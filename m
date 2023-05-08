@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2000E6FB9D7
+	by mail.lfdr.de (Postfix) with ESMTP id C25846FB9D9
 	for <lists+kvm@lfdr.de>; Mon,  8 May 2023 23:35:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233877AbjEHVfD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 May 2023 17:35:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45186 "EHLO
+        id S233974AbjEHVfH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 May 2023 17:35:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbjEHVe5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 May 2023 17:34:57 -0400
+        with ESMTP id S233238AbjEHVe7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 May 2023 17:34:59 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44209DE;
-        Mon,  8 May 2023 14:34:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAF3C129;
+        Mon,  8 May 2023 14:34:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=y/NZkFjA2o+5kqY9Uzuitbn0zBukaZRP/fG6yHo/Mzw=; b=DR37JdMJecYKE8vH9MPmtZRs5A
-        XWITmzNs1sn56eCXZ1sFUJPLFtuVOFvWlWkl3ZFUyDy0UY2QbuQQStdtz6WpGq0WKb/CpD83ravJF
-        cAhzD4bfbpVZkKvODjERzxd8VjoOdK6VLJdKZb4Gq7oPEknGH875+hTYt4dBj/EmOp5mJ+6UQMdLJ
-        HlSO+eI8jz7OO0U5xrrXvNYj4hxiqSA+4cYFFydfnPMPPtjkdnmHNghYo8gfCor4l3FWRl9d9WwS3
-        BlPVYt3Z7qeJ2amRuFeQdKimGkygzER0E2GaTGbJjmTXqLL5SD0Q59vFCBFYZ1QrdQTlLpLfLyUS2
-        XmDPsofA==;
+        bh=bEROWOrEuHGtVGNiYWuINxVA4qSy8ulUpF6Cr1VtAOk=; b=Rw8MxGzMcck/SmtNHPxJBTkUJ2
+        glIi2eVEv3SEs7dwl7ZznmvfLWL/+hcH6+HqoI/0OpRAKtLEwozOzJIP1ucdO77zKFOBYmn2HAeik
+        Q9dVu9HEGaXeNwVh9YkItAwMOYPP5acMOrWwhH140v6BsV7TML3Gh6CG7Esu0OG6hyOvl9rB+1wb5
+        nA2pozVz0eUelrQmFssZEfx0yQZGfDWONRB5yt5jJnnXeSQ68+9CxDgZTz/0A9VMRaQiqImxK6CE9
+        BWcxxygJsv3c8ji0Cuzqxdn6Fvj3pVdTCleFQKnOhQuG3y4YayiE6ujN/Xz0m7h3YRbQcyTHwR5gI
+        ptGi/ITg==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pw8UY-00EW3i-Pu; Mon, 08 May 2023 21:33:58 +0000
+        id 1pw8UZ-00EW3p-Dg; Mon, 08 May 2023 21:33:59 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 66F03302188;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 93D41306137;
         Mon,  8 May 2023 23:33:48 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 320C42482941C; Mon,  8 May 2023 23:33:48 +0200 (CEST)
-Message-ID: <20230508213147.515668092@infradead.org>
+        id 356B62482941D; Mon,  8 May 2023 23:33:48 +0200 (CEST)
+Message-ID: <20230508213147.583344579@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 08 May 2023 23:19:53 +0200
+Date:   Mon, 08 May 2023 23:19:54 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     bigeasy@linutronix.de
 Cc:     mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
@@ -60,7 +60,7 @@ Cc:     mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
         loongarch@lists.linux.dev, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
         linux-pm@vger.kernel.org
-Subject: [RFC][PATCH 2/9] time/sched_clock: Provide sched_clock_noinstr()
+Subject: [RFC][PATCH 3/9] arm64/io: Always inline all of __raw_{read,write}[bwlq]()
 References: <20230508211951.901961964@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -74,75 +74,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With the intent to provide local_clock_noinstr(), a variant of
-local_clock() that's safe to be called from noinstr code (with the
-assumption that any such code will already be non-preemptible),
-prepare for things by providing a noinstr sched_clock_noinstr() function.
+The next patch will want to use __raw_readl() from a noinstr section
+and as such that needs to be marked __always_inline to avoid the
+compiler being a silly bugger.
 
-Specifically, preempt_enable_*() calls out to schedule(), which upsets
-noinstr validation efforts.
-
-As such, pull out the preempt_{dis,en}able_notrace() requirements from
-the sched_clock_read() implementations by explicitly providing it in
-the sched_clock() function.
-
-This further requires said sched_clock_read() functions to be noinstr
-themselves, for ARCH_WANTS_NO_INSTR users. See the next few patches.
+Turns out it already is, but its siblings are not.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- kernel/time/sched_clock.c |   22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/io.h |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
---- a/kernel/time/sched_clock.c
-+++ b/kernel/time/sched_clock.c
-@@ -64,7 +64,7 @@ static struct clock_data cd ____cachelin
- 	.actual_read_sched_clock = jiffy_sched_clock_read,
- };
- 
--static inline u64 notrace cyc_to_ns(u64 cyc, u32 mult, u32 shift)
-+static __always_inline u64 cyc_to_ns(u64 cyc, u32 mult, u32 shift)
+--- a/arch/arm64/include/asm/io.h
++++ b/arch/arm64/include/asm/io.h
+@@ -22,13 +22,13 @@
+  * Generic IO read/write.  These perform native-endian accesses.
+  */
+ #define __raw_writeb __raw_writeb
+-static inline void __raw_writeb(u8 val, volatile void __iomem *addr)
++static __always_inline void __raw_writeb(u8 val, volatile void __iomem *addr)
  {
- 	return (cyc * mult) >> shift;
- }
-@@ -80,23 +80,33 @@ notrace int sched_clock_read_retry(unsig
- 	return raw_read_seqcount_latch_retry(&cd.seq, seq);
+ 	asm volatile("strb %w0, [%1]" : : "rZ" (val), "r" (addr));
  }
  
--unsigned long long notrace sched_clock(void)
-+unsigned long long noinstr sched_clock_noinstr(void)
+ #define __raw_writew __raw_writew
+-static inline void __raw_writew(u16 val, volatile void __iomem *addr)
++static __always_inline void __raw_writew(u16 val, volatile void __iomem *addr)
  {
--	u64 cyc, res;
--	unsigned int seq;
- 	struct clock_read_data *rd;
-+	unsigned int seq;
-+	u64 cyc, res;
- 
- 	do {
--		rd = sched_clock_read_begin(&seq);
-+		seq = raw_read_seqcount_latch(&cd.seq);
-+		rd = cd.read_data + (seq & 1);
- 
- 		cyc = (rd->read_sched_clock() - rd->epoch_cyc) &
- 		      rd->sched_clock_mask;
- 		res = rd->epoch_ns + cyc_to_ns(cyc, rd->mult, rd->shift);
--	} while (sched_clock_read_retry(seq));
-+	} while (raw_read_seqcount_latch_retry(&cd.seq, seq));
- 
- 	return res;
+ 	asm volatile("strh %w0, [%1]" : : "rZ" (val), "r" (addr));
+ }
+@@ -40,13 +40,13 @@ static __always_inline void __raw_writel
  }
  
-+unsigned long long notrace sched_clock(void)
-+{
-+	unsigned long long ns;
-+	preempt_disable_notrace();
-+	ns = sched_clock_noinstr();
-+	preempt_enable_notrace();
-+	return ns;
-+}
-+
- /*
-  * Updating the data required to read the clock.
-  *
+ #define __raw_writeq __raw_writeq
+-static inline void __raw_writeq(u64 val, volatile void __iomem *addr)
++static __always_inline void __raw_writeq(u64 val, volatile void __iomem *addr)
+ {
+ 	asm volatile("str %x0, [%1]" : : "rZ" (val), "r" (addr));
+ }
+ 
+ #define __raw_readb __raw_readb
+-static inline u8 __raw_readb(const volatile void __iomem *addr)
++static __always_inline u8 __raw_readb(const volatile void __iomem *addr)
+ {
+ 	u8 val;
+ 	asm volatile(ALTERNATIVE("ldrb %w0, [%1]",
+@@ -57,7 +57,7 @@ static inline u8 __raw_readb(const volat
+ }
+ 
+ #define __raw_readw __raw_readw
+-static inline u16 __raw_readw(const volatile void __iomem *addr)
++static __always_inline u16 __raw_readw(const volatile void __iomem *addr)
+ {
+ 	u16 val;
+ 
+@@ -80,7 +80,7 @@ static __always_inline u32 __raw_readl(c
+ }
+ 
+ #define __raw_readq __raw_readq
+-static inline u64 __raw_readq(const volatile void __iomem *addr)
++static __always_inline u64 __raw_readq(const volatile void __iomem *addr)
+ {
+ 	u64 val;
+ 	asm volatile(ALTERNATIVE("ldr %0, [%1]",
 
 
