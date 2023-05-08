@@ -2,43 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B4526FB9FB
-	for <lists+kvm@lfdr.de>; Mon,  8 May 2023 23:37:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7638F6FB9E8
+	for <lists+kvm@lfdr.de>; Mon,  8 May 2023 23:36:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234406AbjEHVg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 May 2023 17:36:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47530 "EHLO
+        id S233944AbjEHVfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 May 2023 17:35:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234197AbjEHVgj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 May 2023 17:36:39 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54CC893DD;
-        Mon,  8 May 2023 14:36:09 -0700 (PDT)
+        with ESMTP id S233787AbjEHVfv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 May 2023 17:35:51 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8A2F8A71;
+        Mon,  8 May 2023 14:35:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=33CfYuIrVYZl2aHKgRGfmqvRmjmw9yx5a1cynu5QEgI=; b=U9/HqRh7NJpCcAxxxSP9FV7Eie
-        MEdu0Gh7Nzrq0ve2MN/sx6wfa0QOt4/gbjQrkl78uzjuzEIZsWWix+2VhgAgc1XjOprqwXwMF01cF
-        bLy0VwWAuIYQH6zrX1IwaTGgccbW97pHN72DaYLsAS1P93TRGkzZyg7AICjrNkpnkvVR+karqqZ9z
-        EOU9eRirRrG0WkvMJIp7RSZF/d/ELAc57IFffCvMubgAdeMB3uH+EakU1wrGrNQX4lQKtAPJhAKl1
-        8G3WeOtMnc7DecO1M2xS9WheTs8e4srdZTcoiTuoXxr1WrBE8VJ8Os1qKOwN6/vHmgPXq28TUTDZ0
-        zfjhfmvQ==;
+        bh=Er0HJF5+HBoF3muAv/w3BVVkES/scqceLlbLLVy6xkA=; b=AHrbBohxk9L7amjAySd/QLMFLx
+        yN6fwaHqY0dSmAu2KjyhrpDAmMtsXE6E9JnwKZQax/WoFSCs39hsHw6U0DKLpxl6GmqYXZxMKqtEl
+        4vW4iyFqQHzFw2NS21TBa4VRbWTk/dzekZerer8CmS483RFpKYuOP+2SfYY0JTPJYF70f15XtGmSf
+        OOX1ka8ZG2DYbzd/nZfhPDZriXKwFll1cVMYedMw4WnusF68aV3bGnDP4Y8Ub7+iA+Kl5kd50OrmO
+        lmX1CXDbNf/fFyCIIg2K1q+I8RU2Ss+U/Z/V65UrFQNep8sbZ5IiWX5ZHqeK6LOcYJ0HDTyRjVUuz
+        FYyDIqrw==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pw8UY-005J1B-0f;
-        Mon, 08 May 2023 21:34:15 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pw8UY-00EW3j-QC; Mon, 08 May 2023 21:33:58 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B9CCD306144;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id C29BD306148;
         Mon,  8 May 2023 23:33:48 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 48C572482942B; Mon,  8 May 2023 23:33:48 +0200 (CEST)
-Message-ID: <20230508213147.853677542@infradead.org>
+        id 4B64F2482942A; Mon,  8 May 2023 23:33:48 +0200 (CEST)
+Message-ID: <20230508213147.922038236@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 08 May 2023 23:19:58 +0200
+Date:   Mon, 08 May 2023 23:19:59 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     bigeasy@linutronix.de
 Cc:     mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
@@ -61,7 +60,7 @@ Cc:     mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
         loongarch@lists.linux.dev, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
         linux-pm@vger.kernel.org
-Subject: [RFC][PATCH 7/9] x86/tsc: Provide sched_clock_noinstr()
+Subject: [RFC][PATCH 8/9] sched/clock: Provide local_clock_noinstr()
 References: <20230508211951.901961964@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -75,193 +74,113 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With the intent to provide local_clock_noinstr(), a variant of
-local_clock() that's safe to be called from noinstr code (with the
-assumption that any such code will already be non-preemptible),
-prepare for things by providing a noinstr sched_clock_noinstr()
-function.
+Now that all ARCH_WANTS_NO_INSTR architectures (arm64, loongarch,
+s390, x86) provide sched_clock_noinstr(), use this to provide
+local_clock_noinstr().
 
-Specifically, preempt_enable_*() calls out to schedule(), which upsets
-noinstr validation efforts.
+This local_clock_noinstr() will be safe to use from noinstr code with
+the assumption that any such noinstr code is non-preemptible (it had
+better be, entry code will have IRQs disabled while __cpuidle must
+have preemption disabled).
 
-  vmlinux.o: warning: objtool: native_sched_clock+0x96: call to preempt_schedule_notrace_thunk() leaves .noinstr.text section
-  vmlinux.o: warning: objtool: kvm_clock_read+0x22: call to preempt_schedule_notrace_thunk() leaves .noinstr.text section
+Specifically, preempt_enable_notrace(), a common part of many a
+sched_clock() implementation calls out to schedule() -- even though,
+per the above, it will never trigger -- which frustrates noinstr
+validation.
+
+  vmlinux.o: warning: objtool: local_clock+0xb5: call to preempt_schedule_notrace_thunk() leaves .noinstr.text section
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- arch/x86/kernel/kvmclock.c         |    4 +--
- arch/x86/kernel/tsc.c              |   38 ++++++++++++++++++++++++++++---------
- arch/x86/xen/time.c                |    3 --
- drivers/clocksource/hyperv_timer.c |    4 +--
- include/clocksource/hyperv_timer.h |    4 +--
- 5 files changed, 36 insertions(+), 17 deletions(-)
+ include/linux/sched/clock.h |   17 ++++++++++++++++-
+ kernel/sched/clock.c        |   19 +++++++++++++------
+ 2 files changed, 29 insertions(+), 7 deletions(-)
 
---- a/arch/x86/kernel/kvmclock.c
-+++ b/arch/x86/kernel/kvmclock.c
-@@ -71,7 +71,7 @@ static int kvm_set_wallclock(const struc
- 	return -ENODEV;
- }
- 
--static noinstr u64 kvm_clock_read(void)
-+static u64 kvm_clock_read(void)
- {
- 	u64 ret;
- 
-@@ -88,7 +88,7 @@ static u64 kvm_clock_get_cycles(struct c
- 
- static noinstr u64 kvm_sched_clock_read(void)
- {
--	return kvm_clock_read() - kvm_sched_clock_offset;
-+	return pvclock_clocksource_read_nowd(this_cpu_pvti()) - kvm_sched_clock_offset;
- }
- 
- static inline void kvm_sched_clock_init(bool stable)
---- a/arch/x86/kernel/tsc.c
-+++ b/arch/x86/kernel/tsc.c
-@@ -69,12 +69,10 @@ static int __init tsc_early_khz_setup(ch
- }
- early_param("tsc_early_khz", tsc_early_khz_setup);
- 
--__always_inline void cyc2ns_read_begin(struct cyc2ns_data *data)
-+__always_inline void __cyc2ns_read(struct cyc2ns_data *data)
- {
- 	int seq, idx;
- 
--	preempt_disable_notrace();
--
- 	do {
- 		seq = this_cpu_read(cyc2ns.seq.seqcount.sequence);
- 		idx = seq & 1;
-@@ -86,6 +84,12 @@ __always_inline void cyc2ns_read_begin(s
- 	} while (unlikely(seq != this_cpu_read(cyc2ns.seq.seqcount.sequence)));
- }
- 
-+__always_inline void cyc2ns_read_begin(struct cyc2ns_data *data)
+--- a/include/linux/sched/clock.h
++++ b/include/linux/sched/clock.h
+@@ -12,7 +12,16 @@
+  *
+  * Please use one of the three interfaces below.
+  */
+-extern unsigned long long notrace sched_clock(void);
++extern u64 sched_clock(void);
++
++#if defined(CONFIG_ARCH_WANTS_NO_INSTR) || defined(CONFIG_GENERIC_SCHED_CLOCK)
++extern u64 sched_clock_noinstr(void);
++#else
++__always_inline u64 sched_clock_noinstr(void)
 +{
-+	preempt_disable_notrace();
-+	__cyc2ns_read(data);
++	return sched_clock();
++}
++#endif
+ 
+ /*
+  * See the comment in kernel/sched/clock.c
+@@ -45,6 +54,11 @@ static inline u64 cpu_clock(int cpu)
+ 	return sched_clock();
+ }
+ 
++static __always_inline u64 local_clock_noinstr(void)
++{
++	return sched_clock_noinstr();
 +}
 +
- __always_inline void cyc2ns_read_end(void)
+ static __always_inline u64 local_clock(void)
  {
- 	preempt_enable_notrace();
-@@ -115,18 +119,25 @@ __always_inline void cyc2ns_read_end(voi
-  *                      -johnstul@us.ibm.com "math is hard, lets go shopping!"
-  */
- 
--static __always_inline unsigned long long cycles_2_ns(unsigned long long cyc)
-+static __always_inline unsigned long long __cycles_2_ns(unsigned long long cyc)
- {
- 	struct cyc2ns_data data;
- 	unsigned long long ns;
- 
--	cyc2ns_read_begin(&data);
-+	__cyc2ns_read(&data);
- 
- 	ns = data.cyc2ns_offset;
- 	ns += mul_u64_u32_shr(cyc, data.cyc2ns_mul, data.cyc2ns_shift);
- 
--	cyc2ns_read_end();
-+	return ns;
-+}
- 
-+static __always_inline unsigned long long cycles_2_ns(unsigned long long cyc)
-+{
-+	unsigned long long ns;
-+	preempt_disable_notrace();
-+	ns = __cycles_2_ns(cyc);
-+	preempt_enable_notrace();
- 	return ns;
+ 	return sched_clock();
+@@ -79,6 +93,7 @@ static inline u64 cpu_clock(int cpu)
+ 	return sched_clock_cpu(cpu);
  }
  
-@@ -223,7 +234,7 @@ noinstr u64 native_sched_clock(void)
- 		u64 tsc_now = rdtsc();
++extern u64 local_clock_noinstr(void);
+ extern u64 local_clock(void);
  
- 		/* return the value in ns */
--		return cycles_2_ns(tsc_now);
-+		return __cycles_2_ns(tsc_now);
- 	}
- 
- 	/*
-@@ -250,7 +261,7 @@ u64 native_sched_clock_from_tsc(u64 tsc)
- /* We need to define a real function for sched_clock, to override the
-    weak default version */
- #ifdef CONFIG_PARAVIRT
--noinstr u64 sched_clock(void)
-+noinstr u64 sched_clock_noinstr(void)
- {
- 	return paravirt_sched_clock();
- }
-@@ -260,11 +271,20 @@ bool using_native_sched_clock(void)
- 	return static_call_query(pv_sched_clock) == native_sched_clock;
- }
- #else
--u64 sched_clock(void) __attribute__((alias("native_sched_clock")));
-+u64 sched_clock_noinstr(void) __attribute__((alias("native_sched_clock")));
- 
- bool using_native_sched_clock(void) { return true; }
  #endif
+--- a/kernel/sched/clock.c
++++ b/kernel/sched/clock.c
+@@ -266,7 +266,7 @@ static __always_inline u64 sched_clock_l
+ 	s64 delta;
  
-+notrace u64 sched_clock(void)
+ again:
+-	now = sched_clock();
++	now = sched_clock_noinstr();
+ 	delta = now - scd->tick_raw;
+ 	if (unlikely(delta < 0))
+ 		delta = 0;
+@@ -293,22 +293,29 @@ static __always_inline u64 sched_clock_l
+ 	return clock;
+ }
+ 
+-noinstr u64 local_clock(void)
++noinstr u64 local_clock_noinstr(void)
+ {
+ 	u64 clock;
+ 
+ 	if (static_branch_likely(&__sched_clock_stable))
+-		return sched_clock() + __sched_clock_offset;
++		return sched_clock_noinstr() + __sched_clock_offset;
+ 
+ 	if (!static_branch_likely(&sched_clock_running))
+-		return sched_clock();
++		return sched_clock_noinstr();
+ 
+-	preempt_disable_notrace();
+ 	clock = sched_clock_local(this_scd());
+-	preempt_enable_notrace();
+ 
+ 	return clock;
+ }
++
++u64 local_clock(void)
 +{
 +	u64 now;
 +	preempt_disable_notrace();
-+	now = sched_clock_noinstr();
++	now = local_clock_noinstr();
 +	preempt_enable_notrace();
 +	return now;
 +}
-+
- int check_tsc_unstable(void)
- {
- 	return tsc_unstable;
---- a/arch/x86/xen/time.c
-+++ b/arch/x86/xen/time.c
-@@ -66,11 +66,10 @@ static noinstr u64 xen_sched_clock(void)
-         struct pvclock_vcpu_time_info *src;
- 	u64 ret;
+ EXPORT_SYMBOL_GPL(local_clock);
  
--	preempt_disable_notrace();
- 	src = &__this_cpu_read(xen_vcpu)->time;
- 	ret = pvclock_clocksource_read_nowd(src);
- 	ret -= xen_sched_clock_offset;
--	preempt_enable_notrace();
-+
- 	return ret;
- }
- 
---- a/drivers/clocksource/hyperv_timer.c
-+++ b/drivers/clocksource/hyperv_timer.c
-@@ -408,9 +408,9 @@ static u64 notrace read_hv_clock_tsc_cs(
- 	return read_hv_clock_tsc();
- }
- 
--static u64 notrace read_hv_sched_clock_tsc(void)
-+static u64 noinstr read_hv_sched_clock_tsc(void)
- {
--	return (read_hv_clock_tsc() - hv_sched_clock_offset) *
-+	return (hv_read_tsc_page(hv_get_tsc_page()) - hv_sched_clock_offset) *
- 		(NSEC_PER_SEC / HV_CLOCK_HZ);
- }
- 
---- a/include/clocksource/hyperv_timer.h
-+++ b/include/clocksource/hyperv_timer.h
-@@ -38,7 +38,7 @@ extern void hv_remap_tsc_clocksource(voi
- extern unsigned long hv_get_tsc_pfn(void);
- extern struct ms_hyperv_tsc_page *hv_get_tsc_page(void);
- 
--static inline notrace u64
-+static __always_inline notrace u64
- hv_read_tsc_page_tsc(const struct ms_hyperv_tsc_page *tsc_pg, u64 *cur_tsc)
- {
- 	u64 scale, offset;
-@@ -85,7 +85,7 @@ hv_read_tsc_page_tsc(const struct ms_hyp
- 	return mul_u64_u64_shr(*cur_tsc, scale, 64) + offset;
- }
- 
--static inline notrace u64
-+static __always_inline notrace u64
- hv_read_tsc_page(const struct ms_hyperv_tsc_page *tsc_pg)
- {
- 	u64 cur_tsc;
+ static notrace u64 sched_clock_remote(struct sched_clock_data *scd)
 
 
