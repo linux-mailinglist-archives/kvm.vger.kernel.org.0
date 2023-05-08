@@ -2,127 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 585746FA359
-	for <lists+kvm@lfdr.de>; Mon,  8 May 2023 11:31:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DFCD6FA6E8
+	for <lists+kvm@lfdr.de>; Mon,  8 May 2023 12:25:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233059AbjEHJbV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 May 2023 05:31:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33398 "EHLO
+        id S233895AbjEHKZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 May 2023 06:25:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232904AbjEHJbM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 May 2023 05:31:12 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A68B23483
-        for <kvm@vger.kernel.org>; Mon,  8 May 2023 02:31:02 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-50be0d835aaso7848840a12.3
-        for <kvm@vger.kernel.org>; Mon, 08 May 2023 02:31:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1683538261; x=1686130261;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xJsMaaib4S4YQf7cwjjwDzkruMi933rtsEbLahJA8Q0=;
-        b=Zyo8t9FlL6nkopag+GXloHgl6s/8uIuNvr9YwkNVQB84in1g1ILOGM8eK3ltOxSVfr
-         5/jQKuBq0MWGJdVkt1LWFeKmvuKbvR8WdaTDITHtUFrr1zyCvuZNyakYHZSEOvCPWf+Y
-         DbpNbvGU+4Y9LCkS0KyEYzUw+i9CJX7VwiIQPmIMr4dAFaK/24I7ooMIizZxu+3O+nz9
-         FpLUK6ZW8nxoXALR9MmEPggp8RMK5U9JCo1NqlU4rpzhNoL588kHApi1z4Xi82bZQx7h
-         CkKP//RWXbteZxXhshxDACZl/CQlefLKaiHktrcf+zPxjSahSLB2uvsP6rCPXnE+9ggr
-         gUOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683538261; x=1686130261;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xJsMaaib4S4YQf7cwjjwDzkruMi933rtsEbLahJA8Q0=;
-        b=fPcyglDh8IJoOERv32NNAJUMxCf6wcboMaBx/aZI4JSP8nbUBicigGs/7ZBZ3O3tYm
-         j60PjSM0RqbnJNEc1ROMcmRuyFW5jir5rnL0ixzASlDGfFAcMSjG2nuaB0sKywWGi+tK
-         M7Z/3oEGisOdXlgrnk/E7jbcgDk8cDfoSVm52RdpqNTQAs+XQjRK3BO9tmDBkvdv4Jsl
-         rahBWbSRSNv2NWzVFCUO4Zyd43o5/iQDi3rYNwEjGXdEtwRb5mpdC1CVZQ5zLwqGIwCh
-         M2GCaWrw3TO15Ao/hvHRXl74f4pO5k6n8BsnW3sZgHOQcB8dBVVFAARviEJwjK9KL4Xd
-         e4WQ==
-X-Gm-Message-State: AC+VfDwGS7BIkix9X9Nux8l3wXMtiom+RA2G3DIDUAZqGmpbjwruOqkB
-        UiHNEPYuTcRx6sJsahpVqprPWkZiO+NveD8zKmc=
-X-Google-Smtp-Source: ACHHUZ6Et9kLsJpvwHPUWJ8xZuJ70HBhils+Fb+XcTIIrLHLMhBdVy7dPsX4MEHdNLMphOJLQEPMfQ==
-X-Received: by 2002:a17:907:3e13:b0:948:b9ea:3302 with SMTP id hp19-20020a1709073e1300b00948b9ea3302mr11144575ejc.1.1683538260844;
-        Mon, 08 May 2023 02:31:00 -0700 (PDT)
-Received: from ?IPV6:2003:f6:af27:500:653d:9c74:8bdf:2820? (p200300f6af270500653d9c748bdf2820.dip0.t-ipconnect.de. [2003:f6:af27:500:653d:9c74:8bdf:2820])
-        by smtp.gmail.com with ESMTPSA id n26-20020a17090673da00b0094eeea5c649sm4842304ejl.114.2023.05.08.02.30.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 May 2023 02:31:00 -0700 (PDT)
-Message-ID: <b0d4b430-afd2-979c-e7d2-b53e131412ad@grsecurity.net>
-Date:   Mon, 8 May 2023 11:30:59 +0200
+        with ESMTP id S234568AbjEHKZH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 May 2023 06:25:07 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D202E6B4;
+        Mon,  8 May 2023 03:24:34 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 348ACkr8012339;
+        Mon, 8 May 2023 10:24:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=aBVBk50Fpf9vVbRQUMonGU5PbfH12aLpkiTizF7yfkI=;
+ b=n5F5i0B+c/k1ucgnLWz1EWHMR2olobsW9osNXsAQtnCbip79Ohx/FBuq59XZQBJ3T9rw
+ 3M/DVZkAx7BiFY8V1O5q3O36JL4zg5hV1fIehDrxkQRG6yPtXZAaoHPTMp1ebv27EvAO
+ vVeGrk1XyltTePKuxpuY16kMVsT/ZxxKBWN+1XVRIokfI5pdPq4YJCQhhI/F7N9NhfIy
+ EiH7ENDLUxzu52HKhjo+THDVOB9NlAOS8eQTScQ4cav/cb96jSsDBMlu0RwFt5TxYBdJ
+ gp7ylExMB8z511C1E5wacE8yYrTmElSVsf+HDw153847JsT6ORGhTtBOeBQabJ2oN0oW Uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qexeshurv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 May 2023 10:24:33 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 348ALwGm011558;
+        Mon, 8 May 2023 10:24:32 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qexeshur7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 May 2023 10:24:32 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3484lfDb024440;
+        Mon, 8 May 2023 10:24:30 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3qdeh6h1ty-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 May 2023 10:24:30 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 348AOQAI62193948
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 8 May 2023 10:24:26 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AB0022004E;
+        Mon,  8 May 2023 10:24:26 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6E1242004D;
+        Mon,  8 May 2023 10:24:26 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon,  8 May 2023 10:24:26 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v1] lib: s390x: mmu: fix conflicting types for get_dat_entry
+Date:   Mon,  8 May 2023 12:24:26 +0200
+Message-Id: <20230508102426.130768-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v4 2/6] KVM: x86: Do not unload MMU roots when only
- toggling CR0.WP with TDP enabled
-Content-Language: en-US, de-DE
-To:     Robert Hoo <robert.hoo.linux@gmail.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230322013731.102955-1-minipli@grsecurity.net>
- <20230322013731.102955-3-minipli@grsecurity.net>
- <e70af22a-f09f-aadb-8353-35b29d2def61@gmail.com>
-From:   Mathias Krause <minipli@grsecurity.net>
-In-Reply-To: <e70af22a-f09f-aadb-8353-35b29d2def61@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: PMmg4EPSSwXW6uBsjtxTiw6t95oEUKmX
+X-Proofpoint-GUID: NzmGGZKpWeLUMxrqvoa4Z-rYlHzs93Us
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-08_05,2023-05-05_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ malwarescore=0 spamscore=0 mlxlogscore=793 clxscore=1015
+ priorityscore=1501 bulkscore=0 impostorscore=0 phishscore=0
+ lowpriorityscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2303200000 definitions=main-2305080068
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07.05.23 09:32, Robert Hoo wrote:
-> On 3/22/2023 9:37 AM, Mathias Krause wrote:
->> There is no need to unload the MMU roots with TDP enabled when only
->> CR0.WP has changed -- the paging structures are still valid, only the
->> permission bitmap needs to be updated.
->>
->> One heavy user of toggling CR0.WP is grsecurity's KERNEXEC feature to
->> implement kernel W^X.
->>
->> The optimization brings a huge performance gain for this case as the
->> following micro-benchmark running 'ssdd 10 50000' from rt-tests[1] on a
->> grsecurity L1 VM shows (runtime in seconds, lower is better):
->>
->>                         legacy     TDP    shadow
->> kvm-x86/next@d8708b     8.43s    9.45s    70.3s
->>               +patch     5.39s    5.63s    70.2s
->>
->> For legacy MMU this is ~36% faster, for TTP MMU even ~40% faster. 
-> 
-> TTP --> TDP
+This causes compilation to fail with GCC 13:
 
-Thanks, Sean fixed it up in the final commit:
-https://git.kernel.org/linus/01b31714bd90
+gcc -std=gnu99 -ffreestanding -I/kut/lib -I/kut/lib/s390x -Ilib -O2 -march=zEC12 -mbackchain -fno-delete-null-pointer-checks -g -MMD -MF lib/s390x/.mmu.d -fno-strict-aliasing -fno-common -Wall -Wwrite-strings -Wempty-body -Wuninitialized -Wignored-qualifiers -Wno-missing-braces -Werror  -fomit-frame-pointer  -fno-stack-protector    -Wno-frame-address   -fno-pic  -no-pie  -Wclobbered  -Wunused-but-set-parameter  -Wmissing-parameter-type  -Wold-style-declaration -Woverride-init -Wmissing-prototypes -Wstrict-prototypes -I/kut/lib -I/kut/lib/s390x -Ilib  -c -o lib/s390x/mmu.o lib/s390x/mmu.c
+lib/s390x/mmu.c:132:7: error: conflicting types for ‘get_dat_entry’ due to enum/integer mismatch; have ‘void *(pgd_t *, void *, enum pgt_level)’ [-Werror=enum-int-mismatch]
+  132 | void *get_dat_entry(pgd_t *pgtable, void *vaddr, enum pgt_level level)
+      |       ^~~~~~~~~~~~~
+In file included from lib/s390x/mmu.c:16:
+lib/s390x/mmu.h:96:7: note: previous declaration of ‘get_dat_entry’ with type ‘void *(pgd_t *, void *, unsigned int)’
+   96 | void *get_dat_entry(pgd_t *pgtable, void *vaddr, unsigned int level);
+      |       ^~~~~~~~~~~~~
 
-> 
->>   void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0,
->> unsigned long cr0)
->>   {
->> +    /*
->> +     * CR0.WP is incorporated into the MMU role, but only for
->> non-nested,
->> +     * indirect shadow MMUs.  If TDP is enabled, the MMU's metadata
->> needs
->> +     * to be updated, e.g. so that emulating guest translations does the
->> +     * right thing, but there's no need to unload the root as CR0.WP
->> +     * doesn't affect SPTEs.
->> +     */
->> +    if (tdp_enabled && (cr0 ^ old_cr0) == X86_CR0_WP) {
-> 
-> Curiously, this patch only affects tdp_enabled, why does legacy MMU also
-> see comparable performance gains?
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+---
+ lib/s390x/mmu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Because 'tdp_enabled' just implies EPT / NPT and only 'tdp_mmu_enabled'
-decides which MMU mode to use -- either legacy or TDP MMU (see
-kvm_configure_mmu() and now gets invoked from vmx.c / svm.c).
+diff --git a/lib/s390x/mmu.h b/lib/s390x/mmu.h
+index 15f88e4f424e..dadc2e600f9a 100644
+--- a/lib/s390x/mmu.h
++++ b/lib/s390x/mmu.h
+@@ -93,6 +93,6 @@ static inline void unprotect_page(void *vaddr, unsigned long prot)
+ 	unprotect_dat_entry(vaddr, prot, pgtable_level_pte);
+ }
+ 
+-void *get_dat_entry(pgd_t *pgtable, void *vaddr, unsigned int level);
++void *get_dat_entry(pgd_t *pgtable, void *vaddr, enum pgt_level level);
+ 
+ #endif /* _ASMS390X_MMU_H_ */
+-- 
+2.39.1
 
-Thanks,
-Mathias
