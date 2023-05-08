@@ -2,143 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7107E6FB854
-	for <lists+kvm@lfdr.de>; Mon,  8 May 2023 22:30:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56F0E6FB911
+	for <lists+kvm@lfdr.de>; Mon,  8 May 2023 22:58:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233277AbjEHUay (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 May 2023 16:30:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35636 "EHLO
+        id S233835AbjEHU6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 May 2023 16:58:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229690AbjEHUau (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 May 2023 16:30:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BFD149C3
-        for <kvm@vger.kernel.org>; Mon,  8 May 2023 13:30:07 -0700 (PDT)
+        with ESMTP id S233766AbjEHU6J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 May 2023 16:58:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73C35198D
+        for <kvm@vger.kernel.org>; Mon,  8 May 2023 13:57:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683577806;
+        s=mimecast20190719; t=1683579439;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DVSAqbGo/SYymxziE0Ynvj5CJeQ8fOYfiV63Ae36Jlg=;
-        b=Vp3OXkB0Zp14ZyzkOhjvxXhvAnNAnwJHh9Z/srtpZJ7qRBP9eRIjqt4iaJjFNzmeUrYigK
-        /F34YRrA1faGni9j4pCRsCO6AtOSY5rYcHd4yQX0GwT3puC7+v/UA7SeHHR2Y+OITB6ZjT
-        YcJbrGXqdqtyqsGiGVe3auH4c9dbip8=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=PF08ivr9oSEP89wN8+cQKlEYL8DT1MNWzBoIvN2S2Vw=;
+        b=MtXhua5EBUoB+9Z4yOWMtXCymf5TFSafkvbY2KSsEJaCB2+LBVeZc8EJHo3Qm96J2N2gwX
+        R3iRZ97hdZoYWFwMBfI6c7vzQXINlW4IJxYxkNqpZDLO9VMQ4iATEVlCLraktNTllo9cx4
+        PuO7E9K/jaxXeVHrhGSMrIcksfQilfk=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-68-sYQoVXOaNIOFTiQQAKjZeA-1; Mon, 08 May 2023 16:29:59 -0400
-X-MC-Unique: sYQoVXOaNIOFTiQQAKjZeA-1
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3358657b57aso3696825ab.3
-        for <kvm@vger.kernel.org>; Mon, 08 May 2023 13:29:59 -0700 (PDT)
+ us-mta-61-x2p9gZYdN3ulpRj6KBV79g-1; Mon, 08 May 2023 16:57:18 -0400
+X-MC-Unique: x2p9gZYdN3ulpRj6KBV79g-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-763997ab8cdso745920039f.2
+        for <kvm@vger.kernel.org>; Mon, 08 May 2023 13:57:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683577798; x=1686169798;
+        d=1e100.net; s=20221208; t=1683579437; x=1686171437;
         h=content-transfer-encoding:mime-version:organization:references
          :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=DVSAqbGo/SYymxziE0Ynvj5CJeQ8fOYfiV63Ae36Jlg=;
-        b=FOT146dhvjRWuK8hjNZVSqvREN+kpiNeXJ0VvLyI21I4n1ojfxwawGDdP/5TrhLNhX
-         AZAUU6UHZkPKhbzn4X6KdmWQUrdaJWGbw6DpEOKnIM4nurLya06E6znSiIj7rQGSoCCJ
-         2dF7jmhg8uEqo9/22AKu4LQSLyKCrqFxdRHBlMoUJD2dM6r0jTu5uN6uHCn88dMhGFZ7
-         /09f9NmdEama7pawrHKTE/5r/MVWz2SWSBX2WaygIowZOzwcmG/aj9j64F6Qr0XQQuiL
-         pSAGTpqCF+/lfyJZNoOLv+bU7E3VDnq1PTPOWPS3ZzAoT0WWTGIw0VZ0Q7oKao82t9UZ
-         hV8w==
-X-Gm-Message-State: AC+VfDzdWe0KnGyObhYwkPl66ZlJ1r8Ua4OV3kXp8NvBgGu8VyEmiOsO
-        LoRc7MZ6CVmcPtJWtB5ovKas9L8Qt17OFnHd9p7iNsf4BuP3QRNPtQ/sSk9gvu/dEE/Md8sB4df
-        h5VitcOy72xX+
-X-Received: by 2002:a92:d403:0:b0:326:3a39:89d0 with SMTP id q3-20020a92d403000000b003263a3989d0mr8107223ilm.1.1683577798626;
-        Mon, 08 May 2023 13:29:58 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7DrZnriZETaQ/90S6mqc6FkPi+6no4KK3rwJGM0g691+Xcp+XCrkWFWkbvezVgZkHdFJFtOw==
-X-Received: by 2002:a92:d403:0:b0:326:3a39:89d0 with SMTP id q3-20020a92d403000000b003263a3989d0mr8107209ilm.1.1683577798310;
-        Mon, 08 May 2023 13:29:58 -0700 (PDT)
+        bh=PF08ivr9oSEP89wN8+cQKlEYL8DT1MNWzBoIvN2S2Vw=;
+        b=PT5qBIPnQX0TvOQsHlSRZsQDPEne+MD4srqFMfGYPeDTksRI0XEQiDpL0AQGV8S2tv
+         xJvE8j0u7ctOQZacfvqWXJqXDHBECd+suL9Vpy5xfmb+P5QxyQnbncMbo4BymmiVYL5N
+         tKU4I/ndK7krX1tbWy7CCBXDdKFxC/Z5iw+TKdjIvJJCB8KRg7qC9b64Pv8J8+U8bTt8
+         QPVLSs2vTEcLJttozyz8xhGQqR8HqxMluCXKTFt0qiy6TSTZMkbxZo6mtaEHdPrYZaKh
+         fPnvJsVeoqJUFvdqFiNZghNi68ZbgUS8SSHcrMpFnd4kEq6Bh02CJGJYgMcjfp9Bq6ct
+         EUJg==
+X-Gm-Message-State: AC+VfDx388HIYTW/bQXuI0LgXDWxX0DthXv0TZ9h/swTxOaL9wrslach
+        Vo8gB6A4+PnE/ZGnbh6nYn5w1pchTDW9+gQGpgwuiLrnhfpsW5VD026sdr5+Wn3T95TTUzyUWX2
+        conRjdErE6Y/1H7qDAytA
+X-Received: by 2002:a5e:8d13:0:b0:760:d6d2:fa61 with SMTP id m19-20020a5e8d13000000b00760d6d2fa61mr8286934ioj.7.1683579437207;
+        Mon, 08 May 2023 13:57:17 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7YrMvnzexkIVya3O7RAWT/SHW6i9D8O1Nxy6GIXjeV8l8JY5b9qa8AlPCuaTDeX/E2NibREw==
+X-Received: by 2002:a5e:8d13:0:b0:760:d6d2:fa61 with SMTP id m19-20020a5e8d13000000b00760d6d2fa61mr8286926ioj.7.1683579436982;
+        Mon, 08 May 2023 13:57:16 -0700 (PDT)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id l2-20020a056e0205c200b00334faa50484sm1915883ils.54.2023.05.08.13.29.56
+        by smtp.gmail.com with ESMTPSA id cc6-20020a056602424600b0076c3189a8d9sm1890274iob.38.2023.05.08.13.57.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 May 2023 13:29:57 -0700 (PDT)
-Date:   Mon, 8 May 2023 14:29:55 -0600
+        Mon, 08 May 2023 13:57:16 -0700 (PDT)
+Date:   Mon, 8 May 2023 14:57:15 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v4 8/9] vfio/pci: Extend
- VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for vfio device cdev
-Message-ID: <20230508142955.44566026.alex.williamson@redhat.com>
-In-Reply-To: <DS0PR11MB75295210DA7C4C2896D1FB6DC3719@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230426145419.450922-1-yi.l.liu@intel.com>
-        <20230426145419.450922-9-yi.l.liu@intel.com>
-        <20230427140405.2afe27d4.alex.williamson@redhat.com>
-        <20230427141533.7d8861ed.alex.williamson@redhat.com>
-        <DS0PR11MB75295210DA7C4C2896D1FB6DC3719@DS0PR11MB7529.namprd11.prod.outlook.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kevin.tian@intel.com,
+        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+        =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@redhat.com>
+Subject: Re: [PATCH] vfio/pci: take mmap write lock for io_remap_pfn_range
+Message-ID: <20230508145715.630fe3ae.alex.williamson@redhat.com>
+In-Reply-To: <ZFkn3q45RUJXMS+P@nvidia.com>
+References: <20230508125842.28193-1-yan.y.zhao@intel.com>
+        <ZFkn3q45RUJXMS+P@nvidia.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 8 May 2023 15:32:44 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+On Mon, 8 May 2023 13:48:30 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Friday, April 28, 2023 4:16 AM
-> >  
-> > > > + *
-> > > >   * Return: 0 on success, -errno on failure:
-> > > >   *	-enospc = insufficient buffer, -enodev = unsupported for device.
-> > > >   */
-> > > >  struct vfio_pci_dependent_device {
-> > > > -	__u32	group_id;
-> > > > +	union {
-> > > > +		__u32   group_id;
-> > > > +		__u32	dev_id;
-> > > > +#define VFIO_PCI_DEVID_NONBLOCKING	0
-> > > > +#define VFIO_PCI_DEVID_BLOCKING	-1  
-> > >
-> > > The above description seems like it's leaning towards OWNED rather than
-> > > BLOCKING.  
+> On Mon, May 08, 2023 at 08:58:42PM +0800, Yan Zhao wrote:
+> > In VFIO type1, vaddr_get_pfns() will try fault in MMIO PFNs after
+> > pin_user_pages_remote() returns -EFAULT.
 > > 
-> > Also these should be defined relative to something defined in IOMMUFD
-> > rather than inventing values here.  We can't have the valid devid
-> > number space owned by IOMMUFD conflict with these definitions.  Thanks,  
+> > follow_fault_pfn
+> >  fixup_user_fault
+> >   handle_mm_fault
+> >    handle_mm_fault
+> >     do_fault
+> >      do_shared_fault
+> >       do_fault
+> >        __do_fault
+> >         vfio_pci_mmap_fault
+> >          io_remap_pfn_range
+> >           remap_pfn_range
+> >            track_pfn_remap
+> >             vm_flags_set         ==> mmap_assert_write_locked(vma->vm_mm)
+> >            remap_pfn_range_notrack
+> >             vm_flags_set         ==> mmap_assert_write_locked(vma->vm_mm)
+> > 
+> > As io_remap_pfn_range() will call vm_flags_set() to update vm_flags [1],
+> > holding of mmap write lock is required.
+> > So, update vfio_pci_mmap_fault() to drop mmap read lock and take mmap
+> > write lock.
+> > 
+> > [1] https://lkml.kernel.org/r/20230126193752.297968-3-surenb@google.com
+> > commit bc292ab00f6c ("mm: introduce vma->vm_flags wrapper functions")
+> > commit 1c71222e5f23
+> > ("mm: replace vma->vm_flags direct modifications with modifier calls")
+> > 
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci_core.c | 17 +++++++++++++++++
+> >  1 file changed, 17 insertions(+)
+> > 
+> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> > index a5ab416cf476..5082f89152b3 100644
+> > --- a/drivers/vfio/pci/vfio_pci_core.c
+> > +++ b/drivers/vfio/pci/vfio_pci_core.c
+> > @@ -1687,6 +1687,12 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
+> >  	struct vfio_pci_mmap_vma *mmap_vma;
+> >  	vm_fault_t ret = VM_FAULT_NOPAGE;
+> >  
+> > +	mmap_assert_locked(vma->vm_mm);
+> > +	mmap_read_unlock(vma->vm_mm);
+> > +
+> > +	if (mmap_write_lock_killable(vma->vm_mm))
+> > +		return VM_FAULT_RETRY;  
 > 
-> Jason has proposed to reserve all negative IDs and 0 in iommufd. In that case,
-> can vfio define the numbers now?
+> Certainly not..
+> 
+> I'm not sure how to resolve this properly, set the flags in advance?
+> 
+> The address space conversion?
 
-Ok, as long as it's guaranteed that we're overlapping invalid dev-ids,
-as specified by IOMMUFD, then the mapping of specific invalid dev-ids
-to error values here is interface specific and can be defined here.
-Thanks,
+We already try to set the flags in advance, but there are some
+architectural flags like VM_PAT that make that tricky.  Cedric has been
+looking at inserting individual pages with vmf_insert_pfn(), but that
+incurs a lot more faults and therefore latency vs remapping the entire
+vma on fault.  I'm not convinced that we shouldn't just attempt to
+remove the fault handler entirely, but I haven't tried it yet to know
+what gotchas are down that path.  Thanks,
 
 Alex
 
