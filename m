@@ -2,53 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E3D46FB164
-	for <lists+kvm@lfdr.de>; Mon,  8 May 2023 15:23:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81F796FB1DF
+	for <lists+kvm@lfdr.de>; Mon,  8 May 2023 15:43:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233267AbjEHNXw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 May 2023 09:23:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42886 "EHLO
+        id S233758AbjEHNnb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 May 2023 09:43:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbjEHNXu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 May 2023 09:23:50 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 642E383;
-        Mon,  8 May 2023 06:23:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683552229; x=1715088229;
-  h=from:to:cc:subject:date:message-id;
-  bh=8SCm4wFEaCHIjaaMs+tOcclnzwJ0N0aJVRlTnjeWArY=;
-  b=NxiT+kvP3EHjRZBkF5hpSVX3nOEH2ECltC9x5L/ltmwX9zMnx3uEXJsE
-   cXp9fJvTCLCPm0QSJlcj1VkAyCv6iM4jV6cwmcWDB8120J/uC1Im+E73q
-   hoWwtzAaw+PQxIi7b/es5uG6mOVLh7w1TPe8PPyM3m9lG9agMxa4giuny
-   Y8JIz3unikABksYQ80hBiDwC/gC+wPh7K/WWpXaQFe1H/J/QIzW/ac+jq
-   MpAqKvOAKzzq+XiKN8tMSoiFBqMbO3b6sBUGRsgMrI3XDhlqJ207M3dDf
-   8FZpn+bWwnMbH956OOTctospTcuCmtkKGp7skcsYXWXXRksChEUxDPipf
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10703"; a="349674058"
-X-IronPort-AV: E=Sophos;i="5.99,259,1677571200"; 
-   d="scan'208";a="349674058"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2023 06:23:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10703"; a="648873705"
-X-IronPort-AV: E=Sophos;i="5.99,259,1677571200"; 
-   d="scan'208";a="648873705"
-Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2023 06:23:46 -0700
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     alex.williamson@redhat.com, kevin.tian@intel.com, jgg@nvidia.com,
-        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-        Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH] vfio/pci: take mmap write lock for io_remap_pfn_range
-Date:   Mon,  8 May 2023 20:58:42 +0800
-Message-Id: <20230508125842.28193-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.17.1
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        with ESMTP id S233886AbjEHNna (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 May 2023 09:43:30 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDC0625739
+        for <kvm@vger.kernel.org>; Mon,  8 May 2023 06:43:24 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1pw18s-0001YG-LV; Mon, 08 May 2023 15:43:06 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1pw18n-0020ex-GE; Mon, 08 May 2023 15:43:01 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1pw18m-002RT6-Eg; Mon, 08 May 2023 15:43:00 +0200
+Date:   Mon, 8 May 2023 15:43:00 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Leo Li <leoyang.li@nxp.com>
+Cc:     Stuart Yoder <stuyoder@gmail.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Roy Pledge <roy.pledge@nxp.com>,
+        "Diana Madalina Craciun (OSS)" <diana.craciun@oss.nxp.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Ioana Ciornei <ioana.ciornei@nxp.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        "Y.B. Lu" <yangbo.lu@nxp.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH 0/6] bus: fsl-mc: Make remove function return void
+Message-ID: <20230508134300.s36d6k4e25f6ubg4@pengutronix.de>
+References: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
+ <20230412171056.xcluewbuyytm77yp@pengutronix.de>
+ <AM0PR04MB6289BB9BA4BC0B398F2989108F9B9@AM0PR04MB6289.eurprd04.prod.outlook.com>
+ <20230413060004.t55sqmfxqtnejvkc@pengutronix.de>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="er5lj4tlfdoxmrvp"
+Content-Disposition: inline
+In-Reply-To: <20230413060004.t55sqmfxqtnejvkc@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvm@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -56,77 +79,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In VFIO type1, vaddr_get_pfns() will try fault in MMIO PFNs after
-pin_user_pages_remote() returns -EFAULT.
 
-follow_fault_pfn
- fixup_user_fault
-  handle_mm_fault
-   handle_mm_fault
-    do_fault
-     do_shared_fault
-      do_fault
-       __do_fault
-        vfio_pci_mmap_fault
-         io_remap_pfn_range
-          remap_pfn_range
-           track_pfn_remap
-            vm_flags_set         ==> mmap_assert_write_locked(vma->vm_mm)
-           remap_pfn_range_notrack
-            vm_flags_set         ==> mmap_assert_write_locked(vma->vm_mm)
+--er5lj4tlfdoxmrvp
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-As io_remap_pfn_range() will call vm_flags_set() to update vm_flags [1],
-holding of mmap write lock is required.
-So, update vfio_pci_mmap_fault() to drop mmap read lock and take mmap
-write lock.
+Hello Leo,
 
-[1] https://lkml.kernel.org/r/20230126193752.297968-3-surenb@google.com
-commit bc292ab00f6c ("mm: introduce vma->vm_flags wrapper functions")
-commit 1c71222e5f23
-("mm: replace vma->vm_flags direct modifications with modifier calls")
+On Thu, Apr 13, 2023 at 08:00:04AM +0200, Uwe Kleine-K=F6nig wrote:
+> On Wed, Apr 12, 2023 at 09:30:05PM +0000, Leo Li wrote:
+> > > On Fri, Mar 10, 2023 at 11:41:22PM +0100, Uwe Kleine-K=F6nig wrote:
+> > > > Hello,
+> > > >
+> > > > many bus remove functions return an integer which is a historic
+> > > > misdesign that makes driver authors assume that there is some kind =
+of
+> > > > error handling in the upper layers. This is wrong however and
+> > > > returning and error code only yields an error message.
+> > > >
+> > > > This series improves the fsl-mc bus by changing the remove callback=
+ to
+> > > > return no value instead. As a preparation all drivers are changed to
+> > > > return zero before so that they don't trigger the error message.
+> > >=20
+> > > Who is supposed to pick up this patch series (or point out a good rea=
+son for
+> > > not taking it)?
+> >=20
+> > Previously Greg KH picked up MC bus patches.
+> >=20
+> > If no one is picking up them this time, I probably can take it through
+> > the fsl soc tree.
+>=20
+> I guess Greg won't pick up this series as he didn't get a copy of it :-)
+>=20
+> Browsing through the history of drivers/bus/fsl-mc there is no
+> consistent maintainer to see. So if you can take it, that's very
+> appreciated.
 
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- drivers/vfio/pci/vfio_pci_core.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+My mail was meant encouraging, maybe it was too subtile? I'll try again:
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index a5ab416cf476..5082f89152b3 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -1687,6 +1687,12 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
- 	struct vfio_pci_mmap_vma *mmap_vma;
- 	vm_fault_t ret = VM_FAULT_NOPAGE;
- 
-+	mmap_assert_locked(vma->vm_mm);
-+	mmap_read_unlock(vma->vm_mm);
-+
-+	if (mmap_write_lock_killable(vma->vm_mm))
-+		return VM_FAULT_RETRY;
-+
- 	mutex_lock(&vdev->vma_lock);
- 	down_read(&vdev->memory_lock);
- 
-@@ -1726,6 +1732,17 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
- up_out:
- 	up_read(&vdev->memory_lock);
- 	mutex_unlock(&vdev->vma_lock);
-+	mmap_write_unlock(vma->vm_mm);
-+
-+	/* If PTE is installed successfully, add the completed flag to
-+	 * indicate mmap lock is released,
-+	 * otherwise retake the read lock
-+	 */
-+	if (ret == VM_FAULT_NOPAGE)
-+		ret |= VM_FAULT_COMPLETED;
-+	else
-+		mmap_read_lock(vma->vm_mm);
-+
- 	return ret;
- }
- 
+Yes, please apply, that would be wonderful!
 
-base-commit: 705b004ee377b789e39ae237519bab714297ac83
--- 
-2.17.1
+:-)
 
+Thanks
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--er5lj4tlfdoxmrvp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmRY/GMACgkQj4D7WH0S
+/k4cswf+N9Mgu+WF1jiKgllTl1eIxkYX2sJ67f9koV32iMjq4Cfyr/EeCWolZb/c
+5MfyrMdDe6UXeNzFn/HNTMJ+2Uc+zhRsowOFNHQKu9ysxWqNLnGnr+2Z1B9BSQY+
+mK3hhU0iLOWmLRZqQvK4iOKQmoy/jtBUWRIOfmff7fVrmHke3of31J7iZGaVLbEM
+uKgAqaUqbuhy/yKnWrtsjI032ANLw3SbE0KBgTIOLsWADSgYqHJVsxs7Ek5vLFy0
+yixu653kysPtTS5Jb20ytWk7BzQVMpYFdfq7QogzdL0qYqqrO+oJEGjXP5traHsl
+DX2GOiQ8R6tswdZcisDFe4wQC15hYQ==
+=19CE
+-----END PGP SIGNATURE-----
+
+--er5lj4tlfdoxmrvp--
