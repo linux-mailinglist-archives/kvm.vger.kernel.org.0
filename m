@@ -2,148 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81F796FB1DF
-	for <lists+kvm@lfdr.de>; Mon,  8 May 2023 15:43:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 401EA6FB238
+	for <lists+kvm@lfdr.de>; Mon,  8 May 2023 16:05:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233758AbjEHNnb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 May 2023 09:43:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59730 "EHLO
+        id S234380AbjEHOFw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 May 2023 10:05:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233886AbjEHNna (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 May 2023 09:43:30 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDC0625739
-        for <kvm@vger.kernel.org>; Mon,  8 May 2023 06:43:24 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pw18s-0001YG-LV; Mon, 08 May 2023 15:43:06 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pw18n-0020ex-GE; Mon, 08 May 2023 15:43:01 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pw18m-002RT6-Eg; Mon, 08 May 2023 15:43:00 +0200
-Date:   Mon, 8 May 2023 15:43:00 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Leo Li <leoyang.li@nxp.com>
-Cc:     Stuart Yoder <stuyoder@gmail.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Roy Pledge <roy.pledge@nxp.com>,
-        "Diana Madalina Craciun (OSS)" <diana.craciun@oss.nxp.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Ioana Ciornei <ioana.ciornei@nxp.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        "Y.B. Lu" <yangbo.lu@nxp.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 0/6] bus: fsl-mc: Make remove function return void
-Message-ID: <20230508134300.s36d6k4e25f6ubg4@pengutronix.de>
-References: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
- <20230412171056.xcluewbuyytm77yp@pengutronix.de>
- <AM0PR04MB6289BB9BA4BC0B398F2989108F9B9@AM0PR04MB6289.eurprd04.prod.outlook.com>
- <20230413060004.t55sqmfxqtnejvkc@pengutronix.de>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="er5lj4tlfdoxmrvp"
-Content-Disposition: inline
-In-Reply-To: <20230413060004.t55sqmfxqtnejvkc@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S234411AbjEHOFs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 May 2023 10:05:48 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90F1238F28
+        for <kvm@vger.kernel.org>; Mon,  8 May 2023 07:05:40 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-b9a6eeea78cso34288138276.0
+        for <kvm@vger.kernel.org>; Mon, 08 May 2023 07:05:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1683554739; x=1686146739;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jcl8cYiE8GBONZ/kHylHxTzdCz6iJZwPGQYSWy24JYA=;
+        b=o8mfj/R750kMfA2bvKpyJZuf/ZhVeSnXBF4/wapKjmLIWy2rqeeSrAOt5X+YjYxuNh
+         OyItG8a6SQBaYR3ol78KhlI6eh/Q0yN90HXJhxbVGAtpEUWsNrYhxsckDEtq7PX0t1EO
+         f0JB4uXPde4Ox7tQXsrWT/ya3dTEG/JI0bIE5xqIVrID3KZMsDfqqnqBT9Za2r4APAZX
+         B2RpVJzivT+iO2b+LbU+0Zontf8zI/Ed9ngpy3ey89L83c7xn7vHODjkZU8knTdQD3t/
+         n78u+Am85L+2PUzMWncpwoOAYV0GlSklrJfhHVJlIR1I82Kkd1Qrpj4q6M6s9sph6PlJ
+         aA7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683554739; x=1686146739;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jcl8cYiE8GBONZ/kHylHxTzdCz6iJZwPGQYSWy24JYA=;
+        b=jAxM/jjfaOcfItfG9It7XA8rFj1cdxAWxDnU1M2/54xhxQmgUsIJgXLZPRTcfEe3vx
+         Yi/0hspXAVjdr0n/2nUA8QxLmbBIKtpGad+0peu8+80n0R/jDKNOsDRL4GAJFdjzXoW+
+         bdATAd1DGJOC9Qiz2PfQO41e/7lPfBFILgQ3BCLBPfe/3yK7sKHW4CXdP7LvCuyvXl1v
+         +ev842ooVSqrg2rwZ/dWjE3lZDt6xDTF5XzCo/+daScdwWBI9PpEC2xnOK6LzCoc0ETQ
+         u4Zp9aVDg3ymMAxBSOp8Aa5by0eCETD9Mnl18XZ4U0hDJERZ3N48jNmmcd0+y1x6bsLk
+         aT3g==
+X-Gm-Message-State: AC+VfDyNosus1bCW/tcumeGmC1aieVvpFpNwNAToVamZyQsh6BX+wufw
+        c+LxreFkHj/lKj1vZVXSEDuUVM4dRls=
+X-Google-Smtp-Source: ACHHUZ7FCpMclh8b9aJYyQEcgnuYE0OwetS8XqokoS1TJPz66KwW2xxY/XhdC86wb/WWcOzl5JiJiPlwO6k=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:10c:b0:55c:a5db:869 with SMTP id
+ bd12-20020a05690c010c00b0055ca5db0869mr10528119ywb.4.1683554739792; Mon, 08
+ May 2023 07:05:39 -0700 (PDT)
+Date:   Mon, 8 May 2023 07:05:32 -0700
+In-Reply-To: <ZFYyt2fF6alyKlzO@yzhao56-desk.sh.intel.com>
+Mime-Version: 1.0
+References: <20230311002258.852397-1-seanjc@google.com> <20230311002258.852397-6-seanjc@google.com>
+ <ZBP7oZ1lkJhlSNpY@yzhao56-desk.sh.intel.com> <ZFQYbHTYgG4HJ+ac@google.com>
+ <ZFX1PaKIa44WtSNX@yzhao56-desk.sh.intel.com> <ZFYyt2fF6alyKlzO@yzhao56-desk.sh.intel.com>
+Message-ID: <ZFkBrLuBY5fOU6qX@google.com>
+Subject: Re: [PATCH v2 05/27] drm/i915/gvt: Verify VFIO-pinned page is THP
+ when shadowing 2M gtt entry
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     kvm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Ben Gardon <bgardon@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        Zhi Wang <zhi.a.wang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, May 06, 2023, Yan Zhao wrote:
+> On Sat, May 06, 2023 at 02:35:41PM +0800, Yan Zhao wrote:
+> > > > Maybe the checking of PageTransHuge(cur_page) and bailing out is not necessary.
+> > > > If a page is not transparent huge, but there are 512 contigous 4K
+> > > > pages, I think it's still good to map them in IOMMU in 2M.
+> > > > See vfio_pin_map_dma() who does similar things.
+> > > 
+> > > I agree that bailing isn't strictly necessary, and processing "blindly" should
+> > > Just Work for HugeTLB and other hugepage types.  I was going to argue that it
+> > > would be safer to add this and then drop it at the end, but I think that's a
+> > > specious argument.  If not checking the page type is unsafe, then the existing
+> > > code is buggy, and this changelog literally states that the check for contiguous
+> > > pages guards against any such problems.
+> > > 
+> > > I do think there's a (very, very theoretical) issue though.  For "CONFIG_SPARSEMEM=y
+> > > && CONFIG_SPARSEMEM_VMEMMAP=n", struct pages aren't virtually contiguous with respect
+> > > to their pfns, i.e. it's possible (again, very theoretically) that two struct pages
+> > > could be virtually contiguous but physically discontiguous.  I suspect I'm being
+> > > ridiculously paranoid, but for the efficient cases where pages are guaranteed to
+> > > be contiguous, the extra page_to_pfn() checks should be optimized away by the
+> > > compiler, i.e. there's no meaningful downside to the paranoia.
+> > To make sure I understand it correctly:
+> > There are 3 conditions:
+> > (1) Two struct pages aren't virtually contiguous, but there PFNs are contiguous.
+> > (2) Two struct pages are virtually contiguous but their PFNs aren't contiguous.
+> >     (Looks this will not happen?)
+> > (3) Two struct pages are virtually contiguous, and their PFNs are contiguous, too.
+> >     But they have different backends, e.g.
+> >     PFN 1 and PFN 2 are contiguous, while PFN 1 belongs to RAM, and PFN 2
+> >     belongs to DEVMEM.
+> > 
+> > I think you mean condition (3) is problematic, am I right?
+> Oh, I got it now.
+> You are saying about condition (2), with "CONFIG_SPARSEMEM=y &&
+> CONFIG_SPARSEMEM_VMEMMAP=n".
+> Two struct pages are contiguous if one is at one section's tail and another at
+> another section's head, but the two sections aren't for contiguous PFNs.
 
---er5lj4tlfdoxmrvp
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hello Leo,
-
-On Thu, Apr 13, 2023 at 08:00:04AM +0200, Uwe Kleine-K=F6nig wrote:
-> On Wed, Apr 12, 2023 at 09:30:05PM +0000, Leo Li wrote:
-> > > On Fri, Mar 10, 2023 at 11:41:22PM +0100, Uwe Kleine-K=F6nig wrote:
-> > > > Hello,
-> > > >
-> > > > many bus remove functions return an integer which is a historic
-> > > > misdesign that makes driver authors assume that there is some kind =
-of
-> > > > error handling in the upper layers. This is wrong however and
-> > > > returning and error code only yields an error message.
-> > > >
-> > > > This series improves the fsl-mc bus by changing the remove callback=
- to
-> > > > return no value instead. As a preparation all drivers are changed to
-> > > > return zero before so that they don't trigger the error message.
-> > >=20
-> > > Who is supposed to pick up this patch series (or point out a good rea=
-son for
-> > > not taking it)?
-> >=20
-> > Previously Greg KH picked up MC bus patches.
-> >=20
-> > If no one is picking up them this time, I probably can take it through
-> > the fsl soc tree.
->=20
-> I guess Greg won't pick up this series as he didn't get a copy of it :-)
->=20
-> Browsing through the history of drivers/bus/fsl-mc there is no
-> consistent maintainer to see. So if you can take it, that's very
-> appreciated.
-
-My mail was meant encouraging, maybe it was too subtile? I'll try again:
-
-Yes, please apply, that would be wonderful!
-
-:-)
-
-Thanks
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---er5lj4tlfdoxmrvp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmRY/GMACgkQj4D7WH0S
-/k4cswf+N9Mgu+WF1jiKgllTl1eIxkYX2sJ67f9koV32iMjq4Cfyr/EeCWolZb/c
-5MfyrMdDe6UXeNzFn/HNTMJ+2Uc+zhRsowOFNHQKu9ysxWqNLnGnr+2Z1B9BSQY+
-mK3hhU0iLOWmLRZqQvK4iOKQmoy/jtBUWRIOfmff7fVrmHke3of31J7iZGaVLbEM
-uKgAqaUqbuhy/yKnWrtsjI032ANLw3SbE0KBgTIOLsWADSgYqHJVsxs7Ek5vLFy0
-yixu653kysPtTS5Jb20ytWk7BzQVMpYFdfq7QogzdL0qYqqrO+oJEGjXP5traHsl
-DX2GOiQ8R6tswdZcisDFe4wQC15hYQ==
-=19CE
------END PGP SIGNATURE-----
-
---er5lj4tlfdoxmrvp--
+Yep, exactly.
