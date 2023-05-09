@@ -2,376 +2,282 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E46C26FC1FB
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 10:50:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 388A86FC30A
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 11:47:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234341AbjEIIue (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 04:50:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55012 "EHLO
+        id S234758AbjEIJrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 05:47:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbjEIIuc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 04:50:32 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3D092705
-        for <kvm@vger.kernel.org>; Tue,  9 May 2023 01:50:30 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3498afIi010762;
-        Tue, 9 May 2023 08:50:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=79B0v5FvWelzcBfU7I16hTzj+BylCliLtpkm/vAUy94=;
- b=oxZuaMbpFf3WkHNigweMia1C8uC8rL3uR76ccOQldXXl7T2U1qvjP4jJgHBlJDHJZruc
- gTG515MfPpSkDO9b1O7zNzt2trFcNG1h4T01+RRN42MPxgn1X6XYmx1Q+PM9uYQwMHgK
- a3N3II3szqXw84UYCb9IMtzvHV02jpSHR3LYjkmzY6Qi71ekMRCdT/7yzlnbyjWFzJHo
- 5r7UR2mzQqtWwXgUWrzBW22w7Zr+gE3QGuogY6iK0dCrZjAVFxRWmrtsDNEhXAlt/diy
- PDlpJpyfH7V2ZxkdCbOZWvjVqdc1NTPFwMh64zklXj3f95SdyDuGXsqH7O4lBi+uH/Jy 2Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qfgpxw1ev-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 May 2023 08:50:14 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3498i5t5008911;
-        Tue, 9 May 2023 08:50:14 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qfgpxw1d0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 May 2023 08:50:14 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3491Yfx6007361;
-        Tue, 9 May 2023 08:50:11 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3qf7dg08db-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 May 2023 08:50:11 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3498o5Jh262660
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 9 May 2023 08:50:05 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9623B20040;
-        Tue,  9 May 2023 08:50:05 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 29C3C20043;
-        Tue,  9 May 2023 08:50:05 +0000 (GMT)
-Received: from [9.152.222.242] (unknown [9.152.222.242])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Tue,  9 May 2023 08:50:05 +0000 (GMT)
-Message-ID: <9447bf7b-6dc0-4197-1134-266a257d06de@linux.ibm.com>
-Date:   Tue, 9 May 2023 10:50:04 +0200
+        with ESMTP id S234809AbjEIJq6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 05:46:58 -0400
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 709B749CB;
+        Tue,  9 May 2023 02:46:55 -0700 (PDT)
+X-UUID: d7a081788efd4b19bc571412c01d7c3f-20230509
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.22,REQID:90058afd-4b39-4e2c-b393-8a509900c318,IP:20,
+        URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+        ON:release,TS:6
+X-CID-INFO: VERSION:1.1.22,REQID:90058afd-4b39-4e2c-b393-8a509900c318,IP:20,UR
+        L:0,TC:0,Content:-5,EDM:0,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+        :release,TS:6
+X-CID-META: VersionHash:120426c,CLOUDID:746343c0-e32c-4c97-918d-fbb3fc224d4e,B
+        ulkID:230509174649WJ486XEL,BulkQuantity:0,Recheck:0,SF:45|24|17|19|102,TC:
+        nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OS
+        I:0,OSA:0,AV:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-UUID: d7a081788efd4b19bc571412c01d7c3f-20230509
+X-User: lienze@kylinos.cn
+Received: from fedora [(210.12.40.82)] by mailgw
+        (envelope-from <lienze@kylinos.cn>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 878831980; Tue, 09 May 2023 17:46:48 +0800
+From:   Enze Li <lienze@kylinos.cn>
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
+        Xi Ruoyao <xry111@xry111.site>
+Subject: Re: [PATCH v9 30/30] LoongArch: KVM: Supplement kvm document about
+ LoongArch-specific part
+In-Reply-To: <20230509075346.1023386-31-zhaotianrui@loongson.cn> (Tianrui
+        Zhao's message of "Tue, 9 May 2023 15:53:46 +0800")
+References: <20230509075346.1023386-1-zhaotianrui@loongson.cn>
+        <20230509075346.1023386-31-zhaotianrui@loongson.cn>
+Date:   Tue, 09 May 2023 17:50:59 +0800
+Message-ID: <87bkitomt8.fsf@kylinos.cn>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v20 08/21] qapi/s390x/cpu topology: set-cpu-topology qmp
- command
-Content-Language: en-US
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-References: <20230425161456.21031-1-pmorel@linux.ibm.com>
- <20230425161456.21031-9-pmorel@linux.ibm.com>
- <e1301b4f488df0d84617685a6ee29c4c916c8068.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <e1301b4f488df0d84617685a6ee29c4c916c8068.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -RVJWipYyAgO7CDLPaXNWQ-V7OEDEb_y
-X-Proofpoint-ORIG-GUID: xLmsTiBFrnsq_Vv_C5VhFr4WKKBosP13
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-09_05,2023-05-05_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
- impostorscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0 phishscore=0
- adultscore=0 bulkscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2304280000
- definitions=main-2305090065
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Tianrui,
 
-On 5/8/23 21:42, Nina Schoetterl-Glausch wrote:
-> On Tue, 2023-04-25 at 18:14 +0200, Pierre Morel wrote:
->> The modification of the CPU attributes are done through a monitor
->> command.
->>
->> It allows to move the core inside the topology tree to optimize
->> the cache usage in the case the host's hypervisor previously
->> moved the CPU.
->>
->> The same command allows to modify the CPU attributes modifiers
->> like polarization entitlement and the dedicated attribute to notify
->> the guest if the host admin modified scheduling or dedication of a vCPU.
->>
->> With this knowledge the guest has the possibility to optimize the
->> usage of the vCPUs.
->>
->> The command has a feature unstable for the moment.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Logic is sound, minor stuff below.
+Thank you for working on this.  Only one small nit, please see below.
+
+On Tue, May 09 2023 at 03:53:46 PM +0800, Tianrui Zhao wrote:
+
+> Supplement kvm document about LoongArch-specific part, such as add
+> api introduction for GET/SET_ONE_REG, GET/SET_FPU, GET/SET_MP_STATE,
+> etc.
 >
->> ---
->>   qapi/machine-target.json |  37 +++++++++++
->>   hw/s390x/cpu-topology.c  | 136 +++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 173 insertions(+)
->>
->> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
->> index 42a6a40333..3b7a0b77f4 100644
->> --- a/qapi/machine-target.json
->> +++ b/qapi/machine-target.json
->> @@ -4,6 +4,8 @@
->>   # This work is licensed under the terms of the GNU GPL, version 2 or later.
->>   # See the COPYING file in the top-level directory.
->>   
->> +{ 'include': 'machine-common.json' }
->> +
->>   ##
->>   # @CpuModelInfo:
->>   #
->> @@ -354,3 +356,38 @@
->>   { 'enum': 'CpuS390Polarization',
->>     'prefix': 'S390_CPU_POLARIZATION',
->>     'data': [ 'horizontal', 'vertical' ] }
->> +
->> +##
->> +# @set-cpu-topology:
->> +#
->> +# @core-id: the vCPU ID to be moved
->> +# @socket-id: optional destination socket where to move the vCPU
->> +# @book-id: optional destination book where to move the vCPU
->> +# @drawer-id: optional destination drawer where to move the vCPU
->> +# @entitlement: optional entitlement
->> +# @dedicated: optional, if the vCPU is dedicated to a real CPU
->> +#
->> +# Features:
->> +# @unstable: This command may still be modified.
->> +#
->> +# Modifies the topology by moving the CPU inside the topology
->> +# tree or by changing a modifier attribute of a CPU.
->> +# Default value for optional parameter is the current value
->> +# used by the CPU.
->> +#
->> +# Returns: Nothing on success, the reason on failure.
->> +#
->> +# Since: 8.1
->> +##
->> +{ 'command': 'set-cpu-topology',
->> +  'data': {
->> +      'core-id': 'uint16',
->> +      '*socket-id': 'uint16',
->> +      '*book-id': 'uint16',
->> +      '*drawer-id': 'uint16',
->> +      '*entitlement': 'CpuS390Entitlement',
->> +      '*dedicated': 'bool'
->> +  },
->> +  'features': [ 'unstable' ],
->> +  'if': { 'all': [ 'TARGET_S390X' , 'CONFIG_KVM' ] }
->> +}
->> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
->> index d9cd3dc3ce..e5fb976594 100644
->> --- a/hw/s390x/cpu-topology.c
->> +++ b/hw/s390x/cpu-topology.c
->> @@ -16,6 +16,7 @@
->>   #include "target/s390x/cpu.h"
->>   #include "hw/s390x/s390-virtio-ccw.h"
->>   #include "hw/s390x/cpu-topology.h"
->> +#include "qapi/qapi-commands-machine-target.h"
->>   
->>   /*
->>    * s390_topology is used to keep the topology information.
->> @@ -261,6 +262,27 @@ static bool s390_topology_check(uint16_t socket_id, uint16_t book_id,
->>       return true;
->>   }
->>   
->> +/**
->> + * s390_topology_need_report
->> + * @cpu: Current cpu
->> + * @drawer_id: future drawer ID
->> + * @book_id: future book ID
->> + * @socket_id: future socket ID
-> Entitlement and dedicated are missing here.
-
-Yes, thx
-
-
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> ---
+>  Documentation/virt/kvm/api.rst | 71 +++++++++++++++++++++++++++++-----
+>  1 file changed, 62 insertions(+), 9 deletions(-)
 >
->> + *
->> + * A modified topology change report is needed if the topology
->> + * tree or the topology attributes change.
->> + */
->> +static int s390_topology_need_report(S390CPU *cpu, int drawer_id,
-> I'd prefer a bool return type.
-
-ok
-
-
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index add067793b90..ae7d6a2cd54f 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -416,6 +416,12 @@ Reads the general purpose registers from the vcpu.
+>  	__u64 pc;
+>    };
+>  
+> +  /* LoongArch */
+> +  struct kvm_regs {
+> +        unsigned long gpr[32];
+> +        unsigned long pc;
+> +  };
+> +
+>  
+>  4.12 KVM_SET_REGS
+>  -----------------
+> @@ -506,7 +512,7 @@ translation mode.
+>  ------------------
+>  
+>  :Capability: basic
+> -:Architectures: x86, ppc, mips, riscv
+> +:Architectures: x86, ppc, mips, riscv, loongarch
+>  :Type: vcpu ioctl
+>  :Parameters: struct kvm_interrupt (in)
+>  :Returns: 0 on success, negative on failure.
+> @@ -592,6 +598,14 @@ b) KVM_INTERRUPT_UNSET
+>  
+>  This is an asynchronous vcpu ioctl and can be invoked from any thread.
+>  
+> +LOONGARCH:
+> +^^^^^^^^^^
+> +
+> +Queues an external interrupt to be injected into the virtual CPU. A negative
+> +interrupt number dequeues the interrupt.
+> +
+> +This is an asynchronous vcpu ioctl and can be invoked from any thread.
+> +
+>  
+>  4.17 KVM_DEBUG_GUEST
+>  --------------------
+> @@ -737,7 +751,7 @@ signal mask.
+>  ----------------
+>  
+>  :Capability: basic
+> -:Architectures: x86
+> +:Architectures: x86, loongarch
+>  :Type: vcpu ioctl
+>  :Parameters: struct kvm_fpu (out)
+>  :Returns: 0 on success, -1 on error
+> @@ -746,7 +760,7 @@ Reads the floating point state from the vcpu.
+>  
+>  ::
+>  
+> -  /* for KVM_GET_FPU and KVM_SET_FPU */
+> +  /* x86: for KVM_GET_FPU and KVM_SET_FPU */
+>    struct kvm_fpu {
+>  	__u8  fpr[8][16];
+>  	__u16 fcw;
+> @@ -761,12 +775,22 @@ Reads the floating point state from the vcpu.
+>  	__u32 pad2;
+>    };
+>  
+> +  /* LoongArch: for KVM_GET_FPU and KVM_SET_FPU */
+> +  struct kvm_fpu {
+> +        __u32 fcsr;
+> +        __u32 none;
+> +        __u64 fcc;
+> +        struct kvm_fpureg {
+> +                __u64 val64[4];
+> +        }fpr[32];
+> +  };
+> +
+>  
+>  4.23 KVM_SET_FPU
+>  ----------------
+>  
+>  :Capability: basic
+> -:Architectures: x86
+> +:Architectures: x86, loongarch
+>  :Type: vcpu ioctl
+>  :Parameters: struct kvm_fpu (in)
+>  :Returns: 0 on success, -1 on error
+> @@ -775,7 +799,7 @@ Writes the floating point state to the vcpu.
+>  
+>  ::
+>  
+> -  /* for KVM_GET_FPU and KVM_SET_FPU */
+> +  /* x86: for KVM_GET_FPU and KVM_SET_FPU */
+>    struct kvm_fpu {
+>  	__u8  fpr[8][16];
+>  	__u16 fcw;
+> @@ -790,6 +814,16 @@ Writes the floating point state to the vcpu.
+>  	__u32 pad2;
+>    };
+>  
+> +  /* LoongArch: for KVM_GET_FPU and KVM_SET_FPU */
+> +  struct kvm_fpu {
+> +        __u32 fcsr;
+> +        __u32 none;
+> +        __u64 fcc;
+> +        struct kvm_fpureg {
+> +                __u64 val64[4];
+> +        }fpr[32];
+> +  };
+> +
+>  
+>  4.24 KVM_CREATE_IRQCHIP
+>  -----------------------
+> @@ -1387,7 +1421,7 @@ documentation when it pops into existence).
+>  -------------------
+>  
+>  :Capability: KVM_CAP_ENABLE_CAP
+> -:Architectures: mips, ppc, s390, x86
+> +:Architectures: mips, ppc, s390, x86, loongarch
+>  :Type: vcpu ioctl
+>  :Parameters: struct kvm_enable_cap (in)
+>  :Returns: 0 on success; -1 on error
+> @@ -1442,7 +1476,7 @@ for vm-wide capabilities.
+>  ---------------------
+>  
+>  :Capability: KVM_CAP_MP_STATE
+> -:Architectures: x86, s390, arm64, riscv
+> +:Architectures: x86, s390, arm64, riscv, loongarch
+>  :Type: vcpu ioctl
+>  :Parameters: struct kvm_mp_state (out)
+>  :Returns: 0 on success; -1 on error
+> @@ -1460,7 +1494,7 @@ Possible values are:
+>  
+>     ==========================    ===============================================
+>     KVM_MP_STATE_RUNNABLE         the vcpu is currently running
+> -                                 [x86,arm64,riscv]
+> +                                 [x86,arm64,riscv,loongarch]
+>     KVM_MP_STATE_UNINITIALIZED    the vcpu is an application processor (AP)
+>                                   which has not yet received an INIT signal [x86]
+>     KVM_MP_STATE_INIT_RECEIVED    the vcpu has received an INIT signal, and is
+> @@ -1516,11 +1550,14 @@ For riscv:
+>  The only states that are valid are KVM_MP_STATE_STOPPED and
+>  KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
 >
->> +                                   int book_id, int socket_id,
->> +                                   uint16_t entitlement, bool dedicated)
->> +{
->> +    return cpu->env.drawer_id != drawer_id ||
->> +           cpu->env.book_id != book_id ||
->> +           cpu->env.socket_id != socket_id ||
->> +           cpu->env.entitlement != entitlement ||
->> +           cpu->env.dedicated != dedicated;
->> +}
->> +
->>   /**
->>    * s390_update_cpu_props:
->>    * @ms: the machine state
->> @@ -330,3 +352,117 @@ void s390_topology_setup_cpu(MachineState *ms, S390CPU *cpu, Error **errp)
->>       /* topology tree is reflected in props */
->>       s390_update_cpu_props(ms, cpu);
->>   }
->> +
->> +static void s390_change_topology(uint16_t core_id,
->> +                                 bool has_socket_id, uint16_t socket_id,
->> +                                 bool has_book_id, uint16_t book_id,
->> +                                 bool has_drawer_id, uint16_t drawer_id,
->> +                                 bool has_entitlement, uint16_t entitlement,
-> I would keep the enum type for entitlement.
 
-ok
+> +On LoongArch, the KVM_MP_STATE_RUNNABLE state is only used which reflect the
+> +vcpu is runnable.
 
+There seems to be a grammatical error here.  The original sentence uses
+"which" to connect two clauses, but lacks a subject to introduce the
+second clause.  I think we should correct it like this,
 
+"On LoongArch, the KVM_MP_STATE_RUNNABLE state is only used to reflect
+whether the vcpu is runnable."
+
+> +
+>  4.39 KVM_SET_MP_STATE
+>  ---------------------
+>  
+>  :Capability: KVM_CAP_MP_STATE
+> -:Architectures: x86, s390, arm64, riscv
+> +:Architectures: x86, s390, arm64, riscv, loongarch
+>  :Type: vcpu ioctl
+>  :Parameters: struct kvm_mp_state (in)
+>  :Returns: 0 on success; -1 on error
+> @@ -1538,6 +1575,9 @@ For arm64/riscv:
+>  The only states that are valid are KVM_MP_STATE_STOPPED and
+>  KVM_MP_STATE_RUNNABLE which reflect if the vcpu should be paused or not.
 >
->> +                                 bool has_dedicated, bool dedicated,
->> +                                 Error **errp)
->> +{
->> +    MachineState *ms = current_machine;
->> +    int old_socket_entry;
->> +    int new_socket_entry;
->> +    int report_needed;
->> +    S390CPU *cpu;
->> +    ERRP_GUARD();
->> +
->> +    if (core_id >= ms->smp.max_cpus) {
->> +        error_setg(errp, "Core-id %d out of range!", core_id);
->> +        return;
->> +    }
->> +
->> +    cpu = (S390CPU *)ms->possible_cpus->cpus[core_id].cpu;
-> You can replace this with
->
->         cpu = s390_cpu_addr2state(core_id);
->
-> and get rid of the if above that checks for out of range.
 
 
-yes, ok
+> +On LoongArch, the KVM_MP_STATE_RUNNABLE state is only used which reflect the
+> +vcpu is runnable.
 
+Likewise here.
 
->
->> +    if (!cpu) {
->> +        error_setg(errp, "Core-id %d does not exist!", core_id);
->> +        return;
->> +    }
->> +
->> +    /* Get attributes not provided from cpu and verify the new topology */
->> +    if (!has_socket_id) {
->> +        socket_id = cpu->env.socket_id;
->> +    }
->> +    if (!has_book_id) {
->> +        book_id = cpu->env.book_id;
->> +    }
->> +    if (!has_drawer_id) {
->> +        drawer_id = cpu->env.drawer_id;
->> +    }
->> +    if (!has_dedicated) {
->> +        dedicated = cpu->env.dedicated;
->> +    }
->> +
->> +    /*
->> +     * When the user specifies the entitlement as 'auto' on the command line,
->> +     * qemu will set the entitlement as:
->> +     * Medium when the CPU is not dedicated.
->> +     * High when dedicated is true.
->> +     */
->> +    if (!has_entitlement || (entitlement == S390_CPU_ENTITLEMENT_AUTO)) {
->> +        if (dedicated) {
->> +            entitlement = S390_CPU_ENTITLEMENT_HIGH;
->> +        } else {
->> +            entitlement = S390_CPU_ENTITLEMENT_MEDIUM;
->> +        }
->> +    }
->> +
->> +    if (!s390_topology_check(socket_id, book_id, drawer_id,
->> +                             entitlement, dedicated, errp))
->> +        return;
->> +
->> +    /* Check for space on new socket */
->> +    old_socket_entry = s390_socket_nb(cpu);
->> +    new_socket_entry = __s390_socket_nb(drawer_id, book_id, socket_id);
->> +
->> +    if (new_socket_entry != old_socket_entry) {
->> +        if (s390_topology.cores_per_socket[new_socket_entry] >=
->> +            s390_topology.smp->cores) {
->> +            error_setg(errp, "No more space on this socket");
->> +            return;
->> +        }
->> +        /* Update the count of cores in sockets */
->> +        s390_topology.cores_per_socket[new_socket_entry] += 1;
->> +        s390_topology.cores_per_socket[old_socket_entry] -= 1;
->> +    }
->> +
->> +    /* Check if we will need to report the modified topology */
->> +    report_needed = s390_topology_need_report(cpu, drawer_id, book_id,
->> +                                              socket_id, entitlement,
->> +                                              dedicated);
->> +
->> +    /* All checks done, report new topology into the vCPU */
->> +    cpu->env.drawer_id = drawer_id;
->> +    cpu->env.book_id = book_id;
->> +    cpu->env.socket_id = socket_id;
->> +    cpu->env.dedicated = dedicated;
->> +    cpu->env.entitlement = entitlement;
->> +
->> +    /* topology tree is reflected in props */
->> +    s390_update_cpu_props(ms, cpu);
->> +
->> +    /* Advertise the topology change */
->> +    if (report_needed) {
->> +        s390_cpu_topology_set_changed(true);
->> +    }
->> +}
->> +
->> +void qmp_set_cpu_topology(uint16_t core,
->> +                         bool has_socket, uint16_t socket,
->> +                         bool has_book, uint16_t book,
->> +                         bool has_drawer, uint16_t drawer,
->> +                         bool has_entitlement, CpuS390Entitlement entitlement,
->> +                         bool has_dedicated, bool dedicated,
->> +                         Error **errp)
->> +{
->> +    ERRP_GUARD();
->> +
->> +    if (!s390_has_topology()) {
->> +        error_setg(errp, "This machine doesn't support topology");
->> +        return;
->> +    }
->> +
->> +    s390_change_topology(core, has_socket, socket, has_book, book,
->> +                         has_drawer, drawer, has_entitlement, entitlement,
->> +                         has_dedicated, dedicated, errp);
->> +}
+WDYT?
 
-Thanks I change this.
+Thanks,
+Enze
 
-regards,
-
-Pierre
-
-
+> +
+>  4.40 KVM_SET_IDENTITY_MAP_ADDR
+>  ------------------------------
+>  
+> @@ -2839,6 +2879,19 @@ Following are the RISC-V D-extension registers:
+>    0x8020 0000 0600 0020 fcsr      Floating point control and status register
+>  ======================= ========= =============================================
+>  
+> +LoongArch registers are mapped using the lower 32 bits. The upper 16 bits of
+> +that is the register group type.
+> +
+> +LoongArch csr registers are used to control guest cpu or get status of guest
+> +cpu, and they have the following id bit patterns::
+> +
+> +  0x9030 0000 0001 00 <reg:5> <sel:3>   (64-bit)
+> +
+> +LoongArch KVM control registers are used to implement some new defined functions
+> +such as set vcpu counter or reset vcpu, and they have the following id bit patterns::
+> +
+> +  0x9030 0000 0002 <reg:16>
+> +
+>  
+>  4.69 KVM_GET_ONE_REG
+>  --------------------
