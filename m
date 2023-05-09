@@ -2,70 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FB106FC3E1
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 12:31:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5E9C6FC3E2
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 12:31:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235137AbjEIKbM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 06:31:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60302 "EHLO
+        id S235138AbjEIKbP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 06:31:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231467AbjEIKbL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 06:31:11 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2E8ADC53
-        for <kvm@vger.kernel.org>; Tue,  9 May 2023 03:31:08 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-643465067d1so4279688b3a.0
-        for <kvm@vger.kernel.org>; Tue, 09 May 2023 03:31:08 -0700 (PDT)
+        with ESMTP id S229523AbjEIKbO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 06:31:14 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4187EDC62
+        for <kvm@vger.kernel.org>; Tue,  9 May 2023 03:31:13 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-51b603bb360so5179635a12.2
+        for <kvm@vger.kernel.org>; Tue, 09 May 2023 03:31:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1683628268; x=1686220268;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y7dh+k6V02cyI7OPFfCN+08dONMqMpHYTjseiNbl3eo=;
-        b=iLkoM8zk6OHy1oDfhe/NCGvhnigGfGqWynqEkoeoZRVkRGJQo0F5g2T2v52XMv4pJA
-         iSOrsM6NHJWcC7Sx7sfyOdTSp9a/OBJPdac7IWCQjLKaRWmJc7PeByjdWqowHD727qPx
-         ZB1/KHI9IKoR4gZvMmf9dEzySBmK5VrC+zuevDDoHK2CQl2Yqc9G83eRqGI7ymvX4HUW
-         H7hkAeN7BSzKqJIxOzz91g8voCgyKzOaTNHXU3Kee9fHmMJUuGFr7imKCtAlDDKmAU5c
-         Y0clJB7PhNn5QLHTn61029QwG+mu2TXJhdClxkgALchfurJhPDJsqSur/BO2KGLQkZRJ
-         Lp2g==
+        d=sifive.com; s=google; t=1683628273; x=1686220273;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xZD7AFVtobxh1FGjEKQD2QW8IDIT5bzbSx/S1GQl+8U=;
+        b=du0Io6LpcTYopchyJqH+rRocOYaZGCdablSccjAYQc49Ba6S0Rrmyl+ci/Z+nxxPQw
+         YaGBoKgHS8g3Qaggx+BYSu+hG+hAq80EgnZUR8Ct3LhmNYq4RlRrKbL4AwRUdiHmIlkD
+         OcFpHCYfFBsM0b1GAsqbvXLC/uMZqsaurfdT4Zi4oZieblml1tYf+lAmm06k2j/ghmRA
+         nZJfoSzceS6dk8Uj9dFuPVrcmHIow3ct78SnSgotzluof0dvxdUaahq1BZuj286W1pZO
+         XxyuRuSDnvPxZj5Nc+Egn1JuGzOsL+9sOHwXxobILy/DT2BmJPKbef9R6okXZQ478eGF
+         TGmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683628268; x=1686220268;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Y7dh+k6V02cyI7OPFfCN+08dONMqMpHYTjseiNbl3eo=;
-        b=ITHm3B7MKciTx5OeeN6hzXq5/YYa1er0mxB1334rGnPgjECOnJPru6fVXc4pwW2scx
-         sfXhmglcCz3Q5RBqaWw4x2GADwnebeSTx9WFtdimvjKEn6MC5jSAOZaCKwuVOvcm9XnZ
-         GBHPEYiptUL2iR1ySfc/I0B21sdFusC0MgJhuG6Xw7W9SvwFvKbEMJ+ZmvtvFBDGBusx
-         j3Ld3Q2IAFrjy+zIHAvlrbQfUSEJpspyaB31lDY9810ij9OnfbM3icHmh+SHsfiz/0/A
-         5o+69S7aGv/NBisjL80faR3nK0b3hIRG6yFP1hMLAsNxO86MMoJG/8E/ABmRDKD6IcRu
-         l0ZA==
-X-Gm-Message-State: AC+VfDweGJw5yIh9v57PVgZ0A/YH6DrzcFE+oYmyJfhpRemD8LCOpfJn
-        PySt6TqA2obAFKtNEAkqwgRYIA==
-X-Google-Smtp-Source: ACHHUZ7NG1ZfaP8XhBc7DUf1Ft/6K2hlpwz/kMHoDS+3sqj5YrzS414VkoicLGuIAuS6aptBY3W9RQ==
-X-Received: by 2002:a17:902:c94b:b0:1ab:675:3e0c with SMTP id i11-20020a170902c94b00b001ab06753e0cmr18177250pla.33.1683628268206;
-        Tue, 09 May 2023 03:31:08 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1683628273; x=1686220273;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xZD7AFVtobxh1FGjEKQD2QW8IDIT5bzbSx/S1GQl+8U=;
+        b=Ok41Jb8EcU3jBbhV9MlV/7bmquhEQ0+PB5zOR02ldvEp95rXRC5JEaHFZbz4+qpP9H
+         3eRYLBLeIGoUSUFvFPmQ5/LIQWMAzjc+a3tRUh2MbEYeavHdIkPnM1WE7I8ihSa6ELTt
+         MHg3qrfGe43XuuvJZ+0BjrErak50fx7Tg+PQ/2brniEsspDomH5ToYsWi7FocBDvryPT
+         JXlNj245tcwARwMPjYhExZ0M5684qACZArJvoVl02TzZSRFOf1DHvZ5UxE/5n37pQup1
+         x7ZBnSMue/90DaaMYHRPWm4dIeDDZHefGLrG0zQfXo9Srfk0t2nIHe/YvVhaVADUVcND
+         DiKg==
+X-Gm-Message-State: AC+VfDyBm25mN2QXTYUzwFIa0mnsyCfPUfszYcj4bif6aKvz6KRX29wE
+        6HvuP4ofeda7ueSJEhl5ttzrTw==
+X-Google-Smtp-Source: ACHHUZ7IV6OdLi4xQaDu/P5gI9gcveGZ+FpKBQDsjRAPmDvKXG6DubfHPMgSkhsF+HAPAzAZIy4G8A==
+X-Received: by 2002:a17:903:18f:b0:1ac:8717:d436 with SMTP id z15-20020a170903018f00b001ac8717d436mr5304921plg.60.1683628272702;
+        Tue, 09 May 2023 03:31:12 -0700 (PDT)
 Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id o11-20020a170902d4cb00b001a076025715sm1195191plg.117.2023.05.09.03.31.05
+        by smtp.gmail.com with ESMTPSA id o11-20020a170902d4cb00b001a076025715sm1195191plg.117.2023.05.09.03.31.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 May 2023 03:31:07 -0700 (PDT)
+        Tue, 09 May 2023 03:31:12 -0700 (PDT)
 From:   Andy Chiu <andy.chiu@sifive.com>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
 Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
+        guoren@linux.alibaba.com, Guo Ren <ren_guo@c-sky.com>,
+        Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>
-Subject: [PATCH -next v19 00/24] riscv: Add vector ISA support
-Date:   Tue,  9 May 2023 10:30:09 +0000
-Message-Id: <20230509103033.11285-1-andy.chiu@sifive.com>
+        Heiko Stuebner <heiko.stuebner@vrull.eu>,
+        Guo Ren <guoren@kernel.org>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Jisheng Zhang <jszhang@kernel.org>
+Subject: [PATCH -next v19 01/24] riscv: Rename __switch_to_aux() -> fpu
+Date:   Tue,  9 May 2023 10:30:10 +0000
+Message-Id: <20230509103033.11285-2-andy.chiu@sifive.com>
 X-Mailer: git-send-email 2.17.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230509103033.11285-1-andy.chiu@sifive.com>
+References: <20230509103033.11285-1-andy.chiu@sifive.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
@@ -76,269 +76,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patchset is implemented based on vector 1.0 spec to add vector support
-in riscv Linux kernel. There are some assumptions for this implementations.
+From: Guo Ren <ren_guo@c-sky.com>
 
-1. We assume all harts has the same ISA in the system.
-2. We disable vector in both kernel and user space [1] by default. Only
-   enable an user's vector after an illegal instruction trap where it
-   actually starts executing vector (the first-use trap [2]).
-3. We detect "riscv,isa" to determine whether vector is support or not.
+The name of __switch_to_aux() is not clear and rename it with the
+determine function: __switch_to_fpu(). Next we could add other regs'
+switch.
 
-We defined a new structure __riscv_v_ext_state in struct thread_struct to
-save/restore the vector related registers. It is used for both kernel space
-and user space.
- - In kernel space, the datap pointer in __riscv_v_ext_state will be
-   allocated to save vector registers.
- - In user space,
-	- In signal handler of user space, the structure is placed
-	  right after __riscv_ctx_hdr, which is embedded in fp reserved
-	  aera. This is required to avoid ABI break [2]. And datap points
-	  to the end of __riscv_v_ext_state.
-	- In ptrace, the data will be put in ubuf in which we use
-	  riscv_vr_get()/riscv_vr_set() to get or set the
-	  __riscv_v_ext_state data structure from/to it, datap pointer
-	  would be zeroed and vector registers will be copied to the
-	  address right after the __riscv_v_ext_state structure in ubuf.
-
-This patchset is rebased to v6.4-rc1 and it is tested by running several
-vector programs simultaneously. It delivers signals correctly in a test
-where we can see a valid ucontext_t in a signal handler, and a correct V
-context returing back from it. And the ptrace interface is tested by
-PTRACE_{GET,SET}REGSET. Lastly, KVM is tested by running above tests in
-a guest using the same kernel image. All tests are done on an rv64gcv
-virt QEMU.
-
-Source tree:
-https://github.com/sifive/riscv-linux/tree/riscv/for-next/vector-v19
-
-Links:
- - [1] https://lore.kernel.org/all/20220921214439.1491510-17-stillson@rivosinc.com/
- - [2] https://lore.kernel.org/all/73c0124c-4794-6e40-460c-b26df407f322@rivosinc.com/T/#u
- - [3] https://lore.kernel.org/all/20230128082847.3055316-1-apatel@ventanamicro.com/
-
-Updated patches: 6, 8, 14 (conflict), 15 (conflict), 19 (conflict), 23
-New patches: 3, 20, 21, 24
-Unchanged patches: 1, 2, 4, 5, 7, 9, 10, 11, 12, 13, 16, 17, 18, 22
-
+Signed-off-by: Guo Ren <ren_guo@c-sky.com>
+Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+Reviewed-by: Anup Patel <anup@brainfault.org>
+Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
+Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+Tested-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+Reviewed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 ---
-Changelog V19
- - Rebase to the latest -next branch (at 6.4-rc1 ac9a786). Solve
-   conflicts at patch 14, 15, and 19.
- - Add a sysctl, and prctl intefaces for userspace Vector control, and a
-   document for it. (patch 20, 21, 24)
- - Add a Kconfig RISCV_V_DISABLE to set the default value of userspace
-   Vector enablement status at compile-time. (patch 23)
- - Allow hwprobe interface to probe Vector. (patch 3)
- - Fix typos and commit msg at patch 6 and 8.
+ arch/riscv/include/asm/switch_to.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Changelog V18
- - Rebase to the latest -next branch (at 9c2598d)
- - patch 7: Detect inconsistent VLEN setup on an SMP system (Heiko).
- - patch 10: Add blank lines (Heiko)
- - patch 10: Return immediately in insn_is_vector() if an insn matches (Heiko)
- - patch 11: Use sizeof(vstate->datap) instead of sizeof(void*) (Eike)
-
-Changelog V17
- - Rebase to the latest -next branch (at e45d6a5):
-   - Solve conflicts at 9 and 13 due to generic entry
-   - Use generic entry in do_trap_insn_illegal() trap handler
-
-Changelog V16
- - Rebase to the latest for-next (at 4b74077):
- - Solve conflicts at 7, and 17
- - Use as-instr to detect if assembler supports .option arch directive
-   and remove dependency from GAS, for both ZBB and V.
- - Cleanup code in KVM vector
- - Address issue reported by sparse
- - Refine code:
-   - Fix a mixed-use of space/tab
-   - Remove new lines at the end of file
-
-Changelog V15
- - Rebase to risc-v -next (v6.3-rc1)
- - Make V depend on FD in Kconfig according to the spec and shut off v
-   properly.
- - Fix a syntax error for clang build. But mark RISCV_ISA_V GAS only due
-   to https://reviews.llvm.org/D123515
- - Use scratch reg in inline asm instead of t4.
- - Refine code.
- - Cleanup per-patch changelogs.
-
-Changelog V14
- - Rebase to risc-v -next (v6.2-rc7)
- - Use TOOLCHAIN_HAS_V to detect if we can enable Vector. And refine
-   KBUILD_CFLAGS to remove v from default compile option.
- - Drop illegal instruction handling patch in kvm and leave it to a
-   independent series[3]. The series has merged into 6.3-rc1
- - Move KVM_RISCV_ISA_EXT_V to the end of enum to prevent potential ABI
-   breaks.
- - Use PT_SIZE_ON_STACK instead of PT_SIZE to fit alignment. Also,
-   remove panic log from v13 (15/19) because it is no longer relevant.
- - Rewrite insn_is_vector for better structuring (change if-else chain to
-   a switch)
- - Fix compilation error in the middle of the series
- - Validate size of the alternative signal frame if V is enabled
-   whenever:
-     - The user call sigaltstack to update altstack
-     - A signal is being delivered
- - Rename __riscv_v_state to __riscv_v_ext_state.
- - Add riscv_v_ prefix and rename rvv appropriately
- - Organize riscv_v_vsize setup code into vector.c
- - Address the issue mentioned by Heiko on !FPU case
- - Honor orignal authors that got changed accidentally in v13 4,5,6
-
-Changelog V13
- - Rebase to latest risc-v next (v6.2-rc1)
- - vineetg: Re-organize the series to comply with bisect-ability
- - andy.chiu: Improve task switch with inline assembly
- - Re-structure the signal frame to avoid user ABI break.
- - Implemnt first-use trap and drop prctl for per-task V state
-   enablement. Also, redirect this trap from hs to vs for kvm setup.
- - Do not expose V context in ptrace/sigframe until the task start using
-   V. But still reserve V context for size ofsigframe reported by auxv.
- - Drop the kernel mode vector and leave it to another (future) series.
-
-Changelog V12 (Chris)
- - rebases to some point after v5.18-rc6
- - add prctl to control per-process V state
-
-Chnagelog V10
- - Rebase to v5.18-rc6
- - Merge several patches
- - Refine codes
- - Fix bugs
- - Add kvm vector support
-
-Changelog V9
- - Rebase to v5.15
- - Merge several patches
- - Refine codes
- - Fix a kernel panic issue
-
-Changelog V8
- - Rebase to v5.14
- - Refine struct __riscv_v_ext_state with struct __riscv_ctx_hdr
- - Refine has_vector into a static key
- - Defined __reserved space in struct sigcontext for vector and future extensions
-
-Changelog V7
- - Add support for kernel mode vector
- - Add vector extension XOR implementation
- - Optimize task switch codes of vector
- - Allocate space for vector registers in start_thread()
- - Fix an illegal instruction exception when accessing vlenb
- - Optimize vector registers initialization
- - Initialize vector registers with proper vsetvli then it can work normally
- - Refine ptrace porting due to generic API changed
- - Code clean up
-
-Changelog V6
- - Replace vle.v/vse.v instructions with vle8.v/vse8.v based on 0.9 spec
- - Add comments based on mailinglist feedback
- - Fix rv32 build error
-
-Changelog V5
- - Using regset_size() correctly in generic ptrace
- - Fix the ptrace porting
- - Fix compile warning
-
-Changelog V4
- - Support dynamic vlen
- - Fix bugs: lazy save/resotre, not saving vtype
- - Update VS bit offset based on latest vector spec
- - Add new vector csr based on latest vector spec
- - Code refine and removed unused macros
-
-Changelog V3
- - Rebase linux-5.6-rc3 and tested with qemu
- - Seperate patches with Anup's advice
- - Give out a ABI puzzle with unlimited vlen
-
-Changelog V2
- - Fixup typo "vecotr, fstate_save->vstate_save".
- - Fixup wrong saved registers' length in vector.S.
- - Seperate unrelated patches from this one.
-
-Andy Chiu (8):
-  riscv: hwprobe: Add support for RISCV_HWPROBE_BASE_BEHAVIOR_V
-  riscv: Allocate user's vector context in the first-use trap
-  riscv: signal: check fp-reserved words unconditionally
-  riscv: signal: validate altstack to reflect Vector
-  riscv: Add prctl controls for userspace vector management
-  riscv: Add sysctl to set the default vector rule for new processes
-  riscv: detect assembler support for .option arch
-  riscv: Add documentation for Vector
-
-Greentime Hu (9):
-  riscv: Add new csr defines related to vector extension
-  riscv: Clear vector regfile on bootup
-  riscv: Introduce Vector enable/disable helpers
-  riscv: Introduce riscv_v_vsize to record size of Vector context
-  riscv: Introduce struct/helpers to save/restore per-task Vector state
-  riscv: Add task switch support for vector
-  riscv: Add ptrace vector support
-  riscv: signal: Add sigcontext save/restore for vector
-  riscv: prevent stack corruption by reserving task_pt_regs(p) early
-
-Guo Ren (4):
-  riscv: Rename __switch_to_aux() -> fpu
-  riscv: Extending cpufeature.c to detect V-extension
-  riscv: Disable Vector Instructions for kernel itself
-  riscv: Enable Vector code to be built
-
-Vincent Chen (3):
-  riscv: signal: Report signal frame size to userspace via auxv
-  riscv: kvm: Add V extension to KVM ISA
-  riscv: KVM: Add vector lazy save/restore support
-
- Documentation/riscv/hwprobe.rst          |  10 +
- Documentation/riscv/index.rst            |   1 +
- Documentation/riscv/vector.rst           | 128 +++++++++++
- arch/riscv/Kconfig                       |  39 +++-
- arch/riscv/Makefile                      |   6 +-
- arch/riscv/include/asm/csr.h             |  18 +-
- arch/riscv/include/asm/elf.h             |   9 +
- arch/riscv/include/asm/hwcap.h           |   1 +
- arch/riscv/include/asm/hwprobe.h         |   2 +-
- arch/riscv/include/asm/insn.h            |  29 +++
- arch/riscv/include/asm/kvm_host.h        |   2 +
- arch/riscv/include/asm/kvm_vcpu_vector.h |  82 +++++++
- arch/riscv/include/asm/processor.h       |  16 ++
- arch/riscv/include/asm/switch_to.h       |   9 +-
- arch/riscv/include/asm/thread_info.h     |   3 +
- arch/riscv/include/asm/vector.h          | 184 ++++++++++++++++
- arch/riscv/include/uapi/asm/auxvec.h     |   1 +
- arch/riscv/include/uapi/asm/hwcap.h      |   1 +
- arch/riscv/include/uapi/asm/hwprobe.h    |   3 +
- arch/riscv/include/uapi/asm/kvm.h        |   8 +
- arch/riscv/include/uapi/asm/ptrace.h     |  39 ++++
- arch/riscv/include/uapi/asm/sigcontext.h |  16 +-
- arch/riscv/kernel/Makefile               |   1 +
- arch/riscv/kernel/cpufeature.c           |  13 ++
- arch/riscv/kernel/entry.S                |   6 +-
- arch/riscv/kernel/head.S                 |  41 +++-
- arch/riscv/kernel/process.c              |  19 ++
- arch/riscv/kernel/ptrace.c               |  70 ++++++
- arch/riscv/kernel/setup.c                |   3 +
- arch/riscv/kernel/signal.c               | 220 ++++++++++++++++---
- arch/riscv/kernel/smpboot.c              |   7 +
- arch/riscv/kernel/sys_riscv.c            |   9 +
- arch/riscv/kernel/traps.c                |  26 ++-
- arch/riscv/kernel/vector.c               | 266 +++++++++++++++++++++++
- arch/riscv/kvm/Makefile                  |   1 +
- arch/riscv/kvm/vcpu.c                    |  25 +++
- arch/riscv/kvm/vcpu_vector.c             | 186 ++++++++++++++++
- include/uapi/linux/elf.h                 |   1 +
- include/uapi/linux/prctl.h               |  11 +
- kernel/sys.c                             |  12 +
- 40 files changed, 1474 insertions(+), 50 deletions(-)
- create mode 100644 Documentation/riscv/vector.rst
- create mode 100644 arch/riscv/include/asm/kvm_vcpu_vector.h
- create mode 100644 arch/riscv/include/asm/vector.h
- create mode 100644 arch/riscv/kernel/vector.c
- create mode 100644 arch/riscv/kvm/vcpu_vector.c
-
+diff --git a/arch/riscv/include/asm/switch_to.h b/arch/riscv/include/asm/switch_to.h
+index 60f8ca01d36e..4b96b13dee27 100644
+--- a/arch/riscv/include/asm/switch_to.h
++++ b/arch/riscv/include/asm/switch_to.h
+@@ -46,7 +46,7 @@ static inline void fstate_restore(struct task_struct *task,
+ 	}
+ }
+ 
+-static inline void __switch_to_aux(struct task_struct *prev,
++static inline void __switch_to_fpu(struct task_struct *prev,
+ 				   struct task_struct *next)
+ {
+ 	struct pt_regs *regs;
+@@ -66,7 +66,7 @@ static __always_inline bool has_fpu(void)
+ static __always_inline bool has_fpu(void) { return false; }
+ #define fstate_save(task, regs) do { } while (0)
+ #define fstate_restore(task, regs) do { } while (0)
+-#define __switch_to_aux(__prev, __next) do { } while (0)
++#define __switch_to_fpu(__prev, __next) do { } while (0)
+ #endif
+ 
+ extern struct task_struct *__switch_to(struct task_struct *,
+@@ -77,7 +77,7 @@ do {							\
+ 	struct task_struct *__prev = (prev);		\
+ 	struct task_struct *__next = (next);		\
+ 	if (has_fpu())					\
+-		__switch_to_aux(__prev, __next);	\
++		__switch_to_fpu(__prev, __next);	\
+ 	((last) = __switch_to(__prev, __next));		\
+ } while (0)
+ 
 -- 
 2.17.1
 
