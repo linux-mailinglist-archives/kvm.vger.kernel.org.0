@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DDB86FC0D1
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 09:54:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F28E16FC0D3
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 09:54:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234639AbjEIHyC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 03:54:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37394 "EHLO
+        id S234620AbjEIHyF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 03:54:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234534AbjEIHxy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S234552AbjEIHxy (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 9 May 2023 03:53:54 -0400
 Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 112371FC2;
-        Tue,  9 May 2023 00:53:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BA0DF3C32;
+        Tue,  9 May 2023 00:53:52 -0700 (PDT)
 Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8CxVPAP_FlkxuIGAA--.11562S3;
+        by gateway (Coremail) with SMTP id _____8DxzOoP_FlkyuIGAA--.11417S3;
         Tue, 09 May 2023 15:53:51 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxFLUK_FlkIEhSAA--.16908S8;
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxFLUK_FlkIEhSAA--.16908S9;
         Tue, 09 May 2023 15:53:50 +0800 (CST)
 From:   Tianrui Zhao <zhaotianrui@loongson.cn>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -31,19 +31,19 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Alex Deucher <alexander.deucher@amd.com>,
         Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
         Xi Ruoyao <xry111@xry111.site>, zhaotianrui@loongson.cn
-Subject: [PATCH v9 06/30] LoongArch: KVM: Implement vcpu create and destroy interface
-Date:   Tue,  9 May 2023 15:53:22 +0800
-Message-Id: <20230509075346.1023386-7-zhaotianrui@loongson.cn>
+Subject: [PATCH v9 07/30] LoongArch: KVM: Implement vcpu run interface
+Date:   Tue,  9 May 2023 15:53:23 +0800
+Message-Id: <20230509075346.1023386-8-zhaotianrui@loongson.cn>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230509075346.1023386-1-zhaotianrui@loongson.cn>
 References: <20230509075346.1023386-1-zhaotianrui@loongson.cn>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8BxFLUK_FlkIEhSAA--.16908S8
+X-CM-TRANSID: AQAAf8BxFLUK_FlkIEhSAA--.16908S9
 X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvJXoWxur1fAw1xCrW7Wr1ktw4UCFg_yoW5Cr47pF
-        4xCw15Ww48Jry7Gw1fXrn0vrn0qrW8uF12ga47X3ySyr1DtryFvF4vkrWDAFW3XayfZF1S
-        qF1rJF1Uuw4UAw7anT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+X-Coremail-Antispam: 1Uk129KBjvJXoWxAryruFWxJryUXw43KFWxWFg_yoW5XFW3pF
+        4xCwn09w4rJ34xG3yfJrs0vrs0qrZ5Kr17XryxtrW3tr1Ut34DursakrWUAFWfA34fZF1S
+        vFn5tF4UCF1jy37anT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
         qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
         b48Fc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4
         AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF
@@ -67,110 +67,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement vcpu create and destroy interface, saving some info
-into vcpu arch structure such as vcpu exception entrance, vcpu
-enter guest pointer, etc. Init vcpu timer and set address
-translation mode when vcpu create.
+Implement vcpu run interface, handling mmio, iocsr reading fault
+and deliver interrupt, lose fpu before vcpu enter guest.
 
 Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 ---
- arch/loongarch/kvm/vcpu.c | 88 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 88 insertions(+)
- create mode 100644 arch/loongarch/kvm/vcpu.c
+ arch/loongarch/kvm/vcpu.c | 86 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 86 insertions(+)
 
 diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-new file mode 100644
-index 000000000000..24b5b00266a1
---- /dev/null
+index 24b5b00266a1..eca8b96a3e6e 100644
+--- a/arch/loongarch/kvm/vcpu.c
 +++ b/arch/loongarch/kvm/vcpu.c
-@@ -0,0 +1,88 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
-+ */
-+
-+#include <linux/kvm_host.h>
-+#include <asm/fpu.h>
-+#include <asm/loongarch.h>
-+#include <asm/setup.h>
-+#include <asm/time.h>
-+
-+#define CREATE_TRACE_POINTS
-+#include "trace.h"
-+
-+int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+@@ -17,6 +17,44 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+ 	return 0;
+ }
+ 
++/* Returns 1 if the guest TLB may be clobbered */
++static int _kvm_check_requests(struct kvm_vcpu *vcpu, int cpu)
 +{
-+	return 0;
++	int ret = 0;
++
++	if (!kvm_request_pending(vcpu))
++		return 0;
++
++	if (kvm_check_request(KVM_REQ_TLB_FLUSH, vcpu)) {
++		/* Drop vpid for this vCPU */
++		vcpu->arch.vpid = 0;
++		/* This will clobber guest TLB contents too */
++		ret = 1;
++	}
++
++	return ret;
 +}
 +
-+int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long timer_hz;
-+	struct loongarch_csrs *csr;
-+
-+	vcpu->arch.vpid = 0;
-+
-+	hrtimer_init(&vcpu->arch.swtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_PINNED);
-+	vcpu->arch.swtimer.function = kvm_swtimer_wakeup;
-+	vcpu->kvm->arch.online_vcpus = vcpu->vcpu_id + 1;
-+
-+	vcpu->arch.guest_eentry = (unsigned long)kvm_loongarch_ops->guest_eentry;
-+	vcpu->arch.handle_exit = _kvm_handle_exit;
-+	vcpu->arch.csr = kzalloc(sizeof(struct loongarch_csrs), GFP_KERNEL);
-+	if (!vcpu->arch.csr)
-+		return -ENOMEM;
-+
-+	/*
-+	 * kvm all exceptions share one exception entry, and host <-> guest switch
-+	 * also switch excfg.VS field, keep host excfg.VS info here
-+	 */
-+	vcpu->arch.host_ecfg = (read_csr_ecfg() & CSR_ECFG_VS);
-+
-+	/* Init */
-+	vcpu->arch.last_sched_cpu = -1;
-+	vcpu->arch.last_exec_cpu = -1;
-+
-+	/*
-+	 * Initialize guest register state to valid architectural reset state.
-+	 */
-+	timer_hz = calc_const_freq();
-+	kvm_init_timer(vcpu, timer_hz);
-+
-+	/* Set Initialize mode for GUEST */
-+	csr = vcpu->arch.csr;
-+	kvm_write_sw_gcsr(csr, LOONGARCH_CSR_CRMD, CSR_CRMD_DA);
-+
-+	/* Set cpuid */
-+	kvm_write_sw_gcsr(csr, LOONGARCH_CSR_TMID, vcpu->vcpu_id);
-+
-+	/* start with no pending virtual guest interrupts */
-+	csr->csrs[LOONGARCH_CSR_GINTC] = 0;
-+
-+	return 0;
-+}
-+
-+void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
-+{
-+}
-+
-+void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
++static void kvm_pre_enter_guest(struct kvm_vcpu *vcpu)
 +{
 +	int cpu;
-+	struct kvm_context *context;
-+
-+	hrtimer_cancel(&vcpu->arch.swtimer);
-+	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-+	kfree(vcpu->arch.csr);
 +
 +	/*
-+	 * If the vCPU is freed and reused as another vCPU, we don't want the
-+	 * matching pointer wrongly hanging around in last_vcpu.
++	 * handle vcpu timer, interrupts, check requests and
++	 * check vmid before vcpu enter guest
 +	 */
-+	for_each_possible_cpu(cpu) {
-+		context = per_cpu_ptr(vcpu->kvm->arch.vmcs, cpu);
-+		if (context->last_vcpu == vcpu)
-+			context->last_vcpu = NULL;
++	kvm_acquire_timer(vcpu);
++	_kvm_deliver_intr(vcpu);
++	/* make sure the vcpu mode has been written */
++	smp_store_mb(vcpu->mode, IN_GUEST_MODE);
++	cpu = smp_processor_id();
++	_kvm_check_requests(vcpu, cpu);
++	_kvm_check_vmid(vcpu, cpu);
++	vcpu->arch.host_eentry = csr_read64(LOONGARCH_CSR_EENTRY);
++	/* clear KVM_LARCH_CSR as csr will change when enter guest */
++	vcpu->arch.aux_inuse &= ~KVM_LARCH_CSR;
++}
++
+ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long timer_hz;
+@@ -86,3 +124,51 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 			context->last_vcpu = NULL;
+ 	}
+ }
++
++int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
++{
++	int r = -EINTR;
++	struct kvm_run *run = vcpu->run;
++
++	vcpu_load(vcpu);
++
++	kvm_sigset_activate(vcpu);
++
++	if (vcpu->mmio_needed) {
++		if (!vcpu->mmio_is_write)
++			_kvm_complete_mmio_read(vcpu, run);
++		vcpu->mmio_needed = 0;
 +	}
++
++	if (run->exit_reason == KVM_EXIT_LOONGARCH_IOCSR) {
++		if (!run->iocsr_io.is_write)
++			_kvm_complete_iocsr_read(vcpu, run);
++	}
++
++	/* clear exit_reason */
++	run->exit_reason = KVM_EXIT_UNKNOWN;
++	if (run->immediate_exit)
++		goto out;
++
++	lose_fpu(1);
++
++	local_irq_disable();
++	guest_timing_enter_irqoff();
++
++	kvm_pre_enter_guest(vcpu);
++	trace_kvm_enter(vcpu);
++
++	guest_state_enter_irqoff();
++	r = kvm_loongarch_ops->enter_guest(run, vcpu);
++
++	/* guest_state_exit_irqoff() already done.  */
++	trace_kvm_out(vcpu);
++	guest_timing_exit_irqoff();
++	local_irq_enable();
++
++out:
++	kvm_sigset_deactivate(vcpu);
++
++	vcpu_put(vcpu);
++	return r;
 +}
 -- 
 2.31.1
