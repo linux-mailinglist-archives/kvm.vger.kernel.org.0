@@ -2,89 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A82616FCA11
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 17:17:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18C476FCA13
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 17:18:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236094AbjEIPRt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 11:17:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42186 "EHLO
+        id S235974AbjEIPSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 11:18:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235974AbjEIPRl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 11:17:41 -0400
+        with ESMTP id S235676AbjEIPS3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 11:18:29 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CDD55246;
-        Tue,  9 May 2023 08:17:40 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 349FBqMH002486;
-        Tue, 9 May 2023 15:17:40 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99C2E4EDB;
+        Tue,  9 May 2023 08:18:20 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 349F7Txq016026;
+        Tue, 9 May 2023 15:18:20 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=Af2VQI1T69tDDRRekZ/MH5dGctquO7a7wHILz5QViF4=;
- b=K1nwmdFmrOGS8hzRvfBwj4w8/bEcSLMUzojYWrsBtQ6UFd5m1kmpEy9H4pne7Wc00I7Q
- wAGIRA5HcP3lMr9xYfNg27F1fCgFxcpHWJth+rU1bz/aVSXy+T830IJVKGz8EYWxeMdP
- DWhzUfDwJUFgA5Qg3o16qpZOG/R1u7XRK9wZ4nDdG/55Mmg/hG9R3xltGVBCMvKxm2FC
- Fy/FdLgcPvqn901KkTgbzaekgy6Fx8Odoy1I5PrYSbJkXuTzNcbEbQjWi1jPAmsVNa9P
- Uv92P8u9RF7R6DqJBWAKtGrr6vhLyMScvoNbbcUYrZ0IrFzmA1hA+wSQgISRc6zJDoV4 fw== 
+ bh=yvxgSm4F0OLa7CL2/XDs6iTGpXSrzQlxD40fAI6Cf+8=;
+ b=Y2WAWKZ+ML/k3x6vCkfpZ8qxrR/i0v7wCTrXiVqH00L+y1ZANptbMvPDPNSrJT/m3Cm2
+ UUTUR0NGS57/I/wLg1wHO61FL53A+uT3bZ5ZpGqcw4Ak5lkgRYV46Is6l5OMWZT+/6c+
+ NR/QJvNx13SLu2z84Nb+5NfoUosHbnajwApeGGEmvKBV+7UYjT4QabZb9WKy5CmqYuUm
+ NkfMy0XKqhFZmOSebQLPYlHGzINqrwVARWnV0HT8x1Lo2g0oMSjodHAmfBhyxSVRBXo0
+ oDwlMa1MH13HaccdFoWj0wO6Q+FOKMjYV4zNYrpDNKgwOHjXOBXKxzped7RcEwMBngPM oA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qfrkv0b80-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qfrbas12a-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 May 2023 15:17:38 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 349FBwsO003468;
-        Tue, 9 May 2023 15:17:38 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qfrkv0b5g-1
+        Tue, 09 May 2023 15:18:19 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 349F7VOl016171;
+        Tue, 9 May 2023 15:18:19 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qfrbas102-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 May 2023 15:17:38 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3493vjUX019814;
-        Tue, 9 May 2023 15:17:35 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3qf896rh1t-1
+        Tue, 09 May 2023 15:18:19 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 349BrrrR031277;
+        Tue, 9 May 2023 15:18:16 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3qf7e0re5f-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 May 2023 15:17:35 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 349FHVVw36963068
+        Tue, 09 May 2023 15:18:16 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 349FIDuh52822456
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 9 May 2023 15:17:31 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8E8B620040;
-        Tue,  9 May 2023 15:17:31 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5D9982004D;
-        Tue,  9 May 2023 15:17:31 +0000 (GMT)
+        Tue, 9 May 2023 15:18:13 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 16EC32004B;
+        Tue,  9 May 2023 15:18:13 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CCA922004E;
+        Tue,  9 May 2023 15:18:12 +0000 (GMT)
 Received: from p-imbrenda (unknown [9.152.224.56])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  9 May 2023 15:17:31 +0000 (GMT)
-Date:   Tue, 9 May 2023 17:17:29 +0200
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  9 May 2023 15:18:12 +0000 (GMT)
+Date:   Tue, 9 May 2023 17:18:11 +0200
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     borntraeger@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v1 2/3] KVM: s390: add stat counter for shadow gmap
- events
-Message-ID: <20230509171729.1a69f89b@p-imbrenda>
-In-Reply-To: <168364399371.331309.5908202452338432368@t14-nrb>
-References: <20230509111202.333714-1-nrb@linux.ibm.com>
-        <20230509111202.333714-3-nrb@linux.ibm.com>
-        <20230509134351.1ac4ea63@p-imbrenda>
-        <168364399371.331309.5908202452338432368@t14-nrb>
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v1] lib: s390x: mmu: fix conflicting
+ types for get_dat_entry
+Message-ID: <20230509171811.0c22a6f5@p-imbrenda>
+In-Reply-To: <20230508102426.130768-1-nrb@linux.ibm.com>
+References: <20230508102426.130768-1-nrb@linux.ibm.com>
 Organization: IBM
 X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: syIqV5uYwwLm0wqJ4DKbwVZrPmeb6Mru
-X-Proofpoint-ORIG-GUID: EQXUgesW4lqxJdEVLQsIMuq8tRvT3aD_
+X-Proofpoint-GUID: llM5qnc0pOpSu-YYC7KXcVg7Y_AN8OKP
+X-Proofpoint-ORIG-GUID: MaIaGzcmb44fE6iJrQVSR6wzZFXGO84d
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-05-09_08,2023-05-05_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- suspectscore=0 mlxscore=0 mlxlogscore=999 spamscore=0 adultscore=0
- lowpriorityscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2304280000 definitions=main-2305090124
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 malwarescore=0 mlxscore=0 suspectscore=0 clxscore=1015
+ phishscore=0 lowpriorityscore=0 impostorscore=0 mlxlogscore=999
+ adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2305090124
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
@@ -94,71 +92,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 09 May 2023 16:53:13 +0200
+On Mon,  8 May 2023 12:24:26 +0200
 Nico Boehr <nrb@linux.ibm.com> wrote:
 
-> Quoting Claudio Imbrenda (2023-05-09 13:43:51)
-> [...]
-> > > diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> > > index 3eb85f254881..8348a0095f3a 100644
-> > > --- a/arch/s390/kvm/gaccess.c
-> > > +++ b/arch/s390/kvm/gaccess.c
-> > > @@ -1382,6 +1382,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
-> > >                                 unsigned long *pgt, int *dat_protection,
-> > >                                 int *fake)
-> > >  {
-> > > +     struct kvm *kvm;
-> > >       struct gmap *parent;
-> > >       union asce asce;
-> > >       union vaddress vaddr;
-> > > @@ -1390,6 +1391,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
-> > >  
-> > >       *fake = 0;
-> > >       *dat_protection = 0;
-> > > +     kvm = sg->private;
-> > >       parent = sg->parent;
-> > >       vaddr.addr = saddr;
-> > >       asce.val = sg->orig_asce;
-> > > @@ -1450,6 +1452,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
-> > >               rc = gmap_shadow_r2t(sg, saddr, rfte.val, *fake);
-> > >               if (rc)
-> > >                       return rc;
-> > > +             kvm->stat.gmap_shadow_r2++;
-> > >       }
-> > >               fallthrough;
-> > >       case ASCE_TYPE_REGION2: {
-> > > @@ -1478,6 +1481,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
-> > >               rc = gmap_shadow_r3t(sg, saddr, rste.val, *fake);
-> > >               if (rc)
-> > >                       return rc;
-> > > +             kvm->stat.gmap_shadow_r3++;
-> > >       }
-> > >               fallthrough;
-> > >       case ASCE_TYPE_REGION3: {
-> > > @@ -1515,6 +1519,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
-> > >               rc = gmap_shadow_sgt(sg, saddr, rtte.val, *fake);
-> > >               if (rc)
-> > >                       return rc;
-> > > +             kvm->stat.gmap_shadow_segment++;
-> > >       }
-> > >               fallthrough;
-> > >       case ASCE_TYPE_SEGMENT: {
-> > > @@ -1548,6 +1553,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
-> > >               rc = gmap_shadow_pgt(sg, saddr, ste.val, *fake);
-> > >               if (rc)
-> > >                       return rc;
-> > > +             kvm->stat.gmap_shadow_page++;  
-> > 
-> > do I understand correctly that, if several levels need to be shadowed
-> > at the same time, you will increment every affected counter, and not
-> > just the highest or lowest level?
-> > 
-> > if so, please add a brief explanation to the patch description  
-> 
-> Yes, that seemed like the simplest thing to do.
-> 
-> Will add a explanation.
-> 
-> Or should I add a flag and only increment the top level?
+> This causes compilation to fail with GCC 13:
+>=20
+> gcc -std=3Dgnu99 -ffreestanding -I/kut/lib -I/kut/lib/s390x -Ilib -O2 -ma=
+rch=3DzEC12 -mbackchain -fno-delete-null-pointer-checks -g -MMD -MF lib/s39=
+0x/.mmu.d -fno-strict-aliasing -fno-common -Wall -Wwrite-strings -Wempty-bo=
+dy -Wuninitialized -Wignored-qualifiers -Wno-missing-braces -Werror  -fomit=
+-frame-pointer  -fno-stack-protector    -Wno-frame-address   -fno-pic  -no-=
+pie  -Wclobbered  -Wunused-but-set-parameter  -Wmissing-parameter-type  -Wo=
+ld-style-declaration -Woverride-init -Wmissing-prototypes -Wstrict-prototyp=
+es -I/kut/lib -I/kut/lib/s390x -Ilib  -c -o lib/s390x/mmu.o lib/s390x/mmu.c
+> lib/s390x/mmu.c:132:7: error: conflicting types for =E2=80=98get_dat_entr=
+y=E2=80=99 due to enum/integer mismatch; have =E2=80=98void *(pgd_t *, void=
+ *, enum pgt_level)=E2=80=99 [-Werror=3Denum-int-mismatch]
+>   132 | void *get_dat_entry(pgd_t *pgtable, void *vaddr, enum pgt_level l=
+evel)
+>       |       ^~~~~~~~~~~~~
+> In file included from lib/s390x/mmu.c:16:
+> lib/s390x/mmu.h:96:7: note: previous declaration of =E2=80=98get_dat_entr=
+y=E2=80=99 with type =E2=80=98void *(pgd_t *, void *, unsigned int)=E2=80=99
+>    96 | void *get_dat_entry(pgd_t *pgtable, void *vaddr, unsigned int lev=
+el);
+>       |       ^~~~~~~~~~~~~
+>=20
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 
-that's up to you, see what makes more sense
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  lib/s390x/mmu.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/lib/s390x/mmu.h b/lib/s390x/mmu.h
+> index 15f88e4f424e..dadc2e600f9a 100644
+> --- a/lib/s390x/mmu.h
+> +++ b/lib/s390x/mmu.h
+> @@ -93,6 +93,6 @@ static inline void unprotect_page(void *vaddr, unsigned=
+ long prot)
+>  	unprotect_dat_entry(vaddr, prot, pgtable_level_pte);
+>  }
+> =20
+> -void *get_dat_entry(pgd_t *pgtable, void *vaddr, unsigned int level);
+> +void *get_dat_entry(pgd_t *pgtable, void *vaddr, enum pgt_level level);
+> =20
+>  #endif /* _ASMS390X_MMU_H_ */
+
