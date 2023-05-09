@@ -2,108 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13F506FCE33
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 21:03:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 989C36FD050
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 22:54:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234360AbjEITDs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 15:03:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39148 "EHLO
+        id S234609AbjEIUyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 16:54:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234743AbjEITDl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 15:03:41 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DA7C4494;
-        Tue,  9 May 2023 12:03:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=TSBh9Kcc3KUBCL5aBYO64M6mJ0lqBshLkhyf/of1TC0=; b=FCW62nSzYz/ok7iHxNvcDpG+dG
-        p6YklNcqU1xc1R5gABl7j+pzt4edhSw9O4ekmaa3xTKe85WxJ7j//bk1Hq0aCLl67UaBbwwxCCHk/
-        nBmP1Oh1U922UgmktErEM43hSE3cxvXYb9NGz9UhnoYMvGUoSgjnPgFVXoSKId4RFqoRyo4NHPoij
-        bcScWKk9g+9EmYD6JUcbQy52qy2HwBwNUmDY8rkGLXv4ab46T6LJkJ9XmnxOAcFAsQwz8NgGbcGaF
-        KscqydThd0TZMh7kkUKJjl966pJSmroQfUfcyEtrdVazmY6otdbItrWnRiZGbTqn4ostdQpRvv49n
-        n+gHUO8Q==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pwSbb-006EfJ-1j;
-        Tue, 09 May 2023 19:02:38 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id EA809300451;
-        Tue,  9 May 2023 21:02:31 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id CC6D620F0E418; Tue,  9 May 2023 21:02:31 +0200 (CEST)
-Date:   Tue, 9 May 2023 21:02:31 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Rafael J. Wysocki" <rafael@kernel.org>
-Cc:     bigeasy@linutronix.de, mark.rutland@arm.com, maz@kernel.org,
-        catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org,
-        kernel@xen0n.name, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, pbonzini@redhat.com, wanpengli@tencent.com,
-        vkuznets@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, jgross@suse.com, boris.ostrovsky@oracle.com,
-        daniel.lezcano@linaro.org, kys@microsoft.com,
-        haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-        longman@redhat.com, boqun.feng@gmail.com, pmladek@suse.com,
-        senozhatsky@chromium.org, rostedt@goodmis.org,
-        john.ogness@linutronix.de, juri.lelli@redhat.com,
-        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-        bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
-        vschneid@redhat.com, jstultz@google.com, sboyd@kernel.org,
-        linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-pm@vger.kernel.org
-Subject: Re: [RFC][PATCH 9/9] cpuidle: Use local_clock_noinstr()
-Message-ID: <20230509190231.GA2148518@hirez.programming.kicks-ass.net>
-References: <20230508211951.901961964@infradead.org>
- <20230508213147.990013706@infradead.org>
- <CAJZ5v0jc29fSGFzN2Yeb+xRQZ9Y0V2_Ge17YnsEG5Um9OV25uw@mail.gmail.com>
+        with ESMTP id S229738AbjEIUyj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 16:54:39 -0400
+Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FFE56A64
+        for <kvm@vger.kernel.org>; Tue,  9 May 2023 13:54:19 -0700 (PDT)
+Received: by mail-vs1-xe36.google.com with SMTP id ada2fe7eead31-43476bbec67so4040638137.2
+        for <kvm@vger.kernel.org>; Tue, 09 May 2023 13:54:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1683665528; x=1686257528;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1ek4N4zhVnFp0OjD2e91cJw6qEMFFDQc5/FTgmHiGak=;
+        b=rVJW9XdHV4bhVBpENigqqik2I2pCncaz794aO5r0GaFD6EOogLB5GsTpjkOXXFk1cl
+         BLaajyFwcHYbDsMksrmy46rkJ8Xg5XgSiPcKIeqTk5sc4i6ByJVNSNE661bfq0lTqdr5
+         15qPLPCf/jWgZf76j7FinTn4I6xu8cSDiM5g9kSu8JtTXKgSM8OwYPMKVaG7suYL8InA
+         DMrcHjABRjgiApDllMJEgP/iLFCOFcqlwydZH35zZAE5dGhLWBf35Ag5dGmDJHpUzL+l
+         I6D5uZx78KFyGlmPQFh+q8W5REGbWvTcrIRfpmnEKUzBt+OarAE0cEQNLkGT/+HDIP0z
+         HuDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683665528; x=1686257528;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1ek4N4zhVnFp0OjD2e91cJw6qEMFFDQc5/FTgmHiGak=;
+        b=LdyM9jW0QV4RR5cS0YX0YM5J9wooomM3Xm2GNSKkSmppfZfm5lwiKMNamHWOdWrs4P
+         dKFS3i7OZGeDW5AsjkOPSqiQhDd8lWL2MzEnMbpEKTbYnOmdBULlfkB8Gn6vRh/Aqox0
+         HGs1/EfwZDUEI+1a9tTzNbEI9S/VAmELgx/xLv4RStgieYBGdAmN7kT5iz//GrliE1QZ
+         KTe7JYZpNkBMeO2VlXEi8dPEkeLXiBhv/fRlbx/Li3jT5UUuoXqJjpboLy06BfLBNqSZ
+         FVuwl01UUJKSVVH2IBAr24qf6B7+Zt184IdYBgX/+ucohmSInf2/ZB4f/nf0il8Nm+1s
+         I/Eg==
+X-Gm-Message-State: AC+VfDzj+UVImeJU+kTn3ydgmPJeIfN1SBISopELTLThmSggdxhLc8C6
+        QrCWGTX9M/wPwD4s0jRPWud2O0Vi4FuBkRBiljZnMA==
+X-Google-Smtp-Source: ACHHUZ5qUtibgquXG1CHXn5rsYEnNugGuamTPmXoGAjYsiSltyM3mefeFrXCpD+c8boXnApqrdpstv0ZlJ4ZhdJ1iOQ=
+X-Received: by 2002:a67:f291:0:b0:42e:6748:13dc with SMTP id
+ m17-20020a67f291000000b0042e674813dcmr5348659vsk.0.1683665528538; Tue, 09 May
+ 2023 13:52:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJZ5v0jc29fSGFzN2Yeb+xRQZ9Y0V2_Ge17YnsEG5Um9OV25uw@mail.gmail.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230306190156.434452-1-dmatlack@google.com>
+In-Reply-To: <20230306190156.434452-1-dmatlack@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 9 May 2023 13:51:42 -0700
+Message-ID: <CALzav=fZFpzw57hNmg2fqYG-0ddtvQd9+=7cw8tzuOGbZW1A1A@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] KVM: Refactor KVM stats macros and enable custom
+ stat names
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Eric Farman <farman@linux.ibm.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        Sathvika Vasireddy <sv@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 09, 2023 at 06:18:08PM +0200, Rafael J. Wysocki wrote:
-> On Mon, May 8, 2023 at 11:34 PM Peter Zijlstra <peterz@infradead.org> wrote:
-> > --- a/drivers/cpuidle/poll_state.c
-> > +++ b/drivers/cpuidle/poll_state.c
-> > @@ -15,7 +15,7 @@ static int __cpuidle poll_idle(struct cp
-> >  {
-> >         u64 time_start;
-> >
-> > -       time_start = local_clock();
-> > +       time_start = local_clock_noinstr();
-> >
-> >         dev->poll_time_limit = false;
-> >
-> > @@ -32,7 +32,7 @@ static int __cpuidle poll_idle(struct cp
-> >                                 continue;
-> >
-> >                         loop_count = 0;
-> > -                       if (local_clock() - time_start > limit) {
-> > +                       if (local_clock_noinstr() - time_start > limit) {
-> >                                 dev->poll_time_limit = true;
-> >                                 break;
-> >                         }
-> >
-> 
-> The above LGTM, but the teo governors uses local_clock() too.  Should
-> it use the _noinstr() version?
+On Mon, Mar 6, 2023 at 11:01=E2=80=AFAM David Matlack <dmatlack@google.com>=
+ wrote:
+>
+> This series refactors the KVM stats macros to reduce duplication and
+> adds the support for choosing custom names for stats.
 
-Only the callsites from noinstr or __cpuidle functions, IIRC the
-governors are neither and should be OK.
+Hi Paolo,
+
+I just wanted to double-check if this series is on your radar
+(probably for 6.5)?
