@@ -2,160 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3D4B6FBB6F
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 01:30:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 778C76FBC46
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 03:04:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233831AbjEHXay (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 May 2023 19:30:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48738 "EHLO
+        id S230348AbjEIBEs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 May 2023 21:04:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbjEHXax (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 May 2023 19:30:53 -0400
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 899964C1F;
-        Mon,  8 May 2023 16:30:51 -0700 (PDT)
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1aafa03f541so50866335ad.0;
-        Mon, 08 May 2023 16:30:51 -0700 (PDT)
+        with ESMTP id S229526AbjEIBEp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 May 2023 21:04:45 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A9862700;
+        Mon,  8 May 2023 18:04:44 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-64115eef620so38718198b3a.1;
+        Mon, 08 May 2023 18:04:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1683594283; x=1686186283;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=A/eeFC8dcbPa4pCqEyWdKkytQsMGVfBsdFuIBBNLaI4=;
+        b=Ids9hQYw3LSbClm+e+oSHj6XMgYdg3GeiZBlLd3gXX19ywvH/YEjxhUdCxqL1YPiAO
+         2IX/0dwlyBdgXYszLhCqAmGWLrN8jcGN6nTDofvtQAJH2Cc5tIjyh73HvWXn03HiRCao
+         RwZ4zsHPesKy+iRmvf4Kzi9YF3AjV+ikv9XKu/pv4FNe67oX8P8xLEpKqTdCW3dyDyyl
+         l7BeNYemar6Gk+jUn85bqSP+TB8J+lw6Az8jdw6bh3FPYrIlUqtSo0G8kRkts6uLXHfX
+         3RIJacgl0ptAJV5o41KdK2TyfudwjCzFQh34MUqizKcz5+SD3goaGp0Rwat6zNC2I/c9
+         B2FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683588646; x=1686180646;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NWxWshApja0U0iHBNlsacIgsAdM0MyD6OFNDBR0TtQw=;
-        b=IzLBkalk10UYJRHbcvJG4FDrPexD91OQn3RH12DbW9q+8Pwfa+GgVwBtjGHUORnPbn
-         RohXlJHd63t1c54UlWzN/JozEybtgV9vUE9OPXF7SMpAhP42DqYsvI1gh887hNU8xwEc
-         0MD9S6HswMr7DZfEj7RQTo4iFpa8orlzLcAboUThFoPOnmfCayn+7+91QABLIe2OaKYN
-         YPvuI3QPL28A2HHSV9Gj2vL7ofXNRsiE257rcw+ede932eqP7RHlRnSX2og5Igw/0vbw
-         rMXijtJWsSWQwvkYwHJxq53BfdcZ4OVoeiYRvR3jbPE7hvW4PIaSVA2TSDGs0KoksUF2
-         Y2qQ==
-X-Gm-Message-State: AC+VfDzJGojeTxY9NvpnCzvPqUo9vDJsRhzXHbgQ63Q6PQi4DhLJVVX2
-        zEZc6kS5SrhwcVdgJpU2clg=
-X-Google-Smtp-Source: ACHHUZ5KJ4FNkdOABPorvJcHaGbZpI6LNA96wccpsa7XLg8qzH5+GC1t9zf3JxwP2V/DQj2I5E7UKA==
-X-Received: by 2002:a17:902:ec88:b0:1aa:fbaa:ee09 with SMTP id x8-20020a170902ec8800b001aafbaaee09mr16421433plg.49.1683588646241;
-        Mon, 08 May 2023 16:30:46 -0700 (PDT)
-Received: from liuwe-devbox-debian-v2 ([20.69.120.36])
-        by smtp.gmail.com with ESMTPSA id x1-20020a170902820100b0019e60c645b1sm6760pln.305.2023.05.08.16.30.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 May 2023 16:30:45 -0700 (PDT)
-Date:   Mon, 8 May 2023 23:30:43 +0000
-From:   Wei Liu <wei.liu@kernel.org>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Michael Kelley <mikelley@microsoft.com>, ltykernel@gmail.com
-Cc:     bigeasy@linutronix.de, mark.rutland@arm.com, maz@kernel.org,
-        catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org,
-        kernel@xen0n.name, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, pbonzini@redhat.com, wanpengli@tencent.com,
-        vkuznets@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, jgross@suse.com, boris.ostrovsky@oracle.com,
-        daniel.lezcano@linaro.org, kys@microsoft.com,
-        haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-        rafael@kernel.org, longman@redhat.com, boqun.feng@gmail.com,
-        pmladek@suse.com, senozhatsky@chromium.org, rostedt@goodmis.org,
-        john.ogness@linutronix.de, juri.lelli@redhat.com,
-        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-        bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
-        vschneid@redhat.com, jstultz@google.com, sboyd@kernel.org,
-        linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-pm@vger.kernel.org
-Subject: Re: [RFC][PATCH 7/9] x86/tsc: Provide sched_clock_noinstr()
-Message-ID: <ZFmGI1EN24xroPHa@liuwe-devbox-debian-v2>
-References: <20230508211951.901961964@infradead.org>
- <20230508213147.853677542@infradead.org>
- <20230508214419.GA2053935@hirez.programming.kicks-ass.net>
+        d=1e100.net; s=20221208; t=1683594283; x=1686186283;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A/eeFC8dcbPa4pCqEyWdKkytQsMGVfBsdFuIBBNLaI4=;
+        b=aK0XoaZMbHjOvODfG/4nUjghWu+yM0aNOzv8MpBn7p+H7FAQkIKgi8JXj5YJ6IDDf+
+         7MzbjmdiGIqYsBw/IzjwA3ybnbav1Zlpd01atNJBgdbnaPMcH28ny+YKPAZC0hoFcCsk
+         6v8tgihVghb72oNSn55nrRquSmqarvd7nQtttDjUQ3okSCf4e6+k+yarpCQ+oKo+pqLh
+         308wP/9MHUIiX+4LGalw8x1pyBILX6FDKtwFz+DKA29yeEfZqbLXEH05T+E/oEape54u
+         PV/Twf9suQwvYPamW/ecYOkpARkgi+Kl+ddrsA2q/ry+hcXFl+7ixH+kvz+RuiSH0fqJ
+         zT5A==
+X-Gm-Message-State: AC+VfDySNRlncdWuQYYC41SdTstTIVlvhavzXioL/xs+wm1rlab7dl63
+        HP84SeC9QWPjNl46JohRmKgFzvLLPnE=
+X-Google-Smtp-Source: ACHHUZ5sKdGmB7fo/A8VsSBn039olyGcgtYBkwC7l/jWfQClFlGNymESgeJ88HgoFLm9fFTNMzM7Ng==
+X-Received: by 2002:a17:902:e5c6:b0:1a5:27d2:b6de with SMTP id u6-20020a170902e5c600b001a527d2b6demr21951662plf.3.1683594283413;
+        Mon, 08 May 2023 18:04:43 -0700 (PDT)
+Received: from [172.27.232.45] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
+        by smtp.gmail.com with ESMTPSA id l5-20020a17090270c500b001a641ea111fsm109074plt.112.2023.05.08.18.04.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 May 2023 18:04:43 -0700 (PDT)
+Message-ID: <5aec4689-fe63-abff-94d4-8e42cf5bba66@gmail.com>
+Date:   Tue, 9 May 2023 09:04:38 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230508214419.GA2053935@hirez.programming.kicks-ass.net>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v4 2/6] KVM: x86: Do not unload MMU roots when only
+ toggling CR0.WP with TDP enabled
+To:     Mathias Krause <minipli@grsecurity.net>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20230322013731.102955-1-minipli@grsecurity.net>
+ <20230322013731.102955-3-minipli@grsecurity.net>
+ <e70af22a-f09f-aadb-8353-35b29d2def61@gmail.com>
+ <b0d4b430-afd2-979c-e7d2-b53e131412ad@grsecurity.net>
+Content-Language: en-US
+From:   Robert Hoo <robert.hoo.linux@gmail.com>
+In-Reply-To: <b0d4b430-afd2-979c-e7d2-b53e131412ad@grsecurity.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 08, 2023 at 11:44:19PM +0200, Peter Zijlstra wrote:
-> On Mon, May 08, 2023 at 11:19:58PM +0200, Peter Zijlstra wrote:
+On 5/8/2023 5:30 PM, Mathias Krause wrote:
+>>>    void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0,
+>>> unsigned long cr0)
+>>>    {
+>>> +    /*
+>>> +     * CR0.WP is incorporated into the MMU role, but only for
+>>> non-nested,
+>>> +     * indirect shadow MMUs.  If TDP is enabled, the MMU's metadata
+>>> needs
+>>> +     * to be updated, e.g. so that emulating guest translations does the
+>>> +     * right thing, but there's no need to unload the root as CR0.WP
+>>> +     * doesn't affect SPTEs.
+>>> +     */
+>>> +    if (tdp_enabled && (cr0 ^ old_cr0) == X86_CR0_WP) {
+>>
+>> Curiously, this patch only affects tdp_enabled, why does legacy MMU also
+>> see comparable performance gains?
 > 
-> > --- a/drivers/clocksource/hyperv_timer.c
-> > +++ b/drivers/clocksource/hyperv_timer.c
-> > @@ -408,9 +408,9 @@ static u64 notrace read_hv_clock_tsc_cs(
-> >  	return read_hv_clock_tsc();
-> >  }
-> >  
-> > -static u64 notrace read_hv_sched_clock_tsc(void)
-> > +static u64 noinstr read_hv_sched_clock_tsc(void)
-> >  {
-> > -	return (read_hv_clock_tsc() - hv_sched_clock_offset) *
-> > +	return (hv_read_tsc_page(hv_get_tsc_page()) - hv_sched_clock_offset) *
-> >  		(NSEC_PER_SEC / HV_CLOCK_HZ);
-> >  }
-> >  
-> > --- a/include/clocksource/hyperv_timer.h
-> > +++ b/include/clocksource/hyperv_timer.h
-> > @@ -38,7 +38,7 @@ extern void hv_remap_tsc_clocksource(voi
-> >  extern unsigned long hv_get_tsc_pfn(void);
-> >  extern struct ms_hyperv_tsc_page *hv_get_tsc_page(void);
-> >  
-> > -static inline notrace u64
-> > +static __always_inline notrace u64
-> >  hv_read_tsc_page_tsc(const struct ms_hyperv_tsc_page *tsc_pg, u64 *cur_tsc)
-> >  {
-> >  	u64 scale, offset;
-> > @@ -85,7 +85,7 @@ hv_read_tsc_page_tsc(const struct ms_hyp
-> >  	return mul_u64_u64_shr(*cur_tsc, scale, 64) + offset;
-> >  }
-> >  
-> > -static inline notrace u64
-> > +static __always_inline notrace u64
-> >  hv_read_tsc_page(const struct ms_hyperv_tsc_page *tsc_pg)
-> >  {
-> >  	u64 cur_tsc;
+> Because 'tdp_enabled' just implies EPT / NPT and only 'tdp_mmu_enabled'
+> decides which MMU mode to use -- either legacy or TDP MMU (see
+> kvm_configure_mmu() and now gets invoked from vmx.c / svm.c).
 > 
-> Hyper-V folks!
-> 
-> While reviewing all this I found the following 'gem':
-> 
-> hv_init_clocksource()
->   hv_setup_sched_clock()
->     paravirt_set_sched_clock(read_hv_sched_clock_msr)
-> 
-> read_hv_sched_clock_msr() [notrace]
->   read_hv_clock_msr()     [notrace]
->     hv_get_register()      *traced*
->       hv_get_non_nested_register() ...
->         hv_ghcb_msr_read()
-> 	  WARN_ON(in_nmi())
-> 	  ...
-> 	  local_irq_save()
-> 
-> 
-> Note that:
-> 
->  a) sched_clock() is used in NMI context a *LOT*
->  b) sched_clock() is notrace (or even noinstr with these patches)
->     and local_irq_save() implies tracing
-> 
+Ah, get it, thanks. The name indeed confuses me (and perhaps others).
+After dig into,
+1. kvm modules has a param "tdp_mmu_enabled", (in the first place) 
+indicates KVM level's willingness on enable two dimensional paging. 
+However, it in the end depends on ept/npt enabled or not on vendor layer.
+So, uses a "tdp_mmu_allowed" to intermediately record this willness in kvm 
+module init phase.
+	/*
+	 * Snapshot userspace's desire to enable the TDP MMU. Whether or not the
+	 * TDP MMU is actually enabled is determined in kvm_configure_mmu()
+	 * when the vendor module is loaded.
+	 */
+	tdp_mmu_allowed = tdp_mmu_enabled;
+2. When vendor module init --> kvm_configure_mmu()
+	tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled;
 
-Tianyu and Michael, what's your thought on this?
+    tdp_mmu_enabled's semantics becomes, as its name indicates, the 
+eventual tdp mmu enablement status.
 
-Is the MSR-based GHCB usable at this point?
+    And, tdp_enabled, is the general (ept_enabled | npt_enabled).
 
-What other clock source can be used?
-
-Thanks,
-Wei.
-
-> 
-> Can you pretty please:
-> 
->  1) delete all this; or,
->  2) fix it in a hurry?
-> 
-> Thanks!
