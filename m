@@ -2,141 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 18C476FCA13
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 17:18:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A1016FCAB6
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 18:04:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235974AbjEIPSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 11:18:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43104 "EHLO
+        id S235583AbjEIQEc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 12:04:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235676AbjEIPS3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 11:18:29 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99C2E4EDB;
-        Tue,  9 May 2023 08:18:20 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 349F7Txq016026;
-        Tue, 9 May 2023 15:18:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=yvxgSm4F0OLa7CL2/XDs6iTGpXSrzQlxD40fAI6Cf+8=;
- b=Y2WAWKZ+ML/k3x6vCkfpZ8qxrR/i0v7wCTrXiVqH00L+y1ZANptbMvPDPNSrJT/m3Cm2
- UUTUR0NGS57/I/wLg1wHO61FL53A+uT3bZ5ZpGqcw4Ak5lkgRYV46Is6l5OMWZT+/6c+
- NR/QJvNx13SLu2z84Nb+5NfoUosHbnajwApeGGEmvKBV+7UYjT4QabZb9WKy5CmqYuUm
- NkfMy0XKqhFZmOSebQLPYlHGzINqrwVARWnV0HT8x1Lo2g0oMSjodHAmfBhyxSVRBXo0
- oDwlMa1MH13HaccdFoWj0wO6Q+FOKMjYV4zNYrpDNKgwOHjXOBXKxzped7RcEwMBngPM oA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qfrbas12a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 May 2023 15:18:19 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 349F7VOl016171;
-        Tue, 9 May 2023 15:18:19 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qfrbas102-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 May 2023 15:18:19 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 349BrrrR031277;
-        Tue, 9 May 2023 15:18:16 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3qf7e0re5f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 May 2023 15:18:16 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 349FIDuh52822456
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 9 May 2023 15:18:13 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 16EC32004B;
-        Tue,  9 May 2023 15:18:13 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CCA922004E;
-        Tue,  9 May 2023 15:18:12 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  9 May 2023 15:18:12 +0000 (GMT)
-Date:   Tue, 9 May 2023 17:18:11 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v1] lib: s390x: mmu: fix conflicting
- types for get_dat_entry
-Message-ID: <20230509171811.0c22a6f5@p-imbrenda>
-In-Reply-To: <20230508102426.130768-1-nrb@linux.ibm.com>
-References: <20230508102426.130768-1-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-redhat-linux-gnu)
+        with ESMTP id S231488AbjEIQEb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 12:04:31 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC98249EC
+        for <kvm@vger.kernel.org>; Tue,  9 May 2023 09:04:25 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4ec8eca56cfso6807708e87.0
+        for <kvm@vger.kernel.org>; Tue, 09 May 2023 09:04:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1683648264; x=1686240264;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P5eI2yzNCfdr9SsLOpnjF/NfxrXE0SJgMXU078Kgt/I=;
+        b=J0pEnRua2uyGW9LomKvzRZcRaZoMbGkoXEwVtzd/6euViySYeB9iFTNBXV0uuWPBCF
+         vskxrrYyS2phpkjiJ3gMDe8j3zdvUHtszIbazvGuWdXKPVUwdCqGTa2Q0oISrb5rpFfJ
+         Y2j62+v2Rq4VqYRg1FyQR1cUC0pddLk3LLrKMtHVNlQxuOj5XazbiUO6YlyY3H9CJdyK
+         m7hlbAHkWcpLNeMxhjfWVu57Me7r6PHsVoqxz7eNR2V3NwYPCnIbYTijf3lHNMwdq88V
+         d5K9nZ/mvV1e3rFmF5FH+AnPmxpc3CGPYodVaD2g6jeGiQNgB6Rmz4P7Jelmn6aohkHG
+         Hg3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683648264; x=1686240264;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P5eI2yzNCfdr9SsLOpnjF/NfxrXE0SJgMXU078Kgt/I=;
+        b=LPrveSe6S3icKx7ZIsQxVVmWiXCPviW0i1H1plzICdIUaEGuf505xw2A0ObUZvIRLj
+         pcF6TFPMVpNWYUia0sSg+zCZKlvpatKGI4niDwmqqsNXPRFSN4+EPkqsGmbzjCGgIcds
+         D31HvB4rwmzFDZX6y+Xizp38W46JN342BBPh0ZK0UrqnTzGY+3fx2G0A97VSjJla2ZDx
+         PSOxKB+l/OwF+nYD4iwPLueE00NvC8NY6JpGlLjDqLKN37c4/Zm7RWgcBlWk57v4jYUB
+         OUzmc1WtugYkN3/g4QBVcPo+lnNwoMsXy7Siwwo6ADrlSNbimC8zpUlJ0acuIt/EkZi5
+         l4lQ==
+X-Gm-Message-State: AC+VfDyJFQhilZjcNwnCbXDeCvFhg/YW2Z8Rh1O/4N8Cz0h3NYZtYSSH
+        Ml7mRaKTnSkTT4FflqO4+j9cAdFIQX1eK8azSYgcsA==
+X-Google-Smtp-Source: ACHHUZ5ny9OYUO8ttAEKM8lx+rDZbiwo4O5HMSbiqxwuUjYxEq/NRzUx+9FkFZuIuyZAI6xXQ2pLEnMwlpjaOWp2y2s=
+X-Received: by 2002:ac2:593a:0:b0:4eb:44c2:ab6c with SMTP id
+ v26-20020ac2593a000000b004eb44c2ab6cmr845205lfi.2.1683648263872; Tue, 09 May
+ 2023 09:04:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20230509103033.11285-1-andy.chiu@sifive.com> <20230509103033.11285-24-andy.chiu@sifive.com>
+ <20230509-resilient-lagoon-265e851e5bf8@wendy>
+In-Reply-To: <20230509-resilient-lagoon-265e851e5bf8@wendy>
+From:   Andy Chiu <andy.chiu@sifive.com>
+Date:   Wed, 10 May 2023 00:04:12 +0800
+Message-ID: <CABgGipXvVw8GWeVLTuTJT9Hus-pEPUcgRhO3oovKYOAZK3fAEg@mail.gmail.com>
+Subject: Re: [PATCH -next v19 23/24] riscv: Enable Vector code to be built
+To:     Conor Dooley <conor.dooley@microchip.com>
+Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
+        anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: llM5qnc0pOpSu-YYC7KXcVg7Y_AN8OKP
-X-Proofpoint-ORIG-GUID: MaIaGzcmb44fE6iJrQVSR6wzZFXGO84d
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-09_08,2023-05-05_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 malwarescore=0 mlxscore=0 suspectscore=0 clxscore=1015
- phishscore=0 lowpriorityscore=0 impostorscore=0 mlxlogscore=999
- adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305090124
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  8 May 2023 12:24:26 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
+On Tue, May 9, 2023 at 8:35=E2=80=AFPM Conor Dooley <conor.dooley@microchip=
+.com> wrote:
+>
+> Hey Andy,
+>
+> On Tue, May 09, 2023 at 10:30:32AM +0000, Andy Chiu wrote:
+> > From: Guo Ren <guoren@linux.alibaba.com>
+> >
+> > This patch adds a config which enables vector feature from the kernel
+> > space.
+>
+> This commit message probably needs to change, it's not exactly doing
+> that anymore!
 
-> This causes compilation to fail with GCC 13:
->=20
-> gcc -std=3Dgnu99 -ffreestanding -I/kut/lib -I/kut/lib/s390x -Ilib -O2 -ma=
-rch=3DzEC12 -mbackchain -fno-delete-null-pointer-checks -g -MMD -MF lib/s39=
-0x/.mmu.d -fno-strict-aliasing -fno-common -Wall -Wwrite-strings -Wempty-bo=
-dy -Wuninitialized -Wignored-qualifiers -Wno-missing-braces -Werror  -fomit=
--frame-pointer  -fno-stack-protector    -Wno-frame-address   -fno-pic  -no-=
-pie  -Wclobbered  -Wunused-but-set-parameter  -Wmissing-parameter-type  -Wo=
-ld-style-declaration -Woverride-init -Wmissing-prototypes -Wstrict-prototyp=
-es -I/kut/lib -I/kut/lib/s390x -Ilib  -c -o lib/s390x/mmu.o lib/s390x/mmu.c
-> lib/s390x/mmu.c:132:7: error: conflicting types for =E2=80=98get_dat_entr=
-y=E2=80=99 due to enum/integer mismatch; have =E2=80=98void *(pgd_t *, void=
- *, enum pgt_level)=E2=80=99 [-Werror=3Denum-int-mismatch]
->   132 | void *get_dat_entry(pgd_t *pgtable, void *vaddr, enum pgt_level l=
-evel)
->       |       ^~~~~~~~~~~~~
-> In file included from lib/s390x/mmu.c:16:
-> lib/s390x/mmu.h:96:7: note: previous declaration of =E2=80=98get_dat_entr=
-y=E2=80=99 with type =E2=80=98void *(pgd_t *, void *, unsigned int)=E2=80=99
->    96 | void *get_dat_entry(pgd_t *pgtable, void *vaddr, unsigned int lev=
-el);
->       |       ^~~~~~~~~~~~~
->=20
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+Yes, I totally missed that part. I will get commit messages updated
+when it's time for the next revision.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>
+> > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> > Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
+> > Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+>
+> > Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
+> > Suggested-by: Atish Patra <atishp@atishpatra.org>
+>
+> And I suspect that these two are also likely inaccurate at this point,
+> but IDC.
 
-> ---
->  lib/s390x/mmu.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/lib/s390x/mmu.h b/lib/s390x/mmu.h
-> index 15f88e4f424e..dadc2e600f9a 100644
-> --- a/lib/s390x/mmu.h
-> +++ b/lib/s390x/mmu.h
-> @@ -93,6 +93,6 @@ static inline void unprotect_page(void *vaddr, unsigned=
- long prot)
->  	unprotect_dat_entry(vaddr, prot, pgtable_level_pte);
->  }
-> =20
-> -void *get_dat_entry(pgd_t *pgtable, void *vaddr, unsigned int level);
-> +void *get_dat_entry(pgd_t *pgtable, void *vaddr, enum pgt_level level);
-> =20
->  #endif /* _ASMS390X_MMU_H_ */
+Agree. I am going to drop these.
 
+>
+> > Co-developed-by: Andy Chiu <andy.chiu@sifive.com>
+> > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+> > ---
+> > Changelog V19:
+> >  - Add RISCV_V_DISABLE to set compile-time default.
+> >
+> >  arch/riscv/Kconfig  | 31 +++++++++++++++++++++++++++++++
+> >  arch/riscv/Makefile |  6 +++++-
+> >  2 files changed, 36 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > index 1019b519d590..fa256f2e23c1 100644
+> > --- a/arch/riscv/Kconfig
+> > +++ b/arch/riscv/Kconfig
+> > @@ -466,6 +466,37 @@ config RISCV_ISA_SVPBMT
+> >
+> >          If you don't know what to do here, say Y.
+> >
+> > +config TOOLCHAIN_HAS_V
+> > +     bool
+> > +     default y
+> > +     depends on !64BIT || $(cc-option,-mabi=3Dlp64 -march=3Drv64iv)
+> > +     depends on !32BIT || $(cc-option,-mabi=3Dilp32 -march=3Drv32iv)
+> > +     depends on LLD_VERSION >=3D 140000 || LD_VERSION >=3D 23800
+> > +     depends on AS_HAS_OPTION_ARCH
+> > +
+> > +config RISCV_ISA_V
+> > +     bool "VECTOR extension support"
+> > +     depends on TOOLCHAIN_HAS_V
+> > +     depends on FPU
+> > +     select DYNAMIC_SIGFRAME
+> > +     default y
+> > +     help
+> > +       Say N here if you want to disable all vector related procedure
+> > +       in the kernel.
+> > +
+> > +       If you don't know what to do here, say Y.
+> > +
+> > +config RISCV_V_DISABLE
+> > +     bool "Disable userspace Vector by default"
+> > +     depends on RISCV_ISA_V
+> > +     default n
+> > +     help
+> > +       Say Y here if you want to disable default enablement state of V=
+ector
+> > +       in u-mode. This way userspace has to make explicit prctl() call=
+ to
+> > +       enable Vector, or enable it via sysctl interface.
+>
+> If we are worried about breaking userspace, why is the default for this
+> option not y? Or further,
+>
+> config RISCV_ISA_V_DEFAULT_ENABLE
+>         bool "Enable userspace Vector by default"
+>         depends on RISCV_ISA_V
+>         help
+>           Say Y here to allow use of Vector in userspace by default.
+>           Otherwise, userspace has to make an explicit prctl() call to
+>           enable Vector, or enable it via the sysctl interface.
+>
+>           If you don't know what to do here, say N.
+>
+
+Yes, expressing the option, where Y means "on", is more direct. But I
+have a little concern if we make the default as "off". Yes, we create
+this option in the worries of breaking userspace. But given that the
+break case might be rare, is it worth making userspace Vector harder
+to use by doing this? I assume in an ideal world that nothing would
+break and programs could just use V without bothering with prctl(), or
+sysctl. But on the other hand, to make a program robust enough, we
+must check the status with the prctl() anyway. So I have no answer
+here.
+
+> Thanks,
+> Conor.
