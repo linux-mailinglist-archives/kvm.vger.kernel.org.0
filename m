@@ -2,172 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B6A686FC67E
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 14:35:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5CD96FC714
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 14:52:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235574AbjEIMfM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 08:35:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44364 "EHLO
+        id S231467AbjEIMwJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 08:52:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234567AbjEIMfH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 08:35:07 -0400
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4065F40F1
-        for <kvm@vger.kernel.org>; Tue,  9 May 2023 05:35:00 -0700 (PDT)
+        with ESMTP id S234981AbjEIMwD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 08:52:03 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 727AA2694;
+        Tue,  9 May 2023 05:52:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1683635701; x=1715171701;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=IGW4MUyXwLnRAJqCcL3gpIXRjeYwxHcdIWMyXJUWta4=;
-  b=zmRMNKu4KbX/q7qOWM/8B3JlFM/yHlIcdaB+sPVOCfmPYjgTORhOCW73
-   1vctK7zLPlzUz6xdFw5oSeu0RqhMu0lEdSdaijF3JTRS7tuQ+d4pff5p6
-   IbeiNfgnlEClDuH7l8TyVaPfOonlgfdWMlduth17QcaZVP8a6bmqYnC5e
-   QHs8s3CDyijcFMv8wUWISJPaRCZQFIVWQXf2Sup+49HLa/s02jhXLOVyc
-   qTSfm2xltqc/9XAb/rP7bNX7RXrcZZ0w68+OWkXRkCiAvQfdF9k5D4+HC
-   rFbhECDew68kVtqdSy7+5XD/8h72MFfzND7W/w+8vclbtlScXGZAlESi8
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1683636720; x=1715172720;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=rrSQ/FJcEqHkrsjB0HKViGMNUOtQomkux4NFU2fyLL0=;
+  b=UQd+EizIVOZpQSRFB1ChVWrnDtLeMUmqaZsyXRzu8n5A1wMND7BGtcr9
+   dCosj+p3HS3vxF1yS36bX+LDLCuYk4zjgBxN0lxh3oa9Yz2BLekLZKel4
+   IBWohBrUsz+CyPxguby8SUTReCXjmV+Fgy6kdULuhJK4BMETaU5r8qM5z
+   i7bAsRZ5/yBn/Ja+W4oit51fwHr711jbWjpwi8NvWUmZd5/HEsRyqSfuS
+   gzR+v6b9syaG7Omf4Rz8aGo4tfuXNsYpOhPkUuw/S0ylczJakaSs2eiyv
+   aMIqJxYQ6geE3dLEX1wgv8es5nqVUMqncM7cDKorYBapaNEv9NIFNfccp
    Q==;
-X-IronPort-AV: E=Sophos;i="5.99,262,1677567600"; 
-   d="asc'?scan'208";a="213086078"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 09 May 2023 05:34:55 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Tue, 9 May 2023 05:34:53 -0700
-Received: from wendy (10.10.115.15) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
- Transport; Tue, 9 May 2023 05:34:51 -0700
-Date:   Tue, 9 May 2023 13:34:31 +0100
-From:   Conor Dooley <conor.dooley@microchip.com>
-To:     Andy Chiu <andy.chiu@sifive.com>
-CC:     <linux-riscv@lists.infradead.org>, <palmer@dabbelt.com>,
-        <anup@brainfault.org>, <atishp@atishpatra.org>,
-        <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <vineetg@rivosinc.com>, <greentime.hu@sifive.com>,
-        <guoren@linux.alibaba.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>
-Subject: Re: [PATCH -next v19 23/24] riscv: Enable Vector code to be built
-Message-ID: <20230509-resilient-lagoon-265e851e5bf8@wendy>
-References: <20230509103033.11285-1-andy.chiu@sifive.com>
- <20230509103033.11285-24-andy.chiu@sifive.com>
+X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="347373707"
+X-IronPort-AV: E=Sophos;i="5.99,262,1677571200"; 
+   d="scan'208";a="347373707"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2023 05:52:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="768484681"
+X-IronPort-AV: E=Sophos;i="5.99,262,1677571200"; 
+   d="scan'208";a="768484681"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.105])
+  by fmsmga004.fm.intel.com with ESMTP; 09 May 2023 05:51:54 -0700
+Date:   Tue, 9 May 2023 20:44:28 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Ackerley Tng <ackerleytng@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>, david@redhat.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, jmattson@google.com,
+        joro@8bytes.org, mail@maciej.szmigiero.name, vbabka@suse.cz,
+        vannapurve@google.com, yu.c.zhang@linux.intel.com,
+        kirill.shutemov@linux.intel.com, dhildenb@redhat.com,
+        qperret@google.com, tabba@google.com, michael.roth@amd.com,
+        wei.w.wang@intel.com, rppt@kernel.org, liam.merwick@oracle.com,
+        isaku.yamahata@gmail.com, jarkko@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, hughd@google.com, brauner@kernel.org
+Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
+ KVM: mm: fd-based approach for supporting KVM)
+Message-ID: <20230509124428.GA217130@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <ZEM5Zq8oo+xnApW9@google.com>
+ <diqz8re2ftzb.fsf@ackerleytng-ctop.c.googlers.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="hmFU81Al1OkqyRgj"
+Content-Type: text/plain; charset=gb2312
 Content-Disposition: inline
-In-Reply-To: <20230509103033.11285-24-andy.chiu@sifive.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <diqz8re2ftzb.fsf@ackerleytng-ctop.c.googlers.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---hmFU81Al1OkqyRgj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Fri, May 05, 2023 at 07:39:36PM +0000, Ackerley Tng wrote:
+> 
+> Hi Sean,
+> 
+> Thanks for implementing this POC!
+> 
+> I¡¯ve started porting the selftests (both Chao¡¯s and those I added [1]).
 
-Hey Andy,
+Hi Sean/Ackerley,
 
-On Tue, May 09, 2023 at 10:30:32AM +0000, Andy Chiu wrote:
-> From: Guo Ren <guoren@linux.alibaba.com>
->=20
-> This patch adds a config which enables vector feature from the kernel
-> space.
+Thanks for doing that. Overall making gmem a KVM ioctl() looks good to
+me and it should also play nice with Intel TDX. Besides what Ackerley
+mentioned below, I think we haven't discussed device assignment, which
+will be supported in not too long distance. Current VFIO_IOMMU_MAP_DMA
+consumes virtual address so that needs to be fixed for fd-based memory
+anyway, and the fix looks not related to whether this being a syscall()
+or a KVM ioctl(). There will be some initialization sequence dependency,
+e.g. if gmem is finally a VM-scope ioctl() then we need VM created first
+before can we map fd-based memory in VFIO, but that sounds not an issue
+at all.
 
-This commit message probably needs to change, it's not exactly doing
-that anymore!
+I also see Vlastimil/David expressed their preference on ioctl. So maybe
+we can move forward on your current PoC. Do you already have a plan to
+post a formal version?
 
-> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
-> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+Chao
 
-> Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
-> Suggested-by: Atish Patra <atishp@atishpatra.org>
-
-And I suspect that these two are also likely inaccurate at this point,
-but IDC.
-
-> Co-developed-by: Andy Chiu <andy.chiu@sifive.com>
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> ---
-> Changelog V19:
->  - Add RISCV_V_DISABLE to set compile-time default.
->=20
->  arch/riscv/Kconfig  | 31 +++++++++++++++++++++++++++++++
->  arch/riscv/Makefile |  6 +++++-
->  2 files changed, 36 insertions(+), 1 deletion(-)
->=20
-> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> index 1019b519d590..fa256f2e23c1 100644
-> --- a/arch/riscv/Kconfig
-> +++ b/arch/riscv/Kconfig
-> @@ -466,6 +466,37 @@ config RISCV_ISA_SVPBMT
-> =20
->  	   If you don't know what to do here, say Y.
-> =20
-> +config TOOLCHAIN_HAS_V
-> +	bool
-> +	default y
-> +	depends on !64BIT || $(cc-option,-mabi=3Dlp64 -march=3Drv64iv)
-> +	depends on !32BIT || $(cc-option,-mabi=3Dilp32 -march=3Drv32iv)
-> +	depends on LLD_VERSION >=3D 140000 || LD_VERSION >=3D 23800
-> +	depends on AS_HAS_OPTION_ARCH
-> +
-> +config RISCV_ISA_V
-> +	bool "VECTOR extension support"
-> +	depends on TOOLCHAIN_HAS_V
-> +	depends on FPU
-> +	select DYNAMIC_SIGFRAME
-> +	default y
-> +	help
-> +	  Say N here if you want to disable all vector related procedure
-> +	  in the kernel.
-> +
-> +	  If you don't know what to do here, say Y.
-> +
-> +config RISCV_V_DISABLE
-> +	bool "Disable userspace Vector by default"
-> +	depends on RISCV_ISA_V
-> +	default n
-> +	help
-> +	  Say Y here if you want to disable default enablement state of Vector
-> +	  in u-mode. This way userspace has to make explicit prctl() call to
-> +	  enable Vector, or enable it via sysctl interface.
-
-If we are worried about breaking userspace, why is the default for this
-option not y? Or further,
-
-config RISCV_ISA_V_DEFAULT_ENABLE
-	bool "Enable userspace Vector by default"
-	depends on RISCV_ISA_V
-	help
-	  Say Y here to allow use of Vector in userspace by default.
-	  Otherwise, userspace has to make an explicit prctl() call to
-	  enable Vector, or enable it via the sysctl interface.
-
-	  If you don't know what to do here, say N.
-
-Thanks,
-Conor.
-
---hmFU81Al1OkqyRgj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZFo91wAKCRB4tDGHoIJi
-0irBAQDZLK/emZnHozYTMzlCfcn1KDeyYeKp6hc160uDpKl3wAEAp5PAZqH7QZv8
-PIFHgeMttfCqIXDkQLNsnWfqqPjqdgw=
-=mTan
------END PGP SIGNATURE-----
-
---hmFU81Al1OkqyRgj--
+> 
+> guest mem seems to cover the use cases that have been discussed and
+> proposed so far, but I still need to figure out how gmem can work with
+> 
+> + hugetlbfs
+> + specification of/storing memory policy (for NUMA node bindings)
+> + memory accounting - we may need to account for memory used separately,
+>   so that guest mem shows up separately on /proc/meminfo and similar
+>   places.
+> 
+> One issue I¡¯ve found so far is that the pointer to kvm (gmem->kvm) is
+> not cleaned up, and hence it is possible to crash the host kernel in the
+> following way
+> 
+> 1. Create a KVM VM
+> 2. Create a guest mem fd on that VM
+> 3. Create a memslot with the guest mem fd (hence binding the fd to the
+>    VM)
+> 4. Close/destroy the KVM VM
+> 5. Call fallocate(PUNCH_HOLE) on the guest mem fd, which uses gmem->kvm
+>    when it tries to do invalidation.
+> 
+> I then tried to clean up the gmem->kvm pointer during unbinding when the
+> KVM VM is destroyed.
+> 
+> That works, but then I realized there¡¯s a simpler way to use the pointer
+> after freeing:
+> 
+> 1. Create a KVM VM
+> 2. Create a guest mem fd on that VM
+> 3. Close/destroy the KVM VM
+> 4. Call fallocate(PUNCH_HOLE) on the guest mem fd, which uses gmem->kvm
+>    when it tries to do invalidation.
+> 
+> Perhaps binding should mean setting the gmem->kvm pointer in addition to
+> gmem->bindings. This makes binding and unbinding symmetric and avoids
+> the use-after-frees described above.
+> 
+> This also means that creating a guest mem fd is no longer dependent on
+> the VM. Perhaps we can make creating a gmem fd a system ioctl (like
+> KVM_GET_API_VERSION and KVM_CREATE_VM) instead of a vm ioctl?
+> 
+> [1]
+> https://lore.kernel.org/all/cover.1678926164.git.ackerleytng@google.com/T/
+> 
+> Ackerley
