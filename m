@@ -2,88 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFA1F6FC5B4
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 13:59:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B596A6FC667
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 14:31:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234673AbjEIL75 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 07:59:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45976 "EHLO
+        id S235480AbjEIMb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 08:31:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234783AbjEIL7z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 07:59:55 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79344FA;
-        Tue,  9 May 2023 04:59:54 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 349BRo2n011242;
-        Tue, 9 May 2023 11:59:54 GMT
+        with ESMTP id S234704AbjEIMbz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 08:31:55 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 943FD40DB
+        for <kvm@vger.kernel.org>; Tue,  9 May 2023 05:31:54 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 349CGxGj024086;
+        Tue, 9 May 2023 12:31:48 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
+ mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=o0qyN5dTTBE89PMggpKSegxyyCQ4S7DBukr1wkMx5Io=;
- b=BzIEGEgS8QWc+TBjN92NgaAUExtehh+jOKOoZP/dfDDwfIN+RTsVJPrDtTvCEn2UiPlV
- mhRp0GIHauwjqo9O2CHGfeFdvjtu4rijWtPlqFJhXVqx1LhOtlVh3HjI9d805bKS9kc4
- K763TqsHDEwm3Jy1fpatFCdz1oe1HtQIb1Pz9Zpn/opFB9D9LNkCK2P+LauOsEFApMkA
- 8PMZpPQ6/ugEe6/c1L9XRml9I503uxQx4QgciPx3sM1JDTpyDwrK4pwOB/QzD3dJvXt8
- F9jY1JYLQWyBqAv3eaglhRnnoatJ8Pe8WC9stlaNcqKDiGlr0puAnq0/n84earPMzQt5 fg== 
+ bh=UjDeIGXwvkRfdc5WVoZon46BLUv2RODnqijZ3sWvMnQ=;
+ b=ML0NeCiePEQEWyH4jGGjGxHUzekqYD0Y+WKne27Ep0xSFkPuL55qO07IgKN8W9SROSmz
+ Sdy/6vyH7IE6SUnqGnqF8bEQPYNZCURjl/ETuLll5S0zmGhZ6XhSKQrsQMPYbqM3rgCv
+ PBxpFtwPYrPmphi+vqF6bKuxjLHVJuVUy0R2AYXzapWywzu+BbYTI6wlrqp3/mbBY+Lt
+ hRxu+9MRF+/Dni0Wh4ZOVjcWExX56JZv0pERRRYTyVSEiHyepCaNFG+uPZY9tB9hK0JH
+ 1qfIqvw3JblOTkbhal0UN1Fj7WLoneQYFYUotbCNUtMNrz6pFtekPygmBGHGAbMu3TUC Lw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qfmb32dvd-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qfnn4h45n-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 May 2023 11:59:53 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 349BnVFb026790;
-        Tue, 9 May 2023 11:59:53 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qfmb32du8-1
+        Tue, 09 May 2023 12:31:48 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 349CTxOF013592;
+        Tue, 9 May 2023 12:31:47 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qfnn4h44s-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 May 2023 11:59:53 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3492mfmm022263;
-        Tue, 9 May 2023 11:59:50 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3qf896rdh8-1
+        Tue, 09 May 2023 12:31:47 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3494oH54006449;
+        Tue, 9 May 2023 12:31:45 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3qf7s8gbsg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 May 2023 11:59:50 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 349Bxlao40174000
+        Tue, 09 May 2023 12:31:45 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 349CVdM44784866
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 9 May 2023 11:59:47 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3F33B2004D;
-        Tue,  9 May 2023 11:59:47 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CB5F32004E;
-        Tue,  9 May 2023 11:59:46 +0000 (GMT)
-Received: from [9.171.74.57] (unknown [9.171.74.57])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  9 May 2023 11:59:46 +0000 (GMT)
-Message-ID: <c762bd30-9753-7b3e-3f46-b15ba575ee7c@linux.ibm.com>
-Date:   Tue, 9 May 2023 13:59:46 +0200
+        Tue, 9 May 2023 12:31:39 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C9A232004D;
+        Tue,  9 May 2023 12:31:39 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 16CC820040;
+        Tue,  9 May 2023 12:31:39 +0000 (GMT)
+Received: from [9.152.222.242] (unknown [9.152.222.242])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Tue,  9 May 2023 12:31:39 +0000 (GMT)
+Message-ID: <316aab44-7bba-001b-b80b-019af97e9e76@linux.ibm.com>
+Date:   Tue, 9 May 2023 14:31:38 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-To:     Nico Boehr <nrb@linux.ibm.com>, borntraeger@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20230509111202.333714-1-nrb@linux.ibm.com>
- <20230509111202.333714-3-nrb@linux.ibm.com>
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v20 11/21] qapi/s390x/cpu topology:
+ CPU_POLARIZATION_CHANGE qapi event
 Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v1 2/3] KVM: s390: add stat counter for shadow gmap events
-In-Reply-To: <20230509111202.333714-3-nrb@linux.ibm.com>
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20230425161456.21031-1-pmorel@linux.ibm.com>
+ <20230425161456.21031-12-pmorel@linux.ibm.com>
+ <3a79538637fc8e8f226290c9ba833face1784c29.camel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <3a79538637fc8e8f226290c9ba833face1784c29.camel@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: omvTEdiiMHIAl_w4jdzO-3K8Uffq4YFc
-X-Proofpoint-GUID: q7nn9e5KdceUtwNuAvKthT5NaTwKluFS
+X-Proofpoint-GUID: 7ZNS1ReELsABF9ESWzs9DWi4SQ0gTZ52
+X-Proofpoint-ORIG-GUID: rygWCqN6wEyPr2pDVTw5nP3npKbC9uC5
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-09_07,2023-05-05_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- priorityscore=1501 phishscore=0 suspectscore=0 bulkscore=0 adultscore=0
- mlxlogscore=999 clxscore=1015 spamscore=0 malwarescore=0 impostorscore=0
+ definitions=2023-05-09_08,2023-05-05_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
+ mlxlogscore=999 mlxscore=0 adultscore=0 priorityscore=1501 spamscore=0
+ phishscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0 malwarescore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2304280000
- definitions=main-2305090092
+ definitions=main-2305090097
 X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
         SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
@@ -94,146 +101,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/9/23 13:12, Nico Boehr wrote:
-> The shadow gmap tracks memory of nested guests (guest-3). In certain
-> scenarios, the shadow gmap needs to be rebuilt, which is a costly operation
-> since it involves a SIE exit into guest-1 for every entry in the respective
-> shadow level.
-> 
-> Add kvm stat counters when new shadow structures are created at various
-> levels. Also add a counter gmap_shadow_acquire when a completely fresh
-> shadow gmap is created.
-> 
-> Note that there is no counter for the region first level. This is because
-> the region first level is the highest level and hence is never referenced
-> by another table. Creating a new region first table is therefore always
-> equivalent to a new shadow gmap and hence is counted as
-> gmap_shadow_acquire.
-> 
-> Also note that not all page table levels need to be present and a ASCE
-> can directly point to e.g. a segment table. In this case, a new segment
-> table will always be equivalent to a new shadow gmap and hence will be
-> counted as gmap_shadow_acquire and not as gmap_shadow_segment.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   arch/s390/include/asm/kvm_host.h | 5 +++++
->   arch/s390/kvm/gaccess.c          | 6 ++++++
->   arch/s390/kvm/kvm-s390.c         | 7 ++++++-
->   arch/s390/kvm/vsie.c             | 1 +
->   4 files changed, 18 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index 3c3fe45085ec..7f70e3bbb44c 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -777,6 +777,11 @@ struct kvm_vm_stat {
->   	u64 inject_service_signal;
->   	u64 inject_virtio;
->   	u64 aen_forward;
-> +	u64 gmap_shadow_acquire;
-> +	u64 gmap_shadow_r2;
-> +	u64 gmap_shadow_r3;
-> +	u64 gmap_shadow_segment;
-> +	u64 gmap_shadow_page;
 
-This needs to be gmap_shadow_pgt and then we need a separate shadow page 
-counter that's beeing incremented in kvm_s390_shadow_fault().
+On 5/8/23 23:47, Nina Schoetterl-Glausch wrote:
+> On Tue, 2023-04-25 at 18:14 +0200, Pierre Morel wrote:
+>> When the guest asks to change the polarization this change
+>> is forwarded to the upper layer using QAPI.
+>> The upper layer is supposed to take according decisions concerning
+>> CPU provisioning.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   qapi/machine-target.json | 33 +++++++++++++++++++++++++++++++++
+>>   hw/s390x/cpu-topology.c  |  2 ++
+>>   2 files changed, 35 insertions(+)
+>>
+>> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+>> index 3b7a0b77f4..ffde2e9cbd 100644
+>> --- a/qapi/machine-target.json
+>> +++ b/qapi/machine-target.json
+>> @@ -391,3 +391,36 @@
+>>     'features': [ 'unstable' ],
+>>     'if': { 'all': [ 'TARGET_S390X' , 'CONFIG_KVM' ] }
+>>   }
+>> +
+>> +##
+>> +# @CPU_POLARIZATION_CHANGE:
+>> +#
+>> +# Emitted when the guest asks to change the polarization.
+>> +#
+>> +# @polarization: polarization specified by the guest
+>> +#
+>> +# Features:
+>> +# @unstable: This command may still be modified.
+>> +#
+>> +# The guest can tell the host (via the PTF instruction) whether the
+>> +# CPUs should be provisioned using horizontal or vertical polarization.
+>> +#
+>> +# On horizontal polarization the host is expected to provision all vCPUs
+>> +# equally.
+>> +# On vertical polarization the host can provision each vCPU differently.
+>> +# The guest will get information on the details of the provisioning
+>> +# the next time it uses the STSI(15) instruction.
+>> +#
+>> +# Since: 8.1
+>> +#
+>> +# Example:
+>> +#
+>> +# <- { "event": "CPU_POLARIZATION_CHANGE",
+>> +#      "data": { "polarization": 0 },
+> I think you'd be getting "horizontal" instead of 0.
 
 
-I'm wondering if we should name them after the entries to reduce 
-confusion especially when we get huge pages in the future.
+you are right.
 
-gmap_shadow_acquire
-gmap_shadow_r1_te (ptr to r2 table)
-gmap_shadow_r2_te (ptr to r3 table)
-gmap_shadow_r3_te (ptr to segment table)
-gmap_shadow_sg_te (ptr to page table)
-gmap_shadow_pg_te (single page table entry)
 
->   };
->   
->   struct kvm_arch_memory_slot {
-> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> index 3eb85f254881..8348a0095f3a 100644
-> --- a/arch/s390/kvm/gaccess.c
-> +++ b/arch/s390/kvm/gaccess.c
-> @@ -1382,6 +1382,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
->   				  unsigned long *pgt, int *dat_protection,
->   				  int *fake)
->   {
-> +	struct kvm *kvm;
->   	struct gmap *parent;
->   	union asce asce;
->   	union vaddress vaddr;
-> @@ -1390,6 +1391,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
->   
->   	*fake = 0;
->   	*dat_protection = 0;
-> +	kvm = sg->private;
->   	parent = sg->parent;
->   	vaddr.addr = saddr;
->   	asce.val = sg->orig_asce;
-> @@ -1450,6 +1452,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
->   		rc = gmap_shadow_r2t(sg, saddr, rfte.val, *fake);
->   		if (rc)
->   			return rc;
-> +		kvm->stat.gmap_shadow_r2++;
->   	}
->   		fallthrough;
->   	case ASCE_TYPE_REGION2: {
-> @@ -1478,6 +1481,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
->   		rc = gmap_shadow_r3t(sg, saddr, rste.val, *fake);
->   		if (rc)
->   			return rc;
-> +		kvm->stat.gmap_shadow_r3++;
->   	}
->   		fallthrough;
->   	case ASCE_TYPE_REGION3: {
-> @@ -1515,6 +1519,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
->   		rc = gmap_shadow_sgt(sg, saddr, rtte.val, *fake);
->   		if (rc)
->   			return rc;
-> +		kvm->stat.gmap_shadow_segment++;
->   	}
->   		fallthrough;
->   	case ASCE_TYPE_SEGMENT: {
-> @@ -1548,6 +1553,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
->   		rc = gmap_shadow_pgt(sg, saddr, ste.val, *fake);
->   		if (rc)
->   			return rc;
-> +		kvm->stat.gmap_shadow_page++;
->   	}
->   	}
->   	/* Return the parent address of the page table */
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 17b81659cdb2..b012645a5a7c 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -66,7 +66,12 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
->   	STATS_DESC_COUNTER(VM, inject_pfault_done),
->   	STATS_DESC_COUNTER(VM, inject_service_signal),
->   	STATS_DESC_COUNTER(VM, inject_virtio),
-> -	STATS_DESC_COUNTER(VM, aen_forward)
-> +	STATS_DESC_COUNTER(VM, aen_forward),
-> +	STATS_DESC_COUNTER(VM, gmap_shadow_acquire),
-> +	STATS_DESC_COUNTER(VM, gmap_shadow_r2),
-> +	STATS_DESC_COUNTER(VM, gmap_shadow_r3),
-> +	STATS_DESC_COUNTER(VM, gmap_shadow_segment),
-> +	STATS_DESC_COUNTER(VM, gmap_shadow_page),
->   };
->   
->   const struct kvm_stats_header kvm_vm_stats_header = {
-> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-> index 8d6b765abf29..beb3be037722 100644
-> --- a/arch/s390/kvm/vsie.c
-> +++ b/arch/s390/kvm/vsie.c
-> @@ -1221,6 +1221,7 @@ static int acquire_gmap_shadow(struct kvm_vcpu *vcpu,
->   	if (IS_ERR(gmap))
->   		return PTR_ERR(gmap);
->   	gmap->private = vcpu->kvm;
-> +	vcpu->kvm->stat.gmap_shadow_acquire++;
->   	WRITE_ONCE(vsie_page->gmap, gmap);
->   	return 0;
->   }
+>
+>> +#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
+>> +##
+>> +{ 'event': 'CPU_POLARIZATION_CHANGE',
+>> +  'data': { 'polarization': 'CpuS390Polarization' },
+>> +  'features': [ 'unstable' ],
+>> +  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
+>> +}
+>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+>> index e5fb976594..e8b140d623 100644
+>> --- a/hw/s390x/cpu-topology.c
+>> +++ b/hw/s390x/cpu-topology.c
+>> @@ -17,6 +17,7 @@
+>>   #include "hw/s390x/s390-virtio-ccw.h"
+>>   #include "hw/s390x/cpu-topology.h"
+>>   #include "qapi/qapi-commands-machine-target.h"
+>> +#include "qapi/qapi-events-machine-target.h"
+>>   
+>>   /*
+>>    * s390_topology is used to keep the topology information.
+>> @@ -138,6 +139,7 @@ void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra)
+>>           } else {
+>>               s390_topology.vertical_polarization = !!fc;
+>>               s390_cpu_topology_set_changed(true);
+>> +            qapi_event_send_cpu_polarization_change(fc);
+> I'm not sure I like the implicit conversation of the function code to the enum value.
+> How about you do qapi_event_send_cpu_polarization_change(s390_topology.polarization);
+> and rename vertical_polarization and change it's type to the enum.
+> You can then also do
+>
+> +    CpuS390Polarization polarization = S390_CPU_POLARIZATION_HORIZONTAL;
+> +    switch (fc) {
+> +    case S390_CPU_POLARIZATION_VERTICAL:
+> +        polarization = S390_CPU_POLARIZATION_VERTICAL;
+> +        /* fallthrough */
+> +    case S390_CPU_POLARIZATION_HORIZONTAL:
+> +        if (s390_topology.polarization == polarization) {
+>
+> and use the value for the assignment further down, too.
 
+OK, that look good.
+
+I guess I have to modify the patch 8 on handle_ptf ,
+
+
+
+
+
+>>               setcc(cpu, 0);
+>>           }
+>>           break;
