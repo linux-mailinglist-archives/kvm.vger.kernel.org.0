@@ -2,62 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB0A46FC401
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 12:34:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FB6C6FC402
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 12:34:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235385AbjEIKeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 06:34:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35106 "EHLO
+        id S235339AbjEIKeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 06:34:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235349AbjEIKdp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 06:33:45 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A5EA106FF
-        for <kvm@vger.kernel.org>; Tue,  9 May 2023 03:33:30 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-64115e652eeso41451460b3a.0
-        for <kvm@vger.kernel.org>; Tue, 09 May 2023 03:33:30 -0700 (PDT)
+        with ESMTP id S235342AbjEIKdz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 06:33:55 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13D410A37
+        for <kvm@vger.kernel.org>; Tue,  9 May 2023 03:33:37 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1aad6f2be8eso53363085ad.3
+        for <kvm@vger.kernel.org>; Tue, 09 May 2023 03:33:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1683628408; x=1686220408;
+        d=sifive.com; s=google; t=1683628416; x=1686220416;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=tnXXiygjZrZ2nYQZcu1XSE2OAbXCB6jkIWrGS8Lz/3Q=;
-        b=IR3iXP3SDmxJ/rPrizGRos8/ObgSjWdTQdkW3fRxoUTzbLKnjqc6Oxcb4DF3Izln/H
-         8AZCqVbmImpoC/l8GrCzcLTxwa9Yj0xuj7D7Mz92ec7BjELInCJJy4gTVvUyxRezuR9M
-         zECoLoEU7mNOq/xHSu1cs2GlytbDOJ99vYIq6fKDvMMPITHlthy/2Etb1HKrvQbZKfH7
-         zNqNIAuNfFLRuuOdHiRmq5X7sKkq7aQVhUSPztHNLZzAyXBFv/pLq5Ti0KZzSlajA2x8
-         +a1PoFgQDzIMM2X1ZE5rNn3sm4MsTMxGs4F+tCatjRS79wZfXqrM4xL0Q3Havcq/b5nO
-         oPGw==
+        bh=qucKeRyh/Imh/QucdmZht4NliS4NWL7FZ9KuokUyTQ4=;
+        b=RPHrkafqXS52Wg7m6OhvO5aJv73Qq0CPcXlWNAChl9UFVDlc7obLTUAb1mX7TO3eBk
+         /VEs6rJ9PxTZKSG7MnxNdDpg10fxFHmy/21n9Ghtl9CUhqrRdB73OuSsrlxz69txwk+T
+         m/hNCvQo4ID72yyqc940tYoMMfNGaL9+UpFECLx6Ut9AL+uGXrgpnYRycGke34mYFDY6
+         16Zb2/Ub6DDT4VYWEcLgSXk/WRgzdJbySCGNEFwcQ6dW0bkh0ORQKZmZ9d1WhdKXvbWA
+         agvf9ixKTq+GMCf2KESyQ3DyOXMs357vkPNWyGm4/cPCeNKJS7qBc9Uh6tP5caFAb5sx
+         vi8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683628408; x=1686220408;
+        d=1e100.net; s=20221208; t=1683628416; x=1686220416;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tnXXiygjZrZ2nYQZcu1XSE2OAbXCB6jkIWrGS8Lz/3Q=;
-        b=Jf8oviBeyyrDaDZjOhoMO3/YyMvwHvy7r36ELwI+RSjS3EJB+L8EGHOCzFgREf/fVv
-         DLHkgFdMdwaeKr5IZlW0WGZ51Mm2Z+nJjMk7xoJRBjhh5ygCtwd7SUVdPKNzfJ68QQvO
-         IJOgvmxvraOLwpMpqYw5V4TH0lNwm+ZdBcRxP+/lOZowi1s7sn7SqsTe8sVGf+SLVYNX
-         b2ZdKNs/ZDkz4ZqNTi/eIaB3gV6PWCkMxo+1l+B52XEaMvxVwNgso6udxMtMMHtDXhJ8
-         qUy5a24EmO0yxh2skQuda+nKPN9PjBnifrnBdtEDR5EtG4FZ0dxAc4KPlNA6R1Kl8he/
-         yHyg==
-X-Gm-Message-State: AC+VfDyCU+WmR7o2XFU9/wyUgazQABfPZ6YI0PLxNIMvV4ydE6Y1v2Ch
-        7QzSqL2zU6Osdq15usIm2yXWaNkeh32nNw2DwGM=
-X-Google-Smtp-Source: ACHHUZ5H9al3o7R9DVJ8noKHqXN/Z6PK0n9zsnGfLVf4cZOf/4z90B0NyME5n2HJdo21x+D4YU0/wg==
-X-Received: by 2002:a17:902:d505:b0:1a6:f93a:a136 with SMTP id b5-20020a170902d50500b001a6f93aa136mr22651724plg.22.1683628408433;
-        Tue, 09 May 2023 03:33:28 -0700 (PDT)
+        bh=qucKeRyh/Imh/QucdmZht4NliS4NWL7FZ9KuokUyTQ4=;
+        b=XepiDdj5H5lBOnY/TXtxYVaL3vF4svV3zRwWSjSAXP4nepmXAjjEg5sul8GyG+O4wh
+         XdL9kfxhDfw4ekj1iGT+O1ug/G8kMbHY8cIXE6a5PVdY9aU0+Y9ff1BoBjz2YH9+EVZt
+         IxBgMxjuRJQlc8DSUVOaqpyWEDEK2rhrKzLWJUYzDnmFcja6/IjWCN1tAf6Zr9wmYjzl
+         I1ARFWqMPVIYVrniDOBN3sL7PezlbFLZJWDbkb0u+zg69JXuM04aig/UDri0w2gMH1CJ
+         pPXb0Q8LCRrRvUU5Tq6t9Ac+MpGVyhDo4MeEY0BvlXZFprtRvs7gkQDYo2y73Vu6CUky
+         +b8g==
+X-Gm-Message-State: AC+VfDx34Lvp/vyc3pj532Gm6cX6zbNGrL9XGVpEKaOhCgYxUo2HXLyO
+        DOjK7BIqvj0VSwTHM9coWh+JDA==
+X-Google-Smtp-Source: ACHHUZ69hHFFrmlH7WzhZrLSkuYBwmBwSmfhQkhRM9vbdt9geJFktynx5l8H14IWczWj026EcHV8Fw==
+X-Received: by 2002:a17:902:ecd0:b0:1ac:7ae7:3fe1 with SMTP id a16-20020a170902ecd000b001ac7ae73fe1mr7424380plh.20.1683628416235;
+        Tue, 09 May 2023 03:33:36 -0700 (PDT)
 Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id o11-20020a170902d4cb00b001a076025715sm1195191plg.117.2023.05.09.03.33.25
+        by smtp.gmail.com with ESMTPSA id o11-20020a170902d4cb00b001a076025715sm1195191plg.117.2023.05.09.03.33.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 May 2023 03:33:27 -0700 (PDT)
+        Tue, 09 May 2023 03:33:35 -0700 (PDT)
 From:   Andy Chiu <andy.chiu@sifive.com>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
 Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
         guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>
-Subject: [PATCH -next v19 23/24] riscv: Enable Vector code to be built
-Date:   Tue,  9 May 2023 10:30:32 +0000
-Message-Id: <20230509103033.11285-24-andy.chiu@sifive.com>
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        Evan Green <evan@rivosinc.com>
+Subject: [PATCH -next v19 24/24] riscv: Add documentation for Vector
+Date:   Tue,  9 May 2023 10:30:33 +0000
+Message-Id: <20230509103033.11285-25-andy.chiu@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230509103033.11285-1-andy.chiu@sifive.com>
 References: <20230509103033.11285-1-andy.chiu@sifive.com>
@@ -71,92 +76,164 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Guo Ren <guoren@linux.alibaba.com>
+This patch add a brief documentation of the userspace interface in
+regard to the RISC-V Vector extension.
 
-This patch adds a config which enables vector feature from the kernel
-space.
-
-Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
-Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
-Suggested-by: Atish Patra <atishp@atishpatra.org>
-Co-developed-by: Andy Chiu <andy.chiu@sifive.com>
 Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+Reviewed-by: Greentime Hu <greentime.hu@sifive.com>
+Reviewed-by: Vincent Chen <vincent.chen@sifive.com>
 ---
-Changelog V19:
- - Add RISCV_V_DISABLE to set compile-time default.
+ Documentation/riscv/index.rst  |   1 +
+ Documentation/riscv/vector.rst | 128 +++++++++++++++++++++++++++++++++
+ 2 files changed, 129 insertions(+)
+ create mode 100644 Documentation/riscv/vector.rst
 
- arch/riscv/Kconfig  | 31 +++++++++++++++++++++++++++++++
- arch/riscv/Makefile |  6 +++++-
- 2 files changed, 36 insertions(+), 1 deletion(-)
-
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index 1019b519d590..fa256f2e23c1 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -466,6 +466,37 @@ config RISCV_ISA_SVPBMT
+diff --git a/Documentation/riscv/index.rst b/Documentation/riscv/index.rst
+index 175a91db0200..95cf9c1e1da1 100644
+--- a/Documentation/riscv/index.rst
++++ b/Documentation/riscv/index.rst
+@@ -10,6 +10,7 @@ RISC-V architecture
+     hwprobe
+     patch-acceptance
+     uabi
++    vector
  
- 	   If you don't know what to do here, say Y.
+     features
  
-+config TOOLCHAIN_HAS_V
-+	bool
-+	default y
-+	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64iv)
-+	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32iv)
-+	depends on LLD_VERSION >= 140000 || LD_VERSION >= 23800
-+	depends on AS_HAS_OPTION_ARCH
+diff --git a/Documentation/riscv/vector.rst b/Documentation/riscv/vector.rst
+new file mode 100644
+index 000000000000..d4d626721921
+--- /dev/null
++++ b/Documentation/riscv/vector.rst
+@@ -0,0 +1,128 @@
++.. SPDX-License-Identifier: GPL-2.0
++=========================================
++Vector Extension Support for RISC-V Linux
++=========================================
 +
-+config RISCV_ISA_V
-+	bool "VECTOR extension support"
-+	depends on TOOLCHAIN_HAS_V
-+	depends on FPU
-+	select DYNAMIC_SIGFRAME
-+	default y
-+	help
-+	  Say N here if you want to disable all vector related procedure
-+	  in the kernel.
++This document briefly outlines the interface provided to userspace by Linux in
++order to support the use of the RISC-V Vector Extension.
 +
-+	  If you don't know what to do here, say Y.
++1.  prctl() Interface
++---------------------
 +
-+config RISCV_V_DISABLE
-+	bool "Disable userspace Vector by default"
-+	depends on RISCV_ISA_V
-+	default n
-+	help
-+	  Say Y here if you want to disable default enablement state of Vector
-+	  in u-mode. This way userspace has to make explicit prctl() call to
-+	  enable Vector, or enable it via sysctl interface.
++Two new prctl() calls are added to allow programs to manage the enablement
++status for the use of Vector in userspace:
 +
-+	  If you don't know what to do here, say N.
++prctl(PR_RISCV_V_SET_CONTROL, unsigned long arg)
 +
- config TOOLCHAIN_HAS_ZBB
- 	bool
- 	default y
-diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
-index 0fb256bf8270..6ec6d52a4180 100644
---- a/arch/riscv/Makefile
-+++ b/arch/riscv/Makefile
-@@ -60,6 +60,7 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:= rv32ima
- riscv-march-$(CONFIG_ARCH_RV64I)	:= rv64ima
- riscv-march-$(CONFIG_FPU)		:= $(riscv-march-y)fd
- riscv-march-$(CONFIG_RISCV_ISA_C)	:= $(riscv-march-y)c
-+riscv-march-$(CONFIG_RISCV_ISA_V)	:= $(riscv-march-y)v
- 
- ifdef CONFIG_TOOLCHAIN_NEEDS_OLD_ISA_SPEC
- KBUILD_CFLAGS += -Wa,-misa-spec=2.2
-@@ -71,7 +72,10 @@ endif
- # Check if the toolchain supports Zihintpause extension
- riscv-march-$(CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE) := $(riscv-march-y)_zihintpause
- 
--KBUILD_CFLAGS += -march=$(subst fd,,$(riscv-march-y))
-+# Remove F,D,V from isa string for all. Keep extensions between "fd" and "v" by
-+# matching non-v and non-multi-letter extensions out with the filter ([^v_]*)
-+KBUILD_CFLAGS += -march=$(shell echo $(riscv-march-y) | sed -E 's/(rv32ima|rv64ima)fd([^v_]*)v?/\1\2/')
++    Sets the Vector enablement status of the calling thread, where the control
++    argument consists of two 2-bit enablement statuses and a bit for inheritance
++    model. Other threads of the calling process are unaffected.
 +
- KBUILD_AFLAGS += -march=$(riscv-march-y)
- 
- KBUILD_CFLAGS += -mno-save-restore
++    Enablement status is a tri-state value each occupying 2-bit of space in
++    the control argument:
++
++    * :c:macro:`PR_RISCV_V_VSTATE_CTRL_DEFAULT`: Use the system-wide default
++      enablement status on execve(). The system-wide default setting can be
++      controlled via sysctl interface (see sysctl section below).
++
++    * :c:macro:`PR_RISCV_V_VSTATE_CTRL_ON`: Allow Vector to be run for the
++      thread.
++
++    * :c:macro:`PR_RISCV_V_VSTATE_CTRL_OFF`: Disallow Vector. Executing Vector
++      instructions under such condition will trap and casuse the termination of the thread.
++
++    arg: The control argument is a 5-bit value consisting of 3 parts, which can
++    be interpreted as the following structure, and accessed by 3 masks
++    respectively.
++
++    struct control_argument {
++        // Located by PR_RISCV_V_VSTATE_CTRL_CUR_MASK
++        int current_enablement_status : 2;
++        // Located by PR_RISCV_V_VSTATE_CTRL_NEXT_MASK
++        int next_enablement_status : 2;
++        // Located by PR_RISCV_V_VSTATE_CTRL_INHERIT
++        bool inherit_mode : 1;
++    }
++
++    The 3 masks, PR_RISCV_V_VSTATE_CTRL_CUR_MASK,
++    PR_RISCV_V_VSTATE_CTRL_NEXT_MASK, and PR_RISCV_V_VSTATE_CTRL_INHERIT
++    represents bit[1:0], bit[3:2], and bit[4] respectively. bit[1:0] and
++    accounts for the enablement status of current thread, and bit[3:2] the
++    setting for when next execve() happens. bit[4] defines the inheritance model
++    of the setting in bit[3:2]
++
++        * :c:macro:`PR_RISCV_V_VSTATE_CTRL_CUR_MASK`: bit[1:0]: Account for the
++          Vector enablement status for the calling thread. The calling thread is
++          not able to turn off Vector once it has been enabled. The prctl() call
++          fails with EPERM if the value in this mask is PR_RISCV_V_VSTATE_CTRL_OFF
++          but the current enablement status is not off. Setting
++          PR_RISCV_V_VSTATE_CTRL_DEFAULT here takes no effect but to set back
++          the original enablement status.
++
++        * :c:macro:`PR_RISCV_V_VSTATE_CTRL_NEXT_MASK`: bit[3:2]: Account for the
++          Vector enablement setting for the calling thread at the next execve()
++          system call. If PR_RISCV_V_VSTATE_CTRL_DEFAULT is used in this mask,
++          then the enablement status will be decided by the system-wide
++          enablement status when execve() happen.
++
++        * :c:macro:`PR_RISCV_V_VSTATE_CTRL_INHERIT`: bit[4]: the inheritance
++          model for the setting at PR_RISCV_V_VSTATE_CTRL_NEXT_MASK. If the bit
++          is set then the following execve() will not clear the setting in both
++          PR_RISCV_V_VSTATE_CTRL_NEXT_MASK and PR_RISCV_V_VSTATE_CTRL_INHERIT.
++          This setting persists across changes in the system-wide default value.
++
++    Return value: return 0 on success, or a negative error value:
++        EINVAL: Vector not supported, invalid enablement status for current or
++                next mask
++        EPERM: Turning off Vector in PR_RISCV_V_VSTATE_CTRL_CUR_MASK if Vector
++                was enabled for the calling thread.
++
++    On success:
++        * A valid setting for PR_RISCV_V_VSTATE_CTRL_CUR_MASK takes place
++          immediately. The enablement status specified in
++          PR_RISCV_V_VSTATE_CTRL_NEXT_MASK happens at the next execve() call, or
++          all following execve() calls if PR_RISCV_V_VSTATE_CTRL_INHERIT bit is
++          set.
++        * Every successful call overwrites a previous setting for the calling
++          thread.
++
++prctl(PR_RISCV_V_SET_CONTROL)
++
++    Gets the same Vector enablement status for the calling thread. Setting for
++    next execve() call and the inheritance bit are all OR-ed together.
++
++    Return value: a nonnegative value on success, or a negative error value:
++        EINVAL: Vector not supported.
++
++2.  System runtime configuration (sysctl)
++-----------------------------------------
++
++ * To mitigate the ABI impact of expansion of the signal stack, a
++   policy mechanism is provided to the administrators, distro maintainers, and
++   developers to control the default Vector enablement status for userspace
++   processes:
++
++/proc/sys/abi/riscv_v_default_allow
++
++    Writing the text representation of 0 or 1 to this file sets the default
++    system enablement status for new starting userspace programs. A valid value
++    should be:
++
++    0: Do not allow Vector code to be executed as the default for new processes.
++
++    1: Allow Vector code to be executed as the default for new processes.
++
++    Reading this file returns the current system default enablement status.
++
++* At every execve() call, a new enablement status of the new process is set to
++  the system default, unless:
++
++      * PR_RISCV_V_VSTATE_CTRL_INHERIT is set for the calling process, and the
++        setting in PR_RISCV_V_VSTATE_CTRL_NEXT_MASK is not
++        PR_RISCV_V_VSTATE_CTRL_DEFAULT. Or,
++
++      * The setting in PR_RISCV_V_VSTATE_CTRL_NEXT_MASK is not
++        PR_RISCV_V_VSTATE_CTRL_DEFAULT.
++
++* Modifying the system default enablement status does not affect the enablement
++  status of any existing process of thread that do not make an execve() call.
 -- 
 2.17.1
 
