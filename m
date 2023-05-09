@@ -2,65 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB2B76FBD9B
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 05:24:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96B846FBDC1
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 05:46:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234000AbjEIDXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 May 2023 23:23:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56874 "EHLO
+        id S234214AbjEIDqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 May 2023 23:46:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231311AbjEIDXx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 May 2023 23:23:53 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 779636581
-        for <kvm@vger.kernel.org>; Mon,  8 May 2023 20:23:52 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-ba2b9ecfadaso3729806276.2
-        for <kvm@vger.kernel.org>; Mon, 08 May 2023 20:23:52 -0700 (PDT)
+        with ESMTP id S233943AbjEIDqG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 May 2023 23:46:06 -0400
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4893C24
+        for <kvm@vger.kernel.org>; Mon,  8 May 2023 20:46:04 -0700 (PDT)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-559e2051d05so77326177b3.3
+        for <kvm@vger.kernel.org>; Mon, 08 May 2023 20:46:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683602631; x=1686194631;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dpR8Y6nIPqOi37Vpixye2m/ShUW0PmFinpaY55RFLko=;
-        b=IynTJ+LrrQ/irCAS/yQpEIpoCR0SK5m22p9JNDAzBLi+UWDI2PIlonD9wh6D8TX1Gs
-         koKXf9fpViApnKPuDBCww3vgPUI0gaeQDQuanMrmQl7bmK2BgkqVRuFpnBoz1AiRIQ7j
-         /HhMcc981NAvCoQ5onPD7grsJuZeBQHH7eP6eTh/5zdItygwqC+98uKBtYwx/kt3Trna
-         vFSWLbmTkeBfhC37qsMcECicf6fOUS9wqPTOq+rpybJo+2kiWs5kbT+GzYUQz0JmtPjH
-         Vg6RD18kCPf0J3izsTE4eRl0qYBMuNSNWrl/yomA59dGbU92JeUxgbCiiz6sZT9FhT1P
-         M6uw==
+        d=google.com; s=20221208; t=1683603964; x=1686195964;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=heI6wD+fRYtkZA7vvjU6+YVyZT4dFVGT3j8tdiHIFbk=;
+        b=WVVeeXL+crNCpKv0OvJoozBZPP1RrEdHMojK0ZVf+NV5Unc7dqSTg1Rh5DD/EXHV/6
+         Hbtn1iwbMcKJ0Q+p66hu3AQ5nyMMisv3ORTVS73CxwjNKSo/dAb9Ei5ielbuaETHed1J
+         zlJwTCPEDzwA5wubx7F5QqSC8OsiebANCQWpNuI836b0doLi1qrIKy60/JxJW4LqQZZH
+         WO0T+T+RnIYQV5JXlHY322CB0voYnpHvn2Q0M+3bxsrvqwXB0TLJ7aZEdpdQIJMFEM/k
+         M18q4vHN5viXsYYGJ/Vr66+vmM5PzPu+7CcyWyXahpYY4uswv7oZ7pPiTUGgk1P/u3tB
+         re3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683602631; x=1686194631;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dpR8Y6nIPqOi37Vpixye2m/ShUW0PmFinpaY55RFLko=;
-        b=ajjH65yGoI001QWOahKquTKuAi4D4Dsal0IZhMlG4H2N9Qt12IMe7mhqzqvwnYwuPy
-         8te6Nw6/Pp9gtIZYq68zDSPc0fJDxRsCyWlEoPhUKozxi/TuqS/y2vnzlHYacHlMtiZL
-         e2nxthUL0evj/xBEsADmSo1Vf1ShNNwpBIQAQSdq+B9DH4FossenglNYs4/F55rXhpR8
-         9ettNOCn2VGpikFn2WP62jploMjumHjNBN17717OSiFRdA73c9WOcaJp+xHHvrkgJZyS
-         zS1p4PYop1W10q9RecGGNiVXa4woewlbunW2SgksUagXJ1NyZSo5P7p4FE/pZjvlnRBQ
-         69Vg==
-X-Gm-Message-State: AC+VfDzZBGogksgFrMn+oFj+k23cJjxWox/KX4cksYVsgj4GZHgO2l6D
-        d5B8PBGFXzSpggRXiSkEtjJPaHUxw7zD
-X-Google-Smtp-Source: ACHHUZ4DVvfOHRSg1jmcddDMu9OZASQu5P2D/etnx7+IJsHUqHQnsef4mpRMPm5yxXYudr5pL7rKuPrHSgmK
-X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
- job=sendgmr) by 2002:a25:d34b:0:b0:b8f:47c4:58ed with SMTP id
- e72-20020a25d34b000000b00b8f47c458edmr8078755ybf.9.1683602631765; Mon, 08 May
- 2023 20:23:51 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Tue,  9 May 2023 03:23:48 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.1.521.gf1e218fcd8-goog
-Message-ID: <20230509032348.1153070-1-mizhang@google.com>
-Subject: [PATCH v3] KVM: VMX: add MSR_IA32_TSX_CTRL into msrs_to_save
+        d=1e100.net; s=20221208; t=1683603964; x=1686195964;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=heI6wD+fRYtkZA7vvjU6+YVyZT4dFVGT3j8tdiHIFbk=;
+        b=YWiNoAH3a8xPKOeDoLZq7WbjrutjyuGr3F6nDFQiDtr4odB7WxLIoWQ46eTduA3aLc
+         OCQofAV0nJrrbW6sc47CkfeI7nTBUOW3ovYTRIBgJQ9PcdT82bDLXo+wgtYhxrDTKrUI
+         1xWc02huhRrX4sW/HvRbyZtntnS5sr3RGB1vbFh8yDphDHLB0fQa97ttw0ksTQ4S4OPh
+         m8sADUh+cawtkspMUNHudJvbr8ddTuWQkd+OHsoRqZiwACXlsHfk9QtSbf8nhhZpMsqu
+         J+UL0uoe/+g4fj24SGoUkq/anZ13+RCEURMN3X60HBgnMXTKARHHuDLCtSUhrJez7wJF
+         E+Lw==
+X-Gm-Message-State: AC+VfDwLaSmimQJRBQx11u5edFKvsuYWQufoRDjd1JiALWaK8LPOGR1v
+        tHiTQAaQhH+YSIf4wwnCH7zd0erOXU2kc15NLRSZ/w==
+X-Google-Smtp-Source: ACHHUZ6BXIumyb22hMEKrqwVERlTg3Gi82E1Wx1OzLAKN+UGFPvJGZZNrhiqWcKABGepS/mm1xwsv8n49RNf1H7czak=
+X-Received: by 2002:a25:20d:0:b0:b9e:33a3:f8b4 with SMTP id
+ 13-20020a25020d000000b00b9e33a3f8b4mr12510089ybc.48.1683603963978; Mon, 08
+ May 2023 20:46:03 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230509032348.1153070-1-mizhang@google.com>
+In-Reply-To: <20230509032348.1153070-1-mizhang@google.com>
 From:   Mingwei Zhang <mizhang@google.com>
+Date:   Mon, 8 May 2023 20:45:27 -0700
+Message-ID: <CAL715WJJHqZcFURC1h2qa0yyH-cK-T1wxuYnBN7fcVB67kMmbw@mail.gmail.com>
+Subject: Re: [PATCH v3] KVM: VMX: add MSR_IA32_TSX_CTRL into msrs_to_save
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Mingwei Zhang <mizhang@google.com>
+        Xiaoyao Li <xiaoyao.li@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,46 +71,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add MSR_IA32_TSX_CTRL into msrs_to_save[] to explicitly tell userspace to
-save/restore the register value during migration. Missing this may cause
-userspace that relies on KVM ioctl(KVM_GET_MSR_INDEX_LIST) fail to port the
-value to the target VM.
+On Mon, May 8, 2023 at 8:23=E2=80=AFPM Mingwei Zhang <mizhang@google.com> w=
+rote:
+>
+> Add MSR_IA32_TSX_CTRL into msrs_to_save[] to explicitly tell userspace to
+> save/restore the register value during migration. Missing this may cause
+> userspace that relies on KVM ioctl(KVM_GET_MSR_INDEX_LIST) fail to port t=
+he
+> value to the target VM.
+>
+> In addition, there is no need to add MSR_IA32_TSX_CTRL when
+> ARCH_CAP_TSX_CTRL_MSR is not supported in kvm_get_arch_capabilities(). So
+> add the checking in kvm_probe_msr_to_save().
+>
+> Fixes: c11f83e0626b ("KVM: vmx: implement MSR_IA32_TSX_CTRL disable RTM f=
+unctionality")
+> Reported-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
 
-In addition, there is no need to add MSR_IA32_TSX_CTRL when
-ARCH_CAP_TSX_CTRL_MSR is not supported in kvm_get_arch_capabilities(). So
-add the checking in kvm_probe_msr_to_save().
+Sign... missed the following two Reviewed-by...
 
-Fixes: c11f83e0626b ("KVM: vmx: implement MSR_IA32_TSX_CTRL disable RTM functionality")
-Reported-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/kvm/x86.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 237c483b1230..c8accbd6c861 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1431,7 +1431,7 @@ static const u32 msrs_to_save_base[] = {
- #endif
- 	MSR_IA32_TSC, MSR_IA32_CR_PAT, MSR_VM_HSAVE_PA,
- 	MSR_IA32_FEAT_CTL, MSR_IA32_BNDCFGS, MSR_TSC_AUX,
--	MSR_IA32_SPEC_CTRL,
-+	MSR_IA32_SPEC_CTRL, MSR_IA32_TSX_CTRL,
- 	MSR_IA32_RTIT_CTL, MSR_IA32_RTIT_STATUS, MSR_IA32_RTIT_CR3_MATCH,
- 	MSR_IA32_RTIT_OUTPUT_BASE, MSR_IA32_RTIT_OUTPUT_MASK,
- 	MSR_IA32_RTIT_ADDR0_A, MSR_IA32_RTIT_ADDR0_B,
-@@ -7077,6 +7077,10 @@ static void kvm_probe_msr_to_save(u32 msr_index)
- 		if (!kvm_cpu_cap_has(X86_FEATURE_XFD))
- 			return;
- 		break;
-+	case MSR_IA32_TSX_CTRL:
-+		if (!(kvm_get_arch_capabilities() & ARCH_CAP_TSX_CTRL_MSR))
-+			return;
-+		break;
- 	default:
- 		break;
- 	}
--- 
-2.40.1.521.gf1e218fcd8-goog
+Since this is probably the final version, I hope Sean or Paolo would
+help add them up before merging it. Appreciate your help. Thanks.
 
+-Mingwei
