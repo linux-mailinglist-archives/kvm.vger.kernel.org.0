@@ -2,161 +2,299 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 844546FC34A
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 11:56:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFB836FC364
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 12:04:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229952AbjEIJ4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 05:56:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33172 "EHLO
+        id S234575AbjEIKEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 06:04:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232299AbjEIJ4V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 05:56:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEC2919AB
-        for <kvm@vger.kernel.org>; Tue,  9 May 2023 02:55:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683626126;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=hwTL2pt1zMgvZpiDp/C711U7xrW46SHJVw2melI5eMU=;
-        b=Pl9Vh7R92x4/TZne913LhM/+eIind6F5msc9dUZLqc89AumcsLA7vMvghhWrTbO1B4H+uq
-        nn7reuASA4mTpH77MiUri2BbPDV5TwXjiE1r2N6o9oULeHNNMwP9aSQDYbUz5ybRGlEUUg
-        xX1pAtSBOgT19E7E3yz0mnmmOKshS0w=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-14-1EPOt1eCNGOckkeZyUNr5Q-1; Tue, 09 May 2023 05:55:25 -0400
-X-MC-Unique: 1EPOt1eCNGOckkeZyUNr5Q-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-94a341efd9aso699348966b.0
-        for <kvm@vger.kernel.org>; Tue, 09 May 2023 02:55:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683626123; x=1686218123;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=hwTL2pt1zMgvZpiDp/C711U7xrW46SHJVw2melI5eMU=;
-        b=ZsYVaZ7TSO+pvy7T8K4xAKWzLOMneWJ6H4SUyP5zNJtg6BRTkQfnyOPuXvfPjzTFWa
-         FotsdI2i0GeDYtf/W8ZdxrU2mG0jlGMdGGu136TzDtNcwaFrZ+TSAE6MMJr6TtmmU0R9
-         DSM7t0yU538hXNLysfvy+vHit94kh5HctqGg3tVXTuMDEWjYzI/2vtJ2UZvvVpVPz+XS
-         9mZwAXUfuG96Q4LY39prxeW8nIjY68EVnIFj0gbEQwwtZ6Q51nM208wNGupnmT3G6i3q
-         LRfFHsXOGzEOsnldeiJGN1iYjtIccG796+NW9I9PRzSxh6l7QBl/UEKN3jlnpjEXD6Z0
-         e1gg==
-X-Gm-Message-State: AC+VfDwqhrCR1e2C+NoFQyCC+gh+phIyfSYmQklrr2rLMRlSmJV/W3YP
-        TFvbs8YHo1IwKCkuOro8w/jthrBAS8Yf434hCJ0m+8W96CjCfBTS48SkQXnB+eQ4HIa7rgeKMhv
-        SVg0tqzAQGz++8yNZIO6UppfmgOvhocpjpbnJcT+TpqnoEC1XlLohPHgKIp6b4I/WXfoE9dCT
-X-Received: by 2002:a17:906:c14e:b0:94a:58a5:2300 with SMTP id dp14-20020a170906c14e00b0094a58a52300mr12038013ejc.27.1683626123187;
-        Tue, 09 May 2023 02:55:23 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7KVwDdIh+k0IFIADeE84XXMr59CW7Y/gjpBElAhOEldqYXarnqFl7S0CQI/ZY3TrvKeHZ9dQ==
-X-Received: by 2002:a17:906:c14e:b0:94a:58a5:2300 with SMTP id dp14-20020a170906c14e00b0094a58a52300mr12037990ejc.27.1683626122677;
-        Tue, 09 May 2023 02:55:22 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id qo28-20020a170907213c00b00965ddf2e221sm1110897ejb.93.2023.05.09.02.55.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 May 2023 02:55:22 -0700 (PDT)
-Message-ID: <2f19f26e-20e5-8198-294e-27ea665b706f@redhat.com>
-Date:   Tue, 9 May 2023 11:55:21 +0200
+        with ESMTP id S234645AbjEIKEL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 06:04:11 -0400
+Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CF2DE4EFB;
+        Tue,  9 May 2023 03:04:06 -0700 (PDT)
+Received: from loongson.cn (unknown [10.20.42.120])
+        by gateway (Coremail) with SMTP id _____8DxZPCVGlpkZO0GAA--.11560S3;
+        Tue, 09 May 2023 18:04:05 +0800 (CST)
+Received: from [10.20.42.120] (unknown [10.20.42.120])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxfTuTGlpkYWlSAA--.16963S3;
+        Tue, 09 May 2023 18:04:03 +0800 (CST)
+Subject: Re: [PATCH v9 30/30] LoongArch: KVM: Supplement kvm document about
+ LoongArch-specific part
+To:     Enze Li <lienze@kylinos.cn>
+References: <20230509075346.1023386-1-zhaotianrui@loongson.cn>
+ <20230509075346.1023386-31-zhaotianrui@loongson.cn>
+ <87bkitomt8.fsf@kylinos.cn>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
+        Xi Ruoyao <xry111@xry111.site>
+From:   Tianrui Zhao <zhaotianrui@loongson.cn>
+Message-ID: <1f06f49b-3b0a-efc4-97f2-3b64e6a82188@loongson.cn>
+Date:   Tue, 9 May 2023 18:04:02 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-X-Mozilla-News-Host: news://nntp.lore.kernel.org:119
-Content-Language: en-US
-To:     KVM list <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: [ANNOUNCE] KVM Microconference at LPC 2023
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <87bkitomt8.fsf@kylinos.cn>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-CM-TRANSID: AQAAf8DxfTuTGlpkYWlSAA--.16963S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjvJXoW3GryDAFy8uw15AF4kZF1xAFb_yoWxCrykpF
+        ZakayfKr4vqry7t347t34jgryakrWxtF47C3Wrtr18C3Wjyr18Jr1qqrW8WFyDCryDAF18
+        ZF18t3W3CFWUArJanT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
+        bqxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s
+        1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+        wVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4
+        x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAaw2AF
+        wI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
+        Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE
+        14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1c
+        AE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCj
+        c4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+        Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
+        6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6x
+        AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr1j6F4UJwCI42IY6I8E87Iv
+        6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
+X-Spam-Status: No, score=1.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_SBL_CSS,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all!
-
-We are planning on submitting a CFP to host a KVM Microconference at
-Linux Plumbers Conference 2023. To help justify the proposal, we would
-like to gather a list of folks that would likely attend, and crowdsource
-a list of topics to include in the proposal.
-
-For both this year and future years, the intent is that a KVM
-Microconference will complement KVM Forum, *NOT* supplant it. As you
-probably noticed, KVM Forum is going through a somewhat radical change in
-how it's organized; the conference is now free and (with some help from
-Red Hat) organized directly by the KVM and QEMU communities. Despite the
-unexpected changes and some teething pains, community response to KVM
-Forum continues to be overwhelmingly positive! KVM Forum will remain
-the venue of choice for KVM/userspace collaboration, for educational
-content covering both KVM and userspace, and to discuss new features in
-QEMU and other userspace projects.
-
-At least on the x86 side, however, the success of KVM Forum led us
-virtualization folks to operate in relative isolation. KVM depends on
-and impacts multiple subsystems (MM, scheduler, perf) in profound ways,
-and recently we鈥檝e seen more and more ideas/features that require
-non-trivial changes outside KVM and buy-in from stakeholders that
-(typically) do not attend KVM Forum. Linux Plumbers Conference is a
-natural place to establish such collaboration within the kernel.
-
-Therefore, the aim of the KVM Microconference will be:
-* to provide a setting in which to discuss KVM and kernel internals
-* to increase collaboration and reduce friction with other subsystems
-* to discuss system virtualization issues that require coordination with
-other subsystems (such as VFIO, or guest support in arch/)
-
-Below is a rough draft of the planned CFP submission.
-
-Thanks!
-
-Paolo Bonzini (KVM Maintainer)
-Sean Christopherson (KVM x86 Co-Maintainer)
-Marc Zyngier (KVM ARM Co-Maintainer)
 
 
-===================
-KVM Microconference
-===================
+在 2023年05月09日 17:50, Enze Li 写道:
+> Hi Tianrui,
+>
+> Thank you for working on this.  Only one small nit, please see below.
+>
+> On Tue, May 09 2023 at 03:53:46 PM +0800, Tianrui Zhao wrote:
+>
+>> Supplement kvm document about LoongArch-specific part, such as add
+>> api introduction for GET/SET_ONE_REG, GET/SET_FPU, GET/SET_MP_STATE,
+>> etc.
+>>
+>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+>> ---
+>>   Documentation/virt/kvm/api.rst | 71 +++++++++++++++++++++++++++++-----
+>>   1 file changed, 62 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>> index add067793b90..ae7d6a2cd54f 100644
+>> --- a/Documentation/virt/kvm/api.rst
+>> +++ b/Documentation/virt/kvm/api.rst
+>> @@ -416,6 +416,12 @@ Reads the general purpose registers from the vcpu.
+>>   	__u64 pc;
+>>     };
+>>   
+>> +  /* LoongArch */
+>> +  struct kvm_regs {
+>> +        unsigned long gpr[32];
+>> +        unsigned long pc;
+>> +  };
+>> +
+>>   
+>>   4.12 KVM_SET_REGS
+>>   -----------------
+>> @@ -506,7 +512,7 @@ translation mode.
+>>   ------------------
+>>   
+>>   :Capability: basic
+>> -:Architectures: x86, ppc, mips, riscv
+>> +:Architectures: x86, ppc, mips, riscv, loongarch
+>>   :Type: vcpu ioctl
+>>   :Parameters: struct kvm_interrupt (in)
+>>   :Returns: 0 on success, negative on failure.
+>> @@ -592,6 +598,14 @@ b) KVM_INTERRUPT_UNSET
+>>   
+>>   This is an asynchronous vcpu ioctl and can be invoked from any thread.
+>>   
+>> +LOONGARCH:
+>> +^^^^^^^^^^
+>> +
+>> +Queues an external interrupt to be injected into the virtual CPU. A negative
+>> +interrupt number dequeues the interrupt.
+>> +
+>> +This is an asynchronous vcpu ioctl and can be invoked from any thread.
+>> +
+>>   
+>>   4.17 KVM_DEBUG_GUEST
+>>   --------------------
+>> @@ -737,7 +751,7 @@ signal mask.
+>>   ----------------
+>>   
+>>   :Capability: basic
+>> -:Architectures: x86
+>> +:Architectures: x86, loongarch
+>>   :Type: vcpu ioctl
+>>   :Parameters: struct kvm_fpu (out)
+>>   :Returns: 0 on success, -1 on error
+>> @@ -746,7 +760,7 @@ Reads the floating point state from the vcpu.
+>>   
+>>   ::
+>>   
+>> -  /* for KVM_GET_FPU and KVM_SET_FPU */
+>> +  /* x86: for KVM_GET_FPU and KVM_SET_FPU */
+>>     struct kvm_fpu {
+>>   	__u8  fpr[8][16];
+>>   	__u16 fcw;
+>> @@ -761,12 +775,22 @@ Reads the floating point state from the vcpu.
+>>   	__u32 pad2;
+>>     };
+>>   
+>> +  /* LoongArch: for KVM_GET_FPU and KVM_SET_FPU */
+>> +  struct kvm_fpu {
+>> +        __u32 fcsr;
+>> +        __u32 none;
+>> +        __u64 fcc;
+>> +        struct kvm_fpureg {
+>> +                __u64 val64[4];
+>> +        }fpr[32];
+>> +  };
+>> +
+>>   
+>>   4.23 KVM_SET_FPU
+>>   ----------------
+>>   
+>>   :Capability: basic
+>> -:Architectures: x86
+>> +:Architectures: x86, loongarch
+>>   :Type: vcpu ioctl
+>>   :Parameters: struct kvm_fpu (in)
+>>   :Returns: 0 on success, -1 on error
+>> @@ -775,7 +799,7 @@ Writes the floating point state to the vcpu.
+>>   
+>>   ::
+>>   
+>> -  /* for KVM_GET_FPU and KVM_SET_FPU */
+>> +  /* x86: for KVM_GET_FPU and KVM_SET_FPU */
+>>     struct kvm_fpu {
+>>   	__u8  fpr[8][16];
+>>   	__u16 fcw;
+>> @@ -790,6 +814,16 @@ Writes the floating point state to the vcpu.
+>>   	__u32 pad2;
+>>     };
+>>   
+>> +  /* LoongArch: for KVM_GET_FPU and KVM_SET_FPU */
+>> +  struct kvm_fpu {
+>> +        __u32 fcsr;
+>> +        __u32 none;
+>> +        __u64 fcc;
+>> +        struct kvm_fpureg {
+>> +                __u64 val64[4];
+>> +        }fpr[32];
+>> +  };
+>> +
+>>   
+>>   4.24 KVM_CREATE_IRQCHIP
+>>   -----------------------
+>> @@ -1387,7 +1421,7 @@ documentation when it pops into existence).
+>>   -------------------
+>>   
+>>   :Capability: KVM_CAP_ENABLE_CAP
+>> -:Architectures: mips, ppc, s390, x86
+>> +:Architectures: mips, ppc, s390, x86, loongarch
+>>   :Type: vcpu ioctl
+>>   :Parameters: struct kvm_enable_cap (in)
+>>   :Returns: 0 on success; -1 on error
+>> @@ -1442,7 +1476,7 @@ for vm-wide capabilities.
+>>   ---------------------
+>>   
+>>   :Capability: KVM_CAP_MP_STATE
+>> -:Architectures: x86, s390, arm64, riscv
+>> +:Architectures: x86, s390, arm64, riscv, loongarch
+>>   :Type: vcpu ioctl
+>>   :Parameters: struct kvm_mp_state (out)
+>>   :Returns: 0 on success; -1 on error
+>> @@ -1460,7 +1494,7 @@ Possible values are:
+>>   
+>>      ==========================    ===============================================
+>>      KVM_MP_STATE_RUNNABLE         the vcpu is currently running
+>> -                                 [x86,arm64,riscv]
+>> +                                 [x86,arm64,riscv,loongarch]
+>>      KVM_MP_STATE_UNINITIALIZED    the vcpu is an application processor (AP)
+>>                                    which has not yet received an INIT signal [x86]
+>>      KVM_MP_STATE_INIT_RECEIVED    the vcpu has received an INIT signal, and is
+>> @@ -1516,11 +1550,14 @@ For riscv:
+>>   The only states that are valid are KVM_MP_STATE_STOPPED and
+>>   KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
+>>
+>> +On LoongArch, the KVM_MP_STATE_RUNNABLE state is only used which reflect the
+>> +vcpu is runnable.
+> There seems to be a grammatical error here.  The original sentence uses
+> "which" to connect two clauses, but lacks a subject to introduce the
+> second clause.  I think we should correct it like this,
+>
+> "On LoongArch, the KVM_MP_STATE_RUNNABLE state is only used to reflect
+> whether the vcpu is runnable."
+Thanks very much, I will fix the grammatical error in this sentence.
 
-KVM (Kernel-based Virtual Machine) enables the use of hardware features
-to improve the efficiency, performance, and security of virtual machines
-created and managed by userspace.  KVM was originally developed to host
-and accelerate "full" virtual machines running a traditional kernel and
-operating system, but has long since expanded to cover a wide array of use
-cases, e.g. hosting real time workloads, sandboxing untrusted workloads,
-deprivileging third party code, reducing the trusted computed base of
-security sensitive workloads, etc.  As KVM's use cases have grown, so too
-have the requirements placed on KVM and the interactions between it and
-other kernel subsystems.
+Thanks
+Tianrui Zhao
+>
+>> +
+>>   4.39 KVM_SET_MP_STATE
+>>   ---------------------
+>>   
+>>   :Capability: KVM_CAP_MP_STATE
+>> -:Architectures: x86, s390, arm64, riscv
+>> +:Architectures: x86, s390, arm64, riscv, loongarch
+>>   :Type: vcpu ioctl
+>>   :Parameters: struct kvm_mp_state (in)
+>>   :Returns: 0 on success; -1 on error
+>> @@ -1538,6 +1575,9 @@ For arm64/riscv:
+>>   The only states that are valid are KVM_MP_STATE_STOPPED and
+>>   KVM_MP_STATE_RUNNABLE which reflect if the vcpu should be paused or not.
+>>
+>
+>> +On LoongArch, the KVM_MP_STATE_RUNNABLE state is only used which reflect the
+>> +vcpu is runnable.
+> Likewise here.
+>
+> WDYT?
+>
+> Thanks,
+> Enze
+Thanks, I will fix it too.
 
-The KVM Microconference will focus on how to evolve KVM and adjacent
-subsystems in order to satisfy new and upcoming requirements: serving
-guest memory that cannot be accessed by host userspace[1], providing
-accurate, feature-rich PMU/perf virtualization in cloud VMs[2], etc.
-
-
-Potential Topics:
-   - Serving inaccessible/unmappable memory for KVM guests (protected VMs)
-   - Optimizing mmu_notifiers, e.g. reducing TLB flushes and spurious zapping
-   - Supporting multiple KVM modules (for non-disruptive upgrades)
-   - Improving and hardening KVM+perf interactions
-   - Implementing arch-agnostic abstractions in KVM (e.g. MMU)
-   - Defining KVM requirements for hardware vendors
-   - Utilizing "fault" injection to increase test coverage of edge cases
-   - KVM vs VFIO (e.g. memory types, a rather hot topic on the ARM side)
-
-
-Key Attendees:
-   - Paolo Bonzini <pbonzini@redhat.com> (KVM Maintainer)
-   - Sean Christopherson <seanjc@google.com>  (KVM x86 Co-Maintainer)
-   - Your name could be here!
-
-[1] https://lore.kernel.org/all/20221202061347.1070246-1-chao.p.peng@linux.intel.com
-[2] https://lore.kernel.org/all/CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com
+Thanks
+Tianrui Zhao
+>
+>> +
+>>   4.40 KVM_SET_IDENTITY_MAP_ADDR
+>>   ------------------------------
+>>   
+>> @@ -2839,6 +2879,19 @@ Following are the RISC-V D-extension registers:
+>>     0x8020 0000 0600 0020 fcsr      Floating point control and status register
+>>   ======================= ========= =============================================
+>>   
+>> +LoongArch registers are mapped using the lower 32 bits. The upper 16 bits of
+>> +that is the register group type.
+>> +
+>> +LoongArch csr registers are used to control guest cpu or get status of guest
+>> +cpu, and they have the following id bit patterns::
+>> +
+>> +  0x9030 0000 0001 00 <reg:5> <sel:3>   (64-bit)
+>> +
+>> +LoongArch KVM control registers are used to implement some new defined functions
+>> +such as set vcpu counter or reset vcpu, and they have the following id bit patterns::
+>> +
+>> +  0x9030 0000 0002 <reg:16>
+>> +
+>>   
+>>   4.69 KVM_GET_ONE_REG
+>>   --------------------
 
