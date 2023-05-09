@@ -2,52 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BA4B6FD0ED
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 23:21:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CA026FD1A5
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 23:49:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235997AbjEIVVT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 17:21:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38942 "EHLO
+        id S235377AbjEIVtB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 17:49:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235904AbjEIVU3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 17:20:29 -0400
+        with ESMTP id S236109AbjEIVs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 17:48:58 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5A4359CB;
-        Tue,  9 May 2023 14:20:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3792B5FF2;
+        Tue,  9 May 2023 14:48:54 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D5FA563738;
-        Tue,  9 May 2023 21:20:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3D66C43446;
-        Tue,  9 May 2023 21:20:01 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AC83B62F2A;
+        Tue,  9 May 2023 21:48:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0416C433EF;
+        Tue,  9 May 2023 21:48:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683667202;
-        bh=djH6aZW19S3vEZiHpsXq509OwDWDfSJMc0qTNyzHOh0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HSL4Usxfvc0EcUjWOTzv/tcG5QO7uMRB3H6uA3lq7oNCM2F7OBaCMbYT5Zumdq5vt
-         aOHsW5Dq1ij6LvgSS7bewnDp7dQOJ0yYOYJpPBIDYlwG/mjGBpaGBY1NTnJ+4uUYmW
-         ux+qQvm2JpwJpc7Am6zCm6rHfpCaI0piEcP5XrqhquThgPXjdOravBCv7iCgSWop5y
-         H40XWvsRyfUlu4WNkyeTTA1LaC8tCteYV6yF3BvcHWTQklgxIUVfrXCjW8mXXR59ST
-         RGwSvqW7f2TiPTKynROr/fTWlmV1mn0x7Sh7U+FcDElE8GGsihWdNX7loy2MhlFCOd
-         5t2reQkciO/Dg==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ivan Orlov <ivan.orlov0322@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Sasha Levin <sashal@kernel.org>, pbonzini@redhat.com,
-        shuah@kernel.org, dmatlack@google.com, vannapurve@google.com,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.2 02/18] KVM: selftests: Add 'malloc' failure check in vcpu_save_state
-Date:   Tue,  9 May 2023 17:19:40 -0400
-Message-Id: <20230509211958.21596-2-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230509211958.21596-1-sashal@kernel.org>
-References: <20230509211958.21596-1-sashal@kernel.org>
+        s=k20201202; t=1683668932;
+        bh=aGVn1Bb8EN0xVHHb7dzroGsVo8/flhCFZO4CFZWHcik=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=tkJpRcU+UpwjTdZQRc3cNQ8tasr/HuQGKVAD5vOXgft97gjXJgDHENRfSwF+lM4P4
+         gYJG+tKkqYAldsu1NpXO9IezE/FFk1Szw+YGCeKSafMDv++VjJB8Y0lSf0mh4UsZKg
+         +/5vdKBAWJnepY31oKiFtrgB1ubCBe6ZsZaaAUiOfj/Id6N5Y+ZQDcC86hYyUq4ANi
+         tZ9tdzDiSiR22Olmx01Da8IaGDDEL+6uZko5i6Z2i9MMKXTadL3VwHCX/MyupibrBi
+         qMh0WSlMECtcfAOvoTthfxi6n6yJKCtstd8OrkmEAp/0WgW18by/lSt036undmn6h7
+         XqOBEEXUwE82w==
+Date:   Tue, 9 May 2023 16:48:51 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Mike Pastore <mike@oobak.org>
+Cc:     linux-pci@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] PCI: Apply Intel NVMe quirk to Solidigm P44 Pro
+Message-ID: <20230509214851.GA1277116@bhelgaas>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230507073519.9737-1-mike@oobak.org>
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -58,35 +53,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ivan Orlov <ivan.orlov0322@gmail.com>
+[+cc Alex, kvm list]
 
-[ Upstream commit 735b0e0f2d001b7ed9486db84453fb860e764a4d ]
+On Sun, May 07, 2023 at 02:35:19AM -0500, Mike Pastore wrote:
+> Prevent KVM hang when a Solidgm P44 Pro NVMe is passed through to a
+> guest via IOMMU and the guest is subsequently rebooted.
+> 
+> A similar issue was identified and patched in commit 51ba09452d11b
+> ("PCI: Delay after FLR of Intel DC P3700 NVMe") and the same fix can be
+> aplied for this case. (Intel spun off their NAND and SSD business as
+> Solidigm and sold it to SK Hynix in late 2021.)
+> 
+> Signed-off-by: Mike Pastore <mike@oobak.org>
 
-There is a 'malloc' call in vcpu_save_state function, which can
-be unsuccessful. This patch will add the malloc failure checking
-to avoid possible null dereference and give more information
-about test fail reasons.
+Applied with subject:
 
-Signed-off-by: Ivan Orlov <ivan.orlov0322@gmail.com>
-Link: https://lore.kernel.org/r/20230322144528.704077-1-ivan.orlov0322@gmail.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 1 +
- 1 file changed, 1 insertion(+)
+  PCI: Delay after FLR of Solidigm P44 Pro NVMe
 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index acfa1d01e7df0..d9365a9d1c490 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -950,6 +950,7 @@ struct kvm_x86_state *vcpu_save_state(struct kvm_vcpu *vcpu)
- 	vcpu_run_complete_io(vcpu);
- 
- 	state = malloc(sizeof(*state) + msr_list->nmsrs * sizeof(state->msrs.entries[0]));
-+	TEST_ASSERT(state, "-ENOMEM when allocating kvm state");
- 
- 	vcpu_events_get(vcpu, &state->events);
- 	vcpu_mp_state_get(vcpu, &state->mp_state);
--- 
-2.39.2
+to my virtualization branch for v6.5.  I also moved
+PCI_VENDOR_ID_SOLIDIGM to keep pci_ids.h sorted.
 
+> ---
+>  drivers/pci/quirks.c    | 10 ++++++----
+>  include/linux/pci_ids.h |  2 ++
+>  2 files changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+> index 44cab813bf95..b47844d0e574 100644
+> --- a/drivers/pci/quirks.c
+> +++ b/drivers/pci/quirks.c
+> @@ -3980,10 +3980,11 @@ static int nvme_disable_and_flr(struct pci_dev *dev, bool probe)
+>  }
+>  
+>  /*
+> - * Intel DC P3700 NVMe controller will timeout waiting for ready status
+> - * to change after NVMe enable if the driver starts interacting with the
+> - * device too soon after FLR.  A 250ms delay after FLR has heuristically
+> - * proven to produce reliably working results for device assignment cases.
+> + * Some NVMe controllers such as Intel DC P3700 and Solidigm P44 Pro will
+> + * timeout waiting for ready status to change after NVMe enable if the driver
+> + * starts interacting with the device too soon after FLR.  A 250ms delay after
+> + * FLR has heuristically proven to produce reliably working results for device
+> + * assignment cases.
+>   */
+>  static int delay_250ms_after_flr(struct pci_dev *dev, bool probe)
+>  {
+> @@ -4070,6 +4071,7 @@ static const struct pci_dev_reset_methods pci_dev_reset_methods[] = {
+>  	{ PCI_VENDOR_ID_SAMSUNG, 0xa804, nvme_disable_and_flr },
+>  	{ PCI_VENDOR_ID_INTEL, 0x0953, delay_250ms_after_flr },
+>  	{ PCI_VENDOR_ID_INTEL, 0x0a54, delay_250ms_after_flr },
+> +	{ PCI_VENDOR_ID_SOLIDIGM, 0xf1ac, delay_250ms_after_flr },
+>  	{ PCI_VENDOR_ID_CHELSIO, PCI_ANY_ID,
+>  		reset_chelsio_generic_dev },
+>  	{ PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HINIC_VF,
+> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+> index 45c3d62e616d..6105eddf41bf 100644
+> --- a/include/linux/pci_ids.h
+> +++ b/include/linux/pci_ids.h
+> @@ -3119,4 +3119,6 @@
+>  
+>  #define PCI_VENDOR_ID_NCUBE		0x10ff
+>  
+> +#define PCI_VENDOR_ID_SOLIDIGM		0x025e
+> +
+>  #endif /* _LINUX_PCI_IDS_H */
+> 
+> base-commit: 63355b9884b3d1677de6bd1517cd2b8a9bf53978
+> -- 
+> 2.39.2
+> 
