@@ -2,158 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A4EA6FC881
-	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 16:05:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 371096FC91D
+	for <lists+kvm@lfdr.de>; Tue,  9 May 2023 16:35:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235741AbjEIOEr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 10:04:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49808 "EHLO
+        id S235495AbjEIOfL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 10:35:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235724AbjEIOEp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 10:04:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B414B46AF
-        for <kvm@vger.kernel.org>; Tue,  9 May 2023 07:04:36 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AA3786254C
-        for <kvm@vger.kernel.org>; Tue,  9 May 2023 14:04:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EFB5CC4339C
-        for <kvm@vger.kernel.org>; Tue,  9 May 2023 14:04:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683641073;
-        bh=25+i3J0TqHcemgyXp1sJT2MX0rg7KU38ZOSn9jpbL9k=;
-        h=From:To:Subject:Date:From;
-        b=FcvAFEcpQG+hVWuFf4mNoDHRq4+WTpCBntWRzJRahohBlIUc2wuy625Jr5dJ5BUIH
-         8/HRn5AipPxEoUSsellO0Y+Uhjn6oROImCjZQ7iCUnq/qQNQ/podkjBTGEuWuqTPrF
-         HNeQ41STtOUDyMEFdfcJ8sf1nmb7Mun+tprD2o9oeKEuaNDWhfgQWK4nm9JbKufoso
-         hrNxOiam7FjWIPIRM6UZ0nZ66hpF7md2acvPyiJGHeHTTfKXGsJx7kqhKZ0GmDde5Q
-         ZQx6DjAAjw/3ZZ3AlxZ9mBirBvN70Lmuon7ttfG07Ucd0N2zy7anetDi8awb8tK924
-         w52TetU+jb9zw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id D7B8CC43144; Tue,  9 May 2023 14:04:32 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 217424] New: TSC synchronization issue in VM restore
-Date:   Tue, 09 May 2023 14:04:32 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: zhuangel570@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-217424-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S235636AbjEIOfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 10:35:09 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50909E45
+        for <kvm@vger.kernel.org>; Tue,  9 May 2023 07:35:08 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-30796c0cbcaso2335051f8f.1
+        for <kvm@vger.kernel.org>; Tue, 09 May 2023 07:35:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1683642907; x=1686234907;
+        h=content-transfer-encoding:mime-version:message-id:date:reply-to
+         :user-agent:references:in-reply-to:subject:cc:to:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q1YdxCB85DjavEkSSztecs/1uZiFEj5gdNIdoSOu2jU=;
+        b=JjwcIBMfH+BKJVT6FcDztOmongSI6w+OBJ3K9dqquNYFHFhfY1nBfCuSiaQvTio+3q
+         wPer1OGk4WFag7yRr2sj4GG65I2c5wIpn4I7aRYIzWj/EHyEDaIf0JOGLNMYI7akj0q0
+         r4JRt7SZUYifZc8eNv8nzcGzuwNFB8emQ3EzaTBg5IzyWjMKUUv3lskT6TwhaU9i3oX/
+         nb5NfU4EOSHOEoLNn/VrzvMT2SCtToGbf1BihltZYcPw4li7nhDS9qPJN6UvVBQNkD/V
+         yRNbK4OdCUdyDJWZnal2bHI0gJ621BCZO/ZcpL3Z8Ue+ES23pD8QXdzBx5EW1z2ccpkE
+         ci8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683642907; x=1686234907;
+        h=content-transfer-encoding:mime-version:message-id:date:reply-to
+         :user-agent:references:in-reply-to:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q1YdxCB85DjavEkSSztecs/1uZiFEj5gdNIdoSOu2jU=;
+        b=hxawRZGsWo0uiRGY14Q/Yy3gKbjUcyznRHt8+bIbwfoUOWvRlOdDr6KZCQOuqr1SBH
+         64k9aAuUyL2J7ors+gtviILTA3DIoYcMozn0eHLoyi42j1d6BSZ4SgHV5oJrH2O+lG8J
+         ulb7QkXKm97y7HQbAmP1buLbXVElMMPRwi8Lep+q0e0te75J9tk0PnSvlWq1a5V5nNMx
+         mCUdwhJpCu9W7O7lXvXN/mHH4Gtcl8BfSEZMWzWvkgWDHGHPZnBxnSO3sW7/FzX+urlf
+         01iPET9ur402j1nrz6KJLwndLxZ3zNVver9o3mUxj4SDb0u77bNt1o++d5ONmJD06rCq
+         LiMQ==
+X-Gm-Message-State: AC+VfDy0IlPUF1CACmURUtbOONHJfTPJTdDWUpEFyDnNFVsHEka5ST5x
+        hxsKT8bWwXcdpftOswxi1jM=
+X-Google-Smtp-Source: ACHHUZ5CsIMAIYa0KMYVoSFLvRU9hT596yzswoHdUDGZmpOnYS1VpOcagpzLja7w4fJycoNIhgFXXA==
+X-Received: by 2002:adf:fa50:0:b0:307:a3e9:8b93 with SMTP id y16-20020adffa50000000b00307a3e98b93mr1960264wrr.2.1683642906530;
+        Tue, 09 May 2023 07:35:06 -0700 (PDT)
+Received: from gmail.com (static-92-120-85-188.ipcom.comunitel.net. [188.85.120.92])
+        by smtp.gmail.com with ESMTPSA id n3-20020a7bc5c3000000b003f0b1b8cd9bsm20181621wmk.4.2023.05.09.07.35.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 May 2023 07:35:06 -0700 (PDT)
+From:   Juan Quintela <juan.quintela@gmail.com>
+To:     Mark Burton <mburton@qti.qualcomm.com>
+Cc:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        "afaerber@suse.de" <afaerber@suse.de>,
+        Alessandro Di Federico <ale@rev.ng>,
+        "anjo@rev.ng" <anjo@rev.ng>,
+        "bazulay@redhat.com" <bazulay@redhat.com>,
+        "bbauman@redhat.com" <bbauman@redhat.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>, "cw@f00f.org" <cw@f00f.org>,
+        "david.edmondson@oracle.com" <david.edmondson@oracle.com>,
+        "dustin.kirkland@canonical.com" <dustin.kirkland@canonical.com>,
+        "eblake@redhat.com" <eblake@redhat.com>,
+        "edgar.iglesias@gmail.com" <edgar.iglesias@gmail.com>,
+        "elena.ufimtseva@oracle.com" <elena.ufimtseva@oracle.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "f4bug@amsat.org" <f4bug@amsat.org>,
+        Felipe Franciosi <felipe.franciosi@nutanix.com>,
+        "iggy@theiggy.com" <iggy@kws1.com>, Warner Losh <wlosh@bsdimp.com>,
+        "jan.kiszka@web.de" <jan.kiszka@web.de>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "jidong.xiao@gmail.com" <jidong.xiao@gmail.com>,
+        "jjherne@linux.vnet.ibm.com" <jjherne@linux.vnet.ibm.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mdean@redhat.com" <mdean@redhat.com>,
+        "mimu@linux.vnet.ibm.com" <mimu@linux.vnet.ibm.com>,
+        "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "stefanha@gmail.com" <stefanha@gmail.com>,
+        "wei.w.wang@intel.com" <wei.w.wang@intel.com>,
+        "z.huo@139.com" <z.huo@139.com>,
+        "zwu.kernel@gmail.com" <zwu.kernel@gmail.com>
+Subject: Re: QEMU developers fortnightly call for agenda for 2023-05-16
+In-Reply-To: <70D7039C-F950-421C-A3A8-D5559DDD6E0C@qti.qualcomm.com> (Mark
+        Burton's message of "Tue, 9 May 2023 14:25:41 +0000")
+References: <calendar-f9e06ce0-8972-4775-9a3d-7269ec566398@google.com>
+        <70D7039C-F950-421C-A3A8-D5559DDD6E0C@qti.qualcomm.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+Reply-To: juan.quintela@gmail.com
+Date:   Tue, 09 May 2023 16:35:05 +0200
+Message-ID: <87zg6dd146.fsf@secure.mitica>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217424
+Mark Burton <mburton@qti.qualcomm.com> wrote:
+> I=E2=80=99d appreciate an update on single binary.
+> Also, What=E2=80=99s the status on the =E2=80=9Cicount=E2=80=9D plugin ?
 
-            Bug ID: 217424
-           Summary: TSC synchronization issue in VM restore
-           Product: Virtualization
-           Version: unspecified
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: zhuangel570@gmail.com
-        Regression: No
+Annotated.
 
-Hi
+BTW, if people are interested I can expose the "idea" of all the
+migration patches going on the tree.
 
-We are using lightweight VM with snapshot feature, the VM will be saved with
-100ms+, and we found restore such VM will not get correct TSC, which will m=
-ake
-the VM world stop about 100ms+ after restore (the stop time is same as time
-when VM saved).
-
-After Investigation, we found the issue caused by TSC synchronization in
-setting MSR_IA32_TSC. In VM save, VMM (cloud-hypervisor) will record TSC of
-each
-VCPU, then restore the TSC of VCPU in VM restore (about 100ms+ in guest tim=
-e).
-But in KVM, setting a TSC within 1 second is identified as TSC synchronizat=
-ion,
-and the TSC offset will not be updated in stable TSC environment, this will
-cause the lapic set up a hrtimer expires after 100ms+, the restored VM now =
-will
-in stop state about 100ms+, if no other event to wake guest kernel in NO_HZ
-mode.
-
-More investigation show, the MSR_IA32_TSC set from guest side has disabled =
-TSC
-synchronization in commit 0c899c25d754 (KVM: x86: do not attempt TSC
-synchronization on guest writes), now host side will do TSC synchronization
-when
-setting MSR_IA32_TSC.
-
-I think setting MSR_IA32_TSC within 1 second from host side should not be
-identified as TSC synchronization, like above case, VMM set TSC from host s=
-ide
-always should be updated as user want.
-
-The MSR_IA32_TSC set code is complicated and with a long history, so I come
-here
-to try to get help about whether my thought is correct. Here is my fix to s=
-olve
-the issue, any comments are welcomed:
-
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ceb7c5e9cf9e..9380a88b9c1f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2722,17 +2722,6 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcp=
-u,
-u64 data)
-                         * kvm_clock stable after CPU hotplug
-                         */
-                        synchronizing =3D true;
--               } else {
--                       u64 tsc_exp =3D kvm->arch.last_tsc_write +
--                                               nsec_to_cycles(vcpu, elapse=
-d);
--                       u64 tsc_hz =3D vcpu->arch.virtual_tsc_khz * 1000LL;
--                       /*
--                        * Special case: TSC write with a small delta (1
-second)
--                        * of virtual cycle time against real time is
--                        * interpreted as an attempt to synchronize the CPU.
--                        */
--                       synchronizing =3D data < tsc_exp + tsc_hz &&
--                                       data + tsc_hz > tsc_exp;
-                }
-        }
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Later, Juan.
