@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C38E6FD452
-	for <lists+kvm@lfdr.de>; Wed, 10 May 2023 05:34:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE9B06FD45F
+	for <lists+kvm@lfdr.de>; Wed, 10 May 2023 05:35:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234932AbjEJDee (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 23:34:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38320 "EHLO
+        id S235560AbjEJDfP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 23:35:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229704AbjEJDe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 23:34:28 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2048.outbound.protection.outlook.com [40.107.92.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 765BF2106;
-        Tue,  9 May 2023 20:34:27 -0700 (PDT)
+        with ESMTP id S235593AbjEJDeu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 23:34:50 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2054.outbound.protection.outlook.com [40.107.96.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69FCE5BB5;
+        Tue,  9 May 2023 20:34:35 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RU05401MY08BiS6xiy1FcOla3aAyiHL5xbJuZUzZ3T83pK8jKLo9orTcQNWl4v1+FYTfCrViLudfZSFSCkHWXclsBXciTpF1LfVTCAPCq6t81qeMXJ+fWUdRCg/yPiNqN1QuXL78dT7nPSbPKQC+rWqg4ghYJzDH1afa7L2oGSmBzLXq8mdNwBxdK20xLkaLrx/yJNjfM7M1oGvZ7WhzgvKYT29S6BbM1ePxcuCgIRKraE08hST6b2XYvBQT7F4wRyhN8X0QfQ/5a9nhHva7Y77AzSfZZEJEZF3YjQnf+2M7wNmyjFwOEPhtPuq1eJZZmaN2C06OF+aSVdXuMPrghQ==
+ b=UK7gS24+JR7UiOLcZZgpVkQ4wGFhtCrjIphfknhu3bxsxjDxIvwHmNBOYlMHFhRT7Y4uA+L+ByCRtZpfyUNhlBHCv768d6yW1Vpej2fmmUkRuhTGHZo126eUvsMQNetxhBmo/yQiSbqL2EMrFNAykadEcym360tbsl9kYxCzcRnpkZfANkgA38jAT9HS0PstSy0R3WoxOCryOiEvUnFuC7HHH9zzTtxGzcUmkq3xiR3qlsGJHfmKmoNJtv4dI+gd3nP8zwDCQy5OyKbsbTZzq1g5hQYCO+C3gc5IgrGmLnCoiyTE8SnbYusruNPCc8OczcUxKFIA56ainsrIsfIaTA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ykmkw5RtWsKK04pdCG62YjB2lEQt4XEWrgruyTEakjg=;
- b=ju02c9p8SVmp6KtzGQ9V2lh96OCEMdvP7w/a1rp7+0kX4M52e6HDtnmNCysKsWYOQ3ufNYPFNPVIhgXTBtmeJ0nlcdqURIEgyXmbnNgbOlf4dTCJPbomwBuONdKoItkFyPK1nE6yTTdaxVxZYTwjezXM3NYDYQ7i779lqo97z5S7o48CRNOa9TFTtiWnsb4U/4NfpN/yzq/vMft+KsBPHci91R7YiSEUxgi0+0uxxgBHbO3Ab/WzEBIDy3HqwICInLaQMfiWVvNm4otZte43bFFV+TfMFK2HWm/CukIo1aEiRhYmx1R5uOd+lfyHAMy9SUBp+fohh68YWGGZDuwg1A==
+ bh=yJebtEKrtrvbLCiBOy7gpOUhYpCLuJx46uKWTr4rd0w=;
+ b=LZpwr3UJfHIGx+w+3WJqSnUuxju9BDpFwHRQoNvkfuMXrt1fY3sA/WK6a5APPTRaZKObU9e4c0Neb7yt/mtS8p0xHgsFeR3zVCLw/ZOTeQ3GT2ht1bLHVg13BvRxx8vY9f7mJ9cTBuGsvkgNm5D0EAM5BUSsoNX293C54bfuQMrtnPfvBIJbgtKNOY2evpqC/0T1qhMRIWOUEQUIS4Uhs7iePDdCW7Rw8kCAuoerZnxKmQnc+J/QFuhdxcyV7L8ljAZmXl/TcAPFzOLQ5aYer8eQB04QAcB4MyyzO0uzbquYJ7WERWP2Cpw2Bl1ukn3g+bMZKydykNt/anv0o7tmIw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=arm.com smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=arm.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ykmkw5RtWsKK04pdCG62YjB2lEQt4XEWrgruyTEakjg=;
- b=ZRLPY+KPFSI9GqHMJtr37x/zX22E+vhyNKq2+bGv4vwZCkTrVE9SZxQTvxzONWOMifbcC5ismhiS7DRsce+X5rRuLx+evoO1RxdbYEIOeYZwmIjFht5p5sEGAKNoYJtYeOJ2bEMiNEipuc+rADjMpAXL6kWEsVnQrZnCxv4zSJ90IDRSrKuLt1J6CCDeiUzuRogVKHaFjZhaYZtZs9q1GiUlNyw0aqYvrZizAPHFwQCx2So7025IWxnp9451M2FtfOYSpLeoV7YhNNytazxZwEhHtQzsK65SROjQFU2Vqh8pWDKUqrwhEw7uH9lxle6iMSaFKZZByv26g1sD1T+ocw==
-Received: from BN9PR03CA0197.namprd03.prod.outlook.com (2603:10b6:408:f9::22)
- by DM4PR12MB5392.namprd12.prod.outlook.com (2603:10b6:5:39f::18) with
+ bh=yJebtEKrtrvbLCiBOy7gpOUhYpCLuJx46uKWTr4rd0w=;
+ b=Lc5l/fR04Xb/f2jenYtbrCR1qLipx0THIdj7T4S5A4BzNB8mdP/d+NwZjB7NzZijnvV7PwA30sjGT2yxBgzoUok3QExcl9xndMm6SMHr9wS2aRrVlQlO+eUyxi795F8vqgYDCQQO4B6IRfypTOcoCQ7a1QG5v71+MPjeor4S/PieLNcwOgqFXcqd95zdG0Rk8t90OQloK++8Zc1dYbFISp9RFygdy7wkkRbS5CuJrk1qzQuaYLUNFRPonBCW9YpwSN1jNUr61nF/9DMkKK3n7nftPEi2Y9Ky2WCZVm3lNrI+8uUcq3EtujTI8g0oueewNb5wtyVqRlE4tdGY6xC7OQ==
+Received: from BN9P220CA0026.NAMP220.PROD.OUTLOOK.COM (2603:10b6:408:13e::31)
+ by SJ2PR12MB8926.namprd12.prod.outlook.com (2603:10b6:a03:53b::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.32; Wed, 10 May
- 2023 03:34:25 +0000
-Received: from BN8NAM11FT009.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:f9:cafe::76) by BN9PR03CA0197.outlook.office365.com
- (2603:10b6:408:f9::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.33 via Frontend
- Transport; Wed, 10 May 2023 03:34:25 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ 2023 03:34:30 +0000
+Received: from BL02EPF000145B8.namprd05.prod.outlook.com
+ (2603:10b6:408:13e:cafe::32) by BN9P220CA0026.outlook.office365.com
+ (2603:10b6:408:13e::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.18 via Frontend
+ Transport; Wed, 10 May 2023 03:34:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN8NAM11FT009.mail.protection.outlook.com (10.13.176.65) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6387.19 via Frontend Transport; Wed, 10 May 2023 03:34:24 +0000
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BL02EPF000145B8.mail.protection.outlook.com (10.167.241.208) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6387.19 via Frontend Transport; Wed, 10 May 2023 03:34:29 +0000
 Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 9 May 2023
- 20:34:13 -0700
+ 20:34:15 -0700
 Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
  (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 9 May 2023
- 20:34:13 -0700
+ 20:34:14 -0700
 Received: from Asurada-Nvidia.nvidia.com (10.127.8.10) by mail.nvidia.com
  (10.129.68.6) with Microsoft SMTP Server id 15.2.986.37 via Frontend
- Transport; Tue, 9 May 2023 20:34:12 -0700
+ Transport; Tue, 9 May 2023 20:34:13 -0700
 From:   Nicolin Chen <nicolinc@nvidia.com>
 To:     <jgg@nvidia.com>, <robin.murphy@arm.com>, <will@kernel.org>
 CC:     <eric.auger@redhat.com>, <kevin.tian@intel.com>,
@@ -69,9 +69,9 @@ CC:     <eric.auger@redhat.com>, <kevin.tian@intel.com>,
         <linux-arm-kernel@lists.infradead.org>, <iommu@lists.linux.dev>,
         <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
         <alex.williamson@redhat.com>, <yi.l.liu@intel.com>
-Subject: [PATCH v2 04/17] iommufd/device: Setup MSI on kernel-managed domains
-Date:   Tue, 9 May 2023 20:33:24 -0700
-Message-ID: <4e70a7985a2921db3a91539c690a9a86c4e1a184.1683688960.git.nicolinc@nvidia.com>
+Subject: [PATCH v2 05/17] iommu/arm-smmu-v3: Add arm_smmu_hw_info
+Date:   Tue, 9 May 2023 20:33:25 -0700
+Message-ID: <07c9c019eb6cc9226d0117373dcfe0daf8436fee.1683688960.git.nicolinc@nvidia.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <cover.1683688960.git.nicolinc@nvidia.com>
 References: <cover.1683688960.git.nicolinc@nvidia.com>
@@ -80,23 +80,23 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT009:EE_|DM4PR12MB5392:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4241ab29-525e-485f-d4a2-08db510773a3
+X-MS-TrafficTypeDiagnostic: BL02EPF000145B8:EE_|SJ2PR12MB8926:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6e4e6883-18b7-4fb7-52e3-08db51077686
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /TQvlcdFER7jTdnoZZ6x31g26uR4mJVOMmllGXwcaNepKQlYFoQ/4MiSbLcX/ue/N4PtpvGFBfYdeEPwaxMZAIrS19e4T8d4OmpDf6J1VKQfYqlU0s5JdV04a8CUldHzXxv+DlbpEcyNSWN4irB5KodH8gR8Mui4wn6t4nQY7aL+D8/NGS0lQ5ckNQsZgAXFM3YEfxUY02xK5dTpg44lH+8hr170/vmmGNyykSm5GVIUqBPm481SpmCXlFWZDmoyzj/mkEl9pgpJUlPoYZUrjrnl+CC+EDbcCYINlzx56kc6su7GDLF1JasvWeyHtGzJd7INL2NP2Ufuwpp4eCFQUTPL9WEu6ShQeay3RQN0yDS2bCQmydK/3ty5n28ZKLccCJ9vdyxI3RUFcUwksfxp8WmxrCit7/H/pn0wt828J5gyJ+l1ML93SmkOrGvGbHWyXcBk7FRFJM1Fu02nZQm8+VIyr8GoUcEgV50F1sgoxjWZfFGnDMD5JaaX3RZiLV7JWY7BNCQ0TT6LjuHURCYOHHWlvt/sHMyuC/Dz1h864JxpLC4ln23fHmSmQv7m/cK5brFrcUZPPziFSXwWYMFoyHygwCOg7C/C5uW0C7QVVhvm70WRwX5qzgJagIFH+Jk2qjbLQ3DvOFk7UrEMNv8XVPXvbj4YzXlaWhc+NZHxOW+oqCR1h7XToPWlvvy7JWkMRuzKH+2E5VlHRpQJvC4pZg==
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(376002)(136003)(396003)(451199021)(46966006)(40470700004)(36840700001)(86362001)(36756003)(6666004)(316002)(54906003)(70586007)(478600001)(4326008)(7696005)(70206006)(110136005)(40480700001)(82310400005)(5660300002)(8936002)(8676002)(47076005)(7416002)(356005)(41300700001)(2906002)(82740400003)(7636003)(186003)(36860700001)(26005)(336012)(83380400001)(426003)(2616005)(40460700003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: CfOwJiVZitsY2TPfj5ClKtX1U8UjXlX3cka5i7mi2Kt02/9H1Eg52FEgPg8WmBlltwuuT/9IcNaEttIaNcGsM5N6ha27Iqb1f+hRQdfIBEHdZ4QOnGbrsHYNa8SsdmTx2GDzcaSde1t7krXkELzakrjzYOwAXkcpspajo7eKZFfDAfqgB+3nJM5ahQuRSyOqDkD8b2kh3SUzexiYtcCkGfAO3aiaStKRQQtzMusjgzHlKBdCjuZXkDvy7WVvb8fCNtMwwXf+uoDtD7yuioUtERQ6E198lCBOxS6KQJQUcuXYSpZV/DWIZ2kBbhbstzHYNaO99lPou2UQQjFr46vB0j0gC/0Hm8Tv++txyN2KGMJJHDryMS4ZOGd4SplR9DUAFrV1PiVPfkwSLUU54NfFvuZzYjCQYObjjYPud+hEemCUX9oa/02PaQYGR4mGxqMdVRVe5WRrf09pHs6gWr/O7lPOG8OBxZt7k/YXFcphtC10PHSVYTJhH5P+6DyWb6wZscgXI19/yJeC2NDcEpgDouzq8Wj5/pSfXLRPk+VMLdI729YRPuEogTe50WwB11bU9AdLlFAzHdlCm8Z54rcjTN/bMMsI2iyRrwoGoJt4OcEU5oSFG2b4/AvYmLK0pbACqTftMi8t43RZlfZnGGGMbd63X9SXyOhAxlgF5bmnFyDnFWO4ysHEVesS5LzORKRasN3vmmDynj4n7wajtkc0fQ==
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(39860400002)(136003)(376002)(451199021)(36840700001)(40470700004)(46966006)(47076005)(36860700001)(26005)(186003)(478600001)(426003)(336012)(2616005)(40460700003)(7696005)(6666004)(8936002)(5660300002)(8676002)(86362001)(82310400005)(316002)(41300700001)(356005)(7636003)(40480700001)(70206006)(70586007)(36756003)(2906002)(82740400003)(110136005)(7416002)(54906003)(4326008);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2023 03:34:24.8076
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2023 03:34:29.6161
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4241ab29-525e-485f-d4a2-08db510773a3
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e4e6883-18b7-4fb7-52e3-08db51077686
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT009.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF000145B8.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5392
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8926
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -108,38 +108,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The IOMMU_RESV_SW_MSI is a kernel-managed domain thing. So, it should be
-only setup on a kernel-managed domain only. If the attaching domain is a
-user-managed domain, redirect the hwpt to hwpt->parent to do it correctly.
+This is used to forward the host IDR values to the user space, so the
+hypervisor and the guest VM can learn about the underlying hardware's
+capabilities.
+
+Also, set the ops->hw_info_type and ops->hwpt_type_bitmap accordingly.
 
 Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
 ---
- drivers/iommu/iommufd/device.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 26 +++++++++++++++++++++
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  2 ++
+ include/uapi/linux/iommufd.h                | 14 +++++++++++
+ 3 files changed, 42 insertions(+)
 
-diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
-index e40f576fdf0e..e403cf6c336d 100644
---- a/drivers/iommu/iommufd/device.c
-+++ b/drivers/iommu/iommufd/device.c
-@@ -351,7 +351,8 @@ static int iommufd_group_setup_msi(struct iommufd_group *igroup,
- 	 * call iommu_get_msi_cookie() on its behalf. This is necessary to setup
- 	 * the MSI window so iommu_dma_prepare_msi() can install pages into our
- 	 * domain after request_irq(). If it is not done interrupts will not
--	 * work on this domain.
-+	 * work on this domain. The msi_cookie should be always set into the
-+	 * kernel-managed (parent) domain.
- 	 *
- 	 * FIXME: This is conceptually broken for iommufd since we want to allow
- 	 * userspace to change the domains, eg switch from an identity IOAS to a
-@@ -359,6 +360,8 @@ static int iommufd_group_setup_msi(struct iommufd_group *igroup,
- 	 * matches what the IRQ layer actually expects in a newly created
- 	 * domain.
- 	 */
-+	if (hwpt->parent)
-+		hwpt = hwpt->parent;
- 	if (sw_msi_start != PHYS_ADDR_MAX && !hwpt->msi_cookie) {
- 		rc = iommu_get_msi_cookie(hwpt->domain, sw_msi_start);
- 		if (rc)
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+index 2c53849cae30..89daf50be87b 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -2014,6 +2014,29 @@ static bool arm_smmu_capable(struct device *dev, enum iommu_cap cap)
+ 	}
+ }
+ 
++static void *arm_smmu_hw_info(struct device *dev, u32 *length)
++{
++	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
++	struct iommu_hw_info_smmuv3 *info;
++	void *base_idr;
++	int i;
++
++	if (!master || !master->smmu)
++		return ERR_PTR(-ENODEV);
++
++	info = kzalloc(sizeof(*info), GFP_KERNEL);
++	if (!info)
++		return ERR_PTR(-ENOMEM);
++
++	base_idr = master->smmu->base + ARM_SMMU_IDR0;
++	for (i = 0; i <= 5; i++)
++		info->idr[i] = readl_relaxed(base_idr + 0x4 * i);
++
++	*length = sizeof(*info);
++
++	return info;
++}
++
+ static struct iommu_domain *arm_smmu_domain_alloc(unsigned type)
+ {
+ 	struct arm_smmu_domain *smmu_domain;
+@@ -2846,6 +2869,7 @@ static void arm_smmu_remove_dev_pasid(struct device *dev, ioasid_t pasid)
+ 
+ static struct iommu_ops arm_smmu_ops = {
+ 	.capable		= arm_smmu_capable,
++	.hw_info		= arm_smmu_hw_info,
+ 	.domain_alloc		= arm_smmu_domain_alloc,
+ 	.probe_device		= arm_smmu_probe_device,
+ 	.release_device		= arm_smmu_release_device,
+@@ -2857,6 +2881,8 @@ static struct iommu_ops arm_smmu_ops = {
+ 	.dev_disable_feat	= arm_smmu_dev_disable_feature,
+ 	.page_response		= arm_smmu_page_response,
+ 	.def_domain_type	= arm_smmu_def_domain_type,
++	.hw_info_type		= IOMMU_HW_INFO_TYPE_ARM_SMMUV3,
++	.hwpt_type_bitmap	= BIT_ULL(IOMMU_HWPT_TYPE_ARM_SMMUV3),
+ 	.pgsize_bitmap		= -1UL, /* Restricted during device attach */
+ 	.owner			= THIS_MODULE,
+ 	.default_domain_ops = &(const struct iommu_domain_ops) {
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+index b574c58a3487..5fa010c6fe20 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+@@ -14,6 +14,8 @@
+ #include <linux/mmzone.h>
+ #include <linux/sizes.h>
+ 
++#include <uapi/linux/iommufd.h>
++
+ /* MMIO registers */
+ #define ARM_SMMU_IDR0			0x0
+ #define IDR0_ST_LVL			GENMASK(28, 27)
+diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+index 6845ce6e1e76..b1fe4c59ab82 100644
+--- a/include/uapi/linux/iommufd.h
++++ b/include/uapi/linux/iommufd.h
+@@ -534,6 +534,20 @@ struct iommu_hw_info_vtd {
+ 	__aligned_u64 ecap_reg;
+ };
+ 
++/**
++ * struct iommu_hw_info_smmuv3 - ARM SMMUv3 device info
++ *
++ * @flags: Must be set to 0
++ * @__reserved: Must be 0
++ * @idr: Implemented features for the SMMU Non-secure programming interface.
++ *       Please refer to the chapters from 6.3.1 to 6.3.6 in the SMMUv3 Spec.
++ */
++struct iommu_hw_info_smmuv3 {
++	__u32 flags;
++	__u32 __reserved;
++	__u32 idr[6];
++};
++
+ /**
+  * struct iommu_hw_info - ioctl(IOMMU_DEVICE_GET_HW_INFO)
+  * @size: sizeof(struct iommu_hw_info)
 -- 
 2.40.1
 
