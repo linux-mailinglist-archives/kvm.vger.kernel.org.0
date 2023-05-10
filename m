@@ -2,185 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E43F6FD649
-	for <lists+kvm@lfdr.de>; Wed, 10 May 2023 07:40:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6CBB6FD67A
+	for <lists+kvm@lfdr.de>; Wed, 10 May 2023 08:06:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235606AbjEJFku (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 May 2023 01:40:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45100 "EHLO
+        id S235951AbjEJGGm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 May 2023 02:06:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229741AbjEJFkr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 May 2023 01:40:47 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2228271B;
-        Tue,  9 May 2023 22:40:46 -0700 (PDT)
+        with ESMTP id S229711AbjEJGGl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 May 2023 02:06:41 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B84140F7;
+        Tue,  9 May 2023 23:06:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683697247; x=1715233247;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=AZ0u5YaG5RgdyRrypXhZx0cd4Ebis1NUoshQ+pul9iM=;
-  b=aNr5YAN9JHGobVH9+Uu6nkBYdaJxeNp5uT9HJGc1PQQPoq99XoNNzxKN
-   68xNGYcO6Hxdoq8hYPXRR7Z0a1eesoPvx/UqEIOtxmLiaI0skjvnQrDS9
-   fgw8Wi0ZOH73LGNYvZhO/9te+CRnV1PDU0ortuffsjfI0r/Y1oy9HDVSp
-   Y0zmrJ1pnapFsdtgglU7vW4E5AAcAyQpGd/L2867hC9FkAfvtYvO+HAt1
-   ydTKyT/hOE/Q8fPxMVuCWdGAd82CgrdLBliKBuR3j4kx47LGI8mNwYeLI
-   7fmlIwkEjtxm/KxFlzstUNfCyV++yoJMkxQbhnsd5skm3TbnU8qNKHDJ7
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="329750491"
+  t=1683698799; x=1715234799;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=oqEs5zcNkA4V+tby98rv6WGwEjyA+1MOpIYE77GZBic=;
+  b=fSsDCssIUkNkWFRJ243vGoHLqD4rN6Gp+FVyoUZVdJFL9tPYmHlXwGO/
+   V6VdSCnuNRlZNrpQ7FiDPqqDkIipkhB54hGqydyBc15oGXDcALOKd8gIr
+   5yrE2tkZJKPsC6bGRDKRrrB4rcqARbnWsTu1LTMcwv6kNKzN1PAwfJ8uQ
+   tiiWI5kzRpvKymwdgKyP4Gy3p5tL22dnBqFDz9rSGKzG3ZEP4mbtgOfVC
+   oLUstFZVA9MsYJGLL9i53ouwDtoeRv7iOOYhCsIj3Xt3NJh72JCGKo7Vl
+   H1FI8YwKoY7OCFFOm7Q2qMnIV/wjx9Oum7qXr2hn9Rc8Oi31wh/6PoDFV
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="348969238"
 X-IronPort-AV: E=Sophos;i="5.99,263,1677571200"; 
-   d="scan'208";a="329750491"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2023 22:40:40 -0700
+   d="scan'208";a="348969238"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2023 23:06:39 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="649620679"
+X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="768803030"
 X-IronPort-AV: E=Sophos;i="5.99,263,1677571200"; 
-   d="scan'208";a="649620679"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga003.jf.intel.com with ESMTP; 09 May 2023 22:40:39 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 9 May 2023 22:40:38 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 9 May 2023 22:40:37 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Tue, 9 May 2023 22:40:37 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.173)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Tue, 9 May 2023 22:40:37 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XmyYVhNdNUbgBMY1EsaohRh4nOByJ4iAdJr1g285ZAC9U5gIKrrnZJDjEMuge9mvxQ2lUoJMankxdZtGGOcUldKzOmuAx7Oet3gcDhmBrdINjwol+Hy4/IKwfBNCtezRvsqI8k8LI2TLlaY6gLkYT47C8LhSDHk7QDMvmNBOOUJ+YWUpE4eVgP+b817raOp8J0Xu3y5wSyJKAtj+IMPa0lYUWDJOqCT2wYefPwhkJSqnpo253Yp7T5jzm/YkkhKF/jJETivnCeFT118Qyq7I/HsCvdTr8xCU+z0s8XMzx9Gg4gqcdh/vn0rGQsCczDoF8vNhZLjffRVyciXziHp11w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CtnTtcmCIKgsA1g3dT6zyGPlINOlzW4GqSxM/vIA6Uw=;
- b=S3WynEKZwT4FdOxOypDJhINYUXCbhVq88N/WfKjxKxSrmCU+XE+ZjETMoGBrF/e249ALPeGE14Wq5ikTDd0zNmEufI6nZoDhDSE1gSxLtRsdwyjAkjy1R7amnDeEpqecw5UdNm7mNl+oKCdzu7ZLVILUnwReZ0bMn0Qn1kLiMTLeu2Z2OBJ6RnxUyFTVPCJrYNPoa7/yABbAouvSLkmUQIJIpKc/OUSLzN0HXA7z7h0t8PtMy8CTtgyYsLCDf2r4hJx9c6DK9xbjP7ITg4QBZij+0qGdUJonKvH+q3eNYGBScpaYEn8y1VKyLgS3w1/tzzF9E4B6tvUO5ACP6FgMiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by CY8PR11MB6868.namprd11.prod.outlook.com (2603:10b6:930:5c::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.18; Wed, 10 May
- 2023 05:40:35 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::b4cb:1f70:7e2a:c4f5]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::b4cb:1f70:7e2a:c4f5%9]) with mapi id 15.20.6363.031; Wed, 10 May 2023
- 05:40:35 +0000
-Date:   Wed, 10 May 2023 13:39:25 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>
-Subject: Re: [PATCH v2 3/6] KVM: x86/mmu: only zap EPT when guest MTRR changes
-Message-ID: <ZFsuDWwoKRA0W2/j@chao-email>
-References: <20230509134825.1523-1-yan.y.zhao@intel.com>
- <20230509135143.1721-1-yan.y.zhao@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230509135143.1721-1-yan.y.zhao@intel.com>
-X-ClientProxiedBy: SG2PR02CA0097.apcprd02.prod.outlook.com
- (2603:1096:4:92::13) To PH8PR11MB6780.namprd11.prod.outlook.com
- (2603:10b6:510:1cb::11)
+   d="scan'208";a="768803030"
+Received: from binbinwu-mobl.ccr.corp.intel.com ([10.238.8.90])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2023 23:06:36 -0700
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, chao.gao@intel.com,
+        kai.huang@intel.com, robert.hu@linux.intel.com,
+        binbin.wu@linux.intel.com
+Subject: [PATCH v8 0/6] Linear Address Masking (LAM) KVM Enabling
+Date:   Wed, 10 May 2023 14:06:05 +0800
+Message-Id: <20230510060611.12950-1-binbin.wu@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|CY8PR11MB6868:EE_
-X-MS-Office365-Filtering-Correlation-Id: b685440c-f73b-4106-910f-08db51191388
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 76A2gCFrRl2Iw2CCYn32VMACHeruI/XP3wt0d17TpdbNBD8i3i4DrTd5+svZZVNKesez/NHBYRAJnNYit22d2+dlaC70FO2sA90RdWdF9UPlGOTCs6cw+iBptfLwmLmqq0XM04omIuBTqERvgskHmeaxt+U02Q1qN1i6iV3LBobmdI2bHYzEIP6qjWM6Z6/wSLLRO3EtGeU1lbl6gfrAh/9TdmwFgW++z2SsI9zO0AgKL0mARNA81OewfLxZ/muFMwxfgWyVe8EKzJcZKKUY1ypXwYCFR5/VO12Uip0cZsJJHX1o9rbHZRcINzm6c33LF9udnQbJsgBGHT9zb9nelD3xC7NXujI3kIdhSF04ApbnUWfp7eDhCGEJX3lhuHGjinXD9+r8s7ogZueoe6z5YBz5SfeLsWevdZCaHInQ3s8CoFa/qVOIQ4wjLgcQ2Ofy7WqAtVq+jb9eWoCkYP4ez+Qua+X6QE8zqcZyPjtctyj/O2AVG/CjESf3QDyOaxnqh0cYMtSYIxYaw4qtZ0JJmQ/Q1oUcO8uUBIhD9A9EF/o4F/GHeCesIVOpluWwM4VC
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(396003)(346002)(136003)(376002)(39860400002)(366004)(451199021)(66946007)(33716001)(66476007)(6666004)(6486002)(66556008)(6636002)(4326008)(316002)(26005)(2906002)(41300700001)(6862004)(8936002)(8676002)(6506007)(9686003)(6512007)(186003)(44832011)(5660300002)(86362001)(38100700002)(82960400001)(478600001)(83380400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2RPBT4P6W/gLI8B1aI1sSizX9NYrqj67CR7TAT7p8zUyaZgIqeTmoN8XooGE?=
- =?us-ascii?Q?yHWBleHr/yDe0R0kQ0sCj3E4PDk2PIwqF009vBcclWdpVb1J3NkpMkmVhmrC?=
- =?us-ascii?Q?w4+O5pHNy2LtqMU5WInVtRXJy9cptv6lRvuosk3bfJ9iWuUxqLXn0DwNjE7g?=
- =?us-ascii?Q?ctQVr7FWvBMd4XLeCRTTLpDi3hvpMqrU1UiuGViZrb5VBIwHhV/orWEWfPOS?=
- =?us-ascii?Q?Un7H0MMD+Ggo1jkQU8jekHsZ9JWk2XnT6cajG0Ok1Eij6UQvulNtGJslJYaw?=
- =?us-ascii?Q?t+bDMX7XWEc3yJM7r7lhI8IlrgqrecAmPc4ruqerniX9SINLrVyBhj13soqN?=
- =?us-ascii?Q?GwGGE6dlkqROjsS5MckfwhVztMlkx5R5ZmeX4GMFK8qk5b23Dpl5qXl/LfQQ?=
- =?us-ascii?Q?3Qo/qEWdg1jsoaaf7LeLMHZZDqStkw6TDGo1FNGMHnnmI95qnE+cjiIykqWn?=
- =?us-ascii?Q?Esu4/Y6k23MpSZHfKoNj03pgSDR4cg6GC1X7eWR9XunIqdgN193X8aR0tsV/?=
- =?us-ascii?Q?7IY1e95fQxTu6bmjw2ZSZRKfCquTvJeVt6TKHm+Po6Qsg+NV3MHfESYo1auN?=
- =?us-ascii?Q?b8RUo1zxNW5kigWaRIGVC6yzr8QWZ9H1UimIDuog/bOH+WxsQ42RFupzcQ76?=
- =?us-ascii?Q?SOjLUVXvbk6/w41ysD3vgEoGbhgPFhVvS6rD1cAO+jX2jlDgY+2e8QTovKCk?=
- =?us-ascii?Q?+m3xhRcObeAovH+cL16zOQlohiC4ENXaQNq4snoNgy6YxVojB8aY9KDG3cyh?=
- =?us-ascii?Q?nh4nJIrL0TawtlZIM9Kva7mHZLhD0c8a3Wh89s40lRNo6CadgzTdWpK1mGrc?=
- =?us-ascii?Q?j6lWvU6uug9frbKLLX2147wyMsP5uMzNCjL1As30TuHuM5weFMpka00rPMTQ?=
- =?us-ascii?Q?mfci/RsOyFXrcs2sPHUriEoBLPUGjY3k8F1GqHdxUrZUs9XDmwl3d0QfPR14?=
- =?us-ascii?Q?NYUb6k2mlndzMg+wwH/O8KVx1MFcCWgwHitByblYxTOCQcUe+dk7y0tqp7KG?=
- =?us-ascii?Q?U/zN1WXCB2ABYs/8gngn079uAH6ryZJvqK3NGiHuPlxGzbqb36i05oF6EJhw?=
- =?us-ascii?Q?+esXV1OHJHdoPh3XzVsyx2Y2pnuUA0iJWZTS8f1iOUI6YdoNv1HsL5DsL+Qo?=
- =?us-ascii?Q?hRq5wdTtgujy+NPZ2/8zOhdE9jU3c85jmIyqps2gZlaI09aZ60W8kCwAOqx0?=
- =?us-ascii?Q?OQtLnHSalmFyTZQawVG/9DtW8vNA2LUjQxNLa0cZR5bKbyBW4xMdCPYzBuIr?=
- =?us-ascii?Q?7Jhw2aAw9MSbdg7Shq7fvhjwS7nxxCxdUoKFs0P/PP2c+I0AEhnK043B81os?=
- =?us-ascii?Q?PLUSmOK06cbwupm4MTf61hu1AwOi8hQOH6KYHJkUMpQUDqX78uBZeq2JjXmc?=
- =?us-ascii?Q?ea2D/xO1AXzF8Qo2C85hy4LZmI1NtvSm8D/0I3zHsEg8k/9iTNTLTV6XdJey?=
- =?us-ascii?Q?Jkz8Xh0j+oGSr9/e0Zl+pWjTNSA16H2b+wlVZtUbjIY9UNySA44gI/eX9BxA?=
- =?us-ascii?Q?Tz7Xbr7DwVdk1z7FQTWPx4sVgmYr48yF892B1KM46+3GOsZeJXgCcDkDaSsO?=
- =?us-ascii?Q?AR5LGfTt0OxIuBSWc6IluOZT8JnC8o6bOUqfP7nU?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b685440c-f73b-4106-910f-08db51191388
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2023 05:40:34.8539
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iW2Dz4/cshwDx87HCtUxUxYc8rDePtTiALxXAeo+J9E8Lk9AZ/wasf6BDW5lyWF6m8TB+CppDH3FvsxPi5zz7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6868
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 09, 2023 at 09:51:43PM +0800, Yan Zhao wrote:
->Call new helper kvm_zap_gfn_for_memtype() to skip zap mmu if EPT is not
->enabled.
->
->When guest MTRR changes and it's desired to zap TDP entries to remove
->stale mappings, only do it when EPT is enabled, because only memory type
->of EPT leaf is affected by guest MTRR with noncoherent DMA present.
->
->Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
->---
-> arch/x86/kvm/mtrr.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/arch/x86/kvm/mtrr.c b/arch/x86/kvm/mtrr.c
->index 9fac1ec03463..62ebb9978156 100644
->--- a/arch/x86/kvm/mtrr.c
->+++ b/arch/x86/kvm/mtrr.c
->@@ -330,7 +330,7 @@ static void update_mtrr(struct kvm_vcpu *vcpu, u32 msr)
-> 		var_mtrr_range(&mtrr_state->var_ranges[index], &start, &end);
-> 	}
-> 
->-	kvm_zap_gfn_range(vcpu->kvm, gpa_to_gfn(start), gpa_to_gfn(end));
->+	kvm_zap_gfn_for_memtype(vcpu->kvm, gpa_to_gfn(start), gpa_to_gfn(end));
+===Feature Introduction===
 
-I am wondering if the check of shadow_memtype_mask (now inside the
-kvm_zap_gfn_for_memtype()) should be moved to the beginning of update_mtrr().
-Because if EPT isn't enabled, computing @start/@end is useless and can be
-skipped.
+Linear-address masking (LAM) [1], modifies the checking that is applied to
+*64-bit* linear addresses, allowing software to use of the untranslated address
+bits for metadata and masks the metadata bits before using them as linear 
+addresses to access memory.
 
-> }
-> 
-> static bool var_mtrr_range_is_valid(struct kvm_mtrr_range *range)
->-- 
->2.17.1
->
+When the feature is virtualized and exposed to guest, it can be used for efficient
+address sanitizers (ASAN) implementation and for optimizations in JITs and virtual
+machines.
+
+Regarding which pointer bits are masked and can be used for metadata, LAM has 2
+modes:
+- LAM_48: metadata bits 62:48, i.e. LAM width of 15.
+- LAM_57: metadata bits 62:57, i.e. LAM width of 6.
+
+* For user pointers:
+  CR3.LAM_U57 = CR3.LAM_U48 = 0, LAM is off;
+  CR3.LAM_U57 = 1, LAM57 is active;
+  CR3.LAM_U57 = 0 and CR3.LAM_U48 = 1, LAM48 is active.
+* For supervisor pointers: 
+  CR4.LAM_SUP =0, LAM is off;
+  CR4.LAM_SUP =1 with 5-level paging mode, LAM57 is active;
+  CR4.LAM_SUP =1 with 4-level paging mode, LAM48 is active.
+
+The modified LAM canonicality check:
+* LAM_S48                : [ 1 ][ metadata ][ 1 ]
+                             63               47
+* LAM_U48                : [ 0 ][ metadata ][ 0 ]
+                             63               47
+* LAM_S57                : [ 1 ][ metadata ][ 1 ]
+                             63               56
+* LAM_U57 + 5-lvl paging : [ 0 ][ metadata ][ 0 ]
+                             63               56
+* LAM_U57 + 4-lvl paging : [ 0 ][ metadata ][ 0...0 ]
+                             63               56..47
+
+Note:
+1. LAM applies to only data address, not to instructions.
+2. LAM identification of an address as user or supervisor is based solely on the
+   value of pointer bit 63 and does not depend on the CPL.
+3. LAM doesn't apply to the writes to control registers or MSRs.
+4. LAM masking applies before paging, so the faulting linear address in CR2
+   doesn't contain the metadata.
+5  The guest linear address saved in VMCS doesn't contain metadata.
+6. For user mode address, it is possible that 5-level paging and LAM_U48 are both
+   set, in this case, the effective usable linear address width is 48.
+   (Currently, only LAM_U57 is enabled in Linux kernel. [2])
+
+===LAM KVM Design===
+LAM KVM enabling includes the following parts:
+- Feature Enumeration
+  LAM feature is enumerated by CPUID.7.1:EAX.LAM[bit 26].
+  If hardware supports LAM and host doesn't disable it explicitly (e.g. via 
+  clearcpuid), LAM feature will be exposed to user VMM.
+
+- CR4 Virtualization
+  LAM uses CR4.LAM_SUP (bit 28) to configure LAM on supervisor pointers.
+  Add support to allow guests to set the new CR4 control bit for guests to enable
+  LAM on supervisor pointers.
+
+- CR3 Virtualization
+  LAM uses CR3.LAM_U48 (bit 62) and CR3.LAM_U57 (bit 61) to configure LAM on user
+  pointers.
+  Add support to allow guests to set two new CR3 non-address control bits for
+  guests to enable LAM on user pointers.
+
+- Modified Canonicality Check and Metadata Mask
+  When LAM is enabled, 64-bit linear address may be tagged with metadata. Linear
+  address should be checked for modified canonicality and untagged in instruction
+  emulations and VMExit handlers when LAM is applicable.
+
+LAM inside nested guest is supported by this patch series. 
+LAM inside SGX enclave mode is NOT supported by this patch series.
+
+LAM QEMU patch:
+https://lists.gnu.org/archive/html/qemu-devel/2023-02/msg08036.html
+
+LAM kvm-unit-tests patch:
+https://lore.kernel.org/kvm/20230504084751.968-1-binbin.wu@linux.intel.com/
+
+===Test===
+1. Add test cases in kvm-unit-test [3] for LAM, including LAM_SUP and LAM_{U57,U48}.
+   For supervisor pointers, the test covers CR4 LAM_SUP bits toggle, Memory/MMIO
+   access with tagged pointer, and some special instructions (INVLPG, INVPCID,
+   INVVPID), INVVPID cases also used to cover VMX instruction VMExit path.
+   For uer pointers, the test covers CR3 LAM bits toggle, Memory/MMIO access with
+   tagged pointer.
+   MMIO cases are used to trigger instruction emulation path.
+   Run the unit test with both LAM feature on/off (i.e. including negative cases).
+   Run the unit test in L1 guest with both LAM feature on/off.
+2. Run Kernel LAM kselftests [2] in guest, with both EPT=Y/N.
+3. Launch a nested guest.
+
+All tests have passed in Simics environment.
+
+[1] Intel ISE https://cdrdv2.intel.com/v1/dl/getContent/671368
+    Chapter Linear Address Masking (LAM)
+[2] https://lore.kernel.org/all/20230312112612.31869-9-kirill.shutemov@linux.intel.com/
+[3] https://lore.kernel.org/kvm/20230504084751.968-1-binbin.wu@linux.intel.com/
+
+---
+Changelog
+v7 --> v8:
+- Rebase the patch series on Linux kernel v6.4-rc1, which has all dependencies
+  of this patch series.
+- Add a cleanup patch to consolidate flags for __linearize().
+- Some changes in commit message of patch 2.
+- Rewrite the commit message of patch 3 (Thanks Kai Huang for the suggestion).
+  Opportunistically use GENMASK_ULL() to define __PT_BASE_ADDR_MASK.
+  Opportunistically use kvm_vcpu_is_legal_cr3() to check CR3 in SVM nested code,
+  to provide a clear distinction b/t CR3 and GPA checks.
+- Change interface untag_addr() to optional version to avoid adding a dummy
+  version in SVM in patch 4.
+- Verified and confirmed that LAM doesn't apply to the address in descriptor of
+  invvpid, drop the untag action for it in patch 5.
+
+v6 --> v7:
+- Changes to CR3 virtualization when EPT off
+  * Leave LAM bits in root.pgd to force a new root for a CR3+LAM combination. (Sean)
+  * Perform GFN calculation from guest CR3/PGD generically by extracting the maximal 
+    base address mask. (Sean)
+- Remove de-reference of ctxt->vcpu in the emulator. (Sean)
+- Fix a bug in v6, which hardcoded "write" to "false" by mistake in linearize(). (Chao Gao)
+- Add Chao Gao's reviewed-by in Patch 5.
+- Add Xuelian Guo's tested-by in the patch set.
+- Separate cleanup patches from the patch set.
+
+v5 --> v6:
+Add Patch 2 to fix the check of 64-bit mode.
+Add untag_addr() to kvm_x86_ops to hide vendor specific code.
+Simplify the LAM canonicality check per Chao's suggestion.
+Add cr3_ctrl_bits to kvm_vcpu_arch to simplify cr3 invalidation/extract/mask (Chao Gao)
+Extend the patchset scope to include nested virtualization and SGX ENCLS handling.
+- Add X86_CR4_LAM_SUP in cr4_fixed1_update for nested vmx. (Chao Gao)
+- Add SGX ENCLS VMExit handling
+- Add VMX instruction VMExit handling
+More descriptions in cover letter.
+Add Chao's reviewed-by on Patch 4.
+Add more test cases in kvm-unit-test.
+
+v4 --> v5:
+Reorder and melt patches surround CR3.LAM bits into Patch 3 of this
+version.
+Revise Patch 1's subject and description
+Drop Patch 3
+Use kvm_read_cr4_bits() instead of kvm_read_cr4()
+Fix: No need to untag addr when write to msr, it should be legacy canonical check
+Rename kvm_is_valid_cr3() --> kvm_vcpu_is_valid_cr3(), and update some call
+sites of kvm_vcpu_is_valid_cr3() to use kvm_is_valid_cr3().
+Other refactors and Miscs.
+
+v3 --> v4:
+Drop unrelated Patch 1 in v3 (Binbin, Sean, Xiaoyao)
+Intercept CR4.LAM_SUP instead of pass through to guest (Sean)
+Just filter out CR3.LAM_{U48, U57}, instead of all reserved high bits
+(Sean, Yuan)
+Use existing __canonical_address() helper instead write a new one (Weijiang)
+Add LAM handling in KVM emulation (Yu, Yuan)
+Add Jingqi's reviwed-by on Patch 7
+Rebased to Kirill's latest code, which is 6.2-rc1 base.
+
+v2 --> v3:
+As LAM Kernel patches are in tip tree now, rebase to it.
+https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/
+
+v1 --> v2:
+1. Fixes i386-allyesconfig build error on get_pgd(), where
+   CR3_HIGH_RSVD_MASK isn't applicable.
+   (Reported-by: kernel test robot <lkp@intel.com>)
+2. In kvm_set_cr3(), be conservative on skip tlb flush when only LAM bits
+   toggles. (Kirill)
+
+Binbin Wu (3):
+  KVM: x86: Consolidate flags for __linearize()
+  KVM: x86: Introduce untag_addr() in kvm_x86_ops
+  KVM: x86: Untag address when LAM applicable
+
+Robert Hoo (3):
+  KVM: x86: Virtualize CR4.LAM_SUP
+  KVM: x86: Virtualize CR3.LAM_{U48,U57}
+  KVM: x86: Expose LAM feature to userspace VMM
+
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    | 10 ++++-
+ arch/x86/kvm/cpuid.c               |  2 +-
+ arch/x86/kvm/cpuid.h               |  5 +++
+ arch/x86/kvm/emulate.c             | 30 +++++++++++----
+ arch/x86/kvm/kvm_emulate.h         |  7 ++++
+ arch/x86/kvm/mmu.h                 |  5 +++
+ arch/x86/kvm/mmu/mmu.c             |  8 +++-
+ arch/x86/kvm/mmu/mmu_internal.h    |  1 +
+ arch/x86/kvm/mmu/paging_tmpl.h     |  3 +-
+ arch/x86/kvm/mmu/spte.h            |  2 +-
+ arch/x86/kvm/svm/nested.c          |  4 +-
+ arch/x86/kvm/vmx/nested.c          |  6 ++-
+ arch/x86/kvm/vmx/sgx.c             |  1 +
+ arch/x86/kvm/vmx/vmx.c             | 59 +++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.h             |  2 +
+ arch/x86/kvm/x86.c                 | 11 +++++-
+ arch/x86/kvm/x86.h                 |  2 +
+ 18 files changed, 140 insertions(+), 19 deletions(-)
+
+
+base-commit: ac9a78681b921877518763ba0e89202254349d1b
+-- 
+2.25.1
+
