@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B8DB6FD44F
-	for <lists+kvm@lfdr.de>; Wed, 10 May 2023 05:34:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 397A76FD44D
+	for <lists+kvm@lfdr.de>; Wed, 10 May 2023 05:34:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230264AbjEJDe1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 23:34:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38274 "EHLO
+        id S229734AbjEJDeZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 23:34:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229574AbjEJDeX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229564AbjEJDeX (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 9 May 2023 23:34:23 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2055.outbound.protection.outlook.com [40.107.220.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26D2F1FEE;
-        Tue,  9 May 2023 20:34:20 -0700 (PDT)
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2079.outbound.protection.outlook.com [40.107.95.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13C91FF3;
+        Tue,  9 May 2023 20:34:21 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e/JdbTgYTyeJ7/b0z/nG6pbbrVPGdqIOCUZq5G027LCNHfLdQ8dmyT3CqDGwPzFf+AfWkZuKfXtuuPq/rlrU+UEVvKowkwjlIzHZcAaZGgtSthPHQq/8RwK2/L6zTOnv6dg8oK9yXi0Ii4atzyA4WEX7ReoAVs10Ef0PnGp05C1jHSisO8x4rnkUGSO+pA95savdBmeeSqHhEdydjlWYYe8JziCXDFcC6niC29/INtPszycxlQAqQ7OQpki/4YoSPc1XS632vaN9ffqS3UhAIBJzizbzAgmDwms+TrlsIQ/PELmywzKqdR5RhFohVH50CS9C0QxNEX9UsP1k/uR1yw==
+ b=gWonM3qM/FXWfx7IxJmXr8wChJT3NrSVdNx/Jw/EJalWGCtjZkwT5yuViSJ8HmZW4gtBWzVxla01cgd+Xra/q/cLW8OcNRTDqvRCA5gH+HAmioelL/XPL5BNmVHYqM41MPS0AFLcYYG/E40y1V4UFJ544xXTCCp6PwJciyHQy4rwvZZFIAzrLVb5J6gI/gwLf3hWN8Ub9k6OAvpBdJ1baGeWEWZORvCVHlJjU6ce0jK7SWq0dW7majMP05tVfLvzgNyk0/TX/V86p4l7HfKr5nA0En8ckYEeoQzg77er924vXrlf/Dpa6/oADf8RMcWCyEMB0X5hEhoq7MlDrwptsg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nm6vv8W4uGmWfFQfyrhHXkdlgjCGnzbDiQoV8M71IgA=;
- b=RX5tENLRMZyex1Eta3YKippdV4hTZuoGIajweFS4rlDfdF5okrvwzLvnGjBSI+Ix2AjdFPYg5Y1H/YSNpZE7B/u5Lvwp9b9txmrzRUBrTC2g85olfOMho7ERQW/jSpWkmi142+CDEVM2q3XahqOpK7FlYBGBUOJMJaakEdSzrfLDIQNnXUalEynR6iAWpxG4hdyabkt8kC/epsoEGuADuSNhfNxZr0S37hJ5ZbSK2oljFvIln3CPNf0NpHqeVgZJGpvvW/ncHSybToHFdbEZ2BnXa6QYzuLFJIE6sIRZTBip4+iQ3i1gLutU9/0X3c/E88EYVcy/h8/4Ks3eSw+Q+A==
+ bh=hSbSlCr03XeDRoHeAnKC4x+Qxv/DX5Kz0F0kI7nfSzg=;
+ b=L/SAx1HcQ3aPGIgz+ufgvI03FygA1QSZxND5doj+rNu3IjeA8qFp9MCsWXkzehT36/Q308AI8XgQlvF+UMVnExWBGB15z05I1ydSLz8dTOmFGYQFxrsRVSSpwDGV10Fca5wUAtIdszwlseT2fS6ipBVW1c4tVkbLyRvQUA8IUHf0vH99u76wxdsEH+ZnuCKfCSm8T8y1TSTKM0N66XQ784oeUcfcq1C9ckVSVvX7ERp81RjrU8njOTxSEATF8ENjtumcCNVCx1apPjblkqPqo5GgYiz7V+JTCtkbeqEKCTNcbzk26bdsoRDBQNJt5S/E41IdBSeb4GIjeHOjYZYt2A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=arm.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -28,18 +28,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nm6vv8W4uGmWfFQfyrhHXkdlgjCGnzbDiQoV8M71IgA=;
- b=dWQh9hozFuZ2a5PemsWGddVe5t4+JG5Bvvvgl3SaOIM4XOxqBHKu8EFVOl7VJS4UoOK7z5xnrdXm/hCk8l/P4i4KSOLO5RcRXhvJoikiPtwTP2JdisKx+ebHf/Dr9k7SGKz1WW3KIMN1O144pDvOEWtB+1SuVsHfv5d/Qgx72IZnaV3jSaDxFvmqORqGB/Eh6ZLVDBRG9LcASxoKhMCw/lmk6n/k4BAQTHJ6LuDsJtiCZBJkk6CjA+AmM7BLInAwz76QI9LNPMng2qCGnyVPvrTvhzMflI00p89hdeC73Je8OLfTY7vKoZ/YtOyjQL/i34Atqf6/AB6Ig2q9fPDTDw==
-Received: from BN0PR04CA0002.namprd04.prod.outlook.com (2603:10b6:408:ee::7)
- by PH8PR12MB7421.namprd12.prod.outlook.com (2603:10b6:510:22b::17) with
+ bh=hSbSlCr03XeDRoHeAnKC4x+Qxv/DX5Kz0F0kI7nfSzg=;
+ b=F5BZhaZOLLXyAznV5M3eRAnMWf6TiQWAXn3GJnyj+3mgUPwKYQaohbtO99A/ddvctRBOs9wh7NtakCCi171Odkhid33vfulb90h90g7Ql0JeP4Ux4kaE42rm/aXk1R1ZCDs6QTlKslGMLHfJ8oeb3rOfknLLMb/l6yWnIquvgGNbu9XeN1k6EDMzt8zwLC4ChiVHFVG1WcXdSnL4DzZfVaLGZNkXfG00CIpMD5FvGwh/Plkox+bsnyXmIF2sw18u5ZnI2XSznr5qtaeY8EohTq33B/0pPUfjPGq4sJvUWIYgjy+gFV9+WdphXkKYSoorReWZ177awX43s8Am2SI+VA==
+Received: from BN9PR03CA0359.namprd03.prod.outlook.com (2603:10b6:408:f6::34)
+ by CY8PR12MB7100.namprd12.prod.outlook.com (2603:10b6:930:60::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.33; Wed, 10 May
- 2023 03:34:17 +0000
-Received: from BN8NAM11FT072.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:ee:cafe::84) by BN0PR04CA0002.outlook.office365.com
- (2603:10b6:408:ee::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.18 via Frontend
- Transport; Wed, 10 May 2023 03:34:17 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.20; Wed, 10 May
+ 2023 03:34:19 +0000
+Received: from BN8NAM11FT065.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:f6:cafe::7c) by BN9PR03CA0359.outlook.office365.com
+ (2603:10b6:408:f6::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.33 via Frontend
+ Transport; Wed, 10 May 2023 03:34:19 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -47,20 +47,20 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- BN8NAM11FT072.mail.protection.outlook.com (10.13.176.165) with Microsoft SMTP
+ BN8NAM11FT065.mail.protection.outlook.com (10.13.177.63) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6387.19 via Frontend Transport; Wed, 10 May 2023 03:34:16 +0000
+ 15.20.6387.18 via Frontend Transport; Wed, 10 May 2023 03:34:19 +0000
 Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 9 May 2023
- 20:34:08 -0700
+ 20:34:10 -0700
 Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail202.nvidia.com
  (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 9 May 2023
- 20:34:08 -0700
+ 20:34:09 -0700
 Received: from Asurada-Nvidia.nvidia.com (10.127.8.10) by mail.nvidia.com
  (10.129.68.6) with Microsoft SMTP Server id 15.2.986.37 via Frontend
- Transport; Tue, 9 May 2023 20:34:07 -0700
+ Transport; Tue, 9 May 2023 20:34:08 -0700
 From:   Nicolin Chen <nicolinc@nvidia.com>
 To:     <jgg@nvidia.com>, <robin.murphy@arm.com>, <will@kernel.org>
 CC:     <eric.auger@redhat.com>, <kevin.tian@intel.com>,
@@ -69,32 +69,34 @@ CC:     <eric.auger@redhat.com>, <kevin.tian@intel.com>,
         <linux-arm-kernel@lists.infradead.org>, <iommu@lists.linux.dev>,
         <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
         <alex.williamson@redhat.com>, <yi.l.liu@intel.com>
-Subject: [PATCH v2 00/17] Add Nested Translation Support for SMMUv3
-Date:   Tue, 9 May 2023 20:33:20 -0700
-Message-ID: <cover.1683688960.git.nicolinc@nvidia.com>
+Subject: [PATCH v2 01/17] vfio: Remove VFIO_TYPE1_NESTING_IOMMU
+Date:   Tue, 9 May 2023 20:33:21 -0700
+Message-ID: <a0ca90a794e68a870457aa1a9a4329c1cd2e71c6.1683688960.git.nicolinc@nvidia.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <cover.1683688960.git.nicolinc@nvidia.com>
+References: <cover.1683688960.git.nicolinc@nvidia.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT072:EE_|PH8PR12MB7421:EE_
-X-MS-Office365-Filtering-Correlation-Id: c8fef9d5-1b92-4e49-996b-08db51076ecd
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT065:EE_|CY8PR12MB7100:EE_
+X-MS-Office365-Filtering-Correlation-Id: b9537d55-329c-45f6-213e-08db51077032
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ExxKo/F9E0Kk+gLakoFqjxqlvRofUzbtHQtHp5kpCe+EsgasCHDSQYitSHGWNlAP4xUG9yA9611KSzeGyXYRahvAyU+gcfxGTKnMA3J/G4qocWl6upJUaz2VEO7tlR6LSDYGa/KHQhTUoZVmqhvGKB413dktbpD2MaIrIxROfbm/UvSL4sWbctGXKXJrlI9nfmW29wuqbS3c/rqCelNGnb+JO856xlDRQB6Snek7kr6angWqeABFQb9WDQBeuGOWjyd8VKFr62qwLW0tN/KeOB/djuXg6XizNj2XhnensT6wJfPopJPSZbsR1s7Lq8008HTaElB7hszuiCg61mUaCSgJXNiLk96evxkmpa9rLizlycGqjdH5nbn2raF8lpviS4ls+6yhsPCU4YtX+0iTWc+ITAGCBHg0r78DAYSn/cOHUv9yx2V8hSznv9fwVhdjTGkzJtDj2RvboyOHAy+rEtRGCerFZI48NQepxNjSB3HAoozPS0Fg0C0S9jV6tDQdf62Egu1sjyda8I4O64vyCDimrfpyTuNmxVp8kcv3QvOx63R7BEYaRlorWANgBPUlQ07vwXazbMt+mN8DXAXMRf63BB8supw35Go2SooYQfyFHR41/lPshdHsHO8K4in7sK0LmcHhrtDq6cBkWfCWuf6MrDrbrRcC5TVRbJFVBx+BtNgd0Hcj+0WdMvpIzibJQa9b+mmYp0ODb1SPM28xoKjP9w2mFYkkJUySDSboZwFKnK59TKVn5UMTKEaRCTaytCaEl1EOlvWdyI/gTNSN3q3vjYm/HAVMn0N6Hi3N+P1eAhH1u4W018ErXYl7H3So8gW4gWUptUXng+584r3Bjg==
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(396003)(136003)(376002)(451199021)(40470700004)(46966006)(36840700001)(5660300002)(110136005)(41300700001)(47076005)(316002)(4326008)(70206006)(70586007)(26005)(478600001)(8676002)(7416002)(186003)(8936002)(6666004)(7696005)(966005)(54906003)(40480700001)(40460700003)(2906002)(36756003)(7636003)(356005)(426003)(336012)(2616005)(36860700001)(83380400001)(86362001)(82740400003)(82310400005)(473944003)(414714003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 3Iav346U5iebInO33CVa4wASxQ3gObKo/IPk2OGOdYloceIt7kRK8ThsWZe5wTBceTvr6/ay6j0QYMPGkDe/jPgTLDToEOYKfwvFpYE/pkPm27iV9K1Dt3SWmsES685yW9MMhVTpEtRy/Z3M0V1fWe1OoTYu6mkJ1hzKK+T5jJuUmuo12jiX4Vbr5YCA1zqf06l1MWdTWUuAN2x8xPfcX9qkRdJEvRtCGkKvawI2T4aio1+9jwp9Sh/4fW5TJGJ74uupvTNNS0+MEym0qX+sVmvl8esQU3cr9Uo/nwPmGLb6MWXl4uFPdcGfmQeCcWIoA5w0xWq70FckGEmgoONyt+RMwNOOfubX+E7Yichnmdt9wpQvVRs3ZPWWAnb9fc2ca3D9Ywg/wvm/YNV1coQ0IWcg9hyxXMDSNKHscY8SA3YBN6zt0zzD5XFtv0hnPIY1uUj4u6Wq2g+ECe2uJ+sTVOe6dyny1wwfz0voAalhl/sHW7WBjbYIoVihuHWAtMvUY+lRJsYyNVE5sZheIePaKYdTX1ljrUy/xFRcHeIEt0mPcx3V1DvD7veQ9RxCuQ1ZUDy3QX2z7kEaWqMscpr1wyoyUoXfwwi1HbhsxRT8R2gkpHAR+Vr3rkL5GaU0O8T16FxxwVtiw6bgc0wsiYxE44ILk2g2Wxon4xHDrc/u7bkMXj3hlcF91bzn33BRTZyUsJ1hoSiRAi3HiOPwZjaAQdMZ5NigGkxlTL/mD9JLgB4GjqwvQ2w3shb0eSjbDOqT
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(346002)(39860400002)(136003)(451199021)(40470700004)(46966006)(36840700001)(4326008)(86362001)(36756003)(82310400005)(2906002)(70206006)(478600001)(7416002)(40480700001)(47076005)(83380400001)(336012)(426003)(6666004)(7696005)(186003)(966005)(316002)(26005)(110136005)(5660300002)(70586007)(40460700003)(54906003)(8936002)(356005)(2616005)(41300700001)(8676002)(82740400003)(7636003)(36860700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2023 03:34:16.6771
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2023 03:34:19.0136
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8fef9d5-1b92-4e49-996b-08db51076ecd
+X-MS-Exchange-CrossTenant-Network-Message-Id: b9537d55-329c-45f6-213e-08db51077032
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT072.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT065.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7421
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7100
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -106,125 +108,236 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[ This series is rebased on top of v6.4-rc1 merging Jason's iommu_hwpt
-  branch and Yi's vfio cdev v11 branch, then the replace v7 series and
-  the nesting v2 (candidate) series and Intel VT-d series. Note that
-  some of them are still getting finalized. So, there can be potential
-  minor API changes that would not be reflected in this series. Yet, we
-  can start the review at the SMMU driver specific things.
+From: Jason Gunthorpe <jgg@nvidia.com>
 
-  @robin, the hw_info patch still requires the errata patch that you
-  mentioned. Perhaps we can merge that separately or include it in v3.
+This control causes the ARM SMMU drivers to choose a stage 2
+implementation for the IO pagetable (vs the stage 1 usual default),
+however this choice has no visible impact to the VFIO user. Further qemu
+never implemented this and no other userspace user is known.
 
-  Thanks! ]
+The original description in commit f5c9ecebaf2a ("vfio/iommu_type1: add
+new VFIO_TYPE1_NESTING_IOMMU IOMMU type") suggested this was to "provide
+SMMU translation services to the guest operating system" however the rest
+of the API to set the guest table pointer for the stage 1 was never
+completed, or at least never upstreamed, rendering this part useless dead
+code.
 
-Changelog
-v2:
- * Added arm_smmu_set_dev_data after the set_dev_data series.
- * Added Jason's patch "vfio: Remove VFIO_TYPE1_NESTING_IOMMU"
- * Replaced the iommu_get_unmanaged_domain() helper with Robin's patch.
- * Reworked the code in arm_smmu_cmdq_build_cmd() to make NH_VA to be
-   a superset of NH_VAA.
- * Added inline comments and a bug-report link to the patch unsetting
-   dst[2] and dst[3] of STE.
- * Dropped the to_s2_cfg helper since only one place really needs it.
- * Dropped the VMID (override) flag and s2vmid in iommu_hwpt_arm_smmuv3
-   structure, because it's expected for user space to use a shared S2
-   domain/hwpt for all devices, i.e. the VMID (allocated with the S2
-   domain is already unified. If there's some special case that still
-   needs a VMID unification, we should probably add it incrementally.
- * Move the introduction of the "struct arm_smmu_domain *s2" function
-   parameter to the proper patch.
- * Redefined "struct iommu_hwpt_arm_smmuv3" by adding ste_uptr/len and
-   out_event_uptr/len. Then added an arm_smmu_domain_finalise_nested()
-   function to read guest Stream Table Entry with a proper sanity.
- * Reworked arm_smmu_cache_invalidate_user() by reading the guest CMDQ
-   directly, to support batching. Also, added return value feedback of
-   -ETIMEDOUT at CMD_SYNC, and reported CERROR_ILL errors via the CONS
-   in the user_data structure.
- * Updated data/functions following the nesting infrastructure updates.
- * Added/fixed multiple comments per v1 review inputs.
-v1:
- https://lore.kernel.org/all/cover.1678348754.git.nicolinc@nvidia.com/
+Since the current patches to enable nested translation, aka userspace page
+tables, rely on iommufd and will not use the enable_nesting()
+iommu_domain_op, remove this infrastructure. However, don't cut too deep
+into the SMMU drivers for now expecting the iommufd work to pick it up -
+we still need to create S2 IO page tables.
 
---------------------------------------------------------------------------
+Remove VFIO_TYPE1_NESTING_IOMMU and everything under it including the
+enable_nesting iommu_domain_op.
 
-Hi all,
+Just in-case there is some userspace using this continue to treat
+requesting it as a NOP, but do not advertise support any more.
 
-This series of patches add nested translation support for ARM SMMUv3.
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+---
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ----------------
+ drivers/iommu/arm/arm-smmu/arm-smmu.c       | 16 ----------------
+ drivers/iommu/iommu.c                       | 10 ----------
+ drivers/iommu/iommufd/vfio_compat.c         |  7 +------
+ drivers/vfio/vfio_iommu_type1.c             | 12 +-----------
+ include/linux/iommu.h                       |  3 ---
+ include/uapi/linux/vfio.h                   |  2 +-
+ 7 files changed, 3 insertions(+), 63 deletions(-)
 
-Eric Auger made a huge effort previously with the VFIO uAPIs, and sent
-his v16 a year ago. Now, the nested translation should follow the new
-IOMMUFD uAPIs design. So, most of the key features are ported from the
-privous VFIO solution, and then rebuilt on top of the IOMMUFD nesting
-infrastructure.
-
-The essential parts in the driver to support a nested translation are
-->hw_info, ->domain_alloc_user and ->cache_invalidate_user ops. So this
-series fundamentally adds these three functions in the SMMUv3 driver,
-along with several preparations and cleanups for them.
-
-One unique requirement for SMMUv3 nested translation support is the MSI
-doorbell address translation, which is a 2-stage translation too. And,
-to working with the ITS driver, an msi_cookie needs to be setup on the
-kernel-managed domain, the stage-2 domain of the nesting setup. And the
-same msi_cookie will be fetched, via iommu_dma_get_msi_mapping_domain(),
-in the iommu core to allocate and creates IOVA mappings for MSI doorbell
-page(s). However, with the nesting design, the device is attached to a
-user-managed domain, the stage-1 domain. So both the setup and fetching
-of the msi_cookie would not work at the level of stage-2 domain. Thus,
-on both sides, the msi_cookie setup and fetching require a redirection
-of the domain pointer. It's easy to do so in iommufd core, but needs a
-new op in the iommu core and driver.
-
-You can also find this series on the Github:
-https://github.com/nicolinc/iommufd/commits/iommufd_nesting-v2
-
-The kernel branch is tested with this QEMU branch:
-https://github.com/nicolinc/qemu/commits/wip/iommufd_rfcv4+nesting+smmuv3-v2
-
-Thanks!
-Nicolin Chen
-
-Eric Auger (2):
-  iommu/arm-smmu-v3: Unset corresponding STE fields when s2_cfg is NULL
-  iommu/arm-smmu-v3: Add STRTAB_STE_0_CFG_NESTED for 2-stage translation
-
-Jason Gunthorpe (1):
-  vfio: Remove VFIO_TYPE1_NESTING_IOMMU
-
-Nicolin Chen (13):
-  iommufd: Add nesting related data structures for ARM SMMUv3
-  iommufd/device: Setup MSI on kernel-managed domains
-  iommu/arm-smmu-v3: Add arm_smmu_hw_info
-  iommu/arm-smmu-v3: Add arm_smmu_set/unset_dev_user_data
-  iommu/arm-smmu-v3: Remove ARM_SMMU_DOMAIN_NESTED
-  iommu/arm-smmu-v3: Allow ARM_SMMU_DOMAIN_S1 stage to access s2_cfg
-  iommu/arm-smmu-v3: Add s1dss in struct arm_smmu_s1_cfg
-  iommu/arm-smmu-v3: Pass in user_cfg to arm_smmu_domain_finalise
-  iommu/arm-smmu-v3: Add arm_smmu_domain_alloc_user
-  iommu/arm-smmu-v3: Support IOMMU_DOMAIN_NESTED type of allocations
-  iommu/arm-smmu-v3: Implement arm_smmu_get_msi_mapping_domain
-  iommu/arm-smmu-v3: Add CMDQ_OP_TLBI_NH_VAA and CMDQ_OP_TLBI_NH_ALL
-  iommu/arm-smmu-v3: Add arm_smmu_cache_invalidate_user
-
-Robin Murphy (1):
-  iommu/dma: Support MSIs through nested domains
-
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 461 ++++++++++++++++++--
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  11 +-
- drivers/iommu/arm/arm-smmu/arm-smmu.c       |  16 -
- drivers/iommu/dma-iommu.c                   |  18 +-
- drivers/iommu/iommu.c                       |  10 -
- drivers/iommu/iommufd/device.c              |   5 +-
- drivers/iommu/iommufd/main.c                |   1 +
- drivers/iommu/iommufd/vfio_compat.c         |   7 +-
- drivers/vfio/vfio_iommu_type1.c             |  12 +-
- include/linux/iommu.h                       |   7 +-
- include/uapi/linux/iommufd.h                |  83 ++++
- include/uapi/linux/vfio.h                   |   2 +-
- 12 files changed, 538 insertions(+), 95 deletions(-)
-
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+index 3fd83fb75722..2c53849cae30 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -2740,21 +2740,6 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
+ 	return group;
+ }
+ 
+-static int arm_smmu_enable_nesting(struct iommu_domain *domain)
+-{
+-	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+-	int ret = 0;
+-
+-	mutex_lock(&smmu_domain->init_mutex);
+-	if (smmu_domain->smmu)
+-		ret = -EPERM;
+-	else
+-		smmu_domain->stage = ARM_SMMU_DOMAIN_NESTED;
+-	mutex_unlock(&smmu_domain->init_mutex);
+-
+-	return ret;
+-}
+-
+ static int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args *args)
+ {
+ 	return iommu_fwspec_add_ids(dev, args->args, 1);
+@@ -2881,7 +2866,6 @@ static struct iommu_ops arm_smmu_ops = {
+ 		.flush_iotlb_all	= arm_smmu_flush_iotlb_all,
+ 		.iotlb_sync		= arm_smmu_iotlb_sync,
+ 		.iova_to_phys		= arm_smmu_iova_to_phys,
+-		.enable_nesting		= arm_smmu_enable_nesting,
+ 		.free			= arm_smmu_domain_free,
+ 	}
+ };
+diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu.c b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+index 6e0813b26fb6..97d3fbcbd7f3 100644
+--- a/drivers/iommu/arm/arm-smmu/arm-smmu.c
++++ b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+@@ -1484,21 +1484,6 @@ static struct iommu_group *arm_smmu_device_group(struct device *dev)
+ 	return group;
+ }
+ 
+-static int arm_smmu_enable_nesting(struct iommu_domain *domain)
+-{
+-	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+-	int ret = 0;
+-
+-	mutex_lock(&smmu_domain->init_mutex);
+-	if (smmu_domain->smmu)
+-		ret = -EPERM;
+-	else
+-		smmu_domain->stage = ARM_SMMU_DOMAIN_NESTED;
+-	mutex_unlock(&smmu_domain->init_mutex);
+-
+-	return ret;
+-}
+-
+ static int arm_smmu_set_pgtable_quirks(struct iommu_domain *domain,
+ 		unsigned long quirks)
+ {
+@@ -1579,7 +1564,6 @@ static struct iommu_ops arm_smmu_ops = {
+ 		.flush_iotlb_all	= arm_smmu_flush_iotlb_all,
+ 		.iotlb_sync		= arm_smmu_iotlb_sync,
+ 		.iova_to_phys		= arm_smmu_iova_to_phys,
+-		.enable_nesting		= arm_smmu_enable_nesting,
+ 		.set_pgtable_quirks	= arm_smmu_set_pgtable_quirks,
+ 		.free			= arm_smmu_domain_free,
+ 	}
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index b44fd1a76997..13a2e0e26884 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -2680,16 +2680,6 @@ static int __init iommu_init(void)
+ }
+ core_initcall(iommu_init);
+ 
+-int iommu_enable_nesting(struct iommu_domain *domain)
+-{
+-	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
+-		return -EINVAL;
+-	if (!domain->ops->enable_nesting)
+-		return -EINVAL;
+-	return domain->ops->enable_nesting(domain);
+-}
+-EXPORT_SYMBOL_GPL(iommu_enable_nesting);
+-
+ int iommu_set_pgtable_quirks(struct iommu_domain *domain,
+ 		unsigned long quirk)
+ {
+diff --git a/drivers/iommu/iommufd/vfio_compat.c b/drivers/iommu/iommufd/vfio_compat.c
+index fe02517c73cc..2c5a523b5354 100644
+--- a/drivers/iommu/iommufd/vfio_compat.c
++++ b/drivers/iommu/iommufd/vfio_compat.c
+@@ -291,12 +291,7 @@ static int iommufd_vfio_check_extension(struct iommufd_ctx *ictx,
+ 	case VFIO_DMA_CC_IOMMU:
+ 		return iommufd_vfio_cc_iommu(ictx);
+ 
+-	/*
+-	 * This is obsolete, and to be removed from VFIO. It was an incomplete
+-	 * idea that got merged.
+-	 * https://lore.kernel.org/kvm/0-v1-0093c9b0e345+19-vfio_no_nesting_jgg@nvidia.com/
+-	 */
+-	case VFIO_TYPE1_NESTING_IOMMU:
++	case __VFIO_RESERVED_TYPE1_NESTING_IOMMU:
+ 		return 0;
+ 
+ 	/*
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 3d4dd9420c30..0bce568f129a 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -72,7 +72,6 @@ struct vfio_iommu {
+ 	uint64_t		pgsize_bitmap;
+ 	uint64_t		num_non_pinned_groups;
+ 	bool			v2;
+-	bool			nesting;
+ 	bool			dirty_page_tracking;
+ 	struct list_head	emulated_iommu_groups;
+ };
+@@ -2200,12 +2199,6 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	if (!domain->domain)
+ 		goto out_free_domain;
+ 
+-	if (iommu->nesting) {
+-		ret = iommu_enable_nesting(domain->domain);
+-		if (ret)
+-			goto out_domain;
+-	}
+-
+ 	ret = iommu_attach_group(domain->domain, group->iommu_group);
+ 	if (ret)
+ 		goto out_domain;
+@@ -2546,9 +2539,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
+ 	switch (arg) {
+ 	case VFIO_TYPE1_IOMMU:
+ 		break;
+-	case VFIO_TYPE1_NESTING_IOMMU:
+-		iommu->nesting = true;
+-		fallthrough;
++	case __VFIO_RESERVED_TYPE1_NESTING_IOMMU:
+ 	case VFIO_TYPE1v2_IOMMU:
+ 		iommu->v2 = true;
+ 		break;
+@@ -2643,7 +2634,6 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
+ 	switch (arg) {
+ 	case VFIO_TYPE1_IOMMU:
+ 	case VFIO_TYPE1v2_IOMMU:
+-	case VFIO_TYPE1_NESTING_IOMMU:
+ 	case VFIO_UNMAP_ALL:
+ 		return 1;
+ 	case VFIO_UPDATE_VADDR:
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index 1e1124f79b56..470b088a13f7 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -360,7 +360,6 @@ struct iommu_ops {
+  * @enforce_cache_coherency: Prevent any kind of DMA from bypassing IOMMU_CACHE,
+  *                           including no-snoop TLPs on PCIe or other platform
+  *                           specific mechanisms.
+- * @enable_nesting: Enable nesting
+  * @set_pgtable_quirks: Set io page table quirks (IO_PGTABLE_QUIRK_*)
+  * @free: Release the domain after use.
+  */
+@@ -393,7 +392,6 @@ struct iommu_domain_ops {
+ 				    dma_addr_t iova);
+ 
+ 	bool (*enforce_cache_coherency)(struct iommu_domain *domain);
+-	int (*enable_nesting)(struct iommu_domain *domain);
+ 	int (*set_pgtable_quirks)(struct iommu_domain *domain,
+ 				  unsigned long quirks);
+ 
+@@ -566,7 +564,6 @@ extern int iommu_page_response(struct device *dev,
+ extern int iommu_group_id(struct iommu_group *group);
+ extern struct iommu_domain *iommu_group_default_domain(struct iommu_group *);
+ 
+-int iommu_enable_nesting(struct iommu_domain *domain);
+ int iommu_set_pgtable_quirks(struct iommu_domain *domain,
+ 		unsigned long quirks);
+ 
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index e57112f63760..ecbd013ae6ea 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -35,7 +35,7 @@
+ #define VFIO_EEH			5
+ 
+ /* Two-stage IOMMU */
+-#define VFIO_TYPE1_NESTING_IOMMU	6	/* Implies v2 */
++#define __VFIO_RESERVED_TYPE1_NESTING_IOMMU	6	/* Implies v2 */
+ 
+ #define VFIO_SPAPR_TCE_v2_IOMMU		7
+ 
 -- 
 2.40.1
 
