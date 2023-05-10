@@ -2,186 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC8766FD34D
-	for <lists+kvm@lfdr.de>; Wed, 10 May 2023 02:32:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BB706FD366
+	for <lists+kvm@lfdr.de>; Wed, 10 May 2023 02:59:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235093AbjEJAcH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 May 2023 20:32:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40022 "EHLO
+        id S235352AbjEJA7T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 May 2023 20:59:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbjEJAcF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 May 2023 20:32:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 422282D7B
-        for <kvm@vger.kernel.org>; Tue,  9 May 2023 17:31:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683678676;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AaGvAGLjFXPfpvTNP/bdiZ7J41peMCCPDlY16Vtsnuk=;
-        b=I6Pio3IH4I//3GkGh+Gsw9ucigcLx3Jl7k744dReQoXNKVpohqs9JL2PvNiCSDOa6f0QB6
-        iNAaflMWw/WYSDvYbIzhPz9u1KRjlT42GffglSDgxbiPbk7qDMaqChiz9OrHqXeCQufIwE
-        88mSjyDD2uC7LkKbVSEQspL/wXa/3dQ=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-645-37ZuUlGAOT-bhIb3X3rjtQ-1; Tue, 09 May 2023 20:31:14 -0400
-X-MC-Unique: 37ZuUlGAOT-bhIb3X3rjtQ-1
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-33338be98cdso35023675ab.3
-        for <kvm@vger.kernel.org>; Tue, 09 May 2023 17:31:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683678674; x=1686270674;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AaGvAGLjFXPfpvTNP/bdiZ7J41peMCCPDlY16Vtsnuk=;
-        b=VNfIpMRtS+whz7sNaWK8zdmtN/qJRd1iD9x4PB/Wmzgb/mduGKQEwWMjiLW8TW6MSc
-         /8OCV0dsfdEIx23duhT/6nl5HsoCMQJ953t779Mf69vdD+o+OZnOYaj0QTwq7CXPstxY
-         tTiuuUyzKMQZN+sasF0aVioJbivMZx0ZOtLtJ2/JLPoW0eKzZpw5BlfjzX8b9A377kvH
-         G27+KvlaDuZ2ANFx0Go4qLCPcMHuF+dpoTebzeJu+MPC79s1CVjNyqjsVQucWCPp9/cr
-         egB23bcJklQlXmx0oQEc9/l6MZ53Gtiv4QqwK8gOfIPexE2s/i0uMamnLw50Logz58mD
-         Bs2A==
-X-Gm-Message-State: AC+VfDxzL+MPWNn3jGmj5bpXopU8/Ww7U1gXj7roN13rd5lmsBauYbHT
-        BCrSpLuAle3q4nSwQZ1f4Zfu/3wOCf8SECcuROabFC6svv3jV0YZQOV5f3jk60WzKw4HyCAwzmt
-        3IrF0O+Cabu8a
-X-Received: by 2002:a92:4a06:0:b0:32b:7df:f753 with SMTP id m6-20020a924a06000000b0032b07dff753mr9869332ilf.11.1683678674073;
-        Tue, 09 May 2023 17:31:14 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ79Yj2G0XIIcmZ/c1KruTGfkagj0u9LrnxFQ/2bXVIs32rC2FuiPnD49eLE6EdbC76r06jWUw==
-X-Received: by 2002:a92:4a06:0:b0:32b:7df:f753 with SMTP id m6-20020a924a06000000b0032b07dff753mr9869323ilf.11.1683678673720;
-        Tue, 09 May 2023 17:31:13 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id t13-20020a92d14d000000b0033154d10283sm3386377ilg.40.2023.05.09.17.31.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 May 2023 17:31:13 -0700 (PDT)
-Date:   Tue, 9 May 2023 18:31:11 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
+        with ESMTP id S229702AbjEJA7S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 May 2023 20:59:18 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2069.outbound.protection.outlook.com [40.107.94.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D17D44B0;
+        Tue,  9 May 2023 17:59:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nXILZlujlFQrM7HpB18nWIPGF8AnLzURplEnlnn0oOt/O/VOFjp/m0mnJafY2CTJwQuvTHXuKng12gyz/enwEhdbhgNb1/yh2txfyEcq5PWWjqPuP5vBsDBfHyZZOlOi4pz47X0NbMh2UxyjzvEJ9aG7UYtwiSo1hfsUL+OtktisqbTnWjieruONK4eqs0eecCGOEqJzQG8kQUWGs93nxix1smJb5LmV7By5AuHohfnMdx7L/Iv2HAcfIR8JaV8np5rQFbqIGg6VM/JQSrE2IA8LK75mek5fr3z6awn9hKBOI4YY0u5swkMCgGvI7cSBNCDjPiN8D80h6uvhyWAK2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oByJe20814prFskT1wFBy/Kwol7GWmfvvQPhO56YD0w=;
+ b=ArHekjd6E3Pkmg9fF2562OcRwQpPHHIUXV9YDQd3lqJ5inw+2dtfogJDJfjTsAL0K1019KQwTxZw1dn1oW57V37pmfSLimXJrrLm6BdwbTosVUEKE7pN5/1GQcFiHrgWsSzJk/B10OKK2vdBoOmnxDPEyzVq1bsUhMcxoQ60eKOia3+DHjmMrzbavWIKDxi/116tYgV9P29b7Eki53zsHNUabZ1F6BrtYk8P381jvCYJUg723A5FslIdJ2rjUpfbxCmSQiNrk7lC3nb8u3L2hNCxzNZdhMLcjzVWkCgvLnhuIeqQ+EzVdE3o+25UPmpWRS9hU2KbBM57WJn+oQLAWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oByJe20814prFskT1wFBy/Kwol7GWmfvvQPhO56YD0w=;
+ b=cilPS7EH8qWsWt28+HbV6G4K2HwuNbnXNiEHbVzGo8dY0575y+9Js5enb3LcpfLJL0LaqbQd0Zr0rXMAx+ovBhfvhngug7SlzgakNvqSZBqC0ch6WfraA6NW5Y++/Y2+mSugprLT3LpFkAxxEDRn+EYhu1EphnmWgHgS847c6lBjCeIr9fUHBEhalQ0HhmUTJS/SGi7K5AbwgO2T3Cdf5RazMiMPPxtBhXy6e7O75x4bNtXHZWsn7Sd3H9Sqs+2WQdhpjP53a1fyX3GB15NQpsh68mv9bA4ui64Y93d/N4ZqA9w+4MbSb69eaS1h5y7Yeg5KgbcaBk/TdG6HgVhliQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by IA0PR12MB8255.namprd12.prod.outlook.com (2603:10b6:208:404::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.33; Wed, 10 May
+ 2023 00:59:15 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6363.032; Wed, 10 May 2023
+ 00:59:15 +0000
+Date:   Tue, 9 May 2023 21:59:13 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
 Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Nicolin Chen" <nicolinc@nvidia.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
         "Lu, Baolu" <baolu.lu@intel.com>
 Subject: Re: vPASID capability for VF
-Message-ID: <20230509183111.6a4a7f39.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB52760816DC23D5322A4318228C769@BN9PR11MB5276.namprd11.prod.outlook.com>
+Message-ID: <ZFrsYZPRpHqVyjcZ@nvidia.com>
 References: <BN9PR11MB52764BE569672A02FE2A8CCA8C769@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <ZFrMneCMKuCtu7JF@nvidia.com>
-        <BN9PR11MB527627F407BB2942ADFF800E8C769@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <ZFrThMhUnsYOE3WP@nvidia.com>
-        <BN9PR11MB52760816DC23D5322A4318228C769@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: Red Hat
+ <ZFrMneCMKuCtu7JF@nvidia.com>
+ <BN9PR11MB527627F407BB2942ADFF800E8C769@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZFrThMhUnsYOE3WP@nvidia.com>
+ <BN9PR11MB52760816DC23D5322A4318228C769@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20230509183111.6a4a7f39.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230509183111.6a4a7f39.alex.williamson@redhat.com>
+X-ClientProxiedBy: SJ2PR07CA0014.namprd07.prod.outlook.com
+ (2603:10b6:a03:505::7) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA0PR12MB8255:EE_
+X-MS-Office365-Filtering-Correlation-Id: ab25671f-1b33-47f4-22ac-08db50f1c66f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4ZcZSwy2g8/KKpf2BnPtdKchBknyXNHeaPg/bEMgn5FsgrgFzp3HAgBq9A10US38EqZtL5dHSSbACg5cpD8vRxqW9+E4HMoqv8EEvwKzfgOtuQ1pkwNHI7+LrKcsGJZZQL4ui2wFagmxl5rkvkOvacBUwQvV3xNfZI+woe/A2f4J/Ouer/9B4sGZxo8dLjXcLj6gt6dNM7lHxcco+iXV5RFhmku+UA5UmjpMAdy5ivmVl6y0kvt2pQXOnHv/M7sZnpPdJgIYssb9kiU8mIo4cx+uAeun37lHge+BOj84q1qds+voFleZFJC4SmrmgYrJaBCtWOyfzoHcf/nZ0KHYlyBgtPZB+2/2bS3fJl0eWA5MQPKsuI6UQX6dBO8UPUf/oZkyll0O5ru/Vaa/aO0XdCTUqHBZWJWyLkwnR4n8nhH8mtzylYP2AidUggqcDdtBp9JpB/Ch5yyqgzbiinl2MjgAloMwkHD1kds0+GCHXnvzkJqIKoL94EX1GuF2U7z3YqQTWwYmQ9pdaCyZ3eS6JVqZMtixFscCcUUqvLRA/Ss1rxjt0RJOUVF/gatB3Kds
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(396003)(136003)(346002)(376002)(451199021)(5660300002)(54906003)(478600001)(6486002)(41300700001)(8676002)(316002)(8936002)(6506007)(6512007)(6916009)(4326008)(66556008)(66476007)(66946007)(26005)(2906002)(4744005)(2616005)(83380400001)(186003)(3480700007)(86362001)(38100700002)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?CrnciYP/lqx6llyEMLLbsmA3MAbeniMlIXhOiBdbqQXYt3wghRmTSGQ9yuJq?=
+ =?us-ascii?Q?v/LWoxwRgh8LOjX9hKkpqOmBFe7RygD3RCG+SrC+yn20zwPzVdHNtCSZISkt?=
+ =?us-ascii?Q?fAG2GgyVSQfpmm1kHjB+r2sIn2e5PCChloc+YKh48w17epwKwCxSknvCEA/K?=
+ =?us-ascii?Q?/CkufF1yu5+BVQKIzXzMInWSL5MW3GEW5yaYIzkFI965awtpNyuJa1x6+fSF?=
+ =?us-ascii?Q?5fxNUsLfa7LDhco1fri86wSrse3HdlcHNqAvt5RZslV4diSLUj46jn8GCPTZ?=
+ =?us-ascii?Q?vr4FP+AFlN66q0VG8EjWcoqC6HxylOpwnQ5m0SHUrEvd+9E7xv2qAozgebn3?=
+ =?us-ascii?Q?Pbi+y+7FvBg0LFbegcEPbeWZS+UF23/xqvpLyqS5J7ExK/Oi178vF+BPIf4a?=
+ =?us-ascii?Q?LJc5msFn9XZJCtiKLm+I98GXnv306dXiJfBthYBDmWroxALBiUX96yn+F1VZ?=
+ =?us-ascii?Q?iKJ5AfHqXXiq97KfaNTZvFlJQMhLWarNq/uWj+iAUfz2VObbNgiyCCFh46SK?=
+ =?us-ascii?Q?EXm5b9QQwylMRdrVoqvOTlj4LH2U5t4djpWUS3AIUH+jhqNa4XLnklh4Laa9?=
+ =?us-ascii?Q?V/PZb5M3sKz4mVqnpqto4X3zf/a2kgtxMk1CQbYTJbdM9eK45GFIjeFwt4W2?=
+ =?us-ascii?Q?IpA5HJiHacNHEfR6VtVUgP3jbb6Fhk00+Rs7wj1fI1Qi7hrzPmJf0hA5bLP1?=
+ =?us-ascii?Q?eXtT2LUBJj/B24g/9UKQb+gnroJFJF9zH+IHy8rQ/GH+Yq3FXtmIdFnUOQrd?=
+ =?us-ascii?Q?2pBzCNbEDVtESIlioz4dOq7De2siMGdXDIydP118MPOhk13cUdOkVXUhZS1A?=
+ =?us-ascii?Q?qvO0APr9N8qQ62WAaOBmhgPiqNw+LluNHps4j5Q9RK7N+/0lbLvCHtLevQDm?=
+ =?us-ascii?Q?42OKOUH+NzQ0tAs0y+0dU1p9OnACL/vW/sDxVMj1CsKIKjmXYwKsGh3tiU8g?=
+ =?us-ascii?Q?YqYR2JR7ES5dq0TtiUTaFtVeN/A0pgen5s2f6yd4cLkafM2de9lLJuKRtSKu?=
+ =?us-ascii?Q?HnZgz0M8egOtcvDSW7ERdhmNvf/K2+M8v6EAX3HdWGHpdyEiAQl3X0ZFW+uM?=
+ =?us-ascii?Q?HQXwcVXOaj3RV7vkDAkCO2AHoFKp1jiXGwqHSfXlbsXvphT57N+AaVaPikEs?=
+ =?us-ascii?Q?AUKw71da9Sa0PrNBWgLpp3RB2INIInTq616rqpr6UcuWRu+U/IvYucnmHjYF?=
+ =?us-ascii?Q?FMsnsI6jKJZXlj1kbC+8OgyJR7K0OtM5Y+rIyXCQKLpW+jhwv9WsxihMR8Eb?=
+ =?us-ascii?Q?VJyIgzN/LrETH8jlKefTdRYANAO0x2YE84+F3fagAR+nTMCG1wR9Xa1ZoTYV?=
+ =?us-ascii?Q?bcXL9TjMNTfNmmlp0mCfF5Ae8VLKHHd9xHerDNQThuds7V67FAyjPuy0G71q?=
+ =?us-ascii?Q?iwdHi9RDXgfp8Krd2hi3zZik2iEKlB7JgqAcbFKqp9Q2+JqY8pY5i1tvgKh2?=
+ =?us-ascii?Q?LR9JmI1TR4XmIFujXl4Lnsw1MSr/SfshYLyACWddXOPXF2LIFhDAXjWnTBOm?=
+ =?us-ascii?Q?6ThB3RZn4gDPEOFXGe1vp5tXYWRfLBv0KOcWTixHngse0C31bcIBGu5+f1je?=
+ =?us-ascii?Q?Z4P2M9ndXE4nSQ11f6/BxcL7NiQ69oEbvYCmzg/3?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab25671f-1b33-47f4-22ac-08db50f1c66f
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2023 00:59:15.0835
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: o1AAmSsnD8pS2PS1hMrLsSQsObDKUnQAG+BV9FO6qkrQeQAaxCm3CjNNLIMJhp+S
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8255
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 9 May 2023 23:41:44 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Tue, May 09, 2023 at 06:31:11PM -0600, Alex Williamson wrote:
 
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Wednesday, May 10, 2023 7:13 AM
-> > 
-> > On Tue, May 09, 2023 at 10:57:04PM +0000, Tian, Kevin wrote:  
-> > > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > > Sent: Wednesday, May 10, 2023 6:44 AM
-> > > >
-> > > > On Tue, May 09, 2023 at 08:34:53AM +0000, Tian, Kevin wrote:  
-> > > > > According to PCIe spec (7.8.9 PASID Extended Capability Structure):
-> > > > >
-> > > > >   The PASID configuration of the single non-VF Function representing
-> > > > >   the device is also used by all VFs in the device. A PF is permitted
-> > > > >   to implement the PASID capability, but VFs must not implement it.
-> > > > >
-> > > > > To enable PASID on VF then one open is where to locate the PASID
-> > > > > capability in VF's vconfig space. vfio-pci doesn't know which offset
-> > > > > may contain VF specific config registers. Finding such offset must
-> > > > > come from a device specific knowledge.  
-> > > >
-> > > > Why? Can't vfio probe the cap tree and just find a gap to insert a new
-> > > > cap? We already mangle the cap list, I'm not sure I see what
-> > > > the problem is?
-> > > >  
-> > >
-> > > PCI config space includes not only caps, but also device specific
-> > > defined fields. e.g. Intel IGD defines offset 0xfc as a pointer to
-> > > OpRegion. I'm sure Alex can give many other examples.  
-> > 
-> > Do we even expose those over VIFO? I thought in general we blocked of  
-> 
-> Yes. I did a quick check:
-> 
-> /*
->  * Default unassigned regions to raw read-write access.  Some devices
->  * require this to function as they hide registers between the gaps in
->  * config space (be2net).  Like MMIO and I/O port registers, we have
->  * to trust the hardware isolation.
->  */
-> static struct perm_bits unassigned_perms = {
-> 	.readfn = vfio_raw_config_read,
-> 	.writefn = vfio_raw_config_write
-> };
-> 
-> vfio_config_do_rw()
-> {
-> 	...
-> 	if (cap_id == PCI_CAP_ID_INVALID) {
-> 		perm = &unassigned_perms;
-> 		cap_start = *ppos;
-> 	} ...
-> }
-> 
-> vfio_config_init()
-> {
-> 	...
-> 	memset(map, PCI_CAP_ID_BASIC, PCI_STD_HEADER_SIZEOF);
-> 	memset(map + PCI_STD_HEADER_SIZEOF, PCI_CAP_ID_INVALID,
->               		 pdev->cfg_size - PCI_STD_HEADER_SIZEOF);
-> 	...
-> }
-> 
-> > various parts of the config space. I keep seeing patches to unblock
-> > parts of config space?
-> > 
-> > I'd do the reverse and say devices that want to pass parts of their
-> > config space should have a special hook to do it and otherwise we
-> > should sanitize and block?  
-> 
-> This then may break backward compatibility. We don't know how
-> many devices have such hidden registers so if anyone misses a hook
-> immediately it cannot be assigned after we start blocking as default.
-> 
-> > 
-> > eg we already have a hook to pass the opregion
-> >   
-> > > So it's easy to find the gap between caps, but not easy to know
-> > > whether that gap is actually free to use.  
-> > 
-> > Because, let's face it, this is a horrible thing to do, and the
-> > opregion stuff is just ugly as s sin.
-> >   
-> 
-> It's ugly, but that is the reality. :/
+> IIRC we originally needed to enable this for a Broadcom NIC that
+> stuffed device specific registers in un-architected config space. The
+> capabilities we're {un}hiding are architected things that we know are
+> unsupported or unsafe, the gaps, just like device specific
+> capabilities, we're obliged to expose for functionality.  Thanks,
 
-Have a peak at the config space of an NVIDIA GPU and tell me which of
-those non-zero fields between capabilities are used as well.  Glass
-houses...  ;-)
+I still think that if people want to do this they should wrap their
+stuff in a dvsec..
 
-IIRC we originally needed to enable this for a Broadcom NIC that
-stuffed device specific registers in un-architected config space. The
-capabilities we're {un}hiding are architected things that we know are
-unsupported or unsafe, the gaps, just like device specific
-capabilities, we're obliged to expose for functionality.  Thanks,
+If we have no choice but to inject a PASID cap for this to work then I
+don't think we should quirk every device, but punish those that don't
+use DVSEC/etc
 
-Alex
+So.. If PASID injection is needed then block the unmanaged space and
+add quirks for devices that really need it. Otherwise leave it
+alone.
 
+Jason
