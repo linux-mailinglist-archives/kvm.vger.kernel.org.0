@@ -2,153 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36A096FE33A
-	for <lists+kvm@lfdr.de>; Wed, 10 May 2023 19:26:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 300AE6FE3C7
+	for <lists+kvm@lfdr.de>; Wed, 10 May 2023 20:16:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236268AbjEJR0u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 May 2023 13:26:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36742 "EHLO
+        id S235723AbjEJSQe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 May 2023 14:16:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236334AbjEJR0q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 May 2023 13:26:46 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F220213B
-        for <kvm@vger.kernel.org>; Wed, 10 May 2023 10:26:45 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-50bc37e1525so14291321a12.1
-        for <kvm@vger.kernel.org>; Wed, 10 May 2023 10:26:45 -0700 (PDT)
+        with ESMTP id S235456AbjEJSQ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 May 2023 14:16:28 -0400
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEA516A78;
+        Wed, 10 May 2023 11:16:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683739603; x=1686331603;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HJL+JhQmxU9qA5lMrvGM05IUnqGL3GZgrHCNTgjj3t0=;
-        b=v3awAP8GUD/ZDAJvrp2L+Znr7TDIkUCt5LWmzipwChCwH7m0oNy7iOV/XqpkYIvXC/
-         BaMLy1q5d30O1WltT+xWOddJUdKCZ77bVEh+iIGcn7clk+Pr7J34ZR9C6HjlOh0M8PQN
-         +KtV3eWjkMhmHGFj3VzXyHLN12k3kTd0Xp27WmEQMgAvOXZx8+M07tdd09LAcdq9S5gw
-         Op6AeU8UYav4jAMxNbO8sejmCm826l+LN+yd8U18+i4+BXzX9kJ4pN6hmGxz+2JMRPVy
-         lnOmcSZWW/LN0u/yOT1Hm6pCFNYc9LVNZeLjV+RSIjZHbsGsFCzBdebHdWJa6cCrS655
-         E2wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683739603; x=1686331603;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HJL+JhQmxU9qA5lMrvGM05IUnqGL3GZgrHCNTgjj3t0=;
-        b=fghgQlr5a1RK0PfmTA9xN0vNiO2rmVLRMkhQWkzpNWvz7cp3qrSLQWLkAuzZmAXAM2
-         zDvmW1rh5omXDDbSmqhmM3uh+D9cDIlHuzIC8HYQXsRDBahsy3oRRplc3UZ7OP5LEgRk
-         YKwfwF3rdAMqxgPXMCF1NgCqZqbTDr+ucM5b/OZSn4WN579U6HMNJDNbyLO6/zagNDNY
-         66OkItpVbSVlZcj/SKGYE/plBzWbqmB75BndOwCypXXD1a5pSv54OtPVdB8Z2/zKI3lT
-         5bmMB/h7JhDl21U4YfGDqGqW7F4c1R5LQD96PuVvimMaPWgkQHXwoU6O1H32aIPzwXj6
-         ax7g==
-X-Gm-Message-State: AC+VfDztEkDvaKREzNH6YDMz4OEVE/6251L7x75ZVcp/l62nIQOljMXu
-        W1asRq5pI1axqWZ0FzZLc0e4kUceyNkkEGadA84nog==
-X-Google-Smtp-Source: ACHHUZ64G94ODQQyPBdm7IGyu9kHzcE0JVQFyt0rwKkromaOxP7k8Aq6aDDkSvekpiO3NFhe4DF5fY89lBIyRxbDjfw=
-X-Received: by 2002:aa7:cf95:0:b0:50b:c4f0:c200 with SMTP id
- z21-20020aa7cf95000000b0050bc4f0c200mr15479402edx.41.1683739603390; Wed, 10
- May 2023 10:26:43 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1683742584; x=1715278584;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4+PLDXIuLS7zMNKmQgEeIqDX/trfOpS2kPwFzqSrpDg=;
+  b=Co3hos0ytHdk5iywIE6+f50Xn1SiQSYKXnWJz8XWKvhHggewBarIn/Bn
+   1q1T+IKChA0rpAruyx0gm+nzwmcBc/HgLjprDEGkAEfb+G3s3rPXjRC0z
+   +nU3Np7hqAjXCr+6oxpYm8saHtL+mkkPbr9J0KGqLykOAbU0hm1sonxx+
+   4=;
+X-IronPort-AV: E=Sophos;i="5.99,265,1677542400"; 
+   d="scan'208";a="212881562"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3e1fab07.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2023 18:16:22 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1e-m6i4x-3e1fab07.us-east-1.amazon.com (Postfix) with ESMTPS id AC81E81F07;
+        Wed, 10 May 2023 18:16:18 +0000 (UTC)
+Received: from EX19D002UWC001.ant.amazon.com (10.13.138.148) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 10 May 2023 18:16:18 +0000
+Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
+ EX19D002UWC001.ant.amazon.com (10.13.138.148) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 10 May 2023 18:16:17 +0000
+Received: from dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com
+ (10.189.73.169) by mail-relay.amazon.com (10.252.135.35) with Microsoft SMTP
+ Server id 15.2.1118.26 via Frontend Transport; Wed, 10 May 2023 18:16:17
+ +0000
+Received: by dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com (Postfix, from userid 22673075)
+        id 53F66BF6; Wed, 10 May 2023 18:16:17 +0000 (UTC)
+From:   Rishabh Bhatnagar <risbhat@amazon.com>
+To:     <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>
+CC:     <lee@kernel.org>, <seanjc@google.com>, <kvm@vger.kernel.org>,
+        <bp@alien8.de>, <mingo@redhat.com>, <tglx@linutronix.de>,
+        <pbonzini@redhat.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        Rishabh Bhatnagar <risbhat@amazon.com>
+Subject: [PATCH 0/9] KVM backports to 5.10
+Date:   Wed, 10 May 2023 18:15:38 +0000
+Message-ID: <20230510181547.22451-1-risbhat@amazon.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <ZD1oevE8iHsi66T2@google.com> <658018f9-581c-7786-795a-85227c712be0@redhat.com>
- <ZD12htq6dWg0tg2e@google.com> <1ed06a62-05a1-ebe6-7ac4-5b35ba272d13@redhat.com>
- <ZD2bBB00eKP6F8kz@google.com> <9efef45f-e9f4-18d1-0120-f0fc0961761c@redhat.com>
- <ZD86E23gyzF6Q7AF@google.com> <5869f50f-0858-ab0c-9049-4345abcf5641@redhat.com>
- <ZEM5Zq8oo+xnApW9@google.com>
-In-Reply-To: <ZEM5Zq8oo+xnApW9@google.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Wed, 10 May 2023 10:26:32 -0700
-Message-ID: <CAGtprH_+bF4VZg2ps6CM8vjJVvShsvSGAvaLfTedts4cKqhSUw@mail.gmail.com>
-Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
- KVM: mm: fd-based approach for supporting KVM)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        tabba@google.com, Michael Roth <michael.roth@amd.com>,
-        wei.w.wang@intel.com, Mike Rapoport <rppt@kernel.org>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Hugh Dickins <hughd@google.com>,
-        Christian Brauner <brauner@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 21, 2023 at 6:33=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> ...
-> cold.  I poked around a bit to see how we could avoid reinventing all of =
-that
-> infrastructure for fd-only memory, and the best idea I could come up with=
- is
-> basically a rehash of Kirill's very original "KVM protected memory" RFC[3=
-], i.e.
-> allow "mapping" fd-only memory, but ensure that memory is never actually =
-present
-> from hardware's perspective.
->
+This patch series backports a few VM preemption_status, steal_time and
+PV TLB flushing fixes to 5.10 stable kernel.
 
-I am most likely missing a lot of context here and possibly venturing
-into an infeasible/already shot down direction here. But I would still
-like to get this discussed here before we move on.
+Most of the changes backport cleanly except i had to work around a few
+because of missing support/APIs in 5.10 kernel. I have captured those in
+the changelog as well in the individual patches.
 
-I am wondering if it would make sense to implement
-restricted_mem/guest_mem file to expose both private and shared memory
-regions, inline with Kirill's original proposal now that the file
-implementation is controlled by KVM.
+Earlier patch series that i'm resending for stable.
+https://lore.kernel.org/all/20220909181351.23983-1-risbhat@amazon.com/
 
-Thinking from userspace perspective:
-1) Userspace creates guest mem files and is able to mmap them but all
-accesses to these files result into faults as no memory is allowed to
-be mapped into userspace VMM pagetables.
-2) Userspace registers mmaped HVA ranges with KVM with additional
-KVM_MEM_PRIVATE flag
-3) Userspace converts memory attributes and this memory conversion
-allows userspace to access shared ranges of the file because those are
-allowed to be faulted in from guest_mem. Shared to private conversion
-unmaps the file ranges from userspace VMM pagetables.
-4) Granularity of userspace pagetable mappings for shared ranges will
-have to be dictated by KVM guest_mem file implementation.
+Changelog
+- Use mark_page_dirty_in_slot api without kvm argument (KVM: x86: Fix
+  recording of guest steal time / preempted status)
+- Avoid checking for xen_msr and SEV-ES conditions (KVM: x86:
+  do not set st->preempted when going back to user space)
+- Use VCPU_STAT macro to expose preemption_reported and
+  preemption_other fields (KVM: x86: do not report a vCPU as preempted
+  outside instruction boundaries)
 
-Caveat here is that once private pages are mapped into userspace view.
+David Woodhouse (2):
+  KVM: x86: Fix recording of guest steal time / preempted status
+  KVM: Fix steal time asm constraints
 
-Benefits here:
-1) Userspace view remains consistent while still being able to use HVA rang=
-es
-2) It would be possible to use HVA based APIs from userspace to do
-things like binding.
-3) Double allocation wouldn't be a concern since hva ranges and gpa
-ranges possibly map to the same HPA ranges.
+Lai Jiangshan (1):
+  KVM: x86: Ensure PV TLB flush tracepoint reflects KVM behavior
 
->
-> Code is available here if folks want to take a look before any kind of fo=
-rmal
-> posting:
->
->         https://github.com/sean-jc/linux.git x86/kvm_gmem_solo
->
-> [1] https://lore.kernel.org/all/ff5c5b97-acdf-9745-ebe5-c6609dd6322e@goog=
-le.com
-> [2] https://lore.kernel.org/all/20230418-anfallen-irdisch-6993a61be10b@br=
-auner
-> [3] https://lore.kernel.org/linux-mm/20200522125214.31348-1-kirill.shutem=
-ov@linux.intel.com
+Paolo Bonzini (5):
+  KVM: x86: do not set st->preempted when going back to user space
+  KVM: x86: do not report a vCPU as preempted outside instruction
+    boundaries
+  KVM: x86: revalidate steal time cache if MSR value changes
+  KVM: x86: do not report preemption if the steal time cache is stale
+  KVM: x86: move guest_pv_has out of user_access section
+
+Sean Christopherson (1):
+  KVM: x86: Remove obsolete disabling of page faults in
+    kvm_arch_vcpu_put()
+
+ arch/x86/include/asm/kvm_host.h |   5 +-
+ arch/x86/kvm/svm/svm.c          |   2 +
+ arch/x86/kvm/vmx/vmx.c          |   1 +
+ arch/x86/kvm/x86.c              | 164 ++++++++++++++++++++++----------
+ 4 files changed, 122 insertions(+), 50 deletions(-)
+
+-- 
+2.39.2
