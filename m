@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 300AE6FE3C7
-	for <lists+kvm@lfdr.de>; Wed, 10 May 2023 20:16:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 858456FE3BC
+	for <lists+kvm@lfdr.de>; Wed, 10 May 2023 20:16:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235723AbjEJSQe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 May 2023 14:16:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52468 "EHLO
+        id S233919AbjEJSQZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 May 2023 14:16:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235456AbjEJSQ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 May 2023 14:16:28 -0400
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEA516A78;
-        Wed, 10 May 2023 11:16:23 -0700 (PDT)
+        with ESMTP id S230440AbjEJSQV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 May 2023 14:16:21 -0400
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD8715FEF;
+        Wed, 10 May 2023 11:16:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1683742584; x=1715278584;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=4+PLDXIuLS7zMNKmQgEeIqDX/trfOpS2kPwFzqSrpDg=;
-  b=Co3hos0ytHdk5iywIE6+f50Xn1SiQSYKXnWJz8XWKvhHggewBarIn/Bn
-   1q1T+IKChA0rpAruyx0gm+nzwmcBc/HgLjprDEGkAEfb+G3s3rPXjRC0z
-   +nU3Np7hqAjXCr+6oxpYm8saHtL+mkkPbr9J0KGqLykOAbU0hm1sonxx+
-   4=;
+  t=1683742580; x=1715278580;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=5Ds7mSqwag+N+EQuUEK2PDr8cfDEE8mIZ1PGiViQ7cw=;
+  b=gij9VWQs3iFWGYa+DPtqT8WlUfp00/+8aALoM8BM93iDDaDYJ/aLvUhp
+   bNt9k+JzB7BptIVfVge36gik1Z3UHJstw7xJBmR3rN0QrzL3r4piVrZia
+   rmPhnrOvGbAiRCEEOx7ffoagW8NSSxjdSIU4zXosh22DgSg107ZZ5/v9a
+   g=;
 X-IronPort-AV: E=Sophos;i="5.99,265,1677542400"; 
-   d="scan'208";a="212881562"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3e1fab07.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2023 18:16:22 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1e-m6i4x-3e1fab07.us-east-1.amazon.com (Postfix) with ESMTPS id AC81E81F07;
+   d="scan'208";a="337789830"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-32fb4f1a.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2023 18:16:19 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2b-m6i4x-32fb4f1a.us-west-2.amazon.com (Postfix) with ESMTPS id 6DE1CC062F;
         Wed, 10 May 2023 18:16:18 +0000 (UTC)
-Received: from EX19D002UWC001.ant.amazon.com (10.13.138.148) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+Received: from EX19D002UWA004.ant.amazon.com (10.13.138.230) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
  15.2.1118.26; Wed, 10 May 2023 18:16:18 +0000
 Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
- EX19D002UWC001.ant.amazon.com (10.13.138.148) with Microsoft SMTP Server
+ EX19D002UWA004.ant.amazon.com (10.13.138.230) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
  15.2.1118.26; Wed, 10 May 2023 18:16:17 +0000
 Received: from dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com
@@ -44,18 +44,22 @@ Received: from dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com
  Server id 15.2.1118.26 via Frontend Transport; Wed, 10 May 2023 18:16:17
  +0000
 Received: by dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com (Postfix, from userid 22673075)
-        id 53F66BF6; Wed, 10 May 2023 18:16:17 +0000 (UTC)
+        id 566CFF00; Wed, 10 May 2023 18:16:17 +0000 (UTC)
 From:   Rishabh Bhatnagar <risbhat@amazon.com>
 To:     <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>
 CC:     <lee@kernel.org>, <seanjc@google.com>, <kvm@vger.kernel.org>,
         <bp@alien8.de>, <mingo@redhat.com>, <tglx@linutronix.de>,
         <pbonzini@redhat.com>, <vkuznets@redhat.com>,
         <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        Rishabh Bhatnagar <risbhat@amazon.com>
-Subject: [PATCH 0/9] KVM backports to 5.10
-Date:   Wed, 10 May 2023 18:15:38 +0000
-Message-ID: <20230510181547.22451-1-risbhat@amazon.com>
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Rishabh Bhatnagar <risbhat@amazon.com>,
+        Allen Pais <apais@linux.microsoft.com>
+Subject: [PATCH 1/9] KVM: x86: Ensure PV TLB flush tracepoint reflects KVM behavior
+Date:   Wed, 10 May 2023 18:15:39 +0000
+Message-ID: <20230510181547.22451-2-risbhat@amazon.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230510181547.22451-1-risbhat@amazon.com>
+References: <20230510181547.22451-1-risbhat@amazon.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -69,49 +73,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch series backports a few VM preemption_status, steal_time and
-PV TLB flushing fixes to 5.10 stable kernel.
+From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-Most of the changes backport cleanly except i had to work around a few
-because of missing support/APIs in 5.10 kernel. I have captured those in
-the changelog as well in the individual patches.
+commit af3511ff7fa2107d6410831f3d71030f5e8d2b25 upstream.
 
-Earlier patch series that i'm resending for stable.
-https://lore.kernel.org/all/20220909181351.23983-1-risbhat@amazon.com/
+In record_steal_time(), st->preempted is read twice, and
+trace_kvm_pv_tlb_flush() might output result inconsistent if
+kvm_vcpu_flush_tlb_guest() see a different st->preempted later.
 
-Changelog
-- Use mark_page_dirty_in_slot api without kvm argument (KVM: x86: Fix
-  recording of guest steal time / preempted status)
-- Avoid checking for xen_msr and SEV-ES conditions (KVM: x86:
-  do not set st->preempted when going back to user space)
-- Use VCPU_STAT macro to expose preemption_reported and
-  preemption_other fields (KVM: x86: do not report a vCPU as preempted
-  outside instruction boundaries)
+It is a very trivial problem and hardly has actual harm and can be
+avoided by reseting and reading st->preempted in atomic way via xchg().
 
-David Woodhouse (2):
-  KVM: x86: Fix recording of guest steal time / preempted status
-  KVM: Fix steal time asm constraints
+Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 
-Lai Jiangshan (1):
-  KVM: x86: Ensure PV TLB flush tracepoint reflects KVM behavior
+Message-Id: <20210531174628.10265-1-jiangshanlai@gmail.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Rishabh Bhatnagar <risbhat@amazon.com>
+Tested-by: Allen Pais <apais@linux.microsoft.com>
+Acked-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Paolo Bonzini (5):
-  KVM: x86: do not set st->preempted when going back to user space
-  KVM: x86: do not report a vCPU as preempted outside instruction
-    boundaries
-  KVM: x86: revalidate steal time cache if MSR value changes
-  KVM: x86: do not report preemption if the steal time cache is stale
-  KVM: x86: move guest_pv_has out of user_access section
-
-Sean Christopherson (1):
-  KVM: x86: Remove obsolete disabling of page faults in
-    kvm_arch_vcpu_put()
-
- arch/x86/include/asm/kvm_host.h |   5 +-
- arch/x86/kvm/svm/svm.c          |   2 +
- arch/x86/kvm/vmx/vmx.c          |   1 +
- arch/x86/kvm/x86.c              | 164 ++++++++++++++++++++++----------
- 4 files changed, 122 insertions(+), 50 deletions(-)
-
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0ccc8d1b972c..60bf007f4118 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3039,9 +3039,11 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+ 	 * expensive IPIs.
+ 	 */
+ 	if (guest_pv_has(vcpu, KVM_FEATURE_PV_TLB_FLUSH)) {
++		u8 st_preempted = xchg(&st->preempted, 0);
++
+ 		trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
+-				       st->preempted & KVM_VCPU_FLUSH_TLB);
+-		if (xchg(&st->preempted, 0) & KVM_VCPU_FLUSH_TLB)
++				       st_preempted & KVM_VCPU_FLUSH_TLB);
++		if (st_preempted & KVM_VCPU_FLUSH_TLB)
+ 			kvm_vcpu_flush_tlb_guest(vcpu);
+ 	} else {
+ 		st->preempted = 0;
 -- 
 2.39.2
+
