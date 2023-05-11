@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D46F6FFD8F
-	for <lists+kvm@lfdr.de>; Fri, 12 May 2023 01:59:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D25A6FFD92
+	for <lists+kvm@lfdr.de>; Fri, 12 May 2023 01:59:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239648AbjEKX7f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 19:59:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52892 "EHLO
+        id S239671AbjEKX7i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 19:59:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239613AbjEKX70 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 19:59:26 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE34F7698
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:59:24 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-643a1fed384so4803156b3a.3
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:59:24 -0700 (PDT)
+        with ESMTP id S239624AbjEKX71 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 19:59:27 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A19D56EBD
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:59:26 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-51bb4164162so8220424a12.2
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:59:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683849564; x=1686441564;
+        d=google.com; s=20221208; t=1683849566; x=1686441566;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=MEk4ljfjUrhYUrSteJqpKxRY6vJbyA6fFCK+rB7er/I=;
-        b=ZTKfWcodlx+iAl7zxea0FMeNu6SZzfQ391F9NdQdcDalTF810JiIW+11fnDFvCxftW
-         YOTk1GcXRemaIFDnJKfDJ/9ZIhmJ1DrnF7eQkl4olnIjpXECV+zr50SHuMQjl8aUvgZf
-         V2fsmPRUBzHwTR28iFSim2t7wgW2DeJxeoZka9mF7A6lBburlYrEB+VUaTAW13EZVAUY
-         I3HBUF6UkvWU1AI/DxsLzCDqlR8HVMF7IeVpF+zjpJdMHrOJQT9gAIhHybKb761iF4U5
-         mvM430WKhXJFE/Yk9hCXHdfFvsdG422kHWf3cMn8wRH80p2g8sdw43iZxtoogclofmgg
-         lQHw==
+        bh=PikE2sys0Bkw6OuFwhsOmriaAvdxJeJy0bEZXYHR6ps=;
+        b=dZK3TIMY1KqU98/dI2bh88MzcBwpNW/nl4yCarDpLAxx5tYXXWm/+94gBnBN8jaTTa
+         a4ZSO3mz0BDPUpqRLN+T177f+nEGv1K34k6YguSfdMsD1oD5E7JM3w2RYqSdL3JdRQbl
+         Y4CGw1pePwomjKrjZTfGH1pLhgooy7ncPlEAL86vDItZPf57h/fLbm+bexMZv8rELGFd
+         WnuhXWPcpXTO5EIINh2kH7XSKRtECYbPz7EvbfLuSP8elSf77h0hvLRihkPqSZwNHBQo
+         HD49nVUppK2fo1ud/3++WO2wC4lcTjI/nHf3UPRHk0/g1tbM5FqFR/aTP9i6y8mLpsDm
+         JeKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683849564; x=1686441564;
+        d=1e100.net; s=20221208; t=1683849566; x=1686441566;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MEk4ljfjUrhYUrSteJqpKxRY6vJbyA6fFCK+rB7er/I=;
-        b=hlsURKa442SL4sc/rBFydA/O86/9KG68LwvoQzTWpf9eVi8M/jDMZwz1fHRftcbhDK
-         E6HjdYP42cu8ZfryHhn62qfATcm96krRDHnTGawBq+PzPiz4KE1SBb4MFU52yCVKt5Tm
-         UO+39PGlY/8xUShr36tRukRvO7oXG73OV4wimaebUcGNzPZqzDeMDlbSgA8DKMeoG8QT
-         +r41D0qOXDFRnnZ+uTw94PfmXWazgiWpN8XiTI17+yN/yB1Lwwx+7+T+h09DnpHe/r5c
-         3Z+QaI0Inden6cm56ZSnsGKaAR6S/sYtBOEEX2qBo4V3MHPGssU8BPcRO40EyRqmOcWx
-         IZPg==
-X-Gm-Message-State: AC+VfDw9qTB61GvTXWPch+RlDe9UowJDoUhXEwyeRF/Q2+DX3Sc+46Sj
-        OZqBoAtY6G3aewL5XrN1wsgL3amNMAE=
-X-Google-Smtp-Source: ACHHUZ5l3rRuanjYbp1RV2ouAwFxf1cJNWLF+jyC0+yqQArFREl4t0+hRDySD9cYAS6UIzzTM7dmmv4jZPI=
+        bh=PikE2sys0Bkw6OuFwhsOmriaAvdxJeJy0bEZXYHR6ps=;
+        b=d+hUB+kecuE364LH2LpxZe1i0uMpiUXFsWqIkRKFf9LmHO2eA9TiGUUMtF/xmYs/ko
+         0owMKFOCiuTyiNDuEZIZvSjSQ+06+1citqUktReGcWkieL1vZ1NrBxenOvgq6VbSS83c
+         OTA4+GkN3k/I2tFArH4rQuJS0kB3KherPdj5MO5bJKnbEqRmZsdogBEsFsdXvhuCZj/y
+         RvYCLEmzanNnrhpSo1H8v1cwFcE4hGfEIwTseebtOm9rpvcKT4JgLEPwnNyxOIlp1whw
+         Su65lPNpJRZRa4b74kjLeNDmSEWbLfSLMXR8WjilpLtTpyp4Z4uutX6st4axRQTyP6pI
+         WYkQ==
+X-Gm-Message-State: AC+VfDyWnpvqxZS/1iS4/n0wTvdcd8ldJC28HwcCTdK4cNWNoSczbyHM
+        iwdQzh0FKsU/uDYl7Oh73COKAN/rcqI=
+X-Google-Smtp-Source: ACHHUZ5rDKGyUS4GvTb7gmtbjPIQqXx4fUgA3xtEszH3sHui2Ppu/htGcfPhkCGRTei+fbyk6Tovrv37/lI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2cf:b0:643:4b03:4930 with SMTP id
- b15-20020a056a0002cf00b006434b034930mr5941851pft.0.1683849564339; Thu, 11 May
- 2023 16:59:24 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a63:2807:0:b0:52c:4227:aa60 with SMTP id
+ bs7-20020a632807000000b0052c4227aa60mr6346089pgb.7.1683849566231; Thu, 11 May
+ 2023 16:59:26 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 11 May 2023 16:59:11 -0700
+Date:   Thu, 11 May 2023 16:59:12 -0700
 In-Reply-To: <20230511235917.639770-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230511235917.639770-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
-Message-ID: <20230511235917.639770-4-seanjc@google.com>
-Subject: [PATCH 3/9] KVM: x86/mmu: Delete the "dbg" module param
+Message-ID: <20230511235917.639770-5-seanjc@google.com>
+Subject: [PATCH 4/9] KVM: x86/mmu: Rename MMU_WARN_ON() to KVM_MMU_WARN_ON()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -72,44 +72,117 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Delete KVM's "dbg" module param now that its usage in KVM is gone (it
-used to guard pgprintk() and rmap_printk()).
+Rename MMU_WARN_ON() to make it super obvious that the assertions are
+all about KVM's MMU, not the primary MMU.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c          | 5 -----
- arch/x86/kvm/mmu/mmu_internal.h | 2 --
- 2 files changed, 7 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 4 ++--
+ arch/x86/kvm/mmu/mmu_internal.h | 4 ++--
+ arch/x86/kvm/mmu/spte.h         | 8 ++++----
+ arch/x86/kvm/mmu/tdp_mmu.c      | 8 ++++----
+ 4 files changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f6918c0bb82d..2b65a62fb953 100644
+index 2b65a62fb953..240272b10ceb 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -112,11 +112,6 @@ static int max_huge_page_level __read_mostly;
- static int tdp_root_level __read_mostly;
- static int max_tdp_level __read_mostly;
+@@ -1252,7 +1252,7 @@ static bool spte_clear_dirty(u64 *sptep)
+ {
+ 	u64 spte = *sptep;
  
--#ifdef MMU_DEBUG
--bool dbg = 0;
--module_param(dbg, bool, 0644);
--#endif
--
- #define PTE_PREFETCH_NUM		8
+-	MMU_WARN_ON(!spte_ad_enabled(spte));
++	KVM_MMU_WARN_ON(!spte_ad_enabled(spte));
+ 	spte &= ~shadow_dirty_mask;
+ 	return mmu_spte_update(sptep, spte);
+ }
+@@ -1728,7 +1728,7 @@ static void kvm_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
  
- #include <trace/events/kvm.h>
+ static void kvm_mmu_free_shadow_page(struct kvm_mmu_page *sp)
+ {
+-	MMU_WARN_ON(!is_empty_shadow_page(sp->spt));
++	KVM_MMU_WARN_ON(!is_empty_shadow_page(sp->spt));
+ 	hlist_del(&sp->hash_link);
+ 	list_del(&sp->link);
+ 	free_page((unsigned long)sp->spt);
 diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 9c9dd9340c63..9ea80e4d463c 100644
+index 9ea80e4d463c..bb1649669bc9 100644
 --- a/arch/x86/kvm/mmu/mmu_internal.h
 +++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -9,8 +9,6 @@
+@@ -9,9 +9,9 @@
  #undef MMU_DEBUG
  
  #ifdef MMU_DEBUG
--extern bool dbg;
--
- #define MMU_WARN_ON(x) WARN_ON(x)
+-#define MMU_WARN_ON(x) WARN_ON(x)
++#define KVM_MMU_WARN_ON(x) WARN_ON(x)
  #else
- #define MMU_WARN_ON(x) do { } while (0)
+-#define MMU_WARN_ON(x) do { } while (0)
++#define KVM_MMU_WARN_ON(x) do { } while (0)
+ #endif
+ 
+ /* Page table builder macros common to shadow (host) PTEs and guest PTEs. */
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 1279db2eab44..83e6614f3720 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -265,13 +265,13 @@ static inline bool sp_ad_disabled(struct kvm_mmu_page *sp)
+ 
+ static inline bool spte_ad_enabled(u64 spte)
+ {
+-	MMU_WARN_ON(!is_shadow_present_pte(spte));
++	KVM_MMU_WARN_ON(!is_shadow_present_pte(spte));
+ 	return (spte & SPTE_TDP_AD_MASK) != SPTE_TDP_AD_DISABLED;
+ }
+ 
+ static inline bool spte_ad_need_write_protect(u64 spte)
+ {
+-	MMU_WARN_ON(!is_shadow_present_pte(spte));
++	KVM_MMU_WARN_ON(!is_shadow_present_pte(spte));
+ 	/*
+ 	 * This is benign for non-TDP SPTEs as SPTE_TDP_AD_ENABLED is '0',
+ 	 * and non-TDP SPTEs will never set these bits.  Optimize for 64-bit
+@@ -282,13 +282,13 @@ static inline bool spte_ad_need_write_protect(u64 spte)
+ 
+ static inline u64 spte_shadow_accessed_mask(u64 spte)
+ {
+-	MMU_WARN_ON(!is_shadow_present_pte(spte));
++	KVM_MMU_WARN_ON(!is_shadow_present_pte(spte));
+ 	return spte_ad_enabled(spte) ? shadow_accessed_mask : 0;
+ }
+ 
+ static inline u64 spte_shadow_dirty_mask(u64 spte)
+ {
+-	MMU_WARN_ON(!is_shadow_present_pte(spte));
++	KVM_MMU_WARN_ON(!is_shadow_present_pte(spte));
+ 	return spte_ad_enabled(spte) ? shadow_dirty_mask : 0;
+ }
+ 
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 08340219c35a..6ef44d60ba2b 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1545,8 +1545,8 @@ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		if (!is_shadow_present_pte(iter.old_spte))
+ 			continue;
+ 
+-		MMU_WARN_ON(kvm_ad_enabled() &&
+-			    spte_ad_need_write_protect(iter.old_spte));
++		KVM_MMU_WARN_ON(kvm_ad_enabled() &&
++				spte_ad_need_write_protect(iter.old_spte));
+ 
+ 		if (!(iter.old_spte & dbit))
+ 			continue;
+@@ -1604,8 +1604,8 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		if (!mask)
+ 			break;
+ 
+-		MMU_WARN_ON(kvm_ad_enabled() &&
+-			    spte_ad_need_write_protect(iter.old_spte));
++		KVM_MMU_WARN_ON(kvm_ad_enabled() &&
++				spte_ad_need_write_protect(iter.old_spte));
+ 
+ 		if (iter.level > PG_LEVEL_4K ||
+ 		    !(mask & (1UL << (iter.gfn - gfn))))
 -- 
 2.40.1.606.ga4b1b128d6-goog
 
