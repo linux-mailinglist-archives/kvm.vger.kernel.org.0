@@ -2,348 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C16E16FFB31
-	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 22:22:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC4B26FFB39
+	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 22:24:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239018AbjEKUWh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 16:22:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33456 "EHLO
+        id S239298AbjEKUY4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 16:24:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231446AbjEKUWg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 16:22:36 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32793270D
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 13:22:34 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-b9a7e3fc659so20207541276.1
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 13:22:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683836553; x=1686428553;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Pc3KTqUCSKzWsEHzUQVAXEAq3C5U5xaJDzEQ7e6JFi4=;
-        b=M2/PeIN97s00eeSmiyRLGD3PvefqBVctLWv3nW5t4O6pOr++sFB6okzpEdh+jpfo/S
-         jemOIrVU7Z7IMbsUdZ7dXTnK+8YnKESUBsfmeDIo4B6gIGKl4mp9YbGYzF05b2MHc++R
-         zkcce/ZyYYpNkKUtCt72zSN1YjgO9e+EWHySXPu/XQ/kyZm/voKg5eCBBSAsHahuDaJH
-         jLL9LhVQJCo8AHn4S8PdTTdejXbygVl0i7ZxwB1wak1aR4nGilvXs1ASnRk30XHqvR7O
-         efEpYYxjaBUGWBULkP6gDuE9gTITT4yxhSlSPSOY1ZVFJN0bRyOk9oCkyt57Bvs8tkus
-         XFtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683836553; x=1686428553;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Pc3KTqUCSKzWsEHzUQVAXEAq3C5U5xaJDzEQ7e6JFi4=;
-        b=eB7xJStXxBis2HIzTkCPWecJpC+k9tvDVV1dl95d50K/AMbLUfJ8Ak6ktKzGoxqt/y
-         WTkkKvfFa0Wwgtsi+sv5XcQfPpGTX7gPjxuI/bekmdwRhZA92PxYynbHtsQDIVDocL5p
-         DqhfL9c9xJh49jBjTREyr1BpjIohuFI65Q+1zYY0rhS+ftNf/Q8VilFGPsfBMFtBbdAz
-         tuLTJ+NQZG8WdCGBjer8wKVra2tA+r7+uSaPGdmw9E91Pa7ui5007/yyRaejUTWr9rYT
-         +5TJ4b3+y0EcMBj7fC5YY9CUh4NKWdM5GLNzL9I2Aj1eFOe/giHRChfTfiqXS5L9i1GG
-         xe3Q==
-X-Gm-Message-State: AC+VfDwS26lmqvL0QrCxkU+h+jIZxKXkPbLEWU8G3SpAAN66esqIFP8z
-        jF+mhJTvZQ6Bi7TQ/8ozAQqyEDlXFxI=
-X-Google-Smtp-Source: ACHHUZ7Axk7QKjEI2Ze7kTlQKJK2/j1UAuv4jea1yq8A1ku9q05Red0Z9Gik8pF5gmrO0M4cdRMEeCOKKjQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:5e55:0:b0:ba6:c897:53d9 with SMTP id
- s82-20020a255e55000000b00ba6c89753d9mr1141409ybb.10.1683836553436; Thu, 11
- May 2023 13:22:33 -0700 (PDT)
-Date:   Thu, 11 May 2023 13:22:31 -0700
-In-Reply-To: <CAGtprH8jUAM015h4eEhbdAv6Oq2UNbX3P5Z-VCVbcrHtnATJwQ@mail.gmail.com>
-Mime-Version: 1.0
-References: <ZD12htq6dWg0tg2e@google.com> <1ed06a62-05a1-ebe6-7ac4-5b35ba272d13@redhat.com>
- <ZD2bBB00eKP6F8kz@google.com> <9efef45f-e9f4-18d1-0120-f0fc0961761c@redhat.com>
- <ZD86E23gyzF6Q7AF@google.com> <5869f50f-0858-ab0c-9049-4345abcf5641@redhat.com>
- <ZEM5Zq8oo+xnApW9@google.com> <CAGtprH_+bF4VZg2ps6CM8vjJVvShsvSGAvaLfTedts4cKqhSUw@mail.gmail.com>
- <ZFwPBqGeW+d9xMEs@google.com> <CAGtprH8jUAM015h4eEhbdAv6Oq2UNbX3P5Z-VCVbcrHtnATJwQ@mail.gmail.com>
-Message-ID: <ZF1Oh5qrgcNNZ7Jc@google.com>
-Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
- KVM: mm: fd-based approach for supporting KVM)
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        tabba@google.com, Michael Roth <michael.roth@amd.com>,
-        wei.w.wang@intel.com, Mike Rapoport <rppt@kernel.org>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Hugh Dickins <hughd@google.com>,
-        Christian Brauner <brauner@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S238381AbjEKUYy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 16:24:54 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E889270D;
+        Thu, 11 May 2023 13:24:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=E5l2shnH01QrTljpAFFGCJicO6JUqqgyxvzlIMkP6A0=; b=eszcc0bs0lf/dqVDO8eQ4oUVkU
+        cMqG0k06X+5D5Liq1lzWonVEHUZhG+C4fHoBAx0b2kIHABcyMm6+cnaOofe8PHLUvnloriwFbxFoV
+        Yqem1gFhi9OYmna/FWqs44k/rS2+x6h8vxkpOaqvEyZ6z9ng2JWTiy+HodorH5wmvv7WM0YTRAVUy
+        qPTYmsTBy69OorstP119zRNMNMdRXh9iAua0LPGy+eE2xLKjO0XL4HM5sgiM3D/O7OzRWPVxpdQKv
+        x6jrzvogksLb37T9oN2EKWjffwa5kV/zWypFMtC+VxyMR+i4uabOkU0shVvaJEjBXed5+1s03gDUT
+        qFxpBLLQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pxCpO-008NaG-2j;
+        Thu, 11 May 2023 20:23:55 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B76C1300244;
+        Thu, 11 May 2023 22:23:51 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 9F2A32C7C5BE0; Thu, 11 May 2023 22:23:51 +0200 (CEST)
+Date:   Thu, 11 May 2023 22:23:51 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Wei Liu <wei.liu@kernel.org>
+Cc:     Michael Kelley <mikelley@microsoft.com>, ltykernel@gmail.com,
+        bigeasy@linutronix.de, mark.rutland@arm.com, maz@kernel.org,
+        catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org,
+        kernel@xen0n.name, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, pbonzini@redhat.com, wanpengli@tencent.com,
+        vkuznets@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, jgross@suse.com, boris.ostrovsky@oracle.com,
+        daniel.lezcano@linaro.org, kys@microsoft.com,
+        haiyangz@microsoft.com, decui@microsoft.com, rafael@kernel.org,
+        longman@redhat.com, boqun.feng@gmail.com, pmladek@suse.com,
+        senozhatsky@chromium.org, rostedt@goodmis.org,
+        john.ogness@linutronix.de, juri.lelli@redhat.com,
+        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+        bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
+        vschneid@redhat.com, jstultz@google.com, sboyd@kernel.org,
+        linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-pm@vger.kernel.org
+Subject: Re: [RFC][PATCH 7/9] x86/tsc: Provide sched_clock_noinstr()
+Message-ID: <20230511202351.GE2296992@hirez.programming.kicks-ass.net>
+References: <20230508211951.901961964@infradead.org>
+ <20230508213147.853677542@infradead.org>
+ <20230508214419.GA2053935@hirez.programming.kicks-ass.net>
+ <ZFmGI1EN24xroPHa@liuwe-devbox-debian-v2>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZFmGI1EN24xroPHa@liuwe-devbox-debian-v2>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 10, 2023, Vishal Annapurve wrote:
-> On Wed, May 10, 2023 at 2:39=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > > But I would still like to get this discussed here before we move on.
-> > >
-> > > I am wondering if it would make sense to implement
-> > > restricted_mem/guest_mem file to expose both private and shared memor=
-y
-> > > regions, inline with Kirill's original proposal now that the file
-> > > implementation is controlled by KVM.
-> > >
-> > > Thinking from userspace perspective:
-> > > 1) Userspace creates guest mem files and is able to mmap them but all
-> > > accesses to these files result into faults as no memory is allowed to
-> > > be mapped into userspace VMM pagetables.
-> >
-> > Never mapping anything into the userspace page table is infeasible.  Te=
-chnically
-> > it's doable, but it'd effectively require all of the work of an fd-base=
-d approach
-> > (and probably significantly more), _and_ it'd require touching core mm =
-code.
-> >
-> > VMAs don't provide hva=3D>pfn information, they're the kernel's way of =
-implementing
-> > the abstraction provided to userspace by mmap(), mprotect() etc.  Among=
- many other
-> > things, a VMA describes properties of what is mapped, e.g. hugetblfs ve=
-rsus
-> > anonymous, where memory is mapped (virtual address), how memory is mapp=
-ed, e.g.
-> > RWX protections, etc.  But a VMA doesn't track the physical address, th=
-at info
-> > is all managed through the userspace page tables.
-> >
-> > To make it possible to allow userspace to mmap() but not access memory =
-(without
-> > redoing how the kernel fundamentally manages virtual=3D>physical mappin=
-gs), the
-> > simplest approach is to install PTEs into userspace page tables, but ne=
-ver mark
-> > them Present in hardware, i.e. prevent actually accessing the backing m=
-emory.
-> > This is is exactly what Kirill's series in link [3] below implemented.
-> >
->=20
-> Maybe it's simpler to do when mmaped regions are backed with files.
->=20
-> I see that shmem has fault handlers for accesses to VMA regions
-> associated with the files, In theory a file implementation can always
-> choose to not allocate physical pages for such faults (similar to
-> F_SEAL_FAULT_AUTOALLOCATE that was discussed earlier).
+On Mon, May 08, 2023 at 11:30:43PM +0000, Wei Liu wrote:
+> On Mon, May 08, 2023 at 11:44:19PM +0200, Peter Zijlstra wrote:
+> > On Mon, May 08, 2023 at 11:19:58PM +0200, Peter Zijlstra wrote:
+> > 
+> > > --- a/drivers/clocksource/hyperv_timer.c
+> > > +++ b/drivers/clocksource/hyperv_timer.c
+> > > @@ -408,9 +408,9 @@ static u64 notrace read_hv_clock_tsc_cs(
+> > >  	return read_hv_clock_tsc();
+> > >  }
+> > >  
+> > > -static u64 notrace read_hv_sched_clock_tsc(void)
+> > > +static u64 noinstr read_hv_sched_clock_tsc(void)
+> > >  {
+> > > -	return (read_hv_clock_tsc() - hv_sched_clock_offset) *
+> > > +	return (hv_read_tsc_page(hv_get_tsc_page()) - hv_sched_clock_offset) *
+> > >  		(NSEC_PER_SEC / HV_CLOCK_HZ);
+> > >  }
+> > >  
+> > > --- a/include/clocksource/hyperv_timer.h
+> > > +++ b/include/clocksource/hyperv_timer.h
+> > > @@ -38,7 +38,7 @@ extern void hv_remap_tsc_clocksource(voi
+> > >  extern unsigned long hv_get_tsc_pfn(void);
+> > >  extern struct ms_hyperv_tsc_page *hv_get_tsc_page(void);
+> > >  
+> > > -static inline notrace u64
+> > > +static __always_inline notrace u64
+> > >  hv_read_tsc_page_tsc(const struct ms_hyperv_tsc_page *tsc_pg, u64 *cur_tsc)
+> > >  {
+> > >  	u64 scale, offset;
+> > > @@ -85,7 +85,7 @@ hv_read_tsc_page_tsc(const struct ms_hyp
+> > >  	return mul_u64_u64_shr(*cur_tsc, scale, 64) + offset;
+> > >  }
+> > >  
+> > > -static inline notrace u64
+> > > +static __always_inline notrace u64
+> > >  hv_read_tsc_page(const struct ms_hyperv_tsc_page *tsc_pg)
+> > >  {
+> > >  	u64 cur_tsc;
+> > 
+> > Hyper-V folks!
+> > 
+> > While reviewing all this I found the following 'gem':
+> > 
+> > hv_init_clocksource()
+> >   hv_setup_sched_clock()
+> >     paravirt_set_sched_clock(read_hv_sched_clock_msr)
+> > 
+> > read_hv_sched_clock_msr() [notrace]
+> >   read_hv_clock_msr()     [notrace]
+> >     hv_get_register()      *traced*
+> >       hv_get_non_nested_register() ...
+> >         hv_ghcb_msr_read()
+> > 	  WARN_ON(in_nmi())
+> > 	  ...
+> > 	  local_irq_save()
+> > 
+> > 
+> > Note that:
+> > 
+> >  a) sched_clock() is used in NMI context a *LOT*
+> >  b) sched_clock() is notrace (or even noinstr with these patches)
+> >     and local_irq_save() implies tracing
+> > 
+> 
+> Tianyu and Michael, what's your thought on this?
+> 
+> Is the MSR-based GHCB usable at this point?
+> 
+> What other clock source can be used?
 
-Ah, you're effectively suggesting a hybrid model where the file is the sing=
-le
-source of truth for what's private versus shared, ad KVM gets pfns through
-direct communication with the backing store via the file descriptor, but us=
-erspace
-can still control things via mmap() and friends.
+You do have TSC support -- which is what I fixed for you. It's just the
+whole MSR thing that is comically broken.
 
-If you're not suggesting a backdoor, i.e. KVM still gets private pfns via h=
-vas,
-then we're back at Kirill's series, because otherwise there's no easy way f=
-or KVM
-to retrieve the pfn.
+You could do a read_hv_clock_msr() implementation using
+__rdmsr() and add some sanity checking that anything GHCB using (SEV?)
+*will* use TSC.
 
-A form of this was also discussed, though I don't know how much of the disc=
-ussion
-happened on-list.
-=20
-KVM actually does something like this for s390's Ultravisor (UV), which is =
-quite
-a bit like TDX (UV is a trusted intermediary) except that it handles faults=
- much,
-much more gracefully.  Specifically, when the untrusted host attempts to ac=
-cess a
-secure page, a fault occurs and the kernel responds by telling UV to export=
- the
-page.  The fault is gracefully handled even even for kernel accesses
-(see do_secure_storage_access()).  The kernel does BUG() if the export fail=
-s when
-handling fault from kernel context, but my understanding is that export can=
- fail
-if and only if there's a fatal error elsewhere, i.e. the UV essentialy _ens=
-ures_
-success, and goes straight to BUG()/panic() if something goes wrong.
-
-On the guest side, accesses to exported (swapped) secure pages generate int=
-ercepts
-and KVM faults in the page.  To do so, KVM freezes the page/folio refcount,=
- tells
-the UV to import the page, and then unfreezes the page/folio.  But very cru=
-cially,
-when _anything_ in the untrusted host attempts to access the secure page, t=
-he
-above fault handling for untrusted host accesses kicks in.  In other words,=
- the
-guest can cause thrash, but can't bring down the host.
-
-TDX on the other hand silently poisons memory, i.e. doesn't even generate a
-synchronous fault.  Thus the kernel needs to be 100% perfect on preventing =
-_any_
-accesses to private memory from the host, and doing that is non-trivial and
-invasive.
-
-SNP does synchronously fault, but the automatically converting in the #PF h=
-andler
-got NAK'd[*] for good reasons, e.g. SNP doesn't guarantee conversion succes=
-s as the
-guest can trigger concurrent RMP modifications.  So the end result ends up =
-being
-the same as TDX, host accesses need to be completely prevented.
-
-Again, this is all doable, but costly.  And IMO, provides very little value=
-.
-
-Allowing things like mbind() is nice-to-have at best, as implementing fbind=
-()
-isn't straightforward and arguably valuable to have irrespective of this
-discussion, e.g. to allow userspace to say "use this policy regardless of w=
-hat
-process maps the file".
-
-Using a common memory pool (same physical page is used for both shared and =
-private)
-is a similar story.  There are plenty of existing controls to limit userspa=
-ce/guest
-memory usage and to deal with OOM scenarios, so barring egregious host acco=
-unting
-and/or limiting bugs, which would affect _all_ VM types, the worst case sce=
-nario
-is that a VM is terminated because host userspace is buggy.  On the slip si=
-de, using
-a common pool brings complexity into the kernel, as backing stores would ne=
-ed to
-be taught to deny access to a subset of pages in their mappings, and in mul=
-tiple
-paths, e.g. faults, read()/write() and similar, page migration, swap, etc.
-
-[*] https://lore.kernel.org/linux-mm/8a244d34-2b10-4cf8-894a-1bf12b59cf92@w=
-ww.fastmail.com
-
-> > Issues that led to us abandoning the "map with special !Present PTEs" a=
-pproach:
-> >
-> >  - Using page tables, i.e. hardware defined structures, to track gfn=3D=
->pfn mappings
-> >    is inefficient and inflexible compared to software defined structure=
-s, especially
-> >    for the expected use cases for CoCo guests.
-> >
-> >  - The kernel wouldn't _easily_ be able to enforce a 1:1 page:guest ass=
-ociation,
-> >    let alone a 1:1 pfn:gfn mapping.
->=20
-> Maybe KVM can ensure that each page of the guest_mem file is
-> associated with a single memslot.
-
-This is a hard NAK.  Guest physical address space is guaranteed to have hol=
-es
-and/or be discontiguous, for the PCI hole at the top of lower memory.  Allo=
-wing
-only a single binding would prevent userspace from backing all (or large ch=
-unks)
-of guest memory with a single file.
-
-> HVAs when they are registered can be associated with offsets into guest_m=
-em files.
-
-Enforcing 1:1 assocations is doable if KVM inserts a shim/interposer, e.g. =
-essentially
-implements the exclusivity bits of restrictedmem.  But that's adding even m=
-ore
-complexity.
-
-> >  - Does not work for memory that isn't backed by 'struct page', e.g. if=
- devices
-> >    gain support for exposing encrypted memory regions to guests.
-> >
-> >  - Poking into the VMAs to convert memory would be likely be less perfo=
-rmant due
-> >    to using infrastructure that is much "heavier", e.g. would require t=
-aking
-> >    mmap_lock for write.
->=20
-> Converting memory doesn't necessarily need to poke holes into VMA, but
-> rather just unmap pagetables just like what would happen when mmapped
-> files are punched to free the backing file offsets.
-
-Sorry, bad choice of word on my part.  I didn't intend to imply poking hole=
-s, in
-this case I used "poking" to mean "modifying".  munmap(), mprotected(), etc=
- all
-require modifying VMAs, which means taking mmap_lock for write.
-
-> > In short, shoehorning this into mmap() requires fighting how the kernel=
- works at
-> > pretty much every step, and in the end, adding e.g. fbind() is a lot ea=
-sier.
-> >
-> > > 2) Userspace registers mmaped HVA ranges with KVM with additional
-> > > KVM_MEM_PRIVATE flag
-> > > 3) Userspace converts memory attributes and this memory conversion
-> > > allows userspace to access shared ranges of the file because those ar=
-e
-> > > allowed to be faulted in from guest_mem. Shared to private conversion
-> > > unmaps the file ranges from userspace VMM pagetables.
-> > > 4) Granularity of userspace pagetable mappings for shared ranges will
-> > > have to be dictated by KVM guest_mem file implementation.
-> > >
-> > > Caveat here is that once private pages are mapped into userspace view=
-.
-> > >
-> > > Benefits here:
-> > > 1) Userspace view remains consistent while still being able to use HV=
-A ranges
-> > > 2) It would be possible to use HVA based APIs from userspace to do
-> > > things like binding.
-> > > 3) Double allocation wouldn't be a concern since hva ranges and gpa
-> > > ranges possibly map to the same HPA ranges.
-> >
-> > #3 isn't entirely correct.  If a different process (call it "B") maps s=
-hared memory,
-> > and then the guest converts that memory from shared to private, the bac=
-king pages
-> > for the previously shared mapping will still be mapped by process B unl=
-ess userspace
-> > also ensures process B also unmaps on conversion.
-> >
->=20
-> This should be ideally handled by something like: unmap_mapping_range()
-
-That'd work for the hybrid model (fd backdoor with pseudo mmap() support), =
-but
-not for a generic VMA-based implementation.  If the file isn't the single s=
-ource
-of truth, then forcing all mappings to go away simply can't work.
-=20
-> > #3 is also a limiter.  E.g. if a guest is primarly backed by 1GiB pages=
-, keeping
-> > the 1GiB mapping is desirable if the guest converts a few KiB of memory=
- to shared,
-> > and possibly even if the guest converts a few MiB of memory.
->=20
-> This caveat maybe can be lived with as shared ranges most likely will
-> not be backed by 1G pages anyways, possibly causing IO performance to
-> get hit. This possibly needs more discussion about conversion
-> granularity used by guests.
-
-Yes, it's not the end of the world.  My point is that separating shared and=
- private
-memory provides more flexibility.  Maybe that flexibility never ends up bei=
-ng
-super important, but at the same time we shouldn't willingly paint ourselve=
-s into
-a corner.
+Anyway, will you guys do that, or should I pull out the chainsaw and fix
+it for you?
