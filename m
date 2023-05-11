@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83F7F6FFD8B
+	by mail.lfdr.de (Postfix) with ESMTP id CF1946FFD8C
 	for <lists+kvm@lfdr.de>; Fri, 12 May 2023 01:59:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239628AbjEKX73 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 19:59:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52874 "EHLO
+        id S239619AbjEKX71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 19:59:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239604AbjEKX7Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 19:59:25 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A3BF49E8
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:59:21 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-559ea6b1065so152489307b3.0
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:59:21 -0700 (PDT)
+        with ESMTP id S239118AbjEKX7Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 19:59:24 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D40BA49F9
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:59:22 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-24e16918391so5078510a91.3
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:59:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683849560; x=1686441560;
+        d=google.com; s=20221208; t=1683849562; x=1686441562;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=CNraDidmFDw9dJQ9QnV0Y0C81tvqP9mqw0EiCSRz+Vs=;
-        b=sOIKLxFGuZR3i+K8MJnpj7JJVwmgGhXNdfe9XNnpN8OBIHbAYWKHKMnwLAXfeq0eS2
-         ML6wMOtYOj99/tupq5/BOSt0fd19YAO+5/xjWDl0mbazf82YyyhL0m2wtHFjZwoa87x/
-         iFiAl66sn+AQjsVPkU5S2e0s7QnsrMicU9ivDez7l6MkMd0z0N8wR0rZTx6+swKs+YEL
-         3cxQEQwHQTqOs7qC0XOyaKQJ+AwoNL/dPQTVXgZeYaToXfHCQKLMJ6sY3p/OudNICFtd
-         oFAFNrp3Nu13/EUHIEvlNfCOBJwPTpZeUgGaw0luySkG+EAYCs99WAR7cgEIWIScPC9E
-         4rmw==
+        bh=VIjrZedVYHUazO+QEAuS++mQjGlxrOf/5Ry3YdZ2+oU=;
+        b=o016p9C1l7Bf40QWW5hZhlJ6UNhvoepg3EV6HlxcEYKweG3hyj3sX9GCUcRyUaOCgw
+         1EsWeEZWAF5yt9PC1IvGCqyts1dY1FMyo9VyyOnzVniVn1OOjUz/rJcvRoKtyYpf9oYW
+         xjmQozf8TMPhASSJoL9Qgtz7Jnj1N6K3BmfgneVnlwAuEKLZ5/r47TvU4fS4y6XX6aJV
+         eKnjIqfLnrUfCd+h9dNaC9E78ttRH6SvCz+F63h2Op6/U3ZNBVEJJmavoSBz2hwqF+Gr
+         6k8Fp7hpwoCAq/i3vHBs0AguuohmxIjuP9c2uDco58HxBUqso8q2sogF9Szz/CBXk6qn
+         MrEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683849560; x=1686441560;
+        d=1e100.net; s=20221208; t=1683849562; x=1686441562;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=CNraDidmFDw9dJQ9QnV0Y0C81tvqP9mqw0EiCSRz+Vs=;
-        b=cnnXLwmlIQTl69FCmPwhvL2IrJNC7nISNbQCvLwHZ8Iy5BZD7aX8VR2uWI1dBHuPdT
-         8Bmb/3k/C+tWDBA79TOpgFsXVLgeMUIzC893rl0CjzqbvR556zm134nmq+OVvJlkXHru
-         tHobD2WDHQ9r+/evhHKVDRsnnGMFo94AfAizcOYuVPly52RNujv/RK555uPdfzvxxmWX
-         Xna8Gbp8Hvaxmmm6+/FWONMlaYgNeahwK4fHasGe0ulTdrDlN2R9fsrlOjdhN1GSXRPo
-         ZATpbAocMcXvg0QhgKhvrN6pAy87WOmbYuqeFwgobN8apNDD1Z7PCaSTSeIvXyBrlMda
-         YqZA==
-X-Gm-Message-State: AC+VfDzyxdgKlPcn2ktKoJ3bYxbweZs6xQL9RxpgglDN+fZ883dWhqXq
-        sj6IR87dh+IR0atfIntdfzedCamAEh0=
-X-Google-Smtp-Source: ACHHUZ6DJJxHn1wWxo8Af/BSN9VswWrMKBS5HRAMWHBlrXxQJVzW1+QwvpSq7d3Dmgy9grKr3jV273YrWho=
+        bh=VIjrZedVYHUazO+QEAuS++mQjGlxrOf/5Ry3YdZ2+oU=;
+        b=NT7YOP+m0jcIzgZa6I/mFDGMkryb3OEV57xxjOEQGNdPutbCZq46VjZrFFQA2FAV4y
+         Vj60lELAAt953rScxqbCDj3y4Qhvkz9Rjy5Ev1/7Ny47ufxbPnrVZzduil8yr3smKulH
+         oMgpF/4Yb0/Ig5YupdFZ5bwnPGF6J1CFaFZFMjEFVP3yW2VhQH0Gjvw0DDmfEzTI2nSN
+         Z0+FLj3mbx/3SbH2+H8lLG22dUM6YPb3Y1pag4+JjET9yqwmGcXZdnNQAYlZo8v5V/lo
+         ud+wPaeITSxmtiWPvf/KX1oeSkELQdLxK2wjLFjQln2lhZ0UoBYUmW6/DstU9x4TtKEN
+         QZig==
+X-Gm-Message-State: AC+VfDzQ7Ktnoo8H7GIZIzVLm/vhaB41iROfPa0LHdFlERQBJ57d/h52
+        BoEcXVKp+AGKa/iQnJlZP2P5gUZttmE=
+X-Google-Smtp-Source: ACHHUZ5ncEZoSbrKYktLcseA8fx7EMsUd80/dPDRz+xO8GX7szwGTZ2sEmLLJw4b5O1/sROyqSHmg/wxPCI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ae65:0:b0:55d:f921:6bfa with SMTP id
- g37-20020a81ae65000000b0055df9216bfamr9874068ywk.5.1683849560649; Thu, 11 May
- 2023 16:59:20 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:d80d:b0:252:8154:790c with SMTP id
+ a13-20020a17090ad80d00b002528154790cmr1368698pjv.9.1683849562448; Thu, 11 May
+ 2023 16:59:22 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 11 May 2023 16:59:09 -0700
+Date:   Thu, 11 May 2023 16:59:10 -0700
 In-Reply-To: <20230511235917.639770-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230511235917.639770-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
-Message-ID: <20230511235917.639770-2-seanjc@google.com>
-Subject: [PATCH 1/9] KVM: x86/mmu: Delete pgprintk() and all its usage
+Message-ID: <20230511235917.639770-3-seanjc@google.com>
+Subject: [PATCH 2/9] KVM: x86/mmu: Delete rmap_printk() and all its usage
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -65,170 +65,116 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Delete KVM's pgprintk() and all its usage, as the code is very prone
-to bitrot due to being buried behind MMU_DEBUG, and the functionality has
-been rendered almost entirely obsolete by the tracepoints KVM has gained
-over the years.  And for the situations where the information provided by
-KVM's tracepoints is insufficient, pgprintk() rarely fills in the gaps,
-and is almost always far too noisy, i.e. developers end up implementing
-custom prints anyways.
+Delete rmap_printk() so that MMU_WARN_ON() and MMU_DEBUG can be morphed
+into something that can be regularly enabled for debug kernels.  The
+information provided by rmap_printk() isn't all that useful now that the
+rmap and unsync code is mature, as the prints are simultaneously too
+verbose (_lots_ of message) and yet not verbose enough to be helpful for
+debug (most instances print just the SPTE pointer/value, which is rarely
+sufficient to root cause anything but trivial bugs).
+
+Alternatively, rmap_printk() could be reworked to into tracepoints, but
+it's not clear there is a real need as rmap bugs rarely escape initial
+development, and when bugs do escape to production, they are often edge
+cases and/or reside in code that isn't directly related to the rmaps.
+In other words, the problems with rmap_printk() being unhelpful also apply
+to tracepoints.  And deleting rmap_printk() doesn't preclude adding
+tracepoints in the future.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c          | 17 -----------------
+ arch/x86/kvm/mmu/mmu.c          | 12 ------------
  arch/x86/kvm/mmu/mmu_internal.h |  2 --
- arch/x86/kvm/mmu/paging_tmpl.h  |  7 -------
- arch/x86/kvm/mmu/spte.c         |  2 --
- 4 files changed, 28 deletions(-)
+ 2 files changed, 14 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c8961f45e3b1..cb70958eeaf9 100644
+index cb70958eeaf9..f6918c0bb82d 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2768,12 +2768,9 @@ int kvm_mmu_unprotect_page(struct kvm *kvm, gfn_t gfn)
- 	LIST_HEAD(invalid_list);
- 	int r;
+@@ -938,10 +938,8 @@ static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
+ 	int count = 0;
  
--	pgprintk("%s: looking for gfn %llx\n", __func__, gfn);
- 	r = 0;
- 	write_lock(&kvm->mmu_lock);
- 	for_each_gfn_valid_sp_with_gptes(kvm, sp, gfn) {
--		pgprintk("%s: gfn %llx role %x\n", __func__, gfn,
--			 sp->role.word);
- 		r = 1;
- 		kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
- 	}
-@@ -2931,9 +2928,6 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 	bool prefetch = !fault || fault->prefetch;
- 	bool write_fault = fault && fault->write;
+ 	if (!rmap_head->val) {
+-		rmap_printk("%p %llx 0->1\n", spte, *spte);
+ 		rmap_head->val = (unsigned long)spte;
+ 	} else if (!(rmap_head->val & 1)) {
+-		rmap_printk("%p %llx 1->many\n", spte, *spte);
+ 		desc = kvm_mmu_memory_cache_alloc(cache);
+ 		desc->sptes[0] = (u64 *)rmap_head->val;
+ 		desc->sptes[1] = spte;
+@@ -950,7 +948,6 @@ static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
+ 		rmap_head->val = (unsigned long)desc | 1;
+ 		++count;
+ 	} else {
+-		rmap_printk("%p %llx many->many\n", spte, *spte);
+ 		desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
+ 		count = desc->tail_count + desc->spte_count;
  
--	pgprintk("%s: spte %llx write_fault %d gfn %llx\n", __func__,
--		 *sptep, write_fault, gfn);
+@@ -1015,14 +1012,12 @@ static void pte_list_remove(u64 *spte, struct kvm_rmap_head *rmap_head)
+ 		pr_err("%s: %p 0->BUG\n", __func__, spte);
+ 		BUG();
+ 	} else if (!(rmap_head->val & 1)) {
+-		rmap_printk("%p 1->0\n", spte);
+ 		if ((u64 *)rmap_head->val != spte) {
+ 			pr_err("%s:  %p 1->BUG\n", __func__, spte);
+ 			BUG();
+ 		}
+ 		rmap_head->val = 0;
+ 	} else {
+-		rmap_printk("%p many->many\n", spte);
+ 		desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
+ 		while (desc) {
+ 			for (i = 0; i < desc->spte_count; ++i) {
+@@ -1238,8 +1233,6 @@ static bool spte_write_protect(u64 *sptep, bool pt_protect)
+ 	    !(pt_protect && is_mmu_writable_spte(spte)))
+ 		return false;
+ 
+-	rmap_printk("spte %p %llx\n", sptep, *sptep);
 -
- 	if (unlikely(is_noslot_pfn(pfn))) {
- 		vcpu->stat.pf_mmio_spte_created++;
- 		mark_mmio_spte(vcpu, sptep, gfn, pte_access);
-@@ -2953,8 +2947,6 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 			drop_parent_pte(child, sptep);
- 			flush = true;
- 		} else if (pfn != spte_to_pfn(*sptep)) {
--			pgprintk("hfn old %llx new %llx\n",
--				 spte_to_pfn(*sptep), pfn);
- 			drop_spte(vcpu->kvm, sptep);
- 			flush = true;
- 		} else
-@@ -2979,8 +2971,6 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 	if (flush)
- 		kvm_flush_remote_tlbs_gfn(vcpu->kvm, gfn, level);
- 
--	pgprintk("%s: setting spte %llx\n", __func__, *sptep);
--
- 	if (!was_rmapped) {
- 		WARN_ON_ONCE(ret == RET_PF_SPURIOUS);
- 		rmap_add(vcpu, slot, sptep, gfn, pte_access);
-@@ -4436,8 +4426,6 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- static int nonpaging_page_fault(struct kvm_vcpu *vcpu,
- 				struct kvm_page_fault *fault)
+ 	if (pt_protect)
+ 		spte &= ~shadow_mmu_writable_mask;
+ 	spte = spte & ~PT_WRITABLE_MASK;
+@@ -1264,8 +1257,6 @@ static bool spte_clear_dirty(u64 *sptep)
  {
--	pgprintk("%s: gva %lx error %x\n", __func__, fault->addr, fault->error_code);
+ 	u64 spte = *sptep;
+ 
+-	rmap_printk("spte %p %llx\n", sptep, *sptep);
 -
- 	/* This path builds a PAE pagetable, we can map 2mb pages at maximum. */
- 	fault->max_level = PG_LEVEL_2M;
- 	return direct_page_fault(vcpu, fault);
-@@ -5627,9 +5615,6 @@ static bool detect_write_misaligned(struct kvm_mmu_page *sp, gpa_t gpa,
- {
- 	unsigned offset, pte_size, misaligned;
+ 	MMU_WARN_ON(!spte_ad_enabled(spte));
+ 	spte &= ~shadow_dirty_mask;
+ 	return mmu_spte_update(sptep, spte);
+@@ -1477,9 +1468,6 @@ static bool kvm_set_pte_rmap(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
  
--	pgprintk("misaligned: gpa %llx bytes %d role %x\n",
--		 gpa, bytes, sp->role.word);
+ restart:
+ 	for_each_rmap_spte(rmap_head, &iter, sptep) {
+-		rmap_printk("spte %p %llx gfn %llx (%d)\n",
+-			    sptep, *sptep, gfn, level);
 -
- 	offset = offset_in_page(gpa);
- 	pte_size = sp->role.has_4_byte_gpte ? 4 : 8;
+ 		need_flush = true;
  
-@@ -5695,8 +5680,6 @@ static void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa,
- 	if (!READ_ONCE(vcpu->kvm->arch.indirect_shadow_pages))
- 		return;
- 
--	pgprintk("%s: gpa %llx bytes %d\n", __func__, gpa, bytes);
--
- 	write_lock(&vcpu->kvm->mmu_lock);
- 
- 	gentry = mmu_pte_write_fetch_gpte(vcpu, &gpa, &bytes);
+ 		if (pte_write(pte)) {
 diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index d39af5639ce9..4f1e4b327f40 100644
+index 4f1e4b327f40..9c9dd9340c63 100644
 --- a/arch/x86/kvm/mmu/mmu_internal.h
 +++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -11,11 +11,9 @@
+@@ -11,10 +11,8 @@
  #ifdef MMU_DEBUG
  extern bool dbg;
  
--#define pgprintk(x...) do { if (dbg) printk(x); } while (0)
- #define rmap_printk(fmt, args...) do { if (dbg) printk("%s: " fmt, __func__, ## args); } while (0)
+-#define rmap_printk(fmt, args...) do { if (dbg) printk("%s: " fmt, __func__, ## args); } while (0)
  #define MMU_WARN_ON(x) WARN_ON(x)
  #else
--#define pgprintk(x...) do { } while (0)
- #define rmap_printk(x...) do { } while (0)
+-#define rmap_printk(x...) do { } while (0)
  #define MMU_WARN_ON(x) do { } while (0)
  #endif
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 0662e0278e70..7a97f769a7cb 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -456,9 +456,6 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 			goto retry_walk;
- 	}
  
--	pgprintk("%s: pte %llx pte_access %x pt_access %x\n",
--		 __func__, (u64)pte, walker->pte_access,
--		 walker->pt_access[walker->level - 1]);
- 	return 1;
- 
- error:
-@@ -529,8 +526,6 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	if (FNAME(prefetch_invalid_gpte)(vcpu, sp, spte, gpte))
- 		return false;
- 
--	pgprintk("%s: gpte %llx spte %p\n", __func__, (u64)gpte, spte);
--
- 	gfn = gpte_to_gfn(gpte);
- 	pte_access = sp->role.access & FNAME(gpte_access)(gpte);
- 	FNAME(protect_clean_gpte)(vcpu->arch.mmu, &pte_access, gpte);
-@@ -758,7 +753,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	struct guest_walker walker;
- 	int r;
- 
--	pgprintk("%s: addr %lx err %x\n", __func__, fault->addr, fault->error_code);
- 	WARN_ON_ONCE(fault->is_tdp);
- 
- 	/*
-@@ -773,7 +767,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	 * The page is not mapped by the guest.  Let the guest handle it.
- 	 */
- 	if (!r) {
--		pgprintk("%s: guest page fault\n", __func__);
- 		if (!fault->prefetch)
- 			kvm_inject_emulated_page_fault(vcpu, &walker.fault);
- 
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index cf2c6426a6fc..438a86bda9f3 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -221,8 +221,6 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 		 * shadow pages and unsync'ing pages is not allowed.
- 		 */
- 		if (mmu_try_to_unsync_pages(vcpu->kvm, slot, gfn, can_unsync, prefetch)) {
--			pgprintk("%s: found shadow page for %llx, marking ro\n",
--				 __func__, gfn);
- 			wrprot = true;
- 			pte_access &= ~ACC_WRITE_MASK;
- 			spte &= ~(PT_WRITABLE_MASK | shadow_mmu_writable_mask);
 -- 
 2.40.1.606.ga4b1b128d6-goog
 
