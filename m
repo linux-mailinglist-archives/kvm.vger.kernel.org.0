@@ -2,96 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADCA46FFCE9
-	for <lists+kvm@lfdr.de>; Fri, 12 May 2023 01:03:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D51406FFCEC
+	for <lists+kvm@lfdr.de>; Fri, 12 May 2023 01:03:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238958AbjEKXDL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 19:03:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53796 "EHLO
+        id S239497AbjEKXD0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 19:03:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238815AbjEKXDG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 19:03:06 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B767B10DC
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:03:03 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1a950b982d4so445645ad.0
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:03:03 -0700 (PDT)
+        with ESMTP id S239214AbjEKXDV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 19:03:21 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EED1BE74
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:03:18 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-ba69d93a6b5so3609926276.1
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:03:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683846183; x=1686438183;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uB2iqlK11OQsKPd9Pr1QSGgzqWB2tqFxHS68iHnGQns=;
-        b=RWmON4VeXRg726Drr60jlakRmM+cWHoNancE+z69c2c9PPzUWq+Qkucb/Jc3iMoo/Z
-         DaR5eV+kEPLKbHzvrcFcJhZdU9QKFDvtyZ1M/bwRqxLLvL8q9Nyu/quyJmHdLogNVshe
-         Bs4CxefhMIP+sVOa5ez2hraCriFiQFp7MtFz+ALzBQ5wERl0qSqON5DPizJx/XvJDmeH
-         YelRz/mtLw3VwB5G4mBCX23meLfPO2miiJVrgziyJfWO4fyftyI+aku9cQU932UjDQAE
-         HfylxX05aegejIT6AzxnWB7MwnTHVLKXWDhETWB5bSjMoCtfhe3NGwqxdzUDEfKvhBR1
-         /WyA==
+        d=google.com; s=20221208; t=1683846198; x=1686438198;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=G7in9pHI8f4PbQncUNnm7irUkPJSlHoe9VFQrVjPC7s=;
+        b=tlr7jb7AGBJLC1tGipYMA+NIE4W3qmlQdmY6GWrzLWsGWnOTLjaPHHlQG+JucDh8Qh
+         Q+VUON7noOWe1bBTJLFWP8puzEqijn6x7iGqKtaf9KUTnJocCwIq8bQ4zF4ncz61ZUGV
+         nIHRFyH+MjsY730vxId7VHLbcvyRGoDaRelSW10OrS6ersh1m09qWmIwdCDpEBmNK6ei
+         d6zSU5NXO5rdsbAuzikE+DvT55dlDlrAAaWpeQnkwAGG0fYAdvmwXqV5dGWS3kPWcdMF
+         u2iSGm/rtbBHvcFaFQcphfbZ8bqMKYu0jmywqpH7Ckh7xisCgK+GQqSuL5CH54Cv6zlp
+         sNvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683846183; x=1686438183;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uB2iqlK11OQsKPd9Pr1QSGgzqWB2tqFxHS68iHnGQns=;
-        b=C7EKpc/q1p5gFqX5O5kCyF799Kav/I/+e7MWh4AM35uKE5/X+Rhqa3brwdDYeAjfEI
-         v0XM1ftr8+4+0+Tj0GaFqPw5gT0Ekaf36jMn9MmbxXJOph7VCJPK8EDfTuFW7o0Eo6dY
-         zidg537/q0MMit/ra5DAiv5zeV6zVihDWERYOAdgIiso/hNyciFcmeb+FGD3+xYFicXM
-         028FPFEKmkwKVARZrFhF/+6OfGYXqp5ajJ4vJ/bIOoMGQEpiqXS1veNku+779NlS1130
-         ArmrY9rrkGWLx6btp/WfxDa6qlwlbrDdqL55fnDmmN2CPAmTeCFO0FvWzWORLNcRrzWg
-         0YFQ==
-X-Gm-Message-State: AC+VfDyBg5Hiw5ZFDUcw4wvoUToHLrwuuyAnNbPk9H7yVPtF7LfEk7KP
-        zP+WaBP9n2IY3SUuodWXzcUvmuQGgagd05yy68DyyA==
-X-Google-Smtp-Source: ACHHUZ64VnYmS71+rD9l4jUC2YQ3gX3wsLmYkLHhKgjyoMKx1yuh1vMc6oYGJskGIumQz6tzdZGDUjW/uKNeU+fF+Cc=
-X-Received: by 2002:a17:902:ce8d:b0:1a9:343c:76e5 with SMTP id
- f13-20020a170902ce8d00b001a9343c76e5mr89434plg.18.1683846183027; Thu, 11 May
- 2023 16:03:03 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221214194056.161492-1-michael.roth@amd.com> <20221214194056.161492-53-michael.roth@amd.com>
- <aab7ed11-870e-579d-9328-4c32d9936392@amd.com> <66039193-14ca-5edb-d8d4-ca732d8c13a6@amd.com>
- <119075dd-5f3e-a393-f543-6cdfd34cd337@amd.com> <385016f9-e948-4f7f-8db3-24a0c0543b3d@amd.com>
- <55e5f02f-4c1f-e6b0-59ba-07abc4d3408f@amd.com> <81037a58-6b5c-cde4-79fe-3686d9b8a551@amd.com>
- <b0baa6ee-ea6d-3a30-d5fb-3ec395896750@amd.com> <dbcb6666-270a-4867-6de7-73812d32fd8c@amd.com>
- <7fb25176-3752-1be3-66d4-a7f5a0e1617a@amd.com> <682c0bf9-ccf7-9660-21fe-925ef63c5fbb@amd.com>
- <4c642bd1-5f1c-292e-398f-eed699db590d@amd.com> <65cb8f0f-7e8b-6df6-6bb1-a9f1add027bb@amd.com>
-In-Reply-To: <65cb8f0f-7e8b-6df6-6bb1-a9f1add027bb@amd.com>
-From:   Dionna Amalie Glaze <dionnaglaze@google.com>
-Date:   Thu, 11 May 2023 16:02:50 -0700
-Message-ID: <CAAH4kHYDUGnUnZt2HUVcGqOYyzsyUhBXUqW+iDyvKCtQW9XuEQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v7 52/64] KVM: SVM: Provide support for
- SNP_GUEST_REQUEST NAE event
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Alexey Kardashevskiy <aik@amd.com>,
-        "Kalra, Ashish" <ashish.kalra@amd.com>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, hpa@zytor.com, ardb@kernel.org,
-        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1683846198; x=1686438198;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=G7in9pHI8f4PbQncUNnm7irUkPJSlHoe9VFQrVjPC7s=;
+        b=BoTuyfh4WtzwQwGd44zPaU0SH6XPSVmvYHS3yxtfdH25MPDWQwztZ9mEWwyq7h1Rgp
+         /ocukIeATfbT1WTY2FWrYONsHwZecp1Xkhk56pRZZWgyNqwQxYECffpnOxjd9QM5s+mt
+         hIRYwyiberrv2lESzxvInqa5R+r3MSFkYe5fSpjFO+L8IPMS9ocX7viuYvXN2qd337jb
+         kYLHxs4mvxp1ZDQvTkT8fRe82kr8MQNFfkifzM1HABaZ2AL/gv1rPciaNYsHDhc4ukGU
+         xlsPU9FMX6Nui4YsVaC6qt8xSTQdV19Qzt4pRapHjTRMe9WkraU3a6cKjKTl7hBMPXG6
+         LybQ==
+X-Gm-Message-State: AC+VfDy0K8zcI3FmbUlpihiDjbR3zY/X9PM5YE9mRHiSu7Q+K8JEa1yj
+        /24fFGPdWSritqnTpPWgs2jU4QbFTmI=
+X-Google-Smtp-Source: ACHHUZ43vzdgen2cveEeuKc+w92V7EeydHPKvEDKQRhBlrxAUEbdBd/WS3cmrriiVF0Dek+gyLX5N7OBccE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:21c5:0:b0:ba6:e7ee:bb99 with SMTP id
+ h188-20020a2521c5000000b00ba6e7eebb99mr976041ybh.12.1683846198249; Thu, 11
+ May 2023 16:03:18 -0700 (PDT)
+Date:   Thu, 11 May 2023 16:03:16 -0700
+In-Reply-To: <fa16b58fb9a8a0a3ad192963a66e327e74b387e5.camel@intel.com>
+Mime-Version: 1.0
+References: <20230503182852.3431281-1-seanjc@google.com> <20230503182852.3431281-3-seanjc@google.com>
+ <06715227566b520d4a445466f091dc28a0b8cd95.camel@intel.com>
+ <ZFPQodNs0Cn9YDXT@google.com> <fa16b58fb9a8a0a3ad192963a66e327e74b387e5.camel@intel.com>
+Message-ID: <ZF10NPeLviOKtsxT@google.com>
+Subject: Re: [PATCH 2/5] KVM: SVM: Use kvm_pat_valid() directly instead of kvm_mtrr_valid()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "guoke@uniontech.com" <guoke@uniontech.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "haiwenyao@uniontech.com" <haiwenyao@uniontech.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Would it be okay to request that we add a KVM stat for how often there
-are GUEST_REQUEST_NAE exits? I think it'd be good for service
-operators to get a better idea how valued the feature is.
+On Fri, May 05, 2023, Kai Huang wrote:
+> On Thu, 2023-05-04 at 08:34 -0700, Sean Christopherson wrote:
+> > On Wed, May 03, 2023, Kai Huang wrote:
+> > > > for better or worse, KVM doesn't apply the "zap
+> > > > SPTEs" logic to guest PAT changes when the VM has a passthrough device
+> > > > with non-coherent DMA.
+> > > 
+> > > Is it a bug?
+> > 
+> > No.  KVM's MTRR behavior is using a heuristic to try not to break the VM: if the
+> > VM has non-coherent DMA, then honor UC mapping in the MTRRs as such mappings may
+> > be coverage the non-coherent DMA.
+> > 
+> > From vmx_get_mt_mask():
+> > 
+> > 	/* We wanted to honor guest CD/MTRR/PAT, but doing so could result in
+> > 	 * memory aliases with conflicting memory types and sometimes MCEs.
+> > 	 * We have to be careful as to what are honored and when.
+> > 
+> > The PAT is problematic because it is referenced via the guest PTEs, versus the
+> > MTRRs being tied to the guest physical address, e.g. different virtual mappings
+> > for the same physical address can yield different memtypes via the PAT.  My head
+> > hurts just thinking about how that might interact with shadow paging :-)
+> > 
+> > Even the MTRRs are somewhat sketchy because they are technically per-CPU, i.e.
+> > two vCPUs could have different memtypes for the same physical address.  But in
+> > practice, sane software/firmware uses consistent MTRRs across all CPUs.
+> 
+> Agreed on all above odds.
+> 
+> But I think the answer to my question is actually we simply don't _need_ to zap
+> SPTEs (with non-coherent DMA) when guest's IA32_PAT is changed:
+> 
+> 1) If EPT is enabled, IIUC guest's PAT is already horned.  VMCS's GUEST_IA32_PAT
+> always reflects the IA32_PAT that guest wants to set.  EPT's memtype bits are
+> set according to guest's MTRR.  That means guest changing IA32_PAT doesn't need
+> to zap EPT PTEs as "EPT PTEs essentially only replaces guest's MTRRs".
 
--- 
--Dionna Glaze, PhD (she/her)
+Ah, yes, you're correct.  I thought KVM _always_ set the "ignore guest PAT" bit
+in the EPT PTEs, but KVM honors guest PAT when non-coherent DMA is present and
+CR0.CD=0.
+
+> 2) If EPT is disabled, looking at the code, if I read correctly, the
+> 'shadow_memtype_mask' is 0 for Intel, in which case KVM won't try to set any PAT
+> memtype bit in shadow MMU PTE, which means the true PAT memtype is always WB and
+> guest's memtype is never horned (guest's MTRRs are also never actually used by
+> HW), which should be fine I guess??  My brain refused to go further :)
+
+Yep.  It's entirely possible that VT-d without snoop control simply doesn't work
+with shadow paging, but no one has ever cared.
+
+> But anyway back to my question, I think "changing guest's IA32_PAT" shouldn't
+> result in needing to "zap SPTEs".
