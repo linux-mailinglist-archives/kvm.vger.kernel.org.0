@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 586366FFBC0
-	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 23:16:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AACE6FFBC5
+	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 23:19:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238866AbjEKVQ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 17:16:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58924 "EHLO
+        id S239259AbjEKVTa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 17:19:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239215AbjEKVQZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 17:16:25 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1C2B1FFF
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 14:16:24 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-6436b503faeso9184048b3a.3
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 14:16:24 -0700 (PDT)
+        with ESMTP id S238915AbjEKVT3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 17:19:29 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 252B72D62
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 14:19:28 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-b9a7c58ec19so10954865276.2
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 14:19:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683839784; x=1686431784;
+        d=google.com; s=20221208; t=1683839967; x=1686431967;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eH8gR//xYJ4W1EGUtNgoN6c4lYqH8jKsRvjQaXXfguY=;
-        b=Mnn3pHxJBj0swVnZ61VZ2LnEtFSmvHpgENByHR7o4QngBT1QGHWwUpbBmacGkqA1gU
-         eRprkFiyjcZSMIISPyRZReVagD/SxEEZrNZmD4h7L/lZRycIB1Fg7HaJ30b1tBXYefab
-         gkh8K8mp8rF8ScT7IB7nyMTN8uaeLqFHJLBUK3V7YdRr4aZyrx3SJckLBTCvAVy+hN0t
-         JEEs1g320gB8mpecAB3cHZgxayfEvHUwNM2bL3hU6RdAatifflEcd3h9V0PJo7PhElAN
-         rm0FsJCRFpDxQcJ8XXNSYxIFZMOYkwrBk1MoNHrhLBfHorF8VG1Ag085OqaicXrYT8p6
-         /pPg==
+        bh=Oc8hUlEPkHXHpIXaObZi2PEY2szZrP2OC/2zdz9YSM8=;
+        b=GBOsY0xKh32hZmAjiI+2tIEUFpP/w98yvdkIkerE3xKnb7+LX9xcPEFSVNiSWHlUc6
+         rzD2un+RgboQBATM0H/exrHiR42ToPnaprS6xWswb2JI3bwZ5m/+0pYb0WzH34hJnRyi
+         SPpRJXrhk3jmV2CZbmcYhFZaLAR1PDQ+H8T/oE4Y1qS1oARGTGPUTfkm/MU08kmy5c8i
+         +4YjORQ2CYwSntXH0PmZfwnu8m1Sz0YVFiL2MkOARE3T6hF2RZ4j/YUhAgeNPBMhilKy
+         z/Tn7VHDkco04jkRjkQMqDwkoJxh5nCW1GQW1GO307PkmTU5GpFOYxXmL38XtisC59AO
+         2Xvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683839784; x=1686431784;
+        d=1e100.net; s=20221208; t=1683839967; x=1686431967;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eH8gR//xYJ4W1EGUtNgoN6c4lYqH8jKsRvjQaXXfguY=;
-        b=kPmA1U08a99T5VtUuR5Wsdq85WTOlbe/81gWQibmBem4WBwK/A4aygoQQLZR+PGrq2
-         kuS+Yw8FtfNTQHOGWvpB8/ZdDN0rcEwDUVDIsFTQCO/Y2HytUmFrUn32IhOIOhGsr2hi
-         u5AX3qEzXWBabyB+XaYEZCFfppYdR367WcRuTWYyTgn6Ka4kgOBXsMIH892qPwRJnSFS
-         NJMrPMFeCTdAhfmH8p7ucVXOLJJ5b2oUMzBeISuQA5A4Wmohf/Tsu6eoCxuoK0emni3r
-         En07GQfbwHXax4uW6B3aYTkpTkjIROYKttb0bIWbDpiRHCFmUlEK4rNv4ZgBmqD3vqNq
-         NAow==
-X-Gm-Message-State: AC+VfDz/Pvq2dyzFozt4TDVUmaPhXWvRUWc2l4hilETJ6roc3pVJfhm0
-        hoZzu1BlFxRk9zoBVw22QunvkLdlMZw=
-X-Google-Smtp-Source: ACHHUZ7OGIT9Tf4V9m4ctBKsDSTDFIQNfzThBD2UsGzsGFMLq3A9SnXEyZuH5bzDSbrA0USqn9dzGxQDuy4=
+        bh=Oc8hUlEPkHXHpIXaObZi2PEY2szZrP2OC/2zdz9YSM8=;
+        b=eKRaX5Xsy2ztXTj/dbTcjNNuCuPZerW3utdtI6kC0hyXhk6kR87ZNEt0cBqfAD9hrG
+         /R6WZ1IY4CE5D82U1vp1EulGwgAUkNOo1QEfVwTdZro6GX39hwTCHlt+51/OQGgMS3qN
+         gOvsB5QyHFJwTxwon/+xO+/E603/k1yy3PKyfjrbqyJaf2Z9dGnr+GFAHBMwfgbWJAac
+         BG0AQnZHaHDso1zglOaY/vG8eN68mDFIjvhN557Fnw6oS9d91OipHtbOvIr0iNHIwoOY
+         Ph6/eHTUezqJPiCuhw3nQtASi/W/16QmYFIP3ZiBJqFXoNjRGl37axhP0kLSvm99IsDY
+         6BMA==
+X-Gm-Message-State: AC+VfDy3qABut+nr/vMeNrzgw0hTAWfVHShvkIuHlEdP2eCJQYUUjdyq
+        +Gw5r+/Tn6c0E6trD/CTrkgW0YqpXrk=
+X-Google-Smtp-Source: ACHHUZ4QUgn9SvBu8/bvMAP98JMZb8LOhazbEpwjq76h22pyaexHc3eakOAHRr8Tahs/rDdfmf0AHVNqN1o=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:7c6:b0:643:599b:4db4 with SMTP id
- n6-20020a056a0007c600b00643599b4db4mr6114797pfu.1.1683839784281; Thu, 11 May
- 2023 14:16:24 -0700 (PDT)
-Date:   Thu, 11 May 2023 14:16:22 -0700
-In-Reply-To: <20230508154457.29956-1-minipli@grsecurity.net>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1890:b0:b96:7676:db4a with SMTP id
+ cj16-20020a056902189000b00b967676db4amr14611706ybb.0.1683839967423; Thu, 11
+ May 2023 14:19:27 -0700 (PDT)
+Date:   Thu, 11 May 2023 14:19:25 -0700
+In-Reply-To: <20230508154804.30078-1-minipli@grsecurity.net>
 Mime-Version: 1.0
-References: <20230508154457.29956-1-minipli@grsecurity.net>
-Message-ID: <ZF1bJgJSepCwE02l@google.com>
-Subject: Re: [PATCH 6.2 0/5] KVM CR0.WP series backport
+References: <20230508154804.30078-1-minipli@grsecurity.net>
+Message-ID: <ZF1b3TVTibSbnHrH@google.com>
+Subject: Re: [PATCH 5.10 00/10] KVM CR0.WP series backport
 From:   Sean Christopherson <seanjc@google.com>
 To:     Mathias Krause <minipli@grsecurity.net>
 Cc:     stable@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -67,43 +67,26 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, May 08, 2023, Mathias Krause wrote:
-> This is a backport of the CR0.WP KVM series[1] to Linux v6.2. All
-> commits applied either clean or with only minor changes needed to
-> account for missing prerequisite patches, e.g. the lack of a
-> kvm_is_cr0_bit_set() helper for patch 5 or the slightly different
-> surrounding context in patch 4 (__always_inline vs. plain inline for
-> to_kvm_vmx()).
+> This is a backport of the CR0.WP KVM series[1] to Linux v5.10. It
+> further extends the v5.15 backport by two patches, namely patch 5 (which
+> is the prerequisite for Lai's patches) and patch 8 which was already
+> part of the v5.15.27 stable update but didn't made it to v5.10.
 > 
 > I used 'ssdd 10 50000' from rt-tests[2] as a micro-benchmark, running on
 > a grsecurity L1 VM. Below table shows the results (runtime in seconds,
 > lower is better):
 > 
->                         legacy     TDP    shadow
->     Linux v6.2.10        7.61s    7.98s    68.6s
->     + patches            3.37s    3.41s    70.2s
+>                           legacy     TDP    shadow
+>     Linux v5.10.177       10.37s    88.7s    69.7s
+>     + patches              4.88s     4.92s   70.1s
+> 
+> TDP MMU is, as for v5.15, slower than shadow paging on a vanilla kernel.
+> Fortunately it's disabled by default.
 > 
 > The KVM unit test suite showed no regressions.
 > 
 > Please consider applying.
-> 
-> Thanks,
-> Mathias
-> 
-> [1] https://lore.kernel.org/kvm/20230322013731.102955-1-minipli@grsecurity.net/
-> [2] https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
-> 
-> 
-> Mathias Krause (3):
->   KVM: x86: Do not unload MMU roots when only toggling CR0.WP with TDP
->     enabled
->   KVM: x86: Make use of kvm_read_cr*_bits() when testing bits
->   KVM: VMX: Make CR0.WP a guest owned bit
-> 
-> Paolo Bonzini (1):
->   KVM: x86/mmu: Avoid indirect call for get_cr3
-> 
-> Sean Christopherson (1):
->   KVM: x86/mmu: Refresh CR0.WP prior to checking for emulated permission
->     faults
 
-Acked-by: Sean Christopherson <seanjc@google.com>
+NAK, same reasoning as the 5.15 backports.
+
+https://lore.kernel.org/all/ZF1a8xIGLwcdJDVZ@google.com
