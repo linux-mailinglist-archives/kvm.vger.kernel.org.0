@@ -2,60 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D4956FF51C
-	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 16:53:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB5356FF646
+	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 17:44:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238113AbjEKOxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 10:53:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47300 "EHLO
+        id S238454AbjEKPo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 11:44:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238195AbjEKOwl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 10:52:41 -0400
+        with ESMTP id S237526AbjEKPoz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 11:44:55 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6366711B63;
-        Thu, 11 May 2023 07:52:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FDCED7;
+        Thu, 11 May 2023 08:44:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683816726; x=1715352726;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=zSBFf3R+KE7eDYqzxRY/XTRifADKsFtYgSSwmUYfOpg=;
-  b=fL7fQk+h0kNFY08et8nEr3Yv6MlXhrooek+fuqhGEUw/TwftHFfRAOgK
-   Lr211iGYErx6ESLe2ZdyCJXefytyAn2VRshalmNTM0VQ842Jl92p9fLJd
-   erb2dk7kuH/FVZkb50X6TCCj4T5AB77XDRmtjkQvkYs49pzSGBL9PKAyb
-   nOpgF9pVmejmqg7H1PhElbD0loL9dJfVkgiU3E8KvCTgp9LuLYEmD589i
-   +Oru0O55Bji1+zcMXqnqQ1+zWgPNTVPETC4NUvTjOS35Ku+2+vUofmaEu
-   nLVCLCAJY0myKmFVk5wHwkKLjVds2lymAYm9QkBLyNKskBVNO2ZUDw+Aq
+  t=1683819894; x=1715355894;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=UPzRdwh80F7gww+xL3tYd6eQrJ5u7CiNTO8sjTFxYz8=;
+  b=WwchiOZ/dPsMt2jhO+sAHKVyBiqoiB1S6y2FLy5zaYjm7GHMyo1x+KWX
+   lkWVrPHVzps9wA7CqE0TjqvX4kQjk6LueoLU9OG7IXDsePqZ8DoW90YIa
+   W1JKW6RLxtg5Vb3QQYp6eJVCYjyYJQbNYxjjtx241yO+lUPVfNpRvZR7G
+   Kvl2E2ig94Cqo22eguPO4MY4sN88G8NMIdwtN56nUV8UbsiOKqNd5s9Rb
+   4uLWY8mRzKVfSQiinGhHaLmZHlTbTaO3F5ZkO5of73okCKhVy+5fgKRse
+   5qeVKHE6MgAITsZnqCzIca8pnvBS7AUUDdKXo9sN2cZ9fXNSnqClW6A87
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10707"; a="335025529"
+X-IronPort-AV: E=McAfee;i="6600,9927,10707"; a="335046640"
 X-IronPort-AV: E=Sophos;i="5.99,266,1677571200"; 
-   d="scan'208";a="335025529"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2023 07:51:21 -0700
+   d="scan'208";a="335046640"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2023 08:44:49 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10707"; a="769355198"
+X-IronPort-AV: E=McAfee;i="6600,9927,10707"; a="699776218"
 X-IronPort-AV: E=Sophos;i="5.99,266,1677571200"; 
-   d="scan'208";a="769355198"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga004.fm.intel.com with ESMTP; 11 May 2023 07:51:21 -0700
-From:   Yi Liu <yi.l.liu@intel.com>
-To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
-        kevin.tian@intel.com, robin.murphy@arm.com,
-        baolu.lu@linux.intel.com
-Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
-        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        zhenzhong.duan@intel.com
-Subject: [PATCH v3 10/10] iommu/vt-d: Disallow nesting on domains with read-only mappings
-Date:   Thu, 11 May 2023 07:51:10 -0700
-Message-Id: <20230511145110.27707-11-yi.l.liu@intel.com>
+   d="scan'208";a="699776218"
+Received: from rchatre-ws.ostc.intel.com ([10.54.69.144])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2023 08:44:48 -0700
+From:   Reinette Chatre <reinette.chatre@intel.com>
+To:     jgg@nvidia.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        alex.williamson@redhat.com
+Cc:     tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
+        dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
+        fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
+        reinette.chatre@intel.com, linux-kernel@vger.kernel.org
+Subject: [PATCH V5 00/11] vfio/pci: Support dynamic allocation of MSI-X interrupts
+Date:   Thu, 11 May 2023 08:44:27 -0700
+Message-Id: <cover.1683740667.git.reinette.chatre@intel.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230511145110.27707-1-yi.l.liu@intel.com>
-References: <20230511145110.27707-1-yi.l.liu@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -68,169 +62,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lu Baolu <baolu.lu@linux.intel.com>
+Changes since V4:
+- V4: https://lore.kernel.org/lkml/cover.1682615447.git.reinette.chatre@intel.com/
+- Add Kevin's Reviewed-by tag as applicable.
+- Treat non-existing INTx interrupt context as kernel bug with WARN. This
+  exposed an issue in the scenario where INTx mask/unmask may occur without
+  INTx enabled. This is fixed by obtaining the interrupt context later
+  (right before use) within impacted functions: vfio_pci_intx_mask() and
+  vfio_pci_intx_unmask_handler(). (Kevin)
+- Treat pci_irq_vector() returning '0' for a MSI/MSI-X interrupt as a kernel
+  bug via a WARN instead of ignoring this value. (Kevin)
+- Improve accuracy of comments. (Kevin)
+- Please refer to individual patches for local changes.
 
-When remapping hardware is configured by system software in scalable mode
-as Nested (PGTT=011b) and with PWSNP field Set in the PASID-table-entry,
-it may Set Accessed bit and Dirty bit (and Extended Access bit if enabled)
-in first-stage page-table entries even when second-stage mappings indicate
-that corresponding first-stage page-table is Read-Only.
+Changes since V3:
+- V3: https://lore.kernel.org/lkml/cover.1681837892.git.reinette.chatre@intel.com/
+- Be considerate about layout and size with changes to
+  struct vfio_pci_core_device. Keep flags together and transition all to
+  use bitfields. (Alex and Jason)
+- Do not free dynamically allocated interrupts on error path. (Alex)
+- Please refer to individual patches for localized changes.
 
-As the result, contents of pages designated by VMM as Read-Only can be
-modified by IOMMU via PML5E (PML4E for 4-level tables) access as part of
-address translation process due to DMAs issued by Guest.
+Changes since V2:
+- V2: https://lore.kernel.org/lkml/cover.1680038771.git.reinette.chatre@intel.com/
+- During testing of V2 "kernel test robot" reported issues resulting from
+  include/linux/pci.h missing a stub for pci_msix_can_alloc_dyn() when
+  CONFIG_PCI_MSI=n. A separate fix was sent to address this. The fix can
+  be found in the kernel (since v6.3-rc7) as
+  commit 195d8e5da3ac ("PCI/MSI: Provide missing stub for pci_msix_can_alloc_dyn()")
+- Biggest change is the transition to "active contexts" for both MSI and MSI-X.
+  Interrupt contexts have always been allocated when the interrupts are
+  allocated while they are only used while interrupts are
+  enabled. In this series interrupt contexts are made dynamic, while doing
+  so their allocation is moved to match how they are used: allocated when
+  interrupts are enabled. Whether a Linux interrupt number exists determines
+  whether an interrupt can be enabled.
+  Previous policy (up to V2) that an allocated interrupt has an interrupt
+  context no longer applies. Instead, an interrupt context has a
+  handler/trigger, aka "active contexts". (Alex)
+- Re-ordered patches in support of "active contexts".
+- Only free interrupts on MSI-X teardown and otherwise use the
+  allocated interrupts as a cache. (Alex)
+- Using unsigned int for the vector broke the unwind loop within
+  vfio_msi_set_block(). (Alex)
+- Introduce new "has_dyn_msix" property of virtual device instead of
+  querying support every time. (Alex)
+- Some smaller changes, please refer to individual patches.
 
-Disallow the nested translation when there are read-only pages in the
-corresponding second-stage mappings. And, no read-only pages are allowed
-to be configured in the second-stage table of a nested translation.
-For the latter, an alternative is to disallow read-only mappings in
-any stage-2 domain as long as it's ever been used as a parent. In this
-way, we can simply replace the user counter with a flag.
+Changes since RFC V1:
+- RFC V1: https://lore.kernel.org/lkml/cover.1678911529.git.reinette.chatre@intel.com/
+- Improved changelogs.
+- Simplify interface so that vfio_irq_ctx_alloc_single() returns pointer to
+  allocated context. (Alex)
+- Remove vfio_irq_ctx_range_allocated() and associated attempts to maintain
+  invalid error path behavior. (Alex and Kevin)
+- Add pointer to interrupt context as function parameter to
+  vfio_irq_ctx_free(). (Alex)
+- Ensure variables are initialized. (Dan Carpenter)
+- Only support dynamic allocation if device supports it. (Alex)
 
-In concept if the user understands this errata and does expect to
-enable nested translation it should never install any RO mapping
-in stage-2 in the entire VM life cycle."
+Qemu allocates interrupts incrementally at the time the guest unmasks an
+interrupt, for example each time a Linux guest runs request_irq().
 
-Reference from Sapphire Rapids Specification Update [1], errata details,
-SPR17.
+Dynamic allocation of MSI-X interrupts was not possible until v6.2 [1].
+This prompted Qemu to, when allocating a new interrupt, first release all
+previously allocated interrupts (including disable of MSI-X) followed
+by re-allocation of all interrupts that includes the new interrupt.
+Please see [2] for a detailed discussion about this issue.
 
-[1] https://www.intel.com/content/www/us/en/content-details/772415/content-details.html
+Releasing and re-allocating interrupts may be acceptable if all
+interrupts are unmasked during device initialization. If unmasking of
+interrupts occur during runtime this may result in lost interrupts.
+For example, consider an accelerator device with multiple work queues,
+each work queue having a dedicated interrupt. A work queue can be
+enabled at any time with its associated interrupt unmasked while other
+work queues are already active. Having all interrupts released and MSI-X
+disabled to enable the new work queue will impact active work queues.
 
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/iommu/intel/iommu.c  | 13 +++++++++++++
- drivers/iommu/intel/iommu.h  |  4 ++++
- drivers/iommu/intel/nested.c | 22 ++++++++++++++++++++--
- include/uapi/linux/iommufd.h | 12 +++++++++++-
- 4 files changed, 48 insertions(+), 3 deletions(-)
+This series builds on the recent interrupt sub-system core changes
+that added support for dynamic MSI-X allocation after initial MSI-X
+enabling.
 
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index 20d4ae1cb8a6..42288bd449a0 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -2150,6 +2150,7 @@ __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
- 	struct dma_pte *first_pte = NULL, *pte = NULL;
- 	unsigned int largepage_lvl = 0;
- 	unsigned long lvl_pages = 0;
-+	unsigned long flags;
- 	phys_addr_t pteval;
- 	u64 attr;
- 
-@@ -2159,6 +2160,17 @@ __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
- 	if ((prot & (DMA_PTE_READ|DMA_PTE_WRITE)) == 0)
- 		return -EINVAL;
- 
-+	if (!(prot & DMA_PTE_WRITE) && !domain->read_only_mapped) {
-+		spin_lock_irqsave(&domain->lock, flags);
-+		if (domain->nested_users > 0) {
-+			spin_unlock_irqrestore(&domain->lock, flags);
-+			return -EINVAL;
-+		}
-+
-+		domain->read_only_mapped = true;
-+		spin_unlock_irqrestore(&domain->lock, flags);
-+	}
-+
- 	attr = prot & (DMA_PTE_READ | DMA_PTE_WRITE | DMA_PTE_SNP);
- 	attr |= DMA_FL_PTE_PRESENT;
- 	if (domain->use_first_level) {
-@@ -4756,6 +4768,7 @@ static void *intel_iommu_hw_info(struct device *dev, u32 *length)
- 	if (!vtd)
- 		return ERR_PTR(-ENOMEM);
- 
-+	vtd->flags = IOMMU_HW_INFO_VTD_ERRATA_772415_SPR17;
- 	vtd->cap_reg = iommu->cap;
- 	vtd->ecap_reg = iommu->ecap;
- 	*length = sizeof(*vtd);
-diff --git a/drivers/iommu/intel/iommu.h b/drivers/iommu/intel/iommu.h
-index 581596d90c1b..95644c6815af 100644
---- a/drivers/iommu/intel/iommu.h
-+++ b/drivers/iommu/intel/iommu.h
-@@ -616,6 +616,10 @@ struct dmar_domain {
- 			int		agaw;
- 			/* maximum mapped address */
- 			u64		max_addr;
-+			/* domain has mappings with read-only permission */
-+			bool		read_only_mapped;
-+			/* user nested domain count */
-+			int		nested_users;
- 		};
- 
- 		/* Nested user domain */
-diff --git a/drivers/iommu/intel/nested.c b/drivers/iommu/intel/nested.c
-index d13fbcd3f5a6..9092ce28382c 100644
---- a/drivers/iommu/intel/nested.c
-+++ b/drivers/iommu/intel/nested.c
-@@ -61,7 +61,14 @@ static int intel_nested_attach_dev(struct iommu_domain *domain,
- 
- static void intel_nested_domain_free(struct iommu_domain *domain)
- {
--	kfree(to_dmar_domain(domain));
-+	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-+	struct dmar_domain *s2_domain = dmar_domain->s2_domain;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&s2_domain->lock, flags);
-+	s2_domain->nested_users--;
-+	spin_unlock_irqrestore(&s2_domain->lock, flags);
-+	kfree(dmar_domain);
- }
- 
- static void intel_nested_invalidate(struct device *dev,
-@@ -143,14 +150,25 @@ struct iommu_domain *intel_nested_domain_alloc(struct iommu_domain *s2_domain,
- 					       const union iommu_domain_user_data *user_data)
- {
- 	const struct iommu_hwpt_intel_vtd *vtd = (struct iommu_hwpt_intel_vtd *)user_data;
-+	struct dmar_domain *s2_dmar_domain = to_dmar_domain(s2_domain);
- 	struct dmar_domain *domain;
-+	unsigned long flags;
- 
- 	domain = kzalloc(sizeof(*domain), GFP_KERNEL_ACCOUNT);
- 	if (!domain)
- 		return NULL;
- 
-+	spin_lock_irqsave(&s2_dmar_domain->lock, flags);
-+	if (s2_dmar_domain->read_only_mapped) {
-+		spin_unlock_irqrestore(&s2_dmar_domain->lock, flags);
-+		kfree(domain);
-+		return NULL;
-+	}
-+	s2_dmar_domain->nested_users++;
-+	spin_unlock_irqrestore(&s2_dmar_domain->lock, flags);
-+
- 	domain->use_first_level = true;
--	domain->s2_domain = to_dmar_domain(s2_domain);
-+	domain->s2_domain = s2_dmar_domain;
- 	domain->s1_pgtbl = vtd->pgtbl_addr;
- 	domain->s1_cfg = *vtd;
- 	domain->domain.ops = &intel_nested_domain_ops;
-diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
-index b46270a4cf46..8626f36e0353 100644
---- a/include/uapi/linux/iommufd.h
-+++ b/include/uapi/linux/iommufd.h
-@@ -471,10 +471,20 @@ enum iommu_hw_info_type {
- 	IOMMU_HW_INFO_TYPE_INTEL_VTD,
- };
- 
-+/**
-+ * enum iommu_hw_info_vtd_flags - Flags for VT-d hw_info
-+ * @IOMMU_HW_INFO_VTD_ERRATA_772415_SPR17: If set, disallow nesting on domains
-+ *                                   with read-only mapping.
-+ *                                   https://www.intel.com/content/www/us/en/content-details/772415/content-details.html
-+ */
-+enum iommu_hw_info_vtd_flags {
-+	IOMMU_HW_INFO_VTD_ERRATA_772415_SPR17 = 1 << 0,
-+};
-+
- /**
-  * struct iommu_hw_info_vtd - Intel VT-d hardware information
-  *
-- * @flags: Must be 0
-+ * @flags: Combination of enum iommu_hw_info_vtd_flags
-  * @__reserved: Must be 0
-  *
-  * @cap_reg: Value of Intel VT-d capability register defined in VT-d spec
+Add support for dynamic MSI-X allocation to vfio-pci. A flag
+indicating lack of support for dynamic allocation already exist:
+VFIO_IRQ_INFO_NORESIZE and has always been set for MSI and MSI-X. With
+support for dynamic MSI-X the flag is cleared for MSI-X when supported,
+enabling Qemu to modify its behavior.
+
+Any feedback is appreciated
+
+Reinette
+
+[1] commit 34026364df8e ("PCI/MSI: Provide post-enable dynamic allocation interfaces for MSI-X")
+[2] https://lore.kernel.org/kvm/MWHPR11MB188603D0D809C1079F5817DC8C099@MWHPR11MB1886.namprd11.prod.outlook.com/#t
+
+Reinette Chatre (11):
+  vfio/pci: Consolidate irq cleanup on MSI/MSI-X disable
+  vfio/pci: Remove negative check on unsigned vector
+  vfio/pci: Prepare for dynamic interrupt context storage
+  vfio/pci: Move to single error path
+  vfio/pci: Use xarray for interrupt context storage
+  vfio/pci: Remove interrupt context counter
+  vfio/pci: Update stale comment
+  vfio/pci: Use bitfield for struct vfio_pci_core_device flags
+  vfio/pci: Probe and store ability to support dynamic MSI-X
+  vfio/pci: Support dynamic MSI-X
+  vfio/pci: Clear VFIO_IRQ_INFO_NORESIZE for MSI-X
+
+ drivers/vfio/pci/vfio_pci_core.c  |   8 +-
+ drivers/vfio/pci/vfio_pci_intrs.c | 305 ++++++++++++++++++++----------
+ include/linux/vfio_pci_core.h     |  26 +--
+ include/uapi/linux/vfio.h         |   3 +
+ 4 files changed, 229 insertions(+), 113 deletions(-)
+
+
+base-commit: 457391b0380335d5e9a5babdec90ac53928b23b4
 -- 
 2.34.1
 
