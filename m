@@ -2,126 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E60A6FF79E
-	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 18:40:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E806C6FF840
+	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 19:18:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238867AbjEKQkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 12:40:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54008 "EHLO
+        id S238768AbjEKRSn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 13:18:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238327AbjEKQkK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 12:40:10 -0400
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D0BF3A8C
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 09:40:08 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-3f42b984405so25045715e9.3
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 09:40:08 -0700 (PDT)
+        with ESMTP id S238936AbjEKRSd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 13:18:33 -0400
+Received: from mail-ua1-x931.google.com (mail-ua1-x931.google.com [IPv6:2607:f8b0:4864:20::931])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 571E786BD
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 10:18:24 -0700 (PDT)
+Received: by mail-ua1-x931.google.com with SMTP id a1e0cc1a2514c-77f693190caso2732716241.0
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 10:18:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1683823207; x=1686415207;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rWPj+0MEcU+bJjFDLtiKhJORofVGXZE+QDk7KaJWG9E=;
-        b=UuPFreN/sIyZvma3z9Xm6KxNZFcbh1TpDfsITGLUWBCWA6T4xHCFr5HuwlelWhANsc
-         GODLbDYWSkjxpw1FlGH7zBZhqQl+PBnoza0HREbOpZD4TA496u22UD6bDXXczi7KYVpl
-         vUHL3f5x4AXj97duCDa1dgEYjprlWsVyV+SBIS6xrVMPSwQcsV6kK8n5uf0FR6XnIuc4
-         bHtcnz/0qP1iI3PLzgpdryNpdPYlDZbySxQcLGTnHTgtAXoWs5v1mwmzllg9a6m64GLt
-         EJC3fIG+NQH/j+vTbDoa5wKLgeATWhDm4OwK78ppk49kTcq7mfR/nc2WNPwoATtQv89M
-         LAmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683823207; x=1686415207;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1683825503; x=1686417503;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rWPj+0MEcU+bJjFDLtiKhJORofVGXZE+QDk7KaJWG9E=;
-        b=XQqiVsveAAj/BnMSTp9PLGPdS7C8masG25HqZYTrRX54mqwxb5AJN//NIhF0fNtyjC
-         TAPo/s12jHuIx5hvWix7n42LtV8NwjpMfl7Boxizck0mQ72cyX1qkdS+A3WtxTXTlZsv
-         YjRg9AxCWf+F7wnZVMDPnz0NK2900y72S8nARhF9sUW3Dyvy71kFBs/kEK7rtJSDqquy
-         XLu65el6k2xqIMpsbmRaBA0F+4KuEdVVPPpKiY7Zx4pksF/N6cug9xWrdoW3FPlyy/Kz
-         skcwvfJXD7Q81m1okUiDPt3tn1ShUjqw+TirJJbGABUbME9iWEzl8Rw7V8zNZC9KcOOn
-         5j9g==
-X-Gm-Message-State: AC+VfDyaceHBM2rtDU9Y2R5R3qoqoM5fxku0B3Q7V8thKCVuoOZ7FpLF
-        70eNHsHS24GeWaERlIKB/D6OgQ==
-X-Google-Smtp-Source: ACHHUZ5lIBereKcBnZpJKQGjLGzbXt7Ys+TI95CPzIw7E6x8cqi52/zghFhzklOdZznlq63vKEcQWg==
-X-Received: by 2002:a1c:f20a:0:b0:3f1:819d:d050 with SMTP id s10-20020a1cf20a000000b003f1819dd050mr15055961wmc.37.1683823206802;
-        Thu, 11 May 2023 09:40:06 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id 12-20020a05600c020c00b003f4b6bcbd8bsm4941659wmi.31.2023.05.11.09.40.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 May 2023 09:40:06 -0700 (PDT)
-Date:   Thu, 11 May 2023 18:40:05 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Haibo Xu <haibo1.xu@intel.com>
-Cc:     xiaobo55x@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 1/2] riscv: kvm: Add KVM_GET_REG_LIST API support
-Message-ID: <20230511-d0a207eebb30fc88de875e4f@orel>
-References: <cover.1683791148.git.haibo1.xu@intel.com>
- <921fc2e1a91887170e277acb1b52df57480a5736.1683791148.git.haibo1.xu@intel.com>
+        bh=9g3QPSW366xmIBoE8HQa8vjGvWDy8pwzthEW0pwdt28=;
+        b=MipUL06ocXBu9FwukZ7DW2NA1NNmGyNqva3aZjTBC2oESbDvCcvVfylCT66cV7ezIB
+         uPV9b5xDBpZIoxSEiZ0Wdsg3gBTvXTrF+mGI03zCPmSJWYoozdYYGiA11wdrwZSlycz4
+         /i/2ycYyXxlhTDLPgPT8d7HeXqziet8Pk/HTK6fG+IrW3wE/ZFxtD5lLLvucOMfvHN4P
+         OnvYzhpFk0LeFtwrEh8aCwnzHSGk7OqTxlIg8cAjqZnLLCUjGfsRlf/Ter8CLOi5Az2k
+         JT4ihBgb0+2dcyW6LpjlZD2V7TlpzkZS+EuXMmwvlb9s+Y8SPJ+9CDw4OJCpsgKnu4wU
+         eYqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683825503; x=1686417503;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9g3QPSW366xmIBoE8HQa8vjGvWDy8pwzthEW0pwdt28=;
+        b=j9QKFyzAbyDg3sF62jdlLtbzPBJWm3UjnSll/04Lb3zBmScGxTDcOLmFAPlEjHr5hx
+         LhqUo86fb5UrH8Setq0DB/1ZTxoSK3R05ozzUPUkLje3wEImQ/q5GJzKnRyq3Gf9eLZf
+         X19VqkgatByPmcDNe7Rnm+2O2K57uJJGdCPXPJMTgZ+ej7N2AWt6RMDl5fFrN2XeJuAd
+         +hYV1SBTOjaYr7oxgomNVLm+oJojRmKxBKnwW+wXC3ysTkjw4hhsmgjeH1unYZUu7x+c
+         VNCgpkcQfEcU5dUlcw1fWHX3wVtGdxxM8WIGwRYExOXCgKfgzBKCGEv1XIbrKYVGPdmT
+         GEXw==
+X-Gm-Message-State: AC+VfDyUiR4t5Yt1ctJ+Vqt0gyLCgiQM+eJnt8F9zrW4d8FzyrISUsYL
+        NB1gxvrme7NADFt1B8SUvhs5ke5gXMVzPRlW8aiynQ==
+X-Google-Smtp-Source: ACHHUZ43+BQhWUSZulu6UjBHzIWdkmWmLNZmOzHgMSGV0VvNDJlrAeTewbS6qaqSQipZKGmlTn2mDi8c09VzxKLRTOE=
+X-Received: by 2002:a67:f047:0:b0:42c:761a:90ed with SMTP id
+ q7-20020a67f047000000b0042c761a90edmr8867617vsm.6.1683825503429; Thu, 11 May
+ 2023 10:18:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <921fc2e1a91887170e277acb1b52df57480a5736.1683791148.git.haibo1.xu@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <ZErahL/7DKimG+46@x1n> <CAF7b7mqaxk6w90+9+5UkEAE13vDTmBMmCO_ZdAEo6pD8_--fZA@mail.gmail.com>
+ <ZFLPlRReglM/Vgfu@x1n> <ZFLRpEV09lrpJqua@x1n> <ZFLVS+UvpG5w747u@google.com>
+ <ZFLyGDoXHQrN1CCD@x1n> <ZFQC5TZ9tVSvxFWt@x1n> <CAF7b7mrTGL8rLVCmsmX4dZinZHRFFB7R7kX0Wv9FZR-B-4xhhw@mail.gmail.com>
+ <ZFhO9dlaFQRwaPFa@x1n> <CAF7b7mqPdfbzj6cOWPsg+Owysc-SOTF+6UUymd9f0Mctag=8DQ@mail.gmail.com>
+ <ZFwRuCuYYMtuUFFA@x1n>
+In-Reply-To: <ZFwRuCuYYMtuUFFA@x1n>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 11 May 2023 10:17:56 -0700
+Message-ID: <CALzav=e29rRw4TTRGpTkazgJpU1zPML3zQGoyeHj9Zbkq+yAdQ@mail.gmail.com>
+Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
+ migration via annotated memory faults.
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Anish Moorthy <amoorthy@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Nadav Amit <nadav.amit@gmail.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
+        oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
+        bgardon@google.com, ricarkol@google.com, kvm <kvm@vger.kernel.org>,
+        kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 11, 2023 at 05:22:48PM +0800, Haibo Xu wrote:
-> KVM_GET_REG_LIST API will return all registers that are available to
-> KVM_GET/SET_ONE_REG APIs. It's very useful to identify some platform
-> regression issue during VM migration.
-> 
-> Since this API was already supported on arm64, it'd be straightforward
-> to enable it on riscv with similar code structure.
-> 
-> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> ---
->  Documentation/virt/kvm/api.rst |   2 +-
->  arch/riscv/kvm/vcpu.c          | 346 +++++++++++++++++++++++++++++++++
->  2 files changed, 347 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index add067793b90..280e89abd004 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -3499,7 +3499,7 @@ VCPU matching underlying host.
->  ---------------------
->  
->  :Capability: basic
-> -:Architectures: arm64, mips
-> +:Architectures: arm64, mips, riscv
->  :Type: vcpu ioctl
->  :Parameters: struct kvm_reg_list (in/out)
->  :Returns: 0 on success; -1 on error
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 8bd9f2a8a0b9..fb8834e4fa15 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -657,6 +657,334 @@ static int kvm_riscv_vcpu_set_reg_isa_ext(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> +static inline unsigned long num_config_regs(void)
-> +{
-> +	return sizeof(struct kvm_riscv_config) / sizeof(unsigned long);
+On Wed, May 10, 2023 at 2:50=E2=80=AFPM Peter Xu <peterx@redhat.com> wrote:
+> On Tue, May 09, 2023 at 01:52:05PM -0700, Anish Moorthy wrote:
+> > On Sun, May 7, 2023 at 6:23=E2=80=AFPM Peter Xu <peterx@redhat.com> wro=
+te:
+>
+> What I wanted to do is to understand whether there's still chance to
+> provide a generic solution.  I don't know why you have had a bunch of pmu
+> stack showing in the graph, perhaps you forgot to disable some of the per=
+f
+> events when doing the test?  Let me know if you figure out why it happene=
+d
+> like that (so far I didn't see), but I feel guilty to keep overloading yo=
+u
+> with such questions.
+>
+> The major problem I had with this series is it's definitely not a clean
+> approach.  Say, even if you'll all rely on userapp you'll still need to
+> rely on userfaultfd for kernel traps on corner cases or it just won't wor=
+k.
+> IIUC that's also the concern from Nadav.
 
-We can't assume all config registers are present. For example,
-zicbom and zicboz block size registers are only present when their
-respective extensions are available.
+This is a long thread, so apologies if the following has already been discu=
+ssed.
 
-Thanks,
-drew
+Would per-tid userfaultfd support be a generic solution? i.e. Allow
+userspace to create a userfaultfd that is tied to a specific task. Any
+userfaults encountered by that task use that fd, rather than the
+process-wide fd. I'm making the assumption here that each of these fds
+would have independent signaling mechanisms/queues and so this would
+solve the scaling problem.
+
+A VMM could use this to create 1 userfaultfd per vCPU and 1 thread per
+vCPU for handling userfault requests. This seems like it'd have
+roughly the same scalability characteristics as the KVM -EFAULT
+approach.
