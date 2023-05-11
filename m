@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DF3A6FF653
-	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 17:46:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 678C46FF65C
+	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 17:46:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238772AbjEKPpQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 11:45:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36304 "EHLO
+        id S238848AbjEKPpR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 11:45:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238811AbjEKPpD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 11:45:03 -0400
+        with ESMTP id S238807AbjEKPpC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 11:45:02 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D431B5B93;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CABA459E6;
         Thu, 11 May 2023 08:45:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1683819901; x=1715355901;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+C6B7H7ve/lwfgUWQi6R33paNDdITx62G7bxEy6HEqA=;
-  b=IwGfVQLezTasKcUFeB3X6ofNyhWDMwl7Mwen1aTIBDAPI03VfL8Zn3ps
-   nRPOfVCwfLPGwERnZhqjwNDEEJHrcSLMQNxpM1Xdzox6aZsMMzCsI4iDY
-   zbmQ/FGtxY1dgsUWJUtjXEmCmYKDch/4lOgSjxErDosLDv/BHuam2hddV
-   kON5Bwlnq6TffAohBBdLd2uj4Jse2Lk3q/JJPvZ3j3jO62bIvwigwcrdx
-   cz9TE0O9NfVC32Gd8pqxEhpYYfGHpvk6CGjeMHvT3JCjhboUL2hBDGAYU
-   htDyA7SSsBErJeDyIO8yxnaPT5cEnJF3NLpNUVYj1WKPRJydHQtBeSxbn
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10707"; a="335046681"
+  bh=8QfQokLJef1Q3tFm7nj3VQwR9R1wsoZXkMCX5UZhwws=;
+  b=BPNojPFC3PGuF7jA9DOxYrp/IK0Im2Yc7OlGDSoE8pXAj5cr6Q+j/7Ak
+   Xfezzqdb5jBnbjDMJuC3C5pM1lXk1mtXPeBdJhBoMXBCcbZPpy/ROkyFg
+   ruaCJYS4utdagSZg2zMQZeV6agfUMHoG8hd3l4ejiuqditARbQ6lArfWL
+   EXHCHALL+D9+c7vNUumzfxuTIyGDbsCcIm/N6HdEs1HYbS7lQe/UHwXh0
+   r5Ia3PcxiZr1ID5QNQQAqF8mw3+5I+BdhURa00JulqXHrCqQ6Shdkr0Ch
+   /TMHDDyujC/KrCCEFpdFSA4AqYRioowUmRmoq2n59K5uuJqENAMpXG97W
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10707"; a="335046685"
 X-IronPort-AV: E=Sophos;i="5.99,266,1677571200"; 
-   d="scan'208";a="335046681"
+   d="scan'208";a="335046685"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2023 08:44:50 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10707"; a="699776239"
+X-IronPort-AV: E=McAfee;i="6600,9927,10707"; a="699776242"
 X-IronPort-AV: E=Sophos;i="5.99,266,1677571200"; 
-   d="scan'208";a="699776239"
+   d="scan'208";a="699776242"
 Received: from rchatre-ws.ostc.intel.com ([10.54.69.144])
   by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2023 08:44:48 -0700
 From:   Reinette Chatre <reinette.chatre@intel.com>
@@ -46,9 +46,9 @@ Cc:     tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
         dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
         fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
         reinette.chatre@intel.com, linux-kernel@vger.kernel.org
-Subject: [PATCH V5 07/11] vfio/pci: Update stale comment
-Date:   Thu, 11 May 2023 08:44:34 -0700
-Message-Id: <5b605ce7dcdab5a5dfef19cec4d73ae2fdad3ae1.1683740667.git.reinette.chatre@intel.com>
+Subject: [PATCH V5 08/11] vfio/pci: Use bitfield for struct vfio_pci_core_device flags
+Date:   Thu, 11 May 2023 08:44:35 -0700
+Message-Id: <cf34bf0499c889554a8105eeb18cc0ab673005be.1683740667.git.reinette.chatre@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1683740667.git.reinette.chatre@intel.com>
 References: <cover.1683740667.git.reinette.chatre@intel.com>
@@ -64,47 +64,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In preparation for surrounding code change it is helpful to
-ensure that existing comments are accurate.
+struct vfio_pci_core_device contains eleven boolean flags.
+Boolean flags clearly indicate their usage but space usage
+starts to be a concern when there are many.
 
-Remove inaccurate comment about direct access and update
-the rest of the comment to reflect the purpose of writing
-the cached MSI message to the device.
+An upcoming change adds another boolean flag to
+struct vfio_pci_core_device, thereby increasing the concern
+that the boolean flags are consuming unnecessary space.
 
-Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-Link: https://lore.kernel.org/lkml/20230330164050.0069e2a5.alex.williamson@redhat.com/
+Transition the boolean flags to use bitfields. On a system that
+uses one byte per boolean this reduces the space consumed
+by existing flags from 11 bytes to 2 bytes with room for
+a few more flags without increasing the structure's size.
+
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 ---
 Changes since V4:
-- Restore text about backdoor reset as example to indicate that
-  the restore may not be a severe problem but instead done in
-  collaboration with user space. (Kevin)
+- Add Kevin's Reviewed-by tag. (Kevin)
 
-Changes since V2:
-- New patch.
+Changes since V3:
+- New patch. (Jason)
 
- drivers/vfio/pci/vfio_pci_intrs.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ include/linux/vfio_pci_core.h | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index e40eca69a293..867327e159c1 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -428,11 +428,9 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
- 	}
- 
- 	/*
--	 * The MSIx vector table resides in device memory which may be cleared
--	 * via backdoor resets. We don't allow direct access to the vector
--	 * table so even if a userspace driver attempts to save/restore around
--	 * such a reset it would be unsuccessful. To avoid this, restore the
--	 * cached value of the message prior to enabling.
-+	 * If the vector was previously allocated, refresh the on-device
-+	 * message data before enabling in case it had been cleared or
-+	 * corrupted (e.g. due to backdoor resets) since writing.
- 	 */
- 	cmd = vfio_pci_memory_lock_and_enable(vdev);
- 	if (msix) {
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+index 148fd1ae6c1c..adb47e2914d7 100644
+--- a/include/linux/vfio_pci_core.h
++++ b/include/linux/vfio_pci_core.h
+@@ -68,17 +68,17 @@ struct vfio_pci_core_device {
+ 	u16			msix_size;
+ 	u32			msix_offset;
+ 	u32			rbar[7];
+-	bool			pci_2_3;
+-	bool			virq_disabled;
+-	bool			reset_works;
+-	bool			extended_caps;
+-	bool			bardirty;
+-	bool			has_vga;
+-	bool			needs_reset;
+-	bool			nointx;
+-	bool			needs_pm_restore;
+-	bool			pm_intx_masked;
+-	bool			pm_runtime_engaged;
++	bool			pci_2_3:1;
++	bool			virq_disabled:1;
++	bool			reset_works:1;
++	bool			extended_caps:1;
++	bool			bardirty:1;
++	bool			has_vga:1;
++	bool			needs_reset:1;
++	bool			nointx:1;
++	bool			needs_pm_restore:1;
++	bool			pm_intx_masked:1;
++	bool			pm_runtime_engaged:1;
+ 	struct pci_saved_state	*pci_saved_state;
+ 	struct pci_saved_state	*pm_save;
+ 	int			ioeventfds_nr;
 -- 
 2.34.1
 
