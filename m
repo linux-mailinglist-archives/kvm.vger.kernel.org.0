@@ -2,161 +2,284 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75E866FEDDC
-	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 10:34:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E32B26FEE90
+	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 11:20:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234840AbjEKIeX convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 11 May 2023 04:34:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46374 "EHLO
+        id S237680AbjEKJTu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 05:19:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjEKIeV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 04:34:21 -0400
-Received: from senda.mailex.chinaunicom.cn (senda.mailex.chinaunicom.cn [123.138.59.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4957430D8
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 01:34:08 -0700 (PDT)
-Received: from M10-XA-MLCEN02.MailSrv.cnc.intra (unknown [10.236.3.198])
-        by senda.mailex.chinaunicom.cn (SkyGuard) with ESMTPS id 4QH4xf4F5Fz3F4Hp
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 16:36:38 +0800 (CST)
-Received: from smtpbg.qq.com (10.237.2.99) by M10-XA-MLCEN02.MailSrv.cnc.intra
- (10.236.3.198) with Microsoft SMTP Server id 15.0.1497.47; Thu, 11 May 2023
- 16:33:58 +0800
-X-QQ-mid: Ymail-xx24b003-t1683794036tk8
-Received: from localhost.localdomain (unknown [10.3.224.193])
-        by smtp.qq.com (ESMTP) with 
-        id ; Thu, 11 May 2023 16:33:55 +0800 (CST)
-X-QQ-SSF: 0190000000000060I630050A0000000
-X-QQ-GoodBg: 0
-From:   =?gb18030?B?yM7D9MP0KMGqzai8r83FwarNqMr919a/xry809A=?=
-         =?gb18030?B?z965q8u+sb6yvyk=?= <renmm6@chinaunicom.cn>
-To:     =?gb18030?B?a3Zt?= <kvm@vger.kernel.org>
-CC:     =?gb18030?B?cGJvbnppbmk=?= <pbonzini@redhat.com>,
-        =?gb18030?B?YW5kcmV3LmpvbmVz?= <andrew.jones@linux.dev>
-Subject: [kvm-unit-tests PATCH] run_tests: add list tests name option on command line
-Date:   Thu, 11 May 2023 16:33:29 +0800
-Message-ID: <20230511083329.3432954-1-renmm6@chinaunicom.cn>
-X-Mailer: git-send-email 2.33.0
+        with ESMTP id S237513AbjEKJTV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 05:19:21 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D15E07EF4;
+        Thu, 11 May 2023 02:18:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1683796717; x=1715332717;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=izGf/Vn8cCPgVluQqzhpqULCCQz7JRVql9Rar4he6Vc=;
+  b=gyDEXZGM8AKXPMdIIne8wjN0eC5GF4b+QSC3zyAmgmReGhheetCXHRMK
+   u37FTty7DzZHRh6PMk+yvaQZMMEOTdyQF27hGXPGyK6CBOpYVJl6DWEQq
+   GllqOsixhvusDOSlopjsIhfH8TszUNgh2qBQeLik986Kl201IxI33BlJm
+   wpTJfEwUt8scIFvzKMJ6bxN+KX0grF01r7rgEbq8X4SB1o+PQxomagwKX
+   r721ASgx8Qu6JAdW0rZESVeiu6UqVrXrXUKFkxG1erAA+PV3b+xbqIdwf
+   3ILSjNRrwIVpFwayR9fIhoE7zGsmFOZhAnnM8Pi9EUSOhI25XDRSbGvyy
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10706"; a="330070872"
+X-IronPort-AV: E=Sophos;i="5.99,266,1677571200"; 
+   d="scan'208";a="330070872"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2023 02:18:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10706"; a="699650061"
+X-IronPort-AV: E=Sophos;i="5.99,266,1677571200"; 
+   d="scan'208";a="699650061"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.8.90]) ([10.238.8.90])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2023 02:18:33 -0700
+Message-ID: <a2ef5302-d27d-945e-3c67-0bc9855fc4a6@linux.intel.com>
+Date:   Thu, 11 May 2023 17:18:31 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-X-QQ-SENDSIZE: 520
-Feedback-ID: Ymail-xx:chinaunicom.cn:mail-xx:mail-xx24b003-zhyw47w
-Content-Type: text/plain
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [PATCH v8 4/6] KVM: x86: Introduce untag_addr() in kvm_x86_ops
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        seanjc@google.com, pbonzini@redhat.com, kai.huang@intel.com,
+        robert.hu@linux.intel.com
+References: <20230510060611.12950-1-binbin.wu@linux.intel.com>
+ <20230510060611.12950-5-binbin.wu@linux.intel.com>
+ <ZFyFPOo2Fp+yVU2n@chao-email>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ZFyFPOo2Fp+yVU2n@chao-email>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: rminmin <renmm6@chinaunicom.cn>
 
-Add '-l | --list' option on command line to output
-all tests name only, and cloud be filtered by group
-with '-g | --group' option.
 
-E.g.
-  List all vmx group tests name:
-  $ ./run_tests.sh -g vmx -l
+On 5/11/2023 2:03 PM, Chao Gao wrote:
+> On Wed, May 10, 2023 at 02:06:09PM +0800, Binbin Wu wrote:
+>> Introduce a new optional interface untag_addr() to kvm_x86_ops to untag
+>> the metadata from linear address. Implement LAM version in VMX.
+>>
+>> When enabled feature like Intel Linear Address Masking or AMD Upper
+>> Address Ignore, linear address may be tagged with metadata. Linear
+>> address should be checked for modified canonicality and untagged in
+>> instruction emulations or VMExit handlers if LAM or UAI is applicable.
+>>
+>> Introduce untag_addr() to kvm_x86_ops to hide the vendor specific code.
+>> Pass the 'flags' to avoid distinguishing processor vendor in common emulator
+>> path for the cases whose untag policies are different in the future.
+>>
+>
+>> For VMX, LAM version is implemented.
+>> LAM has a modified canonical check when applicable:
+>> * LAM_S48                : [ 1 ][ metadata ][ 1 ]
+>>                              63               47
+>> * LAM_U48                : [ 0 ][ metadata ][ 0 ]
+>>                              63               47
+>> * LAM_S57                : [ 1 ][ metadata ][ 1 ]
+>>                              63               56
+>> * LAM_U57 + 5-lvl paging : [ 0 ][ metadata ][ 0 ]
+>>                              63               56
+>> * LAM_U57 + 4-lvl paging : [ 0 ][ metadata ][ 0...0 ]
+>>                              63               56..47
+>> LAM identification of an address as user or supervisor is based solely on
+>> the value of pointer bit 63.
+>> If LAM is applicable to certain address, untag the metadata bits by
+>> sign-extending the value of bit 47 (LAM48) or bit 56 (LAM57). Later
+>> the untagged address will do legacy canonical check. So that LAM canonical
+>> check and mask can be covered by "untag + legacy canonical check".
+> Do you think it is better to remove such details from the changelog and
+> instead document them in comments e.g.,
+>
+>> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+>> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
+>> ---
+>> arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>> arch/x86/include/asm/kvm_host.h    |  2 ++
+>> arch/x86/kvm/kvm_emulate.h         |  1 +
+>> arch/x86/kvm/vmx/vmx.c             | 50 ++++++++++++++++++++++++++++++
+>> arch/x86/kvm/vmx/vmx.h             |  2 ++
+>> 5 files changed, 56 insertions(+)
+>>
+>> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+>> index 13bc212cd4bc..c0cebe671d41 100644
+>> --- a/arch/x86/include/asm/kvm-x86-ops.h
+>> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+>> @@ -52,6 +52,7 @@ KVM_X86_OP(cache_reg)
+>> KVM_X86_OP(get_rflags)
+>> KVM_X86_OP(set_rflags)
+>> KVM_X86_OP(get_if_flag)
+>> +KVM_X86_OP_OPTIONAL(untag_addr)
+>> KVM_X86_OP(flush_tlb_all)
+>> KVM_X86_OP(flush_tlb_current)
+>> KVM_X86_OP_OPTIONAL(flush_remote_tlbs)
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index 46471dd9cc1b..bfccc0e19bf2 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -1588,6 +1588,8 @@ struct kvm_x86_ops {
+>> 	void (*set_rflags)(struct kvm_vcpu *vcpu, unsigned long rflags);
+>> 	bool (*get_if_flag)(struct kvm_vcpu *vcpu);
+>>
+>> +	void (*untag_addr)(struct kvm_vcpu *vcpu, u64 *la, u32 flags);
+>> +
+>> 	void (*flush_tlb_all)(struct kvm_vcpu *vcpu);
+>> 	void (*flush_tlb_current)(struct kvm_vcpu *vcpu);
+>> 	int  (*flush_remote_tlbs)(struct kvm *kvm);
+>> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+>> index 5b9ec610b2cb..c2091e24a6b9 100644
+>> --- a/arch/x86/kvm/kvm_emulate.h
+>> +++ b/arch/x86/kvm/kvm_emulate.h
+>> @@ -91,6 +91,7 @@ struct x86_instruction_info {
+>> /* x86-specific emulation flags */
+>> #define X86EMUL_F_FETCH			BIT(0)
+>> #define X86EMUL_F_WRITE			BIT(1)
+>> +#define X86EMUL_F_SKIPLAM		BIT(2)
+>>
+>> struct x86_emulate_ops {
+>> 	void (*vm_bugged)(struct x86_emulate_ctxt *ctxt);
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 9c80048ca30c..b52e44758a4e 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -8134,6 +8134,54 @@ static void vmx_vm_destroy(struct kvm *kvm)
+>> 	free_pages((unsigned long)kvm_vmx->pid_table, vmx_get_pid_table_order(kvm));
+>> }
+>>
+>> +#define LAM_S57_EN_MASK (X86_CR4_LAM_SUP | X86_CR4_LA57)
+>> +static int lam_sign_extend_bit(struct kvm_vcpu *vcpu, bool user)
+> we can let this function take an address ...
+>
+>> +{
+>> +	u64 cr3, cr4;
+>> +
+> then it is natural to add the comment -- "LAM identification ...", like
+>
+> 	/*
+> 	 * The LAM identification of a pointer as user or supervisor is
+> 	 * based solely on the value of pointer bit 63.
+> 	 */
+> 	if (!(addr >> 63)) {
+OK.
 
-  List all tests name:
-  $ ./run_tests.sh -l
+>
+>> +	if (user) {
+>> +		cr3 = kvm_read_cr3(vcpu);
+>> +		if (cr3 & X86_CR3_LAM_U57)
+>> +			return 56;
+>> +		if (cr3 & X86_CR3_LAM_U48)
+>> +			return 47;
+>> +	} else {
+>> +		cr4 = kvm_read_cr4_bits(vcpu, LAM_S57_EN_MASK);
+>> +		if (cr4 == LAM_S57_EN_MASK)
+>> +			return 56;
+>> +		if (cr4 & X86_CR4_LAM_SUP)
+>> +			return 47;
+>> +	}
+>> +	return -1;
+>> +}
+>> +
+>> +/*
+>> + * Only called in 64-bit mode.
+>> + *
+>> + * Metadata bits are [62:48] in LAM48 and [62:57] in LAM57. Mask metadata in
+>> + * pointers by sign-extending the value of bit 47 (LAM48) or 56 (LAM57).
+>> + * The resulting address after untagging isn't guaranteed to be canonical.
+>> + * Callers should perform the original canonical check and raise #GP/#SS if the
+>> + * address is non-canonical.
+> To document the difference between KVM's emulation of LAM and real hardware
+> behavior:
+>
+>     *
+>     * Note that KVM masks the metadata in addresses, performs the (original)
+>     * canonicality checking and then walks page table. This is slightly
+>     * different from hardware behavior but achieves the same effect.
+>     * Specifically, if LAM is enabled, the processor performs a modified
+>     * canonicality checking where the metadata are ignored instead of
+>     * masked. After the modified canonicality checking, the processor masks
+>     * the metadata before passing addresses for paging translation.
+>     */
+OK.
 
-Signed-off-by: rminmin <renmm6@chinaunicom.cn>
----
- run_tests.sh        | 14 ++++++++++++--
- scripts/common.bash | 24 ++++++++++++++++++++++++
- 2 files changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/run_tests.sh b/run_tests.sh
-index f61e005..a95c2bc 100755
---- a/run_tests.sh
-+++ b/run_tests.sh
-@@ -15,7 +15,7 @@ function usage()
- {
- cat <<EOF
+>
+>> + */
+>> +void vmx_untag_addr(struct kvm_vcpu *vcpu, u64 *la, u32 flags)
+> 						  ^
+> 					nit: "gla" or "gva" is slightly better.
+> 					It may be hard to immediately
+> 					connect "la" with "linear address".
+>
+> 					or even better, use "gva_t gva"?
+Will update it to use "gva_t gva", thanks.
 
--Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t]
-+Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t] [-l]
+>> +{
+>> +	int sign_ext_bit;
+>> +
+>> +	/*
+>> +	 * Check LAM_U48 in cr3_ctrl_bits to avoid guest_cpuid_has().
+>> +	 * If not set, vCPU doesn't supports LAM.
+>> +	 */
+>> +	if (!(vcpu->arch.cr3_ctrl_bits & X86_CR3_LAM_U48) ||
+>> +	    (flags & X86EMUL_F_SKIPLAM) || WARN_ON_ONCE(!is_64_bit_mode(vcpu)))
+>> +		return;
+>> +
+>> +	sign_ext_bit = lam_sign_extend_bit(vcpu, !(*la >> 63));
+>> +	if (sign_ext_bit > 0)
+>> +		*la = (sign_extend64(*la, sign_ext_bit) & ~BIT_ULL(63)) |
+>> +		       (*la & BIT_ULL(63));
+> nit: curly braces are needed.
+Even if it's only one statement (although splited to two lines), curly 
+braces are needed?
 
-     -h, --help      Output this help text
-     -v, --verbose   Enables verbose mode
-@@ -24,6 +24,7 @@ Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t]
-     -g, --group     Only execute tests in the given group
-     -j, --parallel  Execute tests in parallel
-     -t, --tap13     Output test results in TAP format
-+    -l, --list      Only output all tests list
+>
+> Overall the patch looks good to me, so
+>
+> Reviewed-by: Chao Gao <chao.gao@intel.com>
+>
+> (regardless of whether you choose to make the suggested changes to the
+> changelog/comments)
+>
+>> +}
+>> +
+>> static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>> 	.name = KBUILD_MODNAME,
+>>
+>> @@ -8182,6 +8230,8 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>> 	.set_rflags = vmx_set_rflags,
+>> 	.get_if_flag = vmx_get_if_flag,
+>>
+>> +	.untag_addr = vmx_untag_addr,
+>> +
+>> 	.flush_tlb_all = vmx_flush_tlb_all,
+>> 	.flush_tlb_current = vmx_flush_tlb_current,
+>> 	.flush_tlb_gva = vmx_flush_tlb_gva,
+>> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+>> index 9e66531861cf..e1e6d2e03b61 100644
+>> --- a/arch/x86/kvm/vmx/vmx.h
+>> +++ b/arch/x86/kvm/vmx/vmx.h
+>> @@ -433,6 +433,8 @@ void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type);
+>> u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu);
+>> u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
+>>
+>> +void vmx_untag_addr(struct kvm_vcpu *vcpu, u64 *la, u32 flags);
+>> +
+>> static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr,
+>> 					     int type, bool value)
+>> {
+>> -- 
+>> 2.25.1
+>>
 
- Set the environment variable QEMU=/path/to/qemu-system-ARCH to
- specify the appropriate qemu binary for ARCH-run.
-@@ -42,7 +43,8 @@ if [ $? -ne 4 ]; then
- fi
-
- only_tests=""
--args=$(getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $*)
-+list_tests=""
-+args=$(getopt -u -o ag:htj:v:l -l all,group:,help,tap13,parallel:,verbose:,list -- $*)
- [ $? -ne 0 ] && exit 2;
- set -- $args;
- while [ $# -gt 0 ]; do
-@@ -73,6 +75,9 @@ while [ $# -gt 0 ]; do
-         -t | --tap13)
-             tap_output="yes"
-             ;;
-+       -l | --list)
-+           list_tests="yes"
-+           ;;
-         --)
-             ;;
-         *)
-@@ -154,6 +159,11 @@ function run_task()
- : ${unittest_run_queues:=1}
- config=$TEST_DIR/unittests.cfg
-
-+if [[ $list_tests == "yes" ]];then
-+       output_tests_list $config
-+       exit
-+fi
-+
- rm -rf $unittest_log_dir.old
- [ -d $unittest_log_dir ] && mv $unittest_log_dir $unittest_log_dir.old
- mkdir $unittest_log_dir || exit 2
-diff --git a/scripts/common.bash b/scripts/common.bash
-index 7b983f7..7ff1098 100644
---- a/scripts/common.bash
-+++ b/scripts/common.bash
-@@ -61,6 +61,30 @@ function arch_cmd()
-        [ "${ARCH_CMD}" ] && echo "${ARCH_CMD}"
- }
-
-+function output_tests_list()
-+{
-+       local unittests="$1"
-+       local testname=""
-+       local group=""
-+       exec {fd}<"$unittests"
-+       while read -r -u $fd line; do
-+               if [[ "$line" =~ ^\[(.*)\]$ ]]; then
-+                       if [ -z "${only_group}" ] || [[ -n "${group}" ]];then
-+                               if [ -n "${testname}" ];then
-+                                       echo "${testname}"
-+                               fi
-+                       fi
-+                       testname=${BASH_REMATCH[1]}
-+                       group=""
-+               elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
-+                       local groups=${BASH_REMATCH[1]}
-+                       if [ -n "$only_group" ] && find_word "$only_group" "$groups";then
-+                               group=$only_group
-+                       fi
-+               fi
-+       done
-+}
-+
- # The current file has to be the only file sourcing the arch helper
- # file
- ARCH_FUNC=scripts/${ARCH}/func.bash
---
-2.33.0
-
-如果您错误接收了该邮件，请通过电子邮件立即通知我们。请回复邮件到 hqs-spmc@chinaunicom.cn，即可以退订此邮件。我们将立即将您的信息从我们的发送目录中删除。 If you have received this email in error please notify us immediately by e-mail. Please reply to hqs-spmc@chinaunicom.cn ,you can unsubscribe from this mail. We will immediately remove your information from send catalogue of our.
