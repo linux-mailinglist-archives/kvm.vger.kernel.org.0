@@ -2,76 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 603946FFACE
-	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 21:48:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C16E16FFB31
+	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 22:22:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239353AbjEKTsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 15:48:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37594 "EHLO
+        id S239018AbjEKUWh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 16:22:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239336AbjEKTrk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 15:47:40 -0400
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 866F51FE1
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 12:46:47 -0700 (PDT)
-Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-7576ecfa4e7so594100085a.3
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 12:46:47 -0700 (PDT)
+        with ESMTP id S231446AbjEKUWg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 16:22:36 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32793270D
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 13:22:34 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-b9a7e3fc659so20207541276.1
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 13:22:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683834368; x=1686426368;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zB5JTYTzbjxzfAcUGW7YtQ3w09yA53VmJwoy9w9h8Mk=;
-        b=MSYO5oY101nXNgFFS5INBeg2REcRI+bKb25dJwtMCcKSB3EDAEemoJ2RsN/mt5/vp1
-         XDxFf+aX8AYgEWlwhXjccCnosCqiGBVJ8BxykT5Q2LDiiX6CwItdMnjLwWH+n8jjD8bv
-         SdFHVLaBMUdKsNEeFF436uQekPut9i21dLMCrLpbR8Jzs8mHk+x0Z3j9Zt7/bO+1WNNW
-         vDf3laD/eLstGDdoy9XZ9dZfGnm/cPqR4dMLS5VwI/PjdDOTznc7dhfy7hPAtGy+Gjzc
-         OIA+E//Ow0LYcHpjyvdF0t9UMzZQdsK88GfkViGJUPSBP4b0YAruoE9aCphuzmEc+Tc/
-         D+Ew==
+        d=google.com; s=20221208; t=1683836553; x=1686428553;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Pc3KTqUCSKzWsEHzUQVAXEAq3C5U5xaJDzEQ7e6JFi4=;
+        b=M2/PeIN97s00eeSmiyRLGD3PvefqBVctLWv3nW5t4O6pOr++sFB6okzpEdh+jpfo/S
+         jemOIrVU7Z7IMbsUdZ7dXTnK+8YnKESUBsfmeDIo4B6gIGKl4mp9YbGYzF05b2MHc++R
+         zkcce/ZyYYpNkKUtCt72zSN1YjgO9e+EWHySXPu/XQ/kyZm/voKg5eCBBSAsHahuDaJH
+         jLL9LhVQJCo8AHn4S8PdTTdejXbygVl0i7ZxwB1wak1aR4nGilvXs1ASnRk30XHqvR7O
+         efEpYYxjaBUGWBULkP6gDuE9gTITT4yxhSlSPSOY1ZVFJN0bRyOk9oCkyt57Bvs8tkus
+         XFtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683834368; x=1686426368;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zB5JTYTzbjxzfAcUGW7YtQ3w09yA53VmJwoy9w9h8Mk=;
-        b=CX2QkQxWN6XsUK5N3xcfHT+LKfacGDVzo8JJba5hZthiSHNrzfsd2vOzo8Am63wQkk
-         wS8qDvKeHXiwHLDkrLqIufR9iepWyl+fQKEayD6kNUPBwadzNGT5YroRL9xG77VoRz24
-         YbuFpIW9ErWW3Dm8b2FNUevz8Zy4jt7FeJbc/tMlx2Zzm2x/BzuZe8MHW6LOqiLiPvOJ
-         3fLMpeOQbBc039MAaC1mQbb4IG9kyH+SGzuGuWyC7pEUN+IjJYATkh1xAbNJvOwLM9gt
-         X4E5ouYcyk1mTNiLWZ2W4DSWJbpqSrZX1HQp1CAgRmq47kenLVneaciiKIXcdFwmJKap
-         wtMw==
-X-Gm-Message-State: AC+VfDxAFyNHqy/nXqfYCNHsAmGlugUIMNtE69YN2L/cwX6SK/21nxEO
-        pjYnEvUI/4XvBuHEvXr6HtmJFL7Xyl/zejMDdfPuzA==
-X-Google-Smtp-Source: ACHHUZ4192j+G1w1msXArHzmReLPzl2xDtf2sGnLdLch/KHNXXd/yT2Q/my6BF1ZMFaye4VbWvxXT2hCMleHgbz6G7k=
-X-Received: by 2002:a05:6214:c8f:b0:621:451b:6e1b with SMTP id
- r15-20020a0562140c8f00b00621451b6e1bmr13275772qvr.10.1683834368475; Thu, 11
- May 2023 12:46:08 -0700 (PDT)
-MIME-Version: 1.0
-References: <ZFLRpEV09lrpJqua@x1n> <ZFLVS+UvpG5w747u@google.com>
- <ZFLyGDoXHQrN1CCD@x1n> <ZFQC5TZ9tVSvxFWt@x1n> <CAF7b7mrTGL8rLVCmsmX4dZinZHRFFB7R7kX0Wv9FZR-B-4xhhw@mail.gmail.com>
- <ZFhO9dlaFQRwaPFa@x1n> <CAF7b7mqPdfbzj6cOWPsg+Owysc-SOTF+6UUymd9f0Mctag=8DQ@mail.gmail.com>
- <ZFwRuCuYYMtuUFFA@x1n> <CALzav=e29rRw4TTRGpTkazgJpU1zPML3zQGoyeHj9Zbkq+yAdQ@mail.gmail.com>
- <CAJHvVci4VuQ_vdpRKczg4ic6x7eZRXE4+ZUvzO-xU_9VJ1Vqvg@mail.gmail.com> <ZF08Zg90emoDJJIp@google.com>
-In-Reply-To: <ZF08Zg90emoDJJIp@google.com>
-From:   Axel Rasmussen <axelrasmussen@google.com>
-Date:   Thu, 11 May 2023 12:45:32 -0700
-Message-ID: <CAJHvVciW4NZ6Jztq_ojsQD6vzD1duyXc7VG4iZyMR1-p=V_yzw@mail.gmail.com>
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-To:     David Matlack <dmatlack@google.com>
-Cc:     Peter Xu <peterx@redhat.com>, Anish Moorthy <amoorthy@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Nadav Amit <nadav.amit@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
-        oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
-        bgardon@google.com, ricarkol@google.com, kvm <kvm@vger.kernel.org>,
-        kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+        d=1e100.net; s=20221208; t=1683836553; x=1686428553;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Pc3KTqUCSKzWsEHzUQVAXEAq3C5U5xaJDzEQ7e6JFi4=;
+        b=eB7xJStXxBis2HIzTkCPWecJpC+k9tvDVV1dl95d50K/AMbLUfJ8Ak6ktKzGoxqt/y
+         WTkkKvfFa0Wwgtsi+sv5XcQfPpGTX7gPjxuI/bekmdwRhZA92PxYynbHtsQDIVDocL5p
+         DqhfL9c9xJh49jBjTREyr1BpjIohuFI65Q+1zYY0rhS+ftNf/Q8VilFGPsfBMFtBbdAz
+         tuLTJ+NQZG8WdCGBjer8wKVra2tA+r7+uSaPGdmw9E91Pa7ui5007/yyRaejUTWr9rYT
+         +5TJ4b3+y0EcMBj7fC5YY9CUh4NKWdM5GLNzL9I2Aj1eFOe/giHRChfTfiqXS5L9i1GG
+         xe3Q==
+X-Gm-Message-State: AC+VfDwS26lmqvL0QrCxkU+h+jIZxKXkPbLEWU8G3SpAAN66esqIFP8z
+        jF+mhJTvZQ6Bi7TQ/8ozAQqyEDlXFxI=
+X-Google-Smtp-Source: ACHHUZ7Axk7QKjEI2Ze7kTlQKJK2/j1UAuv4jea1yq8A1ku9q05Red0Z9Gik8pF5gmrO0M4cdRMEeCOKKjQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:5e55:0:b0:ba6:c897:53d9 with SMTP id
+ s82-20020a255e55000000b00ba6c89753d9mr1141409ybb.10.1683836553436; Thu, 11
+ May 2023 13:22:33 -0700 (PDT)
+Date:   Thu, 11 May 2023 13:22:31 -0700
+In-Reply-To: <CAGtprH8jUAM015h4eEhbdAv6Oq2UNbX3P5Z-VCVbcrHtnATJwQ@mail.gmail.com>
+Mime-Version: 1.0
+References: <ZD12htq6dWg0tg2e@google.com> <1ed06a62-05a1-ebe6-7ac4-5b35ba272d13@redhat.com>
+ <ZD2bBB00eKP6F8kz@google.com> <9efef45f-e9f4-18d1-0120-f0fc0961761c@redhat.com>
+ <ZD86E23gyzF6Q7AF@google.com> <5869f50f-0858-ab0c-9049-4345abcf5641@redhat.com>
+ <ZEM5Zq8oo+xnApW9@google.com> <CAGtprH_+bF4VZg2ps6CM8vjJVvShsvSGAvaLfTedts4cKqhSUw@mail.gmail.com>
+ <ZFwPBqGeW+d9xMEs@google.com> <CAGtprH8jUAM015h4eEhbdAv6Oq2UNbX3P5Z-VCVbcrHtnATJwQ@mail.gmail.com>
+Message-ID: <ZF1Oh5qrgcNNZ7Jc@google.com>
+Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
+ KVM: mm: fd-based approach for supporting KVM)
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vishal Annapurve <vannapurve@google.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        tabba@google.com, Michael Roth <michael.roth@amd.com>,
+        wei.w.wang@intel.com, Mike Rapoport <rppt@kernel.org>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Hugh Dickins <hughd@google.com>,
+        Christian Brauner <brauner@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,143 +91,259 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 11, 2023 at 12:05=E2=80=AFPM David Matlack <dmatlack@google.com=
-> wrote:
->
-> On Thu, May 11, 2023 at 10:33:24AM -0700, Axel Rasmussen wrote:
-> > On Thu, May 11, 2023 at 10:18=E2=80=AFAM David Matlack <dmatlack@google=
-.com> wrote:
+On Wed, May 10, 2023, Vishal Annapurve wrote:
+> On Wed, May 10, 2023 at 2:39=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > > But I would still like to get this discussed here before we move on.
 > > >
-> > > On Wed, May 10, 2023 at 2:50=E2=80=AFPM Peter Xu <peterx@redhat.com> =
-wrote:
-> > > > On Tue, May 09, 2023 at 01:52:05PM -0700, Anish Moorthy wrote:
-> > > > > On Sun, May 7, 2023 at 6:23=E2=80=AFPM Peter Xu <peterx@redhat.co=
-m> wrote:
-> > > >
-> > > > What I wanted to do is to understand whether there's still chance t=
-o
-> > > > provide a generic solution.  I don't know why you have had a bunch =
-of pmu
-> > > > stack showing in the graph, perhaps you forgot to disable some of t=
-he perf
-> > > > events when doing the test?  Let me know if you figure out why it h=
-appened
-> > > > like that (so far I didn't see), but I feel guilty to keep overload=
-ing you
-> > > > with such questions.
-> > > >
-> > > > The major problem I had with this series is it's definitely not a c=
-lean
-> > > > approach.  Say, even if you'll all rely on userapp you'll still nee=
-d to
-> > > > rely on userfaultfd for kernel traps on corner cases or it just won=
-'t work.
-> > > > IIUC that's also the concern from Nadav.
-> > >
-> > > This is a long thread, so apologies if the following has already been=
- discussed.
-> > >
-> > > Would per-tid userfaultfd support be a generic solution? i.e. Allow
-> > > userspace to create a userfaultfd that is tied to a specific task. An=
+> > > I am wondering if it would make sense to implement
+> > > restricted_mem/guest_mem file to expose both private and shared memor=
 y
-> > > userfaults encountered by that task use that fd, rather than the
-> > > process-wide fd. I'm making the assumption here that each of these fd=
-s
-> > > would have independent signaling mechanisms/queues and so this would
-> > > solve the scaling problem.
+> > > regions, inline with Kirill's original proposal now that the file
+> > > implementation is controlled by KVM.
 > > >
-> > > A VMM could use this to create 1 userfaultfd per vCPU and 1 thread pe=
-r
-> > > vCPU for handling userfault requests. This seems like it'd have
-> > > roughly the same scalability characteristics as the KVM -EFAULT
-> > > approach.
+> > > Thinking from userspace perspective:
+> > > 1) Userspace creates guest mem files and is able to mmap them but all
+> > > accesses to these files result into faults as no memory is allowed to
+> > > be mapped into userspace VMM pagetables.
 > >
-> > I think this would work in principle, but it's significantly different
-> > from what exists today.
+> > Never mapping anything into the userspace page table is infeasible.  Te=
+chnically
+> > it's doable, but it'd effectively require all of the work of an fd-base=
+d approach
+> > (and probably significantly more), _and_ it'd require touching core mm =
+code.
 > >
-> > The splitting of userfaultfds Peter is describing is splitting up the
-> > HVA address space, not splitting per-thread.
+> > VMAs don't provide hva=3D>pfn information, they're the kernel's way of =
+implementing
+> > the abstraction provided to userspace by mmap(), mprotect() etc.  Among=
+ many other
+> > things, a VMA describes properties of what is mapped, e.g. hugetblfs ve=
+rsus
+> > anonymous, where memory is mapped (virtual address), how memory is mapp=
+ed, e.g.
+> > RWX protections, etc.  But a VMA doesn't track the physical address, th=
+at info
+> > is all managed through the userspace page tables.
 > >
-> > I think for this design, we'd need to change UFFD registration so
-> > multiple UFFDs can register the same VMA, but can be filtered so they
-> > only receive fault events caused by some particular tid(s).
+> > To make it possible to allow userspace to mmap() but not access memory =
+(without
+> > redoing how the kernel fundamentally manages virtual=3D>physical mappin=
+gs), the
+> > simplest approach is to install PTEs into userspace page tables, but ne=
+ver mark
+> > them Present in hardware, i.e. prevent actually accessing the backing m=
+emory.
+> > This is is exactly what Kirill's series in link [3] below implemented.
 > >
-> > This might also incur some (small?) overhead, because in the fault
-> > path we now need to maintain some data structure so we can lookup
-> > which UFFD to notify based on a combination of the address and our
-> > tid. Today, since VMAs and UFFDs are 1:1 this lookup is trivial.
->
-> I was (perhaps naively) assuming the lookup would be as simple as:
->
-> diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-> index 44d1ee429eb0..e9856e2ba9ef 100644
-> --- a/fs/userfaultfd.c
-> +++ b/fs/userfaultfd.c
-> @@ -417,7 +417,10 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, un=
-signed long reason)
->          */
->         mmap_assert_locked(mm);
->
-> -       ctx =3D vma->vm_userfaultfd_ctx.ctx;
-> +       if (current->userfaultfd_ctx)
-> +               ctx =3D current->userfaultfd_ctx;
-> +       else
-> +               ctx =3D vma->vm_userfaultfd_ctx.ctx;
->         if (!ctx)
->                 goto out;
+>=20
+> Maybe it's simpler to do when mmaped regions are backed with files.
+>=20
+> I see that shmem has fault handlers for accesses to VMA regions
+> associated with the files, In theory a file implementation can always
+> choose to not allocate physical pages for such faults (similar to
+> F_SEAL_FAULT_AUTOALLOCATE that was discussed earlier).
 
-Hmm, perhaps. It might have to be more complicated if we want to allow
-a single task to have both per-TID UFFDs for some addresses, and
-"global" UFFDs for others.
+Ah, you're effectively suggesting a hybrid model where the file is the sing=
+le
+source of truth for what's private versus shared, ad KVM gets pfns through
+direct communication with the backing store via the file descriptor, but us=
+erspace
+can still control things via mmap() and friends.
 
+If you're not suggesting a backdoor, i.e. KVM still gets private pfns via h=
+vas,
+then we're back at Kirill's series, because otherwise there's no easy way f=
+or KVM
+to retrieve the pfn.
 
+A form of this was also discussed, though I don't know how much of the disc=
+ussion
+happened on-list.
+=20
+KVM actually does something like this for s390's Ultravisor (UV), which is =
+quite
+a bit like TDX (UV is a trusted intermediary) except that it handles faults=
+ much,
+much more gracefully.  Specifically, when the untrusted host attempts to ac=
+cess a
+secure page, a fault occurs and the kernel responds by telling UV to export=
+ the
+page.  The fault is gracefully handled even even for kernel accesses
+(see do_secure_storage_access()).  The kernel does BUG() if the export fail=
+s when
+handling fault from kernel context, but my understanding is that export can=
+ fail
+if and only if there's a fatal error elsewhere, i.e. the UV essentialy _ens=
+ures_
+success, and goes straight to BUG()/panic() if something goes wrong.
 
-Actually, while thinking about this, another wrinkle:
+On the guest side, accesses to exported (swapped) secure pages generate int=
+ercepts
+and KVM faults in the page.  To do so, KVM freezes the page/folio refcount,=
+ tells
+the UV to import the page, and then unfreezes the page/folio.  But very cru=
+cially,
+when _anything_ in the untrusted host attempts to access the secure page, t=
+he
+above fault handling for untrusted host accesses kicks in.  In other words,=
+ the
+guest can cause thrash, but can't bring down the host.
 
-Imagine we have per-thread UFFDs. Thread X faults on some address, and
-goes to sleep waiting for its paired resolver thread to resolve the
-fault.
+TDX on the other hand silently poisons memory, i.e. doesn't even generate a
+synchronous fault.  Thus the kernel needs to be 100% perfect on preventing =
+_any_
+accesses to private memory from the host, and doing that is non-trivial and
+invasive.
 
-In the meantime, thread Y also faults on the same address, before the
-resolution happens.
+SNP does synchronously fault, but the automatically converting in the #PF h=
+andler
+got NAK'd[*] for good reasons, e.g. SNP doesn't guarantee conversion succes=
+s as the
+guest can trigger concurrent RMP modifications.  So the end result ends up =
+being
+the same as TDX, host accesses need to be completely prevented.
 
-In the existing model, there is a single UFFD context per VMA, and
-therefore a single wait queue for all threads to wait on. In the
-per-TID-UFFD design, now each thread has its own context, and
-ostensibly its own wait queue (since the wait queue locks are where
-Anish saw the contention, I think this is exactly what we want to
-split up). When we have this "multiple threads waiting on the same
-address" situation, how do we ensure the fault is resolved exactly
-once? And how do we wake up all of the sleeping threads when it is
-resolved?
+Again, this is all doable, but costly.  And IMO, provides very little value=
+.
 
-I'm sure it's solvable, but especially doing it without any locks /
-contention seems like it could be a bit complicated.
+Allowing things like mbind() is nice-to-have at best, as implementing fbind=
+()
+isn't straightforward and arguably valuable to have irrespective of this
+discussion, e.g. to allow userspace to say "use this policy regardless of w=
+hat
+process maps the file".
 
->
+Using a common memory pool (same physical page is used for both shared and =
+private)
+is a similar story.  There are plenty of existing controls to limit userspa=
+ce/guest
+memory usage and to deal with OOM scenarios, so barring egregious host acco=
+unting
+and/or limiting bugs, which would affect _all_ VM types, the worst case sce=
+nario
+is that a VM is terminated because host userspace is buggy.  On the slip si=
+de, using
+a common pool brings complexity into the kernel, as backing stores would ne=
+ed to
+be taught to deny access to a subset of pages in their mappings, and in mul=
+tiple
+paths, e.g. faults, read()/write() and similar, page migration, swap, etc.
+
+[*] https://lore.kernel.org/linux-mm/8a244d34-2b10-4cf8-894a-1bf12b59cf92@w=
+ww.fastmail.com
+
+> > Issues that led to us abandoning the "map with special !Present PTEs" a=
+pproach:
 > >
-> > I think it's worth keeping in mind that a selling point of Anish's
-> > approach is that it's a very small change. It's plausible we can come
-> > up with some alternative way to scale, but it seems to me everything
-> > suggested so far is likely to require a lot more code, complexity, and
-> > effort vs. Anish's approach.
->
-> Agreed.
->
-> Mostly I think the per-thread UFFD approach would add complexity on the
-> userspace side of things. With Anish's approach userspace is able to
-> trivially re-use the vCPU thread (and it's associated pCPU if pinned) to
-> handle the request. That gets more complicated when juggling the extra
-> paired threads.
->
-> The per-thread approach would requires a new userfault UAPI change which
-> I think is a higher bar than the KVM UAPI change proposed here.
->
-> The per-thread approach would require KVM call into slow GUP and take
-> the mmap_lock before contacting userspace. I'm not 100% convinced that's
-> a bad thing long term (e.g. it avoids the false-positive -EFAULT exits
-> in Anish's proposal), but could have performance implications.
->
-> Lastly, inter-thread communication is likely slower than returning to
-> userspace from KVM_RUN. So the per-thread approach might increase the
-> end-to-end latency of demand fetches.
+> >  - Using page tables, i.e. hardware defined structures, to track gfn=3D=
+>pfn mappings
+> >    is inefficient and inflexible compared to software defined structure=
+s, especially
+> >    for the expected use cases for CoCo guests.
+> >
+> >  - The kernel wouldn't _easily_ be able to enforce a 1:1 page:guest ass=
+ociation,
+> >    let alone a 1:1 pfn:gfn mapping.
+>=20
+> Maybe KVM can ensure that each page of the guest_mem file is
+> associated with a single memslot.
+
+This is a hard NAK.  Guest physical address space is guaranteed to have hol=
+es
+and/or be discontiguous, for the PCI hole at the top of lower memory.  Allo=
+wing
+only a single binding would prevent userspace from backing all (or large ch=
+unks)
+of guest memory with a single file.
+
+> HVAs when they are registered can be associated with offsets into guest_m=
+em files.
+
+Enforcing 1:1 assocations is doable if KVM inserts a shim/interposer, e.g. =
+essentially
+implements the exclusivity bits of restrictedmem.  But that's adding even m=
+ore
+complexity.
+
+> >  - Does not work for memory that isn't backed by 'struct page', e.g. if=
+ devices
+> >    gain support for exposing encrypted memory regions to guests.
+> >
+> >  - Poking into the VMAs to convert memory would be likely be less perfo=
+rmant due
+> >    to using infrastructure that is much "heavier", e.g. would require t=
+aking
+> >    mmap_lock for write.
+>=20
+> Converting memory doesn't necessarily need to poke holes into VMA, but
+> rather just unmap pagetables just like what would happen when mmapped
+> files are punched to free the backing file offsets.
+
+Sorry, bad choice of word on my part.  I didn't intend to imply poking hole=
+s, in
+this case I used "poking" to mean "modifying".  munmap(), mprotected(), etc=
+ all
+require modifying VMAs, which means taking mmap_lock for write.
+
+> > In short, shoehorning this into mmap() requires fighting how the kernel=
+ works at
+> > pretty much every step, and in the end, adding e.g. fbind() is a lot ea=
+sier.
+> >
+> > > 2) Userspace registers mmaped HVA ranges with KVM with additional
+> > > KVM_MEM_PRIVATE flag
+> > > 3) Userspace converts memory attributes and this memory conversion
+> > > allows userspace to access shared ranges of the file because those ar=
+e
+> > > allowed to be faulted in from guest_mem. Shared to private conversion
+> > > unmaps the file ranges from userspace VMM pagetables.
+> > > 4) Granularity of userspace pagetable mappings for shared ranges will
+> > > have to be dictated by KVM guest_mem file implementation.
+> > >
+> > > Caveat here is that once private pages are mapped into userspace view=
+.
+> > >
+> > > Benefits here:
+> > > 1) Userspace view remains consistent while still being able to use HV=
+A ranges
+> > > 2) It would be possible to use HVA based APIs from userspace to do
+> > > things like binding.
+> > > 3) Double allocation wouldn't be a concern since hva ranges and gpa
+> > > ranges possibly map to the same HPA ranges.
+> >
+> > #3 isn't entirely correct.  If a different process (call it "B") maps s=
+hared memory,
+> > and then the guest converts that memory from shared to private, the bac=
+king pages
+> > for the previously shared mapping will still be mapped by process B unl=
+ess userspace
+> > also ensures process B also unmaps on conversion.
+> >
+>=20
+> This should be ideally handled by something like: unmap_mapping_range()
+
+That'd work for the hybrid model (fd backdoor with pseudo mmap() support), =
+but
+not for a generic VMA-based implementation.  If the file isn't the single s=
+ource
+of truth, then forcing all mappings to go away simply can't work.
+=20
+> > #3 is also a limiter.  E.g. if a guest is primarly backed by 1GiB pages=
+, keeping
+> > the 1GiB mapping is desirable if the guest converts a few KiB of memory=
+ to shared,
+> > and possibly even if the guest converts a few MiB of memory.
+>=20
+> This caveat maybe can be lived with as shared ranges most likely will
+> not be backed by 1G pages anyways, possibly causing IO performance to
+> get hit. This possibly needs more discussion about conversion
+> granularity used by guests.
+
+Yes, it's not the end of the world.  My point is that separating shared and=
+ private
+memory provides more flexibility.  Maybe that flexibility never ends up bei=
+ng
+super important, but at the same time we shouldn't willingly paint ourselve=
+s into
+a corner.
