@@ -2,143 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C5B76FF49A
-	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 16:37:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65A706FF4BF
+	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 16:43:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238329AbjEKOh1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 10:37:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59842 "EHLO
+        id S238649AbjEKOm6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 10:42:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238415AbjEKOhN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 10:37:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2174C106FA
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 07:36:57 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8B34C64DE1
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 14:36:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB984C433D2;
-        Thu, 11 May 2023 14:36:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683815816;
-        bh=mUNqzMhvbJdK3NJYcIHALgFTFkjdxLhN/do6OyaUVjo=;
-        h=From:To:Cc:Subject:Date:From;
-        b=lAh3E5QjFdI3+D3LkF6nr16xtVnjWw83kof5WIxKOPkk65CKcwHKO2yCM3zJCNiv6
-         V1R/ysz6FAFkxcZ/HyX1m89vUeuJmjZtd3Alj4tP6p71hJuhN+e5wt5/dU+BuLGmmB
-         jOL4oas555iLX5JiNxL82GUic4UA9vRqF+RgN+akxSPbGHqcZR9oKWWFaVl+yHLGAw
-         azuAzIaG7g1wBwMg45CMyhaouGGbuQ1UANQvKYFVlj2S4Ia64J0Y4PwndWDqE5QXDN
-         mtTAkxNkSsWODROnEAr/pmieBCUR25icsx0BVll6+VCsBSLIXokdPmbffwbV5VK6Xt
-         4P0K0n4tMJzXA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1px7PZ-00EM0w-Bh;
-        Thu, 11 May 2023 15:36:53 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Jingyu Wang <jingyuwang_vip@163.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mukesh Ojha <quic_mojha@quicinc.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.4, take #1
-Date:   Thu, 11 May 2023 15:36:38 +0100
-Message-Id: <20230511143638.350228-1-maz@kernel.org>
+        with ESMTP id S238273AbjEKOma (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 10:42:30 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBFB6273E;
+        Thu, 11 May 2023 07:38:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1683815927; x=1715351927;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=hB7sN8KBNaFlRFygVg+2VFuPkNFm9CNTHJkLgvR0w9I=;
+  b=mZmhOWUntaIpdUJddCsiTB/Zx720Yu4OLlzJ1EuLZ5iHHFxIZ2I8JILq
+   Apn5EbiIAEByPWS8svXgrM/W/6RjNOkhDsxbUXzDfp5deSYkF7AaQR5ut
+   iL63upuZyepefwMK4YJzMFsoD3wt4HofC6a3erYMCBseZWo2aehF4XUxu
+   AWJRyABcaNzPjHg06URbyXuO9Tz6zSTYcFLdytjAvlXU+JghDjpK3ZBwN
+   OiopBPXtrWSX6rnoHrphyUTAVkh6pO6AV+vAjLMJ3luVcHO+c/kfJw/jL
+   XNH8mBWN8F764BYTM6aO0R09OkVduPXQ0o/JOhK7k/MNYn8j91wyAHdVS
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10707"; a="339812829"
+X-IronPort-AV: E=Sophos;i="5.99,266,1677571200"; 
+   d="scan'208";a="339812829"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2023 07:38:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10707"; a="730382587"
+X-IronPort-AV: E=Sophos;i="5.99,266,1677571200"; 
+   d="scan'208";a="730382587"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga008.jf.intel.com with ESMTP; 11 May 2023 07:38:45 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
+        kevin.tian@intel.com, robin.murphy@arm.com,
+        baolu.lu@linux.intel.com
+Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com
+Subject: [PATCH v2 00/11] iommufd: Add nesting infrastructure
+Date:   Thu, 11 May 2023 07:38:33 -0700
+Message-Id: <20230511143844.22693-1-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, christophe.jaillet@wanadoo.fr, jingyuwang_vip@163.com, broonie@kernel.org, quic_mojha@quicinc.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.morse@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+Nested translation is a hardware feature that is supported by many modern
+IOMMU hardwares. It has two stages (stage-1, stage-2) address translation
+to get access to the physical address. stage-1 translation table is owned
+by userspace (e.g. by a guest OS), while stage-2 is owned by kernel. Changes
+to stage-1 translation table should be followed by an IOTLB invalidation.
 
-Here's a first set of fixes, most of which has been simmering in -next
-for some time now. The most important one is a series from Oliver,
-plugging a (hard to trigger) race that would result in the wrong
-mapping being established at S2.
+Take Intel VT-d as an example, the stage-1 translation table is I/O page
+table. As the below diagram shows, guest I/O page table pointer in GPA
+(guest physical address) is passed to host and be used to perform the stage-1
+address translation. Along with it, modifications to present mappings in the
+guest I/O page table should be followed with an IOTLB invalidation.
 
-The rest is a bunch of cleanups and HW workarounds (the usual Apple
-vgic issue that keeps cropping up on new SoCs).
+    .-------------.  .---------------------------.
+    |   vIOMMU    |  | Guest I/O page table      |
+    |             |  '---------------------------'
+    .----------------/
+    | PASID Entry |--- PASID cache flush --+
+    '-------------'                        |
+    |             |                        V
+    |             |           I/O page table pointer in GPA
+    '-------------'
+Guest
+------| Shadow |--------------------------|--------
+      v        v                          v
+Host
+    .-------------.  .------------------------.
+    |   pIOMMU    |  |  FS for GIOVA->GPA     |
+    |             |  '------------------------'
+    .----------------/  |
+    | PASID Entry |     V (Nested xlate)
+    '----------------\.----------------------------------.
+    |             |   | SS for GPA->HPA, unmanaged domain|
+    |             |   '----------------------------------'
+    '-------------'
+Where:
+ - FS = First stage page tables
+ - SS = Second stage page tables
+<Intel VT-d Nested translation>
 
-Please pull,
+In IOMMUFD, all the translation tables are tracked by hw_pagetable (hwpt)
+and each has an iommu_domain allocated from iommu driver. So in this series
+hw_pagetable and iommu_domain means the same thing if no special note.
+IOMMUFD has already supported allocating hw_pagetable that is linked with
+an IOAS. However, nesting requires IOMMUFD to allow allocating hw_pagetable
+with driver specific parameters and interface to sync stage-1 IOTLB as user
+owns the stage-1 translation table.
 
-       M.
+This series is based on the iommu hw info reporting series [1]. It first
+introduces new iommu op for allocating domains with user data and the op
+for syncing stage-1 IOTLB, and then extend the IOMMUFD internal infrastructure
+to accept user_data and parent hwpt, then relay the data to iommu core to
+allocate iommu_domain. After it, extend the ioctl IOMMU_HWPT_ALLOC to accept
+user data and stage-2 hwpt ID to allocate hwpt. Along with it, ioctl
+IOMMU_HWPT_INVALIDATE is added to invalidate stage-1 IOTLB. This is needed
+for user-managed hwpts. Selftest is added as well to cover the new ioctls.
 
-The following changes since commit ac9a78681b921877518763ba0e89202254349d1b:
+Complete code can be found in [2], QEMU could can be found in [3].
 
-  Linux 6.4-rc1 (2023-05-07 13:34:35 -0700)
+At last, this is a team work together with Nicolin Chen, Lu Baolu. Thanks
+them for the help. ^_^. Look forward to your feedbacks.
 
-are available in the Git repository at:
+base-commit: cf905391237ded2331388e75adb5afbabeddc852
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.4-1
+[1] https://lore.kernel.org/linux-iommu/20230511143024.19542-1-yi.l.liu@intel.com/
+[2] https://github.com/yiliu1765/iommufd/tree/iommufd_nesting
+[3] https://github.com/yiliu1765/qemu/tree/wip/iommufd_rfcv4.mig.reset.v4_var3%2Bnesting
 
-for you to fetch changes up to c3a62df457ff9ac8c77efe6d1eca2855d399355d:
+Change log:
 
-  Merge branch kvm-arm64/pgtable-fixes-6.4 into kvmarm-master/fixes (2023-05-11 15:26:01 +0100)
+v2:
+ - Add union iommu_domain_user_data to include all user data structures to avoid
+   passing void * in kernel APIs.
+ - Add iommu op to return user data length for user domain allocation
+ - Rename struct iommu_hwpt_alloc::data_type to be hwpt_type
+ - Store the invalidation data length in iommu_domain_ops::cache_invalidate_user_data_len
+ - Convert cache_invalidate_user op to be int instead of void
+ - Remove @data_type in struct iommu_hwpt_invalidate
+ - Remove out_hwpt_type_bitmap in struct iommu_hw_info hence drop patch 08 of v1
 
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.4, take #1
+v1: https://lore.kernel.org/linux-iommu/20230309080910.607396-1-yi.l.liu@intel.com/
 
-- Plug a race in the stage-2 mapping code where the IPA and the PA
-  would end up being out of sync
+Thanks,
+	Yi Liu
 
-- Make better use of the bitmap API (bitmap_zero, bitmap_zalloc...)
+Lu Baolu (2):
+  iommu: Add new iommu op to create domains owned by userspace
+  iommu: Add nested domain support
 
-- FP/SVE/SME documentation update, in the hope that this field
-  becomes clearer...
+Nicolin Chen (5):
+  iommufd/hw_pagetable: Do not populate user-managed hw_pagetables
+  iommufd/selftest: Add domain_alloc_user() support in iommu mock
+  iommufd/selftest: Add coverage for IOMMU_HWPT_ALLOC with user data
+  iommufd/selftest: Add IOMMU_TEST_OP_MD_CHECK_IOTLB test op
+  iommufd/selftest: Add coverage for IOMMU_HWPT_INVALIDATE ioctl
 
-- Add workaround for the usual Apple SEIS brokenness
+Yi Liu (4):
+  iommufd/hw_pagetable: Use domain_alloc_user op for domain allocation
+  iommufd: Pass parent hwpt and user_data to
+    iommufd_hw_pagetable_alloc()
+  iommufd: IOMMU_HWPT_ALLOC allocation with user data
+  iommufd: Add IOMMU_HWPT_INVALIDATE
 
-- Random comment fixes
+ drivers/iommu/iommufd/device.c                |   2 +-
+ drivers/iommu/iommufd/hw_pagetable.c          | 191 +++++++++++++++++-
+ drivers/iommu/iommufd/iommufd_private.h       |  16 +-
+ drivers/iommu/iommufd/iommufd_test.h          |  30 +++
+ drivers/iommu/iommufd/main.c                  |   5 +-
+ drivers/iommu/iommufd/selftest.c              | 119 ++++++++++-
+ include/linux/iommu.h                         |  36 ++++
+ include/uapi/linux/iommufd.h                  |  58 +++++-
+ tools/testing/selftests/iommu/iommufd.c       | 126 +++++++++++-
+ tools/testing/selftests/iommu/iommufd_utils.h |  70 +++++++
+ 10 files changed, 629 insertions(+), 24 deletions(-)
 
-----------------------------------------------------------------
-Christophe JAILLET (2):
-      KVM: arm64: Slightly optimize flush_context()
-      KVM: arm64: Use the bitmap API to allocate bitmaps
+-- 
+2.34.1
 
-Jingyu Wang (1):
-      KVM: arm64: Fix repeated words in comments
-
-Marc Zyngier (4):
-      KVM: arm64: Constify start/end/phys fields of the pgtable walker data
-      KVM: arm64: vgic: Add Apple M2 PRO/MAX cpus to the list of broken SEIS implementations
-      Merge branch kvm-arm64/misc-6.4 into kvmarm-master/fixes
-      Merge branch kvm-arm64/pgtable-fixes-6.4 into kvmarm-master/fixes
-
-Mark Brown (3):
-      KVM: arm64: Document check for TIF_FOREIGN_FPSTATE
-      KVM: arm64: Restructure check for SVE support in FP trap handler
-      KVM: arm64: Clarify host SME state management
-
-Oliver Upton (2):
-      KVM: arm64: Infer the PA offset from IPA in stage-2 map walker
-      KVM: arm64: Infer PA offset from VA in hyp map walker
-
- arch/arm64/include/asm/cputype.h        |  8 +++++++
- arch/arm64/include/asm/kvm_pgtable.h    |  1 +
- arch/arm64/kvm/fpsimd.c                 | 26 +++++++++++++--------
- arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++++--
- arch/arm64/kvm/hyp/pgtable.c            | 41 +++++++++++++++++++++++++--------
- arch/arm64/kvm/inject_fault.c           |  2 +-
- arch/arm64/kvm/vgic/vgic-v3.c           |  4 ++++
- arch/arm64/kvm/vmid.c                   |  7 +++---
- 8 files changed, 76 insertions(+), 25 deletions(-)
