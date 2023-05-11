@@ -2,106 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7011A6FFB6F
-	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 22:46:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 514F06FFBBB
+	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 23:15:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239124AbjEKUqW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 16:46:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45714 "EHLO
+        id S239232AbjEKVPf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 17:15:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239113AbjEKUqU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 16:46:20 -0400
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C983F2705
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 13:46:13 -0700 (PDT)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-559eae63801so138746057b3.2
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 13:46:13 -0700 (PDT)
+        with ESMTP id S239206AbjEKVPe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 17:15:34 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D9E61FF3
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 14:15:34 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-ba2526a8918so11581026276.1
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 14:15:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683837973; x=1686429973;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:from:to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=o3IhR8j0I8r27dlVdqBeOblOhv/55O4fJqm1FBFy6Uk=;
-        b=dwlrPtacT6G8IUr0BeeCMnWejqo/h/3mr9W6RtMKXd2r52d/+o6Obq1cKA9ampOlze
-         tfy25EuABlw2Qui5CH+cfZLcPbIQv7DbB9VsWgB9LGIZ8zxLCtjFT1Gd63Sv2tZZCUjs
-         x/JkvDsjLxDecPDcc/++KfbX3HVQ6dHSAkjoXDqI4nQRY1SV+3CeNGs7nJqWn03OZzym
-         +kunqilfeOZEu2X60VWdDmyuzu01GtexseJDpO+bNS5ETSyD17gs4JIBlPiE7fN9zF6t
-         eLXirZJlBT0+GaSuTsJ+v/bACGBEATy+OVyiU0T4QditQIwpCw29MpkrAGIZFK38PKKB
-         n13g==
+        d=google.com; s=20221208; t=1683839733; x=1686431733;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eYt/rFt4ATArTlkw2U5UMFdKJHBmWLe43VjEXYy+lio=;
+        b=lYv4EGgeOaaTWEyU/KcDRMofS3MH1008jKthME3mqsgtNK0qF3xIcEO3PIPE5PhVo2
+         6dNniCNbu6/CAxK+XIGlEwhCncsGpJwxBry3PUM5tJRHfRbmPLxF+b7GbTwCUG59eBOO
+         Y4WUaFxv9PiIl/fDq2mOpAXWI4/HMucX55WmwsRxWS8Em3Uo1OnDl3B91J5A5xuUTjTQ
+         MBF6bvZwNkQpRFdOwoXxPg0PU6AjSOo9OIHj2XVkm/PjASbiliUJ0yzFn0W1EFAtgEtC
+         90KSpYIEkSxWdJA7O/RhAtLlLuV+RHJuko8iSVx7OBrTJjKp067mjikten/jCUHBtoKM
+         ujHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683837973; x=1686429973;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:from:to:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o3IhR8j0I8r27dlVdqBeOblOhv/55O4fJqm1FBFy6Uk=;
-        b=kGFXbDUXdEFWh5HmJsdBNiZgMak252vayPa1I1Oyzxej1i0nK1iDLVcqvDk2Sd0/0n
-         dgu6L54z98Y8w784EFhfzFuuxMOjx3H8NQCEcGDFuU/T9av2EiclPPSQbqVBhsZFcDUb
-         4xc67BsgP89VTuQTukMcJmlex/mFFibMnoIcXJhqh69YKo8sjhp0zpeoS3ZigPRMH6u2
-         DL31GbC3/NdDXJm75rFjEIcDc5YJT/dWw8nnOooYgYNoyxbDnDxQuoGi1j0Y8bvpaYwS
-         Ga3czuE5oCbyPciTTlU427N4Z0zuK5MrRx9cBxCTlznV57kR0BmK2vTIXVFOM7xD+f8e
-         m+5A==
-X-Gm-Message-State: AC+VfDxbNuYBeN9mDd2aJJDVSP72oCJDWzRt07jxCkhnUp0kTSvS7J9B
-        SuCMOLLkCPMeO/ofhqZK5PlMkw8ATtY=
-X-Google-Smtp-Source: ACHHUZ7Z7TfTjuU9gnpUqFfJz0YPhH0pypbdQaOMK8IU0jLXQ3wzyVZY2LqtqOFD62KjPX3/VMUL3g==
-X-Received: by 2002:a0d:cc09:0:b0:55a:5870:3d47 with SMTP id o9-20020a0dcc09000000b0055a58703d47mr22755307ywd.26.1683837972752;
-        Thu, 11 May 2023 13:46:12 -0700 (PDT)
-Received: from Ubuntu (alpha.fresent.com. [64.44.167.152])
-        by smtp.gmail.com with ESMTPSA id h123-20020a0df781000000b0055a382ae26fsm4325672ywf.49.2023.05.11.13.46.12
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 May 2023 13:46:12 -0700 (PDT)
-Date:   Thu, 11 May 2023 20:46:12 +0000
-To:     kvm@vger.kernel.org
-From:   Karla Lambert <azogmijiga@gmail.com>
-Subject: junk referral job?
-Message-ID: <mce-1-603035aee28247288f64a529e2f416b4@gmail.com>
-Received: 
-In-Reply-To: <mce-1-603035aee28247288f64a529e2f416b4@gmail.com>
-References: <mce-1-603035aee28247288f64a529e2f416b4@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=2.5 required=5.0 tests=BAYES_40,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        GUARANTEED_100_PERCENT,MSGID_FROM_MTA_HEADER,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
-X-Spam-Level: **
+        d=1e100.net; s=20221208; t=1683839733; x=1686431733;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eYt/rFt4ATArTlkw2U5UMFdKJHBmWLe43VjEXYy+lio=;
+        b=L8TLYXYY73ipCwHTnT/tC6jjOBT83iTBOZrW2IPI7+iw+gdYipejK0dAykxEWRhkHJ
+         0KcPorSEGfNeYyoHMrU8T53RpJ3fh2OEo1ldYYQEYKsPus/VEuCVHQfaREWSYbaJFPz6
+         nTn3oOIDmfJmaIq/D2rTUs2BNQIAOJ1wev2CJQXS2ZSCRbQ/NQECpd/QGmhxWiiIQ5G0
+         IAsl/90BnZlUwU5xjcpePRDbzDXdD45mHy9Ziz/phtS42I43M8jfdarT4eDvQo8Dd82p
+         aU1BegW8lqRPt/OAzEQlSx/lAucMcZ5PnwhwBUnaeTUlEiL9kbg2VJncqJ6lgamKCo7K
+         Q7jw==
+X-Gm-Message-State: AC+VfDxBBMuVa0NrJciYyogkuJjxfv4Q19dvY5iJaV0lodl3faHpLTBz
+        kwT6Wu0Tb+5qQ2vvVnsVTfzIfBB0Kbs=
+X-Google-Smtp-Source: ACHHUZ5IhR7PpbWupkdM3XbIo6vUvgVmG4Gxs9rkF8nEzxgMk7qZZC8AI71C9esWqCKNDDxGbZEiFlirgco=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:114e:b0:b4a:3896:bc17 with SMTP id
+ p14-20020a056902114e00b00b4a3896bc17mr10141981ybu.0.1683839733419; Thu, 11
+ May 2023 14:15:33 -0700 (PDT)
+Date:   Thu, 11 May 2023 14:15:31 -0700
+In-Reply-To: <20230508154709.30043-1-minipli@grsecurity.net>
+Mime-Version: 1.0
+References: <20230508154709.30043-1-minipli@grsecurity.net>
+Message-ID: <ZF1a8xIGLwcdJDVZ@google.com>
+Subject: Re: [PATCH 5.15 0/8] KVM CR0.WP series backport
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mathias Krause <minipli@grsecurity.net>
+Cc:     stable@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi there
+On Mon, May 08, 2023, Mathias Krause wrote:
+> This is a backport of the CR0.WP KVM series[1] to Linux v5.15. It
+> differs from the v6.1 backport as in needing additional prerequisite
+> patches from Lai Jiangshan (and fixes for those) to ensure the
+> assumption it's safe to let CR0.WP be a guest owned bit still stand.
 
-I came upon your Florida junk removal business on Google.
+NAK.
 
-I’m contacting you because we’re getting a lot of referral jobs for residential and we currently don’t have a junk removal service in your area to send them to.
+The CR0.WP changes also very subtly rely on commit 2ba676774dfc ("KVM: x86/mmu:
+cleanup computation of MMU roles for two-dimensional paging"), which hardcodes
+WP=1 in the mmu role.  Without that, KVM will end up in a weird state when
+reinitializing the MMU context without reloading the root, as KVM will effectively
+change the role of an active root.  E.g. child pages in the legacy MMU will have
+a mix of WP=0 and WP=1 in their role.
 
-14 jobs in 30 days are 100% guaranteed by our brand-new junk removal system, or there is no charge to you.
-
-That can have your schedule booked solid within a week. To get more jobs, more customers, and higher prices!
-
-Reply with a quick "Yes" with your best cell phone number whether you can accept additional removal jobs.
-
-Reply with a quick "No" if you want to be taken off the list.
-
-Thanks,
-
-Karla
-
- 
-
-Sent From My iPhone 
-
-Capital Digital Markup 444 Alaska Avenue Torrance, CA 90503
-
- 
-
- 
-
- 
-
- 
-
+The inconsistency may or may not cause functional problems (I honestly don't know),
+but this missed dependency is exactly the type of problem that I am/was worried
+about with respect to backporting these changes all the way to 5.15.  I'm simply
+not comfortable backporting these changes due to the number of modifications and
+enhancements that we've made to the TDP MMU, and to KVM's MMU handling in general,
+between 5.15 and 6.1.
