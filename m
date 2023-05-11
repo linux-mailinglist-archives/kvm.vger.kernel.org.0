@@ -2,143 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E9C16FEF8D
-	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 12:00:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 540F86FEF9F
+	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 12:06:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237327AbjEKKAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 06:00:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45290 "EHLO
+        id S236152AbjEKKGo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 06:06:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237814AbjEKJ7r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 05:59:47 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C1B51FF3
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 02:59:42 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9BC7964BC6
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 09:59:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C79A8C4339B
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 09:59:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683799180;
-        bh=vZXmP5JUFt2+ykXVd7pzp2XgSzVg4TcDLIbyVY9TKMI=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=prl5GIejdp1FO2OJskEuVuxSr6tJrjLSNabzJyX3fll53a6T+Jwss2R3eWN7sJ1YL
-         QLzxkylj+tO95ix8PEsKDSwA4+tWcHCiNUHGsV3jowRcHa0ucc+vBFAhXLpqby/rg1
-         BFFdqNPgHK2oo5rSTDyGyrJMEJKQD3SWECsPYzVxrpi6znIFFlznHV0kRoGg1kAwnV
-         VNXU1Q/Mj5PB33scH/mVPkwy1bdq+E8N0kZo78DWHIsGB2hcgduoiSKrC/0dI2quCv
-         fQ/8miFiPqyl+HEAJkT+p42r5S6k28xoTdYta6bILFV6yqe0eboLWBa80BWnoSnP+Z
-         R0wQFxjvSc4Yw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id AD34BC43144; Thu, 11 May 2023 09:59:40 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 217379] Latency issues in irq_bypass_register_consumer
-Date:   Thu, 11 May 2023 09:59:40 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: zhuangel570@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217379-28872-KU8tTDkhtT@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217379-28872@https.bugzilla.kernel.org/>
-References: <bug-217379-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S229888AbjEKKGk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 06:06:40 -0400
+Received: from out-7.mta0.migadu.com (out-7.mta0.migadu.com [IPv6:2001:41d0:1004:224b::7])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4310F868D
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 03:06:38 -0700 (PDT)
+Date:   Thu, 11 May 2023 12:06:35 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1683799596;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=z+aWv3dxKKfyJHceGqTUBu82Oukos+qfj42GrKteHkw=;
+        b=fbP2OneWxJAdLLgqM/0NifIWplOCLr6SOegEVER3JHx6j0hrE13Y8rmxOb1xgzSfV8hKhK
+        Xbe01UdH5zpKmtvIioYFpGIMn4O5sWuiyABn5/50xn+nGiY04+7yveBioRg2OaVRz9H4Ec
+        QVokL9NYzSOTTMqHZiqWuESxo28eCh0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     =?utf-8?B?5Lu75pWP5pWPKOiBlOmAmumbhuWbouiBlOmAmuaVsOWtl+enkeaKgOaciQ==?=
+         =?utf-8?B?6ZmQ5YWs5Y+45pys6YOoKQ==?= <renmm6@chinaunicom.cn>
+Cc:     kvm <kvm@vger.kernel.org>, pbonzini <pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] run_tests: add list tests name option on
+ command line
+Message-ID: <20230511-c28341edcfad3aea9e7bac0d@orel>
+References: <20230511083329.3432954-1-renmm6@chinaunicom.cn>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230511083329.3432954-1-renmm6@chinaunicom.cn>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217379
+On Thu, May 11, 2023 at 04:33:29PM +0800, 任敏敏(联通集团联通数字科技有限公司本部) wrote:
+> From: rminmin <renmm6@chinaunicom.cn>
+> 
+> Add '-l | --list' option on command line to output
+> all tests name only, and cloud be filtered by group
+> with '-g | --group' option.
+> 
+> E.g.
+>   List all vmx group tests name:
+>   $ ./run_tests.sh -g vmx -l
+> 
+>   List all tests name:
+>   $ ./run_tests.sh -l
+> 
+> Signed-off-by: rminmin <renmm6@chinaunicom.cn>
+> ---
+>  run_tests.sh        | 14 ++++++++++++--
+>  scripts/common.bash | 24 ++++++++++++++++++++++++
+>  2 files changed, 36 insertions(+), 2 deletions(-)
+> 
+> diff --git a/run_tests.sh b/run_tests.sh
+> index f61e005..a95c2bc 100755
+> --- a/run_tests.sh
+> +++ b/run_tests.sh
+> @@ -15,7 +15,7 @@ function usage()
+>  {
+>  cat <<EOF
+> 
+> -Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t]
+> +Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t] [-l]
+> 
+>      -h, --help      Output this help text
+>      -v, --verbose   Enables verbose mode
+> @@ -24,6 +24,7 @@ Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t]
+>      -g, --group     Only execute tests in the given group
+>      -j, --parallel  Execute tests in parallel
+>      -t, --tap13     Output test results in TAP format
+> +    -l, --list      Only output all tests list
+> 
+>  Set the environment variable QEMU=/path/to/qemu-system-ARCH to
+>  specify the appropriate qemu binary for ARCH-run.
+> @@ -42,7 +43,8 @@ if [ $? -ne 4 ]; then
+>  fi
+> 
+>  only_tests=""
+> -args=$(getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $*)
+> +list_tests=""
+> +args=$(getopt -u -o ag:htj:v:l -l all,group:,help,tap13,parallel:,verbose:,list -- $*)
+>  [ $? -ne 0 ] && exit 2;
+>  set -- $args;
+>  while [ $# -gt 0 ]; do
+> @@ -73,6 +75,9 @@ while [ $# -gt 0 ]; do
+>          -t | --tap13)
+>              tap_output="yes"
+>              ;;
+> +       -l | --list)
+> +           list_tests="yes"
+> +           ;;
 
---- Comment #2 from zhuangel (zhuangel570@gmail.com) ---
-Thanks for the suggestion, Sean.
+run_tests.sh is a complete mess for space/tab style, but it looks like
+you've used tabs when the rest of this case statement is using spaces...
 
-Before we had a complete optimize for irq_bypass, do you think such kind of=
- fix
-is acceptable. We should provide VMM with the ability to turn off irq_bypass
-feature for device not need irq_bypass:
+>          --)
+>              ;;
+>          *)
+> @@ -154,6 +159,11 @@ function run_task()
+>  : ${unittest_run_queues:=1}
+>  config=$TEST_DIR/unittests.cfg
+> 
+> +if [[ $list_tests == "yes" ]];then
+                                 ^ please add a space here after ;
+
+> +       output_tests_list $config
+> +       exit
+> +fi
+> +
+>  rm -rf $unittest_log_dir.old
+>  [ -d $unittest_log_dir ] && mv $unittest_log_dir $unittest_log_dir.old
+>  mkdir $unittest_log_dir || exit 2
+> diff --git a/scripts/common.bash b/scripts/common.bash
+> index 7b983f7..7ff1098 100644
+> --- a/scripts/common.bash
+> +++ b/scripts/common.bash
+> @@ -61,6 +61,30 @@ function arch_cmd()
+>         [ "${ARCH_CMD}" ] && echo "${ARCH_CMD}"
+>  }
+> 
+> +function output_tests_list()
+> +{
+> +       local unittests="$1"
+> +       local testname=""
+> +       local group=""
+> +       exec {fd}<"$unittests"
+> +       while read -r -u $fd line; do
+> +               if [[ "$line" =~ ^\[(.*)\]$ ]]; then
+> +                       if [ -z "${only_group}" ] || [[ -n "${group}" ]];then
+> +                               if [ -n "${testname}" ];then
+> +                                       echo "${testname}"
+> +                               fi
+> +                       fi
+> +                       testname=${BASH_REMATCH[1]}
+> +                       group=""
+> +               elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
+> +                       local groups=${BASH_REMATCH[1]}
+> +                       if [ -n "$only_group" ] && find_word "$only_group" "$groups";then
+> +                               group=$only_group
+> +                       fi
+> +               fi
+> +       done
+> +}
+> +
+
+None of this is necessary. All you need is to add the '--list' option and
+then do
+
+diff --git a/run_tests.sh b/run_tests.sh
+index f61e0057b537..4c1b174a20bb 100755
+--- a/run_tests.sh
++++ b/run_tests.sh
+@@ -154,6 +154,12 @@ function run_task()
+ : ${unittest_run_queues:=1}
+ config=$TEST_DIR/unittests.cfg
+
++print_testname() { echo "$1"; }
++if [[ $list_tests == "yes" ]]; then
++       for_each_unittest $config print_testname
++       exit
++fi
++
+ rm -rf $unittest_log_dir.old
+ [ -d $unittest_log_dir ] && mv $unittest_log_dir $unittest_log_dir.old
+ mkdir $unittest_log_dir || exit 2
 
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 737318b1c1d9..a7a018ce954a 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1292,7 +1292,7 @@ struct kvm_xen_hvm_config {
- };
- #endif
-
--#define KVM_IRQFD_FLAG_DEASSIGN (1 << 0)
-+#define KVM_IRQFD_FLAG_DEASSIGN                (1 << 0)
- /*
-  * Available with KVM_CAP_IRQFD_RESAMPLE
-  *
-@@ -1300,7 +1300,8 @@ struct kvm_xen_hvm_config {
-  * the irqfd to operate in resampling mode for level triggered interrupt
-  * emulation.  See Documentation/virt/kvm/api.rst.
-  */
--#define KVM_IRQFD_FLAG_RESAMPLE (1 << 1)
-+#define KVM_IRQFD_FLAG_RESAMPLE                (1 << 1)
-+#define KVM_IRQFD_FLAG_NO_BYPASS       (1 << 2)
-
- struct kvm_irqfd {
-        __u32 fd;
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index b0af834ffa95..90fa203d7ef3 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -425,7 +425,7 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *arg=
-s)
-                schedule_work(&irqfd->inject);
-
- #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
--       if (kvm_arch_has_irq_bypass()) {
-+       if (!(args->flags & KVM_IRQFD_FLAG_NO_BYPASS) &&
-kvm_arch_has_irq_bypass()) {
-                irqfd->consumer.token =3D (void *)irqfd->eventfd;
-                irqfd->consumer.add_producer =3D
-kvm_arch_irq_bypass_add_producer;
-                irqfd->consumer.del_producer =3D
-kvm_arch_irq_bypass_del_producer;
-@@ -587,7 +587,8 @@ kvm_irqfd_deassign(struct kvm *kvm, struct kvm_irqfd *a=
-rgs)
- int
- kvm_irqfd(struct kvm *kvm, struct kvm_irqfd *args)
- {
--       if (args->flags & ~(KVM_IRQFD_FLAG_DEASSIGN | KVM_IRQFD_FLAG_RESAMP=
-LE))
-+       if (args->flags & ~(KVM_IRQFD_FLAG_DEASSIGN | KVM_IRQFD_FLAG_RESAMP=
-LE
-+                               | KVM_IRQFD_FLAG_NO_BYPASS))
-                return -EINVAL;
-
-        if (args->flags & KVM_IRQFD_FLAG_DEASSIGN)
---
-2.31.1
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Thanks,
+drew
