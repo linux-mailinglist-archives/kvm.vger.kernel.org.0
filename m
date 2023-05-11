@@ -2,80 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 803C66FF6C9
-	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 18:08:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E60A6FF79E
+	for <lists+kvm@lfdr.de>; Thu, 11 May 2023 18:40:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238652AbjEKQIC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 May 2023 12:08:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56190 "EHLO
+        id S238867AbjEKQkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 May 2023 12:40:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238603AbjEKQIA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 May 2023 12:08:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0525B1BD1
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 09:07:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683821232;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5MGlLbnpCq0gqjV9LAs8cLD+kUlHrxgJjrFlgPMgwWE=;
-        b=QPcrzxW6D4IfXWRo4IT26a+Cp+Jh8Xem3HAhit1DFK7JkCGUHT2SOyPZOb1+jioWGAUVbO
-        EFJ/bb5qCu28WVR5aSctJAY7thI57lMets7FeVVGB9fSHRV7eGEOyHjU01ePsCcp96Ol/r
-        Siv98mcw53lWikghthruVLbnkpX6/r4=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-583-zikvc4nQOLKqFsE8WFGzhg-1; Thu, 11 May 2023 12:07:09 -0400
-X-MC-Unique: zikvc4nQOLKqFsE8WFGzhg-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-76984376366so1292487939f.3
-        for <kvm@vger.kernel.org>; Thu, 11 May 2023 09:07:09 -0700 (PDT)
+        with ESMTP id S238327AbjEKQkK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 May 2023 12:40:10 -0400
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D0BF3A8C
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 09:40:08 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-3f42b984405so25045715e9.3
+        for <kvm@vger.kernel.org>; Thu, 11 May 2023 09:40:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1683823207; x=1686415207;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rWPj+0MEcU+bJjFDLtiKhJORofVGXZE+QDk7KaJWG9E=;
+        b=UuPFreN/sIyZvma3z9Xm6KxNZFcbh1TpDfsITGLUWBCWA6T4xHCFr5HuwlelWhANsc
+         GODLbDYWSkjxpw1FlGH7zBZhqQl+PBnoza0HREbOpZD4TA496u22UD6bDXXczi7KYVpl
+         vUHL3f5x4AXj97duCDa1dgEYjprlWsVyV+SBIS6xrVMPSwQcsV6kK8n5uf0FR6XnIuc4
+         bHtcnz/0qP1iI3PLzgpdryNpdPYlDZbySxQcLGTnHTgtAXoWs5v1mwmzllg9a6m64GLt
+         EJC3fIG+NQH/j+vTbDoa5wKLgeATWhDm4OwK78ppk49kTcq7mfR/nc2WNPwoATtQv89M
+         LAmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683821228; x=1686413228;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5MGlLbnpCq0gqjV9LAs8cLD+kUlHrxgJjrFlgPMgwWE=;
-        b=mEAzqA4ViTW7sc0g5csJyIOQuol6fcDlm+IR3HaDCc8nWv5fr3H2+JYJfqr+o90YuR
-         ahzGdnaNhMOhXdo7nlMpC8Th+pLboI7Ug3oIe36X/ixf4YB51Qrt69VVBFGNAuWR7q3B
-         BwszSRH2lhSo6qKa0vNO7FC/4J6mwB30lJWfctc5texD8d6oJJkDKfjM0SiRnvwD4iYx
-         fEdm1WkCuXBleNBIWkfBTTR6tQo/dP9mhcR+rakwqe/17FWDisfFIopHQn9nsvoU69dR
-         UTKo+XiuoO1rGZ1mAt+rQUkzwbPBB+EV5l0kzHbryaL1A9a7V75rh+J8Ch28dHqw58xW
-         180Q==
-X-Gm-Message-State: AC+VfDyqvGrquWyMlBX5At+HN+F8IMe9emS9mQ0OMxm8xdin5d5MBGRg
-        LCoqfVhUDOSBbxEPQW5uIC0vowEHUNOlPfbxOtg8jBnj0W2tPmZaLfJQxRKC5iqYKZUFvBY9fNm
-        bboHzLBTnKs5H
-X-Received: by 2002:a92:d950:0:b0:328:6412:df0e with SMTP id l16-20020a92d950000000b003286412df0emr16457949ilq.29.1683821228644;
-        Thu, 11 May 2023 09:07:08 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7tukUJrVj1wrrpEM6kkFdaC+CQrut3RZr54Ry8cX3nUsKWd1Ny0OxWMK0l+RwvVEhRXnT9IQ==
-X-Received: by 2002:a92:d950:0:b0:328:6412:df0e with SMTP id l16-20020a92d950000000b003286412df0emr16457932ilq.29.1683821228395;
-        Thu, 11 May 2023 09:07:08 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id cs11-20020a056638470b00b0040bd3646d0dsm4247854jab.157.2023.05.11.09.07.07
+        d=1e100.net; s=20221208; t=1683823207; x=1686415207;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rWPj+0MEcU+bJjFDLtiKhJORofVGXZE+QDk7KaJWG9E=;
+        b=XQqiVsveAAj/BnMSTp9PLGPdS7C8masG25HqZYTrRX54mqwxb5AJN//NIhF0fNtyjC
+         TAPo/s12jHuIx5hvWix7n42LtV8NwjpMfl7Boxizck0mQ72cyX1qkdS+A3WtxTXTlZsv
+         YjRg9AxCWf+F7wnZVMDPnz0NK2900y72S8nARhF9sUW3Dyvy71kFBs/kEK7rtJSDqquy
+         XLu65el6k2xqIMpsbmRaBA0F+4KuEdVVPPpKiY7Zx4pksF/N6cug9xWrdoW3FPlyy/Kz
+         skcwvfJXD7Q81m1okUiDPt3tn1ShUjqw+TirJJbGABUbME9iWEzl8Rw7V8zNZC9KcOOn
+         5j9g==
+X-Gm-Message-State: AC+VfDyaceHBM2rtDU9Y2R5R3qoqoM5fxku0B3Q7V8thKCVuoOZ7FpLF
+        70eNHsHS24GeWaERlIKB/D6OgQ==
+X-Google-Smtp-Source: ACHHUZ5lIBereKcBnZpJKQGjLGzbXt7Ys+TI95CPzIw7E6x8cqi52/zghFhzklOdZznlq63vKEcQWg==
+X-Received: by 2002:a1c:f20a:0:b0:3f1:819d:d050 with SMTP id s10-20020a1cf20a000000b003f1819dd050mr15055961wmc.37.1683823206802;
+        Thu, 11 May 2023 09:40:06 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id 12-20020a05600c020c00b003f4b6bcbd8bsm4941659wmi.31.2023.05.11.09.40.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 May 2023 09:07:07 -0700 (PDT)
-Date:   Thu, 11 May 2023 10:07:06 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kevin.tian@intel.com,
-        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-        =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@redhat.com>
-Subject: Re: [PATCH] vfio/pci: take mmap write lock for io_remap_pfn_range
-Message-ID: <20230511100706.63d420db.alex.williamson@redhat.com>
-In-Reply-To: <ZFwBYtjL1V0r5WW3@nvidia.com>
-References: <20230508125842.28193-1-yan.y.zhao@intel.com>
-        <ZFkn3q45RUJXMS+P@nvidia.com>
-        <20230508145715.630fe3ae.alex.williamson@redhat.com>
-        <ZFwBYtjL1V0r5WW3@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        Thu, 11 May 2023 09:40:06 -0700 (PDT)
+Date:   Thu, 11 May 2023 18:40:05 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Haibo Xu <haibo1.xu@intel.com>
+Cc:     xiaobo55x@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 1/2] riscv: kvm: Add KVM_GET_REG_LIST API support
+Message-ID: <20230511-d0a207eebb30fc88de875e4f@orel>
+References: <cover.1683791148.git.haibo1.xu@intel.com>
+ <921fc2e1a91887170e277acb1b52df57480a5736.1683791148.git.haibo1.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <921fc2e1a91887170e277acb1b52df57480a5736.1683791148.git.haibo1.xu@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,43 +80,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 10 May 2023 17:41:06 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Mon, May 08, 2023 at 02:57:15PM -0600, Alex Williamson wrote:
+On Thu, May 11, 2023 at 05:22:48PM +0800, Haibo Xu wrote:
+> KVM_GET_REG_LIST API will return all registers that are available to
+> KVM_GET/SET_ONE_REG APIs. It's very useful to identify some platform
+> regression issue during VM migration.
 > 
-> > We already try to set the flags in advance, but there are some
-> > architectural flags like VM_PAT that make that tricky.  Cedric has been
-> > looking at inserting individual pages with vmf_insert_pfn(), but that
-> > incurs a lot more faults and therefore latency vs remapping the entire
-> > vma on fault.  I'm not convinced that we shouldn't just attempt to
-> > remove the fault handler entirely, but I haven't tried it yet to know
-> > what gotchas are down that path.  Thanks,  
+> Since this API was already supported on arm64, it'd be straightforward
+> to enable it on riscv with similar code structure.
 > 
-> I thought we did it like this because there were races otherwise with
-> PTE insertion and zapping? I don't remember well anymore.
+> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> ---
+>  Documentation/virt/kvm/api.rst |   2 +-
+>  arch/riscv/kvm/vcpu.c          | 346 +++++++++++++++++++++++++++++++++
+>  2 files changed, 347 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index add067793b90..280e89abd004 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -3499,7 +3499,7 @@ VCPU matching underlying host.
+>  ---------------------
+>  
+>  :Capability: basic
+> -:Architectures: arm64, mips
+> +:Architectures: arm64, mips, riscv
+>  :Type: vcpu ioctl
+>  :Parameters: struct kvm_reg_list (in/out)
+>  :Returns: 0 on success; -1 on error
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 8bd9f2a8a0b9..fb8834e4fa15 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -657,6 +657,334 @@ static int kvm_riscv_vcpu_set_reg_isa_ext(struct kvm_vcpu *vcpu,
+>  	return 0;
+>  }
+>  
+> +static inline unsigned long num_config_regs(void)
+> +{
+> +	return sizeof(struct kvm_riscv_config) / sizeof(unsigned long);
 
-TBH, I don't recall if we tried a synchronous approach previously.  The
-benefit of the faulting approach was that we could track the minimum
-set of vmas which are actually making use of the mapping and throw that
-tracking list away when zapping.  Without that, we need to add vmas
-both on mmap and in vm_ops.open, removing only in vm_ops.close, and
-acquire all the proper mm locking for each vma to re-insert the
-mappings.
-
-> I vaugely remember the address_space conversion might help remove the
-> fault handler?
-
-Yes, this did remove the fault handler entirely, it's (obviously)
-dropped off my radar, but perhaps in the interim we could switch to
-vmf_insert_pfn() and revive the address space series to eventually
-remove the fault handling and vma list altogether.
-
-For reference, I think this was the last posting of the address space
-series:
-
-https://lore.kernel.org/all/162818167535.1511194.6614962507750594786.stgit@omen/
+We can't assume all config registers are present. For example,
+zicbom and zicboz block size registers are only present when their
+respective extensions are available.
 
 Thanks,
-Alex
-
+drew
