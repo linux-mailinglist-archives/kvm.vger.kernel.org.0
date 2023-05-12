@@ -2,129 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14376700D1A
-	for <lists+kvm@lfdr.de>; Fri, 12 May 2023 18:36:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44193700D59
+	for <lists+kvm@lfdr.de>; Fri, 12 May 2023 18:50:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236019AbjELQgB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 May 2023 12:36:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60730 "EHLO
+        id S237438AbjELQuY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 May 2023 12:50:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230155AbjELQgA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 May 2023 12:36:00 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95184AD06
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 09:35:43 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-51b7810ec2cso5479756a12.1
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 09:35:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683909343; x=1686501343;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fJVtsVgkJ9xPeAAGT/C87CXV1IF/qgXHBdnwAFzyB8I=;
-        b=1VNxtdKQHKbcU7lqUQORqeDfbAmE33Jz9JeTk4gPQ3CVa5kpsaJ5Mxv3KG0KO1ro3u
-         Ccl5UAMIEsghYui3h7vbtdCJ5jhhcGcKmHs4g0sXYlJiln3detNGXE0ei4phyk79HYAn
-         bWdrdat13IaSNS4qnYv0WtA5jwzRudQvvRdHVyJYKhgTu+mlmaJ+KAxOsxHklg8VKEGR
-         fNaBGNtbiOmR50W8rwor0ixLVLi9We7DMgFzhtwgk0/Iwu+kcvrhHkEC0EJSCnpyVZwy
-         7VNR5RO2oNREIgvrTU82m/vsv5hVhj55J7RzM8caBxLBHwD8h63w2LxKqYa7c7RueDgB
-         PMcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683909343; x=1686501343;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fJVtsVgkJ9xPeAAGT/C87CXV1IF/qgXHBdnwAFzyB8I=;
-        b=Qw9ohmnHeFWse/i0nLUtdO+FayqGuskv9/CsGdvuNO3LBhDtCb9tzTD5hT7X/iNVf9
-         pygzk1gUNeONyKIQKum23wx41sGzQVwxVzrNPfFv9UF2UhoZa/y+8GGvzK1yNxqiNPoc
-         ntG5l2G7wMaiu09lnTQp9i2keWYzoRJjOVmWRCQVNqOrZZ1AC48FicZENqhpUoUgXDFr
-         Q60X009IzyuNcxshKtg2EkwFiv08ldvsDiVfj1ky/0LcCNUXNvibXQpcpeW0wgExer4i
-         5F0VeM1zdcwp48v648hB/FYujtC0d/Kld/GaDDjEK5xa1ilBIpp/HJGpqv6E6qte4C1c
-         6A6A==
-X-Gm-Message-State: AC+VfDxznrj1wS+Ve3DtEwftaqcJHY8ONVNND7TJTNUlDsTV/h5LOmfz
-        jyRidz1g1WrMaHIcmfSRlbPXMc8qoBM=
-X-Google-Smtp-Source: ACHHUZ4CBKc6IL7gAYfIPzaLSvqPSjfRZ59HmgdGmTz8eILgng02sq5+DVlkeY/SKMuvIZOE1knm71X5xdI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:2d5:0:b0:52c:bf59:f4f2 with SMTP id
- 204-20020a6302d5000000b0052cbf59f4f2mr6269326pgc.1.1683909343049; Fri, 12 May
- 2023 09:35:43 -0700 (PDT)
-Date:   Fri, 12 May 2023 09:35:40 -0700
-In-Reply-To: <ecbcfb6ca243cf587eb6e61c6e852b4f474a36d7.camel@intel.com>
-Mime-Version: 1.0
-References: <20230511233351.635053-1-seanjc@google.com> <20230511233351.635053-6-seanjc@google.com>
- <ecbcfb6ca243cf587eb6e61c6e852b4f474a36d7.camel@intel.com>
-Message-ID: <ZF5qnQQYa6OAI0Hy@google.com>
-Subject: Re: [PATCH v2 5/8] KVM: x86: Use MTRR macros to define possible MTRR
- MSR ranges
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "guoke@uniontech.com" <guoke@uniontech.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "haiwenyao@uniontech.com" <haiwenyao@uniontech.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229589AbjELQuW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 May 2023 12:50:22 -0400
+Received: from out-32.mta1.migadu.com (out-32.mta1.migadu.com [95.215.58.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E476F35B8
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 09:50:20 -0700 (PDT)
+Date:   Fri, 12 May 2023 16:50:13 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1683910218;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4PTfi/CRVlLihpd7NcDHa6MiGARrs9Gf4ZlSXwZztBQ=;
+        b=ckABoCJOeT0cC23Vyy/T4xUiN0xAN6xQgiRXdD6yuo+EBlCRorITYgG/ly/qJ18Yy0GQOM
+        GrCipZfeifTYjPmrN3BL6rW5I6uQt7PCrHtPoD0n5q9KQ8oSo1TnUK/8j5sWv7fE8qDgGP
+        m6Fn/pjyPHTYKARNHPZP6QgODuzooAc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 2/7] KVM: arm64: Implement
+  __kvm_tlb_flush_vmid_range()
+Message-ID: <ZF5uRWtvhhqZSQCa@linux.dev>
+References: <20230414172922.812640-1-rananta@google.com>
+ <20230414172922.812640-3-rananta@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230414172922.812640-3-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 12, 2023, Kai Huang wrote:
-> On Thu, 2023-05-11 at 16:33 -0700, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index e7f78fe79b32..8b356c9d8a81 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -3700,8 +3700,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >  			return 1;
-> >  		}
-> >  		break;
-> > -	case 0x200 ... MSR_IA32_MC0_CTL2 - 1:
-> > -	case MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) ... 0x2ff:
-> > +	case MSR_IA32_CR_PAT:
-> > +	case MTRRphysBase_MSR(0) ... MSR_MTRRfix4K_F8000:
-> > +	case MSR_MTRRdefType:
-> >  		return kvm_mtrr_set_msr(vcpu, msr, data);
-> >  	case MSR_IA32_APICBASE:
-> >  		return kvm_set_apic_base(vcpu, msr_info);
-> > @@ -4108,9 +4109,10 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >  		msr_info->data = kvm_scale_tsc(rdtsc(), ratio) + offset;
-> >  		break;
-> >  	}
-> > +	case MSR_IA32_CR_PAT:
-> >  	case MSR_MTRRcap:
+Hi Raghavendra,
+
+On Fri, Apr 14, 2023 at 05:29:17PM +0000, Raghavendra Rao Ananta wrote:
+> Define  __kvm_tlb_flush_vmid_range() (for VHE and nVHE)
+> to flush a range of stage-2 page-tables using IPA in one go.
+> If the system supports FEAT_TLBIRANGE, the following patches
+> would conviniently replace global TLBI such as vmalls12e1is
+> in the map, unmap, and dirty-logging paths with ripas2e1is
+> instead.
 > 
-> ... Should we put MSR_IA32_CR_PAT after MSR_MTRRcap so it can be symmetric to
-> kvm_set_msr_common()?
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h   |  3 +++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 11 +++++++++
+>  arch/arm64/kvm/hyp/nvhe/tlb.c      | 39 ++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/vhe/tlb.c       | 35 +++++++++++++++++++++++++++
+>  4 files changed, 88 insertions(+)
 > 
-> Looks there's no reason to put it before MSR_MTRRcap.
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 43c3bc0f9544d..33352d9399e32 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -79,6 +79,7 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
+> +	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_range,
+>  };
+>  
+>  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+> @@ -225,6 +226,8 @@ extern void __kvm_flush_vm_context(void);
+>  extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
+>  extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
+>  				     int level);
+> +extern void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> +					phys_addr_t start, phys_addr_t end);
+>  extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
+>  
+>  extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 728e01d4536b0..81d30737dc7c9 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -125,6 +125,16 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
+>  	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
+>  }
+>  
+> +static void
+> +handle___kvm_tlb_flush_vmid_range(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+> +	DECLARE_REG(phys_addr_t, start, host_ctxt, 2);
+> +	DECLARE_REG(phys_addr_t, end, host_ctxt, 3);
+> +
+> +	__kvm_tlb_flush_vmid_range(kern_hyp_va(mmu), start, end);
+> +}
+> +
+>  static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+>  {
+>  	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+> @@ -315,6 +325,7 @@ static const hcall_t host_hcall[] = {
+>  	HANDLE_FUNC(__kvm_vcpu_run),
+>  	HANDLE_FUNC(__kvm_flush_vm_context),
+>  	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
+> +	HANDLE_FUNC(__kvm_tlb_flush_vmid_range),
+>  	HANDLE_FUNC(__kvm_tlb_flush_vmid),
+>  	HANDLE_FUNC(__kvm_flush_cpu_context),
+>  	HANDLE_FUNC(__kvm_timer_set_cntvoff),
+> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> index d296d617f5896..d2504df9d38b6 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> @@ -109,6 +109,45 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
+>  	__tlb_switch_to_host(&cxt);
+>  }
+>  
+> +void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> +				phys_addr_t start, phys_addr_t end)
+> +{
+> +	struct tlb_inv_context cxt;
+> +	unsigned long pages, stride;
+> +
+> +	/*
+> +	 * Since the range of addresses may not be mapped at
+> +	 * the same level, assume the worst case as PAGE_SIZE
+> +	 */
+> +	stride = PAGE_SIZE;
+> +	start = round_down(start, stride);
+> +	end = round_up(end, stride);
+> +	pages = (end - start) >> PAGE_SHIFT;
+> +
+> +	if (!system_supports_tlb_range() || pages >= MAX_TLBI_RANGE_PAGES) {
+> +		__kvm_tlb_flush_vmid(mmu);
+> +		return;
+> +	}
+> +
+> +	dsb(ishst);
 
-No, it's above MTRRcap for two reasons:
+Due to some concerns w.r.t. the imprecision of the architecture for
+synchronizing with the table walkers, these preamble barriers were
+upgraded to dsb(ish) in commit 7e1b2329c205 ("KVM: arm64: nvhe:
+Synchronise with page table walker on TLBI"). Good news is, the magic is
+behind __tlb_switch_to_guest(), so just drop these barriers when you
+rebase the series onto a 6.4 rc.
 
- 1. When PAT is moved out of mtrr.c, PAT doesn't get bunded with the other MTRRs
-    and so would just need to be hoisted back up.  The end code looks like:
-
-	case MSR_IA32_CR_PAT:
-		msr_info->data = vcpu->arch.pat;
-		break;
-	case MSR_MTRRcap:
-	case MTRRphysBase_MSR(0) ... MSR_MTRRfix4K_F8000:
-	case MSR_MTRRdefType:
-		return kvm_mtrr_get_msr(vcpu, msr_info->index, &msr_info->data);
- 
- 2. There is no MSR_MTRRcap case statement in kvm_set_msr_common() because it's
-    a read-only MSR, i.e. the two can't be symmetric :-)
-
-> > -	case 0x200 ... MSR_IA32_MC0_CTL2 - 1:
-> > -	case MSR_IA32_MCx_CTL2(KVM_MAX_MCE_BANKS) ... 0x2ff:
-> > +	case MTRRphysBase_MSR(0) ... MSR_MTRRfix4K_F8000:
-> > +	case MSR_MTRRdefType:
-> >  		return kvm_mtrr_get_msr(vcpu, msr_info->index, &msr_info->data);
-> >  	case 0xcd: /* fsb frequency */
-> >  		msr_info->data = 3;
-> > -- 
-> > 2.40.1.606.ga4b1b128d6-goog
-> > 
-> 
+-- 
+Thanks,
+Oliver
