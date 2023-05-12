@@ -2,63 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D38DD70128E
-	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 01:41:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 945EF70129F
+	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 01:50:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240797AbjELXlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 May 2023 19:41:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47256 "EHLO
+        id S240864AbjELXue (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 May 2023 19:50:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240655AbjELXlA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 May 2023 19:41:00 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B869A19AD
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:40:59 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-530a1b22514so519041a12.1
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:40:59 -0700 (PDT)
+        with ESMTP id S240270AbjELXuc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 May 2023 19:50:32 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3CFA1FCE
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:50:30 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-517bfcfe83fso5742995a12.2
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:50:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683934859; x=1686526859;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rdSWNdPBzCvQZue8s+nJ8+4j93W1/3mOYRyvy9I/esk=;
-        b=s748YbYXBKYE0u5/i9t2zN0VCehO3hUO821bHn0KtVX4LXrWfGzZ4Jbc6Q9rO3V43b
-         RiyXOdLXeaLu1852urhveSmkofnGqK7qbxSK014EGoO6mUFQdrZhTVh7xP56qFs/ATrE
-         MVCFF+tfhGcmsE/KSSsyntK9K+1Z48J82yBZDZCMbNAcXrXE5esiP7TaLOp2ffybU5c3
-         if3wbDGggFxaCeOy3aqvsUdvpZtLMT/bklfy6heYp/Wg3hXEsrFldIoHxeZAA2BayQHp
-         3Fhz7FG2ldpIJhdmn4rkX9lUdmSuRINZLW+58knj9s89UwMfOzRBvTXpwOeXTBrz3txA
-         JCBQ==
+        d=google.com; s=20221208; t=1683935430; x=1686527430;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cOnJ9xJztukkbWobx7LZ+dJafNK2aLEAFwkDyM5Z4k0=;
+        b=WdGoaQYf0ZC3fzYn/JkCyBl1g/pzBQtXwu9n+LoP1TM9nXmjn5uc5mhUyFoDlT5axW
+         loY5DFgEcsI2mkhpKf89E9LM3feQpb80Qt3mSfR2nOscBqzn6L7vsJ1oU4qBWc8KjUMl
+         n8ONEfPm1WPua2qNw3NANlS3Qmzapacc1MJMXTfIULIM1RWPuf8afL8fHppbNK/dOUBx
+         1S8YemTBUz+gNyoeHQNNweEKGsvvL5Y2KF+k4Usz56ErgqLIgtH8wMzdFR8701ZtPf4r
+         I7upAX9/AwQzBI813KcnU3fBl1iXCKoIXH+vyyrUKevgM42CzQcyDDL0fO3qP5wVo2qF
+         wAag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683934859; x=1686526859;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rdSWNdPBzCvQZue8s+nJ8+4j93W1/3mOYRyvy9I/esk=;
-        b=SavhNo/qzKBIJ5KI2ByDm5f16sBFtismnsHTEnOhVr0TeymULCkTBFko+v3f3CIoLV
-         EYUXvwCpjO/iEG/H0v8d3/vSDViGVRF9k37uJi7zFUnlkRI0tC8VEqqSi2Rf8UJqt8hI
-         MfF7jbQhgVIYCtnzuBGi8VvaoLjm3PDFEunh0eem9XrcX66Xwqs34lsbKW3vrrjTerq5
-         d4/3piy3w+dt5bQdkkEJFFUsAw7Eg1JeDTUPvrZqryNctcdTFh+Tz5aegay+a2yoU0aE
-         okdLiSyBI9PmSu8WO3sfz29Gf0ZAZC1wblnUjWUi04KMU2KNXxy22YmghTTpLyn1T3eq
-         Wz3g==
-X-Gm-Message-State: AC+VfDzt9MdvPF7WvehdzSVV1XA4+781kaxmCrrv6+dLX5LTg0mdUmOb
-        6fH0lc3xJXhFGRlPBaseGrGFnNFdgyg=
-X-Google-Smtp-Source: ACHHUZ4OzfCZhOK1+M55+P7V05CPjr5Pv1An6dc8vQsgHRcETuTHgKA7sVjS0VxhHEOQ9gqJIf3D6QUKhuQ=
+        d=1e100.net; s=20221208; t=1683935430; x=1686527430;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cOnJ9xJztukkbWobx7LZ+dJafNK2aLEAFwkDyM5Z4k0=;
+        b=hyl8CiH2m9xtw92FQEJ/k0qBM7HZAhsfB4XZIfCMd1qgviBUSgtlR8ajz78pWai6RC
+         g3VapAY/nbOIgx6XO7aOhRNwKFlfzLN4N6CUeZKyAzyHbsD4+pF0+YWUX2MM2aWLWcn2
+         T/Bk4Tb6qAtAOk6BA6+1drQbNaA6Izugzk6L+MfNsg9vgYp1pkuvdB8Wdi9Q4oL6ljjw
+         lX9j4rcVZHmouaBS0VwyPx43jc6VkW1epVwp0oCoFxeujq30LB0zKdCkaZr2whG6iXFN
+         YO8JeDW0rg277Uii6hG+w1f4dKGnowvXBEwAE0EjYy4eHoZ5EydXBbGsNM+wiRoWhr/z
+         7Lyg==
+X-Gm-Message-State: AC+VfDzceQqx2bjMIggA6OPKmLzXIcgyThdRBvtQ8LWVgroDLIW2EW1u
+        bNPrikbuHOpPRU4JuXZquWxovpFgoaA=
+X-Google-Smtp-Source: ACHHUZ7UTFBfbHDaJpR2CZa/9ilNO1ZdYpnEuBI8MEQ0z9u/B2TnTgW6/zNhg5IQ+BCrdTrpWUu6TwrjtAg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:2b04:0:b0:521:62ef:9b38 with SMTP id
- r4-20020a632b04000000b0052162ef9b38mr7266189pgr.3.1683934859334; Fri, 12 May
- 2023 16:40:59 -0700 (PDT)
-Date:   Fri, 12 May 2023 16:40:57 -0700
-In-Reply-To: <ZF7MuDGp9MvPNwFh@google.com>
+ (user=seanjc job=sendgmr) by 2002:a63:115:0:b0:520:e728:8894 with SMTP id
+ 21-20020a630115000000b00520e7288894mr7203655pgb.5.1683935430245; Fri, 12 May
+ 2023 16:50:30 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 12 May 2023 16:50:08 -0700
 Mime-Version: 1.0
-References: <20230511235917.639770-1-seanjc@google.com> <20230511235917.639770-7-seanjc@google.com>
- <ZF7MuDGp9MvPNwFh@google.com>
-Message-ID: <ZF7OiYzjkG2cp7Fi@google.com>
-Subject: Re: [PATCH 6/9] KVM: x86/mmu: Bug the VM if a vCPU ends up in long
- mode without PAE enabled
+X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
+Message-ID: <20230512235026.808058-1-seanjc@google.com>
+Subject: [PATCH v3 00/18] x86/reboot: KVM: Clean up "emergency" virt code
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Mingwei Zhang <mizhang@google.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="us-ascii"
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Andrew Cooper <Andrew.Cooper3@citrix.com>,
+        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
@@ -69,66 +68,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 12, 2023, David Matlack wrote:
-> On Thu, May 11, 2023 at 04:59:14PM -0700, Sean Christopherson wrote:
-> > Promote the ASSERT(), which is quite dead code in KVM, into a KVM_BUG_ON()
-> > for KVM's sanity check that CR4.PAE=1 if the vCPU is in long mode when
-> > performing a walk of guest page tables.  The sanity is quite cheap since
-> > neither EFER nor CR4.PAE requires a VMREAD, especially relative to the
-> > cost of walking the guest page tables.
-> > 
-> > More importantly, the sanity check would have prevented the true badness
-> > fixed by commit 112e66017bff ("KVM: nVMX: add missing consistency checks
-> > for CR0 and CR4").  The missed consistency check resulted in some versions
-> > of KVM corrupting the on-stack guest_walker structure due to KVM thinking
-> > there are 4/5 levels of page tables, but wiring up the MMU hooks to point
-> > at the paging32 implementation, which only allocates space for two levels
-> > of page tables in "struct guest_walker32".
-> > 
-> > Queue a page fault for injection if the assertion fails, as the sole
-> > caller, FNAME(gva_to_gpa), assumes that walker.fault contains sane info
-> 
-> FNAME(page_fault)->FNAME(walk_addr)->FNAME(walk_addr_generic) is another
-> caller but I think the same reasoning here applies.
+Instead of having the reboot code blindly try to disable virtualization
+during an emergency, use the existing callback into KVM to disable virt
+as "needed".  In quotes because KVM still somewhat blindly attempts to
+disable virt, e.g. if KVM is loaded but doesn't have active VMs and thus
+hasn't enabled hardware.  That could theoretically be "fixed", but due to
+the callback being invoked from NMI context, I'm not convinced it would
+be worth the complexity.  E.g. false positives would still be possible,
+and KVM would have to play games with the per-CPU hardware_enabled flag
+to ensure there are no false negatives.
 
-Huh.  No idea what I was doing.  Missed the super obvious use case...  I'll make
-sure the call from walk_addr() does something not awful.
+The callback is currently used only to VMCLEAR the per-CPU list of VMCSes,
+but not using the callback to disable virt isn't intentional.  Arguably, a
+callback should have been used in the initial "disable virt" code added by
+commit d176720d34c7 ("x86: disable VMX on all CPUs on reboot").  And the
+kexec logic added (much later) by commit f23d1f4a1160 ("x86/kexec: VMCLEAR
+VMCSs loaded on all cpus if necessary") simply missed the opportunity to
+use the callback for all virtualization needs.
 
-> > on a walk failure, i.e. avoid making the situation worse between the time
-> > the assertion fails and when KVM kicks the vCPU out to userspace (because
-> > the VM is bugged).
-> > 
-> > Move the check below the initialization of "pte_access" so that the
-> > aforementioned to-be-injected page fault doesn't consume uninitialized
-> > stack data.  The information _shouldn't_ reach the guest or userspace,
-> > but there's zero downside to being paranoid in this case.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/paging_tmpl.h | 5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> > index a3fc7c1a7f8d..f297e9311dcd 100644
-> > --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> > +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> > @@ -338,7 +338,6 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
-> >  	}
-> >  #endif
-> >  	walker->max_level = walker->level;
-> > -	ASSERT(!(is_long_mode(vcpu) && !is_pae(vcpu)));
-> >  
-> >  	/*
-> >  	 * FIXME: on Intel processors, loads of the PDPTE registers for PAE paging
-> > @@ -348,6 +347,10 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
-> >  	nested_access = (have_ad ? PFERR_WRITE_MASK : 0) | PFERR_USER_MASK;
-> >  
-> >  	pte_access = ~0;
-> > +
-> > +	if (KVM_BUG_ON(is_long_mode(vcpu) && !is_pae(vcpu), vcpu->kvm))
-> > +		goto error;
-> 
-> This if() deserves a comment since it's queueing a page fault for what
-> is likely a KVM bug. As a reader that'd be pretty jarring to see.
+Once KVM handles disabling virt, move all of the helpers provided by
+virtext.h into KVM proper.
 
-Will add.
+There's one outlier patch, "Make KVM_AMD depend on CPU_SUP_AMD or
+CPU_SUP_HYGON", that I included here because it felt weird to pull in the
+"must be AMD or Hygon" check without KVM demanding that at build time.
+
+v3:
+ - Massage changelogs to avoid talking about out-of-tree hypervisors. [Kai]
+ - Move #ifdef "KVM" addition later. [Kai]
+
+v2:
+ - https://lore.kernel.org/all/20230310214232.806108-1-seanjc@google.com
+ - Disable task migration when probing basic SVM and VMX support to avoid
+   logging misleading info (wrong CPU) if probing fails.
+
+v1: https://lore.kernel.org/all/20221201232655.290720-1-seanjc@google.com
+
+Sean Christopherson (18):
+  x86/reboot: VMCLEAR active VMCSes before emergency reboot
+  x86/reboot: Harden virtualization hooks for emergency reboot
+  x86/reboot: KVM: Handle VMXOFF in KVM's reboot callback
+  x86/reboot: KVM: Disable SVM during reboot via virt/KVM reboot
+    callback
+  x86/reboot: Disable virtualization during reboot iff callback is
+    registered
+  x86/reboot: Assert that IRQs are disabled when turning off
+    virtualization
+  x86/reboot: Hoist "disable virt" helpers above "emergency reboot" path
+  x86/reboot: Expose VMCS crash hooks if and only if KVM_{INTEL,AMD} is
+    enabled
+  x86/virt: KVM: Open code cpu_has_vmx() in KVM VMX
+  x86/virt: KVM: Move VMXOFF helpers into KVM VMX
+  KVM: SVM: Make KVM_AMD depend on CPU_SUP_AMD or CPU_SUP_HYGON
+  x86/virt: Drop unnecessary check on extended CPUID level in
+    cpu_has_svm()
+  x86/virt: KVM: Open code cpu_has_svm() into kvm_is_svm_supported()
+  KVM: SVM: Check that the current CPU supports SVM in
+    kvm_is_svm_supported()
+  KVM: VMX: Ensure CPU is stable when probing basic VMX support
+  x86/virt: KVM: Move "disable SVM" helper into KVM SVM
+  KVM: x86: Force kvm_rebooting=true during emergency reboot/crash
+  KVM: SVM: Use "standard" stgi() helper when disabling SVM
+
+ arch/x86/include/asm/kexec.h   |   2 -
+ arch/x86/include/asm/reboot.h  |   7 ++
+ arch/x86/include/asm/virtext.h | 154 ---------------------------------
+ arch/x86/kernel/crash.c        |  31 -------
+ arch/x86/kernel/reboot.c       |  66 ++++++++++----
+ arch/x86/kvm/Kconfig           |   2 +-
+ arch/x86/kvm/svm/svm.c         |  70 ++++++++++++---
+ arch/x86/kvm/vmx/vmx.c         |  68 +++++++++++----
+ 8 files changed, 168 insertions(+), 232 deletions(-)
+ delete mode 100644 arch/x86/include/asm/virtext.h
+
+
+base-commit: b3c98052d46948a8d65d2778c7f306ff38366aac
+-- 
+2.40.1.606.ga4b1b128d6-goog
+
