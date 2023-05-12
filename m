@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 94F027012A4
-	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 01:50:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D49FC7012A8
+	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 01:50:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240920AbjELXul (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 May 2023 19:50:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50968 "EHLO
+        id S241004AbjELXuu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 May 2023 19:50:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240883AbjELXug (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 May 2023 19:50:36 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF8F269D
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:50:34 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-552f2f940edso189893447b3.0
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:50:34 -0700 (PDT)
+        with ESMTP id S240900AbjELXuj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 May 2023 19:50:39 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A069E72BC
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:50:36 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5287c9b01fdso9668892a12.2
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:50:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683935434; x=1686527434;
+        d=google.com; s=20221208; t=1683935436; x=1686527436;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=nr0/2P0PrhPVltPxqFEO8yZGlq+w0+NW5S2btIKs8As=;
-        b=WnOy9eWYFT1JeIO58JaMN1jZcMhT11BdOKPnALDAvrjMuhmZH42P9YhiZa/7JYaYGY
-         ZpHrwciGnurOfJK9oBMXECwzcbEmpZfTWoGPFiZvJ8gE7xDpEIqA+FoxYyfH6y7DyEbJ
-         +lNK1HZAQoGu6aWxcQqJxEpOkzAtMrWoFOh0Eelr1BaB+ZGd4k5UOiGGNYp9UpCi9D+z
-         K5up0w1/ftbLw4OwW15WahGKHXE4yaa6gTWI6h7md8aEWjTJaNNiXhCLCQ9EeQlXZjhk
-         M+9AdiXDgGvYOgot5GgzVAVDi+/PP32mF4DqfsRGOyX3UZkUQ2COmITahoXI/TtRngN+
-         mU6g==
+        bh=+s2vjHRYRtpZyb+3MD4uIyfdE2NLcpaPYwgApb/ZFNM=;
+        b=eL4nHQSDwW7gmn00vvldj9MYIw/3vl4sCi/gnCCZSk6YcH5PAXQT7/IXU9zbw1lNI9
+         z+L1Zy318WhArTc/IZwxY2CV/HxE6817Z6q5II4naCiKmZwRCydxx9BFa3lSMUkDWQXs
+         uQTqwaP1wdkQmPAB+fuSO33FjSoWj/+WsZ5JB83+H3v3s5puS+/LPVNmUvWnx9bcX9RF
+         AYH5XguXq4T2STOgcQIcPxf6BixVfX46SeQfMIqlMJ9k08ja3rveKxzZUzkpQuNLnvcn
+         oENOWnPIVaCFGgVgYvMUxe6OMGVjh3GK8kO3QPex+mbdBytrp1xOd2AfIy8LFooshtE4
+         fe+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683935434; x=1686527434;
+        d=1e100.net; s=20221208; t=1683935436; x=1686527436;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nr0/2P0PrhPVltPxqFEO8yZGlq+w0+NW5S2btIKs8As=;
-        b=Bjqkld9zgiDT/06GaFV7uVO48uvYUTqU8qamG55YIKjax63VmdliSwHFE0yWCTZgYV
-         D+txkkthpxFtIXKMwpo+oGwFAgeBngBUUj0WDmoIh8H8V2phWiaZnbDPDGIncauDfS8r
-         byNN4SgtAmSb6SXr0+mv4shvUK1mwskyqvI+7A9L8lEgO6ciWXrKDXhCceeCnXS2nH9v
-         QMd8kCN26qRnUAmhuZie9HJOyxp8E+QGtPsGiAurW9I+c8fJmSqVrng4l37m+4JaGhZ5
-         C9fEBc4yWUbD95eOZo4qKjFVvus34KiUU/eVjljhrUMYV7rVxKXBtSEMM4vaVRt9fsvZ
-         p31g==
-X-Gm-Message-State: AC+VfDzk8ptBFKGhV1+pAm950nXjBuQUkBLyVo/GaUNoi41bfphdYQaI
-        EwKVM8/D51dzLuMqq6PWs3Xj82r6wKI=
-X-Google-Smtp-Source: ACHHUZ5fCcu/o8G8jp7gcUKE/IEMSr5CBYWwKcUGKW1V18cr7ZFI2S5aWNKXh3lhFT3tw6R83mDt0fyaSK8=
+        bh=+s2vjHRYRtpZyb+3MD4uIyfdE2NLcpaPYwgApb/ZFNM=;
+        b=TtT3UceL5OT49PLRxevEJpulkFbbDQxY1a9Dkz6xevHxvwm9gAt5GSMiOOdLMWw3wV
+         irMpw4Rnd9XreQPhIwQZDM5caafLwBifWKJXwiJ+CPCAou9UDIbhny4amI7id6OfOlKI
+         nfNkXLGtJKX1o1b+XKp5iBfnyN4VknQezwHxqMoCVoghpmNrIv9TSvXaDJK7GgASoehX
+         JQUT0ZvCmwJDZ3pAeonzZKnFMieXH871lGPD3b2vuf9GglY5IyGlpQI5Hz/h6RL0H/Vc
+         Mge+c5hz0vPmPkL8PHeaspy8YNcJ7IYYEnPyEKQjjRsIqNcSFTULdtXzfGRzfH2XH8NA
+         xtOg==
+X-Gm-Message-State: AC+VfDzg2NiSRE0lIERZ6PLtu8YUNkhOGwtBr42T7zSx90s9nude/Xu7
+        m/TPZRf7pzW81uM9YrhgWOB7IdAj1F8=
+X-Google-Smtp-Source: ACHHUZ7YCOK7NeYCRWfTly2nekYy4l2odBN0e7AOiKGNjhSjgZdoa73xpxS+RBUYSn0lbsw0WS09kiQdiYg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ca49:0:b0:55d:9484:f153 with SMTP id
- y9-20020a81ca49000000b0055d9484f153mr16043474ywk.7.1683935434025; Fri, 12 May
- 2023 16:50:34 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a63:28c6:0:b0:520:bbac:7c4e with SMTP id
+ bs189-20020a6328c6000000b00520bbac7c4emr7385721pgb.9.1683935436148; Fri, 12
+ May 2023 16:50:36 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 12 May 2023 16:50:10 -0700
+Date:   Fri, 12 May 2023 16:50:11 -0700
 In-Reply-To: <20230512235026.808058-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230512235026.808058-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
-Message-ID: <20230512235026.808058-3-seanjc@google.com>
-Subject: [PATCH v3 02/18] x86/reboot: Harden virtualization hooks for
- emergency reboot
+Message-ID: <20230512235026.808058-4-seanjc@google.com>
+Subject: [PATCH v3 03/18] x86/reboot: KVM: Handle VMXOFF in KVM's reboot callback
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -65,112 +64,138 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Provide dedicated helpers to (un)register virt hooks used during an
-emergency crash/reboot, and WARN if there is an attempt to overwrite
-the registered callback, or an attempt to do an unpaired unregister.
-
-Opportunsitically use rcu_assign_pointer() instead of RCU_INIT_POINTER(),
-mainly so that the set/unset paths are more symmetrical, but also because
-any performance gains from using RCU_INIT_POINTER() are meaningless for
-this code.
+Use KVM VMX's reboot/crash callback to do VMXOFF in an emergency instead
+of manually and blindly doing VMXOFF.  There's no need to attempt VMXOFF
+if a hypervisor, i.e. KVM, isn't loaded/active, i.e. if the CPU can't
+possibly be post-VMXON.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/reboot.h |  5 +++--
- arch/x86/kernel/reboot.c      | 30 ++++++++++++++++++++++++------
- arch/x86/kvm/vmx/vmx.c        |  6 ++----
- 3 files changed, 29 insertions(+), 12 deletions(-)
+ arch/x86/include/asm/virtext.h | 10 ----------
+ arch/x86/kernel/reboot.c       | 29 +++++++++--------------------
+ arch/x86/kvm/vmx/vmx.c         |  8 +++++---
+ 3 files changed, 14 insertions(+), 33 deletions(-)
 
-diff --git a/arch/x86/include/asm/reboot.h b/arch/x86/include/asm/reboot.h
-index 2551baec927d..d9a38d379d18 100644
---- a/arch/x86/include/asm/reboot.h
-+++ b/arch/x86/include/asm/reboot.h
-@@ -25,8 +25,9 @@ void __noreturn machine_real_restart(unsigned int type);
- #define MRR_BIOS	0
- #define MRR_APM		1
+diff --git a/arch/x86/include/asm/virtext.h b/arch/x86/include/asm/virtext.h
+index 3b12e6b99412..5bc29fab15da 100644
+--- a/arch/x86/include/asm/virtext.h
++++ b/arch/x86/include/asm/virtext.h
+@@ -70,16 +70,6 @@ static inline void __cpu_emergency_vmxoff(void)
+ 		cpu_vmxoff();
+ }
  
--typedef void crash_vmclear_fn(void);
--extern crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
-+typedef void (cpu_emergency_virt_cb)(void);
-+void cpu_emergency_register_virt_callback(cpu_emergency_virt_cb *callback);
-+void cpu_emergency_unregister_virt_callback(cpu_emergency_virt_cb *callback);
- void cpu_emergency_disable_virtualization(void);
+-/** Disable VMX if it is supported and enabled on the current CPU
+- */
+-static inline void cpu_emergency_vmxoff(void)
+-{
+-	if (cpu_has_vmx())
+-		__cpu_emergency_vmxoff();
+-}
+-
+-
+-
  
- typedef void (*nmi_shootdown_cb)(int, struct pt_regs*);
+ /*
+  * SVM functions:
 diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
-index 299b970e5f82..739e09527dbb 100644
+index 739e09527dbb..0cf2261c2dec 100644
 --- a/arch/x86/kernel/reboot.c
 +++ b/arch/x86/kernel/reboot.c
-@@ -794,17 +794,35 @@ void machine_crash_shutdown(struct pt_regs *regs)
-  *
-  * protected by rcu.
-  */
--crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
--EXPORT_SYMBOL_GPL(crash_vmclear_loaded_vmcss);
-+static cpu_emergency_virt_cb __rcu *cpu_emergency_virt_callback;
-+
-+void cpu_emergency_register_virt_callback(cpu_emergency_virt_cb *callback)
-+{
-+	if (WARN_ON_ONCE(rcu_access_pointer(cpu_emergency_virt_callback)))
-+		return;
-+
-+	rcu_assign_pointer(cpu_emergency_virt_callback, callback);
-+}
-+EXPORT_SYMBOL_GPL(cpu_emergency_register_virt_callback);
-+
-+void cpu_emergency_unregister_virt_callback(cpu_emergency_virt_cb *callback)
-+{
-+	if (WARN_ON_ONCE(rcu_access_pointer(cpu_emergency_virt_callback) != callback))
-+		return;
-+
-+	rcu_assign_pointer(cpu_emergency_virt_callback, NULL);
-+	synchronize_rcu();
-+}
-+EXPORT_SYMBOL_GPL(cpu_emergency_unregister_virt_callback);
+@@ -787,13 +787,7 @@ void machine_crash_shutdown(struct pt_regs *regs)
+ }
+ #endif
  
- static inline void cpu_crash_vmclear_loaded_vmcss(void)
+-/*
+- * This is used to VMCLEAR all VMCSs loaded on the
+- * processor. And when loading kvm_intel module, the
+- * callback function pointer will be assigned.
+- *
+- * protected by rcu.
+- */
++/* RCU-protected callback to disable virtualization prior to reboot. */
+ static cpu_emergency_virt_cb __rcu *cpu_emergency_virt_callback;
+ 
+ void cpu_emergency_register_virt_callback(cpu_emergency_virt_cb *callback)
+@@ -815,17 +809,6 @@ void cpu_emergency_unregister_virt_callback(cpu_emergency_virt_cb *callback)
+ }
+ EXPORT_SYMBOL_GPL(cpu_emergency_unregister_virt_callback);
+ 
+-static inline void cpu_crash_vmclear_loaded_vmcss(void)
+-{
+-	cpu_emergency_virt_cb *callback;
+-
+-	rcu_read_lock();
+-	callback = rcu_dereference(cpu_emergency_virt_callback);
+-	if (callback)
+-		callback();
+-	rcu_read_unlock();
+-}
+-
+ /* This is the CPU performing the emergency shutdown work. */
+ int crashing_cpu = -1;
+ 
+@@ -836,9 +819,15 @@ int crashing_cpu = -1;
+  */
+ void cpu_emergency_disable_virtualization(void)
  {
--	crash_vmclear_fn *do_vmclear_operation = NULL;
+-	cpu_crash_vmclear_loaded_vmcss();
 +	cpu_emergency_virt_cb *callback;
  
- 	rcu_read_lock();
--	do_vmclear_operation = rcu_dereference(crash_vmclear_loaded_vmcss);
--	if (do_vmclear_operation)
--		do_vmclear_operation();
+-	cpu_emergency_vmxoff();
++	rcu_read_lock();
 +	callback = rcu_dereference(cpu_emergency_virt_callback);
 +	if (callback)
 +		callback();
- 	rcu_read_unlock();
++	rcu_read_unlock();
++
++	/* KVM_AMD doesn't yet utilize the common callback. */
+ 	cpu_emergency_svm_disable();
  }
  
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 317f72baf0c3..fc9cdb4114cc 100644
+index fc9cdb4114cc..76cdb189f1b5 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8547,8 +8547,7 @@ static void __vmx_exit(void)
+@@ -744,7 +744,7 @@ static int vmx_set_guest_uret_msr(struct vcpu_vmx *vmx,
+ 	return ret;
+ }
+ 
+-static void crash_vmclear_local_loaded_vmcss(void)
++static void vmx_emergency_disable(void)
+ {
+ 	int cpu = raw_smp_processor_id();
+ 	struct loaded_vmcs *v;
+@@ -752,6 +752,8 @@ static void crash_vmclear_local_loaded_vmcss(void)
+ 	list_for_each_entry(v, &per_cpu(loaded_vmcss_on_cpu, cpu),
+ 			    loaded_vmcss_on_cpu_link)
+ 		vmcs_clear(v->vmcs);
++
++	__cpu_emergency_vmxoff();
+ }
+ 
+ static void __loaded_vmcs_clear(void *arg)
+@@ -8547,7 +8549,7 @@ static void __vmx_exit(void)
  {
  	allow_smaller_maxphyaddr = false;
  
--	RCU_INIT_POINTER(crash_vmclear_loaded_vmcss, NULL);
--	synchronize_rcu();
-+	cpu_emergency_unregister_virt_callback(crash_vmclear_local_loaded_vmcss);
+-	cpu_emergency_unregister_virt_callback(crash_vmclear_local_loaded_vmcss);
++	cpu_emergency_unregister_virt_callback(vmx_emergency_disable);
  
  	vmx_cleanup_l1d_flush();
  }
-@@ -8598,8 +8597,7 @@ static int __init vmx_init(void)
+@@ -8597,7 +8599,7 @@ static int __init vmx_init(void)
  		pi_init_cpu(cpu);
  	}
  
--	rcu_assign_pointer(crash_vmclear_loaded_vmcss,
--			   crash_vmclear_local_loaded_vmcss);
-+	cpu_emergency_register_virt_callback(crash_vmclear_local_loaded_vmcss);
+-	cpu_emergency_register_virt_callback(crash_vmclear_local_loaded_vmcss);
++	cpu_emergency_register_virt_callback(vmx_emergency_disable);
  
  	vmx_check_vmcs12_offsets();
  
