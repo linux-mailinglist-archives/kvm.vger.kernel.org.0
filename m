@@ -2,135 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2D0F70036D
-	for <lists+kvm@lfdr.de>; Fri, 12 May 2023 11:10:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 426957003CB
+	for <lists+kvm@lfdr.de>; Fri, 12 May 2023 11:32:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240421AbjELJKl convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 12 May 2023 05:10:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46036 "EHLO
+        id S240447AbjELJcE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 May 2023 05:32:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239984AbjELJKk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 May 2023 05:10:40 -0400
-Received: from senda.mailex.chinaunicom.cn (senda.mailex.chinaunicom.cn [123.138.59.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C125B11635
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 02:10:34 -0700 (PDT)
-Received: from M10-XA-MLCEN01.MailSrv.cnc.intra (unknown [10.236.3.197])
-        by senda.mailex.chinaunicom.cn (SkyGuard) with ESMTPS id 4QHjjF531Qz3Dthn
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:13:05 +0800 (CST)
-Received: from smtpbg.qq.com (10.237.2.96) by M10-XA-MLCEN01.MailSrv.cnc.intra
- (10.236.3.197) with Microsoft SMTP Server id 15.0.1497.47; Fri, 12 May 2023
- 17:10:29 +0800
-X-QQ-mid: Ymail-xx24b003-t1683882626tqw
-Received: from localhost.localdomain (unknown [10.3.224.193])
-        by smtp.qq.com (ESMTP) with 
-        id ; Fri, 12 May 2023 17:10:26 +0800 (CST)
-X-QQ-SSF: 0190000000000060I730050A0000000
-X-QQ-GoodBg: 0
-From:   =?gb18030?B?yM7D9MP0KMGqzai8r83FwarNqMr919a/xry809A=?=
-         =?gb18030?B?z965q8u+sb6yvyk=?= <renmm6@chinaunicom.cn>
-To:     =?gb18030?B?a3Zt?= <kvm@vger.kernel.org>
-CC:     =?gb18030?B?cGJvbnppbmk=?= <pbonzini@redhat.com>,
-        =?gb18030?B?YW5kcmV3LmpvbmVz?= <andrew.jones@linux.dev>,
-        =?gb18030?B?cm1tMTk4NQ==?= <rmm1985@163.com>
-Subject: [kvm-unit-tests PATCH v3] run_tests: add list tests name option on command line
-Date:   Fri, 12 May 2023 17:09:28 +0800
-Message-ID: <20230512090928.3437244-1-renmm6@chinaunicom.cn>
-X-Mailer: git-send-email 2.33.0
+        with ESMTP id S240239AbjELJcD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 May 2023 05:32:03 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E48825596;
+        Fri, 12 May 2023 02:32:00 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34C9PiHh007243;
+        Fri, 12 May 2023 09:32:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=okP6Pq6MJ09PNXRXbF+JgVfwUd0jdWmjvDe2AGlc6BM=;
+ b=l1ZMCoPDhgMOSqmMyt81xndvK2d5lqwUo8chV+6QaQ+E6Z+u7JkPQRB/qsTLijFKCNen
+ rFj5KamcG/AJu4OZc6dRr91fRVacURejOcWQcWv423rPO3R4UyM0r0B7lqToSRl1Fgpu
+ RhjLitlwjLKcthXRw+JA7YwgTCKFPcySpPM+ZIs0BsLNIqEwST+399FP0DFCGLasurV0
+ 5Y0Cm2xOsZ4oni+xfaz3PVBBjwBt3PA+q8wGWxqKBOPuGV0Lm0CrZ39JP540tbrF3X0e
+ 2S2FKTL7F4sc3xx1YbszdOjtisRMctALHggz5A6fcTfEcup3CpDAq/xaDPO5YygOWKI5 sg== 
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qhjtbg5fm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 May 2023 09:31:59 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34C29Xpe018116;
+        Fri, 12 May 2023 09:31:57 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3qf896t8es-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 May 2023 09:31:57 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34C9VriS30278280
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 May 2023 09:31:53 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9769820040;
+        Fri, 12 May 2023 09:31:53 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 45FC820043;
+        Fri, 12 May 2023 09:31:53 +0000 (GMT)
+Received: from a46lp73.lnxne.boe (unknown [9.152.108.100])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 12 May 2023 09:31:53 +0000 (GMT)
+From:   Steffen Eiden <seiden@linux.ibm.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>
+Subject: [PATCH 0/5] s390/uvdevice: Expose secret UVCs
+Date:   Fri, 12 May 2023 11:31:48 +0200
+Message-Id: <20230512093153.206378-1-seiden@linux.ibm.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-X-QQ-SENDSIZE: 520
-Feedback-ID: Ymail-xx:chinaunicom.cn:mail-xx:mail-xx24b003-zhyw44w
-Content-Type: text/plain
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: RdJfXh1_JHc8vv_vpylVrCeum6m2H6Sg
+X-Proofpoint-GUID: RdJfXh1_JHc8vv_vpylVrCeum6m2H6Sg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-12_06,2023-05-05_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 mlxscore=0 bulkscore=0 mlxlogscore=680 phishscore=0
+ lowpriorityscore=0 clxscore=1011 adultscore=0 impostorscore=0
+ malwarescore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2304280000 definitions=main-2305120075
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: rminmin <renmm6@chinaunicom.cn>
+IBM Secure Execution guests may want to inject secrets into the Ultravisor(UV).
+Also they should be able to know which secrets the UV possesses and prevent the
+further addition of more secrets.
 
-Add '-l | --list' option on command line to output
-all tests name only, and could be filtered by group
-with '-g | --group' option.
+Therefore, add three new Ultravisor-Calls and expose them via the uvdevice:
+Add Secret, List Secrets, and Lock Secrets.
+The uvdevice still acts as the messenger only and does not inspect or modify
+the requests. Only some sanity checks are made to prevent the kernel from corruption.
+Also add a new IOCTL to get information about the supported UV-calls of the uvdevice.
+As userspace wants to know which secrets, types, etc. are supported expose the corresponding
+UV Query info data to userspace via sysfs.
 
-E.g.
-  List all vmx group tests name:
-  $ ./run_tests.sh -g vmx -l
+The series contains:
+  * A new info IOCTL, giving information about the capabilities of the uvdevice and UV
+  * 3 patches adding new Ultravisor-Calls and expose them to userspace
+  * A patch with an Ultravisor Query Info update for the new secret related information
 
-  List all tests name:
-  $ ./run_tests.sh -l
+Steffen
 
-Signed-off-by: rminmin <renmm6@chinaunicom.cn>
----
- run_tests.sh | 23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+Steffen Eiden (5):
+  s390/uvdevice: Add info IOCTL
+  s390/uvdevice: Add 'Add Secret' UVC
+  s390/uvdevice: Add 'List Secrets' UVC
+  s390/uvdevice: Add 'Lock Secret Store' UVC
+  s390/uv: Update query for secret-UVCs
 
-diff --git a/run_tests.sh b/run_tests.sh
-index f61e005..baf8e46 100755
---- a/run_tests.sh
-+++ b/run_tests.sh
-@@ -15,7 +15,7 @@ function usage()
- {
- cat <<EOF
+ arch/s390/boot/uv.c                   |   4 +
+ arch/s390/include/asm/uv.h            |  30 +++-
+ arch/s390/include/uapi/asm/uvdevice.h |  56 ++++++-
+ arch/s390/kernel/uv.c                 |  40 +++++
+ drivers/s390/char/uvdevice.c          | 229 +++++++++++++++++++++++++-
+ 5 files changed, 350 insertions(+), 9 deletions(-)
 
--Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t]
-+Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t] [-l]
+-- 
+2.40.1
 
-     -h, --help      Output this help text
-     -v, --verbose   Enables verbose mode
-@@ -24,6 +24,7 @@ Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t]
-     -g, --group     Only execute tests in the given group
-     -j, --parallel  Execute tests in parallel
-     -t, --tap13     Output test results in TAP format
-+    -l, --list      Only output all tests list
-
- Set the environment variable QEMU=/path/to/qemu-system-ARCH to
- specify the appropriate qemu binary for ARCH-run.
-@@ -42,7 +43,8 @@ if [ $? -ne 4 ]; then
- fi
-
- only_tests=""
--args=$(getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $*)
-+list_tests=""
-+args=$(getopt -u -o ag:htj:v:l -l all,group:,help,tap13,parallel:,verbose:,list -- $*)
- [ $? -ne 0 ] && exit 2;
- set -- $args;
- while [ $# -gt 0 ]; do
-@@ -73,6 +75,9 @@ while [ $# -gt 0 ]; do
-         -t | --tap13)
-             tap_output="yes"
-             ;;
-+        -l | --list)
-+            list_tests="yes"
-+            ;;
-         --)
-             ;;
-         *)
-@@ -154,6 +159,20 @@ function run_task()
- : ${unittest_run_queues:=1}
- config=$TEST_DIR/unittests.cfg
-
-+print_testname()
-+{
-+    local testname=$1
-+    local groups=$2
-+    if [ -n "$only_group" ] && ! find_word "$only_group" "$groups"; then
-+        return
-+    fi
-+    echo "$testname"
-+}
-+if [[ $list_tests == "yes" ]]; then
-+    for_each_unittest $config print_testname
-+    exit
-+fi
-+
- rm -rf $unittest_log_dir.old
- [ -d $unittest_log_dir ] && mv $unittest_log_dir $unittest_log_dir.old
- mkdir $unittest_log_dir || exit 2
---
-2.33.0
-
-如果您错误接收了该邮件，请通过电子邮件立即通知我们。请回复邮件到 hqs-spmc@chinaunicom.cn，即可以退订此邮件。我们将立即将您的信息从我们的发送目录中删除。 If you have received this email in error please notify us immediately by e-mail. Please reply to hqs-spmc@chinaunicom.cn ,you can unsubscribe from this mail. We will immediately remove your information from send catalogue of our.
