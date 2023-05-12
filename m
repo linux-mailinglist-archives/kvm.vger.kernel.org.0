@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27B107012AF
-	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 01:51:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 834AA7012B2
+	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 01:51:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241247AbjELXv1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 May 2023 19:51:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51716 "EHLO
+        id S241147AbjELXvc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 May 2023 19:51:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241055AbjELXuv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 May 2023 19:50:51 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B01327695
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:50:44 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-559f48c530eso171835857b3.0
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:50:44 -0700 (PDT)
+        with ESMTP id S241002AbjELXvB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 May 2023 19:51:01 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03ED1A5EA
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:50:45 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-5301ed4ba6bso4215134a12.1
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:50:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683935443; x=1686527443;
+        d=google.com; s=20221208; t=1683935444; x=1686527444;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=XrP26l12dblklnP33ZoJ42tkdCuUxCksg2I7hVQj90o=;
-        b=t3l3UThP2dJQk781dgfm6ckxPk0wInH63kNwS1OxOB5doCeMhOaQ3QCXkQXvuUOA22
-         f500PigbQpIBdH2L/iV9XKXKmJBE5MSuSvQPGDjtyzUbExUbv/sIzHHFD8tUjK52BCI0
-         Y+UQneyRIAprJu6zNMgiQ7+5VC9LUoyyAgYLFz2IPzVqdrQFmyu7zqrD528/W/QvjSCz
-         p4IyB3q3+NIIppbhu+S9j9P4m/QenC8u7xxgvihHzvBMezKm8ffOtRi3dn9ayb6slaPk
-         NqjANNiGDzr1vrweDks4SWJ6Xs/zvvsU82qGHDybQx1cmHSVayh1VoU3yVv/OeK3VYc5
-         vipw==
+        bh=/1IPICvf7oBSkQ+FrPIawf/Mg2EXS+lcMpbXqr7FjNI=;
+        b=TymfnqyOMHELbo2UfU2++anjDyQ5g/Fd3TGS65R1rGGjB5ZdpTRVOXWGPFiLTKxtrv
+         wyJwbLAFaG+N5fESRVELoolS3Ul5LAUQJUBqoWxGuaYg7kIBA6li7RU69Y3DVPBExuRj
+         Gz1TmaQpvxIm8yq8J96nz+Oy0ixKCzQ/92URbshs0tQynmouaoSlkYRkCUGvL2dQZLnw
+         OURA4pD1v+JIREOhUZ+cjyPIOh2nkk+u0EgwbQhEgrifasOJ4LgFsX1ONtqhrf8PM17V
+         yzAx6U/uE7gXlrCYy1lBNHL4CGo0tog2DdHnZmEY9831+q9P6JXpZGiTnNjxJAmQpWnJ
+         aatA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683935443; x=1686527443;
+        d=1e100.net; s=20221208; t=1683935444; x=1686527444;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XrP26l12dblklnP33ZoJ42tkdCuUxCksg2I7hVQj90o=;
-        b=fToSF//0z1SVv/AamEXXaM4eFUaZZM6Yk0hR/AKGoWbFDcBKz3zIc/iFQP1f0I8ym+
-         yhEaVLzr0ZbnU+iay7WPlZ7AaaxuIdLIXjL6xmDKQQutm0NSJYnppMwixIEEhkeURwpO
-         ajh4DWE5MgLOLYUtyk+dyYIceUAKCzFPyCf76TRUjHNUJQkgAbaWTg1ujprUbUyWl49f
-         URYp/N49ZtWDmGsinHorvVXYW/yWtlTubECAQ/NYkqGIPioUfHqB1zre+ODBQt5qf2DS
-         Rx4hlG71McxQJT2mjfDTpHnRiypQtaSve6AV+2kIle22tQaTMw4jK9hSrsCPhHB4JdcR
-         m1DQ==
-X-Gm-Message-State: AC+VfDyWy8XBKSFUK5/pYKw/rasaoQ8saEDBbjPvjcYPUJiXrBIU8sGN
-        djK7lvBCMVloHdcD38VfC08xJIfglFo=
-X-Google-Smtp-Source: ACHHUZ6M2e4Ssla5r6FTjmFpHe6ltl5bE07hk4DQg/mz/hvAn1S6vuXVAqtyoscKHvcT/LmMkGccQQCY/Ak=
+        bh=/1IPICvf7oBSkQ+FrPIawf/Mg2EXS+lcMpbXqr7FjNI=;
+        b=iotw3Kb/Hbv674fIG96ey5YbocHWJOTCpa7xpw1ZRr8p5XZ1po6jy+Y5f8GL8xW8M0
+         XhAnqBDskesmki2lajVIY7ZZrkTeB4yJxDGDh4Ntna8Nq8Og4Qg9UGMOXKBQsN+Jv4mO
+         sR9Q9RwKmCewyDTJPq6H3QBWBtojt60QSEjtT3LodT/w3180jk9AX7PjU9p4XV/nGAkx
+         HziNXcawrzwqDRa+1KfhGuXfQKHfXB2TIJTaQkN/ysIwWuvyU6tZz+9zOJv5T/RibTPP
+         qa26yQ50rSC+gM4qsaAK7NnzMlsHpRpDrHNJhUTxN/kaV1/m3xv8PlFv6vfS2LcM4/UX
+         vbmg==
+X-Gm-Message-State: AC+VfDwFtJX9heGKtYXRkF8AnjFd6aP20G2enSAS/7HEKk8lhJo5HH3c
+        sDEoUhGk6ZmFTCIVHjZXZV6Pd477g74=
+X-Google-Smtp-Source: ACHHUZ4NkybXz2S8sZ+f7jfd9GQ8/ArkxwtmNPQiM8HUXTMa0NPm7uvWK7LDMj15Q8ugWGuQHxy6T5Nx4TM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:c70a:0:b0:55d:6af3:1e2c with SMTP id
- m10-20020a81c70a000000b0055d6af31e2cmr15498070ywi.3.1683935443126; Fri, 12
- May 2023 16:50:43 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a63:8ac1:0:b0:52c:8878:65dc with SMTP id
+ y184-20020a638ac1000000b0052c887865dcmr7791562pgd.1.1683935444712; Fri, 12
+ May 2023 16:50:44 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 12 May 2023 16:50:15 -0700
+Date:   Fri, 12 May 2023 16:50:16 -0700
 In-Reply-To: <20230512235026.808058-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230512235026.808058-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
-Message-ID: <20230512235026.808058-8-seanjc@google.com>
-Subject: [PATCH v3 07/18] x86/reboot: Hoist "disable virt" helpers above
- "emergency reboot" path
+Message-ID: <20230512235026.808058-9-seanjc@google.com>
+Subject: [PATCH v3 08/18] x86/reboot: Expose VMCS crash hooks if and only if
+ KVM_{INTEL,AMD} is enabled
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -72,129 +72,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the various "disable virtualization" helpers above the emergency
-reboot path so that emergency_reboot_disable_virtualization() can be
-stubbed out in a future patch if neither KVM_INTEL nor KVM_AMD is enabled,
-i.e. if there is no in-tree user of CPU virtualization.
-
-No functional change intended.
+Expose the crash/reboot hooks used by KVM to disable virtualization in
+hardware and unblock INIT only if there's a potential in-tree user,
+i.e. either KVM_INTEL or KVM_AMD is enabled.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kernel/reboot.c | 90 ++++++++++++++++++++--------------------
- 1 file changed, 45 insertions(+), 45 deletions(-)
+ arch/x86/include/asm/reboot.h | 4 ++++
+ arch/x86/kernel/reboot.c      | 5 ++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
+diff --git a/arch/x86/include/asm/reboot.h b/arch/x86/include/asm/reboot.h
+index d9a38d379d18..9cf0b21bf495 100644
+--- a/arch/x86/include/asm/reboot.h
++++ b/arch/x86/include/asm/reboot.h
+@@ -25,10 +25,14 @@ void __noreturn machine_real_restart(unsigned int type);
+ #define MRR_BIOS	0
+ #define MRR_APM		1
+ 
++#if IS_ENABLED(CONFIG_KVM_INTEL) || IS_ENABLED(CONFIG_KVM_AMD)
+ typedef void (cpu_emergency_virt_cb)(void);
+ void cpu_emergency_register_virt_callback(cpu_emergency_virt_cb *callback);
+ void cpu_emergency_unregister_virt_callback(cpu_emergency_virt_cb *callback);
+ void cpu_emergency_disable_virtualization(void);
++#else
++static inline void cpu_emergency_disable_virtualization(void) {}
++#endif /* CONFIG_KVM_INTEL || CONFIG_KVM_AMD */
+ 
+ typedef void (*nmi_shootdown_cb)(int, struct pt_regs*);
+ void nmi_panic_self_stop(struct pt_regs *regs);
 diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
-index fddfea5f1d20..493d66e59a4f 100644
+index 493d66e59a4f..6818d8de85a1 100644
 --- a/arch/x86/kernel/reboot.c
 +++ b/arch/x86/kernel/reboot.c
-@@ -529,6 +529,51 @@ static inline void kb_wait(void)
+@@ -529,6 +529,7 @@ static inline void kb_wait(void)
  
  static inline void nmi_shootdown_cpus_on_restart(void);
  
-+/* RCU-protected callback to disable virtualization prior to reboot. */
-+static cpu_emergency_virt_cb __rcu *cpu_emergency_virt_callback;
-+
-+void cpu_emergency_register_virt_callback(cpu_emergency_virt_cb *callback)
-+{
-+	if (WARN_ON_ONCE(rcu_access_pointer(cpu_emergency_virt_callback)))
-+		return;
-+
-+	rcu_assign_pointer(cpu_emergency_virt_callback, callback);
-+}
-+EXPORT_SYMBOL_GPL(cpu_emergency_register_virt_callback);
-+
-+void cpu_emergency_unregister_virt_callback(cpu_emergency_virt_cb *callback)
-+{
-+	if (WARN_ON_ONCE(rcu_access_pointer(cpu_emergency_virt_callback) != callback))
-+		return;
-+
-+	rcu_assign_pointer(cpu_emergency_virt_callback, NULL);
-+	synchronize_rcu();
-+}
-+EXPORT_SYMBOL_GPL(cpu_emergency_unregister_virt_callback);
-+
-+/*
-+ * Disable virtualization, i.e. VMX or SVM, to ensure INIT is recognized during
-+ * reboot.  VMX blocks INIT if the CPU is post-VMXON, and SVM blocks INIT if
-+ * GIF=0, i.e. if the crash occurred between CLGI and STGI.
-+ */
-+void cpu_emergency_disable_virtualization(void)
-+{
-+	cpu_emergency_virt_cb *callback;
-+
-+	/*
-+	 * IRQs must be disabled as KVM enables virtualization in hardware via
-+	 * function call IPIs, i.e. IRQs need to be disabled to guarantee
-+	 * virtualization stays disabled.
-+	 */
-+	lockdep_assert_irqs_disabled();
-+
-+	rcu_read_lock();
-+	callback = rcu_dereference(cpu_emergency_virt_callback);
-+	if (callback)
-+		callback();
-+	rcu_read_unlock();
-+}
-+
- static void emergency_reboot_disable_virtualization(void)
- {
- 	local_irq_disable();
-@@ -785,54 +830,9 @@ void machine_crash_shutdown(struct pt_regs *regs)
++#if IS_ENABLED(CONFIG_KVM_INTEL) || IS_ENABLED(CONFIG_KVM_AMD)
+ /* RCU-protected callback to disable virtualization prior to reboot. */
+ static cpu_emergency_virt_cb __rcu *cpu_emergency_virt_callback;
+ 
+@@ -596,7 +597,9 @@ static void emergency_reboot_disable_virtualization(void)
+ 		nmi_shootdown_cpus_on_restart();
+ 	}
  }
- #endif
+-
++#else
++static void emergency_reboot_disable_virtualization(void) { }
++#endif /* CONFIG_KVM_INTEL || CONFIG_KVM_AMD */
  
--/* RCU-protected callback to disable virtualization prior to reboot. */
--static cpu_emergency_virt_cb __rcu *cpu_emergency_virt_callback;
--
--void cpu_emergency_register_virt_callback(cpu_emergency_virt_cb *callback)
--{
--	if (WARN_ON_ONCE(rcu_access_pointer(cpu_emergency_virt_callback)))
--		return;
--
--	rcu_assign_pointer(cpu_emergency_virt_callback, callback);
--}
--EXPORT_SYMBOL_GPL(cpu_emergency_register_virt_callback);
--
--void cpu_emergency_unregister_virt_callback(cpu_emergency_virt_cb *callback)
--{
--	if (WARN_ON_ONCE(rcu_access_pointer(cpu_emergency_virt_callback) != callback))
--		return;
--
--	rcu_assign_pointer(cpu_emergency_virt_callback, NULL);
--	synchronize_rcu();
--}
--EXPORT_SYMBOL_GPL(cpu_emergency_unregister_virt_callback);
--
- /* This is the CPU performing the emergency shutdown work. */
- int crashing_cpu = -1;
- 
--/*
-- * Disable virtualization, i.e. VMX or SVM, to ensure INIT is recognized during
-- * reboot.  VMX blocks INIT if the CPU is post-VMXON, and SVM blocks INIT if
-- * GIF=0, i.e. if the crash occurred between CLGI and STGI.
-- */
--void cpu_emergency_disable_virtualization(void)
--{
--	cpu_emergency_virt_cb *callback;
--
--	/*
--	 * IRQs must be disabled as KVM enables virtualization in hardware via
--	 * function call IPIs, i.e. IRQs need to be disabled to guarantee
--	 * virtualization stays disabled.
--	 */
--	lockdep_assert_irqs_disabled();
--
--	rcu_read_lock();
--	callback = rcu_dereference(cpu_emergency_virt_callback);
--	if (callback)
--		callback();
--	rcu_read_unlock();
--}
--
- #if defined(CONFIG_SMP)
- 
- static nmi_shootdown_cb shootdown_callback;
+ void __attribute__((weak)) mach_reboot_fixups(void)
+ {
 -- 
 2.40.1.606.ga4b1b128d6-goog
 
