@@ -2,55 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F24E70127C
-	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 01:31:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A87870127E
+	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 01:31:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240807AbjELXbi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 May 2023 19:31:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42266 "EHLO
+        id S240815AbjELXbk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 May 2023 19:31:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240720AbjELXbb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 May 2023 19:31:31 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AE2B1FF6
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:31:30 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-6439a13ba1eso10123462b3a.0
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:31:30 -0700 (PDT)
+        with ESMTP id S240779AbjELXbe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 May 2023 19:31:34 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 409FD30F0
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:31:32 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-24deb9c5f8dso5536917a91.0
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:31:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683934289; x=1686526289;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LOZreDabNqpUj7u+V8APqRqu4TK74uLHH24UEDNUCHI=;
-        b=Zja9mH7oY+lw1E5/US7t2dlayN3yjG5xJZYmUi1MDWPsxw2Sy/jDu9vsw5olTvhSNd
-         QCgQkjoYs8efeFbYFt87WjqxowUr6XJhvHeiVn9eyKykCmOnrNkC55/LgY0EDQKPJWim
-         a6bM36P7UC21fS6BS4B6XHLZIivgPIeib0cLg0JTtNa1n0cX/fMBHSQHX3dvNKG/WG8t
-         7N6LK6oLs/SBnJzm/i9BkS6O236X4516CUCogNmtvONYwYxdHDnwbvIqcgYmEUafFWKk
-         UvqFOltbKLn9ANbffrpoouV/QgP0kXGjj8DMEuk7Yewe9MtzPew9TLs8tss9e/tpkpqd
-         7WPA==
+        d=google.com; s=20221208; t=1683934291; x=1686526291;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=NwZBPWdtO/ryX4s5SybYGIvceJOpqL00ruN6lX2awnM=;
+        b=I5cbSAqjIEnw5/qA+SDzjgh/7wgSqDk/YzpaFGJ7XoAzj+2/l7pFdtD5ThRZCIUl/W
+         j89Z/QLK01RU1+FF7Q1NSVNIXc9+WeqCYfcXKkLBsNlH7pN+KD952mpxIOfZNnNaPPAx
+         kJEIeLUQuqO6MlSJGSX/4+kTSk5nsmrcqpyV0TIyrG1f4BE5jjQbGlKPuKOWPgS3c+Zg
+         CkGfru99WPin3KXQTN2x4uQPR85Bw8T6bo9L8TC2sJXkrUmbzS1Tr9K5UkpAw8NlpIfE
+         nUcO4fytBd/+p7f42PwcenWjH6Vj0RsnJlWnQA86zrYZPv69LDVCZYbHCIddmIm0YfdS
+         6reg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683934289; x=1686526289;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LOZreDabNqpUj7u+V8APqRqu4TK74uLHH24UEDNUCHI=;
-        b=SBIWkpv755r2VglKJLiFfkfPYVxeuXwewufo9nkLb7ir17AbudRJdINj2d0dTKT9PY
-         rtejI6yWpQl4dEw6hrVpzd5KTaGp4ITeQf6B2LouQ/bQeSl5MX1ZLgTMbQ2WFKg3JPZu
-         TtiT2/ukigXqPliLEY/QVM1nt2EQhFN2iMkjPLuNL4Dbl0cDioGy8XGNfCoUkfXlBohu
-         61z2+r6QViiaG/nhZyGbysduVGQ7qf+6FUlc+AJkQ5Ztr7CZCc+Ojr2LX6VSJyFA+Q65
-         zbaU7e3nuCFfa1MFpFrK5ULbS2zZ85qWMl5mTgt30TzCgHsTxZ0HYLAOfC5U1pc0SQlo
-         j8jQ==
-X-Gm-Message-State: AC+VfDxtQyjsRfdrQqJU7KBKitUWZtpiLjGz4SwFjgyTr2xyOedKEJ2C
-        8hJTG+dGoTamOxDFBBOUnG6ov3FOwhc=
-X-Google-Smtp-Source: ACHHUZ4+wXYsC9AiEzl5m7UK3UfElGCg0UgJLKMd3X0fuTu7gvDDXKM0VCK/mWN3zQh5HT0lfa6pt+xxtg8=
+        d=1e100.net; s=20221208; t=1683934291; x=1686526291;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NwZBPWdtO/ryX4s5SybYGIvceJOpqL00ruN6lX2awnM=;
+        b=CumBrG0Qjh/UD4CZ8A4cERwK7SeKSiJMYaLOGKFYhFIxXbVbZD0HMExHYOafkrtPo2
+         H+d+ep6LNIphRhro5345R1pOY+hDZFcRQh9RKdDEfEJJnNCxCmZSVv9sqH40A3WLrouw
+         Rjs2RUBzd6+CiISlR+pGNjIwTpSsQrML5UFBW53kT4i1EEuMWfXEyc+01NwbSyRIlsOa
+         T0AnZxyjzNmBsgi5dyY5gI+M5uMjL7kO978hwxv6nGt/M7Jl/pKkkPbWMFsEvn+mQa+r
+         pCdYWlyluOKELQkzcASW0gKjvynwuauiMxs5FslZKXoBLwe97ajEGZVZ+iCy9lxIiM3r
+         XLgQ==
+X-Gm-Message-State: AC+VfDwpv0pIDOGObtMpMEbt+AzF/M9mWn4KLg74oSQBPYzzPurvfXLu
+        tcS8PT2+rY781QcoEO2OLZZ7MOFvyj4=
+X-Google-Smtp-Source: ACHHUZ4yUt9N5BqOTLmaCILe8ZuPRN9eXE67MV+WK1Qa1rT2H0gDzMRZjCiyKyrvKWegiGaVwmxlZ8fH0Ns=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:d42:b0:643:a029:5b3f with SMTP id
- n2-20020a056a000d4200b00643a0295b3fmr6979951pfv.2.1683934289733; Fri, 12 May
- 2023 16:31:29 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:895:b0:250:a6c1:b843 with SMTP id
+ bj21-20020a17090b089500b00250a6c1b843mr4708527pjb.9.1683934291769; Fri, 12
+ May 2023 16:31:31 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 12 May 2023 16:31:25 -0700
+Date:   Fri, 12 May 2023 16:31:26 -0700
+In-Reply-To: <20230512233127.804012-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20230512233127.804012-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
-Message-ID: <20230512233127.804012-1-seanjc@google.com>
-Subject: [PATCH v2 0/2] KVM: Fix race between reboot and hardware enabling
+Message-ID: <20230512233127.804012-2-seanjc@google.com>
+Subject: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier to
+ hook restart/shutdown
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -76,31 +80,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix a bug where enabling hardware virtualization can race with a forced
-reboot, e.g. `reboot -f`, and result in virt hardware being enabled when
-the reboot is attempted, and thus hanging the reboot.
+Use syscore_ops.shutdown to disable hardware virtualization during a
+reboot instead of using the dedicated reboot_notifier so that KVM disables
+virtualization _after_ system_state has been updated.  This will allow
+fixing a race in KVM's handling of a forced reboot where KVM can end up
+enabling hardware virtualization between kernel_restart_prepare() and
+machine_restart().
 
-Found by inspection, confirmed by hacking the reboot flow to wait until
-KVM loads (the problematic window is ridiculously small).
+Rename KVM's hook to match the syscore op to avoid any possible confusion
+from wiring up a "reboot" helper to a "shutdown" hook (neither "shutdown
+nor "reboot" is completely accurate as the hook handles both).
 
-Fully tested only on x86, compile tested on other architectures.
+Opportunistically rewrite kvm_shutdown()'s comment to make it less VMX
+specific, and to explain why kvm_rebooting exists.
 
-v2:
- - Rename KVM's callback to kvm_shutdown() to match the hook. [Marc]
- - Don't add a spurious newline. [Marc]
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Zenghui Yu <yuzenghui@huawei.com>
+Cc: kvmarm@lists.linux.dev
+Cc: Huacai Chen <chenhuacai@kernel.org>
+Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc: Anup Patel <anup@brainfault.org>
+Cc: Atish Patra <atishp@atishpatra.org>
+Cc: kvm-riscv@lists.infradead.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ virt/kvm/kvm_main.c | 26 +++++++++++---------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
 
-v1: https://lore.kernel.org/all/20230310221414.811690-1-seanjc@google.com
-
-Sean Christopherson (2):
-  KVM: Use syscore_ops instead of reboot_notifier to hook
-    restart/shutdown
-  KVM: Don't enable hardware after a restart/shutdown is initiated
-
- virt/kvm/kvm_main.c | 43 +++++++++++++++++++++++++++----------------
- 1 file changed, 27 insertions(+), 16 deletions(-)
-
-
-base-commit: b3c98052d46948a8d65d2778c7f306ff38366aac
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d1abb331ea68..e771b6a013c9 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -5211,26 +5211,24 @@ static int hardware_enable_all(void)
+ 	return r;
+ }
+ 
+-static int kvm_reboot(struct notifier_block *notifier, unsigned long val,
+-		      void *v)
++static void kvm_shutdown(void)
+ {
+ 	/*
+-	 * Some (well, at least mine) BIOSes hang on reboot if
+-	 * in vmx root mode.
+-	 *
+-	 * And Intel TXT required VMX off for all cpu when system shutdown.
++	 * Disable hardware virtualization and set kvm_rebooting to indicate
++	 * that KVM has asynchronously disabled hardware virtualization, i.e.
++	 * that relevant errors and exceptions aren't entirely unexpected.
++	 * Some flavors of hardware virtualization need to be disabled before
++	 * transferring control to firmware (to perform shutdown/reboot), e.g.
++	 * on x86, virtualization can block INIT interrupts, which are used by
++	 * firmware to pull APs back under firmware control.  Note, this path
++	 * is used for both shutdown and reboot scenarios, i.e. neither name is
++	 * 100% comprehensive.
+ 	 */
+ 	pr_info("kvm: exiting hardware virtualization\n");
+ 	kvm_rebooting = true;
+ 	on_each_cpu(hardware_disable_nolock, NULL, 1);
+-	return NOTIFY_OK;
+ }
+ 
+-static struct notifier_block kvm_reboot_notifier = {
+-	.notifier_call = kvm_reboot,
+-	.priority = 0,
+-};
+-
+ static int kvm_suspend(void)
+ {
+ 	/*
+@@ -5261,6 +5259,7 @@ static void kvm_resume(void)
+ static struct syscore_ops kvm_syscore_ops = {
+ 	.suspend = kvm_suspend,
+ 	.resume = kvm_resume,
++	.shutdown = kvm_shutdown,
+ };
+ #else /* CONFIG_KVM_GENERIC_HARDWARE_ENABLING */
+ static int hardware_enable_all(void)
+@@ -5965,7 +5964,6 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
+ 	if (r)
+ 		return r;
+ 
+-	register_reboot_notifier(&kvm_reboot_notifier);
+ 	register_syscore_ops(&kvm_syscore_ops);
+ #endif
+ 
+@@ -6037,7 +6035,6 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
+ err_vcpu_cache:
+ #ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
+ 	unregister_syscore_ops(&kvm_syscore_ops);
+-	unregister_reboot_notifier(&kvm_reboot_notifier);
+ 	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_ONLINE);
+ #endif
+ 	return r;
+@@ -6063,7 +6060,6 @@ void kvm_exit(void)
+ 	kvm_async_pf_deinit();
+ #ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
+ 	unregister_syscore_ops(&kvm_syscore_ops);
+-	unregister_reboot_notifier(&kvm_reboot_notifier);
+ 	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_ONLINE);
+ #endif
+ 	kvm_irqfd_exit();
 -- 
 2.40.1.606.ga4b1b128d6-goog
 
