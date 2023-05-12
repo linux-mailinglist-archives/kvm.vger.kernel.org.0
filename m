@@ -2,184 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AA69701130
-	for <lists+kvm@lfdr.de>; Fri, 12 May 2023 23:29:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0022701255
+	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 01:12:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234709AbjELV3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 May 2023 17:29:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55920 "EHLO
+        id S240474AbjELXMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 May 2023 19:12:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230041AbjELV3w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 May 2023 17:29:52 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2078.outbound.protection.outlook.com [40.107.244.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C264B30C3
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 14:29:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FzJb94zPHwlDKCS07PNfpnA7oGL/r04Ax4uCJchRdoI+Td7dS/xTqM6K60fuhwTeX4eSutbSZ/xQdJ5uwH994fy/3mzYr1vHZAk47z8Gqti8ZdnuL1NwlHofWKUY4n/17z9WjevC6s/402qfmmtRyVnW3vuimzHjLZmXIVAcel+4BPM1NrGu4lnY5rsUb51pGuOfRTHiKMGPZKYARbBdZhxRrfdzyFSiBOKC4DONRYiwMbhIOzmg4f856eHkYeJafUk65hxLcu34cR3GZqmIF25Qu+92+W4rZzuU4vqqNa22XxqAp76/SLXeOsB+jLz6B1zdcoDt2ZS6Er1oQxvoEQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ye8pLgNUUktz3ZyHLSe0O1Rlq7rnbt/rGWq9f8Ppgxk=;
- b=DtEmsdxXrhuQWR4MkbjDtr/Uu1nk2EKkAmcmOgdcS309wysoHCdr0asmPQS+SpyjIcnjJJwYXiWrdmYjvwE/05dPzP6ZWwkGgIBFM5XB94+mGZKYGxf8soWIcv74zxKkc/nkZYBlRvRQUIsGPm63V65UR9gE+yBve7vUEugZdDXNaPbsyUsoiXo+QUl/lmD4ImYostxmDenif8BekhgpVPOnke7saP9532MA8MHeiQ0i0lznXcf8PksAiJXX2izvZJ2PDFqDARvgynfwI38gAn5r2F4UO7iWcBF4Jj6L2wY+2cnwhbr8i/Udj3mZWoQzDN9JtDlsPh8GcOsreCzaXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ye8pLgNUUktz3ZyHLSe0O1Rlq7rnbt/rGWq9f8Ppgxk=;
- b=jU4VhjFMuK0TBhQcVM04Lba+veizH84sKZXxCptqfsFy6pAGGQ9wfM1HCzmD+yP/oPTKkZfELCmUIKbN5w8jEHTrtpEfWMwFDoNdDGBAi30s3kPQRPG3Y9vvXWUbzMKubR3X9vLoO86wkg2wCjqTtTnhfK/sTZ94Qjtv8i8Sn6y2nPsojuLGASUnmYiukHSvEWWQeFD0La9+JpZw5tyMTjHshzhDb46hqgarfsL9wLBIiPjYVWm5WFO5aB+jn8PTWO1/eezPzL5DORkivE37X2vJ9EVIuGOTB1SEjvEzDxj75mtTJZ76eugpqf6+zQ0fQLit7NkPbJeoUsyIENl0Qw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH0PR12MB5268.namprd12.prod.outlook.com (2603:10b6:610:d3::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.22; Fri, 12 May
- 2023 21:29:44 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6387.021; Fri, 12 May 2023
- 21:29:43 +0000
-Date:   Fri, 12 May 2023 18:29:41 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        with ESMTP id S240423AbjELXMw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 May 2023 19:12:52 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6525D76A1
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:12:50 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-55a40d32a6bso115966117b3.2
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 16:12:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1683933169; x=1686525169;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tROVMxD+wvr9Y37+JVktpX9DU9Q3as8dJoLtqpcc4T0=;
+        b=RALdbsOhos+ByDWKzKVujlqUCzIvZgeqF3NEA/CjV0hB7BxbA1EkfglTIgnc8JkeaA
+         lOGPedhVRZ9D+4JdDT8/LSGndu6BdRa4QKqV7QdESgewzIewSJRJGSxxZXshm3kQCob+
+         SmAikhVqOUlOSfDYM5yY+QLXvbZG9LH/ktp5slyQhnb1MHiJpLTHMuv/sIRAQQTkeilR
+         h7Ul7reXi7I+fTMGGkNP5GukPAI6ejYA76YO35UVaIlKQiq/G3bM8+ZF/XVR4EJrijU8
+         WBCfzZeHhH3npv4axO4nZ9eXUKsUlpk80yzNs5gKe1/jYdkCalilzgm7WysxOUqAqPly
+         4gHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683933169; x=1686525169;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tROVMxD+wvr9Y37+JVktpX9DU9Q3as8dJoLtqpcc4T0=;
+        b=h697e81Tm7eZHfLG6NYQtEAi6BkTftc4GIski8o4d3vp+p6oesilflw4N/qhx2FHNX
+         4Q10Q1+aXxKNzfVsY1NEIUwFZDla3GDvP1Pvh/2GEct92buQ7nyjIyehXuC5iHxKXCiK
+         lzrk7oOeS+Ayo3/v1H+hkSJrkvJXpFU0rESRDxUYiaw1SG9k46Sp2vKPB5lyO8RyOP/t
+         VrI2pOQCDsxLSRBdmx6eYhtP9wjNJeF1a5g88XMKILDbWkf1HqYmq/LWoy6iCMyLNlPr
+         C1xKZENdElTXRWXXujSllRMV5544rkzC/6e3mVpOwZSlITKCZs5x1qauwfjPM05X3f4U
+         dgoA==
+X-Gm-Message-State: AC+VfDymus6L4f3BehxsElMCE549y+Wa2E1bt7ymiNMa8rPonLn7CqAC
+        YgGLLUug3/DMJSPkcxsHiEQbIL5m1yIQytlMPNCBFBPPvh2tSld2lZ/U0x3bTc3TRffgjcz4ot2
+        uLbb8KjkU/3oJnZVBV0eHTLihlwBt79dSd1vY1rBsbJQKcOBmswZfIx4R6Q==
+X-Google-Smtp-Source: ACHHUZ6o6mh7AYkUxxlfeMrJUR4eohO5DPS/K9FPNc/BUp4krpFBkxsvfYG+61Iz8/lUmBQRYYFk/m9fcHg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:441a:0:b0:561:1d3b:af40 with SMTP id
+ r26-20020a81441a000000b005611d3baf40mr2105258ywa.1.1683933169412; Fri, 12 May
+ 2023 16:12:49 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 12 May 2023 16:10:27 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
+Message-ID: <20230512231026.799267-1-seanjc@google.com>
+Subject: [ANNOUNCE / RFC] Periodic Upstream Call for KVM
+From:   Sean Christopherson <seanjc@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Qian Cai <cai@lca.pw>, Eric Farman <farman@linux.ibm.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2 3/3] vfio: Make the group FD disassociate from the
- iommu_group
-Message-ID: <ZF6vxfU0Si6lBK9u@nvidia.com>
-References: <0-v2-15417f29324e+1c-vfio_group_disassociate_jgg@nvidia.com>
- <3-v2-15417f29324e+1c-vfio_group_disassociate_jgg@nvidia.com>
- <20230511165342.6fd5b04e.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230511165342.6fd5b04e.alex.williamson@redhat.com>
-X-ClientProxiedBy: MW4PR03CA0125.namprd03.prod.outlook.com
- (2603:10b6:303:8c::10) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH0PR12MB5268:EE_
-X-MS-Office365-Filtering-Correlation-Id: fa69aa4c-a851-45d9-4d57-08db5330008f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: soIz1M8emLZwDXUNscKq4YkraL0Ctz3vvryxk/BxXl2YsVTKV1ARh+vHGRKCZuWD950O8JMVY/1eB0r29XAuT2ngOMqsv+XjpnutIiIKFUzN7hy+BeeNsh4CyUihmyncJM15Y6waq7BSxn76g2gFy6JFBJ7CS+KUC7sGOL30jwUzcGUpn+XyBQrvXPnpf8fDjMqUmL+YmSWvSHds21d6OylR/8/rssOEMxQwahDGXjHJ3j+8EAGv27ZRa8KBGPbqGk0OGUzwUN/xwr3ZkiXxqIh9WmVcspclWJEkDFmKiTt1wf+0H2s5yts7E+Q0+rivRLNYpsJ8NNMVK/wY31ZwzAFixXXPMsvBXVfrHQk8n6iCTGXsSkmYb9pehNwTdj0vTgM0nBEvi04KClboEYP3iWINur7ccWRzu31kSfaxou5f1U61CNzzDzVtOWoC10J5QjMkWxvA8FeCoPvbn677TwthXFd56T69ry21ry6C66gQud/4Mt78h+n4fUNBsFvar4m76u/O5qOavAISLp8LXcWG0VZXOgCBRGUsnRWN5ZtstRTvscwLnxNjYGd3oKJE
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(346002)(39860400002)(376002)(136003)(396003)(451199021)(8936002)(54906003)(478600001)(7416002)(5660300002)(8676002)(36756003)(86362001)(2906002)(66946007)(6916009)(66476007)(66556008)(4326008)(316002)(38100700002)(41300700001)(186003)(6486002)(6512007)(2616005)(6506007)(83380400001)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tUNczosKFdwQMyNaeCTHcVqKh6/iOaoqvILINGlyxZopWQMYHvSIm4YLJZgj?=
- =?us-ascii?Q?P6TByR6a+mRLz80dawI+8gk/9UGKl/nGnatcnCx7np+//2LIYRSYcIjR+TH3?=
- =?us-ascii?Q?UAHTuAm3uHKvWst6rs/XbIBtp09SCOIo4k1YN3Q+C+SfLNNVzIynAeGyb6D6?=
- =?us-ascii?Q?oSddsFqW0rXgPIQUQW5mNGM6OGiXNetTkbK3zClehaVE+AsSpwsedk8ah/1K?=
- =?us-ascii?Q?9gFoA8mJTum4IVf+OPvKkldserVkVich1zdcU1H0KQbv9fNUiNkNvpjmq8wS?=
- =?us-ascii?Q?DxSyTS6W0vI085Yo3tULpwb2+0GHAL1YAn75iqedVnKQjq3G6kKiQmlQtiOo?=
- =?us-ascii?Q?yKMpf5rLW2IeFfi/T7cgluODy+5wHoZT2fYcnKI5nRU1/BHBo5vGTxY14RqT?=
- =?us-ascii?Q?1LO2zzKR8D4pPf/6cUKyFPVpG8Fgscp1fOncE9z1OnW6IS8UQMR3W4+yD1xH?=
- =?us-ascii?Q?WbiHyzv+G5N8HQERxzfVdSPIfRtivtH3Tg7TDmKkrAL7OXdHeLGj4f/chGL8?=
- =?us-ascii?Q?Rc7VFOryyXtfYI9wPvK56Za8VcCI2F19yd0P+SZF0JsGcRfF3VLNJ7541iUm?=
- =?us-ascii?Q?cK6YnQ3b49qU+7/AuKG2uQOlDTXGFPSA9flBgatgRAMWSR94LJlrPr+ty45+?=
- =?us-ascii?Q?9BYWf0ltefwMCtzVKTJCkCLdvjPM34bBSaoQCfD2uIGw7oR2w/Xd2ScbmqCl?=
- =?us-ascii?Q?xHVogj9YOMvgB9GjXzB6YlzOVMd/dpg9s4aF8D8lumgetUiZ1v0cbx/12WAN?=
- =?us-ascii?Q?irf1jIdnF1TcqvBf6UqubnAqfo86888oBCyYLLIswxsgsbAH6rRQFd/VmeFK?=
- =?us-ascii?Q?HX9gAr53xPV/cgjurnfotfj998+qo3QqwLPTwbpZzqwSHTMFHLGEU9WF6P3r?=
- =?us-ascii?Q?rL9T2duUQ/VeK8JTUPCVSS+aU/3/AmxVAvA+zOU692ka7L8eSqzrvkzz1NHd?=
- =?us-ascii?Q?drKa4TYKXCoyYk+YBSs4kpvvd8PyfghHvmfkrW100TDNRq/cu7VWERWBOjrz?=
- =?us-ascii?Q?vWP5dsNIRQnf63oHw7uHj234ydxJLJCuwtprgBEWtZTOpPVcPruSIiP8d5A7?=
- =?us-ascii?Q?s/FrKkDYLm2U1P6HtcqMD69cdQq5utZLiqCp+zOPJR4JrRlF+oIx3/dvoiqq?=
- =?us-ascii?Q?HZc/hbpbBU5yZSHS61lHJejIqNUqOgfYyGpDD3DEl9hSgWoa7egsgmS/jTBR?=
- =?us-ascii?Q?J5xjoJXLG7JhFivJwi+Z267eRiIxzBxwHljHFW0yoBhOGlgMQlUl7igNpSOC?=
- =?us-ascii?Q?HrDKhj8+gF5JN2VT90/Lig8xGyCkvmmFF40uWli3NreobyW22Sx/7NQllLXW?=
- =?us-ascii?Q?QlJ5QqXMUD6v1tCnJUOkbPwfU9xAzP7YV5q4mpIGbVyaMzVkA1gRvXRtNlpX?=
- =?us-ascii?Q?+JlLVmbLO8nkVUaQlz9HzhXCBpL6ZFK49QbqFbfvT0up78/50x8y7JKD65G5?=
- =?us-ascii?Q?djlVxvFQ/ceuOvU9KEeEJLq2HPEzZGAnEBzDcyLYY4ReMZlgnHJkA8PK2l4g?=
- =?us-ascii?Q?VgYGNi1YMEOJ24uveEDVFbw2xCkXI4aqoXP0cdrM2YuK3cCnMotRpGpQ+LFo?=
- =?us-ascii?Q?ZHj6wQsmOA4d9GXVYDY=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fa69aa4c-a851-45d9-4d57-08db5330008f
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2023 21:29:43.7661
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dWEZyk49SbSWgOXTxQHX0vk1uqIv9QMj4pu82PiNS/OuWf/ziwZYx/CQhvDb4YAF
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5268
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+        Sagi Shahar <sagis@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Anish Ghulati <aghulati@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Houghton <jthoughton@google.com>,
+        Anish Moorthy <amoorthy@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Guang Zeng <guang.zeng@intel.com>,
+        Hou Wenlong <houwenlong.hwl@antgroup.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Jing Liu <jing2.liu@intel.com>,
+        Junaid Shahid <junaids@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Leonardo Bras <leobras@redhat.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Li RongQing <lirongqing@baidu.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Michal Luczaj <mhal@rbox.co>,
+        Mingwei Zhang <mizhang@google.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Paul Durrant <pdurrant@amazon.com>,
+        Peng Hao <flyingpenghao@gmail.com>,
+        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+        Robert Hoo <robert.hu@linux.intel.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Fuad Tabba <tabba@google.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Qinglan Xiang <qinglan.xiang@intel.com>,
+        Kai Svahn <kai.svahn@intel.com>,
+        Margarita Maroto <margarita.maroto@intel.com>,
+        Anil Keshavamurthy <anil.s.keshavamurthy@intel.com>,
+        Nagareddy Reddy <nspreddy@google.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 11, 2023 at 04:53:42PM -0600, Alex Williamson wrote:
-> On Fri,  7 Oct 2022 11:04:41 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > Allow the vfio_group struct to exist with a NULL iommu_group pointer. When
-> > the pointer is NULL the vfio_group users promise not to touch the
-> > iommu_group. This allows a driver to be hot unplugged while userspace is
-> > keeping the group FD open.
-> > 
-> > Remove all the code waiting for the group FD to close.
-> > 
-> > This fixes a userspace regression where we learned that virtnodedevd
-> > leaves a group FD open even though the /dev/ node for it has been deleted
-> > and all the drivers for it unplugged.
-> > 
-> > Fixes: ca5f21b25749 ("vfio: Follow a strict lifetime for struct iommu_group")
-> > Reported-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-> > Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> > Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> > Tested-by: Eric Farman <farman@linux.ibm.com>
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > ---
-> >  drivers/vfio/vfio.h      |  1 -
-> >  drivers/vfio/vfio_main.c | 67 ++++++++++++++++++++++++++--------------
-> >  2 files changed, 44 insertions(+), 24 deletions(-)
-> 
-> I'm not sure we're out of the woods on this one.  QE found a regression
-> when unbinding a device assigned to a QEMU VM resulting in errors from
-> VFIO_UNMAP_DMA and VFIO_GROUP_UNSET_CONTAINER.
-> 
-> When finalizing the vfio object in QEMU, it will first release the
-> device and close the device fd before iterating the container address
-> space to do unmaps and finally unset the container for the group.
-> 
-> Meanwhile the vfio-pci remove callback is sitting in
-> vfio_device_put_registration() waiting for the device completion.  Once
-> that occurs, it enters vfio_device_remove_group() where this patch
-> removed the open file barrier that we can't have and also detaches the
-> group from the container, destroying the container.  The unmaps from
-> userspace were always redundant at this point since removing the last
-> device from a container removes the mappings and de-privileges the
-> container, but unmaps of nonexistent mappings didn't fail, nor did the
-> unset container operations.
+I am "officially" announcing a Periodic Upstream Call for KVM, a.k.a. PUCK.
+The intent of the PUCK is to provide a vehicle for having "in-person" technical
+discussions of features, designs, problems, etc. that are cumbersome to discuss
+asynchronously on-list, e.g. because something is too complex, too large, etc.
 
-So it did this threaded which is why it didn't hang before?
+Exact details are TBD, and obviously can be adapted as needed.  Proposal:
 
-> None of these are hard failures for QEMU, the regression is that we're
-> logging new errors due to unintended changes to the API.  Do we need to
-> gut the container but still keep the group-container association?
+  Frequency: Weekly
+  Time:      Wednesday, 6:00am Pacific Time
+  Duration:  60 minutes
+  Software:  ???
 
-If it isn't creating a functional problem can we approach the logging
-by doing something in qemu? ie not doing the unmaps after it closed
-all the device FDs?
+My thinking for weekly versus fortnightly (every other week) is that we can always
+cancel meetings if there are no agenda items, and bump down to fortnightly if we
+are constantly canceling.  On the flip side, if we go with fortnightly, it'd be
+more difficult to clear the backlog if PUCK gets booked out multiple sessions, and
+PUCK would be less useful for discussing urgent issues.
 
-Otherwise I'd suggest that the container should not be unmapped when
-the last device is closed?
+As for the time, 6am Pacific Time was the least awful (and still quite awful IMO)
+time I could find that gives the majority of the community a reasonable chance of
+attending.  I know we have developers in at least the below time zones (and probably
+more, though I don't think anyone works from Hawaii, and if someone does work from
+Hawaii then they have nothing to complain about :-) ).
 
-Or turning unmap to be a NOP on a container with no devices?
+  PT   (6am)
+  MT   (7am)
+  CT   (8am)
+  ET   (9am)
+  WET  (2pm)
+  CET  (3pm)
+  EET  (4pm)
+  EST  (5pm)
+  CST  (9pm)
+  NZST (1am)
 
-Jason
+The obvious alternative would be to invert the schedule and have the sync be in
+the evening/night for Pacific Time, but to get 6am for ARM folks, we end up with:
+
+  PT   (10pm)
+  MT   (11pm)
+  CT   (12pm)
+  ET   (1am)
+  WET  (6am)
+  CET  (7am)
+  EET  (8am)
+  EST  (9am)
+  CST  (1pm)
+  NZST (5pm)
+
+which is quite unreasonable for pretty much everyone based in the US.  Earlier
+than 6am for WET is likewise unreasonable and will result in people not attending.
+9pm for China is also unreasonable, but I hope that it's not completely ridiculous
+and is doable enough that people can at least attend on an as-needed basis.  Sorry
+Kai, as the sole representative from New Zealand, you get hosed :-(
+
+Wednesday because holidays and (short) vacations most often land at the beginning
+and end of the week.
+
+60 minutes because I'm not waking up at dawn for anything less, and anything
+more will likely have dimishing returns, especially for folks on the edges of
+the time zone table.
+
+Lastly, the big unknown is which video communication software to use.  My default
+is obviously Google Meet, but I've been told that Meet is unusable in some
+countries. :-/  My only requirements (beyond basic, obvious functionality) are
+that (a) there's a web interface (no install required) and that (b) the calls can
+be recorded.
+
+To kick things off, I am leaning toward a "launch" date of May 24th (Pacific),
+with KVM guest private mem (a.k.a. UPM) as the first topic.
+
+Please chime in with thoughts and ideas!
+
+
+P.S. This is an open invite, feel free to forward at will.  The Cc list is by no
+means intended to be definitive.
