@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A667170134D
-	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 02:37:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B16FC701355
+	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 02:37:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241770AbjEMAhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 May 2023 20:37:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44586 "EHLO
+        id S241273AbjEMAhO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 May 2023 20:37:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241606AbjEMAgn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 May 2023 20:36:43 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B5DA5FEF
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:36:26 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-24e40246bb6so5733942a91.0
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:36:26 -0700 (PDT)
+        with ESMTP id S241673AbjEMAgx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 May 2023 20:36:53 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14B555FCD
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:36:30 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-ba6386e6f7aso7863093276.3
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:36:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683938185; x=1686530185;
+        d=google.com; s=20221208; t=1683938187; x=1686530187;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dpd6gQkAH1gq2UUCXhRbZwdMmtHjG2V07AhbHbITBsg=;
-        b=kd32jcAWHgv7bEQ/AOl/anO++S7xJsu084O8mhBxdsCT3KpoFCflHX9hVdrvmbF4ZY
-         NGR/kU3IkSRjTGhXdcC0z9ZzMD/vTZnN3VZyYChMNSdI8UrIbjCrWwdHRffxz0uYo1Kr
-         yG9099A9uCaWCR4sJJ/cQrnlUz7cE70EZR9dlQ+NErwgg/XCfH6BnPC9VPmnEjdXBJ8y
-         QQDvf/OHT55UA8oMgCPeEegwYwPX2Cnsa5tmpa2gyROT2SwmMlR9rG+goAmxfPCxI6jl
-         T8bnvgqxbQoyM3gl6zyD8gcsrzwSya8GpGUGHzo6RycqW7S5cHxPl4jw3QWrO4N2EK9h
-         JgFw==
+        bh=FkA1kDYxtUVHRHibS4MjAh7jt6yYy8zgAEbTcCm3Aro=;
+        b=QcrHglgjQKdCLUAUPMt9T3ZETFuoebB3X4ZrPMqqN1eLxNZeHHFYM5Li0G7IRgqzrT
+         fUVNXQwICEpsoThiTF/27ls8NtDVXRlUSaPuMKvwmyD/7uceYhmBrCPiy7GX0eueEu59
+         sh9w4SiwmEFDhqqSLuUpF5qaASCXXyd5jyTm4pEA0+CY3bY1yazJ05Y5xvWzMU1c15df
+         VoedXBsbFUxFrWiOjMFEcmY03nk0s1gkww2AJXLxZ81nvGUkTvoFTXrUmacMm6kuMB8i
+         fh7hFM+tD29QS8LZlww8KRhvNvJE3Ob9njWh3aSLQLuqJGYvHbr4R0FjA8ENS9UaHnm/
+         M1DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683938185; x=1686530185;
+        d=1e100.net; s=20221208; t=1683938187; x=1686530187;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Dpd6gQkAH1gq2UUCXhRbZwdMmtHjG2V07AhbHbITBsg=;
-        b=ErqpPlLM+7OlzSDCs/v4DYpFvS4ONMsUtNc1ZsEPoifd320/Ev3QotzAdZdBd4tN3e
-         BAWvBGJW9x6I102f3cciZdHBcjzzMhAgjWYs9dTgOCLYadOitkA+E+EqKQ6QS+QU4A51
-         NU3SEew4BmAJ4KlXG5CJGYZCDgym1GKUwaabgR9OmslMW10elH2QWa1LoGSi7Gv+zRR5
-         2vGZRSJM4XTCn+YzGmyEqo89NDW7h+aDpq+rY6KpDLtLn7RyE4dNUS0QJKiZHZWwixjt
-         4AAFN/2CcaIketxhFeOFPPJiu4mEBhcbGiPXuqcvasH3HlH0ttwo79Ra+2SwHAXA/+E6
-         cOeQ==
-X-Gm-Message-State: AC+VfDyuoLBpCfj4wRkOueXvqTE2rhFzbxf+I6MfPkwW65hc3HvBFEjQ
-        ydsJP7eDmbzW2op8QwrLutIo3B7mQXM=
-X-Google-Smtp-Source: ACHHUZ7Qo1Atc/8jMIYBdXK9BXM4nlxb0C6uIZfdmu90WzAvRGgnvmGajVFzZ7JZhpeUh4AAzkhmaHcVA0w=
+        bh=FkA1kDYxtUVHRHibS4MjAh7jt6yYy8zgAEbTcCm3Aro=;
+        b=NX+r55HBjoGUzf4VqtCOhwNc4MswMBt0JCq9yIzUW0V0IiOjTBa7PiV4g2MdKARL6S
+         /CrIu+2i9nnzLk6sRvpU76AT7pQURJ5J1cgJKSfLRjIWN8PpMlCoKfKx4ErvOQb3Glds
+         SQTW3Zrulo10YPi+XGF8i1JWJWGiwYGDjlELprTjWfU+kNypKu5NJDw8AChD/E5nuj5R
+         o3UPGgyJipJk20JskZryZFNaajyJytVz2gcfZA6+/x7+XO6pWEHBYjO0sDZGAZgiNmco
+         2RstEyGOEBFDhk9jGEiTvqoWB+6bb+KZSHdVo8sDfZ5r5GsG29LFarYIi4dzV/chWF0H
+         4kqg==
+X-Gm-Message-State: AC+VfDyL22utYiK85C6q3MDLcbNwCcW+1x0ThLgbRKTYvkSfwqU6w4n2
+        thNrHDs9exlottP3YXL+WjAN99MQtBY=
+X-Google-Smtp-Source: ACHHUZ7+gIUnmBGvUuumWyI5g0GRGJ88QYrLdJ3wdv8MgxZd8U0nKSB4DYEio0yahHNKQwNut26HYiPeL6I=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:5d01:b0:246:f535:3132 with SMTP id
- s1-20020a17090a5d0100b00246f5353132mr7976189pji.7.1683938185478; Fri, 12 May
- 2023 17:36:25 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:9d84:0:b0:b9d:c27c:3442 with SMTP id
+ v4-20020a259d84000000b00b9dc27c3442mr11524411ybp.9.1683938186917; Fri, 12 May
+ 2023 17:36:26 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 12 May 2023 17:35:42 -0700
+Date:   Fri, 12 May 2023 17:35:43 -0700
 In-Reply-To: <20230513003600.818142-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230513003600.818142-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
-Message-ID: <20230513003600.818142-11-seanjc@google.com>
-Subject: [PATCH v3 10/28] drm/i915/gvt: Protect gfn hash table with vgpu_lock
+Message-ID: <20230513003600.818142-12-seanjc@google.com>
+Subject: [PATCH v3 11/28] KVM: x86/mmu: Move kvm_arch_flush_shadow_{all,memslot}()
+ to mmu.c
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -74,189 +75,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use vgpu_lock instead of KVM's mmu_lock to protect accesses to the hash
-table used to track which gfns are write-protected when shadowing the
-guest's GTT, and hoist the acquisition of vgpu_lock from
-intel_vgpu_page_track_handler() out to its sole caller,
-kvmgt_page_track_write().
+Move x86's implementation of kvm_arch_flush_shadow_{all,memslot}() into
+mmu.c, and make kvm_mmu_zap_all() static as it was globally visible only
+for kvm_arch_flush_shadow_all().  This will allow refactoring
+kvm_arch_flush_shadow_memslot() to call kvm_mmu_zap_all() directly without
+having to expose kvm_mmu_zap_all_fast() outside of mmu.c.  Keeping
+everything in mmu.c will also likely simplify supporting TDX, which
+intends to do zap only relevant SPTEs on memslot updates.
 
-This fixes a bug where kvmgt_page_track_write(), which doesn't hold
-kvm->mmu_lock, could race with intel_gvt_page_track_remove() and trigger
-a use-after-free.
+No functional change intended.
 
-Fixing kvmgt_page_track_write() by taking kvm->mmu_lock is not an option
-as mmu_lock is a r/w spinlock, and intel_vgpu_page_track_handler() might
-sleep when acquiring vgpu->cache_lock deep down the callstack:
-
-  intel_vgpu_page_track_handler()
-  |
-  |->  page_track->handler / ppgtt_write_protection_handler()
-       |
-       |-> ppgtt_handle_guest_write_page_table_bytes()
-           |
-           |->  ppgtt_handle_guest_write_page_table()
-                |
-                |-> ppgtt_handle_guest_entry_removal()
-                    |
-                    |-> ppgtt_invalidate_pte()
-                        |
-                        |-> intel_gvt_dma_unmap_guest_page()
-                            |
-                            |-> mutex_lock(&vgpu->cache_lock);
-
-Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
+Suggested-by: Yan Zhao <yan.y.zhao@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/gpu/drm/i915/gvt/kvmgt.c      | 55 +++++++++++++++------------
- drivers/gpu/drm/i915/gvt/page_track.c | 10 +----
- 2 files changed, 33 insertions(+), 32 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 -
+ arch/x86/kvm/mmu/mmu.c          | 13 ++++++++++++-
+ arch/x86/kvm/x86.c              | 11 -----------
+ 3 files changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index 117bac85ac2c..0785f9cb2c20 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -351,6 +351,8 @@ __kvmgt_protect_table_find(struct intel_vgpu *info, gfn_t gfn)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index fb9d1f2d6136..564a29153cee 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1832,7 +1832,6 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
+ 				   const struct kvm_memory_slot *memslot);
+ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
+ 				   const struct kvm_memory_slot *memslot);
+-void kvm_mmu_zap_all(struct kvm *kvm);
+ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
+ void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
+ 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index c8961f45e3b1..2e4476d38377 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -6717,7 +6717,7 @@ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
+ 	 */
+ }
+ 
+-void kvm_mmu_zap_all(struct kvm *kvm)
++static void kvm_mmu_zap_all(struct kvm *kvm)
  {
- 	struct kvmgt_pgfn *p, *res = NULL;
- 
-+	lockdep_assert_held(&info->vgpu_lock);
-+
- 	hash_for_each_possible(info->ptable, p, hnode, gfn) {
- 		if (gfn == p->gfn) {
- 			res = p;
-@@ -1552,6 +1554,9 @@ int intel_gvt_page_track_add(struct intel_vgpu *info, u64 gfn)
- 	if (!test_bit(INTEL_VGPU_STATUS_ATTACHED, info->status))
- 		return -ESRCH;
- 
-+	if (kvmgt_gfn_is_write_protected(info, gfn))
-+		return 0;
-+
- 	idx = srcu_read_lock(&kvm->srcu);
- 	slot = gfn_to_memslot(kvm, gfn);
- 	if (!slot) {
-@@ -1560,16 +1565,12 @@ int intel_gvt_page_track_add(struct intel_vgpu *info, u64 gfn)
- 	}
- 
- 	write_lock(&kvm->mmu_lock);
--
--	if (kvmgt_gfn_is_write_protected(info, gfn))
--		goto out;
--
- 	kvm_slot_page_track_add_page(kvm, slot, gfn, KVM_PAGE_TRACK_WRITE);
-+	write_unlock(&kvm->mmu_lock);
-+
-+	srcu_read_unlock(&kvm->srcu, idx);
-+
- 	kvmgt_protect_table_add(info, gfn);
--
--out:
--	write_unlock(&kvm->mmu_lock);
--	srcu_read_unlock(&kvm->srcu, idx);
- 	return 0;
+ 	struct kvm_mmu_page *sp, *node;
+ 	LIST_HEAD(invalid_list);
+@@ -6742,6 +6742,17 @@ void kvm_mmu_zap_all(struct kvm *kvm)
+ 	write_unlock(&kvm->mmu_lock);
  }
  
-@@ -1582,24 +1583,22 @@ int intel_gvt_page_track_remove(struct intel_vgpu *info, u64 gfn)
- 	if (!test_bit(INTEL_VGPU_STATUS_ATTACHED, info->status))
- 		return -ESRCH;
- 
--	idx = srcu_read_lock(&kvm->srcu);
--	slot = gfn_to_memslot(kvm, gfn);
--	if (!slot) {
--		srcu_read_unlock(&kvm->srcu, idx);
--		return -EINVAL;
--	}
--
--	write_lock(&kvm->mmu_lock);
--
- 	if (!kvmgt_gfn_is_write_protected(info, gfn))
--		goto out;
-+		return 0;
- 
-+	idx = srcu_read_lock(&kvm->srcu);
-+	slot = gfn_to_memslot(kvm, gfn);
-+	if (!slot) {
-+		srcu_read_unlock(&kvm->srcu, idx);
-+		return -EINVAL;
-+	}
++void kvm_arch_flush_shadow_all(struct kvm *kvm)
++{
++	kvm_mmu_zap_all(kvm);
++}
 +
-+	write_lock(&kvm->mmu_lock);
- 	kvm_slot_page_track_remove_page(kvm, slot, gfn, KVM_PAGE_TRACK_WRITE);
-+	write_unlock(&kvm->mmu_lock);
-+	srcu_read_unlock(&kvm->srcu, idx);
++void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
++				   struct kvm_memory_slot *slot)
++{
++	kvm_page_track_flush_slot(kvm, slot);
++}
 +
- 	kvmgt_protect_table_del(info, gfn);
--
--out:
--	write_unlock(&kvm->mmu_lock);
--	srcu_read_unlock(&kvm->srcu, idx);
- 	return 0;
+ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
+ {
+ 	WARN_ON(gen & KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 523c39a03c00..b2d9c5979df7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12758,17 +12758,6 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 		kvm_arch_free_memslot(kvm, old);
  }
  
-@@ -1610,9 +1609,13 @@ static void kvmgt_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa,
- 	struct intel_vgpu *info =
- 		container_of(node, struct intel_vgpu, track_node);
- 
-+	mutex_lock(&info->vgpu_lock);
-+
- 	if (kvmgt_gfn_is_write_protected(info, gpa_to_gfn(gpa)))
- 		intel_vgpu_page_track_handler(info, gpa,
- 						     (void *)val, len);
-+
-+	mutex_unlock(&info->vgpu_lock);
- }
- 
- static void kvmgt_page_track_flush_slot(struct kvm *kvm,
-@@ -1624,16 +1627,20 @@ static void kvmgt_page_track_flush_slot(struct kvm *kvm,
- 	struct intel_vgpu *info =
- 		container_of(node, struct intel_vgpu, track_node);
- 
--	write_lock(&kvm->mmu_lock);
-+	mutex_lock(&info->vgpu_lock);
-+
- 	for (i = 0; i < slot->npages; i++) {
- 		gfn = slot->base_gfn + i;
- 		if (kvmgt_gfn_is_write_protected(info, gfn)) {
-+			write_lock(&kvm->mmu_lock);
- 			kvm_slot_page_track_remove_page(kvm, slot, gfn,
- 						KVM_PAGE_TRACK_WRITE);
-+			write_unlock(&kvm->mmu_lock);
-+
- 			kvmgt_protect_table_del(info, gfn);
- 		}
- 	}
--	write_unlock(&kvm->mmu_lock);
-+	mutex_unlock(&info->vgpu_lock);
- }
- 
- void intel_vgpu_detach_regions(struct intel_vgpu *vgpu)
-diff --git a/drivers/gpu/drm/i915/gvt/page_track.c b/drivers/gpu/drm/i915/gvt/page_track.c
-index df34e73cba41..60a65435556d 100644
---- a/drivers/gpu/drm/i915/gvt/page_track.c
-+++ b/drivers/gpu/drm/i915/gvt/page_track.c
-@@ -162,13 +162,9 @@ int intel_vgpu_page_track_handler(struct intel_vgpu *vgpu, u64 gpa,
- 	struct intel_vgpu_page_track *page_track;
- 	int ret = 0;
- 
--	mutex_lock(&vgpu->vgpu_lock);
+-void kvm_arch_flush_shadow_all(struct kvm *kvm)
+-{
+-	kvm_mmu_zap_all(kvm);
+-}
 -
- 	page_track = intel_vgpu_find_page_track(vgpu, gpa >> PAGE_SHIFT);
--	if (!page_track) {
--		ret = -ENXIO;
--		goto out;
--	}
-+	if (!page_track)
-+		return -ENXIO;
- 
- 	if (unlikely(vgpu->failsafe)) {
- 		/* Remove write protection to prevent furture traps. */
-@@ -179,7 +175,5 @@ int intel_vgpu_page_track_handler(struct intel_vgpu *vgpu, u64 gpa,
- 			gvt_err("guest page write error, gpa %llx\n", gpa);
- 	}
- 
--out:
--	mutex_unlock(&vgpu->vgpu_lock);
- 	return ret;
- }
+-void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+-				   struct kvm_memory_slot *slot)
+-{
+-	kvm_page_track_flush_slot(kvm, slot);
+-}
+-
+ static inline bool kvm_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
+ {
+ 	return (is_guest_mode(vcpu) &&
 -- 
 2.40.1.606.ga4b1b128d6-goog
 
