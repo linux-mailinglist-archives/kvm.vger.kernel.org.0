@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 372C0701768
-	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 15:30:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 708B470176A
+	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 15:30:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238987AbjEMNaC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 13 May 2023 09:30:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59428 "EHLO
+        id S239282AbjEMNaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 13 May 2023 09:30:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238989AbjEMNaA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 13 May 2023 09:30:00 -0400
+        with ESMTP id S239199AbjEMNaE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 13 May 2023 09:30:04 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 536EF49E2;
-        Sat, 13 May 2023 06:29:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF62F525C;
+        Sat, 13 May 2023 06:29:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683984583; x=1715520583;
+  t=1683984586; x=1715520586;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8b+sMJ9CtsqavfRZw2uc4X1L8VxMQmoBLRSiSkpXBgo=;
-  b=TWo3+Yp8LKlW9q/pGqWXZDk5xTotTHeLzkFQjHs3yziJ5ByaV/C3RP/f
-   0f84Lwwezf+UuNOgE8u5QnoVO0ZUWsBwWZfRXw0JrSm9PZLAspLnwYwpP
-   vQp5EKZuEDjXWUEhf8bJvbHChQqpkYASnSHTI9M5iqo712y2fAee8gb7H
-   avjmiJ9cdP0Kkb4yrYJG0cnl3qnb2cD+ZeA9Wv40LdYiLE8H0+dTCdshC
-   eTFoOQBfy/qJOafC3Bv31FHdbH9U9UjTaPyrMQEzPU62Y/PesNs0U1Xv9
-   F6io3K556lzRmsU1UcoNkG0tTJOpthU1kljbpLyCvttNVQ6PBghi4200F
+  bh=2fu+dAYJPz4/qOxaSd9W6WOxKNBX1f78yuw2FVb9sf8=;
+  b=gqlyuidjTq9DkrGtW7KLK/bGtkyMa//yTXIaeeMrc+JnES/a5aDULy4Y
+   2W9+F6rjnZ1y9iyecBmImXI8+ZlbVtAt2g17o/ov4Ln81znIFMftVFAMz
+   1K3HLAwjMpNHTZmJGSCpP9GfidzSn9vYjerYlBiVG+Y1u4PzsQbHuqG56
+   KM7IZ4puneBobsqoggfQkI1K3wzwtT2kaNJIvkyqViRUHtciZiaGb4U6u
+   GN4z9yWb9BiDB5YAw1FJJ7q4Coe12jcSMwglRn66Osf68sMXSjmNn01Ei
+   1uilxgSdpmvsk5TN7dMIWGs7uhxqf3itrZoAP8cqVCfIBzq85UKGTzmoD
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="354100847"
+X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="354100861"
 X-IronPort-AV: E=Sophos;i="5.99,272,1677571200"; 
-   d="scan'208";a="354100847"
+   d="scan'208";a="354100861"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2023 06:28:59 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2023 06:29:00 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="703459532"
+X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="703459537"
 X-IronPort-AV: E=Sophos;i="5.99,272,1677571200"; 
-   d="scan'208";a="703459532"
+   d="scan'208";a="703459537"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga007.fm.intel.com with ESMTP; 13 May 2023 06:28:58 -0700
+  by fmsmga007.fm.intel.com with ESMTP; 13 May 2023 06:28:59 -0700
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
 Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
@@ -51,9 +51,9 @@ Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
         xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
         yanting.jiang@intel.com, zhenzhong.duan@intel.com,
         clegoate@redhat.com
-Subject: [PATCH v11 21/23] vfio: Determine noiommu device in __vfio_register_dev()
-Date:   Sat, 13 May 2023 06:28:25 -0700
-Message-Id: <20230513132827.39066-22-yi.l.liu@intel.com>
+Subject: [PATCH v11 22/23] vfio: Compile vfio_group infrastructure optionally
+Date:   Sat, 13 May 2023 06:28:26 -0700
+Message-Id: <20230513132827.39066-23-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230513132827.39066-1-yi.l.liu@intel.com>
 References: <20230513132827.39066-1-yi.l.liu@intel.com>
@@ -69,169 +69,329 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is to make the cdev path and group path consistent for the noiommu
-devices registration. If vfio_noiommu is disabled, such registration
-should fail. However, this check is vfio_device_set_group() which is part
-of the vfio_group code. If the vfio_group code is compiled out, noiommu
-devices would be registered even vfio_noiommu is disabled.
+vfio_group is not needed for vfio device cdev, so with vfio device cdev
+introduced, the vfio_group infrastructures can be compiled out if only
+cdev is needed.
 
-This adds vfio_device_set_noiommu() which can fail and calls it in the
-device registration. For now, it never fails as long as
-vfio_device_set_group() is successful. But when the vfio_group code is
-compiled out, vfio_device_set_noiommu() would fail the noiommu devices
-when vfio_noiommu is disabled.
-
-As noiommu devices is checked and there are multiple places which needs
-to test noiommu devices, this also adds a flag to mark noiommu devices.
-Hence the callers of vfio_device_is_noiommu() can be converted to test
-vfio_device->noiommu.
-
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Tested-by: Nicolin Chen <nicolinc@nvidia.com>
 Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/vfio/device_cdev.c |  4 ++--
- drivers/vfio/group.c       |  2 +-
- drivers/vfio/iommufd.c     | 10 +++++-----
- drivers/vfio/vfio.h        |  7 ++++---
- drivers/vfio/vfio_main.c   |  6 +++++-
- include/linux/vfio.h       |  1 +
- 6 files changed, 18 insertions(+), 12 deletions(-)
+ drivers/iommu/iommufd/Kconfig    |   4 +-
+ drivers/vfio/Kconfig             |  14 +++++
+ drivers/vfio/Makefile            |   2 +-
+ drivers/vfio/pci/vfio_pci_core.c |  16 +++--
+ drivers/vfio/vfio.h              | 101 +++++++++++++++++++++++++++++--
+ include/linux/vfio.h             |  25 +++++++-
+ 6 files changed, 146 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
-index 3f14edb80a93..6d7f50ee535d 100644
---- a/drivers/vfio/device_cdev.c
-+++ b/drivers/vfio/device_cdev.c
-@@ -111,7 +111,7 @@ long vfio_device_ioctl_bind_iommufd(struct vfio_device_file *df,
- 	if (df->group)
- 		return -EINVAL;
+diff --git a/drivers/iommu/iommufd/Kconfig b/drivers/iommu/iommufd/Kconfig
+index ada693ea51a7..99d4b075df49 100644
+--- a/drivers/iommu/iommufd/Kconfig
++++ b/drivers/iommu/iommufd/Kconfig
+@@ -14,8 +14,8 @@ config IOMMUFD
+ if IOMMUFD
+ config IOMMUFD_VFIO_CONTAINER
+ 	bool "IOMMUFD provides the VFIO container /dev/vfio/vfio"
+-	depends on VFIO && !VFIO_CONTAINER
+-	default VFIO && !VFIO_CONTAINER
++	depends on VFIO_GROUP && !VFIO_CONTAINER
++	default VFIO_GROUP && !VFIO_CONTAINER
+ 	help
+ 	  IOMMUFD will provide /dev/vfio/vfio instead of VFIO. This relies on
+ 	  IOMMUFD providing compatibility emulation to give the same ioctls.
+diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+index e2105b4dac2d..62c58830a8d5 100644
+--- a/drivers/vfio/Kconfig
++++ b/drivers/vfio/Kconfig
+@@ -4,6 +4,8 @@ menuconfig VFIO
+ 	select IOMMU_API
+ 	depends on IOMMUFD || !IOMMUFD
+ 	select INTERVAL_TREE
++	select VFIO_GROUP if SPAPR_TCE_IOMMU || IOMMUFD=n
++	select VFIO_DEVICE_CDEV if !VFIO_GROUP
+ 	select VFIO_CONTAINER if IOMMUFD=n
+ 	help
+ 	  VFIO provides a framework for secure userspace device drivers.
+@@ -15,6 +17,7 @@ if VFIO
+ config VFIO_DEVICE_CDEV
+ 	bool "Support for the VFIO cdev /dev/vfio/devices/vfioX"
+ 	depends on IOMMUFD
++	default !VFIO_GROUP
+ 	help
+ 	  The VFIO device cdev is another way for userspace to get device
+ 	  access. Userspace gets device fd by opening device cdev under
+@@ -23,9 +26,20 @@ config VFIO_DEVICE_CDEV
  
--	if (vfio_device_is_noiommu(device) && !capable(CAP_SYS_RAWIO))
-+	if (device->noiommu && !capable(CAP_SYS_RAWIO))
- 		return -EPERM;
+ 	  If you don't know what to do here, say N.
  
- 	ret = vfio_device_block_group(device);
-@@ -157,7 +157,7 @@ long vfio_device_ioctl_bind_iommufd(struct vfio_device_file *df,
- 	device->cdev_opened = true;
- 	mutex_unlock(&device->dev_set->lock);
++config VFIO_GROUP
++	bool "Support for the VFIO group /dev/vfio/$group_id"
++	default y
++	help
++	   VFIO group support provides the traditional model for accessing
++	   devices through VFIO and is used by the majority of userspace
++	   applications and drivers making use of VFIO.
++
++	   If you don't know what to do here, say Y.
++
+ config VFIO_CONTAINER
+ 	bool "Support for the VFIO container /dev/vfio/vfio"
+ 	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
++	depends on VFIO_GROUP
+ 	default y
+ 	help
+ 	  The VFIO container is the classic interface to VFIO for establishing
+diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+index 245394aeb94b..57c3515af606 100644
+--- a/drivers/vfio/Makefile
++++ b/drivers/vfio/Makefile
+@@ -2,9 +2,9 @@
+ obj-$(CONFIG_VFIO) += vfio.o
  
--	if (vfio_device_is_noiommu(device))
-+	if (device->noiommu)
- 		dev_warn(device->dev, "noiommu device is bound to iommufd by user "
- 			 "(%s:%d)\n", current->comm, task_pid_nr(current));
- 	return 0;
-diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
-index 7aacbd9d08c9..bf4335bce892 100644
---- a/drivers/vfio/group.c
-+++ b/drivers/vfio/group.c
-@@ -192,7 +192,7 @@ static int vfio_device_group_open(struct vfio_device_file *df)
- 		vfio_device_group_get_kvm_safe(device);
+ vfio-y += vfio_main.o \
+-	  group.o \
+ 	  iova_bitmap.o
+ vfio-$(CONFIG_VFIO_DEVICE_CDEV) += device_cdev.o
++vfio-$(CONFIG_VFIO_GROUP) += group.o
+ vfio-$(CONFIG_IOMMUFD) += iommufd.o
+ vfio-$(CONFIG_VFIO_CONTAINER) += container.o
+ vfio-$(CONFIG_VFIO_VIRQFD) += virqfd.o
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 7fa3f54eb855..94d1f690d721 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -796,8 +796,12 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
+ 		return -EAGAIN; /* Something changed, try again */
  
- 	df->iommufd = device->group->iommufd;
--	if (df->iommufd && vfio_device_is_noiommu(device) && device->open_count == 0) {
-+	if (df->iommufd && device->noiommu && device->open_count == 0) {
- 		ret = vfio_iommufd_compat_probe_noiommu(device,
- 							df->iommufd);
- 		if (ret)
-diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
-index 799ea322a7d4..dfe706f1e952 100644
---- a/drivers/vfio/iommufd.c
-+++ b/drivers/vfio/iommufd.c
-@@ -71,7 +71,7 @@ int vfio_iommufd_bind(struct vfio_device_file *df)
+ 	iommu_group = iommu_group_get(&pdev->dev);
+-	if (!iommu_group)
+-		return -EPERM; /* Cannot reset non-isolated devices */
++	/*
++	 * With CONFIG_VFIO_GROUP enabled, device should always have
++	 * iommu_group.
++	 */
++	if (IS_ENABLED(CONFIG_VFIO_GROUP) && !iommu_group)
++		return -EPERM;
  
- 	lockdep_assert_held(&vdev->dev_set->lock);
- 
--	if (vfio_device_is_noiommu(vdev))
-+	if (vdev->noiommu)
- 		return vfio_iommufd_noiommu_bind(vdev, ictx, &df->devid);
- 
- 	return vdev->ops->bind_iommufd(vdev, ictx, &df->devid);
-@@ -86,7 +86,7 @@ int vfio_iommufd_compat_attach_ioas(struct vfio_device *vdev,
- 	lockdep_assert_held(&vdev->dev_set->lock);
- 
- 	/* compat noiommu does not need to do ioas attach */
--	if (vfio_device_is_noiommu(vdev))
-+	if (vdev->noiommu)
- 		return 0;
- 
- 	ret = iommufd_vfio_compat_ioas_get_id(ictx, &ioas_id);
-@@ -103,7 +103,7 @@ void vfio_iommufd_unbind(struct vfio_device_file *df)
- 
- 	lockdep_assert_held(&vdev->dev_set->lock);
- 
--	if (vfio_device_is_noiommu(vdev)) {
-+	if (vdev->noiommu) {
- 		vfio_iommufd_noiommu_unbind(vdev);
- 		return;
+ 	if (fill->devid) {
+ 		struct iommufd_ctx *iommufd = vfio_iommufd_physical_ictx(fill->vdev);
+@@ -821,20 +825,24 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
+ 			if (WARN_ON(ret < 0))
+ 				return ret;
+ 			fill->devices[fill->cur].devid = ret;
+-		} else if (vdev && iommufd_ctx_has_group(iommufd, iommu_group)) {
++		} else if (vdev && iommu_group &&
++			   iommufd_ctx_has_group(iommufd, iommu_group)) {
+ 			fill->devices[fill->cur].devid = VFIO_PCI_DEVID_OWNED;
+ 		} else {
+ 			fill->devices[fill->cur].devid = VFIO_PCI_DEVID_NOT_OWNED;
+ 			fill->dev_owned = false;
+ 		}
+ 	} else {
++		if (WARN_ON(!iommu_group))
++			return -EINVAL;
+ 		fill->devices[fill->cur].group_id = iommu_group_id(iommu_group);
  	}
-@@ -116,7 +116,7 @@ int vfio_iommufd_attach(struct vfio_device *vdev, u32 *pt_id)
- {
- 	lockdep_assert_held(&vdev->dev_set->lock);
- 
--	if (vfio_device_is_noiommu(vdev))
-+	if (vdev->noiommu)
- 		return 0;
- 
- 	return vdev->ops->attach_ioas(vdev, pt_id);
-@@ -126,7 +126,7 @@ void vfio_iommufd_detach(struct vfio_device *vdev)
- {
- 	lockdep_assert_held(&vdev->dev_set->lock);
- 
--	if (!vfio_device_is_noiommu(vdev))
-+	if (!vdev->noiommu)
- 		vdev->ops->detach_ioas(vdev);
+ 	fill->devices[fill->cur].segment = pci_domain_nr(pdev->bus);
+ 	fill->devices[fill->cur].bus = pdev->bus->number;
+ 	fill->devices[fill->cur].devfn = pdev->devfn;
+ 	fill->cur++;
+-	iommu_group_put(iommu_group);
++	if (iommu_group)
++		iommu_group_put(iommu_group);
+ 	return 0;
  }
  
 diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-index 50553f67600f..c8579d63b2b9 100644
+index c8579d63b2b9..cbc65bfdd13f 100644
 --- a/drivers/vfio/vfio.h
 +++ b/drivers/vfio/vfio.h
-@@ -106,10 +106,11 @@ bool vfio_device_has_container(struct vfio_device *device);
- int __init vfio_group_init(void);
- void vfio_group_cleanup(void);
+@@ -36,6 +36,12 @@ vfio_allocate_device_file(struct vfio_device *device);
  
--static inline bool vfio_device_is_noiommu(struct vfio_device *vdev)
-+static inline int vfio_device_set_noiommu(struct vfio_device *device)
- {
--	return IS_ENABLED(CONFIG_VFIO_NOIOMMU) &&
--	       vdev->group->type == VFIO_NO_IOMMU;
-+	device->noiommu = IS_ENABLED(CONFIG_VFIO_NOIOMMU) &&
-+			  device->group->type == VFIO_NO_IOMMU;
-+	return 0;
- }
+ extern const struct file_operations vfio_device_fops;
  
- #if IS_ENABLED(CONFIG_VFIO_CONTAINER)
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 8c3f26b4929b..8979f320d620 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -289,8 +289,12 @@ static int __vfio_register_dev(struct vfio_device *device,
- 	if (ret)
- 		return ret;
- 
-+	ret = vfio_device_set_noiommu(device);
-+	if (ret)
-+		goto err_out;
++#ifdef CONFIG_VFIO_NOIOMMU
++extern bool vfio_noiommu __read_mostly;
++#else
++enum { vfio_noiommu = false };
++#endif
 +
- 	ret = dev_set_name(&device->device, "%svfio%d",
--			   vfio_device_is_noiommu(device) ? "noiommu-" : "", device->index);
-+			   device->noiommu ? "noiommu-" : "", device->index);
- 	if (ret)
- 		goto err_out;
- 
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index cf9d082a623c..fa13889e763f 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -68,6 +68,7 @@ struct vfio_device {
- 	bool iommufd_attached;
- #endif
- 	bool cdev_opened:1;
-+	bool noiommu:1;
+ enum vfio_group_type {
+ 	/*
+ 	 * Physical device with IOMMU backing.
+@@ -60,6 +66,7 @@ enum vfio_group_type {
+ 	VFIO_NO_IOMMU,
  };
  
++#if IS_ENABLED(CONFIG_VFIO_GROUP)
+ struct vfio_group {
+ 	struct device 			dev;
+ 	struct cdev			cdev;
+@@ -112,6 +119,94 @@ static inline int vfio_device_set_noiommu(struct vfio_device *device)
+ 			  device->group->type == VFIO_NO_IOMMU;
+ 	return 0;
+ }
++#else
++struct vfio_group;
++
++static inline int vfio_device_block_group(struct vfio_device *device)
++{
++	return 0;
++}
++
++static inline void vfio_device_unblock_group(struct vfio_device *device)
++{
++}
++
++static inline int vfio_device_set_group(struct vfio_device *device,
++					enum vfio_group_type type)
++{
++	return 0;
++}
++
++static inline void vfio_device_remove_group(struct vfio_device *device)
++{
++}
++
++static inline void vfio_device_group_register(struct vfio_device *device)
++{
++}
++
++static inline void vfio_device_group_unregister(struct vfio_device *device)
++{
++}
++
++static inline int vfio_device_group_use_iommu(struct vfio_device *device)
++{
++	return -EOPNOTSUPP;
++}
++
++static inline void vfio_device_group_unuse_iommu(struct vfio_device *device)
++{
++}
++
++static inline void vfio_device_group_close(struct vfio_device_file *df)
++{
++}
++
++static inline struct vfio_group *vfio_group_from_file(struct file *file)
++{
++	return NULL;
++}
++
++static inline bool vfio_group_enforced_coherent(struct vfio_group *group)
++{
++	return true;
++}
++
++static inline void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm)
++{
++}
++
++static inline bool vfio_device_has_container(struct vfio_device *device)
++{
++	return false;
++}
++
++static inline int __init vfio_group_init(void)
++{
++	return 0;
++}
++
++static inline void vfio_group_cleanup(void)
++{
++}
++
++static inline int vfio_device_set_noiommu(struct vfio_device *device)
++{
++	struct iommu_group *iommu_group;
++
++	iommu_group = iommu_group_get(device->dev);
++	if (!iommu_group) {
++		if (!IS_ENABLED(CONFIG_VFIO_NOIOMMU) || !vfio_noiommu)
++			return -EINVAL;
++		device->noiommu = true;
++	} else {
++		iommu_group_put(iommu_group);
++		device->noiommu = false;
++	}
++
++	return 0;
++}
++#endif /* CONFIG_VFIO_GROUP */
+ 
+ #if IS_ENABLED(CONFIG_VFIO_CONTAINER)
  /**
+@@ -357,12 +452,6 @@ static inline void vfio_virqfd_exit(void)
+ }
+ #endif
+ 
+-#ifdef CONFIG_VFIO_NOIOMMU
+-extern bool vfio_noiommu __read_mostly;
+-#else
+-enum { vfio_noiommu = false };
+-#endif
+-
+ #ifdef CONFIG_HAVE_KVM
+ void _vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm);
+ void vfio_device_put_kvm(struct vfio_device *device);
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index fa13889e763f..c9e05acc20d2 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -43,7 +43,11 @@ struct vfio_device {
+ 	 */
+ 	const struct vfio_migration_ops *mig_ops;
+ 	const struct vfio_log_ops *log_ops;
++#if IS_ENABLED(CONFIG_VFIO_GROUP)
+ 	struct vfio_group *group;
++	struct list_head group_next;
++	struct list_head iommu_entry;
++#endif
+ 	struct vfio_device_set *dev_set;
+ 	struct list_head dev_set_list;
+ 	unsigned int migration_flags;
+@@ -58,8 +62,6 @@ struct vfio_device {
+ 	refcount_t refcount;	/* user count on registered device*/
+ 	unsigned int open_count;
+ 	struct completion comp;
+-	struct list_head group_next;
+-	struct list_head iommu_entry;
+ 	struct iommufd_access *iommufd_access;
+ 	struct iommufd_access *noiommu_access;
+ 	void (*put_kvm)(struct kvm *kvm);
+@@ -286,12 +288,29 @@ int vfio_mig_get_next_state(struct vfio_device *device,
+ /*
+  * External user API
+  */
++#if IS_ENABLED(CONFIG_VFIO_GROUP)
+ struct iommu_group *vfio_file_iommu_group(struct file *file);
+ bool vfio_file_is_group(struct file *file);
++bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
++#else
++static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
++{
++	return NULL;
++}
++
++static inline bool vfio_file_is_group(struct file *file)
++{
++	return false;
++}
++
++static inline bool vfio_file_has_dev(struct file *file, struct vfio_device *device)
++{
++	return false;
++}
++#endif
+ bool vfio_file_is_valid(struct file *file);
+ bool vfio_file_enforced_coherent(struct file *file);
+ void vfio_file_set_kvm(struct file *file, struct kvm *kvm);
+-bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
+ 
+ #define VFIO_PIN_PAGES_MAX_ENTRIES	(PAGE_SIZE/sizeof(unsigned long))
+ 
 -- 
 2.34.1
 
