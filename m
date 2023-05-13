@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 808D4701319
-	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 02:36:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E72EA70131E
+	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 02:36:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241245AbjEMAgY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 May 2023 20:36:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43572 "EHLO
+        id S241159AbjEMAg1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 May 2023 20:36:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241048AbjEMAgO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 May 2023 20:36:14 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 981A755B8
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:36:12 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-55d9a9d19c9so154145437b3.1
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:36:12 -0700 (PDT)
+        with ESMTP id S241005AbjEMAgP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 May 2023 20:36:15 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B04159E4
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:36:14 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-b9a805e82a9so23508545276.3
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:36:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683938171; x=1686530171;
+        d=google.com; s=20221208; t=1683938173; x=1686530173;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=XwIKHmmTJOUjvBBd2bP49EQ+CK24vBc6gAU6yUFfBBk=;
-        b=IWvS7YHz5rmBbZ87EXsze85WRKsVI10IsyQ7JYdQXOzJhyy8qqCn3wse0CPqqOXIBX
-         aqU7JitkpcoRfcEZY2JJNf8S8d/tnnkgje+Fb4zLrrKWNaMFAyOX/CLFfbtG/eSWp/qD
-         5x9EqS0ian2MiBrDyRlPSTrcvLs4DL5O2LEPim+W/E/mF3yzmJmrq/CsiPCw5q8Wx9oP
-         c0nbU7OgipPHjbcUxB3T/ZIW9THv5V8Gflz8/Q2xYarvFCVHcDsYYIrGq0/4NiZsi4AE
-         e7SDmRDh/ac2cSIflttoJ8v7fnAtl8LfqwSunApvH8au0zJUJ/WWoenJobAWpbFDXWBB
-         ue+g==
+        bh=yTF+WvdTXOp88OUwMxHsF/SYvL5GAznXpvvOJVXr590=;
+        b=6clpcNXwWNgtNSBv1Zuk/HmYC1Ks8Z/956BRzb0731I1kGR3sHKzRDOs8rAs55Rngl
+         YjLuzIFPVOaWwOFhxj00mGWX5v6Y5zmAsUVKlXW9dSMnUWfihfWcGbsxx/I2Mc2dFlCS
+         J+3sFb2ZQuySk4Nr8M3GUZT5mX/9hDwI6MGTbwWBC9pmh8tpW0cK1X1J7mShS6THXi8A
+         gBFUR3R4cpv0GkJSakzcRj3FUOW+uJnd5/aAId1JxY0rey3Jwz0QtMgu91VHfSOlNnIq
+         HDHMzpGoJrm3I37RuzzTHm+5Y46vQHC2/CO+XFbFRbayyHmQIA4qNF6KOlI4W61gzbsK
+         1aVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683938171; x=1686530171;
+        d=1e100.net; s=20221208; t=1683938173; x=1686530173;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XwIKHmmTJOUjvBBd2bP49EQ+CK24vBc6gAU6yUFfBBk=;
-        b=O9IVcr504hG8PSylhLSsAfmV+0KtRI5MR/wlvg99Ngd0lQjhL4PdI2XEA+CsSYJBPX
-         4Ke6mDb6K5fxIWmPHOgRSXPdsdQ9SIVoD88yUSVrtuO7JU1WvxvQRzr+BvR3laponB8/
-         PiVWombYrCbKybikaqDn+Cs4463cyBU/L4d9IfPt064PizGfRm9hHbNweK1emgZbrvb9
-         X0cVkq/mJlhQsM56aevKr/51imgMO2MxR4TsMSPbh1YZWdwJ9k99JjgyFIs2pnUf82nt
-         ec58K0lM0uP6gqEghgFMih/A2ejbN4FAMm/sbT2yNzgdiGJNJouLqpRk+11PbqJUd/Vq
-         jk/g==
-X-Gm-Message-State: AC+VfDyMVdU3CL4fInOy3ciNfgdajBdKReeFvUWJuP576VYrrxZC/fUX
-        BTJzTGKyk8PrdD1pX4PKBhKaAs/hWrY=
-X-Google-Smtp-Source: ACHHUZ6ory0k/qFNjJuvZa2lN6LXysci1uDwM6JYHBj9iXnwBOWmSbi9qEBm6YL7pzYtMD+CEsW4NisJ8+M=
+        bh=yTF+WvdTXOp88OUwMxHsF/SYvL5GAznXpvvOJVXr590=;
+        b=Rh3KDO/1gQqbEmhO09C61wTBfyPdySO3FuJkYi54uvz1B3iFEdW4EI7kVUwMeNxBty
+         li/SlRrdRy3efOy//nr4y/mcdcT3xPjsF+vnyIOuERQmd+AHeS82LZ1uuHsLzWDeIuzA
+         FWM9FP53AKl7Ygy9oYRG7bLIuR30hhpor+f8ItWnt4tY9fH3AZ2Ys3M3JbnvwRRBSFzt
+         0aLUuF+Mvh6a90Rt0uE+Lqoiye44Wpxw6FGGkSm1qg6jVWuhtWa5jpWe9X9rtl0Hb8Nv
+         ID96WzBV+mIm38P5URAne7sfgIDpOLLPHTueiT0cZ5vmjlOU1KlQnFkUDKgb/OY6uwZI
+         Pufg==
+X-Gm-Message-State: AC+VfDxxt0JeV3oIe7kdxDnKrDlYgl/oEBLXH+MVVI7Z1tG+us4/585o
+        tlTiwrvhmoVm8WyyqpTS3djaq/ARXdE=
+X-Google-Smtp-Source: ACHHUZ6sCXV5bYrQMueEEkeXbkChM3ieDdBL6hB5rVuoYaO/GqHC/qHdq6D5z3cP7chOjEQvwTelozt9YWI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:af0e:0:b0:55a:5641:54be with SMTP id
- n14-20020a81af0e000000b0055a564154bemr16292331ywh.6.1683938171803; Fri, 12
- May 2023 17:36:11 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:824f:0:b0:b92:25bf:a6ba with SMTP id
+ d15-20020a25824f000000b00b9225bfa6bamr12046826ybn.6.1683938173689; Fri, 12
+ May 2023 17:36:13 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 12 May 2023 17:35:35 -0700
+Date:   Fri, 12 May 2023 17:35:36 -0700
 In-Reply-To: <20230513003600.818142-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230513003600.818142-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
-Message-ID: <20230513003600.818142-4-seanjc@google.com>
-Subject: [PATCH v3 03/28] drm/i915/gvt: Verify hugepages are contiguous in
- physical address space
+Message-ID: <20230513003600.818142-5-seanjc@google.com>
+Subject: [PATCH v3 04/28] drm/i915/gvt: Put the page reference obtained by
+ KVM's gfn_to_pfn()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -68,42 +68,49 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When shadowing a GTT entry with a 2M page, verify that the pfns are
-contiguous, not just that the struct page pointers are contiguous.  The
-memory map is virtual contiguous if "CONFIG_FLATMEM=y ||
-CONFIG_SPARSEMEM_VMEMMAP=y", but not for "CONFIG_SPARSEMEM=y &&
-CONFIG_SPARSEMEM_VMEMMAP=n", so theoretically KVMGT could encounter struct
-pages that are virtually contiguous, but not physically contiguous.
+Put the struct page reference acquired by gfn_to_pfn(), KVM's API is that
+the caller is ultimately responsible for dropping any reference.
 
-In practice, this flaw is likely a non-issue as it would cause functional
-problems iff a section isn't 2M aligned _and_ is directly adjacent to
-another section with discontiguous pfns.
+Note, kvm_release_pfn_clean() ensures the pfn is actually a refcounted
+struct page before trying to put any references.
 
+Fixes: b901b252b6cf ("drm/i915/gvt: Add 2M huge gtt support")
+Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/gpu/drm/i915/gvt/kvmgt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/gpu/drm/i915/gvt/gtt.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index de675d799c7d..429f0f993a13 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -161,7 +161,7 @@ static int gvt_pin_guest_page(struct intel_vgpu *vgpu, unsigned long gfn,
+diff --git a/drivers/gpu/drm/i915/gvt/gtt.c b/drivers/gpu/drm/i915/gvt/gtt.c
+index f30922c55a0c..5426a27c1b71 100644
+--- a/drivers/gpu/drm/i915/gvt/gtt.c
++++ b/drivers/gpu/drm/i915/gvt/gtt.c
+@@ -1158,6 +1158,7 @@ static int is_2MB_gtt_possible(struct intel_vgpu *vgpu,
+ {
+ 	const struct intel_gvt_gtt_pte_ops *ops = vgpu->gvt->gtt.pte_ops;
+ 	kvm_pfn_t pfn;
++	int ret;
  
- 		if (npage == 0)
- 			base_page = cur_page;
--		else if (base_page + npage != cur_page) {
-+		else if (page_to_pfn(base_page) + npage != page_to_pfn(cur_page)) {
- 			gvt_vgpu_err("The pages are not continuous\n");
- 			ret = -EINVAL;
- 			npage++;
+ 	if (!HAS_PAGE_SIZES(vgpu->gvt->gt->i915, I915_GTT_PAGE_SIZE_2M))
+ 		return 0;
+@@ -1171,7 +1172,9 @@ static int is_2MB_gtt_possible(struct intel_vgpu *vgpu,
+ 	if (!pfn_valid(pfn))
+ 		return -EINVAL;
+ 
+-	return PageTransHuge(pfn_to_page(pfn));
++	ret = PageTransHuge(pfn_to_page(pfn));
++	kvm_release_pfn_clean(pfn);
++	return ret;
+ }
+ 
+ static int split_2MB_gtt_entry(struct intel_vgpu *vgpu,
 -- 
 2.40.1.606.ga4b1b128d6-goog
 
