@@ -2,113 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30225701491
-	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 08:11:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EADA47016DF
+	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 15:21:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232319AbjEMGLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 13 May 2023 02:11:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59300 "EHLO
+        id S237339AbjEMNVm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 13 May 2023 09:21:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbjEMGLO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 13 May 2023 02:11:14 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2303440DA;
-        Fri, 12 May 2023 23:11:10 -0700 (PDT)
+        with ESMTP id S229910AbjEMNVl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 13 May 2023 09:21:41 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 502D6E77;
+        Sat, 13 May 2023 06:21:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683958270; x=1715494270;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=72itzeKxsk7S7f1i1V3zonGHpciPHvK7GsN+s81/H4w=;
-  b=VqY1zd7U+sMH8ceAslyko1vww4US3O5TZ6HJi5pOaIDI173nRpaDJUFw
-   W3oaRyTjQ7F9d9w4gvPGQoRJBKNsIqnyldmi74q4Cbwk7CQdn543s/Vfw
-   aJuNpspcQ3J5QtNmGbRhrGn5neTAkeo3r6MpMCLHhIoGuV8Hz1oYaU51W
-   FAhBw7wbMu96a6kc8hdBqe9t06Inxip4ydo/BrYIVw0Wy24BiHoGjIAJi
-   Ftsgw4YMKcgRAnctnY58pKNdS46ftTf8PvXChGVSH3SytkcdjVPNm213A
-   xCEcpKoeLUcmy/uwZW8inxSJ+6i0QSEWgsHa+x0rvTdGGLM+pjEm2qZUr
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="354069735"
-X-IronPort-AV: E=Sophos;i="5.99,271,1677571200"; 
-   d="scan'208";a="354069735"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2023 23:11:09 -0700
+  t=1683984099; x=1715520099;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PqVszXHCfyzxixQbnnKl9PA7bYJV5I+dg9B0dKF8BBc=;
+  b=nnYzavcIiVZjyXEjg7Re/5Tofj8zRuFT95czqrYBhrzJAG3knD4SfSXz
+   Ut2fO7cg22K1PDwUQXi2PuOKvRRKlmOimg7/yCVWlemYSBIw5ozXZmcB2
+   mgr1T5Eyeunf0jtf3R/jB9saNvTNLeb8s4DTOkjG5xGZQrPQLmZO4Wtij
+   BGrV+EPMQ75JmZ9XIIPdSURCu1EpGkAJe6NUKBKYB11jTW6xz/KBVEbvl
+   92566DJ6d1aO5D8OBRSy9g4FWEsex1fLFw0zWScNXCMJBIkBqOOAqmkey
+   sdqhkmdsv6EvO1c/MZZ7Q06qWSb5gsv1rNj8LX1sbMMrKixbeggiMOEId
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="416598941"
+X-IronPort-AV: E=Sophos;i="5.99,272,1677571200"; 
+   d="scan'208";a="416598941"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2023 06:21:38 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="765377755"
-X-IronPort-AV: E=Sophos;i="5.99,271,1677571200"; 
-   d="scan'208";a="765377755"
-Received: from lkp-server01.sh.intel.com (HELO dea6d5a4f140) ([10.239.97.150])
-  by fmsmga008.fm.intel.com with ESMTP; 12 May 2023 23:11:06 -0700
-Received: from kbuild by dea6d5a4f140 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pxiTC-0005Mo-0e;
-        Sat, 13 May 2023 06:11:06 +0000
-Date:   Sat, 13 May 2023 14:10:16 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Cc:     oe-kbuild-all@lists.linux.dev,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>
-Subject: Re: [PATCH 1/5] s390/uvdevice: Add info IOCTL
-Message-ID: <202305131333.DKwclZxs-lkp@intel.com>
-References: <20230512093153.206378-2-seiden@linux.ibm.com>
+X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="790126420"
+X-IronPort-AV: E=Sophos;i="5.99,272,1677571200"; 
+   d="scan'208";a="790126420"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by FMSMGA003.fm.intel.com with ESMTP; 13 May 2023 06:21:37 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
+Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+        yi.l.liu@intel.com, yi.y.sun@linux.intel.com, peterx@redhat.com,
+        jasowang@redhat.com, shameerali.kolothum.thodi@huawei.com,
+        lulu@redhat.com, suravee.suthikulpanit@amd.com,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
+        clegoate@redhat.com
+Subject: [PATCH v5 00/10] Enhance vfio PCI hot reset for vfio cdev device
+Date:   Sat, 13 May 2023 06:21:26 -0700
+Message-Id: <20230513132136.15021-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230512093153.206378-2-seiden@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Steffen,
+VFIO_DEVICE_PCI_HOT_RESET requires user to pass an array of group fds
+to prove that it owns all devices affected by resetting the calling
+device. While for cdev devices, user can use an iommufd-based ownership
+checking model and invoke VFIO_DEVICE_PCI_HOT_RESET with a zero-length
+fd array.
 
-kernel test robot noticed the following build errors:
+This series first creates iommufd_access for noiommu devices to fill the
+gap for adding iommufd-based ownership checking model, then extends
+VFIO_DEVICE_GET_PCI_HOT_RESET_INFO to check ownership and return the
+check result and the devid of affected devices to user. In the end, extends
+the VFIO_DEVICE_PCI_HOT_RESET to accept zero-length fd array for hot-reset
+with cdev devices.
 
-[auto build test ERROR on kvms390/next]
-[also build test ERROR on s390/features mst-vhost/linux-next linus/master v6.4-rc1 next-20230512]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+The new hot reset method and updated _INFO ioctl are tested with the
+below qemu:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Steffen-Eiden/s390-uvdevice-Add-info-IOCTL/20230512-174226
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git next
-patch link:    https://lore.kernel.org/r/20230512093153.206378-2-seiden%40linux.ibm.com
-patch subject: [PATCH 1/5] s390/uvdevice: Add info IOCTL
-config: s390-randconfig-s043-20230509 (https://download.01.org/0day-ci/archive/20230513/202305131333.DKwclZxs-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 12.1.0
-reproduce:
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # apt-get install sparse
-        # sparse version: v0.6.4-39-gce1a6720-dirty
-        # https://github.com/intel-lab-lkp/linux/commit/82f137c1686ef0317cd12c5737fa349f2582163c
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Steffen-Eiden/s390-uvdevice-Add-info-IOCTL/20230512-174226
-        git checkout 82f137c1686ef0317cd12c5737fa349f2582163c
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=s390 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=s390 SHELL=/bin/bash
+https://github.com/yiliu1765/qemu/tree/iommufd_rfcv4.mig.reset.v4_var3
+(requires to test with the cdev kernel)
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202305131333.DKwclZxs-lkp@intel.com/
+Change log:
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
+v5:
+ - Drop patch 01 of v4 (Alex)
+ - Create noiommu_access for noiommu devices (Jason)
+ - Reserve all negative iommufd IDs, hence VFIO can encode negative
+   values (Jason)
+ - Make vfio_iommufd_physical_devid() return -EINVAL if it's not called
+   with a physical device or a noiommu device.
+ - Add vfio_find_device_in_devset() in vfio_main.c (Alex)
+ - Add iommufd_ctx_has_group() to replace vfio_devset_iommufd_has_group().
+   Reason: vfio_devset_iommufd_has_group() only loops the devices within
+   the given devset to check the iommufd an iommu_group, but an iommu_group
+   can span into multiple devsets. So if failed to find the group in a
+   devset doesn't mean the group is not owned by the iommufd. So here either
+   needs to search all the devsets or add an iommufd API to check it. It
+   appears an iommufd API makes more sense.
+ - Adopt suggestions from Alex on patch 08 and 09 of v4, refine the hot-reset
+   uapi description and minor tweaks
+ - Use bitfields for bool members (Alex)
 
->> ERROR: modpost: "uv_info" [drivers/s390/char/uvdevice.ko] undefined!
+v4: https://lore.kernel.org/kvm/20230426145419.450922-1-yi.l.liu@intel.com/
+ - Rename the patch series subject
+ - Patch 01 is moved from the cdev series
+ - Patch 02, 06 are new per review comments in v3
+ - Patch 03/04/05/07/08/09 are from v3 with updates
+
+v3: https://lore.kernel.org/kvm/20230401144429.88673-1-yi.l.liu@intel.com/
+ - Remove the new _INFO ioctl of v2, extend the existing _INFO ioctl to
+   report devid (Alex)
+ - Add r-b from Jason
+ - Add t-b from Terrence Xu and Yanting Jiang (mainly regression test)
+
+v2: https://lore.kernel.org/kvm/20230327093458.44939-1-yi.l.liu@intel.com/
+ - Split the patch 03 of v1 to be 03, 04 and 05 of v2 (Jaon)
+ - Add r-b from Kevin and Jason
+ - Add patch 10 to introduce a new _INFO ioctl for the usage of device
+   fd passing usage in cdev path (Jason, Alex)
+
+v1: https://lore.kernel.org/kvm/20230316124156.12064-1-yi.l.liu@intel.com/
+
+Regards,
+	Yi Liu
+
+Yi Liu (10):
+  vfio-iommufd: Create iommufd_access for noiommu devices
+  vfio/pci: Update comment around group_fd get in
+    vfio_pci_ioctl_pci_hot_reset()
+  vfio/pci: Move the existing hot reset logic to be a helper
+  vfio: Mark cdev usage in vfio_device
+  iommufd: Reserve all negative IDs in the iommufd xarray
+  vfio-iommufd: Add helper to retrieve iommufd_ctx and devid for
+    vfio_device
+  vfio: Add helper to search vfio_device in a dev_set
+  iommufd: Add iommufd_ctx_has_group()
+  vfio/pci: Extend VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for vfio device
+    cdev
+  vfio/pci: Allow passing zero-length fd array in
+    VFIO_DEVICE_PCI_HOT_RESET
+
+ drivers/iommu/iommufd/device.c   |  53 +++++++++
+ drivers/iommu/iommufd/main.c     |   2 +-
+ drivers/vfio/iommufd.c           |  63 ++++++++++-
+ drivers/vfio/pci/vfio_pci_core.c | 184 ++++++++++++++++++++++++-------
+ drivers/vfio/vfio_main.c         |  15 +++
+ include/linux/iommufd.h          |  14 +++
+ include/linux/vfio.h             |  23 ++++
+ include/uapi/linux/vfio.h        |  60 +++++++++-
+ 8 files changed, 368 insertions(+), 46 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+2.34.1
+
