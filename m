@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DC5B70133C
-	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 02:36:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0FF3701344
+	for <lists+kvm@lfdr.de>; Sat, 13 May 2023 02:36:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241666AbjEMAgr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 May 2023 20:36:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43894 "EHLO
+        id S241725AbjEMAgz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 May 2023 20:36:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241505AbjEMAgb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 May 2023 20:36:31 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D1A559F
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:36:22 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-643aeb66f4bso5439246b3a.1
-        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:36:22 -0700 (PDT)
+        with ESMTP id S241290AbjEMAgl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 May 2023 20:36:41 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B3DC59ED
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:36:24 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-ba2526a8918so14116921276.1
+        for <kvm@vger.kernel.org>; Fri, 12 May 2023 17:36:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1683938182; x=1686530182;
+        d=google.com; s=20221208; t=1683938183; x=1686530183;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=xOh8270aHmhQkt9lEUjS49SPgiz7MiCgITarxX9E6A4=;
-        b=0jqUD1zjEi55ZfhAIwMWNWENT9MRrpNqKPwfQ1O+9RvhBF4O2kdCyXExTphM2+/m9k
-         /jnyyeFCDa3H2au4xyKDmwQ25q0BQadY/AQ5keaYUsgrQKFeyRVTbA64tAv2mHUVd79F
-         MA1woP6wnOSriWMc3ixbrjlmsjIvDoDt2FMBhOh/vWdW0IYpXN+YySWq8QleQOn1OCNY
-         zaA45ZWqVu8O+rYagST5vwdnd2n7ifjmb0xsLWIRl0HT3SzfiTn9LZMpvRUt0vUY023R
-         scxbCiPEhmmQYIdSQSSJVaEk7yZ8fAWjNetppIAeHmtlBBJ2ncdcrr67LCrk49c7ptKV
-         AVOw==
+        bh=kGWzOGNnYX/vPHab7hWTlXeNk8DC7e1HwcSSdi2i4zw=;
+        b=cSZ/VlxdW4Pvbsz3re6QAwL7WZtCGSlM3rK2fKtPlroG7b/uYLspYK3BUBxjTTVT5H
+         rExIRgrg9h7XNVV7S8JfLCc6hKMFeVMPfqlR+bwL2034YQgp2h3wOyvRQhcjmYy/0CWV
+         Tb+gGu3prYb0KrHv7Vpt1Y+ROsVp45lgtRd9usk1mFWD3GZrX5I8Fe1G/lbZAI8o3lEr
+         mWJgGWPW0bvh34EiK1V42Nbd2UJvbVYh21LbBL0Z3RhkD6kdDit2UIz+fEakFenDOmre
+         edXxYiugm9t9TfwtH8lYTgo0OpSfKkvacHAeaJpt4SGriTEuFWd6Nrv6Y3L/CUCP08tz
+         nGqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683938182; x=1686530182;
+        d=1e100.net; s=20221208; t=1683938183; x=1686530183;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xOh8270aHmhQkt9lEUjS49SPgiz7MiCgITarxX9E6A4=;
-        b=A2oQFreQPQCS1vdFKlQbMSf0bRmdqZaChmy/j/0D/Cs+Ge2wytTb8gwkkMbQKup4ST
-         LJ7/mp+MRPzDzR/57KnAjV4HqAPegw3x7iiOgSFODTpBcP6Fvs5DX3OQidwJBmh1QCw3
-         AwJPAbC7qb4RPNVh6rLXk462AunZl9HFGbWcR1SsfKNsY37PqcYi1UQn+QlkPe7E4F5S
-         QwWebwBpZn7C/+TwIJ0D4T6kyX9kli7D+qRUxds2wAltHqeog/KZ5JqzrnDgKJS7hZPV
-         I+rW39Hc3APuN2lObZemZKR81Tvw4CIeW6hKnOuidxYHS7ZnL+vCZTROrgnzeFiVMHdr
-         Zxtg==
-X-Gm-Message-State: AC+VfDwm7q+l9b566d2IOtZJfgvSwLRCc+btRxQUjvnqvu2a493l5c7n
-        liTBAE+Rn64juqaU9zVrpx1k0Y0x9TU=
-X-Google-Smtp-Source: ACHHUZ4jgx7mBorgy6buawkOwqeHbNOdHMLcx00pmvGCjodnLruorEbphmkbg9mH6m6+8x0sTFFO0bzj3qo=
+        bh=kGWzOGNnYX/vPHab7hWTlXeNk8DC7e1HwcSSdi2i4zw=;
+        b=L2V/xjNAIzPNM8UvLvXZBoR+vhgjNCQK2EshWndoJt/rKwEX1pErZt4NYKYVH7Dl95
+         0PTla3Fawa3ruI2eXXFrsJItN8si3HlU52XIGRw3cfufRj5bUnB6Z3mvl03zxSWmYcrx
+         ZuQH4t+qihJJlbLDBbkqwC0RXZa2+4CW9/s8AcZebWh0PmkuRX+EdQbiKpc3eLA5UZx4
+         tkKV24F1c1JutM9D8N9LUCJ/E263l57swmUwv/uVPyAQ/WArX//oImcjuMB0K5Qh9gnp
+         2IYgqbZEPbJxpEgHUhJVGPsGMCNqnFQJD+2Do8Ge6GySkCAws7n7XfSxcDil2W/BDiHp
+         CTBQ==
+X-Gm-Message-State: AC+VfDx3PJxSEpLm6mehdsvl0YD8eNT4SPKHzCKmQt8qQjd+ilUH9qgX
+        QJOAMdFM5d+FWBBLohyMdW9BN6lW4vY=
+X-Google-Smtp-Source: ACHHUZ44XO16MxtzD/w1KoYsys54d1K4j5Ud62MPtg/R3svFiezEkhnbaVUuOmGlNoGAUGi8FiukEJhRUEo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1790:b0:64a:f4ac:3433 with SMTP id
- s16-20020a056a00179000b0064af4ac3433mr565273pfg.6.1683938181992; Fri, 12 May
- 2023 17:36:21 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:4a9:b0:ba7:6620:4caa with SMTP id
+ r9-20020a05690204a900b00ba766204caamr88646ybs.4.1683938183796; Fri, 12 May
+ 2023 17:36:23 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 12 May 2023 17:35:40 -0700
+Date:   Fri, 12 May 2023 17:35:41 -0700
 In-Reply-To: <20230513003600.818142-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230513003600.818142-1-seanjc@google.com>
 X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
-Message-ID: <20230513003600.818142-9-seanjc@google.com>
-Subject: [PATCH v3 08/28] drm/i915/gvt: Use an "unsigned long" to iterate over
- memslot gfns
+Message-ID: <20230513003600.818142-10-seanjc@google.com>
+Subject: [PATCH v3 09/28] drm/i915/gvt: Drop unused helper intel_vgpu_reset_gtt()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -75,30 +74,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use an "unsigned long" instead of an "int" when iterating over the gfns
-in a memslot.  The number of pages in the memslot is tracked as an
-"unsigned long", e.g. KVMGT could theoretically break if a KVM memslot
-larger than 16TiB were deleted (2^32 * 4KiB).
+Drop intel_vgpu_reset_gtt() as it no longer has any callers.  In addition
+to eliminating dead code, this eliminates the last possible scenario where
+__kvmgt_protect_table_find() can be reached without holding vgpu_lock.
+Requiring vgpu_lock to be held when calling __kvmgt_protect_table_find()
+will allow a protecting the gfn hash with vgpu_lock without too much fuss.
 
+No functional change intended.
+
+Fixes: ba25d977571e ("drm/i915/gvt: Do not destroy ppgtt_mm during vGPU D3->D0.")
 Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/gpu/drm/i915/gvt/kvmgt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/gpu/drm/i915/gvt/gtt.c | 18 ------------------
+ drivers/gpu/drm/i915/gvt/gtt.h |  1 -
+ 2 files changed, 19 deletions(-)
 
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index 92ceefe1e6fb..117bac85ac2c 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -1619,7 +1619,7 @@ static void kvmgt_page_track_flush_slot(struct kvm *kvm,
- 		struct kvm_memory_slot *slot,
- 		struct kvm_page_track_notifier_node *node)
- {
--	int i;
-+	unsigned long i;
- 	gfn_t gfn;
- 	struct intel_vgpu *info =
- 		container_of(node, struct intel_vgpu, track_node);
+diff --git a/drivers/gpu/drm/i915/gvt/gtt.c b/drivers/gpu/drm/i915/gvt/gtt.c
+index f505be9e647a..c3c623b929ce 100644
+--- a/drivers/gpu/drm/i915/gvt/gtt.c
++++ b/drivers/gpu/drm/i915/gvt/gtt.c
+@@ -2817,24 +2817,6 @@ void intel_vgpu_reset_ggtt(struct intel_vgpu *vgpu, bool invalidate_old)
+ 	ggtt_invalidate(gvt->gt);
+ }
+ 
+-/**
+- * intel_vgpu_reset_gtt - reset the all GTT related status
+- * @vgpu: a vGPU
+- *
+- * This function is called from vfio core to reset reset all
+- * GTT related status, including GGTT, PPGTT, scratch page.
+- *
+- */
+-void intel_vgpu_reset_gtt(struct intel_vgpu *vgpu)
+-{
+-	/* Shadow pages are only created when there is no page
+-	 * table tracking data, so remove page tracking data after
+-	 * removing the shadow pages.
+-	 */
+-	intel_vgpu_destroy_all_ppgtt_mm(vgpu);
+-	intel_vgpu_reset_ggtt(vgpu, true);
+-}
+-
+ /**
+  * intel_gvt_restore_ggtt - restore all vGPU's ggtt entries
+  * @gvt: intel gvt device
+diff --git a/drivers/gpu/drm/i915/gvt/gtt.h b/drivers/gpu/drm/i915/gvt/gtt.h
+index a3b0f59ec8bd..4cb183e06e95 100644
+--- a/drivers/gpu/drm/i915/gvt/gtt.h
++++ b/drivers/gpu/drm/i915/gvt/gtt.h
+@@ -224,7 +224,6 @@ void intel_vgpu_reset_ggtt(struct intel_vgpu *vgpu, bool invalidate_old);
+ void intel_vgpu_invalidate_ppgtt(struct intel_vgpu *vgpu);
+ 
+ int intel_gvt_init_gtt(struct intel_gvt *gvt);
+-void intel_vgpu_reset_gtt(struct intel_vgpu *vgpu);
+ void intel_gvt_clean_gtt(struct intel_gvt *gvt);
+ 
+ struct intel_vgpu_mm *intel_gvt_find_ppgtt_mm(struct intel_vgpu *vgpu,
 -- 
 2.40.1.606.ga4b1b128d6-goog
 
