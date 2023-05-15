@@ -2,40 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F091870322D
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 18:06:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C850E70322B
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 18:06:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242491AbjEOQGp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 12:06:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37844 "EHLO
+        id S242517AbjEOQGm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 12:06:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242509AbjEOQGl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 12:06:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A9151706
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 09:05:33 -0700 (PDT)
+        with ESMTP id S242471AbjEOQGk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 12:06:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC3DBA3
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 09:05:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684166712;
+        s=mimecast20190719; t=1684166715;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=lcQUWH2Bg0LeZN3EAXHkDBBz74AC6jKu2ky3WAA/zwY=;
-        b=NrytPKqm/UWDhmnex+2ny925nxStafwRQQ0bWbBDn2X6U7l6hisKmNrfsoMz0z0vZojdtd
-        5NPcLvUDyYwwL9hYFXCr5aTAreuU15WIfPWDUB9hQ5BMkci2QptxP6EH4ADO39pZX0mkmo
-        tSyM++cEAF9ElC1hym6bAumeq8yBTSE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1kuaKv1v3rG2+TaMI2y2qLreVAPANNYNqIiaJNA6pjQ=;
+        b=cSidijGpvTtaqVloxc2SNNJ3ADE4TT5Ly5EnkNFdW8WEL2ZnVfLwPx3WP/QrUX6pa+d8ld
+        Gi/tybZT7V9Nnl0DMdCq4x8Vx5ds8NFlH3nrQH7yqO7WZy0XSTGfLJK3Joq4F3Gpv1FTpN
+        E9fZSRbCNtYqToJ3RHDnRhc9LfxYA0k=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-127-ROeSGZqQOD-a-c7Wpgk-Nw-1; Mon, 15 May 2023 12:05:09 -0400
-X-MC-Unique: ROeSGZqQOD-a-c7Wpgk-Nw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-250-8pCZOJTVO2GgJGqQW0n6QQ-1; Mon, 15 May 2023 12:05:11 -0400
+X-MC-Unique: 8pCZOJTVO2GgJGqQW0n6QQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 80A381C00046;
-        Mon, 15 May 2023 16:05:08 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 94E3485C06D;
+        Mon, 15 May 2023 16:05:10 +0000 (UTC)
 Received: from localhost (unknown [10.39.192.179])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DEAB920268C4;
-        Mon, 15 May 2023 16:05:07 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D39F335453;
+        Mon, 15 May 2023 16:05:09 +0000 (UTC)
 From:   Stefan Hajnoczi <stefanha@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Richard Henderson <rth@twiddle.net>,
@@ -55,101 +56,102 @@ Cc:     Richard Henderson <rth@twiddle.net>,
         Hanna Reitz <hreitz@redhat.com>,
         Eric Blake <eblake@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
-        Fam Zheng <fam@euphon.net>
-Subject: [PULL v2 00/16] Block patches
-Date:   Mon, 15 May 2023 12:04:50 -0400
-Message-Id: <20230515160506.1776883-1-stefanha@redhat.com>
+        Fam Zheng <fam@euphon.net>, Sam Li <faithilikerun@gmail.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Subject: [PULL v2 01/16] block/block-common: add zoned device structs
+Date:   Mon, 15 May 2023 12:04:51 -0400
+Message-Id: <20230515160506.1776883-2-stefanha@redhat.com>
+In-Reply-To: <20230515160506.1776883-1-stefanha@redhat.com>
+References: <20230515160506.1776883-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit 8844bb8d896595ee1d25d21c770e6e6f29803097:
+From: Sam Li <faithilikerun@gmail.com>
 
-  Merge tag 'or1k-pull-request-20230513' of https://github.com/stffrdhrn/qemu into staging (2023-05-13 11:23:14 +0100)
+Signed-off-by: Sam Li <faithilikerun@gmail.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Acked-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20230508045533.175575-2-faithilikerun@gmail.com
+Message-id: 20230324090605.28361-2-faithilikerun@gmail.com
+[Adjust commit message prefix as suggested by Philippe Mathieu-Daudé
+<philmd@linaro.org>.
+--Stefan]
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ include/block/block-common.h | 43 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-are available in the Git repository at:
-
-  https://gitlab.com/stefanha/qemu.git tags/block-pull-request
-
-for you to fetch changes up to 01562fee5f3ad4506d57dbcf4b1903b565eceec7:
-
-  docs/zoned-storage:add zoned emulation use case (2023-05-15 08:19:04 -0400)
-
-----------------------------------------------------------------
-Pull request
-
-This pull request contain's Sam Li's zoned storage support in the QEMU block
-layer and virtio-blk emulation.
-
-v2:
-- Sam fixed the CI failures. CI passes for me now. [Richard]
-
-----------------------------------------------------------------
-
-Sam Li (16):
-  block/block-common: add zoned device structs
-  block/file-posix: introduce helper functions for sysfs attributes
-  block/block-backend: add block layer APIs resembling Linux
-    ZonedBlockDevice ioctls
-  block/raw-format: add zone operations to pass through requests
-  block: add zoned BlockDriver check to block layer
-  iotests: test new zone operations
-  block: add some trace events for new block layer APIs
-  docs/zoned-storage: add zoned device documentation
-  file-posix: add tracking of the zone write pointers
-  block: introduce zone append write for zoned devices
-  qemu-iotests: test zone append operation
-  block: add some trace events for zone append
-  virtio-blk: add zoned storage emulation for zoned devices
-  block: add accounting for zone append operation
-  virtio-blk: add some trace events for zoned emulation
-  docs/zoned-storage:add zoned emulation use case
-
- docs/devel/index-api.rst               |   1 +
- docs/devel/zoned-storage.rst           |  62 +++
- qapi/block-core.json                   |  68 ++-
- qapi/block.json                        |   4 +
- meson.build                            |   5 +
- include/block/accounting.h             |   1 +
- include/block/block-common.h           |  57 ++
- include/block/block-io.h               |  13 +
- include/block/block_int-common.h       |  37 ++
- include/block/raw-aio.h                |   8 +-
- include/sysemu/block-backend-io.h      |  27 +
- block.c                                |  19 +
- block/block-backend.c                  | 198 +++++++
- block/file-posix.c                     | 692 +++++++++++++++++++++++--
- block/io.c                             |  68 +++
- block/io_uring.c                       |   4 +
- block/linux-aio.c                      |   3 +
- block/qapi-sysemu.c                    |  11 +
- block/qapi.c                           |  18 +
- block/raw-format.c                     |  26 +
- hw/block/virtio-blk-common.c           |   2 +
- hw/block/virtio-blk.c                  | 405 +++++++++++++++
- hw/virtio/virtio-qmp.c                 |   2 +
- qemu-io-cmds.c                         | 224 ++++++++
- block/trace-events                     |   4 +
- docs/system/qemu-block-drivers.rst.inc |   6 +
- hw/block/trace-events                  |   7 +
- tests/qemu-iotests/227.out             |  18 +
- tests/qemu-iotests/tests/zoned         | 105 ++++
- tests/qemu-iotests/tests/zoned.out     |  69 +++
- 30 files changed, 2106 insertions(+), 58 deletions(-)
- create mode 100644 docs/devel/zoned-storage.rst
- create mode 100755 tests/qemu-iotests/tests/zoned
- create mode 100644 tests/qemu-iotests/tests/zoned.out
-
+diff --git a/include/block/block-common.h b/include/block/block-common.h
+index b5122ef8ab..1576fcf2ed 100644
+--- a/include/block/block-common.h
++++ b/include/block/block-common.h
+@@ -75,6 +75,49 @@ typedef struct BlockDriver BlockDriver;
+ typedef struct BdrvChild BdrvChild;
+ typedef struct BdrvChildClass BdrvChildClass;
+ 
++typedef enum BlockZoneOp {
++    BLK_ZO_OPEN,
++    BLK_ZO_CLOSE,
++    BLK_ZO_FINISH,
++    BLK_ZO_RESET,
++} BlockZoneOp;
++
++typedef enum BlockZoneModel {
++    BLK_Z_NONE = 0x0, /* Regular block device */
++    BLK_Z_HM = 0x1, /* Host-managed zoned block device */
++    BLK_Z_HA = 0x2, /* Host-aware zoned block device */
++} BlockZoneModel;
++
++typedef enum BlockZoneState {
++    BLK_ZS_NOT_WP = 0x0,
++    BLK_ZS_EMPTY = 0x1,
++    BLK_ZS_IOPEN = 0x2,
++    BLK_ZS_EOPEN = 0x3,
++    BLK_ZS_CLOSED = 0x4,
++    BLK_ZS_RDONLY = 0xD,
++    BLK_ZS_FULL = 0xE,
++    BLK_ZS_OFFLINE = 0xF,
++} BlockZoneState;
++
++typedef enum BlockZoneType {
++    BLK_ZT_CONV = 0x1, /* Conventional random writes supported */
++    BLK_ZT_SWR = 0x2, /* Sequential writes required */
++    BLK_ZT_SWP = 0x3, /* Sequential writes preferred */
++} BlockZoneType;
++
++/*
++ * Zone descriptor data structure.
++ * Provides information on a zone with all position and size values in bytes.
++ */
++typedef struct BlockZoneDescriptor {
++    uint64_t start;
++    uint64_t length;
++    uint64_t cap;
++    uint64_t wp;
++    BlockZoneType type;
++    BlockZoneState state;
++} BlockZoneDescriptor;
++
+ typedef struct BlockDriverInfo {
+     /* in bytes, 0 if irrelevant */
+     int cluster_size;
 -- 
 2.40.1
 
