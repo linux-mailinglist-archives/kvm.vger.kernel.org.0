@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 754277038AF
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 19:34:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81B9E703A42
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 19:50:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244423AbjEOReI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 13:34:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55428 "EHLO
+        id S244851AbjEORuS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 13:50:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244275AbjEORds (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 13:33:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97B331491D
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:31:38 -0700 (PDT)
+        with ESMTP id S244863AbjEORtu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 13:49:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE61E1691E
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:47:46 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D623562D56
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 17:31:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8839AC433D2;
-        Mon, 15 May 2023 17:31:27 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3756462EF8
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 17:47:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A544C433D2;
+        Mon, 15 May 2023 17:47:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684171887;
-        bh=QgkkzL7UoeUjp0ClcPU82j2iDGtiQBtIU1l3pnC+VR8=;
+        s=k20201202; t=1684172865;
+        bh=gLFc7QVKfaRY88gF3YMIZKP5jR9X1Plewv0OYz1MtlI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=sEHIU12scjEZVoUbCMETsqMIwg9MULK3NIAQMlfpNNLGdmdH4b/Y6h2I5qGBrvoMF
-         VH77Byr0ot4xpvchheIF99/H5P0EMUscLoBy2WR1bsF6IwP2EtLdKWyOM6/CfSlzb/
-         HccZEvo9sHE5vg0TabQk+WwDa4RIfdt6kCW57mH8Bs16HUmWrBpD0eyAvV3n2wLEOr
-         MN6sEPS0kaXI8J8kDgFIJSoIuE6DllYlvapTcybrmoxwZm78Y/7DyOO3UC/2QYhclM
-         Gs4F/6InTdXbQyTu1WV0p/Rbe2UKIzYwSDYzSWAiGtl8nHhK9fHerXPQMO4d8b56it
-         teF2Jfr7hTl5g==
+        b=qOka9T2ElM8Ard5BsUPyjK3V0YItJINdNSM7Ju6+/zxMosmgqTI5nyWjbgUfUMSAS
+         OS0NII4Eshmz2YytK5EaB9XTvRjmuf4hHuR+mOnoTiJd4FuHuVzWK9a//Dhgs1qnN9
+         ZwS3kOm0pph8V/A+wRV5CDj3uJgrazPQfJ6XGJtVwynIYYDGJ/4xmA2vpQFMbyzlCS
+         KvfXuwaAPwv9uvuE1mIDhtdFvBP4axL4svDr19dGjii8Lk1vpNqjZDKvyrhE06+jsE
+         lk9COy7HO70fueSwnFZ2w2WS7deT54V5pUHW6Te3x3MWUtLXhVciGrA77fqDCp9dVO
+         mz4C2PsT+8DZw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pyc2f-00FJAF-Kz;
+        id 1pyc2f-00FJAF-T7;
         Mon, 15 May 2023 18:31:25 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v10 09/59] KVM: arm64: nv: Add trap forwarding infrastructure
-Date:   Mon, 15 May 2023 18:30:13 +0100
-Message-Id: <20230515173103.1017669-10-maz@kernel.org>
+Subject: [PATCH v10 10/59] KVM: arm64: nv: Add trap forwarding for HCR_EL2
+Date:   Mon, 15 May 2023 18:30:14 +0100
+Message-Id: <20230515173103.1017669-11-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230515173103.1017669-1-maz@kernel.org>
 References: <20230515173103.1017669-1-maz@kernel.org>
@@ -65,311 +65,534 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UPPERCASE_75_100
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A significant part of what a NV hypervisor needs to do is to decide
-whether a trap from a L2+ guest has to be forwarded to a L1 guest
-or handled locally. This is done by checking for the trap bits that
-the guest hypervisor has set and acting accordingly, as described by
-the architecture.
-
-A previous approach was to sprinkle a bunch of checks in all the
-system register accessors, but this is pretty error prone and doesn't
-help getting an overview of what is happening.
-
-Instead, implement a set of global tables that describe a trap bit,
-combinations of trap bits, behaviours on trap, and what bits must
-be evaluated on a system register trap.
-
-Although this is painful to describe, this allows to specify each
-and every control bit in a static manner. To make it efficient,
-the table is inserted in an xarray that is global to the system,
-and checked each time we trap a system register.
-
-Add the basic infrastructure for now, while additional patches will
-implement configuration registers.
+Describe the HCR_EL2 register, and associate it with all the sysregs
+it allows to trap.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h   |   1 +
- arch/arm64/include/asm/kvm_nested.h |   2 +
- arch/arm64/kvm/emulate-nested.c     | 175 ++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c           |   6 +
- arch/arm64/kvm/trace_arm.h          |  19 +++
- 5 files changed, 203 insertions(+)
+ arch/arm64/kvm/emulate-nested.c | 472 ++++++++++++++++++++++++++++++++
+ 1 file changed, 472 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f2e3b5889f8b..65810618cb42 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -960,6 +960,7 @@ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu);
- void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
- 
- int __init kvm_sys_reg_table_init(void);
-+void __init populate_nv_trap_config(void);
- 
- bool lock_all_vcpus(struct kvm *kvm);
- void unlock_all_vcpus(struct kvm *kvm);
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 8fb67f032fd1..fa23cc9c2adc 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -11,6 +11,8 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
- 		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
- }
- 
-+extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
-+
- struct sys_reg_params;
- struct sys_reg_desc;
- 
 diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index b96662029fb1..a923f7f47add 100644
+index a923f7f47add..8be331e5de9d 100644
 --- a/arch/arm64/kvm/emulate-nested.c
 +++ b/arch/arm64/kvm/emulate-nested.c
-@@ -14,6 +14,181 @@
+@@ -37,12 +37,47 @@ enum coarse_grain_trap_id {
+ 	 * on their own instead of being part of a combination of
+ 	 * trap controls.
+ 	 */
++	CGT_HCR_TID1,
++	CGT_HCR_TID2,
++	CGT_HCR_TID3,
++	CGT_HCR_IMO,
++	CGT_HCR_FMO,
++	CGT_HCR_TIDCP,
++	CGT_HCR_TACR,
++	CGT_HCR_TSW,
++	CGT_HCR_TPC,
++	CGT_HCR_TPU,
++	CGT_HCR_TTLB,
++	CGT_HCR_TVM,
++	CGT_HCR_TDZ,
++	CGT_HCR_TRVM,
++	CGT_HCR_TLOR,
++	CGT_HCR_TERR,
++	CGT_HCR_APK,
++	CGT_HCR_NV,
++	CGT_HCR_NV1,
++	CGT_HCR_AT,
++	CGT_HCR_FIEN,
++	CGT_HCR_TID4,
++	CGT_HCR_TICAB,
++	CGT_HCR_TOCU,
++	CGT_HCR_ENSCXT,
++	CGT_HCR_TTLBIS,
++	CGT_HCR_TTLBOS,
  
- #include "trace.h"
+ 	/*
+ 	 * Anything after this point is a combination of trap controls,
+ 	 * which all must be evaluated to decide what to do.
+ 	 */
+ 	__MULTIPLE_CONTROL_BITS__,
++	CGT_HCR_IMO_FMO = __MULTIPLE_CONTROL_BITS__,
++	CGT_HCR_TID2_TID4,
++	CGT_HCR_TTLB_TTLBIS,
++	CGT_HCR_TTLB_TTLBOS,
++	CGT_HCR_TVM_TRVM,
++	CGT_HCR_TPU_TICAB,
++	CGT_HCR_TPU_TOCU,
++	CGT_HCR_NV1_ENSCXT,
  
-+enum trap_behaviour {
-+	BEHAVE_HANDLE_LOCALLY	= 0,
-+	BEHAVE_FORWARD_READ	= BIT(0),
-+	BEHAVE_FORWARD_WRITE	= BIT(1),
-+	BEHAVE_FORWARD_ANY	= BEHAVE_FORWARD_READ | BEHAVE_FORWARD_WRITE,
-+};
-+
-+struct trap_bits {
-+	const enum vcpu_sysreg		index;
-+	const enum trap_behaviour	behaviour;
-+	const u64			value;
-+	const u64			mask;
-+};
-+
-+enum coarse_grain_trap_id {
-+	/* Indicates no coarse trap control */
-+	__RESERVED__,
-+
-+	/*
-+	 * The first batch of IDs denote coarse trapping that are used
-+	 * on their own instead of being part of a combination of
-+	 * trap controls.
-+	 */
-+
-+	/*
-+	 * Anything after this point is a combination of trap controls,
-+	 * which all must be evaluated to decide what to do.
-+	 */
-+	__MULTIPLE_CONTROL_BITS__,
-+
-+	/*
-+	 * Anything after this point requires a callback evaluating a
-+	 * complex trap condition. Hopefully we'll never need this...
-+	 */
-+	__COMPLEX_CONDITIONS__,
-+};
-+
-+static const struct trap_bits coarse_trap_bits[] = {
-+};
-+
-+#define MCB(id, ...)					\
-+	[id - __MULTIPLE_CONTROL_BITS__]	=	\
-+		(const enum coarse_grain_trap_id []){	\
-+			__VA_ARGS__ , __RESERVED__	\
-+		}
-+
-+static const enum coarse_grain_trap_id *coarse_control_combo[] = {
-+};
-+
-+typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
-+
-+#define CCC(id, fn)	[id - __COMPLEX_CONDITIONS__] = fn
-+
-+static const complex_condition_check ccc[] = {
-+};
-+
-+struct encoding_to_trap_configs {
-+	const u32			encoding;
-+	const u32			end;
-+	const enum coarse_grain_trap_id	id;
-+};
-+
-+#define SR_RANGE_TRAP(sr_start, sr_end, trap_id)			\
-+	{								\
-+		.encoding	= sr_start,				\
-+		.end		= sr_end,				\
-+		.id		= trap_id,				\
-+	}
-+
-+#define SR_TRAP(sr, trap_id)		SR_RANGE_TRAP(sr, sr, trap_id)
-+
-+/*
-+ * Map encoding to trap bits for exception reported with EC=0x18.
-+ * These must only be evaluated when running a nested hypervisor, but
-+ * that the current context is not a hypervisor context. When the
-+ * trapped access matches one of the trap controls, the exception is
-+ * re-injected in the nested hypervisor.
-+ */
-+static const struct encoding_to_trap_configs encoding_to_traps[] __initdata = {
-+};
-+
-+static DEFINE_XARRAY(sr_forward_xa);
-+
-+void __init populate_nv_trap_config(void)
-+{
-+	for (int i = 0; i < ARRAY_SIZE(encoding_to_traps); i++) {
-+		const struct encoding_to_trap_configs *ett = &encoding_to_traps[i];
-+		void *prev;
-+
-+		prev = xa_store_range(&sr_forward_xa, ett->encoding, ett->end,
-+				      xa_mk_value(ett->id), GFP_KERNEL);
-+		WARN_ON(prev);
-+	}
-+
-+	kvm_info("nv: %ld trap handlers\n", ARRAY_SIZE(encoding_to_traps));
-+}
-+
-+static const enum coarse_grain_trap_id get_trap_config(u32 sysreg)
-+{
-+	return xa_to_value(xa_load(&sr_forward_xa, sysreg));
-+}
-+
-+static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
-+					 const struct trap_bits *tb)
-+{
-+	enum trap_behaviour b = BEHAVE_HANDLE_LOCALLY;
-+	u64 val;
-+
-+	val = __vcpu_sys_reg(vcpu, tb->index);
-+	if ((val & tb->mask) == tb->value)
-+		b |= tb->behaviour;
-+
-+	return b;
-+}
-+
-+static enum trap_behaviour __do_compute_behaviour(struct kvm_vcpu *vcpu,
-+						  const enum coarse_grain_trap_id id,
-+						  enum trap_behaviour b)
-+{
-+	switch (id) {
-+		const enum coarse_grain_trap_id *cgids;
-+
-+	case __RESERVED__ ... __MULTIPLE_CONTROL_BITS__ - 1:
-+		if (likely(id != __RESERVED__))
-+			b |= get_behaviour(vcpu, &coarse_trap_bits[id]);
-+		break;
-+	case __MULTIPLE_CONTROL_BITS__ ... __COMPLEX_CONDITIONS__ - 1:
-+		/* Yes, this is recursive. Don't do anything stupid. */
-+		cgids = coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
-+		for (int i = 0; cgids[i] != __RESERVED__; i++)
-+			b |= __do_compute_behaviour(vcpu, cgids[i], b);
-+		break;
-+	default:
-+		if (ARRAY_SIZE(ccc))
-+			b |= ccc[id -  __COMPLEX_CONDITIONS__](vcpu);
-+		break;
-+	}
-+
-+	return b;
-+}
-+
-+static enum trap_behaviour compute_behaviour(struct kvm_vcpu *vcpu, u32 sysreg)
-+{
-+	const enum coarse_grain_trap_id id = get_trap_config(sysreg);
-+	enum trap_behaviour b = BEHAVE_HANDLE_LOCALLY;
-+
-+	return __do_compute_behaviour(vcpu, id, b);
-+}
-+
-+bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
-+{
-+	enum trap_behaviour b;
-+	bool is_read;
-+	u32 sysreg;
-+	u64 esr;
-+
-+	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
-+		return false;
-+
-+	esr = kvm_vcpu_get_esr(vcpu);
-+	sysreg = esr_sys64_to_sysreg(esr);
-+	is_read = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ;
-+
-+	b = compute_behaviour(vcpu, sysreg);
-+
-+	if (!((b & BEHAVE_FORWARD_READ) && is_read) &&
-+	    !((b & BEHAVE_FORWARD_WRITE) && !is_read))
-+		return false;
-+
-+	trace_kvm_forward_sysreg_trap(vcpu, sysreg, is_read);
-+
-+	kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+	return true;
-+}
-+
- static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
- {
- 	u64 mode = spsr & PSR_MODE_MASK;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 71b12094d613..77f8bc64148a 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2955,6 +2955,9 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+ 	/*
+ 	 * Anything after this point requires a callback evaluating a
+@@ -52,6 +87,168 @@ enum coarse_grain_trap_id {
+ };
  
- 	trace_kvm_handle_sys_reg(esr);
+ static const struct trap_bits coarse_trap_bits[] = {
++	[CGT_HCR_TID1] = {
++		.index		= HCR_EL2,
++		.value 		= HCR_TID1,
++		.mask		= HCR_TID1,
++		.behaviour	= BEHAVE_FORWARD_READ,
++	},
++	[CGT_HCR_TID2] = {
++		.index		= HCR_EL2,
++		.value 		= HCR_TID2,
++		.mask		= HCR_TID2,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TID3] = {
++		.index		= HCR_EL2,
++		.value 		= HCR_TID3,
++		.mask		= HCR_TID3,
++		.behaviour	= BEHAVE_FORWARD_READ,
++	},
++	[CGT_HCR_IMO] = {
++		.index		= HCR_EL2,
++		.value 		= HCR_IMO,
++		.mask		= HCR_IMO,
++		.behaviour	= BEHAVE_FORWARD_WRITE,
++	},
++	[CGT_HCR_FMO] = {
++		.index		= HCR_EL2,
++		.value 		= HCR_FMO,
++		.mask		= HCR_FMO,
++		.behaviour	= BEHAVE_FORWARD_WRITE,
++	},
++	[CGT_HCR_TIDCP] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TIDCP,
++		.mask		= HCR_TIDCP,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TACR] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TACR,
++		.mask		= HCR_TACR,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TSW] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TSW,
++		.mask		= HCR_TSW,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TPC] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TPC,
++		.mask		= HCR_TPC,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TPU] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TPU,
++		.mask		= HCR_TPU,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TTLB] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TTLB,
++		.mask		= HCR_TTLB,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TVM] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TVM,
++		.mask		= HCR_TVM,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TDZ] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TDZ,
++		.mask		= HCR_TDZ,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TRVM] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TRVM,
++		.mask		= HCR_TRVM,
++		.behaviour	= BEHAVE_FORWARD_READ,
++	},
++	[CGT_HCR_TLOR] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TLOR,
++		.mask		= HCR_TLOR,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TERR] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TERR,
++		.mask		= HCR_TERR,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_APK] = {
++		.index		= HCR_EL2,
++		.value		= 0,
++		.mask		= HCR_APK,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_NV] = {
++		.index		= HCR_EL2,
++		.value		= HCR_NV,
++		.mask		= HCR_NV | HCR_NV2,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_NV1] = {
++		.index		= HCR_EL2,
++		.value		= HCR_NV | HCR_NV1,
++		.mask		= HCR_NV | HCR_NV1 | HCR_NV2,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_AT] = {
++		.index		= HCR_EL2,
++		.value		= HCR_AT,
++		.mask		= HCR_AT,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_FIEN] = {
++		.index		= HCR_EL2,
++		.value		= HCR_FIEN,
++		.mask		= HCR_FIEN,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TID4] = {
++		.index		= HCR_EL2,
++		.value 		= HCR_TID4,
++		.mask		= HCR_TID4,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TICAB] = {
++		.index		= HCR_EL2,
++		.value 		= HCR_TICAB,
++		.mask		= HCR_TICAB,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TOCU] = {
++		.index		= HCR_EL2,
++		.value 		= HCR_TOCU,
++		.mask		= HCR_TOCU,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_ENSCXT] = {
++		.index		= HCR_EL2,
++		.value 		= 0,
++		.mask		= HCR_ENSCXT,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TTLBIS] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TTLBIS,
++		.mask		= HCR_TTLBIS,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
++	[CGT_HCR_TTLBOS] = {
++		.index		= HCR_EL2,
++		.value		= HCR_TTLBOS,
++		.mask		= HCR_TTLBOS,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
+ };
  
-+	if (__check_nv_sr_forward(vcpu))
-+		return 1;
-+
- 	params = esr_sys64_to_params(esr);
- 	params.regval = vcpu_get_reg(vcpu, Rt);
+ #define MCB(id, ...)					\
+@@ -61,6 +258,14 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		}
  
-@@ -3363,5 +3366,8 @@ int __init kvm_sys_reg_table_init(void)
- 	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
- 		invariant_sys_regs[i].reset(NULL, &invariant_sys_regs[i]);
+ static const enum coarse_grain_trap_id *coarse_control_combo[] = {
++	MCB(CGT_HCR_IMO_FMO,		CGT_HCR_IMO, CGT_HCR_FMO),
++	MCB(CGT_HCR_TID2_TID4,		CGT_HCR_TID2, CGT_HCR_TID4),
++	MCB(CGT_HCR_TTLB_TTLBIS,	CGT_HCR_TTLB, CGT_HCR_TTLBIS),
++	MCB(CGT_HCR_TTLB_TTLBOS,	CGT_HCR_TTLB, CGT_HCR_TTLBOS),
++	MCB(CGT_HCR_TVM_TRVM,		CGT_HCR_TVM, CGT_HCR_TRVM),
++	MCB(CGT_HCR_TPU_TICAB,		CGT_HCR_TPU, CGT_HCR_TICAB),
++	MCB(CGT_HCR_TPU_TOCU,		CGT_HCR_TPU, CGT_HCR_TOCU),
++	MCB(CGT_HCR_NV1_ENSCXT,		CGT_HCR_NV1, CGT_HCR_ENSCXT),
+ };
  
-+	if (kvm_get_mode() == KVM_MODE_NV)
-+		populate_nv_trap_config();
-+		
- 	return 0;
- }
-diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-index 6ce5c025218d..1f0f3f653606 100644
---- a/arch/arm64/kvm/trace_arm.h
-+++ b/arch/arm64/kvm/trace_arm.h
-@@ -364,6 +364,25 @@ TRACE_EVENT(kvm_inject_nested_exception,
- 		  __entry->hcr_el2)
- );
+ typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
+@@ -93,6 +298,273 @@ struct encoding_to_trap_configs {
+  * re-injected in the nested hypervisor.
+  */
+ static const struct encoding_to_trap_configs encoding_to_traps[] __initdata = {
++	SR_TRAP(SYS_REVIDR_EL1,		CGT_HCR_TID1),
++	SR_TRAP(SYS_AIDR_EL1,		CGT_HCR_TID1),
++	SR_TRAP(SYS_SMIDR_EL1,		CGT_HCR_TID1),
++	SR_TRAP(SYS_CTR_EL0,		CGT_HCR_TID2),
++	SR_TRAP(SYS_CCSIDR_EL1,		CGT_HCR_TID2_TID4),
++	SR_TRAP(SYS_CCSIDR2_EL1,	CGT_HCR_TID2_TID4),
++	SR_TRAP(SYS_CLIDR_EL1,		CGT_HCR_TID2_TID4),
++	SR_TRAP(SYS_CSSELR_EL1,		CGT_HCR_TID2_TID4),
++	SR_RANGE_TRAP(SYS_ID_PFR0_EL1,
++		      sys_reg(3, 0, 0, 7, 7), CGT_HCR_TID3),
++	SR_TRAP(SYS_ICC_SGI0R_EL1,	CGT_HCR_IMO_FMO),
++	SR_TRAP(SYS_ICC_ASGI1R_EL1,	CGT_HCR_IMO_FMO),
++	SR_TRAP(SYS_ICC_SGI1R_EL1,	CGT_HCR_IMO_FMO),
++	SR_RANGE_TRAP(sys_reg(3, 0, 11, 0, 0),
++		      sys_reg(3, 0, 11, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 1, 11, 0, 0),
++		      sys_reg(3, 1, 11, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 2, 11, 0, 0),
++		      sys_reg(3, 2, 11, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 3, 11, 0, 0),
++		      sys_reg(3, 3, 11, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 4, 11, 0, 0),
++		      sys_reg(3, 4, 11, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 5, 11, 0, 0),
++		      sys_reg(3, 5, 11, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 6, 11, 0, 0),
++		      sys_reg(3, 6, 11, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 7, 11, 0, 0),
++		      sys_reg(3, 7, 11, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 0, 15, 0, 0),
++		      sys_reg(3, 0, 15, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 1, 15, 0, 0),
++		      sys_reg(3, 1, 15, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 2, 15, 0, 0),
++		      sys_reg(3, 2, 15, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 3, 15, 0, 0),
++		      sys_reg(3, 3, 15, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 4, 15, 0, 0),
++		      sys_reg(3, 4, 15, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 5, 15, 0, 0),
++		      sys_reg(3, 5, 15, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 6, 15, 0, 0),
++		      sys_reg(3, 6, 15, 15, 7), CGT_HCR_TIDCP),
++	SR_RANGE_TRAP(sys_reg(3, 7, 15, 0, 0),
++		      sys_reg(3, 7, 15, 15, 7), CGT_HCR_TIDCP),
++	SR_TRAP(SYS_ACTLR_EL1,		CGT_HCR_TACR),
++	SR_TRAP(SYS_DC_ISW,		CGT_HCR_TSW),
++	SR_TRAP(SYS_DC_CSW,		CGT_HCR_TSW),
++	SR_TRAP(SYS_DC_CISW,		CGT_HCR_TSW),
++	SR_TRAP(SYS_DC_IGSW,		CGT_HCR_TSW),
++	SR_TRAP(SYS_DC_IGDSW,		CGT_HCR_TSW),
++	SR_TRAP(SYS_DC_CGSW,		CGT_HCR_TSW),
++	SR_TRAP(SYS_DC_CGDSW,		CGT_HCR_TSW),
++	SR_TRAP(SYS_DC_CIGSW,		CGT_HCR_TSW),
++	SR_TRAP(SYS_DC_CIGDSW,		CGT_HCR_TSW),
++	SR_TRAP(SYS_DC_CIVAC,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CVAC,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CVAP,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_IVAC,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CIGVAC,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CIGDVAC,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_IGVAC,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_IGDVAC,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CGVAC,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CGDVAC,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CGVAP,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CGDVAP,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CGVADP,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CGDVADP,		CGT_HCR_TPC),
++	SR_TRAP(SYS_IC_IVAU,		CGT_HCR_TPU_TOCU),
++	SR_TRAP(SYS_IC_IALLU,		CGT_HCR_TPU_TOCU),
++	SR_TRAP(SYS_IC_IALLUIS,		CGT_HCR_TPU_TICAB),
++	SR_TRAP(SYS_DC_CVAU,		CGT_HCR_TPU_TOCU),
++	SR_TRAP(OP_TLBI_RVAE1,		CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_RVAAE1,		CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_RVALE1,		CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_RVAALE1,	CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_VMALLE1,	CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_VAE1,		CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_ASIDE1,		CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_VAAE1,		CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_VALE1,		CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_VAALE1,		CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_RVAE1NXS,	CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_RVAAE1NXS,	CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_RVALE1NXS,	CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_RVAALE1NXS,	CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_VMALLE1NXS,	CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_VAE1NXS,	CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_ASIDE1NXS,	CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_VAAE1NXS,	CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_VALE1NXS,	CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_VAALE1NXS,	CGT_HCR_TTLB),
++	SR_TRAP(OP_TLBI_RVAE1IS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_RVAAE1IS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_RVALE1IS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_RVAALE1IS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_VMALLE1IS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_VAE1IS,		CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_ASIDE1IS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_VAAE1IS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_VALE1IS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_VAALE1IS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_RVAE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_RVAAE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_RVALE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_RVAALE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_VMALLE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_VAE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_ASIDE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_VAAE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_VALE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_VAALE1ISNXS,	CGT_HCR_TTLB_TTLBIS),
++	SR_TRAP(OP_TLBI_VMALLE1OS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_VAE1OS,		CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_ASIDE1OS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_VAAE1OS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_VALE1OS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_VAALE1OS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_RVAE1OS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_RVAAE1OS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_RVALE1OS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_RVAALE1OS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_VMALLE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_VAE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_ASIDE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_VAAE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_VALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_VAALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_RVAE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_RVAAE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_RVALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(OP_TLBI_RVAALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),
++	SR_TRAP(SYS_SCTLR_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_TTBR0_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_TTBR1_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_TCR_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_ESR_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_FAR_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_AFSR0_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_AFSR1_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_MAIR_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_AMAIR_EL1,		CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_CONTEXTIDR_EL1,	CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_DC_ZVA,		CGT_HCR_TDZ),
++	SR_TRAP(SYS_DC_GVA,		CGT_HCR_TDZ),
++	SR_TRAP(SYS_DC_GZVA,		CGT_HCR_TDZ),
++	SR_RANGE_TRAP(SYS_LORSA_EL1,
++		      SYS_LORC_EL1,	CGT_HCR_TLOR),
++	SR_TRAP(SYS_LORID_EL1,		CGT_HCR_TLOR),
++	SR_TRAP(SYS_ERRIDR_EL1,		CGT_HCR_TERR),
++	SR_TRAP(SYS_ERRSELR_EL1,	CGT_HCR_TERR),
++	SR_TRAP(SYS_ERXADDR_EL1,	CGT_HCR_TERR),
++	SR_TRAP(SYS_ERXCTLR_EL1,	CGT_HCR_TERR),
++	SR_TRAP(SYS_ERXFR_EL1,		CGT_HCR_TERR),
++	SR_TRAP(SYS_ERXMISC0_EL1,	CGT_HCR_TERR),
++	SR_TRAP(SYS_ERXMISC1_EL1,	CGT_HCR_TERR),
++	SR_TRAP(SYS_ERXMISC2_EL1,	CGT_HCR_TERR),
++	SR_TRAP(SYS_ERXMISC3_EL1,	CGT_HCR_TERR),
++	SR_TRAP(SYS_ERXSTATUS_EL1,	CGT_HCR_TERR),
++	SR_TRAP(SYS_APIAKEYLO_EL1,	CGT_HCR_APK),
++	SR_TRAP(SYS_APIAKEYHI_EL1,	CGT_HCR_APK),
++	SR_TRAP(SYS_APIBKEYLO_EL1,	CGT_HCR_APK),
++	SR_TRAP(SYS_APIBKEYHI_EL1,	CGT_HCR_APK),
++	SR_TRAP(SYS_APDAKEYLO_EL1,	CGT_HCR_APK),
++	SR_TRAP(SYS_APDAKEYHI_EL1,	CGT_HCR_APK),
++	SR_TRAP(SYS_APDBKEYLO_EL1,	CGT_HCR_APK),
++	SR_TRAP(SYS_APDBKEYHI_EL1,	CGT_HCR_APK),
++	SR_TRAP(SYS_APGAKEYLO_EL1,	CGT_HCR_APK),
++	SR_TRAP(SYS_APGAKEYHI_EL1,	CGT_HCR_APK),
++	/* All _EL2 registers */
++	SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
++		      sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
++	SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
++		      sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
++	/* All _EL02, _EL12 registers */
++	SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
++		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
++	SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
++		      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
++	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV),
++	SR_TRAP(OP_AT_S1E2R,		CGT_HCR_NV),
++	SR_TRAP(OP_AT_S1E2W,		CGT_HCR_NV),
++	SR_TRAP(OP_AT_S12E1R,		CGT_HCR_NV),
++	SR_TRAP(OP_AT_S12E1W,		CGT_HCR_NV),
++	SR_TRAP(OP_AT_S12E0R,		CGT_HCR_NV),
++	SR_TRAP(OP_AT_S12E0W,		CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_IPAS2E1,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RIPAS2E1,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_IPAS2LE1,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RIPAS2LE1,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RVAE2,		CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RVALE2,		CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_ALLE2,		CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VAE2,		CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_ALLE1,		CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VALE2,		CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VMALLS12E1,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_IPAS2E1NXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RIPAS2E1NXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_IPAS2LE1NXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RIPAS2LE1NXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RVAE2NXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RVALE2NXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_ALLE2NXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VAE2NXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_ALLE1NXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VALE2NXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VMALLS12E1NXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_IPAS2E1IS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RIPAS2E1IS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_IPAS2LE1IS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RIPAS2LE1IS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RVAE2IS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RVALE2IS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_ALLE2IS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VAE2IS,		CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_ALLE1IS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VALE2IS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VMALLS12E1IS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_IPAS2E1ISNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RIPAS2E1ISNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_IPAS2LE1ISNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RIPAS2LE1ISNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RVAE2ISNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RVALE2ISNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_ALLE2ISNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VAE2ISNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_ALLE1ISNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VALE2ISNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VMALLS12E1ISNXS,CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_ALLE2OS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VAE2OS,		CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_ALLE1OS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VALE2OS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VMALLS12E1OS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_IPAS2E1OS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RIPAS2E1OS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_IPAS2LE1OS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RIPAS2LE1OS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RVAE2OS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RVALE2OS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_ALLE2OSNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VAE2OSNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_ALLE1OSNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VALE2OSNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_VMALLS12E1OSNXS,CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_IPAS2E1OSNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RIPAS2E1OSNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_IPAS2LE1OSNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RIPAS2LE1OSNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RVAE2OSNXS,	CGT_HCR_NV),
++	SR_TRAP(OP_TLBI_RVALE2OSNXS,	CGT_HCR_NV),
++	SR_TRAP(SYS_VBAR_EL1,		CGT_HCR_NV1),
++	SR_TRAP(SYS_ELR_EL1,		CGT_HCR_NV1),
++	SR_TRAP(SYS_SPSR_EL1,		CGT_HCR_NV1),
++	SR_TRAP(SYS_SCXTNUM_EL1,	CGT_HCR_NV1_ENSCXT),
++	SR_TRAP(OP_AT_S1E1R, 		CGT_HCR_AT),
++	SR_TRAP(OP_AT_S1E1W, 		CGT_HCR_AT),
++	SR_TRAP(OP_AT_S1E0R, 		CGT_HCR_AT),
++	SR_TRAP(OP_AT_S1E0W, 		CGT_HCR_AT),
++	SR_TRAP(OP_AT_S1E1RP, 		CGT_HCR_AT),
++	SR_TRAP(OP_AT_S1E1WP, 		CGT_HCR_AT),
++	/* ERXPFGCDN_EL1, ERXPFGCTL_EL1, and ERXPFGF_EL1 */
++	SR_RANGE_TRAP(sys_reg(3, 0, 5, 4, 4),
++		      sys_reg(3, 0, 5, 4, 6), CGT_HCR_FIEN),
++	SR_TRAP(SYS_SCXTNUM_EL0,	CGT_HCR_ENSCXT),
+ };
  
-+TRACE_EVENT(kvm_forward_sysreg_trap,
-+	    TP_PROTO(struct kvm_vcpu *vcpu, u32 sysreg, bool is_read),
-+	    TP_ARGS(vcpu, sysreg, is_read),
-+
-+	    TP_STRUCT__entry(
-+		__field(struct kvm_vcpu *, vcpu)
-+		__field(u32,		   sysreg)
-+		__field(bool,		   is_read)
-+	    ),
-+
-+	    TP_fast_assign(
-+		__entry->vcpu = vcpu;
-+		__entry->sysreg = sysreg;
-+		__entry->is_read = is_read;
-+	    ),
-+
-+	    TP_printk("%c %x", __entry->is_read ? 'R' : 'W', __entry->sysreg)
-+);
-+
- #endif /* _TRACE_ARM_ARM64_KVM_H */
- 
- #undef TRACE_INCLUDE_PATH
+ static DEFINE_XARRAY(sr_forward_xa);
 -- 
 2.34.1
 
