@@ -2,116 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08DBA702F04
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 16:00:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27C01702F19
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 16:01:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238942AbjEOOAq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 10:00:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35332 "EHLO
+        id S238949AbjEOOBB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 10:01:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238603AbjEOOAl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 10:00:41 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06D8E171F;
-        Mon, 15 May 2023 07:00:39 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34FDeeoX008152;
-        Mon, 15 May 2023 14:00:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- to : subject : from : message-id : date; s=pp1;
- bh=rcplVe4CUdr40r8BcWqxao8gDcFXnBHZJ3jHKLeGToY=;
- b=hjZyMg4RDW6lMPlDvsAyKqGr3kgmQfUZe/0MnXks8LB076k6w4gf2ZrPNFQTCAShhOHr
- CAEr9G+2HkyF0IfcZprIr8sccTYNr+mcjGnFCAauysOH8oa43iH5sKcnenE0Dx7KuPuC
- NGD6KXr4kF3D9rr7RsEWrWuX6p5TqfiA14EmbE3fD7KErZ4/KGcTck2WysnIvP4jthge
- Kk6LsIM7i3mmC9KUX3vYODModdqeq3ANgI3erEVjBXwOFRP0QrTOgQCP0QJNV/fWfA0k
- hlSy4MBHN+HdEc8HPjtG4fgNQ1HXwLp4xHQJb56/yYBlv9fKjJu7orQfav9CwCP0nZLV ag== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qknhgs4yn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 May 2023 14:00:38 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34FDwrVw028156;
-        Mon, 15 May 2023 14:00:38 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qknhgs4p5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 May 2023 14:00:37 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34F3I7xe015522;
-        Mon, 15 May 2023 14:00:28 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3qj264s3vn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 May 2023 14:00:28 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34FE0O7250725146
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 15 May 2023 14:00:24 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 753B720083;
-        Mon, 15 May 2023 14:00:24 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5FA8420063;
-        Mon, 15 May 2023 14:00:24 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.73.31])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 15 May 2023 14:00:24 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S239050AbjEOOAs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 10:00:48 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2067.outbound.protection.outlook.com [40.107.94.67])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AA081BC1;
+        Mon, 15 May 2023 07:00:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Fi2tJz1US08Ba+gHR6tnsf88NHQqYorTn9tF9WMvmW+bj00hdqG/+PBnB9Jw+GanJYlgFqbCaeLBS2IrmVUO2PKpghIPOa5Bj38YA6BWRYKXvNdPMlrDC/rlfzoGpXtH1lwYCtvfGGX+4Lz66GdMZVD8+iyJQBzDLDU87KqN7b/xM41vM0xrCrBzsUrncpsVa/w3kEVAnLYsUQM37J+X01+8iND3DFGslW12q30ON9RbBDaBrjBV8VhKZNMgP0SsAHGbZp2KkGpB7L13gjMrG9+knpKcp95Jf5V26sqjA2IF/+S9h6MjQi0Vus+3UIYcdg68+6DP2hn+SC9lI3xvWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3KrRml8Xz4S1Kj6/7WxuwqOBkkv4fufSC/K/xYR58Xg=;
+ b=YPMN5Y+ri3mxPpwfyN6vM0V5d41s6P0NIvQfDfpYAnOXWRQpUtWh7DDJTiNBGJ42gWVRSe/xKJ3BilYEeV2m2c1O2qsEr+VoXmwjTzHpsVjilX8ghHuwoegxW/IYRj7GFrzkqD0L1upUv6d7ShzWtWfRXmPzNSEW1qSkVHd/LpeI+cU+c7lYpGQXBEdS+g4n0qxtJndPVJUDT6tf+iaT73Mc5WptTIupdZrxz/0UTewDaoXPKC7Kt8AfUEDjE2T4A5jK7cmbvVRGnCibzgmcOofWbmYChM946ARFXDd9dVflZSeggoI9nghz0j20bz7YGWoeU7OcrLejmDPeE0J4sA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3KrRml8Xz4S1Kj6/7WxuwqOBkkv4fufSC/K/xYR58Xg=;
+ b=FMvjKhyZGadz0ZTg5Sr55JaoAUb6lZ+52B9reLcmCFkciIiZXh0z2q/CJiB9HnXARZ4I9/NV0m+2GCm588Atrep4TmYzyrqtP0G3zPyhd92pFxIIiz6WW+B+i9I5wL9L2a6SLuUg/qnZzdGXLTqSZgdIq6B6RnJnLe9W4TUidS/LDTQG/nXMW5LCwL3beoYRmkP3dBTMQSThUaFGdwZcyT+tgXafIYvQW/Pga+e5aZxozdXbG0DCF4WHKWnvGJa+Do0K4ojKxocTvKM+BvhRTiW3LQiwnhAVnu9lYI0PegV0yanHurvLqeV7j/mCDG4yhDBWhh5IPuF3A72a4VYw6g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SN7PR12MB7954.namprd12.prod.outlook.com (2603:10b6:806:344::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.30; Mon, 15 May
+ 2023 14:00:40 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6387.030; Mon, 15 May 2023
+ 14:00:40 +0000
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     iommu@lists.linux.dev, linux-kselftest@vger.kernel.org
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Lixiao Yang <lixiao.yang@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
+Subject: [PATCH v7 09/19] iommufd: Add enforced_cache_coherency to iommufd_hw_pagetable_alloc()
+Date:   Mon, 15 May 2023 11:00:24 -0300
+Message-Id: <9-v7-6c0fd698eda2+5e3-iommufd_alloc_jgg@nvidia.com>
+In-Reply-To: <0-v7-6c0fd698eda2+5e3-iommufd_alloc_jgg@nvidia.com>
+References: 
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BL6PEPF00013E13.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:22e:400:0:1001:0:14) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230515115311.1970-1-frankja@linux.ibm.com>
-References: <168370369446.357872.12935361214141873283@t14-nrb> <20230515115311.1970-1-frankja@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        thuth@redhat.com, david@redhat.com
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v5] s390x: pv: Add sie entry intercept and validity test
-From:   Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <168415922405.12463.14160729135637986664@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Mon, 15 May 2023 16:00:24 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3WxRS9waegPapbP3j3cgQ7vHJGXoFEKY
-X-Proofpoint-GUID: vVPzi4yafu96l5wjtXCJpGu5MSYWrG-2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-15_10,2023-05-05_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 bulkscore=0 impostorscore=0 phishscore=0 suspectscore=0
- mlxscore=0 adultscore=0 mlxlogscore=999 malwarescore=0 priorityscore=1501
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305150117
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SN7PR12MB7954:EE_
+X-MS-Office365-Filtering-Correlation-Id: 60634020-ca76-4c02-3c22-08db554cc1aa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: kAjMbhl3Mz5KzeJw5A0GXJfg93Z1nUVw1LqPzFap56uTklA2UrHmj8CNoELnsTAjl+Wf6jDxOccp9yO10TBUV2OqirBT7e9WdBFi6idOka9+BcMGQY+pmsGai00MjCzpwQ9HnslzfW/1GO5JByoje9PbTeBLFQKGNOxUTd3ctpfCbwXIizv7Z3KY+1ldR806x+H7N2hKob15ypeONUT6VCbcQDYKxqnA+khV6XmcvfwfQYIWOMXayItE26L3tUURIUHKbKWi1yl3Rba9ChuaP7PeD8W+yKKBGj5efZRy3ESmdqLsTwc9WPCgS6qwIfM1PyhS8WBGIDq47AcVbUFpuIrhjyStuYeOswbJtU9q7RvsfaS2ypuPvIUPIa7s9Dn2u7pCdcg3WKU0uc59EgIpo4zlwZ8DF/dAOoglmF3LQBoX0vxYUF7lJkj7z5n4CHujLom0jR80CUTTXbMM29dTIdNmpWtUbRhPC870rJp+kn+Sk4Y6tkvoi25wkU4p3rx7Qy/t7Rm2ABJGhLLTQDqdf1R5xuarVmiWzqKKg/pw9/AAmF4TPP6CoNeL2XpQOUeY4Nz5WPBA/1GIKt7cW5kCqvSTdD8AV21zevL6gYjMnx4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(39860400002)(366004)(346002)(376002)(451199021)(83380400001)(66476007)(66556008)(66946007)(2616005)(6486002)(26005)(6506007)(6512007)(478600001)(54906003)(6666004)(186003)(5660300002)(86362001)(8676002)(8936002)(36756003)(2906002)(316002)(4326008)(41300700001)(38100700002)(4216001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Wt4/8sjI1harRdMh/Mv3uPPX+udTqa4yFb9Se1cjesMpjwa4I0tLn21NFB4E?=
+ =?us-ascii?Q?Mw+zBxEZvrcJB0ia7E1b4uDUNEhTvutP/Gp5xi4CEWhJMkhgat4pof00Xrfj?=
+ =?us-ascii?Q?1O2QzsxauaeGX2HA8NhZG7r4kOjFgjR+YlcXS5EQVKDDw3vfF4f5L/imM9Aq?=
+ =?us-ascii?Q?mb0uWpyzPnAmTP9LNeQmtHapXVZ+2kIUbxLnNEpCJPMP2NnM8M4toMZLvG4j?=
+ =?us-ascii?Q?RLCoc8c12cr7lTUQskCkfkD3qmFqCLzqug9Ks2WW+0qmAk21RHzoQRD+qEhy?=
+ =?us-ascii?Q?1cEBBm1HhsYpHVtgbzBdAjyMAzq3ffmwJSvnqaqxubijeMyCKzD3gLuxHXkg?=
+ =?us-ascii?Q?jLVmraBHlpPcM6gNHn1+OGbWoJLSlSbGxS60ODu1ElRZsXI65WaM48cE5GQ+?=
+ =?us-ascii?Q?vMTNAZRhtHGz0Immkh7PQkPFm6MKdOwvGYoYWmoJwIVOZwHeJHLPGPuiTBGz?=
+ =?us-ascii?Q?IuWsbHGbZprxAUVfkATYYGrAwtd5m8vr1YfVrGGYJ/US/o9xxfMl9/xFaspk?=
+ =?us-ascii?Q?mKbctq/swe1PrPaoYLcqOg5CYlNsXRSXbuqEuYt+4muaU9YkR+FEffp0wwtJ?=
+ =?us-ascii?Q?FnYGw6DgFIZbzK9HrjA7CsfILbbcYKhCB3gkXtnRg0nEbvGUSBHCf9/8cQJD?=
+ =?us-ascii?Q?bvAnobmB/USqhccri9JjmklVyp0bT9SNiAakcPR3jYofCKg9WH5bPSs7g0ck?=
+ =?us-ascii?Q?JqX0250TVN0tfCoJ6+0Pa6L7FUZ3rrlnyHA66NHgPi4twdhVM+AOIdzvl25k?=
+ =?us-ascii?Q?6G0hB3g86GWmKp/SDMO7iuSDfpANgXQv5SDtROzy6Wsy4suG/CwehoihjZoG?=
+ =?us-ascii?Q?hhhOryOAJzYdZ5KVZaxhbHlqc6oKVICkBgF4zLm+PncouOFq8Qt/FeQfiJCi?=
+ =?us-ascii?Q?urYACIcioZB+q5hGZjNpIXvGEZDtzI+uVmqwRWnMM3bmsEl9W/e9ZYJJuuZz?=
+ =?us-ascii?Q?Qx+6Pb5IkgbbYZAFfjIiW0Fx/DQ3xES6AxzFzmNVwe49cMXVk8cFuCD+WUrV?=
+ =?us-ascii?Q?nZRIvtpH62TpnRfltZ5UoWWoNsTZh0Nfo0OM3oIsOBqiH+XuJdkEHIBTGNI5?=
+ =?us-ascii?Q?vykx3453cQofxxfdjEl5Go5J410EI8HDwSABXodX3/D9ZaLp3dwADYgI32l9?=
+ =?us-ascii?Q?gnRrVbR+tcWkVIztNqtt+FbJLhLDFMhlOQhl/bykQfCwpZqNFimyu7aDD5Qe?=
+ =?us-ascii?Q?wcp0JanTiUT7frw36rZeCraUgU6U2en+b1TuURBWnKmteQEZxzJZywqV5K2Q?=
+ =?us-ascii?Q?mVu3dKs0aOT8yv4/stP3ERmNuVTbn9k7dQ8LzPMcmNANHay/+CgpvimIyEZt?=
+ =?us-ascii?Q?w0ZMl9q4XGoiF60d3aCLrvuo151n02zlgymrF2p8jbWxeJl5yA+LkP+tcSM4?=
+ =?us-ascii?Q?N24kCGx9h3yDG/Dtrn7Vw0kwYz3R4WbWQtRzCSzEK3B992gO4SRwyOyEaPUZ?=
+ =?us-ascii?Q?A7L1TwRrRr7lUNJCLA3YiVmfgRgUZLrzyvc5rPLXgopp5zvujLrmaVPCDMEz?=
+ =?us-ascii?Q?GMkFLTjJbdo7tpvQWpU/R67JyeUzJNz6mQK/TNvFdy7hzv6zW5aBVXloe2Ac?=
+ =?us-ascii?Q?uUFVLdizYKI9vekpxs5watgAeh+srO0MOD2gYckw?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 60634020-ca76-4c02-3c22-08db554cc1aa
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2023 14:00:35.9426
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UD9mOJS34U2IAGT+MlQ+n1YBY2TfPVwM1G1VqVPdndijKmDaCHynxSJaQZwyS2cG
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7954
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2023-05-15 13:53:11)
-> The lowcore is an important part of any s390 cpu so we need to make
-> sure it's always available when we virtualize one. For non-PV guests
-> that would mean ensuring that the lowcore page is read and writable by
-> the guest.
->=20
-> For PV guests we additionally need to make sure that the page is owned
-> by the guest as it is only allowed to access them if that's the
-> case. The code 112 SIE intercept tells us if the lowcore pages aren't
-> secure anymore.
->=20
-> Let's check if that intercept is reported by SIE if we export the
-> lowcore pages. Additionally check if that's also the case if the guest
-> shares the lowcore which will make it readable to the host but
-> ownership of the page should not change.
->=20
-> Also we check for validities in these conditions:
->      * Manipulated cpu timer
->      * Double SIE for same vcpu
->      * Re-use of VCPU handle from another secure configuration
->      * ASCE re-use
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Logically the HWPT should have the coherency set properly for the device
+that it is being created for when it is created.
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+This was happening implicitly if the immediate_attach was set because
+iommufd_hw_pagetable_attach() does it as the first thing.
+
+Do it unconditionally so !immediate_attach works properly.
+
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+---
+ drivers/iommu/iommufd/device.c          | 19 ++++-------------
+ drivers/iommu/iommufd/hw_pagetable.c    | 27 +++++++++++++++++++++++++
+ drivers/iommu/iommufd/iommufd_private.h |  1 +
+ 3 files changed, 32 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
+index 69536f6c7be832..2eec53c5d00e74 100644
+--- a/drivers/iommu/iommufd/device.c
++++ b/drivers/iommu/iommufd/device.c
+@@ -295,22 +295,11 @@ int iommufd_hw_pagetable_attach(struct iommufd_hw_pagetable *hwpt,
+ 		goto err_unlock;
+ 	}
+ 
+-	/*
+-	 * Try to upgrade the domain we have, it is an iommu driver bug to
+-	 * report IOMMU_CAP_ENFORCE_CACHE_COHERENCY but fail
+-	 * enforce_cache_coherency when there are no devices attached to the
+-	 * domain.
+-	 */
+-	if (idev->enforce_cache_coherency && !hwpt->enforce_cache_coherency) {
+-		if (hwpt->domain->ops->enforce_cache_coherency)
+-			hwpt->enforce_cache_coherency =
+-				hwpt->domain->ops->enforce_cache_coherency(
+-					hwpt->domain);
+-		if (!hwpt->enforce_cache_coherency) {
+-			WARN_ON(list_empty(&idev->igroup->device_list));
+-			rc = -EINVAL;
++	/* Try to upgrade the domain we have */
++	if (idev->enforce_cache_coherency) {
++		rc = iommufd_hw_pagetable_enforce_cc(hwpt);
++		if (rc)
+ 			goto err_unlock;
+-		}
+ 	}
+ 
+ 	rc = iopt_table_enforce_dev_resv_regions(&hwpt->ioas->iopt, idev->dev,
+diff --git a/drivers/iommu/iommufd/hw_pagetable.c b/drivers/iommu/iommufd/hw_pagetable.c
+index bdb76cdb1dc347..e0699d7f4c64af 100644
+--- a/drivers/iommu/iommufd/hw_pagetable.c
++++ b/drivers/iommu/iommufd/hw_pagetable.c
+@@ -25,6 +25,20 @@ void iommufd_hw_pagetable_destroy(struct iommufd_object *obj)
+ 	refcount_dec(&hwpt->ioas->obj.users);
+ }
+ 
++int iommufd_hw_pagetable_enforce_cc(struct iommufd_hw_pagetable *hwpt)
++{
++	if (hwpt->enforce_cache_coherency)
++		return 0;
++
++	if (hwpt->domain->ops->enforce_cache_coherency)
++		hwpt->enforce_cache_coherency =
++			hwpt->domain->ops->enforce_cache_coherency(
++				hwpt->domain);
++	if (!hwpt->enforce_cache_coherency)
++		return -EINVAL;
++	return 0;
++}
++
+ /**
+  * iommufd_hw_pagetable_alloc() - Get an iommu_domain for a device
+  * @ictx: iommufd context
+@@ -60,6 +74,19 @@ iommufd_hw_pagetable_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
+ 		goto out_abort;
+ 	}
+ 
++	/*
++	 * Set the coherency mode before we do iopt_table_add_domain() as some
++	 * iommus have a per-PTE bit that controls it and need to decide before
++	 * doing any maps. It is an iommu driver bug to report
++	 * IOMMU_CAP_ENFORCE_CACHE_COHERENCY but fail enforce_cache_coherency on
++	 * a new domain.
++	 */
++	if (idev->enforce_cache_coherency) {
++		rc = iommufd_hw_pagetable_enforce_cc(hwpt);
++		if (WARN_ON(rc))
++			goto out_abort;
++	}
++
+ 	/*
+ 	 * immediate_attach exists only to accommodate iommu drivers that cannot
+ 	 * directly allocate a domain. These drivers do not finish creating the
+diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
+index 63b2587a37f23d..5ce9eaf5fb88e3 100644
+--- a/drivers/iommu/iommufd/iommufd_private.h
++++ b/drivers/iommu/iommufd/iommufd_private.h
+@@ -254,6 +254,7 @@ struct iommufd_hw_pagetable {
+ struct iommufd_hw_pagetable *
+ iommufd_hw_pagetable_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
+ 			   struct iommufd_device *idev, bool immediate_attach);
++int iommufd_hw_pagetable_enforce_cc(struct iommufd_hw_pagetable *hwpt);
+ int iommufd_hw_pagetable_attach(struct iommufd_hw_pagetable *hwpt,
+ 				struct iommufd_device *idev);
+ struct iommufd_hw_pagetable *
+-- 
+2.40.1
+
