@@ -2,88 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E599670342A
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 18:45:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35F6070357B
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 18:59:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242941AbjEOQpZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 12:45:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49408 "EHLO
+        id S243332AbjEOQ72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 12:59:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242928AbjEOQpX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 12:45:23 -0400
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E74414EC4
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 09:45:22 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-3f38824a025so1515521cf.0
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 09:45:22 -0700 (PDT)
+        with ESMTP id S243317AbjEOQ7Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 12:59:25 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D4011D;
+        Mon, 15 May 2023 09:59:23 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-24e3b69bc99so9329453a91.2;
+        Mon, 15 May 2023 09:59:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684169122; x=1686761122;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zRf1suCxpp2xw9xVtC6+jBhjPv+ukUhidKZm42V6ybU=;
-        b=EDIK7Pc/86wryFh04RCHc696LTO8e7WBVjartdOINZOy20P8SDN8FxNtn6AilVWdDJ
-         qplWuDdd5lGpudBSOsNa6OtkgIfzsB1eE3m9Lz9jwt0A7SGm1KHD+bVxe7ba8YJCzgix
-         pDK/Y1fX6/d0Z/3gceRYPDj/4YsT9gpdTuFL0i7mGT/AQWNw+0YAxKOVMGp/HP7RNbyE
-         ldupBjv3mNrUNl76wZi15yBT8Nk2Yw9AXWOL2I6CLO4jQTn+MQkw2agqf0aQXHYl9Pp9
-         74JixFrx7e9SWXEAs+6xBUIsPOEuCLml3za3UZTShdbIxXM5CzjTNNDOcPyjcbYEoerk
-         iR0Q==
+        d=gmail.com; s=20221208; t=1684169963; x=1686761963;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NetrHyA9aTHO12kOXVHLfNdXD6bWd3/ADT376MZNP08=;
+        b=OFTGusHZcWI0b5Nox3GEcaSms7z5HXj1c32YcVrP8W7Cpw11qfHLFGa6f258DZsRh4
+         lnRvCqmrxxh/gIPFJalueEnjo6EmGnKzFmo10U2KQTliG16cxFcwbgKpqjfEyVVWrlDc
+         IdFsRSqkpnkmlzBLrjXDcEYDXoBSI5F/FpmWq9m+RLGAEtLh//YHIskn9CQ48bS2r2jr
+         phoA9vE1h7sEdOT67hAAxaVBb2dVwpdSlfWdE31WeCH3rfW6A9GK2akb7AyWNO++fIOJ
+         BFliahWY160AvwnpY1sdDJY/VjTnNZrDocm46FhWr+BgN6yajmFlX1qEra490r23b45B
+         R5cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684169122; x=1686761122;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zRf1suCxpp2xw9xVtC6+jBhjPv+ukUhidKZm42V6ybU=;
-        b=VgMm7LPNgbxLbUb8TW11IAuI+BiT7qd6vPFeWTxys9JW4OWQrrM4L+988TTXid7UXo
-         T0Fg1BQnmwPlh/LjSJBQHKiIawoDCgDwvSsjRdFWH5U4ToDTV3T6UG5sHKSI2Ff8wR90
-         qpI/B04gN+dDEUdzOnvc3v/Gp/8jG5BiKnWebdNrIdzwKtR9jC2XsIxFFnGH1c3cMSio
-         35xTNz9f7PsGDoC0zZ43HnYnZLmGWZ0+3VvAkc7fPTbGhsFS1DhAOntKiU4nu91gpgJS
-         56E+kYq4R5UL/TrPNV7bySwM+xyviixi9J3HPik6TKCUf+QsHYPRg9zE0wew8+UOgBYC
-         /Qvg==
-X-Gm-Message-State: AC+VfDzXlOKl9j7iPCtFE+JhBpdEPxvsdxvx0UFOj06KZIhhXrm5xYyh
-        nZ8g2n388Y0BQPlpwdv4+TmSk8K4GQL2lwKSOGC8Ew==
-X-Google-Smtp-Source: ACHHUZ6WL2yHBGGSTjCR/zNcMyHw7JQQk7RuXqLGbndgXVi0BaKjhZ4zIXUc8BriMv7vS24UmRRZQDqx5sUvWOA/tBw=
-X-Received: by 2002:a05:622a:1456:b0:3ed:6bde:9681 with SMTP id
- v22-20020a05622a145600b003ed6bde9681mr1323105qtx.0.1684169121825; Mon, 15 May
- 2023 09:45:21 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1684169963; x=1686761963;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NetrHyA9aTHO12kOXVHLfNdXD6bWd3/ADT376MZNP08=;
+        b=NtByOEY2/TTSfuufHJb4fNsNbobZYDTgFLj6JSue/q/BIXjwtX6QNUN1AQaSPmwmsH
+         rBodNhPoWl3wO2Elne24bkoB6dICFzvIXX6iGXdwHXQK1EBkJNXIJJEdO8Ylx4BUnevx
+         8c8QGDuwSnszlA8zOAA1wFPbGtV3YOMN9uz1mu7XlQ+UL+rsibnOlO6Lqv2faIEo92KE
+         N2MC1XHuV1NO5cqr6XKC06C4mUq2HfmYyxeZcuLGt/awzGtolvAgdqOPoqztrc41cEhJ
+         6KZlckAEG8J+jYGCrP1zr2udoO5ng9xaiFuXCbevtgpiE6s+8f+i+nCgwuIKbTPoBz5s
+         ppbQ==
+X-Gm-Message-State: AC+VfDwru3AvQtQGsF9S4FVyYZp40+xri445gNNpmm1hIY0PgqXNbNp1
+        sas+xrMvfl9DSadAn7beq40=
+X-Google-Smtp-Source: ACHHUZ4/nFDj2h5aDZ4chISqddNF7Jwhg02FYofjW39s2dw652S5ij45Gr2UVyCYuSkhClqV9p4Wpg==
+X-Received: by 2002:a17:90a:e00f:b0:247:19ac:9670 with SMTP id u15-20020a17090ae00f00b0024719ac9670mr33641804pjy.26.1684169962891;
+        Mon, 15 May 2023 09:59:22 -0700 (PDT)
+Received: from ubuntu-Virtual-Machine.corp.microsoft.com ([2001:4898:80e8:f:85bb:dfc8:391f:ff73])
+        by smtp.gmail.com with ESMTPSA id x13-20020a17090aa38d00b0024df6bbf5d8sm2151pjp.30.2023.05.15.09.59.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 May 2023 09:59:22 -0700 (PDT)
+From:   Tianyu Lan <ltykernel@gmail.com>
+To:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
+        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, peterz@infradead.org,
+        ashish.kalra@amd.com, srutherford@google.com,
+        akpm@linux-foundation.org, anshuman.khandual@arm.com,
+        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
+        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
+        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
+        michael.roth@amd.com, thomas.lendacky@amd.com,
+        venu.busireddy@oracle.com, sterritt@google.com,
+        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com
+Cc:     pangupta@amd.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-arch@vger.kernel.org
+Subject: [RFC PATCH V6 00/14] x86/hyperv/sev: Add AMD sev-snp enlightened guest support on hyperv
+Date:   Mon, 15 May 2023 12:59:02 -0400
+Message-Id: <20230515165917.1306922-1-ltykernel@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <385016f9-e948-4f7f-8db3-24a0c0543b3d@amd.com> <55e5f02f-4c1f-e6b0-59ba-07abc4d3408f@amd.com>
- <81037a58-6b5c-cde4-79fe-3686d9b8a551@amd.com> <b0baa6ee-ea6d-3a30-d5fb-3ec395896750@amd.com>
- <dbcb6666-270a-4867-6de7-73812d32fd8c@amd.com> <7fb25176-3752-1be3-66d4-a7f5a0e1617a@amd.com>
- <682c0bf9-ccf7-9660-21fe-925ef63c5fbb@amd.com> <4c642bd1-5f1c-292e-398f-eed699db590d@amd.com>
- <65cb8f0f-7e8b-6df6-6bb1-a9f1add027bb@amd.com> <CAAH4kHYDUGnUnZt2HUVcGqOYyzsyUhBXUqW+iDyvKCtQW9XuEQ@mail.gmail.com>
- <ZF17KuHV5VIpT8DG@google.com>
-In-Reply-To: <ZF17KuHV5VIpT8DG@google.com>
-From:   Dionna Amalie Glaze <dionnaglaze@google.com>
-Date:   Mon, 15 May 2023 09:45:10 -0700
-Message-ID: <CAAH4kHbLrZZ6xvXYc-TLEyN4pAd=-PL4d2T2yUF318yuh+=_pw@mail.gmail.com>
-Subject: Re: [PATCH RFC v7 52/64] KVM: SVM: Provide support for
- SNP_GUEST_REQUEST NAE event
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, hpa@zytor.com, ardb@kernel.org,
-        pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,42 +81,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 11, 2023 at 4:33=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Thu, May 11, 2023, Dionna Amalie Glaze wrote:
-> > Would it be okay to request that we add a KVM stat for how often there
-> > are GUEST_REQUEST_NAE exits? I think it'd be good for service
-> > operators to get a better idea how valued the feature is.
->
-> Heh, it's always ok to request something, but sometimes the answer will b=
-e no.
->
-> And in the case, the answer is likely "no stat for you".  A year or so ag=
-o, in the
-> context of us (Google) trying to upstream a pile of stats, we (KVM folks)=
- came to
-> a rough consensus that KVM should only add upstream stats if they are rel=
-atively
-> generic and (almost) universally useful[*].  IMO, a one-off stat for a sp=
-ecific exit
-> reason is too narrowly focused, e.g. collecting information on all exit r=
-easons is
-> superior.  And no, that won't be accepted upstream either, because for so=
-me environments
-> gathering detailed information on all exits is too much overhead (also co=
-vered in
-> the link).
->
-> FWIW, we (GCE) plan on carrying stats like this in out-of-tree patches, i=
-.e. your
-> request for stats is likely something that would get accepted internally =
-(if it
-> isn't already captured through our generic stats collection).
->
-> [*] https://lore.kernel.org/all/87czp0voqg.wl-maz@kernel.org
+From: Tianyu Lan <tiala@microsoft.com>
 
-Thanks Sean, noted :)
+This patchset is to add AMD sev-snp enlightened guest
+support on hyperv. Hyperv uses Linux direct boot mode
+to boot up Linux kernel and so it needs to pvalidate
+system memory by itself.
 
---=20
--Dionna Glaze, PhD (she/her)
+In hyperv case, there is no boot loader and so cc blob
+is prepared by hypervisor. In this series, hypervisor
+set the cc blob address directly into boot parameter
+of Linux kernel.
+
+Shared memory between guests and hypervisor should be
+decrypted and zero memory after decrypt memory. The data
+in the target address. It maybe smearedto avoid smearing
+data.
+
+Introduce #HV exception support in AMD sev snp code and
+#HV handler.
+
+Change since v6:
+       - Merge Ashish Kalr patch https://github.com/
+       ashkalra/linux/commit/6975484094b7cb8d703c45066780dd85043cd040
+       - Merge patch "x86/sev: Fix interrupt exit code paths from
+        #HV exception" with patch "x86/sev: Add AMD sev-snp enlightened guest
+	 support on hyperv".
+       - Fix getting processor num in the hv_snp_get_smp_config() when ealry is false.
+
+Change since v4:
+       - Use pgcount to free intput arg page.
+       - Fix encrypt and free page order.
+       - struct_size to calculate array size
+       - Share asm code between #HV and #VC exception.
+
+Change since v3:
+       - Replace struct sev_es_save_area with struct vmcb_save_area
+       - Move smp, cpu and memory enumerating code from mshyperv.c to ivm.c
+       - Handle nested entry case of do_exc_hv() case.
+       - Check NMI event when irq is disabled
+
+Change since v2:
+       - Remove validate kernel memory code at boot stage
+       - Split #HV page patch into two parts
+       - Remove HV-APIC change due to enable x2apic from
+       	 host side
+       - Rework vmbus code to handle error of decrypt page
+       - Spilt memory and cpu initialization patch. 
+Change since v1:
+       - Remove boot param changes for cc blob address and
+       use setup head to pass cc blob info
+       - Remove unnessary WARN and BUG check
+       - Add system vector table map in the #HV exception
+       - Fix interrupt exit issue when use #HV exception
+
+Ashish Kalra (1):
+  x86/sev: optimize system vector processing invoked from #HV exception
+
+Tianyu Lan (13):
+  x86/sev: Add a #HV exception handler
+  x86/sev: Add Check of #HV event in path
+  x86/sev: Add AMD sev-snp enlightened guest support on hyperv
+  x86/hyperv: Add sev-snp enlightened guest static key
+  x86/hyperv: Mark Hyper-V vp assist page unencrypted in SEV-SNP
+    enlightened guest
+  x86/hyperv: Set Virtual Trust Level in VMBus init message
+  x86/hyperv: Use vmmcall to implement Hyper-V hypercall in sev-snp
+    enlightened guest
+  clocksource/drivers/hyper-v: decrypt hyperv tsc page in sev-snp
+    enlightened guest
+  hv: vmbus: Mask VMBus pages unencrypted for sev-snp enlightened guest
+  drivers: hv: Decrypt percpu hvcall input arg page in sev-snp
+    enlightened guest
+  x86/hyperv: Initialize cpu and memory for sev-snp enlightened guest
+  x86/hyperv: Add smp support for sev-snp guest
+  x86/hyperv: Add hyperv-specific handling for VMMCALL under SEV-ES
+
+ arch/x86/entry/entry_64.S             |  46 ++-
+ arch/x86/hyperv/hv_init.c             |  42 +++
+ arch/x86/hyperv/ivm.c                 | 196 +++++++++++++
+ arch/x86/include/asm/cpu_entry_area.h |   6 +
+ arch/x86/include/asm/hyperv-tlfs.h    |   7 +
+ arch/x86/include/asm/idtentry.h       |  52 +++-
+ arch/x86/include/asm/irqflags.h       |  14 +-
+ arch/x86/include/asm/mem_encrypt.h    |   2 +
+ arch/x86/include/asm/mshyperv.h       |  74 ++++-
+ arch/x86/include/asm/page_64_types.h  |   1 +
+ arch/x86/include/asm/trapnr.h         |   1 +
+ arch/x86/include/asm/traps.h          |   1 +
+ arch/x86/include/uapi/asm/svm.h       |   4 +
+ arch/x86/kernel/cpu/common.c          |   1 +
+ arch/x86/kernel/cpu/mshyperv.c        |  42 ++-
+ arch/x86/kernel/dumpstack_64.c        |   9 +-
+ arch/x86/kernel/idt.c                 |   1 +
+ arch/x86/kernel/sev.c                 | 404 +++++++++++++++++++++++---
+ arch/x86/kernel/traps.c               |  60 ++++
+ arch/x86/kernel/vmlinux.lds.S         |   7 +
+ arch/x86/mm/cpu_entry_area.c          |   2 +
+ drivers/clocksource/hyperv_timer.c    |   2 +-
+ drivers/hv/connection.c               |   1 +
+ drivers/hv/hv.c                       |  37 ++-
+ drivers/hv/hv_common.c                |  27 +-
+ include/asm-generic/hyperv-tlfs.h     |   3 +-
+ include/asm-generic/mshyperv.h        |   1 +
+ include/linux/hyperv.h                |   4 +-
+ 28 files changed, 960 insertions(+), 87 deletions(-)
+
+-- 
+2.25.1
+
