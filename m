@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B7E9703A72
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 19:51:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7036703A25
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 19:49:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244954AbjEORvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 13:51:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47344 "EHLO
+        id S244639AbjEORtR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 13:49:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244760AbjEORun (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 13:50:43 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B123A1B764
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:48:53 -0700 (PDT)
+        with ESMTP id S244773AbjEORtB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 13:49:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF76D14E52
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:47:07 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D8B7362F07
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 17:48:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47B20C4339C;
-        Mon, 15 May 2023 17:48:51 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1CC3F62F0E
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 17:46:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77203C433D2;
+        Mon, 15 May 2023 17:46:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684172931;
-        bh=L7Cto5GZkzBjeBcm57gXboidJyQk8i65m2MN6RtnDug=;
+        s=k20201202; t=1684172818;
+        bh=HzXSsUwByW2jAR2hO6nb9l7RS/h2EPWpRifFw83LriQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=MMYC/5ic1lFY3CJq5pMF7wQUERnkvnC7PXnj7HBWempOTK2ra04OOE2A3Zw/ro7+S
-         kJ12pjsCXsvQfj6HgpLx+NxznU0YitJXm1zeNjosRpmqP9D2XY9PPiajNOhS564nJd
-         X461PiLPfYwiqXhyD+6suFfR7JuXT1dH7RPwazRKKLf5GFiINevv0zqgTL1xiFAdOJ
-         ut4Hq5mBdkxR4/6t1Y+TiTx6+m83YKgAiqD2lyaeZ0ZAO6Z+AiZOXm56WhLyZVFgZk
-         i6R1qi1izq9/SYD7kzy5azb7lS+j+h5zu0+PZMO7m3LEjrzJ++agFk9m6vDE+gDOiK
-         yeyc4zUvcl6/A==
+        b=VtbYv0YCiu90BRfaTqc0HWRAsF7HP5omooE1sYKhjY/XJAuteor9FUcliAJI4S7OA
+         wL561TyhMVo5QTZ9MoMSxQ6LKUM0wc+lxWJrc9y8oa18cACP0J1bXVhcfr3XWnSPFb
+         rWoyLa94bMy0wwq7hG7CQ61j499QGPAUbTylcSIZAHA4fRAXoHaqpyafpW9rObN1oc
+         5SJgaLrRIf7uHnRzbiv+AFlAD0E65Ugqy7+w/KDNMRez8t+X8ObCLYKmSGV+kWXbRl
+         AdKuj1XGTsdI/js1RMjYZVVFBzncE+kksPLVjOzLQuwFthaiZBZIhL+eIgt2lmXeW2
+         sCo1KrI/NuV2A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pyc30-00FJAF-TM;
-        Mon, 15 May 2023 18:31:47 +0100
+        id 1pyc32-00FJAF-5f;
+        Mon, 15 May 2023 18:31:49 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -53,9 +53,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v10 41/59] KVM: arm64: nv: Implement maintenance interrupt forwarding
-Date:   Mon, 15 May 2023 18:30:45 +0100
-Message-Id: <20230515173103.1017669-42-maz@kernel.org>
+Subject: [PATCH v10 42/59] KVM: arm64: nv: Deal with broken VGIC on maintenance interrupt delivery
+Date:   Mon, 15 May 2023 18:30:46 +0100
+Message-Id: <20230515173103.1017669-43-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230515173103.1017669-1-maz@kernel.org>
 References: <20230515173103.1017669-1-maz@kernel.org>
@@ -65,8 +65,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -75,148 +75,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When we take a maintenance interrupt, we need to decide whether
-it is generated on an action from the guest, or if it is something
-that needs to be forwarded to the guest hypervisor.
+Normal, non-nesting KVM deals with maintenance interrupt in a very
+simple way: we don't even try to handle it and just turn it off
+as soon as we exit, long before the kernel can handle it.
+
+However, with NV, we rely on the actual handling of the interrupt
+to leave it active and pass it down to the L1 guest hypervisor
+(we effectively treat it as an assigned interrupt, just like the
+timer).
+
+This doesn't work with something like the Apple M2, which doesn't
+have an active state that allows the interrupt to be masked.
+
+Instead, just disable the vgic after having taken the interrupt and
+injected a virtual interrupt. This is enough for the guest to make
+forward progress, but will limit its ability to handle further
+interrupts until it next exits (IAR will always report "spurious").
+
+Oh well.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-init.c      | 33 ++++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 28 ++++++++++++++++++-----
- 2 files changed, 55 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 9d42c7cb2b58..4ded51eea1a6 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -6,10 +6,12 @@
- #include <linux/uaccess.h>
- #include <linux/interrupt.h>
- #include <linux/cpu.h>
-+#include <linux/irq.h>
- #include <linux/kvm_host.h>
- #include <kvm/arm_vgic.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include "vgic.h"
- 
- /*
-@@ -230,6 +232,16 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- 	if (!irqchip_in_kernel(vcpu->kvm))
- 		return 0;
- 
-+	if (vcpu_has_nv(vcpu)) {
-+		/* Cope with vintage userspace. Maybe we should fail instead */
-+		if (vcpu->kvm->arch.vgic.maint_irq == 0)
-+			vcpu->kvm->arch.vgic.maint_irq = kvm_vgic_global_state.maint_irq;
-+		ret = kvm_vgic_set_owner(vcpu, vcpu->kvm->arch.vgic.maint_irq,
-+					 vcpu);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	/*
- 	 * If we are creating a VCPU with a GICv3 we must also register the
- 	 * KVM io device for the redistributor that belongs to this VCPU.
-@@ -488,12 +500,23 @@ void kvm_vgic_cpu_down(void)
- 
- static irqreturn_t vgic_maintenance_handler(int irq, void *data)
- {
-+	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)data;
-+
- 	/*
- 	 * We cannot rely on the vgic maintenance interrupt to be
- 	 * delivered synchronously. This means we can only use it to
- 	 * exit the VM, and we perform the handling of EOIed
- 	 * interrupts on the exit path (see vgic_fold_lr_state).
- 	 */
-+
-+	/* If not nested, deactivate */
-+	if (!vcpu || !vgic_state_is_nested(vcpu)) {
-+		irq_set_irqchip_state(irq, IRQCHIP_STATE_ACTIVE, false);
-+		return IRQ_HANDLED;
-+	}
-+
-+	/* Assume nested from now */
-+	vgic_v3_handle_nested_maint_irq(vcpu);
- 	return IRQ_HANDLED;
- }
- 
-@@ -592,6 +615,16 @@ int kvm_vgic_hyp_init(void)
- 		return ret;
- 	}
- 
-+	if (has_mask) {
-+		ret = irq_set_vcpu_affinity(kvm_vgic_global_state.maint_irq,
-+					    kvm_get_running_vcpus());
-+		if (ret) {
-+			kvm_err("Error setting vcpu affinity\n");
-+			free_percpu_irq(kvm_vgic_global_state.maint_irq, kvm_get_running_vcpus());
-+			return ret;
-+		}
-+	}
-+
- 	kvm_info("vgic interrupt IRQ%d\n", kvm_vgic_global_state.maint_irq);
- 	return 0;
- }
 diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index e88c75e79010..755e4819603a 100644
+index 755e4819603a..919275b94625 100644
 --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
 +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -175,10 +175,20 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_irq *irq;
-+	unsigned long flags;
- 
- 	vgic_cpu->shadow_vgic_v3 = vgic_cpu->nested_vgic_v3;
- 	vgic_v3_create_shadow_lr(vcpu);
- 	__vgic_v3_restore_state(vcpu_shadow_if(vcpu));
+@@ -225,4 +225,7 @@ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
+ 		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+ 				    vcpu->kvm->arch.vgic.maint_irq, state, vcpu);
+ 	}
 +
-+	irq = vgic_get_irq(vcpu->kvm, vcpu, vcpu->kvm->arch.vgic.maint_irq);
-+	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+	if (irq->line_level || irq->active)
-+		irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
-+				      IRQCHIP_STATE_ACTIVE, true);
-+	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-+	vgic_put_irq(vcpu->kvm, irq);
- }
- 
- void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
-@@ -193,20 +203,26 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
- 	 */
- 	vgic_v3_fixup_shadow_lr_state(vcpu);
- 	vgic_cpu->nested_vgic_v3 = vgic_cpu->shadow_vgic_v3;
-+	irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
-+			      IRQCHIP_STATE_ACTIVE, false);
- }
- 
- void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
- {
--	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
--
- 	/*
- 	 * If we exit a nested VM with a pending maintenance interrupt from the
- 	 * GIC, then we need to forward this to the guest hypervisor so that it
- 	 * can re-sync the appropriate LRs and sample level triggered interrupts
- 	 * again.
- 	 */
--	if (vgic_state_is_nested(vcpu) &&
--	    (cpu_if->vgic_hcr & ICH_HCR_EN) &&
--	    vgic_v3_get_misr(vcpu))
--		kvm_inject_nested_irq(vcpu);
-+	if (vgic_state_is_nested(vcpu)) {
-+		struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
-+		bool state;
-+
-+		state  = cpu_if->vgic_hcr & ICH_HCR_EN;
-+		state &= vgic_v3_get_misr(vcpu);
-+
-+		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-+				    vcpu->kvm->arch.vgic.maint_irq, state, vcpu);
-+	}
++	if (unlikely(kvm_vgic_global_state.no_hw_deactivation))
++		sysreg_clear_set_s(SYS_ICH_HCR_EL2, ICH_HCR_EN, 0);
  }
 -- 
 2.34.1
