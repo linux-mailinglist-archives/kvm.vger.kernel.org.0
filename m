@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14591703A27
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 19:49:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42755703A4A
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 19:50:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244697AbjEORtU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 13:49:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44648 "EHLO
+        id S244874AbjEORu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 13:50:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244648AbjEORtE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 13:49:04 -0400
+        with ESMTP id S244706AbjEORt6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 13:49:58 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24CCC1524F
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:47:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF9E419BDD
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:47:59 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E44D162F0A
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 17:47:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BCFEC433A1;
-        Mon, 15 May 2023 17:47:10 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 267B162F15
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 17:47:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85C08C433EF;
+        Mon, 15 May 2023 17:47:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684172830;
-        bh=L+vFEjrDxPHQopVHyQuoKaHYPKVgXf8Bsk3j4A6+Qig=;
+        s=k20201202; t=1684172875;
+        bh=OP9zUGwP8iltF698WsVKx5VGN0i7zVhdo+nQClGUotk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cKUSVc+H8T3NHRl003iPAAAC4keJaMZUXQCfZQ9TlZJatClnDKwYUw3yxnIRBMqyn
-         Nd3dqViTExBh5aR6M6IG8PoIaboTMEfbYVF9zibyA+adLGty5ti5xDrdmXzMUR9QYp
-         MC6TuLkeLpqsed+v0v1LLm7gEy2imvtoQbj4XTjO3mF2v5/67vsMEi/UiCNxqAqFoi
-         MzcwRhwQekI3AUGucMExEZZ5OHZ+O4Z2csMCyT5HOAnt/kQ62HE5kCaWCWCIpquxl2
-         StuwMUypC3bREDbIa0g1mesDjWTrSl9F3a1Hmrvb38Qu2Ip+ALGdKiwM9d3Ddtp0dX
-         4VnJHUTYFQb+A==
+        b=cuSLCDpB6jh/YKgGRh83X/UMWWBDxdpyAqUkx3FybIjeEzJy0CXbiBt3ZmuWAm5WD
+         qNpd4B56Z3UHAu9ftOUCQ2mLtRLYoALs5tA11NaVKgOECcX9Yz9Sb0Ybq/mc3hcitr
+         Smbh7nVvVGeAIAhRN+uSTS1VWRklLYTn77L2yyVDCa933NktJ1ZxuuoE5d5Ew5wXYT
+         AoXlXPwD6R61d2cNSL1/0U4mkEgFQQmLrlhw5OXLlnlBrAtQUWrQa8emMrcQC4cMG7
+         obzw0fdNtwkNJtGTzWdKdH3qPCwz9a2wPoFWxiw3Q/Jgbn6fSnJ2iysQSi9Z1n2XP+
+         eETzLHSsVYUwg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pyc2i-00FJAF-B0;
+        id 1pyc2i-00FJAF-JN;
         Mon, 15 May 2023 18:31:28 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v10 19/59] KVM: arm64: nv: Trap EL1 VM register accesses in virtual EL2
-Date:   Mon, 15 May 2023 18:30:23 +0100
-Message-Id: <20230515173103.1017669-20-maz@kernel.org>
+Subject: [PATCH v10 20/59] KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
+Date:   Mon, 15 May 2023 18:30:24 +0100
+Message-Id: <20230515173103.1017669-21-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230515173103.1017669-1-maz@kernel.org>
 References: <20230515173103.1017669-1-maz@kernel.org>
@@ -75,116 +75,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Jintack Lim <jintack.lim@linaro.org>
 
-When running in virtual EL2 mode, we actually run the hardware in EL1
-and therefore have to use the EL1 registers to ensure correct operation.
+For the same reason we trap virtual memory register accesses in virtual
+EL2, we trap CPACR_EL1 access too; We allow the virtual EL2 mode to
+access EL1 system register state instead of the virtual EL2 one.
 
-By setting the HCR.TVM and HCR.TVRM we ensure that the virtual EL2 mode
-doesn't shoot itself in the foot when setting up what it believes to be
-a different mode's system register state (for example when preparing to
-switch to a VM).
-
-We can leverage the existing sysregs infrastructure to support trapped
-accesses to these registers.
-
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +---
- arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
- arch/arm64/kvm/hyp/vhe/switch.c         |  7 ++++++-
- arch/arm64/kvm/sys_regs.c               | 19 ++++++++++++++++---
- 4 files changed, 24 insertions(+), 8 deletions(-)
+ arch/arm64/kvm/hyp/vhe/switch.c | 3 +++
+ arch/arm64/kvm/sys_regs.c       | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index e78a08a72a3c..c6d62357e736 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -119,10 +119,8 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--static inline void ___activate_traps(struct kvm_vcpu *vcpu)
-+static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
- {
--	u64 hcr = vcpu->arch.hcr_el2;
--
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
- 		hcr |= HCR_TVM;
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 71fa16a0dc77..7730860552da 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -40,7 +40,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
- 
--	___activate_traps(vcpu);
-+	___activate_traps(vcpu, vcpu->arch.hcr_el2);
- 	__activate_traps_common(vcpu);
- 
- 	val = vcpu->arch.cptr_el2;
 diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 3d868e84c7a0..14880c84678f 100644
+index 14880c84678f..8d1a6b007c19 100644
 --- a/arch/arm64/kvm/hyp/vhe/switch.c
 +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -35,9 +35,14 @@ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+@@ -68,6 +68,9 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 		__activate_traps_fpsimd32(vcpu);
+ 	}
  
- static void __activate_traps(struct kvm_vcpu *vcpu)
- {
-+	u64 hcr = vcpu->arch.hcr_el2;
- 	u64 val;
- 
--	___activate_traps(vcpu);
-+	/* Trap VM sysreg accesses if an EL2 guest is not using VHE. */
 +	if (vcpu_is_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
-+		hcr |= HCR_TVM | HCR_TRVM;
-+
-+	___activate_traps(vcpu, hcr);
++		val |= CPTR_EL2_TCPAC;
++	
+ 	write_sysreg(val, cpacr_el1);
  
- 	val = read_sysreg(cpacr_el1);
- 	val |= CPACR_ELx_TTA;
+ 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el1);
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index a881d5cd1671..28b882b79d3e 100644
+index 28b882b79d3e..52d798dbc202 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -391,8 +391,15 @@ static void get_access_mask(const struct sys_reg_desc *r, u64 *mask, u64 *shift)
+@@ -2065,7 +2065,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  
- /*
-  * Generic accessor for VM registers. Only called as long as HCR_TVM
-- * is set. If the guest enables the MMU, we stop trapping the VM
-- * sys_regs and leave it in complete control of the caches.
-+ * is set.
-+ *
-+ * This is set in two cases: either (1) we're running at vEL2, or (2)
-+ * we're running at EL1 and the guest has its MMU off.
-+ *
-+ * (1) TVM/TRVM is set, as we need to virtualise some of the VM
-+ * registers for the guest hypervisor
-+ * (2) Once the guest enables the MMU, we stop trapping the VM sys_regs
-+ * and leave it in complete control of the caches.
-  */
- static bool access_vm_reg(struct kvm_vcpu *vcpu,
- 			  struct sys_reg_params *p,
-@@ -401,7 +408,13 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
- 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
- 	u64 val, mask, shift;
+ 	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
+ 	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
+-	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
++	{ SYS_DESC(SYS_CPACR_EL1), access_rw, reset_val, CPACR_EL1, 0 },
  
--	BUG_ON(!p->is_write);
-+	/* We don't expect TRVM on the host */
-+	BUG_ON(!vcpu_is_el2(vcpu) && !p->is_write);
-+
-+	if (!p->is_write) {
-+		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-+		return true;
-+	}
- 
- 	get_access_mask(r, &mask, &shift);
- 
+ 	MTE_REG(RGSR_EL1),
+ 	MTE_REG(GCR_EL1),
 -- 
 2.34.1
 
