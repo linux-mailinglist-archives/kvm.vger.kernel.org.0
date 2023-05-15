@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF179703A3E
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 19:50:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D1B8703A65
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 19:51:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244826AbjEORuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 13:50:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47766 "EHLO
+        id S244930AbjEORvC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 13:51:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244839AbjEORtr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 13:49:47 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B38F18AA2
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:47:41 -0700 (PDT)
+        with ESMTP id S244837AbjEORuf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 13:50:35 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162E46EAD
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:48:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EA5B162EEC
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 17:47:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53605C433A0;
-        Mon, 15 May 2023 17:47:40 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B454762F1C
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 17:48:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 225DDC433D2;
+        Mon, 15 May 2023 17:48:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684172860;
-        bh=fah9jVAP7gnhp59S4TINJMNuYdRjJn2ZprixYP5w/Xg=;
+        s=k20201202; t=1684172912;
+        bh=g1A5Ryw1S7CyGgp8tGYF5UTYtvhJesZ4XnlNwnG/pyk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ltrun6EhHKpSUL5fdYzDc/BK5adgcRa5AeuzRjckpG6K1GHDMd8dz869jdVNRY4ep
-         dQ98xO20AZQuX1iph0RiegNHTg9gVvSmAqI/SS9tW4KDsnxGJINuyIiZhkljwUDR8+
-         IJspJBhOQEz8nq+IbGU+Y3G04fLQ9N+tQsWyEEh7sDq7glxzb1y1Wf+rsWXxX7+UI0
-         7EzPGZo1X3v02a2xBLxC8Cy1lTiSluPq4/ZcteK/0Y+ipkCcrgR1ksi3nsUF8qtlK0
-         s+41yiGrWgdNNBQvCXsg9D4HlAXr1prNDMKNPdQEER8V5eFTnEhGFwFTkosVbD6eZX
-         Tg5dGNSp7Zg8Q==
+        b=oM8jZhhB6KMEYqM+05Pcgq80mTEew5qx3RV4i5eh0ztce0tbI/oev0cZHwHdUrU1K
+         OGFAyF8jZdMDJi9nlNg4oerKpBkTlWgIJc+Q3c1Diwyc+JKCrz4O/gN8xlm4yLajJL
+         hmv3UyC/jLnbknAnIluOe3AlrLhuvAt17HLpLWMB1jr1JCTgeudWDiBNlALvEgJT31
+         lsjbPJdEz5oscMx3A2x/fkuCTWRwQwES7ChNNhFGFbK6gPoyey3oG81f4+MRFU1DGN
+         7hNmZIcYVXUl5i6LqxAYlsZErOsD4U4fmF1BpVuc5SRcqYlVpnxU16Se2lzghJgAp+
+         wfiIHCtq7XuRQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pyc3B-00FJAF-4L;
+        id 1pyc3B-00FJAF-DA;
         Mon, 15 May 2023 18:31:57 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v10 56/59] KVM: arm64: nv: Fast-track 'InHost' exception returns
-Date:   Mon, 15 May 2023 18:31:00 +0100
-Message-Id: <20230515173103.1017669-57-maz@kernel.org>
+Subject: [PATCH v10 57/59] KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
+Date:   Mon, 15 May 2023 18:31:01 +0100
+Message-Id: <20230515173103.1017669-58-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230515173103.1017669-1-maz@kernel.org>
 References: <20230515173103.1017669-1-maz@kernel.org>
@@ -65,8 +65,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -75,144 +75,134 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A significant part of the ARMv8.3-NV extension is to trap ERET
-instructions so that the hypervisor gets a chance to switch
-from a vEL2 L1 guest to an EL1 L2 guest.
+Due to the way ARMv8.4-NV suppresses traps when accessing EL2
+system registers, we can't track when the guest changes its
+HCR_EL2.TGE setting. This means we always trap EL1 TLBIs,
+even if they don't affect any guest.
 
-But this also has the unfortunate consequence of trapping ERET
-in unsuspecting circumstances, such as staying at vEL2 (interrupt
-handling while being in the guest hypervisor), or returning to host
-userspace in the case of a VHE guest.
+This obviously has a huge impact on performance, as we handle
+TLBI traps as a normal exit, and a normal VHE host issues
+thousands of TLBIs when booting (and quite a few when running
+userspace).
 
-Although we already make some effort to handle these ERET quicker
-by not doing the put/load dance, it is still way too far down the
-line for it to be efficient enough.
-
-For these cases, it would ideal to ERET directly, no question asked.
-Of course, we can't do that. But the next best thing is to do it as
-early as possible, in fixup_guest_exit(), much as we would handle
-FPSIMD exceptions.
+A cheap way to reduce the overhead is to handle the limited
+case of {E2H,TGE}=={1,1} as a guest fixup, as we already have
+the right mmu configuration in place. Just execute the decoded
+instruction right away and return to the guest.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 29 +++------------------
- arch/arm64/kvm/hyp/vhe/switch.c | 46 +++++++++++++++++++++++++++++++++
- 2 files changed, 49 insertions(+), 26 deletions(-)
+ arch/arm64/kvm/hyp/vhe/switch.c | 43 ++++++++++++++++++++++++++++++++-
+ arch/arm64/kvm/hyp/vhe/tlb.c    |  6 +++--
+ arch/arm64/kvm/sys_regs.c       | 12 ---------
+ 3 files changed, 46 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 08b152f8ba6a..45d4e148b735 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -955,8 +955,7 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
- 
- void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- {
--	u64 spsr, elr, mode;
--	bool direct_eret;
-+	u64 spsr, elr;
- 
- 	/*
- 	 * Forward this trap to the virtual EL2 if the virtual
-@@ -965,33 +964,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 	if (forward_traps(vcpu, HCR_NV))
- 		return;
- 
--	/*
--	 * Going through the whole put/load motions is a waste of time
--	 * if this is a VHE guest hypervisor returning to its own
--	 * userspace, or the hypervisor performing a local exception
--	 * return. No need to save/restore registers, no need to
--	 * switch S2 MMU. Just do the canonical ERET.
--	 */
--	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
--	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
--
--	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
--
--	direct_eret  = (mode == PSR_MODE_EL0t &&
--			vcpu_el2_e2h_is_set(vcpu) &&
--			vcpu_el2_tge_is_set(vcpu));
--	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
--
--	if (direct_eret) {
--		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
--		*vcpu_cpsr(vcpu) = spsr;
--		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
--		return;
--	}
--
- 	preempt_disable();
- 	kvm_arch_vcpu_put(vcpu);
- 
-+	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
-+	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
- 	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
- 
- 	trace_kvm_nested_eret(vcpu, elr, spsr);
 diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 0aeafda5b966..a63c44bf62ce 100644
+index a63c44bf62ce..2d305e0f145f 100644
 --- a/arch/arm64/kvm/hyp/vhe/switch.c
 +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -168,6 +168,51 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
+@@ -168,6 +168,47 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
  	__deactivate_traps_common(vcpu);
  }
  
-+static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
++static bool kvm_hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
 +{
-+	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-+	u64 spsr, mode;
++	u32 instr;
++	u64 val;
 +
 +	/*
-+	 * Going through the whole put/load motions is a waste of time
-+	 * if this is a VHE guest hypervisor returning to its own
-+	 * userspace, or the hypervisor performing a local exception
-+	 * return. No need to save/restore registers, no need to
-+	 * switch S2 MMU. Just do the canonical ERET.
++	 * Ideally, we would never trap on EL1 TLB invalidations when the
++	 * guest's HCR_EL2.{E2H,TGE} == {1,1}. But "thanks" to ARMv8.4, we
++	 * don't trap writes to HCR_EL2, meaning that we can't track
++	 * changes to the virtual TGE bit. So we leave HCR_EL2.TTLB set on
++	 * the host. Oopsie...
 +	 *
-+	 * Unless the trap has to be forwarded further down the line,
-+	 * of course...
++	 * In order to speed-up EL1 TLBIs from the vEL2 guest when TGE is
++	 * set, try and handle these invalidation as quickly as possible,
++	 * without fully exiting (unless this needs forwarding).
 +	 */
-+	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
++	if (!vcpu_has_nv2(vcpu) ||
++	    !vcpu_is_el2(vcpu) ||
++	    (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE))
 +		return false;
 +
-+	spsr = read_sysreg_el1(SYS_SPSR);
-+	spsr = __fixup_spsr_el2_read(ctxt, spsr);
-+	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-+
-+	switch (mode) {
-+	case PSR_MODE_EL0t:
-+		if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
-+			return false;
-+		break;
-+	case PSR_MODE_EL2t:
-+		mode = PSR_MODE_EL1t;
-+		break;
-+	case PSR_MODE_EL2h:
-+		mode = PSR_MODE_EL1h;
-+		break;
-+	default:
++	instr = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
++	if (sys_reg_Op0(instr) != TLBI_Op0 ||
++	    sys_reg_Op1(instr) != TLBI_Op1_EL1)
 +		return false;
-+	}
 +
-+	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
-+
-+	write_sysreg_el2(spsr, SYS_SPSR);
-+	write_sysreg_el2(read_sysreg_el1(SYS_ELR), SYS_ELR);
++	val = vcpu_get_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu));
++	__kvm_tlb_el1_instr(NULL, val, instr);
++	__kvm_skip_instr(vcpu);
 +
 +	return true;
 +}
 +
++static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	if (kvm_hyp_handle_tlbi_el1(vcpu, exit_code))
++		return true;
++
++	return kvm_hyp_handle_sysreg(vcpu, exit_code);
++}
++
+ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
+ 	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+@@ -216,7 +257,7 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
  static const exit_handler_fn hyp_exit_handlers[] = {
  	[0 ... ESR_ELx_EC_MAX]		= NULL,
  	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
-@@ -177,6 +222,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+-	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
++	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg_vhe,
+ 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
+ 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
  	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
- 	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
- 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
-+	[ESR_ELx_EC_ERET]		= kvm_hyp_handle_eret,
- };
+diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+index c4389db4cc22..beb162468c0b 100644
+--- a/arch/arm64/kvm/hyp/vhe/tlb.c
++++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+@@ -201,7 +201,8 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
+ 	dsb(ishst);
  
- static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	if (mmu)
++		__tlb_switch_to_guest(mmu, &cxt);
+ 
+ 	/*
+ 	 * Execute the same instruction as the guest hypervisor did,
+@@ -240,5 +241,6 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
+ 	dsb(ish);
+ 	isb();
+ 
+-	__tlb_switch_to_host(&cxt);
++	if (mmu)
++		__tlb_switch_to_host(&cxt);
+ }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 228dba82e9e5..27a29dcbfcd2 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2987,18 +2987,6 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 
+ 	WARN_ON(!vcpu_is_el2(vcpu));
+ 
+-	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
+-		mutex_lock(&vcpu->kvm->lock);
+-		/*
+-		 * ARMv8.4-NV allows the guest to change TGE behind
+-		 * our back, so we always trap EL1 TLBIs from vEL2...
+-		 */
+-		__kvm_tlb_el1_instr(&vcpu->kvm->arch.mmu, p->regval, sys_encoding);
+-		mutex_unlock(&vcpu->kvm->lock);
+-
+-		return true;
+-	}
+-
+ 	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
+ 				   &(union tlbi_info) {
+ 					   .va = {
 -- 
 2.34.1
 
