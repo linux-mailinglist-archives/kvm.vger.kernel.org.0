@@ -2,141 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DF41703B32
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 20:00:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B251703D50
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 21:07:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242332AbjEOSAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 14:00:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58374 "EHLO
+        id S243974AbjEOTHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 15:07:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245122AbjEOSAI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 14:00:08 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8ABC1BB87
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:57:22 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-b9a7d92d0f7so23886780276.1
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:57:22 -0700 (PDT)
+        with ESMTP id S230423AbjEOTHg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 15:07:36 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 114FD14E4B
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 12:07:35 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-5340957a1f1so958254a12.1
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 12:07:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684173429; x=1686765429;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=99srR1wR+oKvE5/WokGr4LZs8iI5brQIGfN7GCM4UrE=;
-        b=qgBmAUsdMhWoFgdfIMBysrOMi/gESv0r34Xoj0igegtNAqMmPuZYSN8teIqqNTO4qr
-         +o9xeOyk9osBGJxQbQuznSPE37lto98WL25ntsbJrltXSslcw1N9UwCjtAleA783eS5O
-         9YwANM1uEr3ANtlR1gIiXFGuiQX6HZHez7Az1JmZfWcgZ8XXRvwsKlQVSp1qYogeiohP
-         HZiUVEoNqJwtMnWDAcgFy21hoDfY46Zz54Xrc7sGdVcVXFt7SRAKBWqGimi1IwSKlxe6
-         LTURlyPrfkfy2KvuKglvcB3GJiMGve4uIMdIImYsP6Uo1qtixcy8iwFrsPFnos8ejlvp
-         S2tA==
+        d=google.com; s=20221208; t=1684177654; x=1686769654;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xFQ6BaKkjgdTBjpn34wxJVuNtEcQXtwUwEd7418PjqE=;
+        b=JuYLR5X0h/SijvimdD4P6z8hE52bUlPctx7U3AXULuAYdPapAYdXj4OHLU+jesv1e9
+         MHD8Lj1brV1Npy46pM9iEXGc7wGUTxWx5S45qz+oF49+y23jmGnaSXuWfuvxKy9KlI32
+         Hj3tzhYZW0L7IEI7hrXAP0QK8j1h/iBkzVacQ4G+iCXVlem0u2jrysU5Jy1+pmmQkIiS
+         37u1TKNLXuqkmFNxlKyPYyrXLxlhP+oe0s01snkpX8vow2muHJ/gJ/9E3/Z8g6E6znWq
+         LjYx6A8GjdqjoJArA5vnUgfV49yAKbwmFV4Q/QmYgCdQHL8+QmSU6eGY5cEBbL26CcKy
+         ee8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684173429; x=1686765429;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=99srR1wR+oKvE5/WokGr4LZs8iI5brQIGfN7GCM4UrE=;
-        b=eXP7YrEvBohlBOgwsKb9xeHihEkMsAESU7RTirqcTam5gWGxDffwpdmCtG52w33McT
-         iEYIfAtKSuEEsQ73PsehPuS4Z8Q7/H0N3WJs0z8MVilNyqEAZNFAuNWGUO0g7UF2OO6S
-         OduK31WimlRZMTME2RBiWowHghZ1WvYWFTqzSI1bFotffxzhPLMLui0Ri2Nhq76Dqbcn
-         5iGJuDLrTwGqouT4mIkJ5/K0YLQmDxvQyp4PzAY7AHXyHlQYf3uFqREqhyIjw0g5ikH6
-         gL/7R4PTSipyym91MP+ITgWzn7pLcNI67iL9cwPwmlUCUgHmjmzTtpz10v6hWoh+z3Z+
-         EuIQ==
-X-Gm-Message-State: AC+VfDzPySHF4lSgG5Dl0MqYOpkCJIliMD4o3oaJs19/acIB3/gHUHV/
-        Kowb238SoNAn53Xp1fWpq2fOmly0tAY=
-X-Google-Smtp-Source: ACHHUZ4He0csQ4Oev4VXrHXbI7rX8wyUIkfOSTVuja6DxDI6qDgf1L+qcXE8dfIu5YKaWZQqJrs9xqp4fJ0=
+        d=1e100.net; s=20221208; t=1684177654; x=1686769654;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=xFQ6BaKkjgdTBjpn34wxJVuNtEcQXtwUwEd7418PjqE=;
+        b=EewPrA47nLq4VU79Li8Njf703s+wFTcT3Hr8uJ5wj5kXNmwENMpqjQj7elIiLGSt7Y
+         qbBnEsaFu8cGkwtvW1c04OFALWf+wUGFWWuA941YQuDkpav0f12oRRmW2LAKcfETD+Ve
+         0T8H1GFkCjzHSpZYLcL5CtlsNqXIYPFWjnvqBSJL4Bj2tRvoX9iDjKwY5a+AkwDFoac8
+         o9pzKqUhY9ogcB04FeANUXfpNcOcxBJhQ+uuPa0K9bVWBzD3aL+Da5YBo15dUFr4ohBv
+         /O4ILJH/nJYvW3wx0mN9s/mzwzAxNqvczA3vPRvPOVvzp5fveIGgdwNAzYUQ60NnsBWa
+         VPRA==
+X-Gm-Message-State: AC+VfDwKTLciBHVOX5wmp0tcLdKONqkDuACXGlaVp6Ux3zrSjN4La0aD
+        v5npwqDkoI1H4cugHPIHquy2Vj/pMhw=
+X-Google-Smtp-Source: ACHHUZ4P6L9nc0hf9pk7PqVX9406UpgOTZdsuzGyBat9IwfSmmaZ8nUqj18ulapGHZTegPpSzUo6g677OqY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:5454:0:b0:ba2:1a28:c852 with SMTP id
- i81-20020a255454000000b00ba21a28c852mr14179279ybb.7.1684173429090; Mon, 15
- May 2023 10:57:09 -0700 (PDT)
-Date:   Mon, 15 May 2023 10:57:07 -0700
-In-Reply-To: <66685365-86f9-9ddf-d63b-f87621b05b88@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a63:6b4a:0:b0:4fc:2058:fa29 with SMTP id
+ g71-20020a636b4a000000b004fc2058fa29mr9542105pgc.1.1684177654484; Mon, 15 May
+ 2023 12:07:34 -0700 (PDT)
+Date:   Mon, 15 May 2023 12:07:33 -0700
+In-Reply-To: <b61d5999a4fc6d50b7e073cc3c3efa8fe79bbd94.1684097002.git.lstoakes@gmail.com>
 Mime-Version: 1.0
-References: <20230513003600.818142-1-seanjc@google.com> <20230513003600.818142-6-seanjc@google.com>
- <66685365-86f9-9ddf-d63b-f87621b05b88@intel.com>
-Message-ID: <ZGJyc7k1Z4gXQH2U@google.com>
-Subject: Re: [PATCH v3 05/28] drm/i915/gvt: Explicitly check that vGPU is
- attached before shadowing
+References: <cover.1684097001.git.lstoakes@gmail.com> <b61d5999a4fc6d50b7e073cc3c3efa8fe79bbd94.1684097002.git.lstoakes@gmail.com>
+Message-ID: <ZGKC9fHoE+kDs0ar@google.com>
+Subject: Re: [PATCH v5 1/6] mm/gup: remove unused vmas parameter from get_user_pages()
 From:   Sean Christopherson <seanjc@google.com>
-To:     Zhi A Wang <zhi.a.wang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Yan Y Zhao <yan.y.zhao@intel.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="us-ascii"
+To:     Lorenzo Stoakes <lstoakes@gmail.com>
+Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Hildenbrand <david@redhat.com>, x86@kernel.org,
+        linux-sgx@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, Xinhui Pan <Xinhui.Pan@amd.com>,
+        David Airlie <airlied@gmail.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dimitri Sivanich <dimitri.sivanich@hpe.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Christian Konig <christian.koenig@amd.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 15, 2023, Zhi A Wang wrote:
-> On 5/13/2023 8:35 AM, Sean Christopherson wrote:
-> > Move the check that a vGPU is attacked from is_2MB_gtt_possible() to its
-> > sole caller, ppgtt_populate_shadow_entry().  All of the paths in
-> > ppgtt_populate_shadow_entry() eventually check for attachment by way of
-> > intel_gvt_dma_map_guest_page(), but explicitly checking can avoid
-> > unnecessary work and will make it more obvious that a future cleanup of
-> > is_2MB_gtt_possible() isn't introducing a bug.
-> > 
-> 
-> It might be better move this check to shadow_ppgtt_mm() which is used
-> in both shadow page table creation and pinning path so that the path
-> can bail out even earlier when creating a shadow page table but a vGPU
-> has not been attached to KVM yet.
+On Sun, May 14, 2023, Lorenzo Stoakes wrote:
+> No invocation of get_user_pages() use the vmas parameter, so remove it.
+>=20
+> The GUP API is confusing and caveated. Recent changes have done much to
+> improve that, however there is more we can do. Exporting vmas is a prime
+> target as the caller has to be extremely careful to preclude their use
+> after the mmap_lock has expired or otherwise be left with dangling
+> pointers.
+>=20
+> Removing the vmas parameter focuses the GUP functions upon their primary
+> purpose - pinning (and outputting) pages as well as performing the action=
+s
+> implied by the input flags.
+>=20
+> This is part of a patch series aiming to remove the vmas parameter
+> altogether.
+>=20
+> Suggested-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Acked-by: Christian K=EF=BF=BDnig <christian.koenig@amd.com> (for radeon =
+parts)
+> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+> Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
+> ---
+>  arch/x86/kernel/cpu/sgx/ioctl.c     | 2 +-
+>  drivers/gpu/drm/radeon/radeon_ttm.c | 2 +-
+>  drivers/misc/sgi-gru/grufault.c     | 2 +-
+>  include/linux/mm.h                  | 3 +--
+>  mm/gup.c                            | 9 +++------
+>  mm/gup_test.c                       | 5 ++---
+>  virt/kvm/kvm_main.c                 | 2 +-
+>  7 files changed, 10 insertions(+), 15 deletions(-)
 
-Ah, yes, that'll work.  I traced through all of the paths that lead to
-ppgtt_populate_shadow_entry(), and shadow_ppgtt_mm() is the only caller that isn't
-already gated by INTEL_VGPU_STATUS_ATTACHED or INTEL_VGPU_STATUS_ACTIVE (ACTIVE
-is set iff ATTACHED is set).
+Acked-by: Sean Christopherson <seanjc@google.com> (KVM)
 
-I'll move the check up to shadow_ppgtt_mm() in the next version.
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index cb5c13eee193..eaa5bb8dbadc 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2477,7 +2477,7 @@ static inline int check_user_page_hwpoison(unsigned=
+ long addr)
+>  {
+>  	int rc, flags =3D FOLL_HWPOISON | FOLL_WRITE;
+> =20
+> -	rc =3D get_user_pages(addr, 1, flags, NULL, NULL);
+> +	rc =3D get_user_pages(addr, 1, flags, NULL);
+>  	return rc =3D=3D -EHWPOISON;
 
-Thanks!
+Unrelated to this patch, I think there's a pre-existing bug here.  If gup()=
+ returns
+a valid page, KVM will leak the refcount and unintentionally pin the page. =
+ That's
+highly unlikely as check_user_page_hwpoison() is called iff get_user_pages_=
+unlocked()
+fails (called by hva_to_pfn_slow()), but it's theoretically possible that u=
+serspace
+could change the VMAs between hva_to_pfn_slow() and check_user_page_hwpoiso=
+n() since
+KVM doesn't hold any relevant locks at this point.
 
+E.g. if there's no VMA during hva_to_pfn_{fast,slow}(), npages=3D=3D-EFAULT=
+ and KVM
+will invoke check_user_page_hwpoison().  If userspace installs a valid mapp=
+ing
+after hva_to_pfn_slow() but before KVM acquires mmap_lock, then gup() will =
+find
+a valid page.
 
-workload_thread() <= pick_next_workload() => INTEL_VGPU_STATUS_ACTIVE
-|
--> dispatch_workload()
-   |
-   |-> prepare_workload()
-       |
-       -> intel_vgpu_sync_oos_pages()
-       |  |
-       |  |-> ppgtt_set_guest_page_sync()
-       |      |
-       |      |-> sync_oos_page()
-       |          |
-       |          |-> ppgtt_populate_shadow_entry()
-       |
-       |-> intel_vgpu_flush_post_shadow()
-           |
-1:         |-> ppgtt_handle_guest_write_page_table()
-               |
-               |-> ppgtt_handle_guest_entry_add()
-                   |
-2:                 | -> ppgtt_populate_spt_by_guest_entry()
-                   |    |
-                   |    |-> ppgtt_populate_spt()
-                   |        |
-                   |        |-> ppgtt_populate_shadow_entry()
-                   |            |
-                   |            |-> ppgtt_populate_spt_by_guest_entry() [see 2]
-                   |
-                   |-> ppgtt_populate_shadow_entry()
+I _think_ the fix is to simply delete this code. The bug was introduced by =
+commit
+fafc3dbaac64 ("KVM: Replace is_hwpoison_address with __get_user_pages").  A=
+t that
+time, KVM didn't check for "npages =3D=3D -EHWPOISON" from the first call t=
+o
+get_user_pages_unlocked().  Later on, commit 0857b9e95c1a ("KVM: Enable asy=
+nc page
+fault processing") reworked the caller to be:
 
+	mmap_read_lock(current->mm);
+	if (npages =3D=3D -EHWPOISON ||
+	      (!async && check_user_page_hwpoison(addr))) {
+		pfn =3D KVM_PFN_ERR_HWPOISON;
+		goto exit;
+	}
 
-kvmgt_page_track_write()  <= KVM callback => INTEL_VGPU_STATUS_ATTACHED
-|
-|-> intel_vgpu_page_track_handler()
-    |
-    |-> ppgtt_write_protection_handler()
-        |
-        |-> ppgtt_handle_guest_write_page_table_bytes()
-            |
-            |-> ppgtt_handle_guest_write_page_table() [see 1]
+where async really means NOWAIT, so that the hwpoison use of gup() didn't s=
+leep.
+
+    KVM: Enable async page fault processing
+   =20
+    If asynchronous hva_to_pfn() is requested call GUP with FOLL_NOWAIT to
+    avoid sleeping on IO. Check for hwpoison is done at the same time,
+    otherwise check_user_page_hwpoison() will call GUP again and will put
+    vcpu to sleep.
+
+There are other potential problems too, e.g. the hwpoison call doesn't hono=
+r
+the recently introduced @interruptible flag.
+
+I don't see any reason to keep check_user_page_hwpoison(), KVM can simply r=
+ely on
+the "npages =3D=3D -EHWPOISON" check.   get_user_pages_unlocked() is guaran=
+teed to be
+called with roughly equivalent flags, and the flags that aren't equivalent =
+are
+arguably bugs in check_user_page_hwpoison(), e.g. assuming FOLL_WRITE is wr=
+ong.
+
+TL;DR: Go ahead with this change, I'll submit a separate patch to delete th=
+e
+buggy KVM code.
