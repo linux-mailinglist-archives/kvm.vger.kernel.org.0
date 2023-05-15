@@ -2,138 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0067B7035B9
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 19:01:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D41EF7035CC
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 19:02:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243460AbjEORB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 13:01:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40822 "EHLO
+        id S243578AbjEORCu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 13:02:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243456AbjEOQ7z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 12:59:55 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 130E683CE;
-        Mon, 15 May 2023 09:59:47 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1ab032d9266so120602405ad.0;
-        Mon, 15 May 2023 09:59:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684169986; x=1686761986;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cmY2ej1hy4vAs/f4OlrbKuvNcHo8SUtv7o8IcsrQg3U=;
-        b=llobHjZ8CaIv83lisuWYuHqNS76/tNXm2lgpfFKCeP6ap94oN1gkuO+vAaGen3l7Zf
-         /5N9F6v7G42Et49vEQ4VYj0iNh3BUmWx45NHrOwY6DFCAIrau+ZWoft2KLtHIvm+J6M9
-         GjXehqZjYbmt+TDyDM0qFuICTBIMGYCZJjMeAojhXpVR0uqz0+acO0YybhbjaQSHPA55
-         7cMs9Y+n6PFLSzYGnlLM4tkK5Vg0NZFew5KLtO3NBkZ3+zlJQIsyO86fR30/uLY0m003
-         iDD9GC0tTbV8Lpcm8XbGD1Cds3XMYs+m+DcjhoIwNKfuS9Tb7GXTMDNPUoFoWObxFFES
-         E3RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684169986; x=1686761986;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cmY2ej1hy4vAs/f4OlrbKuvNcHo8SUtv7o8IcsrQg3U=;
-        b=UU5Q0/y4zuhNb40+zmiO122y1xSm3PTXBHhnMmuanAiuFU+fM1awCsG5UFzduwuyuc
-         pmrsxW29Ke1Dh7f9FYzXRE+WJnNOHklGwFEj8B5gVO8ge5nGdMsgrmnlH6x19SmDxs57
-         Y7tZKDYR8E4GD/Irb+SKRx0M/nYbCuKPW6/w27EkMaM1wLwgCn3QnuRlfIVTRD7lIPuq
-         6fU46eph2U+oISgx+oTGa1uA+8gHNutTp9iXGQiFfqaCD4BhmCQiqX93h4aemCSHq8VG
-         A8O2wZssfxR11/14fBBm9SIOHZplswKVA0kWPUWusTUcJKtgfOHIp5AY3Vr2LxuXEqjI
-         L4Lw==
-X-Gm-Message-State: AC+VfDybsvqnf7wuu+SprOO44lBFmaDNjzPe2VBrLL2ogorXsSyDVUEq
-        kz30QyUI46bC3MGvKvfJTs0=
-X-Google-Smtp-Source: ACHHUZ5ax8PMzMJyb4JE01QgIu1eN/8WniJ6gslKo//Mqlo5UEC9KUHdakOZkvioQ2T6mK0YMaHGpQ==
-X-Received: by 2002:a17:90a:e50d:b0:247:6a31:d59d with SMTP id t13-20020a17090ae50d00b002476a31d59dmr33951385pjy.1.1684169986489;
-        Mon, 15 May 2023 09:59:46 -0700 (PDT)
-Received: from ubuntu-Virtual-Machine.corp.microsoft.com ([2001:4898:80e8:f:85bb:dfc8:391f:ff73])
-        by smtp.gmail.com with ESMTPSA id x13-20020a17090aa38d00b0024df6bbf5d8sm2151pjp.30.2023.05.15.09.59.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 May 2023 09:59:46 -0700 (PDT)
-From:   Tianyu Lan <ltykernel@gmail.com>
-To:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com
-Cc:     pangupta@amd.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-arch@vger.kernel.org
-Subject: [RFC PATCH V6 14/14] x86/hyperv: Add hyperv-specific handling for VMMCALL under SEV-ES
-Date:   Mon, 15 May 2023 12:59:16 -0400
-Message-Id: <20230515165917.1306922-15-ltykernel@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230515165917.1306922-1-ltykernel@gmail.com>
-References: <20230515165917.1306922-1-ltykernel@gmail.com>
+        with ESMTP id S243392AbjEORC1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 13:02:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E60EF9036
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:00:29 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 241BD62A77
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 17:00:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8533DC433A0;
+        Mon, 15 May 2023 17:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684170022;
+        bh=yaBwlfhHBKhoy9UfTyXssm3QaX93Y5s7wLXz9SfiTQg=;
+        h=From:To:Cc:Subject:Date:From;
+        b=u7tHAFbqO8Z2dIoVQnCdcAnwvfjzoJjhZw75favVb8vk1AvtIj4s8L1qxC9/+3vc2
+         el3bY0Ki9fpogktyL9DxX6760vx2wlnst/w+riF7xVbLGIyxNOu/dbGIyGs/OVN71K
+         8ejLPYcNkIKSvzB4hrFAomogX+N7Mb0wM1YdTBfxw2SNzdcLjr7xfcqNdbuuXApi1J
+         q9fBXm1wB+ywz4W/mzlhT+Xa+Et2rLKY2Y+RaZWOrmoS2yVPQ3ewtECjER09A0+G4o
+         SHd3MLxyb/K1yLsz8n4gYWWw6PV+nb/7WjCjnWNgpJIIllaURxZ/1Im6B2JJYi/BcU
+         G0dDgTBpYDddQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pybYZ-00FIeI-3Y;
+        Mon, 15 May 2023 18:00:20 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm64: Relax trapping of CTR_EL0 when FEAT_EVT is available
+Date:   Mon, 15 May 2023 18:00:16 +0100
+Message-Id: <20230515170016.965378-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Tianyu Lan <tiala@microsoft.com>
+CTR_EL0 can often be used in userspace, and it would be nice if
+KVM didn't have to emulate it unnecessarily.
 
-Add Hyperv-specific handling for faults caused by VMMCALL
-instructions.
+While it isn't possible to trap the cache configuration registers
+indemendently from CTR_EL0 in the base ARMv8.0 architecture, FEAT_EVT
+allows these cache configuration registers (CCSIDR_EL1, CCSIDR2_EL1,
+CLIDR_EL1 and CSSELR_EL1) to be trapped indepdently by setting
+HCR_EL2.TID4.
 
-Signed-off-by: Tianyu Lan <tiala@microsoft.com>
+Switch to using TID4 instead of TID2 in the cases where FEAT_EVT
+is available *and* that KVM doesn't need to sanitise CTR_EL0 to
+paper over mismatched cache configurations.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/x86/kernel/cpu/mshyperv.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ arch/arm64/include/asm/kvm_arm.h     |  2 +-
+ arch/arm64/include/asm/kvm_emulate.h |  6 ++++++
+ arch/arm64/kernel/cpufeature.c       | 11 +++++++++++
+ arch/arm64/tools/cpucaps             |  1 +
+ 4 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyperv.c
-index 0c5f9f7bd7ba..3469b369e627 100644
---- a/arch/x86/kernel/cpu/mshyperv.c
-+++ b/arch/x86/kernel/cpu/mshyperv.c
-@@ -32,6 +32,7 @@
- #include <asm/nmi.h>
- #include <clocksource/hyperv_timer.h>
- #include <asm/numa.h>
-+#include <asm/svm.h>
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index baef29fcbeee..209a4fba5d2a 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -86,7 +86,7 @@
+ #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
+ 			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+-			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID2)
++			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3)
+ #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+ #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
+ #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index b31b32ecbe2d..a08291051ac9 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -95,6 +95,12 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.hcr_el2 |= HCR_TVM;
+ 	}
  
- /* Is Linux running as the root partition? */
- bool hv_root_partition;
-@@ -577,6 +578,20 @@ static bool __init ms_hyperv_msi_ext_dest_id(void)
- 	return eax & HYPERV_VS_PROPERTIES_EAX_EXTENDED_IOAPIC_RTE;
- }
++	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
++	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE))
++		vcpu->arch.hcr_el2 |= HCR_TID4;
++	else
++		vcpu->arch.hcr_el2 |= HCR_TID2;
++	
+ 	if (vcpu_el1_is_32bit(vcpu))
+ 		vcpu->arch.hcr_el2 &= ~HCR_RW;
  
-+static void hv_sev_es_hcall_prepare(struct ghcb *ghcb, struct pt_regs *regs)
-+{
-+	/* RAX and CPL are already in the GHCB */
-+	ghcb_set_rcx(ghcb, regs->cx);
-+	ghcb_set_rdx(ghcb, regs->dx);
-+	ghcb_set_r8(ghcb, regs->r8);
-+}
-+
-+static bool hv_sev_es_hcall_finish(struct ghcb *ghcb, struct pt_regs *regs)
-+{
-+	/* No checking of the return state needed */
-+	return true;
-+}
-+
- const __initconst struct hypervisor_x86 x86_hyper_ms_hyperv = {
- 	.name			= "Microsoft Hyper-V",
- 	.detect			= ms_hyperv_platform,
-@@ -584,4 +599,6 @@ const __initconst struct hypervisor_x86 x86_hyper_ms_hyperv = {
- 	.init.x2apic_available	= ms_hyperv_x2apic_available,
- 	.init.msi_ext_dest_id	= ms_hyperv_msi_ext_dest_id,
- 	.init.init_platform	= ms_hyperv_init_platform,
-+	.runtime.sev_es_hcall_prepare = hv_sev_es_hcall_prepare,
-+	.runtime.sev_es_hcall_finish = hv_sev_es_hcall_finish,
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index c331c49a7d19..bd184c2cef33 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2783,6 +2783,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		.cpu_enable = cpu_enable_dit,
+ 	},
++	{
++		.desc = "Extended Virtualization Traps",
++		.capability = ARM64_HAS_EVT,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.sys_reg = SYS_ID_AA64MMFR2_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR2_EL1_EVT_SHIFT,
++		.field_width = 4,
++		.min_field_value = ID_AA64MMFR2_EL1_EVT_IMP,
++		.matches = has_cpuid_feature,
++	},
+ 	{},
  };
+ 
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 40ba95472594..606d1184a5e9 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -25,6 +25,7 @@ HAS_E0PD
+ HAS_ECV
+ HAS_ECV_CNTPOFF
+ HAS_EPAN
++HAS_EVT
+ HAS_GENERIC_AUTH
+ HAS_GENERIC_AUTH_ARCH_QARMA3
+ HAS_GENERIC_AUTH_ARCH_QARMA5
 -- 
-2.25.1
+2.34.1
 
