@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37A89702173
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 04:15:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3363970216B
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 04:15:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238146AbjEOCPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 May 2023 22:15:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53334 "EHLO
+        id S237524AbjEOCPj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 May 2023 22:15:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234226AbjEOCPc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 14 May 2023 22:15:32 -0400
+        with ESMTP id S231910AbjEOCPb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 May 2023 22:15:31 -0400
 Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2AC5E1712;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 29F7310F0;
         Sun, 14 May 2023 19:15:27 -0700 (PDT)
 Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8Cxe+q9lWFkR68IAA--.14800S3;
-        Mon, 15 May 2023 10:15:25 +0800 (CST)
+        by gateway (Coremail) with SMTP id _____8Cxe+q+lWFkV68IAA--.14801S3;
+        Mon, 15 May 2023 10:15:26 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxn7O6lWFk0KJeAA--.33838S5;
-        Mon, 15 May 2023 10:15:24 +0800 (CST)
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxn7O6lWFk0KJeAA--.33838S6;
+        Mon, 15 May 2023 10:15:25 +0800 (CST)
 From:   Tianrui Zhao <zhaotianrui@loongson.cn>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Huacai Chen <chenhuacai@kernel.org>
@@ -31,32 +31,32 @@ Cc:     WANG Xuerui <kernel@xen0n.name>,
         Alex Deucher <alexander.deucher@amd.com>,
         Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
         Xi Ruoyao <xry111@xry111.site>, zhaotianrui@loongson.cn
-Subject: [PATCH v10 03/30] LoongArch: KVM: Implement kvm hardware enable, disable interface
-Date:   Mon, 15 May 2023 10:14:55 +0800
-Message-Id: <20230515021522.2445551-4-zhaotianrui@loongson.cn>
+Subject: [PATCH v10 04/30] LoongArch: KVM: Implement VM related functions
+Date:   Mon, 15 May 2023 10:14:56 +0800
+Message-Id: <20230515021522.2445551-5-zhaotianrui@loongson.cn>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230515021522.2445551-1-zhaotianrui@loongson.cn>
 References: <20230515021522.2445551-1-zhaotianrui@loongson.cn>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8Dxn7O6lWFk0KJeAA--.33838S5
+X-CM-TRANSID: AQAAf8Dxn7O6lWFk0KJeAA--.33838S6
 X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvJXoW7Ar4DJrWxKFW5ZFyDAF4kCrg_yoW8tF4fpr
-        W7AFW5Ary5tr1SgF93J3Zxtr13GrWvgay7Za12ya45Xw4j9F4rXF95Kr9rJFy5W3y8XF1S
-        v39ayFyF9F1DAwUanT9S1TB71UUUUjUqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+X-Coremail-Antispam: 1Uk129KBjvJXoW7KFWrZF1xWFWkKF1fAF4rAFb_yoW5JF1kpF
+        1UCa95Kr4rX3s7trn3J3yDuw1S9393Wry8J342v345CFnxtrn5JFy0yry5GFWDJ34ruryf
+        Xa4aqwnI9a4Yy3DanT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
         qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
-        bwxFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4
+        b48Fc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4
         AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF
         7I0E14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6x
-        kF7I0E14v26r4UJVWxJr1ln4kS14v26r1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l
+        kF7I0E14v26r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l
         57IF6xkI12xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6x8ErcxFaV
-        Av8VWrMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCF04k20xvY0x0EwIxG
-        rwCF04k20xvE74AGY7Cv6cx26rWl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI
-        0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-        1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Xr0_Ar1lIx
-        AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-        42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
-        evJa73UjIFyTuYvj4RKtC7UUUUU
+        Av8VWrMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY1x0262kKe7AKxVWU
+        AVWUtwCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26rWl4I8I3I0E4IkC6x0Yz7
+        v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+        x0cI8IcVAFwI0_Ar0_tr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAI
+        w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x
+        0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7xRiTKZJUUUUU==
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
         SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
@@ -66,89 +66,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement kvm hardware enable, disable interface, setting
-the guest config register to enable virtualization features
-when called the interface.
+Implement LoongArch VM operations: Init and destroy vm interface,
+allocating memory page to save the vm pgd when init vm. Implement
+vm check extension, such as getting vcpu number info, memory slots
+info, and fpu info. And implement vm status description.
 
 Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 ---
- arch/loongarch/kvm/main.c | 63 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+ arch/loongarch/kvm/vm.c | 78 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 78 insertions(+)
+ create mode 100644 arch/loongarch/kvm/vm.c
 
-diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
-index 228d21dc40ae..08e8ec497660 100644
---- a/arch/loongarch/kvm/main.c
-+++ b/arch/loongarch/kvm/main.c
-@@ -188,6 +188,69 @@ static void _kvm_init_gcsr_flag(void)
- 	set_gcsr_sw_flag(LOONGARCH_CSR_PERFCNTR3);
- }
- 
-+void kvm_init_vmcs(struct kvm *kvm)
+diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
+new file mode 100644
+index 000000000000..43688a04ab78
+--- /dev/null
++++ b/arch/loongarch/kvm/vm.c
+@@ -0,0 +1,78 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
++ */
++
++#include <linux/kvm_host.h>
++
++#define KVM_LOONGARCH_VERSION 1
++
++const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
++	KVM_GENERIC_VM_STATS(),
++};
++
++const struct kvm_stats_header kvm_vm_stats_header = {
++	.name_size = KVM_STATS_NAME_SIZE,
++	.num_desc = ARRAY_SIZE(kvm_vm_stats_desc),
++	.id_offset =  sizeof(struct kvm_stats_header),
++	.desc_offset = sizeof(struct kvm_stats_header) + KVM_STATS_NAME_SIZE,
++	.data_offset = sizeof(struct kvm_stats_header) + KVM_STATS_NAME_SIZE +
++					sizeof(kvm_vm_stats_desc),
++};
++
++int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
 +{
-+	kvm->arch.vmcs = vmcs;
-+}
++	/* Allocate page table to map GPA -> RPA */
++	kvm->arch.gpa_mm.pgd = kvm_pgd_alloc();
++	if (!kvm->arch.gpa_mm.pgd)
++		return -ENOMEM;
 +
-+long kvm_arch_dev_ioctl(struct file *filp,
-+			unsigned int ioctl, unsigned long arg)
-+{
-+	return -ENOIOCTLCMD;
-+}
-+
-+#ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
-+int kvm_arch_hardware_enable(void)
-+{
-+	unsigned long gcfg = 0;
-+
-+	/* First init gtlbc, gcfg, gstat, gintc. All guest use the same config */
-+	clear_csr_gtlbc(CSR_GTLBC_USETGID | CSR_GTLBC_TOTI);
-+	write_csr_gcfg(0);
-+	write_csr_gstat(0);
-+	write_csr_gintc(0);
-+
-+	/*
-+	 * Enable virtualization features granting guest direct control of
-+	 * certain features:
-+	 * GCI=2:       Trap on init or unimplement cache instruction.
-+	 * TORU=0:      Trap on Root Unimplement.
-+	 * CACTRL=1:    Root control cache.
-+	 * TOP=0:       Trap on Previlege.
-+	 * TOE=0:       Trap on Exception.
-+	 * TIT=0:       Trap on Timer.
-+	 */
-+	if (cpu_has_gcip_all)
-+		gcfg |= CSR_GCFG_GCI_SECURE;
-+	if (cpu_has_matc_root)
-+		gcfg |= CSR_GCFG_MATC_ROOT;
-+
-+	gcfg |= CSR_GCFG_TIT;
-+	write_csr_gcfg(gcfg);
-+
-+	kvm_flush_tlb_all();
-+
-+	/* Enable using TGID  */
-+	set_csr_gtlbc(CSR_GTLBC_USETGID);
-+	kvm_debug("gtlbc:%llx gintc:%llx gstat:%llx gcfg:%llx",
-+			read_csr_gtlbc(), read_csr_gintc(),
-+			read_csr_gstat(), read_csr_gcfg());
-+
++	kvm_init_vmcs(kvm);
++	kvm->arch.gpa_size = BIT(cpu_vabits - 1);
 +	return 0;
 +}
 +
-+void kvm_arch_hardware_disable(void)
++void kvm_arch_destroy_vm(struct kvm *kvm)
 +{
-+	clear_csr_gtlbc(CSR_GTLBC_USETGID | CSR_GTLBC_TOTI);
-+	write_csr_gcfg(0);
-+	write_csr_gstat(0);
-+	write_csr_gintc(0);
-+
-+	/* Flush any remaining guest TLB entries */
-+	kvm_flush_tlb_all();
++	kvm_destroy_vcpus(kvm);
++	_kvm_destroy_mm(kvm);
 +}
-+#endif
 +
- static int kvm_loongarch_env_init(void)
- {
- 	struct kvm_context *context;
++int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
++{
++	int r;
++
++	switch (ext) {
++	case KVM_CAP_ONE_REG:
++	case KVM_CAP_ENABLE_CAP:
++	case KVM_CAP_READONLY_MEM:
++	case KVM_CAP_SYNC_MMU:
++	case KVM_CAP_IMMEDIATE_EXIT:
++	case KVM_CAP_IOEVENTFD:
++	case KVM_CAP_MP_STATE:
++		r = 1;
++		break;
++	case KVM_CAP_NR_VCPUS:
++		r = num_online_cpus();
++		break;
++	case KVM_CAP_MAX_VCPUS:
++		r = KVM_MAX_VCPUS;
++		break;
++	case KVM_CAP_MAX_VCPU_ID:
++		r = KVM_MAX_VCPU_IDS;
++		break;
++	case KVM_CAP_NR_MEMSLOTS:
++		r = KVM_USER_MEM_SLOTS;
++		break;
++	default:
++		r = 0;
++		break;
++	}
++
++	return r;
++}
++
++int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
++{
++	return -ENOIOCTLCMD;
++}
 -- 
 2.31.1
 
