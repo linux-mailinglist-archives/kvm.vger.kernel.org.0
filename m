@@ -2,114 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C22E702BE4
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 13:55:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C29BE702BF9
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 13:56:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230342AbjEOLy4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 07:54:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50296 "EHLO
+        id S241599AbjEOLzx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 07:55:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241256AbjEOLye (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 07:54:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45ED45FDE
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 04:43:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CF26D622FA
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 11:42:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4039C433EF;
-        Mon, 15 May 2023 11:42:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684150979;
-        bh=UwXA51cUOqHr2O0y8aV9fxZOLviMaAOAKrM3IfbYbAk=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=JH6UYS6CPmMu5V8OzIWZoTX4OoNLrR9CWkSPjGLPU7IkYVRVuJ+zArYgUm0bha0Z2
-         ZA6TyxrHj4OJbjNKEuaNUoLLO383sGJwpTiqF4emj2nyp0KIvqggU77ckohaOTsMcX
-         U5ycecIxk5EqvinxLa9Vj8fUJO4er4/mglb0GVHzXqK42rvTXuoOkA6064a8AL/jj2
-         As2z82Q8DSePHOTqplTBFNzgZtN2lYjtdF4gWqd8a3m+PAGc+3z2O+/fI/8Ln79wbQ
-         /NiV2MH3r1/cjkjE/NkmaF5zuuNfTYBT8KoqaMLvzEvqlU4PaHQF1AxxTGxlNlEKeV
-         dK3lxORxuFBzw==
-From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
-        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Guo Ren <guoren@kernel.org>
-Subject: Re: [PATCH -next v19 21/24] riscv: Add sysctl to set the default
- vector rule for new processes
-In-Reply-To: <20230509103033.11285-22-andy.chiu@sifive.com>
-References: <20230509103033.11285-1-andy.chiu@sifive.com>
- <20230509103033.11285-22-andy.chiu@sifive.com>
-Date:   Mon, 15 May 2023 13:42:56 +0200
-Message-ID: <87mt25hlbz.fsf@all.your.base.are.belong.to.us>
+        with ESMTP id S241501AbjEOLz1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 07:55:27 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C8130C4;
+        Mon, 15 May 2023 04:48:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=n5/swiT08Y26j0t7CBJZ7PvSqO
+        DQLkLauK9MFy5aaB7j19TglgfjeCHSVW2kgO1eG9Ya3XIn+wt0Wed+Z3wFb/m5D0Su3xMQvVtMdVp
+        0dotpE7Uoj81Fe8D74tpRFhk7oPBBZLHunOTpfy3v6inHgv6v7+khEx8CqFFdPGgbrgoQqmw3s/T8
+        VFrBPzjPen2cxXNIIT0unAWBGhbcMegPFXHLJHKfCTR1I/aGXaCSZ5JqvImBREGxyO4cSeNPONsnr
+        lcV+csmX472tjoo96u4m1obyrV7CSwZYAaGxAH4RF1O4RvSVn11IFNcxfiNnLUSYaF7tKnfVefP2i
+        SnpYckwg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pyWgN-0021iX-1W;
+        Mon, 15 May 2023 11:48:03 +0000
+Date:   Mon, 15 May 2023 04:48:03 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Lorenzo Stoakes <lstoakes@gmail.com>
+Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Hildenbrand <david@redhat.com>, x86@kernel.org,
+        linux-sgx@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, Xinhui Pan <Xinhui.Pan@amd.com>,
+        David Airlie <airlied@gmail.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dimitri Sivanich <dimitri.sivanich@hpe.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Christian Konig <christian.koenig@amd.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v5 1/6] mm/gup: remove unused vmas parameter from
+ get_user_pages()
+Message-ID: <ZGIb8wTIAFOdtI5L@infradead.org>
+References: <cover.1684097001.git.lstoakes@gmail.com>
+ <b61d5999a4fc6d50b7e073cc3c3efa8fe79bbd94.1684097002.git.lstoakes@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b61d5999a4fc6d50b7e073cc3c3efa8fe79bbd94.1684097002.git.lstoakes@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Andy Chiu <andy.chiu@sifive.com> writes:
+Looks good:
 
-> To support Vector extension, the series exports variable-length vector
-> registers on the signal frame. However, this potentially breaks abi if
-> processing vector registers is required in the signal handler for old
-> binaries. For example, there is such need if user-level context switch
-> is triggerred via signals[1].
->
-> For this reason, it is best to leave a decision to distro maintainers,
-> where the enablement of userspace Vector for new launching programs can
-> be controlled. Developers may also need the switch to experiment with.
-> The parameter is configurable through sysctl interface so a distro may
-> turn off Vector early at init script if the break really happens in the
-> wild.
->
-> The switch will only take effects on new execve() calls once set. This
-> will not effect existing processes that do not call execve(), nor
-> processes which has been set with a non-default vstate_ctrl by making
-> explicit PR_RISCV_V_SET_CONTROL prctl() calls.
->
-> Link: https://lore.kernel.org/all/87cz4048rp.fsf@all.your.base.are.belong=
-.to.us/
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> Reviewed-by: Greentime Hu <greentime.hu@sifive.com>
-> Reviewed-by: Vincent Chen <vincent.chen@sifive.com>
-> ---
->  arch/riscv/kernel/vector.c | 31 +++++++++++++++++++++++++++++++
->  1 file changed, 31 insertions(+)
->
-> diff --git a/arch/riscv/kernel/vector.c b/arch/riscv/kernel/vector.c
-> index 16ccb35625a9..1c4ac821e008 100644
-> --- a/arch/riscv/kernel/vector.c
-> +++ b/arch/riscv/kernel/vector.c
-> @@ -233,3 +233,34 @@ unsigned int riscv_v_vstate_ctrl_set_current(unsigne=
-d long arg)
->=20=20
->  	return -EINVAL;
->  }
-> +
-> +#ifdef CONFIG_SYSCTL
-> +
-> +static struct ctl_table riscv_v_default_vstate_table[] =3D {
-> +	{
-> +		.procname	=3D "riscv_v_default_allow",
-> +		.data		=3D &riscv_v_implicit_uacc,
-
-Now that riscv_v_implicit_uacc can be changed via sysctl, I'd add
-explicit READ_ONCE() to the accesses to make race checkers happy.
-
-
-Bj=C3=B6rn
+Reviewed-by: Christoph Hellwig <hch@lst.de>
