@@ -2,119 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E45B70248F
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 08:24:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E53D1702587
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 08:57:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239657AbjEOGYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 02:24:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56888 "EHLO
+        id S239907AbjEOG5K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 02:57:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239350AbjEOGYn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 02:24:43 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C6CA9F;
-        Sun, 14 May 2023 23:24:40 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-52caed90d17so7778091a12.0;
-        Sun, 14 May 2023 23:24:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684131880; x=1686723880;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ipVfxboz2N3BTbhUZctFrasYMvC8E8GR8fiHDB5wG9A=;
-        b=K/Ds5UQDShQ1jfqjq8VIbQzq9KL8b4ueLhmM+jbfvGykQOm9udF30CIzh7yLh0AyyW
-         VYx2xlivf2OSEdspjfb8Gx7JMtCBsJInxMc/fFczq4kfjpAo0USZOFUZc6QxtZNJ4j3N
-         E79DBz4t+N8DzEbdPJRBFSlFxD+9mq6SDrSMmmWHAeKYSgfnh2tpWRcuuT+67GCsSXQ/
-         FP3HV5EZfoM11bfhNw1pyATMs6J2zLTpG+S2im1DBjb52UWpC5TQMtLjdJSk97kejt+d
-         ZrAzPOBGlVVTLZU9eegXT+l0o/7mv0ugLJBck6gy/AjW0mGGRfvrYJoYuhwH2BEWATXt
-         pymQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684131880; x=1686723880;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ipVfxboz2N3BTbhUZctFrasYMvC8E8GR8fiHDB5wG9A=;
-        b=Ob1oLNPv7UZCEYzxzV8UVeAv28qv3ZYiSly+mgYgoAKTiea9/Hnb1a45lINmSixoFS
-         hU12ipxaDR9Hur4wq2aT1G3LiLEB+aAbuAiggi7/5dWEghuwEo/bl/WOBM6YoAjdpaFe
-         NrD4P4a9gNb+OT75yYUWsxcKOMqkVAhWUEYXo0G3Uex+4O2stBsZ9W3FpWjFpggbfdnc
-         mDq6SyodrLnpI94fw0NYZSFPXpvUa38BmHSo0EeLikh6dUqpUtmHPSu7Y0XxgltX2Dws
-         7JwsT4sPrW5M22Q86IhkbAmAtUYEHZP4QlwPYdoYCv00no3Ld+rQtPkBM4MYN91Xlv66
-         ExBA==
-X-Gm-Message-State: AC+VfDyuMyne+u4KCGcf9EUjW7qw5v5d9uL3OwpL0tKF76HGBRPbVUus
-        G39kWewu1LGu4AXltoIYRtxmxOlkDG0I/NGMXSA=
-X-Google-Smtp-Source: ACHHUZ4wRiCLeYPgQOiKNNvZY75L/XiRY4hGc1xrqkwiizwTTiO+743uCn+9bRYh7GxEKf2LBVi2VCi/iVrz18zFAOQ=
-X-Received: by 2002:a17:90a:d48d:b0:252:a7b5:723f with SMTP id
- s13-20020a17090ad48d00b00252a7b5723fmr11803679pju.2.1684131879992; Sun, 14
- May 2023 23:24:39 -0700 (PDT)
+        with ESMTP id S238487AbjEOG4y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 02:56:54 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 439EE3C18;
+        Sun, 14 May 2023 23:55:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684133747; x=1715669747;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=qIXmvd3j2fVBKbZUcUDrV/9yPn2Cw2z7HN8LPIqTArs=;
+  b=meHf5U13YsSsQPSPoQVM3qcMS5QrhSAwj3x2REFDZ1A6Mg0THQjeptFE
+   Ji3RndyAkHEPnQkk3YIBZVwxGL21Ms0xtoMX/ZEzOTTjg4bJPAQy4xP03
+   ebp99jE9wvG4/yuuYRUewOsBOP3YoHVn+UkXWcsZFINQ0fQ9WWAi6P7QO
+   Bg5ZyVDKkqIRRpVcTHkkLnigj/5Oct3xP4SpGf5Ipo4xWLVHEDQAlG3Pz
+   3649TyBD5qJxn8LlhtO/pXRD+644En0xHqfHxhoFMAezb6501tY+P7Xye
+   GzFunY5jQYxjQq5fD7f9ypUpjfA3iccAhtvXmKyOtowpD6eCMrBJd6tCx
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10710"; a="354285220"
+X-IronPort-AV: E=Sophos;i="5.99,275,1677571200"; 
+   d="scan'208";a="354285220"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2023 23:53:13 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10710"; a="845128369"
+X-IronPort-AV: E=Sophos;i="5.99,275,1677571200"; 
+   d="scan'208";a="845128369"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.254.214.85]) ([10.254.214.85])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2023 23:53:10 -0700
+Message-ID: <a88b2504-b79b-83d6-383e-a948f9da662b@intel.com>
+Date:   Mon, 15 May 2023 14:53:07 +0800
 MIME-Version: 1.0
-References: <cover.1683791148.git.haibo1.xu@intel.com> <921fc2e1a91887170e277acb1b52df57480a5736.1683791148.git.haibo1.xu@intel.com>
- <20230511-boozy-comic-5bc8f297dc8e@spud> <20230511-leverage-backspin-34bcde885006@spud>
-In-Reply-To: <20230511-leverage-backspin-34bcde885006@spud>
-From:   Haibo Xu <xiaobo55x@gmail.com>
-Date:   Mon, 15 May 2023 14:24:28 +0800
-Message-ID: <CAJve8okYNEbk2PwXVzx+dMSq+uci=W_tpShNv3FER=pWRUymWw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] riscv: kvm: Add KVM_GET_REG_LIST API support
-To:     Conor Dooley <conor@kernel.org>
-Cc:     Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.10.1
+Subject: Re: [RFC PATCH v2 02/11] KVM: x86: Advertise CPUID.7.2.EDX and
+ RRSBA_CTRL support
+Content-Language: en-US
+To:     Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org
+Cc:     Jiaan Lu <jiaan.lu@intel.com>, Zhang Chen <chen.zhang@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+References: <20230414062545.270178-1-chao.gao@intel.com>
+ <20230414062545.270178-3-chao.gao@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20230414062545.270178-3-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 12, 2023 at 6:48=E2=80=AFAM Conor Dooley <conor@kernel.org> wro=
-te:
->
-> On Thu, May 11, 2023 at 11:25:41PM +0100, Conor Dooley wrote:
-> > On Thu, May 11, 2023 at 05:22:48PM +0800, Haibo Xu wrote:
-> > > KVM_GET_REG_LIST API will return all registers that are available to
-> > > KVM_GET/SET_ONE_REG APIs. It's very useful to identify some platform
-> > > regression issue during VM migration.
-> > >
-> > > Since this API was already supported on arm64, it'd be straightforwar=
-d
-> > > to enable it on riscv with similar code structure.
-> >
-> > Applied on top of v6.4-rc1 this breaks the build :/
->
-> I lied, I forgot W=3D1 is enabled for the allmodconfig builds in the
-> patchwork automation.
-> The warnings are trivial to fix, so you should fix them anyway!
->
+On 4/14/2023 2:25 PM, Chao Gao wrote:
+> From: Zhang Chen <chen.zhang@intel.com>
+> 
+> Add a kvm-only CPUID feature leaf for CPUID.7.2.EDX and RRSBA_CTRL
+> as the first feature in the leaf.
+> 
+> RRSBA_CTRL is enumerated by CPUID.7.2.EDX[2]. If supported, RRSBA_DIS_U
+> (bit 5) and RRSBA_DIS_S (bit 6) of IA32_SPEC_CTRL MSR can be used to
+> disable RRSBA behavior for CPL3 and CPL0/1/2 respectively.
+> 
+> Note that KVM does not intercept guests' IA32_SPEC_CTRL MSR accesses
+> after a non-zero is written to the MSR. Therefore, guests can already
+> toggle the two bits if the host supports RRSBA_CTRL, and no extra code
+> is needed to allow guests to toggle the two bits.
 
-sure, I will fix them in the next version.
+This is a bug that also matters with other bits in MSR_IA32_SPEC_CTRL 
+which has a dedicated enumeration CPUID bit and no support in KVM yet.
 
-Thanks,
-Haibo
+I think we need to fix this bug at first.
 
-> > warning: Function parameter or member 'vcpu' not described in 'kvm_risc=
-v_vcpu_num_regs'
-> > warning: Function parameter or member 'uindices' not described in 'kvm_=
-riscv_vcpu_copy_reg_indices'
-> > warning: Function parameter or member 'vcpu' not described in 'kvm_risc=
-v_vcpu_copy_reg_indices'
-> >
-> > You have a bunch of kerneldoc comments (the ones with /**) that are not
-> > valid kerneldoc. Apparently allmodconfig catches that!
-> >
-> > Cheers,
-> > Conor.
->
->
+> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Tested-by: Jiaan Lu <jiaan.lu@intel.com>
+> ---
+>   arch/x86/kvm/cpuid.c         | 22 +++++++++++++++++++---
+>   arch/x86/kvm/reverse_cpuid.h |  7 +++++++
+>   2 files changed, 26 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 9583a110cf5f..f024c3ac2203 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -685,6 +685,10 @@ void kvm_set_cpu_caps(void)
+>   		SF(SGX1) | SF(SGX2) | SF(SGX_EDECCSSA)
+>   	);
+>   
+> +	kvm_cpu_cap_init_kvm_defined(CPUID_7_2_EDX,
+> +		SF(RRSBA_CTRL)
+> +	);
+> +
+
+Please move this hook up to right follow the leaf CPUID_7_1_EAX.
+
+>   	kvm_cpu_cap_mask(CPUID_8000_0001_ECX,
+>   		F(LAHF_LM) | F(CMP_LEGACY) | 0 /*SVM*/ | 0 /* ExtApicSpace */ |
+>   		F(CR8_LEGACY) | F(ABM) | F(SSE4A) | F(MISALIGNSSE) |
+> @@ -949,13 +953,14 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>   		break;
+>   	/* function 7 has additional index. */
+>   	case 7:
+> -		entry->eax = min(entry->eax, 1u);
+> +		entry->eax = min(entry->eax, 2u);
+>   		cpuid_entry_override(entry, CPUID_7_0_EBX);
+>   		cpuid_entry_override(entry, CPUID_7_ECX);
+>   		cpuid_entry_override(entry, CPUID_7_EDX);
+>   
+> -		/* KVM only supports 0x7.0 and 0x7.1, capped above via min(). */
+> -		if (entry->eax == 1) {
+> +		max_idx = entry->eax;
+> +
+> +		if (max_idx >= 1) {
+>   			entry = do_host_cpuid(array, function, 1);
+>   			if (!entry)
+>   				goto out;
+> @@ -965,6 +970,17 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>   			entry->ebx = 0;
+>   			entry->ecx = 0;
+>   		}
+> +
+> +		if (max_idx >= 2) {
+> +			entry = do_host_cpuid(array, function, 2);
+> +			if (!entry)
+> +				goto out;
+> +
+> +			cpuid_entry_override(entry, CPUID_7_2_EDX);
+> +			entry->eax = 0;
+> +			entry->ebx = 0;
+> +			entry->ecx = 0;
+> +		}
+>   		break;
+>   	case 0xa: { /* Architectural Performance Monitoring */
+>   		union cpuid10_eax eax;
+> diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+> index a5717282bb9c..72bad8314a9c 100644
+> --- a/arch/x86/kvm/reverse_cpuid.h
+> +++ b/arch/x86/kvm/reverse_cpuid.h
+> @@ -15,6 +15,7 @@ enum kvm_only_cpuid_leafs {
+>   	CPUID_12_EAX	 = NCAPINTS,
+>   	CPUID_7_1_EDX,
+>   	CPUID_8000_0007_EDX,
+> +	CPUID_7_2_EDX,
+>   	NR_KVM_CPU_CAPS,
+>   
+>   	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+> @@ -47,6 +48,9 @@ enum kvm_only_cpuid_leafs {
+>   /* CPUID level 0x80000007 (EDX). */
+>   #define KVM_X86_FEATURE_CONSTANT_TSC	KVM_X86_FEATURE(CPUID_8000_0007_EDX, 8)
+>   
+> +/* Intel-defined sub-features, CPUID level 0x00000007:2 (EDX) */
+> +#define KVM_X86_FEATURE_RRSBA_CTRL	KVM_X86_FEATURE(CPUID_7_2_EDX, 2)
+> +
+>   struct cpuid_reg {
+>   	u32 function;
+>   	u32 index;
+> @@ -69,6 +73,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
+>   	[CPUID_8000_0007_EBX] = {0x80000007, 0, CPUID_EBX},
+>   	[CPUID_7_EDX]         = {         7, 0, CPUID_EDX},
+>   	[CPUID_7_1_EAX]       = {         7, 1, CPUID_EAX},
+> +	[CPUID_7_2_EDX]       = {         7, 2, CPUID_EDX},
+>   	[CPUID_12_EAX]        = {0x00000012, 0, CPUID_EAX},
+>   	[CPUID_8000_001F_EAX] = {0x8000001f, 0, CPUID_EAX},
+>   	[CPUID_7_1_EDX]       = {         7, 1, CPUID_EDX},
+> @@ -108,6 +113,8 @@ static __always_inline u32 __feature_translate(int x86_feature)
+>   		return KVM_X86_FEATURE_SGX_EDECCSSA;
+>   	else if (x86_feature == X86_FEATURE_CONSTANT_TSC)
+>   		return KVM_X86_FEATURE_CONSTANT_TSC;
+> +	else if (x86_feature == X86_FEATURE_RRSBA_CTRL)
+> +		return KVM_X86_FEATURE_RRSBA_CTRL;
+>   
+>   	return x86_feature;
+>   }
+
