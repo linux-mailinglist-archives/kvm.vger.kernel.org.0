@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE44C703EBF
+	by mail.lfdr.de (Postfix) with ESMTP id 4E061703EBE
 	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 22:46:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245307AbjEOUqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 16:46:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52834 "EHLO
+        id S245292AbjEOUqN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 16:46:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244704AbjEOUqJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 16:46:09 -0400
+        with ESMTP id S242842AbjEOUqI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 16:46:08 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36C1AD1C
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFD99AD13
         for <kvm@vger.kernel.org>; Mon, 15 May 2023 13:46:07 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5793D62472
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 500536325C
         for <kvm@vger.kernel.org>; Mon, 15 May 2023 20:46:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABDBAC4339C;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A951AC4339B;
         Mon, 15 May 2023 20:46:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1684183566;
-        bh=b1oP4ZBP2/2HbNU0ajHcv5Rt9d4QSrPGjjdrWvA8y/I=;
+        bh=fxToMJPXBRwBImuWVs5OjxsfYe0QdWmMyVn4i/4v4BQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=eB7kY22oq4msn/sUyGFbaMA7KrU16seLrxypWZwat+Vwkp3Ct1aCW1E+f0+0pQzeI
-         Z4++1yDsxRRZ8uv4zzCwf3b/9jMyB4uFGptf9UUjjQtR+9AzQob4g0IalImrh/fv5h
-         Kq5K5hiQSwnf2zvQ4QRlzBil4EWZdDXD7JwGOsIBdsJMgKgLsPgXYSWXsnKG55RhO3
-         tgySsKWz8vFAvAUzWyUIIdPkGMkPpna01FngXETNZB96b6a8l1aEAl93sSl7yJSOkx
-         X4Edg7TVzk6lrpvT+XU7IY3mdSXVJWXKVbkATuHsNEwuBO4IQfXxv15cx+rJWaUgK2
-         PSvgMPWdzE14Q==
+        b=o5G04jrCHJKBpu/EONUAdL8S1KrONbGXuhaWrZ6bwd674MNCf8TlMAAXFUQbWvSsq
+         /mHiP1E5YCWaTYPvJfQK+icVi1uKpPYRalw0NNRXWCgX3zXtH/utHlBQx2SBqTYkh8
+         v1RRn/WG8j8AWW5Kpz45ql/hOgCyTAFTmnpbDhzGw9VzbZXq7YI1/M0ZpmaQTZn1cC
+         PSG0dD6lBOAR0uU1f0FZJgB3myKNi0dkqRY363jbz/nX781n8qQjUusJ+GpGxGHZhS
+         0Okf+z/L9OfpFBFQHWYQtwENi1J8DT+RNHF7qMO3WOKk7TPJp7uJTfOwAyZoM7OoKU
+         yv/P7ZeZvmM6g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pyf52-00FM0a-JV;
+        id 1pyf52-00FM0a-PL;
         Mon, 15 May 2023 21:46:04 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     James Morse <james.morse@arm.com>,
@@ -45,9 +45,9 @@ To:     James Morse <james.morse@arm.com>,
 Cc:     Catalin Marinas <catalin.marinas@arm.com>, steven.price@arm.com,
         kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
         kvm@vger.kernel.org
-Subject: [PATCH 1/2] arm64: Add missing Set/Way CMO encodings
-Date:   Mon, 15 May 2023 21:46:00 +0100
-Message-Id: <20230515204601.1270428-2-maz@kernel.org>
+Subject: [PATCH 2/2] KVM: arm64: Handle trap of tagged Set/Way CMOs
+Date:   Mon, 15 May 2023 21:46:01 +0100
+Message-Id: <20230515204601.1270428-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230515204601.1270428-1-maz@kernel.org>
 References: <20230515204601.1270428-1-maz@kernel.org>
@@ -67,32 +67,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the missing Set/Way CMOs that apply to tagged memory.
+We appear to have missed the Set/Way CMOs when adding MTE support.
+Not that we really expect anyone to use them, but you never know
+what stupidity some people can come up with...
+
+Treat these mostly like we deal with the classic S/W CMOs, only
+with an additional check that MTE really is enabled.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index e72d9aaab6b1..eefd712f2430 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -115,8 +115,14 @@
- #define SB_BARRIER_INSN			__SYS_BARRIER_INSN(0, 7, 31)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 71b12094d613..753aa7418149 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -211,6 +211,19 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
  
- #define SYS_DC_ISW			sys_insn(1, 0, 7, 6, 2)
-+#define SYS_DC_IGSW			sys_insn(1, 0, 7, 6, 4)
-+#define SYS_DC_IGDSW			sys_insn(1, 0, 7, 6, 6)
- #define SYS_DC_CSW			sys_insn(1, 0, 7, 10, 2)
-+#define SYS_DC_CGSW			sys_insn(1, 0, 7, 10, 4)
-+#define SYS_DC_CGDSW			sys_insn(1, 0, 7, 10, 6)
- #define SYS_DC_CISW			sys_insn(1, 0, 7, 14, 2)
-+#define SYS_DC_CIGSW			sys_insn(1, 0, 7, 14, 4)
-+#define SYS_DC_CIGDSW			sys_insn(1, 0, 7, 14, 6)
++static bool access_dcgsw(struct kvm_vcpu *vcpu,
++			 struct sys_reg_params *p,
++			 const struct sys_reg_desc *r)
++{
++	if (!kvm_has_mte(vcpu->kvm)) {
++		kvm_inject_undefined(vcpu);
++		return false;
++	}
++
++	/* Treat MTE S/W ops as we treat the classic ones: with contempt */
++	return access_dcsw(vcpu, p, r);
++}
++
+ static void get_access_mask(const struct sys_reg_desc *r, u64 *mask, u64 *shift)
+ {
+ 	switch (r->aarch32_map) {
+@@ -1756,8 +1769,14 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+  */
+ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
++	{ SYS_DESC(SYS_DC_IGSW), access_dcgsw },
++	{ SYS_DESC(SYS_DC_IGDSW), access_dcgsw },
+ 	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
++	{ SYS_DESC(SYS_DC_CGSW), access_dcgsw },
++	{ SYS_DESC(SYS_DC_CGDSW), access_dcgsw },
+ 	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
++	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
++	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
  
- /*
-  * Automatically generated definitions for system registers, the
+ 	DBG_BCR_BVR_WCR_WVR_EL1(0),
+ 	DBG_BCR_BVR_WCR_WVR_EL1(1),
 -- 
 2.34.1
 
