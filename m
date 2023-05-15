@@ -2,256 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EBF5470314F
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 17:17:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5571770320A
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 17:59:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242262AbjEOPRv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 11:17:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60114 "EHLO
+        id S242479AbjEOP7E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 11:59:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242208AbjEOPRt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 11:17:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E8328E
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 08:16:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684163818;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YCwcJkHP2VwXTHNzCgrgxgRUW6C/jeHxPk/Gqy5woUA=;
-        b=CgpraR36VMiI9bErk5eAvoptiy6lUCB5v7EGyujrjw8Mwd1hWEjOgb6NY53oZGd5cnL7LX
-        43jhy3LIysEVcwsohjfwm+L6f7XkkPqSX/4qcaW36ib4mJHMJwcbAE7EGLWTyqEe4+rGKJ
-        765CXAVk+vt2FCho0waIPkVDcJCY8dY=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-550-dlTNkTFsOY2hwVwBI7itLQ-1; Mon, 15 May 2023 11:16:57 -0400
-X-MC-Unique: dlTNkTFsOY2hwVwBI7itLQ-1
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-434817c57d9so201208137.1
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 08:16:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684163816; x=1686755816;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YCwcJkHP2VwXTHNzCgrgxgRUW6C/jeHxPk/Gqy5woUA=;
-        b=j6MNey5+KTt0pIM7ZmyrJjhNsTRgzAPB3+GfqwXizsKIIizHUD7BZ8jixjznr8s+UN
-         M2o15niSTH49RkBkzIcIKr689H1xuQAav98hTUxop2hDRiErBOJj4KZd197A9tfnYiYK
-         W02Z9FZdVhNp6cT7/8LAg6k6+Imbab0A5PV7cz+fxnmH4xXBmOTphivH/3+Og/y94ijD
-         ic7117QEFkJgep/B8i4m9SFSbmBABel6kQc23CjAbZHZNX06SW6aACk4ENKWcy0+6WAA
-         pvjQWDsWQEDkDuoT+M3CHdmgyNfrgNfF/eaDA6eRIZT8eiSllUYoqZIj59SvIqfEae/L
-         L4bQ==
-X-Gm-Message-State: AC+VfDw8y4rvTyU5xcs3YSYBdoqSU6AQoNpDvQ5G1qgtZkBkqsnavevc
-        +rPphXP+TENltEfBr6XuQ9FCNy1CfrOncsFw3v4DA6S2bkEx+YBGDQUx1i0a03/FRlo4muzetEo
-        Rn9kbCyeU59YA
-X-Received: by 2002:a05:6122:997:b0:443:dbd9:793d with SMTP id g23-20020a056122099700b00443dbd9793dmr11025076vkd.1.1684163816083;
-        Mon, 15 May 2023 08:16:56 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5RIGq8qt/SN5aLMHlhA9iOpqU1rzwegJvYxfrc19MpJdS/SVpEbjz0oEsG3xDWVXWwnongjg==
-X-Received: by 2002:a05:6122:997:b0:443:dbd9:793d with SMTP id g23-20020a056122099700b00443dbd9793dmr11025046vkd.1.1684163815688;
-        Mon, 15 May 2023 08:16:55 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-62-70-24-86-62.dsl.bell.ca. [70.24.86.62])
-        by smtp.gmail.com with ESMTPSA id o7-20020a05620a130700b0074df5d787f2sm443qkj.89.2023.05.15.08.16.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 May 2023 08:16:54 -0700 (PDT)
-Date:   Mon, 15 May 2023 11:16:53 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Axel Rasmussen <axelrasmussen@google.com>
-Cc:     David Matlack <dmatlack@google.com>,
-        Anish Moorthy <amoorthy@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Nadav Amit <nadav.amit@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
-        oliver.upton@linux.dev, James Houghton <jthoughton@google.com>,
-        bgardon@google.com, ricarkol@google.com, kvm <kvm@vger.kernel.org>,
-        kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 00/22] Improve scalability of KVM + userfaultfd live
- migration via annotated memory faults.
-Message-ID: <ZGJM5VfMT8iQJa0r@x1n>
-References: <ZFLyGDoXHQrN1CCD@x1n>
- <ZFQC5TZ9tVSvxFWt@x1n>
- <CAF7b7mrTGL8rLVCmsmX4dZinZHRFFB7R7kX0Wv9FZR-B-4xhhw@mail.gmail.com>
- <ZFhO9dlaFQRwaPFa@x1n>
- <CAF7b7mqPdfbzj6cOWPsg+Owysc-SOTF+6UUymd9f0Mctag=8DQ@mail.gmail.com>
- <ZFwRuCuYYMtuUFFA@x1n>
- <CALzav=e29rRw4TTRGpTkazgJpU1zPML3zQGoyeHj9Zbkq+yAdQ@mail.gmail.com>
- <CAJHvVci4VuQ_vdpRKczg4ic6x7eZRXE4+ZUvzO-xU_9VJ1Vqvg@mail.gmail.com>
- <ZF08Zg90emoDJJIp@google.com>
- <CAJHvVciW4NZ6Jztq_ojsQD6vzD1duyXc7VG4iZyMR1-p=V_yzw@mail.gmail.com>
+        with ESMTP id S242514AbjEOP6q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 11:58:46 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2077.outbound.protection.outlook.com [40.107.244.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E2730F0;
+        Mon, 15 May 2023 08:58:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XU+20i5Jw11BG05+Kf5iWbmvUbofMI/3OiF1XMKrKfZ4Q0/Acrp3hzgr11Y4wfQQNxeJXhssP4AODR3XjnHlgppuiPDEpXgVJkl/VjRtvWlyHY3Pxp3KbgOGPFFxnwhEC0R4mKUCzFAC96+JoaaJHvEY/Bzho47cXABATncqBZBBpHoFCRbdaGqGAYLE24U6+Z/164dtujIpOmnP3bdONh32LePIggW0wRnXrkc6N1lnVXrmsqme3jHhCJT7jVbaFDsNnf9CJHus/GvaosVG/wJksCpTX12ZjRuQ11XTZVEpaG5qjJvDQkz+S2+68IG4XZMgfqZaFiUc7jSRUhAX7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lLCdeyfuqkdoWsFvgwI2ZPMmQ7gFAcK9jgiuQU9FpdY=;
+ b=L+eQyqOhDZBZ+Ouyuypu62yznfqKraleWjMbqBChKr2HIDiRXhrZhaInXClH2fHxWlplZAbX2nx51J7k/pOjO9Wun/ozboxcysPOR5kGwK/WlJ1CBxEuh7Ri7ua1b/EfRWEMF4PK4CuuoW6Y9IbOYLSmL5aWzi/QR8pc86ovRycgsjZe6EBfjIrNteAnDxLE8Y629Y+u/Bqdq8jYu1BQD4yIIxFT47BE4xo17W0YRat0S8VseYy8GCwMtxop64+IQ6o68aCMGox900Pd9S8T7QXdn3+IzBV4JkSLklORmH8uwnLFzR09IajuDjbmCGZlp4Gz7lPiZSrvaCinnzjnRA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=linaro.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lLCdeyfuqkdoWsFvgwI2ZPMmQ7gFAcK9jgiuQU9FpdY=;
+ b=ni8fLrWqgNTaKLfgHjOvsQPhUcTSZtdiQPvW4fXGJ1s3XflulfO7mUx9m70+UeLPP4DcVZFvHHyYOSxdmFFRe/G1Rk7QtJ2rijEkbUF1yCbT+N8aYkCL9dw2Nac8foP+Lnbd5QdmzasCcjtQtFnSs9nHlB9ybMdlzlyktYxil7Mc4JGbF5UrlqEIC0Ordr9N206P18z8EN3hVJ5YVI1mMIl7xV7bZMX4sNTk+LzPWHkxJwj4G0iT3nBFGNfmCPGw4JB8A2px4bbMsCaHWQtrkFSIUJe7Cd6a8HuE7cQrsofwW4+n2zwj8Dgrsi2/XYn8WKPGHhPeRqvUe8mEgpYutQ==
+Received: from BN0PR04CA0153.namprd04.prod.outlook.com (2603:10b6:408:eb::8)
+ by LV3PR12MB9093.namprd12.prod.outlook.com (2603:10b6:408:19d::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.30; Mon, 15 May
+ 2023 15:58:10 +0000
+Received: from BN8NAM11FT015.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:eb:cafe::2a) by BN0PR04CA0153.outlook.office365.com
+ (2603:10b6:408:eb::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.30 via Frontend
+ Transport; Mon, 15 May 2023 15:58:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN8NAM11FT015.mail.protection.outlook.com (10.13.176.90) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6411.14 via Frontend Transport; Mon, 15 May 2023 15:58:10 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 15 May 2023
+ 08:57:54 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 15 May
+ 2023 08:57:54 -0700
+Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Mon, 15 May 2023 08:57:53 -0700
+Date:   Mon, 15 May 2023 08:57:52 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Zhangfei Gao <zhangfei.gao@linaro.org>
+CC:     <jgg@nvidia.com>, <robin.murphy@arm.com>, <will@kernel.org>,
+        <eric.auger@redhat.com>, <kevin.tian@intel.com>,
+        <baolu.lu@linux.intel.com>, <joro@8bytes.org>,
+        <shameerali.kolothum.thodi@huawei.com>, <jean-philippe@linaro.org>,
+        <linux-arm-kernel@lists.infradead.org>, <iommu@lists.linux.dev>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <alex.williamson@redhat.com>, <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 00/17] Add Nested Translation Support for SMMUv3
+Message-ID: <ZGJWgFVJDWxVpiBE@Asurada-Nvidia>
+References: <cover.1683688960.git.nicolinc@nvidia.com>
+ <CABQgh9FL4ssQjBJM52_kb0aBVVPb_9Wc0Q+NL1PaQO=2LYBHCA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJHvVciW4NZ6Jztq_ojsQD6vzD1duyXc7VG4iZyMR1-p=V_yzw@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CABQgh9FL4ssQjBJM52_kb0aBVVPb_9Wc0Q+NL1PaQO=2LYBHCA@mail.gmail.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT015:EE_|LV3PR12MB9093:EE_
+X-MS-Office365-Filtering-Correlation-Id: e48d40ec-0f4e-4946-af04-08db555d2ea2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SKe7LsCQHX7Y3rHey3Syi2/3rjtRGNDLi8ArCTEuK9FHJrfvNa7UJzxxDBXlqYclWYPNb3cGYtDrywjcLiNhNNa1cCI/hrTg1XPybrwJSgcHIu7tbMGLnjBjrwhLsIjL65F6JSa/+PbxU23c9znvIvwYbUTnwM3u11bi2fyPjHYDwo5a7s4z7AfpPw130Fw5l249tCGyN0YdRDW0GtLB9CdSmKeRV8LGqFa/I5TCqXZWQqLPPhGGYb5MynEgjAzA3xcYqE5kO+Mok9maSQmu7fVMyVoYmAwKWSvaH7XfJfZTYn+o1NFDwiZlRwCQb9IbYs6zsCg8ZV+hwu04p2MEM5p9f+WtBWsHyUkWR5YOct61EuwT01kxeexZ4lqCFFvJBNgvMZep1zGbLnSVxQ2xJijATRyNXvrZDiynSaROWIFzFHN6nzR6xWpdw9KKxZLvXCHt8F419D/PNaZBUyzOtm6j6qh/7qqWkRYXILTOLFkHJ01Qg66Yn14w9ZeF4F2dCdV0OnKasISNZWxksrt6B6w+aRQ/CiOfUNOaIq3+9K4jQOm/cE17ClPziFe5gPbZJ1opkR96f1pAeiEhUCtJpnn+FKG6JDy6FeU85juMUd5mXWxB+z9Enpl58Qf5py1voNUfxWWl2Rv59paKNI8GvpsVez5RQSAoYjcxGfoo+HBBvZ0Sel9nXKMo8ChJosOceB03vpjcs5AFThdIvTnFoELdNIUILHbKW2e+dlwW/Gjhluir9FoOP1iqvGltZof1w9K+CKhZPWlF/h2aGG7tTp0Z7QIvMdcvEDx3W0o2KJ3xs20721f1tWrdd2c3ROsh
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(136003)(346002)(396003)(376002)(39860400002)(451199021)(46966006)(40470700004)(36840700001)(33716001)(336012)(47076005)(36860700001)(426003)(9686003)(316002)(70586007)(70206006)(55016003)(26005)(966005)(40480700001)(478600001)(54906003)(2906002)(86362001)(186003)(7416002)(8676002)(8936002)(40460700003)(5660300002)(356005)(82740400003)(4326008)(6916009)(41300700001)(7636003)(82310400005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2023 15:58:10.3915
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e48d40ec-0f4e-4946-af04-08db555d2ea2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT015.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9093
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 11, 2023 at 12:45:32PM -0700, Axel Rasmussen wrote:
-> On Thu, May 11, 2023 at 12:05 PM David Matlack <dmatlack@google.com> wrote:
-> >
-> > On Thu, May 11, 2023 at 10:33:24AM -0700, Axel Rasmussen wrote:
-> > > On Thu, May 11, 2023 at 10:18 AM David Matlack <dmatlack@google.com> wrote:
-> > > >
-> > > > On Wed, May 10, 2023 at 2:50 PM Peter Xu <peterx@redhat.com> wrote:
-> > > > > On Tue, May 09, 2023 at 01:52:05PM -0700, Anish Moorthy wrote:
-> > > > > > On Sun, May 7, 2023 at 6:23 PM Peter Xu <peterx@redhat.com> wrote:
-> > > > >
-> > > > > What I wanted to do is to understand whether there's still chance to
-> > > > > provide a generic solution.  I don't know why you have had a bunch of pmu
-> > > > > stack showing in the graph, perhaps you forgot to disable some of the perf
-> > > > > events when doing the test?  Let me know if you figure out why it happened
-> > > > > like that (so far I didn't see), but I feel guilty to keep overloading you
-> > > > > with such questions.
-> > > > >
-> > > > > The major problem I had with this series is it's definitely not a clean
-> > > > > approach.  Say, even if you'll all rely on userapp you'll still need to
-> > > > > rely on userfaultfd for kernel traps on corner cases or it just won't work.
-> > > > > IIUC that's also the concern from Nadav.
-> > > >
-> > > > This is a long thread, so apologies if the following has already been discussed.
-> > > >
-> > > > Would per-tid userfaultfd support be a generic solution? i.e. Allow
-> > > > userspace to create a userfaultfd that is tied to a specific task. Any
-> > > > userfaults encountered by that task use that fd, rather than the
-> > > > process-wide fd. I'm making the assumption here that each of these fds
-> > > > would have independent signaling mechanisms/queues and so this would
-> > > > solve the scaling problem.
-> > > >
-> > > > A VMM could use this to create 1 userfaultfd per vCPU and 1 thread per
-> > > > vCPU for handling userfault requests. This seems like it'd have
-> > > > roughly the same scalability characteristics as the KVM -EFAULT
-> > > > approach.
-> > >
-> > > I think this would work in principle, but it's significantly different
-> > > from what exists today.
-> > >
-> > > The splitting of userfaultfds Peter is describing is splitting up the
-> > > HVA address space, not splitting per-thread.
-> > >
-> > > I think for this design, we'd need to change UFFD registration so
-> > > multiple UFFDs can register the same VMA, but can be filtered so they
-> > > only receive fault events caused by some particular tid(s).
-> > >
-> > > This might also incur some (small?) overhead, because in the fault
-> > > path we now need to maintain some data structure so we can lookup
-> > > which UFFD to notify based on a combination of the address and our
-> > > tid. Today, since VMAs and UFFDs are 1:1 this lookup is trivial.
-> >
-> > I was (perhaps naively) assuming the lookup would be as simple as:
-> >
-> > diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-> > index 44d1ee429eb0..e9856e2ba9ef 100644
-> > --- a/fs/userfaultfd.c
-> > +++ b/fs/userfaultfd.c
-> > @@ -417,7 +417,10 @@ vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason)
-> >          */
-> >         mmap_assert_locked(mm);
-> >
-> > -       ctx = vma->vm_userfaultfd_ctx.ctx;
-> > +       if (current->userfaultfd_ctx)
-> > +               ctx = current->userfaultfd_ctx;
-> > +       else
-> > +               ctx = vma->vm_userfaultfd_ctx.ctx;
-> >         if (!ctx)
-> >                 goto out;
+Hi Zhangfei,
 
-This is an interesting idea, but I'll just double check before I grow
-task_struct and see whether that's the only solution. :)
-
-I'd start with hash(tid) or even hash(pcpu) to choose queue.  In a pinned
-use case hash(pcpu) should probably reach a similar goal here (and I'd
-guess hash(tid) too if vcpus are mostly always created in one shot, just
-slightly trickier).
-
+On Mon, May 15, 2023 at 06:00:26PM +0800, Zhangfei Gao wrote:
+ 
+> I rebased on these two branches and did some basic tests.
 > 
-> Hmm, perhaps. It might have to be more complicated if we want to allow
-> a single task to have both per-TID UFFDs for some addresses, and
-> "global" UFFDs for others.
+> The basic functions work after backport
+> iommufd: Add IOMMU_PAGE_RESPONSE
+> iommufd: Add device fault handler support
 > 
+> https://github.com/Linaro/linux-kernel-warpdrive/tree/uacce-devel-6.4
+> https://github.com/Linaro/qemu/tree/iommufd-6.4-nesting-smmuv3-v2
+
+Thanks for testing!
+
+> However when debugging hotplug PCI device, it still does not work,
+> Segmentation fault same as 6.2.
 > 
+> guest kernel
+> CONFIG_HOTPLUG_PCI_PCIE=y
 > 
-> Actually, while thinking about this, another wrinkle:
+> boot guest (this info does not appear in 6.2)
+> qemu-system-aarch64: -device
+> vfio-pci,host=0000:76:00.1,bus=pci.1,addr=0x0,id=acc1,iommufd=iommufd0:
+> Failed to set data -1
+> qemu-system-aarch64: -device
+> vfio-pci,host=0000:76:00.1,bus=pci.1,addr=0x0,id=acc1,iommufd=iommufd0:
+> failed to set device data
+
+Hmm.. I wonder what fails the set_dev_data ioctl...
+
+> $ sudo nc -U /tmp/qmpm_1.socket
+> (qemu) info pci
+> (qemu) device_del acc1
 > 
-> Imagine we have per-thread UFFDs. Thread X faults on some address, and
-> goes to sleep waiting for its paired resolver thread to resolve the
-> fault.
-> 
-> In the meantime, thread Y also faults on the same address, before the
-> resolution happens.
-> 
-> In the existing model, there is a single UFFD context per VMA, and
-> therefore a single wait queue for all threads to wait on. In the
-> per-TID-UFFD design, now each thread has its own context, and
-> ostensibly its own wait queue (since the wait queue locks are where
-> Anish saw the contention, I think this is exactly what we want to
-> split up). When we have this "multiple threads waiting on the same
-> address" situation, how do we ensure the fault is resolved exactly
-> once? And how do we wake up all of the sleeping threads when it is
-> resolved?
+> guest:
+> qemu-system-aarch64: IOMMU_IOAS_UNMAP failed: No such file or directory
+> qemu-system-aarch64: vfio_container_dma_unmap(0xaaaae1fc0380,
+> 0x8000000000, 0x10000) = -2 (No such file or directory)
 
-We probably need to wake them one by one in that case.  The 2nd-Nth
-UFFDIO_COPY/CONTINUE will fail with -EEXIST anyway, then the userapp will
-need a UFFDIO_WAKE I assume.
+This is resulted from the following commit that we should
+drop later:
 
-> 
-> I'm sure it's solvable, but especially doing it without any locks /
-> contention seems like it could be a bit complicated.
+commit c4fd2efd7c02dd30491adf676c1b0aed67656f36
+Author: Yi Liu <yi.l.liu@intel.com>
+Date:   Thu Apr 27 05:47:03 2023 -0700
 
-IMHO no complicated locking is needed.  Here the "complicated locking" is
-done with pgtable lock and it should be reflected by -EEXISTs to userapp.
+    vfio/container: Skip readonly pages
 
-> 
-> >
-> > >
-> > > I think it's worth keeping in mind that a selling point of Anish's
-> > > approach is that it's a very small change. It's plausible we can come
-> > > up with some alternative way to scale, but it seems to me everything
-> > > suggested so far is likely to require a lot more code, complexity, and
-> > > effort vs. Anish's approach.
-> >
-> > Agreed.
-> >
-> > Mostly I think the per-thread UFFD approach would add complexity on the
-> > userspace side of things. With Anish's approach userspace is able to
-> > trivially re-use the vCPU thread (and it's associated pCPU if pinned) to
-> > handle the request. That gets more complicated when juggling the extra
-> > paired threads.
-> >
-> > The per-thread approach would requires a new userfault UAPI change which
-> > I think is a higher bar than the KVM UAPI change proposed here.
-> >
-> > The per-thread approach would require KVM call into slow GUP and take
-> > the mmap_lock before contacting userspace. I'm not 100% convinced that's
-> > a bad thing long term (e.g. it avoids the false-positive -EFAULT exits
-> > in Anish's proposal), but could have performance implications.
-> >
-> > Lastly, inter-thread communication is likely slower than returning to
-> > userspace from KVM_RUN. So the per-thread approach might increase the
-> > end-to-end latency of demand fetches.
+    This is a temparary solution for Intel platform due to an errata in
+    which readonly pages in second stage page table is exclusive with
+    nested support.
 
-Right.  The overhead here is (IMHO):
+    Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 
-  - KVM solution: vcpu exit -> enter again, whatever happens in the
-    procedure of exit/enter will count.
 
-  - mm solution: at least schedule overhead, meanwhile let's hope we can
-    scale first elsewhere (and I'm not sure if there'll be other issues,
-    e.g., even if we can split the uffd queues, hopefully totally nowhere I
-    overlooked that still need the shared uffd context)
+> qemu-system-aarch64: Failed to unset data -1
+> Segmentation fault (core dumped).  // also happened in 6.2
 
-I'm not sure which one will be higher or maybe it depends (e.g., some
-specific cases where vcpu KVM_RUN can have higher overhead when loading?).
+Hmm, would it be possible for you to run the test again by
+adding the following tracers to your QEMU command?
+    --trace "iommufd*" \
+    --trace "smmu*" \
+    --trace "vfio_*" \
+    --trace "pci_*"
 
-Thanks,
-
--- 
-Peter Xu
-
+Thanks
+Nic
