@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79973703A62
-	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 19:50:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6908703A5C
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 19:50:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244880AbjEORu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 13:50:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47766 "EHLO
+        id S244913AbjEORus (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 13:50:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244878AbjEORub (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 13:50:31 -0400
+        with ESMTP id S244128AbjEORu1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 13:50:27 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75A753C32
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:48:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D8DF16EA1
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 10:48:34 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 54ACF62F3C
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 17:48:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8A3AC4339E;
-        Mon, 15 May 2023 17:48:27 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 413426233D
+        for <kvm@vger.kernel.org>; Mon, 15 May 2023 17:48:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5538C433A0;
+        Mon, 15 May 2023 17:48:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684172907;
-        bh=F+9WesFTXCCuJ+1TkWYjP7j2xz7RrQW71dVOswKi8Ss=;
+        s=k20201202; t=1684172902;
+        bh=7fShZrDUash1wyylQ+DkORTt1ZUQvuw5zUThr8G57Ao=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AtdebCxDo3XN7j5GhwI3QRNuGVcxrKZtpYaCf0/tu6FYxp0nJ9qeDvK2k1FCJSvW9
-         OrVu4uRgSFkMTEIKL4xbr6T9XU/WPerXeI+WfWJOgOdONec5suTRcojhT/prb6HcRa
-         nLMP5LoPDZOxE9FzuSmdPRFqrUgpvHZZ7HryFSot8Uy0IyFcjH/cpjhRK9NLxvu0GN
-         OG2izmlTF0QzhqhJYNX/5NsEPpa8nc/QmWn3JMMcdpmstfFNN8zNvAVAmdiydV2gao
-         orRGcGpVOBhHskKEZSRntnMLTWNhxBfFEJU0+vh8anGnw05EAk7YmidI0ku3hD1GlP
-         LWlBtXXbgQtDA==
+        b=HCCFe65/JbZrM3LnhckpOsZALLNvfs6YVmLpNecszwot2dgpN417vMBrQSVP8rwvM
+         eUrbd/yoHBjgwuGBqpDJmSNyTZpxD/f2RndwEhSPN4l9dczB9xbUJWWLq5aYL8SfxM
+         M/WflJw39rv6fkFaEydOL/4N8ngfEy2VBCHbRnuMFNhxFHSkK/4vENW2G4WJxEvOEc
+         CEXc4J4QWn0rPoWpmO2mruzQbG4F7kSzj0bAjyB/F1548bBlVjtjZii1W564OsrWrF
+         saZSANh+TEh4IR9NKoWqao84w3XbAVg+ix2DKdkQJXzKAOlfz6AzAonbTFfeEtnwbz
+         mr15grbOxZZfw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pyc2m-00FJAF-5n;
+        id 1pyc2m-00FJAF-DS;
         Mon, 15 May 2023 18:31:32 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v10 33/59] KVM: arm64: nv: Fold guest's HCR_EL2 configuration into the host's
-Date:   Mon, 15 May 2023 18:30:37 +0100
-Message-Id: <20230515173103.1017669-34-maz@kernel.org>
+Subject: [PATCH v10 34/59] KVM: arm64: nv: Hide RAS from nested guests
+Date:   Mon, 15 May 2023 18:30:38 +0100
+Message-Id: <20230515173103.1017669-35-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230515173103.1017669-1-maz@kernel.org>
 References: <20230515173103.1017669-1-maz@kernel.org>
@@ -75,33 +75,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When entering a L2 guest (nested virt enabled, but not in hypervisor
-context), we need to honor the traps the L1 guest has asked enabled.
-
-For now, just OR the guest's HCR_EL2 into the host's. We may have to do
-some filtering in the future though.
+We don't want to expose complicated features to guests until we have
+a good grasp on the basic CPU emulation. So let's pretend that RAS,
+doesn't exist in a nested guest. We already hide the feature bits,
+let's now make sure VDISR_EL1 will UNDEF.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index c7d083407fae..154d994c1015 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -81,6 +81,11 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 			if (!vcpu_el2_tge_is_set(vcpu))
- 				hcr |= HCR_AT | HCR_TTLB;
- 		}
-+	} else if (vcpu_has_nv(vcpu)) {
-+		u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
-+
-+		vhcr_el2 &= ~HCR_GUEST_NV_FILTER_FLAGS;
-+		hcr |= vhcr_el2;
- 	}
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 1c66f0520ec3..0ed928dfe345 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2391,6 +2391,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(VBAR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(RVBAR_EL2, access_rw, reset_val, 0),
+ 	{ SYS_DESC(SYS_RMR_EL2), trap_undef },
++	{ SYS_DESC(SYS_VDISR_EL2), trap_undef },
  
- 	___activate_traps(vcpu, hcr);
+ 	EL2_REG(CONTEXTIDR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(TPIDR_EL2, access_rw, reset_val, 0),
 -- 
 2.34.1
 
