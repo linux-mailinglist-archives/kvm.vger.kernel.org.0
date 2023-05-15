@@ -2,329 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F96D701FCF
-	for <lists+kvm@lfdr.de>; Sun, 14 May 2023 23:27:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CDDD7020D1
+	for <lists+kvm@lfdr.de>; Mon, 15 May 2023 02:37:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237954AbjENV1c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 May 2023 17:27:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46352 "EHLO
+        id S237784AbjEOAhj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 May 2023 20:37:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237948AbjENV1M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 14 May 2023 17:27:12 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4D9A19AD;
-        Sun, 14 May 2023 14:27:03 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-3078fa679a7so8523692f8f.3;
-        Sun, 14 May 2023 14:27:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684099621; x=1686691621;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8xqzyCEy7iofGcOYzYypeQYEUsssg0r/A+Ok0DOjdDs=;
-        b=aoQGznX+L0dqapBQrZ7tkkNVdcbVvdSJlnUDKwjlWhMHJsKAuaUDUnJC42eQD2DeDX
-         34fO8/v7vg1LUopNvlyFJXzAO8PJUfjM3OQDqGW4BrssZLPdgbji8y3zkxIzTeu5JVw+
-         FV+CRnz59VmbrLGfyt4pGVm2hqrgAeBWO/vmr91k4swlQ7b3D85FRtZxbGcfBOxjKMkn
-         d6RdWLeX4B78nbG17RhE7r0ymv0s8n0GnnM29Du5pRxfNwNAvV4LSbovqFC2br4iXOY0
-         F6V6C6RK12INseuaPzDfQvZ3a4AIEsBo87ya77kVsQ2VR2mFMjFu/AjnVpJftddk4v0z
-         Z6og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684099621; x=1686691621;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8xqzyCEy7iofGcOYzYypeQYEUsssg0r/A+Ok0DOjdDs=;
-        b=lFPxqYFhqRmXmHyxFo1K79Im/VS+q/fEoZ5QLhBd8ubvmulMcRRY3TROkfuP36RUbG
-         +xr6uO8zZyWa3wftZGc7b7qkFeh/hz6jQrnf5NbtDeNEdCQXWIE6ulFOT79a3dce+nJo
-         LsHXiUElyvuGkjkKicUIYG1z4Gwu8ITuttliRA0GU51a2B3wwizQqdKKK5I9VMs2bAhY
-         qsfopKL6Yp1fu27bg+kzWiAlIEpR8lTxLMlTSyoW26bbAGlYUoUnzac8yu7sTYs2CghT
-         /TvCPBtgLfLq3LahxojvzxcBE+8LSssNXH9D1ICHCp5Pn/MlrHV9AiNuK6cE4EZHEl4x
-         dX5Q==
-X-Gm-Message-State: AC+VfDwwGJrQ+ICIo7LvTd8n1kKFZL3AKANYJMQZoOuWEjGtmwPmZA/e
-        HDyTUMBMhgqFctQB/3Z2IrY=
-X-Google-Smtp-Source: ACHHUZ6PRLUWV/JXBbb+jR9+33X81exRRn6i14eei9wAVcEb3WES66stfPnuGtQX6n6Zzc9+QFQNkQ==
-X-Received: by 2002:adf:ec45:0:b0:306:3f97:4847 with SMTP id w5-20020adfec45000000b003063f974847mr21210684wrn.65.1684099621384;
-        Sun, 14 May 2023 14:27:01 -0700 (PDT)
-Received: from lucifer.home ([2a00:23c5:dc8c:8701:1663:9a35:5a7b:1d76])
-        by smtp.googlemail.com with ESMTPSA id d18-20020adfe852000000b002fe13ec49fasm30174117wrn.98.2023.05.14.14.26.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 May 2023 14:27:00 -0700 (PDT)
-From:   Lorenzo Stoakes <lstoakes@gmail.com>
-To:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        David Hildenbrand <david@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>,
-        Christian Benvenuti <benve@cisco.com>,
-        Nelson Escobar <neescoba@cisco.com>,
-        Bernard Metzler <bmt@zurich.ibm.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Bjorn Topel <bjorn@kernel.org>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-        Jonathan Lemon <jonathan.lemon@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, io-uring@vger.kernel.org,
-        bpf@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>,
-        Lorenzo Stoakes <lstoakes@gmail.com>
-Subject: [PATCH v5 5/6] mm/gup: remove vmas parameter from pin_user_pages()
-Date:   Sun, 14 May 2023 22:26:58 +0100
-Message-Id: <acd4a8c735c9bc1c736e1a52a9a036db5cc7d462.1684097002.git.lstoakes@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <cover.1684097001.git.lstoakes@gmail.com>
-References: <cover.1684097001.git.lstoakes@gmail.com>
+        with ESMTP id S229800AbjEOAhh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 May 2023 20:37:37 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A89911D;
+        Sun, 14 May 2023 17:37:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684111056; x=1715647056;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=O3aZJcvntH9iryrNTwrsXSBG4CCIKWDidtKW02vN0hA=;
+  b=WFDhufpasM+XZyu+y/IH0HonZxeNn1Qhx9SBFV828VactVP+DFq3g/2P
+   Sad+oQlFHcakqRW2zrp+jXQbwSPYUf1IQMwMDVcfEGdYCEX47y4z7yIzK
+   61IjJ3OeXnK1b8jsbQyUvBzjAiP/a2OigWQHqJ8N5ILDZI/DY6BnzKblI
+   VL4FaDnS5/+CSVHaTIq447jVQRhvTQbht5riyKSNq9b669PQvV4JASNgV
+   Kx1kCWLwrH/5NRmCDbso2iikb9eezFEyWwpE2oqFbA9DH0EH9s9EBxcRC
+   88Ocwc6UpPvI5sZPwQAEA7wH79MKWw/RGgdl4h4Pd9pSlzMM+K4q/psZF
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10710"; a="414471390"
+X-IronPort-AV: E=Sophos;i="5.99,275,1677571200"; 
+   d="scan'208";a="414471390"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2023 17:37:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10710"; a="790462168"
+X-IronPort-AV: E=Sophos;i="5.99,275,1677571200"; 
+   d="scan'208";a="790462168"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by FMSMGA003.fm.intel.com with ESMTP; 14 May 2023 17:37:31 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Sun, 14 May 2023 17:37:31 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Sun, 14 May 2023 17:37:30 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Sun, 14 May 2023 17:37:30 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.44) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Sun, 14 May 2023 17:37:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Lq2HtDnEraV9fN3kphTIrITM7OITLNj1wujj9nywKwUhRH4RC68qO/RQ8NOhHaVzwUOJzh/gWP7ZzXK5yE0z12d/FDWgKAe85yhsO8zOEqBd3R1O6xhEF7ioyzBXcvplTysPfF09iPxjrZJrL9dZYPJVuhrJN8rAATQsMgjI1parSvQ8KEqQq5BkvzOSrnk6pZJuPZJA3ipIQ3yHbs6oneAYPL1IExpWkw6p9z1eHirL7lhIMMXNS+16276Snke/xTYG/pSVK8w00QquGYV+jvYiifIk8Up/VzJUthe25bvu8EHxa90OAGVKRhjPNUzxCShKQ/lLtZiwexp45aXKrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=O3aZJcvntH9iryrNTwrsXSBG4CCIKWDidtKW02vN0hA=;
+ b=Ux89PaKqndDA/fA+0IzIJvt/mwZGqSRYy/BEB9u1TDATuLNfkaE7N5w8OcG3Qs33oRnNIg2F1IOHCVSFTMIjy9rlh2vI3C8fXsGRp0/5Vx2L1j3myzYNryaUp7zwSrIlmmRlNpQS24kn5M2EKaFege1bJ9jjgyPDCI5Nfue52n67JMFOGYiStEXtVfU5H5XwQbmruznHG2PO1QRin66XlIh16Bv9eAyw8jCcwN3UYPo7kp27dWtRc4TAzmwYfXyWVW3MiMCqOc0vSmlowfgqHgTEAQbPHccrjqcFxkk38oUL4mwlrbqNQbHf0LzUZwAiShCa73XmKok3MkRgCzOU1Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by CH0PR11MB5489.namprd11.prod.outlook.com (2603:10b6:610:d4::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.30; Mon, 15 May
+ 2023 00:37:28 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::3a8a:7ef7:fbaa:19e2]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::3a8a:7ef7:fbaa:19e2%5]) with mapi id 15.20.6387.030; Mon, 15 May 2023
+ 00:37:28 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "Christopherson,, Sean" <seanjc@google.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "guoke@uniontech.com" <guoke@uniontech.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "haiwenyao@uniontech.com" <haiwenyao@uniontech.com>
+Subject: Re: [PATCH v2 5/8] KVM: x86: Use MTRR macros to define possible MTRR
+ MSR ranges
+Thread-Topic: [PATCH v2 5/8] KVM: x86: Use MTRR macros to define possible MTRR
+ MSR ranges
+Thread-Index: AQHZhGEcNSDg8JA/dkmFf9j26efTAK9WchSAgABkvQCAA6tDgA==
+Date:   Mon, 15 May 2023 00:37:27 +0000
+Message-ID: <7972883f69abe6fe61a2e76def6a0a1f1f28228b.camel@intel.com>
+References: <20230511233351.635053-1-seanjc@google.com>
+         <20230511233351.635053-6-seanjc@google.com>
+         <ecbcfb6ca243cf587eb6e61c6e852b4f474a36d7.camel@intel.com>
+         <ZF5qnQQYa6OAI0Hy@google.com>
+In-Reply-To: <ZF5qnQQYa6OAI0Hy@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.48.1 (3.48.1-1.fc38) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|CH0PR11MB5489:EE_
+x-ms-office365-filtering-correlation-id: be8e3c4e-7a36-4574-9bbd-08db54dc8f82
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: oNFUJsaSg145vc4pDmrP88MNKPj58dv9dgzSof08OP5hf/LULlqpS5vwNql8Let/YQx9xZRegx6a7Q2YfBpiKGf/EBwytpP3Jo5r64GQC6BeH9CvBv3vjfDz22IDwfmmdrZHxPFUQeAMXUlx4NCGhBvylskwB05Kl/XYH5H5nDgxFg6V0R0+oTi6FAZl2rtQhiWu2SUJ4VEKl0Vgku13RCwPBr8arNO6yRkceuV0RSepWt37ej5MdIpW6Rc35OknH4sWqZu0pzBpaWDUT2taxXAcbwvRRBBiT6t8w9BLbIV07TjVlWvE5ARGC4h5ZBoKUQ80ubrSlwxz7dAPLhxckvwVHByGb+v68/h4PTm3sIvoPSLEsiBHv+eB/Ti3JpODzgdMR9MUT5w3cpfW9UGS7OJ0c9DwlaLZ3RJcwNJJrRuRN2GVqdm1+Srhp6+q/0xH2zvnUkfcd87xBKxFYOT/fuOe/lDl0NmuDIBWxTWQBJhVUmVH8Txj1+oZkPW2Aj9mQ4oF9r698Y31OJCWnVuRjaSOsq4j7gybmSxww6N3AQzcBsz0u4lJ6/DsiKZ6c9QswOL+y40zIjgkalbJupD3LbuPBu0lYHfQ4jrAudwUXgM=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(396003)(39860400002)(136003)(376002)(346002)(451199021)(36756003)(6486002)(86362001)(91956017)(54906003)(316002)(76116006)(66556008)(66476007)(66446008)(64756008)(6916009)(66946007)(4326008)(966005)(478600001)(71200400001)(8936002)(8676002)(5660300002)(41300700001)(2906002)(38070700005)(82960400001)(122000001)(38100700002)(2616005)(26005)(186003)(6512007)(6506007)(83380400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZnU4SWFEc0VENU9acS90a21wbmVGd0pqdnBUdE9MT1h0eGVrZTBwaHFDYkFl?=
+ =?utf-8?B?U1N4Wk5kOGxJd0dWdW1wdjUzeWJ0VE5vY0lPUW1jZWpZQmV6K09CalFRbVR0?=
+ =?utf-8?B?TUdUVFdrRzdaMm1xRlA3R1lxcDFmTHFocHJaQ1NtTXQxNktVVU50dzZITHRv?=
+ =?utf-8?B?MWVkRjhvT3hENjFzbEFHcHZTZ1g3MXoxbkZxWUZSZ1d2V0pGUWRVdVRINWJz?=
+ =?utf-8?B?LzZTMkh1QUVVL1RKWFJyMUdGNm1OSEF0ZEpRRHREa1RxbUQ4NTEyenZ3cWlZ?=
+ =?utf-8?B?MXZwOGp3SmZRU1Q1NXAvb3hQV0orTGVZSEZDVmlDZGFVaEVMVmdycDZqb1hh?=
+ =?utf-8?B?U3hBQmlGNmxXSnpFR3ZmRjgzL2NzR3BRVkhHbWcvcjZ2TXIxbzM5R24rY0Vl?=
+ =?utf-8?B?Y2FLaTZOSzVYRFQ3dzdBRE5zT2F4K21mUDFvbzk1RXZLTDFLQ25IQW1SOE5y?=
+ =?utf-8?B?TzFaVDdmaFo1TTlqS0pwNjJDZzk4YjhwOCt2N3VLMnBaQ0xHRUJmbDArQjMw?=
+ =?utf-8?B?dldtV2lGRGlNUVBUSWtsZGRzU1IvY3ZnS0ZkUTJpWmt2MlRpL0JFempYd0JI?=
+ =?utf-8?B?c1Q4eHpzQVZ2QnhuTWpXVUs1emNib29hazVma0VqcFliRlFsblQxaUNINk5K?=
+ =?utf-8?B?TDBUKzBzcVJaYWtGWnRGN0xJV2xlQjYvUlh6V1EyZWRqY3hLVHB0QlpxRjg4?=
+ =?utf-8?B?aTdIT3NkVUJoUlhYSHd6VDFHSXNsMDVUcGVVOVZPWXA4U1hsOVlrbSthcVhO?=
+ =?utf-8?B?bHV2TTdwaHVGNGdzQnB2Ull2VkVjQVQ3MWI5UW8vZnBXWmNWNkdsZk5TelVr?=
+ =?utf-8?B?NHk0NndBeG5IV3BNanN0WE9Gek9UN3AraUJTb05uTm1ZYTg5Z09KenRNVlly?=
+ =?utf-8?B?VFpSSUY0SGZ0M3FWbEQ0Y1drT1dSYjNOS1ZDT3NFWnprdkpFeUx5Q0ppTkc4?=
+ =?utf-8?B?d2NiK2ZZVVVJYW9qYUhkeFZPZDhMU1QrTG9QdkgxYW1EUzBnc1NPaS95MThO?=
+ =?utf-8?B?azF3YmZ3UHhBeDFzSmFNRkpvWVlzQ3VRb1d6UDRYaHBEcXppRGNLOXNDUlZ0?=
+ =?utf-8?B?YXlQNFQrWHJoOXdLcDFUVWRsR1FkVGNxRjlnNzlndFdveS83MHh6ajZWZk9a?=
+ =?utf-8?B?T3dpM2lWSmRuK250dUlCcE53SlhmaEFyTzhYVVh2emVrSWVJY2xBbHh1L0t2?=
+ =?utf-8?B?dnUyVVJJVDBCYkduemUxRldxMmxFOEZuRGQvT253eEc0N1Y3dXFMR2I4aE5o?=
+ =?utf-8?B?NTZJSzVkenFtUWFKZ0RiL0VOckwwRkN3dWsyZGdWOTlMZ09uU1FNOGx6dGMv?=
+ =?utf-8?B?R0JQNGlNQVc2OFIxUDFJS0o3YXloQkdiZFhWSDBBakVyY1VNdTFpZndzYWJr?=
+ =?utf-8?B?R05XcFhYQ2ZTQUF6azNIcmVOdWhBQ1gzTnU5U1VwNFVmZCtMaStkeW15ZEMx?=
+ =?utf-8?B?cm43aDI2RVZvMVdmZ3kzaUVrVWhYU0p0ZzZZS0hjNlpFV1BVNEJJS1VXT2dS?=
+ =?utf-8?B?SnNhK1F1MnUyZVF6WFJySzNFQkQ2d242ZXltTTk1b2JQMWJtOWNqMUhENUx4?=
+ =?utf-8?B?aFNYenE3NlBuTUlNYU9ESlllZEhoRjRacnNQbk9mOWZZc08xMGpKaklsTzZF?=
+ =?utf-8?B?bjBSRXV5MS9KRlBVZFBUNXlFQ2RyMlpJTFJvT1NmS016emF6RjBwR3I0SFJq?=
+ =?utf-8?B?UE0wN0h4U2FjRHIzMTlLbjZBd1pXOWV3aUVnbjd5cHRsWG5XVTJmVFdQR3pB?=
+ =?utf-8?B?anV0TGpma1JDK2xoWVFOVnlUTzFrUlZWTW1YdmNkeDFESVViTmFCMXh0b2pu?=
+ =?utf-8?B?NzJvRXZWUEZIZVNHdTBOTWU0M3BjVjduVjRaR2RmZ1dZMFF0aXVFb1FHL2tC?=
+ =?utf-8?B?Y0xoQ0tQQmxLeGk5SDRiajBYRlRwVjZJNUNHaHdVNkJzcjBMQ0t6SUV0bGU2?=
+ =?utf-8?B?VitkRkdENTFjRWZmYW1ucFo4RnprTHFEc0pnMGhHTmFBNUdXdWRSWEk0cDh2?=
+ =?utf-8?B?VUNVczlHZTdiS3dzdjd5eXZMUzNJeTE1TDBEeXZDY01saWRqaWtQaW5NRGdx?=
+ =?utf-8?B?RXZrWkcrMXIwYjRBQ0NZSFdTbTlMczhJQXQ2Nmd5R1RzS2c0dk9zM050ZURy?=
+ =?utf-8?Q?HeNp7B8KwUF1/0CJSSlSp1poG?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7A9D0AF185CBDD4E93AFCB73C74181CB@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: be8e3c4e-7a36-4574-9bbd-08db54dc8f82
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 May 2023 00:37:28.0211
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: I+vsqHbiO9ARiRXtnJsO+GUEnsN/lnhI1DXwDjZ6wjvyK9jNQQOSokFc4Rsy810T5u+mVIaxOTjRIPiiUbEm0A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5489
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We are now in a position where no caller of pin_user_pages() requires the
-vmas parameter at all, so eliminate this parameter from the function and
-all callers.
-
-This clears the way to removing the vmas parameter from GUP altogether.
-
-Acked-by: David Hildenbrand <david@redhat.com>
-Acked-by: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com> (for qib)
-Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
----
- arch/powerpc/mm/book3s64/iommu_api.c       | 2 +-
- drivers/infiniband/hw/qib/qib_user_pages.c | 2 +-
- drivers/infiniband/hw/usnic/usnic_uiom.c   | 2 +-
- drivers/infiniband/sw/siw/siw_mem.c        | 2 +-
- drivers/media/v4l2-core/videobuf-dma-sg.c  | 2 +-
- drivers/vdpa/vdpa_user/vduse_dev.c         | 2 +-
- drivers/vhost/vdpa.c                       | 2 +-
- include/linux/mm.h                         | 3 +--
- io_uring/rsrc.c                            | 2 +-
- mm/gup.c                                   | 9 +++------
- mm/gup_test.c                              | 9 ++++-----
- net/xdp/xdp_umem.c                         | 2 +-
- 12 files changed, 17 insertions(+), 22 deletions(-)
-
-diff --git a/arch/powerpc/mm/book3s64/iommu_api.c b/arch/powerpc/mm/book3s64/iommu_api.c
-index 81d7185e2ae8..d19fb1f3007d 100644
---- a/arch/powerpc/mm/book3s64/iommu_api.c
-+++ b/arch/powerpc/mm/book3s64/iommu_api.c
-@@ -105,7 +105,7 @@ static long mm_iommu_do_alloc(struct mm_struct *mm, unsigned long ua,
- 
- 		ret = pin_user_pages(ua + (entry << PAGE_SHIFT), n,
- 				FOLL_WRITE | FOLL_LONGTERM,
--				mem->hpages + entry, NULL);
-+				mem->hpages + entry);
- 		if (ret == n) {
- 			pinned += n;
- 			continue;
-diff --git a/drivers/infiniband/hw/qib/qib_user_pages.c b/drivers/infiniband/hw/qib/qib_user_pages.c
-index f693bc753b6b..1bb7507325bc 100644
---- a/drivers/infiniband/hw/qib/qib_user_pages.c
-+++ b/drivers/infiniband/hw/qib/qib_user_pages.c
-@@ -111,7 +111,7 @@ int qib_get_user_pages(unsigned long start_page, size_t num_pages,
- 		ret = pin_user_pages(start_page + got * PAGE_SIZE,
- 				     num_pages - got,
- 				     FOLL_LONGTERM | FOLL_WRITE,
--				     p + got, NULL);
-+				     p + got);
- 		if (ret < 0) {
- 			mmap_read_unlock(current->mm);
- 			goto bail_release;
-diff --git a/drivers/infiniband/hw/usnic/usnic_uiom.c b/drivers/infiniband/hw/usnic/usnic_uiom.c
-index 2a5cac2658ec..84e0f41e7dfa 100644
---- a/drivers/infiniband/hw/usnic/usnic_uiom.c
-+++ b/drivers/infiniband/hw/usnic/usnic_uiom.c
-@@ -140,7 +140,7 @@ static int usnic_uiom_get_pages(unsigned long addr, size_t size, int writable,
- 		ret = pin_user_pages(cur_base,
- 				     min_t(unsigned long, npages,
- 				     PAGE_SIZE / sizeof(struct page *)),
--				     gup_flags, page_list, NULL);
-+				     gup_flags, page_list);
- 
- 		if (ret < 0)
- 			goto out;
-diff --git a/drivers/infiniband/sw/siw/siw_mem.c b/drivers/infiniband/sw/siw/siw_mem.c
-index f51ab2ccf151..e6e25f15567d 100644
---- a/drivers/infiniband/sw/siw/siw_mem.c
-+++ b/drivers/infiniband/sw/siw/siw_mem.c
-@@ -422,7 +422,7 @@ struct siw_umem *siw_umem_get(u64 start, u64 len, bool writable)
- 		umem->page_chunk[i].plist = plist;
- 		while (nents) {
- 			rv = pin_user_pages(first_page_va, nents, foll_flags,
--					    plist, NULL);
-+					    plist);
- 			if (rv < 0)
- 				goto out_sem_up;
- 
-diff --git a/drivers/media/v4l2-core/videobuf-dma-sg.c b/drivers/media/v4l2-core/videobuf-dma-sg.c
-index 53001532e8e3..405b89ea1054 100644
---- a/drivers/media/v4l2-core/videobuf-dma-sg.c
-+++ b/drivers/media/v4l2-core/videobuf-dma-sg.c
-@@ -180,7 +180,7 @@ static int videobuf_dma_init_user_locked(struct videobuf_dmabuf *dma,
- 		data, size, dma->nr_pages);
- 
- 	err = pin_user_pages(data & PAGE_MASK, dma->nr_pages, gup_flags,
--			     dma->pages, NULL);
-+			     dma->pages);
- 
- 	if (err != dma->nr_pages) {
- 		dma->nr_pages = (err >= 0) ? err : 0;
-diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
-index de97e38c3b82..4d4405f058e8 100644
---- a/drivers/vdpa/vdpa_user/vduse_dev.c
-+++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-@@ -1052,7 +1052,7 @@ static int vduse_dev_reg_umem(struct vduse_dev *dev,
- 		goto out;
- 
- 	pinned = pin_user_pages(uaddr, npages, FOLL_LONGTERM | FOLL_WRITE,
--				page_list, NULL);
-+				page_list);
- 	if (pinned != npages) {
- 		ret = pinned < 0 ? pinned : -ENOMEM;
- 		goto out;
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 8c1aefc865f0..61223fcbe82b 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -983,7 +983,7 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
- 	while (npages) {
- 		sz2pin = min_t(unsigned long, npages, list_size);
- 		pinned = pin_user_pages(cur_base, sz2pin,
--					gup_flags, page_list, NULL);
-+					gup_flags, page_list);
- 		if (sz2pin != pinned) {
- 			if (pinned < 0) {
- 				ret = pinned;
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 679b41ef7a6d..db09c7062965 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -2412,8 +2412,7 @@ static inline struct page *get_user_page_vma_remote(struct mm_struct *mm,
- long get_user_pages(unsigned long start, unsigned long nr_pages,
- 		    unsigned int gup_flags, struct page **pages);
- long pin_user_pages(unsigned long start, unsigned long nr_pages,
--		    unsigned int gup_flags, struct page **pages,
--		    struct vm_area_struct **vmas);
-+		    unsigned int gup_flags, struct page **pages);
- long get_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
- 		    struct page **pages, unsigned int gup_flags);
- long pin_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
-diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-index b6451f8bc5d5..b56bda46a9eb 100644
---- a/io_uring/rsrc.c
-+++ b/io_uring/rsrc.c
-@@ -1044,7 +1044,7 @@ struct page **io_pin_pages(unsigned long ubuf, unsigned long len, int *npages)
- 	ret = 0;
- 	mmap_read_lock(current->mm);
- 	pret = pin_user_pages(ubuf, nr_pages, FOLL_WRITE | FOLL_LONGTERM,
--			      pages, NULL);
-+			      pages);
- 	if (pret == nr_pages)
- 		*npages = nr_pages;
- 	else
-diff --git a/mm/gup.c b/mm/gup.c
-index 1493cc8dd526..36701b5f0123 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -3274,8 +3274,6 @@ EXPORT_SYMBOL(pin_user_pages_remote);
-  * @gup_flags:	flags modifying lookup behaviour
-  * @pages:	array that receives pointers to the pages pinned.
-  *		Should be at least nr_pages long.
-- * @vmas:	array of pointers to vmas corresponding to each page.
-- *		Or NULL if the caller does not require them.
-  *
-  * Nearly the same as get_user_pages(), except that FOLL_TOUCH is not set, and
-  * FOLL_PIN is set.
-@@ -3284,15 +3282,14 @@ EXPORT_SYMBOL(pin_user_pages_remote);
-  * see Documentation/core-api/pin_user_pages.rst for details.
-  */
- long pin_user_pages(unsigned long start, unsigned long nr_pages,
--		    unsigned int gup_flags, struct page **pages,
--		    struct vm_area_struct **vmas)
-+		    unsigned int gup_flags, struct page **pages)
- {
- 	int locked = 1;
- 
--	if (!is_valid_gup_args(pages, vmas, NULL, &gup_flags, FOLL_PIN))
-+	if (!is_valid_gup_args(pages, NULL, NULL, &gup_flags, FOLL_PIN))
- 		return 0;
- 	return __gup_longterm_locked(current->mm, start, nr_pages,
--				     pages, vmas, &locked, gup_flags);
-+				     pages, NULL, &locked, gup_flags);
- }
- EXPORT_SYMBOL(pin_user_pages);
- 
-diff --git a/mm/gup_test.c b/mm/gup_test.c
-index 9ba8ea23f84e..1668ce0e0783 100644
---- a/mm/gup_test.c
-+++ b/mm/gup_test.c
-@@ -146,18 +146,17 @@ static int __gup_test_ioctl(unsigned int cmd,
- 						 pages + i);
- 			break;
- 		case PIN_BASIC_TEST:
--			nr = pin_user_pages(addr, nr, gup->gup_flags, pages + i,
--					    NULL);
-+			nr = pin_user_pages(addr, nr, gup->gup_flags, pages + i);
- 			break;
- 		case PIN_LONGTERM_BENCHMARK:
- 			nr = pin_user_pages(addr, nr,
- 					    gup->gup_flags | FOLL_LONGTERM,
--					    pages + i, NULL);
-+					    pages + i);
- 			break;
- 		case DUMP_USER_PAGES_TEST:
- 			if (gup->test_flags & GUP_TEST_FLAG_DUMP_PAGES_USE_PIN)
- 				nr = pin_user_pages(addr, nr, gup->gup_flags,
--						    pages + i, NULL);
-+						    pages + i);
- 			else
- 				nr = get_user_pages(addr, nr, gup->gup_flags,
- 						    pages + i);
-@@ -270,7 +269,7 @@ static inline int pin_longterm_test_start(unsigned long arg)
- 							gup_flags, pages);
- 		else
- 			cur_pages = pin_user_pages(addr, remaining_pages,
--						   gup_flags, pages, NULL);
-+						   gup_flags, pages);
- 		if (cur_pages < 0) {
- 			pin_longterm_test_stop();
- 			ret = cur_pages;
-diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
-index 02207e852d79..06cead2b8e34 100644
---- a/net/xdp/xdp_umem.c
-+++ b/net/xdp/xdp_umem.c
-@@ -103,7 +103,7 @@ static int xdp_umem_pin_pages(struct xdp_umem *umem, unsigned long address)
- 
- 	mmap_read_lock(current->mm);
- 	npgs = pin_user_pages(address, umem->npgs,
--			      gup_flags | FOLL_LONGTERM, &umem->pgs[0], NULL);
-+			      gup_flags | FOLL_LONGTERM, &umem->pgs[0]);
- 	mmap_read_unlock(current->mm);
- 
- 	if (npgs != umem->npgs) {
--- 
-2.40.1
-
+T24gRnJpLCAyMDIzLTA1LTEyIGF0IDA5OjM1IC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBPbiBGcmksIE1heSAxMiwgMjAyMywgS2FpIEh1YW5nIHdyb3RlOg0KPiA+IE9uIFRo
+dSwgMjAyMy0wNS0xMSBhdCAxNjozMyAtMDcwMCwgU2VhbiBDaHJpc3RvcGhlcnNvbiB3cm90ZToN
+Cj4gPiA+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0veDg2LmMgYi9hcmNoL3g4Ni9rdm0veDg2
+LmMNCj4gPiA+IGluZGV4IGU3Zjc4ZmU3OWIzMi4uOGIzNTZjOWQ4YTgxIDEwMDY0NA0KPiA+ID4g
+LS0tIGEvYXJjaC94ODYva3ZtL3g4Ni5jDQo+ID4gPiArKysgYi9hcmNoL3g4Ni9rdm0veDg2LmMN
+Cj4gPiA+IEBAIC0zNzAwLDggKzM3MDAsOSBAQCBpbnQga3ZtX3NldF9tc3JfY29tbW9uKHN0cnVj
+dCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IG1zcl9kYXRhICptc3JfaW5mbykNCj4gPiA+ICAJCQly
+ZXR1cm4gMTsNCj4gPiA+ICAJCX0NCj4gPiA+ICAJCWJyZWFrOw0KPiA+ID4gLQljYXNlIDB4MjAw
+IC4uLiBNU1JfSUEzMl9NQzBfQ1RMMiAtIDE6DQo+ID4gPiAtCWNhc2UgTVNSX0lBMzJfTUN4X0NU
+TDIoS1ZNX01BWF9NQ0VfQkFOS1MpIC4uLiAweDJmZjoNCj4gPiA+ICsJY2FzZSBNU1JfSUEzMl9D
+Ul9QQVQ6DQo+ID4gPiArCWNhc2UgTVRSUnBoeXNCYXNlX01TUigwKSAuLi4gTVNSX01UUlJmaXg0
+S19GODAwMDoNCj4gPiA+ICsJY2FzZSBNU1JfTVRSUmRlZlR5cGU6DQo+ID4gPiAgCQlyZXR1cm4g
+a3ZtX210cnJfc2V0X21zcih2Y3B1LCBtc3IsIGRhdGEpOw0KPiA+ID4gIAljYXNlIE1TUl9JQTMy
+X0FQSUNCQVNFOg0KPiA+ID4gIAkJcmV0dXJuIGt2bV9zZXRfYXBpY19iYXNlKHZjcHUsIG1zcl9p
+bmZvKTsNCj4gPiA+IEBAIC00MTA4LDkgKzQxMDksMTAgQEAgaW50IGt2bV9nZXRfbXNyX2NvbW1v
+bihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBtc3JfZGF0YSAqbXNyX2luZm8pDQo+ID4g
+PiAgCQltc3JfaW5mby0+ZGF0YSA9IGt2bV9zY2FsZV90c2MocmR0c2MoKSwgcmF0aW8pICsgb2Zm
+c2V0Ow0KPiA+ID4gIAkJYnJlYWs7DQo+ID4gPiAgCX0NCj4gPiA+ICsJY2FzZSBNU1JfSUEzMl9D
+Ul9QQVQ6DQo+ID4gPiAgCWNhc2UgTVNSX01UUlJjYXA6DQo+ID4gDQo+ID4gLi4uIFNob3VsZCB3
+ZSBwdXQgTVNSX0lBMzJfQ1JfUEFUIGFmdGVyIE1TUl9NVFJSY2FwIHNvIGl0IGNhbiBiZSBzeW1t
+ZXRyaWMgdG8NCj4gPiBrdm1fc2V0X21zcl9jb21tb24oKT8NCj4gPiANCj4gPiBMb29rcyB0aGVy
+ZSdzIG5vIHJlYXNvbiB0byBwdXQgaXQgYmVmb3JlIE1TUl9NVFJSY2FwLg0KPiANCj4gTm8sIGl0
+J3MgYWJvdmUgTVRSUmNhcCBmb3IgdHdvIHJlYXNvbnM6DQo+IA0KPiAgMS4gV2hlbiBQQVQgaXMg
+bW92ZWQgb3V0IG9mIG10cnIuYywgUEFUIGRvZXNuJ3QgZ2V0IGJ1bmRlZCB3aXRoIHRoZSBvdGhl
+ciBNVFJScw0KPiAgICAgYW5kIHNvIHdvdWxkIGp1c3QgbmVlZCB0byBiZSBob2lzdGVkIGJhY2sg
+dXAuICBUaGUgZW5kIGNvZGUgbG9va3MgbGlrZToNCj4gDQo+IAljYXNlIE1TUl9JQTMyX0NSX1BB
+VDoNCj4gCQltc3JfaW5mby0+ZGF0YSA9IHZjcHUtPmFyY2gucGF0Ow0KPiAJCWJyZWFrOw0KPiAJ
+Y2FzZSBNU1JfTVRSUmNhcDoNCj4gCWNhc2UgTVRSUnBoeXNCYXNlX01TUigwKSAuLi4gTVNSX01U
+UlJmaXg0S19GODAwMDoNCj4gCWNhc2UgTVNSX01UUlJkZWZUeXBlOg0KPiAJCXJldHVybiBrdm1f
+bXRycl9nZXRfbXNyKHZjcHUsIG1zcl9pbmZvLT5pbmRleCwgJm1zcl9pbmZvLT5kYXRhKTsNCg0K
+U29ycnkgSSBtaXN0YWtlbmx5IHRob3VnaHQgTVNSX01UUlJjYXAgd2Fzbid0IGhhbmRsZWQgaW4g
+a3ZtX210cnJfZ2V0X21zcigpLiANClllcyBsb29rcyBnb29kIHRvIG1lLg0KDQo+ICANCj4gIDIu
+IFRoZXJlIGlzIG5vIE1TUl9NVFJSY2FwIGNhc2Ugc3RhdGVtZW50IGluIGt2bV9zZXRfbXNyX2Nv
+bW1vbigpIGJlY2F1c2UgaXQncw0KPiAgICAgYSByZWFkLW9ubHkgTVNSLCBpLmUuIHRoZSB0d28g
+Y2FuJ3QgYmUgc3ltbWV0cmljIDotKQ0KDQpEbyB5b3Uga25vdyB3aHkgaXQgaXMgYSByZWFkLW9u
+bHkgTVNSLCB3aGljaCBlbmFibGVzIGJvdGggRklYRUQgcmFuZ2VzIGFuZA0KKGZpeGVkIG51bWJl
+ciBvZikgZHluYW1pYyByYW5nZXM/DQoNCkkgYW0gYXNraW5nIGJlY2F1c2UgdGhlcmUncyBhIHg4
+NiBzZXJpZXMgdG8gZmFrZSBhIHNpbXBsZSBzeW50aGV0aWMgTVRSUiB3aGljaA0KbmVpdGhlciBo
+YXMgZml4ZWQgbm9yIGR5bmFtaWMgcmFuZ2VzIGJ1dCBvbmx5IGhhcyBhIGRlZmF1bHQgTVNSX01U
+UlJkZWZUeXBlOg0KDQpodHRwczovL2xvcmUua2VybmVsLm9yZy9sa21sLzIwMjMwNTA5MjMzNjQx
+LkdHWkZyWkNUREg3VndVTXA1UkBmYXRfY3JhdGUubG9jYWwvVC8NCg0KVGhlIG1haW4gdXNlIGNh
+c2VzIGFyZSBYZW4gUFYgZ3Vlc3RzIGFuZCBTRVYtU05QIGd1ZXN0cyBydW5uaW5nIHVuZGVyDQpI
+eXBlci1WLCBidXQgaXQgYXBwZWFycyBURFggZ3Vlc3QgaXMgYWxzbyBkZXNpcmVkIHRvIGhhdmUg
+c2ltaWxhciBoYW5kbGluZywNCmJlY2F1c2U6wqANCg0KMSkgVERYIG1vZHVsZSBleHBvc2VzIE1U
+UlIgaW4gQ1BVSUQgdG8gZ3Vlc3QsIGJ1dCBoYW5kbGVzIG5vdGhpbmcgYWJvdXQgTVRSUg0KTVNS
+cyBidXQgb25seSBpbmplY3RzICNWRS4NCg0KMikgVERYIG1vZHVsZSBhbHdheXMgbWFwcyBndWVz
+dCBwcml2YXRlIG1lbW9yeSBhcyBXQiAoYW5kIGlnbm9yZXMgZ3Vlc3QncyBQQVQNCklJVUMpOw0K
+DQozKSBGb3Igc2hhcmVkIG1lbW9yeSwgdy9vIG5vbi1jb2hlcmVudCBETUEgZ3Vlc3QncyBNVFJS
+cyBhcmUgaWdub3JlZCBieSBLVk0NCmFueXdheS4gIFREWCBkb2Vzbid0IG9mZmljaWFsbHkgc3Vw
+cG9ydCBub24tdHJ1c3RlZCBkZXZpY2UgYXNzaWdubWVudCBBRkFJQ1QuDQpFdmVuIHdlIHdhbnQg
+dG8gY29uc2lkZXIgbm9uLWNvaGVyZW50IERNQSwgaXQgd291bGQgb25seSBhZGQgY29uZnVzaW9u
+IHRvIGhvbm9yDQpndWVzdCdzIE1UUlJzIHNpbmNlIHRoZXkgY2FuIHBvaW50IHRvIHByaXZhdGUg
+bWVtb3J5LCB3aGljaCBpcyBhbHdheXMgbWFwcGVkIGFzDQpXQi4NCg0KU28gYmFzaWNhbGx5IGxv
+b2tzIHRoZXJlJ3Mgbm8gdmFsdWUgdG8gZXhwb3NpbmcgRklYRUQgYW5kIGR5bmFtaWMgTVRSUiBy
+YW5nZXMgdG8NClREWCBndWVzdC4NCg0K
