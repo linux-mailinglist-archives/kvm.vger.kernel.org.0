@@ -2,142 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 557877056DC
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 21:14:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA0F67058DA
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 22:28:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229571AbjEPTOU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 15:14:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43682 "EHLO
+        id S229691AbjEPU2r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 16:28:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbjEPTOP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 15:14:15 -0400
-Received: from mail-oa1-x33.google.com (mail-oa1-x33.google.com [IPv6:2001:4860:4864:20::33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA7E57DAA
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 12:14:14 -0700 (PDT)
-Received: by mail-oa1-x33.google.com with SMTP id 586e51a60fabf-19290ad942aso11456042fac.2
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 12:14:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684264454; x=1686856454;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XPvU4GCpDRUjtoRqRZA6QpZocRSHyFeHeKs9Xzsz5SE=;
-        b=UjF3qIkYbDoLOOcWkR1rwVW/qTBqj/aXk2y85s6vzRnKGAlQKwJPAJNv8dR+ZTmfxy
-         rswxC5ujj5GkNX/SavhJFN0H7tkbr8ecbJe+Z/UcApo/hexFw75jfOk6EkqaWt6zSE6y
-         LZLRZ6jTqKhdUKrwepK8JUQL8aZHXnc7pFQu3IAthKKHSGgN71CHe4HyHoKALyVwua2R
-         Wix/jKKncCLEi6ekKZRL8MkNwaoDD0U49GtS9K5GihSO+yB4MzM6JOJGMspZhgaHbOOm
-         BJBcfw1XOj2UgWn2/Szq3ZBzdrC6hwAbNKJcjTtN7ibVfk+69BPbpMOU4gasMxCax8io
-         x6jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684264454; x=1686856454;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XPvU4GCpDRUjtoRqRZA6QpZocRSHyFeHeKs9Xzsz5SE=;
-        b=YTtCqJGUc8ssFj3JVLywhRFq1YzKUJd0/QV3iS+l+tc3Xz3waxNbSpO1JNlELozDyZ
-         LtFP2HhmxCF6WKoiQy57A7nsB3yN/nDIvSJDxmTrh3kJfCdvXCodAESGzn8FC/MsVJbZ
-         ZmYjfXfGhyKq5jEx3gt8SJCj26/IRdKNREL2Cn0HYtZnJtXkons9+7dkrwrOXiCzuq0Z
-         KqvBH2exPggZlZbBvk8G9mLSkVgDL79iEvHemM4TgLxaRqlgIhleMf4cLeAv5LBABY6g
-         EuJapY67huiaaP3wpBJ+zf6lq32ihKa9NTYxoLm3PfPyK4l9YyS0LTDQGdUzwwLcM9b+
-         YsbA==
-X-Gm-Message-State: AC+VfDyZiy2Wbu05SqdaxaCDZKvy7OqxjOFDfJtUq0pBDnpxjopvoHrs
-        dwd18hzFggfHP3DvATQ9YIytc3AOZFJ3UyYNc1uIgQ==
-X-Google-Smtp-Source: ACHHUZ5ceWiUmfFJLjs+TLJrYt45xeTB53hPSxiwg22yyF9LukggkV0CssCRkcDsSIcgQYsvVkk9ejd9e41yOmDwFpg=
-X-Received: by 2002:a05:6870:b79a:b0:199:d0fa:ee1a with SMTP id
- ed26-20020a056870b79a00b00199d0faee1amr4374967oab.31.1684264453899; Tue, 16
- May 2023 12:14:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230503171618.2020461-1-jingzhangos@google.com>
- <20230503171618.2020461-2-jingzhangos@google.com> <861qjgmf2t.wl-maz@kernel.org>
-In-Reply-To: <861qjgmf2t.wl-maz@kernel.org>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Tue, 16 May 2023 12:14:03 -0700
-Message-ID: <CAAdAUtgEi_4pH+t-kJRjykJg-o2ccHcSVuQ_rn9+-_bbEu8obQ@mail.gmail.com>
-Subject: Re: [PATCH v8 1/6] KVM: arm64: Move CPU ID feature registers
- emulation into a separate file
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
+        with ESMTP id S229496AbjEPU2p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 16:28:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88F7211C
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 13:28:44 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0FE5A63180
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 20:28:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 766F7C433D2;
+        Tue, 16 May 2023 20:28:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684268923;
+        bh=DW61ZP82H+VuUq1yDKIyiiIILGwHFpx8XnUhpoPXlo0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=MZrqtQmawO8EHlXUlLZjKDgVjH2GnVnBRWadDqRQR/XQ4Qkxn/sGH9gnbijtf92eb
+         mkZKNEX5HpqXeEW2gfAUcUcGjB42ZNeSF+p5slfbMl9H0y2n8OfogIV902gTRJ7dus
+         r8k0nxRq97EbEte5W5QnSqYkyJMlRGczh05PoE8N2L0ZlaT37RR5+hCTYZjWxP7PWm
+         7dbJ0SLaewRgwaeWexA2XQQzE9lmHvlZN69gjp1NmQd1ARv8meST/vetdJI+hc8kDI
+         w+xXPO9oH4roVxQRUjElEyyn216ndLkm4g6AtCd+HhiuJvaCL5E0KKM+OoUOLqAdKy
+         5xkkPvdqXk6ZA==
+Received: from 82-132-215-232.dab.02.net ([82.132.215.232] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pz1Hk-00FfLo-OV;
+        Tue, 16 May 2023 21:28:41 +0100
+Date:   Tue, 16 May 2023 21:28:38 +0100
+Message-ID: <87zg64nhqh.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Eric Auger <eauger@redhat.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
         Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
+In-Reply-To: <16d9fda4-3ead-7d5e-9f54-ef29fbd932ac@redhat.com>
+References: <20230515173103.1017669-1-maz@kernel.org>
+        <16d9fda4-3ead-7d5e-9f54-ef29fbd932ac@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 82.132.215.232
+X-SA-Exim-Rcpt-To: eauger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Tue, 16 May 2023 17:53:14 +0100,
+Eric Auger <eauger@redhat.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> On 5/15/23 19:30, Marc Zyngier wrote:
+> > This is the 4th drop of NV support on arm64 for this year.
+> >=20
+> > For the previous episodes, see [1].
+> >=20
+> > What's changed:
+> >=20
+> > - New framework to track system register traps that are reinjected in
+> >   guest EL2. It is expected to replace the discrete handling we have
+> >   enjoyed so far, which didn't scale at all. This has already fixed a
+> >   number of bugs that were hidden (a bunch of traps were never
+> >   forwarded...). Still a work in progress, but this is going in the
+> >   right direction.
+> >=20
+> > - Allow the L1 hypervisor to have a S2 that has an input larger than
+> >   the L0 IPA space. This fixes a number of subtle issues, depending on
+> >   how the initial guest was created.
+> >=20
+> > - Consequently, the patch series has gone longer again. Boo. But
+> >   hopefully some of it is easier to review...
+> >=20
+> > [1] https://lore.kernel.org/r/20230405154008.3552854-1-maz@kernel.org
+>=20
+> I have started testing this and when booting my fedora guest I get
+>=20
+> [  151.796544] kvm [7617]: Unsupported guest sys_reg access at:
+> 23f425fd0 [80000209]
+> [  151.796544]  { Op0( 3), Op1( 3), CRn(14), CRm( 3), Op2( 1), func_write=
+ },
+>=20
+> as soon as the host has kvm-arm.mode=3Dnested
+>=20
+> This seems to be triggered very early by EDK2
+> (ArmPkg/Drivers/TimerDxe/TimerDxe.c).
+>=20
+> If I am not wrong this CNTV_CTL_EL0. Do you have any idea?
 
-On Tue, May 16, 2023 at 9:11=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> On Wed, 03 May 2023 18:16:13 +0100,
-> Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > Create a new file id_regs.c for CPU ID feature registers emulation code=
-,
-> > which are moved from sys_regs.c and tweak sys_regs code accordingly.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/kvm/Makefile   |   2 +-
-> >  arch/arm64/kvm/id_regs.c  | 460 +++++++++++++++++++++++++++++++++++++
-> >  arch/arm64/kvm/sys_regs.c | 464 ++++----------------------------------
-> >  arch/arm64/kvm/sys_regs.h |  19 ++
-> >  4 files changed, 519 insertions(+), 426 deletions(-)
-> >  create mode 100644 arch/arm64/kvm/id_regs.c
-> >
-> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> > index c0c050e53157..a6a315fcd81e 100644
-> > --- a/arch/arm64/kvm/Makefile
-> > +++ b/arch/arm64/kvm/Makefile
-> > @@ -13,7 +13,7 @@ obj-$(CONFIG_KVM) +=3D hyp/
-> >  kvm-y +=3D arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
-> >        inject_fault.o va_layout.o handle_exit.o \
-> >        guest.o debug.o reset.o sys_regs.o stacktrace.o \
-> > -      vgic-sys-reg-v3.o fpsimd.o pkvm.o \
-> > +      vgic-sys-reg-v3.o fpsimd.o pkvm.o id_regs.o \
-> >        arch_timer.o trng.o vmid.o emulate-nested.o nested.o \
-> >        vgic/vgic.o vgic/vgic-init.o \
-> >        vgic/vgic-irqfd.o vgic/vgic-v2.o \
-> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-> > new file mode 100644
-> > index 000000000000..96b4c43a5100
-> > --- /dev/null
-> > +++ b/arch/arm64/kvm/id_regs.c
-> > @@ -0,0 +1,460 @@
->
-> [...]
->
-> I really wonder why we move this to another file. It only creates
-> noise, and doesn't add much. Yes, the file is big. But now you need to
-> expose all the internal machinery that was private until now.
->
-> If you look at the global diffstat, this is "only" another 200
-> lines. I don't think this is worth the churn.
-Yes, the global diff is not that big as in the first patch series now.
-Will do all the changes in the same file in the next version.
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+So here's my current analysis:
 
-Thanks,
-Jing
+I assume you are running EDK2 as the L1 guest in a nested
+configuration. I also assume that you are not running on an Apple
+CPU. If these assumptions are correct, then EDK2 runs at vEL2, and is
+in nVHE mode.
+
+Finally, I'm going to assume that your implementation has FEAT_ECV and
+FEAT_NV2, because I can't see how it could fail otherwise.
+
+In these precise conditions, KVM sets the CNTHCTL_EL2.EL1TVT bit so
+that we can trap the EL0 virtual timer and faithfully emulate it (it
+is otherwise written to memory, which isn't very helpful).
+
+As it turns out, we don't handle these traps. I didn't spot it because
+my test machines are all Apple boxes that don't have a nVHE mode, so
+nothing on the nVHE path is getting *ANY* coverage. Hint: having
+access to such a machine would help (shipping address on request!).
+Otherwise, I'll eventually kill the nVHE support altogether.
+
+I have written the following patch, which compiles, but that I cannot
+test with my current setup. Could you please give it a go?
+
+Thanks again,
+
+	M.
+
+=46rom feb03b57de0bcb83254a2d6a3ce320f5e39434b6 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Tue, 16 May 2023 21:06:20 +0100
+Subject: [PATCH] KVM: arm64: Handle virtual timer traps when
+ CNTHCTL_EL2.EL1TVT is set
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/sysreg.h |  1 +
+ arch/arm64/kvm/sys_regs.c       | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
+
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysre=
+g.h
+index 72ff6df5d75b..77a61179ea37 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -436,6 +436,7 @@
+ #define SYS_CNTP_CTL_EL0		sys_reg(3, 3, 14, 2, 1)
+ #define SYS_CNTP_CVAL_EL0		sys_reg(3, 3, 14, 2, 2)
+=20
++#define SYS_CNTV_TVAL_EL0		sys_reg(3, 3, 14, 3, 0)
+ #define SYS_CNTV_CTL_EL0		sys_reg(3, 3, 14, 3, 1)
+ #define SYS_CNTV_CVAL_EL0		sys_reg(3, 3, 14, 3, 2)
+=20
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 27a29dcbfcd2..9aa9c4e4b4d6 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1328,6 +1328,14 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+ 		treg =3D TIMER_REG_TVAL;
+ 		break;
+=20
++	case SYS_CNTV_TVAL_EL0:
++		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
++			tmr =3D TIMER_HVTIMER;
++		else
++			tmr =3D TIMER_VTIMER;
++		treg =3D TIMER_REG_TVAL;
++		break;
++
+ 	case SYS_AARCH32_CNTP_TVAL:
+ 	case SYS_CNTP_TVAL_EL02:
+ 		tmr =3D TIMER_PTIMER;
+@@ -1357,6 +1365,14 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+ 		treg =3D TIMER_REG_CTL;
+ 		break;
+=20
++	case SYS_CNTV_CTL_EL0:
++		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
++			tmr =3D TIMER_HVTIMER;
++		else
++			tmr =3D TIMER_VTIMER;
++		treg =3D TIMER_REG_CTL;
++		break;
++
+ 	case SYS_AARCH32_CNTP_CTL:
+ 	case SYS_CNTP_CTL_EL02:
+ 		tmr =3D TIMER_PTIMER;
+@@ -1386,6 +1402,14 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+ 		treg =3D TIMER_REG_CVAL;
+ 		break;
+=20
++	case SYS_CNTV_CVAL_EL0:
++		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
++			tmr =3D TIMER_HVTIMER;
++		else
++			tmr =3D TIMER_VTIMER;
++		treg =3D TIMER_REG_CVAL;
++		break;
++
+ 	case SYS_AARCH32_CNTP_CVAL:
+ 	case SYS_CNTP_CVAL_EL02:
+ 		tmr =3D TIMER_PTIMER;
+@@ -2510,6 +2534,10 @@ static const struct sys_reg_desc sys_reg_descs[] =3D=
+ {
+ 	{ SYS_DESC(SYS_CNTP_CTL_EL0), access_arch_timer },
+ 	{ SYS_DESC(SYS_CNTP_CVAL_EL0), access_arch_timer },
+=20
++	{ SYS_DESC(SYS_CNTV_TVAL_EL0), access_arch_timer },
++	{ SYS_DESC(SYS_CNTV_CTL_EL0), access_arch_timer },
++	{ SYS_DESC(SYS_CNTV_CVAL_EL0), access_arch_timer },
++
+ 	/* PMEVCNTRn_EL0 */
+ 	PMU_PMEVCNTR_EL0(0),
+ 	PMU_PMEVCNTR_EL0(1),
+--=20
+2.39.2
+
+
+--=20
+Without deviation from the norm, progress is not possible.
