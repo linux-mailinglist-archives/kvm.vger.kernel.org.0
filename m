@@ -2,154 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38B3A705648
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 20:47:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82CED705665
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 20:55:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229635AbjEPSrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 14:47:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54892 "EHLO
+        id S229684AbjEPSzK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 14:55:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229574AbjEPSrR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 14:47:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FE483A87
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 11:47:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E24E062CD7
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 18:47:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C68FC433EF;
-        Tue, 16 May 2023 18:47:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684262823;
-        bh=Ai5dTWFXnWb/13sR7qeK7xi7T0l15zxYtlSLz/ku5wA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Hz3PPIDO1FiENcBWZQToZ27EN+jGg4NNFnKm0ajFY4LCEQ1NblgutI9xXMdwJmI0R
-         36VZEg8w3Y/XvVJpxI51ZWbwed4xiNIY2RUww8+nGZbYUW+PQCP1cz3+CqOQ0UB3Yf
-         8+pMJGWZ2NQkr8tMmdctIBGp4ctHqh00YnhpmQcXeLFI/xRih0Si0grhtLkSDG1T3S
-         Z9hrTZ9e5VU7s7jX42VqPKGDgqWLrCG78c9GEQAzf38MoBOBgMkUO1CeG8ChOb9XbQ
-         onD6UHBan0zQf0k7MmTEYkZMxXWDT8IwkhaOBiaH4YnjcqSClreUFdB89a5Lw3QapA
-         p6nzof97QaQVA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pyzhM-00FdjW-Sq;
-        Tue, 16 May 2023 19:47:01 +0100
-Date:   Tue, 16 May 2023 19:47:00 +0100
-Message-ID: <86y1loktaz.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Eric Auger <eauger@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
+        with ESMTP id S229535AbjEPSzJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 14:55:09 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 313211FD4
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 11:55:08 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1aaf702c3ccso15605ad.1
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 11:55:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1684263307; x=1686855307;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8fHu8DghP/3luSr7ps7cBkVA14o+LEPwp4DzxgOICm0=;
+        b=EWymJLI8k5puZBECOECCM84RcyNPf+rTQ8fonInnveY/Tffhcw7y8207Ev8sUwcA1B
+         VTOVrYAwkrLX/47yt82UvGrmSrlFwBkC3vW0bnGnrFF3CcnmyvGB0duRIXyqwBUf2EP7
+         KQnI/Zndg507Fljg9y8xyqc+eOGV7A0p39pGeGBCdAclB9liFAq9U82AnbyTgpauEarM
+         HOu11s1B8mjE3d6Z97hP+ZptKvE7hEiDr8f7uwWsuCNMMr1npGYmfp+Be7/bBF2hywbK
+         Umm1BxmPThLI9WFUXoYpzxelXFbF3zAdXdiLgFti+Cz1/Btdni0Cp1cWGVBmm9nslRO4
+         Qv3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684263307; x=1686855307;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8fHu8DghP/3luSr7ps7cBkVA14o+LEPwp4DzxgOICm0=;
+        b=hXqnPXe9+I7GgKTJRHSb1QvRgkkeG54T+BwX3IfYTYBWoLe4mKEgHiLiOyWP/DF5Kx
+         3UAEQmYvdI5b4JIZthN1j8Yoy6dGnrxkX9OIAtAuQBvRbM8Vz69t1BWLVBadSQldHui2
+         o7l8qwFav/7cdTRf5WExEbe+j7wONyjHCOz8STHM6NDBrata/j/4RMNpiM0vz61vWKjB
+         TL4UMbbPYM0nLpPn60FDmOnoAGJBXKlnRVQm3a+xh9KVOo98OEmefQl9wSjsHX89YZj7
+         Jf9IKETvdmnakL2ianPQaV8BflIu93pWqzP7+k3ThkJqXs07ov0xvulNJ6SoS2FAoYZj
+         Inaw==
+X-Gm-Message-State: AC+VfDxZc7oh3hyYi+aZlDqhieB+sSvq53YTgMyFzddIhbMlIXUhLWUQ
+        QWwpz0z7/27+HXareBOogm4DYG6HubWJ1gl11Bxu9A==
+X-Google-Smtp-Source: ACHHUZ7tZ09F/p3tKg+e7V/wH7ylAcrEIIFRoV+uNHj0vk7rLne7WYSwiuVG8QKXQ1XXx7qqfBebFzGe81h5v2o/EMM=
+X-Received: by 2002:a17:902:dac6:b0:1ac:2daf:34da with SMTP id
+ q6-20020a170902dac600b001ac2daf34damr3858plx.17.1684263307150; Tue, 16 May
+ 2023 11:55:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230414172922.812640-1-rananta@google.com> <20230414172922.812640-8-rananta@google.com>
+ <ZF5xLrr2tEYdLL1i@linux.dev> <CAJHc60wUu3xB4J8oJ+FCxerDad1TzZLCMgHYGFfv0K-hzC0qmw@mail.gmail.com>
+ <ZGPPj1AXS0Uah2Ug@linux.dev>
+In-Reply-To: <ZGPPj1AXS0Uah2Ug@linux.dev>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Tue, 16 May 2023 11:54:55 -0700
+Message-ID: <CAJHc60wF19h9ixEQK5SS+oGA41xNqrFQaH9VE6sS0DXjQFCh7A@mail.gmail.com>
+Subject: Re: [PATCH v3 7/7] KVM: arm64: Use TLBI range-based intructions for unmap
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
-In-Reply-To: <16d9fda4-3ead-7d5e-9f54-ef29fbd932ac@redhat.com>
-References: <20230515173103.1017669-1-maz@kernel.org>
-        <16d9fda4-3ead-7d5e-9f54-ef29fbd932ac@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eauger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Ricardo Koller <ricarkol@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Eric,
+On Tue, May 16, 2023 at 11:46=E2=80=AFAM Oliver Upton <oliver.upton@linux.d=
+ev> wrote:
+>
+> On Tue, May 16, 2023 at 10:21:33AM -0700, Raghavendra Rao Ananta wrote:
+> > On Fri, May 12, 2023 at 10:02=E2=80=AFAM Oliver Upton <oliver.upton@lin=
+ux.dev> wrote:
+> > > >  int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u6=
+4 size)
+> > > >  {
+> > > > +     int ret;
+> > > > +     struct stage2_unmap_data unmap_data =3D {
+> > > > +             .pgt =3D pgt,
+> > > > +             /*
+> > > > +              * If FEAT_TLBIRANGE is implemented, defer the indivi=
+dial PTE
+> > > > +              * TLB invalidations until the entire walk is finishe=
+d, and
+> > > > +              * then use the range-based TLBI instructions to do t=
+he
+> > > > +              * invalidations. Condition this upon S2FWB in order =
+to avoid
+> > > > +              * a page-table walk again to perform the CMOs after =
+TLBI.
+> > > > +              */
+> > > > +             .skip_pte_tlbis =3D system_supports_tlb_range() &&
+> > > > +                                     stage2_has_fwb(pgt),
+> > >
+> > > Why can't the underlying walker just call these two helpers directly?
+> > > There are static keys behind these...
+> > >
+> > I wasn't aware of that. Although, I tried to look into the
+> > definitions, but couldn't understand how static keys are at play here.
+> > By any chance are you referring to the alternative_has_feature_*()
+> > implementations when checking for cpu capabilities?
+>
+> Ah, right, these were recently changed to rely on alternative patching
+> in commit 21fb26bfb01f ("arm64: alternatives: add alternative_has_feature=
+_*()").
+> Even still, the significance remains as the alternative patching
+> completely eliminates a conditional branch on the presence of a
+> particular feature.
+>
+> Initializing a local with the presence/absence of a feature defeats such
+> an optimization.
+>
+Thanks for the info! Introduction of stage2_unmap_defer_tlb_flush()
+(in patch-7/7) would call these functions as needed and get rid of
+'skip_pte_tlbis'.
 
-On Tue, 16 May 2023 17:53:14 +0100,
-Eric Auger <eauger@redhat.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 5/15/23 19:30, Marc Zyngier wrote:
-> > This is the 4th drop of NV support on arm64 for this year.
-> > 
-> > For the previous episodes, see [1].
-> > 
-> > What's changed:
-> > 
-> > - New framework to track system register traps that are reinjected in
-> >   guest EL2. It is expected to replace the discrete handling we have
-> >   enjoyed so far, which didn't scale at all. This has already fixed a
-> >   number of bugs that were hidden (a bunch of traps were never
-> >   forwarded...). Still a work in progress, but this is going in the
-> >   right direction.
-> > 
-> > - Allow the L1 hypervisor to have a S2 that has an input larger than
-> >   the L0 IPA space. This fixes a number of subtle issues, depending on
-> >   how the initial guest was created.
-> > 
-> > - Consequently, the patch series has gone longer again. Boo. But
-> >   hopefully some of it is easier to review...
-> > 
-> > [1] https://lore.kernel.org/r/20230405154008.3552854-1-maz@kernel.org
-> 
-> I have started testing this and when booting my fedora guest I get
-> 
-> [  151.796544] kvm [7617]: Unsupported guest sys_reg access at:
-> 23f425fd0 [80000209]
-> [  151.796544]  { Op0( 3), Op1( 3), CRn(14), CRm( 3), Op2( 1), func_write },
-> 
-> as soon as the host has kvm-arm.mode=nested
-
-Very odd. A write to CNTV_CTL_EL0 that fails, meaning that we have ECV
-traps for the virtual timer set, and so this is probably done from
-(virtual) EL2. Which of course we're not properly handling. Duh.
-
-> This seems to be triggered very early by EDK2
-> (ArmPkg/Drivers/TimerDxe/TimerDxe.c).
-> 
-> If I am not wrong this CNTV_CTL_EL0. Do you have any idea?
-
-I have a good idea, but I could use some more information:
-
-- Is this a nested guest? Or a non nested guest?
-
-- Can you stash your EDK2 build somewhere so that I can try to
-  reproduce it?
-
-- What do you use for VMM on the host?
-
-I'm running EDK2 on both L1 and L2 guests (some Debian builds), and I
-don't see any issue. But when running EDK2 on L1, I run it non-nested.
-
-> By the way I got this already with your v9
-> (git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git
-> kvm-arm64/nv-6.4-WIP) and with your v10 (I cherry-picked your
-> maz/kvm-arm64/nv-6.5-WIP branch).
-
-That's an interesting data point. At least, it hasn't regressed
-further... I'll try and cook a test tomorrow and run it on my own
-rig. Which may or may not behave like yours, you never know...
-
-Thanks a lot for the report!
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+- Raghavendra
+> --
+> Thanks,
+> Oliver
