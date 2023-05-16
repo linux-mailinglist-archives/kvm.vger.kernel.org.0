@@ -2,174 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A98B705A5D
-	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 00:02:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90F49705AD3
+	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 00:54:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbjEPWCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 18:02:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44036 "EHLO
+        id S231128AbjEPWyZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 18:54:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229578AbjEPWCW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 18:02:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24A0CB4;
-        Tue, 16 May 2023 15:02:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B587363CF5;
-        Tue, 16 May 2023 22:02:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C90F7C433EF;
-        Tue, 16 May 2023 22:02:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1684274540;
-        bh=Xn5gFOegvDQoAs6fV+QPMtWJd/9gIN1gu+8PHj8jATQ=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=I8HmcSl3RSMNgObVi4nyzA8Dn0pIVn3Hyd4M9+6+jiCnOIEHPDAD1katsykkWAiMa
-         gn5fQMZJ0CFmK2NC9H7JKcNfD2tVhwbbUSeGJQe61+ttSYu+uB1762WRf9rvoaH/7u
-         R2FZf07p1aiooDIDhn5t28F6IgINIJ5khA8X4Fo4=
-Date:   Tue, 16 May 2023 15:02:18 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Anders Roxell <anders.roxell@linaro.org>
-Cc:     Lorenzo Stoakes <lstoakes@gmail.com>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-        David Hildenbrand <david@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-perf-users@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Eric Biederman <ebiederm@xmission.com>,
-        Kees Cook <keescook@chromium.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Kentaro Takeda <takedakn@nttdata.co.jp>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v5 3/6] mm/gup: remove vmas parameter from
- get_user_pages_remote()
-Message-Id: <20230516150218.477c5e9d0a2d9ef8b057069c@linux-foundation.org>
-In-Reply-To: <20230516094919.GA411@mutt>
-References: <cover.1684097001.git.lstoakes@gmail.com>
-        <afe323639b7bda066ee5c7a6cca906f5ad8df940.1684097002.git.lstoakes@gmail.com>
-        <20230516094919.GA411@mutt>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
+        with ESMTP id S229814AbjEPWyS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 18:54:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 343E17681
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 15:53:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684277607;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ss0pPdFOewpkZHx2T3QpB5km0Ro73ZOgGxvoEbK/oys=;
+        b=RUPejOjJ10/hmQqOwcVaSQ03u9jn96ZSZ3yZAeDBcsVIGw/k2PEAktXfCvaNZmFgpDSZD6
+        EfizJQ3ly/Xt2/WRBdJdHEIXvYmganA2+39R4rEqPcoKSZgHaGIK9gLgmVit4SypEoQ1Wt
+        4CZSPzHqlfjOl20VoR77WmVE3TRDweQ=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-591-IpkpbhASO1e9JVrbaWBZ-w-1; Tue, 16 May 2023 18:53:24 -0400
+X-MC-Unique: IpkpbhASO1e9JVrbaWBZ-w-1
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-33338be98cdso756825ab.3
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 15:53:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684277603; x=1686869603;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ss0pPdFOewpkZHx2T3QpB5km0Ro73ZOgGxvoEbK/oys=;
+        b=hrIS8SSFiKoUZw7gbKal4ZeqIHUPidh+uNaskvh2cjapxfsSRaxtN9p2+CE4KXIp+L
+         oR4dNi6k3bW5nB+oSATqoG/qyVKEIlSyvEuog4e2wDZcnNBZZ4pp9/qNvp+LvFm+TI0W
+         OBxNA/amFR7xasYYWgTzkgp2TGPeFqskiLHJC/kKr87RsmT+T8YjAQnibfGWfUlLzEm6
+         Dz2OolczKVRTLtVAIykR6EEX3bGLm5MxNXZB9e3dCc7iqZkqEGPDSBpdZI3i1zSLwj0r
+         SlSvqSEwPTsefCyBL7jv2P8mvr8SeZXCLhMYaCyt7ag4XVNq5jkOZMhDYQS2VicTt4Kk
+         aLiA==
+X-Gm-Message-State: AC+VfDw+7fYeSmdx5OdgD48Y68tiLq5HKaKFEb2Iqb0TyTNi4eMosXhY
+        ahlJng2lzMqVAj2nq01DXNK+ZBNusphU1H34HutmApWgqebRqO+PNLkEpMlP9KXg+wMWPTl7J1m
+        bzHvUsYHse9Zv
+X-Received: by 2002:a92:d70e:0:b0:331:45e5:7eb4 with SMTP id m14-20020a92d70e000000b0033145e57eb4mr488692iln.8.1684277603537;
+        Tue, 16 May 2023 15:53:23 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6fpANkITD6op5AHWN6yBz8DB2WTjb/xxFk/WaISkGfqMQwFcV3PIer4KT9w9F11idIcYp4qA==
+X-Received: by 2002:a92:d70e:0:b0:331:45e5:7eb4 with SMTP id m14-20020a92d70e000000b0033145e57eb4mr488673iln.8.1684277603187;
+        Tue, 16 May 2023 15:53:23 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id m16-20020a92d710000000b0032e1f94be7bsm3606691iln.33.2023.05.16.15.53.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 May 2023 15:53:22 -0700 (PDT)
+Date:   Tue, 16 May 2023 16:53:20 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Reinette Chatre <reinette.chatre@intel.com>
+Cc:     jgg@nvidia.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        tglx@linutronix.de, darwi@linutronix.de, kvm@vger.kernel.org,
+        dave.jiang@intel.com, jing2.liu@intel.com, ashok.raj@intel.com,
+        fenghua.yu@intel.com, tom.zanussi@linux.intel.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V5 00/11] vfio/pci: Support dynamic allocation of MSI-X
+ interrupts
+Message-ID: <20230516165320.229b4928.alex.williamson@redhat.com>
+In-Reply-To: <cover.1683740667.git.reinette.chatre@intel.com>
+References: <cover.1683740667.git.reinette.chatre@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 May 2023 11:49:19 +0200 Anders Roxell <anders.roxell@linaro.org> wrote:
+On Thu, 11 May 2023 08:44:27 -0700
+Reinette Chatre <reinette.chatre@intel.com> wrote:
 
-> On 2023-05-14 22:26, Lorenzo Stoakes wrote:
-> > The only instances of get_user_pages_remote() invocations which used the
-> > vmas parameter were for a single page which can instead simply look up the
-> > VMA directly. In particular:-
-> > 
-> > - __update_ref_ctr() looked up the VMA but did nothing with it so we simply
-> >   remove it.
-> > 
-> > - __access_remote_vm() was already using vma_lookup() when the original
-> >   lookup failed so by doing the lookup directly this also de-duplicates the
-> >   code.
-> > 
-> > We are able to perform these VMA operations as we already hold the
-> > mmap_lock in order to be able to call get_user_pages_remote().
-> > 
-> > As part of this work we add get_user_page_vma_remote() which abstracts the
-> > VMA lookup, error handling and decrementing the page reference count should
-> > the VMA lookup fail.
-> > 
-> > This forms part of a broader set of patches intended to eliminate the vmas
-> > parameter altogether.
-> > 
-> > -		int bytes, ret, offset;
-> > +		int bytes, offset;
-> >  		void *maddr;
-> > -		struct page *page = NULL;
-> > +		struct vm_area_struct *vma;
-> > +		struct page *page = get_user_page_vma_remote(mm, addr,
-> > +							     gup_flags, &vma);
-> > +
-> > +		if (IS_ERR_OR_NULL(page)) {
-> > +			int ret = 0;
-> 
-> I see the warning below when building without CONFIG_HAVE_IOREMAP_PROT set.
-> 
-> make --silent --keep-going --jobs=32 \
-> O=/home/anders/.cache/tuxmake/builds/1244/build ARCH=arm \
-> CROSS_COMPILE=arm-linux-gnueabihf- /home/anders/src/kernel/next/mm/memory.c: In function '__access_remote_vm':
-> /home/anders/src/kernel/next/mm/memory.c:5608:29: warning: unused variable 'ret' [-Wunused-variable]
->  5608 |                         int ret = 0;
->       |                             ^~~
+> Changes since V4:
+> - V4: https://lore.kernel.org/lkml/cover.1682615447.git.reinette.chatre@intel.com/
+> - Add Kevin's Reviewed-by tag as applicable.
+> - Treat non-existing INTx interrupt context as kernel bug with WARN. This
+>   exposed an issue in the scenario where INTx mask/unmask may occur without
+>   INTx enabled. This is fixed by obtaining the interrupt context later
+>   (right before use) within impacted functions: vfio_pci_intx_mask() and
+>   vfio_pci_intx_unmask_handler(). (Kevin)
+> - Treat pci_irq_vector() returning '0' for a MSI/MSI-X interrupt as a kernel
+>   bug via a WARN instead of ignoring this value. (Kevin)
+> - Improve accuracy of comments. (Kevin)
+> - Please refer to individual patches for local changes.
 
-Thanks, I did the obvious.
+Looks good to me.
 
-Also s/ret/res/, as `ret' is kinda reserved for "this is what this
-function will return".
+Kevin, do you want to add any additional reviews or check the changes
+made based on your previous comments?
 
---- a/mm/memory.c~mm-gup-remove-vmas-parameter-from-get_user_pages_remote-fix
-+++ a/mm/memory.c
-@@ -5605,11 +5605,11 @@ int __access_remote_vm(struct mm_struct
- 							     gup_flags, &vma);
+Thanks,
+Alex
+
  
- 		if (IS_ERR_OR_NULL(page)) {
--			int ret = 0;
--
- #ifndef CONFIG_HAVE_IOREMAP_PROT
- 			break;
- #else
-+			int res = 0;
-+
- 			/*
- 			 * Check if this is a VM_IO | VM_PFNMAP VMA, which
- 			 * we can access using slightly different code.
-@@ -5617,11 +5617,11 @@ int __access_remote_vm(struct mm_struct
- 			if (!vma)
- 				break;
- 			if (vma->vm_ops && vma->vm_ops->access)
--				ret = vma->vm_ops->access(vma, addr, buf,
-+				res = vma->vm_ops->access(vma, addr, buf,
- 							  len, write);
--			if (ret <= 0)
-+			if (res <= 0)
- 				break;
--			bytes = ret;
-+			bytes = res;
- #endif
- 		} else {
- 			bytes = len;
-_
+> Changes since V3:
+> - V3: https://lore.kernel.org/lkml/cover.1681837892.git.reinette.chatre@intel.com/
+> - Be considerate about layout and size with changes to
+>   struct vfio_pci_core_device. Keep flags together and transition all to
+>   use bitfields. (Alex and Jason)
+> - Do not free dynamically allocated interrupts on error path. (Alex)
+> - Please refer to individual patches for localized changes.
+> 
+> Changes since V2:
+> - V2: https://lore.kernel.org/lkml/cover.1680038771.git.reinette.chatre@intel.com/
+> - During testing of V2 "kernel test robot" reported issues resulting from
+>   include/linux/pci.h missing a stub for pci_msix_can_alloc_dyn() when
+>   CONFIG_PCI_MSI=n. A separate fix was sent to address this. The fix can
+>   be found in the kernel (since v6.3-rc7) as
+>   commit 195d8e5da3ac ("PCI/MSI: Provide missing stub for pci_msix_can_alloc_dyn()")
+> - Biggest change is the transition to "active contexts" for both MSI and MSI-X.
+>   Interrupt contexts have always been allocated when the interrupts are
+>   allocated while they are only used while interrupts are
+>   enabled. In this series interrupt contexts are made dynamic, while doing
+>   so their allocation is moved to match how they are used: allocated when
+>   interrupts are enabled. Whether a Linux interrupt number exists determines
+>   whether an interrupt can be enabled.
+>   Previous policy (up to V2) that an allocated interrupt has an interrupt
+>   context no longer applies. Instead, an interrupt context has a
+>   handler/trigger, aka "active contexts". (Alex)
+> - Re-ordered patches in support of "active contexts".
+> - Only free interrupts on MSI-X teardown and otherwise use the
+>   allocated interrupts as a cache. (Alex)
+> - Using unsigned int for the vector broke the unwind loop within
+>   vfio_msi_set_block(). (Alex)
+> - Introduce new "has_dyn_msix" property of virtual device instead of
+>   querying support every time. (Alex)
+> - Some smaller changes, please refer to individual patches.
+> 
+> Changes since RFC V1:
+> - RFC V1: https://lore.kernel.org/lkml/cover.1678911529.git.reinette.chatre@intel.com/
+> - Improved changelogs.
+> - Simplify interface so that vfio_irq_ctx_alloc_single() returns pointer to
+>   allocated context. (Alex)
+> - Remove vfio_irq_ctx_range_allocated() and associated attempts to maintain
+>   invalid error path behavior. (Alex and Kevin)
+> - Add pointer to interrupt context as function parameter to
+>   vfio_irq_ctx_free(). (Alex)
+> - Ensure variables are initialized. (Dan Carpenter)
+> - Only support dynamic allocation if device supports it. (Alex)
+> 
+> Qemu allocates interrupts incrementally at the time the guest unmasks an
+> interrupt, for example each time a Linux guest runs request_irq().
+> 
+> Dynamic allocation of MSI-X interrupts was not possible until v6.2 [1].
+> This prompted Qemu to, when allocating a new interrupt, first release all
+> previously allocated interrupts (including disable of MSI-X) followed
+> by re-allocation of all interrupts that includes the new interrupt.
+> Please see [2] for a detailed discussion about this issue.
+> 
+> Releasing and re-allocating interrupts may be acceptable if all
+> interrupts are unmasked during device initialization. If unmasking of
+> interrupts occur during runtime this may result in lost interrupts.
+> For example, consider an accelerator device with multiple work queues,
+> each work queue having a dedicated interrupt. A work queue can be
+> enabled at any time with its associated interrupt unmasked while other
+> work queues are already active. Having all interrupts released and MSI-X
+> disabled to enable the new work queue will impact active work queues.
+> 
+> This series builds on the recent interrupt sub-system core changes
+> that added support for dynamic MSI-X allocation after initial MSI-X
+> enabling.
+> 
+> Add support for dynamic MSI-X allocation to vfio-pci. A flag
+> indicating lack of support for dynamic allocation already exist:
+> VFIO_IRQ_INFO_NORESIZE and has always been set for MSI and MSI-X. With
+> support for dynamic MSI-X the flag is cleared for MSI-X when supported,
+> enabling Qemu to modify its behavior.
+> 
+> Any feedback is appreciated
+> 
+> Reinette
+> 
+> [1] commit 34026364df8e ("PCI/MSI: Provide post-enable dynamic allocation interfaces for MSI-X")
+> [2] https://lore.kernel.org/kvm/MWHPR11MB188603D0D809C1079F5817DC8C099@MWHPR11MB1886.namprd11.prod.outlook.com/#t
+> 
+> Reinette Chatre (11):
+>   vfio/pci: Consolidate irq cleanup on MSI/MSI-X disable
+>   vfio/pci: Remove negative check on unsigned vector
+>   vfio/pci: Prepare for dynamic interrupt context storage
+>   vfio/pci: Move to single error path
+>   vfio/pci: Use xarray for interrupt context storage
+>   vfio/pci: Remove interrupt context counter
+>   vfio/pci: Update stale comment
+>   vfio/pci: Use bitfield for struct vfio_pci_core_device flags
+>   vfio/pci: Probe and store ability to support dynamic MSI-X
+>   vfio/pci: Support dynamic MSI-X
+>   vfio/pci: Clear VFIO_IRQ_INFO_NORESIZE for MSI-X
+> 
+>  drivers/vfio/pci/vfio_pci_core.c  |   8 +-
+>  drivers/vfio/pci/vfio_pci_intrs.c | 305 ++++++++++++++++++++----------
+>  include/linux/vfio_pci_core.h     |  26 +--
+>  include/uapi/linux/vfio.h         |   3 +
+>  4 files changed, 229 insertions(+), 113 deletions(-)
+> 
+> 
+> base-commit: 457391b0380335d5e9a5babdec90ac53928b23b4
 
