@@ -2,116 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1512F704EDE
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 15:11:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5C55704F48
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 15:29:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233186AbjEPNLg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 09:11:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57050 "EHLO
+        id S232545AbjEPN3U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 09:29:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233006AbjEPNLe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 09:11:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85E06BD
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 06:11:33 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1A88E6194D
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 13:11:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 724E7C433D2;
-        Tue, 16 May 2023 13:11:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684242692;
-        bh=IJsMGoud7bTgHYYbedTM5y6Eb34rX7hOhJN1b6kykfU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=LK+bVF/5Z1JNGB1HcqBAUvUoSTK/dIyhQXtKGtZhCFdOX838n5Vl9DZh3P6AJKmy8
-         +plzXsfqoH3aebWLp+5lPHyspxKEhq1yyZHqHw9QeQZjV5TtxrMX52natFO8Db7X9O
-         F+KBLC28gB23BIIkGE1Bc/QDE0AyxZ3CLsq/WBxt2O5B2tz0zij4smpzubvIW4ZTS2
-         gevS1MTf6nMPIpQ/Aon/6VdfjDetb4QMI2SN9ZRCG3I5ALMqX24WrKEdOjHwD+Dn8X
-         n9PQrqMuhMubEn1NZCWiHZ6HPT/w9T5DNAhpEA4LxGZcYw5ryLztvDbnuJ+bes3S2j
-         4x10l8TMnahQw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pyuSg-00FXpL-Dd;
-        Tue, 16 May 2023 14:11:30 +0100
-Date:   Tue, 16 May 2023 14:11:30 +0100
-Message-ID: <867ct8mnel.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
+        with ESMTP id S231624AbjEPN3S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 09:29:18 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963C410DA;
+        Tue, 16 May 2023 06:29:17 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-64a9335a8e7so5612151b3a.0;
+        Tue, 16 May 2023 06:29:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684243757; x=1686835757;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jUpMKkeQ46D5uu18ivzpTiIogNM9XxtMaWsIe0fYmGc=;
+        b=NaJWSEVAIt3X4DtjyEJdf8yCCDHUz3EQN6BKfiW80SIkZspCQAyB4bjm07gOlridsq
+         /kaDGDRXLMJj6VB6sQg/Dt4IREqxuGwEVzrm2/o6NylG1XFMBl8AMP0jcrNEeJlwPUzs
+         UZJTie37JGC+/D0aHFikoWpQkzZuffCP440Qj4iD1DMaDQ8Cul6NIJjtQVM9j/JXXS7M
+         ztijTyH6kKgs4wN5H+UC/tSu7rIezUNZCC/JPFcKZspnaqQqil1esGcDIconlB3YB24b
+         szpqm+Gn0dHjC/WqdaDrWRAu5OPqQAvjVl+uOTfQWMTZVdLIbdLmNQscVjItfyhgOb0W
+         6r8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684243757; x=1686835757;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jUpMKkeQ46D5uu18ivzpTiIogNM9XxtMaWsIe0fYmGc=;
+        b=PHPyRYWAV50DfR94uDSm1ymjKtP+MC3LLXgNdYSwCprJy6mpaLveCpm7CY7aBKMJaI
+         NpH7FT7G9RN+Skt0dFrM3UzZCv8aBcSnv4qlMsdCP88RAfjwDvYleHPkRpGHkB8+tSI+
+         yi0LKqV3AaFd/rinFrhbAC8rOBVYzi8KH4MnwC6m5zuLpZtuMyZGHjwni4I+cxl7BuBM
+         hLeQF43MCQBzfneZ44TvbF01/a2DIkY5FtN2Ab+QqD9gFMNaKg7nI6hr5Rs59itExeDy
+         a15bY9baepwZx7u98yNTOCDz3+U+pr3aoCtbPbCAv2fag6ghLXeQuU/pugndwJxs1+/M
+         2M2A==
+X-Gm-Message-State: AC+VfDx/aSOBKe9UEYxpKpyWJOQxirvA8cG4wofk6RuAtbSf8C+VLI+a
+        /Ks0EqsKHv/43askzoaFiH0=
+X-Google-Smtp-Source: ACHHUZ5KQBHcV/EXVP/PA0CwMyI4VZOO8xTzsMe1XoYtRsH8glLYgll8eLIrWe/4QGYAucRkKnpjbA==
+X-Received: by 2002:a05:6a00:b45:b0:63d:3c39:ecc2 with SMTP id p5-20020a056a000b4500b0063d3c39ecc2mr45566401pfo.12.1684243756820;
+        Tue, 16 May 2023 06:29:16 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id n23-20020a62e517000000b0064398fe3451sm13327197pff.217.2023.05.16.06.29.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 May 2023 06:29:16 -0700 (PDT)
+Message-ID: <2d7f7f80-278d-9fcf-cfc4-c433e95d9842@gmail.com>
+Date:   Tue, 16 May 2023 21:29:07 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.10.1
+Subject: Re: [PATCH 0/2] KVM support for Intel PMU v5 fixed function PMC
+ bitmap
+Content-Language: en-US
+To:     Anselm Busse <abusse@amazon.com>
+Cc:     dwmw@amazon.co.uk, hborghor@amazon.de, sironi@amazon.de,
+        Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v8 0/6] Support writable CPU ID registers from userspace
-In-Reply-To: <87cz30h4nx.fsf@redhat.com>
-References: <20230503171618.2020461-1-jingzhangos@google.com>
-        <2ef9208dabe44f5db445a1061a0d5918@huawei.com>
-        <868rdomtfo.wl-maz@kernel.org>
-        <1a96a72e87684e2fb3f8c77e32516d04@huawei.com>
-        <87cz30h4nx.fsf@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: cohuck@redhat.com, shameerali.kolothum.thodi@huawei.com, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230427095333.35038-1-abusse@amazon.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20230427095333.35038-1-abusse@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 May 2023 12:55:14 +0100,
-Cornelia Huck <cohuck@redhat.com> wrote:
+On 27/4/2023 5:53 pm, Anselm Busse wrote:
+> Starting with v5, the Intel PMU allows to indicate the available fixed
+> function PMCs not only through CPUID.0AH.EDX[4:0] but also through a
+> bit mask in CPUID.0AH.ECX. According to the SDM the OS can consider a
+> fix function PMC i supported for:
 > 
-> Do you have more concrete ideas for QEMU CPU models already? Asking
-> because I wanted to talk about this at KVM Forum, so collecting what
-> others would like to do seems like a good idea :)
+> CPUID.0AH.ECX[i] || (CPUID.0AH.EDX[4:0] > i)
 
-I'm not being asked, but I'll share my thoughts anyway! ;-)
+Yes, this feature is attractive for virtualization scenarios, and it gives 
+flexibility
+to control which fixed counters are available or not in the virtual machine.
 
-I don't think CPU models are necessarily the most important thing.
-Specially when you look at the diversity of the ecosystem (and even
-the same CPU can be configured in different ways at integration
-time). Case in point, Neoverse N1 which can have its I/D caches made
-coherent or not. And the guest really wants to know which one it is
-(you can only lie in one direction).
+However, currently KVM/x86 also supports Intel PMU V2, so I would expect
+that we will review the enablement code for v3 and v4 first.
 
-But being able to control the feature set exposed to the guest from
-userspace is a huge benefit in terms of migration.
+Ref: 
+https://lore.kernel.org/kvm/CALMp9eQVnk8gkOpX5AHhaCr8-5Fe=qNuX8PUP1Gv2H5FSYmHSw@mail.gmail.com/
 
-Now, this is only half of the problem (and we're back to the CPU
-model): most of these CPUs have various degrees of brokenness. Most of
-the workarounds have to be implemented by the guest, and are keyed on
-the MIDR values. So somehow, you need to be able to expose *all* the
-possible MIDR values that a guest can observe in its lifetime.
-
-I have a vague prototype for that that I'd need to dust off and
-finish, because that's also needed for this very silly construct
-called big-little...
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> This behavior is already supported by the Intel PMU driver. However, KVM
+> support is missing. This patch series add the support by first
+> refactoring the tracking of available fixed function PMCs in KVM from a
+> number to a bitmap in the frist patch. The second patch populates the
+> bitmap accoring to the rule given by the SDM mentioned above.
+> 
+> Regards,
+> Anselm
+> 
+> Anselm Busse (2):
+>    KVM: vmx/pmu: Indicate available fixed function PMCs through a bitmap
+>    KVM: vmx/pmu: Add support for selected fixed vPMU enablement for PMU v5
+> 
+>   arch/x86/include/asm/kvm_host.h |  2 +-
+>   arch/x86/kvm/pmu.h              |  6 ++---
+>   arch/x86/kvm/svm/pmu.c          |  2 +-
+>   arch/x86/kvm/vmx/pmu_intel.c    | 40 ++++++++++++++++++++-------------
+>   4 files changed, 30 insertions(+), 20 deletions(-)
+> 
+> 
+> base-commit: 0cfd8703e7da687924371e9bc77a025bdeba9637
