@@ -2,167 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C7F27054A6
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 19:04:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E45DA705507
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 19:30:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230238AbjEPREG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 13:04:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38488 "EHLO
+        id S229633AbjEPRar (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 13:30:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229644AbjEPREF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 13:04:05 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2066.outbound.protection.outlook.com [40.107.93.66])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 187A1102;
-        Tue, 16 May 2023 10:04:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TVnjM+f7C2lqDXrixxKHXm+KGToFilkVKG7voHiZJkl9myymf+ObksTsqJnozF3a48KwijkbGmMulU5jst8aJshjfFhaRlmmq0GzwkVngEK/G/c3vidU3CR+RqREa6/+F32qSC06O5u8WuiqatTcnfJvMbxuqkqLC3+2f/4OHFBx+iFS03h4/KQ6PUbRvAw1GtyS2Lm7HaybrIay8mu3JLu6zxOX/fSJWL13kN9uNJreiAyKQYu/z0Is3rRNYqsA1YVVeZF9IB95NxFVu5xUCSn5+aNp3sv1khyH0/Hu0SRA/Ryqc5WRvzW6WjqNZ6Uzfd+ldn1GOG7HX7Rkepu2sA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=69PrBF497gMQGtzXZi1dErDa8PqQHhoZZT/PmP8uQpw=;
- b=RXKIKSBpRM42cF7kSwgI99SW/ie0iFEGqID8y/tQ6mG+gVVQ3TM2a5MIhrS5x+mdVFD+Gr+4g13Qr6VjzybNkfGKVr8oNI9M5qcwqSg3Vg9IgOy+I6SVz82A9zbaor/ov1xh0FXyBWKYEM+UbReXs5TbdfSEbiHcZODGl2D53b3CuE64JyR2FxddHsYOa3jxskAJSfNguxIeaytwC4jekY95QTspS1f9FA0rCFhwnDP1EJVwnC2xnrcJDtvqHRTkeV2EfuyYCUsYAY0f80Qh3hliNe/ptH/K8FozfC6nzRiQE2vrpwfEfQwoLlHKPMrlPIEZh6uGzZMoERCqqAJvsg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=69PrBF497gMQGtzXZi1dErDa8PqQHhoZZT/PmP8uQpw=;
- b=quRh28OSYSJ435SWGJhzISIQV0rXhjUo9V4cN7mBFBIhZJZaadrKa8VsKiSsaFFx2AiJfXXxoh2z0IDf9TgfIHqqK829Eqd7KxSyKCG39v5WtzoqIibhjezx+X4RSZhrbvvs8B+yM3xxXekWyWStoDI/52thOg/L9hnSfhIOb+Qmdub9smBDN4PTDJnLl4/rme0GnS15k1WyZZvNM6IBvlQUTr2Az8gzBewG6Olh61Db9VC6GdoxqIoX30UCCfuUDk5ghXS11gY8SlWUJJmQ33PBHxYWjTbc9kByoPHR5Kmq0uZn6pBV8SBgD98g5UI9zLALFhGVj1PlPje5PwS0BA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
- by DM6PR12MB4465.namprd12.prod.outlook.com (2603:10b6:5:28f::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.31; Tue, 16 May
- 2023 17:04:02 +0000
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::e01a:d41e:80b4:7cef]) by BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::e01a:d41e:80b4:7cef%6]) with mapi id 15.20.6387.032; Tue, 16 May 2023
- 17:04:02 +0000
-Message-ID: <dfb84ac7-cb5f-5631-3f71-7f882300e240@nvidia.com>
-Date:   Tue, 16 May 2023 10:03:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.1
-Subject: Re: [PATCH v5 1/6] mm/gup: remove unused vmas parameter from
- get_user_pages()
-Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Lorenzo Stoakes <lstoakes@gmail.com>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>, x86@kernel.org,
-        linux-sgx@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        "H . Peter Anvin" <hpa@zytor.com>, Xinhui Pan <Xinhui.Pan@amd.com>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dimitri Sivanich <dimitri.sivanich@hpe.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christian Konig <christian.koenig@amd.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-References: <cover.1684097001.git.lstoakes@gmail.com>
- <b61d5999a4fc6d50b7e073cc3c3efa8fe79bbd94.1684097002.git.lstoakes@gmail.com>
- <ZGKC9fHoE+kDs0ar@google.com>
- <b97e8c2a-b629-f597-d011-395071011f1b@redhat.com>
- <ZGOTadDG/b0904YI@google.com>
- <7e9651d6-382a-287c-cd08-03762ccce1f7@redhat.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <7e9651d6-382a-287c-cd08-03762ccce1f7@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR05CA0095.namprd05.prod.outlook.com
- (2603:10b6:a03:e0::36) To BY5PR12MB4130.namprd12.prod.outlook.com
- (2603:10b6:a03:20b::16)
+        with ESMTP id S231405AbjEPRan (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 13:30:43 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7877B35BC;
+        Tue, 16 May 2023 10:30:42 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34GHLZPF031845;
+        Tue, 16 May 2023 17:30:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=7xMOC1IuE8cNbuHlH1BRvtjy8UdshLHidP97vg6KXBQ=;
+ b=KOWwNnLhdq9u+nOxJqRfGQFMbxfGa0iF6YOMHck8TIRyaUVofAUEzseN5luek6nHPRYD
+ vQAR4922DoDCTKgBpGK6DrdQBKVbTc5oVwee4lHldCrr2GPPNVEmRL9DorhQOtzHgxOt
+ Tss+pCVF8qsuw2k5k4gq9bo1p0GVjWLqUylq+UO7wIF26vWKAth0Q9m1K/otAzDs8C5T
+ kf2SelKeFUZdfXhju/zCgXI6afKLNoHco+cmtwN3IqjSzvex6rE7zmAA1IhXnTkF5rzj
+ cVFlIQsomkD5/efHoHJiWyPDzFlORVsYuy77+FXLiWsaGmjpiJ4XVd87i0veuK7Dviqm 9g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qme5mr63p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 May 2023 17:30:40 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34GHQAIp011150;
+        Tue, 16 May 2023 17:30:40 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qme5mr62s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 May 2023 17:30:40 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34G7Zhql028201;
+        Tue, 16 May 2023 17:30:38 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3qj264ss3n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 May 2023 17:30:38 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34GHUZp024183324
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 May 2023 17:30:35 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2B7B320043;
+        Tue, 16 May 2023 17:30:35 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F2D5F20040;
+        Tue, 16 May 2023 17:30:34 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 16 May 2023 17:30:34 +0000 (GMT)
+Date:   Tue, 16 May 2023 19:17:24 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v2 1/6] s390x: add function to set DAT
+ mode for all interrupts
+Message-ID: <20230516191724.0b9809ac@p-imbrenda>
+In-Reply-To: <20230516130456.256205-2-nrb@linux.ibm.com>
+References: <20230516130456.256205-1-nrb@linux.ibm.com>
+        <20230516130456.256205-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4130:EE_|DM6PR12MB4465:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8eb85184-8d4f-4fed-b250-08db562f8c06
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kQpI8jSlx6im8pDgxB+kchrY6HZIxIR4s8KR1MLTMJb8OXlbeZtzUHOsvwLjps75aLRVy5plPcWOmuG7weVCsunAcsOQYnD6cBw6YxMTltPlmHJLGcub2eVTcr8aLdW1nCLG/28ayAvx6e3ypZ7UCmguaIUhfW4f3LaMbZqfDaCxUvtc2v69+cmvLPAgB2lTtxuip3Ve53hZdtift2A+PGNKWBg0p8RMbyweRcox48rzyK2jXSGcSvBdGfaRWEur0Hrl/dZka7IpL5KDnGirtkkmHt74sB6dbxZoz0E5+qX8vBOVNRDuTUpC69nOGkKwbQfCDIBc2iSyo0/jW19r2QBPk0Rt+PvcKiX1RClJEuUAxtutNAF85nxXSrOL/BqS57U01OuIDBpSRv/a0jImik4KFqJBwPVfd5gXi2xn3Jz2yFJ8DRXMudLmEGbXKCnaauITyTQh6qiVvoVMznNKfDL6nz1q37wpdq49o7JFC4XFdhQGbxIz5XHTJmMeAOLLQF3W/9mdgre8A72mNCOuU5zCDK0wUHx1QYBAiPg/CZdBM7OJN6sBqOL1V31VCbl2XLJzTRIod/duz4Js76EJwXA3IizpLILu/Wsm++4GOL0IIP4FiUeDJuJbH+LFkoUHB+Hop5CVhuDAcmBpjVHKkA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(346002)(376002)(396003)(39860400002)(451199021)(83380400001)(2616005)(66946007)(66556008)(66476007)(6486002)(478600001)(6666004)(26005)(107886003)(8676002)(7416002)(54906003)(186003)(110136005)(4744005)(31696002)(6506007)(5660300002)(8936002)(2906002)(86362001)(6512007)(316002)(4326008)(38100700002)(41300700001)(36756003)(53546011)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?STFRTEhianVpQzhyWnFxTjNRR3o1NFpPZ2dUYjNSQ20xUEs2LzlCNUJCQ2NM?=
- =?utf-8?B?em5tS1Y2bFFidWNvVVpqTjY5bjM1RGlJN1ZTVlYyNmc0bG1ycHRvRkZORjRt?=
- =?utf-8?B?L0x2aWtGNFRVTGJRcTQ3OXVDRnRodlRsRnBmZkJVNG9Nbnd1SmVVVnlMOTNw?=
- =?utf-8?B?Z0svQWl6aVl0eFpEVnBaQkZKUWZVYUZ3MHk4aDJXWFRMdjRZTEdUWXFXWWxM?=
- =?utf-8?B?MkhOdGM0MDR1R0hUTE1UbmcxaHV1WE4veWcvQ0s5UytwN2Z4QjM1UU5sMDVG?=
- =?utf-8?B?OFNUazdsSUorMnFObEdKZkRMbjV2cDZDOUphblV6VFhtOWhNL3hEYURLczNL?=
- =?utf-8?B?Y2MrVEVtUjhDdlJKZVd0M2Z5OFJONjRpVjVBS05vQXlCL3ZNU1J4Yk9Hckp1?=
- =?utf-8?B?UUJ6Q1hwbklDajRhU3djekNtc3VCMzJmd0tqeXYrUkpKYS9OcjFlS1NMRlpv?=
- =?utf-8?B?N05hZitNanR4QjZleFYyd25IZ0tkdVE1TkszcHpBSzJzN1ZicTVGVDRsdlZW?=
- =?utf-8?B?bkx2cms4YnJIdXBJTWo1d1h0eGRpWmxOYkM5RTdIbFBiZVdMcjV0eHljbVlG?=
- =?utf-8?B?TWtWUGlqWFRYMFFxVzBtY2I0SVYraWhHMElMMjlFK0ljNVE1MDZTc0h3Q096?=
- =?utf-8?B?cWlCdFpZNTZaWjJDOG1FdlhlcnRYcnRHK1NJTC9DUzNtS3RDZnM5QWFHTEJQ?=
- =?utf-8?B?eTRBLzdkWGNXRmt1U0dzUzhJN004S1FCUy8vcThuRVdFbVhFOGZUb2UyeE1U?=
- =?utf-8?B?SUJ0ZUlWTXVtU1Vjb0UvSDd4a0V6azZIUGF6SUlpMVJmUm9HTlNlNFIwdmdW?=
- =?utf-8?B?NGs4ZEZWR0l0SFRaVHRtMmZXd2w1Rmk2NGNmMEFsOVljc01XMXRpaVBMNGNq?=
- =?utf-8?B?K2JRNHh2Q2xZT2d2TFhZenp1UVhmcHBZTzNFWldKK1FHTWFjaDY0NVY2YXg0?=
- =?utf-8?B?YS9YaUJ5L01jN3A4YU1pMEhWT1VKNGljYklWN1lzRzE3UzI3Z1ZEakowc3Ex?=
- =?utf-8?B?enVnQ3NteDVXQW1lb1lmSUdrSVl3S0VOVkRNY0ZtYXFENkFVc2d2TlBUanB0?=
- =?utf-8?B?YnBsTjgrN0h1dEZ4MHhZSjUwdDRQUzFHcEJRMXVlTVo2dGNCQkY3VFd3ckQ5?=
- =?utf-8?B?d2hiS2JnUTZNS2YyODdDbmNhZkhZYjlhcE9MUjFLUTdhbHBKbHU3SGJIeHVX?=
- =?utf-8?B?eW1adVJaNndzSXhkUmxHWkVkNlJwSWRUcG9vRFBjTHFUWjZYOFJGZlg0WFR3?=
- =?utf-8?B?MVBHQmxLWE9SUW9NZW9yUVYrbzkrLzdFNXBUWE5KOUdremxxNnFBbkJwTjgz?=
- =?utf-8?B?NzUySVlIVDBBWjZ5ZTBGclZQcVh0T3JDU2FFejZ1RDZtZlFUNlFQZ2t0NUdh?=
- =?utf-8?B?ZitHODVNVFQ5WkZ4andhdXU5anlZT1FpemtXVVJOL1dwZENWdUFQQms0Uy9a?=
- =?utf-8?B?RUJ0dGEwRzkzTmxnUnJ4Wm9JVGd4OTdoTVZUa1l5RmlCQ1BlZ0QrTkEwVVA1?=
- =?utf-8?B?MFUwZVBlMnc2NVNWeitUYlU2a20xTnByV0FTZGVhdXArSVFPUkg2dTcyajRt?=
- =?utf-8?B?dnNyamNkTTlXZ3F2TWVmTjZjN0llQkEzM1BGeWxmb3Zpa2pNbHhuQVIrUUw3?=
- =?utf-8?B?T3Z4ZGQ4OXFPeGxmQ0tZbHFYN0tiRnJSQStNenB2TGc5Z3JhK252S1NuZC9W?=
- =?utf-8?B?QXAvWkMybWVCdi9id0M2TnNnbjlBZXkreDd0aW0yMTdhT1dGeUUwTmptZE9V?=
- =?utf-8?B?cDZycUp0dmRXcW5Ya21vMWFaVUNkbkpwYjNpYkI0ZTR0ZEgxRFJaelNUMnUv?=
- =?utf-8?B?TzBWblhYQ2sySlRXcFRUb2xhaG1XWEVsM2VkdTkxSmFheTlFWGx5dzRtK2c0?=
- =?utf-8?B?NmJ0cTB6OHlHZXRqL2Q3Ykl3dVBRYXBaUWNkSER5bTgrclBJTThLUDN1Tlp1?=
- =?utf-8?B?YzJHMlVsRTJvRGNvaklSQzd2Z0s3VC9lMlg1QzB4eUZXWDVYKzJ2RkdsSnVV?=
- =?utf-8?B?bW5sek1BMUM1Q3lNOWNXWUc5dXJXZTNTbFNNRnNLYWlOZlA4Mkd0WG5iTzU2?=
- =?utf-8?B?R0xEbWUrM0ZtU290YTNDV2NxYS9KZHdUQkJEanJxYUFvVTJvVVZqaEFxSmh4?=
- =?utf-8?Q?oEm6zP/EPsoorC+JtPC84NJEL?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8eb85184-8d4f-4fed-b250-08db562f8c06
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 May 2023 17:04:01.9836
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Xgab2dXUr4ntzf2cb6vGwVzPf+rWvuepZcnfhtWENIbjW33+FVBwykRsiaIad+DegwTK3+OREbC6YRITI22cKQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4465
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: NOelFF3dq1uqmxvo6-7oHRKoILZ3ArZh
+X-Proofpoint-GUID: _kwpX2z66qk9PMLfGMW9HjObjEz8NPq8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-16_09,2023-05-16_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ mlxlogscore=709 lowpriorityscore=0 suspectscore=0 adultscore=0 spamscore=0
+ impostorscore=0 clxscore=1015 phishscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2305160145
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/16/23 07:35, David Hildenbrand wrote:
-...
->>> When passing NULL as "pages" to get_user_pages(), __get_user_pages_locked()
->>> won't set FOLL_GET. As FOLL_PIN is also not set, we won't be messing with
->>> the mapcount of the page.
+On Tue, 16 May 2023 15:04:51 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
+
+> When toggling DAT or switch address space modes, it is likely that
+> interrupts should be handled in the same DAT or address space mode.
 > 
-> For completeness: s/mapcount/refcount/ :)
+> Add a function which toggles DAT and address space mode for all
+> interruptions, except restart interrupts.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>  lib/s390x/asm/interrupt.h |  4 ++++
+>  lib/s390x/interrupt.c     | 38 ++++++++++++++++++++++++++++++++++++++
+>  lib/s390x/mmu.c           |  5 +++--
+>  3 files changed, 45 insertions(+), 2 deletions(-)
+> 
+> diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
+> index 35c1145f0349..55759002dce2 100644
+> --- a/lib/s390x/asm/interrupt.h
+> +++ b/lib/s390x/asm/interrupt.h
+> @@ -83,6 +83,10 @@ void expect_ext_int(void);
+>  uint16_t clear_pgm_int(void);
+>  void check_pgm_int_code(uint16_t code);
+>  
+> +#define IRQ_DAT_ON	true
+> +#define IRQ_DAT_OFF	false
+> +void irq_set_dat_mode(bool dat, uint64_t as);
+> +
+>  /* Activate low-address protection */
+>  static inline void low_prot_enable(void)
+>  {
+> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index 3f993a363ae2..1180ec44d72f 100644
+> --- a/lib/s390x/interrupt.c
+> +++ b/lib/s390x/interrupt.c
+> @@ -9,6 +9,7 @@
+>   */
+>  #include <libcflat.h>
+>  #include <asm/barrier.h>
+> +#include <asm/mem.h>
+>  #include <asm/asm-offsets.h>
+>  #include <sclp.h>
+>  #include <interrupt.h>
+> @@ -104,6 +105,43 @@ void register_ext_cleanup_func(void (*f)(struct stack_frame_int *))
+>  	THIS_CPU->ext_cleanup_func = f;
+>  }
+>  
+> +/**
+> + * irq_set_dat_mode - Set the DAT mode of all interrupt handlers, except for
+> + * restart.
+> + * This will update the DAT mode and address space mode of all interrupt new
+> + * PSWs.
+> + *
+> + * Since enabling DAT needs initalized CRs and the restart new PSW is often used
+> + * to initalize CRs, the restart new PSW is never touched to avoid the chicken
+> + * and egg situation.
+> + *
+> + * @dat specifies whether to use DAT or not
+> + * @as specifies the address space mode to use - one of AS_PRIM, AS_ACCR,
+> + * AS_SECN or AS_HOME.
+> + */
+> +void irq_set_dat_mode(bool dat, uint64_t as)
+> +{
+> +	struct psw* irq_psws[] = {
+> +		OPAQUE_PTR(GEN_LC_EXT_NEW_PSW),
+> +		OPAQUE_PTR(GEN_LC_SVC_NEW_PSW),
+> +		OPAQUE_PTR(GEN_LC_PGM_NEW_PSW),
+> +		OPAQUE_PTR(GEN_LC_MCCK_NEW_PSW),
+> +		OPAQUE_PTR(GEN_LC_IO_NEW_PSW),
+> +		NULL /* sentinel */
+> +	};
+> +
+> +	assert(as == AS_PRIM || as == AS_ACCR || as == AS_SECN || as == AS_HOME);
+> +
+> +	for (struct psw *irq_psw = irq_psws[0]; irq_psw != NULL; irq_psw++) {
 
-whew, you had me going there! Now it all adds up. :) 
+just call it psw, or cur_psw, it's a little confusing otherwise
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+add in arch_def.c:
+
+#define PSW_MASK_AS 0x0000C00000000000UL
+
+> +		if (!dat)
+> +			irq_psw->mask &= ~PSW_MASK_DAT;
+
+cur_psw->mask &= ~(PSW_MASK_DAT | PSW_MASK_AS);
+if (dat)
+	cur_psw->mask |=  PSW_MASK_DAT | BIT_ULL(63 - 16);
+
+
+alternatively, you can redefine psw with a bitfield (as you mentioned
+offline):
+
+cur_psw->mask.dat = dat;
+if (dat)
+	cur_psw->mask.as = as;
+
+> +		else
+> +			irq_psw->mask |= PSW_MASK_DAT | as << (63 - 16);
+
+otherwise here you're ORing stuff to other stuff, if you had 3 and you
+OR 0 you get 3, but you actually want 0
+
+> +	}
+> +
+> +	mb();
+
+what's the purpose of this?
+
+> +}
+> +
+>  static void fixup_pgm_int(struct stack_frame_int *stack)
+>  {
+>  	/* If we have an error on SIE we directly move to sie_exit */
+> diff --git a/lib/s390x/mmu.c b/lib/s390x/mmu.c
+> index b474d7021d3f..199bd3fbc9c8 100644
+> --- a/lib/s390x/mmu.c
+> +++ b/lib/s390x/mmu.c
+> @@ -12,6 +12,7 @@
+>  #include <asm/pgtable.h>
+>  #include <asm/arch_def.h>
+>  #include <asm/barrier.h>
+> +#include <asm/interrupt.h>
+>  #include <vmalloc.h>
+>  #include "mmu.h"
+>  
+> @@ -41,8 +42,8 @@ static void mmu_enable(pgd_t *pgtable)
+>  	/* enable dat (primary == 0 set as default) */
+>  	enable_dat();
+>  
+> -	/* we can now also use DAT unconditionally in our PGM handler */
+> -	lowcore.pgm_new_psw.mask |= PSW_MASK_DAT;
+> +	/* we can now also use DAT in all interrupt handlers */
+> +	irq_set_dat_mode(IRQ_DAT_ON, AS_PRIM);
+>  }
+>  
+>  /*
 
