@@ -2,197 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D99F67054E5
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 19:21:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C62670550B
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 19:30:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231651AbjEPRVz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 13:21:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50074 "EHLO
+        id S231405AbjEPRav (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 13:30:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231579AbjEPRVx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 13:21:53 -0400
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE8B1E7A
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 10:21:45 -0700 (PDT)
-Received: by mail-il1-x12c.google.com with SMTP id e9e14a558f8ab-335a61eb904so13035ab.0
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 10:21:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684257705; x=1686849705;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GVZ+9c6lPsr2Ao0MCG6loW9XjO0wPrRtUbpRQdctJK8=;
-        b=V20gW+9L8/ycr7z7MDOazESc5AWPQ6RaLNAU1aDp3gfWGjsTlqyb+MOGJspMnYhrzV
-         ScNhoWkwm/CYep76EmK9b6+uQhuv4UzFHTo8iI1l6ODk5Lhb/+wCt5Yco6qwZDZh7ioT
-         a7am0Lrk/vP105gUHlugDOVJSELWJ3whi/YmC+qBm3zfc5wFKO2hTUrBymF8rfsBFAue
-         DDpMu2gB6x20PZhX+z0pixo0INU7xfSjzx7GnUdutGnIJOzRShVnCsz0dM/Vja2h3alB
-         3jMNtlPhTQTcOYfneJRQRVXF6yQPGblwP5erwuJ63dJnwqq9eCpbNF1J/VyOBsBuNGoZ
-         4hkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684257705; x=1686849705;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GVZ+9c6lPsr2Ao0MCG6loW9XjO0wPrRtUbpRQdctJK8=;
-        b=AO2klsFZctlgsqVVbmbJHa3UBH1tMwILnO1J5S0LjGP185HLNxlPfVstBsNRwrjFbW
-         Et/lcaYbMEMsE/gfpxNZF1+nenbYOs4fmJVSVl96vNHEf6JMjtv/rURS2/HXfq9xVC+3
-         gs3PBdj9CTC/IyP58TejDi7fplplqfWzdNpRXSSdoL1YpV0IX6WQv6jwpGWJRqMBrrG9
-         xmmRZTuKCrU4+Hm7CQuOuf/ftq+YLInK4+mKG8wNMX8xKbHLkkl9fdECzmrPNNwProJE
-         38nDD7Mh4PlowYjEh3Co9k6o/eLMXKlM1hvKBrO0rg8y5R7urPvhcgi2NbxywXhtRBP/
-         3WZw==
-X-Gm-Message-State: AC+VfDy4bAtSKz1PqX2fJqByMXKzcC/AvYPdtlmeNjRX7K++2+Z41/JN
-        1C9Aa0YqKKnh23H7HLlMn1a121FNFO0Z7aCXJ/4Ojw==
-X-Google-Smtp-Source: ACHHUZ6BL2PMIcSJjwAf2AgEJNcVVxzbOdam3StqauutqGNlV5v/nj8Tk0EG41bRNqE6I54B8OY65aevOf4qC52Evtg=
-X-Received: by 2002:a05:6e02:1a0d:b0:32a:db6c:d51d with SMTP id
- s13-20020a056e021a0d00b0032adb6cd51dmr325280ild.12.1684257704853; Tue, 16 May
- 2023 10:21:44 -0700 (PDT)
+        with ESMTP id S231536AbjEPRaq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 13:30:46 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C1D4A27C;
+        Tue, 16 May 2023 10:30:44 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34GHCBJ3003726;
+        Tue, 16 May 2023 17:30:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=4sTTnoeLU+kDni4VxpopKcMNHZCqc0+xw6oPhGSGjps=;
+ b=lszo6Gz+g5e5/u6uIacdzRg3aTa4P+c+hfP21L2jNvapfvnlvOR+2Mv4XQjtmHESU+hk
+ 3Wl4KYIjhESEDw9aeN5rRH1n6KL3acjIdzmT/ovvCaRvnq4Y6JTsHlu6BDWx+YjBonmi
+ T1MRZaCjQt6abuBQpiFF9nEtaIrFzRKNpk9cjYUSLg4l5eEDHa9zCeTGHhEuTv9CIDRX
+ JBPAzqV3GaaHez6f0VO9LBk9u4o2V9ptvyaYoMFug8a98pxXKwIzA6m4Ir3+jXune20u
+ 3UGwgsS9grdEspI8jzOL/MZT5rY7CzxxAUUQsYyd9SUW2zjM7wzM6sOQyLP0z/scR1vB eQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qmd8k9rnp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 May 2023 17:30:44 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34GHDlSM009863;
+        Tue, 16 May 2023 17:30:43 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qmd8k9rmu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 May 2023 17:30:43 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34G4UV7s012372;
+        Tue, 16 May 2023 17:30:41 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3qj264ssk6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 May 2023 17:30:41 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34GHUcVH20054574
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 May 2023 17:30:38 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5871920043;
+        Tue, 16 May 2023 17:30:38 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A1772004B;
+        Tue, 16 May 2023 17:30:38 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 16 May 2023 17:30:38 +0000 (GMT)
+Date:   Tue, 16 May 2023 19:22:25 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v2 2/6] s390x: sie: switch to home space
+ mode before entering SIE
+Message-ID: <20230516192225.2b4eea48@p-imbrenda>
+In-Reply-To: <20230516130456.256205-3-nrb@linux.ibm.com>
+References: <20230516130456.256205-1-nrb@linux.ibm.com>
+        <20230516130456.256205-3-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20230414172922.812640-1-rananta@google.com> <20230414172922.812640-8-rananta@google.com>
- <ZF5xLrr2tEYdLL1i@linux.dev>
-In-Reply-To: <ZF5xLrr2tEYdLL1i@linux.dev>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 16 May 2023 10:21:33 -0700
-Message-ID: <CAJHc60wUu3xB4J8oJ+FCxerDad1TzZLCMgHYGFfv0K-hzC0qmw@mail.gmail.com>
-Subject: Re: [PATCH v3 7/7] KVM: arm64: Use TLBI range-based intructions for unmap
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: CA4z1MrlAMOiZJPSLoQSS1webpw-ElCU
+X-Proofpoint-GUID: 4qLU8HcY1yNxM8RzC99iE0wwAl9wkd-T
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-16_09,2023-05-16_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ lowpriorityscore=0 priorityscore=1501 malwarescore=0 spamscore=0
+ bulkscore=0 clxscore=1015 suspectscore=0 impostorscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2305160145
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 12, 2023 at 10:02=E2=80=AFAM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
->
-> Hi Raghavendra,
->
-> On Fri, Apr 14, 2023 at 05:29:22PM +0000, Raghavendra Rao Ananta wrote:
-> > The current implementation of the stage-2 unmap walker traverses
-> > the given range and, as a part of break-before-make, performs
-> > TLB invalidations with a DSB for every PTE. A multitude of this
-> > combination could cause a performance bottleneck.
-> >
-> > Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
-> > invalidations until the entire walk is finished, and then
-> > use range-based instructions to invalidate the TLBs in one go.
-> > Condition this upon S2FWB in order to avoid walking the page-table
-> > again to perform the CMOs after issuing the TLBI.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 33 +++++++++++++++++++++++++++++----
-> >  1 file changed, 29 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
-c
-> > index 3f136e35feb5e..bcb748e3566c7 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -987,10 +987,16 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtab=
-le *pgt, u64 addr, u64 size,
-> >       return ret;
-> >  }
-> >
-> > +struct stage2_unmap_data {
-> > +     struct kvm_pgtable *pgt;
-> > +     bool skip_pte_tlbis;
-> > +};
-> > +
-> >  static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx=
-,
-> >                              enum kvm_pgtable_walk_flags visit)
-> >  {
-> > -     struct kvm_pgtable *pgt =3D ctx->arg;
-> > +     struct stage2_unmap_data *unmap_data =3D ctx->arg;
-> > +     struct kvm_pgtable *pgt =3D unmap_data->pgt;
-> >       struct kvm_s2_mmu *mmu =3D pgt->mmu;
-> >       struct kvm_pgtable_mm_ops *mm_ops =3D ctx->mm_ops;
-> >       kvm_pte_t *childp =3D NULL;
-> > @@ -1018,7 +1024,7 @@ static int stage2_unmap_walker(const struct kvm_p=
-gtable_visit_ctx *ctx,
-> >        * block entry and rely on the remaining portions being faulted
-> >        * back lazily.
-> >        */
-> > -     stage2_put_pte(ctx, mmu, mm_ops, false);
-> > +     stage2_put_pte(ctx, mmu, mm_ops, unmap_data->skip_pte_tlbis);
-> >
-> >       if (need_flush && mm_ops->dcache_clean_inval_poc)
-> >               mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old, m=
-m_ops),
-> > @@ -1032,13 +1038,32 @@ static int stage2_unmap_walker(const struct kvm=
-_pgtable_visit_ctx *ctx,
-> >
-> >  int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 si=
-ze)
-> >  {
-> > +     int ret;
-> > +     struct stage2_unmap_data unmap_data =3D {
-> > +             .pgt =3D pgt,
-> > +             /*
-> > +              * If FEAT_TLBIRANGE is implemented, defer the individial=
- PTE
-> > +              * TLB invalidations until the entire walk is finished, a=
-nd
-> > +              * then use the range-based TLBI instructions to do the
-> > +              * invalidations. Condition this upon S2FWB in order to a=
-void
-> > +              * a page-table walk again to perform the CMOs after TLBI=
-.
-> > +              */
-> > +             .skip_pte_tlbis =3D system_supports_tlb_range() &&
-> > +                                     stage2_has_fwb(pgt),
->
-> Why can't the underlying walker just call these two helpers directly?
-> There are static keys behind these...
->
-I wasn't aware of that. Although, I tried to look into the
-definitions, but couldn't understand how static keys are at play here.
-By any chance are you referring to the alternative_has_feature_*()
-implementations when checking for cpu capabilities?
+On Tue, 16 May 2023 15:04:52 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-Thank you.
-Raghavendra
+> This is to prepare for running guests without MSO/MSL, which is
+> currently not possible.
+> 
+> We already have code in sie64a to setup a guest primary ASCE before
+> entering SIE, so we can in theory switch to the page tables which
+> translate gpa to hpa.
+> 
+> But the host is running in primary space mode already, so changing the
+> primary ASCE before entering SIE will also affect the host's code and
+> data.
+> 
+> To make this switch useful, the host should run in a different address
+> space mode. Hence, set up and change to home address space mode before
+> installing the guest ASCE.
+> 
+> The home space ASCE is just copied over from the primary space ASCE, so
+> no functional change is intended, also for tests that want to use
+> MSO/MSL. If a test intends to use a different primary space ASCE, it can
+> now just set the guest.asce in the save_area.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
 
-> > +     };
-> >       struct kvm_pgtable_walker walker =3D {
-> >               .cb     =3D stage2_unmap_walker,
-> > -             .arg    =3D pgt,
-> > +             .arg    =3D &unmap_data,
-> >               .flags  =3D KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABL=
-E_POST,
-> >       };
-> >
-> > -     return kvm_pgtable_walk(pgt, addr, size, &walker);
-> > +     ret =3D kvm_pgtable_walk(pgt, addr, size, &walker);
-> > +     if (unmap_data.skip_pte_tlbis)
-> > +             /* Perform the deferred TLB invalidations */
-> > +             kvm_call_hyp(__kvm_tlb_flush_vmid_range, pgt->mmu,
-> > +                             addr, addr + size);
-> > +
-> > +     return ret;
-> >  }
-> >
-> >  struct stage2_attr_data {
-> > --
-> > 2.40.0.634.g4ca3ef3211-goog
-> >
->
-> --
-> Thanks,
-> Oliver
+[...]
+
+> diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
+> index 147cb0f2a556..0b00fb709776 100644
+> --- a/lib/s390x/sie.h
+> +++ b/lib/s390x/sie.h
+> @@ -284,5 +284,6 @@ void sie_handle_validity(struct vm *vm);
+>  void sie_guest_sca_create(struct vm *vm);
+>  void sie_guest_create(struct vm *vm, uint64_t guest_mem, uint64_t guest_mem_len);
+>  void sie_guest_destroy(struct vm *vm);
+> +bool sie_had_pgm_int(struct vm *vm);
+
+what's this?
+
+>  
+>  #endif /* _S390X_SIE_H_ */
+
