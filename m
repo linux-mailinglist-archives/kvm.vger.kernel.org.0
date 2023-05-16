@@ -2,106 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F7C67055E3
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 20:21:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D14170561E
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 20:37:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231300AbjEPSVj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 14:21:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35874 "EHLO
+        id S229957AbjEPShb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 14:37:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbjEPSVi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 14:21:38 -0400
-Received: from out-30.mta1.migadu.com (out-30.mta1.migadu.com [IPv6:2001:41d0:203:375::1e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31F0326AB
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 11:21:36 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1684261294;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DJIiUAqU0U9NkUHObypH6C3V+XIHAJcOTcw9BCe8MYk=;
-        b=AHw2Mna4in3bpSeHQGOK9UcQF7Ic+VOu0Nw7bkq0HabAiT/rFsZvYkaBF9XhXdwjtPdiEu
-        xzV+Y8j5JXJy5OlcaxwNvfBIe6HGtPlxoA/p8W4zkVXNH0ExAe24SB++k+sjde6N7MeG5d
-        5286z7RvdDWfEjRAURN6C9kZ3JqLsJs=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Oliver Upton <oliver.upton@linux.dev>,
-        Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
-        maz@kernel.org, yuzenghui@huawei.com, dmatlack@google.com
-Cc:     gshan@redhat.com, ricarkol@gmail.com, kvmarm@lists.linux.dev,
-        qperret@google.com, suzuki.poulose@arm.com, bgardon@google.com,
-        andrew.jones@linux.dev, rananta@google.com,
-        catalin.marinas@arm.com, kvm@vger.kernel.org, reijiw@google.com,
-        seanjc@google.com, alexandru.elisei@arm.com, eric.auger@redhat.com
-Subject: Re: [PATCH v8 00/12] Implement Eager Page Splitting for ARM
-Date:   Tue, 16 May 2023 18:21:09 +0000
-Message-ID: <168426111477.3193133.10748106199843780930.b4-ty@linux.dev>
-In-Reply-To: <20230426172330.1439644-1-ricarkol@google.com>
-References: <20230426172330.1439644-1-ricarkol@google.com>
+        with ESMTP id S229483AbjEPSh2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 14:37:28 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CAA910FA;
+        Tue, 16 May 2023 11:37:27 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-3f4c6c4b51eso73260385e9.2;
+        Tue, 16 May 2023 11:37:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684262246; x=1686854246;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yaslgZEeUfyG0dbWvN9RhS0f93vIcfVbTpmBHRl31SQ=;
+        b=ByOFPTS8wX1VocazZm5K+Z/cV+JAF1+/AEe+abUpe++GbuDmB2pEMIzzMc0Yrg+AFo
+         t1/2xGnROfijw9CNIHJfrhJA18laHF/O37aX7TWS9v+ye8bw/8ieT5MZvJk47O1k0LmC
+         xH609mx8Ukcznx13GNlVzb/lPR1B4vT6iO2oGCLO0KwZIPwOfdIgV9f7Zx75dp/vMUiU
+         6Hw7fZokzaskSvKzuW4yn9td7ihuacbj74EfwAguGShiogskn6VrXoSU3Zelpiodam6z
+         xOV/YzPM4V5atP0720m3Ct7bzaJ/CcfJqKIhq5QoFK0DuXoaX9z60S2NujzYokH04xie
+         IKgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684262246; x=1686854246;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yaslgZEeUfyG0dbWvN9RhS0f93vIcfVbTpmBHRl31SQ=;
+        b=ObEA1K6mPD4RvKLoXDV36XS2ppzJJnjUeZHXPWILXUh+XV4M+lLCgeG9TmMvcErPHp
+         xp/loH2LdtAh3CR1dTK5jZ7SeUTiF/t2roogHlcBe1R30nsmPmmXctBSC5RvF6CyjAjo
+         FSfGq4paBB/2HdiZSyh0ueKff/X4ffuKNuq3w9qtzTH3kO61UR/CblIxipqNj/UVIuMz
+         fmhj6djSqX0upMcLKqhHdT+xfsihEx7PNIjn4n466wkxDyxuoKbl6ufMf4e3KfGgTQfr
+         9Kw+otEfE4rjX6fh87QVA79AsbFvH8GVm1ScKz0Rc/lg4OQALl+uRNcXXlE7r7/Qu4pU
+         Gn4Q==
+X-Gm-Message-State: AC+VfDyjFnZuAyvQGkIj5ULIzNMA4K0OPptiUSHjzs11bqhkUfqkXvq5
+        kwqdLjmmklEriPiYEgZMAJs=
+X-Google-Smtp-Source: ACHHUZ5FbzA2y39DLkphw8Nq0JUTk+Jyh31cY6z+5LmeNOVBA5+4d41LJGOyvlXiibxy7NLJ7ZRP9A==
+X-Received: by 2002:a5d:4d44:0:b0:306:484e:e568 with SMTP id a4-20020a5d4d44000000b00306484ee568mr28717336wru.40.1684262245393;
+        Tue, 16 May 2023 11:37:25 -0700 (PDT)
+Received: from localhost (host86-156-84-164.range86-156.btcentralplus.com. [86.156.84.164])
+        by smtp.gmail.com with ESMTPSA id x9-20020a5d6509000000b00304b5b2f5ffsm212309wru.53.2023.05.16.11.37.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 May 2023 11:37:24 -0700 (PDT)
+Date:   Tue, 16 May 2023 19:37:23 +0100
+From:   Lorenzo Stoakes <lstoakes@gmail.com>
+To:     Anders Roxell <anders.roxell@linaro.org>
+Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-perf-users@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Eric Biederman <ebiederm@xmission.com>,
+        Kees Cook <keescook@chromium.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Kentaro Takeda <takedakn@nttdata.co.jp>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v5 3/6] mm/gup: remove vmas parameter from
+ get_user_pages_remote()
+Message-ID: <0db8b45d-8f7d-46bc-8739-c167c086bcfc@lucifer.local>
+References: <cover.1684097001.git.lstoakes@gmail.com>
+ <afe323639b7bda066ee5c7a6cca906f5ad8df940.1684097002.git.lstoakes@gmail.com>
+ <20230516094919.GA411@mutt>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230516094919.GA411@mutt>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        TO_EQ_FM_DIRECT_MX,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 26 Apr 2023 17:23:18 +0000, Ricardo Koller wrote:
-> Eager Page Splitting improves the performance of dirty-logging (used
-> in live migrations) when guest memory is backed by huge-pages.  It's
-> an optimization used in Google Cloud since 2016 on x86, and for the
-> last couple of months on ARM.
-> 
-> Background and motivation
-> =========================
-> Dirty logging is typically used for live-migration iterative copying.
-> KVM implements dirty-logging at the PAGE_SIZE granularity (will refer
-> to 4K pages from now on).  It does it by faulting on write-protected
-> 4K pages.  Therefore, enabling dirty-logging on a huge-page requires
-> breaking it into 4K pages in the first place.  KVM does this breaking
-> on fault, and because it's in the critical path it only maps the 4K
-> page that faulted; every other 4K page is left unmapped.  This is not
-> great for performance on ARM for a couple of reasons:
-> 
+On Tue, May 16, 2023 at 11:49:19AM +0200, Anders Roxell wrote:
+> On 2023-05-14 22:26, Lorenzo Stoakes wrote:
+> > The only instances of get_user_pages_remote() invocations which used the
+> > vmas parameter were for a single page which can instead simply look up the
+> > VMA directly. In particular:-
+> >
+> > - __update_ref_ctr() looked up the VMA but did nothing with it so we simply
+> >   remove it.
+> >
+> > - __access_remote_vm() was already using vma_lookup() when the original
+> >   lookup failed so by doing the lookup directly this also de-duplicates the
+> >   code.
+> >
+> > We are able to perform these VMA operations as we already hold the
+> > mmap_lock in order to be able to call get_user_pages_remote().
+> >
+> > As part of this work we add get_user_page_vma_remote() which abstracts the
+> > VMA lookup, error handling and decrementing the page reference count should
+> > the VMA lookup fail.
+> >
+> > This forms part of a broader set of patches intended to eliminate the vmas
+> > parameter altogether.
+> >
+> > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com> (for arm64)
+> > Acked-by: David Hildenbrand <david@redhat.com>
+> > Reviewed-by: Janosch Frank <frankja@linux.ibm.com> (for s390)
+> > Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
+> > ---
+> >  arch/arm64/kernel/mte.c   | 17 +++++++++--------
+> >  arch/s390/kvm/interrupt.c |  2 +-
+> >  fs/exec.c                 |  2 +-
+> >  include/linux/mm.h        | 34 +++++++++++++++++++++++++++++++---
+> >  kernel/events/uprobes.c   | 13 +++++--------
+> >  mm/gup.c                  | 12 ++++--------
+> >  mm/memory.c               | 14 +++++++-------
+> >  mm/rmap.c                 |  2 +-
+> >  security/tomoyo/domain.c  |  2 +-
+> >  virt/kvm/async_pf.c       |  3 +--
+> >  10 files changed, 61 insertions(+), 40 deletions(-)
+> >
+>
 > [...]
+>
+> > diff --git a/mm/memory.c b/mm/memory.c
+> > index 146bb94764f8..63632a5eafc1 100644
+> > --- a/mm/memory.c
+> > +++ b/mm/memory.c
+> > @@ -5590,7 +5590,6 @@ EXPORT_SYMBOL_GPL(generic_access_phys);
+> >  int __access_remote_vm(struct mm_struct *mm, unsigned long addr, void *buf,
+> >  		       int len, unsigned int gup_flags)
+> >  {
+> > -	struct vm_area_struct *vma;
+> >  	void *old_buf = buf;
+> >  	int write = gup_flags & FOLL_WRITE;
+> >
+> > @@ -5599,13 +5598,15 @@ int __access_remote_vm(struct mm_struct *mm, unsigned long addr, void *buf,
+> >
+> >  	/* ignore errors, just check how much was successfully transferred */
+> >  	while (len) {
+> > -		int bytes, ret, offset;
+> > +		int bytes, offset;
+> >  		void *maddr;
+> > -		struct page *page = NULL;
+> > +		struct vm_area_struct *vma;
+> > +		struct page *page = get_user_page_vma_remote(mm, addr,
+> > +							     gup_flags, &vma);
+> > +
+> > +		if (IS_ERR_OR_NULL(page)) {
+> > +			int ret = 0;
+>
+> I see the warning below when building without CONFIG_HAVE_IOREMAP_PROT set.
+>
+> make --silent --keep-going --jobs=32 \
+> O=/home/anders/.cache/tuxmake/builds/1244/build ARCH=arm \
+> CROSS_COMPILE=arm-linux-gnueabihf- /home/anders/src/kernel/next/mm/memory.c: In function '__access_remote_vm':
+> /home/anders/src/kernel/next/mm/memory.c:5608:29: warning: unused variable 'ret' [-Wunused-variable]
+>  5608 |                         int ret = 0;
+>       |                             ^~~
+>
 
-Picking these patches up early, as I'd like to get some mileage on the
-patches well in advance of 6.5.
+Ah damn, nice spot thanks!
 
-Applied to kvmarm/next, thanks!
+>
+> >
+> > -		ret = get_user_pages_remote(mm, addr, 1,
+> > -				gup_flags, &page, &vma, NULL);
+> > -		if (ret <= 0) {
+> >  #ifndef CONFIG_HAVE_IOREMAP_PROT
+> >  			break;
+> >  #else
+> > @@ -5613,7 +5614,6 @@ int __access_remote_vm(struct mm_struct *mm, unsigned long addr, void *buf,
+> >  			 * Check if this is a VM_IO | VM_PFNMAP VMA, which
+> >  			 * we can access using slightly different code.
+> >  			 */
+> > -			vma = vma_lookup(mm, addr);
+> >  			if (!vma)
+> >  				break;
+> >  			if (vma->vm_ops && vma->vm_ops->access)
+>
+> Cheers,
+> Anders
 
-[01/12] KVM: arm64: Rename free_removed to free_unlinked
-        https://git.kernel.org/kvmarm/kvmarm/c/c14d08c5adb2
-[02/12] KVM: arm64: Add KVM_PGTABLE_WALK flags for skipping CMOs and BBM TLBIs
-        https://git.kernel.org/kvmarm/kvmarm/c/02f10845f435
-[03/12] KVM: arm64: Add helper for creating unlinked stage2 subtrees
-        https://git.kernel.org/kvmarm/kvmarm/c/e7c05540c694
-[04/12] KVM: arm64: Export kvm_are_all_memslots_empty()
-        https://git.kernel.org/kvmarm/kvmarm/c/26f457142d7e
-[05/12] KVM: arm64: Add KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-        https://git.kernel.org/kvmarm/kvmarm/c/2f440b72e852
-[06/12] KVM: arm64: Add kvm_pgtable_stage2_split()
-        https://git.kernel.org/kvmarm/kvmarm/c/8f5a3eb7513f
-[07/12] KVM: arm64: Refactor kvm_arch_commit_memory_region()
-        https://git.kernel.org/kvmarm/kvmarm/c/6bd92b9d8b02
-[08/12] KVM: arm64: Add kvm_uninit_stage2_mmu()
-        https://git.kernel.org/kvmarm/kvmarm/c/ce2b60223800
-[09/12] KVM: arm64: Split huge pages when dirty logging is enabled
-        https://git.kernel.org/kvmarm/kvmarm/c/e7bf7a490c68
-[10/12] KVM: arm64: Open-code kvm_mmu_write_protect_pt_masked()
-        https://git.kernel.org/kvmarm/kvmarm/c/3005f6f29447
-[11/12] KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
-        https://git.kernel.org/kvmarm/kvmarm/c/6acf51666d03
-[12/12] KVM: arm64: Use local TLBI on permission relaxation
-        https://git.kernel.org/kvmarm/kvmarm/c/a12ab1378a88
+I enclose a -fix patch for this below:-
 
+----8<----
+From 6a4bb033a1ec60920e4945e7e063443f91489d06 Mon Sep 17 00:00:00 2001
+From: Lorenzo Stoakes <lstoakes@gmail.com>
+Date: Tue, 16 May 2023 19:16:22 +0100
+Subject: [PATCH] mm/gup: remove vmas parameter from get_user_pages_remote()
+
+Fix unused variable warning as reported by Anders Roxell.
+
+Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
+
+---
+ mm/memory.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mm/memory.c b/mm/memory.c
+index 63632a5eafc1..b1b25e61294a 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -5605,11 +5605,11 @@ int __access_remote_vm(struct mm_struct *mm, unsigned long addr, void *buf,
+ 							     gup_flags, &vma);
+
+ 		if (IS_ERR_OR_NULL(page)) {
+-			int ret = 0;
+-
+ #ifndef CONFIG_HAVE_IOREMAP_PROT
+ 			break;
+ #else
++			int ret = 0;
++
+ 			/*
+ 			 * Check if this is a VM_IO | VM_PFNMAP VMA, which
+ 			 * we can access using slightly different code.
 --
-Best,
-Oliver
+2.40.1
