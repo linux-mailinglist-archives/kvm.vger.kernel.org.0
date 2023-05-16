@@ -2,48 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57E3E7052FF
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 18:01:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A6C0705349
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 18:11:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234243AbjEPQBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 12:01:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55028 "EHLO
+        id S229820AbjEPQLu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 12:11:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232434AbjEPQBm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 12:01:42 -0400
+        with ESMTP id S229542AbjEPQLq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 12:11:46 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ABED40F5
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 09:01:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38896A5E0
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 09:11:27 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AFB3C633A6
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 16:01:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18D45C433EF;
-        Tue, 16 May 2023 16:01:40 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A7D4563397
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 16:11:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B116C433D2;
+        Tue, 16 May 2023 16:11:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684252900;
-        bh=GjOiiAlorp/so+OO/WtKtCBW4Yvzhv1+UXUClXfimoU=;
+        s=k20201202; t=1684253485;
+        bh=sItnS/W3hGMIZ8xDewgQMk1wOABe9uUE8aPZbDpdYH4=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=UDOJK8zMJB3En1Zvwzl3RYm6oITlX55grA1IIl/Mc2I7lYGxdMRUtHkHWnuQ82oYu
-         9ykUU6u14fOIGh4/7aZvdRggVpB41+KL9y+iO/09ZjVRWnYZUkrLHhztWDjwjdE2zd
-         dGsMyly5+RcURzTtzy2pkAfoXYrDNS5Hg+YHSBnSc1wXdbAa6Rcx9iyD/AT3YlE721
-         lCs1bHIp1KTjOam7JRkCXeDNhMliF522VOHnrkbQ3BVIK/t7NcPIJ9I4MRYU2SgiR0
-         6jsYuzqTQEfz3clWUtMrYegn9pBiPPrAqyC22uF2S3e2RyfpTFHhCt5SHWH2icwDSL
-         51etGwFUoPfnA==
+        b=mp3kgNX75/0aXMztfEw6hScQAPI/gG6YBDfFxlRSMnpamgiyyXHsjRQItfs/2FIlZ
+         WIkvnuYmwlTXV1DTkwHclveb6Pj+SNmbbbOJgYKr9aW0KTXrMohjkASRmvOM1ShtXo
+         sCvLbhvCEsKFQCuNdcn4xw3yp36Yc/dh49BoEGhRJZtb0a0wwFnWctF6Czb0xANrVW
+         8uVZK+YPYkYTFX0nCl8Xede3+IgDMaw9Ys+q8zwkPno0birKeBU3viItWlJpikTsbk
+         TH3WfhmabJtPdDXq5tCg4Ojvi6ELectmHMfdUn7AVjPJUDhsm11IXWxtzQgLIPgkzC
+         TQEhJNxuOGwNg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pyx7K-00Fb60-1C;
-        Tue, 16 May 2023 17:01:38 +0100
-Date:   Tue, 16 May 2023 17:01:37 +0100
-Message-ID: <86353wmfj2.wl-maz@kernel.org>
+        id 1pyxGk-00FbTf-Mu;
+        Tue, 16 May 2023 17:11:22 +0100
+Date:   Tue, 16 May 2023 17:11:22 +0100
+Message-ID: <861qjgmf2t.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
         ARMLinux <linux-arm-kernel@lists.infradead.org>,
         Oliver Upton <oupton@google.com>,
         Will Deacon <will@kernel.org>,
@@ -54,22 +52,17 @@ Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
         Fuad Tabba <tabba@google.com>,
         Reiji Watanabe <reijiw@google.com>,
         Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v8 0/6] Support writable CPU ID registers from userspace
-In-Reply-To: <87a5y4gy0b.fsf@redhat.com>
+Subject: Re: [PATCH v8 1/6] KVM: arm64: Move CPU ID feature registers emulation into a separate file
+In-Reply-To: <20230503171618.2020461-2-jingzhangos@google.com>
 References: <20230503171618.2020461-1-jingzhangos@google.com>
-        <2ef9208dabe44f5db445a1061a0d5918@huawei.com>
-        <868rdomtfo.wl-maz@kernel.org>
-        <1a96a72e87684e2fb3f8c77e32516d04@huawei.com>
-        <87cz30h4nx.fsf@redhat.com>
-        <867ct8mnel.wl-maz@kernel.org>
-        <87a5y4gy0b.fsf@redhat.com>
+        <20230503171618.2020461-2-jingzhangos@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: cohuck@redhat.com, shameerali.kolothum.thodi@huawei.com, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -82,64 +75,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 May 2023 15:19:00 +0100,
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Wed, 03 May 2023 18:16:13 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> On Tue, May 16 2023, Marc Zyngier <maz@kernel.org> wrote:
+> Create a new file id_regs.c for CPU ID feature registers emulation code,
+> which are moved from sys_regs.c and tweak sys_regs code accordingly.
 > 
-> > On Tue, 16 May 2023 12:55:14 +0100,
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >> 
-> >> Do you have more concrete ideas for QEMU CPU models already? Asking
-> >> because I wanted to talk about this at KVM Forum, so collecting what
-> >> others would like to do seems like a good idea :)
-> >
-> > I'm not being asked, but I'll share my thoughts anyway! ;-)
-> >
-> > I don't think CPU models are necessarily the most important thing.
-> > Specially when you look at the diversity of the ecosystem (and even
-> > the same CPU can be configured in different ways at integration
-> > time). Case in point, Neoverse N1 which can have its I/D caches made
-> > coherent or not. And the guest really wants to know which one it is
-> > (you can only lie in one direction).
-> >
-> > But being able to control the feature set exposed to the guest from
-> > userspace is a huge benefit in terms of migration.
+> No functional change intended.
 > 
-> Certainly; the important part is that we can keep the guest ABI
-> stable... which parts match to a "CPU model" in the way other
-> architectures use it is an interesting question. It almost certainly
-> will look different from e.g. s390, where we only have to deal with a
-> single manufacturer.
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/Makefile   |   2 +-
+>  arch/arm64/kvm/id_regs.c  | 460 +++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c | 464 ++++----------------------------------
+>  arch/arm64/kvm/sys_regs.h |  19 ++
+>  4 files changed, 519 insertions(+), 426 deletions(-)
+>  create mode 100644 arch/arm64/kvm/id_regs.c
 > 
-> I'm wondering whether we'll end up building frankenmonster CPUs.
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index c0c050e53157..a6a315fcd81e 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -13,7 +13,7 @@ obj-$(CONFIG_KVM) += hyp/
+>  kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>  	 inject_fault.o va_layout.o handle_exit.o \
+>  	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
+> -	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
+> +	 vgic-sys-reg-v3.o fpsimd.o pkvm.o id_regs.o \
+>  	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o \
+>  	 vgic/vgic.o vgic/vgic-init.o \
+>  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> new file mode 100644
+> index 000000000000..96b4c43a5100
+> --- /dev/null
+> +++ b/arch/arm64/kvm/id_regs.c
+> @@ -0,0 +1,460 @@
 
-We already do. KVM hides a bunch of things we don't want the guest to
-see, either because we don't support the feature, or that we want to
-present it with a different shape (cache topology, for example), and
-these combination don't really exist in any physical implementation.
+[...]
 
-Which is why I don't really buy the "CPU model" concept as defined by
-x86 and s390. We already are in a vastly different place.
+I really wonder why we move this to another file. It only creates
+noise, and doesn't add much. Yes, the file is big. But now you need to
+expose all the internal machinery that was private until now.
 
-The way I see it, you get a bunch of architectural features that can
-be enabled/disabled depending on the underlying HW, hypervisor's
-capabilities and userspace input. On top of that, there is a layer of
-paint that tells you what is the overall implementation you could be
-running on (that's what MIDR+REVIDR+AIDR tell you) so that you can
-apply some unspeakable, uarch-specific hacks that keep the machine
-going (got to love these CPU errata).
-
-> Another interesting aspect is how KVM ends up influencing what the guest
-> sees on the CPU level, as in the case where we migrate across matching
-> CPUs, but with a different software level. I think we want userspace to
-> control that to some extent, but I'm not sure if this fully matches the
-> CPU model context.
-
-I'm not sure I get the "different software level" part. Do you mean
-VMM revisions?
-
-Thanks,
+If you look at the global diffstat, this is "only" another 200
+lines. I don't think this is worth the churn.
 
 	M.
 
