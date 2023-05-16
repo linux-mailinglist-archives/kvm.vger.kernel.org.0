@@ -2,224 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9137B70417D
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 01:47:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52F1E70431D
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 03:50:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243399AbjEOXrA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 19:47:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39916 "EHLO
+        id S229753AbjEPBt7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 21:49:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240909AbjEOXqz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 19:46:55 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E8595269
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 16:46:54 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-ba712bb7b28so1532398276.1
-        for <kvm@vger.kernel.org>; Mon, 15 May 2023 16:46:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684194413; x=1686786413;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hKsIhDAHTI5ZGBx0uDNeQEoycM9HPHgfOdTtTFPu9+s=;
-        b=hWjyFiegM0tb/GaofgR7rRw3hIZNOV9FsPrhVWxTiKhHWqy6v0SUvlAjliF0ErVHJ7
-         Kz36gSecGJfOx5lmd37GnYQIXY/kt0kRwLdgrudskRZUGCpWfbBYEW/aGMIBWFsIIdNf
-         Bv2GFO7D0fLJlIBVO20wFzOmQoSqdIVKUUFDY6qv0gMzhzh6cYjrnbd0laa41ocCHvee
-         fStSOpGtclJAFcmhRcdWCFBM2yx94S5r0pXRzqTLnPqrgVOvUHR9nJoAG13J3sKPm6Vm
-         ss5vrtADrgVIer0DCcDTdGWmk927umJkQYXu71KPAD7Anf9kWBmf6BqmQUqhQINReCVR
-         iLFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684194413; x=1686786413;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hKsIhDAHTI5ZGBx0uDNeQEoycM9HPHgfOdTtTFPu9+s=;
-        b=HIpnmmPrjuS27Cwv4XvhwEcvmkdwDcqoXCQd7G8Dsx1Z9t+AmsaBkb8BVQp3zlFDj8
-         +YzklBicww3kYSkePUJRp1IUhRCMvb1sPH7bORuf2KFDrEBeMjDMETyldHDEPMgvlKLD
-         xAYcBqsjCPw/fDXauyLUM5MzFa7KNL6WBvfvkdNCqB4oz/ZDJh4cxH7/4ZJrWE26Jltz
-         KapmujjXEmm/Ij0OCWJ2SUiIezBwHq6EoJ1Q4uERIjeQmmZkIC/MokSv/2iPVLf6MLXI
-         UEOhFt2F/s5jgCwhDU1vwGItIs1hkpCI/erCsKfMFNXDym2Ty/WawohGpqiVNOMAIth5
-         XJqw==
-X-Gm-Message-State: AC+VfDyDJM6ZqwP/hTzXY6/eMNAQaxw8gd0bes5a88CSB6/FMMno2lwc
-        xK/7/ts8SnlCf5WI0/fOw6Aw4+lnCF0=
-X-Google-Smtp-Source: ACHHUZ5nKlYqg8fqkFRiAsU+szzbdXJrcWjwocU8iSc7OEG0O5T8XFggiMvHTBNDo9CrEEoZ2dw4RNcURAY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:9290:0:b0:ba8:1e5f:8514 with SMTP id
- y16-20020a259290000000b00ba81e5f8514mr184923ybl.5.1684194413294; Mon, 15 May
- 2023 16:46:53 -0700 (PDT)
-Date:   Mon, 15 May 2023 16:46:51 -0700
-In-Reply-To: <ZFWli2/H5M8MZRiY@google.com>
-Mime-Version: 1.0
-References: <ZEM5Zq8oo+xnApW9@google.com> <diqz8re2ftzb.fsf@ackerleytng-ctop.c.googlers.com>
- <ZFWli2/H5M8MZRiY@google.com>
-Message-ID: <ZGLEa2j4wi0t4xLI@google.com>
-Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
- KVM: mm: fd-based approach for supporting KVM)
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ackerley Tng <ackerleytng@google.com>
-Cc:     david@redhat.com, chao.p.peng@linux.intel.com, pbonzini@redhat.com,
-        vkuznets@redhat.com, jmattson@google.com, joro@8bytes.org,
-        mail@maciej.szmigiero.name, vbabka@suse.cz, vannapurve@google.com,
-        yu.c.zhang@linux.intel.com, kirill.shutemov@linux.intel.com,
-        dhildenb@redhat.com, qperret@google.com, tabba@google.com,
-        michael.roth@amd.com, wei.w.wang@intel.com, rppt@kernel.org,
-        liam.merwick@oracle.com, isaku.yamahata@gmail.com,
-        jarkko@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hughd@google.com, brauner@kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229553AbjEPBtz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 21:49:55 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42F511BD0;
+        Mon, 15 May 2023 18:49:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684201794; x=1715737794;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=yoBH6vhYXirTJn4ngLQetM+EEw/EqS96eNcX9cDbZ/o=;
+  b=BR04lS4lP/ELMB8tQoS067kbCPNy39tya0lNKYcdtOBpA4roEG1G1Aeg
+   YKmAxRUCqlkp2q2j0JyBzgTQiNJ1dEl9N6D9TmHAXQ5sarZxgrrMEnLe5
+   X4E0cHVpBEepw1U5mB/YC1Cwg0cVf6TfE3ec8l4qb0aLbPd/nB4ckSYZg
+   qxq7/QjOBWaHSCrJh51nIX4JfsQuspI9Cbsea1wFqsZBobY8LThLt4ywt
+   lRPUw2Etu408HkPLbjRrmiNcnWQrOJw8ScCkqiaf5h6Niu3ki4Z6HTqEA
+   xjNug+iSQY8UxovqRQ/rDYrhsHiWnnovzBF6F0Qb+r/l6nu6ku6S+TstG
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10711"; a="340716246"
+X-IronPort-AV: E=Sophos;i="5.99,277,1677571200"; 
+   d="scan'208";a="340716246"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2023 18:49:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10711"; a="790880836"
+X-IronPort-AV: E=Sophos;i="5.99,277,1677571200"; 
+   d="scan'208";a="790880836"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by FMSMGA003.fm.intel.com with ESMTP; 15 May 2023 18:49:48 -0700
+Message-ID: <57101685-35c3-8a71-9a39-a6d9fd58414c@linux.intel.com>
+Date:   Tue, 16 May 2023 09:49:13 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Cc:     baolu.lu@linux.intel.com, "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v3 3/4] iommufd: Add IOMMU_DEVICE_GET_HW_INFO
+Content-Language: en-US
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+References: <20230511143024.19542-1-yi.l.liu@intel.com>
+ <20230511143024.19542-4-yi.l.liu@intel.com>
+ <6ab2d63e-4dcc-6562-9698-d23300c7d1ae@linux.intel.com>
+ <DS0PR11MB752940450312B2E0529C3DC6C3789@DS0PR11MB7529.namprd11.prod.outlook.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <DS0PR11MB752940450312B2E0529C3DC6C3789@DS0PR11MB7529.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 05, 2023, Sean Christopherson wrote:
-> On Fri, May 05, 2023, Ackerley Tng wrote:
-> > One issue I=E2=80=99ve found so far is that the pointer to kvm (gmem->k=
-vm) is
-> > not cleaned up, and hence it is possible to crash the host kernel in th=
-e
-> > following way
-> >=20
-> > 1. Create a KVM VM
-> > 2. Create a guest mem fd on that VM
-> > 3. Create a memslot with the guest mem fd (hence binding the fd to the
-> >    VM)
-> > 4. Close/destroy the KVM VM
-> > 5. Call fallocate(PUNCH_HOLE) on the guest mem fd, which uses gmem->kvm
-> >    when it tries to do invalidation.
-> >=20
-> > I then tried to clean up the gmem->kvm pointer during unbinding when th=
-e
-> > KVM VM is destroyed.
-> >=20
-> > That works, but then I realized there=E2=80=99s a simpler way to use th=
-e pointer
-> > after freeing:
-> >=20
-> > 1. Create a KVM VM
-> > 2. Create a guest mem fd on that VM
-> > 3. Close/destroy the KVM VM
-> > 4. Call fallocate(PUNCH_HOLE) on the guest mem fd, which uses gmem->kvm
-> >    when it tries to do invalidation.
-> >=20
-> > Perhaps binding should mean setting the gmem->kvm pointer in addition t=
-o
-> > gmem->bindings. This makes binding and unbinding symmetric and avoids
-> > the use-after-frees described above.
->=20
-> Hrm, that would work, though it's a bit convoluted, e.g. would require de=
-tecting
-> when the last binding is being removed.  A similar (also ugly) solution w=
-ould be
-> to nullify gmem->kvm when KVM dies.
->=20
-> I don't love either approach idea because it means a file created in the =
-context
-> of a VM can outlive the VM itself, and then userspace ends up with a file=
- descriptor
-> that it can't do anything with except close().  I doubt that matters in p=
-ractice
-> though, e.g. when the VM dies, all memory can be freed so that the file e=
-nds up
-> being little more than a shell.  And if we go that route, there's no need=
- to grab
-> a reference to the file during bind, KVM can just grab a longterm referen=
-ce when
-> the file is initially created and then drop it when KVM dies (and nullifi=
-es gmem->kvm).
->=20
-> Blech, another wart is that I believe gmem would need to do __module_get(=
-) during
-> file creation to prevent kvm.ko from being unloaded after the last VM die=
-s.  Ah,
-> but that'd also be true if we went with a system-scoped KVM ioctl(), so I=
- suppose
-> it's not _that_ ugly.
->=20
-> Exchanging references (at binding or at creation) doesn't work, because t=
-hat
-> creates a circular dependency, i.e. gmem and KVM would pin each other.=20
->=20
-> A "proper" refcounting approach, where the file pins KVM and not vice ver=
-sa, gets
-> nasty because of how KVM's memslots work.  The least awful approach I can=
- think of
-> would be to delete the associated memslot(s) when the file is released, p=
-ossibly
-> via deferred work to avoid deadlock issues.  Not the prettiest thing ever=
- and in
-> some ways that'd yield an even worse ABI.
+On 5/15/23 2:14 PM, Liu, Yi L wrote:
+>> -----Original Message-----
+>> From: Baolu Lu<baolu.lu@linux.intel.com>
+>> Sent: Friday, May 12, 2023 1:39 PM
+>> To: Liu, Yi L<yi.l.liu@intel.com>;joro@8bytes.org;alex.williamson@redhat.com;
+>> jgg@nvidia.com; Tian, Kevin<kevin.tian@intel.com>;robin.murphy@arm.com
+>> Cc:baolu.lu@linux.intel.com;cohuck@redhat.com;eric.auger@redhat.com;
+>> nicolinc@nvidia.com;kvm@vger.kernel.org;mjrosato@linux.ibm.com;
+>> chao.p.peng@linux.intel.com;yi.y.sun@linux.intel.com;peterx@redhat.com;
+>> jasowang@redhat.com;shameerali.kolothum.thodi@huawei.com;lulu@redhat.com;
+>> suravee.suthikulpanit@amd.com;iommu@lists.linux.dev;linux-kernel@vger.kernel.org;
+>> linux-kselftest@vger.kernel.org; Duan, Zhenzhong<zhenzhong.duan@intel.com>
+>> Subject: Re: [PATCH v3 3/4] iommufd: Add IOMMU_DEVICE_GET_HW_INFO
+>>
+>> On 5/11/23 10:30 PM, Yi Liu wrote:
+>>> Under nested IOMMU translation, userspace owns the stage-1 translation
+>>> table (e.g. the stage-1 page table of Intel VT-d or the context table
+>>> of ARM SMMUv3, and etc.). Stage-1 translation tables are vendor specific,
+>>> and needs to be compatiable with the underlying IOMMU hardware. Hence,
+>>> userspace should know the IOMMU hardware capability before creating and
+>>> configuring the stage-1 translation table to kernel.
+>>>
+>>> This adds IOMMU_DEVICE_GET_HW_INFO to query the IOMMU hardware
+>> information
+>>> for a given device. The returned data is vendor specific, userspace needs
+>>> to decode it with the structure mapped by the @out_data_type field.
+>>>
+>>> As only physical devices have IOMMU hardware, so this will return error
+>>> if the given device is not a physical device.
+>>>
+>>> Co-developed-by: Nicolin Chen<nicolinc@nvidia.com>
+>>> Signed-off-by: Nicolin Chen<nicolinc@nvidia.com>
+>>> Signed-off-by: Yi Liu<yi.l.liu@intel.com>
+>>> ---
+>>>    drivers/iommu/iommufd/device.c          | 72 +++++++++++++++++++++++++
+>>>    drivers/iommu/iommufd/iommufd_private.h |  1 +
+>>>    drivers/iommu/iommufd/main.c            |  3 ++
+>>>    include/uapi/linux/iommufd.h            | 37 +++++++++++++
+>>>    4 files changed, 113 insertions(+)
+>>>
+>>> diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
+>>> index 051bd8e99858..bc99d092de8f 100644
+>>> --- a/drivers/iommu/iommufd/device.c
+>>> +++ b/drivers/iommu/iommufd/device.c
+>>> @@ -263,6 +263,78 @@ u32 iommufd_device_to_id(struct iommufd_device *idev)
+>>>    }
+>>>    EXPORT_SYMBOL_NS_GPL(iommufd_device_to_id, IOMMUFD);
+>>>
+>>> +static int iommufd_zero_fill_user(u64 ptr, int bytes)
+>>> +{
+>>> +	int index = 0;
+>>> +
+>>> +	for (; index < bytes; index++) {
+>>> +		if (put_user(0, (uint8_t __user *)u64_to_user_ptr(ptr + index)))
+>>> +			return -EFAULT;
+>>> +	}
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +int iommufd_device_get_hw_info(struct iommufd_ucmd *ucmd)
+>>> +{
+>>> +	struct iommu_hw_info *cmd = ucmd->cmd;
+>>> +	unsigned int length = 0, data_len;
+>>> +	struct iommufd_device *idev;
+>>> +	const struct iommu_ops *ops;
+>>> +	void *data = NULL;
+>>> +	int rc = 0;
+>>> +
+>>> +	if (cmd->flags || cmd->__reserved || !cmd->data_len)
+>>> +		return -EOPNOTSUPP;
+>>> +
+>>> +	idev = iommufd_get_device(ucmd, cmd->dev_id);
+>>> +	if (IS_ERR(idev))
+>>> +		return PTR_ERR(idev);
+>>> +
+>>> +	ops = dev_iommu_ops(idev->dev);
+>>> +	if (!ops->hw_info)
+>>> +		goto done;
+>> If the iommu driver doesn't provide a hw_info callback, it still
+>> returns success?
+> Yes, as noted in the cover letter. It's for a remark from Jason. In such
+> case, the out_data_type is NULL, it means no specific data is filled
+> in the buffer pointed by cmd->data_ptr.
+> 
+> - Let IOMMU_DEVICE_GET_HW_INFO succeed even the underlying iommu driver
+>     does not have driver-specific data to report per below remark.
+>     https://lore.kernel.org/kvm/ZAcwJSK%2F9UVI9LXu@nvidia.com/
 
-Circling back to this.  Pending testing, the "proper" refcounting approach =
-seems
-to be the way to go.  KVM's existing memslots actually work this way, e.g. =
-if
-userspace does munmap() on an active memslot, KVM zaps any PTEs but the mem=
-slot
-stays alive.  A similar approach can be taken here, the only wrinkle is tha=
-t the
-association between gmem and the memslot is stronger than between VMAs and =
-memslots,
-specifically KVM binds the file and not simply the file descriptor.  This i=
-s
-necessary because not binding to an exact file would let userspace install =
-a
-different file at the file descriptor.
+Oh, I overlooked that. Thanks for the explanation. It's fair enough.
 
-That's solvable without having to delete memslots though, e.g. by protectin=
-g the
-file pointer in the memslot with RCU and directly bumping the refcount in t=
-he two
-places where KVM needs to get at gmem (the file) via the memslot (unbind an=
-d
-faulting in a page).  E.g.
-
-  static struct file *kvm_gmem_get_file(struct kvm_memory_slot *slot)
-  {
-	struct file *file;
-
-	rcu_read_lock();
-
-	file =3D rcu_dereference(slot->gmem.file);
-	if (file && !get_file_rcu(file))
-		file =3D NULL;
-	rcu_read_unlock();
-
-	return file;
-  }
-
-The gotcha is that ->release could race with memslot deletion, as kvm_gmem_=
-unbind()
-won't be able to differentiate between "file was deleted" and "file is curr=
-ently
-being deleted".  That's easy enough to deal with though, kvm_gmem_release()=
- can
-take slots_lock to prevent the memslot from going away when nullifying and
-invalidating ranges for the memslot.
-
-> Side topic, there's a second bug (and probably more lurking): kvm_swap_ac=
-tive_memslots()'s
-> call to synchronize_srcu_expedited() is done _before_ the call to kvm_gme=
-m_unbind(),
-> i.e. doesn't wait for readers in kvm_gmem_invalidate_begin() to go away. =
- The easy
-> solution for that one is to add another synchronize_srcu_expedited() afte=
-r unbinding.
-
-There's a bug here, but not the one I pointed out.  Acquiring kvm->srcu doe=
-sn't
-provide any protection, the binding already has a pointer to the memslot, i=
-.e.
-isn't doing an SRCU-protected lookup in the memslots.  The actual protectio=
-n is
-provided by the filemap invalidate lock, which prevents unbinding a memslot=
- until
-all invalidations complete, i.e. acquiring kvm->srcu in the punch hole path=
- is
-completely unnecessary.
+Best regards,
+baolu
