@@ -2,160 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39435704E32
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 14:54:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB4BB704EA9
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 15:05:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233045AbjEPMyk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 08:54:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35994 "EHLO
+        id S233486AbjEPNFv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 09:05:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233049AbjEPMyf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 08:54:35 -0400
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2060e.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eb2::60e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 427B7527B;
-        Tue, 16 May 2023 05:54:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NRqfT5slah8b/N3QzDJX3dp36mSW0n8RS9A1/7i24GOSoR8DpDj2WeXAs0q4LZAp/leZ5hilMkLcWGV4sdGrJp4aT53gt83e6NhOqGhSHk6/o6YqemJ4TvV4Iwd6bFwgETQFZThFKsTLFicWrY5R+Qjox18bMBKPXGmgWmHKL3q/uZirh+5YqDGJ4AVFAhS81lfnhqhUOFGQL5nd02zeG1NgW7Ak5VdKOMaeTz1JutQhvYUWZVNDF39s/7Yc1bnXaRb+VHlQSaOfgvydEArP/OMMbtbaSmN90QdB3hxf8UkKieqgfSZH++BrVYMWSQCENjhd4tTGfz/3w/ZqjzWVHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JUg0YxL07CR9ite2+CkYkl7X3I9ChsDhPcMxuFVHJLI=;
- b=kII1JqERnseccREzsesMFBJfW4K43TkEGOErGAX96KV+GXO3CLyUotS/+J1kOY7pFFM0ELO30pb0vSCUaVssulVIP6CLY0+6qdbOOOVApx/RjxYGis04W9TbBdFhVXtsogylBrsrfnPYXk2k9cImsu1kXFLpp6B0R5Kh+HuUkMew4HziVh65kIwqW2tKwYvL85G+B6l/AWKYBg8zIYydv1Qo4xVsmErzGIGMXDOpNM3KygHfOe62pY82JjqDDRJK+PgOHz/rLysLIjgq243JXFnrpjffZeZo7cDmzzLk8VB6j0kxy+jp9vlZ5Or6munYUHAHCWv8+jEkiYr0OM1SXw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JUg0YxL07CR9ite2+CkYkl7X3I9ChsDhPcMxuFVHJLI=;
- b=IpGFhq4eFTKZeSvt3rwD3IOvHiVk6HH5ge0S9K84TeJCXzRbIhwzh8a59e6jXYxqA7tqWcvIn6kG/xoUBB8b5iEZJWO3Dvard3N6ts/yL39dfdjHcXqmwbFc7s6bIbUU6y5ra4fXBeU1OFGsvByWyGGoLkT6JPlllIOj0e/wqTi38qelUZ+gPworkzGfQFgee55o18t5UhJe3yN6XTMDsk3tyK7dZKHjjkFgVHFF1k4qb52v8lErAFdrz61lVnPFaLalJb29sc6wOnyifvkP205utWDDv/eHZlABhj5tk0d0XAjdTC95UYkQ+s7PQvEr1EkYDVkVggxi3vIiDdHj0w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SN7PR12MB7812.namprd12.prod.outlook.com (2603:10b6:806:329::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.30; Tue, 16 May
- 2023 12:54:21 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6387.030; Tue, 16 May 2023
- 12:54:21 +0000
-Date:   Tue, 16 May 2023 09:54:20 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Baolu Lu <baolu.lu@linux.intel.com>
-Cc:     iommu@lists.linux.dev, linux-kselftest@vger.kernel.org,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Lixiao Yang <lixiao.yang@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH v7 02/19] iommufd: Add iommufd_group
-Message-ID: <ZGN8/K2qg4zsaeYQ@nvidia.com>
-References: <2-v7-6c0fd698eda2+5e3-iommufd_alloc_jgg@nvidia.com>
- <89d800bf-87cf-6a7d-85b3-74bd457b1454@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <89d800bf-87cf-6a7d-85b3-74bd457b1454@linux.intel.com>
-X-ClientProxiedBy: BL1P223CA0027.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:208:2c4::32) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S233518AbjEPNF2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 09:05:28 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C8207EE6;
+        Tue, 16 May 2023 06:05:14 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34GCcecL014930;
+        Tue, 16 May 2023 13:05:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=InV0wzE/hmnvNbld4gJlyZ/LP3jJNfjJEPl1q236sx4=;
+ b=QGBKBq0FhaDQnvJTkcIZ9wbHFfcrAtTQL1M6OFTjqekcxk02kBBtW8JyMnRJSL9mXE5w
+ ZnyEevoP7kR6Ki+5tTlbJsrpMjSaZmKOzH52JIsuxpG6g3/PEgssdxDuRc1kjNN0ULzM
+ uyfphXl/4CX7DtfbjyQ/WS3CRDS/LMk81CcrJ9nv0R7Il8tWvSVyaOTbEeskrwywlH8N
+ gTczDY4z3w9vavQw7gUUHA5lh2N4R+NkIA9jf1TtfTGNT5RvXMG7/xMblziM04QpADxb
+ XezRRx6gi63xSBrW2xzqDao6Ec7lru5mpUGG4kjG8gjzUzn//RT5X7x+6+GNzJSqJ8rx hg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qm8h63weh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 May 2023 13:05:10 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34GD4dPR022094;
+        Tue, 16 May 2023 13:05:05 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qm8h63w6s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 May 2023 13:05:05 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34G67uQs005223;
+        Tue, 16 May 2023 13:05:00 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3qj264sn3s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 May 2023 13:04:59 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34GD4uds14418566
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 May 2023 13:04:56 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8380D20043;
+        Tue, 16 May 2023 13:04:56 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5C87720040;
+        Tue, 16 May 2023 13:04:56 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 16 May 2023 13:04:56 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v2 0/6] s390x: Add support for running guests without MSO/MSL
+Date:   Tue, 16 May 2023 15:04:50 +0200
+Message-Id: <20230516130456.256205-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SN7PR12MB7812:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c6bd522-07e7-47b9-557c-08db560cab23
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: iNjsxtSrCw3VDWilNOwHgNii7A1teXWNeiXok6DZiGOSDuGZrxybb2RjlFPIkk5//IXYBFlz+azBOMq8g9EiRDM7b8ohM1va24F9qsWaWVtffivLzqh/eeatRsvrnpMrgV9HNM+csFDwpvUv6uX92+SsSauaDr6A1e+pwJ0hXp/YAn8c1Nly4eJ715KSzSd8pqkDFlVSTqSPopQ2RV2eFTC+yuOhPjAnP5mQusttAivj6K5dGdIGMe/0eUMTB89M9GJ3nsgb0GC06pfitH5seluJGKimFRaX/n9UXrixchdqZGc5vmKr6Mv73Ws8jYABQUAOmXR3HjCWG2oSI09GeUfGB3X4C0L241iZQqDrqxtGsHaY+DHEGqMP8yD5AMcbhlPQ8oTIQPGhtpfFxd7X0C1DeGYPRBNS091xo2sBcWImbeCC2L+gZ+VE7sv619dZWSaR+KRlXx67ivNYvatk8fFO+izr8HydUq93AOk4bM4BH1Zd0yP3WAJD/f8Zv5GtRLRzwxEG1TXxjPyFU/EWneyu+MI5DQdNRgWrv24loArdQ/xhiLIS83hF0UsJUXSy
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(39860400002)(376002)(136003)(366004)(451199021)(6916009)(4326008)(316002)(41300700001)(38100700002)(36756003)(66556008)(6506007)(478600001)(6486002)(66946007)(2616005)(66476007)(8676002)(86362001)(6512007)(26005)(53546011)(8936002)(5660300002)(2906002)(54906003)(186003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Gz/Fl1ernAC6crBjwAjm3DgX7Wtw7BC0sCiLz9gErI2UZL421z3sKHDluJVa?=
- =?us-ascii?Q?pPTv+QV5ohe3ndLMoF/20lGU3fbO21yNwWMl1iIp18k6dfntDhCAkO0wf0Mg?=
- =?us-ascii?Q?bDOZXMV+bZ66n84mwph5kKLV7ZrSZ8ZkGk7lha0OBJ8Ln8NJMKimR0V7M4R5?=
- =?us-ascii?Q?hiX28MXGHse0KVzJXpqqVzoEOnM1IJvf9wFexvsRSfOhzwWcYHkgQUx8L6sV?=
- =?us-ascii?Q?7hpJSnt6BmgIQcGL0GJXZQA7XajSCnBW/F7MXNyrfrBiX6Um7l3xxOTo2k4r?=
- =?us-ascii?Q?2vE+Tvv6TTdpbj4oIWgp3t9/h/k3xPNlu+RlbYNwl7A1pIvAdw42VWrE0oc+?=
- =?us-ascii?Q?3RuVqF0ZnuhEAlnX+zTxk2LqP5D4y0l1wFF9IHL3nT0eu7bOY7P3W/2rnCVy?=
- =?us-ascii?Q?RCMkhB6vR7Itc4vrOSUq9C7dG5D6DNmvkg3f8b6IPrFnBbjX00GHVAQ1ihgb?=
- =?us-ascii?Q?/vfLOKU54+c9QLmbv9HpNLKfPIneegTwbBZYh/mD6o9M79PjTeN3hS+ScOgq?=
- =?us-ascii?Q?JbuIhvHE/tVlrnz8VqdcWm/mwPD29jyb7/GQg1++JU+eQZP/HTbZJck1fLuE?=
- =?us-ascii?Q?9huCSTxzLm4en4v+SVChrN7TUwgUOnE1DTGkHx1teXfYsK5180L2Kz9COjnY?=
- =?us-ascii?Q?mAultotBwHQLaUhdmwSnHVgxEOg2yOQ/8OgdMK+kWdHF0bariyWiRsdf675b?=
- =?us-ascii?Q?/bnDlP7vJVVMftTxGc54Y9lImUar8qU2UHd3JhBWh/mqcmFmMUUSkEPBOOlY?=
- =?us-ascii?Q?PA7xWwzJB34FDGBuVrnW/a1yx5W7VgbhY4QXt2xuudoVHnXQRkVYHXDMQyjf?=
- =?us-ascii?Q?rt5lw1JQ7G4JXMYN3N5ydpXhAl+9qKvag63AaPAOVOGrGuYuQFwHMZeDaGn5?=
- =?us-ascii?Q?oeJdJGWONqAuxSBLPk/aTt0TDlH0w2gSKyVXdaG3TLSsWYr809qhaOFbNzQY?=
- =?us-ascii?Q?04sqAQu/6VasHGSPmL5bhWygbNG9U/AGuIkbw8aDoSn/g1nz/Yo30EN9kPPF?=
- =?us-ascii?Q?zlVWIoygsq/DdmypxlRu21BkaBflZjZEj4nNm7gvMFC/IwID4XiAYKVooHSH?=
- =?us-ascii?Q?D7lSUMHxGX53eyzWoiBiNgNMbxqPIb0OZj5JtohrTL1jxkmiIa9KPdKXfgbB?=
- =?us-ascii?Q?oyMmkFK905EhBamYzI/Qao+8VlXW4EYseEwbe2NQjwO/8/014Fp1OzVcu4RT?=
- =?us-ascii?Q?0q9TLmxIYQwXWd3X73IRMqeAZ0Gg+SVHow+t8vdgEwHSnHKkNZJfomdxccd3?=
- =?us-ascii?Q?sOJ1sjAXlXBBwLbZi9L/ONWG+0kpPQ+G4e98MaobLjZkOuZmN26iIZluIWhf?=
- =?us-ascii?Q?d4CsmBoBDwVvjGffmobgcDtb3MHCJTUwZzwb9mvXiJceHMP+OnbKfsk5LUAv?=
- =?us-ascii?Q?upkI2bVgeKuEk572M7NLdCf7kk0AKglfPyMea/zJFgBfjDvJsf0yUm6SLsF6?=
- =?us-ascii?Q?vGhlURA2AGmcpyZgPv/8kCGDvzCLfJ1ZdAgGkyDIyVIaikwqL0oertPvqAUx?=
- =?us-ascii?Q?bvismyZo8dRUp0IKS+PSat9U5jriEhC7xfJv2k3C2gjLrn6FnNgeURwZCGqF?=
- =?us-ascii?Q?owBfhnfRJ0b4kvP+P2vBQTVEZsdM8IKGf3WL4HZx?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c6bd522-07e7-47b9-557c-08db560cab23
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 May 2023 12:54:21.5094
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VEcE/1ZglaNILLrDNR+uqDppjNP04SYsfIi2RTE0geEX7fB+Wf1SfMY448rpbGnu
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7812
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: dKYclYBw29ye41LYAa9p1R-pEaGDVUql
+X-Proofpoint-ORIG-GUID: K0m8TdrN1Hexc-yBktm0T9DW4fFl0h1t
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-16_06,2023-05-16_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=538
+ priorityscore=1501 impostorscore=0 mlxscore=0 clxscore=1015 malwarescore=0
+ phishscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2305160110
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 16, 2023 at 10:43:23AM +0800, Baolu Lu wrote:
-> On 5/15/23 10:00 PM, Jason Gunthorpe wrote:
-> >   void iommufd_device_destroy(struct iommufd_object *obj)
-> >   {
-> >   	struct iommufd_device *idev =
-> >   		container_of(obj, struct iommufd_device, obj);
-> >   	iommu_device_release_dma_owner(idev->dev);
-> > -	iommu_group_put(idev->group);
-> > +	iommufd_put_group(idev->igroup);
-> >   	if (!iommufd_selftest_is_mock_dev(idev->dev))
-> >   		iommufd_ctx_put(idev->ictx);
-> >   }
-> > @@ -46,7 +154,7 @@ struct iommufd_device *iommufd_device_bind(struct iommufd_ctx *ictx,
-> >   					   struct device *dev, u32 *id)
-> >   {
-> >   	struct iommufd_device *idev;
-> > -	struct iommu_group *group;
-> > +	struct iommufd_group *igroup;
-> >   	int rc;
-> >   	/*
-> > @@ -56,9 +164,9 @@ struct iommufd_device *iommufd_device_bind(struct iommufd_ctx *ictx,
-> >   	if (!device_iommu_capable(dev, IOMMU_CAP_CACHE_COHERENCY))
-> >   		return ERR_PTR(-EINVAL);
-> > -	group = iommu_group_get(dev);
-> > -	if (!group)
-> > -		return ERR_PTR(-ENODEV);
-> > +	igroup = iommufd_get_group(ictx, dev);
-> > +	if (IS_ERR(igroup))
-> > +		return ERR_CAST(igroup);
-> >   	/*
-> >   	 * For historical compat with VFIO the insecure interrupt path is
-> 
-> Hi Jason,
-> 
-> Perhaps I am asking a silly question. The iommufd_group is get in
-> iommufd_device_bind(), but put in iommufd_device_destroy(). Why not put
-> it in iommufd_device_unbind()?
+v2:
+---
+* add function to change DAT/AS mode for all irq handlers (Janosch, Claudio)
+* instead of a new flag in PROG0C, check the pgm int code in lowcore (Janosch)
+* fix indents, comments (Nina)
 
-It basically is like that, iommufd_device_destroy() is a helper that
-is only called by iommufd_device_unbind() through the usual
-destruction mechanism.
+Right now, all SIE tests in kvm-unit-tests (i.e. where kvm-unit-test is the
+hypervisor) run using MSO/MSL.
 
-Jason
+This is convenient, because it's simple. But it also comes with
+disadvantages, for example some features are unavailabe with MSO/MSL.
+
+This series adds support for running guests without MSO/MSL with dedicated
+guest page tables for the GPA->HPA translation.
+
+Since SIE implicitly uses the primary space mode for the guest, the host
+can't run in the primary space mode, too. To avoid moving all tests to the
+home space mode, only switch to home space mode when it is actually needed.
+
+This series also comes with various bugfixes that were caught while
+develoing this.
+
+Nico Boehr (6):
+  s390x: add function to set DAT mode for all interrupts
+  s390x: sie: switch to home space mode before entering SIE
+  s390x: lib: don't forward PSW when handling exception in SIE
+  s390x: fix compile of interrupt.c
+  s390x: lib: sie: don't reenter SIE on pgm int
+  s390x: add a test for SIE without MSO/MSL
+
+ lib/s390x/asm/arch_def.h   |   1 +
+ lib/s390x/asm/interrupt.h  |   5 ++
+ lib/s390x/asm/mem.h        |   1 +
+ lib/s390x/interrupt.c      |  54 +++++++++++++++++
+ lib/s390x/mmu.c            |   5 +-
+ lib/s390x/sie.c            |  22 ++++++-
+ s390x/Makefile             |   2 +
+ s390x/sie-dat.c            | 120 +++++++++++++++++++++++++++++++++++++
+ s390x/snippets/c/sie-dat.c |  58 ++++++++++++++++++
+ s390x/unittests.cfg        |   3 +
+ 10 files changed, 268 insertions(+), 3 deletions(-)
+ create mode 100644 s390x/sie-dat.c
+ create mode 100644 s390x/snippets/c/sie-dat.c
+
+-- 
+2.39.1
+
