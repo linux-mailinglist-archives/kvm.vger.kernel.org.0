@@ -2,115 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2280D704A81
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 12:27:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D94E704A8D
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 12:30:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232365AbjEPK1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 06:27:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52126 "EHLO
+        id S232147AbjEPKaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 06:30:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232157AbjEPK1E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 06:27:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B6FF468E
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 03:26:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684232778;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=A8RPDB5oCUZPol53GuFRKa1PDnfifaD9ISAfpPJWqOU=;
-        b=WoNrQaIRdRLKO44WdstukE5Sz6Up2LNlNGNSMpzStnCqhiOWO7Nde/b+T8MFLP7v2QGgAu
-        am8AQmu+iSMq4tqe4r5qCUm+voW101VRx//XoIcZEBzcrA11uOTcaYq8v/F6Iz3ScBbOPV
-        ekeUjVzZUcDKCuJQ3L89DXePJWKcmK0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-108-M7Zkyq0vMxez3ve1Zok7Lw-1; Tue, 16 May 2023 06:26:13 -0400
-X-MC-Unique: M7Zkyq0vMxez3ve1Zok7Lw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B31E785A5B1;
-        Tue, 16 May 2023 10:26:12 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 70AA740C206F;
-        Tue, 16 May 2023 10:26:12 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
-Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v8 5/6] KVM: arm64: Reuse fields of sys_reg_desc for idreg
-In-Reply-To: <20230503171618.2020461-6-jingzhangos@google.com>
-Organization: Red Hat GmbH
-References: <20230503171618.2020461-1-jingzhangos@google.com>
- <20230503171618.2020461-6-jingzhangos@google.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Tue, 16 May 2023 12:26:11 +0200
-Message-ID: <87ilcsh8sc.fsf@redhat.com>
+        with ESMTP id S231825AbjEPK3g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 06:29:36 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07BC2199C;
+        Tue, 16 May 2023 03:29:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=y4Tufl1po7Cl9hDm+Oo1ngXMbvo0BEiHzt9PTKc8NSo=; b=jTKwSQpSv5rJ0LOcwK5IbIh7/M
+        n1HQwMJjZrH1R0jHF9L3+NvSFY9iI3zoS2w8WJFfQf0tvQmyI2cXdfbBwKwKB8af+ZFHavTFN8L5g
+        ktbJwGqFWASPpxuPur5EM77I/VmVmu5ATvQtjgVlpN1jiiq6HaI6on9hxnsybRFvqRn4wCJQYS39r
+        pQ10X89RFeKzzwA7h5e6feEATtCjZykDSiIsz+RZr+HgJtqrp16zULgJhXxAsoS82/4QaYiGZejlm
+        Acv+SomLLIomuAkr/8FeIJ08mdVeiIzuT3N55OftMT8iKmHAzlpuMOgh84b3lzxL6KxXT3jnSv70r
+        MxtTkKWQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pyrvd-004AUg-KI; Tue, 16 May 2023 10:29:13 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 740443003CF;
+        Tue, 16 May 2023 12:29:12 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 58CA920118D79; Tue, 16 May 2023 12:29:12 +0200 (CEST)
+Date:   Tue, 16 May 2023 12:29:12 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Tianyu Lan <ltykernel@gmail.com>
+Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
+        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, ashish.kalra@amd.com,
+        srutherford@google.com, akpm@linux-foundation.org,
+        anshuman.khandual@arm.com, pawan.kumar.gupta@linux.intel.com,
+        adrian.hunter@intel.com, daniel.sneddon@linux.intel.com,
+        alexander.shishkin@linux.intel.com, sandipan.das@amd.com,
+        ray.huang@amd.com, brijesh.singh@amd.com, michael.roth@amd.com,
+        thomas.lendacky@amd.com, venu.busireddy@oracle.com,
+        sterritt@google.com, tony.luck@intel.com, samitolvanen@google.com,
+        fenghua.yu@intel.com, pangupta@amd.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
+Subject: Re: [RFC PATCH V6 08/14] x86/hyperv: Use vmmcall to implement
+ Hyper-V hypercall in sev-snp enlightened guest
+Message-ID: <20230516102912.GG2587705@hirez.programming.kicks-ass.net>
+References: <20230515165917.1306922-1-ltykernel@gmail.com>
+ <20230515165917.1306922-9-ltykernel@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230515165917.1306922-9-ltykernel@gmail.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 03 2023, Jing Zhang <jingzhangos@google.com> wrote:
-
-> Since reset() and val are not used for idreg in sys_reg_desc, they would
-> be used with other purposes for idregs.
-> The callback reset() would be used to return KVM sanitised id register
-> values. The u64 val would be used as mask for writable fields in idregs.
-> Only bits with 1 in val are writable from userspace.
->
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+On Mon, May 15, 2023 at 12:59:10PM -0400, Tianyu Lan wrote:
+> From: Tianyu Lan <tiala@microsoft.com>
+> 
+> In sev-snp enlightened guest, Hyper-V hypercall needs
+> to use vmmcall to trigger vmexit and notify hypervisor
+> to handle hypercall request.
+> 
+> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
 > ---
->  arch/arm64/kvm/id_regs.c  | 44 +++++++++++++++++++----------
->  arch/arm64/kvm/sys_regs.c | 59 +++++++++++++++++++++++++++------------
->  arch/arm64/kvm/sys_regs.h | 10 ++++---
->  3 files changed, 77 insertions(+), 36 deletions(-)
->
-
-(...)
-
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index e88fd77309b2..21869319f6e1 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -65,12 +65,12 @@ struct sys_reg_desc {
->  		       const struct sys_reg_desc *);
+> Change since RFC V2:
+>        * Fix indentation style
+> ---
+>  arch/x86/include/asm/mshyperv.h | 44 ++++++++++++++++++++++++---------
+>  1 file changed, 33 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/mshyperv.h b/arch/x86/include/asm/mshyperv.h
+> index 97d117ec95c4..939373791249 100644
+> --- a/arch/x86/include/asm/mshyperv.h
+> +++ b/arch/x86/include/asm/mshyperv.h
+> @@ -61,16 +61,25 @@ static inline u64 hv_do_hypercall(u64 control, void *input, void *output)
+>  	u64 hv_status;
 >  
->  	/* Initialization for vcpu. */
-
-Maybe be a bit more verbose here?
-
-/* Initialization for vcpu. Return initialized value, or KVM sanitized
-   value for id registers. */
-
-> -	void (*reset)(struct kvm_vcpu *, const struct sys_reg_desc *);
-> +	u64 (*reset)(struct kvm_vcpu *, const struct sys_reg_desc *);
+>  #ifdef CONFIG_X86_64
+> -	if (!hv_hypercall_pg)
+> -		return U64_MAX;
+> +	if (hv_isolation_type_en_snp()) {
+> +		__asm__ __volatile__("mov %4, %%r8\n"
+> +				     "vmmcall"
+> +				     : "=a" (hv_status), ASM_CALL_CONSTRAINT,
+> +				       "+c" (control), "+d" (input_address)
+> +				     :  "r" (output_address)
+> +				     : "cc", "memory", "r8", "r9", "r10", "r11");
+> +	} else {
+> +		if (!hv_hypercall_pg)
+> +			return U64_MAX;
 >  
->  	/* Index into sys_reg[], or 0 if we don't need to save it. */
->  	int reg;
->  
-> -	/* Value (usually reset value) */
-> +	/* Value (usually reset value), or write mask for idregs */
->  	u64 val;
->  
->  	/* Custom get/set_user functions, fallback to generic if NULL */
+> -	__asm__ __volatile__("mov %4, %%r8\n"
+> -			     CALL_NOSPEC
+> -			     : "=a" (hv_status), ASM_CALL_CONSTRAINT,
+> -			       "+c" (control), "+d" (input_address)
+> -			     :  "r" (output_address),
+> -				THUNK_TARGET(hv_hypercall_pg)
+> -			     : "cc", "memory", "r8", "r9", "r10", "r11");
+> +		__asm__ __volatile__("mov %4, %%r8\n"
+> +				     CALL_NOSPEC
+> +				     : "=a" (hv_status), ASM_CALL_CONSTRAINT,
+> +				       "+c" (control), "+d" (input_address)
+> +				     :  "r" (output_address),
+> +					THUNK_TARGET(hv_hypercall_pg)
+> +				     : "cc", "memory", "r8", "r9", "r10", "r11");
+> +	}
 
+Wouldn't this generate better code with an alternative?
