@@ -2,147 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E457D704988
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 11:41:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0213D7049AC
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 11:49:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232093AbjEPJlV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 05:41:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50200 "EHLO
+        id S232148AbjEPJt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 05:49:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230517AbjEPJlU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 05:41:20 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D73826A2;
-        Tue, 16 May 2023 02:41:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=8/4tilrQKiIvB0XfRafYvjplDtXGmdWzz3tJ/hV+6Oo=; b=ERWziaznZS59/P3raJ/oSaU4FO
-        5DzH9OMJuMMiTDupib/I5+sd2VAdnjXu0PaIjSknwMx+MNgg4Ub6bviM0g8QnvZrV1xbO3jQyIdcU
-        1jafU4KSEKHxEBtMhCnvbRZMEcgIsUbZS7QRLLxAAFKvPEtZRUiR0oCsfRqyPn72qgUOZKgMv20Uc
-        z81G3YOnoR1ANp5XYuNZ2kGnBrY8u0EwPntOBjNng1V4ZXrtTJj1hrgyUBETn5D7ElQsuCN4j34Gs
-        c2Vn2kKovXSm6B7BZjC4/KTXifk7pbFGYutQEQ216e28uLuIQJ5TP5QLSuS+seFD/h1/W7IdXukC6
-        8C4peoRA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pyrAn-0048tQ-F2; Tue, 16 May 2023 09:40:49 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 771B93003CF;
-        Tue, 16 May 2023 11:40:48 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 593AE20118D79; Tue, 16 May 2023 11:40:48 +0200 (CEST)
-Date:   Tue, 16 May 2023 11:40:48 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Tianyu Lan <ltykernel@gmail.com>
-Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, ashish.kalra@amd.com,
-        srutherford@google.com, akpm@linux-foundation.org,
-        anshuman.khandual@arm.com, pawan.kumar.gupta@linux.intel.com,
-        adrian.hunter@intel.com, daniel.sneddon@linux.intel.com,
-        alexander.shishkin@linux.intel.com, sandipan.das@amd.com,
-        ray.huang@amd.com, brijesh.singh@amd.com, michael.roth@amd.com,
-        thomas.lendacky@amd.com, venu.busireddy@oracle.com,
-        sterritt@google.com, tony.luck@intel.com, samitolvanen@google.com,
-        fenghua.yu@intel.com, pangupta@amd.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
-Subject: Re: [RFC PATCH V6 03/14] x86/sev: Add AMD sev-snp enlightened guest
- support on hyperv
-Message-ID: <20230516094048.GE2587705@hirez.programming.kicks-ass.net>
-References: <20230515165917.1306922-1-ltykernel@gmail.com>
- <20230515165917.1306922-4-ltykernel@gmail.com>
+        with ESMTP id S231422AbjEPJt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 05:49:26 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 832171BDD
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 02:49:24 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4f00c33c3d6so16116181e87.2
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 02:49:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1684230563; x=1686822563;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZU/9Bd1F4v4AQI4XYwGvMKtVUVhP+Ta/KlDV/Ofhgvw=;
+        b=DLO9Sp+4W+z5eLJ4OplpY56KL7dsXPxPyKzZN31e24ZgWla/8bs4IkvAtRU1sNrr4d
+         M/zIAUZjhZlW4P2rkk7T+6W0UVsyD90WG+YdGYFrH/Glii/KUDZq0IpUmntg707CdF5n
+         i37UB3Tbbcas87bL0/efYfe6w3ZnC5XyG3qMqn02SGpfBU+8hNkNlrN1nhw2lKAkzq5B
+         CRMAVzp4RUPFc/3/QZ675+4TlLXQLlc1iMNrOb5F/K4RaFPvTUMi9nJBxjhqICMZPBab
+         XEfOKIgxNn+kxSFXUOWAg+ZiVcGCmn7Ho0MHbSwpND8R8HARcto93DQrGrEkUYhsomoF
+         2BmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684230563; x=1686822563;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZU/9Bd1F4v4AQI4XYwGvMKtVUVhP+Ta/KlDV/Ofhgvw=;
+        b=S5S7nGDE9XbKxUuxnaM1uvpvAM1/crvZEJmZ5CcP0hc1SbKhXrjgWNcyRfipKlw7Tp
+         Pdm5Ia9rRF7bfF3+csRKkHXDs5DJQTedDoS/sFT+Dcyun0krAaSvSMHIEub0Be/i8OtV
+         Wcr7RUnltAY+0SM0aU5OQI0cb4mIlHLyYRTrAA6Weykm0f3rLooIVJ/j7kBZYCoUBD+j
+         6hasjOvkOr8qLmCpuGz2589EeAeMXl0bJErt6gJdfgFjj15IrrQKSFAwVnqSfo63fAt5
+         6K5TPIobGrb980Nb7pBpyeKKZHDRsmy7Xe2XcCyres/6nIEEwSefR9ZKou+WmMt9qBS3
+         sV1A==
+X-Gm-Message-State: AC+VfDyPPsWmMIQ8KWduLmEIanSTHD7e1eCAzolC0+nrFqOYcFnfdwLR
+        zNiQhp+t/f5Ko6n9zrsViYRbFQ==
+X-Google-Smtp-Source: ACHHUZ4l3TyALRDEaGcVcIkdK7q9mH/ov5OVGGAezktN7u9QG834/IDjSuCD7zTf56ZU9ouww0Hd6Q==
+X-Received: by 2002:a05:6512:2181:b0:4e8:4a21:9c92 with SMTP id b1-20020a056512218100b004e84a219c92mr7419897lft.4.1684230562687;
+        Tue, 16 May 2023 02:49:22 -0700 (PDT)
+Received: from mutt (c-9b0ee555.07-21-73746f28.bbcust.telenor.se. [85.229.14.155])
+        by smtp.gmail.com with ESMTPSA id w11-20020a19c50b000000b004f251cf3d31sm2908003lfe.153.2023.05.16.02.49.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 May 2023 02:49:21 -0700 (PDT)
+Date:   Tue, 16 May 2023 11:49:19 +0200
+From:   Anders Roxell <anders.roxell@linaro.org>
+To:     Lorenzo Stoakes <lstoakes@gmail.com>
+Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-perf-users@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Eric Biederman <ebiederm@xmission.com>,
+        Kees Cook <keescook@chromium.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Kentaro Takeda <takedakn@nttdata.co.jp>,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v5 3/6] mm/gup: remove vmas parameter from
+ get_user_pages_remote()
+Message-ID: <20230516094919.GA411@mutt>
+References: <cover.1684097001.git.lstoakes@gmail.com>
+ <afe323639b7bda066ee5c7a6cca906f5ad8df940.1684097002.git.lstoakes@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230515165917.1306922-4-ltykernel@gmail.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <afe323639b7bda066ee5c7a6cca906f5ad8df940.1684097002.git.lstoakes@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 15, 2023 at 12:59:05PM -0400, Tianyu Lan wrote:
-> From: Tianyu Lan <tiala@microsoft.com>
+On 2023-05-14 22:26, Lorenzo Stoakes wrote:
+> The only instances of get_user_pages_remote() invocations which used the
+> vmas parameter were for a single page which can instead simply look up the
+> VMA directly. In particular:-
 > 
-> Enable #HV exception to handle interrupt requests from hypervisor.
+> - __update_ref_ctr() looked up the VMA but did nothing with it so we simply
+>   remove it.
 > 
-> Co-developed-by: Lendacky Thomas <thomas.lendacky@amd.com>
-> Co-developed-by: Kalra Ashish <ashish.kalra@amd.com>
-> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
+> - __access_remote_vm() was already using vma_lookup() when the original
+>   lookup failed so by doing the lookup directly this also de-duplicates the
+>   code.
+> 
+> We are able to perform these VMA operations as we already hold the
+> mmap_lock in order to be able to call get_user_pages_remote().
+> 
+> As part of this work we add get_user_page_vma_remote() which abstracts the
+> VMA lookup, error handling and decrementing the page reference count should
+> the VMA lookup fail.
+> 
+> This forms part of a broader set of patches intended to eliminate the vmas
+> parameter altogether.
+> 
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com> (for arm64)
+> Acked-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com> (for s390)
+> Signed-off-by: Lorenzo Stoakes <lstoakes@gmail.com>
 > ---
-> Change since RFC V5:
->        * Merge patch "x86/sev: Fix interrupt exit code paths from
->         #HV exception" with this commit.
+>  arch/arm64/kernel/mte.c   | 17 +++++++++--------
+>  arch/s390/kvm/interrupt.c |  2 +-
+>  fs/exec.c                 |  2 +-
+>  include/linux/mm.h        | 34 +++++++++++++++++++++++++++++++---
+>  kernel/events/uprobes.c   | 13 +++++--------
+>  mm/gup.c                  | 12 ++++--------
+>  mm/memory.c               | 14 +++++++-------
+>  mm/rmap.c                 |  2 +-
+>  security/tomoyo/domain.c  |  2 +-
+>  virt/kvm/async_pf.c       |  3 +--
+>  10 files changed, 61 insertions(+), 40 deletions(-)
 > 
-> Change since RFC V3:
->        * Check NMI event when irq is disabled.
->        * Remove redundant variable
-> ---
->  arch/x86/include/asm/idtentry.h    |  12 +-
->  arch/x86/include/asm/mem_encrypt.h |   2 +
->  arch/x86/include/uapi/asm/svm.h    |   4 +
->  arch/x86/kernel/sev.c              | 349 ++++++++++++++++++++++++-----
->  arch/x86/kernel/traps.c            |   2 +
->  5 files changed, 310 insertions(+), 59 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
-> index b0f3501b2767..867073ccf1d1 100644
-> --- a/arch/x86/include/asm/idtentry.h
-> +++ b/arch/x86/include/asm/idtentry.h
-> @@ -13,6 +13,12 @@
+
+[...]
+
+> diff --git a/mm/memory.c b/mm/memory.c
+> index 146bb94764f8..63632a5eafc1 100644
+> --- a/mm/memory.c
+> +++ b/mm/memory.c
+> @@ -5590,7 +5590,6 @@ EXPORT_SYMBOL_GPL(generic_access_phys);
+>  int __access_remote_vm(struct mm_struct *mm, unsigned long addr, void *buf,
+>  		       int len, unsigned int gup_flags)
+>  {
+> -	struct vm_area_struct *vma;
+>  	void *old_buf = buf;
+>  	int write = gup_flags & FOLL_WRITE;
 >  
->  #include <asm/irq_stack.h>
+> @@ -5599,13 +5598,15 @@ int __access_remote_vm(struct mm_struct *mm, unsigned long addr, void *buf,
 >  
-> +#ifdef CONFIG_AMD_MEM_ENCRYPT
-> +noinstr void irqentry_exit_hv_cond(struct pt_regs *regs, irqentry_state_t state);
-> +#else
-> +#define irqentry_exit_hv_cond(regs, state)	irqentry_exit(regs, state)
-> +#endif
+>  	/* ignore errors, just check how much was successfully transferred */
+>  	while (len) {
+> -		int bytes, ret, offset;
+> +		int bytes, offset;
+>  		void *maddr;
+> -		struct page *page = NULL;
+> +		struct vm_area_struct *vma;
+> +		struct page *page = get_user_page_vma_remote(mm, addr,
+> +							     gup_flags, &vma);
 > +
->  /**
->   * DECLARE_IDTENTRY - Declare functions for simple IDT entry points
->   *		      No error code pushed by hardware
-> @@ -201,7 +207,7 @@ __visible noinstr void func(struct pt_regs *regs,			\
->  	kvm_set_cpu_l1tf_flush_l1d();					\
->  	run_irq_on_irqstack_cond(__##func, regs, vector);		\
->  	instrumentation_end();						\
-> -	irqentry_exit(regs, state);					\
-> +	irqentry_exit_hv_cond(regs, state);				\
->  }									\
->  									\
->  static noinline void __##func(struct pt_regs *regs, u32 vector)
-> @@ -241,7 +247,7 @@ __visible noinstr void func(struct pt_regs *regs)			\
->  	kvm_set_cpu_l1tf_flush_l1d();					\
->  	run_sysvec_on_irqstack_cond(__##func, regs);			\
->  	instrumentation_end();						\
-> -	irqentry_exit(regs, state);					\
-> +	irqentry_exit_hv_cond(regs, state);				\
->  }									\
->  									\
->  static noinline void __##func(struct pt_regs *regs)
-> @@ -270,7 +276,7 @@ __visible noinstr void func(struct pt_regs *regs)			\
->  	__##func (regs);						\
->  	__irq_exit_raw();						\
->  	instrumentation_end();						\
-> -	irqentry_exit(regs, state);					\
-> +	irqentry_exit_hv_cond(regs, state);				\
->  }									\
->  									\
->  static __always_inline void __##func(struct pt_regs *regs)
+> +		if (IS_ERR_OR_NULL(page)) {
+> +			int ret = 0;
 
-WTF is this supposed to do and why is this the right way to achieve the
-desired result?
+I see the warning below when building without CONFIG_HAVE_IOREMAP_PROT set.
 
-Your changelog gives me 0 clues -- guess how much I then care about your
-patches?
+make --silent --keep-going --jobs=32 \
+O=/home/anders/.cache/tuxmake/builds/1244/build ARCH=arm \
+CROSS_COMPILE=arm-linux-gnueabihf- /home/anders/src/kernel/next/mm/memory.c: In function '__access_remote_vm':
+/home/anders/src/kernel/next/mm/memory.c:5608:29: warning: unused variable 'ret' [-Wunused-variable]
+ 5608 |                         int ret = 0;
+      |                             ^~~
+
+
+>  
+> -		ret = get_user_pages_remote(mm, addr, 1,
+> -				gup_flags, &page, &vma, NULL);
+> -		if (ret <= 0) {
+>  #ifndef CONFIG_HAVE_IOREMAP_PROT
+>  			break;
+>  #else
+> @@ -5613,7 +5614,6 @@ int __access_remote_vm(struct mm_struct *mm, unsigned long addr, void *buf,
+>  			 * Check if this is a VM_IO | VM_PFNMAP VMA, which
+>  			 * we can access using slightly different code.
+>  			 */
+> -			vma = vma_lookup(mm, addr);
+>  			if (!vma)
+>  				break;
+>  			if (vma->vm_ops && vma->vm_ops->access)
+
+Cheers,
+Anders
