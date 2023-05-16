@@ -2,97 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E60C1705263
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 17:38:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC3AD7052E5
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 17:55:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233937AbjEPPis (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 11:38:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59138 "EHLO
+        id S234122AbjEPPzN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 11:55:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233906AbjEPPio (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 11:38:44 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C06FC6EB3
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 08:38:40 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-3f51ea3a062so593991cf.1
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 08:38:40 -0700 (PDT)
+        with ESMTP id S234448AbjEPPzB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 11:55:01 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2BB37DAA
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 08:54:38 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-648f83d2169so7154698b3a.0
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 08:54:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684251520; x=1686843520;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=N2CRyxNmsdznR8/fBUCCYBNG767y6htOcJe+Dq978O0=;
-        b=ky99+SCHVfnCmAJnGMGv+XVy+Y/5w5Oriop+D60VXZbCJ46gh+BY4W/UCSx8Jw6A1Y
-         WeM0aEvIRgrM2jDStmfPFfmthOHniHIbD6BBAkMqS2rRLZbeZZIgdXCCOoRBUnvSevIu
-         mGuNBL4Mr3wXiwPb659vYj/tqLRCY8VqO+w/QgMqd5eX9Uw6OGg4SA2MO9aKFK9RIRvU
-         tNCGIHM+6q9QmYMsDDHzkOg7i/4XX2pKHtb2C+hHmMlevY63HKwLMDWrQseSHQPXXPBX
-         PZhvWIyZ0rkWNQ7lzVI/RMghiVJsnssJd/v656xW56cjCjuc8HUMmcZXCCBDdfbZ3RxZ
-         SnvA==
+        d=google.com; s=20221208; t=1684252478; x=1686844478;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vuvfF0mbmPVlAJV/IyiTE8KBjpX8EqXFXoocKzSOeCE=;
+        b=4jbQy6plX2lrkT/CFX+Cpnj+y3894hYSyxz8xIqHyBpW/z0cbpNkv454t/4RvQazmk
+         KgY8LvK71QLdsJCPUKE7j+UC29pMRQ1vQ1ziv9dMTVSOo53YxdXNdDiDPLRrUIxSZpMg
+         gXiu+ZP/i1UzrXGn5v03XfEnnEoQiVb9Sitsw1Gjs9FgOnOr0fM1CT2/XKoXJkKL+JF3
+         dJ5BHQ1jlKtOGR/QPiAEn29qdZWIUlRiYOtYSz9Pi5e32CqaoZCwN8ps+eluFs2uUnJb
+         rUVz/3//yZO4SC/Svtgh4IM2gnGLO5+phPQEew1TZIPb134WIiaHFLZtMPo7l5w3RHOx
+         Y7VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684251520; x=1686843520;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N2CRyxNmsdznR8/fBUCCYBNG767y6htOcJe+Dq978O0=;
-        b=aLWE3EEaArJABIzWNAbGDcAKPkn8N86zbSWC75xc6ZMrhww4ujwaX0uyy6uRBglSH1
-         OyeWKMuascbeKifUGMpPg+dFx9ae9axSi5GCELYuKTlXaSuQHSibBM5WJgjktRiQe8OQ
-         0MzkVMXouvDL1t4UOCHumLXd5MCmhKR6f8Deq3+i+wg0ir6JDn1Sb3TMFY0uQRk3oL6d
-         OJirPm+bLo70BoGuD/wZiArybmmsJt2XandzTf2hfgFKGbsSqqjJBbvzQc9emd5INfBg
-         Qh4NZe2DZvCetbgJcx0YaRO76cFrSliO7jB6trV8TwDjIFtpqIOJvqwJpq2TbsfTr97W
-         lrOA==
-X-Gm-Message-State: AC+VfDxyOH5iyFfO7MFJt2Pch0mkc7u6rNEIPJuo/vKBS5ykXIeSSP+m
-        Lr1bhrqyMkY1eITGvztnlcdcVCRHmJiN6W903KoiVg==
-X-Google-Smtp-Source: ACHHUZ6fQp/lKGz1+t36Q6XsaElEPIWiVg1TuKslqyo6sEc8QdbtTlLU6AEW4d5yZVI5PwZB9goyJxoyJD4Dogeldhw=
-X-Received: by 2002:ac8:4e86:0:b0:3f5:4eb4:414f with SMTP id
- 6-20020ac84e86000000b003f54eb4414fmr44516qtp.13.1684251519819; Tue, 16 May
- 2023 08:38:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230515165917.1306922-1-ltykernel@gmail.com> <20230515165917.1306922-4-ltykernel@gmail.com>
- <20230516094048.GE2587705@hirez.programming.kicks-ass.net>
-In-Reply-To: <20230516094048.GE2587705@hirez.programming.kicks-ass.net>
-From:   Dionna Amalie Glaze <dionnaglaze@google.com>
-Date:   Tue, 16 May 2023 08:38:28 -0700
-Message-ID: <CAAH4kHZvSDNeRsiCCJ-DyBEj2MxGdmGuZeuofL0y=RP19cqfVw@mail.gmail.com>
-Subject: Re: [RFC PATCH V6 03/14] x86/sev: Add AMD sev-snp enlightened guest
- support on hyperv
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Tianyu Lan <ltykernel@gmail.com>, luto@kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
-        tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, ashish.kalra@amd.com,
-        srutherford@google.com, akpm@linux-foundation.org,
-        anshuman.khandual@arm.com, pawan.kumar.gupta@linux.intel.com,
-        adrian.hunter@intel.com, daniel.sneddon@linux.intel.com,
-        alexander.shishkin@linux.intel.com, sandipan.das@amd.com,
-        ray.huang@amd.com, brijesh.singh@amd.com, michael.roth@amd.com,
-        thomas.lendacky@amd.com, venu.busireddy@oracle.com,
-        sterritt@google.com, tony.luck@intel.com, samitolvanen@google.com,
-        fenghua.yu@intel.com, pangupta@amd.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1684252478; x=1686844478;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vuvfF0mbmPVlAJV/IyiTE8KBjpX8EqXFXoocKzSOeCE=;
+        b=Q3xT3+ptIqiN8w46wscPpPLW/cMndtvbtVRx8sawztDTNpFNaihWON3ulx95C/xjj8
+         lN8Qu9d+2EXi+XImZQZDMWC+d8lfikCYAUKm/xg1kymnRI73/wdghhJebXppOvPcWcd7
+         f8ZVNayaxnHwqLCSCuRhLKZ1rTh+gWWCHKimITveCpZcbpAYnyPwpiu2Q0ylF5GW8FXK
+         5bMZTYEq/5lMWIbxru99K6+UTE91ZK6vZTPeaDJDAfVdp6iIXsoFbDx7y7cYLE319XPP
+         5oG4oRJ36ssKzyoMdAWKosTO3KWOk8wZsubWxBfJkyM50h+bgNKJopSGR+pIBDkKFMbS
+         swJA==
+X-Gm-Message-State: AC+VfDz6SCrO0yP/C9j1SXWeOeTiSaUrWKVGHV+LoWsmNnUo1fB327X9
+        Lu1Ldk0aspy32oTGAo5DcnqGr9CIJiM=
+X-Google-Smtp-Source: ACHHUZ5eDqFHhP00qJpB5efU8Z8+xLn+sgiI3C5FYM7RixATG9CvKtOxlEBBv07UOEqzZrDzfmgiwa4HKdU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:80df:b0:646:6baf:48d7 with SMTP id
+ ei31-20020a056a0080df00b006466baf48d7mr7162453pfb.1.1684252478431; Tue, 16
+ May 2023 08:54:38 -0700 (PDT)
+Date:   Tue, 16 May 2023 08:54:36 -0700
+In-Reply-To: <20230516122159.3834044-1-dengqiao.joey@bytedance.com>
+Mime-Version: 1.0
+References: <20230516122159.3834044-1-dengqiao.joey@bytedance.com>
+Message-ID: <ZGOnPMTEKqRq89jt@google.com>
+Subject: Re: [PATCH] KVM: SVM: Update destination when updating pi irte
+From:   Sean Christopherson <seanjc@google.com>
+To:     "dengqiao.joey" <dengqiao.joey@bytedance.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->
-> WTF is this supposed to do and why is this the right way to achieve the
-> desired result?
->
-> Your changelog gives me 0 clues -- guess how much I then care about your
-> patches?
+On Tue, May 16, 2023, dengqiao.joey wrote:
+> Destination of irte will be cleard by IOMMU driver when updating irte.
+> It will only be set correctly in vcpu_load. IOMMU will deliver the
+> doorbell message to the wrong physical cpu before vcpu_load is executed.
+> That means vcpu can not recognize interrupt delivery during the time of
+> non-root mode.
 
-Excuse me? No. This is incredibly rude and violates the community code
-of conduct. Please review examples of creating a positive environment
-here https://docs.kernel.org/process/code-of-conduct.html
+I suspect this is actually a bug in amd_iommu_activate_guest_mode().  Does the
+below fix the issue?  If so, can you give a Tested-by and/or Reviewed-by on the
+posted patch[*]?
 
--- 
--Dionna Glaze, PhD (she/her)
+diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
+index 5a505ba5467e..fbe77ee2d26c 100644
+--- a/drivers/iommu/amd/iommu.c
++++ b/drivers/iommu/amd/iommu.c
+@@ -3484,8 +3484,7 @@ int amd_iommu_activate_guest_mode(void *data)
+ 	struct irte_ga *entry = (struct irte_ga *) ir_data->entry;
+ 	u64 valid;
+ 
+-	if (!AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir) ||
+-	    !entry || entry->lo.fields_vapic.guest_mode)
++	if (!AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir) || !entry)
+ 		return 0;
+ 
+ 	valid = entry->lo.fields_vapic.valid;
+
+[*] https://lore.kernel.org/all/20230419201154.83880-2-joao.m.martins@oracle.com
