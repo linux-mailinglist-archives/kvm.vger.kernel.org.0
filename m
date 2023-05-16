@@ -2,65 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 980187059B1
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 23:40:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A98B705A5D
+	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 00:02:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbjEPVkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 17:40:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55992 "EHLO
+        id S229748AbjEPWCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 18:02:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjEPVkV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 17:40:21 -0400
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1177170D
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 14:40:20 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-3f51ea3a062so37991cf.1
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 14:40:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684273220; x=1686865220;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WBWzZ1fuaiKLG9VaE48oXuTKbbOfGWu4xTiiYU69WFY=;
-        b=1xMVpM85sRCMWv3cTm4heqjZ9rr0DqyJoh+rxCj0a7TlY2mtxgJYe/FSxsohDxb37h
-         pmIsq22W70owvlM2QYab1s8vfLfVelLr+db27v/N0wrIqrkH+Asn8CMSQJJHBY1bY3Hn
-         6ZwY9AGOPd3PNJJ75Onxhj3/e/dLOTAVNpLsHbJCd5Cucp/OzpIEJCaChsgq8pfHDA5H
-         qvkZTbgm6LNs7Zvz+nM+7AEw/8eRNaDXjAt+o1nDbs7J4Rlw1Ny5szh3g51seW+Lk4Nz
-         3M9SUlMVxPWZs7hKUWHmLXQQXWjaU1ibLufGcSWd3gz3OH8YcBegOo2IhqnCWR5akJDk
-         qTvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684273220; x=1686865220;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WBWzZ1fuaiKLG9VaE48oXuTKbbOfGWu4xTiiYU69WFY=;
-        b=ZKqagUeDObZrUohn8jCxirOTCvNIfKmopE6bnr59Q6lU/u0CQ+XNND9kdiP9uHHGmP
-         D0ak9FPXW/VstyeA5vbJK6y00ASfhfEMCw1USG0/tn07OjNEzsc/XsCHOb08XmsNvqLU
-         AwTKkXWdx6SQAvFWeOYSyW5qU05qeLxhGEpTtYzA86tuoiYFKqYYa1THSN6Vi5XPhSc8
-         cGzmmiEYtwwIlwM43SeOFI5gjSIlurmAuEOUYcri4Vx27Vm4uWjv7SCfUYhOlI9PcZqV
-         MeKsmLynRxjiXdpfRFIKIdhDotybQcCBJXnzmRuQN6OR0gSIlxvkQJiMvmsSV15MqTEz
-         3OHw==
-X-Gm-Message-State: AC+VfDws4YtzcgHsKft9I2JMPCcLR3jlkdGiDvPXtmCWZ6DdIUQGVtno
-        z+T7pAi1p6xCoZ7+C3V7m32d+WWPFOohiYBRbCm7vg==
-X-Google-Smtp-Source: ACHHUZ5O3TpDez4/ceufx3QgUALhmlmkLhLDu3sqaex5zVfs/B6kjqQuC4aT78OURRr+hmHCmhDxLIOPAEqG10WYI/M=
-X-Received: by 2002:a05:622a:34a:b0:3f3:75c2:7466 with SMTP id
- r10-20020a05622a034a00b003f375c27466mr128665qtw.8.1684273219625; Tue, 16 May
- 2023 14:40:19 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220225012959.1554168-1-jmattson@google.com> <YhgxvA4KBEZc/4VG@google.com>
-In-Reply-To: <YhgxvA4KBEZc/4VG@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 16 May 2023 14:40:08 -0700
-Message-ID: <CALMp9eRQC-U4f9imkwsMM1=ewtJFuUORjseFPNskib4t-AL6-w@mail.gmail.com>
-Subject: Re: [PATCH] KVM: VMX: Fix header file dependency of asm/vmx.h
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        with ESMTP id S229578AbjEPWCW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 18:02:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24A0CB4;
+        Tue, 16 May 2023 15:02:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B587363CF5;
+        Tue, 16 May 2023 22:02:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C90F7C433EF;
+        Tue, 16 May 2023 22:02:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+        s=korg; t=1684274540;
+        bh=Xn5gFOegvDQoAs6fV+QPMtWJd/9gIN1gu+8PHj8jATQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=I8HmcSl3RSMNgObVi4nyzA8Dn0pIVn3Hyd4M9+6+jiCnOIEHPDAD1katsykkWAiMa
+         gn5fQMZJ0CFmK2NC9H7JKcNfD2tVhwbbUSeGJQe61+ttSYu+uB1762WRf9rvoaH/7u
+         R2FZf07p1aiooDIDhn5t28F6IgINIJ5khA8X4Fo4=
+Date:   Tue, 16 May 2023 15:02:18 -0700
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     Anders Roxell <anders.roxell@linaro.org>
+Cc:     Lorenzo Stoakes <lstoakes@gmail.com>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-perf-users@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Eric Biederman <ebiederm@xmission.com>,
+        Kees Cook <keescook@chromium.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Kentaro Takeda <takedakn@nttdata.co.jp>,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v5 3/6] mm/gup: remove vmas parameter from
+ get_user_pages_remote()
+Message-Id: <20230516150218.477c5e9d0a2d9ef8b057069c@linux-foundation.org>
+In-Reply-To: <20230516094919.GA411@mutt>
+References: <cover.1684097001.git.lstoakes@gmail.com>
+        <afe323639b7bda066ee5c7a6cca906f5ad8df940.1684097002.git.lstoakes@gmail.com>
+        <20230516094919.GA411@mutt>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,41 +91,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 24, 2022 at 5:32=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Thu, Feb 24, 2022, Jim Mattson wrote:
-> > From: Jacob Xu <jacobhxu@google.com>
-> >
-> > Include a definition of WARN_ON_ONCE() before using it.
-> >
-> > Fixes: bb1fcc70d98f ("KVM: nVMX: Allow L1 to use 5-level page walks for=
- nested EPT")
-> > Cc: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Jacob Xu <jacobhxu@google.com>
-> > [reworded commit message; changed <asm/bug.h> to <linux/bug.h>]
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > ---
-> >  arch/x86/include/asm/vmx.h | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> > index 0ffaa3156a4e..447b97296400 100644
-> > --- a/arch/x86/include/asm/vmx.h
-> > +++ b/arch/x86/include/asm/vmx.h
-> > @@ -14,6 +14,7 @@
-> >
-> >  #include <linux/bitops.h>
-> >  #include <linux/types.h>
-> > +#include <linux/bug.h>
->
-> Paolo, any chance you want to put these in alphabetical order when applyi=
-ng? :-)
->
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
->
-> >  #include <uapi/asm/vmx.h>
-> >  #include <asm/vmxfeatures.h>
-> >
+On Tue, 16 May 2023 11:49:19 +0200 Anders Roxell <anders.roxell@linaro.org> wrote:
 
-Ping.
+> On 2023-05-14 22:26, Lorenzo Stoakes wrote:
+> > The only instances of get_user_pages_remote() invocations which used the
+> > vmas parameter were for a single page which can instead simply look up the
+> > VMA directly. In particular:-
+> > 
+> > - __update_ref_ctr() looked up the VMA but did nothing with it so we simply
+> >   remove it.
+> > 
+> > - __access_remote_vm() was already using vma_lookup() when the original
+> >   lookup failed so by doing the lookup directly this also de-duplicates the
+> >   code.
+> > 
+> > We are able to perform these VMA operations as we already hold the
+> > mmap_lock in order to be able to call get_user_pages_remote().
+> > 
+> > As part of this work we add get_user_page_vma_remote() which abstracts the
+> > VMA lookup, error handling and decrementing the page reference count should
+> > the VMA lookup fail.
+> > 
+> > This forms part of a broader set of patches intended to eliminate the vmas
+> > parameter altogether.
+> > 
+> > -		int bytes, ret, offset;
+> > +		int bytes, offset;
+> >  		void *maddr;
+> > -		struct page *page = NULL;
+> > +		struct vm_area_struct *vma;
+> > +		struct page *page = get_user_page_vma_remote(mm, addr,
+> > +							     gup_flags, &vma);
+> > +
+> > +		if (IS_ERR_OR_NULL(page)) {
+> > +			int ret = 0;
+> 
+> I see the warning below when building without CONFIG_HAVE_IOREMAP_PROT set.
+> 
+> make --silent --keep-going --jobs=32 \
+> O=/home/anders/.cache/tuxmake/builds/1244/build ARCH=arm \
+> CROSS_COMPILE=arm-linux-gnueabihf- /home/anders/src/kernel/next/mm/memory.c: In function '__access_remote_vm':
+> /home/anders/src/kernel/next/mm/memory.c:5608:29: warning: unused variable 'ret' [-Wunused-variable]
+>  5608 |                         int ret = 0;
+>       |                             ^~~
+
+Thanks, I did the obvious.
+
+Also s/ret/res/, as `ret' is kinda reserved for "this is what this
+function will return".
+
+--- a/mm/memory.c~mm-gup-remove-vmas-parameter-from-get_user_pages_remote-fix
++++ a/mm/memory.c
+@@ -5605,11 +5605,11 @@ int __access_remote_vm(struct mm_struct
+ 							     gup_flags, &vma);
+ 
+ 		if (IS_ERR_OR_NULL(page)) {
+-			int ret = 0;
+-
+ #ifndef CONFIG_HAVE_IOREMAP_PROT
+ 			break;
+ #else
++			int res = 0;
++
+ 			/*
+ 			 * Check if this is a VM_IO | VM_PFNMAP VMA, which
+ 			 * we can access using slightly different code.
+@@ -5617,11 +5617,11 @@ int __access_remote_vm(struct mm_struct
+ 			if (!vma)
+ 				break;
+ 			if (vma->vm_ops && vma->vm_ops->access)
+-				ret = vma->vm_ops->access(vma, addr, buf,
++				res = vma->vm_ops->access(vma, addr, buf,
+ 							  len, write);
+-			if (ret <= 0)
++			if (res <= 0)
+ 				break;
+-			bytes = ret;
++			bytes = res;
+ #endif
+ 		} else {
+ 			bytes = len;
+_
+
