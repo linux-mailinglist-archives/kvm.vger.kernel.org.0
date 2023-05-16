@@ -2,70 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E2F08704359
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 04:22:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B059704389
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 04:44:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229828AbjEPCWc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 May 2023 22:22:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44888 "EHLO
+        id S229913AbjEPCoL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 May 2023 22:44:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbjEPCWb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 May 2023 22:22:31 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11DE3F2;
-        Mon, 15 May 2023 19:22:29 -0700 (PDT)
+        with ESMTP id S229911AbjEPCoD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 May 2023 22:44:03 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 086965BB4;
+        Mon, 15 May 2023 19:44:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684203749; x=1715739749;
-  h=message-id:date:mime-version:subject:to:cc:references:
+  t=1684205042; x=1715741042;
+  h=message-id:date:mime-version:cc:subject:to:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=Xhub620MvUkYB5ByKu+zzBEV74A0k3faGyp2jpIPNqo=;
-  b=nyA0Yhl4OJIhJERB3C9eHDKSGvW5u4/1gyxkPV8GWRHCJOavYtA5wAu4
-   Wr4dnSLKe332AYy1XApP0bj4NBptUUnlUaDM7nfwkCFkCLV63PE2X9k/d
-   MMSQ6Hjf/m1cP5uH719+m/NR+eF9irAr6k44qMcDG3me1L0J8zA2yblz2
-   jo8Yj/fQTnq6XTinurc9+JL+uOYmtJkKqSel6CUpk47+tygEKUu4qqZn3
-   e4qoTS0czsgi9V4H6X8/GJ3o/OOl6elDNwOsqTPjy9lBpbnKOwPsdDYtm
-   ioqcC73AYdC6gyMtXt5jik4i/Edeafpn0kyTePPFzw/bJdfHIBW3028p8
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10711"; a="417018389"
+  bh=PQC9n1gXUZAOwEzChv+hdaQZHcZ4tJdAn2yzVm4wFag=;
+  b=I/zKEefwXyOlCEYKfa7By2R0EP6OoEBOS9YctGYh/LdL3kIY71LcV1WQ
+   YaAYJJXkCUf32AN9FmI/CCrYN/4x9V+9dSR6i3FjRQsLRI01Dj+WflzHB
+   cXlbzZyWbeM24OqbFG6yGj1uZYWNuLPRZQZH2RGA2kArcZjgKTAgIO3jR
+   BR49EnuUdJvUWAVshp+YmkyeINPMaCvQWi2smSvilTlILzHsihZ/nYOx9
+   WGxsuxV2aIfcIZ0Z7DITsofPawM+AUnbltFXxf96ZHNWWVpTmn6dn4uXg
+   i9sRLl6eNLCHUt6p4Su8OPq2ADlTk2MNjQ4LnNL2jCOFhTbBRTEnmQgyf
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10711"; a="437704663"
 X-IronPort-AV: E=Sophos;i="5.99,277,1677571200"; 
-   d="scan'208";a="417018389"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2023 19:22:28 -0700
+   d="scan'208";a="437704663"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2023 19:44:01 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10711"; a="695261042"
+X-IronPort-AV: E=McAfee;i="6600,9927,10711"; a="770856241"
 X-IronPort-AV: E=Sophos;i="5.99,277,1677571200"; 
-   d="scan'208";a="695261042"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.174.127]) ([10.249.174.127])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2023 19:22:25 -0700
-Message-ID: <9c75663c-6363-34e7-8341-d8f719365768@intel.com>
-Date:   Tue, 16 May 2023 10:22:22 +0800
+   d="scan'208";a="770856241"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by fmsmga004.fm.intel.com with ESMTP; 15 May 2023 19:43:59 -0700
+Message-ID: <89d800bf-87cf-6a7d-85b3-74bd457b1454@linux.intel.com>
+Date:   Tue, 16 May 2023 10:43:23 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.10.1
-Subject: Re: [RFC PATCH v2 02/11] KVM: x86: Advertise CPUID.7.2.EDX and
- RRSBA_CTRL support
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Cc:     baolu.lu@linux.intel.com, Kevin Tian <kevin.tian@intel.com>,
+        kvm@vger.kernel.org, Lixiao Yang <lixiao.yang@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Nicolin Chen <nicolinc@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
+Subject: Re: [PATCH v7 02/19] iommufd: Add iommufd_group
 Content-Language: en-US
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     kvm@vger.kernel.org, Jiaan Lu <jiaan.lu@intel.com>,
-        Zhang Chen <chen.zhang@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-References: <20230414062545.270178-1-chao.gao@intel.com>
- <20230414062545.270178-3-chao.gao@intel.com>
- <a88b2504-b79b-83d6-383e-a948f9da662b@intel.com>
- <ZGLkvlx5W0JStTjD@chao-email>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <ZGLkvlx5W0JStTjD@chao-email>
+To:     Jason Gunthorpe <jgg@nvidia.com>, iommu@lists.linux.dev,
+        linux-kselftest@vger.kernel.org
+References: <2-v7-6c0fd698eda2+5e3-iommufd_alloc_jgg@nvidia.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <2-v7-6c0fd698eda2+5e3-iommufd_alloc_jgg@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-8.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,
+X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -74,67 +66,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/16/2023 10:04 AM, Chao Gao wrote:
-> On Mon, May 15, 2023 at 02:53:07PM +0800, Xiaoyao Li wrote:
->> On 4/14/2023 2:25 PM, Chao Gao wrote:
->>> From: Zhang Chen <chen.zhang@intel.com>
->>>
->>> Add a kvm-only CPUID feature leaf for CPUID.7.2.EDX and RRSBA_CTRL
->>> as the first feature in the leaf.
->>>
->>> RRSBA_CTRL is enumerated by CPUID.7.2.EDX[2]. If supported, RRSBA_DIS_U
->>> (bit 5) and RRSBA_DIS_S (bit 6) of IA32_SPEC_CTRL MSR can be used to
->>> disable RRSBA behavior for CPL3 and CPL0/1/2 respectively.
->>>
->>> Note that KVM does not intercept guests' IA32_SPEC_CTRL MSR accesses
->>> after a non-zero is written to the MSR. Therefore, guests can already
->>> toggle the two bits if the host supports RRSBA_CTRL, and no extra code
->>> is needed to allow guests to toggle the two bits.
->>
->> This is a bug that also matters with other bits in MSR_IA32_SPEC_CTRL which
->> has a dedicated enumeration CPUID bit and no support in KVM yet.
-> 
-> Do you mean passing through the MSR is a bug? guest can write any hardware
-> supported value to the MSR if the MSR isn't intercepted.
-> 
-> I guess this is intentional and a trade-off for performance (note that
-> context-switch may cause writes to the MSR). And see
-> 
-> commit 841c2be09fe4 ("kvm: x86: replace kvm_spec_ctrl_test_value with runtime test on the host")
-> 
-> it appears that this behavior is widely recognized.
-> 
->>
->> I think we need to fix this bug at first.
-> 
-> I have no idea how to fix the "bug" without intercepting the MSR. The
-> performance penalty makes me think intercepting the MSR is not a viable
-> solution.
+On 5/15/23 10:00 PM, Jason Gunthorpe wrote:
+>   void iommufd_device_destroy(struct iommufd_object *obj)
+>   {
+>   	struct iommufd_device *idev =
+>   		container_of(obj, struct iommufd_device, obj);
+>   
+>   	iommu_device_release_dma_owner(idev->dev);
+> -	iommu_group_put(idev->group);
+> +	iommufd_put_group(idev->igroup);
+>   	if (!iommufd_selftest_is_mock_dev(idev->dev))
+>   		iommufd_ctx_put(idev->ictx);
+>   }
+> @@ -46,7 +154,7 @@ struct iommufd_device *iommufd_device_bind(struct iommufd_ctx *ictx,
+>   					   struct device *dev, u32 *id)
+>   {
+>   	struct iommufd_device *idev;
+> -	struct iommu_group *group;
+> +	struct iommufd_group *igroup;
+>   	int rc;
+>   
+>   	/*
+> @@ -56,9 +164,9 @@ struct iommufd_device *iommufd_device_bind(struct iommufd_ctx *ictx,
+>   	if (!device_iommu_capable(dev, IOMMU_CAP_CACHE_COHERENCY))
+>   		return ERR_PTR(-EINVAL);
+>   
+> -	group = iommu_group_get(dev);
+> -	if (!group)
+> -		return ERR_PTR(-ENODEV);
+> +	igroup = iommufd_get_group(ictx, dev);
+> +	if (IS_ERR(igroup))
+> +		return ERR_CAST(igroup);
+>   
+>   	/*
+>   	 * For historical compat with VFIO the insecure interrupt path is
 
-I thought correctness always takes higher priority over performance.
+Hi Jason,
 
->>
->>> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
->>> Signed-off-by: Chao Gao <chao.gao@intel.com>
->>> Tested-by: Jiaan Lu <jiaan.lu@intel.com>
->>> ---
->>>    arch/x86/kvm/cpuid.c         | 22 +++++++++++++++++++---
->>>    arch/x86/kvm/reverse_cpuid.h |  7 +++++++
->>>    2 files changed, 26 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->>> index 9583a110cf5f..f024c3ac2203 100644
->>> --- a/arch/x86/kvm/cpuid.c
->>> +++ b/arch/x86/kvm/cpuid.c
->>> @@ -685,6 +685,10 @@ void kvm_set_cpu_caps(void)
->>>    		SF(SGX1) | SF(SGX2) | SF(SGX_EDECCSSA)
->>>    	);
->>> +	kvm_cpu_cap_init_kvm_defined(CPUID_7_2_EDX,
->>> +		SF(RRSBA_CTRL)
->>> +	);
->>> +
->>
->> Please move this hook up to right follow the leaf CPUID_7_1_EAX.
-> 
-> sure. will do.
+Perhaps I am asking a silly question. The iommufd_group is get in
+iommufd_device_bind(), but put in iommufd_device_destroy(). Why not put
+it in iommufd_device_unbind()?
 
+Best regards,
+baolu
