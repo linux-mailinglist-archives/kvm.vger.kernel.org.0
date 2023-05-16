@@ -2,94 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC3AD7052E5
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 17:55:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57E3E7052FF
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 18:01:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234122AbjEPPzN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 11:55:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50806 "EHLO
+        id S234243AbjEPQBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 12:01:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234448AbjEPPzB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 11:55:01 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2BB37DAA
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 08:54:38 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-648f83d2169so7154698b3a.0
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 08:54:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684252478; x=1686844478;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vuvfF0mbmPVlAJV/IyiTE8KBjpX8EqXFXoocKzSOeCE=;
-        b=4jbQy6plX2lrkT/CFX+Cpnj+y3894hYSyxz8xIqHyBpW/z0cbpNkv454t/4RvQazmk
-         KgY8LvK71QLdsJCPUKE7j+UC29pMRQ1vQ1ziv9dMTVSOo53YxdXNdDiDPLRrUIxSZpMg
-         gXiu+ZP/i1UzrXGn5v03XfEnnEoQiVb9Sitsw1Gjs9FgOnOr0fM1CT2/XKoXJkKL+JF3
-         dJ5BHQ1jlKtOGR/QPiAEn29qdZWIUlRiYOtYSz9Pi5e32CqaoZCwN8ps+eluFs2uUnJb
-         rUVz/3//yZO4SC/Svtgh4IM2gnGLO5+phPQEew1TZIPb134WIiaHFLZtMPo7l5w3RHOx
-         Y7VQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684252478; x=1686844478;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vuvfF0mbmPVlAJV/IyiTE8KBjpX8EqXFXoocKzSOeCE=;
-        b=Q3xT3+ptIqiN8w46wscPpPLW/cMndtvbtVRx8sawztDTNpFNaihWON3ulx95C/xjj8
-         lN8Qu9d+2EXi+XImZQZDMWC+d8lfikCYAUKm/xg1kymnRI73/wdghhJebXppOvPcWcd7
-         f8ZVNayaxnHwqLCSCuRhLKZ1rTh+gWWCHKimITveCpZcbpAYnyPwpiu2Q0ylF5GW8FXK
-         5bMZTYEq/5lMWIbxru99K6+UTE91ZK6vZTPeaDJDAfVdp6iIXsoFbDx7y7cYLE319XPP
-         5oG4oRJ36ssKzyoMdAWKosTO3KWOk8wZsubWxBfJkyM50h+bgNKJopSGR+pIBDkKFMbS
-         swJA==
-X-Gm-Message-State: AC+VfDz6SCrO0yP/C9j1SXWeOeTiSaUrWKVGHV+LoWsmNnUo1fB327X9
-        Lu1Ldk0aspy32oTGAo5DcnqGr9CIJiM=
-X-Google-Smtp-Source: ACHHUZ5eDqFHhP00qJpB5efU8Z8+xLn+sgiI3C5FYM7RixATG9CvKtOxlEBBv07UOEqzZrDzfmgiwa4HKdU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:80df:b0:646:6baf:48d7 with SMTP id
- ei31-20020a056a0080df00b006466baf48d7mr7162453pfb.1.1684252478431; Tue, 16
- May 2023 08:54:38 -0700 (PDT)
-Date:   Tue, 16 May 2023 08:54:36 -0700
-In-Reply-To: <20230516122159.3834044-1-dengqiao.joey@bytedance.com>
-Mime-Version: 1.0
-References: <20230516122159.3834044-1-dengqiao.joey@bytedance.com>
-Message-ID: <ZGOnPMTEKqRq89jt@google.com>
-Subject: Re: [PATCH] KVM: SVM: Update destination when updating pi irte
-From:   Sean Christopherson <seanjc@google.com>
-To:     "dengqiao.joey" <dengqiao.joey@bytedance.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232434AbjEPQBm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 12:01:42 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ABED40F5
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 09:01:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AFB3C633A6
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 16:01:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18D45C433EF;
+        Tue, 16 May 2023 16:01:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684252900;
+        bh=GjOiiAlorp/so+OO/WtKtCBW4Yvzhv1+UXUClXfimoU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=UDOJK8zMJB3En1Zvwzl3RYm6oITlX55grA1IIl/Mc2I7lYGxdMRUtHkHWnuQ82oYu
+         9ykUU6u14fOIGh4/7aZvdRggVpB41+KL9y+iO/09ZjVRWnYZUkrLHhztWDjwjdE2zd
+         dGsMyly5+RcURzTtzy2pkAfoXYrDNS5Hg+YHSBnSc1wXdbAa6Rcx9iyD/AT3YlE721
+         lCs1bHIp1KTjOam7JRkCXeDNhMliF522VOHnrkbQ3BVIK/t7NcPIJ9I4MRYU2SgiR0
+         6jsYuzqTQEfz3clWUtMrYegn9pBiPPrAqyC22uF2S3e2RyfpTFHhCt5SHWH2icwDSL
+         51etGwFUoPfnA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pyx7K-00Fb60-1C;
+        Tue, 16 May 2023 17:01:38 +0100
+Date:   Tue, 16 May 2023 17:01:37 +0100
+Message-ID: <86353wmfj2.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v8 0/6] Support writable CPU ID registers from userspace
+In-Reply-To: <87a5y4gy0b.fsf@redhat.com>
+References: <20230503171618.2020461-1-jingzhangos@google.com>
+        <2ef9208dabe44f5db445a1061a0d5918@huawei.com>
+        <868rdomtfo.wl-maz@kernel.org>
+        <1a96a72e87684e2fb3f8c77e32516d04@huawei.com>
+        <87cz30h4nx.fsf@redhat.com>
+        <867ct8mnel.wl-maz@kernel.org>
+        <87a5y4gy0b.fsf@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: cohuck@redhat.com, shameerali.kolothum.thodi@huawei.com, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 16, 2023, dengqiao.joey wrote:
-> Destination of irte will be cleard by IOMMU driver when updating irte.
-> It will only be set correctly in vcpu_load. IOMMU will deliver the
-> doorbell message to the wrong physical cpu before vcpu_load is executed.
-> That means vcpu can not recognize interrupt delivery during the time of
-> non-root mode.
+On Tue, 16 May 2023 15:19:00 +0100,
+Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> On Tue, May 16 2023, Marc Zyngier <maz@kernel.org> wrote:
+> 
+> > On Tue, 16 May 2023 12:55:14 +0100,
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> >> 
+> >> Do you have more concrete ideas for QEMU CPU models already? Asking
+> >> because I wanted to talk about this at KVM Forum, so collecting what
+> >> others would like to do seems like a good idea :)
+> >
+> > I'm not being asked, but I'll share my thoughts anyway! ;-)
+> >
+> > I don't think CPU models are necessarily the most important thing.
+> > Specially when you look at the diversity of the ecosystem (and even
+> > the same CPU can be configured in different ways at integration
+> > time). Case in point, Neoverse N1 which can have its I/D caches made
+> > coherent or not. And the guest really wants to know which one it is
+> > (you can only lie in one direction).
+> >
+> > But being able to control the feature set exposed to the guest from
+> > userspace is a huge benefit in terms of migration.
+> 
+> Certainly; the important part is that we can keep the guest ABI
+> stable... which parts match to a "CPU model" in the way other
+> architectures use it is an interesting question. It almost certainly
+> will look different from e.g. s390, where we only have to deal with a
+> single manufacturer.
+> 
+> I'm wondering whether we'll end up building frankenmonster CPUs.
 
-I suspect this is actually a bug in amd_iommu_activate_guest_mode().  Does the
-below fix the issue?  If so, can you give a Tested-by and/or Reviewed-by on the
-posted patch[*]?
+We already do. KVM hides a bunch of things we don't want the guest to
+see, either because we don't support the feature, or that we want to
+present it with a different shape (cache topology, for example), and
+these combination don't really exist in any physical implementation.
 
-diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-index 5a505ba5467e..fbe77ee2d26c 100644
---- a/drivers/iommu/amd/iommu.c
-+++ b/drivers/iommu/amd/iommu.c
-@@ -3484,8 +3484,7 @@ int amd_iommu_activate_guest_mode(void *data)
- 	struct irte_ga *entry = (struct irte_ga *) ir_data->entry;
- 	u64 valid;
- 
--	if (!AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir) ||
--	    !entry || entry->lo.fields_vapic.guest_mode)
-+	if (!AMD_IOMMU_GUEST_IR_VAPIC(amd_iommu_guest_ir) || !entry)
- 		return 0;
- 
- 	valid = entry->lo.fields_vapic.valid;
+Which is why I don't really buy the "CPU model" concept as defined by
+x86 and s390. We already are in a vastly different place.
 
-[*] https://lore.kernel.org/all/20230419201154.83880-2-joao.m.martins@oracle.com
+The way I see it, you get a bunch of architectural features that can
+be enabled/disabled depending on the underlying HW, hypervisor's
+capabilities and userspace input. On top of that, there is a layer of
+paint that tells you what is the overall implementation you could be
+running on (that's what MIDR+REVIDR+AIDR tell you) so that you can
+apply some unspeakable, uarch-specific hacks that keep the machine
+going (got to love these CPU errata).
+
+> Another interesting aspect is how KVM ends up influencing what the guest
+> sees on the CPU level, as in the case where we migrate across matching
+> CPUs, but with a different software level. I think we want userspace to
+> control that to some extent, but I'm not sure if this fully matches the
+> CPU model context.
+
+I'm not sure I get the "different software level" part. Do you mean
+VMM revisions?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
