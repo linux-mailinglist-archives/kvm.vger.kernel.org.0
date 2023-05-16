@@ -2,206 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88509705502
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 19:30:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EBC0705522
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 19:39:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231401AbjEPRan (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 13:30:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55768 "EHLO
+        id S230419AbjEPRjV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 13:39:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231219AbjEPRal (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 13:30:41 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35354F7;
-        Tue, 16 May 2023 10:30:40 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34GH9BG1019087;
-        Tue, 16 May 2023 17:30:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=ZCC9vxMr9joRi3dfenpx5oloFZIV+OcEGd7qoO8+S44=;
- b=dm/Fm+Vrr8wKhkGRCFEMZ5D1IWxlaflft29mhy005ZRMsYlZ2t2wb7R8YiFDm/ND4MSY
- PjuN3xHa7tKj5Q7qvz9CiBsJwoQM1wz1xbXoUaaet8aQHyfmiU+MBZh51wgjZahV8rjD
- 8Sq0WgmHx/c46B+x6UkMQFJ11lnANlKLWc4qm3LHMpaQfsFbkbCmVBCkAKXnt10Y1DiW
- W2CPDnZb10jBKUdpkCvD7MhvKMvqXx+T1DNPJ98r0mM/m9OWS45d62eqngCcyIYuh+hr
- r9X21nKLYzyDwlz34Y7d1I56Z0ySDrdOoECGwM4vUjwuMGmIriorlF9eeSElT0A+t7Bw bw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qmdc51gkx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 May 2023 17:30:39 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34GH9J16020068;
-        Tue, 16 May 2023 17:30:39 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qmdc51gjw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 May 2023 17:30:39 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34G67uZH005223;
-        Tue, 16 May 2023 17:30:37 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3qj264ss3k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 May 2023 17:30:36 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34GHUXW019595788
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 May 2023 17:30:33 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E0852004B;
-        Tue, 16 May 2023 17:30:33 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4F52C20043;
-        Tue, 16 May 2023 17:30:33 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 16 May 2023 17:30:33 +0000 (GMT)
-Date:   Tue, 16 May 2023 19:30:18 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 5/6] s390x: lib: sie: don't reenter
- SIE on pgm int
-Message-ID: <20230516193018.2e6cab64@p-imbrenda>
-In-Reply-To: <20230516130456.256205-6-nrb@linux.ibm.com>
-References: <20230516130456.256205-1-nrb@linux.ibm.com>
-        <20230516130456.256205-6-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-redhat-linux-gnu)
+        with ESMTP id S229533AbjEPRjT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 13:39:19 -0400
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B765F6EB1
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 10:39:18 -0700 (PDT)
+Received: by mail-il1-x12b.google.com with SMTP id e9e14a558f8ab-33164ec77ccso14165ab.0
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 10:39:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1684258758; x=1686850758;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rwakRNEZg00nJzKAJVvqSW5mx9DF58xDsBOKOjXcGQA=;
+        b=Ek49bn3anPQPSUmms5vWVmfuR7XlCCgjUhzxojlwroQ8vkZYmSTR9nij0U7tkcbx7M
+         kdSuSp99b7kuefNb3ThsnUu+n6jLA2KjLjWtJTN1ckWqFdM7dXCqsv5HYmbOQJyFw28S
+         vI30S/hDXN3LvOEgWthOWiaiK/7h5p8Av9AQM+ft28NJwU0yWvTPSaUUagyBFVzvG/Iq
+         eVnyDDGUOULhf2SFffzXUXIOeabZs9SAvrJeuhdOQI2jOGfJJ0XnB6p8LTJChtpvpwKa
+         m+T/MqTeGMac0ZoKEC2dlV9r1ttRUZ8bAFRYw6HJftHYGP5wuA0YPN8nE4iszhwA9jbC
+         CXwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684258758; x=1686850758;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rwakRNEZg00nJzKAJVvqSW5mx9DF58xDsBOKOjXcGQA=;
+        b=YQkbr7QaKHd6k4QpSVopRaAwNVr0UyDpb7jmpVWh9wbZ6eWJACeH2YNkWjTYTkHKOZ
+         2IBr4bRjla9pmD4MJlyI5+Ytl9O2CdDPeGfz1LaQrQJY8VdxSNWuWT405SqaE8yDMalw
+         LRlisS+jyztrsW3SgBOoErSjkLD0iksWaaFHl5J5IS1T5hSc0skZ1rhMLaZaH8BH0oXI
+         3mru0qtkKgqfoCc8sJM/burSHOZ7duGyP1KUcK0nMHC32nFhGwZv04VHm0TJEgGJGAPP
+         y/iNAK3Se6TcNkXtvwHeKAoClfkqae9EuV3dwHabEhTM/9JH4wPg2vVecK8ibrnTwqEs
+         rFGw==
+X-Gm-Message-State: AC+VfDw/r5H4lF6UvbWa6Azgl/Qg7SRk+mlDgOG+3j0XRoiVbFQIgkxT
+        EpSFv450QT9/cisNrkT+tbtyyn1qtBEpGGayQG5H/iqA2Tfd5wecsgixqA==
+X-Google-Smtp-Source: ACHHUZ6wWlpTv3IpwTR512FEiD5s98A5U3Lt0r6lTl9BzMmumqhm2ei8LXBGXvZYcIrzuW22YQrsdzk3pHp0zdiWakE=
+X-Received: by 2002:a17:903:187:b0:1a6:6a2d:18f0 with SMTP id
+ z7-20020a170903018700b001a66a2d18f0mr213668plg.9.1684258352254; Tue, 16 May
+ 2023 10:32:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3d70aQGzdrSMKYvO5BQwBmw-JcnG6oqj
-X-Proofpoint-GUID: P8i_mVAuNP93zFYn5K2Jmrwwj8f1-Xi_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-16_09,2023-05-16_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 bulkscore=0 mlxlogscore=514 malwarescore=0 phishscore=0
- clxscore=1015 lowpriorityscore=0 suspectscore=0 spamscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305160145
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230414172922.812640-1-rananta@google.com> <20230414172922.812640-7-rananta@google.com>
+ <ZF51f5tYPjK1aCpd@linux.dev>
+In-Reply-To: <ZF51f5tYPjK1aCpd@linux.dev>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Tue, 16 May 2023 10:32:20 -0700
+Message-ID: <CAJHc60wJob+VpRN-Z3VDTH1sVHSYUxPSCpyKCrC4rFBRuCcsQA@mail.gmail.com>
+Subject: Re: [PATCH v3 6/7] KVM: arm64: Add 'skip_flush' arg to stage2_put_pte()
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 May 2023 15:04:55 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
+Hi Oliver,
 
-> At the moment, when a PGM int occurs while in SIE, we will just reenter
-> SIE after the interrupt handler was called.
-> 
-> This is because sie() has a loop which checks icptcode and re-enters SIE
-> if it is zero.
-> 
-> However, this behaviour is quite undesirable for SIE tests, since it
-> doesn't give the host the chance to assert on the PGM int. Instead, we
-> will just re-enter SIE, on nullifing conditions even causing the
-> exception again.
-> 
-> In sie(), check whether a pgm int code is set in lowcore. If it has,
-> exit the loop so the test can react to the interrupt. Add a new function
-> read_pgm_int_code() to obtain the interrupt code.
-> 
-> Note that this introduces a slight oddity with sie and pgm int in
-> certain cases: If a PGM int occurs between a expect_pgm_int() and sie(),
-> we will now never enter SIE until the pgm_int_code is cleared by e.g.
-> clear_pgm_int().
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->  lib/s390x/asm/interrupt.h |  1 +
->  lib/s390x/interrupt.c     | 15 +++++++++++++++
->  lib/s390x/sie.c           |  4 +++-
->  lib/s390x/sie.h           |  1 -
->  4 files changed, 19 insertions(+), 2 deletions(-)
-> 
-> diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
-> index 55759002dce2..2d7eb1907458 100644
-> --- a/lib/s390x/asm/interrupt.h
-> +++ b/lib/s390x/asm/interrupt.h
-> @@ -81,6 +81,7 @@ void handle_svc_int(void);
->  void expect_pgm_int(void);
->  void expect_ext_int(void);
->  uint16_t clear_pgm_int(void);
-> +uint16_t read_pgm_int_code(void);
->  void check_pgm_int_code(uint16_t code);
->  
->  #define IRQ_DAT_ON	true
-> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-> index 2e5309cee40f..82b4259d433c 100644
-> --- a/lib/s390x/interrupt.c
-> +++ b/lib/s390x/interrupt.c
-> @@ -60,6 +60,21 @@ uint16_t clear_pgm_int(void)
->  	return code;
->  }
->  
-> +/**
-> + * read_pgm_int_code - Get the program interruption code of the last pgm int
-> + * on the current CPU.
-> + *
-> + * This is similar to clear_pgm_int(), except that it doesn't clear the
-> + * interruption information from lowcore.
-> + *
-> + * Returns 0 when none occured.
-> + */
-> +uint16_t read_pgm_int_code(void)
+On Fri, May 12, 2023 at 10:21=E2=80=AFAM Oliver Upton <oliver.upton@linux.d=
+ev> wrote:
+>
+> Hi Raghavendra,
+>
+> On Fri, Apr 14, 2023 at 05:29:21PM +0000, Raghavendra Rao Ananta wrote:
+> > Add a 'skip_flush' argument in stage2_put_pte() to
+> > control the TLB invalidations. This will be leveraged
+> > by the upcoming patch to defer the individual PTE
+> > invalidations until the entire walk is finished.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/pgtable.c | 9 ++++++---
+> >  1 file changed, 6 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
+c
+> > index b8f0dbd12f773..3f136e35feb5e 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -772,7 +772,7 @@ static void stage2_make_pte(const struct kvm_pgtabl=
+e_visit_ctx *ctx, kvm_pte_t n
+> >  }
+> >
+> >  static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, st=
+ruct kvm_s2_mmu *mmu,
+> > -                        struct kvm_pgtable_mm_ops *mm_ops)
+> > +                        struct kvm_pgtable_mm_ops *mm_ops, bool skip_f=
+lush)
+>
+> Assuming you are going to pull the cpufeature checks into this helper,
+> it might me helpful to narrow the scope of it. 'stage2_put_pte()' sounds
+> very generic, but it is about to have a very precise meaning in relation
+> to kvm_pgtable_stage2_unmap().
+>
+> So maybe stage2_unmap_put_pte()? While at it, you'd want to have a
+> shared helper for the deferral check:
+>
+Yeah, stage2_unmap_put_pte() sounds better. I'll change that.
 
-could this whole function go in the header as static inline?
+> static bool stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
+> {
+>         /* your blurb for why FWB is required too */
+>         return system_supports_tlb_range() && stage2_has_fwb(pgt);
+> }
+>
+Good idea; I can introduce the helper, now that we'll get rid of
+stage2_unmap_data.skip_pte_tlbis (patch 7/7) as per your comments.
+Also, since we are now making stage2_put_pte() specific to unmap, I
+can also get rid of the 'skip_flush' arg and call
+stage2_unmap_defer_tlb_flush() directly, or do you have a preference
+for the additional arg?
 
-> +{
-> +	mb();
-
-is the mb really needed?
-
-> +	return lowcore.pgm_int_code;
-> +}
-> +
->  /**
->   * check_pgm_int_code - Check the program interrupt code on the current CPU.
->   * @code the expected program interrupt code on the current CPU
-> diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
-> index ffa8ec91a423..632740edd431 100644
-> --- a/lib/s390x/sie.c
-> +++ b/lib/s390x/sie.c
-> @@ -13,6 +13,7 @@
->  #include <libcflat.h>
->  #include <sie.h>
->  #include <asm/page.h>
-> +#include <asm/interrupt.h>
->  #include <libcflat.h>
->  #include <alloc_page.h>
->  
-> @@ -65,7 +66,8 @@ void sie(struct vm *vm)
->  	/* also handle all interruptions in home space while in SIE */
->  	irq_set_dat_mode(IRQ_DAT_ON, AS_HOME);
->  
-> -	while (vm->sblk->icptcode == 0) {
-> +	/* leave SIE when we have an intercept or an interrupt so the test can react to it */
-> +	while (vm->sblk->icptcode == 0 && !read_pgm_int_code()) {
->  		sie64a(vm->sblk, &vm->save_area);
->  		sie_handle_validity(vm);
->  	}
-> diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
-> index 0b00fb709776..147cb0f2a556 100644
-> --- a/lib/s390x/sie.h
-> +++ b/lib/s390x/sie.h
-> @@ -284,6 +284,5 @@ void sie_handle_validity(struct vm *vm);
->  void sie_guest_sca_create(struct vm *vm);
->  void sie_guest_create(struct vm *vm, uint64_t guest_mem, uint64_t guest_mem_len);
->  void sie_guest_destroy(struct vm *vm);
-> -bool sie_had_pgm_int(struct vm *vm);
-
-... ?
-
->  
->  #endif /* _S390X_SIE_H_ */
-
+Thank you.
+Raghavendra
+> The 'flush' part is annoying, because the exact term is an invalidation,
+> but we already have that pattern in all of our TLB invalidation helpers.
+>
+> >  {
+> >       /*
+> >        * Clear the existing PTE, and perform break-before-make with
+> > @@ -780,7 +780,10 @@ static void stage2_put_pte(const struct kvm_pgtabl=
+e_visit_ctx *ctx, struct kvm_s
+> >        */
+> >       if (kvm_pte_valid(ctx->old)) {
+> >               kvm_clear_pte(ctx->ptep);
+> > -             kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ct=
+x->level);
+> > +
+> > +             if (!skip_flush)
+> > +                     kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
+> > +                                     ctx->addr, ctx->level);
+> >       }
+> >
+> >       mm_ops->put_page(ctx->ptep);
+> > @@ -1015,7 +1018,7 @@ static int stage2_unmap_walker(const struct kvm_p=
+gtable_visit_ctx *ctx,
+> >        * block entry and rely on the remaining portions being faulted
+> >        * back lazily.
+> >        */
+> > -     stage2_put_pte(ctx, mmu, mm_ops);
+> > +     stage2_put_pte(ctx, mmu, mm_ops, false);
+> >
+> >       if (need_flush && mm_ops->dcache_clean_inval_poc)
+> >               mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old, m=
+m_ops),
+> > --
+> > 2.40.0.634.g4ca3ef3211-goog
+> >
+>
+> --
+> Thanks,
+> Oliver
