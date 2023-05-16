@@ -2,73 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A5D170507E
-	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 16:22:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 143117050BE
+	for <lists+kvm@lfdr.de>; Tue, 16 May 2023 16:30:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232315AbjEPOWh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 10:22:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59876 "EHLO
+        id S233927AbjEPOaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 10:30:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231624AbjEPOWg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 10:22:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3DA76EB3
-        for <kvm@vger.kernel.org>; Tue, 16 May 2023 07:21:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684246888;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iI7IGPaVhBWiA9o2JZBNiM8ifHsTLnjxJmTcjx0w6Sw=;
-        b=aqbJxm4U8Op+XdpK69EhjR5U/9zSkAj/TE2a/JZevWm6nJxUGC/fh0KGNDdeKp2SBBvIr2
-        7ptbUysonULr30br5YT5etEzTu0sKx9sW30bAii99iGdRN9MuGEq6Q4f2WOFN3Wba5VbSL
-        yGzUCqoNQJWSQUbhtH2oIe2XdYRf46M=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-651-xYJHXN4xNuSjXGgPbW4jhw-1; Tue, 16 May 2023 10:21:24 -0400
-X-MC-Unique: xYJHXN4xNuSjXGgPbW4jhw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E775C85C06E;
-        Tue, 16 May 2023 14:21:23 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FB852166B31;
-        Tue, 16 May 2023 14:21:23 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
+        with ESMTP id S233776AbjEPOaE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 10:30:04 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD12410FE
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 07:30:03 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-561a148e524so5926097b3.0
+        for <kvm@vger.kernel.org>; Tue, 16 May 2023 07:30:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1684247403; x=1686839403;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4YEPKrVR9zT024XK7Pjo91EG5vcxIVFCJtB9CTxRlDM=;
+        b=hqHcxjQbJBGZla48WsupFSE1qX/Q50O/tDR9HRispcTqhozzhNaDapI1iUI+nV5Dqa
+         +1YztNS7sMj7wiHDm0+uAOJXhAOMuPVrU6pHbFstZqhwb/IN4HRrOjpIO8eadjPxWAiv
+         74ZKC4fPNkL7uHLKcrORbKVAL6lyxZVoThJRc2570yDONMDvXbttp+1WyG/KPEVI0Mbj
+         /NITT/iX9eusiaFbGu44753OhtSEHfnh4iDWqcOdXFdq/GRuHbEd3f6wqf1Ezyk3tHWu
+         lGLELXUKPIoHXEUyM1vl7ctdC6KLkFsE4Fe4uGvSVPO5JyNR6ut5eE1mOnGUTpwSdULf
+         SuMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684247403; x=1686839403;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4YEPKrVR9zT024XK7Pjo91EG5vcxIVFCJtB9CTxRlDM=;
+        b=EO6uOjQPwwP8o9ZspH5DdAtuwhJtFhjvZa+cE1nxhuhqN8nx9SlwbWb2f7GgTM5B3y
+         G2pyinC2sLARi5yErHlN2pQwlmOPZkv6GGwyjxNh1QzvdH9dmobfddm8su0MtHJJGEsJ
+         aXUcLfAXL6y6Bh3zaQ/LC5z3Da8q4LcCr7OWUSiuqIyCDU3baKUUKPZywgHWEQBeKK1b
+         5oMPyQBbFP+0pAn1FFsiArhL/IjagATUOJHRHWVRNhG1nOXp9Doei4fFNssPnenXvdU3
+         B8FrlCKTYRhFaVYyFJehulM1TQUdzs8rW2Hxd1axM+wyNlMSL3DHHAwcy6ggdnH8ZBtw
+         07VA==
+X-Gm-Message-State: AC+VfDyCQNwe4FqnjqKecHav0pKfJYmF7mu7Sheh4lv/6Nhs6gwqzd2l
+        9BOLSdtSnBjXHMRKQYTqIVgoR+JoOAA=
+X-Google-Smtp-Source: ACHHUZ6nLWUlEK0uTVg2ClJoaxJ9mV14xuwTnG5GvNICmdUhSrCvtGUgZ3UVfCgP00Yml5lYnHv0fvo+YTM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:c903:0:b0:556:cacc:1f1d with SMTP id
+ o3-20020a81c903000000b00556cacc1f1dmr22415308ywi.8.1684247402987; Tue, 16 May
+ 2023 07:30:02 -0700 (PDT)
+Date:   Tue, 16 May 2023 07:30:01 -0700
+In-Reply-To: <b97e8c2a-b629-f597-d011-395071011f1b@redhat.com>
+Mime-Version: 1.0
+References: <cover.1684097001.git.lstoakes@gmail.com> <b61d5999a4fc6d50b7e073cc3c3efa8fe79bbd94.1684097002.git.lstoakes@gmail.com>
+ <ZGKC9fHoE+kDs0ar@google.com> <b97e8c2a-b629-f597-d011-395071011f1b@redhat.com>
+Message-ID: <ZGOTadDG/b0904YI@google.com>
+Subject: Re: [PATCH v5 1/6] mm/gup: remove unused vmas parameter from get_user_pages()
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Lorenzo Stoakes <lstoakes@gmail.com>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, x86@kernel.org,
+        linux-sgx@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, Xinhui Pan <Xinhui.Pan@amd.com>,
+        David Airlie <airlied@gmail.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dimitri Sivanich <dimitri.sivanich@hpe.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Subject: RE: [PATCH v8 0/6] Support writable CPU ID registers from userspace
-In-Reply-To: <bb1e038f0bf04d62beda15d0830920ee@huawei.com>
-Organization: Red Hat GmbH
-References: <20230503171618.2020461-1-jingzhangos@google.com>
- <2ef9208dabe44f5db445a1061a0d5918@huawei.com>
- <868rdomtfo.wl-maz@kernel.org>
- <1a96a72e87684e2fb3f8c77e32516d04@huawei.com> <87cz30h4nx.fsf@redhat.com>
- <867ct8mnel.wl-maz@kernel.org>
- <bb1e038f0bf04d62beda15d0830920ee@huawei.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Tue, 16 May 2023 16:21:22 +0200
-Message-ID: <877ct8gxwd.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Christian Konig <christian.koenig@amd.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,62 +87,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 16 2023, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+On Tue, May 16, 2023, David Hildenbrand wrote:
+> On 15.05.23 21:07, Sean Christopherson wrote:
+> > On Sun, May 14, 2023, Lorenzo Stoakes wrote:
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index cb5c13eee193..eaa5bb8dbadc 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -2477,7 +2477,7 @@ static inline int check_user_page_hwpoison(unsigned long addr)
+> > >   {
+> > >   	int rc, flags = FOLL_HWPOISON | FOLL_WRITE;
+> > > -	rc = get_user_pages(addr, 1, flags, NULL, NULL);
+> > > +	rc = get_user_pages(addr, 1, flags, NULL);
+> > >   	return rc == -EHWPOISON;
+> > 
+> > Unrelated to this patch, I think there's a pre-existing bug here.  If gup() returns
+> > a valid page, KVM will leak the refcount and unintentionally pin the page.  That's
+> 
+> When passing NULL as "pages" to get_user_pages(), __get_user_pages_locked()
+> won't set FOLL_GET. As FOLL_PIN is also not set, we won't be messing with
+> the mapcount of the page.
 
->> -----Original Message-----
->> From: Marc Zyngier [mailto:maz@kernel.org]
->> Sent: 16 May 2023 14:12
->> To: Cornelia Huck <cohuck@redhat.com>
->> Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
->> Jing Zhang <jingzhangos@google.com>; KVM <kvm@vger.kernel.org>;
->> KVMARM <kvmarm@lists.linux.dev>; ARMLinux
->> <linux-arm-kernel@lists.infradead.org>; Oliver Upton <oupton@google.com>;
->> Will Deacon <will@kernel.org>; Paolo Bonzini <pbonzini@redhat.com>;
->> James Morse <james.morse@arm.com>; Alexandru Elisei
->> <alexandru.elisei@arm.com>; Suzuki K Poulose <suzuki.poulose@arm.com>;
->> Fuad Tabba <tabba@google.com>; Reiji Watanabe <reijiw@google.com>;
->> Raghavendra Rao Ananta <rananta@google.com>
->> Subject: Re: [PATCH v8 0/6] Support writable CPU ID registers from
->> userspace
->> 
->> On Tue, 16 May 2023 12:55:14 +0100,
->> Cornelia Huck <cohuck@redhat.com> wrote:
->> >
->> > Do you have more concrete ideas for QEMU CPU models already? Asking
->> > because I wanted to talk about this at KVM Forum, so collecting what
->> > others would like to do seems like a good idea :)
->> 
->> I'm not being asked, but I'll share my thoughts anyway! ;-)
->> 
->> I don't think CPU models are necessarily the most important thing.
->> Specially when you look at the diversity of the ecosystem (and even
->> the same CPU can be configured in different ways at integration
->> time). Case in point, Neoverse N1 which can have its I/D caches made
->> coherent or not. And the guest really wants to know which one it is
->> (you can only lie in one direction).
->> 
->> But being able to control the feature set exposed to the guest from
->> userspace is a huge benefit in terms of migration.
->
-> Yes, this is what we also need and was thinking of adding a named CPU with
-> common min feature set exposed to Guest. There were some previous
-> attempts to add the basic support in Qemu here,
->
-> https://lists.gnu.org/archive/html/qemu-devel/2020-11/msg00087.html
+Ah, that's what I'm missing.
 
-Thanks for the link.
+> So even if get_user_pages() returns "1", we should be fine.
+> 
+> 
+> Or am I misunderstanding your concern?
 
->
->> Now, this is only half of the problem (and we're back to the CPU
->> model): most of these CPUs have various degrees of brokenness. Most of
->> the workarounds have to be implemented by the guest, and are keyed on
->> the MIDR values. So somehow, you need to be able to expose *all* the
->> possible MIDR values that a guest can observe in its lifetime.
->
-> Ok. This will be a problem and I am not sure this has an impact on our 
-> platforms or not.
+Nope, you covered everything.  I do think we can drop the extra gup() though,
+AFAICT it's 100% redundant.  But it's not a bug.
 
-Oh, I see that the MIDR fun had already been mentioned in a reply to the
-first version of that patchset; this needs to be addressed for the
-general case, I guess...
-
+Thanks!
