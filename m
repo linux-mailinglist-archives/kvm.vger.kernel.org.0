@@ -2,265 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6CB170637B
-	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 11:01:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5F48706380
+	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 11:02:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231290AbjEQJB0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 May 2023 05:01:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47256 "EHLO
+        id S230493AbjEQJCl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 May 2023 05:02:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbjEQJBJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 May 2023 05:01:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9A5855B3
-        for <kvm@vger.kernel.org>; Wed, 17 May 2023 01:59:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684313990;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HIVGKr92to8Dmk2bxhmzlEfc+g/1vVinSymgfq9Os5w=;
-        b=RlWMIj9KQv1RAuj8BL2u2IQBigUxg7AEbwRMQ46/OCcWXEz0Kkg0NbHOe8QoE0FABZV5vD
-        eEwdKd/LGLp7INWS51Akt8y6bSWEjDQSFEKu7Zyiath6sAr4g1RxckKAKy4gDgtfm6fXrA
-        wOuApvZnuBu5hJ8KsL2pouUeV+RW1vQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-638-k0t70JWHOkGCKK1jM1KrAQ-1; Wed, 17 May 2023 04:59:48 -0400
-X-MC-Unique: k0t70JWHOkGCKK1jM1KrAQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-3f348182ffcso3650265e9.3
-        for <kvm@vger.kernel.org>; Wed, 17 May 2023 01:59:48 -0700 (PDT)
+        with ESMTP id S229496AbjEQJCY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 May 2023 05:02:24 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CC1F30E0;
+        Wed, 17 May 2023 02:02:03 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-64ab2a37812so11523573b3a.1;
+        Wed, 17 May 2023 02:02:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684314123; x=1686906123;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ph7FWotnDHyNH43Suo9o026I5GBhoRCi6trqJm+ae1c=;
+        b=cOn7sW93YxROwtygiZ4kd6HC6BbzEHtija5wSUXNqYIudX5SCymwnx4qX3kwMKrjWV
+         90e27La7ebSJzffNnJsKKHey7cKsPV/kors2tLfdFYziBd0nPtoHMafZBFsQiQyKpLhh
+         FlktAOsEqWN7I3T4kvxc51w9EjkSrpw5EWcZI/pk5PUJWkKwYj65dnxR+39jZ0kg0m38
+         AkBEe7+TelBuXq8v+ZNCnqZSpJAax9mH3MTWDpBe78F3DFEW3efPAKuR8GwnOQZNQvL4
+         Q8tS5ZooefJN3S5lCYtSZmvqD6TAzWE6OOftQuMwRuuWnZxEIo30Y/0WKIs3Xc/oEgf8
+         gr+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684313988; x=1686905988;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HIVGKr92to8Dmk2bxhmzlEfc+g/1vVinSymgfq9Os5w=;
-        b=BbPu4cSq2mj33leozgU/fuxcoyN3VUpj5Q0wO30r8JsNMHhc+w9kEUeTeduFnrii1A
-         HOsYBU0mURfpgH/TnEQnIhv53xMDTzblqI/ZsLi6kzQY+lXFNF6Vlog1c7Ftmr16O4TO
-         laqFsBumccpMTiIl1K3UjlL+h72r/CiLuCPe0vzTSGxgM1ffKMxZQK8VmsScZha9il6v
-         56mrOE0R58g2vQPAA3rP9kz62bBS16/zbFVmSERFk5PyWhnG7YsSyMW5Lm1F7Lqs95Gp
-         ASzCb4hcfxyzyRrkYaSWW+hgl9gqpNWRrGlvjyLyunj9Wm7p7PTzPFfHDdp8+cKnLLVN
-         R5iQ==
-X-Gm-Message-State: AC+VfDxZd405v4YSdqBhZ4QDAWBiSdchLdFw/IINlBawZjb1a1HFvyhF
-        uCcO8ywWaD0R5WfVaxgEVvbadrvmzrPCQDx866HfmwbBDJE+p6rmqR7ykji2uzWM1oyCqHBrZfh
-        3QBgnsZGqpISb
-X-Received: by 2002:a7b:c5d2:0:b0:3f3:2b37:dd34 with SMTP id n18-20020a7bc5d2000000b003f32b37dd34mr26929669wmk.9.1684313987886;
-        Wed, 17 May 2023 01:59:47 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7zHvTt2KB86FL8HelVnj5IrobJnjcl3UexrHbo6YuaT13OfR4AW0fEjEpq69UXVUCvfNcDXw==
-X-Received: by 2002:a7b:c5d2:0:b0:3f3:2b37:dd34 with SMTP id n18-20020a7bc5d2000000b003f32b37dd34mr26929653wmk.9.1684313987561;
-        Wed, 17 May 2023 01:59:47 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id f6-20020a1cc906000000b003f435652aaesm1557077wmb.11.2023.05.17.01.59.45
+        d=1e100.net; s=20221208; t=1684314123; x=1686906123;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Ph7FWotnDHyNH43Suo9o026I5GBhoRCi6trqJm+ae1c=;
+        b=bp2ZC+lYCeShFRvM4cwkWcqT/ZkWXNC4Pj/Ucy7lYMBjg1j2HX6WsM1vt07b+kKq6R
+         MLycK9TrQVLEtEJbevjUvfOfJVn3R21iJP4+Hj+xJJZbzP3mMQKv0JiIVhmlL6bENa+h
+         gvDl9d3JU1lVnRQ202GPspGaRnIssDPonEpWcAlTYZCQjH41dimKOcbGHWE51nN22SSd
+         SjRMICLk0+K3WbSjfyqj7TmeDoZTEbc+4aaNRLmD9zgfhFXIBKa0oKoFCSl8UQfdqCom
+         ky23r00iESoDL/7mhX6K+gD+Yt1N/18kKoWU1wW+KEcIrcYz/5WUT4Gzkm9y5nF+pVHi
+         sUFA==
+X-Gm-Message-State: AC+VfDxv8bfDRqB/lq5Rz/jqBupuQj/AL+XR6HKaeM38me2JTtqGFuyq
+        +/zPyIn98xwpnxCu3sDvgbA=
+X-Google-Smtp-Source: ACHHUZ63hS1/S/jzGaGnpkvjna7RhS7G2JWLtso6RdQPEeBMDByM66294yz5+hFQTOQZz07Cn9oEkg==
+X-Received: by 2002:a17:90b:4b0e:b0:250:648b:781d with SMTP id lx14-20020a17090b4b0e00b00250648b781dmr1763729pjb.23.1684314122885;
+        Wed, 17 May 2023 02:02:02 -0700 (PDT)
+Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
+        by smtp.gmail.com with ESMTPSA id l14-20020a17090a384e00b00250d670306esm1076450pjf.35.2023.05.17.02.01.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 May 2023 01:59:46 -0700 (PDT)
-Message-ID: <d0b77823-c04c-4ee0-cb55-2cc20a48903b@redhat.com>
-Date:   Wed, 17 May 2023 10:59:45 +0200
+        Wed, 17 May 2023 02:02:02 -0700 (PDT)
+Message-ID: <e255cc80-a232-d66c-5f9b-9db179d33951@gmail.com>
+Date:   Wed, 17 May 2023 17:01:51 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
- support
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20230515173103.1017669-1-maz@kernel.org>
- <16d9fda4-3ead-7d5e-9f54-ef29fbd932ac@redhat.com>
- <87zg64nhqh.wl-maz@kernel.org>
-From:   Eric Auger <eauger@redhat.com>
-In-Reply-To: <87zg64nhqh.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [RFC PATCH V6 01/14] x86/sev: Add a #HV exception handler
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
+        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, ashish.kalra@amd.com,
+        srutherford@google.com, akpm@linux-foundation.org,
+        anshuman.khandual@arm.com, pawan.kumar.gupta@linux.intel.com,
+        adrian.hunter@intel.com, daniel.sneddon@linux.intel.com,
+        alexander.shishkin@linux.intel.com, sandipan.das@amd.com,
+        ray.huang@amd.com, brijesh.singh@amd.com, michael.roth@amd.com,
+        thomas.lendacky@amd.com, venu.busireddy@oracle.com,
+        sterritt@google.com, tony.luck@intel.com, samitolvanen@google.com,
+        fenghua.yu@intel.com, pangupta@amd.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
+References: <20230515165917.1306922-1-ltykernel@gmail.com>
+ <20230515165917.1306922-2-ltykernel@gmail.com>
+ <20230516093010.GC2587705@hirez.programming.kicks-ass.net>
+From:   Tianyu Lan <ltykernel@gmail.com>
+In-Reply-To: <20230516093010.GC2587705@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On 5/16/23 22:28, Marc Zyngier wrote:
-> On Tue, 16 May 2023 17:53:14 +0100,
-> Eric Auger <eauger@redhat.com> wrote:
+On 5/16/2023 5:30 PM, Peter Zijlstra wrote:
+> On Mon, May 15, 2023 at 12:59:03PM -0400, Tianyu Lan wrote:
+>> From: Tianyu Lan<tiala@microsoft.com>
 >>
->> Hi Marc,
+>> Add a #HV exception handler that uses IST stack.
 >>
->> On 5/15/23 19:30, Marc Zyngier wrote:
->>> This is the 4th drop of NV support on arm64 for this year.
->>>
->>> For the previous episodes, see [1].
->>>
->>> What's changed:
->>>
->>> - New framework to track system register traps that are reinjected in
->>>   guest EL2. It is expected to replace the discrete handling we have
->>>   enjoyed so far, which didn't scale at all. This has already fixed a
->>>   number of bugs that were hidden (a bunch of traps were never
->>>   forwarded...). Still a work in progress, but this is going in the
->>>   right direction.
->>>
->>> - Allow the L1 hypervisor to have a S2 that has an input larger than
->>>   the L0 IPA space. This fixes a number of subtle issues, depending on
->>>   how the initial guest was created.
->>>
->>> - Consequently, the patch series has gone longer again. Boo. But
->>>   hopefully some of it is easier to review...
->>>
->>> [1] https://lore.kernel.org/r/20230405154008.3552854-1-maz@kernel.org
->>
->> I have started testing this and when booting my fedora guest I get
->>
->> [  151.796544] kvm [7617]: Unsupported guest sys_reg access at:
->> 23f425fd0 [80000209]
->> [  151.796544]  { Op0( 3), Op1( 3), CRn(14), CRm( 3), Op2( 1), func_write },
->>
->> as soon as the host has kvm-arm.mode=nested
->>
->> This seems to be triggered very early by EDK2
->> (ArmPkg/Drivers/TimerDxe/TimerDxe.c).
->>
->> If I am not wrong this CNTV_CTL_EL0. Do you have any idea?
+> Urgh.. that is entirely insufficient. Like it doesn't even begin to
+> start to cover things.
 > 
-> So here's my current analysis:
+> The whole existing VC IST stack abuse is already a nightmare and you're
+> duplicating that.. without any explanation for why this would be needed
+> and how it is correct.
 > 
-> I assume you are running EDK2 as the L1 guest in a nested
-> configuration. I also assume that you are not running on an Apple
-> CPU. If these assumptions are correct, then EDK2 runs at vEL2, and is
-> in nVHE mode.
-> 
-> Finally, I'm going to assume that your implementation has FEAT_ECV and
-> FEAT_NV2, because I can't see how it could fail otherwise.
-all the above is correct.
-> 
-> In these precise conditions, KVM sets the CNTHCTL_EL2.EL1TVT bit so
-> that we can trap the EL0 virtual timer and faithfully emulate it (it
-> is otherwise written to memory, which isn't very helpful).
+> Please try again.
 
-indeed
-> 
-> As it turns out, we don't handle these traps. I didn't spot it because
-> my test machines are all Apple boxes that don't have a nVHE mode, so
-> nothing on the nVHE path is getting *ANY* coverage. Hint: having
-> access to such a machine would help (shipping address on request!).
-> Otherwise, I'll eventually kill the nVHE support altogether.
-> 
-> I have written the following patch, which compiles, but that I cannot
-> test with my current setup. Could you please give it a go?
-
-with the patch below, my guest boots nicely. You did it great on the 1st
-shot!!! So this fixes my issue. I will continue testing the v10.
-
-Thank you again!
-
-Eric
-
-
-> 
-> Thanks again,
-> 
-> 	M.
-> 
-> From feb03b57de0bcb83254a2d6a3ce320f5e39434b6 Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Tue, 16 May 2023 21:06:20 +0100
-> Subject: [PATCH] KVM: arm64: Handle virtual timer traps when
->  CNTHCTL_EL2.EL1TVT is set
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/sysreg.h |  1 +
->  arch/arm64/kvm/sys_regs.c       | 28 ++++++++++++++++++++++++++++
->  2 files changed, 29 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 72ff6df5d75b..77a61179ea37 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -436,6 +436,7 @@
->  #define SYS_CNTP_CTL_EL0		sys_reg(3, 3, 14, 2, 1)
->  #define SYS_CNTP_CVAL_EL0		sys_reg(3, 3, 14, 2, 2)
->  
-> +#define SYS_CNTV_TVAL_EL0		sys_reg(3, 3, 14, 3, 0)
->  #define SYS_CNTV_CTL_EL0		sys_reg(3, 3, 14, 3, 1)
->  #define SYS_CNTV_CVAL_EL0		sys_reg(3, 3, 14, 3, 2)
->  
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 27a29dcbfcd2..9aa9c4e4b4d6 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1328,6 +1328,14 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  		treg = TIMER_REG_TVAL;
->  		break;
->  
-> +	case SYS_CNTV_TVAL_EL0:
-> +		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			tmr = TIMER_HVTIMER;
-> +		else
-> +			tmr = TIMER_VTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
->  	case SYS_AARCH32_CNTP_TVAL:
->  	case SYS_CNTP_TVAL_EL02:
->  		tmr = TIMER_PTIMER;
-> @@ -1357,6 +1365,14 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  		treg = TIMER_REG_CTL;
->  		break;
->  
-> +	case SYS_CNTV_CTL_EL0:
-> +		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			tmr = TIMER_HVTIMER;
-> +		else
-> +			tmr = TIMER_VTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +
->  	case SYS_AARCH32_CNTP_CTL:
->  	case SYS_CNTP_CTL_EL02:
->  		tmr = TIMER_PTIMER;
-> @@ -1386,6 +1402,14 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  		treg = TIMER_REG_CVAL;
->  		break;
->  
-> +	case SYS_CNTV_CVAL_EL0:
-> +		if (is_hyp_ctxt(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			tmr = TIMER_HVTIMER;
-> +		else
-> +			tmr = TIMER_VTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
->  	case SYS_AARCH32_CNTP_CVAL:
->  	case SYS_CNTP_CVAL_EL02:
->  		tmr = TIMER_PTIMER;
-> @@ -2510,6 +2534,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_CNTP_CTL_EL0), access_arch_timer },
->  	{ SYS_DESC(SYS_CNTP_CVAL_EL0), access_arch_timer },
->  
-> +	{ SYS_DESC(SYS_CNTV_TVAL_EL0), access_arch_timer },
-> +	{ SYS_DESC(SYS_CNTV_CTL_EL0), access_arch_timer },
-> +	{ SYS_DESC(SYS_CNTV_CVAL_EL0), access_arch_timer },
-> +
->  	/* PMEVCNTRn_EL0 */
->  	PMU_PMEVCNTR_EL0(0),
->  	PMU_PMEVCNTR_EL0(1),
-
+Hi Peter:
+	Thanks for your review. Will add more explanation in the next version.
