@@ -2,220 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81AE470611D
-	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 09:29:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4917870616F
+	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 09:41:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229946AbjEQH3S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 May 2023 03:29:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57268 "EHLO
+        id S230095AbjEQHl0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 May 2023 03:41:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229916AbjEQH3Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 May 2023 03:29:16 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2709D13E;
-        Wed, 17 May 2023 00:29:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684308554; x=1715844554;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=KUTTKyyqSIOhbwnfwoQB9gHTid5Fu1ZCtFhtCiPJX4Q=;
-  b=YdOa8lHm6qgjJbCOiKqY7UGlKXLFTU7poYIxWD6nKu0gpmTXMsRCojJ2
-   bZVHAyPAQhrn3Qc7FZhtJH1AYCwlrL6hG6/7fZb3zPswBVNJrMWQeAp1r
-   siMS8BbQkmsfjdltGR+vXuWs8zIkdoCvwD73MgWwKezvR6EDhn5fNmdEF
-   aaJ4sTOnZauhWEP32t63P9OXzldkrMLASvSknUJ6bQ6uggZKzExZFymwL
-   4OjgMzyGmCMPwBZzG8jMTesPpbVWbDZDTpmaAsba+JuElm1dmLWuQrvTz
-   6efTepfDWNJKxMMcotoMqBprjZQlqiW4WQF9pTAQCHqWp26ilI7JdzAGW
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10712"; a="341073363"
-X-IronPort-AV: E=Sophos;i="5.99,281,1677571200"; 
-   d="scan'208";a="341073363"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2023 00:29:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10712"; a="845981648"
-X-IronPort-AV: E=Sophos;i="5.99,281,1677571200"; 
-   d="scan'208";a="845981648"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga001.fm.intel.com with ESMTP; 17 May 2023 00:29:12 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Wed, 17 May 2023 00:29:12 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Wed, 17 May 2023 00:29:12 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.45) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Wed, 17 May 2023 00:29:12 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ggQJA92T0MlTvovU2VzRisbfBf+7a2iPKGtw2q3AIh1HP4iZsq4KmvEtrqOuhXjszkOmi1SFN8+5SR4+UlvzLp/JlWh4MUn5wUaRPE3eAr2EaWJUOUNF86u0vHnc9nbbgPWSrtMjNxl1jU8hpjhVyIW9TWQdh2kIS3fKZB5dCwAhP22frpXMmLu9mtNCjONjwssUSXCCuUT6QUS07pRgmb0wjGzvh1iKNZqlWBxasRVHfIyIf1ZqA0jEUiUxuqd/Ib9A1z9bKUqioyHQq3Ey34cxb7N1KWRYmNIo4MDU0Bv3bVby6FJiIi7dqgqXrWwrVuevz1NqLBbzvwsEa6OVgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=n3vpOu3f8//PmRU4vdDCY5ZJ69YnmHANyojWGdIepi0=;
- b=DLke02tOjsRz4AcGIR6r6Dt7EHwf9cItf5IcBPdxoCRg6YFaNEKvUHBmIsrxY8qYQfndeg76MDW72S74TRnfRK2K4QPNxq6pS434NzbYiP3BetudDgyBvzfFOAnrYVN+FC4rG0QfLKzwCDAM9m1tVFU5H+38WoulK0wPLr8fCSjUc82ONrhuSx020QvdePwDYXK2w4JXmuADYqPQ+AIdBd1aRl+OFqMEulV6ay8jEWOoGZBCQQ7FWrz82+8hlS5g1uNZVa9YuUPK7knIx7dOcICoVq04WriEFiOUBJhVIbinkmxHdG8obudGsF9KYm0zLlsQK87eAzWgNktcK2laxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by PH0PR11MB5095.namprd11.prod.outlook.com (2603:10b6:510:3b::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.33; Wed, 17 May
- 2023 07:29:10 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::73e9:b405:2cae:9174]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::73e9:b405:2cae:9174%5]) with mapi id 15.20.6387.033; Wed, 17 May 2023
- 07:29:09 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "ankita@nvidia.com" <ankita@nvidia.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-CC:     "aniketa@nvidia.com" <aniketa@nvidia.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "targupta@nvidia.com" <targupta@nvidia.com>,
-        "vsethi@nvidia.com" <vsethi@nvidia.com>,
-        "Currid, Andy" <acurrid@nvidia.com>,
-        "apopple@nvidia.com" <apopple@nvidia.com>,
-        "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
-        "danw@nvidia.com" <danw@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v2 1/1] vfio/nvgpu: Add vfio pci variant module for grace
- hopper
-Thread-Topic: [PATCH v2 1/1] vfio/nvgpu: Add vfio pci variant module for grace
- hopper
-Thread-Index: AQHZgiwdnOavLCCjbEOsVWRum+0Dua9eG+Lg
-Date:   Wed, 17 May 2023 07:29:09 +0000
-Message-ID: <BN9PR11MB52763B1BC1C88EB8C24E2AD88C7E9@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230509040734.24392-1-ankita@nvidia.com>
-In-Reply-To: <20230509040734.24392-1-ankita@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH0PR11MB5095:EE_
-x-ms-office365-filtering-correlation-id: 5a3b99e1-891d-49fc-3833-08db56a867cd
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: bFKISivh5+d+Xxb36Vfg+E4mIPH5tqak1i6Q0wlGKeJ6rH5d10VWsvxpf2sZw1aRNVur/yJz+lGlhgwymXOivTHcBngKfDH4kBJKZEtpLTcK3aKcirMfacRkA0IKGCRAZ96p2m/bPU+7wY2tztnRzMJ5VU2Ys/suG5pYwPH1UytEwCnT4k1zW+KeWCXeCuTxrjFE9pjDtKUeX15vjj7M6mvigwmjLJnp4/t8EizjqngFgckQ3B8K7TVWjB/Jt+K04zdtbR7WbzEVNTPelP0+eOX/e6lLKvUS7J103Nr0f6aGjuxyTj6Og3vKXQJrPipWCchaYLqGfRdQFPc18miVrW+UT7CkVIVtOzvVnA8NYat6hcBZi5cwe9VoSDLaseT6EabvbdK1D9xLi/4g3LkOxlEoOmvwCAHGAsMcNDw9xUK5GkUxNrhrWb0gX4Bot7Y5fpi8nJaY0F7HZcJJHDbqqR92w9dHwgDmlDITmdT/KLfn4MK25kKn/+7JvXfVU+Q/V29rjPKe8HRBbadgPcukOXk8JwzLK9gjNN8A9poFyTuQD3STXv/MQyVkUCBJfGauGLIskajlYTT6j1jsLEPVJEuZy0zc0TqwlXuSzgpuvNT4fYByZ1VnXQdxFBexrj+D
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(346002)(366004)(136003)(39860400002)(396003)(451199021)(9686003)(8936002)(6506007)(5660300002)(8676002)(26005)(55016003)(33656002)(86362001)(2906002)(83380400001)(478600001)(7696005)(76116006)(41300700001)(7416002)(66476007)(186003)(66946007)(110136005)(54906003)(64756008)(66556008)(316002)(38100700002)(38070700005)(122000001)(82960400001)(4326008)(71200400001)(66446008)(52536014);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?cH7b9tYo1Bkf7RbQs8gWx9RIuyqipbAhmGqGnoSajwPW52I2tTm9FSakFyK+?=
- =?us-ascii?Q?cQP/HJsKY29JvCsWQ9lWUYHqJpZCAV5Sa5f1Ruq3cmU3nBv0PXx7nFONiO5o?=
- =?us-ascii?Q?nHFrLQSBRuwnf5Mk7Ja9aL0m3IriOF5E4YSWAWIIeo5wbgzJyrM7j9Ts2IJG?=
- =?us-ascii?Q?ipX/qfCtJNU8r+XSTC83M3snb2oS6027D0IKyL2X/3kVKQtTnJ9+9pUNDzXC?=
- =?us-ascii?Q?hWVMRqic/wg1BaTjyzftuL78B40Ra1ntnuEURidl9zMILzdqgSI3214R+E0v?=
- =?us-ascii?Q?d+aLL9S0RDRqQQfWrwpXWhuAkU2IcxTljv3z+4tacTmLtR2lFy8iiPaOHiDJ?=
- =?us-ascii?Q?e2z3bZbxRqlc8eAMfI4S8IqB17bm2X9duaHcn1AfJprlElBuC/xl6RGFWssB?=
- =?us-ascii?Q?wB0+PbZF5MKYOW+8zLt8oV6xFsFub5eSgL5CRXQ2/MHasEQ8tBZ3Z4VOpqxi?=
- =?us-ascii?Q?ZG4vJnikFWc37rtsEru+r3jdwxDDg1Zc69fiHhADTOu+sXU8jtb6di1uGumJ?=
- =?us-ascii?Q?wWwuFBIa2O9dGO0RIt/dlkhqlGiw2s2o+NpULs504w8YSM5AwSWgBfMIOMXg?=
- =?us-ascii?Q?EDsowFcBQEg7ME8++PEdDFQGAG1N/FYzLPEOgryQwLGkleWch6wR+UrsBMrU?=
- =?us-ascii?Q?Lxftf4mL30kbJDjzQqB28xtFuedCEhiBwvAooT/EgYfKTAyorj9v4ywBUz/J?=
- =?us-ascii?Q?ul1NDHCXZno9HN4Zi9rJCl4Q5Q2O4Wq8fNHdxcRS74nmIxPfExrGG6H/Ms0N?=
- =?us-ascii?Q?ja9UhKasdFvrE3RZkQkZ2WJVCFE1UyE7Y+wQBT0UscmwM95N/MsELXuwUxgh?=
- =?us-ascii?Q?gJnrIjwf7pgYxOWY+Zp3sYqsemhDgrcNxjTUqt7x8kHMSAP36Vf8CGbeyGmo?=
- =?us-ascii?Q?BRb8lmoOL8Fd4zCX17GmhKMEd+zYpd5YlZu8rFAdo9BvdR/9Ps1qa67KsK+z?=
- =?us-ascii?Q?94OJqYsA33AqqeBZpgevsiV801/m+NM5XC+jIM/0ptBv4xrWT06XF/lrprNS?=
- =?us-ascii?Q?fVOFzBdfcHxp/sakjF4C+5DXjP/i2dhHQoqjAnhxUNcCvWTqtrsRUoBYL/2U?=
- =?us-ascii?Q?zjy9nCI6cVEbDnGHkMQDfKWrr9wJ8+TjHwIucXhoo78CulzURA8sCOpiGqsP?=
- =?us-ascii?Q?GKjXWHUTP8nrtMfOpmWBCgw+b/Iie+pHg/GB71fDIFIFFucCs10qfchNTxuL?=
- =?us-ascii?Q?+bYl8hi02zSaE1ELSWeyzmpM4oHE3BzbTTswf5GCnEeSO81G2ZHqkhMMS171?=
- =?us-ascii?Q?CO2W/AScvDzyUbh7k0r67BlIj3PF/LGlijUAlststXNdv95fc76g4TIiyfwH?=
- =?us-ascii?Q?NmutlmmIel4X/armwh4j94U/7PyEKux0t2Vwcf84Nk+l7bwRDj7iNZCa7jYw?=
- =?us-ascii?Q?Kd+kJPZrlCcSU4Mv6DOf9IgaL/h1M/Vik4vjxKlOSRJ92ozzLM9RZ4QjJ1CF?=
- =?us-ascii?Q?mQAC2992dWq9xW1Ss8swSk0ByxrvRHI/nA+Rd5byQUqI/MHZqOdjK3xqGzxH?=
- =?us-ascii?Q?sFpAiHy77UOMPuaXoTov3S4ZCAIsDnSu9yWuF6OvvVgToGDktHgNLPdDb/n9?=
- =?us-ascii?Q?/vSQ15VI/n2OCR5YNmKAI8Pvy73kckHH8kg9j4lI?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a3b99e1-891d-49fc-3833-08db56a867cd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 May 2023 07:29:09.8995
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: fuunWkcjPkWoxBjBIMZBK8XxWwlaTPGPSlgImgEHI/KESxdkfBUuDZWcXWRFvT9CbTWjN11N0hDSYxPm+4Zdbg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5095
-X-OriginatorOrg: intel.com
+        with ESMTP id S230110AbjEQHlU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 May 2023 03:41:20 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AB162D4D
+        for <kvm@vger.kernel.org>; Wed, 17 May 2023 00:41:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F41CC638A4
+        for <kvm@vger.kernel.org>; Wed, 17 May 2023 07:41:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61F3DC4339B;
+        Wed, 17 May 2023 07:41:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684309277;
+        bh=jl579H+lvowIwD62rjIEZ6W163467bPWlDxnNI9N+m4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Rhtjo8zm6UVgHseXIlHW1qbPHgB4CMLZ4C1ftiR3UaszefCjrLBIKnefV7zRStcJX
+         P9VHJLkbIFyCJ/UNIBdMlofd/3plKqLy8XakzW2Hl471gON6IaakXruzrdMC63aKJY
+         cU1/JUjS3uaCId4GRM1S465lhLFcxbAehmfAfg09ArO9/CZETVPxd4pDe/+AXRSVt9
+         g4D8X/EHrNoGpnaxO5EvmCTjL5JOZE53es6Q+Y/rV0qfqK4vLbhIjGggZsrB7ro8CN
+         8JoxpHbhNhBsnc+yPUrXHHcZfAISj8IpYLJ4i52tvZHJUpAVKHiqr6hNZT/cmBJG4W
+         UcwtInh/0r7eg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pzBmc-00Fm0C-Vw;
+        Wed, 17 May 2023 08:41:15 +0100
+Date:   Wed, 17 May 2023 08:41:14 +0100
+Message-ID: <86wn17l811.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v8 2/6] KVM: arm64: Save ID registers' sanitized value per guest
+In-Reply-To: <20230503171618.2020461-3-jingzhangos@google.com>
+References: <20230503171618.2020461-1-jingzhangos@google.com>
+        <20230503171618.2020461-3-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: ankita@nvidia.com <ankita@nvidia.com>
-> Sent: Tuesday, May 9, 2023 12:08 PM
->=20
-> From: Ankit Agrawal <ankita@nvidia.com>
->=20
-> NVIDIA's upcoming Grace Hopper Superchip provides a PCI-like device
-> for the on-chip GPU that is the logical OS representation of the
-> internal propritary cache coherent interconnect.
->=20
-> This representation has a number of limitations compared to a real PCI
-> device, in particular, it does not model the coherent GPU memory
-> aperture as a PCI config space BAR, and PCI doesn't know anything
-> about cacheable memory types.
->=20
-> Provide a VFIO PCI variant driver that adapts the unique PCI
-> representation into a more standard PCI representation facing
-> userspace. The GPU memory aperture is obtained from ACPI using
-> device_property_read_u64(), according to the FW specification,
-> and exported to userspace as the VFIO_REGION that covers the first
-> PCI BAR. qemu will naturally generate a PCI device in the VM where the
-> cacheable aperture is reported in BAR1.
+On Wed, 03 May 2023 18:16:14 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
+> and save ID registers' sanitized value in the array at KVM_CREATE_VM.
+> Use the saved ones when ID registers are read by the guest or
+> userspace (via KVM_GET_ONE_REG).
+> 
+> No functional change intended.
+> 
+> Co-developed-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 20 ++++++++++++++
+>  arch/arm64/kvm/arm.c              |  1 +
+>  arch/arm64/kvm/id_regs.c          | 46 +++++++++++++++++++++++++------
+>  arch/arm64/kvm/sys_regs.c         | 11 +++++++-
+>  arch/arm64/kvm/sys_regs.h         |  3 +-
+>  5 files changed, 69 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index bcd774d74f34..a7d4d9e093e3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -177,6 +177,21 @@ struct kvm_smccc_features {
+>  	unsigned long vendor_hyp_bmap;
+>  };
+>  
+> +/*
+> + * Emulated CPU ID registers per VM
+> + * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
+> + * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
+> + *
+> + * These emulated idregs are VM-wide, but accessed from the context of a vCPU.
+> + * Access to id regs are guarded by kvm_arch.config_lock.
+> + */
+> +#define KVM_ARM_ID_REG_NUM	56
 
-BAR2.
+You already have this as part of patch #1 in another include file, and
+then move it here. Surely you can do that in one go. I'd also like it
+to be defined in terms of encodings, and not as a raw value.
 
-and it's more informative by describing how many BARs this device
-already implements then BAR2 is selected because it's free.
+> +#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
+> +#define IDREG(kvm, id)		kvm->arch.idregs.regs[IDREG_IDX(id)]
 
+Missing brackets around 'kvm'.
+
+> +struct kvm_idregs {
+> +	u64 regs[KVM_ARM_ID_REG_NUM];
+> +};
 > +
-> +static int nvgpu_vfio_pci_open_device(struct vfio_device *core_vdev)
+>  typedef unsigned int pkvm_handle_t;
+>  
+>  struct kvm_protected_vm {
+> @@ -243,6 +258,9 @@ struct kvm_arch {
+>  	/* Hypercall features firmware registers' descriptor */
+>  	struct kvm_smccc_features smccc_feat;
+>  
+> +	/* Emulated CPU ID registers */
+> +	struct kvm_idregs idregs;
+> +
+>  	/*
+>  	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+>  	 * the associated pKVM instance in the hypervisor.
+> @@ -1008,6 +1026,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>  				struct kvm_arm_copy_mte_tags *copy_tags);
+>  
+> +void kvm_arm_init_id_regs(struct kvm *kvm);
+> +
+>  /* Guest/host FPSIMD coordination helpers */
+>  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 4b2e16e696a8..e34744c36406 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -153,6 +153,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  
+>  	set_default_spectre(kvm);
+>  	kvm_arm_init_hypercalls(kvm);
+> +	kvm_arm_init_id_regs(kvm);
+>  
+>  	/*
+>  	 * Initialise the default PMUver before there is a chance to
+> diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> index 96b4c43a5100..e769223bcee2 100644
+> --- a/arch/arm64/kvm/id_regs.c
+> +++ b/arch/arm64/kvm/id_regs.c
+> @@ -52,16 +52,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
+>  	}
+>  }
+>  
+> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+
+Why getting rid of this comment instead of moving it next to the
+(re-implemented) function?
+
+> -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
+> +u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+>  {
+> -	u32 id = reg_to_encoding(r);
+> -	u64 val;
+> -
+> -	if (sysreg_visible_as_raz(vcpu, r))
+> -		return 0;
+> -
+> -	val = read_sanitised_ftr_reg(id);
+> +	u64 val = IDREG(vcpu->kvm, id);
+>  
+>  	switch (id) {
+>  	case SYS_ID_AA64PFR0_EL1:
+> @@ -126,6 +119,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
+>  	return val;
+>  }
+>  
+> +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
 > +{
-> +	struct vfio_pci_core_device *vdev =3D
-> +		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-> +	int ret;
+> +	if (sysreg_visible_as_raz(vcpu, r))
+> +		return 0;
 > +
-> +	ret =3D vfio_pci_core_enable(vdev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	vfio_pci_core_finish_enable(vdev);
-> +
-> +	return ret;
+> +	return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
 > +}
-
-NIT. "return 0" as other variant drivers do.
-
-
 > +
-> +MODULE_LICENSE("GPL v2");
-> +MODULE_AUTHOR("Ankit Agrawal <ankita@nvidia.com>");
-> +MODULE_AUTHOR("Aniket Agashe <aniketa@nvidia.com>");
-> +MODULE_DESCRIPTION(
-> +	"VFIO NVGPU PF - User Level driver for NVIDIA devices with CPU
-> coherently accessible device memory");
+>  /* cpufeature ID register access trap handlers */
+>  
+>  static bool access_id_reg(struct kvm_vcpu *vcpu,
+> @@ -458,3 +459,30 @@ int emulate_id_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params)
+>  
+>  	return 1;
+>  }
+> +
+> +/*
+> + * Set the guest's ID registers that are defined in id_reg_descs[]
+> + * with ID_SANITISED() to the host's sanitized value.
+> + */
+> +void kvm_arm_init_id_regs(struct kvm *kvm)
+> +{
+> +	u64 val;
+> +	u32 id;
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(id_reg_descs); i++) {
+> +		id = reg_to_encoding(&id_reg_descs[i]);
+> +
+> +		/*
+> +		 * Some hidden ID registers which are not in arm64_ftr_regs[]
+> +		 * would cause warnings from read_sanitised_ftr_reg().
+> +		 * Skip those ID registers to avoid the warnings.
+> +		 */
+> +		if (id_reg_descs[i].visibility == raz_visibility)
+> +			/* Hidden or reserved ID register */
+> +			continue;
 
-what does 'PF' mean? Physical function?
+Are you sure? What about other visibility attributes that are normally
+evaluated at runtime? This may work as a short term hack, but I'm not
+sure this is the correct long-term solution...
 
-Probably needs a more specific name for the coherent part... nvgpu-vfio-pci
-sounds covering all NV GPUs.
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
