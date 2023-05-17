@@ -2,168 +2,288 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58156705BED
-	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 02:28:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC10C705C58
+	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 03:22:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231530AbjEQA2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 20:28:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50302 "EHLO
+        id S231478AbjEQBWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 21:22:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229671AbjEQA2k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 20:28:40 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2061.outbound.protection.outlook.com [40.107.93.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F388940F5;
-        Tue, 16 May 2023 17:28:38 -0700 (PDT)
+        with ESMTP id S231452AbjEQBWm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 21:22:42 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61C3359C4;
+        Tue, 16 May 2023 18:22:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684286559; x=1715822559;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=TWMcZMLHdLjlTJs1uxBlTxkJ22hCNaYJDgS4NPJUW8Q=;
+  b=HU4+VaLEr7AIvMpeg+hs6cke14i56n5DFN+GvLBy/e2iWAqXrRy7YMkd
+   SBSit7X6OYIafOYR12ZLpYChAzmGRGcrIajhuk/RZRaQUVUNPv4vUP6P4
+   LzNnmVPDiNGJwx+A7K9PNHhYT4un68lUgrYBGNzLTAQ9mJOpKvzgGUT6I
+   8yzmXQ6JvD8M4vV/OxeiJ8pq/mDxQkoW5glBTEmhMdLBgqXmnRl6kchDb
+   clpcl7So2CyFut0kmBYqErtvz2qLk6/c/Qi5h9u6KtKPsLxo4xUcJHopn
+   0i/SN/ibxWpPv1gaGpEgXOxsVUbQ4xEUIGPaWGyz8fRu2RlX4Cn2KHboU
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10712"; a="415040681"
+X-IronPort-AV: E=Sophos;i="5.99,280,1677571200"; 
+   d="scan'208";a="415040681"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2023 18:22:39 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10712"; a="652047788"
+X-IronPort-AV: E=Sophos;i="5.99,280,1677571200"; 
+   d="scan'208";a="652047788"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga003.jf.intel.com with ESMTP; 16 May 2023 18:22:39 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 16 May 2023 18:22:38 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Tue, 16 May 2023 18:22:38 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Tue, 16 May 2023 18:22:38 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mA4Xl4Iu5B5IDcWXdxx9mOP05mUiBoHt8y8Jh4Hn/V1X3bAMOw5l/Qr4tgiXnPvnigs+Lc5CQ6TFXiz2HZLzLXcC4sdtGHG2PAm3uZbeZNyp0zK9AR1jqp7T8NLz/LTM/cZJIy9TI2wMuJaPUn4Q1r+coJwF7jnrxHJWY/ae8HAUURmvmq8EAnCz6IQeCuyQHEpYMt2Q7x4vEL2kHYC83FsKnuUGoce98gn6wQM4nY9KerrWicp0HEzDRn2xsT9Y4nw9+/N4lDuK63LV2wiOZfXnvwKPdwAl4fRxAj9JZuQl8vyVmXcOGOxQN3uwm+qg3xtGPT232E03pjCdtZQiCw==
+ b=kzsf9/uHD4BMGcCJFQVcYtv4o3HSZPmdCuN84GhGQE202CC2CkXfPQfsS/vFuWDq8VnveAxNh/Lv+2SMm+ABniDlk9m93YJH6AUb2noud02YF/mDWMI0oVU9IOCrkX1COnLRZGQyIzmBgXg6LFHQb4CWpVmMLYsDeKVnYv5IJDUAJSpEZIlCfHJQcypT7JIjT69brFtIDl5FRtGP8OOSneNGnJJy1y7oTWjCRY1xlVzRUHhdbPoD3JWYz5jLtDthQRxUmEotp9OUiPnHx1Z1POgknsYOXGwfgeTZ8XepA6fvqgH+IWDLDi9EoAUfJS1UPEEtfgygoourFnY5EjRHWQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m1TX1WmCR2FBlHduYoJbtm3AnrqnoauD69JXt7/L1W0=;
- b=Jx4YGL+ORsa3b75Bg87s1i5ltf3+6NsHBgOsQX+czxECgfEhc88ENlBDsNcnVv26FV2oawvG/YWPLs3/KOF/scZQr+IXr1XqVZTJaWFu1svP9K8OOZJPw65BFtoF2oUysK+0lIHamuUi7ax0uzxEmJ7QyEHiDj0Q0PgQ/15bNCOhOBSwhCla0Yez4J+lJTR+jEHSTxFZfNHAviSfA+cIDrocXwizXH32FDahXIkOpfBQKZXmdEaI9iraJgB8OyqFYdk3Eg5iWfQ/6+pw5MDdQL0qR98sH76VOIH/Y8P4YM7cSmJ5Id11tPbbtD3WieNrQzqr4zs96jBBdO6+D4XnFA==
+ bh=8k0p8ng9Y0hE8OE294Z5UkFW1P11//+W16FhA+x7fw8=;
+ b=VR44PIZclHttTiIRIiwcuFvXrQB8GNd+j2qJXObvcgAFW3DPgAHv4SG39EuyaRSQVXx+NrBlCOqlB+FmQPPxExoSrEeL6466vamCDl/29wQxeb2Dzqs2bN/eYbK1peVz7fP28UXSLkjTNjIxbviqLSQUcoHLHWQBmPmA7TFHPZUHqcnk9uwyN1e2o5SF2WXXiHs7pVxFFopbXBQO1B/mM3lKZXgouXU+srjpZssHz1ilKFb67CH6dNed+QJE+rq0Freb//9BK7HdgUNJ5FYP3/pULdNDHZgLt+zgVzBcPS+9uTOzGzM8viBYoTi+q3gcyZXNpS3qBdkSqHiaB/peMA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m1TX1WmCR2FBlHduYoJbtm3AnrqnoauD69JXt7/L1W0=;
- b=fzJk2Wx26FCAYYOcXRG2VP1StFcSHH4wlrDwimWp19k/LBEzy7ccERqfADwPW/TnXcO+9eNyHf5j/0aoJSC3DlN69eCjHjhQgv+h9p8nf2ODX3VzPPbgldALOFMYk4atOOUS45jWDS83mEG4iqn/gGqduSwBiglnCVZ9UARUQRkbmAjffwwOVV3lxD5gvcMURLuOKgmG4yzTmBsX5gRuhk8eEuAigYwZI97J4wk3LqYWzrPaiNP/9Sx7mX0ru2qquWISseY2XoWqKxRNulEi8Wbo2p/jmcbHd0gR3KCC0K0Aju/DIajosi9SZGisGSStQC4Hxkhk7N9foPerWu4bBQ==
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN0PR12MB5859.namprd12.prod.outlook.com (2603:10b6:208:37a::17)
- by CY8PR12MB7490.namprd12.prod.outlook.com (2603:10b6:930:91::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.33; Wed, 17 May
- 2023 00:28:37 +0000
-Received: from MN0PR12MB5859.namprd12.prod.outlook.com
- ([fe80::94b9:a372:438d:94a2]) by MN0PR12MB5859.namprd12.prod.outlook.com
- ([fe80::94b9:a372:438d:94a2%7]) with mapi id 15.20.6387.030; Wed, 17 May 2023
- 00:28:37 +0000
-Date:   Tue, 16 May 2023 21:28:35 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     ankita@nvidia.com, aniketa@nvidia.com, cjia@nvidia.com,
-        kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
-        acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
-        danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
-        kevin.tian@intel.com
-Subject: Re: [PATCH v2 1/1] vfio/nvgpu: Add vfio pci variant module for grace
- hopper
-Message-ID: <ZGQfszAGGKhCp20q@nvidia.com>
-References: <20230509040734.24392-1-ankita@nvidia.com>
- <20230516150914.26ae99c3.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ LV3PR11MB8508.namprd11.prod.outlook.com (2603:10b6:408:1b4::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6387.33; Wed, 17 May 2023 01:22:35 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::a670:49f5:d602:e2e4]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::a670:49f5:d602:e2e4%6]) with mapi id 15.20.6387.033; Wed, 17 May 2023
+ 01:22:35 +0000
+Date:   Wed, 17 May 2023 08:57:28 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, <kvm@vger.kernel.org>,
+        <intel-gfx@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        <intel-gvt-dev@lists.freedesktop.org>
+Subject: Re: [PATCH v3 07/28] drm/i915/gvt: Don't rely on KVM's gfn_to_pfn()
+ to query possible 2M GTT
+Message-ID: <ZGQmeH4ADjQh4m9H@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20230513003600.818142-1-seanjc@google.com>
+ <20230513003600.818142-8-seanjc@google.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20230516150914.26ae99c3.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR03CA0018.namprd03.prod.outlook.com
- (2603:10b6:208:23a::23) To MN0PR12MB5859.namprd12.prod.outlook.com
- (2603:10b6:208:37a::17)
+In-Reply-To: <20230513003600.818142-8-seanjc@google.com>
+X-ClientProxiedBy: SG2PR02CA0010.apcprd02.prod.outlook.com
+ (2603:1096:3:17::22) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR12MB5859:EE_|CY8PR12MB7490:EE_
-X-MS-Office365-Filtering-Correlation-Id: b6e524fc-5764-41e3-a9c4-08db566da796
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|LV3PR11MB8508:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7648c5f5-49cb-410f-ec7b-08db567531ee
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: c/ujQUDRb/YW0MLJmY1b1N5xIOaJ9JDXyl1t8D7oGiavQ4o7Bq2CG4o/Pv5Q4O2SWByJG0nLhZhaHHU0pBJmjqTBqR1L+hQU4N351cDH07vs2Iw0cpUA2vJC7+ac01wUUNdaVLVuvXH1s/BH/NQ96ZaSpqbLhIbfBHqZlYsabPX/GTA66Mzsj1Y1K+Arf3Aaekwd05RMUPW1HcYktmmn9vVibBhsEHl+s70xh+6Z58Gky19kXVM2IrmnMQf9qPkbtuLhOgsTqTmCzzpIv+2rdGNtLNR5O5i+ZNMvFoLTIeMxmdNfmHvE31hxdBj0I6GWPCh5abDxGk4I+eOf/JhZgFKbvPEDCOqASx+VktqIMbHq1eR2MxUVwKurXO/qPWbRrBEXbMuoOg+VuC6Fuyeif6xZTYJrKHdrcSQzU+326InS1GnD3ZQ5vI7QN5upLJyNREt68/lk+PHC5kmeABE18LFkYBrP+xWD5OW/wFZFfFLleR8lP/D0u2XNTrv+t4CmhJx9f1+yA/6YMmvVl79dTquGp/2S0UeNg7/C/ysjqsshn8W4GDwEI0eytHHMBJx1
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB5859.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(39860400002)(376002)(346002)(136003)(396003)(451199021)(6486002)(36756003)(2616005)(83380400001)(26005)(6506007)(6512007)(186003)(5660300002)(38100700002)(86362001)(41300700001)(316002)(478600001)(8676002)(8936002)(66476007)(66946007)(4326008)(6916009)(66556008)(2906002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: grhgvJbrdzsBCHsDmXPb1Sifoj6Cz7qZ6ZRXUxNA0Bg4tCgGTHgNML+6upbhtp3d08OZ7+/FsBm/hrVyzWHZQaeAeU8zPj4hkvufZf+FLJpL5B+FK/Z8gMeAVGOpDgtQ/KU/hQqhOgyuWT77klURp8Rc7RHoEbge7t6o4A8znEjMFaD4uUe1zrtyJeKD7paDrzYijT4pHwbECvN4wqfeMvj4LDUxenm0ZVKMBnX+Q4K2lAQwoDmfGEqAr3gmj7/EJxxlfzK6UJe92HE3LbiZtWn4Mt28d8TKFmJyI+lxsusWMM4WecywCPPCqCotWT6T3jsv1XdAGiv8GE8SF7m1WR+LKoC6D+ot3MREWU/Y0swOqFXKun/rJeOr/mOESUKFy/j3qpmH7pSbU/pba8FMsos4tGUycdX8IyGuuZNkQpaWn8m+Nwsl5zNZOuahoU9BGkrLPHJ/9c6/taVKOSx6MsyndEGqJjpQ/uNR3jovdWkLl1WzqSJq9MkxMPcQYJWsCCyMgoX5PZDxxPnOLQ9IpnbXZzpOrIWoyT/lLTJpXtvZEryATUIuCDeORjAV5z73
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(376002)(346002)(366004)(136003)(396003)(451199021)(5660300002)(86362001)(8936002)(8676002)(83380400001)(82960400001)(6506007)(6512007)(26005)(38100700002)(186003)(6486002)(478600001)(6666004)(316002)(41300700001)(66946007)(54906003)(66476007)(66556008)(6916009)(4326008)(3450700001)(2906002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?uiH0OUfLxiJyJV9TvKrKUk4VZJuRGCQyl5LMeT7K3bJuTIpWfqfcMD91yLJl?=
- =?us-ascii?Q?ULV3jnYxl4hJgP561fpH6LT2sd7EpxQ5MK9GHlm0Djz/NAOu2MRZRv8Tvqgu?=
- =?us-ascii?Q?lQRNDIE5tQHAg4otuByppLmlLM82wXYvviTWdJZVwhDlXFg1FJN2MWF6mV++?=
- =?us-ascii?Q?txFRpucCgxOVVq9yyUbn3cdm5q0ZGmHoOF1CcnM1qcpP2k6zqc4jwIVGjjlj?=
- =?us-ascii?Q?s/xWdZtm0TH+MENm9o7YIo6Wbqypo1IkmfZI3IRkrMazJJ2tKn6MRHDju4Ns?=
- =?us-ascii?Q?PEIUTh6egbRGm+3WY9lEy5skk1vkH3qqnJXzNSogaubw+zSRgUIqWR5L1ObP?=
- =?us-ascii?Q?fAozzHRCDvsnvqPSd1yp6luZoVWZw5bOLhsn5lLn9cDyBkfFX6BKHu23UpyJ?=
- =?us-ascii?Q?POeG0FEgUsgZHuvqxKUVlsXKI3iHKherkV2j07634yImFLIrBRdmjBPwdyKa?=
- =?us-ascii?Q?cNv8avLb8Muf6yxzXgxw/xI9hUVjs+nNmKekjX2wQWl8BNGoGBnbUF+NSMLq?=
- =?us-ascii?Q?rxnW48SegbAJCAbRCM6c/Hi6zA+7Nm0+8X5EMTXYyst9uFYGfpvWoT8Ea18o?=
- =?us-ascii?Q?sHFxnhUMUVXvsrxnAnou21YVUFGFDjjf83bUxofQmjG8fHbbo2LBbTFtr/O8?=
- =?us-ascii?Q?6b/Myhz1eZX2uk+MeChov3U/KZrZN/uREVYocoYRZtzPcT7mGJALX+437Veq?=
- =?us-ascii?Q?Me2Fop3HU/3aVjP+Ul1LfuxuKm28lNWF7Qaf8JkHQ57wvd788jZqXTtWY7V/?=
- =?us-ascii?Q?y6/XOyPJSOHBSVD1hMb1xAkAKuvwBwP2O1iV5+4fq7Q+baBlvRbkVStAQV+O?=
- =?us-ascii?Q?c+Sit0kPwXmIA18h90nKG4xaGLZm5ocFnk+B7imlVYNFhowIbYSR5M6wqA9M?=
- =?us-ascii?Q?jylIc0nta+EL3Hlw5rpBudqPppAmLN7Tzt6OQykqM9KGmNm7vQBeqRJ+qy3z?=
- =?us-ascii?Q?jGfNaYE6qVuh5JO7TMoUHh6n46F/EN8nMVhQp1BDo2oTbFCrr5imy8Y7I0q/?=
- =?us-ascii?Q?y3TOf/Kkupi9QdusBf7LEtBmdy7IanBajkozpcQNiItGtoPJEC1UxaYN3eCs?=
- =?us-ascii?Q?NgoncvdIJSl4JLKdESxLmNZtBxwohH+9jsPxxsAcw7rQTNJP+wjuTda5CIC0?=
- =?us-ascii?Q?slfgoeu69VliOlxZsD8QpoX24/XNe72NK6UL/ahiwdsx1v29E0BgTZVPLULH?=
- =?us-ascii?Q?NBgvNJFIZfFq6a0zL7mTko6+qbOjB9upMa+Dxry02p506yxE1d5pkjSKKLls?=
- =?us-ascii?Q?QHIzDwQ7Bk0agkvsWFb4UQiCE74AQObIPmDB49wCjKPb+SI9H4zhrKkF+Izx?=
- =?us-ascii?Q?EPcBlLivZZxAhC06oCvWIfQXq9CWPFF0lVncsmMB3tfp2pshPYdgFQ9ZAckh?=
- =?us-ascii?Q?MRN3OBpkX1JhLcRRbm+5FGHWyK1DHbaY2TzGDUtRYAm6wrGaGi5VlCJCPvb1?=
- =?us-ascii?Q?MYU4dJkLYjUrQuPEHbPKwi34HBJ8wg6xgZ8Tp16fPc8x2ho1Or2RE2/YOKIA?=
- =?us-ascii?Q?pv3Po4Z0tKgHYSSkYObsCICNTfHA/GeUHz7ZheJeRCQ0m/pmx2RLNipvz0+U?=
- =?us-ascii?Q?dANE/0I0/qxVoQ9u/Bh9p0rCak1llkuqwKTzVGdl?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b6e524fc-5764-41e3-a9c4-08db566da796
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB5859.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?QIcmuFVgbMRCvy1Y4CDJ0sjHuuercUg31p0L9Qe1KHEyJ657VYIUClPTexnh?=
+ =?us-ascii?Q?05YBnj1dRuEBPsG302YJx4RW/iM7QXffCqo8S3GYt7SIDVlaW0b6Fl3GSKGd?=
+ =?us-ascii?Q?YIZs+hEhm+nQO+Yxl7/ILG0uKq7IlNGTm7GHRFFMPLtGdhzm4kfU4hzCzGVp?=
+ =?us-ascii?Q?ai9bURok4aNDh5geqHcrhHbzLTZiylP2C+g05CTwOSQ6OUmWwsl4R8Fnvr7o?=
+ =?us-ascii?Q?ZnUUuFP7mGwaQFNeiwkwIxE9KfpTL2eMs4uvrxT7Swn4xF00kEl8TibsMYB9?=
+ =?us-ascii?Q?6/m/F7KsXpuKCrXebu1bis/GQUDHHo+cBxY7xI1yoq8YpG3KKzDMr/PtSCOw?=
+ =?us-ascii?Q?wFK6cb5SP+AlDMUby15hXRtNXr4DjzsJkMcIMZtX7XsnuLnRTS5m3Mj8FQ2j?=
+ =?us-ascii?Q?4mSKdTZziWy++cu0VfklKGFQdV++PncjGJ7IOuN9LD63VUskVaQAa1tJu00A?=
+ =?us-ascii?Q?QhN1PFtKehDIlXNUQW5AvHin2T/OOeHAKBaQp7Wpz8gjUG/9qsu/VXO4G3/W?=
+ =?us-ascii?Q?AE75K5jXUQiJ3CU4YMc/4bOMANrfI8XQfzjZQGZTzMlQoIh2APnptGeCOhsN?=
+ =?us-ascii?Q?9zc3AWY5HtFQJoMZXtpkStbDck/jaLL7bkXKXn2KKCQZQEJwjUIF8EygAUs5?=
+ =?us-ascii?Q?jxMnzlhInJp4vpy3ODR/VY5HkVCKk2oiro6gzMwJND40v4i8uOVeqNEF9L28?=
+ =?us-ascii?Q?iDT4IE8580ibBVPb54wZEy3YEffkq8BBG+4ni+k8ro+023O7KjJlDAub6enT?=
+ =?us-ascii?Q?Zpk0iZFus6/Nsb4r7lgkjXdrLd2eAcu/sceGdB27qr1dvKDhrk7eBNMuioA5?=
+ =?us-ascii?Q?Xf6Y6gvccFj+TQz/7HKICMRi7PuG/v2G0N91S4WXEsQeYoqHWxskRRTINGmr?=
+ =?us-ascii?Q?Wi7ruuhbrOOLhWIojlGfzRJOgp12NSCnogh+6N/qnauCNHMx8zAbfRH0h4GQ?=
+ =?us-ascii?Q?BM3WRE2rVR9nzHrcVitp4sBdiJCLeYFJBdVkw3TdE2sMXprU8/jkJWwt0D/F?=
+ =?us-ascii?Q?VAIbVXGZ2b3TUBWMkhzf8wEAYdN2/4xRXKszTPLQoz0BxFrSkY6xlAonRN55?=
+ =?us-ascii?Q?AX6N7wrMkbtR52KBuwxuenvZ7AqaQABpndEsk8TN+X6qHbnkKpnhbijQi2WA?=
+ =?us-ascii?Q?888IUCtaX+XSRoTMxYkertF8GUZpLfdBmDI5mJZ2k5RtmptvwHX5MWNOO8V3?=
+ =?us-ascii?Q?2CQQqQqlkB7YKI7XYcJyxdxqxp16jmQlY/INBN9swKt9aXpr7tO/ku5fcrY3?=
+ =?us-ascii?Q?Q/lIBasFlcA1l+J1Bzz6Q5MYA+AFvLnxlO0cc85T7HBxbmf0kGU0NwifeJJ4?=
+ =?us-ascii?Q?eqCHy3Ukz77NBGoSBrTOIDZyq2PW+x18Byoit2IXPBdrb/TVjGIY5Gn7E0DV?=
+ =?us-ascii?Q?wVDaeZ6EgpYF0cxEfOr0lbbm9UtUz4orBCMbfRXGRWR1KC0kXFk+ND3QOrW5?=
+ =?us-ascii?Q?sl6G6gt1PYAs3wwqxPJRsqvk5NH3TIWlLIv+l+R8ZNZjtQJok6QvFjsvyjQR?=
+ =?us-ascii?Q?dxV6Q/QZShf64j5OchAVr4n4ukNg6N8m4VqwjTef9bu6YhLuMU5BhjxzCuxa?=
+ =?us-ascii?Q?sz0OtgtzVSzVRdZB/hQV8i3PkdnML7UZGzHOIQAK?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7648c5f5-49cb-410f-ec7b-08db567531ee
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2023 00:28:36.8666
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2023 01:22:35.5400
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ds11jTz3Lb4/Zyx+5nA4VayuvSIxqSIhThA7psAJf4CSRtilzM47MrAUxUIwXYG2
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7490
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: +INPcWP5sMMs93FooXlquJY8QnWJ3fswut+PckS7vwo35snPjx3tqx1XBc7L+ccC7D5r7h50kOtOE/w9BWDMgQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8508
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 16, 2023 at 03:09:14PM -0600, Alex Williamson wrote:
+Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
+Tested-by: Yan Zhao <yan.y.zhao@intel.com>
 
-> > +# SPDX-License-Identifier: GPL-2.0-only
-> > +config NVGPU_VFIO_PCI
-> > +	tristate "VFIO support for the GPU in the NVIDIA Grace Hopper Superchip"
-> > +	depends on ARM64 || (COMPILE_TEST && 64BIT)
-> > +	select VFIO_PCI_CORE
+On Fri, May 12, 2023 at 05:35:39PM -0700, Sean Christopherson wrote:
+> Now that gvt_pin_guest_page() explicitly verifies the pinned PFN is a
+> transparent hugepage page, don't use KVM's gfn_to_pfn() to pre-check if a
+> 2MiB GTT entry is possible and instead just try to map the GFN with a 2MiB
+> entry.  Using KVM to query pfn that is ultimately managed through VFIO is
+> odd, and KVM's gfn_to_pfn() is not intended for non-KVM consumption; it's
+> exported only because of KVM vendor modules (x86 and PPC).
 > 
-> I think this should be a 'depends on' as well, that's what we have for
-> the other vfio-pci variant drivers.
-
-It should be removed completely, AFAICT:
-
-config VFIO_PCI
-        tristate "Generic VFIO support for any PCI device"
-        select VFIO_PCI_CORE
-
-Ensures it is turned on
-
-if VFIO_PCI
-source "drivers/vfio/pci/mlx5/Kconfig"
-endif
-
-Autoamtically injects a 'depends on VFIO_PCI' to all the enclosed
-kconfig statements (and puts them nicely in the menu)
-
-So we have everything needed already
-
-SELECT is the correct action since it doesn't have a config text.
-
-> Is our test for vm_end < vm_start in vfio-pci-core just paranoia?  I
-> don't see an equivalent here.
-
-Yes, mm core will not invoke the op with something incorrect.
- 
-> Can we also get a comment in the code outlining the various reasons
-> that this "BAR" doesn't need the disabled access protections that
-> vfio-pci-core implements?  For example outlining the behavior relative
-> to BAR access while the memory enable bit is disabled, the bus being in
-> reset, or the device being in a low-power state.
-
-The HW has some "isolation" feature that kicks in and safely
-disconnects the GPU from the CPU.
-
-A lot of work has been done to make things like VFIO and KVM safe
-against machine checks/etc under basically all circumstances.
-
-Jason
+> Open code the check on 2MiB support instead of keeping
+> is_2MB_gtt_possible() around for a single line of code.
+> 
+> Move the call to intel_gvt_dma_map_guest_page() for a 4KiB entry into its
+> case statement, i.e. fork the common path into the 4KiB and 2MiB "direct"
+> shadow paths.  Keeping the call in the "common" path is arguably more in
+> the spirit of "one change per patch", but retaining the local "page_size"
+> variable is silly, i.e. the call site will be changed either way, and
+> jumping around the no-longer-common code is more subtle and rather odd,
+> i.e. would just need to be immediately cleaned up.
+> 
+> Drop the error message from gvt_pin_guest_page() when KVMGT attempts to
+> shadow a 2MiB guest page that isn't backed by a compatible hugepage in the
+> host.  Dropping the pre-check on a THP makes it much more likely that the
+> "error" will be encountered in normal operation.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  drivers/gpu/drm/i915/gvt/gtt.c   | 49 ++++++--------------------------
+>  drivers/gpu/drm/i915/gvt/kvmgt.c |  1 -
+>  2 files changed, 8 insertions(+), 42 deletions(-)
+> 
+> diff --git a/drivers/gpu/drm/i915/gvt/gtt.c b/drivers/gpu/drm/i915/gvt/gtt.c
+> index 61e38acee2d5..f505be9e647a 100644
+> --- a/drivers/gpu/drm/i915/gvt/gtt.c
+> +++ b/drivers/gpu/drm/i915/gvt/gtt.c
+> @@ -1145,36 +1145,6 @@ static inline void ppgtt_generate_shadow_entry(struct intel_gvt_gtt_entry *se,
+>  	ops->set_pfn(se, s->shadow_page.mfn);
+>  }
+>  
+> -/*
+> - * Check if can do 2M page
+> - * @vgpu: target vgpu
+> - * @entry: target pfn's gtt entry
+> - *
+> - * Return 1 if 2MB huge gtt shadowing is possible, 0 if miscondition,
+> - * negative if found err.
+> - */
+> -static int is_2MB_gtt_possible(struct intel_vgpu *vgpu,
+> -	struct intel_gvt_gtt_entry *entry)
+> -{
+> -	const struct intel_gvt_gtt_pte_ops *ops = vgpu->gvt->gtt.pte_ops;
+> -	kvm_pfn_t pfn;
+> -	int ret;
+> -
+> -	if (!HAS_PAGE_SIZES(vgpu->gvt->gt->i915, I915_GTT_PAGE_SIZE_2M))
+> -		return 0;
+> -
+> -	pfn = gfn_to_pfn(vgpu->vfio_device.kvm, ops->get_pfn(entry));
+> -	if (is_error_noslot_pfn(pfn))
+> -		return -EINVAL;
+> -
+> -	if (!pfn_valid(pfn))
+> -		return -EINVAL;
+> -
+> -	ret = PageTransHuge(pfn_to_page(pfn));
+> -	kvm_release_pfn_clean(pfn);
+> -	return ret;
+> -}
+> -
+>  static int split_2MB_gtt_entry(struct intel_vgpu *vgpu,
+>  	struct intel_vgpu_ppgtt_spt *spt, unsigned long index,
+>  	struct intel_gvt_gtt_entry *se)
+> @@ -1268,7 +1238,7 @@ static int ppgtt_populate_shadow_entry(struct intel_vgpu *vgpu,
+>  {
+>  	const struct intel_gvt_gtt_pte_ops *pte_ops = vgpu->gvt->gtt.pte_ops;
+>  	struct intel_gvt_gtt_entry se = *ge;
+> -	unsigned long gfn, page_size = PAGE_SIZE;
+> +	unsigned long gfn;
+>  	dma_addr_t dma_addr;
+>  	int ret;
+>  
+> @@ -1283,6 +1253,9 @@ static int ppgtt_populate_shadow_entry(struct intel_vgpu *vgpu,
+>  	switch (ge->type) {
+>  	case GTT_TYPE_PPGTT_PTE_4K_ENTRY:
+>  		gvt_vdbg_mm("shadow 4K gtt entry\n");
+> +		ret = intel_gvt_dma_map_guest_page(vgpu, gfn, PAGE_SIZE, &dma_addr);
+> +		if (ret)
+> +			return -ENXIO;
+>  		break;
+>  	case GTT_TYPE_PPGTT_PTE_64K_ENTRY:
+>  		gvt_vdbg_mm("shadow 64K gtt entry\n");
+> @@ -1294,12 +1267,10 @@ static int ppgtt_populate_shadow_entry(struct intel_vgpu *vgpu,
+>  		return split_64KB_gtt_entry(vgpu, spt, index, &se);
+>  	case GTT_TYPE_PPGTT_PTE_2M_ENTRY:
+>  		gvt_vdbg_mm("shadow 2M gtt entry\n");
+> -		ret = is_2MB_gtt_possible(vgpu, ge);
+> -		if (ret == 0)
+> +		if (!HAS_PAGE_SIZES(vgpu->gvt->gt->i915, I915_GTT_PAGE_SIZE_2M) ||
+> +		    intel_gvt_dma_map_guest_page(vgpu, gfn,
+> +						 I915_GTT_PAGE_SIZE_2M, &dma_addr))
+>  			return split_2MB_gtt_entry(vgpu, spt, index, &se);
+> -		else if (ret < 0)
+> -			return ret;
+> -		page_size = I915_GTT_PAGE_SIZE_2M;
+>  		break;
+>  	case GTT_TYPE_PPGTT_PTE_1G_ENTRY:
+>  		gvt_vgpu_err("GVT doesn't support 1GB entry\n");
+> @@ -1309,11 +1280,7 @@ static int ppgtt_populate_shadow_entry(struct intel_vgpu *vgpu,
+>  		return -EINVAL;
+>  	}
+>  
+> -	/* direct shadow */
+> -	ret = intel_gvt_dma_map_guest_page(vgpu, gfn, page_size, &dma_addr);
+> -	if (ret)
+> -		return -ENXIO;
+> -
+> +	/* Successfully shadowed a 4K or 2M page (without splitting). */
+>  	pte_ops->set_pfn(&se, dma_addr >> PAGE_SHIFT);
+>  	ppgtt_set_shadow_entry(spt, &se, index);
+>  	return 0;
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> index 429f0f993a13..92ceefe1e6fb 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -162,7 +162,6 @@ static int gvt_pin_guest_page(struct intel_vgpu *vgpu, unsigned long gfn,
+>  		if (npage == 0)
+>  			base_page = cur_page;
+>  		else if (page_to_pfn(base_page) + npage != page_to_pfn(cur_page)) {
+> -			gvt_vgpu_err("The pages are not continuous\n");
+>  			ret = -EINVAL;
+>  			npage++;
+>  			goto err;
+> -- 
+> 2.40.1.606.ga4b1b128d6-goog
+> 
