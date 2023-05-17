@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5F48706380
-	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 11:02:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1BDF7064B5
+	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 11:56:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230493AbjEQJCl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 May 2023 05:02:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47190 "EHLO
+        id S229775AbjEQJ4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 May 2023 05:56:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjEQJCY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 May 2023 05:02:24 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CC1F30E0;
-        Wed, 17 May 2023 02:02:03 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-64ab2a37812so11523573b3a.1;
-        Wed, 17 May 2023 02:02:03 -0700 (PDT)
+        with ESMTP id S230055AbjEQJ4G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 May 2023 05:56:06 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 968044209;
+        Wed, 17 May 2023 02:56:01 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-51b33c72686so365541a12.1;
+        Wed, 17 May 2023 02:56:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684314123; x=1686906123;
+        d=gmail.com; s=20221208; t=1684317361; x=1686909361;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
          :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ph7FWotnDHyNH43Suo9o026I5GBhoRCi6trqJm+ae1c=;
-        b=cOn7sW93YxROwtygiZ4kd6HC6BbzEHtija5wSUXNqYIudX5SCymwnx4qX3kwMKrjWV
-         90e27La7ebSJzffNnJsKKHey7cKsPV/kors2tLfdFYziBd0nPtoHMafZBFsQiQyKpLhh
-         FlktAOsEqWN7I3T4kvxc51w9EjkSrpw5EWcZI/pk5PUJWkKwYj65dnxR+39jZ0kg0m38
-         AkBEe7+TelBuXq8v+ZNCnqZSpJAax9mH3MTWDpBe78F3DFEW3efPAKuR8GwnOQZNQvL4
-         Q8tS5ZooefJN3S5lCYtSZmvqD6TAzWE6OOftQuMwRuuWnZxEIo30Y/0WKIs3Xc/oEgf8
-         gr+Q==
+        bh=ayYNauh9YOj0YuMbIMh+fZvBeOH7YM6wlBBt72xWnhI=;
+        b=jMRIWYqEgbvXYuhnGgk45LlPtJB67tD2df9o2Ef8nY5Jr4Ct1wQHVwKLRD9CiiyPTp
+         vwZIarGqWvB31/jkH3HYZJrisEb5hiAYr0aRHxZaG2qKAKBvdpu96EQOUvOvoaZ/77jN
+         jSTX5FpZR4VrOTGZcixeEQl2R5mBefwz7Hc1RSC9dJmhnHO2UU/iTPzALJo9PQHrIv8N
+         FLpDWANJRIM/d/5A/JCoycDb0JWOKp33gZwPSmwst7YdCF7C6RCKq2G9YlhmRdCpTujM
+         nSEb1/B4OsOb6440+nWy930mTxBFZzdiFOJMRVtLbHSsZUbvV4a3+Na5veQHeO87/Qw9
+         Zbcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684314123; x=1686906123;
+        d=1e100.net; s=20221208; t=1684317361; x=1686909361;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
          :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=Ph7FWotnDHyNH43Suo9o026I5GBhoRCi6trqJm+ae1c=;
-        b=bp2ZC+lYCeShFRvM4cwkWcqT/ZkWXNC4Pj/Ucy7lYMBjg1j2HX6WsM1vt07b+kKq6R
-         MLycK9TrQVLEtEJbevjUvfOfJVn3R21iJP4+Hj+xJJZbzP3mMQKv0JiIVhmlL6bENa+h
-         gvDl9d3JU1lVnRQ202GPspGaRnIssDPonEpWcAlTYZCQjH41dimKOcbGHWE51nN22SSd
-         SjRMICLk0+K3WbSjfyqj7TmeDoZTEbc+4aaNRLmD9zgfhFXIBKa0oKoFCSl8UQfdqCom
-         ky23r00iESoDL/7mhX6K+gD+Yt1N/18kKoWU1wW+KEcIrcYz/5WUT4Gzkm9y5nF+pVHi
-         sUFA==
-X-Gm-Message-State: AC+VfDxv8bfDRqB/lq5Rz/jqBupuQj/AL+XR6HKaeM38me2JTtqGFuyq
-        +/zPyIn98xwpnxCu3sDvgbA=
-X-Google-Smtp-Source: ACHHUZ63hS1/S/jzGaGnpkvjna7RhS7G2JWLtso6RdQPEeBMDByM66294yz5+hFQTOQZz07Cn9oEkg==
-X-Received: by 2002:a17:90b:4b0e:b0:250:648b:781d with SMTP id lx14-20020a17090b4b0e00b00250648b781dmr1763729pjb.23.1684314122885;
-        Wed, 17 May 2023 02:02:02 -0700 (PDT)
+        bh=ayYNauh9YOj0YuMbIMh+fZvBeOH7YM6wlBBt72xWnhI=;
+        b=GQxwvZ0Kv9elNv3N1tUx89JaIN7eHXJ2U+Blk3iIxiFrVk5ig+exiolGBUynwCUZ8x
+         sMLm9Oz5eepY2pZoRlSwrTyMYQJ/CJAJy8meqB4qRRZdUMuT/2OHhP2CExy3kfuThtJR
+         2Pvp5HJaQvXtz9NgjqkgMNfe17+7peG5mTCBXGD8MTQImffDk5GacEmpqzU6M1kd77gT
+         QLT1C3foGUySUfLKc9PTkkre2WnwUzWsN+1teWB/BSAqexgssVZXEZD0GX51j02rVWtH
+         ApE06e2E+ErI7S/4S4SJyEJBmvUTgZoo4snX5jr+zT90C5TxZezmFihowsYwrbsCLUEB
+         UjHw==
+X-Gm-Message-State: AC+VfDyoiyFmccAy4OujUipJQu07m2dydwsuBKwssNTWosD0C303TfUF
+        uzT0c8kcgxOHghkGpvjkQrw=
+X-Google-Smtp-Source: ACHHUZ5hXvFTup24JPN1NmOVtxyJWdFuwnnZ/SrTyzOet8dUUnQEq+IxV3mh5Y9b2PKgrA8uzhrQWQ==
+X-Received: by 2002:a17:903:120d:b0:1a5:2993:8aa6 with SMTP id l13-20020a170903120d00b001a529938aa6mr47905055plh.63.1684317360866;
+        Wed, 17 May 2023 02:56:00 -0700 (PDT)
 Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
-        by smtp.gmail.com with ESMTPSA id l14-20020a17090a384e00b00250d670306esm1076450pjf.35.2023.05.17.02.01.52
+        by smtp.gmail.com with ESMTPSA id a11-20020a170902eccb00b001a6c15cad12sm667642plh.166.2023.05.17.02.55.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 May 2023 02:02:02 -0700 (PDT)
-Message-ID: <e255cc80-a232-d66c-5f9b-9db179d33951@gmail.com>
-Date:   Wed, 17 May 2023 17:01:51 +0800
+        Wed, 17 May 2023 02:56:00 -0700 (PDT)
+Message-ID: <851f6305-2145-d756-91e3-55ab89bfcd42@gmail.com>
+Date:   Wed, 17 May 2023 17:55:45 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.1
-Subject: Re: [RFC PATCH V6 01/14] x86/sev: Add a #HV exception handler
+Subject: Re: [RFC PATCH V6 02/14] x86/sev: Add Check of #HV event in path
 To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
         bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
@@ -72,10 +72,10 @@ Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
 References: <20230515165917.1306922-1-ltykernel@gmail.com>
- <20230515165917.1306922-2-ltykernel@gmail.com>
- <20230516093010.GC2587705@hirez.programming.kicks-ass.net>
+ <20230515165917.1306922-3-ltykernel@gmail.com>
+ <20230516093225.GD2587705@hirez.programming.kicks-ass.net>
 From:   Tianyu Lan <ltykernel@gmail.com>
-In-Reply-To: <20230516093010.GC2587705@hirez.programming.kicks-ass.net>
+In-Reply-To: <20230516093225.GD2587705@hirez.programming.kicks-ass.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -88,20 +88,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/16/2023 5:30 PM, Peter Zijlstra wrote:
-> On Mon, May 15, 2023 at 12:59:03PM -0400, Tianyu Lan wrote:
->> From: Tianyu Lan<tiala@microsoft.com>
->>
->> Add a #HV exception handler that uses IST stack.
->>
-> Urgh.. that is entirely insufficient. Like it doesn't even begin to
-> start to cover things.
+On 5/16/2023 5:32 PM, Peter Zijlstra wrote:
+>> --- a/arch/x86/entry/entry_64.S
+>> +++ b/arch/x86/entry/entry_64.S
+>> @@ -1019,6 +1019,15 @@ SYM_CODE_END(paranoid_entry)
+>>    * R15 - old SPEC_CTRL
+>>    */
+>>   SYM_CODE_START_LOCAL(paranoid_exit)
+>> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+>> +	/*
+>> +	 * If a #HV was delivered during execution and interrupts were
+>> +	 * disabled, then check if it can be handled before the iret
+>> +	 * (which may re-enable interrupts).
+>> +	 */
+>> +	mov     %rsp, %rdi
+>> +	call    check_hv_pending
+>> +#endif
+>>   	UNWIND_HINT_REGS
+>>   
+>>   	/*
+>> @@ -1143,6 +1152,15 @@ SYM_CODE_START(error_entry)
+>>   SYM_CODE_END(error_entry)
+>>   
+>>   SYM_CODE_START_LOCAL(error_return)
+>> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+>> +	/*
+>> +	 * If a #HV was delivered during execution and interrupts were
+>> +	 * disabled, then check if it can be handled before the iret
+>> +	 * (which may re-enable interrupts).
+>> +	 */
+>> +	mov     %rsp, %rdi
+>> +	call    check_hv_pending
+>> +#endif
+>>   	UNWIND_HINT_REGS
+>>   	DEBUG_ENTRY_ASSERT_IRQS_OFF
+>>   	testb	$3, CS(%rsp)
+> Oh hell no... do now you're adding unconditional calls to every single
+> interrupt and nmi exit path, with the grand total of 0 justification.
 > 
-> The whole existing VC IST stack abuse is already a nightmare and you're
-> duplicating that.. without any explanation for why this would be needed
-> and how it is correct.
-> 
-> Please try again.
 
-Hi Peter:
-	Thanks for your review. Will add more explanation in the next version.
+Sorry to Add check inside of check_hv_pending(). Will move the check 
+before calling check_hv_pending() in the next version. Thanks.
