@@ -2,83 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC5D07074E2
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 00:00:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A92C57074F7
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 00:02:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229590AbjEQWAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 May 2023 18:00:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51336 "EHLO
+        id S229819AbjEQWCa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 May 2023 18:02:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjEQWA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 May 2023 18:00:29 -0400
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A239C2D53
-        for <kvm@vger.kernel.org>; Wed, 17 May 2023 15:00:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1684360827; x=1715896827;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=DMh2GnHy4DRlnnaezWyc0g3ItT6kGIdtxAftGGXw3s0=;
-  b=uNk5AmiTG+y4CslfdkiBcdveeZmm6DXVWS0E9hcvPIpu/HjjTqDMRimN
-   Cqb50nvNyiyYeR3ye1QTO7dXPqoD08P+HU5mFF3ZItrv4OiEfA2ME7bj3
-   FcJ/qm8uc0XCis6xlxYLa+97z6bj2B5IZs2B+8p57jtShWeSY9C9aypIf
-   Q=;
-X-IronPort-AV: E=Sophos;i="5.99,283,1677542400"; 
-   d="scan'208";a="330777155"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2023 22:00:27 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com (Postfix) with ESMTPS id 81CE080FA0;
-        Wed, 17 May 2023 22:00:21 +0000 (UTC)
-Received: from EX19D030UWB001.ant.amazon.com (10.13.139.159) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 17 May 2023 22:00:21 +0000
-Received: from EX19D030UWB002.ant.amazon.com (10.13.139.182) by
- EX19D030UWB001.ant.amazon.com (10.13.139.159) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 17 May 2023 22:00:20 +0000
-Received: from EX19D030UWB002.ant.amazon.com ([fe80::8cbd:fcae:56ad:4dfa]) by
- EX19D030UWB002.ant.amazon.com ([fe80::8cbd:fcae:56ad:4dfa%6]) with mapi id
- 15.02.1118.026; Wed, 17 May 2023 22:00:20 +0000
-From:   "Jitindar Singh, Suraj" <surajjs@amazon.com>
-To:     "jingzhangos@google.com" <jingzhangos@google.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "oupton@google.com" <oupton@google.com>
-CC:     "james.morse@arm.com" <james.morse@arm.com>,
-        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-        "rananta@google.com" <rananta@google.com>,
-        "tabba@google.com" <tabba@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
-        "will@kernel.org" <will@kernel.org>,
-        "reijiw@google.com" <reijiw@google.com>
-Subject: Re: [PATCH v8 6/6] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
-Thread-Topic: [PATCH v8 6/6] KVM: arm64: Refactor writings for
- PMUVer/CSV2/CSV3
-Thread-Index: AQHZiQr5jQzeF1NLLE28Gk+kHNwsug==
-Date:   Wed, 17 May 2023 22:00:20 +0000
-Message-ID: <b64e5639b1b9bb5e5e4ff8eaa10554ae0d9a6016.camel@amazon.com>
-References: <20230503171618.2020461-1-jingzhangos@google.com>
-         <20230503171618.2020461-7-jingzhangos@google.com>
-In-Reply-To: <20230503171618.2020461-7-jingzhangos@google.com>
-Accept-Language: en-AU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.187.170.32]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EAFA9C87004A074997EE046DE8B842E8@amazon.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S229704AbjEQWC0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 May 2023 18:02:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BF6E2D53
+        for <kvm@vger.kernel.org>; Wed, 17 May 2023 15:01:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684360897;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HG/rceSfXoWbIlm6Cl/pPVb/WvTeG1OA3/AKdOuyr2M=;
+        b=Ne8kGk1bPXuxvMa/BogjM/BIcIgTsFGVrt0tAqEg/F4XRgRRRzQ3YbXPuFWZA0K5spaauE
+        xCg6UVriBmDEdKY945sFwLxWPJ2EoJzeLOYD/fKHo8mEFnpdaLSTXwg9GjhKrOfdWtENry
+        1XMyD+a9JIC4sCkgadwpBrGjfBDbfoU=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-137-u-daC3SzOoCgkZdnunQ1FA-1; Wed, 17 May 2023 18:01:35 -0400
+X-MC-Unique: u-daC3SzOoCgkZdnunQ1FA-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-76c48b53e16so90520339f.1
+        for <kvm@vger.kernel.org>; Wed, 17 May 2023 15:01:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684360895; x=1686952895;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HG/rceSfXoWbIlm6Cl/pPVb/WvTeG1OA3/AKdOuyr2M=;
+        b=TzZDsKklEwSPzE9eVT6ngIr9RNdBq+fhWa6Kj/NxLZ2i5MBFZkeMC27RtzRO65ds1e
+         SDgP/InNBHCcr6JNGTIC6WjulcznPnSzUfUBSPxfPs2ZBokCeN7cDRkvnkGWtT4svhyr
+         ccwWvykIi1JVysGfalam0FR2dSjo3wBENEoKyH6OK0606hes9JXw2rR5qeAeWD0sQwpK
+         UCdmitQNDY6m/X7xbrzDCLk8Yiz92p64QW0ilzRGBMt/y3SdRfSZ/++xj90FSRmX9zRw
+         ENTHNpAscT9f8y4c+K4oHOFryD5uChLXAC0tq1AKwIhG1424Vwpd3F4nbvY5h+DpHntm
+         2JeA==
+X-Gm-Message-State: AC+VfDzmKWzFxbl+A+4+fk9DyEBrL2f8jvFSoK+PoMvNteKzp/Xh1DQi
+        hil8zHWV8bnOSwMdeKTBEJLWvewGIxbIbxtBmrrDYGmWPpIG6f8ZLllgWaNbYnJ7Gx3XMmQ72SJ
+        CsR5hNhpYxE0Y
+X-Received: by 2002:a5d:8558:0:b0:763:a8a0:c7c0 with SMTP id b24-20020a5d8558000000b00763a8a0c7c0mr5096038ios.10.1684360894637;
+        Wed, 17 May 2023 15:01:34 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5VIN7oZu7ufkSHUSKK5ieAsNm16qvFybf0QXWwaZsZClXLWw964O5XEMhRfmlbyIumybiHYA==
+X-Received: by 2002:a5d:8558:0:b0:763:a8a0:c7c0 with SMTP id b24-20020a5d8558000000b00763a8a0c7c0mr5096013ios.10.1684360894200;
+        Wed, 17 May 2023 15:01:34 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id dl6-20020a056638278600b004166c24e30dsm27560jab.32.2023.05.17.15.01.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 May 2023 15:01:33 -0700 (PDT)
+Date:   Wed, 17 May 2023 16:01:31 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, kevin.tian@intel.com, joro@8bytes.org,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
+        clegoate@redhat.com
+Subject: Re: [PATCH v5 09/10] vfio/pci: Extend
+ VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for vfio device cdev
+Message-ID: <20230517160131.254be76b.alex.williamson@redhat.com>
+In-Reply-To: <20230513132136.15021-10-yi.l.liu@intel.com>
+References: <20230513132136.15021-1-yi.l.liu@intel.com>
+        <20230513132136.15021-10-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -87,250 +89,365 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gV2VkLCAyMDIzLTA1LTAzIGF0IDE3OjE2ICswMDAwLCBKaW5nIFpoYW5nIHdyb3RlOgo+IFJl
-ZmFjdG9yIHdyaXRpbmdzIGZvciBJRF9BQTY0UEZSMF9FTDEuW0NTVjJ8Q1NWM10sCj4gSURfQUE2
-NERGUjBfRUwxLlBNVVZlciBhbmQgSURfREZSMF9FTEYuUGVyZk1vbiBiYXNlZCBvbiB1dGlsaXRp
-ZXMKPiBpbnRyb2R1Y2VkIGJ5IElEIHJlZ2lzdGVyIGRlc2NyaXB0b3IgYXJyYXkuCj4gCj4gU2ln
-bmVkLW9mZi1ieTogSmluZyBaaGFuZyA8amluZ3poYW5nb3NAZ29vZ2xlLmNvbT4KPiAtLS0KPiDC
-oGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vY3B1ZmVhdHVyZS5oIHzCoMKgIDEgKwo+IMKgYXJjaC9h
-cm02NC9rZXJuZWwvY3B1ZmVhdHVyZS5jwqDCoMKgwqDCoCB8wqDCoCAyICstCj4gwqBhcmNoL2Fy
-bTY0L2t2bS9pZF9yZWdzLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMzYxICsrKysrKysrKysr
-KysrKysrKy0tLS0tLS0tCj4gLS0KPiDCoDMgZmlsZXMgY2hhbmdlZCwgMjQyIGluc2VydGlvbnMo
-KyksIDEyMiBkZWxldGlvbnMoLSkKPiAKPiAKClsgU05JUCBdCgo+IMKgCj4gK3N0YXRpYyB1NjQg
-cmVhZF9zYW5pdGlzZWRfaWRfYWE2NHBmcjBfZWwxKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYwo+ICpyZCkK
-PiArewo+ICvCoMKgwqDCoMKgwqDCoHU2NCB2YWw7Cj4gK8KgwqDCoMKgwqDCoMKgdTMyIGlkID0g
-cmVnX3RvX2VuY29kaW5nKHJkKTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgdmFsID0gcmVhZF9zYW5p
-dGlzZWRfZnRyX3JlZyhpZCk7Cj4gK8KgwqDCoMKgwqDCoMKgLyoKPiArwqDCoMKgwqDCoMKgwqAg
-KiBUaGUgZGVmYXVsdCBpcyB0byBleHBvc2UgQ1NWMiA9PSAxIGlmIHRoZSBIVyBpc24ndAo+IGFm
-ZmVjdGVkLgo+ICvCoMKgwqDCoMKgwqDCoCAqIEFsdGhvdWdoIHRoaXMgaXMgYSBwZXItQ1BVIGZl
-YXR1cmUsIHdlIG1ha2UgaXQgZ2xvYmFsCj4gYmVjYXVzZQo+ICvCoMKgwqDCoMKgwqDCoCAqIGFz
-eW1tZXRyaWMgc3lzdGVtcyBhcmUganVzdCBhIG51aXNhbmNlLgo+ICvCoMKgwqDCoMKgwqDCoCAq
-Cj4gK8KgwqDCoMKgwqDCoMKgICogVXNlcnNwYWNlIGNhbiBvdmVycmlkZSB0aGlzIGFzIGxvbmcg
-YXMgaXQgZG9lc24ndCBwcm9taXNlCj4gK8KgwqDCoMKgwqDCoMKgICogdGhlIGltcG9zc2libGUu
-Cj4gK8KgwqDCoMKgwqDCoMKgICovCj4gK8KgwqDCoMKgwqDCoMKgaWYgKGFybTY0X2dldF9zcGVj
-dHJlX3YyX3N0YXRlKCkgPT0gU1BFQ1RSRV9VTkFGRkVDVEVEKSB7Cj4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoHZhbCAmPSB+QVJNNjRfRkVBVFVSRV9NQVNLKElEX0FBNjRQRlIwX0VM
-MV9DU1YyKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdmFsIHw9Cj4gRklFTERf
-UFJFUChBUk02NF9GRUFUVVJFX01BU0soSURfQUE2NFBGUjBfRUwxX0NTVjIpLCAxKTsKPiArwqDC
-oMKgwqDCoMKgwqB9Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKGFybTY0X2dldF9tZWx0ZG93bl9zdGF0
-ZSgpID09IFNQRUNUUkVfVU5BRkZFQ1RFRCkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqB2YWwgJj0gfkFSTTY0X0ZFQVRVUkVfTUFTSyhJRF9BQTY0UEZSMF9FTDFfQ1NWMyk7Cj4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHZhbCB8PQo+IEZJRUxEX1BSRVAoQVJNNjRf
-RkVBVFVSRV9NQVNLKElEX0FBNjRQRlIwX0VMMV9DU1YzKSwgMSk7Cj4gK8KgwqDCoMKgwqDCoMKg
-fQo+ICsKPiArwqDCoMKgwqDCoMKgwqB2YWwgJj0gfkFSTTY0X0ZFQVRVUkVfTUFTSyhJRF9BQTY0
-UEZSMF9FTDFfQU1VKTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgcmV0dXJuIHZhbDsKPiArfQo+ICsK
-PiDCoHN0YXRpYyBpbnQgc2V0X2lkX2FhNjRwZnIwX2VsMShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
-Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLAo+IMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB1NjQgdmFsKQo+IMKg
-ewo+IC3CoMKgwqDCoMKgwqDCoHN0cnVjdCBrdm1fYXJjaCAqYXJjaCA9ICZ2Y3B1LT5rdm0tPmFy
-Y2g7Cj4gLcKgwqDCoMKgwqDCoMKgdTY0IHN2YWwgPSB2YWw7Cj4gwqDCoMKgwqDCoMKgwqDCoHU4
-IGNzdjIsIGNzdjM7Cj4gLcKgwqDCoMKgwqDCoMKgaW50IHJldCA9IDA7Cj4gwqAKPiDCoMKgwqDC
-oMKgwqDCoMKgLyoKPiDCoMKgwqDCoMKgwqDCoMKgICogQWxsb3cgQUE2NFBGUjBfRUwxLkNTVjIg
-dG8gYmUgc2V0IGZyb20gdXNlcnNwYWNlIGFzIGxvbmcKPiBhcwo+IEBAIC0yMjYsMjYgKzMzOCwz
-MCBAQCBzdGF0aWMgaW50IHNldF9pZF9hYTY0cGZyMF9lbDEoc3RydWN0IGt2bV92Y3B1Cj4gKnZj
-cHUsCj4gwqDCoMKgwqDCoMKgwqDCoGlmIChjc3YzID4gMSB8fCAoY3N2MyAmJiBhcm02NF9nZXRf
-bWVsdGRvd25fc3RhdGUoKSAhPQo+IFNQRUNUUkVfVU5BRkZFQ1RFRCkpCj4gwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gLUVJTlZBTDsKCkNhbid0IHdlIHJlbW92ZSB0aGUg
-Y2hlY2tpbmcgb2YgY3N2WzIzXSBoZXJlIGFzIGl0IHdpbGwgYmUgY2hlY2tlZCBieQphcm02NF9j
-aGVja19mZWF0dXJlcygpPwoKaS5lLiBpbiBhcm02NF9jaGVja19mZWF0dXJlcygpIHdlIHdpbGwg
-bG9hZCB0aGUgImxpbWl0IiB2YWx1ZSBmcm9tIHRoZQoicmVzZXQiIGZ1bmN0aW9uIChyZWFkX3Nh
-bml0aXNlZF9pZF9hYTY0cGZyMF9lbDEoKSkgd2hpY2ggaGFzIGNzdlsyM10Kc2V0IGFwcHJvcHJp
-YXRlbHkgYW5kIGxpbWl0IGl0IHRvIGEgc2FmZSB2YWx1ZSBiYXNpY2FsbHkgcGVyZm9ybWluZyB0
-aGUKc2FtZSBjaGVjayBhcyB3ZSBhcmUgaGVyZS4KCj4gwqAKPiAtwqDCoMKgwqDCoMKgwqBtdXRl
-eF9sb2NrKCZhcmNoLT5jb25maWdfbG9jayk7Cj4gLcKgwqDCoMKgwqDCoMKgLyogV2UgY2FuIG9u
-bHkgZGlmZmVyIHdpdGggQ1NWWzIzXSwgYW5kIGFueXRoaW5nIGVsc2UgaXMgYW4KPiBlcnJvciAq
-Lwo+IC3CoMKgwqDCoMKgwqDCoHZhbCBePSByZWFkX2lkX3JlZyh2Y3B1LCByZCk7Cj4gLcKgwqDC
-oMKgwqDCoMKgdmFsICY9IH4oQVJNNjRfRkVBVFVSRV9NQVNLKElEX0FBNjRQRlIwX0VMMV9DU1Yy
-KSB8Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBBUk02NF9GRUFUVVJFX01BU0so
-SURfQUE2NFBGUjBfRUwxX0NTVjMpKTsKPiAtwqDCoMKgwqDCoMKgwqBpZiAodmFsKSB7Cj4gLcKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldCA9IC1FSU5WQUw7Cj4gLcKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0Owo+IC3CoMKgwqDCoMKgwqDCoH0KPiArwqDCoMKg
-wqDCoMKgwqByZXR1cm4gc2V0X2lkX3JlZyh2Y3B1LCByZCwgdmFsKTsKPiArfQo+IMKgCj4gLcKg
-wqDCoMKgwqDCoMKgLyogT25seSBhbGxvdyB1c2Vyc3BhY2UgdG8gY2hhbmdlIHRoZSBpZHJlZ3Mg
-YmVmb3JlIFZNCj4gcnVubmluZyAqLwo+IC3CoMKgwqDCoMKgwqDCoGlmICh0ZXN0X2JpdChLVk1f
-QVJDSF9GTEFHX0hBU19SQU5fT05DRSwgJnZjcHUtPmt2bS0KPiA+YXJjaC5mbGFncykpIHsKPiAt
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHN2YWwgIT0gcmVhZF9pZF9yZWcodmNw
-dSwgcmQpKQo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-cmV0ID0gLUVCVVNZOwo+IC3CoMKgwqDCoMKgwqDCoH0gZWxzZSB7Cj4gLcKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoElEUkVHKHZjcHUtPmt2bSwgcmVnX3RvX2VuY29kaW5nKHJkKSkgPSBz
-dmFsOwo+IC3CoMKgwqDCoMKgwqDCoH0KPiAtb3V0Ogo+IC3CoMKgwqDCoMKgwqDCoG11dGV4X3Vu
-bG9jaygmYXJjaC0+Y29uZmlnX2xvY2spOwo+IC3CoMKgwqDCoMKgwqDCoHJldHVybiByZXQ7Cj4g
-K3N0YXRpYyB1NjQgcmVhZF9zYW5pdGlzZWRfaWRfYWE2NGRmcjBfZWwxKHN0cnVjdCBrdm1fdmNw
-dSAqdmNwdSwKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29uc3Qgc3RydWN0IHN5c19yZWdf
-ZGVzYwo+ICpyZCkKPiArewo+ICvCoMKgwqDCoMKgwqDCoHU2NCB2YWw7Cj4gK8KgwqDCoMKgwqDC
-oMKgdTMyIGlkID0gcmVnX3RvX2VuY29kaW5nKHJkKTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgdmFs
-ID0gcmVhZF9zYW5pdGlzZWRfZnRyX3JlZyhpZCk7Cj4gK8KgwqDCoMKgwqDCoMKgLyogTGltaXQg
-ZGVidWcgdG8gQVJNdjguMCAqLwo+ICvCoMKgwqDCoMKgwqDCoHZhbCAmPSB+QVJNNjRfRkVBVFVS
-RV9NQVNLKElEX0FBNjRERlIwX0VMMV9EZWJ1Z1Zlcik7Cj4gK8KgwqDCoMKgwqDCoMKgdmFsIHw9
-Cj4gRklFTERfUFJFUChBUk02NF9GRUFUVVJFX01BU0soSURfQUE2NERGUjBfRUwxX0RlYnVnVmVy
-KSwgNik7Cj4gK8KgwqDCoMKgwqDCoMKgLyoKPiArwqDCoMKgwqDCoMKgwqAgKiBJbml0aWFsaXNl
-IHRoZSBkZWZhdWx0IFBNVXZlciBiZWZvcmUgdGhlcmUgaXMgYSBjaGFuY2UgdG8KPiArwqDCoMKg
-wqDCoMKgwqAgKiBjcmVhdGUgYW4gYWN0dWFsIFBNVS4KPiArwqDCoMKgwqDCoMKgwqAgKi8KPiAr
-wqDCoMKgwqDCoMKgwqB2YWwgJj0gfkFSTTY0X0ZFQVRVUkVfTUFTSyhJRF9BQTY0REZSMF9FTDFf
-UE1VVmVyKTsKPiArwqDCoMKgwqDCoMKgwqB2YWwgfD0gRklFTERfUFJFUChBUk02NF9GRUFUVVJF
-X01BU0soSURfQUE2NERGUjBfRUwxX1BNVVZlciksCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBrdm1fYXJtX3BtdV9nZXRfcG11dmVyX2xpbWl0KCkp
-Owo+ICvCoMKgwqDCoMKgwqDCoC8qIEhpZGUgU1BFIGZyb20gZ3Vlc3RzICovCj4gK8KgwqDCoMKg
-wqDCoMKgdmFsICY9IH5BUk02NF9GRUFUVVJFX01BU0soSURfQUE2NERGUjBfRUwxX1BNU1Zlcik7
-Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoHJldHVybiB2YWw7Cj4gwqB9Cj4gwqAKPiDCoHN0YXRpYyBp
-bnQgc2V0X2lkX2FhNjRkZnIwX2VsMShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4gQEAgLTI1NSw3
-ICszNzEsNiBAQCBzdGF0aWMgaW50IHNldF9pZF9hYTY0ZGZyMF9lbDEoc3RydWN0IGt2bV92Y3B1
-Cj4gKnZjcHUsCj4gwqDCoMKgwqDCoMKgwqDCoHN0cnVjdCBrdm1fYXJjaCAqYXJjaCA9ICZ2Y3B1
-LT5rdm0tPmFyY2g7Cj4gwqDCoMKgwqDCoMKgwqDCoHU4IHBtdXZlciwgaG9zdF9wbXV2ZXI7Cj4g
-wqDCoMKgwqDCoMKgwqDCoGJvb2wgdmFsaWRfcG11Owo+IC3CoMKgwqDCoMKgwqDCoHU2NCBzdmFs
-ID0gdmFsOwo+IMKgwqDCoMKgwqDCoMKgwqBpbnQgcmV0ID0gMDsKPiDCoAo+IMKgwqDCoMKgwqDC
-oMKgwqBob3N0X3BtdXZlciA9IGt2bV9hcm1fcG11X2dldF9wbXV2ZXJfbGltaXQoKTsKPiBAQCAt
-Mjc3LDQwICszOTIsNjEgQEAgc3RhdGljIGludCBzZXRfaWRfYWE2NGRmcjBfZWwxKHN0cnVjdCBr
-dm1fdmNwdQo+ICp2Y3B1LAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJu
-IC1FSU5WQUw7Cj4gwqAKPiDCoMKgwqDCoMKgwqDCoMKgbXV0ZXhfbG9jaygmYXJjaC0+Y29uZmln
-X2xvY2spOwo+IC3CoMKgwqDCoMKgwqDCoC8qIFdlIGNhbiBvbmx5IGRpZmZlciB3aXRoIFBNVXZl
-ciwgYW5kIGFueXRoaW5nIGVsc2UgaXMgYW4KPiBlcnJvciAqLwo+IC3CoMKgwqDCoMKgwqDCoHZh
-bCBePSByZWFkX2lkX3JlZyh2Y3B1LCByZCk7Cj4gLcKgwqDCoMKgwqDCoMKgdmFsICY9IH5BUk02
-NF9GRUFUVVJFX01BU0soSURfQUE2NERGUjBfRUwxX1BNVVZlcik7Cj4gLcKgwqDCoMKgwqDCoMKg
-aWYgKHZhbCkgewo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXQgPSAtRUlOVkFM
-Owo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3RvIG91dDsKPiAtwqDCoMKgwqDC
-oMKgwqB9Cj4gLQo+IMKgwqDCoMKgwqDCoMKgwqAvKiBPbmx5IGFsbG93IHVzZXJzcGFjZSB0byBj
-aGFuZ2UgdGhlIGlkcmVncyBiZWZvcmUgVk0KPiBydW5uaW5nICovCj4gwqDCoMKgwqDCoMKgwqDC
-oGlmICh0ZXN0X2JpdChLVk1fQVJDSF9GTEFHX0hBU19SQU5fT05DRSwgJnZjcHUtPmt2bS0KPiA+
-YXJjaC5mbGFncykpIHsKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHN2YWwg
-IT0gcmVhZF9pZF9yZWcodmNwdSwgcmQpKQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqBpZiAodmFsICE9IHJlYWRfaWRfcmVnKHZjcHUsIHJkKSkKPiDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXQgPSAtRUJVU1k7Cj4gLcKgwqDCoMKgwqDC
-oMKgfSBlbHNlIHsKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHZhbGlkX3Bt
-dSkgewo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdmFs
-ID0gSURSRUcodmNwdS0+a3ZtLCBTWVNfSURfQUE2NERGUjBfRUwxKTsKPiAtwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHZhbCAmPSB+SURfQUE2NERGUjBfRUwx
-X1BNVVZlcl9NQVNLOwo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgdmFsIHw9Cj4gRklFTERfUFJFUChJRF9BQTY0REZSMF9FTDFfUE1VVmVyX01BU0ssIHBt
-dXZlcik7Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBJ
-RFJFRyh2Y3B1LT5rdm0sIFNZU19JRF9BQTY0REZSMF9FTDEpID0gdmFsOwo+IC0KPiAtwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHZhbCA9IElEUkVHKHZjcHUt
-Pmt2bSwgU1lTX0lEX0RGUjBfRUwxKTsKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoHZhbCAmPSB+SURfREZSMF9FTDFfUGVyZk1vbl9NQVNLOwo+IC3CoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdmFsIHw9IEZJRUxEX1BS
-RVAoSURfREZSMF9FTDFfUGVyZk1vbl9NQVNLLAo+IHBtdXZlcl90b19wZXJmbW9uKHBtdXZlcikp
-Owo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgSURSRUco
-dmNwdS0+a3ZtLCBTWVNfSURfREZSMF9FTDEpID0gdmFsOwo+IC3CoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqB9IGVsc2Ugewo+IC0KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgYXNzaWduX2JpdChLVk1fQVJDSF9GTEFHX1ZDUFVfSEFTX0lNUF9ERUZf
-UE1VLAo+ICZ2Y3B1LT5rdm0tPmFyY2guZmxhZ3MsCj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBwbXV2ZXIgPT0KPiBJ
-RF9BQTY0REZSMF9FTDFfUE1VVmVyX0lNUF9ERUYpOwo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqB9Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0Owo+ICvC
-oMKgwqDCoMKgwqDCoH0KPiArCj4gK8KgwqDCoMKgwqDCoMKgaWYgKCF2YWxpZF9wbXUpIHsKPiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgLyoKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgICogSWdub3JlIHRoZSBQTVVWZXIgZmlsZWQgaW4gQHZhbC4gVGhlIFBNVVZlciB3
-b3VsZAoKTml0IHMvZmlsZWQvZmllbGQKCj4gYmUgZGV0ZXJtaW5lZAo+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgKiBieSBhcmNoIGZsYWdzIGJpdAo+IEtWTV9BUkNIX0ZMQUdfVkNQ
-VV9IQVNfSU1QX0RFRl9QTVUsCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqLwo+
-ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBwbXV2ZXIgPSBGSUVMRF9HRVQoSURfQUE2
-NERGUjBfRUwxX1BNVVZlcl9NQVNLLAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgSURSRUcodmNwdS0+a3ZtLAo+IFNZ
-U19JRF9BQTY0REZSMF9FTDEpKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdmFs
-ICY9IH5JRF9BQTY0REZSMF9FTDFfUE1VVmVyX01BU0s7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoHZhbCB8PSBGSUVMRF9QUkVQKElEX0FBNjRERlIwX0VMMV9QTVVWZXJfTUFTSywK
-PiBwbXV2ZXIpOwo+IMKgwqDCoMKgwqDCoMKgwqB9Cj4gwqAKPiArwqDCoMKgwqDCoMKgwqByZXQg
-PSBhcm02NF9jaGVja19mZWF0dXJlcyh2Y3B1LCByZCwgdmFsKTsKPiArwqDCoMKgwqDCoMKgwqBp
-ZiAocmV0KQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3RvIG91dDsKPiArCj4g
-K8KgwqDCoMKgwqDCoMKgSURSRUcodmNwdS0+a3ZtLCBTWVNfSURfQUE2NERGUjBfRUwxKSA9IHZh
-bDsKPiArCj4gK8KgwqDCoMKgwqDCoMKgdmFsID0gSURSRUcodmNwdS0+a3ZtLCBTWVNfSURfREZS
-MF9FTDEpOwo+ICvCoMKgwqDCoMKgwqDCoHZhbCAmPSB+SURfREZSMF9FTDFfUGVyZk1vbl9NQVNL
-Owo+ICvCoMKgwqDCoMKgwqDCoHZhbCB8PSBGSUVMRF9QUkVQKElEX0RGUjBfRUwxX1BlcmZNb25f
-TUFTSywKPiBwbXV2ZXJfdG9fcGVyZm1vbihwbXV2ZXIpKTsKPiArwqDCoMKgwqDCoMKgwqBJRFJF
-Ryh2Y3B1LT5rdm0sIFNZU19JRF9ERlIwX0VMMSkgPSB2YWw7Cj4gKwo+ICvCoMKgwqDCoMKgwqDC
-oGlmICghdmFsaWRfcG11KQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBhc3NpZ25f
-Yml0KEtWTV9BUkNIX0ZMQUdfVkNQVV9IQVNfSU1QX0RFRl9QTVUsICZ2Y3B1LQo+ID5rdm0tPmFy
-Y2guZmxhZ3MsCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIHBtdXZlciA9PSBJRF9BQTY0REZSMF9FTDFfUE1VVmVyX0lNUF9ERUYpOwo+ICsKPiDC
-oG91dDoKPiDCoMKgwqDCoMKgwqDCoMKgbXV0ZXhfdW5sb2NrKCZhcmNoLT5jb25maWdfbG9jayk7
-Cj4gwqDCoMKgwqDCoMKgwqDCoHJldHVybiByZXQ7Cj4gwqB9Cj4gwqAKPiArc3RhdGljIHU2NCBy
-ZWFkX3Nhbml0aXNlZF9pZF9kZnIwX2VsMShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4gK8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCkKPiArewo+ICvCoMKgwqDC
-oMKgwqDCoHU2NCB2YWw7Cj4gK8KgwqDCoMKgwqDCoMKgdTMyIGlkID0gcmVnX3RvX2VuY29kaW5n
-KHJkKTsKPiArCj4gK8KgwqDCoMKgwqDCoMKgdmFsID0gcmVhZF9zYW5pdGlzZWRfZnRyX3JlZyhp
-ZCk7Cj4gK8KgwqDCoMKgwqDCoMKgLyoKPiArwqDCoMKgwqDCoMKgwqAgKiBJbml0aWFsaXNlIHRo
-ZSBkZWZhdWx0IFBNVXZlciBiZWZvcmUgdGhlcmUgaXMgYSBjaGFuY2UgdG8KPiArwqDCoMKgwqDC
-oMKgwqAgKiBjcmVhdGUgYW4gYWN0dWFsIFBNVS4KPiArwqDCoMKgwqDCoMKgwqAgKi8KPiArwqDC
-oMKgwqDCoMKgwqB2YWwgJj0gfkFSTTY0X0ZFQVRVUkVfTUFTSyhJRF9ERlIwX0VMMV9QZXJmTW9u
-KTsKPiArwqDCoMKgwqDCoMKgwqB2YWwgfD0gRklFTERfUFJFUChBUk02NF9GRUFUVVJFX01BU0so
-SURfREZSMF9FTDFfUGVyZk1vbiksCj4ga3ZtX2FybV9wbXVfZ2V0X3BtdXZlcl9saW1pdCgpKTsK
-PiArCj4gK8KgwqDCoMKgwqDCoMKgcmV0dXJuIHZhbDsKPiArfQo+ICsKPiDCoHN0YXRpYyBpbnQg
-c2V0X2lkX2RmcjBfZWwxKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnN0IHN0cnVjdCBzeXNfcmVn
-X2Rlc2MgKnJkLAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgdTY0IHZhbCkKPiBAQCAtMzE4LDcgKzQ1NCw2IEBAIHN0YXRpYyBpbnQgc2V0X2lk
-X2RmcjBfZWwxKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiDCoMKgwqDCoMKgwqDCoMKgc3RydWN0
-IGt2bV9hcmNoICphcmNoID0gJnZjcHUtPmt2bS0+YXJjaDsKPiDCoMKgwqDCoMKgwqDCoMKgdTgg
-cGVyZm1vbiwgaG9zdF9wZXJmbW9uOwo+IMKgwqDCoMKgwqDCoMKgwqBib29sIHZhbGlkX3BtdTsK
-PiAtwqDCoMKgwqDCoMKgwqB1NjQgc3ZhbCA9IHZhbDsKPiDCoMKgwqDCoMKgwqDCoMKgaW50IHJl
-dCA9IDA7Cj4gwqAKPiDCoMKgwqDCoMKgwqDCoMKgaG9zdF9wZXJmbW9uID0KPiBwbXV2ZXJfdG9f
-cGVyZm1vbihrdm1fYXJtX3BtdV9nZXRfcG11dmVyX2xpbWl0KCkpOwo+IEBAIC0zNDEsMzUgKzQ3
-NiwzOSBAQCBzdGF0aWMgaW50IHNldF9pZF9kZnIwX2VsMShzdHJ1Y3Qga3ZtX3ZjcHUKPiAqdmNw
-dSwKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybiAtRUlOVkFMOwo+IMKg
-Cj4gwqDCoMKgwqDCoMKgwqDCoG11dGV4X2xvY2soJmFyY2gtPmNvbmZpZ19sb2NrKTsKPiAtwqDC
-oMKgwqDCoMKgwqAvKiBXZSBjYW4gb25seSBkaWZmZXIgd2l0aCBQZXJmTW9uLCBhbmQgYW55dGhp
-bmcgZWxzZSBpcyBhbgo+IGVycm9yICovCj4gLcKgwqDCoMKgwqDCoMKgdmFsIF49IHJlYWRfaWRf
-cmVnKHZjcHUsIHJkKTsKPiAtwqDCoMKgwqDCoMKgwqB2YWwgJj0gfkFSTTY0X0ZFQVRVUkVfTUFT
-SyhJRF9ERlIwX0VMMV9QZXJmTW9uKTsKPiAtwqDCoMKgwqDCoMKgwqBpZiAodmFsKSB7Cj4gLcKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldCA9IC1FSU5WQUw7Cj4gLcKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0Owo+IC3CoMKgwqDCoMKgwqDCoH0KPiAtCj4gwqDC
-oMKgwqDCoMKgwqDCoC8qIE9ubHkgYWxsb3cgdXNlcnNwYWNlIHRvIGNoYW5nZSB0aGUgaWRyZWdz
-IGJlZm9yZSBWTQo+IHJ1bm5pbmcgKi8KPiDCoMKgwqDCoMKgwqDCoMKgaWYgKHRlc3RfYml0KEtW
-TV9BUkNIX0ZMQUdfSEFTX1JBTl9PTkNFLCAmdmNwdS0+a3ZtLQo+ID5hcmNoLmZsYWdzKSkgewo+
-IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAoc3ZhbCAhPSByZWFkX2lkX3JlZyh2
-Y3B1LCByZCkpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmICh2YWwgIT0gcmVh
-ZF9pZF9yZWcodmNwdSwgcmQpKQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoHJldCA9IC1FQlVTWTsKPiAtwqDCoMKgwqDCoMKgwqB9IGVsc2Ugewo+IC3C
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAodmFsaWRfcG11KSB7Cj4gLcKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB2YWwgPSBJRFJFRyh2Y3B1LT5r
-dm0sIFNZU19JRF9ERlIwX0VMMSk7Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqB2YWwgJj0gfklEX0RGUjBfRUwxX1BlcmZNb25fTUFTSzsKPiAtwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHZhbCB8PSBGSUVMRF9QUkVQ
-KElEX0RGUjBfRUwxX1BlcmZNb25fTUFTSywKPiBwZXJmbW9uKTsKPiAtwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoElEUkVHKHZjcHUtPmt2bSwgU1lTX0lEX0RG
-UjBfRUwxKSA9IHZhbDsKPiAtCj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqB2YWwgPSBJRFJFRyh2Y3B1LT5rdm0sIFNZU19JRF9BQTY0REZSMF9FTDEpOwo+
-IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdmFsICY9IH5J
-RF9BQTY0REZSMF9FTDFfUE1VVmVyX01BU0s7Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqB2YWwgfD0KPiBGSUVMRF9QUkVQKElEX0FBNjRERlIwX0VMMV9Q
-TVVWZXJfTUFTSywgcGVyZm1vbl90b19wbXV2ZXIocGVyZm1vbikpOwo+IC3CoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgSURSRUcodmNwdS0+a3ZtLCBTWVNfSURf
-QUE2NERGUjBfRUwxKSA9IHZhbDsKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfSBl
-bHNlIHsKPiAtCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oGFzc2lnbl9iaXQoS1ZNX0FSQ0hfRkxBR19WQ1BVX0hBU19JTVBfREVGX1BNVSwKPiAmdmNwdS0+
-a3ZtLT5hcmNoLmZsYWdzLAo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcGVyZm1vbiA9PQo+IElEX0RGUjBfRUwxX1Bl
-cmZNb25fSU1QREVGKTsKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfQo+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3RvIG91dDsKPiArwqDCoMKgwqDCoMKgwqB9Cj4g
-Kwo+ICvCoMKgwqDCoMKgwqDCoGlmICghdmFsaWRfcG11KSB7Cj4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoC8qCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqIElnbm9y
-ZSB0aGUgUGVyZk1vbiBmaWxlZCBpbiBAdmFsLiBUaGUgUGVyZk1vbgoKTml0IHMvZmlsZWQvZmll
-bGQKCj4gd291bGQgYmUgZGV0ZXJtaW5lZAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgKiBieSBhcmNoIGZsYWdzIGJpdAo+IEtWTV9BUkNIX0ZMQUdfVkNQVV9IQVNfSU1QX0RFRl9Q
-TVUsCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAqLwo+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqBwZXJmbW9uID0gRklFTERfR0VUKElEX0RGUjBfRUwxX1BlcmZNb25f
-TUFTSywKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgSURSRUcodmNwdS0+a3ZtLAo+IFNZU19JRF9ERlIwX0VMMSkp
-Owo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB2YWwgJj0gfklEX0RGUjBfRUwxX1Bl
-cmZNb25fTUFTSzsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdmFsIHw9IEZJRUxE
-X1BSRVAoSURfREZSMF9FTDFfUGVyZk1vbl9NQVNLLCBwZXJmbW9uKTsKPiDCoMKgwqDCoMKgwqDC
-oMKgfQo+IMKgCj4gK8KgwqDCoMKgwqDCoMKgcmV0ID0gYXJtNjRfY2hlY2tfZmVhdHVyZXModmNw
-dSwgcmQsIHZhbCk7Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKHJldCkKPiArwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgZ290byBvdXQ7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoElEUkVHKHZjcHUt
-Pmt2bSwgU1lTX0lEX0RGUjBfRUwxKSA9IHZhbDsKPiArCj4gK8KgwqDCoMKgwqDCoMKgdmFsID0g
-SURSRUcodmNwdS0+a3ZtLCBTWVNfSURfQUE2NERGUjBfRUwxKTsKPiArwqDCoMKgwqDCoMKgwqB2
-YWwgJj0gfklEX0FBNjRERlIwX0VMMV9QTVVWZXJfTUFTSzsKPiArwqDCoMKgwqDCoMKgwqB2YWwg
-fD0gRklFTERfUFJFUChJRF9BQTY0REZSMF9FTDFfUE1VVmVyX01BU0ssCj4gcGVyZm1vbl90b19w
-bXV2ZXIocGVyZm1vbikpOwo+ICvCoMKgwqDCoMKgwqDCoElEUkVHKHZjcHUtPmt2bSwgU1lTX0lE
-X0FBNjRERlIwX0VMMSkgPSB2YWw7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoGlmICghdmFsaWRfcG11
-KQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBhc3NpZ25fYml0KEtWTV9BUkNIX0ZM
-QUdfVkNQVV9IQVNfSU1QX0RFRl9QTVUsICZ2Y3B1LQo+ID5rdm0tPmFyY2guZmxhZ3MsCj4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHBlcmZtb24g
-PT0gSURfREZSMF9FTDFfUGVyZk1vbl9JTVBERUYpOwo+ICsKPiDCoG91dDoKPiDCoMKgwqDCoMKg
-wqDCoMKgbXV0ZXhfdW5sb2NrKCZhcmNoLT5jb25maWdfbG9jayk7Cj4gwqDCoMKgwqDCoMKgwqDC
-oHJldHVybiByZXQ7CgpPdGhlcndpc2UgbG9va3MgZ29vZCEKClRoYW5rcywKU3VyYWoK
+On Sat, 13 May 2023 06:21:35 -0700
+Yi Liu <yi.l.liu@intel.com> wrote:
+
+> This makes VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl to use the iommufd_ctx
+
+s/makes/allows/?
+
+s/to//
+
+> of the cdev device to check the ownership of the other affected devices.
+> 
+> This returns devid for each of the affected devices. If it is bound to the
+> iommufd_ctx of the cdev device, _INFO reports a valid devid > 0; If it is
+> not opened by the calling user, but it belongs to the same iommu_group of
+> a device that is bound to the iommufd_ctx of the cdev device, reports devid
+> value of 0; If the device is un-owned device, configured within a different
+> iommufd, or opened outside of the vfio device cdev API, the _INFO ioctl shall
+> report devid value of -1.
+> 
+> devid >=0 doesn't block hot-reset as the affected devices are considered to
+> be owned, while devid == -1 will block the use of VFIO_DEVICE_PCI_HOT_RESET
+> outside of proof-of-ownership calling conventions (ie. via legacy group
+> accessed devices).
+> 
+> This adds flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID to tell the user devid is
+> returned in case of calling user get device fd from other software stack
+
+"other software stack"?  I think this is trying to say something like:
+
+  When VFIO_DEVICE_GET_PCI_HOT_RESET_INFO is called on an IOMMUFD
+  managed device, the new flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID is
+  reported to indicate the values returned are IOMMUFD devids rather
+  than group IDs as used when accessing vfio devices through the
+  conventional vfio group interface.  Additionally the flag
+  VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED will be reported in this mode if
+  all of the devices affected by the hot-reset are owned by either
+  virtue of being directly bound to the same iommufd context as the
+  calling device, or implicitly owned via a shared IOMMU group.
+
+> and adds flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED to tell user if all
+> the affected devices are owned, so user can know it without looping all
+> the returned devids.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_core.c | 52 ++++++++++++++++++++++++++++++--
+>  include/uapi/linux/vfio.h        | 46 +++++++++++++++++++++++++++-
+>  2 files changed, 95 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 4df2def35bdd..57586be770af 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -27,6 +27,7 @@
+>  #include <linux/vgaarb.h>
+>  #include <linux/nospec.h>
+>  #include <linux/sched/mm.h>
+> +#include <linux/iommufd.h>
+>  #if IS_ENABLED(CONFIG_EEH)
+>  #include <asm/eeh.h>
+>  #endif
+> @@ -36,6 +37,10 @@
+>  #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
+>  #define DRIVER_DESC "core driver for VFIO based PCI devices"
+>  
+> +#ifdef CONFIG_IOMMUFD
+> +MODULE_IMPORT_NS(IOMMUFD);
+> +#endif
+> +
+>  static bool nointxmask;
+>  static bool disable_vga;
+>  static bool disable_idle_d3;
+> @@ -776,6 +781,9 @@ struct vfio_pci_fill_info {
+>  	int max;
+>  	int cur;
+>  	struct vfio_pci_dependent_device *devices;
+> +	struct vfio_device *vdev;
+> +	bool devid:1;
+> +	bool dev_owned:1;
+>  };
+>  
+>  static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
+> @@ -790,7 +798,37 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
+>  	if (!iommu_group)
+>  		return -EPERM; /* Cannot reset non-isolated devices */
+>  
+> -	fill->devices[fill->cur].group_id = iommu_group_id(iommu_group);
+> +	if (fill->devid) {
+> +		struct iommufd_ctx *iommufd = vfio_iommufd_physical_ictx(fill->vdev);
+> +		struct vfio_device_set *dev_set = fill->vdev->dev_set;
+> +		struct vfio_device *vdev;
+> +
+> +		/*
+> +		 * Report devid for the affected devices:
+> +		 * - valid devid > 0 for the devices that are bound with
+> +		 *   the iommufd of the calling device.
+> +		 * - devid == 0 for the devices that have not been opened
+> +		 *   but have same group with one of the devices bound to
+> +		 *   the iommufd of the calling device.
+> +		 * - devid == -1 for others, and clear dev_owned flag.
+> +		 */
+> +		vdev = vfio_find_device_in_devset(dev_set, &pdev->dev);
+> +		if (vdev && iommufd == vfio_iommufd_physical_ictx(vdev)) {
+> +			int ret;
+> +
+> +			ret = vfio_iommufd_physical_devid(vdev);
+> +			if (WARN_ON(ret < 0))
+> +				return ret;
+> +			fill->devices[fill->cur].devid = ret;
+
+Nit, @devid seems like a better variable name here rather than @ret.
+
+> +		} else if (vdev && iommufd_ctx_has_group(iommufd, iommu_group)) {
+> +			fill->devices[fill->cur].devid = VFIO_PCI_DEVID_OWNED;
+> +		} else {
+> +			fill->devices[fill->cur].devid = VFIO_PCI_DEVID_NOT_OWNED;
+> +			fill->dev_owned = false;
+> +		}
+
+I think we're not describing the requirements for this middle test
+correctly.  We're essentially only stating the iommufd_ctx_has_group()
+part of the requirement, but we're also enforcing a
+vfio_find_device_in_devset() requirement, which means the device is not
+just unopened within a group shared by the iommufd context, but it must
+also still be a device registered as a member of the devset, ie. it
+must be bound to a vfio driver.
+
+It's not a new requirement, it's imposed in the hot-reset ioctl itself,
+but it's new for the info ioctl given that it's now trying to report
+that the user can perform the reset for cdev callers.
+
+This also shares too much logic with vfio_device_owned() added in the
+next patch.  I think it might be cleaner to move the iommu_group_get() to
+the group path below and change vfio_device_owned() to something that
+can be used here and in the reset path.  For example, if we had a
+function like:
+
+static int vfio_hot_reset_devid(struct vfio_device *vdev,
+                                struct iommufd_ctx *iommufd_ctx)
+{
+        struct iommu_group *group;
+        int devid;
+
+        if (!vdev)
+                return VFIO_PCI_DEVID_NOT_OWNED;
+
+        if (vfio_iommufd_physical_ictx(vdev) == iommufd_ctx) 
+                return vfio_iommufd_physical_devid(vdev);
+
+        group = iommu_group_get(vdev->dev);
+        if (!group)
+                return VFIO_PCI_DEVID_NOT_OWNED;
+                        
+        if (iommufd_ctx_has_group(iommufd_ctx, group))
+                devid = VFIO_PCI_DEVID_OWNED;
+
+        iommu_group_put(group);
+                                
+        return devid;
+} 
+
+It could be called above as:
+
+	vdev = vfio_find_device_in_devset(dev_set, &pdev->dev);
+	fill->devices[fill->cur].devid =
+			vfio_hot_reset_devid(vdev, iommufd);
+
+
+And from vfio_pci_dev_set_hot_reset() as:
+
+	bool owned;
+
+	if (iommufd_ctx) {
+		int devid = vfio_hot_reset_devid(&cur_vma->vdev,
+						 iommufd_ctx);
+
+		owned = (devid != VFIO_PCI_DEVID_NOT_OWNED);
+	} else
+		owned = vfio_dev_in_groups(&cur_vma->vdev, groups);
+
+Any better?
+
+> +	} else {
+> +		fill->devices[fill->cur].group_id = iommu_group_id(iommu_group);
+> +	}
+>  	fill->devices[fill->cur].segment = pci_domain_nr(pdev->bus);
+>  	fill->devices[fill->cur].bus = pdev->bus->number;
+>  	fill->devices[fill->cur].devfn = pdev->devfn;
+> @@ -1229,17 +1267,27 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
+>  		return -ENOMEM;
+>  
+>  	fill.devices = devices;
+> +	fill.vdev = &vdev->vdev;
+>  
+> +	mutex_lock(&vdev->vdev.dev_set->lock);
+> +	fill.devid = fill.dev_owned = vfio_device_cdev_opened(&vdev->vdev);
+>  	ret = vfio_pci_for_each_slot_or_bus(vdev->pdev, vfio_pci_fill_devs,
+>  					    &fill, slot);
+> +	mutex_unlock(&vdev->vdev.dev_set->lock);
+>  
+>  	/*
+>  	 * If a device was removed between counting and filling, we may come up
+>  	 * short of fill.max.  If a device was added, we'll have a return of
+>  	 * -EAGAIN above.
+>  	 */
+> -	if (!ret)
+> +	if (!ret) {
+>  		hdr.count = fill.cur;
+> +		if (fill.devid) {
+> +			hdr.flags |= VFIO_PCI_HOT_RESET_FLAG_DEV_ID;
+> +			if (fill.dev_owned)
+> +				hdr.flags |= VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED;
+> +		}
+> +	}
+
+Does this clean up the flag and branching a bit?
+
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 737115d16a79..6a2a079e452d 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -786,8 +786,7 @@ struct vfio_pci_fill_info {
+ 	int cur;
+ 	struct vfio_pci_dependent_device *devices;
+ 	struct vfio_device *vdev;
+-	bool devid:1;
+-	bool dev_owned:1;
++	u32 flags;
+ };
+ 
+ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
+@@ -802,7 +801,7 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
+ 	if (!iommu_group)
+ 		return -EPERM; /* Cannot reset non-isolated devices */
+ 
+-	if (fill->devid) {
++	if (fill->flags & VFIO_PCI_HOT_RESET_FLAG_DEV_ID) {
+ 		struct iommufd_ctx *iommufd = vfio_iommufd_physical_ictx(fill->vdev);
+ 		struct vfio_device_set *dev_set = fill->vdev->dev_set;
+ 		struct vfio_device *vdev;
+@@ -814,7 +813,7 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
+ 		 * - devid == 0 for the devices that have not been opened
+ 		 *   but have same group with one of the devices bound to
+ 		 *   the iommufd of the calling device.
+-		 * - devid == -1 for others, and clear dev_owned flag.
++		 * - devid == -1 for others, and clear owned flag.
+ 		 */
+ 		vdev = vfio_find_device_in_devset(dev_set, &pdev->dev);
+ 		if (vdev && iommufd == vfio_iommufd_physical_ictx(vdev)) {
+@@ -828,7 +827,7 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
+ 			fill->devices[fill->cur].devid = VFIO_PCI_DEVID_OWNED;
+ 		} else {
+ 			fill->devices[fill->cur].devid = VFIO_PCI_DEVID_NOT_OWNED;
+-			fill->dev_owned = false;
++			fill->flags &= ~VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED;
+ 		}
+ 	} else {
+ 		fill->devices[fill->cur].group_id = iommu_group_id(iommu_group);
+@@ -1273,8 +1272,11 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
+ 	fill.devices = devices;
+ 	fill.vdev = &vdev->vdev;
+ 
++	if (vfio_device_cdev_opened(&vdev->vdev))
++		fill.flags |= VFIO_PCI_HOT_RESET_FLAG_DEV_ID |
++			     VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED;
++
+ 	mutex_lock(&vdev->vdev.dev_set->lock);
+-	fill.devid = fill.dev_owned = vfio_device_cdev_opened(&vdev->vdev);
+ 	ret = vfio_pci_for_each_slot_or_bus(vdev->pdev, vfio_pci_fill_devs,
+ 					    &fill, slot);
+ 	mutex_unlock(&vdev->vdev.dev_set->lock);
+@@ -1286,11 +1288,7 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
+ 	 */
+ 	if (!ret) {
+ 		hdr.count = fill.cur;
+-		if (fill.devid) {
+-			hdr.flags |= VFIO_PCI_HOT_RESET_FLAG_DEV_ID;
+-			if (fill.dev_owned)
+-				hdr.flags |= VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED;
+-		}
++		hdr.flags = fill.flags;
+ 	}
+ 
+ reset_info_exit:
+
+Thanks,
+Alex
+
+>  
+>  reset_info_exit:
+>  	if (copy_to_user(arg, &hdr, minsz))
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 0552e8dcf0cb..01203215251a 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -650,11 +650,53 @@ enum {
+>   * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 12,
+>   *					      struct vfio_pci_hot_reset_info)
+>   *
+> + * This command is used to query the affected devices in the hot reset for
+> + * a given device.
+> + *
+> + * This command always reports the segment, bus, and devfn information for
+> + * each affected device, and selectively reports the group_id or devid per
+> + * the way how the calling device is opened.
+> + *
+> + *	- If the calling device is opened via the traditional group/container
+> + *	  API, group_id is reported.  User should check if it has owned all
+> + *	  the affected devices and provides a set of group fds to prove the
+> + *	  ownership in VFIO_DEVICE_PCI_HOT_RESET ioctl.
+> + *
+> + *	- If the calling device is opened as a cdev, devid is reported.
+> + *	  Flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID is set to indicate this
+> + *	  data type.  For a given affected device, it is considered owned by
+> + *	  this interface if it meets the following conditions:
+> + *	  1) Has a valid devid within the iommufd_ctx of the calling device.
+> + *	     Ownership cannot be determined across separate iommufd_ctx and the
+> + *	     cdev calling conventions do not support a proof-of-ownership model
+> + *	     as provided in the legacy group interface.  In this case a valid
+> + *	     devid with value greater than zero is provided in the return
+> + *	     structure.
+> + *	  2) Does not have a valid devid within the iommufd_ctx of the calling
+> + *	     device, but belongs to the same IOMMU group as the calling device
+> + *	     or another opened device that has a valid devid within the
+> + *	     iommufd_ctx of the calling device.  This provides implicit ownership
+> + *	     for devices within the same DMA isolation context.  In this case
+> + *	     the invalid devid value of zero is provided in the return structure.
+> + *
+> + *	  A devid value of -1 is provided in the return structure for devices
+> + *	  where ownership is not available.  Such devices prevent the use of
+> + *	  VFIO_DEVICE_PCI_HOT_RESET outside of proof-of-ownership calling
+> + *	  conventions (ie. via legacy group accessed devices).
+> + *	  Flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED would be set when all the
+> + *	  affected devices are owned by the user.  This flag is available only
+> + *	  when VFIO_PCI_HOT_RESET_FLAG_DEV_ID is set, otherwise reserved.
+> + *
+>   * Return: 0 on success, -errno on failure:
+>   *	-enospc = insufficient buffer, -enodev = unsupported for device.
+>   */
+>  struct vfio_pci_dependent_device {
+> -	__u32	group_id;
+> +	union {
+> +		__u32   group_id;
+> +		__u32	devid;
+> +#define VFIO_PCI_DEVID_OWNED		0
+> +#define VFIO_PCI_DEVID_NOT_OWNED	-1
+> +	};
+>  	__u16	segment;
+>  	__u8	bus;
+>  	__u8	devfn; /* Use PCI_SLOT/PCI_FUNC */
+> @@ -663,6 +705,8 @@ struct vfio_pci_dependent_device {
+>  struct vfio_pci_hot_reset_info {
+>  	__u32	argsz;
+>  	__u32	flags;
+> +#define VFIO_PCI_HOT_RESET_FLAG_DEV_ID		(1 << 0)
+> +#define VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED	(1 << 1)
+>  	__u32	count;
+>  	struct vfio_pci_dependent_device	devices[];
+>  };
+
