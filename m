@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AFD36707431
-	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 23:26:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9469570743D
+	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 23:28:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229436AbjEQV0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 May 2023 17:26:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38342 "EHLO
+        id S229899AbjEQV2t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 May 2023 17:28:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbjEQV0w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 May 2023 17:26:52 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93E931732
-        for <kvm@vger.kernel.org>; Wed, 17 May 2023 14:26:51 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-517bad1b8c5so1176526a12.0
-        for <kvm@vger.kernel.org>; Wed, 17 May 2023 14:26:51 -0700 (PDT)
+        with ESMTP id S229756AbjEQV2p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 May 2023 17:28:45 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99BFD1FD4
+        for <kvm@vger.kernel.org>; Wed, 17 May 2023 14:28:40 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-561c11762b7so18760167b3.3
+        for <kvm@vger.kernel.org>; Wed, 17 May 2023 14:28:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684358811; x=1686950811;
+        d=google.com; s=20221208; t=1684358919; x=1686950919;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7aLwMNNZ7THbUm/ibMfTeaBcnWfdNE0xdsaZCsKooo8=;
-        b=eLvvouwa/T3SIA/wCbtkDO3ClC96pQ+4JcdvmLbPMhUiemc9qbYtVUic73gYWQ5qLx
-         QRSTwjb8LJmedqG4R2QNl5VSXsZ5pj0DzTYFeGKwh+onT0jFF0rYI1VGE9LTfAZbjj9b
-         VJOIIY1WjIOK8niCCoeE355dACVc4KJtSYhLOy+J74QrufcN0A0NK2yNAHKOxnvBIuuL
-         W691zzSKMcgYqWFKZkvIhqk1fOkhdKAEy2VmwdUFkxMCaR3DrZOh67dM1IiW0NaPtE83
-         B4BVqgyhzzqMd765k6Glt+80KOdeah7nW2FrcjbLpesxsiOZ31h76aQ/tsa3IFji6VE2
-         0Pxg==
+        bh=2U//1HaqKRad3YxcpM56jnvDfvX6xGIz9OVATVBgbMA=;
+        b=tSaGmziXCuNZfqUQrEkatzGF35vhAvQ0IUU9JqMsTs3yjD7bsqOh/xaLzZZJ+1jGVJ
+         tg8ANWmyQyPUYzfMS+tGcUR/Ka2NwMQbmcZKalUmHL/k+tXKN1oZHLvyUZ+0malc/YQ9
+         ofaxXQcgKXhGdlj/55HDjtQKY1e8NcAzO53uBYNuvY+9fyGR/nsFyJ8O8O1Zot4kBUs0
+         VVL+0fh6MgRyIYZwvuOnH1FkYA8F3k1MDrG01J/sOXTQffQ8hURH7QHLjyoj0w67as7d
+         kXfrndbftio5xkGAsEyh3V05jpxjQ7K47WdKWrmbNbWjBLzKVCe7GGo9NID8YpQT3dxZ
+         /m+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684358811; x=1686950811;
+        d=1e100.net; s=20221208; t=1684358919; x=1686950919;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7aLwMNNZ7THbUm/ibMfTeaBcnWfdNE0xdsaZCsKooo8=;
-        b=BFzom1WbOuyEsVmNabpHYkdNaPf3t6dBEc2Eh3l33tEpLG5FyEehJUBo6+mCLShiBa
-         qXdWnEq95KJMIm+Kzkm3K64yIPmJbShenbJCk4623xXLY0aKxKxMl55KUfsYfSeA9DKY
-         O64o+YKjf4tDECd3XjbOPN0mXmVq5HmlHJKUsyb3hvqqjSxOp264dbf1uJ/1CKxc6i+L
-         TRdECqTbSonVPyiv8lHMsD9PlSbjJC81Eil0S/AqrBtVfpy9qSYoBRtn0gpxlNV1xKWz
-         8CBR3H+ZijIMQvXE8JjLF9bi55z3H+XdCU4SPyxOqsycBGNsfHsvPqIiiA4buqnCXmg+
-         +Iew==
-X-Gm-Message-State: AC+VfDy4Ip6yBuz/mWNB3MXu16vCL/Pxfetrnxp+YVTuy2+cRlHoTIR2
-        gTZzHy3ydgcDuGX6WXEl8ANMf65MdrA=
-X-Google-Smtp-Source: ACHHUZ6MWd33Mlnt+4OxhzKnqu6BxRsTK3Re1/4i71IPViyqQy95aDKNTvq5sgtGEAmyyNA1QA0KIZEZJjQ=
+        bh=2U//1HaqKRad3YxcpM56jnvDfvX6xGIz9OVATVBgbMA=;
+        b=DZSmb7bpK64FM2njctcFuYXCDIp7Jk7ySSas7OwGHOMdbOiDDXsZM4Ua1Hk2n7QgYZ
+         xQZwLE1hczXT2LMMtisE9a+7Sex0HgcgKJ9KNJ59RBYMQ9whtaZJA9YBUGzmdnDDl1/4
+         SUCaboMXsGLqPJAMGO3EHRIIxvhwY4kIsLNN/y5zbEGkLmt0UK2r4Q819651EVq34FTa
+         IiFCoYUGbdl108mqgmRa2i8iIrPc9JtAyHzgtuwH4MNA41HCk6PMeu3gbXbDbpvPjpe+
+         KwPsPj5SkjZpnf5fdrzwWPXPa5FFvFYNPKRu/OqBsQXZbOw4MbUiMQHR0Zkok1oAaraZ
+         gsog==
+X-Gm-Message-State: AC+VfDzAH1osIIRLPCTeg0k1FL0p8pErm+gRh8ogZJu6k8mYe+1fwOhG
+        wnYEl0ZkqnhBwbiRlQysly4/16z1SAI=
+X-Google-Smtp-Source: ACHHUZ7sdyIC1kxCapYW50rX7lK3Ggjlqjf/JnqIztWHaa0sMAdk0yeb7RjFGK4UAdaSqD7D3W0oA4Geh7U=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:792:0:b0:51b:fa5:7bce with SMTP id
- 140-20020a630792000000b0051b0fa57bcemr60801pgh.1.1684358811032; Wed, 17 May
- 2023 14:26:51 -0700 (PDT)
-Date:   Wed, 17 May 2023 14:26:42 -0700
-In-Reply-To: <20230423101112.13803-2-binbin.wu@linux.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a81:ca44:0:b0:54f:a35e:e79a with SMTP id
+ y4-20020a81ca44000000b0054fa35ee79amr23994145ywk.8.1684358919790; Wed, 17 May
+ 2023 14:28:39 -0700 (PDT)
+Date:   Wed, 17 May 2023 14:28:38 -0700
+In-Reply-To: <20230423101112.13803-3-binbin.wu@linux.intel.com>
 Mime-Version: 1.0
-References: <20230423101112.13803-1-binbin.wu@linux.intel.com> <20230423101112.13803-2-binbin.wu@linux.intel.com>
-Message-ID: <ZGVGkpvWQqLX2BrV@google.com>
-Subject: Re: [PATCH 1/2] KVM: Fix comments for KVM_ENABLE_CAP
+References: <20230423101112.13803-1-binbin.wu@linux.intel.com> <20230423101112.13803-3-binbin.wu@linux.intel.com>
+Message-ID: <ZGVHBosyCEOrokyJ@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Fix some comments
 From:   Sean Christopherson <seanjc@google.com>
 To:     Binbin Wu <binbin.wu@linux.intel.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
@@ -66,36 +66,13 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Sun, Apr 23, 2023, Binbin Wu wrote:
-
-Please write a changelog, I'm not willing to trudge through KVM's capability mess
-to determine whether or not this is correct without some effort on your part to
-point me in the right direction.
-
-> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-> ---
->  include/uapi/linux/kvm.h       | 2 +-
->  tools/include/uapi/linux/kvm.h | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+> msrs_to_save_all is out-dated after commit 2374b7310b66
+> (KVM: x86/pmu: Use separate array for defining "PMU MSRs to save").
+> Update the comments to msrs_to_save_base.
 > 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 4003a166328c..1a5cc4c6b59b 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1605,7 +1605,7 @@ struct kvm_s390_ucas_mapping {
->  #define KVM_GET_DEBUGREGS         _IOR(KVMIO,  0xa1, struct kvm_debugregs)
->  #define KVM_SET_DEBUGREGS         _IOW(KVMIO,  0xa2, struct kvm_debugregs)
->  /*
-> - * vcpu version available with KVM_ENABLE_CAP
-> + * vcpu version available with KVM_CAP_ENABLE_CAP
->   * vm version available with KVM_CAP_ENABLE_CAP_VM
->   */
->  #define KVM_ENABLE_CAP            _IOW(KVMIO,  0xa3, struct kvm_enable_cap)
-> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-> index 4003a166328c..1a5cc4c6b59b 100644
-> --- a/tools/include/uapi/linux/kvm.h
-> +++ b/tools/include/uapi/linux/kvm.h
+> Fix a typo in x86 mmu.rst.
 
-Unless someone objects, please drop the tools/ change and let the perf folks deal
-with their mess.
-
-https://lore.kernel.org/all/Y8bZ%2FJ98V5i3wG%2Fv@google.com
+Please split this into two patches, these are two completely unrelated changes.
+Yes, they're tiny, but the mmu.rst change is more than just a trivial typo, e.g.
+it can't be reasonably reviewed by someone without at least passing knowledge of
+NPT, LA57, etc.
