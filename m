@@ -2,254 +2,405 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CC3D705D3E
-	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 04:27:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9791705DB7
+	for <lists+kvm@lfdr.de>; Wed, 17 May 2023 05:08:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231906AbjEQC1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 May 2023 22:27:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50922 "EHLO
+        id S232296AbjEQDIi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 May 2023 23:08:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231278AbjEQC1o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 May 2023 22:27:44 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 863355FE1;
-        Tue, 16 May 2023 19:27:15 -0700 (PDT)
+        with ESMTP id S231986AbjEQDIg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 May 2023 23:08:36 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F3D171F;
+        Tue, 16 May 2023 20:08:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684292914; x=1715828914;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=J7lxeLbJhP+Nbq8dObGHLLHqSCGEiPGBfRx5vEGlC9E=;
+  b=TbGrV+odPozPO4+DDUy0UgfOtR9ROZr8vejDga/apicuDyP2ylpjZzVA
+   Bbr3so2SkM9VKBuuXLu/DWXMy2Ts7osOn6A6Hj0OYee1ZFgPsIm+MN9UE
+   CJjXk+2SdeNkKHI9FxCi8ZSe3eKeVnuauI1B+GBfBnslWSzc1Ekv6mhvr
+   X5c10W3kHSdx2RYjHqXJHZEg60JEwLNxd7EL7ep3xL61cM8B1IeBMgpSK
+   tJpoAmo2m5IxCX8xAL3c1d91CMV+LYLEI3LkZDjmemAwiXk7hlNvKpyPz
+   v2d5Gw1ZXXO/oCoiSVfGmcw0yL10btTT9ePbV1w4pKPLzQqO5YO3ZdCdG
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10712"; a="437995516"
+X-IronPort-AV: E=Sophos;i="5.99,280,1677571200"; 
+   d="scan'208";a="437995516"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2023 20:08:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10712"; a="813693451"
+X-IronPort-AV: E=Sophos;i="5.99,280,1677571200"; 
+   d="scan'208";a="813693451"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga002.fm.intel.com with ESMTP; 16 May 2023 20:08:33 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 16 May 2023 20:08:33 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 16 May 2023 20:08:33 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Tue, 16 May 2023 20:08:33 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.172)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Tue, 16 May 2023 20:08:32 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Rw5KQ9Ii6gbtDWbJw1HW3+96fiC65KOBcUoDOwNFrlFVJ6NHiKD5ToYlf40v+D91+jMbRiKOfxoIXV6Tyx8yInAoHSoZ9kWAa36PFeuzdki8bGSiNlc2AJxHFA3L84CRgg04dXQv9mc8MNzjRWTAiASQPKe1TpraXh5ob5lbDa4YMNdNgVamGSvMG7U8Jcx5WJ/Mrr4yUcj+IRuQlCwFRET7ZDlMZ99CBkT7TBHRMGNOdhtaAovuh9nyhVnKdWAytSMMe872BUAnKNXtBwBrR0STIZy4RCDSlvcL9IR7F9enJY286U4YvDKpcAtwmxvLQeu7FCrCSwD0hnLbJyk+ag==
+ b=B3yKilqe0PgipLg59ImKi129rEPNURjtDqbAFmh/2zbqAlIzD8EfWmOr8elhcz1TX+3CP95OFBrVtJWwlfgd0koL3zVrZ/Ro8HzJ4yVRaZw3q/pvb1E2erq5c/i5kwdamz6qQZfW5N8FoAcFZN/E85zlzdNnNS7TArf+qtuhpIk52MU9nRI5WDRDEtf4ssYHy29GQSHLpjzCjXgAgQ9GtQlmP0UEYBq7FY+NEnkOPTVspZIrY7g2v3pGkK1Td0oHSdaIic/SuWhGKi25czIiCIyadZtdYtn34cNJkKPmx8MiBzJBdkKB0VQ0kzFoxXUvX4zxnAUY/M7pdjkD8Ge1bA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oh+jtBDcQGwKL47a/sTYNeBB8dtEGr5uAwWvDP8A28U=;
- b=cjI9rfNHyuGjqn5eWNtWxGeEkHpHAncNyDxbqWlCddNjLyefWOpkmpAv3dzFmr+vUvDYeRpIUmxcQjLJ1eDbOt10uslxaKouCbkk5PGt8ypNiT96MuF/weZWKcf5pasctuaol4QYVOQEyIvHQioXk5vpBXmVWYj5no9Ze9+P6eFZE0h/aCQfiSpoZuz2Sg8QXd+NWu+oBGIeVjVsLbh6UeCso+7cDesKNZ6YsqGKf34IaON+1Io964lBgQAdq/7FN0X2xXddTz+pI/5iJS1oBBoIWB9pWnFryIprWM4PhKhx5RFQsPFuYseQ6y3BasSlqNjpdtpArOcEgEQS3FqCEw==
+ bh=NEhCwNGmWBZD+6CRjUfokS717TnHmbjHh325QwRIXfk=;
+ b=IkGsi8/m66TApYo4hzxZHZsT9PjDrI4fx5OCzrj8WvFmfES1GE//3NPmEtnj/USVck/7T4ACQvl0g8ikhNzR1XJjwu2c+ymDdVrXB0cOcnHc1mM08IypFJWDv55bngvKdKNGMT3LmscHlmdjPAEKt6skiBVeQUfERoklKnrf9N+I14VYdPN811QtVFPZp2lOmNzbuPesuXTcuaGMiA70EXUtdLd8itA25KF9dCwj/1TjMLKwgXcCRc5Xi/HFNu+GM/H/pk92uiR4nDwrlxpZDUKdu8z3RkZEuKnHedds028k39aQoyJ473YmBao6+mdU3ZltvKkw2IbCrtbBmQjm7A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oh+jtBDcQGwKL47a/sTYNeBB8dtEGr5uAwWvDP8A28U=;
- b=V5UI8iMWxWA5SNTBmjgCxrZwe0RW/XcBshERDXL7ftbQEgAJ5VHIatLCzn1dJVAeZIFC0ILf9iDAbt5wXO7bxtElmdb4rqjwKrOJcyGNiv41p9uLFq1bYHQDY5pZ1WQCHQtdW20hUUKm9uU3XmqW9S/ZKumv+IVd0+Gr1m41a7I=
-Received: from BYAPR21MB1688.namprd21.prod.outlook.com (2603:10b6:a02:bf::26)
- by PH8PR21MB3815.namprd21.prod.outlook.com (2603:10b6:510:215::13) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB5469.namprd11.prod.outlook.com (2603:10b6:5:399::13)
+ by SA0PR11MB4765.namprd11.prod.outlook.com (2603:10b6:806:9b::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.4; Wed, 17 May
- 2023 02:26:37 +0000
-Received: from BYAPR21MB1688.namprd21.prod.outlook.com
- ([fe80::a4f7:2466:97b5:bd31]) by BYAPR21MB1688.namprd21.prod.outlook.com
- ([fe80::a4f7:2466:97b5:bd31%5]) with mapi id 15.20.6433.005; Wed, 17 May 2023
- 02:26:35 +0000
-From:   "Michael Kelley (LINUX)" <mikelley@microsoft.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        "bigeasy@linutronix.de" <bigeasy@linutronix.de>
-CC:     Mark Rutland <Mark.Rutland@arm.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-        "will@kernel.org" <will@kernel.org>,
-        "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-        "kernel@xen0n.name" <kernel@xen0n.name>,
-        "hca@linux.ibm.com" <hca@linux.ibm.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "svens@linux.ibm.com" <svens@linux.ibm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "jgross@suse.com" <jgross@suse.com>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-        "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        "wei.liu@kernel.org" <wei.liu@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "longman@redhat.com" <longman@redhat.com>,
-        "boqun.feng@gmail.com" <boqun.feng@gmail.com>,
-        "pmladek@suse.com" <pmladek@suse.com>,
-        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "john.ogness@linutronix.de" <john.ogness@linutronix.de>,
-        "juri.lelli@redhat.com" <juri.lelli@redhat.com>,
-        "vincent.guittot@linaro.org" <vincent.guittot@linaro.org>,
-        "dietmar.eggemann@arm.com" <dietmar.eggemann@arm.com>,
-        "bsegall@google.com" <bsegall@google.com>,
-        "mgorman@suse.de" <mgorman@suse.de>,
-        "bristot@redhat.com" <bristot@redhat.com>,
-        "vschneid@redhat.com" <vschneid@redhat.com>,
-        "jstultz@google.com" <jstultz@google.com>,
-        "sboyd@kernel.org" <sboyd@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>
-Subject: RE: [RFC][PATCH 7/9] x86/tsc: Provide sched_clock_noinstr()
-Thread-Topic: [RFC][PATCH 7/9] x86/tsc: Provide sched_clock_noinstr()
-Thread-Index: AQHZgfVJgXDGJCXHgkicklmkIOtQvK9Q6JGAgAzfthA=
-Date:   Wed, 17 May 2023 02:26:35 +0000
-Message-ID: <BYAPR21MB1688853D01CABA74B51DA841D77E9@BYAPR21MB1688.namprd21.prod.outlook.com>
-References: <20230508211951.901961964@infradead.org>
- <20230508213147.853677542@infradead.org>
- <20230508214419.GA2053935@hirez.programming.kicks-ass.net>
-In-Reply-To: <20230508214419.GA2053935@hirez.programming.kicks-ass.net>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.17; Wed, 17 May
+ 2023 03:08:29 +0000
+Received: from DM4PR11MB5469.namprd11.prod.outlook.com
+ ([fe80::e825:c2b5:8df5:e17b]) by DM4PR11MB5469.namprd11.prod.outlook.com
+ ([fe80::e825:c2b5:8df5:e17b%4]) with mapi id 15.20.6411.017; Wed, 17 May 2023
+ 03:08:29 +0000
+Message-ID: <4bb0b861-2b01-746c-88a8-c3d675a3d4f5@intel.com>
+Date:   Wed, 17 May 2023 11:08:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2 06/11] iommufd: IOMMU_HWPT_ALLOC allocation with user
+ data
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=5329c7e3-bfca-439e-a9df-2326ba163ea2;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-05-17T02:20:07Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BYAPR21MB1688:EE_|PH8PR21MB3815:EE_
-x-ms-office365-filtering-correlation-id: c63e16e8-eeb6-4a29-5a22-08db567e22e0
-x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: waLSHBo/lES7jG6wG1LW2+XHWMJJ/G6gPu3InDad+lxE6TkKdxwR3D7dsrY8WCylV9F0iqMvmaVdgHDityFP3P7+ztGrLMft8oRqJrLHdjv4RYxXUli8Z2GacmEgbDrKp+1cid6tdluuqXX/EB1xL0X0XkKn51pGsmDfUVBUftXvZ8L0PiqvYDB7kAYIbnpPx4V0AjlccRG+k1m1FmH5YSv3uvX+28cJiVfM80vy7sMLzzCAEtLmDSNAWioP7/S9sdmDXc4IIfOtJ0nEg/3dPVVD7Whrhnw//ZxMMK+86brRfIUzsCZb2ZVu2hoN5wgET+jHoWArBqgntl8HosCs+VFST+Zw4J59FkL4FX2Yx28j4NBa+xCJPNy+yQf9/t9SXh3TOW5TICHEpo7zwqAlyxN7PdJz+P6Dli4qe/2hC3NJsEM7SGzvJDPeHygoaVVwjNJwfCkpAJYUXGRGVrU/tNkNiOUByR6PF/MJVRrtl/7MhUWGb6AyUCiwuaGdlE//h/dWN9cDhTzYTa7iWjbwckC2CAYVJzh/Ps+9k2Mte+Xf7kEHrBF7EoCI3dq+gbhI37pEzN6poQvUr2kQqsiPNQyAXp1jQIsTQK9gPdO9ZkRdjZ7wentXcQ+KxWbty2sekt1G1ApCY3K16vjvX0cn9WshYTSrhUOhE1yUMWNzkAk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR21MB1688.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(39860400002)(376002)(396003)(136003)(451199021)(83380400001)(6506007)(26005)(2906002)(33656002)(8990500004)(186003)(9686003)(38070700005)(52536014)(7416002)(86362001)(7696005)(5660300002)(55016003)(7406005)(71200400001)(8676002)(478600001)(64756008)(8936002)(10290500003)(54906003)(38100700002)(110136005)(41300700001)(66476007)(316002)(66446008)(122000001)(76116006)(4326008)(786003)(82960400001)(66946007)(82950400001)(66556008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?WdBIUJO4K6JFXQfd53wgHzYQWp2Ie+ouaIGbeG4jIET39gzz+QIUB13AAGed?=
- =?us-ascii?Q?IeRD2NPpriFCuLUdTlPqJSXktq7FSZZQs3ErBZeZipBs2cUNQCdwh2G3Xpz7?=
- =?us-ascii?Q?FM0BNIoyWKTSJyHyE5Uk5nEjOLFVFkkTPleynUjUo6oq0VkYFEhZXhEourP+?=
- =?us-ascii?Q?1s5NhleSN2j+fN5CRhSjjQEDCI9P08vZIbgE/R5oB7pNOGO7OvXUKuq9oXL7?=
- =?us-ascii?Q?Xv9hPOOF5kPtblZAWhtW7TkhLWr2w6R4sJc8OOeJb2n20/KKk7D5bfpJ4MUz?=
- =?us-ascii?Q?shuGlxprq6aomK1mvNNj/FBpmET3qtE+bv87WDpZfw+/UAUKsAITSrqYrJYW?=
- =?us-ascii?Q?hI5CUpT1NDaPSfSkK9VXLCklhag8Y/9nrDGuHydFWiDI3NVGvJVTmMhXJTSz?=
- =?us-ascii?Q?5+iLBsos38ba3+l8gqlrkuijwfm50zUJr805w72i6iegmKee3jRz9yj8z3R6?=
- =?us-ascii?Q?NSgaRn313LIAGlG1C8ORR3gOGb3vzSHsa+Nqk5KR6splu67pIs0SYnWx3i/l?=
- =?us-ascii?Q?H9dA7Uzdy2oxzo5sHg3BHIYyDa4GWvKtEKqdTz+jZ+HcwTdvBwSnPTEUM+Ih?=
- =?us-ascii?Q?GBz26fFo1A7MCYEpf4VHuBtXiPTNB29Jy1NtuJfptbolkdAO7Ws75jDBebtc?=
- =?us-ascii?Q?+yzjMcZeHLKScZthMjqbsYSJY2lrV1M0xqtz1MAgVFB2AggdgpwntW9Vkpgg?=
- =?us-ascii?Q?JJCjpqlsKq4dtV6O4PIBgLr/SdKAc/+gat8qQ5xJkf3e9Atf2eAyZsKqqs7m?=
- =?us-ascii?Q?CMFbrMwIt5T/VMOScU2Q+/vseMA4rPNg+MRGdOFUCQ1EONIRFhIvbhawjR1a?=
- =?us-ascii?Q?zjy6XPvKaM07B/fgkhnq6JQS8heMwT6uxor6vFUaDJmDJvI+PbFkz96cz7fq?=
- =?us-ascii?Q?f0WHlxrZknHZcmWm+UA/yM4uTbt1hr2mUetpOY06ordtsIoT6XY3riWHG70r?=
- =?us-ascii?Q?b1TXf7/hMFhPcC1/Q6wMZvRXmZEwkvqLhlplcJDxkkgrG23Kmq2A3W9OUqRK?=
- =?us-ascii?Q?da1NPOI7JXwSdABJuKGdyD+EMF//+S9m3cTOBm/lZHwns3YAl9+36W7BMYoC?=
- =?us-ascii?Q?ml8MHPzSPe+UXBkijErSycGQMBmmKeYnAzs11DU5vqj5c8dnIljLdScHef1J?=
- =?us-ascii?Q?Jp257rJ2OdJOG6Uj/qcSw29+lzDTUtjMyAJkzMHe1yBEg/otRywl8zk+TAOB?=
- =?us-ascii?Q?O5qs8UR/7kQe6V/eLIBqHMkH/ec8puT/NoTo6/1XW1QewmuVCuYoaljE4PTP?=
- =?us-ascii?Q?oLxETYSF9CEXwN17/83XACkuuIKUPf25MFF4Zowcg6glcX9d1ZG4O/O+ekJK?=
- =?us-ascii?Q?COXyi25z1a0YLZx76vgqF+WrkEQFW1fQZDWyOcBVY8stgCJvU8Elw0ved7MQ?=
- =?us-ascii?Q?E81rci+C1CrG6oo4N6NzwJN53LV+7cD85JZoMTq8IGqvIVCCdVVOY5GaOh7l?=
- =?us-ascii?Q?4VXsWVIezPqw128XOqaPsKdrGZMJW5c+u+uUf1CtpQcfY0SC5sOBPG4S76dz?=
- =?us-ascii?Q?+kwHbf5JJ+1yDqUInRGRTQ48LP/T1sTLH1W79BHLZnsoWou99/MTq1kt5y2+?=
- =?us-ascii?Q?tHksHD5aCKdSkbyYS7XfxgyCaxjqFrU6UJZ8no7llmxGjOw0XqOrhZeTCz9a?=
- =?us-ascii?Q?GQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+To:     Yi Liu <yi.l.liu@intel.com>, <joro@8bytes.org>,
+        <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+        <kevin.tian@intel.com>, <robin.murphy@arm.com>,
+        <baolu.lu@linux.intel.com>
+CC:     <cohuck@redhat.com>, <eric.auger@redhat.com>,
+        <nicolinc@nvidia.com>, <kvm@vger.kernel.org>,
+        <mjrosato@linux.ibm.com>, <chao.p.peng@linux.intel.com>,
+        <yi.y.sun@linux.intel.com>, <peterx@redhat.com>,
+        <jasowang@redhat.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <lulu@redhat.com>, <suravee.suthikulpanit@amd.com>,
+        <iommu@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <zhenzhong.duan@intel.com>
+References: <20230511143844.22693-1-yi.l.liu@intel.com>
+ <20230511143844.22693-7-yi.l.liu@intel.com>
+From:   "Liu, Jingqi" <jingqi.liu@intel.com>
+In-Reply-To: <20230511143844.22693-7-yi.l.liu@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SG2PR04CA0168.apcprd04.prod.outlook.com (2603:1096:4::30)
+ To DM4PR11MB5469.namprd11.prod.outlook.com (2603:10b6:5:399::13)
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB5469:EE_|SA0PR11MB4765:EE_
+X-MS-Office365-Filtering-Correlation-Id: 93c555de-79e1-4005-af25-08db5683fce0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9RJKQ2HL5ZFoPSMEt+iVf7PIJubEtgKWHRgq4PcV0YoRfEJtKHx9qHfgd5MGeUhtO2MpeNpXLRXQIvBXw2hvdSF/qnGkJl2Gmr8EjL/oo8DEAXpQybJZUr2spM5/41jNHm5aK/OSpuiTG0qzlIc+aFoLpb4GC0RQ5DMeyJXDCL5NtRnPhBMeAt2HQ/fHsHf7Hw4qv/2UbkfvAu5frVHqR1xpRqre0VTSuG+sN20EQ/t+ZLajomd/InfgMnNdQ98UlBDwneVW5njndM0JRz8g+WgcFCRsTdOtRMJ6koPGjCynn4GOpiR7mSujbim3LI4rdbBuWopasmXVXuKve6fE/LKl4kcTGpOlgPFD1ljZrlwBOkiV296SP3DUfJtBtFySrqxOlLFMb/oOS3BeHrcdQpDbdPKcaodxI9IoMBdv2FsvXbayBxkVftLMJlp87TjzlwAOKiR89qdwkHEIU92ROcaHyjHEH32eWFqVYGTZQoaI4Tj1EwMcsm0XExoL9BFwfZ8JMQbAQ+PWGqhT7XTFwSEImyjPgQqnvqbmdr0BKNZv3N3VxWZGgaFzAwV8n1ZDSyKEbQG9Si1kGbBINrcjfhV4kAHtVECKlPn5AXKR4HXUVFzzaSH9XVg24ANhMajsHRp1f+KU0av2536segamuw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5469.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(376002)(346002)(136003)(39860400002)(396003)(451199021)(36756003)(31696002)(86362001)(316002)(4326008)(66946007)(66556008)(66476007)(478600001)(6486002)(6666004)(8936002)(8676002)(5660300002)(41300700001)(2906002)(7416002)(38100700002)(82960400001)(2616005)(6512007)(6506007)(26005)(186003)(53546011)(83380400001)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bTVuSVQva0p6eTQ4Q1BUUWtHVGVsTjJVdUdxOTJVUTVIaDczR2hMWFJheC9w?=
+ =?utf-8?B?aUpBRVRTY014QXJtb1ZObmdvQlpLVDhTQzRldnJmUGxaYm9OWlE4TWNFQ3J4?=
+ =?utf-8?B?cGRpa2N3eXYzenJDS0pRYTN3SnE2Qm1JZnczZEpvdXVjRmI4K29Id1VGc1ZH?=
+ =?utf-8?B?anUvY0dLM1p4NFR1N1hwQ0Q4Q1RhNjZnRGNlU2ZjQ0xhZWExc3YrL01ZZDgz?=
+ =?utf-8?B?bi9FTWp2cU5BNzBZNDZKSlExWVEyaWdiaTZaS0wvZTl5b2NiRnovVCtqSGNQ?=
+ =?utf-8?B?bjVZZnhNUlVUOStrRGc4d2pBWU9RaDllNERRVUdvQ3hCM3Bhd21XWlBJWUdv?=
+ =?utf-8?B?Zm90aHNZbXpVU1JuVTBSRDB0NE81TlVRMnB4cVVUem5aR1ptdEhBSkoyRndX?=
+ =?utf-8?B?QitKZUo5M3k5VnhvUEdTTG4wU2tWbUtudE1JTG83cGRXVkh6OXkyQ2RIRGVH?=
+ =?utf-8?B?ZmQyZ2o2TVI5akl2THd4YmxBZ0o3eEorcWh4TW1ZWnZkUG1JbVhWZEVlZHZk?=
+ =?utf-8?B?M0xpeDJBeHRPVjBMZGNKS1RacXV5aDdnZ0dIUUhqTkFkY2Uzb0FQRWtvdlR6?=
+ =?utf-8?B?WUxEdkszS3BCN0hETW5QbTU1eDhTcUU3VmtvWlJKYkx0NW93RVowRDQxSGdZ?=
+ =?utf-8?B?aytTYUp4Mk94VkZ3OHd1a3hrQkRoblUrbTMwdEIrNGpscUxCZytVbnFQRU1R?=
+ =?utf-8?B?bzl6MnljYlNDUWFpYmhTUnFKU3BNQ0NlRjNSc3c2b1JkSVZUdC9vQzk2V3E1?=
+ =?utf-8?B?eGh1OXVoKzhsTDgyaWk3OGloczBqUHF0UWJSMmZtRFl3NFkrUXpiL2srYWdr?=
+ =?utf-8?B?akJPVGl0c01PNzA5OHowN2dkRXRsQkthMFl4VEk3VUhmUGY1WHpxNUFIK1ln?=
+ =?utf-8?B?eHVZU2NSbDlBdzU5cEhVU1MxenViZnI0cW16L3JoTmoxdVAyRExyL055eGx0?=
+ =?utf-8?B?MUlCNnNYb3pvZ2dJdkNsQ2NTejhRQnhDY0ZacDVINHVSd01DRlI2M29sRTEx?=
+ =?utf-8?B?aGMzSFhTbmRFMTN4U2g0SlJUeGJLci9jenB4bGYzUytRMmtKVXEzTVNvUGdy?=
+ =?utf-8?B?UUE0d1NKck9jZHFPWVQ2cTRCWWx2OENzZ2k0K0VUd000MFVLeTRWeFlSMmNy?=
+ =?utf-8?B?QmhiMXdrUEk2eGtGQlpHQXFGNFNBVWRCMk5jMzhGOGtzcE9kemtZTm40SEtY?=
+ =?utf-8?B?UDNxaCtaTUJmNXhsa0lwejhqamJCbnZHWitNMWFUVFU0bHF5SHZPVy9tR1BD?=
+ =?utf-8?B?bWVSL2t4MS8wNWIxbHlxSENXS0ZtL0FoMktYQS91U3p5ejkxNGRlMWlPOHdC?=
+ =?utf-8?B?RFRRVTE5Ry9Ka0JhZ1poTTJSbTFJMFZScjRLRTBoNHVPejJyUHRmVUJ3NmZY?=
+ =?utf-8?B?N21jcFh6ckxqanVxdEVHNzJzYjQ0YkFReHpHY2NyK0FJT0hTK0pTTWtKdERo?=
+ =?utf-8?B?dTA4RW9BSXJFbUEzRGROS09GQ2tZbnVPOVdrODVZbmcyWks3Um5DSUJJeCtM?=
+ =?utf-8?B?VDhzSnl5SFJ1Z0tqM3pSZEw2YS9YakpCT21YMzM3TjVkZkUwMzZkWG1ySUgx?=
+ =?utf-8?B?YkEyU2h1SVpuQ0xydit5OXZTa1ZHaUd3NnFURjI4QmhzdElsNjh1N01oN2J6?=
+ =?utf-8?B?eGJMMHdXMFFVTWFZZUhEYWN2Mkp4ZjNWbUVXOGRJQ080WS9ZLzJBazlpNy9x?=
+ =?utf-8?B?RUpIWWYwNWRqektieDBhOFhvdDVNbzEwLzJ3RXpVdEx6Rm5wVVRhakhUeSs1?=
+ =?utf-8?B?WGtNUzIvV0c3NnlMYVZnTUd3TzREazNrNUpsdHNCUlJkYmZ4TDZjZVFoNXBG?=
+ =?utf-8?B?V05QWTFkbjU5cUVCakVyRlFnWXZjNjB5a2Y2cm12N2poUXZPVXUzSTBNNHB0?=
+ =?utf-8?B?L1k2TTlTY2hWOHlFUGNQNk9BRGsyQW9vLzRXcVVNNHZCUXhKWHRhT09pb05N?=
+ =?utf-8?B?NjN6QjhrSjRueUdGSnMvV3RnTTljYVhqeGdGOEhzaitCajFJL2daeHRDTTZB?=
+ =?utf-8?B?dHkyVG5CUmx4MnNYTzR3amExR3hNNUN0cGRHMnZPUTNIb09lL2N6WDUxQk5D?=
+ =?utf-8?B?bWxHVzZKZWlhQnprc1NzaXZsMjRzaVZYYXpMMkRjYVFvOWwyYm5lTTdGdDJL?=
+ =?utf-8?Q?UcDO7NQ/J/F+Lf6iXJgQ5djVH?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 93c555de-79e1-4005-af25-08db5683fce0
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5469.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR21MB1688.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c63e16e8-eeb6-4a29-5a22-08db567e22e0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 May 2023 02:26:35.3749
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2023 03:08:29.0691
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FPZ4GOpGAuIx5bJtFl3Vkxr0ZAvJKjBDnZZrBToKIBr8lPXi7HEHtm0565mKm9ITiPtESmoeBR8nkfYMI0m0GhP0cax1h0qvGzwYwhXj3I8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR21MB3815
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sqpz9gpxbvisMVcbpFgHTVVuSvZQMSVGelCYo1hjgPhyRkmUOGMuhrLiCt2QfkVmYQbvV7kr1AxqhhbVTu+aVQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4765
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peter Zijlstra <peterz@infradead.org> Sent: Monday, May 8, 2023 2:44 =
-PM
->=20
-> On Mon, May 08, 2023 at 11:19:58PM +0200, Peter Zijlstra wrote:
->=20
-> > --- a/drivers/clocksource/hyperv_timer.c
-> > +++ b/drivers/clocksource/hyperv_timer.c
-> > @@ -408,9 +408,9 @@ static u64 notrace read_hv_clock_tsc_cs(
-> >  	return read_hv_clock_tsc();
-> >  }
-> >
-> > -static u64 notrace read_hv_sched_clock_tsc(void)
-> > +static u64 noinstr read_hv_sched_clock_tsc(void)
-> >  {
-> > -	return (read_hv_clock_tsc() - hv_sched_clock_offset) *
-> > +	return (hv_read_tsc_page(hv_get_tsc_page()) - hv_sched_clock_offset) =
-*
-> >  		(NSEC_PER_SEC / HV_CLOCK_HZ);
-> >  }
-> >
-> > --- a/include/clocksource/hyperv_timer.h
-> > +++ b/include/clocksource/hyperv_timer.h
-> > @@ -38,7 +38,7 @@ extern void hv_remap_tsc_clocksource(voi
-> >  extern unsigned long hv_get_tsc_pfn(void);
-> >  extern struct ms_hyperv_tsc_page *hv_get_tsc_page(void);
-> >
-> > -static inline notrace u64
-> > +static __always_inline notrace u64
-> >  hv_read_tsc_page_tsc(const struct ms_hyperv_tsc_page *tsc_pg, u64 *cur=
-_tsc)
-> >  {
-> >  	u64 scale, offset;
-> > @@ -85,7 +85,7 @@ hv_read_tsc_page_tsc(const struct ms_hyp
-> >  	return mul_u64_u64_shr(*cur_tsc, scale, 64) + offset;
-> >  }
-> >
-> > -static inline notrace u64
-> > +static __always_inline notrace u64
-> >  hv_read_tsc_page(const struct ms_hyperv_tsc_page *tsc_pg)
-> >  {
-> >  	u64 cur_tsc;
->=20
-> Hyper-V folks!
->=20
-> While reviewing all this I found the following 'gem':
->=20
-> hv_init_clocksource()
->   hv_setup_sched_clock()
->     paravirt_set_sched_clock(read_hv_sched_clock_msr)
->=20
-> read_hv_sched_clock_msr() [notrace]
->   read_hv_clock_msr()     [notrace]
->     hv_get_register()      *traced*
->       hv_get_non_nested_register() ...
->         hv_ghcb_msr_read()
-> 	  WARN_ON(in_nmi())
-> 	  ...
-> 	  local_irq_save()
->=20
->=20
-> Note that:
->=20
->  a) sched_clock() is used in NMI context a *LOT*
->  b) sched_clock() is notrace (or even noinstr with these patches)
->     and local_irq_save() implies tracing
->=20
->=20
-> Can you pretty please:
->=20
->  1) delete all this; or,
->  2) fix it in a hurry?
->=20
+On 5/11/2023 10:38 PM, Yi Liu wrote:
+> IOMMU_HWPT_ALLOC already supports iommu_domain allocation for usersapce.
+> But it can only allocate hw_pagetables linked with IOAS. There are needs
+> to support hw_pagetable allocation with parameters specified by user. For
+> example, in nested translation, user needs to allocate hw_pagetable for
+> the stage-1 translation (e.g. a single I/O page table or a set of I/O page
+> tables) with user data. It also needs provide a stage-2 hw_pagetable which
+s/provide/to provide
+> is linked to the GPA IOAS.
+>
+> This extends IOMMU_HWPT_ALLOC to accept user specified parameter and hwpt
+> ID in @pt_id field. Such as the user-managed stage-1 hwpt, which requires
+> a parent hwpt to point to stage-2 translation.
+>
+> enum iommu_hwpt_type is defined to differentiate the user parameters use
+> by different usages. For the allocations that don't require user parameter,
+s/parameter/parameters
+> IOMMU_HWPT_TYPE_DEFAULT is defined for backward compatibility. Other types
+> would be added by future iommu vendor driver extensions.
+>
+> Co-developed-by: Nicolin Chen <nicolinc@nvidia.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>   drivers/iommu/iommufd/hw_pagetable.c | 87 +++++++++++++++++++++++++---
+>   drivers/iommu/iommufd/main.c         |  2 +-
+>   include/uapi/linux/iommufd.h         | 32 +++++++++-
+>   3 files changed, 112 insertions(+), 9 deletions(-)
+>
+> diff --git a/drivers/iommu/iommufd/hw_pagetable.c b/drivers/iommu/iommufd/hw_pagetable.c
+> index 73d7d9d07726..e84270eb6e49 100644
+> --- a/drivers/iommu/iommufd/hw_pagetable.c
+> +++ b/drivers/iommu/iommufd/hw_pagetable.c
+> @@ -184,11 +184,15 @@ iommufd_hw_pagetable_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
+>   
+>   int iommufd_hwpt_alloc(struct iommufd_ucmd *ucmd)
+>   {
+> +	struct iommufd_hw_pagetable *hwpt, *parent = NULL;
+> +	union iommu_domain_user_data *data = NULL;
+>   	struct iommu_hwpt_alloc *cmd = ucmd->cmd;
+> -	struct iommufd_hw_pagetable *hwpt;
+> +	struct iommufd_object *pt_obj;
+> +	const struct iommu_ops *ops;
+>   	struct iommufd_device *idev;
+>   	struct iommufd_ioas *ioas;
+> -	int rc;
+> +	int klen = 0;
+> +	int rc = 0;
+>   
+>   	if (cmd->flags || cmd->__reserved)
+>   		return -EOPNOTSUPP;
+> @@ -197,15 +201,81 @@ int iommufd_hwpt_alloc(struct iommufd_ucmd *ucmd)
+>   	if (IS_ERR(idev))
+>   		return PTR_ERR(idev);
+>   
+> -	ioas = iommufd_get_ioas(ucmd->ictx, cmd->pt_id);
+> -	if (IS_ERR(ioas)) {
+> -		rc = PTR_ERR(ioas);
+> +	ops = dev_iommu_ops(idev->dev);
+> +
+> +	/*
+> +	 * All drivers support IOMMU_HWPT_TYPE_DEFAULT, so pass it through.
+> +	 * For any other hwpt_type, check the ops->domain_alloc_user_data_len
+> +	 * presence and its result.
+> +	 */
+> +	if (cmd->hwpt_type != IOMMU_HWPT_TYPE_DEFAULT) {
+> +		if (!ops->domain_alloc_user_data_len) {
+> +			rc = -EOPNOTSUPP;
+> +			goto out_put_idev;
+> +		}
+> +		klen = ops->domain_alloc_user_data_len(cmd->hwpt_type);
+> +		if (WARN_ON(klen < 0)) {
+> +			rc = -EINVAL;
+> +			goto out_put_pt;
+> +		}
+Would it be better if the later check "klen" is moved here ?
+     if (klen) {
+                 [...]
+     }
+If this check fails here, there's no need to execute the code after it.
+If this path is not executed, "klen" is 0, and there's no need to check it.
+Do I understand it right ?
 
-Peter -- I've sent you an RFC patch to incorporate into your broader
-patch set.  I think it probably makes sense for all the Hyper-V
-stuff to be a separate patch.
+Thanks,
+Jingqi
+> +	}
+> +
+> +	pt_obj = iommufd_get_object(ucmd->ictx, cmd->pt_id, IOMMUFD_OBJ_ANY);
+> +	if (IS_ERR(pt_obj)) {
+> +		rc = -EINVAL;
+>   		goto out_put_idev;
+>   	}
+>   
+> +	switch (pt_obj->type) {
+> +	case IOMMUFD_OBJ_IOAS:
+> +		ioas = container_of(pt_obj, struct iommufd_ioas, obj);
+> +		break;
+> +	case IOMMUFD_OBJ_HW_PAGETABLE:
+> +		/* pt_id points HWPT only when hwpt_type is !IOMMU_HWPT_TYPE_DEFAULT */
+> +		if (cmd->hwpt_type == IOMMU_HWPT_TYPE_DEFAULT) {
+> +			rc = -EINVAL;
+> +			goto out_put_pt;
+> +		}
+> +
+> +		parent = container_of(pt_obj, struct iommufd_hw_pagetable, obj);
+> +		/*
+> +		 * Cannot allocate user-managed hwpt linking to auto_created
+> +		 * hwpt. If the parent hwpt is already a user-managed hwpt,
+> +		 * don't allocate another user-managed hwpt linking to it.
+> +		 */
+> +		if (parent->auto_domain || parent->parent) {
+> +			rc = -EINVAL;
+> +			goto out_put_pt;
+> +		}
+> +		ioas = parent->ioas;
+> +		break;
+> +	default:
+> +		rc = -EINVAL;
+> +		goto out_put_pt;
+> +	}
+> +
+> +	if (klen) {
+> +		if (!cmd->data_len) {
+> +			rc = -EINVAL;
+> +			goto out_put_pt;
+> +		}
+> +
+> +		data = kzalloc(sizeof(*data), GFP_KERNEL);
+> +		if (!data) {
+> +			rc = -ENOMEM;
+> +			goto out_put_pt;
+> +		}
+> +
+> +		rc = copy_struct_from_user(data, sizeof(*data),
+> +					   u64_to_user_ptr(cmd->data_uptr),
+> +					   cmd->data_len);
+> +		if (rc)
+> +			goto out_free_data;
+> +	}
+> +
+>   	mutex_lock(&ioas->mutex);
+>   	hwpt = iommufd_hw_pagetable_alloc(ucmd->ictx, ioas, idev,
+> -					  NULL, NULL, false);
+> +					  parent, data, false);
+>   	if (IS_ERR(hwpt)) {
+>   		rc = PTR_ERR(hwpt);
+>   		goto out_unlock;
+> @@ -222,7 +292,10 @@ int iommufd_hwpt_alloc(struct iommufd_ucmd *ucmd)
+>   	iommufd_object_abort_and_destroy(ucmd->ictx, &hwpt->obj);
+>   out_unlock:
+>   	mutex_unlock(&ioas->mutex);
+> -	iommufd_put_object(&ioas->obj);
+> +out_free_data:
+> +	kfree(data);
+> +out_put_pt:
+> +	iommufd_put_object(pt_obj);
+>   out_put_idev:
+>   	iommufd_put_object(&idev->obj);
+>   	return rc;
+> diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
+> index 5c24e8971f09..ac81403ba78e 100644
+> --- a/drivers/iommu/iommufd/main.c
+> +++ b/drivers/iommu/iommufd/main.c
+> @@ -302,7 +302,7 @@ struct iommufd_ioctl_op {
+>   static const struct iommufd_ioctl_op iommufd_ioctl_ops[] = {
+>   	IOCTL_OP(IOMMU_DESTROY, iommufd_destroy, struct iommu_destroy, id),
+>   	IOCTL_OP(IOMMU_HWPT_ALLOC, iommufd_hwpt_alloc, struct iommu_hwpt_alloc,
+> -		 __reserved),
+> +		 data_uptr),
+>   	IOCTL_OP(IOMMU_DEVICE_GET_HW_INFO, iommufd_device_get_hw_info,
+>   		 struct iommu_hw_info, __reserved),
+>   	IOCTL_OP(IOMMU_IOAS_ALLOC, iommufd_ioas_alloc_ioctl,
+> diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+> index e9d42838dcbd..699e735828db 100644
+> --- a/include/uapi/linux/iommufd.h
+> +++ b/include/uapi/linux/iommufd.h
+> @@ -347,6 +347,14 @@ struct iommu_vfio_ioas {
+>   };
+>   #define IOMMU_VFIO_IOAS _IO(IOMMUFD_TYPE, IOMMUFD_CMD_VFIO_IOAS)
+>   
+> +/**
+> + * enum iommu_hwpt_type - IOMMU HWPT Type
+> + * @IOMMU_HWPT_TYPE_DEFAULT: default
+> + */
+> +enum iommu_hwpt_type {
+> +	IOMMU_HWPT_TYPE_DEFAULT,
+> +};
+> +
+>   /**
+>    * struct iommu_hwpt_alloc - ioctl(IOMMU_HWPT_ALLOC)
+>    * @size: sizeof(struct iommu_hwpt_alloc)
+> @@ -355,12 +363,31 @@ struct iommu_vfio_ioas {
+>    * @pt_id: The IOAS to connect this HWPT to
+>    * @out_hwpt_id: The ID of the new HWPT
+>    * @__reserved: Must be 0
+> + * @hwpt_type: One of enum iommu_hwpt_type
+> + * @data_len: Length of the type specific data
+> + * @data_uptr: User pointer to the type specific data
+>    *
+>    * Explicitly allocate a hardware page table object. This is the same object
+>    * type that is returned by iommufd_device_attach() and represents the
+>    * underlying iommu driver's iommu_domain kernel object.
+>    *
+> - * A HWPT will be created with the IOVA mappings from the given IOAS.
+> + * A kernel-managed HWPT will be created with the mappings from the given IOAS.
+> + * The @hwpt_type for its allocation can be set to IOMMU_HWPT_TYPE_DEFAULT, or
+> + * another type (being listed below) to specialize a kernel-managed HWPT.
+> + *
+> + * A user-managed HWPT will be created from a given parent HWPT via @pt_id, in
+> + * which the parent HWPT must be allocated previously via the same ioctl from a
+> + * given IOAS. The @hwpt_type must not be set to IOMMU_HWPT_TYPE_DEFAULT but a
+> + * pre-defined type corresponding to the underlying IOMMU hardware.
+> + *
+> + * If the @hwpt_type is set to IOMMU_HWPT_TYPE_DEFAULT, both the @data_len and
+> + * the @data_uptr will be ignored. Otherwise, both of them must be given.
+> + *
+> + * +==============================+=====================================+===========+
+> + * | @hwpt_type                   |    Data structure in @data_uptr     |   @pt_id  |
+> + * +------------------------------+-------------------------------------+-----------+
+> + * | IOMMU_HWPT_TYPE_DEFAULT      |               N/A                   |    IOAS   |
+> + * +------------------------------+-------------------------------------+-----------+
+>    */
+>   struct iommu_hwpt_alloc {
+>   	__u32 size;
+> @@ -369,6 +396,9 @@ struct iommu_hwpt_alloc {
+>   	__u32 pt_id;
+>   	__u32 out_hwpt_id;
+>   	__u32 __reserved;
+> +	__u32 hwpt_type;
+> +	__u32 data_len;
+> +	__aligned_u64 data_uptr;
+>   };
+>   #define IOMMU_HWPT_ALLOC _IO(IOMMUFD_TYPE, IOMMUFD_CMD_HWPT_ALLOC)
+>   
 
-I haven't previously worked with the details of notrace vs. noinstr,
-but I followed the patterns elsewhere in patch set. Please review
-to see if it seems correct.
-
-One thing:  In the cases where I added __always_inline, I dropped
-any notrace or noinstr annotations.  I presume such code always
-takes on the attributes of the caller.  If that's not correct, let me know.
-
-Michael
