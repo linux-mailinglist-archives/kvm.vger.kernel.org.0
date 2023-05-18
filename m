@@ -2,83 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66A16707B01
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 09:33:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2FCB707B2B
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 09:38:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230148AbjERHd2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 03:33:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60872 "EHLO
+        id S229921AbjERHi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 03:38:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230129AbjERHd0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 May 2023 03:33:26 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F66710E3
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 00:33:06 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-307d58b3efbso1120563f8f.0
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 00:33:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1684395176; x=1686987176;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Nr3DCNB0Ixq72umVN8Ju8XfUzmslSWPo/26RuL/v64=;
-        b=lgWrWFUqwIldB1/V3hLGpdkSWhVDPycAmU8Mb4DgAs8Kdp50VYkKtRMkBE/iO7HR6K
-         YG22U7m0sQNRC4eEWVXiAuLVpZu37bDV9Stsuo+uvxVhf3HszKROh7xNWvhlcT5VzGmn
-         Ltw6vxOCDiTdALmS//YmL9KOGZmOkdGpQJDxWxy5ocrzN2eZlhLShQtKcTUT/432p8qT
-         MU2XTtGY1N/K2fdCulWo4u/0/4v3T37U+TdX5fvFeYpldD1wtaumhvjDzTjiSPZEZ/in
-         Ac0nQnbghlggU1O6LnzFQ33nJ94VD5brGYVGvSgEpxvfBA6LvcKWlJx2fhXAWhEOlsAj
-         Bu8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684395176; x=1686987176;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/Nr3DCNB0Ixq72umVN8Ju8XfUzmslSWPo/26RuL/v64=;
-        b=d3y7KQM4917utTIFJOdA79+Bg+pqxwhHA1Xc+ziLBjijOFhVamhb7K7Mj3BAlc3Xhp
-         T+D25UrZtnmkCUpefryHbGVX3h8RtLncNaNLy2XNqJndiPHRJNcdwEim8YycAnuJdeMp
-         jvOMQvtwZKIJhWsAYXfQlTw/mLkkWHi9eMTxkFUIN0heJoK6vZP29wen9E0nWHZuHnLY
-         jehcy1NZFkBFe5x97Tp5fksPE4v6ZLHxG5H4P8VKIOIEmPe0++CZhXUCLNXuH6s4BnA1
-         0CgOH9hnvM/GS+qVthDtzFW3n0i2eu3n6do/t21QyWsIo5n2UTDRjuFP7QFthlnIgRtJ
-         cgVQ==
-X-Gm-Message-State: AC+VfDyklabIZ8nguZFXNBxrVokESYGjMwbZGluBNK2cinJgM1L/GCJK
-        fjGuSVjcf2sjOBRYdtNQAi1o8g==
-X-Google-Smtp-Source: ACHHUZ7xPFCjfZgnxJjwQ1q3sKhEpq9jWYbgE8XVf82gwX/CzK1u2s1hoM6OrcuqCwZHD2o13qE15g==
-X-Received: by 2002:a5d:4fce:0:b0:307:86fb:dada with SMTP id h14-20020a5d4fce000000b0030786fbdadamr818073wrw.36.1684395176400;
-        Thu, 18 May 2023 00:32:56 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id g8-20020adfe408000000b002f9e04459desm1160629wrm.109.2023.05.18.00.32.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 May 2023 00:32:56 -0700 (PDT)
-Date:   Thu, 18 May 2023 09:32:55 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Haibo Xu <xiaobo55x@gmail.com>
-Cc:     Haibo Xu <haibo1.xu@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        with ESMTP id S230160AbjERHiZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 03:38:25 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 163E0ED;
+        Thu, 18 May 2023 00:38:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A75A964D6F;
+        Thu, 18 May 2023 07:38:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEE5CC4339B;
+        Thu, 18 May 2023 07:38:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684395503;
+        bh=Ceo3lyC/EwdTNGI5NUXzd4YJkOb6wd2EkIraNcTbQQc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=RLB6p1ywGt+LBd2Qmq5hcPqfttFG614vnyUj1r5Ty26GytDdISZFSM9DQDaFxm1Px
+         k8BpJsUBr6Sy3j2jenlA32KO3sSxHHhswZjftoqHcHIVGiJ/Wi9VGQTqK0Uyghm0Lq
+         gWnABgKsK6ZbScOvMoYRN3PdQQaUJUrcHVWMoF9bGnlyuI7WhkHOaBYCf+vCh/p3jj
+         /V0GraVhUaJ/waydKdq97ngVY+EYInMqACdDa1LGdS0x1uHVO1KuFJGsrZWthI6SZO
+         7Z3BtXSqsNecDaP3knbL/DR0NoY4Lpzvv6zpgE17sA4pZvubSxMQ35VNzGU5ClvERL
+         7ZqcdCa7XsyXw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pzYDM-00G4j7-Op;
+        Thu, 18 May 2023 08:38:20 +0100
+Date:   Thu, 18 May 2023 08:38:20 +0100
+Message-ID: <86jzx6ks2b.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Anup Patel <anup@brainfault.org>,
         Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org, kvmarm@lists.linux.dev,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 2/2] KVM: selftests: Add riscv get-reg-list test
-Message-ID: <20230518-60da3b82641bdaccec589b8b@orel>
-References: <cover.1683791148.git.haibo1.xu@intel.com>
- <751a84a9691c86df0e65cdb02abf1e073892d1ca.1683791148.git.haibo1.xu@intel.com>
- <20230511-28ec368a8168342c68ca2187@orel>
- <CAJve8okVFr-m6go6dCg7Cf=Uq3Yt9Xmxi0Z3B2vbWvahvx4GgA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJve8okVFr-m6go6dCg7Cf=Uq3Yt9Xmxi0Z3B2vbWvahvx4GgA@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 0/2] KVM: Fix race between reboot and hardware enabling
+In-Reply-To: <20230512233127.804012-1-seanjc@google.com>
+References: <20230512233127.804012-1-seanjc@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org, atishp@atishpatra.org, kvm-riscv@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,46 +74,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 18, 2023 at 12:17:18PM +0800, Haibo Xu wrote:
-...
-> > The idea of these *to_str functions is to dump output that can be
-> > copy+pasted into a reg array (hence the trailing commas in print_reg
-> > lines). So we can't just print random lines here or return '##UNKOWN##',
-> > as that won't compile. Instead, the default should return
-> >
-> >   str_with_index("KVM_REG_RISCV_CONFIG_REG(##)", reg_off)
-> >
+On Sat, 13 May 2023 00:31:25 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
 > 
-> Thanks for sharing the detailed idea, will fix it in next version!
-
-I guess we could also return a string like,
-
-"KVM_REG_RISCV_CONFIG_REG(##) /* UNKNOWN */"
-
-as that would still compile and also convey the message that this
-register doesn't have a name because the test doesn't know it yet.
-
-...
-> > We should share all the code above, except print_reg(), with aarch64.
-> > I'll send a patch series that splits the arch-neutral code out of
-> > the aarch64 test that you can base this test on.
-> >
+> Fix a bug where enabling hardware virtualization can race with a forced
+> reboot, e.g. `reboot -f`, and result in virt hardware being enabled when
+> the reboot is attempted, and thus hanging the reboot.
 > 
-> Good idea! I will rebase the patch based on your work.
->
+> Found by inspection, confirmed by hacking the reboot flow to wait until
+> KVM loads (the problematic window is ridiculously small).
+> 
+> Fully tested only on x86, compile tested on other architectures.
+> 
+> v2:
+>  - Rename KVM's callback to kvm_shutdown() to match the hook. [Marc]
+>  - Don't add a spurious newline. [Marc]
+> 
+> v1: https://lore.kernel.org/all/20230310221414.811690-1-seanjc@google.com
+> 
+> Sean Christopherson (2):
+>   KVM: Use syscore_ops instead of reboot_notifier to hook
+>     restart/shutdown
+>   KVM: Don't enable hardware after a restart/shutdown is initiated
+> 
+>  virt/kvm/kvm_main.c | 43 +++++++++++++++++++++++++++----------------
+>  1 file changed, 27 insertions(+), 16 deletions(-)
 
-Ok, I've pushed patches to [1]. This series introduces two things to KVM
-selftests. Primarily it splits the aarch64/get-reg-list test into a
-cross-arch get-reg-list test and an $ARCH_DIR/get-reg-list.o object file,
-which the cross-arch test depends on. To do that, it also introduces the
-concept of a "split test", a test that has a cross-arch part which depends
-on an arch-specific part. Using a split test is cleaner than the
-#ifdeffery we usually do for cross-arch tests.
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-I've added kvmarm@lists.linux.dev, Marc, Oliver, and Sean to the CC of
-this message. You'll want to add them when you post v2 as well.
+	M.
 
-[1] https://github.com/jones-drew/linux/commits/arm64/kself/get-reg-list
-
-Thanks,
-drew
+-- 
+Without deviation from the norm, progress is not possible.
