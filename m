@@ -2,375 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43F73708898
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 21:49:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5788770889F
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 21:51:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230244AbjERTtI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 15:49:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33522 "EHLO
+        id S230268AbjERTvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 15:51:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229644AbjERTtG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 May 2023 15:49:06 -0400
-Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58A97E6A
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 12:49:04 -0700 (PDT)
-Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-19a36435e81so34742fac.1
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 12:49:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684439343; x=1687031343;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qk5Lbn69kj1bFKsvMlF20IOUXzLua8Iu4G9yP2dd/EI=;
-        b=ocpMoi9fjhzQm3NNFbZ+ww90Vj1QVzcRB2U3Cch/3Klr+98dL/qQpASmVM6l1yBgbS
-         4YE0cawWM6wZOLdoI4HQeRJchBwHWxFWQYWCTIi0MpttqTyhczoez6zvgeH22GZo6tl6
-         /3g4i/YGmUB4IW50qRs5ssMjjSk9LhI7mSmicOoHe935Nbsxipc9Ym8xi3jzAkp9KwQt
-         LreKwk66mFuQ99m1bGocWw+bRGzrCIKub6tOqhFdw3X79L2HBV6L20kwJD04yqbIgoYV
-         rSoU0ZrSP/d7yMgD6pMfx/3H7EHOl5AzhhPwtcMQt8ZisgEHgFypqMf5ZX1hYW64Ko8e
-         WoSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684439343; x=1687031343;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qk5Lbn69kj1bFKsvMlF20IOUXzLua8Iu4G9yP2dd/EI=;
-        b=et60YqMkJ+i7gVh5fNRgmh00ta9Xg5mDcy4+OZHngJSKuo/GmAJBEdhLjpuZwdKx84
-         IbmqZs+sZ/ZdQwn4uNY4Bkin+8OUkJUGOoYnxciZwlqFTGTHesS23YRoTCzTIczV95Hy
-         0LqaCp5bLiDK7oAmjh4kqplvjyPVJZhsHwnTFiwuU77RwFcUe5xvroh7414rSKvoHlrY
-         Hsm9h3ttJ7tr1mBOrWzzJf7h3y8sn9xAVE7GoVQHlnffCS2LabSGQgry8WgEvU224GrL
-         oLnRJVei02cswXV5H5ecdUXMHENV6YTDvBT7YDdcysy/sCmCF8b1Hsx077Nah/d2IbQM
-         QWCg==
-X-Gm-Message-State: AC+VfDxBQTv9KtX1OpsJ13NisnIalU8kskpsRLua46XuBMBolo3sSkKm
-        jjobCEkJo4tA9kiNXikO8aWdhjWjo3W4zOfPNMH0bA==
-X-Google-Smtp-Source: ACHHUZ7HZXZEIv1lu9n48kvOiudc6d5E1YViqp6VaQGEmYLbUhtgMlmViU3shS53V91FoJDQGcNClrUp/aobJ8o6oMw=
-X-Received: by 2002:a05:6870:9565:b0:196:37ab:95e9 with SMTP id
- v37-20020a056870956500b0019637ab95e9mr148775oal.8.1684439343565; Thu, 18 May
- 2023 12:49:03 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230517061015.1915934-1-jingzhangos@google.com>
- <20230517061015.1915934-2-jingzhangos@google.com> <2e727b02fe9141098ed474ef49ddc495@huawei.com>
-In-Reply-To: <2e727b02fe9141098ed474ef49ddc495@huawei.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 18 May 2023 12:48:52 -0700
-Message-ID: <CAAdAUtiWkqaymY3e3=m3YHw9FNGYf6rsFsAVkFKpUh-p9nd+gQ@mail.gmail.com>
-Subject: Re: [PATCH v9 1/5] KVM: arm64: Save ID registers' sanitized value per guest
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        with ESMTP id S230252AbjERTvE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 15:51:04 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2065.outbound.protection.outlook.com [40.107.220.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E43BDE6D;
+        Thu, 18 May 2023 12:51:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Z8yWA45AjZGd7Wku0k0t4Z2gZudEzppmMTQmxmZVtG+6vA2Mc/N/qxXtYaNGiFERvpHr4MLHQ73ukYeOlTIulg9I8f3id6GnT4DnsE1a/yIHDr1KTgKccKuz8xZJchQfdpFVurQ7xBKHppKEj5YlCpYbmhzFGxlLajkrs/EDaxzLBhv/Sf5hO4yvEVF3LPyCkODDx1fkQAFEFP8/7h3JrlA1bE3+PjEOXRP7TXkSJhvjjqPfjpjiIdZAuPZii5skWkHOhGsX8GwRSrX2Z6+gylK8FyHvbExSEIHVffvJfl8oVCw4EPoibvdfqQcFWbI9aSdqzpre3T6bSc+d1GDVzA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=m7fBIhCoyq8ZaDvAZ1+zTUyTyDQkQzr/8pBunfZXGQk=;
+ b=OgYqaRpeLzvsxEwpcgUmM5MOX8Z/oEMcvyg6Y1mlVEykD2hSaaGX3bms1tcjReSu7/dgQhjkwBwThb64SeEDDg3Y/CgJcMQrD406KQ5YShjnisT7muEZODBofMY98hW1oKlfj7HlrWcAIl21voH4RQwQVd/4ECu0igoyDn9CCLA5qR9k+HrT9xjBi7GWWykhyB9uZgO0jXpd8ztLfvA4/z/toZMp9cBO55WPTcp2OdC3IPu8Q8WMo7v5Y/JpPef73B+cOMah4wxzNNHj8qH6OUNoHcbV4ICTDlor2MuBcGgSPXfMqgepu3ikkT5xKXndv4mXTN1oZ/0p84OYpRXzJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m7fBIhCoyq8ZaDvAZ1+zTUyTyDQkQzr/8pBunfZXGQk=;
+ b=FoZYgfUBJIylq7U0O5H6FJ6hhi++sOfF95E9qWS8yMYWRuf3agRiqiCW6juZ3xwIJV7fOtIupyqTjspET8VHEBWLb4KKLHTKBVaogtZ3ridL0G4dksl8HL6cmEc/SRUWYWzd/d6FW5nxRnARIyYk/Apze8dWrtpkd/gwuYvNRYg=
+Received: from BL1PR13CA0144.namprd13.prod.outlook.com (2603:10b6:208:2bb::29)
+ by DM4PR12MB6566.namprd12.prod.outlook.com (2603:10b6:8:8d::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.19; Thu, 18 May
+ 2023 19:50:59 +0000
+Received: from BL02EPF000145B9.namprd05.prod.outlook.com
+ (2603:10b6:208:2bb:cafe::8f) by BL1PR13CA0144.outlook.office365.com
+ (2603:10b6:208:2bb::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.6 via Frontend
+ Transport; Thu, 18 May 2023 19:50:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL02EPF000145B9.mail.protection.outlook.com (10.167.241.209) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6411.11 via Frontend Transport; Thu, 18 May 2023 19:50:59 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Thu, 18 May
+ 2023 14:50:58 -0500
+Date:   Thu, 18 May 2023 14:50:22 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sagi Shahar <sagis@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Anish Ghulati <aghulati@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Houghton <jthoughton@google.com>,
+        Anish Moorthy <amoorthy@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        "David Woodhouse" <dwmw@amazon.co.uk>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Guang Zeng <guang.zeng@intel.com>,
+        Hou Wenlong <houwenlong.hwl@antgroup.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Jing Liu <jing2.liu@intel.com>,
+        Junaid Shahid <junaids@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Leonardo Bras <leobras@redhat.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Li RongQing <lirongqing@baidu.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Michal Luczaj <mhal@rbox.co>,
+        Mingwei Zhang <mizhang@google.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Paul Durrant <pdurrant@amazon.com>,
+        Peng Hao <flyingpenghao@gmail.com>,
+        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+        Robert Hoo <robert.hu@linux.intel.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        "Xiaoyao Li" <xiaoyao.li@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
         Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Qinglan Xiang <qinglan.xiang@intel.com>,
+        "Kai Svahn" <kai.svahn@intel.com>,
+        Margarita Maroto <margarita.maroto@intel.com>,
+        Anil Keshavamurthy <anil.s.keshavamurthy@intel.com>,
+        Nagareddy Reddy <nspreddy@google.com>,
+        <linux-kernel@vger.kernel.org>, <Dhaval.Giani@amd.com>
+Subject: Re: [ANNOUNCE / RFC] Periodic Upstream Call for KVM
+Message-ID: <20230518195022.osqj2b34vijvrfrm@amd.com>
+References: <20230512231026.799267-1-seanjc@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230512231026.799267-1-seanjc@google.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF000145B9:EE_|DM4PR12MB6566:EE_
+X-MS-Office365-Filtering-Correlation-Id: e43c1d9a-7af9-45d1-b9e9-08db57d933de
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: PVSoziAU0uVC5XQz5iPEKG/BpprgNZShSrPcoNCRtDtioOtHAwLWnPswLiRmHBZK5tqspIWRMFKQdWrsNCjzHiTl1Q86gZIKsulAX+QAe76CZtT5B6E6UF1gFCEt1IbtvZAqHG+C9vHShrVvHex1a5MVpVrbJsRKEtZcsORbIlT+/WCoOdTtrJt3uZ3bl8uWvBMH/YEZhRnpfOaUl7W6Zx9U6Y7rW6oSlMSyKUCaFEUB6gaKipJD435lttv3yZmmj4jbRjPqAkC7GavDYBTdvbABpQIRWjxyxWql2PsMEI7nzNH3qDk+72Acq4hEdzFb12XWNvUm3hYGplvXa3gisppjcTkYoMogJidMYzHVae8dJc958xxjWUeVvp7lsZWRtd3lTO+Z16DHU1SMQrJ5FOpQn+C1tK8RRJWjoOj4so+hal+yYlDbLj57RpQ1GaKsHIYTOMHvHBu0rHYfEPmbAxkd9JxQQb39F0aI2Xphh9UWApQEPqRYM6EuYztNvIwmmtRWBzxKnXOlAQlzkg4gTYY3cz8Dz37dNJrIZDFYjmDRV0wObcyTbZ7/UKGlfSvI9te0B6qvgZoPLxSEbhXSs60VEYElAdAv/ObABsE5vkWUsUpJpF7TFfJVhpt520dPmaN/dT2u5iSn45aM8Lp+Iy6qTvI8GzzrFXrBTUqCUENP2jxkx0cOBWI0wejY316Mqy4A/ZEerz5nIjNHfcIB/WMuvmtfH6+o9LPHNQ89ZooHLjR1+FhkJwd1eTerOHC7G1VLW959hv3OQVgL5Eit9Q==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(396003)(39860400002)(346002)(451199021)(40470700004)(46966006)(36840700001)(44832011)(86362001)(36756003)(7366002)(8936002)(356005)(40480700001)(82310400005)(8676002)(7416002)(7406005)(82740400003)(81166007)(47076005)(2616005)(426003)(336012)(40460700003)(6666004)(16526019)(83380400001)(2906002)(36860700001)(41300700001)(70206006)(186003)(26005)(1076003)(70586007)(4326008)(316002)(54906003)(5660300002)(6916009)(478600001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2023 19:50:59.2186
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e43c1d9a-7af9-45d1-b9e9-08db57d933de
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF000145B9.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6566
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shameerali,
+On Fri, May 12, 2023 at 04:10:27PM -0700, Sean Christopherson wrote:
+> I am "officially" announcing a Periodic Upstream Call for KVM, a.k.a. PUCK.
+> The intent of the PUCK is to provide a vehicle for having "in-person" technical
+> discussions of features, designs, problems, etc. that are cumbersome to discuss
+> asynchronously on-list, e.g. because something is too complex, too large, etc.
+> 
+> Exact details are TBD, and obviously can be adapted as needed.  Proposal:
+> 
+>   Frequency: Weekly
+>   Time:      Wednesday, 6:00am Pacific Time
+>   Duration:  60 minutes
+>   Software:  ???
+> 
+> My thinking for weekly versus fortnightly (every other week) is that we can always
+> cancel meetings if there are no agenda items, and bump down to fortnightly if we
+> are constantly canceling.  On the flip side, if we go with fortnightly, it'd be
+> more difficult to clear the backlog if PUCK gets booked out multiple sessions, and
+> PUCK would be less useful for discussing urgent issues.
+> 
+> As for the time, 6am Pacific Time was the least awful (and still quite awful IMO)
+> time I could find that gives the majority of the community a reasonable chance of
+> attending.  I know we have developers in at least the below time zones (and probably
+> more, though I don't think anyone works from Hawaii, and if someone does work from
+> Hawaii then they have nothing to complain about :-) ).
+> 
+>   PT   (6am)
+>   MT   (7am)
+>   CT   (8am)
+>   ET   (9am)
+>   WET  (2pm)
+>   CET  (3pm)
+>   EET  (4pm)
+>   EST  (5pm)
+>   CST  (9pm)
+>   NZST (1am)
+> 
+> The obvious alternative would be to invert the schedule and have the sync be in
+> the evening/night for Pacific Time, but to get 6am for ARM folks, we end up with:
+> 
+>   PT   (10pm)
+>   MT   (11pm)
+>   CT   (12pm)
+>   ET   (1am)
+>   WET  (6am)
+>   CET  (7am)
+>   EET  (8am)
+>   EST  (9am)
+>   CST  (1pm)
+>   NZST (5pm)
+> 
+> which is quite unreasonable for pretty much everyone based in the US.  Earlier
+> than 6am for WET is likewise unreasonable and will result in people not attending.
+> 9pm for China is also unreasonable, but I hope that it's not completely ridiculous
+> and is doable enough that people can at least attend on an as-needed basis.  Sorry
+> Kai, as the sole representative from New Zealand, you get hosed :-(
+> 
+> Wednesday because holidays and (short) vacations most often land at the beginning
+> and end of the week.
+> 
+> 60 minutes because I'm not waking up at dawn for anything less, and anything
+> more will likely have dimishing returns, especially for folks on the edges of
+> the time zone table.
+> 
+> Lastly, the big unknown is which video communication software to use.  My default
+> is obviously Google Meet, but I've been told that Meet is unusable in some
+> countries. :-/  My only requirements (beyond basic, obvious functionality) are
+> that (a) there's a web interface (no install required) and that (b) the calls can
+> be recorded.
+> 
+> To kick things off, I am leaning toward a "launch" date of May 24th (Pacific),
+> with KVM guest private mem (a.k.a. UPM) as the first topic.
 
-On Thu, May 18, 2023 at 12:17=E2=80=AFAM Shameerali Kolothum Thodi
-<shameerali.kolothum.thodi@huawei.com> wrote:
->
->
->
-> > -----Original Message-----
-> > From: Jing Zhang [mailto:jingzhangos@google.com]
-> > Sent: 17 May 2023 07:10
-> > To: KVM <kvm@vger.kernel.org>; KVMARM <kvmarm@lists.linux.dev>;
-> > ARMLinux <linux-arm-kernel@lists.infradead.org>; Marc Zyngier
-> > <maz@kernel.org>; Oliver Upton <oupton@google.com>
-> > Cc: Will Deacon <will@kernel.org>; Paolo Bonzini <pbonzini@redhat.com>;
-> > James Morse <james.morse@arm.com>; Alexandru Elisei
-> > <alexandru.elisei@arm.com>; Suzuki K Poulose <suzuki.poulose@arm.com>;
-> > Fuad Tabba <tabba@google.com>; Reiji Watanabe <reijiw@google.com>;
-> > Raghavendra Rao Ananta <rananta@google.com>; Jing Zhang
-> > <jingzhangos@google.com>
-> > Subject: [PATCH v9 1/5] KVM: arm64: Save ID registers' sanitized value =
-per
-> > guest
-> >
-> > Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
-> > and save ID registers' sanitized value in the array at KVM_CREATE_VM.
-> > Use the saved ones when ID registers are read by the guest or
-> > userspace (via KVM_GET_ONE_REG).
-> >
-> > No functional change intended.
-> >
-> > Co-developed-by: Reiji Watanabe <reijiw@google.com>
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 20 +++++++++
-> >  arch/arm64/kvm/arm.c              |  1 +
-> >  arch/arm64/kvm/sys_regs.c         | 69
-> > +++++++++++++++++++++++++------
-> >  arch/arm64/kvm/sys_regs.h         |  7 ++++
-> >  4 files changed, 85 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h
-> > b/arch/arm64/include/asm/kvm_host.h
-> > index 7e7e19ef6993..949a4a782844 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -178,6 +178,21 @@ struct kvm_smccc_features {
-> >       unsigned long vendor_hyp_bmap;
-> >  };
-> >
-> > +/*
-> > + * Emulated CPU ID registers per VM
-> > + * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
-> > + * is (3, 0, 0, crm, op2), where 1<=3Dcrm<8, 0<=3Dop2<8.
-> > + *
-> > + * These emulated idregs are VM-wide, but accessed from the context of=
- a
-> > vCPU.
-> > + * Access to id regs are guarded by kvm_arch.config_lock.
-> > + */
-> > +#define KVM_ARM_ID_REG_NUM   56
-> > +#define IDREG_IDX(id)                (((sys_reg_CRm(id) - 1) << 3) | s=
-ys_reg_Op2(id))
-> > +#define IDREG(kvm, id)               ((kvm)->arch.idregs.regs[IDREG_ID=
-X(id)])
-> > +struct kvm_idregs {
-> > +     u64 regs[KVM_ARM_ID_REG_NUM];
-> > +};
-> >
->
-> Not sure we really need this struct here. Why can't this array be moved t=
-o
-> struct kvm_arch directly?
-It was put in kvm_arch directly before, then got into its own
-structure in v5 according to the comments here:
-https://lore.kernel.org/all/861qlaxzyw.wl-maz@kernel.org/#t
->
-> >  typedef unsigned int pkvm_handle_t;
-> >
-> >  struct kvm_protected_vm {
-> > @@ -253,6 +268,9 @@ struct kvm_arch {
-> >       struct kvm_smccc_features smccc_feat;
-> >       struct maple_tree smccc_filter;
-> >
-> > +     /* Emulated CPU ID registers */
-> > +     struct kvm_idregs idregs;
-> > +
-> >       /*
-> >        * For an untrusted host VM, 'pkvm.handle' is used to lookup
-> >        * the associated pKVM instance in the hypervisor.
-> > @@ -1045,6 +1063,8 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm
-> > *kvm,
-> >  int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
-> >                                   struct kvm_arm_counter_offset *offset=
-);
-> >
-> > +void kvm_arm_init_id_regs(struct kvm *kvm);
-> > +
-> >  /* Guest/host FPSIMD coordination helpers */
-> >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-> >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 14391826241c..774656a0718d 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -163,6 +163,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned
-> > long type)
-> >
-> >       set_default_spectre(kvm);
-> >       kvm_arm_init_hypercalls(kvm);
-> > +     kvm_arm_init_id_regs(kvm);
-> >
-> >       /*
-> >        * Initialise the default PMUver before there is a chance to
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 71b12094d613..d2ee3a1c7f03 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -41,6 +41,7 @@
-> >   * 64bit interface.
-> >   */
-> >
-> > +static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
-> >  static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
-> >
-> >  static bool read_from_write_only(struct kvm_vcpu *vcpu,
-> > @@ -364,7 +365,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
-> >                         struct sys_reg_params *p,
-> >                         const struct sys_reg_desc *r)
-> >  {
-> > -     u64 val =3D read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> > +     u64 val =3D kvm_arm_read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
-> >       u32 sr =3D reg_to_encoding(r);
-> >
-> >       if (!(val & (0xfUL << ID_AA64MMFR1_EL1_LO_SHIFT))) {
-> > @@ -1208,16 +1209,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
-> >       }
-> >  }
-> >
-> > -/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> > -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_des=
-c
-> > const *r)
-> > +static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-> >  {
-> > -     u32 id =3D reg_to_encoding(r);
-> > -     u64 val;
-> > -
-> > -     if (sysreg_visible_as_raz(vcpu, r))
-> > -             return 0;
-> > -
-> > -     val =3D read_sanitised_ftr_reg(id);
-> > +     u64 val =3D IDREG(vcpu->kvm, id);
-> >
-> >       switch (id) {
-> >       case SYS_ID_AA64PFR0_EL1:
-> > @@ -1280,6 +1274,26 @@ static u64 read_id_reg(const struct kvm_vcpu
-> > *vcpu, struct sys_reg_desc const *r
-> >       return val;
-> >  }
-> >
-> > +/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> > +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_des=
-c
-> > const *r)
-> > +{
-> > +     if (sysreg_visible_as_raz(vcpu, r))
-> > +             return 0;
-> > +
-> > +     return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
-> > +}
-> > +
-> > +/*
-> > + * Return true if the register's (Op0, Op1, CRn, CRm, Op2) is
-> > + * (3, 0, 0, crm, op2), where 1<=3Dcrm<8, 0<=3Dop2<8.
-> > + */
-> > +static inline bool is_id_reg(u32 id)
-> > +{
-> > +     return (sys_reg_Op0(id) =3D=3D 3 && sys_reg_Op1(id) =3D=3D 0 &&
-> > +             sys_reg_CRn(id) =3D=3D 0 && sys_reg_CRm(id) >=3D 1 &&
-> > +             sys_reg_CRm(id) < 8);
-> > +}
-> > +
-> >  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
-> >                                 const struct sys_reg_desc *r)
-> >  {
-> > @@ -2244,8 +2258,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
-> >       if (p->is_write) {
-> >               return ignore_write(vcpu, p);
-> >       } else {
-> > -             u64 dfr =3D read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-> > -             u64 pfr =3D read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> > +             u64 dfr =3D kvm_arm_read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1=
-);
-> > +             u64 pfr =3D kvm_arm_read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1=
-);
->
-> Does this change the behavior slightly as now within the kvm_arm_read_id_=
-reg()
-> the val will be further adjusted based on KVM/vCPU?
-That's a good question. Although the actual behavior would be the same
-no matter read idreg with read_sanitised_ftr_reg or
-kvm_arm_read_id_reg, it is possible that the behavior would change
-potentially in the future.
-Since now every guest has its own idregs, for every guest, the idregs
-should be read from kvm_arm_read_id_reg instead of
-read_sanitised_ftr_reg.
-The point is, for trap_dbgdidr, we should read AA64DFR0/AA64PFR0 from
-host or the VM-scope?
->
-> Thanks,
-> Shameer
->
-> >               u32 el3 =3D !!cpuid_feature_extract_unsigned_field(pfr,
-> > ID_AA64PFR0_EL1_EL3_SHIFT);
-> >
-> >               p->regval =3D ((((dfr >> ID_AA64DFR0_EL1_WRPs_SHIFT) & 0x=
-f) <<
-> > 28) |
-> > @@ -3343,6 +3357,37 @@ int kvm_arm_copy_sys_reg_indices(struct
-> > kvm_vcpu *vcpu, u64 __user *uindices)
-> >       return write_demux_regids(uindices);
-> >  }
-> >
-> > +/*
-> > + * Set the guest's ID registers with ID_SANITISED() to the host's sani=
-tized
-> > value.
-> > + */
-> > +void kvm_arm_init_id_regs(struct kvm *kvm)
-> > +{
-> > +     const struct sys_reg_desc *idreg;
-> > +     struct sys_reg_params params;
-> > +     u32 id;
-> > +
-> > +     /* Find the first idreg (SYS_ID_PFR0_EL1) in sys_reg_descs. */
-> > +     id =3D SYS_ID_PFR0_EL1;
-> > +     params =3D encoding_to_params(id);
-> > +     idreg =3D find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_des=
-cs));
-> > +     if (WARN_ON(!idreg))
-> > +             return;
-> > +
-> > +     /* Initialize all idregs */
-> > +     while (is_id_reg(id)) {
-> > +             /*
-> > +              * Some hidden ID registers which are not in arm64_ftr_re=
-gs[]
-> > +              * would cause warnings from read_sanitised_ftr_reg().
-> > +              * Skip those ID registers to avoid the warnings.
-> > +              */
-> > +             if (idreg->visibility !=3D raz_visibility)
-> > +                     IDREG(kvm, id) =3D read_sanitised_ftr_reg(id);
-> > +
-> > +             idreg++;
-> > +             id =3D reg_to_encoding(idreg);
-> > +     }
-> > +}
-> > +
-> >  int __init kvm_sys_reg_table_init(void)
-> >  {
-> >       bool valid =3D true;
-> > diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> > index 6b11f2cc7146..eba10de2e7ae 100644
-> > --- a/arch/arm64/kvm/sys_regs.h
-> > +++ b/arch/arm64/kvm/sys_regs.h
-> > @@ -27,6 +27,13 @@ struct sys_reg_params {
-> >       bool    is_write;
-> >  };
-> >
-> > +#define encoding_to_params(reg)                                       =
-       \
-> > +     ((struct sys_reg_params){ .Op0 =3D sys_reg_Op0(reg),             =
- \
-> > +                               .Op1 =3D sys_reg_Op1(reg),             =
- \
-> > +                               .CRn =3D sys_reg_CRn(reg),             =
- \
-> > +                               .CRm =3D sys_reg_CRm(reg),             =
- \
-> > +                               .Op2 =3D sys_reg_Op2(reg) })
-> > +
-> >  #define esr_sys64_to_params(esr)
-> > \
-> >       ((struct sys_reg_params){ .Op0 =3D ((esr) >> 20) & 3,
-> > \
-> >                                 .Op1 =3D ((esr) >> 14) & 0x7,          =
-        \
-> > --
-> > 2.40.1.606.ga4b1b128d6-goog
-> >
->
-Thanks,
-Jing
+Hi Sean,
+
+Seems like a great idea to me.
+
+We have a number of people at AMD interested in joining for the UPM topic. Is
+the proposed 6am Pacific slot still the plan? No objections to using Google
+Meet on our end.
+
+-Mike
+
+> 
+> Please chime in with thoughts and ideas!
+> 
+> 
+> P.S. This is an open invite, feel free to forward at will.  The Cc list is by no
+> means intended to be definitive.
