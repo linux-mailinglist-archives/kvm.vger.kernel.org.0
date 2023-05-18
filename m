@@ -2,123 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 505917083C1
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 16:14:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4508F708486
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 17:03:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230252AbjEROOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 10:14:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47552 "EHLO
+        id S231475AbjERPC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 11:02:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229884AbjEROOo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 May 2023 10:14:44 -0400
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3D14DC;
-        Thu, 18 May 2023 07:14:43 -0700 (PDT)
+        with ESMTP id S231219AbjERPCx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 11:02:53 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 774521B6
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 08:02:25 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-561f6e63decso11218277b3.1
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 08:02:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1684419284; x=1715955284;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=/EG3kAoZFFoNmCZxjC6esPJxCN2aXyXfUCBCGN6t9H4=;
-  b=qBiCGTIDiOH5mAN/A1EqCjfnfQD5UEeF0WyP4RV2uHoX7qGpZGzf4duW
-   0yMhRbzAAmSmp0GRH0HovwkRb4cGIvtAWSK1ecn4nUm3nRjEGrVqc1lmx
-   Iw66bOVbWhiyFSGmzdzwIYgfu4WonYLO+qTOg2SJoGC/eOad/DGddivU2
-   s=;
-X-IronPort-AV: E=Sophos;i="5.99,285,1677542400"; 
-   d="scan'208";a="214654107"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-b404fda3.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2023 14:14:41 +0000
-Received: from EX19MTAUWB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1d-m6i4x-b404fda3.us-east-1.amazon.com (Postfix) with ESMTPS id 1BC99822CA;
-        Thu, 18 May 2023 14:14:39 +0000 (UTC)
-Received: from EX19D002ANA003.ant.amazon.com (10.37.240.141) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Thu, 18 May 2023 14:14:38 +0000
-Received: from b0f1d8753182.ant.amazon.com (10.106.82.23) by
- EX19D002ANA003.ant.amazon.com (10.37.240.141) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.26;
- Thu, 18 May 2023 14:14:35 +0000
-From:   Takahiro Itazuri <itazur@amazon.com>
-To:     <kvm@vger.kernel.org>
-CC:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        <linux-kernel@vger.kernel.org>,
-        Takahiro Itazuri <zulinx86@gmail.com>,
-        Takahiro Itazuri <itazur@amazon.com>
-Subject: [RESEND PATCH v2] KVM: x86: Update KVM_GET_CPUID2 to return valid entry count
-Date:   Thu, 18 May 2023 15:14:20 +0100
-Message-ID: <20230518141420.37404-1-itazur@amazon.com>
-X-Mailer: git-send-email 2.38.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.82.23]
-X-ClientProxiedBy: EX19D035UWB003.ant.amazon.com (10.13.138.85) To
- EX19D002ANA003.ant.amazon.com (10.37.240.141)
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,
-        T_SPF_PERMERROR autolearn=ham autolearn_force=no version=3.4.6
+        d=google.com; s=20221208; t=1684422073; x=1687014073;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=COEcCFWgCbplE1MtlqGXZIriKuoSjyaM69XcEc43hFs=;
+        b=V4t31ISM6ddijUWJrMbzNdsub50JqaWK0bG2NFCCpmTFivM5lhHY9OWHzMC0C/HCMT
+         Ja37GZLQK+L91ygKXO4cJFqPAoIr3jFi1MTJXKDiS/EGFspP9Frt+o9dDL8Nt0rXY7Ua
+         Ausy7uWZTyz5+fN5nyBn1wmlxoKRTBGWLWJlig0yVzR79vIUv/RMFOFcXJiDrmQZoa6d
+         HQy+bLYpiwmqRs3B2j7jXF2JXzKsYXuDfjdrnYJNbxh/Km+HRilenhnoRg1cmJFynjeP
+         xxeuMJ42jYGmeu3M3IZ8qsQ+6U1GzhFBwKRh08c9gxKDFBu4fbkUTLHLge/Lo83UhALz
+         gvEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684422073; x=1687014073;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=COEcCFWgCbplE1MtlqGXZIriKuoSjyaM69XcEc43hFs=;
+        b=RVn4ECi+ITOTNHrWC4Eid3gwaZDc6U9M/GDQFBBuw/QIgWMYodH0EV7R0VWHkf3XBn
+         N29sJBCLmRuBAxGcmJ32DlZgAxBDuPcSBtxINm0q718zMV8RxULYhc8vuVJtn+Eg6aXF
+         BCURxAhdrP1Yo6v28tajSXaZnVcU9STHif1u/6sOYN5E1vGFGXYc/gNjoIHMbIEMD+gq
+         uZoVGp3UhwZsne5P6HqHff1ytK4czuW6xyOmgvAjps/FZwe5FXycD2eIOXRe70yR7Kv0
+         Vylbh/PCAsWUhDQPV2aSjIVbaViivA4+gsDvUQQyrLZ1R+pqdtFaacSN4dkMEHDkbA8/
+         AEGA==
+X-Gm-Message-State: AC+VfDxZFBJRjXRX2teWTM3vOLXeazpliDHKy8tpuH7vpqTVm+EE84I8
+        50p1K3Qfo25TC+YBWJCzbKpbkSiR+dA=
+X-Google-Smtp-Source: ACHHUZ7IX6Wx0LSBkpzQqjr+OXaJS2pKyVuTTzwb3z0a97s/un34w9qdMEO5QA63WIOBuZvYpFhahx6OOmI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:e50e:0:b0:561:3149:d684 with SMTP id
+ s14-20020a81e50e000000b005613149d684mr1180910ywl.10.1684422072950; Thu, 18
+ May 2023 08:01:12 -0700 (PDT)
+Date:   Thu, 18 May 2023 08:01:11 -0700
+In-Reply-To: <babafe0f-3154-fb0a-346f-2bbea48a366e@gmail.com>
+Mime-Version: 1.0
+References: <71288f04-546c-9af3-e29a-eb3c44e0d948@gmail.com> <babafe0f-3154-fb0a-346f-2bbea48a366e@gmail.com>
+Message-ID: <ZGY9twXBuTWpliAB@google.com>
+Subject: Re: Fwd: Persistent rt_sigreturn segfaults on KVM VMs after upgrade
+ to 5.15
+From:   Sean Christopherson <seanjc@google.com>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Regressions <regressions@lists.linux.dev>,
+        Linux KVM <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, Theodor Milkov <tm@del.bg>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Modify the KVM_GET_CPUID2 API to return the number of valid entries in
-nent field of kvm_cpuid2 even on success.
+On Thu, May 18, 2023, Bagas Sanjaya wrote:
+> On 5/18/23 20:57, Bagas Sanjaya wrote:
+> > Hi,
+> > 
+> > I notice a regression report on Bugzilla [1]. Quoting from it:
+> > 
+> >> I'm experiencing sporadic but persistent segmentation faults on the KVM
+> >> VMs I manage. These faults began appearing after upgrading from Linux
+> >> Kernel 4.x to 5.15.59. I further upgraded to 5.15.91 and transitioned the
+> >> userspace from Debian 10 (buster) to Debian 11 (bullseye), yet the issues
+> >> persist. Notably, the libc has also changed in the process as seen in the
+> >> following error logs:
 
-Previously, the KVM_GET_CPUID2 API only updated the nent field when an
-error was returned. If the API was called with an entry count larger
-than necessary (e.g., KVM_MAX_CPUID_ENTRIES), it would succeed, but the
-nent field would continue to show a value larger than the actual number
-of entries filled by the KVM_GET_CPUID2 API. With this change, users can
-rely on the updated nent field and there is no need to traverse
-unnecessary entries and check whether an entry is valid or not.
+Was the host or guest kernel upgraded?  If the guest kernel was upgraded, it's
+unlikely, though still possible, that this is a KVM bug.
 
-Signed-off-by: Takahiro Itazuri <itazur@amazon.com>
----
-Changes
-v1 -> v2
-* Capitalize "kvm" in the commit title.
-* Remove a scratch "nent" variable.
-* Link to v1: https://lore.kernel.org/all/20230410141820.57328-1-itazur@amazon.com/
-
- arch/x86/kvm/cpuid.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 599aebec2d52..20d28ebdc672 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -523,18 +523,18 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
- 			      struct kvm_cpuid2 *cpuid,
- 			      struct kvm_cpuid_entry2 __user *entries)
- {
--	int r;
-+	int r = 0;
- 
--	r = -E2BIG;
- 	if (cpuid->nent < vcpu->arch.cpuid_nent)
--		goto out;
--	r = -EFAULT;
--	if (copy_to_user(entries, vcpu->arch.cpuid_entries,
-+		r = -E2BIG;
-+	else if (copy_to_user(entries, vcpu->arch.cpuid_entries,
- 			 vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
--		goto out;
--	return 0;
-+		r = -EFAULT;
- 
--out:
-+	/*
-+	 * Update "nent" even on failure, e.g. so that userspace can fix an
-+	 * -E2BIG issue by allocating a larger array.
-+	 */
- 	cpuid->nent = vcpu->arch.cpuid_nent;
- 	return r;
- }
--- 
-2.39.2
-
+> >> post.sh[21952]: bad frame in rt_sigreturn frame:000072db65961bb8
+> >> ip:6c25f82a9a5d sp:72db65962168 orax:ffffffffffffffff in
+> >> libc-2.28.so[6c25f8294000+147000]
+> >>
+> >> cron[7626]: bad frame in rt_sigreturn frame:000073ddebeb6ff8
+> >> ip:72ad9f44d594 sp:73ddebeb75a8 orax:ffffffffffffffff in
+> >> libc-2.28.so[72ad9f3a9000+147000]
+> >>
+> >> cron[64687]: bad frame in rt_sigreturn frame:000073265764b038
+> >> ip:67c7b5a0f14a sp:73265764b5f0 orax:ffffffffffffffff in
+> >> libc-2.31.so[67c7b596f000+159000]
+> >>
+> >> worker.py[54568]: bad frame in rt_sigreturn frame:000078eef6591cf8
+> >> ip:6c9f9b2a604e sp:78eef6592298 orax:ffffffffffffffff in
+> >> libpthread-2.31.so[6c9f9b29a000+10000]
+> >>
+> >>
+> >> The segmentation faults occur 1-3 times daily across approximately 1000
+> >> VMs running on hundreds of (supermicro, intel cpu) bare-metal servers.
+> >> Currently, there's no reliable way for me to reproduce the issue. I
+> >> initially considered this bug -
+> >> https://www.spinics.net/lists/linux-tip-commits/msg61293.html - as a
+> >> possible cause, but judging from the comments it likely isn't.
+> >>
+> >> The best approximation to a reproducer I have is a Python script that
+> >> initiates several child processes and continuously sends them a sigusr1
+> >> signal. Still, it takes a few hours to trigger the issue even when running
+> >> this script on several hundred VMs.
+> >>
+> >> Switching to the 6.x kernel isn't immediately feasible as these are
+> >> production systems with specific requirements. The transition is planned
+> >> but will likely take several months.
+> >>
+> >> I'm looking for suggestions on how to more reliably reproduce this
+> >> problem. Then I could try different old and new kernels and maybe narrow
+> >> it down.
+> > 
+> > See bugzilla for the full thread.
+> > 
+> > Anyway, I'm adding it to regzbot:
+> > 
+> > #regzbot introduced: v4.19..v5.15 https://bugzilla.kernel.org/show_bug.cgi?id=217457
+> > #regzbot title: bad frame in rt_sigreturn (libc-related?) regression after 5.15 upgrade
+> > 
+> 
+> Oops, I forgot to add the reporter:
+> 
+> #regzbot from: Theodor Milkov <tm@del.bg>
+> 
+> Sorry for inconvenience.
+> 
+> -- 
+> An old man doll... just what I always wanted! - Clara
+> 
