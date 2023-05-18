@@ -2,66 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E2FCB707B2B
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 09:38:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33691707B98
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 10:06:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229921AbjERHi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 03:38:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36326 "EHLO
+        id S229824AbjERIGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 04:06:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230160AbjERHiZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 May 2023 03:38:25 -0400
+        with ESMTP id S229810AbjERIGh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 04:06:37 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 163E0ED;
-        Thu, 18 May 2023 00:38:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D40F2699
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 01:06:32 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A75A964D6F;
-        Thu, 18 May 2023 07:38:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEE5CC4339B;
-        Thu, 18 May 2023 07:38:22 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 079616097C
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 08:06:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F7A9C433EF;
+        Thu, 18 May 2023 08:06:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684395503;
-        bh=Ceo3lyC/EwdTNGI5NUXzd4YJkOb6wd2EkIraNcTbQQc=;
+        s=k20201202; t=1684397191;
+        bh=ukx0kR6wVUdBLLkQ5cmS/keY/vGVx91Dm6ZPJJOPhpQ=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=RLB6p1ywGt+LBd2Qmq5hcPqfttFG614vnyUj1r5Ty26GytDdISZFSM9DQDaFxm1Px
-         k8BpJsUBr6Sy3j2jenlA32KO3sSxHHhswZjftoqHcHIVGiJ/Wi9VGQTqK0Uyghm0Lq
-         gWnABgKsK6ZbScOvMoYRN3PdQQaUJUrcHVWMoF9bGnlyuI7WhkHOaBYCf+vCh/p3jj
-         /V0GraVhUaJ/waydKdq97ngVY+EYInMqACdDa1LGdS0x1uHVO1KuFJGsrZWthI6SZO
-         7Z3BtXSqsNecDaP3knbL/DR0NoY4Lpzvv6zpgE17sA4pZvubSxMQ35VNzGU5ClvERL
-         7ZqcdCa7XsyXw==
+        b=ZxRkmPHDoLnQsX5qXKgkNlZ5SoWn08jKauwPaf4MpcJz35g8dzr+qSzwlg91frT+B
+         fUVp9Xn7+lwcLjLLc4YAAv8Z2Aj9/ATLnYqvCfsg74OfCh6XXGjrQ1mLLbZLVQ+IK/
+         7cDuDQK9CkDL061INn0ljrc11hfw/uzVEcgdayO8hc/Ywr8wH/lY49U51+BInUfHGO
+         pnR0y+yrMG+qV9VnRYQfbwleYSV5V/75uZIPB4XAeI9p6wEKAiyJVa9AWl3sZDVLtK
+         C3k4bDynI3+kY1wPGycGd8ZdRLxAhJgusOJvx0nal+NysV1+1gCFHdMoYmRVH93VZB
+         JFq6/N9x+NpWw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pzYDM-00G4j7-Op;
-        Thu, 18 May 2023 08:38:20 +0100
-Date:   Thu, 18 May 2023 08:38:20 +0100
-Message-ID: <86jzx6ks2b.wl-maz@kernel.org>
+        id 1pzYeb-00G50K-43;
+        Thu, 18 May 2023 09:06:29 +0100
+Date:   Thu, 18 May 2023 09:06:28 +0100
+Message-ID: <86ilcqkqrf.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Oliver Upton <oliver.upton@linux.dev>,
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Salil Mehta <salil.mehta@huawei.com>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 0/2] KVM: Fix race between reboot and hardware enabling
-In-Reply-To: <20230512233127.804012-1-seanjc@google.com>
-References: <20230512233127.804012-1-seanjc@google.com>
+        yuzenghui <yuzenghui@huawei.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+In-Reply-To: <ZGUfFn0jai9n4eSF@linux.dev>
+References: <20230404154050.2270077-1-oliver.upton@linux.dev>
+        <20230404154050.2270077-9-oliver.upton@linux.dev>
+        <87o7o26aty.wl-maz@kernel.org>
+        <86pm8iv8tj.wl-maz@kernel.org>
+        <fd9aee7022ea47e29cbff3120764c2c6@huawei.com>
+        <ZGUfFn0jai9n4eSF@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org, atishp@atishpatra.org, kvm-riscv@lists.infradead.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, salil.mehta@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -74,33 +76,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 13 May 2023 00:31:25 +0100,
-Sean Christopherson <seanjc@google.com> wrote:
+On Wed, 17 May 2023 19:38:14 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Fix a bug where enabling hardware virtualization can race with a forced
-> reboot, e.g. `reboot -f`, and result in virt hardware being enabled when
-> the reboot is attempted, and thus hanging the reboot.
+> Hi Salil,
 > 
-> Found by inspection, confirmed by hacking the reboot flow to wait until
-> KVM loads (the problematic window is ridiculously small).
+> On Wed, May 17, 2023 at 06:00:18PM +0000, Salil Mehta wrote:
 > 
-> Fully tested only on x86, compile tested on other architectures.
+> [...]
 > 
-> v2:
->  - Rename KVM's callback to kvm_shutdown() to match the hook. [Marc]
->  - Don't add a spurious newline. [Marc]
+> > > > Should we expose the ESR, or at least ESR_EL2.IL as an additional
+> > > > flag?
+> > 
+> > 
+> > I think we would need "Immediate value" of the ESR_EL2 register in the
+> > user-space/VMM to be able to construct the syndrome value. I cannot see
+> > where it is being sent? 
 > 
-> v1: https://lore.kernel.org/all/20230310221414.811690-1-seanjc@google.com
+> The immediate value is not exposed to userspace, although by definition
+> the immediate value must be zero. The SMCCC spec requires all compliant
+> calls to use an immediate of zero (DEN0028E 2.9).
 > 
-> Sean Christopherson (2):
->   KVM: Use syscore_ops instead of reboot_notifier to hook
->     restart/shutdown
->   KVM: Don't enable hardware after a restart/shutdown is initiated
-> 
->  virt/kvm/kvm_main.c | 43 +++++++++++++++++++++++++++----------------
->  1 file changed, 27 insertions(+), 16 deletions(-)
+> Is there a legitimate use case for hypercalls with a nonzero immediate?
+> They would no longer be considered SMCCC calls at that point, so they
+> wouldn't work with the new UAPI.
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+I agree. The use of non-zero immediate has long been deprecated. I
+guess we should actually reject non-zero immediate for HVC just like
+we do for SMC.
+
+If there is an actual need for a non-zero immediate to be propagated
+to userspace (want to emulate Xen's infamous 'HVC #0xEA1'?), then this
+should be an extension to the current API.
+
+Thanks,
 
 	M.
 
