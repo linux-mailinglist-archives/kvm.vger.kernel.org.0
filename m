@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A6437089D4
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 22:49:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A80D87089D3
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 22:49:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229456AbjERUtP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 16:49:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57198 "EHLO
+        id S229951AbjERUtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 16:49:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230102AbjERUtL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 May 2023 16:49:11 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B16137
+        with ESMTP id S230038AbjERUtK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 16:49:10 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 107B4EE
         for <kvm@vger.kernel.org>; Thu, 18 May 2023 13:48:56 -0700 (PDT)
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34IIx6tE032295;
-        Thu, 18 May 2023 20:48:34 GMT
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34IIxAnN015445;
+        Thu, 18 May 2023 20:48:39 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2023-03-30;
- bh=EFvSg79Rv2Ate9GlGq+dGjSzoLuLv3TJBFevauYPCxU=;
- b=t5kpYyBlTHtZhDwU5QQ/jMpfbCRHhF5tRHzzMS7iGqLa+aUNHozlghBlONbbwhj18CG3
- 5U/Oge/UdBNODe8DVx0FfMQgzJuSas5OOIZq3X0biDwKnHo4WqEns4mIuxJotGGJmAEK
- iNa/RpjyRTl9hQrlEDbdvKmwO0kpRqE/0ihmQPlrsnROuQIDuDBjQOZVgyC9SO4FR9ts
- 6ORWEI17DyHGK3gRU8IHOcDtaFm00YYuObPg0VgPiCBoW0ZzZS5D9gBlHMhTzYL5o3yW
- r9XalwNSwYFBAxQgckhno/v+jifa4pQtMGDAFebNEKakDG1POuCf3yCzI/1ATwoe9YQl cg== 
+ bh=CY7DPvw82imjKSegForCze2+T0wx2g71jXQTjdS3kYg=;
+ b=yvwl24vgUG6Vclh39wgaMI7zyrY0fRZn6yhn5oPU1oDOi/knfoswgXMFSlpVhGth4JRc
+ Jcj6QQDo/y31EthnCVwuq+6yxunWQLAvqHlLo0z3s7YMj0DSnvJpPR/cJDksSd1S0xNt
+ i2LLtrB4Qe27aSPhqFGDkAIxwboc/YWYU0n2ayP6RG50W7JsshNr0Dj8OUzfOqUsWe8O
+ m5XRsWqZ18xfUOPVPMlafVaRSHcCZydFDII06aVP7K8o9zPw+mfVHXfORJ7+/IYkWhGt
+ i6B+vZReH79Mc0nbO29Q+/OPR8GSkKedCifcR7nyrjRgVWalRK6amqC0SI6c+aXjBvbs UA== 
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3qnkux92ms-1
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3qmx8j3n57-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 May 2023 20:48:34 +0000
+        Thu, 18 May 2023 20:48:38 +0000
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 34IJJYQf032277;
-        Thu, 18 May 2023 20:48:33 GMT
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 34IJPApx032227;
+        Thu, 18 May 2023 20:48:37 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3qj10daf6e-1
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3qj10daf8m-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 May 2023 20:48:33 +0000
+        Thu, 18 May 2023 20:48:37 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34IKlE3B033533;
-        Thu, 18 May 2023 20:48:32 GMT
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34IKlE3D033533;
+        Thu, 18 May 2023 20:48:36 GMT
 Received: from joaomart-mac.uk.oracle.com (dhcp-10-175-172-172.vpn.oracle.com [10.175.172.172])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3qj10dae46-13;
-        Thu, 18 May 2023 20:48:32 +0000
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3qj10dae46-14;
+        Thu, 18 May 2023 20:48:36 +0000
 From:   Joao Martins <joao.m.martins@oracle.com>
 To:     iommu@lists.linux.dev
 Cc:     Jason Gunthorpe <jgg@nvidia.com>,
@@ -60,9 +60,9 @@ Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         Robin Murphy <robin.murphy@arm.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         kvm@vger.kernel.org, Joao Martins <joao.m.martins@oracle.com>
-Subject: [PATCH RFCv2 12/24] iommufd/selftest: Test IOMMU_HWPT_GET_DIRTY_IOVA
-Date:   Thu, 18 May 2023 21:46:38 +0100
-Message-Id: <20230518204650.14541-13-joao.m.martins@oracle.com>
+Subject: [PATCH RFCv2 13/24] iommufd: Add IOMMU_DEVICE_GET_CAPS
+Date:   Thu, 18 May 2023 21:46:39 +0100
+Message-Id: <20230518204650.14541-14-joao.m.martins@oracle.com>
 In-Reply-To: <20230518204650.14541-1-joao.m.martins@oracle.com>
 References: <20230518204650.14541-1-joao.m.martins@oracle.com>
 MIME-Version: 1.0
@@ -74,8 +74,8 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 a
  malwarescore=0 mlxscore=0 spamscore=0 bulkscore=0 phishscore=0
  suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2304280000 definitions=main-2305180171
-X-Proofpoint-ORIG-GUID: JGWrncO-jNQMK83klwDTkHS58c5bwlxT
-X-Proofpoint-GUID: JGWrncO-jNQMK83klwDTkHS58c5bwlxT
+X-Proofpoint-GUID: flZONY3ZXnpcPSNEL-7abX4_ZBbdmyhy
+X-Proofpoint-ORIG-GUID: flZONY3ZXnpcPSNEL-7abX4_ZBbdmyhy
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -86,484 +86,130 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a new test ioctl for simulating the dirty IOVAs in the mock domain, and
-implement the mock iommu domain ops that get the dirty tracking supported.
+Add IOMMU_DEVICE_GET_CAPS op for querying iommu capabilities for a given
+device.
 
-The selftest exercises the usual main workflow of:
-
-1) Setting dirty tracking from the iommu domain
-2) Read and clear dirty IOPTEs
-
-Different fixtures will test different IOVA range sizes, that exercise
-corner cases of the bitmaps.
+Capabilities are IOMMU agnostic and use device_iommu_capable() API passing
+one of the IOMMU_CAP_*. Enumerate IOMMU_CAP_DIRTY for now in the out_caps
+field returned back to userspace.
 
 Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
 ---
- drivers/iommu/iommufd/iommufd_test.h          |   9 ++
- drivers/iommu/iommufd/selftest.c              |  97 ++++++++++++++-
- tools/testing/selftests/iommu/iommufd.c       |  99 ++++++++++++++++
- tools/testing/selftests/iommu/iommufd_utils.h | 112 ++++++++++++++++++
- 4 files changed, 314 insertions(+), 3 deletions(-)
+ drivers/iommu/iommufd/device.c          | 26 +++++++++++++++++++++++++
+ drivers/iommu/iommufd/iommufd_private.h |  1 +
+ drivers/iommu/iommufd/main.c            |  3 +++
+ include/uapi/linux/iommufd.h            | 23 ++++++++++++++++++++++
+ 4 files changed, 53 insertions(+)
 
-diff --git a/drivers/iommu/iommufd/iommufd_test.h b/drivers/iommu/iommufd/iommufd_test.h
-index 9abcc3231137..8c9f0d95ed94 100644
---- a/drivers/iommu/iommufd/iommufd_test.h
-+++ b/drivers/iommu/iommufd/iommufd_test.h
-@@ -18,6 +18,7 @@ enum {
- 	IOMMU_TEST_OP_ACCESS_RW,
- 	IOMMU_TEST_OP_SET_TEMP_MEMORY_LIMIT,
- 	IOMMU_TEST_OP_MOCK_DOMAIN_REPLACE,
-+	IOMMU_TEST_OP_DIRTY,
- };
- 
- enum {
-@@ -96,6 +97,14 @@ struct iommu_test_cmd {
- 		struct {
- 			__u32 limit;
- 		} memory_limit;
-+		struct {
-+			__u32 flags;
-+			__aligned_u64 iova;
-+			__aligned_u64 length;
-+			__aligned_u64 page_size;
-+			__aligned_u64 uptr;
-+			__aligned_u64 out_nr_dirty;
-+		} dirty;
- 	};
- 	__u32 last;
- };
-diff --git a/drivers/iommu/iommufd/selftest.c b/drivers/iommu/iommufd/selftest.c
-index ee7523c8d46a..3ec0eb4dfe97 100644
---- a/drivers/iommu/iommufd/selftest.c
-+++ b/drivers/iommu/iommufd/selftest.c
-@@ -34,6 +34,7 @@ enum {
- 	_MOCK_PFN_START = MOCK_PFN_MASK + 1,
- 	MOCK_PFN_START_IOVA = _MOCK_PFN_START,
- 	MOCK_PFN_LAST_IOVA = _MOCK_PFN_START,
-+	MOCK_PFN_DIRTY_IOVA = _MOCK_PFN_START << 1,
- };
- 
- /*
-@@ -234,7 +235,7 @@ static size_t mock_domain_unmap_pages(struct iommu_domain *domain,
- 
- 		for (cur = 0; cur != pgsize; cur += MOCK_IO_PAGE_SIZE) {
- 			ent = xa_erase(&mock->pfns, iova / MOCK_IO_PAGE_SIZE);
--			WARN_ON(!ent);
-+
- 			/*
- 			 * iommufd generates unmaps that must be a strict
- 			 * superset of the map's performend So every starting
-@@ -244,12 +245,12 @@ static size_t mock_domain_unmap_pages(struct iommu_domain *domain,
- 			 * passed to map_pages
- 			 */
- 			if (first) {
--				WARN_ON(!(xa_to_value(ent) &
-+				WARN_ON(ent && !(xa_to_value(ent) &
- 					  MOCK_PFN_START_IOVA));
- 				first = false;
- 			}
- 			if (pgcount == 1 && cur + MOCK_IO_PAGE_SIZE == pgsize)
--				WARN_ON(!(xa_to_value(ent) &
-+				WARN_ON(ent && !(xa_to_value(ent) &
- 					  MOCK_PFN_LAST_IOVA));
- 
- 			iova += MOCK_IO_PAGE_SIZE;
-@@ -303,6 +304,39 @@ static int mock_domain_set_dirty_tracking(struct iommu_domain *domain,
- 	return 0;
+diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
+index 48d1300f0350..63e2ffe21653 100644
+--- a/drivers/iommu/iommufd/device.c
++++ b/drivers/iommu/iommufd/device.c
+@@ -263,6 +263,32 @@ u32 iommufd_device_to_id(struct iommufd_device *idev)
  }
+ EXPORT_SYMBOL_NS_GPL(iommufd_device_to_id, IOMMUFD);
  
-+static int mock_domain_read_and_clear_dirty(struct iommu_domain *domain,
-+					    unsigned long iova, size_t size,
-+					    unsigned long flags,
-+					    struct iommu_dirty_bitmap *dirty)
++int iommufd_device_get_caps(struct iommufd_ucmd *ucmd)
 +{
-+	struct mock_iommu_domain *mock =
-+		container_of(domain, struct mock_iommu_domain, domain);
-+	unsigned long i, max = size / MOCK_IO_PAGE_SIZE;
-+	void *ent, *old;
++	struct iommu_device_get_caps *cmd = ucmd->cmd;
++	struct iommufd_object *obj;
++	struct iommufd_device *idev;
++	int rc;
 +
-+	if (!(mock->flags & MOCK_DIRTY_TRACK) && dirty->bitmap)
-+		return -EINVAL;
++	obj = iommufd_get_object(ucmd->ictx, cmd->dev_id, IOMMUFD_OBJ_DEVICE);
++	if (IS_ERR(obj))
++		return PTR_ERR(obj);
 +
-+	for (i = 0; i < max; i++) {
-+		unsigned long cur = iova + i * MOCK_IO_PAGE_SIZE;
++	idev = container_of(obj, struct iommufd_device, obj);
 +
-+		ent = xa_load(&mock->pfns, cur / MOCK_IO_PAGE_SIZE);
-+		if (ent &&
-+		    (xa_to_value(ent) & MOCK_PFN_DIRTY_IOVA)) {
-+			unsigned long val;
++	cmd->out_caps = 0;
++	if (device_iommu_capable(idev->dev, IOMMU_CAP_DIRTY))
++		cmd->out_caps |= IOMMUFD_CAP_DIRTY_TRACKING;
 +
-+			/* Clear dirty */
-+			val = xa_to_value(ent) & ~MOCK_PFN_DIRTY_IOVA;
-+			old = xa_store(&mock->pfns, cur / MOCK_IO_PAGE_SIZE,
-+				       xa_mk_value(val), GFP_KERNEL);
-+			WARN_ON_ONCE(ent != old);
-+			iommu_dirty_bitmap_record(dirty, cur, MOCK_IO_PAGE_SIZE);
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static const struct iommu_ops mock_ops = {
- 	.owner = THIS_MODULE,
- 	.supported_flags = IOMMU_DOMAIN_F_ENFORCE_DIRTY,
-@@ -318,6 +352,7 @@ static const struct iommu_ops mock_ops = {
- 			.unmap_pages = mock_domain_unmap_pages,
- 			.iova_to_phys = mock_domain_iova_to_phys,
- 			.set_dirty_tracking = mock_domain_set_dirty_tracking,
-+			.read_and_clear_dirty = mock_domain_read_and_clear_dirty,
- 		},
- };
- 
-@@ -994,6 +1029,56 @@ static_assert((unsigned int)MOCK_ACCESS_RW_WRITE == IOMMUFD_ACCESS_RW_WRITE);
- static_assert((unsigned int)MOCK_ACCESS_RW_SLOW_PATH ==
- 	      __IOMMUFD_ACCESS_RW_SLOW_PATH);
- 
-+static int iommufd_test_dirty(struct iommufd_ucmd *ucmd,
-+			      unsigned int mockpt_id, unsigned long iova,
-+			      size_t length, unsigned long page_size,
-+			      void __user *uptr, u32 flags)
-+{
-+	unsigned long i, max = length / page_size;
-+	struct iommu_test_cmd *cmd = ucmd->cmd;
-+	struct iommufd_hw_pagetable *hwpt;
-+	struct mock_iommu_domain *mock;
-+	int rc, count = 0;
-+
-+	if (iova % page_size || length % page_size ||
-+	    (uintptr_t)uptr % page_size)
-+		return -EINVAL;
-+
-+	hwpt = get_md_pagetable(ucmd, mockpt_id, &mock);
-+	if (IS_ERR(hwpt))
-+		return PTR_ERR(hwpt);
-+
-+	if (!(mock->flags & MOCK_DIRTY_TRACK)) {
-+		rc = -EINVAL;
-+		goto out_put;
-+	}
-+
-+	for (i = 0; i < max; i++) {
-+		unsigned long cur = iova + i * page_size;
-+		void *ent, *old;
-+
-+		if (!test_bit(i, (unsigned long *) uptr))
-+			continue;
-+
-+		ent = xa_load(&mock->pfns, cur / page_size);
-+		if (ent) {
-+			unsigned long val;
-+
-+			val = xa_to_value(ent) | MOCK_PFN_DIRTY_IOVA;
-+			old = xa_store(&mock->pfns, cur / page_size,
-+				       xa_mk_value(val), GFP_KERNEL);
-+			WARN_ON_ONCE(ent != old);
-+			count++;
-+		}
-+	}
-+
-+	cmd->dirty.out_nr_dirty = count;
 +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
++	if (rc)
++		goto out_put;
++
 +out_put:
-+	iommufd_put_object(&hwpt->obj);
++	iommufd_put_object(obj);
 +	return rc;
 +}
 +
- void iommufd_selftest_destroy(struct iommufd_object *obj)
+ static int iommufd_group_setup_msi(struct iommufd_group *igroup,
+ 				   struct iommufd_hw_pagetable *hwpt)
  {
- 	struct selftest_obj *sobj = container_of(obj, struct selftest_obj, obj);
-@@ -1055,6 +1140,12 @@ int iommufd_test(struct iommufd_ucmd *ucmd)
- 			return -EINVAL;
- 		iommufd_test_memory_limit = cmd->memory_limit.limit;
- 		return 0;
-+	case IOMMU_TEST_OP_DIRTY:
-+		return iommufd_test_dirty(
-+			ucmd, cmd->id, cmd->dirty.iova,
-+			cmd->dirty.length, cmd->dirty.page_size,
-+			u64_to_user_ptr(cmd->dirty.uptr),
-+			cmd->dirty.flags);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
-index 8adccdde5ecc..818e78cd889a 100644
---- a/tools/testing/selftests/iommu/iommufd.c
-+++ b/tools/testing/selftests/iommu/iommufd.c
-@@ -12,6 +12,7 @@
- static unsigned long HUGEPAGE_SIZE;
+diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
+index 3de8046fee07..e5782459e4aa 100644
+--- a/drivers/iommu/iommufd/iommufd_private.h
++++ b/drivers/iommu/iommufd/iommufd_private.h
+@@ -246,6 +246,7 @@ int iommufd_option_rlimit_mode(struct iommu_option *cmd,
+ int iommufd_vfio_ioas(struct iommufd_ucmd *ucmd);
+ int iommufd_check_iova_range(struct iommufd_ioas *ioas,
+ 			     struct iommufd_dirty_data *bitmap);
++int iommufd_device_get_caps(struct iommufd_ucmd *ucmd);
  
- #define MOCK_PAGE_SIZE (PAGE_SIZE / 2)
-+#define BITS_PER_BYTE 8
- 
- static unsigned long get_huge_page_size(void)
- {
-@@ -1361,13 +1362,47 @@ FIXTURE(iommufd_dirty_tracking)
- 	uint32_t hwpt_id;
- 	uint32_t stdev_id;
- 	uint32_t idev_id;
-+	unsigned long page_size;
-+	unsigned long bitmap_size;
-+	void *bitmap;
-+	void *buffer;
-+};
-+
-+FIXTURE_VARIANT(iommufd_dirty_tracking)
-+{
-+	unsigned long buffer_size;
+ /*
+  * A HW pagetable is called an iommu_domain inside the kernel. This user object
+diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
+index f34b309a1baf..c4c6f900ef0a 100644
+--- a/drivers/iommu/iommufd/main.c
++++ b/drivers/iommu/iommufd/main.c
+@@ -279,6 +279,7 @@ union ucmd_buffer {
+ 	struct iommu_vfio_ioas vfio_ioas;
+ 	struct iommu_hwpt_set_dirty set_dirty;
+ 	struct iommu_hwpt_get_dirty_iova get_dirty_iova;
++	struct iommu_device_get_caps get_caps;
+ #ifdef CONFIG_IOMMUFD_TEST
+ 	struct iommu_test_cmd test;
+ #endif
+@@ -324,6 +325,8 @@ static const struct iommufd_ioctl_op iommufd_ioctl_ops[] = {
+ 		 struct iommu_hwpt_set_dirty, __reserved),
+ 	IOCTL_OP(IOMMU_HWPT_GET_DIRTY_IOVA, iommufd_hwpt_get_dirty_iova,
+ 		 struct iommu_hwpt_get_dirty_iova, bitmap.data),
++	IOCTL_OP(IOMMU_DEVICE_GET_CAPS, iommufd_device_get_caps,
++		 struct iommu_device_get_caps, out_caps),
+ #ifdef CONFIG_IOMMUFD_TEST
+ 	IOCTL_OP(IOMMU_TEST_CMD, iommufd_test, struct iommu_test_cmd, last),
+ #endif
+diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+index 44f9ddcfda58..c256f7354867 100644
+--- a/include/uapi/linux/iommufd.h
++++ b/include/uapi/linux/iommufd.h
+@@ -48,6 +48,7 @@ enum {
+ 	IOMMUFD_CMD_HWPT_ALLOC,
+ 	IOMMUFD_CMD_HWPT_SET_DIRTY,
+ 	IOMMUFD_CMD_HWPT_GET_DIRTY_IOVA,
++	IOMMUFD_CMD_DEVICE_GET_CAPS,
  };
  
- FIXTURE_SETUP(iommufd_dirty_tracking)
- {
-+	void *vrc;
-+	int rc;
-+
- 	self->fd = open("/dev/iommu", O_RDWR);
- 	ASSERT_NE(-1, self->fd);
+ /**
+@@ -442,4 +443,26 @@ struct iommu_hwpt_get_dirty_iova {
+ };
+ #define IOMMU_HWPT_GET_DIRTY_IOVA _IO(IOMMUFD_TYPE, IOMMUFD_CMD_HWPT_GET_DIRTY_IOVA)
  
-+	rc = posix_memalign(&self->buffer, HUGEPAGE_SIZE, variant->buffer_size);
-+	if (rc || !self->buffer) {
-+		SKIP(return, "Skipping buffer_size=%lu due to errno=%d",
-+			     variant->buffer_size, rc);
-+	}
 +
-+	assert((uintptr_t)self->buffer % HUGEPAGE_SIZE == 0);
-+	vrc = mmap(self->buffer, variant->buffer_size, PROT_READ | PROT_WRITE,
-+                   MAP_SHARED | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
-+        assert(vrc == self->buffer);
-+
-+	self->page_size = MOCK_PAGE_SIZE;
-+	self->bitmap_size = variant->buffer_size /
-+			     self->page_size / BITS_PER_BYTE;
-+
-+	/* Provision with an extra (MOCK_PAGE_SIZE) for the unaligned case */
-+	rc = posix_memalign(&self->bitmap, PAGE_SIZE,
-+			    self->bitmap_size + MOCK_PAGE_SIZE);
-+	assert(!rc);
-+	assert(self->bitmap);
-+	assert((uintptr_t)self->bitmap % PAGE_SIZE == 0);
-+
- 	test_ioctl_ioas_alloc(&self->ioas_id);
- 	test_cmd_mock_domain(self->ioas_id, &self->stdev_id,
- 			     &self->hwpt_id, &self->idev_id);
-@@ -1375,9 +1410,41 @@ FIXTURE_SETUP(iommufd_dirty_tracking)
- 
- FIXTURE_TEARDOWN(iommufd_dirty_tracking)
- {
-+	munmap(self->buffer, variant->buffer_size);
-+	munmap(self->bitmap, self->bitmap_size);
- 	teardown_iommufd(self->fd, _metadata);
- }
- 
-+FIXTURE_VARIANT_ADD(iommufd_dirty_tracking, domain_dirty128k)
-+{
-+	/* one u32 index bitmap */
-+	.buffer_size = 128UL * 1024UL,
++/**
++ * enum iommufd_device_caps
++ * @IOMMU_CAP_DIRTY_TRACKING: IOMMU device support for dirty tracking
++ */
++enum iommufd_device_caps {
++	IOMMUFD_CAP_DIRTY_TRACKING = 1 << 0,
 +};
 +
-+FIXTURE_VARIANT_ADD(iommufd_dirty_tracking, domain_dirty256k)
-+{
-+	/* one u64 index bitmap */
-+	.buffer_size = 256UL * 1024UL,
++/*
++ * struct iommu_device_caps - ioctl(IOMMU_DEVICE_GET_CAPS)
++ * @size: sizeof(struct iommu_device_caps)
++ * @dev_id: the device to query
++ * @caps: IOMMU capabilities of the device
++ */
++struct iommu_device_get_caps {
++       __u32 size;
++       __u32 dev_id;
++       __aligned_u64 out_caps;
 +};
++#define IOMMU_DEVICE_GET_CAPS _IO(IOMMUFD_TYPE, IOMMUFD_CMD_DEVICE_GET_CAPS)
 +
-+FIXTURE_VARIANT_ADD(iommufd_dirty_tracking, domain_dirty640k)
-+{
-+	/* two u64 index and trailing end bitmap */
-+	.buffer_size = 640UL * 1024UL,
-+};
-+
-+FIXTURE_VARIANT_ADD(iommufd_dirty_tracking, domain_dirty128M)
-+{
-+	/* 4K bitmap (128M IOVA range) */
-+	.buffer_size = 128UL * 1024UL * 1024UL,
-+};
-+
-+FIXTURE_VARIANT_ADD(iommufd_dirty_tracking, domain_dirty256M)
-+{
-+	/* 8K bitmap (256M IOVA range) */
-+	.buffer_size = 256UL * 1024UL * 1024UL,
-+};
-+
- TEST_F(iommufd_dirty_tracking, enforce_dirty)
- {
- 	uint32_t dev_flags = MOCK_FLAGS_DEVICE_NO_DIRTY;
-@@ -1408,6 +1475,38 @@ TEST_F(iommufd_dirty_tracking, set_dirty)
- 	test_ioctl_destroy(hwpt_id);
- }
- 
-+TEST_F(iommufd_dirty_tracking, get_dirty_iova)
-+{
-+	uint32_t stddev_id;
-+	uint32_t hwpt_id;
-+	uint32_t ioas_id;
-+
-+	test_ioctl_ioas_alloc(&ioas_id);
-+	test_ioctl_ioas_map_fixed_id(ioas_id, self->buffer,
-+				     variant->buffer_size,
-+				     MOCK_APERTURE_START);
-+
-+	test_cmd_hwpt_alloc(self->idev_id, ioas_id,
-+			    IOMMU_HWPT_ALLOC_ENFORCE_DIRTY, &hwpt_id);
-+	test_cmd_mock_domain(hwpt_id, &stddev_id, NULL, NULL);
-+
-+	test_cmd_set_dirty(hwpt_id, true);
-+
-+	test_mock_dirty_bitmaps(hwpt_id, variant->buffer_size,
-+				MOCK_APERTURE_START,
-+				self->page_size, self->bitmap,
-+				self->bitmap_size, _metadata);
-+
-+	/* PAGE_SIZE unaligned bitmap */
-+	test_mock_dirty_bitmaps(hwpt_id, variant->buffer_size,
-+				MOCK_APERTURE_START,
-+				self->page_size, self->bitmap + MOCK_PAGE_SIZE,
-+				self->bitmap_size, _metadata);
-+
-+	test_ioctl_destroy(stddev_id);
-+	test_ioctl_destroy(hwpt_id);
-+}
-+
- /* VFIO compatibility IOCTLs */
- 
- TEST_F(iommufd, simple_ioctls)
-diff --git a/tools/testing/selftests/iommu/iommufd_utils.h b/tools/testing/selftests/iommu/iommufd_utils.h
-index 3629c531ec9f..4d428fbb12e2 100644
---- a/tools/testing/selftests/iommu/iommufd_utils.h
-+++ b/tools/testing/selftests/iommu/iommufd_utils.h
-@@ -9,6 +9,8 @@
- #include <sys/ioctl.h>
- #include <stdint.h>
- #include <assert.h>
-+#include <linux/bitmap.h>
-+#include <linux/bitops.h>
- 
- #include "../kselftest_harness.h"
- #include "../../../../drivers/iommu/iommufd/iommufd_test.h"
-@@ -143,6 +145,105 @@ static int _test_cmd_set_dirty(int fd, __u32 hwpt_id, bool enabled)
- 
- #define test_cmd_set_dirty(hwpt_id, enabled) \
- 	ASSERT_EQ(0, _test_cmd_set_dirty(self->fd, hwpt_id, enabled))
-+
-+static int _test_cmd_get_dirty_iova(int fd, __u32 hwpt_id, size_t length,
-+				    __u64 iova, size_t page_size, __u64 *bitmap)
-+{
-+	struct iommu_hwpt_get_dirty_iova cmd = {
-+		.size = sizeof(cmd),
-+		.hwpt_id = hwpt_id,
-+		.bitmap = {
-+			.iova = iova,
-+			.length = length,
-+			.page_size = page_size,
-+			.data = bitmap,
-+		}
-+	};
-+	int ret;
-+
-+	ret = ioctl(fd, IOMMU_HWPT_GET_DIRTY_IOVA, &cmd);
-+	if (ret)
-+		return ret;
-+	return 0;
-+}
-+
-+#define test_cmd_get_dirty_iova(fd, hwpt_id, length, iova, page_size, bitmap) \
-+	ASSERT_EQ(0, _test_cmd_get_dirty_iova(fd, hwpt_id, length,            \
-+					      iova, page_size, bitmap))
-+
-+static int _test_cmd_mock_domain_set_dirty(int fd, __u32 hwpt_id, size_t length,
-+				           __u64 iova, size_t page_size,
-+					   __u64 *bitmap, __u64 *dirty)
-+{
-+	struct iommu_test_cmd cmd = {
-+		.size = sizeof(cmd),
-+		.op = IOMMU_TEST_OP_DIRTY,
-+		.id = hwpt_id,
-+		.dirty = {
-+			.iova = iova,
-+			.length = length,
-+			.page_size = page_size,
-+			.uptr = (uintptr_t) bitmap,
-+		}
-+	};
-+	int ret;
-+
-+	ret = ioctl(fd, _IOMMU_TEST_CMD(IOMMU_TEST_OP_DIRTY), &cmd);
-+	if (ret)
-+		return -ret;
-+	if (dirty)
-+		*dirty = cmd.dirty.out_nr_dirty;
-+	return 0;
-+}
-+
-+#define test_cmd_mock_domain_set_dirty(fd, hwpt_id, length, iova, page_size, bitmap, nr) \
-+	ASSERT_EQ(0, _test_cmd_mock_domain_set_dirty(fd, hwpt_id,            \
-+						     length, iova,           \
-+						     page_size, bitmap,      \
-+						     nr))
-+
-+static int _test_mock_dirty_bitmaps(int fd, __u32 hwpt_id, size_t length,
-+				    __u64 iova, size_t page_size,
-+				    __u64 *bitmap, __u64 bitmap_size,
-+				    struct __test_metadata *_metadata)
-+{
-+	unsigned long i, count, nbits = bitmap_size * BITS_PER_BYTE;
-+	unsigned long nr = nbits / 2;
-+	__u64 out_dirty = 0;
-+
-+	/* Mark all even bits as dirty in the mock domain */
-+	for (count = 0, i = 0; i < nbits; count += !(i%2), i++)
-+		if (!(i % 2))
-+			__set_bit(i, (unsigned long *) bitmap);
-+	ASSERT_EQ(nr, count);
-+
-+	test_cmd_mock_domain_set_dirty(fd, hwpt_id, length, iova, page_size,
-+				       bitmap, &out_dirty);
-+	ASSERT_EQ(nr, out_dirty);
-+
-+	/* Expect all even bits as dirty in the user bitmap */
-+	memset(bitmap, 0, bitmap_size);
-+	test_cmd_get_dirty_iova(fd, hwpt_id, length, iova, page_size, bitmap);
-+	for (count = 0, i = 0; i < nbits; count += !(i%2), i++)
-+		ASSERT_EQ(!(i % 2), test_bit(i, (unsigned long *) bitmap));
-+	ASSERT_EQ(count, out_dirty);
-+
-+	memset(bitmap, 0, bitmap_size);
-+	test_cmd_get_dirty_iova(fd, hwpt_id, length, iova, page_size, bitmap);
-+
-+	/* It as read already -- expect all zeroes */
-+	for (i = 0; i < nbits; i++)
-+		ASSERT_EQ(0, test_bit(i, (unsigned long *) bitmap));
-+
-+	return 0;
-+}
-+#define test_mock_dirty_bitmaps(hwpt_id, length, iova, page_size, bitmap, \
-+				bitmap_size, _metadata) \
-+	ASSERT_EQ(0, _test_mock_dirty_bitmaps(self->fd, hwpt_id,      \
-+					      length, iova,           \
-+					      page_size, bitmap,      \
-+					      bitmap_size, _metadata))
-+
- static int _test_cmd_create_access(int fd, unsigned int ioas_id,
- 				   __u32 *access_id, unsigned int flags)
- {
-@@ -267,6 +368,17 @@ static int _test_ioctl_ioas_map(int fd, unsigned int ioas_id, void *buffer,
- 					     IOMMU_IOAS_MAP_READABLE));       \
- 	})
- 
-+#define test_ioctl_ioas_map_fixed_id(ioas_id, buffer, length, iova)           \
-+	({                                                                    \
-+		__u64 __iova = iova;                                          \
-+		ASSERT_EQ(0, _test_ioctl_ioas_map(                            \
-+				     self->fd, ioas_id, buffer, length,       \
-+				     &__iova,                                 \
-+				     IOMMU_IOAS_MAP_FIXED_IOVA |              \
-+					     IOMMU_IOAS_MAP_WRITEABLE |       \
-+					     IOMMU_IOAS_MAP_READABLE));       \
-+	})
-+
- #define test_err_ioctl_ioas_map_fixed(_errno, buffer, length, iova)           \
- 	({                                                                    \
- 		__u64 __iova = iova;                                          \
+ #endif
 -- 
 2.17.2
 
