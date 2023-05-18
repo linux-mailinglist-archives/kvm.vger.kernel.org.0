@@ -2,121 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2079708366
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 16:00:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 505917083C1
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 16:14:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231514AbjEROAc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 10:00:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40716 "EHLO
+        id S230252AbjEROOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 10:14:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230324AbjEROAb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 May 2023 10:00:31 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14AE510E9;
-        Thu, 18 May 2023 07:00:30 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6436dfa15b3so1482329b3a.1;
-        Thu, 18 May 2023 07:00:30 -0700 (PDT)
+        with ESMTP id S229884AbjEROOo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 10:14:44 -0400
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3D14DC;
+        Thu, 18 May 2023 07:14:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684418429; x=1687010429;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WOXc8StjOjh7MjrwfdFz6Z5mSMunJ3OwEZtOAZGxw5w=;
-        b=chkulIZ6uorScOasKTo1T616TaqyCfxKWcN6F0yWKAWf4vRGVx57rEUMVsyZ5H5Anc
-         5d0IKXu+PLF/6afFsjrzETnufH5dVrw7H44vePy45JJBpdC1xXTX5dTcgGONFzSvuj8f
-         y+sFbEr9FBck9AiAV/sifz2rtIVGwoOiN7E846VR3uyBoFBDMV6teUnenpwvfFu6Tn02
-         5/OWAyUxcLGifb+iUZwE54LVkVOkTUCItaIB641xyid6pXeDYqHGXh6iO1K7HIsSInBi
-         3cwSVvRxOnHaPCNAWgvH9d3zUKrFR8CELNYfXS3GIIF4yg7X5JKkfpjzehS3n4rJB+0G
-         nM2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684418429; x=1687010429;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WOXc8StjOjh7MjrwfdFz6Z5mSMunJ3OwEZtOAZGxw5w=;
-        b=J4VIKm1g814bTGJJV412vDiacG2jaqvqgrNb53FoRp/ux8yIdbBRMp/KRXxW4/ZopO
-         CykvgENnZU+0p/6tJDVRLqb9MWfyRIx9bko+YJBCcpnQXZrNk6CPH570yuMWIjjF3fE6
-         FuYCIi4RDORfV+ZDo9HVBrCNkBzQzww8BS4ChwLjPGgkubn5OcoMUbigK04b/uO6XDnn
-         cBF3oi+roo4Oain6jmrPfibvBTOgMxi4AmhcQiGuYeUKYMF0h/Q171VbvXOzlhbprxfQ
-         umWU30JulpZ6azP5tP8lI1x/9YfhppyqwmS0MuY4fiajZQbv3E1Xs02oxBKytmLtVCBi
-         yVkA==
-X-Gm-Message-State: AC+VfDyaAhUhS39zFea1sron462oaRP0mZATUiGgGlRWxUxVzrGKd7uM
-        MrGG7a4KoZkjNiyl13Dcllbj7GXUqHo=
-X-Google-Smtp-Source: ACHHUZ5ZLMZpbnzWCKHzvLj9RuRQJqt96wTDHMlD4k9s89X9UUUGfqQ6LSKNUqfU4z5dLBRVyjqg8g==
-X-Received: by 2002:a05:6a20:105a:b0:105:6d0e:c037 with SMTP id gt26-20020a056a20105a00b001056d0ec037mr1804571pzc.38.1684418428448;
-        Thu, 18 May 2023 07:00:28 -0700 (PDT)
-Received: from [192.168.43.80] (subs03-180-214-233-78.three.co.id. [180.214.233.78])
-        by smtp.gmail.com with ESMTPSA id p15-20020a63c14f000000b00528db73ed70sm1301332pgi.3.2023.05.18.07.00.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 May 2023 07:00:27 -0700 (PDT)
-Message-ID: <babafe0f-3154-fb0a-346f-2bbea48a366e@gmail.com>
-Date:   Thu, 18 May 2023 21:00:23 +0700
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1684419284; x=1715955284;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/EG3kAoZFFoNmCZxjC6esPJxCN2aXyXfUCBCGN6t9H4=;
+  b=qBiCGTIDiOH5mAN/A1EqCjfnfQD5UEeF0WyP4RV2uHoX7qGpZGzf4duW
+   0yMhRbzAAmSmp0GRH0HovwkRb4cGIvtAWSK1ecn4nUm3nRjEGrVqc1lmx
+   Iw66bOVbWhiyFSGmzdzwIYgfu4WonYLO+qTOg2SJoGC/eOad/DGddivU2
+   s=;
+X-IronPort-AV: E=Sophos;i="5.99,285,1677542400"; 
+   d="scan'208";a="214654107"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-b404fda3.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2023 14:14:41 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1d-m6i4x-b404fda3.us-east-1.amazon.com (Postfix) with ESMTPS id 1BC99822CA;
+        Thu, 18 May 2023 14:14:39 +0000 (UTC)
+Received: from EX19D002ANA003.ant.amazon.com (10.37.240.141) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Thu, 18 May 2023 14:14:38 +0000
+Received: from b0f1d8753182.ant.amazon.com (10.106.82.23) by
+ EX19D002ANA003.ant.amazon.com (10.37.240.141) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.26;
+ Thu, 18 May 2023 14:14:35 +0000
+From:   Takahiro Itazuri <itazur@amazon.com>
+To:     <kvm@vger.kernel.org>
+CC:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        <linux-kernel@vger.kernel.org>,
+        Takahiro Itazuri <zulinx86@gmail.com>,
+        Takahiro Itazuri <itazur@amazon.com>
+Subject: [RESEND PATCH v2] KVM: x86: Update KVM_GET_CPUID2 to return valid entry count
+Date:   Thu, 18 May 2023 15:14:20 +0100
+Message-ID: <20230518141420.37404-1-itazur@amazon.com>
+X-Mailer: git-send-email 2.38.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: Fwd: Persistent rt_sigreturn segfaults on KVM VMs after upgrade
- to 5.15
-Content-Language: en-US
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Regressions <regressions@lists.linux.dev>,
-        Linux KVM <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Theodor Milkov <tm@del.bg>
-References: <71288f04-546c-9af3-e29a-eb3c44e0d948@gmail.com>
-In-Reply-To: <71288f04-546c-9af3-e29a-eb3c44e0d948@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.82.23]
+X-ClientProxiedBy: EX19D035UWB003.ant.amazon.com (10.13.138.85) To
+ EX19D002ANA003.ant.amazon.com (10.37.240.141)
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,
+        T_SPF_PERMERROR autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/18/23 20:57, Bagas Sanjaya wrote:
-> Hi,
-> 
-> I notice a regression report on Bugzilla [1]. Quoting from it:
-> 
->> I'm experiencing sporadic but persistent segmentation faults on the KVM VMs I manage. These faults began appearing after upgrading from Linux Kernel 4.x to 5.15.59. I further upgraded to 5.15.91 and transitioned the userspace from Debian 10 (buster) to Debian 11 (bullseye), yet the issues persist. Notably, the libc has also changed in the process as seen in the following error logs:
->>
->>
->> post.sh[21952]: bad frame in rt_sigreturn frame:000072db65961bb8 ip:6c25f82a9a5d sp:72db65962168 orax:ffffffffffffffff in libc-2.28.so[6c25f8294000+147000]
->>
->> cron[7626]: bad frame in rt_sigreturn frame:000073ddebeb6ff8 ip:72ad9f44d594 sp:73ddebeb75a8 orax:ffffffffffffffff in libc-2.28.so[72ad9f3a9000+147000]
->>
->> cron[64687]: bad frame in rt_sigreturn frame:000073265764b038 ip:67c7b5a0f14a sp:73265764b5f0 orax:ffffffffffffffff in libc-2.31.so[67c7b596f000+159000]
->>
->> worker.py[54568]: bad frame in rt_sigreturn frame:000078eef6591cf8 ip:6c9f9b2a604e sp:78eef6592298 orax:ffffffffffffffff in libpthread-2.31.so[6c9f9b29a000+10000]
->>
->>
->> The segmentation faults occur 1-3 times daily across approximately 1000 VMs running on hundreds of (supermicro, intel cpu) bare-metal servers. Currently, there's no reliable way for me to reproduce the issue. I initially considered this bug - https://www.spinics.net/lists/linux-tip-commits/msg61293.html - as a possible cause, but judging from the comments it likely isn't.
->>
->> The best approximation to a reproducer I have is a Python script that initiates several child processes and continuously sends them a sigusr1 signal. Still, it takes a few hours to trigger the issue even when running this script on several hundred VMs.
->>
->> Switching to the 6.x kernel isn't immediately feasible as these are production systems with specific requirements. The transition is planned but will likely take several months.
->>
->> I'm looking for suggestions on how to more reliably reproduce this problem. Then I could try different old and new kernels and maybe narrow it down.
-> 
-> See bugzilla for the full thread.
-> 
-> Anyway, I'm adding it to regzbot:
-> 
-> #regzbot introduced: v4.19..v5.15 https://bugzilla.kernel.org/show_bug.cgi?id=217457
-> #regzbot title: bad frame in rt_sigreturn (libc-related?) regression after 5.15 upgrade
-> 
+Modify the KVM_GET_CPUID2 API to return the number of valid entries in
+nent field of kvm_cpuid2 even on success.
 
-Oops, I forgot to add the reporter:
+Previously, the KVM_GET_CPUID2 API only updated the nent field when an
+error was returned. If the API was called with an entry count larger
+than necessary (e.g., KVM_MAX_CPUID_ENTRIES), it would succeed, but the
+nent field would continue to show a value larger than the actual number
+of entries filled by the KVM_GET_CPUID2 API. With this change, users can
+rely on the updated nent field and there is no need to traverse
+unnecessary entries and check whether an entry is valid or not.
 
-#regzbot from: Theodor Milkov <tm@del.bg>
+Signed-off-by: Takahiro Itazuri <itazur@amazon.com>
+---
+Changes
+v1 -> v2
+* Capitalize "kvm" in the commit title.
+* Remove a scratch "nent" variable.
+* Link to v1: https://lore.kernel.org/all/20230410141820.57328-1-itazur@amazon.com/
 
-Sorry for inconvenience.
+ arch/x86/kvm/cpuid.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 599aebec2d52..20d28ebdc672 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -523,18 +523,18 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
+ 			      struct kvm_cpuid2 *cpuid,
+ 			      struct kvm_cpuid_entry2 __user *entries)
+ {
+-	int r;
++	int r = 0;
+ 
+-	r = -E2BIG;
+ 	if (cpuid->nent < vcpu->arch.cpuid_nent)
+-		goto out;
+-	r = -EFAULT;
+-	if (copy_to_user(entries, vcpu->arch.cpuid_entries,
++		r = -E2BIG;
++	else if (copy_to_user(entries, vcpu->arch.cpuid_entries,
+ 			 vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
+-		goto out;
+-	return 0;
++		r = -EFAULT;
+ 
+-out:
++	/*
++	 * Update "nent" even on failure, e.g. so that userspace can fix an
++	 * -E2BIG issue by allocating a larger array.
++	 */
+ 	cpuid->nent = vcpu->arch.cpuid_nent;
+ 	return r;
+ }
 -- 
-An old man doll... just what I always wanted! - Clara
+2.39.2
 
