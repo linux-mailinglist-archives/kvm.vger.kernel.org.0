@@ -2,153 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C661707D19
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 11:42:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0A8C707D3E
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 11:50:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230160AbjERJmj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 05:42:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59802 "EHLO
+        id S230283AbjERJu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 05:50:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230033AbjERJmi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 May 2023 05:42:38 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F85C198A
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 02:42:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C0FD264B77
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 09:42:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2487EC433EF;
-        Thu, 18 May 2023 09:42:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684402956;
-        bh=uisIdhnWB6GwRAUzV3HPPcigaCgjrHYq2RgDUEI1zEw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=C73U7N45qEWfraWndjG8oBmtR0eYkY7+IGrOqxqrYZoVxsyV9W4A/56KoPyJT5t3U
-         8xXruXpFilLkLAyUjQUg2od30+lCu5u6IAPx0VuzTS0ZZ2ULd6nPC5JVnY+AIZIBmA
-         aj+2prrvvaU7Mz5Ycf45LKyXgmhIZkUZ9o0QnIZMglWzJ3QZH/xForB2VO1TLC675L
-         SIsYELItvebLfS3KuWA3hB7h7Ku2BasAfd5L+8exdMAPwAPmpN6b3cPkuUNA3Tb5lB
-         4+9tL4Cq8UDaae0Pt/eTmCpyLMO4yCZ0Nv7PxaL376Nb8g9wJ6UCLk+oL5NnbDCFrD
-         EznANNNxwGx2w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pza9Z-00G6Do-TM;
-        Thu, 18 May 2023 10:42:34 +0100
-Date:   Thu, 18 May 2023 10:42:33 +0100
-Message-ID: <86fs7ukmba.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Salil Mehta <salil.mehta@huawei.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        with ESMTP id S229915AbjERJuY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 05:50:24 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 006A410E9;
+        Thu, 18 May 2023 02:50:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684403424; x=1715939424;
+  h=message-id:date:mime-version:from:subject:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=rPagqShIA0d1pTwUICG1O4W8vWxt4pVZ7r9/3WRbX4A=;
+  b=eBP4kPMBOY6b/KedoTQhaCTpwZEDCtWRUa5ohdljD4Ylc4vZwrhSg2im
+   4Sif/8dLdSWXXG1pesXX4/kw0r7asBnDHak7xoFEt5Cxlxd8Igm1fpPNG
+   zyABCI3kGSfblzTABvVj/eb8EKacZdzPklp6OmN1Nghr55fJeUhQ4dVnI
+   ep6FCILMUDEj3gRe0vld96vwZsxSYIl9zW4SvoGIzOe6nQuhQGQ9l+c0Z
+   6QfLFxddgRcAOGP4Tnfxp5Ffxbv3cGoB5gM2ix4yjUk6UzQVoRRMgZA4V
+   c5fX64/hkilk3Mg97+rw046Lp5mVQktr2Eh0UzvW3HgVc3Q1H6qnbn8ST
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10713"; a="332392008"
+X-IronPort-AV: E=Sophos;i="5.99,285,1677571200"; 
+   d="scan'208";a="332392008"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2023 02:50:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10713"; a="652575062"
+X-IronPort-AV: E=Sophos;i="5.99,285,1677571200"; 
+   d="scan'208";a="652575062"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.254.211.142]) ([10.254.211.142])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2023 02:50:20 -0700
+Message-ID: <d9be9385-4101-2e9e-c6d7-1d980697c02f@intel.com>
+Date:   Thu, 18 May 2023 17:50:17 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.10.1
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [RFC PATCH v2 02/11] KVM: x86: Advertise CPUID.7.2.EDX and
+ RRSBA_CTRL support
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     kvm@vger.kernel.org, Jiaan Lu <jiaan.lu@intel.com>,
+        Zhang Chen <chen.zhang@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        yuzenghui <yuzenghui@huawei.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v3 08/13] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
-In-Reply-To: <30eae0208b55463bb644c6700951d4b8@huawei.com>
-References: <20230404154050.2270077-1-oliver.upton@linux.dev>
-        <20230404154050.2270077-9-oliver.upton@linux.dev>
-        <87o7o26aty.wl-maz@kernel.org>
-        <86pm8iv8tj.wl-maz@kernel.org>
-        <fd9aee7022ea47e29cbff3120764c2c6@huawei.com>
-        <ZGUfFn0jai9n4eSF@linux.dev>
-        <86ilcqkqrf.wl-maz@kernel.org>
-        <30eae0208b55463bb644c6700951d4b8@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: salil.mehta@huawei.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seanjc@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+References: <20230414062545.270178-1-chao.gao@intel.com>
+ <20230414062545.270178-3-chao.gao@intel.com>
+ <a88b2504-b79b-83d6-383e-a948f9da662b@intel.com>
+ <ZGLkvlx5W0JStTjD@chao-email>
+ <9c75663c-6363-34e7-8341-d8f719365768@intel.com>
+ <ZGLyEhKH+MoCY/R4@chao-email>
+ <11b515b3-bb5a-bea1-ad01-caffdd151bf6@intel.com>
+ <ZGNIN7O8BErVP88x@chao-email>
+Content-Language: en-US
+In-Reply-To: <ZGNIN7O8BErVP88x@chao-email>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 May 2023 10:08:46 +0100,
-Salil Mehta <salil.mehta@huawei.com> wrote:
+On 5/16/2023 5:09 PM, Chao Gao wrote:
+> On Tue, May 16, 2023 at 03:03:15PM +0800, Xiaoyao Li wrote:
+>> On 5/16/2023 11:01 AM, Chao Gao wrote:
+>>> On Tue, May 16, 2023 at 10:22:22AM +0800, Xiaoyao Li wrote:
+>>>>>> I think we need to fix this bug at first.
+>>>>>
+>>>>> I have no idea how to fix the "bug" without intercepting the MSR. The
+>>>>> performance penalty makes me think intercepting the MSR is not a viable
+>>>>> solution.
+>>>>
+>>>> I thought correctness always takes higher priority over performance.
+>>>
+>>> It is generally true. however, there are situations where we should make
+>>> trade-offs between correctness and other factors (like performance):
+>>>
+>>> E.g., instructions without control bits, to be 100% compliant with CPU
+>>> spec, in theory, VMMs can trap/decode every instruction and inject #UD
+>>> if a guest tries to use some instructions it shouldn't.
+>>
+>> This is the virtualization hole. IMHO, they are different things.
 > 
-> Hi Marc,
+> what are the differences between?
+> 1. Executing some unsupported instructions should cause #UD. But this is allowed
+>     in a KVM guest.
+> 2. Setting some reserved bits in SPEC_CTRL MSR should cause #GP. But this is
+>     allowed in a KVM guest.
+
+The difference is that for virtualization hole, there is no way but 
+intercept and decode every instruction if we want the correctness. It's 
+a disaster.
+
+But for MSR virtualization, we do have an option and we don't need to 
+trap every instruction. MSR interception is the designated mechanism to 
+correctly and elegantly virtualize the MSR.
+
+>>
+>> Pass through MSR_IA32_SPEC_CTRL was introduced in commit d28b387fb74d
+>> ("KVM/VMX: Allow direct access to MSR_IA32_SPEC_CTRL"). At that time there
+>> was only a few bits defined, and the changelog called out that
+>>
+>>   No attempt is made to handle STIBP here, intentionally. Filtering
+>>   STIBP may be added in a future patch, which may require trapping all
+>>   writes if we don't want to pass it through directly to the guest.
+>>
+>> Per my undesrstanding, it implied that we need to re-visit it when more bits
+>> added instead of following the pass-through design siliently.
 > 
-> > From: Marc Zyngier <maz@kernel.org>
-> > Sent: Thursday, May 18, 2023 9:06 AM
-> > To: Oliver Upton <oliver.upton@linux.dev>
-> > Cc: Salil Mehta <salil.mehta@huawei.com>; kvmarm@lists.linux.dev;
-> > kvm@vger.kernel.org; Paolo Bonzini <pbonzini@redhat.com>; James Morse
-> > <james.morse@arm.com>; Suzuki K Poulose <suzuki.poulose@arm.com>; yuzenghui
-> > <yuzenghui@huawei.com>; Sean Christopherson <seanjc@google.com>
-> > Subject: Re: [PATCH v3 08/13] KVM: arm64: Add support for
-> > KVM_EXIT_HYPERCALL
-> > 
-> > On Wed, 17 May 2023 19:38:14 +0100,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > >
-> > > Hi Salil,
-> > >
-> > > On Wed, May 17, 2023 at 06:00:18PM +0000, Salil Mehta wrote:
-> > >
-> > > [...]
-> > >
-> > > > > > Should we expose the ESR, or at least ESR_EL2.IL as an additional
-> > > > > > flag?
-> > > >
-> > > >
-> > > > I think we would need "Immediate value" of the ESR_EL2 register in the
-> > > > user-space/VMM to be able to construct the syndrome value. I cannot see
-> > > > where it is being sent?
-> > >
-> > > The immediate value is not exposed to userspace, although by definition
-> > > the immediate value must be zero. The SMCCC spec requires all compliant
-> > > calls to use an immediate of zero (DEN0028E 2.9).
-> > >
-> > > Is there a legitimate use case for hypercalls with a nonzero immediate?
-> > > They would no longer be considered SMCCC calls at that point, so they
-> > > wouldn't work with the new UAPI.
-> > 
-> > I agree. The use of non-zero immediate has long been deprecated. I
-> > guess we should actually reject non-zero immediate for HVC just like
-> > we do for SMC.
+> I don't object to re-visiting the design. My point is that to prevent guests from
+> setting RRSBA_CTRL/BHI_CTRL when they are not advertised isn't a strong
+> justfication for intercepting the MSR. STIBP and other bits (except IBRS) have
+> the same problem. And the gain of fixing this is too small.
 > 
-> 
-> Ok. Maybe I will hard code Immediate value as 0 to create a syndrome value
-> at the VMM/Qemu and will also put a note stating non-zero immediate for
-> HVC/SVC are not supported/deprecated.
+> If passing through the SPEC_CTRL MSR to guests might cause security issues, I
+> would agree to intercept accesses to the MSR.
 
-Yes, because this should be the only situation where you should see
-such an exit to userspace.
-
-> > If there is an actual need for a non-zero immediate to be propagated
-> > to userspace (want to emulate Xen's infamous 'HVC #0xEA1'?), then this
-> > should be an extension to the current API.
-> 
-> Oh ok, then perhaps this new extension change should be simultaneously
-> committed to avoid breaking Xen?
-
-How would that break Xen? I don't have any plan to emulate Xen in any
-shape or form, and I don't think anyone want to do that in userspace
-either.
-
-I really want to see an actual use case to expand this stuff. Because
-so far, we follow the strict SMCCC spec, and nothing else. But if we
-admit deviations, do we also have to expose SMC and HVC as different
-instructions?
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+I never buy it. How to interpret the security? If the user wants to hide 
+one feature from guest but KVM allows it when KVM does have a reasonable 
+way to hide it. Does it violate the security?
