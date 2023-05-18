@@ -2,68 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 654847078B0
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 05:58:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A82C7078B6
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 06:01:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229749AbjERD6d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 May 2023 23:58:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57392 "EHLO
+        id S229650AbjEREBw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 00:01:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbjERD6c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 May 2023 23:58:32 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E68BD30EC
-        for <kvm@vger.kernel.org>; Wed, 17 May 2023 20:58:10 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1ae54b623c2so13431445ad.3
-        for <kvm@vger.kernel.org>; Wed, 17 May 2023 20:58:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1684382290; x=1686974290;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MwR/MBLwVadvtqxIlhzjVFYQdhCDR7Ii81JaCJPJvZs=;
-        b=VrZI+Xa6/9MhLk/l3U2AToFKZEO4zZxd2Dl/8O31TlPKkWSfJxemmpYpXLU1cGPRlB
-         oyTmKQZcNN9Q8ZVf3BpTO6ovTzg3t/IfRzrKMIVohUAMFJrb3cOQ0gpsE8T9QmETJlC1
-         E2gYpfH6OW5n3cUvvXjzqyIrhaWDOV3xFwHTENG2LSriCnR55HJky9ZLpgg71aFaFc5S
-         L9I76yVUw2ZKg7j5gi96Qq6nv2bBdBG8jL7jmspxeWXqULRtju790lTI9t4T0OIY2eeT
-         ySEtUAgL8mPhnouDarRYobCr6b9fnca+awWv5YYwVsDMKRZPN/dNF3Q3qSDGugLjpfAa
-         pyFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684382290; x=1686974290;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MwR/MBLwVadvtqxIlhzjVFYQdhCDR7Ii81JaCJPJvZs=;
-        b=fuaHRTvhtRz659D0blpCGabPgGzoaCXCcZS4J01UsY+V1eCGqE17bHmw2wxMOYJx7G
-         MAJHF4eTQUJGOor9MrNw/fktO4W/z5LF/cI111V9gTyYnF5IFV7LhYyQAR1HNhaA8uvH
-         0zW8O3Pt6mK6qQUgv/xK3OKwdH2+qtOWH7IZyA+m8VRqU3o3S1EI2AvOFTD+S/kOR5nv
-         xcuD1RajfdFaDCqoy5ILqfhEFXriwbQdMD7tvniQ2C/i9NuN63yo0ZLk2TQb4LyYOE75
-         +HmKbAp6Sv0AYppv7EZXodktbO0+D5nwMapX4941S4Hk08oOgA3I2pDW7e6jnM+OWedy
-         rkFQ==
-X-Gm-Message-State: AC+VfDyIr+IbfejtgXQNvlF4KnLCUOoFgkOuE3Gp4I3QfzZi7cItAdsD
-        V1pJhEwcqpEcAZyQjQW89RKE+Q==
-X-Google-Smtp-Source: ACHHUZ5dM9p+w/Tl4roOT7M6b4mt62W2zJIE2K6h3j6JSm8YgZBgaYbs9zWm57rGVtsvhBSmijDHKw==
-X-Received: by 2002:a17:902:d382:b0:1aa:dd14:da98 with SMTP id e2-20020a170902d38200b001aadd14da98mr1219183pld.50.1684382290257;
-        Wed, 17 May 2023 20:58:10 -0700 (PDT)
-Received: from n37-012-157.byted.org ([180.184.51.70])
-        by smtp.gmail.com with ESMTPSA id ch9-20020a17090af40900b0024e4aa37b90sm342311pjb.45.2023.05.17.20.58.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 May 2023 20:58:09 -0700 (PDT)
-From:   "dengqiao.joey" <dengqiao.joey@bytedance.com>
-To:     joao.m.martins@oracle.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, seanjc@google.com
-Subject: Re: [PATCH] KVM: SVM: Update destination when updating pi irte
-Date:   Thu, 18 May 2023 11:58:06 +0800
-Message-Id: <20230518035806.938517-1-dengqiao.joey@bytedance.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <3d05fcf1-dad3-826e-03e9-599ced7524b4@oracle.com>
-References: <3d05fcf1-dad3-826e-03e9-599ced7524b4@oracle.com>
+        with ESMTP id S229451AbjEREBt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 00:01:49 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1258119C;
+        Wed, 17 May 2023 21:01:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684382508; x=1715918508;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=/f54lyDTOV5ImAqX+HJtrGe9U/rdT/+EHFDiCLpy4pU=;
+  b=mD7QyUvAzzy0ncFa8H5oT+O9DqgStCsQRS4wPEweHZMQeVlZrpINgpOO
+   OUy9GB67hpo2leRHCqUkc0pKFn+IrneV/SVDbtSNvFLBhIrRqxjZuzgwp
+   S8UgeOmeauj5oRws0ESd+0DN/wzie1lZilYBjuhrHIBv0RNRT5NncYUL+
+   yY5Aup+VpsahCke2BD+qSoA3uxngpvJWPsgzXRc6fa/JyBcNBB7JMq3CU
+   hGhRjfJi8q5+1e5fWJ3U9rVOyU1zftGNy90VHFlDHlWrakLuuo1qAJrrP
+   OYfBRncme7xjHOJzUybgORreDD+prMLacpveu/Lc4qf5gONW4Cy+texdP
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10713"; a="351973302"
+X-IronPort-AV: E=Sophos;i="5.99,284,1677571200"; 
+   d="scan'208";a="351973302"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2023 21:01:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10713"; a="814162103"
+X-IronPort-AV: E=Sophos;i="5.99,284,1677571200"; 
+   d="scan'208";a="814162103"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.254.208.101]) ([10.254.208.101])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2023 21:01:42 -0700
+Message-ID: <b143c338-270a-ebda-03a3-a85463be2686@linux.intel.com>
+Date:   Thu, 18 May 2023 12:01:39 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [PATCH v8 2/6] KVM: x86: Virtualize CR4.LAM_SUP
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+References: <20230510060611.12950-1-binbin.wu@linux.intel.com>
+ <20230510060611.12950-3-binbin.wu@linux.intel.com>
+ <67a20fe2a41fbe99de1470254b14f282f72571c7.camel@intel.com>
+ <abbb7938-0615-8578-0072-a96d21df3b4d@linux.intel.com>
+ <982ce5177647331b7b9f6526dfe064b76a921d06.camel@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <982ce5177647331b7b9f6526dfe064b76a921d06.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -72,38 +70,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 17, 2023 at 11:32 PM Joao Martins <joao.m.martins@oracle.com> wrote:
->
-> On 17/05/2023 13:04, dengqiao.joey wrote:
-> > This seems to be a different issue. Joao's patch tries to fix the issue
-> > that IRTE is not changed. The problem I encountered is that IRTE does
-> > get changed, thus the destination field is also cleared by
-> > amd_iommu_activate_guest_mode().
->
-> Whether the amd_iommu_activate_guest_mode() clears the destination field or not
-> doesn't change the situation I think. So I don't think that is the problem
-> you're having. amd_iommu_activate_guest_mode() will always make IRTEs with
-> isRun=0. Which means your VF interrupts get injected via GALog events and the
-> DestID is meaningless there :/ Even if you leave the old affinity there with
-> isRun=1 bit it's still wrong as by the time you run the vcpu, the wrong affinity
-> will be used by the VF. More fundamentally I am not sure that on IRTE routing
-> updates in the VM that you can look on vcpu->cpu the way you are using it could
-> be potentially invalid when vcpus are blocked/preempted. You're changing IRTEs
-> in the whole VM in pi_update_irte()
->
-> My changes essentially handle the fact where IRTEs will be always updated with
-> the right GATag set in the IRTE ... and then when the vCPU migrates, wakes or
-> block+unblocks it will change IRTE[DestID] with the new pcpu (which the vcpu is
-> running on) via amd_iommu_update_ga(). So there's a good chance my changes fixes
-> your affinity issue.
->
->         Joao
 
-Sorry I forgot to mention before that in my application scenario, the vcpu runs on
-a dedicated isolated cpu and uses "mwait" instead of "halt". So it will not be migrated,
-blocked/wake and rarely get preempted by other threads. I think your patch can not fix
-my issue because the vcpu rarely gets the opportunity to execute amd_iommu_update_ga()
-from vcpu_load().
 
-So each time the interrupt affinity is updated I can observe the loss of VF interrupt.
-After applying my patch, the problem is solved.
+On 5/12/2023 6:49 PM, Huang, Kai wrote:
+>>>>    
+>>> LAM only applies to 64-bit linear address, which means LAM can only be enabled
+>>> when CPU is in 64-bit mode with either 4-level or 5-level paging enabled.
+>>>
+>>> What's the hardware behaviour if we set CR4.LAM_SUP when CPU isn't in 64-bit
+>>> mode?  And how does VMENTRY check GUEST_CR4.LAM_SUP and 64-bit mode?
+>>>
+>>> Looks they are not clear in the spec you pasted in the cover letter:
+>>>
+>>> https://cdrdv2.intel.com/v1/dl/getContent/671368
+>>>
+>>> Or I am missing something?
+>> Yes, it is not clearly described in LAM spec.
+>> Had some internal discussions and also did some tests in host,
+>> if the processor supports LAM, CR4.LAM_SUP is allowed to be set even
+>> when cpu isn't in 64bit mode.
+>>
+>> There was a statement in commit message of the last version, but I
+>> missed it in this version. I'll add it back.
+>> "CR4.LAM_SUP is allowed to be set even not in 64-bit mode, but it will not
+>> take effect since LAM only applies to 64-bit linear address."
+> Yeah this does help.  Please add it back to the changelog.
+>
+>> Also, I will try to ask Intel guys if it's possible to update the document.
+>>
+> Thanks.
+
+
+Per the internal discussion, there is no need to explicitly callout 
+CR4[28] can be set out side of 64-bit mode in SDM/LAM spec for the 
+following reasons:
+
+According to SDM Vol.2 Move to/from Control Registers:
+- "On a 64-bit capable processor, an execution of MOV to CR outside of 
+64-bit mode zeros the upper 32 bits of the control register."
+   It doesn't mention of clearing any of the lower bits.
+
+- "Some of the bits in CR0, CR3, and CR4 are reserved and must be 
+written with zeros. ...  Attempting to set any reserved bits in CR4 
+results in #GP(0)"
+   CR4[28] is not reserved on processors that support LAM, and SDM / LAM 
+spec doesn't explicitly say the bit cannot be set under some specific 
+condition.
+
+So just like the reset of CR4[31:0], CR4[28] can be set by any 32-bit 
+load of CR4 when LAM is supported.
+For example, CR4[17] is used only with 64-bit paging, but it can be set 
+by a 32-bit load of CR4 when 32-bit paging or PAE paging is in use.
+Similarly, user-interrupt delivery is enabled by setting CR4[25]. It can 
+be set in any mode, even though user-interrupt delivery can occur only 
+in 64-bit mode.
+
