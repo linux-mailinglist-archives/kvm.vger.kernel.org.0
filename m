@@ -2,98 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BE3370871E
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 19:45:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59C64708731
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 19:48:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229552AbjERRpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 13:45:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38056 "EHLO
+        id S229675AbjERRsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 13:48:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229869AbjERRpn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 May 2023 13:45:43 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D86210EC
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 10:45:37 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-ba88ec544ddso2797266276.1
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 10:45:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684431936; x=1687023936;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WQzTFP1RC3/tfWA0w7bguLLG8lFnT5FIHPo6B2Lf8Ag=;
-        b=VpVPg93dEFqXNhcVdA4Xmhk1P800XWr2Ih3sIhCjsrlKx1xuBR8BfPJM6cQJ8iWFN+
-         l7V8aTO4+Q/tUkxXMpjaX081IH24WjveSXyEjLXIs2WaghY+o8y1otzQbGZ48TAKN/AO
-         UNxIEzuvNUkPOxWbqkYWhFJhUGRt7kAiJVtDtsl6eK8ObQRzw/lc5TNH7WDuT39cSu9j
-         SEPWAI7OemYDihQuOrkA9+NtHcz98c59GL4SWeTrCryVIJVmI9JWr+fZfb6grMGsfS3o
-         gpAaX4UK9sdHRo6UGVsO6o0TFEbXR+lz9iCvbMvcxzLIsO2Py06qiDZa911rxvKXtSc+
-         J/Ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684431936; x=1687023936;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WQzTFP1RC3/tfWA0w7bguLLG8lFnT5FIHPo6B2Lf8Ag=;
-        b=JHChYRh8eNrJru8WeHXfQcvKz1bmxCag/akecs7mXvTEONSG39Rv/evOTAoWKoYvAt
-         ibtfIDXlntgndqDEx/dGtQNAjxv48cmLwCMimmpMKcf5vLC4BWTRcd+NadwfDzhc1hmd
-         drvyxzHCq3Wzs52DAX0LKZ5Dn4q1I4yxVjjph6xDkAzBNLfj/6CTzx/FtdYZxd/cPv1f
-         WzCHnnyNcc20hxeCF3BBxZqUEf5AwYpBU+ECHMY9HvDL8BH2GvneMUDJpic86vhyuDUi
-         BVAMH16+d33N07NgbI3mLduAvZJ1X8MOtv09mhnu3U5B7RzXWkYzP/KqPZwLbCD/ubSv
-         2jMg==
-X-Gm-Message-State: AC+VfDyuhdfbt1xrz90DneNGa3U1QvbkyuuzLqUTolLNO8zCXh1+KVzZ
-        XgA90Uzhw5BsbnS4nn828GaLpaQ6lyQ=
-X-Google-Smtp-Source: ACHHUZ4mV7Ub1P0BypUYeexPRLsbECnF+7L3840vcDgfoGJzZRbixYrlE4Ezn2sZXGD3Q7Vf+G7eCNJnx9U=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d7cd:0:b0:ba7:e9b6:2994 with SMTP id
- o196-20020a25d7cd000000b00ba7e9b62994mr1646199ybg.7.1684431936329; Thu, 18
- May 2023 10:45:36 -0700 (PDT)
-Date:   Thu, 18 May 2023 10:45:34 -0700
-In-Reply-To: <20230518170653.704562-1-mizhang@google.com>
-Mime-Version: 1.0
-References: <20230518170653.704562-1-mizhang@google.com>
-Message-ID: <ZGZkPqC7SK4AdEGV@google.com>
-Subject: Re: [PATCH] KVM: SVM: Remove TSS reloading code after VMEXIT
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Venkatesh Srinivas <venkateshs@google.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229810AbjERRrn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 13:47:43 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CBEEA9
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 10:47:42 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 02D276510A
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 17:47:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 320B3C433EF;
+        Thu, 18 May 2023 17:47:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684432061;
+        bh=USjwvx+K9igUSpQ4sS7LlyJXHC3ABEpSlAR4iN8rmMQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AotWzmcqKomLPCgLrJlJ0tI49tPiaVnSHeIJe5+CaNXdW1+ykdhyW3sARApMc88uC
+         s7CcqkidDKMLb0Jx2HRIS/Vr9/RnI1m1jev4G1PKHLQZHnG2hQaVWZ62KqbKqjX9BR
+         f+o5Ars5P17nDwTO8eEKHyfm/u84NQ+BQiHe9E/Of9X0Ptoy3y2ndbVhIEhikr/1FZ
+         twcEV3PGC3cIk1teeyNuW2XHycCeBWqEj1JJq+m/vd2HRKZ+vRuf1y1a7Y8Q6qF5Ey
+         AVT/Io/XbzsEB2MzEHX0SiRH+4BEuA7ljRKutDyIpfW4YZpHys5qsDTR+YgKEYDkvc
+         3ZXkjlwKc9ygw==
+Date:   Thu, 18 May 2023 18:47:34 +0100
+From:   Conor Dooley <conor@kernel.org>
+To:     Andy Chiu <andy.chiu@sifive.com>
+Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
+        anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+        Liao Chang <liaochang1@huawei.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        Guo Ren <guoren@kernel.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@rivosinc.com>,
+        Mattias Nissler <mnissler@rivosinc.com>
+Subject: Re: [PATCH -next v20 11/26] riscv: Allocate user's vector context in
+ the first-use trap
+Message-ID: <20230518-external-sixteen-f2d2ae444547@spud>
+References: <20230518161949.11203-1-andy.chiu@sifive.com>
+ <20230518161949.11203-12-andy.chiu@sifive.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="JqzHJXxaEWN8S6RA"
+Content-Disposition: inline
+In-Reply-To: <20230518161949.11203-12-andy.chiu@sifive.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 18, 2023, Mingwei Zhang wrote:
-> Remove TSS reloading code after VMEXIT since upstream KVM after [1] has
-> already been using VMLOAD to load host segment state (including TSS).
-> Therefore, reload_tss() becomes redundant. Because of that, also remove the
-> relevant data field tss_desc in svm_cpu_data as well as its data structure
-> definition.
-> 
-> [1] commit e79b91bb3c91 ("KVM: SVM: use vmsave/vmload for saving/restoring additionalhost state")
 
-This should be
+--JqzHJXxaEWN8S6RA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Fixes: e79b91bb3c91 ("KVM: SVM: use vmsave/vmload for saving/restoring additional host state")
+On Thu, May 18, 2023 at 04:19:34PM +0000, Andy Chiu wrote:
+> Vector unit is disabled by default for all user processes. Thus, a
+> process will take a trap (illegal instruction) into kernel at the first
+> time when it uses Vector. Only after then, the kernel allocates V
+> context and starts take care of the context for that user process.
+>=20
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Link: https://lore.kernel.org/r/3923eeee-e4dc-0911-40bf-84c34aee962d@lina=
+ro.org
+> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+> ---
+> Hey Heiko and Conor, I am dropping you guys' A-b, T-b, and R-b because I
+> added a check in riscv_v_first_use_handler().
 
-to make it clear that the code could have, and should have, been removed by that
-commit.
+> +bool riscv_v_first_use_handler(struct pt_regs *regs)
+> +{
+> +	u32 __user *epc =3D (u32 __user *)regs->epc;
+> +	u32 insn =3D (u32)regs->badaddr;
+> +
+> +	/* Do not handle if V is not supported, or disabled */
+> +	if (!has_vector() || !(elf_hwcap & COMPAT_HWCAP_ISA_V))
+> +		return false;
 
-Can you also explain what happens with the TSS busy bit?  I'm staring at a comically
-long internal discussion about this patch, I would likely to capture the important
-bits in the changelog.  Doesn't have to be super verbose, e.g. just an explanation
-that makes it abundantly clear reload_tss() is fully redundant.
+Remind me please, in what situation is this actually even possible?
+The COMPAT_HWCAP_ISA_V flag only gets set if CONFIG_RISCV_ISA_V is
+enabled & v is in the DT.
+has_vector() is backed by different things whether alternatives are
+enabled or not. With alternatives, it depends on the bit being set in
+the riscv_isa bitmap & the Kconfig option.
+Without alternatives it is backed by __riscv_isa_extension_available()
+which only depends in the riscv_isa bitmap.
+Since the bit in the bitmap does not get cleared if CONFIG_RISCV_ISA_V
+is not set, unlike the elf_hwcap bit which does, it seems like this
+might be the condition you are trying to prevent?
 
-> Reported-by: Venkatesh Srinivas <venkateshs@google.com>
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Tested-by: Mingwei Zhang <mizhang@google.com>
+If so,
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
-Heh, you wrote the code and sent the patch, so it darn well better be tested :-)
-There are scenarios where a Tested-by for the _original_ author is warranted, e.g.
-if someone else tweaked and reposted the patch.  But in this case, there's no need.
+Otherwise, please let me know where I have gone wrong!
+
+Thanks,
+Conor.
+
+--JqzHJXxaEWN8S6RA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZGZktgAKCRB4tDGHoIJi
+0jBjAP43M+8VnOUuyPI5wMK5s570SUnfEYjrVN/aExukXNTvhgEAusFeyqLf8+Jz
++H7+bvlRv8qn/5r5HUv8o62L8hDZlwQ=
+=klJB
+-----END PGP SIGNATURE-----
+
+--JqzHJXxaEWN8S6RA--
