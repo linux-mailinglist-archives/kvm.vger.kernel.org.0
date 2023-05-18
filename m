@@ -2,122 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 017847087C0
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 20:24:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1544670882C
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 21:05:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229922AbjERSYj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 14:24:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55144 "EHLO
+        id S230212AbjERTFc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 15:05:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjERSYi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 May 2023 14:24:38 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8FC31B5
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 11:24:36 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6436dfa15b3so1708843b3a.1
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 11:24:36 -0700 (PDT)
+        with ESMTP id S229681AbjERTFa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 15:05:30 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC61ECA
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 12:05:27 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-64d18d772bdso1234130b3a.3
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 12:05:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684434276; x=1687026276;
+        d=google.com; s=20221208; t=1684436727; x=1687028727;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OpyylvXibv8EvGCfTZdYQmSeri6SL1uyvIVaeAFD11A=;
-        b=b7bQt1minZmnr2zvZfdSq58GrwSnQ65PwX096lykRd7/O0puR8TJTSRNNd7ScBPw54
-         KuWSMfvdNwr56sicVT8GnxX4oiogZUK/64JPFyZOaPK96J+ixU8lYgWxyhuksUt82k0i
-         W+uiHxq3XQSBAXnhtqLkRV3i78JKP0yVTjTeDFStgm0cfP7isTuZ/DJjqEbiUwZQ3JuO
-         VJlNyndI3X6dJ/jgWZKJMCK/m6HodC6OduyJ1DKRf5yWE1ZJBPVjBqXfjCvl/C7rnRjd
-         MOV8fZR0mvSIvqkzddGCWcMfhosPgwToZv0MJIa4FpSlNNvdaVAH9CDYnr8A4MM8uz9R
-         VO5A==
+        bh=qaPXZjQwpMuHucPSSvg3vCkUQc8Ay+DRE5sO9MN2VqU=;
+        b=zwveXuIfdYd/qj8tZUjdiY0xZagkmXSohLR+VJHXjIH+BQtZdirtrWdMnfi2Tntiw2
+         tNnBgNDzfxhxzJ4MlMXKjmrIFWiSEMC4k63wRhYBN3T6mfHSuzkxxGUb95lZmD1j4ptE
+         4HkcpXW02IxpKntr/WVLoZWRb1dBMqYTg9Dwb9NuNqdE3VztQzeiYmREE+HTag6uUoBB
+         GTq2m4brQDiLD5CuytB3nCe+3UEYo1w+PxLov+pKHC7m8q/3xnGE6ikvwcRvPzvpRORL
+         7jbVVdNo1Pv8ZresIgf7H9Nrh2mDcO7JqyaR8lI8wyQxW4awuwCwa8NAQerB7F7ZhF95
+         g+fQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684434276; x=1687026276;
+        d=1e100.net; s=20221208; t=1684436727; x=1687028727;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OpyylvXibv8EvGCfTZdYQmSeri6SL1uyvIVaeAFD11A=;
-        b=K4fwIQxg7QmW/YyGc0qnjDajMIKc5J7QJPk7JFni+0cYYjYkDGr8CbL8pRxkPD8UdT
-         j922/2tOwSSindIiVvblqWI2//JCEB5gECrJqPFWBsMCF2TTl6YAdD5YpjDGpUsU7uqh
-         c2ZyQz1vW6g4PcozldmuDtUcbAAmZvcSemNEm7gtsGlwMSGHQqECQRluJNojwbx3Rpj9
-         J0/vHwN5o1LSpql1502sb7Us24VWmMUE0q3dnWnDMk721Ej7OsxWNFbHpBLVxSHDOYFj
-         mAYXixErgpgFSzBKvzbtPGf5oic6xufAP2Vz6BWb6velo8dE6ZzorBa2pNY60ZWYsjnv
-         qfzg==
-X-Gm-Message-State: AC+VfDxFfABXjBboliQ7lVMRoGe675skSCNISII4mFaKNzox1lAfapLd
-        XjJEgWkhiMF5Xb4JE8G2MIgb+g==
-X-Google-Smtp-Source: ACHHUZ6Z6A+4bVAZNXNGODfZRR6lq7j9dFBxx/w5HM5Lg6JxFeRPILtOQJ7phK1dd8rgICBChCty+Q==
-X-Received: by 2002:a05:6a20:7fa7:b0:109:38b4:a21b with SMTP id d39-20020a056a207fa700b0010938b4a21bmr632340pzj.51.1684434276180;
-        Thu, 18 May 2023 11:24:36 -0700 (PDT)
-Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
-        by smtp.gmail.com with ESMTPSA id gk13-20020a17090b118d00b0024ffa911e2asm1692421pjb.51.2023.05.18.11.24.35
+        bh=qaPXZjQwpMuHucPSSvg3vCkUQc8Ay+DRE5sO9MN2VqU=;
+        b=K2u13QIGtPiSsdY+ugcRERPmQf5CrwE1NxCzYCPoe2C5L6f1G8RMpAyKwMXYugjDYf
+         cA5vBd6qlyFOQrILzGRZfb4rdBLbbBjp/0kj/mK+fwom8Rd9RQgLqs8axrFUL89y/XU/
+         9wS/PvS8tWJZc2aCqYPkAieuVZ4sfXKRg/H47ybvShjGyf9CA6rbg/INedSsgcBeqnpw
+         zrQ4FZDED4iaSMg9QAsJ0rN2rv9b4uiI96bHBeVAuYMt7LvO7lqwD+ZGdWrVMi9eP4wU
+         v5sUkc3oBUQL/yVX9rNwPU51gX5n93KGmtyOKa3NnkhkKlNrOhla3aVwyLcmdy7OdEpC
+         D61w==
+X-Gm-Message-State: AC+VfDzj3bydA/YV4LykNUNdVjtqzO5muCPV5ae/XxAnqKZ+EXYfnBmN
+        kRsSSaML1AzH83Q7KCYNop5Gpw==
+X-Google-Smtp-Source: ACHHUZ4mwnJuBAqtj5AknLIgnMxasaPqQbsplioZ5tOpO4rPnkfRPMamoigo1opISuywXj4AfUhF2Q==
+X-Received: by 2002:a05:6a20:4321:b0:104:3c82:38c0 with SMTP id h33-20020a056a20432100b001043c8238c0mr970876pzk.41.1684436726991;
+        Thu, 18 May 2023 12:05:26 -0700 (PDT)
+Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
+        by smtp.gmail.com with ESMTPSA id q35-20020a17090a17a600b002502161b063sm8871pja.54.2023.05.18.12.05.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 May 2023 11:24:35 -0700 (PDT)
-Date:   Thu, 18 May 2023 18:24:31 +0000
+        Thu, 18 May 2023 12:05:26 -0700 (PDT)
+Date:   Thu, 18 May 2023 19:05:23 +0000
 From:   Mingwei Zhang <mizhang@google.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Venkatesh Srinivas <venkateshs@google.com>,
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
         Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH] KVM: SVM: Remove TSS reloading code after VMEXIT
-Message-ID: <ZGZtX1MilF9mPLX/@google.com>
-References: <20230518170653.704562-1-mizhang@google.com>
- <ZGZkPqC7SK4AdEGV@google.com>
+Subject: Re: [PATCH 9/9] KVM: x86/mmu: BUG() in rmap helpers iff
+ CONFIG_BUG_ON_DATA_CORRUPTION=y
+Message-ID: <ZGZ2834xLw/woerO@google.com>
+References: <20230511235917.639770-1-seanjc@google.com>
+ <20230511235917.639770-10-seanjc@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZGZkPqC7SK4AdEGV@google.com>
+In-Reply-To: <20230511235917.639770-10-seanjc@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 18, 2023, Sean Christopherson wrote:
-> On Thu, May 18, 2023, Mingwei Zhang wrote:
-> > Remove TSS reloading code after VMEXIT since upstream KVM after [1] has
-> > already been using VMLOAD to load host segment state (including TSS).
-> > Therefore, reload_tss() becomes redundant. Because of that, also remove the
-> > relevant data field tss_desc in svm_cpu_data as well as its data structure
-> > definition.
-> > 
-> > [1] commit e79b91bb3c91 ("KVM: SVM: use vmsave/vmload for saving/restoring additionalhost state")
+On Thu, May 11, 2023, Sean Christopherson wrote:
+> Introduce KVM_BUG_ON_DATA_CORRUPTION() and use it in the low-level rmap
+> helpers to convert the existing BUG()s to WARN_ON_ONCE() when the kernel
+> is built with CONFIG_BUG_ON_DATA_CORRUPTION=n, i.e. does NOT want to BUG()
+> on corruption of host kernel data structures.  Environments that don't
+> have infrastructure to automatically capture crash dumps, i.e. aren't
+> likely to enable CONFIG_BUG_ON_DATA_CORRUPTION=y, are typically better
+> served overall by WARN-and-continue behavior (for the kernel, the VM is
+> dead regardless), as a BUG() while holding mmu_lock all but guarantees
+> the _best_ case scenario is a panic().
 > 
-> This should be
+> Make the BUG()s conditional instead of removing/replacing them entirely as
+> there's a non-zero chance (though by no means a guarantee) that the damage
+> isn't contained to the target VM, e.g. if no rmap is found for a SPTE then
+> KVM may be double-zapping the SPTE, i.e. has already freed the memory the
+> SPTE pointed at and thus KVM is reading/writing memory that KVM no longer
+> owns.
 > 
-> Fixes: e79b91bb3c91 ("KVM: SVM: use vmsave/vmload for saving/restoring additional host state")
-> 
-> to make it clear that the code could have, and should have, been removed by that
-> commit.
+> Link: https://lore.kernel.org/all/20221129191237.31447-1-mizhang@google.com
+> Suggested-by: Mingwei Zhang <mizhang@google.com>
+> Cc: David Matlack <dmatlack@google.com>
+> Cc: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Mingwei Zhang <mizhang@google.com>
+> +/*
+> + * Note, "data corruption" refers to corruption of host kernel data structures,
+> + * not guest data.  Guest data corruption, suspected or confirmed, that is tied
+> + * and contained to a single VM should *never* BUG() and potentially panic the
+> + * host, i.e. use this variant of KVM_BUG() if and only if a KVM data structure
+> + * is corrupted and that corruption can have a cascading effect to other parts
+> + * of the hosts and/or to other VMs.
+> + */
+> +#define KVM_BUG_ON_DATA_CORRUPTION(cond, kvm)			\
+> +({								\
+> +	bool __ret = !!(cond);					\
+> +								\
+> +	if (IS_ENABLED(CONFIG_BUG_ON_DATA_CORRUPTION))		\
+> +		BUG_ON(__ret);					\
+> +	else if (WARN_ON_ONCE(__ret && !(kvm)->vm_bugged))	\
+> +		kvm_vm_bugged(kvm);				\
+> +	unlikely(__ret);					\
+> +})
+> +
+Previously, my concern was that people might abuse this feature by
+generating lots of KVM_BUG_ON_DATA_CORRUPTION() in the code, with the
+execuse that "hey, it is not a BUG_ON(), just turn off
+CONFIG_BUG_ON_DATA_CORRUPTION." In reality, especially in production, no
+one will take that risk by completely turning off the KCONFIG, so
+KVM_BUG_ON_DATA_CORRUPTION() is still a BUG_ON() but with people having
+execuses to add more.
 
-Sure, will do in next version.
+Later I realize that this worry is purely based on hypothesis, so I
+choose to not worry about that anymore. Overall, making BUG_ON()
+tunable is still a very good progress. Thank you and David for the
+help.
+
+-Mingwei
+
+>  static inline void kvm_vcpu_srcu_read_lock(struct kvm_vcpu *vcpu)
+>  {
+>  #ifdef CONFIG_PROVE_RCU
+> -- 
+> 2.40.1.606.ga4b1b128d6-goog
 > 
-> Can you also explain what happens with the TSS busy bit?  I'm staring at a comically
-> long internal discussion about this patch, I would likely to capture the important
-> bits in the changelog.  Doesn't have to be super verbose, e.g. just an explanation
-> that makes it abundantly clear reload_tss() is fully redundant.
-> 
-
-Oh, the busy bit was not related with the removal. I was confused about
-the busy bit being 0 when being loaded by LTR on SVM side. I thought
-this was an inconsistency since on VMX side, immediately after VMEXIT,
-TR.type == 11 (1011b) which means busy bit (bit 1) is 1 (SDM vol 3
-28.5.2).
-
-It turns out it was just my confusion, since busy bit is to prevent
-reloading a 'busy' segment, i.e., if LTR reloads a 'busy' segment, it
-triggers #GP at host level. To avoid that, KVM clear the bit in
-reload_tss() and make it 'available' (that's why the value is 9).
-Immediately after being loaded by LTR, the busy bit will be set again.
-
-> > Reported-by: Venkatesh Srinivas <venkateshs@google.com>
-> > Suggested-by: Jim Mattson <jmattson@google.com>
-> > Tested-by: Mingwei Zhang <mizhang@google.com>
-> 
-> Heh, you wrote the code and sent the patch, so it darn well better be tested :-)
-> There are scenarios where a Tested-by for the _original_ author is warranted, e.g.
-> if someone else tweaked and reposted the patch.  But in this case, there's no need.
-
-I see. I can remove the Tested-by.
