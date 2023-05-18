@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30BAD7089CA
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 22:48:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD92E7089CB
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 22:48:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229635AbjERUsI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 16:48:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56118 "EHLO
+        id S230144AbjERUsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 16:48:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230144AbjERUsG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 May 2023 16:48:06 -0400
+        with ESMTP id S229555AbjERUsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 16:48:09 -0400
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 831AB189
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 13:48:01 -0700 (PDT)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34IIxeiR012540;
-        Thu, 18 May 2023 20:47:38 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C0D8E7F
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 13:48:03 -0700 (PDT)
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34IIx8m9032118;
+        Thu, 18 May 2023 20:47:42 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2023-03-30;
- bh=QcIsCoHtQ7tdFGqnxoNBNnKAFVBbCL6Lhv33lo+g6fU=;
- b=nIzaPt4rqGDzI6yOUWmN+fTE2/eiW2EiHpXUuJ3aQuOOCMCNCpdWBcmrrDcop2IkcPAO
- GHewE9Yagz8nf8i1Qk1BEopWRC/61evLxV5kaDidSJl7BJ+l85zwdmhWKF6UDeI/EMDo
- KgAtOGWpUMEv3scOn9dW6I4DrRaoO7fitUGvxNanvW41h/t/oLTN1csVGsZezwf7+cqY
- pv0gAoCESyfzWPQAQdtNaD0a9QQmbTDEjPrAr7HgKmYgu5LDwBQNgv5IYXAc9J/2MJJf
- ukFsoI0Y6Blckedlg/ZinJygeRaj+/vfNlc2W/LvoptEMbaY9ZL/1/ewWKTnFn3h2rVo dg== 
+ bh=iMktio9VTgbJ1yfqMEUUnV1ANkjO6zvNSUX5TxAJMrU=;
+ b=ptwdTBuf1JcJzHelS2lyO/TdiOfO+V4FJmr4k2i45kDclFjYYylPnwSFn+KkGwVjzdd0
+ M7mluSL+e4tpC5whfaaHsEqHiJwGpDgdLKYAIN8IoAaKuozMYwzQzvGoSyxdfKvwgKKo
+ WCYf7XrRCCAYQjQyAU0b9UjDYLfaETf36PL3KBNSxWTF+L+UwUPzhmsaDKrvuheAVvNh
+ 5PSZf0bWA8V8Ao4tErxH3IIwobuRuFYg0IyaEc2mZc/yg9heTeGYrCkLvDV3Z26TGPY6
+ s0YSZXsoA9Y752HqssDs53x2LP7zBxDKB3x8go7O7bJA+j2F6wyUZRGZkUKJ4Yaueh2q 5Q== 
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3qmxfc3jx4-1
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3qj33v0v9w-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 May 2023 20:47:37 +0000
+        Thu, 18 May 2023 20:47:41 +0000
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 34IJ2W5a032112;
-        Thu, 18 May 2023 20:47:36 GMT
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 34IJkARw032121;
+        Thu, 18 May 2023 20:47:40 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3qj10daedy-1
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3qj10daeff-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 May 2023 20:47:36 +0000
+        Thu, 18 May 2023 20:47:40 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34IKlE2v033533;
-        Thu, 18 May 2023 20:47:35 GMT
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34IKlE2x033533;
+        Thu, 18 May 2023 20:47:39 GMT
 Received: from joaomart-mac.uk.oracle.com (dhcp-10-175-172-172.vpn.oracle.com [10.175.172.172])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3qj10dae46-6;
-        Thu, 18 May 2023 20:47:35 +0000
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3qj10dae46-7;
+        Thu, 18 May 2023 20:47:39 +0000
 From:   Joao Martins <joao.m.martins@oracle.com>
 To:     iommu@lists.linux.dev
 Cc:     Jason Gunthorpe <jgg@nvidia.com>,
@@ -60,9 +60,9 @@ Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         Robin Murphy <robin.murphy@arm.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         kvm@vger.kernel.org, Joao Martins <joao.m.martins@oracle.com>
-Subject: [PATCH RFCv2 05/24] iommufd: Add a flag to enforce dirty tracking on attach
-Date:   Thu, 18 May 2023 21:46:31 +0100
-Message-Id: <20230518204650.14541-6-joao.m.martins@oracle.com>
+Subject: [PATCH RFCv2 06/24] iommufd/selftest: Add a flags to _test_cmd_{hwpt_alloc,mock_domain}
+Date:   Thu, 18 May 2023 21:46:32 +0100
+Message-Id: <20230518204650.14541-7-joao.m.martins@oracle.com>
 In-Reply-To: <20230518204650.14541-1-joao.m.martins@oracle.com>
 References: <20230518204650.14541-1-joao.m.martins@oracle.com>
 MIME-Version: 1.0
@@ -70,12 +70,12 @@ Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-05-18_15,2023-05-17_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=865 adultscore=0
  malwarescore=0 mlxscore=0 spamscore=0 bulkscore=0 phishscore=0
  suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2304280000 definitions=main-2305180170
-X-Proofpoint-GUID: -JeeAC5ISuAFikfuevNFnqcc00JsaYFW
-X-Proofpoint-ORIG-GUID: -JeeAC5ISuAFikfuevNFnqcc00JsaYFW
+X-Proofpoint-GUID: 5j-peOTwN9q8QBBoW7Zrh2AkwgJ4B1n7
+X-Proofpoint-ORIG-GUID: 5j-peOTwN9q8QBBoW7Zrh2AkwgJ4B1n7
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -86,164 +86,166 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Throughout IOMMU domain lifetime that wants to use dirty tracking, some
-guarantees are needed such that any device attached to the iommu_domain
-supports dirty tracking.
+In preparation to test passing flags to HWPT_ALLOC (particularly
+IOMMU_HWPT_ALLOC_ENFORCE_DIRTY), add a flags argument into the test
+functions.
 
-The idea is to handle a case where IOMMUs are assymetric feature-wise and
-thus the capability may not be advertised for all devices.  This is done by
-adding a flag into HWPT_ALLOC namely:
-
-	IOMMUFD_HWPT_ALLOC_ENFORCE_DIRTY
-
-.. Passed in HWPT_ALLOC ioctl flags. The enforcement is done by creating a
-iommu_domain and setting the associated flags (via iommu_domain_set_flags)
-cross-checking with IOMMU driver advertised flags (and failing if it's not
-advertised). Advertising the new IOMMU domain feature flag requires that
-the individual iommu driver capability is supported when we attach a new
-device to the iommu_domain or otherwise fail the attachment if the
-capability is not set in the device.  Userspace will have also the option
-of checking which that dirty tracking is supported in the IOMMU behind the
-device.
-
-Link: https://lore.kernel.org/kvm/20220721142421.GB4609@nvidia.com/
 Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
 ---
- drivers/iommu/iommufd/device.c          |  2 +-
- drivers/iommu/iommufd/hw_pagetable.c    | 29 ++++++++++++++++++++++---
- drivers/iommu/iommufd/iommufd_private.h |  4 +++-
- include/uapi/linux/iommufd.h            |  9 ++++++++
- 4 files changed, 39 insertions(+), 5 deletions(-)
+ tools/testing/selftests/iommu/iommufd.c       |  3 ++-
+ .../selftests/iommu/iommufd_fail_nth.c        | 24 +++++++++++--------
+ tools/testing/selftests/iommu/iommufd_utils.h | 22 ++++++++++-------
+ 3 files changed, 30 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
-index 989bd485f92f..48d1300f0350 100644
---- a/drivers/iommu/iommufd/device.c
-+++ b/drivers/iommu/iommufd/device.c
-@@ -511,7 +511,7 @@ iommufd_device_auto_get_domain(struct iommufd_device *idev,
- 	}
+diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
+index dc09c1de319f..771e4a40200f 100644
+--- a/tools/testing/selftests/iommu/iommufd.c
++++ b/tools/testing/selftests/iommu/iommufd.c
+@@ -1346,7 +1346,8 @@ TEST_F(iommufd_mock_domain, alloc_hwpt)
+ 		uint32_t stddev_id;
+ 		uint32_t hwpt_id;
  
- 	hwpt = iommufd_hw_pagetable_alloc(idev->ictx, ioas, idev,
--					  immediate_attach);
-+					  immediate_attach, false);
- 	if (IS_ERR(hwpt)) {
- 		destroy_hwpt = ERR_CAST(hwpt);
- 		goto out_unlock;
-diff --git a/drivers/iommu/iommufd/hw_pagetable.c b/drivers/iommu/iommufd/hw_pagetable.c
-index cf2c1504e20d..4f0b72737ae2 100644
---- a/drivers/iommu/iommufd/hw_pagetable.c
-+++ b/drivers/iommu/iommufd/hw_pagetable.c
-@@ -55,12 +55,26 @@ int iommufd_hw_pagetable_enforce_cc(struct iommufd_hw_pagetable *hwpt)
+-		test_cmd_hwpt_alloc(self->idev_ids[0], self->ioas_id, &hwpt_id);
++		test_cmd_hwpt_alloc(self->idev_ids[0], self->ioas_id,
++				    0, &hwpt_id);
+ 		test_cmd_mock_domain(hwpt_id, &stddev_id, NULL, NULL);
+ 		test_ioctl_destroy(stddev_id);
+ 		test_ioctl_destroy(hwpt_id);
+diff --git a/tools/testing/selftests/iommu/iommufd_fail_nth.c b/tools/testing/selftests/iommu/iommufd_fail_nth.c
+index d4c552e56948..0e003069bb2a 100644
+--- a/tools/testing/selftests/iommu/iommufd_fail_nth.c
++++ b/tools/testing/selftests/iommu/iommufd_fail_nth.c
+@@ -315,7 +315,8 @@ TEST_FAIL_NTH(basic_fail_nth, map_domain)
+ 
+ 	fail_nth_enable();
+ 
+-	if (_test_cmd_mock_domain(self->fd, ioas_id, &stdev_id, &hwpt_id, NULL))
++	if (_test_cmd_mock_domain(self->fd, ioas_id, 0, &stdev_id,
++				  &hwpt_id, NULL))
+ 		return -1;
+ 
+ 	if (_test_ioctl_ioas_map(self->fd, ioas_id, buffer, 262144, &iova,
+@@ -326,7 +327,8 @@ TEST_FAIL_NTH(basic_fail_nth, map_domain)
+ 	if (_test_ioctl_destroy(self->fd, stdev_id))
+ 		return -1;
+ 
+-	if (_test_cmd_mock_domain(self->fd, ioas_id, &stdev_id, &hwpt_id, NULL))
++	if (_test_cmd_mock_domain(self->fd, ioas_id, 0,
++				  &stdev_id, &hwpt_id, NULL))
+ 		return -1;
+ 	return 0;
+ }
+@@ -350,13 +352,14 @@ TEST_FAIL_NTH(basic_fail_nth, map_two_domains)
+ 	if (_test_ioctl_set_temp_memory_limit(self->fd, 32))
+ 		return -1;
+ 
+-	if (_test_cmd_mock_domain(self->fd, ioas_id, &stdev_id, &hwpt_id, NULL))
++	if (_test_cmd_mock_domain(self->fd, ioas_id, 0,
++				  &stdev_id, &hwpt_id, NULL))
+ 		return -1;
+ 
+ 	fail_nth_enable();
+ 
+-	if (_test_cmd_mock_domain(self->fd, ioas_id, &stdev_id2, &hwpt_id2,
+-				  NULL))
++	if (_test_cmd_mock_domain(self->fd, ioas_id, 0,
++				  &stdev_id2, &hwpt_id2, NULL))
+ 		return -1;
+ 
+ 	if (_test_ioctl_ioas_map(self->fd, ioas_id, buffer, 262144, &iova,
+@@ -370,9 +373,9 @@ TEST_FAIL_NTH(basic_fail_nth, map_two_domains)
+ 	if (_test_ioctl_destroy(self->fd, stdev_id2))
+ 		return -1;
+ 
+-	if (_test_cmd_mock_domain(self->fd, ioas_id, &stdev_id, &hwpt_id, NULL))
++	if (_test_cmd_mock_domain(self->fd, ioas_id, 0, &stdev_id, &hwpt_id, NULL))
+ 		return -1;
+-	if (_test_cmd_mock_domain(self->fd, ioas_id, &stdev_id2, &hwpt_id2,
++	if (_test_cmd_mock_domain(self->fd, ioas_id, 0, &stdev_id2, &hwpt_id2,
+ 				  NULL))
+ 		return -1;
+ 	return 0;
+@@ -530,7 +533,8 @@ TEST_FAIL_NTH(basic_fail_nth, access_pin_domain)
+ 	if (_test_ioctl_set_temp_memory_limit(self->fd, 32))
+ 		return -1;
+ 
+-	if (_test_cmd_mock_domain(self->fd, ioas_id, &stdev_id, &hwpt_id, NULL))
++	if (_test_cmd_mock_domain(self->fd, ioas_id, 0,
++				  &stdev_id, &hwpt_id, NULL))
+ 		return -1;
+ 
+ 	if (_test_ioctl_ioas_map(self->fd, ioas_id, buffer, BUFFER_SIZE, &iova,
+@@ -607,11 +611,11 @@ TEST_FAIL_NTH(basic_fail_nth, device)
+ 
+ 	fail_nth_enable();
+ 
+-	if (_test_cmd_mock_domain(self->fd, ioas_id, &stdev_id, NULL,
++	if (_test_cmd_mock_domain(self->fd, ioas_id, 0, &stdev_id, NULL,
+ 				  &idev_id))
+ 		return -1;
+ 
+-	if (_test_cmd_hwpt_alloc(self->fd, idev_id, ioas_id, &hwpt_id))
++	if (_test_cmd_hwpt_alloc(self->fd, idev_id, ioas_id, 0, &hwpt_id))
+ 		return -1;
+ 
+ 	if (_test_cmd_mock_domain_replace(self->fd, stdev_id, ioas_id2, NULL))
+diff --git a/tools/testing/selftests/iommu/iommufd_utils.h b/tools/testing/selftests/iommu/iommufd_utils.h
+index 53b4d3f2d9fc..04871bcfd34b 100644
+--- a/tools/testing/selftests/iommu/iommufd_utils.h
++++ b/tools/testing/selftests/iommu/iommufd_utils.h
+@@ -40,7 +40,8 @@ static unsigned long PAGE_SIZE;
+ 				&test_cmd));                                  \
+ 	})
+ 
+-static int _test_cmd_mock_domain(int fd, unsigned int ioas_id, __u32 *stdev_id,
++static int _test_cmd_mock_domain(int fd, unsigned int ioas_id,
++				 __u32 stdev_flags, __u32 *stdev_id,
+ 				 __u32 *hwpt_id, __u32 *idev_id)
+ {
+ 	struct iommu_test_cmd cmd = {
+@@ -64,10 +65,13 @@ static int _test_cmd_mock_domain(int fd, unsigned int ioas_id, __u32 *stdev_id,
+ 	return 0;
+ }
+ #define test_cmd_mock_domain(ioas_id, stdev_id, hwpt_id, idev_id)       \
+-	ASSERT_EQ(0, _test_cmd_mock_domain(self->fd, ioas_id, stdev_id, \
+-					   hwpt_id, idev_id))
+-#define test_err_mock_domain(_errno, ioas_id, stdev_id, hwpt_id)      \
+-	EXPECT_ERRNO(_errno, _test_cmd_mock_domain(self->fd, ioas_id, \
++	ASSERT_EQ(0, _test_cmd_mock_domain(self->fd, ioas_id, 0,	\
++					   stdev_id, hwpt_id, idev_id))
++#define test_err_mock_domain(_errno, ioas_id, stdev_id, hwpt_id)         \
++	EXPECT_ERRNO(_errno, _test_cmd_mock_domain(self->fd, ioas_id, 0, \
++						   stdev_id, hwpt_id, NULL))
++#define test_err_mock_domain_flags(_errno, ioas_id, flags, stdev_id, hwpt_id) \
++	EXPECT_ERRNO(_errno, _test_cmd_mock_domain(self->fd, ioas_id, flags,  \
+ 						   stdev_id, hwpt_id, NULL))
+ 
+ static int _test_cmd_mock_domain_replace(int fd, __u32 stdev_id, __u32 pt_id,
+@@ -99,10 +103,11 @@ static int _test_cmd_mock_domain_replace(int fd, __u32 stdev_id, __u32 pt_id,
+ 							   pt_id, NULL))
+ 
+ static int _test_cmd_hwpt_alloc(int fd, __u32 device_id, __u32 pt_id,
+-					 __u32 *hwpt_id)
++				__u32 flags, __u32 *hwpt_id)
+ {
+ 	struct iommu_hwpt_alloc cmd = {
+ 		.size = sizeof(cmd),
++		.flags = flags,
+ 		.dev_id = device_id,
+ 		.pt_id = pt_id,
+ 	};
+@@ -116,8 +121,9 @@ static int _test_cmd_hwpt_alloc(int fd, __u32 device_id, __u32 pt_id,
  	return 0;
  }
  
-+int iommufd_hw_pagetable_enforce_dirty(struct iommufd_hw_pagetable *hwpt,
-+				       struct iommufd_device *idev)
-+{
-+	hwpt->enforce_dirty =
-+		!iommu_domain_set_flags(hwpt->domain, idev->dev->bus,
-+					IOMMU_DOMAIN_F_ENFORCE_DIRTY);
-+	if (!hwpt->enforce_dirty)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- /**
-  * iommufd_hw_pagetable_alloc() - Get an iommu_domain for a device
-  * @ictx: iommufd context
-  * @ioas: IOAS to associate the domain with
-  * @idev: Device to get an iommu_domain for
-  * @immediate_attach: True if idev should be attached to the hwpt
-+ * @enforce_dirty: True if dirty tracking support should be enforce
-+ * 		   on device attach
-  *
-  * Allocate a new iommu_domain and return it as a hw_pagetable. The HWPT
-  * will be linked to the given ioas and upon return the underlying iommu_domain
-@@ -72,7 +86,8 @@ int iommufd_hw_pagetable_enforce_cc(struct iommufd_hw_pagetable *hwpt)
-  */
- struct iommufd_hw_pagetable *
- iommufd_hw_pagetable_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
--			   struct iommufd_device *idev, bool immediate_attach)
-+			   struct iommufd_device *idev, bool immediate_attach,
-+			   bool enforce_dirty)
- {
- 	struct iommufd_hw_pagetable *hwpt;
- 	int rc;
-@@ -107,6 +122,12 @@ iommufd_hw_pagetable_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
- 			goto out_abort;
- 	}
+-#define test_cmd_hwpt_alloc(device_id, pt_id, hwpt_id) \
+-	ASSERT_EQ(0, _test_cmd_hwpt_alloc(self->fd, device_id, pt_id, hwpt_id))
++#define test_cmd_hwpt_alloc(device_id, pt_id, flags, hwpt_id) \
++	ASSERT_EQ(0, _test_cmd_hwpt_alloc(self->fd, device_id, pt_id, flags, \
++					  hwpt_id))
  
-+	if (enforce_dirty) {
-+		rc = iommufd_hw_pagetable_enforce_dirty(hwpt, idev);
-+		if (rc)
-+			goto out_abort;
-+	}
-+
- 	/*
- 	 * immediate_attach exists only to accommodate iommu drivers that cannot
- 	 * directly allocate a domain. These drivers do not finish creating the
-@@ -141,7 +162,8 @@ int iommufd_hwpt_alloc(struct iommufd_ucmd *ucmd)
- 	struct iommufd_ioas *ioas;
- 	int rc;
- 
--	if (cmd->flags || cmd->__reserved)
-+	if ((cmd->flags & ~(IOMMU_HWPT_ALLOC_ENFORCE_DIRTY)) ||
-+	    cmd->__reserved)
- 		return -EOPNOTSUPP;
- 
- 	idev = iommufd_get_device(ucmd, cmd->dev_id);
-@@ -155,7 +177,8 @@ int iommufd_hwpt_alloc(struct iommufd_ucmd *ucmd)
- 	}
- 
- 	mutex_lock(&ioas->mutex);
--	hwpt = iommufd_hw_pagetable_alloc(ucmd->ictx, ioas, idev, false);
-+	hwpt = iommufd_hw_pagetable_alloc(ucmd->ictx, ioas, idev, false,
-+				  cmd->flags & IOMMU_HWPT_ALLOC_ENFORCE_DIRTY);
- 	if (IS_ERR(hwpt)) {
- 		rc = PTR_ERR(hwpt);
- 		goto out_unlock;
-diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
-index dba730129b8c..2552eb44d83a 100644
---- a/drivers/iommu/iommufd/iommufd_private.h
-+++ b/drivers/iommu/iommufd/iommufd_private.h
-@@ -247,6 +247,7 @@ struct iommufd_hw_pagetable {
- 	struct iommu_domain *domain;
- 	bool auto_domain : 1;
- 	bool enforce_cache_coherency : 1;
-+	bool enforce_dirty : 1;
- 	bool msi_cookie : 1;
- 	/* Head at iommufd_ioas::hwpt_list */
- 	struct list_head hwpt_item;
-@@ -254,7 +255,8 @@ struct iommufd_hw_pagetable {
- 
- struct iommufd_hw_pagetable *
- iommufd_hw_pagetable_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
--			   struct iommufd_device *idev, bool immediate_attach);
-+			   struct iommufd_device *idev, bool immediate_attach,
-+			   bool enforce_dirty);
- int iommufd_hw_pagetable_enforce_cc(struct iommufd_hw_pagetable *hwpt);
- int iommufd_hw_pagetable_attach(struct iommufd_hw_pagetable *hwpt,
- 				struct iommufd_device *idev);
-diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
-index 8245c01adca6..1cd9c54d0f64 100644
---- a/include/uapi/linux/iommufd.h
-+++ b/include/uapi/linux/iommufd.h
-@@ -346,6 +346,15 @@ struct iommu_vfio_ioas {
- };
- #define IOMMU_VFIO_IOAS _IO(IOMMUFD_TYPE, IOMMUFD_CMD_VFIO_IOAS)
- 
-+/**
-+ * enum iommufd_hwpt_alloc_flags - Flags for alloc hwpt
-+ * @IOMMU_HWPT_ALL_ENFORCE_DIRTY: Dirty tracking support for device IOMMU is
-+ *                                enforced on device attachment
-+ */
-+enum iommufd_hwpt_alloc_flags {
-+	IOMMU_HWPT_ALLOC_ENFORCE_DIRTY = 1 << 0,
-+};
-+
- /**
-  * struct iommu_hwpt_alloc - ioctl(IOMMU_HWPT_ALLOC)
-  * @size: sizeof(struct iommu_hwpt_alloc)
+ static int _test_cmd_create_access(int fd, unsigned int ioas_id,
+ 				   __u32 *access_id, unsigned int flags)
 -- 
 2.17.2
 
