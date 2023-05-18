@@ -2,132 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 59C64708731
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 19:48:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9E2E708772
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 20:04:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229675AbjERRsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 13:48:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39918 "EHLO
+        id S229723AbjERSE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 14:04:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229810AbjERRrn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 May 2023 13:47:43 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CBEEA9
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 10:47:42 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 02D276510A
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 17:47:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 320B3C433EF;
-        Thu, 18 May 2023 17:47:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684432061;
-        bh=USjwvx+K9igUSpQ4sS7LlyJXHC3ABEpSlAR4iN8rmMQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=AotWzmcqKomLPCgLrJlJ0tI49tPiaVnSHeIJe5+CaNXdW1+ykdhyW3sARApMc88uC
-         s7CcqkidDKMLb0Jx2HRIS/Vr9/RnI1m1jev4G1PKHLQZHnG2hQaVWZ62KqbKqjX9BR
-         f+o5Ars5P17nDwTO8eEKHyfm/u84NQ+BQiHe9E/Of9X0Ptoy3y2ndbVhIEhikr/1FZ
-         twcEV3PGC3cIk1teeyNuW2XHycCeBWqEj1JJq+m/vd2HRKZ+vRuf1y1a7Y8Q6qF5Ey
-         AVT/Io/XbzsEB2MzEHX0SiRH+4BEuA7ljRKutDyIpfW4YZpHys5qsDTR+YgKEYDkvc
-         3ZXkjlwKc9ygw==
-Date:   Thu, 18 May 2023 18:47:34 +0100
-From:   Conor Dooley <conor@kernel.org>
-To:     Andy Chiu <andy.chiu@sifive.com>
-Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-        Liao Chang <liaochang1@huawei.com>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Guo Ren <guoren@kernel.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@rivosinc.com>,
-        Mattias Nissler <mnissler@rivosinc.com>
-Subject: Re: [PATCH -next v20 11/26] riscv: Allocate user's vector context in
- the first-use trap
-Message-ID: <20230518-external-sixteen-f2d2ae444547@spud>
-References: <20230518161949.11203-1-andy.chiu@sifive.com>
- <20230518161949.11203-12-andy.chiu@sifive.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="JqzHJXxaEWN8S6RA"
-Content-Disposition: inline
-In-Reply-To: <20230518161949.11203-12-andy.chiu@sifive.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229769AbjERSEu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 14:04:50 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D22E710E
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 11:04:48 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-ba8338f20bdso2794194276.0
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 11:04:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1684433088; x=1687025088;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vCrVtwdIraNV2irdPKpgDX1UCTkhSG6uoeDckqbr3Es=;
+        b=gQ9Z3F2vw3+VareHpKfWGGRTctpzyfv4csZGMg2YaLnhnyXjwobQQGO/wA6h0O+lJ3
+         9kRuqIngT8mGqWAbR+pbqmRCfc5Jn53wOJ8dC3SAyCq8ku2lJdrNYJDeS8QtzHJ11P3Z
+         E2zgzhaLMfDysfnU9WzOecKRSRWAyK4ygjJIW9rT5PCi+ujIXjfWUjOifb86jt0FfJmB
+         GEkCOzRHGp2BucWTHjYw1OeO0PpAGtx1WzumH46CcmmxMrIiXFUzYpmzuiK4RX3JyUhT
+         x3dng1sy9tSLjWIox+YKLGWhx3LBS+vUH5O4fhooCf6bPzJXXs7MqY8SDb0+JZ8KHABy
+         HwWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684433088; x=1687025088;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vCrVtwdIraNV2irdPKpgDX1UCTkhSG6uoeDckqbr3Es=;
+        b=GpQwr5F57HLvPEtfxTSFlja/sp+TS4lyTxzC7o3ddgIkUDHXFD+hVwYmJX/ZhNQrJ1
+         4hhLqL2lRslFnHq4R101bJ1ZX4IzLN0niQuU80MGmbIRid+LG0N9VyfRcbL7cjHSujp7
+         9hAsSNdnnjb3fvhaa1ORfPgZnorBsir0p0wuRFuSAhKRbXwM2pvB9OyEX1/P0hYMNcpP
+         fzfT66YKL+9vG0d0Cvcc0b4toXLc/vwpd6lI02KsBtOP171lweZyeEVJTA+8iep9qwGo
+         M864wY+p6lcRgbkjTN6yxU0pQ55iSHD+mFz1Y8nSKo0imQwQNO1GnWa2FQ0qosF+IoNL
+         Gj5Q==
+X-Gm-Message-State: AC+VfDwhiiPQlIxZAC8K6PFf4e7tgA7j1kxK0TLcCsY322kzfmTs4KJP
+        Ekmn4MMl1kkHdBiBkCDHKwQsy+m/pT0=
+X-Google-Smtp-Source: ACHHUZ6WUkWetnPqPXPZQxsXjjLbLmLdZFTJ9NTfgI7Sfh4L6noylG2KxLFdoGMzzXRn4d8670caCGGziEM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:2e0b:0:b0:ba8:93c3:331a with SMTP id
+ u11-20020a252e0b000000b00ba893c3331amr1627455ybu.5.1684433088097; Thu, 18 May
+ 2023 11:04:48 -0700 (PDT)
+Date:   Thu, 18 May 2023 11:04:46 -0700
+In-Reply-To: <ZGXqo+tG35S2c+QQ@yzhao56-desk.sh.intel.com>
+Mime-Version: 1.0
+References: <20230513003600.818142-1-seanjc@google.com> <20230513003600.818142-4-seanjc@google.com>
+ <ZGNO5gYKOhhnslsp@yzhao56-desk.sh.intel.com> <ZGTpsvZed+r3Low1@google.com> <ZGXqo+tG35S2c+QQ@yzhao56-desk.sh.intel.com>
+Message-ID: <ZGZovmcrdh8NcWqb@google.com>
+Subject: Re: [PATCH v3 03/28] drm/i915/gvt: Verify hugepages are contiguous in
+ physical address space
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, May 18, 2023, Yan Zhao wrote:
+> On Wed, May 17, 2023 at 07:50:26AM -0700, Sean Christopherson wrote:
+> > On Tue, May 16, 2023, Yan Zhao wrote:
+> > > hi Sean
+> > > 
+> > > Do you think it's necessary to double check that struct page pointers
+> > > are also contiguous?
+> > 
+> > No, the virtual address space should be irrelevant.  The only way it would be
+> > problematic is if something in dma_map_page() expected to be able to access the
+> > entire chunk of memory by getting the virtual address of only the first page,
+> > but I can't imagine that code is reading or writing memory, let alone doing so
+> > across a huge range of memory.
+> Yes, I do find arm_iommu version of dma_map_page() access the memory by getting
+> virtual address of pages passed in, but it's implemented as page by page, not only
+> from the first page.
+> 
+> dma_map_page
+>   dma_map_page_attrs
+>     ops->map_page
+>       arm_iommu_map_page
 
---JqzHJXxaEWN8S6RA
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Heh, thankfully this is ARM specific, which presumably doesn't collide with KVMGT.
 
-On Thu, May 18, 2023 at 04:19:34PM +0000, Andy Chiu wrote:
-> Vector unit is disabled by default for all user processes. Thus, a
-> process will take a trap (illegal instruction) into kernel at the first
-> time when it uses Vector. Only after then, the kernel allocates V
-> context and starts take care of the context for that user process.
->=20
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Link: https://lore.kernel.org/r/3923eeee-e4dc-0911-40bf-84c34aee962d@lina=
-ro.org
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> ---
-> Hey Heiko and Conor, I am dropping you guys' A-b, T-b, and R-b because I
-> added a check in riscv_v_first_use_handler().
+>          __dma_page_cpu_to_dev
+>            dma_cache_maint_page
+> 
+> Just a little worried about the condition of PFNs are contiguous
+> while they belong to different backends, e.g. one from system memory and
+> one from MMIO.
+> But I don't know how to avoid this without complicated checks.
+> And this condition might not happen in practice.
 
-> +bool riscv_v_first_use_handler(struct pt_regs *regs)
-> +{
-> +	u32 __user *epc =3D (u32 __user *)regs->epc;
-> +	u32 insn =3D (u32)regs->badaddr;
-> +
-> +	/* Do not handle if V is not supported, or disabled */
-> +	if (!has_vector() || !(elf_hwcap & COMPAT_HWCAP_ISA_V))
-> +		return false;
-
-Remind me please, in what situation is this actually even possible?
-The COMPAT_HWCAP_ISA_V flag only gets set if CONFIG_RISCV_ISA_V is
-enabled & v is in the DT.
-has_vector() is backed by different things whether alternatives are
-enabled or not. With alternatives, it depends on the bit being set in
-the riscv_isa bitmap & the Kconfig option.
-Without alternatives it is backed by __riscv_isa_extension_available()
-which only depends in the riscv_isa bitmap.
-Since the bit in the bitmap does not get cleared if CONFIG_RISCV_ISA_V
-is not set, unlike the elf_hwcap bit which does, it seems like this
-might be the condition you are trying to prevent?
-
-If so,
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-
-Otherwise, please let me know where I have gone wrong!
-
-Thanks,
-Conor.
-
---JqzHJXxaEWN8S6RA
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZGZktgAKCRB4tDGHoIJi
-0jBjAP43M+8VnOUuyPI5wMK5s570SUnfEYjrVN/aExukXNTvhgEAusFeyqLf8+Jz
-+H7+bvlRv8qn/5r5HUv8o62L8hDZlwQ=
-=klJB
------END PGP SIGNATURE-----
-
---JqzHJXxaEWN8S6RA--
+IMO, assuming that contiguous pfns are vritually contiguous is wrong, i.e. would
+be a bug in the other code.  The above dma_cache_maint_page() get's this right,
+and even has a well written comment to boot.
