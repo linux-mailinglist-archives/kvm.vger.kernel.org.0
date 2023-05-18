@@ -2,75 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A20BA708602
-	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 18:23:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 571CE708604
+	for <lists+kvm@lfdr.de>; Thu, 18 May 2023 18:23:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229851AbjERQXG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 12:23:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54456 "EHLO
+        id S229801AbjERQXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 12:23:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229801AbjERQXD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 May 2023 12:23:03 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4268810E2
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 09:22:41 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-643bb9cdd6eso2377797b3a.1
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 09:22:41 -0700 (PDT)
+        with ESMTP id S229805AbjERQXM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 May 2023 12:23:12 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 737F41991
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 09:22:55 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-64d2ca9ef0cso107644b3a.1
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 09:22:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1684426955; x=1687018955;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N+MDCRro9Xf50+QJNvlhYGv12fy+n0EAq9lKznlrmn0=;
-        b=dI2lUVtcWdnnndgRtINY/ZSV1RMXEiah5l8Nv2d4Tb3ZnEkqMkveETcc7/S8uOoNyS
-         QwmLuihecc+W7fdv7QLY5dikWZjluTxnEpFQxuce39ldhA37AyqT3GrBwg3RidIWy71u
-         le+Ht0tz3SkDK/BcQ6Pf5bAy/35uWXUMMDCoQdgXQeGHh3Qb4vphOosBl8KtXOOMmaIF
-         ZV8MyqmvnbaawWMpKaZErCjgtjymx7Dsw5obx9dcxU3/5sFxSboJEiPd6z/0/8K5s6TA
-         /gmwokF5YRtQ6/J2RS5VU8s/JT2nkFu7fUEXpgUOBS6V8XKnv9RSnhUWoJNu6R5SRAR7
-         Yvpw==
+        d=sifive.com; s=google; t=1684426967; x=1687018967;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=DUVXHBR1wkNxT0wOTAVxttFccgUOF7kcLoBjUYXBqWs=;
+        b=RmsyqDtixA9d40WGB2+ewkRJXbAbmcHiHrmnFjYIMoX+1KRp80VKc0jE5HvbCUSlNW
+         9lTkR+2iciWcmwwNHsatLkcSL5hNX/EkOHX8ZGg1KnizuOkrYwY5JUj8N3RTl+vthVx5
+         tWsBWx+fEqnRkswV4Wc32lwdc3rvsZpqeBkUZrQOI6Fdye6keuC7GoLZXgpGxsvJOxnN
+         XHNqvkwRGAoZRPGIQo6mskRfyvn9uQ4zOUubbEO+9RMUn2vQTVvxJOor7YRpaYdiugKg
+         iiCmL6prpazWZr8FEGNblwtWY8Fsk3aMb2zhpqrwagoLnCK6FIQZcMJ7w2+3y5kGrks2
+         SZ2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684426955; x=1687018955;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N+MDCRro9Xf50+QJNvlhYGv12fy+n0EAq9lKznlrmn0=;
-        b=ejN9JJcG10+51+wne1uQiujEOek1GJtETBtpOl0Bt1UxDWAXXHpDwfKfk+66Ie5/DQ
-         5tsBG51/6dtBiTwsc7hMEjO9mIfsNSgw1iivtzGZ+HOFGW6DBU8Z7uPzIRK4WAJRFAkd
-         9YLFY5+7gSJ1MCZ/yHH0Ybsj1OaYiWMpnAxKqZzYa9VPmOVSDpkgTPgOJHYzkl0RvAZq
-         cN7wH7Bu6bb6gURkaDtJY7Pnw0QhXguJ2jwZulWUSc+kj0zdHv5PRt9dNiWnpqhk3v0f
-         qfietyabDScuutkCaAEtb+HqK6Lq+7c7NGBAkspAHVw5MPo6cXfdRpDoUqENL4U1fV9/
-         sORQ==
-X-Gm-Message-State: AC+VfDzMAzmfcgW+QEG1MItCMewLDn8n1K/7HGnVrJ4xQjcYpUatMQjE
-        YbgriJfa4cGnMnYl3Zjnh1F22A==
-X-Google-Smtp-Source: ACHHUZ5lZGUdhh230ULPpQTyLuMbqnQU18JBqRp6StmIPyw1vtFKIhtu4JXH5qp913PbkJwmAtmtvA==
-X-Received: by 2002:a05:6a00:b45:b0:64c:c5c0:6e01 with SMTP id p5-20020a056a000b4500b0064cc5c06e01mr6494433pfo.31.1684426954742;
-        Thu, 18 May 2023 09:22:34 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1684426967; x=1687018967;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DUVXHBR1wkNxT0wOTAVxttFccgUOF7kcLoBjUYXBqWs=;
+        b=dQTuitnLu2Y/gS5fBylVE2M/OuQc0RqUyoYWR54ZgL5lAaF0vv0amsrPnI+ItM2d+N
+         OXtXAr/TvPnYJ93c9GbDrenq5+kBKDWXGMDvbiUfQP4CE9ab1EpQ4EnioRKxlLjeRPsB
+         eeH645P0MEJHfGA0ZwT1IC1FmKEPFlIw2Q0+/0iJ5uTYrs6iny9xKJ8tOkxJdoiHNkMm
+         tnkoeLfIt8/PnJ1PDZy9uwGMSdmPghu2GrY3ZEPkUqhiTdfB3cZV66V5pBM+/AhNuDFQ
+         pnPkBnnpABLInadQjb1pS6pAui6lKXxYf1zLbBOU7OiH9W5hwOufHh5SX4vTBZojJ8Jf
+         xF3Q==
+X-Gm-Message-State: AC+VfDykclZKvy96XsitghbWnmN5NDEw8yiZUgAQqgOmc5jO02IIQH8c
+        hKiE8INltVXB7uldmxffbne68Q==
+X-Google-Smtp-Source: ACHHUZ6vyYtlBdSkdSHYeVzI3iXRymDGrAOwy7m6x8IxaET2P8QNIPLM/BTxFuOyugdPDEK2hFApwQ==
+X-Received: by 2002:a05:6a00:2ea4:b0:64a:f8c9:a421 with SMTP id fd36-20020a056a002ea400b0064af8c9a421mr5461304pfb.32.1684426966909;
+        Thu, 18 May 2023 09:22:46 -0700 (PDT)
 Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id x23-20020a62fb17000000b006414b2c9efasm1515862pfm.123.2023.05.18.09.22.31
+        by smtp.gmail.com with ESMTPSA id x23-20020a62fb17000000b006414b2c9efasm1515862pfm.123.2023.05.18.09.22.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 May 2023 09:22:34 -0700 (PDT)
+        Thu, 18 May 2023 09:22:46 -0700 (PDT)
 From:   Andy Chiu <andy.chiu@sifive.com>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
 Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
         guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <shuah@kernel.org>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Evan Green <evan@rivosinc.com>,
-        Vincent Chen <vincent.chen@sifive.com>
-Subject: [PATCH -next v20 24/26] riscv: Add documentation for Vector
-Date:   Thu, 18 May 2023 16:19:47 +0000
-Message-Id: <20230518161949.11203-25-andy.chiu@sifive.com>
+        Evan Green <evan@rivosinc.com>
+Subject: [PATCH -next v20 25/26] selftests: Test RISC-V Vector prctl interface
+Date:   Thu, 18 May 2023 16:19:48 +0000
+Message-Id: <20230518161949.11203-26-andy.chiu@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230518161949.11203-1-andy.chiu@sifive.com>
 References: <20230518161949.11203-1-andy.chiu@sifive.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -81,162 +73,376 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch add a brief documentation of the userspace interface in
-regard to the RISC-V Vector extension.
+This add a test for prctl interface that controls the use of userspace
+Vector.
 
 Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-Reviewed-by: Greentime Hu <greentime.hu@sifive.com>
-Reviewed-by: Vincent Chen <vincent.chen@sifive.com>
-Co-developed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
-Changelog v20:
- - Drop bit-field repressentation and typos (Björn)
- - Fix document styling (Bagas)
----
- Documentation/riscv/index.rst  |   1 +
- Documentation/riscv/vector.rst | 120 +++++++++++++++++++++++++++++++++
- 2 files changed, 121 insertions(+)
- create mode 100644 Documentation/riscv/vector.rst
+ tools/testing/selftests/riscv/Makefile        |   2 +-
+ .../testing/selftests/riscv/vector/.gitignore |   2 +
+ tools/testing/selftests/riscv/vector/Makefile |  15 ++
+ .../riscv/vector/vstate_exec_nolibc.c         | 111 ++++++++++
+ .../selftests/riscv/vector/vstate_prctl.c     | 189 ++++++++++++++++++
+ 5 files changed, 318 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/riscv/vector/.gitignore
+ create mode 100644 tools/testing/selftests/riscv/vector/Makefile
+ create mode 100644 tools/testing/selftests/riscv/vector/vstate_exec_nolibc.c
+ create mode 100644 tools/testing/selftests/riscv/vector/vstate_prctl.c
 
-diff --git a/Documentation/riscv/index.rst b/Documentation/riscv/index.rst
-index 175a91db0200..95cf9c1e1da1 100644
---- a/Documentation/riscv/index.rst
-+++ b/Documentation/riscv/index.rst
-@@ -10,6 +10,7 @@ RISC-V architecture
-     hwprobe
-     patch-acceptance
-     uabi
-+    vector
+diff --git a/tools/testing/selftests/riscv/Makefile b/tools/testing/selftests/riscv/Makefile
+index 32a72902d045..9dd629cc86aa 100644
+--- a/tools/testing/selftests/riscv/Makefile
++++ b/tools/testing/selftests/riscv/Makefile
+@@ -5,7 +5,7 @@
+ ARCH ?= $(shell uname -m 2>/dev/null || echo not)
  
-     features
- 
-diff --git a/Documentation/riscv/vector.rst b/Documentation/riscv/vector.rst
+ ifneq (,$(filter $(ARCH),riscv))
+-RISCV_SUBTARGETS ?= hwprobe
++RISCV_SUBTARGETS ?= hwprobe vector
+ else
+ RISCV_SUBTARGETS :=
+ endif
+diff --git a/tools/testing/selftests/riscv/vector/.gitignore b/tools/testing/selftests/riscv/vector/.gitignore
 new file mode 100644
-index 000000000000..5d37fd212720
+index 000000000000..4f2b4e8a3b08
 --- /dev/null
-+++ b/Documentation/riscv/vector.rst
-@@ -0,0 +1,120 @@
-+.. SPDX-License-Identifier: GPL-2.0
++++ b/tools/testing/selftests/riscv/vector/.gitignore
+@@ -0,0 +1,2 @@
++vstate_exec_nolibc
++vstate_prctl
+diff --git a/tools/testing/selftests/riscv/vector/Makefile b/tools/testing/selftests/riscv/vector/Makefile
+new file mode 100644
+index 000000000000..cd6e80bf995d
+--- /dev/null
++++ b/tools/testing/selftests/riscv/vector/Makefile
+@@ -0,0 +1,15 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021 ARM Limited
++# Originally tools/testing/arm64/abi/Makefile
 +
-+=========================================
-+Vector Extension Support for RISC-V Linux
-+=========================================
++TEST_GEN_PROGS := vstate_prctl
++TEST_GEN_PROGS_EXTENDED := vstate_exec_nolibc
 +
-+This document briefly outlines the interface provided to userspace by Linux in
-+order to support the use of the RISC-V Vector Extension.
++include ../../lib.mk
 +
-+1.  prctl() Interface
-+---------------------
++$(OUTPUT)/vstate_prctl: vstate_prctl.c ../hwprobe/sys_hwprobe.S
++	$(CC) -static -o$@ $(CFLAGS) $(LDFLAGS) $^
 +
-+Two new prctl() calls are added to allow programs to manage the enablement
-+status for the use of Vector in userspace:
++$(OUTPUT)/vstate_exec_nolibc: vstate_exec_nolibc.c
++	$(CC) -nostdlib -static -include ../../../../include/nolibc/nolibc.h \
++		-Wall $(CFLAGS) $(LDFLAGS) $^ -o $@ -lgcc
+diff --git a/tools/testing/selftests/riscv/vector/vstate_exec_nolibc.c b/tools/testing/selftests/riscv/vector/vstate_exec_nolibc.c
+new file mode 100644
+index 000000000000..5cbc392944a6
+--- /dev/null
++++ b/tools/testing/selftests/riscv/vector/vstate_exec_nolibc.c
+@@ -0,0 +1,111 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include <sys/prctl.h>
 +
-+* prctl(PR_RISCV_V_SET_CONTROL, unsigned long arg)
++#define THIS_PROGRAM "./vstate_exec_nolibc"
 +
-+    Sets the Vector enablement status of the calling thread, where the control
-+    argument consists of two 2-bit enablement statuses and a bit for inheritance
-+    mode. Other threads of the calling process are unaffected.
++int main(int argc, char **argv)
++{
++	int rc, pid, status, test_inherit = 0;
++	long ctrl, ctrl_c;
++	char *exec_argv[2], *exec_envp[2];
 +
-+    Enablement status is a tri-state value each occupying 2-bit of space in
-+    the control argument:
++	if (argc > 1)
++		test_inherit = 1;
 +
-+    * :c:macro:`PR_RISCV_V_VSTATE_CTRL_DEFAULT`: Use the system-wide default
-+      enablement status on execve(). The system-wide default setting can be
-+      controlled via sysctl interface (see sysctl section below).
++	ctrl = my_syscall1(__NR_prctl, PR_RISCV_V_GET_CONTROL);
++	if (ctrl < 0) {
++		puts("PR_RISCV_V_GET_CONTROL is not supported\n");
++		return ctrl;
++	}
 +
-+    * :c:macro:`PR_RISCV_V_VSTATE_CTRL_ON`: Allow Vector to be run for the
-+      thread.
++	if (test_inherit) {
++		pid = fork();
++		if (pid == -1) {
++			puts("fork failed\n");
++			exit(-1);
++		}
 +
-+    * :c:macro:`PR_RISCV_V_VSTATE_CTRL_OFF`: Disallow Vector. Executing Vector
-+      instructions under such condition will trap and casuse the termination of the thread.
++		/* child  */
++		if (!pid) {
++			exec_argv[0] = THIS_PROGRAM;
++			exec_argv[1] = NULL;
++			exec_envp[0] = NULL;
++			exec_envp[1] = NULL;
++			/* launch the program again to check inherit */
++			rc = execve(THIS_PROGRAM, exec_argv, exec_envp);
++			if (rc) {
++				puts("child execve failed\n");
++				exit(-1);
++			}
++		}
 +
-+    arg: The control argument is a 5-bit value consisting of 3 parts, and
-+    accessed by 3 masks respectively.
++	} else {
++		pid = fork();
++		if (pid == -1) {
++			puts("fork failed\n");
++			exit(-1);
++		}
 +
-+    The 3 masks, PR_RISCV_V_VSTATE_CTRL_CUR_MASK,
-+    PR_RISCV_V_VSTATE_CTRL_NEXT_MASK, and PR_RISCV_V_VSTATE_CTRL_INHERIT
-+    represents bit[1:0], bit[3:2], and bit[4]. bit[1:0] accounts for the
-+    enablement status of current thread, and the setting at bit[3:2] takes place
-+    at next execve(). bit[4] defines the inheritance mode of the setting in
-+    bit[3:2].
++		if (!pid) {
++			rc = my_syscall1(__NR_prctl, PR_RISCV_V_GET_CONTROL);
++			if (rc != ctrl) {
++				puts("child's vstate_ctrl not equal to parent's\n");
++				exit(-1);
++			}
++			asm volatile (".option push\n\t"
++				      ".option arch, +v\n\t"
++				      "vsetvli x0, x0, e32, m8, ta, ma\n\t"
++				      ".option pop\n\t"
++				      );
++			exit(ctrl);
++		}
++	}
 +
-+        * :c:macro:`PR_RISCV_V_VSTATE_CTRL_CUR_MASK`: bit[1:0]: Account for the
-+          Vector enablement status for the calling thread. The calling thread is
-+          not able to turn off Vector once it has been enabled. The prctl() call
-+          fails with EPERM if the value in this mask is PR_RISCV_V_VSTATE_CTRL_OFF
-+          but the current enablement status is not off. Setting
-+          PR_RISCV_V_VSTATE_CTRL_DEFAULT here takes no effect but to set back
-+          the original enablement status.
++	rc = waitpid(-1, &status, 0);
 +
-+        * :c:macro:`PR_RISCV_V_VSTATE_CTRL_NEXT_MASK`: bit[3:2]: Account for the
-+          Vector enablement setting for the calling thread at the next execve()
-+          system call. If PR_RISCV_V_VSTATE_CTRL_DEFAULT is used in this mask,
-+          then the enablement status will be decided by the system-wide
-+          enablement status when execve() happen.
++	if (WIFEXITED(status) && WEXITSTATUS(status) == -1) {
++		puts("child exited abnormally\n");
++		exit(-1);
++	}
 +
-+        * :c:macro:`PR_RISCV_V_VSTATE_CTRL_INHERIT`: bit[4]: the inheritance
-+          mode for the setting at PR_RISCV_V_VSTATE_CTRL_NEXT_MASK. If the bit
-+          is set then the following execve() will not clear the setting in both
-+          PR_RISCV_V_VSTATE_CTRL_NEXT_MASK and PR_RISCV_V_VSTATE_CTRL_INHERIT.
-+          This setting persists across changes in the system-wide default value.
++	if (WIFSIGNALED(status)) {
++		if (WTERMSIG(status) != SIGILL) {
++			puts("child was terminated by unexpected signal\n");
++			exit(-1);
++		}
 +
-+    Return value:
-+        * 0 on success;
-+        * EINVAL: Vector not supported, invalid enablement status for current or
-+          next mask;
-+        * EPERM: Turning off Vector in PR_RISCV_V_VSTATE_CTRL_CUR_MASK if Vector
-+          was enabled for the calling thread.
++		if ((ctrl & PR_RISCV_V_VSTATE_CTRL_CUR_MASK) != PR_RISCV_V_VSTATE_CTRL_OFF) {
++			puts("child signaled by illegal V access but vstate_ctrl is not off\n");
++			exit(-1);
++		}
 +
-+    On success:
-+        * A valid setting for PR_RISCV_V_VSTATE_CTRL_CUR_MASK takes place
-+          immediately. The enablement status specified in
-+          PR_RISCV_V_VSTATE_CTRL_NEXT_MASK happens at the next execve() call, or
-+          all following execve() calls if PR_RISCV_V_VSTATE_CTRL_INHERIT bit is
-+          set.
-+        * Every successful call overwrites a previous setting for the calling
-+          thread.
++		/* child terminated, and its vstate_ctrl is off */
++		exit(ctrl);
++	}
 +
-+* prctl(PR_RISCV_V_GET_CONTROL)
++	ctrl_c = WEXITSTATUS(status);
++	if (test_inherit) {
++		if (ctrl & PR_RISCV_V_VSTATE_CTRL_INHERIT) {
++			if (!(ctrl_c & PR_RISCV_V_VSTATE_CTRL_INHERIT)) {
++				puts("parent has inherit bit, but child has not\n");
++				exit(-1);
++			}
++		}
++		rc = (ctrl & PR_RISCV_V_VSTATE_CTRL_NEXT_MASK) >> 2;
++		if (rc != PR_RISCV_V_VSTATE_CTRL_DEFAULT) {
++			if (rc != (ctrl_c & PR_RISCV_V_VSTATE_CTRL_CUR_MASK)) {
++				puts("parent's next setting does not equal to child's\n");
++				exit(-1);
++			}
 +
-+    Gets the same Vector enablement status for the calling thread. Setting for
-+    next execve() call and the inheritance bit are all OR-ed together.
++			if (!(ctrl & PR_RISCV_V_VSTATE_CTRL_INHERIT)) {
++				if ((ctrl_c & PR_RISCV_V_VSTATE_CTRL_NEXT_MASK) !=
++				    PR_RISCV_V_VSTATE_CTRL_DEFAULT) {
++					puts("must clear child's next vstate_ctrl if !inherit\n");
++					exit(-1);
++				}
++			}
++		}
++	}
++	return ctrl;
++}
+diff --git a/tools/testing/selftests/riscv/vector/vstate_prctl.c b/tools/testing/selftests/riscv/vector/vstate_prctl.c
+new file mode 100644
+index 000000000000..b348b475be57
+--- /dev/null
++++ b/tools/testing/selftests/riscv/vector/vstate_prctl.c
+@@ -0,0 +1,189 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include <sys/prctl.h>
++#include <unistd.h>
++#include <asm/hwprobe.h>
++#include <errno.h>
++#include <sys/wait.h>
 +
-+    Return value:
-+        * a nonnegative value on success;
-+        * EINVAL: Vector not supported.
++#include "../../kselftest.h"
 +
-+2.  System runtime configuration (sysctl)
-+-----------------------------------------
++/*
++ * Rather than relying on having a new enough libc to define this, just do it
++ * ourselves.  This way we don't need to be coupled to a new-enough libc to
++ * contain the call.
++ */
++long riscv_hwprobe(struct riscv_hwprobe *pairs, size_t pair_count,
++		   size_t cpu_count, unsigned long *cpus, unsigned int flags);
 +
-+To mitigate the ABI impact of expansion of the signal stack, a
-+policy mechanism is provided to the administrators, distro maintainers, and
-+developers to control the default Vector enablement status for userspace
-+processes in form of sysctl knob:
++#define NEXT_PROGRAM "./vstate_exec_nolibc"
++static int launch_test(int test_inherit)
++{
++	char *exec_argv[3], *exec_envp[1];
++	int rc, pid, status;
 +
-+* /proc/sys/abi/riscv_v_default_allow
++	pid = fork();
++	if (pid < 0) {
++		ksft_test_result_fail("fork failed %d", pid);
++		return -1;
++	}
 +
-+    Writing the text representation of 0 or 1 to this file sets the default
-+    system enablement status for new starting userspace programs. Valid values
-+    are:
++	if (!pid) {
++		exec_argv[0] = NEXT_PROGRAM;
++		exec_argv[1] = test_inherit != 0 ? "x" : NULL;
++		exec_argv[2] = NULL;
++		exec_envp[0] = NULL;
++		/* launch the program again to check inherit */
++		rc = execve(NEXT_PROGRAM, exec_argv, exec_envp);
++		if (rc) {
++			perror("execve");
++			ksft_test_result_fail("child execve failed %d\n", rc);
++			exit(-1);
++		}
++	}
 +
-+    * 0: Do not allow Vector code to be executed as the default for new processes.
-+    * 1: Allow Vector code to be executed as the default for new processes.
++	rc = waitpid(-1, &status, 0);
++	if (rc < 0) {
++		ksft_test_result_fail("waitpid failed\n");
++		return -3;
++	}
 +
-+    Reading this file returns the current system default enablement status.
++	if ((WIFEXITED(status) && WEXITSTATUS(status) == -1) ||
++	    WIFSIGNALED(status)) {
++		ksft_test_result_fail("child exited abnormally\n");
++		return -4;
++	}
 +
-+    At every execve() call, a new enablement status of the new process is set to
-+    the system default, unless:
++	return WEXITSTATUS(status);
++}
 +
-+      * PR_RISCV_V_VSTATE_CTRL_INHERIT is set for the calling process, and the
-+        setting in PR_RISCV_V_VSTATE_CTRL_NEXT_MASK is not
-+        PR_RISCV_V_VSTATE_CTRL_DEFAULT. Or,
++int test_and_compare_child(long provided, long expected, int inherit)
++{
++	int rc;
 +
-+      * The setting in PR_RISCV_V_VSTATE_CTRL_NEXT_MASK is not
-+        PR_RISCV_V_VSTATE_CTRL_DEFAULT.
++	rc = prctl(PR_RISCV_V_SET_CONTROL, provided);
++	if (rc != 0) {
++		ksft_test_result_fail("prctl with provided arg %lx failed with code %d\n",
++				      provided, rc);
++		return -1;
++	}
++	rc = launch_test(inherit);
++	if (rc != expected) {
++		ksft_test_result_fail("Test failed, check %d != %d\n", rc,
++				      expected);
++		return -2;
++	}
++	return 0;
++}
 +
-+    Modifying the system default enablement status does not affect the enablement
-+    status of any existing process of thread that do not make an execve() call.
++#define PR_RISCV_V_VSTATE_CTRL_CUR_SHIFT	0
++#define PR_RISCV_V_VSTATE_CTRL_NEXT_SHIFT	2
++
++int main(void)
++{
++	struct riscv_hwprobe pair;
++	long flag, expected;
++	long rc;
++
++	pair.key = RISCV_HWPROBE_KEY_IMA_EXT_0;
++	rc = riscv_hwprobe(&pair, 1, 0, NULL, 0);
++	if (rc < 0) {
++		ksft_test_result_fail("hwprobe() failed with %d\n", rc);
++		return -1;
++	}
++
++	if (pair.key != RISCV_HWPROBE_KEY_IMA_EXT_0) {
++		ksft_test_result_fail("hwprobe cannot probe RISCV_HWPROBE_KEY_IMA_EXT_0\n");
++		return -2;
++	}
++
++	if (!(pair.value & RISCV_HWPROBE_IMA_V)) {
++		rc = prctl(PR_RISCV_V_GET_CONTROL);
++		if (rc != -1 || errno != EINVAL) {
++			ksft_test_result_fail("GET_CONTROL should fail on kernel/hw without V\n");
++			return -3;
++		}
++
++		rc = prctl(PR_RISCV_V_SET_CONTROL, PR_RISCV_V_VSTATE_CTRL_ON);
++		if (rc != -1 || errno != EINVAL) {
++			ksft_test_result_fail("GET_CONTROL should fail on kernel/hw without V\n");
++			return -4;
++		}
++
++		ksft_test_result_skip("Vector not supported\n");
++		return 0;
++	}
++
++	flag = PR_RISCV_V_VSTATE_CTRL_ON;
++	rc = prctl(PR_RISCV_V_SET_CONTROL, flag);
++	if (rc != 0) {
++		ksft_test_result_fail("Enabling V for current should always success\n");
++		return -5;
++	}
++
++	flag = PR_RISCV_V_VSTATE_CTRL_OFF;
++	rc = prctl(PR_RISCV_V_SET_CONTROL, flag);
++	if (rc != -1 || errno != EPERM) {
++		ksft_test_result_fail("Disabling current's V alive must fail with EPERM(%d)\n",
++				      errno);
++		return -5;
++	}
++
++	/* Turn on next's vector explicitly and test */
++	flag = PR_RISCV_V_VSTATE_CTRL_ON << PR_RISCV_V_VSTATE_CTRL_NEXT_SHIFT;
++	if (test_and_compare_child(flag, PR_RISCV_V_VSTATE_CTRL_ON, 0))
++		return -6;
++
++	/* Turn off next's vector explicitly and test */
++	flag = PR_RISCV_V_VSTATE_CTRL_OFF << PR_RISCV_V_VSTATE_CTRL_NEXT_SHIFT;
++	if (test_and_compare_child(flag, PR_RISCV_V_VSTATE_CTRL_OFF, 0))
++		return -7;
++
++	/* Turn on next's vector explicitly and test inherit */
++	flag = PR_RISCV_V_VSTATE_CTRL_ON << PR_RISCV_V_VSTATE_CTRL_NEXT_SHIFT;
++	flag |= PR_RISCV_V_VSTATE_CTRL_INHERIT;
++	expected = flag | PR_RISCV_V_VSTATE_CTRL_ON;
++	if (test_and_compare_child(flag, expected, 0))
++		return -8;
++
++	if (test_and_compare_child(flag, expected, 1))
++		return -9;
++
++	/* Turn off next's vector explicitly and test inherit */
++	flag = PR_RISCV_V_VSTATE_CTRL_OFF << PR_RISCV_V_VSTATE_CTRL_NEXT_SHIFT;
++	flag |= PR_RISCV_V_VSTATE_CTRL_INHERIT;
++	expected = flag | PR_RISCV_V_VSTATE_CTRL_OFF;
++	if (test_and_compare_child(flag, expected, 0))
++		return -10;
++
++	if (test_and_compare_child(flag, expected, 1))
++		return -11;
++
++	/* arguments should fail with EINVAL */
++	rc = prctl(PR_RISCV_V_SET_CONTROL, 0xff0);
++	if (rc != -1 || errno != EINVAL) {
++		ksft_test_result_fail("Undefined control argument should return EINVAL\n");
++		return -12;
++	}
++
++	rc = prctl(PR_RISCV_V_SET_CONTROL, 0x3);
++	if (rc != -1 || errno != EINVAL) {
++		ksft_test_result_fail("Undefined control argument should return EINVAL\n");
++		return -12;
++	}
++
++	rc = prctl(PR_RISCV_V_SET_CONTROL, 0xc);
++	if (rc != -1 || errno != EINVAL) {
++		ksft_test_result_fail("Undefined control argument should return EINVAL\n");
++		return -12;
++	}
++
++	rc = prctl(PR_RISCV_V_SET_CONTROL, 0xc);
++	if (rc != -1 || errno != EINVAL) {
++		ksft_test_result_fail("Undefined control argument should return EINVAL\n");
++		return -12;
++	}
++
++	ksft_test_result_pass("tests for riscv_v_vstate_ctrl pass\n");
++	ksft_exit_pass();
++	return 0;
++}
 -- 
 2.17.1
 
