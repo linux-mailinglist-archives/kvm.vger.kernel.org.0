@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F036708D17
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 02:53:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E1DA708D12
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 02:53:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230510AbjESAwu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 May 2023 20:52:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44488 "EHLO
+        id S230233AbjESAwx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 May 2023 20:52:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230459AbjESAwp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229529AbjESAwp (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 18 May 2023 20:52:45 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADE3410CF
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 17:52:41 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-ba82ed6e450so4879726276.2
-        for <kvm@vger.kernel.org>; Thu, 18 May 2023 17:52:41 -0700 (PDT)
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC8A510DF
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 17:52:42 -0700 (PDT)
+Received: by mail-io1-xd4a.google.com with SMTP id ca18e2360f4ac-76c63aadc10so27405539f.0
+        for <kvm@vger.kernel.org>; Thu, 18 May 2023 17:52:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684457561; x=1687049561;
+        d=google.com; s=20221208; t=1684457562; x=1687049562;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=e6DsOoIF+x/A7ZYSTdRHf2cD4dqAihxaeRbkm/Wf8QE=;
-        b=5jParhefjh0HI3DzorDBwf9sb8RHRycHwmfDukeUSFn84zbi/9wRDfQaKoBx20Z2pS
-         jgAJQ4ttTjCt4O4bkCtGffdz6NOopVPRPNoSjGutVL/MA59xkj/2i64IMZ4xsfb5JZvo
-         kQknAlNduF12wnSsQxHbve4iQrVfw5KgPyNjRsYycjJCm6HjknBcGXCHSIYIS5n8fG/P
-         xg/hoe/5+I5sWP+59TvQr8H21v4IS7jO4EfQnXFGK7qjua8eIK0OYqkQwb0pnsQqec5q
-         4KabcCQrLkUiQ1gkV268Wti7RamOnI6hXcNQ2d3KXg8+bwW6KOn9g17yKdwKwZ3kjqrY
-         RESA==
+        bh=rGsmPoc/T4Ss3kfVhJrmlF6LuTv5aUCcul/iCKRGGfw=;
+        b=xW05sinAfw8C44WTP/9vyg4AsrI69Imj2ZmwYQLJZF8kEHkqon5WhJrYk6DNXK7Gw6
+         ORpvYUQiCd6GWx/VkoJW+RFSdfhvlRh0N9mjXQWCD6GhGofxw22goCURFVI2zQtlWjI3
+         q40Px7tzzEXTuwbuR/ZiN0k40rk4wWlizlUEyM3BENmLsLioAlGtY649VgAWbXD8mNoT
+         jqpj50br7Y7C26Wwzs7ZYrY5XUZtlZuQUEmP94MjpBLWtfJKC0Hj0gvsmYFqFZ6EU0/5
+         BTWcttwAOtqDV1LAtO7UFkbUjq6YDBOiaJ3QlnQPpYOq6lbHz3ZzDuYKfXJ/7nDGH2YH
+         /vSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684457561; x=1687049561;
+        d=1e100.net; s=20221208; t=1684457562; x=1687049562;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e6DsOoIF+x/A7ZYSTdRHf2cD4dqAihxaeRbkm/Wf8QE=;
-        b=L0FFathaYThPhvEyfIvYjUhdKR5gBapZpvdHtqnhxamrH3JqvD9BRHGR2KjSXRB8rL
-         Pwstzm6wpHX8rFRv0c2mmrgNuYKkQ3Asw3PFSyGx4f58w+MbzOJM+9EQTPvzsxyQcIih
-         wCautfxEx4TAOw+fWW3VzC+fgZ2eflcTX2xiIqfxJn3E/X+LH47ExOaqmqU146lTMCsU
-         yfgtT383pkDu++no7WPi0pWBrTHN4KkmcaQssglU804i/hqO19sHX7RCMW4kKG2tT1dS
-         psnedesCB37v0SWOonH1ooredj31VJSzl6qhOCav2Zzhojauxab2E+NPKnUB8JbYjCgB
-         pavw==
-X-Gm-Message-State: AC+VfDx3MpofYDMYevSIEtXudtX4KO5FJykl1CdKxxy3aWsY0YE6NZgf
-        PNnOams0PQLMIowRKS6sqht/UBKHbcvD
-X-Google-Smtp-Source: ACHHUZ4Lgs2jxcq+llYDlHCAR5udROfxgqvoQbhs56Qn9JKtSHbYquhrdkyDxuf1xI7e7oDzhrf6uwFOdXpl
+        bh=rGsmPoc/T4Ss3kfVhJrmlF6LuTv5aUCcul/iCKRGGfw=;
+        b=dsyVcpTOktB4ccot3dl9/XEh1C1JgL5sAF722egZzWTedLqAeEVtp0y1LYm6w+TvBJ
+         otgVhNH1yeYHDB4+Xn49qNb1E81XsIp29qvhJhXpge35GqVVBFmaIP83E5a+KOANxKLd
+         9IqWZNH+Lba7Pm1KA+rINqBJyraLRAFnvOKzmLHLwuIpqw9OA5vRhck+G5sx0KQWxUnX
+         wMjALZwWd0uqTH1GH3ci2dAl3NiOeXQW9TWqgYkdZMCRFPvXItUZnZePmwn3Qwuqtpf+
+         9NccVpS+ituYFEwIwcQEKFa7HojvF5e3TJ1Kvq8QRxdR7IEV/cjMZJUwyim/Y9cL/iqU
+         oBbQ==
+X-Gm-Message-State: AC+VfDz3zVNhenYMVyW1pC2WADkx6FALZVhMNbktZeaLHG0qT47k6flC
+        s9Y5c98aRX19tMeRWW1HkfEDrH4noZ7R
+X-Google-Smtp-Source: ACHHUZ6TXO388gzfHLwp1jHRgCji0izRBrbXcyR7uAZvijYpyuzGsSLXba63Usu2McZd5g1WZCldx8ML+Rhn
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a25:b906:0:b0:ba8:9096:df50 with SMTP id
- x6-20020a25b906000000b00ba89096df50mr26549ybj.9.1684457560955; Thu, 18 May
- 2023 17:52:40 -0700 (PDT)
-Date:   Fri, 19 May 2023 00:52:30 +0000
+ (user=rananta job=sendgmr) by 2002:a05:6602:2ac4:b0:763:b184:fe92 with SMTP
+ id m4-20020a0566022ac400b00763b184fe92mr5060981iov.0.1684457562041; Thu, 18
+ May 2023 17:52:42 -0700 (PDT)
+Date:   Fri, 19 May 2023 00:52:31 +0000
 In-Reply-To: <20230519005231.3027912-1-rananta@google.com>
 Mime-Version: 1.0
 References: <20230519005231.3027912-1-rananta@google.com>
 X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
-Message-ID: <20230519005231.3027912-6-rananta@google.com>
-Subject: [PATCH v4 5/6] KVM: arm64: Invalidate the table entries upon a range
+Message-ID: <20230519005231.3027912-7-rananta@google.com>
+Subject: [PATCH v4 6/6] KVM: arm64: Use TLBI range-based intructions for unmap
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>,
@@ -68,50 +68,106 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, during the operations such as a hugepage collapse,
-KVM would flush the entire VM's context using 'vmalls12e1is'
-TLBI operation. Specifically, if the VM is faulting on many
-hugepages (say after dirty-logging), it creates a performance
-penalty for the guest whose pages have already been faulted
-earlier as they would have to refill their TLBs again.
+The current implementation of the stage-2 unmap walker traverses
+the given range and, as a part of break-before-make, performs
+TLB invalidations with a DSB for every PTE. A multitude of this
+combination could cause a performance bottleneck.
 
-Instead, call __kvm_tlb_flush_vmid_range() for table entries.
-If the system supports it, only the required range will be
-flushed. Else, it'll fallback to the previous mechanism.
+Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
+invalidations until the entire walk is finished, and then
+use range-based instructions to invalidate the TLBs in one go.
+Condition this upon S2FWB in order to avoid walking the page-table
+again to perform the CMOs after issuing the TLBI.
+
+Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
+now serves the stage-2 unmap walker specifically, rather than
+acting generic.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 35 ++++++++++++++++++++++++++++++-----
+ 1 file changed, 30 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 3d61bd3e591d2..b8f0dbd12f773 100644
+index b8f0dbd12f773..5832ee3418fb0 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -745,10 +745,13 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
- 	 * Perform the appropriate TLB invalidation based on the evicted pte
- 	 * value (if any).
- 	 */
--	if (kvm_pte_table(ctx->old, ctx->level))
--		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
--	else if (kvm_pte_valid(ctx->old))
-+	if (kvm_pte_table(ctx->old, ctx->level)) {
-+		u64 end = ctx->addr + kvm_granule_size(ctx->level);
-+
-+		kvm_call_hyp(__kvm_tlb_flush_vmid_range, mmu, ctx->addr, end);
-+	} else if (kvm_pte_valid(ctx->old)) {
- 		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
-+	}
+@@ -771,16 +771,34 @@ static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t n
+ 	smp_store_release(ctx->ptep, new);
+ }
  
- 	if (stage2_pte_is_counted(ctx->old))
- 		mm_ops->put_page(ctx->ptep);
+-static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
+-			   struct kvm_pgtable_mm_ops *mm_ops)
++static bool stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
+ {
++	/*
++	 * If FEAT_TLBIRANGE is implemented, defer the individial PTE
++	 * TLB invalidations until the entire walk is finished, and
++	 * then use the range-based TLBI instructions to do the
++	 * invalidations. Condition this upon S2FWB in order to avoid
++	 * a page-table walk again to perform the CMOs after TLBI.
++	 */
++	return system_supports_tlb_range() && stage2_has_fwb(pgt);
++}
++
++static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx *ctx,
++				struct kvm_s2_mmu *mmu,
++				struct kvm_pgtable_mm_ops *mm_ops)
++{
++	struct kvm_pgtable *pgt = ctx->arg;
++
+ 	/*
+ 	 * Clear the existing PTE, and perform break-before-make with
+ 	 * TLB maintenance if it was valid.
+ 	 */
+ 	if (kvm_pte_valid(ctx->old)) {
+ 		kvm_clear_pte(ctx->ptep);
+-		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
++
++		if (!stage2_unmap_defer_tlb_flush(pgt))
++			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
++					ctx->addr, ctx->level);
+ 	}
+ 
+ 	mm_ops->put_page(ctx->ptep);
+@@ -1015,7 +1033,7 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	 * block entry and rely on the remaining portions being faulted
+ 	 * back lazily.
+ 	 */
+-	stage2_put_pte(ctx, mmu, mm_ops);
++	stage2_unmap_put_pte(ctx, mmu, mm_ops);
+ 
+ 	if (need_flush && mm_ops->dcache_clean_inval_poc)
+ 		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old, mm_ops),
+@@ -1029,13 +1047,20 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 
+ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ {
++	int ret;
+ 	struct kvm_pgtable_walker walker = {
+ 		.cb	= stage2_unmap_walker,
+ 		.arg	= pgt,
+ 		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
+ 	};
+ 
+-	return kvm_pgtable_walk(pgt, addr, size, &walker);
++	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
++	if (stage2_unmap_defer_tlb_flush(pgt))
++		/* Perform the deferred TLB invalidations */
++		kvm_call_hyp(__kvm_tlb_flush_vmid_range, pgt->mmu,
++				addr, addr + size);
++
++	return ret;
+ }
+ 
+ struct stage2_attr_data {
 -- 
 2.40.1.698.g37aff9b760-goog
 
