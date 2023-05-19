@@ -2,126 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F030D709EF3
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 20:17:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87C4C709F04
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 20:23:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231193AbjESSRM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 14:17:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60866 "EHLO
+        id S229695AbjESSX3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 14:23:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbjESSRL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 14:17:11 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F9712C
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 11:17:09 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-2533b914d33so3761610a91.3
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 11:17:09 -0700 (PDT)
+        with ESMTP id S229458AbjESSX0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 May 2023 14:23:26 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E96DE1A1
+        for <kvm@vger.kernel.org>; Fri, 19 May 2023 11:23:24 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-64d1c53cad8so2538423b3a.3
+        for <kvm@vger.kernel.org>; Fri, 19 May 2023 11:23:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684520229; x=1687112229;
+        d=google.com; s=20221208; t=1684520604; x=1687112604;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=p7OoJfw3RHMFn7mGuM4fGvncHAWlDYR0N8g6j4d0nVE=;
-        b=DbwE3NxE6r7NeADpJ6ABRv/bnfbI/0LJHJMB4K9aetjV+ctmPbRt8KZUZnB01lVh5f
-         Pg+4MezKvCs8pFl8SfCID+aeV7vPPOze2DihxQ255PZc9nbStbalRpZJxN/8KtbLFUqz
-         mPvEu2FuiKLgDWEjbLSBchLAPyq7FcJtsXX/+0NVzcRG6xJp0tL8ef+iRpeXJiY5MOrJ
-         LlsX9CDFab32oYpXoHnXeD2nF0SzwspoWHRrSlISx7x5U8+1O4idqew6Bm8pZvyzys41
-         WhqXGk9Nz5xYy7crWzMUSDrORyjLJm8D3jkz6U2qM0DnOf+nYH9bfJYsNfR0I3NoWlSd
-         yUsw==
+        bh=DLB02Z/Vwsol/Ye6PM6jgDdfosuGHdGXe49pn4jVFGs=;
+        b=ITz9fDEYRz6uJ1+nRWO7vsSi14em+HdSJidcWgxJ4Wt6DeOJu7xDarNLoGHPPmOBJm
+         513df8JS3NzUdZBK5GSwxSAE1obesd28XWXoOz2iBbvdy2ADgD8Q7q4etCMKIPinEZf9
+         82KenOrwjvv/KK8vs+qKxwowe4qePsP8+TuW1ty9rOYtzfzi/ynfD476K7Sa4jcxQ34p
+         HkwfUr8RcwOMfxti367AckaqXDd3aDIN65dnmKhBIIZmfTcWPib/CZQFAhBLIgn2eTM2
+         VcgA71nqkKuEZwM79FEKmyy8iW+KFC3fLH2DABkTHNX+7IlmO+RnTTQJhuLLoZh1rgpR
+         H95A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684520229; x=1687112229;
+        d=1e100.net; s=20221208; t=1684520604; x=1687112604;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p7OoJfw3RHMFn7mGuM4fGvncHAWlDYR0N8g6j4d0nVE=;
-        b=bh74/yw467p3tOTyvPE598cmSKd9ew6AtBSXkicQIxRffh2hp7IDOaue9fbtAHoWvT
-         5j045ifWIdOAwOjZQQ2b7xRNu3Il901iLu2g5QwHDV3ov8XdU33j21jDNJuH28ghuxPH
-         T4bc+PrDL3cC42CRLgpTZN71jNcIs++uAkMuqcZnftO45xl81r3dMqrjVnOovyz0vK3+
-         INCLgWsB1LRQWJUgNEYkGX81NnXeJJ6tYnrnHOexzY6ie5UfVg/mGGtjB5rtw1RtJmcC
-         GMdy8My6xRHCNoBn8IYc2gztC0CeRCH8DaNfwtkXTzR/kwIcajvJheWwWdZFmpter2cL
-         CYqw==
-X-Gm-Message-State: AC+VfDy4h0bYskvIQCfzfdenihMp7fB1i6MNLHnwlxzq0ScVKZLyxPQb
-        Tl6L2yPaGblUS8dLnc7eFctHGeCnWdQ=
-X-Google-Smtp-Source: ACHHUZ5hiuYY7xIICZlrf2NJEEijsjU6hS74QOOvmQfsNtxcSIqUyXsJfot6x9ETVDyakelaxsAowBF8Hlg=
+        bh=DLB02Z/Vwsol/Ye6PM6jgDdfosuGHdGXe49pn4jVFGs=;
+        b=YbJTQnCE85ocFb8iL3fWfsLnR1MUj35jVCXInAGAK2QGw5xMbL//6LOZwJHUwz9LbT
+         MfEH1LwWZfC2REUgXWPEbuh+10vbUdbJe242QQJrEZg+1xzZxRLt59G7LlH9+Zcaa0AO
+         +7jE4iXYyKpYpCtLV0PxlJMUphLOmqUByvA9qprc4Z/jwti+0ikkVEjKstyi4o5Ta1BB
+         dHpR9ZMT+M6jwfUzlzCAu1KTtb+fWI1OjMGn5BbNv1LheIliANvLh/rnw9PnF8F9L9+C
+         h4LIhGCv/IqoXYe3kWMikUC9au9AKJKQTCvqOsF5LCN4Cm3cdNdNJuR3WUh35ybmuwUl
+         jU9g==
+X-Gm-Message-State: AC+VfDwh2/YatslzhupD4mYEX6mBBPm/DLFeXHWc3WMNwjihDmCT2tdo
+        W2XTXcBZ4ccFAOaoBNK1wzcDhJRLsuM=
+X-Google-Smtp-Source: ACHHUZ419BZyva9XfjdHZezzlVRJTJng9P1rwHIVB2iZ3Kvn5yX6WZYPLwlGGRjyBM2xKvPRPQpWmzT2ch0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:b03:b0:253:8392:8c2f with SMTP id
- bf3-20020a17090b0b0300b0025383928c2fmr678602pjb.6.1684520229207; Fri, 19 May
- 2023 11:17:09 -0700 (PDT)
-Date:   Fri, 19 May 2023 11:17:07 -0700
-In-Reply-To: <20230404122652.275005-3-aleksandr.mikhalitsyn@canonical.com>
+ (user=seanjc job=sendgmr) by 2002:aa7:88c4:0:b0:643:4595:64c7 with SMTP id
+ k4-20020aa788c4000000b00643459564c7mr1352262pff.4.1684520604384; Fri, 19 May
+ 2023 11:23:24 -0700 (PDT)
+Date:   Fri, 19 May 2023 11:23:23 -0700
+In-Reply-To: <CSQFE7I30W27.2TPDIHOTZNRIZ@dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com>
 Mime-Version: 1.0
-References: <20230404122652.275005-1-aleksandr.mikhalitsyn@canonical.com> <20230404122652.275005-3-aleksandr.mikhalitsyn@canonical.com>
-Message-ID: <ZGe9I+S78pQ/RPs7@google.com>
-Subject: Re: [PATCH 2/2] KVM: SVM: add some info prints to SEV init
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-3-chao.p.peng@linux.intel.com> <CSQFE7I30W27.2TPDIHOTZNRIZ@dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com>
+Message-ID: <ZGe+m+uFzpiW7wlr@google.com>
+Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
 From:   Sean Christopherson <seanjc@google.com>
-To:     Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Cc:     pbonzini@redhat.com,
-        "=?iso-8859-1?Q?St=E9phane?= Graber" <stgraber@ubuntu.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To:     Nicolas Saenz Julienne <nsaenz@amazon.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, graf@amazon.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com, anelkz@amazon.de
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 04, 2023, Alexander Miqqqqkhalitsyn wrote:
-> Let's add a few pr_info's to sev_hardware_setup to make SEV/SEV-ES
-> enabling a little bit handier for users. Right now it's too hard
-> to guess why SEV/SEV-ES are failing to enable.
+On Fri, May 19, 2023, Nicolas Saenz Julienne wrote:
+> Hi,
+> 
+> On Fri Dec 2, 2022 at 6:13 AM UTC, Chao Peng wrote:
+> 
+> [...]
+> > +The user sets the per-page memory attributes to a guest memory range indicated
+> > +by address/size, and in return KVM adjusts address and size to reflect the
+> > +actual pages of the memory range have been successfully set to the attributes.
+> > +If the call returns 0, "address" is updated to the last successful address + 1
+> > +and "size" is updated to the remaining address size that has not been set
+> > +successfully. The user should check the return value as well as the size to
+> > +decide if the operation succeeded for the whole range or not. The user may want
+> > +to retry the operation with the returned address/size if the previous range was
+> > +partially successful.
+> > +
+> > +Both address and size should be page aligned and the supported attributes can be
+> > +retrieved with KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES.
+> > +
+> > +The "flags" field may be used for future extensions and should be set to 0s.
+> 
+> We have been looking into adding support for the Hyper-V VSM extensions
+> which Windows uses to implement Credential Guard. This interface seems
+> like a good fit for one of its underlying features. I just wanted to
+> share a bit about it, and see if we can expand it to fit this use-case.
+> Note that this was already briefly discussed between Sean and Alex some
+> time ago[1].
+> 
+> VSM introduces isolated guest execution contexts called Virtual Trust
+> Levels (VTL) [2]. Each VTL has its own memory access protections,
+> virtual processors states, interrupt controllers and overlay pages. VTLs
+> are hierarchical and might enforce memory protections on less privileged
+> VTLs. Memory protections are enforced on a per-GPA granularity.
+> 
+> The list of possible protections is:
+> - No access -- This needs a new memory attribute, I think.
 
-Hmm, I'm somewhat torn, but I'm against taking this patch, at least not in its
-current form.  I appreciated that determining why KVM isn't enabling SEV/SEV-ES
-is annoying, but there's very little actionable information provided here that
-isn't also super obvious.  I also don't want to start us down a slippery slope
-of printing out messages every time KVM doesn't enable a feature.
+No, if KVM provides three bits for READ, WRITE, and EXECUTE, then userspace can
+get all the possible combinations.  E.g. this is RWX=000b
 
-If someone tries to enable SEV and doesn't check that their CPU supports SEV,
-then IMO that's on them.  Ditto for SEV-ES.
+> - Read-only, no execute
 
-The NPT thing is mildly interesting, but practically speaking I don't expect that
-to ever be a hindrace for generic enabling.  Ditto for MMIO caching.
+RWX=100b (using my completely arbitrary ordering of RWX bits :-) )
 
-The decode assists check is (a) completely unactionable for the vast, vast majority
-of users and (b) is a WARN_ON_ONCE() condition.
+> - Read-only, execute
 
-The ASID stuff is by far the most interesting, but that's also quite interesting
-for when SEV and SEV-ES _are_ fully supported.
+RWX=101b
 
-So if we want to provide the user more info, I'd prefer to do something like the
-below, which I think would be more helpful and would avoid my slippery slope
-concerns.
+> - Read/write, no execute
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index c25aeb550cd9..eb4c6e3812d9 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2216,7 +2216,6 @@ void __init sev_hardware_setup(void)
-        if (misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count))
-                goto out;
- 
--       pr_info("SEV supported: %u ASIDs\n", sev_asid_count);
-        sev_supported = true;
- 
-        /* SEV-ES support requested? */
-@@ -2243,11 +2242,16 @@ void __init sev_hardware_setup(void)
-        sev_es_asid_count = min_sev_asid - 1;
-        if (misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))
-                goto out;
--
--       pr_info("SEV-ES supported: %u ASIDs\n", sev_es_asid_count);
-        sev_es_supported = true;
- 
- out:
-+       if (boot_cpu_has(X86_FEATURE_SEV))
-+               pr_info("SEV %s (ASIDs %u - %u)\n",
-+                       sev_supported ? "enabled" : "disabled", ...);
-+       if (boot_cpu_has(X86_FEATURE_SEV_ES))
-+               pr_info("SEV-ES %s (ASIDs %u - %u)\n",
-+                       sev_es_supported ? "enabled" : "disabled", ...);
-+
-        sev_enabled = sev_supported;
-        sev_es_enabled = sev_es_supported;
- #endif
+RWX=110b
+
+> - Read/write, execute
+
+RWX=111b
+
+> We implemented this in the past by using a separate address space per
+> VTL and updating memory regions on protection changes. But having to
+> update the memory slot layout for every permission change scales poorly,
+> especially as we have to perform 100.000s of these operations at boot
+> (see [1] for a little more context).
+> 
+> I believe the biggest barrier for us to use memory attributes is not
+> having the ability to target specific address spaces, or to the very
+> least having some mechanism to maintain multiple independent layers of
+> attributes.
+
+Can you elaborate on "specific address spaces"?  In KVM, that usually means SMM,
+but the VTL comment above makes me think you're talking about something entirely
+different.  E.g. can you provide a brief summary of the requirements/expectations?
+
+> Also sorry for not posting our VSM patches. They are not ready for
+> upstream review yet, but we're working on it.
+> 
+> Nicolas
+> 
+> [1] https://patchwork.kernel.org/comment/25054908/
+> [2] See Chapter 15 of Microsoft's 'Hypervisor Top Level Functional Specification':
+>     https://raw.githubusercontent.com/MicrosoftDocs/Virtualization-Documentation/main/tlfs/Hypervisor%20Top%20Level%20Functional%20Specification%20v6.0b.pdf
