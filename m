@@ -2,216 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D680709F59
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 20:48:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7D79709F5F
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 20:49:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230267AbjESSs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 14:48:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43984 "EHLO
+        id S229789AbjESStn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 14:49:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230235AbjESSsZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 14:48:25 -0400
-Received: from DM5PR00CU002.outbound.protection.outlook.com (mail-centralusazon11021017.outbound.protection.outlook.com [52.101.62.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6104CF3;
-        Fri, 19 May 2023 11:48:24 -0700 (PDT)
+        with ESMTP id S229792AbjESStl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 May 2023 14:49:41 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2082.outbound.protection.outlook.com [40.107.223.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D1ECE45;
+        Fri, 19 May 2023 11:49:29 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UANkpDnVSZZNQMOleAkrOEmr1dfdfGHVAVp6itf0VsAEEMqxiLGj7sOpb5ocIh+vyN/esPq5SmZtWs+Qjoh/LZv5mYlpp5a4jcgGZXd+NS4N0DwP7r7oNZN0ta5qGpMFj5OHHyf7H53PIco35dDERWZ0xsOcZv6Cw46sUVNhpbvwmVu1HmUQth37t2QWgFv3RHoL8Bp+Hz0myX4uzo6Q8NDY6CbhS9LtsagFvuG4E3mrAU0WIP/IdHMDXROktL/r2H6arac2K8y6uYmjvXpm9X/zSqDzOjTZPf+a/RR+p0NoLwnGiCEakai2i0SecasVrOswUaFXbWLemvFW077JKw==
+ b=kGAfwlzJ4wCEe+RuWYCsEf23RQPN2SDqXz9D1g2L+21AEj83Pso3s8e7w9r0Vyk1ydPmT1ziHtYnCrXi+JMqbiMaPgL2UI41C95f4G74ScEiJ5JJIMHR3YGocUPWTYT7qmOXE0Ewx0DC1Cg5t6mGc9/IBCprtKrc/+RxQapuzlYNjnIsmwzr0y7H6h2nGxOaxN+Wis1Y7rabTJpm3p3jvljemCal13L3dgNUWP1vbbZLf15vXISQnJs7LWMCqIDbkbkhORgVvZoyGFisC74dFShaH4U+nxhPffxzQXqdiAC+wY7TrcoGbFMBdZ2LnaBlCpULE1H/mqbKSc8hgXJOeQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PuA9oV2aPaHyo1atkeJyk8mbwVgSIglUdFC691brwc4=;
- b=VOBjYn+twyiOcN0OjlQz1ayBW9ZAXTS3Jtne0MTSx/EiQNhY21B+vP8E+EgKuPSKI3S221BLQCjZQ1D3nSTMABiWMuLbKdGvYF+EHG2AJ1ND9CYbx//mDeeINnUZEsTL0/KClbPj2ZgmIa0MZorZT9nAcs3XqpPAr+Eqxa9owSQKMhAugLYFbXnTJMOmn95kPmWJxU1a0mTRWbB3q6R9gYhiIRF0+JqbGEjw+u4iIl8+0smTIsljfq/tO4QNMa3Xxd1PJi95jg2KjkFZAQXdJgZ/MfOH+cdShymTb8oSN5jMtC3Ixr2CH6iHMJZ+p1yiFL0e22iOnawrRIj3EbjvbQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ bh=A0ml7zBR+fE0I9SJ61LwZRJk4o5McbaYZ8P+NPAtlWw=;
+ b=ACwJPScxKarIODFByB4l20bwARRPsBFCB77f6bUuJQQebwrW70h/4h+iKuawtjUfcHbqiwMVl4Hbd+VMw8u6PpIG5B0n3MJWV47mdgPw8ILTIoBdmRjREaw4k535YXaEVI8udXFyZfE5MqUTp/VhrI1Ej3Uxr3SkElBjEnmN+oONKIDOLq8wywzoyBLrulbkBxT0zv+KjFvdiam6Phsst55DVljHUXL/xCNltfZKyjxcROJ/IH5dmJpaX7F8O2/Fd4Xva5wbPgP9rAv+5IonPP5GuTszBe8AKtrH1APm8Tl9ioEtceVkDsn1LaJrRXukCVO94LajaTR7e04Dq/OuMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PuA9oV2aPaHyo1atkeJyk8mbwVgSIglUdFC691brwc4=;
- b=cC+1hHVZWHqSWsDEpKStSylDnqCLYJCN2g0XkY0THhTPGKnO4G51eBl8GiKABGlWOOiMryy/OlODy/Ccy6HG6Vct7s78H4KROwu/bGb2XRfJ3pDRh1QTS/Fig4LJu/yNn5kioOnmXPikUiZ4qs0a+B9fE7HAU6fkIOXVxx3kMQY=
-Received: from BYAPR21MB1688.namprd21.prod.outlook.com (2603:10b6:a02:bf::26)
- by CO1PPF59DDB86B4.namprd21.prod.outlook.com (2603:10b6:30f:fff1:0:4:0:c)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.5; Fri, 19 May
- 2023 18:48:21 +0000
-Received: from BYAPR21MB1688.namprd21.prod.outlook.com
- ([fe80::a4f7:2466:97b5:bd31]) by BYAPR21MB1688.namprd21.prod.outlook.com
- ([fe80::a4f7:2466:97b5:bd31%5]) with mapi id 15.20.6433.007; Fri, 19 May 2023
- 18:48:21 +0000
-From:   "Michael Kelley (LINUX)" <mikelley@microsoft.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        "bigeasy@linutronix.de" <bigeasy@linutronix.de>
-CC:     Mark Rutland <Mark.Rutland@arm.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-        "will@kernel.org" <will@kernel.org>,
-        "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-        "kernel@xen0n.name" <kernel@xen0n.name>,
-        "hca@linux.ibm.com" <hca@linux.ibm.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "svens@linux.ibm.com" <svens@linux.ibm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "jgross@suse.com" <jgross@suse.com>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-        "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        "wei.liu@kernel.org" <wei.liu@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "longman@redhat.com" <longman@redhat.com>,
-        "boqun.feng@gmail.com" <boqun.feng@gmail.com>,
-        "pmladek@suse.com" <pmladek@suse.com>,
-        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "john.ogness@linutronix.de" <john.ogness@linutronix.de>,
-        "juri.lelli@redhat.com" <juri.lelli@redhat.com>,
-        "vincent.guittot@linaro.org" <vincent.guittot@linaro.org>,
-        "dietmar.eggemann@arm.com" <dietmar.eggemann@arm.com>,
-        "bsegall@google.com" <bsegall@google.com>,
-        "mgorman@suse.de" <mgorman@suse.de>,
-        "bristot@redhat.com" <bristot@redhat.com>,
-        "vschneid@redhat.com" <vschneid@redhat.com>,
-        "jstultz@google.com" <jstultz@google.com>,
-        "sboyd@kernel.org" <sboyd@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+ bh=A0ml7zBR+fE0I9SJ61LwZRJk4o5McbaYZ8P+NPAtlWw=;
+ b=LGyQBkuWpmA6E22osPZQnDpQzc0H8Hmnq3CCZp9hH4BAgmsCZEJEVfp9PwhpVHua34DGi4G/4if87ym8bgea3naJlrxIWy3dCeXiJBnG6YEDqQGedJXBXFo0iz/Wkdd6Q4Epzskhqit5ymLV+Zf54pv+2VR0+QAe1BjhGaPTzrHtvsSHBr5TdCZhUEIjvWQANkYL/oEEa71Fy/xWzW6sBEkANFRk7tuw3xFX2x19IOcWivOT/2qEj7EIxoS/cDKPHmK1hfFxVXpY8nt+wcvccrce8dhDiHURbvx5Mv1qQvwWYfvUrMZrPI5BfuQRJLdZ++QnGWdGRzYczmV3UeBsdQ==
+Received: from MW4PR04CA0043.namprd04.prod.outlook.com (2603:10b6:303:6a::18)
+ by PH7PR12MB7331.namprd12.prod.outlook.com (2603:10b6:510:20e::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.21; Fri, 19 May
+ 2023 18:49:27 +0000
+Received: from CO1NAM11FT028.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:6a:cafe::48) by MW4PR04CA0043.outlook.office365.com
+ (2603:10b6:303:6a::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.21 via Frontend
+ Transport; Fri, 19 May 2023 18:49:27 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ CO1NAM11FT028.mail.protection.outlook.com (10.13.175.214) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6411.23 via Frontend Transport; Fri, 19 May 2023 18:49:26 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 19 May 2023
+ 11:49:17 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.37; Fri, 19 May 2023 11:49:17 -0700
+Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Fri, 19 May 2023 11:49:16 -0700
+Date:   Fri, 19 May 2023 11:49:14 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>
-Subject: RE: [PATCH v2 00/13] local_clock() vs noinstr
-Thread-Topic: [PATCH v2 00/13] local_clock() vs noinstr
-Thread-Index: AQHZij3IV/oI1X52lEiQ97JQ1G8kIa9h7iJw
-Date:   Fri, 19 May 2023 18:48:20 +0000
-Message-ID: <BYAPR21MB16887E8B94335E4331FF439AD77CA@BYAPR21MB1688.namprd21.prod.outlook.com>
-References: <20230519102058.581557770@infradead.org>
-In-Reply-To: <20230519102058.581557770@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=86956934-20fc-4e64-960d-927f86cb8830;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-05-19T18:39:56Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BYAPR21MB1688:EE_|CO1PPF59DDB86B4:EE_
-x-ms-office365-filtering-correlation-id: e52c8618-69c5-4183-a096-08db58999e12
-x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: lB2PNdJjxe3vAABKSSGPPlkVHpiWmKd/vsNFRTmyci9cVjoKA1b7QycEyJQvVCGqjgHo3nRqxPywdMZG2fFplULr1mZ/AAPBo6cxFllWFc+QGL+7G8QC1awKmdAorTNWf/hgOoe0Fk1lZuNYydW8TxEVaxNdOXBwlCTfieFOd4bT38V5Tkt1dpPPPi/IfaOQRPtOrgIesYK08+SJ7dqr9f+6nYcpsaBnIb0FTmh5i3qX4uRA/sjVk3BvuXgH0IsPFuHTzLYqSMn8KmhLM/y9HaEw+bd9cMCXvMgAAsZzbEA1iug1Or0GWCQPxM1Wrp/EYmF+o0hBPLFCaJsBF34vX37DRsIFSp356bnOU37sJQ2PZBNgOaZGpy3emwqdD1PFQJEE1d32eZksu+heylbfBbq+wyLH8xqx9F0yhOPfGb5ZRlbay6a9kKNSOm8KAY5ZxxGOX+E2drpCYBQ9327+K8+h2wFr++5hbFJPnPl1r1UyW5hugwy1fOJa5l9hTSA9gadHXb+5qtjOt6pTHpJKGnalb4/IjmwdaAhYeGGUk3/DB5W2ZBzs/UMRArh4sFH3aNVsXSqSWu3jCGgnHEZrYcOHWUdmj5ArQGNZFmwMzGHLoTXcGv007yWGS6E58ctrxeFO0osrMgn3eNTEKJjhbO/9+t02PhGFln088esy3lM=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR21MB1688.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(366004)(346002)(376002)(136003)(451199021)(71200400001)(76116006)(66556008)(10290500003)(478600001)(86362001)(54906003)(786003)(316002)(66446008)(4326008)(66946007)(7696005)(66476007)(64756008)(110136005)(52536014)(8936002)(82950400001)(7416002)(7406005)(55016003)(38100700002)(38070700005)(5660300002)(41300700001)(2906002)(122000001)(8990500004)(33656002)(8676002)(82960400001)(6506007)(9686003)(83380400001)(186003)(26005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7T2jFawu8LnV4egSakgssV2YFkBwDFrd8eihD5/kFgXEDneoeY47tUZETr9W?=
- =?us-ascii?Q?FjEhpf8EZKTD0Of5rHTKZKmFGbQJS6wB3IKH8PsEoQkuhcfuKp7AnMlRMrty?=
- =?us-ascii?Q?SjdVl4iHlUFef+TVNgUWKPDenLXzTpCxE8iNPHxSltwRtV+JJK26p0U5ZXEQ?=
- =?us-ascii?Q?shTVZjc1Q/HAC4iuxrRSoiSrD9Ws0Ytiy2jh+kdqJsMrX866XqTyQ0D7DS2c?=
- =?us-ascii?Q?PD7byjZiIY0PdSc8WPOEo3l8Xfw5LC4alvoy1mgv1cw/yj82fFJH3T/rVmAj?=
- =?us-ascii?Q?yCRjGimtiiVhLAJVYLpHxgd3fpZmEB2nUTN9qfoc529LZDN4prsXpTUZfLPm?=
- =?us-ascii?Q?F+0xGGdZLTqRUWhSXIgufzANVfp/nL5EfFsauo2IYtlUtNykeZySUETbpOrP?=
- =?us-ascii?Q?q1Whp1dZXpHPrq/QwmqnYHDT2vCXs5oqfZC/TKu/A6Mrxufah6DhyvvMWbAu?=
- =?us-ascii?Q?kIEptTMytZs1gB/Dkiz1A2HQZnSoZkPNXGO7WvA6Yc48EAjLEJunDvDPrfen?=
- =?us-ascii?Q?Idpf5a//f5NWnNrn0ZE37nsctAp2OuwN6WOfwphn2tmvv7qUtaoM8/8kQv1O?=
- =?us-ascii?Q?QPjQeS3RtSlr09s7UIEDAQT11zIVwitr14q3sEE84+mR3rhKEgVm31l357sR?=
- =?us-ascii?Q?hw6HU/yGWb6AHIEghwwAawAumnzZwTWmfehYxfkX91E8Z7LLZnv1WNV3zutX?=
- =?us-ascii?Q?v7wagmrZs7nm40MihiJPDcVbwPpi8HI+HqY+YONBQ9zR4vcNBOOmnQ9GTZmL?=
- =?us-ascii?Q?LyRCnaPoqKHJkEgrJnNAUvg0aPA+7yPddoCePqJrC0hpRbbHS5KkCyBn8cc7?=
- =?us-ascii?Q?/hdK+0s8lpT6IdvAaOzBwGSddcWvqJepz1ubiwALx4Lt0S1hATvBLxY+oFRk?=
- =?us-ascii?Q?e3cLs85fU47jWs/MV1xdPVx9mwH5jvopfTaPPO73cwyIA5anz/MNEktK96Q4?=
- =?us-ascii?Q?jlPvYXwTi12hlMJMMYN/XwwwQAGIACOwpxymrn1TF55ukeyLds1Y8BayCmSY?=
- =?us-ascii?Q?+lsJr/3Yn5jbjaa7FM00qyC+qaTxD/+OxlvfAmEh4eEOEbikASE3GfhXoGTS?=
- =?us-ascii?Q?YRxuwlNdKK6OTNCNkKSqECPArYpc4IXOVP+HzST9HAj70WUvjERa/xuKBI9D?=
- =?us-ascii?Q?c2tSacbQmNhmehOeA53AfIB1ITY0foKIzLgKnwzVd7NUD2oWM+AwPUQAtu3m?=
- =?us-ascii?Q?jqzV38yzeetKnEeo9/9kkus8Kv/IXBAg/m2n2LM4PbueqxYbWf4TV3WNrfys?=
- =?us-ascii?Q?rJ93hHgiBMBYouhpum+eWoxDkKbwGyVxaKZOezEj7olS2dNKQe4u59xCUoOO?=
- =?us-ascii?Q?KeAF9Xc4xqtln+zmxcLwSiutxHKMkYAViv1MtO1V2DUtDDFKzIDQs3v1nPkJ?=
- =?us-ascii?Q?0xfoGphcLB39Kx+WfO7E8urXlPafL5MAGvcfSulb+0ykbRxJUa9m2WdR/6z7?=
- =?us-ascii?Q?tlmlZ/iKxfrLFiGOoBD/0DeqgUyB4dT5hMYXQNlyakIm0zU7Zd9g+o6KxHK6?=
- =?us-ascii?Q?RVcCdUMtwbU1kcJo0cd5bMbT3TP8hlKekdhRvrLIKUWmhmeFge8CVFBMGmUg?=
- =?us-ascii?Q?/IqFQyWEnF9O8CpbzaSy0m/A1QzOoG+593GaIzVUmn1mxqsdipItbOIXTrlB?=
- =?us-ascii?Q?4w=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v2 02/11] iommu: Add nested domain support
+Message-ID: <ZGfEqmD0mrE0NTDW@Asurada-Nvidia>
+References: <20230511143844.22693-1-yi.l.liu@intel.com>
+ <20230511143844.22693-3-yi.l.liu@intel.com>
+ <BL1PR11MB52717388249F052433A7FBB08C7C9@BL1PR11MB5271.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR21MB1688.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e52c8618-69c5-4183-a096-08db58999e12
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 May 2023 18:48:20.7722
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <BL1PR11MB52717388249F052433A7FBB08C7C9@BL1PR11MB5271.namprd11.prod.outlook.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT028:EE_|PH7PR12MB7331:EE_
+X-MS-Office365-Filtering-Correlation-Id: 18a68b89-5a00-499f-0409-08db5899c577
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JPi27Un4iTQrem+6WQq6JOF10i9I/QGUMFC+fyIO9a+K7qLH/HGOwaDdzoofR8k+C6IEWtvXTNAtTt8ZGxp3bflszLEhc5l7QwXCrfhjVjGrtNZ46m1URO4e9z8D8CdpOxrSZyOjmxeqSPa8rxG9OJ8oZm3p4WaKyMWhq770a/FvmgEKjL70HsrfCP3kRyz4fFCURCA4gbvjrWc4Cfq/xElUuZeRNbMysPHZgW7OaQ1ACpLmBkidgXlszRGwGwmWeJxUbFHLAs1o93ZKYm8zpQ2NYYSl5EJHArAgmEVQlYJyMX8yVyrtT2+76SHZIsgGlWZmT+byavR0HDGBxrTkXyAcNTeV6uOicdpbhtikQ8WtbajAL1GtnBECq58yJr3aU1yqxzEJb4ILyK/1VS3NGyFzRn5FwCpkyesIVQtu1lZfUOPTTVmr2sdRh7Zv6HjLcodDIlj1EVwhfGktY3Js72R08L4Gyf/TMVxpuBwq3/IxjaHQUgS2u1TnjzIPhuuMSk50w7aQwutro5e3IztYWDyI1moSKGERfJMX9m9gdgeFGUIYZrkByjjyNB5MsC892g4jV5xI+gIt2wp2onCrTYurFiXKO2L+BA4UNwNrfQEHpGLqqP8Cg1bOQZEo6COQeZENwu8cO5xeHAgKshmvIFQtBLlyx+8t+gCsI7gWBvvMZbIP2UcESGO8Txzdk8YTrkDnk0dZ+t/jicPLfjE/TGFRvF3nMP5mZ1fie1JgzndG8GRUFOWPWHyb86BIZzMF
+X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(376002)(346002)(136003)(451199021)(36840700001)(40470700004)(46966006)(40460700003)(6916009)(70586007)(478600001)(70206006)(4326008)(54906003)(316002)(86362001)(47076005)(83380400001)(9686003)(26005)(186003)(336012)(426003)(36860700001)(41300700001)(5660300002)(8676002)(8936002)(7416002)(4744005)(2906002)(33716001)(82310400005)(55016003)(7636003)(82740400003)(356005)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 18:49:26.8271
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kB1+KDQN6kL950BelAL49/u33BuEIWKLrz/OpEDOdpfMVcOlQfhkdmCcQi0Y6DgAz3VsuA8y2hGOCEAXIl5gHkn8wKyX00CYdcz5OvO8ato=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PPF59DDB86B4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18a68b89-5a00-499f-0409-08db5899c577
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT028.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7331
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peter Zijlstra <peterz@infradead.org> Sent: Friday, May 19, 2023 3:21=
- AM
->=20
-> Hi All,
->=20
-> latest version of the local_clock_noinstr() patches.
->=20
-> Most of the changes are in Hyper-V and x86/vdso/gettimeofday; Michael has=
- been
-> very helpful navigating the Hyper-V spec and fixing their sched_clock
-> implementation.
->=20
-> ---
->  arch/arm64/include/asm/arch_timer.h      |  8 +----
->  arch/arm64/include/asm/io.h              | 12 +++----
->  arch/loongarch/include/asm/loongarch.h   |  2 +-
->  arch/loongarch/kernel/time.c             |  6 ++--
->  arch/s390/include/asm/timex.h            | 13 ++++---
->  arch/s390/kernel/time.c                  |  5 +++
->  arch/x86/include/asm/mshyperv.h          |  5 +++
->  arch/x86/include/asm/vdso/gettimeofday.h | 41 ++++++++++++++++------
->  arch/x86/kernel/kvmclock.c               |  4 +--
->  arch/x86/kernel/tsc.c                    | 38 +++++++++++++++-----
->  arch/x86/kvm/x86.c                       |  7 ++--
->  arch/x86/xen/time.c                      |  3 +-
->  drivers/clocksource/arm_arch_timer.c     | 60 ++++++++++++++++++++++++--=
-------
->  drivers/clocksource/hyperv_timer.c       | 44 ++++++++++++++---------
->  drivers/cpuidle/cpuidle.c                |  8 ++---
->  drivers/cpuidle/poll_state.c             |  4 +--
->  include/clocksource/hyperv_timer.h       | 24 +++++--------
->  include/linux/math64.h                   |  2 +-
->  include/linux/rbtree_latch.h             |  2 +-
->  include/linux/sched/clock.h              | 17 ++++++++-
->  include/linux/seqlock.h                  | 15 ++++----
->  kernel/printk/printk.c                   |  2 +-
->  kernel/sched/clock.c                     | 19 ++++++----
->  kernel/time/sched_clock.c                | 24 +++++++++----
->  kernel/time/timekeeping.c                |  4 +--
->  25 files changed, 242 insertions(+), 127 deletions(-)
+On Fri, May 19, 2023 at 08:51:21AM +0000, Tian, Kevin wrote:
+ 
+> > @@ -346,6 +350,10 @@ struct iommu_ops {
+> >   * @iotlb_sync_map: Sync mappings created recently using @map to the
+> > hardware
+> >   * @iotlb_sync: Flush all queued ranges from the hardware TLBs and empty
+> > flush
+> >   *            queue
+> > + * @cache_invalidate_user: Flush hardware TLBs caching user space IO
+> > mappings
+> > + * @cache_invalidate_user_data_len: Defined length of input user data for
+> > the
+> > + *                                  cache_invalidate_user op, being sizeof the
+> > + *                                  structure in include/uapi/linux/iommufd.h
+> 
+> same as comment to last patch, can this be merged with @hw_info?
 
-Based on linux-next20230519, tested the full series in a Hyper-V
-VM on x86/x64.   Did mainly a basic smoke test.  Sched clock
-appears to work correctly.  Verified correct operation of the TSC page
-clocksource and the MSR-based clocksource.  Verified that vDSO
-gettimeofday() works with the Hyper-V TSC page clocksource and
-is correctly disabled with the Hyper-V MSR-based clocksource.
-Tested in a normal VM and in an "SEV-SNP with vTOM" VM.
+I think it's better to keep them separate, since this is added
+in struct iommu_domain_ops, given it is domain/hwpt specific,
+while the hw_info is in struct iommu_ops?
 
-Tested-by: Michael Kelley <mikelley@microsoft.com>  # Hyper-V
+Thanks
+Nic
