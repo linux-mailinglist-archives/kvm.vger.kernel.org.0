@@ -2,124 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C74C70A129
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 23:02:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8982E70A1F8
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 23:49:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230250AbjESVCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 17:02:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40732 "EHLO
+        id S231156AbjESVsy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 17:48:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbjESVCN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 17:02:13 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 605831A5
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 14:02:11 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-6435432f56bso2365889b3a.3
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 14:02:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684530131; x=1687122131;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Mw3Ozc4fZg2tj7CT8Q6YsEZOU9HXZu7Pqk3RzFDGAeg=;
-        b=hNqb88g2Aeap67x1FMTjGHF4R/Xg7gRRWKuiWZSgR63RmDKjcslfpiMQ/XEeL3j6+R
-         DG31pafPWlx0zaTuIJ4RwvepIWrUKJFkVkKtod5fcTr6Hu+JKiJAJEPtnRMdAe+0BPR2
-         gIs18PQLRxZY1NDqP1K8Xvdfw+ys4n2aNDSCWQqsrD+CunKeFcuP47lED449bgiSsOjO
-         p+CVxQuMmoH0SEbHGDeBe6TQHCAz91qxWyiq8FmWzP1GXons1ME+1VMdGnLBa9oDebnU
-         Q3ARPv/fHksN59aDO1JExSqEtmCobGVo2EuvLXstm3Va95C+HI/C1YrV+0Iyr6iW/FY0
-         FPxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684530131; x=1687122131;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Mw3Ozc4fZg2tj7CT8Q6YsEZOU9HXZu7Pqk3RzFDGAeg=;
-        b=GaPGZX4ifMnVAxyRiEfPdCoxCLFWEVOdqhaY5Ol/6THyXTzNnfflmCX7Qi95YScAsZ
-         b6sadVFPuF8CE74GbgZsEkA6FU+aBrG4ZddippvdFSVysE0LBltVNpJaUqKTM0Uhb8mf
-         85vwPK3Y/H053rIth5XPxU70qP/nNcACNpQDF4yww43hP379ruC3/SUDf3nVUGLim0zC
-         Aef1qwixCzw+8f2dNijuPLXDX+sne1CZHjTkqYFiZjRbkdGu5O29KEvijZZLzfKaSyH/
-         W3C4zq73FoiVZSA8Irp2fm770t/Csdcr9vB6I8LbYmYofiAqO0jktG0QUzTKkfx4QGUR
-         8jDw==
-X-Gm-Message-State: AC+VfDyvHjGXqZJtb0bzGTOrzvaC6Ea50sNG7zaWsIw16i3KRoZn3wSc
-        y/BAzDK2tYJ0gaG8CHmFogvkxins14w=
-X-Google-Smtp-Source: ACHHUZ7NvdrVLKzYiaTxHRsLQSoMdRHj0JrAs5j8t7q4YRdK3vLRz1AQvmxSAVOq0KKowdDTiH0p7G2+xFQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2d28:b0:63b:1a20:5ea2 with SMTP id
- fa40-20020a056a002d2800b0063b1a205ea2mr1615463pfb.1.1684530130898; Fri, 19
- May 2023 14:02:10 -0700 (PDT)
-Date:   Fri, 19 May 2023 14:02:09 -0700
-In-Reply-To: <CAEivzxcx3yCXO_Hk1_xgWZgkHrTmZNNXVBU2ox2Y=vVY_vnG-g@mail.gmail.com>
-Mime-Version: 1.0
-References: <20230404122652.275005-1-aleksandr.mikhalitsyn@canonical.com>
- <20230404122652.275005-3-aleksandr.mikhalitsyn@canonical.com>
- <ZGe9I+S78pQ/RPs7@google.com> <CAEivzxcx3yCXO_Hk1_xgWZgkHrTmZNNXVBU2ox2Y=vVY_vnG-g@mail.gmail.com>
-Message-ID: <ZGfj0QrdgQDhrR0M@google.com>
-Subject: Re: [PATCH 2/2] KVM: SVM: add some info prints to SEV init
-From:   Sean Christopherson <seanjc@google.com>
-To:     Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Cc:     pbonzini@redhat.com,
-        "=?iso-8859-1?Q?St=E9phane?= Graber" <stgraber@ubuntu.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        with ESMTP id S230329AbjESVsu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 May 2023 17:48:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FB6710F
+        for <kvm@vger.kernel.org>; Fri, 19 May 2023 14:48:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684532882;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=C9UIYQ0roparrpAkenEQbXkxd1bQCXoJbjl1UvbMjDQ=;
+        b=Sqg3sF3eSCbk8oJD7PyVRqwieo9UX9WKMQIlY72jOeBT3Z7etXME2DePby8flFVq0wHBV7
+        HxGjJ5FkkXF1wpU2fw+5GyJP2l4PnbEacw1x73oubE2TS0p+aRwSyQZrDhlP4pTU+ABqpI
+        BYGMaw/WJEyBdbDxKpngd+SO7ZUoWLk=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-627-K8DmDakeOL-F9_jzromLRQ-1; Fri, 19 May 2023 17:48:01 -0400
+X-MC-Unique: K8DmDakeOL-F9_jzromLRQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EA0CA38035AC;
+        Fri, 19 May 2023 21:48:00 +0000 (UTC)
+Received: from omen.home.shazbot.org (unknown [10.22.10.168])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 64B3840D1B61;
+        Fri, 19 May 2023 21:48:00 +0000 (UTC)
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>, robin@streamhpc.com
+Subject: [PATCH] vfio/pci-core: Add capability for AtomicOp copleter support
+Date:   Fri, 19 May 2023 15:47:48 -0600
+Message-Id: <20230519214748.402003-1-alex.williamson@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 19, 2023, Aleksandr Mikhalitsyn wrote:
-> On Fri, May 19, 2023 at 8:17=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Tue, Apr 04, 2023, Alexander Miqqqqkhalitsyn wrote:
-> > > Let's add a few pr_info's to sev_hardware_setup to make SEV/SEV-ES
-> > > enabling a little bit handier for users. Right now it's too hard
-> > > to guess why SEV/SEV-ES are failing to enable.
-> >
-> > Hmm, I'm somewhat torn, but I'm against taking this patch, at least not=
- in its
-> > current form.  I appreciated that determining why KVM isn't enabling SE=
-V/SEV-ES
-> > is annoying, but there's very little actionable information provided he=
-re that
-> > isn't also super obvious.  I also don't want to start us down a slipper=
-y slope
-> > of printing out messages every time KVM doesn't enable a feature.
-> >
-> > If someone tries to enable SEV and doesn't check that their CPU support=
-s SEV,
-> > then IMO that's on them.  Ditto for SEV-ES.
-> >
-> > The NPT thing is mildly interesting, but practically speaking I don't e=
-xpect that
-> > to ever be a hindrace for generic enabling.  Ditto for MMIO caching.
-> >
-> > The decode assists check is (a) completely unactionable for the vast, v=
-ast majority
-> > of users and (b) is a WARN_ON_ONCE() condition.
-> >
-> > The ASID stuff is by far the most interesting, but that's also quite in=
-teresting
-> > for when SEV and SEV-ES _are_ fully supported.
-> >
-> > So if we want to provide the user more info, I'd prefer to do something=
- like the
-> > below, which I think would be more helpful and would avoid my slippery =
-slope
-> > concerns.
->=20
-> Dear Sean,
->=20
-> Thanks for looking into this!
->=20
-> I agree with your points, let's go that way and print only ASID stuff
-> as it can be not obvious to the end-user.
->=20
-> I'm ready to prepare -v2 if you don't mind.
+Test and enable PCIe AtomicOp completer support of various widths and
+report via device-info capability to userspace.
 
-Ya, fire away.  Thanks!
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ drivers/vfio/pci/vfio_pci_core.c | 38 ++++++++++++++++++++++++++++++++
+ include/uapi/linux/vfio.h        | 14 ++++++++++++
+ 2 files changed, 52 insertions(+)
+
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index a5ab416cf476..a21ab726c9d4 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -882,6 +882,37 @@ int vfio_pci_core_register_dev_region(struct vfio_pci_core_device *vdev,
+ }
+ EXPORT_SYMBOL_GPL(vfio_pci_core_register_dev_region);
+ 
++static int vfio_pci_info_atomic_cap(struct vfio_pci_core_device *vdev,
++				    struct vfio_info_cap *caps)
++{
++	struct vfio_device_info_cap_pci_atomic_comp cap = {
++		.header.id = VFIO_DEVICE_INFO_CAP_PCI_ATOMIC_COMP,
++		.header.version = 1
++	};
++	struct pci_dev *pdev = pci_physfn(vdev->pdev);
++	u32 devcap2;
++
++	pcie_capability_read_dword(pdev, PCI_EXP_DEVCAP2, &devcap2);
++
++	if ((devcap2 & PCI_EXP_DEVCAP2_ATOMIC_COMP32) &&
++	    !pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP32))
++		cap.flags |= VFIO_PCI_ATOMIC_COMP32;
++
++	if ((devcap2 & PCI_EXP_DEVCAP2_ATOMIC_COMP64) &&
++	    !pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP64))
++		cap.flags |= VFIO_PCI_ATOMIC_COMP64;
++
++	if ((devcap2 & PCI_EXP_DEVCAP2_ATOMIC_COMP128) &&
++	    !pci_enable_atomic_ops_to_root(pdev,
++					   PCI_EXP_DEVCAP2_ATOMIC_COMP128))
++		cap.flags |= VFIO_PCI_ATOMIC_COMP128;
++
++	if (!cap.flags)
++		return -ENODEV;
++
++	return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
++}
++
+ static int vfio_pci_ioctl_get_info(struct vfio_pci_core_device *vdev,
+ 				   struct vfio_device_info __user *arg)
+ {
+@@ -920,6 +951,13 @@ static int vfio_pci_ioctl_get_info(struct vfio_pci_core_device *vdev,
+ 		return ret;
+ 	}
+ 
++	ret = vfio_pci_info_atomic_cap(vdev, &caps);
++	if (ret && ret != -ENODEV) {
++		pci_warn(vdev->pdev,
++			 "Failed to setup AtomicOps info capability\n");
++		return ret;
++	}
++
+ 	if (caps.size) {
+ 		info.flags |= VFIO_DEVICE_FLAGS_CAPS;
+ 		if (info.argsz < sizeof(info) + caps.size) {
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 0552e8dcf0cb..07988d62b33c 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -240,6 +240,20 @@ struct vfio_device_info {
+ #define VFIO_DEVICE_INFO_CAP_ZPCI_UTIL		3
+ #define VFIO_DEVICE_INFO_CAP_ZPCI_PFIP		4
+ 
++/*
++ * The following VFIO_DEVICE_INFO capability reports support for PCIe AtomicOp
++ * completion to the root bus with supported widths provided via flags.
++ */
++#define VFIO_DEVICE_INFO_CAP_PCI_ATOMIC_COMP	5
++struct vfio_device_info_cap_pci_atomic_comp {
++	struct vfio_info_cap_header header;
++	__u32 flags;
++#define VFIO_PCI_ATOMIC_COMP32	(1 << 0)
++#define VFIO_PCI_ATOMIC_COMP64	(1 << 1)
++#define VFIO_PCI_ATOMIC_COMP128	(1 << 2)
++	__u32 reserved;
++};
++
+ /**
+  * VFIO_DEVICE_GET_REGION_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 8,
+  *				       struct vfio_region_info)
+-- 
+2.39.2
+
