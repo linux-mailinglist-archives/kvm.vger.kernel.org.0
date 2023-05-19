@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7540E7094F8
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 12:34:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B08A709502
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 12:34:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231974AbjESKeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 06:34:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53666 "EHLO
+        id S231953AbjESKeU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 06:34:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231927AbjESKeM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231932AbjESKeM (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 19 May 2023 06:34:12 -0400
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 457D710F4;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9358A10F5;
         Fri, 19 May 2023 03:34:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=giIQX2Zs4VTp0HoKM0lBH5Aj6/hHWaqvN+LCMp+82bc=; b=CA71o9xgUhDALWVpBZL3Kbb0us
-        w28SqK/pSvpC8QCgu0cE5pQhHZtssq8nLJkLI3nn9B0xHjOLG5romDSz4bfcIqeKXpUhn7chPpoFP
-        G82NWMaRlMLIomwhAnwgXykMyjFllI8R44sXXNauaW2R2+69VDJthz1fNlJ2Ah3OZTG1UkX44rZ1M
-        t6/glWLZdH9w+df3kaRipZFxE2x8sn1A3AQVMI9u3N7PTr2SDj2lpRbBH3heuqhke29k6v4QVs+8w
-        nBoFuK9RU64bsZwe0cbHuXq+4EXZYfKM0cENPc/LAEE0lzuRLi4+x9pysDMkYMay8uXWK2hK5X8lC
-        ACU4n1tw==;
+        bh=YKwqF+BUvFX/eM4sVo4oYqYCF/ZGTA0lXMxYZ5TRTwg=; b=nThm858ZrHzNO23eD6wR31ciwE
+        x58F2HwKZ7dRAXG6f+BjqKOAdxpfqCDGfd4O+9QOYCETZe6KwTkDvdcS+urMnFoDb0XAFn5cZf5Jb
+        USmR2+R7fZRNW+sAUJOz8Qr7tfOZwBvKcJplaAvug3uZrKLsOVlJY1RLCfFVvjW022AFyKU60blBK
+        /NYfGaPir9Wm8y6qd2NdN74E7cmTt19yBte5ieU75rebcHtSVqpFrNafD8uMhJKc9OdXa+OtkCRgK
+        H+ZoX5Z72bDBHvE6ZQNpn5rZSXXufP8PR+5eAzIjGIZri6Qcz/K6n6SFWo1Wht92C2G7fBe18aXuB
+        32XxWojg==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
         by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pzxPv-00FrWW-2I;
+        id 1pzxPv-00FrWQ-07;
         Fri, 19 May 2023 10:32:59 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 224B4306138;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 2B57C306146;
         Fri, 19 May 2023 12:32:56 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id CEB67235EF0A9; Fri, 19 May 2023 12:32:55 +0200 (CEST)
-Message-ID: <20230519102715.637420396@infradead.org>
+        id D8C6A235EF0B1; Fri, 19 May 2023 12:32:55 +0200 (CEST)
+Message-ID: <20230519102715.704767397@infradead.org>
 User-Agent: quilt/0.66
-Date:   Fri, 19 May 2023 12:21:05 +0200
+Date:   Fri, 19 May 2023 12:21:06 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     bigeasy@linutronix.de
 Cc:     mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
@@ -61,7 +61,7 @@ Cc:     mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
         loongarch@lists.linux.dev, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
         linux-pm@vger.kernel.org
-Subject: [PATCH v2 07/13] math64: Always inline u128 version of mul_u64_u64_shr()
+Subject: [PATCH v2 08/13] x86/vdso: Fix gettimeofday masking
 References: <20230519102058.581557770@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -75,37 +75,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to prevent the following complaint from happening, always
-inline the u128 variant of mul_u64_u64_shr() -- which is what x86_64
-will use.
+Because of how the virtual clocks use U64_MAX as an exception value
+instead of a valid time, the clocks can no longer be assumed to wrap
+cleanly. This is then compounded by arch_vdso_cycles_ok() rejecting
+everything with the MSB/Sign-bit set.
 
-  vmlinux.o: warning: objtool: read_hv_sched_clock_tsc+0x5a: call to mul_u64_u64_shr.constprop.0() leaves .noinstr.text section
+Therefore, the effective mask becomes S64_MAX, and the comment with
+vdso_calc_delta() that states the mask is U64_MAX and isn't optimized
+out is just plain silly.
 
-It should compile into something like:
+Now, the code has a negative filter -- to deal with TSC wobbles:
 
-  asm("mul	%[mul];"
-      "shrd	%rdx, %rax, %cl"
-      : "+&a" (a)
-      : "c" shift, [mul] "r" (mul)
-      : "d");
+	if (cycles > last)
 
-Which is silly not to inline, but it happens.
+which is just plain wrong, because it should've been written as:
+
+	if ((s64)(cycles - last) > 0)
+
+to take wrapping into account, but per all the above, we don't
+actually wrap on u64 anymore.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- include/linux/math64.h |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/include/asm/vdso/gettimeofday.h |   39 ++++++++++++++++++++++---------
+ 1 file changed, 28 insertions(+), 11 deletions(-)
 
---- a/include/linux/math64.h
-+++ b/include/linux/math64.h
-@@ -168,7 +168,7 @@ static __always_inline u64 mul_u64_u32_s
- #endif /* mul_u64_u32_shr */
+--- a/arch/x86/include/asm/vdso/gettimeofday.h
++++ b/arch/x86/include/asm/vdso/gettimeofday.h
+@@ -231,14 +231,17 @@ static u64 vread_pvclock(void)
+ 		ret = __pvclock_read_cycles(pvti, rdtsc_ordered());
+ 	} while (pvclock_read_retry(pvti, version));
  
- #ifndef mul_u64_u64_shr
--static inline u64 mul_u64_u64_shr(u64 a, u64 mul, unsigned int shift)
-+static __always_inline u64 mul_u64_u64_shr(u64 a, u64 mul, unsigned int shift)
- {
- 	return (u64)(((unsigned __int128)a * mul) >> shift);
+-	return ret;
++	return ret & S64_MAX;
  }
+ #endif
+ 
+ #ifdef CONFIG_HYPERV_TIMER
+ static u64 vread_hvclock(void)
+ {
+-	return hv_read_tsc_page(&hvclock_page);
++	u64 ret = hv_read_tsc_page(&hvclock_page);
++	if (likely(ret != U64_MAX))
++		ret &= S64_MAX;
++	return ret;
+ }
+ #endif
+ 
+@@ -246,7 +249,7 @@ static inline u64 __arch_get_hw_counter(
+ 					const struct vdso_data *vd)
+ {
+ 	if (likely(clock_mode == VDSO_CLOCKMODE_TSC))
+-		return (u64)rdtsc_ordered();
++		return (u64)rdtsc_ordered() & S64_MAX;
+ 	/*
+ 	 * For any memory-mapped vclock type, we need to make sure that gcc
+ 	 * doesn't cleverly hoist a load before the mode check.  Otherwise we
+@@ -284,6 +287,9 @@ static inline bool arch_vdso_clocksource
+  * which can be invalidated asynchronously and indicate invalidation by
+  * returning U64_MAX, which can be effectively tested by checking for a
+  * negative value after casting it to s64.
++ *
++ * This effectively forces a S64_MAX mask on the calculations, unlike the
++ * U64_MAX mask normally used by x86 clocksources.
+  */
+ static inline bool arch_vdso_cycles_ok(u64 cycles)
+ {
+@@ -303,18 +309,29 @@ static inline bool arch_vdso_cycles_ok(u
+  * @last. If not then use @last, which is the base time of the current
+  * conversion period.
+  *
+- * This variant also removes the masking of the subtraction because the
+- * clocksource mask of all VDSO capable clocksources on x86 is U64_MAX
+- * which would result in a pointless operation. The compiler cannot
+- * optimize it away as the mask comes from the vdso data and is not compile
+- * time constant.
++ * This variant also uses a custom mask because while the clocksource mask of
++ * all the VDSO capable clocksources on x86 is U64_MAX, the above code uses
++ * U64_MASK as an exception value, additionally arch_vdso_cycles_ok() above
++ * declares everything with the MSB/Sign-bit set as invalid. Therefore the
++ * effective mask is S64_MAX.
+  */
+ static __always_inline
+ u64 vdso_calc_delta(u64 cycles, u64 last, u64 mask, u32 mult)
+ {
+-	if (cycles > last)
+-		return (cycles - last) * mult;
+-	return 0;
++	/*
++	 * Due to the MSB/Sign-bit being used as invald marker (see
++	 * arch_vdso_cycles_valid() above), the effective mask is S64_MAX.
++	 */
++	u64 delta = (cycles - last) & S64_MAX;
++
++	/*
++	 * Due to the above mentioned TSC wobbles, filter out negative motion.
++	 * Per the above masking, the effective sign bit is now bit 62.
++	 */
++	if (unlikely(delta & (1ULL << 62)))
++		return 0;
++
++	return delta * mult;
+ }
+ #define vdso_calc_delta vdso_calc_delta
+ 
 
 
