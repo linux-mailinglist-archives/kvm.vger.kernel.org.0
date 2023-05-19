@@ -2,90 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EDDF709727
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 14:17:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFDB870971D
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 14:13:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231331AbjESMRj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 08:17:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49578 "EHLO
+        id S230412AbjESMNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 08:13:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjESMRi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 08:17:38 -0400
-X-Greylist: delayed 1799 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 19 May 2023 05:17:36 PDT
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D908199;
-        Fri, 19 May 2023 05:17:36 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1pzyFc-0005jV-AN; Fri, 19 May 2023 13:26:24 +0200
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Santosh Shukla <santosh.shukla@amd.com>, vkuznets@redhat.com,
-        jmattson@google.com, thomas.lendacky@amd.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: SVM: vNMI pending bit is V_NMI_PENDING_MASK not V_NMI_BLOCKING_MASK
-Date:   Fri, 19 May 2023 13:26:18 +0200
-Message-Id: <be4ca192eb0c1e69a210db3009ca984e6a54ae69.1684495380.git.maciej.szmigiero@oracle.com>
-X-Mailer: git-send-email 2.40.1
+        with ESMTP id S229586AbjESMNN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 May 2023 08:13:13 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00CFE18C
+        for <kvm@vger.kernel.org>; Fri, 19 May 2023 05:13:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684498393; x=1716034393;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=oE6bARp4hKw3cRBqUJZEMxSRLzfZZiTuupE4Ov1vvl0=;
+  b=Q+5n2fIx8ZwzUJaiiDkvqHwkeELZZ+1hbq4pxMZr+zeCai5KJ98qeBcp
+   tbK4Cx4uGsIYjsSS9mHeEhsg4CM0pg94NgStcjRDjnpyRgbHaD8M6TXkK
+   2urigBMmsKiV2QzUi++HIfHxCQq/qouTMoRRq2pYrwi1bCcEhKWa49gNM
+   Yk7uBL4AGapeGSiKAzgHsnIHUmlfHPppwHFPQioshHtpRFd0ne6YUWptd
+   b1BA3JRqxzasNtKNUukwgX2MsKaIm3Tm8wQZxOc5R3mdoQX4raofBnFDx
+   vJvB/1orYFvPblY8QLxOYviwlYHRTdgGA9iw1fOKkRzdadgTeKf2D9sxJ
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10714"; a="351197499"
+X-IronPort-AV: E=Sophos;i="6.00,176,1681196400"; 
+   d="scan'208";a="351197499"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2023 05:13:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10714"; a="949093773"
+X-IronPort-AV: E=Sophos;i="6.00,176,1681196400"; 
+   d="scan'208";a="949093773"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.210.160]) ([10.254.210.160])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2023 05:13:05 -0700
+Message-ID: <4581681d-748e-1e1b-2b9c-b4a57e3a4b33@linux.intel.com>
+Date:   Fri, 19 May 2023 20:13:03 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Cc:     baolu.lu@linux.intel.com, iommu@lists.linux.dev,
+        Kevin Tian <kevin.tian@intel.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH RFCv2 04/24] iommu: Add iommu_domain ops for dirty
+ tracking
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+References: <20230518204650.14541-1-joao.m.martins@oracle.com>
+ <20230518204650.14541-5-joao.m.martins@oracle.com>
+ <ZGdgNblpO4rE+IF4@nvidia.com>
+ <424d37fc-d1a4-f56c-e034-20fb96b69c86@oracle.com>
+ <ZGdipWrnZNI/C7mF@nvidia.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <ZGdipWrnZNI/C7mF@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+On 2023/5/19 19:51, Jason Gunthorpe wrote:
+> On Fri, May 19, 2023 at 12:47:24PM +0100, Joao Martins wrote:
+> 
+>> In practice it is done as soon after the domain is created but I understand what
+>> you mean that both should be together; I have this implemented like that as my
+>> first take as a domain_alloc passed flags, but I was a little undecided because
+>> we are adding another domain_alloc() op for the user-managed pagetable and after
+>> having another one we would end up with 3 ways of creating iommu domain -- but
+>> maybe that's not an issue
+> It should ride on the same user domain alloc op as some generic flags,
+> there is no immediate use case to enable dirty tracking for
+> non-iommufd page tables
 
-While testing Hyper-V enabled Windows Server 2019 guests on Zen4 hardware
-I noticed that with vCPU count large enough (> 16) they sometimes froze at
-boot.
-With vCPU count of 64 they never booted successfully - suggesting some kind
-of a race condition.
+This is better than the current solution.
 
-Since adding "vnmi=0" module parameter made these guests boot successfully
-it was clear that the problem is most likely (v)NMI-related.
-
-Running kvm-unit-tests quickly showed failing NMI-related tests cases, like
-"multiple nmi" and "pending nmi" from apic-split, x2apic and xapic tests
-and the NMI parts of eventinj test.
-
-The issue was that once one NMI was being serviced no other NMI was allowed
-to be set pending (NMI limit = 0), which was traced to
-svm_is_vnmi_pending() wrongly testing for the "NMI blocked" flag rather
-than for the "NMI pending" flag.
-
-Fix this by testing for the right flag in svm_is_vnmi_pending().
-Once this is done, the NMI-related kvm-unit-tests pass successfully and
-the Windows guest no longer freezes at boot.
-
-Fixes: fa4c027a7956 ("KVM: x86: Add support for SVM's Virtual NMI")
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
----
-
-It's a bit sad that no-one apparently tested the vNMI patchset with
-kvm-unit-tests on an actual vNMI-enabled hardware...
-
- arch/x86/kvm/svm/svm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index ca32389f3c36..54089f990c8f 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3510,7 +3510,7 @@ static bool svm_is_vnmi_pending(struct kvm_vcpu *vcpu)
- 	if (!is_vnmi_enabled(svm))
- 		return false;
- 
--	return !!(svm->vmcb->control.int_ctl & V_NMI_BLOCKING_MASK);
-+	return !!(svm->vmcb->control.int_ctl & V_NMI_PENDING_MASK);
- }
- 
- static bool svm_set_vnmi_pending(struct kvm_vcpu *vcpu)
+Best regards,
+baolu
