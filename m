@@ -2,105 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A8D5709161
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 10:10:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FFC8709186
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 10:17:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230002AbjESIKD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 04:10:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49934 "EHLO
+        id S230303AbjESIRi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 04:17:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230266AbjESIJx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 04:09:53 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A1E7E4C
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 01:09:51 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1ae5dc9eac4so16860465ad.1
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 01:09:51 -0700 (PDT)
+        with ESMTP id S230307AbjESIRg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 May 2023 04:17:36 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A385710D;
+        Fri, 19 May 2023 01:17:30 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-53482b44007so763284a12.2;
+        Fri, 19 May 2023 01:17:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684483791; x=1687075791;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MFfvDsP1Pp4ougCeQR0lxQyoOnnXgdmQJ0jpJVRq650=;
-        b=mZKyEbd2FwrmrGjcDUlov5PgReXqA95wKg7WVMytdTw3x1Hm97Ozy7fDGGF5lOQW/B
-         UHzk9z/eHgd59LpEHrCBOjiekcCjIqIkpEjN6Ld6LQv144n3zYAOLzPbtqf6Wfpwrze9
-         U2YYhITOjtqwZFp+dnfjzWkUGRTJyywhrooERY4rTkmXk1BeRvy9EyFaCo+fVj89/mJE
-         UKQYA/Be04N8FV0jtmzK7s1FhQ/h6epij9/WNacbNjM5Q39UhxgxOAJsevkvXgHtedWA
-         Sn480P/3Md/iagXiFDA6LZNqJ7saTYabvlSfYUhOLIRKz3yutdK5WHbjp1/gxB5F35wM
-         dK4Q==
+        d=gmail.com; s=20221208; t=1684484250; x=1687076250;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pIn44GlIkUSHR9NPd+HhQz6XW7R0sVim+0/fBrzpEgk=;
+        b=AQVNDPLt5jt81iQAXe4qXMvSCzNJAYOHBuxJYE5KRuaPCyHYRP4jq1g8KQ2V63IxAE
+         ZuxnpjqwV3MoRsKNb4D9ZqeUKAH9SYFGSiys66XCjKC0aZW83E2+f+Ug4a8yHtEjH4zF
+         pI4hCfn/H2pbGkflAZ/1RCKo7TgXBJH4iIKxH36FmbTavxl7/8nNRB905M7N7UZbbK71
+         7JA/CTE0IHxi6suBNRUdM3CmAkeCVJ4n5vo/YfdA8p0zsZn6Z6hGg7GHe81m2Fv9X4Sz
+         0MYRpSkn08b86yEtWI9yFQYWeLgi0semaIHy/3uQHa3R1Rl2nxnFe09M8NOXfx5ybEad
+         fyvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684483791; x=1687075791;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MFfvDsP1Pp4ougCeQR0lxQyoOnnXgdmQJ0jpJVRq650=;
-        b=hcfZhC56SepvD2In0kUOD7uvg0RBarhBybE5JeDcU13IaIPeabgSlhO5+gYJo+W+EA
-         i0rfkeOXJd9EV4yXVNnFXuYN3FZ0M6xtL67P7JntKajZD50ETo5GDL3qgYOtMmPQnMLj
-         nes9jvsof7ckn9Qa383T0au4XL+eKrxhoxZ+HC92Jd+dFNcwL9RJd/SxIL5TcYqOKZU9
-         ytlO+iz6a/OBxxw5aHI1wMZe/oqHrCwSTBppiTcSLCQa2RnJPqo5fM6Ax99Y/tWvim1S
-         BIoSq9FB3M+AGMe12nyfBkJlb9by4P44+YGrxeea2NQZXFnoFcNOyYeN8qfrkyw6Fp1E
-         SWjQ==
-X-Gm-Message-State: AC+VfDwkBqGih3v6LuvzhS7ndcxMXZMxFFEj2pXv4jxbkL0B3AL08xxr
-        8CdgzT9NtwebkR3/24jUAcA=
-X-Google-Smtp-Source: ACHHUZ4nqCkVmeN4mA+zGKJoBbXRsxdBZKDRrLPkqszJ5QyaxylLhYNjgRgML55fKiz4ClX0CsiQyw==
-X-Received: by 2002:a17:903:11c9:b0:1ac:63ac:10a7 with SMTP id q9-20020a17090311c900b001ac63ac10a7mr1994932plh.68.1684483790607;
-        Fri, 19 May 2023 01:09:50 -0700 (PDT)
-Received: from [192.168.43.80] (subs32-116-206-28-39.three.co.id. [116.206.28.39])
-        by smtp.gmail.com with ESMTPSA id t21-20020a63d255000000b0053071b00c49sm2516483pgi.23.2023.05.19.01.09.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 May 2023 01:09:50 -0700 (PDT)
-Message-ID: <b66104cf-9e70-0d9b-ccc3-4f1897c84720@gmail.com>
-Date:   Fri, 19 May 2023 15:09:43 +0700
+        d=1e100.net; s=20221208; t=1684484250; x=1687076250;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pIn44GlIkUSHR9NPd+HhQz6XW7R0sVim+0/fBrzpEgk=;
+        b=U9fRkAcnm3mghhIczYv+4Dk1j3Nxrwy86J4skSJ+WD3WfPdI/RXSHF8N0Wqy97XG8C
+         /zLZQjJ28v2UjBw8wE0haMRMFu/qNtIayBMm1SkMs55z5FKDn94cJIwrTAqbjKj0oF6Q
+         CcRV+aP7C4sf9FWy+UOLoOuKkxtAb11AJ8SRiHUE9Up2iF+q8IpUZtJ2Px9d6bUznXev
+         8Z9Hetmj6+1U5Wy5iS4dso5hsIBrn2FVX06AbELDU7hkMrtsC+Wr7N674L9sHkk8DuTS
+         YnkDlSDCPxn2+26Ng7v7RW0lIF912sjNAVeau0YBW9W46mo/dO3eCknHFtQnpYBSyH/2
+         hWhA==
+X-Gm-Message-State: AC+VfDwgXbPUH6g20sn4+JEI96njwx84sIY5W4BAWKYSf36hEnOWA+bf
+        g7bsSnbNh7/H1XpJ8Xf//fQ=
+X-Google-Smtp-Source: ACHHUZ4HJ6W+i9ZOHujorFlZvsNJvYi+zcDceQE67y7nLQrgjQvW74O3gJzrTG5lZfBVjdvH3Sg8YQ==
+X-Received: by 2002:a17:902:6b48:b0:1a6:87e3:db50 with SMTP id g8-20020a1709026b4800b001a687e3db50mr1900566plt.1.1684484250058;
+        Fri, 19 May 2023 01:17:30 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id l11-20020a170903244b00b001ac937171e4sm2778714pls.254.2023.05.19.01.17.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 May 2023 01:17:29 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86/mmu: Drop "struct kvm_mmu *mmu" from __kvm_mmu_invalidate_addr()
+Date:   Fri, 19 May 2023 16:17:11 +0800
+Message-Id: <20230519081711.72906-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH -next v20 24/26] riscv: Add documentation for Vector
-To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
-        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Jonathan Corbet <corbet@lwn.net>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Evan Green <evan@rivosinc.com>,
-        Vincent Chen <vincent.chen@sifive.com>
-References: <20230518161949.11203-1-andy.chiu@sifive.com>
- <20230518161949.11203-25-andy.chiu@sifive.com>
-Content-Language: en-US
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <20230518161949.11203-25-andy.chiu@sifive.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/18/23 23:19, Andy Chiu wrote:
-> This patch add a brief documentation of the userspace interface in
-> regard to the RISC-V Vector extension.
-> 
+From: Like Xu <likexu@tencent.com>
 
-"Add a brief documentation ..."
+Remove incoming parameter "struct kvm_mmu *mmu" that are no longer used.
+Whether the func is using "vcpu->arch.root_mmu" or "vcpu->arch.guest_mmu",
+it can be referenced as expected via "vcpu->arch.mmu". Thus the "*mmu"
+is replaced by the use of "vcpu->arch.mmu" in commit 19ace7d6ca15 ("KVM:
+x86/mmu: Skip calling mmu->sync_spte() when the spte is 0").
 
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> Reviewed-by: Greentime Hu <greentime.hu@sifive.com>
-> Reviewed-by: Vincent Chen <vincent.chen@sifive.com>
-> Co-developed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> ---
-> Changelog v20:
->  - Drop bit-field repressentation and typos (Björn)
->  - Fix document styling (Bagas)
+No functional change is intended.
 
-Anyway, thanks for applying my fixups!
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index c8961f45e3b1..160c40c83330 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5790,8 +5790,8 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_page_fault);
+ 
+-static void __kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+-				      u64 addr, hpa_t root_hpa)
++static void __kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, u64 addr,
++				      hpa_t root_hpa)
+ {
+ 	struct kvm_shadow_walk_iterator iterator;
+ 
+@@ -5839,11 +5839,11 @@ void kvm_mmu_invalidate_addr(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 		return;
+ 
+ 	if (roots & KVM_MMU_ROOT_CURRENT)
+-		__kvm_mmu_invalidate_addr(vcpu, mmu, addr, mmu->root.hpa);
++		__kvm_mmu_invalidate_addr(vcpu, addr, mmu->root.hpa);
+ 
+ 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
+ 		if (roots & KVM_MMU_ROOT_PREVIOUS(i))
+-			__kvm_mmu_invalidate_addr(vcpu, mmu, addr, mmu->prev_roots[i].hpa);
++			__kvm_mmu_invalidate_addr(vcpu, addr, mmu->prev_roots[i].hpa);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_invalidate_addr);
+
+base-commit: f1fcbaa18b28dec10281551dfe6ed3a3ed80e3d6
 -- 
-An old man doll... just what I always wanted! - Clara
+2.40.1
 
