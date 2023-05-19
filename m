@@ -2,48 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5207D7098B4
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 15:49:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7344A7098B6
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 15:50:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231954AbjESNtm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 09:49:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60556 "EHLO
+        id S231410AbjESNuj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 09:50:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231876AbjESNte (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 09:49:34 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2080.outbound.protection.outlook.com [40.107.243.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48BACBC
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 06:49:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Twk2UaI/qxLWwXmI+HZBTuOgt/wN+vryWIbY+7VJFH/Vsk5K5OzDR/G/n8ZcTU6bYKSB/LoIQuNFKmqXpscrqr8UQiG1R/3Ku0lRotq/TD9lfvPibxcQHaxbBR7gOmT8ejzhcX4hLzarx0fXXtNGH5qXk1cXDNKj2GSen9TtXKU6JdfLELG1DnykIesdzp88HjQUQl3OcvnhW9HNpj5TcJSMzMub0Fuv/InikW1GTZmB9pxmnYXKQBkW3obp6Se4BcglR24G1YXf+GMc5s6Rt2BYLoEVUFSNU6jYVqq31rLsEVo3O6JMNsizFU771qWmg6Bp+sDMhvLpLzD0b69XlA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6yE7PCkTVRZpP+NZSzgsP0TLJ/650CMMMTZuxUJCRmo=;
- b=N3s3drPRtKwjNdLvguHPfcD+6N4vvIGZ+fRVCfO2PVpZQr7RucPfumqP+MkasFMX4Nsnrflwb05blxEP++1NhIxjA0aA30sEiY3pk+fZHcAK51pujQ1HLPcoEWCNewS8XbPPtJQCFqKVXzF+FH+0R7DqEBnN3pEpKVliH3PscR8YY83jRQ0p0KVdcY0VcwNuOsrdGBlDl09T9IAE4gOxYEyKCySAcNgM8wpoEcyzH/mcAt7CkWj1Vlr/71zMke86w5gXEwYcQs0wk5hQRVcCQmdEoEy5n4JNuAQazeFrcMr0SUqrmFvKFDFqXrKNSNDvTvrte2sNBnKJ5zr0eaRYHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6yE7PCkTVRZpP+NZSzgsP0TLJ/650CMMMTZuxUJCRmo=;
- b=mOWBfHouYUPJumEsBYm3jqYdXoFQomMD4GtNM79UmcLpF4M44Ad0Hd3QrcL7igz0kryiJTAOMi9pXo6yZ6pV2HSz3y6CXVugo//b5619Z4Fy9LedxGL5MR4gbpY+24rHwE/wXOpCFnI4E5t4n6l8PBe5xAjl3gYASLm0uOggdJ0QvIZ1BOkCSqjiD4nYq8yBUHMd778AK6DbJFsSZiyomOwvQ1dS9F+rgnjfgDHyqyEtSaDQcdP6WCaXT5g154sqqhX6RngP2TesZhbsZTrYyHWykxzvqCl/qmUC4dLM2toUlwBUJilrxgZl6Qvhar/TPKDH26dZ2EiX+P6dJdHYag==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH2PR12MB4279.namprd12.prod.outlook.com (2603:10b6:610:af::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.21; Fri, 19 May
- 2023 13:49:31 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6411.021; Fri, 19 May 2023
- 13:49:30 +0000
-Date:   Fri, 19 May 2023 10:49:28 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
+        with ESMTP id S230518AbjESNui (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 May 2023 09:50:38 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4A8D11B3
+        for <kvm@vger.kernel.org>; Fri, 19 May 2023 06:50:01 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8F1DA1FB;
+        Fri, 19 May 2023 06:50:45 -0700 (PDT)
+Received: from [10.57.84.114] (unknown [10.57.84.114])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 362B03F73F;
+        Fri, 19 May 2023 06:49:58 -0700 (PDT)
+Message-ID: <d7aad90c-e009-d577-eb89-3c0859ce3952@arm.com>
+Date:   Fri, 19 May 2023 14:49:53 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH RFCv2 21/24] iommu/arm-smmu-v3: Enable HTTU for stage1
+ with io-pgtable mapping
+Content-Language: en-GB
+To:     Joao Martins <joao.m.martins@oracle.com>, iommu@lists.linux.dev
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
         Shameerali Kolothum Thodi 
         <shameerali.kolothum.thodi@huawei.com>,
         Lu Baolu <baolu.lu@linux.intel.com>,
@@ -54,113 +41,178 @@ Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
         Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
         Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         kvm@vger.kernel.org
-Subject: Re: [PATCH RFCv2 09/24] iommufd: Add IOMMU_HWPT_SET_DIRTY
-Message-ID: <ZGd+aNMNyd9ZXF2L@nvidia.com>
 References: <20230518204650.14541-1-joao.m.martins@oracle.com>
- <20230518204650.14541-10-joao.m.martins@oracle.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230518204650.14541-10-joao.m.martins@oracle.com>
-X-ClientProxiedBy: MN2PR01CA0027.prod.exchangelabs.com (2603:10b6:208:10c::40)
- To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH2PR12MB4279:EE_
-X-MS-Office365-Filtering-Correlation-Id: fd0d652a-1a43-44ab-b976-08db586fdead
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XWQ646mTBw7eTept9TTzpGjvrvQhLOKZ38k3bITCm5YR9oj07TBhLhhlB3uKbe1USI+E5x34RSkZ5yVMF4cd2UUF3AFih4teEHNKQGHfdoteCEsJwFhXhEbcAJJpdTsKZJ5HIAaYNpnCH/8BXuel+bxvi077VPg8Uy5BRq2ozFMQav2ZAT545I/saINaSinxyWmWk9QwrOF261jcUXmm7whF0yeRs4Uu5zOUguVlGUzhs42aQu/bREw4VQTUHuN/O7VBo8lR4m40D9G8T90mAHK4DnNPfozikXgn18RNHVjaDBqV5QRN8dqXTZZjml5FRBOjRWwZ9TNlfUaEJUUuRFy1htRfy2dtW1Shmn4IYOfKB3a7EpGwV4cRuGcPKiQofNVaDDD1ZaaWrrQs3+9Zs4eZpDPOd7/r6kQ7T2bGFAgxyPmCxqOHTVKkFETFxfG7MhVzgggxlsbDejno1i4nxTyUBOBFKHHFCFYsseiPEyRblbKuzbzjXDYJ0m7V58z1swnSv9g/N95JBpixMNB3AgYW6R9rncqsCv/BsRVzRpuleOkisJ0eFOaU+SUIJitcl9KMTJ41Vrp8ClPvb1rQOXagjBL5P+h0XctvvMBVYPkOEzBnckDh5r6iMjZ6AlYGpLOBKzOjKvi2TSQyBpnjRg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(376002)(346002)(136003)(39860400002)(451199021)(83380400001)(36756003)(6916009)(7416002)(5660300002)(8936002)(8676002)(41300700001)(4326008)(66476007)(38100700002)(66556008)(66946007)(86362001)(316002)(6506007)(26005)(6512007)(2906002)(186003)(6486002)(478600001)(2616005)(54906003)(14143004)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?sp3UQ7VNHLOvJsuoeevtza0LLolH7v5qPSet/bzaHBBnveClXR3211fOzV2m?=
- =?us-ascii?Q?EfsSdLIbXBmV6M1w2DacGSSywUV3LPgVa6l12SLdjlpGbJW8XrpZNYPPOq7F?=
- =?us-ascii?Q?iQFNEVY2LVhP6STPBP6v0ZboJRBfhDTcA8TUExgnOGFd4pzfwwdzebvCeC9f?=
- =?us-ascii?Q?/TIGIYomNQtJL3b6f0gtEhWevB65JOhFTpbJoqYNpUXWKWQUs/koavFvAuVX?=
- =?us-ascii?Q?yY6PJ4+k31Gv10WOEg8WvO4coVGp6BUbQVW4R/jggM30FYa9SN/g9s+sSs2f?=
- =?us-ascii?Q?flKOIuSV6tsPiaBRiUDdU4hPk+fFRhgOkGLBfADpRd74GWYBd+JZjZANKUxU?=
- =?us-ascii?Q?Cm4+kNQHzMBUPiVtvvmkl3VFRCfvROHRgi8cAcICJArjDOzCBpkQq/44Urlk?=
- =?us-ascii?Q?TmJqWsogfmiOSMIKQ1Oj39P62rdDCA0SVJWjurLvKG1Zgt7mVTGYbZ5kjsvQ?=
- =?us-ascii?Q?/eOrh6iwHOz3Zb9xaS2/T02A2GU8nxwWeve91LN+9nedJBQXCP5R+uPC7yJe?=
- =?us-ascii?Q?1+N/2IJzNrPeJ3mLfTvcMjt0VWD7bybIDCO7XObVKfAQDDinKmd/A1b4ctvK?=
- =?us-ascii?Q?g4twgM/1DTQ69mh2r2/axGI7h3yAOWg2ZwrR951IKknJc9lUFjOj5J/d5H8f?=
- =?us-ascii?Q?V/WTmpAh1H6yv/WD1Tf5e/xhHR1Zn6K9eyl9lQNUVe62a5sC1G38bsCwgrcm?=
- =?us-ascii?Q?TDDsRQSBcTMMiECU2ixNHLNpnMTFhsextvvXQihMSgXLfCSTMgiEeXRijyit?=
- =?us-ascii?Q?ht95e8VazfMlKZOVrE/8axWdj23lnoOkPGLml7TTkHharblAjo7StM6W5/5n?=
- =?us-ascii?Q?brJKXD4QJe2iRlvf2PfSfvW37CjubXB5oOT/VDN4BqednxxgbaajCpuR+1Qd?=
- =?us-ascii?Q?iEjWFwie/y2L3FtUtKDyhG9MXitkZrn/UfLzSGfcsgxSkjsshF8+fR5QI523?=
- =?us-ascii?Q?mtP7OKtYTq1aY5PATcOok+lKXOh+32HOFrV7Jdk5L0JJtQ8oAi3wSIGK3C9X?=
- =?us-ascii?Q?bsAX85/OrGoKpO7aIyxnqXlwhKfhNerrtuUzWRsVMYfvqvSZZub0fETNFAu3?=
- =?us-ascii?Q?bdTgZJuoN7fLjK52AMrDaLbW09mcvscU2GPNFD7ImJ0rd5ck4eZ43lOlm9op?=
- =?us-ascii?Q?vesdeJc8cZ2uQIUGAwCyh8CNQhJ5k0Uf0CEVGk2mfXV61NCekmySr5S4ynDx?=
- =?us-ascii?Q?4DYdeAbiO42nUO/zy7SVEvrjMDV6D0NfhlzgntDeVD6s0UbR3wmdewgAydlS?=
- =?us-ascii?Q?pwF+F6lQw+qnUsogHz+HH5AAu5fDpgz3Si7aMISYuuWQne/WIw40WLL/6yX1?=
- =?us-ascii?Q?8RS2hA05olPRgCe7dEToRBu8rzWvQOHoEPv8e8THZYIYW/byVg8n9niHABiX?=
- =?us-ascii?Q?X+KP7ba2CmwGC/8A3+nYZEsb0dccgo2l6C7H0UDylf6w9Ns+gqKVqWys1Xw6?=
- =?us-ascii?Q?i351qCPMMFKO7jdLqeRpBmyKHnl4hSklIsjT4hkMk0DPHfXweDR+ssckr0ub?=
- =?us-ascii?Q?koapWyIjqplGkXFSlM+kpYZrhx8kC/4zVPqr4mS4MN1/MuMCAY15Z3n2KoFv?=
- =?us-ascii?Q?ud+893ZZOX1dDYpHxFUo2XHcluQ7GuJxhEXqVH2l?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd0d652a-1a43-44ab-b976-08db586fdead
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 13:49:30.5328
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CNOmZ9oxs92Jv6RM2YYRhve4QJ2nqwBCqhYcx8Of4ETAcalh6eOvEqdmRK/E42ur
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4279
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+ <20230518204650.14541-22-joao.m.martins@oracle.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20230518204650.14541-22-joao.m.martins@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 18, 2023 at 09:46:35PM +0100, Joao Martins wrote:
-> +int iopt_set_dirty_tracking(struct io_pagetable *iopt,
-> +			    struct iommu_domain *domain, bool enable)
+On 2023-05-18 21:46, Joao Martins wrote:
+> From: Kunkun Jiang <jiangkunkun@huawei.com>
+> 
+> As nested mode is not upstreamed now, we just aim to support dirty
+> log tracking for stage1 with io-pgtable mapping (means not support
+> SVA mapping). If HTTU is supported, we enable HA/HD bits in the SMMU
+> CD and transfer ARM_HD quirk to io-pgtable.
+> 
+> We additionally filter out HD|HA if not supportted. The CD.HD bit
+> is not particularly useful unless we toggle the DBM bit in the PTE
+> entries.
+
+...seeds odd to describe the control which fundamentally enables DBM or 
+not as "not particularly useful" to the DBM use-case :/
+
+> Link: https://lore.kernel.org/lkml/20210413085457.25400-6-zhukeqian1@huawei.com/
+> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> [joaomart:Convey HD|HA bits over to the context descriptor
+>   and update commit message; original in Link, where this is based on]
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> ---
+>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 10 ++++++++++
+>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  3 +++
+>   drivers/iommu/io-pgtable-arm.c              | 11 +++++++++--
+>   include/linux/io-pgtable.h                  |  4 ++++
+
+For the sake of cleanliness, please split the io-pgtable and SMMU 
+additions into separate patches (you could perhaps then squash 
+set_dirty_tracking() into the SMMU patch as well).
+
+Thanks,
+Robin.
+
+>   4 files changed, 26 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> index e110ff4710bf..e2b98a6a6b74 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> @@ -1998,6 +1998,11 @@ static const struct iommu_flush_ops arm_smmu_flush_ops = {
+>   	.tlb_add_page	= arm_smmu_tlb_inv_page_nosync,
+>   };
+>   
+> +static bool arm_smmu_dbm_capable(struct arm_smmu_device *smmu)
 > +{
-> +	const struct iommu_domain_ops *ops = domain->ops;
-> +	struct iommu_dirty_bitmap dirty;
-> +	struct iommu_iotlb_gather gather;
-> +	struct iopt_area *area;
-> +	int ret = 0;
+> +	return smmu->features & (ARM_SMMU_FEAT_HD | ARM_SMMU_FEAT_COHERENCY);
+> +}
 > +
-> +	if (!ops->set_dirty_tracking)
-> +		return -EOPNOTSUPP;
+>   /* IOMMU API */
+>   static bool arm_smmu_capable(struct device *dev, enum iommu_cap cap)
+>   {
+> @@ -2124,6 +2129,8 @@ static int arm_smmu_domain_finalise_s1(struct arm_smmu_domain *smmu_domain,
+>   			  FIELD_PREP(CTXDESC_CD_0_TCR_SH0, tcr->sh) |
+>   			  FIELD_PREP(CTXDESC_CD_0_TCR_IPS, tcr->ips) |
+>   			  CTXDESC_CD_0_TCR_EPD1 | CTXDESC_CD_0_AA64;
+> +	if (pgtbl_cfg->quirks & IO_PGTABLE_QUIRK_ARM_HD)
+> +		cfg->cd.tcr |= CTXDESC_CD_0_TCR_HA | CTXDESC_CD_0_TCR_HD;
+>   	cfg->cd.mair	= pgtbl_cfg->arm_lpae_s1_cfg.mair;
+>   
+>   	/*
+> @@ -2226,6 +2233,9 @@ static int arm_smmu_domain_finalise(struct iommu_domain *domain,
+>   		.iommu_dev	= smmu->dev,
+>   	};
+>   
+> +	if (smmu->features & arm_smmu_dbm_capable(smmu))
+> +		pgtbl_cfg.quirks |= IO_PGTABLE_QUIRK_ARM_HD;
 > +
-> +	iommu_dirty_bitmap_init(&dirty, NULL, &gather);
+>   	pgtbl_ops = alloc_io_pgtable_ops(fmt, &pgtbl_cfg, smmu_domain);
+>   	if (!pgtbl_ops)
+>   		return -ENOMEM;
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> index d82dd125446c..83d6f3a2554f 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> @@ -288,6 +288,9 @@
+>   #define CTXDESC_CD_0_TCR_IPS		GENMASK_ULL(34, 32)
+>   #define CTXDESC_CD_0_TCR_TBI0		(1ULL << 38)
+>   
+> +#define CTXDESC_CD_0_TCR_HA            (1UL << 43)
+> +#define CTXDESC_CD_0_TCR_HD            (1UL << 42)
 > +
-> +	down_write(&iopt->iova_rwsem);
-> +	for (area = iopt_area_iter_first(iopt, 0, ULONG_MAX);
-> +	     area && enable;
-
-That's a goofy way to write this.. put this in a function and don't
-call it if enable is not set.
-
-Why is this down_write() ?
-
-You can see that this locking already prevents racing dirty read with
-domain unmap.
-
-This domain cannot be removed from the iopt eg through
-iopt_table_remove_domain() because this is holding the object
-reference on the hwpt
-
-The area cannot be unmapped because this is holding the
-&iopt->iova_rwsem
-
-There is no other way to call unmap..
-
-You do have to check that area->pages != NULL though
-
-Jason
+>   #define CTXDESC_CD_0_AA64		(1UL << 41)
+>   #define CTXDESC_CD_0_S			(1UL << 44)
+>   #define CTXDESC_CD_0_R			(1UL << 45)
+> diff --git a/drivers/iommu/io-pgtable-arm.c b/drivers/iommu/io-pgtable-arm.c
+> index 72dcdd468cf3..b2f470529459 100644
+> --- a/drivers/iommu/io-pgtable-arm.c
+> +++ b/drivers/iommu/io-pgtable-arm.c
+> @@ -75,6 +75,7 @@
+>   
+>   #define ARM_LPAE_PTE_NSTABLE		(((arm_lpae_iopte)1) << 63)
+>   #define ARM_LPAE_PTE_XN			(((arm_lpae_iopte)3) << 53)
+> +#define ARM_LPAE_PTE_DBM		(((arm_lpae_iopte)1) << 51)
+>   #define ARM_LPAE_PTE_AF			(((arm_lpae_iopte)1) << 10)
+>   #define ARM_LPAE_PTE_SH_NS		(((arm_lpae_iopte)0) << 8)
+>   #define ARM_LPAE_PTE_SH_OS		(((arm_lpae_iopte)2) << 8)
+> @@ -84,7 +85,7 @@
+>   
+>   #define ARM_LPAE_PTE_ATTR_LO_MASK	(((arm_lpae_iopte)0x3ff) << 2)
+>   /* Ignore the contiguous bit for block splitting */
+> -#define ARM_LPAE_PTE_ATTR_HI_MASK	(((arm_lpae_iopte)6) << 52)
+> +#define ARM_LPAE_PTE_ATTR_HI_MASK	(((arm_lpae_iopte)13) << 51)
+>   #define ARM_LPAE_PTE_ATTR_MASK		(ARM_LPAE_PTE_ATTR_LO_MASK |	\
+>   					 ARM_LPAE_PTE_ATTR_HI_MASK)
+>   /* Software bit for solving coherency races */
+> @@ -93,6 +94,9 @@
+>   /* Stage-1 PTE */
+>   #define ARM_LPAE_PTE_AP_UNPRIV		(((arm_lpae_iopte)1) << 6)
+>   #define ARM_LPAE_PTE_AP_RDONLY		(((arm_lpae_iopte)2) << 6)
+> +#define ARM_LPAE_PTE_AP_RDONLY_BIT	7
+> +#define ARM_LPAE_PTE_AP_WRITABLE	(ARM_LPAE_PTE_AP_RDONLY | \
+> +					 ARM_LPAE_PTE_DBM)
+>   #define ARM_LPAE_PTE_ATTRINDX_SHIFT	2
+>   #define ARM_LPAE_PTE_nG			(((arm_lpae_iopte)1) << 11)
+>   
+> @@ -407,6 +411,8 @@ static arm_lpae_iopte arm_lpae_prot_to_pte(struct arm_lpae_io_pgtable *data,
+>   		pte = ARM_LPAE_PTE_nG;
+>   		if (!(prot & IOMMU_WRITE) && (prot & IOMMU_READ))
+>   			pte |= ARM_LPAE_PTE_AP_RDONLY;
+> +		else if (data->iop.cfg.quirks & IO_PGTABLE_QUIRK_ARM_HD)
+> +			pte |= ARM_LPAE_PTE_AP_WRITABLE;
+>   		if (!(prot & IOMMU_PRIV))
+>   			pte |= ARM_LPAE_PTE_AP_UNPRIV;
+>   	} else {
+> @@ -804,7 +810,8 @@ arm_64_lpae_alloc_pgtable_s1(struct io_pgtable_cfg *cfg, void *cookie)
+>   
+>   	if (cfg->quirks & ~(IO_PGTABLE_QUIRK_ARM_NS |
+>   			    IO_PGTABLE_QUIRK_ARM_TTBR1 |
+> -			    IO_PGTABLE_QUIRK_ARM_OUTER_WBWA))
+> +			    IO_PGTABLE_QUIRK_ARM_OUTER_WBWA |
+> +			    IO_PGTABLE_QUIRK_ARM_HD))
+>   		return NULL;
+>   
+>   	data = arm_lpae_alloc_pgtable(cfg);
+> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
+> index 25142a0e2fc2..9a996ba7856d 100644
+> --- a/include/linux/io-pgtable.h
+> +++ b/include/linux/io-pgtable.h
+> @@ -85,6 +85,8 @@ struct io_pgtable_cfg {
+>   	 *
+>   	 * IO_PGTABLE_QUIRK_ARM_OUTER_WBWA: Override the outer-cacheability
+>   	 *	attributes set in the TCR for a non-coherent page-table walker.
+> +	 *
+> +	 * IO_PGTABLE_QUIRK_ARM_HD: Enables dirty tracking.
+>   	 */
+>   	#define IO_PGTABLE_QUIRK_ARM_NS			BIT(0)
+>   	#define IO_PGTABLE_QUIRK_NO_PERMS		BIT(1)
+> @@ -92,6 +94,8 @@ struct io_pgtable_cfg {
+>   	#define IO_PGTABLE_QUIRK_ARM_MTK_TTBR_EXT	BIT(4)
+>   	#define IO_PGTABLE_QUIRK_ARM_TTBR1		BIT(5)
+>   	#define IO_PGTABLE_QUIRK_ARM_OUTER_WBWA		BIT(6)
+> +	#define IO_PGTABLE_QUIRK_ARM_HD			BIT(7)
+> +
+>   	unsigned long			quirks;
+>   	unsigned long			pgsize_bitmap;
+>   	unsigned int			ias;
