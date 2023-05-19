@@ -2,144 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C28E17091CB
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 10:40:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 501067091D3
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 10:42:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230281AbjESIkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 04:40:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33816 "EHLO
+        id S230409AbjESImQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 04:42:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbjESIks (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 04:40:48 -0400
+        with ESMTP id S229932AbjESImM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 May 2023 04:42:12 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36D5CE5D;
-        Fri, 19 May 2023 01:40:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CED9C2;
+        Fri, 19 May 2023 01:42:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684485647; x=1716021647;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=uquxl4LqumwWhgaqOjFC3r5NVVh5ga2ulg7e5s0QI9U=;
-  b=iY6NwD8cRKYCl8PNIEdgsZLMf0q+lLzuI7jobeD/vYTg5VxnaqyiS70a
-   vOjl5qzhIMWiSOMBwBLC9JqEtfE3voMWCbWfneZDoVngGq3VDblPp9AWF
-   gsRhULsfTzZ+z4Lq/t15iSb6qj4OQbZ59tCYdqRQlas2CQ3evxQEBj0la
-   mCu3eSPCS9dJ4thmWtGjK6ebg/Ic/VMUKfRnSXtIjZSEs2mf9g7XkpCCC
-   xJ92+st5Xwee2srsAN7mfhop1hc8VYrjj9Eszr5JWDUNlOaZ3putKYKGP
-   BDi3G8k1C4g7sHEVWN2aGvKj5Fco5DZcfQ7pty++5vQOK7VDWWiUv0AJu
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10714"; a="349833590"
+  t=1684485731; x=1716021731;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=YBDD61LYc+8YyV9IHFS+UX0XRgQWBsc6LAg20rZ53AY=;
+  b=HqATrXLjs5G89/RG+47ZMn9TkOdTDJ8794BSLBYC+HwoJuKBMS+DaWBA
+   7XkmwcNU+nCveMVDsI7NtdmxyfrPN2RfbJKP50FLv9SDKVoLZH7iiHuNc
+   O/FmnKCZa4BSG7Wf/VRq/pXsj1dWqItu6NYRMNcqJeUFaxPN+L8duETPf
+   DE5kW+Cu8uxb/tIFuUfAdqEwiF2rCBocdGEn9Bayi/JmFC1YgA/E50mbp
+   t9PIEsyWG1qFoq49Pt9b2qexMX5UrRhC7Xu3Ep0ZrQYgk10859AmaRHux
+   vgVMUF2tN1jS4eo0UFDIRyNAedJSpgMw380oABOazMDRbjAOZ+7oeWOtJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10714"; a="349833894"
 X-IronPort-AV: E=Sophos;i="6.00,176,1681196400"; 
-   d="scan'208";a="349833590"
+   d="scan'208";a="349833894"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2023 01:40:46 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2023 01:42:10 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10714"; a="652975371"
+X-IronPort-AV: E=McAfee;i="6600,9927,10714"; a="652975528"
 X-IronPort-AV: E=Sophos;i="6.00,176,1681196400"; 
-   d="scan'208";a="652975371"
+   d="scan'208";a="652975528"
 Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga003.jf.intel.com with ESMTP; 19 May 2023 01:40:46 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+  by orsmga003.jf.intel.com with ESMTP; 19 May 2023 01:42:10 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
  fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 19 May 2023 01:40:45 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ 15.1.2507.23; Fri, 19 May 2023 01:42:09 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Fri, 19 May 2023 01:40:45 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.175)
+ 15.1.2507.23; Fri, 19 May 2023 01:42:09 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Fri, 19 May 2023 01:42:09 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.105)
  by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Fri, 19 May 2023 01:40:45 -0700
+ 15.1.2507.23; Fri, 19 May 2023 01:42:09 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R5rWmc/tK/2kW8JNIou48J3HCbUBKA6IlKMOa51j/imJAy2l/8StUA1IfkvUrXfcfLHCprAfI3Q7fajuRjiOIySf1NjwL8lnFUNQlVpWrx2h09OK8V+N81sej2bFp31oP0krN5QbWEz49J2jtP4bY2+4C61Etkiu9kuuoJ3DJNbPEgcAUFkYEGYBD4wPHuKS6jA+0un+C9nFaNgEWv0quaLwFFHwJdRwhORQPw9eqPh1nwSr3FY0V/ovvSz1rj/c/usjLJLbng762UV78kIMnw+2l0ec5lYQKOZJ+tOMG6MrOHS4jEBqo+t7EpIlFbjlgCuqWdDStxpeUTN+p3GPYA==
+ b=RqjwiHx7rfb8+rnkHnbmFtARJ4GmPzxRq823aHLj7MqtdW1dHa4nTkn4UUHkX0HdtXRq185S+CpayKIZLRaHqHA8AEZY6xtcojLG/wkxhM21/J81L1I6Kby0Qm7jFmm6IzmP67CU2EhOVsKbjtDqwE0mKWeJypJfcLmbHQFVsilk7kLVM4vqOrootdF3VXQlA+Krz0FT90BZO6TiYlNZZryicWEYoj7lzG83yGybGyQhNoY2MzIHZb2Edhyg74vKTeLXUnuzpQOmqltf8iMRaLXyfiaYuSyLYoy1VA0aJnNbgBjAqx0JCc+fCw+tcqwNBrw81fqppuuv0UYGZJsiQg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bnY7GxBVKvp6BtS96EB2awJPXY37LEJxEBUOG5zuCP0=;
- b=d4Hg7NRrrR45/2h7cmVKRZxpcXKVd/WYtbWQBTbWaXyYiBev6wRiRrO5Pe05PKRZsaUOvcqb8MhgWO84qXKqaglPemI1HDBAQJD9Z1gIgXFb+bP3OtzkaYiDfqk/ekPFoQh4V4FYEP1wCf/x8cHBLU8FuHz+C0W752QaKcFePvN5bqNkld1pfcmTq268NGJ/TuizNyrw+PawydxIHlHLRv0iVYv4tWXby1x4VAGmT/H0mo1uY+ilhXozn0zTMpTAsUbDPky0m5pxRnqvVvq3ptp2oO6ROTlLlsIpOA4Zo1UIirc8hWFxNzBpjcmOSYdWJtsj49VxqUNKbh0hdBR3Fw==
+ bh=nqWPpKV/SDoufZb+WRyFoUiAVCVv7Jid7ZhuWp4XsRk=;
+ b=Ibjg4SHLQTtbj4pmYF5uYDb6J2tARlKxFLGZFoi7jX7jt140nU6sZNDFAsIG36MnffwsJ/6XE+xA8ug0fbCjm2FMnbVItIYqVJ05wsYv3OzbT9olyE5iDfMAvrem3AhYf2LyvbLGuXWVJYBZgLC2Sv53nTHSXHxBQOEQ3zKrC5WxuWxPzYKKMm06JnPQm1BBDgakBZYqOeNyJ23we8cv31uo9HvkXVUy41oUsFAhmTY6SLEGHMh/CKxEtbyIdcjF2Kbu7bZRQ+wrzUn1SYK2x86B0pzhDRQFJ8ujS8F7upUuvowz7BeTFP7lFpCaDDdJXnJGYwsEJoHpPbvB/e7OiA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by DM4PR11MB5229.namprd11.prod.outlook.com (2603:10b6:5:39f::16) with
+Received: from BL1PR11MB5271.namprd11.prod.outlook.com (2603:10b6:208:31a::21)
+ by PH8PR11MB6563.namprd11.prod.outlook.com (2603:10b6:510:1c2::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.19; Fri, 19 May
- 2023 08:40:42 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::b4cb:1f70:7e2a:c4f5]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::b4cb:1f70:7e2a:c4f5%2]) with mapi id 15.20.6411.019; Fri, 19 May 2023
- 08:40:42 +0000
-Date:   Fri, 19 May 2023 16:40:30 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        <pawan.kumar.gupta@linux.intel.com>
-CC:     Xiaoyao Li <xiaoyao.li@intel.com>, <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, <linux-kernel@vger.kernel.org>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH] KVM: x86: Track supported ARCH_CAPABILITIES in kvm_caps
-Message-ID: <ZGc1/lwk5BAdRyOi@chao-email>
-References: <20230506030435.80262-1-chao.gao@intel.com>
- <b472b58d-0469-8a55-985c-1d966ce66419@intel.com>
- <ZGZhW/x5OWPmx1qD@google.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.17; Fri, 19 May
+ 2023 08:42:07 +0000
+Received: from BL1PR11MB5271.namprd11.prod.outlook.com
+ ([fe80::6f80:cda7:a88f:3cc1]) by BL1PR11MB5271.namprd11.prod.outlook.com
+ ([fe80::6f80:cda7:a88f:3cc1%3]) with mapi id 15.20.6411.021; Fri, 19 May 2023
+ 08:42:07 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: RE: [PATCH v3 3/4] iommufd: Add IOMMU_DEVICE_GET_HW_INFO
+Thread-Topic: [PATCH v3 3/4] iommufd: Add IOMMU_DEVICE_GET_HW_INFO
+Thread-Index: AQHZhBUvZZEu1sIxqEeJFXndXH1dUK9hUM+A
+Date:   Fri, 19 May 2023 08:42:07 +0000
+Message-ID: <BL1PR11MB527103529CB229A58C2439FF8C7C9@BL1PR11MB5271.namprd11.prod.outlook.com>
+References: <20230511143024.19542-1-yi.l.liu@intel.com>
+ <20230511143024.19542-4-yi.l.liu@intel.com>
+In-Reply-To: <20230511143024.19542-4-yi.l.liu@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5271:EE_|PH8PR11MB6563:EE_
+x-ms-office365-filtering-correlation-id: d47e08bd-d38d-4b57-482b-08db5844edd6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: S2Q6zRvtJ+M5oIAySc0QQmj+5lYqY86kI1b73VOWvO7vwYtpOaor517PawQmdb5Hs/hV02yQN46YBeo4Im1ZJTsy70S1WJnByJyI9CbUUIaPfU2hPRPQ0ZtTOckIQY+W2/SN9efJtpUuUvZ50rTsxSs0u7R7XwkbMzd8W7Z4yNACLEVhbzEy1Hw8keydEejlZhhpYp/jrc/NDScw0LRRa2prFwW8TbL1CubWVPDRoPGrVIZtUyoZb34fPTWEJReaTqO5ucGy21jDhs54ZtNwvxTiEHcXyV0YQ2sKKURBcqV5f2uVWUt5fzuAVrOi9Jb6sQG3lvpFhYStHkBhmdjQBBs8sVGFBVRbHQ7yPxDB1g7RrwxwBhXaKnY5L0VK3ZAl8duETxO0tzBnXIErydCxBlPkQdOnA0JvUa5qnQmMZ6Xs0jStZl2itatI8XUHudvCntd6hnUmVOccTta6sIhESdZ5v7ImY5r798jo/8t4UgY0JDGUws4+136QdirQuQWnkeJjeldcIKI/5DhJaYA1bHgpH091O/CEqcLb17TXT70qVm1Pki4vjQ1987/vr4JQftKNikRE9VbPOIUhHDdYzV/m3lzg/39QdhboXZjzIzcUUMJptG1SSfQ18gcJ8l6u
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5271.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(39860400002)(346002)(396003)(366004)(451199021)(86362001)(5660300002)(52536014)(41300700001)(71200400001)(2906002)(83380400001)(122000001)(38100700002)(38070700005)(82960400001)(33656002)(9686003)(186003)(6506007)(8936002)(7416002)(8676002)(55016003)(66446008)(66556008)(66476007)(66946007)(64756008)(76116006)(478600001)(7696005)(110136005)(54906003)(316002)(4326008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?pk1PU/6VVA+XVYn3/jTJ5weRXA5FTrZXYFaBxdR5gSDhEgVAJWw5/wpnZhEx?=
+ =?us-ascii?Q?coLgtlPggaAfSTDVpjOmRAyc+doaRWzeJFhMCjAD/GgWP2aUwkpix09ofY4h?=
+ =?us-ascii?Q?8p+8KsnKyzkJ9/9rc0KIonaSWvKsCojIGj6tUNkFEr+OD8dgSQaTPHNmsLXH?=
+ =?us-ascii?Q?5sAAjQ4Ly9HzzW41botWY6ayYXpcx/64j9B0copoiAQ7OAgASKTCAB0/cFOm?=
+ =?us-ascii?Q?siPDp2GdSL+kC+p/y6DrLDIYYhtPo+oGv6+bmxFnee4A/TFXwWI57tPxZdcD?=
+ =?us-ascii?Q?bcAh9A99l51JAP66+N2IKmJtCgnq6q4XbHP9BZQXU3e9JTQqTb/l33Wu907+?=
+ =?us-ascii?Q?ibYsxkYuqvvNYV/MSSOFHBX1HVPKOrsT07PAsbD2mmoxmkUQTKkz6UK7JJEo?=
+ =?us-ascii?Q?k/joLEhlpUtbXvS6q6MlipVHtq8t9BJ1l9oJWoennWS8Mv+Y6QYb9OxPH3pi?=
+ =?us-ascii?Q?YsxvPgB01r44Ke9QNfgLLrHlZnaL/yZnoeNJZyaPtWOXg2krasN69bxbkqJC?=
+ =?us-ascii?Q?2fvThUoDKaRuVNarvcTPZNppfcxGZvrLgwoHGGW9na801LDeA0rzH+NSauzD?=
+ =?us-ascii?Q?cRUQ3jJAaAYT/mTT4xFOOsCbZFG4Cw6ZPTqVEXCrrvoEngEVsXVNir1gAvTa?=
+ =?us-ascii?Q?PQ6zCQ1h0V1fuNvA6cSXaohW36spnaFDB187R/6KA1cLSCIhKdK0kiqtQo7i?=
+ =?us-ascii?Q?3XASJ7rzVWwTx+jm16gsfdQAD0bMhkfuqIpkLptJTRxPpMQBzfJ+VWCg0MCL?=
+ =?us-ascii?Q?VbJP3ieoIzXP2Qn+043CrKXnuWLw/6QS45Ex7YAOuTl4cpyHnXim1aB6n4P7?=
+ =?us-ascii?Q?CqNhLkjKwdVF/ei7ABiwOfKrqK0pWc1Mq4Aw0tNDyrndVrvC2yEWqsXj94Zr?=
+ =?us-ascii?Q?CiWKXgpOCs5aOxFzCqwqob9DmGqzamvf/viqRaOp9CV46BfY1pRz7MC2Bz3r?=
+ =?us-ascii?Q?L2BKQMXajYYfnnBAwMJ+52XswgW/S+WyJeDkgTTKflvzDY3UR6rgSb9shydz?=
+ =?us-ascii?Q?u9S5RfvQBHoiksUdow2Dc9K7OtHiYY0DQFc4dugFk1+N2cH3I1hA/xpfGlt9?=
+ =?us-ascii?Q?tqMV3Dq+CNLkyjQ7D8CqbeNHBNAVkpCo9QbluNV1n5eVwJD+LlTSFK/Vgq8/?=
+ =?us-ascii?Q?T0w0GXSTfmlyox01HjcwWcvQEuHoAo55BP/JmS7XF+LksJRHTyDF6vCh6m7r?=
+ =?us-ascii?Q?xFlpoW+CO8Xfngw7iWQZ63LAker27rD0pElRn7RG65qaSzCLCMLIOQdK6J5w?=
+ =?us-ascii?Q?Irl2akIhnPh+2hxP8vs92WKhYjiWXqwnq8g8KheJZntaLKvzDJsBh/Mk42+7?=
+ =?us-ascii?Q?DpA+UYmqgW+FCIzAiPELPpBDOWaRo7DThrjp++7isWH/XgJw7nsRHcMcK5jK?=
+ =?us-ascii?Q?/8SxeYTppupe7nDxENV1ZiwRtzBrUH9cierZx4EQVUJiZzqIJD8AHHXk0Ohq?=
+ =?us-ascii?Q?SXCMsbb/03qAHmlp+Mpg7148kSqsIMCPXBsUaSDnceJSJJdY9ejX2HgnBTNn?=
+ =?us-ascii?Q?zw2WtdhNOaY3Xp9QjIbsCBOg0+p2IhntjjJ3g1/SV39na6dCZp4aq+hi1th5?=
+ =?us-ascii?Q?kiePFANt5QGObooFiCA=3D?=
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZGZhW/x5OWPmx1qD@google.com>
-X-ClientProxiedBy: SGAP274CA0024.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::36)
- To PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|DM4PR11MB5229:EE_
-X-MS-Office365-Filtering-Correlation-Id: b9b98a29-4b11-4586-6437-08db5844babd
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3VDaadALSvnUz7vaKtAL+kr6fSnnym3hRQt4YUORqmPMcseth3I9/sEXY1TQ4o44OhIH0imA3WSHOxemTIG4QWJDJrLg/yH8xHIjt9pWgzPEoiznk0w9YtYjN073+1avPakuF5b/V2JjE/rgtS8ryoe1sR7zAABOQQivkdJuYwb8hJJoJo8lcfw1crJUhTG2grP2IBYQYh1C5Bu13E5NNydnpPffJaCFIrWuIOUSafPD3EEMfL+mVGzJ+kyTe2Wle+cKv42wtFn+mU76ttURMPFYUrjdVzSNx3YE5hOoUT6pSXERoG2BK4RtkBTy7w/DnQuebB3rWx5GU8fc/PZ+J2H3Ts7JmqUcGY3yg+7ijIWkrOOGteTQp4rAXLDRvriJBfcyMhyBG3TwBFmqAGLC5gObqNKUolX66Q2/WluZYXW9wutVaHPH7cMeCYkZ3maRm4uhnOLr8uHUDz1dMbWUm4uCLf5fAxFcyQq4d5q2G0jntSkDFJcMnCwzoTKbtMaFyYA7KcfP+t93Qc+Ua+jJw8zoVlYG70I6rVEClbJFK3I5eyPLQUXeqTptBUgxidAW
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(39860400002)(396003)(346002)(366004)(136003)(376002)(451199021)(6666004)(83380400001)(5660300002)(2906002)(8676002)(8936002)(44832011)(7416002)(9686003)(6506007)(26005)(53546011)(186003)(82960400001)(66946007)(86362001)(54906003)(6512007)(33716001)(6486002)(4326008)(316002)(41300700001)(478600001)(38100700002)(66556008)(66476007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FnV7dAM+SdtCtw8I9WOUt/TuUvEL3hDF3wO3c7W1XcN6n8vWhiA0gdWJTpKc?=
- =?us-ascii?Q?LuMsjcd7Q+oi2mhzd5Q+5p9hy+AEDmf0eQP/CubxV5fWdK1gNK0bqomYWEao?=
- =?us-ascii?Q?nvu5WgsMKOLf7B6l386JzF1X2WotX7hcNanRnUC7DPcgFQAcfc4t91ZDqlKn?=
- =?us-ascii?Q?25zUCLblJFVYRWk2a4GEEh4pNkJB6aMzjqNw4F/2m8eIjuvMue2barJj8766?=
- =?us-ascii?Q?lZaGkm4co+hzOMOXsXXtt8TO9EQ+Iel2J+JQhY6sPTY9z6aj9RCkg6qzym+k?=
- =?us-ascii?Q?x4bZxKO6wObKds8/hwkBf4/NZC6Ey4bzgTIw0S+UkQfS/bo7t30U/YIwkyxQ?=
- =?us-ascii?Q?aY0I2oiDs32AEhHDdbUn8bpr4PBfR7ksxc01O8bI4ChXbOB02Xt9CToM//Kr?=
- =?us-ascii?Q?QfkCL+qFjfCW+GwrsgRopK2BuPhMPGJjrykXUwpTu9XVOCNdCt9F2JGW1e1u?=
- =?us-ascii?Q?LdPBp7SkaFFvFwUJZgw89OG9qkyiBol9h/5susbJQ37OG9JHVE4n/4d4z68b?=
- =?us-ascii?Q?SeK02MZIxZbqu36+idUfhnsyMcGJgZoFHZCCO/MFuOYm3V6IeeR5+6IE9q7e?=
- =?us-ascii?Q?ae6FwuDcVUvSkDn6gr1cCSqel8cdJ7vxQYyfVPcmSR8j11uA8VCC37q/VjTb?=
- =?us-ascii?Q?AvKnA7p+WnJXc6fJgcxdXp8kUi8tggndrnhna3IlCJDBK2XXT6uFVyHKoVyK?=
- =?us-ascii?Q?o18ztHdsN0KEnK8UyF2mYYhzLpJNsjiasiCDkRjXuUdnwJKjX0o+dPNrtPPr?=
- =?us-ascii?Q?QUuUEcspbltQmyZJZP2z3EK5ya4O7Vcxtir3tpaMtmKBN61epqM8qrnz7K+Y?=
- =?us-ascii?Q?J689sQVCGLqP/PJ8G4YJX/Q/kktv39iHTJoJm6tYIEJnOWwS1VhxtdssC22R?=
- =?us-ascii?Q?w+6gNz4oXJgJw2D5pefhYd2kPCCpKpyXmEIPOmgeyEIXph4sWCLBHtdfPOg7?=
- =?us-ascii?Q?n0bDDa4HUv0mIx/hqaUu/3TYEdumS+ZcxZjnwOy+LgPpLHWsVH9ImL0bvL7J?=
- =?us-ascii?Q?rgLB66ktwX6rSZcKXzCR6jGCL4q6Vnujym4lwX12oSGncwBMxbl/klNhIav0?=
- =?us-ascii?Q?NUKR1ecTd9rp7HYFepnS0A+7XQGdCcOi03ZDoNo0/fSshzWq+16zT/RPhgqE?=
- =?us-ascii?Q?/nAClB6H9AK3jmFazrCub/oHCZU1N4u3PqPuF/G4nDepit0F1ka9PaYR1Ho3?=
- =?us-ascii?Q?i+FToMt1jaI3k4HcrTYNjPgYGVxzbyIJuPBy24D/i9PvM84A+W689jbw2DcF?=
- =?us-ascii?Q?wWimlPYjM4+n5F5qradOv0ZrIi+UeGgGBx+nc//dLRJJ+re+pOTKyL34/kU0?=
- =?us-ascii?Q?SYpYX96koEQpZh/VqV7qdYhzUAWC77nv0YtRUkK7daR5OERfsSJ+WALvretC?=
- =?us-ascii?Q?e22/nfPfMatdYAkUZr/ltHGMwfXp4tCqvSxLjFyGXTfSh8UyJPaWLeYHfsIS?=
- =?us-ascii?Q?2UziVi1/y8hZA7uKQDZfuTObBIxFWB/zrhcSUoRhuRL0bVAJ2nic/08991ZU?=
- =?us-ascii?Q?s216RYHArKjUxq91YSlFiP2Gdc+3GXvOL2UIWDfK9VwyXhcDzEkwOcf4l7v0?=
- =?us-ascii?Q?PsBdJzTIAesHaSiVYfW8OKop39m1boJEj6cGxFCH?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9b98a29-4b11-4586-6437-08db5844babd
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 08:40:42.0581
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5271.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d47e08bd-d38d-4b57-482b-08db5844edd6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 May 2023 08:42:07.3925
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MGRVeL4WT3uQ4MoZY2oXbTZ9DmXy2yu795fVcWDzC3H452x03JbHyUWSwHegDq1Lmqb/bMZ0bWUqTYRTBGed5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5229
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SUPD3W9m/cuh9BXjL3V5yolCTU5h0U+X/jOygi/Bn9pEs7JjQ5Ahl8WWzwB/qMPpwe/U7H56M5+kJZ4wgbmBOw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6563
 X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
@@ -151,137 +171,150 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Pawan, could you share your thoughts on questions about FB_CLEAR?
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Thursday, May 11, 2023 10:30 PM
+> +
+> +int iommufd_device_get_hw_info(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_hw_info *cmd =3D ucmd->cmd;
+> +	unsigned int length =3D 0, data_len;
+> +	struct iommufd_device *idev;
+> +	const struct iommu_ops *ops;
+> +	void *data =3D NULL;
+> +	int rc =3D 0;
+> +
+> +	if (cmd->flags || cmd->__reserved || !cmd->data_len)
+> +		return -EOPNOTSUPP;
+> +
+> +	idev =3D iommufd_get_device(ucmd, cmd->dev_id);
+> +	if (IS_ERR(idev))
+> +		return PTR_ERR(idev);
+> +
+> +	ops =3D dev_iommu_ops(idev->dev);
+> +	if (!ops->hw_info)
+> +		goto done;
+> +
+> +	/* driver has hw_info callback should have a unique hw_info_type */
+> +	if (ops->hw_info_type =3D=3D IOMMU_HW_INFO_TYPE_NONE) {
+> +		pr_warn_ratelimited("iommu driver set an invalid type\n");
+> +		rc =3D -ENODEV;
+> +		goto out_err;
+> +	}
 
-On Thu, May 18, 2023 at 10:33:15AM -0700, Sean Christopherson wrote:
->+Jim
->
->On Thu, May 18, 2023, Xiaoyao Li wrote:
->> On 5/6/2023 11:04 AM, Chao Gao wrote:
->> > to avoid computing the supported value at runtime every time.
->> > 
->> > No functional change intended.
->> 
->> the value of kvm_get_arch_capabilities() can be changed due to
->> 
->> 	if (l1tf_vmx_mitigation != VMENTER_L1D_FLUSH_NEVER)
->> 		data |= ARCH_CAP_SKIP_VMENTRY_L1DFLUSH;
->> 
->> and l1tf_vmx_mitigation can be runtime changed by vmentry_l1d_flush module
->> param.
+this should be a WARN_ON_ONCE() since it's a driver bug.
 
-Thanks for pointing this out. I noticed l1tf_vmx_mitigation and analyzed if
-it could be changed at runtime. Obviously I did a wrong analysis.
+> +
+> +	data =3D ops->hw_info(idev->dev, &data_len);
+> +	if (IS_ERR(data)) {
+> +		rc =3D PTR_ERR(data);
+> +		goto out_err;
+> +	}
+> +
+> +	length =3D min(cmd->data_len, data_len);
+> +	if (copy_to_user(u64_to_user_ptr(cmd->data_ptr), data, length)) {
+> +		rc =3D -EFAULT;
+> +		goto out_err;
+> +	}
+> +
+> +	/*
+> +	 * Zero the trailing bytes if the user buffer is bigger than the
+> +	 * data size kernel actually has.
+> +	 */
+> +	if (length < cmd->data_len) {
+> +		rc =3D iommufd_zero_fill_user(cmd->data_ptr + length,
+> +					    cmd->data_len - length);
+> +		if (rc)
+> +			goto out_err;
+> +	}
+> +
+> +done:
+> +	cmd->data_len =3D length;
+> +	cmd->out_data_type =3D ops->hw_info_type;
+> +	rc =3D iommufd_ucmd_respond(ucmd, sizeof(*cmd));
 
->
->Nice catch!
->
->> We need a detailed analysis that in no real case can
->> ARCH_CAP_SKIP_VMENTRY_L1DFLUSH bit change runtime.
->
->No, the fact that it _can_ be modified by a writable module param is enough to
->make this patch buggy.
->
->I do like snapshotting and then updating the value, even though there's likely no
->meaningful performance benefit, as that would provide a place to document that
->the "supported" value is dynamic.  Though the fact that it's dynamic is arguably a bug
->in its own right, e.g. if userspace isn't careful, a VM can have vCPUs with different
->values for ARCH_CAPABILITIES.  But fixing that is probably a fool's errand.  So
+the 'done' label should be moved before above zero_fill. Otherwise
+in !ops->hw_info case the user buffer is not cleared.
 
-I am not sure if fixing it is fool. There would be some other problem:
+>  union ucmd_buffer {
+>  	struct iommu_destroy destroy;
+>  	struct iommu_hwpt_alloc hwpt;
+> +	struct iommu_hw_info info;
 
-KVM enables L1DLFUSH and creates a guest. Then ARCH_CAP_SKIP_VMENTRY_L1DFLUSH is
-exposed to the guest. If L1DFLUSH is disabled at runtime in KVM, the guest
-doesn't know this change and won't do L1DFLUSH when entering L2. Then L2 may use
-L1TF to leak some secrets of L1.
+follow alphabetic order this should be ahead of hwpt.
 
->I vote to snapshot the value and toggle the ARCH_CAP_SKIP_VMENTRY_L1DFLUSH bit
->when l1tf_vmx_mitigation is modified.
+> @@ -302,6 +303,8 @@ static const struct iommufd_ioctl_op
+> iommufd_ioctl_ops[] =3D {
+>  	IOCTL_OP(IOMMU_DESTROY, iommufd_destroy, struct
+> iommu_destroy, id),
+>  	IOCTL_OP(IOMMU_HWPT_ALLOC, iommufd_hwpt_alloc, struct
+> iommu_hwpt_alloc,
+>  		 __reserved),
+> +	IOCTL_OP(IOMMU_DEVICE_GET_HW_INFO,
+> iommufd_device_get_hw_info,
+> +		 struct iommu_hw_info, __reserved),
 
-Sure. Will do.
+before IOMMU_HWPT_ALLOC
 
->
->On a somewhat related topic, what in the absolute #$#$ is going on with FB_CLEAR_DIS!?!?
->I made the mistake of digging into why KVM doesn't advertise ARCH_CAP_FB_CLEAR_CTRL...
->
->  1. I see *nothing* in commit 027bbb884be0 ("KVM: x86/speculation: Disable Fill
->     buffer clear within guests") that justifies 1x RDMSR and 2x WRMSR on every
->     entry+exit.
->
->  2. I'm pretty sure conditioning mmio_stale_data_clear on kvm_arch_has_assigned_device()
->     is a bug.  AIUI, the vulnerability applies to _any_ MMIO accesses.  Assigning
->     a device is necessary to let the device DMA into the guest, but it's not
->     necessary to let the guest access MMIO addresses, that's done purely via
->     memslots.
->
->  3. Irrespective of whether or not there is a performance benefit, toggling the
->     MSR on every entry+exit is completely unnecessary if KVM won't do VERW before
->     VM-Enter, i.e. if (!mds_user_clear && !mmio_stale_data_clear), then the
->     toggling can be done in vmx_prepare_switch_to_{guest,host}().  This probably
->     isn't worth pursuing though, as #4 below is more likely, especially since
->     X86_BUG_MSBDS_ONLY is limited to Atom (and MIC, lol) CPUs.
->
->  4. If the host will will _never_ do VERW, i.e. #3 + !X86_BUG_MSBDS_ONLY, then
->     KVM just needs to context switch the MSR between guests since the value that's
->     loaded while running in the host is irrelevant.  E.g. use a percpu cache to
->     track the current value.
+> +
+> +/**
+> + * struct iommu_hw_info - ioctl(IOMMU_DEVICE_GET_HW_INFO)
+> + * @size: sizeof(struct iommu_hw_info)
+> + * @flags: Must be 0
+> + * @dev_id: The device bound to the iommufd
+> + * @data_len: Input the length of the user buffer in bytes. Output the
+> + *            length of data filled in the user buffer.
+> + * @data_ptr: Pointer to the user buffer
+> + * @out_data_type: Output the iommu hardware info type as defined by
+> + *                 enum iommu_hw_info_type.
+> + * @__reserved: Must be 0
+> + *
+> + * Query the hardware iommu information for given device which has been
+> + * bound to iommufd. @data_len is the size of the buffer which captures
+> + * iommu type specific data and the data will be filled. Trailing bytes
+> + * are zeroed if the user buffer is larger than the data kernel has.
+> + *
+> + * The type specific data would be used to sync capability between the
+> + * virtual IOMMU and the hardware IOMMU. e.g. nested translation
+> requires
+> + * to check the hardware IOMMU capability so guest stage-1 page table
+> + * uses a format compatible to the hardware IOMMU.
+> + *
+> + * The @out_data_type will be filled if the ioctl succeeds. It would
+> + * be used to decode the data filled in the buffer pointed by @data_ptr.
+> + */
+> +struct iommu_hw_info {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 dev_id;
+> +	__u32 data_len;
+> +	__aligned_u64 data_ptr;
+> +	__u32 out_data_type;
+> +	__u32 __reserved;
 
-Agreed.
+it's unusual to have reserved field in the end. It makes more sense
+to move data_ptr to the end to make it meaningful.
 
-Looks VERW can be used in CPL3, should we restore the MSR on returning
-to userspace i.e., leverage uret mechanism?
+> +};
+> +#define IOMMU_DEVICE_GET_HW_INFO _IO(IOMMUFD_TYPE,
+> IOMMUFD_CMD_DEVICE_GET_HW_INFO)
+>  #endif
 
->
->  5. MSR_IA32_MCU_OPT_CTRL is not modified by the host after a CPU is brought up,
->     i.e. the host's desired value is effectively static post-boot, and barring
->     a buggy configuration (running KVM as a guest), the boot CPU's value will be
->     the same as every other CPU.
->
->  6. Performance aside, KVM should not be speculating (ha!) on what the guest
->     will and will not do, and should instead honor whatever behavior is presented
->     to the guest.  If the guest CPU model indicates that VERW flushes buffers,
->     then KVM damn well needs to let VERW flush buffers.
->
->  7. Why on earth did Intel provide a knob that affects both the host and guest,
->     since AFAICT the intent of the MSR is purely to suppress FB clearing for an
->     unsuspecting (or misconfigured?) guest!?!?!
+Here we have a naming confusion.
 
-I doubt it is purely for guests. Any chance userspace application may use VERW?
+'IOMMU' is the prefix of iommufd ioctls.
 
-And I don't think the original patch is for misconfigured guest. IIUC, it is
-about migrating a guest from a vulnerable host to an invulnerable host.
+'DEVICE' is the subjective.
 
->
->FWIW, this trainwreck is another reason why I'm not going to look at the proposed
->"Intel IA32_SPEC_CTRL Virtualization" crud until external forces dictate that I
->do so. I have zero confidence that a paravirt interface defined by hardware
->vendors to fiddle with mitigations will be sane, flexible, and extensible.
->
->Anyways, can someone from Intel do some basic performance analysis to justify
->doing RDMSR + WRMSRx2 on every transition?  Unless someone provides numbers that
+Then "GET_HW_INFO" implies getting hardware info related to
+this device. then it should not be restricted to the iommu info.
 
-Pawan, could you help to answer this question?
+with that it's clearer to call it IOMMU_DEVICE_GET_IOMMU_INFO.
 
->show a clear, meaningful benefit to the aggressive toggling, I'm inclined to have
->KVM do #4, e.g. end up with something like:
->
->	/* L1D Flush includes CPU buffer clear to mitigate MDS */
->	if (static_branch_unlikely(&vmx_l1d_should_flush)) {
->		vmx_l1d_flush(vcpu);
->	} else if (static_branch_unlikely(&mds_user_clear) ||
->		   static_branch_unlikely(&mmio_stale_data_clear)) {
->		mds_clear_cpu_buffers();
->	} else if (static_branch_unlikely(&kvm_toggle_fb_clear) {
->		bool enable_fb_clear = !!(vcpu->arch.arch_capabilities & ARCH_CAP_FB_CLEAR);
->
->		if (this_cpu_read(kvm_fb_clear_enabled) != enable_fb_clear) {
->			u64 mcu_opt_ctrl = host_mcu_opt_ctrl;
->
->			if (enable_fb_clear)
->				mcu_opt_ctrl &= ~FB_CLEAR_DIS;
->			else
->				mcu_opt_ctrl |= FB_CLEAR_DIS;
->			native_wrmsrl(MSR_IA32_MCU_OPT_CTRL, mcu_opt_ctrl);
->			this_cpu_write(kvm_fb_clear_enabled, enable_fb_clear);
->		}
->	}
+similarly for struct iommu_hw_info.
+
+'iommu' is the prefix for all iommufd ioctl structures.
+
+then 'hw_info' is too broard.
+
+iommu_device_iommu_info reads better? though having two
+iommu's in the name is a little bit annoying...
