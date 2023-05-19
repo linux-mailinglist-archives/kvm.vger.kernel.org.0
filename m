@@ -2,178 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87C4C709F04
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 20:23:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FB23709F12
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 20:30:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229695AbjESSX3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 14:23:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34418 "EHLO
+        id S229964AbjESSag (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 14:30:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjESSX0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 14:23:26 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E96DE1A1
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 11:23:24 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-64d1c53cad8so2538423b3a.3
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 11:23:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684520604; x=1687112604;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DLB02Z/Vwsol/Ye6PM6jgDdfosuGHdGXe49pn4jVFGs=;
-        b=ITz9fDEYRz6uJ1+nRWO7vsSi14em+HdSJidcWgxJ4Wt6DeOJu7xDarNLoGHPPmOBJm
-         513df8JS3NzUdZBK5GSwxSAE1obesd28XWXoOz2iBbvdy2ADgD8Q7q4etCMKIPinEZf9
-         82KenOrwjvv/KK8vs+qKxwowe4qePsP8+TuW1ty9rOYtzfzi/ynfD476K7Sa4jcxQ34p
-         HkwfUr8RcwOMfxti367AckaqXDd3aDIN65dnmKhBIIZmfTcWPib/CZQFAhBLIgn2eTM2
-         VcgA71nqkKuEZwM79FEKmyy8iW+KFC3fLH2DABkTHNX+7IlmO+RnTTQJhuLLoZh1rgpR
-         H95A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684520604; x=1687112604;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DLB02Z/Vwsol/Ye6PM6jgDdfosuGHdGXe49pn4jVFGs=;
-        b=YbJTQnCE85ocFb8iL3fWfsLnR1MUj35jVCXInAGAK2QGw5xMbL//6LOZwJHUwz9LbT
-         MfEH1LwWZfC2REUgXWPEbuh+10vbUdbJe242QQJrEZg+1xzZxRLt59G7LlH9+Zcaa0AO
-         +7jE4iXYyKpYpCtLV0PxlJMUphLOmqUByvA9qprc4Z/jwti+0ikkVEjKstyi4o5Ta1BB
-         dHpR9ZMT+M6jwfUzlzCAu1KTtb+fWI1OjMGn5BbNv1LheIliANvLh/rnw9PnF8F9L9+C
-         h4LIhGCv/IqoXYe3kWMikUC9au9AKJKQTCvqOsF5LCN4Cm3cdNdNJuR3WUh35ybmuwUl
-         jU9g==
-X-Gm-Message-State: AC+VfDwh2/YatslzhupD4mYEX6mBBPm/DLFeXHWc3WMNwjihDmCT2tdo
-        W2XTXcBZ4ccFAOaoBNK1wzcDhJRLsuM=
-X-Google-Smtp-Source: ACHHUZ419BZyva9XfjdHZezzlVRJTJng9P1rwHIVB2iZ3Kvn5yX6WZYPLwlGGRjyBM2xKvPRPQpWmzT2ch0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:88c4:0:b0:643:4595:64c7 with SMTP id
- k4-20020aa788c4000000b00643459564c7mr1352262pff.4.1684520604384; Fri, 19 May
- 2023 11:23:24 -0700 (PDT)
-Date:   Fri, 19 May 2023 11:23:23 -0700
-In-Reply-To: <CSQFE7I30W27.2TPDIHOTZNRIZ@dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com>
-Mime-Version: 1.0
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <20221202061347.1070246-3-chao.p.peng@linux.intel.com> <CSQFE7I30W27.2TPDIHOTZNRIZ@dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com>
-Message-ID: <ZGe+m+uFzpiW7wlr@google.com>
-Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
-From:   Sean Christopherson <seanjc@google.com>
-To:     Nicolas Saenz Julienne <nsaenz@amazon.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, graf@amazon.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com, anelkz@amazon.de
+        with ESMTP id S229508AbjESSae (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 May 2023 14:30:34 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2060e.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5a::60e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 911E4132;
+        Fri, 19 May 2023 11:30:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hZGOm+v1SlmsOWLZhgu+3g848L/Csc5cYAtAnNGEDl+6x4HcWwG/in7k0Vclggw7MOf+cgEuEI8QxISqqyK25I6XTvmNcoU3+rsyzLFA9Hjc68zbtLvPf9aUP9GpYMhpnJ4orO5bSybrYGeJ8p1BRqEOclqSjjbw3WRV9/Qg2eJCqIFKZu1UnjpebRaASv/xZJtVil+N8A3PD7uLeYhgZKEAcyKdxFl+GVvvkqc6hg282ZULlsigmw6n8a9ZiHprGilWC9DNZViqqSOxldSkYKNUq3jxW7yrYI3vjgnyN9i5shicWMmFwyPkWVoK2VZ2nTezojMLKcrt0129cQMt1A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5Hp5hbomG0ZEehiPXX1QujU9CzRbKKEEYl/JCOJOWbc=;
+ b=dNy2CsoDhXqgUGPWr9Xlr1YYEl0Xw9KQBQ2T6JxC5eFsbaeqjkM4W81sZhXgieKOtVhJSJmec9h+90HalT8XM5IWdB2CGlqnE5SCd55D/bgJgYN3d18XGuvxvlnJoKthnzXPMzIPk9T1bXnYD7lZAW3Jpw/WPlSDlOnh5MN9l49OssNfu4zlbk7ApFhrkX1Yz1us5ITEdy2/9lynQNonhI7zq4uYt62HbfPysdIXPabn74kJ2Kp2xEMXxhsKZ2FF/BZC0xo59tbU6s3FyfxbxLlprODmOkvmF34qUxLWZ7ukvt5DmGO8XBzo0AWkSOHygo9+uNZAze+sWs+ECdhEag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5Hp5hbomG0ZEehiPXX1QujU9CzRbKKEEYl/JCOJOWbc=;
+ b=f09P0ERX7n2hvCpmsrWsSz60ThAGaf77qtVli1Nf5GK/W+bA7tjyD5MFNbmGGk4d2ZcrlY175AeYkG83cpf1XBuax9hTbuWJ5TcM+B5fi2UlAfaRc3xwa0L7iJx0snCGf93ZiC0aaR34mNGSs4W1yA5Rjo1rTZJMKG/fktspP7YhS92SJ2+50Yh7ZD7zM81v+ZqC0kSEcE9SUnGcp67dHveiDB8rI3/gBaJjX4yjJwuozPhHX0sJsXd30fRBviL/KJgn5eviXtn4joWi2O2eMaAGiFZn0W3zRCZfSY5lQ855F/5eW8g1dt+dpLu1avfDTdHl8zziEEeAJcK+XNMcbA==
+Received: from MW4PR03CA0002.namprd03.prod.outlook.com (2603:10b6:303:8f::7)
+ by DS0PR12MB7969.namprd12.prod.outlook.com (2603:10b6:8:146::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.19; Fri, 19 May
+ 2023 18:30:31 +0000
+Received: from CO1NAM11FT104.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:8f:cafe::ee) by MW4PR03CA0002.outlook.office365.com
+ (2603:10b6:303:8f::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.21 via Frontend
+ Transport; Fri, 19 May 2023 18:30:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1NAM11FT104.mail.protection.outlook.com (10.13.174.220) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6411.21 via Frontend Transport; Fri, 19 May 2023 18:30:30 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 19 May 2023
+ 11:30:18 -0700
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Fri, 19 May
+ 2023 11:30:18 -0700
+Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Fri, 19 May 2023 11:30:17 -0700
+Date:   Fri, 19 May 2023 11:30:15 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v3 3/4] iommufd: Add IOMMU_DEVICE_GET_HW_INFO
+Message-ID: <ZGfANz/aJp2WtXSp@Asurada-Nvidia>
+References: <20230511143024.19542-1-yi.l.liu@intel.com>
+ <20230511143024.19542-4-yi.l.liu@intel.com>
+ <BL1PR11MB527103529CB229A58C2439FF8C7C9@BL1PR11MB5271.namprd11.prod.outlook.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Disposition: inline
+In-Reply-To: <BL1PR11MB527103529CB229A58C2439FF8C7C9@BL1PR11MB5271.namprd11.prod.outlook.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT104:EE_|DS0PR12MB7969:EE_
+X-MS-Office365-Filtering-Correlation-Id: da7d642d-efe3-4ffc-a1d8-08db58972056
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /RC5ETfrSu6eMYT2HJhzAu6wJQFdoEoFpPh6STEvlahY8qtwwG4XoTuIvD62kKGPVyCPmXCHb6OuOaaaReVxt1/e2UL9p0+AUyQ8aB9Ynm595TmMKb6RgxKweke8S2h9QVuIm5Wy5TPQ++Djljuo3y10a7prsLNVu+7mzERL6O1oCyvd2SkAzrpJgvRkleMHzEntIKT+iL6pSvGDThy/D/AWoRnjxLrrBIP4HsXxJPmTfYxSk65QCZAPOwX8Yd7xb2cNaVyZqpx9SGuH1mFhtqP/YkNbUh/kq6WTzKfC/j+QdzfG+k1sQcbb7tktk1nxXeeqxtLqKMnYimr1ArEZLtqGR8/70XFrKoSc92Pth5uW7+4lUHEBdig5G3emXa8ddamw56sJ7LaxATl4fhLYOmA8GKMV0b09O63zZMmWpEk9DMNXs4lSxAhKpBDgfIOo+BghUAj0/uc7vh2BQJbo0hf9mYSggRx5Ofj0D2h61aXrDetuD0tkze/8SR2XyM26gK8eC8IT9GFyR5uTVkyE8ct8+Kof/7YbFGQXXkhL9yXT9My48IwNiXLtbc4Vjz/ElHKoaQjU/n1uyft/O8rgRk3QdgZ29tH+CA8Pl8ldXq1S090BMzU5UfHFHoMYAhnoOWtP/qbGc8JVdyA8hYIwcSnQxlJ+Z6Wsh9dJe+bLqY3NNM4ZVSAXqT5J0YiUzmlwotpttx2XXIlrlKqhAxmnTe9sUAcatpY7v06WUAWJHCkeG3rA3S6GwM16UOrzUh2Q
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(376002)(346002)(39860400002)(451199021)(40470700004)(46966006)(36840700001)(8936002)(316002)(2906002)(478600001)(4326008)(41300700001)(8676002)(6916009)(54906003)(7416002)(70206006)(70586007)(5660300002)(9686003)(26005)(40460700003)(82740400003)(33716001)(186003)(55016003)(356005)(7636003)(40480700001)(336012)(36860700001)(86362001)(82310400005)(47076005)(426003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 18:30:30.7974
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: da7d642d-efe3-4ffc-a1d8-08db58972056
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT104.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7969
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 19, 2023, Nicolas Saenz Julienne wrote:
-> Hi,
+Hi Kevin,
+
+On Fri, May 19, 2023 at 08:42:07AM +0000, Tian, Kevin wrote:
+
+> > +};
+> > +#define IOMMU_DEVICE_GET_HW_INFO _IO(IOMMUFD_TYPE,
+> > IOMMUFD_CMD_DEVICE_GET_HW_INFO)
+> >  #endif
 > 
-> On Fri Dec 2, 2022 at 6:13 AM UTC, Chao Peng wrote:
+> Here we have a naming confusion.
 > 
-> [...]
-> > +The user sets the per-page memory attributes to a guest memory range indicated
-> > +by address/size, and in return KVM adjusts address and size to reflect the
-> > +actual pages of the memory range have been successfully set to the attributes.
-> > +If the call returns 0, "address" is updated to the last successful address + 1
-> > +and "size" is updated to the remaining address size that has not been set
-> > +successfully. The user should check the return value as well as the size to
-> > +decide if the operation succeeded for the whole range or not. The user may want
-> > +to retry the operation with the returned address/size if the previous range was
-> > +partially successful.
-> > +
-> > +Both address and size should be page aligned and the supported attributes can be
-> > +retrieved with KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES.
-> > +
-> > +The "flags" field may be used for future extensions and should be set to 0s.
+> 'IOMMU' is the prefix of iommufd ioctls.
 > 
-> We have been looking into adding support for the Hyper-V VSM extensions
-> which Windows uses to implement Credential Guard. This interface seems
-> like a good fit for one of its underlying features. I just wanted to
-> share a bit about it, and see if we can expand it to fit this use-case.
-> Note that this was already briefly discussed between Sean and Alex some
-> time ago[1].
+> 'DEVICE' is the subjective.
 > 
-> VSM introduces isolated guest execution contexts called Virtual Trust
-> Levels (VTL) [2]. Each VTL has its own memory access protections,
-> virtual processors states, interrupt controllers and overlay pages. VTLs
-> are hierarchical and might enforce memory protections on less privileged
-> VTLs. Memory protections are enforced on a per-GPA granularity.
+> Then "GET_HW_INFO" implies getting hardware info related to
+> this device. then it should not be restricted to the iommu info.
 > 
-> The list of possible protections is:
-> - No access -- This needs a new memory attribute, I think.
+> with that it's clearer to call it IOMMU_DEVICE_GET_IOMMU_INFO.
 
-No, if KVM provides three bits for READ, WRITE, and EXECUTE, then userspace can
-get all the possible combinations.  E.g. this is RWX=000b
+Though the entire ioctl is tied to the input "dev_id", I think
+it isn't really about the device corresponding to the dev_id,
+similar to the IOMMU_HWPT_ALLOC having a dev_id input too. So,
+I think the "IOMMU_DEVICE" here should be interpreted simply
+as "an iommu device". We could also highlight this somewhere
+in the header.
 
-> - Read-only, no execute
+With that being said, IOMMU_DEVICE_SET/UNSET_DATA should be
+renamed to IOMMU_DEVICE_SET/UNSET_DEV_DATA -- "DEVICE" is the
+iommu device while the "DEV_DATA" is a given device that's
+behind the iommu.
 
-RWX=100b (using my completely arbitrary ordering of RWX bits :-) )
-
-> - Read-only, execute
-
-RWX=101b
-
-> - Read/write, no execute
-
-RWX=110b
-
-> - Read/write, execute
-
-RWX=111b
-
-> We implemented this in the past by using a separate address space per
-> VTL and updating memory regions on protection changes. But having to
-> update the memory slot layout for every permission change scales poorly,
-> especially as we have to perform 100.000s of these operations at boot
-> (see [1] for a little more context).
+> similarly for struct iommu_hw_info.
 > 
-> I believe the biggest barrier for us to use memory attributes is not
-> having the ability to target specific address spaces, or to the very
-> least having some mechanism to maintain multiple independent layers of
-> attributes.
-
-Can you elaborate on "specific address spaces"?  In KVM, that usually means SMM,
-but the VTL comment above makes me think you're talking about something entirely
-different.  E.g. can you provide a brief summary of the requirements/expectations?
-
-> Also sorry for not posting our VSM patches. They are not ready for
-> upstream review yet, but we're working on it.
+> 'iommu' is the prefix for all iommufd ioctl structures.
 > 
-> Nicolas
+> then 'hw_info' is too broard.
 > 
-> [1] https://patchwork.kernel.org/comment/25054908/
-> [2] See Chapter 15 of Microsoft's 'Hypervisor Top Level Functional Specification':
->     https://raw.githubusercontent.com/MicrosoftDocs/Virtualization-Documentation/main/tlfs/Hypervisor%20Top%20Level%20Functional%20Specification%20v6.0b.pdf
+> iommu_device_iommu_info reads better? though having two
+> iommu's in the name is a little bit annoying...
+
+How about:
+IOMMU_DEVICE_GET_FEATURES
+struct iommu_device_features
+?
+
+Thanks
+Nic
