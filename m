@@ -2,108 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3EFD709E90
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 19:51:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69DB8709E9A
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 19:55:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230288AbjESRvs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 13:51:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52008 "EHLO
+        id S231193AbjESRz3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 13:55:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbjESRvq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 13:51:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B70BA110
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 10:51:07 -0700 (PDT)
+        with ESMTP id S231189AbjESRz2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 May 2023 13:55:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3C7FD1
+        for <kvm@vger.kernel.org>; Fri, 19 May 2023 10:54:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684518667;
+        s=mimecast20190719; t=1684518885;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aXBKbAUPwLNGSOGtOcJl8CX+LoyRECpahodgh91Qy1Q=;
-        b=D8a7SsHkAnmi4sTebic6/tKdt8+z5/yzvBJ/XvKkCdq4RcC4FY7A9BYj2AG4EtOidIUsNc
-        XnjkFGGXBq4AalqgpbB4phmz3AhO+azDvOYvFCcmUjgARqQH2fiqaQJx+yfhZvXgFzcKsC
-        IbSbV4W1m0pDAAQS8MEX5PoQtZ58gBk=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=xY5DdzJZ+tlOEiTm+AjVxU9GWuiQ7xHZ1fBRd1/mcD4=;
+        b=amraDaqI6fqzQnAL8fonAZMAI5cdYNGhLutcA/bafMrinrK8fXtVZYjZ+UlTyChREOZiQ8
+        i03eiBIY2PejOGuFsVzISjW4xWeO3UySEUPjsuZWk5zj5mnizxCtER6el2ng3RYmuj503i
+        C72H2hzcW4GBYMNMzbNLQqwzddGB4Ng=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-554-y7Xq-bqbMESD4K9uYfw-jQ-1; Fri, 19 May 2023 13:51:05 -0400
-X-MC-Unique: y7Xq-bqbMESD4K9uYfw-jQ-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5114bcc2156so924744a12.3
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 10:51:05 -0700 (PDT)
+ us-mta-655-3gb-asLJNlGxFHJGdE8f6A-1; Fri, 19 May 2023 13:54:40 -0400
+X-MC-Unique: 3gb-asLJNlGxFHJGdE8f6A-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-510ec47c66aso1954658a12.0
+        for <kvm@vger.kernel.org>; Fri, 19 May 2023 10:54:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684518663; x=1687110663;
+        d=1e100.net; s=20221208; t=1684518878; x=1687110878;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aXBKbAUPwLNGSOGtOcJl8CX+LoyRECpahodgh91Qy1Q=;
-        b=S8KX/g2GNiyjrYS7vvSIfDtaCM2xnqBmQkZVPW1gpdty/Xi31Am8rx3moSfD54A2mZ
-         u9zQXws8XWnfqXgD5TvSTIrj2968D4AZH+0Y2pffVJaprBfbuQQ7JbN6A3pTKhTw5LQk
-         FPL+jSOom2mHhqnpFjkCltPiU4sgiXQ+PTCrml5EeaUwdOVljMo2bLVrpECC7wm3xhoQ
-         bxpgX6ZQx+7O/khIDHoVzk1ToU/o3pezFEc8zTsKJ6lF8guow/RiyZBqDoMWdpQUUqy4
-         xlb9nNyVVYvjgpvHOqER83OSlO3tCMbQ2LRg3iC16G5e6SAcVwSHwoXCXAEbvMTipFbw
-         pMzQ==
-X-Gm-Message-State: AC+VfDw11Ezr6S3WkIf+7QRhPh78S519CEIpaFte2B3N2znnXBhZOxaq
-        9nrDWvrnblFfDnY13wPvEpr0YIOp5bQrBt1zKMSAeNvmuWLT0rm3pE6jOLm5iCVPynYCF16j6O7
-        cHg7Pr1PcdEZPdtOuCD8E
-X-Received: by 2002:a17:907:1003:b0:96a:863c:46a9 with SMTP id ox3-20020a170907100300b0096a863c46a9mr2256989ejb.71.1684518663547;
-        Fri, 19 May 2023 10:51:03 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ71u4FLUOojgOd4CfrwIOEuF6XSrVQjMcLrzS0tAtzAMVglxm7RoS1EtqhPb0ZvhFOl5TBADg==
-X-Received: by 2002:a17:907:1003:b0:96a:863c:46a9 with SMTP id ox3-20020a170907100300b0096a863c46a9mr2256977ejb.71.1684518663235;
-        Fri, 19 May 2023 10:51:03 -0700 (PDT)
+        bh=xY5DdzJZ+tlOEiTm+AjVxU9GWuiQ7xHZ1fBRd1/mcD4=;
+        b=h8+WOi7P4PAyHALbtkQ5DDMKlnV/uB0UICV2QseMugFdVMmUfutm2HYQ8uZLNjn7wN
+         XIh6kX91WJMSbTZQbKvUZ5e2LTfrH3Pv5GoO1zWDSadNo9kQHkIanPGXZ9wABouLLtAe
+         pU/BzTDsRvtrmAVrppYULZ2q9GX1BgkiztF7e+JyKwNunHLCyDM/xdtbO/xea1VwNto0
+         3ao1akfGknkch9v1RY/dqtejqBL6ZGw8l97dYb5iNO4AbWXJVgf+o+cNL8SJjS3vrL5M
+         yINxMLhlgIFl5JLSJ0itMczK2jtRJmRZgKDYYD+QsDbLt7F2RSL0jEmUE+8uBbtf+LIb
+         PvOQ==
+X-Gm-Message-State: AC+VfDxgCWizz4j5hmoMRVplQZ1KoLYgS/+wQUQd8MTTEl2k9RD+yO9u
+        JulfoTsCI9/uLRIJs2+3QgiuwZNnBvDrsJ2z0aR+NcVoJjKrOddT/a5oOaxU2XTvTjZoH6uGr+x
+        fSa0lgzK7AlRQqn5O5uml
+X-Received: by 2002:a17:907:72cf:b0:962:9ffa:be19 with SMTP id du15-20020a17090772cf00b009629ffabe19mr2943444ejc.5.1684518878580;
+        Fri, 19 May 2023 10:54:38 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6k+lSmFhwFt9ODv52zCJC2W5+1YXpeZwuhQQgCCONXKzc2wDPXKpayvsMJ4YjV4aXwHMTRtA==
+X-Received: by 2002:a17:907:72cf:b0:962:9ffa:be19 with SMTP id du15-20020a17090772cf00b009629ffabe19mr2943429ejc.5.1684518878240;
+        Fri, 19 May 2023 10:54:38 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id v23-20020a17090651d700b0096f83b16ab1sm317111ejk.136.2023.05.19.10.51.02
+        by smtp.googlemail.com with ESMTPSA id l18-20020a170906a41200b00965a52d2bf6sm2548561ejz.88.2023.05.19.10.54.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 May 2023 10:51:02 -0700 (PDT)
-Message-ID: <7a1c5fb8-6285-2517-2662-702b62f8ffe0@redhat.com>
-Date:   Fri, 19 May 2023 19:51:01 +0200
+        Fri, 19 May 2023 10:54:37 -0700 (PDT)
+Message-ID: <10abe213-54bb-e637-7ea2-c088bca4726d@redhat.com>
+Date:   Fri, 19 May 2023 19:54:36 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH 0/2] KVM: vcpu_array[0] races
+Subject: Re: [PATCH v2 0/3] KVM: x86: SGX vs. XCR0 cleanups
 Content-Language: en-US
-To:     Michal Luczaj <mhal@rbox.co>
-Cc:     kvm@vger.kernel.org, shuah@kernel.org
-References: <20230510140410.1093987-1-mhal@rbox.co>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kai Huang <kai.huang@intel.com>
+References: <20230503160838.3412617-1-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20230510140410.1093987-1-mhal@rbox.co>
+In-Reply-To: <20230503160838.3412617-1-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/10/23 16:04, Michal Luczaj wrote:
-> When online_vcpus=0, any call to kvm_get_vcpu() goes through
-> array_index_nospec() and ends with an attempt to xa_load(vcpu_array, 0):
+On 5/3/23 18:08, Sean Christopherson wrote:
+> Stop adjusting the guest's CPUID info for the allowed XFRM (a.k.a. XCR0)
+> for SGX enclaves.  Past me didn't understand the roles and responsibilities
+> between userspace and KVM with respect to CPUID leafs, i.e. I thought I was
+> being helpful by having KVM adjust the entries.
 > 
-> 	int num_vcpus = atomic_read(&kvm->online_vcpus);
-> 	i = array_index_nospec(i, num_vcpus);
-> 	return xa_load(&kvm->vcpu_array, i);
+> This is clearly an ABI change, but QEMU does the right thing and AFAIK no
+> other VMMs support SGX (yet), so I'm hopeful/confident that we can excise
+> the ugly before userspace starts depending on the bad behavior.
+>   
+> v2:
+>   - Collect reviews/testing. [Kai]
+>   - Require FP+SSE to always be set in XFRM, and exempt them from the XFRM
+>     vs. XCR0 check. [Kai]
 > 
-> Similarly, when online_vcpus=0, a kvm_for_each_vcpu() does not iterate over
-> an "empty" range, but actually [0, ULONG_MAX]:
+> v1: https://lore.kernel.org/all/20230405005911.423699-1-seanjc@google.com
 > 
-> 	xa_for_each_range(&kvm->vcpu_array, idx, vcpup, 0, \
-> 			  (atomic_read(&kvm->online_vcpus) - 1))
+> Sean Christopherson (3):
+>    KVM: VMX: Don't rely _only_ on CPUID to enforce XCR0 restrictions for
+>      ECREATE
+>    KVM: x86: Don't adjust guest's CPUID.0x12.1 (allowed SGX enclave XFRM)
+>    KVM: x86: Open code supported XCR0 calculation in
+>      kvm_vcpu_after_set_cpuid()
 > 
-> In both cases, such online_vcpus=0 edge case, even if leading to
-> unnecessary calls to XArray API, should not be an issue; requesting
-> unpopulated indexes/ranges is handled by xa_load() and xa_for_each_range().
+>   arch/x86/kvm/cpuid.c   | 43 ++++++++++--------------------------------
+>   arch/x86/kvm/vmx/sgx.c | 11 +++++++++--
+>   2 files changed, 19 insertions(+), 35 deletions(-)
 > 
-> However, this means that when the first vCPU is created and inserted in
-> vcpu_array *and* before online_vcpus is incremented, code calling
-> kvm_get_vcpu()/kvm_for_each_vcpu() already has access to that first vCPU.
+> 
+> base-commit: 5c291b93e5d665380dbecc6944973583f9565ee5
 
-Queued, thanks.  I added
+Queued, thanks.  But why patch 3?  Small functions are nice and remove 
+the need to remember what is in EDX:EAX of CPUID[0xD,0].
 
-Fixes: c5b077549136 ("KVM: Convert the kvm->vcpus array to a xarray", 
-2021-12-08)
-Cc: stable@vger.kernel.org
+Paolo
 
