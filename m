@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BCAD709508
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 12:34:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF22470950D
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 12:35:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232033AbjESKem (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 06:34:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53804 "EHLO
+        id S232070AbjESKep (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 06:34:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231963AbjESKeV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231962AbjESKeV (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 19 May 2023 06:34:21 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE47B10E9;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 660D710C9;
         Fri, 19 May 2023 03:34:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=jRlOPCiGZ1QUnD3ip/ciK1dDyTis2uNLJ5A1APQzhgQ=; b=Dzv1GYHGnPXTBnG4o/Xs2ei8aB
-        Q4Q6AnwKkhA4/hEfC+CyMGueM2yEEVQV5k5/e+DpKX7iQH+uIsaifb3r5hun1Lb7Ut3RbjPW/FK3q
-        7GgHVmd0difqEDkcOUBcHAAh5c6uRhVnesPdDrMRNy/o6AnRENKyjOblNglpALQqDQc/2Nn6ie6+b
-        ucFkxiKZvHRfSu80GKiNvsUh8ymS2G3cSlbSyOZ+URcvm9aZHO7ZGRSM/eu5b4omZrZLj+4rqNVY9
-        AKoPw+lovjejVC3kt7P8jMHh8B13s8koFqJH7ULD9r3B+YQXXFeiaQspwGhIId5AKB0TqQ/qGFkBs
-        ApoGTrcA==;
+        bh=cKpejYmfn/dwgoc8/Ux+H5v1/oKuMUaJW2+Pm10iheA=; b=hHewstjGYkEwmftSKz7hwTlnXO
+        XqnHqg3tnw9L6JOIXGSPQBnDGOnhnV82EMWaDAgsbdrN1T8YocHYPCffaa9YgB4Vwgz5Vi5OVc5lp
+        krAi7/gqRn7Rkl+eIDbL9JFmrLe6RcyInAFCntZiWVGMoqtF9WGgAtjQQBpY4T/ivHIy4pbJ7FTux
+        q2d27w30skvDgoOu34zbjF9h8l3HwTfqFC8xIL2wNc0BcPUmQh+Di3OV+Fka0Gl5YgyBnlO4tagwZ
+        Nz+7U1gafXZWgFBYVocD5gvABRX7o4XHRlGJcDbdzNw7TRGAOxz66P6rc+AfluCm/laqHDb3nn+FS
+        jUWBtljA==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pzxPv-006UqQ-LP; Fri, 19 May 2023 10:33:00 +0000
+        id 1pzxPv-006UqH-0F; Fri, 19 May 2023 10:32:59 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3C81430614C;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 4730030614E;
         Fri, 19 May 2023 12:32:56 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id E61E9235EF0B3; Fri, 19 May 2023 12:32:55 +0200 (CEST)
-Message-ID: <20230519102715.843039089@infradead.org>
+        id EB58B235EF0B0; Fri, 19 May 2023 12:32:55 +0200 (CEST)
+Message-ID: <20230519102715.910937674@infradead.org>
 User-Agent: quilt/0.66
-Date:   Fri, 19 May 2023 12:21:08 +0200
+Date:   Fri, 19 May 2023 12:21:09 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     bigeasy@linutronix.de
 Cc:     mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
@@ -59,8 +59,8 @@ Cc:     mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
         sboyd@kernel.org, linux-kernel@vger.kernel.org,
         loongarch@lists.linux.dev, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-pm@vger.kernel.org, Michael Kelley <mikelley@microsoft.com>
-Subject: [PATCH v2 10/13] clocksource: hyper-v: Provide noinstr sched_clock()
+        linux-pm@vger.kernel.org
+Subject: [PATCH v2 11/13] x86/tsc: Provide sched_clock_noinstr()
 References: <20230519102058.581557770@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -77,105 +77,158 @@ X-Mailing-List: kvm@vger.kernel.org
 With the intent to provide local_clock_noinstr(), a variant of
 local_clock() that's safe to be called from noinstr code (with the
 assumption that any such code will already be non-preemptible),
-prepare for things by making the Hyper-V TSC and MSR sched_clock
-implementations noinstr.
+prepare for things by providing a noinstr sched_clock_noinstr()
+function.
 
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Co-developed-by: Michael Kelley <mikelley@microsoft.com>
-Signed-off-by: Michael Kelley <mikelley@microsoft.com>
+Specifically, preempt_enable_*() calls out to schedule(), which upsets
+noinstr validation efforts.
+
+  vmlinux.o: warning: objtool: native_sched_clock+0x96: call to preempt_schedule_notrace_thunk() leaves .noinstr.text section
+  vmlinux.o: warning: objtool: kvm_clock_read+0x22: call to preempt_schedule_notrace_thunk() leaves .noinstr.text section
+
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- arch/x86/include/asm/mshyperv.h    |    5 +++++
- drivers/clocksource/hyperv_timer.c |   32 ++++++++++++++++++--------------
- 2 files changed, 23 insertions(+), 14 deletions(-)
+ arch/x86/include/asm/hyperv_timer.h |    5 ++++
+ arch/x86/kernel/kvmclock.c          |    4 +--
+ arch/x86/kernel/tsc.c               |   38 +++++++++++++++++++++++--------
+ arch/x86/kvm/x86.c                  |    7 ++---
+ arch/x86/xen/time.c                 |    3 --
+ drivers/clocksource/hyperv_timer.c  |   44 ++++++++++++++++++++++--------------
+ include/clocksource/hyperv_timer.h  |   24 +++++++------------
+ 7 files changed, 76 insertions(+), 49 deletions(-)
 
---- a/arch/x86/include/asm/mshyperv.h
-+++ b/arch/x86/include/asm/mshyperv.h
-@@ -257,6 +257,11 @@ void hv_set_register(unsigned int reg, u
- u64 hv_get_non_nested_register(unsigned int reg);
- void hv_set_non_nested_register(unsigned int reg, u64 value);
- 
-+static __always_inline u64 hv_raw_get_register(unsigned int reg)
-+{
-+	return __rdmsr(reg);
-+}
-+
- #else /* CONFIG_HYPERV */
- static inline void hyperv_init(void) {}
- static inline void hyperv_setup_mmu_ops(void) {}
---- a/drivers/clocksource/hyperv_timer.c
-+++ b/drivers/clocksource/hyperv_timer.c
-@@ -365,6 +365,20 @@ void hv_stimer_global_cleanup(void)
+--- a/arch/x86/kernel/kvmclock.c
++++ b/arch/x86/kernel/kvmclock.c
+@@ -71,7 +71,7 @@ static int kvm_set_wallclock(const struc
+ 	return -ENODEV;
  }
- EXPORT_SYMBOL_GPL(hv_stimer_global_cleanup);
  
-+static __always_inline u64 read_hv_clock_msr(void)
-+{
-+	/*
-+	 * Read the partition counter to get the current tick count. This count
-+	 * is set to 0 when the partition is created and is incremented in 100
-+	 * nanosecond units.
-+	 *
-+	 * Use hv_raw_get_register() because this function is used from
-+	 * noinstr. Notable; while HV_REGISTER_TIME_REF_COUNT is a synthetic
-+	 * register it doesn't need the GHCB path.
-+	 */
-+	return hv_raw_get_register(HV_REGISTER_TIME_REF_COUNT);
-+}
-+
- /*
-  * Code and definitions for the Hyper-V clocksources.  Two
-  * clocksources are defined: one that reads the Hyper-V defined MSR, and
-@@ -393,7 +407,7 @@ struct ms_hyperv_tsc_page *hv_get_tsc_pa
- }
- EXPORT_SYMBOL_GPL(hv_get_tsc_page);
- 
--static notrace u64 read_hv_clock_tsc(void)
-+static __always_inline u64 read_hv_clock_tsc(void)
+-static noinstr u64 kvm_clock_read(void)
++static u64 kvm_clock_read(void)
  {
- 	u64 cur_tsc, time;
+ 	u64 ret;
  
-@@ -404,7 +418,7 @@ static notrace u64 read_hv_clock_tsc(voi
- 	 * to the MSR in case the TSC page indicates unavailability.
- 	 */
- 	if (!hv_read_tsc_page_tsc(tsc_page, &cur_tsc, &time))
--		time = hv_get_register(HV_REGISTER_TIME_REF_COUNT);
-+		time = read_hv_clock_msr();
+@@ -88,7 +88,7 @@ static u64 kvm_clock_get_cycles(struct c
  
- 	return time;
- }
-@@ -414,7 +428,7 @@ static u64 notrace read_hv_clock_tsc_cs(
- 	return read_hv_clock_tsc();
- }
- 
--static u64 notrace read_hv_sched_clock_tsc(void)
-+static u64 noinstr read_hv_sched_clock_tsc(void)
+ static noinstr u64 kvm_sched_clock_read(void)
  {
- 	return (read_hv_clock_tsc() - hv_sched_clock_offset) *
- 		(NSEC_PER_SEC / HV_CLOCK_HZ);
-@@ -466,22 +480,12 @@ static struct clocksource hyperv_cs_tsc
- #endif
- };
+-	return kvm_clock_read() - kvm_sched_clock_offset;
++	return pvclock_clocksource_read_nowd(this_cpu_pvti()) - kvm_sched_clock_offset;
+ }
  
--static u64 notrace read_hv_clock_msr(void)
--{
--	/*
--	 * Read the partition counter to get the current tick count. This count
--	 * is set to 0 when the partition is created and is incremented in
--	 * 100 nanosecond units.
--	 */
--	return hv_get_register(HV_REGISTER_TIME_REF_COUNT);
--}
+ static inline void kvm_sched_clock_init(bool stable)
+--- a/arch/x86/kernel/tsc.c
++++ b/arch/x86/kernel/tsc.c
+@@ -69,12 +69,10 @@ static int __init tsc_early_khz_setup(ch
+ }
+ early_param("tsc_early_khz", tsc_early_khz_setup);
+ 
+-__always_inline void cyc2ns_read_begin(struct cyc2ns_data *data)
++__always_inline void __cyc2ns_read(struct cyc2ns_data *data)
+ {
+ 	int seq, idx;
+ 
+-	preempt_disable_notrace();
 -
- static u64 notrace read_hv_clock_msr_cs(struct clocksource *arg)
- {
- 	return read_hv_clock_msr();
+ 	do {
+ 		seq = this_cpu_read(cyc2ns.seq.seqcount.sequence);
+ 		idx = seq & 1;
+@@ -86,6 +84,12 @@ __always_inline void cyc2ns_read_begin(s
+ 	} while (unlikely(seq != this_cpu_read(cyc2ns.seq.seqcount.sequence)));
  }
  
--static u64 notrace read_hv_sched_clock_msr(void)
-+static u64 noinstr read_hv_sched_clock_msr(void)
++__always_inline void cyc2ns_read_begin(struct cyc2ns_data *data)
++{
++	preempt_disable_notrace();
++	__cyc2ns_read(data);
++}
++
+ __always_inline void cyc2ns_read_end(void)
  {
- 	return (read_hv_clock_msr() - hv_sched_clock_offset) *
- 		(NSEC_PER_SEC / HV_CLOCK_HZ);
+ 	preempt_enable_notrace();
+@@ -115,18 +119,25 @@ __always_inline void cyc2ns_read_end(voi
+  *                      -johnstul@us.ibm.com "math is hard, lets go shopping!"
+  */
+ 
+-static __always_inline unsigned long long cycles_2_ns(unsigned long long cyc)
++static __always_inline unsigned long long __cycles_2_ns(unsigned long long cyc)
+ {
+ 	struct cyc2ns_data data;
+ 	unsigned long long ns;
+ 
+-	cyc2ns_read_begin(&data);
++	__cyc2ns_read(&data);
+ 
+ 	ns = data.cyc2ns_offset;
+ 	ns += mul_u64_u32_shr(cyc, data.cyc2ns_mul, data.cyc2ns_shift);
+ 
+-	cyc2ns_read_end();
++	return ns;
++}
+ 
++static __always_inline unsigned long long cycles_2_ns(unsigned long long cyc)
++{
++	unsigned long long ns;
++	preempt_disable_notrace();
++	ns = __cycles_2_ns(cyc);
++	preempt_enable_notrace();
+ 	return ns;
+ }
+ 
+@@ -223,7 +234,7 @@ noinstr u64 native_sched_clock(void)
+ 		u64 tsc_now = rdtsc();
+ 
+ 		/* return the value in ns */
+-		return cycles_2_ns(tsc_now);
++		return __cycles_2_ns(tsc_now);
+ 	}
+ 
+ 	/*
+@@ -250,7 +261,7 @@ u64 native_sched_clock_from_tsc(u64 tsc)
+ /* We need to define a real function for sched_clock, to override the
+    weak default version */
+ #ifdef CONFIG_PARAVIRT
+-noinstr u64 sched_clock(void)
++noinstr u64 sched_clock_noinstr(void)
+ {
+ 	return paravirt_sched_clock();
+ }
+@@ -260,11 +271,20 @@ bool using_native_sched_clock(void)
+ 	return static_call_query(pv_sched_clock) == native_sched_clock;
+ }
+ #else
+-u64 sched_clock(void) __attribute__((alias("native_sched_clock")));
++u64 sched_clock_noinstr(void) __attribute__((alias("native_sched_clock")));
+ 
+ bool using_native_sched_clock(void) { return true; }
+ #endif
+ 
++notrace u64 sched_clock(void)
++{
++	u64 now;
++	preempt_disable_notrace();
++	now = sched_clock_noinstr();
++	preempt_enable_notrace();
++	return now;
++}
++
+ int check_tsc_unstable(void)
+ {
+ 	return tsc_unstable;
+--- a/arch/x86/xen/time.c
++++ b/arch/x86/xen/time.c
+@@ -66,11 +66,10 @@ static noinstr u64 xen_sched_clock(void)
+         struct pvclock_vcpu_time_info *src;
+ 	u64 ret;
+ 
+-	preempt_disable_notrace();
+ 	src = &__this_cpu_read(xen_vcpu)->time;
+ 	ret = pvclock_clocksource_read_nowd(src);
+ 	ret -= xen_sched_clock_offset;
+-	preempt_enable_notrace();
++
+ 	return ret;
+ }
+ 
 
 
