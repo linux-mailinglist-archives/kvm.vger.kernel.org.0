@@ -2,35 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CA85709821
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 15:22:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49DE170984E
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 15:30:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231575AbjESNWl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 09:22:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47644 "EHLO
+        id S231911AbjESNaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 09:30:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229605AbjESNWj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 09:22:39 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 72656CE
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 06:22:37 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0E3611FB;
-        Fri, 19 May 2023 06:23:22 -0700 (PDT)
-Received: from [10.57.84.114] (unknown [10.57.84.114])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B09B83F762;
-        Fri, 19 May 2023 06:22:34 -0700 (PDT)
-Message-ID: <940bbc2e-874e-8cde-c4c9-be7884c3ef57@arm.com>
-Date:   Fri, 19 May 2023 14:22:29 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH RFCv2 04/24] iommu: Add iommu_domain ops for dirty
- tracking
-Content-Language: en-GB
-To:     Joao Martins <joao.m.martins@oracle.com>, iommu@lists.linux.dev
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
+        with ESMTP id S231983AbjESN3v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 May 2023 09:29:51 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2078.outbound.protection.outlook.com [40.107.220.78])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F988E7F
+        for <kvm@vger.kernel.org>; Fri, 19 May 2023 06:29:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fJn72qHb5TJq/EuiycHVO0TmpMLNqj9scogEXw8IArgSTrgWyUSnRSkwn6+5YjbgDXsbBI6I7gBfNmAz9PbMRZqEu6lVsaqV8nTm/d37OriIOOBwvki7LM23M6FBBZomWxBMXy88SO3o8pSH56jFl/qrx/XtHSD2MFQhtAq1enVQQbe9vPIv0TmYVhOUCErivThbWhIosnGq/AyItcHcurcRKAKOM3nbDFLXCv+wmfmTdJCFgqJIk1dnxZQKhU1GlEkNeZ5mSNY9K/4SfsOLpb4/C8S39KmDc29TdJnN1Mf8OzCcu31qu573LNQJ4ppYiDFLH6sxpDj4TFg+Eizwrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3ElmX6AUznC7MQJUyR0leMmnNABrDXJtOklYHq3grmE=;
+ b=Cca/pQSB1ep7JSQuSQHF5mPcWsE4Xt7UStwIsB3TRTYfCeotcKf6VrtA7F9Ha+MQMi00ZF9KP4pBQIkPKykGYH0WJJ6XtuXFsJm0C88cB0FQCrmSp0ZYP7wSAGJekGltlEJFre2Z0Sn6QlcYndzt0mYiap7DJREhQGW6rSxSSt8KG6zqHR9TsbqK+yNr39h79NbdOMm95PsGT1xkCQOBiERzZbziLpIqN35SXBYV8ZUk8CYCAZJaPZFTXvaeTC2CLVTDCiXyou1ArRbbaD1dbrdUVXcner39EsxTUY5/8BSYXVH8bR0kUHhr39Nv52Ed7uwJuWGWdoKSjGkfiVfu5w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3ElmX6AUznC7MQJUyR0leMmnNABrDXJtOklYHq3grmE=;
+ b=YHkxSg9ArAsHbVr0VXQrA/R69l2ZuzH2UbHgooTIiar7w5E+dNM7kZgXK7TBHFRtlzqkqvZI3VjG4zBvGszGI0RxzL0rKAjwDPCA3K5dEtsQc0THuMKJycacuHcvTnFtO4RZSsWNcRq2mqDk898OO2EHVtstLRjbDOeujcHDI7Q1LI5MdFHX6AJ4YAtI/y2LRz1taGbJUzbEUdxgIcPyKTzokz5NOlEOW1Dx/j2/kLKrAEl88RLbGALM4wuBlOr7Ndd8W8Apmb433shLhTceUAV29jhBlrfC/1lxOYljIgiHM0O5xS8acoNRiMWTjS50EYW2h8WgKTfHtnkAUBllpw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SJ1PR12MB6218.namprd12.prod.outlook.com (2603:10b6:a03:457::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.19; Fri, 19 May
+ 2023 13:29:32 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6411.021; Fri, 19 May 2023
+ 13:29:32 +0000
+Date:   Fri, 19 May 2023 10:29:30 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
         Shameerali Kolothum Thodi 
         <shameerali.kolothum.thodi@huawei.com>,
         Lu Baolu <baolu.lu@linux.intel.com>,
@@ -41,291 +54,109 @@ Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
         Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
         Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         kvm@vger.kernel.org
+Subject: Re: [PATCH RFCv2 04/24] iommu: Add iommu_domain ops for dirty
+ tracking
+Message-ID: <ZGd5uvINBChBll31@nvidia.com>
 References: <20230518204650.14541-1-joao.m.martins@oracle.com>
  <20230518204650.14541-5-joao.m.martins@oracle.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20230518204650.14541-5-joao.m.martins@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+ <ZGdgNblpO4rE+IF4@nvidia.com>
+ <424d37fc-d1a4-f56c-e034-20fb96b69c86@oracle.com>
+ <ZGdipWrnZNI/C7mF@nvidia.com>
+ <29dc2b4c-691f-fe34-f198-f1fde229fdb0@oracle.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <29dc2b4c-691f-fe34-f198-f1fde229fdb0@oracle.com>
+X-ClientProxiedBy: BL1PR13CA0427.namprd13.prod.outlook.com
+ (2603:10b6:208:2c3::12) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ1PR12MB6218:EE_
+X-MS-Office365-Filtering-Correlation-Id: 486c06fc-8dd2-438a-3878-08db586d1447
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: H8po1AG/ILiPktzqdPJ9h3xMp4cGoS1i0BOOsNRSDMavXIOmxDJDsNvAgikeX/tGrlX+iwkx0w7/pJUct+1bVBuih0h9PJZR/PHU1hjmFMt4I+zEdBmxutI3IY2Gn/D6641gohKSNXVywbfLfyK2+S+bsSHCsbsduuV7bTUNuD8v3C5MnRmXNWD+xw1110bxMS7N4QDgNetFY852EL53OK2VmpBetlxS5edCFPeGIolHgfzsxxjZmfq6y27TGSKyUQUdztBCSVFQOn3jUlx0LEpWMIklVauI8ANumi4nGNC8lxe4odyZb1F6udqD7gdlrQ+7XP78yW+XDIdNK6ct6P6UdklHFQ9AdUs9UYJAw6E39FoBaWTTWqES2PVkyecfUpWS/HrbMaEKNQ1jjVLe3Vb+d4Y32VKGtAxa/YfN1tKJcJAzxm3UwLx0WY7CVw5Y/xBtFS/s1syjAxFc8msLS6xOE62MG8L7JnaCElR6qKNrsnZUbhkWWUyJm4dF11InbCqK8GZzlbagRR9dBWf7kR1qef6NewuU0h5VFU/5cKeHDE39veN25COghdRGldoCYvyMdZC7A7VwbAJvfnBNqR88ttM0tuAtM58mw9Tc98I=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(366004)(346002)(396003)(39860400002)(451199021)(2906002)(8676002)(41300700001)(316002)(8936002)(478600001)(54906003)(7416002)(6486002)(6916009)(66946007)(66556008)(66476007)(5660300002)(4326008)(6512007)(86362001)(53546011)(26005)(6506007)(186003)(2616005)(38100700002)(36756003)(14143004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?idY6WBEvb905sVuG6agtl+/sDYO1P2+9T/JYmrlMMmu6+X28Ies+0EHWtQmS?=
+ =?us-ascii?Q?NutlHF6SAQ2jcjLoa9XUKV9YxN/WSLxKnF+gB2e1uGSvqH1OiotjqfumB2ud?=
+ =?us-ascii?Q?27+oD/Mc6z+10TRl20i6BZPNDyHlHqEwGOFpNQH/8412Z3RFP9RQ9F7VKz7D?=
+ =?us-ascii?Q?1dIhMeWFwVkEkae82QVIdGDTt/emn8b+l+jSuFRCgdEfAyuUxCaNsHOwIQNe?=
+ =?us-ascii?Q?ThAO2MH/ZpuVUiZzE7VydvyrmhLq4xDj4tE8CCu/oOGLBReR6Eobls0OLbsh?=
+ =?us-ascii?Q?AsRvA4UZqlTnJiit2DCQLX06KatJ/jfgKu190k0XSxqsJtOPVgG+xyfWhNFv?=
+ =?us-ascii?Q?Z+qyx7Hllmo+Vv1pWrF7AywaCYT9Y29IJJOxMIk94ZAJNfyd++YNrI8boeGz?=
+ =?us-ascii?Q?ASrakLg4FWodehUD99cYW21CVqfNYm7eZsl+GSmgBSuLUyw8Q6WG/idiOEYb?=
+ =?us-ascii?Q?xOPMuxLxO2qkO8n3vM/VxpY6SCs9I8XGuAPlU3BppspcP5py9IzjDpe3euQG?=
+ =?us-ascii?Q?RcMy+g927by17sdZs+hpOh3Rf/rbSq65vVi36brHhPNIhKVGReYNK4NwZ49p?=
+ =?us-ascii?Q?SLMVP0u6LEW3EQoqCVTq1IXbyy9DhSw2JmObpG9La5P6vtQpMJ7rU9YPpaUy?=
+ =?us-ascii?Q?i4hVjCQQMQKRV0PDTxPEYqooHHh6Gc1Rt39N5I4VGuvBJKiaDAvgQ7FKE8px?=
+ =?us-ascii?Q?xD8UVFJEBlYb/XBfYHteg02ci7kxnf9f2QXYfwmPzMnI7Hnlbp9EflasLgoC?=
+ =?us-ascii?Q?YJesUnoQ+SeyMi+M8zmyx3GwJwI5mmrVJrv122fPZeElwaHHJ5MCP3Nizy6v?=
+ =?us-ascii?Q?pp0vFz7KusUVfl6nVseNbk4QFb2Xu+SlM9eL928t6jHV8tjBOmYhBy5zCQ9Y?=
+ =?us-ascii?Q?4d+pBUPZUpNIJrvKiyd5YYUvFEpIJv4XYzwR4eHx9t0jOacYMK1xsoDuM0zx?=
+ =?us-ascii?Q?242CNbrGnYvOUstGxHrkE6gq2un817BxI9QgWWtn690pzMhtixvrJNaz4tlK?=
+ =?us-ascii?Q?9tbHY1ltlHfzGuLi5AusoTNAfknlGcFqhcPxS0/2Zm4L/CliqzxWlwZJbfjC?=
+ =?us-ascii?Q?AZlVDalIb4pWbcWGcVRFrmJMHh7VqEhPmFo3pWqvp+7nvsz9i+xH+7njY543?=
+ =?us-ascii?Q?fIjHTzQ9cjnJmVWOEl0HgBmYy+5lgXcIG67uGaIlrUGW1Q0mO3vbaHLIBfQI?=
+ =?us-ascii?Q?EcRYThDy+i1clxmVO0ytzylvKf52sA3ssCO20gU8tFAXaTk+4/Lo51weE0ho?=
+ =?us-ascii?Q?47QBmQ1zreiFcZxuW15e6nOI24EHC8zJnIJp09i7HTmqP68EKrjUolBTjw9J?=
+ =?us-ascii?Q?DXnMbCjE/WOBz8lqoVNzv10v7cxSzL0yRTTEJoNCpGtoU7WlQUtiKfBbZL8K?=
+ =?us-ascii?Q?NhqU0LpJOgdqUBR+lXAEkp3RDyVxGOl8kFAxE/J8nLBc/7oQNE2mZqNQEFdi?=
+ =?us-ascii?Q?e/Jmtkh1xJLAp8BJEMeshP7J/vOvfnqgX/yOzVkfkfUZJMW+Rh/7losh40vA?=
+ =?us-ascii?Q?GFM30o2howRbknAtY8qVaUIQiUSmqAZFadexBngdaFUdki8olOwt+CNIAQ78?=
+ =?us-ascii?Q?NkJzGDV/d7Pxj/NPprdIeeTmD15kkhOVrPSzghoJ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 486c06fc-8dd2-438a-3878-08db586d1447
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 13:29:31.9716
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FqrZxHz344NUsvbyh3CnEC2IKJ31tkOPzwoXzAQiTu2aePo9dQMhvoQq6hT95cML
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6218
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-05-18 21:46, Joao Martins wrote:
-> Add to iommu domain operations a set of callbacks to perform dirty
-> tracking, particulary to start and stop tracking and finally to read and
-> clear the dirty data.
+On Fri, May 19, 2023 at 12:56:19PM +0100, Joao Martins wrote:
 > 
-> Drivers are generally expected to dynamically change its translation
-> structures to toggle the tracking and flush some form of control state
-> structure that stands in the IOVA translation path. Though it's not
-> mandatory, as drivers will be enable dirty tracking at boot, and just flush
-> the IO pagetables when setting dirty tracking.  For each of the newly added
-> IOMMU core APIs:
 > 
-> .supported_flags[IOMMU_DOMAIN_F_ENFORCE_DIRTY]: Introduce a set of flags
-> that enforce certain restrictions in the iommu_domain object. For dirty
-> tracking this means that when IOMMU_DOMAIN_F_ENFORCE_DIRTY is set via its
-> helper iommu_domain_set_flags(...) devices attached via attach_dev will
-> fail on devices that do *not* have dirty tracking supported. IOMMU drivers
-> that support dirty tracking should advertise this flag, while enforcing
-> that dirty tracking is supported by the device in its .attach_dev iommu op.
-
-Eww, no. For an internal thing, just call ->capable() - I mean, you're 
-literally adding this feature as one of its caps...
-
-However I'm not sure if we even need that - domains which don't support 
-dirty tracking should just not expose the ops, and thus it ought to be 
-inherently obvious.
-
-I'm guessing most of the weirdness here is implicitly working around the 
-enabled-from-the-start scenario on SMMUv3:
-
-	domain = iommu_domain_alloc(bus);
-	iommu_set_dirty_tracking(domain);
-	// arm-smmu-v3 says OK since it doesn't know that it
-	// definitely *isn't* possible, and saying no wouldn't
-	// be helpful
-	iommu_attach_group(group, domain);
-	// oops, now we see that the relevant SMMU instance isn't one
-	// which actually supports HTTU, what do we do? :(
-
-I don't have any major objection to the general principle of flagging 
-the domain to fail attach if it can't do what we promised, as a bodge 
-for now, but please implement it privately in arm-smmu-v3 so it's easier 
-to clean up again in future once until iommu_domain_alloc() gets sorted 
-out properly to get rid of this awkward blind spot.
-
-Thanks,
-Robin.
-
-> iommu_cap::IOMMU_CAP_DIRTY: new device iommu_capable value when probing for
-> capabilities of the device.
+> On 19/05/2023 12:51, Jason Gunthorpe wrote:
+> > On Fri, May 19, 2023 at 12:47:24PM +0100, Joao Martins wrote:
+> > 
+> >> In practice it is done as soon after the domain is created but I understand what
+> >> you mean that both should be together; I have this implemented like that as my
+> >> first take as a domain_alloc passed flags, but I was a little undecided because
+> >> we are adding another domain_alloc() op for the user-managed pagetable and after
+> >> having another one we would end up with 3 ways of creating iommu domain -- but
+> >> maybe that's not an issue
+> > 
+> > It should ride on the same user domain alloc op as some generic flags,
 > 
-> .set_dirty_tracking(): an iommu driver is expected to change its
-> translation structures and enable dirty tracking for the devices in the
-> iommu_domain. For drivers making dirty tracking always-enabled, it should
-> just return 0.
-> 
-> .read_and_clear_dirty(): an iommu driver is expected to walk the iova range
-> passed in and use iommu_dirty_bitmap_record() to record dirty info per
-> IOVA. When detecting a given IOVA is dirty it should also clear its dirty
-> state from the PTE, *unless* the flag IOMMU_DIRTY_NO_CLEAR is passed in --
-> flushing is steered from the caller of the domain_op via iotlb_gather. The
-> iommu core APIs use the same data structure in use for dirty tracking for
-> VFIO device dirty (struct iova_bitmap) abstracted by
-> iommu_dirty_bitmap_record() helper function.
-> 
-> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
-> ---
->   drivers/iommu/iommu.c      | 11 +++++++
->   include/linux/io-pgtable.h |  4 +++
->   include/linux/iommu.h      | 67 ++++++++++++++++++++++++++++++++++++++
->   3 files changed, 82 insertions(+)
-> 
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 2088caae5074..95acc543e8fb 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -2013,6 +2013,17 @@ struct iommu_domain *iommu_domain_alloc(const struct bus_type *bus)
->   }
->   EXPORT_SYMBOL_GPL(iommu_domain_alloc);
->   
-> +int iommu_domain_set_flags(struct iommu_domain *domain,
-> +			   const struct bus_type *bus, unsigned long val)
-> +{
-> +	if (!(val & bus->iommu_ops->supported_flags))
-> +		return -EINVAL;
-> +
-> +	domain->flags |= val;
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_domain_set_flags);
-> +
->   void iommu_domain_free(struct iommu_domain *domain)
->   {
->   	if (domain->type == IOMMU_DOMAIN_SVA)
-> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
-> index 1b7a44b35616..25142a0e2fc2 100644
-> --- a/include/linux/io-pgtable.h
-> +++ b/include/linux/io-pgtable.h
-> @@ -166,6 +166,10 @@ struct io_pgtable_ops {
->   			      struct iommu_iotlb_gather *gather);
->   	phys_addr_t (*iova_to_phys)(struct io_pgtable_ops *ops,
->   				    unsigned long iova);
-> +	int (*read_and_clear_dirty)(struct io_pgtable_ops *ops,
-> +				    unsigned long iova, size_t size,
-> +				    unsigned long flags,
-> +				    struct iommu_dirty_bitmap *dirty);
->   };
->   
->   /**
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index 39d25645a5ab..992ea87f2f8e 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -13,6 +13,7 @@
->   #include <linux/errno.h>
->   #include <linux/err.h>
->   #include <linux/of.h>
-> +#include <linux/iova_bitmap.h>
->   #include <uapi/linux/iommu.h>
->   
->   #define IOMMU_READ	(1 << 0)
-> @@ -65,6 +66,11 @@ struct iommu_domain_geometry {
->   
->   #define __IOMMU_DOMAIN_SVA	(1U << 4)  /* Shared process address space */
->   
-> +/* Domain feature flags that do not define domain types */
-> +#define IOMMU_DOMAIN_F_ENFORCE_DIRTY	(1U << 6)  /* Enforce attachment of
-> +						      dirty tracking supported
-> +						      devices		  */
-> +
->   /*
->    * This are the possible domain-types
->    *
-> @@ -93,6 +99,7 @@ struct iommu_domain_geometry {
->   
->   struct iommu_domain {
->   	unsigned type;
-> +	unsigned flags;
->   	const struct iommu_domain_ops *ops;
->   	unsigned long pgsize_bitmap;	/* Bitmap of page sizes in use */
->   	struct iommu_domain_geometry geometry;
-> @@ -128,6 +135,7 @@ enum iommu_cap {
->   	 * this device.
->   	 */
->   	IOMMU_CAP_ENFORCE_CACHE_COHERENCY,
-> +	IOMMU_CAP_DIRTY,		/* IOMMU supports dirty tracking */
->   };
->   
->   /* These are the possible reserved region types */
-> @@ -220,6 +228,17 @@ struct iommu_iotlb_gather {
->   	bool			queued;
->   };
->   
-> +/**
-> + * struct iommu_dirty_bitmap - Dirty IOVA bitmap state
-> + *
-> + * @bitmap: IOVA bitmap
-> + * @gather: Range information for a pending IOTLB flush
-> + */
-> +struct iommu_dirty_bitmap {
-> +	struct iova_bitmap *bitmap;
-> +	struct iommu_iotlb_gather *gather;
-> +};
-> +
->   /**
->    * struct iommu_ops - iommu ops and capabilities
->    * @capable: check capability
-> @@ -248,6 +267,7 @@ struct iommu_iotlb_gather {
->    *                    pasid, so that any DMA transactions with this pasid
->    *                    will be blocked by the hardware.
->    * @pgsize_bitmap: bitmap of all possible supported page sizes
-> + * @flags: All non domain type supported features
->    * @owner: Driver module providing these ops
->    */
->   struct iommu_ops {
-> @@ -281,6 +301,7 @@ struct iommu_ops {
->   
->   	const struct iommu_domain_ops *default_domain_ops;
->   	unsigned long pgsize_bitmap;
-> +	unsigned long supported_flags;
->   	struct module *owner;
->   };
->   
-> @@ -316,6 +337,11 @@ struct iommu_ops {
->    * @enable_nesting: Enable nesting
->    * @set_pgtable_quirks: Set io page table quirks (IO_PGTABLE_QUIRK_*)
->    * @free: Release the domain after use.
-> + * @set_dirty_tracking: Enable or Disable dirty tracking on the iommu domain
-> + * @read_and_clear_dirty: Walk IOMMU page tables for dirtied PTEs marshalled
-> + *                        into a bitmap, with a bit represented as a page.
-> + *                        Reads the dirty PTE bits and clears it from IO
-> + *                        pagetables.
->    */
->   struct iommu_domain_ops {
->   	int (*attach_dev)(struct iommu_domain *domain, struct device *dev);
-> @@ -348,6 +374,12 @@ struct iommu_domain_ops {
->   				  unsigned long quirks);
->   
->   	void (*free)(struct iommu_domain *domain);
-> +
-> +	int (*set_dirty_tracking)(struct iommu_domain *domain, bool enabled);
-> +	int (*read_and_clear_dirty)(struct iommu_domain *domain,
-> +				    unsigned long iova, size_t size,
-> +				    unsigned long flags,
-> +				    struct iommu_dirty_bitmap *dirty);
->   };
->   
->   /**
-> @@ -461,6 +493,9 @@ extern bool iommu_present(const struct bus_type *bus);
->   extern bool device_iommu_capable(struct device *dev, enum iommu_cap cap);
->   extern bool iommu_group_has_isolated_msi(struct iommu_group *group);
->   extern struct iommu_domain *iommu_domain_alloc(const struct bus_type *bus);
-> +extern int iommu_domain_set_flags(struct iommu_domain *domain,
-> +				  const struct bus_type *bus,
-> +				  unsigned long flags);
->   extern void iommu_domain_free(struct iommu_domain *domain);
->   extern int iommu_attach_device(struct iommu_domain *domain,
->   			       struct device *dev);
-> @@ -627,6 +662,28 @@ static inline bool iommu_iotlb_gather_queued(struct iommu_iotlb_gather *gather)
->   	return gather && gather->queued;
->   }
->   
-> +static inline void iommu_dirty_bitmap_init(struct iommu_dirty_bitmap *dirty,
-> +					   struct iova_bitmap *bitmap,
-> +					   struct iommu_iotlb_gather *gather)
-> +{
-> +	if (gather)
-> +		iommu_iotlb_gather_init(gather);
-> +
-> +	dirty->bitmap = bitmap;
-> +	dirty->gather = gather;
-> +}
-> +
-> +static inline void
-> +iommu_dirty_bitmap_record(struct iommu_dirty_bitmap *dirty, unsigned long iova,
-> +			  unsigned long length)
-> +{
-> +	if (dirty->bitmap)
-> +		iova_bitmap_set(dirty->bitmap, iova, length);
-> +
-> +	if (dirty->gather)
-> +		iommu_iotlb_gather_add_range(dirty->gather, iova, length);
-> +}
-> +
->   /* PCI device grouping function */
->   extern struct iommu_group *pci_device_group(struct device *dev);
->   /* Generic device grouping function */
-> @@ -657,6 +714,9 @@ struct iommu_fwspec {
->   /* ATS is supported */
->   #define IOMMU_FWSPEC_PCI_RC_ATS			(1 << 0)
->   
-> +/* Read but do not clear any dirty bits */
-> +#define IOMMU_DIRTY_NO_CLEAR			(1 << 0)
-> +
->   /**
->    * struct iommu_sva - handle to a device-mm bond
->    */
-> @@ -755,6 +815,13 @@ static inline struct iommu_domain *iommu_domain_alloc(const struct bus_type *bus
->   	return NULL;
->   }
->   
-> +static inline int iommu_domain_set_flags(struct iommu_domain *domain,
-> +					 const struct bus_type *bus,
-> +					 unsigned long flags)
-> +{
-> +	return -ENODEV;
-> +}
-> +
->   static inline void iommu_domain_free(struct iommu_domain *domain)
->   {
->   }
+> OK, I suppose that makes sense specially with this being tied in HWPT_ALLOC
+> where all this new user domain alloc does.
+
+Yes, it should be easy.
+
+Then do what Robin said and make the domain ops NULL if the user
+didn't ask for dirty tracking and then attach can fail if there are
+domain incompatibility's.
+
+Since alloc_user (or whatever it settles into) will have the struct
+device * argument this should be easy enough with out getting mixed
+with the struct bus cleanup.
+
+Jason
