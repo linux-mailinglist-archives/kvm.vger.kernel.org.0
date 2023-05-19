@@ -2,43 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41BCC7094EA
-	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 12:34:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BCAD709508
+	for <lists+kvm@lfdr.de>; Fri, 19 May 2023 12:34:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231926AbjESKeY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 06:34:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53672 "EHLO
+        id S232033AbjESKem (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 06:34:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231928AbjESKeM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 06:34:12 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BC23E6E;
-        Fri, 19 May 2023 03:34:08 -0700 (PDT)
+        with ESMTP id S231963AbjESKeV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 May 2023 06:34:21 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE47B10E9;
+        Fri, 19 May 2023 03:34:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=PdkNN+bEFxvrPVsYQm09x9UzPIqGPkz1+SOV54XiNcU=; b=T2SfA/ycuf9iIQR3nhN3Yoezbh
-        Z+GZXjbbtDoSBbbCOqeaqVhsuf4EUgIZccbxHfFCy15IHy8j7dBIZUglCv6S0Zcc0TQAtkSlZ7v29
-        n33ezqIIhYJAcMKsqdJekL8h5dSSKkY5gx+25HMi720JmqMpF6deZDaSpVD19BF0UEmdseoyMOLVe
-        nKxQAk7K7k3pxR87/bEltU4rij6Wx7P5JhQrsvB8RzcEs2tYyN0jlu5F4hMhIO1KzIbY2HnKvoJQ2
-        Tg19FWFf6e/85e9bUCZDNYr9mDz4gPJvj1kP/YSFdXb+kbultWmzECEohGZ4fpNxtxm14QYtNotiv
-        lI8soIEQ==;
+        bh=jRlOPCiGZ1QUnD3ip/ciK1dDyTis2uNLJ5A1APQzhgQ=; b=Dzv1GYHGnPXTBnG4o/Xs2ei8aB
+        Q4Q6AnwKkhA4/hEfC+CyMGueM2yEEVQV5k5/e+DpKX7iQH+uIsaifb3r5hun1Lb7Ut3RbjPW/FK3q
+        7GgHVmd0difqEDkcOUBcHAAh5c6uRhVnesPdDrMRNy/o6AnRENKyjOblNglpALQqDQc/2Nn6ie6+b
+        ucFkxiKZvHRfSu80GKiNvsUh8ymS2G3cSlbSyOZ+URcvm9aZHO7ZGRSM/eu5b4omZrZLj+4rqNVY9
+        AKoPw+lovjejVC3kt7P8jMHh8B13s8koFqJH7ULD9r3B+YQXXFeiaQspwGhIId5AKB0TqQ/qGFkBs
+        ApoGTrcA==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pzxPv-00FrWZ-2x;
-        Fri, 19 May 2023 10:33:00 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pzxPv-006UqQ-LP; Fri, 19 May 2023 10:33:00 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 340BF30614A;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3C81430614C;
         Fri, 19 May 2023 12:32:56 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id DE3EC235EF0B2; Fri, 19 May 2023 12:32:55 +0200 (CEST)
-Message-ID: <20230519102715.775630881@infradead.org>
+        id E61E9235EF0B3; Fri, 19 May 2023 12:32:55 +0200 (CEST)
+Message-ID: <20230519102715.843039089@infradead.org>
 User-Agent: quilt/0.66
-Date:   Fri, 19 May 2023 12:21:07 +0200
+Date:   Fri, 19 May 2023 12:21:08 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     bigeasy@linutronix.de
 Cc:     mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
@@ -60,8 +59,8 @@ Cc:     mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
         sboyd@kernel.org, linux-kernel@vger.kernel.org,
         loongarch@lists.linux.dev, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-pm@vger.kernel.org
-Subject: [PATCH v2 09/13] clocksource: hyper-v: Adjust hv_read_tsc_page_tsc() to avoid special casing U64_MAX
+        linux-pm@vger.kernel.org, Michael Kelley <mikelley@microsoft.com>
+Subject: [PATCH v2 10/13] clocksource: hyper-v: Provide noinstr sched_clock()
 References: <20230519102058.581557770@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -75,143 +74,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently hv_read_tsc_page_tsc() (ab)uses the (valid) time value of
-U64_MAX as an error return. This breaks the clean wrap-around of the
-clock.
-
-Modify the function signature to return a boolean state and provide
-another u64 pointer to store the actual time on success. This obviates
-the need to steal one time value and restores the full counter width.
+With the intent to provide local_clock_noinstr(), a variant of
+local_clock() that's safe to be called from noinstr code (with the
+assumption that any such code will already be non-preemptible),
+prepare for things by making the Hyper-V TSC and MSR sched_clock
+implementations noinstr.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Co-developed-by: Michael Kelley <mikelley@microsoft.com>
+Signed-off-by: Michael Kelley <mikelley@microsoft.com>
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- arch/x86/include/asm/vdso/gettimeofday.h |   10 ++++++----
- arch/x86/kvm/x86.c                       |    7 +++----
- drivers/clocksource/hyperv_timer.c       |   16 +++++++++++-----
- include/clocksource/hyperv_timer.h       |   24 +++++++++---------------
- 4 files changed, 29 insertions(+), 28 deletions(-)
+ arch/x86/include/asm/mshyperv.h    |    5 +++++
+ drivers/clocksource/hyperv_timer.c |   32 ++++++++++++++++++--------------
+ 2 files changed, 23 insertions(+), 14 deletions(-)
 
---- a/arch/x86/include/asm/vdso/gettimeofday.h
-+++ b/arch/x86/include/asm/vdso/gettimeofday.h
-@@ -238,10 +238,12 @@ static u64 vread_pvclock(void)
- #ifdef CONFIG_HYPERV_TIMER
- static u64 vread_hvclock(void)
- {
--	u64 ret = hv_read_tsc_page(&hvclock_page);
--	if (likely(ret != U64_MAX))
--		ret &= S64_MAX;
--	return ret;
-+	u64 tsc, time;
-+
-+	if (hv_read_tsc_page_tsc(&hvclock_page, &tsc, &time))
-+		return time & S64_MAX;
-+
-+	return U64_MAX;
- }
- #endif
+--- a/arch/x86/include/asm/mshyperv.h
++++ b/arch/x86/include/asm/mshyperv.h
+@@ -257,6 +257,11 @@ void hv_set_register(unsigned int reg, u
+ u64 hv_get_non_nested_register(unsigned int reg);
+ void hv_set_non_nested_register(unsigned int reg, u64 value);
  
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2799,14 +2799,13 @@ static u64 read_tsc(void)
- static inline u64 vgettsc(struct pvclock_clock *clock, u64 *tsc_timestamp,
- 			  int *mode)
- {
--	long v;
- 	u64 tsc_pg_val;
-+	long v;
- 
- 	switch (clock->vclock_mode) {
- 	case VDSO_CLOCKMODE_HVCLOCK:
--		tsc_pg_val = hv_read_tsc_page_tsc(hv_get_tsc_page(),
--						  tsc_timestamp);
--		if (tsc_pg_val != U64_MAX) {
-+		if (hv_read_tsc_page_tsc(hv_get_tsc_page(),
-+					 tsc_timestamp, &tsc_pg_val)) {
- 			/* TSC page valid */
- 			*mode = VDSO_CLOCKMODE_HVCLOCK;
- 			v = (tsc_pg_val - clock->cycle_last) &
++static __always_inline u64 hv_raw_get_register(unsigned int reg)
++{
++	return __rdmsr(reg);
++}
++
+ #else /* CONFIG_HYPERV */
+ static inline void hyperv_init(void) {}
+ static inline void hyperv_setup_mmu_ops(void) {}
 --- a/drivers/clocksource/hyperv_timer.c
 +++ b/drivers/clocksource/hyperv_timer.c
-@@ -393,14 +393,20 @@ struct ms_hyperv_tsc_page *hv_get_tsc_pa
+@@ -365,6 +365,20 @@ void hv_stimer_global_cleanup(void)
+ }
+ EXPORT_SYMBOL_GPL(hv_stimer_global_cleanup);
+ 
++static __always_inline u64 read_hv_clock_msr(void)
++{
++	/*
++	 * Read the partition counter to get the current tick count. This count
++	 * is set to 0 when the partition is created and is incremented in 100
++	 * nanosecond units.
++	 *
++	 * Use hv_raw_get_register() because this function is used from
++	 * noinstr. Notable; while HV_REGISTER_TIME_REF_COUNT is a synthetic
++	 * register it doesn't need the GHCB path.
++	 */
++	return hv_raw_get_register(HV_REGISTER_TIME_REF_COUNT);
++}
++
+ /*
+  * Code and definitions for the Hyper-V clocksources.  Two
+  * clocksources are defined: one that reads the Hyper-V defined MSR, and
+@@ -393,7 +407,7 @@ struct ms_hyperv_tsc_page *hv_get_tsc_pa
  }
  EXPORT_SYMBOL_GPL(hv_get_tsc_page);
  
--static u64 notrace read_hv_clock_tsc(void)
-+static notrace u64 read_hv_clock_tsc(void)
+-static notrace u64 read_hv_clock_tsc(void)
++static __always_inline u64 read_hv_clock_tsc(void)
  {
--	u64 current_tick = hv_read_tsc_page(hv_get_tsc_page());
-+	u64 cur_tsc, time;
+ 	u64 cur_tsc, time;
  
--	if (current_tick == U64_MAX)
--		current_tick = hv_get_register(HV_REGISTER_TIME_REF_COUNT);
-+	/*
-+	 * The Hyper-V Top-Level Function Spec (TLFS), section Timers,
-+	 * subsection Refererence Counter, guarantees that the TSC and MSR
-+	 * times are in sync and monotonic. Therefore we can fall back
-+	 * to the MSR in case the TSC page indicates unavailability.
-+	 */
-+	if (!hv_read_tsc_page_tsc(tsc_page, &cur_tsc, &time))
-+		time = hv_get_register(HV_REGISTER_TIME_REF_COUNT);
+@@ -404,7 +418,7 @@ static notrace u64 read_hv_clock_tsc(voi
+ 	 * to the MSR in case the TSC page indicates unavailability.
+ 	 */
+ 	if (!hv_read_tsc_page_tsc(tsc_page, &cur_tsc, &time))
+-		time = hv_get_register(HV_REGISTER_TIME_REF_COUNT);
++		time = read_hv_clock_msr();
  
--	return current_tick;
-+	return time;
+ 	return time;
+ }
+@@ -414,7 +428,7 @@ static u64 notrace read_hv_clock_tsc_cs(
+ 	return read_hv_clock_tsc();
  }
  
- static u64 notrace read_hv_clock_tsc_cs(struct clocksource *arg)
---- a/include/clocksource/hyperv_timer.h
-+++ b/include/clocksource/hyperv_timer.h
-@@ -38,8 +38,9 @@ extern void hv_remap_tsc_clocksource(voi
- extern unsigned long hv_get_tsc_pfn(void);
- extern struct ms_hyperv_tsc_page *hv_get_tsc_page(void);
- 
--static inline notrace u64
--hv_read_tsc_page_tsc(const struct ms_hyperv_tsc_page *tsc_pg, u64 *cur_tsc)
-+static __always_inline bool
-+hv_read_tsc_page_tsc(const struct ms_hyperv_tsc_page *tsc_pg,
-+		     u64 *cur_tsc, u64 *time)
+-static u64 notrace read_hv_sched_clock_tsc(void)
++static u64 noinstr read_hv_sched_clock_tsc(void)
  {
- 	u64 scale, offset;
- 	u32 sequence;
-@@ -63,7 +64,7 @@ hv_read_tsc_page_tsc(const struct ms_hyp
- 	do {
- 		sequence = READ_ONCE(tsc_pg->tsc_sequence);
- 		if (!sequence)
--			return U64_MAX;
-+			return false;
- 		/*
- 		 * Make sure we read sequence before we read other values from
- 		 * TSC page.
-@@ -82,15 +83,8 @@ hv_read_tsc_page_tsc(const struct ms_hyp
+ 	return (read_hv_clock_tsc() - hv_sched_clock_offset) *
+ 		(NSEC_PER_SEC / HV_CLOCK_HZ);
+@@ -466,22 +480,12 @@ static struct clocksource hyperv_cs_tsc
+ #endif
+ };
  
- 	} while (READ_ONCE(tsc_pg->tsc_sequence) != sequence);
- 
--	return mul_u64_u64_shr(*cur_tsc, scale, 64) + offset;
+-static u64 notrace read_hv_clock_msr(void)
+-{
+-	/*
+-	 * Read the partition counter to get the current tick count. This count
+-	 * is set to 0 when the partition is created and is incremented in
+-	 * 100 nanosecond units.
+-	 */
+-	return hv_get_register(HV_REGISTER_TIME_REF_COUNT);
 -}
 -
--static inline notrace u64
--hv_read_tsc_page(const struct ms_hyperv_tsc_page *tsc_pg)
--{
--	u64 cur_tsc;
--
--	return hv_read_tsc_page_tsc(tsc_pg, &cur_tsc);
-+	*time = mul_u64_u64_shr(*cur_tsc, scale, 64) + offset;
-+	return true;
- }
- 
- #else /* CONFIG_HYPERV_TIMER */
-@@ -104,10 +98,10 @@ static inline struct ms_hyperv_tsc_page
- 	return NULL;
- }
- 
--static inline u64 hv_read_tsc_page_tsc(const struct ms_hyperv_tsc_page *tsc_pg,
--				       u64 *cur_tsc)
-+static __always_inline bool
-+hv_read_tsc_page_tsc(const struct ms_hyperv_tsc_page *tsc_pg, u64 *cur_tsc, u64 *time)
+ static u64 notrace read_hv_clock_msr_cs(struct clocksource *arg)
  {
--	return U64_MAX;
-+	return false;
+ 	return read_hv_clock_msr();
  }
  
- static inline int hv_stimer_cleanup(unsigned int cpu) { return 0; }
+-static u64 notrace read_hv_sched_clock_msr(void)
++static u64 noinstr read_hv_sched_clock_msr(void)
+ {
+ 	return (read_hv_clock_msr() - hv_sched_clock_offset) *
+ 		(NSEC_PER_SEC / HV_CLOCK_HZ);
 
 
