@@ -2,178 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 85C6070A424
-	for <lists+kvm@lfdr.de>; Sat, 20 May 2023 03:02:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD98870A5DD
+	for <lists+kvm@lfdr.de>; Sat, 20 May 2023 08:08:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229673AbjETBCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 21:02:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39938 "EHLO
+        id S229543AbjETGH6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 20 May 2023 02:07:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbjETBCm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 21:02:42 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C0F1A4;
-        Fri, 19 May 2023 18:02:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684544561; x=1716080561;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YP7JReTPyYFTvm8W8YvbkQJKFNcymHcA+Vrpk4UdMRs=;
-  b=jGS2kFCU9iw+zzy1JiO5jVT/hA4ODxRGp58dB1neU9Aj6Ed2nK0pSK9+
-   WzAOclYOJy+Z/hq59SIBoFveXQld79AGB7K2bvDPZ5XgH9cLBDT1fNe8y
-   3rrVlcWerphomqkmiJ7omth9lVe49VCJhY/qKCrz6IhQ09md+tjdC1JWi
-   IUZw66LcP47zp4EWQsVZ/OzuORYXkVpzcg33lWdLwIz0l5V/PQ1FWtuCN
-   yqYKdO9wvWCHYo3iv6zCPwHIeT46MuNoEYiXeOSGH0NmrBIsc+dvJlRQG
-   wPK3n+5hWsTJ6dfip+C9WH6dNhL5dSjM4m8S6LSl2ZjMJ9dMypfJxY8RO
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10715"; a="355748766"
-X-IronPort-AV: E=Sophos;i="6.00,178,1681196400"; 
-   d="scan'208";a="355748766"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2023 18:02:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10715"; a="814906286"
-X-IronPort-AV: E=Sophos;i="6.00,178,1681196400"; 
-   d="scan'208";a="814906286"
-Received: from jasampan-mobl.amr.corp.intel.com (HELO desk) ([10.212.248.200])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2023 18:02:39 -0700
-Date:   Fri, 19 May 2023 18:02:37 -0700
-From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, Chao Gao <chao.gao@intel.com>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH] KVM: x86: Track supported ARCH_CAPABILITIES in kvm_caps
-Message-ID: <20230520010237.3tepk3q44j52leuk@desk>
-References: <20230506030435.80262-1-chao.gao@intel.com>
- <b472b58d-0469-8a55-985c-1d966ce66419@intel.com>
- <ZGZhW/x5OWPmx1qD@google.com>
+        with ESMTP id S229436AbjETGH4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 20 May 2023 02:07:56 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2052.outbound.protection.outlook.com [40.107.93.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0446F1A1;
+        Fri, 19 May 2023 23:07:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MlMeIlGhsiG8qehFHm+kyksodUiYcuNydH49AUnx+3N2ea1IzEaLvrNEWhUDMr+qi8OwLPyEGazINi9xt03LIj2T1lv2v09DcIfqQXnDed/ICboAaBhNhoO2CCASmbpjwlAbnJRdhGFVB/7zI8NiRB4ALuZlPenDuOnVt7rTSb2Q/lM3u3I+fmCydJmj4lJJSPyyNyqlLBy+Ld5Pb5leL/LLQvITQ7OyGAwkLwgKzqMg35oq5ZxJ7O26y+WsUvo6yNCVtYikD5r8BPmY3vnKfDa515LtygPka2qY7+uRZmyFyVkVYDbNrLp9S1JKBa8/MYmPxyAI79VaQpYC0Ti9EQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=m5dUBh3bdo7QiN2qYL8PVK0WGibt2uJ3Jw8v4oHkRtg=;
+ b=flHlW6JD6YGh9EpXsQQ2SHwG1H65FO3rW6Cl812ALWaIj0HBg8X2278ALnokVh5ygR6lF/FOoeRv32Fc9RoNSMFWBd5A+DVpTd/4WO6TozUeJqtVJT5b6LJ4UA3S9WonHTZqWFWF8u9DHbKsK8/E5LjzhQJMdn+5jDrN1wf8PcIfAsQ2QMSecH9fF9/9TZPSE1t1gQS+ZS/yFthpHCYMJJb8HEy71YKFGViNAotDk2h3RHP65VzrvWLZ9McVIsa2RO7JjhkS3tAKqO1Q0oU1uVx/dVugXtqdE9c8737dAzLMvpDPAqkN0eoaQumBlLI0d+Q7EAGeRFrNh+U2BPhwhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m5dUBh3bdo7QiN2qYL8PVK0WGibt2uJ3Jw8v4oHkRtg=;
+ b=fCpIU1or5h/ccgnKpCKipoYjmLCHwOYa25OKAPQtmoIr1ePZkxdcW3Lkb5IwHnkm9LJHdm8PFgKo05vm0sF+NofnjFHy+GaWiHqt4FAsJ7kfOTNdT0hmTd+k9mKaDqkL0loDV2ZMYzyh7kl8R8s0uRKZa6zoWJ+Q/CW6TVaHsRQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CY5PR12MB6323.namprd12.prod.outlook.com (2603:10b6:930:20::11)
+ by DM4PR12MB6615.namprd12.prod.outlook.com (2603:10b6:8:8d::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6411.21; Sat, 20 May 2023 06:07:52 +0000
+Received: from CY5PR12MB6323.namprd12.prod.outlook.com
+ ([fe80::6af2:58b5:ae35:6ff4]) by CY5PR12MB6323.namprd12.prod.outlook.com
+ ([fe80::6af2:58b5:ae35:6ff4%6]) with mapi id 15.20.6411.021; Sat, 20 May 2023
+ 06:07:52 +0000
+Message-ID: <cae16272-2fcb-3e9f-5ad3-50d5a7e137d1@amd.com>
+Date:   Sat, 20 May 2023 11:36:36 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH] KVM: SVM: vNMI pending bit is V_NMI_PENDING_MASK not
+ V_NMI_BLOCKING_MASK
+To:     Sean Christopherson <seanjc@google.com>,
+        "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Santosh Shukla <santosh.shukla@amd.com>, vkuznets@redhat.com,
+        jmattson@google.com, thomas.lendacky@amd.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <be4ca192eb0c1e69a210db3009ca984e6a54ae69.1684495380.git.maciej.szmigiero@oracle.com>
+ <ZGebCSwAA4W10atN@google.com>
+Content-Language: en-US
+From:   Santosh Shukla <santosh.shukla@amd.com>
+In-Reply-To: <ZGebCSwAA4W10atN@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0219.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:ea::13) To CY5PR12MB6323.namprd12.prod.outlook.com
+ (2603:10b6:930:20::11)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZGZhW/x5OWPmx1qD@google.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6323:EE_|DM4PR12MB6615:EE_
+X-MS-Office365-Filtering-Correlation-Id: b1f26060-a544-428e-5d4f-08db58f88bc2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: FYEnwFlow8ANOOEqsT9DLYDv5z+83Or/kUb0ImTn6G6fxYzgmTFLKD8SCBx9055UqUJRpPmfcR9F9dImCvl+AlEn/m3dnU8ibAiJKlryU7iXkREQVWaCVQh/PU0bymNnat1SEqo+mX7AFg5mFnP0MY7P744GwW5EpMWhxBuyHkQh8hi91SLVjdKJhQABkdE911LMeySzCQQgr945QOV8GiYnG5PovwLePCoglO32RkIE1EIGTyP3d/KDBwyT7YotcuHU0sZ3X708bmBzz9HFAHEU6mUfNQ1mC3N75NLsokuDJ76ugsii56au0Ajwi/zboQ4wSAUAnajD89Mjuw6K27CeGPkC6Zp/2KE9oEXuVFVO1xH/zBiLf2Alhr7ryHyS9NRI6utTl7E6SQfsV1oKdG5Wf0TrHYIp9KzDfxojjZR3o6BIpxRGcHggUWHA8equNZs7dfe1LusdpWoEw3+ZWFLu1hSFi1DhFq7D0owxiBDis/79gnD/EllR+LkySdK7YYyZOvk2i7D0cyZBPWPhxSrwJU/FGY/pfpk+gOLZmB3OjUzg1hnI34dSFoIz/JoW97uFyokTHR+FFfKNpH4qIb48QIWWtaAbtBtKYYJeGfKrIKdK1blQZDbdBGJt04w+aJjDNPO+UYWhGTccC6psVw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6323.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(366004)(39860400002)(136003)(396003)(451199021)(31696002)(86362001)(36756003)(110136005)(316002)(478600001)(66556008)(66946007)(4326008)(54906003)(66476007)(6666004)(8936002)(8676002)(5660300002)(2906002)(44832011)(38100700002)(6486002)(41300700001)(186003)(26005)(53546011)(6512007)(6506007)(83380400001)(2616005)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YXVyUVc1eW1zL0FlbVNTdWl4TUtHQ2JHSGFZSCt3L0JqRUl6WEpUWEJ3YVlS?=
+ =?utf-8?B?ZW80TmRISG5Qa2M2eHhDY2tMY3J0YmlDYUhpSGQvZkxERWFXekwwZEhiZGsv?=
+ =?utf-8?B?djYvTCtTUEErL2wvbWlwZ1NPOWhhMGZ5aHZGdm1tTndySlNnQXhIU1V6TGlZ?=
+ =?utf-8?B?NzFDMzc1OW9Lbnl1alNqN2t4NUJ5TFJGVm5ranBOSmVrODZlakRqZ2JrQytv?=
+ =?utf-8?B?c1dORmRmMVducW83aHZQRjVISzZuYjJMbEpMa3BBWTRkQkt5N09Qc28yZ1dh?=
+ =?utf-8?B?UmFIaStHZGlWdll2UWV5SFdrV1dmUDZNMjAwR0Ftd1hkc1g0dHlPQzk5OVRC?=
+ =?utf-8?B?U2t6Mnd3MDNGSWprTHI4U0lmNS9hMWNZL1VEQlZMdEdlK2Y3TUtQMEdNL2cw?=
+ =?utf-8?B?SFFPN3huTTNibDBJTjNka0Q1eGdYUDdjT2xvdm9XQVpFV3ByOSs1eElkNVhR?=
+ =?utf-8?B?Kzl0Z3o5VEtjVFZYYkZlU3lFdCt5Z1piUWd3MkFzZXdJMDkyaEw4NFFZQWhJ?=
+ =?utf-8?B?bHpjdlBoOG9rREw4dmo1RVdZdkNlSHdWR0FmVHNHYzhxU21TSkhWSEJ1RHda?=
+ =?utf-8?B?Qk5nL0MycUYyc04xTisyOGRwNWRHU2VkdGtwTEpWVmltWjlNRkdiRnNHYmpR?=
+ =?utf-8?B?cDNsM2Z4bTV0YlptN3pmU0tncUttK0JSdExhSEc1aVp4UUdTak5wd2ZpYXFE?=
+ =?utf-8?B?bjhSZXN5VWdDbk1ZUWlZUC8zTzgyNWlEcWlkRDJQT2t3MTJ5TW82TXFoeGRW?=
+ =?utf-8?B?ZjFRV01vTVZCeWQvZzlmdlJjbFhGK1NCMWRoR2hOUjlUc3h0eitvU1h5Z0Js?=
+ =?utf-8?B?SFVCRGg2QUdubzNKMXI1dWsvV2pwRW03eGR0R0dZRVVSK1hQYkpIMjFhQ001?=
+ =?utf-8?B?ZngxejNGM3lqSXNmYkUwUjBZUlFmbWtiTENnMDBmVWtxdmFKZ1FWTlRwb1dC?=
+ =?utf-8?B?bGg3RnI0dmExWldaaE94bXFJSkZFbDRmTnRITHBoc1VSM3dpYWhDcHhYSm81?=
+ =?utf-8?B?VnhNcmVGT0xsKzM2UUxuVmZRaUFLcjZzTkNsZDRETEJod0c0azhjbG8wZnJO?=
+ =?utf-8?B?V2FLaWg0Q2NjUkdCNWI0Nzc4TlEweU8wRHQxc1NiRDgycUIvSWZ4eE9PaDE1?=
+ =?utf-8?B?ZFgzR0pXdHlWaEtGbWltWEdTVmFHTjNQU1d4aGFDeXRzc2tTWk54cVVpMDJT?=
+ =?utf-8?B?d1FzbGRPaE1jZmc1MW9hVzlYcmRnTFg4REhCQlFKejYraUIxUVhiOTgzUk1x?=
+ =?utf-8?B?YzU4N1EwZDRYbzBweTdaV0FrQno1QTdnT3ZKYTMvcWpvdzhyTjh2MTNEV3lW?=
+ =?utf-8?B?VWRQL2lXVTJsVVFIM3V6ZGtBTkFpT0JmZWw3R25nNG5HeW94cVA5OElNVStG?=
+ =?utf-8?B?aW1POW4zdnhDTkZKYzBtT2pXdGRxYm5GUStmbUVpaGVpdysxaTUvOVdMSzM5?=
+ =?utf-8?B?UzlFUWZ6NzZXdktBZjd3alhFbDZuTmZzb1lUT2hvV2RndEtYSklMSm1jdnpE?=
+ =?utf-8?B?NHNra0NMazJtdzBxa3QzSGdNYStEeHdOWmx6ZXdCa25TU1JMTHlHVWRZN0VY?=
+ =?utf-8?B?eG42eG1FY2c2SmFUMXpBNEVkUFFVbi9maVRPaHZ6ZGlHdllFNEhjRjZ5eXNU?=
+ =?utf-8?B?UDYvWXNIbHorQXhJTVk5cmlCSzhkMXhqS2dQWTFCeXdvR1FiZjNWWllHbkgx?=
+ =?utf-8?B?NHRMelBKUFVUVitCRWxtbVFxK2tYc0RDa21lRlN5L21EWGFGYk1Gb2luc3dY?=
+ =?utf-8?B?Nys2QUF6dXkyaW9TeTI3N3BvcWlRZ0RTaTRvSkZmSlFvOVpWR3JUbWE4NDdF?=
+ =?utf-8?B?NG53RlFVYVZLWGlUWFM4L2hxWHo4cjlqdXkwNndkcmhUZUVEOHZZeDhkWkpW?=
+ =?utf-8?B?VUZtaFpnUVZzUEVyUGxCek1uVE5UYUtRL0krdnJWdjExMjRWR0dQRlk5Yiti?=
+ =?utf-8?B?NFkxYXJRYXhxR3NiY3E3QVoxMzJOTEUxNG0vZS9XUStjMWw2dGVUUHh6TTV4?=
+ =?utf-8?B?b0FEZlhBRGNOUXM2SWFJcmMyZjNsaCtMaDlZMHVTU2Vtc0M2WFhGZDN6Vy8x?=
+ =?utf-8?B?OW1ZYjRsbUtSQ0lBakRnZFFtazhNbytKbm1OVi9pRDhEZHFHODg4aThubHRh?=
+ =?utf-8?Q?PJm/u3IXHK4JDlZx4LCkhaPmj?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1f26060-a544-428e-5d4f-08db58f88bc2
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6323.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2023 06:07:52.6365
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kZ89tJbFyWehUg4am2vc8qLF1Z9wIceTJMiCjws/V1lGDF6XWNw4C1o2BFiKnWilcDJwBNOtlVo4ROdcPFNc+Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6615
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 18, 2023 at 10:33:15AM -0700, Sean Christopherson wrote:
-> +Jim
+Hi Sean and Maciej,
+
+On 5/19/2023 9:21 PM, Sean Christopherson wrote:
+> On Fri, May 19, 2023, Maciej S. Szmigiero wrote:
+>> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+>>
+>> While testing Hyper-V enabled Windows Server 2019 guests on Zen4 hardware
+>> I noticed that with vCPU count large enough (> 16) they sometimes froze at
+>> boot.
+>> With vCPU count of 64 they never booted successfully - suggesting some kind
+>> of a race condition.
+>>
+>> Since adding "vnmi=0" module parameter made these guests boot successfully
+>> it was clear that the problem is most likely (v)NMI-related.
+>>
+>> Running kvm-unit-tests quickly showed failing NMI-related tests cases, like
+>> "multiple nmi" and "pending nmi" from apic-split, x2apic and xapic tests
+>> and the NMI parts of eventinj test.
+>>
+>> The issue was that once one NMI was being serviced no other NMI was allowed
+>> to be set pending (NMI limit = 0), which was traced to
+>> svm_is_vnmi_pending() wrongly testing for the "NMI blocked" flag rather
+>> than for the "NMI pending" flag.
+>>
+>> Fix this by testing for the right flag in svm_is_vnmi_pending().
+>> Once this is done, the NMI-related kvm-unit-tests pass successfully and
+>> the Windows guest no longer freezes at boot.
+>>
+>> Fixes: fa4c027a7956 ("KVM: x86: Add support for SVM's Virtual NMI")
+>> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 > 
-> On Thu, May 18, 2023, Xiaoyao Li wrote:
-> > On 5/6/2023 11:04 AM, Chao Gao wrote:
-> > > to avoid computing the supported value at runtime every time.
-> > > 
-> > > No functional change intended.
-> > 
-> > the value of kvm_get_arch_capabilities() can be changed due to
-> > 
-> > 	if (l1tf_vmx_mitigation != VMENTER_L1D_FLUSH_NEVER)
-> > 		data |= ARCH_CAP_SKIP_VMENTRY_L1DFLUSH;
-> > 
-> > and l1tf_vmx_mitigation can be runtime changed by vmentry_l1d_flush module
-> > param.
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
 > 
-> Nice catch!
+>> ---
+>>
+>> It's a bit sad that no-one apparently tested the vNMI patchset with
+>> kvm-unit-tests on an actual vNMI-enabled hardware...
 > 
-> > We need a detailed analysis that in no real case can
-> > ARCH_CAP_SKIP_VMENTRY_L1DFLUSH bit change runtime.
+> That's one way to put it.
 > 
-> No, the fact that it _can_ be modified by a writable module param is enough to
-> make this patch buggy.
-> 
-> I do like snapshotting and then updating the value, even though there's likely no
-> meaningful performance benefit, as that would provide a place to document that
-> the "supported" value is dynamic.  Though the fact that it's dynamic is arguably a bug
-> in its own right, e.g. if userspace isn't careful, a VM can have vCPUs with different
-> values for ARCH_CAPABILITIES.  But fixing that is probably a fool's errand.  So
-> I vote to snapshot the value and toggle the ARCH_CAP_SKIP_VMENTRY_L1DFLUSH bit
-> when l1tf_vmx_mitigation is modified.
-> 
-> On a somewhat related topic, what in the absolute #$#$ is going on with FB_CLEAR_DIS!?!?
-> I made the mistake of digging into why KVM doesn't advertise ARCH_CAP_FB_CLEAR_CTRL...
-> 
->   1. I see *nothing* in commit 027bbb884be0 ("KVM: x86/speculation: Disable Fill
->      buffer clear within guests") that justifies 1x RDMSR and 2x WRMSR on every
->      entry+exit.
+> Santosh, what happened?  This goof was present in both v3 and v4, i.e. it wasn't
+> something that we botched when applying/massaging at the last minute.  And the
+> cover letters for both v3 and v4 state "Series ... tested on AMD EPYC-Genoa".
 
-Unnecessary VERWs in guest will have much higher impact than due to MSR
-read/write at vmentry/exit. On an Icelake system it is pointless for a
-guest to incur VERW penalty when the system is not affected by MDS/TAA and
-guests don't need mitigation for MMIO Stale Data. MSR writes are only
-done when the guest is likely to execute unnecessary VERWs(e.g. when the
-guest thinks its running on an older gen CPU).
+My bad that I only ran svm_test with vnmi in past using Sean's KUT branch
+remotes/sean-kut/svm/vnmi_test and saw that vnmi test was passing.
+Here are the logs:
+---
+PASS: vNMI enabled but NMI_INTERCEPT unset!
+PASS: vNMI with vector 2 not injected
+PASS: VNMI serviced
+PASS: vnmi
+--- 
 
->   2. I'm pretty sure conditioning mmio_stale_data_clear on kvm_arch_has_assigned_device()
->      is a bug.  AIUI, the vulnerability applies to _any_ MMIO accesses.
+However when I ran mentioned tests by Maciej, I do see the failure. Thanks for this pointing out.
 
-Vulnerability applies to MMIO access to devices that don't respect "byte
-enable" (which indicates valid bytes in a transaction), and don't error
-on incorrect read or write size.
+Reviewed-by : Santosh Shukla <Santosh.Shukla@amd.com>
 
->      Assigning a device is necessary to let the device DMA into the
->      guest, but it's not necessary to let the guest access MMIO
->      addresses, that's done purely via memslots.
-
-I will get back on this. The guest would typically need access to an
-area that doesn't fail an incorrectly sized MMIO.
-
->   3. Irrespective of whether or not there is a performance benefit, toggling the
->      MSR on every entry+exit is completely unnecessary if KVM won't do VERW before
->      VM-Enter, i.e. if (!mds_user_clear && !mmio_stale_data_clear), then the
->      toggling can be done in vmx_prepare_switch_to_{guest,host}().  This probably
->      isn't worth pursuing though, as #4 below is more likely, especially since
->      X86_BUG_MSBDS_ONLY is limited to Atom (and MIC, lol) CPUs.
->
->   4. If the host will will _never_ do VERW, i.e. #3 + !X86_BUG_MSBDS_ONLY, then
-
-Is it likely that KVM will not do VERW when affected by MMIO Stale Data?
-If you mean on a hardware that is not vulnerable to MDS and MMIO Stale
-Data, in that case MSR writes are unnecessary and will be skipped
-because FB_CLEAR_DIS is not available on unaffected hardware.
-
->      KVM just needs to context switch the MSR between guests since the value that's
->      loaded while running in the host is irrelevant.  E.g. use a percpu cache to
-
-I will be happy to avoid the MSR read/write, but its worth considering
-that this MSR can receive more bits that host may want to toggle, then
-percpu cache implementation would likely change.
-
->      track the current value.
-> 
->   5. MSR_IA32_MCU_OPT_CTRL is not modified by the host after a CPU is brought up,
->      i.e. the host's desired value is effectively static post-boot, and barring
->      a buggy configuration (running KVM as a guest), the boot CPU's value will be
->      the same as every other CPU.
-
-Would the MSR value be same on every CPU, if only some guests have
-enumerated FB_CLEAR and others haven't? MSR writes (to disable FB_CLEAR)
-are not done when a guest enumerates FB_CLEAR. Enumeration of FB_CLEAR
-in guest will depend on its configuration.
-
->   6. Performance aside, KVM should not be speculating (ha!) on what the guest
->      will and will not do, and should instead honor whatever behavior is presented
->      to the guest.  If the guest CPU model indicates that VERW flushes buffers,
->      then KVM damn well needs to let VERW flush buffers.
-
-The current implementation allows guests to have VERW flush buffers when
-they enumerate FB_CLEAR. It only restricts the flush behavior when the
-guest is trying to mitigate against a vulnerability(like MDS) on a
-hardware that is not affected. I guess its common for guests to be
-running with older gen configuration on a newer hardware.
-
->   7. Why on earth did Intel provide a knob that affects both the host and guest,
->      since AFAICT the intent of the MSR is purely to suppress FB clearing for an
->      unsuspecting (or misconfigured?) guest!?!?!
-
-Thats true.
+Best Regards,
+Santosh
