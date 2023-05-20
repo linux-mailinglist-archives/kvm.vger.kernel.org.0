@@ -2,129 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8303470A630
-	for <lists+kvm@lfdr.de>; Sat, 20 May 2023 09:42:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37E4A70A677
+	for <lists+kvm@lfdr.de>; Sat, 20 May 2023 10:45:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229890AbjETHmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 20 May 2023 03:42:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52940 "EHLO
+        id S231294AbjETIpW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 20 May 2023 04:45:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbjETHml (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 20 May 2023 03:42:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A5B51A5
-        for <kvm@vger.kernel.org>; Sat, 20 May 2023 00:41:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684568511;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=O0AguDfj6JP2qnVVf1ZTLGQH6Es2HVgXZKNmzU3nM3g=;
-        b=PZti+F83cztvMI1fURyVUN9mrHoGj9xRHnEKI7YvJcCKumUKB74DJdgmRsgkkqS3x9+9mi
-        c1DenXj/UMWxyEKkZ0VWGzuxYoA6X1ppf2TTgs3sKjDkyKdi29KbRwu4xT4t8AK7rVPcaz
-        UlnPYG6Gw8vy1HhN9eUWTrSr66w3xnc=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-70-uUEN5emcOkCG34VfflMQ2w-1; Sat, 20 May 2023 03:41:49 -0400
-X-MC-Unique: uUEN5emcOkCG34VfflMQ2w-1
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-534107e73cfso2344809a12.1
-        for <kvm@vger.kernel.org>; Sat, 20 May 2023 00:41:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684568508; x=1687160508;
-        h=content-transfer-encoding:in-reply-to:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O0AguDfj6JP2qnVVf1ZTLGQH6Es2HVgXZKNmzU3nM3g=;
-        b=cN76oM5QCguK9tPGOmuGzc1CMRCqnKX1RadtxTiCeDhup37jCrP48xH8jPmt4kyiFc
-         3gzCxKwj9uVPOYmNcGEHlYJApdpLl4J6nBzPLZuxe3Pke97FrJD7EtIjQGn0kA+ADeyS
-         j4/7AiEviunhSGj8t0UxbngzCYg5SZz4BKWU0vp26rCJxGJFO8lMeI+Ov9Hy+JLjjigX
-         PPWE0K+RRSwlZdCIs2faoO2BfNb9+e+ZKp2VAWdfDRBwscSM/rJxAGUK2uHoQMXIhxz5
-         JRSGkupcWxQvCkroCeMZ+WWLRQfpxQgzDrpvUml//LIxh8I16WpUmCAo+fPMq3bt8Jzx
-         femg==
-X-Gm-Message-State: AC+VfDzXcNc7RkQ+n6GAlyVCgbuxGw2d2vi6+NWHUwVIlvMOsMmKtO73
-        cXwPRfRnhDKunnxSeQMS5YARrGjdBytH/MvF7sbUkx8H/OsSLS7hc+lyReynRAgXYVCmoNiE6RE
-        Hghi4l3ej3g/G
-X-Received: by 2002:a05:6a20:3d83:b0:104:beb4:da38 with SMTP id s3-20020a056a203d8300b00104beb4da38mr4804461pzi.35.1684568508557;
-        Sat, 20 May 2023 00:41:48 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6eXTRhEhp3x78rhFMpORaXutxEGfsp/UfsShsbpXjJZiG21s3ATningAfFDQyDpwJnRCAT3A==
-X-Received: by 2002:a05:6a20:3d83:b0:104:beb4:da38 with SMTP id s3-20020a056a203d8300b00104beb4da38mr4804442pzi.35.1684568508246;
-        Sat, 20 May 2023 00:41:48 -0700 (PDT)
-Received: from [10.72.12.17] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 19-20020aa79213000000b00639eae8816asm722737pfo.130.2023.05.20.00.41.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 20 May 2023 00:41:47 -0700 (PDT)
-From:   Yanghang Luy <yanghliu@redhat.com>
-X-Google-Original-From: Yanghang Luy <yanghliu@gapps.redhat.com>
-Message-ID: <ce2e4e15-d4a5-fb48-1b2f-4f70c623b1b3@gapps.redhat.com>
-Date:   Sat, 20 May 2023 15:41:42 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] vfio/pci: demote hiding ecap messages to debug level
-Content-Language: en-US
-To:     Oleksandr Natalenko <oleksandr@natalenko.name>,
-        linux-kernel@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Cornelia Huck <cohuck@redhat.com>, Bo Liu <liubo03@inspur.com>,
-        "K V P, Satyanarayana" <satyanarayana.k.v.p@intel.com>,
-        kvm@vger.kernel.org
-References: <20230504131654.24922-1-oleksandr@natalenko.name>
-In-Reply-To: <20230504131654.24922-1-oleksandr@natalenko.name>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230419AbjETIpT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 20 May 2023 04:45:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2FDFAB
+        for <kvm@vger.kernel.org>; Sat, 20 May 2023 01:45:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3E34F601B6
+        for <kvm@vger.kernel.org>; Sat, 20 May 2023 08:45:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C459C433D2;
+        Sat, 20 May 2023 08:45:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684572314;
+        bh=Q2w/ZHIycmAJKSbj+m7Y7anZVkCPJuKGJTfDF1LoZR8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=sKrkFr3KOMgw2ulTcx31zs7D1/06N7yrvEzIW//zw40XxQ3yCDriyrLsIp0/lVpRG
+         52nZFA8PyONX5oVNEBP8Q0gqyK1zzO4uY/chmR+FNSReUVEhFOjT9Ateg3Q+C1QKfI
+         hfvug8ZwVue8bfQuOSF598Rdv+JJbtAFNiEtduCF4tUBGRwH/zEgCG5FHHcfynl636
+         0Qn1Lu0uErKduOCJF/yzwX1gVSE1vpauDIIQ8vyZJdgkin7sD3GT5jrDLhasJunR+O
+         bhAcRwivC66rV5A3QEQS6PThOPWEzVpK54ZdJPv5bp6G8AXmiEifFYvCrh6sLabJ9y
+         hcfTk331owHyQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q0ID0-00Gh4i-9q;
+        Sat, 20 May 2023 09:45:02 +0100
+Date:   Sat, 20 May 2023 09:45:01 +0100
+Message-ID: <87y1ljo0he.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     "Jitindar Singh, Suraj" <surajjs@amazon.com>
+Cc:     "jingzhangos@google.com" <jingzhangos@google.com>,
+        "oupton@google.com" <oupton@google.com>,
+        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "rananta@google.com" <rananta@google.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "reijiw@google.com" <reijiw@google.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "tabba@google.com" <tabba@google.com>
+Subject: Re: [PATCH v8 6/6] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
+In-Reply-To: <bdba9f6db5bc2f617f2242c3ddbff8adb7c00c91.camel@amazon.com>
+References: <20230503171618.2020461-1-jingzhangos@google.com>
+        <20230503171618.2020461-7-jingzhangos@google.com>
+        <b64e5639b1b9bb5e5e4ff8eaa10554ae0d9a6016.camel@amazon.com>
+        <CAAdAUtibBVuMGhh9NEOxpEyMQ6bxde674ME+hHqERoT5hctETA@mail.gmail.com>
+        <7a4a7d86c851563d5ad631070611918906e92015.camel@amazon.com>
+        <86bkigllzn.wl-maz@kernel.org>
+        <bdba9f6db5bc2f617f2242c3ddbff8adb7c00c91.camel@amazon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: surajjs@amazon.com, jingzhangos@google.com, oupton@google.com, alexandru.elisei@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev, rananta@google.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, reijiw@google.com, will@kernel.org, kvm@vger.kernel.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tested-by: YangHang Liu <yanghliu@redhat.com>
+On Sat, 20 May 2023 00:04:53 +0100,
+"Jitindar Singh, Suraj" <surajjs@amazon.com> wrote:
+>=20
+> On Fri, 2023-05-19 at 10:16 +0100, Marc Zyngier wrote:
+> > CAUTION: This email originated from outside of the organization. Do
+> > not click links or open attachments unless you can confirm the sender
+> > and know the content is safe.
+> >=20
+> >=20
+> >=20
+> > On Thu, 18 May 2023 22:08:15 +0100,
+> > "Jitindar Singh, Suraj" <surajjs@amazon.com> wrote:
+> > >=20
+> > > Reading init_cpu_ftr_reg() is hurting my head :p but don't we have
+> > > basically 2 cases here?
+> > >=20
+> > > 1. We are unaffected by spectre|meltdown i.e.
+> > > arm64_get_[spectre|meltdown]_v2_state() will return
+> > > SPECTRE_UNAFFECTED
+> > > and we will set the limit to 1 for the csv[1|2] bit fields in
+> > > read_sanitised_id_aa64pfr0_el1()
+> > >=20
+> > > or
+> > >=20
+> > > 2. We ARE affected by spectre|meltdown in which case
+> > > arm64_get_[spectre|meltdown]_v2_state() will be
+> > > SPECTRE_VULNERABLE|SPECTRE_MITIGATED in which case
+> > > read_sanitised_ftr_reg() will return a value with csv[1|2] set to 0
+> > > essentially setting the limit for either of these bit fields to 0
+> > > in
+> > > read_sanitised_id_aa64pfr0_el1().
+> >=20
+> > What is "WE"?
+>=20
+> The CPU
 
-On 5/4/2023 9:16 PM, Oleksandr Natalenko wrote:
-> Seeing a burst of messages like this:
-> 
->      vfio-pci 0000:98:00.0: vfio_ecap_init: hiding ecap 0x19@0x1d0
->      vfio-pci 0000:98:00.0: vfio_ecap_init: hiding ecap 0x25@0x200
->      vfio-pci 0000:98:00.0: vfio_ecap_init: hiding ecap 0x26@0x210
->      vfio-pci 0000:98:00.0: vfio_ecap_init: hiding ecap 0x27@0x250
->      vfio-pci 0000:98:00.1: vfio_ecap_init: hiding ecap 0x25@0x200
->      vfio-pci 0000:b1:00.0: vfio_ecap_init: hiding ecap 0x19@0x1d0
->      vfio-pci 0000:b1:00.0: vfio_ecap_init: hiding ecap 0x25@0x200
->      vfio-pci 0000:b1:00.0: vfio_ecap_init: hiding ecap 0x26@0x210
->      vfio-pci 0000:b1:00.0: vfio_ecap_init: hiding ecap 0x27@0x250
->      vfio-pci 0000:b1:00.1: vfio_ecap_init: hiding ecap 0x25@0x200
-> 
-> is of little to no value for an ordinary user.
-> 
-> Hence, use pci_dbg() instead of pci_info().
-> 
-> Signed-off-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-> ---
->   drivers/vfio/pci/vfio_pci_config.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-> index 948cdd464f4e..dd8dda14e701 100644
-> --- a/drivers/vfio/pci/vfio_pci_config.c
-> +++ b/drivers/vfio/pci/vfio_pci_config.c
-> @@ -1643,7 +1643,7 @@ static int vfio_ecap_init(struct vfio_pci_core_device *vdev)
->   		}
->   
->   		if (!len) {
-> -			pci_info(pdev, "%s: hiding ecap %#x@%#x\n",
-> +			pci_dbg(pdev, "%s: hiding ecap %#x@%#x\n",
->   				 __func__, ecap, epos);
->   
->   			/* If not the first in the chain, we can skip over it */
+Hilarious.
 
+>=20
+> >=20
+> > >=20
+> > > Are we trying to catch the case where csv[1|2] is 0 on the host but
+> > > we
+> > > are unaffected as detected by e.g. cpuid and that cpu happens to
+> > > incorrectly not set csv[1|2] in the ID register but we still want
+> > > to
+> > > allow the guest to see those bits as set?
+> > >=20
+> > > This isn't really related to the CR as I know this is existing code
+> > > which has just been moved around and sorry if I'm missing something
+> > > obvious.
+> >=20
+> > This code is called from *userspace*, and tries to cope with a VM
+> > being restored. So we have 3 (not 2 cases):
+> >=20
+> > - both the source and the destination have the same level of CSVx
+> > =C2=A0 support, and all is great in the world
+> >=20
+> > - the source has CSVx=3D=3D0, while the destination has CSVx=3D1. All g=
+ood,
+> > =C2=A0 as we won't be lying to the guest, and the extra mitigation
+> > =C2=A0 executed by the guest isn't a functional problem. The guest will
+> > =C2=A0 still see CSVx=3D0 after migration.
+> >=20
+> > - the source has CSVx=3D1, while the destination has CSVx=3D0. This isn=
+'t
+> > =C2=A0 an acceptable situation, and we return an error
+> >=20
+> > Is that clearer?
+>=20
+> Yes thanks, that all makes sense.
+>=20
+> My initial question was why we needed to enforce the limit essentially
+> twice in set_id_aa64pfr0_el1().
+>=20
+> Once with:
+>         /* =20
+>          * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
+>          * it doesn't promise more than what is actually provided (the
+>          * guest could otherwise be covered in ectoplasmic residue).
+>          */
+>         csv2 =3D cpuid_feature_extract_unsigned_field(val,
+> ID_AA64PFR0_EL1_CSV2_SHIFT);
+>         if (csv2 > 1 ||
+>             (csv2 && arm64_get_spectre_v2_state() !=3D
+> SPECTRE_UNAFFECTED))
+>                 return -EINVAL;
+>=20
+>         /* Same thing for CSV3 */
+>         csv3 =3D cpuid_feature_extract_unsigned_field(val,
+> ID_AA64PFR0_EL1_CSV3_SHIFT);
+>         if (csv3 > 1 ||
+>             (csv3 && arm64_get_meltdown_state() !=3D SPECTRE_UNAFFECTED))
+>                 return -EINVAL;
+>=20
+> And then again with the check in arm64_check_features().
+
+Ah, I see what you mean. Yes, this isn't right. I asked for the
+generic code to be used in the past, but the old stuff was left
+in. Which is obviously not great.
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
