@@ -2,277 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33B8A70A382
-	for <lists+kvm@lfdr.de>; Sat, 20 May 2023 01:52:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85C6070A424
+	for <lists+kvm@lfdr.de>; Sat, 20 May 2023 03:02:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229508AbjESXwd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 May 2023 19:52:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50128 "EHLO
+        id S229673AbjETBCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 May 2023 21:02:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjESXwc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 May 2023 19:52:32 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D0C31B7
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 16:52:31 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1ac65ab7432so70265ad.0
-        for <kvm@vger.kernel.org>; Fri, 19 May 2023 16:52:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684540351; x=1687132351;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AzrOripG/0UM1uy77HwHWNetJDSTuSvHzc6hXIhMhWw=;
-        b=ztclACejKwTWFaL3X/RbGIQnScMluaN1oIR1hZYwXOz+C/OyHuvIvs3K0Y1GL4wHaZ
-         VrgyuxSDG+eh+BdkyG6clAJmtU9Hk2TUU4QMLPjSljUd9TLl9O6llq75vlYmcclUey+o
-         16NbBU/FNYY6lQSqiUTvQB26r+OD5mZc4m0Tb4311pYxbuQSBpfD8SoYWD0/1R9GTKm0
-         ouqBbPj+/oFD8Cvea6hKh6sugxzXbV4AhIrO7uELcfBJbUEx3eL2yynucn0d+R0dXUnt
-         yGsCXNHoq7FpDGgxU6mbETF/J87rkv/TQiHTSLml6oCBfqJ3bmMDvzpvQ5B/563/d8gm
-         RVgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684540351; x=1687132351;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AzrOripG/0UM1uy77HwHWNetJDSTuSvHzc6hXIhMhWw=;
-        b=J/oy/Daow3Oaj1Kk0kWuMUyhOep19LbudlAI0murCfa1tKQDY2/zN33NpOUIME51jv
-         VeNIAy3JPd1LeKw6N0UI2rPB36ftX0R+m+6/4l8Lfrg97dIb09CqQtt210tMWOXfcuA1
-         ZNgrWxJXh0IubhEWMaBFu2F6abPdlICBBSKG75Fa3tf3V1H5r9+vYPKqJj2v3oyUt/3e
-         5e+qincoAX7/ch8goPj6nGAQ5cySVoCxXtTyqmtdkX9q54pD+lQ/yzPSwU3YCzq6rQXC
-         WFET0T0J9NxIO0IrQVNvvrMlT2L78UuWeYT9EOrQjPUgqiEElOT2JLd3zYSCslyfq29m
-         PU6w==
-X-Gm-Message-State: AC+VfDyWVuAGbrwLxsFKxI/jBTyNvepkD56cz2aTqW4eetg9TASv5jGN
-        X+E9M4WmOhr4J1pb62q861g/2g==
-X-Google-Smtp-Source: ACHHUZ5pX7dUvCsCqV97saKwVL7mSfDd219hgxmRjo6mr9ahRBM6g4j++Tsv7Kcp2ZMl0g+ahMwLyQ==
-X-Received: by 2002:a17:903:230f:b0:1aa:ea22:8043 with SMTP id d15-20020a170903230f00b001aaea228043mr392586plh.7.1684540350977;
-        Fri, 19 May 2023 16:52:30 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id c18-20020a170902d49200b001a064282b11sm181265plg.151.2023.05.19.16.52.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 May 2023 16:52:29 -0700 (PDT)
-Date:   Fri, 19 May 2023 16:52:25 -0700
-From:   Reiji Watanabe <reijiw@google.com>
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v9 2/5] KVM: arm64: Use per guest ID register for
- ID_AA64PFR0_EL1.[CSV2|CSV3]
-Message-ID: <20230519235225.jotppbswdvmjcanj@google.com>
-References: <20230517061015.1915934-1-jingzhangos@google.com>
- <20230517061015.1915934-3-jingzhangos@google.com>
+        with ESMTP id S229512AbjETBCm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 May 2023 21:02:42 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C0F1A4;
+        Fri, 19 May 2023 18:02:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684544561; x=1716080561;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YP7JReTPyYFTvm8W8YvbkQJKFNcymHcA+Vrpk4UdMRs=;
+  b=jGS2kFCU9iw+zzy1JiO5jVT/hA4ODxRGp58dB1neU9Aj6Ed2nK0pSK9+
+   WzAOclYOJy+Z/hq59SIBoFveXQld79AGB7K2bvDPZ5XgH9cLBDT1fNe8y
+   3rrVlcWerphomqkmiJ7omth9lVe49VCJhY/qKCrz6IhQ09md+tjdC1JWi
+   IUZw66LcP47zp4EWQsVZ/OzuORYXkVpzcg33lWdLwIz0l5V/PQ1FWtuCN
+   yqYKdO9wvWCHYo3iv6zCPwHIeT46MuNoEYiXeOSGH0NmrBIsc+dvJlRQG
+   wPK3n+5hWsTJ6dfip+C9WH6dNhL5dSjM4m8S6LSl2ZjMJ9dMypfJxY8RO
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10715"; a="355748766"
+X-IronPort-AV: E=Sophos;i="6.00,178,1681196400"; 
+   d="scan'208";a="355748766"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2023 18:02:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10715"; a="814906286"
+X-IronPort-AV: E=Sophos;i="6.00,178,1681196400"; 
+   d="scan'208";a="814906286"
+Received: from jasampan-mobl.amr.corp.intel.com (HELO desk) ([10.212.248.200])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2023 18:02:39 -0700
+Date:   Fri, 19 May 2023 18:02:37 -0700
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, Chao Gao <chao.gao@intel.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH] KVM: x86: Track supported ARCH_CAPABILITIES in kvm_caps
+Message-ID: <20230520010237.3tepk3q44j52leuk@desk>
+References: <20230506030435.80262-1-chao.gao@intel.com>
+ <b472b58d-0469-8a55-985c-1d966ce66419@intel.com>
+ <ZGZhW/x5OWPmx1qD@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230517061015.1915934-3-jingzhangos@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <ZGZhW/x5OWPmx1qD@google.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jing,
-
-On Wed, May 17, 2023 at 06:10:11AM +0000, Jing Zhang wrote:
-> With per guest ID registers, ID_AA64PFR0_EL1.[CSV2|CSV3] settings from
-> userspace can be stored in its corresponding ID register.
+On Thu, May 18, 2023 at 10:33:15AM -0700, Sean Christopherson wrote:
+> +Jim
 > 
-> The setting of CSV bits for protected VMs are removed according to the
-> discussion from Fuad below:
-> https://lore.kernel.org/all/CA+EHjTwXA9TprX4jeG+-D+c8v9XG+oFdU1o6TSkvVye145_OvA@mail.gmail.com
+> On Thu, May 18, 2023, Xiaoyao Li wrote:
+> > On 5/6/2023 11:04 AM, Chao Gao wrote:
+> > > to avoid computing the supported value at runtime every time.
+> > > 
+> > > No functional change intended.
+> > 
+> > the value of kvm_get_arch_capabilities() can be changed due to
+> > 
+> > 	if (l1tf_vmx_mitigation != VMENTER_L1D_FLUSH_NEVER)
+> > 		data |= ARCH_CAP_SKIP_VMENTRY_L1DFLUSH;
+> > 
+> > and l1tf_vmx_mitigation can be runtime changed by vmentry_l1d_flush module
+> > param.
 > 
-> Besides the removal of CSV bits setting for protected VMs, No other
-> functional change intended.
+> Nice catch!
 > 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  2 --
->  arch/arm64/kvm/arm.c              | 17 ----------
->  arch/arm64/kvm/sys_regs.c         | 55 +++++++++++++++++++++++++------
->  3 files changed, 45 insertions(+), 29 deletions(-)
+> > We need a detailed analysis that in no real case can
+> > ARCH_CAP_SKIP_VMENTRY_L1DFLUSH bit change runtime.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 949a4a782844..07f0e091ae48 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -257,8 +257,6 @@ struct kvm_arch {
->  
->  	cpumask_var_t supported_cpus;
->  
-> -	u8 pfr0_csv2;
-> -	u8 pfr0_csv3;
->  	struct {
->  		u8 imp:4;
->  		u8 unimp:4;
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 774656a0718d..5114521ace60 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -102,22 +102,6 @@ static int kvm_arm_default_max_vcpus(void)
->  	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
->  }
->  
-> -static void set_default_spectre(struct kvm *kvm)
-> -{
-> -	/*
-> -	 * The default is to expose CSV2 == 1 if the HW isn't affected.
-> -	 * Although this is a per-CPU feature, we make it global because
-> -	 * asymmetric systems are just a nuisance.
-> -	 *
-> -	 * Userspace can override this as long as it doesn't promise
-> -	 * the impossible.
-> -	 */
-> -	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
-> -		kvm->arch.pfr0_csv2 = 1;
-> -	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED)
-> -		kvm->arch.pfr0_csv3 = 1;
-> -}
-> -
->  /**
->   * kvm_arch_init_vm - initializes a VM data structure
->   * @kvm:	pointer to the KVM struct
-> @@ -161,7 +145,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	/* The maximum number of VCPUs is limited by the host's GIC model */
->  	kvm->max_vcpus = kvm_arm_default_max_vcpus();
->  
-> -	set_default_spectre(kvm);
->  	kvm_arm_init_hypercalls(kvm);
->  	kvm_arm_init_id_regs(kvm);
->  
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index d2ee3a1c7f03..3c52b136ade3 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1218,10 +1218,6 @@ static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  		if (!vcpu_has_sve(vcpu))
->  			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE);
->  		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
-> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
-> -		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
-> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
-> -		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
->  		if (kvm_vgic_global_state.type == VGIC_V3) {
->  			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
->  			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
-> @@ -1359,7 +1355,10 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->  			       const struct sys_reg_desc *rd,
->  			       u64 val)
->  {
-> +	struct kvm_arch *arch = &vcpu->kvm->arch;
-> +	u64 sval = val;
->  	u8 csv2, csv3;
-> +	int ret = 0;
->  
->  	/*
->  	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
-> @@ -1377,17 +1376,26 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->  	    (csv3 && arm64_get_meltdown_state() != SPECTRE_UNAFFECTED))
->  		return -EINVAL;
->  
-> +	mutex_lock(&arch->config_lock);
->  	/* We can only differ with CSV[23], and anything else is an error */
->  	val ^= read_id_reg(vcpu, rd);
->  	val &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
->  		 ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
-> -	if (val)
-> -		return -EINVAL;
-> -
-> -	vcpu->kvm->arch.pfr0_csv2 = csv2;
-> -	vcpu->kvm->arch.pfr0_csv3 = csv3;
-> +	if (val) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
->  
-> -	return 0;
-> +	/* Only allow userspace to change the idregs before VM running */
-> +	if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &vcpu->kvm->arch.flags)) {
-
-How about using kvm_vm_has_ran_once() instead ?
-
-
-> +		if (sval != read_id_reg(vcpu, rd))
-
-Rather than calling read_id_reg() twice in this function,
-perhaps you might want to save the original val we got earlier
-and re-use it here ?
-
-Thank you,
-Reiji
-
-
-
-
-> +			ret = -EBUSY;
-> +	} else {
-> +		IDREG(vcpu->kvm, reg_to_encoding(rd)) = sval;
-> +	}
-> +out:
-> +	mutex_unlock(&arch->config_lock);
-> +	return ret;
->  }
->  
->  static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> @@ -1479,7 +1487,12 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
->  static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
->  		      u64 *val)
->  {
-> +	struct kvm_arch *arch = &vcpu->kvm->arch;
-> +
-> +	mutex_lock(&arch->config_lock);
->  	*val = read_id_reg(vcpu, rd);
-> +	mutex_unlock(&arch->config_lock);
-> +
->  	return 0;
->  }
->  
-> @@ -3364,6 +3377,7 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
->  {
->  	const struct sys_reg_desc *idreg;
->  	struct sys_reg_params params;
-> +	u64 val;
->  	u32 id;
->  
->  	/* Find the first idreg (SYS_ID_PFR0_EL1) in sys_reg_descs. */
-> @@ -3386,6 +3400,27 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
->  		idreg++;
->  		id = reg_to_encoding(idreg);
->  	}
-> +
-> +	/*
-> +	 * The default is to expose CSV2 == 1 if the HW isn't affected.
-> +	 * Although this is a per-CPU feature, we make it global because
-> +	 * asymmetric systems are just a nuisance.
-> +	 *
-> +	 * Userspace can override this as long as it doesn't promise
-> +	 * the impossible.
-> +	 */
-> +	val = IDREG(kvm, SYS_ID_AA64PFR0_EL1);
-> +
-> +	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED) {
-> +		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
-> +		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), 1);
-> +	}
-> +	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED) {
-> +		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
-> +		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), 1);
-> +	}
-> +
-> +	IDREG(kvm, SYS_ID_AA64PFR0_EL1) = val;
->  }
->  
->  int __init kvm_sys_reg_table_init(void)
-> -- 
-> 2.40.1.606.ga4b1b128d6-goog
+> No, the fact that it _can_ be modified by a writable module param is enough to
+> make this patch buggy.
 > 
+> I do like snapshotting and then updating the value, even though there's likely no
+> meaningful performance benefit, as that would provide a place to document that
+> the "supported" value is dynamic.  Though the fact that it's dynamic is arguably a bug
+> in its own right, e.g. if userspace isn't careful, a VM can have vCPUs with different
+> values for ARCH_CAPABILITIES.  But fixing that is probably a fool's errand.  So
+> I vote to snapshot the value and toggle the ARCH_CAP_SKIP_VMENTRY_L1DFLUSH bit
+> when l1tf_vmx_mitigation is modified.
+> 
+> On a somewhat related topic, what in the absolute #$#$ is going on with FB_CLEAR_DIS!?!?
+> I made the mistake of digging into why KVM doesn't advertise ARCH_CAP_FB_CLEAR_CTRL...
+> 
+>   1. I see *nothing* in commit 027bbb884be0 ("KVM: x86/speculation: Disable Fill
+>      buffer clear within guests") that justifies 1x RDMSR and 2x WRMSR on every
+>      entry+exit.
+
+Unnecessary VERWs in guest will have much higher impact than due to MSR
+read/write at vmentry/exit. On an Icelake system it is pointless for a
+guest to incur VERW penalty when the system is not affected by MDS/TAA and
+guests don't need mitigation for MMIO Stale Data. MSR writes are only
+done when the guest is likely to execute unnecessary VERWs(e.g. when the
+guest thinks its running on an older gen CPU).
+
+>   2. I'm pretty sure conditioning mmio_stale_data_clear on kvm_arch_has_assigned_device()
+>      is a bug.  AIUI, the vulnerability applies to _any_ MMIO accesses.
+
+Vulnerability applies to MMIO access to devices that don't respect "byte
+enable" (which indicates valid bytes in a transaction), and don't error
+on incorrect read or write size.
+
+>      Assigning a device is necessary to let the device DMA into the
+>      guest, but it's not necessary to let the guest access MMIO
+>      addresses, that's done purely via memslots.
+
+I will get back on this. The guest would typically need access to an
+area that doesn't fail an incorrectly sized MMIO.
+
+>   3. Irrespective of whether or not there is a performance benefit, toggling the
+>      MSR on every entry+exit is completely unnecessary if KVM won't do VERW before
+>      VM-Enter, i.e. if (!mds_user_clear && !mmio_stale_data_clear), then the
+>      toggling can be done in vmx_prepare_switch_to_{guest,host}().  This probably
+>      isn't worth pursuing though, as #4 below is more likely, especially since
+>      X86_BUG_MSBDS_ONLY is limited to Atom (and MIC, lol) CPUs.
+>
+>   4. If the host will will _never_ do VERW, i.e. #3 + !X86_BUG_MSBDS_ONLY, then
+
+Is it likely that KVM will not do VERW when affected by MMIO Stale Data?
+If you mean on a hardware that is not vulnerable to MDS and MMIO Stale
+Data, in that case MSR writes are unnecessary and will be skipped
+because FB_CLEAR_DIS is not available on unaffected hardware.
+
+>      KVM just needs to context switch the MSR between guests since the value that's
+>      loaded while running in the host is irrelevant.  E.g. use a percpu cache to
+
+I will be happy to avoid the MSR read/write, but its worth considering
+that this MSR can receive more bits that host may want to toggle, then
+percpu cache implementation would likely change.
+
+>      track the current value.
+> 
+>   5. MSR_IA32_MCU_OPT_CTRL is not modified by the host after a CPU is brought up,
+>      i.e. the host's desired value is effectively static post-boot, and barring
+>      a buggy configuration (running KVM as a guest), the boot CPU's value will be
+>      the same as every other CPU.
+
+Would the MSR value be same on every CPU, if only some guests have
+enumerated FB_CLEAR and others haven't? MSR writes (to disable FB_CLEAR)
+are not done when a guest enumerates FB_CLEAR. Enumeration of FB_CLEAR
+in guest will depend on its configuration.
+
+>   6. Performance aside, KVM should not be speculating (ha!) on what the guest
+>      will and will not do, and should instead honor whatever behavior is presented
+>      to the guest.  If the guest CPU model indicates that VERW flushes buffers,
+>      then KVM damn well needs to let VERW flush buffers.
+
+The current implementation allows guests to have VERW flush buffers when
+they enumerate FB_CLEAR. It only restricts the flush behavior when the
+guest is trying to mitigate against a vulnerability(like MDS) on a
+hardware that is not affected. I guess its common for guests to be
+running with older gen configuration on a newer hardware.
+
+>   7. Why on earth did Intel provide a knob that affects both the host and guest,
+>      since AFAICT the intent of the MSR is purely to suppress FB clearing for an
+>      unsuspecting (or misconfigured?) guest!?!?!
+
+Thats true.
