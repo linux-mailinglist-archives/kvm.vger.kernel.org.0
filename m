@@ -2,236 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E1B8B70BCB5
-	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 13:58:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE5F970BCE5
+	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 14:05:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233625AbjEVL6t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 07:58:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36640 "EHLO
+        id S233717AbjEVMFZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 08:05:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233602AbjEVL6n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 07:58:43 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA6401B4;
-        Mon, 22 May 2023 04:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684756705; x=1716292705;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=FoJTA2x8O689fca/M93WyP56FZmqpQ0OhJBWveNQU+4=;
-  b=OV1pFRPtk7J4RHkk6yrTKw+apQ859NMuZB8dQrkQ87jbuWR1KkfnVM+s
-   ziCCiBIt+qQgW0oE/h8L9MHaMtmzUqx/kMMCYzv8ObkVOzReO7Ea24Zjf
-   3bUNmrbgMMk8tIoURnRBB4P05h0/gD7Jf7UPwNF1KQ2D0MjU4ITBMxAUf
-   4hPegUDsv1dHdUMD53VcPRyJc2xKNPYgvQtgoxMuVnY/3Gv5X1OWCrEC3
-   Y+1Tt4OPNBApLipVIna5rebWlLislq/S7rvcqKRMUZzTHsi699lpn6kjG
-   uiqpn3V23XWigga/3ChGSESI+DKO++2R+j7m6FgHf48e7yb/ai+UNGAD9
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10717"; a="356128244"
-X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
-   d="scan'208";a="356128244"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2023 04:58:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10717"; a="815660290"
-X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
-   d="scan'208";a="815660290"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga002.fm.intel.com with ESMTP; 22 May 2023 04:58:03 -0700
-From:   Yi Liu <yi.l.liu@intel.com>
-To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
-Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
-        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
-        yi.l.liu@intel.com, yi.y.sun@linux.intel.com, peterx@redhat.com,
-        jasowang@redhat.com, shameerali.kolothum.thodi@huawei.com,
-        lulu@redhat.com, suravee.suthikulpanit@amd.com,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
-        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
-        clegoate@redhat.com
-Subject: [PATCH v6 10/10] vfio/pci: Allow passing zero-length fd array in VFIO_DEVICE_PCI_HOT_RESET
-Date:   Mon, 22 May 2023 04:57:51 -0700
-Message-Id: <20230522115751.326947-11-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230522115751.326947-1-yi.l.liu@intel.com>
-References: <20230522115751.326947-1-yi.l.liu@intel.com>
+        with ESMTP id S233816AbjEVMFN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 08:05:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C79099
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 05:04:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684757073;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zqyo5rJ8j59rDGA94pvvhHY82P2NKop29y8JPKXIx9A=;
+        b=TvpbmVS4Mct2+DAKHryrA0yuoP3s717bYPlPH220zIrNo9iO9hCY/TuByBvEHZ+6dX1od1
+        sIOMe9LHzhyfJ9SZbwViEw7LEJazIfSDiI34yRK9WkSJkSqKbhEmh6mWPyedQAZxzwOONN
+        Kvj66H9/bw1+ghBka7XnpVsHWtDWiuw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-296-5Qq3rbTSNVqd0y0Tzgym1w-1; Mon, 22 May 2023 08:04:30 -0400
+X-MC-Unique: 5Qq3rbTSNVqd0y0Tzgym1w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0ADF28007D9;
+        Mon, 22 May 2023 12:04:30 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.141])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BB3C2C58DC1;
+        Mon, 22 May 2023 12:04:29 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Eric Auger <eauger@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Andrea Bolognani <abologna@redhat.com>
+Subject: Re: [PATCH v7 0/1] arm: enable MTE for QEMU + kvm
+In-Reply-To: <20230428095533.21747-1-cohuck@redhat.com>
+Organization: Red Hat GmbH
+References: <20230428095533.21747-1-cohuck@redhat.com>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date:   Mon, 22 May 2023 14:04:28 +0200
+Message-ID: <87v8gkzi5v.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is the way user to invoke hot-reset for the devices opened by cdev
-interface. User should check the flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED
-in the output of VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl before doing
-hot-reset for cdev devices.
+On Fri, Apr 28 2023, Cornelia Huck <cohuck@redhat.com> wrote:
 
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/vfio/pci/vfio_pci_core.c | 56 +++++++++++++++++++++++++-------
- include/uapi/linux/vfio.h        | 14 ++++++++
- 2 files changed, 59 insertions(+), 11 deletions(-)
+> Another open problem is mte vs mte3: tcg emulates mte3, kvm gives the guest
+> whatever the host supports. Without migration support, this is not too much
+> of a problem yet, but for compatibility handling, we'll need a way to keep
+> QEMU from handing out mte3 for guests that might be migrated to a mte3-less
+> host. We could tack this unto the mte property (specifying the version or
+> max supported), or we could handle this via cpu properties if we go with
+> handling compatibility via cpu models (sorting this out for kvm is probably
+> going to be interesting in general.) In any case, I think we'll need a way
+> to inform kvm of it.
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 890065f846e4..67f1cb426505 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -181,7 +181,8 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
- struct vfio_pci_group_info;
- static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
- static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
--				      struct vfio_pci_group_info *groups);
-+				      struct vfio_pci_group_info *groups,
-+				      struct iommufd_ctx *iommufd_ctx);
- 
- /*
-  * INTx masking requires the ability to disable INTx signaling via PCI_COMMAND
-@@ -1301,8 +1302,7 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
- 	if (ret)
- 		return ret;
- 
--	/* Somewhere between 1 and count is OK */
--	if (!array_count || array_count > count)
-+	if (array_count > count || vfio_device_cdev_opened(&vdev->vdev))
- 		return -EINVAL;
- 
- 	group_fds = kcalloc(array_count, sizeof(*group_fds), GFP_KERNEL);
-@@ -1351,7 +1351,7 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
- 	info.count = array_count;
- 	info.files = files;
- 
--	ret = vfio_pci_dev_set_hot_reset(vdev->vdev.dev_set, &info);
-+	ret = vfio_pci_dev_set_hot_reset(vdev->vdev.dev_set, &info, NULL);
- 
- hot_reset_release:
- 	for (file_idx--; file_idx >= 0; file_idx--)
-@@ -1380,7 +1380,11 @@ static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
- 	else if (pci_probe_reset_bus(vdev->pdev->bus))
- 		return -ENODEV;
- 
--	return vfio_pci_ioctl_pci_hot_reset_groups(vdev, hdr.count, slot, arg);
-+	if (hdr.count)
-+		return vfio_pci_ioctl_pci_hot_reset_groups(vdev, hdr.count, slot, arg);
-+
-+	return vfio_pci_dev_set_hot_reset(vdev->vdev.dev_set, NULL,
-+					  vfio_iommufd_device_ictx(&vdev->vdev));
- }
- 
- static int vfio_pci_ioctl_ioeventfd(struct vfio_pci_core_device *vdev,
-@@ -2347,13 +2351,16 @@ const struct pci_error_handlers vfio_pci_core_err_handlers = {
- };
- EXPORT_SYMBOL_GPL(vfio_pci_core_err_handlers);
- 
--static bool vfio_dev_in_groups(struct vfio_pci_core_device *vdev,
-+static bool vfio_dev_in_groups(struct vfio_device *vdev,
- 			       struct vfio_pci_group_info *groups)
- {
- 	unsigned int i;
- 
-+	if (!groups)
-+		return false;
-+
- 	for (i = 0; i < groups->count; i++)
--		if (vfio_file_has_dev(groups->files[i], &vdev->vdev))
-+		if (vfio_file_has_dev(groups->files[i], vdev))
- 			return true;
- 	return false;
- }
-@@ -2429,7 +2436,8 @@ static int vfio_pci_dev_set_pm_runtime_get(struct vfio_device_set *dev_set)
-  * get each memory_lock.
-  */
- static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
--				      struct vfio_pci_group_info *groups)
-+				      struct vfio_pci_group_info *groups,
-+				      struct iommufd_ctx *iommufd_ctx)
- {
- 	struct vfio_pci_core_device *cur_mem;
- 	struct vfio_pci_core_device *cur_vma;
-@@ -2459,11 +2467,37 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
- 		goto err_unlock;
- 
- 	list_for_each_entry(cur_vma, &dev_set->device_list, vdev.dev_set_list) {
-+		bool owned;
-+
- 		/*
--		 * Test whether all the affected devices are contained by the
--		 * set of groups provided by the user.
-+		 * Test whether all the affected devices can be reset by the
-+		 * user.
-+		 *
-+		 * If the user provides a set of groups, all the devices
-+		 * in the dev_set should be contained by the set of groups
-+		 * provided by the user.
-+		 *
-+		 * If the user provides a zero-length group fd array, then
-+		 * all the devices in the dev_set must be bound to the same
-+		 * iommufd_ctx as the input iommufd_ctx.  If there is any
-+		 * device that has not been bound to iommufd_ctx yet, check
-+		 * if its iommu_group has any device bound to the input
-+		 * iommufd_ctx Such devices can be considered owned by
-+		 * the input iommufd_ctx as the device cannot be owned
-+		 * by another iommufd_ctx when its iommu_group is owned.
-+		 *
-+		 * Otherwise, reset is not allowed.
- 		 */
--		if (!vfio_dev_in_groups(cur_vma, groups)) {
-+		if (iommufd_ctx) {
-+			int devid = vfio_iommufd_device_hot_reset_devid(&cur_vma->vdev,
-+									iommufd_ctx);
-+
-+			owned = (devid != VFIO_PCI_DEVID_NOT_OWNED);
-+		} else {
-+			owned = vfio_dev_in_groups(&cur_vma->vdev, groups);
-+		}
-+
-+		if (!owned) {
- 			ret = -EINVAL;
- 			goto err_undo;
- 		}
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 01203215251a..24858b650562 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -686,6 +686,9 @@ enum {
-  *	  Flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED would be set when all the
-  *	  affected devices are owned by the user.  This flag is available only
-  *	  when VFIO_PCI_HOT_RESET_FLAG_DEV_ID is set, otherwise reserved.
-+ *	  When set, user could invoke VFIO_DEVICE_PCI_HOT_RESET with a zero
-+ *	  length fd array on the calling device as the ownership is validated
-+ *	  by iommufd_ctx.
-  *
-  * Return: 0 on success, -errno on failure:
-  *	-enospc = insufficient buffer, -enodev = unsupported for device.
-@@ -717,6 +720,17 @@ struct vfio_pci_hot_reset_info {
-  * VFIO_DEVICE_PCI_HOT_RESET - _IOW(VFIO_TYPE, VFIO_BASE + 13,
-  *				    struct vfio_pci_hot_reset)
-  *
-+ * Userspace requests hot reset for the devices it operates.  Due to the
-+ * underlying topology, multiple devices can be affected in the reset
-+ * while some might be opened by another user.  To avoid interference
-+ * the calling user must ensure all affected devices are owned by itself.
-+ *
-+ * As the ownership described by VFIO_DEVICE_GET_PCI_HOT_RESET_INFO, the
-+ * cdev opened devices must exclusively provide a zero-length fd array and
-+ * the group opened devices must exclusively use an array of group fds for
-+ * proof of ownership.  Mixed access to devices between cdev and legacy
-+ * groups are not supported by this interface.
-+ *
-  * Return: 0 on success, -errno on failure.
-  */
- struct vfio_pci_hot_reset {
--- 
-2.34.1
+Before I start to figure out the initialization breakage, I think it
+might be worth pointing to this open issue again. As Andrea mentioned in
+https://listman.redhat.com/archives/libvir-list/2023-May/239926.html,
+libvirt wants to provide a stable guest ABI, not only in the context of
+migration compatibility (which we can handwave away via the migration
+blocker.)
+
+The part I'm mostly missing right now is how to tell KVM to not present
+mte3 to a guest while running on a mte3 capable host (i.e. the KVM
+interface for that; it's more a case of "we don't have it right now",
+though.) I'd expect it to be on the cpu level, rather than on the vm
+level, but it's not there yet; we also probably want something that's
+not fighting whatever tcg (or other accels) end up doing.
+
+I see several options here:
+- Continue to ignore mte3 and its implications for now. The big risk is
+  that someone might end up implementing support for MTE in libvirt again,
+  with the same stable guest ABI issues as for this version.
+- Add a "version" qualifier to the mte machine prop (probably with
+  semantics similar to the gic stuff), with the default working with tcg
+  as it does right now (i.e. defaulting to mte3). KVM would only support
+  "no mte" or "same as host" (with no stable guest ABI guarantees) for
+  now. I'm not sure how hairy this might get if we end up with a per-cpu
+  configuration of mte (and other features) with kvm.
+- Add cpu properties for mte and mte3. I think we've been there before
+  :) It would likely match any KVM infrastructure well, but we gain
+  interactions with the machine property. Also, there's a lot in the
+  whole CPU model area that need proper figuring out first... if we go
+  that route, we won't be able to add MTE support with KVM anytime soon,
+  I fear.
+
+The second option might be the most promising, except for potential
+future headaches; but a lot depends on where we want to be going with
+cpu models for KVM in general.
 
