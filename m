@@ -2,67 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADD9F70CE54
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 00:51:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AFAC70CE56
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 00:52:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234655AbjEVWva (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 18:51:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50226 "EHLO
+        id S232351AbjEVWwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 18:52:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234923AbjEVWvO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 18:51:14 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8273310E9
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 15:50:51 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-517c06c1a1bso3569280a12.3
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 15:50:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684795851; x=1687387851;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bc5jJ+m1tcxtw8j616gCjMtw6tcRDR1frZV9vlfkfio=;
-        b=zWTqbmrQVIwk4Hve+ZzgfU5EKSEgtGvUP65d9xqBIvTMso2XJ7FsHytFLhw0uKduv4
-         HY5EujbVEii/zaSAuEe2chCkZCL2vTuFED9rB75iha0g65+ygf0Q7NdPTOYBnC7heuvn
-         9LaEaNeugxMMVVDJiJZxlVoSVncfgwThodi3SUyWKKxg7AeACCiHjv3hkI4kzgMhhVvA
-         YPJBJaNKnt0Oww1V5VPrZ0NMhm7WkMSKv+2Y5CzNK3Vj6nfM9B+k77leL8LkzIatLjX8
-         AhyOmKNceg4VzbkJ5taqKetpTE6HYu6GcpmEnNMPgMx4nIM5TeAB5nLHjxfg69ZtmvFT
-         MnaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684795851; x=1687387851;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bc5jJ+m1tcxtw8j616gCjMtw6tcRDR1frZV9vlfkfio=;
-        b=PJgazzo57M8W/Lz6MsN8hSQ6P01eju5Rsd0JsSBlOwoejKGIxYRGBXVQ/hZWs1PmLD
-         JTPAdyhmzJo/5r8TCGszmbNNoIiM/Ka1bbdG/TJ6dErqdBMWlnEvf3fWrStuH0sMXbNp
-         zqjRUf1mmK60qpwazxHNUzgXFGqCydRfwOI9+/mBZcdmuFaz3aDxhHKfQEIkdGKkQkuu
-         BIMAurGjpP1b/ZM5oXkEI7kmrWpDM22MXZRa/usaHvHZNwK4mJp0niGGpB4lO7Z002z1
-         MYT4veTA9jSmVKroeRdXFXCbSSSzJzfZRkbYrb5+AatDMqkAdg1mAwR4qe8bYY431dpt
-         SXTQ==
-X-Gm-Message-State: AC+VfDxlHpN3vEcMnfDg/E0lakvYJ9+neH+wwdGoTuljYO3XBEDE8h44
-        mlOBhvWo8c2OssDUuDaPiXmzT92x2Lc=
-X-Google-Smtp-Source: ACHHUZ7Dj8WBk9maf5oJXV41B1Q4+sdaH6HOuUiCpdSlIJ06j9QXT8RVfxkvsvQ81illJ20TYT6T2JMbO1c=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:5310:0:b0:530:866e:c3c0 with SMTP id
- h16-20020a635310000000b00530866ec3c0mr2799819pgb.10.1684795850767; Mon, 22
- May 2023 15:50:50 -0700 (PDT)
-Date:   Mon, 22 May 2023 15:50:49 -0700
-In-Reply-To: <20230411125718.2297768-4-aik@amd.com>
-Mime-Version: 1.0
-References: <20230411125718.2297768-1-aik@amd.com> <20230411125718.2297768-4-aik@amd.com>
-Message-ID: <ZGvxyTyzOBod6+ki@google.com>
-Subject: Re: [PATCH kernel v5 3/6] KVM: SEV-ES: explicitly disable debug
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Pankaj Gupta <pankaj.gupta@amd.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        Santosh Shukla <santosh.shukla@amd.com>,
-        Carlos Bilbao <carlos.bilbao@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        with ESMTP id S230232AbjEVWwW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 18:52:22 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21D0A9D;
+        Mon, 22 May 2023 15:52:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684795942; x=1716331942;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=wQgW8eAq5Xn6Q9LE2ANQ057bUQ+jHEMzIrwjFA6rY+Q=;
+  b=hNsUFUfWdWyNfdOr70prugA0l0aKsDbCuUziZiNvjtyd7Wpot1rtWOmf
+   Lrg++A3+gFR5Fs46CbkheHReawYeqxPxFMUw2LlwDQy3qRac9r2JK59H7
+   p4p2ezNriQgIuQvfI52p+G92ORFGni0IjNkO9qgQCYfe/2n1UTcwni4Zo
+   vxGz5GwN4Pgm5sTOHky9PmGD0FUZxnPG6Ee1qL0U49CRmNbd+RL9CRVgF
+   TYvTM9Gv2zIjEKxak/+oBm/iXvCo1QQehMygGV5MiGqRF6xELtywSKec8
+   /48d6K+J7ReCMMJHkxHvk3yamkVa/zpGatoyAjRlSEg/T/1zPbflhQXga
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="333428370"
+X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
+   d="scan'208";a="333428370"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2023 15:52:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="706723074"
+X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
+   d="scan'208";a="706723074"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga007.fm.intel.com with ESMTP; 22 May 2023 15:52:21 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Mon, 22 May 2023 15:52:20 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Mon, 22 May 2023 15:52:20 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.109)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Mon, 22 May 2023 15:52:20 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FJ3SlkoqSkDW5HJt0CAU5+w2yZJpqp2eO44iBkEnQ0zD5ZcbutsUVpBGGnV2UKFcfM1aAM8jpRO/5DgtnZYH82ktTYauSim0w942OLLxAbjdUSgMtSG0cbVR025c2hTEybGqaxeSRQuo4fHONZ/iox8YwKetvvaHPSDIDTKPuOegztv/e2th1s9niDaDD53ss3e7cG0IZKlTHmGY87EVe0aQ9ViGp11Dksp8FV5JqHIaKpm/5P6TjHD159hbAV1UgNNCUQAMelipq6JNjpuOqZWdgGEULhN2FAvE90m+EYyUYp2R/6WgQD+52alNjZC+u89Zohizt0IHNCiQzw7SDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oHJQ8Wlkt7wW6mFaWygycViKQ2uhT8JTL1wWzbtFF0Q=;
+ b=oBxouH8E5SuVcLNye0anrMDl/77bC/Cv124d8mVbTS2/nU3RIuYkz/pFlFa2vXYKF9Jp4c7rVbE8P/GsLVgx3q51L9951+5n2Y3ZSxZV6RGZE7Sn21AZKvpEFfHaac6wftM8o/nKV8/5HvEiHepYgf0f10i3Fmy7deyZdQnIpU8DkDJN99f255UbYb0Fx2JJTwVF62dEtIf4HjF+WNE8lcjdIzHCll6amWxRP5gooF2gYV7g+QbudcEHn2vea6/3LobMj5VPSatlf6KsQYX/h4XoSqsob55aN1JiTgup6IwCHWYW+0C/SBX7aJH+k3e9aAB7yChhwh+ev+Wt0huuCQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SJ2PR11MB7573.namprd11.prod.outlook.com (2603:10b6:a03:4d2::10)
+ by SA0PR11MB4735.namprd11.prod.outlook.com (2603:10b6:806:92::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.28; Mon, 22 May
+ 2023 22:52:17 +0000
+Received: from SJ2PR11MB7573.namprd11.prod.outlook.com
+ ([fe80::591f:4873:fd80:9a6d]) by SJ2PR11MB7573.namprd11.prod.outlook.com
+ ([fe80::591f:4873:fd80:9a6d%6]) with mapi id 15.20.6411.028; Mon, 22 May 2023
+ 22:52:17 +0000
+Message-ID: <9d7fc729-209c-97cb-68fd-88ae6240d952@intel.com>
+Date:   Mon, 22 May 2023 15:52:15 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.11.0
+Subject: Re: [PATCH V5 00/11] vfio/pci: Support dynamic allocation of MSI-X
+ interrupts
+Content-Language: en-US
+To:     Thomas Gleixner <tglx@linutronix.de>, <jgg@nvidia.com>,
+        <yishaih@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <kevin.tian@intel.com>, <alex.williamson@redhat.com>
+CC:     <darwi@linutronix.de>, <kvm@vger.kernel.org>,
+        <dave.jiang@intel.com>, <jing2.liu@intel.com>,
+        <ashok.raj@intel.com>, <fenghua.yu@intel.com>,
+        <tom.zanussi@linux.intel.com>, <linux-kernel@vger.kernel.org>
+References: <cover.1683740667.git.reinette.chatre@intel.com>
+ <875y8kvwa1.ffs@tglx>
+From:   Reinette Chatre <reinette.chatre@intel.com>
+In-Reply-To: <875y8kvwa1.ffs@tglx>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR03CA0125.namprd03.prod.outlook.com
+ (2603:10b6:a03:33c::10) To SJ2PR11MB7573.namprd11.prod.outlook.com
+ (2603:10b6:a03:4d2::10)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR11MB7573:EE_|SA0PR11MB4735:EE_
+X-MS-Office365-Filtering-Correlation-Id: ac232470-509d-4c20-d451-08db5b17314a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yCMKY/bCNXC6gMBlGXY+hn2krsAad5cRVReutbU5RPWTboyKEh09aNxa3ZDvKFplKrnP3WfS9o4Tx21uCeIHHeFiqtY0gquqxHMjI73VK7SLYYycxP0ZRq8rrppGAEeLfXNJD2mPLNucLVCn5w1jXlAfli+/nh3ggKWjf1RwycUf6A5pNfVfwVPa0vZhZEtpzb1fdOyf76mPMLcxgE5Ax6S0n33MOf5m1O5/BWm8AXfKXp2vMC7lFnftUFP6iLW1lztDdMj9ubdMqvH9sosAMXw9dD+BCFRBF1gnJcq8wR6wY7bqS9HKBqGCeuoZRZjPA0HrcTwDMR/ecu4q4PLOigFPqpY2wRoSJlJMtuHFmXFFYAxB6vVpF++Cjo6kAxuSdWEw+xp6hAwOFmoj1en5s5G17jfj4HLuHt4VkDwe8ovY7yxgwJnur6KkhbhPkXpSqQkR0UMc0E36qrBlBFQftHms7s94wKlpRZ34bN3Fe34fnPJxC9nHdasK8lN+KLWZXiFL0M+d3+pIafUFZzhtvp7asBddR1T2R0YybVM+81ToGZvDHPxPYbLzkFoZqBuDRvWlhfDQnAZnaO+cjLbEhA/b1ffH4p7k51yrX+0TonWv8YVY9PK9PN6ujXgFOYAYwkcgp37Lsxohkvgmgb0Jzw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB7573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(39860400002)(366004)(346002)(396003)(451199021)(8676002)(8936002)(44832011)(5660300002)(6512007)(186003)(6506007)(31696002)(26005)(2616005)(86362001)(53546011)(82960400001)(38100700002)(558084003)(478600001)(41300700001)(4326008)(66476007)(6486002)(36756003)(66946007)(66556008)(316002)(2906002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OHR6L1dZbTJsK0xmNTZ0YmdaWUhXQVpScHdNUllXS1F2M1ljeDc5UjFYSFNo?=
+ =?utf-8?B?TWhxRkJqQStkU280TFdmOTV6cjRpRzhiVDhWa3paQndGTWorTjVETVdhenpF?=
+ =?utf-8?B?RXVBVTZqTkFtNWoyQnBVNlRyN2M4M3Z5Q2prVnRzV0hhWmtTUm13RnhoSFR2?=
+ =?utf-8?B?VVI2MU96VG9nNHdxY2xsbDkwOVVwRXgvZHQzUEdDZkEvV2szWlFneWEyaUpq?=
+ =?utf-8?B?d09zUXRFakpEakVHeFR0OW9nUS81UFE0WnRueVdDT1JGcEJ6OHM0Z2FJOTBr?=
+ =?utf-8?B?SUtHaHlzVlhhUGVNN0F2ZHRDRHZLTmwvMXZSNUQ0djQrbmtJK0tUOURSeU0z?=
+ =?utf-8?B?eGlpWDJmSkx1YTJzNVNqQnVzNW9zenhrR2NtWlpuZWxxajNaWkFSM1hNR29j?=
+ =?utf-8?B?WDREWUsrK3pzTzMreGliWThLbmlFd0hJMDBDdXMxRll6ZVc1YWhCYXZrUzA4?=
+ =?utf-8?B?VktDd1JIZFNQVUpqb0tFcHJocmhnWVhKczN6TkJQakZ4d0NQNEgwa1NBU3I0?=
+ =?utf-8?B?cHd2MjB6S1VHZ3QvYVhnMlZGMWRUWFVpOVBTdlBhVWg3Tk9Ob1c0V1BmNjdB?=
+ =?utf-8?B?ZUZHV09CcndkaktEZzJyMHhESjUwU0ZXL1dkRnAyR3VkN09EeFhMQzE2N3Ba?=
+ =?utf-8?B?UVJqcnhQTisrOHpTbjZuM0lrMUZIMVM4QXBUdGF1eHlPS0loRWNPbVBmM3FC?=
+ =?utf-8?B?Z3dhbjdVNHVLK3lCdTBZSE51clZRbHZiNGorU1pYRkErWExFaTRjd2JoTzgy?=
+ =?utf-8?B?UzVrRG5Tc2pEWWZNeG5BS0VkZ2RJdHRlUXJoRzRLUW1zYXFFV2FramFKU1Nr?=
+ =?utf-8?B?UVlVbWE1ZElwTzBCdjd2WWFkemw2SFVoZ0VzMlBjK2Irb1Q4dlY0OFBCN3pW?=
+ =?utf-8?B?YVVFbUVtdWRaTkNWSEgzbmJxUnlFblJMUG4vVzNVcy9NajM0NDlyQ2FKQllQ?=
+ =?utf-8?B?ZXZMVDJUK2JjbVNWZlRTcUFrUXh0MU83VklKOWRzOXNiL21VejBsMzZ5WGtU?=
+ =?utf-8?B?b3orcUpwY2toNEREOW81VWZ4NG9sRXBpOTgvN1NtN3ByT3BRcFJ5MG04R09t?=
+ =?utf-8?B?UTJmOXdaYnQzMHRtYStXODZQemFocjZ0S0hnaE05RC9sbWRtRmlGM21QM3BI?=
+ =?utf-8?B?MG0yM05ISDFvOUxJamN0NzhIam5IVGdLWUZyZXNTdW5RNnB6dEpPeVZ5RWFo?=
+ =?utf-8?B?Ym1XNHpMR3Z1cGNOd3UzeHhzUjE3Y1RLY0N3WUZnRkxqbFRUeUlxdnFsQXcz?=
+ =?utf-8?B?L0h0d2RQeXdxRytZTGwvTUdYUFBRY25RNCt3TEJnMjJPZEViYVBvN1pvL1Vj?=
+ =?utf-8?B?eWRQRnhkV0xJK3lHVXY5NTJKajgrRHNGeVRNQUg5R1FnYis1K1pON2N0Wmdn?=
+ =?utf-8?B?eGhIVmZKSENQdHBuMnFneEhSbVZQeU1FdWtlVUdvVmc1d3hPdjMwY2pjWUhq?=
+ =?utf-8?B?R1M4c3Rub3JTa2JlVXQ0VWNvZlRFcHVBTEpibjNPeFJLTW5reWxnWXhrZklG?=
+ =?utf-8?B?bmhGU2dTVTNlMyt4Y0FVdDVxTlo0a2xBbWRHcFN0NEJ4bmlhVTZHa0Fjcitx?=
+ =?utf-8?B?VTFnZnVTaE5uUk4xVCtDbFhQTkxsR0o5bkg0N2xiQmZLUlM5cHBLMy95U2JT?=
+ =?utf-8?B?K0l2bUo5T2JvSUVRalh2RUozbW1lT0JkRUg3bWwyUy9WcDdrN2RCZFBsMjlh?=
+ =?utf-8?B?RUhLeHhJak1ZUXZyWE4rZUJYZ3owdk51QmFSaXNRaG1ZZk5hY1hBa1M1VkVG?=
+ =?utf-8?B?bHdYNURKYStLSzRqZnBKMFgycDA0SDVKOFo1MEVTTEpUSXJGK1NoWXR5c1Rp?=
+ =?utf-8?B?TFRqU0dGdGp5WjlvTDZ5UUp4YnBvMCtWUm9tR2RRSFlXWXFNdEhZdm4vazZ0?=
+ =?utf-8?B?ZzhJK0NkUkhjZUNFdUtRckdlKzNwRWlZRTl1ZHc4SkxpUEZWcFhMUGo1Z0dv?=
+ =?utf-8?B?RXZTM1lDU3lMY0ZISW1vS1JIR3RnRWlJK01RQ2JqaGJwTGxkckpzdW1uaVFM?=
+ =?utf-8?B?TmZoeFJYaGJManM0a0UyanhrMTBRYll6SERhbUY4L1REWnU1Ung5Vms4RHN3?=
+ =?utf-8?B?MEErdWJmWThxMnl0akwxU2U5MnFjVldIeE1EWXZ6WmVmQ3N5WXF2RmVoVmdn?=
+ =?utf-8?B?b00wTHQzaU5xSjdpY0lwMEtTMkpPV0NBa0gvVEh0dlVCU0h5VE5jdFpTSVhm?=
+ =?utf-8?B?S3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ac232470-509d-4c20-d451-08db5b17314a
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB7573.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2023 22:52:17.7255
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ie1bTwflf9Jsdt2NxCLtqVp/ZiNm1cHhC21iufxuXBjqPplWOgVoKvi6dIWq00jS5CI85RSVsnWEp6lzwFjCsoJjj4R5lCj2I7jS1BI/ISw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4735
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,120 +162,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 11, 2023, Alexey Kardashevskiy wrote:
-> SVM/SEV enable debug registers intercepts to skip swapping DRs
-> on entering/exiting the guest. When the guest is in control of
-> debug registers (vcpu->guest_debug == 0), there is an optimisation to
-> reduce the number of context switches: intercepts are cleared and
-> the KVM_DEBUGREG_WONT_EXIT flag is set to tell KVM to do swapping
-> on guest enter/exit.
+
+
+On 5/22/2023 3:25 PM, Thomas Gleixner wrote:
 > 
-> The same code also executes for SEV-ES, however it has no effect as
-> - it always takes (vcpu->guest_debug == 0) branch;
-> - KVM_DEBUGREG_WONT_EXIT is set but DR7 intercept is not cleared;
-> - vcpu_enter_guest() writes DRs but VMRUN for SEV-ES swaps them
-> with the values from _encrypted_ VMSA.
+> Acked-by: Thomas Gleixner <tglx@linutronix.de>
 > 
-> Be explicit about SEV-ES not supporting debug:
-> - return right away from dr_interception() and skip unnecessary processing;
-> - clear vcpu->guest_debug at SEV-ES' LAUNCH_UPDATE_VMSA if debugging
-> was already enabled; after that point the generic x86's
-> KVM_SET_GUEST_DEBUG ioctl disallows enabling debug.
-> 
-> Add WARN_ON to kvm_x86::sync_dirty_debug_regs() (saves guest DRs on
-> guest exit) to signify that SEV-ES won't hit that path.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
-> Changes:
-> v5:
-> * new in the series
-> ---
->  arch/x86/kvm/svm/sev.c |  6 ++++++
->  arch/x86/kvm/svm/svm.c | 10 +++++++++-
->  2 files changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 0f4761a57d86..b4365622222b 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -639,6 +639,12 @@ static int __sev_launch_update_vmsa(struct kvm *kvm, struct kvm_vcpu *vcpu,
->  	  return ret;
->  
->  	vcpu->arch.guest_state_protected = true;
-> +
-> +	if (vcpu->guest_debug)
-> +		pr_warn_ratelimited("guest_debug (%lx) not supported for SEV-ES",
 
-Note, this needs a newline in the printk, otherwise it'll get buffered until
-the next non-cont printk comes along (guess how many times I've been burned by
-this).
+Thank you very much Thomas.
 
-> +				    vcpu->guest_debug);
-> +	vcpu->guest_debug = 0;
-
-Argh, KVM's APIs can be quite frustrating.  IIUC, guest_debug can never actually
-be consumed because, per Tom[*], "A guest can't run before the LAUNCH_UPDATE process
-is complete".  But because the fact that the VM is an SEV-ES is communicated to
-KVM after KVM_CREATE_VM, userspace can do KVM_SET_GUEST_DEBUG before KVM_SEV_ES_INIT
-and before KVM_SEV_LAUNCH_UPDATE_VMSA, and thus get KVM into a state where
-guest_debug is non-zero for an SEV-ES guest.  Blech.
-
-Instead of a ratelimited warn, can KVM get away with simply rejecting
-KVM_SEV_LAUNCH_UPDATE_VMSA if guest_debug is non-zero?  That combo can't work,
-so it's seems unlikely userspace is relying on being able to do KVM_SET_GUEST_DEBUG.
-
-If we do "have" to keep this approach, I'm generally opposed to any kind of printk
-in KVM, but this one does seem to be justified since the most likely scenario is
-that there's a human interactively debugging the guest (or at least, trying to
-debug the guest).  But I would say explicitly call out the ioctl(), "guest_debug"
-probably won't mean anything to a random user.  And I vote to not print the value,
-that implies that the specific value is unsupported, not that debug in general is
-disallowed.
-
-Something like this (if we have to)?
-
-		pr_warn_ratelimited("Suppressing KVM_SET_GUEST_DEBUG for SEV-ES guest\n"
-
-[*] https://lore.kernel.org/all/7edcf2c3-005f-04bd-7ec6-80baee236f40@amd.com
-
-> +
->  	return 0;
->  }
->  
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index dc12de325cca..179952a31d3b 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1980,7 +1980,7 @@ static void svm_sync_dirty_debug_regs(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  
-> -	if (vcpu->arch.guest_state_protected)
-> +	if (WARN_ON_ONCE(sev_es_guest(vcpu->kvm)))
->  		return;
->  
->  	get_debugreg(vcpu->arch.db[0], 0);
-> @@ -2698,6 +2698,14 @@ static int dr_interception(struct kvm_vcpu *vcpu)
->  	unsigned long val;
->  	int err = 0;
->  
-> +	/*
-> +	 * SEV-ES intercepts DR7 only to disable guest debugging
-> +	 * and the guest issues a VMGEXIT for DR7 write only. KVM cannot
-
-Wrapping is a bit aggressive (wrap at 80, not earlier).
-
-> +	 * change DR7 (always swapped as type 'A') so return early.
-> +	 */
-> +	if (sev_es_guest(vcpu->kvm))
-> +		return 1;
-> +
->  	if (vcpu->guest_debug == 0) {
->  		/*
->  		 * No more DR vmexits; force a reload of the debug registers
-> -- 
-> 2.39.1
-> 
+Reinette
