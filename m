@@ -2,170 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36B0A70B3D0
-	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 05:34:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2D0B70B3DA
+	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 05:43:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230050AbjEVDeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 21 May 2023 23:34:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55530 "EHLO
+        id S230162AbjEVDnB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 21 May 2023 23:43:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbjEVDeG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 21 May 2023 23:34:06 -0400
-Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F4C7BA;
-        Sun, 21 May 2023 20:34:04 -0700 (PDT)
-Received: by mail-ed1-x543.google.com with SMTP id 4fb4d7f45d1cf-510db954476so7481693a12.0;
-        Sun, 21 May 2023 20:34:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684726443; x=1687318443;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rLQltY4BWYnDf5Slt54wU1dHTqVUE/fDKiqtVuJkX0U=;
-        b=IW5Q8xFDyOcEMX85AjNd1AxfqAo+mf6/3jnQHdtK37dz/6LVTbS/FkRwbn6IIocu3O
-         F9QiE4d8pyB89xIYEMpQXawpgVS04gUVWyNO4VVeai378r4XRNq6czblu1aYSiTluRQy
-         UvIIa2eRRBDhn6i5OGIfHxlodxdWJiOZs0XTgxeJ1PhOvI/WAxHMya1Z93EG0R4xJhEa
-         Dnxoq32eMgNoGGeDXBvUl2UuleSLzdYzgr7Cq1p1DRwpTITlFBOOdklzJrpoJm0q+KUb
-         4tJbmwOvONeR3WwObg4PhhaBqAho2DnJbzd5hqSnwtUSdg4nGVs3Pl7TmxNV/isgGEoM
-         e8ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684726443; x=1687318443;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rLQltY4BWYnDf5Slt54wU1dHTqVUE/fDKiqtVuJkX0U=;
-        b=VuMvYUh/k0CUSGAVzWPtmmPLbn98WqJVpUKnyGE1QhaXF+B5o32jRgSfTYBovQTGL0
-         YY80Hx/whc4zzex/WPuDeXef4HZ39k6bR309SiB+lMZC53yPnRKbsHsShUb82BZByCZ0
-         tbByFbpjLCckkBC5MxXKrTRNvjDbSHegh4VZk26qZUDw0C48pYZR/LzKyYKicBx3miTB
-         LAkBNtnMN/58C0Dxbl7mrW2jYz3ZM7P+ITGeFJAKwy2BURQm30s+74QxdoKs5v2oG2bX
-         q/X2i59rA2BmgL/7EqyFDERIQox9d20YpyWZU6jzS+09yInk+AJPsk0W7dN5sAxbPHuM
-         Txfw==
-X-Gm-Message-State: AC+VfDxWwAGfFIIWpNCY1aKPvisTXufsAnD7FfaJVTxC9xr7x60gZQH6
-        pYNO3Db4pYzrbhDSyI5wRa7P7NSFLiJlYXqWNf8=
-X-Google-Smtp-Source: ACHHUZ5HtlGCCQVcPFb1g7HouFAf8sCSlMSKbyJ8+ZtJ345DO8Iv3V8Qgu6/DGZY0hF72wAFLcBr7BJ2YkdpenAR2iQ=
-X-Received: by 2002:aa7:ca42:0:b0:50b:d26d:c57e with SMTP id
- j2-20020aa7ca42000000b0050bd26dc57emr7312670edt.12.1684726442775; Sun, 21 May
- 2023 20:34:02 -0700 (PDT)
+        with ESMTP id S229649AbjEVDm6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 21 May 2023 23:42:58 -0400
+Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BF62C4;
+        Sun, 21 May 2023 20:42:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
+        t=1684726974; bh=rP3A3NWlnh0twgVqFQ9Ghly+c940ixOeCKKj1+JbAPg=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=TgTPePy3dbHCvevaw8C53ojSoukuZsTopdglf3UgOEYx8yBZDCWUQFwhf2Eor3Ouz
+         BVM/TQYAjWQ4NjeOXP5WCaWWDftJKJZ7QjKzK1hjMFcD6thpVFkwxnZC7PfCFHmyyQ
+         2884cIXsSC/C2suSJzQryU3Fz+mYxbMqEcH+SFtQ=
+Received: from [100.100.57.122] (unknown [58.34.185.106])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mailbox.box.xen0n.name (Postfix) with ESMTPSA id B3558600DA;
+        Mon, 22 May 2023 11:42:53 +0800 (CST)
+Message-ID: <fb7f0c26-b609-c225-f8db-de32e72cd97b@xen0n.name>
+Date:   Mon, 22 May 2023 11:42:53 +0800
 MIME-Version: 1.0
-References: <20230420104622.12504-1-ljrcore@126.com>
-In-Reply-To: <20230420104622.12504-1-ljrcore@126.com>
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-Date:   Mon, 22 May 2023 11:33:51 +0800
-Message-ID: <CAFg_LQVfECWsmcSXJWnnyJK5mZAbjdCTX-RXP3aoDAECTspqkA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/7] KVM: selftests: Add tests for pmu event filter
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Like Xu <like.xu.linux@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <shuah@kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Jinrong Liang <cloudliang@tencent.com>,
-        linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.11.0
+Subject: Re: [PATCH v11 31/31] LoongArch: KVM: Add maintainers for LoongArch
+ KVM
+Content-Language: en-US
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
+        Xi Ruoyao <xry111@xry111.site>
+References: <20230522031217.956464-1-zhaotianrui@loongson.cn>
+ <20230522031217.956464-32-zhaotianrui@loongson.cn>
+From:   WANG Xuerui <kernel@xen0n.name>
+In-Reply-To: <20230522031217.956464-32-zhaotianrui@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jinrong Liang <ljr.kernel@gmail.com> =E4=BA=8E2023=E5=B9=B44=E6=9C=8820=E6=
-=97=A5=E5=91=A8=E5=9B=9B 18:46=E5=86=99=E9=81=93=EF=BC=9A
->
-> From: Jinrong Liang <cloudliang@tencent.com>
->
-> From: Jinrong Liang <cloudliang@tencent.com>
->
-> Hi,
->
-> This patch set adds some tests to ensure consistent PMU performance event
-> filter behavior. Specifically, the patches aim to improve KVM's PMU event
-> filter by strengthening the test coverage, adding documentation, and maki=
-ng
-> other small changes.
->
-> The first patch replaces int with uint32_t for nevents to ensure consiste=
-ncy
-> and readability in the code. The second patch adds fixed_counter_bitmap t=
-o
-> create_pmu_event_filter() to support the use of the same creator to contr=
-ol
-> the use of guest fixed counters. The third patch adds test cases for
-> unsupported input values in PMU filter, including unsupported "action"
-> values, unsupported "flags" values, and unsupported "nevents" values. Als=
-o,
-> it tests setting non-existent fixed counters in the fixed bitmap doesn't
-> fail.
->
-> The fourth patch updates the documentation for KVM_SET_PMU_EVENT_FILTER i=
-octl
-> to include a detailed description of how fixed performance events are han=
-dled
-> in the pmu filter. The fifth patch adds tests to cover that pmu_event_fil=
-ter
-> works as expected when applied to fixed performance counters, even if the=
-re
-> is no fixed counter exists. The sixth patch adds a test to ensure that se=
-tting
-> both generic and fixed performance event filters does not affect the cons=
-istency
-> of the fixed performance filter behavior in KVM. The seventh patch adds a=
- test
-> to verify the behavior of the pmu event filter when an incomplete
-> kvm_pmu_event_filter structure is used.
->
-> These changes help to ensure that KVM's PMU event filter functions as exp=
-ected
-> in all supported use cases. These patches have been tested and verified t=
-o
-> function properly.
->
-> Thanks for your review and feedback.
->
-> Sincerely,
-> Jinrong Liang
->
-> Previous:
-> https://lore.kernel.org/kvm/20230414110056.19665-1-cloudliang@tencent.com
->
-> v2:
-> - Wrap the code from the documentation in a block of code; (Bagas Sanjaya=
-)
->
-> Jinrong Liang (7):
->   KVM: selftests: Replace int with uint32_t for nevents
->   KVM: selftests: Apply create_pmu_event_filter() to fixed ctrs
->   KVM: selftests: Test unavailable event filters are rejected
->   KVM: x86/pmu: Add documentation for fixed ctr on PMU filter
->   KVM: selftests: Check if pmu_event_filter meets expectations on fixed
->     ctrs
->   KVM: selftests: Check gp event filters without affecting fixed event
->     filters
->   KVM: selftests: Test pmu event filter with incompatible
->     kvm_pmu_event_filter
->
->  Documentation/virt/kvm/api.rst                |  21 ++
->  .../kvm/x86_64/pmu_event_filter_test.c        | 239 ++++++++++++++++--
->  2 files changed, 243 insertions(+), 17 deletions(-)
->
->
-> base-commit: a25497a280bbd7bbcc08c87ddb2b3909affc8402
-> --
-> 2.31.1
->
+On 2023/5/22 11:12, Tianrui Zhao wrote:
+> Add maintainers for LoongArch KVM.
+> 
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> ---
+>   MAINTAINERS | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 27ef11624748..0b6fe590f275 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -11357,6 +11357,18 @@ F:	include/kvm/arm_*
+>   F:	tools/testing/selftests/kvm/*/aarch64/
+>   F:	tools/testing/selftests/kvm/aarch64/
+>   
+> +KERNEL VIRTUAL MACHINE FOR LOONGARCH (KVM/LoongArch)
+> +M:	Tianrui Zhao <zhaotianrui@loongson.com>
+> +M:	Bibo Mao <maobibo@loongson.com>
 
-Polite ping.
+Your company email addresses end with loongson.cn, aren't they? ;-)
 
-Should I post version 3 to fix the problem of two "From: Jinrong Liang
-<cloudliang@tencent.com>"?
+> +M:	Huacai Chen <chenhuacai@kernel.org>
+> +L:	kvm@vger.kernel.org
+> +L:	loongarch@lists.linux.dev
+> +S:	Maintained
+> +T:	git https://github.com/loongson/linux-loongarch-kvm
+> +F:	arch/loongarch/include/asm/kvm*
+> +F:	arch/loongarch/include/uapi/asm/kvm*
+> +F:	arch/loongarch/kvm/
+> +
+>   KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)
+>   M:	Huacai Chen <chenhuacai@kernel.org>
+>   M:	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 
-Thanks
+-- 
+WANG "xen0n" Xuerui
+
+Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
+
