@@ -2,183 +2,261 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FA1070BF75
-	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 15:15:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FBA470C026
+	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 15:52:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233871AbjEVNPy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 09:15:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42034 "EHLO
+        id S233992AbjEVNwM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 09:52:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231517AbjEVNPx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 09:15:53 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0F9092;
-        Mon, 22 May 2023 06:15:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684761352; x=1716297352;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=m2XSaEQGG4Oc098jL8Imnfx/JeSiBiOieU8osURlbiU=;
-  b=IopX4rCJx4zPtc966AniYbSwyyPOYhp8F2Ry8nRTB72XD55MJ676J0rf
-   O91GmXFI6hg7GdTP92rQmoW1OCREu/nz00UVhFDSgZyOhhn0jaRCkpgrP
-   aMbzOlOA+uyka3E6e7xRfVq/rEeRZTcsoH091Zu2+CVZf7PyZ5JdUoXM3
-   T3AMV+Rt1LvLT5l+fmU6M4nBnrvYmPGxOfNmkZAseEN1zPj+jAxvYOxyz
-   w2C1F0+Ye8Kd9LQJZe5+lWt8mOvDUfvxhuxcZ88i3X0seZ8O7qQ1NWq9A
-   lE1uCBZp8uktDs87d5HiSzd1rVmI5zPTCbsjkYsvAfJJ/Ivs1deCpD20Z
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10717"; a="333282930"
-X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
-   d="scan'208";a="333282930"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2023 06:15:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10717"; a="680941707"
-X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
-   d="scan'208";a="680941707"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga006.jf.intel.com with ESMTP; 22 May 2023 06:15:52 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Mon, 22 May 2023 06:15:51 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Mon, 22 May 2023 06:15:51 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Mon, 22 May 2023 06:15:51 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.105)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Mon, 22 May 2023 06:15:51 -0700
+        with ESMTP id S233863AbjEVNwE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 09:52:04 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2056.outbound.protection.outlook.com [40.107.93.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A9FB1B0;
+        Mon, 22 May 2023 06:51:37 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eZlHktu0w42H+0Ft+DBIks20HOsPGkmegximbY/ajdBFhAtX3jyFCTLRWYVOIyauRXjjNW5XRSJcEWQdsgvwcrLoMDTfAnzBp2J5YqsuwkNvhYCSwHce6U3PS2WQ5QMBiHRi3gUx7MA0TwYrXXP2Wg2RxiOJkgsBTsUF9c75As3xmLqBUNjpR7BEmhkf1KIa86dZ5o4o68uDlwZcoaSZxXDq4EkZH6P0hpIVZGLQnuERZcgun3LXsCYfgXKqbaq82FAsdDC3Db3FvGki1SsfnG4q3uCSsgeDwRyPJt+v3Ijc971KCX/PK7ux4ZYNgjbFbWHG6k8TD0GjXZUmVm6fZg==
+ b=iAfDda/9fSZJvo+9gctfLMdyIqYuhMzp6CUTYNAbQX6f6mGp8mNmU3xrDvIIjcjfyKuxmnG9o67HS/xXla7DQm59RjtzdQXiPlC9xmcr5QZMFDDv6dYdjaPxOPthqzRWgUTO8/in8Oe564JPvFo4oPl+Ds+GF/kJMOFfmnJrR8qtTo/QIg/BKT/ax9GPFt8zCeQbqIObzIBtzaE+nPbTm+lu/+ukcA5VXBplIjHJB0BjoOX6g7EhO7ps1QUl0fqYnh7r5Tw8r3f9KDvxqGGil3a93MJ7qiXCUqMSW4kowpYA86N7DgyITW8mcbODix/lhSyS+ifH/6wyQbtOrK1vqg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m2XSaEQGG4Oc098jL8Imnfx/JeSiBiOieU8osURlbiU=;
- b=TBsKmX8giwf0Zrb6dcXwk32yfdBfeKxfpS//AKcZhwGniP6iSzSV19Pa966ExmpFC9ZixrEAP9OjGffJHGjVU4piVG7yYEYquRL47M+HVb3E+5dOfN8vff9wiNroL48pdxoOERGevXGG6EEmvWkbK1vlxiC9/7clvFk+anuYs/iWJZRWBVBG6wKitXpvojdufOBUSsR+FlrzPxqlXPP1ar6uk+Q/+BW4NfBWLbKOeqlHbPVAZhoujHdSp0GQquR/uy7n3lBa17/mtiQhK5Hs1UoarBw0WPA7zUk0NN/w1ndF1R6yP4b8juHdumOqP5Xy/jn1LmgUmtxDrQwnpzSYxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by DS0PR11MB6424.namprd11.prod.outlook.com (2603:10b6:8:c4::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6411.27; Mon, 22 May 2023 13:15:47 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::3a8a:7ef7:fbaa:19e2]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::3a8a:7ef7:fbaa:19e2%5]) with mapi id 15.20.6411.028; Mon, 22 May 2023
- 13:15:47 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>
-Subject: Re: [PATCH v3 10/18] x86/virt: KVM: Move VMXOFF helpers into KVM VMX
-Thread-Topic: [PATCH v3 10/18] x86/virt: KVM: Move VMXOFF helpers into KVM VMX
-Thread-Index: AQHZhSyZW6joyL11ZkKnLJ9zpN/uPa9mVK4A
-Date:   Mon, 22 May 2023 13:15:47 +0000
-Message-ID: <79073b9c22cf60ac87896f0bbcdfd905196e1b4a.camel@intel.com>
-References: <20230512235026.808058-1-seanjc@google.com>
-         <20230512235026.808058-11-seanjc@google.com>
-In-Reply-To: <20230512235026.808058-11-seanjc@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.48.1 (3.48.1-1.fc38) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|DS0PR11MB6424:EE_
-x-ms-office365-filtering-correlation-id: 97eb850b-d696-4369-53cc-08db5ac6a810
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: JOwh3z4DaX3beFQeNC91Cwr01Y+cTSXO9MbHNNa6tb1wdx2Hpl0lIl1OoFinz5LyHZUfWbV6zKbJlNiyQ8x2ULitUPcJH0Hq//BxgqSnfKt0X6S9ZURvunqv7IAem1F4JBmpbPE6K9fzRx5UawHFaus4IWlfpoYDq+a4ZYBiDqkI6p7s/c8HllkhyYWoyslRTCGQjt48r/NEpFXJ0q83cBlnxdqdI0QCkkiceIk9GG2I9RRkw0K4UrG10UxWyvMTKh5VXpkiUJZo7SmmARa39RfubGBEfhIRjsQtr2PCFGikJLqUChkJP3Nbub3h879Azrp4dhJbS1m2qb+SCTr4XPOADFprin5Mvcxt3bKbQS5mibWLVbO4EUKwFZQQ+FrtzDJ66wkijNSntMZYMFl6nUdpHkpVuBIk0LqJxo6e1XzPshdeqAT+p9DXdVV6ITB1ZFRAM/1XKvvLxP2GEl8vuON1DQbz97iNkFT519dSukTPsDDfPcLE5Ya7DiDhznISRc9dpM6f+oZxKWVqNyd5jbCxZbZ7/mVZEXrDDJ0S1hkO00tRAD+bAvoc0Yp9YRMI4NadpMw5KR13un+y887J7IciCXscqiuwEDzR43q1se/CrD43kVuahlbEQjI+UB6R
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(376002)(136003)(39850400004)(346002)(396003)(451199021)(110136005)(54906003)(82960400001)(38100700002)(478600001)(4326008)(66476007)(66446008)(66556008)(64756008)(91956017)(76116006)(66946007)(38070700005)(83380400001)(122000001)(2616005)(71200400001)(2906002)(4744005)(316002)(186003)(86362001)(26005)(6512007)(6506007)(41300700001)(6486002)(5660300002)(8676002)(8936002)(36756003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?T0Z5Wit4T0VoK3dSSWtqUmVvWjFzcGVKYjEvL1pHRzg1UFhmVjBnTlBNclNH?=
- =?utf-8?B?Y0NhKzVNd0hBaWVpSGUycTJCY3RydHBzK25QdGJmRVpKOEVMQ3ExSitFTm5F?=
- =?utf-8?B?cnJyUlhrbEh1ZDU3WWM2aVV4NE9hM1RXMVRxR2F3ZXpYbnZxTUI2S3hOOVdL?=
- =?utf-8?B?YXBKVUkxdE10WFZscEMyZWhzYlVmRmpqOFFiOWM0ZERiclJGL3FpZFp3TEVa?=
- =?utf-8?B?c0FGa3Nyek1qWGpKNGo3b2kvZlRTQUxoT29kTWhFbVZRWldJV0tQdGJKNGxC?=
- =?utf-8?B?Ti9aR1VyYytqTnJERE5kNkgyb3Iwc1BKR3ZrTlZGYVpkNzIraTVRTzlIUDM1?=
- =?utf-8?B?VlNOdCszTjlTYWlEcFB2bnZKeWdVUjdIdGJFeTJlS2NQTG5hVU1BWDh3cHUy?=
- =?utf-8?B?UkxMNDFBQzlHSlFQQnZIRm5hVEttbDluWFppbDNCWkk2N1dmNU43YWpoWUtj?=
- =?utf-8?B?N0RYWlhhSFpkK3BJUE96YkNvM1FBRnlNcUFVWEFIdW1MaUpSZzVXVUxLNW5v?=
- =?utf-8?B?dXR1MS9IU1p2eVF3UklBVHNQays2eXNScSs2dU5UdWlFNmJFM1Y5bUg1VnA0?=
- =?utf-8?B?azkxc01LaVhVOU45ejlOSXc4L3orS0pFWXE4Uk9TYnpxWHNjeDh4cTRqSnpP?=
- =?utf-8?B?MEgxQ2xjNjBNbE05R2NhQjFzbDY0VXJLRlVYQlV6aVpRS3hPcklTMnRweXdM?=
- =?utf-8?B?cnBJOHBub08rd1dGOWU1RlJCcGFjYUVFM0JhKzI3bFRuR3BkbXFJRmp3TVFE?=
- =?utf-8?B?Q1lvcGlRS0xwNVpMZk1KRUhTdEMwN2ZZNkEwZkdKNVNzNWFYOWxQOVlTR09z?=
- =?utf-8?B?T3BLN29tZnJobmlLbmdLWk8wclQydEFzODVGbmVEbk9ldisyUkV5SlVSUldn?=
- =?utf-8?B?S3BXZGtCQXljNUptc2EyMHFTTmF5OFdWMjloRHhpbUxjSGlJang2UXNURXVJ?=
- =?utf-8?B?N3Blc1p4RmlzME56TlNKdGw3WEdjcW9nOUt1VmpXU1dzanYvT1V5KytVSkE2?=
- =?utf-8?B?M1FDdGxtakxvTitiZW1LWi9mQ2FtMkRiVHBzVFhEMUxFL1RGeGpwT0N0OE1k?=
- =?utf-8?B?SmZyL3J4NUZack9EWlJuaUloYk5ZMlYyYmNLSEZ5NXZjWnIvNXBmNzl1WFVr?=
- =?utf-8?B?dGo3WDJsQjRKcEtvRWdweTRQbmFYaEZnRjkrYUpYTHVOcXk2QXI5MUdtb0px?=
- =?utf-8?B?dGZpOHB6NkxKNzg3WlVyVWxkeDl3LzBTVURYajU3R0FmLzdvVTViZU9Nc2NO?=
- =?utf-8?B?SFNwb3VOWS9NeTkveGNYbEMxUnRpVTdya3JRV3BheVphUSt3WURWZ25Cd25Z?=
- =?utf-8?B?NkxMVkZHS08rZmZ0VFg3N0c5WVg0cC9TeGdGQ3cwdElzOFh0NldhQlNFRWtT?=
- =?utf-8?B?SUkvNWlNL2hEN040dGQ0cFlwYUJIOENGSEZtNzRtcFQ3ZWRJSXV1MG11ZnIz?=
- =?utf-8?B?NzNEWitjV0JsZnErSmY2Zit0eEJ6MmFYVmthOG55Tk54RjBCWlJncVFra0V1?=
- =?utf-8?B?MitpRFdpWmx4UThwd2JOcHBabnppbTBZNE5tMEVubTVGOVQ4ZEJlRytFVGIv?=
- =?utf-8?B?TDNzN0NpSHUrMTA3eUFPNngwZ1MxVmpoWVUrWVhxdnI5WUpCclVzamJBNC9m?=
- =?utf-8?B?ZU1CKzVwMkx5cS8rU3RyZExNQXlENmw3UFFUQVh4Q05mUzJrOVVLbmd4eDdk?=
- =?utf-8?B?U3lIRzhNZDRlM1dkRlRpN21kUU9UQ3dHYjVvUG5OamQ3VHlMODl1M0VMaGJR?=
- =?utf-8?B?MVhYbE9USDVBSUYrbDJ0bmRvRk52bXh1M3psdEh4SlRYMCtoRkxsMmhteUlW?=
- =?utf-8?B?MFJUaVQyUkRXL1hrWnpZcm9MS0EwTjlRK3pJcmdXTW1EWkJFazNyMmNFZjBE?=
- =?utf-8?B?OUQ2SXA2cm5iUXJpVU9FZWREb3NGOHJacTFhdGJ1ZTRFcTRFK3M3NEtXK1ls?=
- =?utf-8?B?NHh2dFgvYk8rdk52ZjVzelZ3R3pnYXRpeEh1Q0FYUHcvSlN0OGdKSmxJVWNz?=
- =?utf-8?B?ZW51ZGZVVy9iM1BxY3l3SndDbG44cDQ0aHhhSGNhZ1RXQ25ZU1ZJMlNVQ3dP?=
- =?utf-8?B?Vm4yUW1oYitITjVQUmJzYnh6cmhPRDd3S3g1WEtLKytLRmpNc2RqVjFRMnBx?=
- =?utf-8?B?dGhhOS81SVVGWUZFeWlrSnppTWd6UStHZXNvem9PeHJSMWlRdXZTelJJd3pK?=
- =?utf-8?B?Y3c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <418233C6E53D29459D40339E9B0598AF@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ bh=76cSel3QToqev4Pc0eePM1AhngzwT3EPPY5BzurTtrk=;
+ b=FESSN+8lSDg7rjviH4JiKqaxi4KdDoiBdhmvbChqgoeyXoKLtQDYUaSGBswsKyH5c07L4wDcD52Xz72KE7PHidBF5/7yWIxJdHTXGuTTvreV3d6Y4lb7N/aqF0IfPPfovipu9ZPyeuc4BdCwh9Dt7XsS81VnBu4FLluYJGQtXEUGOxj80V1ULrRyLTv0V6qkf3ODUpNc/vtlK4ZOUwbxZb4Xjbvo4ZUygSRBFmRhEBqMXkXO7i9P1Mmg4LQHAJgu9e6yM84J3wc+7H7rsWENhaiEgadsTRl5Tdk6MO4o49mPMYJsvJRKXvuvum/s3+RedfOrNauWBb2brWj7XV5sUw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=76cSel3QToqev4Pc0eePM1AhngzwT3EPPY5BzurTtrk=;
+ b=4DvdRtwiJKn/V8PIZv92j3zn9NFOaoWIMXFOYRevYH3g2oYLALkhx+9d6gSdDJ5QeLHqfkNKdrgqC/z1cbBRDE+XfnV3Y9sP3QeSFduriiNfxU5tDWQCPpJqx52Xx5xplIw3nFM7xJGxEPiGNYwNDscbqD+5vsRfwHpA8it2WDQ=
+Received: from DM6PR13CA0042.namprd13.prod.outlook.com (2603:10b6:5:134::19)
+ by DS0PR12MB8245.namprd12.prod.outlook.com (2603:10b6:8:f2::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.28; Mon, 22 May
+ 2023 13:51:35 +0000
+Received: from DM6NAM11FT068.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:134:cafe::82) by DM6PR13CA0042.outlook.office365.com
+ (2603:10b6:5:134::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.13 via Frontend
+ Transport; Mon, 22 May 2023 13:51:35 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT068.mail.protection.outlook.com (10.13.173.67) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6411.29 via Frontend Transport; Mon, 22 May 2023 13:51:34 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 22 May
+ 2023 08:51:34 -0500
+Date:   Mon, 22 May 2023 08:50:36 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     David Hildenbrand <david@redhat.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        <dhildenb@redhat.com>, Quentin Perret <qperret@google.com>,
+        <tabba@google.com>, <wei.w.wang@intel.com>,
+        Mike Rapoport <rppt@kernel.org>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Ackerley Tng <ackerleytng@google.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Hugh Dickins <hughd@google.com>,
+        Christian Brauner <brauner@kernel.org>
+Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
+ KVM: mm: fd-based approach for supporting KVM)
+Message-ID: <20230522135036.wnvsmryhkvstwvw2@amd.com>
+References: <658018f9-581c-7786-795a-85227c712be0@redhat.com>
+ <ZD12htq6dWg0tg2e@google.com>
+ <1ed06a62-05a1-ebe6-7ac4-5b35ba272d13@redhat.com>
+ <ZD2bBB00eKP6F8kz@google.com>
+ <9efef45f-e9f4-18d1-0120-f0fc0961761c@redhat.com>
+ <ZD86E23gyzF6Q7AF@google.com>
+ <5869f50f-0858-ab0c-9049-4345abcf5641@redhat.com>
+ <ZEM5Zq8oo+xnApW9@google.com>
+ <20230512002124.3sap3kzxpegwj3n2@amd.com>
+ <ZF5+5g5hI7xyyIAS@google.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 97eb850b-d696-4369-53cc-08db5ac6a810
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 May 2023 13:15:47.2644
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZF5+5g5hI7xyyIAS@google.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT068:EE_|DS0PR12MB8245:EE_
+X-MS-Office365-Filtering-Correlation-Id: 489b8569-1a8f-4152-f440-08db5acba835
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 669yamDJV32O+WolAsJL1aRFZnMcBQHJH1SteQdsOkYbNJDXEiL0myMzNWLxhYf+tvUEWYjMzdOqRkuzopy5KPthYjddQLBG8N83vtmNf78wb0V1X/6Z7IaJgWlCywenrOQTSsrM0iqAIUyNvyze3hQs+TxBG2rBqdmsACnapOBxNWzDun28JrLP4JCyMYs8clsgCsRPe/lSzf5Qxot+gNgilekxp6JmqD0jVxucUK8gkPlF7hGtLjucoKLY3lI0mboooYoft+2fSzvSXWOLKLJRPWM95wWdresWt5mh6VurzmTNyYKrj0HaU31DuOI0Xjk0r7gFEOEnEQXgIurxPpJeG66ruYzOvpHfq/OXkvybXKgVZIkMQ6w9H/0j6cKkSP7FV/Q7p2iuiv81YQ8c6Yr2V5HJOYC1WFQbpOCFO9RV4WQ7x2MgbC7+k95eWlmd1TTsC/YoPyDgdyguGv/8C5LeEEyWeRTdqt+28NkIewHH4mguc8eotExJgCSUJccBGCJyJS83EsMPnjqBOMN60BpfzjLtcPmowrRaL83HMnUgXIfkR+IO0ZBqc12OgjK/xE1bdpxDMfuYnWoOOeY2Pycob2Z4X11/PzbcXVZZNjOGR9ZPpnseOnufgYGvpgo1uvRK+caNNi7byxF7khk19dtgKAVibY6ZBUHLCxhxzDiNvsVSV0awzTeTcf5kb+vM1JXpIm9G91hy8lLAtRduPiDbZKHzFZY0CwI0zgx86JofzjjTYX06Ti5xhcfdbk+oFlbwRWBRe3PcyUUrDGnr0eKI3tPBRuceMSaMe7hH5Ko=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(396003)(136003)(376002)(451199021)(36840700001)(46966006)(40470700004)(478600001)(54906003)(5660300002)(26005)(41300700001)(966005)(186003)(316002)(4326008)(6916009)(44832011)(1076003)(7416002)(336012)(8936002)(8676002)(426003)(16526019)(2906002)(47076005)(2616005)(36860700001)(83380400001)(70206006)(70586007)(82740400003)(356005)(81166007)(36756003)(82310400005)(40460700003)(86362001)(40480700001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2023 13:51:34.9401
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rNu7ZygP2W0lYNvFQkiWqRpCupSMvy6QDuhzO8VZ7krVGvsKj7Pbu0JVjrZk8+9SgCoacft1nokP8bGmzAHw2A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6424
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 489b8569-1a8f-4152-f440-08db5acba835
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT068.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8245
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gRnJpLCAyMDIzLTA1LTEyIGF0IDE2OjUwIC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBOb3cgdGhhdCBWTVggaXMgZGlzYWJsZWQgaW4gZW1lcmdlbmNpZXMgdmlhIHRoZSB2
-aXJ0IGNhbGxiYWNrcywgbW92ZSB0aGUNCj4gVk1YT0ZGIGhlbHBlcnMgaW50byBLVk0sIHRoZSBv
-bmx5IHJlbWFpbmluZyB1c2VyLg0KPiANCj4gTm8gZnVuY3Rpb25hbCBjaGFuZ2UgaW50ZW5kZWQu
-DQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuamNAZ29vZ2xl
-LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IEthaSBIdWFuZyA8a2FpLmh1YW5nQGludGVsLmNvbT4NCg0K
-T25lIG5pdCAuLi4NCg0KWy4uLl0NCg0KDQo+ICBzdGF0aWMgdm9pZCB2bXhfZW1lcmdlbmN5X2Rp
-c2FibGUodm9pZCkNCj4gIHsNCj4gIAlpbnQgY3B1ID0gcmF3X3NtcF9wcm9jZXNzb3JfaWQoKTsN
-Cj4gQEAgLTc1Myw3ICs3NzUsOCBAQCBzdGF0aWMgdm9pZCB2bXhfZW1lcmdlbmN5X2Rpc2FibGUo
-dm9pZCkNCj4gIAkJCSAgICBsb2FkZWRfdm1jc3Nfb25fY3B1X2xpbmspDQo+ICAJCXZtY3NfY2xl
-YXIodi0+dm1jcyk7DQo+ICANCj4gLQlfX2NwdV9lbWVyZ2VuY3lfdm14b2ZmKCk7DQo+ICsJaWYg
-KF9fcmVhZF9jcjQoKSAmIFg4Nl9DUjRfVk1YRSkNCj4gKwkJa3ZtX2NwdV92bXhvZmYoKTsNCj4g
-IH0NCg0KQXMgcmVwbGllZCB0byBwYXRjaCAzLCBpcyBpdCBiZXR0ZXIgdG8gbW92ZSBDUjQuVk1Y
-RSBiaXQgY2hlY2sgYmVmb3JlIFZNQ0xFQVINCihjYW4gYmUgZG9uZSBpbiBlaXRoZXIgcGF0Y2gg
-Mywgb3IgaGVyZSk/DQoNCg0K
+On Fri, May 12, 2023 at 11:01:10AM -0700, Sean Christopherson wrote:
+> On Thu, May 11, 2023, Michael Roth wrote:
+> > On Fri, Apr 21, 2023 at 06:33:26PM -0700, Sean Christopherson wrote:
+> > > 
+> > > Code is available here if folks want to take a look before any kind of formal
+> > > posting:
+> > > 
+> > > 	https://github.com/sean-jc/linux.git x86/kvm_gmem_solo
+> > 
+> > Hi Sean,
+> > 
+> > I've been working on getting the SNP patches ported to this but I'm having
+> > some trouble working out a reasonable scheme for how to work the
+> > RMPUPDATE hooks into the proposed design.
+> > 
+> > One of the main things is kvm_gmem_punch_hole(): this is can free pages
+> > back to the host whenever userspace feels like it. Pages that are still
+> > marked private in the RMP table will blow up the host if they aren't returned
+> > to the normal state before handing them back to the kernel. So I'm trying to
+> > add a hook, orchestrated by kvm_arch_gmem_invalidate(), to handle that,
+> > e.g.:
+> > 
+> >   static long kvm_gmem_punch_hole(struct file *file, int mode, loff_t offset,
+> >                                   loff_t len)
+> >   {
+> >           struct kvm_gmem *gmem = file->private_data;
+> >           pgoff_t start = offset >> PAGE_SHIFT;
+> >           pgoff_t end = (offset + len) >> PAGE_SHIFT;
+> >           struct kvm *kvm = gmem->kvm;
+> >   
+> >           /*
+> >            * Bindings must stable across invalidation to ensure the start+end
+> >            * are balanced.
+> >            */
+> >           filemap_invalidate_lock(file->f_mapping);
+> >           kvm_gmem_invalidate_begin(kvm, gmem, start, end);
+> >   
+> >           /* Handle arch-specific cleanups before releasing pages */
+> >           kvm_arch_gmem_invalidate(kvm, gmem, start, end);
+> >           truncate_inode_pages_range(file->f_mapping, offset, offset + len);
+> >   
+> >           kvm_gmem_invalidate_end(kvm, gmem, start, end);
+> >           filemap_invalidate_unlock(file->f_mapping);
+> >   
+> >           return 0;
+> >   }
+> > 
+> > But there's another hook, kvm_arch_gmem_set_mem_attributes(), needed to put
+> > the page in its intended state in the RMP table prior to mapping it into the
+> > guest's NPT.
+> 
+> IMO, this approach is wrong.  kvm->mem_attr_array is the source of truth for whether
+> userspace wants _guest_ physical pages mapped private vs. shared, but the attributes
+> array has zero insight into the _host_ physical pages.  I.e. SNP shouldn't hook
+> kvm_mem_attrs_changed(), because operating on the RMP from that code is fundamentally
+> wrong.
+> 
+> A good analogy is moving a memslot (ignoring that AFAIK no VMM actually moves
+> memslots, but it's a good analogy for KVM internals).  KVM needs to zap all mappings
+> for the old memslot gfn, but KVM does not create mappings for the new memslot gfn.
+> Same for changing attributes; unmap, but never map.
+> 
+> As for the unmapping side of things, kvm_unmap_gfn_range() will unmap all relevant
+> NPT entries, and the elevated mmu_invalidate_in_progress will prevent KVM from
+> establishing a new NPT mapping.  And mmu_invalidate_in_progress will reach '0' only
+> after both truncation _and_ kvm_vm_ioctl_set_mem_attributes() complete, i.e. KVM
+> can create new mappings only when both kvm->mem_attr_array and any relevant
+> guest_mem bindings have reached steady state.
+> 
+> That leaves the question of when/where to do RMP updates.  Off the cuff, I think
+> RMP updates (and I _think_ also TDX page conversions) should _always_ be done in
+> the context of either (a) file truncation (make host owned due, a.k.a. TDX reclaim)
+> or (b) allocating a new page/folio in guest_mem, a.k.a. kvm_gmem_get_folio().
+> Under the hood, even though the gfn is the same, the backing pfn is different, i.e.
+> installing a shared mapping should _never_ need to touch the RMP because pages
+> common from the normal (non-guest_mem) pool must already be host owned.
+
+Hi Sean, thanks for the suggestions.
+
+I reworked things based on this approach and things seems to work out
+pretty nicely for SNP.
+
+I needed to add the hook to kvm_gmem_get_pfn() instead of
+kvm_gmem_get_folio() because SNP needs to know the GFN in order to mark
+the page as private in the RMP table, but otherwise I think things are
+the same as what you had in mind. One downside to this approach is since
+the hook always gets called during kvm_gmem_get_pfn(), we need to do an
+extra RMP lookup to determine whether or not that page has already been
+set to private state, vs. being able to assume it's already been put in
+the expected state, but it's only a memory access so not a huge
+overhead. Not sure if that would be a concern of not on the TDX side
+though.
+
+I put together a tree with some fixups that are needed for against the
+kvm_gmem_solo base tree, and a set of hooks to handle invalidations,
+preparing the initial private state as suggested above, and a
+platform-configurable mask that the x86 MMU code can use for determining
+whether a fault is for private vs. shared pages.
+
+  KVM: x86: Determine shared/private faults using a configurable mask
+  ^ for TDX we could trivially add an inverted analogue of the mask/logic
+  KVM: x86: Use full 64-bit error code for kvm_mmu_do_page_fault
+  KVM: x86: Add platform hooks for private memory invalidations
+  KVM: x86: Add platform hook for initializing private memory
+  *fixup (kvm_gmem_solo): KVM: Fix end range calculation for MMU invalidations
+  *fixup (kvm_gmem_solo): KVM: selftests: update kvm_create_guest_memfd struct usage
+
+  https://github.com/mdroth/linux/commits/kvm_gmem_solo_x86
+
+I'm hoping these are similarly usable for TDX, but could use some input
+from TDX folks on that aspect.
+
+> > 
+> > Keep in mind that RMP updates can't be done while holding KVM->mmu_lock
+> > spinlock, because we also need to unmap pages from the directmap, which can
+> > lead to scheduling-while-atomic BUG()s[1], so that's another constraint we
+> > need to work around.
+
+This concern also ends up going away since GFP_RECLAIM also has similar
+issues when called under kvm->mmu_lock, so having the hook in
+kvm_gmem_get_pfn() sort of guarantees we wouldn't hit issues with this.
+
+-Mike
+
+> > 
+> > Thanks!
+> > 
+> > -Mike
+> > 
+> > [1] https://lore.kernel.org/linux-coco/20221214194056.161492-7-michael.roth@amd.com/T/#m45a1af063aa5ac0b9314d6a7d46eecb1253bba7a
+> > 
+> > > 
+> > > [1] https://lore.kernel.org/all/ff5c5b97-acdf-9745-ebe5-c6609dd6322e@google.com
+> > > [2] https://lore.kernel.org/all/20230418-anfallen-irdisch-6993a61be10b@brauner
+> > > [3] https://lore.kernel.org/linux-mm/20200522125214.31348-1-kirill.shutemov@linux.intel.com
