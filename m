@@ -2,379 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AB4970C43B
-	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 19:27:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A81170C48C
+	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 19:44:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231649AbjEVR1Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 13:27:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40088 "EHLO
+        id S231970AbjEVRn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 13:43:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbjEVR1Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 13:27:24 -0400
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE335E9
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 10:27:22 -0700 (PDT)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-19e69a8c58bso470281fac.3
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 10:27:22 -0700 (PDT)
+        with ESMTP id S231417AbjEVRn4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 13:43:56 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43C72120
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 10:43:52 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1ae79528ad4so22487195ad.3
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 10:43:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684776442; x=1687368442;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lGm3z+8llPSaHrhufRl+ALYbuFw178Ej6kpXrs2ZlzI=;
-        b=2wqombPCf7WPKNQM2EjxgGkKnwrxzLl2f3DzoR9kCpV2cqMHrA1XfaBPXnmq4uUOuS
-         97MIwirv92Ex5GktbR/0ymWxMEHLsZhB14IWSo4kBmwiF6PopdmCDbYcAoWdXHxNBJ3S
-         2RA4iku9fQ7zRJOXYRQNCG/qKHPvQht5xfhfgfpWI0oj2CvTRpIvZFQWygo9BIVQ5PQW
-         AHzgbPht50JWbgWsOuciMwoVOXfULwcMOTggCSmP7WaxBTu9rE1m7MShuL4UUNonihjM
-         K2sSkEVtNFtrXLrQmJlpkM84Avej5bqcq/oVYFuC3nUcIQs7r9RAFtZHzMD9hHnOLq5m
-         Ingw==
+        d=google.com; s=20221208; t=1684777431; x=1687369431;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iC3M/RVEiAsEvRwykjn0mpnilLBCs5c/vIl/8zacyfg=;
+        b=KNOCWK4K1+8gamK8MURP2nRppShxkwO7KtAR6Snf0KDCtWZ3XsPoj+saNuen2kNrkT
+         bqz07VQXZAPVpDYse+bdRasvs5feMkYvrCjuK2tZhGPyyEpmWxmYQTyFUGxRU9y+kmWx
+         5xreYW1c+VhACq8Y8YZ4F2RSnkd8yY7XsQSpkhi/r5FOmKX63zWeMYBT8Hc5EufDG473
+         oBlDT7WXTH1wtHavax3SvrKzhmI/TKDCDr1eeAQpSYzagWkanSEphjcjPa60+bhjcBIn
+         cKnXog8Y9wGSbX+wUPactdnBAbG+ukyZG3oVkDBSk4hRE2kGnBw1zJR5nDVH4W8x9Nev
+         H0yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684776442; x=1687368442;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lGm3z+8llPSaHrhufRl+ALYbuFw178Ej6kpXrs2ZlzI=;
-        b=YYmjBRGX9ULqE6r/yMhQEBTkDB9Caiz5IgPdM9NKcy6VEc5TMNrfudVA9uG0qyjvbH
-         DOLdeRXSjkr7St+HAshUb2SPgxXsbxj5ddlfh1GqeFCfqFPG4B3ECY8AudTKgekWCl1b
-         tM7WzAnSUONIRCbFVsi7+TFreMlwBs2JmigE+/hKxa78Q+GKTccIejKNdsN0e8dUck9a
-         fVEi1DnUiPKo8h+UG0JSEZtJbqSvpKmwu5nElzSe8+0DnD3OykW9ffjXht6SijgXq9pI
-         YR1eQJkLdB2/u6e/7PqkMqR1OM+BWRJgNMAKD+Yp9m32RXxVkbpX7m6VlW77eqonjTYY
-         w+FQ==
-X-Gm-Message-State: AC+VfDwCuUVISpu3CBo/LmdCCA43FFgTxNwUHnySrqlwHu6/BRXRumXZ
-        4dSqNXsup+coHNJrlEL/LS2u0isqbugZmTZkTwuKzg==
-X-Google-Smtp-Source: ACHHUZ461r+BzuxQBLYMmN7k1+CnkmCzG8f9pz6NXjsm/LQLuY26EzzOYIKFdA8ytJnZI/NyCJl/MrTADUyEl9fl/c0=
-X-Received: by 2002:a05:6870:a2c4:b0:19a:733:53c3 with SMTP id
- w4-20020a056870a2c400b0019a073353c3mr6233830oak.35.1684776442152; Mon, 22 May
- 2023 10:27:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230517061015.1915934-1-jingzhangos@google.com>
- <20230517061015.1915934-2-jingzhangos@google.com> <2e727b02fe9141098ed474ef49ddc495@huawei.com>
- <CAAdAUtiWkqaymY3e3=m3YHw9FNGYf6rsFsAVkFKpUh-p9nd+gQ@mail.gmail.com>
- <f8ad69243ac5407f8d4d78689bba8c9a@huawei.com> <CAAdAUtiR9JWm7V++9jNPPznc4jBG9sDgkfDMW5Vck610O3XCUw@mail.gmail.com>
- <20230519221636.jey62kmyrsncuytu@google.com>
-In-Reply-To: <20230519221636.jey62kmyrsncuytu@google.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Mon, 22 May 2023 10:27:10 -0700
-Message-ID: <CAAdAUtitsbDxAcgH4aFogjLubX3w0fFbYgU+JRgprynxZB2QzA@mail.gmail.com>
-Subject: Re: [PATCH v9 1/5] KVM: arm64: Save ID registers' sanitized value per guest
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1684777431; x=1687369431;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iC3M/RVEiAsEvRwykjn0mpnilLBCs5c/vIl/8zacyfg=;
+        b=AvfzqGRYPNnRE5HgNs/wihJ2g4fi8oxcQdNeMbxbz3TuPkW6oAqWDEQt93+1nDpuDv
+         v+rSkyc0zN9E3/8e2xi2Aj+MG8Q6yHn+gfK3EvccPBndvvhPp1uLBqQ5kucRai0VLVr9
+         hg8Lpaud5Pt1ZuBiUYHwOZ0lEGRRwxnZDSCzEGWFg+YqfdxeuFTWVfZy2y7hy9fjueWA
+         vtluCeRK5OnjDX9lYIMCF1FQsSmdxxG6t52UZVb2GNjVor6OGi/lxkjgaPJ663wUdHem
+         /Jf55uq9g/75A5IKRyjRL1kmlrCWQMRiy4FZqw1/rnFuPYkim4L036c3GIo8hsYyi42q
+         7Ceg==
+X-Gm-Message-State: AC+VfDwftQ340h508rYLWxSBFB6wO5H470i2UAEIIZx+maZkPZLMoX2l
+        nCx97axD3de+d/r3kMBdy2v3M0VSZIs=
+X-Google-Smtp-Source: ACHHUZ5tdYQpYrbpDVARXGV8NJ1f7fpCU5P0i5Io/HQvjwIM2pcFQKzlONCgHkbWeM4ZF4OqIOvF0Yrp3HU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:68f:b0:1a8:16d2:a86b with SMTP id
+ ki15-20020a170903068f00b001a816d2a86bmr2580886plb.8.1684777431487; Mon, 22
+ May 2023 10:43:51 -0700 (PDT)
+Date:   Mon, 22 May 2023 10:43:49 -0700
+In-Reply-To: <20230520010237.3tepk3q44j52leuk@desk>
+Mime-Version: 1.0
+References: <20230506030435.80262-1-chao.gao@intel.com> <b472b58d-0469-8a55-985c-1d966ce66419@intel.com>
+ <ZGZhW/x5OWPmx1qD@google.com> <20230520010237.3tepk3q44j52leuk@desk>
+Message-ID: <ZGup1TjeqBF7bgWG@google.com>
+Subject: Re: [PATCH] KVM: x86: Track supported ARCH_CAPABILITIES in kvm_caps
+From:   Sean Christopherson <seanjc@google.com>
+To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, Chao Gao <chao.gao@intel.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+On Fri, May 19, 2023, Pawan Gupta wrote:
+> On Thu, May 18, 2023 at 10:33:15AM -0700, Sean Christopherson wrote:
+> > I made the mistake of digging into why KVM doesn't advertise ARCH_CAP_FB_CLEAR_CTRL...
+> > 
+> >   1. I see *nothing* in commit 027bbb884be0 ("KVM: x86/speculation: Disable Fill
+> >      buffer clear within guests") that justifies 1x RDMSR and 2x WRMSR on every
+> >      entry+exit.
+> 
+> Unnecessary VERWs in guest will have much higher impact than due to MSR
+> read/write at vmentry/exit.
 
-On Fri, May 19, 2023 at 3:16=E2=80=AFPM Reiji Watanabe <reijiw@google.com> =
-wrote:
->
-> On Fri, May 19, 2023 at 10:44:41AM -0700, Jing Zhang wrote:
-> > HI Shameerali,
-> >
-> > On Fri, May 19, 2023 at 1:08=E2=80=AFAM Shameerali Kolothum Thodi
-> > <shameerali.kolothum.thodi@huawei.com> wrote:
-> > >
-> > >
-> > >
-> > > > -----Original Message-----
-> > > > From: Jing Zhang [mailto:jingzhangos@google.com]
-> > > > Sent: 18 May 2023 20:49
-> > > > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com=
->
-> > > > Cc: KVM <kvm@vger.kernel.org>; KVMARM <kvmarm@lists.linux.dev>;
-> > > > ARMLinux <linux-arm-kernel@lists.infradead.org>; Marc Zyngier
-> > > > <maz@kernel.org>; Oliver Upton <oupton@google.com>; Will Deacon
-> > > > <will@kernel.org>; Paolo Bonzini <pbonzini@redhat.com>; James Morse
-> > > > <james.morse@arm.com>; Alexandru Elisei <alexandru.elisei@arm.com>;
-> > > > Suzuki K Poulose <suzuki.poulose@arm.com>; Fuad Tabba
-> > > > <tabba@google.com>; Reiji Watanabe <reijiw@google.com>; Raghavendra
-> > > > Rao Ananta <rananta@google.com>
-> > > > Subject: Re: [PATCH v9 1/5] KVM: arm64: Save ID registers' sanitize=
-d value
-> > > > per guest
-> > > >
-> > > > Hi Shameerali,
-> > > >
-> > > > On Thu, May 18, 2023 at 12:17=E2=80=AFAM Shameerali Kolothum Thodi
-> > > > <shameerali.kolothum.thodi@huawei.com> wrote:
-> > > > >
-> > > > >
-> > > > >
-> > > > > > -----Original Message-----
-> > > > > > From: Jing Zhang [mailto:jingzhangos@google.com]
-> > > > > > Sent: 17 May 2023 07:10
-> > > > > > To: KVM <kvm@vger.kernel.org>; KVMARM <kvmarm@lists.linux.dev>;
-> > > > > > ARMLinux <linux-arm-kernel@lists.infradead.org>; Marc Zyngier
-> > > > > > <maz@kernel.org>; Oliver Upton <oupton@google.com>
-> > > > > > Cc: Will Deacon <will@kernel.org>; Paolo Bonzini
-> > > > <pbonzini@redhat.com>;
-> > > > > > James Morse <james.morse@arm.com>; Alexandru Elisei
-> > > > > > <alexandru.elisei@arm.com>; Suzuki K Poulose
-> > > > <suzuki.poulose@arm.com>;
-> > > > > > Fuad Tabba <tabba@google.com>; Reiji Watanabe <reijiw@google.co=
-m>;
-> > > > > > Raghavendra Rao Ananta <rananta@google.com>; Jing Zhang
-> > > > > > <jingzhangos@google.com>
-> > > > > > Subject: [PATCH v9 1/5] KVM: arm64: Save ID registers' sanitize=
-d value
-> > > > per
-> > > > > > guest
-> > > > > >
-> > > > > > Introduce id_regs[] in kvm_arch as a storage of guest's ID regi=
-sters,
-> > > > > > and save ID registers' sanitized value in the array at KVM_CREA=
-TE_VM.
-> > > > > > Use the saved ones when ID registers are read by the guest or
-> > > > > > userspace (via KVM_GET_ONE_REG).
-> > > > > >
-> > > > > > No functional change intended.
-> > > > > >
-> > > > > > Co-developed-by: Reiji Watanabe <reijiw@google.com>
-> > > > > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > > > > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > > > > > ---
-> > > > > >  arch/arm64/include/asm/kvm_host.h | 20 +++++++++
-> > > > > >  arch/arm64/kvm/arm.c              |  1 +
-> > > > > >  arch/arm64/kvm/sys_regs.c         | 69
-> > > > > > +++++++++++++++++++++++++------
-> > > > > >  arch/arm64/kvm/sys_regs.h         |  7 ++++
-> > > > > >  4 files changed, 85 insertions(+), 12 deletions(-)
-> > > > > >
-> > > > > > diff --git a/arch/arm64/include/asm/kvm_host.h
-> > > > > > b/arch/arm64/include/asm/kvm_host.h
-> > > > > > index 7e7e19ef6993..949a4a782844 100644
-> > > > > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > > > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > > > > @@ -178,6 +178,21 @@ struct kvm_smccc_features {
-> > > > > >       unsigned long vendor_hyp_bmap;
-> > > > > >  };
-> > > > > >
-> > > > > > +/*
-> > > > > > + * Emulated CPU ID registers per VM
-> > > > > > + * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved i=
-n it
-> > > > > > + * is (3, 0, 0, crm, op2), where 1<=3Dcrm<8, 0<=3Dop2<8.
-> > > > > > + *
-> > > > > > + * These emulated idregs are VM-wide, but accessed from the co=
-ntext of
-> > > > a
-> > > > > > vCPU.
-> > > > > > + * Access to id regs are guarded by kvm_arch.config_lock.
->
-> Nit: This statement doesn't seem to be true yet :)
-Will remend it.
->
->
-> > > > > > + */
-> > > > > > +#define KVM_ARM_ID_REG_NUM   56
-> > > > > > +#define IDREG_IDX(id)                (((sys_reg_CRm(id) - 1) <=
-< 3) |
-> > > > sys_reg_Op2(id))
-> > > > > > +#define IDREG(kvm, id)
-> > > > ((kvm)->arch.idregs.regs[IDREG_IDX(id)])
-> > > > > > +struct kvm_idregs {
-> > > > > > +     u64 regs[KVM_ARM_ID_REG_NUM];
-> > > > > > +};
-> > > > > >
-> > > > >
-> > > > > Not sure we really need this struct here. Why can't this array be=
- moved to
-> > > > > struct kvm_arch directly?
-> > > > It was put in kvm_arch directly before, then got into its own
-> > > > structure in v5 according to the comments here:
-> > > > https://lore.kernel.org/all/861qlaxzyw.wl-maz@kernel.org/#t
-> > >
-> > > Ok.
-> > >
-> > > > > >  typedef unsigned int pkvm_handle_t;
-> > > > > >
-> > > > > >  struct kvm_protected_vm {
-> > > > > > @@ -253,6 +268,9 @@ struct kvm_arch {
-> > > > > >       struct kvm_smccc_features smccc_feat;
-> > > > > >       struct maple_tree smccc_filter;
-> > > > > >
-> > > > > > +     /* Emulated CPU ID registers */
-> > > > > > +     struct kvm_idregs idregs;
-> > > > > > +
-> > > > > >       /*
-> > > > > >        * For an untrusted host VM, 'pkvm.handle' is used to loo=
-kup
-> > > > > >        * the associated pKVM instance in the hypervisor.
-> > > > > > @@ -1045,6 +1063,8 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm
-> > > > > > *kvm,
-> > > > > >  int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
-> > > > > >                                   struct kvm_arm_counter_offset
-> > > > *offset);
-> > > > > >
-> > > > > > +void kvm_arm_init_id_regs(struct kvm *kvm);
-> > > > > > +
-> > > > > >  /* Guest/host FPSIMD coordination helpers */
-> > > > > >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-> > > > > >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
-> > > > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > > > > index 14391826241c..774656a0718d 100644
-> > > > > > --- a/arch/arm64/kvm/arm.c
-> > > > > > +++ b/arch/arm64/kvm/arm.c
-> > > > > > @@ -163,6 +163,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsig=
-ned
-> > > > > > long type)
-> > > > > >
-> > > > > >       set_default_spectre(kvm);
-> > > > > >       kvm_arm_init_hypercalls(kvm);
-> > > > > > +     kvm_arm_init_id_regs(kvm);
-> > > > > >
-> > > > > >       /*
-> > > > > >        * Initialise the default PMUver before there is a chance=
- to
-> > > > > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_reg=
-s.c
-> > > > > > index 71b12094d613..d2ee3a1c7f03 100644
-> > > > > > --- a/arch/arm64/kvm/sys_regs.c
-> > > > > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > > > > @@ -41,6 +41,7 @@
-> > > > > >   * 64bit interface.
-> > > > > >   */
-> > > > > >
-> > > > > > +static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u3=
-2 id);
-> > > > > >  static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
-> > > > > >
-> > > > > >  static bool read_from_write_only(struct kvm_vcpu *vcpu,
-> > > > > > @@ -364,7 +365,7 @@ static bool trap_loregion(struct kvm_vcpu *=
-vcpu,
-> > > > > >                         struct sys_reg_params *p,
-> > > > > >                         const struct sys_reg_desc *r)
-> > > > > >  {
-> > > > > > -     u64 val =3D read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> > > > > > +     u64 val =3D kvm_arm_read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL=
-1);
-> > > > > >       u32 sr =3D reg_to_encoding(r);
-> > > > > >
-> > > > > >       if (!(val & (0xfUL << ID_AA64MMFR1_EL1_LO_SHIFT))) {
-> > > > > > @@ -1208,16 +1209,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
-> > > > > >       }
-> > > > > >  }
-> > > > > >
-> > > > > > -/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> > > > > > -static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys=
-_reg_desc
-> > > > > > const *r)
-> > > > > > +static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u3=
-2 id)
-> > > > > >  {
-> > > > > > -     u32 id =3D reg_to_encoding(r);
-> > > > > > -     u64 val;
-> > > > > > -
-> > > > > > -     if (sysreg_visible_as_raz(vcpu, r))
-> > > > > > -             return 0;
-> > > > > > -
-> > > > > > -     val =3D read_sanitised_ftr_reg(id);
-> > > > > > +     u64 val =3D IDREG(vcpu->kvm, id);
-> > > > > >
-> > > > > >       switch (id) {
-> > > > > >       case SYS_ID_AA64PFR0_EL1:
-> > > > > > @@ -1280,6 +1274,26 @@ static u64 read_id_reg(const struct
-> > > > kvm_vcpu
-> > > > > > *vcpu, struct sys_reg_desc const *r
-> > > > > >       return val;
-> > > > > >  }
-> > > > > >
-> > > > > > +/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> > > > > > +static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct
-> > > > sys_reg_desc
-> > > > > > const *r)
-> > > > > > +{
-> > > > > > +     if (sysreg_visible_as_raz(vcpu, r))
-> > > > > > +             return 0;
-> > > > > > +
-> > > > > > +     return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
-> > > > > > +}
-> > > > > > +
-> > > > > > +/*
-> > > > > > + * Return true if the register's (Op0, Op1, CRn, CRm, Op2) is
-> > > > > > + * (3, 0, 0, crm, op2), where 1<=3Dcrm<8, 0<=3Dop2<8.
-> > > > > > + */
-> > > > > > +static inline bool is_id_reg(u32 id)
-> > > > > > +{
-> > > > > > +     return (sys_reg_Op0(id) =3D=3D 3 && sys_reg_Op1(id) =3D=
-=3D 0 &&
-> > > > > > +             sys_reg_CRn(id) =3D=3D 0 && sys_reg_CRm(id) >=3D =
-1 &&
-> > > > > > +             sys_reg_CRm(id) < 8);
-> > > > > > +}
-> > > > > > +
-> > > > > >  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
-> > > > > >                                 const struct sys_reg_desc *r)
-> > > > > >  {
-> > > > > > @@ -2244,8 +2258,8 @@ static bool trap_dbgdidr(struct kvm_vcpu
-> > > > *vcpu,
-> > > > > >       if (p->is_write) {
-> > > > > >               return ignore_write(vcpu, p);
-> > > > > >       } else {
-> > > > > > -             u64 dfr =3D
-> > > > read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-> > > > > > -             u64 pfr =3D
-> > > > read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> > > > > > +             u64 dfr =3D kvm_arm_read_id_reg(vcpu,
-> > > > SYS_ID_AA64DFR0_EL1);
-> > > > > > +             u64 pfr =3D kvm_arm_read_id_reg(vcpu,
-> > > > SYS_ID_AA64PFR0_EL1);
-> > > > >
-> > > > > Does this change the behavior slightly as now within the
-> > > > kvm_arm_read_id_reg()
-> > > > > the val will be further adjusted based on KVM/vCPU?
-> > > > That's a good question. Although the actual behavior would be the s=
-ame
-> > > > no matter read idreg with read_sanitised_ftr_reg or
-> > > > kvm_arm_read_id_reg, it is possible that the behavior would change
-> > > > potentially in the future.
-> > > > Since now every guest has its own idregs, for every guest, the idre=
-gs
-> > > > should be read from kvm_arm_read_id_reg instead of
-> > > > read_sanitised_ftr_reg.
-> > > > The point is, for trap_dbgdidr, we should read AA64DFR0/AA64PFR0 fr=
-om
-> > > > host or the VM-scope?
-> > >
-> > > Ok. I was just double checking whether it changes the behavior now it=
-self or
-> > > not as we claim no functional changes in this series. As far as host =
-vs VM
-> > > scope, I am not sure as well. From a quick look through the history o=
-f debug
-> > > support, couldn=E2=80=99t find anything that mandates host values tho=
-ugh.
->
-> We should use the VM-scope AA64DFR0/AA64PFR0 values here.
-> As trap_dbgdidr() is the emulation code for the guest's reading DBGDIDR,
-> its WRPs, BRPs, CTX_CMPs, and EL3 field must be consistent with the ones
-> in the guest's AA64DFR0_EL1/AA64PFR0_EL1 values.
->
-> As Jing said, it doesn't matter practically until we allow userspace to
-> modify those fields though :)
->
-> Thank you,
-> Reiji
+Can you provide numbers for something closeish to a real world workload?
 
-Thanks,
-Jing
+> On an Icelake system it is pointless for a guest to incur VERW penalty when
+> the system is not affected by MDS/TAA and guests don't need mitigation for
+> MMIO Stale Data. MSR writes are only done when the guest is likely to execute
+> unnecessary VERWs(e.g. when the guest thinks its running on an older gen
+> CPU).
+>
+> >      KVM just needs to context switch the MSR between guests since the value that's
+> >      loaded while running in the host is irrelevant.  E.g. use a percpu cache to
+> 
+> I will be happy to avoid the MSR read/write, but its worth considering
+> that this MSR can receive more bits that host may want to toggle, then
+> percpu cache implementation would likely change.
+
+Change in and of itself isn't problematic, so long as whatever code we write won't
+fall over if/when new bits are added, i.e. doesn't clobber unknown bits.
+
+> >   5. MSR_IA32_MCU_OPT_CTRL is not modified by the host after a CPU is brought up,
+> >      i.e. the host's desired value is effectively static post-boot, and barring
+> >      a buggy configuration (running KVM as a guest), the boot CPU's value will be
+> >      the same as every other CPU.
+> 
+> Would the MSR value be same on every CPU, if only some guests have
+> enumerated FB_CLEAR and others haven't?
+
+Ignore the guest, I'm talking purely about the host.  Specifically, there's no
+reason to do a RDMSR to get the host value on every VM-Enter since the host's
+value is effectively static post-boot.
+
+> MSR writes (to disable FB_CLEAR) are not done when a guest enumerates
+> FB_CLEAR. Enumeration of FB_CLEAR in guest will depend on its configuration.
+> 
+> >   6. Performance aside, KVM should not be speculating (ha!) on what the guest
+> >      will and will not do, and should instead honor whatever behavior is presented
+> >      to the guest.  If the guest CPU model indicates that VERW flushes buffers,
+> >      then KVM damn well needs to let VERW flush buffers.
+> 
+> The current implementation allows guests to have VERW flush buffers when
+> they enumerate FB_CLEAR. It only restricts the flush behavior when the
+> guest is trying to mitigate against a vulnerability(like MDS) on a
+> hardware that is not affected. I guess its common for guests to be
+> running with older gen configuration on a newer hardware.
+
+Right, I'm saying that that behavior is wrong.  KVM shouldn't assume the guest
+the guest will do things a certain way and should instead honor the "architectural"
+definition, in quotes because I realize there probably is no architectural
+definition for any of this.
+
+It might be that the code does (unintentionally?) honor the "architecture", i.e.
+this code might actually be accurrate with respect to when the guest can expect
+VERW to flush buffers.  But the comment is so, so wrong.
+
+	/*
+	 * If guest will not execute VERW, there is no need to set FB_CLEAR_DIS
+	 * at VMEntry. Skip the MSR read/write when a guest has no use case to
+	 * execute VERW.
+	 */
+	if ((vcpu->arch.arch_capabilities & ARCH_CAP_FB_CLEAR) ||
+	   ((vcpu->arch.arch_capabilities & ARCH_CAP_MDS_NO) &&
+	    (vcpu->arch.arch_capabilities & ARCH_CAP_TAA_NO) &&
+	    (vcpu->arch.arch_capabilities & ARCH_CAP_PSDP_NO) &&
+	    (vcpu->arch.arch_capabilities & ARCH_CAP_FBSDP_NO) &&
+	    (vcpu->arch.arch_capabilities & ARCH_CAP_SBDR_SSDP_NO)))
+		vmx->disable_fb_clear = false;
