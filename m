@@ -2,128 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEE8A70C223
-	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 17:17:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5352170C315
+	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 18:13:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233437AbjEVPRV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 11:17:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54176 "EHLO
+        id S233077AbjEVQN1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 12:13:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230164AbjEVPRU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 11:17:20 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4019BB;
-        Mon, 22 May 2023 08:17:19 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34MEtx0e028313;
-        Mon, 22 May 2023 15:17:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=wXTSv3FLtaXpqGiU7UNhhaMATj9K7JSUq/px+y/IwhU=;
- b=Q6JVqCmoL6i/zuTwKBj1kVwwciyJ2+JtefNXSVd8QTGMPlamOg1RxA4fsqabHYxj98dS
- x0CdXgrWqIGWFxVoYk1ikUmlGy/UU4COSzgoEK3siv3xHKOr5M0BQodg1R3+fI5JgbmA
- L6VTXRvteAqAe/BpsyS0skEIknczKrbgi/roI+FyAVJUThCFdP+Du1q/mb1Gh75nyIEw
- AIv2Euf4h+orxas6n8MwCz6BaoOwW8CP1tW5XuDl4f32NAt/DvnKR8gbupzH8wOw3qWE
- vmsFIl0WbwPfUYiuXqFoDSC8RnerJbc3y5mtGLRE9nj5XENEQwfg6L28N+DULGDWgIht gA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qrae3s361-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 May 2023 15:17:18 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34MEkkXI030543;
-        Mon, 22 May 2023 15:17:18 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qrae3s35h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 May 2023 15:17:18 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34M8tUik032622;
-        Mon, 22 May 2023 15:17:16 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3qppc3h11b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 May 2023 15:17:16 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34MFHDQE57147680
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 May 2023 15:17:13 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EC4F320040;
-        Mon, 22 May 2023 15:17:12 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 60B6320043;
-        Mon, 22 May 2023 15:17:12 +0000 (GMT)
-Received: from [9.171.22.41] (unknown [9.171.22.41])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Mon, 22 May 2023 15:17:12 +0000 (GMT)
-Message-ID: <1ef42084-6ccf-359c-13bb-595069573e15@linux.ibm.com>
-Date:   Mon, 22 May 2023 17:17:11 +0200
+        with ESMTP id S231439AbjEVQNX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 12:13:23 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0468AF1
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 09:13:22 -0700 (PDT)
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 9DC0C41B56
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 16:13:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1684771995;
+        bh=125o6Ozycv6hr1/Xmw5xSDqLfuhzE74ZgK6ojkSnDGM=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type;
+        b=XBzQLaI7BkOgc15BVW/5Xhu+DoiFN9pD0+RKQuW+ZLb+r761Nut3u5zat4pxqG2bE
+         dhsgbN7C7U5g1qecvf7Vdg2Cl1XVtpgtCOMRBxLgBw9UZnAKBFRDAfMZoLv4cPwrM3
+         eKQvneUrjAGuMAyTtKGoP8agXuwMELls8k5mbiP71lwXwolnqcp5gmxakdSy+FcGw3
+         j6Z+K94ZPDTERHgvgoZ3uv0W3SEMfLTfUT+pKY09Bt4E6dZ266trwvfy+upl2mJYLs
+         SXS7aSdSH2BV8AHp7aRs+CqF+TnvzsbaWSPUyvLtg2uFK69yGeC1i1uOpvOB8F/k2Q
+         M3D7VLAQfcGow==
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-96f5157aca5so484748466b.0
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 09:13:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684771993; x=1687363993;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=125o6Ozycv6hr1/Xmw5xSDqLfuhzE74ZgK6ojkSnDGM=;
+        b=LiuXt6nwbhHX2rTPFaTJo7frIQdtdRi5/yA65BHONmNgWO0EqQqRkX3mwsy69OvBqw
+         cAHVvkRZDhocN6BpaBaBT92NSPTg0QOBun1pDVlChzbdXg6nVlDeDOAFDFjeNhy2D8AB
+         VyupDmiYV5vt0SkDC57ZtC+oLh3awEmg219K4N6lI2OvTCx/s6rdZc6bK4kJl4D6AMCv
+         IuXW/8Vf4h8Jwmj7HcqA1gEOCOuhvFRhNFS4ERWRltFK2jcfrRpNOAMIILGAkUv1aNj6
+         NqReT9l8zvzaSCO/JuqRQT1/zJx+S/Lz7W/X+rvJj9Mwngv9XX8ZFuOlXSqQOlt5hPFh
+         N1+A==
+X-Gm-Message-State: AC+VfDwBN4wwq01iebjMetOtPds7PZL+JTIAi2ievb8TPkjB0gNQlk5S
+        HwbuRbatRls2lv/YMz4EyNvgo+9KRhmZRrnqayfkhe7DNhuDqGjX/NbJs4O7K4mXLDX//skj+gd
+        qkZidFcKIqJP9XEVDrsWVPea3u0Sztw==
+X-Received: by 2002:a17:907:1b24:b0:96a:7196:6e2b with SMTP id mp36-20020a1709071b2400b0096a71966e2bmr10253684ejc.14.1684771993798;
+        Mon, 22 May 2023 09:13:13 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6JhXod18v9tx/IMD9T4ikV8Z2+zzpkEtqWBU2p4/F0aROYYH+dRjw49JIvOk5T3iEmefxvpg==
+X-Received: by 2002:a17:907:1b24:b0:96a:7196:6e2b with SMTP id mp36-20020a1709071b2400b0096a71966e2bmr10253660ejc.14.1684771993509;
+        Mon, 22 May 2023 09:13:13 -0700 (PDT)
+Received: from amikhalitsyn.local (dslb-088-074-206-207.088.074.pools.vodafone-ip.de. [88.74.206.207])
+        by smtp.gmail.com with ESMTPSA id a7-20020a17090682c700b009658475919csm3225039ejy.188.2023.05.22.09.13.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 May 2023 09:13:12 -0700 (PDT)
+From:   Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+To:     pbonzini@redhat.com
+Cc:     Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
+        Sean Christopherson <seanjc@google.com>,
+        =?UTF-8?q?St=C3=A9phane=20Graber?= <stgraber@ubuntu.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH v2 0/2] KVM: SVM: small tweaks for sev_hardware_setup
+Date:   Mon, 22 May 2023 18:12:46 +0200
+Message-Id: <20230522161249.800829-1-aleksandr.mikhalitsyn@canonical.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [kvm-unit-tests PATCH v9 1/2] s390x: topology: Check the Perform
- Topology Function
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com
-References: <20230519112236.14332-1-pmorel@linux.ibm.com>
- <20230519112236.14332-2-pmorel@linux.ibm.com>
- <168475411852.27238.14110102220289082947@t14-nrb>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <168475411852.27238.14110102220289082947@t14-nrb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: fj-EtvTBZyrFsD4bfUF3HlQ_3ntmyAkH
-X-Proofpoint-GUID: zGYBJk7vE8qTw6kdgZJfwVT0SEh0--TB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-22_10,2023-05-22_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- mlxscore=0 adultscore=0 priorityscore=1501 impostorscore=0
- lowpriorityscore=0 spamscore=0 mlxlogscore=999 bulkscore=0 clxscore=1015
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305220125
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+KVM: SVM: enhance info printk's in SEV init
 
-On 5/22/23 13:15, Nico Boehr wrote:
-> Quoting Pierre Morel (2023-05-19 13:22:35)
-> [...]
->> diff --git a/s390x/topology.c b/s390x/topology.c
->> new file mode 100644
->> index 0000000..2acede0
->> --- /dev/null
->> +++ b/s390x/topology.c
-> [...]
->> +static void check_privilege(int fc)
->> +{
->> +       unsigned long rc;
->> +
->> +       report_prefix_push("Privilege");
->> +       report_info("function code %d", fc);
-> report() messages should be unique.
->
-> Can you please make this a
->    report_prefix_pushf("Privileged fc %d", fc);
-> and get rid of the report_info()?
->
-> With this change:
->
-> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+Let's print available ASID ranges for SEV/SEV-ES guests.
+This information can be useful for system administrator
+to debug if SEV/SEV-ES fails to enable.
 
+There are a few reasons.
+SEV:
+- NPT is disabled (module parameter)
+- CPU lacks some features (sev, decodeassists)
+- Maximum SEV ASID is 0
 
-Yes, thanks
+SEV-ES:
+- mmio_caching is disabled (module parameter)
+- CPU lacks sev_es feature
+- Minimum SEV ASID value is 1 (can be adjusted in BIOS/UEFI)
 
-Pierre
+==
+   
+KVM: SVM: free sev_*asid_bitmap init if SEV init fails
+
+If misc_cg_set_capacity() fails for some reason then we have
+a memleak for sev_reclaim_asid_bitmap/sev_asid_bitmap. It's
+not a case right now, because misc_cg_set_capacity() just can't
+fail and check inside it is always successful.
+
+But let's fix that for code consistency.
+
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stéphane Graber <stgraber@ubuntu.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+
+Alexander Mikhalitsyn (2):
+  KVM: SVM: free sev_*asid_bitmap init if SEV init fails
+  KVM: SVM: enhance info printk's in SEV init
+
+ arch/x86/kvm/svm/sev.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+-- 
+2.34.1
 
