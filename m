@@ -2,181 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B82D70C966
-	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 21:47:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57C0670CAEC
+	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 22:26:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235316AbjEVTrm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 15:47:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42582 "EHLO
+        id S233768AbjEVUZw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 16:25:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235321AbjEVTrk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 15:47:40 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C29E8C1
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 12:47:39 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34MJktur025198;
-        Mon, 22 May 2023 19:47:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=yedHbQ3TFlHq6yfvLew0FF9aQmw0CarYHtSHvrQVmfM=;
- b=TGI48b4VqU7PjL7vE30iYqEppQhwaHyANfcbVcuYF1/ABh7bpaSkE6U9W0SOxjSTK8RV
- AasQOhf+C0X6kwlZINKcQ8lAgJcEjiiW192K7g1oQpGAf0pCtcaXCRw47VC6LLPIfdaG
- BkIeg7ohYoi4Mc7jeWpnuY1Pv/C+5jSCY4tJLBROrCBWMUVlpu2CsYjPFsP6M4V1m8uN
- 4NrJEB9xqkZPYa+h+aHzjgf+Yik/4MmhvQ09RS3SQIOUgMDYdoa5PPROvy9w840VoPyE
- Ka/S8s9m0HiAeAH8fxee8FcxJuGZtRxeKmNvZk9fXf+pmzDM/9eIdPQF/pHFXRYVt15A tA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qre6q99w8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 May 2023 19:47:27 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34MJVEp3023748;
-        Mon, 22 May 2023 19:47:26 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qre6q99vq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 May 2023 19:47:26 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34LMi16Q025356;
-        Mon, 22 May 2023 19:47:24 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3qppc3h3ya-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 May 2023 19:47:24 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34MJlJWA59375886
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 May 2023 19:47:19 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EC06820049;
-        Mon, 22 May 2023 19:47:18 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC93B20043;
-        Mon, 22 May 2023 19:47:17 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.42.164])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 22 May 2023 19:47:17 +0000 (GMT)
-Message-ID: <c268bd5b3246bdd0b7736eeeaba200a10546c470.camel@linux.ibm.com>
-Subject: Re: [PATCH v20 16/21] tests/avocado: s390x cpu topology entitlement
- tests
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Date:   Mon, 22 May 2023 21:47:17 +0200
-In-Reply-To: <20230425161456.21031-17-pmorel@linux.ibm.com>
-References: <20230425161456.21031-1-pmorel@linux.ibm.com>
-         <20230425161456.21031-17-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        with ESMTP id S234860AbjEVUZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 16:25:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF109B6
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 13:24:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684787081;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NENApr2cZp+USCY75WyJ/FbkT9bE21OL+57iVe/1FUo=;
+        b=Duj0V6trDCu88lJXrfrxG+pI/NTSpb9n3MNyQbMAzEDdTtonYEyXvkhMM+2E+UC6GeAVQh
+        CdEQw8stUOvurn31hkVm/Ag8CHDJumBqrpgV9zIMHNDePo55a5gb+c7MveO1QNeXgjiGFL
+        vU+Jtlxut4/yuBm44UpsFEiR/bI9K6g=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-357-Ys4PytckNNqEisLKuN6S7g-1; Mon, 22 May 2023 16:24:40 -0400
+X-MC-Unique: Ys4PytckNNqEisLKuN6S7g-1
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3382b8b357aso250255ab.3
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 13:24:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684787080; x=1687379080;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NENApr2cZp+USCY75WyJ/FbkT9bE21OL+57iVe/1FUo=;
+        b=CwCp6A70MIFwtxVi2FLUgEoKJ5Lu4ZPnVqVss0Cfbbp7lSlc5GLpKNJTYFBjpBaExu
+         wxMOzlatw0iQQ7jIyI3ug1mpQkmeFPNLF59rR8s6f5mbf80QNkfDZSCQB7ieJR04nt0L
+         fHCCurBoU1m3eH+3rkVN4iQ+flJBTZIxgXCmJKuxy/e/WfTW9d9Q9pMWYZQpK8E5Pdzz
+         z7l5zwbWAZ4Fao/LwdoxiJXpnIBFXzGeXEsdEhLMKmceDOOzbycs3otAJLEeUgf3gFfQ
+         V4keDMFcyfUZX1vwT/nI3ZA7aCim3Gt9MI+g2kacfHv+gKmmbIt3k0dqRtmaMwfFU3rx
+         CkgA==
+X-Gm-Message-State: AC+VfDxb/rWWdgXauSzT3j/ogTnejEcpbOV2kHCDkitt8jay9sWBdyYH
+        MNg0M3W6DwAjZ6umyJYtTd/CC5XUaTIOp7EPUcIE8gTKkRUsMOtnuLdTCEyrIwzqXf/Cj4gIq/X
+        PAZbSNp3iVVgn
+X-Received: by 2002:a92:c64d:0:b0:338:e5a9:e43f with SMTP id 13-20020a92c64d000000b00338e5a9e43fmr4889675ill.17.1684787079725;
+        Mon, 22 May 2023 13:24:39 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ512CeDeZO8hU3xF8vOUYaaUxxB6hwvCnGroyhxR9InVCYt68F99GX0+3UcrYhQidOeA0YXTA==
+X-Received: by 2002:a92:c64d:0:b0:338:e5a9:e43f with SMTP id 13-20020a92c64d000000b00338e5a9e43fmr4889656ill.17.1684787079467;
+        Mon, 22 May 2023 13:24:39 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id m16-20020a92d710000000b0032e1f94be7bsm1919596iln.33.2023.05.22.13.24.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 May 2023 13:24:38 -0700 (PDT)
+Date:   Mon, 22 May 2023 14:24:35 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, kevin.tian@intel.com, joro@8bytes.org,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
+        clegoate@redhat.com
+Subject: Re: [PATCH v11 10/23] vfio-iommufd: Move noiommu compat probe out
+ of vfio_iommufd_bind()
+Message-ID: <20230522142435.298ea794.alex.williamson@redhat.com>
+In-Reply-To: <20230513132827.39066-11-yi.l.liu@intel.com>
+References: <20230513132827.39066-1-yi.l.liu@intel.com>
+        <20230513132827.39066-11-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: OUgY8OabcnxDrLPkN5w-49LhCbwzwIrG
-X-Proofpoint-ORIG-GUID: Xro6b8icC8Sl5BEdmOummKEFsT3BfGgk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-22_14,2023-05-22_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
- spamscore=0 priorityscore=1501 suspectscore=0 impostorscore=0
- lowpriorityscore=0 malwarescore=0 mlxscore=0 adultscore=0 bulkscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305220165
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2023-04-25 at 18:14 +0200, Pierre Morel wrote:
-> This test takes care to check the changes on different entitlements
-> when the guest requests a polarization change.
->=20
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+On Sat, 13 May 2023 06:28:14 -0700
+Yi Liu <yi.l.liu@intel.com> wrote:
+
+> into vfio_device_group_open(). This is more consistent with what will
+> be done in vfio device cdev path.
+
+Same comment regarding flowing commit subject into body on this series.
+
+> 
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Tested-by: Terrence Xu <terrence.xu@intel.com>
+> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+> Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 > ---
->  tests/avocado/s390_topology.py | 56 ++++++++++++++++++++++++++++++++++
->  1 file changed, 56 insertions(+)
->=20
-> diff --git a/tests/avocado/s390_topology.py b/tests/avocado/s390_topology=
-.py
-> index 30d3c0d0cb..64e1cc9209 100644
-> --- a/tests/avocado/s390_topology.py
-> +++ b/tests/avocado/s390_topology.py
-> @@ -244,3 +244,59 @@ def test_polarisation(self):
->                  '/bin/cat /sys/devices/system/cpu/dispatching', '0')
-> =20
->          self.check_topology(0, 0, 0, 0, 'medium', False)
+>  drivers/vfio/group.c   |  6 ++++++
+>  drivers/vfio/iommufd.c | 32 +++++++++++++++++++-------------
+>  drivers/vfio/vfio.h    |  9 +++++++++
+>  3 files changed, 34 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index a17584e8be15..cfd0b9254bbc 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -192,6 +192,12 @@ static int vfio_device_group_open(struct vfio_device_file *df)
+>  		vfio_device_group_get_kvm_safe(device);
+>  
+>  	df->iommufd = device->group->iommufd;
+> +	if (df->iommufd && vfio_device_is_noiommu(device) && device->open_count == 0) {
+> +		ret = vfio_iommufd_compat_probe_noiommu(device,
+> +							df->iommufd);
+> +		if (ret)
+> +			goto out_put_kvm;
+> +	}
+>  
+>  	ret = vfio_device_open(df);
+>  	if (ret) {
+> diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
+> index a18e920be164..7a654a1437f0 100644
+> --- a/drivers/vfio/iommufd.c
+> +++ b/drivers/vfio/iommufd.c
+> @@ -46,6 +46,24 @@ static void vfio_iommufd_noiommu_unbind(struct vfio_device *vdev)
+>  	}
+>  }
+>  
+> +int vfio_iommufd_compat_probe_noiommu(struct vfio_device *device,
+> +				      struct iommufd_ctx *ictx)
+> +{
+> +	u32 ioas_id;
 > +
-> +    def test_entitlement(self):
-> +        """
-> +        This test verifies that QEMU modifies the polarization
-> +        after a guest request.
+> +	if (!capable(CAP_SYS_RAWIO))
+> +		return -EPERM;
 > +
-> +        :avocado: tags=3Darch:s390x
-> +        :avocado: tags=3Dmachine:s390-ccw-virtio
-> +        """
-> +        self.kernel_init()
-> +        self.vm.add_args('-smp',
-> +                         '1,drawers=3D2,books=3D2,sockets=3D3,cores=3D2,=
-maxcpus=3D24')
-> +        self.vm.add_args('-device', 'z14-s390x-cpu,core-id=3D1')
-> +        self.vm.add_args('-device', 'z14-s390x-cpu,core-id=3D2')
-> +        self.vm.add_args('-device', 'z14-s390x-cpu,core-id=3D3')
+> +	/*
+> +	 * Require no compat ioas to be assigned to proceed.  The basic
+> +	 * statement is that the user cannot have done something that
+> +	 * implies they expected translation to exist
+> +	 */
+> +	if (!iommufd_vfio_compat_ioas_get_id(ictx, &ioas_id))
+> +		return -EPERM;
+> +	return 0;
+> +}
 
-Why the -device statements? Won't they result in the same as specifying -sm=
-p 4,...?
-Same for patch 17.
+I think the purpose of this function is to keep the iommufd namespace
+out of the group, but we're muddying it as a general grab bag of
+noiommu validation.  What if the caller retained the RAWIO test and
+comment, and this function simply became a wrapper around the iommufd
+function, ex:
 
-> +        self.vm.launch()
-> +        self.wait_for_console_pattern('no job control')
+bool vfio_iommufd_device_has_compat_ioas(struct vfio_device *device,
+					 struct iommufd_ctx *ictx)
+{
+	u32 ioas_id;
+
+	return !iommufd_vfio_compat_ioas_get_id(ictx, &ioas_id));
+}
+
+Thanks,
+Alex
+
 > +
-> +        self.system_init()
+>  int vfio_iommufd_bind(struct vfio_device *vdev, struct iommufd_ctx *ictx)
+>  {
+>  	u32 ioas_id;
+> @@ -54,20 +72,8 @@ int vfio_iommufd_bind(struct vfio_device *vdev, struct iommufd_ctx *ictx)
+>  
+>  	lockdep_assert_held(&vdev->dev_set->lock);
+>  
+> -	if (vfio_device_is_noiommu(vdev)) {
+> -		if (!capable(CAP_SYS_RAWIO))
+> -			return -EPERM;
+> -
+> -		/*
+> -		 * Require no compat ioas to be assigned to proceed. The basic
+> -		 * statement is that the user cannot have done something that
+> -		 * implies they expected translation to exist
+> -		 */
+> -		if (!iommufd_vfio_compat_ioas_get_id(ictx, &ioas_id))
+> -			return -EPERM;
+> -
+> +	if (vfio_device_is_noiommu(vdev))
+>  		return vfio_iommufd_noiommu_bind(vdev, ictx, &device_id);
+> -	}
+>  
+>  	ret = vdev->ops->bind_iommufd(vdev, ictx, &device_id);
+>  	if (ret)
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index 785afc40ece8..8884b557fb26 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -234,9 +234,18 @@ static inline void vfio_container_cleanup(void)
+>  #endif
+>  
+>  #if IS_ENABLED(CONFIG_IOMMUFD)
+> +int vfio_iommufd_compat_probe_noiommu(struct vfio_device *device,
+> +				      struct iommufd_ctx *ictx);
+>  int vfio_iommufd_bind(struct vfio_device *device, struct iommufd_ctx *ictx);
+>  void vfio_iommufd_unbind(struct vfio_device *device);
+>  #else
+> +static inline int
+> +vfio_iommufd_compat_probe_noiommu(struct vfio_device *device,
+> +				  struct iommufd_ctx *ictx)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
 > +
-> +        res =3D self.vm.qmp('set-cpu-topology',
-> +                          {'core-id': 0, 'entitlement': 'low'})
-> +        self.assertEqual(res['return'], {})
-> +        res =3D self.vm.qmp('set-cpu-topology',
-> +                          {'core-id': 1, 'entitlement': 'medium'})
-> +        self.assertEqual(res['return'], {})
-> +        res =3D self.vm.qmp('set-cpu-topology',
-> +                          {'core-id': 2, 'entitlement': 'high'})
-> +        self.assertEqual(res['return'], {})
-> +        res =3D self.vm.qmp('set-cpu-topology',
-> +                          {'core-id': 3, 'entitlement': 'high'})
-> +        self.assertEqual(res['return'], {})
-> +        self.check_topology(0, 0, 0, 0, 'low', False)
-> +        self.check_topology(1, 0, 0, 0, 'medium', False)
-> +        self.check_topology(2, 1, 0, 0, 'high', False)
-> +        self.check_topology(3, 1, 0, 0, 'high', False)
-> +
-> +        exec_command(self, 'echo 1 > /sys/devices/system/cpu/dispatching=
-')
-> +        time.sleep(0.2)
-> +        exec_command_and_wait_for_pattern(self,
-> +                '/bin/cat /sys/devices/system/cpu/dispatching', '1')
-> +
-> +        self.check_topology(0, 0, 0, 0, 'low', False)
-> +        self.check_topology(1, 0, 0, 0, 'medium', False)
-> +        self.check_topology(2, 1, 0, 0, 'high', False)
-> +        self.check_topology(3, 1, 0, 0, 'high', False)
-> +
-> +        exec_command(self, 'echo 0 > /sys/devices/system/cpu/dispatching=
-')
-> +        time.sleep(0.2)
-> +        exec_command_and_wait_for_pattern(self,
-> +                '/bin/cat /sys/devices/system/cpu/dispatching', '0')
-> +
-> +        self.check_topology(0, 0, 0, 0, 'low', False)
-> +        self.check_topology(1, 0, 0, 0, 'medium', False)
-> +        self.check_topology(2, 1, 0, 0, 'high', False)
-> +        self.check_topology(3, 1, 0, 0, 'high', False)
+>  static inline int vfio_iommufd_bind(struct vfio_device *device,
+>  				    struct iommufd_ctx *ictx)
+>  {
 
