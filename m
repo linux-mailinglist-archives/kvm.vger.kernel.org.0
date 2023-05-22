@@ -2,208 +2,264 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74E5170CEF2
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 02:24:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E59070CF9D
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 02:41:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234184AbjEWACo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 20:02:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34222 "EHLO
+        id S234858AbjEWAkw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 20:40:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235191AbjEVXar (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 19:30:47 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 887A7F1;
-        Mon, 22 May 2023 16:30:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684798244; x=1716334244;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=4foQLvTvXeFvWz+kS1Ppa5oRnJY9uY7sriZpj0P1m6g=;
-  b=Idw3+3sWo8S7vYHe1QCQtheguGyhl8caV8eIY/1ydp+/YLC1CIPXo3y/
-   QeFMAzvQ7d6kDNuM4SRzlHxXePpeMefjDIIHQq2K133ORE8a2Xsw9LbBB
-   991hq8kFtB8K8ULttOkr3gcB+elF6vJen3igvx2QrmLEirYCvGbl6hlU6
-   jpRY5s9e7Oh/gFOwZIOIf5WIERzi2+uHRX0OAkrUEDVAsCQnig6eswYDe
-   p6cWxGfbEWKtvVw78pZTqqTpv56eccAOtAFyBEcGefmrQdYB5/uTIxcr1
-   YFmnJE73QZeQdX85XH+7rutua5PBLWD3vz+hRm+oZxQMp8VbgdSnbcJwr
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="439425351"
-X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
-   d="scan'208";a="439425351"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2023 16:30:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="703721660"
-X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
-   d="scan'208";a="703721660"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga002.jf.intel.com with ESMTP; 22 May 2023 16:30:43 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Mon, 22 May 2023 16:30:43 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Mon, 22 May 2023 16:30:43 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Mon, 22 May 2023 16:30:43 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.102)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Mon, 22 May 2023 16:30:43 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nUxpixdQq+QaElT9f6Yvcl5S6mLhHBeKX2KY18lmyPc7kQH/nURcNdYaPLCQzo+v3+HSGlZqhYo6idUWSdoM9N6a/Tx67nemiuSzRY2WVcDlGTHlOhi9rePmEluuJ+sXZibEoJCkqnmAmrkyRSvBIsaqX1zZqzIb3sVEu2owklQp6kCyp2BbEfhrgd+xo+VZFRsNKZOGsTQp4+eEo7geqiq2heLtMaPlWeT2q60wAL338djQ+sM+rJz2rRfv4MwXVP8wnXvfirh6mssxca/35Z9ESJv3DEFmTNR5O9MhHfo84FH2IrF9Pj3vRwHXs78sWCg2w6tk7CwD4kdEi/j5rg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4foQLvTvXeFvWz+kS1Ppa5oRnJY9uY7sriZpj0P1m6g=;
- b=b6uKHP4Z81KLceIin6da4Z7ROPKGGHOUrirBWFUtCDl2g2FHRe/vwmuf+tlerPeEmFRpMmpYkk9Cr4J6yf6BuNhG7GXOv5Y0TJOhF0SZsCNIF9v5DrMmbeq/3hg0ZpJP4hGg/h9xt0FWpeXxK2lj1OI5Wub7MSz73T6y3UQ1/jbtYSWR6MK2Gc4PmrtdvfpzAPukYe0q6YrZ6ErC9pPQfZYEUygaFvEFx4GQdseTcR6GBZwtLdxbxof3fbaTN9GE434uj+vmaBQ/8gUaDbcWZfKvQIU2VS1uivTTJzdKG8WTg4WHkSa+D6XdDhl3b+UXm79kfOE78oMhAbYqxSmuug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by SJ2PR11MB7714.namprd11.prod.outlook.com (2603:10b6:a03:4fd::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.28; Mon, 22 May
- 2023 23:30:36 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::3a8a:7ef7:fbaa:19e2]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::3a8a:7ef7:fbaa:19e2%5]) with mapi id 15.20.6411.028; Mon, 22 May 2023
- 23:30:36 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>
-Subject: Re: [PATCH v3 15/18] KVM: VMX: Ensure CPU is stable when probing
- basic VMX support
-Thread-Topic: [PATCH v3 15/18] KVM: VMX: Ensure CPU is stable when probing
- basic VMX support
-Thread-Index: AQHZhSydK91vrj+YiUOw7lt9ygQpeK9nAHWA
-Date:   Mon, 22 May 2023 23:30:35 +0000
-Message-ID: <379c16f0d81a00afdeba6916c5044c2ffee56071.camel@intel.com>
-References: <20230512235026.808058-1-seanjc@google.com>
-         <20230512235026.808058-16-seanjc@google.com>
-In-Reply-To: <20230512235026.808058-16-seanjc@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.48.1 (3.48.1-1.fc38) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SJ2PR11MB7714:EE_
-x-ms-office365-filtering-correlation-id: 1de84591-3d49-4231-223c-08db5b1c8b6f
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Wc+05YvmZYt/F+5yvk1wRy7rr1cz/IircxxkFD+C1S0H8ZFBuqbeXRH+PQHdaSZeMyOZgA/QwHElI28UwLZSIgKjDMVX5Y40KmRKoFeznuafVS2uu3kvrXbwVD0ap3HjlQwyPnPcG1/FY7J4Cn51rgq1K+SwLb9amnNUZirhLkFiSdh3eT2NnN8mUZulL8ekiDLyzT1b0JAW84o8AUvsVVTnOotWkEatVvhr+nlYspwhrJyEEiMUDrRi84DfzzJ0YX8kTKKT6YQ/2RN1XrsTkEVx8oAAsigqNJ32+G/vSiDV05DqWFJnidyDC6QAMaekvAW8hbKyWECV0mZS4tHAe4Y+uslgYk7BMx4tvOMKhKCVzitIg5x2gWhvaBkawR8H+E+9t2OctIixbe/Ql0tReDcJJXAL2JWwUE4kmfLTnTa7TkejCfj4IAYga9IQPOeD7+D8kV2m8bgi7hIHjEdGi3PiBKZNqM9qyca8ad0K4UcQfWVf+2aRtpJ2yTlm7iRz7iGU1H/h729xCLuaAMVFlnpypPMaBDdvrV4F0En3l+ajJDKEj0bvGMbRtYTc/skn5/diN/fup2bb4gkrekBKu9SQf42EajtZLFhQI0HFY3be5IyDrUlZI/KDILM2OKQW
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(346002)(39860400002)(136003)(376002)(396003)(451199021)(71200400001)(2906002)(6486002)(38070700005)(91956017)(82960400001)(66446008)(64756008)(76116006)(66556008)(54906003)(66946007)(66476007)(110136005)(478600001)(2616005)(8676002)(122000001)(38100700002)(8936002)(36756003)(41300700001)(5660300002)(4326008)(86362001)(316002)(6506007)(26005)(83380400001)(186003)(6512007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?dXRaMS9nWUtlQmVRMWlRU2RHZHRkdDZBMjNDSlVUVWVPcXExb0p1ZVlYNVA5?=
- =?utf-8?B?bTMxYnVUaVorZk0xWDc0R0UvNkZCWlYvWGZoVzVKRlZyc0ltY0ZLaEpYNThI?=
- =?utf-8?B?ekkxNHI0cU14aHJ3aUhLSkhEN2J6VDVFanIxS0pOOGhOTm5iYlJLeEtSTUNB?=
- =?utf-8?B?QVBvRW4rNW5pRG1PMGFKS1M2ZkpWNTNmM1ZzanJBdVRPSWxPejJLa1VRNWlK?=
- =?utf-8?B?VEdoT0FRWlRhYUlDa2prdE5iTTBGK1ppSGlZblJOTmREQ1pEeElDQ01GUW5Y?=
- =?utf-8?B?UnRzbDYrNmVKaEx0Tk5IbTlIb0FvU2g3Q04ycFlNY3Y2WVQrWGR1VjVEVnM1?=
- =?utf-8?B?OUdXZzR2MVo4S3R3bjlDZTRubUtlVVlWZEMvSG9WN2pEamZUTnFTWUtVdmJP?=
- =?utf-8?B?REdWY3hwWnNlNE1MQWlMNTJXK1NGOGpKMDdtTVMzd0ZEOXRrNUV0Y0dEdDIz?=
- =?utf-8?B?U2NCZXVwODYwRS9XYVpwVW1vUkMwdTQwb3VaQm4rMHZaYngzUGQvYzQ4ZXl2?=
- =?utf-8?B?Y0tITUNnRXRVbGhUTjZxOXdBSGtoYUtOSUh1TXhSS0xRa0hDNUE3aFYxK3hy?=
- =?utf-8?B?MEFBUldhSlhqZ2UwK1NhcXo4eTVrRzI4RWdNd2cvVXIyVktOWG4rVUtaK054?=
- =?utf-8?B?WXhwUzNMd2l3Zm1HbHpXeUx6YUpFaE81ZlRUYlB4MFQyTFphdFdMRmRIZU9u?=
- =?utf-8?B?Y3ZVSEVMRlRKVkNBMENoTE1DeUNHay9PZm01d1RyT2gvMFpzQm4rdHZMckFi?=
- =?utf-8?B?ZFoxWEdQeEVpMGp3TlJkYU5RNm1LYU9PSTVCZytqYVd0cDdTakJTYXJ5MDlt?=
- =?utf-8?B?djl2OUg1RFYyZ2dCclFJcVZZSGVMbHFpTTdWMkY4R2plR0pQOFNyeTUzSit2?=
- =?utf-8?B?OXJ3SElheGUwOW43d1owMTBxRjRvNVpvRHh5VExyKzFTQ3Zzb01qRlo1WHhN?=
- =?utf-8?B?djc3MzlmTVBWcWNOMC94RXBSZEtFZGFBUS82UGxKTGMvbVdJanpHais0Mkdk?=
- =?utf-8?B?Sm1YTFl6MjZlc1NOYVhkNDZVYzQ5V2Nsb1ppcmw1WXBIVUxpdStZM0JVQnd5?=
- =?utf-8?B?a2FFL1BML2ZJdksxRExiNFRzcG12VWJBRnd5elFVQ2RhdnRzWnBDWUNVRE9a?=
- =?utf-8?B?cGVpZERJb0FJVXFER1krT3YyWnNFOVN2eVZIV0YyakdhVDBvbTNFRWdtRFdN?=
- =?utf-8?B?elA2L2E0eS9NazFhSW9idHdzbTN4MytydGlIS0pjdE9nb3JYbmJmK0haTHh4?=
- =?utf-8?B?VE9wSS8vb2djZm0rL1Z6TlRlQ21TM0orQzJsMzJPWnlEcWFaQWtrd0lJNkl6?=
- =?utf-8?B?ME56QUM4aVQrK1pYL01PZlAyZ1pSS3ZDczJJaXBlY2JCcUljVzQ5QVlWNlRq?=
- =?utf-8?B?aVA0bjdJRnFIT05UNEg2R2IxNCtIQnNHM0FES2ZWUmlobnVJL21SMjVOMXF0?=
- =?utf-8?B?MldPVncxZVhNaHNLNFdwaGpqTVdlUmN5ZmxDL1RrWmxCbVN2c0ZUQjFpdkRN?=
- =?utf-8?B?cGQrKzIyc05USGJsKzdWMnh2ZVo3UGlNeTVua0wvclI3WGpRRjRpdzRxSCta?=
- =?utf-8?B?RzFXVFV3QnBwSkFKSXU3bVkrUFlOZFkvU2d0ajNHYWxGdkpKdW5XUXhERUl4?=
- =?utf-8?B?TThUVlFKUTJmVGY4WmNBd25FUUU0UnVxQVU3aUlUaW1ubWFCeE5lamhYRWhm?=
- =?utf-8?B?TlUya0ZTalVFZGxsSmJsWXNJRldpYjlUcVlzNUJSc1VXZmlhdlR6NDZGcmhJ?=
- =?utf-8?B?dnBldm1Fb3laVWFHQlJUZDZXQ2d4VVhqY05ya1B1SmpSU3p5dDc3VHltTEJB?=
- =?utf-8?B?RW1FZ3h6Mjlnei9iaUZUeG5xSk8zb2YxeHZnajh3STAvQlF4SndmcXZjTkJ1?=
- =?utf-8?B?YmtiY05FMlNhbXB0WEhDY2dPOVBWY2pwMDQ1a0kvd2pOWHhuTnE1Zyt4aHpx?=
- =?utf-8?B?UkVkcyt5Z0kvSEhubDcvQUNDbEdLN3kvbmJrRW43NGNZYnBVdW81MmxUcC8r?=
- =?utf-8?B?WmZCMmtTOFZZQ3dieVBkWDlTVFJVbjRhcUhyVlNicU5VT3MrS2k4ZVF5RjFJ?=
- =?utf-8?B?R2ZybVF1ZVhxYzFJWEFKR3YzelF4TjM0V2FLcm95eWVlcW0rbmRyNm1wTEho?=
- =?utf-8?B?WVhzYmRLTVdpdUhZQUZKcU00MHJwRzIvNTE2Ulp3UC9pNnc0QTV3bVJJdXV4?=
- =?utf-8?B?N2c9PQ==?=
+        with ESMTP id S234788AbjEWAGa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 20:06:30 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28D0519B3
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 16:39:59 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-561f201a646so103572627b3.1
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 16:39:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1684798798; x=1687390798;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HZenqV6ENOtdC3IAYPpjXT1tsTf7oZsrQ2divi+KMXw=;
+        b=7qIhMZnB7ip/AwQj7RBVQrlgUH2zld3NyBPTfc2ZhknKV+9SKieqPYkhSRXPfrdYNK
+         lETIMEUrp7RgmJPtj9WVYbx7I4BXQ278tjcPuiu+FGcRY6xmymzspVAnnKbxE3rKaMn1
+         HFO9p6ZjJAKrMn1khMbP9wGgh4OEx72UOWCuEBLz0OAApkL9a3q+uJFZnjbZ6Vw9TzJ9
+         c4zFx0kIxFg1vmbFHVHhw+Y26OuEXiZrFU2/yZjCZObMu2ss0FVC50uH0XV/X+RUtWqp
+         cVBYea8w1T8ZYaCCY0NDKZMuxNezsnnaTT3+jKpTwgs0NyLZj1OZWJGQgr7w4WsgmuWg
+         HBfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684798798; x=1687390798;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HZenqV6ENOtdC3IAYPpjXT1tsTf7oZsrQ2divi+KMXw=;
+        b=AetFatE+mlqRtCCoSqj5XUX5DJdY+/H0VXQU2xl9mCPYr4V7MfW43/a+0VNEvTxTFR
+         iB3MOSqZ+yXAoFz/rnssoXm8AnBwtwoG1TMHAdsyZKwCRy/cFckDn9XcP/I9tbvKKYfJ
+         ZUbkyoTyy0edLJxVTb3IKAJv8HO8D6ywyNamBwPmadQpo1wtP7ISum6Q6XwNrU35X5JM
+         dhs8CF+rgoWeuQrEL3A3aYwyCOybRd5m4yelGW17n6H0Awix+uAc/M3tF90QtR8uDHWA
+         Kkc7vMBtn+dAbarp92MDbhCoNEVPNemhwNa8tUSEYcu0/hD7SfpE4q9xa+Zw0YcDN/cF
+         Wlcg==
+X-Gm-Message-State: AC+VfDyhAbrzxIMzVwQW+kHt4ied7KqfyNstcM7BKxNrljHQfhnZC7Op
+        4lket7AJwjhp2yNfzrVE5jYlMau4Te0=
+X-Google-Smtp-Source: ACHHUZ6K4SYJn9KKrPTSI2xtIW00BVoWY/F51nj6TfhBx+vxPeCHJpWo3DLWtC1uIz5ry0O5Sd2squFPRO8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:d80d:0:b0:561:61e9:ab39 with SMTP id
+ d13-20020a81d80d000000b0056161e9ab39mr7595291ywj.8.1684798798454; Mon, 22 May
+ 2023 16:39:58 -0700 (PDT)
+Date:   Mon, 22 May 2023 16:39:57 -0700
+In-Reply-To: <20230411125718.2297768-6-aik@amd.com>
+Mime-Version: 1.0
+References: <20230411125718.2297768-1-aik@amd.com> <20230411125718.2297768-6-aik@amd.com>
+Message-ID: <ZGv9Td4p1vtXC0Hy@google.com>
+Subject: Re: [PATCH kernel v5 5/6] KVM: SEV: Enable data breakpoints in SEV-ES
+From:   Sean Christopherson <seanjc@google.com>
+To:     Alexey Kardashevskiy <aik@amd.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Pankaj Gupta <pankaj.gupta@amd.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Santosh Shukla <santosh.shukla@amd.com>,
+        Carlos Bilbao <carlos.bilbao@amd.com>
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <883F9335A8CE304AA77279DC84CB40CE@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1de84591-3d49-4231-223c-08db5b1c8b6f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 May 2023 23:30:35.9063
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4gtGE3XKa02IQG1aSN1D3M+susoqDwcJlnASEX2AGSfKsJ3TsHRC8nCQKcuBq5caTFk3rAO5WnRM9THUshYW1Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7714
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gRnJpLCAyMDIzLTA1LTEyIGF0IDE2OjUwIC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBEaXNhYmxlIG1pZ3JhdGlvbiB3aGVuIHByb2JpbmcgVk1YIHN1cHBvcnQgZHVyaW5n
-IG1vZHVsZSBsb2FkIHRvIGVuc3VyZQ0KPiB0aGUgQ1BVIGlzIHN0YWJsZSwgbW9zdGx5IHRvIG1h
-dGNoIHNpbWlsYXIgU1ZNIGxvZ2ljLCB3aGVyZSBhbGxvd2luZw0KPiBtaWdyYXRpb24gZWZmZWN0
-aXZlIHJlcXVpcmVzIGRlbGliZXJhdGVseSB3cml0aW5nIGJ1Z2d5IGNvZGUuICBBcyBhIGJvbnVz
-LA0KPiBLVk0gd29uJ3QgcmVwb3J0IHRoZSB3cm9uZyBDUFUgdG8gdXNlcnNwYWNlIGlmIFZNWCBp
-cyB1bnN1cHBvcnRlZCwgYnV0IGluDQo+IHByYWN0aWNlIHRoYXQgaXMgYSB2ZXJ5LCB2ZXJ5IG1p
-bm9yIGJvbnVzIGFzIHRoZSBvbmx5IHdheSB0aGF0IHJlcG9ydGluZw0KPiB0aGUgd3JvbmcgQ1BV
-IHdvdWxkIGFjdHVhbGx5IG1hdHRlciBpcyBpZiBoYXJkd2FyZSBpcyBicm9rZW4gb3IgaWYgdGhl
-DQo+IHN5c3RlbSBpcyBtaXNjb25maWd1cmVkLCBpLmUuIGlmIEtWTSBnZXRzIG1pZ3JhdGVkIGZy
-b20gYSBDUFUgdGhhdCBfZG9lc18NCj4gc3VwcG9ydCBWTVggdG8gYSBDUFUgdGhhdCBkb2VzIF9u
-b3RfIHN1cHBvcnQgVk1YLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogU2VhbiBDaHJpc3RvcGhlcnNv
-biA8c2VhbmpjQGdvb2dsZS5jb20+DQoNClJldmlld2VkLWJ5OiBLYWkgSHVhbmcgPGthaS5odWFu
-Z0BpbnRlbC5jb20+DQoNCj4gLS0tDQo+ICBhcmNoL3g4Ni9rdm0vdm14L3ZteC5jIHwgMTcgKysr
-KysrKysrKysrKystLS0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxNCBpbnNlcnRpb25zKCspLCAzIGRl
-bGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS92bXgvdm14LmMgYi9h
-cmNoL3g4Ni9rdm0vdm14L3ZteC5jDQo+IGluZGV4IGUwMGRiYTE2NmE5ZS4uMDA4OTE0Mzk2MTgw
-IDEwMDY0NA0KPiAtLS0gYS9hcmNoL3g4Ni9rdm0vdm14L3ZteC5jDQo+ICsrKyBiL2FyY2gveDg2
-L2t2bS92bXgvdm14LmMNCj4gQEAgLTI3NDAsOSArMjc0MCw5IEBAIHN0YXRpYyBpbnQgc2V0dXBf
-dm1jc19jb25maWcoc3RydWN0IHZtY3NfY29uZmlnICp2bWNzX2NvbmYsDQo+ICAJcmV0dXJuIDA7
-DQo+ICB9DQo+ICANCj4gLXN0YXRpYyBib29sIGt2bV9pc192bXhfc3VwcG9ydGVkKHZvaWQpDQo+
-ICtzdGF0aWMgYm9vbCBfX2t2bV9pc192bXhfc3VwcG9ydGVkKHZvaWQpDQo+ICB7DQo+IC0JaW50
-IGNwdSA9IHJhd19zbXBfcHJvY2Vzc29yX2lkKCk7DQo+ICsJaW50IGNwdSA9IHNtcF9wcm9jZXNz
-b3JfaWQoKTsNCj4gIA0KPiAgCWlmICghKGNwdWlkX2VjeCgxKSAmIGZlYXR1cmVfYml0KFZNWCkp
-KSB7DQo+ICAJCXByX2VycigiVk1YIG5vdCBzdXBwb3J0ZWQgYnkgQ1BVICVkXG4iLCBjcHUpOw0K
-PiBAQCAtMjc1OCwxMyArMjc1OCwyNCBAQCBzdGF0aWMgYm9vbCBrdm1faXNfdm14X3N1cHBvcnRl
-ZCh2b2lkKQ0KPiAgCXJldHVybiB0cnVlOw0KPiAgfQ0KPiAgDQo+ICtzdGF0aWMgYm9vbCBrdm1f
-aXNfdm14X3N1cHBvcnRlZCh2b2lkKQ0KPiArew0KPiArCWJvb2wgc3VwcG9ydGVkOw0KPiArDQo+
-ICsJbWlncmF0ZV9kaXNhYmxlKCk7DQo+ICsJc3VwcG9ydGVkID0gX19rdm1faXNfdm14X3N1cHBv
-cnRlZCgpOw0KPiArCW1pZ3JhdGVfZW5hYmxlKCk7DQo+ICsNCj4gKwlyZXR1cm4gc3VwcG9ydGVk
-Ow0KPiArfQ0KPiArDQo+ICBzdGF0aWMgaW50IHZteF9jaGVja19wcm9jZXNzb3JfY29tcGF0KHZv
-aWQpDQo+ICB7DQo+ICAJaW50IGNwdSA9IHJhd19zbXBfcHJvY2Vzc29yX2lkKCk7DQo+ICAJc3Ry
-dWN0IHZtY3NfY29uZmlnIHZtY3NfY29uZjsNCj4gIAlzdHJ1Y3Qgdm14X2NhcGFiaWxpdHkgdm14
-X2NhcDsNCj4gIA0KPiAtCWlmICgha3ZtX2lzX3ZteF9zdXBwb3J0ZWQoKSkNCj4gKwlpZiAoIV9f
-a3ZtX2lzX3ZteF9zdXBwb3J0ZWQoKSkNCj4gIAkJcmV0dXJuIC1FSU87DQo+ICANCj4gIAlpZiAo
-c2V0dXBfdm1jc19jb25maWcoJnZtY3NfY29uZiwgJnZteF9jYXApIDwgMCkgew0KPiAtLSANCj4g
-Mi40MC4xLjYwNi5nYTRiMWIxMjhkNi1nb29nDQo+IA0KDQo=
+On Tue, Apr 11, 2023, Alexey Kardashevskiy wrote:
+> Prior to SEV-ES, KVM saved/restored host debug registers upon switching
+> to/from a VM. Changing those registers inside a running SEV VM
+> triggered #VMEXIT to KVM.
+
+Please, please don't make it sound like some behavior is *the* one and only=
+ behavior.
+*KVM* *chooses* to intercept debug register accesses.  Though I would omit =
+this
+paragraph (and largely the next) entirely, IMO it's safe to assume the read=
+er has
+a basic understanding of how KVM deals with DRs and #DBs.=20
+
+> SEV-ES added encrypted state (ES) which uses an encrypted page
+> for the VM state (VMSA). The hardware saves/restores certain registers
+> on VMRUN/VMEXIT according to a swap type (A, B, C), see
+> "Table B-3. Swap Types" in the AMD Architecture Programmer=E2=80=99s Manu=
+al
+> volume 2.
+>=20
+> The DR6 and DR7 registers have always been swapped as Type A for SEV-ES
+
+Please rewrite this to just state what the behavior is instead of "Type A" =
+vs.
+"Type B".  Outside of AMD, the "type a/b/c" stuff isn't anywhere near ubiqu=
+itous
+enough to justify obfuscating super simple concepts.
+
+Actually, this feature really has nothing to do with Type A vs. Type B, sin=
+ce
+that's purely about host state.  I assume the switch from Type A to Type B =
+is a
+side effect, or an opportunistic optimization?
+
+Regardless, something like this is a lot easier for a human to read.  It's =
+easy
+enough to find DebugSwap in the APM (literally took me longer to find my co=
+py of
+the PDF).
+
+  Add support for "DebugSwap for SEV-ES guests", which provides support
+  for swapping DR[0-3] and DR[0-3]_ADDR_MASK on VMRUN and VMEXIT, i.e.
+  allows KVM to expose debug capabilities to SEV-ES guests.  Without
+  DebugSwap support, the CPU doesn't save/load _guest_ debug registers,
+  and KVM cannot manually context switch guest DRs due the VMSA being
+  encrypted.
+
+  Enable DebugSwap if and only if the CPU also supports NoNestedDataBp,
+  which causes the CPU to ignore nested #DBs, i.e. #DBs that occur when
+  vectoring a #DB.  Without NoNestedDataBp, a malicious guest can DoS
+  the host by putting the CPU into an infinite loop of vectoring #DBs
+  (see https://bugzilla.redhat.com/show_bug.cgi?id=3D1278496)
+
+  Set the features bit in sev_es_sync_vmsa() which is the last point
+  when VMSA is not encrypted yet as sev_(es_)init_vmcb() (where the most
+  init happens) is called not only when VCPU is initialized but also on
+  intrahost migration when VMSA is encrypted.
+
+> guests, but a new feature is available, identified via
+> CPUID Fn8000001F_EAX[14] "DebugSwap for SEV-ES guests", that provides
+> support for swapping additional debug registers. DR[0-3] and
+> DR[0-3]_ADDR_MASK are swapped as Type B when SEV_FEATURES[5] (DebugSwap)
+> is set.
+>=20
+> Enable DebugSwap for a VMSA but only do so if CPUID Fn80000021_EAX[0]
+> ("NoNestedDataBp", "Processor ignores nested data breakpoints") is
+> supported by the SOC as otherwise a malicious SEV-ES guest can set up
+> data breakpoints on the #DB IDT entry/stack and cause an infinite loop.
+> Set the features bit in sev_es_sync_vmsa() which is the last point
+> when VMSA is not encrypted yet as sev_(es_)init_vmcb() (where the most
+> init happens) is called not only when VCPU is initialized but also on
+> intrahost migration when VMSA is encrypted.
+>=20
+> Eliminate DR7 and #DB intercepts as:
+> - they are not needed when DebugSwap is supported;
+
+"not needed" isn't sufficient justification.  KVM doesn't strictly need to =
+do a
+lot of things, but does them anyways for a variety of reasons.  E.g. #DB in=
+tercept
+is also not needed when NoNestedDataBp is supported and vcpu->guest_debug=
+=3D=3D0, i.e.
+this should clarify why KVM doesn't simply disable #DB intercepts for _all_=
+ VMs
+when NoNestedDataBp is support.  Presumably the answer is "because it's sim=
+pler
+than toggling #DB interception for guest_debug.
+
+Actually, can't disabling #DB interception for DebugSwap SEV-ES guests be a
+separate patch?  KVM can still inject #DBs for SEV-ES guests, no?
+
+As for DR7, the real justification is that, as above, KVM can't modify gues=
+t DR7,
+and intercepting DR7 would completely defeat the purpose of enabling DebugS=
+wap.
+
+> - #VC for these intercepts is most likely not supported anyway and
+> kills the VM.
+
+I don't see how this is relevant or helpful.  What the guest may or may not=
+ do in
+response to a #VC on a DR7 write has no bearing on KVM's behavior.=20
+
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+
+...
+
+> @@ -3048,6 +3066,18 @@ void sev_es_prepare_switch_to_guest(struct sev_es_=
+save_area *hostsa)
+> =20
+>  	/* MSR_IA32_XSS is restored on VMEXIT, save the currnet host value */
+>  	hostsa->xss =3D host_xss;
+> +
+> +	/* The DebugSwap SEV feature does Type B swaps of DR[0-3] */
+
+Since dangling a carrot didn't work[*], I'm going to resort to extortion :-=
+)
+Can you fold the below somewhere before this patch, and then tweak this com=
+ment
+to say something like:
+
+	/*
+	 * If DebugSwap is enabled, debug registers are loaded but NOT saved by
+	 * the CPU (Type-B).  If DebugSwap is disabled/unsupported, the CPU both
+	 * saves and loads debug registers (Type-A).
+	 */
+
+[*] https://lore.kernel.org/all/YzOTOzUzKPQSqURo@google.com/
+
+--
+From: Sean Christopherson <seanjc@google.com>
+Date: Mon, 22 May 2023 16:29:52 -0700
+Subject: [PATCH] KVM: SVM: Rewrite sev_es_prepare_switch_to_guest()'s comme=
+nt
+ about swap types
+
+Rewrite the comment(s) in sev_es_prepare_switch_to_guest() to explain the
+swap types employed by the CPU for SEV-ES guests, i.e. to explain why KVM
+needs to save a seemingly random subset of host state, and to provide a
+decoder for the APM's Type-A/B/C terminology.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/sev.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 69ae5e1b3120..1e0e9b08e491 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -3017,19 +3017,24 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm)
+ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
+ {
+ 	/*
+-	 * As an SEV-ES guest, hardware will restore the host state on VMEXIT,
+-	 * of which one step is to perform a VMLOAD.  KVM performs the
+-	 * corresponding VMSAVE in svm_prepare_guest_switch for both
+-	 * traditional and SEV-ES guests.
++	 * All host state for SEV-ES guests is categorized into three swap types
++	 * based on how it is handled by hardware during a world switch:
++	 *
++	 * A: VMRUN:   Host state saved in host save area
++	 *    VMEXIT:  Host state loaded from host save area
++	 *
++	 * B: VMRUN:   Host state _NOT_ saved in host save area
++	 *    VMEXIT:  Host state loaded from host save area
++	 *
++	 * C: VMRUN:   Host state _NOT_ saved in host save area
++	 *    VMEXIT:  Host state initialized to default(reset) values
++	 *
++	 * Manually save type-B state, i.e. state that is loaded by VMEXIT but
++	 * isn't saved by VMRUN, that isn't already saved by VMSAVE (performed
++	 * by common SVM code).
+ 	 */
+-
+-	/* XCR0 is restored on VMEXIT, save the current host value */
+ 	hostsa->xcr0 =3D xgetbv(XCR_XFEATURE_ENABLED_MASK);
+-
+-	/* PKRU is restored on VMEXIT, save the current host value */
+ 	hostsa->pkru =3D read_pkru();
+-
+-	/* MSR_IA32_XSS is restored on VMEXIT, save the currnet host value */
+ 	hostsa->xss =3D host_xss;
+ }
+=20
+
+base-commit: 39428f6ea9eace95011681628717062ff7f5eb5f
+--=20
