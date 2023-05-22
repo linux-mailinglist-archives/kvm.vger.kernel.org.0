@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 971D370B39D
-	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 05:13:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A747970B3A0
+	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 05:13:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231774AbjEVDNd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 21 May 2023 23:13:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42104 "EHLO
+        id S231675AbjEVDNj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 21 May 2023 23:13:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231574AbjEVDMa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231580AbjEVDMa (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 21 May 2023 23:12:30 -0400
 Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 30686B5;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1A69A102;
         Sun, 21 May 2023 20:12:27 -0700 (PDT)
 Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8Bx7eqZ3WpkvcsKAA--.18745S3;
-        Mon, 22 May 2023 11:12:25 +0800 (CST)
+        by gateway (Coremail) with SMTP id _____8AxV+ma3Wpk4csKAA--.18376S3;
+        Mon, 22 May 2023 11:12:26 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxMMiR3WpkJIFuAA--.54000S25;
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxMMiR3WpkJIFuAA--.54000S26;
         Mon, 22 May 2023 11:12:25 +0800 (CST)
 From:   Tianrui Zhao <zhaotianrui@loongson.cn>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -31,21 +31,21 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Alex Deucher <alexander.deucher@amd.com>,
         Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
         Xi Ruoyao <xry111@xry111.site>, zhaotianrui@loongson.cn
-Subject: [PATCH v11 23/31] LoongArch: KVM: Implement handle gspr exception
-Date:   Mon, 22 May 2023 11:12:09 +0800
-Message-Id: <20230522031217.956464-24-zhaotianrui@loongson.cn>
+Subject: [PATCH v11 24/31] LoongArch: KVM: Implement handle mmio exception
+Date:   Mon, 22 May 2023 11:12:10 +0800
+Message-Id: <20230522031217.956464-25-zhaotianrui@loongson.cn>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230522031217.956464-1-zhaotianrui@loongson.cn>
 References: <20230522031217.956464-1-zhaotianrui@loongson.cn>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8DxMMiR3WpkJIFuAA--.54000S25
+X-CM-TRANSID: AQAAf8DxMMiR3WpkJIFuAA--.54000S26
 X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjvJXoWxZrW3CrWrJF18Ary8tr13Jwb_yoW5ZF4kpr
-        W7Z34F9r4kJrySyw4aqrsYvrn0va18Kry7XasxJ3y3u3y7t3s5Jr40yrZFyF1DKrySvF4x
-        Za15tF13CF1UAaUanT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+X-Coremail-Antispam: 1Uk129KBjvJXoW3JFWkGrW3Gw1kAF13Wr1xXwb_yoW3GF1fpr
+        WUC34jvrsaqryYy3srKrs5Xr1a9F48GrsrJrZ7t39Fgr17tFy5Ar4v9rW2vFW3CrWF9a1x
+        Z3Z3JF47uF1UAa7anT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
         qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
-        bxxFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4
+        b2xFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4
         AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF
         7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aV
         CY1x0267AKxVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487
@@ -53,10 +53,10 @@ X-Coremail-Antispam: 1Uk129KBjvJXoWxZrW3CrWrJF18Ary8tr13Jwb_yoW5ZF4kpr
         IEY20_WwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lc7CjxVAaw2AFwI0_
         JF0_Jw1l42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VWrMxC20s026xCaFVCjc4
         AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-        r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-        IIjxv20xvE14v26w1j6s0DMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0xvE
-        42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8Jr0_Cr1UMIIF0xvEx4A2js
-        IEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvj4RKpBTUUUUU
+        r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI42IY6xIIjxv20xvE14v26w
+        1j6s0DMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0xvE42xK8VAvwI8IcIk0
+        rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8Jr0_Cr1UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr
+        1j6F4UJbIYCTnIWIevJa73UjIFyTuYvj4RKpBTUUUUU
 X-Spam-Status: No, score=1.4 required=5.0 tests=BAYES_00,RCVD_IN_SBL_CSS,
         SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
         autolearn_force=no version=3.4.6
@@ -67,136 +67,336 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement kvm handle gspr exception interface, including emulate the
-reading and writing of cpucfg, csr, iocsr resource.
+Implement handle mmio exception, setting the mmio info into vcpu_run and
+return to user space to handle it.
 
 Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 ---
- arch/loongarch/kvm/exit.c | 115 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 115 insertions(+)
+ arch/loongarch/kvm/exit.c | 308 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 308 insertions(+)
 
 diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
-index 3fdb42939a05..26283a9d3c6d 100644
+index 26283a9d3c6d..1237ceb06d0c 100644
 --- a/arch/loongarch/kvm/exit.c
 +++ b/arch/loongarch/kvm/exit.c
-@@ -208,3 +208,118 @@ int _kvm_emu_idle(struct kvm_vcpu *vcpu)
- 
+@@ -209,6 +209,265 @@ int _kvm_emu_idle(struct kvm_vcpu *vcpu)
  	return EMULATE_DONE;
  }
-+
-+static int _kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
+ 
++int _kvm_emu_mmio_write(struct kvm_vcpu *vcpu, larch_inst inst)
 +{
-+	enum emulation_result er = EMULATE_DONE;
 +	struct kvm_run *run = vcpu->run;
-+	larch_inst inst;
++	unsigned int rd, op8, opcode;
++	unsigned long rd_val = 0;
++	void *data = run->mmio.data;
 +	unsigned long curr_pc;
-+	int rd, rj;
-+	unsigned int index;
++	int ret;
 +
 +	/*
-+	 *  Fetch the instruction.
++	 * Update PC and hold onto current PC in case there is
++	 * an error and we want to rollback the PC
 +	 */
-+	inst.word = vcpu->arch.badi;
 +	curr_pc = vcpu->arch.pc;
 +	update_pc(&vcpu->arch);
 +
-+	trace_kvm_exit_gspr(vcpu, inst.word);
-+	er = EMULATE_FAIL;
-+	switch (((inst.word >> 24) & 0xff)) {
-+	case 0x0:
-+		/* cpucfg GSPR */
-+		if (inst.reg2_format.opcode == 0x1B) {
-+			rd = inst.reg2_format.rd;
-+			rj = inst.reg2_format.rj;
-+			++vcpu->stat.cpucfg_exits;
-+			index = vcpu->arch.gprs[rj];
++	op8 = (inst.word >> 24) & 0xff;
++	run->mmio.phys_addr = vcpu->arch.badv;
++	ret = EMULATE_DO_MMIO;
++	if (op8 < 0x28) {
++		/* stptrw/d process */
++		rd = inst.reg2i14_format.rd;
++		opcode = inst.reg2i14_format.opcode;
 +
-+			vcpu->arch.gprs[rd] = read_cpucfg(index);
-+			/* Nested KVM is not supported */
-+			if (index == 2)
-+				vcpu->arch.gprs[rd] &= ~CPUCFG2_LVZP;
-+			if (index == 6)
-+				vcpu->arch.gprs[rd] &= ~CPUCFG6_PMP;
-+			er = EMULATE_DONE;
-+		}
-+		break;
-+	case 0x4:
-+		/* csr GSPR */
-+		er = _kvm_handle_csr(vcpu, inst);
-+		break;
-+	case 0x6:
-+		/* iocsr,cache,idle GSPR */
-+		switch (((inst.word >> 22) & 0x3ff)) {
-+		case 0x18:
-+			/* cache GSPR */
-+			er = EMULATE_DONE;
-+			trace_kvm_exit_cache(vcpu, KVM_TRACE_EXIT_CACHE);
++		switch (opcode) {
++		case stptrd_op:
++			run->mmio.len = 8;
++			*(unsigned long *)data = vcpu->arch.gprs[rd];
 +			break;
-+		case 0x19:
-+			/* iocsr/idle GSPR */
-+			switch (((inst.word >> 15) & 0x1ffff)) {
-+			case 0xc90:
-+				/* iocsr GSPR */
-+				er = _kvm_emu_iocsr(inst, run, vcpu);
-+				break;
-+			case 0xc91:
-+				/* idle GSPR */
-+				er = _kvm_emu_idle(vcpu);
-+				break;
-+			default:
-+				er = EMULATE_FAIL;
-+				break;
-+			}
++		case stptrw_op:
++			run->mmio.len = 4;
++			*(unsigned int *)data = vcpu->arch.gprs[rd];
 +			break;
 +		default:
-+			er = EMULATE_FAIL;
++			ret = EMULATE_FAIL;
 +			break;
 +		}
++	} else if (op8 < 0x30) {
++		/* st.b/h/w/d  process */
++		rd = inst.reg2i12_format.rd;
++		opcode = inst.reg2i12_format.opcode;
++		rd_val = vcpu->arch.gprs[rd];
++
++		switch (opcode) {
++		case std_op:
++			run->mmio.len = 8;
++			*(unsigned long *)data = rd_val;
++			break;
++		case stw_op:
++			run->mmio.len = 4;
++			*(unsigned int *)data = rd_val;
++			break;
++		case sth_op:
++			run->mmio.len = 2;
++			*(unsigned short *)data = rd_val;
++			break;
++		case stb_op:
++			run->mmio.len = 1;
++			*(unsigned char *)data = rd_val;
++			break;
++		default:
++			ret = EMULATE_FAIL;
++			break;
++		}
++	} else if (op8 == 0x38) {
++		/* stxb/h/w/d process */
++		rd = inst.reg3_format.rd;
++		opcode = inst.reg3_format.opcode;
++
++		switch (opcode) {
++		case stxb_op:
++			run->mmio.len = 1;
++			*(unsigned char *)data = vcpu->arch.gprs[rd];
++			break;
++		case stxh_op:
++			run->mmio.len = 2;
++			*(unsigned short *)data = vcpu->arch.gprs[rd];
++			break;
++		case stxw_op:
++			run->mmio.len = 4;
++			*(unsigned int *)data = vcpu->arch.gprs[rd];
++			break;
++		case stxd_op:
++			run->mmio.len = 8;
++			*(unsigned long *)data = vcpu->arch.gprs[rd];
++			break;
++		default:
++			ret = EMULATE_FAIL;
++			break;
++		}
++	} else
++		ret = EMULATE_FAIL;
++
++	if (ret == EMULATE_DO_MMIO) {
++		run->mmio.is_write = 1;
++		vcpu->mmio_needed = 1;
++		vcpu->mmio_is_write = 1;
++	} else {
++		vcpu->arch.pc = curr_pc;
++		kvm_err("Write not supporded inst=0x%08x @%lx BadVaddr:%#lx\n",
++			inst.word, vcpu->arch.pc, vcpu->arch.badv);
++		kvm_arch_vcpu_dump_regs(vcpu);
++		/* Rollback PC if emulation was unsuccessful */
++	}
++
++	return ret;
++}
++
++int _kvm_emu_mmio_read(struct kvm_vcpu *vcpu, larch_inst inst)
++{
++	unsigned int op8, opcode, rd;
++	struct kvm_run *run = vcpu->run;
++	int ret;
++
++	run->mmio.phys_addr = vcpu->arch.badv;
++	vcpu->mmio_needed = 2;	/* signed */
++	op8 = (inst.word >> 24) & 0xff;
++	ret = EMULATE_DO_MMIO;
++
++	if (op8 < 0x28) {
++		/* ldptr.w/d process */
++		rd = inst.reg2i14_format.rd;
++		opcode = inst.reg2i14_format.opcode;
++
++		switch (opcode) {
++		case ldptrd_op:
++			run->mmio.len = 8;
++			break;
++		case ldptrw_op:
++			run->mmio.len = 4;
++			break;
++		default:
++			break;
++		}
++	} else if (op8 < 0x2f) {
++		/* ld.b/h/w/d, ld.bu/hu/wu process */
++		rd = inst.reg2i12_format.rd;
++		opcode = inst.reg2i12_format.opcode;
++
++		switch (opcode) {
++		case ldd_op:
++			run->mmio.len = 8;
++			break;
++		case ldwu_op:
++			vcpu->mmio_needed = 1;	/* unsigned */
++			run->mmio.len = 4;
++			break;
++		case ldw_op:
++			run->mmio.len = 4;
++			break;
++		case ldhu_op:
++			vcpu->mmio_needed = 1;	/* unsigned */
++			run->mmio.len = 2;
++			break;
++		case ldh_op:
++			run->mmio.len = 2;
++			break;
++		case ldbu_op:
++			vcpu->mmio_needed = 1;	/* unsigned */
++			run->mmio.len = 1;
++			break;
++		case ldb_op:
++			run->mmio.len = 1;
++			break;
++		default:
++			ret = EMULATE_FAIL;
++			break;
++		}
++	} else if (op8 == 0x38) {
++		/* ldxb/h/w/d, ldxb/h/wu, ldgtb/h/w/d, ldleb/h/w/d process */
++		rd = inst.reg3_format.rd;
++		opcode = inst.reg3_format.opcode;
++
++		switch (opcode) {
++		case ldxb_op:
++			run->mmio.len = 1;
++			break;
++		case ldxbu_op:
++			run->mmio.len = 1;
++			vcpu->mmio_needed = 1;	/* unsigned */
++			break;
++		case ldxh_op:
++			run->mmio.len = 2;
++			break;
++		case ldxhu_op:
++			run->mmio.len = 2;
++			vcpu->mmio_needed = 1;	/* unsigned */
++			break;
++		case ldxw_op:
++			run->mmio.len = 4;
++			break;
++		case ldxwu_op:
++			run->mmio.len = 4;
++			vcpu->mmio_needed = 1;	/* unsigned */
++			break;
++		case ldxd_op:
++			run->mmio.len = 8;
++			break;
++		default:
++			ret = EMULATE_FAIL;
++			break;
++		}
++	} else
++		ret = EMULATE_FAIL;
++
++	if (ret == EMULATE_DO_MMIO) {
++		/* Set for _kvm_complete_mmio_read use */
++		vcpu->arch.io_gpr = rd;
++		run->mmio.is_write = 0;
++		vcpu->mmio_is_write = 0;
++	} else {
++		kvm_err("Load not supporded inst=0x%08x @%lx BadVaddr:%#lx\n",
++			inst.word, vcpu->arch.pc, vcpu->arch.badv);
++		kvm_arch_vcpu_dump_regs(vcpu);
++		vcpu->mmio_needed = 0;
++	}
++	return ret;
++}
++
++int _kvm_complete_mmio_read(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	unsigned long *gpr = &vcpu->arch.gprs[vcpu->arch.io_gpr];
++	enum emulation_result er = EMULATE_DONE;
++
++	/* update with new PC */
++	update_pc(&vcpu->arch);
++	switch (run->mmio.len) {
++	case 8:
++		*gpr = *(s64 *)run->mmio.data;
++		break;
++	case 4:
++		if (vcpu->mmio_needed == 2)
++			*gpr = *(int *)run->mmio.data;
++		else
++			*gpr = *(unsigned int *)run->mmio.data;
++		break;
++	case 2:
++		if (vcpu->mmio_needed == 2)
++			*gpr = *(short *) run->mmio.data;
++		else
++			*gpr = *(unsigned short *)run->mmio.data;
++
++		break;
++	case 1:
++		if (vcpu->mmio_needed == 2)
++			*gpr = *(char *) run->mmio.data;
++		else
++			*gpr = *(unsigned char *) run->mmio.data;
 +		break;
 +	default:
++		kvm_err("Bad MMIO length: %d,addr is 0x%lx",
++				run->mmio.len, vcpu->arch.badv);
 +		er = EMULATE_FAIL;
 +		break;
 +	}
 +
-+	/* Rollback PC only if emulation was unsuccessful */
-+	if (er == EMULATE_FAIL) {
-+		kvm_err("[%#lx]%s: unsupported gspr instruction 0x%08x\n",
-+			curr_pc, __func__, inst.word);
-+
-+		kvm_arch_vcpu_dump_regs(vcpu);
-+		vcpu->arch.pc = curr_pc;
-+	}
 +	return er;
 +}
 +
-+/*
-+ * Execute cpucfg instruction will tirggerGSPR,
-+ * Also the access to unimplemented csrs 0x15
-+ * 0x16, 0x50~0x53, 0x80, 0x81, 0x90~0x95, 0x98
-+ * 0xc0~0xff, 0x100~0x109, 0x500~0x502,
-+ * cache_op, idle_op iocsr ops the same
-+ */
-+static int _kvm_handle_gspr(struct kvm_vcpu *vcpu)
-+{
-+	enum emulation_result er = EMULATE_DONE;
-+	int ret = RESUME_GUEST;
+ static int _kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
+ {
+ 	enum emulation_result er = EMULATE_DONE;
+@@ -323,3 +582,52 @@ static int _kvm_handle_gspr(struct kvm_vcpu *vcpu)
+ 	}
+ 	return ret;
+ }
 +
-+	er = _kvm_trap_handle_gspr(vcpu);
++static int _kvm_handle_mmu_fault(struct kvm_vcpu *vcpu, bool write)
++{
++	struct kvm_run *run = vcpu->run;
++	unsigned long badv = vcpu->arch.badv;
++	larch_inst inst;
++	enum emulation_result er = EMULATE_DONE;
++	int ret;
++
++	ret = kvm_handle_mm_fault(vcpu, badv, write);
++	if (ret) {
++		/* Treat as MMIO */
++		inst.word = vcpu->arch.badi;
++		if (write) {
++			er = _kvm_emu_mmio_write(vcpu, inst);
++		} else {
++			/* A code fetch fault doesn't count as an MMIO */
++			if (kvm_is_ifetch_fault(&vcpu->arch)) {
++				kvm_err("%s ifetch error addr:%lx\n", __func__, badv);
++				run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
++				return RESUME_HOST;
++			}
++
++			er = _kvm_emu_mmio_read(vcpu, inst);
++		}
++	}
 +
 +	if (er == EMULATE_DONE) {
 +		ret = RESUME_GUEST;
 +	} else if (er == EMULATE_DO_MMIO) {
-+		vcpu->run->exit_reason = KVM_EXIT_MMIO;
-+		ret = RESUME_HOST;
-+	} else if (er == EMULATE_DO_IOCSR) {
-+		vcpu->run->exit_reason = KVM_EXIT_LOONGARCH_IOCSR;
++		run->exit_reason = KVM_EXIT_MMIO;
 +		ret = RESUME_HOST;
 +	} else {
-+		kvm_err("%s internal error\n", __func__);
-+		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
++		run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
 +		ret = RESUME_HOST;
 +	}
++
 +	return ret;
++}
++
++static int _kvm_handle_write_fault(struct kvm_vcpu *vcpu)
++{
++	return _kvm_handle_mmu_fault(vcpu, true);
++}
++
++static int _kvm_handle_read_fault(struct kvm_vcpu *vcpu)
++{
++	return _kvm_handle_mmu_fault(vcpu, false);
 +}
 -- 
 2.39.1
