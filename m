@@ -2,83 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2D9370C314
-	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 18:13:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F54370C397
+	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 18:37:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232913AbjEVQNd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 12:13:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57670 "EHLO
+        id S233053AbjEVQhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 12:37:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233040AbjEVQN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 12:13:27 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B45EBB6
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 09:13:26 -0700 (PDT)
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 370723F526
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 16:13:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1684772002;
-        bh=yEoXhOv9392G4YyVtPika8TuddyFutw1yuUvDKTMDXc=;
-        h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-         MIME-Version:Content-Type;
-        b=WZAkvBik5wa79VE7Idp3tQYhg14zHkrgDhu8rA7vqtlzOqq7BafNhexk8b7htU0y0
-         UGa33jGd71X8MU9gMPxeLZHFMvW+zmuD6dIywbRVLy8fDGbDPXaN9aFN068NvxwbL0
-         1KYLEmd/XLkVZ0PSvo2ujaH6KUjiE1TpH+WMZ+Bwscx6D6QMWYM3KtOE+Z8/29yoId
-         iqWu0Tg5ZVf7pXdE3uffJSUZDwK2/UqXR/ksDyELn6XwIvB7YL8kF32CySw9kO2Zoa
-         gEw/Y4kKBoMSEo2MAtc7R8OLWx06DTG5s8Ybj4J6wNzEQsNeAXvzUbl8BdDHoLYPUi
-         Dttr1R5xFH2Fg==
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-510d8e4416cso6659725a12.3
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 09:13:22 -0700 (PDT)
+        with ESMTP id S232364AbjEVQhx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 12:37:53 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D34BF
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 09:37:52 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-528ab7097afso5315510a12.1
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 09:37:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1684773472; x=1687365472;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VtfwEOOrFT56Me1+y80csEj29fh/4MEfuxZGlV/VCwA=;
+        b=VkBCPFP4Xr4WiQTM6UWimd/KzdFgGf1iO10w8WMqvOYGA9ksvBEI+77IilCjSLsRg6
+         EX8gGuEzmu2jQ0l7+I42/XZ73M6g2Hivq0shGrBNxEDc+Wrb9R1UNelbm6cq/cHThulK
+         u+OAoXsC9QgWYKMhU2KgdeOWPmh1cMUs53eLClb9eluF/vE1mwbxnOuGVT8U3OzSrzv6
+         TNSSJ0siqzX/P+ElcDsqhyZTm+e0IggrzH0mMbpYpy/mYsc5K8Xm+vixj+7wRdKd2CBS
+         g2xqYzW399l2F4YXnV7jDYyb6ILAyoabt9yzprRzFSWOT5ELhje2w5Z+2IEgOgC3vEFe
+         qvRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684772001; x=1687364001;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yEoXhOv9392G4YyVtPika8TuddyFutw1yuUvDKTMDXc=;
-        b=kFbh3Kru5FvjB+Rffg9YzAa2aZDw2+1WXmBQXv7AdjuiRZ4B5wfhQwORSMDDpSrSix
-         Oj9jQWbj3sUvmyLva/+XpSxyMpO+JAW45CBZsg6ysqlBkfrpoyml1OMoulofLaXigq1m
-         IwmR5nIeUpTEO7eUezuE8hOPgKEnSKvdWWOWB9EQwaQUXtvvgJuSKB1CXLzK8bTmwvYB
-         X39AEjuCHpzUBUcs3VXw+SfYU/wetUE63lr4kJEJICVXXpAJY+qQWnnhadDesL7q/+1s
-         0GyWSDoseNgBaKkeOdLlNqO7Cq3QzeQWyGFPnvfLutAkKeAoWrEl/fSDIlDmKjuC90pr
-         AKAA==
-X-Gm-Message-State: AC+VfDxoao6JwVB2U+nhOnDMmeW/0m+tFPZs7rvgwbSO5M9o3miHisPx
-        Xqk91FNlJYiPFTXbKsQt58Fy0kG9bYDzOSPoPq8TNTbpM68hifI9jZ9/FJrX8W8PtIdlAl5AdCt
-        fN9L7y809uEwjCLZR2w9rNit8mfzV7Q==
-X-Received: by 2002:a17:906:58c7:b0:96b:e93:3a9f with SMTP id e7-20020a17090658c700b0096b0e933a9fmr11141498ejs.20.1684772001414;
-        Mon, 22 May 2023 09:13:21 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6dUWTXh+XjI7wSktkwgjubPt+RAL8UbOeWuwZfD0kG6B2OVu9hYOQ/teuL04KXyyfGDkSquQ==
-X-Received: by 2002:a17:906:58c7:b0:96b:e93:3a9f with SMTP id e7-20020a17090658c700b0096b0e933a9fmr11141482ejs.20.1684772001173;
-        Mon, 22 May 2023 09:13:21 -0700 (PDT)
-Received: from amikhalitsyn.local (dslb-088-074-206-207.088.074.pools.vodafone-ip.de. [88.74.206.207])
-        by smtp.gmail.com with ESMTPSA id a7-20020a17090682c700b009658475919csm3225039ejy.188.2023.05.22.09.13.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 May 2023 09:13:20 -0700 (PDT)
-From:   Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-To:     pbonzini@redhat.com
-Cc:     Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
-        Sean Christopherson <seanjc@google.com>,
-        =?UTF-8?q?St=C3=A9phane=20Graber?= <stgraber@ubuntu.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        d=1e100.net; s=20221208; t=1684773472; x=1687365472;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VtfwEOOrFT56Me1+y80csEj29fh/4MEfuxZGlV/VCwA=;
+        b=JyriJyKyoOxqu26bgOlJmAriouxCWar/LiQN5/+x+5JQgVtMfGfP9Gy1vmobFIuoLx
+         MJfIjGgh86SRpwisELFnodUbRMfpXRus9LDQdP/ZgxF6EpFAisn/wTPtYrDQJF1DU2x3
+         JYoSpBqcPYLwzMmyBXlg6mkifQTUSccDgtxMX3A1HQci6A2XVVcOhqeDTQYP/fRqbfJa
+         jG1mrFL0FAQPx8dvFoshP8x5gTU4KHvQlRl9iImqRm50/FagJLeeMr+NpYF9eQcWTaZB
+         7Obzb9sAQcFr7gFnAUc2ah1+aUzuGkDUtS/zHwdIezq8cHYzCZz99xGNv8JkgviSLhNp
+         rAvw==
+X-Gm-Message-State: AC+VfDy/AhYKQRGWWjOf48YcRTSN6/ZzJBniATz3lWxT+plJBUSjys63
+        pVHSqH7f7EmMdqP9e+kF+P1KxhuRe5c=
+X-Google-Smtp-Source: ACHHUZ6EpaYD3bKwNCWWyaUrZhak9gLowttSZvR91by2PQtqwd6WvpY4NdAZKtlgX3Hlhqji73+7Shdv7ow=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:ec12:0:b0:52c:4227:aa60 with SMTP id
+ j18-20020a63ec12000000b0052c4227aa60mr2565348pgh.7.1684773472003; Mon, 22 May
+ 2023 09:37:52 -0700 (PDT)
+Date:   Mon, 22 May 2023 09:37:50 -0700
+In-Reply-To: <4ffbb2c3-8ed1-d419-16ca-b311867537be@intel.com>
+Mime-Version: 1.0
+References: <20230506030435.80262-1-chao.gao@intel.com> <b472b58d-0469-8a55-985c-1d966ce66419@intel.com>
+ <ZGZhW/x5OWPmx1qD@google.com> <4ffbb2c3-8ed1-d419-16ca-b311867537be@intel.com>
+Message-ID: <ZGuaXp2f5VhfEyUI@google.com>
+Subject: Re: [PATCH] KVM: x86: Track supported ARCH_CAPABILITIES in kvm_caps
+From:   Sean Christopherson <seanjc@google.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, Chao Gao <chao.gao@intel.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v2 2/2] KVM: SVM: enhance info printk's in SEV init
-Date:   Mon, 22 May 2023 18:12:48 +0200
-Message-Id: <20230522161249.800829-3-aleksandr.mikhalitsyn@canonical.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230522161249.800829-1-aleksandr.mikhalitsyn@canonical.com>
-References: <20230522161249.800829-1-aleksandr.mikhalitsyn@canonical.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,65 +72,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's print available ASID ranges for SEV/SEV-ES guests.
-This information can be useful for system administrator
-to debug if SEV/SEV-ES fails to enable.
+On Mon, May 22, 2023, Dave Hansen wrote:
+> On 5/18/23 10:33, Sean Christopherson wrote:
+> > 
+> >   2. I'm pretty sure conditioning mmio_stale_data_clear on kvm_arch_has_assigned_device()
+> >      is a bug.  AIUI, the vulnerability applies to _any_ MMIO accesses.  Assigning
+> >      a device is necessary to let the device DMA into the guest, but it's not
+> >      necessary to let the guest access MMIO addresses, that's done purely via
+> >      memslots.
+> 
+> Just to make sure we're all on the same page: KVM needs mitigations when
+> real, hardware MMIO is exposed to the guest.  None of this has anything
+> to do with virtio or what guests _normally_ see as devices or MMIO.  Right?
 
-There are a few reasons.
-SEV:
-- NPT is disabled (module parameter)
-- CPU lacks some features (sev, decodeassists)
-- Maximum SEV ASID is 0
+Yes.  I try to always call MMIO that is handled by a synthetic/virtual/emulated
+device "emulated MMIO", specifically to differentiate between the two cases.
 
-SEV-ES:
-- mmio_caching is disabled (module parameter)
-- CPU lacks sev_es feature
-- Minimum SEV ASID value is 1 (can be adjusted in BIOS/UEFI)
+> But direct device assignment does that "real hardware MMIO" for sure
+> because it's mapping parts of the PCI address space (which is all MMIO)
+> into the guest.  That's what the kvm_arch_has_assigned_device() check
+> was going for.
+> 
+> But I think you're also saying that, in the end, memory gets exposed to
+> the guest by KVM userspace setting up a memslot.  KVM userspace _could_
+> have mapped a piece of MMIO and could just pass that down to a guest
+> without kvm_arch_has_assigned_device() being involved.  That makes the
+> kvm_arch_has_assigned_device() useless.
 
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stéphane Graber <stgraber@ubuntu.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
----
-v2:
-	- print only the ASID ranges according to Sean's suggestion
----
- arch/x86/kvm/svm/sev.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+Yep.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index cc832a8d1bca..fff63d1f2a34 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2224,7 +2224,6 @@ void __init sev_hardware_setup(void)
- 		goto out;
- 	}
+> In other words, all guests with kvm_arch_has_assigned_device() need
+> mitigation.
+
+Yes, assuming the guest wants to actually use the device :-)
+
+> But there are potentially situations where the guest can see real hardware MMIO
+> and yet also be !kvm_arch_has_assigned_device().
+
+Yes.  There may or may not be _legitimate_ scenarios for exposing host MMIO to the
+guest without an assigned device, but as far as the mitigation is concerned, being
+legitimate or not doesn't matter, all that matters is that userspace can expose
+host MMIO to the guest irrespective of VFIO.
+
+FWIW, I think this would be a minimal fix without having to apply the mitigation
+blindly.  My only concern is that there might be gaps in the kvm_is_mmio_pfn()
+heuristic, but if that's the case then KVM likely has other issues, e.g. would
+potentially map MMIO with the wrong memtype.
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 2865c3cb3501..ac3c535ae3b9 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1274,6 +1274,7 @@ struct kvm_arch {
  
--	pr_info("SEV supported: %u ASIDs\n", sev_asid_count);
- 	sev_supported = true;
+        bool apic_access_memslot_enabled;
+        bool apic_access_memslot_inhibited;
++       bool vm_has_passthrough_mmio;
  
- 	/* SEV-ES support requested? */
-@@ -2252,10 +2251,16 @@ void __init sev_hardware_setup(void)
- 	if (misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))
- 		goto out;
+        /* Protects apicv_inhibit_reasons */
+        struct rw_semaphore apicv_update_lock;
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index cf2c6426a6fc..83d235488e56 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -189,6 +189,10 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+        if (level > PG_LEVEL_4K)
+                spte |= PT_PAGE_SIZE_MASK;
  
--	pr_info("SEV-ES supported: %u ASIDs\n", sev_es_asid_count);
- 	sev_es_supported = true;
- 
- out:
-+	if (boot_cpu_has(X86_FEATURE_SEV))
-+		pr_info("SEV %s (ASIDs %u - %u)\n",
-+			sev_supported ? "enabled" : "disabled", min_sev_asid, max_sev_asid);
-+	if (boot_cpu_has(X86_FEATURE_SEV_ES))
-+		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
-+			sev_es_supported ? "enabled" : "disabled", 1, min_sev_asid - 1);
++       if (static_branch_unlikely(&mmio_stale_data_clear) &&
++           !vcpu->kvm->arch.vm_has_passthrough_mmio && kvm_is_mmio_pfn(pfn))
++               vcpu->kvm->arch.vm_has_passthrough_mmio = true;
 +
- 	sev_enabled = sev_supported;
- 	sev_es_enabled = sev_es_supported;
- #endif
--- 
-2.34.1
-
+        if (shadow_memtype_mask)
+                spte |= static_call(kvm_x86_get_mt_mask)(vcpu, gfn,
+                                                         kvm_is_mmio_pfn(pfn));
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 44fb619803b8..9c66ba35af92 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7159,7 +7159,7 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+        else if (static_branch_unlikely(&mds_user_clear))
+                mds_clear_cpu_buffers();
+        else if (static_branch_unlikely(&mmio_stale_data_clear) &&
+-                kvm_arch_has_assigned_device(vcpu->kvm))
++                to_kvm_vmx(vcpu->kvm)->vm_has_passthrough_mmio)
+                mds_clear_cpu_buffers();
+ 
+        vmx_disable_fb_clear(vmx);
