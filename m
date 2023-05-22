@@ -2,65 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A81170C48C
-	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 19:44:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18BD770C4AF
+	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 19:51:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231970AbjEVRn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 13:43:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48864 "EHLO
+        id S233413AbjEVRvt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 13:51:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231417AbjEVRn4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 13:43:56 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43C72120
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 10:43:52 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1ae79528ad4so22487195ad.3
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 10:43:52 -0700 (PDT)
+        with ESMTP id S233143AbjEVRvp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 13:51:45 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D71C118
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 10:51:42 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-64d413b27a1so1643896b3a.2
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 10:51:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684777431; x=1687369431;
+        d=google.com; s=20221208; t=1684777902; x=1687369902;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iC3M/RVEiAsEvRwykjn0mpnilLBCs5c/vIl/8zacyfg=;
-        b=KNOCWK4K1+8gamK8MURP2nRppShxkwO7KtAR6Snf0KDCtWZ3XsPoj+saNuen2kNrkT
-         bqz07VQXZAPVpDYse+bdRasvs5feMkYvrCjuK2tZhGPyyEpmWxmYQTyFUGxRU9y+kmWx
-         5xreYW1c+VhACq8Y8YZ4F2RSnkd8yY7XsQSpkhi/r5FOmKX63zWeMYBT8Hc5EufDG473
-         oBlDT7WXTH1wtHavax3SvrKzhmI/TKDCDr1eeAQpSYzagWkanSEphjcjPa60+bhjcBIn
-         cKnXog8Y9wGSbX+wUPactdnBAbG+ukyZG3oVkDBSk4hRE2kGnBw1zJR5nDVH4W8x9Nev
-         H0yQ==
+        bh=2UjMNtojrW/qrTrI17UCkfJw9PMPQf1c8uRjRPa1hgo=;
+        b=WbRMKZ+lB6YkCfS92JX7T2JKrlVxEvqXFigAjOjqgg9uHzs1zcgLU85aEmke/nHXZ6
+         /0Pu5kfQJR1lF5z+AywWkTmtQbFqRQfral+EWIgJX3/0tCgMdEcHSiZ8UjLlWuemDE6C
+         0QwhqtKLE226uUMckA1Mo+z+8vp/oqervlDZb/GCAhWDbnCApCxAWCFG79iI4s9pJOMg
+         C7PEYvWhatxe8yIJVxPk3BTz8zKPjQJmL8tt9sXncRCBZlmIe55QIYNnpnBBDuTgdTKF
+         f5aewGWKGQJ+S6Kc8PUI7f661bRgl6+Ph83tiSD6fjVmuRWy14LL1j6GMTsGsIDcAZzj
+         PZ2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684777431; x=1687369431;
+        d=1e100.net; s=20221208; t=1684777902; x=1687369902;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iC3M/RVEiAsEvRwykjn0mpnilLBCs5c/vIl/8zacyfg=;
-        b=AvfzqGRYPNnRE5HgNs/wihJ2g4fi8oxcQdNeMbxbz3TuPkW6oAqWDEQt93+1nDpuDv
-         v+rSkyc0zN9E3/8e2xi2Aj+MG8Q6yHn+gfK3EvccPBndvvhPp1uLBqQ5kucRai0VLVr9
-         hg8Lpaud5Pt1ZuBiUYHwOZ0lEGRRwxnZDSCzEGWFg+YqfdxeuFTWVfZy2y7hy9fjueWA
-         vtluCeRK5OnjDX9lYIMCF1FQsSmdxxG6t52UZVb2GNjVor6OGi/lxkjgaPJ663wUdHem
-         /Jf55uq9g/75A5IKRyjRL1kmlrCWQMRiy4FZqw1/rnFuPYkim4L036c3GIo8hsYyi42q
-         7Ceg==
-X-Gm-Message-State: AC+VfDwftQ340h508rYLWxSBFB6wO5H470i2UAEIIZx+maZkPZLMoX2l
-        nCx97axD3de+d/r3kMBdy2v3M0VSZIs=
-X-Google-Smtp-Source: ACHHUZ5tdYQpYrbpDVARXGV8NJ1f7fpCU5P0i5Io/HQvjwIM2pcFQKzlONCgHkbWeM4ZF4OqIOvF0Yrp3HU=
+        bh=2UjMNtojrW/qrTrI17UCkfJw9PMPQf1c8uRjRPa1hgo=;
+        b=Ir+XNbe0wTzbfYO926Pfx6ddH3S1ZBYitl8SzFEx/3ubw7apwrRY8q8pl3veO47NAz
+         4eXXFO628HU0h/jVQd5dWhUo7OSKHq+loOaqgazJm76DbZC5rcb3XRkTx7XrjUdZOT3c
+         /hPKNRkB/O2aGKO/PfEFXPnZF2zVaMu5qNNBc6pkj9rgvR1h28T3ZFlNvg65USy9TpWZ
+         tjoYbt4rOUNeO+cmi+HziVUCAECrk9QXppr7IutUwzXPJLhXK/6Ol/O2mmF5j2d1Gn4O
+         y85YjF0NXlKDotmF7K+5TcXr8rrwldv/HhmMNVETXYlME6g6xEs+U6qfmSGxk+0lvJWF
+         ZETw==
+X-Gm-Message-State: AC+VfDwiwn4ed7kxl51ZK0UVVmUFcEBbt3hW7j8dVaK2tr7Fx0p+Y112
+        Gj/9DhYejF4UpL/05P6SN6eWFntUvdE=
+X-Google-Smtp-Source: ACHHUZ7Bq43enaocbWto/QJGkbIVxTEMmGyZPOOip/KVM5nl0hVcdgsj6hgll5ji2ugIu4ii+yN5mY1a0t8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:68f:b0:1a8:16d2:a86b with SMTP id
- ki15-20020a170903068f00b001a816d2a86bmr2580886plb.8.1684777431487; Mon, 22
- May 2023 10:43:51 -0700 (PDT)
-Date:   Mon, 22 May 2023 10:43:49 -0700
-In-Reply-To: <20230520010237.3tepk3q44j52leuk@desk>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1814:b0:64d:2cb0:c60c with SMTP id
+ y20-20020a056a00181400b0064d2cb0c60cmr4967667pfa.5.1684777901822; Mon, 22 May
+ 2023 10:51:41 -0700 (PDT)
+Date:   Mon, 22 May 2023 10:51:40 -0700
+In-Reply-To: <babc4cb3856dd5fc1bc6fa742e484667dc02c054.camel@intel.com>
 Mime-Version: 1.0
-References: <20230506030435.80262-1-chao.gao@intel.com> <b472b58d-0469-8a55-985c-1d966ce66419@intel.com>
- <ZGZhW/x5OWPmx1qD@google.com> <20230520010237.3tepk3q44j52leuk@desk>
-Message-ID: <ZGup1TjeqBF7bgWG@google.com>
-Subject: Re: [PATCH] KVM: x86: Track supported ARCH_CAPABILITIES in kvm_caps
+References: <20230512235026.808058-1-seanjc@google.com> <20230512235026.808058-6-seanjc@google.com>
+ <babc4cb3856dd5fc1bc6fa742e484667dc02c054.camel@intel.com>
+Message-ID: <ZGurrDEdMj6rJ6dU@google.com>
+Subject: Re: [PATCH v3 05/18] x86/reboot: Disable virtualization during reboot
+ iff callback is registered
 From:   Sean Christopherson <seanjc@google.com>
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, Chao Gao <chao.gao@intel.com>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Chao Gao <chao.gao@intel.com>,
+        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -72,79 +71,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 19, 2023, Pawan Gupta wrote:
-> On Thu, May 18, 2023 at 10:33:15AM -0700, Sean Christopherson wrote:
-> > I made the mistake of digging into why KVM doesn't advertise ARCH_CAP_FB_CLEAR_CTRL...
+On Mon, May 22, 2023, Kai Huang wrote:
+> On Fri, 2023-05-12 at 16:50 -0700, Sean Christopherson wrote:
+> > Attempt to disable virtualization during an emergency reboot if and only
+> > if there is a registered virt callback, i.e. iff a hypervisor (KVM) is
+> > active.  If there's no active hypervisor, then the CPU can't be operating
+> > with VMX or SVM enabled (barring an egregious bug).
 > > 
-> >   1. I see *nothing* in commit 027bbb884be0 ("KVM: x86/speculation: Disable Fill
-> >      buffer clear within guests") that justifies 1x RDMSR and 2x WRMSR on every
-> >      entry+exit.
+> > Note, IRQs are disabled, which prevents KVM from coming along and enabling
+> > virtualization after the fact.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kernel/reboot.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
+> > index 92b380e199a3..20f7bdabc52e 100644
+> > --- a/arch/x86/kernel/reboot.c
+> > +++ b/arch/x86/kernel/reboot.c
+> > @@ -22,7 +22,6 @@
+> >  #include <asm/reboot_fixups.h>
+> >  #include <asm/reboot.h>
+> >  #include <asm/pci_x86.h>
+> > -#include <asm/virtext.h>
+> >  #include <asm/cpu.h>
+> >  #include <asm/nmi.h>
+> >  #include <asm/smp.h>
+> > @@ -545,7 +544,7 @@ static void emergency_reboot_disable_virtualization(void)
+> >  	 * Do the NMI shootdown even if virtualization is off on _this_ CPU, as
+> >  	 * other CPUs may have virtualization enabled.
+> >  	 */
+> > -	if (cpu_has_vmx() || cpu_has_svm(NULL)) {
+> > +	if (rcu_access_pointer(cpu_emergency_virt_callback)) {
+> >  		/* Safely force _this_ CPU out of VMX/SVM operation. */
+> >  		cpu_emergency_disable_virtualization();
 > 
-> Unnecessary VERWs in guest will have much higher impact than due to MSR
-> read/write at vmentry/exit.
-
-Can you provide numbers for something closeish to a real world workload?
-
-> On an Icelake system it is pointless for a guest to incur VERW penalty when
-> the system is not affected by MDS/TAA and guests don't need mitigation for
-> MMIO Stale Data. MSR writes are only done when the guest is likely to execute
-> unnecessary VERWs(e.g. when the guest thinks its running on an older gen
-> CPU).
->
-> >      KVM just needs to context switch the MSR between guests since the value that's
-> >      loaded while running in the host is irrelevant.  E.g. use a percpu cache to
 > 
-> I will be happy to avoid the MSR read/write, but its worth considering
-> that this MSR can receive more bits that host may want to toggle, then
-> percpu cache implementation would likely change.
-
-Change in and of itself isn't problematic, so long as whatever code we write won't
-fall over if/when new bits are added, i.e. doesn't clobber unknown bits.
-
-> >   5. MSR_IA32_MCU_OPT_CTRL is not modified by the host after a CPU is brought up,
-> >      i.e. the host's desired value is effectively static post-boot, and barring
-> >      a buggy configuration (running KVM as a guest), the boot CPU's value will be
-> >      the same as every other CPU.
+> IIUC, for cpu_emergency_disable_virtualization() itself, looks it's OK to not
+> having the pointer check, since it internally will do rcu_dereference() inside
+> RCU critical section anyway.
 > 
-> Would the MSR value be same on every CPU, if only some guests have
-> enumerated FB_CLEAR and others haven't?
-
-Ignore the guest, I'm talking purely about the host.  Specifically, there's no
-reason to do a RDMSR to get the host value on every VM-Enter since the host's
-value is effectively static post-boot.
-
-> MSR writes (to disable FB_CLEAR) are not done when a guest enumerates
-> FB_CLEAR. Enumeration of FB_CLEAR in guest will depend on its configuration.
+> But nmi_shootdown_cpus_on_restart() is called after
+> cpu_emergency_disable_virtualization(), and having the pointer check here can
+> avoid sending NMI to remote cpus if there's no active hypervisor.
 > 
-> >   6. Performance aside, KVM should not be speculating (ha!) on what the guest
-> >      will and will not do, and should instead honor whatever behavior is presented
-> >      to the guest.  If the guest CPU model indicates that VERW flushes buffers,
-> >      then KVM damn well needs to let VERW flush buffers.
-> 
-> The current implementation allows guests to have VERW flush buffers when
-> they enumerate FB_CLEAR. It only restricts the flush behavior when the
-> guest is trying to mitigate against a vulnerability(like MDS) on a
-> hardware that is not affected. I guess its common for guests to be
-> running with older gen configuration on a newer hardware.
+> Am I missing something?  If not, is it worth to call this out in changelog?
 
-Right, I'm saying that that behavior is wrong.  KVM shouldn't assume the guest
-the guest will do things a certain way and should instead honor the "architectural"
-definition, in quotes because I realize there probably is no architectural
-definition for any of this.
-
-It might be that the code does (unintentionally?) honor the "architecture", i.e.
-this code might actually be accurrate with respect to when the guest can expect
-VERW to flush buffers.  But the comment is so, so wrong.
-
-	/*
-	 * If guest will not execute VERW, there is no need to set FB_CLEAR_DIS
-	 * at VMEntry. Skip the MSR read/write when a guest has no use case to
-	 * execute VERW.
-	 */
-	if ((vcpu->arch.arch_capabilities & ARCH_CAP_FB_CLEAR) ||
-	   ((vcpu->arch.arch_capabilities & ARCH_CAP_MDS_NO) &&
-	    (vcpu->arch.arch_capabilities & ARCH_CAP_TAA_NO) &&
-	    (vcpu->arch.arch_capabilities & ARCH_CAP_PSDP_NO) &&
-	    (vcpu->arch.arch_capabilities & ARCH_CAP_FBSDP_NO) &&
-	    (vcpu->arch.arch_capabilities & ARCH_CAP_SBDR_SSDP_NO)))
-		vmx->disable_fb_clear = false;
+No, you're not missing anything.  I agree it's worth a line in the changelog.
+Dropping the "spurious" NMI should be a-ok, but explicitly calling out the side
+effect could be helpful for debug if something is silently relying on the NMI.
