@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26BF370CDAC
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 00:18:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C19EE70CDAD
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 00:18:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234635AbjEVWSp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 18:18:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35314 "EHLO
+        id S234641AbjEVWSq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 18:18:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbjEVWSm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 18:18:42 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB27D9E
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 15:18:40 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-ba81b37d9d2so12008548276.3
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 15:18:40 -0700 (PDT)
+        with ESMTP id S234630AbjEVWSn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 18:18:43 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3C7EAF
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 15:18:42 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1ae4ecb00feso36042725ad.0
+        for <kvm@vger.kernel.org>; Mon, 22 May 2023 15:18:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684793920; x=1687385920;
+        d=google.com; s=20221208; t=1684793922; x=1687385922;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IDMeA7A1szNMy9XVG2BQVLz/xGU0fwdnrNBj9KxEXqQ=;
-        b=sxaNsKaYp7rfW2UnfBF/MIX5ykqr/q+S0h/gmcehsB3hGwDKycL+hqVAfhHie0d3DN
-         VR6hF1Vst7StwAyhIpzmA94mUwrS2m4EUs7NYPjNMAaODHRlINSwHljfossSVDlPeWtq
-         om/SI51LbQeJCSPFOFyI5HyQbEoua3+OJy2dKpCcC6beACOe8ZFnW2e23138ZWch0BGa
-         OokO9LAt/IZShM+2zinSXJwgmij4H6wMMcboBCbTM5xXMMuhf1TyYEr2U1/LBWAeCd5n
-         jb4oA88Xgsg0uM0RphZQojhcam9b60q/XANIbGgCrhvOIa4byW2YFUQnqfzg1qmqCkx0
-         Vn3w==
+        bh=/VrN2Ar+AOdWjfiYe/2nYRQITVL0veWRWCp7zOr2qyA=;
+        b=rRVPR4tKxt43nlG+IuMkOLZRfyICGLMKSXLHPT1Qx704DFwmHi8y3V/jtWrcWQWyDa
+         Jg7RAno6p7cTYfPopz/fP4DB4s1XWf1o5mwnPm2x+cgJzAYoGS0cVdkA03huXsbRTt16
+         eB7Vi6DDXss9qKqpaClzs3Mb1MoOKxxiW8uNx3d0+WJv09ryABea+4IXSbc+MjpN6hAp
+         4JBMpFryEKgYWK+S89VXuSAlusM6eGJE/IDZOCLBT1vpmJRF9kFZu9E3zt9ouZ995XyL
+         Dd+CG5Nwffewy1PgXV7UKkiygvL/txsjlntDLImYdCwMGtwi8tGzgNH1Mu7CApfCv3QL
+         xH5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684793920; x=1687385920;
+        d=1e100.net; s=20221208; t=1684793922; x=1687385922;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IDMeA7A1szNMy9XVG2BQVLz/xGU0fwdnrNBj9KxEXqQ=;
-        b=E4GU1cZs7HIb/bC8nUalNuN1AKDMAOgXFcZpEb6Lg1sYlmX9bndq0jnYvRSgbh1csA
-         LlIUqogvy8/NtZEMNNOwLvqZehTAuJOzKrRds9If+24IzH504DBqkHJmZ8VZSwnlg/Gi
-         xiDrL2I3JZImZWIcnxjXyig5atAR+RBf5xgIHb7cXzTKAk6MWD4lsNDPyj5d5kIo2Y00
-         9kaOvBP7K4UyNcgA6FThbHsRwMYeRrxILzqdh88GnbImAw+BjgcWdPDKhP2KEIiNEv4F
-         t8/UXoDX0SOmrQH44MwXbifGtOopoEKeNcmzkUKY9q4DMmmuvj2H70n5H6vPjp4VhhQn
-         VKKQ==
-X-Gm-Message-State: AC+VfDzd9WiywZR+XBLOnPwDOorjitP4fsze6X69g13duQExhTfpLwl0
-        4xbi7MXdTs1LUfsfhWkrC+LUwwMz0LxWquW7whtZBOf30d6a38sArCuh2DV5oiq+wHED90rE5Kx
-        8bJ7TJvLNwyQjlywYgRMfdmoTcX48umwwJJMQr506xaxe5aEEr/BeshGgZsRw6qN6gRoAW3U=
-X-Google-Smtp-Source: ACHHUZ6dJKEQ9FePfmeIiD/2qt9Vd0Xa5GOm/1XWH/27M9QAvRROIMEl+qs3XrlO7knAL25ZXX9mn7R2Bb1kzTe9hw==
+        bh=/VrN2Ar+AOdWjfiYe/2nYRQITVL0veWRWCp7zOr2qyA=;
+        b=BN5o2l69bWo31JgJmW+RzDAEj+re/YbEz8S6zGP0SiWY9t+m9Ls3G8aq6O6oO5ezNW
+         xs/+OoM5Of1Ktxbnyv0J6au08EVEm+5rK57nXGDJWB+PlhiJjNzjrU69s1NcTgpRmKb8
+         EN/pDu3KhVkRRLf+sFlJpPPcjoyoyiUCZu16jiVrK8eYp5v5D8mXgPQ0kgbrQGnRqf6D
+         Y9hwrn+sxi4gy8kXJqYVb5I0QCs7wIyRQR1DZs4OeizOkPYNXgoqLkJqEtb9/GZ5GJq7
+         XJs1YlwrGpUruJgZ0tbRpKPnBKf5k8fzYPcfhmHr06BffW6eX7V2nhlNfnjxYD6/hY3i
+         ARrg==
+X-Gm-Message-State: AC+VfDwB7yST+RbfvtGWGSbTsGteEa3ME5Vhut4/RidxXJJXjDKcp3XQ
+        Y6zk+MGwS352xk4McgIyqKmiTv8cugU6Nu7wG9otXWdE9h7rSkjW2GkcrldhmqVBtpeod6Rwq2U
+        k1Hotyq/6AlrqvqCPiq/SC+NcB7lGRIzg4jsheFV4wHy+PE5u1Kuf9+az+C8wfsKI9hODaL8=
+X-Google-Smtp-Source: ACHHUZ4HoO5hlOBsRNn24MoFNGIQjCDVVm3MB7aqK9lioRYeF9fvojdnGXslsxiJUFgurOBI1z0N7vVipd5ZsT5f9Q==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a05:6902:1895:b0:ba8:4ba3:5b54 with
- SMTP id cj21-20020a056902189500b00ba84ba35b54mr5371297ybb.11.1684793920168;
- Mon, 22 May 2023 15:18:40 -0700 (PDT)
-Date:   Mon, 22 May 2023 22:18:31 +0000
+ (user=jingzhangos job=sendgmr) by 2002:a17:903:33ce:b0:1ae:5bf5:1082 with
+ SMTP id kc14-20020a17090333ce00b001ae5bf51082mr2854105plb.6.1684793922069;
+ Mon, 22 May 2023 15:18:42 -0700 (PDT)
+Date:   Mon, 22 May 2023 22:18:32 +0000
 In-Reply-To: <20230522221835.957419-1-jingzhangos@google.com>
 Mime-Version: 1.0
 References: <20230522221835.957419-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
-Message-ID: <20230522221835.957419-2-jingzhangos@google.com>
-Subject: [PATCH v10 1/5] KVM: arm64: Save ID registers' sanitized value per guest
+Message-ID: <20230522221835.957419-3-jingzhangos@google.com>
+Subject: [PATCH v10 2/5] KVM: arm64: Use per guest ID register for ID_AA64PFR0_EL1.[CSV2|CSV3]
 From:   Jing Zhang <jingzhangos@google.com>
 To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
         ARMLinux <linux-arm-kernel@lists.infradead.org>,
@@ -76,214 +76,181 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
-and save ID registers' sanitized value in the array at KVM_CREATE_VM.
-Use the saved ones when ID registers are read by the guest or
-userspace (via KVM_GET_ONE_REG).
+With per guest ID registers, ID_AA64PFR0_EL1.[CSV2|CSV3] settings from
+userspace can be stored in its corresponding ID register.
 
-No functional change intended.
+The setting of CSV bits for protected VMs are removed according to the
+discussion from Fuad below:
+https://lore.kernel.org/all/CA+EHjTwXA9TprX4jeG+-D+c8v9XG+oFdU1o6TSkvVye145_OvA@mail.gmail.com
 
-Co-developed-by: Reiji Watanabe <reijiw@google.com>
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
+Besides the removal of CSV bits setting for protected VMs, No other
+functional change intended.
+
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 20 +++++++++
- arch/arm64/kvm/arm.c              |  1 +
- arch/arm64/kvm/sys_regs.c         | 69 +++++++++++++++++++++++++------
- arch/arm64/kvm/sys_regs.h         |  7 ++++
- 4 files changed, 85 insertions(+), 12 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  2 --
+ arch/arm64/kvm/arm.c              | 17 ---------
+ arch/arm64/kvm/sys_regs.c         | 58 +++++++++++++++++++++++++------
+ 3 files changed, 47 insertions(+), 30 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7e7e19ef6993..069606170c82 100644
+index 069606170c82..8a2fde6c04c4 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -178,6 +178,21 @@ struct kvm_smccc_features {
- 	unsigned long vendor_hyp_bmap;
- };
+@@ -257,8 +257,6 @@ struct kvm_arch {
  
-+/*
-+ * Emulated CPU ID registers per VM
-+ * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
-+ * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
-+ *
-+ * These emulated idregs are VM-wide, but accessed from the context of a vCPU.
-+ * Atomic access to multiple idregs are guarded by kvm_arch.config_lock.
-+ */
-+#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
-+#define IDREG(kvm, id)		((kvm)->arch.idregs.regs[IDREG_IDX(id)])
-+#define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
-+struct kvm_idregs {
-+	u64 regs[KVM_ARM_ID_REG_NUM];
-+};
-+
- typedef unsigned int pkvm_handle_t;
+ 	cpumask_var_t supported_cpus;
  
- struct kvm_protected_vm {
-@@ -253,6 +268,9 @@ struct kvm_arch {
- 	struct kvm_smccc_features smccc_feat;
- 	struct maple_tree smccc_filter;
- 
-+	/* Emulated CPU ID registers */
-+	struct kvm_idregs idregs;
-+
- 	/*
- 	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
- 	 * the associated pKVM instance in the hypervisor.
-@@ -1045,6 +1063,8 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
- int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
- 				    struct kvm_arm_counter_offset *offset);
- 
-+void kvm_arm_init_id_regs(struct kvm *kvm);
-+
- /* Guest/host FPSIMD coordination helpers */
- int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+-	u8 pfr0_csv2;
+-	u8 pfr0_csv3;
+ 	struct {
+ 		u8 imp:4;
+ 		u8 unimp:4;
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 14391826241c..774656a0718d 100644
+index 774656a0718d..5114521ace60 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -163,6 +163,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+@@ -102,22 +102,6 @@ static int kvm_arm_default_max_vcpus(void)
+ 	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+ }
  
- 	set_default_spectre(kvm);
+-static void set_default_spectre(struct kvm *kvm)
+-{
+-	/*
+-	 * The default is to expose CSV2 == 1 if the HW isn't affected.
+-	 * Although this is a per-CPU feature, we make it global because
+-	 * asymmetric systems are just a nuisance.
+-	 *
+-	 * Userspace can override this as long as it doesn't promise
+-	 * the impossible.
+-	 */
+-	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
+-		kvm->arch.pfr0_csv2 = 1;
+-	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED)
+-		kvm->arch.pfr0_csv3 = 1;
+-}
+-
+ /**
+  * kvm_arch_init_vm - initializes a VM data structure
+  * @kvm:	pointer to the KVM struct
+@@ -161,7 +145,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	/* The maximum number of VCPUs is limited by the host's GIC model */
+ 	kvm->max_vcpus = kvm_arm_default_max_vcpus();
+ 
+-	set_default_spectre(kvm);
  	kvm_arm_init_hypercalls(kvm);
-+	kvm_arm_init_id_regs(kvm);
+ 	kvm_arm_init_id_regs(kvm);
  
- 	/*
- 	 * Initialise the default PMUver before there is a chance to
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 71b12094d613..d2ee3a1c7f03 100644
+index d2ee3a1c7f03..9fb1c2f8f5a5 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -41,6 +41,7 @@
-  * 64bit interface.
-  */
- 
-+static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
- static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
- 
- static bool read_from_write_only(struct kvm_vcpu *vcpu,
-@@ -364,7 +365,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
- 			  struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
+@@ -1218,10 +1218,6 @@ static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+ 		if (!vcpu_has_sve(vcpu))
+ 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE);
+ 		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
+-		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
+-		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
+-		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
+-		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
+ 		if (kvm_vgic_global_state.type == VGIC_V3) {
+ 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC);
+ 			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC), 1);
+@@ -1359,7 +1355,11 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 			       const struct sys_reg_desc *rd,
+ 			       u64 val)
  {
--	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-+	u64 val = kvm_arm_read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
- 	u32 sr = reg_to_encoding(r);
++	struct kvm_arch *arch = &vcpu->kvm->arch;
++	u64 old_val = read_id_reg(vcpu, rd);
++	u64 new_val = val;
+ 	u8 csv2, csv3;
++	int ret = 0;
  
- 	if (!(val & (0xfUL << ID_AA64MMFR1_EL1_LO_SHIFT))) {
-@@ -1208,16 +1209,9 @@ static u8 pmuver_to_perfmon(u8 pmuver)
- 	}
- }
+ 	/*
+ 	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
+@@ -1377,17 +1377,26 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 	    (csv3 && arm64_get_meltdown_state() != SPECTRE_UNAFFECTED))
+ 		return -EINVAL;
  
--/* Read a sanitised cpufeature ID register by sys_reg_desc */
--static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
-+static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
- {
--	u32 id = reg_to_encoding(r);
--	u64 val;
++	mutex_lock(&arch->config_lock);
+ 	/* We can only differ with CSV[23], and anything else is an error */
+-	val ^= read_id_reg(vcpu, rd);
++	val ^= old_val;
+ 	val &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
+ 		 ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
+-	if (val)
+-		return -EINVAL;
 -
--	if (sysreg_visible_as_raz(vcpu, r))
--		return 0;
--
--	val = read_sanitised_ftr_reg(id);
-+	u64 val = IDREG(vcpu->kvm, id);
- 
- 	switch (id) {
- 	case SYS_ID_AA64PFR0_EL1:
-@@ -1280,6 +1274,26 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
- 	return val;
- }
- 
-+/* Read a sanitised cpufeature ID register by sys_reg_desc */
-+static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
-+{
-+	if (sysreg_visible_as_raz(vcpu, r))
-+		return 0;
-+
-+	return kvm_arm_read_id_reg(vcpu, reg_to_encoding(r));
-+}
-+
-+/*
-+ * Return true if the register's (Op0, Op1, CRn, CRm, Op2) is
-+ * (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
-+ */
-+static inline bool is_id_reg(u32 id)
-+{
-+	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
-+		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
-+		sys_reg_CRm(id) < 8);
-+}
-+
- static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
- 				  const struct sys_reg_desc *r)
- {
-@@ -2244,8 +2258,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
- 	if (p->is_write) {
- 		return ignore_write(vcpu, p);
- 	} else {
--		u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
--		u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-+		u64 dfr = kvm_arm_read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
-+		u64 pfr = kvm_arm_read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
- 		u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL1_EL3_SHIFT);
- 
- 		p->regval = ((((dfr >> ID_AA64DFR0_EL1_WRPs_SHIFT) & 0xf) << 28) |
-@@ -3343,6 +3357,37 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- 	return write_demux_regids(uindices);
- }
- 
-+/*
-+ * Set the guest's ID registers with ID_SANITISED() to the host's sanitized value.
-+ */
-+void kvm_arm_init_id_regs(struct kvm *kvm)
-+{
-+	const struct sys_reg_desc *idreg;
-+	struct sys_reg_params params;
-+	u32 id;
-+
-+	/* Find the first idreg (SYS_ID_PFR0_EL1) in sys_reg_descs. */
-+	id = SYS_ID_PFR0_EL1;
-+	params = encoding_to_params(id);
-+	idreg = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+	if (WARN_ON(!idreg))
-+		return;
-+
-+	/* Initialize all idregs */
-+	while (is_id_reg(id)) {
-+		/*
-+		 * Some hidden ID registers which are not in arm64_ftr_regs[]
-+		 * would cause warnings from read_sanitised_ftr_reg().
-+		 * Skip those ID registers to avoid the warnings.
-+		 */
-+		if (idreg->visibility != raz_visibility)
-+			IDREG(kvm, id) = read_sanitised_ftr_reg(id);
-+
-+		idreg++;
-+		id = reg_to_encoding(idreg);
+-	vcpu->kvm->arch.pfr0_csv2 = csv2;
+-	vcpu->kvm->arch.pfr0_csv3 = csv3;
++	if (val) {
++		ret = -EINVAL;
++		goto out;
 +	}
-+}
-+
- int __init kvm_sys_reg_table_init(void)
- {
- 	bool valid = true;
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 6b11f2cc7146..eba10de2e7ae 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -27,6 +27,13 @@ struct sys_reg_params {
- 	bool	is_write;
- };
  
-+#define encoding_to_params(reg)						\
-+	((struct sys_reg_params){ .Op0 = sys_reg_Op0(reg),		\
-+				  .Op1 = sys_reg_Op1(reg),		\
-+				  .CRn = sys_reg_CRn(reg),		\
-+				  .CRm = sys_reg_CRm(reg),		\
-+				  .Op2 = sys_reg_Op2(reg) })
+-	return 0;
++	/* Only allow userspace to change the idregs before VM running */
++	if (kvm_vm_has_ran_once(vcpu->kvm)) {
++		if (new_val != old_val)
++			ret = -EBUSY;
++	} else {
++		IDREG(vcpu->kvm, reg_to_encoding(rd)) = new_val;
++	}
++out:
++	mutex_unlock(&arch->config_lock);
++	return ret;
+ }
+ 
+ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+@@ -1479,7 +1488,12 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		      u64 *val)
+ {
++	struct kvm_arch *arch = &vcpu->kvm->arch;
 +
- #define esr_sys64_to_params(esr)                                               \
- 	((struct sys_reg_params){ .Op0 = ((esr) >> 20) & 3,                    \
- 				  .Op1 = ((esr) >> 14) & 0x7,                  \
++	mutex_lock(&arch->config_lock);
+ 	*val = read_id_reg(vcpu, rd);
++	mutex_unlock(&arch->config_lock);
++
+ 	return 0;
+ }
+ 
+@@ -3364,6 +3378,7 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
+ {
+ 	const struct sys_reg_desc *idreg;
+ 	struct sys_reg_params params;
++	u64 val;
+ 	u32 id;
+ 
+ 	/* Find the first idreg (SYS_ID_PFR0_EL1) in sys_reg_descs. */
+@@ -3386,6 +3401,27 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
+ 		idreg++;
+ 		id = reg_to_encoding(idreg);
+ 	}
++
++	/*
++	 * The default is to expose CSV2 == 1 if the HW isn't affected.
++	 * Although this is a per-CPU feature, we make it global because
++	 * asymmetric systems are just a nuisance.
++	 *
++	 * Userspace can override this as long as it doesn't promise
++	 * the impossible.
++	 */
++	val = IDREG(kvm, SYS_ID_AA64PFR0_EL1);
++
++	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED) {
++		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
++		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2), 1);
++	}
++	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED) {
++		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
++		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3), 1);
++	}
++
++	IDREG(kvm, SYS_ID_AA64PFR0_EL1) = val;
+ }
+ 
+ int __init kvm_sys_reg_table_init(void)
 -- 
 2.40.1.698.g37aff9b760-goog
 
