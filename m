@@ -2,246 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07E6470B82C
-	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 10:57:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A50870B938
+	for <lists+kvm@lfdr.de>; Mon, 22 May 2023 11:40:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232671AbjEVI5z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 04:57:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41032 "EHLO
+        id S232443AbjEVJkG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 05:40:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232662AbjEVI50 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 04:57:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C760AF
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 01:56:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684745771;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=v4/mES/i+aWv5NPMCuzU07vDqmm6ywd8X/SsDFXQTQU=;
-        b=Gr2b8p9TY3nXinpqK8whWKU+Lgg6GoQqTkHm60SBsV2urGc/hVV+SCT8R957af8mTbVXTD
-        LaPSjmQtgtCoBQEtTBfNJMb7FpNOs+rWUU9RCAZ/Lk2bm4EnSxub/QNrqWtaeU6GIjTpPL
-        NslAo1EcO8BxOLLCsqefhRUp8d1Ooxg=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-647-HBXaRMfTNrWQKqO-bmGPEw-1; Mon, 22 May 2023 04:56:10 -0400
-X-MC-Unique: HBXaRMfTNrWQKqO-bmGPEw-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6237c937691so20607376d6.0
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 01:56:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684745769; x=1687337769;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v4/mES/i+aWv5NPMCuzU07vDqmm6ywd8X/SsDFXQTQU=;
-        b=SB86+i2BT6iT7GMrb8z2+IvJOQgp2RR5czZflfcqwhKgsk3DRrD4N+xVMzPbEREnzC
-         5buI3rWXGX7qFD3OVKQARrGMle00sjq/Rj9G2vPVYjAWnUD5KcicKXZ8+K5mE+a5NkL3
-         eGbqrf1yICqlaKB2aptiAMQSLD5VjsR7ZUF/FZZnCdGMMwwChFQ83euS8mgCwfz6sDjI
-         vOJTyKDUKMTwNYPKwhYybRVxIj7fqnR/P/KLSXwHij1Fled30xdJy13sevP4SZXqZ39V
-         VWKipxdprnooLnhJIiFVVzic+O7qJnRzVrPDvLosE2qjBBbbCCkSApwQx5MY1tjJVGNR
-         Zkpg==
-X-Gm-Message-State: AC+VfDytqt26Uk8C/0MXsR/BhZEYCRI43Ztbe9WAajgYI9GdJI9bUiVK
-        ll0jamXC+FJ5mQ1omPI4EnbESQqyHHETLcUvAoJiQV1YKdo03pV0wxXp398ukH+B3qEOaAhohzg
-        Js+cMXxPD6gnEMl39Aae6F8YAaNWfKWh9IRywEq6rjYDOp1eX+yFNvFy9t1z1RZiCNxOaR64P
-X-Received: by 2002:ad4:574f:0:b0:61b:58ec:24c8 with SMTP id q15-20020ad4574f000000b0061b58ec24c8mr19041582qvx.10.1684745769663;
-        Mon, 22 May 2023 01:56:09 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6uniPtYnrTfdnta4PkKXkaaURbeQlrK+ltmlFW9A16ZWTL6u653yf9McI3kMPgTvMlDD4Mow==
-X-Received: by 2002:ad4:574f:0:b0:61b:58ec:24c8 with SMTP id q15-20020ad4574f000000b0061b58ec24c8mr19041550qvx.10.1684745769306;
-        Mon, 22 May 2023 01:56:09 -0700 (PDT)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id f28-20020ad4559c000000b0061f7cf8207asm1810803qvx.133.2023.05.22.01.56.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 May 2023 01:56:08 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Michael Kelley <mikelley@microsoft.com>
-Cc:     mikelley@microsoft.com, kys@microsoft.com, haiyangz@microsoft.com,
-        wei.liu@kernel.org, decui@microsoft.com, catalin.marinas@arm.com,
-        will@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, x86@kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 1/2] x86/hyperv: Fix hyperv_pcpu_input_arg handling when
- CPUs go online/offline
-In-Reply-To: <1684506832-41392-1-git-send-email-mikelley@microsoft.com>
-References: <1684506832-41392-1-git-send-email-mikelley@microsoft.com>
-Date:   Mon, 22 May 2023 10:56:05 +0200
-Message-ID: <87o7mczqvu.fsf@redhat.com>
+        with ESMTP id S232599AbjEVJj5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 05:39:57 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 741BCB7;
+        Mon, 22 May 2023 02:39:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684748396; x=1716284396;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=uLAb9CBgZUhOiDdXwAUM8fSGi8W+6P9c/CnKEAYfUVA=;
+  b=QCwPQHgN+D9MvkCk07bZhLViN0IgYSg7nR4m79ex2X209L4k/lJDEcS7
+   FFOoyUJV3+XUP8YF/CweaOdtarVv9PGWCRbRBatgxKAcQGFFC+p8gHbL6
+   VwcSG1sMp6PFe+rLf+QE9x9Ew7pk3JGDcjpnIUma1M5fBsh1qg/03sazd
+   bPHaita5CZ/tgRHDcK+AmmqI2ssSFo+6V0HudSxmywrYbQ84J4JHax7q9
+   Q8uVr72tYhqw4GrWV/UTP7FiBFzHIqMQE0S8M+frNjFbGur0PuwurlvBh
+   2ox9FkRhYrlekB8/O0pY0adgjHW+yjXr0t1l04qNHQT4L7ASVtZ1SUqSx
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10717"; a="355220955"
+X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
+   d="scan'208";a="355220955"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2023 02:39:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10717"; a="734201827"
+X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
+   d="scan'208";a="734201827"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga008.jf.intel.com with ESMTP; 22 May 2023 02:39:55 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Mon, 22 May 2023 02:39:55 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Mon, 22 May 2023 02:39:55 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.171)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Mon, 22 May 2023 02:39:55 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=C6srtkOdNP6AKjj4eocGvRGCymzLWvHO7q0brsJNjq/4VzG6FKW9uZKBzyMG3dFzvvjSDLkI/3A3wIz7szdIy+72I69yvhcRkC0udqHLDsz/gTLfGzC7XtPwhchwT9vHdMXMg56rzt8CN1WxeYNeEJgLmKuPBwJ7stc/Md6BX2C7sRYC3cg/6FK6TnfonDOdHXTnrADgxao5/0XwnIfy6/H+wOP/LbE91YPZhvh7+zK+E/kcaMcFgcL1ZZT9gavQWPptIM/eaeSlQUoUFJBOpnqOwBD1Bqa8waOt6q4GMNs49Mf6XP4Da9nLfTJlX7b28lXSkKwb8tGMSrsFJuoGsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZoZpdyVVAJHCsnq3m82cxW41adlI7yj1jRfASip3g8c=;
+ b=VUSI5bmXVc2jiub/zfEcTB4mIM5kKLHa0GdlkEV5R58seh7yZiwBmnoaP2qIGpPaBWKXpq5UJUb+FylchZ+rKPvoBnTTDK95JQ2NaZv3RKp9F/5UCMPes1/bG8PvBpUm/Ndhw3URFjgTSWQ1Pc3WVVXkalQvVcbxRbFtkQAe54E3qwKqHJiSqdUB+40aXcZpYm6RE6HJ/G5maylht6fHHT0B59cN4vsAQW0Ix8Vo33/m4tCBV2f7IcmEG0fHrjZEDI6llLwOGDWUq1lFV9e1H/ZdKywkdC4mqp8r4glfuI4CeeUPunvSdoraxfhvvcCi6aFRriBFEsu+LuqCbqBNoA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB5469.namprd11.prod.outlook.com (2603:10b6:5:399::13)
+ by MN2PR11MB4520.namprd11.prod.outlook.com (2603:10b6:208:265::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.28; Mon, 22 May
+ 2023 09:39:54 +0000
+Received: from DM4PR11MB5469.namprd11.prod.outlook.com
+ ([fe80::e825:c2b5:8df5:e17b]) by DM4PR11MB5469.namprd11.prod.outlook.com
+ ([fe80::e825:c2b5:8df5:e17b%4]) with mapi id 15.20.6411.028; Mon, 22 May 2023
+ 09:39:53 +0000
+Message-ID: <4f548084-3739-b0b0-8a18-1384393fbfe1@intel.com>
+Date:   Mon, 22 May 2023 17:39:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [RFC PATCH v2 10/11] KVM: selftests: Add tests for virtual
+ enumeration/mitigation MSRs
+Content-Language: en-US
+To:     Chao Gao <chao.gao@intel.com>, <kvm@vger.kernel.org>
+CC:     Jiaan Lu <jiaan.lu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        "Shuah Khan" <shuah@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        "Borislav Petkov" <bp@suse.de>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        "Zhang Chen" <chen.zhang@intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+References: <20230414062545.270178-1-chao.gao@intel.com>
+ <20230414062545.270178-11-chao.gao@intel.com>
+From:   "Liu, Jingqi" <jingqi.liu@intel.com>
+In-Reply-To: <20230414062545.270178-11-chao.gao@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR01CA0186.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:189::14) To DM4PR11MB5469.namprd11.prod.outlook.com
+ (2603:10b6:5:399::13)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB5469:EE_|MN2PR11MB4520:EE_
+X-MS-Office365-Filtering-Correlation-Id: ca662926-89a3-44d3-78f8-08db5aa87ea1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: slr56xdtkBs9dbp3rgwQPKfNH3rlXNc6mIVOWyXUEeG6cZwePiIZMMtIpb93/ajt4Sj0xc+Ufsh0HP3h1u+L65tliu7nx6/sFJHBm5yHJt+B9JJ8x2WTwXO+1n5aIFWqCqR7Guy1EdgIT/XlAzMonGxWK3qaNx9vF/nBGqnwSetLSKiPulphJXNX3bNhqgKqv169UlXrIMtvzfCD5gBpYQTd5gacxYpO/EJYDL5xAxe9qLgHmLK1K2iZ4OGeTLNU18fbsIXhGWd68xTD/me8ZZ9duTUPJFul33+Vq6yIghcw8iCXPpCEfOy+ib0QgcWOKFARmFB4jj9xAUPnDmOdVDhaMn+YoNcpJm7kUMDMqEhXVWstX/Q7Tgfj1NxRDZlnvtLIsSSXW57MBhchu/uRmcapx2twz9/a4Cf85t/i6TapzjAuks199+izw09VVd02k0yYMOAu+IKdF5mmzEOqNvxHABWkQEBkqT22VEVGuF5jwO6WHWIDytk2FoLj+24kHdailJ+nTA6L4VB9R3it9eIXdiueOClqGb0pQqo78tsTE6jOUAp3oMb0aesLhlVyLiugm5+UHx/YmAEMj/47O5sUFByUeQY0/P4pL2s0zrAU6SSoIYmdQMSc4PqfYEIGAc7Qa81SwVqN4LQyuCRo3A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5469.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(396003)(366004)(136003)(376002)(346002)(451199021)(6512007)(6506007)(26005)(53546011)(6666004)(31686004)(6486002)(54906003)(41300700001)(66946007)(66556008)(66476007)(4326008)(478600001)(316002)(8936002)(8676002)(5660300002)(31696002)(86362001)(83380400001)(4744005)(82960400001)(38100700002)(2906002)(36756003)(186003)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MmtwSkEyb3lyQTRDQkRubjhWRUk2MVFGdXIxVGVHNVNYWVRDelhVd3dJbzQ4?=
+ =?utf-8?B?OWRCT0lIN3dXelJVM295NXZ4QWg0SmN0M0lEMXRIbXJ3OWRGRFpyYjFISG9Q?=
+ =?utf-8?B?d2FTRXNOV2l6dFlieGhFNmQzbGE3eXBERFNZZUxtSlJhRDFQZStYN2xQeSth?=
+ =?utf-8?B?SHZqWU11VFAwQkdCYTFGWDliOEZ2SWJudnA3eFdFanhPVy9kMVlYMkhLaVhP?=
+ =?utf-8?B?NjRMdzJIYXN1bjluU2VxczNyUllnaldJTlhWazVPTFNQajBFR3dWTkxGVXhV?=
+ =?utf-8?B?dU5oYkRQNCszVnMrbEZLaUY5Zm5ZSGhaRWd1a0Vxb3BaeWdLOStZT0pOcFZl?=
+ =?utf-8?B?SnB4MEV4b1lrZzlvM1psZlA2WWJCSUt6enVjanBLMmlxOXFMeFZqWE1qYjA5?=
+ =?utf-8?B?aE9Gc1k3SktxeWdDOUJicEwxQUZBOGNnSitSc05NQmRaMEZ2SFRQTThFWWRq?=
+ =?utf-8?B?bS9mS1dYRE9SVWo5TnV0bVRNOEZzS2ZiY2lSdkYwWW0zOFJXeENBUkdkKzlk?=
+ =?utf-8?B?ZlFMeEtjKzdHQ3lJMmZjNTFMQm9hMlFsdE04d3Z1dVgrSWY2TW92T0pudy9J?=
+ =?utf-8?B?OGlHbzYydWUxR1g1Vnlvd25TQVdyV20zamhwVDhxYnBGc1ZYcXVuaGJ5VnNU?=
+ =?utf-8?B?WklOYzl5WHpwQ0ZFd0FQdUpMTGdCUVRjb0RYTUpFa01ZS3QrV2F0YmxONGt0?=
+ =?utf-8?B?RU1mMTU5VUVPSjdRUlQ5WWM2NnJvS2YyU1RYa2hLRElUZnViMUoxbGRHb2V5?=
+ =?utf-8?B?QzRUUU9QSFY3eDE3d2hlR2E0VEIrd0ExaFdnL3k5RVNiTzV3dUZLeWJ4a2Ew?=
+ =?utf-8?B?eEYyRFJyUFBMNWNrT0xQb0pLeXA0ZGFQS0J5Z1c3NDZGYTdhQ3lJRGNEOHND?=
+ =?utf-8?B?ZDZTRC9PZHF2K3RwVzZwUzMyWE5TV0Z5SktKOS9hOXJpcW9MVE1oMWtiRC9M?=
+ =?utf-8?B?bVJ0bkhaOWhKNWRySEZjalRzeFJxNGFHOWxlTHZoYU1YZ3VhY0JncmFRTHA0?=
+ =?utf-8?B?bC8rZmFSbWREV3pyeHRHK1hZVk9lNldsTExiZXdwVGFpYXZKQkFxWGM3Q2xX?=
+ =?utf-8?B?MDJhSHJmaWZ4R3BkQWlvMThhQTdFRkZWYWVSMUpxZmRJbjZMREhrTkhrSTFB?=
+ =?utf-8?B?UGhiUktRUGViTnRZcnFPWFV3WGQ5UEFyaTBHUHdyRkVSelZtOUM0TXZmajhw?=
+ =?utf-8?B?SGZBWmEzekozK1J5VkZjWnVjZW1iUTJ2QjJSTlpGNjJGekNTTEt1b0lXYUNi?=
+ =?utf-8?B?d3dnYW1vZEVOb3FqL2duVjF2bEFNcUdOR3RHK2s3RW1EZVBvRG5kb1hORk5J?=
+ =?utf-8?B?ckdIRnp3SXFwcmMzbkxFYmZINURTbmd4cUJlQ1lVdGxEWlhGakpBcEtEc2xJ?=
+ =?utf-8?B?cDFrNVc1eTRLMkNhajZqNm0vYmc4QkZCR3ZZd243eElQT1hhWHVwSVNDODN3?=
+ =?utf-8?B?dXB5cTJ2WDRGRFpxbTJQZWM3ZTRHOW9IMmJBMnFFOWtlVWdzRGsyV3N6MGxT?=
+ =?utf-8?B?SHRQblFtQUFtR3l2b2ZtSFNiMExtYlEzZ0thampPaWdMMiswWUJheWJZY1Zw?=
+ =?utf-8?B?d3JXQmFqeTlrT3YrWll4YVp3cmZMRlpRN3dzdmR3RWZyU2UyRFZVbFp0TXRq?=
+ =?utf-8?B?VlRldWlzZDJoTHlLOGhaZkk4UVA0b0djWkIrTlFIOHJjZTQ0M2k0Y002Tk1M?=
+ =?utf-8?B?NmJRcEw3WmxlZ0k3dVB3dU1QVm5wMlNiclBmSm02ckNua0ZpdmZ0S21GQlFQ?=
+ =?utf-8?B?QldwNnJqMEFZVlhyaTFwcGtVajNHNThoaXQrMWhqY0xQbXRnNGpEOE02bUFl?=
+ =?utf-8?B?WUk3VWM1aTJ3S05vOVVEUWdkVGRDVFd4cGR2d0E2anVnRExyWUZFOWZiV0hl?=
+ =?utf-8?B?TkdMdzZpa3lkMlNjaVdVeXBPeHF5QjYxYk1rLzJLL29YR3VodTBrM1A2Y0Nw?=
+ =?utf-8?B?MHk3SWJHSmlkNURXa1dVWXkwRWtxOHpXYitOVVI0cTVmYk9vVTdBbDFoSUFN?=
+ =?utf-8?B?SEd1R2NOdyt5Ly82bi9vY3ZUWU93czlxMEFmRG9QOXZ4VnY0bjlVbmtDU3RC?=
+ =?utf-8?B?dnJzV1did0t0T1VleSt4cWVqMWxQYVZlaHNPUTd2eEVoYjhqN0VGWHZqR0xn?=
+ =?utf-8?Q?mPyqDd1d9qXHbFJ890QuHS2d6?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca662926-89a3-44d3-78f8-08db5aa87ea1
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5469.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2023 09:39:53.2170
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: l44tPTMY0Rz2oENkK9aMEfnlSoVXnK+uAAQ/MNJm6eHfwxSRJ/8lhQ6AlCEnRE9njsyZkbXiUb4EUlbYZDnBmQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4520
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Michael Kelley <mikelley@microsoft.com> writes:
-
-> These commits
+On 4/14/2023 2:25 PM, Chao Gao wrote:
+> Three virtual MSRs added for guest to report the usage of software
+Seems it's better like below.
+s/Three virtual MSRs added/Add three virtual MSRs ?
+> mitigations. They are enumerated in an architectural way. Try to
+> access the three MSRs to ensure the behavior is expected:
+> Specifically,
 >
-> a494aef23dfc ("PCI: hv: Replace retarget_msi_interrupt_params with hyperv_pcpu_input_arg")
-> 2c6ba4216844 ("PCI: hv: Enable PCI pass-thru devices in Confidential VMs")
+> 1. below three cases should cause #GP:
+>   * access to a non-present MSR
+>   * write to read-only MSRs
+>   * toggling reserved bit of a writeable MSR
 >
-> update the Hyper-V virtual PCI driver to use the hyperv_pcpu_input_arg
-> because that memory will be correctly marked as decrypted or encrypted
-> for all VM types (CoCo or normal). But problems ensue when CPUs in the
-> VM go online or offline after virtual PCI devices have been configured.
+> 2. rdmsr/wrmsr in other cases should succeed
 >
-> When a CPU is brought online, the hyperv_pcpu_input_arg for that CPU is
-> initialized by hv_cpu_init() running under state CPUHP_AP_ONLINE_DYN.
-> But this state occurs after state CPUHP_AP_IRQ_AFFINITY_ONLINE, which
-> may call the virtual PCI driver and fault trying to use the as yet
-> uninitialized hyperv_pcpu_input_arg. A similar problem occurs in a CoCo
-> VM if the MMIO read and write hypercalls are used from state
-> CPUHP_AP_IRQ_AFFINITY_ONLINE.
+> 3. rdmsr should return the value last written
 >
-> When a CPU is taken offline, IRQs may be reassigned in state
-> CPUHP_TEARDOWN_CPU. Again, the virtual PCI driver may fault trying to
-> use the hyperv_pcpu_input_arg that has already been freed by a
-> higher state.
->
-> Fix the onlining problem by adding state CPUHP_AP_HYPERV_ONLINE
-> immediately after CPUHP_AP_ONLINE_IDLE (similar to CPUHP_AP_KVM_ONLINE)
-> and before CPUHP_AP_IRQ_AFFINITY_ONLINE. Use this new state for
-> Hyper-V initialization so that hyperv_pcpu_input_arg is allocated
-> early enough.
->
-> Fix the offlining problem by not freeing hyperv_pcpu_input_arg when
-> a CPU goes offline. Retain the allocated memory, and reuse it if
-> the CPU comes back online later.
->
-> Signed-off-by: Michael Kelley <mikelley@microsoft.com>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
 > ---
->  arch/x86/hyperv/hv_init.c  |  2 +-
->  drivers/hv/hv_common.c     | 48 +++++++++++++++++++++++-----------------------
->  include/linux/cpuhotplug.h |  1 +
->  3 files changed, 26 insertions(+), 25 deletions(-)
->
-> diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
-> index a5f9474..6c04b52 100644
-> --- a/arch/x86/hyperv/hv_init.c
-> +++ b/arch/x86/hyperv/hv_init.c
-> @@ -416,7 +416,7 @@ void __init hyperv_init(void)
->  			goto free_vp_assist_page;
->  	}
->  
-> -	cpuhp = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/hyperv_init:online",
-> +	cpuhp = cpuhp_setup_state(CPUHP_AP_HYPERV_ONLINE, "x86/hyperv_init:online",
->  				  hv_cpu_init, hv_cpu_die);
->  	if (cpuhp < 0)
->  		goto free_ghcb_page;
-> diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
-> index 64f9cec..4c5cee4 100644
-> --- a/drivers/hv/hv_common.c
-> +++ b/drivers/hv/hv_common.c
-> @@ -364,13 +364,20 @@ int hv_common_cpu_init(unsigned int cpu)
->  	flags = irqs_disabled() ? GFP_ATOMIC : GFP_KERNEL;
->  
->  	inputarg = (void **)this_cpu_ptr(hyperv_pcpu_input_arg);
-> -	*inputarg = kmalloc(pgcount * HV_HYP_PAGE_SIZE, flags);
-> -	if (!(*inputarg))
-> -		return -ENOMEM;
->  
-> -	if (hv_root_partition) {
-> -		outputarg = (void **)this_cpu_ptr(hyperv_pcpu_output_arg);
-> -		*outputarg = (char *)(*inputarg) + HV_HYP_PAGE_SIZE;
-> +	/*
-> +	 * hyperv_pcpu_input_arg and hyperv_pcpu_output_arg memory is already
-> +	 * allocated if this CPU was previously online and then taken offline
-> +	 */
-> +	if (!*inputarg) {
-> +		*inputarg = kmalloc(pgcount * HV_HYP_PAGE_SIZE, flags);
-> +		if (!(*inputarg))
-> +			return -ENOMEM;
-> +
-> +		if (hv_root_partition) {
-> +			outputarg = (void **)this_cpu_ptr(hyperv_pcpu_output_arg);
-> +			*outputarg = (char *)(*inputarg) + HV_HYP_PAGE_SIZE;
-> +		}
->  	}
->  
->  	msr_vp_index = hv_get_register(HV_REGISTER_VP_INDEX);
-> @@ -385,24 +392,17 @@ int hv_common_cpu_init(unsigned int cpu)
->  
->  int hv_common_cpu_die(unsigned int cpu)
->  {
-> -	unsigned long flags;
-> -	void **inputarg, **outputarg;
-> -	void *mem;
-> -
-> -	local_irq_save(flags);
-> -
-> -	inputarg = (void **)this_cpu_ptr(hyperv_pcpu_input_arg);
-> -	mem = *inputarg;
-> -	*inputarg = NULL;
-> -
-> -	if (hv_root_partition) {
-> -		outputarg = (void **)this_cpu_ptr(hyperv_pcpu_output_arg);
-> -		*outputarg = NULL;
-> -	}
-> -
-> -	local_irq_restore(flags);
-> -
-> -	kfree(mem);
-> +	/*
-> +	 * The hyperv_pcpu_input_arg and hyperv_pcpu_output_arg memory
-> +	 * is not freed when the CPU goes offline as the hyperv_pcpu_input_arg
-> +	 * may be used by the Hyper-V vPCI driver in reassigning interrupts
-> +	 * as part of the offlining process.  The interrupt reassignment
-> +	 * happens *after* the CPUHP_AP_HYPERV_ONLINE state has run and
-> +	 * called this function.
-> +	 *
-> +	 * If a previously offlined CPU is brought back online again, the
-> +	 * originally allocated memory is reused in hv_common_cpu_init().
-> +	 */
->  
->  	return 0;
->  }
-> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-> index 0f1001d..696004a 100644
-> --- a/include/linux/cpuhotplug.h
-> +++ b/include/linux/cpuhotplug.h
-> @@ -201,6 +201,7 @@ enum cpuhp_state {
->  	/* Online section invoked on the hotplugged CPU from the hotplug thread */
->  	CPUHP_AP_ONLINE_IDLE,
->  	CPUHP_AP_KVM_ONLINE,
-> +	CPUHP_AP_HYPERV_ONLINE,
-
-(Cc: KVM)
-
-I would very much prefer we swap the order with KVM here: hv_cpu_init()
-allocates and sets vCPU's VP assist page which is used by KVM on
-CPUHP_AP_KVM_ONLINE:
-
-kvm_online_cpu() -> __hardware_enable_nolock() ->
-kvm_arch_hardware_enable() -> vmx_hardware_enable():
-
-        /*
-         * This can happen if we hot-added a CPU but failed to allocate
-         * VP assist page for it.
-         */
-	if (kvm_is_using_evmcs() && !hv_get_vp_assist_page(cpu))
-		return -EFAULT;
-
-With the change, this is likely broken.
-
-FWIF, KVM also needs current vCPU's VP index (also set by hv_cpu_init())
-through __kvm_x86_vendor_init() -> set_hv_tscchange_cb() call chain but
-this happens upon KVM module load so CPU hotplug ordering should not
-matter as this always happens on a CPU which is already online.
-
-Generally, as 'KVM on Hyper-V' is a supported scenario, doing Hyper-V
-init before KVM's (and vice versa on teardown) makes sense.
-
->  	CPUHP_AP_SCHED_WAIT_EMPTY,
->  	CPUHP_AP_SMPBOOT_THREADS,
->  	CPUHP_AP_X86_VDSO_VMA_ONLINE,
-
--- 
-Vitaly
-
+Thanks,
+Jingqi
