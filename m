@@ -2,170 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF7CC70E3B1
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 19:47:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7926270E3C7
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 19:47:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237852AbjEWQ4q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 12:56:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34728 "EHLO
+        id S237931AbjEWRVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 13:21:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235480AbjEWQ4o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 12:56:44 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D437CC2
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 09:56:41 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-564fb1018bcso57520257b3.0
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 09:56:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684861001; x=1687453001;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wrBhXdURti5dDN8ayuXGB0ofh5Nn3n6ogjtgMB2nW2Q=;
-        b=Ipet8D8+ByimH4J0Yup7AfjiRNANkpz/sRtQDxkHat/bahvEYoS8gmEG+5SvYC/1P5
-         a3Gt1GqyMyas8m2DUR8jNdOeVjEozG7mJ8b0FpV3xK4vdY2FW1zll8VQ9WTZpnx8KK96
-         V8o7yNyKqoUq0JvtTqDMPlC2lQ9KE7MkOAjJOnrOLDCQBJeu382hvUwjbEl0omhYc70B
-         0jOPclBKZDuIPzxBbVa6p5N34U0+/g81y/fBMppddz2NEvmAoAcdVx0Z3Kh+3t1AeGg2
-         2SVWh4JSYEaSmlvIWLVfmxpMxRMey2K0vULQYfWcdfCOlfDucPH0EzILs16hEgQojH/B
-         tX/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684861001; x=1687453001;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wrBhXdURti5dDN8ayuXGB0ofh5Nn3n6ogjtgMB2nW2Q=;
-        b=H1UOEnfT7gZn0CAH1hlEnGt+Wf1DLb+tsdAn6+jrlUYErd9zGhZfukslMRJkpFdozR
-         oXVhumAK8Xvs9uHn1uo6ys5nxUmlGUXekfPxZ+BDx1rZFfmatQzxdfTA0+bt0rzTNzY/
-         NDrlQboJAV8gR5Jx+YHGUZrEXqM/B8VVLOBsoC+AoHY20ifyMo0Wjq9NbPrfaB8Iz9xQ
-         9QFyfDw0nhgXBt3vmwvyB6EDVENqwRd8g0pxrfBBOvCOuCtfykwRye5gdetmc60O4oAw
-         BwwC1dnH5pbgeGugnIOoivfaTS8UjIOUr6gYd1rBUp3/fcsk9YjS1LfB+P27h3jvn5gg
-         9wmw==
-X-Gm-Message-State: AC+VfDzDOAHwE+P0Ba21K4WjZO6/41twzUuCXFROoELzaPK8yRjaYv6w
-        9KXyjS2rDluUY2lKGpO5WGEO4kIMSb3Q
-X-Google-Smtp-Source: ACHHUZ7zZMPI75T9CkUUAEFQYaJqKd4MnmRq2fA2kMT2h5naBwye5UXY+Z4MCIilxMLOtegZ6zbRAscuAMzd
-X-Received: from mizhang-super.c.googlers.com ([34.105.13.176]) (user=mizhang
- job=sendgmr) by 2002:a81:440b:0:b0:565:2bb:6860 with SMTP id
- r11-20020a81440b000000b0056502bb6860mr4621180ywa.4.1684861001145; Tue, 23 May
- 2023 09:56:41 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Tue, 23 May 2023 16:56:35 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
-Message-ID: <20230523165635.4002711-1-mizhang@google.com>
-Subject: [PATCH v2] KVM: SVM: Remove TSS reloading code after VMEXIT
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Venkatesh Srinivas <venkateshs@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Michael Roth <Michael.Roth@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S237736AbjEWRVp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 13:21:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E74FCBF;
+        Tue, 23 May 2023 10:21:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7BC2B634FD;
+        Tue, 23 May 2023 17:21:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC00CC433D2;
+        Tue, 23 May 2023 17:21:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684862487;
+        bh=Mlb70fPzSp44IfyqduXQkVQtlmfOh88KwIwDwATPXzo=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=NbQWIb186lkngXgl31wbkSXEHdu2tTTAcq/u7WaYhqcsZyQF/JWdg3RqGgIGjKe5o
+         8e6Q2DdpbMyw/vVP3dpfs03F+ljNuPsPUS8xrWDRizmMT2fzOUA1GgxgA6AALl0S6x
+         7acE+Zc6ImBOtMBTbTwT6xeqlhHyNVhxMZIUii1LVHaMIYFPhEpckIxaxvo98U3hug
+         9T/Cu24Q3s2bzdTQyfhAWTfsGSVB1yKxuWILeCwTpI30C+zKCY0FrkIr8NpHqP08gY
+         kQyAzR5XhD/c6JFAzT8ifYl5K9bqFP+fGyNh3PHBIKIezJTxJR1gN3DjLIqlAnTz69
+         AAK4kGmcgXsAQ==
+Date:   Tue, 23 May 2023 12:21:25 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        linux-acpi@vger.kernel.org
+Cc:     Nirmal Patel <nirmal.patel@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [Bug 217472] New: ACPI _OSC features have different values in
+ Host OS and Guest OS
+Message-ID: <ZGz2FQpHPKYgcc0+@bhelgaas>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bug-217472-41252@https.bugzilla.kernel.org/>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove TSS reloading code after VMEXIT since upstream KVM after [1] has
-already been using VMLOAD to load host segment state (including TSS).
-Therefore, reload_tss() becomes redundant and could have been removed in
-[1]. So fix it by removing remove reload_tss() and the relevant data field
-tss_desc in svm_cpu_data as well as its data structure definition.
+Hi Nirmal, thanks for the report!
 
-[1] Check the Fixes tag.
+On Mon, May 22, 2023 at 04:32:03PM +0000, bugzilla-daemon@kernel.org wrote:
+> https://bugzilla.kernel.org/show_bug.cgi?id=217472
+> ...
 
-Fixes: e79b91bb3c91 ("KVM: SVM: use vmsave/vmload for saving/restoring additional host state")
-Reported-by: Venkatesh Srinivas <venkateshs@google.com>
-Suggested-by: Jim Mattson <jmattson@google.com>
-Tested-by: Mingwei Zhang <mizhang@google.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/kvm/svm/svm.c | 24 ------------------------
- arch/x86/kvm/svm/svm.h |  1 -
- 2 files changed, 25 deletions(-)
+> Created attachment 304301
+>   --> https://bugzilla.kernel.org/attachment.cgi?id=304301&action=edit
+> Rhel9.1_Guest_dmesg
+> 
+> Issue:
+> NVMe Drives are still present after performing hotplug in guest OS. We have
+> tested with different combination of OSes, drives and Hypervisor. The issue is
+> present across all the OSes. 
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index eb308c9994f9..cfbe00360908 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -240,15 +240,6 @@ static u8 rsm_ins_bytes[] = "\x0f\xaa";
- 
- static unsigned long iopm_base;
- 
--struct kvm_ldttss_desc {
--	u16 limit0;
--	u16 base0;
--	unsigned base1:8, type:5, dpl:2, p:1;
--	unsigned limit1:4, zero0:3, g:1, base2:8;
--	u32 base3;
--	u32 zero1;
--} __attribute__((packed));
--
- DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
- 
- /*
-@@ -584,7 +575,6 @@ static int svm_hardware_enable(void)
- 
- 	struct svm_cpu_data *sd;
- 	uint64_t efer;
--	struct desc_struct *gdt;
- 	int me = raw_smp_processor_id();
- 
- 	rdmsrl(MSR_EFER, efer);
-@@ -597,9 +587,6 @@ static int svm_hardware_enable(void)
- 	sd->next_asid = sd->max_asid + 1;
- 	sd->min_asid = max_sev_asid + 1;
- 
--	gdt = get_current_gdt_rw();
--	sd->tss_desc = (struct kvm_ldttss_desc *)(gdt + GDT_ENTRY_TSS);
--
- 	wrmsrl(MSR_EFER, efer | EFER_SVME);
- 
- 	wrmsrl(MSR_VM_HSAVE_PA, sd->save_area_pa);
-@@ -3453,14 +3440,6 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 	return svm_invoke_exit_handler(vcpu, exit_code);
- }
- 
--static void reload_tss(struct kvm_vcpu *vcpu)
--{
--	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
--
--	sd->tss_desc->type = 9; /* available 32/64-bit TSS */
--	load_TR_desc();
--}
--
- static void pre_svm_run(struct kvm_vcpu *vcpu)
- {
- 	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
-@@ -4064,9 +4043,6 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	svm_vcpu_enter_exit(vcpu, spec_ctrl_intercepted);
- 
--	if (!sev_es_guest(vcpu->kvm))
--		reload_tss(vcpu);
--
- 	if (!static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
- 		x86_spec_ctrl_restore_host(svm->virt_spec_ctrl);
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index f44751dd8d5d..18af7e712a5a 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -303,7 +303,6 @@ struct svm_cpu_data {
- 	u32 max_asid;
- 	u32 next_asid;
- 	u32 min_asid;
--	struct kvm_ldttss_desc *tss_desc;
- 
- 	struct page *save_area;
- 	unsigned long save_area_pa;
+Maybe attach the specific commands to reproduce the problem in one of
+these scenarios to the bugzilla?  I'm a virtualization noob, so I
+can't visualize all the usual pieces.
 
-base-commit: 5c291b93e5d665380dbecc6944973583f9565ee5
--- 
-2.40.1.698.g37aff9b760-goog
+> The following patch was added to honor ACPI _OSC values set by BIOS and the
+> patch helped to bring the issue out in VM/ Guest OS.
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/helgaas/pci.git/commit/drivers/pci/controller/vmd.c?id=04b12ef163d10e348db664900ae7f611b83c7a0e
+> 
+> 
+> I also compared the values of the parameters in the patch in Host and Guest OS.
+> The parameters with different values in Host and Guest OS are:
+> 
+> native_pcie_hotplug
+> native_shpc_hotplug
+> native_aer
+> native_ltr
+> 
+> i.e.
+> value of native_pcie_hotplug in Host OS is 1.
+> value of native_pcie_hotplug in Guest OS is 0.
+> 
+> I am not sure why "native_pcie_hotplug" is changed to 0 in guest.
+> Isn't it OSC_ managed parameter? If that is the case, it should
+> have same value in Host and Guest OS.
 
+From your dmesg:
+
+  DMI: Red Hat KVM/RHEL, BIOS 1.16.0-4.el9 04/01/2014
+  _OSC: OS supports [ExtendedConfig ASPM ClockPM Segments MSI EDR HPX-Type3]
+  _OSC: platform does not support [PCIeHotplug LTR DPC]
+  _OSC: OS now controls [SHPCHotplug PME AER PCIeCapability]
+  acpiphp: Slot [0] registered
+  virtio_blk virtio3: [vda] 62914560 512-byte logical blocks (32.2 GB/30.0 GiB)
+
+So the DMI ("KVM/RHEL ...") is the BIOS seen by the guest.  Doesn't
+mean anything to me, but the KVM folks would know about it.  In any
+event, the guest BIOS is different from the host BIOS, so I'm not
+surprised that _OSC is different.
+
+That guest BIOS _OSC declined to grant control of PCIe native hotplug
+to the guest OS, so the guest will use acpiphp (not pciehp, which
+would be used if native_pcie_hotplug were set).
+
+The dmesg doesn't mention the nvme driver.  Are you using something
+like virtio_blk with qemu pointed at an NVMe drive?  And you
+hot-remove the NVMe device, but the guest OS thinks it's still
+present?
+
+Since the guest is using acpiphp, I would think a hot-remove of a host
+NVMe device should be noticed by qemu and turned into an ACPI
+notification that the guest OS would consume.  But I don't know how
+those connections work.
+
+Bjorn
