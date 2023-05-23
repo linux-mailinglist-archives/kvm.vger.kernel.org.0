@@ -2,197 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B6AF70E25B
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 18:49:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF7CC70E3B1
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 19:47:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237736AbjEWQnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 12:43:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53138 "EHLO
+        id S237852AbjEWQ4q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 12:56:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237726AbjEWQnR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 12:43:17 -0400
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09DFE11A;
-        Tue, 23 May 2023 09:42:57 -0700 (PDT)
+        with ESMTP id S235480AbjEWQ4o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 12:56:44 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D437CC2
+        for <kvm@vger.kernel.org>; Tue, 23 May 2023 09:56:41 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-564fb1018bcso57520257b3.0
+        for <kvm@vger.kernel.org>; Tue, 23 May 2023 09:56:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1684860177; x=1716396177;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4cLn24dkdXYEj5ZgRvb+j624niie2xsz48lKPuQZSQs=;
-  b=k+Y63rtPjf+1xh64dy4Uue9CI1xwKf1hEqmLNYE4pyS6HFZJQkjC5lMq
-   DWP5REAx6N3rDhmHm1B4i7htDhQzPfj0zzk78Ymu+kzd0iVnkgjEe0C5p
-   JPZrTfAXHUcmf+PQ7CUwLdmq/E0wIebcqDXxnZMlao1xLHJuk1AwRWZIc
-   o=;
-X-IronPort-AV: E=Sophos;i="6.00,186,1681171200"; 
-   d="scan'208";a="215862704"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-edda28d4.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2023 16:42:54 +0000
-Received: from EX19D016EUA004.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1a-m6i4x-edda28d4.us-east-1.amazon.com (Postfix) with ESMTPS id 9ABD080C67;
-        Tue, 23 May 2023 16:42:50 +0000 (UTC)
-Received: from EX19D033EUC004.ant.amazon.com (10.252.61.133) by
- EX19D016EUA004.ant.amazon.com (10.252.50.4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 23 May 2023 16:42:49 +0000
-Received: from u40bc5e070a0153.ant.amazon.com (10.1.212.30) by
- EX19D033EUC004.ant.amazon.com (10.252.61.133) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 23 May 2023 16:42:46 +0000
-Date:   Tue, 23 May 2023 18:42:40 +0200
-From:   Roman Kagan <rkagan@amazon.de>
-To:     Like Xu <like.xu.linux@gmail.com>
-CC:     Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, <x86@kernel.org>,
-        Eric Hankland <ehankland@google.com>,
-        <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        "kvm list" <kvm@vger.kernel.org>
-Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
-Message-ID: <ZGztAF1e5op6FlRQ@u40bc5e070a0153.ant.amazon.com>
-Mail-Followup-To: Roman Kagan <rkagan@amazon.de>,
-        Like Xu <like.xu.linux@gmail.com>,
+        d=google.com; s=20221208; t=1684861001; x=1687453001;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wrBhXdURti5dDN8ayuXGB0ofh5Nn3n6ogjtgMB2nW2Q=;
+        b=Ipet8D8+ByimH4J0Yup7AfjiRNANkpz/sRtQDxkHat/bahvEYoS8gmEG+5SvYC/1P5
+         a3Gt1GqyMyas8m2DUR8jNdOeVjEozG7mJ8b0FpV3xK4vdY2FW1zll8VQ9WTZpnx8KK96
+         V8o7yNyKqoUq0JvtTqDMPlC2lQ9KE7MkOAjJOnrOLDCQBJeu382hvUwjbEl0omhYc70B
+         0jOPclBKZDuIPzxBbVa6p5N34U0+/g81y/fBMppddz2NEvmAoAcdVx0Z3Kh+3t1AeGg2
+         2SVWh4JSYEaSmlvIWLVfmxpMxRMey2K0vULQYfWcdfCOlfDucPH0EzILs16hEgQojH/B
+         tX/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684861001; x=1687453001;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wrBhXdURti5dDN8ayuXGB0ofh5Nn3n6ogjtgMB2nW2Q=;
+        b=H1UOEnfT7gZn0CAH1hlEnGt+Wf1DLb+tsdAn6+jrlUYErd9zGhZfukslMRJkpFdozR
+         oXVhumAK8Xvs9uHn1uo6ys5nxUmlGUXekfPxZ+BDx1rZFfmatQzxdfTA0+bt0rzTNzY/
+         NDrlQboJAV8gR5Jx+YHGUZrEXqM/B8VVLOBsoC+AoHY20ifyMo0Wjq9NbPrfaB8Iz9xQ
+         9QFyfDw0nhgXBt3vmwvyB6EDVENqwRd8g0pxrfBBOvCOuCtfykwRye5gdetmc60O4oAw
+         BwwC1dnH5pbgeGugnIOoivfaTS8UjIOUr6gYd1rBUp3/fcsk9YjS1LfB+P27h3jvn5gg
+         9wmw==
+X-Gm-Message-State: AC+VfDzDOAHwE+P0Ba21K4WjZO6/41twzUuCXFROoELzaPK8yRjaYv6w
+        9KXyjS2rDluUY2lKGpO5WGEO4kIMSb3Q
+X-Google-Smtp-Source: ACHHUZ7zZMPI75T9CkUUAEFQYaJqKd4MnmRq2fA2kMT2h5naBwye5UXY+Z4MCIilxMLOtegZ6zbRAscuAMzd
+X-Received: from mizhang-super.c.googlers.com ([34.105.13.176]) (user=mizhang
+ job=sendgmr) by 2002:a81:440b:0:b0:565:2bb:6860 with SMTP id
+ r11-20020a81440b000000b0056502bb6860mr4621180ywa.4.1684861001145; Tue, 23 May
+ 2023 09:56:41 -0700 (PDT)
+Reply-To: Mingwei Zhang <mizhang@google.com>
+Date:   Tue, 23 May 2023 16:56:35 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
+Message-ID: <20230523165635.4002711-1-mizhang@google.com>
+Subject: [PATCH v2] KVM: SVM: Remove TSS reloading code after VMEXIT
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Venkatesh Srinivas <venkateshs@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-        Eric Hankland <ehankland@google.com>, linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>
-References: <20230504120042.785651-1-rkagan@amazon.de>
- <de6acc7e-8e7f-2c54-11cc-822df4084719@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <de6acc7e-8e7f-2c54-11cc-822df4084719@gmail.com>
-X-Originating-IP: [10.1.212.30]
-X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
- EX19D033EUC004.ant.amazon.com (10.252.61.133)
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_TEMPERROR
-        autolearn=ham autolearn_force=no version=3.4.6
+        Mingwei Zhang <mizhang@google.com>,
+        Michael Roth <Michael.Roth@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 23, 2023 at 08:40:53PM +0800, Like Xu wrote:
-> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
-> 
-> 
-> 
-> On 4/5/2023 8:00 pm, Roman Kagan wrote:
-> > Performance counters are defined to have width less than 64 bits.  The
-> > vPMU code maintains the counters in u64 variables but assumes the value
-> > to fit within the defined width.  However, for Intel non-full-width
-> > counters (MSR_IA32_PERFCTRx) the value receieved from the guest is
-> > truncated to 32 bits and then sign-extended to full 64 bits.  If a
-> > negative value is set, it's sign-extended to 64 bits, but then in
-> > kvm_pmu_incr_counter() it's incremented, truncated, and compared to the
-> > previous value for overflow detection.
-> 
-> Thanks for reporting this issue. An easier-to-understand fix could be:
-> 
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index e17be25de6ca..51e75f121234 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -718,7 +718,7 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
-> 
->  static void kvm_pmu_incr_counter(struct kvm_pmc *pmc)
->  {
-> -       pmc->prev_counter = pmc->counter;
-> +       pmc->prev_counter = pmc->counter & pmc_bitmask(pmc);
->        pmc->counter = (pmc->counter + 1) & pmc_bitmask(pmc);
->        kvm_pmu_request_counter_reprogram(pmc);
->  }
-> 
-> Considering that the pmu code uses pmc_bitmask(pmc) everywhere to wrap
-> around, I would prefer to use this fix above first and then do a more thorough
-> cleanup based on your below diff. What do you think ?
+Remove TSS reloading code after VMEXIT since upstream KVM after [1] has
+already been using VMLOAD to load host segment state (including TSS).
+Therefore, reload_tss() becomes redundant and could have been removed in
+[1]. So fix it by removing remove reload_tss() and the relevant data field
+tss_desc in svm_cpu_data as well as its data structure definition.
 
-I did exactly this at first.  However, it felt more natural and easier
-to reason about and less error-prone going forward, to maintain the
-invariant that pmc->counter always fits in the assumed width.
+[1] Check the Fixes tag.
 
-> > That previous value is not truncated, so it always evaluates bigger than
-> > the truncated new one, and a PMI is injected.  If the PMI handler writes
-> > a negative counter value itself, the vCPU never quits the PMI loop.
-> > 
-> > Turns out that Linux PMI handler actually does write the counter with
-> > the value just read with RDPMC, so when no full-width support is exposed
-> > via MSR_IA32_PERF_CAPABILITIES, and the guest initializes the counter to
-> > a negative value, it locks up.
-> 
-> Not really sure what the behavioral difference is between "it locks up" and
-> "the vCPU never quits the PMI loop".
+Fixes: e79b91bb3c91 ("KVM: SVM: use vmsave/vmload for saving/restoring additional host state")
+Reported-by: Venkatesh Srinivas <venkateshs@google.com>
+Suggested-by: Jim Mattson <jmattson@google.com>
+Tested-by: Mingwei Zhang <mizhang@google.com>
+Signed-off-by: Mingwei Zhang <mizhang@google.com>
+---
+ arch/x86/kvm/svm/svm.c | 24 ------------------------
+ arch/x86/kvm/svm/svm.h |  1 -
+ 2 files changed, 25 deletions(-)
 
-No difference, the second paragraph just illustrates the specific case
-with Linux PMI handler and the system not exposing full-width counter
-support so the problematic code path is triggered.
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index eb308c9994f9..cfbe00360908 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -240,15 +240,6 @@ static u8 rsm_ins_bytes[] = "\x0f\xaa";
+ 
+ static unsigned long iopm_base;
+ 
+-struct kvm_ldttss_desc {
+-	u16 limit0;
+-	u16 base0;
+-	unsigned base1:8, type:5, dpl:2, p:1;
+-	unsigned limit1:4, zero0:3, g:1, base2:8;
+-	u32 base3;
+-	u32 zero1;
+-} __attribute__((packed));
+-
+ DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
+ 
+ /*
+@@ -584,7 +575,6 @@ static int svm_hardware_enable(void)
+ 
+ 	struct svm_cpu_data *sd;
+ 	uint64_t efer;
+-	struct desc_struct *gdt;
+ 	int me = raw_smp_processor_id();
+ 
+ 	rdmsrl(MSR_EFER, efer);
+@@ -597,9 +587,6 @@ static int svm_hardware_enable(void)
+ 	sd->next_asid = sd->max_asid + 1;
+ 	sd->min_asid = max_sev_asid + 1;
+ 
+-	gdt = get_current_gdt_rw();
+-	sd->tss_desc = (struct kvm_ldttss_desc *)(gdt + GDT_ENTRY_TSS);
+-
+ 	wrmsrl(MSR_EFER, efer | EFER_SVME);
+ 
+ 	wrmsrl(MSR_VM_HSAVE_PA, sd->save_area_pa);
+@@ -3453,14 +3440,6 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+ 	return svm_invoke_exit_handler(vcpu, exit_code);
+ }
+ 
+-static void reload_tss(struct kvm_vcpu *vcpu)
+-{
+-	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
+-
+-	sd->tss_desc->type = 9; /* available 32/64-bit TSS */
+-	load_TR_desc();
+-}
+-
+ static void pre_svm_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
+@@ -4064,9 +4043,6 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	svm_vcpu_enter_exit(vcpu, spec_ctrl_intercepted);
+ 
+-	if (!sev_es_guest(vcpu->kvm))
+-		reload_tss(vcpu);
+-
+ 	if (!static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
+ 		x86_spec_ctrl_restore_host(svm->virt_spec_ctrl);
+ 
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index f44751dd8d5d..18af7e712a5a 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -303,7 +303,6 @@ struct svm_cpu_data {
+ 	u32 max_asid;
+ 	u32 next_asid;
+ 	u32 min_asid;
+-	struct kvm_ldttss_desc *tss_desc;
+ 
+ 	struct page *save_area;
+ 	unsigned long save_area_pa;
 
-> > We observed this in the field, for example, when the guest configures
-> > atop to use perfevents and runs two instances of it simultaneously.
-> 
-> A more essential case I found is this:
-> 
->  kvm_msr: msr_write CTR1 = 0xffffffffffffffea
->  rdpmc on host: CTR1, value 0xffffffffffe3
->  kvm_exit: vcpu 0 reason EXCEPTION_NMI
->  kvm_msr: msr_read CTR1 = 0x83 // nmi_handler
-> 
-> There are two typical issues here:
-> - the emulated counter value changed from 0xffffffffffffffffea to 0xffffffffffffe3,
-
-Strange, why would the counter go backwards (disregarding the extra high
-bits)?
-
->  triggering __kvm_perf_overflow(pmc, false);
-> - PMI-handler should not reset the counter to a value that is easily overflowed,
->  in order to avoid overflow here before iret;
-
-This is a legitimate guest behavior, isn't it?  The problem I'm trying
-to fix is when the value written is sufficiently far from overflowing,
-but it still ends up looking as an overflow and triggers a PMI.
-
-> Please confirm whether your usage scenarios consist of these two types, or more.
-
-The *usage* scenario is the one I wrote above.  I've identified an
-easier repro since then:
-
-  perf stat -e instructions -C 0 &
-  sleep 1 && perf stat -e instructions,cycles -C 0 sleep 0.1 && kill -INT %
-
-Please also see the kvm-unit-test I posted at
-https://lore.kernel.org/kvm/20230504134908.830041-1-rkagan@amazon.de
-
-> > To address the problem, maintain the invariant that the counter value
-> > always fits in the defined bit width, by truncating the received value
-> > in the respective set_msr methods.  For better readability, factor this
-> > out into a helper function, pmc_set_counter, shared by vmx and svm
-> > parts.
-> > 
-> > Fixes: 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions")
-> > Signed-off-by: Roman Kagan <rkagan@amazon.de>
-> 
-> Tested-by: Like Xu <likexu@tencent.com>
-> I prefer to use pmc_bitmask(pmc) to wrap around pmc->prev_counter as the first step.
-
-My preference is to keep the counter within the limits all the time, so
-I'd leave it up to the maintainers to decide.
-
-Thanks,
-Roman.
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
+base-commit: 5c291b93e5d665380dbecc6944973583f9565ee5
+-- 
+2.40.1.698.g37aff9b760-goog
 
