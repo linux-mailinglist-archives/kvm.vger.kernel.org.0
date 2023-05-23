@@ -2,158 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 620C670E655
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 22:16:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38EF070E681
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 22:33:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238532AbjEWUQR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 16:16:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59152 "EHLO
+        id S238375AbjEWUdA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 16:33:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238116AbjEWUQP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 16:16:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECAA211D
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 13:15:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684872932;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cuGsJq81+rG6lnQFp71rynuXDjC9rqreWyLFpkfHXI0=;
-        b=DCjI/kQ5Rt6NboESsEeDtDZa4yn4CwarpkYC9DHKJYi9/ewh3KUbMt9uxd8VG8YI0TDXeZ
-        uX9Gw3/Qe12Z4QZ+2GITCT+hjlopKr5ou7gqEmcssOicFGvwuiKARb4mFqDrlB6iv2Ag1Q
-        DIa9Mcch2BKvj9+DvV/j0SgIup9sBV4=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-669-g5t2c4TPM7yaJe9AxPxYZw-1; Tue, 23 May 2023 16:15:30 -0400
-X-MC-Unique: g5t2c4TPM7yaJe9AxPxYZw-1
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-33859d4a322so341465ab.1
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 13:15:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684872930; x=1687464930;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cuGsJq81+rG6lnQFp71rynuXDjC9rqreWyLFpkfHXI0=;
-        b=HfDxU0zUEDLBH33PYE3Qq03tjDZZoChfor8RxWl5kxHkKEvb8tLnO50lWpdf35bqHu
-         +iV2RWvMrzPDF6yDpJW8aFwtPStWvUO5oqrG7IV5AR1L0zK8IQ2YwZhzw2RNbMf89clr
-         UO528D9a0FzuXQP3xDHoXgv8Iziuigw3pHSGEi54e9ViC/Hjeyh9MeykS6vo0iH/cR/8
-         vkWb138N+7/ztnFHItgDYnNFDn3xE3eJwgAfjxjeOVS8pds8vYD5SDaBJh3XwbYmHdns
-         JFSoXAvq83QuLYcJtZvco4NYJZRUU+dekZXL1L4DWdYJzrlTh1E3xGl1Gf0Ycpj+hDWR
-         Dmxg==
-X-Gm-Message-State: AC+VfDypEZc4YFCd0dVTZDmGOOiFRNqH88TWls4vn163ildyHWOqquJP
-        pWWkK3/bjhqZWCdwJAx2bfCz+mNTalgBsIKOkmfysEg6QFqa43vl3kCWqEbseuYGDP7zpqH1j3u
-        REOEV0u23YaB3
-X-Received: by 2002:a92:c691:0:b0:32b:c70b:92af with SMTP id o17-20020a92c691000000b0032bc70b92afmr10104050ilg.16.1684872929886;
-        Tue, 23 May 2023 13:15:29 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5jnBGKc1//J7T8ZKzI7utit9/2wFXFS8PyN6dZFNhg+b7iIA8IA3ZxtJniFT1wYfrexXH/Dg==
-X-Received: by 2002:a92:c691:0:b0:32b:c70b:92af with SMTP id o17-20020a92c691000000b0032bc70b92afmr10104034ilg.16.1684872929599;
-        Tue, 23 May 2023 13:15:29 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id h25-20020a056638063900b004166d06f656sm2627536jar.177.2023.05.23.13.15.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 May 2023 13:15:29 -0700 (PDT)
-Date:   Tue, 23 May 2023 14:15:27 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kevin.tian@intel.com>, <jgg@nvidia.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v2] vfio/type1: check pfn valid before converting to
- struct page
-Message-ID: <20230523141527.6186a044.alex.williamson@redhat.com>
-In-Reply-To: <ZGxTpo1Zmi54UYFE@yzhao56-desk.sh.intel.com>
-References: <20230519065843.10653-1-yan.y.zhao@intel.com>
-        <20230522130030.44c6c5c2.alex.williamson@redhat.com>
-        <ZGxTpo1Zmi54UYFE@yzhao56-desk.sh.intel.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S233535AbjEWUc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 16:32:59 -0400
+Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D12A3BB;
+        Tue, 23 May 2023 13:32:57 -0700 (PDT)
+Received: from [127.0.0.1] ([73.231.166.163])
+        (authenticated bits=0)
+        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 34NKVZvn2821465
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Tue, 23 May 2023 13:31:35 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 34NKVZvn2821465
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+        s=2023051001; t=1684873896;
+        bh=j48OLSwG1gjUAr7jSdrExwOtC18vWxxR2v3o37+/ivU=;
+        h=Date:From:To:Subject:In-Reply-To:References:From;
+        b=RthoEZm75qRPIUTB89o0F+MAJd3/jy2JpXCa8RhNp7HlSjDG/crOzuR6eSf687wrR
+         o2u+iYhVfw1mpyGKtIv4Am97beqMbAyh/wWR4dbRa/MmJkW5GJ9Q05pADeg8uYwYC7
+         Urfnq3iLfLXh21U82Pk86g+T5ql618qkgLD+ivI8ZB+0RDw80U9ACZ5MQ1tOJW+aGQ
+         xW+MxZg49gKuPBPz9Vj/nk5mWt9WnNsGt6uPXfmCYDbVuO8CfHFCbTfonX7ULfvAR2
+         fQjwgN0X9ZduCLAhGlzOwxO6+km+0Tz5F9s8vYItSdmDslLGHIM9ehg0w+4KMkkwpZ
+         IPjKz/DhKbf6A==
+Date:   Tue, 23 May 2023 13:31:31 -0700
+From:   "H. Peter Anvin" <hpa@zytor.com>
+To:     Tim Wiederhake <twiederh@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH 2/2] x86/msr: Allow unprivileged read access to some MSRs
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20230523194949.96149-2-twiederh@redhat.com>
+References: <20230523194949.96149-1-twiederh@redhat.com> <20230523194949.96149-2-twiederh@redhat.com>
+Message-ID: <25E09D2E-E918-4B1D-B307-54F9A801FCF8@zytor.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 23 May 2023 13:48:22 +0800
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On May 23, 2023 12:49:49 PM PDT, Tim Wiederhake <twiederh@redhat=2Ecom> wro=
+te:
+>Delaying access control allows unprivileged processes to
+>read specific MSRs, such as IA32_CORE_CAPABILITIES and
+>IA32_ARCH_CAPABILITIES=2E This is helpful for e=2Eg=2E qemu and
+>libvirt who require the raw MSR content to calculate host
+>CPU capabilities=2E Other programs might be interested in
+>IA32_EFER for x86-64-v1 detection=2E
+>
+>Signed-off-by: Tim Wiederhake <twiederh@redhat=2Ecom>
+>---
+> arch/x86/kernel/msr=2Ec | 38 +++++++++++++++++++++++++++++++++-----
+> 1 file changed, 33 insertions(+), 5 deletions(-)
+>
+>diff --git a/arch/x86/kernel/msr=2Ec b/arch/x86/kernel/msr=2Ec
+>index 058f2b67d0c7=2E=2E9485aa7f8161 100644
+>--- a/arch/x86/kernel/msr=2Ec
+>+++ b/arch/x86/kernel/msr=2Ec
+>@@ -50,6 +50,23 @@ enum allow_write_msrs {
+>=20
+> static enum allow_write_msrs allow_writes =3D MSR_WRITES_DEFAULT;
+>=20
+>+static int filter_read(struct file *file, u32 reg)
+>+{
+>+	if (file->private_data)
+>+		return 0;
+>+
+>+	switch (reg) {
+>+	case MSR_IA32_CORE_CAPS:
+>+	case MSR_IA32_ARCH_CAPABILITIES:
+>+	case MSR_EFER:
+>+		return 0;
+>+	default:
+>+		break;
+>+	}
+>+
+>+	return -EPERM;
+>+}
+>+
+> static ssize_t msr_read(struct file *file, char __user *buf,
+> 			size_t count, loff_t *ppos)
+> {
+>@@ -59,6 +76,10 @@ static ssize_t msr_read(struct file *file, char __user=
+ *buf,
+> 	int cpu =3D iminor(file_inode(file));
+> 	int err =3D 0;
+>=20
+>+	err =3D filter_read(file, reg);
+>+	if (err)
+>+		return err;
+>+
+> 	if (count < 8)
+> 		return -EINVAL;	/* Invalid chunk size */
+>=20
+>@@ -71,7 +92,7 @@ static ssize_t msr_read(struct file *file, char __user =
+*buf,
+> 	return 8;
+> }
+>=20
+>-static int filter_write(u32 reg)
+>+static int filter_write(struct file *file, u32 reg)
+> {
+> 	/*
+> 	 * MSRs writes usually happen all at once, and can easily saturate kmsg=
+=2E
+>@@ -83,6 +104,9 @@ static int filter_write(u32 reg)
+> 	 */
+> 	static DEFINE_RATELIMIT_STATE(fw_rs, 30 * HZ, 1);
+>=20
+>+	if (!file->private_data)
+>+		return -EPERM;
+>+
+> 	switch (allow_writes) {
+> 	case MSR_WRITES_ON:  return 0;
+> 	case MSR_WRITES_OFF: return -EPERM;
+>@@ -113,7 +137,7 @@ static ssize_t msr_write(struct file *file, const cha=
+r __user *buf,
+> 	if (err)
+> 		return err;
+>=20
+>-	err =3D filter_write(reg);
+>+	err =3D filter_write(file, reg);
+> 	if (err)
+> 		return err;
+>=20
+>@@ -156,6 +180,9 @@ static long msr_ioctl(struct file *file, unsigned int=
+ ioc, unsigned long arg)
+> 			err =3D -EFAULT;
+> 			break;
+> 		}
+>+		err =3D filter_read(file, regs[1]);
+>+		if (err)
+>+			return err;
+> 		err =3D rdmsr_safe_regs_on_cpu(cpu, regs);
+> 		if (err)
+> 			break;
+>@@ -176,7 +203,7 @@ static long msr_ioctl(struct file *file, unsigned int=
+ ioc, unsigned long arg)
+> 		if (err)
+> 			break;
+>=20
+>-		err =3D filter_write(regs[1]);
+>+		err =3D filter_write(file, regs[1]);
+> 		if (err)
+> 			return err;
+>=20
+>@@ -202,8 +229,7 @@ static int msr_open(struct inode *inode, struct file =
+*file)
+> 	unsigned int cpu =3D iminor(file_inode(file));
+> 	struct cpuinfo_x86 *c;
+>=20
+>-	if (!capable(CAP_SYS_RAWIO))
+>-		return -EPERM;
+>+	file->private_data =3D (void *)(capable(CAP_SYS_RAWIO));
+>=20
+> 	if (cpu >=3D nr_cpu_ids || !cpu_online(cpu))
+> 		return -ENXIO;	/* No such CPU */
+>@@ -245,6 +271,8 @@ static int msr_device_destroy(unsigned int cpu)
+>=20
+> static char *msr_devnode(const struct device *dev, umode_t *mode)
+> {
+>+	if (mode)
+>+		*mode =3D 0644;
+> 	return kasprintf(GFP_KERNEL, "cpu/%u/msr", MINOR(dev->devt));
+> }
+>=20
 
-> On Mon, May 22, 2023 at 01:00:30PM -0600, Alex Williamson wrote:
-> > On Fri, 19 May 2023 14:58:43 +0800
-> > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> >   
-> > > Check physical PFN is valid before converting the PFN to a struct page
-> > > pointer to be returned to caller of vfio_pin_pages().
-> > > 
-> > > vfio_pin_pages() pins user pages with contiguous IOVA.
-> > > If the IOVA of a user page to be pinned belongs to vma of vm_flags
-> > > VM_PFNMAP, pin_user_pages_remote() will return -EFAULT without returning
-> > > struct page address for this PFN. This is because usually this kind of PFN
-> > > (e.g. MMIO PFN) has no valid struct page address associated.
-> > > Upon this error, vaddr_get_pfns() will obtain the physical PFN directly.
-> > > 
-> > > While previously vfio_pin_pages() returns to caller PFN arrays directly,
-> > > after commit
-> > > 34a255e67615 ("vfio: Replace phys_pfn with pages for vfio_pin_pages()"),
-> > > PFNs will be converted to "struct page *" unconditionally and therefore
-> > > the returned "struct page *" array may contain invalid struct page
-> > > addresses.
-> > > 
-> > > Given current in-tree users of vfio_pin_pages() only expect "struct page *
-> > > returned, check PFN validity and return -EINVAL to let the caller be
-> > > aware of IOVAs to be pinned containing PFN not able to be returned in
-> > > "struct page *" array. So that, the caller will not consume the returned
-> > > pointer (e.g. test PageReserved()) and avoid error like "supervisor read
-> > > access in kernel mode".
-> > > 
-> > > Fixes: 34a255e67615 ("vfio: Replace phys_pfn with pages for vfio_pin_pages()")
-> > > Cc: Sean Christopherson <seanjc@google.com>
-> > > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > > 
-> > > ---
-> > > v2: update commit message to explain background/problem clearly. (Sean)
-> > > ---
-> > >  drivers/vfio/vfio_iommu_type1.c | 5 +++++
-> > >  1 file changed, 5 insertions(+)
-> > > 
-> > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > > index 493c31de0edb..0620dbe5cca0 100644
-> > > --- a/drivers/vfio/vfio_iommu_type1.c
-> > > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > > @@ -860,6 +860,11 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
-> > >  		if (ret)
-> > >  			goto pin_unwind;
-> > >  
-> > > +		if (!pfn_valid(phys_pfn)) {  
-> > 
-> > Why wouldn't we use our is_invalid_reserved_pfn() test here?  Doing
-> > so would also make it more consistent why we don't need to call
-> > put_pfn() or rewind accounting for this page.  Thanks,
-> >   
-> I actually struggled in choosing is_invalid_reserved_pfn() or
-> pfn_valid() when writing this patch.
-> 
-> Choosing pfn_valid() is because invalid PFN obviously cannot have
-> struct page address and it's a bug fix.
-> 
-> While declining reserved pages will have the IOVA range supported by
-> vfio_pin_pages() even more reduced. So I don't know if there's enough
-> justification to do so, given that (1) device zone memory usually has
-> PG_reserved set. (2) vm_normal_page() also contains reserved page.
+I believe the preferred way to do this is to export "cooked" information i=
+n sysfs=2E /dev/msr really should be considered a legacy, very low-level in=
+terface suitable only for restricted environments=2E
 
-Based on the exclusion we have in vaddr_get_pfn() where we unpin
-zero-page pfns because they hit on the is_invalid_reserved_pfn() test
-and break our accounting otherwise, this does seem like the correct
-choice.  I can imagine a scenario where the device wants to do a DMA
-read from VM memory backed by the zero page.  Ok.  Thanks,
+When I wrote this driver, it was a maxim that "root owns the system"; ther=
+e was no way to restrict privileged interfaces like /dev/(k)mem, /dev/iopor=
+ts, or kernel module installation from root; any of these interfaces can be=
+ trivially used to take full command of the hardware=2E
 
-Alex
+This is no longer the case, and it is better for the kernel to only export=
+ known good information at the semantic level=2E There is no inherent guara=
+ntee that any of these registers may not contain security sensitive informa=
+tion in the future=2E
+
+At this point, /dev/msr should be considered a debugging-only interface (f=
+or which it is quite useful still=2E)
+
+So NAK on allowing any kind of access without CAP_SYS_RAWIO=2E
+
+NAK on your other patch, too, because it is based on an invalid assumption=
+: read/write to /dev/msr does *not* advance the file pointer=2E This is ana=
+logous to /dev/ioports, rather than /dev/mem=2E
+
+Incidentally, you have touched on a potential issue here: I suspect that w=
+e should check CAP_SYS_RAWIO for each access =E2=80=93 the old policy of "i=
+f you can open it you can give someone else a file descriptor" probably no =
+longer makes any sense, at least without some kind of mechanism to filter a=
+ccess control for a specific fd=2E (Then again, the idiom of "open then dro=
+p privileges" might justify caching the capability=2E)
+
+
 
