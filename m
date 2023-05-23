@@ -2,363 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88C3370CFE7
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 03:00:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD89C70CFFF
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 03:02:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232678AbjEWBAL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 21:00:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56758 "EHLO
+        id S235259AbjEWBCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 21:02:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234719AbjEWA7u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 20:59:50 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2061b.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e88::61b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84292170F;
-        Mon, 22 May 2023 17:57:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bXPN6ckhDq1n08tuQ+/WB8uTYQ7FkHTbjAbuEkoLKivBJbviYQBlmjlIqSmuhOqLsDk78b5o9propMhwHy7EMVBZINDYOlKVnpE+/2i649mrMQEIOQHqu0TAf8GgC6EWcRBzcQeX8AOa9A9otCXtzB1KWUfEQNfnTQORCVl1pgK/R1ZZY9yKSsitkaLb07Uara4D+hC628Q0zm3qg+QPzJoXo2HdQry4FPzWBUS5wcGRscwnFYBdIGi4KvdoIwmESWwrjS4Vz4Meta0srD9GG1ZddRMY3oN90urxBtvBsxEUddTw6xcedJcZRgWBu38h75RwOZxDWfA9BRwt2v/cVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8j+EGeKZ1V1VlPfnDrcSeysYDfdm28yYDR5BZNZnEx0=;
- b=KoAWaTvQE57ZhxhYcsb62UCguM6jlwZRFbXj5ODoFOv9Xuo9b5Mnc4kY79QJRdGNbXLvd1pTVWIVV5nF2qq0e1q3aB0mK1Cfci/FSuX/c5+mN5T12eKkwjDXw6iEA6uwp1DwpIWKgV3xPM7BUdGIjgOksHAkCPKdNwZrO+qKCJnA824mriS7eTe4aJDoGoxMiLHcSJdRCEC4kMxR8nLpKbKWHg5cByN3CnV0Jd+hgTUS2md4m4WtwyNEx/XTrzfyVooNeUMmkd6pN2WE00pjHQUvsT3B7rW+Nt2+aSEEllUCrM+g3HttZ3Kmajq3pFWhyRmYY7AicFJWuuWL/ANXDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=linux-foundation.org
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8j+EGeKZ1V1VlPfnDrcSeysYDfdm28yYDR5BZNZnEx0=;
- b=ZmWSyj54Ipl7AYnpJaGW2KCS98HT/R+Cx5r6iYYayTvA4c9pjU7NdsebeBXAKhGi/JRKBtDKhSgiqNOFXAFHw7JyDov+36MG5kDRV6T1jW4LZIPh+9K4SW0EFisuUWsudsSYxVrTZLhwuM3HS+cDo+zrGCfZrua4GfGssZoO+D2GXip55NTUZf7XIr+RICFKM+PCl6TE7BToWXqTPJmKinW63HlLilR7ydn+skYFqjaEKQWdmJDGesuvK1/IK8sUyBp37tWPsZjaThE4bdnXIOVr2RYqcI6vgNdcVsVUSfnP7iq3BtQAVbK4GfjDkmtbFCRezbofwqu/4i+Nmczj8A==
-Received: from DS0PR17CA0007.namprd17.prod.outlook.com (2603:10b6:8:191::14)
- by SA1PR12MB8947.namprd12.prod.outlook.com (2603:10b6:806:386::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.28; Tue, 23 May
- 2023 00:56:04 +0000
-Received: from DM6NAM11FT076.eop-nam11.prod.protection.outlook.com
- (2603:10b6:8:191:cafe::16) by DS0PR17CA0007.outlook.office365.com
- (2603:10b6:8:191::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.28 via Frontend
- Transport; Tue, 23 May 2023 00:56:03 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DM6NAM11FT076.mail.protection.outlook.com (10.13.173.204) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6411.29 via Frontend Transport; Tue, 23 May 2023 00:56:03 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 22 May 2023
- 17:55:53 -0700
-Received: from [10.110.48.28] (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 22 May
- 2023 17:55:52 -0700
-Message-ID: <cf2d7d64-8872-2b22-0b2e-8db96135d3ef@nvidia.com>
-Date:   Mon, 22 May 2023 17:55:52 -0700
+        with ESMTP id S232644AbjEWBCa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 21:02:30 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 806F6110;
+        Mon, 22 May 2023 18:00:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684803658; x=1716339658;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=rtIQBh9F3oyBoHplZAgRHsNnNkZoyG1p6l5/G7ETlYk=;
+  b=g6bHpgGsEu5HkP5I8Kei2teeZIEK2GUqWHJ6GIDDevl/iU0OnxrK2C9E
+   xEHDSh6oC0fk7+Mx1PaI6V5kQKDNx/mI5SVOnM0861AGXivhU+OC6KHOi
+   fKzVsG9d8ulTyXv+1+RPTiGZG1oXRH6h52xWPqYJ5earGNB1PWwaXnA6C
+   bn0Ot/Qdolg/eZT8R0ExGvQCoZDoW24K4DCiDouRE/9X0nUKU7UTr9QbQ
+   I1I9WVGscrnlLgLhzsuUgq8FshzYLSEaiOSjBvE03RZOfFDHlEui1+s87
+   gR5fFRnJMUP2ss6T/1UweiAaWOPpHm2lH8ehe0qnXhQWvNcxd7M/GNFI1
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="351935163"
+X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
+   d="scan'208";a="351935163"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2023 18:00:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="734557346"
+X-IronPort-AV: E=Sophos;i="6.00,184,1681196400"; 
+   d="scan'208";a="734557346"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.254.209.247]) ([10.254.209.247])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2023 18:00:53 -0700
+Message-ID: <aa65ec4f-ccf7-a344-692e-61abe9c95b47@intel.com>
+Date:   Tue, 23 May 2023 09:00:50 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] mmu_notifiers: Notify on pte permission upgrades
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.11.0
+Subject: Re: [PATCH] KVM: x86: Track supported ARCH_CAPABILITIES in kvm_caps
 Content-Language: en-US
-To:     Alistair Popple <apopple@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-CC:     <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
-        <robin.murphy@arm.com>, <will@kernel.org>, <nicolinc@nvidia.com>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <jgg@nvidia.com>
-References: <20230522063725.284686-1-apopple@nvidia.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <20230522063725.284686-1-apopple@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        antonio.gomez.iglesias@linux.intel.com,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>
+References: <20230506030435.80262-1-chao.gao@intel.com>
+ <b472b58d-0469-8a55-985c-1d966ce66419@intel.com>
+ <ZGZhW/x5OWPmx1qD@google.com> <20230520010237.3tepk3q44j52leuk@desk>
+ <ZGup1TjeqBF7bgWG@google.com>
+ <ff2a97c2-1e8f-4adb-78c2-3cf5037f139f@intel.com>
+ <20230522212328.uwyvp3hpwvte6t6g@desk>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20230522212328.uwyvp3hpwvte6t6g@desk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT076:EE_|SA1PR12MB8947:EE_
-X-MS-Office365-Filtering-Correlation-Id: 38b32752-0fba-463f-d22b-08db5b287bdd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uDazVzaRxG4xP6E28zZKketTehKskfELxIoQBHGo3sdu3ig25vysjtjLl+79X7rfYVJv23Hn/JOuR+fwUTwksoo/1w/XzBmmPlpTk2NPNRYOn0PFapssOOp924x82ze7dmMoSlrAQlCx/KiweVwJjCq1o+LOsSqO4LrB+qZaGWDJZxCF38XPy1DBZLZDfzNqys8AF8yNMUYEKtbKaAz9TnnU02E0lwfOUrAbtsntiCcQLmEhPRbqVzuzZuMALwqWCS93HQI6gj0HWyFfQWCzxZXi5oYN0EM2lqBgp8xBBvb4K3wl2lwLfvD3EgVbnBAA6Xn26jJWajOyYVTE/e2g8ybKr5NARhMtlXiKnjv4MqKTg1Ajfd3mTrC9CLqNcpXtkxvskQcImj7/GDJYBGQdX1FSksvK/JEpgOOzqDLzaOk504oX3Ybw1ICXt7JW8U/wxSfze7T7DioBi1gJd9TqEr3B/gHx9rcxXQ0ii2+uLwB3/ezHAMmTEtgrjEHjzOl0TvBhMNvwMOaaea2vn8NgZFLeFy9Y0iH6AD9d6D+F+tFOr1iMDNB9Z5fxXkColpIkU3KHYYGO81XKFoVuzCnjOsB+Y5nR+AtTncieNbSM0YpJ/F6TnD10KbvwyBQAO1f9cgvVkPQbnzBxwfV7JmxtfqFkIHIx0Mx138qu9ZIN0uKugGGAJ6n/X8RKnvmJ4L8vja8Y1S3CpkSLe9kX7jUkUF/cAa+ciquhiQ4C8O/us/Wm7Eh4CR0Uolxv+rVNLFRHh4s6d2LfKP0/y3gEuPfjgg==
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(376002)(39860400002)(136003)(451199021)(46966006)(40470700004)(36840700001)(2906002)(82310400005)(7636003)(2616005)(426003)(336012)(53546011)(356005)(47076005)(40480700001)(186003)(107886003)(83380400001)(26005)(36860700001)(16526019)(8936002)(40460700003)(8676002)(86362001)(36756003)(4326008)(316002)(5660300002)(82740400003)(41300700001)(70586007)(110136005)(31696002)(70206006)(16576012)(54906003)(478600001)(31686004)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 May 2023 00:56:03.6449
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 38b32752-0fba-463f-d22b-08db5b287bdd
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT076.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8947
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/21/23 23:37, Alistair Popple wrote:
-> Some architectures, specifically ARM and perhaps Sparc and IA64,
-> require TLB invalidates when upgrading pte permission from read-only
-> to read-write.
+On 5/23/2023 5:23 AM, Pawan Gupta wrote:
+> On Tue, May 23, 2023 at 03:31:44AM +0800, Xiaoyao Li wrote:
+>> On 5/23/2023 1:43 AM, Sean Christopherson wrote:
+>>>>>     6. Performance aside, KVM should not be speculating (ha!) on what the guest
+>>>>>        will and will not do, and should instead honor whatever behavior is presented
+>>>>>        to the guest.  If the guest CPU model indicates that VERW flushes buffers,
+>>>>>        then KVM damn well needs to let VERW flush buffers.
+>>>> The current implementation allows guests to have VERW flush buffers when
+>>>> they enumerate FB_CLEAR. It only restricts the flush behavior when the
+>>>> guest is trying to mitigate against a vulnerability(like MDS) on a
+>>>> hardware that is not affected. I guess its common for guests to be
+>>>> running with older gen configuration on a newer hardware.
+>>> Right, I'm saying that that behavior is wrong.  KVM shouldn't assume the guest
+>>> the guest will do things a certain way and should instead honor the "architectural"
+>>> definition, in quotes because I realize there probably is no architectural
+>>> definition for any of this.
+>>>
+>>> It might be that the code does (unintentionally?) honor the "architecture", i.e.
+>>> this code might actually be accurrate with respect to when the guest can expect
+>>> VERW to flush buffers.  But the comment is so, so wrong.
+>>
+>> The comment is wrong and the code is wrong in some case as well.
+>>
+>> If none of ARCH_CAP_FB_CLEAR, ARCH_CAP_MDS_NO, ARCH_CAP_TAA_NO,
+>> ARCH_CAP_PSDP_NO, ARCH_CAP_FBSDP_NO and ARCH_CAP_SBDR_SSDP_NO are exposed to
+>> VM, the VM is type of "affected by MDS".
+>>
+>> And accroding to the page https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/processor-mmio-stale-data-vulnerabilities.html
+>>
+>> if the VM enumerates support for both L1D_FLUSH and MD_CLEAR, it implicitly
+>> enumerates FB_CLEAR as part of their MD_CLEAR support.
 > 
-> The current mmu_notifier implementation assumes that upgrades do not
-> need notifications. Typically though mmu_notifiers are used to
-> implement TLB invalidations for secondary MMUs that comply with the
-> main CPU architecture.
+> This is the excerpt from the link that you mentioned:
 > 
-> Therefore if the main CPU architecture requires an invalidation for
-> permission upgrade the secondary MMU will as well and an mmu_notifier
-> should be sent for the upgrade.
+>    "For processors that are affected by MDS and support L1D_FLUSH
+>    operations and MD_CLEAR operations, the VERW instruction flushes fill
+>    buffers."
 > 
-> Currently CPU invalidations for permission upgrade occur in
-> ptep_set_access_flags(). Unfortunately MMU notifiers cannot be called
-> directly from this architecture specific code as the notifier
-> callbacks can sleep, and ptep_set_access_flags() is usually called
-> whilst holding the PTL spinlock. Therefore add the notifier calls
-> after the PTL is dropped and only if the PTE actually changed. This
-> will allow secondary MMUs to obtain an updated PTE with appropriate
-> permissions.
+> You are missing an important information here "For the processors
+> _affected_ by MDS". On such processors ...
 > 
-> This problem was discovered during testing of an ARM SMMU
-> implementation that does not support broadcast TLB maintenance
-> (BTM). In this case the SMMU driver uses notifiers to issue TLB
-> invalidates. For read-only to read-write pte upgrades the SMMU
-> continually returned a read-only PTE to the device, even though the
-> CPU had a read-write PTE installed.
+>> However, the code will leave vmx->disable_fb_clear as 1 if hardware supports
+>> it, and VERW intruction doesn't clear FB in the VM, which conflicts
+>> "architectural" definition.
 > 
-> Sending a mmu notifier event to the SMMU driver fixes the problem by
-> flushing secondary TLB entries. A new notifier event type is added so
-> drivers may filter out these invalidations if not required. Note a
-> driver should never upgrade or install a PTE in response to this mmu
-> notifier event as it is not synchronised against other PTE operations.
+> ... Fill buffer clear is not enabled at all:
 > 
-> Signed-off-by: Alistair Popple <apopple@nvidia.com>
-> ---
->   include/linux/mmu_notifier.h |  6 +++++
->   mm/hugetlb.c                 | 24 ++++++++++++++++++-
->   mm/memory.c                  | 45 ++++++++++++++++++++++++++++++++++--
->   3 files changed, 72 insertions(+), 3 deletions(-)
+>    vmx_setup_fb_clear_ctrl()
+>    {
+>    	u64 msr;
+>    
+>    	if (boot_cpu_has(X86_FEATURE_ARCH_CAPABILITIES) &&
+>    	    !boot_cpu_has_bug(X86_BUG_MDS) &&
+>    	    !boot_cpu_has_bug(X86_BUG_TAA)) {
+>    		rdmsrl(MSR_IA32_ARCH_CAPABILITIES, msr);
+>    		if (msr & ARCH_CAP_FB_CLEAR_CTRL)
+>    			vmx_fb_clear_ctrl_available = true;
+>    	}
+>    }
 
-Point of order:
+This is the check of bare metal, while the check in 
+vmx_update_fb_clear_dis() is of guest VM.
 
-What is this based on? It would really help if you would either use --base
-with git-format-patch, or else just mention the base somewhere. Otherwise,
-actually applying the patch takes some hunting around...in particular for
-older stuff. This is from Feb, 2023, before hugetlb.c got converted to
-folios, right?
+For example, if the hardware (host) enumerates ARCH_CAP_TAA_NO, 
+ARCH_CAP_MDS_NO, ARCH_CAP_PSDP_NO, ARCH_CAP_FBSDP_NO, 
+ARCH_CAP_SBDR_SSDP_NO, ARCH_CAP_FB_CLEAR, and ARCH_CAP_FB_CLEAR_CTRL, 
+the VERW on this hardware clears Fill Buffer (if FB_CLEAR_DIS is not 
+enabled in MSR_IA32_MCU_OPT_CTRL). vmx_setup_fb_clear_ctrl() does set 
+vmx_fb_clear_ctrl_available  to true.
 
-thanks,
--- 
-John Hubbard
-NVIDIA
-
-> 
-> diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.h
-> index d6c06e140277..f14d68f119d8 100644
-> --- a/include/linux/mmu_notifier.h
-> +++ b/include/linux/mmu_notifier.h
-> @@ -31,6 +31,11 @@ struct mmu_interval_notifier;
->    * pages in the range so to mirror those changes the user must inspect the CPU
->    * page table (from the end callback).
->    *
-> + * @MMU_NOTIFY_PROTECTION_UPGRAGE: update is due to a change from read-only to
-> + * read-write for pages in the range. This must not be used to upgrade
-> + * permissions on secondary PTEs, rather it should only be used to invalidate
-> + * caches such as secondary TLBs that may cache old read-only entries.
-> + *
->    * @MMU_NOTIFY_SOFT_DIRTY: soft dirty accounting (still same page and same
->    * access flags). User should soft dirty the page in the end callback to make
->    * sure that anyone relying on soft dirtiness catch pages that might be written
-> @@ -53,6 +58,7 @@ enum mmu_notifier_event {
->   	MMU_NOTIFY_CLEAR,
->   	MMU_NOTIFY_PROTECTION_VMA,
->   	MMU_NOTIFY_PROTECTION_PAGE,
-> +	MMU_NOTIFY_PROTECTION_UPGRADE,
->   	MMU_NOTIFY_SOFT_DIRTY,
->   	MMU_NOTIFY_RELEASE,
->   	MMU_NOTIFY_MIGRATE,
-> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-> index bdbfeb6fb393..e5d467c7bff7 100644
-> --- a/mm/hugetlb.c
-> +++ b/mm/hugetlb.c
-> @@ -5987,6 +5987,7 @@ vm_fault_t hugetlb_fault(struct mm_struct *mm, struct vm_area_struct *vma,
->   	vm_fault_t ret;
->   	u32 hash;
->   	pgoff_t idx;
-> +	bool changed = false;
->   	struct page *page = NULL;
->   	struct page *pagecache_page = NULL;
->   	struct hstate *h = hstate_vma(vma);
-> @@ -6122,6 +6123,9 @@ vm_fault_t hugetlb_fault(struct mm_struct *mm, struct vm_area_struct *vma,
->   		if (!huge_pte_write(entry)) {
->   			ret = hugetlb_wp(mm, vma, address, ptep, flags,
->   					 pagecache_page, ptl);
-> +			if (!ret)
-> +				changed = true;
-> +
->   			goto out_put_page;
->   		} else if (likely(flags & FAULT_FLAG_WRITE)) {
->   			entry = huge_pte_mkdirty(entry);
-> @@ -6129,8 +6133,11 @@ vm_fault_t hugetlb_fault(struct mm_struct *mm, struct vm_area_struct *vma,
->   	}
->   	entry = pte_mkyoung(entry);
->   	if (huge_ptep_set_access_flags(vma, haddr, ptep, entry,
-> -						flags & FAULT_FLAG_WRITE))
-> +						flags & FAULT_FLAG_WRITE)) {
->   		update_mmu_cache(vma, haddr, ptep);
-> +		changed = true;
-> +	}
-> +
->   out_put_page:
->   	if (page != pagecache_page)
->   		unlock_page(page);
-> @@ -6138,6 +6145,21 @@ vm_fault_t hugetlb_fault(struct mm_struct *mm, struct vm_area_struct *vma,
->   out_ptl:
->   	spin_unlock(ptl);
->   
-> +	if (changed) {
-> +		struct mmu_notifier_range range;
-> +		unsigned long hpage_mask = huge_page_mask(h);
-> +		unsigned long hpage_size = huge_page_size(h);
-> +
-> +		update_mmu_cache(vma, haddr, ptep);
-> +
-> +		mmu_notifier_range_init(&range, MMU_NOTIFY_PROTECTION_UPGRADE,
-> +					0, vma, mm, haddr & hpage_mask,
-> +					(haddr & hpage_mask) + hpage_size);
-> +		mmu_notifier_invalidate_range_start(&range);
-> +		mmu_notifier_invalidate_range_end(&range);
-> +	}
-> +
-> +
->   	if (pagecache_page) {
->   		unlock_page(pagecache_page);
->   		put_page(pagecache_page);
-> diff --git a/mm/memory.c b/mm/memory.c
-> index f526b9152bef..0ac78c6a232c 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -2098,6 +2098,7 @@ static vm_fault_t insert_pfn(struct vm_area_struct *vma, unsigned long addr,
->   	struct mm_struct *mm = vma->vm_mm;
->   	pte_t *pte, entry;
->   	spinlock_t *ptl;
-> +	bool changed = false;
->   
->   	pte = get_locked_pte(mm, addr, &ptl);
->   	if (!pte)
-> @@ -2120,8 +2121,10 @@ static vm_fault_t insert_pfn(struct vm_area_struct *vma, unsigned long addr,
->   			}
->   			entry = pte_mkyoung(*pte);
->   			entry = maybe_mkwrite(pte_mkdirty(entry), vma);
-> -			if (ptep_set_access_flags(vma, addr, pte, entry, 1))
-> +			if (ptep_set_access_flags(vma, addr, pte, entry, 1)) {
->   				update_mmu_cache(vma, addr, pte);
-> +				changed = true;
-> +			}
->   		}
->   		goto out_unlock;
->   	}
-> @@ -2142,6 +2145,17 @@ static vm_fault_t insert_pfn(struct vm_area_struct *vma, unsigned long addr,
->   
->   out_unlock:
->   	pte_unmap_unlock(pte, ptl);
-> +
-> +	if (changed) {
-> +		struct mmu_notifier_range range;
-> +
-> +		mmu_notifier_range_init(&range, MMU_NOTIFY_PROTECTION_UPGRADE,
-> +					0, vma, mm, addr & PAGE_MASK,
-> +					(addr & PAGE_MASK) + PAGE_SIZE);
-> +		mmu_notifier_invalidate_range_start(&range);
-> +		mmu_notifier_invalidate_range_end(&range);
-> +	}
-> +
->   	return VM_FAULT_NOPAGE;
->   }
->   
-> @@ -2820,6 +2834,7 @@ static inline int __wp_page_copy_user(struct page *dst, struct page *src,
->   	struct vm_area_struct *vma = vmf->vma;
->   	struct mm_struct *mm = vma->vm_mm;
->   	unsigned long addr = vmf->address;
-> +	bool changed = false;
->   
->   	if (likely(src)) {
->   		if (copy_mc_user_highpage(dst, src, addr, vma)) {
-> @@ -2858,8 +2873,10 @@ static inline int __wp_page_copy_user(struct page *dst, struct page *src,
->   		}
->   
->   		entry = pte_mkyoung(vmf->orig_pte);
-> -		if (ptep_set_access_flags(vma, addr, vmf->pte, entry, 0))
-> +		if (ptep_set_access_flags(vma, addr, vmf->pte, entry, 0)) {
->   			update_mmu_cache(vma, addr, vmf->pte);
-> +			changed = true;
-> +		}
->   	}
->   
->   	/*
-> @@ -2897,6 +2914,16 @@ static inline int __wp_page_copy_user(struct page *dst, struct page *src,
->   		}
->   	}
->   
-> +	if (changed) {
-> +		struct mmu_notifier_range range;
-> +
-> +		mmu_notifier_range_init(&range, MMU_NOTIFY_PROTECTION_UPGRADE,
-> +					0, vma, vma->vm_mm, addr & PAGE_MASK,
-> +					(addr & PAGE_MASK) + PAGE_SIZE);
-> +		mmu_notifier_invalidate_range_start(&range);
-> +		mmu_notifier_invalidate_range_end(&range);
-> +	}
-> +
->   	ret = 0;
->   
->   pte_unlock:
-> @@ -4877,6 +4904,7 @@ static vm_fault_t wp_huge_pud(struct vm_fault *vmf, pud_t orig_pud)
->   static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
->   {
->   	pte_t entry;
-> +	bool changed = false;
->   
->   	if (unlikely(pmd_none(*vmf->pmd))) {
->   		/*
-> @@ -4957,6 +4985,7 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
->   	if (ptep_set_access_flags(vmf->vma, vmf->address, vmf->pte, entry,
->   				vmf->flags & FAULT_FLAG_WRITE)) {
->   		update_mmu_cache(vmf->vma, vmf->address, vmf->pte);
-> +		changed = true;
->   	} else {
->   		/* Skip spurious TLB flush for retried page fault */
->   		if (vmf->flags & FAULT_FLAG_TRIED)
-> @@ -4972,6 +5001,18 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
->   	}
->   unlock:
->   	pte_unmap_unlock(vmf->pte, vmf->ptl);
-> +
-> +	if (changed) {
-> +		struct mmu_notifier_range range;
-> +
-> +		mmu_notifier_range_init(&range, MMU_NOTIFY_PROTECTION_UPGRADE,
-> +					0, vmf->vma, vmf->vma->vm_mm,
-> +					vmf->address & PAGE_MASK,
-> +					(vmf->address & PAGE_MASK) + PAGE_SIZE);
-> +		mmu_notifier_invalidate_range_start(&range);
-> +		mmu_notifier_invalidate_range_end(&range);
-> +	}
-> +
->   	return 0;
->   }
->   
-
-
+If a guest is exposed without ARCH_CAP_TAA_NO, ARCH_CAP_MDS_NO, 
+ARCH_CAP_PSDP_NO, ARCH_CAP_FBSDP_NO, ARCH_CAP_SBDR_SSDP_NO and 
+ARCH_CAP_FB_CLEAR, vmx_update_fb_clear_dis() will leave 
+vmx->disable_fb_clear as true. So VERW doesn't clear Fill Buffer for 
+guest. But in the view of guset, it expects VERW to clear Fill Buffer.
