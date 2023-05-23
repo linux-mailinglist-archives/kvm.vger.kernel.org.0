@@ -2,125 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7926270E3C7
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 19:47:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B849270E3AE
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 19:47:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237931AbjEWRVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 13:21:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52262 "EHLO
+        id S238202AbjEWRaR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 13:30:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237736AbjEWRVp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 13:21:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E74FCBF;
-        Tue, 23 May 2023 10:21:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7BC2B634FD;
-        Tue, 23 May 2023 17:21:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC00CC433D2;
-        Tue, 23 May 2023 17:21:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684862487;
-        bh=Mlb70fPzSp44IfyqduXQkVQtlmfOh88KwIwDwATPXzo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=NbQWIb186lkngXgl31wbkSXEHdu2tTTAcq/u7WaYhqcsZyQF/JWdg3RqGgIGjKe5o
-         8e6Q2DdpbMyw/vVP3dpfs03F+ljNuPsPUS8xrWDRizmMT2fzOUA1GgxgA6AALl0S6x
-         7acE+Zc6ImBOtMBTbTwT6xeqlhHyNVhxMZIUii1LVHaMIYFPhEpckIxaxvo98U3hug
-         9T/Cu24Q3s2bzdTQyfhAWTfsGSVB1yKxuWILeCwTpI30C+zKCY0FrkIr8NpHqP08gY
-         kQyAzR5XhD/c6JFAzT8ifYl5K9bqFP+fGyNh3PHBIKIezJTxJR1gN3DjLIqlAnTz69
-         AAK4kGmcgXsAQ==
-Date:   Tue, 23 May 2023 12:21:25 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        linux-acpi@vger.kernel.org
-Cc:     Nirmal Patel <nirmal.patel@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [Bug 217472] New: ACPI _OSC features have different values in
- Host OS and Guest OS
-Message-ID: <ZGz2FQpHPKYgcc0+@bhelgaas>
+        with ESMTP id S238346AbjEWRaJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 13:30:09 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 544EC186
+        for <kvm@vger.kernel.org>; Tue, 23 May 2023 10:29:56 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-64d3491609fso12612b3a.3
+        for <kvm@vger.kernel.org>; Tue, 23 May 2023 10:29:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1684862996; x=1687454996;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nhOVpdiqhCvs7GVV7f2dklwaVtM++uCHQCldPOpHCUk=;
+        b=A24777sFuS5neXn2X580FSjNLT8hS3n/fA59VHL1HgoGN4qo+vI1L2wT8WPOK1StqC
+         PcNMIz3+z2+2SnzxaOWHjZJNhIlO9GvPIxzUt2GsSAGSw2nIMjGbzqLCnn0lNvkM+zDe
+         J17yTm15T4qXNbdDlwznS7hOhy4dWvxpnay5A=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684862996; x=1687454996;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nhOVpdiqhCvs7GVV7f2dklwaVtM++uCHQCldPOpHCUk=;
+        b=iFNHhyEVs6W4qxIkZOc4hLwGXGMlYaH9lzpGsIVu/fv+GbHcLTsH8nOIwUTiYv3TcT
+         nIA3esscW82ufa1EuKukeo50cDiE6wXhApDv53WGDMTgEdApc8J5LjRJvLLhouzgmm0U
+         Ug7tnaw5lSkCMYCgtBSoZUUYUy9puzwE73lEYTfhjEt6QTqslZkE6l9ODCr7kdxLqDsM
+         zEinirH9nbTEd3mI0fvMIDeqIzohxgUh27qWSmOnTcnP+T7tdkeK/HrmubdJJjsngHkT
+         8c4YgIgWTW+x9+pr8aQ/AFU6n+Zq7AtJ92CoVScw7uP95uI1nuFVgXCUk/Exqf+xbMLl
+         PM+g==
+X-Gm-Message-State: AC+VfDxSsvdjC0Z4DpsoHoSfbwQG6xhYdoKVgMVFhfWs4Up1VPOv5akH
+        Q2Izi3BJHLbh1Y3aNmbCFkBksw==
+X-Google-Smtp-Source: ACHHUZ4uuIdgumk1jumRCzlG+a3yry5AfnyGcbp0y8NXoHGyEspOACJ+nTy3VqiD9jcpG3NGGfSDSQ==
+X-Received: by 2002:a05:6a20:5482:b0:10b:71c:20c5 with SMTP id i2-20020a056a20548200b0010b071c20c5mr11647062pzk.51.1684862995725;
+        Tue, 23 May 2023 10:29:55 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id bs5-20020a632805000000b0051eff0a70d7sm6210358pgb.94.2023.05.23.10.29.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 May 2023 10:29:55 -0700 (PDT)
+Date:   Tue, 23 May 2023 10:29:54 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc:     Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 1/2][next] vfio/ccw: Replace one-element array with
+ flexible-array member
+Message-ID: <202305231029.FC995C740F@keescook>
+References: <cover.1684805398.git.gustavoars@kernel.org>
+ <3c10549ebe1564eade68a2515bde233527376971.1684805398.git.gustavoars@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bug-217472-41252@https.bugzilla.kernel.org/>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <3c10549ebe1564eade68a2515bde233527376971.1684805398.git.gustavoars@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Nirmal, thanks for the report!
-
-On Mon, May 22, 2023 at 04:32:03PM +0000, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=217472
-> ...
-
-> Created attachment 304301
->   --> https://bugzilla.kernel.org/attachment.cgi?id=304301&action=edit
-> Rhel9.1_Guest_dmesg
+On Mon, May 22, 2023 at 07:35:12PM -0600, Gustavo A. R. Silva wrote:
+> One-element arrays are deprecated, and we are replacing them with flexible
+> array members instead. So, replace one-element array with flexible-array
+> member in struct vfio_ccw_parent and refactor the the rest of the code
+> accordingly.
 > 
-> Issue:
-> NVMe Drives are still present after performing hotplug in guest OS. We have
-> tested with different combination of OSes, drives and Hypervisor. The issue is
-> present across all the OSes. 
+> Link: https://github.com/KSPP/linux/issues/79
+> Link: https://github.com/KSPP/linux/issues/297
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-Maybe attach the specific commands to reproduce the problem in one of
-these scenarios to the bugzilla?  I'm a virtualization noob, so I
-can't visualize all the usual pieces.
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-> The following patch was added to honor ACPI _OSC values set by BIOS and the
-> patch helped to bring the issue out in VM/ Guest OS.
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/helgaas/pci.git/commit/drivers/pci/controller/vmd.c?id=04b12ef163d10e348db664900ae7f611b83c7a0e
-> 
-> 
-> I also compared the values of the parameters in the patch in Host and Guest OS.
-> The parameters with different values in Host and Guest OS are:
-> 
-> native_pcie_hotplug
-> native_shpc_hotplug
-> native_aer
-> native_ltr
-> 
-> i.e.
-> value of native_pcie_hotplug in Host OS is 1.
-> value of native_pcie_hotplug in Guest OS is 0.
-> 
-> I am not sure why "native_pcie_hotplug" is changed to 0 in guest.
-> Isn't it OSC_ managed parameter? If that is the case, it should
-> have same value in Host and Guest OS.
-
-From your dmesg:
-
-  DMI: Red Hat KVM/RHEL, BIOS 1.16.0-4.el9 04/01/2014
-  _OSC: OS supports [ExtendedConfig ASPM ClockPM Segments MSI EDR HPX-Type3]
-  _OSC: platform does not support [PCIeHotplug LTR DPC]
-  _OSC: OS now controls [SHPCHotplug PME AER PCIeCapability]
-  acpiphp: Slot [0] registered
-  virtio_blk virtio3: [vda] 62914560 512-byte logical blocks (32.2 GB/30.0 GiB)
-
-So the DMI ("KVM/RHEL ...") is the BIOS seen by the guest.  Doesn't
-mean anything to me, but the KVM folks would know about it.  In any
-event, the guest BIOS is different from the host BIOS, so I'm not
-surprised that _OSC is different.
-
-That guest BIOS _OSC declined to grant control of PCIe native hotplug
-to the guest OS, so the guest will use acpiphp (not pciehp, which
-would be used if native_pcie_hotplug were set).
-
-The dmesg doesn't mention the nvme driver.  Are you using something
-like virtio_blk with qemu pointed at an NVMe drive?  And you
-hot-remove the NVMe device, but the guest OS thinks it's still
-present?
-
-Since the guest is using acpiphp, I would think a hot-remove of a host
-NVMe device should be noticed by qemu and turned into an ACPI
-notification that the guest OS would consume.  But I don't know how
-those connections work.
-
-Bjorn
+-- 
+Kees Cook
