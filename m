@@ -2,71 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08D8570E0CC
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 17:44:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79BC870E0FA
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 17:51:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237622AbjEWPob (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 11:44:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47198 "EHLO
+        id S237172AbjEWPvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 11:51:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231343AbjEWPo3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 11:44:29 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2CD611A
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 08:44:27 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-ba69d93a6b5so15186669276.1
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 08:44:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684856667; x=1687448667;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QDHc53bZmqIqUAnat9C7bwzMrYIxO5J3dPTUYBJnfZE=;
-        b=Vgn+Kkp741xrj6z/R/ZKC7DXK6xoGHPiPFCoYSF0v1JbJB54V+yJlynEPLJKvrumTL
-         +AZi+cSGWfXYD5kq6DfwYMbU9DOYLKfW39Sxl9/NEsWpxLKqYCStTRjbAcfPMb3RVLo6
-         Ry5ZUDJI8jIuJhEMwR8vHh8muGQ8+laQ9eI++Os2JlZ3SwfqSUmTWDLlxuLCpaqlRsez
-         fJkn4tGnJ+gRUxG5EnOWDWZPpj4Udmlx/a3t0++443OpBL0Lba/782+QTe1jrqwspkXB
-         nQQQNa7GePPjOlJJKpLVq238XomSml8qJgccIBYPvqXi3wS+Lp0DLN5M8iNlszCLbj9B
-         Y3GQ==
+        with ESMTP id S237240AbjEWPvS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 11:51:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FD5011A
+        for <kvm@vger.kernel.org>; Tue, 23 May 2023 08:50:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684857030;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wYFl8U0SDWnlIQQFAjgbnzByRprAY7BghMfujkqtBpA=;
+        b=cMuWjnEcXhyevbHA1iv90pSRhUkmgMZ5utfWOj3EKGGFyWVodC49UnJxfBi/ssH6MCyaBa
+        d4VuSbBK3GlOEhKrtSQTSMzsQzWHPOBpqnTONjVVVp9cTCrV33vIQ1CCDNBMsR+YjfKW18
+        vgVRUc+JBtdY3507xbfUr6Vp7Neqc9o=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-330-ErwNBkNZN7CWB3W-7VxnWA-1; Tue, 23 May 2023 11:50:29 -0400
+X-MC-Unique: ErwNBkNZN7CWB3W-7VxnWA-1
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3379306f979so6826615ab.2
+        for <kvm@vger.kernel.org>; Tue, 23 May 2023 08:50:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684856667; x=1687448667;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QDHc53bZmqIqUAnat9C7bwzMrYIxO5J3dPTUYBJnfZE=;
-        b=K6u27U9gz9PkN7ZJWVHjQJD9YTjcdGLFJXptrnJvTQI07WmQGrRpwbJjKjfa+pg62x
-         yeOt/mMvLJuug+/CaG1u4X4j+/aqq2nj9ESEBRxH2X0s1FNn/0oCuPtNaHIIwW6KEz1i
-         Zdk/Y2iUea8ZebpJeSRvQusa2UnIqlko9ubhX/Yo0dqMuEgTc9H/RMQo+FMaAvMeKi6g
-         QElboALFMx58dKVi6cN+UPRhCoEjrxkoWuqw03EOnhvzDPIZfr0JNo7D98TkT9TsrI69
-         NdBQGsdaGKmkVw1r/9QmlLvUFU4gqViER9Fa1p8+x9TFAL1LZaEEU+f1tgfyIprmQPU6
-         70lg==
-X-Gm-Message-State: AC+VfDy6nqh5DM8rLPW6jDbFyRc8aML4vZuchDmiqsIzNMifak5GSwMg
-        11YO8uZtObZ0g9lNo8upON3kO5QfaJc=
-X-Google-Smtp-Source: ACHHUZ6B3oaUsi+ZJMd0uNjJjb3QcQdYtrO1DvYWUMIB8rCIIDCduDFQNU4LDgknZQ0l7eadMQ8Xamj1gWw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:c091:0:b0:ba8:92bd:134c with SMTP id
- c139-20020a25c091000000b00ba892bd134cmr8887577ybf.0.1684856667142; Tue, 23
- May 2023 08:44:27 -0700 (PDT)
-Date:   Tue, 23 May 2023 08:44:25 -0700
-In-Reply-To: <719a6b42-fd91-8eb4-f773-9ed98d2fdb07@amd.com>
-Mime-Version: 1.0
-References: <20230411125718.2297768-1-aik@amd.com> <20230411125718.2297768-6-aik@amd.com>
- <ZGv9Td4p1vtXC0Hy@google.com> <719a6b42-fd91-8eb4-f773-9ed98d2fdb07@amd.com>
-Message-ID: <ZGzfWQub4FQOrEtw@google.com>
-Subject: Re: [PATCH kernel v5 5/6] KVM: SEV: Enable data breakpoints in SEV-ES
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Pankaj Gupta <pankaj.gupta@amd.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        Santosh Shukla <santosh.shukla@amd.com>,
-        Carlos Bilbao <carlos.bilbao@amd.com>
-Content-Type: text/plain; charset="utf-8"
+        d=1e100.net; s=20221208; t=1684857028; x=1687449028;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wYFl8U0SDWnlIQQFAjgbnzByRprAY7BghMfujkqtBpA=;
+        b=J9wl547Nesd0Ff1nYiZZwRarktMMuib/06aCu3/pyqObZZ6FVrCm/VHH6O5ltGra8O
+         tbopXCVKkoJP7vdbw5ysTnZadoAEQDIZ94S8nAx6VUudKPkNdwsh2CZsZ0rldbIECFhr
+         OSJneNi6GZigMVSkyvEjISwgOSr3SVz7nI5kf/lqLXN1Wa1HyAeEG2Dc55ZsM6YoOyFb
+         Dm2GonL/+fuilvcfvMeM60NCRwvPN8tDQxtzrBIfIBWwoID5ABv1jJvyV9gttXuFkndk
+         rDoAwY9DjH3E154sNjP3hHdHj6M6QFLXDqUPNaKx513LPpAjxi6wIcgFZYOO7984Ex67
+         PyRA==
+X-Gm-Message-State: AC+VfDzEgqPdqNbjanlW4PfJlOLZVK5Rur+Iwq5UPB/UrECPL20yYHfE
+        4gczwx793LybvBqjrs1CaUapva22xJvp2buiIkYSjieDgCagrmwrjtVexwzXGa6a0HoYCSdILBU
+        lgDFZILa8coj0
+X-Received: by 2002:a92:cc4e:0:b0:338:b887:b674 with SMTP id t14-20020a92cc4e000000b00338b887b674mr7921334ilq.2.1684857028277;
+        Tue, 23 May 2023 08:50:28 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5L5cxZeYlEeuroxDhVXKppcAZQVL21daMeMkcovyH4v9JrjGeyYnpYWoYxJebm28zcXp2DNQ==
+X-Received: by 2002:a92:cc4e:0:b0:338:b887:b674 with SMTP id t14-20020a92cc4e000000b00338b887b674mr7921317ilq.2.1684857027956;
+        Tue, 23 May 2023 08:50:27 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id y2-20020a056638228200b0040fa5258658sm2401119jas.77.2023.05.23.08.50.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 May 2023 08:50:27 -0700 (PDT)
+Date:   Tue, 23 May 2023 09:50:25 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "clegoate@redhat.com" <clegoate@redhat.com>
+Subject: Re: [PATCH v11 20/23] vfio: Add VFIO_DEVICE_[AT|DE]TACH_IOMMUFD_PT
+Message-ID: <20230523095025.1898297c.alex.williamson@redhat.com>
+In-Reply-To: <DS0PR11MB7529096D1BE1D337BA50884BC3409@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230513132827.39066-1-yi.l.liu@intel.com>
+        <20230513132827.39066-21-yi.l.liu@intel.com>
+        <20230522161534.32f3bf8e.alex.williamson@redhat.com>
+        <DS0PR11MB7529096D1BE1D337BA50884BC3409@DS0PR11MB7529.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,335 +106,326 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 23, 2023, Alexey Kardashevskiy wrote:
->=20
->=20
-> On 23/5/23 09:39, Sean Christopherson wrote:
-> > On Tue, Apr 11, 2023, Alexey Kardashevskiy wrote:
-> > > Prior to SEV-ES, KVM saved/restored host debug registers upon switchi=
-ng
-> > > to/from a VM. Changing those registers inside a running SEV VM
-> > > triggered #VMEXIT to KVM.
+On Tue, 23 May 2023 01:20:17 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Tuesday, May 23, 2023 6:16 AM
 > >=20
-> > Please, please don't make it sound like some behavior is *the* one and =
-only behavior.
-> > *KVM* *chooses* to intercept debug register accesses.  Though I would o=
-mit this
-> > paragraph (and largely the next) entirely, IMO it's safe to assume the =
-reader has
-> > a basic understanding of how KVM deals with DRs and #DBs.
->=20
-> Out of curiosity - is ARM similar in this regard, interceptions and stuff=
-?
-
-Yes.  The granularity of interceptions varies based on the architectural re=
-vision,
-and presumably there are things that always trap.  But the core concept of =
-letting
-software decide what to intercept is the same.
-
-> > > SEV-ES added encrypted state (ES) which uses an encrypted page
-> > > for the VM state (VMSA). The hardware saves/restores certain register=
-s
-> > > on VMRUN/VMEXIT according to a swap type (A, B, C), see
-> > > "Table B-3. Swap Types" in the AMD Architecture Programmer=E2=80=99s =
-Manual
-> > > volume 2.
-> > >=20
-> > > The DR6 and DR7 registers have always been swapped as Type A for SEV-=
-ES
-> >=20
-> > Please rewrite this to just state what the behavior is instead of "Type=
- A" vs.
-> > "Type B".  Outside of AMD, the "type a/b/c" stuff isn't anywhere near u=
-biquitous
-> > enough to justify obfuscating super simple concepts.
-> >=20
-> > Actually, this feature really has nothing to do with Type A vs. Type B,=
- since
-> > that's purely about host state.
->=20
-> Mmm. Nothing? If the feature is enabled and DR[0-3] are not saved in HOST=
-SA,
-> then the host looses debug state because of the working feature.
->=20
-> > I assume the switch from Type A to Type B is a
-> > side effect, or an opportunistic optimization?
->=20
-> There is no switch. DR[67] were and are one type, and the other DRs were =
-not
-> swapped and now are, but with a different Swap Type.
-
-Ah, this is what I missed.
-
-> And the patch saves DR[0-3] in HOSTSA but not DR[67] and this deserves so=
-me
-> explaining why is that.
->=20
-> > Regardless, something like this is a lot easier for a human to read.  I=
-t's easy
-> > enough to find DebugSwap in the APM (literally took me longer to find m=
-y copy of
-> > the PDF).
->=20
-> It is also easy to find "Swap Types" in the APM...
-
-Redirecting readers to specs for gory details is fine.  Redirecting for bas=
-ic,
-simple functionality is not.  Maybe the swap types will someday be common k=
-nowledge
-in KVM, and an explanation will no longer be necessary, but we are nowhere =
-near
-that point.
-
-> >    Add support for "DebugSwap for SEV-ES guests", which provides suppor=
-t
-> >    for swapping DR[0-3] and DR[0-3]_ADDR_MASK on VMRUN and VMEXIT, i.e.
-> >    allows KVM to expose debug capabilities to SEV-ES guests.  Without
-> >    DebugSwap support, the CPU doesn't save/load _guest_ debug registers=
-,
->=20
-> But it does save/load DR6 and DR7.
->=20
-> >    and KVM cannot manually context switch guest DRs due the VMSA being
-> >    encrypted.
-> >=20
-> >    Enable DebugSwap if and only if the CPU also supports NoNestedDataBp=
-,
-> >    which causes the CPU to ignore nested #DBs, i.e. #DBs that occur whe=
-n
-> >    vectoring a #DB.
->=20
-> (english question) What does "vectoring" mean here precisely? Handling?
-> Processing?
-
-It's not really an English thing.  "Vectoring" is, or at least was, Intel t=
-erminology
-for describing the flow from the initial detection of an exception to the e=
-xception's
-delivery to software, e.g. covers the IDT lookup, any GDT/LDT lookups, push=
-ing
-information on the stack, fetching the software exception handler, etc.  Im=
-portantly,
-it describes the period where there are no instructions retired and thus uc=
-ode doesn't
-open event windows, i.e. where triggering another, non-contributory excepti=
-on will
-effectively "hang" the CPU (at least on CPUs without Intel's "notify" VM-Ex=
-it support).
-
-> >    the host by putting the CPU into an infinite loop of vectoring #DBs
-> >    (see https://bugzilla.redhat.com/show_bug.cgi?id=3D1278496)
->=20
-> Good one, thanks for the link.
->=20
-> >=20
-> >    Set the features bit in sev_es_sync_vmsa() which is the last point
-> >    when VMSA is not encrypted yet as sev_(es_)init_vmcb() (where the mo=
-st
-> >    init happens) is called not only when VCPU is initialized but also o=
-n
-> >    intrahost migration when VMSA is encrypted.
-> >=20
-> > > guests, but a new feature is available, identified via
-> > > CPUID Fn8000001F_EAX[14] "DebugSwap for SEV-ES guests", that provides
-> > > support for swapping additional debug registers. DR[0-3] and
-> > > DR[0-3]_ADDR_MASK are swapped as Type B when SEV_FEATURES[5] (DebugSw=
-ap)
-> > > is set.
-> > >=20
-> > > Enable DebugSwap for a VMSA but only do so if CPUID Fn80000021_EAX[0]
-> > > ("NoNestedDataBp", "Processor ignores nested data breakpoints") is
-> > > supported by the SOC as otherwise a malicious SEV-ES guest can set up
-> > > data breakpoints on the #DB IDT entry/stack and cause an infinite loo=
-p.
-> > > Set the features bit in sev_es_sync_vmsa() which is the last point
-> > > when VMSA is not encrypted yet as sev_(es_)init_vmcb() (where the mos=
-t
-> > > init happens) is called not only when VCPU is initialized but also on
-> > > intrahost migration when VMSA is encrypted.
-> > >=20
-> > > Eliminate DR7 and #DB intercepts as:
-> > > - they are not needed when DebugSwap is supported;
-> >=20
-> > "not needed" isn't sufficient justification.  KVM doesn't strictly need=
- to do a
-> > lot of things, but does them anyways for a variety of reasons.  E.g. #D=
-B intercept
-> > is also not needed when NoNestedDataBp is supported and vcpu->guest_deb=
-ug=3D=3D0, i.e.
-> > this should clarify why KVM doesn't simply disable #DB intercepts for _=
-all_ VMs
-> > when NoNestedDataBp is support.  Presumably the answer is "because it's=
- simpler
-> > than toggling #DB interception for guest_debug.
->=20
-> TBH I did not have a good answer but from the above I'd say we want to
-> disable #DB intercepts in a separate patch, just as you say below.
->=20
-> > Actually, can't disabling #DB interception for DebugSwap SEV-ES guests =
-be a
-> > separate patch?  KVM can still inject #DBs for SEV-ES guests, no?
->=20
-> Sorry for my ignorance but what is the point of injecting #DB if there is=
- no
-> way of changing the guest's DR7?
-
-Well, _injecting_ the #DB is necessary for correctness from the guest's per=
-spective.
-"What's the point of _intercepting_ #DB" is the real question.  And for SEV=
--ES guests
-with DebugSwap, there is no point, which is why I agree that KVM should dis=
-able
-interception in that case.  What I'm calling out is that disabling #Db inte=
-rception
-isn't _necessary_ for correctness (unless I'm missing something), which mea=
-ns that
-it can and should go in a separate patch.
-
-> > As for DR7, the real justification is that, as above, KVM can't modify =
-guest DR7,
-> > and intercepting DR7 would completely defeat the purpose of enabling De=
-bugSwap.
-> >=20
-> > > - #VC for these intercepts is most likely not supported anyway and
-> > > kills the VM.
-> >=20
-> > I don't see how this is relevant or helpful.  What the guest may or may=
- not do in
-> > response to a #VC on a DR7 write has no bearing on KVM's behavior.
->=20
-> Readers of the patch may wonder of the chances of breaks guests. Definite=
-ly
-> helps me to realize there is likely to be some sort of panic() in the gue=
-st
-> if such intercept happens.
-
-But that's irrelevant.  Intercepting DR7 writes will break the guest regard=
-less
-of how the guest deals with the #VC.  If the guest eats the #VC and continu=
-es on,
-the debug capabilities expected by the guest will still be missing, i.e. KV=
-M has
-broken the functionality of the guest.  I am total ok if the changelog desc=
-ribes
-the _possible_ scenarios (within reason), e.g. that the guest will either p=
-anic
-on an unexpected #VC or lose debug capabilities that were promised.  What I=
-'m
-objecting to is speculating on what the guest is _likely_ to do, and especi=
-ally
-using that speculation as justification for doing something in KVM.
-
-> > > Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-> > > Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> > On Sat, 13 May 2023 06:28:24 -0700
+> > Yi Liu <yi.l.liu@intel.com> wrote:
+> >  =20
+> > > This adds ioctl for userspace to attach device cdev fd to and detach
+> > > from IOAS/hw_pagetable managed by iommufd.
+> > >
+> > >     VFIO_DEVICE_ATTACH_IOMMUFD_PT: attach vfio device to IOAS, hw_pag=
+etable
+> > > 				   managed by iommufd. Attach can be
+> > > 				   undo by VFIO_DEVICE_DETACH_IOMMUFD_PT
+> > > 				   or device fd close.
+> > >     VFIO_DEVICE_DETACH_IOMMUFD_PT: detach vfio device from the curren=
+t attached
+> > > 				   IOAS or hw_pagetable managed by iommufd.
+> > >
+> > > Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+> > > Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 > > > ---
-> >=20
-> > ...
-> >=20
-> > > @@ -3048,6 +3066,18 @@ void sev_es_prepare_switch_to_guest(struct sev=
-_es_save_area *hostsa)
-> > >   	/* MSR_IA32_XSS is restored on VMEXIT, save the currnet host value=
- */
-> > >   	hostsa->xss =3D host_xss;
+> > >  drivers/vfio/device_cdev.c | 66 ++++++++++++++++++++++++++++++++++++=
+++
+> > >  drivers/vfio/iommufd.c     | 18 +++++++++++
+> > >  drivers/vfio/vfio.h        | 18 +++++++++++
+> > >  drivers/vfio/vfio_main.c   |  8 +++++
+> > >  include/uapi/linux/vfio.h  | 52 ++++++++++++++++++++++++++++++
+> > >  5 files changed, 162 insertions(+)
+> > >
+> > > diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
+> > > index 291cc678a18b..3f14edb80a93 100644
+> > > --- a/drivers/vfio/device_cdev.c
+> > > +++ b/drivers/vfio/device_cdev.c
+> > > @@ -174,6 +174,72 @@ long vfio_device_ioctl_bind_iommufd(struct vfio_=
+device_file =20
+> > *df, =20
+> > >  	return ret;
+> > >  }
+> > >
+> > > +int vfio_ioctl_device_attach(struct vfio_device_file *df,
+> > > +			     struct vfio_device_attach_iommufd_pt __user *arg)
+> > > +{
+> > > +	struct vfio_device *device =3D df->device;
+> > > +	struct vfio_device_attach_iommufd_pt attach;
+> > > +	unsigned long minsz;
+> > > +	int ret;
 > > > +
-> > > +	/* The DebugSwap SEV feature does Type B swaps of DR[0-3] */
+> > > +	minsz =3D offsetofend(struct vfio_device_attach_iommufd_pt, pt_id);
+> > > +
+> > > +	if (copy_from_user(&attach, arg, minsz))
+> > > +		return -EFAULT;
+> > > +
+> > > +	if (attach.argsz < minsz || attach.flags)
+> > > +		return -EINVAL;
+> > > +
+> > > +	/* ATTACH only allowed for cdev fds */
+> > > +	if (df->group)
+> > > +		return -EINVAL;
+> > > +
+> > > +	mutex_lock(&device->dev_set->lock);
+> > > +	ret =3D vfio_iommufd_attach(device, &attach.pt_id);
+> > > +	if (ret)
+> > > +		goto out_unlock;
+> > > +
+> > > +	ret =3D copy_to_user(&arg->pt_id, &attach.pt_id,
+> > > +			   sizeof(attach.pt_id)) ? -EFAULT : 0;
+> > > +	if (ret)
+> > > +		goto out_detach;
+> > > +	mutex_unlock(&device->dev_set->lock);
+> > > +
+> > > +	return 0;
+> > > +
+> > > +out_detach:
+> > > +	vfio_iommufd_detach(device);
+> > > +out_unlock:
+> > > +	mutex_unlock(&device->dev_set->lock);
+> > > +	return ret;
+> > > +}
+> > > +
+> > > +int vfio_ioctl_device_detach(struct vfio_device_file *df,
+> > > +			     struct vfio_device_detach_iommufd_pt __user *arg)
+> > > +{
+> > > +	struct vfio_device *device =3D df->device;
+> > > +	struct vfio_device_detach_iommufd_pt detach;
+> > > +	unsigned long minsz;
+> > > +
+> > > +	minsz =3D offsetofend(struct vfio_device_detach_iommufd_pt, flags);
+> > > +
+> > > +	if (copy_from_user(&detach, arg, minsz))
+> > > +		return -EFAULT;
+> > > +
+> > > +	if (detach.argsz < minsz || detach.flags)
+> > > +		return -EINVAL;
+> > > +
+> > > +	/* DETACH only allowed for cdev fds */
+> > > +	if (df->group)
+> > > +		return -EINVAL;
+> > > +
+> > > +	mutex_lock(&device->dev_set->lock);
+> > > +	vfio_iommufd_detach(device);
+> > > +	mutex_unlock(&device->dev_set->lock);
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > >  static char *vfio_device_devnode(const struct device *dev, umode_t *=
+mode)
+> > >  {
+> > >  	return kasprintf(GFP_KERNEL, "vfio/devices/%s", dev_name(dev));
+> > > diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
+> > > index 83575b65ea01..799ea322a7d4 100644
+> > > --- a/drivers/vfio/iommufd.c
+> > > +++ b/drivers/vfio/iommufd.c
+> > > @@ -112,6 +112,24 @@ void vfio_iommufd_unbind(struct vfio_device_file=
+ *df)
+> > >  		vdev->ops->unbind_iommufd(vdev);
+> > >  }
+> > >
+> > > +int vfio_iommufd_attach(struct vfio_device *vdev, u32 *pt_id)
+> > > +{
+> > > +	lockdep_assert_held(&vdev->dev_set->lock);
+> > > +
+> > > +	if (vfio_device_is_noiommu(vdev))
+> > > +		return 0; =20
 > >=20
-> > Since dangling a carrot didn't work[*], I'm going to resort to extortio=
-n :-)
-> > Can you fold the below somewhere before this patch, and then tweak this=
- comment
-> > to say something like:
-> >=20
-> > 	/*
-> > 	 * If DebugSwap is enabled, debug registers are loaded but NOT saved b=
-y
-> > 	 * the CPU (Type-B).  If DebugSwap is disabled/unsupported, the CPU bo=
-th
-> > 	 * saves and loads debug registers (Type-A).
-> > 	 */
+> > Isn't this an invalid operation for a noiommu cdev, ie. -EINVAL?  We
+> > return success and copy back the provided pt_id, why would a user not
+> > consider it a bug that they can't use whatever value was there with
+> > iommufd? =20
 >=20
-> Sure but...
->=20
-> >=20
-> > [*] https://lore.kernel.org/all/YzOTOzUzKPQSqURo@google.com/
-> >=20
-> >=20
-> > From: Sean Christopherson <seanjc@google.com>
-> > Date: Mon, 22 May 2023 16:29:52 -0700
-> > Subject: [PATCH] KVM: SVM: Rewrite sev_es_prepare_switch_to_guest()'s c=
-omment
-> >   about swap types
->=20
->=20
-> ... I am missing the point here. You already wrote the patch below which =
-1)
-> you are happy about 2) you can push out right away to the upstream. Are y=
-ou
-> suggesting that I repost it?
+> Yes, this is the question I asked in [1]. At that time, it appears to me
+> that better to allow it [2]. Maybe it's more suitable to ask it here.
 
-I am asking you to include it in your series because the comment I suggeste=
-d above
-(for DebugSwap) loosely depends on the revamped comment for sev_es_prepare_=
-switch_to_guest()
-as a whole.  I would like to settle on the exact wording for all of the com=
-ments
-in sev_es_prepare_switch_to_guest() in a single series instead of having di=
-sjoint
-threads.
+=46rom an API perspective it seems wrong.  We return success without
+doing anything.  A user would be right to consider it a bug that the
+attach operation works but there's not actually any association to the
+IOAS.  Thanks,
 
-> > Rewrite the comment(s) in sev_es_prepare_switch_to_guest() to explain t=
-he
-> > swap types employed by the CPU for SEV-ES guests, i.e. to explain why K=
-VM
-> > needs to save a seemingly random subset of host state, and to provide a
-> > decoder for the APM's Type-A/B/C terminology.
-> >=20
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/x86/kvm/svm/sev.c | 25 +++++++++++++++----------
-> >   1 file changed, 15 insertions(+), 10 deletions(-)
-> >=20
-> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > index 69ae5e1b3120..1e0e9b08e491 100644
-> > --- a/arch/x86/kvm/svm/sev.c
-> > +++ b/arch/x86/kvm/svm/sev.c
-> > @@ -3017,19 +3017,24 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm)
-> >   void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
-> >   {
-> >   	/*
-> > -	 * As an SEV-ES guest, hardware will restore the host state on VMEXIT=
-,
-> > -	 * of which one step is to perform a VMLOAD. KVM performs the
-> > -	 * corresponding VMSAVE in svm_prepare_guest_switch for both
-> > -	 * traditional and SEV-ES guests.
+Alex
+
+
+> [1] https://lore.kernel.org/kvm/c203f11f-4d9f-cf43-03ab-e41a858bdd92@inte=
+l.com/
+> [2] https://lore.kernel.org/kvm/ZFFUyhqID+LtUB%2FD@nvidia.com/
 >=20
+> > > +
+> > > +	return vdev->ops->attach_ioas(vdev, pt_id);
+> > > +}
+> > > +
+> > > +void vfio_iommufd_detach(struct vfio_device *vdev)
+> > > +{
+> > > +	lockdep_assert_held(&vdev->dev_set->lock);
+> > > +
+> > > +	if (!vfio_device_is_noiommu(vdev))
+> > > +		vdev->ops->detach_ioas(vdev);
+> > > +}
+> > > +
+> > >  struct iommufd_ctx *vfio_iommufd_physical_ictx(struct vfio_device *v=
+dev)
+> > >  {
+> > >  	if (vdev->iommufd_device)
+> > > diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> > > index 8b359a7794be..50553f67600f 100644
+> > > --- a/drivers/vfio/vfio.h
+> > > +++ b/drivers/vfio/vfio.h
+> > > @@ -241,6 +241,8 @@ int vfio_iommufd_bind(struct vfio_device_file *df=
+);
+> > >  void vfio_iommufd_unbind(struct vfio_device_file *df);
+> > >  int vfio_iommufd_compat_attach_ioas(struct vfio_device *device,
+> > >  				    struct iommufd_ctx *ictx);
+> > > +int vfio_iommufd_attach(struct vfio_device *vdev, u32 *pt_id);
+> > > +void vfio_iommufd_detach(struct vfio_device *vdev);
+> > >  #else
+> > >  static inline int
+> > >  vfio_iommufd_compat_probe_noiommu(struct vfio_device *device,
+> > > @@ -282,6 +284,10 @@ int vfio_device_fops_cdev_open(struct inode *ino=
+de, struct =20
+> > file *filep); =20
+> > >  void vfio_device_cdev_close(struct vfio_device_file *df);
+> > >  long vfio_device_ioctl_bind_iommufd(struct vfio_device_file *df,
+> > >  				    struct vfio_device_bind_iommufd __user *arg);
+> > > +int vfio_ioctl_device_attach(struct vfio_device_file *df,
+> > > +			     struct vfio_device_attach_iommufd_pt __user *arg);
+> > > +int vfio_ioctl_device_detach(struct vfio_device_file *df,
+> > > +			     struct vfio_device_detach_iommufd_pt __user *arg);
+> > >  int vfio_cdev_init(struct class *device_class);
+> > >  void vfio_cdev_cleanup(void);
+> > >  #else
+> > > @@ -315,6 +321,18 @@ static inline long vfio_device_ioctl_bind_iommuf=
+d(struct =20
+> > vfio_device_file *df, =20
+> > >  	return -EOPNOTSUPP;
+> > >  }
+> > >
+> > > +static inline int vfio_ioctl_device_attach(struct vfio_device_file *=
+df,
+> > > +					   struct vfio_device_attach_iommufd_pt __user =20
+> > *arg) =20
+> > > +{
+> > > +	return -EOPNOTSUPP;
+> > > +}
+> > > +
+> > > +static inline int vfio_ioctl_device_detach(struct vfio_device_file *=
+df,
+> > > +					   struct vfio_device_detach_iommufd_pt =20
+> > __user *arg) =20
+> > > +{
+> > > +	return -EOPNOTSUPP;
+> > > +}
+> > > +
+> > >  static inline int vfio_cdev_init(struct class *device_class)
+> > >  {
+> > >  	return 0;
+> > > diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> > > index c9fa39ac4b02..8c3f26b4929b 100644
+> > > --- a/drivers/vfio/vfio_main.c
+> > > +++ b/drivers/vfio/vfio_main.c
+> > > @@ -1165,6 +1165,14 @@ static long vfio_device_fops_unl_ioctl(struct =
+file *filep,
+> > >  		ret =3D vfio_ioctl_device_feature(device, (void __user *)arg);
+> > >  		break;
+> > >
+> > > +	case VFIO_DEVICE_ATTACH_IOMMUFD_PT:
+> > > +		ret =3D vfio_ioctl_device_attach(df, (void __user *)arg);
+> > > +		break;
+> > > +
+> > > +	case VFIO_DEVICE_DETACH_IOMMUFD_PT:
+> > > +		ret =3D vfio_ioctl_device_detach(df, (void __user *)arg);
+> > > +		break;
+> > > +
+> > >  	default:
+> > >  		if (unlikely(!device->ops->ioctl))
+> > >  			ret =3D -EINVAL;
+> > > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > > index 07c917de31e9..770f5f949929 100644
+> > > --- a/include/uapi/linux/vfio.h
+> > > +++ b/include/uapi/linux/vfio.h
+> > > @@ -222,6 +222,58 @@ struct vfio_device_bind_iommufd {
+> > >
+> > >  #define VFIO_DEVICE_BIND_IOMMUFD	_IO(VFIO_TYPE, VFIO_BASE + 19)
+> > >
+> > > +/*
+> > > + * VFIO_DEVICE_ATTACH_IOMMUFD_PT - _IOW(VFIO_TYPE, VFIO_BASE + 20,
+> > > + *					struct vfio_device_attach_iommufd_pt)
+> > > + *
+> > > + * Attach a vfio device to an iommufd address space specified by IOAS
+> > > + * id or hw_pagetable (hwpt) id.
+> > > + *
+> > > + * Available only after a device has been bound to iommufd via
+> > > + * VFIO_DEVICE_BIND_IOMMUFD
+> > > + *
+> > > + * Undo by VFIO_DEVICE_DETACH_IOMMUFD_PT or device fd close.
+> > > + *
+> > > + * @argsz:	User filled size of this data.
+> > > + * @flags:	Must be 0.
+> > > + * @pt_id:	Input the target id which can represent an ioas or a hwpt
+> > > + *		allocated via iommufd subsystem.
+> > > + *		Output the input ioas id or the attached hwpt id which could
+> > > + *		be the specified hwpt itself or a hwpt automatically created
+> > > + *		for the specified ioas by kernel during the attachment.
+> > > + *
+> > > + * Return: 0 on success, -errno on failure.
+> > > + */
+> > > +struct vfio_device_attach_iommufd_pt {
+> > > +	__u32	argsz;
+> > > +	__u32	flags;
+> > > +	__u32	pt_id;
+> > > +};
+> > > +
+> > > +#define VFIO_DEVICE_ATTACH_IOMMUFD_PT		_IO(VFIO_TYPE, =20
+> > VFIO_BASE + 20) =20
+> > > +
+> > > +/*
+> > > + * VFIO_DEVICE_DETACH_IOMMUFD_PT - _IOW(VFIO_TYPE, VFIO_BASE + 21,
+> > > + *					struct vfio_device_detach_iommufd_pt)
+> > > + *
+> > > + * Detach a vfio device from the iommufd address space it has been
+> > > + * attached to. After it, device should be in a blocking DMA state.
+> > > + *
+> > > + * Available only after a device has been bound to iommufd via
+> > > + * VFIO_DEVICE_BIND_IOMMUFD. =20
+> >=20
+> > These "[a]vailable only after" comments are meaningless, if the user
+> > has the file descriptor the ioctl is available.  We can say that ATTACH
+> > should be used after BIND to associate the device with an address space
+> > within the bound iommufd and DETACH removes that association, but the
+> > user is welcome to call everything in the wrong order and we need to be
+> > prepared for that anyway.  Thanks, =20
 >=20
-> When I see "traditional", I assume there was one single x86 KVM before sa=
-y
-> 2010 which was slow, emulated a lot but worked exactly the same on Intel =
-and
-> AMD. Which does not seem to ever be the case. May be say "SVM" here?
+> Oh, yes. it's available as long as FD is got. But it is expected to fail =
+if
+> the order is not met. This should be what the comment really wants
+> to deliver. Will have a look at other ioctls as well.
+>=20
+> Regards,
+> Yi Liu
+>=20
+> >=20
+> > Alex
+> >  =20
+> > > + *
+> > > + * @argsz:	User filled size of this data.
+> > > + * @flags:	Must be 0.
+> > > + *
+> > > + * Return: 0 on success, -errno on failure.
+> > > + */
+> > > +struct vfio_device_detach_iommufd_pt {
+> > > +	__u32	argsz;
+> > > +	__u32	flags;
+> > > +};
+> > > +
+> > > +#define VFIO_DEVICE_DETACH_IOMMUFD_PT		_IO(VFIO_TYPE, =20
+> > VFIO_BASE + 21) =20
+> > > +
+> > >  /**
+> > >   * VFIO_DEVICE_GET_INFO - _IOR(VFIO_TYPE, VFIO_BASE + 7,
+> > >   *						struct vfio_device_info) =20
+>=20
 
-This is the code being removed.  I agree that "traditional" is ambiguous, w=
-hich
-is why I want to delete it :-)
-
-> > +	 * All host state for SEV-ES guests is categorized into three swap ty=
-pes
-> > +	 * based on how it is handled by hardware during a world switch:
-> > +	 *
-> > +	 * A: VMRUN:   Host state saved in host save area
-> > +	 *    VMEXIT:  Host state loaded from host save area
-> > +	 *
-> > +	 * B: VMRUN:   Host state _NOT_ saved in host save area
-> > +	 *    VMEXIT:  Host state loaded from host save area
-> > +	 *
-> > +	 * C: VMRUN:   Host state _NOT_ saved in host save area
-> > +	 *    VMEXIT:  Host state initialized to default(reset) values
-> > +	 *
-> > +	 * Manually save type-B state, i.e. state that is loaded by VMEXIT bu=
-t
-> > +	 * isn't saved by VMRUN, that isn't already saved by VMSAVE (performe=
-d
-> > +	 * by common SVM code).
