@@ -2,175 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0922470E508
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 21:00:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59B6D70E611
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 21:55:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238129AbjEWTAV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 15:00:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53566 "EHLO
+        id S231758AbjEWTzf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 15:55:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229834AbjEWTAQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 15:00:16 -0400
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F5F791;
-        Tue, 23 May 2023 12:00:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1684868415; x=1716404415;
-  h=mime-version:content-transfer-encoding:date:cc:subject:
-   from:to:message-id:references:in-reply-to;
-  bh=2f6hgtyoF3npyINkvFYDynw82+STAB4fWRrWAyFHWQA=;
-  b=rFrsHxEx4TA20pUdS17YN6UMkg+qfoSFBqBw8KE/INYT7NkhhhV5iWwV
-   5T27Bh8pxrQjY/iu0XsMxq0C8VqNzfepjssPX/1G2hHoH5J5W08I3J4uF
-   kpU4FR/qKo1bBZIEXdhuPI4BGSN3koysLpldGLa7iF483sjtn0BAB2T4J
-   E=;
-X-IronPort-AV: E=Sophos;i="6.00,187,1681171200"; 
-   d="scan'208";a="564743059"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2023 19:00:09 +0000
-Received: from EX19D004EUC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com (Postfix) with ESMTPS id 98D7A80457;
-        Tue, 23 May 2023 19:00:05 +0000 (UTC)
-Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
- (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Tue, 23 May
- 2023 18:59:51 +0000
+        with ESMTP id S229666AbjEWTzd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 15:55:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 458B2120
+        for <kvm@vger.kernel.org>; Tue, 23 May 2023 12:54:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684871689;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=IUxmQ5P+MH9SvOjqUd5l2+YQ2XDFMIly2tHjSWnRkr0=;
+        b=WyiEl/6MOghlowh6fItZP6IBgbi4Jq4N9N7e0xGqairqPp1V9MskdbDfHkB+42IHFQ+epL
+        Zt3oUdWm6CUWxv7zMTzK+PYLV638/Bg1TvYQLRZDbbTLpQHJfEZssFhGDJaaOeYBTe//HS
+        GlKfcRLYwYhPRQYBshP0Ai/l4Kdzl2c=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-541-gNeZnkYYM_a-OP0OnxG1Tw-1; Tue, 23 May 2023 15:54:47 -0400
+X-MC-Unique: gNeZnkYYM_a-OP0OnxG1Tw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 06664185A78B;
+        Tue, 23 May 2023 19:54:47 +0000 (UTC)
+Received: from work.redhat.com (unknown [10.39.193.140])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 794E4492B00;
+        Tue, 23 May 2023 19:54:45 +0000 (UTC)
+From:   Tim Wiederhake <twiederh@redhat.com>
+To:     "Borislav Petkov" <bp@alien8.de>,
+        "Dave Hansen" <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, "Ingo Molnar" <mingo@redhat.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        "Thomas Gleixner" <tglx@linutronix.de>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org
+Cc:     Tim Wiederhake <twiederh@redhat.com>
+Subject: [PATCH 1/2] x86/msr: Read MSRs individually
+Date:   Tue, 23 May 2023 21:49:48 +0200
+Message-Id: <20230523194949.96149-1-twiederh@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-Date:   Tue, 23 May 2023 18:59:47 +0000
-CC:     Chao Peng <chao.p.peng@linux.intel.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-        <linux-api@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <qemu-devel@nongnu.org>, <graf@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Naoya Horiguchi" <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, <x86@kernel.org>,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Shuah Khan" <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Vishal Annapurve" <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        <luto@kernel.org>, <jun.nakajima@intel.com>,
-        <dave.hansen@intel.com>, <ak@linux.intel.com>, <david@redhat.com>,
-        <aarcange@redhat.com>, <ddutile@redhat.com>, <dhildenb@redhat.com>,
-        Quentin Perret <qperret@google.com>, <tabba@google.com>,
-        Michael Roth <michael.roth@amd.com>, <mhocko@suse.com>,
-        <wei.w.wang@intel.com>, <anelkz@amazon.de>
-Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
-From:   Nicolas Saenz Julienne <nsaenz@amazon.com>
-To:     Sean Christopherson <seanjc@google.com>
-Message-ID: <CSTLMGOZVEV7.3B9QXJ2STLLLF@dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com>
-X-Mailer: aerc 0.15.2-21-g30c1a30168df-dirty
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
- <CSQFE7I30W27.2TPDIHOTZNRIZ@dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com> <ZGe+m+uFzpiW7wlr@google.com>
-In-Reply-To: <ZGe+m+uFzpiW7wlr@google.com>
-X-Originating-IP: [10.13.235.138]
-X-ClientProxiedBy: EX19D032UWA004.ant.amazon.com (10.13.139.56) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+Reading from /dev/cpu/*/msr with buffer size > 8 would read the data
+of the same msr repeatedly instead of the data for consecutive msrs,
+as one might expect.
 
-On Fri May 19, 2023 at 6:23 PM UTC, Sean Christopherson wrote:
-> On Fri, May 19, 2023, Nicolas Saenz Julienne wrote:
-> > Hi,
-> > On Fri Dec 2, 2022 at 6:13 AM UTC, Chao Peng wrote:
+Solve by restricting MSR reads to one per call.
 
-[...]
+Signed-off-by: Tim Wiederhake <twiederh@redhat.com>
+---
+ arch/x86/kernel/msr.c | 21 +++++++--------------
+ 1 file changed, 7 insertions(+), 14 deletions(-)
 
-> > VSM introduces isolated guest execution contexts called Virtual Trust
-> > Levels (VTL) [2]. Each VTL has its own memory access protections,
-> > virtual processors states, interrupt controllers and overlay pages. VTL=
-s
-> > are hierarchical and might enforce memory protections on less privilege=
-d
-> > VTLs. Memory protections are enforced on a per-GPA granularity.
-> >
-> > We implemented this in the past by using a separate address space per
-> > VTL and updating memory regions on protection changes. But having to
-> > update the memory slot layout for every permission change scales poorly=
-,
-> > especially as we have to perform 100.000s of these operations at boot
-> > (see [1] for a little more context).
-> >
-> > I believe the biggest barrier for us to use memory attributes is not
-> > having the ability to target specific address spaces, or to the very
-> > least having some mechanism to maintain multiple independent layers of
-> > attributes.
->
-> Can you elaborate on "specific address spaces"?  In KVM, that usually mea=
-ns SMM,
-> but the VTL comment above makes me think you're talking about something e=
-ntirely
-> different.  E.g. can you provide a brief summary of the requirements/expe=
-ctations?
+diff --git a/arch/x86/kernel/msr.c b/arch/x86/kernel/msr.c
+index 7bb17d37db01..058f2b67d0c7 100644
+--- a/arch/x86/kernel/msr.c
++++ b/arch/x86/kernel/msr.c
+@@ -58,24 +58,17 @@ static ssize_t msr_read(struct file *file, char __user *buf,
+ 	u32 reg = *ppos;
+ 	int cpu = iminor(file_inode(file));
+ 	int err = 0;
+-	ssize_t bytes = 0;
+ 
+-	if (count % 8)
++	if (count < 8)
+ 		return -EINVAL;	/* Invalid chunk size */
+ 
+-	for (; count; count -= 8) {
+-		err = rdmsr_safe_on_cpu(cpu, reg, &data[0], &data[1]);
+-		if (err)
+-			break;
+-		if (copy_to_user(tmp, &data, 8)) {
+-			err = -EFAULT;
+-			break;
+-		}
+-		tmp += 2;
+-		bytes += 8;
+-	}
++	err = rdmsr_safe_on_cpu(cpu, reg, &data[0], &data[1]);
++	if (err)
++		return err;
++	if (copy_to_user(tmp, &data, 8))
++		return -EFAULT;
+ 
+-	return bytes ? bytes : err;
++	return 8;
+ }
+ 
+ static int filter_write(u32 reg)
+-- 
+2.39.2
 
-Let me refresh some concepts first. VTLs are vCPU modes implemented by
-the hypervisor. Lower VTLs switch into higher VTLs [1] through a
-hypercall or asynchronously through interrupts. Each VTL has its own CPU
-architectural state, lapic and MSR state (applies to only some MSRs).
-These are saved/restored when switching VTLS [2]. Additionally, VTLs
-share a common GPA->HPA mapping, but protection bits differ depending on
-which VTL the CPU is on. Privileged VTLs might revoke R/W/X(+MBEC,
-optional) access bits from lower VTLs on a per-GPA basis.
-
-In order to deal with the per-VTL memory protection bits, we extended
-the number of KVM address spaces and assigned one to each VTL. The
-hypervisor initializes all VTLs address spaces with the same mappings
-and protections, they are expected to diverge during runtime. Operations
-that rely on memory slots for GPA->HPA/HVA translations (including page
-faults) are already address space aware, so adding VTL support was
-fairly simple.
-
-Ultimately, when a privileged VTL enforces memory protections on lower
-VTLs we update that VTL's address space memory regions to reflect them.
-Protection changes are requested through a hypercall, which expects the
-new protection to be visible system wide upon returning from it. These
-hypercalls happen around 100000+ times during boot, so we introduced an
-"atomic memory slot update" API similar to Emanuele's [3] that allows
-splitting memory regions/changing permissions concurrent with other
-vCPUs.
-
-Now, if we had a way to map memory attributes to specific VTLs, we could
-use that instead. Actually, we wouldn't need to extend address spaces at
-all to support this (we might still need them to support Overlay Pages,
-but that's another story).
-
-Hope it makes a little more sense now. :)
-
-Nicolas
-
-[1] In practice we've only seen VTL0 and VTL1 being used. The spec
-    supports up to 16 VTLs.
-
-[2] One can draw an analogy with arm's TrustZone. The hypervisor plays
-    the role of EL3. Windows (VTL0) runs in Non-Secure (EL0/EL1) and the
-    secure kernel (VTL1) in Secure World (EL1s/EL0s).
-
-[3] https://lore.kernel.org/all/20220909104506.738478-1-eesposit@redhat.com=
-/
