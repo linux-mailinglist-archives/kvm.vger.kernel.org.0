@@ -2,93 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1607970DDCF
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 15:45:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C92370DE07
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 15:53:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236865AbjEWNpq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 09:45:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34964 "EHLO
+        id S236669AbjEWNxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 09:53:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236691AbjEWNpp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 09:45:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D40C4E9
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 06:45:43 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6C6C0632A7
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 13:45:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 543C7C4339C;
-        Tue, 23 May 2023 13:45:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684849542;
-        bh=ETJcP1r57z0YzI21dRpkzECXtCN17+uNlMT7Hv4M6F8=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=f923UW09WKDPNspjcv5xj7oJnXWo210SE3L1Aem6JnPzcyiaDY7Fd6uW7ERkCz9dI
-         n2nwVgfzhbsmzeG7SBeDs9cKqWZ3tB73w3umDeEGuDjqAy5857nTv3uynT4QoS/0b8
-         ZLpEv/gxWDoGRunaG1K2naK2cKlt8KIzHBmLdxXI97c6mr/dU9adlQyp1s0kIp2XKS
-         81Sp7pBxvUswjvdOPhs4a8Sc9pYYYTwNfbVcaY3ANdOhGvJn/4Jqughy/tmRQqU1X6
-         y5C3kYiqzvhESOhhprySdZu+DzhAZ1lz1WvxxrQhWixlzPxxPaElxtTdiCvo+r1D2f
-         Dxzl67BNTx83A==
-From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
-        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Guo Ren <guoren@kernel.org>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: Re: [PATCH -next v20 21/26] riscv: Add sysctl to set the default
- vector rule for new processes
-In-Reply-To: <20230518161949.11203-22-andy.chiu@sifive.com>
-References: <20230518161949.11203-1-andy.chiu@sifive.com>
- <20230518161949.11203-22-andy.chiu@sifive.com>
-Date:   Tue, 23 May 2023 15:45:40 +0200
-Message-ID: <87wn0zb1q3.fsf@all.your.base.are.belong.to.us>
+        with ESMTP id S234409AbjEWNxe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 09:53:34 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E2027C4
+        for <kvm@vger.kernel.org>; Tue, 23 May 2023 06:53:32 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B26822F4;
+        Tue, 23 May 2023 06:54:17 -0700 (PDT)
+Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 20C343F840;
+        Tue, 23 May 2023 06:53:32 -0700 (PDT)
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
+Subject: [kvm-unit-tests PATCH v2] arm64: Make vector_table and vector_stub weak symbols
+Date:   Tue, 23 May 2023 14:53:25 +0100
+Message-Id: <20230523135325.1081036-1-nikos.nikoleris@arm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-ARM-No-Footer: FoSSMail
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Andy Chiu <andy.chiu@sifive.com> writes:
+This changes allows a test to define and override the declared symbols,
+taking control of all or some execptions.
 
-> To support Vector extension, the series exports variable-length vector
-> registers on the signal frame. However, this potentially breaks abi if
-> processing vector registers is required in the signal handler for old
-> binaries. For example, there is such need if user-level context switch
-> is triggerred via signals[1].
->
-> For this reason, it is best to leave a decision to distro maintainers,
-> where the enablement of userspace Vector for new launching programs can
-> be controlled. Developers may also need the switch to experiment with.
-> The parameter is configurable through sysctl interface so a distro may
-> turn off Vector early at init script if the break really happens in the
-> wild.
->
-> The switch will only take effects on new execve() calls once set. This
-> will not effect existing processes that do not call execve(), nor
-> processes which has been set with a non-default vstate_ctrl by making
-> explicit PR_RISCV_V_SET_CONTROL prctl() calls.
->
-> Link: https://lore.kernel.org/all/87cz4048rp.fsf@all.your.base.are.belong=
-.to.us/
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> Reviewed-by: Greentime Hu <greentime.hu@sifive.com>
-> Reviewed-by: Vincent Chen <vincent.chen@sifive.com>
-> ---
-> Changelog v20:
->  - Use READ_ONCE to access riscv_v_implicit_uacc (Bj=C3=B6rn)
+With the ability to override specific exception handlers, litmus7 [1] a
+tool used to generate c sources for a given memory model litmus test,
+can override the el1h_sync symbol to implement tests with explicit
+exception handlers. For example:
 
-Reviewed-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
+AArch64 LDRv0+I2V-dsb.ishst-once
+{
+  [PTE(x)]=(oa:PA(x),valid:0);
+  x=1;
+
+  0:X1=x;
+  0:X3=PTE(x);
+  0:X2=(oa:PA(x),valid:1);
+}
+ P0          | P0.F           ;
+L0:          | ADD X8,X8,#1   ;
+ LDR W0,[X1] | STR X2,[X3]    ;
+             | DSB ISHST      ;
+             | ADR X9,L0      ;
+             | MSR ELR_EL1,X9 ;
+             | ERET           ;
+exists(0:X0=0 \/ 0:X8!=1)
+
+In this test, a thread running in core P0 executes a load to a memory
+location x. The PTE of the virtual address x is initially invalid.  The
+execution of the load causes a synchronous EL1 exception which is
+handled by the code in P0.F. P0.F increments a counter which is
+maintained in X8, updates the PTE of x and makes it valid, executes a
+DSB ISHST and calls ERET which is expected to return and retry the
+execution of the load in P0:L0.
+
+The postcondition checks if there is any execution where the load wasn't
+executed (X0 its destination register is not update), or that the P0.F
+handler was invoked more than once (the counter X8 is not 1).
+
+For this tests, litmus7 needs to control the el1h_sync. Calling
+install_exception_handler() would be suboptimal because the
+vector_stub would wrap around the code of P0.F and perturb the test.
+
+[1]: https://diy.inria.fr/doc/litmus.html
+
+Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+---
+ arm/cstart64.S | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index e4ab7d06..eda0daa5 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -275,8 +275,11 @@ exceptions_init:
+ /*
+  * Vector stubs
+  * Adapted from arch/arm64/kernel/entry.S
++ * Declare as weak to allow external tests to redefine and override a
++ * vector_stub.
+  */
+ .macro vector_stub, name, vec
++.weak \name
+ \name:
+ 	stp	 x0,  x1, [sp, #-S_FRAME_SIZE]!
+ 	stp	 x2,  x3, [sp,  #16]
+@@ -369,7 +372,13 @@ vector_stub	el0_error_32, 15
+ 	b	\label
+ .endm
+ 
++
++/*
++ * Declare as weak to allow external tests to redefine and override the
++ * default vector table.
++ */
+ .align 11
++.weak vector_table
+ vector_table:
+ 	ventry	el1t_sync			// Synchronous EL1t
+ 	ventry	el1t_irq			// IRQ EL1t
+-- 
+2.25.1
+
