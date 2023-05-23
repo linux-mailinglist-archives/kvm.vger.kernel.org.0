@@ -2,150 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA64570DFEF
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 17:10:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A64A70E0C0
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 17:41:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237446AbjEWPKQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 11:10:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52172 "EHLO
+        id S237019AbjEWPlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 11:41:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237439AbjEWPKP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 11:10:15 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97CB011A;
-        Tue, 23 May 2023 08:10:13 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34NF2eIp008443;
-        Tue, 23 May 2023 15:10:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=FS0uudSjJ96HuXoHyRk5jgs5LdL69sSYBSOnObqQnwI=;
- b=jsymdvqqm1FVq+F8sG5/6LNOdkroysFBkgC8m/kOSoyaO026fQVHvQ1R8yaEyobtHizS
- STzhkkxNoOSn5uvKBumbyPXMkpYvnmhFvW8qqNGU72aD+PiVArssDdfsgd3Suz2ryI2U
- MI43ahLhjFZTTCDCl6RhiqNRoDcDC5L0pDWAkWfV3Kdu1ud7aIE+7tVRJau4XmRML6HA
- NEVWG0k7ejT+NK0y0Abc4pr6gcxS0eiV0MPQ/q5y4qOAklL3g/ar0v2IJ2P0uF5k+WlO
- cQQvc4dXuBFG+WZEAD9gH1FkyJcm3hcrM50Ulf0/AynI1DW1sm0b7nSYR6jhpVQYNx/+ 0Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qrx73bhes-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 May 2023 15:10:13 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34NDjvcC019916;
-        Tue, 23 May 2023 15:10:12 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qrx73bhdg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 May 2023 15:10:12 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34N1YCYH007828;
-        Tue, 23 May 2023 15:10:10 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3qppcf19bv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 May 2023 15:10:09 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34NFA68828049922
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 May 2023 15:10:06 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8E15620040;
-        Tue, 23 May 2023 15:10:06 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3ECFB20043;
-        Tue, 23 May 2023 15:10:06 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 23 May 2023 15:10:06 +0000 (GMT)
-Date:   Tue, 23 May 2023 17:10:04 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Subject: Re: [PATCH] KVM: s390/diag: fix racy access of physical cpu number
- in diag 9c handler
-Message-ID: <20230523171004.719d9f44@p-imbrenda>
-In-Reply-To: <20230523140500.271990-1-borntraeger@linux.ibm.com>
-References: <20230523140500.271990-1-borntraeger@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-redhat-linux-gnu)
+        with ESMTP id S237530AbjEWPlE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 11:41:04 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 70E8412B
+        for <kvm@vger.kernel.org>; Tue, 23 May 2023 08:41:01 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 33158139F;
+        Tue, 23 May 2023 08:41:46 -0700 (PDT)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2C6E83F840;
+        Tue, 23 May 2023 08:41:00 -0700 (PDT)
+Date:   Tue, 23 May 2023 16:40:52 +0100
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Will Deacon <will@kernel.org>
+Cc:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
+        Sami Mujawar <sami.mujawar@arm.com>,
+        Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH kvmtool v2 2/2] virtio/rng: return at least one byte of
+ entropy
+Message-ID: <20230523164052.7b9c435b@donnerap.cambridge.arm.com>
+In-Reply-To: <20230523104503.GB7414@willie-the-truck>
+References: <20230419170136.1883584-2-andre.przywara@arm.com>
+        <20230419170526.1883812-1-andre.przywara@arm.com>
+        <20230420134627.GA282884@myrica>
+        <20230523104503.GB7414@willie-the-truck>
+Organization: ARM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: D3BGqvrnjgvTSDNoPB_f11HpIhn26wyj
-X-Proofpoint-ORIG-GUID: t8gaCv8tXMKbU80Z6Q1399k-_jxXhtdy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-23_10,2023-05-23_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 mlxlogscore=999 clxscore=1015 phishscore=0 malwarescore=0
- bulkscore=0 adultscore=0 priorityscore=1501 mlxscore=0 suspectscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305230118
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 23 May 2023 16:05:00 +0200
-Christian Borntraeger <borntraeger@linux.ibm.com> wrote:
+On Tue, 23 May 2023 11:45:03 +0100
+Will Deacon <will@kernel.org> wrote:
 
-> We do check for target CPU == -1, but this might change at the time we
-> are going to use it. Hold the physical target CPU in a local variable to
-> avoid out-of-bound accesses to the cpu arrays.
+Hi Will,
+
+> On Thu, Apr 20, 2023 at 02:46:27PM +0100, Jean-Philippe Brucker wrote:
+> > On Wed, Apr 19, 2023 at 06:05:26PM +0100, Andre Przywara wrote:  
+> > > In contrast to the original v0.9 virtio spec (which was rather vague),
+> > > the virtio 1.0+ spec demands that a RNG request returns at least one
+> > > byte:
+> > > "The device MUST place one or more random bytes into the buffer, but it
+> > > MAY use less than the entire buffer length."
+> > > 
+> > > Our current implementation does not prevent returning zero bytes, which
+> > > upsets an assert in EDK II. /dev/urandom should always return at least
+> > > 256 bytes of entropy, unless interrupted by a signal.
+> > > 
+> > > Repeat the read if that happens, and give up if that fails as well.
+> > > This makes sure we return some entropy and become spec compliant.
+> > > 
+> > > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > > Reported-by: Sami Mujawar <sami.mujawar@arm.com>
+> > > ---
+> > >  virtio/rng.c | 14 ++++++++++++--
+> > >  1 file changed, 12 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/virtio/rng.c b/virtio/rng.c
+> > > index e6e70ced3..d5959d358 100644
+> > > --- a/virtio/rng.c
+> > > +++ b/virtio/rng.c
+> > > @@ -66,8 +66,18 @@ static bool virtio_rng_do_io_request(struct kvm *kvm, struct rng_dev *rdev, stru
+> > >  
+> > >  	head	= virt_queue__get_iov(queue, iov, &out, &in, kvm);
+> > >  	len	= readv(rdev->fd, iov, in);
+> > > -	if (len < 0 && errno == EAGAIN)
+> > > -		len = 0;
+> > > +	if (len < 0 && (errno == EAGAIN || errno == EINTR)) {
+> > > +		/*
+> > > +		 * The virtio 1.0 spec demands at least one byte of entropy,
+> > > +		 * so we cannot just return with 0 if something goes wrong.
+> > > +		 * The urandom(4) manpage mentions that a read from /dev/urandom
+> > > +		 * should always return at least 256 bytes of randomness, so  
+> > 
+> > I guess that's implied, but strictly speaking the manpage only states that
+> > reads of <=256 bytes succeed. Larger reads may return an error again or
+> > (if you read the man naively) zero bytes. We could increase the chance of
+> > this succeeding by setting in = 1 and iov_len = min(iov_len, 256)  
 > 
-> Cc: Pierre Morel <pmorel@linux.ibm.com>
-> Fixes: 87e28a15c42c ("KVM: s390: diag9c (directed yield) forwarding")
-> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+> Andre -- do you plan to respin with Jean's suggestion above?
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Yes, sorry, I read too much into the suggestion at first, so it got pushed
+off the table.
+But reading that again now and looking at the code I realise that it's
+indeed easy to implement. I will post something shortly.
 
-> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-> ---
->  arch/s390/kvm/diag.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
-> index 807fa9da1e72..3c65b8258ae6 100644
-> --- a/arch/s390/kvm/diag.c
-> +++ b/arch/s390/kvm/diag.c
-> @@ -166,6 +166,7 @@ static int diag9c_forwarding_overrun(void)
->  static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_vcpu *tcpu;
-> +	int tcpu_cpu;
->  	int tid;
->  
->  	tid = vcpu->run->s.regs.gprs[(vcpu->arch.sie_block->ipa & 0xf0) >> 4];
-> @@ -181,14 +182,15 @@ static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
->  		goto no_yield;
->  
->  	/* target guest VCPU already running */
-> -	if (READ_ONCE(tcpu->cpu) >= 0) {
-> +	tcpu_cpu = READ_ONCE(tcpu->cpu);
-> +	if (tcpu_cpu >= 0) {
->  		if (!diag9c_forwarding_hz || diag9c_forwarding_overrun())
->  			goto no_yield;
->  
->  		/* target host CPU already running */
-> -		if (!vcpu_is_preempted(tcpu->cpu))
-> +		if (!vcpu_is_preempted(tcpu_cpu))
->  			goto no_yield;
-> -		smp_yield_cpu(tcpu->cpu);
-> +		smp_yield_cpu(tcpu_cpu);
->  		VCPU_EVENT(vcpu, 5,
->  			   "diag time slice end directed to %d: yield forwarded",
->  			   tid);
+Thanks,
+Andre.
 
