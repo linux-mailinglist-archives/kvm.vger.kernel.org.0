@@ -2,158 +2,323 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B96970D817
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 10:57:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D11370D913
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 11:33:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236126AbjEWI5f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 04:57:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60736 "EHLO
+        id S235892AbjEWJc6 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 23 May 2023 05:32:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235827AbjEWI5e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 04:57:34 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F14FE;
-        Tue, 23 May 2023 01:57:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684832235; x=1716368235;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=gjnZNYuN0DQXDMokaWqCY+V7fdoox9RByiFn9jusGLc=;
-  b=De3MTQavuttO+6v+E0isxhgIUldWJ1PH1BoduqRhvGZvHvdwZ9MhzpOO
-   iqGpgSkwNfr+al3yfN6AWkvsJikgvYJz6qD4n692NXoZOGItwOHcWPYaI
-   p2Hs+JaI5ANo8u9DSZXOUi0TiZuZw3ohrH5BFNlac1f4/OLmcGAtNT2zL
-   p6ZszbHVJ/1GqZVSqWEzpEtOt2XoCFsQD2yHS7mKmlzEOokrJm3atr891
-   GvZjg3FCjX/7ro3BSI4Mn68CLV4fMjTbSlC3bvIglgZ0CyqxaHxcmtctA
-   THu6dwpvshRYlrrIgWays9RQwqCSQsjsHUlikcA2HUT+iRvsLillgufMS
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="439533963"
-X-IronPort-AV: E=Sophos;i="6.00,185,1681196400"; 
-   d="scan'208";a="439533963"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2023 01:57:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="681308768"
-X-IronPort-AV: E=Sophos;i="6.00,185,1681196400"; 
-   d="scan'208";a="681308768"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.255.29.223]) ([10.255.29.223])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2023 01:57:11 -0700
-Message-ID: <98bbc70e-7566-36fa-98e2-5bf5a97d682c@linux.intel.com>
-Date:   Tue, 23 May 2023 16:57:09 +0800
+        with ESMTP id S232089AbjEWJcz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 05:32:55 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ECD494;
+        Tue, 23 May 2023 02:32:53 -0700 (PDT)
+Received: from lhrpeml500006.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QQTbQ4smpz6D8cC;
+        Tue, 23 May 2023 17:31:30 +0800 (CST)
+Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
+ lhrpeml500006.china.huawei.com (7.191.161.198) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 23 May 2023 10:32:47 +0100
+Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
+ lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.023;
+ Tue, 23 May 2023 10:32:47 +0100
+From:   Salil Mehta <salil.mehta@huawei.com>
+To:     James Morse <james.morse@arm.com>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+        "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "x86@kernel.org" <x86@kernel.org>
+CC:     Marc Zyngier <maz@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        "Oliver Upton" <oliver.upton@linux.dev>,
+        Len Brown <lenb@kernel.org>,
+        Rafael Wysocki <rafael@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Russell King <linux@armlinux.org.uk>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: RE: [RFC PATCH 30/32] KVM: arm64: Pass PSCI calls to userspace
+Thread-Topic: [RFC PATCH 30/32] KVM: arm64: Pass PSCI calls to userspace
+Thread-Index: AQHZN9b+61KzOutLS0qqIaFmxegD669m2QyA
+Date:   Tue, 23 May 2023 09:32:47 +0000
+Message-ID: <7e182886f20044d09d5b269cb6224af7@huawei.com>
+References: <20230203135043.409192-1-james.morse@arm.com>
+ <20230203135043.409192-31-james.morse@arm.com>
+In-Reply-To: <20230203135043.409192-31-james.morse@arm.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.48.157.124]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.1
-Subject: Re: [PATCH v3 14/21] KVM:VMX: Add a synthetic MSR to allow userspace
- to access GUEST_SSP
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        rppt@kernel.org, rick.p.edgecombe@intel.com, john.allen@amd.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20230511040857.6094-1-weijiang.yang@intel.com>
- <20230511040857.6094-15-weijiang.yang@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20230511040857.6094-15-weijiang.yang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi James,
+After Oliver Upton changes, I think we don't need most of the stuff in
+[Patch 29/32] and [Patch 30/32].
+
+I have few questions related to the PSCI Version. Please scroll below.
 
 
-On 5/11/2023 12:08 PM, Yang Weijiang wrote:
-> Introduce a host-only synthetic MSR, MSR_KVM_GUEST_SSP, so that the VMM
-> can read/write the guest's SSP, e.g. to migrate CET state.  Use a synthetic
-> MSR, e.g. as opposed to a VCPU_REG_, as GUEST_SSP is subject to the same
-> consistency checks as the PL*_SSP MSRs, i.e. can share code.
->
-> Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> From: James Morse <james.morse@arm.com>
+> Sent: Friday, February 3, 2023 1:51 PM
+> To: linux-pm@vger.kernel.org; loongarch@lists.linux.dev;
+> kvmarm@lists.linux.dev; kvm@vger.kernel.org; linux-acpi@vger.kernel.org;
+> linux-arch@vger.kernel.org; linux-ia64@vger.kernel.org; linux-
+> kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
+> x86@kernel.org
+
+[...]
+
+
+> 
+> When the KVM_CAP_ARM_PSCI_TO_USER capability is available, userspace can
+> request to handle PSCI calls.
+> 
+> This is required for virtual CPU hotplug to allow the VMM to enforce the
+> online/offline policy it has advertised via ACPI. By managing PSCI in
+> user-space, the VMM is able to return PSCI_DENIED when the guest attempts
+> to bring a disabled vCPU online.
+> Without this, the VMM is only able to not-run the vCPU, the kernel will
+> have already returned PSCI_SUCCESS to the guest. This results in
+> timeouts during boot as the OS must wait for the secondary vCPU.
+> 
+> SMCCC probe requires PSCI v1.x. If userspace only implements PSCI v0.2,
+> the guest won't query SMCCC support through PSCI and won't use the
+> spectre workarounds. We could hijack PSCI_VERSION and pretend to support
+> v1.0 if userspace does not, then handle all v1.0 calls ourselves
+> (including guessing the PSCI feature set implemented by the guest), but
+> that seems unnecessary. After all the API already allows userspace to
+> force a version lower than v1.0 using the firmware pseudo-registers.
+> 
+> The KVM_REG_ARM_PSCI_VERSION pseudo-register currently resets to either
+> v0.1 if userspace doesn't set KVM_ARM_VCPU_PSCI_0_2, or
+> KVM_ARM_PSCI_LATEST (1.0).
+
+
+I just saw the latest PSCI standard issue (Mar 2023 E Non-Confidential
+PSCI 1.2 issue E) and it contains the DENIED return value for the CPU_ON. 
+
+Should we *explicitly* check for PSCI 1.2 support before allowing vCPU
+Hot plug support? For this we would need KVM changes.
+
+
+@James, Since Oliver's patches have now got merged with the kernel I think
+you would need to rebase your RFC on the latest kernel as patches 29/32
+And 30/32 will create conflicts.
+
+
+Many thanks
+Salil
+
+
+
+> 
+> Suggested-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> [morse: Added description of why this is required]
+> Signed-off-by: James Morse <james.morse@arm.com>
 > ---
->   arch/x86/include/uapi/asm/kvm_para.h |  1 +
->   arch/x86/kvm/vmx/vmx.c               | 15 ++++++++++++---
->   arch/x86/kvm/x86.c                   |  4 ++++
->   3 files changed, 17 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-> index 6e64b27b2c1e..7af465e4e0bd 100644
-> --- a/arch/x86/include/uapi/asm/kvm_para.h
-> +++ b/arch/x86/include/uapi/asm/kvm_para.h
-> @@ -58,6 +58,7 @@
->   #define MSR_KVM_ASYNC_PF_INT	0x4b564d06
->   #define MSR_KVM_ASYNC_PF_ACK	0x4b564d07
->   #define MSR_KVM_MIGRATION_CONTROL	0x4b564d08
-> +#define MSR_KVM_GUEST_SSP	0x4b564d09
->   
->   struct kvm_steal_time {
->   	__u64 steal;
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 0ccaa467d7d3..72149156bbd3 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2095,9 +2095,13 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   		break;
->   	case MSR_IA32_U_CET:
->   	case MSR_IA32_PL3_SSP:
-> +	case MSR_KVM_GUEST_SSP:
->   		if (!kvm_cet_is_msr_accessible(vcpu, msr_info))
->   			return 1;
-> -		kvm_get_xsave_msr(msr_info);
-> +		if (msr_info->index == MSR_KVM_GUEST_SSP)
-> +			msr_info->data = vmcs_readl(GUEST_SSP);
-According to the change of the kvm_cet_is_msr_accessible() below,
-kvm_cet_is_msr_accessible() will return false for MSR_KVM_GUEST_SSP, 
-then this code is unreachable?
-
-> +		else
-> +			kvm_get_xsave_msr(msr_info);
->   		break;
->   	case MSR_IA32_DEBUGCTLMSR:
->   		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
-> @@ -2413,15 +2417,20 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   		break;
->   	case MSR_IA32_U_CET:
->   	case MSR_IA32_PL3_SSP:
-> +	case MSR_KVM_GUEST_SSP:
->   		if (!kvm_cet_is_msr_accessible(vcpu, msr_info))
->   			return 1;
->   		if (is_noncanonical_address(data, vcpu))
->   			return 1;
->   		if (msr_index == MSR_IA32_U_CET && (data & GENMASK(9, 6)))
->   			return 1;
-> -		if (msr_index == MSR_IA32_PL3_SSP && (data & GENMASK(2, 0)))
-> +		if ((msr_index == MSR_IA32_PL3_SSP ||
-> +		     msr_index == MSR_KVM_GUEST_SSP) && (data & GENMASK(2, 0)))
->   			return 1;
-> -		kvm_set_xsave_msr(msr_info);
-> +		if (msr_index == MSR_KVM_GUEST_SSP)
-> +			vmcs_writel(GUEST_SSP, data);
-> +		else
-> +			kvm_set_xsave_msr(msr_info);
->   		break;
->   	case MSR_IA32_PERF_CAPABILITIES:
->   		if (data && !vcpu_to_pmu(vcpu)->version)
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 2e3a39c9297c..baac6acebd40 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13642,6 +13642,10 @@ bool kvm_cet_is_msr_accessible(struct kvm_vcpu *vcpu, struct msr_data *msr)
->   	    !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
->   		return false;
->   
-> +	/* The synthetic MSR is for userspace access only. */
-> +	if (msr->index == MSR_KVM_GUEST_SSP)
+>  Documentation/virt/kvm/api.rst            | 14 ++++++++++++++
+>  Documentation/virt/kvm/arm/hypercalls.rst |  1 +
+>  arch/arm64/include/asm/kvm_host.h         |  1 +
+>  arch/arm64/kvm/arm.c                      | 10 +++++++---
+>  arch/arm64/kvm/hypercalls.c               |  2 +-
+>  arch/arm64/kvm/psci.c                     | 13 +++++++++++++
+>  include/kvm/arm_hypercalls.h              |  1 +
+>  include/uapi/linux/kvm.h                  |  1 +
+>  8 files changed, 39 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst
+> b/Documentation/virt/kvm/api.rst
+> index 9a28a9cc1163..eb99436a1d97 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8289,6 +8289,20 @@ This capability indicates that KVM can pass
+> unhandled hypercalls to userspace,
+>  if the VMM enables it. Hypercalls are passed with KVM_EXIT_HYPERCALL in
+>  kvm_run::hypercall.
+> 
+> +8.38 KVM_CAP_ARM_PSCI_TO_USER
+> +-----------------------------
+> +
+> +:Architectures: arm64
+> +
+> +When the VMM enables this capability, all PSCI calls are passed to
+> userspace
+> +instead of being handled by KVM. Capability KVM_CAP_ARM_HVC_TO_USER must
+> be
+> +enabled first.
+> +
+> +Userspace should support at least PSCI v1.0. Otherwise SMCCC features
+> won't be
+> +available to the guest. Userspace does not need to handle the
+> SMCCC_VERSION
+> +parameter for the PSCI_FEATURES function. The KVM_ARM_VCPU_PSCI_0_2 vCPU
+> +feature should be set even if this capability is enabled.
+> +
+>  9. Known KVM API problems
+>  =========================
+> 
+> diff --git a/Documentation/virt/kvm/arm/hypercalls.rst
+> b/Documentation/virt/kvm/arm/hypercalls.rst
+> index 3e23084644ba..4c111afa7d74 100644
+> --- a/Documentation/virt/kvm/arm/hypercalls.rst
+> +++ b/Documentation/virt/kvm/arm/hypercalls.rst
+> @@ -34,6 +34,7 @@ The following registers are defined:
+>    - Allows any PSCI version implemented by KVM and compatible with
+>      v0.2 to be set with SET_ONE_REG
+>    - Affects the whole VM (even if the register view is per-vcpu)
+> +  - Defaults to PSCI 1.0 if userspace enables KVM_CAP_ARM_PSCI_TO_USER.
+> 
+>  * KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+>      Holds the state of the firmware support to mitigate CVE-2017-5715, as
+> diff --git a/arch/arm64/include/asm/kvm_host.h
+> b/arch/arm64/include/asm/kvm_host.h
+> index 40911ebfa710..a9eff47bcb43 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -214,6 +214,7 @@ struct kvm_arch {
+>  	/* PSCI SYSTEM_SUSPEND enabled for the guest */
+>  #define KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED		5
+>  #define KVM_ARCH_FLAG_HVC_TO_USER			6
+> +#define KVM_ARCH_FLAG_PSCI_TO_USER			7
+> 
+>  	unsigned long flags;
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 815b7e8f88e1..3dba4e01f4d8 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -76,7 +76,7 @@ int kvm_arch_check_processor_compat(void *opaque)
+>  int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  			    struct kvm_enable_cap *cap)
+>  {
+> -	int r;
+> +	int r = -EINVAL;
+> 
+>  	if (cap->flags)
+>  		return -EINVAL;
+> @@ -105,8 +105,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		r = 0;
+>  		set_bit(KVM_ARCH_FLAG_HVC_TO_USER, &kvm->arch.flags);
+>  		break;
+> -	default:
+> -		r = -EINVAL;
+> +	case KVM_CAP_ARM_PSCI_TO_USER:
+> +		if (test_bit(KVM_ARCH_FLAG_HVC_TO_USER, &kvm->arch.flags)) {
+> +			r = 0;
+> +			set_bit(KVM_ARCH_FLAG_PSCI_TO_USER, &kvm->arch.flags);
+> +		}
+>  		break;
+>  	}
+> 
+> @@ -235,6 +238,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long
+> ext)
+>  	case KVM_CAP_PTP_KVM:
+>  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+>  	case KVM_CAP_ARM_HVC_TO_USER:
+> +	case KVM_CAP_ARM_PSCI_TO_USER:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_SET_GUEST_DEBUG2:
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index efaf05d40dab..3c2136cd7a3f 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -121,7 +121,7 @@ static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu,
+> u32 func_id)
+>  	}
+>  }
+> 
+> -static int kvm_hvc_user(struct kvm_vcpu *vcpu)
+> +int kvm_hvc_user(struct kvm_vcpu *vcpu)
+>  {
+>  	int i;
+>  	struct kvm_run *run = vcpu->run;
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index 7fbc4c1b9df0..8505b26f0a83 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -418,6 +418,16 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+>  	return 1;
+>  }
+> 
+> +static bool kvm_psci_call_is_user(struct kvm_vcpu *vcpu)
+> +{
+> +	/* Handle the special case of SMCCC probe through PSCI */
+> +	if (smccc_get_function(vcpu) == PSCI_1_0_FN_PSCI_FEATURES &&
+> +	    smccc_get_arg1(vcpu) == ARM_SMCCC_VERSION_FUNC_ID)
 > +		return false;
 > +
->   	if (msr->index == MSR_IA32_PL3_SSP &&
->   	    !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
->   		return false;
+> +	return test_bit(KVM_ARCH_FLAG_PSCI_TO_USER, &vcpu->kvm->arch.flags);
+> +}
+> +
+>  /**
+>   * kvm_psci_call - handle PSCI call if r0 value is in range
+>   * @vcpu: Pointer to the VCPU struct
+> @@ -443,6 +453,9 @@ int kvm_psci_call(struct kvm_vcpu *vcpu)
+>  		return 1;
+>  	}
+> 
+> +	if (kvm_psci_call_is_user(vcpu))
+> +		return kvm_hvc_user(vcpu);
+> +
+>  	switch (kvm_psci_version(vcpu)) {
+>  	case KVM_ARM_PSCI_1_1:
+>  		return kvm_psci_1_x_call(vcpu, 1);
+> diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+> index 1188f116cf4e..ea7073d1a82e 100644
+> --- a/include/kvm/arm_hypercalls.h
+> +++ b/include/kvm/arm_hypercalls.h
+> @@ -6,6 +6,7 @@
+> 
+>  #include <asm/kvm_emulate.h>
+> 
+> +int kvm_hvc_user(struct kvm_vcpu *vcpu);
+>  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
+> 
+>  static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 2ead8b9aae56..c5da9d703a0f 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1176,6 +1176,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+>  #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
+>  #define KVM_CAP_ARM_HVC_TO_USER 226
+> +#define KVM_CAP_ARM_PSCI_TO_USER 227
+> 
+>  #ifdef KVM_CAP_IRQ_ROUTING
+> 
+> --
+> 2.30.2
+> 
 
