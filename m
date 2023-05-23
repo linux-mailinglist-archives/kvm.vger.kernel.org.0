@@ -2,148 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3D9F70DF15
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 16:20:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8A4470DF56
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 16:34:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232929AbjEWOTt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 10:19:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55674 "EHLO
+        id S237124AbjEWOea (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 10:34:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237197AbjEWOTs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 10:19:48 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C6E109
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 07:19:45 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1ae8a684f70so22280965ad.2
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 07:19:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684851584; x=1687443584;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YJTOtttasiWLDEUcufe2rn3c2B61VJIjpPGMO/P/Yds=;
-        b=brwx0PSOMA0wdDk4Q3ZV6Zhimz9MGX1rc3oTrPLZdLDxR99oxRU+kgTiRQZeIUGp/B
-         dyf6U+6YZAZ0UTzApeHQKfgEnBhOiOJ/qXVvQ9J1F3RjGUiuExrD9+BmRrRlbu21nlVD
-         Wx38qijldoSLQu16rAmMxw27fIDqOXmDcc7YNTYCcS5xe37Q9LSgSZUY1x8lcrA4BzR8
-         Gn6XlWuegWj0mDFi1OGEJ901Pjqo4OoenFzAOsc9erWa0V37gRvkLtOzMhqrjLYhuzgg
-         EJnTJnwVBYHzHNPBMQ/b1Fhyc00bJU+3iH49CfEJT1yRwLmSMHit03ZKsytirD36EFwd
-         gllQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684851584; x=1687443584;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YJTOtttasiWLDEUcufe2rn3c2B61VJIjpPGMO/P/Yds=;
-        b=PwEfYCBBU6ekI1DLrKROEB6UszctS2QqedW8sJqLt1uRigYdnQ2/JDgU5aFH43pmRN
-         b4nMSNarOfYLNunato1tZM6wofiLF3f55k48DYR8v6pjcFwh+T6ieNNTc0nGUZmORDn0
-         p1GlmwhsO0S+YWsaO6TqnyYEPhrr0AmRLX5NiLkv7Uw95EM4h+3eHjHJoHXfodRiakcC
-         YJWvBZqmMTfr5YB0MlEO1F7XXhQ8jW+DUADvd8hx1ifGrABT1OOnXV53i8MqbeDn/njm
-         8/4lg0XFHCBRjV4KV1CJ/nQhqUm3U8FUcGJGSqafTY6CrHD6Vc1X+IYdLm6hbsuUIP7q
-         +lYA==
-X-Gm-Message-State: AC+VfDxMABqdDhbpLcLDjaKg0F+VJ11FyNTtmnaYreI+AT4ovZTob26t
-        djXhNgH4nMov1W/sBFqiyR0jIE+71y4=
-X-Google-Smtp-Source: ACHHUZ7XDfHM+pb9CMgdhxQCTf7TNLGglKW4K4aM789UbMGnxCZDh8BKaFM+lAod2VMVzlBmEBluGi8tvqw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:eb11:b0:1a1:b318:2776 with SMTP id
- l17-20020a170902eb1100b001a1b3182776mr3427854plb.0.1684851584603; Tue, 23 May
- 2023 07:19:44 -0700 (PDT)
-Date:   Tue, 23 May 2023 07:19:43 -0700
-In-Reply-To: <ZGxo9ylqYI8JXjGn@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-Mime-Version: 1.0
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-9-chao.p.peng@linux.intel.com> <ZGxo9ylqYI8JXjGn@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-Message-ID: <ZGzLf4zgxpBjghaF@google.com>
-Subject: Re: [PATCH v7 08/14] KVM: Rename mmu_notifier_*
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kautuk Consul <kconsul@linux.vnet.ibm.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
+        with ESMTP id S231951AbjEWOe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 10:34:28 -0400
+Received: from BN3PR00CU001.outbound.protection.outlook.com (mail-eastus2azon11020017.outbound.protection.outlook.com [52.101.56.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33D60E0;
+        Tue, 23 May 2023 07:34:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bsaz2P9s6ZlRLGTMDloEQKZ5DyaHkOoZuFDL+tmtio4EhuqCfRpnJLvRzXOtVWhpOzYlNILKziahsQuiwK41PjTWBMetfEc7kLO8Fi0SDhJqQObSf3Siocbi/3+luYT8ya8/FawvRXHGZ8D3pGR/pY8J9OR/hsn04VTB7MDV7CbiKQFtw27q7DyuFe1hf93nIxxszCsGWk/LWNUXXrIVl2lcyywkqj9weuUWv1djEdpxdorQ27JLgZ+tYxk+2KYFVjb+l4kWL01WnaeZCUDpnub+rsKL/vURfj/uPFGXtTmCRAPaxxhdfFIHRrjFVBs4arJKwJ1OO3GQV1V9FSkuGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S+cctbfDky0Y8n2oto81YsPUnyxlY1kgjkAI6Jyy6iw=;
+ b=esV6wYZj5bPS9DurAmim64KJz1YnAEwwOp/b+zTD2jV2WSxvx971Phi0Ug5JnvvyjC5ZdeysN4Ng5/QIEO2vvwceYmgsNn+nPi3ZZ17WI0I/xiBJ+Egv0SeCbGLNio0wDTVc8NLFPbE8/s3avmzE4FvZgjQJ0n6xhfC1cLQ//E3cAahSuTKsHijT5Hh6/hk8/XkcuKcdbu1hghf6S4+MQ7bgqMAj9zZh4GRWSclWwI7zVTmTtjsNRKDHnQIB3G5/oSvDyb1hOipd/1ia3g8ZPYeoYpAQ9sKyjsVEG/QHf0dH5HNKwxh3J2kReGkWHp9zNrJFaShQqH9RUTjy1CtPpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S+cctbfDky0Y8n2oto81YsPUnyxlY1kgjkAI6Jyy6iw=;
+ b=SfHj7QHcj1rI3tQZC5/eMT/1JNLxJiAMQetXSc/5wD411yL7+18rbZY8RD6JDf+6duTFyW/slYeUnoqVhi6hhwDrNkzYzJJL4rH8QThZ0SjNxVhNKPtci74PKKKdkH8EcopXPaOUk4c6grhQ05zjea988MWk5R+BsPCInl729yg=
+Received: from BYAPR21MB1688.namprd21.prod.outlook.com (2603:10b6:a02:bf::26)
+ by PH0PR21MB1910.namprd21.prod.outlook.com (2603:10b6:510:1b::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.13; Tue, 23 May
+ 2023 14:34:24 +0000
+Received: from BYAPR21MB1688.namprd21.prod.outlook.com
+ ([fe80::a4f7:2466:97b5:bd31]) by BYAPR21MB1688.namprd21.prod.outlook.com
+ ([fe80::a4f7:2466:97b5:bd31%5]) with mapi id 15.20.6455.004; Tue, 23 May 2023
+ 14:34:23 +0000
+From:   "Michael Kelley (LINUX)" <mikelley@microsoft.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+CC:     KY Srinivasan <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        "wei.liu@kernel.org" <wei.liu@kernel.org>,
+        Dexuan Cui <decui@microsoft.com>,
+        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH 1/2] x86/hyperv: Fix hyperv_pcpu_input_arg handling when
+ CPUs go online/offline
+Thread-Topic: [PATCH 1/2] x86/hyperv: Fix hyperv_pcpu_input_arg handling when
+ CPUs go online/offline
+Thread-Index: AQHZil8FRZ0qOnNN10G7K787DJGg/a9mAb2AgABWn6CAAS1hgIAAbJ2Q
+Date:   Tue, 23 May 2023 14:34:23 +0000
+Message-ID: <BYAPR21MB16884F0DFBCF2B419AF46EC1D740A@BYAPR21MB1688.namprd21.prod.outlook.com>
+References: <1684506832-41392-1-git-send-email-mikelley@microsoft.com>
+ <87o7mczqvu.fsf@redhat.com>
+ <BYAPR21MB16889F38274F6F7691DB85F8D743A@BYAPR21MB1688.namprd21.prod.outlook.com>
+ <87wn0zxylc.fsf@redhat.com>
+In-Reply-To: <87wn0zxylc.fsf@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=28520d20-9fa7-468b-af0e-f88769c50adf;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-05-23T14:33:31Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BYAPR21MB1688:EE_|PH0PR21MB1910:EE_
+x-ms-office365-filtering-correlation-id: eac6c40f-76c1-4b73-d791-08db5b9acdac
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: qisHd5gEk7ikcyC+NjqyrhDsDVtjhm5i/JLGKsFq1Sdbvahm9WquS4xD7R1DzdQ4itXAoEIpzalh3n/yMIoe7BtVEVYjpzPPIUIZDLjkZuay8noXOUjdqGGR+WuabW3OXSzmUBn67kL0dFikh+f9iPYVT6RnPWKv9CDStkYfk4Xm15d8F32HbZMB+WNyH4AQ4iILrbn6ZCzTKtV1qATSJIJnqADlWQABCTCKFgN0i58xJvcJOqsLgRzM8DC2AWKML97ZYo3nUr/qQc4fu8W8n4o6zir3U48CPWWquK2OJl2psiUBvHw7xGvGDiamlTLSPRhkOUOfbcZFsVeGcauua5tmj5jubv5TqnTYidmziaaOkMJjteY+o56msqGUiOYzrYZCFihudbIO4aGlEID68wPFJIXyMTbDongoI4wpEFQESOIPaFvhyjBC0hmQ5jOl6ZbOnumTskxYR4FxL9aRL4DRWLCEmDwnZ9zrzPjlKPAOfzJX+r3gRayo1H4RAewcrMpUcj3IUJBBlcO2QSTtVSIQuxLEu9x+ocL+ZhCGeo6Z9HW4r9DgfTGnxVFJNgIpd523zk/nKDiLstvnDqlOsAUvK34D9yhNyxdYvU/TGArzREZ044dcUUMbRrSyrPSu9mpCeOXkyJlR3astmERVX4a3n3cFilXo/ZpVwgRqpDE=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR21MB1688.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(346002)(376002)(396003)(39860400002)(451199021)(316002)(10290500003)(478600001)(6506007)(26005)(9686003)(786003)(71200400001)(54906003)(66946007)(76116006)(66556008)(66476007)(66446008)(64756008)(4326008)(41300700001)(6916009)(7696005)(52536014)(8936002)(8676002)(5660300002)(7416002)(86362001)(55016003)(2906002)(83380400001)(33656002)(122000001)(82950400001)(38100700002)(38070700005)(8990500004)(186003)(82960400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?tredA7MX6ofHOaopL+ozPcbNegjgRrN1WJ74pW2fB9ZGBLo3Mbdu1d3jiPTm?=
+ =?us-ascii?Q?64LL3dCABpr20x5uK48BVlrevubU8YJ1Egu5uX+c/0i7J/jHGDnp53twklmC?=
+ =?us-ascii?Q?E4XZFjUEvCcZx1mN8dDObIiTZZ9DOJ0WDT5Ro2zL97S+nrshqzubmRK3cVrh?=
+ =?us-ascii?Q?/Udf+GL7f7zUNP16h7XUVkZFu/MInEZ3DN50GrQh49u9a7j+h50RXYbZrLho?=
+ =?us-ascii?Q?1Qm6GA6BaYHxy1UPAG8FVGbZMc92fQYLsb1Z78P2C0f9PzWcDtt4BYtNuAlR?=
+ =?us-ascii?Q?QRkFJP1t6dt4HgHDjE86nJGtNWMEp6H7ANOEdLiQn5yLobmpSNxIcHG4xF2P?=
+ =?us-ascii?Q?KOqnZcUEHGajL7zwkVQbdiMbW24Zee39pl6XXyb3kyg4qXkvB58N6RBXivhn?=
+ =?us-ascii?Q?IwrhXAwcYSQkW0O+wh30vl66UTZYvSj4XBdBz8NuMWvcZsqMlrNjl8nGVkfu?=
+ =?us-ascii?Q?ZROO5Cgoo2B3Nxsfw6OicoLcEoCAuZboAxLML2WuWIGbAMNuHNF7O5sRumrw?=
+ =?us-ascii?Q?tY/1xqYcSmGOE5D55yxAT3R4QgyTOOPzXypkf7OI4WZAfB3aHaVIDw8o3giM?=
+ =?us-ascii?Q?16bsEgJ0Dpti6Jm8fs4XgOy8Kz7FOqzuwe8i5UHUZFZEF1wixPg6kmIZILUx?=
+ =?us-ascii?Q?ezG/qcyF5EcmJHcQUrTM5OPtINjo38NW+PCOQ/zINCnW0W5rImGxccyV5UWr?=
+ =?us-ascii?Q?dEMihqmQ2kuq8/SQcFkNI8haWVAJ3AYM87Qq2Hy42uUo7RLO8vOe/lgtGCUf?=
+ =?us-ascii?Q?3yQdpBFQnTs3cyA3jyviBrNnNA7hFg1FBqFqEprTRHfd2LsUZS9c4dB/aYlR?=
+ =?us-ascii?Q?jh4vuKt2LQztDch5J/pmIU+jNZZZaCoSuQiWphhkDlT3sTUyu9dJeKDP+Efk?=
+ =?us-ascii?Q?mS1toKMyVwsjqH3VwpL40YIuS4qwQpECUmCtk/t3RUwz6yTsx5S09dUs5E7O?=
+ =?us-ascii?Q?uz3UMbVoUSO1FQ7RR/JMsdkZEL+h5+v1LWDpYDWfVDWEWhWHXeWNxLpRnyiI?=
+ =?us-ascii?Q?rkymiRQzEnlWI2CWTL5UyLYc1jMhMn/xLBO6aFynp2yrOy4yoYWcKxZzdC3C?=
+ =?us-ascii?Q?mxqp6PVuc68DGM6bc3ault8wkhl5Zh01gpQXxq44bmwHr8TZmR6h0r2w+gEd?=
+ =?us-ascii?Q?Z7Mtd5FABkMgzUt1u6nU7L3TNqqf0vzU213OByG7uG5LPb55X20n9yF+m0m/?=
+ =?us-ascii?Q?aIea7T5Q3Lgz+520iHhIOwJzonoiMwocs5NoUFiYhuFQSGuKjZnaYOKgl239?=
+ =?us-ascii?Q?ol4IPvjSicoT90kYQQzmsfYvkFfXcEVrhhGJZB8IzL0HnBX7E8FJY7EbDeCE?=
+ =?us-ascii?Q?9EI9HptpDV8eAlVE/7lzp0RS9bjpdGz50Mg51hPZ3dKGAoJkbKbm6sOw6XPk?=
+ =?us-ascii?Q?RvFR5byYTi3ETRXRsql+NNrMEYB8hdRkLb1vgMJrhlhgvirtqcm/jyEkt59p?=
+ =?us-ascii?Q?jFV3axm/UdX7j7MzocYod4bf1J2xwBiwgB9E6TvJSG0pxOhdgpwm/6YZlbx+?=
+ =?us-ascii?Q?u17j1tUVEUThy7opr4eMk82M+al2AXjMHG5BdpFSmpIdrjKQ37FnOAltCjrx?=
+ =?us-ascii?Q?P7Ma/lJf0th8Sd3GuuAWwxbpff2E8LH2Tr/evT9lhRYC70jVKKWywNwNFHPs?=
+ =?us-ascii?Q?gQ=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR21MB1688.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eac6c40f-76c1-4b73-d791-08db5b9acdac
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 May 2023 14:34:23.6348
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2g0ZM6MfS+O37ALeNoR7cPuXe2lXP7h7W8Yy0z2pKF1ycGaByBBTJW1A/Jsb1fOZn5KvEeII0BLyvv/VkJ5JK1BuGZZYHV8hkmBbmuZNrHk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR21MB1910
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 23, 2023, Kautuk Consul wrote:
-> On 2022-07-06 16:20:10, Chao Peng wrote:
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index e9153b54e2a4..c262ebb168a7 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -765,10 +765,10 @@ struct kvm {
-> >  
-> >  #if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
-> >  	struct mmu_notifier mmu_notifier;
-> > -	unsigned long mmu_notifier_seq;
-> > -	long mmu_notifier_count;
-> > -	gfn_t mmu_notifier_range_start;
-> > -	gfn_t mmu_notifier_range_end;
-> > +	unsigned long mmu_updating_seq;
-> > +	long mmu_updating_count;
-> 
-> Can we convert mmu_updating_seq and mmu_updating_count to atomic_t ?
+From: Vitaly Kuznetsov <vkuznets@redhat.com> Sent: Tuesday, May 23, 2023 1:=
+05 AM
+>=20
+> "Michael Kelley (LINUX)" <mikelley@microsoft.com> writes:
+>=20
+> > From: Vitaly Kuznetsov <vkuznets@redhat.com> Sent: Monday, May 22, 2023=
+ 1:56 AM
+> >>
+> >> Michael Kelley <mikelley@microsoft.com> writes:
+> >>
+> >
+> > [snip]
+> >
+> >> > diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+> >> > index 0f1001d..696004a 100644
+> >> > --- a/include/linux/cpuhotplug.h
+> >> > +++ b/include/linux/cpuhotplug.h
+> >> > @@ -201,6 +201,7 @@ enum cpuhp_state {
+> >> >  	/* Online section invoked on the hotplugged CPU from the hotplug t=
+hread */
+> >> >  	CPUHP_AP_ONLINE_IDLE,
+> >> >  	CPUHP_AP_KVM_ONLINE,
+> >> > +	CPUHP_AP_HYPERV_ONLINE,
+> >>
+> >> (Cc: KVM)
+> >>
+> >> I would very much prefer we swap the order with KVM here: hv_cpu_init(=
+)
+> >> allocates and sets vCPU's VP assist page which is used by KVM on
+> >> CPUHP_AP_KVM_ONLINE:
+> >>
+> >> kvm_online_cpu() -> __hardware_enable_nolock() ->
+> >> kvm_arch_hardware_enable() -> vmx_hardware_enable():
+> >>
+> >>         /*
+> >>          * This can happen if we hot-added a CPU but failed to allocat=
+e
+> >>          * VP assist page for it.
+> >>          */
+> >> 	if (kvm_is_using_evmcs() && !hv_get_vp_assist_page(cpu))
+> >> 		return -EFAULT;
+> >>
+> >> With the change, this is likely broken.
+> >>
+> >> FWIF, KVM also needs current vCPU's VP index (also set by hv_cpu_init(=
+))
+> >> through __kvm_x86_vendor_init() -> set_hv_tscchange_cb() call chain bu=
+t
+> >> this happens upon KVM module load so CPU hotplug ordering should not
+> >> matter as this always happens on a CPU which is already online.
+> >>
+> >> Generally, as 'KVM on Hyper-V' is a supported scenario, doing Hyper-V
+> >> init before KVM's (and vice versa on teardown) makes sense.
+> >>
+> >> >  	CPUHP_AP_SCHED_WAIT_EMPTY,
+> >> >  	CPUHP_AP_SMPBOOT_THREADS,
+> >> >  	CPUHP_AP_X86_VDSO_VMA_ONLINE,
+> >
+> > I have no objection to putting CPUHP_AP_HYPERV_ONLINE first.  I did
+> > not give any consideration to a possible dependency between the two. :-=
+(
+> > But note that in current code, hv_cpu_init() is running on the
+> > CPUHP_AP_ONLINE_DYN state, which is also after KVM.  So this patch
+> > doesn't change the order w.r.t. KVM and the VP assist page.   Are thing=
+s
+> > already broken for KVM, or is something else happening that makes it
+> > work anyway?
+>=20
+> This looks like a currently present bug indeed so I had to refresh my
+> memory.
+>=20
+> KVM's CPUHP_AP_KVM_STARTIN is registered with
+> cpuhp_setup_state_nocalls() which means that kvm_starting_cpu() is not
+> called for all currently present CPUs. Moreover, kvm_init() is called
+> when KVM vendor module (e.g. kvm_intel) is loaded and as KVM is normally
+> built as module, this happens much later than Hyper-V's
+> hyperv_init(). vmx_hardware_enable() is actually called from
+> hardware_enable_all() which happens when the first KVM VM is created.
+>=20
+> This all changes when a CPU is hotplugged. The order CPUHP_AP_* from
+> cpuhp_state is respected and KVM's kvm_starting_cpu() is called _before_
+> Hyper-V's hv_cpu_init() even before your patch. We don't see the bug
+> just because Hyper-V doesn't(?) support CPU hotplug. Just sending a CPU
+> offline with e.g. "echo 0 > /sys/devices/system/cpu/cpuX/online" is not
+> the same as once allocated, VP assist page persists for all non-root
+> Hyper-V partitions. I don't know if KVM is supported for Hyper-V root
+> partitions but in case it is, we may have a problem.
+>=20
+> Let's put CPUHP_AP_HYPERV_ONLINE before KVM's CPUHP_AP_KVM_ONLINE
+> explicitly so CPU hotplug scenario is handled correctly, even if current
+> Hyper-V versions don't support it.
+>=20
 
-Heh, can we?  Yes.  Should we?  No.
+Will do.  I'll send a v2 with the change.
 
-> I see that not all accesses to these are under the kvm->mmu_lock
-> spinlock.
-
-Ya, working as intended.  Ignoring gfn_to_pfn_cache for the moment, all accesses
-to mmu_invalidate_in_progress (was mmu_notifier_count / mmu_updating_count above)
-are done under mmu_lock.  And for for mmu_notifier_seq (mmu_updating_seq above),
-all writes and some reads are done under mmu_lock.  The only reads that are done
-outside of mmu_lock are the initial snapshots of the sequence number.
-
-gfn_to_pfn_cache uses a different locking scheme, the comments in
-mmu_notifier_retry_cache() do a good job explaining the ordering.
-
-> This will also remove the need for putting separate smp_wmb() and
-> smp_rmb() memory barriers while accessing these structure members.
-
-No, the memory barriers aren't there to provide any kind of atomicity.  The barriers
-exist to ensure that stores and loads to/from the sequence and invalidate in-progress
-counts are ordered relative to the invalidation (stores to counts) and creation (loads)
-of SPTEs.  Making the counts atomic changes nothing because atomic operations don't
-guarantee the necessary ordering.
-
-E.g. when handling a page fault, KVM snapshots the sequence outside of mmu_lock
-_before_ touching any state that is involved in resolving the host pfn, e.g. primary
-MMU state (VMAs, host page tables, etc.).   After the page fault task acquires
-mmu_lock, KVM checks that there are no in-progress invalidations and that the sequence
-count is the same.  This ensures that if there is a concurrent page fault and
-invalidation event, the page fault task will either acquire mmu_lock and create SPTEs
-_before_ the invalidation is processed, or the page fault task will observe either an
-elevated mmu_invalidate_in_progress or a different sequence count, and thus retry the
-page fault, if the page fault task acquires mmu_lock after the invalidation event.
+Michael
