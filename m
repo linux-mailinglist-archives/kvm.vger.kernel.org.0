@@ -2,127 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41B4170E262
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 18:49:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B6AF70E25B
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 18:49:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237358AbjEWQhN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 12:37:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49756 "EHLO
+        id S237736AbjEWQnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 12:43:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237105AbjEWQhI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 12:37:08 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4262111A;
-        Tue, 23 May 2023 09:37:03 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34NGVhmq014628;
-        Tue, 23 May 2023 16:36:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=4QSbeGpvSiReYGcIr7QrxPewrKrb4N/ywhA3WbbktU8=;
- b=HduYbZH3tDTH4FQp2R04o6SBjNP2ws8AVUYhNQ+v1ldlWPDimXYpFmRs14P5CiXukEk7
- MoRlWXv8wB1akliyxDrp9hyHp99LSNMOayx8pgNeZGHm+QY+kWNQ3a3rT3NWhr0v7NHP
- U4Etb8AYXKDiiTaI24aIy5BZuJr5ywN7PxCpVp22bbQa2SLPtFHHbOYSDFvOGTtoIdMU
- mAooG8F1Ies+HAKaYeE4eSYf7tXY8RujVcKQwB9WH6RyU6WGilNP25yjpUofssrVsLEt
- Ril7sCRTfoczWj28hvSULQ2z0s7VslnlYIWRqCmBFgXh0AGeEN8qrl/jZIm3eTk+Jpgb 9A== 
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qryy41ub8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 May 2023 16:36:57 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34NEKh8g031369;
-        Tue, 23 May 2023 16:36:56 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([9.208.130.101])
-        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3qppdpky27-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 May 2023 16:36:56 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-        by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34NGatHo66453942
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 May 2023 16:36:55 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3614858045;
-        Tue, 23 May 2023 16:36:55 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B776158052;
-        Tue, 23 May 2023 16:36:53 +0000 (GMT)
-Received: from [9.61.92.8] (unknown [9.61.92.8])
-        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 23 May 2023 16:36:53 +0000 (GMT)
-Message-ID: <410d06c5-90f5-93dc-6e6d-37e5923fe0a7@linux.ibm.com>
-Date:   Tue, 23 May 2023 12:36:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 0/2][next] vfio/ccw: Replace one-element array with
- flexible-array member
-Content-Language: en-US
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Eric Farman <farman@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <cover.1684805398.git.gustavoars@kernel.org>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <cover.1684805398.git.gustavoars@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ympyjzcNDEsFLxKdxoCce_RGFjRUV_RH
-X-Proofpoint-ORIG-GUID: ympyjzcNDEsFLxKdxoCce_RGFjRUV_RH
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S237726AbjEWQnR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 12:43:17 -0400
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09DFE11A;
+        Tue, 23 May 2023 09:42:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1684860177; x=1716396177;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4cLn24dkdXYEj5ZgRvb+j624niie2xsz48lKPuQZSQs=;
+  b=k+Y63rtPjf+1xh64dy4Uue9CI1xwKf1hEqmLNYE4pyS6HFZJQkjC5lMq
+   DWP5REAx6N3rDhmHm1B4i7htDhQzPfj0zzk78Ymu+kzd0iVnkgjEe0C5p
+   JPZrTfAXHUcmf+PQ7CUwLdmq/E0wIebcqDXxnZMlao1xLHJuk1AwRWZIc
+   o=;
+X-IronPort-AV: E=Sophos;i="6.00,186,1681171200"; 
+   d="scan'208";a="215862704"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-edda28d4.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2023 16:42:54 +0000
+Received: from EX19D016EUA004.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1a-m6i4x-edda28d4.us-east-1.amazon.com (Postfix) with ESMTPS id 9ABD080C67;
+        Tue, 23 May 2023 16:42:50 +0000 (UTC)
+Received: from EX19D033EUC004.ant.amazon.com (10.252.61.133) by
+ EX19D016EUA004.ant.amazon.com (10.252.50.4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 23 May 2023 16:42:49 +0000
+Received: from u40bc5e070a0153.ant.amazon.com (10.1.212.30) by
+ EX19D033EUC004.ant.amazon.com (10.252.61.133) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 23 May 2023 16:42:46 +0000
+Date:   Tue, 23 May 2023 18:42:40 +0200
+From:   Roman Kagan <rkagan@amazon.de>
+To:     Like Xu <like.xu.linux@gmail.com>
+CC:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, <x86@kernel.org>,
+        Eric Hankland <ehankland@google.com>,
+        <linux-kernel@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        "kvm list" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
+Message-ID: <ZGztAF1e5op6FlRQ@u40bc5e070a0153.ant.amazon.com>
+Mail-Followup-To: Roman Kagan <rkagan@amazon.de>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+        Eric Hankland <ehankland@google.com>, linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        kvm list <kvm@vger.kernel.org>
+References: <20230504120042.785651-1-rkagan@amazon.de>
+ <de6acc7e-8e7f-2c54-11cc-822df4084719@gmail.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-23_10,2023-05-23_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 malwarescore=0 bulkscore=0 adultscore=0 mlxscore=0
- priorityscore=1501 mlxlogscore=946 phishscore=0 suspectscore=0 spamscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305230132
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <de6acc7e-8e7f-2c54-11cc-822df4084719@gmail.com>
+X-Originating-IP: [10.1.212.30]
+X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
+ EX19D033EUC004.ant.amazon.com (10.252.61.133)
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_TEMPERROR
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/22/23 9:34 PM, Gustavo A. R. Silva wrote:
-> Hi!
+On Tue, May 23, 2023 at 08:40:53PM +0800, Like Xu wrote:
+> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
 > 
-> This small series aims to replace a one-element array with a
-> flexible-array member in struct vfio_ccw_parent.
 > 
-> This helps with the ongoing efforts to tighten the FORTIFY_SOURCE
-> routines on memcpy() and help us make progress towards globally
-> enabling -fstrict-flex-arrays=3 [1].
 > 
-> Link: https://github.com/KSPP/linux/issues/79
-> Link: https://github.com/KSPP/linux/issues/160
-> Link: https://github.com/KSPP/linux/issues/297
-> Link: https://gcc.gnu.org/pipermail/gcc-patches/2022-October/602902.html [1]
+> On 4/5/2023 8:00 pm, Roman Kagan wrote:
+> > Performance counters are defined to have width less than 64 bits.  The
+> > vPMU code maintains the counters in u64 variables but assumes the value
+> > to fit within the defined width.  However, for Intel non-full-width
+> > counters (MSR_IA32_PERFCTRx) the value receieved from the guest is
+> > truncated to 32 bits and then sign-extended to full 64 bits.  If a
+> > negative value is set, it's sign-extended to 64 bits, but then in
+> > kvm_pmu_incr_counter() it's incremented, truncated, and compared to the
+> > previous value for overflow detection.
 > 
-> Gustavo A. R. Silva (2):
->   vfio/ccw: Replace one-element array with flexible-array member
->   vfio/ccw: Use struct_size() helper
+> Thanks for reporting this issue. An easier-to-understand fix could be:
 > 
->  drivers/s390/cio/vfio_ccw_drv.c     | 2 +-
->  drivers/s390/cio/vfio_ccw_private.h | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index e17be25de6ca..51e75f121234 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -718,7 +718,7 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
 > 
+>  static void kvm_pmu_incr_counter(struct kvm_pmc *pmc)
+>  {
+> -       pmc->prev_counter = pmc->counter;
+> +       pmc->prev_counter = pmc->counter & pmc_bitmask(pmc);
+>        pmc->counter = (pmc->counter + 1) & pmc_bitmask(pmc);
+>        kvm_pmu_request_counter_reprogram(pmc);
+>  }
+> 
+> Considering that the pmu code uses pmc_bitmask(pmc) everywhere to wrap
+> around, I would prefer to use this fix above first and then do a more thorough
+> cleanup based on your below diff. What do you think ?
 
-Hi Gustavo,
+I did exactly this at first.  However, it felt more natural and easier
+to reason about and less error-prone going forward, to maintain the
+invariant that pmc->counter always fits in the assumed width.
 
-Thanks! For the series:
+> > That previous value is not truncated, so it always evaluates bigger than
+> > the truncated new one, and a PMI is injected.  If the PMI handler writes
+> > a negative counter value itself, the vCPU never quits the PMI loop.
+> > 
+> > Turns out that Linux PMI handler actually does write the counter with
+> > the value just read with RDPMC, so when no full-width support is exposed
+> > via MSR_IA32_PERF_CAPABILITIES, and the guest initializes the counter to
+> > a negative value, it locks up.
+> 
+> Not really sure what the behavioral difference is between "it locks up" and
+> "the vCPU never quits the PMI loop".
 
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+No difference, the second paragraph just illustrates the specific case
+with Linux PMI handler and the system not exposing full-width counter
+support so the problematic code path is triggered.
+
+> > We observed this in the field, for example, when the guest configures
+> > atop to use perfevents and runs two instances of it simultaneously.
+> 
+> A more essential case I found is this:
+> 
+>  kvm_msr: msr_write CTR1 = 0xffffffffffffffea
+>  rdpmc on host: CTR1, value 0xffffffffffe3
+>  kvm_exit: vcpu 0 reason EXCEPTION_NMI
+>  kvm_msr: msr_read CTR1 = 0x83 // nmi_handler
+> 
+> There are two typical issues here:
+> - the emulated counter value changed from 0xffffffffffffffffea to 0xffffffffffffe3,
+
+Strange, why would the counter go backwards (disregarding the extra high
+bits)?
+
+>  triggering __kvm_perf_overflow(pmc, false);
+> - PMI-handler should not reset the counter to a value that is easily overflowed,
+>  in order to avoid overflow here before iret;
+
+This is a legitimate guest behavior, isn't it?  The problem I'm trying
+to fix is when the value written is sufficiently far from overflowing,
+but it still ends up looking as an overflow and triggers a PMI.
+
+> Please confirm whether your usage scenarios consist of these two types, or more.
+
+The *usage* scenario is the one I wrote above.  I've identified an
+easier repro since then:
+
+  perf stat -e instructions -C 0 &
+  sleep 1 && perf stat -e instructions,cycles -C 0 sleep 0.1 && kill -INT %
+
+Please also see the kvm-unit-test I posted at
+https://lore.kernel.org/kvm/20230504134908.830041-1-rkagan@amazon.de
+
+> > To address the problem, maintain the invariant that the counter value
+> > always fits in the defined bit width, by truncating the received value
+> > in the respective set_msr methods.  For better readability, factor this
+> > out into a helper function, pmc_set_counter, shared by vmx and svm
+> > parts.
+> > 
+> > Fixes: 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions")
+> > Signed-off-by: Roman Kagan <rkagan@amazon.de>
+> 
+> Tested-by: Like Xu <likexu@tencent.com>
+> I prefer to use pmc_bitmask(pmc) to wrap around pmc->prev_counter as the first step.
+
+My preference is to keep the counter within the limits all the time, so
+I'd leave it up to the maintainers to decide.
+
+Thanks,
+Roman.
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
