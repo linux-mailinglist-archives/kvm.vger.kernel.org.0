@@ -2,199 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B06570CF61
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 02:39:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B66F670CFDD
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 02:54:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234944AbjEWAi7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 20:38:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42260 "EHLO
+        id S229542AbjEWAye (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 20:54:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235528AbjEWAbC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 20:31:02 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2629E4C
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 17:21:42 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-64d20f79776so2836857b3a.1
-        for <kvm@vger.kernel.org>; Mon, 22 May 2023 17:21:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684801302; x=1687393302;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2aYdF7DTvHPO7OMZesJvRkwGqhq0minNXqz8wSE/nz4=;
-        b=6hkfuhgDV+Cm6kpsvzWJ48OVTPAuJNbAy//iZV3iTyUkEm0CBAiqKh89/T3iZhHz2Q
-         cS/nl4xPBMzFPSFWoI45FkfXCfhPFhmdrAtsbpG7H2XU7N4TH9lA1jBlH6doK5D5jGF9
-         ssywWHAIrAIm4hg395CyoE06GD7PWLdSA8pWKEnXN5od0s8MM/vGppgN7Y1k1zVrN/5l
-         t+Xuz2ALaAtGJt9hjPyJJtXoDPu6+f2qM+ISuGV3bk/DwEkTviRlnRJWj+jRfCEMNUsw
-         xubELT0MLwIRN2O5A4wXqEY5VMPb6RITikcAhhPQuoPKHRCzm+uZO4JRG5iNINtlxx8O
-         gjCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684801302; x=1687393302;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2aYdF7DTvHPO7OMZesJvRkwGqhq0minNXqz8wSE/nz4=;
-        b=ZHAsPbQbp+CGwQyjqJLQqqzPiZ45wnPlGBY5WhZX7ETBAtOyVje04yUNLU930RucQq
-         pLRI3YVh/4x2bi06wA4z2VC6nX0UgbPLQvwDL4gq9+uPtf6V/8FMJvFDysl4K63F0Nx1
-         bF9dahIytU+ZId4uhITT8JgEm4n9wMlaTE3cltr0oApIkkLA5lBxQNQDepVUCWplTgTL
-         SajzZpMfYyGGLzG7TxbGju1ia5A9DFVSZ6hT/nyit472IMRUIkkcP0Mn5fKEzqQ/ZrIv
-         tQSlMux3X8qZTAwjSbb6icSHcbJ7gyAcneVc5jpIs9pbaKBhN2iSQZRPRjlPypYWDtfe
-         xs5Q==
-X-Gm-Message-State: AC+VfDyzt818rtw9jKU7O3Mbi1WvwGAXH0kAQ1s+gnzZWAxaE1yS8oq0
-        tIiBEo4LtJqLzsqezM3ds7/ohdRiv5U=
-X-Google-Smtp-Source: ACHHUZ5nM/K1msH8/300AUBbxABE1arku2Ztm2J+BPfcuobQx6fSnGZtV4PF8qqvQU3SEk0HXC++fnu3Dhw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:986:b0:63d:397a:8fdd with SMTP id
- u6-20020a056a00098600b0063d397a8fddmr5586115pfg.0.1684801302311; Mon, 22 May
- 2023 17:21:42 -0700 (PDT)
-Date:   Tue, 23 May 2023 00:21:40 +0000
-In-Reply-To: <20230522235838.ov3722lcusotzlvo@amd.com>
-Mime-Version: 1.0
-References: <ZD2bBB00eKP6F8kz@google.com> <9efef45f-e9f4-18d1-0120-f0fc0961761c@redhat.com>
- <ZD86E23gyzF6Q7AF@google.com> <5869f50f-0858-ab0c-9049-4345abcf5641@redhat.com>
- <ZEM5Zq8oo+xnApW9@google.com> <20230512002124.3sap3kzxpegwj3n2@amd.com>
- <ZF5+5g5hI7xyyIAS@google.com> <20230522135036.wnvsmryhkvstwvw2@amd.com>
- <ZGuh1J6AOw5v2R1W@google.com> <20230522235838.ov3722lcusotzlvo@amd.com>
-Message-ID: <ZGwHFPnNK89/t7wx@google.com>
-Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
- KVM: mm: fd-based approach for supporting KVM)
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        tabba@google.com, wei.w.wang@intel.com,
-        Mike Rapoport <rppt@kernel.org>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Hugh Dickins <hughd@google.com>,
-        Christian Brauner <brauner@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S235244AbjEWAyT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 20:54:19 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2043.outbound.protection.outlook.com [40.107.92.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AC872139;
+        Mon, 22 May 2023 17:48:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=C98pppIbG0Q+JJ1FEjXeP9qVZR1cPYCj4HjrU8n3f0BU3rP/dLmQ1bP7Z1w2J1DEfRGI2pfY0jcsmOqQsmV1ILlefFo8AAZbYHSElPwItNuEQIC+wypt4OTb8PCgoNO9F6mekWG9AAupBlLZvFYX9jxPhh4id6Yl7hWtiFewT8Yz5BJbsM10K8Hw2NLnDJNUpLfi2Xr7GNNj4Nt5qctAm19KtrY7cFdBK8n/ePipNaSCczgrvTwWNdkS6WvnuIrX044PrphJNbtWOjurKuoAGVF9NPsAa2ovwrJuXCJhX1F1KyY9+fqDtxfrOnuFOMM/cFl8pdM7lFIgLoEdRhW7nA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AllstN60M7xRCDeVJkT6HoMgkly4ZZP75yVXjI32Qw0=;
+ b=jap69jOSI7L1YGkYtdYoYYC0fxN+cFEM3zqOd9xJr3frcbZ0OtjZbA4RlTYnMwNZx6uRskYBMRPKCVQrqwDCavA9K11Xdoiyjq+7upQUOxy8Au2RSXGtGgo8ZlGvtO+WJXv3wm+WxzV5yY7bXLHeCMhbhcyaOkzQ1ifwxtqLcfqGei82pA4S5qAd/4m4CK7ALqralYItAX5/LnDE0ygr5fCkJpKmpcQ2Fj7Lb5kIDwqQZGbaqW3ReKj7pqpSqohg2HfH+x2j7SwnyWgzJFSh7wj2r3nwPTebxmqHplaL0yRKvgU3WxlkDzONEpV5qgJZqJtN8LYtclD3KbRJKCZZlw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AllstN60M7xRCDeVJkT6HoMgkly4ZZP75yVXjI32Qw0=;
+ b=XUjeer1omxaMkg/8wP3ABtl2HNV4FomOLhcCWtRRgf0wnGRHx14dPX3AP9zEWOgaxb0lfZqazlCezmhqJQvXeAs+2Z6lhJ8aapajEa8AQWa6vfRBxdmz0rA8FZU2mNnHtDPh1/jHg9602XVzUUwuOMs13SrSvUEvzLwtM4cavgDl7UZeLAEes0noJ0fJGwWHPbbVSAlxP2mMltcQevdYV2uBRlRsd55SJao6oVBxC7/DXVVAIgXLEZnYD3gxMSgjBxsu0PMeFn0c2TcIg13ecYapV26AevQU7cjpKCOtepmduphW4yHYkLwO4XT1JipJKt6W31y3KLXJHao3t6/yPQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB3176.namprd12.prod.outlook.com (2603:10b6:a03:134::26)
+ by DM6PR12MB4315.namprd12.prod.outlook.com (2603:10b6:5:223::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.28; Tue, 23 May
+ 2023 00:46:58 +0000
+Received: from BYAPR12MB3176.namprd12.prod.outlook.com
+ ([fe80::f6e4:71a5:4998:e6b2]) by BYAPR12MB3176.namprd12.prod.outlook.com
+ ([fe80::f6e4:71a5:4998:e6b2%5]) with mapi id 15.20.6411.028; Tue, 23 May 2023
+ 00:46:58 +0000
+References: <20230522063725.284686-1-apopple@nvidia.com>
+ <ZGu1vsbscdO48V6h@google.com> <875y8jappz.fsf@nvidia.com>
+ <ZGwDoONUFAHi7XKz@google.com>
+User-agent: mu4e 1.8.10; emacs 28.2
+From:   Alistair Popple <apopple@nvidia.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, robin.murphy@arm.com,
+        will@kernel.org, nicolinc@nvidia.com,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        jgg@nvidia.com, John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH] mmu_notifiers: Notify on pte permission upgrades
+Date:   Tue, 23 May 2023 10:43:17 +1000
+In-reply-to: <ZGwDoONUFAHi7XKz@google.com>
+Message-ID: <87wn0z98n7.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: SYXPR01CA0143.ausprd01.prod.outlook.com
+ (2603:10c6:0:30::28) To BYAPR12MB3176.namprd12.prod.outlook.com
+ (2603:10b6:a03:134::26)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB3176:EE_|DM6PR12MB4315:EE_
+X-MS-Office365-Filtering-Correlation-Id: adc92530-b127-482b-e3cd-08db5b2736bb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Km1COjutpSICGrn1oQM5/e1e78utryBl+xvlD8sUslh0MhYHjrJ8Kp3HKRovwF/CoWLEMFZinzwFezpqCrjPCAsSuxX/au1luxtNsTGQ4jbUBYfzEkVz22xLsc7Fq1weribvJaRgzOO94gJ0CnqYT/YPlfcxqz0kCNY71EPv5kiLlMJqLnfCdpC6qRasYPmRO3Qwx1hvwW/baOHaK51YwJA8N0e+9MZcQTENOEQn2t7LxbtA5PRe2WRYpLRk8jsnnBuJs6Ti/1UMdL1YRuY1RVyEclfwAbA5LvDWBQA32mKUydzOagYNIo1ajudtig36kYuPerEy1rHEWCuDIQi+KONU+K+tqakZlhKwrY5QUdvD21ZamSlfC9ztQSjIprm5K7Er+BW0P9wsXMf6NAg4pFEpCoCo8t0NaE0ILxRuwgG+dlcEpH21QBECgYxaI6SO+4v2qwBEg3eHZuYtRgSBTl1JSpUtqPNUUbewYyRcLzdYyhpqCDWUjrQyj5ZmoXoZZjD6ISEad6t3rAVyer9pP9QQhb18RDyEDkUVbNygKmv5qizPw6z5s7uovvh2oZwsVgI2sy3Wq00MMDosAdtk5JYofG/f/agVJxHxOx3sOtY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB3176.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(136003)(39860400002)(346002)(366004)(451199021)(8936002)(8676002)(5660300002)(83380400001)(26005)(6506007)(6512007)(107886003)(86362001)(2616005)(186003)(38100700002)(966005)(478600001)(6666004)(6486002)(66946007)(316002)(6916009)(4326008)(36756003)(41300700001)(66476007)(66556008)(54906003)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?a72ko43rOAQRKlaMX4JoSWjHYz3e2NmF5rmEkiLmDToi82XjjjPYCQidqtQ3?=
+ =?us-ascii?Q?vKXhPvj6W9sboj0hS9tcCY+Z9gjIS/l9p8DQ+7Bh62kTRYQckHnH5RjmLFnl?=
+ =?us-ascii?Q?S1UyLq+hrPLYp3UQeqePwKeYZ1V/lJrAwLvKimNYDMdxCg75yj0xjTWOkRmw?=
+ =?us-ascii?Q?oeqD9tlxOywxrecMdUTtatgTmQm23OU9saOI2U/t39nwcpbBSCaFicnxL0fv?=
+ =?us-ascii?Q?2UOGtlUHkK2wo8suqMlUdL/eGM/dNJXqIil8Z8htYOBhOLUs+Gi8VympLnNe?=
+ =?us-ascii?Q?NnA1nwBEJzXFcnpCEQJ7EOEIPpPR5rNJxCYbJciZN2iyii7XZqyhXMi15f/B?=
+ =?us-ascii?Q?RcnjYWlqkNCEwioC+7iaQsMvqSmVxknnKtMrBi6wXzGFXe3xkRiW6PLV9JRY?=
+ =?us-ascii?Q?+g7NcfCp1J/FuguF/iAyaKtG1PZ4QiHYDBTb4+KCqxM/ul2klL4Uneo2pkfG?=
+ =?us-ascii?Q?XECDQGL2vvmjRXDgXDOtSN+B8bnBrGxjG4UICMW2vSo9qZ1Q6d0dsGyUxdwa?=
+ =?us-ascii?Q?sAWWIxDwW/CFzO+/jD3sZBNMD7ySi9etjQ1+N/HkQlR+HIqBdMGZsAxuJ7LY?=
+ =?us-ascii?Q?HiGmOarqoTcjGDYkkDBlO4b095PW3SuLJpp/F2xh08bqBuGLUkczPRZx+B/F?=
+ =?us-ascii?Q?OBk9wsj8FxFz8Nol/hNvmzXeP4xp8uXTCGM7A0jcdQ1t0kfRg9DWvlEUUILM?=
+ =?us-ascii?Q?bn09zeOCYH0vERXQnrFa3oQLpSUHHJPucuOgBufZCOYemiaTrCgDd2WVWVSa?=
+ =?us-ascii?Q?j6Qrh33vMAFOIpUMtPETA/2wBOYetPqdJEXLPYIDYWaKkBF9tiEG7BM0FGmX?=
+ =?us-ascii?Q?XVV4tW274n0opZodT4Ky70G9CBDToI3YtIetreT0Q0N/Ut9lDwcZWd35eyqe?=
+ =?us-ascii?Q?LPKaRN1iUuGr7UAlKVqiLZRnSjRh7d8ZD01hnTlyzYd6Ck83HTO9JaJW2l8N?=
+ =?us-ascii?Q?w4WmpEmDXevBCzNSl3FyaxPsVbdX2QykKSaYRS7CGJLQCsl1lRx3gWEuCY8e?=
+ =?us-ascii?Q?HcFfaalTCfDYkR6I7Yr1+vVj3I+jvrjWRi2WbRNGB9bHyQXaPvktyNDFVj87?=
+ =?us-ascii?Q?uEExGbqb0lnditAgqe60feeTghT5inO4rTjVskCOKo5QhYn9Ba96O/oxazHh?=
+ =?us-ascii?Q?a3DojUpi3IfRUb4Ftv7eKsrVl/n7qsZ7GmgqUeeTvkjPsrI0yXsaHUGJ14Lt?=
+ =?us-ascii?Q?qXkbCGodWLmorADMjG780Gd93lsfLCVVSVc7ZK/kmMf8uSPdM9hkm/JuNeHc?=
+ =?us-ascii?Q?/LOGUO1bsW177wFxzUWqY5qjiaO9ioY1dHiJjbcIpNCGboqE5Vq3F53gTzFl?=
+ =?us-ascii?Q?c6Z18G4aHhfxm11iidkj+OXzGC3N0rDPj1qSPF7Wp5u2JK8lHhQzTfZigdIS?=
+ =?us-ascii?Q?u/Xn5DJXo6q157l6wSxKOcpmtfvjosoJb8vDyXzW+3d0bfq+qC1A/WPcx4oH?=
+ =?us-ascii?Q?rG0LMGCeu1tpXyYw/usYAEsnsAyA4Ais5JJ6v2fxSKyD/5m6w9L2bjn0UmJf?=
+ =?us-ascii?Q?R1SKLRO/IrnieuiApER8GAXfIqCKCnTi5mrpdELR8HNnW/veYHl0Qw/VyNjl?=
+ =?us-ascii?Q?92WXKxJydgq1IjqZG9bfNb038+j3/HVXfC0wJOKL?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: adc92530-b127-482b-e3cd-08db5b2736bb
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB3176.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 May 2023 00:46:58.4789
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QKdVTTII3pk7X71LNbu7uEAIRVAyjCbk7m5pMjdVqOe/G+aOhITSpDF4Pxxois1CepTyuT89DIxbprlSEOCWDg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4315
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 22, 2023, Michael Roth wrote:
-> On Mon, May 22, 2023 at 10:09:40AM -0700, Sean Christopherson wrote:
-> > On Mon, May 22, 2023, Michael Roth wrote:
-> > > On Fri, May 12, 2023 at 11:01:10AM -0700, Sean Christopherson wrote:
-> > > > On Thu, May 11, 2023, Michael Roth wrote:
-> > > I put together a tree with some fixups that are needed for against the
-> > > kvm_gmem_solo base tree, and a set of hooks to handle invalidations,
-> > > preparing the initial private state as suggested above, and a
-> > > platform-configurable mask that the x86 MMU code can use for determining
-> > > whether a fault is for private vs. shared pages.
-> > > 
-> > >   KVM: x86: Determine shared/private faults using a configurable mask
-> > >   ^ for TDX we could trivially add an inverted analogue of the mask/logic
-> > >   KVM: x86: Use full 64-bit error code for kvm_mmu_do_page_fault
-> > >   KVM: x86: Add platform hooks for private memory invalidations
-> > 
-> > Hrm, I'd prefer to avoid adding another hook for this case, arch code already has
-> > a "hook" in the form of kvm_unmap_gfn_range().  We'd probably just need a
-> > kvm_gfn_range.is_private flag to communicate to arch/vendor code that the memory
-> > being zapped is private.
-> 
-> kvm_unmap_gfn_range() does however get called with kvm->mmu_lock held so
-> it might be tricky to tie RMP updates into that path.
 
-Gah, I caught the mmu_lock issue before the end of my email, but forgot to go back
-and rethink the first half.
+Sean Christopherson <seanjc@google.com> writes:
 
-> > That'd leave a gap for the unbind() case because kvm_unmap_gfn_range() is invoked
-> > if and only if there's an overlapping memslot.  I'll chew on that a bit to see if
-> > there's a way to cleanly handle that case without another hook.  I think it's worth
-> > mapping out exactly what we want unbind() to look like anyways, e.g. right now the
-> > code subtly relies on private memslots being immutable.
-m 
-> I thought the direction you sort of driving at was to completely decouple
-> RMP updates for physical pages from the KVM MMU map/unmap paths since the
-> life-cycles of those backing pages and associated RMP state are somewhat
-> separate from the state of the GFNs and kvm->mem_attr_array. It seems to
-> make sense when dealing with things like this unbind() case.
-> 
-> There's also cases like userspaces that opt to not discard memory after
-> conversions because they highly favor performance over memory usage. In
-> those cases it would make sense to defer marking the pages as shared in
-> the RMP until the FALLOC_FL_PUNCH_HOLE, rather than triggering it via
-> KVM MMU invalidation path after a conversion.
+> On Tue, May 23, 2023, Alistair Popple wrote:
+>> 
+>> Sean Christopherson <seanjc@google.com> writes:
 
-Hmm, right.  I got overzealous in my desire to avoid new hooks.
+[...]
 
-> > >   KVM: x86: Add platform hook for initializing private memory
-> > 
-> > This should also be unnecessary.  The call to kvm_gmem_get_pfn() is from arch
-> > code, KVM just needs to ensure the RMP is converted before acquiring mmu_lock,
-> > e.g. KVM has all the necessary info in kvm_tdp_mmu_page_fault().
-> 
-> I think that approach would work fine. The way I was thinking of things
-> is that KVM MMU would necessarily call kvm_gmem_get_pfn() to grab the
-> page before mapping it into the guest, so moving it out into an explicit
-> call should work just as well. That would also drop the need for the
-> __kvm_gmem_get_pfn() stuff I needed to add for the initial case where we
-> need to access the PFN prior to making it private.
-> 
-> > 
-> > The only reason to add another arch hook would be if we wanted to converted the
-> > RMP when _allocating_, e.g. to preconvert in response to fallocate() instead of
-> > waiting until #NPF.  But I think I would rather add a generic ioctl() to allow
-> > userspace to effectively prefault guest memory, e.g. to setup the RMP before
-> > running a vCPU.  Such an ioctl() would potentially be useful in other scenarios,
-> > e.g. on the dest during live migration to reduce jitter.
-> 
-> Agreed, deferring the RMPUPDATE until it's actually needed would give us
-> more flexibility on optimizing for things like lazy-acceptance.
-> 
-> For less-common scenarios like preallocation it makes sense to make that
-> an opt-in sort of thing for userspace to configure explicitly.
-> 
-> > 
-> > >   *fixup (kvm_gmem_solo): KVM: Fix end range calculation for MMU invalidations
-> > 
-> > There was another bug in this path.  The math for handling a non-zero offsets into
-> > the file was wrong.  The code now looks like:
-> > 
-> > 	xa_for_each_range(&gmem->bindings, index, slot, start, end - 1) {
-> > 		struct kvm_gfn_range gfn_range = {
-> > 			.start = slot->base_gfn + start - slot->gmem.index,
-> 
-> Sorry if I'm missing something here, but isn't there a risk that:
-> 
->   start - slot->gmem.index
-> 
-> would be less than zero? E.g. starting GFN was 0, but current slot is bound
-> at some non-zero offset in the same gmem instance. I guess the warning below
-> shouldn't caught that, but it seems like a real scenario.
+>> > 	 * If invalidate_range() is used to manage a non-CPU TLB with
+>> > 	 * shared page-tables, it not necessary to implement the
+>> > 	 * invalidate_range_start()/end() notifiers, as
+>> > 	 * invalidate_range() already catches the points in time when an
+>> > 	 * external TLB range needs to be flushed. For more in depth
+>> > 	 * discussion on this see Documentation/mm/mmu_notifier.rst
+>> >
+>> > Even worse, this change may silently regress performance for secondary MMUs that
+>> > haven't yet taken advantage of the event type, e.g. KVM will zap all of KVM's PTEs
+>> > in response to the upgrade, instead of waiting until the guest actually tries to
+>> > utilize the new protections.
+>> 
+>> Yeah, I like the idea of introducing a
+>> ptep_set_access_flags_notify(). That way this won't regress performance
+>> on platforms that don't need it. Note this isn't a new feature but
+>> rather a bugfix. It's unclear to me why KVM on ARM hasn't already run
+>> into this issue, but I'm no KVM expert. Thanks for the feedback.
+>
+> KVM manages its own page tables and so does its own TLB invalidations as needed,
+> e.g. KVM can and does change KVM's stage-2 PTEs from read-only to read/write
+> irrespective of mmu_notifiers.  I assume the SMMU issue arises only because the
+> SMMU is reusing the host kernel's (stage-1?) page tables.
 
-Heh, only if there's a testcase for it.  Assuming start >= the slot offset does
-seem broken, e.g. if the range-to-invalidate overlaps multiple slots, later slots
-will have index==slot->gmem.index > start.
+Argh, thanks. That makes sense. The SMMU issue arises because it is not
+snooping CPU TLB invalidations and therefore relies entirely on notifier
+callbacks to invalidate it's TLB. If it was snooping invalidations it
+would observe the TLB invalidation ARM64 does in
+ptep_set_access_flags()[1]. Now that I've figured out we can call
+invalidate_range() under the PTL I think I can just add the notifier
+call there.
 
-> Since 'index' corresponds to the gmem offset of the current slot, is there any
-> reason not to do something like this?:
-> 
->   .start = slot->base_gfn + index - slot->gmem.index,
-> 
-> But then, if that's the case, wouldn't index == slot->gmem.index? Suggesting
-> we case just simplify to this?:
-> 
->   .start = slot->base_gfn,
-
-No, e.g. if start is partway through a memslot, there's no need to invalidate
-the entire memslot.  I'll stare at this tomorrow when my brain is hopefully a
-bit more functional, I suspect there is a min() and/or max() needed somewhere.
+[1] - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/arm64/mm/fault.c?id=ae8373a5add4ea39f032563cf12a02946d1e3546#n229
