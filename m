@@ -2,161 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9107270DBD8
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 13:57:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D04B070DCC2
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 14:41:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235903AbjEWL5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 07:57:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37800 "EHLO
+        id S236923AbjEWMlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 08:41:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229893AbjEWL53 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 07:57:29 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3A60E11F;
-        Tue, 23 May 2023 04:57:23 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.170])
-        by gateway (Coremail) with SMTP id _____8CxZ_Ehqmxk6w4AAA--.223S3;
-        Tue, 23 May 2023 19:57:21 +0800 (CST)
-Received: from [10.20.42.170] (unknown [10.20.42.170])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8CxMuUgqmxkoFFwAA--.55963S3;
-        Tue, 23 May 2023 19:57:20 +0800 (CST)
-Message-ID: <94b7f3d6-e2e1-be0a-cd39-dd1b1f1f607e@loongson.cn>
-Date:   Tue, 23 May 2023 19:57:20 +0800
+        with ESMTP id S230230AbjEWMlE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 08:41:04 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14B6ADD;
+        Tue, 23 May 2023 05:41:03 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-2536e522e47so4786393a91.1;
+        Tue, 23 May 2023 05:41:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684845662; x=1687437662;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Gr1WY2Fuh1EgRnKdC7Fm8StOxQjikRGaMYsWVllTkXc=;
+        b=nut+ochA96Xk4vOpZg9Qiy8uNmx/M278Eyt7WdRvY9XXGCForZjUHFvpgqMLvAy2Qu
+         9eJl/SQjOj9O2Oc4csjY/9NN6+lwhIi22RHpbxliSO1OH543hkhDbMHqTz3I7efRL/70
+         zYAWCEeIZ0glSGWYj5B8tzJuFxAPglqkLLULzNrW4HD0xQyz+Q7v9/iTNo0nkaHMy4lL
+         p9aaIwL/WbqzUE5zjd4+6fEBYiAlL1TTYDRlmpd7haFTT/OqtAI9e+fV4v7jf5ebyitX
+         fFXDrtU2DWxBtD4SeNEAfsXrp1HWQTtyQcjNz0mgB2bZ/MlrXH5IQhzI1bRHnhqxDm3k
+         MVmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684845662; x=1687437662;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gr1WY2Fuh1EgRnKdC7Fm8StOxQjikRGaMYsWVllTkXc=;
+        b=FX6C05132CQiDAhS+yfWyRynzgjyPJrgOpDNMnliX/kvCIu2cwXLlR6R0TLXch0wy7
+         81VbnG+/xrJ8qVDWMHwr74NGbHYJGhT0QRct7pd8vGkaJabIvkn8VA0IUU9tEkhu/pTD
+         hAvmLCRuAazaJi35tght7uFwU+8GGSCdruD/kcye3Ay7FuY2+ooRmDWWV0v3brPXDdB/
+         kJFMf8PSNwsDTca1p9Qq7JDftTaQA6KhJQKRYQLDALZ38XXP86W3YIn2WbH7No2TRxu1
+         KQ3tm3tIv7svtGxVD9Rdge9JL42ywFl4K7fhcYXyeSufXF6zi0x7VexUXGYYY6GnPAx5
+         gqdA==
+X-Gm-Message-State: AC+VfDwPld/f6BPTuNihn/kCSbnhFXMVctDFy/pZFLkCmaF4w9VUwSOi
+        CpbrzifsjDtTxtBG9pchels=
+X-Google-Smtp-Source: ACHHUZ74sbVH3K4eprhTZdPfGpcafMs8ZjoeuI5AiPjLNf6PINd9tDgr1XH+yEUMseq6208aHR6sFg==
+X-Received: by 2002:a17:90b:1941:b0:253:5728:f631 with SMTP id nk1-20020a17090b194100b002535728f631mr13558492pjb.15.1684845662254;
+        Tue, 23 May 2023 05:41:02 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id bk3-20020a17090b080300b0024e0141353dsm7421480pjb.28.2023.05.23.05.40.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 May 2023 05:41:01 -0700 (PDT)
+Message-ID: <de6acc7e-8e7f-2c54-11cc-822df4084719@gmail.com>
+Date:   Tue, 23 May 2023 20:40:53 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v10 00/30] Add KVM LoongArch support
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.11.0
+Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
 Content-Language: en-US
-To:     WANG Xuerui <kernel@xen0n.name>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Xi Ruoyao <xry111@xry111.site>,
-        Tianrui Zhao <zhaotianrui@loongson.cn>
-References: <20230515021522.2445551-1-zhaotianrui@loongson.cn>
- <02f07d8e-e1c2-2ec0-59c3-f5b4ef0463dc@loongson.cn>
- <4529ee5b-364a-7819-c727-71cf94057b8b@xen0n.name>
- <99371487-717a-64d6-1c3d-aaeaee6f20db@loongson.cn>
- <90b2fc60-af26-4ba6-f775-7db2514a62f4@xen0n.name>
- <1218d3f9-4955-7176-afbd-a0dfa0bd7565@loongson.cn>
- <29a9c6b4-96b8-3fb5-9b7a-2f9dba97e06f@xen0n.name>
-From:   maobibo <maobibo@loongson.cn>
-In-Reply-To: <29a9c6b4-96b8-3fb5-9b7a-2f9dba97e06f@xen0n.name>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8CxMuUgqmxkoFFwAA--.55963S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjvJXoWxZF15KFWxXry5Ww47Kw45ZFb_yoW5Cr1fpr
-        1kGr15Ary5Wr1kJr17Xr18Xry3Jw1UK3WDJr1DGFy5tF4UJr10qr4UXr1Y9rnrJr48Jr15
-        Jr1Utw13ur17Jr7anT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
-        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
-        bqxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s
-        1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-        wVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4
-        x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4UJVWxJr1l
-        n4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6x
-        ACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1DMcIj6I8E
-        87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0V
-        AS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCF
-        s4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI
-        8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41l
-        IxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIx
-        AIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2
-        jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+To:     Roman Kagan <rkagan@amazon.de>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+        Eric Hankland <ehankland@google.com>,
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        kvm list <kvm@vger.kernel.org>
+References: <20230504120042.785651-1-rkagan@amazon.de>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20230504120042.785651-1-rkagan@amazon.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 4/5/2023 8:00 pm, Roman Kagan wrote:
+> Performance counters are defined to have width less than 64 bits.  The
+> vPMU code maintains the counters in u64 variables but assumes the value
+> to fit within the defined width.  However, for Intel non-full-width
+> counters (MSR_IA32_PERFCTRx) the value receieved from the guest is
+> truncated to 32 bits and then sign-extended to full 64 bits.  If a
+> negative value is set, it's sign-extended to 64 bits, but then in
+> kvm_pmu_incr_counter() it's incremented, truncated, and compared to the
+> previous value for overflow detection.
 
+Thanks for reporting this issue. An easier-to-understand fix could be:
 
-在 2023/5/23 18:27, WANG Xuerui 写道:
-> On 2023/5/23 10:54, maobibo wrote:
->>
->> [snip]
->>
->> I hate parse_r helper also, it is hard to understand, the kernel about
->> LoongArch has the same issue. How about using a fixed register like this?
->>
->> /* GCSR */
->> static __always_inline u64 gcsr_read(u32 reg)
->> {
->>     u64 val = 0;
->>
->>     BUILD_BUG_ON(!__builtin_constant_p(reg));
->>     /* Instructions will be available in binutils later */
->>     asm volatile (
->>         "parse_r __reg, %[val]\n\t"
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index e17be25de6ca..51e75f121234 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -718,7 +718,7 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
+
+  static void kvm_pmu_incr_counter(struct kvm_pmc *pmc)
+  {
+-	pmc->prev_counter = pmc->counter;
++	pmc->prev_counter = pmc->counter & pmc_bitmask(pmc);
+  	pmc->counter = (pmc->counter + 1) & pmc_bitmask(pmc);
+  	kvm_pmu_request_counter_reprogram(pmc);
+  }
+
+Considering that the pmu code uses pmc_bitmask(pmc) everywhere to wrap
+around, I would prefer to use this fix above first and then do a more thorough
+cleanup based on your below diff. What do you think ?
+
+> That previous value is not truncated, so it always evaluates bigger than
+> the truncated new one, and a PMI is injected.  If the PMI handler writes
+> a negative counter value itself, the vCPU never quits the PMI loop.
 > 
-> Isn't this still parse_r-ing things? ;-)
+> Turns out that Linux PMI handler actually does write the counter with
+> the value just read with RDPMC, so when no full-width support is exposed
+> via MSR_IA32_PERF_CAPABILITIES, and the guest initializes the counter to
+> a negative value, it locks up.
+
+Not really sure what the behavioral difference is between "it locks up" and
+"the vCPU never quits the PMI loop".
+
 > 
->>         /*
->>          * read val from guest csr register %[reg]
->>          * gcsrrd %[val], %[reg]
->>          */
->>         ".word 0x5 << 24 | %[reg] << 10 | 0 << 5 | __reg\n\t"
->>         : [val] "+r" (val)
->>         : [reg] "i" (reg)
->>         : "memory");
->>
->>     return val;
->> }
->>
->> /* GCSR */
->> static __always_inline u64 gcsr_read(u32 reg)
->> {
->>          register unsigned long val asm("t0");
+> We observed this in the field, for example, when the guest configures
+> atop to use perfevents and runs two instances of it simultaneously.
+
+A more essential case I found is this:
+
+  kvm_msr: msr_write CTR1 = 0xffffffffffffffea
+  rdpmc on host: CTR1, value 0xffffffffffe3
+  kvm_exit: vcpu 0 reason EXCEPTION_NMI
+  kvm_msr: msr_read CTR1 = 0x83 // nmi_handler
+
+There are two typical issues here:
+- the emulated counter value changed from 0xffffffffffffffffea to 0xffffffffffffe3,
+  triggering __kvm_perf_overflow(pmc, false);
+- PMI-handler should not reset the counter to a value that is easily overflowed,
+  in order to avoid overflow here before iret;
+
+Please confirm whether your usage scenarios consist of these two types, or more.
+
 > 
-> I got what you're trying to accomplish here. At which point you may just refer to how glibc implements its inline syscall templates and hardcode both the input and output arguments, then simply hard-code the whole instruction word. If others don't have opinions about doing things this way, I wouldn't either.
+> To address the problem, maintain the invariant that the counter value
+> always fits in the defined bit width, by truncating the received value
+> in the respective set_msr methods.  For better readability, factor this
+> out into a helper function, pmc_set_counter, shared by vmx and svm
+> parts.
 > 
-> (CSR operations are not expected to become performance-sensitive in any case, so you may freely choose registers here, and t0 for output seems okay. I'd recommend stuffing "reg" to a temporary value bound to a0 though.)
-a0 is ok for me.
+> Fixes: 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions")
+> Signed-off-by: Roman Kagan <rkagan@amazon.de>
 
-riscv has better method than both parse_r helper and using tmp register
-as follows, maybe we can use the similiar method. 
+Tested-by: Like Xu <likexu@tencent.com>
+I prefer to use pmc_bitmask(pmc) to wrap around pmc->prev_counter as the first step.
 
-        .macro insn_r, opcode, func3, func7, rd, rs1, rs2
-        .4byte  ((\opcode << INSN_R_OPCODE_SHIFT) |             \
-                 (\func3 << INSN_R_FUNC3_SHIFT) |               \
-                 (\func7 << INSN_R_FUNC7_SHIFT) |               \
-                 (.L__gpr_num_\rd << INSN_R_RD_SHIFT) |         \
-                 (.L__gpr_num_\rs1 << INSN_R_RS1_SHIFT) |       \
-                 (.L__gpr_num_\rs2 << INSN_R_RS2_SHIFT))
-        .endm
-
-#define HINVAL_VVMA(vaddr, asid)                                \
-        INSN_R(OPCODE_SYSTEM, FUNC3(0), FUNC7(19),              \
-               __RD(0), RS1(vaddr), RS2(asid))
-
-asm volatile(HINVAL_VVMA(%0, %1)
-                        : : "r" (pos), "r" (asid) : "memory");
-
-Regards
-Bibo, Mao
+> ---
+>   arch/x86/kvm/pmu.h           | 6 ++++++
+>   arch/x86/kvm/svm/pmu.c       | 2 +-
+>   arch/x86/kvm/vmx/pmu_intel.c | 4 ++--
+>   3 files changed, 9 insertions(+), 3 deletions(-)
 > 
->>
->>          BUILD_BUG_ON(!__builtin_constant_p(reg));
->>          /* Instructions will be available in binutils later */
->>          asm volatile (
->>                  "parse_r __reg, %[val]\n\t"
->>                  /*
->>                   * read val from guest csr register %[reg]
->>                   * gcsrrd %[val], %[reg]
->>                   */
->>                  ".word 0x5 << 24 | %[reg] << 10 | 0 << 5 | 12 \n\t"
->>                  : : [reg] "i" (reg)
->>                  : "memory", "t0");
->>
->>          return val;
->> }
-> 
-
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index 5c7bbf03b599..6a91e1afef5a 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -60,6 +60,12 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
+>   	return counter & pmc_bitmask(pmc);
+>   }
+>   
+> +static inline void pmc_set_counter(struct kvm_pmc *pmc, u64 val)
+> +{
+> +	pmc->counter += val - pmc_read_counter(pmc);
+> +	pmc->counter &= pmc_bitmask(pmc);
+> +}
+> +
+>   static inline void pmc_release_perf_event(struct kvm_pmc *pmc)
+>   {
+>   	if (pmc->perf_event) {
+> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+> index 5fa939e411d8..f93543d84cfe 100644
+> --- a/arch/x86/kvm/svm/pmu.c
+> +++ b/arch/x86/kvm/svm/pmu.c
+> @@ -151,7 +151,7 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   	/* MSR_PERFCTRn */
+>   	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_COUNTER);
+>   	if (pmc) {
+> -		pmc->counter += data - pmc_read_counter(pmc);
+> +		pmc_set_counter(pmc, data);
+>   		pmc_update_sample_period(pmc);
+>   		return 0;
+>   	}
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 741efe2c497b..51354e3935d4 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -467,11 +467,11 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   			if (!msr_info->host_initiated &&
+>   			    !(msr & MSR_PMC_FULL_WIDTH_BIT))
+>   				data = (s64)(s32)data;
+> -			pmc->counter += data - pmc_read_counter(pmc);
+> +			pmc_set_counter(pmc, data);
+>   			pmc_update_sample_period(pmc);
+>   			break;
+>   		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
+> -			pmc->counter += data - pmc_read_counter(pmc);
+> +			pmc_set_counter(pmc, data);
+>   			pmc_update_sample_period(pmc);
+>   			break;
+>   		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
