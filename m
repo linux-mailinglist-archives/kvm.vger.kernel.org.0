@@ -2,323 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39B2770D12A
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 04:24:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E88770D1CC
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 04:54:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232023AbjEWCYF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 22:24:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42926 "EHLO
+        id S234948AbjEWCya (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 22:54:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229605AbjEWCYD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 22:24:03 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E57F1CA;
-        Mon, 22 May 2023 19:24:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684808641; x=1716344641;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=VtoVt99kVwI5w/Wx4fG+hHvFzF1Q/pSRnjgaGb5NgZw=;
-  b=CeLT5oDIJ/O85mm4rQgjBsA8SbyHU9wI1TGr7Qr3FOX0GqlsSgruBREv
-   ZV1PuVn1QbCympCeOW6/yTnfh3mdFTBgDVSBPVTIwr5ubSykmSIN08OhR
-   Lo2sEVAcs2cImfPpKeQgeAHzySlSd2Vbf5Xoa5S7JVn+BC2V+6JRddJF0
-   VuI+FNiUmNLF0m8Teil8lbLlEUJrnmx3GN1DUw6ctFloQ7lpVX6AIz+pX
-   q2zglTILXqYUL2eWKeYX2ZHy7hBeilsMX+8OsVvESpZs6BevkwtLZsZE8
-   d4+5AFg1pWqufRrbPwlTDVRL5vFsttu23sKbQXNu/9gUjdHNgFgco2q+K
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="439457670"
-X-IronPort-AV: E=Sophos;i="6.00,185,1681196400"; 
-   d="scan'208";a="439457670"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2023 19:24:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="848080658"
-X-IronPort-AV: E=Sophos;i="6.00,185,1681196400"; 
-   d="scan'208";a="848080658"
-Received: from qianwen-mobl1.ccr.corp.intel.com (HELO [10.238.5.200]) ([10.238.5.200])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2023 19:23:58 -0700
-Message-ID: <676b2b3e-b836-4b55-9772-eb6c6db82542@intel.com>
-Date:   Tue, 23 May 2023 10:23:57 +0800
+        with ESMTP id S229605AbjEWCy2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 22:54:28 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 84B45CD;
+        Mon, 22 May 2023 19:54:26 -0700 (PDT)
+Received: from loongson.cn (unknown [10.20.42.170])
+        by gateway (Coremail) with SMTP id _____8Cx_erhKmxkAyYLAA--.18826S3;
+        Tue, 23 May 2023 10:54:25 +0800 (CST)
+Received: from [10.20.42.170] (unknown [10.20.42.170])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8CxqrbfKmxkK9ZvAA--.56532S3;
+        Tue, 23 May 2023 10:54:24 +0800 (CST)
+Message-ID: <1218d3f9-4955-7176-afbd-a0dfa0bd7565@loongson.cn>
+Date:   Tue, 23 May 2023 10:54:23 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v13 002/113] KVM: x86/vmx: Refactor KVM VMX module
- init/exit functions
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>
-References: <cover.1678643051.git.isaku.yamahata@intel.com>
- <e4d32af22f0a540c62fffaa17fe478a723e109ea.1678643052.git.isaku.yamahata@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v10 00/30] Add KVM LoongArch support
 Content-Language: en-US
-From:   "Wen, Qian" <qian.wen@intel.com>
-In-Reply-To: <e4d32af22f0a540c62fffaa17fe478a723e109ea.1678643052.git.isaku.yamahata@intel.com>
+To:     WANG Xuerui <kernel@xen0n.name>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Xi Ruoyao <xry111@xry111.site>,
+        Tianrui Zhao <zhaotianrui@loongson.cn>
+References: <20230515021522.2445551-1-zhaotianrui@loongson.cn>
+ <02f07d8e-e1c2-2ec0-59c3-f5b4ef0463dc@loongson.cn>
+ <4529ee5b-364a-7819-c727-71cf94057b8b@xen0n.name>
+ <99371487-717a-64d6-1c3d-aaeaee6f20db@loongson.cn>
+ <90b2fc60-af26-4ba6-f775-7db2514a62f4@xen0n.name>
+From:   maobibo <maobibo@loongson.cn>
+In-Reply-To: <90b2fc60-af26-4ba6-f775-7db2514a62f4@xen0n.name>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8CxqrbfKmxkK9ZvAA--.56532S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjvJXoWxCw17XFWUJrWktF4xJFWrXwb_yoWrJFyDpa
+        y5uF4akF4vgFnYkwnFyr48u34akrWxGrW5Zr98Kwn7u3Z8AryxKr17tFs0kas8J3Z3CF1Y
+        qr4UtF1UCF4UA3DanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+        qI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUIcSsGvfJTRUUU
+        bq8YFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s
+        1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+        wVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4
+        x0Y4vEx4A2jsIE14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJwAa
+        w2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44
+        I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2
+        jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62
+        AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCa
+        FVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
+        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
+        42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42
+        IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280
+        aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/13/2023 1:55 AM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> Currently, KVM VMX module initialization/exit functions are a single
-> function each.  Refactor KVM VMX module initialization functions into KVM
-> common part and VMX part so that TDX specific part can be added cleanly.
-> Opportunistically refactor module exit function as well.
-> 
-> The current module initialization flow is,
-> 0.) Check if VMX is supported,
-> 1.) hyper-v specific initialization,
-> 2.) system-wide x86 specific and vendor specific initialization,
-> 3.) Final VMX specific system-wide initialization,
-> 4.) calculate the sizes of VMX kvm structure and VMX vcpu structure,
-> 5.) report those sizes to the KVM common layer and KVM common
->     initialization
-> 
-> Refactor the KVM VMX module initialization function into functions with a
-> wrapper function to separate VMX logic in vmx.c from a file, main.c, common
-> among VMX and TDX.  Introduce a wrapper function for vmx_init().
-> 
-> The KVM architecture common layer allocates struct kvm with reported size
-> for architecture-specific code.  The KVM VMX module defines its structure
-> as struct vmx_kvm { struct kvm; VMX specific members;} and uses it as
-> struct vmx kvm.  Similar for vcpu structure. TDX KVM patches will define
-> TDX specific kvm and vcpu structures.
-> 
-> The current module exit function is also a single function, a combination
-> of VMX specific logic and common KVM logic.  Refactor it into VMX specific
-> logic and KVM common logic.  This is just refactoring to keep the VMX
-> specific logic in vmx.c from main.c.
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/kvm/vmx/main.c    | 51 +++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/vmx.c     | 54 +++++---------------------------------
->  arch/x86/kvm/vmx/x86_ops.h | 13 ++++++++-
->  3 files changed, 69 insertions(+), 49 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index a59559ff140e..3f49e8e38b6b 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -165,3 +165,54 @@ struct kvm_x86_init_ops vt_init_ops __initdata = {
->  	.runtime_ops = &vt_x86_ops,
->  	.pmu_ops = &intel_pmu_ops,
->  };
-> +
-> +static int __init vt_init(void)
-> +{
-> +	unsigned int vcpu_size, vcpu_align;
-> +	int r;
-> +
-> +	if (!kvm_is_vmx_supported())
-> +		return -EOPNOTSUPP;
-> +
-> +	/*
-> +	 * Note, hv_init_evmcs() touches only VMX knobs, i.e. there's nothing
-> +	 * to unwind if a later step fails.
-> +	 */
-> +	hv_init_evmcs();
-> +
-> +	r = kvm_x86_vendor_init(&vt_init_ops);
-> +	if (r)
-> +		return r;
-> +
-> +	r = vmx_init();
-> +	if (r)
-> +		goto err_vmx_init;
-> +
-> +	/*
-> +	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
-> +	 * exposed to userspace!
-> +	 */
-> +	vt_x86_ops.vm_size = sizeof(struct kvm_vmx);
-
-nit: why initialize vm_size again? I noticed that it has already been assigned a value when create vt_x86_ops.
-
-+struct kvm_x86_ops vt_x86_ops __initdata = {
-...
-+	.vm_size = sizeof(struct kvm_vmx),
-+	.vm_init = vmx_vm_init,
 
 
-> +	vcpu_size = sizeof(struct vcpu_vmx);
-> +	vcpu_align = __alignof__(struct vcpu_vmx);
-> +	r = kvm_init(vcpu_size, vcpu_align, THIS_MODULE);
-> +	if (r)
-> +		goto err_kvm_init;
-> +
-> +	return 0;
-> +
-> +err_kvm_init:
-> +	vmx_exit();
-> +err_vmx_init:
-> +	kvm_x86_vendor_exit();
-> +	return r;
-> +}
-> +module_init(vt_init);
-> +
-> +static void vt_exit(void)
-> +{
-> +	kvm_exit();
-> +	kvm_x86_vendor_exit();
-> +	vmx_exit();
-> +}
-> +module_exit(vt_exit);
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 47a9a647ae3a..3bbd07412f00 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -553,7 +553,7 @@ static int hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> -static __init void hv_init_evmcs(void)
-> +__init void hv_init_evmcs(void)
->  {
->  	int cpu;
->  
-> @@ -589,7 +589,7 @@ static __init void hv_init_evmcs(void)
->  	}
->  }
->  
-> -static void hv_reset_evmcs(void)
-> +void hv_reset_evmcs(void)
->  {
->  	struct hv_vp_assist_page *vp_ap;
->  
-> @@ -613,10 +613,6 @@ static void hv_reset_evmcs(void)
->  	vp_ap->current_nested_vmcs = 0;
->  	vp_ap->enlighten_vmentry = 0;
->  }
-> -
-> -#else /* IS_ENABLED(CONFIG_HYPERV) */
-> -static void hv_init_evmcs(void) {}
-> -static void hv_reset_evmcs(void) {}
->  #endif /* IS_ENABLED(CONFIG_HYPERV) */
->  
->  /*
-> @@ -2741,7 +2737,7 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->  	return 0;
->  }
->  
-> -static bool kvm_is_vmx_supported(void)
-> +bool kvm_is_vmx_supported(void)
->  {
->  	int cpu = raw_smp_processor_id();
->  
-> @@ -8381,7 +8377,7 @@ static void vmx_cleanup_l1d_flush(void)
->  	l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_AUTO;
->  }
->  
-> -static void __vmx_exit(void)
-> +void vmx_exit(void)
->  {
->  	allow_smaller_maxphyaddr = false;
->  
-> @@ -8392,32 +8388,10 @@ static void __vmx_exit(void)
->  	vmx_cleanup_l1d_flush();
->  }
->  
-> -static void vmx_exit(void)
-> -{
-> -	kvm_exit();
-> -	kvm_x86_vendor_exit();
-> -
-> -	__vmx_exit();
-> -}
-> -module_exit(vmx_exit);
-> -
-> -static int __init vmx_init(void)
-> +int __init vmx_init(void)
->  {
->  	int r, cpu;
->  
-> -	if (!kvm_is_vmx_supported())
-> -		return -EOPNOTSUPP;
-> -
-> -	/*
-> -	 * Note, hv_init_evmcs() touches only VMX knobs, i.e. there's nothing
-> -	 * to unwind if a later step fails.
-> -	 */
-> -	hv_init_evmcs();
-> -
-> -	r = kvm_x86_vendor_init(&vt_init_ops);
-> -	if (r)
-> -		return r;
-> -
->  	/*
->  	 * Must be called after common x86 init so enable_ept is properly set
->  	 * up. Hand the parameter mitigation value in which was stored in
-> @@ -8427,7 +8401,7 @@ static int __init vmx_init(void)
->  	 */
->  	r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);
->  	if (r)
-> -		goto err_l1d_flush;
-> +		return r;
->  
->  	vmx_setup_fb_clear_ctrl();
->  
-> @@ -8451,21 +8425,5 @@ static int __init vmx_init(void)
->  	if (!enable_ept)
->  		allow_smaller_maxphyaddr = true;
->  
-> -	/*
-> -	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
-> -	 * exposed to userspace!
-> -	 */
-> -	r = kvm_init(sizeof(struct vcpu_vmx), __alignof__(struct vcpu_vmx),
-> -		     THIS_MODULE);
-> -	if (r)
-> -		goto err_kvm_init;
-> -
->  	return 0;
-> -
-> -err_kvm_init:
-> -	__vmx_exit();
-> -err_l1d_flush:
-> -	kvm_x86_vendor_exit();
-> -	return r;
->  }
-> -module_init(vmx_init);
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index e9ec4d259ff5..051b5c4b5c2f 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -8,11 +8,22 @@
->  
->  #include "x86.h"
->  
-> -__init int vmx_hardware_setup(void);
-> +#if IS_ENABLED(CONFIG_HYPERV)
-> +__init void hv_init_evmcs(void);
-> +void hv_reset_evmcs(void);
-> +#else /* IS_ENABLED(CONFIG_HYPERV) */
-> +static inline void hv_init_evmcs(void) {}
-> +static inline void hv_reset_evmcs(void) {}
-> +#endif /* IS_ENABLED(CONFIG_HYPERV) */
-> +
-> +bool kvm_is_vmx_supported(void);
-> +int __init vmx_init(void);
-> +void vmx_exit(void);
->  
->  extern struct kvm_x86_ops vt_x86_ops __initdata;
->  extern struct kvm_x86_init_ops vt_init_ops __initdata;
->  
-> +__init int vmx_hardware_setup(void);
->  void vmx_hardware_unsetup(void);
->  int vmx_check_processor_compat(void);
->  int vmx_hardware_enable(void);
+在 2023/5/22 10:37, WANG Xuerui 写道:
+> On 2023/5/22 09:39, maobibo wrote:
+>>
+>>
+>> 在 2023/5/21 18:22, WANG Xuerui 写道:
+>>> On 2023/5/18 10:56, maobibo wrote:
+>>>> <snip>
+>>> (BTW, how do people usually deal with pre-release hardware wit documentation not out yet? I suppose similar situations like this should turn up fairly often.)
+>> Manual is actually one issue, however it does not prevent the review
+>> process. There are some drivers for *fruit* devices, I can not find
+>> the hw manual also.  With the manual, it helps to review and points
+>> out the further and detailed issues.
+> 
+> There's a *slight* difference: the certain vendor you've mentioned is historically uncooperative in providing the documentation, so outside contributors had to reverse-engineer and document the HW themselves; but in Loongson's case, you *are* the vendor, so you are probably in a position that can make everyone's life easier by at least pushing for the docs release...
+> 
+>>>
+>>> Aside from this, there's another point: use of undocumented instructions in raw form with ".word". This currently doesn't work in LLVM/Clang <snip>
+>> As for one new architecture, it is normal to use .word or .insn, instruction
+>> will update for the first few years and also compiler may be not supported
+>> timely. The other arch has the same phenomenon if you grep "\.insn", also
+>> llvm on LoongArch supports ".word" directives.
+>>
+>> After three or five years, we will remove these ".insn" macro when hw and
+>> compiler is matured.
+> 
+> Sorry for the confusion at my side; `.word` certainly works, what doesn't work currently seems to be the `parse_r` helper. I know because I've tried in the last week with latest LLVM/Clang snapshot. And you can't write ergonomic inline asm with proper register allocator awareness without the helper; the LoongArch assembler isn't capable of assembling in a certain encoding format. With RISC-V `.insn` you can do things like `.insn r 0xNN, 0, 0, a0, a1, a2`, but you cannot simply e.g. express gcsrxchg with `.insn DJK 0x05000000, a0, a1, a2` because no such instruction format convention has been standardized. (The notation demonstrated here is taken from [1].)
+
+I hate parse_r helper also, it is hard to understand, the kernel about
+LoongArch has the same issue. How about using a fixed register like this?
+
+/* GCSR */
+static __always_inline u64 gcsr_read(u32 reg)
+{
+	u64 val = 0;
+
+	BUILD_BUG_ON(!__builtin_constant_p(reg));
+	/* Instructions will be available in binutils later */
+	asm volatile (
+		"parse_r __reg, %[val]\n\t"
+		/*
+		 * read val from guest csr register %[reg]
+		 * gcsrrd %[val], %[reg]
+		 */
+		".word 0x5 << 24 | %[reg] << 10 | 0 << 5 | __reg\n\t"
+		: [val] "+r" (val)
+		: [reg] "i" (reg)
+		: "memory");
+
+	return val;
+}
+
+/* GCSR */
+static __always_inline u64 gcsr_read(u32 reg)
+{
+        register unsigned long val asm("t0");
+
+        BUILD_BUG_ON(!__builtin_constant_p(reg));
+        /* Instructions will be available in binutils later */
+        asm volatile (
+                "parse_r __reg, %[val]\n\t"
+                /*
+                 * read val from guest csr register %[reg]
+                 * gcsrrd %[val], %[reg]
+                 */
+                ".word 0x5 << 24 | %[reg] << 10 | 0 << 5 | 12 \n\t"
+                : : [reg] "i" (reg)
+                : "memory", "t0");
+
+        return val;
+} 
+
+Regards
+Bibo, Mao
+> 
+> In any case, it seems best to at least wait for the documentation release a little bit, or you should state clearly that this is not going to happen soon, so people can properly manage their expectation and prioritize. (For example, if I know docs and/or assembler support for the virtualization extension won't come soon, then I'd work on supporting the .word idiom before other things. Otherwise there are more important things than that.)
+> 
+> [1]: https://github.com/loongson/LoongArch-Documentation/pull/56
+> 
+
