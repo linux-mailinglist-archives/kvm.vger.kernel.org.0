@@ -2,113 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD21C70D815
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 10:57:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B96970D817
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 10:57:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236263AbjEWI5B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 04:57:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59730 "EHLO
+        id S236126AbjEWI5f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 04:57:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236282AbjEWI44 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 04:56:56 -0400
-Received: from out-9.mta1.migadu.com (out-9.mta1.migadu.com [IPv6:2001:41d0:203:375::9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 378B81AE
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 01:56:48 -0700 (PDT)
-Date:   Tue, 23 May 2023 10:56:44 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1684832206;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mhkXWgYiS8Hz3Uk2/X30NQOxC9rX5wg51csdd7FMa/8=;
-        b=SsZPhqvg5FRyKtB7x1ICyzlnewzJqqzg8OJILuFVNSoqjnkHDdkU6/dlsD+umieh/7lsHD
-        Ltxy3FHmSI/6PlBczVhEP1ZYke1hZA7gx7mx1974x/asCn+ZVrwJgVIa7TPvfNDYGSARz0
-        iSJ9ozez25DjItLKz4lk8R0ra/xQZNs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, luc.maranget@inria.fr
-Subject: Re: [kvm-unit-tests PATCH] arm64: Make vector_table and vector_stub
- weak symbols
-Message-ID: <20230523-3729e940652cc3b2b753cb8d@orel>
-References: <20230515221517.646549-1-nikos.nikoleris@arm.com>
- <20230518-d8bd66e7bf671f5df706a216@orel>
- <032397f4-62d2-add3-f7d5-0377e125454a@arm.com>
+        with ESMTP id S235827AbjEWI5e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 04:57:34 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F14FE;
+        Tue, 23 May 2023 01:57:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684832235; x=1716368235;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=gjnZNYuN0DQXDMokaWqCY+V7fdoox9RByiFn9jusGLc=;
+  b=De3MTQavuttO+6v+E0isxhgIUldWJ1PH1BoduqRhvGZvHvdwZ9MhzpOO
+   iqGpgSkwNfr+al3yfN6AWkvsJikgvYJz6qD4n692NXoZOGItwOHcWPYaI
+   p2Hs+JaI5ANo8u9DSZXOUi0TiZuZw3ohrH5BFNlac1f4/OLmcGAtNT2zL
+   p6ZszbHVJ/1GqZVSqWEzpEtOt2XoCFsQD2yHS7mKmlzEOokrJm3atr891
+   GvZjg3FCjX/7ro3BSI4Mn68CLV4fMjTbSlC3bvIglgZ0CyqxaHxcmtctA
+   THu6dwpvshRYlrrIgWays9RQwqCSQsjsHUlikcA2HUT+iRvsLillgufMS
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="439533963"
+X-IronPort-AV: E=Sophos;i="6.00,185,1681196400"; 
+   d="scan'208";a="439533963"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2023 01:57:13 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10718"; a="681308768"
+X-IronPort-AV: E=Sophos;i="6.00,185,1681196400"; 
+   d="scan'208";a="681308768"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.255.29.223]) ([10.255.29.223])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2023 01:57:11 -0700
+Message-ID: <98bbc70e-7566-36fa-98e2-5bf5a97d682c@linux.intel.com>
+Date:   Tue, 23 May 2023 16:57:09 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <032397f4-62d2-add3-f7d5-0377e125454a@arm.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [PATCH v3 14/21] KVM:VMX: Add a synthetic MSR to allow userspace
+ to access GUEST_SSP
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        rppt@kernel.org, rick.p.edgecombe@intel.com, john.allen@amd.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20230511040857.6094-1-weijiang.yang@intel.com>
+ <20230511040857.6094-15-weijiang.yang@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230511040857.6094-15-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 22, 2023 at 02:54:14PM +0100, Nikos Nikoleris wrote:
-> On 18/05/2023 17:06, Andrew Jones wrote:
-> > On Mon, May 15, 2023 at 11:15:17PM +0100, Nikos Nikoleris wrote:
-> > > This changes allows a test to define and override the declared symbols,
-> > > taking control of the whole vector_table or a vector_stub.
-> > 
-> > Hi Nikos,
-> > 
-> > Can you add some motivation for this change to the commit message or
-> > submit it along with some test that needs it?
-> > 
-> 
-> Hi Drew,
-> 
-> Thanks for reviewing this.
-> 
-> What do you think about adding the following to the commit message?
-> 
-> > With the ability to override specific exception handlers, litmus7
-> > [1] a tool used to generate c sources for a given memory model
-> > litmus test, can override the el1h_sync symbol to implement tests
-> > with explicit exception handlers. For example:
-> > 
-> > AArch64 LDRv0+I2V-dsb.ishst
-> > { >   [PTE(x)]=(oa:PA(x),valid:0);
-> >   x=1;
-> > 
-> >   0:X1=x;
-> >   0:X3=PTE(x); >   0:X2=(oa:PA(x),valid:1);
-> > }>  P0          | P0.F         ;
-> > L0:          | ADD X8,X8,#1 ;
-> >  LDR W0,[X1] | STR X2,[X3]  ;
-> >              | DSB ISHST    ;
-> >              | ERET         ; > exists(0:X0=0 \/ 0:X8!=1)
-> > 
-> > In this test, a thread running in core P0 executes a load to a memory
-> > location x. The PTE of the virtual address x is initially invalid.
-> > The execution of the load causes a synchronous EL1 exception which is
-> > handled by the code in P0.F. P0.F increments a counter which is
-> > maintained in X8, updates the PTE of x and makes it valid, executes a
-> > DSB ISHST and calls ERET which is expected to return and retry the
-> > execution of the load in P0:L0.
-> > 
-> > The postcondition checks if there is any execution where the load wasn't
-> > executed (X0 its destination register is not update), or that the P0.F >
-> > handler was invoked more than once (the counter X8 is not 1).
-> > 
-> > For this tests, litmus7 needs to control the el1h_sync. Calling
-> > install_exception_handler() would be suboptimal because the vector_stub
-> > would wrap around the code of P0.F and disturb the test.
-> > 
-> > [1]: https://diy.inria.fr/doc/litmus.html
-> If you think this is sufficient, I will update the patch.
 
-The above works for me.
 
-(Unrelated: Sorry I haven't had a chance to give your latest efi branch
-a test drive. I think you can probably go ahead and post the next version
-of the series, though. That'll help bring it to the forefront for me to
-prioritize.)
+On 5/11/2023 12:08 PM, Yang Weijiang wrote:
+> Introduce a host-only synthetic MSR, MSR_KVM_GUEST_SSP, so that the VMM
+> can read/write the guest's SSP, e.g. to migrate CET state.  Use a synthetic
+> MSR, e.g. as opposed to a VCPU_REG_, as GUEST_SSP is subject to the same
+> consistency checks as the PL*_SSP MSRs, i.e. can share code.
+>
+> Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>   arch/x86/include/uapi/asm/kvm_para.h |  1 +
+>   arch/x86/kvm/vmx/vmx.c               | 15 ++++++++++++---
+>   arch/x86/kvm/x86.c                   |  4 ++++
+>   3 files changed, 17 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+> index 6e64b27b2c1e..7af465e4e0bd 100644
+> --- a/arch/x86/include/uapi/asm/kvm_para.h
+> +++ b/arch/x86/include/uapi/asm/kvm_para.h
+> @@ -58,6 +58,7 @@
+>   #define MSR_KVM_ASYNC_PF_INT	0x4b564d06
+>   #define MSR_KVM_ASYNC_PF_ACK	0x4b564d07
+>   #define MSR_KVM_MIGRATION_CONTROL	0x4b564d08
+> +#define MSR_KVM_GUEST_SSP	0x4b564d09
+>   
+>   struct kvm_steal_time {
+>   	__u64 steal;
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 0ccaa467d7d3..72149156bbd3 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2095,9 +2095,13 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		break;
+>   	case MSR_IA32_U_CET:
+>   	case MSR_IA32_PL3_SSP:
+> +	case MSR_KVM_GUEST_SSP:
+>   		if (!kvm_cet_is_msr_accessible(vcpu, msr_info))
+>   			return 1;
+> -		kvm_get_xsave_msr(msr_info);
+> +		if (msr_info->index == MSR_KVM_GUEST_SSP)
+> +			msr_info->data = vmcs_readl(GUEST_SSP);
+According to the change of the kvm_cet_is_msr_accessible() below,
+kvm_cet_is_msr_accessible() will return false for MSR_KVM_GUEST_SSP, 
+then this code is unreachable?
 
-Thanks,
-drew
+> +		else
+> +			kvm_get_xsave_msr(msr_info);
+>   		break;
+>   	case MSR_IA32_DEBUGCTLMSR:
+>   		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> @@ -2413,15 +2417,20 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		break;
+>   	case MSR_IA32_U_CET:
+>   	case MSR_IA32_PL3_SSP:
+> +	case MSR_KVM_GUEST_SSP:
+>   		if (!kvm_cet_is_msr_accessible(vcpu, msr_info))
+>   			return 1;
+>   		if (is_noncanonical_address(data, vcpu))
+>   			return 1;
+>   		if (msr_index == MSR_IA32_U_CET && (data & GENMASK(9, 6)))
+>   			return 1;
+> -		if (msr_index == MSR_IA32_PL3_SSP && (data & GENMASK(2, 0)))
+> +		if ((msr_index == MSR_IA32_PL3_SSP ||
+> +		     msr_index == MSR_KVM_GUEST_SSP) && (data & GENMASK(2, 0)))
+>   			return 1;
+> -		kvm_set_xsave_msr(msr_info);
+> +		if (msr_index == MSR_KVM_GUEST_SSP)
+> +			vmcs_writel(GUEST_SSP, data);
+> +		else
+> +			kvm_set_xsave_msr(msr_info);
+>   		break;
+>   	case MSR_IA32_PERF_CAPABILITIES:
+>   		if (data && !vcpu_to_pmu(vcpu)->version)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2e3a39c9297c..baac6acebd40 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -13642,6 +13642,10 @@ bool kvm_cet_is_msr_accessible(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>   	    !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
+>   		return false;
+>   
+> +	/* The synthetic MSR is for userspace access only. */
+> +	if (msr->index == MSR_KVM_GUEST_SSP)
+> +		return false;
+> +
+>   	if (msr->index == MSR_IA32_PL3_SSP &&
+>   	    !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
+>   		return false;
+
