@@ -2,36 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BDAC70D089
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 03:34:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C44F670D092
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 03:35:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234909AbjEWBeZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 May 2023 21:34:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50178 "EHLO
+        id S233022AbjEWBff (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 May 2023 21:35:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232046AbjEWBeX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 May 2023 21:34:23 -0400
+        with ESMTP id S235097AbjEWBfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 May 2023 21:35:09 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 445868E;
-        Mon, 22 May 2023 18:34:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC75E9E;
+        Mon, 22 May 2023 18:35:08 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 79B4662D89;
-        Tue, 23 May 2023 01:34:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13F37C433EF;
-        Tue, 23 May 2023 01:34:18 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2493162D90;
+        Tue, 23 May 2023 01:35:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDDFFC433D2;
+        Tue, 23 May 2023 01:35:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684805660;
-        bh=BmXuXL/UqVGFg/YhKou0jzuTdayluGE9Gf9Xkd6BVDg=;
+        s=k20201202; t=1684805707;
+        bh=ZVMZMDyY6PGeWLHzzzIJkAPjAJ4vdQOwm8Dt6MaAg4s=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VfscvJfn2ijg4fxrfryZM+rU1I0wnEP4MwW1JE7SHohU7DE9kVcS4HjalgALAffN7
-         8d3CKw/1b4BibMj/OUI75yQbJGV5kDG8GAs28Y/i/LwoUTP43GmqVQiin9IEBL7JT+
-         Xmz1mTEKTvhmGB7FPfUDnTcYPIfjOHqoBp7H+ZE4I80oyDsXaUFeXuZXZGUVinrSTf
-         SFkCl0DqANpM+H5LZz7G2s0dorWeznI8JXT0BmR3lkJMtRGu7o4ICJLS7QaFsACoR2
-         bDsXg84vGUHdtQZ1C4lvtpAQzHyZZmdApp6/9eVz3rt80/+kYS/y8ZMtoiTbAqsfLr
-         sJD7l6zWlkVNA==
-Date:   Mon, 22 May 2023 19:35:12 -0600
+        b=qKNIA0kdKj7tAvK2gRaXubxah2TuEOe4R60oz9LFjX5XtltGDbZh/dElX5UrODlWQ
+         96ti7dPfXUF5sBC6KfECWZLqEVHvqIOha3ZjDDE5qxy6zyLybP80e9Kh+PSOQr4Bbr
+         2s3vbccXWZ8VxznWOUzBsOznhssnAerPySzO5+a+ca9n29gvCR0vkoTaSOiLMACwE+
+         pgRpSmESYc559R8moYJ2qtlDgboB/EkoXI7qElZwEi9sDX8cyMcM/BwS2J8FU8QtdR
+         XiJ7uYl+B9my4O5b0LCRRlCtKVGMBfZoCj7GNfNPW4TiLDsIJwTS69P8QgKWe1SLmL
+         UoD4+02u+dQhA==
+Date:   Mon, 22 May 2023 19:35:59 -0600
 From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
 To:     Eric Farman <farman@linux.ibm.com>,
         Matthew Rosato <mjrosato@linux.ibm.com>,
@@ -47,9 +47,8 @@ Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Gustavo A. R. Silva" <gustavoars@kernel.org>,
         linux-hardening@vger.kernel.org
-Subject: [PATCH 1/2][next] vfio/ccw: Replace one-element array with
- flexible-array member
-Message-ID: <3c10549ebe1564eade68a2515bde233527376971.1684805398.git.gustavoars@kernel.org>
+Subject: [PATCH 2/2][next] vfio/ccw: Use struct_size() helper
+Message-ID: <f657276073630e806e69726a40ad1cc85101448a.1684805398.git.gustavoars@kernel.org>
 References: <cover.1684805398.git.gustavoars@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -65,46 +64,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-One-element arrays are deprecated, and we are replacing them with flexible
-array members instead. So, replace one-element array with flexible-array
-member in struct vfio_ccw_parent and refactor the the rest of the code
-accordingly.
+Prefer struct_size() over open-coded versions.
 
-Link: https://github.com/KSPP/linux/issues/79
-Link: https://github.com/KSPP/linux/issues/297
+Link: https://github.com/KSPP/linux/issues/160
 Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 ---
- drivers/s390/cio/vfio_ccw_drv.c     | 3 ++-
- drivers/s390/cio/vfio_ccw_private.h | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ drivers/s390/cio/vfio_ccw_drv.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index ff538a086fc7..57906a9c6324 100644
+index 57906a9c6324..43601816ea4e 100644
 --- a/drivers/s390/cio/vfio_ccw_drv.c
 +++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -171,7 +171,8 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+@@ -171,8 +171,7 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
  		return -ENODEV;
  	}
  
--	parent = kzalloc(sizeof(*parent), GFP_KERNEL);
-+	parent = kzalloc(sizeof(*parent) + sizeof(struct mdev_type *),
-+			 GFP_KERNEL);
+-	parent = kzalloc(sizeof(*parent) + sizeof(struct mdev_type *),
+-			 GFP_KERNEL);
++	parent = kzalloc(struct_size(parent, mdev_types, 1), GFP_KERNEL);
  	if (!parent)
  		return -ENOMEM;
  
-diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-index b441ae6700fd..b62bbc5c6376 100644
---- a/drivers/s390/cio/vfio_ccw_private.h
-+++ b/drivers/s390/cio/vfio_ccw_private.h
-@@ -79,7 +79,7 @@ struct vfio_ccw_parent {
- 
- 	struct mdev_parent	parent;
- 	struct mdev_type	mdev_type;
--	struct mdev_type	*mdev_types[1];
-+	struct mdev_type	*mdev_types[];
- };
- 
- /**
 -- 
 2.34.1
 
