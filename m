@@ -2,65 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F29C70E1C7
-	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 18:29:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B2B670E22B
+	for <lists+kvm@lfdr.de>; Tue, 23 May 2023 18:49:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235559AbjEWQW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 12:22:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40346 "EHLO
+        id S237422AbjEWQeY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 12:34:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237711AbjEWQWy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 12:22:54 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28A361B1
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 09:22:44 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1ae4a0b5a90so41505765ad.1
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 09:22:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684858963; x=1687450963;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PNHCUppAMmM7GKqBt6zRAnVXYLdUPmYe/rZeobiUH1Q=;
-        b=jHL3C/UhRc3qi7X4MyIUymwIPYodJSqI4yGXsntiUc0MEBkBVJRC87BiHc39UqRMxt
-         R2xvDs0GDsx/JsQYjEhwRvp3iXDy4X1qQWO/Bd+ns9o/E/zzgntOWyctNx07AHz4qBWL
-         2nUKMCVfuTn+L66Pu6lQNWiX3HO2pJR9glXVbuRbVEYPEM704kHzX4GKQKExxn0OQLGu
-         d5F1rRA1tfdhU6ETh/EsaPdFi1jXqeoBOti513crKKBPZYjPcRYS1ezbVnpNs4M/QpNU
-         LRaIG0ItpIUjy7CTW3wTDe0YXKoc1lAmbkirctmjPPh48IiQ0wsVu3Qi55Fc8YJRgHDA
-         X75g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684858963; x=1687450963;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PNHCUppAMmM7GKqBt6zRAnVXYLdUPmYe/rZeobiUH1Q=;
-        b=A4k/M4RwIdvBzANIiCze9/1KaJf7EGzc2lsJYfI7B3kgK4m3iYtWUjBpwzgzllAzYE
-         V8GJB8+cIXQZ52C3sV3JL2FN29mYNHui+8NEL/g1b/Tfgh7Qphdkf4dS+afIGSzb9D8s
-         pszVRSblscxQO2/7ytMg2gfpYIc815lnLy0WAcDer0NKvxE26TKtrzFNR+PNg5auJTrU
-         QM0XAdV8nP2kEa08lpFLItVIjzdCGL9npfjJ8KxluihHT1Y1FSJD0wGWyMJegztgjU6X
-         RrwduAODOPuvvIQNE4jSiokRyOQRgj0D7jdC6eEqU50XJw6Roz7LvIk0drkj0cY9uUAj
-         aQIA==
-X-Gm-Message-State: AC+VfDwc8t9D4+yQoA2Dvt09FHUU2K9rih1wA8LvPmISVygmCAdfkNbT
-        I+u7iSwD4VdJ0b7ERAvGNqMglNTVMEI=
-X-Google-Smtp-Source: ACHHUZ70ulYSvy715Dw24df5yN2+4BwEyc2z7ZpRFKwrErIeMvjnOZV1O2habwLrj9F7E6WGvpgbKnpcVnk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:7c4:b0:1ac:618c:a703 with SMTP id
- ko4-20020a17090307c400b001ac618ca703mr3559477plb.10.1684858963641; Tue, 23
- May 2023 09:22:43 -0700 (PDT)
-Date:   Tue, 23 May 2023 09:22:41 -0700
-In-Reply-To: <f023d927-52aa-7e08-2ee5-59a2fbc65953@gameservers.com>
-Mime-Version: 1.0
-References: <f023d927-52aa-7e08-2ee5-59a2fbc65953@gameservers.com>
-Message-ID: <ZGzoUZLpPopkgvM0@google.com>
-Subject: Re: Deadlock due to EPT_VIOLATION
-From:   Sean Christopherson <seanjc@google.com>
-To:     brak@gameservers.com
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="iso-8859-1"
+        with ESMTP id S236334AbjEWQeV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 12:34:21 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64C0DC2;
+        Tue, 23 May 2023 09:34:05 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34NFpH8E029591;
+        Tue, 23 May 2023 16:33:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=yLQUjASuD0Wzz5ADqgfqMAhs+2Y8p1wr3eeG8IYvX74=;
+ b=s/X/T9RNu/ayUnMW5BVA8OU8elWdAQGYll0z9DZ3STopDBIazbSn8f7LKgsjy8SwQxuO
+ SPrKM4B7Vm4FqHD8WdOwn28a2+fPoaUX2BrM/49gSfBXbVs4kcvYGEabULqmKJJ/Uukk
+ Jc6RlnGAiItAOFcGH8MnMW0Jg6ggmwxI/U0AJL6QdJa5dl63/zIuMcNncld5bv/lqI2a
+ DPdUiKozejevP32CMZiVt53j91U39WvGLMWrEeNXLkGzZOgGuUozD1GBq21Vxoxs+hs3
+ 74/6C0fRnIsqiwkzPC0ec9xyXpu0+YTuQck78Devw0IADWi22eAullhm62rx73wRTQHm aA== 
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qs0gc0ypc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 May 2023 16:33:58 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34NEHcAH030404;
+        Tue, 23 May 2023 16:33:58 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([9.208.129.120])
+        by ppma04dal.us.ibm.com (PPS) with ESMTPS id 3qppcd3y7f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 May 2023 16:33:57 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+        by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34NGXt1E63439306
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 23 May 2023 16:33:56 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC78A58056;
+        Tue, 23 May 2023 16:33:55 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC3EF58052;
+        Tue, 23 May 2023 16:33:54 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.95.28])
+        by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 23 May 2023 16:33:54 +0000 (GMT)
+Message-ID: <fa2905e329f2e723228eb4750b305ae54be2a1ad.camel@linux.ibm.com>
+Subject: Re: [PATCH 1/2][next] vfio/ccw: Replace one-element array with
+ flexible-array member
+From:   Eric Farman <farman@linux.ibm.com>
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Date:   Tue, 23 May 2023 12:33:54 -0400
+In-Reply-To: <3c10549ebe1564eade68a2515bde233527376971.1684805398.git.gustavoars@kernel.org>
+References: <cover.1684805398.git.gustavoars@kernel.org>
+         <3c10549ebe1564eade68a2515bde233527376971.1684805398.git.gustavoars@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 0Ei0tlkdwj_V9c4MJxUtPHDu7Z6hbHnT
+X-Proofpoint-GUID: 0Ei0tlkdwj_V9c4MJxUtPHDu7Z6hbHnT
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-05-23_10,2023-05-23_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
+ malwarescore=0 mlxlogscore=763 priorityscore=1501 impostorscore=0
+ mlxscore=0 spamscore=0 clxscore=1011 suspectscore=0 lowpriorityscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2305230132
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,326 +95,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Nit, this isn't deadlock.  It may or may not even be a livelock AFAICT.  Th=
-e vCPUs
-are simply stuck and not making forward progress, _why_ they aren't making =
-forward
-progress is unknown at this point (obviously :-) ).
+On Mon, 2023-05-22 at 19:35 -0600, Gustavo A. R. Silva wrote:
+> One-element arrays are deprecated, and we are replacing them with
+> flexible
+> array members instead. So, replace one-element array with flexible-
+> array
+> member in struct vfio_ccw_parent and refactor the the rest of the
 
-On Tue, May 23, 2023, Brian Rak wrote:
-> We've been hitting an issue lately where KVM guests (w/ qemu) have been
-> getting stuck in a loop of EPT_VIOLATIONs, and end up requiring a guest
-> reboot to fix.
->=20
-> On Intel machines the trace ends up looking like:
->=20
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465404: kvm_entry:=
-=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD vcpu 1, rip
-> 0xffffffffc0771aa2
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465405: kvm_exit:=
-=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD reason
-> EPT_VIOLATION rip 0xffffffffc0771aa2 info 683 800000ec
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465405: kvm_page_fa=
-ult:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD vcpu 1 rip
-> 0xffffffffc0771aa2 address 0x0000000002594fe0 error_code 0x683
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465406: kvm_inj_vir=
-q:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD =
-IRQ 0xec
-> [reinjected]
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465406: kvm_entry:=
-=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD vcpu 1, rip
-> 0xffffffffc0771aa2
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465407: kvm_exit:=
-=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD reason
-> EPT_VIOLATION rip 0xffffffffc0771aa2 info 683 800000ec
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465407: kvm_page_fa=
-ult:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD vcpu 1 rip
-> 0xffffffffc0771aa2 address 0x0000000002594fe0 error_code 0x683
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465408: kvm_inj_vir=
-q:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD =
-IRQ 0xec
-> [reinjected]
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465408: kvm_entry:=
-=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD vcpu 1, rip
-> 0xffffffffc0771aa2
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465409: kvm_exit:=
-=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD reason
-> EPT_VIOLATION rip 0xffffffffc0771aa2 info 683 800000ec
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465410: kvm_page_fa=
-ult:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD vcpu 1 rip
-> 0xffffffffc0771aa2 address 0x0000000002594fe0 error_code 0x683
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465410: kvm_inj_vir=
-q:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD =
-IRQ 0xec
-> [reinjected]
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465410: kvm_entry:=
-=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD vcpu 1, rip
-> 0xffffffffc0771aa2
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465411: kvm_exit:=
-=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD reason
-> EPT_VIOLATION rip 0xffffffffc0771aa2 info 683 800000ec
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465412: kvm_page_fa=
-ult:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD vcpu 1 rip
-> 0xffffffffc0771aa2 address 0x0000000002594fe0 error_code 0x683
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465413: kvm_inj_vir=
-q:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD =
-IRQ 0xec
-> [reinjected]
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465413: kvm_entry:=
-=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD vcpu 1, rip
-> 0xffffffffc0771aa2
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465414: kvm_exit:=
-=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD reason
-> EPT_VIOLATION rip 0xffffffffc0771aa2 info 683 800000ec
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465414: kvm_page_fa=
-ult:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD vcpu 1 rip
-> 0xffffffffc0771aa2 address 0x0000000002594fe0 error_code 0x683
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465415: kvm_inj_vir=
-q:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD =
-IRQ 0xec
-> [reinjected]
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465415: kvm_entry:=
-=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD vcpu 1, rip
-> 0xffffffffc0771aa2
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465417: kvm_exit:=
-=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD reason
-> EPT_VIOLATION rip 0xffffffffc0771aa2 info 683 800000ec
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-2386625 [094] 6598425.465417: kvm_page_fa=
-ult:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD vcpu 1 rip
-> 0xffffffffc0771aa2 address 0x0000000002594fe0 error_code 0x683
->=20
-> on AMD machines, we end up with:
->=20
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055571: kvm_page_faul=
-t:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD vcpu 0 rip
-> 0xffffffffb172ab2b address 0x0000000f88eb2ff8 error_code 0x200000006
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055571: kvm_entry:=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
-=BD=EF=BF=BD=EF=BF=BD vcpu 0, rip
-> 0xffffffffb172ab2b
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055572: kvm_exit:=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
-=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD reason EXIT_NPF
-> rip 0xffffffffb172ab2b info 200000006 f88eb2ff8
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055572: kvm_page_faul=
-t:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD vcpu 0 rip
-> 0xffffffffb172ab2b address 0x0000000f88eb2ff8 error_code 0x200000006
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055573: kvm_entry:=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
-=BD=EF=BF=BD=EF=BF=BD vcpu 0, rip
-> 0xffffffffb172ab2b
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055574: kvm_exit:=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
-=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD reason EXIT_NPF
-> rip 0xffffffffb172ab2b info 200000006 f88eb2ff8
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055574: kvm_page_faul=
-t:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD vcpu 0 rip
-> 0xffffffffb172ab2b address 0x0000000f88eb2ff8 error_code 0x200000006
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055575: kvm_entry:=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
-=BD=EF=BF=BD=EF=BF=BD vcpu 0, rip
-> 0xffffffffb172ab2b
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055575: kvm_exit:=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
-=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD reason EXIT_NPF
-> rip 0xffffffffb172ab2b info 200000006 f88eb2ff8
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055576: kvm_page_faul=
-t:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD vcpu 0 rip
-> 0xffffffffb172ab2b address 0x0000000f88eb2ff8 error_code 0x200000006
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055576: kvm_entry:=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
-=BD=EF=BF=BD=EF=BF=BD vcpu 0, rip
-> 0xffffffffb172ab2b
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055577: kvm_exit:=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
-=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD reason EXIT_NPF
-> rip 0xffffffffb172ab2b info 200000006 f88eb2ff8
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055577: kvm_page_faul=
-t:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD vcpu 0 rip
-> 0xffffffffb172ab2b address 0x0000000f88eb2ff8 error_code 0x200000006
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055578: kvm_entry:=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
-=BD=EF=BF=BD=EF=BF=BD vcpu 0, rip
-> 0xffffffffb172ab2b
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055579: kvm_exit:=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
-=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD reason EXIT_NPF
-> rip 0xffffffffb172ab2b info 200000006 f88eb2ff8
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055579: kvm_page_faul=
-t:=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD vcpu 0 rip
-> 0xffffffffb172ab2b address 0x0000000f88eb2ff8 error_code 0x200000006
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDCPU-14414 [063] 3039492.055580: kvm_entry:=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
-=BD=EF=BF=BD=EF=BF=BD vcpu 0, rip
-> 0xffffffffb172ab2b
+s/the the/the/
 
-In both cases, the TDP fault (EPT violation on Intel, #NPF on AMD) is occur=
-ring
-when translating a guest paging structure.  I can't glean much from the AMD=
- case,
-but in the Intel trace, the fault occurs during delivery of the timer inter=
-rupt
-(vector 0xec).  That may or may not be relevant to what's going on.
+> code
+> accordingly.
+>=20
+> Link: https://github.com/KSPP/linux/issues/79
+> Link: https://github.com/KSPP/linux/issues/297
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-It's definitely suspicious that both traces show that the guest is stuck fa=
-ulting
-on a guest paging structure.  Purely from a probability perspective, the od=
-ds of
-that being a coincidence are low, though definitely not impossible.
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
 
-> The qemu process ends up looking like this once it happens:
+> ---
+> =C2=A0drivers/s390/cio/vfio_ccw_drv.c=C2=A0=C2=A0=C2=A0=C2=A0 | 3 ++-
+> =C2=A0drivers/s390/cio/vfio_ccw_private.h | 2 +-
+> =C2=A02 files changed, 3 insertions(+), 2 deletions(-)
 >=20
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD0x00007fdc6a51be26 in internal_fallocate64 (f=
-d=3D-514841856, offset=3D16,
-> len=3D140729021657088) at ../sysdeps/posix/posix_fallocate64.c:36
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD36=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD return=
- EINVAL;
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD(gdb) thread apply all bt
->=20
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDThread 6 (Thread 0x7fdbdefff700 (LWP 879746) =
-"vnc_worker"):
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#0=EF=BF=BD futex_wait_cancelable (private=3D=
-0, expected=3D0,
-> futex_word=3D0x7fdc688f66cc) at ../sysdeps/nptl/futex-internal.h:186
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#1=EF=BF=BD __pthread_cond_wait_common (absti=
-me=3D0x0, clockid=3D0,
-> mutex=3D0x7fdc688f66d8, cond=3D0x7fdc688f66a0) at pthread_cond_wait.c:508
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#2=EF=BF=BD __pthread_cond_wait (cond=3Dcond@=
-entry=3D0x7fdc688f66a0,
-> mutex=3Dmutex@entry=3D0x7fdc688f66d8) at pthread_cond_wait.c:638
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#3=EF=BF=BD 0x0000563424cbd32b in qemu_cond_w=
-ait_impl (cond=3D0x7fdc688f66a0,
-> mutex=3D0x7fdc688f66d8, file=3D0x563424d302b4 "../../ui/vnc-jobs.c", line=
-=3D248)
-> at ../../util/qemu-thread-posix.c:220
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#4=EF=BF=BD 0x00005634247dac33 in vnc_worker_=
-thread_loop (queue=3D0x7fdc688f66a0)
-> at ../../ui/vnc-jobs.c:248
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#5=EF=BF=BD 0x00005634247db8f8 in vnc_worker_=
-thread
-> (arg=3Darg@entry=3D0x7fdc688f66a0) at ../../ui/vnc-jobs.c:361
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#6=EF=BF=BD 0x0000563424cbc7e9 in qemu_thread=
-_start (args=3D0x7fdbdeffcf30) at
-> ../../util/qemu-thread-posix.c:505
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#7=EF=BF=BD 0x00007fdc6a8e1ea7 in start_threa=
-d (arg=3D<optimized out>) at
-> pthread_create.c:477
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#8=EF=BF=BD 0x00007fdc6a527a2f in clone () at
-> ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
->=20
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDThread 5 (Thread 0x7fdbe5dff700 (LWP 879738) =
-"CPU 1/KVM"):
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#0=EF=BF=BD 0x00007fdc6a51d5f7 in preadv64v2 =
-(fd=3D1756258112,
-> vector=3D0x563424b5f007 <kvm_vcpu_ioctl+103>, count=3D0, offset=3D0, flag=
-s=3D44672)
-> at ../sysdeps/unix/sysv/linux/preadv64v2.c:31
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#1=EF=BF=BD 0x0000000000000000 in ?? ()
->=20
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDThread 4 (Thread 0x7fdbe6fff700 (LWP 879737) =
-"CPU 0/KVM"):
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#0=EF=BF=BD 0x00007fdc6a51d5f7 in preadv64v2 =
-(fd=3D1755834304,
-> vector=3D0x563424b5f007 <kvm_vcpu_ioctl+103>, count=3D0, offset=3D0, flag=
-s=3D44672)
-> at ../sysdeps/unix/sysv/linux/preadv64v2.c:31
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#1=EF=BF=BD 0x0000000000000000 in ?? ()
->=20
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDThread 3 (Thread 0x7fdbe83ff700 (LWP 879735) =
-"IO mon_iothread"):
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#0=EF=BF=BD 0x00007fdc6a51bd2f in internal_fa=
-llocate64 (fd=3D-413102080, offset=3D3,
-> len=3D4294967295) at ../sysdeps/posix/posix_fallocate64.c:32
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#1=EF=BF=BD 0x000d5572b9bb0764 in ?? ()
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#2=EF=BF=BD 0x000000016891db00 in ?? ()
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#3=EF=BF=BD 0xffffffff7fffffff in ?? ()
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#4=EF=BF=BD 0xf6b8254512850600 in ?? ()
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#5=EF=BF=BD 0x0000000000000000 in ?? ()
->=20
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDThread 2 (Thread 0x7fdc693ff700 (LWP 879730) =
-"qemu-kvm"):
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#0=EF=BF=BD 0x00007fdc6a5212e9 in ?? () from
-> target:/lib/x86_64-linux-gnu/libc.so.6
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#1=EF=BF=BD 0x0000563424cbd9aa in qemu_futex_=
-wait (val=3D<optimized out>,
-> f=3D<optimized out>) at ./include/qemu/futex.h:29
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#2=EF=BF=BD qemu_event_wait (ev=3Dev@entry=3D=
-0x5634254bd1a8 <rcu_call_ready_event>)
-> at ../../util/qemu-thread-posix.c:430
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#3=EF=BF=BD 0x0000563424cc6d80 in call_rcu_th=
-read (opaque=3Dopaque@entry=3D0x0) at
-> ../../util/rcu.c:261
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#4=EF=BF=BD 0x0000563424cbc7e9 in qemu_thread=
-_start (args=3D0x7fdc693fcf30) at
-> ../../util/qemu-thread-posix.c:505
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#5=EF=BF=BD 0x00007fdc6a8e1ea7 in start_threa=
-d (arg=3D<optimized out>) at
-> pthread_create.c:477
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#6=EF=BF=BD 0x00007fdc6a527a2f in clone () at
-> ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
->=20
-> =EF=BF=BD=EF=BF=BD =EF=BF=BDThread 1 (Thread 0x7fdc69c3a680 (LWP 879712) =
-"qemu-kvm"):
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#0=EF=BF=BD 0x00007fdc6a51be26 in internal_fa=
-llocate64 (fd=3D-514841856,
-> offset=3D16, len=3D140729021657088) at ../sysdeps/posix/posix_fallocate64=
-.c:36
-> =EF=BF=BD=EF=BF=BD =EF=BF=BD#1=EF=BF=BD 0x0000000000000000 in ?? ()
->=20
-> We first started seeing this back in 5.19, and we're still seeing it as o=
-f
-> 6.1.24 (likely later too, we don't have a ton of data for newer versions)=
-.=EF=BF=BD
-> We haven't been able to link this to any specific hardware.
+> diff --git a/drivers/s390/cio/vfio_ccw_drv.c
+> b/drivers/s390/cio/vfio_ccw_drv.c
+> index ff538a086fc7..57906a9c6324 100644
+> --- a/drivers/s390/cio/vfio_ccw_drv.c
+> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> @@ -171,7 +171,8 @@ static int vfio_ccw_sch_probe(struct subchannel
+> *sch)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0return -ENODEV;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> =C2=A0
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0parent =3D kzalloc(sizeof(*par=
+ent), GFP_KERNEL);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0parent =3D kzalloc(sizeof(*par=
+ent) + sizeof(struct mdev_type
+> *),
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 GFP_KERN=
+EL);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!parent)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0return -ENOMEM;
+> =C2=A0
+> diff --git a/drivers/s390/cio/vfio_ccw_private.h
+> b/drivers/s390/cio/vfio_ccw_private.h
+> index b441ae6700fd..b62bbc5c6376 100644
+> --- a/drivers/s390/cio/vfio_ccw_private.h
+> +++ b/drivers/s390/cio/vfio_ccw_private.h
+> @@ -79,7 +79,7 @@ struct vfio_ccw_parent {
+> =C2=A0
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct mdev_parent=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0parent;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct mdev_type=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mdev_type;
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct mdev_type=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*mdev_types[1];
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct mdev_type=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*mdev_types[];
+> =C2=A0};
+> =C2=A0
+> =C2=A0/**
 
-Just to double check, this is the host kernel version, correct?  When you u=
-pgraded
-to kernel 5.19, did you change anything else in the stack?  E.g. did you up=
-grade
-QEMU at the same time?  And what kernel were you upgrading from?
-
-> It appears to happen more often on Intel, but our sample size is much lar=
-ger
-> there.=EF=BF=BD Guest operating system type/version doesn't appear to mat=
-ter.=EF=BF=BD This
-> usually happens to guests with a heavy network/disk workload, but it can
-> happen to even idle guests. This has happened on qemu 7.0 and 7.2 (upgrad=
-ing
-> to 7.2.2 is on our list to do).
->=20
-> Where do we go from here?=EF=BF=BD We haven't really made a lot of progre=
-ss in
-> figuring out why this keeps happening, nor have we been able to come up w=
-ith
-> a reliable way to reproduce it.
-
-Is it possible to capture a failure with the trace_kvm_unmap_hva_range,
-kvm_mmu_spte_requested and kvm_mmu_set_spte tracepoints enabled?  That will=
- hopefully
-provide insight into why the vCPU keeps faulting, e.g. should show if KVM i=
-s
-installing a "bad" SPTE, or if KVM is doing nothing and intentionally retry=
-ing
-the fault because there are constant and/or unresolve mmu_notifier events. =
- My
-guess is that it's the latter (KVM doing nothing) due to the fallocate() ca=
-lls
-in the stack, but that's really just a guess.
-
-The other thing that would be helpful would be getting kernel stack traces =
-of the
-relevant tasks/threads.  The vCPU stack traces won't be interesting, but it=
-'ll
-likely help to see what the fallocate() tasks are doing.
