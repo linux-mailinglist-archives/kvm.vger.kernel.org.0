@@ -2,206 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88D2E70EB72
-	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 04:40:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9AE270EB7C
+	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 04:45:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239157AbjEXCki (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 22:40:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60068 "EHLO
+        id S239070AbjEXCpE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 22:45:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239152AbjEXCkf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 22:40:35 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31AFC18C;
-        Tue, 23 May 2023 19:40:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684896034; x=1716432034;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=714PjEPBuHtkF8WESA9llLiU9Jc925oq3PmuReOHxIA=;
-  b=ipgYXBs11iUY/2pYIAciRusYoTgzrv2h2yz78HLnRTu3mbFapmyEYsAP
-   mcppOCXqQqbuHzjROYWQP0pjeC+JaUeqOP5uaW1E1zHMxTrm+pWrAw342
-   5PNiLFuF78TpPOOXvU8ZOkV1RlYH1ATQy0+OYR35z3tC+GVHHUzo10QMM
-   +a7hxAHKF1aMoZr81pG3kwyQV4dKHZb/jHAc6MXbeoTRJK+9MVNmshBAE
-   Q5lE+5p123yUEP3ILTjN9PmPVCFSlhWulcRp+q2O9n4cpo3YWjeAtvobu
-   wznnOmeDhM3hYOuRCaOMachB7JUrHgV+bLP9bpbk6WCogdQmcESO+kX/t
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10719"; a="333794524"
-X-IronPort-AV: E=Sophos;i="6.00,187,1681196400"; 
-   d="scan'208";a="333794524"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2023 19:40:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10719"; a="828371720"
-X-IronPort-AV: E=Sophos;i="6.00,187,1681196400"; 
-   d="scan'208";a="828371720"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga004.jf.intel.com with ESMTP; 23 May 2023 19:40:33 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 23 May 2023 19:40:32 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Tue, 23 May 2023 19:40:32 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Tue, 23 May 2023 19:40:32 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cdhyF1nCObqyZWLQsJjqErsq6c0SX/j7sD7xqNu4DMG45hnEUnvFs/xwhOXKgiyW/SDaBgZnQttBulMN5b69UjxbAMK0am170X1EnzEFxqRXlW9EJzRC4HLB84xmUB+kvMx3epB+N9MOzHEuvi1encK94wyQSvFeL3aq3fBXnpELSw9pd+d9zLXltzn5oS29E6ELCANRg5Cw24/jEa0fEDziapU2+wpdvXdtTl0OozD6Y8qkbQuNpSznDFtIwn1A6KG1GjZsfoDjpiQy2hO3PqReUkGfYju+jdC/Kn3WwL0KC0GcsxTaVz9ZR270z4r2eJE69MSJHATIJvcdVusmXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=714PjEPBuHtkF8WESA9llLiU9Jc925oq3PmuReOHxIA=;
- b=g4JkwrXM/P737YMcm/h6SxG5hVgLY/nW7wZQWdANHnSdJMfEB60L9RUIPjsO5wETlIj4VRZYJkoUtZEuyOA1d+Clz3qQnJRlP50O6Io3y+Mam9V9LyVBQtZzQVimPqZYseg9YEViwcVG1kkDsPXUK7LQr/zwzHlq7swqdQ0VlU+bsMy/rannXNHbSqvEEhw+KgOakeFFepmVmEJlMC6sGi2msUYW/WRW8j6xbGYTl+DMmx1swz2lg8ZWVn29CyAR/AnZIqmjbI8MWexQgQ3LAaW9AazZuBlpar9q7yCVO6XbD8PRQdaLQ4gaQJtSm8RA7aIQhqR0r+KoJDCEDP+7Xg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by DS0PR11MB6541.namprd11.prod.outlook.com (2603:10b6:8:d3::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.28; Wed, 24 May
- 2023 02:40:31 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::5b44:8f52:dbeb:18e5]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::5b44:8f52:dbeb:18e5%3]) with mapi id 15.20.6411.028; Wed, 24 May 2023
- 02:40:30 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "clegoate@redhat.com" <clegoate@redhat.com>
-Subject: RE: [PATCH v11 19/23] vfio: Add VFIO_DEVICE_BIND_IOMMUFD
-Thread-Topic: [PATCH v11 19/23] vfio: Add VFIO_DEVICE_BIND_IOMMUFD
-Thread-Index: AQHZhZ7k65TFikm5KUKI3FkaFFDbUK9m5qgAgAA8RCCAAO6sgIAArYHQgAAHgQCAAAA4gA==
-Date:   Wed, 24 May 2023 02:40:30 +0000
-Message-ID: <DS0PR11MB7529F262A9088E582700C3AAC3419@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230513132827.39066-1-yi.l.liu@intel.com>
-        <20230513132827.39066-20-yi.l.liu@intel.com>
-        <20230522160124.768430b4.alex.williamson@redhat.com>
-        <DS0PR11MB752935BF70AC95B564685DC0C3409@DS0PR11MB7529.namprd11.prod.outlook.com>
- <20230523095121.1a7a255d.alex.williamson@redhat.com>
- <DS0PR11MB75292184D6938DF4193C318EC3419@DS0PR11MB7529.namprd11.prod.outlook.com>
- <BN9PR11MB5276415D558B1BBA5C19A2AA8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
-In-Reply-To: <BN9PR11MB5276415D558B1BBA5C19A2AA8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|DS0PR11MB6541:EE_
-x-ms-office365-filtering-correlation-id: e1a49a93-334f-4c7b-0510-08db5c003d91
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QRmvl8HWKBltm8O4ldTib7rAmsIwiMFVLKARn6FxKA3ht5tUozqIyLYd+hPkAK8800R7RsbBnidXjcKww2QklH2prXJwXoBB4RGtPGSDL3OzqPKGKgeJBIx3F+VzRoYlN8+rrZMWjhlWQ5CM2hVzkBUgLw1NWZMez14nCeLp1dQ9O9Hd3QlArqcFKppQBTggc0C//xZkg9XLhbvkFVoppikPvAh28RrWunQg+p5yD7hB/wb8DeSdpKWBh5+CbpGcZAmH5KDxzICq7YmO2OsVsCa16iG8jr/K0pxuiQmqMjDrhQv0n8LK5TFjGBuBBJg29oVeNqQPSlfRc/UjQ8RJLEBtRSQ1MHyMRODeAT21iERveAujTA9z5uMlXvZuHrF69c5jY8rQxzTdD+Tf/TOIyzp1/64hC/pEiU64g1+jOvikrMdrvJqCz00KgRsShC8YhITvzAESIt7JZDKDHOY/L7yvSnfJ0HLN1IVvfSVGOIBlVzsZBf32qq4O5YcEQEfuDQYg+VuYm2rEI4uOeBBmWZ7rCC3G21V+sIi5xQGnvwcXVzPY7CoDSb+6kqwrZYwGd0144mnycaEf5guyP6HHUdCzSxvRTugLD6Js3mv5IOKy9DlP9675kOv8zgFDm6PGvGL/QX7V4CR6wH/5bNiRWQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(396003)(346002)(136003)(376002)(366004)(451199021)(9686003)(8936002)(8676002)(7416002)(83380400001)(82960400001)(38100700002)(86362001)(38070700005)(122000001)(33656002)(55016003)(6506007)(4744005)(2906002)(41300700001)(71200400001)(66946007)(76116006)(66556008)(66476007)(66446008)(64756008)(4326008)(7696005)(316002)(5660300002)(110136005)(54906003)(186003)(26005)(478600001)(52536014)(13296009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UytaREc5VFpxeDNMeWNxMXZkU2xwL3d0OU12MmRqd0k3SHZLODNWaVJBNVRv?=
- =?utf-8?B?cmphSDZoU2Q5M1RiV2p6L1ZHRzBsd3BVbHJiVXZ2Q1RFeTdnakI2NWN4bkhx?=
- =?utf-8?B?NE44Z0FnSnpNMm5iMitTODQwSlRveE4yREsvRHkyWExJdjh3dnVuM21hYnM4?=
- =?utf-8?B?SnFlaDNPSFNXeGJKcEpnQWJrL1krRTUwZGJOZ2NPSGNDbWFIZDdndy9Ocjg0?=
- =?utf-8?B?NUZnbVIwZTdyNXBpYUlYbEhBUWhiTi9tS29SbEU2U3VMdzVIend4ZGFaYnNM?=
- =?utf-8?B?QWZZRktqQW4xVFNQaW4xYnJDQWVJSG5vVGxncUlqbjFDRlFTZ3RmTW1tY0k2?=
- =?utf-8?B?NHdibU1id1lYcmpVdGNZbDltUDhZYzc2Nkpubmp4ZFJCbDRISS9NK3hXUWVU?=
- =?utf-8?B?UVYzZXJ5SHhDUUQySlh2VmNuaFV5d3BEbTZZLzY4ZkZnVU13RTdVM2NpQ3ln?=
- =?utf-8?B?cUJYRVBOZ25OUk1lSWhCSEl3S3M5eVBWWlNqNnpzUS9wRHJCbmVEblNyM242?=
- =?utf-8?B?K0lFL05FRUR5dWRtV0xybTY2TWlISVNzaDBGVFRndFVZanQrbUc3UWtCYXFX?=
- =?utf-8?B?ZWtqWjhUSnNpWE01TWwrWFZjVW1YWVFzWkY5eG85TlQwNm1BOFI0WndkT1py?=
- =?utf-8?B?emNIZFZNMWQwdS9uSE1aZVo3akd1aFBQbDY5RThNNVJKcGZaVXZQQUczWU12?=
- =?utf-8?B?UUZSV0RSK09TaE1Bb09ERE1lckoxVUJoMVc3bEJtbElOTmxJN09EZExOTVlz?=
- =?utf-8?B?eHQ2aDlCWERhdzRhUlpjZHZRWjJzczV3dFhJTDV6R2t0YmtyQzBJcFdTR0Jl?=
- =?utf-8?B?eGs2UTRWdDFqQXdFZW5ma2lNSzVPNjhxalZKbnJ0emI2MktiY3BlVC83a3FC?=
- =?utf-8?B?cWI4TWpKbkNEa2VOdHJqaFhCaEhDa2NYNGxFMW40dEhrZWxqbzhibk5oN1Zp?=
- =?utf-8?B?bHZWQS9tOVJtdGdsSUtLY05lQURBcmx4ZHo1VlJDRWx5SHRMTGxacHFGVUNZ?=
- =?utf-8?B?SHlDdVdkeDgwaVhaektIbVdkVlh4L1hBcFZUcGE1OHhuTmVxOTZFUWVJRUdz?=
- =?utf-8?B?UzlxYjU4bHpudFdmWHA2RzZZbkh2YnplalViVEZPeHNIMFE1Q1NVcHNUZmFH?=
- =?utf-8?B?Sy9UeTA3NWxSRjg0S2FJNzdSVHBubnp0cDFTcUZDbzJvQ3cxVXQ5Yk1rRDU4?=
- =?utf-8?B?SDZHR1VyOEM1cFp2d0wrOVFGWEsxMDM1aDBuMVlLYmFhczFkVEpKZnNZay9Y?=
- =?utf-8?B?eERWZ3FSdDRTK0JFaXYrWDJ3UkhpeE9wM21EYU8vT0NaSDVCVWMrakEyY2p5?=
- =?utf-8?B?NGpnbUlkc00xY1htczNpQ1RnL0tUOHhKRlh3aHRUeWtvZVBPbjE4Y3IxVUUr?=
- =?utf-8?B?ejBVM0oxaXVLaTFQUTNCWU1XNkRXUmJYVGhGMTV6ZjVybE55NCtyYUtXNWJx?=
- =?utf-8?B?Q3AxeXc2WmJBK1pETVZ3WDZrTGRjSWVqWS9rQnlqVFh4RFZMa0w5RHdXRUNs?=
- =?utf-8?B?OHBWVFJsTmNPbjUxN29WYWhPc3NiS0pqVnZGNHFITjhGTjhzTlhwdGNwYmNV?=
- =?utf-8?B?Q1E5azRLSlZnbC9hS3ZFUWNwVURaTGVScGFpMzZ3b09pV1NZVmVYNTZadmFs?=
- =?utf-8?B?aUdURVd2ajFTdXRINzBKbEdMVHA4RWpMN2MrSXBZbHJySSsvcWM4UThYeGxo?=
- =?utf-8?B?cXBERlpHbndqRnlSS2lONFJCa3N5Rk1RQkhGeGpVZ053SkxXV055d3RYK0JY?=
- =?utf-8?B?Tkt1cmdwSTVJbHh4UCtZTXptNURMN0x2aWpOUFB0MGRPVGlkbnpNenp1dUp2?=
- =?utf-8?B?Rk8zeStoRjBFemt6UnRKWnIwMW9mVU9KMHJ0blpmd204UXhiOTNFeDhMZFgw?=
- =?utf-8?B?MkM0UXVaWG5YTjMrb0JIelZjdnJ0NWR5cHNhcFFiNzZwak5aejBWc3dCNXNY?=
- =?utf-8?B?dHljWXd5Lzh5Q1ZnZ3V6YVYxNUljKytoQW9nSS9LWU0ydGhOTnpHZGR3cFEv?=
- =?utf-8?B?R1lLYTkycHF3bGxLNlFoTHI5dVZGZTI0d3VFT1NYODVxcDJPZW5yWnE3Wkcx?=
- =?utf-8?B?dkFBSXZvSWdnTWpzUWNBbzVRRFc5Q2JJVWxyRDkrSWNCdzV0a3RzcU9nbnVh?=
- =?utf-8?Q?BiIC0ZMxwxa9EreSDcn1EtqvN?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S229698AbjEXCou (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 22:44:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD259E9
+        for <kvm@vger.kernel.org>; Tue, 23 May 2023 19:44:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684896243;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ABJg3jXu2G9EQCuzxA7yWSMvgcd+rU/FTHUIfoh9wHQ=;
+        b=dg1U3AcHoU9DDWNZcMuD2W12ejy5A4/9FVCBB8SSj+MSJ+UalDDqIr6zzjBslX15MLFLrR
+        /9ZGqPwaX2ckWjNW//g/qXMJnTK5ksUO3Sg4ucUOxaQV6KxDYErKSbSOpkgd8no5SqvC9l
+        Lart88Q77CjjG2cl3LQ6lZuYgYqvzxg=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-82-NA3qD_tTNqCQC4FBTXSQiQ-1; Tue, 23 May 2023 22:44:01 -0400
+X-MC-Unique: NA3qD_tTNqCQC4FBTXSQiQ-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-4f26157450aso144686e87.0
+        for <kvm@vger.kernel.org>; Tue, 23 May 2023 19:44:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684896240; x=1687488240;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ABJg3jXu2G9EQCuzxA7yWSMvgcd+rU/FTHUIfoh9wHQ=;
+        b=Oe0A/8lg+vJdDcFoKzrXlHXPOH95ehosKl3g+6t6MGFgtgp4OXIAkvHoGPuuAudpAF
+         1DC8y6j03lpOMKr5TElpYsnyWPTE7wERSfSr2CEsgFcHzbpkOgoF//UhtbgxXjgc1WkO
+         wIpfh1Ea25AE5LGj/f5HMbHKPe+NDy+v7I4hIdGcsJARNbUhQ7Djs8HNxh4OxEe2UKt2
+         5dLl5llDIoE60yahX5/HK5DaHt0dchHkyjkH/8mY67nMU57GsEuZeWLiCBHD/R2vSUhD
+         1Px6HF21BU1NrvBU0kFxqcM7F/+bZzSA02mmucoTMGEYww1YPGcdm5KN+uY6MavUXhPy
+         pxNw==
+X-Gm-Message-State: AC+VfDxt0U/zMrlbXxVNLAj/H4DaFr4FvFSLPy6XbNj95UyyXM0kYgJH
+        +JM6To1UI14yGcHPKHl/7HT5gU+zoz5+AlQ2Y1WVtgYeCr8DIUSv0Z9MW/UDSxDIIYM+UdSYBiw
+        V5AiSlm3qfiVcMrCIcBbY3Cio19wn
+X-Received: by 2002:ac2:5dfc:0:b0:4f1:3b3e:2143 with SMTP id z28-20020ac25dfc000000b004f13b3e2143mr4910283lfq.38.1684896239975;
+        Tue, 23 May 2023 19:43:59 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5G+I8tBySU/AhzxAjYKI/Ryl/z4NNqsbpYzaziVVpOFOgwre9Dlnx8lDNex0PB1WTEz1hSem7hlZhQkbD9Jqo=
+X-Received: by 2002:ac2:5dfc:0:b0:4f1:3b3e:2143 with SMTP id
+ z28-20020ac25dfc000000b004f13b3e2143mr4910273lfq.38.1684896239605; Tue, 23
+ May 2023 19:43:59 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1a49a93-334f-4c7b-0510-08db5c003d91
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 May 2023 02:40:30.5640
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: txHcFsPpqRf0PAitTquYUkN4RS09WI6NhU/vgeHC3udWzy6c87+e8W2SliaYQXad0H8Wkyf371SAlQpIsy/Qng==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6541
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <cover.1683740667.git.reinette.chatre@intel.com> <20230523164301.14620a69.alex.williamson@redhat.com>
+In-Reply-To: <20230523164301.14620a69.alex.williamson@redhat.com>
+From:   YangHang Liu <yanghliu@redhat.com>
+Date:   Wed, 24 May 2023 10:43:48 +0800
+Message-ID: <CAGYh1E8Yk-eVNOMQrx6SUgNou5fY6=jFzHR=rQ9diwXbJAaKVg@mail.gmail.com>
+Subject: Re: [PATCH V5 00/11] vfio/pci: Support dynamic allocation of MSI-X interrupts
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Reinette Chatre <reinette.chatre@intel.com>, jgg@nvidia.com,
+        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+        kevin.tian@intel.com, tglx@linutronix.de, darwi@linutronix.de,
+        kvm@vger.kernel.org, dave.jiang@intel.com, jing2.liu@intel.com,
+        ashok.raj@intel.com, fenghua.yu@intel.com,
+        tom.zanussi@linux.intel.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBUaWFuLCBLZXZpbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+DQo+IFNlbnQ6IFdlZG5l
-c2RheSwgTWF5IDI0LCAyMDIzIDEwOjM5IEFNDQo+IA0KPiA+IEZyb206IExpdSwgWWkgTCA8eWku
-bC5saXVAaW50ZWwuY29tPg0KPiA+IFNlbnQ6IFdlZG5lc2RheSwgTWF5IDI0LCAyMDIzIDEwOjIx
-IEFNDQo+ID4NCj4gPiA+ID4NCj4gPiA+ID4gdmZpb19kZXZpY2Vfb3Blbl9maWxlKCkNCj4gPiA+
-ID4gew0KPiA+ID4gPiAJZGV2X3dhcm4oZGV2aWNlLT5kZXYsICJ2ZmlvLW5vaW9tbXUgZGV2aWNl
-IG9wZW5lZCBieSB1c2VyICINCj4gPiA+ID4gCQkgICAiKCVzOiVkKVxuIiwgY3VycmVudC0+Y29t
-bSwgdGFza19waWRfbnIoY3VycmVudCkpOw0KPiA+ID4gPiB9DQo+ID4gPg0KPiA+ID4gVGhlcmUg
-bmVlZHMgdG8gYmUgYSB0YWludCB3aGVuIFZGSU9fR1JPVVAgaXMgZGlzYWJsZWQuICBUaGFua3Ms
-DQo+ID4gSSBzZWUuIEkgbWlzdW5kZXJzdG9vZCB5b3UuIFlvdSBhcmUgYXNraW5nIGZvciBhIHRh
-aW50LiDwn5iKDQo+ID4NCj4gPiBBY3R1YWxseSwgSSd2ZSBjb25zaWRlcmVkIGl0LiBCdXQgaXQg
-YXBwZWFycyB0byBtZSB0aGUgdGFpbnQgaW4NCj4gPiB2ZmlvX2dyb3VwX2ZpbmRfb3JfYWxsb2Mo
-KSBpcyBkdWUgdG8gdmZpbyBhbGxvY2F0ZXMgZmFrZSBpb21tdV9ncm91cC4NCj4gPiBUaGlzIHNl
-ZW1zIHRvIGJlIGEgdGFpbnQgdG8ga2VybmVsLiBCdXQgbm93LCB5b3UgYXJlIHN1Z2dlc3Rpbmcg
-dG8gYWRkDQo+ID4gYSB0YWludCBhcyBsb25nIGFzIG5vaW9tbXUgZGV2aWNlIGlzIHJlZ2lzdGVy
-ZWQgdG8gdmZpby4gSXMgaXQ/IElmIHNvLA0KPiANCj4gdGFpbnQgaXMgcmVxdWlyZWQgYmVjYXVz
-ZSB0aGUga2VybmVsIGlzIGV4cG9zZWQgdG8gdXNlciBETUEgYXR0YWNrDQo+IGR1ZSB0byBsYWNr
-aW5nIG9mIElPTU1VIHByb3RlY3Rpb24uDQo+IA0KPiBmYWtlIGlvbW11X2dyb3VwIGlzIGp1c3Qg
-dG8gbWVldCB2ZmlvX2dyb3VwIHJlcXVpcmVtZW50Lg0KDQpHb3QgaXQuIHRoYW5rcy4NCg0KUmVn
-YXJkcywNCllpIExpdQ0K
+Running regression tests in the following test matrix:
+
+    i40e PF + INTx interrupt + RHEL9 guest -- PASS
+    bnx2x PF + MSI-X + RHEL9 guest -- PASS
+    iavf VF + MSI-X + Win2019 guest  -- PASS
+    mlx5_core VF + MSI-X  + Win2022 guest -- PASS
+    ixgbe PF + INTx + RHEL9 guest -- PASS
+    i40e PF + MSIX + Win2019 guest -- PASS
+    qede VF + MSIX + RHEL9 guest -- PASS
+
+Tested-by: YangHang Liu <yanghliu@redhat.com>
+
+
+
+On Wed, May 24, 2023 at 6:46=E2=80=AFAM Alex Williamson
+<alex.williamson@redhat.com> wrote:
+>
+> On Thu, 11 May 2023 08:44:27 -0700
+> Reinette Chatre <reinette.chatre@intel.com> wrote:
+>
+> > Changes since V4:
+> > - V4: https://lore.kernel.org/lkml/cover.1682615447.git.reinette.chatre=
+@intel.com/
+> > - Add Kevin's Reviewed-by tag as applicable.
+> > - Treat non-existing INTx interrupt context as kernel bug with WARN. Th=
+is
+> >   exposed an issue in the scenario where INTx mask/unmask may occur wit=
+hout
+> >   INTx enabled. This is fixed by obtaining the interrupt context later
+> >   (right before use) within impacted functions: vfio_pci_intx_mask() an=
+d
+> >   vfio_pci_intx_unmask_handler(). (Kevin)
+> > - Treat pci_irq_vector() returning '0' for a MSI/MSI-X interrupt as a k=
+ernel
+> >   bug via a WARN instead of ignoring this value. (Kevin)
+> > - Improve accuracy of comments. (Kevin)
+> > - Please refer to individual patches for local changes.
+> >
+> > Changes since V3:
+> > - V3: https://lore.kernel.org/lkml/cover.1681837892.git.reinette.chatre=
+@intel.com/
+> > - Be considerate about layout and size with changes to
+> >   struct vfio_pci_core_device. Keep flags together and transition all t=
+o
+> >   use bitfields. (Alex and Jason)
+> > - Do not free dynamically allocated interrupts on error path. (Alex)
+> > - Please refer to individual patches for localized changes.
+> >
+> > Changes since V2:
+> > - V2: https://lore.kernel.org/lkml/cover.1680038771.git.reinette.chatre=
+@intel.com/
+> > - During testing of V2 "kernel test robot" reported issues resulting fr=
+om
+> >   include/linux/pci.h missing a stub for pci_msix_can_alloc_dyn() when
+> >   CONFIG_PCI_MSI=3Dn. A separate fix was sent to address this. The fix =
+can
+> >   be found in the kernel (since v6.3-rc7) as
+> >   commit 195d8e5da3ac ("PCI/MSI: Provide missing stub for pci_msix_can_=
+alloc_dyn()")
+> > - Biggest change is the transition to "active contexts" for both MSI an=
+d MSI-X.
+> >   Interrupt contexts have always been allocated when the interrupts are
+> >   allocated while they are only used while interrupts are
+> >   enabled. In this series interrupt contexts are made dynamic, while do=
+ing
+> >   so their allocation is moved to match how they are used: allocated wh=
+en
+> >   interrupts are enabled. Whether a Linux interrupt number exists deter=
+mines
+> >   whether an interrupt can be enabled.
+> >   Previous policy (up to V2) that an allocated interrupt has an interru=
+pt
+> >   context no longer applies. Instead, an interrupt context has a
+> >   handler/trigger, aka "active contexts". (Alex)
+> > - Re-ordered patches in support of "active contexts".
+> > - Only free interrupts on MSI-X teardown and otherwise use the
+> >   allocated interrupts as a cache. (Alex)
+> > - Using unsigned int for the vector broke the unwind loop within
+> >   vfio_msi_set_block(). (Alex)
+> > - Introduce new "has_dyn_msix" property of virtual device instead of
+> >   querying support every time. (Alex)
+> > - Some smaller changes, please refer to individual patches.
+> >
+> > Changes since RFC V1:
+> > - RFC V1: https://lore.kernel.org/lkml/cover.1678911529.git.reinette.ch=
+atre@intel.com/
+> > - Improved changelogs.
+> > - Simplify interface so that vfio_irq_ctx_alloc_single() returns pointe=
+r to
+> >   allocated context. (Alex)
+> > - Remove vfio_irq_ctx_range_allocated() and associated attempts to main=
+tain
+> >   invalid error path behavior. (Alex and Kevin)
+> > - Add pointer to interrupt context as function parameter to
+> >   vfio_irq_ctx_free(). (Alex)
+> > - Ensure variables are initialized. (Dan Carpenter)
+> > - Only support dynamic allocation if device supports it. (Alex)
+> >
+> > Qemu allocates interrupts incrementally at the time the guest unmasks a=
+n
+> > interrupt, for example each time a Linux guest runs request_irq().
+> >
+> > Dynamic allocation of MSI-X interrupts was not possible until v6.2 [1].
+> > This prompted Qemu to, when allocating a new interrupt, first release a=
+ll
+> > previously allocated interrupts (including disable of MSI-X) followed
+> > by re-allocation of all interrupts that includes the new interrupt.
+> > Please see [2] for a detailed discussion about this issue.
+> >
+> > Releasing and re-allocating interrupts may be acceptable if all
+> > interrupts are unmasked during device initialization. If unmasking of
+> > interrupts occur during runtime this may result in lost interrupts.
+> > For example, consider an accelerator device with multiple work queues,
+> > each work queue having a dedicated interrupt. A work queue can be
+> > enabled at any time with its associated interrupt unmasked while other
+> > work queues are already active. Having all interrupts released and MSI-=
+X
+> > disabled to enable the new work queue will impact active work queues.
+> >
+> > This series builds on the recent interrupt sub-system core changes
+> > that added support for dynamic MSI-X allocation after initial MSI-X
+> > enabling.
+> >
+> > Add support for dynamic MSI-X allocation to vfio-pci. A flag
+> > indicating lack of support for dynamic allocation already exist:
+> > VFIO_IRQ_INFO_NORESIZE and has always been set for MSI and MSI-X. With
+> > support for dynamic MSI-X the flag is cleared for MSI-X when supported,
+> > enabling Qemu to modify its behavior.
+> >
+> > Any feedback is appreciated
+> >
+> > Reinette
+> >
+> > [1] commit 34026364df8e ("PCI/MSI: Provide post-enable dynamic allocati=
+on interfaces for MSI-X")
+> > [2] https://lore.kernel.org/kvm/MWHPR11MB188603D0D809C1079F5817DC8C099@=
+MWHPR11MB1886.namprd11.prod.outlook.com/#t
+> >
+> > Reinette Chatre (11):
+> >   vfio/pci: Consolidate irq cleanup on MSI/MSI-X disable
+> >   vfio/pci: Remove negative check on unsigned vector
+> >   vfio/pci: Prepare for dynamic interrupt context storage
+> >   vfio/pci: Move to single error path
+> >   vfio/pci: Use xarray for interrupt context storage
+> >   vfio/pci: Remove interrupt context counter
+> >   vfio/pci: Update stale comment
+> >   vfio/pci: Use bitfield for struct vfio_pci_core_device flags
+> >   vfio/pci: Probe and store ability to support dynamic MSI-X
+> >   vfio/pci: Support dynamic MSI-X
+> >   vfio/pci: Clear VFIO_IRQ_INFO_NORESIZE for MSI-X
+> >
+> >  drivers/vfio/pci/vfio_pci_core.c  |   8 +-
+> >  drivers/vfio/pci/vfio_pci_intrs.c | 305 ++++++++++++++++++++----------
+> >  include/linux/vfio_pci_core.h     |  26 +--
+> >  include/uapi/linux/vfio.h         |   3 +
+> >  4 files changed, 229 insertions(+), 113 deletions(-)
+> >
+> >
+> > base-commit: 457391b0380335d5e9a5babdec90ac53928b23b4
+>
+> Applied to vfio next branch for v6.5.  Thanks!
+>
+> Alex
+>
+
