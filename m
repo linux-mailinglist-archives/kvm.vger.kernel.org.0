@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88BDE710124
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 00:52:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49FFE710126
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 00:54:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237805AbjEXWwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 May 2023 18:52:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40830 "EHLO
+        id S238271AbjEXWx7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 May 2023 18:53:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229757AbjEXWwh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 May 2023 18:52:37 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7734BA9
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 15:52:36 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-56561689700so29248757b3.2
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 15:52:36 -0700 (PDT)
+        with ESMTP id S229682AbjEXWx5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 May 2023 18:53:57 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9B9A99
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 15:53:56 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-2553b096ddfso201040a91.1
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 15:53:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684968755; x=1687560755;
+        d=google.com; s=20221208; t=1684968836; x=1687560836;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XQzJt7PVzKE0RYFdY1/R7evjIQ4fazx/fIwgD8umm1c=;
-        b=UOZwS8V9j5Vj7d6BBP7lbPtOOLPMognA4evyDEpUyGLMRrcV3vgnjijCWqXJ/5ltPU
-         U/2EPX4zrJ1eKb4Q8NLvxVex6T5Ef3lsZ+VdAPcoeYlEVCYMKRy57K39xvYAg/PFtCfq
-         wrBALWHCCZ1+AmBbdvK5bhdoQK+FyI1SOnq5HJI/peN0LRAXsi2iLy2VRfVaTyqdwzWM
-         KebH4Oj1WwtZrCDJILN6und2ITGTKK8RdBaPUY/eqiVzxiFQUdM7N8CXWuEhIpV89n6W
-         ZmB4aRYkuRZeu3eUWuXSahUmkeOPfoXOGGBKuM5cusjBU/DhJdgjHaXioqtV4DS3T2hK
-         +X1A==
+        bh=x0WpqwanSmBKlqB/KYTJIHjiwaT4vo3S6eGEr+EhUoc=;
+        b=0iFOfuXS06ChvMu47Nq+dNrsb1rcuvQm6ggloE98nwK6hu3HaudExnpKEc/CmuypvT
+         VOg1Rw2c42mHnY0GBjBYW4SUTX1e86gIq+ZX0kdZvkVFRQCW65SN+2DvGcYYgg4fjh5c
+         Mdlql7CzDEVVHmRYxd95Jiuuw+2zTNRwPuHpnvUUJO5tzsOEwzmA4uLbxLnUJ4iamf5e
+         9JBSHoHtLSnO1Bx929g8Fxa1DQuhFCwcAAmQqTnde6AUSchsFYkIE2T8X9oJ0D0MF2cR
+         tHu564hkvrDrqLveQCTXcZoJJWLeXLsDulCp9WJoROiQOCpXkfMJ8ddfhDbIMMYHL7Ar
+         XIjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684968755; x=1687560755;
+        d=1e100.net; s=20221208; t=1684968836; x=1687560836;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XQzJt7PVzKE0RYFdY1/R7evjIQ4fazx/fIwgD8umm1c=;
-        b=goeLd5bxMAGxvEmP/943aMhxYsjOMqfy2yxPwjBHunmw8alMxwc62+2N3VN6op3FGy
-         cddhqYy5np7EZv5Hlk1613AOxLgGTmkl+gTo3a1HL36/nv833ivCxrokDea26YX3UKa5
-         TFSGMt5J12K4uCTdO4Brp3+hBW4D2Ojl7iBmkA8pI2rOu/DJZUHJqVWms0LlOZh65qGa
-         wFlP9Cz+LXr3MFkK8lq2mT2MKZKPRvuWOxrecv0Nh6UWlMWbx/DwZVNa9ALyRR/ctdW0
-         w7+7QjG1uTXtnPiueHLGhqt5byr7h23DaTEG1BOXJM439iBUnD+aGYD6R4ZAI/Yh9Lc2
-         XR1g==
-X-Gm-Message-State: AC+VfDzPve70N7C7xsK2jSdYSu9XjqAp7suthd08a6gpC9/nPM49D6CF
-        VnhvaXbylUgFgfLnDBHZyeTzuShp/ec=
-X-Google-Smtp-Source: ACHHUZ7OAaaoJI95qhata3HKErnQCfVYLGT5GDZUYkSPYRW9Lty5Acw8p9+3sQpUzr+WaRtb9wncucayCQM=
+        bh=x0WpqwanSmBKlqB/KYTJIHjiwaT4vo3S6eGEr+EhUoc=;
+        b=RYh8ulaL+SXjcBANobvpChKV5DIclWC/e3PiOFcS+o+VhfFfnNOcoIXAqW/C+Ambl9
+         RD33GtnmN7MlhR844OaLfODdgoyoNGUHELdN4X81rkhsabpZnLRReW+a2rxBl5b7Rgn4
+         /pYsmge1Xgm+XnsJcG+w3WnHzKqzzQnKbvi0ae5LNe8bUi7SkJoFgbaZDT8N3VJuiaal
+         9eZpdc6Ilq1N8OUwrZmxckmKJ5t+h60HtJepcy0ZM+ZGc2dPCzR09HY+pSJNhUj+vdzW
+         aQ+qsYeqi8GH56aqU0AY4j/gUkvhIYboakPWiVUUkJSg4XvKmYbderP4p57MmVNfD7pK
+         FxHw==
+X-Gm-Message-State: AC+VfDxnO/uvnwKp5zDL0FR7nOQoXRycBitMI4Z/j1cMrTBuYmKThotV
+        4td4JB8PaWWMPBrqzrlCv2oTX0+Fo68=
+X-Google-Smtp-Source: ACHHUZ476UqLrn2Q1a0Lg3CHSzK8Bih/IdjqbG0h2rX+yRAbJfPKV92Qs+JxZEmjEYmulJrCQYm6OeElP7w=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:441b:0:b0:55d:9484:f153 with SMTP id
- r27-20020a81441b000000b0055d9484f153mr12017925ywa.7.1684968755778; Wed, 24
- May 2023 15:52:35 -0700 (PDT)
-Date:   Wed, 24 May 2023 15:52:34 -0700
-In-Reply-To: <20230323072714.82289-8-likexu@tencent.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:e642:b0:23d:30a:692b with SMTP id
+ ep2-20020a17090ae64200b0023d030a692bmr216909pjb.4.1684968836446; Wed, 24 May
+ 2023 15:53:56 -0700 (PDT)
+Date:   Wed, 24 May 2023 15:53:55 -0700
+In-Reply-To: <20230323072714.82289-1-likexu@tencent.com>
 Mime-Version: 1.0
-References: <20230323072714.82289-1-likexu@tencent.com> <20230323072714.82289-8-likexu@tencent.com>
-Message-ID: <ZG6VMrYK2xgR/v95@google.com>
-Subject: Re: [PATCH 7/7] KVM: selftests: Test Intel counters' bit width emulation
+References: <20230323072714.82289-1-likexu@tencent.com>
+Message-ID: <ZG6Vg0RZhJLXxoFC@google.com>
+Subject: Re: [PATCH 0/7] KVM: selftests: Test the consistency of the PMU's
+ CPUID and its features
 From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -60,7 +61,7 @@ Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -68,30 +69,27 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Mar 23, 2023, Like Xu wrote:
-> +static uint64_t test_ctrs_bit_width_setup(struct kvm_vcpu *vcpu,
-> +					  uint8_t bit_width,
-> +					  uint64_t perf_cap,
-> +					  uint32_t msr_base)
-> +{
-> +	struct kvm_cpuid_entry2 *entry;
-> +	bool fw_wr = perf_cap & PMU_CAP_FW_WRITES;
-> +	uint64_t kvm_width;
-> +	uint64_t value;
-> +
-> +	entry = vcpu_get_cpuid_entry(vcpu, 0xa);
-> +	if (msr_base != MSR_CORE_PERF_FIXED_CTR0) {
-> +		kvm_width = kvm_gp_ctr_bit_width();
-> +		entry->eax = (entry->eax & ~GP_WIDTH_MASK) |
-> +			(bit_width << GP_WIDTH_OFS_BIT);
-> +	} else {
-> +		kvm_width = kvm_fixed_ctr_bit_width();
-> +		entry->edx = (entry->edx & ~FIXED_WIDTH_MASK) |
-> +			(bit_width << FIXED_WIDTH_OFS_BIT);
-> +	}
-> +	TEST_REQUIRE(kvm_width > 31);
+> Hi,
+> 
+> The KVM selfstests shows advantages over the KUT in terms of finding
+> defects through flexible and varied guest settings form KVM user space.
+> 
+> This patch set tests whether Intel vPMU works properly with different
+> Intel CPUID.0xA configurations, in which three issues were identified.
+> It also provides test scaffolding and a sufficient number of pmu test cases
+> to subsequently provide adequate code coverage of AMD vPMU or Intel
+> complex features such as LBR or PEBS in selftests.
+> 
+> Please feel free to add more tests or share valuable comments.
+> 
+> Related bugs:
+> KVM: x86/pmu: Fix emulation on Intel counters' bit width
+> (https://lore.kernel.org/kvm/20230322093117.48335-1-likexu@tencent.com/)
+> KVM: x86/pmu: Add Intel PMU supported fixed counters bit mask
+> (https://lore.kernel.org/kvm/20230321112742.25255-1-likexu@tencent.com/)
 
-Unfortunately, using TEST_REQUIRE() in a subtest is generally a bad idea.  This
-will skip _all_ tests if the requirement isn't met.  That might be a signal that
-the test is doing too much, i.e. should be split into multiple tests.  Unlike KUT,
-selftests are more geared towards lots of small tests, not a handful of massive
-tests.
+Can you send a single combined series for these fixes, plus the tests in this
+series?  I expect to apply the fixes before the tests, but I want to make it as
+unlikely as possible that I forget and apply tests that fail.
+
+Thanks!
