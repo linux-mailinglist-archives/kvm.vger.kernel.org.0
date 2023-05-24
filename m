@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D012470F4F8
-	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 13:22:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26B1A70F4F9
+	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 13:22:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232374AbjEXLWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 May 2023 07:22:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45934 "EHLO
+        id S232600AbjEXLWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 May 2023 07:22:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbjEXLWP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 May 2023 07:22:15 -0400
+        with ESMTP id S229540AbjEXLWQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 May 2023 07:22:16 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DC196A3
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 04:22:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EC35D9B
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 04:22:14 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7A8401042;
-        Wed, 24 May 2023 04:22:58 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4F20113E;
+        Wed, 24 May 2023 04:22:59 -0700 (PDT)
 Received: from donnerap.cambridge.arm.com (donnerap.cambridge.arm.com [10.1.197.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5243A3F67D;
-        Wed, 24 May 2023 04:22:12 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9E4E33F67D;
+        Wed, 24 May 2023 04:22:13 -0700 (PDT)
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Will Deacon <will@kernel.org>,
         Julien Thierry <julien.thierry.kdev@gmail.com>
@@ -27,10 +27,12 @@ Cc:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
         kvm@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
         Sami Mujawar <sami.mujawar@arm.com>,
         Marc Zyngier <maz@kernel.org>
-Subject: [PATCH kvmtool v3 0/2] Fix virtio/rng handling in low entropy situations
-Date:   Wed, 24 May 2023 12:22:05 +0100
-Message-Id: <20230524112207.586101-1-andre.przywara@arm.com>
+Subject: [PATCH kvmtool v3 1/2] virtio/rng: switch to using /dev/urandom
+Date:   Wed, 24 May 2023 12:22:06 +0100
+Message-Id: <20230524112207.586101-2-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230524112207.586101-1-andre.przywara@arm.com>
+References: <20230524112207.586101-1-andre.przywara@arm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
@@ -42,54 +44,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-At the moment kvmtool uses the /dev/random device to back the randomness
-provided by our virtio/rng implementation. We run it in non-blocking
-mode, so are not affected by the nasty "can block indefinitely"
-behaviour of that file. However:
-- If /dev/random WOULD block, it returns EAGAIN, and we reflect that by
-  adding 0 bytes of entropy to the virtio queue. However the virtio 1.x
-  spec clearly says this is not allowed, and that we should always provide
-  at least one random byte.
-- If the guest is waiting for the random numbers, we still run into an
-  effective blocking situation, because the buffer will only be filled
-  very slowly, effectively stalling or blocking the guest. EDK II shows
-  that behaviour, when servicing the EFI_RNG_PROTOCOL runtime service
-  call, called by the kernel very early on boot.
+At the moment we use /dev/random as the backing device to provide random
+numbers to our virtio-rng implementation. The downside of doing so is
+that it may block indefinitely - or return EAGAIN repeatedly in our case.
+On one headless system without ample noise sources (no keyboard, mouse,
+or network traffic) I measured 30 seconds to gain one byte of randomness.
+At the moment EDK II insists in waiting for all of the requsted random
+bytes (for its EFI_RNG_PROTOCOL runtime service) to arrive, that held up
+a Linux kernel boot for more than 10 minutes(!).
 
-Those two patches fix those problems, and allow to boot a Linux kernel
-MUCH quicker when the host lacks good entropy sources. On a particular
-system the kernel took 10 minutes to boot because of /dev/random
-effectively blocking, this runs now at full speed.
+According to the Internet(TM), on Linux /dev/urandom provides the same
+quality random numbers as /dev/random, it just does not block when the
+entropy estimation algorithm suggests so. For all practical purposes the
+recommendation is to just use /dev/urandom, QEMU did the switch as well
+in 2019 [1].
 
-The block is avoided by using /dev/urandom, there is a proper rabbit
-hole in the internet out there why this is safe, even for cryptographic
-applications.
+Use /dev/urandom instead of /dev/random when opening the file descriptor
+providing the randomness source for the virtio/rng implementation.
+Due to a special behaviour documented on the urandom(4) manpage, a read
+from /dev/urandom will never block, so we can drop the O_NONBLOCK flag.
 
-Patch 2 aims to fix the corner case when the /dev/urandom read fails for
-whatever reason: we just try once more in this case, since it should
-only happen when the call is interrupted by a signal. This is not 100%
-bullet proof, I am happy to hear any suggestions or whether we just
-don't care about that very rare case.
+[1] https://gitlab.com/qemu-project/qemu/-/commit/a2230bd778d8
 
-Please have a look!
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+---
+ virtio/rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
-Andre
-
-Changelog v2 ... v3:
-- clamp request size on retry to 256 bytes
-
-Changelog v1 ... v2:
-- Drop O_NONBLOCK from the /dev/urandom open() call
-- Drop block/unblock sequence after failed read, just retry once
-
-Andre Przywara (2):
-  virtio/rng: switch to using /dev/urandom
-  virtio/rng: return at least one byte of entropy
-
- virtio/rng.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
-
+diff --git a/virtio/rng.c b/virtio/rng.c
+index 8f85d5ec1..e6e70ced3 100644
+--- a/virtio/rng.c
++++ b/virtio/rng.c
+@@ -166,7 +166,7 @@ int virtio_rng__init(struct kvm *kvm)
+ 	if (rdev == NULL)
+ 		return -ENOMEM;
+ 
+-	rdev->fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
++	rdev->fd = open("/dev/urandom", O_RDONLY);
+ 	if (rdev->fd < 0) {
+ 		r = rdev->fd;
+ 		goto cleanup;
 -- 
 2.25.1
 
