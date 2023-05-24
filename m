@@ -2,197 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C7F170FEF5
-	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 22:05:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A62270FF07
+	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 22:16:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230222AbjEXUFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 May 2023 16:05:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60496 "EHLO
+        id S236332AbjEXUQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 May 2023 16:16:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbjEXUFb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 May 2023 16:05:31 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6DACFC
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 13:05:29 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-518d6f87a47so395997a12.3
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 13:05:29 -0700 (PDT)
+        with ESMTP id S236112AbjEXUQH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 May 2023 16:16:07 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE308180
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 13:16:05 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-ba81b24c1deso2591157276.3
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 13:16:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684958729; x=1687550729;
+        d=google.com; s=20221208; t=1684959365; x=1687551365;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Wo8IPofr5IpEW+ax3IvqEWITKhSS7r+DVQFWDx/Q3w=;
-        b=cM5I2g/sGcDLMJ7cDZJKkrmDCu/I/ejP2YujUQ6/H3ebhoV92Cl+FRrOuefqsp1VqC
-         DCwq4EUofvb6CpFAeuqfuD9sXbUhTXBTxQIAVgLvrTGDHXViI8Jn6GCgN0nNM8034rOW
-         BH7C1jT/9b/68gPTEnBL+E2jBfIppwbdr5bieJ8E0CVDdU2kS88aNFIg26rQBXm9we2E
-         JO46b9KinV65dWntKHZLpbNAFr9Cc3psRjAD6alpHeTYkh5mKSmdDHrngtFUei9SEeD+
-         guxxPGSKjZsOCFB4T1RHbYBeWwd/4xuT8x+xIi3TgcNg/nKNKyWuJzSfG6/d8H7XdJX6
-         SMDQ==
+        bh=et28JU3wkykvEfV7tUaeZmOsEZymHIt/E70MuyiU1No=;
+        b=G2x7cKfO2HsF6MKrRXtuGOoWc4Yj9Z0Q1nyrd66b5CwhWsYKjq6PGytnNGnWnoUbYg
+         0jM5j8y6re71Mo5bG/5Ojl0FuWMuSP9Eaoaxj5HQpFpkslAfyM1khFmi/TCdIov7pGs1
+         35dPUO8OrPbZFQbz/PVLHobvQlt75SleU+2ukbo6ZGqKu4GeU1PfbY6dp1LYUPK5l9gh
+         L9G4O1nBLIgKKq1HPdPHhPEBqnrucIszUNCbUVyzwlbALVm3SP6WSm1IH5u9OT/3syhL
+         D/r8JPmU9oz+tOmHzugTg/xI95+Lz3S8lUd5+91fPkwHf4Yn5e/eFKasubnMlzF3zHuL
+         SiTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684958729; x=1687550729;
+        d=1e100.net; s=20221208; t=1684959365; x=1687551365;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Wo8IPofr5IpEW+ax3IvqEWITKhSS7r+DVQFWDx/Q3w=;
-        b=TRO06KpCBTiu4MeuWazDXSV1z77XA55qLREgCVUIiGeHwyZ/jghpbLu7TXelc4gPnI
-         CWEC1YlIPc0RtukCFM6AgGwdjvBoNdrpAP31AXMS7SYNYK/hC7Dj4opvLCHmjQ8ohz6r
-         EFbIuoFyI5wy7miVS8uLDbWD/szf2w2VINnlGB7xnU5Pyjaz3qeOit+epbFKw82EnmfA
-         h0YcyoasmiO2vwJIGRv8mBys/tYcrWG9J8z1eKABOOf7VGJy2tWm/m7AOg+wWq7qFEbN
-         dM6EGbJK8zZjyjcwUb/PZgtjx9j110OsNuBW4wkxWRs1QUaJOxVvEy+B1ONCMuWwd3Zs
-         AhOw==
-X-Gm-Message-State: AC+VfDypr12PQtMF7E2js6G/C7zRVlj8lw3N/frVFqFySJsuA3nN8Md6
-        VQXAfU9iLbEeinUpEd3ioYof+4EkQ3g=
-X-Google-Smtp-Source: ACHHUZ7aAaZ4DZIh4roCKOcv/0fpbVmvXqI6dKiQGMExO4BifCTRpFrnwqav5XkCzh5HN23hnvYqD6vHIRs=
+        bh=et28JU3wkykvEfV7tUaeZmOsEZymHIt/E70MuyiU1No=;
+        b=BIu5Frz3VHE2TPlhzNJTGoLK+ou9T7cxXHtVZ1IevqtkPbjg5nHBbPBkI2SPuWBlLr
+         b2ZfcdJyfjh7OxXPDj2Dx4j5N1WqXAiaxcspyZl51HSO668QKR95aQ/qUaQCcQhK5zXL
+         d3rrWSS+WsIcEnXy3Jwij50Qhrt8wWluxGEWg+pnFdNmbKNWgcuBXm1eQ5OokpZinANx
+         nwnvrshy1N8BvvR0XOr4NiGH5X7dAXTn3+gfGf/AtbDRPDvPWU4/4c6avT0pLgWc39TI
+         it1Wpw4yaIPJA2TPdnLxjMMN/qpY4njCUtmGXY6HzfLLVVeKqxXRfTEZWUlrc+Tt92oJ
+         K1PA==
+X-Gm-Message-State: AC+VfDwN6+PQIq4M7mVFEssNyhpCOJCz5JJ+0y1S1EyQJmGh0BNgjipd
+        WdWIz0HmicFFzJGC59nZJ1S0UQ5NZgo=
+X-Google-Smtp-Source: ACHHUZ6+sl+l+zuedDR2LRUIRB6sxCHVVBdT9tzV4JiB2otIi8oPUFcdAUNp1gY5P1OZhcp9jKCI0u1SitE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:943:0:b0:53f:2577:74fb with SMTP id
- 64-20020a630943000000b0053f257774fbmr13432pgj.8.1684958729265; Wed, 24 May
- 2023 13:05:29 -0700 (PDT)
-Date:   Wed, 24 May 2023 13:05:27 -0700
-In-Reply-To: <ZG5g7bhAlsli+Pao@x1n>
+ (user=seanjc job=sendgmr) by 2002:a25:ba05:0:b0:ba8:95dd:3ccb with SMTP id
+ t5-20020a25ba05000000b00ba895dd3ccbmr566879ybg.5.1684959365091; Wed, 24 May
+ 2023 13:16:05 -0700 (PDT)
+Date:   Wed, 24 May 2023 13:16:03 -0700
+In-Reply-To: <ZG2qv9sWl2RUnGqd@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
 Mime-Version: 1.0
-References: <20230330085802.2414466-1-stevensd@google.com> <20230330085802.2414466-2-stevensd@google.com>
- <ZGvUsf7lMkrNDHuE@google.com> <ZG45q0xJSnA6NKQN@x1n> <ZG4/VdHu2LqLTlct@google.com>
- <ZG5F3igFgdIAwrn4@x1n> <ZG5XmdYy3VtcyPAL@google.com> <ZG5g7bhAlsli+Pao@x1n>
-Message-ID: <ZG5uB4SiaS92YEWr@google.com>
-Subject: Re: [PATCH v6 1/4] KVM: mmu: introduce new gfn_to_pfn_noref functions
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <20220706082016.2603916-9-chao.p.peng@linux.intel.com> <ZGxo9ylqYI8JXjGn@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+ <ZGzLf4zgxpBjghaF@google.com> <ZG2qv9sWl2RUnGqd@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+Message-ID: <ZG5wg3VbG4rCYrfk@google.com>
+Subject: Re: [PATCH v7 08/14] KVM: Rename mmu_notifier_*
 From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     David Stevens <stevensd@chromium.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
+To:     Kautuk Consul <kconsul@linux.vnet.ibm.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 24, 2023, Peter Xu wrote:
-> On Wed, May 24, 2023 at 11:29:45AM -0700, Sean Christopherson wrote:
-> > On Wed, May 24, 2023, Peter Xu wrote:
-> > > On Wed, May 24, 2023 at 09:46:13AM -0700, Sean Christopherson wrote:
-> > > > If we hack kvm_pfn_to_refcounted_page(), then all of those protections are lost
-> > > > because KVM would drop its assertions and also skip dirtying pages, i.e. would
-> > > > effectively suppress the latent detection by check_new_page_bad().
+On Wed, May 24, 2023, Kautuk Consul wrote:
+> On 2023-05-23 07:19:43, Sean Christopherson wrote:
+> > On Tue, May 23, 2023, Kautuk Consul wrote:
+> > > On 2022-07-06 16:20:10, Chao Peng wrote:
+> > > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > > index e9153b54e2a4..c262ebb168a7 100644
+> > > > --- a/include/linux/kvm_host.h
+> > > > +++ b/include/linux/kvm_host.h
+> > > > @@ -765,10 +765,10 @@ struct kvm {
+> > > >  
+> > > >  #if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
+> > > >  	struct mmu_notifier mmu_notifier;
+> > > > -	unsigned long mmu_notifier_seq;
+> > > > -	long mmu_notifier_count;
+> > > > -	gfn_t mmu_notifier_range_start;
+> > > > -	gfn_t mmu_notifier_range_end;
+> > > > +	unsigned long mmu_updating_seq;
+> > > > +	long mmu_updating_count;
 > > > 
-> > > So it's probably that I totally have no idea what are the attributes for
-> > > those special pages so I don't understand enough on why we need to handle
-> > > those pages differently from e.g. PFNMAP pages, and also the benefits.
-> > > 
-> > > I think what I can tell is that they're pages that doesn't have
-> > > PageCompound bits set on either head or tails, however it's still a
-> > > multi-2-order large page.  Is there an example on how these pages are used
-> > > and allocated?  Why would we need those pages, and whether these pages need
-> > > to be set dirty/accessed after all?
+> > > Can we convert mmu_updating_seq and mmu_updating_count to atomic_t ?
 > > 
-> > The use case David is interested in is where an AMD GPU driver kmallocs() a
-> > chunk of memory, let's it be mmap()'d by userspace, and userspace then maps it
-> > into the guest for a virtual (passthrough?) GPU.  For all intents and purposes,
-> > it's normal memory, just not refcounted.
-> 
-> I'm not familiar enough with kmalloc, but what I think is kmalloc for large
-> chunks will be the same as alloc_pages, and I thought it should also be a
-> compound page already.  If that needs to be mmap()ed to userapp then I
-> assume it mostly should be kmalloc_large().
-
-Sorry, by "kmalloc()" I was handwaving at all of the variations of kernel allocated
-memory.  From a separate thread[*], looks like the actual usage is a direct call to
-alloc_pages() that deliberately doesn't set __GFP_COMP.  Note, I'm pretty sure the
-comment about "mapping pages directly into userspace" being illegal really means
-something like "don't allow these pages to be gup()'d or mapped via standard mmap()".
-IIUC, ttm_pool_alloc() fills tt->pages and then ttm_bo_vm_fault_reserved() does
-vmf_insert_pfn_prot() to shove the pfn into userspace.
-
-  static struct page *ttm_pool_alloc_page(struct ttm_pool *pool, gfp_t gfp_flags,
-					unsigned int order)
-  {
-	unsigned long attr = DMA_ATTR_FORCE_CONTIGUOUS;
-	struct ttm_pool_dma *dma;
-	struct page *p;
-	void *vaddr;
-
-	/* Don't set the __GFP_COMP flag for higher order allocations.
-	 * Mapping pages directly into an userspace process and calling
-	 * put_page() on a TTM allocated page is illegal.
-	 */
-	if (order)
-		gfp_flags |= __GFP_NOMEMALLOC | __GFP_NORETRY | __GFP_NOWARN |
-			__GFP_KSWAPD_RECLAIM;
-
-	if (!pool->use_dma_alloc) {
-		p = alloc_pages(gfp_flags, order);
-		if (p)
-			p->private = order;
-		return p;
-
-	}
-
-[*] https://lore.kernel.org/all/20220815095423.11131-1-dmitry.osipenko@collabora.com
-
-> kmalloc -> kmalloc_large -> __kmalloc_large_node:
-> 
-> 	flags |= __GFP_COMP;
-> 
-> Then when the new page allocated and being prepared (prep_new_page):
-> 
-> 	if (order && (gfp_flags & __GFP_COMP))
-> 		prep_compound_page(page, order);
-> 
-> I assume prep_compound_page() will make PageCompound return true for those
-> pages returned.  So I know I still miss something, but not sure
-> where.. because IIRC we're at least talking about !PageCompound pages.
-
-Yeah, they're !PageCompound().
-
-> > > >  static bool kvm_is_ad_tracked_page(struct page *page)
-> > > >  {
-> > > > +       /*
-> > > > +        * Assert that KVM isn't attempting to mark a freed page as Accessed or
-> > > > +        * Dirty, i.e. that KVM's MMU doesn't have a use-after-free bug.  KVM
-> > > > +        * (typically) doesn't pin pages that are mapped in KVM's MMU, and
-> > > > +        * instead relies on mmu_notifiers to know when a mapping needs to be
-> > > > +        * zapped/invalidated.  Unmapping from KVM's MMU must happen _before_
-> > > > +        * KVM returns from its mmu_notifier, i.e. the page should have an
-> > > > +        * elevated refcount at this point even though KVM doesn't hold a
-> > > > +        * reference of its own.
-> > > > +        */
-> > > > +       if (WARN_ON_ONCE(!page_count(page)))
-> > > > +               return false;
-> > > > +
-> > > >         /*
-> > > >          * Per page-flags.h, pages tagged PG_reserved "should in general not be
-> > > >          * touched (e.g. set dirty) except by its owner".
-> > > > 
-> > > 
-> > > This looks like a good thing to have, indeed.  But again it doesn't seem
-> > > like anything special to the pages we're discussing here, say, !Compound &&
-> > > refcount==0 ones.
+> > Heh, can we?  Yes.  Should we?  No.
 > > 
-> > The problem is that if KVM ignores refcount==0 pages, then KVM can't distinguish
-> > between the legitimate[*] refcount==0 AMD GPU case and a buggy refcount==0
-> > use-after-free scenario.  I don't want to make that sacrifice as the legimiate
-> > !refcounted use case is a very specific use case, whereas consuming refcounted
-> > memory is ubiquituous (outside of maybe AWS).
+> > > I see that not all accesses to these are under the kvm->mmu_lock
+> > > spinlock.
 > > 
-> > [*] Consuming !refcounted pages is safe only for flows that are tied into the
-> >     mmu_notifiers.  The current proposal/plan is to add an off-by-default module
-> >     param that let's userspace opt-in to kmap() use of !refcounted memory, e.g.
-> >     this case and PFNMAP memory.
-> 
-> I see.
-> 
-> I think you mentioned that we can use one special bit in the shadow pte to
-> mark such special pages.  Does it mean that your above patch will still
-> cover what you wanted to protect even if we use the trick?  Because then
-> kvm_is_ad_tracked_page() should only be called when we're sure the special
-> bit is not set.  IOW, we can still rule out these pages already and
-> page_count()==0 check here can still be helpful to track kvm bugs?
+> > Ya, working as intended.  Ignoring gfn_to_pfn_cache for the moment, all accesses
+> > to mmu_invalidate_in_progress (was mmu_notifier_count / mmu_updating_count above)
+> > are done under mmu_lock.  And for for mmu_notifier_seq (mmu_updating_seq above),
+> > all writes and some reads are done under mmu_lock.  The only reads that are done
+> > outside of mmu_lock are the initial snapshots of the sequence number.
+> > 
+> > gfn_to_pfn_cache uses a different locking scheme, the comments in
+> > mmu_notifier_retry_cache() do a good job explaining the ordering.
+> > 
+> > > This will also remove the need for putting separate smp_wmb() and
+> > > smp_rmb() memory barriers while accessing these structure members.
+> > 
+> > No, the memory barriers aren't there to provide any kind of atomicity.  The barriers
+> > exist to ensure that stores and loads to/from the sequence and invalidate in-progress
+> > counts are ordered relative to the invalidation (stores to counts) and creation (loads)
+> > of SPTEs.  Making the counts atomic changes nothing because atomic operations don't
+> > guarantee the necessary ordering.
+> I'm not saying that the memory barriers provide atomicity.
+> My comment was based on the assumption that "all atomic operations are
+> implicit memory barriers". If that assumption is true then we won't need
+> the memory barriers here if we use atomic operations for protecting
+> these 2 structure members.
 
-Yep, exactly.  FWIW, I was thinking that the SPTE bit would flag refcounted pages,
-not these "special" pages, but either way would work.  All that matters is that
-KVM tracks whether or not the page was refcounted when KVM installed the SPTE.
+Atomics aren't memory barriers on all architectures, e.g. see the various
+definitions of smp_mb__after_atomic().
+
+Even if atomic operations did provide barriers, using an atomic would be overkill
+and a net negative.  On strongly ordered architectures like x86, memory barriers are
+just compiler barriers, whereas atomics may be more expensive.  Of course, the only
+accesses outside of mmu_lock are reads, so on x86 that "atomic" access is just a
+READ_ONCE() load, but that's not the case for all architectures.
+
+Anyways, the point is that atomics and memory barriers are different things that
+serve different purposes.
