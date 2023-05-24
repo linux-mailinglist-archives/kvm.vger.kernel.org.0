@@ -2,215 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 94FDB710182
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 01:08:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E608D7101C2
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 01:38:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238649AbjEXXI3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 May 2023 19:08:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50508 "EHLO
+        id S233601AbjEXXiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 May 2023 19:38:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232901AbjEXXI2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 May 2023 19:08:28 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 207A299
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 16:08:27 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1ae64580e9fso31625ad.1
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 16:08:27 -0700 (PDT)
+        with ESMTP id S230457AbjEXXh7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 May 2023 19:37:59 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87E2312B
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 16:37:58 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-ba2b9ecfadaso3276893276.2
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 16:37:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684969706; x=1687561706;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7uIGf3DX/t1yVaRSBiF6g+nRghGOxxs2qgmm7TStiZI=;
-        b=pQrJjkly+JWvSS6WqrgX7WVhttD3oD0FFoWQv+S/8U7sVToiGsLNnF9FRRorNzzKQt
-         ga5G21bM9rOSj8ju6vs+UgU77HkWgoc6XFOkBJOQ8p/fbBWygnsmRgahJnflVUOsvq94
-         8ZQUR+3mEOD1JMflV0LxgIf3LKCu00Q+zfD/h2GUtIDbXGetUU+iXHvsNed+aX7G9CqM
-         0GrQdXHigVrfBoab2kGUkcu0L1j2ypPndAIkdTl7MZgSHfwLUL8LFRQpvfVi2UEBnQYm
-         nb1tRVb9MgmpKc6JVlPSX/sc2ResWe5XgSWqtnNj5Ti5rmUa/tncoMssQsKBEcVGR/25
-         af+w==
+        d=google.com; s=20221208; t=1684971478; x=1687563478;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lRKixmx29kHFhmvvJtxO+P8WwyZKKKL0TswHVA62TTg=;
+        b=HMo3PsEOlHbDpwSZo0W0ifCAM/bCFfT8Q/TFc7+4n21mLX2IUue9LWbu7kskzqalXN
+         fE3eh/8kVp/0ELn0rrU9i/H6sLJQnH1J1pYrACjgXeCx2+QOFsnfqtE+wN3ysVvPf0AI
+         hnT7lUpssSKfGXfCMwTHe6JZRhLGVe6/aZ8OjciiICs6mE7HxHVC5ARci7xo+m3xsxvb
+         M0+RGFf+7OTII9UaXoXg674A5hsDf7ab7RRulxbeuTpAFT+xsuFTQ4XuVhRXstqOK+vu
+         C5K25wQgopGGnTc2MVmSoYU8QNJC2Vt+WBocRPjWNLHblchGKpkYNc6qRnCqv/x/tF1P
+         3hlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684969706; x=1687561706;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7uIGf3DX/t1yVaRSBiF6g+nRghGOxxs2qgmm7TStiZI=;
-        b=f11Axn38TTPCEbLr+l4vn/exuWSKhXjTqDsS8Cf3FT257c9LUmZgWzDIdQnSJYc4C3
-         6AYTwFm8GVrMhvvacOrejTWOvCYiVVv6cN9pBxh479x1A3cUoEeHlt7vxkxkmQeFc38z
-         wGtxCnMy5+zob7hPVSJHEydSos7++Ymh6eicN9sfIEvknVGoRImyqF1HygEcUHa39gHk
-         F+MJWGCkYiT1Htmc+fnU618t59YT8fsXLV7fUPTgZANMns8Y50v9Ovy2U0znclLox6Tq
-         w6KCRXUxMyHUPaqPJj2jgCaJ+9u2E+VjH0ahrN3xjUso7BEq/oPEY/NjgtjOrj1wk+mE
-         ZO/w==
-X-Gm-Message-State: AC+VfDz8+wXwvumjTm3wBP/PJpQYfnSPYpK6tQHLV4OT+//BEBcVYHzr
-        AhSMmDxHC5pL028peaqSY2veMTnjbN+MKE32fEHpLA==
-X-Google-Smtp-Source: ACHHUZ63+Idbw/qt4T1qFTdyJfOJ0ruqx7xMAaVHR2RRTjlcbT6hGthEciYIg12Lx4T0cEZdAzOgYIooXEwjRHzh860=
-X-Received: by 2002:a17:902:e5c3:b0:1a6:6a2d:18f0 with SMTP id
- u3-20020a170902e5c300b001a66a2d18f0mr23477plf.9.1684969706417; Wed, 24 May
- 2023 16:08:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230323072714.82289-1-likexu@tencent.com> <20230323072714.82289-5-likexu@tencent.com>
-In-Reply-To: <20230323072714.82289-5-likexu@tencent.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 24 May 2023 16:08:15 -0700
-Message-ID: <CALMp9eT1e0OB0sRkGu_EhuAa_B5wQUQ9KajEQvN3gg231Pqzaw@mail.gmail.com>
-Subject: Re: [PATCH 4/7] KVM: selftests: Test consistency of CPUID with num of
- Fixed counters
+        d=1e100.net; s=20221208; t=1684971478; x=1687563478;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lRKixmx29kHFhmvvJtxO+P8WwyZKKKL0TswHVA62TTg=;
+        b=f/EUkmQOULS1lP85exzuqAn45+HmBwt1UDhZ7ves12xsAOEpy0st97R+ArceAJPNhx
+         QM5dAWhtBJo13b+AQ7KnmM+Wv28TLjMjsry/q4v77iz8W5FNaFZ7j1CQ5OUhJnvLgi+r
+         cPF9/3z3WQKP00CXVVqTF9I+XQGIXdEI6NAFonaV5fw/fEP3IqIIE8Jc4H7yaoN8SADu
+         iM7soshhWF4dP9dXV9XZw/a1NoVs7TapMVQEfWIoz2mpEcj201wv5MLAnqiFjXiUZQ9z
+         WvMM5Ix8lhUHYEoo/wXjht3tvARQS2eeeGOA1/zFnHK8cNTun9H8D0S5WX2V/26nvmt0
+         ES2g==
+X-Gm-Message-State: AC+VfDzz2/Ri4c55wIOTCBin1P7mBOPoxTm5m0G75FATZ1q5ltzA2WwK
+        hGNsxbgdTqPagZnJHTagBXlgvmZKUa4=
+X-Google-Smtp-Source: ACHHUZ5eOeDLR2dzzroB4RdLP7S27NoHuH6+uqmnsv4YXlugQiLB2yhHbZMsS1oBkOMP/bXtOhbtuhJWN/Q=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1024:b0:ba8:6422:7fc with SMTP id
+ x4-20020a056902102400b00ba8642207fcmr964818ybt.7.1684971477866; Wed, 24 May
+ 2023 16:37:57 -0700 (PDT)
+Date:   Wed, 24 May 2023 16:37:56 -0700
+In-Reply-To: <f4ef3b07-d2f2-5cfc-6783-49e9b6be7a95@gmail.com>
+Mime-Version: 1.0
+References: <20230410105056.60973-1-likexu@tencent.com> <20230410105056.60973-6-likexu@tencent.com>
+ <CALMp9eTLvJ6GW1mfgjO7CL7tW-79asykyz9=Fb=FfT74VRkDVA@mail.gmail.com>
+ <9a7d5814-9eb1-d7af-7968-a6e3ebb90248@gmail.com> <CALMp9eR6DwY0EjAb1hcV9XGWQizN6R0dXtLaC4NXDgtCqv5cTA@mail.gmail.com>
+ <81bbb700-9346-3d0d-ab86-6e684b185772@gmail.com> <CALMp9eSKnE8+jMpp0KzBRC7NDjT+S2cRz9CcBNDKB7JCU8dmTg@mail.gmail.com>
+ <f4ef3b07-d2f2-5cfc-6783-49e9b6be7a95@gmail.com>
+Message-ID: <ZG6f1GYvtZ/Ndf7H@google.com>
+Subject: Re: [PATCH V5 05/10] KVM: x86/pmu: Disable vPMU if the minimum num of
+ counters isn't met
+From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jinrong Liang <cloudliang@tencent.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Cc:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 12:28=E2=80=AFAM Like Xu <like.xu.linux@gmail.com> =
-wrote:
->
-> From: Jinrong Liang <cloudliang@tencent.com>
->
-> Add test to check if non-existent counters can be accessed in guest after
-> determining the number of Intel generic performance counters by CPUID.
-> Per SDM, fixed-function performance counter 'i' is supported if ECX[i] ||
-> (EDX[4:0] > i). KVM doesn't emulate more counters than it can support.
->
-> Co-developed-by: Like Xu <likexu@tencent.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> ---
->  .../selftests/kvm/x86_64/pmu_cpuid_test.c     | 68 +++++++++++++++++++
->  1 file changed, 68 insertions(+)
->
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_cpuid_test.c b/tools/=
-testing/selftests/kvm/x86_64/pmu_cpuid_test.c
-> index 50902187d2c9..c934144be287 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_cpuid_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_cpuid_test.c
-> @@ -74,6 +74,22 @@ static uint8_t kvm_gp_ctrs_num(void)
->         return (kvm_entry->eax & GP_CTR_NUM_MASK) >> GP_CTR_NUM_OFS_BIT;
->  }
->
-> +static uint8_t kvm_fixed_ctrs_num(void)
-> +{
-> +       const struct kvm_cpuid_entry2 *kvm_entry;
-> +
-> +       kvm_entry =3D get_cpuid_entry(kvm_get_supported_cpuid(), 0xa, 0);
-> +       return kvm_entry->edx & FIXED_CTR_NUM_MASK;
-> +}
-> +
-> +static uint32_t kvm_fixed_ctrs_bitmask(void)
-> +{
-> +       const struct kvm_cpuid_entry2 *kvm_entry;
-> +
-> +       kvm_entry =3D get_cpuid_entry(kvm_get_supported_cpuid(), 0xa, 0);
-> +       return kvm_entry->ecx;
-> +}
-> +
->  static struct kvm_vcpu *new_vcpu(void *guest_code)
->  {
->         struct kvm_vm *vm;
-> @@ -230,6 +246,39 @@ static void test_oob_gp_counter_setup(struct kvm_vcp=
-u *vcpu, uint8_t eax_gp_num,
->         vm_install_exception_handler(vcpu->vm, GP_VECTOR, guest_gp_handle=
-r);
->  }
->
-> +static uint64_t test_oob_fixed_counter_setup(struct kvm_vcpu *vcpu,
-> +                                            uint8_t edx_fix_num,
-> +                                            uint32_t fixed_bitmask)
-> +{
-> +       struct kvm_cpuid_entry2 *entry;
-> +       uint32_t ctr_msr =3D MSR_CORE_PERF_FIXED_CTR0;
-> +       uint8_t idx =3D edx_fix_num;
-> +       bool is_supported =3D true;
-> +       uint64_t ret =3D 0xffffULL;
-> +
-> +       entry =3D vcpu_get_cpuid_entry(vcpu, 0xa);
-> +       entry->ecx =3D fixed_bitmask;
-> +       entry->edx =3D (entry->edx & ~FIXED_CTR_NUM_MASK) | edx_fix_num;
-> +       vcpu_set_cpuid(vcpu);
-> +
-> +       /* Per Intel SDM, FixCtr[i]_is_supported :=3D ECX[i] || (EDX[4:0]=
- > i). */
-> +       is_supported =3D (entry->ecx & BIT_ULL(idx) ||
-> +                       ((entry->edx & FIXED_CTR_NUM_MASK) > idx));
-> +
-> +       /* KVM doesn't emulate more fixed counters than it can support. *=
-/
-> +       if (idx >=3D kvm_fixed_ctrs_num())
-> +               is_supported =3D false;
-> +
-> +       if (!is_supported) {
-> +               vm_install_exception_handler(vcpu->vm, GP_VECTOR, guest_g=
-p_handler);
-> +               ret =3D GP_VECTOR;
-> +       }
-> +
-> +       vcpu_args_set(vcpu, 4, ctr_msr, ret, idx, 1);
-> +
-> +       return ret;
-> +}
-> +
->  static void intel_check_arch_event_is_unavl(uint8_t idx)
->  {
->         const char *msg =3D "Unavailable arch event is counting.";
+On Wed, Apr 19, 2023, Like Xu wrote:
+> Jim, sorry for the late reply.
+> 
+> On 11/4/2023 10:58 pm, Jim Mattson wrote:
+> > > > > Jim, does this help you or could you explain more about your confusion ?
+> > > > 
+> > > > You say that "fewer than four counters can lead to guest instability
+> > > > as software expects four counters to be available." Your solution is
+> > > > to disable the PMU, which leaves zero counters available. Zero is less
+> > > > than four. Hence, by your claim, disabling the PMU can lead to guest
+> > > > instability. I don't see how this is an improvement over one, two, or
+> > > > three counters.
 
-This test seems bogus to me. The event may not be available because it
-is inaccurate. That doesn't imply that the count will always be zero.
+KVM can't do the right thing regardless.  I would rather have KVM explicitly tell
+userspace via that it can't support a vPMU than to carry on with a bogus and
+unexpected setup.
 
-> @@ -267,10 +316,23 @@ static void test_oob_gp_counter(uint8_t eax_gp_num,=
- uint64_t perf_cap)
->         free_vcpu(vcpu);
->  }
->
-> +static void intel_test_oob_fixed_ctr(uint8_t edx_fix_num, uint32_t fixed=
-_bitmask)
-> +{
-> +       const char *msg =3D "At least one unsupported Fixed counter is vi=
-sible.";
+> > Does this actually guarantee that the requisite number of counters are
+> > available and will always be available while the guest is running?
+> 
+> Not 100%, the scheduling of physical counters depends on the host perf scheduler.
 
-This test seems bogus to me. Unsupported does not imply invisible.
+Or put differently, the same thing that happens on Intel.  kvm_pmu_cap.num_counters_gp
+is the number of counters reported by perf when KVM loads, i.e. barring oddities,
+it's the number of counters present in the host.  Most importantly, if perf doesn't
+find the expected number of counters, perf will bail and use software only events,
+and then clear all of x86_pmu.
 
-> +       struct kvm_vcpu *vcpu;
-> +       uint64_t ret;
-> +
-> +       vcpu =3D new_vcpu(guest_wr_and_rd_msrs);
-> +       ret =3D test_oob_fixed_counter_setup(vcpu, edx_fix_num, fixed_bit=
-mask);
-> +       run_vcpu(vcpu, msg, first_uc_arg_equals, (void *)ret);
-> +       free_vcpu(vcpu);
-> +}
-> +
->  static void intel_test_counters_num(void)
->  {
->         uint8_t kvm_gp_num =3D kvm_gp_ctrs_num();
->         unsigned int i;
-> +       uint32_t ecx;
->
->         TEST_REQUIRE(kvm_gp_num > 2);
->
-> @@ -289,6 +351,12 @@ static void intel_test_counters_num(void)
->                 /* KVM doesn't emulate more counters than it can support.=
- */
->                 test_oob_gp_counter(kvm_gp_num + 1, perf_caps[i]);
->         }
-> +
-> +       for (ecx =3D 0; ecx <=3D kvm_fixed_ctrs_bitmask() + 1; ecx++) {
-> +               intel_test_oob_fixed_ctr(0, ecx);
-> +               intel_test_oob_fixed_ctr(kvm_fixed_ctrs_num(), ecx);
-> +               intel_test_oob_fixed_ctr(kvm_fixed_ctrs_num() + 1, ecx);
-> +       }
->  }
->
->  static void intel_test_arch_events(void)
-> --
-> 2.40.0
->
+In other words, KVM's new sanity *should* be a nop with respect to current
+behavior.  If we're concerned about "unnecessarily" hiding the PMU when there are
+1-3 counters, I'd be ok with a WARN_ON_ONCE().
+
+Actually, looking more closely, there's unaddressed feedback from v4[*].  Folding
+that in, we can enable the sanity check for both Intel and AMD, though that's a
+bit of a lie since Intel will be '1'.  But the code looks pretty!
+
+	if (enable_pmu) {
+		perf_get_x86_pmu_capability(&kvm_pmu_cap);
+
+		/*
+		 * WARN if perf did NOT disable hardware PMU if the number of
+		 * architecturally required GP counters aren't present, i.e. if
+		 * there are a non-zero number of counters, but fewer than what
+		 * is architecturally required.
+		 */
+		if (!kvm_pmu_cap.num_counters_gp ||
+		    WARN_ON_ONCE(kvm_pmu_cap.num_counters_gp < pmu_ops->MIN_NR_GP_COUNTERS))
+			enable_pmu = false;
+		else if (is_intel && !kvm_pmu_cap.version)
+			enable_pmu = false;
+	}
+
+	if (!enable_pmu) {
+		memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
+		return;
+	}
+
+[*] https://lore.kernel.org/all/ZC9ijgZBaz6p1ecw@google.com
