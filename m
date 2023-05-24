@@ -2,297 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D23BD70FA21
-	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 17:32:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BD9170FAD7
+	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 17:54:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235823AbjEXPce (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 May 2023 11:32:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60344 "EHLO
+        id S237271AbjEXPyI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 May 2023 11:54:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229876AbjEXPcc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 May 2023 11:32:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C07B97
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 08:31:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684942307;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nvdaBvxVvgbIEoVnHfDqGdU+6IOYKpfr6BkQPhMy2q4=;
-        b=LxEYqKjuKx6Rv2eOyum/bOPWy7i6lywnHvPMouclhZpEX/6NxwwRFU5G8KJK4wCG3grYyv
-        cIC5tyT8wwK1mhAQZ5hhlM+hJVrzBHZIatNtD0meY2qtuHfecnCi6Vj2cC2HdVImsgowOO
-        E3FwG7gH1oj9Q6gVEGNJfNgj02gu4h0=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-636-y5PkLt08OOGM7PvHlpiyrQ-1; Wed, 24 May 2023 11:31:46 -0400
-X-MC-Unique: y5PkLt08OOGM7PvHlpiyrQ-1
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-33827ea8273so5883395ab.0
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 08:31:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684942305; x=1687534305;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nvdaBvxVvgbIEoVnHfDqGdU+6IOYKpfr6BkQPhMy2q4=;
-        b=CKdeEOIiYSCSkomKqMzLowdNyIaMgxQClHsiMgAh0JSEkQBB17eo9mzCPkN7U0KLHD
-         t15C1nHAeQY3d0n4kRVRtnjtVKQTizKpaJAYvsakgHE18cG2a/12IqKHiw+MBtwnau3p
-         iauS7Mn1shgQQnWQWh2lmhoKQQs8ooWCKVJ5jCc4Zevgig/Apu3SSi2Vo3LnTtV53oQn
-         vnNvXxeyZVAv1kelEISEkwhBz51FrvX5P6XGExjAnT4+SjpdCtjljoUoxhvjBi1C3pue
-         bRFLdoAeFbYmbuqK3MwKSXH4iKyV4VEN/i+Ia8NfoW1NtfSBQPqkW/xVBJHTnH/acbMW
-         fWeA==
-X-Gm-Message-State: AC+VfDxfSTwqGaR0ai76o1E0LrenGJk9DKY9vMlEbW+Lk8wa5Ze9bhIH
-        cCK9ODxm9fuW6NDdzzLVYFiVPy3nvnO7uvkhYPA48g+IrHLOZaZgiY3kQXy5ZQFNRvPsZdR0d39
-        IbzvlDkp4ksn8
-X-Received: by 2002:a92:c907:0:b0:32b:2884:667d with SMTP id t7-20020a92c907000000b0032b2884667dmr4338093ilp.7.1684942305649;
-        Wed, 24 May 2023 08:31:45 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5cy4JMLj0bwMPsJjsNyex61B0gji72MRQyMprj4D6oX0LlHGIbVejgmylTAcQIeRDEmquiBA==
-X-Received: by 2002:a92:c907:0:b0:32b:2884:667d with SMTP id t7-20020a92c907000000b0032b2884667dmr4338057ilp.7.1684942305320;
-        Wed, 24 May 2023 08:31:45 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id o3-20020a056e02068300b0033079f435f7sm3133927ils.65.2023.05.24.08.31.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 May 2023 08:31:44 -0700 (PDT)
-Date:   Wed, 24 May 2023 09:31:42 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "clegoate@redhat.com" <clegoate@redhat.com>
-Subject: Re: [PATCH v11 20/23] vfio: Add VFIO_DEVICE_[AT|DE]TACH_IOMMUFD_PT
-Message-ID: <20230524093142.3cac798e.alex.williamson@redhat.com>
-In-Reply-To: <DS0PR11MB75292161F081F27C0650EFB3C3419@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230513132827.39066-1-yi.l.liu@intel.com>
-        <20230513132827.39066-21-yi.l.liu@intel.com>
-        <20230522161534.32f3bf8e.alex.williamson@redhat.com>
-        <DS0PR11MB7529096D1BE1D337BA50884BC3409@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230523095025.1898297c.alex.williamson@redhat.com>
-        <DS0PR11MB75292161F081F27C0650EFB3C3419@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S232134AbjEXPyE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 May 2023 11:54:04 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2059.outbound.protection.outlook.com [40.107.244.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2620093;
+        Wed, 24 May 2023 08:54:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MuZHcTV2c1Hw6aFt1H2HzXbUVNHyje4SH4mBJhg1WSZ9mypLuoV3HRZG/U2ANlDGNfOOpt+IUcJohX5WfpmQ9xQyWAXvo4KDCkfuY4HB1O9p7bRT9c8bUbcwq8a7dU6Dnl4iO8unJ5S3lIpt+Nq4XdrIQ2paCGROfnejQok09R+iPDBl7zu0Rtrs5w1b/N+CDJoVK3bdkW0ccz4eT8lBAN/Bq1S99ECOrJk7nsYyffXB2yaFHVwXwvjqvQP4C8svyiJsLHlbg6f3MWDvqkBUfcYaAPvfv9sHkcXKxUA5FvHoO8b18ojWmr2g71QN9RU6ObzWvGz9Yu0OmW8gz4p6Sg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F8KNqdnjtKWcEXSXUqLQ+v026bq+7atcJwrPjkBLIxQ=;
+ b=JWHqASk00xWb7J3fYm4ueJ65ZTe5/KkdkcD6LKdisAkHOXjkBs0rhoP+u4czyTQLCwenHGiXxwNu1tZfS7Tf7K083VoRmCbW8WPStb/Boa97U50EaykpuZUdKIubCrcU0qzQc2EMztOcZ40P/X84Y8EXAw1Hh4auniW6TkjHq09n3uOkqOW1pCsqW3eMImcYP0ymH8UCaA5gLoVf3Nnt+9lMTSEPup5PwUqYq912A36B8HNDc2/AN/R1FYohP/vJuWirzw65wIvM9Ed0h8x5yMuL51vZuLdWnVpBfiIrPRNheBLeagDWPuQziOULRslDFvao5b8VypIqK+jwVgRUFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=F8KNqdnjtKWcEXSXUqLQ+v026bq+7atcJwrPjkBLIxQ=;
+ b=Ah7gqAOCkFqdXAn+gT2Duiz+YRHvfxY29CEUHAtuQFHqQ5SPYdovr8NMhtVpefOODDNdkSDWTEZ0ldDOwDVIZwLy4UxLiT1hkDstOAsPwnQeWdAQqe09PjaWVWkMFEen+9QHXHPPfOUKAkMHxwK9WvIPDiXvn1JG0iB31cnivA0=
+Received: from BN9PR03CA0058.namprd03.prod.outlook.com (2603:10b6:408:fb::33)
+ by CH3PR12MB8209.namprd12.prod.outlook.com (2603:10b6:610:123::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.15; Wed, 24 May
+ 2023 15:54:00 +0000
+Received: from BN8NAM11FT101.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:fb:cafe::ca) by BN9PR03CA0058.outlook.office365.com
+ (2603:10b6:408:fb::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.15 via Frontend
+ Transport; Wed, 24 May 2023 15:54:00 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT101.mail.protection.outlook.com (10.13.177.126) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6433.16 via Frontend Transport; Wed, 24 May 2023 15:53:59 +0000
+Received: from jallen-jump-host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 24 May
+ 2023 10:53:59 -0500
+From:   John Allen <john.allen@amd.com>
+To:     <kvm@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>, <pbonzini@redhat.com>,
+        <weijiang.yang@intel.com>, <rick.p.edgecombe@intel.com>,
+        <seanjc@google.com>, <x86@kernel.org>, <thomas.lendacky@amd.com>,
+        <bp@alien8.de>, John Allen <john.allen@amd.com>
+Subject: [RFC PATCH v2 0/6] SVM guest shadow stack support
+Date:   Wed, 24 May 2023 15:53:33 +0000
+Message-ID: <20230524155339.415820-1-john.allen@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT101:EE_|CH3PR12MB8209:EE_
+X-MS-Office365-Filtering-Correlation-Id: f00dbde6-3216-49c1-13c6-08db5c6f1705
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 1+XA7MpPBFyl9F1PGjydwpXFMz0iiod2Pe4jnfj/LoCjHkAD+BdW79eAFkNJsFotTrswSwZ4//uB1rtQCDWw088YX3R1M81HZ0Ej2kWYnrjHkOfjHbnuKVlSwa9MFTHQSoitqX38+pLcn/vj3uplDM5HAI/SDM4Sd6ruk9yW+Rv96ItVodaVSwGwTFBYly8IQgI7gIDH7FmnmhL+nun7nd/IBmvUB0fl/VfH+V54CXPbq9rI6ZWoxDF6pQEnORPSK2H8xtIicj/XvzlhgpyPYjMHaQStTbrhdHN2midWm4neQH+iSFaV6nvFCgggo3JT3EESXy7xZBbCruw69wlyz6oXnmUJ3N29FWJwnnmGodmuoFcK3jT8PkQnTfBAB667Iqte1iqjz27mEKOXP3N3omd/NcF4mgXYFWwK8ghVbqrYjkHyNoeZ2168wE4CFPfBV7cW0fwlciGi0IFv7YbUNtYu3lfypBdHxZ/e+lNMB0K7CP5c8/rPiFhIXdvcOU4XpG8ugNyA8uHeBCCMon8E1IfDyMYMh5IfH/wsitrhAABdLDxI8mvsNOTKmeBCOMw7+oAA7/l8n2+PMdodd56oJtdawb+cSLgIeXUG1im5zjoA/zk0UD7JkJ/+DYXlPe1hx8xxAF7JRW0OCZJNqiCMlwsmTPKXAFVoMNKnAa4drPpVF+iwzVSuTUwbMRZ6q7X9QQ5fmiZzenJnyNZWXVwk2tlmJUcyy35pYenG55XqvithqNXqz2r82VadI7MqV2SY/EUjyCnQYYHxWxG8qjT+uVHSes1wyFWn5A+2GNmXZdk=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(396003)(39860400002)(451199021)(40470700004)(46966006)(36840700001)(54906003)(6666004)(26005)(1076003)(70586007)(70206006)(316002)(4326008)(6916009)(7696005)(41300700001)(966005)(478600001)(8936002)(8676002)(5660300002)(40460700003)(40480700001)(2616005)(83380400001)(86362001)(426003)(336012)(36756003)(2906002)(82740400003)(356005)(81166007)(82310400005)(44832011)(186003)(16526019)(36860700001)(47076005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 May 2023 15:53:59.9766
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f00dbde6-3216-49c1-13c6-08db5c6f1705
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT101.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8209
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 24 May 2023 02:12:14 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+AMD Zen3 and newer processors support shadow stack, a feature designed to
+protect against ROP (return-oriented programming) attacks in which an attacker
+manipulates return addresses on the call stack in order to execute arbitrary
+code. To prevent this, shadow stacks can be allocated that are only used by
+control transfer and return instructions. When a CALL instruction is issued, it
+writes the return address to both the program stack and the shadow stack. When
+the subsequent RET instruction is issued, it pops the return address from both
+stacks and compares them. If the addresses don't match, a control-protection
+exception is raised.
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Tuesday, May 23, 2023 11:50 PM
-> > 
-> > On Tue, 23 May 2023 01:20:17 +0000
-> > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> >   
-> > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > Sent: Tuesday, May 23, 2023 6:16 AM
-> > > >
-> > > > On Sat, 13 May 2023 06:28:24 -0700
-> > > > Yi Liu <yi.l.liu@intel.com> wrote:
-> > > >  
-> > > > > This adds ioctl for userspace to attach device cdev fd to and detach
-> > > > > from IOAS/hw_pagetable managed by iommufd.
-> > > > >
-> > > > >     VFIO_DEVICE_ATTACH_IOMMUFD_PT: attach vfio device to IOAS, hw_pagetable
-> > > > > 				   managed by iommufd. Attach can be
-> > > > > 				   undo by VFIO_DEVICE_DETACH_IOMMUFD_PT
-> > > > > 				   or device fd close.
-> > > > >     VFIO_DEVICE_DETACH_IOMMUFD_PT: detach vfio device from the current  
-> > attached  
-> > > > > 				   IOAS or hw_pagetable managed by iommufd.
-> > > > >
-> > > > > Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-> > > > > Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > > > > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> > > > > ---
-> > > > >  drivers/vfio/device_cdev.c | 66 ++++++++++++++++++++++++++++++++++++++
-> > > > >  drivers/vfio/iommufd.c     | 18 +++++++++++
-> > > > >  drivers/vfio/vfio.h        | 18 +++++++++++
-> > > > >  drivers/vfio/vfio_main.c   |  8 +++++
-> > > > >  include/uapi/linux/vfio.h  | 52 ++++++++++++++++++++++++++++++
-> > > > >  5 files changed, 162 insertions(+)
-> > > > >
-> > > > > diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
-> > > > > index 291cc678a18b..3f14edb80a93 100644
-> > > > > --- a/drivers/vfio/device_cdev.c
-> > > > > +++ b/drivers/vfio/device_cdev.c
-> > > > > @@ -174,6 +174,72 @@ long vfio_device_ioctl_bind_iommufd(struct  
-> > vfio_device_file  
-> > > > *df,  
-> > > > >  	return ret;
-> > > > >  }
-> > > > >
-> > > > > +int vfio_ioctl_device_attach(struct vfio_device_file *df,
-> > > > > +			     struct vfio_device_attach_iommufd_pt __user *arg)
-> > > > > +{
-> > > > > +	struct vfio_device *device = df->device;
-> > > > > +	struct vfio_device_attach_iommufd_pt attach;
-> > > > > +	unsigned long minsz;
-> > > > > +	int ret;
-> > > > > +
-> > > > > +	minsz = offsetofend(struct vfio_device_attach_iommufd_pt, pt_id);
-> > > > > +
-> > > > > +	if (copy_from_user(&attach, arg, minsz))
-> > > > > +		return -EFAULT;
-> > > > > +
-> > > > > +	if (attach.argsz < minsz || attach.flags)
-> > > > > +		return -EINVAL;
-> > > > > +
-> > > > > +	/* ATTACH only allowed for cdev fds */
-> > > > > +	if (df->group)
-> > > > > +		return -EINVAL;
-> > > > > +
-> > > > > +	mutex_lock(&device->dev_set->lock);
-> > > > > +	ret = vfio_iommufd_attach(device, &attach.pt_id);
-> > > > > +	if (ret)
-> > > > > +		goto out_unlock;
-> > > > > +
-> > > > > +	ret = copy_to_user(&arg->pt_id, &attach.pt_id,
-> > > > > +			   sizeof(attach.pt_id)) ? -EFAULT : 0;
-> > > > > +	if (ret)
-> > > > > +		goto out_detach;
-> > > > > +	mutex_unlock(&device->dev_set->lock);
-> > > > > +
-> > > > > +	return 0;
-> > > > > +
-> > > > > +out_detach:
-> > > > > +	vfio_iommufd_detach(device);
-> > > > > +out_unlock:
-> > > > > +	mutex_unlock(&device->dev_set->lock);
-> > > > > +	return ret;
-> > > > > +}
-> > > > > +
-> > > > > +int vfio_ioctl_device_detach(struct vfio_device_file *df,
-> > > > > +			     struct vfio_device_detach_iommufd_pt __user *arg)
-> > > > > +{
-> > > > > +	struct vfio_device *device = df->device;
-> > > > > +	struct vfio_device_detach_iommufd_pt detach;
-> > > > > +	unsigned long minsz;
-> > > > > +
-> > > > > +	minsz = offsetofend(struct vfio_device_detach_iommufd_pt, flags);
-> > > > > +
-> > > > > +	if (copy_from_user(&detach, arg, minsz))
-> > > > > +		return -EFAULT;
-> > > > > +
-> > > > > +	if (detach.argsz < minsz || detach.flags)
-> > > > > +		return -EINVAL;
-> > > > > +
-> > > > > +	/* DETACH only allowed for cdev fds */
-> > > > > +	if (df->group)
-> > > > > +		return -EINVAL;
-> > > > > +
-> > > > > +	mutex_lock(&device->dev_set->lock);
-> > > > > +	vfio_iommufd_detach(device);
-> > > > > +	mutex_unlock(&device->dev_set->lock);
-> > > > > +
-> > > > > +	return 0;
-> > > > > +}
-> > > > > +
-> > > > >  static char *vfio_device_devnode(const struct device *dev, umode_t *mode)
-> > > > >  {
-> > > > >  	return kasprintf(GFP_KERNEL, "vfio/devices/%s", dev_name(dev));
-> > > > > diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
-> > > > > index 83575b65ea01..799ea322a7d4 100644
-> > > > > --- a/drivers/vfio/iommufd.c
-> > > > > +++ b/drivers/vfio/iommufd.c
-> > > > > @@ -112,6 +112,24 @@ void vfio_iommufd_unbind(struct vfio_device_file *df)
-> > > > >  		vdev->ops->unbind_iommufd(vdev);
-> > > > >  }
-> > > > >
-> > > > > +int vfio_iommufd_attach(struct vfio_device *vdev, u32 *pt_id)
-> > > > > +{
-> > > > > +	lockdep_assert_held(&vdev->dev_set->lock);
-> > > > > +
-> > > > > +	if (vfio_device_is_noiommu(vdev))
-> > > > > +		return 0;  
-> > > >
-> > > > Isn't this an invalid operation for a noiommu cdev, ie. -EINVAL?  We
-> > > > return success and copy back the provided pt_id, why would a user not
-> > > > consider it a bug that they can't use whatever value was there with
-> > > > iommufd?  
-> > >
-> > > Yes, this is the question I asked in [1]. At that time, it appears to me
-> > > that better to allow it [2]. Maybe it's more suitable to ask it here.  
-> > 
-> > From an API perspective it seems wrong.  We return success without
-> > doing anything.  A user would be right to consider it a bug that the
-> > attach operation works but there's not actually any association to the
-> > IOAS.  Thanks,  
-> 
-> The current version is kind of tradeoff based on prior remarks when
-> I asked the question. As prior comment[2], it appears to me the attach
-> shall success for noiommu devices as well, but per your remark it seems
-> not in plan. So anyway, we may just fail the attach/detach for noiommu
-> devices. Is it?
+Shadow stack and a related feature, Indirect Branch Tracking (IBT), are
+collectively referred to as Control-flow Enforcement Technology (CET). However,
+current AMD processors only support shadow stack and not IBT.
 
-If a user creates an ioas within an iommufd, attaches a device to that
-ioas and populates it with mappings, wouldn't the user expect the
-device to have access to and honor those mappings?  I think that's the
-path we're headed down if we report a successful attach of a noiommu
-device to an ioas.
+This series adds support for shadow stack in SVM guests and builds upon
+the support added in the CET guest support patch series [1]. Additional
+patches are required to support shadow stack enabled guests in qemu [2]
+and glibc [3].
 
-We need to keep in mind that noiommu was meant to be a minimally
-intrusive mechanism to provide a dummy vfio IOMMU backend and satisfy
-the group requirements, solely for the purpose of making use of the
-vfio device interface and without providing any DMA mapping services or
-expectations.  IMO, an argument that we need the attach op to succeed in
-order to avoid too much disruption in userspace code is nonsense.  On
-the contrary, userspace needs to be very aware of this difference and
-we shouldn't invest effort trying to make noiommu more convenient to
-use.  It's inherently unsafe.
+[1]: CET guest support patches
+https://lore.kernel.org/all/20230511040857.6094-1-weijiang.yang@intel.com/
 
-I'm not fond of what a mess noiommu has become with cdev, we're well
-beyond the minimal code trickery of the legacy implementation.  I hate
-to ask, but could we reiterate our requirements for noiommu as a part of
-the native iommufd interface for vfio?  The nested userspace requirement
-is gone now that hypervisors have vIOMMU support, so my assumption is
-that this is only for bare metal systems without an IOMMU, which
-ideally are less and less prevalent.  Are there any noiommu userspaces
-that are actually going to adopt the noiommu cdev interface?  What
-terrible things happen if noiommu only exists in the vfio group compat
-interface to iommufd and at some distant point in the future dies when
-that gets disabled?
+[2]: CET qemu patches
+https://patchwork.ozlabs.org/project/qemu-devel/patch/20201013051935.6052-2-weijiang.yang@intel.com/
 
-> btw. Should we document it somewhere as well? E.g. noiommu userspace
-> does not support attach/detach? Userspace should know it is opening
-> noiommu devices.
+[3]: glibc tree containing necessary updates
+https://gitlab.com/x86-glibc/glibc/-/tree/users/hjl/cet/master/
 
-Documentation never hurts.  This is such a specialized use case I'm not
-sure we've bothered to do much documentation for noiommu previously.
+---
+
+v2:
+  - Rebased on v3 of the Intel CET virtualization series, dropping the
+    patch that moved cet_is_msr_accessible to common code as that has
+    been pulled into the Intel series.
+  - Minor change removing curly brackets around if statement introduced
+    in patch 6/6.
+
+---
+
+Note to maintainers:
+
+This series is split into two parts. This series pertains to KVM and
+should apply to the KVM tree. Another patch which I will be submitting
+separately entitled, "[RFC PATCH v2] x86/sev-es: Include XSS value in
+GHCB CPUID request", pertains to the guest kernel and should apply to
+the tip tree. However, I realized that both series depend on the
+following line from patch 5/6 in this series:
+
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index e7c7379d6ac7..8f91376273e0 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -677,5 +677,6 @@ DEFINE_GHCB_ACCESSORS(sw_exit_info_1)
+ DEFINE_GHCB_ACCESSORS(sw_exit_info_2)
+ DEFINE_GHCB_ACCESSORS(sw_scratch)
+ DEFINE_GHCB_ACCESSORS(xcr0)
++DEFINE_GHCB_ACCESSORS(xss)
+
+ #endif
+
+Please advise on how to resolve this situation.
+
 Thanks,
+John
 
-Alex
+John Allen (6):
+  KVM: x86: SVM: Emulate reads and writes to shadow stack MSRs
+  KVM: x86: SVM: Update dump_vmcb with shadow stack save area additions
+  KVM: x86: SVM: Pass through shadow stack MSRs
+  KVM: SVM: Save shadow stack host state on VMRUN
+  KVM: SVM: Add MSR_IA32_XSS to the GHCB for hypervisor kernel
+  KVM: SVM: Add CET features to supported_xss
+
+ arch/x86/include/asm/svm.h |  1 +
+ arch/x86/kvm/svm/sev.c     | 25 +++++++++++-
+ arch/x86/kvm/svm/svm.c     | 84 ++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.h     |  2 +-
+ 4 files changed, 109 insertions(+), 3 deletions(-)
+
+-- 
+2.39.1
 
