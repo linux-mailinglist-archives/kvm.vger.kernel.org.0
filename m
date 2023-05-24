@@ -2,114 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DB0E70EFE3
-	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 09:50:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C1E870EFF0
+	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 09:53:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240086AbjEXHum (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 May 2023 03:50:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49062 "EHLO
+        id S240102AbjEXHxu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 May 2023 03:53:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233407AbjEXHuk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 May 2023 03:50:40 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFF5C93
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 00:50:39 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 647072243F;
-        Wed, 24 May 2023 07:50:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1684914638; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        with ESMTP id S239656AbjEXHxs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 May 2023 03:53:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D20A191
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 00:53:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684914781;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rvDxc996bWvS0b16mE9F71bfGKG1BiGQdYN+RnxVi20=;
-        b=dRjX6YHdAr6Oz3bxNtuCewCuHWH/dKVcCRujoPkqOLdm1zrlK08Oqn/dSMqeGNcPwTpleV
-        QZvcM/qUrTyxnwn1y6UXdkAXjsrmsD8LXwEvnGZ1zi/dGiBGp2gqHo0TtktBIIABWpI++Q
-        lNHwWySaqT7J0jdn62RKGvrO8Yf8rmE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1684914638;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rvDxc996bWvS0b16mE9F71bfGKG1BiGQdYN+RnxVi20=;
-        b=fAYPQMGCH0hE9LJ7NAU43b9T50qoRGr/Aioe0Bz8GX130LN9gTmM9HcS0bN4aS+cmx4JwL
-        VbPIv9dnK2fCM0Bg==
-Received: from hawking.suse.de (unknown [10.168.4.11])
-        by relay2.suse.de (Postfix) with ESMTP id D21882C141;
-        Wed, 24 May 2023 07:50:36 +0000 (UTC)
-Received: by hawking.suse.de (Postfix, from userid 17005)
-        id 9B0444A03A8; Wed, 24 May 2023 09:50:36 +0200 (CEST)
-From:   Andreas Schwab <schwab@suse.de>
-To:     "Arnd Bergmann" <arnd@arndb.de>
-Cc:     "Palmer Dabbelt" <palmer@dabbelt.com>,
-        "Andy Chiu" <andy.chiu@sifive.com>,
-        linux-riscv@lists.infradead.org,
-        "Anup Patel" <anup@brainfault.org>,
-        "Atish Patra" <atishp@atishpatra.org>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        "Vineet Gupta" <vineetg@rivosinc.com>,
-        "Greentime Hu" <greentime.hu@sifive.com>,
-        "Guo Ren" <guoren@linux.alibaba.com>,
-        "Vincent Chen" <vincent.chen@sifive.com>,
-        "Paul Walmsley" <paul.walmsley@sifive.com>,
-        "Albert Ou" <aou@eecs.berkeley.edu>,
-        "Oleg Nesterov" <oleg@redhat.com>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Kees Cook" <keescook@chromium.org>, heiko.stuebner@vrull.eu,
-        "Conor.Dooley" <conor.dooley@microchip.com>,
-        "Huacai Chen" <chenhuacai@kernel.org>,
-        "Janosch Frank" <frankja@linux.ibm.com>,
-        "Qing Zhang" <zhangqing@loongson.cn>, eb@emlix.com
-Subject: Re: [PATCH -next v20 12/26] riscv: Add ptrace vector support
-In-Reply-To: <eb61b8c5-4c0a-4d64-b817-235db848995c@app.fastmail.com> (Arnd
-        Bergmann's message of "Wed, 24 May 2023 08:32:27 +0200")
-References: <mhng-f92fa24d-c8bd-4794-819d-7563c1193430@palmer-ri-x1c9a>
-        <eb61b8c5-4c0a-4d64-b817-235db848995c@app.fastmail.com>
-X-Yow:  My BIOLOGICAL ALARM CLOCK just went off..  It has noiseless
- DOZE FUNCTION and full kitchen!!
-Date:   Wed, 24 May 2023 09:50:36 +0200
-Message-ID: <mvmzg5udv77.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        bh=L/SzYaK85eaBFe9kZW8XCykIez6pdcUrYWu5ue5PqKI=;
+        b=He0fVcI8l/5jiBBNanFrpe0isghVJxYzDce6IDbKOQ719Wh5YXY2HaTziAE+iGBb2Ym8uz
+        nQNlTbG9shpwBfH2dKoanjtXWaZDf+Ods2kZrMzULs6ka4+La2XN2A+A+hjdlSPjOJK66t
+        ttqlNbiprXEDFxSKV/+wvyJORt50GnU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-573-OsNDrSsMND6Pcprxu3utlg-1; Wed, 24 May 2023 03:52:59 -0400
+X-MC-Unique: OsNDrSsMND6Pcprxu3utlg-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-30950eecbc0so171667f8f.3
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 00:52:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684914778; x=1687506778;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L/SzYaK85eaBFe9kZW8XCykIez6pdcUrYWu5ue5PqKI=;
+        b=jNZgZT1C7ZZBWDynvftmCuUNMzHH7UyWpfuowy3aXZDuANjrshLlrv9+SBbV/8/TQk
+         hhL/vEZu5ZBrMcI7LEhNtgeWYwTrmyYjQ9bn7LdHRqO9MLoXAUDYc8nVx+7JJVz5RU9F
+         h3fdmFQdqwiAVdLUz3/ne0TnzFPiliTf/Zn3Jju/XWPlVhdZCl0D2NypEcNrzpvZNVJW
+         tIAFKt4jxmHmZc6DBpikw2WWhIgeh7DtNU7UslMqID1jC3u2iNpHFcZrIsaKP+G4BZxt
+         KukmwFDHlhKwGb4ZNDOCpJmEztlP7B+kuQFeT8pKHWyLl/LayMlLk1IiX9ygejg8q5gb
+         gwBg==
+X-Gm-Message-State: AC+VfDx55hUI7xy8id/AOdezARAZ+Srxoep23pFqioJynRhf6Y/P8UvE
+        iBOO3Gpibjvh7gfinW18YAtnpkTqx7R5CTvmJQyRqt8jkUYZ2KcoRoktn2nSvCx2I/nWJ7vuujy
+        1zM4o/IfVEaXu
+X-Received: by 2002:a5d:40c4:0:b0:306:2a1a:d265 with SMTP id b4-20020a5d40c4000000b003062a1ad265mr11134058wrq.58.1684914778610;
+        Wed, 24 May 2023 00:52:58 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7bVbSA5tm91BTjYYNjcmpGiBhyA/kX2X5RpdEUBeWNkG4IHqN5ECI4wEf/Px8eljALlg9Seg==
+X-Received: by 2002:a5d:40c4:0:b0:306:2a1a:d265 with SMTP id b4-20020a5d40c4000000b003062a1ad265mr11134046wrq.58.1684914778310;
+        Wed, 24 May 2023 00:52:58 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
+        by smtp.gmail.com with ESMTPSA id o9-20020adfeac9000000b0030647d1f34bsm13673489wrn.1.2023.05.24.00.52.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 May 2023 00:52:57 -0700 (PDT)
+Message-ID: <227ebd44-d65c-00ee-b53d-dd65d9a58b5f@redhat.com>
+Date:   Wed, 24 May 2023 09:52:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH] vfio/pci: Also demote hiding standard cap messages
+Content-Language: en-US
+To:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
+Cc:     oleksandr@natalenko.name
+References: <20230523225250.1215911-1-alex.williamson@redhat.com>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@redhat.com>
+In-Reply-To: <20230523225250.1215911-1-alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mai 24 2023, Arnd Bergmann wrote:
+On 5/24/23 00:52, Alex Williamson wrote:
+> Apply the same logic as commit 912b625b4dcf ("vfio/pci: demote hiding
+> ecap messages to debug level") for the less common case of hiding
+> standard capabilities.
+> 
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-> On Wed, May 24, 2023, at 02:49, Palmer Dabbelt wrote:
->> On Thu, 18 May 2023 09:19:35 PDT (-0700), andy.chiu@sifive.com wrote:
->
->>>  static const struct user_regset_view riscv_user_native_view = {
->>> diff --git a/include/uapi/linux/elf.h b/include/uapi/linux/elf.h
->>> index ac3da855fb19..7d8d9ae36615 100644
->>> --- a/include/uapi/linux/elf.h
->>> +++ b/include/uapi/linux/elf.h
->>> @@ -440,6 +440,7 @@ typedef struct elf64_shdr {
->>>  #define NT_MIPS_DSP	0x800		/* MIPS DSP ASE registers */
->>>  #define NT_MIPS_FP_MODE	0x801		/* MIPS floating-point mode */
->>>  #define NT_MIPS_MSA	0x802		/* MIPS SIMD registers */
->>> +#define NT_RISCV_VECTOR	0x900		/* RISC-V vector registers */
->>
->> IIUC we're OK to define note types here, as they're all sub-types of the 
->> "LINUX" note as per the comment?  I'm not entirely sure, though.
->>
->> Maybe Arnd knows?
->
-> No idea. It looks like glibc has the master copy of this file[1], and
-> they pull in changes from the kernel version, so it's probably fine,
-> but I don't know if that's the way it's intended to go.
+Reviewed-by: Cédric Le Goater <clg@redhat.com>
 
-Yes, for these types of definitions the kernel (as the producer) is the
-authoritative source.
+Thanks,
 
--- 
-Andreas Schwab, SUSE Labs, schwab@suse.de
-GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
-"And now for something completely different."
+C.
+
+> ---
+>   drivers/vfio/pci/vfio_pci_config.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> index 1d95fe435f0e..7e2e62ab0869 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -1566,8 +1566,8 @@ static int vfio_cap_init(struct vfio_pci_core_device *vdev)
+>   		}
+>   
+>   		if (!len) {
+> -			pci_info(pdev, "%s: hiding cap %#x@%#x\n", __func__,
+> -				 cap, pos);
+> +			pci_dbg(pdev, "%s: hiding cap %#x@%#x\n", __func__,
+> +				cap, pos);
+>   			*prev = next;
+>   			pos = next;
+>   			continue;
+
