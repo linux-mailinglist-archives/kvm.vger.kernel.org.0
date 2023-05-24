@@ -2,61 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 851EC70EDBE
-	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 08:17:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1200A70EDC0
+	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 08:17:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239236AbjEXGRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 May 2023 02:17:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50792 "EHLO
+        id S239674AbjEXGRB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 May 2023 02:17:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238372AbjEXGQ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 May 2023 02:16:59 -0400
+        with ESMTP id S239080AbjEXGRA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 May 2023 02:17:00 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 634A6184;
-        Tue, 23 May 2023 23:16:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF4B11D;
+        Tue, 23 May 2023 23:16:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684909016; x=1716445016;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=pmlnhEwlLJ82wU3OOOEr2W6zri3/mEqlLsG47OGicj0=;
-  b=cy7BpqLam0SquWxxrRxyAX1T9fZTaaxOrG6bhHn6GNBngYiV0VxjwREw
-   55nJuQlIwBNX2yIIZQ+cBv8tWn45f6brxVbq3Dp47+Jw4nZ2TfzKi16F2
-   XIyQ0X80vESIZ/3W0ZIY2dHcbaV0Cvz+Zg9gJREhnjzREnFyhVYvJAEKX
-   AKRpafnmLnSpCPt2n6BLpLCEMTuuQuLU2iJ6aEDr/xazy/PAubIr3gLbz
-   HfAuBzKWVlmxMGN2Ef2cjlv4KY/6H9FRDBb6qG1ePNzsJffpDpkuZSX5C
-   E225bPdfxcquiox+qMqyEzEuLrGhrzBh6PZqPD9iEgclD5QUYg2qfw3cG
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10719"; a="356695040"
+  t=1684909019; x=1716445019;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=XvdDalOzO6dPftSCyB2wcRuCPA9Wximcc78/Jb4PyuU=;
+  b=O6YA8b4gyjjao9MvU7aUvjmOibaMgokSQMzGNiFW6DM74nrGsp3/xmeM
+   pxkSUf4Oe/853hX4dDNA/NtBqZh4/QRok3ewwrMRMJPLauy/Cr4C6IyeM
+   OWBS4ZKmO3xAVso+aPNltT3PP6GTI5BLq/fM8OULDshEp4s1hy5XvKCA1
+   vvptuh8TzR4hyeevSGX1y57CMPOKB6zWWgNrmdm7fOWDNI5k5zj8VqLS7
+   HbqOcOO2vbmK/pYuyVL043fZFznQzA+ujBCV6BlV2oh6vF7dEBbRKki8s
+   uWUifq1Xv2NJrZPBxWxABseE7opZDEdYY8q7wXctLQWJ2DNgcdh8qhSZ1
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10719"; a="356695065"
 X-IronPort-AV: E=Sophos;i="6.00,188,1681196400"; 
-   d="scan'208";a="356695040"
+   d="scan'208";a="356695065"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2023 23:16:55 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2023 23:16:59 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10719"; a="704212331"
+X-IronPort-AV: E=McAfee;i="6600,9927,10719"; a="704212361"
 X-IronPort-AV: E=Sophos;i="6.00,188,1681196400"; 
-   d="scan'208";a="704212331"
+   d="scan'208";a="704212361"
 Received: from spr.sh.intel.com ([10.239.53.106])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2023 23:16:49 -0700
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2023 23:16:54 -0700
 From:   Chao Gao <chao.gao@intel.com>
 To:     kvm@vger.kernel.org, x86@kernel.org
 Cc:     xiaoyao.li@intel.com, Chao Gao <chao.gao@intel.com>,
-        Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
         Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH v2 0/3] MSR_IA32_ARCH_CAPABILITIES cleanups
-Date:   Wed, 24 May 2023 14:16:30 +0800
-Message-Id: <20230524061634.54141-1-chao.gao@intel.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 1/3] KVM: x86: Track supported ARCH_CAPABILITIES in kvm_caps
+Date:   Wed, 24 May 2023 14:16:31 +0800
+Message-Id: <20230524061634.54141-2-chao.gao@intel.com>
 X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20230524061634.54141-1-chao.gao@intel.com>
+References: <20230524061634.54141-1-chao.gao@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -69,31 +65,115 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Do some cleanups about MSR_IA32_ARCH_CAPABILITIES in KVM e.g, fix stale
-comments, elimite open-coded MSR reads, track features that can be exposed to
-guests to avoid computing them runtime. They are found when reading the code.
+to avoid computing the supported value at runtime every time.
 
-No functional change intented.
+Toggle the ARCH_CAP_SKIP_VMENTRY_L1DFLUSH bit when l1tf_vmx_mitigation
+is modified to achieve the same result as runtime computing.
 
-Changes from v1 -> v2:
-1. toggle ARCH_CAP_SKIP_VMENTRY_L1DFLUSH bit when l1tf mitigation state is
-   changed by module param. [Xiaoyao, Sean]
-2. add more cleanups (patch 2/3)
+Opportunistically, add a comment to document the problem of allowing
+changing the supported value of ARCH_CAPABILITIES and the reason why
+we don't fix it.
 
+No functional change intended.
 
-Chao Gao (3):
-  KVM: x86: Track supported ARCH_CAPABILITIES in kvm_caps
-  KVM: x86: Correct the name for skipping VMENTER l1d flush
-  x86/cpu, KVM: Use helper function to read MSR_IA32_ARCH_CAPABILITIES
+Link: https://lore.kernel.org/all/ZGZhW%2Fx5OWPmx1qD@google.com/
+Link: https://lore.kernel.org/all/ZGeU9sYTPxqNGSqI@google.com/
+Signed-off-by: Chao Gao <chao.gao@intel.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 25 +++++++++++++++++++++++--
+ arch/x86/kvm/x86.c     |  7 ++++---
+ arch/x86/kvm/x86.h     |  1 +
+ 3 files changed, 28 insertions(+), 5 deletions(-)
 
- arch/x86/kernel/cpu/common.c |  1 +
- arch/x86/kvm/vmx/vmx.c       | 44 +++++++++++++++++++++++-------------
- arch/x86/kvm/x86.c           | 16 +++++--------
- arch/x86/kvm/x86.h           |  1 +
- 4 files changed, 36 insertions(+), 26 deletions(-)
-
-
-base-commit: b9846a698c9aff4eb2214a06ac83638ad098f33f
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 44fb619803b8..8274ef5e89e5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -309,10 +309,31 @@ static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
+ 
+ 	l1tf_vmx_mitigation = l1tf;
+ 
+-	if (l1tf != VMENTER_L1D_FLUSH_NEVER)
++	/*
++	 * Update static keys and supported arch capabilities according to
++	 * the new mitigation state.
++	 *
++	 * ARCH_CAP_SKIP_VMENTRY_L1DFLUSH is toggled because if we do cache
++	 * flushes for L1 guests on (nested) vmlaunch/vmresume to L2, L1
++	 * guests can skip the flush and if we don't, then L1 guests need
++	 * to do a flush.
++	 *
++	 * Toggling ARCH_CAP_SKIP_VMENTRY_L1DFLUSH may present inconsistent
++	 * model to the guest, e.g., if userspace isn't careful, a VM can
++	 * have vCPUs with different values for ARCH_CAPABILITIES. But
++	 * there is almost no chance to fix the issue. Because, to present
++	 * a consistent model, KVM essentially needs to disallow changing
++	 * the module param after VMs/vCPUs have been created, but that
++	 * would prevent userspace from toggling the param while VMs are
++	 * running, e.g., in response to a new vulnerability.
++	 */
++	if (l1tf != VMENTER_L1D_FLUSH_NEVER) {
+ 		static_branch_enable(&vmx_l1d_should_flush);
+-	else
++		kvm_caps.supported_arch_cap |= ARCH_CAP_SKIP_VMENTRY_L1DFLUSH;
++	} else {
+ 		static_branch_disable(&vmx_l1d_should_flush);
++		kvm_caps.supported_arch_cap &= ~ARCH_CAP_SKIP_VMENTRY_L1DFLUSH;
++	}
+ 
+ 	if (l1tf == VMENTER_L1D_FLUSH_COND)
+ 		static_branch_enable(&vmx_l1d_flush_cond);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c0778ca39650..2408b5f554b7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1672,7 +1672,7 @@ static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
+ {
+ 	switch (msr->index) {
+ 	case MSR_IA32_ARCH_CAPABILITIES:
+-		msr->data = kvm_get_arch_capabilities();
++		msr->data = kvm_caps.supported_arch_cap;
+ 		break;
+ 	case MSR_IA32_PERF_CAPABILITIES:
+ 		msr->data = kvm_caps.supported_perf_cap;
+@@ -7156,7 +7156,7 @@ static void kvm_probe_msr_to_save(u32 msr_index)
+ 			return;
+ 		break;
+ 	case MSR_IA32_TSX_CTRL:
+-		if (!(kvm_get_arch_capabilities() & ARCH_CAP_TSX_CTRL_MSR))
++		if (!(kvm_caps.supported_arch_cap & ARCH_CAP_TSX_CTRL_MSR))
+ 			return;
+ 		break;
+ 	default:
+@@ -9532,6 +9532,7 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+ 		kvm_caps.max_guest_tsc_khz = max;
+ 	}
+ 	kvm_caps.default_tsc_scaling_ratio = 1ULL << kvm_caps.tsc_scaling_ratio_frac_bits;
++	kvm_caps.supported_arch_cap = kvm_get_arch_capabilities();
+ 	kvm_init_msr_lists();
+ 	return 0;
+ 
+@@ -11895,7 +11896,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	if (r)
+ 		goto free_guest_fpu;
+ 
+-	vcpu->arch.arch_capabilities = kvm_get_arch_capabilities();
++	vcpu->arch.arch_capabilities = kvm_caps.supported_arch_cap;
+ 	vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
+ 	kvm_xen_init_vcpu(vcpu);
+ 	kvm_vcpu_mtrr_init(vcpu);
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index c544602d07a3..d3e524bcc169 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -29,6 +29,7 @@ struct kvm_caps {
+ 	u64 supported_xcr0;
+ 	u64 supported_xss;
+ 	u64 supported_perf_cap;
++	u64 supported_arch_cap;
+ };
+ 
+ void kvm_spurious_fault(void);
 -- 
 2.40.0
 
