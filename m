@@ -2,340 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFFB670EA72
-	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 02:49:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4242E70EAF5
+	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 03:47:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238713AbjEXAtK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 May 2023 20:49:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49132 "EHLO
+        id S239048AbjEXBrt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 May 2023 21:47:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238694AbjEXAtH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 May 2023 20:49:07 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02E3AFA
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 17:49:06 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-64d293746e0so206475b3a.2
-        for <kvm@vger.kernel.org>; Tue, 23 May 2023 17:49:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20221208.gappssmtp.com; s=20221208; t=1684889345; x=1687481345;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PZfMkxRZMQN5HaycmhTXvXemE9ay8dQTvkbDJlQ4W00=;
-        b=VMAckIC/6ajjQ2s/2vRxiwRxLz10N95Ov2evWgbhyG294uUXfq111EMHI1fnWy8WC8
-         CxZksABFTtIMeiIsdTGSFy/BoP19zvMtMmKd7Q7R35wPYOTB99kWF9l/i3nw/XTmQkHO
-         F59ydFL8oICuXtXjUS9f4br/5fQd+g5NFcLH4XroVUk3J8+K2vyS4AowplMNNa4BLbPz
-         LJVbMc8MAB/+ohpU1SU4eELRS3h6onxgq5mWozErUjF0G78iDeVp5oDqZV3xw+uzJmnI
-         PdyFCFFfPT5TGRM0/CSAUBRT37ziU9X9mgFRUls+60rYiGRlQmvQq1Zaz9CgBGdRolfY
-         DfcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684889345; x=1687481345;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PZfMkxRZMQN5HaycmhTXvXemE9ay8dQTvkbDJlQ4W00=;
-        b=N9LTOCKj68dLvEkzsfBhlw1QqIA6VhpBDhmrw0fDA/U+Eki2qTDLMJcPkga9AkkPy7
-         EiqVw9WCVtc0VbGi5uf6FbdDLS+bT31ldVEQmnvgwJG1Gno4EiZERNGjNrG6hDyv2SCQ
-         UKTg9csM2Iqw+0lYYa0NUDLtxuFmwl/Pi7sOuxHf05l/3AVukPwHnntE3bvTxP9p+avX
-         5+gGEiGlmW8l3nVih8GWpA989X+AD8Z27cRc9ytCTq02A7nixEDWApbybTP+NZe11fSf
-         emWbyah5dyCvuOoCEVufiG/h72XI67Xnt8JcP2bEczxue/08ulyDBJ5RBdXzDfQs9rLX
-         l/bA==
-X-Gm-Message-State: AC+VfDxhQmFk/3NbmYbEQSjAD4idpS9kIZOwcsXlkxPI2kRnr6FHJgds
-        4mw/CvJgT0VzdGLxz4tsy2Rpbw==
-X-Google-Smtp-Source: ACHHUZ6naWg3GHVj82tmGBK8I6QlqjI4NOsTvcrDHTu97h7gT5uCCoYF7f4Qax1xiWRh4CGafZu5Ig==
-X-Received: by 2002:a05:6a20:728c:b0:ff:da37:ae9 with SMTP id o12-20020a056a20728c00b000ffda370ae9mr18022562pzk.53.1684889345355;
-        Tue, 23 May 2023 17:49:05 -0700 (PDT)
-Received: from localhost ([50.221.140.188])
-        by smtp.gmail.com with ESMTPSA id l19-20020a635713000000b00530621e5ee4sm6635102pgb.9.2023.05.23.17.49.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 May 2023 17:49:04 -0700 (PDT)
-Date:   Tue, 23 May 2023 17:49:04 -0700 (PDT)
-X-Google-Original-Date: Tue, 23 May 2023 17:48:24 PDT (-0700)
-Subject:     Re: [PATCH -next v20 11/26] riscv: Allocate user's vector context in the first-use trap
-In-Reply-To: <20230518161949.11203-12-andy.chiu@sifive.com>
-CC:     linux-riscv@lists.infradead.org, anup@brainfault.org,
-        atishp@atishpatra.org, kvm-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, Vineet Gupta <vineetg@rivosinc.com>,
-        greentime.hu@sifive.com, guoren@linux.alibaba.com,
-        andy.chiu@sifive.com, Paul Walmsley <paul.walmsley@sifive.com>,
-        aou@eecs.berkeley.edu, ajones@ventanamicro.com,
-        heiko.stuebner@vrull.eu, Conor Dooley <conor.dooley@microchip.com>,
-        prabhakar.mahadev-lad.rj@bp.renesas.com, liaochang1@huawei.com,
-        jszhang@kernel.org, vincent.chen@sifive.com, guoren@kernel.org,
-        Bjorn Topel <bjorn@rivosinc.com>, mnissler@rivosinc.com
-From:   Palmer Dabbelt <palmer@dabbelt.com>
-To:     andy.chiu@sifive.com
-Message-ID: <mhng-6b818098-ee0c-407f-83eb-75db4ea4ff89@palmer-ri-x1c9a>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
+        with ESMTP id S231317AbjEXBrs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 May 2023 21:47:48 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2061.outbound.protection.outlook.com [40.107.93.61])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1DF5184;
+        Tue, 23 May 2023 18:47:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U+kwTUz6DI9duXVNyaE7fYHGfbJ5MQASbhkyHG19lKMIToqIS702wFEg7AQEJ6Tj7TXI+i68xbDdGiNIFNFm0pW9KsSJkgdvitZEhIbXn4ZQXwHtpdklU3N6z5rS/1juenYQUGwQUcDNsi4m6Ds/MSZsBAxnzbabwK+BetCE5x1EfqHrWkkVZUgaAv4OFRzNrwjoeZsBLA/6yWdZMwTSM+ys1KVeMXXB3gyVJOtz1xFWCOUXhkZierMH5ai3F1v/JiJaNSImrIcAWcJOe7977BSt7Daqm2OMtfr5vti7Q3LrESx9XzS3RXYhh4GfzEI1DEE/xSP5m6Xt2hP6ZwcSEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qgJbIcZKx5v84WwaaAM08aQe3wh+Sms6OGgmvrl2w3s=;
+ b=UIB7IbvLJMU8YFG37dadNldFyBGWUk/QlnIydC5MaLkr0mXwTmlOszrelMfMWUSAjSX0kmFTMG/yOJrcZWWWsJSQGZ2TOxRfI62EOd+pvSS2vXJbb3S22tKGyM06NkySCjFNX9vAcCyeeBsSad9u8XUEzy1pXT67H4lM9KUQTzPNYW8u1dxI98DXVyPSFu2dwGdfJeNM0rtkKlvmNOsE8tGb+dPphTiLUbT5T9qHIbyNYiCZMOp0pgGYrINL5argURm9KRgC7IbDlhQsLlUxqfaAkqOx8JwGZu0GVK+EksO7mu83qgG/0YsVdsVL/OEKjJUQAIv+8V3P5xv7cgf87w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qgJbIcZKx5v84WwaaAM08aQe3wh+Sms6OGgmvrl2w3s=;
+ b=g2uGb6WGtw3C6wRd4u2QWlwdZqrXpX6O8bS01j4Sj5Hu8JpX01bt47qqAfAEZ6Ocl5EB/zgbgHBQ+JhkW8mDR0emmf+BD458pMt9SHxkYZXeQQypcDN3R/h7pff2ZG+jE7eNbHXGa44in0nblVDGvronvHwg6cEqldC2dAM7+FC6T14a5OX/QZwbkIcbXRq4M7iinFIS2Z8mXNmsS4+P/6nGN4mdRSE2r9WIwc6ibteROAlZJn3t/koUTqXxJ8O7pULzO/Ir298UavTtltYE6IFstvWBLMv7Yr5bElo7F5WOEUyhz7SUxBk08FHC0L0VLz8ek96Ix33Jq66BFikZhw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB3181.namprd12.prod.outlook.com (2603:10b6:208:ae::27)
+ by CY8PR12MB7492.namprd12.prod.outlook.com (2603:10b6:930:93::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.14; Wed, 24 May
+ 2023 01:47:43 +0000
+Received: from MN2PR12MB3181.namprd12.prod.outlook.com
+ ([fe80::f0b5:271f:a7dd:9e2f]) by MN2PR12MB3181.namprd12.prod.outlook.com
+ ([fe80::f0b5:271f:a7dd:9e2f%5]) with mapi id 15.20.6411.028; Wed, 24 May 2023
+ 01:47:43 +0000
+From:   Alistair Popple <apopple@nvidia.com>
+To:     Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
+        catalin.marinas@arm.com
+Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        robin.murphy@arm.com, nicolinc@nvidia.com,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        jgg@nvidia.com, John Hubbard <jhubbard@nvidia.com>,
+        zhi.wang.linux@gmail.com, Sean Christopherson <seanjc@google.com>,
+        Alistair Popple <apopple@nvidia.com>
+Subject: [PATCH 1/2] mmu_notifiers: Restore documentation for .invalidate_range()
+Date:   Wed, 24 May 2023 11:47:28 +1000
+Message-Id: <3cece716fc09724793aa832e755abfc9d70a8bb3.1684892404.git-series.apopple@nvidia.com>
+X-Mailer: git-send-email 2.39.2
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-ClientProxiedBy: SYXPR01CA0146.ausprd01.prod.outlook.com
+ (2603:10c6:0:30::31) To MN2PR12MB3181.namprd12.prod.outlook.com
+ (2603:10b6:208:ae::27)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3181:EE_|CY8PR12MB7492:EE_
+X-MS-Office365-Filtering-Correlation-Id: 296ad4dd-298e-4f03-37cd-08db5bf8dd9c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: D0OENjXts2es4bMNlg2aFE+gZ4jCjkAXHmoalV76JqMzGBYHMgECf0yOUKSjl/UV8FOYB0cdYJx48EID53jQATtNZh6W90WEOXQDUyia3apKoaSAc2MPaUIfN70kCJVuhMutz0KIsZBkjphqqwN1LfJtuDdCXozTv+tIALZJbRMLXC8gAnbEfqXlFvBhrl3rsLC9ITPGEMEZHWk/TIxI80jxJgZ+AtXgBQJao0WNEH9IuEtex3S3bpHxFjosONrq4DgwNK+tjnZYGQolBjH1WTOMQjCkeHBRbDChO/qu6fxrlWdRjoz9WKuEPJT7MgaTRns1b0rqKzSGFqzDLTZyZNZSaOaf3Cog4t0npC3ghj1qa/a01MmyerwRLYkwF36H8dN1q7e6R5H0MYhv0/FYpBvD6nEMYWZDibEaBiKR2OO3phJqw7Uzql818Ava/diXPu3Q24YFUBNaw1biAC74XMOWILdDNTS6JWsq0mskEeWQVqFJYrOhKKUfbfkcBWKaupWLeKlIuzzSmdGPtKK+eWZi1y7WGlvfoSH/OhNRYMOEnLrr92P/7TqpqqZXZc2Aqi7wSaxZVfZy/VOP73AmXw1nRTFkvwima8L+sefTi7uCRVhMPUQDZOwew09nKiM9
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(376002)(136003)(366004)(396003)(451199021)(8676002)(8936002)(5660300002)(7416002)(186003)(83380400001)(107886003)(26005)(6506007)(6512007)(38100700002)(86362001)(2616005)(41300700001)(6486002)(66946007)(66556008)(66476007)(4326008)(6666004)(478600001)(36756003)(316002)(54906003)(2906002)(142923001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Tl4A7wJneCaa4i0pkAyAA72UG0+OEGzvuvwm7SCqnucodfDKxvb2dZtkehKg?=
+ =?us-ascii?Q?rfG9FetBUZtIy1iq9CtkK8TpSTbS9YgonJIcAEQzi5WK56K62thkYhPCc0gX?=
+ =?us-ascii?Q?6FJw3ScThBxBXi1o1tOe+GCoIXLOflvfw8ToKWwj9QTGpFf7qwjRRwj5Z2kF?=
+ =?us-ascii?Q?ysZutmYp2GavjPmkAG0R+yl4KwPMdRTBIRDfMzAwZjtqEYyXxQy58nizg3oC?=
+ =?us-ascii?Q?ng0SyUQNFuFgbtWXRVyH+OLT4EyP5OYCmRDe3hEBmjfGm7N7EZ6L6TBtbWwA?=
+ =?us-ascii?Q?OEB19/BnpyhX4cB9KcS/izYbavohOXnesdHazj5polC7s5sT+GCPpQANy17C?=
+ =?us-ascii?Q?70vulZy2qgwGcWIimTa1r7U+D6bwtHItMxcXtCAN0ged0q/GQH5n65K5zyfG?=
+ =?us-ascii?Q?/NLvB6MCeKujg0R6opF2UvwRfzS6bzqQdxWpHT3K6etb4ei5UKuGukZESWRV?=
+ =?us-ascii?Q?++ac6kA0umy7nAJH78z+h3O0KYdz7XffUliDuUYukGZzXDvLKiCSi0l/cl6+?=
+ =?us-ascii?Q?2aT3txhxtU7sn1JBAeOUIidF+Rkb9n+cKbtAZSzG3Z1N81axUE8tzBjO4FzU?=
+ =?us-ascii?Q?IM5MtJN4yKCu8qXRTeWGx7sH7VKFWNLexfk45kPORLf3qbbydna63FaR9FSj?=
+ =?us-ascii?Q?oRMVfAusgVeXcFgVGVQdwhBW6kGvkPbFYg7LjP9YWfu9aEhJDTAw5FFhtvZ4?=
+ =?us-ascii?Q?A+qKFbKQ7haBy3X7XZ4rkd+++lyiuKZuQ82CIELpY+dx7lFoqOxgHlvoVvv7?=
+ =?us-ascii?Q?cB4F9ERTnA59qPeyt/gEsXzGtut6+qg4jLTwYbD2+HxJyl6g2xjtCvJ9rkCN?=
+ =?us-ascii?Q?fmwjhBS5wJtG4/T99DO6HHln1K/45tv5MLX90kmJpNHO6/Tywh5Gc/gWlKNI?=
+ =?us-ascii?Q?z6qzxM8+zo1m0vtChm5UakqoowempNSOe//w4MeDmNU/yy5kvt9nLC90yalE?=
+ =?us-ascii?Q?wzkTrjWhRDPsst5APCWZmBpHTG+t7aRCGVxUyrhvwVzMxu4gLRhl+0s283Pw?=
+ =?us-ascii?Q?6vs/ZzQoSmJDoBCrbVMtwhnRDrSEisHFypqpuEVZSVzUwNTi3JexY81D9PUl?=
+ =?us-ascii?Q?3IizYE1083evc9fivyLzZwo71Ysgo2ACztur8wXFrfv4sJDf3WEkS7xsCg1B?=
+ =?us-ascii?Q?W3FVNJOSIfw9+iSmpKnuYx+BGwreYY8gB0/OPNmo7DmhOYonHMGR7/+bsEWo?=
+ =?us-ascii?Q?CKHshVw9FeEwRI4MfrKfvSgjwSUTGOMrkHydJH1LgOFDyrZaE7dFa6sLVfQw?=
+ =?us-ascii?Q?vuuKn4lKgxsZyOE4GmlbGEwEFFCFrZm3V0CVommIGC3zyYEroV1156QZg+xM?=
+ =?us-ascii?Q?arsrWovLAI/zhYwUmfvGsSpAszDIOBLWoBv5B/huPV7FViZICHvOwXg4wJT9?=
+ =?us-ascii?Q?Nur+duMaXwyKiQlAZ+8Miv0fYavh22zQEll1i3qdeCFGsFNtE/nNpR1rR6eN?=
+ =?us-ascii?Q?6HIheVAPU92GDmER2gVeLlHXoN0pt4HAqxE0mU4NXP6LNtSkQ9QhlgXzMpUT?=
+ =?us-ascii?Q?vLQi2Av0oXZIefkSQuqrdD8xvXQgWgmZ8AnpHrzNDiGW4QJXlLBje31a1hxu?=
+ =?us-ascii?Q?8OiDzirVSIUqjOHYU0Pm662N4Tk98j6LHYlZ7aQy?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 296ad4dd-298e-4f03-37cd-08db5bf8dd9c
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3181.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 May 2023 01:47:43.3322
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: o8nzlMl1N86IZpbrrpOE23VRaBtxSTgVMaTXhzqKgky2yc/PjvPLZPmIznMHUzOSmTQ3/JiAcmcxMvDwkw90uQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7492
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 May 2023 09:19:34 PDT (-0700), andy.chiu@sifive.com wrote:
-> Vector unit is disabled by default for all user processes. Thus, a
-> process will take a trap (illegal instruction) into kernel at the first
-> time when it uses Vector. Only after then, the kernel allocates V
-> context and starts take care of the context for that user process.
->
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Link: https://lore.kernel.org/r/3923eeee-e4dc-0911-40bf-84c34aee962d@linaro.org
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> ---
-> Hey Heiko and Conor, I am dropping you guys' A-b, T-b, and R-b because I
-> added a check in riscv_v_first_use_handler().
->
-> Changelog v20:
->  - move has_vector() into vector.c for better code readibility
->  - check elf_hwcap in the first-use trap because it might get turned off
->    if cores have different VLENs.
->
-> Changelog v18:
->  - Add blank lines (Heiko)
->  - Return immediately in insn_is_vector() if an insn matches (Heiko)
-> ---
->  arch/riscv/include/asm/insn.h   | 29 ++++++++++
->  arch/riscv/include/asm/vector.h |  2 +
->  arch/riscv/kernel/traps.c       | 26 ++++++++-
->  arch/riscv/kernel/vector.c      | 95 +++++++++++++++++++++++++++++++++
->  4 files changed, 150 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/riscv/include/asm/insn.h b/arch/riscv/include/asm/insn.h
-> index 8d5c84f2d5ef..4e1505cef8aa 100644
-> --- a/arch/riscv/include/asm/insn.h
-> +++ b/arch/riscv/include/asm/insn.h
-> @@ -137,6 +137,26 @@
->  #define RVG_OPCODE_JALR		0x67
->  #define RVG_OPCODE_JAL		0x6f
->  #define RVG_OPCODE_SYSTEM	0x73
-> +#define RVG_SYSTEM_CSR_OFF	20
-> +#define RVG_SYSTEM_CSR_MASK	GENMASK(12, 0)
-> +
-> +/* parts of opcode for RVF, RVD and RVQ */
-> +#define RVFDQ_FL_FS_WIDTH_OFF	12
-> +#define RVFDQ_FL_FS_WIDTH_MASK	GENMASK(3, 0)
-> +#define RVFDQ_FL_FS_WIDTH_W	2
-> +#define RVFDQ_FL_FS_WIDTH_D	3
-> +#define RVFDQ_LS_FS_WIDTH_Q	4
-> +#define RVFDQ_OPCODE_FL		0x07
-> +#define RVFDQ_OPCODE_FS		0x27
-> +
-> +/* parts of opcode for RVV */
-> +#define RVV_OPCODE_VECTOR	0x57
-> +#define RVV_VL_VS_WIDTH_8	0
-> +#define RVV_VL_VS_WIDTH_16	5
-> +#define RVV_VL_VS_WIDTH_32	6
-> +#define RVV_VL_VS_WIDTH_64	7
-> +#define RVV_OPCODE_VL		RVFDQ_OPCODE_FL
-> +#define RVV_OPCODE_VS		RVFDQ_OPCODE_FS
->
->  /* parts of opcode for RVC*/
->  #define RVC_OPCODE_C0		0x0
-> @@ -304,6 +324,15 @@ static __always_inline bool riscv_insn_is_branch(u32 code)
->  	(RVC_X(x_, RVC_B_IMM_7_6_OPOFF, RVC_B_IMM_7_6_MASK) << RVC_B_IMM_7_6_OFF) | \
->  	(RVC_IMM_SIGN(x_) << RVC_B_IMM_SIGN_OFF); })
->
-> +#define RVG_EXTRACT_SYSTEM_CSR(x) \
-> +	({typeof(x) x_ = (x); RV_X(x_, RVG_SYSTEM_CSR_OFF, RVG_SYSTEM_CSR_MASK); })
-> +
-> +#define RVFDQ_EXTRACT_FL_FS_WIDTH(x) \
-> +	({typeof(x) x_ = (x); RV_X(x_, RVFDQ_FL_FS_WIDTH_OFF, \
-> +				   RVFDQ_FL_FS_WIDTH_MASK); })
-> +
-> +#define RVV_EXRACT_VL_VS_WIDTH(x) RVFDQ_EXTRACT_FL_FS_WIDTH(x)
-> +
->  /*
->   * Get the immediate from a J-type instruction.
->   *
-> diff --git a/arch/riscv/include/asm/vector.h b/arch/riscv/include/asm/vector.h
-> index ce6a75e9cf62..8e56da67b5cf 100644
-> --- a/arch/riscv/include/asm/vector.h
-> +++ b/arch/riscv/include/asm/vector.h
-> @@ -21,6 +21,7 @@
->
->  extern unsigned long riscv_v_vsize;
->  int riscv_v_setup_vsize(void);
-> +bool riscv_v_first_use_handler(struct pt_regs *regs);
->
->  static __always_inline bool has_vector(void)
->  {
-> @@ -165,6 +166,7 @@ struct pt_regs;
->
->  static inline int riscv_v_setup_vsize(void) { return -EOPNOTSUPP; }
->  static __always_inline bool has_vector(void) { return false; }
-> +static inline bool riscv_v_first_use_handler(struct pt_regs *regs) { return false; }
->  static inline bool riscv_v_vstate_query(struct pt_regs *regs) { return false; }
->  #define riscv_v_vsize (0)
->  #define riscv_v_vstate_save(task, regs)		do {} while (0)
-> diff --git a/arch/riscv/kernel/traps.c b/arch/riscv/kernel/traps.c
-> index 8c258b78c925..05ffdcd1424e 100644
-> --- a/arch/riscv/kernel/traps.c
-> +++ b/arch/riscv/kernel/traps.c
-> @@ -26,6 +26,7 @@
->  #include <asm/ptrace.h>
->  #include <asm/syscall.h>
->  #include <asm/thread_info.h>
-> +#include <asm/vector.h>
->
->  int show_unhandled_signals = 1;
->
-> @@ -145,8 +146,29 @@ DO_ERROR_INFO(do_trap_insn_misaligned,
->  	SIGBUS, BUS_ADRALN, "instruction address misaligned");
->  DO_ERROR_INFO(do_trap_insn_fault,
->  	SIGSEGV, SEGV_ACCERR, "instruction access fault");
-> -DO_ERROR_INFO(do_trap_insn_illegal,
-> -	SIGILL, ILL_ILLOPC, "illegal instruction");
-> +
-> +asmlinkage __visible __trap_section void do_trap_insn_illegal(struct pt_regs *regs)
-> +{
-> +	if (user_mode(regs)) {
-> +		irqentry_enter_from_user_mode(regs);
-> +
-> +		local_irq_enable();
-> +
-> +		if (!riscv_v_first_use_handler(regs))
-> +			do_trap_error(regs, SIGILL, ILL_ILLOPC, regs->epc,
-> +				      "Oops - illegal instruction");
-> +
-> +		irqentry_exit_to_user_mode(regs);
-> +	} else {
-> +		irqentry_state_t state = irqentry_nmi_enter(regs);
-> +
-> +		do_trap_error(regs, SIGILL, ILL_ILLOPC, regs->epc,
-> +			      "Oops - illegal instruction");
-> +
-> +		irqentry_nmi_exit(regs, state);
-> +	}
-> +}
-> +
->  DO_ERROR_INFO(do_trap_load_fault,
->  	SIGSEGV, SEGV_ACCERR, "load access fault");
->  #ifndef CONFIG_RISCV_M_MODE
-> diff --git a/arch/riscv/kernel/vector.c b/arch/riscv/kernel/vector.c
-> index 120f1ce9abf9..0080798e8d2e 100644
-> --- a/arch/riscv/kernel/vector.c
-> +++ b/arch/riscv/kernel/vector.c
-> @@ -4,10 +4,19 @@
->   * Author: Andy Chiu <andy.chiu@sifive.com>
->   */
->  #include <linux/export.h>
-> +#include <linux/sched/signal.h>
-> +#include <linux/types.h>
-> +#include <linux/slab.h>
-> +#include <linux/sched.h>
-> +#include <linux/uaccess.h>
->
-> +#include <asm/thread_info.h>
-> +#include <asm/processor.h>
-> +#include <asm/insn.h>
->  #include <asm/vector.h>
->  #include <asm/csr.h>
->  #include <asm/elf.h>
-> +#include <asm/ptrace.h>
->  #include <asm/bug.h>
->
->  unsigned long riscv_v_vsize __read_mostly;
-> @@ -34,3 +43,89 @@ int riscv_v_setup_vsize(void)
->
->  	return 0;
->  }
-> +
-> +static bool insn_is_vector(u32 insn_buf)
-> +{
-> +	u32 opcode = insn_buf & __INSN_OPCODE_MASK;
-> +	u32 width, csr;
-> +
-> +	/*
-> +	 * All V-related instructions, including CSR operations are 4-Byte. So,
-> +	 * do not handle if the instruction length is not 4-Byte.
-> +	 */
-> +	if (unlikely(GET_INSN_LENGTH(insn_buf) != 4))
-> +		return false;
-> +
-> +	switch (opcode) {
-> +	case RVV_OPCODE_VECTOR:
-> +		return true;
-> +	case RVV_OPCODE_VL:
-> +	case RVV_OPCODE_VS:
-> +		width = RVV_EXRACT_VL_VS_WIDTH(insn_buf);
-> +		if (width == RVV_VL_VS_WIDTH_8 || width == RVV_VL_VS_WIDTH_16 ||
-> +		    width == RVV_VL_VS_WIDTH_32 || width == RVV_VL_VS_WIDTH_64)
-> +			return true;
-> +
-> +		break;
-> +	case RVG_OPCODE_SYSTEM:
-> +		csr = RVG_EXTRACT_SYSTEM_CSR(insn_buf);
-> +		if ((csr >= CSR_VSTART && csr <= CSR_VCSR) ||
-> +		    (csr >= CSR_VL && csr <= CSR_VLENB))
-> +			return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-> +static int riscv_v_thread_zalloc(void)
-> +{
-> +	void *datap;
-> +
-> +	datap = kzalloc(riscv_v_vsize, GFP_KERNEL);
-> +	if (!datap)
-> +		return -ENOMEM;
-> +
-> +	current->thread.vstate.datap = datap;
-> +	memset(&current->thread.vstate, 0, offsetof(struct __riscv_v_ext_state,
-> +						    datap));
-> +	return 0;
-> +}
-> +
-> +bool riscv_v_first_use_handler(struct pt_regs *regs)
-> +{
-> +	u32 __user *epc = (u32 __user *)regs->epc;
-> +	u32 insn = (u32)regs->badaddr;
-> +
-> +	/* Do not handle if V is not supported, or disabled */
-> +	if (!has_vector() || !(elf_hwcap & COMPAT_HWCAP_ISA_V))
-> +		return false;
-> +
-> +	/* If V has been enabled then it is not the first-use trap */
-> +	if (riscv_v_vstate_query(regs))
-> +		return false;
-> +
-> +	/* Get the instruction */
-> +	if (!insn) {
-> +		if (__get_user(insn, epc))
-> +			return false;
-> +	}
-> +
-> +	/* Filter out non-V instructions */
-> +	if (!insn_is_vector(insn))
-> +		return false;
-> +
-> +	/* Sanity check. datap should be null by the time of the first-use trap */
-> +	WARN_ON(current->thread.vstate.datap);
-> +
-> +	/*
-> +	 * Now we sure that this is a V instruction. And it executes in the
-> +	 * context where VS has been off. So, try to allocate the user's V
-> +	 * context and resume execution.
-> +	 */
-> +	if (riscv_v_thread_zalloc()) {
-> +		force_sig(SIGKILL);
+The .invalidate_range() callback is called by
+mmu_notifier_invalidate_range() which is often called while holding
+the ptl spin-lock. Therefore any implementations of this callback must
+not sleep. This was originally documented when the call back was added
+in commit 0f0a327fa12c ("mmu_notifier: add the callback for
+mmu_notifier_invalidate_range()") but appears to have been
+inadvertently removed by commit 5ff7091f5a2c ("mm, mmu_notifier:
+annotate mmu notifiers with blockable invalidate callbacks").
 
-Is SIGKILL too strong?  Maybe we just SIGILL here?  Maybe killing the 
-process is the right way to go, though: if we're that out of memory 
-something's getting killed, it might as well be whatever's about to get 
-confused by vectors disappearing.
+Restore the comment to make it clear that .invalidate_range()
+callbacks may not sleep.
 
-> +		return true;
-> +	}
-> +	riscv_v_vstate_on(regs);
-> +	return true;
-> +}
+Signed-off-by: Alistair Popple <apopple@nvidia.com>
+---
+ include/linux/mmu_notifier.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
+diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.h
+index 64a3e05..447d757 100644
+--- a/include/linux/mmu_notifier.h
++++ b/include/linux/mmu_notifier.h
+@@ -200,6 +200,9 @@ struct mmu_notifier_ops {
+ 	 * external TLB range needs to be flushed. For more in depth
+ 	 * discussion on this see Documentation/mm/mmu_notifier.rst
+ 	 *
++	 * The invalidate_range() function is called under the ptl
++	 * spin-lock and not allowed to sleep.
++	 *
+ 	 * Note that this function might be called with just a sub-range
+ 	 * of what was passed to invalidate_range_start()/end(), if
+ 	 * called between those functions.
+
+base-commit: 44c026a73be8038f03dbdeef028b642880cf1511
+-- 
+git-series 0.9.1
