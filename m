@@ -2,104 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AE4B70F593
-	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 13:47:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1580270F6E5
+	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 14:50:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229992AbjEXLru (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 May 2023 07:47:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60788 "EHLO
+        id S232878AbjEXMuW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 May 2023 08:50:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbjEXLrt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 May 2023 07:47:49 -0400
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BB4A12E
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 04:47:48 -0700 (PDT)
-Received: by mail-yb1-xb2d.google.com with SMTP id 3f1490d57ef6-ba82059eec9so1696683276.3
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 04:47:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684928867; x=1687520867;
-        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PlIvlh/Wu/Gdl3bc/cwkv0nvaIs0VGs7tRG/WiHzhks=;
-        b=aeJRz0UMMhYPHrGZJr9eVChNjZuVayk3a+MJkBeciDQVgu05s8pB7uwmYZGVkYhjva
-         6e9wrsuw/kz9qVuSEwHldX3xnVEZVOgi8hdzGw9hJ7xfux5beZ1U8icYBCi0g6XUHouS
-         DvQqUz+gyBvCMAqPPF3dOQIkd0pQMqjM9jQhOww+2yLi/5usPZmlVWON74B31BfSUVti
-         C7hUYVJ8KyMsCnsmW/fjc5joqMNKxiseaZehESBrxPtnRsudW9Xra1CAiPZQgMpqhBD4
-         qY7lp1HKyJMjpai3F91uv/AbaLKVzB3qhtTXp0MVIwwkbxro79wVu1pjBbJm8nEr2eaP
-         NkWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684928867; x=1687520867;
-        h=to:subject:message-id:date:from:reply-to:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PlIvlh/Wu/Gdl3bc/cwkv0nvaIs0VGs7tRG/WiHzhks=;
-        b=DZ1/sGkvUyji/Cb3H203AqGle21x9cejfC+UYJMHMwqzpL+IzjqJM7gJzMW2Fifyy6
-         fp2XC5yCbi4a6/wMkulf6mtvF4ni2LEeVjG3YdBasD3pp4q+naXsoBpYuftEW7XUfaCN
-         x/0xnAQ1i+cspzIitbLgNyhDZ9TIL3OHi1hT+2EE79n9usviCVx751OIcoxEUIMBAJPZ
-         IkzpFh0vy3PSMpxkttoPauNZXjzOWAb3bqLzoGN3t/Uvj+JlA0aQ2MDlZG5+axnuXDp+
-         03H9h1CuJRfhFWl4/PLSEU9UOEMDkwNcyPTGdOz0cQlMuVJTYyCHY6Gx50XhIFnG5Kvg
-         z36Q==
-X-Gm-Message-State: AC+VfDyTxvPG1v24FW9gUP7yEfNWyaFCQquthHfdYKtWfu3HQHSPHV0l
-        gHlMI9Lo+SbhTdlTpwyc6gZuCpSlDCg9aPLjUNE=
-X-Google-Smtp-Source: ACHHUZ5pzn0FAQnUXHsiTGjHk3aky4Nf4dSpifKe9EcrZFvfiui2RfZG0vT6wYnKwc1TJqHvIUCg85oV3HnAqi/HzRU=
-X-Received: by 2002:a25:ad63:0:b0:ba6:b486:84ed with SMTP id
- l35-20020a25ad63000000b00ba6b48684edmr18334370ybe.20.1684928867057; Wed, 24
- May 2023 04:47:47 -0700 (PDT)
+        with ESMTP id S234020AbjEXMuV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 May 2023 08:50:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14B45191
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 05:49:53 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9D71B63D09
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 12:49:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06FA8C433D2;
+        Wed, 24 May 2023 12:49:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684932592;
+        bh=i/pALSACK00jme7nJY2ao5sElEqxR5OSYBsYtB/Ukcw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=O/6Za7MDziW0WSQQF5nREo65zOu4kzq9ht5f/P8DXBjdDWjiKTyQ4jfr1ytuvDUb4
+         2t+KOuv0bj8XXHZ+ElvVWZaLl3O5Kz8A4nXE7WWQNOGETGUi04O98YuX5X7uSdGQOz
+         dHZfTTk2tolwO0aaUxXlNYkEWi2Cp6cp9Y3+1vkbEcJrn2fCdifHZq4k3ps9BbEHP9
+         +ESrgU2rYGD6cB0xATiAx/jTpMq2kJ5d8RZFwPVyJecqeuEk8ykqxFTfkwQoLxM5JD
+         sD8qxFMn3y9e9ajQNMNy0FouDUfd4FSCQR/4eWXfC826g99XD+V6IpmopoFFNvP8pD
+         bjHDMuErA4F+g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q1nw5-0002Lh-Q7;
+        Wed, 24 May 2023 13:49:49 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     James Morse <james.morse@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Marc Zyngier <maz@kernel.org>
+Cc:     steven.price@arm.com, Catalin Marinas <catalin.marinas@arm.com>,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 0/2] KVM: arm64: Handle MTE Set/Way CMOs
+Date:   Wed, 24 May 2023 13:49:47 +0100
+Message-Id: <168493254802.3630329.10412076653071886385.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230515204601.1270428-1-maz@kernel.org>
+References: <20230515204601.1270428-1-maz@kernel.org>
 MIME-Version: 1.0
-Received: by 2002:a05:7000:548d:b0:4d0:6410:f1ce with HTTP; Wed, 24 May 2023
- 04:47:46 -0700 (PDT)
-Reply-To: wormer.amos@aol.com
-From:   Wormer Amos <jyotsnafarhadmurad123@gmail.com>
-Date:   Wed, 24 May 2023 12:47:46 +0100
-Message-ID: <CAJzJiXUJL3Lz_xsuth-WMzGPuUSgtE37wVd1+Pu6kukg+V8XAg@mail.gmail.com>
-Subject: GOOD MORNING.
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=7.8 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,SUBJ_ALL_CAPS,T_SCC_BODY_TEXT_LINE,UNDISC_FREEM,UNDISC_MONEY
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5001]
-        * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2607:f8b0:4864:20:0:0:0:b2d listed in]
-        [list.dnswl.org]
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [jyotsnafarhadmurad123[at]gmail.com]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [jyotsnafarhadmurad123[at]gmail.com]
-        *  0.5 SUBJ_ALL_CAPS Subject is all capitals
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  2.8 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-        *  2.7 UNDISC_MONEY Undisclosed recipients + money/fraud signs
-X-Spam-Level: *******
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, maz@kernel.org, steven.price@arm.com, catalin.marinas@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-My Dear. i just wanted to know if you're capable for handling investment
-project in
-your country because i
-need a serious business partnership with good background, kindly reply
-me to discuss details immediately. i will appreciate you to contact me
-on this same email?
+On Mon, 15 May 2023 21:45:59 +0100, Marc Zyngier wrote:
+> When the MTE support was added, it seens the handling of MTE Set/Way
+> was ommited, meaning that the guest will get an UNDEF if it tries to
+> do something that is quite stupid, but still allowed by the
+> architecture...
+> 
+> Found by inspection while writting the trap support for NV.
+> 
+> [...]
 
-Thanks and awaiting for your quick response,
+Applied to fixes, thanks!
 
-Wormer?
+[1/2] arm64: Add missing Set/Way CMO encodings
+      commit: 8d0f019e4c4f2ee2de81efd9bf1c27e9fb3c0460
+[2/2] KVM: arm64: Handle trap of tagged Set/Way CMOs
+      commit: d282fa3c5ccb7a0029c418f358143689553b6447
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
