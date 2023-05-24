@@ -2,148 +2,413 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC58270FAFF
-	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 17:59:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58BAA70FB97
+	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 18:23:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238057AbjEXP66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 May 2023 11:58:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54110 "EHLO
+        id S233361AbjEXQXB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 May 2023 12:23:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236316AbjEXP6Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 May 2023 11:58:25 -0400
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2063.outbound.protection.outlook.com [40.107.212.63])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DC13E6E;
-        Wed, 24 May 2023 08:57:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oaJG0/+tXqStc4XF5mKfuzLluMkgKkLaaaucUHG/0G1BOlaVr+kfeom21TH9rjd/Y04eTJdxKTM3vHxrjK6DhAU16HIctAtq1BnUA9ZTiZT4wEM6q3USUnpzPWZ+V0wYe/gkaYuz0GHvwmfDHlCcvvqXHHwUl+u7vStL5/G+gto76YDY9GJAW4YCB+E5EvCEMnCQX782pX69455eBVvTIDUgvdOqaE3k57Fp3o5jkiEIPnwrkLUdSZtcBTZNmdg+OfgpXou7tNfY0UKzSjNwRG/yeqbd5q8TSERIEhI7KM/0wkkYErDL865sqWLPBWer024z1sySAjWdP/2otW7DEQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ks+UuaSv5KNQnArNIVH0E99Z78VHH3K53r/X3CDMvc0=;
- b=DzmsBy771kUriH2DZxjzpfd6K70jHuSsL0/G1CAEu/7/PZdQIBGD4iU43/rUHFtel49OQICedzJTPCU8c5+zyJBrq053xHgi3vhAQYyW2ykz3ChNnuu+bIdmUiv8r8VOWEBSnEifoS1XoTOXi8PNP9zrIkh7VP6IZQeLzZ7Vuv6tjqSQSECRZXF/RDvGTRrThnkX5/PijOiaqoD2t0i4iPpgxkVDCabmH79OR36R7h3PiY/z9kHN1knveIhDe7ggQp7UoMWQyPxl9LuFMlvjQDVpBadSUFcIabik/tlP5gIMK/svpm6w1zg7xRWuCK7eVEWJLHro5PjvKI5Q6Y5SiA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ks+UuaSv5KNQnArNIVH0E99Z78VHH3K53r/X3CDMvc0=;
- b=tNT6oXRQRyQwCyF4aUktcH/4vfi+U1WHnubisP1rDWbB5oDEvYHt8CC7xPa6NKzduDXdVnVBiwaG9rq9uu+atSuIniIGY0iFsmarMySp81NRBpLgwdOQcvUcBiEkv7cXo93MZA3FbEl6HAVtiGzhzNnhnlstbnsyLdKicKgKQPE=
-Received: from DM6PR02CA0054.namprd02.prod.outlook.com (2603:10b6:5:177::31)
- by DM4PR12MB6279.namprd12.prod.outlook.com (2603:10b6:8:a3::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.28; Wed, 24 May
- 2023 15:56:49 +0000
-Received: from DM6NAM11FT064.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:177:cafe::de) by DM6PR02CA0054.outlook.office365.com
- (2603:10b6:5:177::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.29 via Frontend
- Transport; Wed, 24 May 2023 15:56:49 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT064.mail.protection.outlook.com (10.13.172.234) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6411.30 via Frontend Transport; Wed, 24 May 2023 15:56:49 +0000
-Received: from jallen-jump-host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 24 May
- 2023 10:56:44 -0500
-From:   John Allen <john.allen@amd.com>
-To:     <kvm@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, <pbonzini@redhat.com>,
-        <weijiang.yang@intel.com>, <rick.p.edgecombe@intel.com>,
-        <seanjc@google.com>, <x86@kernel.org>, <thomas.lendacky@amd.com>,
-        <bp@alien8.de>, John Allen <john.allen@amd.com>
-Subject: [RFC PATCH v2] x86/sev-es: Include XSS value in GHCB CPUID request
-Date:   Wed, 24 May 2023 15:56:19 +0000
-Message-ID: <20230524155619.415961-1-john.allen@amd.com>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S230029AbjEXQWy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 May 2023 12:22:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32EE010B
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 09:22:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684945328;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yPwyuS1OongKitLVaU9z5x5rdysTI14nc2mLRrtatWw=;
+        b=QljhobqysXYCe3EG9X6fU+Xp8tww2tTqTEq3hzAtbH3VmeYUAJHrdKX58pOAMfpe/qjLfQ
+        /7cJslFqAB3FTRNwWl3wkfngRJbkwFibu/eW/2NYz/Kks4zejsnl3jMbLa+bKuNznDL7QS
+        Zp1ACPLdWc4hGJ644twmhM9vPy64Q3M=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-103-H-T6jSOSMd2uHNEQWuyKyA-1; Wed, 24 May 2023 12:22:06 -0400
+X-MC-Unique: H-T6jSOSMd2uHNEQWuyKyA-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6257fdf4bc6so1985806d6.0
+        for <kvm@vger.kernel.org>; Wed, 24 May 2023 09:22:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684945326; x=1687537326;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yPwyuS1OongKitLVaU9z5x5rdysTI14nc2mLRrtatWw=;
+        b=PP0d2cs/SMdLcQpOp39NQNBBOZh/+JW1UGX2J4n16axXR5QtokyNmFumeXdsHu2Qw/
+         ERzmo4hsepvuQWSOy26EK9cNPGbcZUveWro6JAmqqtPdPaX+r1jRYGLGVH7pz75Q9lFq
+         z0ESglJ7mvYLx6GPYBOaWZ2alMiYbU5wuHktPmHFPL1SlpntlkFOw2RxpLv+21c4RDmL
+         0SEumHvWKfs/kG2xyMksuTfq7CweaKFKnvpEHnRMJUl7p7m8eQosW0Yi2Ue7XgfstM5M
+         a1CvnffQiGAH5fdveMFR5bWoWhrllgzQN1BfpKitt7rZC5hUZFUSoj004b8LSAGn12m5
+         Pg2w==
+X-Gm-Message-State: AC+VfDz2N1rwbLPUPfJarAYBsddVygOO2P+uti3TzUz9TeyTr8GeRIzM
+        RemyctpTY8WTQxIwl3wWGiv7vmiBkzLkgndUe4rULkpPEwWa7oj9TeVT1yIAwO4M1xgOF6xce3E
+        gPL0Y6LAvLeSW
+X-Received: by 2002:a05:6214:4118:b0:622:265e:3473 with SMTP id kc24-20020a056214411800b00622265e3473mr26910196qvb.1.1684945326054;
+        Wed, 24 May 2023 09:22:06 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ44gSuxNK5fKTIYGrmxrxLmxwCMv6vwRSeYWoCsOBEZjRDG+1NMNWBC7tmoLEdae6sAzBVCjg==
+X-Received: by 2002:a05:6214:4118:b0:622:265e:3473 with SMTP id kc24-20020a056214411800b00622265e3473mr26910168qvb.1.1684945325673;
+        Wed, 24 May 2023 09:22:05 -0700 (PDT)
+Received: from x1n (bras-base-aurron9127w-grc-62-70-24-86-62.dsl.bell.ca. [70.24.86.62])
+        by smtp.gmail.com with ESMTPSA id bz16-20020ad44c10000000b00621253d19f9sm3649443qvb.98.2023.05.24.09.22.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 May 2023 09:22:04 -0700 (PDT)
+Date:   Wed, 24 May 2023 12:22:03 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     David Stevens <stevensd@chromium.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v6 1/4] KVM: mmu: introduce new gfn_to_pfn_noref functions
+Message-ID: <ZG45q0xJSnA6NKQN@x1n>
+References: <20230330085802.2414466-1-stevensd@google.com>
+ <20230330085802.2414466-2-stevensd@google.com>
+ <ZGvUsf7lMkrNDHuE@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT064:EE_|DM4PR12MB6279:EE_
-X-MS-Office365-Filtering-Correlation-Id: 41250b9d-e6ec-4a34-d076-08db5c6f7c13
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 51d4D6CjgREMNgnFPzhqTpdBzsxCUAI4bf1RFq1D5H/oOj5PdGSiFFIxkZ1h4N6XJEcmdys2IKLMSDLi7n+2n0M16f+WoHztQthZDzuytiDaawa8VcSCdVsjLP5oNK9jDStd9NiWcNzaB+fEzE0ukGhhjeOsCwBxGx3/SUVlpPgIuWeY2hqHQRJskIszT+C59iEvUksDwLP/DkZK0gubaMYpdcD7CLiAQj7Vbt4L2Iyow4V+3PyyY1EHLIbLbNd0mJfjFkQFIN6hZJE8fj8VJDW5xBLKL44Irq1ZqSm8EzCbLKsAIokCIrK71KhoTdzWMxdBTveSLYWG0jgs9oKg37rYxhKhalAPkN+ifBQcFJaKQQRbg7/X7unguKU0WFKP3PnGxFdgP7ZmxWLJeFGGMRo0+bu5UYZGjxJOL379M4HXUSaPFffXz248p4EO7GXp1bM+BlzyyNC0rr6DXnUu5eb02xmj4anjJxWAUyrUQ6GXr9ldosAJ37WeKzTSqgHM+HizRNvPLD9dN9/WLwQsMUub7bGXS9rDSSnlPBSpP6IYpq6mrowizsz67pq9eQFkiFh9NIM+V1ipw+hiqTQ6/d0RZVzcOFVcfa0y8KuenfQUkNj0IuzbMkIxagnzZPKq4DYFoMF4UF7UEWDCwns9kyhPGaNQDLe/iX5pFMBqAKnFGZGT9tF/NSN+q6d2ZuIkpLoYiTwqoSg/FKmp+CS8QZ433ZR70sugFfekNac5RpO9PYtoGOUjze8nXK6yuBZ5I1q1upmFcHnT7wo7791fmQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(376002)(39860400002)(396003)(451199021)(36840700001)(46966006)(40470700004)(54906003)(7696005)(41300700001)(82310400005)(316002)(6666004)(70206006)(4326008)(6916009)(70586007)(8936002)(5660300002)(8676002)(478600001)(86362001)(44832011)(82740400003)(40460700003)(356005)(81166007)(26005)(1076003)(186003)(16526019)(40480700001)(2906002)(2616005)(36756003)(83380400001)(426003)(36860700001)(336012)(47076005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 May 2023 15:56:49.4918
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 41250b9d-e6ec-4a34-d076-08db5c6f7c13
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT064.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6279
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZGvUsf7lMkrNDHuE@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a guest issues a cpuid instruction for Fn0000000D_x0B (CetUserOffset), the
-hypervisor may intercept and access the guest XSS value. For SEV-ES, this is
-encrypted and needs to be included in the GHCB to be visible to the hypervisor.
-The rdmsr instruction needs to be called directly as the code may be used in
-early boot in which case the rdmsr wrappers should be avoided as they are
-incompatible with the decompression boot phase. 
+On Mon, May 22, 2023 at 01:46:41PM -0700, Sean Christopherson wrote:
+> +Peter
+> 
+> On Thu, Mar 30, 2023, David Stevens wrote:
+> > From: David Stevens <stevensd@chromium.org>
+> > 
+> > Introduce new gfn_to_pfn_noref functions that parallel existing
+> > gfn_to_pfn functions. These functions can be used when the caller does
+> > not need to maintain a reference to the returned pfn (i.e. when usage is
+> > guarded by a mmu_notifier). The noref functions take an out parameter
+> > that is used to return the struct page if the hva was resolved via gup.
+> > The caller needs to drop its reference such a returned page.
+> 
+> I dislike the "noref" name and the approach itself (of providing an entirely
+> separate set of APIs).  Using "noref" is confusing because the callers do actually
+> get a reference to the page (if a refcounted page is found).
+> 
+> As for the approach, I really, really don't want to end up with yet more APIs
+> for getting PFNs from GFNs.  We already have far too many.  In the short term,
+> I think we'll need to carry multiple sets of APIs, as converting all architectures
+> to any new API will be too much for a single series.  But I want to have line of
+> sight to convering on a single, as-small-as-possible set of APIs, and I think/hope
+> it should be possible to make the old APIs, e.g. gfn_to_pfn(), to be shims around
+> the new APIs.
+> 
+> And since this series is essentially overhauling the gfn_to_pfn APIs, I think it's
+> the right series to take on refactoring the APIs to clean up the growing flag
+> problem.  There was a bit of discussion back when "interruptible" support was
+> added (https://lore.kernel.org/all/YrTbKaRe497n8M0o@xz-m1.loca), but it got punted
+> because it wasn't necessary, and because there wasn't immediate agreement on what
+> exactly the APIs should look like.
+> 
+> Overhauling the APIs would also let us clean up things like async #PF, specifically
+> replacing the unintuitive "*async = true" logic with something like this:
+> 
+> 		if ((flags & FOLL_NOWAIT) && vma_is_valid(vma, flags & FOLL_WRITE))
+> 			pfn = KVM_PFN_ERR_FAULT_MINOR;
+> 		else
+> 			pfn = KVM_PFN_ERR_FAULT;
+> 
+> Lastly, I think there's also an opportunity here to harden KVM's interaction with
+> mmu_notifiers, and to dedup arch code in KVM .  Specifically, even when the proposed
+> "allow_unsafe_kmap" is true, KVM should either (a) be "in" an mmu_notifier sequence
+> or (b) _want_ to grab a reference.  And when KVM does NOT want a reference, the core
+> API can/should immediately drop the reference even before returning.
+> 
+> My thought is it provide an "entirely" new API, named something like kvm_follow_pfn()
+> to somewhat mirror follow_{pfn,pte,phys}().  Ideally something to pair with gup()
+> would be nice, but having a dedicated KVM helper to get _only_ struct page memory
+> doesn't work well because KVM almost never wants only struct page memory.
+> 
+> As for the flags vs. bools debate (see link above), I think the best approach is
+> a mix of the two.  Specifically, reuse the FOLL_* flags as-is for inputs, and use
+> booleans for outputs.  I don't _think_ there are any input bools/flags that don't
+> map 1:1 with existing FOLL_* flags.
+> 
+> As a very, *very* rough sketch, provide APIs that look a bit like this.
 
-Signed-off-by: John Allen <john.allen@amd.com>
----
-v2:
-  - Do not expose XSS state for ECX > 1
-  - Direct MSR read was left as is for now. Using __rdmsr produces a warning
-    during kernel build as the __ex_table section used by __rdmsr isn't used
-    during decompression boot. Additionally, we can see other code
-    performing a similar direct msr read in this file in commit
-    ee0bfa08a3453.
----
- arch/x86/kernel/sev-shared.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Unifying ref vs nonref cases does look a bit cleaner to me too.
 
-diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-index 3a5b0c9c4fcc..fc4109cc2e67 100644
---- a/arch/x86/kernel/sev-shared.c
-+++ b/arch/x86/kernel/sev-shared.c
-@@ -887,6 +887,21 @@ static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
- 		/* xgetbv will cause #GP - use reset value for xcr0 */
- 		ghcb_set_xcr0(ghcb, 1);
- 
-+	if (has_cpuflag(X86_FEATURE_SHSTK) && regs->ax == 0xd && regs->cx <= 1) {
-+		unsigned long lo, hi;
-+		u64 xss;
-+
-+		/*
-+		 * Since vc_handle_cpuid may be used during early boot, the
-+		 * rdmsr wrappers are incompatible and should not be used.
-+		 * Invoke the instruction directly.
-+		 */
-+		asm volatile("rdmsr" : "=a" (lo), "=d" (hi)
-+			     : "c" (MSR_IA32_XSS));
-+		xss = (hi << 32) | lo;
-+		ghcb_set_xss(ghcb, xss);
-+	}
-+
- 	ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_CPUID, 0, 0);
- 	if (ret != ES_OK)
- 		return ret;
+> 
+>   kvm_pfn_t __kvm_follow_pfn(struct kvm_follow_pfn *foll)
+>   {
+> 	kvm_pfn_t pfn;
+> 
+> 	if (WARN_ON_ONCE(!(foll->flags & FOLL_GET) && !foll.mmu_seq))
+
+IMHO we may not want to rely on mmu_seq==0 either for unlucky very initial
+mmu_seq being zero, or avoid overflows?
+
+I'd say we can stick with FOLL_GET in this case to identify ref vs nonref
+and always assume mmu_seq a pure random number.
+
+> 		return KVM_PFN_ERR_FAULT;
+> 
+> 	pfn = ???;
+> 
+> 	if (foll->page && !(foll->flags & FOLL_GET))
+> 		put_page(foll->page);
+> 
+> 	return pfn;
+>   }
+> 
+>   kvm_pfn_t kvm_follow_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, struct page **page)
+>   {
+> 	struct kvm_follow_pfn foll = {
+> 		.flags = FOLL_GET | FOLL_WRITE,
+> 	};
+> 
+> 	<more stuff here?>
+> 
+> 	foll.slot = ???;
+> 	if (!foll.slot || foll.slot->flags & KVM_MEMSLOT_INVALID)
+> 		return KVM_HVA_ERR_BAD;
+> 
+> 	if (memslot_is_readonly(foll.slot))
+> 		return KVM_HVA_ERR_RO_BAD;
+> 
+> 	return __kvm_follow_pfn(&foll);
+>   }
+> 
+> and a few partially converted users
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 67e2ac799aa7..5eaf0395ed87 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -550,12 +550,14 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
+>  
+>         if (is_accessed_spte(old_spte) && !is_accessed_spte(new_spte)) {
+>                 flush = true;
+> -               kvm_set_pfn_accessed(spte_to_pfn(old_spte));
+> +               if (is_refcounted_page_pte(old_spte))
+
+One question is how to impl is_refcounted_page_pte() here to identify
+non-refcountable pages.
+
+IIUC those pages are mostly identical to a normal page (so !PG_reserved)
+but it has page_ref_count(page)==0 always, am I right?  I got that roughly
+from reading f8be156be1 only though, so I could miss a lot of things..
+
+When thinking about that, I'm also wondering whether we can trivially allow
+kvm to support such mapping (without overhaul of the kvm pfn API) by
+something like this:
+
+===8<===
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 51e4882d0873..467acbac1a96 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -192,7 +192,13 @@ struct page *kvm_pfn_to_refcounted_page(kvm_pfn_t pfn)
+
+        page = pfn_to_page(pfn);
+        if (!PageReserved(page))
+-               return page;
++               /*
++                * When page_ref_count(page)==0 it might be speical page
++                * that do not support refcounting.  Treating them the same
++                * as normal reserved (e.g. MMIO) pages by returning NULL,
++                * so they're exempt of refcounting.
++                */
++               return page_ref_count(page) == 0 ? NULL : page;
+
+        /* The ZERO_PAGE(s) is marked PG_reserved, but is refcounted. */
+        if (is_zero_pfn(pfn))
+===8<===
+
+So that we treat those special pages the same as normal PFNMAP ones by
+skipping all refcountings on inc/dec.  This is based on the fact that kvm
+should always hold at least 1 ref on a normal page so a normal page should
+never hit ref==0 here, but again I could miss something somewhere..
+
+> +                       kvm_set_page_accessed(pfn_to_page(spte_to_pfn));
+>         }
+>  
+>         if (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte)) {
+>                 flush = true;
+> -               kvm_set_pfn_dirty(spte_to_pfn(old_spte));
+> +               if (is_refcounted_page_pte(old_spte))
+> +                       kvm_set_page_dirty(pfn_to_page(spte_to_pfn));
+>         }
+>  
+>         return flush;
+> @@ -4278,6 +4280,10 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>  
+>  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  {
+> +       struct kvm_follow_pfn foll = {
+> +               .mmu_seq = fault->mmu_seq,
+> +               .gfn = fault->gfn,
+> +       };
+>         struct kvm_memory_slot *slot = fault->slot;
+>         bool async;
+>  
+> @@ -4309,12 +4315,16 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>                         return RET_PF_EMULATE;
+>         }
+>  
+> -       async = false;
+> -       fault->pfn = __gfn_to_pfn_noref_memslot(slot, fault->gfn, false, false, &async,
+> -                                               fault->write, &fault->map_writable,
+> -                                               &fault->hva, &fault->page);
+> -       if (!async)
+> -               return RET_PF_CONTINUE; /* *pfn has correct page already */
+> +       foll.flags = FOLL_NOWAIT;
+> +       if (fault->write)
+> +               foll.flags |= FOLL_WRITE;
+> +
+> +       fault->pfn = __kvm_follow_pfn(&foll);
+> +       if (!is_error_noslot_pfn(fault->pfn))
+> +               goto success;
+> +
+> +       if (!is_fault_minor_pfn(fault->pfn))
+> +               return RET_PF_CONTINUE;
+>  
+>         if (!fault->prefetch && kvm_can_do_async_pf(vcpu)) {
+>                 trace_kvm_try_async_get_page(fault->addr, fault->gfn);
+> @@ -4332,9 +4342,18 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>          * to wait for IO.  Note, gup always bails if it is unable to quickly
+>          * get a page and a fatal signal, i.e. SIGKILL, is pending.
+>          */
+> -       fault->pfn = __gfn_to_pfn_noref_memslot(slot, fault->gfn, false, true, NULL,
+> -                                               fault->write, &fault->map_writable,
+> -                                               &fault->hva, &fault->page);
+> +       foll.flags |= FOLL_INTERRUPTIBLE;
+> +       foll.flags &= ~FOLL_NOWAIT;
+> +
+> +       fault->pfn = kvm_follow_pfn(&foll);
+> +       if (!is_error_noslot_pfn(fault->pfn))
+> +               goto success;
+> +
+> +       return RET_PF_CONTINUE;
+> +success:
+> +       fault->hva = foll.hva;
+> +       fault->page = foll.page;
+> +       fault->map_writable = foll.writable;
+>         return RET_PF_CONTINUE;
+>  }
+>  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 360eaa24456f..0bae253c88dd 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2663,9 +2663,10 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
+>                 if (r < 0)
+>                         pfn = KVM_PFN_ERR_FAULT;
+>         } else {
+> -               if (async && vma_is_valid(vma, write_fault))
+> -                       *async = true;
+> -               pfn = KVM_PFN_ERR_FAULT;
+> +               if ((flags & FOLL_NOWAIT) && vma_is_valid(vma, flags & FOLL_WRITE))
+> +                       pfn = KVM_PFN_ERR_FAULT_MINOR;
+> +               else
+> ...skipping...
+> +       fault->pfn = kvm_follow_pfn(&foll);
+> +       if (!is_error_noslot_pfn(fault->pfn))
+> +               goto success;
+> +
+> +       return RET_PF_CONTINUE;
+> +success:
+> +       fault->hva = foll.hva;
+> +       fault->page = foll.page;
+> +       fault->map_writable = foll.writable;
+>         return RET_PF_CONTINUE;
+>  }
+>  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 360eaa24456f..0bae253c88dd 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2663,9 +2663,10 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
+>                 if (r < 0)
+>                         pfn = KVM_PFN_ERR_FAULT;
+>         } else {
+> -               if (async && vma_is_valid(vma, write_fault))
+> -                       *async = true;
+> -               pfn = KVM_PFN_ERR_FAULT;
+> +               if ((flags & FOLL_NOWAIT) && vma_is_valid(vma, flags & FOLL_WRITE))
+> +                       pfn = KVM_PFN_ERR_FAULT_MINOR;
+> +               else
+> +                       pfn = KVM_PFN_ERR_FAULT;
+>         }
+>  exit:
+>         mmap_read_unlock(current->mm);
+> @@ -2732,6 +2733,30 @@ kvm_pfn_t __gfn_to_pfn_noref_memslot(const struct kvm_memory_slot *slot, gfn_t g
+>  }
+>  EXPORT_SYMBOL_GPL(__gfn_to_pfn_noref_memslot);
+>  
+> +kvm_pfn_t __kvm_follow_pfn(struct kvm_follow_pfn *foll)
+> +{
+> +       kvm_pfn_t pfn;
+> +
+> +       if (WARN_ON_ONCE(!(foll->flags & FOLL_GET) && !foll.mmu_seq))
+> +               return KVM_PFN_ERR_FAULT;
+> +
+> +       pfn = __gfn_to_pfn_noref_memslot(...);
+> +
+> +       if (foll->page && !(foll->flags & FOLL_GET))
+> +               put_page(foll->page);
+> +
+> +       return pfn;
+> +}
+> +
+> +kvm_pfn_t kvm_follow_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, struct page **page)
+> +{
+> +       struct kvm_follow_pfn foll = {
+> +               .flags = FOLL_GET | FOLL_WRITE,
+> +       };
+> +
+> +       return __kvm_follow_pfn(&foll);
+> +}
+> +
+>  kvm_pfn_t gfn_to_pfn_noref_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
+>                                 bool *writable, struct page **page)
+>  {
+> @@ -2910,25 +2935,23 @@ void kvm_release_pfn(kvm_pfn_t pfn, bool dirty)
+>  
+>  int kvm_vcpu_map(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map)
+>  {
+> +       struct page *page;
+>         kvm_pfn_t pfn;
+>         void *hva = NULL;
+> -       struct page *page = KVM_UNMAPPED_PAGE;
+>  
+>         if (!map)
+>                 return -EINVAL;
+>  
+> -       pfn = gfn_to_pfn(vcpu->kvm, gfn);
+> +       pfn = kvm_follow_pfn(vcpu->kvm, gfn, &page)
+>         if (is_error_noslot_pfn(pfn))
+>                 return -EINVAL;
+>  
+> -       if (pfn_valid(pfn)) {
+> -               page = pfn_to_page(pfn);
+> +       if (page)
+>                 hva = kmap(page);
+>  #ifdef CONFIG_HAS_IOMEM
+> -       } else {
+> +       else if (allow_unsafe_kmap)
+>                 hva = memremap(pfn_to_hpa(pfn), PAGE_SIZE, MEMREMAP_WB);
+>  #endif
+> -       }
+>  
+>         if (!hva)
+>                 return -EFAULT;
+> 
+
 -- 
-2.39.1
+Peter Xu
 
