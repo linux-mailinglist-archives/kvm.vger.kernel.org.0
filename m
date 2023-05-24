@@ -2,366 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD47570F887
-	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 16:21:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 129FB70F8E0
+	for <lists+kvm@lfdr.de>; Wed, 24 May 2023 16:38:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235933AbjEXOVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 May 2023 10:21:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54398 "EHLO
+        id S235387AbjEXOip (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 May 2023 10:38:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233176AbjEXOV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 May 2023 10:21:28 -0400
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8114E12E
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 07:21:25 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-3f4e01eb845so6450671cf.2
-        for <kvm@vger.kernel.org>; Wed, 24 May 2023 07:21:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bluespec-com.20221208.gappssmtp.com; s=20221208; t=1684938084; x=1687530084;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/V+docf4fzDFmrJfaslFi/OmmvL2qnjhhaEwsdcnckw=;
-        b=vmSiFJbp6qWKZXxvGz2dQ9+yxEuJt1LyzoKTGIe6iVNd+YRXV7bjxDBAqV+3HpxutV
-         gvnhk0Y4KoX5ggLnVaGOrDt78r2E4sLvQ6/w1wftibN2AjpwV00CF5OZQ5zcTbwv0vb9
-         SqxyKa/bnSjXnoSjmPC67JzXhGgxoDDzbgfx7GtavwFzqOd9OGpRKxpRjDB38IfLfnrf
-         fewezplfcoKbUJjB1uIwpUoasRcOHezvJNiNM+TjdJEBGkRvTcmLRwOaociXwDlf9itL
-         hcITyPiCSVrvCRHLFY1ORdCQ3etTjvR++fZd+BAu5fSV9VD3NcTePIbQNdYfRAd4VxTd
-         NsiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684938084; x=1687530084;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/V+docf4fzDFmrJfaslFi/OmmvL2qnjhhaEwsdcnckw=;
-        b=ARovjSEBYmJMk+Go5TIv3AU3SGzE31eO4L2OaLFmMKHOQom2wCrGWukyR1Bi7JxPhJ
-         R+bDSea4jLcsm0cWZulf1r1rd3WjyIWbeeUFipCe7WEq6+jxjS7DYbqo7opF/b13xmfk
-         YQ+Um7BjSjTmjYB8aaUGE589OvnlmbjaqFMQdixuTYSoEuUrB4VUEJDAf5J8ts2Pz+cY
-         g+a7i9pklQehTE5r3H0YnJzNfb0MqztheLhbNxenzv28rRbI8qh13qO69YMVE2gbs5zy
-         6ULt1HKrUa1ndeinH5MDzKC+ouU18Dojl1XNhbz1HmtjkWkrzdOShwLFDtPEUGVIiB+n
-         Isrg==
-X-Gm-Message-State: AC+VfDw2r4yzhMzTdp25fsebSeKXjifhyrm/xAuaDMMsAtK356l/7WyU
-        KW3Aa6eStIANajF2d4axKXAW
-X-Google-Smtp-Source: ACHHUZ6B563mCO+6UR/zlVT0GBYx2Bq2YFQNqwsQ+CnQwLMpqG9gyks9YQfM2uRYXkIgxEfs4aK+Ew==
-X-Received: by 2002:a05:622a:10e:b0:3e6:71d6:5d5d with SMTP id u14-20020a05622a010e00b003e671d65d5dmr26590177qtw.1.1684938084476;
-        Wed, 24 May 2023 07:21:24 -0700 (PDT)
-Received: from bruce.bluespec.com ([181.214.94.126])
-        by smtp.gmail.com with ESMTPSA id ch13-20020a05622a40cd00b003ef573e24cfsm2551977qtb.12.2023.05.24.07.21.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 May 2023 07:21:24 -0700 (PDT)
-Date:   Wed, 24 May 2023 10:21:21 -0400
-From:   Darius Rad <darius@bluespec.com>
-To:     Palmer Dabbelt <palmer@dabbelt.com>
-Cc:     andy.chiu@sifive.com, linux-riscv@lists.infradead.org,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        Vineet Gupta <vineetg@rivosinc.com>, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
-        aou@eecs.berkeley.edu, ajones@ventanamicro.com,
-        heiko.stuebner@vrull.eu, Conor Dooley <conor.dooley@microchip.com>,
-        prabhakar.mahadev-lad.rj@bp.renesas.com, liaochang1@huawei.com,
-        jszhang@kernel.org, vincent.chen@sifive.com, guoren@kernel.org,
-        Bjorn Topel <bjorn@rivosinc.com>, mnissler@rivosinc.com
-Subject: Re: [PATCH -next v20 11/26] riscv: Allocate user's vector context in
- the first-use trap
-Message-ID: <ZG4dYQdHqc2ipoZe@bruce.bluespec.com>
-Mail-Followup-To: Palmer Dabbelt <palmer@dabbelt.com>, andy.chiu@sifive.com,
-        linux-riscv@lists.infradead.org, anup@brainfault.org,
-        atishp@atishpatra.org, kvm-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, Vineet Gupta <vineetg@rivosinc.com>,
-        greentime.hu@sifive.com, guoren@linux.alibaba.com,
-        Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu,
-        ajones@ventanamicro.com, heiko.stuebner@vrull.eu,
-        Conor Dooley <conor.dooley@microchip.com>,
-        prabhakar.mahadev-lad.rj@bp.renesas.com, liaochang1@huawei.com,
-        jszhang@kernel.org, vincent.chen@sifive.com, guoren@kernel.org,
-        Bjorn Topel <bjorn@rivosinc.com>, mnissler@rivosinc.com
-References: <20230518161949.11203-12-andy.chiu@sifive.com>
- <mhng-6b818098-ee0c-407f-83eb-75db4ea4ff89@palmer-ri-x1c9a>
+        with ESMTP id S232570AbjEXOin (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 May 2023 10:38:43 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B761B6;
+        Wed, 24 May 2023 07:38:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1684939109; x=1716475109;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=LAmJa+fHZIGh72ytVsGhZMkD0LlDFf9gjEW5QSDIj9E=;
+  b=dShjJnD1Hkj+5Xl/4S/o1mQ6V2uzCH1TALArRYZU7uX15aslj6Q75kYc
+   w3ub7pRzRKq7KunpPUUNfvQbabMI5nd8Zojnq7PdkJ/LX7TEMPQYLhnUg
+   tjTxnwjY3XDR9KfJBEHd9nqE9hS92j5XoXAKV3eIpwB9lcHVrXGygmZBk
+   Zrce5/cNf+ixZpV1vAH5rteqVR3Bo/udyb8GkE+7claVkkY7huBU4dl2o
+   M+1LZRWf06p3auILHez1CqJMjsLyWWXaNq8LXL7jn3ThYjbZpOcrpXl6Y
+   aHq5m2HXPuecxpSz+1C1LTjX40MO/lxAHz5DjzahuU+CC15Elbj/uYmTu
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10720"; a="351095341"
+X-IronPort-AV: E=Sophos;i="6.00,189,1681196400"; 
+   d="scan'208";a="351095341"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2023 07:38:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10720"; a="816618676"
+X-IronPort-AV: E=Sophos;i="6.00,189,1681196400"; 
+   d="scan'208";a="816618676"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga002.fm.intel.com with ESMTP; 24 May 2023 07:38:18 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Wed, 24 May 2023 07:38:17 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Wed, 24 May 2023 07:38:17 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Wed, 24 May 2023 07:38:17 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.170)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Wed, 24 May 2023 07:38:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kCtzBEtl2GAyapl6vcMwIDUUBWMRora89Ji9Sv1upYWlW9TR2A7JDp9gnuZyEso1yRNyjtILc5h5R5epZA33wMEHdyS+DQTA87wgjKagBujA2JB1NEljwBZuyQFORDI9eD+M+kfUQXoO0aHrWrGiM+VrPcVH3+pfUoNnEgCh+yM3dBNzFc3oZ4x9NqZuYL5D+dQ/iSmQNv3Jc387c10qA+z6eVP8cRetdcJgaeAPsCrFI8C98bZua/2mouUfwVdqJ6jtwhLbEi43IIugy3xBboZQumxU/g3BJSGUscDXkdDocl5JIuc0NnwlXoSIfO4+4A2w8Sn7chdIDJMEfyEXfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0SVrnl4Mw4MyBqr7vTjxE7VLVnnv+9yVkyyrb0sb8hk=;
+ b=gcGBvRhT8EItlEaWAq72yumP/blU0R7KuQmiJ//tVXM9LKBZVoqM7o58rlr6WTPTAgURWmDyQc998kS1VMFUyTKeLjmu1QVN0WnZRL0eJgV07OGNb+Nj5CcBhPqjNXhEoYwMjmJPf9mHjd9d2k3UzpGu5Ihc0WOJ7XqmLBI7jgF8RTBAe5xzTYYBXD1cHCS9J9lRbhcYPvTCUSFPRULBxXar4Va0JtWIzYRk+1u8cjkVCMIUt9nwzPFsj4rt1I/lZna3PukXYXzX/eUDNBaUCPxXWLzQS7JOwJPDnjUOnDpB0v58qVqMJ/cBtQuLYwDG+/FmIjBOPYr5YfymROjf3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SJ2PR11MB7573.namprd11.prod.outlook.com (2603:10b6:a03:4d2::10)
+ by CY8PR11MB7339.namprd11.prod.outlook.com (2603:10b6:930:9f::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.28; Wed, 24 May
+ 2023 14:38:15 +0000
+Received: from SJ2PR11MB7573.namprd11.prod.outlook.com
+ ([fe80::591f:4873:fd80:9a6d]) by SJ2PR11MB7573.namprd11.prod.outlook.com
+ ([fe80::591f:4873:fd80:9a6d%6]) with mapi id 15.20.6411.028; Wed, 24 May 2023
+ 14:38:15 +0000
+Message-ID: <8f7e96e6-6b0b-e51f-ba45-b0c827abf59b@intel.com>
+Date:   Wed, 24 May 2023 07:38:11 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.11.0
+Subject: Re: [PATCH V5 00/11] vfio/pci: Support dynamic allocation of MSI-X
+ interrupts
+Content-Language: en-US
+To:     YangHang Liu <yanghliu@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     <jgg@nvidia.com>, <yishaih@nvidia.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+        <tglx@linutronix.de>, <darwi@linutronix.de>, <kvm@vger.kernel.org>,
+        <dave.jiang@intel.com>, <jing2.liu@intel.com>,
+        <ashok.raj@intel.com>, <fenghua.yu@intel.com>,
+        <tom.zanussi@linux.intel.com>, <linux-kernel@vger.kernel.org>
+References: <cover.1683740667.git.reinette.chatre@intel.com>
+ <20230523164301.14620a69.alex.williamson@redhat.com>
+ <CAGYh1E8Yk-eVNOMQrx6SUgNou5fY6=jFzHR=rQ9diwXbJAaKVg@mail.gmail.com>
+From:   Reinette Chatre <reinette.chatre@intel.com>
+In-Reply-To: <CAGYh1E8Yk-eVNOMQrx6SUgNou5fY6=jFzHR=rQ9diwXbJAaKVg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR03CA0337.namprd03.prod.outlook.com
+ (2603:10b6:a03:39c::12) To SJ2PR11MB7573.namprd11.prod.outlook.com
+ (2603:10b6:a03:4d2::10)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <mhng-6b818098-ee0c-407f-83eb-75db4ea4ff89@palmer-ri-x1c9a>
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NEUTRAL,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR11MB7573:EE_|CY8PR11MB7339:EE_
+X-MS-Office365-Filtering-Correlation-Id: cf343f23-7222-4f3d-049f-08db5c6481da
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: H0xx16OgL0GUAO+cAAmpGkbO/cGVlODEOHKaWPgSBk1rMlXX7P3Xa5LcdK1N8sh7Fx2IxAqiw+VvzrH/a67BRyUW77OijkiDE1eDh0F1asr5UhMebRzZAm9X7ehf1hz7ehoZjM9dsfu2QHUCVpfkxSDBG72Avhu4NIFuCX2p/RRvhfP5JmIJa+iy1CedXkkyUmCD4X/e1zLvk3CuQpqFV/9b9LCLVL/zVk+tj7AI/sF1sEpeLbLausp3VC7jIFJVDRcGl4quOsda0CR7PK3ZXkYuhTHxVynEIIp72DqFAB/soxBufL5Qhb/1eyj0PLiMdwMcVdLM2gKy82tbtqfkGDDxEAKM3dZb4dOMsO8BqAkT+wBkNt/7l1tZHOllkRSJo5U2f+/ReS8+2MIe7e1FdRonDCzO70xPWBptMr0wpI6ozYjZSm5Emi0Hpv7H6EVyg1H5MlYIUnb9AA3FseQp7C/dnG9NPrP+VlnuEHHh8yzlgHdgTXGxt4may3NVM5ioPBl0OvS0VBcZ/2S88Ajh18dM4lvjCEa7u2a0BJ1rfuUfwhEX2wxOuF8quME+0V174hd6p9wKtFnyBit+h6z18Q/JwvaaCm5+gwIL7uwlJMtPpnjp+f4XrO15MjEB4NHl6eGR7TqZYlPwh2NePdIi3A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB7573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(366004)(396003)(39860400002)(346002)(136003)(451199021)(31686004)(31696002)(4744005)(2906002)(6666004)(26005)(6506007)(6512007)(41300700001)(44832011)(110136005)(66476007)(4326008)(478600001)(66946007)(66556008)(82960400001)(38100700002)(53546011)(86362001)(2616005)(186003)(5660300002)(8676002)(316002)(36756003)(7416002)(8936002)(6486002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UXZleWhiMitXcVl1M2ZYTVpxUkRUV1VaY2d3bWQrMERwWm1kU3FOLzFzSHRm?=
+ =?utf-8?B?YlIrSnFTUXpZUklrNmdWMS9KWHd1aUE0Y1NFYm14NS9WU0JoY0JuVFZrWll6?=
+ =?utf-8?B?QzZYNTc5SlJIdHh4NHpySkNPaE5IUkpWVHVhOStaaU00Vm1Xa0ZqWjl1czdK?=
+ =?utf-8?B?SU43ZzBXeDdDWVFmTzM1bFArK2VZai9LLzhzR2Q3KzFXY3EwZEwyNnJXVTQz?=
+ =?utf-8?B?c2JlS3QzZ1dyVDFjekpWWWhJNWRKeHR4c2dZUTZKNVBaRnltUGlFNlJsVWg0?=
+ =?utf-8?B?a01jMXo5K09jdlNrWWJ4Qy9VTkZIbkhQdjhNc0N0UlpWTDl4VWtsVkVGN0tq?=
+ =?utf-8?B?Tlp2aXBoNStKM3E0UGVLeVlGbzdoazRyM3ZRNFRRRkczS2RFUGJLcVVTaWhT?=
+ =?utf-8?B?TGpjZXErRmJCRXdkNmt4cDA3NXRFTkU1UmRDU1JIOHdFdURXSXhYcE1Tc0Fu?=
+ =?utf-8?B?UHYyQmY4VUdlaXk4ODJrL0xqMmYvZEY1aktuNVBNblljVmxyRWtvMjBkT1pY?=
+ =?utf-8?B?TEZTMEF5VC9xNHVnTjVGc0txTmY1K2NWNktXNXFFV1h5bmc4NWs2VThlSUZW?=
+ =?utf-8?B?U2NVSjhqdnJtNTU5cjFCbkkvVXUyRkhOV0h5V2pXanlwNVRKeGw0dG9HRE12?=
+ =?utf-8?B?WFlJWXEwTFRWdTQ4NEEwSEQrWFpGaEJvMDhBZlY2NG9CMTNhR21jL3d0cnVi?=
+ =?utf-8?B?NmlWVkZDUmZWWjRveHhSWWVNUkt6QlNCYWt0VXRXUWtJalNmalo1WnJpY001?=
+ =?utf-8?B?bkI2c1dxN3FIdXpoMFAxa2JoNUZLZTgyellGcHVJQWRMTmJ1bityMDhQMzFq?=
+ =?utf-8?B?VHNpNEdjdFNWelpaeXp0UTZCZ2svUUc2dW9VbVExam5SVEpKbk50OTJZeGdk?=
+ =?utf-8?B?RTZHa3FpNS9DSXdnSDZHdFQvTE9OUXA0L1dwWGQ0SDZzdE96SVhTcnZ6UDdo?=
+ =?utf-8?B?ekZSZGVhNXZQcU9HTW43cFc4MzdJN2hXdTIveEg1ckxPUWJMR1hkS2U4ZkxZ?=
+ =?utf-8?B?RkNISVFqd1pqVmhnSFIzbnlMUFNoaEFERWpKYlRHbjhGUWpoV284bTB2WWlp?=
+ =?utf-8?B?R2ltSmkwYkZETUw1VE1ubFY0RlNzNUpkY2dqTE84Z21lQnN4ZitIUGZFR0sr?=
+ =?utf-8?B?elcxNWNLUGNVdG1Qd3FNNEhlTkdnRFNTMEwwQ3JLWmg5V0dVT2FzWm5mVG42?=
+ =?utf-8?B?VG9GTVpES3lQRVk2MEQrSlJYL2ZxZEdPdmJGdUtXSU55M3hIam51T1lFemJx?=
+ =?utf-8?B?K240SXhhR1o4a0htekwvcERwYlk3SVExTmd6cjdhMy9xWEl2ek1tU3FMQmhn?=
+ =?utf-8?B?QkdzVU5YNlMwbDdDakN0c2RzMWk3by9sMnVtdnlGVVRpbHhKdG5YOVJQclBL?=
+ =?utf-8?B?YlEvaWN3MjN5YzBvcWltT1VXTHl0Ukhwb0FnNVdiODRSQmpZM2lmeDNpK0tz?=
+ =?utf-8?B?bnRUSHN1ZzZ2c2VPVlNSNitNWlhxektDVVpFbnZFL245VkhEZDFMbi9kdjJ2?=
+ =?utf-8?B?d1RSb0ZLdjhwT3NjRnZ5elI2bEdNbzdra3Q3enI5VjVlSkY4dTZWeitqY0lP?=
+ =?utf-8?B?QUVTOG0rYzJXQWRGYlRRa0V6dzRYYTZMTTYxUStJWDRRd2RlSEhFOS9QOVpR?=
+ =?utf-8?B?R0wyUUZMU0FzNnlhSmg4VkQ3cnE0bGd6V3lacXFWeDhwSlplN0ViNkEvbFNl?=
+ =?utf-8?B?SnhNQzMzbi9yby9wT3BtaU1BWXJVaWF4ek8wOHF5NGkrWk1yQ2JEaFhUSElr?=
+ =?utf-8?B?UENOTFN2eGVoODl4bVZCa3d1TmkxWlUrNW8zMmdWYS91VmU5QlZCQ1lnRTMw?=
+ =?utf-8?B?djlUc3VMTUw4UW1hbmRCYk0yVXhXM1EwY1Qvci9jRzdlT2cxYVZ1M0Zpbzdw?=
+ =?utf-8?B?YzVIZ0l1MkN2NXp4VXlqekFXbGNSS3VOQWc2aXVHd29CVjdUL0MxaU05MGU5?=
+ =?utf-8?B?RjBoNmtWSFQybVEvbnM4V1BDUnlWdE9Lbm5xM0pjR0ZwUjAwMForbXVyTkRp?=
+ =?utf-8?B?N1BFWVZjUUtKNlhsNGV4emZwN0lTL0xXY3hNWk9RcXl5cThlaGJnVWRCQVVO?=
+ =?utf-8?B?all3TFUzSW41ZVplUVBEZXd1NGRaTDFqWVhWd2xHbTdBTDRqWVZFK1BUQkRm?=
+ =?utf-8?B?TlduY0dEakxoczdhOEJGdG5ydVNXd2pzY0Q5NzBPV0hQUHVPYWFVc3ZQbjNM?=
+ =?utf-8?B?OWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf343f23-7222-4f3d-049f-08db5c6481da
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB7573.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 May 2023 14:38:15.1750
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ifRyA1mRHbQnenodMc5qWY0ky7s4JcnDFntlYUHEhU5KhQrOc1LCB14pJ/4KsoYq1vEmBLw6UdposqwnOqKJrrONWvH1xWXPH6yaMmC4rG8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7339
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 23, 2023 at 05:49:04PM -0700, Palmer Dabbelt wrote:
-> On Thu, 18 May 2023 09:19:34 PDT (-0700), andy.chiu@sifive.com wrote:
-> > Vector unit is disabled by default for all user processes. Thus, a
-> > process will take a trap (illegal instruction) into kernel at the first
-> > time when it uses Vector. Only after then, the kernel allocates V
-> > context and starts take care of the context for that user process.
-> > 
-> > Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> > Link: https://lore.kernel.org/r/3923eeee-e4dc-0911-40bf-84c34aee962d@linaro.org
-> > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> > ---
-> > Hey Heiko and Conor, I am dropping you guys' A-b, T-b, and R-b because I
-> > added a check in riscv_v_first_use_handler().
-> > 
-> > Changelog v20:
-> >  - move has_vector() into vector.c for better code readibility
-> >  - check elf_hwcap in the first-use trap because it might get turned off
-> >    if cores have different VLENs.
-> > 
-> > Changelog v18:
-> >  - Add blank lines (Heiko)
-> >  - Return immediately in insn_is_vector() if an insn matches (Heiko)
-> > ---
-> >  arch/riscv/include/asm/insn.h   | 29 ++++++++++
-> >  arch/riscv/include/asm/vector.h |  2 +
-> >  arch/riscv/kernel/traps.c       | 26 ++++++++-
-> >  arch/riscv/kernel/vector.c      | 95 +++++++++++++++++++++++++++++++++
-> >  4 files changed, 150 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/riscv/include/asm/insn.h b/arch/riscv/include/asm/insn.h
-> > index 8d5c84f2d5ef..4e1505cef8aa 100644
-> > --- a/arch/riscv/include/asm/insn.h
-> > +++ b/arch/riscv/include/asm/insn.h
-> > @@ -137,6 +137,26 @@
-> >  #define RVG_OPCODE_JALR		0x67
-> >  #define RVG_OPCODE_JAL		0x6f
-> >  #define RVG_OPCODE_SYSTEM	0x73
-> > +#define RVG_SYSTEM_CSR_OFF	20
-> > +#define RVG_SYSTEM_CSR_MASK	GENMASK(12, 0)
-> > +
-> > +/* parts of opcode for RVF, RVD and RVQ */
-> > +#define RVFDQ_FL_FS_WIDTH_OFF	12
-> > +#define RVFDQ_FL_FS_WIDTH_MASK	GENMASK(3, 0)
-> > +#define RVFDQ_FL_FS_WIDTH_W	2
-> > +#define RVFDQ_FL_FS_WIDTH_D	3
-> > +#define RVFDQ_LS_FS_WIDTH_Q	4
-> > +#define RVFDQ_OPCODE_FL		0x07
-> > +#define RVFDQ_OPCODE_FS		0x27
-> > +
-> > +/* parts of opcode for RVV */
-> > +#define RVV_OPCODE_VECTOR	0x57
-> > +#define RVV_VL_VS_WIDTH_8	0
-> > +#define RVV_VL_VS_WIDTH_16	5
-> > +#define RVV_VL_VS_WIDTH_32	6
-> > +#define RVV_VL_VS_WIDTH_64	7
-> > +#define RVV_OPCODE_VL		RVFDQ_OPCODE_FL
-> > +#define RVV_OPCODE_VS		RVFDQ_OPCODE_FS
-> > 
-> >  /* parts of opcode for RVC*/
-> >  #define RVC_OPCODE_C0		0x0
-> > @@ -304,6 +324,15 @@ static __always_inline bool riscv_insn_is_branch(u32 code)
-> >  	(RVC_X(x_, RVC_B_IMM_7_6_OPOFF, RVC_B_IMM_7_6_MASK) << RVC_B_IMM_7_6_OFF) | \
-> >  	(RVC_IMM_SIGN(x_) << RVC_B_IMM_SIGN_OFF); })
-> > 
-> > +#define RVG_EXTRACT_SYSTEM_CSR(x) \
-> > +	({typeof(x) x_ = (x); RV_X(x_, RVG_SYSTEM_CSR_OFF, RVG_SYSTEM_CSR_MASK); })
-> > +
-> > +#define RVFDQ_EXTRACT_FL_FS_WIDTH(x) \
-> > +	({typeof(x) x_ = (x); RV_X(x_, RVFDQ_FL_FS_WIDTH_OFF, \
-> > +				   RVFDQ_FL_FS_WIDTH_MASK); })
-> > +
-> > +#define RVV_EXRACT_VL_VS_WIDTH(x) RVFDQ_EXTRACT_FL_FS_WIDTH(x)
-> > +
-> >  /*
-> >   * Get the immediate from a J-type instruction.
-> >   *
-> > diff --git a/arch/riscv/include/asm/vector.h b/arch/riscv/include/asm/vector.h
-> > index ce6a75e9cf62..8e56da67b5cf 100644
-> > --- a/arch/riscv/include/asm/vector.h
-> > +++ b/arch/riscv/include/asm/vector.h
-> > @@ -21,6 +21,7 @@
-> > 
-> >  extern unsigned long riscv_v_vsize;
-> >  int riscv_v_setup_vsize(void);
-> > +bool riscv_v_first_use_handler(struct pt_regs *regs);
-> > 
-> >  static __always_inline bool has_vector(void)
-> >  {
-> > @@ -165,6 +166,7 @@ struct pt_regs;
-> > 
-> >  static inline int riscv_v_setup_vsize(void) { return -EOPNOTSUPP; }
-> >  static __always_inline bool has_vector(void) { return false; }
-> > +static inline bool riscv_v_first_use_handler(struct pt_regs *regs) { return false; }
-> >  static inline bool riscv_v_vstate_query(struct pt_regs *regs) { return false; }
-> >  #define riscv_v_vsize (0)
-> >  #define riscv_v_vstate_save(task, regs)		do {} while (0)
-> > diff --git a/arch/riscv/kernel/traps.c b/arch/riscv/kernel/traps.c
-> > index 8c258b78c925..05ffdcd1424e 100644
-> > --- a/arch/riscv/kernel/traps.c
-> > +++ b/arch/riscv/kernel/traps.c
-> > @@ -26,6 +26,7 @@
-> >  #include <asm/ptrace.h>
-> >  #include <asm/syscall.h>
-> >  #include <asm/thread_info.h>
-> > +#include <asm/vector.h>
-> > 
-> >  int show_unhandled_signals = 1;
-> > 
-> > @@ -145,8 +146,29 @@ DO_ERROR_INFO(do_trap_insn_misaligned,
-> >  	SIGBUS, BUS_ADRALN, "instruction address misaligned");
-> >  DO_ERROR_INFO(do_trap_insn_fault,
-> >  	SIGSEGV, SEGV_ACCERR, "instruction access fault");
-> > -DO_ERROR_INFO(do_trap_insn_illegal,
-> > -	SIGILL, ILL_ILLOPC, "illegal instruction");
-> > +
-> > +asmlinkage __visible __trap_section void do_trap_insn_illegal(struct pt_regs *regs)
-> > +{
-> > +	if (user_mode(regs)) {
-> > +		irqentry_enter_from_user_mode(regs);
-> > +
-> > +		local_irq_enable();
-> > +
-> > +		if (!riscv_v_first_use_handler(regs))
-> > +			do_trap_error(regs, SIGILL, ILL_ILLOPC, regs->epc,
-> > +				      "Oops - illegal instruction");
-> > +
-> > +		irqentry_exit_to_user_mode(regs);
-> > +	} else {
-> > +		irqentry_state_t state = irqentry_nmi_enter(regs);
-> > +
-> > +		do_trap_error(regs, SIGILL, ILL_ILLOPC, regs->epc,
-> > +			      "Oops - illegal instruction");
-> > +
-> > +		irqentry_nmi_exit(regs, state);
-> > +	}
-> > +}
-> > +
-> >  DO_ERROR_INFO(do_trap_load_fault,
-> >  	SIGSEGV, SEGV_ACCERR, "load access fault");
-> >  #ifndef CONFIG_RISCV_M_MODE
-> > diff --git a/arch/riscv/kernel/vector.c b/arch/riscv/kernel/vector.c
-> > index 120f1ce9abf9..0080798e8d2e 100644
-> > --- a/arch/riscv/kernel/vector.c
-> > +++ b/arch/riscv/kernel/vector.c
-> > @@ -4,10 +4,19 @@
-> >   * Author: Andy Chiu <andy.chiu@sifive.com>
-> >   */
-> >  #include <linux/export.h>
-> > +#include <linux/sched/signal.h>
-> > +#include <linux/types.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/sched.h>
-> > +#include <linux/uaccess.h>
-> > 
-> > +#include <asm/thread_info.h>
-> > +#include <asm/processor.h>
-> > +#include <asm/insn.h>
-> >  #include <asm/vector.h>
-> >  #include <asm/csr.h>
-> >  #include <asm/elf.h>
-> > +#include <asm/ptrace.h>
-> >  #include <asm/bug.h>
-> > 
-> >  unsigned long riscv_v_vsize __read_mostly;
-> > @@ -34,3 +43,89 @@ int riscv_v_setup_vsize(void)
-> > 
-> >  	return 0;
-> >  }
-> > +
-> > +static bool insn_is_vector(u32 insn_buf)
-> > +{
-> > +	u32 opcode = insn_buf & __INSN_OPCODE_MASK;
-> > +	u32 width, csr;
-> > +
-> > +	/*
-> > +	 * All V-related instructions, including CSR operations are 4-Byte. So,
-> > +	 * do not handle if the instruction length is not 4-Byte.
-> > +	 */
-> > +	if (unlikely(GET_INSN_LENGTH(insn_buf) != 4))
-> > +		return false;
-> > +
-> > +	switch (opcode) {
-> > +	case RVV_OPCODE_VECTOR:
-> > +		return true;
-> > +	case RVV_OPCODE_VL:
-> > +	case RVV_OPCODE_VS:
-> > +		width = RVV_EXRACT_VL_VS_WIDTH(insn_buf);
-> > +		if (width == RVV_VL_VS_WIDTH_8 || width == RVV_VL_VS_WIDTH_16 ||
-> > +		    width == RVV_VL_VS_WIDTH_32 || width == RVV_VL_VS_WIDTH_64)
-> > +			return true;
-> > +
-> > +		break;
-> > +	case RVG_OPCODE_SYSTEM:
-> > +		csr = RVG_EXTRACT_SYSTEM_CSR(insn_buf);
-> > +		if ((csr >= CSR_VSTART && csr <= CSR_VCSR) ||
-> > +		    (csr >= CSR_VL && csr <= CSR_VLENB))
-> > +			return true;
-> > +	}
-> > +
-> > +	return false;
-> > +}
-> > +
-> > +static int riscv_v_thread_zalloc(void)
-> > +{
-> > +	void *datap;
-> > +
-> > +	datap = kzalloc(riscv_v_vsize, GFP_KERNEL);
-> > +	if (!datap)
-> > +		return -ENOMEM;
-> > +
-> > +	current->thread.vstate.datap = datap;
-> > +	memset(&current->thread.vstate, 0, offsetof(struct __riscv_v_ext_state,
-> > +						    datap));
-> > +	return 0;
-> > +}
-> > +
-> > +bool riscv_v_first_use_handler(struct pt_regs *regs)
-> > +{
-> > +	u32 __user *epc = (u32 __user *)regs->epc;
-> > +	u32 insn = (u32)regs->badaddr;
-> > +
-> > +	/* Do not handle if V is not supported, or disabled */
-> > +	if (!has_vector() || !(elf_hwcap & COMPAT_HWCAP_ISA_V))
-> > +		return false;
-> > +
-> > +	/* If V has been enabled then it is not the first-use trap */
-> > +	if (riscv_v_vstate_query(regs))
-> > +		return false;
-> > +
-> > +	/* Get the instruction */
-> > +	if (!insn) {
-> > +		if (__get_user(insn, epc))
-> > +			return false;
-> > +	}
-> > +
-> > +	/* Filter out non-V instructions */
-> > +	if (!insn_is_vector(insn))
-> > +		return false;
-> > +
-> > +	/* Sanity check. datap should be null by the time of the first-use trap */
-> > +	WARN_ON(current->thread.vstate.datap);
-> > +
-> > +	/*
-> > +	 * Now we sure that this is a V instruction. And it executes in the
-> > +	 * context where VS has been off. So, try to allocate the user's V
-> > +	 * context and resume execution.
-> > +	 */
-> > +	if (riscv_v_thread_zalloc()) {
-> > +		force_sig(SIGKILL);
+Hi YangHang,
+
+On 5/23/2023 7:43 PM, YangHang Liu wrote:
+> Running regression tests in the following test matrix:
 > 
-> Is SIGKILL too strong?  Maybe we just SIGILL here?  Maybe killing the
-> process is the right way to go, though: if we're that out of memory
-> something's getting killed, it might as well be whatever's about to get
-> confused by vectors disappearing.
+>     i40e PF + INTx interrupt + RHEL9 guest -- PASS
+>     bnx2x PF + MSI-X + RHEL9 guest -- PASS
+>     iavf VF + MSI-X + Win2019 guest  -- PASS
+>     mlx5_core VF + MSI-X  + Win2022 guest -- PASS
+>     ixgbe PF + INTx + RHEL9 guest -- PASS
+>     i40e PF + MSIX + Win2019 guest -- PASS
+>     qede VF + MSIX + RHEL9 guest -- PASS
+> 
+> Tested-by: YangHang Liu <yanghliu@redhat.com>
 > 
 
-SIGILL seems misleading; it's not the instruction that is at fault.  Maybe
-SIGSEGV (or SIGBUS), since that's generally what you get if you assume an
-allocation succeeds when it doesn't, as that is effectively what this
-patchset does by not providing an adequate way to return allocation
-failures to the application.
+Thank you very much for this thorough testing.
 
-> > +		return true;
-> > +	}
-> > +	riscv_v_vstate_on(regs);
-> > +	return true;
-> > +}
-> 
-> Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
-> 
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linu
+Reinette
