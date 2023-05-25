@@ -2,195 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD22F711379
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 20:17:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3A46711458
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 20:38:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241149AbjEYSR3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 14:17:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43244 "EHLO
+        id S241939AbjEYSgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 14:36:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230474AbjEYSR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 14:17:27 -0400
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13330D9;
-        Thu, 25 May 2023 11:17:26 -0700 (PDT)
-Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-b9daef8681fso766668276.1;
-        Thu, 25 May 2023 11:17:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685038645; x=1687630645;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vEt/V8+3jpKdaWf/91twz9m1AxbB8mw1sieW7q1FOX4=;
-        b=qpx33W23LxzGgtt7x0f+jHNiqnq/vW7f+lo4R60odkrqHHbvAvDFwCToA7ZeGOtlZu
-         1pix82nq+XRaSlrOoV5XSSn7dUtYbrVRPJSVcc+Y0QUEIud/VeliblGAWTefKuC3uiLW
-         Y767SW9acPu7TamxQ3rDZ7ad1waallUvH2KGWMSoPdMgQ6uqByETyo++E8JgCnYWaIR7
-         T+3+xQi6fbJlgvqxHEFBxTPhg1oh030qaBtpvB360U8uoO6SqTXFxFoolc38s3Jd+HWF
-         qSuZfJvCEliq2Q2QxhelaN+CYntsdlTkVUzhuGY+pHQjjIlm9D34YIwBuMF1/x8S1rOB
-         qR0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685038645; x=1687630645;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vEt/V8+3jpKdaWf/91twz9m1AxbB8mw1sieW7q1FOX4=;
-        b=GYx8Vc6Qyadtv52ZSRC1OpNQJOXQJ3a9QlpsNbv0Wl5bOH3MasYZx+fdpWz6yovU28
-         cK+lZ6pmJj8CR2CsFNMhwvFZvnnsOPUUE8RU3viIfOUieadTSqgkhShmmtQ05hGF9u7m
-         Hycf/ryemTt+RR0i1XrAIsI5x9ZT20r0z94IZaeM6A+saY6xHcepLVZGO4aOKItNWovJ
-         ir982uyT4S7KaKDZYYZsMvzu44Mme52jKcEAsqHKAYyrWM2XVpGGjLBzAxaRlKcZF3l8
-         i3ZEdC1KTlwBKMqnvWxvuTkb6zQzVZKlYs5XOq9NzhwvqtHf6fQKw7l1adPXcw+lbjSk
-         O0oQ==
-X-Gm-Message-State: AC+VfDzS8nTuROnl9ViiaFP8mNzAbhqJO6XLAcEJSgmaE6emoLIjFG0h
-        m+8Lkay510cSCS0esr3uXlkmcXSxvCQirsrSN3k=
-X-Google-Smtp-Source: ACHHUZ4CxdCafEVA2N8+YE3r54vbJuyNv4iSvWQn7ibpFdu7Q8YcRob13nPjv7XKdbKB6AoaGk0hrDu/6J2TDu7u8Qo=
-X-Received: by 2002:a25:ac6:0:b0:ba7:bb4c:7960 with SMTP id
- 189-20020a250ac6000000b00ba7bb4c7960mr4320550ybk.26.1685038645132; Thu, 25
- May 2023 11:17:25 -0700 (PDT)
+        with ESMTP id S241876AbjEYSfq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 14:35:46 -0400
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09634E73
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 11:34:23 -0700 (PDT)
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1q2Fmy-004iL9-2R; Thu, 25 May 2023 20:34:16 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject
+        :Cc:To:From; bh=XOdnPRfEDDpMwfKFbhHUhttEQLX9uN4kYVfocSXnqp4=; b=YooWEXpfQYqBx
+        aoF8UbRKoIZgRjFwdGbE/2Mbz2jtzCKjGjzisbDoxURsDWA/UTz6EM5eLcxxiQkEBNL2u0uVV+s8B
+        y2yiN+8VW6iCaamSbDxeEMaIltKON6qyBtgP8/uSxb6Yhm0RbwV0QssD+lSfLDjoMlkSLZE1aVuIZ
+        mq3d/YNQ81PQqEVLvzH/PDTk6cZ3Vheg2+Ilss/thhRXxCI1wXBBm0y/kNssSXRzQo9MEiZgnyxDJ
+        MpKGv073zbal8oGRAleZA8JIqMu/9wVtJIs7xodTbQgW3GxtZmqk5LJ8qdFH6+6IV6AeI+C/MTPG8
+        aX/IVnS3GOAJ6C1F0I75Q==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1q2Fmx-0006Wl-Mj; Thu, 25 May 2023 20:34:15 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1q2Fmr-00047d-Rn; Thu, 25 May 2023 20:34:09 +0200
+From:   Michal Luczaj <mhal@rbox.co>
+To:     seanjc@google.com
+Cc:     pbonzini@redhat.com, shuah@kernel.org, kvm@vger.kernel.org,
+        Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH 0/3] Out-of-bounds access in kvm_recalculate_phys_map()
+Date:   Thu, 25 May 2023 20:33:44 +0200
+Message-Id: <20230525183347.2562472-1-mhal@rbox.co>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-References: <20230501192829.17086-1-vishal.moola@gmail.com>
- <20230501192829.17086-14-vishal.moola@gmail.com> <20230525091900.GY4967@kernel.org>
-In-Reply-To: <20230525091900.GY4967@kernel.org>
-From:   Vishal Moola <vishal.moola@gmail.com>
-Date:   Thu, 25 May 2023 11:17:14 -0700
-Message-ID: <CAOzc2pxNRbohxxNnaKtBNOBgOschHMj278-6hWZK9A1oJOgujA@mail.gmail.com>
-Subject: Re: [PATCH v2 13/34] mm: Create ptdesc equivalents for pgtable_{pte,pmd}_page_{ctor,dtor}
-To:     Mike Rapoport <rppt@kernel.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_INVALID,
+        DKIM_SIGNED,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 25, 2023 at 2:19=E2=80=AFAM Mike Rapoport <rppt@kernel.org> wro=
-te:
->
-> On Mon, May 01, 2023 at 12:28:08PM -0700, Vishal Moola (Oracle) wrote:
-> > Creates ptdesc_pte_ctor(), ptdesc_pmd_ctor(), ptdesc_pte_dtor(), and
-> > ptdesc_pmd_dtor() and make the original pgtable constructor/destructors
-> > wrappers.
->
-> I think pgtable_pXY_ctor/dtor names would be better.
+kvm_recalculate_apic_map() creates the APIC map iterating over the list of
+vCPUs twice. First to find the max APIC ID and allocate a max-sized buffer,
+then again, calling kvm_recalculate_phys_map() for each vCPU. This opens a
+race window: value of max APIC ID can increase _after_ the buffer was
+allocated.
 
-I have it as ptdesc to keep it consistent with the rest of the functions. I
-also think it makes more sense as it's initializing stuff tracked by a ptde=
-sc.
+PATCH 1/3 introduces one more if() to thwart the out-of-bounds access.
+PATCH 2/3 attempts to simplify the code touched. Attempts, as I'm really
+not sure if the result is actually cleaner.
+PATCH 3/3 is a selftest that results in:
 
-> > Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
-> > ---
-> >  include/linux/mm.h | 56 ++++++++++++++++++++++++++++++++++------------
-> >  1 file changed, 42 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index 58c911341a33..dc61aeca9077 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -2847,20 +2847,34 @@ static inline bool ptlock_init(struct ptdesc *p=
-tdesc) { return true; }
-> >  static inline void ptlock_free(struct ptdesc *ptdesc) {}
-> >  #endif /* USE_SPLIT_PTE_PTLOCKS */
-> >
-> > -static inline bool pgtable_pte_page_ctor(struct page *page)
-> > +static inline bool ptdesc_pte_ctor(struct ptdesc *ptdesc)
-> >  {
-> > -     if (!ptlock_init(page_ptdesc(page)))
-> > +     struct folio *folio =3D ptdesc_folio(ptdesc);
-> > +
-> > +     if (!ptlock_init(ptdesc))
-> >               return false;
-> > -     __SetPageTable(page);
-> > -     inc_lruvec_page_state(page, NR_PAGETABLE);
-> > +     __folio_set_table(folio);
-> > +     lruvec_stat_add_folio(folio, NR_PAGETABLE);
-> >       return true;
-> >  }
-> >
-> > +static inline bool pgtable_pte_page_ctor(struct page *page)
-> > +{
-> > +     return ptdesc_pte_ctor(page_ptdesc(page));
-> > +}
-> > +
-> > +static inline void ptdesc_pte_dtor(struct ptdesc *ptdesc)
-> > +{
-> > +     struct folio *folio =3D ptdesc_folio(ptdesc);
-> > +
-> > +     ptlock_free(ptdesc);
-> > +     __folio_clear_table(folio);
-> > +     lruvec_stat_sub_folio(folio, NR_PAGETABLE);
-> > +}
-> > +
-> >  static inline void pgtable_pte_page_dtor(struct page *page)
-> >  {
-> > -     ptlock_free(page_ptdesc(page));
-> > -     __ClearPageTable(page);
-> > -     dec_lruvec_page_state(page, NR_PAGETABLE);
-> > +     ptdesc_pte_dtor(page_ptdesc(page));
-> >  }
-> >
-> >  #define pte_offset_map_lock(mm, pmd, address, ptlp)  \
-> > @@ -2942,20 +2956,34 @@ static inline spinlock_t *pmd_lock(struct mm_st=
-ruct *mm, pmd_t *pmd)
-> >       return ptl;
-> >  }
-> >
-> > -static inline bool pgtable_pmd_page_ctor(struct page *page)
-> > +static inline bool ptdesc_pmd_ctor(struct ptdesc *ptdesc)
-> >  {
-> > -     if (!pmd_ptlock_init(page_ptdesc(page)))
-> > +     struct folio *folio =3D ptdesc_folio(ptdesc);
-> > +
-> > +     if (!pmd_ptlock_init(ptdesc))
-> >               return false;
-> > -     __SetPageTable(page);
-> > -     inc_lruvec_page_state(page, NR_PAGETABLE);
-> > +     __folio_set_table(folio);
-> > +     lruvec_stat_add_folio(folio, NR_PAGETABLE);
-> >       return true;
-> >  }
-> >
-> > +static inline bool pgtable_pmd_page_ctor(struct page *page)
-> > +{
-> > +     return ptdesc_pmd_ctor(page_ptdesc(page));
-> > +}
-> > +
-> > +static inline void ptdesc_pmd_dtor(struct ptdesc *ptdesc)
-> > +{
-> > +     struct folio *folio =3D ptdesc_folio(ptdesc);
-> > +
-> > +     pmd_ptlock_free(ptdesc);
-> > +     __folio_clear_table(folio);
-> > +     lruvec_stat_sub_folio(folio, NR_PAGETABLE);
-> > +}
-> > +
-> >  static inline void pgtable_pmd_page_dtor(struct page *page)
-> >  {
-> > -     pmd_ptlock_free(page_ptdesc(page));
-> > -     __ClearPageTable(page);
-> > -     dec_lruvec_page_state(page, NR_PAGETABLE);
-> > +     ptdesc_pmd_dtor(page_ptdesc(page));
-> >  }
-> >
-> >  /*
-> > --
-> > 2.39.2
-> >
-> >
->
-> --
-> Sincerely yours,
-> Mike.
+[   54.253315] ==================================================================
+[   54.253327] BUG: KASAN: slab-out-of-bounds in kvm_recalculate_apic_map+0x3a0/0xa00 [kvm]
+[   54.253431] Read of size 8 at addr ffff88814dd99218 by task recalc_apic_map/955
+
+[   54.253431] CPU: 7 PID: 955 Comm: recalc_apic_map Not tainted 6.4.0-rc3-kasan+ #26
+[   54.253431] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.2-1-1 04/01/2014
+[   54.253431] Call Trace:
+[   54.253431]  <TASK>
+[   54.253431]  dump_stack_lvl+0x57/0x90
+[   54.253431]  print_report+0xcf/0x640
+[   54.253431]  ? _raw_spin_lock_irqsave+0x5b/0x60
+[   54.253431]  ? __virt_addr_valid+0xd5/0x150
+[   54.253431]  kasan_report+0xc1/0xf0
+[   54.253431]  ? kvm_recalculate_apic_map+0x3a0/0xa00 [kvm]
+[   54.253431]  ? kvm_recalculate_apic_map+0x3a0/0xa00 [kvm]
+[   54.253431]  kvm_recalculate_apic_map+0x3a0/0xa00 [kvm]
+[   54.253431]  ? kvm_can_use_hv_timer+0x60/0x60 [kvm]
+[   54.253431]  ? kvm_lapic_set_base+0xae/0x4b0 [kvm]
+[   54.253431]  ? kasan_set_track+0x21/0x30
+[   54.253431]  kvm_apic_set_state+0x1cf/0x5b0 [kvm]
+[   54.253431]  kvm_arch_vcpu_ioctl+0x1806/0x2100 [kvm]
+[   54.253431]  ? preempt_notifier_unregister+0x29/0x60
+[   54.253431]  ? preempt_count_sub+0x14/0xc0
+[   54.253431]  ? vcpu_put+0x46/0x60 [kvm]
+[   54.253431]  ? kvm_arch_vcpu_put+0x410/0x410 [kvm]
+[   54.253431]  ? mark_lock+0xf4/0xce0
+[   54.253431]  ? print_usage_bug.part.0+0x3b0/0x3b0
+[   54.253431]  ? print_usage_bug.part.0+0x3b0/0x3b0
+[   54.253431]  ? mark_lock+0xf4/0xce0
+[   54.253431]  ? __lock_acquire+0x9ed/0x3210
+[   54.253431]  ? lockdep_hardirqs_on_prepare+0x220/0x220
+[   54.253431]  ? mark_lock+0xf4/0xce0
+[   54.253431]  ? lock_acquire+0x159/0x3b0
+[   54.253431]  ? lock_acquire+0x169/0x3b0
+[   54.253431]  ? lock_sync+0x110/0x110
+[   54.253431]  ? lock_acquire+0x169/0x3b0
+[   54.253431]  ? print_usage_bug.part.0+0x3b0/0x3b0
+[   54.253431]  ? mark_lock+0xf4/0xce0
+[   54.253431]  ? rcu_is_watching+0x34/0x50
+[   54.253431]  ? preempt_count_sub+0x14/0xc0
+[   54.253431]  ? __mutex_lock+0x201/0x1040
+[   54.253431]  ? kvm_vcpu_ioctl+0x1c6/0x8a0 [kvm]
+[   54.253431]  ? kvm_vcpu_ioctl+0x13a/0x8a0 [kvm]
+[   54.253431]  ? __mutex_lock+0x201/0x1040
+[   54.253431]  ? mutex_lock_io_nested+0xe40/0xe40
+[   54.253431]  ? __lock_acquire+0x9ed/0x3210
+[   54.253431]  ? kvm_vcpu_ioctl+0x663/0x8a0 [kvm]
+[   54.253431]  kvm_vcpu_ioctl+0x663/0x8a0 [kvm]
+[   54.253431]  ? kvm_vcpu_kick+0x200/0x200 [kvm]
+[   54.253431]  ? vfs_fileattr_set+0x480/0x480
+[   54.253431]  ? find_held_lock+0x83/0xa0
+[   54.253431]  ? ioctl_has_perm.constprop.0.isra.0+0x133/0x1f0
+[   54.253431]  ? selinux_bprm_creds_for_exec+0x440/0x440
+[   54.253431]  ? selinux_bprm_creds_for_exec+0x440/0x440
+[   54.253431]  ? __fget_files+0x146/0x200
+[   54.253431]  __x64_sys_ioctl+0xb8/0xf0
+[   54.253431]  do_syscall_64+0x56/0x80
+[   54.253431]  ? do_syscall_64+0x62/0x80
+[   54.253431]  ? lockdep_hardirqs_on+0x7d/0x100
+[   54.253431]  ? do_syscall_64+0x62/0x80
+[   54.253431]  ? asm_exc_page_fault+0x22/0x30
+[   54.253431]  ? lockdep_hardirqs_on+0x7d/0x100
+[   54.253431]  entry_SYSCALL_64_after_hwframe+0x46/0xb0
+[   54.253431] RIP: 0033:0x7f66e4dedd6f
+[   54.253431] Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 18 48 8b 44 24 18 64 48 2b 04 25 28 00 00
+[   54.253431] RSP: 002b:00007f66e4ce8a60 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+[   54.253431] RAX: ffffffffffffffda RBX: 00007f66e4ce8ac0 RCX: 00007f66e4dedd6f
+[   54.253431] RDX: 00007f66e4ce8ac0 RSI: 000000004400ae8f RDI: 0000000000000005
+[   54.253431] RBP: 0000000000000005 R08: 0000000000000000 R09: 00007ffc7793e4b7
+[   54.253431] R10: 00007f66e4d05c38 R11: 0000000000000246 R12: ffffffffffffff80
+[   54.253431] R13: 0000000000000000 R14: 00007ffc7793e3c0 R15: 00007f66e44e9000
+[   54.253431]  </TASK>
+
+[   54.253431] Allocated by task 955:
+[   54.253431]  kasan_save_stack+0x1c/0x40
+[   54.253431]  kasan_set_track+0x21/0x30
+[   54.253431]  __kasan_kmalloc+0x9e/0xa0
+[   54.253431]  __kmalloc_node+0x61/0x160
+[   54.253431]  kvm_recalculate_apic_map+0x206/0xa00 [kvm]
+[   54.253431]  kvm_apic_set_state+0x1cf/0x5b0 [kvm]
+[   54.253431]  kvm_arch_vcpu_ioctl+0x1806/0x2100 [kvm]
+[   54.253431]  kvm_vcpu_ioctl+0x663/0x8a0 [kvm]
+[   54.253431]  __x64_sys_ioctl+0xb8/0xf0
+[   54.253431]  do_syscall_64+0x56/0x80
+[   54.253431]  entry_SYSCALL_64_after_hwframe+0x46/0xb0
+
+[   54.253431] The buggy address belongs to the object at ffff88814dd98000
+                which belongs to the cache kmalloc-cg-4k of size 4096
+[   54.253431] The buggy address is located 1256 bytes to the right of
+                allocated 3376-byte region [ffff88814dd98000, ffff88814dd98d30)
+
+[   54.253431] The buggy address belongs to the physical page:
+[   54.253431] page:00000000d1f90483 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x14dd98
+[   54.253431] head:00000000d1f90483 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+[   54.253431] memcg:ffff888119ce4ac1
+[   54.253431] anon flags: 0x17ffffc0010200(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
+[   54.253431] page_type: 0xffffffff()
+[   54.253431] raw: 0017ffffc0010200 ffff888100050280 0000000000000000 dead000000000001
+[   54.253431] raw: 0000000000000000 0000000080040004 00000001ffffffff ffff888119ce4ac1
+[   54.253431] page dumped because: kasan: bad access detected
+
+[   54.253431] Memory state around the buggy address:
+[   54.253431]  ffff88814dd99100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[   54.253431]  ffff88814dd99180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[   54.253431] >ffff88814dd99200: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[   54.253431]                             ^
+[   54.253431]  ffff88814dd99280: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[   54.253431]  ffff88814dd99300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[   54.253431] ==================================================================
+[   54.255939] Disabling lock debugging due to kernel taint
+
+Michal Luczaj (3):
+  KVM: x86: Fix out-of-bounds access in kvm_recalculate_phys_map()
+  KVM: x86: Simplify APIC ID selection in kvm_recalculate_phys_map()
+  KVM: selftests: Add test for race in kvm_recalculate_apic_map()
+
+ arch/x86/kvm/lapic.c                          |  38 +++---
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/x86_64/recalc_apic_map_race.c         | 110 ++++++++++++++++++
+ 3 files changed, 127 insertions(+), 22 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/recalc_apic_map_race.c
+
+-- 
+2.40.1
+
