@@ -2,213 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 879F271020E
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 02:39:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0968710280
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 03:42:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235529AbjEYAi6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 May 2023 20:38:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42328 "EHLO
+        id S233299AbjEYBmw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 May 2023 21:42:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229454AbjEYAi5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 May 2023 20:38:57 -0400
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96C35D3;
-        Wed, 24 May 2023 17:38:55 -0700 (PDT)
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34P0TOdZ014158;
-        Thu, 25 May 2023 00:37:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=/e6B8PzwIMOA1NUnKfCKwK2WyRgcsLlUL/WWtMhoXOo=;
- b=p3qB04b9XJKftly38O5+vr0J26dCdM35VoVjloUmf9fYS0RaN82z0Hr3YOWh4ZJQsIjf
- BZiPx+ihcB08jdCDDKbmzPherYn1S2m1s//fnj9cxWlR23hvxTUQUVj+hShpm/tBZn5v
- jDiBZ5ioeyyjMpK+LEvalgHQPiEK8wKmXBNCpReedGyLTdn2zyAqM3iDTmQKde8ORkWM
- T86J62r2qVscXNPcq/nHDEto456qzSc9BtrhHoCSk2cNbiTANPUKFw9/ulvZYESobBSt
- WF7jcasL0f/+Lab6joyPDPm4sna1+eyFr3WPINyTsoOpta5EBv9ueff6H1jxJGX7j1Tt ww== 
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3qscautcq9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 25 May 2023 00:37:18 +0000
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-        by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 34P0bGcV018047
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 25 May 2023 00:37:16 GMT
-Received: from [10.110.74.38] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.42; Wed, 24 May
- 2023 17:37:15 -0700
-Message-ID: <cf1d6831-dac9-f738-44b4-a9dbc575b7e9@quicinc.com>
-Date:   Wed, 24 May 2023 17:37:14 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [RFC PATCH v1 0/9] Hypervisor-Enforced Kernel Integrity
-Content-Language: en-US
-To:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "mic@digikod.net" <mic@digikod.net>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "yuanyu@google.com" <yuanyu@google.com>,
-        "jamorris@linux.microsoft.com" <jamorris@linux.microsoft.com>,
-        "marian.c.rotariu@gmail.com" <marian.c.rotariu@gmail.com>,
-        "Graf, Alexander" <graf@amazon.com>,
-        "Andersen, John S" <john.s.andersen@intel.com>,
-        "madvenka@linux.microsoft.com" <madvenka@linux.microsoft.com>,
-        "liran.alon@oracle.com" <liran.alon@oracle.com>,
-        "ssicleru@bitdefender.com" <ssicleru@bitdefender.com>,
-        "tgopinath@microsoft.com" <tgopinath@microsoft.com>,
+        with ESMTP id S230324AbjEYBmv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 May 2023 21:42:51 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2089.outbound.protection.outlook.com [40.107.92.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 556F0183;
+        Wed, 24 May 2023 18:42:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DWrxX+EvnSE6YoLNpRZq0/yUZqKkPNjVTNY9hVGZNAPD/snXxbASUyfDH2GvAIaTO8tNHWSTEj2JZpZsrtgCbeEIUef7kl18FT7FMYsCCptGtIYHsgYjkWrWHV76uRK3RUroWoosTGMsDzRxKMCcexOrmGrArC3OZvLAE7OyGO+9jJV2mGkJ7viNm6I+Jlp6Hdqm/LBb2+DIbM/v2m1RzrNYlgYw3d+8q199klqXD27BzmvSpcQGbwh/3x87QLbVLVS+WbAlbMgKH88uCiTPOT4MiZOU7ETubTVAkobW9JyVCynGI8cbn3YGWAUJ9VINzLVP8w7AfA0ip1hlYNnAfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8g8JyXKqeW/uXBF8+vZSR2TfQuYTkw+qxu/MiCZm59w=;
+ b=fEKCJQHPdF104ng0PXeDYCiDPabU4snOrwuQq0DekfGeb7WA74shqUykdxq+hflrh1AN7QGd1rFciLvh5DQsg8hHgrufmKc/4JDhYZZGlLbOYRDxn06JvQ+mCnjGp95s2CMsgVLcKPW8V6UCShJzLL+BIHrHulhFjdLi5uKcpHMDRWa2NleP9Nu530Mdk6CPR8j9WYEM3OPpRLWWyp7smGi8GjvNcl732ff7mHrbUgz9BJXuYXW9QUrpYuVsvnmmdpq8N51CG28/S1nnldCrjxTOpBduQ/cMUea4TTQ872RptkwGN8qQV30cKS5J0MSco6TCc4h1XQIYHCm/rf6VUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8g8JyXKqeW/uXBF8+vZSR2TfQuYTkw+qxu/MiCZm59w=;
+ b=NRV6WMmmHs687II5W7pqo5Bo9BPqw/C4QxI6NAH0qrgzi/x4tT2M6DxO0/4P9Gz8GlS506fPx4Iu3aZn7CT1adRhqpKmVO0VV9IsuLc2ArZ1xDRoHz0sRc7Wns1c3TX7L1k1MRhH8zt+aBarsNSFUttHkPLHO+dly8xlsvM4GzDQzEfT7FsPxTYR+ff5wNVMoAdLnVXoc8U5zb0H8PG7HV7tXJJlewH9VVTjoCmeXbMcaH/sWoBJiVeptbFNnpherHBWKLtvKONHRQjjSUft56QPnm/8CFSWCMkGMFLS+yMU5WOQ1No/RGXFEtqG+LPrbEgmFKSpfqmItsJOIts9tA==
+Received: from SJ0PR03CA0252.namprd03.prod.outlook.com (2603:10b6:a03:3a0::17)
+ by SJ0PR12MB6941.namprd12.prod.outlook.com (2603:10b6:a03:448::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.15; Thu, 25 May
+ 2023 01:41:47 +0000
+Received: from CO1NAM11FT086.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:a03:3a0:cafe::ae) by SJ0PR03CA0252.outlook.office365.com
+ (2603:10b6:a03:3a0::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.15 via Frontend
+ Transport; Thu, 25 May 2023 01:41:47 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ CO1NAM11FT086.mail.protection.outlook.com (10.13.175.73) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6411.30 via Frontend Transport; Thu, 25 May 2023 01:41:47 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 24 May 2023
+ 18:41:43 -0700
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.37; Wed, 24 May 2023 18:41:43 -0700
+Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Wed, 24 May 2023 18:41:42 -0700
+Date:   Wed, 24 May 2023 18:41:41 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "dev@lists.cloudhypervisor.org" <dev@lists.cloudhypervisor.org>,
-        "mdontu@bitdefender.com" <mdontu@bitdefender.com>,
-        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "nicu.citu@icloud.com" <nicu.citu@icloud.com>,
-        "ztarkhani@microsoft.com" <ztarkhani@microsoft.com>,
-        "x86@kernel.org" <x86@kernel.org>
-References: <20230505152046.6575-1-mic@digikod.net>
- <93726a7b9498ec66db21c5792079996d5fed5453.camel@intel.com>
-From:   Trilok Soni <quic_tsoni@quicinc.com>
-In-Reply-To: <93726a7b9498ec66db21c5792079996d5fed5453.camel@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: IbOKlK9jsOZG2ChFhg5i0OOOj4Du3a1t
-X-Proofpoint-GUID: IbOKlK9jsOZG2ChFhg5i0OOOj4Du3a1t
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-24_17,2023-05-24_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- impostorscore=0 priorityscore=1501 spamscore=0 lowpriorityscore=0
- phishscore=0 bulkscore=0 suspectscore=0 clxscore=1015 malwarescore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305250003
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v2 01/11] iommu: Add new iommu op to create domains owned
+ by userspace
+Message-ID: <ZG681VohNlw2vvLD@Asurada-Nvidia>
+References: <20230511143844.22693-1-yi.l.liu@intel.com>
+ <20230511143844.22693-2-yi.l.liu@intel.com>
+ <BL1PR11MB5271B553140BB729AF4389AB8C7C9@BL1PR11MB5271.namprd11.prod.outlook.com>
+ <ZGfDrRDI50oGih2r@Asurada-Nvidia>
+ <BN9PR11MB52766A760580E6FBB995A33F8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZG2fVj41GgosR1dk@Asurada-Nvidia>
+ <BN9PR11MB5276F1410A11ED631CE6824F8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB5276F1410A11ED631CE6824F8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT086:EE_|SJ0PR12MB6941:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9a430cdf-f3fa-45de-c925-08db5cc13408
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: iiFTWjWSac8PV3jH6fpHaqQub5IgmKRty2os+i53fKq4sW2MUuqPIigZCYmiBaa2f56xa60F+E/kp4v6NtM9W2T26YpSKTjRh3/4orvOoxCanmdlV6xpWZXC3+R9VIRn5Qkha8grerq1SXQEbWYR+et1S+5ZcDOpzLi5nLJY0qYZzacxmVAVFB6AiTfHOqECzCGmB2CY8YActAw4yDx9uazddB4oBcRSJeunjOtazsnAw5RqUNG+yIIlgAdPt2xqQJ6icl/a72CFTOJ+lbfXLHhfLdlcBjoAiOKVwxjvRle7aN2hRys/PEdwqsawOQi07oh9BLcHvB8w/IkkuPwNnvcUjVjIzr88DXSRx9HmOWWsWQq7x01IV8skvIxdl7ndI+A8RGrQKxlByIi0lKuH9rUBDh7QMI1FAHe2Hpcb4Znf4r5Yd1w6aLcK/L4INdUwec0vgy3cFoMJXuANj7ITYwU8Gn0hS6QBv9bJfPgcWDk16HivO0UfHeDlQ9T224BBEWn21R63EmfCX0I/JdNHCRva4AkeTnYMSZatE25GmrKDEhrTMo7t/ZC7ny5OVdg8kszA/V93aYNWXGmB+Z4JyAelX0bXd68iuhMRxoJ4eT37zgRSkQLuLj3aA69PSXRAGRjNRfUT62NxBkJCLhSUL9Vi2AIvOcGHrYet7fqih9ar+mFSU0bYuSl4c5TaJUCV/KrgBBC3RQbddE9jsClRxTHGtewop3GM0ql/odQgn5VJtgUcCv4kf0TTI3ScI2yF
+X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(136003)(346002)(376002)(451199021)(36840700001)(40470700004)(46966006)(478600001)(54906003)(26005)(9686003)(186003)(70586007)(70206006)(6916009)(4326008)(82740400003)(356005)(5660300002)(82310400005)(426003)(336012)(41300700001)(36860700001)(33716001)(40480700001)(86362001)(55016003)(2906002)(8676002)(8936002)(7636003)(7416002)(47076005)(316002)(83380400001)(40460700003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2023 01:41:47.3241
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a430cdf-f3fa-45de-c925-08db5cc13408
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT086.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6941
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/24/2023 3:20 PM, Edgecombe, Rick P wrote:
-> On Fri, 2023-05-05 at 17:20 +0200, Mickaël Salaün wrote:
->> # How does it work?
->>
->> This implementation mainly leverages KVM capabilities to control the
->> Second
->> Layer Address Translation (or the Two Dimensional Paging e.g.,
->> Intel's EPT or
->> AMD's RVI/NPT) and Mode Based Execution Control (Intel's MBEC)
->> introduced with
->> the Kaby Lake (7th generation) architecture. This allows to set
->> permissions on
->> memory pages in a complementary way to the guest kernel's managed
->> memory
->> permissions. Once these permissions are set, they are locked and
->> there is no
->> way back.
->>
->> A first KVM_HC_LOCK_MEM_PAGE_RANGES hypercall enables the guest
->> kernel to lock
->> a set of its memory page ranges with either the HEKI_ATTR_MEM_NOWRITE
->> or the
->> HEKI_ATTR_MEM_EXEC attribute. The first one denies write access to a
->> specific
->> set of pages (allow-list approach), and the second only allows kernel
->> execution
->> for a set of pages (deny-list approach).
->>
->> The current implementation sets the whole kernel's .rodata (i.e., any
->> const or
->> __ro_after_init variables, which includes critical security data such
->> as LSM
->> parameters) and .text sections as non-writable, and the .text section
->> is the
->> only one where kernel execution is allowed. This is possible thanks
->> to the new
->> MBEC support also brough by this series (otherwise the vDSO would
->> have to be
->> executable). Thanks to this hardware support (VT-x, EPT and MBEC),
->> the
->> performance impact of such guest protection is negligible.
->>
->> The second KVM_HC_LOCK_CR_UPDATE hypercall enables guests to pin some
->> of its
->> CPU control register flags (e.g., X86_CR0_WP, X86_CR4_SMEP,
->> X86_CR4_SMAP),
->> which is another complementary hardening mechanism.
->>
->> Heki can be enabled with the heki=1 boot command argument.
->>
->>
-> 
-> Can the guest kernel ask the host VMM's emulated devices to DMA into
-> the protected data? It should go through the host userspace mappings I
-> think, which don't care about EPT permissions. Or did I miss where you
-> are protecting that another way? There are a lot of easy ways to ask
-> the host to write to guest memory that don't involve the EPT. You
-> probably need to protect the host userspace mappings, and also the
-> places in KVM that kmap a GPA provided by the guest.
-> 
-> [ snip ]
-> 
->>
->> # Current limitations
->>
->> The main limitation of this patch series is the statically enforced
->> permissions. This is not an issue for kernels without module but this
->> needs to
->> be addressed.  Mechanisms that dynamically impact kernel executable
->> memory are
->> not handled for now (e.g., kernel modules, tracepoints, eBPF JIT),
->> and such
->> code will need to be authenticated.  Because the hypervisor is highly
->> privileged and critical to the security of all the VMs, we don't want
->> to
->> implement a code authentication mechanism in the hypervisor itself
->> but delegate
->> this verification to something much less privileged. We are thinking
->> of two
->> ways to solve this: implement this verification in the VMM or spawn a
->> dedicated
->> special VM (similar to Windows's VBS). There are pros on cons to each
->> approach:
->> complexity, verification code ownership (guest's or VMM's), access to
->> guest
->> memory (i.e., confidential computing).
-> 
-> The kernel often creates writable aliases in order to write to
-> protected data (kernel text, etc). Some of this is done right as text
-> is being first written out (alternatives for example), and some happens
-> way later (jump labels, etc). So for verification, I wonder what stage
-> you would be verifying? If you want to verify the end state, you would
-> have to maintain knowledge in the verifier of all the touch-ups the
-> kernel does. I think it would get very tricky.
+On Wed, May 24, 2023 at 07:48:46AM +0000, Tian, Kevin wrote:
 
-Right and for the ARM (from what I know) is that Erratas can be applied
-using the alternatives fwk when you hotplug in the CPU post boot.
+> > > > > >   *           after use. Return the data buffer if success, or ERR_PTR on
+> > > > > >   *           failure.
+> > > > > >   * @domain_alloc: allocate iommu domain
+> > > > > > + * @domain_alloc_user: allocate user iommu domain
+> > > > > > + * @domain_alloc_user_data_len: return the required length of the
+> > user
+> > > > > > data
+> > > > > > + *                              to allocate a specific type user iommu domain.
+> > > > > > + *                              @hwpt_type is defined as enum
+> > iommu_hwpt_type
+> > > > > > + *                              in include/uapi/linux/iommufd.h. The returned
+> > > > > > + *                              length is the corresponding sizeof driver data
+> > > > > > + *                              structures in include/uapi/linux/iommufd.h.
+> > > > > > + *                              -EOPNOTSUPP would be returned if the input
+> > > > > > + *                              @hwpt_type is not supported by the driver.
+> > > > >
+> > > > > Can this be merged with earlier @hw_info callback? That will already
+> > > > > report a list of supported hwpt types. is there a problem to further
+> > > > > describe the data length for each type in that interface?
+> > > >
+> > > > Yi and I had a last minute talk before he sent this version
+> > > > actually... This version of hw_info no longer reports a list
+> > > > of supported hwpt types. We previously did that in a bitmap,
+> > > > but we found that a bitmap will not be sufficient eventually
+> > > > if there are more than 64 hwpt_types.
+> > > >
+> > > > And this domain_alloc_user_data_len might not be necessary,
+> > > > because in this version the IOMMUFD core doesn't really care
+> > > > about the actual data_len since it copies the data into the
+> > > > ucmd_buffer, i.e. we would probably only need a bool op like
+> > > > "hwpt_type_is_supported".
+> > > >
+> > >
+> > > Or just pass to the @domain_alloc_user ops which should fail
+> > > if the type is not supported?
+> >
+> > The domain_alloc_user returns NULL, which then would be turned
+> > into an ENOMEM error code. It might be confusing from the user
+> > space perspective. Having an op at least allows the user space
+> > to realize that something is wrong with the input structure?
+> >
+> 
+> this is a new callback. any reason why it cannot be defined to
+> allow returning ERR_PTR?
 
----Trilok Soni
+Upon a quick check, I think we could. Though it'd be slightly
+mismatched with the domain_alloc op, it should be fine since
+iommufd is likely to be the only caller.
+
+So, I think we can just take the approach letting user space
+try a hwpt_type and see if the ioctl would fail with -EINVAL.
+
+Thanks
+Nic
