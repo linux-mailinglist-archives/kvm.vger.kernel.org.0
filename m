@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B25A7112C5
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 19:46:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B41457112F0
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 19:56:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232904AbjEYRqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 13:46:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52856 "EHLO
+        id S239409AbjEYR4T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 13:56:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240003AbjEYRqj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 13:46:39 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3389D1AB
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 10:46:17 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5659d102318so4928657b3.3
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 10:46:17 -0700 (PDT)
+        with ESMTP id S234326AbjEYR4R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 13:56:17 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E547189
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 10:56:15 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-25345cf3343so20429a91.0
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 10:56:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685036776; x=1687628776;
+        d=google.com; s=20221208; t=1685037375; x=1687629375;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6xpqqXPrAvFJvmn1X4m04iFO9lqyLz151DsCgMF2J2A=;
-        b=vsGHJndszpsQgsdTVc/Azi40HECtyqi5XkDlxGBY6rgqlIl1PWECEjZy+H+NbkelvI
-         +2l57sQdXnaIZSlMjZhOTiV6TEQKfdPsAvNE3iG2iq2G3Y7SCMqyQj/kw2tufMtbMCcA
-         o7wBhpZIWOYH0dgYE6ChQUtyv0bo7CDTBOEOVj63onjziAuTcrTf8A9x2LB1DwJymdCN
-         To1ewi+4lz8kZPupTR1kWQ4hC4Ulo4tXxWHQtFUJ3gadgLqiWxqFCExouCIyJUtqnC8B
-         hd9nf4QGoSu8fdDf0plkasadfslHp+FzcHo3IqGNHNjurioOjg97iT4oMCDmBejQnJmi
-         KS4A==
+        bh=XbZfqBItcXzKLk1nfsDlp5Oogh2CcWLWMFdBRAuDk8A=;
+        b=1Fu2PdpCfqH0lSpeQe9fNQSos+bXML3EY2SUDzAa3hOINxqpZBiwx+MKgAXVqSW3Mf
+         MW7fpm4nqWSK2vXx3qvWinUTBWg7a9vccLx5zjdoUU4QTqUpXQq0Cx8SEyyWG85HYd/y
+         5kl7Y7yefIzp6JZhL1XHcqCn/84W0wDSnSG7xOdPYS6bKI1jZQBfUCkWFKeCtb5Kmdr4
+         8HY43RvH5ZpeqfR3AFXcThEpJ516hVdsT60gZ/C+0wXpjuO0XBywIqv8zs6gikrGO+VE
+         VATFnSylOGmFtIWVBMuC8HB7mydZsgzQ0yFx5WAscXShL+wBFMj8nK1l28M7hlQG4HXl
+         e99w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685036776; x=1687628776;
+        d=1e100.net; s=20221208; t=1685037375; x=1687629375;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6xpqqXPrAvFJvmn1X4m04iFO9lqyLz151DsCgMF2J2A=;
-        b=N4trMt7yDG2fA7oD9WPTdVRwJQltpSTAFefgvCfOzjordQAX6uIfpsM7ZwpUveXr3G
-         CWDfZdEIlrjnql35mwv5Rq6WldN0DKPYeHYo/xfL99nzmKtHX7333jTpcZv6rxWqWbN7
-         F14yESbzuVQ3meM8Xou9aNC0JkH/PHa4e/MNfLUK9yFnfRfUzeBV1MnTrCRyP4i8O7lJ
-         h8sLldG1CFRWWEoL6HqOJ4idVfUBfVxJNvIP+ZPiapZphmJbS8keimZie0MUl/gAstH2
-         PJ23+dUVnxSbOTs1G2KU54322oTwYCPxJXBiOnMjKxrVEphyhB2lj8ZLoU5cE215BN7H
-         GJ3g==
-X-Gm-Message-State: AC+VfDxVhnNgl/RFwxZFGHBCZt2UQ3rzDx+cTWlEGrAKHLEt5NJyzpEY
-        C9zw+znIIPWePH+ZoidXlea5W97+sFs=
-X-Google-Smtp-Source: ACHHUZ6uecTzKvghpOusKXyvvuAFO92WI6ZAoaZZajrASjfWuYLGwgqWAH1KX8n/LYSi4fQ+kXcbOnBKe+w=
+        bh=XbZfqBItcXzKLk1nfsDlp5Oogh2CcWLWMFdBRAuDk8A=;
+        b=j4PizpTqTqT9srhQKCel1wTwXtJm3JipjAlWgymBorLeR9Wu95m7F3I8VND0qUrhXz
+         2kLXzFdc6ZNaXrchD2hQcAFzzripMYiNOgqqb3sXfUFGRJgZrU9zBq04cq3AhXtJb9AR
+         CCiSyWv/Huckyrxkbn7iM7ZKoATcb1UouiVV//2VjZ+cj8o8h9D3x1LE8mYSgf4TIEi7
+         ZTDHQxjhSwuvdpv5zovKPGIujlgcaWPBM/j8pZahA/tVR3pM1bOsQGzir66nAlmPZF21
+         Y0CXoge1stW8z7f2YizWf59KT93h9LaLscMshe8xuF1j+i+vrVXL75wmuKwaow4eQI8W
+         3dpQ==
+X-Gm-Message-State: AC+VfDzZvpyjnVecZbuitmiYBAROq2zh/G925Xi3dxa2uw7ElrmD3EyU
+        IQaQqyPOPWg0RvP/WWir3l1hOgDpx2c=
+X-Google-Smtp-Source: ACHHUZ4JHey+mOcsGiVcMsGqCzw8ThMYj8C/n07M15B/TbYvFT//nOZBrO0Oqn5wlK0fWMOwcq0sWS2EXSo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:b606:0:b0:561:c4ef:1def with SMTP id
- u6-20020a81b606000000b00561c4ef1defmr227363ywh.0.1685036776503; Thu, 25 May
- 2023 10:46:16 -0700 (PDT)
-Date:   Thu, 25 May 2023 10:46:15 -0700
-In-Reply-To: <20230420104622.12504-4-ljrcore@126.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90b:fc4:b0:24d:fb1d:106d with SMTP id
+ gd4-20020a17090b0fc400b0024dfb1d106dmr537997pjb.2.1685037374878; Thu, 25 May
+ 2023 10:56:14 -0700 (PDT)
+Date:   Thu, 25 May 2023 10:56:13 -0700
+In-Reply-To: <20230420104622.12504-5-ljrcore@126.com>
 Mime-Version: 1.0
-References: <20230420104622.12504-1-ljrcore@126.com> <20230420104622.12504-4-ljrcore@126.com>
-Message-ID: <ZG+e55VbXd/YCnnV@google.com>
-Subject: Re: [PATCH v2 3/7] KVM: selftests: Test unavailable event filters are rejected
+References: <20230420104622.12504-1-ljrcore@126.com> <20230420104622.12504-5-ljrcore@126.com>
+Message-ID: <ZG+hPaVxYcBq8S5o@google.com>
+Subject: Re: [PATCH v2 4/7] KVM: x86/pmu: Add documentation for fixed ctr on
+ PMU filter
 From:   Sean Christopherson <seanjc@google.com>
 To:     Jinrong Liang <ljr.kernel@gmail.com>
 Cc:     Like Xu <like.xu.linux@gmail.com>,
@@ -81,49 +82,74 @@ On Thu, Apr 20, 2023, Jinrong Liang wrote:
 > 
 > From: Jinrong Liang <cloudliang@tencent.com>
 > 
-> Adds unsupported input test cases for PMU filter. Specifically,
-> it tests the input of unsupported "action" values, unsupported
-> "flags" values, and unsupported "nevents" values, which should
-> all return an error, as they are currently unsupported by the
-> filter. Additionally, the patch tests setting non-exist fixed
-> counters in the fixed bitmap doesn't fail.
+> Update the documentation for the KVM_SET_PMU_EVENT_FILTER ioctl
+> to include a detailed description of how fixed performance events
+> are handled in the pmu filter. The action and fixed_counter_bitmap
+> members of the pmu filter to determine whether fixed performance
+> events can be programmed by the guest. This information is helpful
+> for correctly configuring the fixed_counter_bitmap and action fields
+> to filter fixed performance events.
 > 
-> This change aims to improve the testing of the PMU filter and
-> ensure that it functions correctly in all supported use cases.
-> The patch has been tested and verified to function correctly.
-> 
+> Suggested-by: Like Xu <likexu@tencent.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Link: https://lore.kernel.org/oe-kbuild-all/202304150850.rx4UDDsB-lkp@intel.com
 > Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
 > ---
->  .../kvm/x86_64/pmu_event_filter_test.c        | 52 +++++++++++++++++++
->  1 file changed, 52 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> index 4e87eea6986b..a3d5c30ce914 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> @@ -27,6 +27,10 @@
->  #define ARCH_PERFMON_BRANCHES_RETIRED		5
->  
->  #define NUM_BRANCHES 42
-> +#define FIXED_CTR_NUM_MASK				GENMASK_ULL(4, 0)
-> +#define PMU_EVENT_FILTER_INVALID_ACTION		(KVM_PMU_EVENT_DENY + 1)
-> +#define PMU_EVENT_FILTER_INVALID_FLAGS			(KVM_PMU_EVENT_FLAG_MASKED_EVENTS + 1)
-> +#define PMU_EVENT_FILTER_INVALID_NEVENTS		(MAX_FILTER_EVENTS + 1)
->  
->  /*
->   * This is how the event selector and unit mask are stored in an AMD
-> @@ -743,10 +747,22 @@ static int run_filter_test(struct kvm_vcpu *vcpu, const uint64_t *events,
->  	return r;
->  }
->  
-> +static uint8_t get_kvm_supported_fixed_num(void)
-> +{
-> +	const struct kvm_cpuid_entry2 *kvm_entry;
-> +
-> +	if (host_cpu_is_amd)
-> +		return 0;
-> +
-> +	kvm_entry = get_cpuid_entry(kvm_get_supported_cpuid(), 0xa, 0);
-> +	return kvm_entry->edx & FIXED_CTR_NUM_MASK;
 
-Ah, I got ahead of myself.  This is where the KVM_X86_PROPERTY comes in.
+Please post this separately from the selftests changes.
+
+>  1 file changed, 21 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index a69e91088d76..b5836767e0e7 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5122,6 +5122,27 @@ Valid values for 'action'::
+>    #define KVM_PMU_EVENT_ALLOW 0
+>    #define KVM_PMU_EVENT_DENY 1
+>  
+> +Via this API, KVM userspace can also control the behavior of the VM's fixed
+> +counters (if any) by configuring the "action" and "fixed_counter_bitmap" fields.
+> +
+> +Specifically, KVM follows the following pseudo-code when determining whether to
+> +allow the guest FixCtr[i] to count its pre-defined fixed event::
+> +
+> +  FixCtr[i]_is_allowed = (action == ALLOW) && (bitmap & BIT(i)) ||
+> +    (action == DENY) && !(bitmap & BIT(i));
+> +  FixCtr[i]_is_denied = !FixCtr[i]_is_allowed;
+> +
+> +Note once this API interface is called, the default zero value of the field
+
+No, there is no "default" value.  Userspace provides the exact value.  The KVM
+*selftest* clears fixed_counter_bitmap in all cases, but there is no default
+anywhere.
+
+> +"fixed_counter_bitmap" will implicitly affect all fixed counters, even if it's
+
+There is no implicit behavior, userspace very explicitly provides fixed_counter_bitmap.
+
+> +expected to be used only to control the events on generic counters.
+
+I would rather phrase this as:
+
+---
+KVM always consumes fixed_counter_bitmap, it's userspace's responsibility to
+ensure fixed_counter_bitmap is set correctly, e.g. if userspace wants to define
+a filter that only affects general purpose counters.
+---
+
+> +In addition, pre-defined performance events on the fixed counters already have
+> +event_select and unit_mask values defined, which means userspace can also
+> +control fixed counters by configuring "action"+ "events" fields.
+>
+> +When there is a contradiction between these two polices, the fixed performance
+> +counter will only follow the rule of the pseudo-code above.
+
+This is unnecessary vague.  I think what you're saying is, with a slight reword
+of the first paragraph too:
+
+---
+Note, the "events" field also applies to fixed counters' hardcoded event_select
+and unit_mask values.  "fixed_counter_bitmap" has higher priority than "events"
+if there is a contradiction between the two.
+---
