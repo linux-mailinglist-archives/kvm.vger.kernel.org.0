@@ -2,111 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 455E2711A32
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 00:35:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF073711AB9
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 01:36:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242125AbjEYWfY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 18:35:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39008 "EHLO
+        id S233619AbjEYXgd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 19:36:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234676AbjEYWfW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 18:35:22 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E4519E
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 15:35:21 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-64d67a12befso149487b3a.3
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 15:35:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685054121; x=1687646121;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UBYS8ENSnn2Pk5z6V6aHzGUw+NHG0kpOMl4KIfPcjCA=;
-        b=qRKy8uPoPoJf4UTgWjlBFVe+Kldw2phWnFhd/KCWSU/tnlqfypZQWvGAHPS1IkLG/h
-         1eVfqdI2Q0mxB5D+wITWYyivkSn9x8W+PeuTadI0Ed1k44jDInf97OukhgnlKparlGct
-         3Hgl9+k3LlgUEf1DwFf72dr1zXMEVwcp+b0BbC1e2bvD/GUOJBanuzI7oNo2BnvfLanD
-         2b7YV5pzoVcxu6VGZhAhWg3TljEFWH4r5Axt+zFfxSYrdNO67h2qPwJLBR8ltRLiiuNU
-         yXC/vLOuet/6BttO6VR0MsETFnvsee/nljeA7/JXktFc6sprlumVIZi0GmAKInfSIwll
-         v8Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685054121; x=1687646121;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UBYS8ENSnn2Pk5z6V6aHzGUw+NHG0kpOMl4KIfPcjCA=;
-        b=kR9kOBviCkz+zM5olxYxperBdtyrAd1q+kQoPSgwDGKpOORwYdDzaiLGFhC/w1c6MU
-         bbLeeVVTFs1zHVRQ69oz4WuGM7HuUEUDfNbzI79b+6jmItlYfaycUl5H3Yu6txlT145q
-         Nq8o3W/A7zFkGm40A6IToPKSqvAcOy/P8h48fq8MqRyoNRIdv30mIdc7Fp7InbRGGCDC
-         ig8vYRgnjN7+uhktZm/qfw+xdYmBaOdVHTczuDdtHPWKV5CWHfTB4gq7YVHEE+mdJ4TO
-         sxQoVQfuw+maf1nTbcCi9m99Q68vQan9LXuRWL8OFEb64m9HSZnIiP3ajpbud4CWCqlp
-         n5ZA==
-X-Gm-Message-State: AC+VfDzXoWYUxmgBw9yguSUfUaZPvtudi5zEJciM7pfmVsnNgQuD8U2A
-        v0PGdNurEhrwsdKeCZJtoIuHSZDocuA=
-X-Google-Smtp-Source: ACHHUZ41JJ99F6PWhhuUkgjNESDV8KtBsDzemlOOvLCtjANxGhBTq8P1XhsgkCd1TVe8BXUtMcfwM+Q5BCk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2d94:b0:643:a260:a5d2 with SMTP id
- fb20-20020a056a002d9400b00643a260a5d2mr119659pfb.0.1685054120984; Thu, 25 May
- 2023 15:35:20 -0700 (PDT)
-Date:   Thu, 25 May 2023 15:35:19 -0700
-In-Reply-To: <20230427095333.35038-2-abusse@amazon.com>
-Mime-Version: 1.0
-References: <20230427095333.35038-1-abusse@amazon.com> <20230427095333.35038-2-abusse@amazon.com>
-Message-ID: <ZG/h2kW8cTY5CuFN@google.com>
-Subject: Re: [PATCH 1/2] KVM: vmx/pmu: Indicate available fixed function PMCs
- through a bitmap
-From:   Sean Christopherson <seanjc@google.com>
-To:     Anselm Busse <abusse@amazon.com>
-Cc:     dwmw@amazon.co.uk, hborghor@amazon.de, sironi@amazon.de,
+        with ESMTP id S230389AbjEYXgb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 19:36:31 -0400
+Received: from out-31.mta1.migadu.com (out-31.mta1.migadu.com [95.215.58.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5226FA3
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 16:36:30 -0700 (PDT)
+Date:   Thu, 25 May 2023 23:36:23 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1685057788;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=P6zAesvCX1np6qowsiTDFn1Ttg3LeLNqimbKFFrO44k=;
+        b=hFk/P8VbvqCXvnUFBR0TDZqH7RTktZxcVeToKNNL9QKObZGJFbHkEb7Cxwj065MufplhgQ
+        GPjZk2yUiY55AT2nqCd4XmNXwUuD4QkGZi4SwSPCII8JWa8KxwTAQTzJq+7cieq65NF1/v
+        946/dwlxo+XduDWeqmM9BP7IolOhSR4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH v3 2/2] KVM: arm64: PMU: Don't overwrite PMUSERENR with
+ vcpu loaded
+Message-ID: <ZG/w95pYjWnMJB62@linux.dev>
+References: <20230415164029.526895-1-reijiw@google.com>
+ <20230415164029.526895-3-reijiw@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230415164029.526895-3-reijiw@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 27, 2023, Anselm Busse wrote:
-> This commit changes the tracking of available fixed function counters
-> from a number to a bitmap.
-> 
-> Starting with Intel PMU v5, the available fixed function counters cannot
-> only be advertised through a number, but also through a bitmap in
-> CPUID.0AH.ECX. However, the current KVM implementation determines if a
-> fixed function PMC is available to a guest purely based on the number
-> of exposed fixed function PMCs. This makes it impossible to use this
-> new feature of the Intel PMU v5. Therefore, this change serves as a
-> preparation to seamlessly enable the virtualization of Intel PMU v5 in
-> the future.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Anselm Busse <abusse@amazon.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  2 +-
->  arch/x86/kvm/pmu.h              |  6 +++---
->  arch/x86/kvm/svm/pmu.c          |  2 +-
->  arch/x86/kvm/vmx/pmu_intel.c    | 33 ++++++++++++++++++---------------
->  4 files changed, 23 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 808c292ad3f4..ea4859554678 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -516,7 +516,7 @@ struct kvm_pmc {
->  #define KVM_AMD_PMC_MAX_GENERIC	6
->  struct kvm_pmu {
->  	unsigned nr_arch_gp_counters;
-> -	unsigned nr_arch_fixed_counters;
-> +	DECLARE_BITMAP(mask_arch_fixed_counters, INTEL_PMC_MAX_FIXED);
+Hi Reiji,
 
-Please see the feedback I gave to Like[*].  Unless I'm missing something, there's
-no need for another bitmap. 
+Apologies, this fell off my list of reviews.
 
-[*] https://lore.kernel.org/kvm/ZB4oUhmIKPF2lAzN@google.com
+On Sat, Apr 15, 2023 at 09:40:29AM -0700, Reiji Watanabe wrote:
+
+[...]
+
+>  static void armv8pmu_enable_event(struct perf_event *event)
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 6718731729fd..7e73be12cfaf 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -82,12 +82,24 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+>  	 */
+>  	if (kvm_arm_support_pmu_v3()) {
+>  		struct kvm_cpu_context *hctxt;
+> +		unsigned long flags;
+>  
+>  		write_sysreg(0, pmselr_el0);
+>  
+>  		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +
+> +		/*
+> +		 * Disable IRQs to prevent a race condition between the
+> +		 * following code and IPIs that attempts to update
+> +		 * PMUSERENR_EL0. See also kvm_set_pmuserenr().
+> +		 */
+> +		local_irq_save(flags);
+> +
+>  		ctxt_sys_reg(hctxt, PMUSERENR_EL0) = read_sysreg(pmuserenr_el0);
+>  		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+> +		vcpu_set_flag(vcpu, PMUSERENR_ON_CPU);
+> +
+> +		local_irq_restore(flags);
+
+Can the IRQ save/restore be moved to {activate,deactivate}_traps_vhe_{load,put}()?
+
+That'd eliminate the dance to avoid using kernel-only symbols in nVHE
+and would be consistent with the existing usage of
+__{activate,deactivate}_traps_common() from nVHE (IRQs already
+disabled).
+
+IMO, the less nVHE knows about the kernel the better.
+
+>  	}
+>  
+>  	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+> @@ -112,9 +124,21 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+>  	write_sysreg(0, hstr_el2);
+>  	if (kvm_arm_support_pmu_v3()) {
+>  		struct kvm_cpu_context *hctxt;
+> +		unsigned long flags;
+>  
+>  		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +
+> +		/*
+> +		 * Disable IRQs to prevent a race condition between the
+> +		 * following code and IPIs that attempts to update
+> +		 * PMUSERENR_EL0. See also kvm_set_pmuserenr().
+> +		 */
+> +		local_irq_save(flags);
+> +
+>  		write_sysreg(ctxt_sys_reg(hctxt, PMUSERENR_EL0), pmuserenr_el0);
+> +		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
+> +
+> +		local_irq_restore(flags);
+>  	}
+>  
+>  	if (cpus_have_final_cap(ARM64_SME)) {
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index 530347cdebe3..2c08a54ca7d9 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -10,7 +10,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS
+>  # will explode instantly (Words of Marc Zyngier). So introduce a generic flag
+>  # __DISABLE_TRACE_MMIO__ to disable MMIO tracing for nVHE KVM.
+>  ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS -D__DISABLE_TRACE_MMIO__
+> -ccflags-y += -fno-stack-protector	\
+> +ccflags-y += -fno-stack-protector -DNO_TRACE_IRQFLAGS \
+>  	     -DDISABLE_BRANCH_PROFILING	\
+>  	     $(DISABLE_STACKLEAK_PLUGIN)
+>  
+> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+> index 7887133d15f0..d6a863853bfe 100644
+> --- a/arch/arm64/kvm/pmu.c
+> +++ b/arch/arm64/kvm/pmu.c
+> @@ -209,3 +209,28 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
+>  	kvm_vcpu_pmu_enable_el0(events_host);
+>  	kvm_vcpu_pmu_disable_el0(events_guest);
+>  }
+> +
+> +/*
+> + * With VHE, keep track of the PMUSERENR_EL0 value for the host EL0 on the pCPU
+> + * where PMUSERENR_EL0 for the guest is loaded, since PMUSERENR_EL0 is switched
+> + * to the value for the guest on vcpu_load().  The value for the host EL0
+> + * will be restored on vcpu_put(), before returning to the EL0.
+
+wording: s/the EL0/EL0. Or, alternatively, to avoid repeating yourself
+you can just say "returning to userspace".
+
+You may also want to mention in passing why this isn't necessary for
+nVHE, as the register is context switched for every guest enter/exit.
+
+> + *
+> + * Return true if KVM takes care of the register. Otherwise return false.
+> + */
+> +bool kvm_set_pmuserenr(u64 val)
+> +{
+> +	struct kvm_cpu_context *hctxt;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	if (!kvm_arm_support_pmu_v3() || !has_vhe())
+> +		return false;
+> +
+> +	vcpu = kvm_get_running_vcpu();
+> +	if (!vcpu || !vcpu_get_flag(vcpu, PMUSERENR_ON_CPU))
+> +		return false;
+> +
+> +	hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
+> +	return true;
+> +}
+
+-- 
+Thanks,
+Oliver
