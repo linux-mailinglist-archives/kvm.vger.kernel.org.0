@@ -2,114 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4B1F71106B
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 18:07:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C10497110D6
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 18:23:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240750AbjEYQHK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 12:07:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51280 "EHLO
+        id S239806AbjEYQXI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 12:23:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240624AbjEYQHG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 12:07:06 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFD12E47
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 09:07:02 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-ba8cf175f5bso1669435276.0
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 09:07:02 -0700 (PDT)
+        with ESMTP id S233178AbjEYQXG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 12:23:06 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4F5C10B
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 09:23:05 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-51b743d592dso838507a12.0
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 09:23:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685030822; x=1687622822;
+        d=google.com; s=20221208; t=1685031785; x=1687623785;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T8fhdJsa5NorDsEqTWIJQ5b4Ve27T8A/3D8mN23h+AM=;
-        b=FEqq2WYT2bpFD+1TtSHkaFzNdRiEuyI2g6NACjIvhMwGd2nTXz/TFAkSgH9Ujas6q/
-         vhfG2wZKYTJDUOpnLW2+ofbeXlQQzMc4kCX+fmSU72PlK4P1Bu6ChRJwig3K6o+kmK9V
-         pCl4CF26O5Po2Isyv/JlTTvFCsfs3ZUrFwA7UHCTWbISgu9JRVShkNuOUaec2GLwo+qR
-         9KOOx1CsOYaN5w2VTeTg1ACrMvUsp1nWuR5WaKwUiyP0rqYNcgG1cqc/7vdfOhawEkwt
-         dDqOiNZlzeyBYZO39XTCtpGesfMZs3DSR4tffu8EiIq8HLxLRNoWCQV/DwcUzn5RT3NK
-         ujWQ==
+        bh=/HdBiYHXb0t/eYfGc/stu36RyqTGN6i7PmYRLl38sM4=;
+        b=Ms1EfGgkWfjHyAEkYKEt1EK1c0RFGrAyO7YlB5VADfKnqvkE/3Q90TA52bwGi+C54/
+         4z+1IXDYFa69QOgk9+iEezTtPmTRTiYRMdTcWoaEhiekfJZ5qanq/KVZ93a35S65Jy1j
+         WpqPDkqSkNnqysAT/nWNmhFVZwb1W5f3wWjc82SXAd7yE53jFxhChegmF2f1mZSgvdYT
+         2PjlMucBTIcEebTxQCHwZcOH/9IqHQZmKPDhGcGs2h8YJtbrrgclLGN8ttUXYsVvTJky
+         PZgij3I8YJ2FZ/t6PC1NhWFH/yMM80DI+lHqqpwW/F0KchdCmxRw0s/1euxOMEabHbgj
+         fvYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685030822; x=1687622822;
+        d=1e100.net; s=20221208; t=1685031785; x=1687623785;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T8fhdJsa5NorDsEqTWIJQ5b4Ve27T8A/3D8mN23h+AM=;
-        b=MxWJMTvQxZg/2ml4X/tZ6SmS1PsXn97ArCb0VH420v4mP9/z09VAg94g72r04bPwYB
-         Qh+trgjldRVlq7TjANAZUH/vlakwVTYKCBR/JXrzTGB24ZsqbGkF4opOXVg/Jt6HlIRs
-         n0mdPws7cgRwAxLKM4wOPRFF+VXS7PO81xXq4PW18G9HOeI948bQIlKdOohlNH0Z6kMq
-         wE1yH4xBiEIK1fpdkun/rGUO/siyQ9bOD7ZDrChdzqOhNlFUeU+1pc1qT5YN+SnhI1HV
-         LtwkaPHm5ovJOsU2EKrlMGlt74gB4NtUltnOSv9Njnaf1Q+wlLps7sfsawj70TGYB0Zd
-         /Blg==
-X-Gm-Message-State: AC+VfDz5uDsYOh4Qgdfc9KAAE7dBrskKdeEAlxJLYjrD/ntp4snaRE9h
-        8TvpHPGcjj5VQmtz/pl4UWcrRq8MPj4=
-X-Google-Smtp-Source: ACHHUZ6yBYNFZuYhfNGO52o3ys/I0sQ5pEx4h3FPL/IsVNBvdz1hiS3BsLpfaNj0iWMqAGXV//6VIasdS2w=
+        bh=/HdBiYHXb0t/eYfGc/stu36RyqTGN6i7PmYRLl38sM4=;
+        b=dQ1ZVkOSJzYOAClJqvGUywmTMsLHQkeMLjhXuvlwAMUS5o6G/U2V9/5iytl0dVR02r
+         FNSbeE4ybJCksUdPpVYbThc2Fkip2SBiIpKiPU+Y50+DDhCaEq4NjDCQsabsQS2BwcHM
+         SVkcUckYFy8Zru11EIOWSxvlV3T0+iGumonuvqimTg35YjB1jafqdc8gyKxrleYe1vbQ
+         1JlTTm4oI8e5m86EgNWAC32HBGcQXxfcZhSsxS6Z9ycWhPs7Z1kERO7kJk8GlY/wau5J
+         sMJIcHVatF3T0jtftsfyg57DTyhubCNSP9WU+WrRqSsLoWOjiOxV3F4ukHJDG944fkgk
+         343Q==
+X-Gm-Message-State: AC+VfDwWGMVgKumu0RGgN+Rwmao+5ILFym7/vUvax2WJ/SvF1iBXD1p2
+        3VSbnpBgWQDtLRtmIs4nmTKfAC1359E=
+X-Google-Smtp-Source: ACHHUZ4eMNRNmPGVNI0d/g62J6qYg9y69eF3HSc+XqALVPDfQutlySlqNuJtdiVOrOZz4FeES2slvW+AmvQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:6584:0:b0:ba8:381b:f764 with SMTP id
- z126-20020a256584000000b00ba8381bf764mr2233557ybb.3.1685030821985; Thu, 25
- May 2023 09:07:01 -0700 (PDT)
-Date:   Thu, 25 May 2023 09:07:00 -0700
-In-Reply-To: <7cb6c4c28c077bb9f866c2d795e918610e77d49f.camel@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a63:e847:0:b0:524:fba4:fd51 with SMTP id
+ a7-20020a63e847000000b00524fba4fd51mr741353pgk.3.1685031785184; Thu, 25 May
+ 2023 09:23:05 -0700 (PDT)
+Date:   Thu, 25 May 2023 09:23:03 -0700
+In-Reply-To: <20230420104622.12504-2-ljrcore@126.com>
 Mime-Version: 1.0
-References: <20230505152046.6575-1-mic@digikod.net> <93726a7b9498ec66db21c5792079996d5fed5453.camel@intel.com>
- <facfd178-3157-80b4-243b-a5c8dabadbfb@digikod.net> <7cb6c4c28c077bb9f866c2d795e918610e77d49f.camel@intel.com>
-Message-ID: <ZG+HpFjIuSWvyo+B@google.com>
-Subject: Re: [RFC PATCH v1 0/9] Hypervisor-Enforced Kernel Integrity
+References: <20230420104622.12504-1-ljrcore@126.com> <20230420104622.12504-2-ljrcore@126.com>
+Message-ID: <ZG+LZ4rATc8elt38@google.com>
+Subject: Re: [PATCH v2 1/7] KVM: selftests: Replace int with uint32_t for nevents
 From:   Sean Christopherson <seanjc@google.com>
-To:     Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc:     "mic@digikod.net" <mic@digikod.net>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "liran.alon@oracle.com" <liran.alon@oracle.com>,
-        "marian.c.rotariu@gmail.com" <marian.c.rotariu@gmail.com>,
-        Alexander Graf <graf@amazon.com>,
-        John S Andersen <john.s.andersen@intel.com>,
-        "madvenka@linux.microsoft.com" <madvenka@linux.microsoft.com>,
-        "ssicleru@bitdefender.com" <ssicleru@bitdefender.com>,
-        "yuanyu@google.com" <yuanyu@google.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tgopinath@microsoft.com" <tgopinath@microsoft.com>,
-        "jamorris@linux.microsoft.com" <jamorris@linux.microsoft.com>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "dev@lists.cloudhypervisor.org" <dev@lists.cloudhypervisor.org>,
-        "mdontu@bitdefender.com" <mdontu@bitdefender.com>,
-        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "nicu.citu@icloud.com" <nicu.citu@icloud.com>,
-        "ztarkhani@microsoft.com" <ztarkhani@microsoft.com>,
-        "x86@kernel.org" <x86@kernel.org>
+To:     Jinrong Liang <ljr.kernel@gmail.com>
+Cc:     Like Xu <like.xu.linux@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Jinrong Liang <cloudliang@tencent.com>,
+        linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 25, 2023, Rick P Edgecombe wrote:
-> I wonder if it might be a good idea to POC the guest side before
-> settling on the KVM interface. Then you can also look at the whole
-> thing and judge how much usage it would get for the different options
-> of restrictions.
+On Thu, Apr 20, 2023, Jinrong Liang wrote:
+> From: Jinrong Liang <cloudliang@tencent.com>
+> 
+> From: Jinrong Liang <cloudliang@tencent.com>
+> 
+> Defined as type __u32, the nevents field in kvm_pmu_event_filter
+> can only accept positive values within a specific range. Therefore,
+> replacing int with uint32_t for nevents ensures consistency and
+> readability in the code.
 
-As I said earlier[*], IMO the control plane logic needs to live in host userspace.
-I think any attempt to have KVM providen anything but the low level plumbing will
-suffer the same fate as CR4 pinning and XO memory.  Iterating on an imperfect
-solution to incremently improve security is far, far easier to do in userspace,
-and far more likely to get merged.
+Not really.  It fixes one type of inconsistency that is fairly common (userspace
+passing an integer count to the kernel), and replaces it with a different type
+of inconsistency (signed iterator comparing against an unsigned count).  There's
+already one of those in remove_event(), but I'd rather not create more.
 
-[*] https://lore.kernel.org/all/ZFUyhPuhtMbYdJ76@google.com
+Passing an unsigned int to track what *should* be a small-ish, postive integer
+can also make it more difficult to detect bugs, e.g. assertions like this won't
+work:
+
+	TEST_ASSERT(nevents >= 0);
+
+If this code were being written from scratch then I wouldn't object to using
+uint32_t everywhere, but I don't see the point of trying to retroactively change
+the code.
