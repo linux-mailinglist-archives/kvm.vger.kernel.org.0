@@ -2,111 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21B5D710EED
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 17:01:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C2FD710F65
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 17:22:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241295AbjEYPBD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 11:01:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42848 "EHLO
+        id S241755AbjEYPWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 11:22:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241064AbjEYPBB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 11:01:01 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0C401B4
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 08:00:59 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-2533d8f48b5so974751a91.0
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 08:00:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685026859; x=1687618859;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2rgc5wNBzRwTZsiTn0J0WHKeSrzO5GwJcVsGE/2GYBg=;
-        b=AyY7s5NO6ZYMxx+nAp8os1iSmL+QUh0+NNNS14PW8xDvfy14jeBv20Cn+/xySm0GS+
-         7JLXIMsPgorL07xkxMYRmcSAp/H90WQnq5m0O4W/mOE9Um4tYYNOk5Bgg/ZJeGjjUE0E
-         tAU2NRyk6rNg0Sd0lXD/e5OJdMa3n3EpMDS/xks/N183FlGxRzVW1SsHC/8+k8/JX/Y1
-         af3OGWtTx7YIOKwNAEi/VswrUDCEvN2lluN+Bpsy/lCDUbo55Rx4891gHCjPsU2SUtSS
-         8uNw0kEDQBwtNMS9jtoCWLNl9mVDch8QqvuUftQh8EZpQMLUC3PrWXy31Dy4aOSm5rUq
-         vuZw==
+        with ESMTP id S241309AbjEYPWT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 11:22:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E2F4198
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 08:21:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685028088;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0V518OsqUrGCxG2mh1VgKtRufND8RHTunMvUY4Z4UHo=;
+        b=dmMngBNKxCgzqSWsYaElCS5kPy7IVbWoOOjFL0X1AkzI7uZy7xtHA2W4YAuAKbKsvXOE59
+        FrG+8JUY1ZvbmfLjPXnmW7kn+m9Wd/Qglr1/rLbd5DsKgLxw3MswxLKrdMy2Qlah11fmRy
+        eZQRb93JxAhRhoB7UG5wOJkhI66DbWI=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-580-lqObaJp1N62fsAA3MJ_dMw-1; Thu, 25 May 2023 11:21:27 -0400
+X-MC-Unique: lqObaJp1N62fsAA3MJ_dMw-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-772d796bbe5so230256939f.2
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 08:21:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685026859; x=1687618859;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2rgc5wNBzRwTZsiTn0J0WHKeSrzO5GwJcVsGE/2GYBg=;
-        b=Ym8qhR7WWo/ZBMIb2cOaw8BCbu2gJrK3QoS6Qb3OeQX5Sab19SJwIYvU6kL5RhQh6/
-         BLA6Mn7ELBNT1++YGP6g7aLwT/5iUc8HQpnmPYDULpkDkCeMSMmd8xV/BIzU0UmQ+pZ5
-         GIbHXDlj0D0o8OHsOuoagh21zFR9COtFkf5XXLvVkwftKKmHeDBQKJTTyJNdghRhzL4T
-         culo12ekkuCARLm87Yj6kykc+XshD+AoAdlnGrZqVCewpTtomSIwz7kFyc9JQkbcvxib
-         eljMRaVsp5Xk574j4kL3HX75niVDfycqphFLw3zVuPd/YrK+WrYl918mrxhKNIPlLCA5
-         QrbA==
-X-Gm-Message-State: AC+VfDyrIBlB7PyfraXyY1On9LSI8TduM6F08KrGITe94GlPydqSHPcf
-        aRG160tQTIck8VN1ITGpMsbbXCinAoU=
-X-Google-Smtp-Source: ACHHUZ7RT45qInXgmU/+XvDTNZGc1dzAPlp7OuPf32BVGX9UmDt71fsVlzRmkTnl1/mPDEQCJf1xczlIfmM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:9304:b0:250:a6c1:b843 with SMTP id
- p4-20020a17090a930400b00250a6c1b843mr436712pjo.9.1685026859534; Thu, 25 May
- 2023 08:00:59 -0700 (PDT)
-Date:   Thu, 25 May 2023 08:00:58 -0700
-In-Reply-To: <393b16f7-8359-5d77-7d5d-8942de987331@gmail.com>
-Mime-Version: 1.0
-References: <20230509134825.1523-1-yan.y.zhao@intel.com> <20230509135300.1855-1-yan.y.zhao@intel.com>
- <3f09e751-33fd-7d60-78cd-6857d113e8bd@gmail.com> <ZGxbat2mM6AfOOVv@yzhao56-desk.sh.intel.com>
- <393b16f7-8359-5d77-7d5d-8942de987331@gmail.com>
-Message-ID: <ZG94Kmb8jMZKhtJW@google.com>
-Subject: Re: [PATCH v2 5/6] KVM: x86: Keep a per-VM MTRR state
-From:   Sean Christopherson <seanjc@google.com>
-To:     Robert Hoo <robert.hoo.linux@gmail.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1685028086; x=1687620086;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0V518OsqUrGCxG2mh1VgKtRufND8RHTunMvUY4Z4UHo=;
+        b=b00T1LhPueKOMjvnSiI1ocwB0S735/llSb8Ob2isoJdlbxh1dNv2+uhtPqNMSQibWy
+         Ai0yEK8rkRAh+i4CNgiNmDWRVSr9sVi8ICnHEtqeoFkmOH+Ky/VCmhMPh5wP8iyigEFD
+         zXL7K7OPterR2ooMZQMCM771BenhgYkpokXFaPNWQwcnfpvdNZh3bvmM5/FaoXQqkRAb
+         P+xcTuciezRlK0cYDbir6rHlZIDKfeN3luB+gNbtUKKQv75q2l5zzvm4hu/xhpedyLRG
+         MMQ6joqC410Ltmjf+SZkTTXpRN6HP3KNNu4JpydQKIp/+EomHQN3ETYOR+wKQZuzWUo2
+         6e9g==
+X-Gm-Message-State: AC+VfDyclmfRIaD7Q2ZtmfaU63QDN4LrDThdZFm7s9h0SGkcI/3l1kwX
+        aeYgvEKdYuYsmvlmqwvot5Shlxx7AYNmSFzLQoC35P4bYH/aenP+2sGTUU24VYEs9/lueCWuWS0
+        4DWYFiSqI5wjS
+X-Received: by 2002:a05:6602:195:b0:76c:8877:861f with SMTP id m21-20020a056602019500b0076c8877861fmr12238225ioo.1.1685028086171;
+        Thu, 25 May 2023 08:21:26 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5Dvwin5vA64+Lt/6YHmWpeTY/wo7iHQfofVJf9Xm4liofqM3m0CvvT/D9oG9z9hJVh0cakng==
+X-Received: by 2002:a05:6602:195:b0:76c:8877:861f with SMTP id m21-20020a056602019500b0076c8877861fmr12238202ioo.1.1685028085781;
+        Thu, 25 May 2023 08:21:25 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id cn15-20020a0566383a0f00b0041a9022c3dasm458603jab.118.2023.05.25.08.21.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 May 2023 08:21:25 -0700 (PDT)
+Date:   Thu, 25 May 2023 09:21:23 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     ankita@nvidia.com, aniketa@nvidia.com, cjia@nvidia.com,
+        kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
+        acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
+        danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+        kevin.tian@intel.com
+Subject: Re: [PATCH v2 1/1] vfio/nvgpu: Add vfio pci variant module for
+ grace hopper
+Message-ID: <20230525092123.2a41c1e4.alex.williamson@redhat.com>
+In-Reply-To: <ZGQfszAGGKhCp20q@nvidia.com>
+References: <20230509040734.24392-1-ankita@nvidia.com>
+        <20230516150914.26ae99c3.alex.williamson@redhat.com>
+        <ZGQfszAGGKhCp20q@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 25, 2023, Robert Hoo wrote:
-> On 5/23/2023 2:21 PM, Yan Zhao wrote:
-> IIUC, your saving comes from skips the intermediate state during boot, when
-> APs goes through setting MTRR, which would cause SPTE zap before your this
-> patch set.
-> 
-> MHO was, now that your ignores other vCPU's MTRR settings (unless it is
-> different from BP's MTRR?), why not let each vCPU's MTRR set/update directly
-> set to the per-VM MTRR states (if differs from current value). It's guest
-> OS/BIOS's responsibility to keep the consistency anyway. And even if the
-> malfunction caused by the inconsistency might differ from that of native,
-> SDM doesn't clearly state how the malfunction should be, does it?
-> that's to say, anyone knows, when inconsistency happens, does it cause that
-> logical processor malfunction or in fact it impacts the global MTRR
-> settings? If the latter, I think leaving only the per-VM MTRR state aligns
-> with native.
+On Tue, 16 May 2023 21:28:35 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-The MTRRs are not system wide or per-package though, they are per logical CPU.
-Yes, they "need" to be consistent with respect to one another, but only when the
-CPU is actually accessing memory.  This is a big reason why trying to track MTRRs
-as a per-VM asset in KVM is so difficult/messy.  Software doesn't rendezvous all
-CPUs and then do the write on just one CPU, each CPU does its own writes more or
-less independently.
+> On Tue, May 16, 2023 at 03:09:14PM -0600, Alex Williamson wrote:
+> 
+> > > +# SPDX-License-Identifier: GPL-2.0-only
+> > > +config NVGPU_VFIO_PCI
+> > > +	tristate "VFIO support for the GPU in the NVIDIA Grace Hopper Superchip"
+> > > +	depends on ARM64 || (COMPILE_TEST && 64BIT)
+> > > +	select VFIO_PCI_CORE  
+> > 
+> > I think this should be a 'depends on' as well, that's what we have for
+> > the other vfio-pci variant drivers.  
+> 
+> It should be removed completely, AFAICT:
+> 
+> config VFIO_PCI
+>         tristate "Generic VFIO support for any PCI device"
+>         select VFIO_PCI_CORE
+> 
+> Ensures it is turned on
+> 
+> if VFIO_PCI
+> source "drivers/vfio/pci/mlx5/Kconfig"
+> endif
 
-> BTW, with regard to KVM_X86_QUIRK_CD_NW_CLEARED, I see svm honors it while
-> vmx doesn't before it clear CR0.CD/NW.
-> 
-> svm_set_cr0():
-> 
-> 	if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
-> 		hcr0 &= ~(X86_CR0_CD | X86_CR0_NW);
-> 
-> 
-> vmx_set_cr0():
-> 
-> 	hw_cr0 = (cr0 & ~KVM_VM_CR0_ALWAYS_OFF);
-> 
-> Perhaps vmx side can be fixed passingly?
+The source command actually comes after the VFIO_PCI endif, the mlx5
+Kconfig is sourced if PCI && MMU.
 
-Sadly, no.  SVM and VMX manage guest memtype completely differently.  VMX doesn't
-allow CR0.CD=1 when VMX is enabled, and so KVM needs to emulate CR0.CD via the EPT
-memtype.
+> Autoamtically injects a 'depends on VFIO_PCI' to all the enclosed
+> kconfig statements (and puts them nicely in the menu)
+> 
+> So we have everything needed already
+> 
+> SELECT is the correct action since it doesn't have a config text.
+
+In fact I think it's the current variant drivers that are incorrect to
+make use of 'depends on', this makes those variant drivers implicitly
+depend on VFIO_PCI, but it should instead be possible to build a kernel
+that doesn't include vfio-pci but does include mlx5-vfio-pci, or other
+vfio-pci variant drivers.  Currently if I disable VFIO_PCI I no longer
+have the option to select either the mlx5 or hisi_acc drivers, they
+actually depend only on VFIO_PCI_CORE, but currently only VFIO_PCI can
+select VFIO_PCI_CORE.
+
+I withdraw my objection to using select, the other variant drivers
+should adopt select as well, imo.
+ 
+> > Is our test for vm_end < vm_start in vfio-pci-core just paranoia?  I
+> > don't see an equivalent here.  
+> 
+> Yes, mm core will not invoke the op with something incorrect.
+>  
+> > Can we also get a comment in the code outlining the various reasons
+> > that this "BAR" doesn't need the disabled access protections that
+> > vfio-pci-core implements?  For example outlining the behavior relative
+> > to BAR access while the memory enable bit is disabled, the bus being in
+> > reset, or the device being in a low-power state.  
+> 
+> The HW has some "isolation" feature that kicks in and safely
+> disconnects the GPU from the CPU.
+> 
+> A lot of work has been done to make things like VFIO and KVM safe
+> against machine checks/etc under basically all circumstances.
+
+So a comment in the code to reflect that the hardware takes this into
+account such that we don't need to worry about mmap access during bus
+reset or otherwise disabled MMIO access of the PCI device would not be
+unreasonable.  Thanks,
+
+Alex
+
