@@ -2,154 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B41457112F0
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 19:56:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C12C71132F
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 20:06:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239409AbjEYR4T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 13:56:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58470 "EHLO
+        id S241046AbjEYSGS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 14:06:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234326AbjEYR4R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 13:56:17 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E547189
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 10:56:15 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-25345cf3343so20429a91.0
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 10:56:15 -0700 (PDT)
+        with ESMTP id S241199AbjEYSGD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 14:06:03 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 995F51723;
+        Thu, 25 May 2023 11:05:18 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id 3f1490d57ef6-ba878d5e75fso1224376276.3;
+        Thu, 25 May 2023 11:05:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685037375; x=1687629375;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XbZfqBItcXzKLk1nfsDlp5Oogh2CcWLWMFdBRAuDk8A=;
-        b=1Fu2PdpCfqH0lSpeQe9fNQSos+bXML3EY2SUDzAa3hOINxqpZBiwx+MKgAXVqSW3Mf
-         MW7fpm4nqWSK2vXx3qvWinUTBWg7a9vccLx5zjdoUU4QTqUpXQq0Cx8SEyyWG85HYd/y
-         5kl7Y7yefIzp6JZhL1XHcqCn/84W0wDSnSG7xOdPYS6bKI1jZQBfUCkWFKeCtb5Kmdr4
-         8HY43RvH5ZpeqfR3AFXcThEpJ516hVdsT60gZ/C+0wXpjuO0XBywIqv8zs6gikrGO+VE
-         VATFnSylOGmFtIWVBMuC8HB7mydZsgzQ0yFx5WAscXShL+wBFMj8nK1l28M7hlQG4HXl
-         e99w==
+        d=gmail.com; s=20221208; t=1685037879; x=1687629879;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YHz1MnM6TYYio2C+7LZLfrVXy67ugaabkk4Lxt+VEKA=;
+        b=NoHSm+P+R3f9P1hTtI0Aa2538QwCPLtSoQPrBLURQdxmp107FQ1F0pBnbEQWwggzlT
+         fiTACnc6uzA/OAWqwR1JVWYYICkwBDdnIXj4ERwntlgZc/Oij0dm8rv+0LrV+CltMo3B
+         fKyXLHfkdRh4xQKVcMe8OCp5giU3Tnn12LZCznOtQl1pIuAziPLT4fePeWe5Cvh7ZNzP
+         bRQ3kdfBju0tbpe4F8kOJL6Oz3PfBgKD+/0uu8kOUyKFxwwoV5gkGDAbnMcHEgSeCLSi
+         HSGZ+QgYvXiydUgpNmaTWLnoPbGEK3dVe0T9hw+SN0OStPQTocdixTet+7JhvERZXcH+
+         xYiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685037375; x=1687629375;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XbZfqBItcXzKLk1nfsDlp5Oogh2CcWLWMFdBRAuDk8A=;
-        b=j4PizpTqTqT9srhQKCel1wTwXtJm3JipjAlWgymBorLeR9Wu95m7F3I8VND0qUrhXz
-         2kLXzFdc6ZNaXrchD2hQcAFzzripMYiNOgqqb3sXfUFGRJgZrU9zBq04cq3AhXtJb9AR
-         CCiSyWv/Huckyrxkbn7iM7ZKoATcb1UouiVV//2VjZ+cj8o8h9D3x1LE8mYSgf4TIEi7
-         ZTDHQxjhSwuvdpv5zovKPGIujlgcaWPBM/j8pZahA/tVR3pM1bOsQGzir66nAlmPZF21
-         Y0CXoge1stW8z7f2YizWf59KT93h9LaLscMshe8xuF1j+i+vrVXL75wmuKwaow4eQI8W
-         3dpQ==
-X-Gm-Message-State: AC+VfDzZvpyjnVecZbuitmiYBAROq2zh/G925Xi3dxa2uw7ElrmD3EyU
-        IQaQqyPOPWg0RvP/WWir3l1hOgDpx2c=
-X-Google-Smtp-Source: ACHHUZ4JHey+mOcsGiVcMsGqCzw8ThMYj8C/n07M15B/TbYvFT//nOZBrO0Oqn5wlK0fWMOwcq0sWS2EXSo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:fc4:b0:24d:fb1d:106d with SMTP id
- gd4-20020a17090b0fc400b0024dfb1d106dmr537997pjb.2.1685037374878; Thu, 25 May
- 2023 10:56:14 -0700 (PDT)
-Date:   Thu, 25 May 2023 10:56:13 -0700
-In-Reply-To: <20230420104622.12504-5-ljrcore@126.com>
-Mime-Version: 1.0
-References: <20230420104622.12504-1-ljrcore@126.com> <20230420104622.12504-5-ljrcore@126.com>
-Message-ID: <ZG+hPaVxYcBq8S5o@google.com>
-Subject: Re: [PATCH v2 4/7] KVM: x86/pmu: Add documentation for fixed ctr on
- PMU filter
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jinrong Liang <ljr.kernel@gmail.com>
-Cc:     Like Xu <like.xu.linux@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <shuah@kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Jinrong Liang <cloudliang@tencent.com>,
-        linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1685037879; x=1687629879;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YHz1MnM6TYYio2C+7LZLfrVXy67ugaabkk4Lxt+VEKA=;
+        b=kUIH37ZAWo7fM0tUzfBZMlgH44Wsgrhc6w7VAtUWyNutx/AeQeNjByX2zcEMy3nrli
+         mPkY74G9FtefHVHhKRE6XvMst+qXP+YsR6q5x0G1Jz90t2QRuN2J9ISmvGq3WOaICeto
+         dEWQSfVQevXKS0Jv9dxwwDBxFHVAywPXpDiohN8EYvN1Bko8+0sxsY8S7Oi/xHgK9RjY
+         852CwgToRHsWEDIxLGxk7B/3vCf4KUnO++s9ZquESY/dNnYAySXdYJiE8eFBVcp+l7C2
+         N0jIIwnmjhA2fJNIsKqGWltZRaq5lU1HGhLB0kmoenfgJdh3/b9LvCP47eL4QPYosKF7
+         9qyw==
+X-Gm-Message-State: AC+VfDzNAwP8H4RdJLuLWEP1fEBW4VMdvr+66Fk57/kDE+16n/M6vepo
+        Ni1QiIz4eSIlCaACRXwZU8UAecuPS2JgVDjeVwMF/VX+87c=
+X-Google-Smtp-Source: ACHHUZ7leu3e42UYud7EgWJZoN6PW1XGYdS9PCBG/tq5rzS7YnuUSWzFoklHW8B2kAANtPb/IRvLBp1ufSDbPWAmKj4=
+X-Received: by 2002:a25:7493:0:b0:ba8:15a3:f2e4 with SMTP id
+ p141-20020a257493000000b00ba815a3f2e4mr4848492ybc.0.1685037879336; Thu, 25
+ May 2023 11:04:39 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230501192829.17086-1-vishal.moola@gmail.com>
+ <20230501192829.17086-6-vishal.moola@gmail.com> <20230525090956.GX4967@kernel.org>
+In-Reply-To: <20230525090956.GX4967@kernel.org>
+From:   Vishal Moola <vishal.moola@gmail.com>
+Date:   Thu, 25 May 2023 11:04:28 -0700
+Message-ID: <CAOzc2pxSH6GhBnAoSOjvYJk2VdMDFZi3H_1qGC5Cdyp3j4AzPQ@mail.gmail.com>
+Subject: Re: [PATCH v2 05/34] mm: add utility functions for ptdesc
+To:     Mike Rapoport <rppt@kernel.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 20, 2023, Jinrong Liang wrote:
-> From: Jinrong Liang <cloudliang@tencent.com>
-> 
-> From: Jinrong Liang <cloudliang@tencent.com>
-> 
-> Update the documentation for the KVM_SET_PMU_EVENT_FILTER ioctl
-> to include a detailed description of how fixed performance events
-> are handled in the pmu filter. The action and fixed_counter_bitmap
-> members of the pmu filter to determine whether fixed performance
-> events can be programmed by the guest. This information is helpful
-> for correctly configuring the fixed_counter_bitmap and action fields
-> to filter fixed performance events.
-> 
-> Suggested-by: Like Xu <likexu@tencent.com>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Link: https://lore.kernel.org/oe-kbuild-all/202304150850.rx4UDDsB-lkp@intel.com
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> ---
-
-Please post this separately from the selftests changes.
-
->  1 file changed, 21 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index a69e91088d76..b5836767e0e7 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -5122,6 +5122,27 @@ Valid values for 'action'::
->    #define KVM_PMU_EVENT_ALLOW 0
->    #define KVM_PMU_EVENT_DENY 1
->  
-> +Via this API, KVM userspace can also control the behavior of the VM's fixed
-> +counters (if any) by configuring the "action" and "fixed_counter_bitmap" fields.
-> +
-> +Specifically, KVM follows the following pseudo-code when determining whether to
-> +allow the guest FixCtr[i] to count its pre-defined fixed event::
-> +
-> +  FixCtr[i]_is_allowed = (action == ALLOW) && (bitmap & BIT(i)) ||
-> +    (action == DENY) && !(bitmap & BIT(i));
-> +  FixCtr[i]_is_denied = !FixCtr[i]_is_allowed;
-> +
-> +Note once this API interface is called, the default zero value of the field
-
-No, there is no "default" value.  Userspace provides the exact value.  The KVM
-*selftest* clears fixed_counter_bitmap in all cases, but there is no default
-anywhere.
-
-> +"fixed_counter_bitmap" will implicitly affect all fixed counters, even if it's
-
-There is no implicit behavior, userspace very explicitly provides fixed_counter_bitmap.
-
-> +expected to be used only to control the events on generic counters.
-
-I would rather phrase this as:
-
----
-KVM always consumes fixed_counter_bitmap, it's userspace's responsibility to
-ensure fixed_counter_bitmap is set correctly, e.g. if userspace wants to define
-a filter that only affects general purpose counters.
----
-
-> +In addition, pre-defined performance events on the fixed counters already have
-> +event_select and unit_mask values defined, which means userspace can also
-> +control fixed counters by configuring "action"+ "events" fields.
+On Thu, May 25, 2023 at 2:10=E2=80=AFAM Mike Rapoport <rppt@kernel.org> wro=
+te:
 >
-> +When there is a contradiction between these two polices, the fixed performance
-> +counter will only follow the rule of the pseudo-code above.
+> On Mon, May 01, 2023 at 12:28:00PM -0700, Vishal Moola (Oracle) wrote:
+> > Introduce utility functions setting the foundation for ptdescs. These
+> > will also assist in the splitting out of ptdesc from struct page.
+> >
+> > ptdesc_alloc() is defined to allocate new ptdesc pages as compound
+> > pages. This is to standardize ptdescs by allowing for one allocation
+> > and one free function, in contrast to 2 allocation and 2 free functions=
+.
+> >
+> > Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> > ---
+> >  include/asm-generic/tlb.h | 11 ++++++++++
+> >  include/linux/mm.h        | 44 +++++++++++++++++++++++++++++++++++++++
+> >  include/linux/pgtable.h   | 12 +++++++++++
+> >  3 files changed, 67 insertions(+)
+> >
+> > diff --git a/include/asm-generic/tlb.h b/include/asm-generic/tlb.h
+> > index b46617207c93..6bade9e0e799 100644
+> > --- a/include/asm-generic/tlb.h
+> > +++ b/include/asm-generic/tlb.h
+> > @@ -481,6 +481,17 @@ static inline void tlb_remove_page(struct mmu_gath=
+er *tlb, struct page *page)
+> >       return tlb_remove_page_size(tlb, page, PAGE_SIZE);
+> >  }
+> >
+> > +static inline void tlb_remove_ptdesc(struct mmu_gather *tlb, void *pt)
+> > +{
+> > +     tlb_remove_table(tlb, pt);
+> > +}
+> > +
+> > +/* Like tlb_remove_ptdesc, but for page-like page directories. */
+> > +static inline void tlb_remove_page_ptdesc(struct mmu_gather *tlb, stru=
+ct ptdesc *pt)
+> > +{
+> > +     tlb_remove_page(tlb, ptdesc_page(pt));
+> > +}
+> > +
+> >  static inline void tlb_change_page_size(struct mmu_gather *tlb,
+> >                                                    unsigned int page_si=
+ze)
+> >  {
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index b18848ae7e22..258f3b730359 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -2744,6 +2744,45 @@ static inline pmd_t *pmd_alloc(struct mm_struct =
+*mm, pud_t *pud, unsigned long a
+> >  }
+> >  #endif /* CONFIG_MMU */
+> >
+> > +static inline struct ptdesc *virt_to_ptdesc(const void *x)
+> > +{
+> > +     return page_ptdesc(virt_to_head_page(x));
+>
+> Do we ever use compound pages for page tables?
 
-This is unnecessary vague.  I think what you're saying is, with a slight reword
-of the first paragraph too:
+Mips and s390 crst tables use multi-order (but not compound) pages.
+The ptdesc api *should* change that, but until all the allocation/free path=
+s
+are changed it may cause problems.
+Thanks for catching that, I'll change it in v3.
 
----
-Note, the "events" field also applies to fixed counters' hardcoded event_select
-and unit_mask values.  "fixed_counter_bitmap" has higher priority than "events"
-if there is a contradiction between the two.
----
+> > +}
+> > +
+> > +static inline void *ptdesc_to_virt(const struct ptdesc *pt)
+> > +{
+> > +     return page_to_virt(ptdesc_page(pt));
+> > +}
+> > +
+> > +static inline void *ptdesc_address(const struct ptdesc *pt)
+> > +{
+> > +     return folio_address(ptdesc_folio(pt));
+> > +}
+> > +
+> > +static inline bool ptdesc_is_reserved(struct ptdesc *pt)
+> > +{
+> > +     return folio_test_reserved(ptdesc_folio(pt));
+> > +}
+> > +
+> > +static inline struct ptdesc *ptdesc_alloc(gfp_t gfp, unsigned int orde=
+r)
+> > +{
+> > +     struct page *page =3D alloc_pages(gfp | __GFP_COMP, order);
+> > +
+> > +     return page_ptdesc(page);
+> > +}
+> > +
+> > +static inline void ptdesc_free(struct ptdesc *pt)
+> > +{
+> > +     struct page *page =3D ptdesc_page(pt);
+> > +
+> > +     __free_pages(page, compound_order(page));
+> > +}
+>
+> The ptdesc_{alloc,free} API does not sound right to me. The name
+> ptdesc_alloc() implies the allocation of the ptdesc itself, rather than
+> allocation of page table page. The same goes for free.
+
+I'm not sure I see the difference. Could you elaborate?
+
+> > +
+> > +static inline void ptdesc_clear(void *x)
+> > +{
+> > +     clear_page(x);
+> > +}
+> > +
+> >  #if USE_SPLIT_PTE_PTLOCKS
+> >  #if ALLOC_SPLIT_PTLOCKS
+> >  void __init ptlock_cache_init(void);
+> > @@ -2970,6 +3009,11 @@ static inline void mark_page_reserved(struct pag=
+e *page)
+> >       adjust_managed_page_count(page, -1);
+> >  }
+> >
+> > +static inline void free_reserved_ptdesc(struct ptdesc *pt)
+> > +{
+> > +     free_reserved_page(ptdesc_page(pt));
+> > +}
+> > +
+> >  /*
+> >   * Default method to free all the __init memory into the buddy system.
+> >   * The freed pages will be poisoned with pattern "poison" if it's with=
+in
+> > diff --git a/include/linux/pgtable.h b/include/linux/pgtable.h
+> > index 5e0f51308724..b067ac10f3dd 100644
+> > --- a/include/linux/pgtable.h
+> > +++ b/include/linux/pgtable.h
+> > @@ -1041,6 +1041,18 @@ TABLE_MATCH(ptl, ptl);
+> >  #undef TABLE_MATCH
+> >  static_assert(sizeof(struct ptdesc) <=3D sizeof(struct page));
+> >
+> > +#define ptdesc_page(pt)                      (_Generic((pt),          =
+       \
+> > +     const struct ptdesc *:          (const struct page *)(pt),      \
+> > +     struct ptdesc *:                (struct page *)(pt)))
+> > +
+> > +#define ptdesc_folio(pt)             (_Generic((pt),                 \
+> > +     const struct ptdesc *:          (const struct folio *)(pt),     \
+> > +     struct ptdesc *:                (struct folio *)(pt)))
+> > +
+> > +#define page_ptdesc(p)                       (_Generic((p),           =
+       \
+> > +     const struct page *:            (const struct ptdesc *)(p),     \
+> > +     struct page *:                  (struct ptdesc *)(p)))
+> > +
+> >  /*
+> >   * No-op macros that just return the current protection value. Defined=
+ here
+> >   * because these macros can be used even if CONFIG_MMU is not defined.
+> > --
+> > 2.39.2
+> >
+> >
+>
+> --
+> Sincerely yours,
+> Mike.
