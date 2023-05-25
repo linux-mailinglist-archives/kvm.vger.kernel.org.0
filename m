@@ -2,214 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AFE20710593
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 08:10:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E331710627
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 09:21:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235080AbjEYGKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 02:10:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56942 "EHLO
+        id S234281AbjEYHVj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 03:21:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjEYGKd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 02:10:33 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1443E6;
-        Wed, 24 May 2023 23:10:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684995025; x=1716531025;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=raZliX21fsLMvljBUB2fEbeToyOCAeOsxdSotZJV8eo=;
-  b=TxN7AP/iWq+a7XPS60/MVtFU6O6zqPjvrifCrL/ztc6c1HUBT4JW0EAq
-   kal0Rj5QTFbBkVchHI/fJrWZ36KxydaWFn4XiTG0jJ9wictcDWcgccj0C
-   dex8iWniXfhOF/MF+Rx98dXJ4I2hCqk3moTVzM/VPqOlqXZ744H+8XFKl
-   1j5CfJsIPv/D1ROcmyAKXiR/MGdYXOW0qsuHpr9Lt0sUZqSl9xHio64py
-   9SD40kfg9KTA5XPHJgQGyKRTcJz9UnNStYeqQ524JpDefeuT/XNjobWwr
-   344zElOAKKtzv3R4bWXIT6VhA1gYwNx3pm+nqvGRl62J/4HfmLGZFLHhG
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10720"; a="419514531"
-X-IronPort-AV: E=Sophos;i="6.00,190,1681196400"; 
-   d="scan'208";a="419514531"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2023 23:10:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10720"; a="704677654"
-X-IronPort-AV: E=Sophos;i="6.00,190,1681196400"; 
-   d="scan'208";a="704677654"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga002.jf.intel.com with ESMTP; 24 May 2023 23:10:25 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Wed, 24 May 2023 23:10:24 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Wed, 24 May 2023 23:10:24 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Wed, 24 May 2023 23:10:24 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P7dWpetTvr4EcnNeLuB+YzIPRbLCMuGI5GGszWEtGYY+nykNDW/bssH8gs2nbwocgtBQq47KbrxvMpDIM8ICZeBQsn1PixrvC2WYyNTzkQ1P+OrcMt5FHqH9vXacqIKxN/isnOo9wWUlC4w0/kypi/bF0zM8KebnqXZYnfod4xqFkZkQcNhIBxHx52+Wk28twuI/tO+grXmAApd66f19TkLNc0lLafqHt4OoEMH6emV6u5roekgiQ1loubl5kEHPkt15aRhW8VWTxWZea31LJlYrxu0pGGNInwRxDSy4yzOb0qMygNFRIFSt9dTI9fQR3srgjtZkB68V/XIL0J3EsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EUIh7yuUmqzjyUwrlajAw+ifseVBS2/QlX8ryDsJ8fE=;
- b=ei4n1er4ZUxlf+J2sTyEuLRgFOCxgxAfRnrx2pqsYLQAeoUciPPTRDvAGj9sbhy4FGPoHuM7gi1jQI3aPKnKfh+Yrs45G118DSXsJGD87C2LiDqAuF8QpqfaJ3jCAmczaz3dwtVK9ggo1lU5QrU2NlIcdyXldHslxKykQz+8cBqKsdzELmosUkCVmiFsmXzSoZ8GHBEF4LF9gGnLcBpt/dyGyV+aCBmG4c9ajwyUaBfIZNtNVmJOw2P2nOlCeqonrW0YdfN6nd0ZK6KuPyOPJzFtce7m0awq3cY9DdinGmbpEXPqZvIKgAhH0IASaZZjFoLg+YgUqWh8Z1RY07WoVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by DS0PR11MB7359.namprd11.prod.outlook.com (2603:10b6:8:134::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.16; Thu, 25 May
- 2023 06:10:21 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::b4cb:1f70:7e2a:c4f5]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::b4cb:1f70:7e2a:c4f5%2]) with mapi id 15.20.6411.028; Thu, 25 May 2023
- 06:10:21 +0000
-Date:   Thu, 25 May 2023 14:10:10 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-CC:     <seanjc@google.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <peterz@infradead.org>,
-        <rppt@kernel.org>, <binbin.wu@linux.intel.com>,
-        <rick.p.edgecombe@intel.com>, <john.allen@amd.com>,
-        Zhang Yi Z <yi.z.zhang@linux.intel.com>
-Subject: Re: [PATCH v3 07/21] KVM:x86: Refresh CPUID on write to guest
- MSR_IA32_XSS
-Message-ID: <ZG77wu4PyBn1z587@chao-email>
-References: <20230511040857.6094-1-weijiang.yang@intel.com>
- <20230511040857.6094-8-weijiang.yang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230511040857.6094-8-weijiang.yang@intel.com>
-X-ClientProxiedBy: SG2P153CA0035.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c7::22)
- To PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+        with ESMTP id S234189AbjEYHVg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 03:21:36 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20FC419D;
+        Thu, 25 May 2023 00:21:35 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-2553663f71eso819790a91.3;
+        Thu, 25 May 2023 00:21:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684999294; x=1687591294;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Xqc0RvBjEqmfMd1qioMCyBJH4DDZdjxzMOj0X5GfsUA=;
+        b=gVlD33aFtOvzkcMkjOJ1fIcAsTV+rLJybqU5nLh5n7mK9K/xH9tWAzYgoNQrCpNzQI
+         gNdVIfwhcj32Xkr//kBOI/fZwy4qPkJOyjT/ndcJ9rGoHxucTUDOazC6Ff67pLMu4O1g
+         Z+1JDlh6ZrD2/nwUI0A8be0EpO0cmc5OSD3C03ecvqVsskQZSWlKofxeU/QnTjQBgTGP
+         S8EA8JrG76ODO5Cqe3zWQRvKzhBZIl9kMDrob4qb+c8iRP5IpEjy0MH4czojugLfHVD8
+         6+MyRN0ZujXqMbMr+CloWAYSHJWXZ5TGHx3HkVnQFbmsw7RzIQHv0J6x7Fu5MzgU2LBK
+         r8Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684999294; x=1687591294;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xqc0RvBjEqmfMd1qioMCyBJH4DDZdjxzMOj0X5GfsUA=;
+        b=IXxKy33Ln8mNZAWVxuY75ie37+IA/plckL96WoFfsgf2FlvNGt3lH57ISRN/av6Wr9
+         aJyCy5axPMwJykxDafRyYHah/abARNlkDJcKskrE+nB8gALk8JqjyYT/No54oSfDon8G
+         +b6ZdKy9gtnVc+zfDp/DPoJ1lvfFLQvIw498O1KyiHIKCE4pOZsUHhwQ+hHFL0CdQkb5
+         Mkmw+tW/8rr/5dyhN95kVaTZCZ+fotISQAjdcc1//eacZJUVfloCRGF29/hpqyZ4Kvrj
+         1uV7lRgk5gU4gQzWsqxrWDWsDXmjvIi+nmm55g1mA4rU91QI5p7qPTf1ututf8ynSCxf
+         t8Qg==
+X-Gm-Message-State: AC+VfDyvRR/rtZQCg3ktDG9uLuptEH+5bbRp0lK+qMjhnpeyKui0V8rx
+        59hzfSlHHhfsiyQnFhCo5ho=
+X-Google-Smtp-Source: ACHHUZ5IYbP3gSc5r6+a5rwq/3ZjNdRBiDTIFHh8RjXFUliqBUw8onJAOOk1gJ3maZ3R7QkHFAGCQw==
+X-Received: by 2002:a17:90a:9317:b0:253:62c2:4e1b with SMTP id p23-20020a17090a931700b0025362c24e1bmr640751pjo.48.1684999294520;
+        Thu, 25 May 2023 00:21:34 -0700 (PDT)
+Received: from [172.27.236.17] (ec2-16-163-40-128.ap-east-1.compute.amazonaws.com. [16.163.40.128])
+        by smtp.gmail.com with ESMTPSA id l64-20020a633e43000000b0053ef188c90bsm467964pga.89.2023.05.25.00.21.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 May 2023 00:21:34 -0700 (PDT)
+Message-ID: <393b16f7-8359-5d77-7d5d-8942de987331@gmail.com>
+Date:   Thu, 25 May 2023 15:21:28 +0800
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|DS0PR11MB7359:EE_
-X-MS-Office365-Filtering-Correlation-Id: 78f344ee-80b6-4376-d8c4-08db5ce6b87a
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oJZ1XkCWryAjK5OhuFp6yE3iC2Bk2dS+ZtfVfeL9S+6Z49tmGi5/S/lSqc30qGuO45srs3pjyCXn1ioyBcuIp1dV4R0ZH4OfTpgQt1Bz6uGtoCVjbDpckfkbPbVFM1MvxZMZD4RJ92U/t3UcEojpyB2Z4SpilD4yA4W3MGL+m5hdYKFVm48tgHgI8LSFk/BImqj5qIPyzONQISEA4pMHyBWWT5dbvehM9vuSX1UPwosXzeOpmQnnUs4L234xCT/EY2s5OG1TneC4S4jtGqzD6Wy0gg+kvNBypBkUVZL3F4lDqjEKY7ZdD5E8wXuIbRXDvL/w7mb78XXZxffhaMetzxQ8bcdhxYjiE2/aEaz7S6CyueLripQ8BK6vZ/ledGwvbM2s2/bE2sXtN8dubEYMXbvo+mKCDHJZ9IX5GE7WkmI0lkh5qjFMVIpIxHpZh5BAt2QIjxB8H1epS/4Uafljfpqto45wapuE2e5b6FBtvSZ89nAtrq2144usedzRwVW6d9iAkitbZM+W03+6m/O+D7G8WLmsV3jc/hiPj+4DWAcL2jK3AxHq2/xr+q8+CE0D
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(376002)(396003)(136003)(346002)(39860400002)(366004)(451199021)(33716001)(41300700001)(9686003)(6512007)(6506007)(8936002)(6862004)(8676002)(44832011)(186003)(26005)(86362001)(4326008)(2906002)(478600001)(66946007)(6636002)(66556008)(66476007)(5660300002)(316002)(83380400001)(38100700002)(6486002)(6666004)(82960400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?JrZRjt5KeFGIpyrrk9cWi061g8CvthrNghd4TQRNOGuiMnIgKvhUGnJzKqav?=
- =?us-ascii?Q?BqeVr/YobIEjjg1GRgcTXIv3narwGhgcz+YEFTdjEo0Gzysb63Sdz8EJD6Zz?=
- =?us-ascii?Q?kOeuSD39q6GuqQvwbvES1O8Rfs7rBSVvBFEkvQuplKK49kpD8wxOPupt+sm6?=
- =?us-ascii?Q?aCGCzBcWwtlMxwqXvOV1gHiaQqZk/o1bmpsjGjbfKp2W20laTy0e0AC1/VQw?=
- =?us-ascii?Q?2FaIF+vzUMSVB6UetPspNFad2XPnAqch9tiEskwNeQrhqdznSzW4x1L0pYPB?=
- =?us-ascii?Q?+YGlm+50HcBOLzy9tG9hguFV8vfuUsJbBEXi/5g6E7LT0txRlx+EHPji15d7?=
- =?us-ascii?Q?HM76XQdb0cTdVf8VL7+y5TYvQhy9f1OVGUehTGrP5oJkz7ryfvXqxkDNIpOh?=
- =?us-ascii?Q?UpGNTxwQHYypDOq241AhsQ7zGe14kmwIXxDJkbIyF3ML18ieVKs2J5ZNjRVm?=
- =?us-ascii?Q?KmnxgKJDIILKhPaMQE9JFfCoMziIDmoYqmYXq0VF00DM3Jd1j0YFSUljl8F+?=
- =?us-ascii?Q?5d30B2kDkNiSUrlB6SwDi/I3hM3Wye3RfVBDy81NpxLkHJJTd+O/w2P80Oqr?=
- =?us-ascii?Q?MPouBUqZTb5PAikGSQOpNw7w4oekRJen4DoMHpOW24O3qtgRcF7L3F/rsWqA?=
- =?us-ascii?Q?Ro1jEI7/UheI7eTV55ifO4dmxHHa2nD3NUI2/iGry4oGCxpMSKwSMPzu5vzd?=
- =?us-ascii?Q?J377d/r1HMFbtcJafAQ+SODWND+UthxHzqURB3HCIUf/z9EKS2n4a0elrBCl?=
- =?us-ascii?Q?fDxTpR2r0Hu2xZB+PecRV8B1z0NJWXCF0qd+HK+8x/2Yi8gsEK2DWtS8qPca?=
- =?us-ascii?Q?x5mhg0jQMj29EynTo9YySrWXmzOgitU1O8ZKEyb0PUN2o1Cilv8eVgV1AgTj?=
- =?us-ascii?Q?06O6ZMVyPKRGgoLcdiPCOGEKmeXYRXfSdg7JfDortK3Mls6yChskRk5bnskH?=
- =?us-ascii?Q?sk7J8yQgjkKz/RHJh4tXK5nhEPCqfvoR+xyLpy58pcO9nsEe881hXlyG5ClG?=
- =?us-ascii?Q?s63fZW16YbIh8Y2RHKS6crzM/3eLd+yKWR6Dq5QiI0FfmZ14C1hqolnsZ86c?=
- =?us-ascii?Q?D2qNKiAMIP1xk0KYwJG0gBYXzYpTvr/Bw0K5IPLCN77koGb1QMvhnYwo9WOh?=
- =?us-ascii?Q?9Ey76OytuasZDosi2aUPRljphbM7lIQ4i8XXgjp8i4tZdUg9XNamg3YlNAht?=
- =?us-ascii?Q?MsMiU4bUjMliS2MPyU+0ALnWfwvcpvi6gj5756axsf7cMo1p5rqlMlcGmcCI?=
- =?us-ascii?Q?be5IH6ELZLfAVQXjHqI4sJDXMtPDV3ZnFFp4zV0/KNeodubDGwe8A48tArgL?=
- =?us-ascii?Q?lX17amhIvQfPGY2UFwSdBCBc8SUCdYaM8Frd46AaDGWJQFOMLPWCuWWSel9k?=
- =?us-ascii?Q?yM9tx1U9FTtNoZE2MyDH2NPebSQf6y9DkpJoxNMrCmIIIi6Fn/C0fxVkbzjW?=
- =?us-ascii?Q?jZrX53HvYh/6ifRIww3+ITyi1ojftS1pQ9CMAojSMl6z2PViN87I3M3rpYqG?=
- =?us-ascii?Q?EvjYmPJcS0MnRO9O/M/vbs8M+aDdGszRsVDefsz1ZqRJonLp6/Xhbs9vRSHu?=
- =?us-ascii?Q?bxz9AeSfjEK0YjPBe9s8m9Gp7z+nWL6x6KWxhwAM?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 78f344ee-80b6-4376-d8c4-08db5ce6b87a
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 May 2023 06:10:21.2119
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ms4+hpYTWGufqbRWtKMtJSxFryduUZkisgprpNZNDbkV0//JzQM7ul/IHDzAepTVoHDTqvwowjB2wnaDFtqUvA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7359
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v2 5/6] KVM: x86: Keep a per-VM MTRR state
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, seanjc@google.com
+References: <20230509134825.1523-1-yan.y.zhao@intel.com>
+ <20230509135300.1855-1-yan.y.zhao@intel.com>
+ <3f09e751-33fd-7d60-78cd-6857d113e8bd@gmail.com>
+ <ZGxbat2mM6AfOOVv@yzhao56-desk.sh.intel.com>
+Content-Language: en-US
+From:   Robert Hoo <robert.hoo.linux@gmail.com>
+In-Reply-To: <ZGxbat2mM6AfOOVv@yzhao56-desk.sh.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 11, 2023 at 12:08:43AM -0400, Yang Weijiang wrote:
->Update CPUID(EAX=0DH,ECX=1) when the guest's XSS is modified.
->CPUID(EAX=0DH,ECX=1).EBX reports current required storage size for all
->features enabled via XCR0 | XSS so that guest can allocate correct xsave
->buffer.
->
->Note, KVM does not yet support any XSS based features, i.e. supported_xss
->is guaranteed to be zero at this time.
->
->Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
->Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
->Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
->---
-> arch/x86/kvm/cpuid.c | 7 +++++--
-> arch/x86/kvm/x86.c   | 6 ++++--
-> 2 files changed, 9 insertions(+), 4 deletions(-)
->
->diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->index 123bf8b97a4b..cbb1b8a65502 100644
->--- a/arch/x86/kvm/cpuid.c
->+++ b/arch/x86/kvm/cpuid.c
->@@ -277,8 +277,11 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
+On 5/23/2023 2:21 PM, Yan Zhao wrote:
+[...]
+> Yes, leaving each vCPU's MTRR to mimic HW.
 > 
-> 	best = cpuid_entry2_find(entries, nent, 0xD, 1);
-> 	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
->-		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
->-		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
->+		cpuid_entry_has(best, X86_FEATURE_XSAVEC))) {
-
-Align indentation.
-
- 	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
-		     cpuid_entry_has(best, X86_FEATURE_XSAVEC))) {
-
->+		u64 xstate = vcpu->arch.xcr0 | vcpu->arch.ia32_xss;
->+
->+		best->ebx = xstate_required_size(xstate, true);
->+	}
+> As also suggested in SDM, the guest OS manipulates MTRRs in this way:
 > 
-> 	best = __kvm_find_kvm_cpuid_features(vcpu, entries, nent);
-> 	if (kvm_hlt_in_guest(vcpu->kvm) && best &&
->diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->index 33a780fe820b..ab3360a10933 100644
->--- a/arch/x86/kvm/x86.c
->+++ b/arch/x86/kvm/x86.c
->@@ -3776,8 +3776,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> 		 */
-> 		if (data & ~kvm_caps.supported_xss)
+> for each online CPUs {
+> 	disable MTRR
+> 	update fixed/var MTRR ranges
+> 	enable MTRR
+> }
+> Guest OS needs to access memory only after this full pattern.
+> 
+Thanks for confirmation and clarification.
 
-Shouldn't we check against the supported value of _this_ guest? similar to
-guest_supported_xcr0.
+> So, I think there should not have "hazard of inconsistency among per-VPU MTRR
+> states".
+> 
+> I want to have per-VM MTRR state is because I want to reduce unnessary EPT
+> zap, which costs quite a lot cpu cycles even when the EPT is empty.
+> 
+> In this patch, per-VM MTRR pointer is used to point to vCPU 0's MTRR state,
+> so that it can save some memory to keep the MTRR state.
+> But I found out that it would only work when vCPU 0 (boot processor) is
+> always online (which is not true for x86 under some configration).
+> 
+> I'll try to find out lowest online vCPU and keep a per-VM copy of MTRR state
+> in next version.
+> 
+> Thanks!
+> 
 
-> 			return 1;
->-		vcpu->arch.ia32_xss = data;
->-		kvm_update_cpuid_runtime(vcpu);
->+		if (vcpu->arch.ia32_xss != data) {
->+			vcpu->arch.ia32_xss = data;
->+			kvm_update_cpuid_runtime(vcpu);
->+		}
-> 		break;
-> 	case MSR_SMI_COUNT:
-> 		if (!msr_info->host_initiated)
->-- 
->2.27.0
->
+IIUC, your saving comes from skips the intermediate state during boot, when 
+APs goes through setting MTRR, which would cause SPTE zap before your this 
+patch set.
+
+MHO was, now that your ignores other vCPU's MTRR settings (unless it is 
+different from BP's MTRR?), why not let each vCPU's MTRR set/update 
+directly set to the per-VM MTRR states (if differs from current value). 
+It's guest OS/BIOS's responsibility to keep the consistency anyway. And 
+even if the malfunction caused by the inconsistency might differ from that 
+of native, SDM doesn't clearly state how the malfunction should be, does it?
+that's to say, anyone knows, when inconsistency happens, does it cause that 
+logical processor malfunction or in fact it impacts the global MTRR 
+settings? If the latter, I think leaving only the per-VM MTRR state aligns 
+with native.
+
+BTW, with regard to KVM_X86_QUIRK_CD_NW_CLEARED, I see svm honors it while 
+vmx doesn't before it clear CR0.CD/NW.
+
+svm_set_cr0():
+
+	if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
+		hcr0 &= ~(X86_CR0_CD | X86_CR0_NW);
+
+
+vmx_set_cr0():
+
+	hw_cr0 = (cr0 & ~KVM_VM_CR0_ALWAYS_OFF);
+
+Perhaps vmx side can be fixed passingly?
