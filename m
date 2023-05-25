@@ -2,87 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B61E971112D
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 18:41:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56E38711189
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 19:00:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239409AbjEYQlo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 12:41:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45872 "EHLO
+        id S240510AbjEYRAi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 13:00:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238874AbjEYQln (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 12:41:43 -0400
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08D8F197
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 09:41:40 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3f6cbf02747so6311125e9.1
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 09:41:40 -0700 (PDT)
+        with ESMTP id S229832AbjEYRAg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 13:00:36 -0400
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE4A194;
+        Thu, 25 May 2023 10:00:35 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id 3f1490d57ef6-ba86ec8047bso1164565276.3;
+        Thu, 25 May 2023 10:00:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1685032899; x=1687624899;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tCR9GGMFNorDSK4vdX+Y26zqtl9VCvHN3JUMiQf7Kew=;
-        b=o0+muES5ARWipQlSHLAB/7akRAZep94c2231xrpi4KXF9lrhcshS97WUidLAwDlV0z
-         RynFU2r3rhKJw/R/nmU6WNfQKB4sdhG5wGjyacVparRSMjT7utlC++3SKNxIWbmEnrqb
-         iCHXwHQ5JCmxDfuVyoomnxx5fXlCmn1FrU94WX//iqa63oTjwym++VI7aXvtVcJPJAnk
-         NxFrHDfHj4z65JE9h93cXQOWf1cNMP7ZqPFB+34FkNCQsI0ojVWYt5Mptr5g22z9HLCz
-         +k1c5zZRwyDfMpndDIIqYhg4r4xDlr4ri4WYXwWXwOy9+6CcBzDuWlNxUyQWJI0UThtJ
-         0Gpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685032899; x=1687624899;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1685034035; x=1687626035;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tCR9GGMFNorDSK4vdX+Y26zqtl9VCvHN3JUMiQf7Kew=;
-        b=NZPsOBf7IccSMBzAMIIue5URdQsuP5RmhoeelY9OhFKRvX5kL6GopokiDDJdrfpHcx
-         lcHA89nf1x5bQY2JoURO3Loj0luFJ8pNQ1LgHbwZuxS1RTVLuTHDu6y6BNJAVDfBDBGW
-         cGwfRTB4UsJcFbymsfiQ9wZk+bF/nUQ/a4o8EtmxWOoo8sU1u7U4KkOBAoBcWxMr1w9H
-         erXK19WA85CQfeVesIF8YIDouydYSWkjINffpb5QC99o3eMe9xqp66ed9iAWavzE6Gcb
-         lB9KuDn33m366y5EnXnQI6CGL4rYGu9+JfV9wTNWrj9m6sLSPcy+R5JXfSQYkm/6zKEj
-         ljLw==
-X-Gm-Message-State: AC+VfDzJE0wIOlrXnvpuFb7LP1bG4xyBQotpOaY/oZtH1TQyB3os0ko/
-        6ojlLEPCd0qacIlCAZhWnenymA==
-X-Google-Smtp-Source: ACHHUZ53ktqlluQQR/F53uKrM+aSDG4pKo6I8rAgr8k2wvNBb6mDiqz/ahIuAkvn+sNwUSvJ1bkr1w==
-X-Received: by 2002:a05:600c:d0:b0:3f6:119:ee11 with SMTP id u16-20020a05600c00d000b003f60119ee11mr3346603wmm.32.1685032899461;
-        Thu, 25 May 2023 09:41:39 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id o16-20020a5d58d0000000b002ffbf2213d4sm2338037wrf.75.2023.05.25.09.41.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 May 2023 09:41:39 -0700 (PDT)
-Date:   Thu, 25 May 2023 18:41:38 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Haibo Xu <haibo1.xu@intel.com>
-Cc:     xiaobo55x@gmail.com, maz@kernel.org, oliver.upton@linux.dev,
-        seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 10/11] KVM: riscv: selftests: Skip some registers set
- operation
-Message-ID: <20230525-50097c796339f56320da7643@orel>
-References: <cover.1684999824.git.haibo1.xu@intel.com>
- <a10cd1ff57e07e408d08eca7e6a4557217ca0af3.1684999824.git.haibo1.xu@intel.com>
+        bh=JHrTsqL0nqeqxBvVw7n3mE3d9UFJpL2j8If6jZFByTc=;
+        b=VEXX4D+/ehgygAWm5BmRxKMQVayX+huiD86BmHpUJbQZIavyZk8MqgFgBVJCgltW8G
+         DGf1XLm8HhYD7C5Ltu5hncRV4xkFiRLvjnKAKUZAVqhHyZU7uDae6IK3C5qSD3GFgpGy
+         OqLSmV63QlFHc9BLqOH+z3/46t/qsNvryv2gOmzRQJTarAzeFF3wkmaawd/u1vYzudf+
+         2OoFyE7ArYkSpPwfiPG4wUCBT5egkmxxlXwXAVhzZYomT8xAIzGjfTrChNVAlbK2FaKO
+         3t03QrSsNM3MzVGbAgb9jEqdKkZ/GGbY36ZIzPCKupNWpFQuCEQc+t41/FAd5d9jW5uu
+         ry0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685034035; x=1687626035;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JHrTsqL0nqeqxBvVw7n3mE3d9UFJpL2j8If6jZFByTc=;
+        b=RMzZUDsJuZLFwgNW98WpKtE0ELbyAiHu1ZKZKNTR0WmqNKZKoXvuKYpCk0sAd8GvrV
+         tEVjLZNihwtsJ+7ELcn5/Wu7Z/OolSONBQfoJ7u7LFEU/MAHrbWrGxnpSWKDzwGwaHZF
+         xZVQp0L1WW/rhxbN8mihO+t9VO4Sdd5gPaYY3iiy0jsbJc3ODwR1p4qL1+r9DfYE0vDg
+         8JfEqi8GOlgYwmhHlIsEdsi6xnStaVP0X1QLzWNoxTKDiLFav7iIT382D0GIvKY7RwWN
+         JKybNMvOdXyF5xgzbl7nuMqVlgFEe8LZUoz/cgYMYonpSrmYxzynYgCn0ui0ItvfGR05
+         5/IQ==
+X-Gm-Message-State: AC+VfDx8+JIBFKYl9eFzTAc5/+skqsZNO5jo7VisB7gsMRGosQzcvIvb
+        9mgWXarQKat5ShyFN5Qo9hPWbhNEhfOoTFMT05y4MRzA
+X-Google-Smtp-Source: ACHHUZ47ymCJWriUjad8DQ05hIMcCKin/PTMMU7nNv3HHwEyV9e0xB3DhHdcf1Fkkg8cgW7lAUtL7p6ayG4dp+Ur5MI=
+X-Received: by 2002:a25:2487:0:b0:ba8:5ded:13f3 with SMTP id
+ k129-20020a252487000000b00ba85ded13f3mr4152229ybk.17.1685034034679; Thu, 25
+ May 2023 10:00:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a10cd1ff57e07e408d08eca7e6a4557217ca0af3.1684999824.git.haibo1.xu@intel.com>
+References: <20230501192829.17086-1-vishal.moola@gmail.com>
+ <20230501192829.17086-2-vishal.moola@gmail.com> <20230525085555.GV4967@kernel.org>
+In-Reply-To: <20230525085555.GV4967@kernel.org>
+From:   Vishal Moola <vishal.moola@gmail.com>
+Date:   Thu, 25 May 2023 10:00:23 -0700
+Message-ID: <CAOzc2pxx489C26NnS9NHkUQY9PYiagzt-nYK6LnkJ1N3NYQWzg@mail.gmail.com>
+Subject: Re: [PATCH v2 01/34] mm: Add PAGE_TYPE_OP folio functions
+To:     Mike Rapoport <rppt@kernel.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,52 +77,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 25, 2023 at 03:38:34PM +0800, Haibo Xu wrote:
-> Set operation on some riscv registers(mostly pesudo ones) was not
-> supported and should be skipped in the get-reg-list test. Just
-> reuse the rejects_set utilities to handle it in riscv.
-> 
-> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> ---
->  tools/testing/selftests/kvm/get-reg-list.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing/selftests/kvm/get-reg-list.c
-> index f1fc113e9719..ebd6b580b33b 100644
-> --- a/tools/testing/selftests/kvm/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/get-reg-list.c
-> @@ -211,16 +211,22 @@ static void run_test(struct vcpu_reg_list *c)
->  			++failed_get;
->  		}
->  
-> -		/* rejects_set registers are rejected after KVM_ARM_VCPU_FINALIZE */
-> +		/*
-> +		 * rejects_set registers are rejected after KVM_ARM_VCPU_FINALIZE on aarch64,
-> +		 * or registers that should skip set operation on riscv.
-> +		 */
->  		for_each_sublist(c, s) {
->  			if (s->rejects_set && find_reg(s->rejects_set, s->rejects_set_n, reg.id)) {
->  				reject_reg = true;
-> -				ret = __vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
-> -				if (ret != -1 || errno != EPERM) {
-> -					printf("%s: Failed to reject (ret=%d, errno=%d) ", config_name(c), ret, errno);
-> -					print_reg(config_name(c), reg.id);
-> -					putchar('\n');
-> -					++failed_reject;
-> +				if ((reg.id & KVM_REG_ARCH_MASK) == KVM_REG_ARM64) {
-> +					ret = __vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
-> +					if (ret != -1 || errno != EPERM) {
-> +						printf("%s: Failed to reject (ret=%d, errno=%d) ",
-> +								config_name(c), ret, errno);
-> +						print_reg(config_name(c), reg.id);
-> +						putchar('\n');
-> +						++failed_reject;
-> +					}
->  				}
->  				break;
->  			}
-> -- 
-> 2.34.1
+On Thu, May 25, 2023 at 1:56=E2=80=AFAM Mike Rapoport <rppt@kernel.org> wro=
+te:
 >
+> Hi,
+>
+> On Mon, May 01, 2023 at 12:27:56PM -0700, Vishal Moola (Oracle) wrote:
+> > No folio equivalents for page type operations have been defined, so
+> > define them for later folio conversions.
+>
+> Can you please elaborate why would we need folios for page table descript=
+ors?
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Thanks for the review!
+
+These macros are for callers that care about the page type, i.e. Table and
+Buddy. Aside from accounting for those cases, the page tables don't use fol=
+ios.
+These are more for the cleanliness of those callers.
