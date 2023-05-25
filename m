@@ -2,91 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 325617107F6
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 10:55:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 202BA710816
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 10:57:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240373AbjEYIzO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 04:55:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42688 "EHLO
+        id S240642AbjEYI5A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 04:57:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230389AbjEYIzM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 04:55:12 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0505798;
-        Thu, 25 May 2023 01:55:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=4b2eicAEuLtRWdZtNZ5cHEIkzBFWO5fbGUCIkmElStA=; b=awjODk2fwPYTgmCI5gJmw6l9OT
-        webj8qbFiwu2EL0MRewtFXEC24of9u7MvAW5satunvNuK0PfsEXnHCvwZdPeVlmrsw6YlUMgskELw
-        WNFvHhYGq2vX1/nA3+RnT7Ewviy63PEB/VQJlSpqkZNlmRE6hBD+qKC25FfdB8cV/yZPZ6qBNLpBo
-        en8dqOWQjXH3kLxP48mjho4LySuKy+LkE7/OcY26lmBWJY9wsywIRwmVJ4noS0NZY3hsyN8wzzxgY
-        eo9zRmZLXoe6kD+DKJ5sOgSpyhphRKbS6OSMZfY7OxgblBnBnlx+363WZE2cNfcb8tk/Pqg7uMSA3
-        iH5ae6cg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q26jT-00C1Be-HE; Thu, 25 May 2023 08:54:03 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id AA4AA3002F0;
-        Thu, 25 May 2023 10:54:00 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 3566720A78733; Thu, 25 May 2023 10:54:00 +0200 (CEST)
-Date:   Thu, 25 May 2023 10:54:00 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Kautuk Consul <kconsul@linux.vnet.ibm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v7 08/14] KVM: Rename mmu_notifier_*
-Message-ID: <20230525085400.GP4253@hirez.programming.kicks-ass.net>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-9-chao.p.peng@linux.intel.com>
- <ZGxo9ylqYI8JXjGn@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
- <ZGzLf4zgxpBjghaF@google.com>
- <ZG2qv9sWl2RUnGqd@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
- <ZG5wg3VbG4rCYrfk@google.com>
- <20230524203336.GC3447678@hirez.programming.kicks-ass.net>
- <ZG6EJoXbduApRsgV@google.com>
+        with ESMTP id S240590AbjEYI4g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 04:56:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C08E10C1;
+        Thu, 25 May 2023 01:56:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 04A2564412;
+        Thu, 25 May 2023 08:56:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9425AC433EF;
+        Thu, 25 May 2023 08:56:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685004981;
+        bh=T3x6HsAO3RQbrXA8lAmGWzhIEFxQo3e/SuF/zmio4Hs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mRtUeUA+TIvgOPBLeDE0LEeluR6Lkzocki1ce4LxvGW3Kh74OsnmFoUFRRmQEOqgY
+         vPbs8UllpBsHYQNETyRPKHNQXbkjzvcZ/qcNMJMO2YSn7oQ9dFwS8Ece6KmReDjGKv
+         UHsfvGg5kn0tsbjmZAqeTwYppOTlzTxEsz6d+ZO+0GcrxaOJ0wF3N2ge6+B4EiqPJP
+         Rr14bkavs3kxuqVnqdy8wSuE2VMYBsI0nPEtl+gq6jIzwj54Hlj3QoMxeOG7OsIhLt
+         Fod2UUbjMqcZpiBjbvghJGsfjbRDVycHZQ/GoUx1cUGXfXrx/0id06caAMVPKwYBaI
+         blTpXwhMXt6qg==
+Date:   Thu, 25 May 2023 11:55:55 +0300
+From:   Mike Rapoport <rppt@kernel.org>
+To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 01/34] mm: Add PAGE_TYPE_OP folio functions
+Message-ID: <20230525085555.GV4967@kernel.org>
+References: <20230501192829.17086-1-vishal.moola@gmail.com>
+ <20230501192829.17086-2-vishal.moola@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZG6EJoXbduApRsgV@google.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+In-Reply-To: <20230501192829.17086-2-vishal.moola@gmail.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,17 +62,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 24, 2023 at 02:39:50PM -0700, Sean Christopherson wrote:
-> On Wed, May 24, 2023, Peter Zijlstra wrote:
-> > On Wed, May 24, 2023 at 01:16:03PM -0700, Sean Christopherson wrote:
-> > > Of course, the only accesses outside of mmu_lock are reads, so on x86 that
-> > > "atomic" access is just a READ_ONCE() load, but that's not the case for all
-> > > architectures.
-> > 
-> > This is true on *all* archs. atomic_set() and atomic_read() are no more
-> > and no less than WRITE_ONCE() / READ_ONCE().
-> 
-> Ah, I take it s390's handcoded assembly routines are just a paranoid equivalents
-> and not truly special?  "l" and "st" do sound quite generic...
+Hi,
 
-Yep, compiler *should* generate the same with READ_ONCE/WRITE_ONCE.
+On Mon, May 01, 2023 at 12:27:56PM -0700, Vishal Moola (Oracle) wrote:
+> No folio equivalents for page type operations have been defined, so
+> define them for later folio conversions.
+
+Can you please elaborate why would we need folios for page table descriptors? 
+ 
+> Also changes the Page##uname macros to take in const struct page* since
+> we only read the memory here.
+> 
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> ---
+>  include/linux/page-flags.h | 20 ++++++++++++++++++--
+>  1 file changed, 18 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> index 1c68d67b832f..607b495d1b57 100644
+> --- a/include/linux/page-flags.h
+> +++ b/include/linux/page-flags.h
+> @@ -902,6 +902,8 @@ static inline bool is_page_hwpoison(struct page *page)
+>  
+>  #define PageType(page, flag)						\
+>  	((page->page_type & (PAGE_TYPE_BASE | flag)) == PAGE_TYPE_BASE)
+> +#define folio_test_type(folio, flag)					\
+> +	((folio->page.page_type & (PAGE_TYPE_BASE | flag)) == PAGE_TYPE_BASE)
+>  
+>  static inline int page_type_has_type(unsigned int page_type)
+>  {
+> @@ -914,20 +916,34 @@ static inline int page_has_type(struct page *page)
+>  }
+>  
+>  #define PAGE_TYPE_OPS(uname, lname)					\
+> -static __always_inline int Page##uname(struct page *page)		\
+> +static __always_inline int Page##uname(const struct page *page)		\
+>  {									\
+>  	return PageType(page, PG_##lname);				\
+>  }									\
+> +static __always_inline int folio_test_##lname(const struct folio *folio)\
+> +{									\
+> +	return folio_test_type(folio, PG_##lname);			\
+> +}									\
+>  static __always_inline void __SetPage##uname(struct page *page)		\
+>  {									\
+>  	VM_BUG_ON_PAGE(!PageType(page, 0), page);			\
+>  	page->page_type &= ~PG_##lname;					\
+>  }									\
+> +static __always_inline void __folio_set_##lname(struct folio *folio)	\
+> +{									\
+> +	VM_BUG_ON_FOLIO(!folio_test_type(folio, 0), folio);		\
+> +	folio->page.page_type &= ~PG_##lname;				\
+> +}									\
+>  static __always_inline void __ClearPage##uname(struct page *page)	\
+>  {									\
+>  	VM_BUG_ON_PAGE(!Page##uname(page), page);			\
+>  	page->page_type |= PG_##lname;					\
+> -}
+> +}									\
+> +static __always_inline void __folio_clear_##lname(struct folio *folio)	\
+> +{									\
+> +	VM_BUG_ON_FOLIO(!folio_test_##lname(folio), folio);		\
+> +	folio->page.page_type |= PG_##lname;				\
+> +}									\
+>  
+>  /*
+>   * PageBuddy() indicates that the page is free and in the buddy system
+> -- 
+> 2.39.2
+> 
+> 
+
+-- 
+Sincerely yours,
+Mike.
