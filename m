@@ -2,179 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A0CD71133A
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 20:10:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61834711343
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 20:11:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241413AbjEYSJr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 14:09:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37832 "EHLO
+        id S236451AbjEYSLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 14:11:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230051AbjEYSJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 14:09:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C77C10C3
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 11:08:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685038014;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/STt3uYUF/eA3pcGXeIfU31ic0BPqfIYsBRnvLLrcA8=;
-        b=Pu5fed8dEuzZT2PK22Cjtmz6pNqpZHlJ77cuwHBItt5C1HwNG94+w9jYRP3NQh3WsgpYE4
-        nEeWnlm0Ydip104Zn5cVhpsGVbXKEyQntUtFntoEGgOIR8uZECUoAmiJAQtModrJ3ZeXBp
-        heLCLf176TgESbBqt6CkQzhUwRUQ+iM=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-204-6C9-x6mzNZ6vd_vCX4iUIg-1; Thu, 25 May 2023 14:06:52 -0400
-X-MC-Unique: 6C9-x6mzNZ6vd_vCX4iUIg-1
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3351e9dbf1dso44436015ab.2
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 11:06:52 -0700 (PDT)
+        with ESMTP id S233783AbjEYSLc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 14:11:32 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B27AE41
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 11:11:24 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5343c1d114cso1917414a12.0
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 11:11:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685038283; x=1687630283;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=24LANnmej8B3PcoImBJ8uEUDYvKnZqxjGN/SizttJ88=;
+        b=tfbNBx83T6bPZDxFw2ZWGuTGQOsaah7q9ig8ugF86C5fhG52SQ/fOUUWwUl4r+W7Jq
+         iKCuG4jyFuJ4zEbeIWoQ5eTXgHX4pe+AHekLx2MiZIGuAl5TACh0y2SJi5StGgDeOhva
+         zJsSCsRi/AWap5Z+nFg7hf7oNOOgjMr+K0fTQqEN2MBGQ3O0ooQ2HBP9c6FMiIvOIc/6
+         yHdrovfpytnGEv5gYTr4XVrf4OE7USNO7lH2b9ctcXJCEJ9YqcMFPR0ysoJIi2gO0Gp/
+         xa0gz0fEanoleg1GN1aZCzkIA38WMLOhMikwyxym85m2e4pSxnOXOSgUme05YV+teuJG
+         rdWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685038011; x=1687630011;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/STt3uYUF/eA3pcGXeIfU31ic0BPqfIYsBRnvLLrcA8=;
-        b=H7TwGs568BKxHnIDHfiFzbA8CLV4AvqeKFqkzAGL6SYrxAdCLaaHu1pGMPQ3oN2hxp
-         qsxg2U0PrpDEj9ds0b8HFUjivd43lHPKjIH9E1WyFcObTScyRt9ie1pUF90UrWO6Q3zV
-         GmhN0l398OKmxjlEWhPp9O/nmLI8+E+Ar5m/zkpzRFpC74CIB/g5lFuar+n4bHbwPlbj
-         pQYZfy20Mi/lARHdB1GE1H+/eKL+tPerVBY09ageOitGxwDqsdjPbJ4/Mibnq0axtCxW
-         0QE2O1X/N72uqdfWMY1KslR6O07OwsCSmXyLSTaPPbTzZ17w0BpvSFsdfPsojRiWj7Gm
-         sVMQ==
-X-Gm-Message-State: AC+VfDykNSG6+V90B5UFOF60y8QPnpLod8LEvztEpUBfk8lz6c2A95ru
-        m7634HIvXFSYDFTgGEGhNAJWJorN2wwXRIM6dJUGoB5NudKVswpBMAJoHOiQZ5qAn9WibxHWCYA
-        H6e4jgAYQgFGD
-X-Received: by 2002:a92:cc92:0:b0:332:dd0a:c6df with SMTP id x18-20020a92cc92000000b00332dd0ac6dfmr15399950ilo.22.1685038011244;
-        Thu, 25 May 2023 11:06:51 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5f0lXAJzyZMLgAAku3HttSAaB/9PyTut5L0+yIVgNcAGnDpm9J3odo9mu57GJnqdXcMVWWew==
-X-Received: by 2002:a92:cc92:0:b0:332:dd0a:c6df with SMTP id x18-20020a92cc92000000b00332dd0ac6dfmr15399922ilo.22.1685038011006;
-        Thu, 25 May 2023 11:06:51 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id v18-20020a056638359200b004145ebbf193sm559419jal.51.2023.05.25.11.06.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 May 2023 11:06:50 -0700 (PDT)
-Date:   Thu, 25 May 2023 12:06:48 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v3 00/10] Add Intel VT-d nested translation
-Message-ID: <20230525120648.70d954fb.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB52765FA8255FB8F8A1A6F11B8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230511145110.27707-1-yi.l.liu@intel.com>
-        <BN9PR11MB52765FA8255FB8F8A1A6F11B8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20221208; t=1685038283; x=1687630283;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=24LANnmej8B3PcoImBJ8uEUDYvKnZqxjGN/SizttJ88=;
+        b=fURDFEy5T+1+kZ0fpuWzwBDdYvCR4RUhUia+pMCDNfD8B6d2cKv70xZ7uJpT7VeXUP
+         2ZdSa7YAIHWt7mVdqG2DV1/HOUFrRyZBwndIrpzbRropF9boRlpGBoVEM4tfFERhK/w2
+         bw6uGPyuatKzWs+/xagmgoxGk9xGKezJDK4TnfzH865SjQlnn9dWg5J5y8X4Qgi0R1S3
+         vkUdoLOmgm9Av2aN+c1JZ4WiYmOz8IbNhOqV0mfl1L+6zp2v4HhXB9uBPlLvUGjxgTAV
+         kd6OcsRlSnBreQufbF61OPxFXAQGHYdxqsHRHF7r2rJcxKRTGwY5AoiEWwm2pVRRC6ee
+         eOcg==
+X-Gm-Message-State: AC+VfDyikctaSDfs/azkxmc7OeGOx0Iq0D2Qtj74BO06kqkny7MzBcPb
+        gsfHM9qDKmeSN+doFLIcuZhnh9C0KpY=
+X-Google-Smtp-Source: ACHHUZ5bIKgjRyFxtN7gSChcpUakbsaH1V3Ik5uR+3HRpu33XfaUepEJ5Tou44ROLmaQZn2Z1cbN7hH+k/M=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a65:6792:0:b0:530:3aaa:81b5 with SMTP id
+ e18-20020a656792000000b005303aaa81b5mr5048751pgr.8.1685038283578; Thu, 25 May
+ 2023 11:11:23 -0700 (PDT)
+Date:   Thu, 25 May 2023 11:11:21 -0700
+In-Reply-To: <20230420104622.12504-6-ljrcore@126.com>
+Mime-Version: 1.0
+References: <20230420104622.12504-1-ljrcore@126.com> <20230420104622.12504-6-ljrcore@126.com>
+Message-ID: <ZG+kyWjyhr7cg/xb@google.com>
+Subject: Re: [PATCH v2 5/7] KVM: selftests: Check if pmu_event_filter meets
+ expectations on fixed ctrs
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jinrong Liang <ljr.kernel@gmail.com>
+Cc:     Like Xu <like.xu.linux@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Jinrong Liang <cloudliang@tencent.com>,
+        linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 24 May 2023 08:59:43 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Thu, Apr 20, 2023, Jinrong Liang wrote:
+> From: Jinrong Liang <cloudliang@tencent.com>
+> 
+> From: Jinrong Liang <cloudliang@tencent.com>
+> 
+> Add tests to cover that pmu_event_filter works as expected when
+> it's applied to fixed performance counters, even if there is none
+> fixed counter exists (e.g. Intel guest pmu version=1 or AMD guest).
+> 
+> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+> ---
+>  .../kvm/x86_64/pmu_event_filter_test.c        | 109 ++++++++++++++++++
+>  1 file changed, 109 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> index a3d5c30ce914..0f54c53d7fff 100644
+> --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> @@ -31,6 +31,7 @@
+>  #define PMU_EVENT_FILTER_INVALID_ACTION		(KVM_PMU_EVENT_DENY + 1)
+>  #define PMU_EVENT_FILTER_INVALID_FLAGS			(KVM_PMU_EVENT_FLAG_MASKED_EVENTS + 1)
+>  #define PMU_EVENT_FILTER_INVALID_NEVENTS		(MAX_FILTER_EVENTS + 1)
+> +#define INTEL_PMC_IDX_FIXED 32
+>  
+>  /*
+>   * This is how the event selector and unit mask are stored in an AMD
+> @@ -817,6 +818,113 @@ static void test_filter_ioctl(struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> +static void intel_guest_run_fixed_counters(uint8_t fixed_ctr_idx)
+> +{
+> +	for (;;) {
+> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
+> +		wrmsr(MSR_CORE_PERF_FIXED_CTR0 + fixed_ctr_idx, 0);
+> +
+> +		/* Only OS_EN bit is enabled for fixed counter[idx]. */
+> +		wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, BIT_ULL(4 * fixed_ctr_idx));
+> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL,
+> +		      BIT_ULL(INTEL_PMC_IDX_FIXED + fixed_ctr_idx));
+> +		__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
+> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
+> +
+> +		GUEST_SYNC(rdmsr(MSR_CORE_PERF_FIXED_CTR0 + fixed_ctr_idx));
+> +	}
+> +}
+> +
+> +static struct kvm_vcpu *new_vcpu(void *guest_code)
+> +{
+> +	struct kvm_vm *vm;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> +	vm_init_descriptor_tables(vm);
+> +	vcpu_init_descriptor_tables(vcpu);
 
-> > From: Liu, Yi L <yi.l.liu@intel.com>
-> > Sent: Thursday, May 11, 2023 10:51 PM
-> >=20
-> > The first Intel platform supporting nested translation is Sapphire
-> > Rapids which, unfortunately, has a hardware errata [2] requiring special
-> > treatment. This errata happens when a stage-1 page table page (either
-> > level) is located in a stage-2 read-only region. In that case the IOMMU
-> > hardware may ignore the stage-2 RO permission and still set the A/D bit
-> > in stage-1 page table entries during page table walking.
-> >=20
-> > A flag IOMMU_HW_INFO_VTD_ERRATA_772415_SPR17 is introduced to
-> > report
-> > this errata to userspace. With that restriction the user should either
-> > disable nested translation to favor RO stage-2 mappings or ensure no
-> > RO stage-2 mapping to enable nested translation.
-> >=20
-> > Intel-iommu driver is armed with necessary checks to prevent such mix
-> > in patch10 of this series.
-> >=20
-> > Qemu currently does add RO mappings though. The vfio agent in Qemu
-> > simply maps all valid regions in the GPA address space which certainly
-> > includes RO regions e.g. vbios.
-> >=20
-> > In reality we don't know a usage relying on DMA reads from the BIOS
-> > region. Hence finding a way to allow user opt-out RO mappings in
-> > Qemu might be an acceptable tradeoff. But how to achieve it cleanly
-> > needs more discussion in Qemu community. For now we just hacked Qemu
-> > to test.
-> >  =20
->=20
-> Hi, Alex,
->=20
-> Want to touch base on your thoughts about this errata before we
-> actually go to discuss how to handle it in Qemu.
->=20
-> Overall it affects all Sapphire Rapids platforms. Fully disabling nested
-> translation in the kernel just for this rare vulnerability sounds an over=
-kill.
->=20
-> So we decide to enforce the exclusive check (RO in stage-2 vs. nesting)
-> in the kernel and expose the restriction to userspace so the VMM can
-> choose which one to enable based on its own requirement.
->=20
-> At least this looks a reasonable tradeoff to some proprietary VMMs
-> which never adds RO mappings in stage-2 today.
->=20
-> But we do want to get Qemu support nested translation on those
-> platform as the widely-used reference VMM!
->=20
-> Do you see any major oversight before pursuing such change in Qemu
-> e.g. having a way for the user to opt-out adding RO mappings in stage-2? =
-=F0=9F=98=8A
+Unnecessary copy+paste, this test doesn't setup a #GP handler.
 
-I don't feel like I have enough info to know what common scenarios are
-going to make use of 2-stage and nested configurations and how likely a
-user is to need such an opt-out.  If it's likely that a user is going
-to encounter this configuration, an opt-out is at best a workaround.
-It's a significant support issue if a user needs to generate a failure
-in QEMU, notice and decipher any log messages that failure may have
-generated, and take action to introduce specific changes in their VM
-configuration to support a usage restriction.
+> +
+> +	return vcpu;
+> +}
+> +
+> +static void free_vcpu(struct kvm_vcpu *vcpu)
+> +{
+> +	kvm_vm_free(vcpu->vm);
+> +}
+> +
+> +static uint64_t test_fixed_ctr_without_filter(struct kvm_vcpu *vcpu)
+> +{
+> +	return run_vcpu_to_sync(vcpu);
+> +}
 
-For QEMU I might lean more towards an effort to better filter the
-mappings we create to avoid these read-only ranges that likely don't
-require DMA mappings anyway.
+Please don't add a wrappers that are single line passthroughs.
 
-How much does this affect arbitrary userspace vfio drivers?  For
-example are there scenarios where running in a VM with a vIOMMU
-introduces nested support that's unknown to the user which now prevents
-this usage?  An example might be running an L2 guest with a version of
-QEMU that does create read-only mappings.  If necessary, how would lack
-of read-only mapping support be conveyed to those nested use cases?
-Thanks,
+> +static const uint32_t actions[] = {
+> +	KVM_PMU_EVENT_ALLOW,
+> +	KVM_PMU_EVENT_DENY,
+> +};
 
-Alex
+(a) don't define global variables with super common names (this test sets a bad
+precedent).  (b) this array is used in *one* function, i.e. it can be a local
+variable.  (c) using an array doesn't save you code and just obfuscates what's
+happening.
 
+> +static uint64_t test_fixed_ctr_with_filter(struct kvm_vcpu *vcpu,
+
+Don't abbreviate "counter", there's really no need and "ctr" versus "ctrl" is
+already confusing enough.
+
+> +					   uint32_t action,
+> +					   uint32_t bitmap)
+> +{
+> +	struct kvm_pmu_event_filter *f;
+> +	uint64_t r;
+> +
+> +	f = create_pmu_event_filter(0, 0, action, 0, bitmap);
+> +	r = test_with_filter(vcpu, f);
+> +	free(f);
+> +	return r;
+> +}
+> +
+> +static bool fixed_ctr_is_allowed(uint8_t idx, uint32_t action, uint32_t bitmap)
+> +{
+> +	return (action == KVM_PMU_EVENT_ALLOW && (bitmap & BIT_ULL(idx))) ||
+> +		(action == KVM_PMU_EVENT_DENY && !(bitmap & BIT_ULL(idx)));
+
+This helper shouldn't exist.  It's largely a symptom of using an array.
+> +}
+> +
+> +static void test_fixed_ctr_action_and_bitmap(struct kvm_vcpu *vcpu,
+> +					     uint8_t fixed_ctr_idx,
+> +					     uint8_t max_fixed_num)
+> +{
+> +	uint8_t i;
+> +	uint32_t bitmap;
+> +	uint64_t count;
+> +	bool expected;
+> +
+> +	/*
+> +	 * Check the fixed performance counter can count normally works when
+> +	 * KVM userspace doesn't set any pmu filter.
+> +	 */
+> +	TEST_ASSERT(max_fixed_num && test_fixed_ctr_without_filter(vcpu),
+> +		    "Fixed counter does not exist or does not work as expected.");
+> +
+> +	for (i = 0; i < ARRAY_SIZE(actions); i++) {
+> +		for (bitmap = 0; bitmap < BIT_ULL(max_fixed_num); bitmap++) {
+
+You're comparing a 32-bit value against a 64-bit value.
+
+> +			expected = fixed_ctr_is_allowed(fixed_ctr_idx, actions[i], bitmap);
+> +			count = test_fixed_ctr_with_filter(vcpu, actions[i], bitmap);
+> +
+> +			TEST_ASSERT(expected == !!count,
+> +				    "Fixed event filter does not work as expected.");
+> +		}
+> +	}
+
+static uint64_t test_with_fixed_counter_filter(struct kvm_vcpu *vcpu,
+					       uint32_t action, uint32_t bitmap)
+{
+	...
+
+}
+
+static void __test_fixed_counter_bitmap(...)
+{
+	uint32_t bitmap;
+
+	TEST_ASSERT(nr_fixed_counters < sizeof(bitmap));
+
+	for (i = 0; i < BIT(nr_fixed_counters); i++) {
+		count = test_with_fixed_counter_filter(vcpu, KVM_PMU_EVENT_ALLOW,
+						       bitmap);
+		TEST_ASSERT(!!count == !!(bitmap & BIT(idx)));
+
+		count = test_with_fixed_counter_filter(vcpu, KVM_PMU_EVENT_DENY,
+						       bitmap);
+		TEST_ASSERT(!!count == !(bitmap & BIT(idx)));
+
+	}
+}
+
+> +}
+> +
+> +static void test_fixed_counter_bitmap(void)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	uint8_t idx, max_fixed_num = get_kvm_supported_fixed_num();
+> +
+> +	/*
+> +	 * Check that pmu_event_filter works as expected when it's applied to
+> +	 * fixed performance counters.
+> +	 */
+> +	for (idx = 0; idx < max_fixed_num; idx++) {
+> +		vcpu = new_vcpu(intel_guest_run_fixed_counters);
+> +		vcpu_args_set(vcpu, 1, idx);
+> +		test_fixed_ctr_action_and_bitmap(vcpu, idx, max_fixed_num);
+> +		free_vcpu(vcpu);
+> +	}
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>  	void (*guest_code)(void);
+> @@ -860,6 +968,7 @@ int main(int argc, char *argv[])
+>  	kvm_vm_free(vm);
+>  
+>  	test_pmu_config_disable(guest_code);
+> +	test_fixed_counter_bitmap();
+>  
+>  	return 0;
+>  }
+> -- 
+> 2.31.1
+> 
