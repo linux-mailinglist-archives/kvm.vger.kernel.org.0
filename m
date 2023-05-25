@@ -2,74 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C937711357
-	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 20:12:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD22F711379
+	for <lists+kvm@lfdr.de>; Thu, 25 May 2023 20:17:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233502AbjEYSMj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 14:12:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41192 "EHLO
+        id S241149AbjEYSR3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 14:17:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233783AbjEYSMi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 14:12:38 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFBFD119
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 11:12:36 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-534107e73cfso1278748a12.1
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 11:12:36 -0700 (PDT)
+        with ESMTP id S230474AbjEYSR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 14:17:27 -0400
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13330D9;
+        Thu, 25 May 2023 11:17:26 -0700 (PDT)
+Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-b9daef8681fso766668276.1;
+        Thu, 25 May 2023 11:17:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685038356; x=1687630356;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3+IxoBoebOsPjsV+diUVwrxPrkn1mNdsKoZUJH//gMM=;
-        b=asq73AO5EW4oiv2rz/cLLjTKTOMfwul5iEyKEl8XBvFpZk1slUgRJeAxEZiuyOH1il
-         u6vWzpiV/+J0VP2thxrbC0sqUAY8L6T1NcUDmCBfLxl6d4IEhC0+Bjuld2ZOJpvagjNb
-         L0xcP0fnuRpHSql/df5vWdxhu0Td5JGTOmuAxT8GCskaoktlIhL8NaZwrJ53m1zmSJr8
-         MJnhsoTOl8hUPUXSB0Kkd+Ve89P/BiBAft9a1eXs7qZSCwL7jQbkiQIf3EGHP2Qv93he
-         vM1Br6nOaSA/7+oc7SgfBTLePi7DLwbUGNSJ95gGLU8ytW/gI9SPrOsgpeGiuJTdA0cg
-         jMTA==
+        d=gmail.com; s=20221208; t=1685038645; x=1687630645;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vEt/V8+3jpKdaWf/91twz9m1AxbB8mw1sieW7q1FOX4=;
+        b=qpx33W23LxzGgtt7x0f+jHNiqnq/vW7f+lo4R60odkrqHHbvAvDFwCToA7ZeGOtlZu
+         1pix82nq+XRaSlrOoV5XSSn7dUtYbrVRPJSVcc+Y0QUEIud/VeliblGAWTefKuC3uiLW
+         Y767SW9acPu7TamxQ3rDZ7ad1waallUvH2KGWMSoPdMgQ6uqByETyo++E8JgCnYWaIR7
+         T+3+xQi6fbJlgvqxHEFBxTPhg1oh030qaBtpvB360U8uoO6SqTXFxFoolc38s3Jd+HWF
+         qSuZfJvCEliq2Q2QxhelaN+CYntsdlTkVUzhuGY+pHQjjIlm9D34YIwBuMF1/x8S1rOB
+         qR0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685038356; x=1687630356;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3+IxoBoebOsPjsV+diUVwrxPrkn1mNdsKoZUJH//gMM=;
-        b=Yb+b3qp/puSHVIf4Kd+2i0qQCqbxsVo99HLK92Q9KwLQb1Lg01bXkVAJbv1mlD2ALO
-         ESLPRpvPo7NKscXrqPi4TDkhI57PJjK3f33gltIaD9iJH3ENR64WZc5nqYUTTIkRGFgp
-         Xsp9mlfAcG1mR7kL/JRjlRDtb2t9SCWNvg9gbwUO7Xgto5ZPXqrIMF3K058j+6rHwMJ9
-         0MyRxUQTgNvKLllrTG2dA9lG/rhJrkbIXofxrLposhG7QK00DCsfaLjg/zisUuXYXNMa
-         28MSTxClceTapeRHFmBFWXVPqP5wGBJCRDKK//Llgy9xszfBSMYwxXoVoyTnlwVjxw+/
-         fXtA==
-X-Gm-Message-State: AC+VfDw2Ds1WHYPB5qDZfkqsgw6YPafMGumXRT0jFQPdgUEvdZjCSJkM
-        dyZYm/8okj9rEyh4Px8KRMMR50yFzAs=
-X-Google-Smtp-Source: ACHHUZ6bh9fTP225CcehXePeNmklaWj/m62wIsPxSDwvjGLsrPGwpHJr1bq64xWWbip8kwiimsbB77Woop4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:5b45:0:b0:53f:265a:a662 with SMTP id
- y5-20020a655b45000000b0053f265aa662mr691222pgr.4.1685038356418; Thu, 25 May
- 2023 11:12:36 -0700 (PDT)
-Date:   Thu, 25 May 2023 11:12:34 -0700
-In-Reply-To: <20230420104622.12504-7-ljrcore@126.com>
-Mime-Version: 1.0
-References: <20230420104622.12504-1-ljrcore@126.com> <20230420104622.12504-7-ljrcore@126.com>
-Message-ID: <ZG+lEmoiJqB9H5tg@google.com>
-Subject: Re: [PATCH v2 6/7] KVM: selftests: Check gp event filters without
- affecting fixed event filters
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jinrong Liang <ljr.kernel@gmail.com>
-Cc:     Like Xu <like.xu.linux@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <shuah@kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Jinrong Liang <cloudliang@tencent.com>,
-        linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        d=1e100.net; s=20221208; t=1685038645; x=1687630645;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vEt/V8+3jpKdaWf/91twz9m1AxbB8mw1sieW7q1FOX4=;
+        b=GYx8Vc6Qyadtv52ZSRC1OpNQJOXQJ3a9QlpsNbv0Wl5bOH3MasYZx+fdpWz6yovU28
+         cK+lZ6pmJj8CR2CsFNMhwvFZvnnsOPUUE8RU3viIfOUieadTSqgkhShmmtQ05hGF9u7m
+         Hycf/ryemTt+RR0i1XrAIsI5x9ZT20r0z94IZaeM6A+saY6xHcepLVZGO4aOKItNWovJ
+         ir982uyT4S7KaKDZYYZsMvzu44Mme52jKcEAsqHKAYyrWM2XVpGGjLBzAxaRlKcZF3l8
+         i3ZEdC1KTlwBKMqnvWxvuTkb6zQzVZKlYs5XOq9NzhwvqtHf6fQKw7l1adPXcw+lbjSk
+         O0oQ==
+X-Gm-Message-State: AC+VfDzS8nTuROnl9ViiaFP8mNzAbhqJO6XLAcEJSgmaE6emoLIjFG0h
+        m+8Lkay510cSCS0esr3uXlkmcXSxvCQirsrSN3k=
+X-Google-Smtp-Source: ACHHUZ4CxdCafEVA2N8+YE3r54vbJuyNv4iSvWQn7ibpFdu7Q8YcRob13nPjv7XKdbKB6AoaGk0hrDu/6J2TDu7u8Qo=
+X-Received: by 2002:a25:ac6:0:b0:ba7:bb4c:7960 with SMTP id
+ 189-20020a250ac6000000b00ba7bb4c7960mr4320550ybk.26.1685038645132; Thu, 25
+ May 2023 11:17:25 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230501192829.17086-1-vishal.moola@gmail.com>
+ <20230501192829.17086-14-vishal.moola@gmail.com> <20230525091900.GY4967@kernel.org>
+In-Reply-To: <20230525091900.GY4967@kernel.org>
+From:   Vishal Moola <vishal.moola@gmail.com>
+Date:   Thu, 25 May 2023 11:17:14 -0700
+Message-ID: <CAOzc2pxNRbohxxNnaKtBNOBgOschHMj278-6hWZK9A1oJOgujA@mail.gmail.com>
+Subject: Re: [PATCH v2 13/34] mm: Create ptdesc equivalents for pgtable_{pte,pmd}_page_{ctor,dtor}
+To:     Mike Rapoport <rppt@kernel.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,58 +77,120 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 20, 2023, Jinrong Liang wrote:
-> From: Jinrong Liang <cloudliang@tencent.com>
-> 
-> From: Jinrong Liang <cloudliang@tencent.com>
-> 
-> Add a test to ensure that setting both generic and fixed performance
-> event filters does not affect the consistency of the fixed performance
-> filter behavior in KVM. This test helps to ensure that the fixed
-> performance filter works as expected even when generic performance
-> event filters are also set.
-> 
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> ---
->  .../selftests/kvm/x86_64/pmu_event_filter_test.c   | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> index 0f54c53d7fff..9be4c6f8fb7e 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> @@ -889,6 +889,7 @@ static void test_fixed_ctr_action_and_bitmap(struct kvm_vcpu *vcpu,
->  	uint32_t bitmap;
->  	uint64_t count;
->  	bool expected;
-> +	struct kvm_pmu_event_filter *f;
->  
->  	/*
->  	 * Check the fixed performance counter can count normally works when
-> @@ -902,6 +903,19 @@ static void test_fixed_ctr_action_and_bitmap(struct kvm_vcpu *vcpu,
->  			expected = fixed_ctr_is_allowed(fixed_ctr_idx, actions[i], bitmap);
->  			count = test_fixed_ctr_with_filter(vcpu, actions[i], bitmap);
->  
-> +			TEST_ASSERT(expected == !!count,
-> +				    "Fixed event filter does not work as expected.");
-> +
-> +			/*
-> +			 * Check that setting both events[] and fixed_counter_bitmap
-> +			 * does not affect the consistency of the fixed ctrs' behaviour.
-> +			 *
-> +			 * Note, the fixed_counter_bitmap rule has high priority.
+On Thu, May 25, 2023 at 2:19=E2=80=AFAM Mike Rapoport <rppt@kernel.org> wro=
+te:
+>
+> On Mon, May 01, 2023 at 12:28:08PM -0700, Vishal Moola (Oracle) wrote:
+> > Creates ptdesc_pte_ctor(), ptdesc_pmd_ctor(), ptdesc_pte_dtor(), and
+> > ptdesc_pmd_dtor() and make the original pgtable constructor/destructors
+> > wrappers.
+>
+> I think pgtable_pXY_ctor/dtor names would be better.
 
-"high" is ambiguous without a baseline.  I believe what you want to say is
-"the fixed_counter_bitmap has higher priority than the events list".
+I have it as ptdesc to keep it consistent with the rest of the functions. I
+also think it makes more sense as it's initializing stuff tracked by a ptde=
+sc.
 
-> +			 */
-> +			f = event_filter(actions[i]);
-> +			f->fixed_counter_bitmap = bitmap;
-> +			count = test_with_filter(vcpu, f);
-> +
->  			TEST_ASSERT(expected == !!count,
->  				    "Fixed event filter does not work as expected.");
->  		}
-> -- 
-> 2.31.1
-> 
+> > Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> > ---
+> >  include/linux/mm.h | 56 ++++++++++++++++++++++++++++++++++------------
+> >  1 file changed, 42 insertions(+), 14 deletions(-)
+> >
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index 58c911341a33..dc61aeca9077 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -2847,20 +2847,34 @@ static inline bool ptlock_init(struct ptdesc *p=
+tdesc) { return true; }
+> >  static inline void ptlock_free(struct ptdesc *ptdesc) {}
+> >  #endif /* USE_SPLIT_PTE_PTLOCKS */
+> >
+> > -static inline bool pgtable_pte_page_ctor(struct page *page)
+> > +static inline bool ptdesc_pte_ctor(struct ptdesc *ptdesc)
+> >  {
+> > -     if (!ptlock_init(page_ptdesc(page)))
+> > +     struct folio *folio =3D ptdesc_folio(ptdesc);
+> > +
+> > +     if (!ptlock_init(ptdesc))
+> >               return false;
+> > -     __SetPageTable(page);
+> > -     inc_lruvec_page_state(page, NR_PAGETABLE);
+> > +     __folio_set_table(folio);
+> > +     lruvec_stat_add_folio(folio, NR_PAGETABLE);
+> >       return true;
+> >  }
+> >
+> > +static inline bool pgtable_pte_page_ctor(struct page *page)
+> > +{
+> > +     return ptdesc_pte_ctor(page_ptdesc(page));
+> > +}
+> > +
+> > +static inline void ptdesc_pte_dtor(struct ptdesc *ptdesc)
+> > +{
+> > +     struct folio *folio =3D ptdesc_folio(ptdesc);
+> > +
+> > +     ptlock_free(ptdesc);
+> > +     __folio_clear_table(folio);
+> > +     lruvec_stat_sub_folio(folio, NR_PAGETABLE);
+> > +}
+> > +
+> >  static inline void pgtable_pte_page_dtor(struct page *page)
+> >  {
+> > -     ptlock_free(page_ptdesc(page));
+> > -     __ClearPageTable(page);
+> > -     dec_lruvec_page_state(page, NR_PAGETABLE);
+> > +     ptdesc_pte_dtor(page_ptdesc(page));
+> >  }
+> >
+> >  #define pte_offset_map_lock(mm, pmd, address, ptlp)  \
+> > @@ -2942,20 +2956,34 @@ static inline spinlock_t *pmd_lock(struct mm_st=
+ruct *mm, pmd_t *pmd)
+> >       return ptl;
+> >  }
+> >
+> > -static inline bool pgtable_pmd_page_ctor(struct page *page)
+> > +static inline bool ptdesc_pmd_ctor(struct ptdesc *ptdesc)
+> >  {
+> > -     if (!pmd_ptlock_init(page_ptdesc(page)))
+> > +     struct folio *folio =3D ptdesc_folio(ptdesc);
+> > +
+> > +     if (!pmd_ptlock_init(ptdesc))
+> >               return false;
+> > -     __SetPageTable(page);
+> > -     inc_lruvec_page_state(page, NR_PAGETABLE);
+> > +     __folio_set_table(folio);
+> > +     lruvec_stat_add_folio(folio, NR_PAGETABLE);
+> >       return true;
+> >  }
+> >
+> > +static inline bool pgtable_pmd_page_ctor(struct page *page)
+> > +{
+> > +     return ptdesc_pmd_ctor(page_ptdesc(page));
+> > +}
+> > +
+> > +static inline void ptdesc_pmd_dtor(struct ptdesc *ptdesc)
+> > +{
+> > +     struct folio *folio =3D ptdesc_folio(ptdesc);
+> > +
+> > +     pmd_ptlock_free(ptdesc);
+> > +     __folio_clear_table(folio);
+> > +     lruvec_stat_sub_folio(folio, NR_PAGETABLE);
+> > +}
+> > +
+> >  static inline void pgtable_pmd_page_dtor(struct page *page)
+> >  {
+> > -     pmd_ptlock_free(page_ptdesc(page));
+> > -     __ClearPageTable(page);
+> > -     dec_lruvec_page_state(page, NR_PAGETABLE);
+> > +     ptdesc_pmd_dtor(page_ptdesc(page));
+> >  }
+> >
+> >  /*
+> > --
+> > 2.39.2
+> >
+> >
+>
+> --
+> Sincerely yours,
+> Mike.
