@@ -2,107 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D97E77125BF
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 13:41:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 831617125BA
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 13:40:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243326AbjEZLk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 07:40:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37472 "EHLO
+        id S237023AbjEZLkH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 07:40:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230121AbjEZLk5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 07:40:57 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 808D6E7;
-        Fri, 26 May 2023 04:40:54 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id B9BEA5FD33;
-        Fri, 26 May 2023 14:40:50 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1685101250;
-        bh=n2x4yjau1soFcfco90woNujVljdNR0rpU1zLVAOSyM4=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-        b=QiFeUnJmQzxST7Eo7f4WbbpPTgf1DzVYdaSYuXVVy2W6rGiomiqPNQoaBVwFUoFYA
-         sDPdl/LSd8TRdKpSlu+JpVZG3UCLdV9hjxbfL5oW16+i2T4yh23vvbYmywgOFmcQaB
-         YJkGmeGkQ8OJ4q1cy3/om+lBjxQu1u4kAw7fUNERqF5BsySFTY+tGZn5oMIbmowzAI
-         GVjwZ3hLx7/TXp3T57fGm7f2tSs7bqQMmVsUcVomikBwUjDykFgN3/udy7I/21Qakb
-         oGcwX0Fs577IAtNXepODapC6y7EH+P2AtEmenX89JAg8/dkXdke7QOFaegVeSGkbD6
-         OnqpjPpNFhC6Q==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Fri, 26 May 2023 14:40:45 +0300 (MSK)
-Message-ID: <4baf786b-afe5-371d-9bc4-90226e5df3af@sberdevices.ru>
-Date:   Fri, 26 May 2023 14:36:17 +0300
+        with ESMTP id S243367AbjEZLkB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 07:40:01 -0400
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55D35A7
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 04:39:59 -0700 (PDT)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1q2VnZ-006Pbe-7H
+        for kvm@vger.kernel.org; Fri, 26 May 2023 13:39:57 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=j/aEUioi+r5pvmdJlqgJVrdJ4zb024hEYws87FrkwVA=; b=I1hjNH5gItY0zzWf7EV397UzCk
+        sbjXZX2pcYKl5U/NR+/rHkRJmkqHvhoHZdck39pjcLxDSosxGxxRKB/6dr5cns0EWj0AoFQCbCQ56
+        859EWNlFzD6zgjPgupl/z3J37+vqDhm4eQE39ahFIFXBbP4nPbq4Id2p8lbMladJ0aM2+ABt4TAzw
+        PGWPBUazz+2WmtCDyJcbDjG22RhfZ/ZBp0FOM8izP9AjiqlhiXGek0hjHTS/yPuRwYNRZz+ry/GDx
+        TcONMdCWFZLyfr92cUNojdcUPz4mXV4dyA8v9/QqmcyoqL26KXR4uQAxkPc5YHApK4D8cKwCdL4cA
+        d5KJCq5A==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1q2VnY-0002hh-GG; Fri, 26 May 2023 13:39:56 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1q2VnF-0000hO-RK; Fri, 26 May 2023 13:39:37 +0200
+Message-ID: <7f8c847e-aa4f-eda6-6f3f-8df56fc1df1b@rbox.co>
+Date:   Fri, 26 May 2023 13:39:36 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v3 00/17] vsock: MSG_ZEROCOPY flag support
-Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230522073950.3574171-1-AVKrasnov@sberdevices.ru>
- <76270fab-8af7-7597-9193-64cb553a543e@sberdevices.ru>
- <y5tgyj5awrd4hvlrsxsvrern6pd2sby2mdtskah2qp5hemmo2a@72nhcpilg7v2>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <y5tgyj5awrd4hvlrsxsvrern6pd2sby2mdtskah2qp5hemmo2a@72nhcpilg7v2>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Thunderbird
+Subject: Re: [PATCH] KVM: Don't kfree(NULL) on kzalloc() failure in
+ kvm_assign_ioeventfd_idx()
+Content-Language: pl-PL
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org
+References: <20230327175457.735903-1-mhal@rbox.co>
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20230327175457.735903-1-mhal@rbox.co>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/05/26 06:32:00 #21351256
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_INVALID,
+        DKIM_SIGNED,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 3/27/23 19:54, Michal Luczaj wrote:
+> On kzalloc() failure, taking the `goto fail` path leads to kfree(NULL).
+> Such no-op has no use. Move it out.
 
+Few weeks later, a polite ping.
 
-On 26.05.2023 13:30, Stefano Garzarella wrote:
-> On Thu, May 25, 2023 at 06:56:42PM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 22.05.2023 10:39, Arseniy Krasnov wrote:
->>
->> This patchset is unstable with SOCK_SEQPACKET. I'll fix it.
-> 
-> Thanks for let us know!
-> 
-> I'm thinking if we should start split this series in two, because it
-> becomes too big.
-> 
-> But let keep this for RFC, we can decide later. An idea is to send
-> the first 7 patches with a preparation series, and the next ones with a
-> second series.
+thanks,
+Michal
 
-Hello, ok! So i'll split patchset in the following way:
-1) Patches which adds new fields/flags and checks. But all of this is not used,
-   as it is preparation.
-2) Second part starts to use it and also carries tests.
-
-Thanks, Arseniy
-
-> 
-> Thanks,
-> Stefano
-> 
