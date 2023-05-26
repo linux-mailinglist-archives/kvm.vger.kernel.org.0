@@ -2,140 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE1637128B7
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 16:40:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE483712946
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 17:22:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244011AbjEZOkR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 10:40:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34990 "EHLO
+        id S244018AbjEZPWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 11:22:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244089AbjEZOkD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 10:40:03 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7005AE4B
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 07:39:27 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-ba8337a5861so2198212276.0
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 07:39:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685111956; x=1687703956;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HNAPtYMKE2DwuE0/Om5XERH8unHdbvGM9xOlT/rQSiM=;
-        b=qsUncX2EbLctr4fP8gajSri5U1pxUkivvKJRV9QQZmG0n0CaNsLFJVwgtgSWDD+SMJ
-         2SdsjklIMX7MTPqTAJd6xEdCOhoRT1rQhi3AonOw5G76o0mFvMlyx2d+x+u3Lv3sR5XU
-         SpIntlAP1o1CdhXFFuU5KFnjUOPei3x70ZeBUQzhnzfj1yKSBUU7AwTHLeMWgZpAsbgh
-         zuODJ2RLL4JnK45BOaGIm4QWeVWqU00jBeMbuLaRDcz1u9yNd4/1VUeVhTAWMR5UXyCT
-         aY3ep4oSH6a2l8RdFYcyXK7LfRXeh/9jcPQiNaj/YT6UTvBvSzXnYlMJLGCqHwQVu6Ai
-         D9jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685111956; x=1687703956;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HNAPtYMKE2DwuE0/Om5XERH8unHdbvGM9xOlT/rQSiM=;
-        b=d2FMD4CqUKJDTHnZt9FpuccPB1z8ZAoDbpWsyyPIIgvvLtTIQv2r2Eu5tx9lwun2wM
-         JVaovDbf6JAWjCPnwYACSyGoyXWMbppLFEI/SVw53JTfbwQR+02AyRLuXUma1BzzJF5H
-         rjoA3AUhy7+0sQ/+iatEHwDtnIvxBoh5pocyYHKupgxULz/1w4nepICkTUScRtEsqSVL
-         VrKVT/dzwyFz9A4np4EUttBEFw38FCnnVD1HecfKD6YNJNthYYakAlE/is9pcReEk2q7
-         jq5/gYtERtC7lTdfCionwZvNb1wGBKKD6PgiJKaRfVEaUJJCRBMEwSCvOeHp6OjQ/Nmb
-         Ni/A==
-X-Gm-Message-State: AC+VfDxOWuw3RboUS7JAhWKaJqTehahiVz9T4Zk1/cNQCoG/Fy8pVu4Y
-        ZV7VXl35BYFoFupz6rcjv6v5Si31syk=
-X-Google-Smtp-Source: ACHHUZ47oCO6HwXqYzWIxcyvOS4fpxEXPkDQACfUzuqbBxss74rfmln5dAtL/xTF8sqWXxmiF1DIIzBlvQQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:8206:0:b0:b9e:7fbc:15e1 with SMTP id
- q6-20020a258206000000b00b9e7fbc15e1mr4332600ybk.0.1685111955796; Fri, 26 May
- 2023 07:39:15 -0700 (PDT)
-Date:   Fri, 26 May 2023 07:39:14 -0700
-In-Reply-To: <fc82a8a7-af38-5037-1862-ba2315c4e5af@amd.com>
-Mime-Version: 1.0
-References: <20230411125718.2297768-1-aik@amd.com> <20230411125718.2297768-6-aik@amd.com>
- <ZGv9Td4p1vtXC0Hy@google.com> <719a6b42-fd91-8eb4-f773-9ed98d2fdb07@amd.com>
- <ZGzfWQub4FQOrEtw@google.com> <fc82a8a7-af38-5037-1862-ba2315c4e5af@amd.com>
-Message-ID: <ZHDEkuaVjs/0kM6t@google.com>
-Subject: Re: [PATCH kernel v5 5/6] KVM: SEV: Enable data breakpoints in SEV-ES
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Pankaj Gupta <pankaj.gupta@amd.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        Santosh Shukla <santosh.shukla@amd.com>,
-        Carlos Bilbao <carlos.bilbao@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        with ESMTP id S243838AbjEZPWN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 11:22:13 -0400
+Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [IPv6:2001:1600:3:17::8fa9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C6BF3
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 08:22:09 -0700 (PDT)
+Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
+        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4QSTDb2m0HzMqJtD;
+        Fri, 26 May 2023 17:22:07 +0200 (CEST)
+Received: from unknown by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4QSTDW5jBkzMpq8r;
+        Fri, 26 May 2023 17:22:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+        s=20191114; t=1685114527;
+        bh=q+ImSjEjmZCszdCMwbCdSpVg4DvQ3poPxVGa8t7f7U4=;
+        h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+        b=tQXLni40CMr4EfzplXOAcaiNi5QkukQ3CoKpUm7sPlK7iwEW6fPx8nY8GaaUiadIG
+         M5KO5fQyWE3EVFklsTrG7jSk0ERYB4XC8Vvc3kkq30lc7cfnaZ5NXLcagUfQK3M2xQ
+         HRaKSJVPM1hu3rh60mZzFma3PA+dy4ElTuUEFWyU=
+Message-ID: <58a803f6-c3de-3362-673f-767767a43f9c@digikod.net>
+Date:   Fri, 26 May 2023 17:22:03 +0200
+MIME-Version: 1.0
+User-Agent: 
+Subject: Re: [RFC PATCH v1 0/9] Hypervisor-Enforced Kernel Integrity
+Content-Language: en-US
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+To:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "keescook@chromium.org" <keescook@chromium.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "yuanyu@google.com" <yuanyu@google.com>,
+        "jamorris@linux.microsoft.com" <jamorris@linux.microsoft.com>,
+        "marian.c.rotariu@gmail.com" <marian.c.rotariu@gmail.com>,
+        "Graf, Alexander" <graf@amazon.com>,
+        "Andersen, John S" <john.s.andersen@intel.com>,
+        "madvenka@linux.microsoft.com" <madvenka@linux.microsoft.com>,
+        "liran.alon@oracle.com" <liran.alon@oracle.com>,
+        "ssicleru@bitdefender.com" <ssicleru@bitdefender.com>,
+        "tgopinath@microsoft.com" <tgopinath@microsoft.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "will@kernel.org" <will@kernel.org>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "dev@lists.cloudhypervisor.org" <dev@lists.cloudhypervisor.org>,
+        "mdontu@bitdefender.com" <mdontu@bitdefender.com>,
+        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "nicu.citu@icloud.com" <nicu.citu@icloud.com>,
+        "ztarkhani@microsoft.com" <ztarkhani@microsoft.com>,
+        "x86@kernel.org" <x86@kernel.org>
+References: <20230505152046.6575-1-mic@digikod.net>
+ <93726a7b9498ec66db21c5792079996d5fed5453.camel@intel.com>
+ <facfd178-3157-80b4-243b-a5c8dabadbfb@digikod.net>
+In-Reply-To: <facfd178-3157-80b4-243b-a5c8dabadbfb@digikod.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 26, 2023, Alexey Kardashevskiy wrote:
+
+On 25/05/2023 15:59, Mickaël Salaün wrote:
 > 
-> On 24/5/23 01:44, Sean Christopherson wrote:
-> > On Tue, May 23, 2023, Alexey Kardashevskiy wrote:
-> > > > Actually, can't disabling #DB interception for DebugSwap SEV-ES guests be a
-> > > > separate patch?  KVM can still inject #DBs for SEV-ES guests, no?
-> > > 
-> > > Sorry for my ignorance but what is the point of injecting #DB if there is no
-> > > way of changing the guest's DR7?
-> > 
-> > Well, _injecting_ the #DB is necessary for correctness from the guest's perspective.
-> > "What's the point of _intercepting_ #DB" is the real question.  And for SEV-ES guests
-> > with DebugSwap, there is no point, which is why I agree that KVM should disable
-> > interception in that case.  What I'm calling out is that disabling #Db interception
-> > isn't _necessary_ for correctness (unless I'm missing something), which means that
-> > it can and should go in a separate patch.
+> On 25/05/2023 00:20, Edgecombe, Rick P wrote:
+>> On Fri, 2023-05-05 at 17:20 +0200, Mickaël Salaün wrote:
+>>> # How does it work?
+>>>
+>>> This implementation mainly leverages KVM capabilities to control the
+>>> Second
+>>> Layer Address Translation (or the Two Dimensional Paging e.g.,
+>>> Intel's EPT or
+>>> AMD's RVI/NPT) and Mode Based Execution Control (Intel's MBEC)
+>>> introduced with
+>>> the Kaby Lake (7th generation) architecture. This allows to set
+>>> permissions on
+>>> memory pages in a complementary way to the guest kernel's managed
+>>> memory
+>>> permissions. Once these permissions are set, they are locked and
+>>> there is no
+>>> way back.
+>>>
+>>> A first KVM_HC_LOCK_MEM_PAGE_RANGES hypercall enables the guest
+>>> kernel to lock
+>>> a set of its memory page ranges with either the HEKI_ATTR_MEM_NOWRITE
+>>> or the
+>>> HEKI_ATTR_MEM_EXEC attribute. The first one denies write access to a
+>>> specific
+>>> set of pages (allow-list approach), and the second only allows kernel
+>>> execution
+>>> for a set of pages (deny-list approach).
+>>>
+>>> The current implementation sets the whole kernel's .rodata (i.e., any
+>>> const or
+>>> __ro_after_init variables, which includes critical security data such
+>>> as LSM
+>>> parameters) and .text sections as non-writable, and the .text section
+>>> is the
+>>> only one where kernel execution is allowed. This is possible thanks
+>>> to the new
+>>> MBEC support also brough by this series (otherwise the vDSO would
+>>> have to be
+>>> executable). Thanks to this hardware support (VT-x, EPT and MBEC),
+>>> the
+>>> performance impact of such guest protection is negligible.
+>>>
+>>> The second KVM_HC_LOCK_CR_UPDATE hypercall enables guests to pin some
+>>> of its
+>>> CPU control register flags (e.g., X86_CR0_WP, X86_CR4_SMEP,
+>>> X86_CR4_SMAP),
+>>> which is another complementary hardening mechanism.
+>>>
+>>> Heki can be enabled with the heki=1 boot command argument.
+>>>
+>>>
+>>
+>> Can the guest kernel ask the host VMM's emulated devices to DMA into
+>> the protected data? It should go through the host userspace mappings I
+>> think, which don't care about EPT permissions. Or did I miss where you
+>> are protecting that another way? There are a lot of easy ways to ask
+>> the host to write to guest memory that don't involve the EPT. You
+>> probably need to protect the host userspace mappings, and also the
+>> places in KVM that kmap a GPA provided by the guest.
 > 
-> 
-> About this. Instead of sev_es_init_vmcb(), I can toggle the #DB intercept
-> when toggling guest_debug, see below. This
-> kvm_x86_ops::update_exception_bitmap hook is called on vcpu reset and
-> kvm_arch_vcpu_ioctl_set_guest_debug (which skips this call if
-> guest_state_protected = true).
+> Good point, I'll check this confused deputy attack. Extended KVM
+> protections should indeed handle all ways to map guests' memory. I'm
+> wondering if current VMMs would gracefully handle such new restrictions
+> though.
 
-KVM also intercepts #DB when single-stepping over IRET to find an NMI window, so
-you'd also have to factor in nmi_singlestep, and update svm_enable_nmi_window()
-and disable_nmi_singlestep() to call svm_update_exception_bitmap().
-
-> Is there any downside?
-
-Complexity is the main one.  The complexity is quite low, but the benefit to the
-guest is likely even lower.  A #DB in the guest isn't likely to be performance
-sensitive.  And on the flip side, opening an NMI window would be a tiny bit more
-expensive, though I doubt that would be meaningful either.
-
-All in all, I think it makes sense to just keep intercepting #DB for non-SEV-ES
-guests.
-
-Side topic, isn't there an existing bug regarding SEV-ES NMI windows?  KVM can't
-actually single-step an SEV-ES guest, but tries to set RFLAGS.TF anyways.  Blech,
-and suppressing EFER.SVME in efer_trap() is a bit gross, but I suppose since the
-GHCB doesn't allow for CLGI or STGI it's "fine".
-
-E.g. shouldn't KVM do this?
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index ca32389f3c36..4e4a49031efe 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3784,6 +3784,16 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
-        if (svm_get_nmi_mask(vcpu) && !svm->awaiting_iret_completion)
-                return; /* IRET will cause a vm exit */
- 
-+       /*
-+        * KVM can't single-step SEV-ES guests and instead assumes that IRET
-+        * in the guest will always succeed, i.e. clears NMI masking on the
-+        * next VM-Exit.  Note, GIF is guaranteed to be '1' for SEV-ES guests
-+        * as the GHCB doesn't allow for CLGI or STGI (and KVM suppresses
-+        * EFER.SVME for good measure, see efer_trap()).
-+        */
-+       if (sev_es_guest(vcpu->kvm))
-+               return;
-+
-        if (!gif_set(svm)) {
-                if (vgif)
-                        svm_set_intercept(svm, INTERCEPT_STGI);
+I guess the host could map arbitrary data to the guest, so that need to 
+be handled, but how could the VMM (not the host kernel) bypass/update 
+EPT initially used for the guest (and potentially later mapped to the host)?
