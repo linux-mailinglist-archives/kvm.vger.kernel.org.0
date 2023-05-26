@@ -2,122 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7C03712EA6
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 23:03:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2547712EF3
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 23:37:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230064AbjEZVDw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 17:03:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58342 "EHLO
+        id S237782AbjEZVhO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 17:37:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243931AbjEZVDt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 17:03:49 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3ACD1AC
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 14:03:47 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-bad1c8dce48so1765215276.0
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 14:03:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685135027; x=1687727027;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=94Gih39C/5Jv2sKi/kH1B+XJjmK37tFsbYqDzgh8LSo=;
-        b=73RcvMGtNzkiHiAzrUk4D4BsUuUTIDzJR6V5U8XGMy27vYtPxtmlqH4IyiW0B8dF4O
-         rA0ZaFT96DO5Xvb3oyGl8FUEw4jXnROB6ckPmAuDivzp5AUQk8VNSwa3ugxH4AGJQvMA
-         xBP4sjdzixlOUqbAJE97AIk3m3mPDjp8DxuLalkyp4kNxG5QovsujN3ov45zLGAFnzA5
-         UeQu0iKn8bUYXNEdui1uwvMrpUsW5UBj4WxK7z07T8JbGH+MAWtkybrhXng4TQ+0SZl/
-         5pLaVTGEBAHh3yjhomAGa6IIPlq1frwJZjRV/ITJGyTiEKVtGCvwVHvWbvMhT8fJgMXA
-         N6aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685135027; x=1687727027;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=94Gih39C/5Jv2sKi/kH1B+XJjmK37tFsbYqDzgh8LSo=;
-        b=TAshPVxCRsbjKQY8t9UpkAkSAQLyd/eSoxwmEh6M3ySqHiYagdIB0G0nZ2OjE9/ZzS
-         jFKfwZK6xp14YXH5elW7wCBXT3EKhisfCSItfUThonU2xe4Uf1pi9HOmVqbHC3qweRE3
-         LWxRK5PaVCDQmnWeOZmZCj4FmnKA0YaI1XTlHY/0OEM0/rbA5Q4Ss4sJ368jyFwRzSQH
-         uoe7nALl2ShFGFARSsCeHDMdwVij60+EEYVC6mu0TxEBXX0z8uyTeThT1ObMv/SfxmXF
-         joItHW9M9g7xjNcSm5fX78wPRzJqrZzV6fj7Oy/kgIbv5EICGxZX0myswjJBH3muN1L+
-         BU4g==
-X-Gm-Message-State: AC+VfDxxjwTzZupnvnZY7ZQRp4ZBBsdYYkBBQ8gDI12rxJadPQbgA67+
-        6+cyGuusaHdl8yNCV32ZGzZdwJn5lZg=
-X-Google-Smtp-Source: ACHHUZ7wz4/ZvBCdD3rlIOVUwAoTohMGbg3GIGXPcyRJsQsUEZ3BXzfeU21emCpgJ6/HAWSYg6v0LHO+KvU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d648:0:b0:bab:9391:470d with SMTP id
- n69-20020a25d648000000b00bab9391470dmr1179468ybg.0.1685135027218; Fri, 26 May
- 2023 14:03:47 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 26 May 2023 14:03:40 -0700
-In-Reply-To: <20230526210340.2799158-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230526210340.2799158-1-seanjc@google.com>
-X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230526210340.2799158-3-seanjc@google.com>
-Subject: [PATCH v3 2/2] KVM: selftests: Extend cpuid_test to verify
- KVM_GET_CPUID2 "nent" updates
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Takahiro Itazuri <itazur@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229755AbjEZVhM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 17:37:12 -0400
+Received: from out-47.mta1.migadu.com (out-47.mta1.migadu.com [IPv6:2001:41d0:203:375::2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3CBFAD
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 14:37:10 -0700 (PDT)
+Date:   Fri, 26 May 2023 21:37:04 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1685137029;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NFmfZJ9XSBvihraEvyzSKBtHQpCcMvW1SpatpSEYiEE=;
+        b=mAQWhVuBWTZ2vUp9QXlpaQmgvIpPn7WZKHBChPEYdJXqisi9FB5bGReorOWP3/umm0nQgh
+        wpQH14L8SKVxqsuP3iyV7hBqWuSQBglt0VRFRwsGr17PN/YnZH5MVM09zmdKOvND3xyqnF
+        qAM4htNt1/pFWDuDRChhDvZDdJZSaHM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v10 4/5] KVM: arm64: Reuse fields of sys_reg_desc for
+ idreg
+Message-ID: <ZHEmgPAK59Wh/jv/@linux.dev>
+References: <20230522221835.957419-1-jingzhangos@google.com>
+ <20230522221835.957419-5-jingzhangos@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230522221835.957419-5-jingzhangos@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Verify that KVM reports the actual number of CPUID entries on success, but
-doesn't touch the userspace struct on failure (which for better or worse,
-is KVM's ABI).
+Hi Jing,
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../testing/selftests/kvm/x86_64/cpuid_test.c | 21 +++++++++++++++++++
- 1 file changed, 21 insertions(+)
+On Mon, May 22, 2023 at 10:18:34PM +0000, Jing Zhang wrote:
+> Since reset() and val are not used for idreg in sys_reg_desc, they would
+> be used with other purposes for idregs.
+> The callback reset() would be used to return KVM sanitised id register
+> values. The u64 val would be used as mask for writable fields in idregs.
+> Only bits with 1 in val are writable from userspace.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/cpuid_test.c b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
-index 2fc3ad9c887e..d3c3aa93f090 100644
---- a/tools/testing/selftests/kvm/x86_64/cpuid_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/cpuid_test.c
-@@ -163,6 +163,25 @@ static void set_cpuid_after_run(struct kvm_vcpu *vcpu)
- 	ent->eax = eax;
- }
- 
-+static void test_get_cpuid2(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpuid2 *cpuid = allocate_kvm_cpuid2(vcpu->cpuid->nent + 1);
-+	int i, r;
-+
-+	vcpu_ioctl(vcpu, KVM_GET_CPUID2, cpuid);
-+	TEST_ASSERT(cpuid->nent == vcpu->cpuid->nent,
-+		    "KVM didn't update nent on success, wanted %u, got %u\n",
-+		    vcpu->cpuid->nent, cpuid->nent);
-+
-+	for (i = 0; i < vcpu->cpuid->nent; i++) {
-+		cpuid->nent = i;
-+		r = __vcpu_ioctl(vcpu, KVM_GET_CPUID2, cpuid);
-+		TEST_ASSERT(r && errno == E2BIG, KVM_IOCTL_ERROR(KVM_GET_CPUID2, r));
-+		TEST_ASSERT(cpuid->nent == i, "KVM modified nent on failure");
-+	}
-+	free(cpuid);
-+}
-+
- int main(void)
- {
- 	struct kvm_vcpu *vcpu;
-@@ -183,5 +202,7 @@ int main(void)
- 
- 	set_cpuid_after_run(vcpu);
- 
-+	test_get_cpuid2(vcpu);
-+
- 	kvm_vm_free(vm);
- }
+The tense of the changelog is wrong (should be in an imperative mood).
+Maybe something like:
+
+  sys_reg_desc::{reset, val} are presently unused for ID register
+  descriptors. Repurpose these fields to support user-configurable ID
+  registers.
+
+  Use the ::reset() function pointer to return the sanitised value of a
+  given ID register, optionally with KVM-specific feature sanitisation.
+  Additionally, keep a mask of writable register fields in ::val.
+
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 101 +++++++++++++++++++++++++++-----------
+>  arch/arm64/kvm/sys_regs.h |  15 ++++--
+>  2 files changed, 82 insertions(+), 34 deletions(-)
+> 
+
+[...]
+
+> +/*
+> + * Since reset() callback and field val are not used for idregs, they will be
+> + * used for specific purposes for idregs.
+> + * The reset() would return KVM sanitised register value. The value would be the
+> + * same as the host kernel sanitised value if there is no KVM sanitisation.
+> + * The val would be used as a mask indicating writable fields for the idreg.
+> + * Only bits with 1 are writable from userspace. This mask might not be
+> + * necessary in the future whenever all ID registers are enabled as writable
+> + * from userspace.
+> + */
+> +
+>  /* sys_reg_desc initialiser for known cpufeature ID registers */
+>  #define ID_SANITISED(name) {			\
+>  	SYS_DESC(SYS_##name),			\
+> @@ -1751,6 +1788,8 @@ static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
+>  	.get_user = get_id_reg,			\
+>  	.set_user = set_id_reg,			\
+>  	.visibility = id_visibility,		\
+> +	.reset = general_read_kvm_sanitised_reg,\
+> +	.val = 0,				\
+
+I generally think unions are more trouble than they're worth, but it
+might make sense to throw the fields with dual meaning into one, like
+
+  struct sys_reg_desc {
+
+  	[...]
+	union {
+		struct {
+			void (*reset)(struct kvm_vcpu *, const struct sys_reg_desc *);
+			u64 val;
+		};
+		struct {
+			u64 (*read_sanitised)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *);
+			u64 mask;
+		};
+	};
+  }
+
+You could then avoid repainting the world to handle ->reset() returning
+a value and usage of the fields in an id register context become a bit
+more self-documenting. And you get to play with fire while you do it!
+
+Let's see if the other side of the pond agrees with my bikeshedding...
+
 -- 
-2.41.0.rc0.172.g3f132b7071-goog
-
+Thanks,
+Oliver
