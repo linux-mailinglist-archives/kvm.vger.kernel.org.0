@@ -2,168 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A98C2711AD6
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 01:47:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21683711B07
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 02:08:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241839AbjEYXrw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 19:47:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60942 "EHLO
+        id S235290AbjEZAIC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 20:08:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233722AbjEYXru (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 19:47:50 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94BA3134
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 16:47:48 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-53f44c25595so58373a12.2
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 16:47:48 -0700 (PDT)
+        with ESMTP id S229944AbjEZAIA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 20:08:00 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B9E21BF
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 17:07:46 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-2537262fad8so200239a91.0
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 17:07:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685058468; x=1687650468;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M8oZjjOQNTxB16i/kRUTHOPkmBlz5h8b4Y2tKsSoEHg=;
-        b=MNBjwkcoIzvJgFY6T3LrC/fvrFsCSV153itbyffZ0Qu+QsnPCQZsCUVrZz0DhJEGYA
-         YsamDAjKloHsF7toJ7bkmnLcTj1ZYkXRSLmC7Nomv3jSSPfxuxLjUVFmYbwjB4qZh9Mw
-         XGh+2WTytNy0Di7jJ+UpcMPCBvHg0dnXNRFIt0wUADaJwv57St8sYL8lhpOThGQr+obf
-         kcykJtmI/XFz16Z2PG8Mj9nVgfDPgzGzOBTorX3YfZ1Uwsk9Aw1NFEoVi1+A41OhX108
-         EuJ0me8RDDDnRzMbTTgWnOhq87ol54ILYp5QhM6Jv7ftzfF0tkQ+v2fj6SotuIMyD4hD
-         ua1w==
+        d=google.com; s=20221208; t=1685059666; x=1687651666;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tgwBf1vpedGR6Qn5q5IWeDAXWFWpxuHGkgwFvsEdueA=;
+        b=RSPcntvLhDvt762w9zQ6wbJTgsueyfNVhOy2LeHkU2pQAuhmVebW/jli9EV2Uneg7Q
+         BFRgQL4psymD4eB9vfLNDJ5tOWLVGXHygXF1rg3RBJXFDpuE+fgHXgMfG+HFil0c0BOt
+         AbnDLQNC/Ve8E9X5cLzi+v37wr/xEPBYPiEKiZtrnZ+Az6myffEgKXvxWVzcOwuZuapJ
+         PPvNbXu5skOI8K7R7kRX79MP8PEDA1J4EHHvq6/CSq81V0rUa/8D2Lx3oKMG2tUC1cDh
+         fLRBXO1glR5GXl2nlTfVqBgXHLJzh/+D6MHaJ9SvZXrclK7AcJceiX5zGkAYdZ5sBKgJ
+         Gtsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685058468; x=1687650468;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M8oZjjOQNTxB16i/kRUTHOPkmBlz5h8b4Y2tKsSoEHg=;
-        b=adKSl2xGKVKOBn0DioWxYL1kOa06wwaQB/SQZA+WPC8eN7yXbWfk1yWB1qVF87+sqq
-         QBuqVYsN29fycIheeyLV3wkwSTKS2wixi2Om03cpm7gaNf0qDniuJbdcT1DnzwfrBqUk
-         VKssde5Yk/Kr2xyIcyZxiyhjim1d892lex/ZFhj6h8N5pAjTsKFmMLXK4yrdqG6Wjy//
-         mvQhk5GRxaSlG2TuzC3sPjei3CtNvSYIrg4k+DL7XDhMBwKN6mjxlFbQuS8oi9Qx82KH
-         aAfTNO+fUzApyDRl5+87yTP1Uqb9rg4be+X2Sfe4kkgHGO8b2RLBQGbXOSoocCmNzgbr
-         76fg==
-X-Gm-Message-State: AC+VfDwSkRpiqYuaFnG0MRehuL0kGMqn8AYZ/1CTUID2tRTGg8AnbZpT
-        GUxUchmFBxPPMTZXEPib5ts2jsuVreitYAM8iCAcVuzFK8x4ahT22lQTbq0k4YBvViZLNjfILgs
-        teiHdhfEhhMdWWD3dICOB3WmWE/z50S/+tFi08rLRSLKBM7eblBgfQXOFEw==
-X-Google-Smtp-Source: ACHHUZ4OPUblLzQ+wnZNi8Hq07X/nDUw9V/Iv71hqqBmrxuykMHf/+umYn8Wea2JDB80fH2D3OsHLU0Jp7o=
+        d=1e100.net; s=20221208; t=1685059666; x=1687651666;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tgwBf1vpedGR6Qn5q5IWeDAXWFWpxuHGkgwFvsEdueA=;
+        b=Xcud/bxKALZQ1QRszREgDWuS+xWaIW7lMFTTK2WbqAkvCfnWZjjw0v9LW+IOJV20dh
+         a4C1Iqt76qoOTWH0DNXS4Q//z1xKZK6FR5znEpPj9D2xlZcsOGXQw32nZ1erjqKJjWym
+         YD36WQw/KG6csfZZJ6ok3iMi+FkS+YVai56VHdgr+f85lDzTTCff+tY1wratV4aN8WZA
+         NcjC4msxrh3N9ufSiIvqYM3b60NU0s0lTnIlbtZnHmiDjTLdM+Qs2+AnOloewV6r+QDg
+         KLIeFL7zYW6II5sRCUfFmFpTU0xcoqwSh7TYewdPz2Jc9ziWJj/2so5LEsZtPUCvjjTj
+         b3Sw==
+X-Gm-Message-State: AC+VfDxndncHagPjFaPBWNAfzpjG0CNXllmG6QouIsD2ueuV+E+YNAya
+        hhoolU5vsxaTHZX+OFsD2ilNbtDNl9Y=
+X-Google-Smtp-Source: ACHHUZ5y0DY3/z5sYSxQLn2fjFdAynG+vT9yVfye3FKuY1U1O7U65cL9yt3YnGPWoULEDbPez5Y4FR+w8pw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:192:0:b0:517:ce37:756e with SMTP id
- 140-20020a630192000000b00517ce37756emr78680pgb.7.1685058467851; Thu, 25 May
- 2023 16:47:47 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 May 2023 16:47:35 -0700
+ (user=seanjc job=sendgmr) by 2002:a17:90a:f490:b0:256:2192:2c58 with SMTP id
+ bx16-20020a17090af49000b0025621922c58mr201955pjb.4.1685059665776; Thu, 25 May
+ 2023 17:07:45 -0700 (PDT)
+Date:   Thu, 25 May 2023 17:07:44 -0700
+In-Reply-To: <20230525183347.2562472-2-mhal@rbox.co>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230525234735.2585977-1-seanjc@google.com>
-Subject: [ANNOUNCE] PUCK Agenda - 2023.05.31 - guest_memfd()
+References: <20230525183347.2562472-1-mhal@rbox.co> <20230525183347.2562472-2-mhal@rbox.co>
+Message-ID: <ZG/4UN2VpZ1a6ek1@google.com>
+Subject: Re: [PATCH 1/3] KVM: x86: Fix out-of-bounds access in kvm_recalculate_phys_map()
 From:   Sean Christopherson <seanjc@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sagi Shahar <sagis@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Anish Ghulati <aghulati@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Houghton <jthoughton@google.com>,
-        Anish Moorthy <amoorthy@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Babu Moger <babu.moger@amd.com>, Chao Gao <chao.gao@intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Guang Zeng <guang.zeng@intel.com>,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Jing Liu <jing2.liu@intel.com>,
-        Junaid Shahid <junaids@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Leonardo Bras <leobras@redhat.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Li RongQing <lirongqing@baidu.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Michal Luczaj <mhal@rbox.co>,
-        Mingwei Zhang <mizhang@google.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        Paul Durrant <pdurrant@amazon.com>,
-        Peng Hao <flyingpenghao@gmail.com>,
-        Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
-        Robert Hoo <robert.hu@linux.intel.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Fuad Tabba <tabba@google.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Qinglan Xiang <qinglan.xiang@intel.com>,
-        Kai Svahn <kai.svahn@intel.com>,
-        Margarita Maroto <margarita.maroto@intel.com>,
-        Anil Keshavamurthy <anil.s.keshavamurthy@intel.com>,
-        Nagareddy Reddy <nspreddy@google.com>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     pbonzini@redhat.com, shuah@kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Topic:      guest_memfd(), a.k.a. restrictedmem, a.k.a. UPM
-Objective:  Reach consensus on design for backing guest private memory
-Background: https://lore.kernel.org/all/ZEM5Zq8oo+xnApW9@google.com
+On Thu, May 25, 2023, Michal Luczaj wrote:
+> Handle the case of vCPU addition and/or APIC enabling during the APIC map
+> recalculations. Check the sanity of x2APIC ID in !x2apic_format &&
+> apic_x2apic_mode() case.
+> 
+> kvm_recalculate_apic_map() creates the APIC map iterating over the list of
+> vCPUs twice. First to find the max APIC ID and allocate a max-sized buffer,
+> then again, calling kvm_recalculate_phys_map() for each vCPU. This opens a
+> race window: value of max APIC ID can increase _after_ the buffer was
+> allocated.
+> 
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
+>  arch/x86/kvm/lapic.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index e542cf285b51..39b9a318d04c 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -265,10 +265,14 @@ static int kvm_recalculate_phys_map(struct kvm_apic_map *new,
+>  		 * mapped, i.e. is aliased to multiple vCPUs.  The optimized
+>  		 * map requires a strict 1:1 mapping between IDs and vCPUs.
+>  		 */
+> -		if (apic_x2apic_mode(apic))
+> +		if (apic_x2apic_mode(apic)) {
+> +			if (x2apic_id > new->max_apic_id)
+> +				return -EINVAL;
 
-Date:  2023.05.31 (May 31st)
-Time:  6am PDT
-Video: https://meet.google.com/vdb-aeqo-knk
-Phone: https://tel.meet/vdb-aeqo-knk?pin=3003112178656
+Hmm, disabling the optimized map just because userspace created a new vCPU is
+unfortunate and unnecessary.  Rather than return -EINVAL and only perform the
+check when x2APIC is enabled, what if we instead do the check immediately and
+return -E2BIG?  Then the caller can retry with a bigger array size.  Preemption
+is enabled and retries are bounded by the number of possible vCPUs, so I don't
+see any obvious issues with retrying.
 
-Future Schedule:
-June 7th  - pKVM on x86 (Google + Intel)
-June 14th - Available!
-June 21st - No Meeting (Sean OOO)
-June 28th - Available!
-July 5th  - No Meeting (Sean OOO)
+And I vote to also add a sanity check on xapic_id, if only to provide documentation
+as to why it can't overflow.
 
-I've created a shared calendar (comically long link at the bottom) that people
-can subscribe to in order to get reminders, notifications, etc.  At least, that's
-the theory.  Holler if it's not working as intended and/or if it's insufficient.
+I think hoisting the checks up would also obviate the need for cleanup (patch 2),
+which I agree isn't obviously better.
 
-Contact me (off-list or on-list, your choice) if you have a topic you'd like to
-discuss (see above for available dates).  I can't promise that I'll accept all
-proposed topics, but at this point the future schedule is quite open :-)  When
-proposing a topic, please provide background info/links and a clear statement on
-exactly what you hope to achieve, e.g. if the goal is to get help solving a
-technical problem, get feedback on a direction, reach consensus on something, etc.
+E.g. this?  Compile tested only.  I'll test more tomorrow unless you beat me to
+it.  Thanks for the fun bugs, as always :-)
 
-My goal is to make PUCK as interactive and informal as possible.  To that end,
-formal presentations are discouraged, but not outright banned.  Though if you
-show up with a big slide deck, I may kick you out of the meeting on principal :-).
+---
+ arch/x86/kvm/lapic.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-Time slots are very flexible (within the 1 hour hard limit), but please try to
-make a semi-accurate estimate of how much time a topic will need.  If there is
-unclaimed/unused time (or even no topic) for a given instance, my plan is to use
-the time for "office hours", e.g. to answer general upstreaming questions, etc.
-At this point, I'm not planning on canceling instances if there's no topic, i.e.
-will still hold office hours, though that may change if the office hours idea
-isn't useful.
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index e542cf285b51..cd34b88c937a 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -228,6 +228,12 @@ static int kvm_recalculate_phys_map(struct kvm_apic_map *new,
+ 	u32 xapic_id = kvm_xapic_id(apic);
+ 	u32 physical_id;
+ 
++	if (WARN_ON_ONCE(xapic_id >= new->max_apic_id))
++		return -EINVAL;
++
++	if (x2apic_id >= new->max_apic_id)
++		return -E2BIG;
++
+ 	/*
+ 	 * Deliberately truncate the vCPU ID when detecting a mismatched APIC
+ 	 * ID to avoid false positives if the vCPU ID, i.e. x2APIC ID, is a
+@@ -253,8 +259,7 @@ static int kvm_recalculate_phys_map(struct kvm_apic_map *new,
+ 	 */
+ 	if (vcpu->kvm->arch.x2apic_format) {
+ 		/* See also kvm_apic_match_physical_addr(). */
+-		if ((apic_x2apic_mode(apic) || x2apic_id > 0xff) &&
+-			x2apic_id <= new->max_apic_id)
++		if (apic_x2apic_mode(apic) || x2apic_id > 0xff)
+ 			new->phys_map[x2apic_id] = apic;
+ 
+ 		if (!apic_x2apic_mode(apic) && !new->phys_map[xapic_id])
+@@ -366,6 +371,7 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+ 	unsigned long i;
+ 	u32 max_id = 255; /* enough space for any xAPIC ID */
+ 	bool xapic_id_mismatch = false;
++	int r;
+ 
+ 	/* Read kvm->arch.apic_map_dirty before kvm->arch.apic_map.  */
+ 	if (atomic_read_acquire(&kvm->arch.apic_map_dirty) == CLEAN)
+@@ -386,6 +392,7 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+ 		return;
+ 	}
+ 
++retry:
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+ 		if (kvm_apic_present(vcpu))
+ 			max_id = max(max_id, kvm_x2apic_id(vcpu->arch.apic));
+@@ -404,9 +411,13 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+ 		if (!kvm_apic_present(vcpu))
+ 			continue;
+ 
+-		if (kvm_recalculate_phys_map(new, vcpu, &xapic_id_mismatch)) {
++		r = kvm_recalculate_phys_map(new, vcpu, &xapic_id_mismatch);
++		if (r) {
+ 			kvfree(new);
+ 			new = NULL;
++			if (r == -E2BIG)
++				goto retry;
++
+ 			goto out;
+ 		}
+ 
 
-People on the Cc list: for my own sanity, future announcements will be sent only
-to kvm@ and LKML.  Please either subscribe to the KVM mailing list or the shared
-calendar below (or bribe someone to forward you announcements) if you want notificatons.
-
-https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
+base-commit: 39428f6ea9eace95011681628717062ff7f5eb5f
+--
