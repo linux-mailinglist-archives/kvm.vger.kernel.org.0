@@ -2,165 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A341D712A78
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 18:17:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2B8E712AD2
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 18:39:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236875AbjEZQRo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 12:17:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33028 "EHLO
+        id S236628AbjEZQjM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 12:39:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236867AbjEZQRm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 12:17:42 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD9AF10A
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 09:17:40 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-64d138bd73aso771770b3a.0
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 09:17:40 -0700 (PDT)
+        with ESMTP id S230437AbjEZQjK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 12:39:10 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1387AD9
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 09:39:09 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-64d1c53cad8so1286340b3a.3
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 09:39:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685117860; x=1687709860;
+        d=google.com; s=20221208; t=1685119148; x=1687711148;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Av6JSvpMO31Ef3i0iy17brBR0RWdNZk95Vd+S8B8AUc=;
-        b=vaLEOccsUzwsXjxN6+ipAFfkVqlek/jd/yllU+PFPnwfKzzLiIW04gWP16FAWyn07h
-         cJkdAGEH9RwOUPpdoDeWaXRRm9mwG5ngD5+x0S3MbatsUMPf2uIdg0WIUGRev4cqQ4iA
-         br5wfncZfH/9vtOY93NqR4eYYYYhQzgqbzOWomSkIPShylzxsuyxf638P1W4yqll5QZX
-         44qFeMBCyFRkFPLs4CwQjtDYXG+DgfkkPlqKmV3AftZbeT7OJGfkI0C1P/WT5bz2lo0R
-         jcThLiH4h7z2PilqMUdz+hxku8ZlhDagvF/ZGamCn+GJMVJQ3WUQL3wV/5yuOq01BuLu
-         VkeA==
+        bh=UJLVDfVcn1dj/LbHO26In0hwpTHbWx8n0yVQTbJTXzg=;
+        b=uTc7NtyrJIEyihrMxask05V/8VG2zI54ut3YHZH3bNGS8o2g4nwve/x4KAOzLEoS1S
+         IXAZ1PG6u3KIHoMgF2pxBeM9CIX51efUEhyvbRBMIjPJHP4gF82/09htMUKnre97au7c
+         9/YztOVxQ38bgMzDxrFWa4RSrFDpstbFQmfrmKuoA9Zvv/5CEbOgGmFuNPMRdOc2MgIH
+         MPlXg1ZAmV7sMmcpp9+sAjRnWt/Bx8WQvXohGS+YrTxYFDQo0JZRWpWwT2UVpH5tByzH
+         rJctbSVbe6+xxofPqBfd1eaEYXTt5bOWaQINBB5t1/Ja2Dn3jOJjFxLwREgwVsntHcvt
+         BHQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685117860; x=1687709860;
+        d=1e100.net; s=20221208; t=1685119148; x=1687711148;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Av6JSvpMO31Ef3i0iy17brBR0RWdNZk95Vd+S8B8AUc=;
-        b=jwSGNi++fJeWedK2xAmNI7NGlYC/tIttaqxC6tFv6D5HLpIUeIKQ+Jy3Kg+c4Kzyzl
-         N4u5qosvHRYwjl7ANGtwUXBQnJ5ZJfnsRld9+sZ8MSDg7BZXKJYqA0JCXKA4puXWbXsm
-         BL0PCE5abpaipT5/X8bbDAhqx+Ve8B/dmEH4gMOL+g4D7icAOALwlwLl0JI708JR3wCR
-         87FJJ86JoDblb5LZRwRYaX9FqOPX1BAXopXshjKgOe4YbrbNIU8hgcrF0YXUM1SwxiZM
-         YZyCZ5+MLn2eRh7dxcq9/LHHxHTcbWIOhFqY6pFvwNMDKUiQLb8VSK+vmOU5rRs/CFnz
-         vRSQ==
-X-Gm-Message-State: AC+VfDzXRimHr/1qoiOf/UA9wIRr6FdW9e26cFo1uO1F6RSTdCwzHqBR
-        /JDxGPFY5TXVX7EVyXPowHLPqEuDzQc=
-X-Google-Smtp-Source: ACHHUZ7+KLogkIR5R8qITQLoZ5UJBXPfzR+K+/t8Xuc4wOawfri/OQJgTOKb3jzwzW5RCJgPpLwlOs2SNDs=
+        bh=UJLVDfVcn1dj/LbHO26In0hwpTHbWx8n0yVQTbJTXzg=;
+        b=W/wBQgQ+d1XPRDCe8w83ohM9ld7AgWgfs2oxh3NRL4/VxgghaozNkK7rtJeVQUsQ9d
+         X1cvIjAE5gYHtF14DZ8o1Zxv5gx9i9uW/IzM30ajNKsTmgOFr3NAlYE3nqzM0btERPKD
+         cX/2fPMkc2rB5q9cpOF+z88YkKzTpTq1ylRh19E3Mg7iXDLs5cNRGTGpiKjNJSVy1bmO
+         3jMGBh2f8o5oaDtA/Ug/Bbl/DCcKBCsNi66ZHh8fBnK5OdA4ED0EGtk2omqLavqqfinw
+         w/mbJEOTa1gUO+ozeh/+16IaJFkrWG3b9BZwA5MrpWrP5EG7HPV1HT3+wD0Enb3PDBdx
+         c38g==
+X-Gm-Message-State: AC+VfDyuQl+QkU1SwJ+/7EbFRRrKoEomGWaL9xGLnjskMH9+RN2ZKT3w
+        GpWTJ0+m1jgUHc7kfV66Wy/whIvQEuU=
+X-Google-Smtp-Source: ACHHUZ5QYr0thV6h4ep+7aFHrM+wG92KDcxf5yGJHUgF2QP+dKoaQKUqvtTI2JkrWIJxDvQv6/G6qOf4Kz4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:b95:b0:63b:526c:ab09 with SMTP id
- g21-20020a056a000b9500b0063b526cab09mr1098287pfj.0.1685117860053; Fri, 26 May
- 2023 09:17:40 -0700 (PDT)
-Date:   Fri, 26 May 2023 09:17:38 -0700
-In-Reply-To: <016686aa-fedc-08bf-df42-9451bba9f82e@rbox.co>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:15d4:b0:643:a029:5b3f with SMTP id
+ o20-20020a056a0015d400b00643a0295b3fmr1135381pfu.2.1685119148597; Fri, 26 May
+ 2023 09:39:08 -0700 (PDT)
+Date:   Fri, 26 May 2023 09:39:06 -0700
+In-Reply-To: <88db2d9cb42e471692ff1feb0b9ca855906a9d95.camel@amazon.com>
 Mime-Version: 1.0
-References: <20230525183347.2562472-1-mhal@rbox.co> <20230525183347.2562472-2-mhal@rbox.co>
- <ZG/4UN2VpZ1a6ek1@google.com> <016686aa-fedc-08bf-df42-9451bba9f82e@rbox.co>
-Message-ID: <ZHDbos7Kf2aX/zyg@google.com>
-Subject: Re: [PATCH 1/3] KVM: x86: Fix out-of-bounds access in kvm_recalculate_phys_map()
+References: <2f19f26e-20e5-8198-294e-27ea665b706f@redhat.com> <88db2d9cb42e471692ff1feb0b9ca855906a9d95.camel@amazon.com>
+Message-ID: <ZHDflnVNGw1fN6VD@google.com>
+Subject: Re: [ANNOUNCE] KVM Microconference at LPC 2023
 From:   Sean Christopherson <seanjc@google.com>
-To:     Michal Luczaj <mhal@rbox.co>
-Cc:     pbonzini@redhat.com, shuah@kernel.org, kvm@vger.kernel.org
+To:     James Gowans <jgowans@amazon.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "maz@kernel.org" <maz@kernel.org>, Alexander Graf <graf@amazon.de>,
+        Nicolas Saenz Julienne <nsaenz@amazon.es>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 26, 2023, Michal Luczaj wrote:
-> On 5/26/23 02:07, Sean Christopherson wrote:
-> > On Thu, May 25, 2023, Michal Luczaj wrote:
-> >> @@ -265,10 +265,14 @@ static int kvm_recalculate_phys_map(struct kvm_apic_map *new,
-> >>  		 * mapped, i.e. is aliased to multiple vCPUs.  The optimized
-> >>  		 * map requires a strict 1:1 mapping between IDs and vCPUs.
-> >>  		 */
-> >> -		if (apic_x2apic_mode(apic))
-> >> +		if (apic_x2apic_mode(apic)) {
-> >> +			if (x2apic_id > new->max_apic_id)
-> >> +				return -EINVAL;
+On Fri, May 26, 2023, James Gowans wrote:
+> On Tue, 2023-05-09 at 11:55 +0200, Paolo Bonzini wrote:
+> > Hi all!
 > > 
-> > Hmm, disabling the optimized map just because userspace created a new vCPU is
-> > unfortunate and unnecessary.  Rather than return -EINVAL and only perform the
-> > check when x2APIC is enabled, what if we instead do the check immediately and
-> > return -E2BIG?  Then the caller can retry with a bigger array size.  Preemption
-> > is enabled and retries are bounded by the number of possible vCPUs, so I don't
-> > see any obvious issues with retrying.
+> > We are planning on submitting a CFP to host a KVM Microconference at
+> > Linux Plumbers Conference 2023. To help justify the proposal, we would
+> > like to gather a list of folks that would likely attend, and crowdsource
+> > a list of topics to include in the proposal.
 > 
-> Right, that makes perfect sense.
+> Hi Paolo,
 > 
-> Just a note, it changes the logic a bit:
+> This MC sounds great! There are two topics I'd be keen to discuss, both in
+> the KVM + memory-management realm:
 > 
-> - x2apic_format: an overflowing x2apic_id won't be silently ignored.
+> 1. Guest and kernel memory persistence across kexec for live update.
+> Specifically focussing on the host IOMMU pgtable persistence for DMA-
+> passthrough devices to support kexec while guest-driven DMA is still
+> running. There is some discussion happening now about this [1] and
+> hopefully the discussion and prototyping will continue in the run up to
+> LPC.
 
-Nit, I wouldn't describe the current behavior as silently ignored.  KVM doesn't
-ignore the case, KVM instead disables the optimized map.
+I don't think a KVM MC conference would be the right venue for this discussion.
+IIUC, KVM does not need to be involved in preserving guest memory or the IOMMU
+page tables.
 
-> - !x2apic_format: -E2BIG even for !apic_x2apic_mode() leads to an realloc
-> instead of "new->phys_map[xapic_id] = apic" right away.
-> 
-> > @@ -228,6 +228,12 @@ static int kvm_recalculate_phys_map(struct kvm_apic_map *new,
-> >  	u32 xapic_id = kvm_xapic_id(apic);
-> >  	u32 physical_id;
-> >  
-> > +	if (WARN_ON_ONCE(xapic_id >= new->max_apic_id))
-> > +		return -EINVAL;
->
-> Shouldn't it be ">" instead of ">="?
+> 2. Supporting more fine-grain memory management and access control APIs
+> for the virtualisation case specifically, for use-cases around live
+> migration, memory oversubscription, and "side-car" virtual machines. These
+> use cases would benefit from kernel support for things like dynamically
+> updating IOMMU and MMU permissions independently at fine granularity, all
+> without actually modifying the VMAs, to support fine-grain handling. And
+> linking this topic to the one above: being able to do these things when
+> not backed by struct pages. (There may be some overlap with "KVM guest
+> private memory" [2] here...)
 
-/facepalm
+Yes, there's overlap with guest private memory.  Though I actually think we should
+start viewing it as "guest first" memory (I'm mentally thinking of it as guest_memfd()),
+since there are potential benefits and applications beyond CoCo VMs for guest memory
+that doesn't *need* to be mapped into host userspace.  If the guest_memfd() idea comes
+to fruition, then KVM would *need* a way to specify guest memory protections without
+VMAs.  So yes, definitely overlap :-)
 
-Yes, I was reading it as the number of IDs, not the max.
+If y'all are interested, guest_memfd() is the topic of discussion for the inaugural
+KVM upstream call (PUCK)[*].  I would also be more than happy to carve out a PUCK
+instance to discuss non-VMA-based MMU protections, i.e. we don't have to wait until
+LPC to start hashing out the KVM API(s) and implementation.
 
-> That said, xapic_id > new->max_apic_id means something terrible has happened as
-> kvm_xapic_id() returns u8 and max_apic_id should never be less than 255. Does
-> this qualify for KVM_BUG_ON?
-
-I don't think so?  The intent of the WARN is mostly to document that KVM always
-allocates enough space for xAPIC IDs, and to guard against that changing in the
-future.  In the latter case, there's no need to kill the VM despite there being
-a KVM bug since running with the optimized map disabled is functionally ok.
-
-If the WARN fires because of host data corruption, then so be it.
-
-> > +	if (x2apic_id >= new->max_apic_id)
-> > +		return -E2BIG;
-> 
-> Probably ">"?
-
-Ya.
-
-> > @@ -366,6 +371,7 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
-> >  	unsigned long i;
-> >  	u32 max_id = 255; /* enough space for any xAPIC ID */
-> >  	bool xapic_id_mismatch = false;
-> > +	int r;
-> >  
-> >  	/* Read kvm->arch.apic_map_dirty before kvm->arch.apic_map.  */
-> >  	if (atomic_read_acquire(&kvm->arch.apic_map_dirty) == CLEAN)
-> > @@ -386,6 +392,7 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
-> >  		return;
-> >  	}
-> >  
-> > +retry:
-> >  	kvm_for_each_vcpu(i, vcpu, kvm)
-> >  		if (kvm_apic_present(vcpu))
-> >  			max_id = max(max_id, kvm_x2apic_id(vcpu->arch.apic));
-> > @@ -404,9 +411,13 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
-> >  		if (!kvm_apic_present(vcpu))
-> >  			continue;
-> >  
-> > -		if (kvm_recalculate_phys_map(new, vcpu, &xapic_id_mismatch)) {
-> > +		r = kvm_recalculate_phys_map(new, vcpu, &xapic_id_mismatch);
-> > +		if (r) {
-> >  			kvfree(new);
-> >  			new = NULL;
-> > +			if (r == -E2BIG)
-> > +				goto retry;
-> > +
-> >  			goto out;
-> >  		}
-> 
-> Maybe it's not important, but what about moving xapic_id_mismatch
-> (re)initialization after "retry:"?
-
-Oof, good catch.  I think it makes sense to move max_id (re)initialization too,
-even though I can't imagine it would matter in practice.
+[*] https://lore.kernel.org/all/20230525234735.2585977-1-seanjc@google.com
