@@ -2,75 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77148712702
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 14:53:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 850F771287B
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 16:35:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243378AbjEZMxl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 08:53:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42554 "EHLO
+        id S237278AbjEZOfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 10:35:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243379AbjEZMxh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 08:53:37 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6997D199;
-        Fri, 26 May 2023 05:53:33 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id C36BA5FD59;
-        Fri, 26 May 2023 15:32:45 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1685104365;
-        bh=vjpgmyB3fJ0fvSTA01eeG607ZmMDcAUYXBQfuZPLoF4=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-        b=ZAH9YvkPcF3G645UtXIYD3gHXqTq5Npnk0hASpHi68u/q9x6+B35D+aeSGzLj+ImW
-         gbJw+8oopgj/4YnPddqrrPCDJAF5tNrZSLaXzKXWfhICmJPjUemtPTkNxMAUmIik7n
-         XD82VIIiZeb6dM1aoR7rUwtX5vA7V2ZYbVhNjFHq0f0SLKdu3+QOUXZoxQU7FJghW8
-         R60OHEycv2S1875uJz3tAeLjM4hfB3sg81+lwxCoj5xgrqIg6rw4R8hAzKeiVEH1gN
-         w5eIi0OX5bckbk84NPT8T5VrwpFYqGZmjezWsUC0okh3cRCZhK+MJqJ3+HPftOFMH5
-         Vxisk4TJQj0ww==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Fri, 26 May 2023 15:32:41 +0300 (MSK)
-Message-ID: <85f50bf8-8b92-c0f8-d994-24b86be9de5b@sberdevices.ru>
-Date:   Fri, 26 May 2023 15:28:13 +0300
+        with ESMTP id S231603AbjEZOe7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 10:34:59 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D561B6
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 07:34:27 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5E1EE61537
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 14:33:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB423C433D2;
+        Fri, 26 May 2023 14:33:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685111633;
+        bh=SF86W45rNNzwtS2zme2rgxuO0AM+zp3YypnP+jojmxI=;
+        h=From:To:Cc:Subject:Date:From;
+        b=C6df6TtKy9fZj8es0dK0LaNt6oH3kVNdlogV2vdjMxYh1/fgcpBgAXzhsXQBBhXq8
+         +YqdOG4xrcm8RsVETxr8ePgxN3IdXuvVQFL6Q1zrk/6/5ilqDgs8yGwjsbLk/rTeKS
+         6NJj/z8k3muJ0NbLtpGe90uDOgEvCqBAbb+LnjDtwvPHmZkjHOt0d/HdTHDHWoDotw
+         rhAqxZ55hk6esfw4b9ZvwDXd8RVd/gL/18DkuHaVHvsNsojmgMsHuYtdQRt0/UxWk7
+         osTqwNVe9o3sTJbR/6UkyXkQaLcRv32Mh8zSwTlDS2IsDDn585kwWRgXgCHQA1tuPk
+         KSz07o/a37Wkg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q2YVr-000aHS-Be;
+        Fri, 26 May 2023 15:33:51 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
+Subject: [PATCH v2 00/17] KVM: arm64: Allow using VHE in the nVHE hypervisor
+Date:   Fri, 26 May 2023 15:33:31 +0100
+Message-Id: <20230526143348.4072074-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v3 00/17] vsock: MSG_ZEROCOPY flag support
-Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230522073950.3574171-1-AVKrasnov@sberdevices.ru>
- <76270fab-8af7-7597-9193-64cb553a543e@sberdevices.ru>
- <y5tgyj5awrd4hvlrsxsvrern6pd2sby2mdtskah2qp5hemmo2a@72nhcpilg7v2>
- <4baf786b-afe5-371d-9bc4-90226e5df3af@sberdevices.ru>
- <sdm43ibxqzdylwxaai4mjj2ucqpduc74ucyg3yrn75dxu2kix5@jynppv7kxyjz>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <sdm43ibxqzdylwxaai4mjj2ucqpduc74ucyg3yrn75dxu2kix5@jynppv7kxyjz>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/05/26 06:32:00 #21351256
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,42 +66,93 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+KVM (on ARMv8.0) and pKVM (on all revisions of the architecture) use
+the split hypervisor model that makes the EL2 code more or less
+standalone. In the later case, we totally ignore the VHE mode and
+stick with the good old v8.0 EL2 setup.
 
+This is all good, but means that the EL2 code is limited in what it
+can do with its own address space. This series proposes to remove this
+limitation and to allow VHE to be used even with the split hypervisor
+model. This has some potential isolation benefits[1], and eventually
+allow systems that do not support HCR_EL2.E2H==0 to eventually run
+pKVM.
 
-On 26.05.2023 15:23, Stefano Garzarella wrote:
-> On Fri, May 26, 2023 at 02:36:17PM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 26.05.2023 13:30, Stefano Garzarella wrote:
->>> On Thu, May 25, 2023 at 06:56:42PM +0300, Arseniy Krasnov wrote:
->>>>
->>>>
->>>> On 22.05.2023 10:39, Arseniy Krasnov wrote:
->>>>
->>>> This patchset is unstable with SOCK_SEQPACKET. I'll fix it.
->>>
->>> Thanks for let us know!
->>>
->>> I'm thinking if we should start split this series in two, because it
->>> becomes too big.
->>>
->>> But let keep this for RFC, we can decide later. An idea is to send
->>> the first 7 patches with a preparation series, and the next ones with a
->>> second series.
->>
->> Hello, ok! So i'll split patchset in the following way:
->> 1) Patches which adds new fields/flags and checks. But all of this is not used,
->>   as it is preparation.
->> 2) Second part starts to use it and also carries tests.
-> 
-> As long as they're RFCs, maybe you can keep them together if they're
-> related, possibly specifying in the cover letter where you'd like to
-> split them. When we agree that we are in good shape, we can split it.
+We introduce a new "mode" for KVM called hVHE, in reference to the
+nVHE mode, and indicating that only the hypervisor is using VHE. Note
+that this is all this series does. No effort is made to improve the VA
+space management, which will be the subject of another series if this
+one ever makes it.
 
-Sure! I'll add this information in cover letter of v4
+This has been tested on a M1 box (bare metal) as well as as a nested
+guest on M2, both with the standard nVHE and protected modes, with no
+measurable change in performance.
 
-Thanks, Arseniy
+Note: the last patch of this series is not a merge candidate.
 
-> > Thanks,
-> Stefano
-> 
+Thanks,
+
+	M.
+
+[1] https://www.youtube.com/watch?v=1F_Mf2j9eIo&list=PLbzoR-pLrL6qWL3v2KOcvwZ54-w0z5uXV&index=11
+
+* From v1:
+  - Fixed CNTHCTL_EL2 setup when switching from E2H=0 to E2H=1
+    Amusingly, this was found on NV...
+  - Rebased on 6.4-rc2
+
+Marc Zyngier (17):
+  KVM: arm64: Drop is_kernel_in_hyp_mode() from
+    __invalidate_icache_guest_page()
+  arm64: Prevent the use of is_kernel_in_hyp_mode() in hypervisor code
+  arm64: Turn kaslr_feature_override into a generic SW feature override
+  arm64: Add KVM_HVHE capability and has_hvhe() predicate
+  arm64: Don't enable VHE for the kernel if OVERRIDE_HVHE is set
+  arm64: Allow EL1 physical timer access when running VHE
+  arm64: Use CPACR_EL1 format to set CPTR_EL2 when E2H is set
+  KVM: arm64: Remove alternatives from sysreg accessors in VHE
+    hypervisor context
+  KVM: arm64: Key use of VHE instructions in nVHE code off
+    ARM64_KVM_HVHE
+  KVM: arm64: Force HCR_EL2.E2H when ARM64_KVM_HVHE is set
+  KVM: arm64: Disable TTBR1_EL2 when using ARM64_KVM_HVHE
+  KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is set
+  KVM: arm64: Rework CPTR_EL2 programming for HVHE configuration
+  KVM: arm64: Program the timer traps with VHE layout in hVHE mode
+  KVM: arm64: Force HCR_E2H in guest context when ARM64_KVM_HVHE is set
+  arm64: Allow arm64_sw.hvhe on command line
+  KVM: arm64: Terrible timer hack for M1 with hVHE
+
+ arch/arm64/include/asm/arch_timer.h     |  8 ++++
+ arch/arm64/include/asm/cpufeature.h     |  5 +++
+ arch/arm64/include/asm/el2_setup.h      | 26 ++++++++++++-
+ arch/arm64/include/asm/kvm_arm.h        |  4 +-
+ arch/arm64/include/asm/kvm_asm.h        |  1 +
+ arch/arm64/include/asm/kvm_emulate.h    | 33 +++++++++++++++-
+ arch/arm64/include/asm/kvm_hyp.h        | 37 +++++++++++++-----
+ arch/arm64/include/asm/kvm_mmu.h        |  3 +-
+ arch/arm64/include/asm/virt.h           | 15 +++++++-
+ arch/arm64/kernel/cpufeature.c          | 17 +++++++++
+ arch/arm64/kernel/hyp-stub.S            | 10 ++++-
+ arch/arm64/kernel/idreg-override.c      | 25 ++++++++-----
+ arch/arm64/kernel/image-vars.h          |  3 ++
+ arch/arm64/kernel/kaslr.c               |  6 +--
+ arch/arm64/kvm/arch_timer.c             |  5 +++
+ arch/arm64/kvm/arm.c                    | 12 +++++-
+ arch/arm64/kvm/fpsimd.c                 |  4 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S      |  9 +++++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 17 ++++++++-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c          | 27 ++++++++++---
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 28 ++++++++------
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c      | 25 +++++++++++--
+ arch/arm64/kvm/hyp/pgtable.c            |  6 ++-
+ arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
+ arch/arm64/kvm/sys_regs.c               |  2 +-
+ arch/arm64/tools/cpucaps                |  1 +
+ drivers/irqchip/irq-apple-aic.c         | 50 ++++++++++++++++++++++++-
+ 28 files changed, 319 insertions(+), 64 deletions(-)
+
+-- 
+2.34.1
+
