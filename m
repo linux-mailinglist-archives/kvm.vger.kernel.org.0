@@ -2,303 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 182BB7128E7
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 16:48:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE1637128B7
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 16:40:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243864AbjEZOsH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 10:48:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42346 "EHLO
+        id S244011AbjEZOkR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 10:40:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243829AbjEZOsF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 10:48:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E740B10D0
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 07:47:38 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 468DF6509D
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 14:46:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90FF4C433D2;
-        Fri, 26 May 2023 14:46:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685112416;
-        bh=hSQy5gLZCuoxx57GR79Suj/ypECkMBpuktFZ/OH29A4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LSV9HG2WMLidZhOqVkX14dvISCMGINHGi/ePjCT+tLL/OGuAOV+58zi3qReiz+uYJ
-         fvO5sqUvQRz9X3iMrGu7+who8YVx7aQTZv7m4i86u3El2Iqsw0R31TfY7lZ7ADe4sM
-         jhCP9PNwQUBuo3pChROyaDi4FaznZx/zE4BG/iudJHyov2V4l4OPwAPzmdK/puUYfy
-         zoWkpbSC/P+3Bow0oxwWsyIn8+uz+O2uTnQYeXvzspHULPHb5QeuebkjZ2SKjya5By
-         xU2fyV6LRiHdPQfaRTtZTmb8q7SX9FpzMF4CmDtdY5SYImGwT/cIJF9xgwgsynX38J
-         xC2iVAtR+KTjQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1q2YVv-000aHS-M2;
-        Fri, 26 May 2023 15:33:55 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 17/17] KVM: arm64: Terrible timer hack for M1 with hVHE
-Date:   Fri, 26 May 2023 15:33:48 +0100
-Message-Id: <20230526143348.4072074-18-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230526143348.4072074-1-maz@kernel.org>
-References: <20230526143348.4072074-1-maz@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S244089AbjEZOkD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 10:40:03 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7005AE4B
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 07:39:27 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-ba8337a5861so2198212276.0
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 07:39:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685111956; x=1687703956;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HNAPtYMKE2DwuE0/Om5XERH8unHdbvGM9xOlT/rQSiM=;
+        b=qsUncX2EbLctr4fP8gajSri5U1pxUkivvKJRV9QQZmG0n0CaNsLFJVwgtgSWDD+SMJ
+         2SdsjklIMX7MTPqTAJd6xEdCOhoRT1rQhi3AonOw5G76o0mFvMlyx2d+x+u3Lv3sR5XU
+         SpIntlAP1o1CdhXFFuU5KFnjUOPei3x70ZeBUQzhnzfj1yKSBUU7AwTHLeMWgZpAsbgh
+         zuODJ2RLL4JnK45BOaGIm4QWeVWqU00jBeMbuLaRDcz1u9yNd4/1VUeVhTAWMR5UXyCT
+         aY3ep4oSH6a2l8RdFYcyXK7LfRXeh/9jcPQiNaj/YT6UTvBvSzXnYlMJLGCqHwQVu6Ai
+         D9jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685111956; x=1687703956;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HNAPtYMKE2DwuE0/Om5XERH8unHdbvGM9xOlT/rQSiM=;
+        b=d2FMD4CqUKJDTHnZt9FpuccPB1z8ZAoDbpWsyyPIIgvvLtTIQv2r2Eu5tx9lwun2wM
+         JVaovDbf6JAWjCPnwYACSyGoyXWMbppLFEI/SVw53JTfbwQR+02AyRLuXUma1BzzJF5H
+         rjoA3AUhy7+0sQ/+iatEHwDtnIvxBoh5pocyYHKupgxULz/1w4nepICkTUScRtEsqSVL
+         VrKVT/dzwyFz9A4np4EUttBEFw38FCnnVD1HecfKD6YNJNthYYakAlE/is9pcReEk2q7
+         jq5/gYtERtC7lTdfCionwZvNb1wGBKKD6PgiJKaRfVEaUJJCRBMEwSCvOeHp6OjQ/Nmb
+         Ni/A==
+X-Gm-Message-State: AC+VfDxOWuw3RboUS7JAhWKaJqTehahiVz9T4Zk1/cNQCoG/Fy8pVu4Y
+        ZV7VXl35BYFoFupz6rcjv6v5Si31syk=
+X-Google-Smtp-Source: ACHHUZ47oCO6HwXqYzWIxcyvOS4fpxEXPkDQACfUzuqbBxss74rfmln5dAtL/xTF8sqWXxmiF1DIIzBlvQQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:8206:0:b0:b9e:7fbc:15e1 with SMTP id
+ q6-20020a258206000000b00b9e7fbc15e1mr4332600ybk.0.1685111955796; Fri, 26 May
+ 2023 07:39:15 -0700 (PDT)
+Date:   Fri, 26 May 2023 07:39:14 -0700
+In-Reply-To: <fc82a8a7-af38-5037-1862-ba2315c4e5af@amd.com>
+Mime-Version: 1.0
+References: <20230411125718.2297768-1-aik@amd.com> <20230411125718.2297768-6-aik@amd.com>
+ <ZGv9Td4p1vtXC0Hy@google.com> <719a6b42-fd91-8eb4-f773-9ed98d2fdb07@amd.com>
+ <ZGzfWQub4FQOrEtw@google.com> <fc82a8a7-af38-5037-1862-ba2315c4e5af@amd.com>
+Message-ID: <ZHDEkuaVjs/0kM6t@google.com>
+Subject: Re: [PATCH kernel v5 5/6] KVM: SEV: Enable data breakpoints in SEV-ES
+From:   Sean Christopherson <seanjc@google.com>
+To:     Alexey Kardashevskiy <aik@amd.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Pankaj Gupta <pankaj.gupta@amd.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Santosh Shukla <santosh.shukla@amd.com>,
+        Carlos Bilbao <carlos.bilbao@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As our M1 friend doesn't have a GIC, it relies on a special hack
-to deal with masking the guest timers, in the form of an IMPDEF
-system register.
+On Fri, May 26, 2023, Alexey Kardashevskiy wrote:
+> 
+> On 24/5/23 01:44, Sean Christopherson wrote:
+> > On Tue, May 23, 2023, Alexey Kardashevskiy wrote:
+> > > > Actually, can't disabling #DB interception for DebugSwap SEV-ES guests be a
+> > > > separate patch?  KVM can still inject #DBs for SEV-ES guests, no?
+> > > 
+> > > Sorry for my ignorance but what is the point of injecting #DB if there is no
+> > > way of changing the guest's DR7?
+> > 
+> > Well, _injecting_ the #DB is necessary for correctness from the guest's perspective.
+> > "What's the point of _intercepting_ #DB" is the real question.  And for SEV-ES guests
+> > with DebugSwap, there is no point, which is why I agree that KVM should disable
+> > interception in that case.  What I'm calling out is that disabling #Db interception
+> > isn't _necessary_ for correctness (unless I'm missing something), which means that
+> > it can and should go in a separate patch.
+> 
+> 
+> About this. Instead of sev_es_init_vmcb(), I can toggle the #DB intercept
+> when toggling guest_debug, see below. This
+> kvm_x86_ops::update_exception_bitmap hook is called on vcpu reset and
+> kvm_arch_vcpu_ioctl_set_guest_debug (which skips this call if
+> guest_state_protected = true).
 
-Unfortunately, this sysreg is EL2-only, which means that the kernel
-cannot mask the interrupts itself, but has to kindly ask EL2 to do
-it. Yes, this is terrible, but we should be used to it by now.
+KVM also intercepts #DB when single-stepping over IRET to find an NMI window, so
+you'd also have to factor in nmi_singlestep, and update svm_enable_nmi_window()
+and disable_nmi_singlestep() to call svm_update_exception_bitmap().
 
-Add a M1-specific hypercall to deal with this. No, I'm not seriously
-suggesting we merge this crap.
+> Is there any downside?
 
-Not-seriously-suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/arch_timer.h |  8 +++++
- arch/arm64/include/asm/kvm_asm.h    |  1 +
- arch/arm64/kernel/image-vars.h      |  3 ++
- arch/arm64/kvm/arch_timer.c         |  5 +++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c  | 11 +++++++
- arch/arm64/kvm/hyp/nvhe/timer-sr.c  |  9 ++++++
- drivers/irqchip/irq-apple-aic.c     | 50 +++++++++++++++++++++++++++--
- 7 files changed, 85 insertions(+), 2 deletions(-)
+Complexity is the main one.  The complexity is quite low, but the benefit to the
+guest is likely even lower.  A #DB in the guest isn't likely to be performance
+sensitive.  And on the flip side, opening an NMI window would be a tiny bit more
+expensive, though I doubt that would be meaningful either.
 
-diff --git a/arch/arm64/include/asm/arch_timer.h b/arch/arm64/include/asm/arch_timer.h
-index af1fafbe7e1d..3817e923f52c 100644
---- a/arch/arm64/include/asm/arch_timer.h
-+++ b/arch/arm64/include/asm/arch_timer.h
-@@ -232,4 +232,12 @@ static inline bool arch_timer_have_evtstrm_feature(void)
- {
- 	return cpu_have_named_feature(EVTSTRM);
- }
-+
-+#ifdef CONFIG_APPLE_AIC
-+#define SYS_IMP_APL_VM_TMR_FIQ_ENA_EL2	sys_reg(3, 5, 15, 1, 3)
-+DECLARE_STATIC_KEY_FALSE(aic_impdef_timer_control);
-+#endif
-+
-+void __aic_timer_fiq_clear_set(u64 clear, u64 set);
-+
- #endif
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 43c3bc0f9544..a9e1444fe1d4 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -75,6 +75,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs,
-+	__KVM_HOST_SMCCC_FUNC___aic_timer_fiq_clear_set,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_init_traps,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 35f3c7959513..3f40f7188acc 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -106,6 +106,9 @@ KVM_NVHE_ALIAS(__hyp_rodata_end);
- /* pKVM static key */
- KVM_NVHE_ALIAS(kvm_protected_mode_initialized);
- 
-+/* Hack for M1 timer control in hVHE mode */
-+KVM_NVHE_ALIAS(aic_impdef_timer_control);
-+
- #endif /* CONFIG_KVM */
- 
- #ifdef CONFIG_EFI_ZBOOT
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 05b022be885b..370e820ecadb 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -1259,6 +1259,11 @@ static int timer_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
- 	return 0;
- }
- 
-+void __aic_timer_fiq_clear_set(u64 clear, u64 set)
-+{
-+	kvm_call_hyp_nvhe(__aic_timer_fiq_clear_set, clear, set);
-+}
-+
- static int timer_irq_set_irqchip_state(struct irq_data *d,
- 				       enum irqchip_irq_state which, bool val)
- {
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index ce602f9e93eb..555294aacfc9 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -192,6 +192,16 @@ static void handle___vgic_v3_restore_aprs(struct kvm_cpu_context *host_ctxt)
- 	__vgic_v3_restore_aprs(kern_hyp_va(cpu_if));
- }
- 
-+#define SYS_IMP_APL_VM_TMR_FIQ_ENA_EL2	sys_reg(3, 5, 15, 1, 3)
-+
-+static void handle___aic_timer_fiq_clear_set(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(u64, clear, host_ctxt, 1);
-+	DECLARE_REG(u64, set, host_ctxt, 2);
-+
-+	__aic_timer_fiq_clear_set(clear, set);
-+}
-+
- static void handle___pkvm_init(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
-@@ -322,6 +332,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__vgic_v3_write_vmcr),
- 	HANDLE_FUNC(__vgic_v3_save_aprs),
- 	HANDLE_FUNC(__vgic_v3_restore_aprs),
-+	HANDLE_FUNC(__aic_timer_fiq_clear_set),
- 	HANDLE_FUNC(__pkvm_vcpu_init_traps),
- 	HANDLE_FUNC(__pkvm_init_vm),
- 	HANDLE_FUNC(__pkvm_init_vcpu),
-diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-index 3aaab20ae5b4..9335dbee88e5 100644
---- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-@@ -60,3 +60,12 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
- 
- 	sysreg_clear_set(cnthctl_el2, clr, set);
- }
-+
-+
-+void __aic_timer_fiq_clear_set(u64 clear, u64 set)
-+{
-+#ifdef CONFIG_APPLE_AIC
-+	if (has_hvhe() && static_branch_likely(&aic_impdef_timer_control))
-+		sysreg_clear_set_s(SYS_IMP_APL_VM_TMR_FIQ_ENA_EL2, clear, set);
-+#endif
-+}
-diff --git a/drivers/irqchip/irq-apple-aic.c b/drivers/irqchip/irq-apple-aic.c
-index 5c534d9fd2b0..acd47f475f36 100644
---- a/drivers/irqchip/irq-apple-aic.c
-+++ b/drivers/irqchip/irq-apple-aic.c
-@@ -180,7 +180,6 @@
- #define IPI_SR_PENDING			BIT(0)
- 
- /* Guest timer FIQ enable register */
--#define SYS_IMP_APL_VM_TMR_FIQ_ENA_EL2	sys_reg(3, 5, 15, 1, 3)
- #define VM_TMR_FIQ_ENABLE_V		BIT(0)
- #define VM_TMR_FIQ_ENABLE_P		BIT(1)
- 
-@@ -236,6 +235,8 @@ enum fiq_hwirq {
- 
- static DEFINE_STATIC_KEY_TRUE(use_fast_ipi);
- 
-+DEFINE_STATIC_KEY_FALSE(aic_impdef_timer_control);
-+
- struct aic_info {
- 	int version;
- 
-@@ -458,6 +459,40 @@ static unsigned long aic_fiq_get_idx(struct irq_data *d)
- 	return AIC_HWIRQ_IRQ(irqd_to_hwirq(d));
- }
- 
-+void __weak __aic_timer_fiq_clear_set(u64 clear, u64 set) { }
-+
-+static bool aic_check_timer_enabled(int timer)
-+{
-+	if (IS_ENABLED(CONFIG_KVM) &&
-+	    static_branch_unlikely(&aic_impdef_timer_control))
-+		return __this_cpu_read(aic_fiq_unmasked) & BIT(timer);
-+	return true;
-+}
-+
-+static void aic_hvhe_timer_mask(int timer, bool mask)
-+{
-+	u64 clr, set, bit;
-+
-+	if (!(IS_ENABLED(CONFIG_KVM) &&
-+	      static_branch_unlikely(&aic_impdef_timer_control)))
-+		return;
-+
-+	if (timer == AIC_TMR_EL0_VIRT)
-+		bit = VM_TMR_FIQ_ENABLE_V;
-+	else
-+	        bit = VM_TMR_FIQ_ENABLE_P;
-+
-+	if (mask) {
-+		clr = bit;
-+		set = 0;
-+	} else {
-+		clr = 0;
-+		set = bit;
-+	}
-+
-+	__aic_timer_fiq_clear_set(clr, set);
-+}
-+
- static void aic_fiq_set_mask(struct irq_data *d)
- {
- 	/* Only the guest timers have real mask bits, unfortunately. */
-@@ -470,6 +505,9 @@ static void aic_fiq_set_mask(struct irq_data *d)
- 		sysreg_clear_set_s(SYS_IMP_APL_VM_TMR_FIQ_ENA_EL2, VM_TMR_FIQ_ENABLE_V, 0);
- 		isb();
- 		break;
-+	case AIC_TMR_EL0_VIRT:
-+		aic_hvhe_timer_mask(AIC_TMR_EL0_VIRT, true);
-+		break;
- 	default:
- 		break;
- 	}
-@@ -486,6 +524,9 @@ static void aic_fiq_clear_mask(struct irq_data *d)
- 		sysreg_clear_set_s(SYS_IMP_APL_VM_TMR_FIQ_ENA_EL2, 0, VM_TMR_FIQ_ENABLE_V);
- 		isb();
- 		break;
-+	case AIC_TMR_EL0_VIRT:
-+		aic_hvhe_timer_mask(AIC_TMR_EL0_VIRT, false);
-+		break;
- 	default:
- 		break;
- 	}
-@@ -545,7 +586,8 @@ static void __exception_irq_entry aic_handle_fiq(struct pt_regs *regs)
- 		generic_handle_domain_irq(aic_irqc->hw_domain,
- 					  AIC_FIQ_HWIRQ(AIC_TMR_EL0_PHYS));
- 
--	if (TIMER_FIRING(read_sysreg(cntv_ctl_el0)))
-+	if (TIMER_FIRING(read_sysreg(cntv_ctl_el0)) &&
-+	    aic_check_timer_enabled(AIC_TMR_EL0_VIRT))
- 		generic_handle_domain_irq(aic_irqc->hw_domain,
- 					  AIC_FIQ_HWIRQ(AIC_TMR_EL0_VIRT));
- 
-@@ -1041,6 +1083,10 @@ static int __init aic_of_ic_init(struct device_node *node, struct device_node *p
- 	if (static_branch_likely(&use_fast_ipi))
- 		pr_info("Using Fast IPIs");
- 
-+	/* Caps are not final at this stage :-/ */
-+	if (cpus_have_cap(ARM64_KVM_HVHE))
-+		static_branch_enable(&aic_impdef_timer_control);
-+
- 	cpuhp_setup_state(CPUHP_AP_IRQ_APPLE_AIC_STARTING,
- 			  "irqchip/apple-aic/ipi:starting",
- 			  aic_init_cpu, NULL);
--- 
-2.34.1
+All in all, I think it makes sense to just keep intercepting #DB for non-SEV-ES
+guests.
 
+Side topic, isn't there an existing bug regarding SEV-ES NMI windows?  KVM can't
+actually single-step an SEV-ES guest, but tries to set RFLAGS.TF anyways.  Blech,
+and suppressing EFER.SVME in efer_trap() is a bit gross, but I suppose since the
+GHCB doesn't allow for CLGI or STGI it's "fine".
+
+E.g. shouldn't KVM do this?
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index ca32389f3c36..4e4a49031efe 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3784,6 +3784,16 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+        if (svm_get_nmi_mask(vcpu) && !svm->awaiting_iret_completion)
+                return; /* IRET will cause a vm exit */
+ 
++       /*
++        * KVM can't single-step SEV-ES guests and instead assumes that IRET
++        * in the guest will always succeed, i.e. clears NMI masking on the
++        * next VM-Exit.  Note, GIF is guaranteed to be '1' for SEV-ES guests
++        * as the GHCB doesn't allow for CLGI or STGI (and KVM suppresses
++        * EFER.SVME for good measure, see efer_trap()).
++        */
++       if (sev_es_guest(vcpu->kvm))
++               return;
++
+        if (!gif_set(svm)) {
+                if (vgif)
+                        svm_set_intercept(svm, INTERCEPT_STGI);
