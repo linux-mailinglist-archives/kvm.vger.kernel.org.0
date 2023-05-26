@@ -2,52 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2547712EF3
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 23:37:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD5AA712FCC
+	for <lists+kvm@lfdr.de>; Sat, 27 May 2023 00:17:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237782AbjEZVhO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 17:37:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41106 "EHLO
+        id S243254AbjEZWR0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 18:17:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbjEZVhM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 17:37:12 -0400
-Received: from out-47.mta1.migadu.com (out-47.mta1.migadu.com [IPv6:2001:41d0:203:375::2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3CBFAD
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 14:37:10 -0700 (PDT)
-Date:   Fri, 26 May 2023 21:37:04 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1685137029;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NFmfZJ9XSBvihraEvyzSKBtHQpCcMvW1SpatpSEYiEE=;
-        b=mAQWhVuBWTZ2vUp9QXlpaQmgvIpPn7WZKHBChPEYdJXqisi9FB5bGReorOWP3/umm0nQgh
-        wpQH14L8SKVxqsuP3iyV7hBqWuSQBglt0VRFRwsGr17PN/YnZH5MVM09zmdKOvND3xyqnF
-        qAM4htNt1/pFWDuDRChhDvZDdJZSaHM=
+        with ESMTP id S229933AbjEZWRZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 18:17:25 -0400
+Received: from out-3.mta0.migadu.com (out-3.mta0.migadu.com [91.218.175.3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7113B83
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 15:17:23 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1685139441;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=0DRZq6mR4INEWOyJ/DMmrZaRWmShYq5YMrnor+fex+M=;
+        b=xmnH4Ig+L0YoY7R+KtbzJ+h6UuJg64rZ0cY8EL3fXwUOOTbBHhPSIlSz6NOus9Z96pDe+N
+        y5tA9RRZvRb313LzQ/t7oE9I3er4Fc1rsAuRqsvKeOIdlTRWDzcOosKnNWrvjrhEyBiWqo
+        HHhOUiQwT08iGXEK6sFLBW8njbEZBx0=
 From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     kvmarm@lists.linux.dev
+Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v10 4/5] KVM: arm64: Reuse fields of sys_reg_desc for
- idreg
-Message-ID: <ZHEmgPAK59Wh/jv/@linux.dev>
-References: <20230522221835.957419-1-jingzhangos@google.com>
- <20230522221835.957419-5-jingzhangos@google.com>
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH kvmtool 00/21] arm64: Handle PSCI calls in userspace
+Date:   Fri, 26 May 2023 22:16:51 +0000
+Message-ID: <20230526221712.317287-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230522221835.957419-5-jingzhangos@google.com>
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
@@ -59,80 +50,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jing,
+The 6.4 kernel picks up support for a generalized SMCCC filter, allowing
+userspace to select hypercall ranges that should be forwarded to
+userspace. This is a shameless attempt of making future SMCCC interfaces
+the responsibility of userspace :)
 
-On Mon, May 22, 2023 at 10:18:34PM +0000, Jing Zhang wrote:
-> Since reset() and val are not used for idreg in sys_reg_desc, they would
-> be used with other purposes for idregs.
-> The callback reset() would be used to return KVM sanitised id register
-> values. The u64 val would be used as mask for writable fields in idregs.
-> Only bits with 1 in val are writable from userspace.
+As a starting point, let's move PSCI up into userspace. KVM already
+leans on userspace for handling calls that have a system-wide effect.
 
-The tense of the changelog is wrong (should be in an imperative mood).
-Maybe something like:
+Tested on linux-next with a 64 vCPU VM. Additionally, I took a stab at
+running kvm-unit-test's psci test, which passes.
 
-  sys_reg_desc::{reset, val} are presently unused for ID register
-  descriptors. Repurpose these fields to support user-configurable ID
-  registers.
+Apologies for some of the changelogs being a bit short. It's Friday, and
+I'm lazy.
 
-  Use the ::reset() function pointer to return the sanitised value of a
-  given ID register, optionally with KVM-specific feature sanitisation.
-  Additionally, keep a mask of writable register fields in ::val.
+Oliver Upton (21):
+  update_headers: Use a list for arch-generic headers
+  update_headers: Add missing entries to list of headers to copy
+  Copy 64-bit alignment attrtibutes from Linux 6.4-rc1
+  Update headers with Linux 6.4-rc1
+  Import arm-smccc.h from Linux 6.4-rc1
+  aarch64: Copy cputype.h from Linux 6.4-rc1
+  arm: Stash kvm_vcpu_init for later use
+  arm: Add support for resetting a vCPU
+  arm: Use KVM_SET_MP_STATE ioctl to power off non-boot vCPUs
+  aarch64: Expose ARM64_CORE_REG() for general use
+  arm: Generalize execution state specific VM initialization
+  Add helpers to pause the VM from vCPU thread
+  aarch64: Add support for finding vCPU for given MPIDR
+  aarch64: Add skeleton implementation for PSCI
+  aarch64: psci: Implement CPU_SUSPEND
+  aarch64: psci: Implement CPU_OFF
+  aarch64: psci: Implement CPU_ON
+  aarch64: psci: Implement AFFINITY_INFO
+  aarch64: psci: Implement MIGRATE_INFO_TYPE
+  aarch64: psci: Implement SYSTEM_{OFF,RESET}
+  aarch64: smccc: Start sending PSCI to userspace
 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 101 +++++++++++++++++++++++++++-----------
->  arch/arm64/kvm/sys_regs.h |  15 ++++--
->  2 files changed, 82 insertions(+), 34 deletions(-)
-> 
+ Makefile                                  |   4 +-
+ arm/aarch32/include/kvm/kvm-arch.h        |   2 +-
+ arm/aarch32/kvm-cpu.c                     |   5 +
+ arm/aarch64/include/asm/cputype.h         | 186 +++++
+ arm/aarch64/include/asm/kvm.h             |  38 +
+ arm/aarch64/include/asm/smccc.h           |  65 ++
+ arm/aarch64/include/kvm/kvm-arch.h        |   2 +-
+ arm/aarch64/include/kvm/kvm-config-arch.h |   6 +-
+ arm/aarch64/include/kvm/kvm-cpu-arch.h    |  28 +-
+ arm/aarch64/kvm-cpu.c                     |  48 +-
+ arm/aarch64/kvm.c                         |  25 +-
+ arm/aarch64/psci.c                        | 206 +++++
+ arm/aarch64/smccc.c                       |  82 ++
+ arm/include/arm-common/kvm-arch.h         |   2 +
+ arm/include/arm-common/kvm-config-arch.h  |   1 +
+ arm/include/arm-common/kvm-cpu-arch.h     |   4 +-
+ arm/kvm-cpu.c                             |  35 +-
+ arm/kvm.c                                 |   2 +-
+ include/kvm/kvm-cpu.h                     |   3 +
+ include/linux/arm-smccc.h                 | 240 ++++++
+ include/linux/kvm.h                       |  55 +-
+ include/linux/psci.h                      |  47 ++
+ include/linux/types.h                     |  13 +
+ include/linux/vfio.h                      | 920 +++++++++++++++++++++-
+ include/linux/vhost.h                     | 186 ++---
+ include/linux/virtio_blk.h                | 105 +++
+ include/linux/virtio_net.h                |   4 +
+ kvm-cpu.c                                 |  15 +
+ riscv/include/asm/kvm.h                   |   3 +
+ util/update_headers.sh                    |  25 +-
+ x86/include/asm/kvm.h                     |  50 +-
+ 31 files changed, 2225 insertions(+), 182 deletions(-)
+ create mode 100644 arm/aarch64/include/asm/cputype.h
+ create mode 100644 arm/aarch64/include/asm/smccc.h
+ create mode 100644 arm/aarch64/psci.c
+ create mode 100644 arm/aarch64/smccc.c
+ create mode 100644 include/linux/arm-smccc.h
 
-[...]
 
-> +/*
-> + * Since reset() callback and field val are not used for idregs, they will be
-> + * used for specific purposes for idregs.
-> + * The reset() would return KVM sanitised register value. The value would be the
-> + * same as the host kernel sanitised value if there is no KVM sanitisation.
-> + * The val would be used as a mask indicating writable fields for the idreg.
-> + * Only bits with 1 are writable from userspace. This mask might not be
-> + * necessary in the future whenever all ID registers are enabled as writable
-> + * from userspace.
-> + */
-> +
->  /* sys_reg_desc initialiser for known cpufeature ID registers */
->  #define ID_SANITISED(name) {			\
->  	SYS_DESC(SYS_##name),			\
-> @@ -1751,6 +1788,8 @@ static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
->  	.get_user = get_id_reg,			\
->  	.set_user = set_id_reg,			\
->  	.visibility = id_visibility,		\
-> +	.reset = general_read_kvm_sanitised_reg,\
-> +	.val = 0,				\
-
-I generally think unions are more trouble than they're worth, but it
-might make sense to throw the fields with dual meaning into one, like
-
-  struct sys_reg_desc {
-
-  	[...]
-	union {
-		struct {
-			void (*reset)(struct kvm_vcpu *, const struct sys_reg_desc *);
-			u64 val;
-		};
-		struct {
-			u64 (*read_sanitised)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *);
-			u64 mask;
-		};
-	};
-  }
-
-You could then avoid repainting the world to handle ->reset() returning
-a value and usage of the fields in an id register context become a bit
-more self-documenting. And you get to play with fire while you do it!
-
-Let's see if the other side of the pond agrees with my bikeshedding...
-
+base-commit: 77b108c6a6f1c66fb7f60a80d17596bb80bda8ad
 -- 
-Thanks,
-Oliver
+2.41.0.rc0.172.g3f132b7071-goog
+
