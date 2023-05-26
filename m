@@ -2,106 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6B79712B65
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 19:08:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D58E4712B9F
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 19:18:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242137AbjEZRIs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 13:08:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59310 "EHLO
+        id S230226AbjEZRSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 13:18:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237407AbjEZRIq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 13:08:46 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0804F3
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 10:08:44 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-babb5e91ab4so2208993276.0
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 10:08:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685120924; x=1687712924;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vGiA8RDXZNla+9oLRBME/ADstNGcLr0myZFsD2x+srs=;
-        b=q+q1fbB+HvtjpmCLptxf0KQdqQ7cCTrflxak5hyAfDyMsl8AwPsS/9dDGqqkCEAbUo
-         XPoOzeWmF2a8QKGAVE3Od0fimzYo47YvWifrxI2j0sYTNVKIGeQ4Rgm/6UwQRExZh02H
-         CozoI7wPYLqEdvkW+Ox56sAS9YqON7dKmdzRU+jS9uZL4g14DSC2+otYfVEr7fzBh359
-         eqO59zmFqtj+qxbx3xnCLVjkYgGbnACaUO2nWt0FFghfZ3TNh+K/3ZqbwH9Xf6JPwso2
-         QjzKIp/3sPi2X15/Z5NGp3sms/bOwF8FfDFAXHjXyIaO32GOw5v+L88cApu9MXYDvO4L
-         fbIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685120924; x=1687712924;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vGiA8RDXZNla+9oLRBME/ADstNGcLr0myZFsD2x+srs=;
-        b=arG3x1NW7jOnXJduP9yhiP7oVsCsGQYTKegzTPaJWqio3WRbl8A3SEd1FNGQ0Ntv0m
-         IcWSkwLcYRar1ol+MZrJMg6B9A/jORF5DDgYz5AZHzqyFT7IT2yP5OUvV0WKACYjh+SN
-         sXljaDlADMkRwJjm3c9sY35DumHkwaCxh7Oic/UxkBOwC+8uvjrXDQVTKn0XIqm2jUAm
-         ySvpB7i2fFF2LjYnl/6ib6qiRnzkqv8csvlz4+zceNt3qrv8+c+EyiTCiEG4ZBDYxJTB
-         c/Q0NcVv7U+ylTcsDlSoaeFWa9Wb6ZQ90KhMpAh1g4b3qzZMI1+/QR9TXqevRdv71pXo
-         d9/Q==
-X-Gm-Message-State: AC+VfDzzzCJu/Ur2pMD1kM85qU8gjgZ+/oEnwsmSUHgNb0S6FszVIAXX
-        W1ZkzOybpBlAduE0DWBfkLGlY8ga6To=
-X-Google-Smtp-Source: ACHHUZ7VjHLnfQxu/pU7xV959/3MV2Qr6me2Aeb/bJmRXm4sLgHq/1MYjPL1W1sqOE2PzCWjfoiItTSNzlA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:bf89:0:b0:bad:600:1833 with SMTP id
- l9-20020a25bf89000000b00bad06001833mr1322707ybk.0.1685120923900; Fri, 26 May
- 2023 10:08:43 -0700 (PDT)
-Date:   Fri, 26 May 2023 10:08:42 -0700
-In-Reply-To: <ZHDflnVNGw1fN6VD@google.com>
-Mime-Version: 1.0
-References: <2f19f26e-20e5-8198-294e-27ea665b706f@redhat.com>
- <88db2d9cb42e471692ff1feb0b9ca855906a9d95.camel@amazon.com> <ZHDflnVNGw1fN6VD@google.com>
-Message-ID: <ZHDnmiyCIXFVxzh9@google.com>
-Subject: Re: [ANNOUNCE] KVM Microconference at LPC 2023
-From:   Sean Christopherson <seanjc@google.com>
-To:     James Gowans <jgowans@amazon.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>, Alexander Graf <graf@amazon.de>,
-        Nicolas Saenz Julienne <nsaenz@amazon.es>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S242487AbjEZRSi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 13:18:38 -0400
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EDF6E6C
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 10:18:03 -0700 (PDT)
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1q2b4i-0076B4-6r
+        for kvm@vger.kernel.org; Fri, 26 May 2023 19:18:00 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=pZulzih1ofPtyRY9EIJibinm9H5qMQgVw6OZvtCrIO0=; b=TD+6IdJvHhhbAphV/AaB1zOP8K
+        pAIUO0MAyiywpRy5dEl0KaOBdekzgFlrQSrrmPlZHJD8YX5rFbs1Ot7Q3D9jbRldIAtAeruDs5sG6
+        ukNsmZRLj1252rtpo+b3h8YJ+OexB2P7PLnKMY3N5UkTVeBN9hdeukJAUPPy5YHnWvcpfaJE21P/l
+        KPUdVzu/3Gnvu49rCCD7FXZ8Ub85QKcgwlHC1bqpykZ63ZpC83UkdQS1sDFYWwkwD4DKBbEdo9VeK
+        T13oavnzpnZnm2WgUQ7GNf3q7zVy8QFVv23dGAHIb44dGvdRbPBDFqqkN2x4Ye9saHtm0TRn3fDAd
+        x7oEiukQ==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1q2b4g-0001K9-G2; Fri, 26 May 2023 19:17:59 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1q2b4f-0000q0-4r; Fri, 26 May 2023 19:17:57 +0200
+Message-ID: <f4c2108d-b5a0-bdee-f354-28ed7e5d4bd5@rbox.co>
+Date:   Fri, 26 May 2023 19:17:55 +0200
+MIME-Version: 1.0
+User-Agent: Thunderbird
+Subject: Re: [PATCH 1/3] KVM: x86: Fix out-of-bounds access in
+ kvm_recalculate_phys_map()
+Content-Language: pl-PL, en-GB
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, shuah@kernel.org, kvm@vger.kernel.org
+References: <20230525183347.2562472-1-mhal@rbox.co>
+ <20230525183347.2562472-2-mhal@rbox.co> <ZG/4UN2VpZ1a6ek1@google.com>
+ <016686aa-fedc-08bf-df42-9451bba9f82e@rbox.co> <ZHDbos7Kf2aX/zyg@google.com>
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <ZHDbos7Kf2aX/zyg@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_INVALID,
+        DKIM_SIGNED,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 26, 2023, Sean Christopherson wrote:
-> On Fri, May 26, 2023, James Gowans wrote:
-> > On Tue, 2023-05-09 at 11:55 +0200, Paolo Bonzini wrote:
-> > > Hi all!
-> > > 
-> > > We are planning on submitting a CFP to host a KVM Microconference at
-> > > Linux Plumbers Conference 2023. To help justify the proposal, we would
-> > > like to gather a list of folks that would likely attend, and crowdsource
-> > > a list of topics to include in the proposal.
-> > 
-> > Hi Paolo,
-> > 
-> > This MC sounds great! There are two topics I'd be keen to discuss, both in
-> > the KVM + memory-management realm:
-> > 
-> > 1. Guest and kernel memory persistence across kexec for live update.
-> > Specifically focussing on the host IOMMU pgtable persistence for DMA-
-> > passthrough devices to support kexec while guest-driven DMA is still
-> > running. There is some discussion happening now about this [1] and
-> > hopefully the discussion and prototyping will continue in the run up to
-> > LPC.
+On 5/26/23 18:17, Sean Christopherson wrote:
+> On Fri, May 26, 2023, Michal Luczaj wrote:
+>> On 5/26/23 02:07, Sean Christopherson wrote:
+>>> On Thu, May 25, 2023, Michal Luczaj wrote:
+>>>> @@ -265,10 +265,14 @@ static int kvm_recalculate_phys_map(struct kvm_apic_map *new,
+>>>>  		 * mapped, i.e. is aliased to multiple vCPUs.  The optimized
+>>>>  		 * map requires a strict 1:1 mapping between IDs and vCPUs.
+>>>>  		 */
+>>>> -		if (apic_x2apic_mode(apic))
+>>>> +		if (apic_x2apic_mode(apic)) {
+>>>> +			if (x2apic_id > new->max_apic_id)
+>>>> +				return -EINVAL;
+>>>
+>>> Hmm, disabling the optimized map just because userspace created a new vCPU is
+>>> unfortunate and unnecessary.  Rather than return -EINVAL and only perform the
+>>> check when x2APIC is enabled, what if we instead do the check immediately and
+>>> return -E2BIG?  Then the caller can retry with a bigger array size.  Preemption
+>>> is enabled and retries are bounded by the number of possible vCPUs, so I don't
+>>> see any obvious issues with retrying.
+>>
+>> Right, that makes perfect sense.
+>>
+>> Just a note, it changes the logic a bit:
+>>
+>> - x2apic_format: an overflowing x2apic_id won't be silently ignored.
 > 
-> I don't think a KVM MC conference would be the right venue for this discussion.
-> IIUC, KVM does not need to be involved in preserving guest memory or the IOMMU
-> page tables.
+> Nit, I wouldn't describe the current behavior as silently ignored.  KVM doesn't
+> ignore the case, KVM instead disables the optimized map.
 
-Ah, I assume the KVM involvement comes from a potentially new filesystem for guest
-memory?
+I may be misusing "silently ignored", but currently if (x2apic_format &&
+apic_x2apic_mode && x2apic_id > new->max_apic_id) new->phys_map[x2apic_id]
+remains unchanged, then kvm_recalculate_phys_map() returns 0 (not -EINVAL).
+I.e. this does not result in rcu_assign_pointer(kvm->arch.apic_map, NULL).
 
-  5. More "advanced" memory management APIs/ioctls for virtualisation: Being
-  able to support things like DMA-driven post-copy live migration, memory
-  oversubscription, carving out chunks of memory from a VM to launch side-
-  car VMs, more fine-grain control of IOMMU or MMU permissions, etc. This
-  may be easier to achieve with a new filesystem, rather than coupling to
-  tempfs semantics and ioctls.
+>> That said, xapic_id > new->max_apic_id means something terrible has happened as
+>> kvm_xapic_id() returns u8 and max_apic_id should never be less than 255. Does
+>> this qualify for KVM_BUG_ON?
+> 
+> I don't think so?  The intent of the WARN is mostly to document that KVM always
+> allocates enough space for xAPIC IDs, and to guard against that changing in the
+> future.  In the latter case, there's no need to kill the VM despite there being
+> a KVM bug since running with the optimized map disabled is functionally ok.
+> 
+> If the WARN fires because of host data corruption, then so be it.
+
+Ahh, OK, I get it.
+
+>> Maybe it's not important, but what about moving xapic_id_mismatch
+>> (re)initialization after "retry:"?
+> 
+> Oof, good catch.  I think it makes sense to move max_id (re)initialization too,
+> even though I can't imagine it would matter in practice.
+
+Right, I forgot that max APIC ID can decrease along the way.
