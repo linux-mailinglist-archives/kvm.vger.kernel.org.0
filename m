@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 569A171287F
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 16:35:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 560D7712880
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 16:35:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242855AbjEZOfx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 10:35:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58640 "EHLO
+        id S237416AbjEZOf5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 10:35:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237386AbjEZOfu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 10:35:50 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11BDDE5D
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 07:35:20 -0700 (PDT)
+        with ESMTP id S230167AbjEZOfz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 10:35:55 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0034CE71
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 07:35:25 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 663A86505F
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8C0B265063
         for <kvm@vger.kernel.org>; Fri, 26 May 2023 14:33:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE7ADC4339B;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E88DDC433A0;
         Fri, 26 May 2023 14:33:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685111633;
-        bh=6wNp/EjkCubmH4jSbimzQJEPlzEQpa08AFTUAXoa3iE=;
+        s=k20201202; t=1685111634;
+        bh=Xl35f5y+0lJ6cnk0BItkJo8xNvJzARnksbTzaqW58BI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ChZ+h+1biz5GYn+nrKqEROEW40i5Jh2C2OLIBoOqR9Ht2+/jJGiO31dnOGDRO9oPP
-         HJLb0oLrBtMy5ScWVFdsLlPD2cG1lwxr2j/MD1C54BvgG1yuFvNrbMv4oKT6C7zmNT
-         J6gqRZUh67PNfO8ZL6sCYGEK56Va1KhTb8P7dY8VrD6rA44r8q/kgW7lkW/n7AfUMB
-         9Jvhb1Fy8AycoeC2bVlILM/uItqm3gBQ+IIjeRi4KQWRJywCaWBg2WCfEZTJ8J/Moo
-         YqPq6hedRQ3U9DXxjBUFCdP5xU+uFiGICa2vn+A8I15I/os5NBCXb4aVtjVv9A31/A
-         hFbDYZ286q9aQ==
+        b=r+kfFMiHYsGjwJcfHCFkTO0wJg6ZQPhYa+JZGFxnzoZMzMFdWyI6yZKMuhfR+6NN8
+         ORgog4mBwfeUYwoV251/69MsgRgmZTmkzoD6dPIONsCpa3UN8hS3uAVnfZBxAkRebu
+         8VvyT8maCPStot229vCbIZf8rDXbCvFZEYV87dVAjmwEStlvyrFirdj4jGMDMt1eI8
+         yBzZZshEwW+1Sn3eF8AERXyoyKthwcab+IqNi5Qme02v66BM9iDEzEXMFyJJ6NeNh+
+         TOMzPvfDOm9bje2fuKPTTD58V6d5EMN/gl58QU7ayErPKQZRE++EsKXKsdI8SPOkeV
+         G0kw1PPx9QlgQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1q2YVr-000aHS-K6;
+        id 1q2YVr-000aHS-Sc;
         Fri, 26 May 2023 15:33:51 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -46,9 +46,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
         Quentin Perret <qperret@google.com>,
         Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 01/17] KVM: arm64: Drop is_kernel_in_hyp_mode() from __invalidate_icache_guest_page()
-Date:   Fri, 26 May 2023 15:33:32 +0100
-Message-Id: <20230526143348.4072074-2-maz@kernel.org>
+Subject: [PATCH v2 02/17] arm64: Prevent the use of is_kernel_in_hyp_mode() in hypervisor code
+Date:   Fri, 26 May 2023 15:33:33 +0100
+Message-Id: <20230526143348.4072074-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230526143348.4072074-1-maz@kernel.org>
 References: <20230526143348.4072074-1-maz@kernel.org>
@@ -58,8 +58,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -68,41 +68,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It is pretty obvious that is_kernel_in_hyp_mode() doesn't make much
-sense in the hypervisor part of KVM, and should be reserved to the
-kernel side.
+Using is_kernel_in_hyp_mode() in hypervisor code is a pretty bad
+mistake. This helper only checks for CurrentEL being EL2, which
+is always true.
 
-However, mem_protect.c::invalidate_icache_guest_page() calls into
-__invalidate_icache_guest_page(), which uses is_kernel_in_hyp_mode().
-Given that this is part of the pKVM side of the hypervisor, this
-helper can only return true.
-
-Nothing goes really bad, but __invalidate_icache_guest_page() could
-spell out what the actual check is: we cannot invalidate the cache
-if the i-cache is VPIPT and we're running at EL1.
-
-Drop the is_kernel_in_hyp_mode() check for an explicit check against
-CurrentEL being EL1 or not.
+Make the link fail if using the helper in hypervisor context
+by referencing a non-existent function. Whilst we're at it,
+flag the helper as __always_inline, which it really should be.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/virt.h | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 27e63c111f78..c8113b931263 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -227,7 +227,8 @@ static inline void __invalidate_icache_guest_page(void *va, size_t size)
- 	if (icache_is_aliasing()) {
- 		/* any kind of VIPT cache */
- 		icache_inval_all_pou();
--	} else if (is_kernel_in_hyp_mode() || !icache_is_vpipt()) {
-+	} else if (read_sysreg(CurrentEL) != CurrentEL_EL1 ||
-+		   !icache_is_vpipt()) {
- 		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
- 		icache_inval_pou((unsigned long)va, (unsigned long)va + size);
- 	}
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 4eb601e7de50..91029709d133 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -110,8 +110,13 @@ static inline bool is_hyp_mode_mismatched(void)
+ 	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
+ }
+ 
+-static inline bool is_kernel_in_hyp_mode(void)
++extern void gotcha_is_kernel_in_hyp_mode(void);
++
++static __always_inline bool is_kernel_in_hyp_mode(void)
+ {
++#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
++	gotcha_is_kernel_in_hyp_mode();
++#endif
+ 	return read_sysreg(CurrentEL) == CurrentEL_EL2;
+ }
+ 
 -- 
 2.34.1
 
