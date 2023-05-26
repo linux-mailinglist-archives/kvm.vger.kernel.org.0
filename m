@@ -2,55 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6861E712EA2
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 23:03:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5E37712EA4
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 23:03:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242710AbjEZVDq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 17:03:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58274 "EHLO
+        id S243877AbjEZVDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 17:03:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230263AbjEZVDo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 17:03:44 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C89F1BB
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 14:03:43 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-530277cf88bso1141704a12.3
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 14:03:43 -0700 (PDT)
+        with ESMTP id S242803AbjEZVDq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 17:03:46 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB6FBBD
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 14:03:45 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-2535728f756so929478a91.3
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 14:03:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685135023; x=1687727023;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bqGO8S3myeC+eomQOIi6rDzjkLbzZroWYlXbkpWLdc0=;
-        b=UOGD5pQjkXpfeiJifIscMBoLdKIcW4HlfIkgcSVUThmQ+Kjhba5PfkMDXdG9Au13SJ
-         7k7vTo+LeVlcwDpTEfhlV+/GfFv/dvO77+0VEaYAqfpfVDRN8/2/m4ad3CiLe6n0cTkM
-         Qc2ELGoDiv+Uf9qPENHYsbOQdVkBk2zSh0Mn9MRq5Wnw4xcUeUptwKZrxBw/Uzqwa2k0
-         PIy3b7l/76nDrP/3TbM8RkarztBK0UhsA5RJ0O64YZw1ZTxNB9ETZdabSOXUAmxWNg1Q
-         YPztFGv72I0nSxQgr7sJ71816BuYb7Xy9MIkLzy65Qe+RzD25hC0oK7oNoWyUMJZGxrz
-         dobg==
+        d=google.com; s=20221208; t=1685135025; x=1687727025;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=hTzx+6AXt6K1nszy+Fq4+7PqDznMb4tNoA3e1kmsjc4=;
+        b=d6VBKb45i+nhnCfXA61AU9D4t4hC9NNWQ3oHjZy8kPJ8JbUc+p0PI3kEO/JJf4hxha
+         CZp1j4ogdlVssTQXCqM6vFPLjoZaBDAvtmZL/IHXPlKjFVSUP/8calK2Rn3ZgQIPfLGr
+         dvEYi267LxAayQftT9J4qsYNfZc9tmqbmFijCoJOuyYrUqn3d7R8364ynMB2lLDWl15A
+         3HApw/46yk2n7KEfdo4yjiPuQzTTRxfs6bQzMwDfcUcKD6MKtS7QqAFue/YfhAKtLa5W
+         a2n4EbiHMOkUTMljD58mKPTGTbxVBlyZEIm0RXhO7Jh0s0wysOrHtj4/1nyMBWEvWxbu
+         hXgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685135023; x=1687727023;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bqGO8S3myeC+eomQOIi6rDzjkLbzZroWYlXbkpWLdc0=;
-        b=aiDwyogOsTYBeUZGFBs8mIos/nBF6U4J92iG2SJ+AHW4LTXn2rqFrnatUDUziCGsGl
-         kNWPYv87G1dEUoV65FYpp+zAc8dIVCEbgcjWIwxWfZm41wZJF/DJ1QgX3KMK0maAY8KY
-         4GAfnpUnzGJ3SAsp7u7Yyq5RDowe0yMcmXfg9xYs2kvzSfU5KSv9LOHS7ZML2lOWmqxQ
-         ikPqMmEABL3IZDmIH9ylSqY2UR33EXL/LEtZBo0q609xZgFSMQUizIe5XTWmFUjA3PQ2
-         eesPEEWzNZAI65bc0WSJ6gtygUswZouf6FfkPZ141IlO/MDAPaawp2U+1QOJf8MsAguA
-         wPlQ==
-X-Gm-Message-State: AC+VfDym8sfO8eIHaRpp6d2fagc+HFSkS9C/sVg0LaIxoc9TpQlV3ie+
-        lqv2En/YMW/9Jc8vDFG4kxtOdHodk0g=
-X-Google-Smtp-Source: ACHHUZ4Q83cLf6FFFwF+jYvtMfxR58orvfBIhh9bjGbnpTN4GHMdHebotzGhf3wNfm/msjEFJjtPuYSPkCo=
+        d=1e100.net; s=20221208; t=1685135025; x=1687727025;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hTzx+6AXt6K1nszy+Fq4+7PqDznMb4tNoA3e1kmsjc4=;
+        b=QN6dX/ImWA65KB/z2Q+qBPX0cu28fiMxSWg2Q5zG3sUkJqSyyZWzwYj1Mb/ImW9Pye
+         7ZXlfgCUfM+40k1hkn+TB08zoEFY7wYlgUNnwzfKyAZDTHaBtr1F+pQDebJ8qlMI9AkN
+         ytNe6efP7Ss7/GADGHfnU0Dgrb507u6yXRMmnPjmcljMElbplm4b11TeHyu/kJwx5DwI
+         YKAeZkD4wkVoav1eMAZYi9KE4KC/SRqtO0yAgvza6dxHMJKvnJMA0uBAX4CxnHXJokCX
+         H2pCX8ryEMbNHPG/rFIUEHnMDTZD8EVu5GJlfuzHaRT1aPvLHeuez9nNwM2qmQ2XwyaU
+         eegg==
+X-Gm-Message-State: AC+VfDwKo84QycX1dtzGa76af+usFvr32kAhg5GiAnyw0pl7mGMdSNiM
+        Jpyx/+hlXhLetJD/Lpbgty+xwNe9LX0=
+X-Google-Smtp-Source: ACHHUZ5lP+//MKLoyHxp7ZBBRTK8HPGitRtGZK1VQLXtpErXRJOzC4NPtxPD1FAXGvKn7FX7vuQdBUUv2CQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:6889:0:b0:52c:999a:fce2 with SMTP id
- e9-20020a656889000000b0052c999afce2mr149604pgt.10.1685135023201; Fri, 26 May
- 2023 14:03:43 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:8c83:b0:253:9751:325f with SMTP id
+ b3-20020a17090a8c8300b002539751325fmr780071pjo.4.1685135025225; Fri, 26 May
+ 2023 14:03:45 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 26 May 2023 14:03:38 -0700
+Date:   Fri, 26 May 2023 14:03:39 -0700
+In-Reply-To: <20230526210340.2799158-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20230526210340.2799158-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230526210340.2799158-1-seanjc@google.com>
-Subject: [PATCH v3 0/2] KVM: x86: Report actual nent from KVM_GET_CPUID2
+Message-ID: <20230526210340.2799158-2-seanjc@google.com>
+Subject: [PATCH v3 1/2] KVM: x86: Update number of entries for KVM_GET_CPUID2
+ on success, not failure
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -67,30 +71,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Essentially v3 of Takahiro's patch.  Update cpuid->nent on a successful
-KVM_GET_CPUID2 so that userspace knows exactly how many entries were
-filled.  Add a testcase to verify KVM's ABI.
+Update cpuid->nent if and only if kvm_vcpu_ioctl_get_cpuid2() succeeds.
+The sole caller copies @cpuid to userspace only on success, i.e. the
+existing code effectively does nothing.
 
-v3:
- - Don't bother updating cpuid->nent in the error path, the data is never
-   copied to userspace.
- - Add testcase to cpuid_test
+Arguably, KVM should report the number of entries when returning -E2BIG so
+that userspace doesn't have to guess the size, but all other similar KVM
+ioctls() don't report the size either, i.e. userspace is conditioned to
+guess.
 
-v2: https://lore.kernel.org/all/20230413175844.21760-1-itazur@amazon.com
-v1: https://lore.kernel.org/all/20230410141820.57328-1-itazur@amazon.com
+Suggested-by: Takahiro Itazuri <itazur@amazon.com>
+Link: https://lore.kernel.org/all/20230410141820.57328-1-itazur@amazon.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/cpuid.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-Sean Christopherson (2):
-  KVM: x86: Update number of entries for KVM_GET_CPUID2 on success, not
-    failure
-  KVM: selftests: Extend cpuid_test to verify KVM_GET_CPUID2 "nent"
-    updates
-
- arch/x86/kvm/cpuid.c                          | 13 ++++--------
- .../testing/selftests/kvm/x86_64/cpuid_test.c | 21 +++++++++++++++++++
- 2 files changed, 25 insertions(+), 9 deletions(-)
-
-
-base-commit: b9846a698c9aff4eb2214a06ac83638ad098f33f
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 0c9660a07b23..241f554f1764 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -501,20 +501,15 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
+ 			      struct kvm_cpuid2 *cpuid,
+ 			      struct kvm_cpuid_entry2 __user *entries)
+ {
+-	int r;
+-
+-	r = -E2BIG;
+ 	if (cpuid->nent < vcpu->arch.cpuid_nent)
+-		goto out;
+-	r = -EFAULT;
++		return -E2BIG;
++
+ 	if (copy_to_user(entries, vcpu->arch.cpuid_entries,
+ 			 vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
+-		goto out;
+-	return 0;
++		return -EFAULT;
+ 
+-out:
+ 	cpuid->nent = vcpu->arch.cpuid_nent;
+-	return r;
++	return 0;
+ }
+ 
+ /* Mask kvm_cpu_caps for @leaf with the raw CPUID capabilities of this CPU. */
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
