@@ -2,185 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C95A712A3F
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 18:10:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51D2D712A2E
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 18:09:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244237AbjEZQKr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 12:10:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55548 "EHLO
+        id S236220AbjEZQJi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 12:09:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237120AbjEZQJN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 12:09:13 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BABE713D
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 09:09:10 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-bacd408046cso2049844276.3
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 09:09:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685117350; x=1687709350;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rpUAYBR7ODlbfqByA26sgwrFPskSnkMccKtexCI4xR0=;
-        b=KnVM34SmIvYa3JrBOC/gfiKutXIv3WzMp6Togx1KyyMfwc+AvVwsruPYa13rekp9Du
-         hJSJccPYF3kwP7fVGsyDSB6T6EsENVuGIMBPYOo2phW8bza8WhwFUiZj1G/abHuYwuGt
-         BA9RbXbR0qcsI43tAGMKau9ThV0zksu/ltW3dpwBrw6Qt69YgVB7FiM11XR9mwT/mas9
-         MpjFUHuesGRqZOZIuBe5YP1Xbafc7wLL8uoHFnPz/rw0djUfELZNqOr601SnGGW1ZBfr
-         5mlJJzsBZbUqptvWCkDuWc9CbGuFGiMlsBYGJGv9V2K1ranMzLHDHVIiGSaojD6g+szT
-         UeBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685117350; x=1687709350;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rpUAYBR7ODlbfqByA26sgwrFPskSnkMccKtexCI4xR0=;
-        b=Mdwt//bMTdhjDwYRcgmecg/OYSRWXR0IdDxyKcKTLBqMX94SiMgCvbhMnQtPLyAdoF
-         Cu0gtu7NUnMSJS/QvHazMCqfV+ZHcVOsgiZPa0lY9ozHGgIcQXqVez3fKBQiMPB9jg7A
-         +8XGzB7nMHWcC02z6IIDTngATAcyRMlMTn+SkiAceZWIybT7jUAHvpuwZ4dzb4rTTnix
-         526ijVMDZxz+qpk5YCVTW9nM3DWwcvXU+eBFNUy+SlCcAEh0Zh/ml4OdNyeNgi8mfoGd
-         GNWBN71vpibzdrGaVSpcyf8W1R3pzmVEoHuX/j5/nmXimD70VqQfbcfevzBEq/V/rxGF
-         N69Q==
-X-Gm-Message-State: AC+VfDz7d8h9m3KRHZGCQPljBZnr9ztsax4O8yEDId2Oj1eJGNSRHRQQ
-        Th00XDOe8ZD/mLTbSkRrDlf6HUS1wjE=
-X-Google-Smtp-Source: ACHHUZ7sOlnlrTgkj5FFmOi0FWZo3NsBjA6ZssYVmLqPoS9NGVJZ/4P4hM/CZbfp7Dc5/d73ga9wDul1k8s=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:f826:0:b0:ba8:2e68:7715 with SMTP id
- u38-20020a25f826000000b00ba82e687715mr1225792ybd.2.1685117350000; Fri, 26 May
- 2023 09:09:10 -0700 (PDT)
-Date:   Fri, 26 May 2023 09:09:08 -0700
-In-Reply-To: <ZHBloxxmY/EUyswL@yzhao56-desk.sh.intel.com>
-Mime-Version: 1.0
-References: <20230509134825.1523-1-yan.y.zhao@intel.com> <20230509135300.1855-1-yan.y.zhao@intel.com>
- <3f09e751-33fd-7d60-78cd-6857d113e8bd@gmail.com> <ZGxbat2mM6AfOOVv@yzhao56-desk.sh.intel.com>
- <ZG1WsnYST4zLqTnv@google.com> <ZG3vB052ubr1vBQA@yzhao56-desk.sh.intel.com>
- <ZG5VlRzJkcwo9Qju@google.com> <ZG8z493pfPIOPAT2@yzhao56-desk.sh.intel.com>
- <ZG92dWFxu+ue31Sl@google.com> <ZHBloxxmY/EUyswL@yzhao56-desk.sh.intel.com>
-Message-ID: <ZHDZpHYQhPtkNnQe@google.com>
-Subject: Re: [PATCH v2 5/6] KVM: x86: Keep a per-VM MTRR state
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Robert Hoo <robert.hoo.linux@gmail.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230300AbjEZQJg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 12:09:36 -0400
+X-Greylist: delayed 96240 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 26 May 2023 09:09:33 PDT
+Received: from smtp-42aa.mail.infomaniak.ch (smtp-42aa.mail.infomaniak.ch [84.16.66.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9DC6187
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 09:09:33 -0700 (PDT)
+Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
+        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4QSVHH60KKzMqG8D;
+        Fri, 26 May 2023 18:09:31 +0200 (CEST)
+Received: from unknown by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4QSVHD3cfwzMpq8P;
+        Fri, 26 May 2023 18:09:28 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+        s=20191114; t=1685117371;
+        bh=GWA0mFQb+8wMidUB9IFkGhraKuBAw7wtqDQzDAqbLj0=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=SHueMjFNo3rqrLqDwx3uLeE8+X5tcivE1oEPiVsupYo6ZiLJ/vTPNLG6eFJuARjXz
+         EChyFftAMsPJ3se0xTmj43Dxi+ekN6Tb9V8ErOqv9uDvNm67z7yhPpfobsNkHwpj/z
+         M1TjsYiSKBpBQcpWBvcaYrXlssdnU8/pqhuOht+c=
+Message-ID: <4142c8dc-5385-fb1d-4f8b-2a98bb3f99af@digikod.net>
+Date:   Fri, 26 May 2023 18:09:14 +0200
+MIME-Version: 1.0
+User-Agent: 
+Subject: Re: [ANNOUNCE] KVM Microconference at LPC 2023
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        James Morris <jamorris@linux.microsoft.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Alexander Graf <graf@amazon.com>,
+        Forrest Yuan Yu <yuanyu@google.com>,
+        John Andersen <john.s.andersen@intel.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        "Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
+        Marian Rotariu <marian.c.rotariu@gmail.com>,
+        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>,
+        =?UTF-8?B?TmljdciZb3IgQ8OuyJt1?= <nicu.citu@icloud.com>,
+        Rick Edgecombe <rick.p.edgecombe@intel.com>,
+        Thara Gopinath <tgopinath@microsoft.com>,
+        Will Deacon <will@kernel.org>,
+        Zahra Tarkhani <ztarkhani@microsoft.com>,
+        =?UTF-8?Q?=c8=98tefan_=c8=98icleru?= <ssicleru@bitdefender.com>,
+        dev@lists.cloudhypervisor.org, kvm@vger.kernel.org,
+        linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, qemu-devel@nongnu.org,
+        virtualization@lists.linux-foundation.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org
+References: <2f19f26e-20e5-8198-294e-27ea665b706f@redhat.com>
+Content-Language: en-US
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+In-Reply-To: <2f19f26e-20e5-8198-294e-27ea665b706f@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 26, 2023, Yan Zhao wrote:
-> On Thu, May 25, 2023 at 07:53:41AM -0700, Sean Christopherson wrote:
-> > > > > > So, if KVM zaps SPTEs when CR0.CD is cleared (even when the quirk is enabled),
-> > > > > > then KVM can skip the MTRR zaps when CR0.CD=1 because KVM is ignoring the MTRRs
-> > > > > > and will zap when CR0.CD is cleared.  And to avoid regressing the CR0.CD case,
-> > > > > > if KVM honors guest PAT for the bizarro CR0.CD quirk, then KVM only needs to
-> > > > > > zap non-WB MTRR ranges when CR0.CD is cleared.  Since WB is weak, looking for
-> > > Not only non-WB ranges are required to be zapped.
-> > > Think about a scenario:
-> > > (1) one fixed MTRR range is UC initially. Its EPT entry memtype is UC, too.
-> > > (2) after CR0.CD=1, without zap, its EPT entry memtype is still UC.
-> > > (3) then guest performs MTRR disable, no zap too.
-> > > (4) guest updates this fixed MTRR range to WB, and performs MTRR enable.
-> > > (5) CR0.CD=0. we need to zap this fixed range to update the EPT memtype to WB.
-> > 
-> > KVM installs WB memtype when the quirk is enabled, thus no need to zap.  KVM
-> > currently zaps everything when the quirk is disabled, and I'm not proposing that
-> > be changed.
-> I didn't explain it clearly.
-> 
-> (1) one fixed MTRR range is UC initially. Its EPT entry memtype is UC, too. ==> EPT entry has been created here
-> (2) after CR0.CD=1, because of the quirk, no zap, the created EPT entry memtype is still UC.
-> (3) then guest performs MTRR disable, no zap too, according to our change.
-> (4) guest updates this fixed MTRR range to WB, and performs MTRR enable.
-> (5) CR0.CD=0. we need to zap this fixed range to update the EPT memtype to WB.==>we also need to zap WB range.
+See James Morris's proposal here: 
+https://lore.kernel.org/all/17f62cb1-a5de-2020-2041-359b8e96b8c0@linux.microsoft.com/
 
-Ugh, right.  But that case can be handled by zapping non-WB ranges on CR0.CD being
-set.  Hmm, and KVM would need to zap everything if CR0.CD is toggled with MTRRs
-disabled, but I don't think OVMF ever does that.  Zapping on CR0.CD toggling would
-would likely introduce a small performance hit for SeaBIOS due to SeaBIOS clearing
-CR0.CD immediately after SIPI, i.e. with MTRRs disabled, but that's arguably a
-correctness fix since the quirk means KVM incorrectly runs the vCPU with WB SPTEs
-until MTRRs are programmed.
+On 26/05/2023 04:36, James Morris wrote:
+ > [Side topic]
+ >
+ > Would folks be interested in a Linux Plumbers Conference MC on this
+ > topic generally, across different hypervisors, VMMs, and architectures?
+ >
+ > If so, please let me know who the key folk would be and we can try 
+writing
+ > up an MC proposal.
 
-With precise+batched zapping, zapping non-WB ranges even when CR0.CD is set should
-still be a healthy performance boost for OVMF.
+The fine-grain memory management proposal from James Gowans looks 
+interesting, especially the "side-car" virtual machines: 
+https://lore.kernel.org/all/88db2d9cb42e471692ff1feb0b9ca855906a9d95.camel@amazon.com/
 
-> > It doesn't actually require non-coherent DMA within the CR0.CD=1 window though.
-> If we don't need to mind non-coherent DMA within the window CR0.CD=1 to CR0.CD=0,
-> do you think it's a good idea to do in this way...
-> 
-> (1) when CR0.CD=1, return guest mtrr type. 
-> 
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7532,12 +7532,13 @@ static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
->                 return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
-> 
->         if (kvm_read_cr0_bits(vcpu, X86_CR0_CD)) {
-> -               if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
-> -                       cache = MTRR_TYPE_WRBACK;
-> -               else
-> +               if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED)) {
-> +                       cache = kvm_mtrr_get_guest_memory_type(vcpu, gfn);
-> +                       return cache << VMX_EPT_MT_EPTE_SHIFT;
-> +               } else {
->                         cache = MTRR_TYPE_UNCACHABLE;
-> -
-> -               return (cache << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
-> +                       return (cache << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
-> +               }
->         }
-> 
-> 
-> (2) return MTRR_TYPE_WRBACK if guest mtrr has not been enabled for once
-> u8 kvm_mtrr_get_guest_memory_type(struct kvm_vcpu *vcpu, gfn_t gfn)
-> @@ -628,13 +635,23 @@ u8 kvm_mtrr_get_guest_memory_type(struct kvm_vcpu *vcpu, gfn_t gfn)
->         struct mtrr_iter iter;
->         u64 start, end;
->         int type = -1;
->         const int wt_wb_mask = (1 << MTRR_TYPE_WRBACK)
->                                | (1 << MTRR_TYPE_WRTHROUGH);
->  
-> +       if (!mtrr_state->enabled_once)
-> +               return MTRR_TYPE_WRBACK;
 
-No, because this assumes too many things about the guest, and completely falls
-apart if the guest reboots.
-
-> (3) when CR0.CD = 1 and the quirk is on, return MTRR type as if MTRR is enabled
-> +       ignore_disable = kvm_read_cr0_bits(vcpu, X86_CR0_CD) &&
-> +                        kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED);
+On 09/05/2023 11:55, Paolo Bonzini wrote:
+> Hi all!
 > 
-> -static void mtrr_lookup_start(struct mtrr_iter *iter)
-> +static void mtrr_lookup_start(struct mtrr_iter *iter, bool ignore_disable)
->  {
-> -       if (!mtrr_is_enabled(iter->mtrr_state)) {
-> +       if (!ignore_disable && !mtrr_is_enabled(iter->mtrr_state)) {
->                 iter->mtrr_disabled = true;
->                 return;
->         }
+> We are planning on submitting a CFP to host a KVM Microconference at
+> Linux Plumbers Conference 2023. To help justify the proposal, we would
+> like to gather a list of folks that would likely attend, and crowdsource
+> a list of topics to include in the proposal.
 > 
-> (4) Then we only need to do EPT zap when MTRR is enabled for the first time
-> and when MTRR fixed/var entries are changed at enabling MTRR or at CR0.CD=0
-> (I prefer at enabling MTRR, as seabios may do the MTRR disable/update/enable when
-> CR0.CD=0)
+> For both this year and future years, the intent is that a KVM
+> Microconference will complement KVM Forum, *NOT* supplant it. As you
+> probably noticed, KVM Forum is going through a somewhat radical change in
+> how it's organized; the conference is now free and (with some help from
+> Red Hat) organized directly by the KVM and QEMU communities. Despite the
+> unexpected changes and some teething pains, community response to KVM
+> Forum continues to be overwhelmingly positive! KVM Forum will remain
+> the venue of choice for KVM/userspace collaboration, for educational
+> content covering both KVM and userspace, and to discuss new features in
+> QEMU and other userspace projects.
+> 
+> At least on the x86 side, however, the success of KVM Forum led us
+> virtualization folks to operate in relative isolation. KVM depends on
+> and impacts multiple subsystems (MM, scheduler, perf) in profound ways,
+> and recently we’ve seen more and more ideas/features that require
+> non-trivial changes outside KVM and buy-in from stakeholders that
+> (typically) do not attend KVM Forum. Linux Plumbers Conference is a
+> natural place to establish such collaboration within the kernel.
+> 
+> Therefore, the aim of the KVM Microconference will be:
+> * to provide a setting in which to discuss KVM and kernel internals
+> * to increase collaboration and reduce friction with other subsystems
+> * to discuss system virtualization issues that require coordination with
+> other subsystems (such as VFIO, or guest support in arch/)
+> 
+> Below is a rough draft of the planned CFP submission.
+> 
+> Thanks!
+> 
+> Paolo Bonzini (KVM Maintainer)
+> Sean Christopherson (KVM x86 Co-Maintainer)
+> Marc Zyngier (KVM ARM Co-Maintainer)
 > 
 > 
-> Besides, accoding to the commit message introducing KVM_QUIRK_CD_NW_CLEARED,
-
-I am not willing to lean on the historical commit messages for the quirk to
-justify any change.  I'm not at all convinced that there was any meaningful thought
-put into ensuring correctness.
-
-> we can return MTRR_TYPE_WRBACK for CR0.CD=1 only when MTRR is not enbled for
-> once. (And I tried, it works!)
-
-On your system, for your setup.  The quirk terrifies me because it likely affects
-every KVM-based VM out there (I can't find a single VMM that disables the quirk).
-These changes are limited to VMs with noncoherent DMA, but still.
-
-In short, I am steadfastly against any change that piles more arbitrary behavior
-functional behavior on top of the quirk, especially when that behavior relies on
-heuristics to try and guess what the guest is doing.
+> ===================
+> KVM Microconference
+> ===================
+> 
+> KVM (Kernel-based Virtual Machine) enables the use of hardware features
+> to improve the efficiency, performance, and security of virtual machines
+> created and managed by userspace.  KVM was originally developed to host
+> and accelerate "full" virtual machines running a traditional kernel and
+> operating system, but has long since expanded to cover a wide array of use
+> cases, e.g. hosting real time workloads, sandboxing untrusted workloads,
+> deprivileging third party code, reducing the trusted computed base of
+> security sensitive workloads, etc.  As KVM's use cases have grown, so too
+> have the requirements placed on KVM and the interactions between it and
+> other kernel subsystems.
+> 
+> The KVM Microconference will focus on how to evolve KVM and adjacent
+> subsystems in order to satisfy new and upcoming requirements: serving
+> guest memory that cannot be accessed by host userspace[1], providing
+> accurate, feature-rich PMU/perf virtualization in cloud VMs[2], etc.
+> 
+> 
+> Potential Topics:
+>     - Serving inaccessible/unmappable memory for KVM guests (protected VMs)
+>     - Optimizing mmu_notifiers, e.g. reducing TLB flushes and spurious zapping
+>     - Supporting multiple KVM modules (for non-disruptive upgrades)
+>     - Improving and hardening KVM+perf interactions
+>     - Implementing arch-agnostic abstractions in KVM (e.g. MMU)
+>     - Defining KVM requirements for hardware vendors
+>     - Utilizing "fault" injection to increase test coverage of edge cases
+>     - KVM vs VFIO (e.g. memory types, a rather hot topic on the ARM side)
+> 
+> 
+> Key Attendees:
+>     - Paolo Bonzini <pbonzini@redhat.com> (KVM Maintainer)
+>     - Sean Christopherson <seanjc@google.com>  (KVM x86 Co-Maintainer)
+>     - Your name could be here!
+> 
+> [1] https://lore.kernel.org/all/20221202061347.1070246-1-chao.p.peng@linux.intel.com
+> [2] https://lore.kernel.org/all/CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com
+> 
+> 
