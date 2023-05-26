@@ -2,113 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82A2F712C3E
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 20:13:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65C0C712E14
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 22:19:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231822AbjEZSNG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 14:13:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33600 "EHLO
+        id S230025AbjEZUTk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 16:19:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229951AbjEZSNF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 14:13:05 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C156FB
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 11:13:03 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b0213d4b43so2084195ad.1
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 11:13:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685124783; x=1687716783;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8723Sfa2idjuBQyBmaDZ+sDNH51vHhk7kq9m2RHFfPo=;
-        b=phFaQo+YrscBxZ4dCTRlBjVL4pmD4DdWCACjQdTVYBaRZdnSp2rdTXqVB/UWwgr4M4
-         /xCclCbfcj/rmH54dDvHRJQJMFWVkDOrFJX9i17QTyocpAv55VhyK4bMV0RTKxPb9ove
-         Wss+h0JL9nsYapeRI+aMTvInNeBDtWl84Q2QbZZYT6VzRAHfq61xWYvnDbasvi/JWePI
-         ZGWQPvdvsTT6VRfjovZ2wf5WzCY63S02m6VLIGprrWqtaJ+IqtQA57EurgYvvEU4CUp+
-         PzWGGDCEL+J17Pvjx++8WmIi/2WC/WMLZnpp9g2nvWHRui1QMKMGLyHd9nkSOI4BMnQV
-         mMvA==
+        with ESMTP id S229519AbjEZUTi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 16:19:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85F05E7
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 13:18:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685132330;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=K+NKhhSWMXaeALHcoBFkaKbpOK9/rzoJSpWkQXlKvtE=;
+        b=K+hYlCH7lpdP1E1A6Yjc1MEFHpn9btRyenon3EPNTNwxTuaIFncYgpglTOzj2DlRYCKQu4
+        KdsY4C9QddhIqI7SNPFuyoMjVwLY1W4sIgwJ4vc4F/Gy9SMjyef1et+TLYAJL6A1SgdDUl
+        LIWddXXcfgE30THYrG7zGN81zPk42hk=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-320-5HLbW6mqMRWLkEaSH_7Cdg-1; Fri, 26 May 2023 16:18:49 -0400
+X-MC-Unique: 5HLbW6mqMRWLkEaSH_7Cdg-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7606e3c6c8aso84529939f.2
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 13:18:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685124783; x=1687716783;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8723Sfa2idjuBQyBmaDZ+sDNH51vHhk7kq9m2RHFfPo=;
-        b=MVxbV3QS1F/9O4xwXA09Ui8lKgIsOM3JZOeioA3XLbBysRn/CdZdzY1ahth4n/cAyt
-         wvC8mO4D72Ufgn0YNRYN+mBYca7m6RmXBummzvgBKnqypd5hSIsuyfwJDL8g8ibYBwKY
-         neIJjU+seOqsm73FFlxxyLjKfCyXKxdwjiXbcT8AAVbUf4r7khwmSbUf+ImPPjqGd1GT
-         u9O/WCe5DR6oE1wEOInuTYS1+UUXq+bDCeGid/atXHgfggd5XqIJoSj88jEwIhZu5g3a
-         czIVYhHH2Ub1wgFyJ4y/RFb3x3dvEmfxpevU02+70xq8u2HMJkdgDW9NatPuC+0JIGm8
-         vaTg==
-X-Gm-Message-State: AC+VfDwR1E+0SFtl6I2sKDzObHubbfYJWqTVVrU+hpAQ2MFjTMnPz2vR
-        uW2jEypdeLMP3bDqbrUZlfI1zPStlrU=
-X-Google-Smtp-Source: ACHHUZ76Nlf0os6oArC9JsZPgT3KHXz0dP+otmezqCfGjdcj+1gOtdBh4RxUVCe0m5DonJ7AV1EEZxLe5ZE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:da82:b0:1a5:25db:5bc0 with SMTP id
- j2-20020a170902da8200b001a525db5bc0mr786579plx.3.1685124782889; Fri, 26 May
- 2023 11:13:02 -0700 (PDT)
-Date:   Fri, 26 May 2023 11:13:01 -0700
-In-Reply-To: <20230425113932.3148-1-ubizjak@gmail.com>
-Mime-Version: 1.0
-References: <20230425113932.3148-1-ubizjak@gmail.com>
-Message-ID: <ZHD2rYBCSe5OSYIU@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Add comment on try_cmpxchg64 usage in tdp_mmu_set_spte_atomic
-From:   Sean Christopherson <seanjc@google.com>
-To:     Uros Bizjak <ubizjak@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1685132328; x=1687724328;
+        h=content-transfer-encoding:mime-version:organization:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K+NKhhSWMXaeALHcoBFkaKbpOK9/rzoJSpWkQXlKvtE=;
+        b=WAtxDElp0OiyitxeUGHj4Z01v3yjWJrZJjSuuHqu4XBYnOzDIPe7p/5lDfMlt5fojC
+         bKsU9qGoAdYwtoa30mSuluD5MzL4uIP3a16RfVgA8HhovPWAcbiivWg87I1fiuDngJKw
+         OLE1SZ8/L0FkRUFa8ho7e2kPLo9CljdrMubrrEb7angHKebvHQku4vcEgRWWwiEIjuzy
+         irkwcDuk2WupEF4ZjhIbyh4a3+F8GO3eWTqChSsCE7VR8AQNVScSpPnTuKsybcDnLNEk
+         g/5q5Bu6N1Ngcadpo1CtcHSbz8TlTR5AHfmBB9EzykgImoD8VIt7gItUKSWkGBMdCanA
+         7lMw==
+X-Gm-Message-State: AC+VfDxBW3wSTffxABLybFheK2dSki30V5gOIQYUHdw3mG8djWWa7WQr
+        c9/91p2On4xI/GC18IZDTFYznihrSnjohLREFMjTiUloLDsJdDdV/Eb/Y1yJzt6n/9tVvDEMgQp
+        1EYLYi3oVTIKS
+X-Received: by 2002:a5e:8b4c:0:b0:76c:56fb:3c59 with SMTP id z12-20020a5e8b4c000000b0076c56fb3c59mr1794586iom.10.1685132328492;
+        Fri, 26 May 2023 13:18:48 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5NbeEx+NfDc/UMOu7Pl0K4c7vVOWs5JK9Whd5LODCKEHzWv2DLGvvkKN15/6kMTMira7yHMg==
+X-Received: by 2002:a5e:8b4c:0:b0:76c:56fb:3c59 with SMTP id z12-20020a5e8b4c000000b0076c56fb3c59mr1794570iom.10.1685132328108;
+        Fri, 26 May 2023 13:18:48 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id s16-20020a02b150000000b0040da7ae3ef9sm1340021jah.100.2023.05.26.13.18.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 May 2023 13:18:47 -0700 (PDT)
+Date:   Fri, 26 May 2023 14:18:46 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [GIT PULL] VFIO fix for v6.4-rc4
+Message-ID: <20230526141846.6f549439.alex.williamson@redhat.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 25, 2023, Uros Bizjak wrote:
-> Commit aee98a6838d5 ("KVM: x86/mmu: Use try_cmpxchg64 in
-> tdp_mmu_set_spte_atomic") removed the comment that iter->old_spte is
-> updated when different logical CPU modifies the page table entry.
-> Although this is what try_cmpxchg does implicitly, it won't hurt
-> if this fact is explicitly mentioned in a restored comment.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: David Matlack <dmatlack@google.com>
-> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 7c25dbf32ecc..5d126b015086 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -655,8 +655,16 @@ static inline int tdp_mmu_set_spte_atomic(struct kvm *kvm,
->  	 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs and
->  	 * does not hold the mmu_lock.
->  	 */
-> -	if (!try_cmpxchg64(sptep, &iter->old_spte, new_spte))
-> +	if (!try_cmpxchg64(sptep, &iter->old_spte, new_spte)) {
-> +		/*
-> +		 * The page table entry was modified by a different logical
-> +		 * CPU. In this case the above try_cmpxchg updates
-> +		 * iter->old_spte with the current value, so the caller
-> +		 * operates on fresh data, e.g. if it retries
-> +		 * tdp_mmu_set_spte_atomic().
-> +		 */
+Hi Linus,
 
-If there's no objection, when applying I'll massage this to extend the comment
-above the try_cmpxchg64(), e.g.
+The following changes since commit 44c026a73be8038f03dbdeef028b642880cf1511:
 
-	/*
-	 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs and
-	 * does not hold the mmu_lock.  On failure, i.e. if a different logical
-	 * CPU modified the SPTE, try_cmpxchg64() updates iter->old_spte with
-	 * the current value, so the caller operates on fresh data, e.g. if it
-	 * retries tdp_mmu_set_spte_atomic()
-	 */
-	if (!try_cmpxchg64(sptep, &iter->old_spte, new_spte))
-		return -EBUSY;
+  Linux 6.4-rc3 (2023-05-21 14:05:48 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.4-rc4
+
+for you to fetch changes up to 4752354af71043e6fd72ef5490ed6da39e6cab4a:
+
+  vfio/type1: check pfn valid before converting to struct page (2023-05-23 14:16:29 -0600)
+
+----------------------------------------------------------------
+VFIO fix for v6.4-rc4
+
+ - Test for and return error for invalid pfns through the pin pages
+   interface. (Yan Zhao)
+
+----------------------------------------------------------------
+Yan Zhao (1):
+      vfio/type1: check pfn valid before converting to struct page
+
+ drivers/vfio/vfio_iommu_type1.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
