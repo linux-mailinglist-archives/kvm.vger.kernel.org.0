@@ -2,84 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65245711FCD
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 08:23:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CB43711FD5
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 08:25:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242100AbjEZGXG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 02:23:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57632 "EHLO
+        id S229847AbjEZGZY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 02:25:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231495AbjEZGXF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 02:23:05 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 294AC125;
-        Thu, 25 May 2023 23:23:04 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-53482b44007so243271a12.2;
-        Thu, 25 May 2023 23:23:04 -0700 (PDT)
+        with ESMTP id S229694AbjEZGZW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 02:25:22 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B870125
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 23:25:21 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1ae3ed1b08eso4143925ad.0
+        for <kvm@vger.kernel.org>; Thu, 25 May 2023 23:25:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685082183; x=1687674183;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7cCHBf3UytwZfxePPwE+jd6ort0sOdXbbuo1VvBkL64=;
-        b=In9JMr9pXJKdU4OFNrKA8VkqvzNERFgbkF1WTefIBpZGNH1cm6Wu4vy6gHMfTTbpH5
-         Bxt1r4RdI0sl2apwFfU9YncceU9jlq55r9HxXRy93MWRcYsVcXQ/3fCBv5QBexNmd25X
-         6G2yWYoM0MVRHQMx8eH0pxaCBL360ys2TBubCUiYCToafZ9wgibDjDx0qVGg1QlxwNOJ
-         mLFF8yI2zd7UosSjjmAmMe1b3OntVisxuNwReKnyR4cjSdQqdBe57OFiu7V+h7YbDTD9
-         gS4FVXbZxLBVK9nWMBpD7mMOq0v4voFCeypL5pXo+ai/vZiKklNlarHEiS6wZWvQStAQ
-         076A==
+        d=sifive.com; s=google; t=1685082320; x=1687674320;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8pjWV+qRwkWtypfMGoFq3ZGcEhsUFF0yGFVJo0XrtJA=;
+        b=fGss6BTA5pCNjGPPJ5z3HpJnY6aLtBaMchFmXG2tk4RG7wdAROb8hpqz8lwxWROar1
+         xnVWOedM4UnFNxwWDAURfSlUT5uXdfdVK6sdllrLZtCui0XMpGwxO2NOiG5k2HObrYIk
+         S/T7RPDxv3/F1XoPI1WrRRNBqxoSlcsyp5jOYsesb4C+fbX2iNSztQoNF1mKqgrD6mri
+         9pCBzT/i+0A6acZCKd1eTCbkXVkbQB4luf1ggw2BVOryPEZhfGFqKpBTO7a/NYuh+puY
+         6hkeTrgg3Brziaj0fIWh64MgIac5fjY8JwANAeUjJ3JVcFQFSXA1p7TxoZ+MXcqQi+Id
+         zHDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685082183; x=1687674183;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7cCHBf3UytwZfxePPwE+jd6ort0sOdXbbuo1VvBkL64=;
-        b=ebjpIGkbPWxespbD+Cr1qrLtNWbdnKXnGoSUtbmExpJ+efkW42z1UxahXGHMk6bL2q
-         Oe0tBcwJdgZ13cKR82hBr8qf2SwVpOFTrm6fbO5gvgCxgUgG26PHSan8oYeJiJ6phP8v
-         isnc6grXZrUBi531so6PKCEigEYanYTBqaBRXLyowYkr/XbBVc52WT/9K1iS10UmRZ93
-         jmMbPTHANuPRj9Lw1yOxS+xMO+R0w8c/a3AbZzixx2XtQvQlN1OSMtgpHCtls9/OCIH7
-         QuHcMw3b2EQKlnOyE6VhsGmotkIpiLNPNWX0gDYlqQfWuh2Lgnaea08P1EsHGaor+3w1
-         2dww==
-X-Gm-Message-State: AC+VfDwIJ5B8DcD38FpUIMgWTPR3jbmeScYQXGpUAGBRPgUOhRFjysda
-        yK8SOegYjoDFpI6VCa6UHUrEgdxzb51lqL0RAxQ=
-X-Google-Smtp-Source: ACHHUZ5+adpq5bn8ccEuSJ16UorMQ11HQo3chgEmsUz3XwrAAvurJ6sIX+3y8mXx79RuaBedX3HqgDmU0iivyP2H1/M=
-X-Received: by 2002:a17:903:2285:b0:1ab:142a:3dd7 with SMTP id
- b5-20020a170903228500b001ab142a3dd7mr1537487plh.68.1685082183465; Thu, 25 May
- 2023 23:23:03 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1684999824.git.haibo1.xu@intel.com> <20230525-6e0855eb07086a96eaa82362@orel>
-In-Reply-To: <20230525-6e0855eb07086a96eaa82362@orel>
-From:   Haibo Xu <xiaobo55x@gmail.com>
-Date:   Fri, 26 May 2023 14:22:52 +0800
-Message-ID: <CAJve8o=SdjMvsVn=3Vqw3QG5SuU8nqLVC_MRAgPX+GuFZj6jvA@mail.gmail.com>
-Subject: Re: [PATCH v2 00/11] RISCV: Add KVM_GET_REG_LIST API
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org,
-        oliver.upton@linux.dev, seanjc@google.com,
+        d=1e100.net; s=20221208; t=1685082320; x=1687674320;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8pjWV+qRwkWtypfMGoFq3ZGcEhsUFF0yGFVJo0XrtJA=;
+        b=UBOHELLLE4/O7anJy4BGowMNDE7uwoT/3HdAZgWt0zU6MFdNfx3wNIEByszyfQLOJI
+         OfxKrkKikhaYOjX885xrc7lF3OwgiI/lY2ZuT6f9dBACKer8MDTnBNAnexA2ut/8r5AI
+         fLASbOgYHTChagkQrOTcobOxpfFrOKW7j06Iify57qaHlzzYcJZvR4BiKKWRyHzEPNR7
+         Ll4awgXL91YU3Lr8K77dUyWeztYWhjbbs/I758u5yqde+HtYHExfdnIRLYR+nOBUwW1S
+         qbpac/lkdQG7Eojry2Pi5/WWTX76g7h1zP5T02nk3pyvmcGESTbXLJuvYELytzd3PLoR
+         SvSw==
+X-Gm-Message-State: AC+VfDx1CunTDD9fBo92p+W7mncYoT/2EldVXBvSdAxVmj5NgddZcULk
+        Pat6gfPPkyjnxG3GmWvrhVNWwg==
+X-Google-Smtp-Source: ACHHUZ6O8dzd9yUsfl8GUCl6aVOP3BspJLNVH1Q07otLAI1jB83wxDYWlmcb+Hwj+w1yDUUnETNtZg==
+X-Received: by 2002:a17:903:d3:b0:1af:beae:c0b with SMTP id x19-20020a17090300d300b001afbeae0c0bmr1283573plc.22.1685082320559;
+        Thu, 25 May 2023 23:25:20 -0700 (PDT)
+Received: from hsinchu26.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
+        by smtp.gmail.com with ESMTPSA id m24-20020a170902bb9800b001a94a497b50sm2429150pls.20.2023.05.25.23.25.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 May 2023 23:25:19 -0700 (PDT)
+From:   Yong-Xuan Wang <yongxuan.wang@sifive.com>
+To:     qemu-devel@nongnu.org, qemu-riscv@nongnu.org, rkanwal@rivosinc.com,
+        anup@brainfault.org, dbarboza@ventanamicro.com,
+        atishp@atishpatra.org, vincent.chen@sifive.com,
+        greentime.hu@sifive.com, frank.chang@sifive.com, jim.shu@sifive.com
+Cc:     Yong-Xuan Wang <yongxuan.wang@sifive.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Alistair Francis <alistair.francis@wdc.com>,
+        Bin Meng <bin.meng@windriver.com>,
+        Weiwei Li <liweiwei@iscas.ac.cn>,
+        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>, kvm@vger.kernel.org
+Subject: [PATCH v3 1/6] update-linux-headers: sync-up header with Linux for KVM AIA support placeholder
+Date:   Fri, 26 May 2023 06:25:01 +0000
+Message-Id: <20230526062509.31682-2-yongxuan.wang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230526062509.31682-1-yongxuan.wang@sifive.com>
+References: <20230526062509.31682-1-yongxuan.wang@sifive.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,42 +80,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 26, 2023 at 1:20=E2=80=AFAM Andrew Jones <ajones@ventanamicro.c=
-om> wrote:
->
-> On Thu, May 25, 2023 at 03:38:24PM +0800, Haibo Xu wrote:
-> > KVM_GET_REG_LIST will dump all register IDs that are available to
-> > KVM_GET/SET_ONE_REG and It's very useful to identify some platform
-> > regression issue during VM migration.
-> >
-> > Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
-> > of the code as common test framework that can be shared by riscv.
-> >
-> > Patch 8 enabled the KVM_GET_REG_LIST API in riscv and patch 9-11 added
-> > the corresponding kselftest for checking possible register regressions.
-> >
-> > The get-reg-list kvm selftest was ported from aarch64 and tested with
-> > Linux 6.4-rc1 on a Qemu riscv virt machine.
-> >
-> > ---
-> > Changed since v1:
-> >   * rebase to Andrew's changes
-> >   * fix coding style
-> >
-> > Andrew Jones (7):
-> >   KVM: arm64: selftests: Replace str_with_index with strdup_printf
-> >   KVM: arm64: selftests: Drop SVE cap check in print_reg
-> >   KVM: arm64: selftests: Remove print_reg's dependency on vcpu_config
-> >   KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
-> >   KVM: arm64: selftests: Delete core_reg_fixup
-> >   KVM: arm64: selftests: Split get-reg-list test code
-> >   KVM: arm64: selftests: Finish generalizing get-reg-list
->
-> All the patches above should also have your s-o-b since your posting them=
-.
->
+Sync-up Linux header to get latest KVM RISC-V headers having AIA support.
 
-Sure.
+Note: This is a placeholder commit and could be replaced when all referenced Linux patchsets are mainlined.
 
-> Thanks,
-> drew
+The linux-headers changes are from 2 different patchsets.
+[1] https://lore.kernel.org/lkml/20230404153452.2405681-1-apatel@ventanamicro.com/
+[2] https://www.spinics.net/lists/kernel/msg4791872.html
+
+Currently, patchset 1 is already merged into mainline kernel in v6.4-rc1 and patchset 2 is not.
+
+Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Reviewed-by: Jim Shu <jim.shu@sifive.com>
+---
+ linux-headers/linux/kvm.h |  2 ++
+ target/riscv/kvm_riscv.h  | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+)
+
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 599de3c6e3..a9a4f5791d 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -1434,6 +1434,8 @@ enum kvm_device_type {
+ #define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
+ 	KVM_DEV_TYPE_ARM_PV_TIME,
+ #define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
++	KVM_DEV_TYPE_RISCV_AIA,
++#define KVM_DEV_TYPE_RISCV_AIA		KVM_DEV_TYPE_RISCV_AIA
+ 	KVM_DEV_TYPE_MAX,
+ };
+ 
+diff --git a/target/riscv/kvm_riscv.h b/target/riscv/kvm_riscv.h
+index ed281bdce0..606968a4b7 100644
+--- a/target/riscv/kvm_riscv.h
++++ b/target/riscv/kvm_riscv.h
+@@ -22,4 +22,37 @@
+ void kvm_riscv_reset_vcpu(RISCVCPU *cpu);
+ void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level);
+ 
++#define KVM_DEV_RISCV_AIA_GRP_CONFIG            0
++#define KVM_DEV_RISCV_AIA_CONFIG_MODE           0
++#define KVM_DEV_RISCV_AIA_CONFIG_IDS            1
++#define KVM_DEV_RISCV_AIA_CONFIG_SRCS           2
++#define KVM_DEV_RISCV_AIA_CONFIG_GROUP_BITS     3
++#define KVM_DEV_RISCV_AIA_CONFIG_GROUP_SHIFT    4
++#define KVM_DEV_RISCV_AIA_CONFIG_HART_BITS      5
++#define KVM_DEV_RISCV_AIA_CONFIG_GUEST_BITS     6
++#define KVM_DEV_RISCV_AIA_MODE_EMUL             0
++#define KVM_DEV_RISCV_AIA_MODE_HWACCEL          1
++#define KVM_DEV_RISCV_AIA_MODE_AUTO             2
++#define KVM_DEV_RISCV_AIA_IDS_MIN               63
++#define KVM_DEV_RISCV_AIA_IDS_MAX               2048
++#define KVM_DEV_RISCV_AIA_SRCS_MAX              1024
++#define KVM_DEV_RISCV_AIA_GROUP_BITS_MAX        8
++#define KVM_DEV_RISCV_AIA_GROUP_SHIFT_MIN       24
++#define KVM_DEV_RISCV_AIA_GROUP_SHIFT_MAX       56
++#define KVM_DEV_RISCV_AIA_HART_BITS_MAX         16
++#define KVM_DEV_RISCV_AIA_GUEST_BITS_MAX        8
++
++#define KVM_DEV_RISCV_AIA_GRP_ADDR              1
++#define KVM_DEV_RISCV_AIA_ADDR_APLIC            0
++#define KVM_DEV_RISCV_AIA_ADDR_IMSIC(__vcpu)    (1 + (__vcpu))
++#define KVM_DEV_RISCV_AIA_ADDR_MAX              \
++        (1 + KVM_DEV_RISCV_APLIC_MAX_HARTS)
++
++#define KVM_DEV_RISCV_AIA_GRP_CTRL              2
++#define KVM_DEV_RISCV_AIA_CTRL_INIT             0
++
++#define KVM_DEV_RISCV_AIA_GRP_APLIC             3
++
++#define KVM_DEV_RISCV_AIA_GRP_IMSIC             4
++
+ #endif
+-- 
+2.17.1
+
