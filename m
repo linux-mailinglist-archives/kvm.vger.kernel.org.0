@@ -2,181 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51D2D712A2E
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 18:09:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A341D712A78
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 18:17:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236220AbjEZQJi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 12:09:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55644 "EHLO
+        id S236875AbjEZQRo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 12:17:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230300AbjEZQJg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 12:09:36 -0400
-X-Greylist: delayed 96240 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 26 May 2023 09:09:33 PDT
-Received: from smtp-42aa.mail.infomaniak.ch (smtp-42aa.mail.infomaniak.ch [84.16.66.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9DC6187
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 09:09:33 -0700 (PDT)
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4QSVHH60KKzMqG8D;
-        Fri, 26 May 2023 18:09:31 +0200 (CEST)
-Received: from unknown by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4QSVHD3cfwzMpq8P;
-        Fri, 26 May 2023 18:09:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-        s=20191114; t=1685117371;
-        bh=GWA0mFQb+8wMidUB9IFkGhraKuBAw7wtqDQzDAqbLj0=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=SHueMjFNo3rqrLqDwx3uLeE8+X5tcivE1oEPiVsupYo6ZiLJ/vTPNLG6eFJuARjXz
-         EChyFftAMsPJ3se0xTmj43Dxi+ekN6Tb9V8ErOqv9uDvNm67z7yhPpfobsNkHwpj/z
-         M1TjsYiSKBpBQcpWBvcaYrXlssdnU8/pqhuOht+c=
-Message-ID: <4142c8dc-5385-fb1d-4f8b-2a98bb3f99af@digikod.net>
-Date:   Fri, 26 May 2023 18:09:14 +0200
-MIME-Version: 1.0
-User-Agent: 
-Subject: Re: [ANNOUNCE] KVM Microconference at LPC 2023
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        James Morris <jamorris@linux.microsoft.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Alexander Graf <graf@amazon.com>,
-        Forrest Yuan Yu <yuanyu@google.com>,
-        John Andersen <john.s.andersen@intel.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        "Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
-        Marian Rotariu <marian.c.rotariu@gmail.com>,
-        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>,
-        =?UTF-8?B?TmljdciZb3IgQ8OuyJt1?= <nicu.citu@icloud.com>,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>,
-        Thara Gopinath <tgopinath@microsoft.com>,
-        Will Deacon <will@kernel.org>,
-        Zahra Tarkhani <ztarkhani@microsoft.com>,
-        =?UTF-8?Q?=c8=98tefan_=c8=98icleru?= <ssicleru@bitdefender.com>,
-        dev@lists.cloudhypervisor.org, kvm@vger.kernel.org,
-        linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org, qemu-devel@nongnu.org,
-        virtualization@lists.linux-foundation.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org
-References: <2f19f26e-20e5-8198-294e-27ea665b706f@redhat.com>
-Content-Language: en-US
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-In-Reply-To: <2f19f26e-20e5-8198-294e-27ea665b706f@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S236867AbjEZQRm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 12:17:42 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD9AF10A
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 09:17:40 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-64d138bd73aso771770b3a.0
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 09:17:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685117860; x=1687709860;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Av6JSvpMO31Ef3i0iy17brBR0RWdNZk95Vd+S8B8AUc=;
+        b=vaLEOccsUzwsXjxN6+ipAFfkVqlek/jd/yllU+PFPnwfKzzLiIW04gWP16FAWyn07h
+         cJkdAGEH9RwOUPpdoDeWaXRRm9mwG5ngD5+x0S3MbatsUMPf2uIdg0WIUGRev4cqQ4iA
+         br5wfncZfH/9vtOY93NqR4eYYYYhQzgqbzOWomSkIPShylzxsuyxf638P1W4yqll5QZX
+         44qFeMBCyFRkFPLs4CwQjtDYXG+DgfkkPlqKmV3AftZbeT7OJGfkI0C1P/WT5bz2lo0R
+         jcThLiH4h7z2PilqMUdz+hxku8ZlhDagvF/ZGamCn+GJMVJQ3WUQL3wV/5yuOq01BuLu
+         VkeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685117860; x=1687709860;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Av6JSvpMO31Ef3i0iy17brBR0RWdNZk95Vd+S8B8AUc=;
+        b=jwSGNi++fJeWedK2xAmNI7NGlYC/tIttaqxC6tFv6D5HLpIUeIKQ+Jy3Kg+c4Kzyzl
+         N4u5qosvHRYwjl7ANGtwUXBQnJ5ZJfnsRld9+sZ8MSDg7BZXKJYqA0JCXKA4puXWbXsm
+         BL0PCE5abpaipT5/X8bbDAhqx+Ve8B/dmEH4gMOL+g4D7icAOALwlwLl0JI708JR3wCR
+         87FJJ86JoDblb5LZRwRYaX9FqOPX1BAXopXshjKgOe4YbrbNIU8hgcrF0YXUM1SwxiZM
+         YZyCZ5+MLn2eRh7dxcq9/LHHxHTcbWIOhFqY6pFvwNMDKUiQLb8VSK+vmOU5rRs/CFnz
+         vRSQ==
+X-Gm-Message-State: AC+VfDzXRimHr/1qoiOf/UA9wIRr6FdW9e26cFo1uO1F6RSTdCwzHqBR
+        /JDxGPFY5TXVX7EVyXPowHLPqEuDzQc=
+X-Google-Smtp-Source: ACHHUZ7+KLogkIR5R8qITQLoZ5UJBXPfzR+K+/t8Xuc4wOawfri/OQJgTOKb3jzwzW5RCJgPpLwlOs2SNDs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:b95:b0:63b:526c:ab09 with SMTP id
+ g21-20020a056a000b9500b0063b526cab09mr1098287pfj.0.1685117860053; Fri, 26 May
+ 2023 09:17:40 -0700 (PDT)
+Date:   Fri, 26 May 2023 09:17:38 -0700
+In-Reply-To: <016686aa-fedc-08bf-df42-9451bba9f82e@rbox.co>
+Mime-Version: 1.0
+References: <20230525183347.2562472-1-mhal@rbox.co> <20230525183347.2562472-2-mhal@rbox.co>
+ <ZG/4UN2VpZ1a6ek1@google.com> <016686aa-fedc-08bf-df42-9451bba9f82e@rbox.co>
+Message-ID: <ZHDbos7Kf2aX/zyg@google.com>
+Subject: Re: [PATCH 1/3] KVM: x86: Fix out-of-bounds access in kvm_recalculate_phys_map()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     pbonzini@redhat.com, shuah@kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-See James Morris's proposal here: 
-https://lore.kernel.org/all/17f62cb1-a5de-2020-2041-359b8e96b8c0@linux.microsoft.com/
+On Fri, May 26, 2023, Michal Luczaj wrote:
+> On 5/26/23 02:07, Sean Christopherson wrote:
+> > On Thu, May 25, 2023, Michal Luczaj wrote:
+> >> @@ -265,10 +265,14 @@ static int kvm_recalculate_phys_map(struct kvm_apic_map *new,
+> >>  		 * mapped, i.e. is aliased to multiple vCPUs.  The optimized
+> >>  		 * map requires a strict 1:1 mapping between IDs and vCPUs.
+> >>  		 */
+> >> -		if (apic_x2apic_mode(apic))
+> >> +		if (apic_x2apic_mode(apic)) {
+> >> +			if (x2apic_id > new->max_apic_id)
+> >> +				return -EINVAL;
+> > 
+> > Hmm, disabling the optimized map just because userspace created a new vCPU is
+> > unfortunate and unnecessary.  Rather than return -EINVAL and only perform the
+> > check when x2APIC is enabled, what if we instead do the check immediately and
+> > return -E2BIG?  Then the caller can retry with a bigger array size.  Preemption
+> > is enabled and retries are bounded by the number of possible vCPUs, so I don't
+> > see any obvious issues with retrying.
+> 
+> Right, that makes perfect sense.
+> 
+> Just a note, it changes the logic a bit:
+> 
+> - x2apic_format: an overflowing x2apic_id won't be silently ignored.
 
-On 26/05/2023 04:36, James Morris wrote:
- > [Side topic]
- >
- > Would folks be interested in a Linux Plumbers Conference MC on this
- > topic generally, across different hypervisors, VMMs, and architectures?
- >
- > If so, please let me know who the key folk would be and we can try 
-writing
- > up an MC proposal.
+Nit, I wouldn't describe the current behavior as silently ignored.  KVM doesn't
+ignore the case, KVM instead disables the optimized map.
 
-The fine-grain memory management proposal from James Gowans looks 
-interesting, especially the "side-car" virtual machines: 
-https://lore.kernel.org/all/88db2d9cb42e471692ff1feb0b9ca855906a9d95.camel@amazon.com/
+> - !x2apic_format: -E2BIG even for !apic_x2apic_mode() leads to an realloc
+> instead of "new->phys_map[xapic_id] = apic" right away.
+> 
+> > @@ -228,6 +228,12 @@ static int kvm_recalculate_phys_map(struct kvm_apic_map *new,
+> >  	u32 xapic_id = kvm_xapic_id(apic);
+> >  	u32 physical_id;
+> >  
+> > +	if (WARN_ON_ONCE(xapic_id >= new->max_apic_id))
+> > +		return -EINVAL;
+>
+> Shouldn't it be ">" instead of ">="?
 
+/facepalm
 
-On 09/05/2023 11:55, Paolo Bonzini wrote:
-> Hi all!
+Yes, I was reading it as the number of IDs, not the max.
+
+> That said, xapic_id > new->max_apic_id means something terrible has happened as
+> kvm_xapic_id() returns u8 and max_apic_id should never be less than 255. Does
+> this qualify for KVM_BUG_ON?
+
+I don't think so?  The intent of the WARN is mostly to document that KVM always
+allocates enough space for xAPIC IDs, and to guard against that changing in the
+future.  In the latter case, there's no need to kill the VM despite there being
+a KVM bug since running with the optimized map disabled is functionally ok.
+
+If the WARN fires because of host data corruption, then so be it.
+
+> > +	if (x2apic_id >= new->max_apic_id)
+> > +		return -E2BIG;
 > 
-> We are planning on submitting a CFP to host a KVM Microconference at
-> Linux Plumbers Conference 2023. To help justify the proposal, we would
-> like to gather a list of folks that would likely attend, and crowdsource
-> a list of topics to include in the proposal.
+> Probably ">"?
+
+Ya.
+
+> > @@ -366,6 +371,7 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+> >  	unsigned long i;
+> >  	u32 max_id = 255; /* enough space for any xAPIC ID */
+> >  	bool xapic_id_mismatch = false;
+> > +	int r;
+> >  
+> >  	/* Read kvm->arch.apic_map_dirty before kvm->arch.apic_map.  */
+> >  	if (atomic_read_acquire(&kvm->arch.apic_map_dirty) == CLEAN)
+> > @@ -386,6 +392,7 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+> >  		return;
+> >  	}
+> >  
+> > +retry:
+> >  	kvm_for_each_vcpu(i, vcpu, kvm)
+> >  		if (kvm_apic_present(vcpu))
+> >  			max_id = max(max_id, kvm_x2apic_id(vcpu->arch.apic));
+> > @@ -404,9 +411,13 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+> >  		if (!kvm_apic_present(vcpu))
+> >  			continue;
+> >  
+> > -		if (kvm_recalculate_phys_map(new, vcpu, &xapic_id_mismatch)) {
+> > +		r = kvm_recalculate_phys_map(new, vcpu, &xapic_id_mismatch);
+> > +		if (r) {
+> >  			kvfree(new);
+> >  			new = NULL;
+> > +			if (r == -E2BIG)
+> > +				goto retry;
+> > +
+> >  			goto out;
+> >  		}
 > 
-> For both this year and future years, the intent is that a KVM
-> Microconference will complement KVM Forum, *NOT* supplant it. As you
-> probably noticed, KVM Forum is going through a somewhat radical change in
-> how it's organized; the conference is now free and (with some help from
-> Red Hat) organized directly by the KVM and QEMU communities. Despite the
-> unexpected changes and some teething pains, community response to KVM
-> Forum continues to be overwhelmingly positive! KVM Forum will remain
-> the venue of choice for KVM/userspace collaboration, for educational
-> content covering both KVM and userspace, and to discuss new features in
-> QEMU and other userspace projects.
-> 
-> At least on the x86 side, however, the success of KVM Forum led us
-> virtualization folks to operate in relative isolation. KVM depends on
-> and impacts multiple subsystems (MM, scheduler, perf) in profound ways,
-> and recently we’ve seen more and more ideas/features that require
-> non-trivial changes outside KVM and buy-in from stakeholders that
-> (typically) do not attend KVM Forum. Linux Plumbers Conference is a
-> natural place to establish such collaboration within the kernel.
-> 
-> Therefore, the aim of the KVM Microconference will be:
-> * to provide a setting in which to discuss KVM and kernel internals
-> * to increase collaboration and reduce friction with other subsystems
-> * to discuss system virtualization issues that require coordination with
-> other subsystems (such as VFIO, or guest support in arch/)
-> 
-> Below is a rough draft of the planned CFP submission.
-> 
-> Thanks!
-> 
-> Paolo Bonzini (KVM Maintainer)
-> Sean Christopherson (KVM x86 Co-Maintainer)
-> Marc Zyngier (KVM ARM Co-Maintainer)
-> 
-> 
-> ===================
-> KVM Microconference
-> ===================
-> 
-> KVM (Kernel-based Virtual Machine) enables the use of hardware features
-> to improve the efficiency, performance, and security of virtual machines
-> created and managed by userspace.  KVM was originally developed to host
-> and accelerate "full" virtual machines running a traditional kernel and
-> operating system, but has long since expanded to cover a wide array of use
-> cases, e.g. hosting real time workloads, sandboxing untrusted workloads,
-> deprivileging third party code, reducing the trusted computed base of
-> security sensitive workloads, etc.  As KVM's use cases have grown, so too
-> have the requirements placed on KVM and the interactions between it and
-> other kernel subsystems.
-> 
-> The KVM Microconference will focus on how to evolve KVM and adjacent
-> subsystems in order to satisfy new and upcoming requirements: serving
-> guest memory that cannot be accessed by host userspace[1], providing
-> accurate, feature-rich PMU/perf virtualization in cloud VMs[2], etc.
-> 
-> 
-> Potential Topics:
->     - Serving inaccessible/unmappable memory for KVM guests (protected VMs)
->     - Optimizing mmu_notifiers, e.g. reducing TLB flushes and spurious zapping
->     - Supporting multiple KVM modules (for non-disruptive upgrades)
->     - Improving and hardening KVM+perf interactions
->     - Implementing arch-agnostic abstractions in KVM (e.g. MMU)
->     - Defining KVM requirements for hardware vendors
->     - Utilizing "fault" injection to increase test coverage of edge cases
->     - KVM vs VFIO (e.g. memory types, a rather hot topic on the ARM side)
-> 
-> 
-> Key Attendees:
->     - Paolo Bonzini <pbonzini@redhat.com> (KVM Maintainer)
->     - Sean Christopherson <seanjc@google.com>  (KVM x86 Co-Maintainer)
->     - Your name could be here!
-> 
-> [1] https://lore.kernel.org/all/20221202061347.1070246-1-chao.p.peng@linux.intel.com
-> [2] https://lore.kernel.org/all/CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com
-> 
-> 
+> Maybe it's not important, but what about moving xapic_id_mismatch
+> (re)initialization after "retry:"?
+
+Oof, good catch.  I think it makes sense to move max_id (re)initialization too,
+even though I can't imagine it would matter in practice.
