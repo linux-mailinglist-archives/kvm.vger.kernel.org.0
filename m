@@ -2,56 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 85568712163
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 09:44:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2748D71217C
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 09:50:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242179AbjEZHoG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 03:44:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40738 "EHLO
+        id S242328AbjEZHur (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 03:50:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242347AbjEZHoB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 03:44:01 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6834510F6;
-        Fri, 26 May 2023 00:43:31 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-3078d1c8828so348003f8f.3;
-        Fri, 26 May 2023 00:43:31 -0700 (PDT)
+        with ESMTP id S236059AbjEZHup (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 03:50:45 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A4C6B6;
+        Fri, 26 May 2023 00:50:44 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-5341737d7aeso410881a12.2;
+        Fri, 26 May 2023 00:50:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685087009; x=1687679009;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=twYef5JxzOYWdFtDJIvI+imxLb6P+iSjJpGmWBNbdSU=;
-        b=a+RCJZ6u48THGZkfG+L3RtSqWxnNYPQt2gfPnZaSyovQTyaCb64YYSYbdSHxETdEtN
-         DrVEfY9LWUW6mVr5kxVCNh7EpMy7ZGniztEXSv7N7NKpNDjLvfO73ktEy57r3SwMrAxS
-         lo5NP1CaFL/6nrNaV4YHPoAx94rcO3AZ1eYwBidgS4qYX3QWbvDWMJIojs5u79RswEvT
-         qUCqI7jf+6X3xO5HNW47Hsccz82wmdmiR8/e5qZ595VUfxnErnLKhoAg9my5WAJrjrgE
-         aWAoLR+dNKJsUY1yXTaQ2H2CcnehGkJzST//luoH3DPPvKeGmCz2rTCPYCVso9lNMFTW
-         lzWA==
+        d=gmail.com; s=20221208; t=1685087444; x=1687679444;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DC31IUhv/KDwF/7LXlScDdxDoyQnFVByk+1cX0N3RaE=;
+        b=Jhs5ewodbHYux8rWhVtQych048Jh1kydORvmCZBCk1d+cKOfGCAypgl5wP36OA6UPY
+         iV2JB3nG+nkKnPEfCq/6JOGJ+BuIrM/MSAbgOJ0p3dOxlDiW5hfzk/rQnKvK0MZFZZmY
+         LqWyiqzwdd8P8J06ueWglPKI4iG8HTQ35NWYE1Zz+rV438CWkHtoGq3E3q4ocLOP5T8C
+         euSntHUIVUEBh3la/Yy5NtBfEcZBeniHggQeHvjGzwtmUrGsUA8pPjwiFDZqJwloc2H5
+         yRpr2O/ZC0n2mgszGTzp1RfDh7Vg8zx5hGA8wOmNgzT9u5/icQUnuQWM3RMTu7N7NCDg
+         VQhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685087009; x=1687679009;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=twYef5JxzOYWdFtDJIvI+imxLb6P+iSjJpGmWBNbdSU=;
-        b=UMydGBHlu7J7cTqh5PpFcvmLywIGnDQL/CowNeknPH3UYbaP3nNuevLJoZwmPCK8dl
-         MYgUwb4GFe/V1863Qf/PnpOrzJIQMCbBMeEMVEP9i2guopakokyCaZCOaNCZdeUHeRK1
-         XOcywMseG5rzwAk7yJebRlkU5D6ZbXcXNXTU57klsG1obT6TDRZoV29selRvR1YoodA/
-         RsSKaUJFD2qiX5h1udlV68cM5bbf8f7C0djzmvkvdAlQSlV7rQnrWCPMJ+9Sw+PAcoGz
-         Sm/hhIoY4ai9M5wh9l9sOdayj5CKZEW/QGLETBiBSBYwC9LtteDT/Wf1OcHv5Yy/S5SI
-         u9Cg==
-X-Gm-Message-State: AC+VfDxUB8oBa8JBchqy4DM6DM+c4hoZKRxZCmMXR2kvfgUMinni5fOk
-        zRLW18iOSTg4iai+rSB6jhDTYtMSCy4lbULvYOcMGoPnzUhWUw==
-X-Google-Smtp-Source: ACHHUZ4F355jBozpMw3/OEJ8PW+sc/pObMm5c/87PQjFnU9AqE6jA1CUem6RiYdym4DwbLSP+XdFma7xjpqk5EiHJ4k=
-X-Received: by 2002:adf:ee0d:0:b0:309:3828:2bde with SMTP id
- y13-20020adfee0d000000b0030938282bdemr653832wrn.60.1685087008551; Fri, 26 May
- 2023 00:43:28 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1685087444; x=1687679444;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DC31IUhv/KDwF/7LXlScDdxDoyQnFVByk+1cX0N3RaE=;
+        b=OpPQvcSy0O5optSX/GwaXXlU6lU4jwf19dIamUxC4aCJ1ooDb+GrtmqT0PfOfciO4G
+         nnJ/2rd+oZG7SmqCEb22gw+t5FP64Edc3wLzPOZOgiB3U+qPzbBdBXBBXRUYOzmTlqoP
+         wZ9lqxS1ReLNj3hPmfEupxKCmVsyXSlMdXjFlZ3tM1bQig90T9WusNSNVkz5De2N38v6
+         HWEnYGAEQOaK38Fk6oWJwsmBa+gnTHuaeKUu50vU9+BKpbAH13OOVkmmQ9WzS1RI9n87
+         oTOOe9kBjsj6x8mwp/iGzuY7h1Gm9uJXJDTmzdNbJJgd61l2m2IGy2hdkI+4bHNlYfNv
+         jC6w==
+X-Gm-Message-State: AC+VfDx6VKzJmHG7dHUGn1TlWTSrEWpTHCErZTi09TAqXj/qRhthZ0cB
+        df8eaFoFjAnPgavm7PJ5rn7aB/KJmQ7OBnWUsNg=
+X-Google-Smtp-Source: ACHHUZ58ZyNcl4smp7Jn1NrrTnovVntKOMAOSrPor/2jlNcaBY0cnT/p2f56wvJwy1y5P3rJncUZpbKm54trYcAP22Q=
+X-Received: by 2002:a17:903:2345:b0:1af:f4f5:6fae with SMTP id
+ c5-20020a170903234500b001aff4f56faemr1891458plh.54.1685087443821; Fri, 26 May
+ 2023 00:50:43 -0700 (PDT)
 MIME-Version: 1.0
-From:   Fabio Coatti <fabio.coatti@gmail.com>
-Date:   Fri, 26 May 2023 09:43:17 +0200
-Message-ID: <CADpTngX9LESCdHVu_2mQkNGena_Ng2CphWNwsRGSMxzDsTjU2A@mail.gmail.com>
-Subject: WARNING trace at kvm_nx_huge_page_recovery_worker on 6.3.4
-To:     stable@vger.kernel.org, regressions@lists.linux.dev,
-        kvm@vger.kernel.org
+References: <cover.1684999824.git.haibo1.xu@intel.com> <26dea518fc5e8da51e61db279d175364bfecd009.1684999824.git.haibo1.xu@intel.com>
+ <20230525-705ddcbcd43aa63e3fd356c8@orel>
+In-Reply-To: <20230525-705ddcbcd43aa63e3fd356c8@orel>
+From:   Haibo Xu <xiaobo55x@gmail.com>
+Date:   Fri, 26 May 2023 15:50:32 +0800
+Message-ID: <CAJve8onF9MFuaVsThFnhjWr6ZomB0Lhr9WXGvMiJDt5vrjeKLg@mail.gmail.com>
+Subject: Re: [PATCH v2 09/11] KVM: riscv: selftests: Make check_supported arch specific
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org,
+        oliver.upton@linux.dev, seanjc@google.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Shuah Khan <shuah@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -62,86 +88,120 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
-I'm using vanilla kernels on a gentoo-based laptop and since 6.3.2 I'm
-getting the kernel log  below when using kvm VM on my box.
-I know, kernel is tainted but avoiding to load nvidia driver could
-make things complicated on my side; if needed for debug I can try to
-avoid it.
+On Fri, May 26, 2023 at 12:40=E2=80=AFAM Andrew Jones <ajones@ventanamicro.=
+com> wrote:
+>
+> On Thu, May 25, 2023 at 03:38:33PM +0800, Haibo Xu wrote:
+> > check_supported() was used to verify whether a feature/extension was
+> > supported in a guest in the get-reg-list test. Currently this info
+> > can be retrieved through the KVM_CAP_ARM_* API in aarch64, but in
+> > riscv, this info was only exposed through the KVM_GET_ONE_REG on
+> > KVM_REG_RISCV_ISA_EXT pseudo registers.
+> >
+> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> > ---
+> >  tools/testing/selftests/kvm/get-reg-list.c | 32 +++++++++++-----------
+> >  1 file changed, 16 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing=
+/selftests/kvm/get-reg-list.c
+> > index f6ad7991a812..f1fc113e9719 100644
+> > --- a/tools/testing/selftests/kvm/get-reg-list.c
+> > +++ b/tools/testing/selftests/kvm/get-reg-list.c
+> > @@ -99,6 +99,20 @@ void __weak print_reg(const char *prefix, __u64 id)
+> >  }
+> >
+> >  #ifdef __aarch64__
+> > +static void check_supported(struct vcpu_reg_list *c)
+> > +{
+> > +     struct vcpu_reg_sublist *s;
+> > +
+> > +     for_each_sublist(c, s) {
+> > +             if (!s->capability)
+> > +                     continue;
+>
+> I was going to say that making this function aarch64 shouldn't be
+> necessary, since riscv leaves capability set to zero and this function
+> doesn't do anything, but then looking ahead I see riscv is abusing
+> capability by putting isa extensions in it. IMO, capability should
+> only be set to KVM_CAP_* values. Since riscv doesn't use it, then it
+> should be left zero.
+>
+> If we're going to abuse something, then I'd rather abuse the 'feature'
+> member, but since it's only an int (not an unsigned long), then let's
+> just add an 'unsigned long extension' member.
+>
 
-Not sure which other infos can be relevant in this context; if you
-need more details just let me know, happy to provide them.
+Good idea!
 
-[Fri May 26 09:16:35 2023] ------------[ cut here ]------------
-[Fri May 26 09:16:35 2023] WARNING: CPU: 5 PID: 4684 at
-kvm_nx_huge_page_recovery_worker+0x38c/0x3d0 [kvm]
-[Fri May 26 09:16:35 2023] Modules linked in: vhost_net vhost
-vhost_iotlb tap tun tls rfcomm snd_hrtimer snd_seq xt_CHECKSUM
-algif_skcipher xt_MASQUERADE xt_conntrack ipt_REJECT nf_reject_ipv4
-ip6table_mangle ip6table_nat ip6table_filter ip6_tables iptable_mangle
-iptable_nat nf_nat iptable_filter ip_tables bpfilter bridge stp llc
-rmi_smbus rmi_core bnep squashfs sch_fq_codel nvidia_drm(POE)
-intel_rapl_msr vboxnetadp(OE) vboxnetflt(OE) nvidia_modeset(POE)
-mei_pxp mei_hdcp rtsx_pci_sdmmc vboxdrv(OE) mmc_core intel_rapl_common
-intel_pmc_core_pltdrv intel_pmc_core snd_ctl_led intel_tcc_cooling
-snd_hda_codec_realtek snd_hda_codec_generic x86_pkg_temp_thermal
-intel_powerclamp btusb btrtl snd_usb_audio btbcm btmtk kvm_intel
-btintel snd_hda_intel snd_intel_dspcfg snd_usbmidi_lib snd_hda_codec
-snd_rawmidi snd_hwdep bluetooth snd_hda_core snd_seq_device kvm
-snd_pcm thinkpad_acpi iwlmvm mousedev ledtrig_audio uvcvideo snd_timer
-ecdh_generic irqbypass crct10dif_pclmul crc32_pclmul polyval_clmulni
-snd think_lmi joydev mei_me ecc uvc
-[Fri May 26 09:16:35 2023]  polyval_generic rtsx_pci iwlwifi
-firmware_attributes_class psmouse wmi_bmof soundcore intel_pch_thermal
-mei platform_profile input_leds evdev nvidia(POE) coretemp hwmon
-akvcam(OE) videobuf2_vmalloc videobuf2_memops videobuf2_v4l2 videodev
-videobuf2_common mc loop nfsd auth_rpcgss nfs_acl efivarfs dmi_sysfs
-dm_zero dm_thin_pool dm_persistent_data dm_bio_prison dm_service_time
-dm_round_robin dm_queue_length dm_multipath dm_delay virtio_pci
-virtio_pci_legacy_dev virtio_pci_modern_dev virtio_blk virtio_console
-virtio_balloon vxlan ip6_udp_tunnel udp_tunnel macvlan virtio_net
-net_failover failover virtio_ring virtio fuse overlay nfs lockd grace
-sunrpc linear raid10 raid1 raid0 dm_raid raid456 async_raid6_recov
-async_memcpy async_pq async_xor async_tx md_mod dm_snapshot dm_bufio
-dm_crypt trusted asn1_encoder tpm rng_core dm_mirror dm_region_hash
-dm_log firewire_core crc_itu_t hid_apple usb_storage ehci_pci ehci_hcd
-sr_mod cdrom ahci libahci libata
-[Fri May 26 09:16:35 2023] CPU: 5 PID: 4684 Comm: kvm-nx-lpage-re
-Tainted: P     U     OE      6.3.4-cova #1
-[Fri May 26 09:16:35 2023] Hardware name: LENOVO
-20EQS58500/20EQS58500, BIOS N1EET98W (1.71 ) 12/06/2022
-[Fri May 26 09:16:35 2023] RIP:
-0010:kvm_nx_huge_page_recovery_worker+0x38c/0x3d0 [kvm]
-[Fri May 26 09:16:35 2023] Code: 48 8b 44 24 30 4c 39 e0 0f 85 1b fe
-ff ff 48 89 df e8 2e ab fb ff e9 23 fe ff ff 49 bc ff ff ff ff ff ff
-ff 7f e9 fb fc ff ff <0f> 0b e9 1b ff ff ff 48 8b 44 24 40 65 48 2b 04
-25 28 00 00 00 75
-[Fri May 26 09:16:35 2023] RSP: 0018:ffff8e1a4403fe68 EFLAGS: 00010246
-[Fri May 26 09:16:35 2023] RAX: 0000000000000000 RBX: ffff8e1a42bbd000
-RCX: 0000000000000000
-[Fri May 26 09:16:35 2023] RDX: 0000000000000000 RSI: 0000000000000000
-RDI: 0000000000000000
-[Fri May 26 09:16:35 2023] RBP: ffff8b4e9a56d930 R08: 0000000000000000
-R09: ffff8b4e9a56d8a0
-[Fri May 26 09:16:35 2023] R10: 0000000000000000 R11: 0000000000000001
-R12: ffff8e1a4403fe98
-[Fri May 26 09:16:35 2023] R13: 0000000000000001 R14: ffff8b4d9c432e80
-R15: 0000000000000010
-[Fri May 26 09:16:35 2023] FS:  0000000000000000(0000)
-GS:ffff8b5cdf740000(0000) knlGS:0000000000000000
-[Fri May 26 09:16:35 2023] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[Fri May 26 09:16:35 2023] CR2: 00007efeac53d000 CR3: 0000000978c2c003
-CR4: 00000000003726e0
-[Fri May 26 09:16:35 2023] Call Trace:
-[Fri May 26 09:16:35 2023]  <TASK>
-[Fri May 26 09:16:35 2023]  ?
-__pfx_kvm_nx_huge_page_recovery_worker+0x10/0x10 [kvm]
-[Fri May 26 09:16:35 2023]  kvm_vm_worker_thread+0x106/0x1c0 [kvm]
-[Fri May 26 09:16:35 2023]  ? __pfx_kvm_vm_worker_thread+0x10/0x10 [kvm]
-[Fri May 26 09:16:35 2023]  kthread+0xd9/0x100
-[Fri May 26 09:16:35 2023]  ? __pfx_kthread+0x10/0x10
-[Fri May 26 09:16:35 2023]  ret_from_fork+0x2c/0x50
-[Fri May 26 09:16:35 2023]  </TASK>
-[Fri May 26 09:16:35 2023] ---[ end trace 0000000000000000 ]---
--- 
-Fabio
+For the new 'extension' member in riscv, I think its use case should be
+identical to the 'feature' member in aarch64(KVM_RISCV_ISA_EXT_F
+was similar to KVM_ARM_VCPU_SVE)? If so, I think we can just reuse
+the 'feature' member since the data type was not a big deal.
+
+> Then, the finalize_vcpu() call can be moved back to run_test(), from
+> aarch64's vcpu_config_get_vcpu(). Both aarch64 and riscv will call it
+> right after vcpu_config_get_vcpu() and the riscv version of it will
+> do what your current riscv check_supported() is doing, using the
+> new 'extension' member instead of 'capability'.
+>
+> And this patch gets dropped.
+>
+> Thanks,
+> drew
+>
+> > +
+> > +             __TEST_REQUIRE(kvm_has_cap(s->capability),
+> > +                            "%s: %s not available, skipping tests\n",
+> > +                            config_name(c), s->name);
+> > +     }
+> > +}
+> > +
+> >  static void prepare_vcpu_init(struct vcpu_reg_list *c, struct kvm_vcpu=
+_init *init)
+> >  {
+> >       struct vcpu_reg_sublist *s;
+> > @@ -126,6 +140,8 @@ static struct kvm_vcpu *vcpu_config_get_vcpu(struct=
+ vcpu_reg_list *c, struct kvm
+> >       struct kvm_vcpu_init init =3D { .target =3D -1, };
+> >       struct kvm_vcpu *vcpu;
+> >
+> > +     check_supported(c);
+> > +
+> >       prepare_vcpu_init(c, &init);
+> >       vcpu =3D __vm_vcpu_add(vm, 0);
+> >       aarch64_vcpu_setup(vcpu, &init);
+> > @@ -140,20 +156,6 @@ static struct kvm_vcpu *vcpu_config_get_vcpu(struc=
+t vcpu_reg_list *c, struct kvm
+> >  }
+> >  #endif
+> >
+> > -static void check_supported(struct vcpu_reg_list *c)
+> > -{
+> > -     struct vcpu_reg_sublist *s;
+> > -
+> > -     for_each_sublist(c, s) {
+> > -             if (!s->capability)
+> > -                     continue;
+> > -
+> > -             __TEST_REQUIRE(kvm_has_cap(s->capability),
+> > -                            "%s: %s not available, skipping tests\n",
+> > -                            config_name(c), s->name);
+> > -     }
+> > -}
+> > -
+> >  static bool print_list;
+> >  static bool print_filtered;
+> >
+> > @@ -165,8 +167,6 @@ static void run_test(struct vcpu_reg_list *c)
+> >       struct kvm_vm *vm;
+> >       struct vcpu_reg_sublist *s;
+> >
+> > -     check_supported(c);
+> > -
+> >       vm =3D vm_create_barebones();
+> >       vcpu =3D vcpu_config_get_vcpu(c, vm);
+> >
+> > --
+> > 2.34.1
+> >
