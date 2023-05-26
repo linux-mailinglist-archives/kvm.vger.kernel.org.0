@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E5087130A2
-	for <lists+kvm@lfdr.de>; Sat, 27 May 2023 01:51:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F6837130A9
+	for <lists+kvm@lfdr.de>; Sat, 27 May 2023 01:51:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231477AbjEZXu4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 19:50:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35432 "EHLO
+        id S237735AbjEZXvC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 19:51:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237211AbjEZXuy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 19:50:54 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 348209E
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 16:50:53 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-64d429d817aso1769263b3a.1
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 16:50:53 -0700 (PDT)
+        with ESMTP id S236849AbjEZXu6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 19:50:58 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30E9283
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 16:50:55 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5341081a962so1325747a12.2
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 16:50:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685145052; x=1687737052;
+        d=google.com; s=20221208; t=1685145054; x=1687737054;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=JJTnaK90tbCk38mc8/WTI5ISgxszxEnEDXTsDq7XHRg=;
-        b=JMhrg9UvfHZSjJmgVRTI7PqyZvt0iLnmuwMIf8oadVR6b/BLDy/9Jc40kUBVPzy1mh
-         qBFSyRD3hhSBSJOraJ9XBqJICFBICIE262E5FcyLJsr8ReNzFIDYw00c/BVPE+rfKE1v
-         774GfbQnmHQ9C9qL5sRQbJ0nLiJv5+cK/zxpPwHvzUEraxplb0i8F8RIEh57YPtwehB2
-         1w+9j576NlriI2nxiL0Y470ZzbTGwGjny8nBW1Z4W66rYiJkT/+OzNIRltyappMmYNSA
-         YbJ/k9prNHu9x/J7hI5Bshvd/ntsVuzGcQmoROyP4Rtl1XiaBP4zjPuxTXgCbQHjfo5Q
-         0QZg==
+        bh=LQ1i2DguubB/+TBn/4idJEX6+htUYXJLnvWqgTtQ+sE=;
+        b=Qb4rdYu25sLs0lTzHE4ARDdUbhO/L0r1lri2Eh42yzbC2ec9iL0kyLgvlu1q2Oxknc
+         GDHb9LthFCdvxEtVvUaFY6pYVJl9tgaUBIvOaSeLHnav+i9QDTUaLPVytgOabMrhZCOi
+         aS20kL8vBcozW6FC/kolZZ0JH4yIy1yQLD5IAIRhJitL4QUUTDVLwEWWZwpgjlJl3Cs6
+         0jNDFS7Ch830eU8VaeQnJvBDu2Sppxiomf7botktlWZA73DVTdEYQqwmyFDmsCBiSino
+         gHtxz3uaJqFeIBPxuY/j00/LCk6Kg4p9LjtoEesicP8WLIhC6CtCopoxX6wpio7w/nDn
+         xK5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685145052; x=1687737052;
+        d=1e100.net; s=20221208; t=1685145054; x=1687737054;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=JJTnaK90tbCk38mc8/WTI5ISgxszxEnEDXTsDq7XHRg=;
-        b=Z1+8NHEbRIrbFpTTI3AjsZYjTYhKAabH2hB1maMbV8oabE0GEzJzf1sUFNBAWH9Js3
-         /wbVOSkc+mDLJhNsnThheGnDRXnmp8U3LgZPZjTc/2P9cGER0qfKXwUjIao77GYjvFeP
-         1Ij9yLWjjmH+fPVGmmr3NH4M6qe5Lg3+Jfh+n8OiBnnt6JeStBpK8FWfPIjrVmHLv2a/
-         sFqUYGl5cK9KbQoio5cphvniUCdbwNmckIDV3edKaJZaWujX40D2Jx/7Ci5WWZE+UaMo
-         kzrOvLLQmdSa0XYFvtBL6X4QxioAumeVERgtg0l+Syyg06MsjqcxHrKJwZnB2JfvqapA
-         DIIw==
-X-Gm-Message-State: AC+VfDy914ChB5U1CXXgUPo2NekkQytQhmlbJekzlpnvIv5K6voWpv0A
-        /0w7vcgUrF2aYEGYuhQZFwpOL87s2yQ=
-X-Google-Smtp-Source: ACHHUZ7a0BcGIFsz+va1Z8MfSc0jUfCemjRjhl7I8w5+AQGD9VfMHUmtHqC/i3JKW5e8JgJ8NTuNfZVdlf8=
+        bh=LQ1i2DguubB/+TBn/4idJEX6+htUYXJLnvWqgTtQ+sE=;
+        b=V3MyVFYtP5/xf3AsqysKpHAdT5m6yw2y9mZWiucXihDURAvXCeP+2T/mBFDnG7TqR1
+         7Y1gU2/wHu8fY80iT9fYcOrQHDwooTL85osB53S5g8odUyAFqdMZpMKaMfDk6obd4b2j
+         E25NJ75XygGYvaooFNkgOWtlLudg4nARUEiaLMqsXz0tURGju31mf4Ansk9fQA/g1ug2
+         x+jUWiPA+PqTRza/lyshrO/9vkl+T2pCexjh377wMt17TrrKsOcR7Ez3kU7e3EyfAp5V
+         PcNZvIxorLJe77sspNEYAdZMIvyypy9cct35DqYJpJdaPO/ibB0zbYXeqT/Q4UPvcJ6e
+         wr6w==
+X-Gm-Message-State: AC+VfDzvMpOncwQp291Ya328Nkyr2LmNCB2IO8Bnjzr0tjy7k/AWWL5P
+        8m4tMwaKhkZc8vcN76cpeVRUsPP5kFE=
+X-Google-Smtp-Source: ACHHUZ63QxfDBJN5gcO9zbQioZ92vLq9NWqlULPbXcgIfsDEZwl5bOocAFcUbzwZq1IWilptEAhIrasqwCw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:14c6:b0:64d:602a:2483 with SMTP id
- w6-20020a056a0014c600b0064d602a2483mr171024pfu.2.1685145052623; Fri, 26 May
- 2023 16:50:52 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a63:6c2:0:b0:53f:5c6c:3d18 with SMTP id
+ 185-20020a6306c2000000b0053f5c6c3d18mr205156pgg.10.1685145054665; Fri, 26 May
+ 2023 16:50:54 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 26 May 2023 16:50:46 -0700
+Date:   Fri, 26 May 2023 16:50:47 -0700
 In-Reply-To: <20230526235048.2842761-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230526235048.2842761-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230526235048.2842761-2-seanjc@google.com>
-Subject: [PATCH v2 1/3] KVM: x86: Bail from kvm_recalculate_phys_map() if
- x2APIC ID is out-of-bounds
+Message-ID: <20230526235048.2842761-3-seanjc@google.com>
+Subject: [PATCH v2 2/3] KVM: x86: Retry APIC optimized map recalc if vCPU is added/enabled
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -71,73 +70,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Bail from kvm_recalculate_phys_map() and disable the optimized map if the
-target vCPU's x2APIC ID is out-of-bounds, i.e. if the vCPU was added
-and/or enabled its local APIC after the map was allocated.  This fixes an
-out-of-bounds access bug in the !x2apic_format path where KVM would write
-beyond the end of phys_map.
+Retry the optimized APIC map recalculation if an APIC-enabled vCPU shows
+up between allocating the map and filling in the map data.  Conditionally
+reschedule before retrying even though the number of vCPUs that can be
+created is bounded by KVM.  Retrying a few thousand times isn't so slow
+as to be hugely problematic, but it's not blazing fast either.
 
-Check the x2APIC ID regardless of whether or not x2APIC is enabled,
-as KVM's hardcodes x2APIC ID to be the vCPU ID, i.e. it can't change, and
-the map allocation in kvm_recalculate_apic_map() doesn't check for x2APIC
-being enabled, i.e. the check won't get false postivies.
+Reset xapic_id_mistach on each retry as a vCPU could change its xAPIC ID
+between loops, but do NOT reset max_id.  The map size also factors in
+whether or not a vCPU's local APIC is hardware-enabled, i.e. userspace
+and/or the guest can theoretically keep KVM retrying indefinitely.  The
+only downside is that KVM will allocate more memory than is strictly
+necessary if the vCPU with the highest x2APIC ID disabled its APIC while
+the recalculation was in-progress.
 
-Note, this also affects the x2apic_format path, which previously just
-ignored the "x2apic_id > new->max_apic_id" case.  That too is arguably a
-bug fix, as ignoring the vCPU meant that KVM would not send interrupts to
-the vCPU until the next map recalculation.  In practice, that "bug" is
-likely benign as a newly present vCPU/APIC would immediately trigger a
-recalc.  But, there's no functional downside to disabling the map, and
-a future patch will gracefully handle the -E2BIG case by retrying instead
-of simply disabling the optimized map.
+Refresh kvm->arch.apic_map_dirty to opportunistically change it from
+DIRTY => UPDATE_IN_PROGRESS to avoid an unnecessary recalc from a
+different task, i.e. if another task is waiting to attempt an update
+(which is likely since a retry happens if and only if an update is
+required).
 
-Opportunistically add a sanity check on the xAPIC ID size, along with a
-comment explaining why the xAPIC ID is guaranteed to be "good".
-
-Reported-by: Michal Luczaj <mhal@rbox.co>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/lapic.c | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+ arch/x86/kvm/lapic.c | 29 +++++++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index e542cf285b51..3c300a196bdf 100644
+index 3c300a196bdf..cadeaba25e65 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -228,6 +228,23 @@ static int kvm_recalculate_phys_map(struct kvm_apic_map *new,
- 	u32 xapic_id = kvm_xapic_id(apic);
- 	u32 physical_id;
+@@ -381,7 +381,8 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+ 	struct kvm_vcpu *vcpu;
+ 	unsigned long i;
+ 	u32 max_id = 255; /* enough space for any xAPIC ID */
+-	bool xapic_id_mismatch = false;
++	bool xapic_id_mismatch;
++	int r;
  
-+	/*
-+	 * For simplicity, KVM always allocates enough space for all possible
-+	 * xAPIC IDs.  Yell, but don't kill the VM, as KVM can continue on
-+	 * without the optimized map.
-+	 */
-+	if (WARN_ON_ONCE(xapic_id > new->max_apic_id))
-+		return -EINVAL;
+ 	/* Read kvm->arch.apic_map_dirty before kvm->arch.apic_map.  */
+ 	if (atomic_read_acquire(&kvm->arch.apic_map_dirty) == CLEAN)
+@@ -391,9 +392,14 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+ 		  "Dirty APIC map without an in-kernel local APIC");
+ 
+ 	mutex_lock(&kvm->arch.apic_map_lock);
 +
-+	/*
-+	 * Bail if a vCPU was added and/or enabled its APIC between allocating
-+	 * the map and doing the actual calculations for the map.  Note, KVM
-+	 * hardcodes the x2APIC ID to vcpu_id, i.e. there's no TOCTOU bug if
-+	 * the compiler decides to reload x2apic_id after this check.
-+	 */
-+	if (x2apic_id > new->max_apic_id)
-+		return -E2BIG;
-+
++retry:
  	/*
- 	 * Deliberately truncate the vCPU ID when detecting a mismatched APIC
- 	 * ID to avoid false positives if the vCPU ID, i.e. x2APIC ID, is a
-@@ -253,8 +270,7 @@ static int kvm_recalculate_phys_map(struct kvm_apic_map *new,
+-	 * Read kvm->arch.apic_map_dirty before kvm->arch.apic_map
+-	 * (if clean) or the APIC registers (if dirty).
++	 * Read kvm->arch.apic_map_dirty before kvm->arch.apic_map (if clean)
++	 * or the APIC registers (if dirty).  Note, on retry the map may have
++	 * not yet been marked dirty by whatever task changed a vCPU's x2APIC
++	 * ID, i.e. the map may still show up as in-progress.  In that case
++	 * this task still needs to retry and copmlete its calculation.
  	 */
- 	if (vcpu->kvm->arch.x2apic_format) {
- 		/* See also kvm_apic_match_physical_addr(). */
--		if ((apic_x2apic_mode(apic) || x2apic_id > 0xff) &&
--			x2apic_id <= new->max_apic_id)
-+		if (apic_x2apic_mode(apic) || x2apic_id > 0xff)
- 			new->phys_map[x2apic_id] = apic;
+ 	if (atomic_cmpxchg_acquire(&kvm->arch.apic_map_dirty,
+ 				   DIRTY, UPDATE_IN_PROGRESS) == CLEAN) {
+@@ -402,6 +408,15 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+ 		return;
+ 	}
  
- 		if (!apic_x2apic_mode(apic) && !new->phys_map[xapic_id])
++	/*
++	 * Reset the mismatch flag between attempts so that KVM does the right
++	 * thing if a vCPU changes its xAPIC ID, but do NOT reset max_id, i.e.
++	 * keep max_id strictly increasing.  Disallowing max_id from shrinking
++	 * ensures KVM won't get stuck in an infinite loop, e.g. if the vCPU
++	 * with the highest x2APIC ID is toggling its APIC on and off.
++	 */
++	xapic_id_mismatch = false;
++
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+ 		if (kvm_apic_present(vcpu))
+ 			max_id = max(max_id, kvm_x2apic_id(vcpu->arch.apic));
+@@ -420,9 +435,15 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+ 		if (!kvm_apic_present(vcpu))
+ 			continue;
+ 
+-		if (kvm_recalculate_phys_map(new, vcpu, &xapic_id_mismatch)) {
++		r = kvm_recalculate_phys_map(new, vcpu, &xapic_id_mismatch);
++		if (r) {
+ 			kvfree(new);
+ 			new = NULL;
++			if (r == -E2BIG) {
++				cond_resched();
++				goto retry;
++			}
++
+ 			goto out;
+ 		}
+ 
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
