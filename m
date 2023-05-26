@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DC86712FD3
-	for <lists+kvm@lfdr.de>; Sat, 27 May 2023 00:17:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F19C712FD4
+	for <lists+kvm@lfdr.de>; Sat, 27 May 2023 00:17:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244386AbjEZWRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 18:17:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36018 "EHLO
+        id S244368AbjEZWRq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 18:17:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244368AbjEZWRh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 18:17:37 -0400
-Received: from out-31.mta0.migadu.com (out-31.mta0.migadu.com [IPv6:2001:41d0:1004:224b::1f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E753119C
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 15:17:35 -0700 (PDT)
+        with ESMTP id S244379AbjEZWRl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 18:17:41 -0400
+Received: from out-39.mta0.migadu.com (out-39.mta0.migadu.com [IPv6:2001:41d0:1004:224b::27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19C241BD
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 15:17:37 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1685139454;
+        t=1685139456;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Q4STaTWwuoBkbwO9uHVVIc2HPcXuNTdgB/WjVKL0rCY=;
-        b=eWKtA4UfAC4v/M0Qt6QHaMFk9cYjnBUqQJRr39kASiMs+uRsSDQRkvJCoh6+HsCb4Dif9F
-        u/Pitp7AUlmtd6a2CplVa6BHXTBdjaYbaCYlNEfW+h3WEdEfDY4lLuyLyXNmVh07hWcyZd
-        yq3Q7ZHitpGZT2FeTGOanaAXJC/ElIA=
+        bh=Yl7AlAoXPf4ogaPws4+d6wv4PIMGGuKWDBSXk06gWVU=;
+        b=MJsAa+U1EJB7/zfjGw0AjUO0gC6tk0IWuCL+RVTtZDCE2aQZAFVdFU0ho0IuNUWc81umLV
+        XbPpzT8J4lKpNliZuJo+iG2Y6EkbCawIQ/4KIbtyV3amQuFRf0wTybH0jh2og8YlKoiFFV
+        UxIrLa1MVOVfcojMTO/7YmX0tIrExDI=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Salil Mehta <salil.mehta@huawei.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH kvmtool 06/21] aarch64: Copy cputype.h from Linux 6.4-rc1
-Date:   Fri, 26 May 2023 22:16:57 +0000
-Message-ID: <20230526221712.317287-7-oliver.upton@linux.dev>
+Subject: [PATCH kvmtool 07/21] arm: Stash kvm_vcpu_init for later use
+Date:   Fri, 26 May 2023 22:16:58 +0000
+Message-ID: <20230526221712.317287-8-oliver.upton@linux.dev>
 In-Reply-To: <20230526221712.317287-1-oliver.upton@linux.dev>
 References: <20230526221712.317287-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -45,215 +45,50 @@ Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,UPPERCASE_50_75,URIBL_BLOCKED autolearn=no
-        autolearn_force=no version=3.4.6
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-cputype.h has some helpful definitions for working with mpidrs and
-affinity masks.
+A subsequent change will add support for resetting a vCPU, which
+requires reissuing the KVM_ARM_VCPU_INIT ioctl. Save the kvm_vcpu_init
+worked out for later use.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arm/aarch64/include/asm/cputype.h | 186 ++++++++++++++++++++++++++++++
- 1 file changed, 186 insertions(+)
- create mode 100644 arm/aarch64/include/asm/cputype.h
+ arm/include/arm-common/kvm-cpu-arch.h | 2 +-
+ arm/kvm-cpu.c                         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arm/aarch64/include/asm/cputype.h b/arm/aarch64/include/asm/cputype.h
-new file mode 100644
-index 000000000000..698665ab41ae
---- /dev/null
-+++ b/arm/aarch64/include/asm/cputype.h
-@@ -0,0 +1,186 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2012 ARM Ltd.
-+ */
-+#ifndef __ASM_CPUTYPE_H
-+#define __ASM_CPUTYPE_H
-+
-+#define INVALID_HWID		ULONG_MAX
-+
-+#define MPIDR_UP_BITMASK	(0x1 << 30)
-+#define MPIDR_MT_BITMASK	(0x1 << 24)
-+#define MPIDR_HWID_BITMASK	UL(0xff00ffffff)
-+
-+#define MPIDR_LEVEL_BITS_SHIFT	3
-+#define MPIDR_LEVEL_BITS	(1 << MPIDR_LEVEL_BITS_SHIFT)
-+#define MPIDR_LEVEL_MASK	((1 << MPIDR_LEVEL_BITS) - 1)
-+
-+#define MPIDR_LEVEL_SHIFT(level) \
-+	(((1 << level) >> 1) << MPIDR_LEVEL_BITS_SHIFT)
-+
-+#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
-+	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & MPIDR_LEVEL_MASK)
-+
-+#define MIDR_REVISION_MASK	0xf
-+#define MIDR_REVISION(midr)	((midr) & MIDR_REVISION_MASK)
-+#define MIDR_PARTNUM_SHIFT	4
-+#define MIDR_PARTNUM_MASK	(0xfff << MIDR_PARTNUM_SHIFT)
-+#define MIDR_PARTNUM(midr)	\
-+	(((midr) & MIDR_PARTNUM_MASK) >> MIDR_PARTNUM_SHIFT)
-+#define MIDR_ARCHITECTURE_SHIFT	16
-+#define MIDR_ARCHITECTURE_MASK	(0xf << MIDR_ARCHITECTURE_SHIFT)
-+#define MIDR_ARCHITECTURE(midr)	\
-+	(((midr) & MIDR_ARCHITECTURE_MASK) >> MIDR_ARCHITECTURE_SHIFT)
-+#define MIDR_VARIANT_SHIFT	20
-+#define MIDR_VARIANT_MASK	(0xf << MIDR_VARIANT_SHIFT)
-+#define MIDR_VARIANT(midr)	\
-+	(((midr) & MIDR_VARIANT_MASK) >> MIDR_VARIANT_SHIFT)
-+#define MIDR_IMPLEMENTOR_SHIFT	24
-+#define MIDR_IMPLEMENTOR_MASK	(0xffU << MIDR_IMPLEMENTOR_SHIFT)
-+#define MIDR_IMPLEMENTOR(midr)	\
-+	(((midr) & MIDR_IMPLEMENTOR_MASK) >> MIDR_IMPLEMENTOR_SHIFT)
-+
-+#define MIDR_CPU_MODEL(imp, partnum) \
-+	((_AT(u32, imp)		<< MIDR_IMPLEMENTOR_SHIFT) | \
-+	(0xf			<< MIDR_ARCHITECTURE_SHIFT) | \
-+	((partnum)		<< MIDR_PARTNUM_SHIFT))
-+
-+#define MIDR_CPU_VAR_REV(var, rev) \
-+	(((var)	<< MIDR_VARIANT_SHIFT) | (rev))
-+
-+#define MIDR_CPU_MODEL_MASK (MIDR_IMPLEMENTOR_MASK | MIDR_PARTNUM_MASK | \
-+			     MIDR_ARCHITECTURE_MASK)
-+
-+#define ARM_CPU_IMP_ARM			0x41
-+#define ARM_CPU_IMP_APM			0x50
-+#define ARM_CPU_IMP_CAVIUM		0x43
-+#define ARM_CPU_IMP_BRCM		0x42
-+#define ARM_CPU_IMP_QCOM		0x51
-+#define ARM_CPU_IMP_NVIDIA		0x4E
-+#define ARM_CPU_IMP_FUJITSU		0x46
-+#define ARM_CPU_IMP_HISI		0x48
-+#define ARM_CPU_IMP_APPLE		0x61
-+#define ARM_CPU_IMP_AMPERE		0xC0
-+
-+#define ARM_CPU_PART_AEM_V8		0xD0F
-+#define ARM_CPU_PART_FOUNDATION		0xD00
-+#define ARM_CPU_PART_CORTEX_A57		0xD07
-+#define ARM_CPU_PART_CORTEX_A72		0xD08
-+#define ARM_CPU_PART_CORTEX_A53		0xD03
-+#define ARM_CPU_PART_CORTEX_A73		0xD09
-+#define ARM_CPU_PART_CORTEX_A75		0xD0A
-+#define ARM_CPU_PART_CORTEX_A35		0xD04
-+#define ARM_CPU_PART_CORTEX_A55		0xD05
-+#define ARM_CPU_PART_CORTEX_A76		0xD0B
-+#define ARM_CPU_PART_NEOVERSE_N1	0xD0C
-+#define ARM_CPU_PART_CORTEX_A77		0xD0D
-+#define ARM_CPU_PART_NEOVERSE_V1	0xD40
-+#define ARM_CPU_PART_CORTEX_A78		0xD41
-+#define ARM_CPU_PART_CORTEX_A78AE	0xD42
-+#define ARM_CPU_PART_CORTEX_X1		0xD44
-+#define ARM_CPU_PART_CORTEX_A510	0xD46
-+#define ARM_CPU_PART_CORTEX_A710	0xD47
-+#define ARM_CPU_PART_CORTEX_A715	0xD4D
-+#define ARM_CPU_PART_CORTEX_X2		0xD48
-+#define ARM_CPU_PART_NEOVERSE_N2	0xD49
-+#define ARM_CPU_PART_CORTEX_A78C	0xD4B
-+
-+#define APM_CPU_PART_POTENZA		0x000
-+
-+#define CAVIUM_CPU_PART_THUNDERX	0x0A1
-+#define CAVIUM_CPU_PART_THUNDERX_81XX	0x0A2
-+#define CAVIUM_CPU_PART_THUNDERX_83XX	0x0A3
-+#define CAVIUM_CPU_PART_THUNDERX2	0x0AF
-+/* OcteonTx2 series */
-+#define CAVIUM_CPU_PART_OCTX2_98XX	0x0B1
-+#define CAVIUM_CPU_PART_OCTX2_96XX	0x0B2
-+#define CAVIUM_CPU_PART_OCTX2_95XX	0x0B3
-+#define CAVIUM_CPU_PART_OCTX2_95XXN	0x0B4
-+#define CAVIUM_CPU_PART_OCTX2_95XXMM	0x0B5
-+#define CAVIUM_CPU_PART_OCTX2_95XXO	0x0B6
-+
-+#define BRCM_CPU_PART_BRAHMA_B53	0x100
-+#define BRCM_CPU_PART_VULCAN		0x516
-+
-+#define QCOM_CPU_PART_FALKOR_V1		0x800
-+#define QCOM_CPU_PART_FALKOR		0xC00
-+#define QCOM_CPU_PART_KRYO		0x200
-+#define QCOM_CPU_PART_KRYO_2XX_GOLD	0x800
-+#define QCOM_CPU_PART_KRYO_2XX_SILVER	0x801
-+#define QCOM_CPU_PART_KRYO_3XX_SILVER	0x803
-+#define QCOM_CPU_PART_KRYO_4XX_GOLD	0x804
-+#define QCOM_CPU_PART_KRYO_4XX_SILVER	0x805
-+
-+#define NVIDIA_CPU_PART_DENVER		0x003
-+#define NVIDIA_CPU_PART_CARMEL		0x004
-+
-+#define FUJITSU_CPU_PART_A64FX		0x001
-+
-+#define HISI_CPU_PART_TSV110		0xD01
-+
-+#define APPLE_CPU_PART_M1_ICESTORM	0x022
-+#define APPLE_CPU_PART_M1_FIRESTORM	0x023
-+#define APPLE_CPU_PART_M1_ICESTORM_PRO	0x024
-+#define APPLE_CPU_PART_M1_FIRESTORM_PRO	0x025
-+#define APPLE_CPU_PART_M1_ICESTORM_MAX	0x028
-+#define APPLE_CPU_PART_M1_FIRESTORM_MAX	0x029
-+#define APPLE_CPU_PART_M2_BLIZZARD	0x032
-+#define APPLE_CPU_PART_M2_AVALANCHE	0x033
-+
-+#define AMPERE_CPU_PART_AMPERE1		0xAC3
-+
-+#define MIDR_CORTEX_A53 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A53)
-+#define MIDR_CORTEX_A57 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A57)
-+#define MIDR_CORTEX_A72 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A72)
-+#define MIDR_CORTEX_A73 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A73)
-+#define MIDR_CORTEX_A75 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A75)
-+#define MIDR_CORTEX_A35 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A35)
-+#define MIDR_CORTEX_A55 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A55)
-+#define MIDR_CORTEX_A76	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A76)
-+#define MIDR_NEOVERSE_N1 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_NEOVERSE_N1)
-+#define MIDR_CORTEX_A77	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A77)
-+#define MIDR_NEOVERSE_V1	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_NEOVERSE_V1)
-+#define MIDR_CORTEX_A78	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A78)
-+#define MIDR_CORTEX_A78AE	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A78AE)
-+#define MIDR_CORTEX_X1	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_X1)
-+#define MIDR_CORTEX_A510 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A510)
-+#define MIDR_CORTEX_A710 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A710)
-+#define MIDR_CORTEX_A715 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A715)
-+#define MIDR_CORTEX_X2 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_X2)
-+#define MIDR_NEOVERSE_N2 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_NEOVERSE_N2)
-+#define MIDR_CORTEX_A78C	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A78C)
-+#define MIDR_THUNDERX	MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
-+#define MIDR_THUNDERX_81XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_81XX)
-+#define MIDR_THUNDERX_83XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_83XX)
-+#define MIDR_OCTX2_98XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_98XX)
-+#define MIDR_OCTX2_96XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_96XX)
-+#define MIDR_OCTX2_95XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_95XX)
-+#define MIDR_OCTX2_95XXN MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_95XXN)
-+#define MIDR_OCTX2_95XXMM MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_95XXMM)
-+#define MIDR_OCTX2_95XXO MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_95XXO)
-+#define MIDR_CAVIUM_THUNDERX2 MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX2)
-+#define MIDR_BRAHMA_B53 MIDR_CPU_MODEL(ARM_CPU_IMP_BRCM, BRCM_CPU_PART_BRAHMA_B53)
-+#define MIDR_BRCM_VULCAN MIDR_CPU_MODEL(ARM_CPU_IMP_BRCM, BRCM_CPU_PART_VULCAN)
-+#define MIDR_QCOM_FALKOR_V1 MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_FALKOR_V1)
-+#define MIDR_QCOM_FALKOR MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_FALKOR)
-+#define MIDR_QCOM_KRYO MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO)
-+#define MIDR_QCOM_KRYO_2XX_GOLD MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_2XX_GOLD)
-+#define MIDR_QCOM_KRYO_2XX_SILVER MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_2XX_SILVER)
-+#define MIDR_QCOM_KRYO_3XX_SILVER MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_3XX_SILVER)
-+#define MIDR_QCOM_KRYO_4XX_GOLD MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_4XX_GOLD)
-+#define MIDR_QCOM_KRYO_4XX_SILVER MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_4XX_SILVER)
-+#define MIDR_NVIDIA_DENVER MIDR_CPU_MODEL(ARM_CPU_IMP_NVIDIA, NVIDIA_CPU_PART_DENVER)
-+#define MIDR_NVIDIA_CARMEL MIDR_CPU_MODEL(ARM_CPU_IMP_NVIDIA, NVIDIA_CPU_PART_CARMEL)
-+#define MIDR_FUJITSU_A64FX MIDR_CPU_MODEL(ARM_CPU_IMP_FUJITSU, FUJITSU_CPU_PART_A64FX)
-+#define MIDR_HISI_TSV110 MIDR_CPU_MODEL(ARM_CPU_IMP_HISI, HISI_CPU_PART_TSV110)
-+#define MIDR_APPLE_M1_ICESTORM MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM)
-+#define MIDR_APPLE_M1_FIRESTORM MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM)
-+#define MIDR_APPLE_M1_ICESTORM_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM_PRO)
-+#define MIDR_APPLE_M1_FIRESTORM_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_PRO)
-+#define MIDR_APPLE_M1_ICESTORM_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM_MAX)
-+#define MIDR_APPLE_M1_FIRESTORM_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_MAX)
-+#define MIDR_APPLE_M2_BLIZZARD MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_BLIZZARD)
-+#define MIDR_APPLE_M2_AVALANCHE MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE)
-+#define MIDR_AMPERE1 MIDR_CPU_MODEL(ARM_CPU_IMP_AMPERE, AMPERE_CPU_PART_AMPERE1)
-+
-+#endif
+diff --git a/arm/include/arm-common/kvm-cpu-arch.h b/arm/include/arm-common/kvm-cpu-arch.h
+index 923d2c4c7ad3..bf5223eaa851 100644
+--- a/arm/include/arm-common/kvm-cpu-arch.h
++++ b/arm/include/arm-common/kvm-cpu-arch.h
+@@ -11,7 +11,7 @@ struct kvm_cpu {
+ 	pthread_t	thread;
+ 
+ 	unsigned long	cpu_id;
+-	unsigned long	cpu_type;
++	struct kvm_vcpu_init	init;
+ 	const char	*cpu_compatible;
+ 
+ 	struct kvm	*kvm;
+diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+index 98bc5fdf0418..0ac488a93eef 100644
+--- a/arm/kvm-cpu.c
++++ b/arm/kvm-cpu.c
+@@ -115,7 +115,7 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ 	/* Populate the vcpu structure. */
+ 	vcpu->kvm		= kvm;
+ 	vcpu->cpu_id		= cpu_id;
+-	vcpu->cpu_type		= vcpu_init.target;
++	vcpu->init		= vcpu_init;
+ 	vcpu->cpu_compatible	= target->compatible;
+ 	vcpu->is_running	= true;
+ 
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
