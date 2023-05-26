@@ -2,79 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E16E711D3E
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 03:59:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E07F5711D63
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 04:05:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235394AbjEZB7O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 May 2023 21:59:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43270 "EHLO
+        id S240695AbjEZCFZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 May 2023 22:05:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232154AbjEZB7N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 May 2023 21:59:13 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DB5118D
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 18:59:12 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-64d1a0d640cso349076b3a.1
-        for <kvm@vger.kernel.org>; Thu, 25 May 2023 18:59:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1685066351; x=1687658351;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SHXSI++vej3nO9JdS3WPE1L2j+X5Z0vQui5q9gEk36o=;
-        b=u7yPykjjbmCytXH6pFeAr3KKb+n0Dr/7iRiYbmd/2mW7OQXDxbdmhCf6WTf2zF/OQA
-         xgvnwKpsoHs4kD48+/NfDkt4HR9uPDjpqKei+Ka0yT6ZhcdLK0WEzirOb1pdjfT6Kl/l
-         y6fqshg9NP1bWU2EoPB5oKxxwgbLMKz4RY56SNq0KLh4CyYFVyxMAhQ+DwYJrgwVHozn
-         ykFkaZy8lZ3/pfwXq3RhNVJy8Z3tiOBvh2IeTdxOFY+GxHTOeQ3Bo9obBuv5UG6Awwnw
-         iKpzYkpMjs2MOvS3KHQ6adGU+HflbDF/dnFeXzOZjqesxCry1a0qQjNBSsy4ajckxZwl
-         R13A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685066351; x=1687658351;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=SHXSI++vej3nO9JdS3WPE1L2j+X5Z0vQui5q9gEk36o=;
-        b=HzjuI4k4TAVKWUXGkF4DHBJMsTuhcukqSFIsKwSxvIl9tUeDTz/sxG+/wVQGcJ69AJ
-         oTBL0fs97kE0J/LZ+n4MOrFLC5OXCfSxwmniNlw4E6vzTLF9ZvosVquJuIzbfWscJH67
-         mmAikPcqVNcpQJ4rl/ysydL7hzn5dkg58nK1k/lATifO1FS4ns7aFVLe5QX7fLtUQMXU
-         44zkgVXau31fp8JwpZu8D2OrHl1DhSS32m9tvsG88caIfe/Lu70OaS6VpIyk109fo8G7
-         SqTP1fvUzTS88Bt5jsRNQQUQZ/QWAiKMQs9p1DuUvq84EI0Ev/PXSRNIWPjzLS6J6O12
-         oQFw==
-X-Gm-Message-State: AC+VfDwlEFn9t8Fft/V8mWE3y3irzJ722+D0JjHdwcB3/u5rKdsFRXRE
-        Xio93MObKwdOEy8SNyqzRu17Bg==
-X-Google-Smtp-Source: ACHHUZ62FFB/huSWayTmzsRIupHGq1n53axHnLv9NDLNL/oh5ccqB5HNl6tnnxMTd0vHw7gzQMDQng==
-X-Received: by 2002:a05:6a00:2491:b0:647:d698:56d2 with SMTP id c17-20020a056a00249100b00647d69856d2mr1017231pfv.27.1685066351315;
-        Thu, 25 May 2023 18:59:11 -0700 (PDT)
-Received: from [100.64.100.6] ([194.5.48.111])
-        by smtp.gmail.com with ESMTPSA id fe22-20020a056a002f1600b0064ceb16a1a8sm1751764pfb.33.2023.05.25.18.59.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 May 2023 18:59:10 -0700 (PDT)
-Message-ID: <7650f32d-6d4d-012e-b14b-538529de0577@linaro.org>
-Date:   Fri, 26 May 2023 09:58:52 +0800
+        with ESMTP id S235135AbjEZCFX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 May 2023 22:05:23 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDC28194;
+        Thu, 25 May 2023 19:05:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685066721; x=1716602721;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=3FRtV+V0lyCeW1Ovj8JS9xrSCJC7ltM313nVTl9jV+0=;
+  b=UqHv8BIsP+L7/7/5CCL+got7RmAJd7NMlf1zJgYW1dDd7MqsIQSttk2j
+   fRZIqglrtLYlwF1+oDMIaKo2G6Ni/Qr/OuB1CCtJ6JJsCeQ4IXCdfUs91
+   yPOjwy9GvFaM/HqWqp6rwB4NaaQkqzQbSa8TiMC8VUZ/D5LR9Thvtgi+T
+   WMH0VND2xJN1ENilSmjwlcr2d87dYV3ehB5Fk8XP8VZoPQFtYg+PtUV0v
+   7gextqFyHEeCyUYm80+kQOYjJCgqa3EcQ8g8YRe80V4di25VUNVysRGrD
+   QVRB0fjUEWlQ8Q4y6gvMAkP1A1s2sDfAmoELuFVG3tqfHZGV0Bj+FwMi9
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10721"; a="440442231"
+X-IronPort-AV: E=Sophos;i="6.00,192,1681196400"; 
+   d="scan'208";a="440442231"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2023 19:05:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10721"; a="735804563"
+X-IronPort-AV: E=Sophos;i="6.00,192,1681196400"; 
+   d="scan'208";a="735804563"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by orsmga008.jf.intel.com with ESMTP; 25 May 2023 19:05:14 -0700
+Message-ID: <355a9f1e-64e6-d785-5a22-027b708b4935@linux.intel.com>
+Date:   Fri, 26 May 2023 10:04:27 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.11.0
-Subject: Re: [PATCH v2 00/17] Add Nested Translation Support for SMMUv3
-To:     Nicolin Chen <nicolinc@nvidia.com>
-Cc:     jgg@nvidia.com, robin.murphy@arm.com, will@kernel.org,
-        eric.auger@redhat.com, kevin.tian@intel.com,
-        baolu.lu@linux.intel.com, joro@8bytes.org,
-        shameerali.kolothum.thodi@huawei.com, jean-philippe@linaro.org,
-        linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        alex.williamson@redhat.com, yi.l.liu@intel.com
-References: <cover.1683688960.git.nicolinc@nvidia.com>
- <CABQgh9FL4ssQjBJM52_kb0aBVVPb_9Wc0Q+NL1PaQO=2LYBHCA@mail.gmail.com>
- <ZGJWgFVJDWxVpiBE@Asurada-Nvidia>
- <CABQgh9FMGPnUpz6tc6c27i6nT0Lcs9YQMoO=V40Fi2inJiCh-A@mail.gmail.com>
- <ZG/ygPy1XbSSNzR4@Asurada-Nvidia>
-From:   zhangfei gao <zhangfei.gao@linaro.org>
-In-Reply-To: <ZG/ygPy1XbSSNzR4@Asurada-Nvidia>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Cc:     baolu.lu@linux.intel.com, "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "clegoate@redhat.com" <clegoate@redhat.com>
+Subject: Re: [PATCH v6 09/10] vfio/pci: Extend
+ VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for vfio device cdev
+Content-Language: en-US
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+References: <20230522115751.326947-1-yi.l.liu@intel.com>
+ <20230522115751.326947-10-yi.l.liu@intel.com>
+ <20230524135603.33ee3d91.alex.williamson@redhat.com>
+ <DS0PR11MB752935203F87D69D4468B890C3469@DS0PR11MB7529.namprd11.prod.outlook.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <DS0PR11MB752935203F87D69D4468B890C3469@DS0PR11MB7529.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,108 +93,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 5/25/23 9:02 PM, Liu, Yi L wrote:
+>>   It's possible that requirement
+>> might be relaxed in the new DMA ownership model, but as it is right
+>> now, the code enforces that requirement and any new discussion about
+>> what makes hot-reset available should note both the ownership and
+>> dev_set requirement.  Thanks,
+> I think your point is that if an iommufd_ctx has acquired DMA ownerhisp
+> of an iommu_group, it means the device is owned. And it should not
+> matter whether all the devices in the iommu_group is present in the
+> dev_set. It is allowed that some devices are bound to pci-stub or
+> pcieport driver. Is it?
+> 
+> Actually I have a doubt on it. IIUC, the above requirement on dev_set
+> is to ensure the reset to the devices are protected by the dev_set->lock.
+> So that either the reset issued by driver itself or a hot reset request
+> from user, there is no race. But if a device is not in the dev_set, then
+> hot reset request from user might race with the bound driver. DMA ownership
+> only guarantees the drivers won't handle DMA via DMA API which would have
+> conflict with DMA mappings from user. I'm not sure if it is able to
+> guarantee reset is exclusive as well. I see pci-stub and pcieport driver
+> are the only two drivers that set the driver_managed_dma flag besides the
+> vfio drivers. pci-stub may be fine. not sure about pcieport driver.
 
-在 2023/5/26 07:42, Nicolin Chen 写道:
-> On Tue, May 16, 2023 at 11:12:44AM +0800, Zhangfei Gao wrote:
->
->>>> However when debugging hotplug PCI device, it still does not work,
->>>> Segmentation fault same as 6.2.
->>>>
->>>> guest kernel
->>>> CONFIG_HOTPLUG_PCI_PCIE=y
->>>>
->>>> boot guest (this info does not appear in 6.2)
->>>> qemu-system-aarch64: -device
->>>> vfio-pci,host=0000:76:00.1,bus=pci.1,addr=0x0,id=acc1,iommufd=iommufd0:
->>>> Failed to set data -1
->>>> qemu-system-aarch64: -device
->>>> vfio-pci,host=0000:76:00.1,bus=pci.1,addr=0x0,id=acc1,iommufd=iommufd0:
->>>> failed to set device data
->>> Hmm.. I wonder what fails the set_dev_data ioctl...
->> Simply debug, it is because dev_data.sid=0, causing
->> arm_smmu_set_dev_user_data fail
-> I found that too. The input pci bus number is 1, yet the in
-> the context of set_dev_data, the pci bus number is 0, which
-> resulted in a 0-valued sid. I will take another look to get
-> why.
->
->>>> $ sudo nc -U /tmp/qmpm_1.socket
->>>> (qemu) info pci
->>>> (qemu) device_del acc1
->>>>
->>>> guest:
->>>> qemu-system-aarch64: IOMMU_IOAS_UNMAP failed: No such file or directory
->>>> qemu-system-aarch64: vfio_container_dma_unmap(0xaaaae1fc0380,
->>>> 0x8000000000, 0x10000) = -2 (No such file or directory)
->>  From ex-email reply
->> (Eric) In qemu arm virt machine 0x8000000000 matches the PCI MMIO region.
->> (Yi) Currently, iommufd kernel part doesn't support mapping device BAR MMIO.
->> This is a known gap.
-> OK.
->
->>>> qemu-system-aarch64: Failed to unset data -1
->>>> Segmentation fault (core dumped).  // also happened in 6.2
->>> Hmm, would it be possible for you to run the test again by
->>> adding the following tracers to your QEMU command?
->>>      --trace "iommufd*" \
->>>      --trace "smmu*" \
->>>      --trace "vfio_*" \
->>>      --trace "pci_*"
->>>
->> Have sent you the log directly, since it is too big.
-> I have found two missing pieces in the device detach routine.
-> Applying the following should fix the crash at hotplug path.
->
-> ----------------------------------------------------------------------------
-> diff --git a/hw/vfio/container-base.c b/hw/vfio/container-base.c
-> index 89a256efa999..2344307523cb 100644
-> --- a/hw/vfio/container-base.c
-> +++ b/hw/vfio/container-base.c
-> @@ -151,8 +151,10 @@ void vfio_container_destroy(VFIOContainer *container)
->       }
->
->       QLIST_FOREACH_SAFE(giommu, &container->giommu_list, giommu_next, tmp) {
-> -        memory_region_unregister_iommu_notifier(
-> -                MEMORY_REGION(giommu->iommu_mr), &giommu->n);
-> +        if (giommu->n.notifier_flags) {
-> +            memory_region_unregister_iommu_notifier(
-> +                    MEMORY_REGION(giommu->iommu_mr), &giommu->n);
-> +        }
->           QLIST_REMOVE(giommu, giommu_next);
->           g_free(giommu);
->       }
-> diff --git a/hw/vfio/iommufd.c b/hw/vfio/iommufd.c
-> index 844c60892db2..35d31480390d 100644
-> --- a/hw/vfio/iommufd.c
-> +++ b/hw/vfio/iommufd.c
-> @@ -652,6 +652,9 @@ found:
->        */
->       if (QLIST_EMPTY(&container->hwpt_list)) {
->           vfio_as_del_container(space, bcontainer);
-> +        if (bcontainer->nested) {
-> +            memory_listener_unregister(& bcontainer->prereg_listener);
-> +        }
->       }
->       __vfio_device_detach_container(vbasedev, container, &err);
->       if (err) {
-> ----------------------------------------------------------------------------
->
-> Would you please try your case with it?
+commit c7d469849747 ("PCI: portdrv: Set driver_managed_dma") described
+the criteria of adding driver_managed_dma to the pcieport driver.
 
+"
+We achieve this by setting ".driver_managed_dma = true" in pci_driver
+structure. It is safe because the portdrv driver meets below criteria:
 
-Yes, this solve the hotplug segmentation fault
+- This driver doesn't use DMA, as you can't find any related calls like
+   pci_set_master() or any kernel DMA API (dma_map_*() and etc.).
+- It doesn't use MMIO as you can't find ioremap() or similar calls. It's
+   tolerant to userspace possibly also touching the same MMIO registers
+   via P2P DMA access.
+"
 
-Still report
+pci_rest_device() definitely shouldn't be done by the kernel drivers
+that have driver_managed_dma set.
 
-qemu-system-aarch64: IOMMU_IOAS_UNMAP failed: No such file or directory
-qemu-system-aarch64: vfio_container_dma_unmap(0xaaaae622e300, 
-0x8000000000, 0x10000) = -2 (No such file or directory)
-qemu-system-aarch64: Failed to unset data -1 (only the first time of 
-device_del)
+> 
+>     #   line  filename / context / line
+>     1     39  drivers/pci/pci-stub.c <<GLOBAL>>
+>               .driver_managed_dma = true,
+>     2    796  drivers/pci/pcie/portdrv.c <<GLOBAL>>
+>               .driver_managed_dma = true,
+>     3    607  drivers/vfio/fsl-mc/vfio_fsl_mc.c <<GLOBAL>>
+>               .driver_managed_dma = true,
+>     4   1459  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c <<GLOBAL>>
+>               .driver_managed_dma = true,
+>     5   1374  drivers/vfio/pci/mlx5/main.c <<GLOBAL>>
+>               .driver_managed_dma = true,
+>     6    203  drivers/vfio/pci/vfio_pci.c <<GLOBAL>>
+>               .driver_managed_dma = true,
+>     7    139  drivers/vfio/platform/vfio_amba.c <<GLOBAL>>
+>               .driver_managed_dma = true,
+>     8    120  drivers/vfio/platform/vfio_platform.c <<GLOBAL>>
+>               .driver_managed_dma = true,
+> 
+> Anyhow, I think this is not a must so far. is it? Even doable, it shall
+> be done in the future. 😄
 
-Test with device_del and device_add
+Perhaps we can take it in this way: it's a bug if any driver sets its
+driver_managed_dma but still resets the hardware during it's life cycle?
 
-Thanks.
-
-
-
+Best regards,
+baolu
