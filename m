@@ -2,158 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE483712946
-	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 17:22:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FD16712963
+	for <lists+kvm@lfdr.de>; Fri, 26 May 2023 17:26:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244018AbjEZPWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 11:22:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57660 "EHLO
+        id S243668AbjEZP0Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 11:26:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243838AbjEZPWN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 11:22:13 -0400
-Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [IPv6:2001:1600:3:17::8fa9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C6BF3
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 08:22:09 -0700 (PDT)
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4QSTDb2m0HzMqJtD;
-        Fri, 26 May 2023 17:22:07 +0200 (CEST)
-Received: from unknown by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4QSTDW5jBkzMpq8r;
-        Fri, 26 May 2023 17:22:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-        s=20191114; t=1685114527;
-        bh=q+ImSjEjmZCszdCMwbCdSpVg4DvQ3poPxVGa8t7f7U4=;
-        h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-        b=tQXLni40CMr4EfzplXOAcaiNi5QkukQ3CoKpUm7sPlK7iwEW6fPx8nY8GaaUiadIG
-         M5KO5fQyWE3EVFklsTrG7jSk0ERYB4XC8Vvc3kkq30lc7cfnaZ5NXLcagUfQK3M2xQ
-         HRaKSJVPM1hu3rh60mZzFma3PA+dy4ElTuUEFWyU=
-Message-ID: <58a803f6-c3de-3362-673f-767767a43f9c@digikod.net>
-Date:   Fri, 26 May 2023 17:22:03 +0200
-MIME-Version: 1.0
-User-Agent: 
-Subject: Re: [RFC PATCH v1 0/9] Hypervisor-Enforced Kernel Integrity
-Content-Language: en-US
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-To:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
+        with ESMTP id S231158AbjEZP0N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 11:26:13 -0400
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44B93A3;
+        Fri, 26 May 2023 08:25:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1685114734; x=1716650734;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=tmfQEVJS4QLMOmMk5N2seJXYVgOGi5nIiXqiC0ehALM=;
+  b=l93uQOzJSq4FdsZ0o4Q3tg4WNvGx/SD5RhWhAq1SpHKwJhzeQpmkz3jj
+   KZZcxsqctg0qvWw5WZh2kdYlfHgOFWybbzSFXQNyO3s90qUmDT2jkcfm3
+   FcJFrPN/PMZzZZMqyeYvaR0Kqa+fiZMwKKZJzXXCmWdKnFMUY1ArBrS6b
+   k=;
+X-IronPort-AV: E=Sophos;i="6.00,194,1681171200"; 
+   d="scan'208";a="6093742"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2023 15:24:19 +0000
+Received: from EX19D004EUC004.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com (Postfix) with ESMTPS id 03C66A389E;
+        Fri, 26 May 2023 15:24:18 +0000 (UTC)
+Received: from EX19D014EUC004.ant.amazon.com (10.252.51.182) by
+ EX19D004EUC004.ant.amazon.com (10.252.51.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 26 May 2023 15:24:17 +0000
+Received: from EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41]) by
+ EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41%3]) with mapi id
+ 15.02.1118.026; Fri, 26 May 2023 15:24:17 +0000
+From:   "Gowans, James" <jgowans@amazon.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "yuanyu@google.com" <yuanyu@google.com>,
-        "jamorris@linux.microsoft.com" <jamorris@linux.microsoft.com>,
-        "marian.c.rotariu@gmail.com" <marian.c.rotariu@gmail.com>,
-        "Graf, Alexander" <graf@amazon.com>,
-        "Andersen, John S" <john.s.andersen@intel.com>,
-        "madvenka@linux.microsoft.com" <madvenka@linux.microsoft.com>,
-        "liran.alon@oracle.com" <liran.alon@oracle.com>,
-        "ssicleru@bitdefender.com" <ssicleru@bitdefender.com>,
-        "tgopinath@microsoft.com" <tgopinath@microsoft.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "dev@lists.cloudhypervisor.org" <dev@lists.cloudhypervisor.org>,
-        "mdontu@bitdefender.com" <mdontu@bitdefender.com>,
-        "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "nicu.citu@icloud.com" <nicu.citu@icloud.com>,
-        "ztarkhani@microsoft.com" <ztarkhani@microsoft.com>,
-        "x86@kernel.org" <x86@kernel.org>
-References: <20230505152046.6575-1-mic@digikod.net>
- <93726a7b9498ec66db21c5792079996d5fed5453.camel@intel.com>
- <facfd178-3157-80b4-243b-a5c8dabadbfb@digikod.net>
-In-Reply-To: <facfd178-3157-80b4-243b-a5c8dabadbfb@digikod.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "maz@kernel.org" <maz@kernel.org>,
+        "Graf (AWS), Alexander" <graf@amazon.de>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "Saenz Julienne, Nicolas" <nsaenz@amazon.es>
+Subject: Re: [ANNOUNCE] KVM Microconference at LPC 2023
+Thread-Topic: [ANNOUNCE] KVM Microconference at LPC 2023
+Thread-Index: AQHZj9zgz1ZgVJ9qBk6Gn3iwvw5JSq9srIUA
+Date:   Fri, 26 May 2023 15:24:17 +0000
+Message-ID: <88db2d9cb42e471692ff1feb0b9ca855906a9d95.camel@amazon.com>
+References: <2f19f26e-20e5-8198-294e-27ea665b706f@redhat.com>
+In-Reply-To: <2f19f26e-20e5-8198-294e-27ea665b706f@redhat.com>
+Accept-Language: en-ZA, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.146.13.223]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A9D5A654711AEA46AF996B9D829BA446@amazon.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 25/05/2023 15:59, Mickaël Salaün wrote:
-> 
-> On 25/05/2023 00:20, Edgecombe, Rick P wrote:
->> On Fri, 2023-05-05 at 17:20 +0200, Mickaël Salaün wrote:
->>> # How does it work?
->>>
->>> This implementation mainly leverages KVM capabilities to control the
->>> Second
->>> Layer Address Translation (or the Two Dimensional Paging e.g.,
->>> Intel's EPT or
->>> AMD's RVI/NPT) and Mode Based Execution Control (Intel's MBEC)
->>> introduced with
->>> the Kaby Lake (7th generation) architecture. This allows to set
->>> permissions on
->>> memory pages in a complementary way to the guest kernel's managed
->>> memory
->>> permissions. Once these permissions are set, they are locked and
->>> there is no
->>> way back.
->>>
->>> A first KVM_HC_LOCK_MEM_PAGE_RANGES hypercall enables the guest
->>> kernel to lock
->>> a set of its memory page ranges with either the HEKI_ATTR_MEM_NOWRITE
->>> or the
->>> HEKI_ATTR_MEM_EXEC attribute. The first one denies write access to a
->>> specific
->>> set of pages (allow-list approach), and the second only allows kernel
->>> execution
->>> for a set of pages (deny-list approach).
->>>
->>> The current implementation sets the whole kernel's .rodata (i.e., any
->>> const or
->>> __ro_after_init variables, which includes critical security data such
->>> as LSM
->>> parameters) and .text sections as non-writable, and the .text section
->>> is the
->>> only one where kernel execution is allowed. This is possible thanks
->>> to the new
->>> MBEC support also brough by this series (otherwise the vDSO would
->>> have to be
->>> executable). Thanks to this hardware support (VT-x, EPT and MBEC),
->>> the
->>> performance impact of such guest protection is negligible.
->>>
->>> The second KVM_HC_LOCK_CR_UPDATE hypercall enables guests to pin some
->>> of its
->>> CPU control register flags (e.g., X86_CR0_WP, X86_CR4_SMEP,
->>> X86_CR4_SMAP),
->>> which is another complementary hardening mechanism.
->>>
->>> Heki can be enabled with the heki=1 boot command argument.
->>>
->>>
->>
->> Can the guest kernel ask the host VMM's emulated devices to DMA into
->> the protected data? It should go through the host userspace mappings I
->> think, which don't care about EPT permissions. Or did I miss where you
->> are protecting that another way? There are a lot of easy ways to ask
->> the host to write to guest memory that don't involve the EPT. You
->> probably need to protect the host userspace mappings, and also the
->> places in KVM that kmap a GPA provided by the guest.
-> 
-> Good point, I'll check this confused deputy attack. Extended KVM
-> protections should indeed handle all ways to map guests' memory. I'm
-> wondering if current VMMs would gracefully handle such new restrictions
-> though.
-
-I guess the host could map arbitrary data to the guest, so that need to 
-be handled, but how could the VMM (not the host kernel) bypass/update 
-EPT initially used for the guest (and potentially later mapped to the host)?
+T24gVHVlLCAyMDIzLTA1LTA5IGF0IDExOjU1ICswMjAwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0K
+PiBIaSBhbGwhDQo+IA0KPiBXZSBhcmUgcGxhbm5pbmcgb24gc3VibWl0dGluZyBhIENGUCB0byBo
+b3N0IGEgS1ZNIE1pY3JvY29uZmVyZW5jZSBhdA0KPiBMaW51eCBQbHVtYmVycyBDb25mZXJlbmNl
+IDIwMjMuIFRvIGhlbHAganVzdGlmeSB0aGUgcHJvcG9zYWwsIHdlIHdvdWxkDQo+IGxpa2UgdG8g
+Z2F0aGVyIGEgbGlzdCBvZiBmb2xrcyB0aGF0IHdvdWxkIGxpa2VseSBhdHRlbmQsIGFuZCBjcm93
+ZHNvdXJjZQ0KPiBhIGxpc3Qgb2YgdG9waWNzIHRvIGluY2x1ZGUgaW4gdGhlIHByb3Bvc2FsLg0K
+DQpIaSBQYW9sbywNCg0KVGhpcyBNQyBzb3VuZHMgZ3JlYXQhIFRoZXJlIGFyZSB0d28gdG9waWNz
+IEknZCBiZSBrZWVuIHRvIGRpc2N1c3MsIGJvdGggaW4NCnRoZSBLVk0gKyBtZW1vcnktbWFuYWdl
+bWVudCByZWFsbToNCg0KMS4gR3Vlc3QgYW5kIGtlcm5lbCBtZW1vcnkgcGVyc2lzdGVuY2UgYWNy
+b3NzIGtleGVjIGZvciBsaXZlIHVwZGF0ZS4NClNwZWNpZmljYWxseSBmb2N1c3Npbmcgb24gdGhl
+IGhvc3QgSU9NTVUgcGd0YWJsZSBwZXJzaXN0ZW5jZSBmb3IgRE1BLQ0KcGFzc3Rocm91Z2ggZGV2
+aWNlcyB0byBzdXBwb3J0IGtleGVjIHdoaWxlIGd1ZXN0LWRyaXZlbiBETUEgaXMgc3RpbGwNCnJ1
+bm5pbmcuIFRoZXJlIGlzIHNvbWUgZGlzY3Vzc2lvbiBoYXBwZW5pbmcgbm93IGFib3V0IHRoaXMg
+WzFdIGFuZA0KaG9wZWZ1bGx5IHRoZSBkaXNjdXNzaW9uIGFuZCBwcm90b3R5cGluZyB3aWxsIGNv
+bnRpbnVlIGluIHRoZSBydW4gdXAgdG8NCkxQQy4NCg0KMi4gU3VwcG9ydGluZyBtb3JlIGZpbmUt
+Z3JhaW4gbWVtb3J5IG1hbmFnZW1lbnQgYW5kIGFjY2VzcyBjb250cm9sIEFQSXMNCmZvciB0aGUg
+dmlydHVhbGlzYXRpb24gY2FzZSBzcGVjaWZpY2FsbHksIGZvciB1c2UtY2FzZXMgYXJvdW5kIGxp
+dmUNCm1pZ3JhdGlvbiwgbWVtb3J5IG92ZXJzdWJzY3JpcHRpb24sIGFuZCAic2lkZS1jYXIiIHZp
+cnR1YWwgbWFjaGluZXMuIFRoZXNlDQp1c2UgY2FzZXMgd291bGQgYmVuZWZpdCBmcm9tIGtlcm5l
+bCBzdXBwb3J0IGZvciB0aGluZ3MgbGlrZSBkeW5hbWljYWxseQ0KdXBkYXRpbmcgSU9NTVUgYW5k
+IE1NVSBwZXJtaXNzaW9ucyBpbmRlcGVuZGVudGx5IGF0IGZpbmUgZ3JhbnVsYXJpdHksIGFsbA0K
+d2l0aG91dCBhY3R1YWxseSBtb2RpZnlpbmcgdGhlIFZNQXMsIHRvIHN1cHBvcnQgZmluZS1ncmFp
+biBoYW5kbGluZy4gQW5kDQpsaW5raW5nIHRoaXMgdG9waWMgdG8gdGhlIG9uZSBhYm92ZTogYmVp
+bmcgYWJsZSB0byBkbyB0aGVzZSB0aGluZ3Mgd2hlbg0Kbm90IGJhY2tlZCBieSBzdHJ1Y3QgcGFn
+ZXMuIChUaGVyZSBtYXkgYmUgc29tZSBvdmVybGFwIHdpdGggIktWTSBndWVzdA0KcHJpdmF0ZSBt
+ZW1vcnkiIFsyXSBoZXJlLi4uKQ0KDQpXb3VsZCBkZWZpbml0ZWx5IGJlIGtlZW4gb24gdGhpcyBN
+QyENCg0KSkcNCg0KWzFdIGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LW1tL2E0ZjYyYThl
+MWIwZjQzZGIwMDVjYzExMTdjMDZjMDBlNmMwYzg1ZmYuY2FtZWxAYW1hem9uLmNvbS9ULyNtMjBj
+NmRmM2Q3NTVjYjc5YjZjNDI2ZjdkOWEwMmNlYzM3ZDIxZTczZQ0KWzJdIGh0dHBzOi8vbG9yZS5r
+ZXJuZWwub3JnL2xrbWwvMjAyMjEyMDIwNjEzNDcuMTA3MDI0Ni0xLWNoYW8ucC5wZW5nQGxpbnV4
+LmludGVsLmNvbS9ULw0K
