@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2814712FCD
-	for <lists+kvm@lfdr.de>; Sat, 27 May 2023 00:17:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A24A712FCE
+	for <lists+kvm@lfdr.de>; Sat, 27 May 2023 00:17:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244340AbjEZWR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 May 2023 18:17:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35978 "EHLO
+        id S244349AbjEZWR3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 May 2023 18:17:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229933AbjEZWR0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 May 2023 18:17:26 -0400
-Received: from out-32.mta0.migadu.com (out-32.mta0.migadu.com [IPv6:2001:41d0:1004:224b::20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 734B183
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 15:17:25 -0700 (PDT)
+        with ESMTP id S229933AbjEZWR2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 May 2023 18:17:28 -0400
+Received: from out-56.mta0.migadu.com (out-56.mta0.migadu.com [IPv6:2001:41d0:1004:224b::38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 700AB83
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 15:17:27 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1685139443;
+        t=1685139445;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OlbJvusYmkmO20ad97kpBo7krR3hJYWNzOkeakE8S4Y=;
-        b=h2wuDuMa+d/+4dgqq0+7e0fbErG//k2FNZt+IcwoERsGZcGaoVcMQMzKGeg4T/mgCcsp7s
-        5O66foxLO7k3HN0Cgw7PMmEP+2YatMeVPe3rVuS3Uj4vI1KJlS4zJskw2ZIkdHFL3F0A2w
-        vKM0vjSJSaRuIE0G4/9DcMGTz7JzDP4=
+        bh=HlI3q1WPiCFI6LWKYg3D5mzmyQa8cYBk2N4tMj4HLGQ=;
+        b=ZLtr38GLB3QLggnvIcY//4Woaa0BgQsm8X4di/r9n6wgkKJgWZgrury1iWQ++6BYIJHHdZ
+        exSk6vKdDf+ZHVY4vPbd03T957E8Qt8eGk8nHZSdA8O8059DqvGEJpchtINFL6+1juwSZH
+        eU6vrctb+py1P2j+ZNxRvj9EqrPxhAQ=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Salil Mehta <salil.mehta@huawei.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH kvmtool 01/21] update_headers: Use a list for arch-generic headers
-Date:   Fri, 26 May 2023 22:16:52 +0000
-Message-ID: <20230526221712.317287-2-oliver.upton@linux.dev>
+Subject: [PATCH kvmtool 02/21] update_headers: Add missing entries to list of headers to copy
+Date:   Fri, 26 May 2023 22:16:53 +0000
+Message-ID: <20230526221712.317287-3-oliver.upton@linux.dev>
 In-Reply-To: <20230526221712.317287-1-oliver.upton@linux.dev>
 References: <20230526221712.317287-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -53,58 +53,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Until now, all of the virtio header names are stuffed in a list and
-iteratively copied from the kernel directory. Repurpose this as a list
-of arch-generic headers, adding kvm.h to the bunch.
-
-While at it, spread out the definition to have a single element per
-line, making it easier to insert elements alphabetically in the future.
+There are a few headers in kvmtool that are not handled by the updater
+script. Add them to the list of headers to update.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- util/update_headers.sh | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ util/update_headers.sh | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/util/update_headers.sh b/util/update_headers.sh
-index 789e2a42b280..4c1be7e84a95 100755
+index 4c1be7e84a95..5720151972a1 100755
 --- a/util/update_headers.sh
 +++ b/util/update_headers.sh
-@@ -9,10 +9,20 @@
- 
+@@ -10,6 +10,9 @@
  set -ue
  
--VIRTIO_LIST="virtio_9p.h virtio_balloon.h virtio_blk.h virtio_config.h \
--	     virtio_console.h virtio_ids.h virtio_mmio.h virtio_net.h \
--	     virtio_pci.h virtio_ring.h virtio_rng.h virtio_scsi.h \
--	     virtio_vsock.h"
-+GENERIC_LIST="kvm.h \
-+	      virtio_9p.h \
-+	      virtio_balloon.h \
-+	      virtio_blk.h \
-+	      virtio_config.h \
-+	      virtio_console.h \
-+	      virtio_ids.h \
-+	      virtio_mmio.h \
-+	      virtio_net.h \
-+	      virtio_pci.h \
-+	      virtio_ring.h \
-+	      virtio_rng.h \
-+	      virtio_scsi.h \
-+	      virtio_vsock.h"
- 
- if [ "$#" -ge 1 ]
- then
-@@ -28,9 +38,7 @@ then
- 	exit 1
- fi
- 
--cp -- "$LINUX_ROOT/include/uapi/linux/kvm.h" include/linux
--
--for header in $VIRTIO_LIST
-+for header in $GENERIC_LIST
- do
- 	cp -- "$LINUX_ROOT/include/uapi/linux/$header" include/linux
- done
+ GENERIC_LIST="kvm.h \
++	      psci.h \
++	      vfio.h \
++	      vhost.h \
+ 	      virtio_9p.h \
+ 	      virtio_balloon.h \
+ 	      virtio_blk.h \
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
