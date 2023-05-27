@@ -2,200 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA847713661
-	for <lists+kvm@lfdr.de>; Sat, 27 May 2023 22:13:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2FE7713738
+	for <lists+kvm@lfdr.de>; Sun, 28 May 2023 01:56:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229472AbjE0UNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 May 2023 16:13:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53544 "EHLO
+        id S229483AbjE0X4Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 May 2023 19:56:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbjE0UNq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 May 2023 16:13:46 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8085C9
-        for <kvm@vger.kernel.org>; Sat, 27 May 2023 13:13:44 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id e9e14a558f8ab-33164ec77ccso110115ab.0
-        for <kvm@vger.kernel.org>; Sat, 27 May 2023 13:13:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685218424; x=1687810424;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hK0j7POD8nRAsgGVVyJyo0UAU2zdW6aeJVN1+UjYElg=;
-        b=QKnbpAkfLda1TvWrqaHzwSET9fcih+s5ib+TdEQpynJiDGgVyvcDWnq3f1jN8iSFFh
-         i4wFHU4TObni6/73zZFM2D/pTSqgWk3+PPUYZMhIR48y37fhDEuDC9+d1+t2fRyrNgkr
-         ayuCVtu0XYwZQdosz7e+wfHDnmUd/KZvqBq519Uy5lfqbbTbuuKK9L+bNXaHlLVwpoUG
-         cBLrrDoSDWDEZ8OZLuLbQmUVgsGX8ts8KOPplFja+x5y6f4LRsCZW4nMJ6qgcp4bf8BG
-         SEOtEkefIHI1t2fsfFozpr5n9BYz9LMkdnQOauJRbx9hSkM/0nH1fRNwjjqiDsKIVZLy
-         cqTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685218424; x=1687810424;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hK0j7POD8nRAsgGVVyJyo0UAU2zdW6aeJVN1+UjYElg=;
-        b=Vmtj61AlNTnGclCmbZqcWoFmiJ4oSNQ6tO019VDTZEFF850bE5wAwXgS2yyfKNrFRg
-         SoPaBjdm++46GuvfyAzHPEK0w6o+UBvCA8WSn8NTP9LTyfJ6RMOrxeUl2zXoVrNVVnqC
-         mmbLgBpmo8RFx+8VsVKndCINFMClPfq20Z/k2KAjMkQpeal1Men5Bb3F+BH5aHlf+2Db
-         RI4OIRNOy/xGtOKIvn1S0hkt7ZVE56Ti0iPTwMVg+SNOE4Io47/1VtdMf4GpTlLuFsDt
-         6N8Q0F1v1EK+LK5JWf0w6kn+U+8QyhInGuuQeFMZeQ/ML01N7eTT7TnWYSw9pTyQ3S2f
-         bMLw==
-X-Gm-Message-State: AC+VfDzskya5Pirp8rCjx6TKYuDcnhha6VzN86n09MfD2zUdgFwEUbni
-        YR3Ku73uaL7EiKZOtlpVgqgdiWtZH3nTufWh+qyWpQ==
-X-Google-Smtp-Source: ACHHUZ5RLdNfCuhTMMzeLnK0AkjXh46hEGbQ5DPXaiuA4QGSm27lLMiJSKz6HarBK0wHhmVvVqcZAJpytCQ/s6idEUA=
-X-Received: by 2002:a05:6e02:2185:b0:337:c9ec:4ca with SMTP id
- j5-20020a056e02218500b00337c9ec04camr138001ila.2.1685218423829; Sat, 27 May
- 2023 13:13:43 -0700 (PDT)
+        with ESMTP id S229441AbjE0X4P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 May 2023 19:56:15 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2055.outbound.protection.outlook.com [40.107.100.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97EBFD8;
+        Sat, 27 May 2023 16:56:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=O5NAbfel1Ryz+7EObSEcvJ6X7AZ8+My+Vnrm+7P2qWt4pQqhKx6OHEU22wJScWr4hQSBGFrnUxMnk8U7ZEWsD15x5/digHcs+NYF+CnImWQ4TFs1nf2kHLMgz1mti2rxAu79Q1ne5gmPhZ8vroC0iQ3whpLwkowBoRQR+GCsVNsXEEV1vnI94GNCJRuHZvcfbiW0lYWBjwYYI0XJXKvQl1C0MlHZgiFaJlMJZY1zlwN4RIFP4llRVY2+NY7e+2IFZoR36CgtOYmCSyWPXUEuuYRMCI1xh8R4MlUQdZprP6pRKOFzIMBdE+gg3JLGjTHGWM9X+ZMlGdbzHLtUd8pi3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XmAEx+cqMmhdq4g4e1XqUP33UszhnkQmwwCX5+N6ffI=;
+ b=SPEihRWIGQHq9dTkTDrx+WooxzoTJzDi8AF1UUZC6xmmcDRFPQAPER5NE6uvWjeSYwYdAIjilIBpd0zb1OHo6I/Xn3/WoN5J/B1BLveuMI3+da8b7bNazoIP0GgUSCe8baWXHyme8duXYmcgKv/cmjma/izohlAD7qOvVkANJZa51LY+CodUOwKRw7RHrFLEQgEm9uN46uCJGNW0WbTe4MNmZ8LT3Ch780qxs2IR9An99tnhWWFN/QC2CLMjZ9d8oWdf7G8sJs7ezo5k6cP1C3+eG7DbApDWp/YL5fPM3iNusmz6dzahtDaLTqt3uLe5rJvS2Y+lkDtofquR/qb4Ug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XmAEx+cqMmhdq4g4e1XqUP33UszhnkQmwwCX5+N6ffI=;
+ b=t81A7V7SVhEiUe7urkaArG7It7+LvlSL8Xn4cz3tMsQ/vrJnaZ6pm9VPITZ7ur+91dbB5aaIA+4qqnT3+eLX61jwpem64FNjQzEAsH7gq9CrDd2Ew9y0IFsDNre5KP/h/mSQkDmosOWz4nASFsWiRR+OqRFhdrc+HjkoqZpdrio2WTA61g8sEjqZHHHMnqEALZBqkGPhOMTJ3jdV+PoLEf9Dsi2gQTA3rGbRGOdf3MHJvVs4PK5MkE7UySCQwFMlkskux/iZC1EgV1a8ws/rX742APAPaiFMbXrQv4zhdurrt6pvsj85G+UEac6b8Le+7C/5zwtF5Lr4ACbDghYgvg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SN7PR12MB6692.namprd12.prod.outlook.com (2603:10b6:806:270::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.15; Sat, 27 May
+ 2023 23:56:11 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6433.017; Sat, 27 May 2023
+ 23:56:11 +0000
+Date:   Sat, 27 May 2023 20:56:08 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Alistair Popple <apopple@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
+        catalin.marinas@arm.com, David Rientjes <rientjes@google.com>,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        robin.murphy@arm.com, nicolinc@nvidia.com,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        zhi.wang.linux@gmail.com, Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 1/2] mmu_notifiers: Restore documentation for
+ .invalidate_range()
+Message-ID: <ZHKYmOc/x+0w2Nd3@nvidia.com>
+References: <3cece716fc09724793aa832e755abfc9d70a8bb3.1684892404.git-series.apopple@nvidia.com>
+ <cb706d3f-1fa8-2047-e65c-e1dc1fa6821f@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cb706d3f-1fa8-2047-e65c-e1dc1fa6821f@nvidia.com>
+X-ClientProxiedBy: BL1PR13CA0145.namprd13.prod.outlook.com
+ (2603:10b6:208:2bb::30) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-References: <20230526234435.662652-1-yuzhao@google.com> <20230526234435.662652-5-yuzhao@google.com>
- <ZHJHJPBF6euzOFdw@linux.dev>
-In-Reply-To: <ZHJHJPBF6euzOFdw@linux.dev>
-From:   Yu Zhao <yuzhao@google.com>
-Date:   Sat, 27 May 2023 14:13:07 -0600
-Message-ID: <CAOUHufa74CufHziHSquO5bZwbFXz2MNssBzW+AH7=Xo5RCnQ0A@mail.gmail.com>
-Subject: Re: [PATCH mm-unstable v2 04/10] kvm/arm64: make stage2 page tables
- RCU safe
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        Anup Patel <anup@brainfault.org>,
-        Ben Gardon <bgardon@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Gaosheng Cui <cuigaosheng1@huawei.com>,
-        Gavin Shan <gshan@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Marc Zyngier <maz@kernel.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michael Larabel <michael@michaellarabel.com>,
-        Mike Rapoport <rppt@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
-        linux-trace-kernel@vger.kernel.org, x86@kernel.org,
-        linux-mm@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SN7PR12MB6692:EE_
+X-MS-Office365-Filtering-Correlation-Id: e4178ea1-0505-4e46-715c-08db5f0df2a3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tr4H4sdeQCnmLupINX3r2xX2p/wk0i79CitwmWhDdHXglHY3W3OMDVK9ljJdcLCp4auPehR2W3xxP3OQhtg88b8zki+eYMF2PeaNjXwlSJQCUiHkcxpVoZfZ1XM8POOb/xObsV64md3xLqtnq/DxiuWlzwQRPEsBroJBN9rJ5FlJhbGhLaunoDxzbxXAG/JT/kfLnli2mfVhLiUiJ6z5KYu/XYcMQ+G9vC4w1uVQyQxcue4W9U5Eunk7w9Zh36wZjgd/d2negz5Kvbfamup/hooP8DABf8B3q86l3FPiO1McbDtsBrejimo9EiYORo8gMCiw1YoBaGUHqOpLsFNVhrlx6BuXnu95GFjf8nzVkR449So963GbOeUi4B4JzFw7NPUa384760YLYdn6UrtnQOrsIuUC4d4ZGQMYUct5wmrgFHZugfpxOJKydASctAcaL68j9DFkJJMyn1W12DFvCKh0Vz166RsMc7MxMMCJP7gdhtOtMEOt6LaXWHdaoHzth00H+ySrV0REBPskj1GSuX2HbkBavyHvGCuoSmATPLDwy/hlsqg5f9IVsHF7atlsIm/r/yN+hx5lOogjuolfr5oEsZjymWkNLmFSgt5o1WAPgZoyZxh019tgWcKR7AX3
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(39860400002)(136003)(396003)(366004)(451199021)(2616005)(83380400001)(2906002)(186003)(36756003)(38100700002)(86362001)(37006003)(6486002)(6666004)(316002)(41300700001)(8936002)(7416002)(8676002)(5660300002)(6862004)(478600001)(54906003)(6636002)(66946007)(66556008)(26005)(53546011)(6506007)(6512007)(66476007)(4326008)(142923001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?H8a118EZulG665EjGKET8lrljgLqGdjROFfrlG14wAQzAZ/cqx63siD3b8uN?=
+ =?us-ascii?Q?yZsor5AJedRB9QOFUmQ9vwNy2k4gC3Ng3nBvdAfaGnvF99DtSq2R5FJa/APg?=
+ =?us-ascii?Q?YbMVb8j2gv4/mZ+NrjJxcvqcOyn31jMZyKMoAhu6nPO+dGndbizDtLHdVOBz?=
+ =?us-ascii?Q?Gdl7wBmCsrcjtSquXa5fZr+tkARlpC8YrlQsSFfQy2qi0Ag09JQv6rvDbALQ?=
+ =?us-ascii?Q?XNVdxIL+JpBsy1EC59l9OnNlwA4hDzZ0P/13WcdbdRDktoG0tmaUzitvY6Ce?=
+ =?us-ascii?Q?1XIIzxsTCeX1wfyGbb3fG25oYf9SVbl2SoRrk1LNLwy/j3eFDz/g+7XSeG96?=
+ =?us-ascii?Q?jPb607C6i8eHdOFVWK+c7ar9ErBS/QFrUF4I0yFnuKBzZSk23MFKVubMSwVb?=
+ =?us-ascii?Q?ArppKr6PvOtQ4k2OtWEJ8zCh/+sDOwg3t1L0PsjrmrQ+LkXatlliyYInrTJM?=
+ =?us-ascii?Q?6ATS6ue1aoJBPaXThU43AhPevWuiDZyhlh9Ds83XpdXGjTkE0Gd/C2XhwS0S?=
+ =?us-ascii?Q?WiYpYA74Wj5lVIMRIjyf3IHYkYHa1vi/bwhTRihOKyT+5+ZpC9Znz4frE/3Z?=
+ =?us-ascii?Q?ROv63INTuEs66AbLWWmvsrdAKWbjAWUBArX0kyGZq/ZiMJ4XeDVd61gt69qi?=
+ =?us-ascii?Q?4noIpMftvgSW7hgQXzKoDuyBM9mxPVlNSnFrgX9MMxLxPllx/ob8bgZyTjHF?=
+ =?us-ascii?Q?xSakHago7geXhJK77xlSnIh/GqCQqnoVHBbVSbGVh/tnZQM/Hg0Sal68IPzp?=
+ =?us-ascii?Q?Mr0rNX/zkhgwnqhazJXARI5PKNyEzdccslllWG03nRriKG1H1N9hJ0v9X0jm?=
+ =?us-ascii?Q?sRIIwRFdQf0S3W1WKM2lLQISe3dt6aUmQ/jebOVWk7Btwh7l3N5jGhSko53K?=
+ =?us-ascii?Q?qvuHa+iE7QA4J1EqceH4rSkt+aJpNVMNYTRmi2ppxhn/r7qMjvmIBQb9GTFs?=
+ =?us-ascii?Q?jJbE4jsBdcE2MG3ruPoitpxg9SB5xmHsPa3yWD5XlAOp8CB+Jj95zhhEpu5+?=
+ =?us-ascii?Q?vqontdw/m72VKsoG6GFqcQ9qW76evLgPQzcN+STZ5hNVwcN7PwwNWLeSHwR2?=
+ =?us-ascii?Q?uMYx1gjHZuv4U7M0t36jBJpkir2qi60+zibDlwoOfelUomEQf8VzmKcQ17re?=
+ =?us-ascii?Q?TlLyAba2PF4VTSUnOetGjkHis6iiA/Uhppt8p9QOUA+jEMebM4aQqm3zKGgq?=
+ =?us-ascii?Q?BT5XrtqybJFqvtxVsAZJhIxpRFYAQSmjdsWwgtxYTEancGDsv4I/RaSt2Ugb?=
+ =?us-ascii?Q?ZAcOevzcctvzsa11PRCH8GWVWTWVz3u8qU8Ft3JpaMSaye+YjMIocxlWTzR5?=
+ =?us-ascii?Q?HZS9XG3HHQSEfHQAfhai/xtmNOWekDRRcFBjwS0JJqxeTluXcejAXcenlpx+?=
+ =?us-ascii?Q?+++07jklvqOyDaZgr9NF7LuKqJ03sabpStPbHjmWa9UOkjK2d3TPoA6lUKgK?=
+ =?us-ascii?Q?0XEPXc4ujm99RNo0FKP0emgjEP4+bOMRIS0EgMrcdStmDCoMsHr84oNS522R?=
+ =?us-ascii?Q?9jHZIyIArcSGHKcsIuSRvvpG5gOCj8tcXVAbvxQrHOcKRb1e78wLw1EaT705?=
+ =?us-ascii?Q?VOahJ8MebC+dt0pyx9o=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e4178ea1-0505-4e46-715c-08db5f0df2a3
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2023 23:56:11.5172
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xS6d4zE1ctTU9ls1A4G56OD5Q5FC/+vTszLplnASE5VYnWq0UXsoacUZVOF8P1cV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6692
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 27, 2023 at 12:08=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
->
-> Yu,
->
-> On Fri, May 26, 2023 at 05:44:29PM -0600, Yu Zhao wrote:
-> > Stage2 page tables are currently not RCU safe against unmapping or VM
-> > destruction. The previous mmu_notifier_ops members rely on
-> > kvm->mmu_lock to synchronize with those operations.
-> >
-> > However, the new mmu_notifier_ops member test_clear_young() provides
-> > a fast path that does not take kvm->mmu_lock. To implement
-> > kvm_arch_test_clear_young() for that path, unmapped page tables need
-> > to be freed by RCU and kvm_free_stage2_pgd() needs to be after
-> > mmu_notifier_unregister().
-> >
-> > Remapping, specifically stage2_free_removed_table(), is already RCU
-> > safe.
-> >
-> > Signed-off-by: Yu Zhao <yuzhao@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h |  2 ++
-> >  arch/arm64/kvm/arm.c                 |  1 +
-> >  arch/arm64/kvm/hyp/pgtable.c         |  8 ++++++--
-> >  arch/arm64/kvm/mmu.c                 | 17 ++++++++++++++++-
-> >  4 files changed, 25 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/=
-asm/kvm_pgtable.h
-> > index ff520598b62c..5cab52e3a35f 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -153,6 +153,7 @@ static inline bool kvm_level_supports_block_mapping=
-(u32 level)
-> >   * @put_page:                        Decrement the refcount on a page.=
- When the
-> >   *                           refcount reaches 0 the page is automatica=
-lly
-> >   *                           freed.
-> > + * @put_page_rcu:            RCU variant of the above.
->
-> You don't need to add yet another hook to implement this. I was working
-> on lock-free walks in a separate context and arrived at the following:
->
-> commit f82d264a37745e07ee28e116c336f139f681fd7f
-> Author: Oliver Upton <oliver.upton@linux.dev>
-> Date:   Mon May 1 08:53:37 2023 +0000
->
->     KVM: arm64: Consistently use free_removed_table() for stage-2
->
->     free_removed_table() is essential to the RCU-protected parallel walki=
-ng
->     scheme, as behind the scenes the cleanup is deferred until an RCU gra=
-ce
->     period. Nonetheless, the stage-2 unmap path calls put_page() directly=
-,
->     which leads to table memory being freed inline with the table walk.
->
->     This is safe for the time being, as the stage-2 unmap walker is calle=
-d
->     while holding the write lock. A future change to KVM will further rel=
-ax
->     the locking mechanics around the stage-2 page tables to allow lock-fr=
-ee
->     walkers protected only by RCU. As such, switch to the RCU-safe mechan=
-ism
->     for freeing table memory.
->
->     Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
->
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 3d61bd3e591d..bfbebdcb4ef0 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1019,7 +1019,7 @@ static int stage2_unmap_walker(const struct kvm_pgt=
-able_visit_ctx *ctx,
->                                                kvm_granule_size(ctx->leve=
-l));
->
->         if (childp)
-> -               mm_ops->put_page(childp);
-> +               mm_ops->free_removed_table(childp, ctx->level);
+On Tue, May 23, 2023 at 07:20:31PM -0700, John Hubbard wrote:
+> On 5/23/23 18:47, Alistair Popple wrote:
+> > The .invalidate_range() callback is called by
+> > mmu_notifier_invalidate_range() which is often called while holding
+> > the ptl spin-lock. Therefore any implementations of this callback must
+> > not sleep. This was originally documented when the call back was added
+> > in commit 0f0a327fa12c ("mmu_notifier: add the callback for
+> > mmu_notifier_invalidate_range()") but appears to have been
+> 
+> Thanks for digging into this. I expect that you're on the right
+> track, I'm just wondering about something still:
+> 
+> > inadvertently removed by commit 5ff7091f5a2c ("mm, mmu_notifier:
+> > annotate mmu notifiers with blockable invalidate callbacks").
+> 
+> Was it really inadvertent, though? The initial patch proposed said this:
+> 
+> "Also remove a bogus comment about invalidate_range() always being called
+> under the ptl spinlock." [1]
 
-Thanks, Oliver.
+Right, it is not always called under PTL spinlocks and the
+implementation cannot assume it, but that doesn't mean the
+implementation is allowed to block.
 
-A couple of things I haven't had the chance to verify -- I'm hoping
-you could help clarify:
-1. For unmapping, with free_removed_table(), wouldn't we have to look
-into the table we know it's empty unnecessarily?
-2. For remapping and unmapping, how does free_removed_table() put the
-final refcnt on the table passed in? (Previously we had
-put_page(childp) in stage2_map_walk_table_post(). So I'm assuming we'd
-have to do something equivalent with free_removed_table().)
+That was one of the main motivating reasons to have both the
+invalidate_start/end and invalidate_range variations, start/end are
+allowed to block and range is not.
+
+invalidate_range really only exists for the iommu drivers to use it
+for SVA designs, there are a few other weird users, but iommu was the
+motivation to create it in the first place.
+
+So the comment should just clarify that it is not allowed to sleep and
+can't assume anything about its locking environment.
+
+Jason
