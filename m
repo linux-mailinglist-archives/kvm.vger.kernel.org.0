@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EEFB671326C
-	for <lists+kvm@lfdr.de>; Sat, 27 May 2023 06:04:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83A8A71326E
+	for <lists+kvm@lfdr.de>; Sat, 27 May 2023 06:05:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231757AbjE0EEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 May 2023 00:04:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36720 "EHLO
+        id S231616AbjE0EFO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 May 2023 00:05:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231571AbjE0EEk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 May 2023 00:04:40 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50525125
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 21:04:39 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-bacfa4ef059so3277829276.2
-        for <kvm@vger.kernel.org>; Fri, 26 May 2023 21:04:39 -0700 (PDT)
+        with ESMTP id S237868AbjE0EFD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 May 2023 00:05:03 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A14DD116
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 21:05:00 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-ba2b9ecfadaso3096580276.2
+        for <kvm@vger.kernel.org>; Fri, 26 May 2023 21:05:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685160278; x=1687752278;
+        d=google.com; s=20221208; t=1685160300; x=1687752300;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uUrVHxQ1VjsIKZJ0cYmjatxxlv1RidcUPcAwfkxMDeQ=;
-        b=mnKD5djePan6cHUiRAmZh38Jmo+ropUJ0h0VmSE6uXDB/X12f01Q1L295u/FPmsJe7
-         psC4a9zcrCkyAa0xQFqKrV9FLzwyA7ATKehSlM0c7ERZJii79G9dsfEwowCoo0nNDTF3
-         5NCRrlT59GgmTp/pVXGlfeSkIkv5YFtnrW0wlZi2s2rqz21oT09bP6qfK4fb5hBCSC09
-         PxuvQeOOnXn4blCcFNbFRNEXN7GPF+KeUXP2ym9XDgMEyPD8icS7IKN2yqxz5oVLyYu7
-         cUUYIHqVISmSIVQvx8JAolK7vvPmc8Lg/sCVUk2mHRfx0V9b2DSRQEcl4CWhrALeA4cm
-         HmOQ==
+        bh=CVdJfxalrKrA0ocQWScQBMNSin7rCXi39ddZCI6I+Lw=;
+        b=PO0DcdNrgP5ptJ8hPQddsyKkA1m1XITJeCVHvd+D6lH6psREctBh/5HOysJRX8ykir
+         jLhbwRKYRAxPDohZZekbUWdT0nbBsQ9KZvaNRl7TuWF2bECg+CKEw84XFxahCJpGNmjG
+         LQsh5VJ+vpYOKQDTOx9ULlWjuL+ZsaVkSqKv3J10C25RvApaafyyY/VWTNAW/mWF1x1v
+         ub23jkoE/KMzNuFLcfOa0Gl9/3lN+WKyYqIp/ly07rtOeFQLDF57jd1vvplhffSEBvdE
+         7Az/+KeXU0dgrnDJ0l8JVkvR184IFiQ/jU4obXNBLJQqOyqHGDzgiyMbSUiFtUKxQFVt
+         GTHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685160278; x=1687752278;
+        d=1e100.net; s=20221208; t=1685160300; x=1687752300;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uUrVHxQ1VjsIKZJ0cYmjatxxlv1RidcUPcAwfkxMDeQ=;
-        b=NaB6/03CoqpE6abXG18+lCtbwpZcZAZDrrGWthR61d0Xvpj6GTpYilIv/6oUiytQ57
-         IN8vpC+UtiYK2C/6HKfEYLIWQWIHR4jTq+9jN6cRTIJI2hR65tx5MKpCOllhmJIsPK6L
-         f3A1cr3DYCZtSECIQcVPEZBKGFVmJWSPzE7eoVr6puhIXU1VM6euO9GLx5mepRNYtYDc
-         N0uuast2MZJzBjcZw4SbRUE7jPDKXJuKCWhkmj8EIicGTVQrl8Wsx5OBSUfUinfVvPkH
-         jU4All6SMjAgkRnqQAYwfqUWGTLvIFlsYsG1f9PhjZac6cns8TwxgecTTjv8VGC/T4Yv
-         3UxA==
-X-Gm-Message-State: AC+VfDyNuG4c1QSZgVlBHunFUuMTqGBm983MFPDHaTdO6PfL7P//8yZK
-        vDfS7YvAliYsiSnxmtF9MVK3rxwTwfw=
-X-Google-Smtp-Source: ACHHUZ40X1JtVnbU0yW1OlIarBd66lox6g/g0byncu954rsHLASWFxfD7mYTWnHgIRpIDTHXydpwbi5LsS4=
+        bh=CVdJfxalrKrA0ocQWScQBMNSin7rCXi39ddZCI6I+Lw=;
+        b=cXno2BenrjelDfSPDBR9pck8l99BQK7qWydQqiHEXF/34STARWO9k9Qrjr6rE30E23
+         wXty7xoEqZoQYRlGJ3ZPevy6KQfZVcaRgJ8l7dyT6Co5bJ0HjeqzZFMmsZYWfvUagJ6J
+         iuvESzvstlFVyiSdzS7oDHF3DHZiTJ0nHaNzPqKk56n97GakgDz3caPtCEp7Anf9cFyL
+         MxeK5bVgO9k8yUjMyTAiCrTjWnjcOhPtyU1jdi8OKx/qLguZmTlWH+zjya5KuGRCo8ki
+         y3IBL226fW0FGsi/Rj8WLLBktrjiZ83ZsjpOHwgKCNmQDaOZVQHlszcyAZ/1Vg3oxXFu
+         p0gg==
+X-Gm-Message-State: AC+VfDwC8sdqS8q+zkTtVKNPpNXv+OPKFwQQRo9bDrALR3LVX9aDbrBX
+        AzDsnlbysxw+3HipMyKpMiQKuxJlW6g=
+X-Google-Smtp-Source: ACHHUZ7xYLN8vvRmoJXz8BY6YHV6oSkGdNHun+pcrFKUH5BINMpkznVSajKgNRJLTycZ6lMNKmVFYhheiy8=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a25:2646:0:b0:bac:f582:ef18 with SMTP id
- m67-20020a252646000000b00bacf582ef18mr2153443ybm.5.1685160278549; Fri, 26 May
- 2023 21:04:38 -0700 (PDT)
-Date:   Fri, 26 May 2023 21:02:34 -0700
+ (user=reijiw job=sendgmr) by 2002:a25:8f8d:0:b0:bac:6ba0:abe with SMTP id
+ u13-20020a258f8d000000b00bac6ba00abemr2094316ybl.10.1685160299956; Fri, 26
+ May 2023 21:04:59 -0700 (PDT)
+Date:   Fri, 26 May 2023 21:02:35 -0700
 In-Reply-To: <20230527040236.1875860-1-reijiw@google.com>
 Mime-Version: 1.0
 References: <20230527040236.1875860-1-reijiw@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230527040236.1875860-3-reijiw@google.com>
-Subject: [PATCH 2/4] KVM: arm64: PMU: Set the default PMU for the guest on
- vCPU reset
+Message-ID: <20230527040236.1875860-4-reijiw@google.com>
+Subject: [PATCH 3/4] KVM: arm64: PMU: Use PMUVer of the guest's PMU for ID_AA64DFR0.PMUVer
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
@@ -78,114 +77,245 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set the default PMU for the guest on the first vCPU reset,
-not when userspace initially uses KVM_ARM_VCPU_PMU_V3_CTRL.
-The following patches will use the PMUVer of the PMU as the
-default value of the ID_AA64DFR0_EL1.PMUVer for vCPUs with
-PMU configured.
+Currently, KVM uses the sanitized value of ID_AA64DFR0_EL1.PMUVer
+as the default value and the limit value of this field for
+vCPUs with PMU configured. But, the sanitized value could
+be inappropriate for the vCPUs on some heterogeneous PMU systems,
+as arm64_ftr_bits for PMUVer is defined as FTR_EXACT with
+safe_val == 0 (if the ID_AA64DFR0_EL1.PMUVer of all PEs on the
+host is not uniform, the sanitized value will be 0).
+
+Use the PMUver of the guest's PMU (kvm->arch.arm_pmu->pmuver) as the
+default value and the limit value of ID_AA64DFR0_EL1.PMUVer for vCPUs
+with PMU configured.
+
+When the guest's PMU is switched to a different PMU, reset
+the value of ID_AA64DFR0_EL1.PMUVer for the vCPUs based on
+the new PMU, unless userspace has already modified the PMUVer
+and the value is still valid even with the new PMU.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/pmu-emul.c | 10 +---------
- arch/arm64/kvm/reset.c    | 20 +++++++++++++-------
- include/kvm/arm_pmu.h     |  6 ++++++
- 3 files changed, 20 insertions(+), 16 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/arm.c              |  6 ----
+ arch/arm64/kvm/pmu-emul.c         | 28 +++++++++++++-----
+ arch/arm64/kvm/sys_regs.c         | 48 ++++++++++++++++++++-----------
+ include/kvm/arm_pmu.h             |  4 +--
+ 5 files changed, 57 insertions(+), 31 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7e7e19ef6993..8ca0e7210a59 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -231,6 +231,8 @@ struct kvm_arch {
+ #define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		7
+ 	/* SMCCC filter initialized for the VM */
+ #define KVM_ARCH_FLAG_SMCCC_FILTER_CONFIGURED		8
++	/* PMUVer set by userspace for the VM */
++#define KVM_ARCH_FLAG_PMUVER_DIRTY			9
+ 	unsigned long flags;
+ 
+ 	/*
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 14391826241c..3c2fddfe90f7 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -164,12 +164,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	set_default_spectre(kvm);
+ 	kvm_arm_init_hypercalls(kvm);
+ 
+-	/*
+-	 * Initialise the default PMUver before there is a chance to
+-	 * create an actual PMU.
+-	 */
+-	kvm->arch.dfr0_pmuver.imp = kvm_arm_pmu_get_pmuver_limit();
+-
+ 	return 0;
+ 
+ err_free_cpumask:
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index d50c8f7a2410..0194a94c4bae 100644
+index 0194a94c4bae..6cd08d5e5b72 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -869,7 +869,7 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
- 	return true;
- }
+@@ -871,6 +871,8 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
  
--static int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-+int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
+ int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
  {
++	u8 new_limit;
++
  	lockdep_assert_held(&kvm->arch.config_lock);
  
-@@ -926,14 +926,6 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 	if (vcpu->arch.pmu.created)
- 		return -EBUSY;
- 
--	if (!kvm->arch.arm_pmu) {
--		/* No PMU set, get the default one */
--		int ret = kvm_arm_set_vm_pmu(kvm, NULL);
--
--		if (ret)
--			return ret;
--	}
--
- 	switch (attr->attr) {
- 	case KVM_ARM_VCPU_PMU_V3_IRQ: {
- 		int __user *uaddr = (int __user *)(long)attr->addr;
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index b5dee8e57e77..f5e24492926c 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -258,13 +258,24 @@ static int kvm_set_vm_width(struct kvm_vcpu *vcpu)
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_reset_state reset_state;
-+	struct kvm *kvm = vcpu->kvm;
- 	int ret;
- 	bool loaded;
- 	u32 pstate;
- 
--	mutex_lock(&vcpu->kvm->arch.config_lock);
-+	mutex_lock(&kvm->arch.config_lock);
- 	ret = kvm_set_vm_width(vcpu);
--	mutex_unlock(&vcpu->kvm->arch.config_lock);
-+	if (!ret && kvm_vcpu_has_pmu(vcpu)) {
-+		if (!kvm_arm_support_pmu_v3())
-+			ret = -EINVAL;
-+		else if (unlikely(!kvm->arch.arm_pmu))
-+			/*
-+			 * As no PMU is set for the guest yet,
-+			 * set the default one.
-+			 */
-+			ret = kvm_arm_set_vm_pmu(kvm, NULL);
-+	}
-+	mutex_unlock(&kvm->arch.config_lock);
- 
- 	if (ret)
- 		return ret;
-@@ -315,11 +326,6 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 		} else {
- 			pstate = VCPU_RESET_PSTATE_EL1;
- 		}
--
--		if (kvm_vcpu_has_pmu(vcpu) && !kvm_arm_support_pmu_v3()) {
--			ret = -EINVAL;
--			goto out;
--		}
- 		break;
+ 	if (!arm_pmu) {
+@@ -880,6 +882,22 @@ int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
  	}
  
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 1a6a695ca67a..5ece2a3c1858 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -96,6 +96,7 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
- 	(vcpu->kvm->arch.dfr0_pmuver.imp >= ID_AA64DFR0_EL1_PMUVer_V3P5)
+ 	kvm->arch.arm_pmu = arm_pmu;
++	new_limit = kvm_arm_pmu_get_pmuver_limit(kvm);
++
++	/*
++	 * Reset the value of ID_AA64DFR0_EL1.PMUVer to the new limit value,
++	 * unless the current value was set by userspace and is still a valid
++	 * value for the new PMU.
++	 */
++	if (!test_bit(KVM_ARCH_FLAG_PMUVER_DIRTY, &kvm->arch.flags)) {
++		kvm->arch.dfr0_pmuver.imp = new_limit;
++		return 0;
++	}
++
++	if (kvm->arch.dfr0_pmuver.imp > new_limit) {
++		kvm->arch.dfr0_pmuver.imp = new_limit;
++		clear_bit(KVM_ARCH_FLAG_PMUVER_DIRTY, &kvm->arch.flags);
++	}
  
- u8 kvm_arm_pmu_get_pmuver_limit(void);
-+int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu);
- 
- #else
- struct kvm_pmu {
-@@ -168,6 +169,11 @@ static inline u8 kvm_arm_pmu_get_pmuver_limit(void)
  	return 0;
  }
+@@ -1049,13 +1067,9 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 	return -ENXIO;
+ }
  
-+static inline int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-+{
-+	return 0;
-+}
+-u8 kvm_arm_pmu_get_pmuver_limit(void)
++u8 kvm_arm_pmu_get_pmuver_limit(struct kvm *kvm)
+ {
+-	u64 tmp;
++	u8 host_pmuver = kvm->arch.arm_pmu ? kvm->arch.arm_pmu->pmuver : 0;
+ 
+-	tmp = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+-	tmp = cpuid_feature_cap_perfmon_field(tmp,
+-					      ID_AA64DFR0_EL1_PMUVer_SHIFT,
+-					      ID_AA64DFR0_EL1_PMUVer_V3P5);
+-	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), tmp);
++	return min_t(u8, host_pmuver, ID_AA64DFR0_EL1_PMUVer_V3P5);
+ }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 71b12094d613..a76155ad997c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1382,8 +1382,11 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ {
+ 	u8 pmuver, host_pmuver;
+ 	bool valid_pmu;
++	u64 current_val = read_id_reg(vcpu, rd);
++	int ret = -EINVAL;
+ 
+-	host_pmuver = kvm_arm_pmu_get_pmuver_limit();
++	mutex_lock(&vcpu->kvm->arch.config_lock);
++	host_pmuver = kvm_arm_pmu_get_pmuver_limit(vcpu->kvm);
+ 
+ 	/*
+ 	 * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
+@@ -1393,26 +1396,31 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 	 */
+ 	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
+ 	if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver))
+-		return -EINVAL;
++		goto out;
+ 
+ 	valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+ 
+ 	/* Make sure view register and PMU support do match */
+ 	if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+-		return -EINVAL;
++		goto out;
+ 
+ 	/* We can only differ with PMUver, and anything else is an error */
+-	val ^= read_id_reg(vcpu, rd);
++	val ^= current_val;
+ 	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+ 	if (val)
+-		return -EINVAL;
++		goto out;
+ 
+-	if (valid_pmu)
++	if (valid_pmu) {
+ 		vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
+-	else
++		set_bit(KVM_ARCH_FLAG_PMUVER_DIRTY, &vcpu->kvm->arch.flags);
++	} else
+ 		vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
+ 
+-	return 0;
++	ret = 0;
++out:
++	mutex_unlock(&vcpu->kvm->arch.config_lock);
 +
- #endif
++	return ret;
+ }
  
- #endif
+ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+@@ -1421,8 +1429,11 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ {
+ 	u8 perfmon, host_perfmon;
+ 	bool valid_pmu;
++	u64 current_val = read_id_reg(vcpu, rd);
++	int ret = -EINVAL;
+ 
+-	host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
++	mutex_lock(&vcpu->kvm->arch.config_lock);
++	host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit(vcpu->kvm));
+ 
+ 	/*
+ 	 * Allow DFR0_EL1.PerfMon to be set from userspace as long as
+@@ -1433,26 +1444,31 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 	perfmon = FIELD_GET(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), val);
+ 	if ((perfmon != ID_DFR0_EL1_PerfMon_IMPDEF && perfmon > host_perfmon) ||
+ 	    (perfmon != 0 && perfmon < ID_DFR0_EL1_PerfMon_PMUv3))
+-		return -EINVAL;
++		goto out;
+ 
+ 	valid_pmu = (perfmon != 0 && perfmon != ID_DFR0_EL1_PerfMon_IMPDEF);
+ 
+ 	/* Make sure view register and PMU support do match */
+ 	if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+-		return -EINVAL;
++		goto out;
+ 
+ 	/* We can only differ with PerfMon, and anything else is an error */
+-	val ^= read_id_reg(vcpu, rd);
++	val ^= current_val;
+ 	val &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
+ 	if (val)
+-		return -EINVAL;
++		goto out;
+ 
+-	if (valid_pmu)
++	if (valid_pmu) {
+ 		vcpu->kvm->arch.dfr0_pmuver.imp = perfmon_to_pmuver(perfmon);
+-	else
++		set_bit(KVM_ARCH_FLAG_PMUVER_DIRTY, &vcpu->kvm->arch.flags);
++	} else
+ 		vcpu->kvm->arch.dfr0_pmuver.unimp = perfmon_to_pmuver(perfmon);
+ 
+-	return 0;
++	ret = 0;
++out:
++	mutex_unlock(&vcpu->kvm->arch.config_lock);
++
++	return ret;
+ }
+ 
+ /*
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 5ece2a3c1858..00c05d17cf3a 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -95,7 +95,7 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+ #define kvm_pmu_is_3p5(vcpu)						\
+ 	(vcpu->kvm->arch.dfr0_pmuver.imp >= ID_AA64DFR0_EL1_PMUVer_V3P5)
+ 
+-u8 kvm_arm_pmu_get_pmuver_limit(void);
++u8 kvm_arm_pmu_get_pmuver_limit(struct kvm *kvm);
+ int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu);
+ 
+ #else
+@@ -164,7 +164,7 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+ static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
+-static inline u8 kvm_arm_pmu_get_pmuver_limit(void)
++static inline u8 kvm_arm_pmu_get_pmuver_limit(struct kvm *kvm)
+ {
+ 	return 0;
+ }
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
