@@ -2,61 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AF3571341D
-	for <lists+kvm@lfdr.de>; Sat, 27 May 2023 12:42:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8B6C713513
+	for <lists+kvm@lfdr.de>; Sat, 27 May 2023 15:41:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232355AbjE0KmM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 May 2023 06:42:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50268 "EHLO
+        id S231151AbjE0Nle (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 May 2023 09:41:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbjE0KmL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 May 2023 06:42:11 -0400
+        with ESMTP id S230137AbjE0Nld (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 May 2023 09:41:33 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EBF110A;
-        Sat, 27 May 2023 03:42:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A01DC3
+        for <kvm@vger.kernel.org>; Sat, 27 May 2023 06:41:31 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9EF3F60B67;
-        Sat, 27 May 2023 10:42:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE11AC433EF;
-        Sat, 27 May 2023 10:42:02 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 24A3B60E8B
+        for <kvm@vger.kernel.org>; Sat, 27 May 2023 13:41:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C49DC433D2;
+        Sat, 27 May 2023 13:41:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685184129;
-        bh=Z4TeIapFpeS1e5WxOMUpOrDg87Rxe8ydQavxJsO0vug=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qtjpACU3i7FVjLT023Ddg5iX1Sm9mYGyR9BAcAldcZGtkGi1IgPSjR20Gkom5YVFi
-         9GqwWTqSe6aCGE+Jk6r1lk9ASI1BqwfpG0h2HSrQ1BaMlG84/DZwyIoKGVbNuFJs46
-         KM/CX4KgN01bs8ctMAmNzdH3P/7vJMOVtl/spQpp1NeNWLVBfmoG8tubTTHEz78nbM
-         Mi5TzSK4O/LtfJpDtvhI5QLWzSn68VROvh7bVsKVmfCA0L8DXw2EUj7uC78b19+5Rx
-         6iPjAV5tMRrgS7SBBOhhGo75UiSObo7waKqxJ5uuMYjPYcI7MRtTbdg+ba8TB9jNgs
-         b+IpYHQpsYW9A==
-Date:   Sat, 27 May 2023 13:41:44 +0300
-From:   Mike Rapoport <rppt@kernel.org>
-To:     Vishal Moola <vishal.moola@gmail.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 05/34] mm: add utility functions for ptdesc
-Message-ID: <20230527104144.GH4967@kernel.org>
-References: <20230501192829.17086-1-vishal.moola@gmail.com>
- <20230501192829.17086-6-vishal.moola@gmail.com>
- <20230525090956.GX4967@kernel.org>
- <CAOzc2pxSH6GhBnAoSOjvYJk2VdMDFZi3H_1qGC5Cdyp3j4AzPQ@mail.gmail.com>
- <20230525202537.GA4967@kernel.org>
- <CAOzc2pxD21mxisy-M5b_SDUv0MYwNHqaVDJnJpARuDG_HjCbOg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOzc2pxD21mxisy-M5b_SDUv0MYwNHqaVDJnJpARuDG_HjCbOg@mail.gmail.com>
+        s=k20201202; t=1685194890;
+        bh=mwhTDDByu0K/0clH3pT3wZsy+vlC2IbWjHkxpXdmxuo=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=XOSi2fqQ6YSex80VsJRvmY/q2b1gUXvXf+I2icP9Htfb032C9LhoUk6/hMueZa0lv
+         Z7C8oLI8S5VVMlaYyruM2xSb7VWnWpTIZcob8CBgQzJ5JeICbuczgA8RkxEZuITGID
+         9HpMfj/rb7mBvSjV1rA7NSa7B6o3yCKk/sXIZdeKcC3HXamibev+nz9UfvrEzqTYac
+         ZbJYce3+Yazy+fFvNTE8ic9ZvYBp9HGZdeGTfj1TCFoW8DsViu7PYbFgMRdI5soumL
+         ijd/M01GVe/znG9As1GGtjBy+cS49RVDrRddcIKxZHGVIlG7PR+isQULi6dRnhRIKe
+         Y2XMxhvtHLk7A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q2uAi-000lBR-3c;
+        Sat, 27 May 2023 14:41:28 +0100
+Date:   Sat, 27 May 2023 14:41:27 +0100
+Message-ID: <86ilcddh88.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v10 4/5] KVM: arm64: Reuse fields of sys_reg_desc for idreg
+In-Reply-To: <ZHEmgPAK59Wh/jv/@linux.dev>
+References: <20230522221835.957419-1-jingzhangos@google.com>
+        <20230522221835.957419-5-jingzhangos@google.com>
+        <ZHEmgPAK59Wh/jv/@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -67,53 +77,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 25, 2023 at 01:53:24PM -0700, Vishal Moola wrote:
-> On Thu, May 25, 2023 at 1:26 PM Mike Rapoport <rppt@kernel.org> wrote:
-> >
-> > On Thu, May 25, 2023 at 11:04:28AM -0700, Vishal Moola wrote:
-> > > On Thu, May 25, 2023 at 2:10 AM Mike Rapoport <rppt@kernel.org> wrote:
-> > > > > +
-> > > > > +static inline struct ptdesc *ptdesc_alloc(gfp_t gfp, unsigned int order)
-> > > > > +{
-> > > > > +     struct page *page = alloc_pages(gfp | __GFP_COMP, order);
-> > > > > +
-> > > > > +     return page_ptdesc(page);
-> > > > > +}
-> > > > > +
-> > > > > +static inline void ptdesc_free(struct ptdesc *pt)
-> > > > > +{
-> > > > > +     struct page *page = ptdesc_page(pt);
-> > > > > +
-> > > > > +     __free_pages(page, compound_order(page));
-> > > > > +}
-> > > >
-> > > > The ptdesc_{alloc,free} API does not sound right to me. The name
-> > > > ptdesc_alloc() implies the allocation of the ptdesc itself, rather than
-> > > > allocation of page table page. The same goes for free.
-> > >
-> > > I'm not sure I see the difference. Could you elaborate?
-> >
-> > I read ptdesc_alloc() as "allocate a ptdesc" rather than as "allocate a
-> > page for page table and return ptdesc pointing to that page". Seems very
-> > confusing to me already and it will be even more confusion when we'll start
-> > allocating actual ptdescs.
+On Fri, 26 May 2023 22:37:04 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Hmm, I see what you're saying. I'm envisioning this function evolving into
-> one that allocates a ptdesc later. I don't see why we would need to have both a
-> page table page AND ptdesc at any point, but that may be a lack of knowledge
-> from my part.
+> Hi Jing,
+> 
+> On Mon, May 22, 2023 at 10:18:34PM +0000, Jing Zhang wrote:
+> > Since reset() and val are not used for idreg in sys_reg_desc, they would
+> > be used with other purposes for idregs.
+> > The callback reset() would be used to return KVM sanitised id register
+> > values. The u64 val would be used as mask for writable fields in idregs.
+> > Only bits with 1 in val are writable from userspace.
+> 
+> The tense of the changelog is wrong (should be in an imperative mood).
+> Maybe something like:
+> 
+>   sys_reg_desc::{reset, val} are presently unused for ID register
+>   descriptors. Repurpose these fields to support user-configurable ID
+>   registers.
+> 
+>   Use the ::reset() function pointer to return the sanitised value of a
+>   given ID register, optionally with KVM-specific feature sanitisation.
+>   Additionally, keep a mask of writable register fields in ::val.
+> 
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 101 +++++++++++++++++++++++++++-----------
+> >  arch/arm64/kvm/sys_regs.h |  15 ++++--
+> >  2 files changed, 82 insertions(+), 34 deletions(-)
+> > 
+> 
+> [...]
+> 
+> > +/*
+> > + * Since reset() callback and field val are not used for idregs, they will be
+> > + * used for specific purposes for idregs.
+> > + * The reset() would return KVM sanitised register value. The value would be the
+> > + * same as the host kernel sanitised value if there is no KVM sanitisation.
+> > + * The val would be used as a mask indicating writable fields for the idreg.
+> > + * Only bits with 1 are writable from userspace. This mask might not be
+> > + * necessary in the future whenever all ID registers are enabled as writable
+> > + * from userspace.
+> > + */
+> > +
+> >  /* sys_reg_desc initialiser for known cpufeature ID registers */
+> >  #define ID_SANITISED(name) {			\
+> >  	SYS_DESC(SYS_##name),			\
+> > @@ -1751,6 +1788,8 @@ static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
+> >  	.get_user = get_id_reg,			\
+> >  	.set_user = set_id_reg,			\
+> >  	.visibility = id_visibility,		\
+> > +	.reset = general_read_kvm_sanitised_reg,\
+> > +	.val = 0,				\
+> 
+> I generally think unions are more trouble than they're worth, but it
+> might make sense to throw the fields with dual meaning into one, like
+> 
+>   struct sys_reg_desc {
+> 
+>   	[...]
+> 	union {
+> 		struct {
+> 			void (*reset)(struct kvm_vcpu *, const struct sys_reg_desc *);
+> 			u64 val;
+> 		};
+> 		struct {
+> 			u64 (*read_sanitised)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *);
+> 			u64 mask;
+> 		};
+> 	};
+>   }
+> 
+> You could then avoid repainting the world to handle ->reset() returning
+> a value and usage of the fields in an id register context become a bit
+> more self-documenting. And you get to play with fire while you do it!
+> 
+> Let's see if the other side of the pond agrees with my bikeshedding...
 
-Sorry if I wasn't clear, by "page table page" I meant the page (or memory
-for that matter) for actual page table rather than struct page describing
-that memory.
+I don't think this works just as suggested. It completely breaks all
+the existing macros that use implicit (in order) initialisers. Not
+hard to fix, but pretty invasive (I count 656 warnings in my current
+tree).
 
-So what we allocate here is the actual memory for the page tables and not
-the memory for the metadata. That's why I think the name ptdesc_alloc is
-confusing.
- 
-> I was thinking later, if necessary, we could make another function
-> (only to be used internally) to allocate page table pages.
+I agree it is much cleaner though.
+
+	M.
 
 -- 
-Sincerely yours,
-Mike.
+Without deviation from the norm, progress is not possible.
