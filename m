@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7986E7142A2
-	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 06:21:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21AF57142A6
+	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 06:21:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231570AbjE2EVe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 May 2023 00:21:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43774 "EHLO
+        id S231503AbjE2EVl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 May 2023 00:21:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231455AbjE2EU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 May 2023 00:20:56 -0400
+        with ESMTP id S231487AbjE2EVJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 May 2023 00:21:09 -0400
 Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA426C2;
-        Sun, 28 May 2023 21:20:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EEF2CD;
+        Sun, 28 May 2023 21:20:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685334054; x=1716870054;
+  t=1685334055; x=1716870055;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Hn7shvW1d+qYgrt4lzN8XBeqmtZHjhyPvGqncbK5er8=;
-  b=ZBrDFFEnQ6nv4s7kaUPO5f71Xli+aMizRAgZmnAxJzEpgUkgzZR7juOo
-   foDTpOnUVht2sE3W/n2pS+o9JUjNUBnFRimbH5c1Y42n3cXjrPOOR7dkl
-   6qfVVk0WW2PEvuSOXatxRFdwzHZT3nBOb1GgXi30FDE9x8PIkDdrF1nZ1
-   gR4B6JHlyidd42yZI7BNgx1wQvCjdXpl6jglPJoV0tdieqLWwZ9p7JC/B
-   mbYYUV7YvU+pAQdjG6e/8377o2iyZVCpoKAlCDVnzlQSIOJYMJsS8iOAl
-   6DzzqlyJQWPKJNkZ8WBGzFXK25xKazrhW2uv2S1lumI5XEKDNHz4N8svq
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="418094322"
+  bh=9Ejnejo1xxFZJOOxnD/7dsWsnDZDzanD+wMLc4cjIDA=;
+  b=E+AxYYsg6Sf7L8aNmcF7bqUm182K33vrFDwM1A60XK55Eeqcg9USSOIr
+   8UvQwM02hqynOcLgGYHE5FA4efBqucOEXO8WiWXbWhW53GJQvoPBUQMut
+   qCLSxvoTgY/c3APlxOO5aijoeiOD9sw/ewaPkmNyAlLe+JPtoMRFE02gQ
+   EVDB9Vhf5vucvx6yAlFkxEEald2Ur+nzizBtLKaLRRsv5MZB52L2FjItx
+   yi9LZrEMHQr0wpHvIv0cu2a8RbkChCu+U+x5rJLCIpBV6u+kXKAqDY/ju
+   D6S0CvH8ClGW5Nt8R1oAN1MoKMWwZRpO0j6rK+bRORtbW+6/EL44Sr+FU
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="418094327"
 X-IronPort-AV: E=Sophos;i="6.00,200,1681196400"; 
-   d="scan'208";a="418094322"
+   d="scan'208";a="418094327"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 21:20:53 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 21:20:54 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="683419337"
+X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="683419345"
 X-IronPort-AV: E=Sophos;i="6.00,200,1681196400"; 
-   d="scan'208";a="683419337"
+   d="scan'208";a="683419345"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 21:20:52 -0700
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 21:20:53 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -46,11 +46,10 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sagi Shahar <sagis@google.com>,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v14 017/113] KVM: TDX: x86: Add ioctl to get TDX systemwide parameters
-Date:   Sun, 28 May 2023 21:18:59 -0700
-Message-Id: <49cdbc21f2cc74faa8fa365ba5091f34c86fec76.1685333727.git.isaku.yamahata@intel.com>
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com
+Subject: [PATCH v14 018/113] KVM: x86, tdx: Make KVM_CAP_MAX_VCPUS backend specific
+Date:   Sun, 28 May 2023 21:19:00 -0700
+Message-Id: <ffc76f3e9acbce3a9810249e52f590b2b1058a1a.1685333727.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1685333727.git.isaku.yamahata@intel.com>
 References: <cover.1685333727.git.isaku.yamahata@intel.com>
@@ -66,170 +65,201 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Implement an ioctl to get system-wide parameters for TDX.  Although the
-function is systemwide, vm scoped mem_enc ioctl works for userspace VMM
-like qemu and device scoped version is not define, re-use vm scoped
-mem_enc.
+TDX has its own limitation on the maximum number of vcpus that the guest
+can accommodate.  Allow x86 kvm backend to implement its own KVM_ENABLE_CAP
+handler and implement TDX backend for KVM_CAP_MAX_VCPUS.  user space VMM,
+e.g. qemu, can specify its value instead of KVM_MAX_VCPUS.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/uapi/asm/kvm.h       | 20 +++++++++++
- arch/x86/kvm/vmx/tdx.c                | 45 +++++++++++++++++++++++++
- tools/arch/x86/include/uapi/asm/kvm.h | 48 +++++++++++++++++++++++++++
- 3 files changed, 113 insertions(+)
+ arch/x86/include/asm/kvm-x86-ops.h |  2 ++
+ arch/x86/include/asm/kvm_host.h    |  2 ++
+ arch/x86/kvm/vmx/main.c            | 22 ++++++++++++++++++++++
+ arch/x86/kvm/vmx/tdx.c             | 30 ++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/tdx.h             |  3 +++
+ arch/x86/kvm/vmx/x86_ops.h         |  2 ++
+ arch/x86/kvm/x86.c                 |  4 ++++
+ 7 files changed, 65 insertions(+)
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 4eb345c3e5ce..bf522e8e461b 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -593,4 +593,24 @@ struct kvm_tdx_cmd {
- 	__u64 unused;
- };
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index cc97fb9920c7..22e2136f8ccd 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -21,6 +21,8 @@ KVM_X86_OP(hardware_unsetup)
+ KVM_X86_OP(has_emulated_msr)
+ KVM_X86_OP(vcpu_after_set_cpuid)
+ KVM_X86_OP(is_vm_type_supported)
++KVM_X86_OP_OPTIONAL(max_vcpus);
++KVM_X86_OP_OPTIONAL(vm_enable_cap)
+ KVM_X86_OP(vm_init)
+ KVM_X86_OP_OPTIONAL(vm_destroy)
+ KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index c00bec29e787..9260667b3cc4 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1544,7 +1544,9 @@ struct kvm_x86_ops {
+ 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
  
-+struct kvm_tdx_cpuid_config {
-+	__u32 leaf;
-+	__u32 sub_leaf;
-+	__u32 eax;
-+	__u32 ebx;
-+	__u32 ecx;
-+	__u32 edx;
-+};
+ 	bool (*is_vm_type_supported)(unsigned long vm_type);
++	int (*max_vcpus)(struct kvm *kvm);
+ 	unsigned int vm_size;
++	int (*vm_enable_cap)(struct kvm *kvm, struct kvm_enable_cap *cap);
+ 	int (*vm_init)(struct kvm *kvm);
+ 	void (*vm_destroy)(struct kvm *kvm);
+ 
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 857e82315049..cea0d32972a7 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -6,6 +6,7 @@
+ #include "nested.h"
+ #include "pmu.h"
+ #include "tdx.h"
++#include "tdx_arch.h"
+ 
+ static bool enable_tdx __ro_after_init;
+ module_param_named(tdx, enable_tdx, bool, 0444);
+@@ -16,6 +17,17 @@ static bool vt_is_vm_type_supported(unsigned long type)
+ 		(enable_tdx && tdx_is_vm_type_supported(type));
+ }
+ 
++static int vt_max_vcpus(struct kvm *kvm)
++{
++	if (!kvm)
++		return KVM_MAX_VCPUS;
 +
-+struct kvm_tdx_capabilities {
-+	__u64 attrs_fixed0;
-+	__u64 attrs_fixed1;
-+	__u64 xfam_fixed0;
-+	__u64 xfam_fixed1;
++	if (is_td(kvm))
++		return min3(kvm->max_vcpus, KVM_MAX_VCPUS, TDX_MAX_VCPUS);
 +
-+	__u32 nr_cpuid_configs;
-+	__u32 padding;
-+	struct kvm_tdx_cpuid_config cpuid_configs[0];
-+};
++	return kvm->max_vcpus;
++}
 +
- #endif /* _ASM_X86_KVM_H */
+ static int vt_hardware_enable(void)
+ {
+ 	int ret;
+@@ -43,6 +55,14 @@ static __init int vt_hardware_setup(void)
+ 	return 0;
+ }
+ 
++static int vt_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
++{
++	if (is_td(kvm))
++		return tdx_vm_enable_cap(kvm, cap);
++
++	return -EINVAL;
++}
++
+ static int vt_vm_init(struct kvm *kvm)
+ {
+ 	if (is_td(kvm))
+@@ -82,7 +102,9 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.has_emulated_msr = vmx_has_emulated_msr,
+ 
+ 	.is_vm_type_supported = vt_is_vm_type_supported,
++	.max_vcpus = vt_max_vcpus,
+ 	.vm_size = sizeof(struct kvm_vmx),
++	.vm_enable_cap = vt_vm_enable_cap,
+ 	.vm_init = vt_vm_init,
+ 	.vm_destroy = vmx_vm_destroy,
+ 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 54e5422ea73a..cf320459574f 100644
+index cf320459574f..4d58bb3333a7 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -16,6 +16,48 @@
+@@ -16,6 +16,36 @@
  		offsetof(struct tdsysinfo_struct, cpuid_configs))	\
  		/ sizeof(struct tdx_cpuid_config))
  
-+static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
++int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
 +{
-+	struct kvm_tdx_capabilities __user *user_caps;
-+	const struct tdsysinfo_struct *tdsysinfo;
-+	struct kvm_tdx_capabilities caps;
++	int r;
 +
-+	BUILD_BUG_ON(sizeof(struct kvm_tdx_cpuid_config) !=
-+		     sizeof(struct tdx_cpuid_config));
++	switch (cap->cap) {
++	case KVM_CAP_MAX_VCPUS: {
++		if (cap->flags || cap->args[0] == 0)
++			return -EINVAL;
++		if (cap->args[0] > KVM_MAX_VCPUS)
++			return -E2BIG;
++		if (cap->args[0] > TDX_MAX_VCPUS)
++			return -E2BIG;
 +
-+	if (cmd->flags)
-+		return -EINVAL;
-+
-+	tdsysinfo = tdx_get_sysinfo();
-+	if (!tdsysinfo)
-+		return -ENOTSUPP;
-+
-+	user_caps = (void __user *)cmd->data;
-+	if (copy_from_user(&caps, user_caps, sizeof(caps)))
-+		return -EFAULT;
-+
-+	if (caps.nr_cpuid_configs < tdsysinfo->num_cpuid_config)
-+		return -E2BIG;
-+
-+	caps = (struct kvm_tdx_capabilities) {
-+		.attrs_fixed0 = tdsysinfo->attributes_fixed0,
-+		.attrs_fixed1 = tdsysinfo->attributes_fixed1,
-+		.xfam_fixed0 = tdsysinfo->xfam_fixed0,
-+		.xfam_fixed1 = tdsysinfo->xfam_fixed1,
-+		.nr_cpuid_configs = tdsysinfo->num_cpuid_config,
-+		.padding = 0,
-+	};
-+
-+	if (copy_to_user(user_caps, &caps, sizeof(caps)))
-+		return -EFAULT;
-+	if (copy_to_user(user_caps->cpuid_configs, &tdsysinfo->cpuid_configs,
-+			 tdsysinfo->num_cpuid_config *
-+			 sizeof(struct tdx_cpuid_config)))
-+		return -EFAULT;
-+
-+	return 0;
++		mutex_lock(&kvm->lock);
++		if (kvm->created_vcpus)
++			r = -EBUSY;
++		else {
++			kvm->max_vcpus = cap->args[0];
++			r = 0;
++		}
++		mutex_unlock(&kvm->lock);
++		break;
++	}
++	default:
++		r = -EINVAL;
++		break;
++	}
++	return r;
 +}
 +
- int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
+ static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
  {
- 	struct kvm_tdx_cmd tdx_cmd;
-@@ -29,6 +71,9 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
- 	mutex_lock(&kvm->lock);
+ 	struct kvm_tdx_capabilities __user *user_caps;
+diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+index 2210c8c1e893..3860aa351bd9 100644
+--- a/arch/x86/kvm/vmx/tdx.h
++++ b/arch/x86/kvm/vmx/tdx.h
+@@ -3,6 +3,9 @@
+ #define __KVM_X86_TDX_H
  
- 	switch (tdx_cmd.id) {
-+	case KVM_TDX_CAPABILITIES:
-+		r = tdx_get_capabilities(&tdx_cmd);
-+		break;
+ #ifdef CONFIG_INTEL_TDX_HOST
++
++#include "tdx_ops.h"
++
+ struct kvm_tdx {
+ 	struct kvm kvm;
+ 	/* TDX specific members follow. */
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index 504a269d3e25..dc0a9d5c2cf6 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -139,11 +139,13 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
+ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+ bool tdx_is_vm_type_supported(unsigned long type);
+ 
++int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+ #else
+ static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -ENOSYS; }
+ static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
+ 
++static inline int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap) { return -EINVAL; };
+ static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
+ #endif
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f08b75da4419..38801728c047 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4565,6 +4565,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		break;
+ 	case KVM_CAP_MAX_VCPUS:
+ 		r = KVM_MAX_VCPUS;
++		if (kvm_x86_ops.max_vcpus)
++			r = static_call(kvm_x86_max_vcpus)(kvm);
+ 		break;
+ 	case KVM_CAP_MAX_VCPU_ID:
+ 		r = KVM_MAX_VCPU_IDS;
+@@ -6494,6 +6496,8 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		break;
  	default:
  		r = -EINVAL;
- 		goto out;
-diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
-index 3e92f1057b51..bf522e8e461b 100644
---- a/tools/arch/x86/include/uapi/asm/kvm.h
-+++ b/tools/arch/x86/include/uapi/asm/kvm.h
-@@ -565,4 +565,52 @@ struct kvm_pmu_event_filter {
- #define KVM_X86_DEFAULT_VM	0
- #define KVM_X86_PROTECTED_VM	1
- 
-+/* Trust Domain eXtension sub-ioctl() commands. */
-+enum kvm_tdx_cmd_id {
-+	KVM_TDX_CAPABILITIES = 0,
-+
-+	KVM_TDX_CMD_NR_MAX,
-+};
-+
-+struct kvm_tdx_cmd {
-+	/* enum kvm_tdx_cmd_id */
-+	__u32 id;
-+	/* flags for sub-commend. If sub-command doesn't use this, set zero. */
-+	__u32 flags;
-+	/*
-+	 * data for each sub-command. An immediate or a pointer to the actual
-+	 * data in process virtual address.  If sub-command doesn't use it,
-+	 * set zero.
-+	 */
-+	__u64 data;
-+	/*
-+	 * Auxiliary error code.  The sub-command may return TDX SEAMCALL
-+	 * status code in addition to -Exxx.
-+	 * Defined for consistency with struct kvm_sev_cmd.
-+	 */
-+	__u64 error;
-+	/* Reserved: Defined for consistency with struct kvm_sev_cmd. */
-+	__u64 unused;
-+};
-+
-+struct kvm_tdx_cpuid_config {
-+	__u32 leaf;
-+	__u32 sub_leaf;
-+	__u32 eax;
-+	__u32 ebx;
-+	__u32 ecx;
-+	__u32 edx;
-+};
-+
-+struct kvm_tdx_capabilities {
-+	__u64 attrs_fixed0;
-+	__u64 attrs_fixed1;
-+	__u64 xfam_fixed0;
-+	__u64 xfam_fixed1;
-+
-+	__u32 nr_cpuid_configs;
-+	__u32 padding;
-+	struct kvm_tdx_cpuid_config cpuid_configs[0];
-+};
-+
- #endif /* _ASM_X86_KVM_H */
++		if (kvm_x86_ops.vm_enable_cap)
++			r = static_call(kvm_x86_vm_enable_cap)(kvm, cap);
+ 		break;
+ 	}
+ 	return r;
 -- 
 2.25.1
 
