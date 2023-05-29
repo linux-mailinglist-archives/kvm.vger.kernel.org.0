@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 94E837142FC
-	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 06:27:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54E4B7142FD
+	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 06:27:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231907AbjE2E1c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 May 2023 00:27:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47678 "EHLO
+        id S232000AbjE2E1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 May 2023 00:27:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231969AbjE2E0d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 May 2023 00:26:33 -0400
+        with ESMTP id S231901AbjE2E0g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 May 2023 00:26:36 -0400
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52EA71FE4;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F9510C4;
         Sun, 28 May 2023 21:24:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685334248; x=1716870248;
+  t=1685334249; x=1716870249;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=TZ+z91imsScQD0p1/VsSa1GqbET/iM4ZKqAoChx+Rzg=;
-  b=BlsL0jAn0jnfR+hTfOK6ph78A6ksWzzL4wYKB8cd9ff6zh5FKANrH/Bo
-   9x5G59WxeAEBR13JB6xb2gCjN2VgOymWEYF9eExFzoVFNh6k6AB4ttx/J
-   1MtyXnDHMil0dalqBFZ6J3e0xH7QYtbX16h94lLZ/X8gbCBQ0htk3GrFP
-   E1/L6X9M9SKjTmzS7aKQBWqZYA6SR5R7lbt9jDxMT1TfcFBRuwFqa/6ku
-   jeJAkNkKe3Cp5sYW+EHuCQiZxtY6hJGxcbNlcQBAnNvqMwSxjoscMVJBH
-   AsBN18gLNh86CuxBSLQhcbLbf5Nbx2ET0c5LlDbOf1e4uapPM9eMCeKrE
+  bh=4fQMAwBkhBOPcZHrfNwNvf0vZJYCSBt6EDjp3nltWEw=;
+  b=IiSNUFSTH0XLpjAQVuHqO6owXndUbg9ms8K8PPFyiC1YIRBKgOvSM4WD
+   Rl8ZQFptolVeHQilOGylAPCzgyryglN3ixhWVqN/bmWequfgYD18HW8s7
+   KaENlhutP4/DXfupXR8QXQTcm/fRAKZRbLE7xWBu4/rwgKjxKmWsTI4qq
+   pjvLmHNWsXg0d9i8d3mGxclTDzgjDK11EFwCwU8OpektqdYGUtdxxQSUV
+   n08IpnLXTCZe0D1SngSQd9GYX+FYddWJh1Xu+FC3GhHUPt8nJCM3JiLT5
+   r8g5Ougax98bGxwkF2XqAQuPZoRgs1SJ5jfHMH5unpbqjXm8HVjkb0Zi7
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="334966069"
+X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="334966075"
 X-IronPort-AV: E=Sophos;i="6.00,200,1681196400"; 
-   d="scan'208";a="334966069"
+   d="scan'208";a="334966075"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
   by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 21:21:21 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="775784366"
+X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="775784369"
 X-IronPort-AV: E=Sophos;i="6.00,200,1681196400"; 
-   d="scan'208";a="775784366"
+   d="scan'208";a="775784369"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 21:21:21 -0700
 From:   isaku.yamahata@intel.com
@@ -46,10 +46,11 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sagi Shahar <sagis@google.com>,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com
-Subject: [PATCH v14 057/113] [MARKER] The start of TDX KVM patch series: TD finalization
-Date:   Sun, 28 May 2023 21:19:39 -0700
-Message-Id: <fa11eeeed87f92942db3a55d54c83e9226956c16.1685333728.git.isaku.yamahata@intel.com>
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v14 058/113] KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX
+Date:   Sun, 28 May 2023 21:19:40 -0700
+Message-Id: <20d6b4926f3bcc31f6acac8882a5b0986f71000b.1685333728.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1685333727.git.isaku.yamahata@intel.com>
 References: <cover.1685333727.git.isaku.yamahata@intel.com>
@@ -65,38 +66,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-This empty commit is to mark the start of patch series of TD finalization.
+Introduce a helper to directly (pun intended) fault-in a TDP page
+without having to go through the full page fault path.  This allows
+TDX to get the resulting pfn and also allows the RET_PF_* enums to
+stay in mmu.c where they belong.
 
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- Documentation/virt/kvm/intel-tdx-layer-status.rst | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu.h     |  3 +++
+ arch/x86/kvm/mmu/mmu.c | 49 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+)
 
-diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-index c4d67dd9ddf8..46ae049b6b85 100644
---- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
-+++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-@@ -11,6 +11,7 @@ What qemu can do
- - TDX VM TYPE is exposed to Qemu.
- - Qemu can create/destroy guest of TDX vm type.
- - Qemu can create/destroy vcpu of TDX vm type.
-+- Qemu can populate initial guest memory image.
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index c1781e0d29e0..a613ef581059 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -174,6 +174,9 @@ static inline void kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
+ 	__kvm_mmu_refresh_passthrough_bits(vcpu, mmu);
+ }
  
- Patch Layer status
- ------------------
-@@ -20,8 +21,8 @@ Patch Layer status
- * TDX architectural definitions:        Applied
- * TD VM creation/destruction:           Applied
- * TD vcpu creation/destruction:         Applied
--* TDX EPT violation:                    Applying
--* TD finalization:                      Not yet
-+* TDX EPT violation:                    Applied
-+* TD finalization:                      Applying
- * TD vcpu enter/exit:                   Not yet
- * TD vcpu interrupts/exit/hypercall:    Not yet
++kvm_pfn_t kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa,
++			       u32 error_code, int max_level);
++
+ /*
+  * Check if a given access (described through the I/D, W/R and U/S bits of a
+  * page fault error code pfec) causes a permission fault with the given PTE
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index c61b77981403..d6e900fb3927 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4666,6 +4666,55 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	return direct_page_fault(vcpu, fault);
+ }
  
++kvm_pfn_t kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa,
++			       u32 error_code, int max_level)
++{
++	int r;
++	struct kvm_page_fault fault = (struct kvm_page_fault) {
++		.addr = gpa,
++		.error_code = error_code,
++		.exec = error_code & PFERR_FETCH_MASK,
++		.write = error_code & PFERR_WRITE_MASK,
++		.present = error_code & PFERR_PRESENT_MASK,
++		.rsvd = error_code & PFERR_RSVD_MASK,
++		.user = error_code & PFERR_USER_MASK,
++		.prefetch = false,
++		.is_tdp = true,
++		.nx_huge_page_workaround_enabled = is_nx_huge_page_enabled(vcpu->kvm),
++		.is_private = kvm_is_private_gpa(vcpu->kvm, gpa),
++	};
++
++	WARN_ON_ONCE(!vcpu->arch.mmu->root_role.direct);
++	fault.gfn = gpa_to_gfn(fault.addr) & ~kvm_gfn_shared_mask(vcpu->kvm);
++	fault.slot = kvm_vcpu_gfn_to_memslot(vcpu, fault.gfn);
++
++	if (mmu_topup_memory_caches(vcpu, false))
++		return KVM_PFN_ERR_FAULT;
++
++	/*
++	 * Loop on the page fault path to handle the case where an mmu_notifier
++	 * invalidation triggers RET_PF_RETRY.  In the normal page fault path,
++	 * KVM needs to resume the guest in case the invalidation changed any
++	 * of the page fault properties, i.e. the gpa or error code.  For this
++	 * path, the gpa and error code are fixed by the caller, and the caller
++	 * expects failure if and only if the page fault can't be fixed.
++	 */
++	do {
++		fault.max_level = max_level;
++		fault.req_level = PG_LEVEL_4K;
++		fault.goal_level = PG_LEVEL_4K;
++
++#ifdef CONFIG_X86_64
++		if (tdp_mmu_enabled)
++			r = kvm_tdp_mmu_page_fault(vcpu, &fault);
++		else
++#endif
++			r = direct_page_fault(vcpu, &fault);
++	} while (r == RET_PF_RETRY && !is_error_noslot_pfn(fault.pfn));
++	return fault.pfn;
++}
++EXPORT_SYMBOL_GPL(kvm_mmu_map_tdp_page);
++
+ static void nonpaging_init_context(struct kvm_mmu *context)
+ {
+ 	context->page_fault = nonpaging_page_fault;
 -- 
 2.25.1
 
