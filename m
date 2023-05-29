@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6A897142C9
-	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 06:24:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B4FD7142CD
+	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 06:24:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231690AbjE2EY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 May 2023 00:24:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45066 "EHLO
+        id S231822AbjE2EYb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 May 2023 00:24:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231685AbjE2EXm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 May 2023 00:23:42 -0400
+        with ESMTP id S231785AbjE2EXt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 May 2023 00:23:49 -0400
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F9DE10D8;
-        Sun, 28 May 2023 21:21:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3D8110FE;
+        Sun, 28 May 2023 21:21:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685334101; x=1716870101;
+  t=1685334114; x=1716870114;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WnICeghPbFSdEGIjCXPh2wwpD3kRVvbfgkr3+BO4qYk=;
-  b=HJUK5VX9tsbzTdNB9YKIMn/PJfr0M93ggbTkknqodELOvjD8jGnljSix
-   QjaM2mVug9/beCq7LEGbrpewoOY1jMK9EDc82pSAZu90hSdLQIHWRlQ62
-   NM6x3w0WG05gpW8EiEcoff8WZtL7y6PzDc4lUKbGlsLix9txOKDD15Tgr
-   ql0hdxUt46n1ae98qTZRETm/3VXxiFMEYDnnOVGUS3eYeK0piB2CNDrGh
-   UB9QdpTdvbl1BAMgGuXZPB5IdWxdJD0lNkcdovdd+quQ+zMRiVYi3gyR6
-   YiYoaiRJhaV/ljbBARsm0Xks21Udr4sCD6UziQ6LwypjJ9bDt/KXnLSko
+  bh=qyq9eCT7ltiIe7K1kIZgzPUbeft0npAbnw+fP2geBGU=;
+  b=Viu0ssuqS1+lnDzrIET93EXwckBaTquoszfgmD/CDwXBbpg/P5MMVlch
+   BL4tTEFY5YrFDTPL6Al3PncMJ7WiaNkntSe6tpmeg+v9b6e+xDWaI4+Os
+   hocB0NQa4+6bO4RVxnVd7S31FhnovvflhRpznOGvcfo21Qz5hbEX5joFg
+   eg2mwM6asIpXAide1pTS5qiAYzAs9Wa+Se+RG7l+tw+TKiF0JeFkuu4iP
+   eFO4t4ewQv8+6spSQDn597g3sTEXhMxcJWTEimTZRfidiTNu/3kEyJhAL
+   kKJiH7fMAsM78CUQb+eVN75uA0xlQUtioAIaJiyLtXrhdCiZtyq5RTeqA
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="334965908"
+X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="334965917"
 X-IronPort-AV: E=Sophos;i="6.00,200,1681196400"; 
-   d="scan'208";a="334965908"
+   d="scan'208";a="334965917"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 21:21:10 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 21:21:11 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="775784235"
+X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="775784241"
 X-IronPort-AV: E=Sophos;i="6.00,200,1681196400"; 
-   d="scan'208";a="775784235"
+   d="scan'208";a="775784241"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 21:21:10 -0700
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 21:21:11 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -46,11 +46,10 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sagi Shahar <sagis@google.com>,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v14 034/113] KVM: x86/mmu: Track shadow MMIO value on a per-VM basis
-Date:   Sun, 28 May 2023 21:19:16 -0700
-Message-Id: <c329c9288f62d935f2649b7bfabf1b667cd9d6c8.1685333727.git.isaku.yamahata@intel.com>
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com
+Subject: [PATCH v14 035/113] KVM: x86/mmu: Disallow fast page fault on private GPA
+Date:   Sun, 28 May 2023 21:19:17 -0700
+Message-Id: <db7f3942099ebf304192f5fb1b18e64a0760ee6f.1685333727.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1685333727.git.isaku.yamahata@intel.com>
 References: <cover.1685333727.git.isaku.yamahata@intel.com>
@@ -68,160 +67,47 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX will use a different shadow PTE entry value for MMIO from VMX.  Add
-members to kvm_arch and track value for MMIO per-VM instead of global
-variables.  By using the per-VM EPT entry value for MMIO, the existing VMX
-logic is kept working.  Introduce a separate setter function so that guest
-TD can override later.
+TDX requires TDX SEAMCALL to operate Secure EPT instead of direct memory
+access and TDX SEAMCALL is heavy operation.  Fast page fault on private GPA
+doesn't make sense.  Disallow fast page fault on private GPA.
 
-Also require mmio spte cachcing for TDX.  Actually this is true case
-because TDX require EPT and KVM EPT allows mmio spte caching.
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/mmu.h              |  1 +
- arch/x86/kvm/mmu/mmu.c          |  7 ++++---
- arch/x86/kvm/mmu/spte.c         | 10 ++++++++--
- arch/x86/kvm/mmu/spte.h         |  4 ++--
- arch/x86/kvm/mmu/tdp_mmu.c      |  6 +++---
- 6 files changed, 20 insertions(+), 10 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 487381bdda23..619ddba86e86 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1258,6 +1258,8 @@ struct kvm_arch {
- 	 */
- 	spinlock_t mmu_unsync_pages_lock;
- 
-+	u64 shadow_mmio_value;
-+
- 	struct list_head assigned_dev_head;
- 	struct iommu_domain *iommu_domain;
- 	bool iommu_noncoherent;
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index cf9c112aec8e..c1781e0d29e0 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -101,6 +101,7 @@ static inline u8 kvm_get_shadow_phys_bits(void)
- }
- 
- void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask);
-+void kvm_mmu_set_mmio_spte_value(struct kvm *kvm, u64 mmio_value);
- void kvm_mmu_set_me_spte_mask(u64 me_value, u64 me_mask);
- void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only);
- 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 1b6fd4434e96..1bf728ec95d7 100644
+index 1bf728ec95d7..8035e96cb687 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2534,7 +2534,7 @@ static int mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
- 				return kvm_mmu_prepare_zap_page(kvm, child,
- 								invalid_list);
- 		}
--	} else if (is_mmio_spte(pte)) {
-+	} else if (is_mmio_spte(kvm, pte)) {
- 		mmu_spte_clear_no_track(spte);
- 	}
- 	return 0;
-@@ -4216,7 +4216,7 @@ static int handle_mmio_page_fault(struct kvm_vcpu *vcpu, u64 addr, bool direct)
- 	if (WARN_ON(reserved))
- 		return -EINVAL;
- 
--	if (is_mmio_spte(spte)) {
-+	if (is_mmio_spte(vcpu->kvm, spte)) {
- 		gfn_t gfn = get_mmio_spte_gfn(spte);
- 		unsigned int access = get_mmio_spte_access(spte);
- 
-@@ -4761,7 +4761,7 @@ EXPORT_SYMBOL_GPL(kvm_mmu_new_pgd);
- static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
- 			   unsigned int access)
- {
--	if (unlikely(is_mmio_spte(*sptep))) {
-+	if (unlikely(is_mmio_spte(vcpu->kvm, *sptep))) {
- 		if (gfn != get_mmio_spte_gfn(*sptep)) {
- 			mmu_spte_clear_no_track(sptep);
- 			return true;
-@@ -6283,6 +6283,7 @@ int kvm_mmu_init_vm(struct kvm *kvm)
- 	struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
- 	int r;
- 
-+	kvm->arch.shadow_mmio_value = shadow_mmio_value;
- 	INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
- 	INIT_LIST_HEAD(&kvm->arch.zapped_obsolete_pages);
- 	INIT_LIST_HEAD(&kvm->arch.possible_nx_huge_pages);
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index 778fbaec1887..a1f332eb3b59 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -74,10 +74,10 @@ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access)
- 	u64 spte = generation_mmio_spte_mask(gen);
- 	u64 gpa = gfn << PAGE_SHIFT;
- 
--	WARN_ON_ONCE(!shadow_mmio_value);
-+	WARN_ON_ONCE(!vcpu->kvm->arch.shadow_mmio_value);
- 
- 	access &= shadow_mmio_access_mask;
--	spte |= shadow_mmio_value | access;
-+	spte |= vcpu->kvm->arch.shadow_mmio_value | access;
- 	spte |= gpa | shadow_nonpresent_or_rsvd_mask;
- 	spte |= (gpa & shadow_nonpresent_or_rsvd_mask)
- 		<< SHADOW_NONPRESENT_OR_RSVD_MASK_LEN;
-@@ -413,6 +413,12 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask)
+@@ -3368,8 +3368,16 @@ static int kvm_handle_noslot_fault(struct kvm_vcpu *vcpu,
+ 	return RET_PF_CONTINUE;
  }
- EXPORT_SYMBOL_GPL(kvm_mmu_set_mmio_spte_mask);
  
-+void kvm_mmu_set_mmio_spte_value(struct kvm *kvm, u64 mmio_value)
-+{
-+	kvm->arch.shadow_mmio_value = mmio_value;
-+}
-+EXPORT_SYMBOL_GPL(kvm_mmu_set_mmio_spte_value);
+-static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
++static bool page_fault_can_be_fast(struct kvm *kvm, struct kvm_page_fault *fault)
+ {
++	/*
++	 * TDX private mapping doesn't support fast page fault because the EPT
++	 * entry is read/written with TDX SEAMCALLs instead of direct memory
++	 * access.
++	 */
++	if (kvm_is_private_gpa(kvm, fault->addr))
++		return false;
 +
- void kvm_mmu_set_me_spte_mask(u64 me_value, u64 me_mask)
- {
- 	/* shadow_me_value must be a subset of shadow_me_mask */
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index a57667810344..a8418fd8ae9e 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -251,9 +251,9 @@ static inline struct kvm_mmu_page *sptep_to_sp(u64 *sptep)
- 	return to_shadow_page(__pa(sptep));
- }
+ 	/*
+ 	 * Page faults with reserved bits set, i.e. faults on MMIO SPTEs, only
+ 	 * reach the common page fault handler if the SPTE has an invalid MMIO
+@@ -3479,7 +3487,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	u64 *sptep = NULL;
+ 	uint retry_count = 0;
  
--static inline bool is_mmio_spte(u64 spte)
-+static inline bool is_mmio_spte(struct kvm *kvm, u64 spte)
- {
--	return (spte & shadow_mmio_mask) == shadow_mmio_value &&
-+	return (spte & shadow_mmio_mask) == kvm->arch.shadow_mmio_value &&
- 	       likely(enable_mmio_caching);
- }
+-	if (!page_fault_can_be_fast(fault))
++	if (!page_fault_can_be_fast(vcpu->kvm, fault))
+ 		return ret;
  
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index ddd995885dd3..b4c81226bcd3 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -522,8 +522,8 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 		 * impact the guest since both the former and current SPTEs
- 		 * are nonpresent.
- 		 */
--		if (WARN_ON(!is_mmio_spte(old_spte) &&
--			    !is_mmio_spte(new_spte) &&
-+		if (WARN_ON(!is_mmio_spte(kvm, old_spte) &&
-+			    !is_mmio_spte(kvm, new_spte) &&
- 			    !is_removed_spte(new_spte)))
- 			pr_err("Unexpected SPTE change! Nonpresent SPTEs\n"
- 			       "should not be replaced with another,\n"
-@@ -1007,7 +1007,7 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
- 	}
- 
- 	/* If a MMIO SPTE is installed, the MMIO will need to be emulated. */
--	if (unlikely(is_mmio_spte(new_spte))) {
-+	if (unlikely(is_mmio_spte(vcpu->kvm, new_spte))) {
- 		vcpu->stat.pf_mmio_spte_created++;
- 		trace_mark_mmio_spte(rcu_dereference(iter->sptep), iter->gfn,
- 				     new_spte);
+ 	walk_shadow_page_lockless_begin(vcpu);
 -- 
 2.25.1
 
