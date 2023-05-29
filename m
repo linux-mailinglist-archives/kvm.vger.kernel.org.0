@@ -2,141 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B97E71453E
-	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 09:09:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F3FF714609
+	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 10:08:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230229AbjE2HJA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 May 2023 03:09:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42676 "EHLO
+        id S231688AbjE2IH6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 May 2023 04:07:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229965AbjE2HI5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 May 2023 03:08:57 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72F71A7
-        for <kvm@vger.kernel.org>; Mon, 29 May 2023 00:08:54 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-3f6094cb2ebso18992885e9.3
-        for <kvm@vger.kernel.org>; Mon, 29 May 2023 00:08:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1685344133; x=1687936133;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=J9yQZI29FBb5uk90C946uFQGVpaFZWwP+axkfkJPRmA=;
-        b=OGzmkwym+ds5lNbK7+lHCLxUguUfy0QTJ/UI2yLcw74+JBxqixt+zmx3lNyihLZ/qW
-         Rrl7u4zd2ZxT7qCL27Mau576RJoJ1CiSa0kWXOUmjHxKhQMPTfGNSIi0byquj1Nki8n7
-         cCB+xb/M+P51G/dtVskzHEkGHBRc60UcS6xABlKWzdN9VqozEbcdLXxh/0kiL9B4u4h8
-         S557VMaZShp76FvJQOnFzyQD/SYCQVb+/87pTopt7EtnK3a3prWQRrU/9gyxDitIX4ea
-         07jX2bKWoC2ai9FXbUtUjmVHAPupvol8Q7kZEcQ8Ii51pvvXXPZUzSPTvb6/hRgb3eYL
-         SuDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685344133; x=1687936133;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J9yQZI29FBb5uk90C946uFQGVpaFZWwP+axkfkJPRmA=;
-        b=cKH4x/C/L1OALFpcYmBMibL+MfodzctWRJvIwVJGK1Wio2N65+KXA8oIPIzYB+MYiX
-         VlNwY4iQ/pJeeKEMCv5hF9LUTHcXoQ0u8xLSG93wbp6HTXmokkckJCnAfMKFfYr6s+a+
-         PRKnR0YPHOk8AQ8InRyzwOs0wssokEnVAxkBytsFnrm2gE78bFtDmnOgEo+kpz8J3BeH
-         W0vWbxj76RopGlDlUppfhkxtAJoJMjiY1CTvRImTFRbsy0YvRxnSGQVtfLkmhCu5q3d4
-         xrRHDaFzQHIqv+C7ws2BqaH2+g7XfboZhCbylnU8ahl4v+UCY6vhV4qSmjeIMAw7Im1A
-         Hb6g==
-X-Gm-Message-State: AC+VfDz0Ido3A/Zdx/JBpUoCtJo9ZOv/2QyEP/tffVq3vpTFgV+k9uWL
-        ccMbTZPCOA0FjqbYvXmqVNTKGQ==
-X-Google-Smtp-Source: ACHHUZ73LyzFhpd/6+sfi011A/EFvj9Fd34HsRwL8GCzpeQu6/GsXCR3FkDg7Ni/nfr2tAz4KOAc6A==
-X-Received: by 2002:a1c:f616:0:b0:3f6:82a:5d1b with SMTP id w22-20020a1cf616000000b003f6082a5d1bmr9377055wmc.34.1685344132851;
-        Mon, 29 May 2023 00:08:52 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id m17-20020a056000009100b0030ae973c2e7sm3092863wrx.83.2023.05.29.00.08.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 May 2023 00:08:52 -0700 (PDT)
-Date:   Mon, 29 May 2023 09:08:51 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Haibo Xu <xiaobo55x@gmail.com>
-Cc:     Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org,
-        oliver.upton@linux.dev, seanjc@google.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 11/11] KVM: riscv: selftests: Add get-reg-list test
-Message-ID: <20230529-7b3e41e6aca55f9e90dd6cd3@orel>
-References: <cover.1684999824.git.haibo1.xu@intel.com>
- <da390e6200e838fce320a2a43b2f87951b4e0bbb.1684999824.git.haibo1.xu@intel.com>
- <20230525-2bab5376987792eab73507ac@orel>
- <CAJve8o=5ji5D-S8k+GaGd7sH7KXNWxDaWhD3jyxtHizKSMtjbA@mail.gmail.com>
+        with ESMTP id S231694AbjE2IHw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 May 2023 04:07:52 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2070.outbound.protection.outlook.com [40.107.94.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B499AF5;
+        Mon, 29 May 2023 01:07:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hZt2VseziN9gpI7cmNiXcLiWT/fwLayvuhOj7UJ+27L/KNvmES8dfgSvJP7Xh12qrEFEDETf3yB0zzTJ46Hxeze8ryc8j50H1KhwcXmCmeCwVTf/HI6ls1rGNURXlkRMk7VVxjzS18ruIfSTk8S00aAnIprYqrlI4FG1yIw4XoMuGzhz1wfTzeG5FB5Hp7Wa0U5sptPMOMzUT3cbeaf596g4RqkGE4Bvms6V83zfEHhtiXdFQx7ddI1DH+fynNmLRUTH10xLzLBcN9oDejy3+Ib/uPmTS3icHWrExHZaQ3RSZLSaM3HtTYl3N7ZGTGrTrCUBkMs1MEryvQ3h25/VOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wtaSRgdEMB6Z0xl2JA0XToTjrGybNczPhHrXGdMgXj4=;
+ b=b4/yUSHPcKOEnI/5z1dTVL7ZqgrJ0WakO5l8icIxd3/SrsHd5YBFRW7A1meI1dMy9eNFjzPlXeRb6fodKnojMRS1iV7swXKqdwxpw2VuTti/zbnqKvvofC7Mql0dlzQZGo6ABDaLWWjZ5H9tG5gZGi62+BHQZQk2fVor02bmRBX6/rk37YHnyWRJEGpUZb2rRa/GM3J285J+iAFC1B7f7cKKvjTrq58sitatz+VkYhdrBQpEONOQ9z68iIjkBPh2su1r99nkz49nG8HxCdTFX/QoGEfIeIUPXCCDLaSITLKDKtubWvrLhgnvazGq+aE+GXM0wdwHZAMCbbq7plxj2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wtaSRgdEMB6Z0xl2JA0XToTjrGybNczPhHrXGdMgXj4=;
+ b=4ZzgypDiy4mR09QvwYLMTzD32qKgIsUmItx6eAc7A4vBGwHoQJItGh4vRKOKhlR2TcN2BhvZudwjrh7TkxYo0MoWS/M7f49Q9l00IiUQJq2qwAdJcY9Zw4eZ3Fpr9q7slUA8GoZQiCeZiBPj4q1XQ7Gano2Fy7OIeppJUR3QGRs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB8308.namprd12.prod.outlook.com (2603:10b6:610:131::8)
+ by SJ2PR12MB9192.namprd12.prod.outlook.com (2603:10b6:a03:55d::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.22; Mon, 29 May
+ 2023 08:07:42 +0000
+Received: from CH3PR12MB8308.namprd12.prod.outlook.com
+ ([fe80::4e4f:3a93:b7bd:489c]) by CH3PR12MB8308.namprd12.prod.outlook.com
+ ([fe80::4e4f:3a93:b7bd:489c%5]) with mapi id 15.20.6433.022; Mon, 29 May 2023
+ 08:07:42 +0000
+Message-ID: <1bf0323b-1191-de11-061e-00227e09dc35@amd.com>
+Date:   Mon, 29 May 2023 13:36:30 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v6] vfio/cdx: add support for CDX bus
+Content-Language: en-US
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     jgg@ziepe.ca, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        masahiroy@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
+        nicolas@fjasle.eu, git@amd.com, harpreet.anand@amd.com,
+        pieter.jansen-van-vuuren@amd.com, nikhil.agarwal@amd.com,
+        michal.simek@amd.com
+References: <20230517095718.16117-1-nipun.gupta@amd.com>
+ <20230524104529.28708ae8.alex.williamson@redhat.com>
+ <20230524134831.28dc97e2.alex.williamson@redhat.com>
+From:   Nipun Gupta <nipun.gupta@amd.com>
+In-Reply-To: <20230524134831.28dc97e2.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0187.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:e8::14) To CH3PR12MB8308.namprd12.prod.outlook.com
+ (2603:10b6:610:131::8)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJve8o=5ji5D-S8k+GaGd7sH7KXNWxDaWhD3jyxtHizKSMtjbA@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UPPERCASE_50_75
-        autolearn=no autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8308:EE_|SJ2PR12MB9192:EE_
+X-MS-Office365-Filtering-Correlation-Id: 232d117e-2ad6-41e8-19f8-08db601bc625
+X-LD-Processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GgkF64vuyeBXfCTfJasz9GZXYvYw7p+Fe9YgsmBKVjYzMucF7oDT9LMB3eR4cE1l6PioY7WxD1FWBKg9XDv3rrOVC1kcXWEEqFmKFTPLvsr3lUEqA0F3EpDJYwlbJ1AG5PKZiI7iDaEgzHQqPXbB7dPz7ZonYVQecoPPbOJWEWsHMmWuCGY3/11ZAcN4bPxU455/3QEYfIl6JaQ/eGtN8h/HAhEqgVZO2HxSOMg0TbaakNJq8HBeDNA5jzJy+n8biNrGKex16uwOcbELRzlrf2ofPDBLVIwIE/Wv52Lq4l/fOxziYoBMGnmB5BihhnqgNyl8hh1B7uxwwypSoIsoFaFmI9hoHWiAdOiVMPgHvTjgfUAJa51bFzUHBeZGmSt9XFCBk4fUswb6iSELCFgVaBPnYGGDe7mChv1jxCs+yuxP3JHvnD0WTaPq286PT+ptGIvkQZtRutVtaCrtwpPTdN7NHo3blmlmA2+e7ExqSm5kq2XyxYYeFcL13kCH8zj0tQSFAwAwAXOjOWgNjhXZ6Kiq5QjO/KY7yMxp0V5vfoJs5OcHhoxzUad6mW3oHJAafppT+reaJgJfC5LJDA93tTnaFggtZ7sZ1pHVkwNCO82GMEuACuGDFu+rq9LavzTbyGuPm4MJTL7Mu/YskVZ/ew==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8308.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(136003)(39860400002)(346002)(376002)(451199021)(26005)(6486002)(53546011)(6512007)(6506007)(2906002)(6666004)(316002)(186003)(5660300002)(44832011)(41300700001)(36756003)(8676002)(8936002)(478600001)(38100700002)(31686004)(4326008)(6916009)(31696002)(86362001)(2616005)(66946007)(66476007)(66556008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NHdQc0FsTHZMS0c2OEZJTGVvaUxneXVZWFRrK2htSXJWSmJVc2xUQUNtejVV?=
+ =?utf-8?B?VVdzMWt5eVBvS0M0ZG40YWJCcm1IVGZubXJqYWVYTmpQeWJqeHI2QUd3bUFh?=
+ =?utf-8?B?aGJsT0xlMjZRcTRyT3BzWXhGUFhXQnN1ZUo5dmlhc0gxUVA3YWl1dW5GNTBM?=
+ =?utf-8?B?V0dsaTRWdXZLd2x1emNBN3NwNlNXdHRrd3pSMjVTODFUTDdCUDF4S3NSZlg1?=
+ =?utf-8?B?VTlRRXdLclc2WVQ5MTFQMCtmOG5aeXJMWHp5RUVmVDQzOFZ6SWpSTEdCOVor?=
+ =?utf-8?B?RGFzSmNUeHBMZHUyR3V5MndpaHl4eEFPUU9HdGNDNmJrbURNUkIxWGFSSEt1?=
+ =?utf-8?B?YzhEbytvazAycnpDTzBoRHVBYnFod1RnUzJpVlpUNHd0R2J4MEVKbDk1UzJZ?=
+ =?utf-8?B?M1VpZ01FeE9WQjBqc1VsaWgrTXZocGMvZUt2cWxIV2swUW5HaXdiQmF1QjhU?=
+ =?utf-8?B?TE4ralI5QmV3T2J1dkVaeFRTUU1lMER4MUJxUDF6all1OE5JRmtBTXlFV1Ri?=
+ =?utf-8?B?NGlTSDdJSjBiY3FmNGN2NGcxTEJuejNTbFZrQTR5bTJnVWlMSzkyc01ZZVp6?=
+ =?utf-8?B?QzhscEZrRmhXM3BhWXhEVDI5SE8zZ0xEK2tFMmpXWjVKRXFWS0I5RXN4VEtN?=
+ =?utf-8?B?VGRFNTFycGlvVmVpUGVrMEdLN25jQUlrcEgzRHBzdVphbUFJSWkrV1hweTVX?=
+ =?utf-8?B?TUl1eHA4MXEvWmZ6cEV2OWRlM2w2NjhOOTg2Mmgydmw2VmJxRkNiK245QkJ4?=
+ =?utf-8?B?Z1NoN1FKNE9Ub1dGd2QwVVd2NzRFSTU5dVJRTVpSL1dzY3R2YzYwWjRZWldK?=
+ =?utf-8?B?a053bUU3TjZwZmNOWXRRRXNidUZSenJqK0pHS0pWa3daSFpkYTB6Ny95cGpK?=
+ =?utf-8?B?ZnRLZ2pPQktKOWdVM253U21pcGIrYi9la1VCcmEwa3RuVUE1TDlnb3pyYktL?=
+ =?utf-8?B?Smtlczc3eDJvajNjQS94SzltWkdpS2ZCWHdwZ01lZkx0YzV0U1FRS3Rsa1Zs?=
+ =?utf-8?B?VUcxc083REN2TVFJQ1JpV0NDbzlmenByNFR6R3MvKzdNL1g4ejk1TDM3cnZp?=
+ =?utf-8?B?ZTB1TU83eHZPTXB4d1FsK0YvcXp3MDFiRCtVQjBpcXdXYUgyV1NjZi9MdzA0?=
+ =?utf-8?B?YUVNa3d6N2pjWmVXdVRpWDViV21jcXRSVmdLTEVGV2RGdmI1bUhUY2JvMGtP?=
+ =?utf-8?B?LzNYL2sxdlVrWEpXd2RlU0xjbTF3R1BRMnZDeTFpYTlQdG9MKyt2Ylg2SEJh?=
+ =?utf-8?B?aSt0WXhqQ1Q0MVI1Nm5WK1RsYW5FNVczWnI1Wk1oNXZ5Nmd6YW02TWxxVmVr?=
+ =?utf-8?B?NUwrVGJLZDQ0ZkxxTkZwUnlsL0h2bE11RVNVZlZoZDMyU3duNEFiNU14VERS?=
+ =?utf-8?B?Q09lQXlZSnQ0OFY4dG12RTcrS0RPcHdJUmRlSUxrbXhvSTVsbVhwaWZHNS80?=
+ =?utf-8?B?U0xoWEVabVBXQ1ZWN1RHamZNbUN2YWdzUW0xVUtJcDdMYnVnR2U2VXJVY1FL?=
+ =?utf-8?B?ZGd4cDNWOEhjMWRrbytIZXZxUyszUm5zZ2xpM0JiTTJOSmxBSGE1TGRuUTVs?=
+ =?utf-8?B?SDZBZDBOWDNLTXNLc2xSSm9ZQzNoS2xCN2pYdFE4VmdNNklUOHlYOFlWS3ZC?=
+ =?utf-8?B?MTJBNC9QTGcyc3NsU0EwMkRPaENhYXMzTXFkMVpQOHQxLy9aU0JSeWFHQTU0?=
+ =?utf-8?B?cWdMSEZJRWwwSjh6bnBaQjIxelFUd05RVldwTnRaZURqVFpHZW85c29BVTNk?=
+ =?utf-8?B?NjE5T0Y1WTlQM2FxYW1nV0huQU9sRHRHVXF5YWw3R21qOHorKzhQM2Q2QjJ5?=
+ =?utf-8?B?a043N3A1WnNwaWZUS1RWeFZNaWZTbnI0NUFCci9DK2xxVEN6ODU4NUhNVlpH?=
+ =?utf-8?B?WlFNbjFmNzNGcGh0YmNXSmZEUEZ4NDNabmNvSStxRGVQYmpxSlhRT3JleDBC?=
+ =?utf-8?B?QTdjVzIwSktPejZiS29RSjQvOEVxd3lwVmZpQ1h5VWlES0ExRHg1TFJoMGtq?=
+ =?utf-8?B?MzQwV0xyMVBPQnAraTJOOG5IS3hreEFOcTVoNHFobkt4UjV5R01rUkNnMzBo?=
+ =?utf-8?B?Y3RnUDZINUdRRklweThlVDlVdHZib2dqa1R5K291VzdxbW5LT2w1QU1SYTg1?=
+ =?utf-8?Q?GHu+BBoxMBvLgg4qMiVW05SqW?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 232d117e-2ad6-41e8-19f8-08db601bc625
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8308.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2023 08:07:41.2873
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mnrJsOuPAJ9DYdog7bxPosW3W/qZWjGWFqLHauOBT1nRPAUL5z7hvWMbmKsQgctU
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9192
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 27, 2023 at 12:39:57PM +0800, Haibo Xu wrote:
-> On Fri, May 26, 2023 at 1:18 AM Andrew Jones <ajones@ventanamicro.com> wrote:
-> >
-> > On Thu, May 25, 2023 at 03:38:35PM +0800, Haibo Xu wrote:
-...
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.a6),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.a7),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s2),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s3),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s4),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s5),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s6),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s7),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s8),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s9),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s10),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s11),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.t3),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.t4),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.t5),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.t6),
-> >
-> > ...all the above would just be indices rather than named registers. I
-> > guess that's better for these registers.
-> >
+
+
+On 5/25/2023 1:18 AM, Alex Williamson wrote:
 > 
-> You mean to show it as KVM_REG_RISCV_CORE_REG(regs.regs[0]) ...
-> KVM_REG_RISCV_CORE_REG(regs.regs[31])?
->
+> On Wed, 24 May 2023 10:45:29 -0600
+> Alex Williamson <alex.williamson@redhat.com> wrote:
+> 
+>> On Wed, 17 May 2023 15:27:18 +0530
+>> Nipun Gupta <nipun.gupta@amd.com> wrote:
+>>
 
-I'm OK with these registers using their names in this list, it does look
-better. However the original idea for these lists was that they would be
-generated from print_reg(). In this case, print_reg() is generating them
-with their number instead of name. Either print_reg() could learn how to
-generate their names by handling the offset ranges of each register type,
-e.g.
+<snip>
 
-switch (reg_off) {
-case 10 ... 17:
-   strdup_printf("... KVM_REG_RISCV_CORE_REG(regs.a%d),", reg_off - 10);
+>>> +
+>>> +MODULE_DEVICE_TABLE(cdx, vfio_cdx_table);
+>>> +
+>>> +static struct cdx_driver vfio_cdx_driver = {
+>>> +   .probe          = vfio_cdx_probe,
+>>> +   .remove         = vfio_cdx_remove,
+>>> +   .match_id_table = vfio_cdx_table,
+>>> +   .driver = {
+>>> +           .name   = "vfio-cdx",
+>>> +           .owner  = THIS_MODULE,
+>>> +   },
+>>> +   .driver_managed_dma = true,
+> 
+> Hmm, looks like cdx bus is broken here, there's no actual
+> implementation of a dma_configure callback and no setup of the IOMMU
+> default domain for theoretical cdx drivers that might want to use the
+> DMA API.  Without that, this driver_manged_dma flag doesn't provide any
+> guarantees to a vfio driver that we have exclusive ownership of the
+> group.  Please fix, this flag needs to actually have some meaning on
+> cdx.  Thanks,
+> 
+> Alex
 
-or we can use the numbers here in this list, or we can leave it as you
-have it (i.e. done manually).
+Agree, this change was missed on CDX bus and we are working on fixing 
+this. Shall I send this fix as a commit with this patch?
 
 Thanks,
-drew
+Nipun
