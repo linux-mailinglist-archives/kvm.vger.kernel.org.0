@@ -2,73 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C793B714A87
-	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 15:44:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A758F714B31
+	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 15:57:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbjE2Nob (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 May 2023 09:44:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58658 "EHLO
+        id S230226AbjE2N5G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 May 2023 09:57:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbjE2No3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 May 2023 09:44:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0832C8E
-        for <kvm@vger.kernel.org>; Mon, 29 May 2023 06:43:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685367827;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cVoBaxeWw0cSFEAA+V8+hZkU/IQSxLca/3oeriUuVyU=;
-        b=iD0jOnM0RkI894pRXdwJ77XF9s/tgC7zZtZaq6P7KI+osPj9rxo6k/CJt6vbwC+RZ3HKJD
-        EnMCHbw7HVtc7dg4dNIYTg3M8Rzbt9R2cpIC1BnKQjI77pqXAUWPIt6B59Idy7iXorl1f5
-        RMuPKVRCOLnTYrKbTjpmTgO25RLd3Vs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-189-bxakOVjRNle_wvarOS6W1A-1; Mon, 29 May 2023 09:43:45 -0400
-X-MC-Unique: bxakOVjRNle_wvarOS6W1A-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-3f60fb7b31fso12333195e9.2
-        for <kvm@vger.kernel.org>; Mon, 29 May 2023 06:43:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685367824; x=1687959824;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cVoBaxeWw0cSFEAA+V8+hZkU/IQSxLca/3oeriUuVyU=;
-        b=N+I5/nVl7LHvvS7EXZab3teKnG12lxtF2Lz1MtHMwCNK5v5cgKr00oRFaj0RAPC0aC
-         WAcBkJ3ZJkUODWzC/GbLa8DNnhOf6b2XgPhc7Tu60fHPtxMPF2VB/gS63hJnjTLpOc9I
-         haEhUI1VFLFRMol/l19cl52lxZqw51GWcrmXltB9nlIRy8X5SePdVxMaAYZHxH++5VB6
-         uckuf9VlMnL5GkhNWvRVucX8KZoYX005YLcHQS3HIVWuI56YSBmNY+3PYxzTWiivovTa
-         Bnl+fKOBKcxTgT/DzFCVzU+jTw51Bz5CXq7+pKzxpQHtPR0sc+QOiXojharykAEPxqhk
-         EgKg==
-X-Gm-Message-State: AC+VfDzRWkbKo3xeJS+D1/tkoKgCelFHXWLQn+Gew7ymEYJ3dANg04Fl
-        erLYH/f1ZOHqsuBH/Pp/iaDkMOy6QoLWwQ0jBLD8V/vV5Uu+05mx6aRuEkLtvzo47rNGMxdvZ6m
-        FQRstntgAe4KRZ4YzV2Dl
-X-Received: by 2002:a05:600c:249:b0:3f6:8af:414 with SMTP id 9-20020a05600c024900b003f608af0414mr10368932wmj.30.1685367824316;
-        Mon, 29 May 2023 06:43:44 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7nPK6PHZe+BvdnFXg9GCe6fFlQqcQlngZ/w0VCsiF/+TTjh5jsSKQA6qVTkAiG5WNZ1mWG3Q==
-X-Received: by 2002:a05:600c:249:b0:3f6:8af:414 with SMTP id 9-20020a05600c024900b003f608af0414mr10368922wmj.30.1685367823998;
-        Mon, 29 May 2023 06:43:43 -0700 (PDT)
-Received: from starship ([89.237.102.231])
-        by smtp.gmail.com with ESMTPSA id f8-20020a1c6a08000000b003f41bb52834sm18083455wmc.38.2023.05.29.06.43.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 May 2023 06:43:43 -0700 (PDT)
-Message-ID: <357d135f9ed65f4e2970c82ae4e855547db70ad1.camel@redhat.com>
-Subject: Re: [Bug] AMD nested: commit broke VMware
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     jwarren@tutanota.com, Kvm <kvm@vger.kernel.org>
-Date:   Mon, 29 May 2023 16:43:41 +0300
-In-Reply-To: <NWb_YOE--3-9@tutanota.com>
-References: <NWb_YOE--3-9@tutanota.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        with ESMTP id S230174AbjE2N4k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 May 2023 09:56:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D6E61A7;
+        Mon, 29 May 2023 06:56:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7B3CF61662;
+        Mon, 29 May 2023 13:54:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3791C433EF;
+        Mon, 29 May 2023 13:54:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685368455;
+        bh=Cg5hiRPG0S2RXe+2ZuA41pCEb3KIBadXoQONSDthYSs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=iWRqAAd6Ke8BonlZa0ifJdbzDILGaYLBYri1qMfWuJ0PZeeJRF726lTYwqZiOHeAr
+         f8AcdZWCP2Aqgay55nkpuTKbUnRvizhD4vqgp6JGvuvsI+RVWyCQ6XD25zcyzGD1Xz
+         Rhp1bbN6V5onj/boWsFspbb8MzegAklK9yDN7iACywb1QOEPRDm92GJZhwgOBrFwRS
+         VXG+AxVDGm9hY+36uLb6P+Z/lvnZgy1X9D8xRRq+WtZryOoSA8SBEd+KPVFR+acVHI
+         ys4dCPzlDDNO9fLfUxoftiINM4gNbYZ8Cu+WMoLXh55CL13JxCCjyMogy4ia9Yn2pI
+         mfb0jt6LufSaA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q3dK9-0014za-PO;
+        Mon, 29 May 2023 14:54:13 +0100
+Date:   Mon, 29 May 2023 14:54:13 +0100
+Message-ID: <87wn0rjla2.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 2/6] KVM: arm64: Implement  __kvm_tlb_flush_vmid_range()
+In-Reply-To: <20230519005231.3027912-3-rananta@google.com>
+References: <20230519005231.3027912-1-rananta@google.com>
+        <20230519005231.3027912-3-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, ricarkol@google.com, pbonzini@redhat.com, jingzhangos@google.com, coltonlewis@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,39 +73,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-У пн, 2023-05-29 у 14:58 +0200, jwarren@tutanota.com пише:
-> Hello,
-> Since kernel 5.16 users can't start VMware VMs when it is nested under KVM on AMD CPUs.
+On Fri, 19 May 2023 01:52:27 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> User reports are here:
-> https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2008583
-> https://forums.unraid.net/topic/128868-vmware-7x-will-not-start-any-vms-under-unraid-6110/
+> Define  __kvm_tlb_flush_vmid_range() (for VHE and nVHE)
+> to flush a range of stage-2 page-tables using IPA in one go.
+> If the system supports FEAT_TLBIRANGE, the following patches
+> would conviniently replace global TLBI such as vmalls12e1is
+> in the map, unmap, and dirty-logging paths with ripas2e1is
+> instead.
 > 
-> I've pinpointed it to commit 174a921b6975ef959dd82ee9e8844067a62e3ec1 (appeared in 5.16rc1)
-> "nSVM: Check for reserved encodings of TLB_CONTROL in nested VMCB"
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h   |  3 +++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 11 +++++++++
+>  arch/arm64/kvm/hyp/nvhe/tlb.c      | 39 ++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/vhe/tlb.c       | 35 +++++++++++++++++++++++++++
+>  4 files changed, 88 insertions(+)
 > 
-> I've confirmed that VMware errors out when it checks for TLB_CONTROL_FLUSH_ASID support and gets a 'false' answer.
-> 
-> First revisions of the patch in question had some support for TLB_CONTROL_FLUSH_ASID, but it was removed:
-> https://lore.kernel.org/kvm/f7c2d5f5-3560-8666-90be-3605220cb93c@redhat.com/
-> 
-> I don't know what would be the best case here, maybe put a quirk there, so it doesn't break "userspace".
-> Committer's email is dead, so I'm writing here.
-> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 43c3bc0f9544d..33352d9399e32 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -79,6 +79,7 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
+> +	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_range,
 
-I have to say that I know about this for long time, because some time ago I used  to play with VMware player in a 
-VM on AMD on my spare time, on weekends 
-(just doing various crazy things with double nesting, running win98 nested, vfio stuff, etc, etc).
+nit: please keep this close to the other TLB operations.
 
-I didn't report it because its a bug in VMWARE - they set a bit in the tlb_control without checking CPUID's FLUSHBYASID
-which states that KVM doesn't support setting this bit.
+>  };
+>  
+>  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+> @@ -225,6 +226,8 @@ extern void __kvm_flush_vm_context(void);
+>  extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
+>  extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
+>  				     int level);
+> +extern void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> +					phys_addr_t start, phys_addr_t end);
+>  extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
+>  
+>  extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 728e01d4536b0..81d30737dc7c9 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -125,6 +125,16 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
+>  	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
+>  }
+>  
+> +static void
+> +handle___kvm_tlb_flush_vmid_range(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+> +	DECLARE_REG(phys_addr_t, start, host_ctxt, 2);
+> +	DECLARE_REG(phys_addr_t, end, host_ctxt, 3);
+> +
+> +	__kvm_tlb_flush_vmid_range(kern_hyp_va(mmu), start, end);
+> +}
+> +
+>  static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+>  {
+>  	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+> @@ -315,6 +325,7 @@ static const hcall_t host_hcall[] = {
+>  	HANDLE_FUNC(__kvm_vcpu_run),
+>  	HANDLE_FUNC(__kvm_flush_vm_context),
+>  	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
+> +	HANDLE_FUNC(__kvm_tlb_flush_vmid_range),
+>  	HANDLE_FUNC(__kvm_tlb_flush_vmid),
+>  	HANDLE_FUNC(__kvm_flush_cpu_context),
+>  	HANDLE_FUNC(__kvm_timer_set_cntvoff),
+> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> index 978179133f4b9..d4ea549c4b5c4 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> @@ -130,6 +130,45 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
+>  	__tlb_switch_to_host(&cxt);
+>  }
+>  
+> +void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> +				phys_addr_t start, phys_addr_t end)
+> +{
+> +	struct tlb_inv_context cxt;
+> +	unsigned long pages, stride;
+> +
+> +	/*
+> +	 * Since the range of addresses may not be mapped at
+> +	 * the same level, assume the worst case as PAGE_SIZE
+> +	 */
+> +	stride = PAGE_SIZE;
+> +	start = round_down(start, stride);
+> +	end = round_up(end, stride);
+> +	pages = (end - start) >> PAGE_SHIFT;
+> +
+> +	if (!system_supports_tlb_range() || pages >= MAX_TLBI_RANGE_PAGES) {
+> +		__kvm_tlb_flush_vmid(mmu);
+> +		return;
 
-Supporting FLUSHBYASID would fix this, and make nesting faster too, 
-but it is far from a trivial job. 
+Why do we give up on "pages >= MAX_TLBI_RANGE_PAGES"? I see no
+rationale for it in the patch. My understanding is that this is the
+maximum representable as a range, in which case this is a programming
+error.
 
-I hope that I will find time to do this soon.
+Or are you *on purpose* making the two equivalent?
 
-Best regards,
-	Maxim Levitsky
+Thanks,
 
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
