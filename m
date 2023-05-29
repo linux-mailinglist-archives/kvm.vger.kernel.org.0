@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 376BB7142EC
-	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 06:26:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E34E7142EE
+	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 06:26:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231828AbjE2E02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 May 2023 00:26:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44068 "EHLO
+        id S231833AbjE2E0e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 May 2023 00:26:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231886AbjE2EZt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 May 2023 00:25:49 -0400
+        with ESMTP id S231905AbjE2EZx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 May 2023 00:25:53 -0400
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70AF1B4;
-        Sun, 28 May 2023 21:23:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B11AE1BE;
+        Sun, 28 May 2023 21:23:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685334209; x=1716870209;
+  t=1685334215; x=1716870215;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=pBXKqlxosCwO8aiKPZVYI09JnTZPIkxCJwhQQGT+T1U=;
-  b=lo3DNQUpLy5z6idOjvcLNIS7DE7AT5YJCNkunBn9y9AgXJZOIuJ6eicz
-   EQsURb/alAFA0saryr6Ad/rrOOnHPYf2O/FJYo1CPydC+MTFw2zTq5opT
-   x9bqA9GjPmP0xi2CJWhRibzZ2EiUYLOBSsDG0p/dmG7xoa2flEKW3AGw7
-   6H6WjdwqL5KkNf7jmdY6OSU67K7y0sv5Lr3jP+aFZOTepex4rECnqeAtB
-   VKkmzMRi/EHT2LMz5vrUFDPYvFSFZf2gh/X5ZnqEcpsvFLoDECUe53gJO
-   MLn4mnIexTCT3pk4Gjg7lYHu1rp/6ZLSbSBe+mW+gJ2rZXRFbDgsb47Ep
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="334966009"
+  bh=bWa3AvpEC6jbEznd1Ji20ghakwuyyQ9ZcKDMuaV5Dds=;
+  b=com+pTqhJC9g/GIsg21tna50WCxUWwYXGpgUj/zhfK+ea6YyFQPQCW2T
+   YNWBSLRvjk23ZHzDsohmcHSN6SFyEmU2FufLtD9B1Hthwpr9zhzzZky9u
+   kqLvhJ3a8kDveFlDKbfoh+CnZ/2q/dCYMcnUcSBH1VeBcTEs43f9AuAeb
+   noI3+/21b+QbmEgHwZdKmt5O13kXr9mkybsK2VydkNXEzpye1lp/vFoJB
+   gTJgIp0gxPmPmIaMvNoD3hIMPSY+xRdvO52CmUjFOsqUH3gEr2skYn4gz
+   tz7hgG359gEMHC/UatcTfcCvDqE1PGLrW25slwFxS6W8i8zay80cQaJeX
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="334966015"
 X-IronPort-AV: E=Sophos;i="6.00,200,1681196400"; 
-   d="scan'208";a="334966009"
+   d="scan'208";a="334966015"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
   by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 21:21:17 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="775784330"
+X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="775784334"
 X-IronPort-AV: E=Sophos;i="6.00,200,1681196400"; 
-   d="scan'208";a="775784330"
+   d="scan'208";a="775784334"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 21:21:17 -0700
 From:   isaku.yamahata@intel.com
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v14 049/113] KVM: VMX: Split out guts of EPT violation to common/exposed function
-Date:   Sun, 28 May 2023 21:19:31 -0700
-Message-Id: <bbfd8570e2e0a416e1cb72dd58fff0396aac964b.1685333727.git.isaku.yamahata@intel.com>
+Subject: [PATCH v14 050/113] KVM: VMX: Move setting of EPT MMU masks to common VT-x code
+Date:   Sun, 28 May 2023 21:19:32 -0700
+Message-Id: <ecd6af0b055e1cd1baaece131edc14c70c601324.1685333728.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1685333727.git.isaku.yamahata@intel.com>
 References: <cover.1685333727.git.isaku.yamahata@intel.com>
@@ -68,118 +68,59 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-The difference of TDX EPT violation is how to retrieve information, GPA,
-and exit qualification.  To share the code to handle EPT violation, split
-out the guts of EPT violation handler so that VMX/TDX exit handler can call
-it after retrieving GPA and exit qualification.
+EPT MMU masks are used commonly for VMX and TDX.  The value needs to be
+initialized in common code before both VMX/TDX-specific initialization
+code.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/kvm/vmx/common.h | 33 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c    | 25 +++----------------------
- 2 files changed, 36 insertions(+), 22 deletions(-)
- create mode 100644 arch/x86/kvm/vmx/common.h
+ arch/x86/kvm/vmx/main.c | 9 +++++++++
+ arch/x86/kvm/vmx/vmx.c  | 4 ----
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
-new file mode 100644
-index 000000000000..235908f3e044
---- /dev/null
-+++ b/arch/x86/kvm/vmx/common.h
-@@ -0,0 +1,33 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef __KVM_X86_VMX_COMMON_H
-+#define __KVM_X86_VMX_COMMON_H
-+
-+#include <linux/kvm_host.h>
-+
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index a04d575ec50e..87003343627b 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -4,6 +4,7 @@
+ #include "x86_ops.h"
+ #include "vmx.h"
+ #include "nested.h"
 +#include "mmu.h"
+ #include "pmu.h"
+ #include "tdx.h"
+ #include "tdx_arch.h"
+@@ -50,6 +51,14 @@ static __init int vt_hardware_setup(void)
+ 	if (ret)
+ 		return ret;
+ 
++	/*
++	 * As kvm_mmu_set_ept_masks() updates enable_mmio_caching, call it
++	 * before checking enable_mmio_caching.
++	 */
++	if (enable_ept)
++		kvm_mmu_set_ept_masks(enable_ept_ad_bits,
++				      cpu_has_vmx_ept_execute_only());
 +
-+static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
-+					     unsigned long exit_qualification)
-+{
-+	u64 error_code;
-+
-+	/* Is it a read fault? */
-+	error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
-+		     ? PFERR_USER_MASK : 0;
-+	/* Is it a write fault? */
-+	error_code |= (exit_qualification & EPT_VIOLATION_ACC_WRITE)
-+		      ? PFERR_WRITE_MASK : 0;
-+	/* Is it a fetch fault? */
-+	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
-+		      ? PFERR_FETCH_MASK : 0;
-+	/* ept page table entry is present? */
-+	error_code |= (exit_qualification & EPT_VIOLATION_RWX_MASK)
-+		      ? PFERR_PRESENT_MASK : 0;
-+
-+	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
-+	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
-+
-+	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
-+}
-+
-+#endif /* __KVM_X86_VMX_COMMON_H */
+ 	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
+ 
+ 	return 0;
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index eef2d3f708ca..a4ef08dfb5e8 100644
+index a4ef08dfb5e8..e1d7c6d01e83 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -51,6 +51,7 @@
- #include <asm/vmx.h>
+@@ -8331,10 +8331,6 @@ __init int vmx_hardware_setup(void)
  
- #include "capabilities.h"
-+#include "common.h"
- #include "cpuid.h"
- #include "hyperv.h"
- #include "kvm_onhyperv.h"
-@@ -5749,11 +5750,8 @@ static int handle_task_switch(struct kvm_vcpu *vcpu)
+ 	set_bit(0, vmx_vpid_bitmap); /* 0 is reserved for host */
  
- static int handle_ept_violation(struct kvm_vcpu *vcpu)
- {
--	unsigned long exit_qualification;
-+	unsigned long exit_qualification = vmx_get_exit_qual(vcpu);
- 	gpa_t gpa;
--	u64 error_code;
+-	if (enable_ept)
+-		kvm_mmu_set_ept_masks(enable_ept_ad_bits,
+-				      cpu_has_vmx_ept_execute_only());
 -
--	exit_qualification = vmx_get_exit_qual(vcpu);
- 
  	/*
- 	 * EPT violation happened while executing iret from NMI,
-@@ -5768,23 +5766,6 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
- 
- 	gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
- 	trace_kvm_page_fault(vcpu, gpa, exit_qualification);
--
--	/* Is it a read fault? */
--	error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
--		     ? PFERR_USER_MASK : 0;
--	/* Is it a write fault? */
--	error_code |= (exit_qualification & EPT_VIOLATION_ACC_WRITE)
--		      ? PFERR_WRITE_MASK : 0;
--	/* Is it a fetch fault? */
--	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
--		      ? PFERR_FETCH_MASK : 0;
--	/* ept page table entry is present? */
--	error_code |= (exit_qualification & EPT_VIOLATION_RWX_MASK)
--		      ? PFERR_PRESENT_MASK : 0;
--
--	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
--	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
--
- 	vcpu->arch.exit_qualification = exit_qualification;
- 
- 	/*
-@@ -5798,7 +5779,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
- 	if (unlikely(allow_smaller_maxphyaddr && kvm_vcpu_is_illegal_gpa(vcpu, gpa)))
- 		return kvm_emulate_instruction(vcpu, 0);
- 
--	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
-+	return __vmx_handle_ept_violation(vcpu, gpa, exit_qualification);
- }
- 
- static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
+ 	 * Setup shadow_me_value/shadow_me_mask to include MKTME KeyID
+ 	 * bits to shadow_zero_check.
 -- 
 2.25.1
 
