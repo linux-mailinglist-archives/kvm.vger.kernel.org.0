@@ -2,175 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C6C9714C7D
-	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 16:52:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25360714DC7
+	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 18:03:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229656AbjE2OwC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 May 2023 10:52:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46382 "EHLO
+        id S229557AbjE2QDs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 May 2023 12:03:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjE2OwB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 May 2023 10:52:01 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED04AD;
-        Mon, 29 May 2023 07:51:59 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-64d41d8bc63so2693947b3a.0;
-        Mon, 29 May 2023 07:51:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685371919; x=1687963919;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dGKdelMf9dMhN4W4Pp2tFWvZsGNtCJT4OnZHjwgV2UM=;
-        b=nEqOTdCt/GAM48PVZyVfrB++hpWYM9PJWjjupvNMbVhAm/qQZnh0ZQLNQkGyN7kCP7
-         j3XeRPEJrsJZFi08RQ1WWJiHtuKolsf/qGXf89+k5lCtAvVFXSqWfRPZ0EvZMgYIgQJ3
-         KkokZNhDVVfOPzzgwefrn7jjFVzxJKfBFyohTkUd+eWo1+I7K8yBagRmZO/VZiA6HF0N
-         rp3DVswo6/4Pc+IpqdiGL3MXAUr9HSNdKXWGRwF33ULF/Y3m4yhulfd+N5aTWAm4hPiv
-         c2EEfWd3J4VCpnsmVCo0u5KwM5YCEwZ6w7lav8592jgtkJzrk6wc8KYr4zvLUhBDhNKw
-         YgYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685371919; x=1687963919;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dGKdelMf9dMhN4W4Pp2tFWvZsGNtCJT4OnZHjwgV2UM=;
-        b=EoD5D7h/ZsxTOWGBOLKH4t0rPgwxYfV6H9ODGOQv/RLTiK3fdg8rEO6RDThuyZGDOi
-         P459r4z7vQReSB5H6Nt7FZN+c+0CVRHibxPW+Xm7V1Pu5ln+sL3y6MnUDNvnCHaGiyAy
-         HQoC/dT8zM4fk9sPURgFhHQM9wJSRhz7OiloHVBjNlTVeAQzzaFUQBmdn76ak5/Sl5/m
-         NhIEnVfyhiTdiExnaC2zzamwwMhUuwqOcPPo7ShUC+vUKbKyoloZs97YmZ+ELqn0zy9X
-         BBPfQymxedd990EukWdxQRjtQI6UfKyMKDf+mvI5L2E3AwfWwCOUFxUP1w35Ihs6pPFB
-         tYeg==
-X-Gm-Message-State: AC+VfDzoSgZFgkX4hqiYWdDoSYny2EdFLPiPNAQ7T5SxVe14qZBAx1by
-        moAxHXjxBOeHRrzRwGbaGrzIAewL9VlxfLJz1/s=
-X-Google-Smtp-Source: ACHHUZ63epL3L7h5fEsa33wfT1JCbUApQdVNyF5SSRse/iE5yubxKNfZts+dgYxIH9XOqK7274epPw==
-X-Received: by 2002:a05:6a20:9151:b0:110:b0ab:879d with SMTP id x17-20020a056a20915100b00110b0ab879dmr7006226pzc.26.1685371918955;
-        Mon, 29 May 2023 07:51:58 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id n12-20020aa78a4c000000b0064fdf576421sm39875pfa.142.2023.05.29.07.51.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 May 2023 07:51:58 -0700 (PDT)
-Message-ID: <ec42501c-2e66-5248-5b97-4827344418f3@gmail.com>
-Date:   Mon, 29 May 2023 22:51:51 +0800
+        with ESMTP id S229531AbjE2QDp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 May 2023 12:03:45 -0400
+Received: from smtp-bc0f.mail.infomaniak.ch (smtp-bc0f.mail.infomaniak.ch [IPv6:2001:1600:3:17::bc0f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A63AFE
+        for <kvm@vger.kernel.org>; Mon, 29 May 2023 09:03:37 -0700 (PDT)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4QVL131MNPzMqYfG;
+        Mon, 29 May 2023 18:03:35 +0200 (CEST)
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4QVL0w4znNz3vb2;
+        Mon, 29 May 2023 18:03:28 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+        s=20191114; t=1685376215;
+        bh=n6vDyeLcnXuJ2e1Kx1oy6dfLDQBfFmEzNL/ERVZDqQU=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=kQUNssi6VBi8KE2R5ANm9fpqaLV9V+BO/pl/pZOb+r07FAQvClXzKkx8C9t2Hytji
+         /4n7ba89FjY/Zfl8t2rhFg1o9pE4iawj/J1DIhc82vGXeZvlW/Z9zID2JwoJwYww3/
+         p8LCe3PI5P3tfO/+Mau3UxTlSDY6CLpnXs/pesiA=
+Message-ID: <90ca1173-4ec1-099f-5744-3d6dc29d919d@digikod.net>
+Date:   Mon, 29 May 2023 18:03:28 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.11.0
-Subject: Re: [PATCH 5/5] KVM: x86/pmu: Hide guest counter updates from the
- VMRUN instruction
+User-Agent: 
+Subject: Re: [PATCH v1 3/9] virt: Implement Heki common code
 Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Sandipan Das <sandipan.das@amd.com>,
+To:     "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Ravi Bangoria <ravi.bangoria@amd.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Alexander Graf <graf@amazon.com>,
+        Forrest Yuan Yu <yuanyu@google.com>,
+        James Morris <jamorris@linux.microsoft.com>,
+        John Andersen <john.s.andersen@intel.com>,
+        Marian Rotariu <marian.c.rotariu@gmail.com>,
+        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>,
+        =?UTF-8?B?TmljdciZb3IgQ8OuyJt1?= <nicu.citu@icloud.com>,
+        Rick Edgecombe <rick.p.edgecombe@intel.com>,
+        Thara Gopinath <tgopinath@microsoft.com>,
+        Will Deacon <will@kernel.org>,
+        Zahra Tarkhani <ztarkhani@microsoft.com>,
+        =?UTF-8?Q?=c8=98tefan_=c8=98icleru?= <ssicleru@bitdefender.com>,
+        dev@lists.cloudhypervisor.org, kvm@vger.kernel.org,
+        linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
         linux-kernel@vger.kernel.org,
-        Santosh Shukla <santosh.shukla@amd.com>,
-        "Tom Lendacky (AMD)" <thomas.lendacky@amd.com>,
-        Ananth Narayan <ananth.narayan@amd.com>
-References: <20230310105346.12302-1-likexu@tencent.com>
- <20230310105346.12302-6-likexu@tencent.com> <ZC99f+AO1tZguu1I@google.com>
- <509b697f-4e60-94e5-f785-95f7f0a14006@gmail.com>
- <ZDAvDhV/bpPyt3oX@google.com>
- <34b5dd08-edac-e32f-1884-c8f2b85f7971@gmail.com>
- <59ef9af0-9528-e220-625a-ff16e6971f23@amd.com> <ZG52cgmjgaqY8jvq@google.com>
- <CALMp9eR_xYapRm=zJ3OdAzBVFjpzeQWYv9nTs1ZstAsugEwWRQ@mail.gmail.com>
- <ZG6BrSXDnOdDvUZh@google.com>
- <CALMp9eQrDX6=gJzybegjzDJ665NCuWmESt-sZrKHcncnuENdpA@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <CALMp9eQrDX6=gJzybegjzDJ665NCuWmESt-sZrKHcncnuENdpA@mail.gmail.com>
+        linux-security-module@vger.kernel.org, qemu-devel@nongnu.org,
+        virtualization@lists.linux-foundation.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org
+References: <20230505152046.6575-1-mic@digikod.net>
+ <20230505152046.6575-4-mic@digikod.net>
+ <ZFkxhWhjyIzrPkt8@liuwe-devbox-debian-v2>
+ <e8fcc1b8-6c0f-9556-a110-bd994d3fe3c6@linux.microsoft.com>
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+In-Reply-To: <e8fcc1b8-6c0f-9556-a110-bd994d3fe3c6@linux.microsoft.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Infomaniak-Routing: alpha
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/5/2023 5:32 am, Jim Mattson wrote:
-> On Wed, May 24, 2023 at 2:29 PM Sean Christopherson <seanjc@google.com> wrote:
->>
->> On Wed, May 24, 2023, Jim Mattson wrote:
->>> On Wed, May 24, 2023 at 1:41 PM Sean Christopherson <seanjc@google.com> wrote:
->>>>
->>>> On Wed, Apr 26, 2023, Sandipan Das wrote:
->>>>> Hi Sean, Like,
->>>>>
->>>>> On 4/19/2023 7:11 PM, Like Xu wrote:
->>>>>>> Heh, it's very much explicable, it's just not desirable, and you and I would argue
->>>>>>> that it's also incorrect.
->>>>>>
->>>>>> This is completely inaccurate from the end guest pmu user's perspective.
->>>>>>
->>>>>> I have a toy that looks like virtio-pmu, through which guest users can get hypervisor performance data.
->>>>>> But the side effect of letting the guest see the VMRUN instruction by default is unacceptable, isn't it ?
->>>>>>
->>>>>>>
->>>>>>> AMD folks, are there plans to document this as an erratum?ï¿½ I agree with Like that
->>>>>>> counting VMRUN as a taken branch in guest context is a CPU bug, even if the behavior
->>>>>>> is known/expected.
->>>>>>
->>>>>
->>>>> This behaviour is architectural and an erratum will not be issued. However, for clarity, a future
->>>>> release of the APM will include additional details like the following:
->>>>>
->>>>>    1) From the perspective of performance monitoring counters, VMRUNs are considered as far control
->>>>>       transfers and VMEXITs as exceptions.
->>>>>
->>>>>    2) When the performance monitoring counters are set up to count events only in certain modes
->>>>>       through the "OsUserMode" and "HostGuestOnly" bits, instructions and events that change the
->>>>>       mode are counted in the target mode. For example, a SYSCALL from CPL 3 to CPL 0 with a
->>>>>       counter set to count retired instructions with USR=1 and OS=0 will not cause an increment of
->>>>>       the counter. However, the SYSRET back from CPL 0 to CPL 3 will cause an increment of the
->>>>>       counter and the total count will end up correct. Similarly, when counting PMCx0C6 (retired
->>>>>       far control transfers, including exceptions and interrupts) with Guest=1 and Host=0, a VMRUN
->>>>>       instruction will cause an increment of the counter. However, the subsequent VMEXIT that occurs,
->>>>>       since the target is in the host, will not cause an increment of the counter and so the total
->>>>>       count will end up correct.
->>>>
->>>> The count from the guest's perspective does not "end up correct".  Unlike SYSCALL,
->>>> where _userspace_ deliberately and synchronously executes a branch instruction,
->>>> VMEXIT and VMRUN are supposed to be transparent to the guest and can be completely
->>>> asynchronous with respect to guest code execution, e.g. if the host is spamming
->>>> IRQs, the guest will see a potentially large number of bogus (from it's perspective)
->>>> branches retired.
->>>
->>> The reverse problem occurs when a PMC is configured to count "CPUID
->>> instructions retired." Since KVM intercepts CPUID and emulates it, the
->>> PMC will always read 0, even if the guest executes a tight loop of
->>> CPUID instructions.
 
-Unlikely. KVM will count any emulated instructions based on kvm_pmu_incr_counter().
-Did I miss some conditions ?
-
->>>
->>> The PMU is not virtualizable on AMD CPUs without significant
->>> hypervisor corrections. I have to wonder if it's really worth the
->>> effort.
-
-I used to think so, until I saw the AMD64_EVENTSEL_GUESTONLY bit.
-Hardware architects are expected to put more effort into this area.
-
->>
->> Per our offlist chat, my understanding is that there are caveats with vPMUs that
->> it's simply not feasible for a hypervisor to handle.  I.e. virtualizing any x86
->> PMU with 100% accuracy isn't happening anytime soon.
-
-Indeed, and any more detailed complaints ?
-
->>
->> The way forward is likely to evaluate each caveat on a case-by-case basis to
->> determine whether or not the cost of the fixup in KVM is worth the benefit to
->> the guest.  E.g. emulating "CPUID instructions retired" seems like it would be
->> fairly straightforward.  AFAICT, fixing up the VMRUN stuff is quite difficult though.
+On 17/05/2023 14:47, Madhavan T. Venkataraman wrote:
+> Sorry for the delay. See inline...
 > 
-> Yeah. The problem with fixing up "CPUID instructions retired" is
-> tracking what the event encoding is for every F/M/S out there. It's
-> not worth it.
+> On 5/8/23 12:29, Wei Liu wrote:
+>> On Fri, May 05, 2023 at 05:20:40PM +0200, Mickaël Salaün wrote:
+>>> From: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
+>>>
+>>> Hypervisor Enforced Kernel Integrity (Heki) is a feature that will use
+>>> the hypervisor to enhance guest virtual machine security.
+>>>
+>>> Configuration
+>>> =============
+>>>
+>>> Define the config variables for the feature. This feature depends on
+>>> support from the architecture as well as the hypervisor.
+>>>
+>>> Enabling HEKI
+>>> =============
+>>>
+>>> Define a kernel command line parameter "heki" to turn the feature on or
+>>> off. By default, Heki is on.
+>>
+>> For such a newfangled feature can we have it off by default? Especially
+>> when there are unsolved issues around dynamically loaded code.
+>>
+> 
+> Yes. We can certainly do that.
 
-I don't think it's feasible to emulate 100% accuracy on Intel. For guest pmu
-users, it is motivated by wanting to know how effective they are running on
-the current pCPU, and any vPMU eimulation behavior that helps this
-understanding would be valuable.
+By default the Kconfig option should definitely be off. We also need to 
+change the Kconfig option to only be set if kernel module, JIT, kprobes 
+and other dynamic text change feature are disabled at build time  (see 
+discussion with Sean).
+
+With this new Kconfig option for the static case, I think the boot 
+option should be on by default because otherwise it would not really be 
+possible to switch back to on later without taking the risk to silently 
+breaking users' machines. However, we should rename this option to 
+something like "heki_static" to be in line with the new Kconfig option.
+
+The goal of Heki is to improve and complement kernel self-protection 
+mechanisms (which don't have boot time options), and to make it 
+available to everyone, see 
+https://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project/Recommended_Settings
+In practice, it would then be kind of useless to be required to set a 
+boot option to enable Heki (rather than to disable it).
+
+
+> 
+>>>
+>> [...]
+>>> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+>>> index 3604074a878b..5cf5a7a97811 100644
+>>> --- a/arch/x86/Kconfig
+>>> +++ b/arch/x86/Kconfig
+>>> @@ -297,6 +297,7 @@ config X86
+>>>   	select FUNCTION_ALIGNMENT_4B
+>>>   	imply IMA_SECURE_AND_OR_TRUSTED_BOOT    if EFI
+>>>   	select HAVE_DYNAMIC_FTRACE_NO_PATCHABLE
+>>> +	select ARCH_SUPPORTS_HEKI		if X86_64
+>>
+>> Why is there a restriction on X86_64?
+>>
+> 
+> We want to get the PoC working and reviewed on X64 first. We have tested this only on X64 so far.
+
+X86_64 includes Intel CPUs, which can support EPT and MBEC, which are a 
+requirement for Heki. ARM might have similar features but we're focused 
+on x86 for now.
+
+As a side note, I only have access to an Intel machine, which means that 
+I cannot work on AMD support. However, I'll be pleased to implement such 
+support if I get access to a machine with a recent AMD CPU.
+
+
+> 
+>>>   
+>>>   config INSTRUCTION_DECODER
+>>>   	def_bool y
+>>> diff --git a/arch/x86/include/asm/sections.h b/arch/x86/include/asm/sections.h
+>>> index a6e8373a5170..42ef1e33b8a5 100644
+>>> --- a/arch/x86/include/asm/sections.h
+>>> +++ b/arch/x86/include/asm/sections.h
+>> [...]
+>>>   
+>>> +#ifdef CONFIG_HEKI
+>>> +
+>>> +/*
+>>> + * Gather all of the statically defined sections so heki_late_init() can
+>>> + * protect these sections in the host page table.
+>>> + *
+>>> + * The sections are defined under "SECTIONS" in vmlinux.lds.S
+>>> + * Keep this array in sync with SECTIONS.
+>>> + */
+>>
+>> This seems a bit fragile, because it requires constant attention from
+>> people who care about this functionality. Can this table be
+>> automatically generated?
+>>
+> 
+> We realize that. But I don't know of a way this can be automatically generated. Also, the permissions for
+> each section is specific to the use of that section. The developer who introduces a new section is the
+> one who will know what the permissions should be.
+> 
+> If any one has any ideas of how we can generate this table automatically or even just add a build time check
+> of some sort, please let us know.
+
+One clean solution might be to parse the vmlinux.lds.S file, extract 
+section and their permission, and fill that into an automatically 
+generated header file.
+
+Another way to do it would be to extract sections and associated 
+permissions with objdump, but that could be an issue because of longer 
+build time.
+
+A better solution would be to extract such sections and associated 
+permissions at boot time. I guess the kernel already has such helpers 
+used in early boot.
