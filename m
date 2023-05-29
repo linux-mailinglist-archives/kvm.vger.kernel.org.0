@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A758F714B31
-	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 15:57:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A0DF714B5F
+	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 16:01:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230226AbjE2N5G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 May 2023 09:57:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35762 "EHLO
+        id S230119AbjE2OBU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 May 2023 10:01:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230174AbjE2N4k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 May 2023 09:56:40 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D6E61A7;
-        Mon, 29 May 2023 06:56:17 -0700 (PDT)
+        with ESMTP id S229483AbjE2OBQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 May 2023 10:01:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 537E010D;
+        Mon, 29 May 2023 07:00:52 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7B3CF61662;
-        Mon, 29 May 2023 13:54:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3791C433EF;
-        Mon, 29 May 2023 13:54:15 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E9AB860FBB;
+        Mon, 29 May 2023 14:00:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ECFAC4339B;
+        Mon, 29 May 2023 14:00:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685368455;
-        bh=Cg5hiRPG0S2RXe+2ZuA41pCEb3KIBadXoQONSDthYSs=;
+        s=k20201202; t=1685368831;
+        bh=XTBuiKvnDD+l/iubLGvNKu/2fkBSZnZrXeAb5inRLRI=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=iWRqAAd6Ke8BonlZa0ifJdbzDILGaYLBYri1qMfWuJ0PZeeJRF726lTYwqZiOHeAr
-         f8AcdZWCP2Aqgay55nkpuTKbUnRvizhD4vqgp6JGvuvsI+RVWyCQ6XD25zcyzGD1Xz
-         Rhp1bbN6V5onj/boWsFspbb8MzegAklK9yDN7iACywb1QOEPRDm92GJZhwgOBrFwRS
-         VXG+AxVDGm9hY+36uLb6P+Z/lvnZgy1X9D8xRRq+WtZryOoSA8SBEd+KPVFR+acVHI
-         ys4dCPzlDDNO9fLfUxoftiINM4gNbYZ8Cu+WMoLXh55CL13JxCCjyMogy4ia9Yn2pI
-         mfb0jt6LufSaA==
+        b=WbYjX4Zwsf0EAitGQnaZHT6xoQMhz2CsSKVLKNYcfvdNl2loHnXayL4CryrhtohjM
+         SpaAVrn7JVYf2ozdw6dE/lwZdpjMWrowHOiuX1w+bF+WwmYjqxdkAvYIj6gkqr+MqG
+         EXfaFHunYOy1xVQlObW/54+2rM2M5CFFZRgKdgVGGtpJcePAw9aai4fITNNOC8/DJd
+         X9AQ8oxQWYxkkj3ESzIjt6snYhfMlq3d5RDq6+3KYTZIce51/nDLmV4JuxP/od+AwL
+         QSMztInsXC3XRah1c0265NbpPdovFjcrXyqiCYsoSavLX+Ld9plUsfzIrLosxu3KuU
+         Itv1sMk/Iek3g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1q3dK9-0014za-PO;
-        Mon, 29 May 2023 14:54:13 +0100
-Date:   Mon, 29 May 2023 14:54:13 +0100
-Message-ID: <87wn0rjla2.wl-maz@kernel.org>
+        id 1q3dQD-001581-2d;
+        Mon, 29 May 2023 15:00:29 +0100
+Date:   Mon, 29 May 2023 15:00:28 +0100
+Message-ID: <87v8gbjkzn.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Raghavendra Rao Ananta <rananta@google.com>
 Cc:     Oliver Upton <oliver.upton@linux.dev>,
@@ -50,10 +50,10 @@ Cc:     Oliver Upton <oliver.upton@linux.dev>,
         Colton Lewis <coltonlewis@google.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 2/6] KVM: arm64: Implement  __kvm_tlb_flush_vmid_range()
-In-Reply-To: <20230519005231.3027912-3-rananta@google.com>
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
+In-Reply-To: <20230519005231.3027912-4-rananta@google.com>
 References: <20230519005231.3027912-1-rananta@google.com>
-        <20230519005231.3027912-3-rananta@google.com>
+        <20230519005231.3027912-4-rananta@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,8 +63,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, ricarkol@google.com, pbonzini@redhat.com, jingzhangos@google.com, coltonlewis@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -73,110 +73,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 19 May 2023 01:52:27 +0100,
+On Fri, 19 May 2023 01:52:28 +0100,
 Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> Define  __kvm_tlb_flush_vmid_range() (for VHE and nVHE)
-> to flush a range of stage-2 page-tables using IPA in one go.
-> If the system supports FEAT_TLBIRANGE, the following patches
-> would conviniently replace global TLBI such as vmalls12e1is
-> in the map, unmap, and dirty-logging paths with ripas2e1is
-> instead.
+> Implement kvm_arch_flush_remote_tlbs_range() for arm64
+> to invalidate the given range in the TLB.
 > 
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > ---
->  arch/arm64/include/asm/kvm_asm.h   |  3 +++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 11 +++++++++
->  arch/arm64/kvm/hyp/nvhe/tlb.c      | 39 ++++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/vhe/tlb.c       | 35 +++++++++++++++++++++++++++
->  4 files changed, 88 insertions(+)
+>  arch/arm64/include/asm/kvm_host.h |  3 +++
+>  arch/arm64/kvm/hyp/nvhe/tlb.c     |  4 +---
+>  arch/arm64/kvm/mmu.c              | 11 +++++++++++
+>  3 files changed, 15 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 43c3bc0f9544d..33352d9399e32 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -79,6 +79,7 @@ enum __kvm_host_smccc_func {
->  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
-> +	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_range,
-
-nit: please keep this close to the other TLB operations.
-
->  };
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 81ab41b84f436..343fb530eea9c 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1081,6 +1081,9 @@ struct kvm *kvm_arch_alloc_vm(void);
+>  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+>  int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
 >  
->  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
-> @@ -225,6 +226,8 @@ extern void __kvm_flush_vm_context(void);
->  extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
->  extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
->  				     int level);
-> +extern void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-> +					phys_addr_t start, phys_addr_t end);
->  extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
->  
->  extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 728e01d4536b0..81d30737dc7c9 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -125,6 +125,16 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
->  	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
->  }
->  
-> +static void
-> +handle___kvm_tlb_flush_vmid_range(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-> +	DECLARE_REG(phys_addr_t, start, host_ctxt, 2);
-> +	DECLARE_REG(phys_addr_t, end, host_ctxt, 3);
+> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn, u64 pages);
 > +
-> +	__kvm_tlb_flush_vmid_range(kern_hyp_va(mmu), start, end);
-> +}
-> +
->  static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+>  static inline bool kvm_vm_is_protected(struct kvm *kvm)
 >  {
->  	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-> @@ -315,6 +325,7 @@ static const hcall_t host_hcall[] = {
->  	HANDLE_FUNC(__kvm_vcpu_run),
->  	HANDLE_FUNC(__kvm_flush_vm_context),
->  	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
-> +	HANDLE_FUNC(__kvm_tlb_flush_vmid_range),
->  	HANDLE_FUNC(__kvm_tlb_flush_vmid),
->  	HANDLE_FUNC(__kvm_flush_cpu_context),
->  	HANDLE_FUNC(__kvm_timer_set_cntvoff),
+>  	return false;
 > diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> index 978179133f4b9..d4ea549c4b5c4 100644
+> index d4ea549c4b5c4..d2c7c1bc6d441 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> @@ -130,6 +130,45 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
->  	__tlb_switch_to_host(&cxt);
+> @@ -150,10 +150,8 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>  		return;
+>  	}
+>  
+> -	dsb(ishst);
+> -
+>  	/* Switch to requested VMID */
+> -	__tlb_switch_to_guest(mmu, &cxt);
+> +	__tlb_switch_to_guest(mmu, &cxt, false);
+
+This hunk is in the wrong patch, isn't it?
+
+>  
+>  	__flush_tlb_range_op(ipas2e1is, start, pages, stride, 0, 0, false);
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index d0a0d3dca9316..e3673b4c10292 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -92,6 +92,17 @@ int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+>  	return 0;
 >  }
 >  
-> +void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-> +				phys_addr_t start, phys_addr_t end)
+> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn, u64 pages)
 > +{
-> +	struct tlb_inv_context cxt;
-> +	unsigned long pages, stride;
+> +	phys_addr_t start, end;
 > +
-> +	/*
-> +	 * Since the range of addresses may not be mapped at
-> +	 * the same level, assume the worst case as PAGE_SIZE
-> +	 */
-> +	stride = PAGE_SIZE;
-> +	start = round_down(start, stride);
-> +	end = round_up(end, stride);
-> +	pages = (end - start) >> PAGE_SHIFT;
+> +	start = start_gfn << PAGE_SHIFT;
+> +	end = (start_gfn + pages) << PAGE_SHIFT;
 > +
-> +	if (!system_supports_tlb_range() || pages >= MAX_TLBI_RANGE_PAGES) {
-> +		__kvm_tlb_flush_vmid(mmu);
-> +		return;
+> +	kvm_call_hyp(__kvm_tlb_flush_vmid_range, &kvm->arch.mmu, start, end);
 
-Why do we give up on "pages >= MAX_TLBI_RANGE_PAGES"? I see no
-rationale for it in the patch. My understanding is that this is the
-maximum representable as a range, in which case this is a programming
-error.
+So that's the point that I think is not right. It is the MMU code that
+should drive the invalidation method, and not the HYP code. The HYP
+code should be as dumb as possible, and the logic should be kept in
+the MMU code.
 
-Or are you *on purpose* making the two equivalent?
+So when a range invalidation is forwarded to HYP, it's a *valid* range
+invalidation. not something that can fallback to VMID-wide invalidation.
 
 Thanks,
 
