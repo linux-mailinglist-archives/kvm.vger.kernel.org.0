@@ -2,190 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3454714EAE
-	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 18:48:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60968714F00
+	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 19:45:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbjE2QsN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 May 2023 12:48:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44870 "EHLO
+        id S229570AbjE2Rpw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 May 2023 13:45:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbjE2QsM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 May 2023 12:48:12 -0400
-Received: from smtp-190d.mail.infomaniak.ch (smtp-190d.mail.infomaniak.ch [IPv6:2001:1600:3:17::190d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DAA5B5
-        for <kvm@vger.kernel.org>; Mon, 29 May 2023 09:48:10 -0700 (PDT)
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4QVM0S0h90zMqS8N;
-        Mon, 29 May 2023 18:48:08 +0200 (CEST)
-Received: from unknown by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4QVM0N4qpgzMpvXY;
-        Mon, 29 May 2023 18:48:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-        s=20191114; t=1685378887;
-        bh=L+AoM15vKXrvn30NczrqA+aX9dwRdpATxmicKsa0b54=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=NIV0lHsv0wTD7BCC4ZXt7w9oowUL9SV7UxKoOT7S1KqEP+2aSUrieQxP9LJP59+mO
-         ZNd3IkCScExVnFAtc3C902qJRT2LHk41z0nJeTFW/IpjysBJPb3bghczvpI3mYK0CS
-         5fhux6+oZzWtW4Q9BILMrxW1qJ1honAjKd3plkns=
-Message-ID: <901ff104-215c-8e81-fbae-5ecd8fa94449@digikod.net>
-Date:   Mon, 29 May 2023 18:48:03 +0200
+        with ESMTP id S229451AbjE2Rpv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 May 2023 13:45:51 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2056.outbound.protection.outlook.com [40.107.220.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 242E9AB;
+        Mon, 29 May 2023 10:45:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kyAD4335XRxFCxR4cxwNw9PtpBir077/cw9rspsigd4B9OeB0KIeTJoJN6m8B4ZqeCzxkzuG5FHCznjL5qxR/tWJrY3orGUnudXE04alAW1KgFrJ4kluqtUDMOxXWLKJFN2XXUUfP/jt6Lja8xKTiuZy1KZhKX2+h+Rp1VeoBp9UOirdGuvht2rFzGXlbZgAvFqQkfMv0uLrluDdVmD7pi6rxQR/aA3LLHZ3wxxsz08XSMYxiQ6IS3/ZrG1kit5BCifaCtXd8D1znllXBq/LKU6cZnLta9rXyG5onjge2zg3uH6zEm+nuHCSl4f4XW/t+OegBRVlQrVup5ohuASNhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mx+GRtdLGBOgJQwerBXpp7S2EQLbom6uJ80ncGy19P8=;
+ b=g8GJmkQdl2pvaU85D7Xf34Zb9yNwAFWhZAivDjvvclKaqggvs+wqWW//ekvqxEOEwdN4+RFl7M3u2nEPlVSRSPB335KbZLNfszA4nrylaBGyy6iiYMNIwPv6LgEJN7xpCAH1Achx+9fg8+VXl8LuuYH9AwERJSkBzUgo6qQXRI3kIQyzmqysitV2ox+oe+vsnPmgS/E0yTPevppDv/kno1BuvyVGY/YCkmywq5LEgJatO389KUGxJTdENluGoPsF7LQCi0JO8YpPoZg48p+gl/WRbyRTnupU7eT4uLV4rj1wH0vm3/FL9G5cQgqlz4t4KYZQYBe5gBq4k45QilvqiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mx+GRtdLGBOgJQwerBXpp7S2EQLbom6uJ80ncGy19P8=;
+ b=ecknAYaWfI2U9JuC+08rmHF/fKa9uh1OmzIL83gcPMW348VM/Kv+oywgE0PPaCIljbUScP/Im40IEVSqjFxloO63WXpmeeGMaaO3Q+bNmeenFQ3LmEXBa6K1D/4TgK0QvCTTUMqr1fvaNsmKsvERnEvSyVEqYauzA8NW2hxpHrGnXx6Ity80ry/UKxJqd62XKOrY10lXVwnRgSK3iOaSNgd158Gvfc0ofvU3esVwmvYCbIzg6cFtb/097y9S/5Sa27nH6KWG3nOzkAY6hm23VFkIOOiOKuaIcARfWpkQBUoJWBLl7L99cO+c0ydbit3vh5Seo+yWiXvpcpxRFrb2ZA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by IA0PR12MB8862.namprd12.prod.outlook.com (2603:10b6:208:48e::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.23; Mon, 29 May
+ 2023 17:45:47 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6433.017; Mon, 29 May 2023
+ 17:45:47 +0000
+Date:   Mon, 29 May 2023 14:38:26 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     ankita@nvidia.com, aniketa@nvidia.com, cjia@nvidia.com,
+        kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
+        acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
+        danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+        kevin.tian@intel.com
+Subject: Re: [PATCH v2 1/1] vfio/nvgpu: Add vfio pci variant module for grace
+ hopper
+Message-ID: <ZHTjEgXPHhTKtT4N@nvidia.com>
+References: <20230509040734.24392-1-ankita@nvidia.com>
+ <20230516150914.26ae99c3.alex.williamson@redhat.com>
+ <ZGQfszAGGKhCp20q@nvidia.com>
+ <20230525092123.2a41c1e4.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230525092123.2a41c1e4.alex.williamson@redhat.com>
+X-ClientProxiedBy: SJ0PR13CA0009.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c0::14) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: 
-Subject: Re: [PATCH v1 5/9] KVM: x86: Add new hypercall to lock control
- registers
-Content-Language: en-US
-To:     Wei Liu <wei.liu@kernel.org>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Alexander Graf <graf@amazon.com>,
-        Forrest Yuan Yu <yuanyu@google.com>,
-        James Morris <jamorris@linux.microsoft.com>,
-        John Andersen <john.s.andersen@intel.com>,
-        "Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
-        Marian Rotariu <marian.c.rotariu@gmail.com>,
-        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>,
-        =?UTF-8?B?TmljdciZb3IgQ8OuyJt1?= <nicu.citu@icloud.com>,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>,
-        Thara Gopinath <tgopinath@microsoft.com>,
-        Will Deacon <will@kernel.org>,
-        Zahra Tarkhani <ztarkhani@microsoft.com>,
-        =?UTF-8?Q?=c8=98tefan_=c8=98icleru?= <ssicleru@bitdefender.com>,
-        dev@lists.cloudhypervisor.org, kvm@vger.kernel.org,
-        linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org, qemu-devel@nongnu.org,
-        virtualization@lists.linux-foundation.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org
-References: <20230505152046.6575-1-mic@digikod.net>
- <20230505152046.6575-6-mic@digikod.net>
- <ZFlllHjntehpthma@liuwe-devbox-debian-v2>
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-In-Reply-To: <ZFlllHjntehpthma@liuwe-devbox-debian-v2>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA0PR12MB8862:EE_
+X-MS-Office365-Filtering-Correlation-Id: b71727da-8c44-44c2-beb7-08db606c8888
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bX8LxlEHSrI15ejjNA0j6faJP8Umcd4z1O0Fmpe94rgGb8zHE4olOJ4NsnamXuhbNx05kNfnF0XBr/Pa5xg7NwQ7MjMw7zznduFeoQt6nsdKrjiiyxYhWEvnCA19kYV/kFrQ55M+Khj0xUdqjeAmhJioi/cdxyG5G3/rXzPSGWBAev1TaMz0bImNqMxpKo40Uf5BXmv6/lgrS45gA67LkYiQlmXzKFKodTsBxWhqC2gdcppib+Q3aLqdahraA2RNjL1mrNwAupY8xD+Ov2TKl098UYgaVUGirRBMVQ5+TM2C/DGjz7MgtGZDdI+xXz0hRAFqg1KC1arOySP55Ij9KTnPHUTxwc3LuexP2Hwpd+mA0cl0sZQubeOPIFVbK6PV/YNBQi5wsN11/xVDNBDgECXcoqIehZ323RgzsLqaalBqDXmszfXArPUkF1Xl2Qo6rf/FoDcfKsa5UaSY0KLguRHFzimbtKItOaLjFp3UbeEU4yLxpC6VB/Uh60hZ7FfsGFRo5yUoAtk5VoWxO8Eb+tzSJSHs9hoB5yZqBYmF9LNfwEwy23GsMXHeZ8CdWX3y
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(39860400002)(136003)(376002)(346002)(396003)(451199021)(41300700001)(6486002)(86362001)(6916009)(4326008)(316002)(6666004)(66556008)(66476007)(36756003)(66946007)(5660300002)(186003)(6512007)(2616005)(6506007)(26005)(478600001)(2906002)(38100700002)(8676002)(8936002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?UUVdbWNIlZfU/TZGlsFc1zRLZKjIaZrrsrdyS7XdQ2sTN/UVm8NZKyFrK8Oz?=
+ =?us-ascii?Q?rnP+Gijuwwdr6KrcD5/Jnnz8DZdZvexSlqZRjd50LbIKfgbV4qa69GKfAaSq?=
+ =?us-ascii?Q?YM6ebv+SYLKlRzhX3GGKcoESdzsH194eF7XLycRqSbLvPrVsa6gzmLzZuc6r?=
+ =?us-ascii?Q?ceKK9bn3YEnDdUH44PSiVEv8RjJPbYOiHv9c951iOK7ELkM6Vur2yhxUHyr4?=
+ =?us-ascii?Q?avB9Jv5zF0c3K5JN9MaAQyU2yoq9JzEaFGH6TeINsTA7+qZ8iPXJWNmMjJft?=
+ =?us-ascii?Q?QGfH2fTNsr3DvMy294Ft1vvGIqZHf1aWuDzNR7g/7oVF/7QqzBfwIlOAvSky?=
+ =?us-ascii?Q?HB9Ghic2u9riz3ZwtvDV04syywJahAOhU7cbSjj5xi0lwCNq1I2VexJkcx4+?=
+ =?us-ascii?Q?djddiqzXCp4RJTOf3FU9olHoOB79xpLRIaSt6Q6b7eD4Uwns29yRZ95CUaqv?=
+ =?us-ascii?Q?yLcHizAwypzgCu9iVK6WNXLaNubbm3P9KKT2/3WB8b26Uxs/B+FjQXZb2pB0?=
+ =?us-ascii?Q?NflQJYrt7WWkX1pn64TKV68rXVifhPt/rgFgb+iGd92ANdulmfrh05FUqYxi?=
+ =?us-ascii?Q?0DBWnbt8QHW2I4bT+ZevO7RAT2h06PYtujjKP3LUisqhTOaYFVK0TomlOGk4?=
+ =?us-ascii?Q?QXr12sKuwM0rylDw/6ptiFk4Izh0m7Jrpgo3vRTiGoxaP66kTvCMtBlHieaw?=
+ =?us-ascii?Q?aePf+PHbVDxcEpJcYWEe9JJB4Cap5D4sW4t9ug7kJPfpNa9SvTdwFCPzPHs5?=
+ =?us-ascii?Q?+7/83aZtN0g7E6Uy9p02VboyW0leBsR7OVajmKT8J425+sSDpN4v7qc/Bf0t?=
+ =?us-ascii?Q?pd0LmYpRgcnTvMEJPHthr1+YcIxxJOFsWrcS5sPt6tKgBhpi7mooW8uUztJR?=
+ =?us-ascii?Q?L2YSDLj+aJzidgCwig40O+LOqub8k2XjShWpCCj9SV7sNztoe1Rm9NL1GKuc?=
+ =?us-ascii?Q?z5btSusm5/VV1lNNkRd/KY0l0McoEqsjOU03e3mXcNuZ7Oy4uXOHmEYp9mVn?=
+ =?us-ascii?Q?/4HgsRLXYIY7aDiIgVt3rXLyd/CKvt+o+0xDGeW2FFL8q0PL96HneIhlJu0B?=
+ =?us-ascii?Q?aAXXayUS1Xmr3MFw0vYPWqIzo68Xo09mVd05EKjvAbMSt81tLbsr8t+7o2dV?=
+ =?us-ascii?Q?VtG8ODQSGPhtBBPzKnZoXKFl0aCItsS5i8kPsmnUR9d64Gu2oHoq3/M7sH7N?=
+ =?us-ascii?Q?VmrOzYMlsLUDcpkngBJSi6YFHlO/4U5XB3EBDeJUFEtGDbIEHzmJhjgCb8pN?=
+ =?us-ascii?Q?d8C2uxTazmspeyDsmLXnJXG5wzCqKtVdOes4PH0wPWLgYvZmwAeFI1BkwLNi?=
+ =?us-ascii?Q?gDw/vMBgJ3jjvh1R5e9/g4E1wBtDtnJXUppMZqXYnZpM9vg/XBNoAQkpKvFq?=
+ =?us-ascii?Q?Ad1/bI+Nj1VPpzuIc58TF3Z1bJ3zlD8AEGLE5f1ppgptLcyxoZhd+5aRQLIc?=
+ =?us-ascii?Q?RupVUTG2P7jmpo14Qjy8mKSGvdNEWCtTjEf6nM96aF2R4+TwKydFr25VN4Fy?=
+ =?us-ascii?Q?HFpLzda3hriqUjj6YUOjdjHtez6TRkmVH6L6MDz0l3cBGd+ViTWV6ej3h5jz?=
+ =?us-ascii?Q?lxUnWL4rNofKIJIy3vjRwCz4fbbP9WT/RnVLpVgJ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b71727da-8c44-44c2-beb7-08db606c8888
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2023 17:45:46.9458
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0J0tl6rV4CHPHeYZu8Ch9SjOBxIJ+Qs6RJtSx+Gw3ErYliV8j5OVnp1mYZRjdbA7
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8862
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 08/05/2023 23:11, Wei Liu wrote:
-> On Fri, May 05, 2023 at 05:20:42PM +0200, Mickaël Salaün wrote:
->> This enables guests to lock their CR0 and CR4 registers with a subset of
->> X86_CR0_WP, X86_CR4_SMEP, X86_CR4_SMAP, X86_CR4_UMIP, X86_CR4_FSGSBASE
->> and X86_CR4_CET flags.
->>
->> The new KVM_HC_LOCK_CR_UPDATE hypercall takes two arguments.  The first
->> is to identify the control register, and the second is a bit mask to
->> pin (i.e. mark as read-only).
->>
->> These register flags should already be pinned by Linux guests, but once
->> compromised, this self-protection mechanism could be disabled, which is
->> not the case with this dedicated hypercall.
->>
->> Cc: Borislav Petkov <bp@alien8.de>
->> Cc: Dave Hansen <dave.hansen@linux.intel.com>
->> Cc: H. Peter Anvin <hpa@zytor.com>
->> Cc: Ingo Molnar <mingo@redhat.com>
->> Cc: Kees Cook <keescook@chromium.org>
->> Cc: Madhavan T. Venkataraman <madvenka@linux.microsoft.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Sean Christopherson <seanjc@google.com>
->> Cc: Thomas Gleixner <tglx@linutronix.de>
->> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
->> Cc: Wanpeng Li <wanpengli@tencent.com>
->> Signed-off-by: Mickaël Salaün <mic@digikod.net>
->> Link: https://lore.kernel.org/r/20230505152046.6575-6-mic@digikod.net
-> [...]
->>   	hw_cr4 = (cr4_read_shadow() & X86_CR4_MCE) | (cr4 & ~X86_CR4_MCE);
->>   	if (is_unrestricted_guest(vcpu))
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index ffab64d08de3..a529455359ac 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -7927,11 +7927,77 @@ static unsigned long emulator_get_cr(struct x86_emulate_ctxt *ctxt, int cr)
->>   	return value;
->>   }
->>   
->> +#ifdef CONFIG_HEKI
->> +
->> +extern unsigned long cr4_pinned_mask;
->> +
+On Thu, May 25, 2023 at 09:21:23AM -0600, Alex Williamson wrote:
+> On Tue, 16 May 2023 21:28:35 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
 > 
-> Can this be moved to a header file?
-
-Yep, but I'm not sure which one. Any preference Kees?
-
-
+> > On Tue, May 16, 2023 at 03:09:14PM -0600, Alex Williamson wrote:
+> > 
+> > > > +# SPDX-License-Identifier: GPL-2.0-only
+> > > > +config NVGPU_VFIO_PCI
+> > > > +	tristate "VFIO support for the GPU in the NVIDIA Grace Hopper Superchip"
+> > > > +	depends on ARM64 || (COMPILE_TEST && 64BIT)
+> > > > +	select VFIO_PCI_CORE  
+> > > 
+> > > I think this should be a 'depends on' as well, that's what we have for
+> > > the other vfio-pci variant drivers.  
+> > 
+> > It should be removed completely, AFAICT:
+> > 
+> > config VFIO_PCI
+> >         tristate "Generic VFIO support for any PCI device"
+> >         select VFIO_PCI_CORE
+> > 
+> > Ensures it is turned on
+> > 
+> > if VFIO_PCI
+> > source "drivers/vfio/pci/mlx5/Kconfig"
+> > endif
 > 
->> +static int heki_lock_cr(struct kvm *const kvm, const unsigned long cr,
->> +			unsigned long pin)
->> +{
->> +	if (!pin)
->> +		return -KVM_EINVAL;
->> +
->> +	switch (cr) {
->> +	case 0:
->> +		/* Cf. arch/x86/kernel/cpu/common.c */
->> +		if (!(pin & X86_CR0_WP))
->> +			return -KVM_EINVAL;
->> +
->> +		if ((read_cr0() & pin) != pin)
->> +			return -KVM_EINVAL;
->> +
->> +		atomic_long_or(pin, &kvm->heki_pinned_cr0);
->> +		return 0;
->> +	case 4:
->> +		/* Checks for irrelevant bits. */
->> +		if ((pin & cr4_pinned_mask) != pin)
->> +			return -KVM_EINVAL;
->> +
-> 
-> It is enforcing the host mask on the guest, right? If the guest's set is a
-> super set of the host's then it will get rejected.
-> 
-> 
->> +		/* Ignores bits not present in host. */
->> +		pin &= __read_cr4();
->> +		atomic_long_or(pin, &kvm->heki_pinned_cr4);
+> The source command actually comes after the VFIO_PCI endif, the mlx5
+> Kconfig is sourced if PCI && MMU.
 
-We assume that the host's mask is a superset of the guest's mask. I 
-guess we should check the absolute supported bits instead, even if it 
-would be weird for the host to not support these bits.
+Ah, I forgot we made the VFIO_PCI_CORE a hidden menu choice, so yeah,
+it should be select everywhere and we can't use the IF trick.
 
+> In fact I think it's the current variant drivers that are incorrect to
+> make use of 'depends on', this makes those variant drivers implicitly
+> depend on VFIO_PCI
 
->> +		return 0;
->> +	}
->> +	return -KVM_EINVAL;
->> +}
->> +
->> +int heki_check_cr(const struct kvm *const kvm, const unsigned long cr,
->> +		  const unsigned long val)
->> +{
->> +	unsigned long pinned;
->> +
->> +	switch (cr) {
->> +	case 0:
->> +		pinned = atomic_long_read(&kvm->heki_pinned_cr0);
->> +		if ((val & pinned) != pinned) {
->> +			pr_warn_ratelimited(
->> +				"heki-kvm: Blocked CR0 update: 0x%lx\n", val);
-> 
-> I think if the message contains the VM and VCPU identifier it will
-> become more useful.
+Yes
 
-Indeed, and this should be the case for all log messages, but I'd left 
-that for future work. ;) I'll update the logs for the next series with a 
-new kvm_warn_ratelimited() helper using VCPU's PID.
+Jason
