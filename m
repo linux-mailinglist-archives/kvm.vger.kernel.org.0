@@ -2,76 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3B2B714BFA
-	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 16:25:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EBC2714C34
+	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 16:37:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230146AbjE2OZf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 May 2023 10:25:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33058 "EHLO
+        id S230090AbjE2OhM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 May 2023 10:37:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbjE2OZc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 May 2023 10:25:32 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8262AD;
-        Mon, 29 May 2023 07:25:30 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-64d3fdcadb8so2461600b3a.3;
-        Mon, 29 May 2023 07:25:30 -0700 (PDT)
+        with ESMTP id S229939AbjE2Ogu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 May 2023 10:36:50 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46691EA;
+        Mon, 29 May 2023 07:36:48 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-2563ca70f64so1805171a91.0;
+        Mon, 29 May 2023 07:36:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685370330; x=1687962330;
+        d=gmail.com; s=20221208; t=1685371007; x=1687963007;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=s0kZQZAOomcqcKQth80IQ2fTscM5DRIxEg+3sdENsiE=;
-        b=e93XWhspHajsDP99VtcVBxnHLpNTihKtNP6VemWTRLPPkLcjCWVFY9odExQlAhCiCG
-         zSVF0MDpCXyBpEG3GeTfkXREHnUKK9AptViuZJCic141yVDr5J99j95Faic7+ZwZipl2
-         Aq5kdcUnaz43BsmnPz5MS00ieyMu+go6whMkh7pSNuFkB7hwezxmLq2ZLGGdpX4xhV28
-         7gdJjI+rf23dKSp+rYYehqxdyFTtomgRNSiN0GXhq92qJ+WHt+iiZRb39qwXLnJWuNAW
-         Rb0XxjrYEHfckNjiUjogGTGNfSryn5gJIYoDro//27rUNj1DGQy9eniSty1GGA0Ft4mY
-         YcWA==
+        bh=3G0tjgLaByKBQEVUEO/ofZvDTdqBJJR2GepbSwtmumE=;
+        b=LAjzeJHAA9CM5w69GeU03Cn5J1WovnzG2udh0exv2HAtoBqx3a8F4DMeyE/rvVn1m6
+         Obdk1pGH2qKn2ejazQ6Vse6THwSrnfa6XwrlBy6X5nv7ujPxZXeaesNH6dSwrX7yCDQj
+         pHo5yGLvkCoC//hNjQSmO4zkq3ZM8a6fHkj2yWNkjqATc4exiHFqkkkN20/WcRANLf3A
+         5VO7ubcH2Q5wcXhHIA/d2QLz0TAQrezn6IQHyrH3AZWwFnBIv26LW/A9M7EGlTQFrqRY
+         TKvOB9MiRJKoZsDlTmvysmXI5Or6kTElIsDcMp3RQEy8+E5aXSm78mkZ6m3r4dJM0EyL
+         CdDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685370330; x=1687962330;
+        d=1e100.net; s=20221208; t=1685371007; x=1687963007;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s0kZQZAOomcqcKQth80IQ2fTscM5DRIxEg+3sdENsiE=;
-        b=YLw9Ukhczf9krpVO7TfqwWm53WDo3+kJinmZEser7/bj+3NHGlf3YXx/oWIRjU838Q
-         wKAl1VP1IjdjNadpnkHU4Vj0pfETsgpRk/Q7kAeOodiiNkhyyAQNUjSSDhIyuZDvY1TL
-         PoT4MncRINadHy9GW+be80Fu4JF8L9TGl2kqW1o6QI9YRz8nIm85P/heAYBVKjWEkGdf
-         Tb+Zz5mb/TZAmr3qYVBJmTyJhARjlxNZECG0PRCIXxDw6mogOp0I9dPpVxVTgWn/m+zU
-         GBHzDonecxN98vLSP2IY2McUBdScu9Z7cjVrGJPnAgkAFcCKbQ6f7ZMBDcgcH+pgZxPI
-         9Wqg==
-X-Gm-Message-State: AC+VfDwhDxcKACBJtEKqVBmuFC82zTeZVdBXPuKoZipXPFkO/tBLWQYX
-        VBQRxXFPgKe5gYZL+BRcAI+KeWT5/AELMGfNfS8=
-X-Google-Smtp-Source: ACHHUZ5jPwsjqLMSYmT7XCPLOgaQc7vImdBwkMLlW4CQ/c4saCrLbRnKsw6u2M0rS4BSzG47wUQQkA==
-X-Received: by 2002:a05:6a00:248f:b0:649:450f:3231 with SMTP id c15-20020a056a00248f00b00649450f3231mr14212327pfv.9.1685370330267;
-        Mon, 29 May 2023 07:25:30 -0700 (PDT)
+        bh=3G0tjgLaByKBQEVUEO/ofZvDTdqBJJR2GepbSwtmumE=;
+        b=W/FcKwMuXQ6fOsgG8Xz3Te3IZl77lbPEMRcIxMlFbEpCB2RkrSHdElQnKEe8VrBL9V
+         /wiFeu1d1juTSln78jyCXMDHW8h9j7SjKpYPf6KOuIic619VivGx2JsGRdVlMc0TJowh
+         FSHa/rZxRbmyaxPnXL1IoOFYgcR74muJ/X945f+3HGNKMVxj3ukj32xRdHHdKH0yKB2m
+         TMXfiCcVqOMn6PnrmnYvuEF6g9Kj9+j41kl/BovNGDhNDnoesx+VA1FeQYUzCtxhComz
+         vSGVCxe0F9KF7q5On+I+SatSz8DJOxNIoVEeBXg/OH5ZlzPA1M4mR6w8uhVt7W2H3xlM
+         v5UA==
+X-Gm-Message-State: AC+VfDzpg0x1ZKI3/juMJ5wGCOQUfxHhHswt/XrOkJstXseJtfdI7CuN
+        tC2+1HzBtDfA9kV691h0VFo=
+X-Google-Smtp-Source: ACHHUZ5VM6y04IN3OksdqB7DbO19L2kV9HAU4PZPtzg4slwt+oNKt06iEkgRR2Jdvfzap/6UREX6+Q==
+X-Received: by 2002:a17:90a:2a49:b0:256:4196:f722 with SMTP id d9-20020a17090a2a4900b002564196f722mr9121877pjg.47.1685371007630;
+        Mon, 29 May 2023 07:36:47 -0700 (PDT)
 Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id 12-20020aa7910c000000b0064fd8b3dd13sm22297pfh.110.2023.05.29.07.25.28
+        by smtp.gmail.com with ESMTPSA id t3-20020a17090aba8300b00256833cd9a4sm1743987pjr.54.2023.05.29.07.36.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 May 2023 07:25:29 -0700 (PDT)
-Message-ID: <514b2966-77a6-3b93-f7fe-80e78783ef55@gmail.com>
-Date:   Mon, 29 May 2023 22:25:22 +0800
+        Mon, 29 May 2023 07:36:47 -0700 (PDT)
+Message-ID: <7f3842a2-879b-2460-229e-745b7122b36a@gmail.com>
+Date:   Mon, 29 May 2023 22:36:39 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.11.0
-Subject: Re: [PATCH V5 05/10] KVM: x86/pmu: Disable vPMU if the minimum num of
- counters isn't met
+Subject: Re: [PATCH 5/5] KVM: x86/pmu: Hide guest counter updates from the
+ VMRUN instruction
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+To:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ravi Bangoria <ravi.bangoria@amd.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20230410105056.60973-1-likexu@tencent.com>
- <20230410105056.60973-6-likexu@tencent.com>
- <CALMp9eTLvJ6GW1mfgjO7CL7tW-79asykyz9=Fb=FfT74VRkDVA@mail.gmail.com>
- <9a7d5814-9eb1-d7af-7968-a6e3ebb90248@gmail.com>
- <CALMp9eR6DwY0EjAb1hcV9XGWQizN6R0dXtLaC4NXDgtCqv5cTA@mail.gmail.com>
- <81bbb700-9346-3d0d-ab86-6e684b185772@gmail.com>
- <CALMp9eSKnE8+jMpp0KzBRC7NDjT+S2cRz9CcBNDKB7JCU8dmTg@mail.gmail.com>
- <f4ef3b07-d2f2-5cfc-6783-49e9b6be7a95@gmail.com>
- <ZG6f1GYvtZ/Ndf7H@google.com>
+References: <20230310105346.12302-1-likexu@tencent.com>
+ <20230310105346.12302-6-likexu@tencent.com> <ZG6AUjci2J9WpT2z@google.com>
+ <CALMp9eSe+kx8s5rkypvHWjFr45L_foXiDi1Vdp3R=AmRwA3RAQ@mail.gmail.com>
 From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <ZG6f1GYvtZ/Ndf7H@google.com>
+In-Reply-To: <CALMp9eSe+kx8s5rkypvHWjFr45L_foXiDi1Vdp3R=AmRwA3RAQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -84,67 +79,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/5/2023 7:37 am, Sean Christopherson wrote:
-> On Wed, Apr 19, 2023, Like Xu wrote:
->> Jim, sorry for the late reply.
->>
->> On 11/4/2023 10:58 pm, Jim Mattson wrote:
->>>>>> Jim, does this help you or could you explain more about your confusion ?
->>>>>
->>>>> You say that "fewer than four counters can lead to guest instability
->>>>> as software expects four counters to be available." Your solution is
->>>>> to disable the PMU, which leaves zero counters available. Zero is less
->>>>> than four. Hence, by your claim, disabling the PMU can lead to guest
->>>>> instability. I don't see how this is an improvement over one, two, or
->>>>> three counters.
-> 
-> KVM can't do the right thing regardless.  I would rather have KVM explicitly tell
-> userspace via that it can't support a vPMU than to carry on with a bogus and
-> unexpected setup.
-> 
->>> Does this actually guarantee that the requisite number of counters are
->>> available and will always be available while the guest is running?
->>
->> Not 100%, the scheduling of physical counters depends on the host perf scheduler.
-> 
-> Or put differently, the same thing that happens on Intel.  kvm_pmu_cap.num_counters_gp
-> is the number of counters reported by perf when KVM loads, i.e. barring oddities,
-> it's the number of counters present in the host.  Most importantly, if perf doesn't
-> find the expected number of counters, perf will bail and use software only events,
-> and then clear all of x86_pmu.
-> 
-> In other words, KVM's new sanity *should* be a nop with respect to current
-> behavior.  If we're concerned about "unnecessarily" hiding the PMU when there are
-> 1-3 counters, I'd be ok with a WARN_ON_ONCE().
-> 
-> Actually, looking more closely, there's unaddressed feedback from v4[*].  Folding
-> that in, we can enable the sanity check for both Intel and AMD, though that's a
-> bit of a lie since Intel will be '1'.  But the code looks pretty!
+On 25/5/2023 5:30 am, Jim Mattson wrote:
+> Note that there's a bug in the original code for this that has
+> probably never been fixed: it ignores CMASK and INV in the PerfEvtSel.
 
-The below diff looks good to me. Please confirm that the other patches are in 
-good shape
-so that we can iterate on the next version. Thanks.
-
-> 
-> 	if (enable_pmu) {
-> 		perf_get_x86_pmu_capability(&kvm_pmu_cap);
-> 
-> 		/*
-> 		 * WARN if perf did NOT disable hardware PMU if the number of
-> 		 * architecturally required GP counters aren't present, i.e. if
-> 		 * there are a non-zero number of counters, but fewer than what
-> 		 * is architecturally required.
-> 		 */
-> 		if (!kvm_pmu_cap.num_counters_gp ||
-> 		    WARN_ON_ONCE(kvm_pmu_cap.num_counters_gp < pmu_ops->MIN_NR_GP_COUNTERS))
-> 			enable_pmu = false;
-> 		else if (is_intel && !kvm_pmu_cap.version)
-> 			enable_pmu = false;
-> 	}
-> 
-> 	if (!enable_pmu) {
-> 		memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
-> 		return;
-> 	}
-> 
-> [*] https://lore.kernel.org/all/ZC9ijgZBaz6p1ecw@google.com
+Regarding the emulation of CMASK, INV and PIN_CONTROL bits on vPMU,
+please forgive me for never having the right expectations (so there will be no
+correct emulation), an share more *architecture* descriptions of those hw
+behavior, and it would be great to have corresponding selftests as a bug report.
