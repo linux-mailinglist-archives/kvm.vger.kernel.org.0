@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A0DF714B5F
-	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 16:01:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26CB7714BE0
+	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 16:18:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230119AbjE2OBU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 May 2023 10:01:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43450 "EHLO
+        id S229998AbjE2OSe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 May 2023 10:18:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbjE2OBQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 May 2023 10:01:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 537E010D;
-        Mon, 29 May 2023 07:00:52 -0700 (PDT)
+        with ESMTP id S229673AbjE2OSd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 May 2023 10:18:33 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87610A8;
+        Mon, 29 May 2023 07:18:29 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E9AB860FBB;
-        Mon, 29 May 2023 14:00:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ECFAC4339B;
-        Mon, 29 May 2023 14:00:31 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 23C5B614CA;
+        Mon, 29 May 2023 14:18:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85056C433EF;
+        Mon, 29 May 2023 14:18:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685368831;
-        bh=XTBuiKvnDD+l/iubLGvNKu/2fkBSZnZrXeAb5inRLRI=;
+        s=k20201202; t=1685369908;
+        bh=XanX7byBEmuBhTMsmTfYRDi9srDmLXFA6kg1lQHYCyQ=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=WbYjX4Zwsf0EAitGQnaZHT6xoQMhz2CsSKVLKNYcfvdNl2loHnXayL4CryrhtohjM
-         SpaAVrn7JVYf2ozdw6dE/lwZdpjMWrowHOiuX1w+bF+WwmYjqxdkAvYIj6gkqr+MqG
-         EXfaFHunYOy1xVQlObW/54+2rM2M5CFFZRgKdgVGGtpJcePAw9aai4fITNNOC8/DJd
-         X9AQ8oxQWYxkkj3ESzIjt6snYhfMlq3d5RDq6+3KYTZIce51/nDLmV4JuxP/od+AwL
-         QSMztInsXC3XRah1c0265NbpPdovFjcrXyqiCYsoSavLX+Ld9plUsfzIrLosxu3KuU
-         Itv1sMk/Iek3g==
+        b=t8PslmTOfb8SYtHGK/zwuAcf+Vr5g/K1h/CwfUP42LMMyeIt1HgPjND/chW2vUPsB
+         tovOtb/q/IQPMivy/hDcxPEYuVcTAMyoS+4vov4+sZbWzehrc7rvdMxKcdV6jpkvW7
+         ahIzHhGDGAx0oXtA4C5CRYBONySa6gtEVWsvkovdmIHsDC/Bi51FfDS1QERO9v6LPS
+         27o7qwcJclJr8L/OULqLNVRzv11idFUqSHGdvn5BbVOTW/GWZa9n2KZoeBxaRVeOZA
+         7fdhf47MlIpQgaZyq2K2GEjxGwPUZZ7LY2Exofrfep9s4ddB8jlskpVBHHNHiY7ElO
+         AK1wdURP+aVEg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1q3dQD-001581-2d;
-        Mon, 29 May 2023 15:00:29 +0100
-Date:   Mon, 29 May 2023 15:00:28 +0100
-Message-ID: <87v8gbjkzn.wl-maz@kernel.org>
+        id 1q3dha-0015Qd-9I;
+        Mon, 29 May 2023 15:18:26 +0100
+Date:   Mon, 29 May 2023 15:18:25 +0100
+Message-ID: <87ttvvjk5q.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Raghavendra Rao Ananta <rananta@google.com>
 Cc:     Oliver Upton <oliver.upton@linux.dev>,
@@ -50,10 +50,10 @@ Cc:     Oliver Upton <oliver.upton@linux.dev>,
         Colton Lewis <coltonlewis@google.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 3/6] KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
-In-Reply-To: <20230519005231.3027912-4-rananta@google.com>
+Subject: Re: [PATCH v4 6/6] KVM: arm64: Use TLBI range-based intructions for unmap
+In-Reply-To: <20230519005231.3027912-7-rananta@google.com>
 References: <20230519005231.3027912-1-rananta@google.com>
-        <20230519005231.3027912-4-rananta@google.com>
+        <20230519005231.3027912-7-rananta@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,8 +63,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, ricarkol@google.com, pbonzini@redhat.com, jingzhangos@google.com, coltonlewis@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -73,76 +73,118 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 19 May 2023 01:52:28 +0100,
+On Fri, 19 May 2023 01:52:31 +0100,
 Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> Implement kvm_arch_flush_remote_tlbs_range() for arm64
-> to invalidate the given range in the TLB.
+> The current implementation of the stage-2 unmap walker traverses
+> the given range and, as a part of break-before-make, performs
+> TLB invalidations with a DSB for every PTE. A multitude of this
+> combination could cause a performance bottleneck.
+> 
+> Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
+> invalidations until the entire walk is finished, and then
+> use range-based instructions to invalidate the TLBs in one go.
+> Condition this upon S2FWB in order to avoid walking the page-table
+> again to perform the CMOs after issuing the TLBI.
+
+But that's the real bottleneck. TLBIs are cheap compared to CMOs, even
+on remarkably bad implementations. What is your plan to fix this?
+
+> 
+> Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
+> now serves the stage-2 unmap walker specifically, rather than
+> acting generic.
 > 
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h |  3 +++
->  arch/arm64/kvm/hyp/nvhe/tlb.c     |  4 +---
->  arch/arm64/kvm/mmu.c              | 11 +++++++++++
->  3 files changed, 15 insertions(+), 3 deletions(-)
+>  arch/arm64/kvm/hyp/pgtable.c | 35 ++++++++++++++++++++++++++++++-----
+>  1 file changed, 30 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 81ab41b84f436..343fb530eea9c 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1081,6 +1081,9 @@ struct kvm *kvm_arch_alloc_vm(void);
->  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
->  int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
->  
-> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn, u64 pages);
-> +
->  static inline bool kvm_vm_is_protected(struct kvm *kvm)
->  {
->  	return false;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> index d4ea549c4b5c4..d2c7c1bc6d441 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> @@ -150,10 +150,8 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
->  		return;
->  	}
->  
-> -	dsb(ishst);
-> -
->  	/* Switch to requested VMID */
-> -	__tlb_switch_to_guest(mmu, &cxt);
-> +	__tlb_switch_to_guest(mmu, &cxt, false);
-
-This hunk is in the wrong patch, isn't it?
-
->  
->  	__flush_tlb_range_op(ipas2e1is, start, pages, stride, 0, 0, false);
->  
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index d0a0d3dca9316..e3673b4c10292 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -92,6 +92,17 @@ int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
->  	return 0;
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index b8f0dbd12f773..5832ee3418fb0 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -771,16 +771,34 @@ static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t n
+>  	smp_store_release(ctx->ptep, new);
 >  }
 >  
-> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn, u64 pages)
+> -static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
+> -			   struct kvm_pgtable_mm_ops *mm_ops)
+> +static bool stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
+>  {
+> +	/*
+> +	 * If FEAT_TLBIRANGE is implemented, defer the individial PTE
+> +	 * TLB invalidations until the entire walk is finished, and
+> +	 * then use the range-based TLBI instructions to do the
+> +	 * invalidations. Condition this upon S2FWB in order to avoid
+> +	 * a page-table walk again to perform the CMOs after TLBI.
+> +	 */
+> +	return system_supports_tlb_range() && stage2_has_fwb(pgt);
+> +}
+> +
+> +static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx *ctx,
+> +				struct kvm_s2_mmu *mmu,
+> +				struct kvm_pgtable_mm_ops *mm_ops)
 > +{
-> +	phys_addr_t start, end;
+> +	struct kvm_pgtable *pgt = ctx->arg;
 > +
-> +	start = start_gfn << PAGE_SHIFT;
-> +	end = (start_gfn + pages) << PAGE_SHIFT;
+>  	/*
+>  	 * Clear the existing PTE, and perform break-before-make with
+>  	 * TLB maintenance if it was valid.
+>  	 */
+>  	if (kvm_pte_valid(ctx->old)) {
+>  		kvm_clear_pte(ctx->ptep);
+> -		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
 > +
-> +	kvm_call_hyp(__kvm_tlb_flush_vmid_range, &kvm->arch.mmu, start, end);
+> +		if (!stage2_unmap_defer_tlb_flush(pgt))
+> +			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
+> +					ctx->addr, ctx->level);
 
-So that's the point that I think is not right. It is the MMU code that
-should drive the invalidation method, and not the HYP code. The HYP
-code should be as dumb as possible, and the logic should be kept in
-the MMU code.
+This really doesn't match the comment anymore.
 
-So when a range invalidation is forwarded to HYP, it's a *valid* range
-invalidation. not something that can fallback to VMID-wide invalidation.
+Overall, I'm very concerned that we lose the consistency property that
+the current code has: once called, the TLBs and the page tables are
+synchronised.
+
+Yes, this patch looks correct. But it is also really fragile.
+
+>  	}
+>  
+>  	mm_ops->put_page(ctx->ptep);
+> @@ -1015,7 +1033,7 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>  	 * block entry and rely on the remaining portions being faulted
+>  	 * back lazily.
+>  	 */
+> -	stage2_put_pte(ctx, mmu, mm_ops);
+> +	stage2_unmap_put_pte(ctx, mmu, mm_ops);
+>  
+>  	if (need_flush && mm_ops->dcache_clean_inval_poc)
+>  		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old, mm_ops),
+> @@ -1029,13 +1047,20 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>  
+>  int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  {
+> +	int ret;
+>  	struct kvm_pgtable_walker walker = {
+>  		.cb	= stage2_unmap_walker,
+>  		.arg	= pgt,
+>  		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
+>  	};
+>  
+> -	return kvm_pgtable_walk(pgt, addr, size, &walker);
+> +	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
+> +	if (stage2_unmap_defer_tlb_flush(pgt))
+> +		/* Perform the deferred TLB invalidations */
+> +		kvm_call_hyp(__kvm_tlb_flush_vmid_range, pgt->mmu,
+> +				addr, addr + size);
+
+This "kvm_call_hyp(__kvm_tlb_flush_vmid_range,...)" could do with a
+wrapper from the point where you introduce it.
+
+> +
+> +	return ret;
+>  }
+>  
 
 Thanks,
 
