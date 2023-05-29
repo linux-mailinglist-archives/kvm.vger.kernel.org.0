@@ -2,207 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D92E2713B1D
-	for <lists+kvm@lfdr.de>; Sun, 28 May 2023 19:27:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D283D714257
+	for <lists+kvm@lfdr.de>; Mon, 29 May 2023 05:36:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229563AbjE1R1A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 28 May 2023 13:27:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42086 "EHLO
+        id S230335AbjE2DgM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 28 May 2023 23:36:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjE1R07 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 28 May 2023 13:26:59 -0400
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ECB8B1
-        for <kvm@vger.kernel.org>; Sun, 28 May 2023 10:26:56 -0700 (PDT)
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1q3KAK-00CUv8-SB; Sun, 28 May 2023 19:26:48 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-        bh=dYvYlL69CdkmAyuMUQGS9XRGjqk7Tjb9aHU7HcEwAro=; b=JMOn+4RJ9QMGmVYlcyVNwrGlJb
-        Wg8DoW2hhK8iDyOuzvF4SZo56rlTtmenFF5yhKNGGgaxur9iQDNpcYYs7Jg+cXC0O7WmenN7zPefL
-        R+srR36gsTFzn4uHH6ylRZ02GruHbZt6A53fauRaoga++zkoVO+VDDLSi1Hf6lGkdfdkETay4NqJn
-        WoeJ9j0MOft1MTEbFxQ1S88+8L3GhaVhHOB5T/AaIFIO1DWGVQcDo6Y4+evbwOoaOQHUVcvZItcu0
-        ZMzl7l51f3AVz0IqF2gIrWZ2CnlAtt7laKOGUw4XMz0ha1NUkMS84/br3Xasw+lo8gE0BBb3hOrrQ
-        eqXOwPqA==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1q3KAK-00030g-1X; Sun, 28 May 2023 19:26:48 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1q3KAI-0004GN-Rc; Sun, 28 May 2023 19:26:46 +0200
-Message-ID: <814baa0c-1eaa-4503-129f-059917365e80@rbox.co>
-Date:   Sun, 28 May 2023 19:26:45 +0200
-MIME-Version: 1.0
-User-Agent: Thunderbird
-Subject: Re: [PATCH 3/3] KVM: selftests: Add test for race in
- kvm_recalculate_apic_map()
-Content-Language: pl-PL, en-GB
+        with ESMTP id S230318AbjE2DgK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 28 May 2023 23:36:10 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 659CCB1;
+        Sun, 28 May 2023 20:36:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685331367; x=1716867367;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=uFE1BijfwKpcS0YoSgjnKtlL+CuDUC5Whiq0VJGgw9g=;
+  b=CNJ8w8RXqROTzJ+EV+ityiRLIPje9qRbtRzRpRBp+PpRxo6zlhjFd3wI
+   881GlcJSrN2XN0aFbdRGet6eELJCDy0C/mkQTrHjmG5UD6eRlKnNAaqZF
+   lly99PoIQOQ/w5aSfQs9XGKdHV1Ql2Nu4rKSzh+pNSyBOxX1AeaoUK6wr
+   jzJYijiutkQeWzjsX5ohaE8DEAD1XRGLYPvsm1qbspzu5K//Zf84krdta
+   AFqhq7i2V+yrETmWgYDzjwstl7eaaBQdwj5cuxeMnCWTkIis8huUt74HJ
+   ALqgJwbvlYCuvUqR+RTtFitLLTi1KidWDDGR7gHI+z1AHawvoaHfNe+X7
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="440963494"
+X-IronPort-AV: E=Sophos;i="6.00,200,1681196400"; 
+   d="scan'208";a="440963494"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 20:36:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="656339249"
+X-IronPort-AV: E=Sophos;i="6.00,200,1681196400"; 
+   d="scan'208";a="656339249"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga003.jf.intel.com with ESMTP; 28 May 2023 20:36:06 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Sun, 28 May 2023 20:36:06 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Sun, 28 May 2023 20:36:05 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Sun, 28 May 2023 20:36:05 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.40) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Sun, 28 May 2023 20:36:05 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=L7Sus/caqi0Rio+rvBirGlFtiOzVFlI4uEu0GXemYdNAMI9J5z8I3abQmP/Nl3V4Pqv8M+V46mh1huSGzdj8gUk/JbRzy1YOh9Dkgp7lMQ9JkSypiP44mwkshbICQTaQX6rXLUeKk2GM/68um1rqyItGSOnf6KAVhRC2kyydf1CAECl0Gt3HUMh/VfHtnr4pqckWfO1IbvrtJ4pGUyeXhTsOYYNjq3+CliH1HsIDq+CFUWUWVfhwis7aB3KbHkrDUM3bxS0EOCgoWv9wqvCWRyG1JX7P7enS0TjhBnCzN9AgLnoHjAAKT1+qLYhnMXXJQNSRBE/Q1k4cOy/KE7fwdA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WPD+5xKPHABwzfGzn1cQrOJf5nCA2fpDnFabZNw/D6I=;
+ b=Q9OP0UoOaFkp4PnEwWETVG97rgeNgqzLrV99oOcJtdR1kOcNsK2p9Nhm4mlB6AN/TnFphDUHOE+vmpmVTC5x/tQ1kKIdpXSjBPNbpB/YaI/NlUX0Zglazj4y6T2SZDdudfeOrcfg1mBZJuWR3F9tKFgMyvT/9czcjs+qLCH3AsJ8UKaUe+oj29AdKUv7xZgXUbgKnOj3o/Lxh/p9gtXO8AiQpIfjmjcJyH0yLlB5b6xGrfI/C6C64KKlXnosJzoP2+90X23QVh2NvaG4lNGx0zhwdikURi8vSFuBZ5m1NC6/sPDKKA+97RXLBVVvhl+PB/ZO2KSxyjOb7IMSSmPcVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+ by DM4PR11MB5471.namprd11.prod.outlook.com (2603:10b6:5:39d::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.22; Mon, 29 May
+ 2023 03:36:02 +0000
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::b4cb:1f70:7e2a:c4f5]) by PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::b4cb:1f70:7e2a:c4f5%2]) with mapi id 15.20.6433.020; Mon, 29 May 2023
+ 03:36:02 +0000
+Date:   Mon, 29 May 2023 11:35:49 +0800
+From:   Chao Gao <chao.gao@intel.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, shuah@kernel.org, kvm@vger.kernel.org
-References: <20230525183347.2562472-1-mhal@rbox.co>
- <20230525183347.2562472-4-mhal@rbox.co> <ZHFDcUcgvRXB/w/g@google.com>
-From:   Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <ZHFDcUcgvRXB/w/g@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_INVALID,
-        DKIM_SIGNED,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+CC:     Xiaoyao Li <xiaoyao.li@intel.com>, <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, <linux-kernel@vger.kernel.org>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH] KVM: x86: Track supported ARCH_CAPABILITIES in kvm_caps
+Message-ID: <ZHQdlSY2tsdGyCPs@chao-email>
+References: <20230506030435.80262-1-chao.gao@intel.com>
+ <b472b58d-0469-8a55-985c-1d966ce66419@intel.com>
+ <ZGZhW/x5OWPmx1qD@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZGZhW/x5OWPmx1qD@google.com>
+X-ClientProxiedBy: SGBP274CA0004.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::16)
+ To PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|DM4PR11MB5471:EE_
+X-MS-Office365-Filtering-Correlation-Id: 62388833-e0fd-4d13-3952-08db5ff5d2da
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Z9ghAOZTrdJ74aAEMcpnDpwTu72H6KVcMsCxQUXeIcpYZwETPqQ/8V3O8F6in7yHCpjekjIjroE/wDmshymODB2n/vPGRvRb/520CB5TLo//vqfMTmK/wm+4JA6mZXWUCl0HX+n2DCTpsCin306eqNkEYt6W92X4jzmGvt2u3vZP3jK2i+FBXecOONxVyQjj3MSni0RKhySy/YcnjNdGz0Tm7GrWcKRxlMWkkGCpfkl18TOGeK9tl9uGgU1rCj130+r12b4A4SsLXkoETiUiKtix7MeCH9z9cBRO6gWlAuANMiGskhOdFSgIJOhVvalosYVmFM3TZQj6ZqUgndeEN4lPMx3b5Kanlbn/+A9fjU6rKjoXQ6cDQoV8MJG5nKZ3d7yoMKgRdBShSYfGt9S8fOlMlfkw0mZMa+HcPx4a43Z2xi18jpcg80vRqq33cJdXCh+Bg7YOE3by0G+IaDbzhGLUj5LswHSEH4A7ZNQ/cC/bxkXvtYDXNoaMtpkCGYAgoSOvuMGDrxWJfxXqAjDylnPhG1Fu4ZYVzZVEFZD397M=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(136003)(346002)(39860400002)(396003)(366004)(376002)(451199021)(26005)(38100700002)(41300700001)(6666004)(966005)(6486002)(83380400001)(186003)(9686003)(6512007)(6506007)(478600001)(54906003)(6916009)(82960400001)(66476007)(66946007)(66556008)(4326008)(316002)(5660300002)(8676002)(8936002)(7416002)(44832011)(86362001)(33716001)(2906002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?0vYLj9s76iHJK8lJ9uEAUtxKUOLvIsFq1W1rw5/fehzQw+EExcoNujuHmlW9?=
+ =?us-ascii?Q?FcUoCSXGENRzDCgzOPjGZcg1dVl4zlr4qJplGWTYVl30k4KO5qW8R0BEuo0Y?=
+ =?us-ascii?Q?Al+Kr/InW0ZXfQURftPW11pc44YKfirE1zv34Zr+o2AdYRxqt28ngTaRRv6j?=
+ =?us-ascii?Q?BrxlMnxf2TM6CxqIdmsP4MXkqs0Xr/Mc8IKirt3m0N/mCe8xhaFkxG1xuDiZ?=
+ =?us-ascii?Q?S5pgbsI9fi9s41J2+jmkrUq06+1juvfvDkj8l9yWy0Y2zuWIVcXeyzpZsgwA?=
+ =?us-ascii?Q?mdKTzV5ipV4xSZvqm3RlD34L6QhLJyVvxcvDAkuhRW20cwB0x+N8l0k3yR2e?=
+ =?us-ascii?Q?Ad9AOHPxpJinKpEuDP0rG1mXILqoqB+xjpXi/yGqJqWFlFSkHWX1sX91J2Rl?=
+ =?us-ascii?Q?bikkStF79uAP8pgNzRLAevT60nwfS4IXUxfpg+UzXE8WRoiHrU8mMepDTHLL?=
+ =?us-ascii?Q?8hSf/Vi4VU1cPDSnIBelLHTWvi5suKKebZEhk42FyHdefYWoFgmm6DT9siFJ?=
+ =?us-ascii?Q?mxJ/OILph8ziqC2dvk5tPmiSzI0Oo5w/uS5cgHsaakV/19Z0tJX9dQzWXK8z?=
+ =?us-ascii?Q?1qm+Wu0n3psK222Z36x82O5U/3kgTwe2CIEvUKNPoK54qnG5mXuXiP/6tvuF?=
+ =?us-ascii?Q?bBFJdGnoetNZMCSJRtJicZBPkQ3ywC22ERcbEaEzYwBGQWUFmXTSgopJBxit?=
+ =?us-ascii?Q?8Hd4HblQPpWD0VtNsEj6/LXdt64UikvSc4uXwzVvNuRyhJt4LPmrZj1Gw3zb?=
+ =?us-ascii?Q?u4t+jzQZOgLBLuhVYLJPEh2knoO8+4s4MVCTNhm1PLu1bHX5WALay/oqLi6U?=
+ =?us-ascii?Q?6Ags8vRPXCxg7ftGDlDlOMokbOqAe8OTNQ9/p5rnQv9gu1wMDN3wnW2s8n3g?=
+ =?us-ascii?Q?6p/ndenrJxhJpqHT2JJyb1AFJzsHfzcQ+BO1cLVHQtXjDxmzHT5ikivypch6?=
+ =?us-ascii?Q?7COV/AxDbhBhdlcmDa/zORc2Gl8Rk+hc5zQH/gpXCgvpXOT7o5qaF8bGGa3B?=
+ =?us-ascii?Q?oYH3k5k+uszxZgG01kWYcdnOci433OBxsHg2HrH0wdDz8hbWJMoIzKeyxzqp?=
+ =?us-ascii?Q?Gll88nnhXZNrktdTiSG58Cpqe1Fm4riwHCT9Yi/tYwe7bekq7XQZ/ilsiDWK?=
+ =?us-ascii?Q?iOBqNBs8jV+DsXOTx1hyoWtQJiDkj0HZ7yzwT4DURX1h8+RGC/DdkGrn/Map?=
+ =?us-ascii?Q?IKMDOKV3ZGvpeHZkWBPl3PhOd2Gg4w8YBbjhyH4pB/BDxbqUsql22Mg5u353?=
+ =?us-ascii?Q?c2CO5U7UZWwZvrKpBSoqskXkmuOEI8WxhJ29fyaRwXcEhg7AD182oBVUVR+L?=
+ =?us-ascii?Q?yroUUtDOhYsth4XKXikivoCZgQ5i7BokQUg0ZG29G4t1VswWecSk/41sqI50?=
+ =?us-ascii?Q?Az2tB1UTGprCJrQVt4JaX1VSIoptc3edOd7J50TOdpQs65/M8rAGRdTnSSy/?=
+ =?us-ascii?Q?HPlKmS3RG2GYLZZlyJlPUWrJUUSMG7YNrirFf1CjFDixfgyG0woEFL5M8MKq?=
+ =?us-ascii?Q?+iio3XhvwHly+YG1BY4JTtC8K+FDEwON+h06L8ew3yIQic6JrEhX9at+FoxO?=
+ =?us-ascii?Q?U2esOColkweoHgdCZzJ8NfLDL4SfXlAncUHfy5rf?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62388833-e0fd-4d13-3952-08db5ff5d2da
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2023 03:36:02.0972
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zG0uRvNae9CRHVzpB7KN/yZDBODNz8Qmm3d6K8/4/4vV8RjdR5nOTe2roLvxfLdc/6Vh9RHb1bBodrNhv4vpbg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5471
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/27/23 01:40, Sean Christopherson wrote:
-> All of these open coded ioctl() calls is unnecessary.  Ditto for the fancy
-> stuffing, which through trial and error I discovered is done to avoid having
-> vCPUs with aliased xAPIC IDs, which would cause KVM to bail before triggering
-> the bug.  It's much easier to just create the max number of vCPUs and enable
-> x2APIC on all of them.
-> ...
+On Thu, May 18, 2023 at 10:33:15AM -0700, Sean Christopherson wrote:
+>FWIW, this trainwreck is another reason why I'm not going to look at the proposed
+>"Intel IA32_SPEC_CTRL Virtualization" crud until external forces dictate that I
+>do so.  I have zero confidence that a paravirt interface defined by hardware
+>vendors to fiddle with mitigations will be sane, flexible, and extensible.
 
-Yup, this looks way better, thanks.
-(FWIW, the #defines were deliberately named to match enum lapic_mode.)
+Hi Sean,
 
-In somewhat related news, I've hit kvm_recalculate_logical_map()'s
-WARN_ON_ONCE(ldr != kvm_apic_calc_x2apic_ldr(kvm_x2apic_id(apic))):
+Just to confirm we are on the same page:
 
-[  464.081627] WARNING: CPU: 2 PID: 958 at arch/x86/kvm/lapic.c:331 kvm_recalculate_apic_map+0x609/0xa00 [kvm]
-[  464.081703] Modules linked in: kvm_intel 9p fscache netfs qrtr sunrpc intel_rapl_msr kvm 9pnet_virtio 9pnet intel_rapl_common rapl pcspkr i2c_piix4 drm zram crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel ata_generic serio_raw virtio_blk virtio_console pata_acpi fuse qemu_fw_cfg [last unloaded: kvm_intel]
-[  464.081778] CPU: 2 PID: 958 Comm: recalc_apic_map Not tainted 6.4.0-rc3-vanilla+ #35
-[  464.081782] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.2-1-1 04/01/2014
-[  464.081785] RIP: 0010:kvm_recalculate_apic_map+0x609/0xa00 [kvm]
-[  464.081852] Code: 04 0f 84 00 02 00 00 49 8d 7e 24 e8 b1 2d 13 c1 41 8b 56 24 89 d0 83 e2 0f c1 e8 04 c1 e0 10 0f ab d0 39 e8 0f 84 50 fe ff ff <0f> 0b e9 49 fe ff ff 4c 8d a5 b0 02 00 00 4c 89 e7 e8 a1 2e 13 c1
-[  464.081855] RSP: 0018:ffffc900015cf6c8 EFLAGS: 00010297
-[  464.081860] RAX: 0000000000000001 RBX: ffff888108bb3c00 RCX: dffffc0000000000
-[  464.081863] RDX: 0000000000000000 RSI: ffffffffc04875ef RDI: ffff888178a651a4
-[  464.081865] RBP: 0000000000000002 R08: 0000000000000000 R09: ffffffff8446e2e7
-[  464.081868] R10: fffffbfff088dc5c R11: 0000000000000000 R12: 0000000000000000
-[  464.081870] R13: 0000000000000003 R14: ffff888178a65180 R15: ffff8881131b2000
-[  464.081873] FS:  00007fade8a9a740(0000) GS:ffff8883eef00000(0000) knlGS:0000000000000000
-[  464.081876] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  464.081879] CR2: 00007fade88d0008 CR3: 000000014d68b000 CR4: 0000000000752ee0
-[  464.081883] PKRU: 55555554
-[  464.081886] Call Trace:
-[  464.081888]  <TASK>
-[  464.081901]  ? kvm_can_use_hv_timer+0x60/0x60 [kvm]
-[  464.081969]  ? queue_delayed_work_on+0x6c/0xa0
-[  464.081978]  kvm_apic_set_state+0x1cf/0x5b0 [kvm]
-[  464.082050]  kvm_arch_vcpu_ioctl+0x1806/0x2100 [kvm]
-[  464.082116]  ? kvm_arch_vcpu_put+0x410/0x410 [kvm]
-[  464.082180]  ? mark_lock+0xf4/0xce0
-[  464.082185]  ? kvm_arch_vcpu_put+0x410/0x410 [kvm]
-[  464.082251]  ? mark_lock+0xf4/0xce0
-[  464.082255]  ? preempt_count_sub+0x14/0xc0
-[  464.082263]  ? print_usage_bug.part.0+0x3b0/0x3b0
-[  464.082269]  ? kvm_arch_vcpu_put+0x410/0x410 [kvm]
-[  464.082363]  ? mark_lock+0xf4/0xce0
-[  464.082369]  ? __kernel_text_address+0xe/0x30
-[  464.082373]  ? unwind_get_return_address+0x2f/0x50
-[  464.082382]  ? print_usage_bug.part.0+0x3b0/0x3b0
-[  464.082392]  ? __lock_acquire+0x9ed/0x3210
-[  464.082404]  ? lockdep_hardirqs_on_prepare+0x220/0x220
-[  464.082410]  ? lockdep_hardirqs_on_prepare+0x220/0x220
-[  464.082420]  ? lock_acquire+0x159/0x3b0
-[  464.082426]  ? lock_acquire+0x169/0x3b0
-[  464.082432]  ? lock_sync+0x110/0x110
-[  464.082438]  ? find_held_lock+0x83/0xa0
-[  464.082444]  ? lock_release+0x214/0x3a0
-[  464.082448]  ? kvm_vcpu_ioctl+0x1c6/0x8a0 [kvm]
-[  464.082507]  ? rcu_is_watching+0x34/0x50
-[  464.082524]  ? preempt_count_sub+0x14/0xc0
-[  464.082527]  ? __mutex_lock+0x201/0x1040
-[  464.082532]  ? kvm_vcpu_ioctl+0x13a/0x8a0 [kvm]
-[  464.082586]  ? find_held_lock+0x83/0xa0
-[  464.082591]  ? kvm_vcpu_ioctl+0x13a/0x8a0 [kvm]
-[  464.082648]  ? mutex_lock_io_nested+0xe40/0xe40
-[  464.082652]  ? bit_wait_io_timeout+0xc0/0xc0
-[  464.082658]  ? kvm_vcpu_ioctl+0x13a/0x8a0 [kvm]
-[  464.082720]  ? kvm_vcpu_ioctl+0x663/0x8a0 [kvm]
-[  464.082774]  kvm_vcpu_ioctl+0x663/0x8a0 [kvm]
-[  464.082831]  ? kvm_vcpu_kick+0x200/0x200 [kvm]
-[  464.082884]  ? vfs_fileattr_set+0x480/0x480
-[  464.082889]  ? vfs_fileattr_set+0x480/0x480
-[  464.082893]  ? rcu_is_watching+0x34/0x50
-[  464.082897]  ? kfree+0x107/0x140
-[  464.082902]  ? kvm_vcpu_ioctl+0x1d6/0x8a0 [kvm]
-[  464.082955]  ? ioctl_has_perm.constprop.0.isra.0+0x133/0x1f0
-[  464.082961]  ? ioctl_has_perm.constprop.0.isra.0+0x133/0x1f0
-[  464.082967]  ? selinux_bprm_creds_for_exec+0x440/0x440
-[  464.082988]  __x64_sys_ioctl+0xb8/0xf0
-[  464.082994]  do_syscall_64+0x56/0x80
-[  464.083000]  ? mark_held_locks+0x1a/0x80
-[  464.083007]  ? do_syscall_64+0x62/0x80
-[  464.083011]  ? lockdep_hardirqs_on+0x7d/0x100
-[  464.083015]  ? do_syscall_64+0x62/0x80
-[  464.083019]  ? lockdep_hardirqs_on+0x7d/0x100
-[  464.083023]  entry_SYSCALL_64_after_hwframe+0x46/0xb0
-[  464.083027] RIP: 0033:0x7fade8b9dd6f
-[  464.083031] Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 18 48 8b 44 24 18 64 48 2b 04 25 28 00 00
-[  464.083034] RSP: 002b:00007ffffd2d4550 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-[  464.083038] RAX: ffffffffffffffda RBX: 00007ffffd2d4ae8 RCX: 00007fade8b9dd6f
-[  464.083041] RDX: 00007ffffd2d45c0 RSI: 000000004400ae8f RDI: 0000000000000005
-[  464.083044] RBP: 0000000000000001 R08: 00000000004150a8 R09: 0000000000415004
-[  464.083047] R10: 0000000002268301 R11: 0000000000000246 R12: 00000000022662a0
-[  464.083050] R13: 00007ffffd2d4af8 R14: 0000000000421df0 R15: 00007fade8cc0000
-[  464.083064]  </TASK>
-[  464.083066] irq event stamp: 22889
-[  464.083069] hardirqs last  enabled at (22895): [<ffffffff81234ede>] __up_console_sem+0x5e/0x70
-[  464.083073] hardirqs last disabled at (22900): [<ffffffff81234ec3>] __up_console_sem+0x43/0x70
-[  464.083077] softirqs last  enabled at (22184): [<ffffffff811538cf>] __irq_exit_rcu+0xdf/0x1b0
-[  464.083082] softirqs last disabled at (22077): [<ffffffff811538cf>] __irq_exit_rcu+0xdf/0x1b0
+"Intel IA32_SPEC_CTRL Virtualization" series consists of 3 parts:
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c9b8f16fb23f..1c7f9cf51998 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -117,6 +117,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/amx_test
- TEST_GEN_PROGS_x86_64 += x86_64/max_vcpuid_cap_test
- TEST_GEN_PROGS_x86_64 += x86_64/triple_fault_event_test
- TEST_GEN_PROGS_x86_64 += x86_64/recalc_apic_map_race
-+TEST_GEN_PROGS_x86_64 += x86_64/recalc_apic_map_warn
- TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
-diff --git a/tools/testing/selftests/kvm/x86_64/recalc_apic_map_warn.c b/tools/testing/selftests/kvm/x86_64/recalc_apic_map_warn.c
-new file mode 100644
-index 000000000000..2845e1d9b865
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/recalc_apic_map_warn.c
-@@ -0,0 +1,30 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * recalc_apic_map_warn
-+ *
-+ * Test for hitting WARN_ON_ONCE() in kvm_recalculate_logical_map().
-+ */
-+
-+#include "processor.h"
-+#include "kvm_util.h"
-+#include "apic.h"
-+
-+#define	LAPIC_X2APIC	(MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE)
-+
-+int main(void)
-+{
-+	struct kvm_lapic_state lapic = {};
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, NULL); /* vcpu_id = 0 */
-+	vcpu_set_msr(vcpu, MSR_IA32_APICBASE, LAPIC_X2APIC);
-+
-+	*(u32 *)(lapic.regs + APIC_ID) = 1 << 24; /* != vcpu_id */
-+	*(u32 *)(lapic.regs + APIC_SPIV) = APIC_SPIV_APIC_ENABLED;
-+	vcpu_ioctl(vcpu, KVM_SET_LAPIC, &lapic);
-+
-+	kvm_vm_release(vm);
-+
-+	return 0;
-+}
+1. Expose BHI_CTRL, RRSBA_CTRL to guests. They are hardware mitigations to
+   disable BHI and RRSBA behaviors and can be used by both guest/host.
+
+2. Enable IA32_SPEC_CTRL Virtualization which is a VMX feature. This is for KVM
+   to effectively lock some bits of IA32_SPEC_CTRL MSR when guests are running.
+
+3. Implement the paravirt interface (the virtual MSRs) for guests to report
+   software mitigations in-use. KVM can utilize such information to enable
+   hardware mitigations for guests transparently to address software mitigation
+   effectiveness issues caused by CPU microarchitecture changes (RRSBA behavior,
+   size of branch history table).
+
+As per my understanding, your concerns are primarily focused on #3, the
+paravirt interface, rather than the entire series. Am I correct in assuming that
+you do not oppose #1 and #2?
+
+
+You previously mentioned that the paravirt interface was not common [1], and
+this time, you expressed an expectation for the interface to be "sane, flexible,
+and extensible." To ensure clarity, I want to confirm my interpretation of
+your expectations:
+
+1. The interface should not be tied to a specific CPU vendor but instead be
+   beneficial for Intel and AMD (and even ARM, and potentially others).
+
+2. The interface should have the capability to solve other issues (e.g,
+   coordinate mitigations in guest/host to address other perf/function issues),
+   not limited to software mitigation effectiveness on Intel CPUs.
+
+3. The interface should be extendable by VMMs rather than relying on hardware
+   vendors rolling out new spec. This enables VMM developers to propose new
+   ideas to coordinate mitigations in guest/host.
+
+Please let me know if I missed any key points or if any of the above statements
+do not align with your expectations. 
+
+[1]: https://lore.kernel.org/all/Y6Sin1bmLN10yvMw@google.com/ 
