@@ -2,74 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BCB371626E
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 15:44:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2F817162AD
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 15:53:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232834AbjE3NoH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 09:44:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33882 "EHLO
+        id S231282AbjE3NxS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 09:53:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232896AbjE3Nn5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 09:43:57 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F2B2E60;
-        Tue, 30 May 2023 06:43:36 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id 41be03b00d2f7-52cbd7d0c37so2802679a12.3;
-        Tue, 30 May 2023 06:43:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685454216; x=1688046216;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=exIXNtJMaAOiUqTB9dbgkYvlgfORS1/be4FuI+e0E5A=;
-        b=cGXivQe0v4wc6+Qopz1n62+79epmXh3BCfYpqC0WcQUU36cLkdzyxgtr+A8Z4E98Uy
-         GuT3/biMQAR+rePXKu3geM1yZ/8Vmam8PB5xrtgItQ8wqeFJYpgRiL1BksJxn5mq37WE
-         mpBUMzyus/yJ64t2qzbFhY8dS2RDcxq+jpYJDeTHjdCWJgdaFF7p9OVTccmfW4SrdIIK
-         dcExmsIQcsSXGpMgErQ+cj5QYN9Y9VJkq7UmDk+ZyDOEyZndxN0txVOUmNhPLyyGWElG
-         en68yjOwQpvyFksAynrU4er4efOIjIAzKPpa4fGzSDgFW9Iztj7E+DnRtZCgKY8/A9dS
-         OFGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685454216; x=1688046216;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=exIXNtJMaAOiUqTB9dbgkYvlgfORS1/be4FuI+e0E5A=;
-        b=XEntuL1lZ4jYsuFoVGnkDJygpGjzNGLGE9kyadEaXceKOivqK6X904TyqukgAds+IZ
-         vtyyBY4ixZWFh3Bz/cz8dvq9Vp0jCGFqWY7HQv1oT2kYLeJ20T/PuFurbwBGF/3oD2B+
-         /LV9le6jTRbvhIcl3momV2/6PWVHbepKfTIc2NDEYRcWbOpYMEyQphdpbGHRwBUKpTBl
-         wJIjdkAwhlxq5iL1d1Hm/ZKIAW1aLFwOXMtp7gdaBq5SgPdRAZNFFI8RK0jiql8/k0Jj
-         F1mt2VyE32ycwDTOxxKsyWKfgCXuGTTkiDiJFtMrLNwwg+HpdXvA9CYDJUAkJdQweO/6
-         l/rg==
-X-Gm-Message-State: AC+VfDzCgZdX0FubkmXF27Iw/BfOI+YeA7u5YLbg2MM6w0RpIkvplKVJ
-        VMKdZFIKIEH+u5HyDsdxCuRiCrgSUi0zb4EV
-X-Google-Smtp-Source: ACHHUZ5KmfpNIkyis/uYiSdVMHN7UoOVmpJKLjpTnqeTb7D9OsRC0/fxG4upuxyzP6YTtvVjfDrE5w==
-X-Received: by 2002:a17:90b:1a85:b0:256:38d8:13c5 with SMTP id ng5-20020a17090b1a8500b0025638d813c5mr2744818pjb.2.1685454216074;
-        Tue, 30 May 2023 06:43:36 -0700 (PDT)
-Received: from CLOUDLIANG-MB2.tencent.com ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id d10-20020a17090ac24a00b00256a4d59bfasm1977186pjx.23.2023.05.30.06.43.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 May 2023 06:43:35 -0700 (PDT)
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
-        David Matlack <dmatlack@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 8/8] KVM: selftests: Test consistency of PMU MSRs with Intel PMU version
-Date:   Tue, 30 May 2023 21:42:48 +0800
-Message-Id: <20230530134248.23998-9-cloudliang@tencent.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230530134248.23998-1-cloudliang@tencent.com>
-References: <20230530134248.23998-1-cloudliang@tencent.com>
+        with ESMTP id S230421AbjE3NxR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 09:53:17 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0DB88C7;
+        Tue, 30 May 2023 06:53:15 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42B4616F2;
+        Tue, 30 May 2023 06:45:03 -0700 (PDT)
+Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6636A3F67D;
+        Tue, 30 May 2023 06:44:16 -0700 (PDT)
+Message-ID: <89dba89c-cb49-f917-31e4-3eafd484f4b2@arm.com>
+Date:   Tue, 30 May 2023 14:44:11 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 2/2] arm64: Notify on pte permission upgrades
+Content-Language: en-GB
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alistair Popple <apopple@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
+        catalin.marinas@arm.com, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, nicolinc@nvidia.com,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        John Hubbard <jhubbard@nvidia.com>, zhi.wang.linux@gmail.com,
+        Sean Christopherson <seanjc@google.com>
+References: <3cece716fc09724793aa832e755abfc9d70a8bb3.1684892404.git-series.apopple@nvidia.com>
+ <5d8e1f752051173d2d1b5c3e14b54eb3506ed3ef.1684892404.git-series.apopple@nvidia.com>
+ <ZHKaBQt8623s9+VK@nvidia.com> <87pm6ii6qi.fsf@nvidia.com>
+ <ZHXj/6Bjraxqk4YR@nvidia.com> <d2e591c1-eb43-377b-d396-8335f77acef6@arm.com>
+ <ZHXxkUe4IZXUc1PV@nvidia.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <ZHXxkUe4IZXUc1PV@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,99 +53,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jinrong Liang <cloudliang@tencent.com>
+On 30/05/2023 1:52 pm, Jason Gunthorpe wrote:
+> On Tue, May 30, 2023 at 01:14:41PM +0100, Robin Murphy wrote:
+>> On 2023-05-30 12:54, Jason Gunthorpe wrote:
+>>> On Tue, May 30, 2023 at 06:05:41PM +1000, Alistair Popple wrote:
+>>>>
+>>>>>> As no notification is sent and the SMMU does not snoop TLB invalidates
+>>>>>> it will continue to return read-only entries to a device even though
+>>>>>> the CPU page table contains a writable entry. This leads to a
+>>>>>> continually faulting device and no way of handling the fault.
+>>>>>
+>>>>> Doesn't the fault generate a PRI/etc? If we get a PRI maybe we should
+>>>>> just have the iommu driver push an iotlb invalidation command before
+>>>>> it acks it? PRI is already really slow so I'm not sure a pipelined
+>>>>> invalidation is going to be a problem? Does the SMMU architecture
+>>>>> permit negative caching which would suggest we need it anyhow?
+>>>>
+>>>> Yes, SMMU architecture (which matches the ARM architecture in regards to
+>>>> TLB maintenance requirements) permits negative caching of some mapping
+>>>> attributes including the read-only attribute. Hence without the flushing
+>>>> we fault continuously.
+>>>
+>>> Sounds like a straight up SMMU bug, invalidate the cache after
+>>> resolving the PRI event.
+>>
+>> No, if the IOPF handler calls back into the mm layer to resolve the fault,
+>> and the mm layer issues an invalidation in the process of that which isn't
+>> propagated back to the SMMU (as it would be if BTM were in use), logically
+>> that's the mm layer's failing. The SMMU driver shouldn't have to issue extra
+>> mostly-redundant invalidations just because different CPU architectures have
+>> different idiosyncracies around caching of permissions.
+> 
+> The mm has a definition for invalidate_range that does not include all
+> the invalidation points SMMU needs. This is difficult to sort out
+> because this is general purpose cross arch stuff.
+> 
+> You are right that this is worth optimizing, but right now we have a
+> -rc bug that needs fixing and adding and extra SMMU invalidation is a
+> straightforward -rc friendly way to address it.
 
-KVM user sapce may control the Intel guest PMU version number via
-CPUID.0AH:EAX[07:00]. A test is added to check if a typical PMU register
-that is not available at the current version number is leaking.
+Sure; to clarify, I'm not against the overall idea of putting a hack in 
+the SMMU driver with a big comment that it is a hack to work around 
+missing notifications under SVA, but it would not constitute an "SMMU 
+bug" to not do that. SMMU is just another VMSAv8-compatible MMU - if, 
+say, KVM or some other arm64 hypervisor driver wanted to do something 
+funky with notifiers to shadow stage 1 permissions for some reason, it 
+would presumably be equally affected.
 
-Co-developed-by: Like Xu <likexu@tencent.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
-Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
----
- .../kvm/x86_64/pmu_basic_functionality_test.c | 64 +++++++++++++++++++
- 1 file changed, 64 insertions(+)
+FWIW, the VT-d spec seems to suggest that invalidation on RO->RW is only 
+optional if the requester supports recoverable page faults, so although 
+there's no use-case for non-PRI-based SVA at the moment, there is some 
+potential argument that the notifier issue generalises even to x86.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c b/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-index 108cfe254095..7da3eaf9ab5a 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-@@ -368,11 +368,75 @@ static void intel_test_fixed_counters(void)
- 	}
- }
- 
-+static void intel_guest_check_pmu_version(uint8_t version)
-+{
-+	switch (version) {
-+	case 0:
-+		GUEST_SYNC(wrmsr_safe(MSR_INTEL_ARCH_PMU_GPCTR, 0xffffull));
-+	case 1:
-+		GUEST_SYNC(wrmsr_safe(MSR_CORE_PERF_GLOBAL_CTRL, 0x1ull));
-+	case 2:
-+		/*
-+		 * AnyThread Bit is only supported in version 3
-+		 *
-+		 * The strange thing is that when version=0, writing ANY-Any
-+		 * Thread bit (bit 21) in MSR_P6_EVNTSEL0 and MSR_P6_EVNTSEL1
-+		 * will not generate #GP. While writing ANY-Any Thread bit
-+		 * (bit 21) in MSR_P6_EVNTSEL0+x (MAX_GP_CTR_NUM > x > 2) to
-+		 * ANY-Any Thread bit (bit 21) will generate #GP.
-+		 */
-+		if (version == 0)
-+			break;
-+
-+		GUEST_SYNC(wrmsr_safe(MSR_P6_EVNTSEL0, EVENTSEL_ANY));
-+		break;
-+	default:
-+		/* KVM currently supports up to pmu version 2 */
-+		GUEST_SYNC(GP_VECTOR);
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+static void test_pmu_version_setup(struct kvm_vcpu *vcpu, uint8_t version,
-+				   uint64_t expected)
-+{
-+	struct kvm_cpuid_entry2 *entry;
-+	uint64_t msr_val;
-+
-+	entry = vcpu_get_cpuid_entry(vcpu, 0xa);
-+	entry->eax = (entry->eax & ~PMU_VERSION_MASK) | version;
-+	vcpu_set_cpuid(vcpu);
-+
-+	vcpu_args_set(vcpu, 1, version);
-+	while (run_vcpu(vcpu, &msr_val) != UCALL_DONE) {
-+		TEST_ASSERT(msr_val == expected,
-+			    "Something beyond this PMU version is leaked.");
-+	}
-+}
-+
-+static void intel_test_pmu_version(void)
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	uint8_t version, unsupported_version = X86_INTEL_PMU_VERSION + 1;
-+
-+	TEST_REQUIRE(X86_INTEL_MAX_FIXED_CTR_NUM > 2);
-+
-+	for (version = 0; version <= unsupported_version; version++) {
-+		vm = pmu_vm_create_with_one_vcpu(&vcpu,
-+						 intel_guest_check_pmu_version);
-+		test_pmu_version_setup(vcpu, version, GP_VECTOR);
-+		kvm_vm_free(vm);
-+	}
-+}
-+
- static void intel_test_pmu_cpuid(void)
- {
- 	intel_test_arch_events();
- 	intel_test_counters_num();
- 	intel_test_fixed_counters();
-+	intel_test_pmu_version();
- }
- 
- int main(int argc, char *argv[])
--- 
-2.31.1
-
+Thanks,
+Robin.
