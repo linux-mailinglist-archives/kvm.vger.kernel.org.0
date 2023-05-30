@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF0E57168E1
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 18:11:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFD437168EB
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 18:11:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233365AbjE3QL0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 12:11:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57538 "EHLO
+        id S233383AbjE3QLy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 12:11:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233318AbjE3QLY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 12:11:24 -0400
+        with ESMTP id S233421AbjE3QLr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 12:11:47 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DC83D1AD
-        for <kvm@vger.kernel.org>; Tue, 30 May 2023 09:10:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5C3FD1B5
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 09:11:31 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C40BB1BD0;
-        Tue, 30 May 2023 09:11:15 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 006711BF3;
+        Tue, 30 May 2023 09:11:17 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A4743F663;
-        Tue, 30 May 2023 09:10:29 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AADB63F663;
+        Tue, 30 May 2023 09:10:30 -0700 (PDT)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
 Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com,
         shahuang@redhat.com
-Subject: [kvm-unit-tests PATCH v6 31/32] arm64: Add an efi/run script
-Date:   Tue, 30 May 2023 17:09:23 +0100
-Message-Id: <20230530160924.82158-32-nikos.nikoleris@arm.com>
+Subject: [kvm-unit-tests PATCH v6 32/32] arm64: Use the provided fdt when booting through EFI
+Date:   Tue, 30 May 2023 17:09:24 +0100
+Message-Id: <20230530160924.82158-33-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230530160924.82158-1-nikos.nikoleris@arm.com>
 References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
@@ -42,183 +42,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This change adds a efi/run script inspired by the one in x86. This
-script will setup a folder with the test compiled as an EFI app and a
-startup.nsh script. The script launches QEMU providing an image with
-EDKII and the path to the folder with the test which is executed
-automatically.
+This patch uses the fdt pointer provided through efi_bootinfo_t for
+tests that run as EFI apps. As in Linux, we give priority to the fdt.
+First, we check if the pointer to the fdt is set and only if it isn't
+we fallback to using the ACPI.
 
-For example:
+In addition, this patches changes the efi run script to generate and
+use a fdt unless the user has set the enviroment variable EFI_USE_ACPI
+to 'y'.
+
+As a result:
 
 $> ./arm/efi/run ./arm/selftest.efi -append "setup smp=2 mem=256" -smp 2 -m 256
 
-Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
----
- scripts/runtime.bash | 13 +++++++---
- arm/efi/run          | 61 ++++++++++++++++++++++++++++++++++++++++++++
- arm/run              | 14 +++++++---
- arm/Makefile.common  |  1 +
- arm/dummy.c          | 12 +++++++++
- 5 files changed, 94 insertions(+), 7 deletions(-)
- create mode 100755 arm/efi/run
- create mode 100644 arm/dummy.c
+will use an fdt, where as
 
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 07b62b0e..785a7b62 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -130,11 +130,18 @@ function run()
-         done
-     fi
- 
--    last_line=$(premature_failure > >(tail -1)) && {
-+    log=$(premature_failure) && {
-         skip=true
--        if [ "${CONFIG_EFI}" == "y" ] && [[ "${last_line}" =~ "Dummy Hello World!" ]]; then
--            skip=false
-+        if [ "${CONFIG_EFI}" == "y" ]; then
-+            if [ "$ARCH" == "x86_64" ] &&
-+               [[ "$(tail -1 <<<"$log")" =~ "Dummy Hello World!" ]]; then
-+                   skip=false
-+            elif [ "$ARCH" == "arm64" ] &&
-+               [[ "$(tail -2 <<<"$log" | head -1)" =~ "Dummy Hello World!" ]]; then
-+                   skip=false
-+            fi
-         fi
-+
-         if [ ${skip} == true ]; then
-             print_result "SKIP" $testname "" "$last_line"
-             return 77
+$> EFI_USE_ACPI=y ./arm/efi/run ./arm/selftest.efi -append "setup smp=2 mem=256" -smp 2 -m 256
+
+will run relying on ACPI.
+
+Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+---
+ arm/efi/run     |  9 +++++++++
+ lib/arm/setup.c | 23 +++++++++++++++++++----
+ 2 files changed, 28 insertions(+), 4 deletions(-)
+
 diff --git a/arm/efi/run b/arm/efi/run
-new file mode 100755
-index 00000000..dfff717a
---- /dev/null
+index dfff717a..c61da311 100755
+--- a/arm/efi/run
 +++ b/arm/efi/run
-@@ -0,0 +1,61 @@
-+#!/bin/bash
+@@ -19,6 +19,9 @@ source scripts/common.bash
+ : "${EFI_UEFI:=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd}"
+ : "${EFI_TEST:=efi-tests}"
+ : "${EFI_CASE:=$(basename $1 .efi)}"
++: "${EFI_VAR_GUID:=97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
 +
-+set -e
-+
-+if [ $# -eq 0 ]; then
-+	echo "Usage $0 TEST_CASE [QEMU_ARGS]"
-+	exit 2
-+fi
-+
-+if [ ! -f config.mak ]; then
-+	echo "run './configure --enable-efi && make' first. See ./configure -h"
-+	exit 2
-+fi
-+source config.mak
-+source scripts/arch-run.bash
-+source scripts/common.bash
-+
-+: "${EFI_SRC:=$(realpath "$(dirname "$0")/../")}"
-+: "${EFI_UEFI:=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd}"
-+: "${EFI_TEST:=efi-tests}"
-+: "${EFI_CASE:=$(basename $1 .efi)}"
-+
-+if [ ! -f "$EFI_UEFI" ]; then
-+	echo "UEFI firmware not found: $EFI_UEFI"
-+	echo "Please install the UEFI firmware to this path"
-+	echo "Or specify the correct path with the env variable EFI_UEFI"
-+	exit 2
-+fi
-+
-+# Remove the TEST_CASE from $@
-+shift 1
-+
-+# Fish out the arguments for the test, they should be the next string
-+# after the "-append" option
-+qemu_args=()
-+cmd_args=()
-+while (( "$#" )); do
-+	if [ "$1" = "-append" ]; then
-+		cmd_args=$2
-+		shift 2
-+	else
-+		qemu_args+=("$1")
-+		shift 1
-+	fi
-+done
-+
-+if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
-+	EFI_CASE=dummy
-+fi
-+
-+: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
-+mkdir -p "$EFI_CASE_DIR"
-+
-+cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
-+echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
-+echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
-+
-+EFI_RUN=y $TEST_DIR/run \
-+       -bios "$EFI_UEFI" \
-+       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
-+       "${qemu_args[@]}"
-diff --git a/arm/run b/arm/run
-index c6f25b8c..de520c11 100755
---- a/arm/run
-+++ b/arm/run
-@@ -64,8 +64,10 @@ if ! $qemu $M -chardev '?' | grep -q testdev; then
- 	exit 2
- fi
++[ "$EFI_USE_ACPI" = "y" ] || EFI_USE_DTB=y
  
--chr_testdev='-device virtio-serial-device'
--chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
-+if [ "$EFI_RUN" != "y" ]; then
-+	chr_testdev='-device virtio-serial-device'
-+	chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
+ if [ ! -f "$EFI_UEFI" ]; then
+ 	echo "UEFI firmware not found: $EFI_UEFI"
+@@ -53,6 +56,12 @@ mkdir -p "$EFI_CASE_DIR"
+ 
+ cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
+ echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
++if [ "$EFI_USE_DTB" = "y" ]; then
++	qemu_args+=(-machine acpi=off)
++	FDT_BASENAME="dtb"
++	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_TEST/$EFI_CASE/$FDT_BASENAME" "${qemu_args[@]}")
++	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_TEST/$EFI_CASE/startup.nsh"
 +fi
+ echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
  
- pci_testdev=
- if $qemu $M -device '?' | grep -q pci-testdev; then
-@@ -74,7 +76,11 @@ fi
+ EFI_RUN=y $TEST_DIR/run \
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index c4f495a9..0fa21b7e 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -329,6 +329,8 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+ 	struct mem_region r;
+ 	uintptr_t text = (uintptr_t)&_text, etext = __ALIGN((uintptr_t)&_etext, 4096);
+ 	uintptr_t data = (uintptr_t)&_data, edata = __ALIGN((uintptr_t)&_edata, 4096);
++	const void *fdt = efi_bootinfo->fdt;
++	int fdt_size, ret;
  
- A="-accel $ACCEL"
- command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
--command+=" -display none -serial stdio -kernel"
-+command+=" -display none -serial stdio"
- command="$(migration_cmd) $(timeout_cmd) $command"
- 
--run_qemu $command "$@"
-+if [ "$EFI_RUN" = "y" ]; then
-+	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
-+else
-+	run_qemu $command -kernel "$@"
-+fi
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index a133309d..d60cf8cd 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -12,6 +12,7 @@ tests-common += $(TEST_DIR)/gic.$(exe)
- tests-common += $(TEST_DIR)/psci.$(exe)
- tests-common += $(TEST_DIR)/sieve.$(exe)
- tests-common += $(TEST_DIR)/pl031.$(exe)
-+tests-common += $(TEST_DIR)/dummy.$(exe)
- 
- tests-all = $(tests-common) $(tests)
- all: directories $(tests-all)
-diff --git a/arm/dummy.c b/arm/dummy.c
-new file mode 100644
-index 00000000..7033bb7c
---- /dev/null
-+++ b/arm/dummy.c
-@@ -0,0 +1,12 @@
-+#include "libcflat.h"
+ 	/*
+ 	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
+@@ -393,6 +395,17 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+ 		}
+ 		mem_region_add(&r);
+ 	}
++	if (fdt) {
++		/* Move the FDT to the base of free memory */
++		fdt_size = fdt_totalsize(fdt);
++		ret = fdt_move(fdt, (void *)free_mem_start, fdt_size);
++		assert(ret == 0);
++		ret = dt_init((void *)free_mem_start);
++		assert(ret == 0);
++		free_mem_start += ALIGN(fdt_size, EFI_PAGE_SIZE);
++		free_mem_pages -= ALIGN(fdt_size, EFI_PAGE_SIZE) >> EFI_PAGE_SHIFT;
++	}
 +
-+int main(int argc, char **argv)
-+{
-+	/*
-+	 * scripts/runtime.bash uses this test as a canary to determine if the
-+	 * basic setup is functional.  Print a magic string to let runtime.bash
-+	 * know that all is well.
-+	 */
-+	printf("Dummy Hello World!");
-+	return 0;
-+}
+ 	__phys_end &= PHYS_MASK;
+ 	asm_mmu_disable();
+ 
+@@ -440,10 +453,12 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+ 		return status;
+ 	}
+ 
+-	status = setup_rsdp(efi_bootinfo);
+-	if (status != EFI_SUCCESS) {
+-		printf("Cannot find RSDP in EFI system table\n");
+-		return status;
++	if (!dt_available()) {
++		status = setup_rsdp(efi_bootinfo);
++		if (status != EFI_SUCCESS) {
++			printf("Cannot find RSDP in EFI system table\n");
++			return status;
++		}
+ 	}
+ 
+ 	psci_set_conduit();
 -- 
 2.25.1
 
