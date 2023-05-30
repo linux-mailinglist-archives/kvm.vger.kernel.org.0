@@ -2,172 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B26E71685E
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 17:59:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3302A71687D
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 18:01:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233173AbjE3P7g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 11:59:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47018 "EHLO
+        id S233194AbjE3QBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 12:01:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233202AbjE3P7W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 11:59:22 -0400
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2079.outbound.protection.outlook.com [40.107.95.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C7CAE47;
-        Tue, 30 May 2023 08:59:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fHVGriVbxb0bAE6o+Ui4npl3ORZHqM3505i9a7cBPEYxc/OJCbMGkiAauzb784BZvmeA8bPWCJDk+EZY2B3krOobgG1uQ6/pwryLGnx2/5Go6I1hpeD7I4pSGRFg7aMHuvogy8wJnjb/Az9adm0+dl5O2S9wdo1noOcrDacz3iWJwJohLxbUztYkqFyfUCasp8ksp/9FFVNawQKyeCikWRQoApfMxdYl63VX9iPbUFp1ZaZn0nobGQmpQRQAK/CtMuYE6DK6g0Qcu0aIziZpY+FosNpS2oC8IxU8Fh5LU4zigyUfJAnn5pRRXMIdr4OR00rngxK46keg25B67P2ElQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eUR1ty7awgip1X62R2Urz0yNWuPl5Q7d6HWJjqrWedA=;
- b=IMpmv3kE/OIiXKc3xXMNXGAz7cn4TfUqevdDHJ0Ik1Oz3UdMFKo7lHSNYk9zcR6lIQoirrRPB+2ONaebzKH/lPdfsaO6WoiX7JwfdUwBzjJzik+8YowYJD4F4j3CTq1WIiC543qVfbBbekv2SH1X/gQQKDdmI+ja990kMCWPMLSHOqKu6cTzbP3EOPsayFw+Z9orOoW9s8cV1LrWGxWru4/pZ0jZ2Lq3NU3lCo+OYk/IflxlbTVlLvimarvSgYdc/lNSLzS/agaqmUbq8B1OX3Jp7hr0D8JYYzzBjvduBF9vELjmBsxOV4E8OS0ahN0stUHcjFb930WuKSPMNEnfpw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eUR1ty7awgip1X62R2Urz0yNWuPl5Q7d6HWJjqrWedA=;
- b=iQwe7srU2ScvVo3YveggXQ7NFFGF1bTDYCT65qPkgTw3iotFthPqjhZBy+pD5MLjfwbtUG5GeEFRt69gkLN7gOqSHbD02TM8+bJ0tKYZIfuUQnf5QHUra2BEt3dbSwCkvLR8PtwE6tPnxXQb3Fr+glXAD3Q6B7K85ncnUxCugZs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by SA3PR12MB9227.namprd12.prod.outlook.com (2603:10b6:806:398::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.22; Tue, 30 May
- 2023 15:59:06 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::61f6:a95e:c41e:bb25]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::61f6:a95e:c41e:bb25%3]) with mapi id 15.20.6455.020; Tue, 30 May 2023
- 15:59:05 +0000
-Message-ID: <0f0ab135-cdd0-0691-e0c1-42645671fe15@amd.com>
-Date:   Tue, 30 May 2023 10:59:01 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [RFC PATCH V6 01/14] x86/sev: Add a #HV exception handler
-Content-Language: en-US
-To:     Peter Zijlstra <peterz@infradead.org>,
-        "Gupta, Pankaj" <pankaj.gupta@amd.com>
-Cc:     Tianyu Lan <ltykernel@gmail.com>, luto@kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
-        tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, ashish.kalra@amd.com,
-        srutherford@google.com, akpm@linux-foundation.org,
-        anshuman.khandual@arm.com, pawan.kumar.gupta@linux.intel.com,
-        adrian.hunter@intel.com, daniel.sneddon@linux.intel.com,
-        alexander.shishkin@linux.intel.com, sandipan.das@amd.com,
-        ray.huang@amd.com, brijesh.singh@amd.com, michael.roth@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com,
-        pangupta@amd.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-arch@vger.kernel.org
-References: <20230515165917.1306922-1-ltykernel@gmail.com>
- <20230515165917.1306922-2-ltykernel@gmail.com>
- <20230516093010.GC2587705@hirez.programming.kicks-ass.net>
- <d43c14d9-a149-860c-71d6-e5c62b7c356f@amd.com>
- <20230530143504.GA200197@hirez.programming.kicks-ass.net>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20230530143504.GA200197@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN7PR04CA0106.namprd04.prod.outlook.com
- (2603:10b6:806:122::21) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        with ESMTP id S233192AbjE3QBt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 12:01:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD7E100
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 09:00:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685462455;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cpizXiy/LDrr+SJt8KqJ4lnndh1NLm4zehYJ/eyPviI=;
+        b=CMiDdP//t65tTmqHCoavUMdLTLRMXiOCGG3IPm127QAzSoCb12kPYQewuwwdjuUYRoL9xa
+        BIEFvX3GcUlBo+HmxpAkYRRmISrpUP82uI6aRiWGtUYkokxGqR1fB3FVdaTXlUE28RjsaW
+        fPaCRs1BvHmS88MSlIvPc9CZ9zAyPC8=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-441-EV0dJ0pAO02qv9I8OcjPUg-1; Tue, 30 May 2023 12:00:52 -0400
+X-MC-Unique: EV0dJ0pAO02qv9I8OcjPUg-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2af924d604cso20853861fa.0
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 09:00:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685462450; x=1688054450;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cpizXiy/LDrr+SJt8KqJ4lnndh1NLm4zehYJ/eyPviI=;
+        b=XLvsIUyGWql4016MwpQHbp+k2wsCX9CFc/g98Tcjbe9jJd2GZgXW6MyoiPUaT4Qn6I
+         glifDP9E1RrtjRXsC2GaOrhQ0aeMw1TqARx4aI18O/nnSGIahk8azmiiha9/4ZgyuXsT
+         r3sMnlHzsA+vVri5gblbXa4HEdb/DQAL/3zhMYhze77JL+UgEsV7nOmD78JLjj5jvgPN
+         yFXE9oGPd9baW8RKsJ8PCinG34MXKy/8wsRD0bF2mnghB2RMA66nbAQ6MQfofP7VvO0e
+         Ugy2w5mpGWzrsFD7NGUjDfkF93n/iIGr/cwG85NiCgYqy6ad+7kfBPbQmYqILM0iXa3W
+         3OLw==
+X-Gm-Message-State: AC+VfDwzoKDqQxP30LxqY5bLftmX49ySGw1KJYy8sOyAoclk389qXu17
+        Fa2zlgkTafAeP5OoZyyWIBDdIXS1ftXbRGTOk0q9ikqNz+t1vMyH51kjbzOyUkbWgBafcOqeVTf
+        U5k41xlUN9yir
+X-Received: by 2002:a2e:2e08:0:b0:2ac:8c5e:e151 with SMTP id u8-20020a2e2e08000000b002ac8c5ee151mr1108265lju.31.1685462450415;
+        Tue, 30 May 2023 09:00:50 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ65CUAQ0psNpySoTjwhH9D51FR0/IOamyhQpQTFmaHfXN81xSEWPOXkE63QmqLY9ZD61r047Q==
+X-Received: by 2002:a2e:2e08:0:b0:2ac:8c5e:e151 with SMTP id u8-20020a2e2e08000000b002ac8c5ee151mr1108234lju.31.1685462449966;
+        Tue, 30 May 2023 09:00:49 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-25-16.business.telecomitalia.it. [87.12.25.16])
+        by smtp.gmail.com with ESMTPSA id j13-20020a170906474d00b0096a5d341b50sm7520587ejs.111.2023.05.30.09.00.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 May 2023 09:00:49 -0700 (PDT)
+Date:   Tue, 30 May 2023 18:00:47 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Mike Christie <michael.christie@oracle.com>
+Cc:     syzbot <syzbot+d0d442c22fa8db45ff0e@syzkaller.appspotmail.com>,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org, stefanha@redhat.com
+Subject: Re: [syzbot] [kvm?] [net?] [virt?] general protection fault in
+ vhost_work_queue
+Message-ID: <CAGxU2F7HK5KRggiY7xnKHeXFRXJmqcKbjf3JnXC3mbmn9xqRtw@mail.gmail.com>
+References: <0000000000001777f605fce42c5f@google.com>
+ <20230530072310-mutt-send-email-mst@kernel.org>
+ <CAGxU2F7O7ef3mdvNXtiC0VtWiS2DMnoiGwSR=Z6SWbzqcrBF-g@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|SA3PR12MB9227:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8daa34e6-04e8-475b-f946-08db6126cb9d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8h+owdRYxOykLSb1VB28E4H3NJI7W9NbRO2zLxJVhdfXET+rpm1tcRmYY0XMFsZciyEpRX+e0Qcxzwj9WKiIu3sV5Yaw4+jz/Tavv7EYC4oNFIM+1QOLKtWxf9abS3Jgwl/Lnn8AXUMwr48UNSlDek7hBGe0M+bfAu3JURbHPXVE7CBtrHfir9GmCGKI9j9sKI8WLJyjw7GxVa/5CAYibTa6MlFbNNnqZ7i7CO2MUZk8dGlEmOG/axdD3ooaPDq1XV43W/qks/3vTix881l9gJjATVBGbRVBD4G9jE8ekBMPCPTw7gceiZcrUTqiskhvBcSZRlAQHklv7k34kgf1kef3/sYKomO9RwlAeVE64xciBHF2Y3d7h/QqvRiV9oxpOh4iyhst3a4vQn2S/gjO72fJWqn8pWRJMcZM8+08Pw2CCKeX4yAzsT9gVdLKppgokDrgtFpVN0Yxca9e0R0f9oo0VES2emDKFWRZh52LkZr4gCqxZ1Zh9T0WsbfB+G3I9mPOB/zb0FUdAEzjhfDZrE2DW8wquNnno3KDXJsDGHR2nwEFpktTGtNSI9JVcDxzpQlrWrDVJovfM1rKM4BIE9Tn9yhpJYzc2S0LFTizyj0bfrYRVoqUj58VMy5zfH6SatYQOXfa2/T0nIJho4DHoA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(346002)(136003)(366004)(39860400002)(451199021)(2906002)(4744005)(31686004)(8936002)(7416002)(7406005)(26005)(6506007)(6512007)(53546011)(5660300002)(6486002)(110136005)(41300700001)(83380400001)(478600001)(86362001)(8676002)(6666004)(38100700002)(186003)(31696002)(2616005)(66556008)(66946007)(4326008)(6636002)(66476007)(316002)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QjZJRXdHdlU2a3RLRHNLeVlFc3lTSGRyWjlaRVlBNmlmMGdtTFA4a0U3TnJF?=
- =?utf-8?B?TExLRmVkU3dZaHRNUGFxNE9BbEdLeGdSRzZMdUkyYzcyUXd5aWVZallNUnhX?=
- =?utf-8?B?YldWSUorb3lsKzVIaVE4UkJnRXlxWGZvVXRkeHNvVWF5UTNMckRsZlVpeVgx?=
- =?utf-8?B?ZGxwYUdTa1ZpdTY5MWlxZnhUWjVydGRQMm9LYUFLZVJtNHRHbU02QU4wNFZE?=
- =?utf-8?B?dkViWG9Wa2daQTJOa2NjWUJibmxSYVhlQTJvOTBYT3R3ZFd0WjAwVjdZVE5k?=
- =?utf-8?B?czk4VjFyVXQzUnplMGl0Rno4eWJQcGo5RytHaEp0OFZEWE9seHBTRHRrY3hX?=
- =?utf-8?B?cTNsVjZMQ3liemVRMUtjdmwvYm4wcnFiQlM1dU9abWcvTU9TeUplcW9zQ0dX?=
- =?utf-8?B?eDVMZS9MWGEvUVBlUHRaNGQ1QlVYR0ppRXF2WG9maHpPL1J0WkQxVzJ1aU11?=
- =?utf-8?B?bDdCc2RCZk1ITExGMTlMWG5xM3Y0ZG5YY05tQW1OMlNmUTJ0NC9KWUJQSk80?=
- =?utf-8?B?bjBFdE51bU1XakZBL0hWMVBwM2NsZDRhVnhxSW56R2dRa2tsZUtmY0xZTm92?=
- =?utf-8?B?RUhyQVlOekV4UjMzM0JMMDB0Ujg3NHU3b0FDV0dKM29PLzdTb0NxdkVzS2k2?=
- =?utf-8?B?RHpieTQzSmwzWUF1NnZRdjVoTzFVZGNTRXMwcXVhTmhEOFlEcy9QYWU0MEVp?=
- =?utf-8?B?OVJadVFuam9OTGtLVHNpWTFIS0Raa3V1MUFLbFV2NUI3SzIrdGRwYWd3bnhZ?=
- =?utf-8?B?Y3pqSlhydDhvWjJ1V1UrMlIzdDBhRlpEMHMyV3dVMS91L05ud1VIbnpDRWZV?=
- =?utf-8?B?WjZZMTduMXNCMHIvcWEyY2hjTGhvRkRNa29WZjg5aUJUTGtUaVVLakpCM09P?=
- =?utf-8?B?WVJ0MUV1U2ZPTWJoaXE1WkI3UzZjV1FUNlJXdkIvVDdSamV5VVNkRHRhVCtw?=
- =?utf-8?B?K3M4M2k1THM5OWcxbWlpUmx6S2o1V3kxWjJVYVdDc1J2L1MreVA5QW1GbTBM?=
- =?utf-8?B?QXBTRkoyaEI3TW1DdHlDNlRkWFY0SkJmVDlrb2xMZldyNmlpZ0E2OUZpdlRP?=
- =?utf-8?B?Rk0rbE45VUxxRWNFY2plcHVTKzJnQnhOS2NBUnJEUHhrc0xidXJPeS9aeGMy?=
- =?utf-8?B?Y3ZUeVRCdkRFV3d1cmlPWmFvdm9zZm44SkpVWk50ZWRUUzFCVFNDL21lZmFT?=
- =?utf-8?B?VkpoWGhWYTZYMDRpVUJHU2czZndIK2hrR2dtUXEyaDhLWWdDd0FNNzRkRGxG?=
- =?utf-8?B?K3hDZ1pWczlmVVY3L0lreUVsMGNUeTF4TnhKeGh2c1BhU0sxbzUrV2lWMDlT?=
- =?utf-8?B?MzNKOEVQejU1K2N0NUVta0xnU1VzQ3hnMGtkemxXbXlnYWFMMTlLVnZodXJP?=
- =?utf-8?B?Y1d0TG9NQVVFUExXa1hHMWI5RWJKbkUxRWEzYktNTkMvOUR0blphTURteFRU?=
- =?utf-8?B?eC9YWTVmeXhHV2VRUHdEbzdYZ0J5dWsvdVZ5TkRZS2VYdWRpS0ZTM2s5Z0RB?=
- =?utf-8?B?aXVFR29PV3Zhc0VGUmtMancxcG5LWVlZVEtwTGI1RXJOOWN4OTg5bTZxY2lJ?=
- =?utf-8?B?YU1LdzNYU3F3WjVoSkd1NmFhY3pvK0o5eVFLYy9keUpxTVRZejQ5NkhtalpS?=
- =?utf-8?B?T3pVSjUwMnJXQm5OMmxJYUU1bExlNXBnOG1JTFQzQW1ncGUwWW1DbE5PSFhp?=
- =?utf-8?B?V2Z6S2w2ZGROeDNISFJYT3hYYXg4VnNzdGMvcFRLaGgvZ2M5RG82MENROFFW?=
- =?utf-8?B?RVNicmJ3c0dvZ3Y4dElHSTlXS0VETkFSYUN2ck9CdXdZZDd4U0M1TFZoMEd1?=
- =?utf-8?B?NkpRNFVsYXZqZkJ0SkJMMVRvc2JHeGVQTCtaeVVqTFRDZnhFNUhneHMyV1R3?=
- =?utf-8?B?Z3pxY0I1QWpIMHBhWkRVRjhQOTZpa3Q0cW0wbWlXdDdVS2s0VHE3SHVCSm8v?=
- =?utf-8?B?NWt6aW5rT2VwOElUemRXdlZzSi9uZEhVSlVEZ3lCYlRkUjl0Tkx0VUR0akJi?=
- =?utf-8?B?d21USkd1aVg3bHg0MWlNWUloRmpyMTZuRjFORFdZaHp3d044VHYvSW9oYlJz?=
- =?utf-8?B?WkFYdDA5eFhiZHJQZFlyWXlXM0dWOHlMdSthdTJyaVY5K1VZR1dQWWVqY1Uz?=
- =?utf-8?Q?nPQ/hX11xin3/3t8DDYA94MKd?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8daa34e6-04e8-475b-f946-08db6126cb9d
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2023 15:59:05.7777
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wkD/omVYbZUAmLIXE8LvsjWQaLMAY4uGlX0xqhTIjgEkdVbxUa6KMwB0zJYptrqwTPY0L4nEMQnNkdWmrTQgqw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9227
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGxU2F7O7ef3mdvNXtiC0VtWiS2DMnoiGwSR=Z6SWbzqcrBF-g@mail.gmail.com>
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/30/23 09:35, Peter Zijlstra wrote:
-> On Tue, May 30, 2023 at 02:16:55PM +0200, Gupta, Pankaj wrote:
->>
->>>> Add a #HV exception handler that uses IST stack.
->>>>
->>>
->>> Urgh.. that is entirely insufficient. Like it doesn't even begin to
->>> start to cover things.
->>>
->>> The whole existing VC IST stack abuse is already a nightmare and you're
->>> duplicating that.. without any explanation for why this would be needed
->>> and how it is correct.
->>>
->>> Please try again.
->>
->> #HV handler handles both #NMI & #MCE in the guest and nested #HV is never
->> raised by the hypervisor.
-> 
-> I thought all this confidental computing nonsense was about not trusting
-> the hypervisor, so how come we're now relying on the hypervisor being
-> sane?
+On Tue, May 30, 2023 at 3:44 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>
+> On Tue, May 30, 2023 at 1:24 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, May 30, 2023 at 12:30:06AM -0700, syzbot wrote:
+> > > Hello,
+> > >
+> > > syzbot found the following issue on:
+> > >
+> > > HEAD commit:    933174ae28ba Merge tag 'spi-fix-v6.4-rc3' of git://git.ker..
+> > > git tree:       upstream
+> > > console output: https://syzkaller.appspot.com/x/log.txt?x=138d4ae5280000
+> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=f389ffdf4e9ba3f0
+> > > dashboard link: https://syzkaller.appspot.com/bug?extid=d0d442c22fa8db45ff0e
+> > > compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> > >
+> > > Unfortunately, I don't have any reproducer for this issue yet.
+> > >
+> > > Downloadable assets:
+> > > disk image: https://storage.googleapis.com/syzbot-assets/21a81b8c2660/disk-933174ae.raw.xz
+> > > vmlinux: https://storage.googleapis.com/syzbot-assets/b4951d89e238/vmlinux-933174ae.xz
+> > > kernel image: https://storage.googleapis.com/syzbot-assets/21eb405303cc/bzImage-933174ae.xz
+> > >
+> > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > > Reported-by: syzbot+d0d442c22fa8db45ff0e@syzkaller.appspotmail.com
+> > >
+> > > general protection fault, probably for non-canonical address 0xdffffc000000000e: 0000 [#1] PREEMPT SMP KASAN
+> > > KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
+> > > CPU: 0 PID: 29845 Comm: syz-executor.4 Not tainted 6.4.0-rc3-syzkaller-00032-g933174ae28ba #0
+> > > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/16/2023
+> > > RIP: 0010:vhost_work_queue drivers/vhost/vhost.c:259 [inline]
+> > > RIP: 0010:vhost_work_queue+0xfc/0x150 drivers/vhost/vhost.c:248
+> > > Code: 00 00 fc ff df 48 89 da 48 c1 ea 03 80 3c 02 00 75 56 48 b8 00 00 00 00 00 fc ff df 48 8b 1b 48 8d 7b 70 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 42 48 8b 7b 70 e8 95 9e ae f9 5b 5d 41 5c 41 5d e9
+> > > RSP: 0018:ffffc9000333faf8 EFLAGS: 00010202
+> > > RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000d84d000
+> > > RDX: 000000000000000e RSI: ffffffff841221d7 RDI: 0000000000000070
+> > > RBP: ffff88804b6b95b0 R08: 0000000000000001 R09: 0000000000000000
+> > > R10: 0000000000000001 R11: 0000000000000000 R12: ffff88804b6b00b0
+> > > R13: 0000000000000000 R14: ffff88804b6b95e0 R15: ffff88804b6b95c8
+> > > FS:  00007f3b445ec700(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+> > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > CR2: 0000001b2e423000 CR3: 000000005d734000 CR4: 00000000003506f0
+> > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > > DR3: 000000000000003b DR6: 00000000ffff0ff0 DR7: 0000000000000400
+> > > Call Trace:
+> > >  <TASK>
+> > >  vhost_transport_send_pkt+0x268/0x520 drivers/vhost/vsock.c:288
+> > >  virtio_transport_send_pkt_info+0x54c/0x820 net/vmw_vsock/virtio_transport_common.c:250
+> > >  virtio_transport_connect+0xb1/0xf0 net/vmw_vsock/virtio_transport_common.c:813
+> > >  vsock_connect+0x37f/0xcd0 net/vmw_vsock/af_vsock.c:1414
+> > >  __sys_connect_file+0x153/0x1a0 net/socket.c:2003
+> > >  __sys_connect+0x165/0x1a0 net/socket.c:2020
+> > >  __do_sys_connect net/socket.c:2030 [inline]
+> > >  __se_sys_connect net/socket.c:2027 [inline]
+> > >  __x64_sys_connect+0x73/0xb0 net/socket.c:2027
+> > >  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> > >  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+> > >  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> > > RIP: 0033:0x7f3b4388c169
+> > > Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> > > RSP: 002b:00007f3b445ec168 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+> > > RAX: ffffffffffffffda RBX: 00007f3b439ac050 RCX: 00007f3b4388c169
+> > > RDX: 0000000000000010 RSI: 0000000020000140 RDI: 0000000000000004
+> > > RBP: 00007f3b438e7ca1 R08: 0000000000000000 R09: 0000000000000000
+> > > R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> > > R13: 00007f3b43acfb1f R14: 00007f3b445ec300 R15: 0000000000022000
+> > >  </TASK>
+> > > Modules linked in:
+> > > ---[ end trace 0000000000000000 ]---
+> > > RIP: 0010:vhost_work_queue drivers/vhost/vhost.c:259 [inline]
+> > > RIP: 0010:vhost_work_queue+0xfc/0x150 drivers/vhost/vhost.c:248
+> > > Code: 00 00 fc ff df 48 89 da 48 c1 ea 03 80 3c 02 00 75 56 48 b8 00 00 00 00 00 fc ff df 48 8b 1b 48 8d 7b 70 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 42 48 8b 7b 70 e8 95 9e ae f9 5b 5d 41 5c 41 5d e9
+> > > RSP: 0018:ffffc9000333faf8 EFLAGS: 00010202
+> > > RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000d84d000
+> > > RDX: 000000000000000e RSI: ffffffff841221d7 RDI: 0000000000000070
+> > > RBP: ffff88804b6b95b0 R08: 0000000000000001 R09: 0000000000000000
+> > > R10: 0000000000000001 R11: 0000000000000000 R12: ffff88804b6b00b0
+> > > R13: 0000000000000000 R14: ffff88804b6b95e0 R15: ffff88804b6b95c8
+> > > FS:  00007f3b445ec700(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+> > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > CR2: 0000001b2e428000 CR3: 000000005d734000 CR4: 00000000003506e0
+> > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > > DR3: 000000000000003b DR6: 00000000ffff0ff0 DR7: 0000000000000400
+> > > ----------------
+> > > Code disassembly (best guess), 5 bytes skipped:
+> > >    0: 48 89 da                mov    %rbx,%rdx
+> > >    3: 48 c1 ea 03             shr    $0x3,%rdx
+> > >    7: 80 3c 02 00             cmpb   $0x0,(%rdx,%rax,1)
+> > >    b: 75 56                   jne    0x63
+> > >    d: 48 b8 00 00 00 00 00    movabs $0xdffffc0000000000,%rax
+> > >   14: fc ff df
+> > >   17: 48 8b 1b                mov    (%rbx),%rbx
+> > >   1a: 48 8d 7b 70             lea    0x70(%rbx),%rdi
+> > >   1e: 48 89 fa                mov    %rdi,%rdx
+> > >   21: 48 c1 ea 03             shr    $0x3,%rdx
+> > > * 25: 80 3c 02 00             cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+> > >   29: 75 42                   jne    0x6d
+> > >   2b: 48 8b 7b 70             mov    0x70(%rbx),%rdi
+> > >   2f: e8 95 9e ae f9          callq  0xf9ae9ec9
+> > >   34: 5b                      pop    %rbx
+> > >   35: 5d                      pop    %rbp
+> > >   36: 41 5c                   pop    %r12
+> > >   38: 41 5d                   pop    %r13
+> > >   3a: e9                      .byte 0xe9
+> >
+> >
+> > Stefano, Stefan, take a look?
+>
+> I'll take a look.
+>
+> From a first glance, it looks like an issue when we call vhost_work_queue().
+> @Mike, does that ring any bells since you recently looked at that code?
 
-That should really say that a nested #HV should never be raised by the 
-hypervisor, but if it is, then the guest should detect that and 
-self-terminate knowing that the hypervisor is possibly being malicious.
+I think it is partially related to commit 6e890c5d5021 ("vhost: use
+vhost_tasks for worker threads") and commit 1a5f8090c6de ("vhost: move
+worker thread fields to new struct"). Maybe that commits just
+highlighted the issue and it was already existing.
+
+In this case I think there is a race between vhost_worker_create() and
+vhost_transport_send_pkt(). vhost_transport_send_pkt() calls
+vhost_work_queue() without holding the vhost device mutex, so it can run
+while vhost_worker_create() set dev->worker, but has not yet set
+worker->vtsk.
+
+Before commit 1a5f8090c6de ("vhost: move worker thread fields to new
+struct"), dev->worker is set when everything was ready, but maybe it was
+just a case of the instructions not being re-ordered and the problem
+could still occur.
+
+This happens because VHOST_VSOCK_SET_GUEST_CID can be called before
+VHOST_SET_OWNER and then vhost_transport_send_pkt() finds the guest's
+CID and tries to send it a packet.
+But is it correct to handle VHOST_VSOCK_SET_GUEST_CID, before
+VHOST_SET_OWNER?
+
+QEMU always calls VHOST_SET_OWNER before anything, but I don't know
+about the other VMMs.
+
+So, could it be an acceptable solution to reject
+VHOST_VSOCK_SET_GUEST_CID before VHOST_SET_OWNER?
+
+I mean somethig like this:
+
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index 6578db78f0ae..33fc0805d189 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -829,7 +829,12 @@ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
+        case VHOST_VSOCK_SET_GUEST_CID:
+                if (copy_from_user(&guest_cid, argp, sizeof(guest_cid)))
+                        return -EFAULT;
+-               return vhost_vsock_set_cid(vsock, guest_cid);
++               mutex_lock(&vsock->dev.mutex);
++               r = vhost_dev_check_owner(&vsock->dev);
++               if (!r)
++                       r = vhost_vsock_set_cid(vsock, guest_cid);
++               mutex_unlock(&vsock->dev.mutex);
++               return r;
+        case VHOST_VSOCK_SET_RUNNING:
+                if (copy_from_user(&start, argp, sizeof(start)))
+                        return -EFAULT;
+
+In the documentation, we say:
+
+  /* Set current process as the (exclusive) owner of this file descriptor.  This
+   * must be called before any other vhost command.  Further calls to
+   * VHOST_OWNER_SET fail until VHOST_OWNER_RESET is called. */
+
+This should prevents the issue, but could break a wrong userspace.
+
+Others idea that I have in mind are:
+- hold vsock->dev.mutex while calling vhost_work_queue() (performance 
+  degradation?)
+- use RCU to protect dev->worker
+
+WDYT?
 
 Thanks,
-Tom
+Stefano
+
