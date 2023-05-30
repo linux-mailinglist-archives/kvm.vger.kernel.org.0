@@ -2,170 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 392BD715ECE
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 14:17:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C492716024
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 14:42:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231460AbjE3MRS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 08:17:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47194 "EHLO
+        id S232087AbjE3MmF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 08:42:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231302AbjE3MRQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 08:17:16 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2074.outbound.protection.outlook.com [40.107.223.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 240C4136;
-        Tue, 30 May 2023 05:17:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j53rtlWihx5vVUV2YO2XLdmr3qkGTJXQqdgEp/AwPBPWMsOwaULLj7+ObXuJ4GVuYcSe7PKTL4mkMex4CmlNSqNgiGkLumwUKUzNopNMa9yid+32X/gEuMhbTtONVLSKq9FKi/Nzd8cdOXN3gCdDxObEXNr3vdohDr4FtN1Yz5I49KwZCM2rWgT7WOtpMhBUc44p/XOTXqRf5tHEtDKDnVPf9TSWHmwLvuym52QBEhYcMWfWYRsQ3P/S0Gupw0LpFZ/v1+e8HxM9ZVQ9+3hSb2MLxaP+Z4JDp2lrf5oNYoxupDSIjh9bWlrfWAucPwL8VwUNATPNNK+uRCxQezAN2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QNQVhgg44HLZp6CP352q6L7RMlhsZtae8G/mtt2Y4ZI=;
- b=EqMRYZXxxXBd4+hkYwbnv5t/0Sre3ua1s31nwZSJIG6pkF1lQrnMpI9aKHheBhFS39+wZwtks1dk8HSsgXVnk3X7NWLmYy+DVRfz+ETInk9SvDOxxsOxSZ9XbQyGANHTNhCyOC3BYsTlLxtYJDYnvPXSRPr3cgZMa6L1gKO/BvMse1ABv84HxQlLTeGF6w9HkvS1zGQth8ELHsvkxZtG8IGzrl1REy++jTf0tbcsp4Fr4ULOGsVGsNelkJYjN3SKwrc3WDbk2MO2g8hT99QVdNIIjnuD5LIjim6wb0+WkkxPjpbSzb8NINpwxblX2t0v1UEpkppxPM+fFInwCrJfQw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QNQVhgg44HLZp6CP352q6L7RMlhsZtae8G/mtt2Y4ZI=;
- b=ri1ee7APkLMoRiQ8C2VjvQQCHsJyxQJeTH4/oKLGcPUgASbHD73Xu3TLRTk3oILkUjQ93PHuH9YMmS6dsGDo1jO76wvatf8WEvZX2e2I19W3IvGri7W5qIHk77w6dN2actFI6Vfp0Wx2jtrtxo8m81Kylj2JcUsUHQiH9qovDXM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB2810.namprd12.prod.outlook.com (2603:10b6:5:41::21) by
- DM8PR12MB5493.namprd12.prod.outlook.com (2603:10b6:8:3d::10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6433.23; Tue, 30 May 2023 12:17:06 +0000
-Received: from DM6PR12MB2810.namprd12.prod.outlook.com
- ([fe80::6220:7985:a611:c053]) by DM6PR12MB2810.namprd12.prod.outlook.com
- ([fe80::6220:7985:a611:c053%4]) with mapi id 15.20.6433.022; Tue, 30 May 2023
- 12:17:05 +0000
-Message-ID: <d43c14d9-a149-860c-71d6-e5c62b7c356f@amd.com>
-Date:   Tue, 30 May 2023 14:16:55 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [RFC PATCH V6 01/14] x86/sev: Add a #HV exception handler
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Tianyu Lan <ltykernel@gmail.com>
-Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, ashish.kalra@amd.com,
-        srutherford@google.com, akpm@linux-foundation.org,
-        anshuman.khandual@arm.com, pawan.kumar.gupta@linux.intel.com,
-        adrian.hunter@intel.com, daniel.sneddon@linux.intel.com,
-        alexander.shishkin@linux.intel.com, sandipan.das@amd.com,
-        ray.huang@amd.com, brijesh.singh@amd.com, michael.roth@amd.com,
-        thomas.lendacky@amd.com, venu.busireddy@oracle.com,
-        sterritt@google.com, tony.luck@intel.com, samitolvanen@google.com,
-        fenghua.yu@intel.com, pangupta@amd.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
-References: <20230515165917.1306922-1-ltykernel@gmail.com>
- <20230515165917.1306922-2-ltykernel@gmail.com>
- <20230516093010.GC2587705@hirez.programming.kicks-ass.net>
-Content-Language: en-US
-From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <20230516093010.GC2587705@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: YQBPR01CA0005.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:c01::13)
- To DM6PR12MB2810.namprd12.prod.outlook.com (2603:10b6:5:41::21)
+        with ESMTP id S232041AbjE3Ml7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 08:41:59 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1E721AD;
+        Tue, 30 May 2023 05:41:36 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34UC8TmC008269;
+        Tue, 30 May 2023 12:41:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=UBwvqp78X4MzSrMKZIbFMnA/WvjHHKH92r/fj5mdZqA=;
+ b=rSGF64744mSOdfCiMsA10Uy/Lil2AtvKG8YBjsQBgOg9d5NhZu9ZWQBycPCeToOBY16Y
+ VaGuEdNYZ1PQ77pmnz90VFWwqd++trhY5rNG5E2vsSbsOGIkvIMywJPDz7TdPzTq50On
+ 8csaTna67YdHU4PPWYihMVLaEHgljWvarNCrxw7FtyCeAdKdNeQnx45JxqK+HLSLborL
+ xkdNyqX6lfxsnkKal2gLeagU1U5PqMgjOOaDoflgbj4tFY9FGR1ygY+yCUqU2vNlfXXq
+ P/Vg6++jSo+coU5Nk/sPhy03dgoJuj39ShDpG5Wrb3BTDiKLHP1u4VWTIrL/wsZ87FHi jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwg87hs3h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 May 2023 12:41:03 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34UCAwge016638;
+        Tue, 30 May 2023 12:41:02 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwg87hs2p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 May 2023 12:41:02 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34U5l6CP010940;
+        Tue, 30 May 2023 12:41:01 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3qu94e1fnp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 May 2023 12:41:00 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34UCevRQ20382232
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 May 2023 12:40:57 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 775F620043;
+        Tue, 30 May 2023 12:40:57 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1E8E620040;
+        Tue, 30 May 2023 12:40:57 +0000 (GMT)
+Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com (unknown [9.152.222.242])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 30 May 2023 12:40:57 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        imbrenda@linux.ibm.com, david@redhat.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com, cohuck@redhat.com
+Subject: [kvm-unit-tests PATCH v3 0/2] Fixing infinite loop on SCLP READ SCP INFO error
+Date:   Tue, 30 May 2023 14:40:54 +0200
+Message-Id: <20230530124056.18332-1-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2810:EE_|DM8PR12MB5493:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7e67db6e-83f2-41aa-ddfa-08db6107c822
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +IaidBle5usX3k3lymGHVmqNf02YJtjr3ETThVJYg8Dkm3CrrSN3UejchDrfmZKE2Da7KZ8CuIjPiYjwTl3+vQLyD4+fFrjvps0y5o6yv5G+ioH8E2eVRFhoEguuaMRLRQdo9yW4xGofE+C9Oj2QngJph/N55l7ueKq7/PWmnHpDCnsWDBHy1iBOyyJx+40MqoOUpGmVAD2dya8rasXFlDhLjX41hgoxvJbVlo5KkhFZY4h51LsgPbzFyg2gf3eKm+bku7hygH8mUUYtKygdlL5McHShpqWDVMDaSDTSgufqNm4VqLPcefEUSooli4n2k0+01Z+L2X0kC1ucHH72W09b26gOAxxnkVe5SEW6Oad/b2TasLLhAnUAEgjEXKs+4+TlEtqUAiJbpSsfBkTfg6urSh8IdanZZ1b6hOurg/beyA7rPA6HMYEaCMYp+9dkVO9nmKkLMDs1JCBIMiCkn09Va1nclnsWuVGJcTQ+Brl1DhXmVcRPpgvDJ3aYAl7/5V8VmHhYZyV/p/OifQZTjx9L6B/jZ2YvGOPZnKhOsBbtbR7VO5Idfet6xMhjzWKKw8AUNbJ2lguII2zio6u9tx5lXCxXH3DBFp0D8TSyHz6B2If5dHhjSSItfteSBi+C+/ron3YIabyPk6HFE6e0rQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2810.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(376002)(346002)(366004)(136003)(451199021)(478600001)(110136005)(8676002)(5660300002)(7406005)(7416002)(8936002)(36756003)(2906002)(31696002)(86362001)(66476007)(66556008)(4326008)(66946007)(316002)(41300700001)(38100700002)(186003)(26005)(6512007)(6506007)(83380400001)(6486002)(6666004)(31686004)(2616005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a21HbFE0eXRGQWhZUXpBRHZUMVZYVWIzaGpQVmtwNTAwVkFtVTluK0JzMFh1?=
- =?utf-8?B?M0lMNVpRanFrU3RKOTlvanZKRStha2Jwb0xoY2Zpa0xpblFwMU1aL2gycTBy?=
- =?utf-8?B?V2tWdThyRTdlaGJzb2FUc2NhVVIzVkhuZ0JWbjJtQ3U3VUFFSDExVjFZQ1Jr?=
- =?utf-8?B?T3FnRklybnJHNklBMFl6Mm9MY3RxTEdlT1RyUUVPSWoyUHZyOWMvQllpZGky?=
- =?utf-8?B?Wk53QXdiZW9MdncySUxBbFE4YUZDMXRkUVA4ck9mK3pwdHRic0JWUEhMQmZu?=
- =?utf-8?B?MTA4eVpPRlVjOWN0VEF0ZFN5bDBvRnI5UkhOaUNMTFJYbDZiQkQyTWhCMy9j?=
- =?utf-8?B?R3RvaVNxNlFDTW1CVEUrSHliMk5Ia0VuUzdXNG81U3dYWGRGY01zbDNPeks0?=
- =?utf-8?B?TExRR0pGODZVSFVpSk44UEJyNCs2RStaalBleEtCdG1ITCtLU0ZmQy9qSy9i?=
- =?utf-8?B?b3NQSjBpMHVHblpJYVdXRTBwTUxkVW56OUIwLzFhcTlEWEtQWGRBZjBpTW5T?=
- =?utf-8?B?Sit5SWxIWktqVkZQUHpSNjFGeU8yRjFqamdBVGdoT2tvNzdvWElFVGhRVGhN?=
- =?utf-8?B?OUZlMVh2ZTJRN0NzK3VmRTBHRjVtZCtrMjdjVk90R3BMOTRtOERsNGpmNDd6?=
- =?utf-8?B?eDJyTEp3Snp0NjVHSUlmSGt3L3hINWxFV3lCRm9QdTk0U0w1eTJsVXd2VTU4?=
- =?utf-8?B?WkQ0VmxhMjRQeUM5VzZVdFpBRjQvSHJESWlSRGNxVTBqekVKNnM5dGZwVDV1?=
- =?utf-8?B?UTF5eHZNZDY0UGs0WEsrYUgvVExBTlEvSHMxcy9yaFp3bWhWYnh2SnViS2Yz?=
- =?utf-8?B?MUJVMVhiVk40QjZnL3dSZjA1dDliaTRldmU1Z3FBRmZua0JsQUVJdDZGUjkw?=
- =?utf-8?B?WHFFUE5xNGR0V2ZtSnRrejZ3L3pzQzlqU1BVMzZRWmU3aHpxbWxSdDAwWW5Z?=
- =?utf-8?B?dExva0ZBRWVKSXNOTVN5cEgxT01ORG9HZklOYnFCUGQ3U1VPSUhjN2xtU2hq?=
- =?utf-8?B?dkJlMk5ObHAzNnorcEtBV2g2MExwOVBPTGV5TnVjLytLUlhLa3h2bmcxends?=
- =?utf-8?B?TWVXYkF3RVRDUFV6Ujc4STlVY0VaY2IrYmtxRHREeldxZE9IRTR0dENMU0xo?=
- =?utf-8?B?aEp3bkYzTlNnUW1WUG9BZnUzYis1ZWl6NXJ5bXB3bWUwd0NIYVc0aUUvaENq?=
- =?utf-8?B?WXdDL0U1WlNNb2MxRDNTTERZanpHdTcrejArSWQ3R1VlRHRZeDFsR0FoOEx4?=
- =?utf-8?B?NEZzeDlsUkRVZ1RncU0raFJoYlpjc2FYZ3FTTHpTWFM5TDNhb243V0o5Zzlp?=
- =?utf-8?B?bjY4ak5xeTNrUHV3ZFhWaE02aENIOTNKeFdmNjFZWW4xM2VodkM5cFg2Q2hR?=
- =?utf-8?B?TnIvK0ViRUlTY0crZ0tRTXpiL3BreFRacnhiRGFXSHVubXY5Z1ZHWUJna0wy?=
- =?utf-8?B?V0tPQVhWZEhHZlBZNFpvM0NiVCtsTDJFU21kUld5d1lyYlRyYzZLQ0g2ajI1?=
- =?utf-8?B?SGx1d205QjJkZEl0MFVjblVVZEduZkpIUlJLMGJ3eGgxeWhtUkNtZjBZbTNM?=
- =?utf-8?B?cU5tY05VM0tmbjhRb0w2RHQ0SmN3Y01ZdWxjMFY2TU4vd2pWVU1IdUxYZEov?=
- =?utf-8?B?bTFJOGI2d052bkl0aWV6bXNEV0RnNXZYcTNMSmc3alR0ak1JekRiV3FVUTdl?=
- =?utf-8?B?U1Y4K3gwcS90NDlLMlVrMWh5dktMS1EzWjdpd1UrbXRtZDd0QVFFeE00czZQ?=
- =?utf-8?B?RStheCtidDM2RTZ5OCtvYTR1UEY3a044QVNUYXpaNm1HWVB6KzZnZHVKQ1kz?=
- =?utf-8?B?ZStJRFhQOWs1RGhtSEtVNlZ3b2ZUTjZJWHprQmR3UDBhd0ViUUpiSWdZRysr?=
- =?utf-8?B?ZThmWC9tZk42MHJTZ05va1A2UjZqdzk2dUpGQ1R6cjM1ZHQwMm00RUZLTmxL?=
- =?utf-8?B?TXhCdm9yQjA5WktRUW10RHlXWllHRmp2Y29EVU9ubmIxQkNyU09GLzQwY3Bv?=
- =?utf-8?B?d2twZjc4VllsTlpKa3NDOXFFejRtcXJ0Q0JNeUdaTkQwaUYzWVphc0J0UDRs?=
- =?utf-8?B?eFhUdFVXRVBtcDh3SmJkTVJLYTFPbjdkN1EwdnFZaWxnY2ZwVHZjR0tiTlBS?=
- =?utf-8?Q?/ReWz0cfZqNgqXJGmSr/1dQBo?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e67db6e-83f2-41aa-ddfa-08db6107c822
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2810.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2023 12:17:05.6276
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2PRPKlCBtKM+O6naIUymFzhFM3kMO0FgiX6CdYrpr0c3LR3MtxVJyD9sTUAFPAmqtybfAGzJkyMSb+ycPZ2+7g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5493
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: JbPZwt4SGdJ-48cTZTRrbMea_eJdM-kk
+X-Proofpoint-ORIG-GUID: yl5HAaDSKQEnjQVxikZpqPOe60cf7bRQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-05-30_08,2023-05-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ impostorscore=0 bulkscore=0 mlxlogscore=577 spamscore=0 clxscore=1015
+ priorityscore=1501 mlxscore=0 adultscore=0 lowpriorityscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2304280000
+ definitions=main-2305300103
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Aborting on SCLP READ SCP INFO error leads to a deadloop.
 
->> Add a #HV exception handler that uses IST stack.
->>
-> 
-> Urgh.. that is entirely insufficient. Like it doesn't even begin to
-> start to cover things.
-> 
-> The whole existing VC IST stack abuse is already a nightmare and you're
-> duplicating that.. without any explanation for why this would be needed
-> and how it is correct.
-> 
-> Please try again.
+The loop is:
+abort() -> exit() -> smp_teardown() -> smp_query_num_cpus() ->
+sclp_get_cpu_num() -> assert() -> abort()
 
-#HV handler handles both #NMI & #MCE in the guest and nested #HV is 
-never raised by the hypervisor. Next #HV exception is only raised by the 
-hypervisor when Guest acknowledges the pending #HV exception by clearing 
-"NoFurtherSignal” bit in the doorbell page.
+Since smp_setup() is done after sclp_read_info() inside setup() this
+loop only happens when only the start processor is running.
+Let sclp_get_cpu_num() return 1 in this case.
 
-There is still protection (please see hv_switch_off_ist()) to gracefully 
-exit the guest if by any chance a malicious hypervisor sends nested #HV. 
-This saves with most of the nested IST stack pitfalls with #NMI & #MCE, 
-also #DB is handled in noinstr code 
-block(exc_vmm_communication()->vc_is_db {...}) hence avoid any recursive 
-#DBs.
+Also implement the SCLP_RC_INSUFFICIENT_SCCB_LENGTH handling and
+repeat the sclp command.
 
-Do you see anything else needs to be handled in #HV IST handling?
+Pierre Morel (2):
+  s390x: sclp: consider monoprocessor on read_info error
+  s390x: sclp: Implement SCLP_RC_INSUFFICIENT_SCCB_LENGTH
 
-Thanks,
-Pankaj
+ lib/s390x/sclp.c | 64 ++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 56 insertions(+), 8 deletions(-)
 
+-- 
+2.31.1
 
+since v2:
+
+- use tabs in first patch
+  (Nico)
+
+- Added comments
+
+- Added SCLP_RC_INSUFFICIENT_SCCB_LENGTH handling
