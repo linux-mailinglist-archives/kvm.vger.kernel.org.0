@@ -2,121 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C79A67170A3
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 00:22:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E86F07170C3
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 00:35:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233713AbjE3WWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 18:22:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46604 "EHLO
+        id S233727AbjE3Wfs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 18:35:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229945AbjE3WWR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 18:22:17 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78019102;
-        Tue, 30 May 2023 15:22:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685485331; x=1717021331;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=1yclU0/PNC1x/+Z0XR9VHAZKmtWtaT5GSX759uuyefU=;
-  b=iy+YT3DU3F3cO+Jr4TA5g6yGimxpFsh2v/mQ1SD46clyAbdd31T8+wIC
-   LPHp1lIwZ2PDrF9ZAMlt9FFf2P4q7FVbIr3vGMRtoKrgj3HKXyhi9MT5/
-   IWSnI5XPgey8/hAayeIWAT1GWdtclLV0546oDOna0ttdNYqai9ql25+c1
-   Pl32HehHvTfeHawCDxP11w6ut0eUIjZFUZ+R+NlSLeH4ZRFDUIRTDxkzL
-   Y4E/JxmycqQT9LwA3srK/ZtUpcwJ0d30qTjknXsuTO3nvpOHcI6pbgiTl
-   STAjqf0lcecAulBbwy/HGOAi7pz8IMEPRHkgCxNr5K/c6MzlKcCHxx7Ew
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10726"; a="335411349"
-X-IronPort-AV: E=Sophos;i="6.00,205,1681196400"; 
-   d="scan'208";a="335411349"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2023 15:22:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10726"; a="796440615"
-X-IronPort-AV: E=Sophos;i="6.00,205,1681196400"; 
-   d="scan'208";a="796440615"
-Received: from jswalken-mobl.amr.corp.intel.com (HELO [10.212.134.46]) ([10.212.134.46])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2023 15:22:10 -0700
-Message-ID: <2a6502e3-ba87-0355-af09-825e8467b81f@intel.com>
-Date:   Tue, 30 May 2023 15:22:09 -0700
+        with ESMTP id S229499AbjE3Wfq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 18:35:46 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A5C7C9;
+        Tue, 30 May 2023 15:35:44 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34UM8sf9032181;
+        Tue, 30 May 2023 22:35:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=tPYaKnQ7SMeZMYNrdYpQjkUth4bn7YaBwUTTakG0I28=;
+ b=TBIwU7MrsLFOu71rmwwnJ3U+7Z04zvqSN20Mc0Q1RNyVdIVlG7YmRJggQulPG4QyiKkU
+ E1++GnAv8Pk4n7UBciKHLp453poQ4FkuqIMiFLKMc341VMpy2/eO+7rWQuZ1WvMdW1u8
+ miItCqE21bF2B6YzDdA/v2hBVfqY9IzImWeJsF4ZLmNMYkQoBHRLgmUmj/8jfGrPummY
+ A1JbgnDASTuiIrKlHkLTuK3/MW5vlTij7TmcrB7vPaTbYNrACvMhbJ6eSatEbjLmc+bZ
+ rZrEBnESW1JhiBvVF2ZPcCrL4Um7mjas3livjOXN5l09BkWb3nI8q6Df0Xh9bpBuAgDo Gw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwj0enmgu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 May 2023 22:35:43 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34UMZher008241;
+        Tue, 30 May 2023 22:35:43 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwj0enmgc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 May 2023 22:35:43 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34UKQoHc019395;
+        Tue, 30 May 2023 22:35:42 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([9.208.130.97])
+        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3qu9g6j2sq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 May 2023 22:35:42 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34UMZeow30212410
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 May 2023 22:35:40 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C3C3158101;
+        Tue, 30 May 2023 22:35:40 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 155DC580FE;
+        Tue, 30 May 2023 22:35:40 +0000 (GMT)
+Received: from li-2c1e724c-2c76-11b2-a85c-ae42eaf3cb3d.ibm.com.com (unknown [9.61.88.233])
+        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 30 May 2023 22:35:39 +0000 (GMT)
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     jjherne@linux.ibm.com, pasic@linux.ibm.com, farman@linux.ibm.com,
+        mjrosato@linux.ibm.com, alex.williamson@redhat.com,
+        borntraeger@linux.ibm.com
+Subject: [PATCH 0/3] s390/vfio-ap: fix hang when mdev attached to guest is removed
+Date:   Tue, 30 May 2023 18:35:35 -0400
+Message-Id: <20230530223538.279198-1-akrowiak@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] x86/fpu/xstate: clear XSAVE features if DISABLED_MASK set
-Content-Language: en-US
-To:     Jon Kohler <jon@nutanix.com>, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Kyle Huey <me@kylehuey.com>, neelnatu@google.com,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230530200152.18961-1-jon@nutanix.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230530200152.18961-1-jon@nutanix.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: vtBORcWIpYCeH2bpLuDBXRoXujzL3okF
+X-Proofpoint-ORIG-GUID: nBEDf3-TsGvbdbg9OoU24RJMHIgrjvad
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-05-30_16,2023-05-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 priorityscore=1501 phishscore=0 spamscore=0
+ adultscore=0 clxscore=1011 mlxlogscore=932 malwarescore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2305300184
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/30/23 13:01, Jon Kohler wrote:
-> Respect DISABLED_MASK when clearing XSAVE features, such that features
-> that are disabled do not appear in the xfeatures mask.
+When a user attempts to remove a vfio-ap mediated device attached to a
+guest, the operation hangs until the mdev's fd is closed by the guest
+(i.e., the hostdev is detached or the guest is shut down). This patch 
+series provides kernel-side code that allows userspace to set up a 
+communication channel that will allow the vfio_ap device driver to notify 
+userspace when a request to release the mdev is received, so that userspace
+can close the mdev fd and avoid the hang. The patch series provides the 
+following:  
 
-One sanity check that I'd suggest adopting is "How many other users in
-the code do this?"  How many DISABLED_MASK_BIT_SET() users are there?
+1. Introduces code to handle the VFIO_DEVICE_GET_IRQ_INFO and 
+   VFIO_DEVICE_SET_IRQS ioctl calls to set the eventfd_ctx for signaling a
+   device request to userspace. 
 
-> This is important for kvm_load_{guest|host}_xsave_state, which look
-> at host_xcr0 and will do an expensive xsetbv when the guest and host
-> do not match.
+2. Wires up the VFIO bus driver callback to request a release of the mdev.
+   When invoked, the vfio_ap device driver will use the eventfd_ctx set up
+   in #1 to signal a request to userspace to release the mdev.
 
-Is that the only problem?  kvm_load_guest_xsave_state() seems to have
-some #ifdef CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS code and I can't
-imagine that KVM guests can even use PKRU if this code is compiled out.
 
-Also, this will set XFEATURE_PKRU in xcr0 and go to the trouble of
-XSAVE/XRSTOR'ing it all over the place even for regular tasks.
+Note:
+----
+If a user subsequently attempts to restart the guest or re-attach the mdev,
+the operation will fail with a message indicating the domain is already
+active. This is a libvirt problem resolved with the following commit:
 
-> A prime example if CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS is disabled,
-> the guest OS will not see PKU masked; however, the guest will incur
-> xsetbv since the host mask will never match the guest, even though
-> DISABLED_MASK16 has DISABLE_PKU set.
+commit ebd004a03dbd ("security: do not remember/recall labels for VFIO 
+MDEVs") 
 
-OK, so you care because you're seeing KVM go slow.  You tracked it down
-to lots of XSETBV's?  You said, "what the heck, why is it doing XSETBV
-so much?" and tracked it down to 'max_features' which we use to populate
-XCR0?
+Tony Krowiak (3):
+  vfio: ap: realize the VFIO_DEVICE_GET_IRQ_INFO ioctl
+  vfio: ap: realize the VFIO_DEVICE_SET_IRQS ioctl
+  s390/vfio-ap: Wire in the vfio_device_ops request callback
 
-> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-> index 0bab497c9436..211ef82b53e3 100644
-> --- a/arch/x86/kernel/fpu/xstate.c
-> +++ b/arch/x86/kernel/fpu/xstate.c
-> @@ -798,7 +798,8 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
->  		unsigned short cid = xsave_cpuid_features[i];
-> 
->  		/* Careful: X86_FEATURE_FPU is 0! */
-> -		if ((i != XFEATURE_FP && !cid) || !boot_cpu_has(cid))
-> +		if ((i != XFEATURE_FP && !cid) || !boot_cpu_has(cid) ||
-> +		    DISABLED_MASK_BIT_SET(cid))
->  			fpu_kernel_cfg.max_features &= ~BIT_ULL(i);
->  	}
+ drivers/s390/crypto/vfio_ap_ops.c     | 134 +++++++++++++++++++++++++-
+ drivers/s390/crypto/vfio_ap_private.h |   3 +
+ include/uapi/linux/vfio.h             |   9 ++
+ 3 files changed, 145 insertions(+), 1 deletion(-)
 
-I _think_ I'd rather this just be cpu_feature_enabled(cid) rather than
-using DISABLED_MASK_BIT_SET() directly.
-
-But, I guess this probably also isn't a big deal for _most_ people.  Any
-sane distro kernel will just set CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS
-since it's pretty widespread on modern CPUs and works across Intel and
-AMD now.
+-- 
+2.31.1
 
