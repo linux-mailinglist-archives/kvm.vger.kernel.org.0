@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26867716267
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 15:43:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF2CA716265
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 15:43:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232844AbjE3Nnn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 09:43:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33170 "EHLO
+        id S232813AbjE3Nnp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 09:43:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232829AbjE3Nn3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 09:43:29 -0400
+        with ESMTP id S232819AbjE3Nnh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 09:43:37 -0400
 Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FB88118;
-        Tue, 30 May 2023 06:43:26 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id 98e67ed59e1d1-2564dc37c3eso1934814a91.0;
-        Tue, 30 May 2023 06:43:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D166D100;
+        Tue, 30 May 2023 06:43:29 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id 98e67ed59e1d1-25695bb6461so1106046a91.1;
+        Tue, 30 May 2023 06:43:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685454205; x=1688046205;
+        d=gmail.com; s=20221208; t=1685454209; x=1688046209;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NVIgrWF0qVdt19S5E5bCe+l7dbI86Yc8ElTcaIuEvg8=;
-        b=hRcz3g0XuhIp/cDoSASTSNyPBi2kDZnqsNHEe+M1zA0wGq+vANLEygNnAv/ncF/KNY
-         dk5kAHgq6LewxH+R2kxR0GV+ApkunE/FlSC+FJInEi9Z2hqIIluZOI0MznO7MZ6L+csO
-         wdrsypZVpPw7rG7niQUARh2wB3SN5kZKklzuSxQyi0CjsFbg4/STm+ss8cyM0Prts7Yf
-         Ved6dV1/3qXjTWo9BObxoJsXPFkCM/R/dwosJeaHt4gNoSDO3cckQDgRwknWdxe5JUpn
-         5CetnRcbEZrJ7PqnDtd/N0KF9sPFFaSxlyqxhv2+nWCeDnMQbhhkHq7Nyt+5MdN5a1gZ
-         6TeA==
+        bh=NBbIGeuwqaX2zOtc4+SIBoh8l1F1qJDaap7wVCA5B+w=;
+        b=rpE6/PUJLioiMlhfbubZ3zhnBkDtawXkZHdQj85ysfcHu47j+8xM6qFJBguKZnh2uy
+         E84TaZEKovGYdFcHpWxXMQo6MVlYbbIHGc8jrxCaq5xvcrYSa3qeGTVMXbNX+CYSyCWw
+         1y9Dz/3r3n+gttUPuZCKVMfksjailFdMlAE3npTOFhQIkWlgAxaXVRIG7KW0ka699aLY
+         +iXNcPisLQSaZN+JVlaDgbfsZ3cXG13JcSp1Ym7Lq0eLHx3hjlXKdK3CwmjhT2h0i5u4
+         bouzEjc3ofXfBcMh2sfzHKfIeNVrau8+McLaK3kKiqhP3Y11hbappnuyIPRFYBAauco3
+         iW3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685454205; x=1688046205;
+        d=1e100.net; s=20221208; t=1685454209; x=1688046209;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NVIgrWF0qVdt19S5E5bCe+l7dbI86Yc8ElTcaIuEvg8=;
-        b=RBmYF4rQSU9h2SfurCcDA1nBkLnB08H4lIL3HUq2wcQ6mywM/x8v0pg9KAqylDsDts
-         7Bzxyhsn5lHLc0deiGuAzTCL3UWZQudOA0gjG8b0jFyQkOEdfemccKKs3xRPr3DWL8+8
-         UTF30AN+IPHii1kMgLrfhTnbRwZofRheTKv52UVoFYMAZqm2CfyF9VruTJz94VsVdGg2
-         WJvuXBxVpKhPOGL7UAqdgaEfqdOellnHpFVLr4YYECzd/8D4fFU5JmUAU01oQ7IkQ14v
-         eV9MBQKfDiUR6lUp+WCN2w3gpkmbD7c+TPtyUGKTln8rWNlB6zzfG1dEDWhSjqPQMEnd
-         oPJA==
-X-Gm-Message-State: AC+VfDz/nghVy65WU1yvA2zYYDF4d0yb9opidWbKCc2puYfuANdxYUXV
-        Iu9JbxyC5vt2JcLRZu2HLeE=
-X-Google-Smtp-Source: ACHHUZ7i0Z64j7byq2AOL9h8KTVoFDnsCvooloRoO7bioFHK/57XVssdVtG6PJeQtV4l7QU9QZn8iA==
-X-Received: by 2002:a17:90a:bb89:b0:253:2f1b:612b with SMTP id v9-20020a17090abb8900b002532f1b612bmr2491694pjr.11.1685454205648;
-        Tue, 30 May 2023 06:43:25 -0700 (PDT)
+        bh=NBbIGeuwqaX2zOtc4+SIBoh8l1F1qJDaap7wVCA5B+w=;
+        b=HLh3w0v5DbYQiOAngUX18oxN/af6kBmssr7As7lY9s5JXhGUTO54hvXI3f0ibgGOm5
+         dkVf0R/wXFUWbz7nZRuMtO81WLjpdZrmuZGTd0WdWPiB+IEt82cvBWMQs1eh8IH6ZSzm
+         tlALlRu3Abc33Y/ww9fkEwSi2HFM8oM+E6M4Fw57RIRBD0qLDRM3rkfGDXPztX9zbhMP
+         BzEz574w4KjxG2vdZE9AJctU59tYH++HT6yL5LjAp8PKGM/KYegIiBXmj9bGixGVT7iz
+         3JPL22PVTmqAkWqQk8egTPUvyyODykLnjk4PIRTyJG6cqLX6PO8NZtepR2Mhxo0SIh/z
+         6BQA==
+X-Gm-Message-State: AC+VfDx8MhLr0UrzfAzcUhtFDQjWEovS2tdbHay4f/lVF6aOnzVndOt1
+        AMeq6BrquIThDV+4t84rL3w=
+X-Google-Smtp-Source: ACHHUZ6EstOfpM606QQ2CsBqFsyzui05xSRFoPAyIEsbjvv66i3hMnkhv1mRFNzr/0CBr7j5yx9YBg==
+X-Received: by 2002:a17:90b:4c06:b0:256:57e6:673b with SMTP id na6-20020a17090b4c0600b0025657e6673bmr2555239pjb.16.1685454209251;
+        Tue, 30 May 2023 06:43:29 -0700 (PDT)
 Received: from CLOUDLIANG-MB2.tencent.com ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id d10-20020a17090ac24a00b00256a4d59bfasm1977186pjx.23.2023.05.30.06.43.22
+        by smtp.gmail.com with ESMTPSA id d10-20020a17090ac24a00b00256a4d59bfasm1977186pjx.23.2023.05.30.06.43.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 May 2023 06:43:25 -0700 (PDT)
+        Tue, 30 May 2023 06:43:28 -0700 (PDT)
 From:   Jinrong Liang <ljr.kernel@gmail.com>
 X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>
@@ -59,9 +59,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 5/8] KVM: selftests: Test consistency of CPUID with num of gp counters
-Date:   Tue, 30 May 2023 21:42:45 +0800
-Message-Id: <20230530134248.23998-6-cloudliang@tencent.com>
+Subject: [PATCH v2 6/8] KVM: selftests: Test consistency of CPUID with num of fixed counters
+Date:   Tue, 30 May 2023 21:42:46 +0800
+Message-Id: <20230530134248.23998-7-cloudliang@tencent.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230530134248.23998-1-cloudliang@tencent.com>
 References: <20230530134248.23998-1-cloudliang@tencent.com>
@@ -77,130 +77,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+From: Jinrong Liang <cloudliang@tencent.com>
 
 Add test to check if non-existent counters can be accessed in guest after
 determining the number of Intel generic performance counters by CPUID.
-When the num of counters is less than 3, KVM does not emulate #GP if
-a counter isn't present due to compatibility MSR_P6_PERFCTRx handling.
-Nor will the KVM emulate more counters than it can support.
+Per SDM, fixed-function performance counter 'i' is supported if ECX[i] ||
+(EDX[4:0] > i). KVM doesn't emulate more counters than it can support.
 
-Co-developed-by: Jinrong Liang <cloudliang@tencent.com>
-Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+Co-developed-by: Like Xu <likexu@tencent.com>
 Signed-off-by: Like Xu <likexu@tencent.com>
+Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
 ---
- .../kvm/x86_64/pmu_basic_functionality_test.c | 88 +++++++++++++++++++
- 1 file changed, 88 insertions(+)
+ .../kvm/x86_64/pmu_basic_functionality_test.c | 42 +++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c b/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-index 81029d05367a..116437ac2095 100644
+index 116437ac2095..e19f8c2774c5 100644
 --- a/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-@@ -16,6 +16,17 @@
- /* Guest payload for any performance counter counting */
- #define NUM_BRANCHES 10
- 
-+/*
-+ * KVM implements the first two non-existent counters (MSR_P6_PERFCTRx)
-+ * via kvm_pr_unimpl_wrmsr() instead of #GP.
-+ */
-+#define MSR_INTEL_ARCH_PMU_GPCTR (MSR_IA32_PERFCTR0 + 2)
-+
-+static const uint64_t perf_caps[] = {
-+	0,
-+	PMU_CAP_FW_WRITES,
-+};
-+
- static struct kvm_vm *pmu_vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
- 						  void *guest_code)
- {
-@@ -169,9 +180,86 @@ static void intel_test_arch_events(void)
- 	}
+@@ -228,10 +228,46 @@ static void test_oob_gp_counter(uint8_t eax_gp_num, uint8_t offset,
+ 	kvm_vm_free(vm);
  }
  
-+static void guest_wr_and_rd_msrs(uint32_t base, uint64_t value,
-+				 uint8_t begin, uint8_t offset)
-+{
-+	unsigned int i;
-+	uint8_t wr_vector, rd_vector;
-+	uint64_t msr_val;
-+
-+	for (i = begin; i < begin + offset; i++) {
-+		wr_vector = wrmsr_safe(base + i, value);
-+		rd_vector = rdmsr_safe(base + i, &msr_val);
-+		if (wr_vector == GP_VECTOR || rd_vector == GP_VECTOR)
-+			GUEST_SYNC(GP_VECTOR);
-+		else
-+			GUEST_SYNC(msr_val);
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+/* Access the first out-of-range counter register to trigger #GP */
-+static void test_oob_gp_counter(uint8_t eax_gp_num, uint8_t offset,
-+				uint64_t perf_cap, uint64_t exported)
++static void intel_test_oob_fixed_ctr(uint8_t edx_fix_num,
++				     uint32_t fixed_bitmask, uint64_t expected)
 +{
 +	struct kvm_vm *vm;
 +	struct kvm_vcpu *vcpu;
 +	struct kvm_cpuid_entry2 *entry;
-+	uint32_t ctr_msr = MSR_IA32_PERFCTR0;
++	uint8_t idx = edx_fix_num;
++	bool visible;
 +	uint64_t msr_val;
 +
 +	vm = pmu_vm_create_with_one_vcpu(&vcpu, guest_wr_and_rd_msrs);
 +
 +	entry = vcpu_get_cpuid_entry(vcpu, 0xa);
-+	entry->eax = (entry->eax & ~GP_CTR_NUM_MASK) |
-+		(eax_gp_num << GP_CTR_NUM_OFS_BIT);
++	entry->ecx = fixed_bitmask;
++	entry->edx = (entry->edx & ~FIXED_CTR_NUM_MASK) | edx_fix_num;
 +	vcpu_set_cpuid(vcpu);
 +
-+	if (perf_cap & PMU_CAP_FW_WRITES)
-+		ctr_msr = MSR_IA32_PMC0;
++	/* Per Intel SDM, FxCtr[i]_is_supported := ECX[i] || (EDX[4:0] > i). */
++	visible = (entry->ecx & BIT_ULL(idx) ||
++			((entry->edx & FIXED_CTR_NUM_MASK) > idx));
 +
-+	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, perf_cap);
-+	vcpu_args_set(vcpu, 4, ctr_msr, 0xffff, eax_gp_num, offset);
-+	while (run_vcpu(vcpu, &msr_val) != UCALL_DONE)
-+		TEST_ASSERT(msr_val == exported,
-+			    "Unexpected when testing gp counter num.");
++	/* KVM doesn't emulate more fixed counters than it can support. */
++	if (idx >= X86_INTEL_MAX_FIXED_CTR_NUM)
++		visible = false;
++
++	vcpu_args_set(vcpu, 4, MSR_CORE_PERF_FIXED_CTR0, 0xffff, idx, 1);
++	if (!visible)
++		while (run_vcpu(vcpu, &msr_val) != UCALL_DONE)
++			TEST_ASSERT(msr_val == expected,
++				    "Unexpected when testing fixed counter num.");
 +
 +	kvm_vm_free(vm);
 +}
 +
-+static void intel_test_counters_num(void)
-+{
-+	unsigned int i;
-+	uint8_t kvm_gp_num = X86_INTEL_MAX_GP_CTR_NUM;
-+
-+	TEST_REQUIRE(kvm_gp_num > 2);
-+
-+	for (i = 0; i < ARRAY_SIZE(perf_caps); i++) {
-+		/*
-+		 * For compatibility reasons, KVM does not emulate #GP
-+		 * when MSR_P6_PERFCTR[0|1] is not present, but it doesn't
-+		 * affect checking the presence of MSR_IA32_PMCx with #GP.
-+		 */
-+		if (perf_caps[i] & PMU_CAP_FW_WRITES)
-+			test_oob_gp_counter(0, 1, perf_caps[i], GP_VECTOR);
-+
-+		test_oob_gp_counter(2, 1, perf_caps[i], GP_VECTOR);
-+		test_oob_gp_counter(kvm_gp_num, 1, perf_caps[i], GP_VECTOR);
-+
-+		/* KVM doesn't emulate more counters than it can support. */
-+		test_oob_gp_counter(kvm_gp_num + 1, 1, perf_caps[i], GP_VECTOR);
-+
-+		/* Test that KVM drops writes to MSR_P6_PERFCTR[0|1]. */
-+		if (perf_caps[i] == 0)
-+			test_oob_gp_counter(0, 2, perf_caps[i], 0);
-+	}
-+}
-+
- static void intel_test_pmu_cpuid(void)
+ static void intel_test_counters_num(void)
  {
- 	intel_test_arch_events();
-+	intel_test_counters_num();
+ 	unsigned int i;
++	uint32_t ecx;
+ 	uint8_t kvm_gp_num = X86_INTEL_MAX_GP_CTR_NUM;
++	uint8_t kvm_fixed_num = X86_INTEL_MAX_FIXED_CTR_NUM;
+ 
+ 	TEST_REQUIRE(kvm_gp_num > 2);
+ 
+@@ -254,6 +290,12 @@ static void intel_test_counters_num(void)
+ 		if (perf_caps[i] == 0)
+ 			test_oob_gp_counter(0, 2, perf_caps[i], 0);
+ 	}
++
++	for (ecx = 0; ecx <= X86_INTEL_FIXED_CTRS_BITMASK + 1; ecx++) {
++		intel_test_oob_fixed_ctr(0, ecx, GP_VECTOR);
++		intel_test_oob_fixed_ctr(kvm_fixed_num, ecx, GP_VECTOR);
++		intel_test_oob_fixed_ctr(kvm_fixed_num + 1, ecx, GP_VECTOR);
++	}
  }
  
- int main(int argc, char *argv[])
+ static void intel_test_pmu_cpuid(void)
 -- 
 2.31.1
 
