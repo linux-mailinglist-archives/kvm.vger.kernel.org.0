@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DAE0A7168EA
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 18:11:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF0E57168E1
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 18:11:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233424AbjE3QLr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 12:11:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57878 "EHLO
+        id S233365AbjE3QL0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 12:11:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233381AbjE3QLk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 12:11:40 -0400
+        with ESMTP id S233318AbjE3QLY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 12:11:24 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D12A6137
-        for <kvm@vger.kernel.org>; Tue, 30 May 2023 09:11:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DC83D1AD
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 09:10:55 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 933731BCB;
-        Tue, 30 May 2023 09:11:14 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C40BB1BD0;
+        Tue, 30 May 2023 09:11:15 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 497013F663;
-        Tue, 30 May 2023 09:10:28 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A4743F663;
+        Tue, 30 May 2023 09:10:29 -0700 (PDT)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
 Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com,
         shahuang@redhat.com
-Subject: [kvm-unit-tests PATCH v6 30/32] arm64: debug: Make inline assembly symbols global
-Date:   Tue, 30 May 2023 17:09:22 +0100
-Message-Id: <20230530160924.82158-31-nikos.nikoleris@arm.com>
+Subject: [kvm-unit-tests PATCH v6 31/32] arm64: Add an efi/run script
+Date:   Tue, 30 May 2023 17:09:23 +0100
+Message-Id: <20230530160924.82158-32-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230530160924.82158-1-nikos.nikoleris@arm.com>
 References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
@@ -42,56 +42,183 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-efi binaries need to be compiled with fPIC. To allow symbols defined in
-inline assembly to be correctly resolved, this patch makes them globally
-visibile to the linker.
+This change adds a efi/run script inspired by the one in x86. This
+script will setup a folder with the test compiled as an EFI app and a
+startup.nsh script. The script launches QEMU providing an image with
+EDKII and the path to the folder with the test which is executed
+automatically.
+
+For example:
+
+$> ./arm/efi/run ./arm/selftest.efi -append "setup smp=2 mem=256" -smp 2 -m 256
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 ---
- arm/debug.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ scripts/runtime.bash | 13 +++++++---
+ arm/efi/run          | 61 ++++++++++++++++++++++++++++++++++++++++++++
+ arm/run              | 14 +++++++---
+ arm/Makefile.common  |  1 +
+ arm/dummy.c          | 12 +++++++++
+ 5 files changed, 94 insertions(+), 7 deletions(-)
+ create mode 100755 arm/efi/run
+ create mode 100644 arm/dummy.c
 
-diff --git a/arm/debug.c b/arm/debug.c
-index b3e9749c..572786a9 100644
---- a/arm/debug.c
-+++ b/arm/debug.c
-@@ -292,11 +292,14 @@ static noinline void test_hw_bp(bool migrate)
- 	hw_bp_idx = 0;
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index 07b62b0e..785a7b62 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -130,11 +130,18 @@ function run()
+         done
+     fi
  
- 	/* Trap on up to 16 debug exception unmask instructions. */
--	asm volatile("hw_bp0:\n"
--	     "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr daifclr, #8\n"
--	     "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr daifclr, #8\n"
--	     "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr daifclr, #8\n"
--	     "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr daifclr, #8\n");
-+	asm volatile(
-+		".globl hw_bp0\n"
-+		"hw_bp0:\n"
-+			"msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr daifclr, #8\n"
-+			"msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr daifclr, #8\n"
-+			"msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr daifclr, #8\n"
-+			"msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr daifclr, #8\n"
-+		);
+-    last_line=$(premature_failure > >(tail -1)) && {
++    log=$(premature_failure) && {
+         skip=true
+-        if [ "${CONFIG_EFI}" == "y" ] && [[ "${last_line}" =~ "Dummy Hello World!" ]]; then
+-            skip=false
++        if [ "${CONFIG_EFI}" == "y" ]; then
++            if [ "$ARCH" == "x86_64" ] &&
++               [[ "$(tail -1 <<<"$log")" =~ "Dummy Hello World!" ]]; then
++                   skip=false
++            elif [ "$ARCH" == "arm64" ] &&
++               [[ "$(tail -2 <<<"$log" | head -1)" =~ "Dummy Hello World!" ]]; then
++                   skip=false
++            fi
+         fi
++
+         if [ ${skip} == true ]; then
+             print_result "SKIP" $testname "" "$last_line"
+             return 77
+diff --git a/arm/efi/run b/arm/efi/run
+new file mode 100755
+index 00000000..dfff717a
+--- /dev/null
++++ b/arm/efi/run
+@@ -0,0 +1,61 @@
++#!/bin/bash
++
++set -e
++
++if [ $# -eq 0 ]; then
++	echo "Usage $0 TEST_CASE [QEMU_ARGS]"
++	exit 2
++fi
++
++if [ ! -f config.mak ]; then
++	echo "run './configure --enable-efi && make' first. See ./configure -h"
++	exit 2
++fi
++source config.mak
++source scripts/arch-run.bash
++source scripts/common.bash
++
++: "${EFI_SRC:=$(realpath "$(dirname "$0")/../")}"
++: "${EFI_UEFI:=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd}"
++: "${EFI_TEST:=efi-tests}"
++: "${EFI_CASE:=$(basename $1 .efi)}"
++
++if [ ! -f "$EFI_UEFI" ]; then
++	echo "UEFI firmware not found: $EFI_UEFI"
++	echo "Please install the UEFI firmware to this path"
++	echo "Or specify the correct path with the env variable EFI_UEFI"
++	exit 2
++fi
++
++# Remove the TEST_CASE from $@
++shift 1
++
++# Fish out the arguments for the test, they should be the next string
++# after the "-append" option
++qemu_args=()
++cmd_args=()
++while (( "$#" )); do
++	if [ "$1" = "-append" ]; then
++		cmd_args=$2
++		shift 2
++	else
++		qemu_args+=("$1")
++		shift 1
++	fi
++done
++
++if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
++	EFI_CASE=dummy
++fi
++
++: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
++mkdir -p "$EFI_CASE_DIR"
++
++cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
++echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
++echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
++
++EFI_RUN=y $TEST_DIR/run \
++       -bios "$EFI_UEFI" \
++       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
++       "${qemu_args[@]}"
+diff --git a/arm/run b/arm/run
+index c6f25b8c..de520c11 100755
+--- a/arm/run
++++ b/arm/run
+@@ -64,8 +64,10 @@ if ! $qemu $M -chardev '?' | grep -q testdev; then
+ 	exit 2
+ fi
  
- 	for (i = 0, addr = (uint64_t)&hw_bp0; i < num_bp; i++, addr += 4)
- 		report(hw_bp_addr[i] == addr, "hw breakpoint: %d", i);
-@@ -367,11 +370,14 @@ static noinline void test_ss(bool migrate)
+-chr_testdev='-device virtio-serial-device'
+-chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
++if [ "$EFI_RUN" != "y" ]; then
++	chr_testdev='-device virtio-serial-device'
++	chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
++fi
  
- 	asm volatile("msr daifclr, #8");
+ pci_testdev=
+ if $qemu $M -device '?' | grep -q pci-testdev; then
+@@ -74,7 +76,11 @@ fi
  
--	asm volatile("ss_start:\n"
-+	asm volatile(
-+		".globl ss_start\n"
-+		"ss_start:\n"
- 			"mrs x0, esr_el1\n"
- 			"add x0, x0, #1\n"
- 			"msr daifset, #8\n"
--			: : : "x0");
-+			: : : "x0"
-+		);
+ A="-accel $ACCEL"
+ command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
+-command+=" -display none -serial stdio -kernel"
++command+=" -display none -serial stdio"
+ command="$(migration_cmd) $(timeout_cmd) $command"
  
- 	report(ss_addr[0] == (uint64_t)&ss_start, "single step");
- }
+-run_qemu $command "$@"
++if [ "$EFI_RUN" = "y" ]; then
++	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
++else
++	run_qemu $command -kernel "$@"
++fi
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index a133309d..d60cf8cd 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -12,6 +12,7 @@ tests-common += $(TEST_DIR)/gic.$(exe)
+ tests-common += $(TEST_DIR)/psci.$(exe)
+ tests-common += $(TEST_DIR)/sieve.$(exe)
+ tests-common += $(TEST_DIR)/pl031.$(exe)
++tests-common += $(TEST_DIR)/dummy.$(exe)
+ 
+ tests-all = $(tests-common) $(tests)
+ all: directories $(tests-all)
+diff --git a/arm/dummy.c b/arm/dummy.c
+new file mode 100644
+index 00000000..7033bb7c
+--- /dev/null
++++ b/arm/dummy.c
+@@ -0,0 +1,12 @@
++#include "libcflat.h"
++
++int main(int argc, char **argv)
++{
++	/*
++	 * scripts/runtime.bash uses this test as a canary to determine if the
++	 * basic setup is functional.  Print a magic string to let runtime.bash
++	 * know that all is well.
++	 */
++	printf("Dummy Hello World!");
++	return 0;
++}
 -- 
 2.25.1
 
