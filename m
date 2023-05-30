@@ -2,117 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6954A7157EB
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 10:06:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E75DC715939
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 10:58:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbjE3IGL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 04:06:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56646 "EHLO
+        id S230037AbjE3I6G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 04:58:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229939AbjE3IGI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 04:06:08 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07213A0;
-        Tue, 30 May 2023 01:06:05 -0700 (PDT)
+        with ESMTP id S229547AbjE3I6E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 04:58:04 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on20614.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eaa::614])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1403BE;
+        Tue, 30 May 2023 01:57:59 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VXWRF4F74MYeoDJgbZIYAF9AuV/+FAAdRKhXwc6kVw6Uh7kWwnlHXX7sIKuuJFwdgEbW8u4qHlJJmgmMJZ1wNz728J33LoBxZnVNNhN3YZ58601RMKeLKGWDtpM6E/ZUmYzJBZ41X+Eg1vRsPH3viP0QP9bO96NrUMBS4CeiUxywqft+jYmajXtSvOE+yKktiCrPq2Mug2kV0uDkDUPY7Rp4epPxq6BbKYeIO2eyfrR9xySJ6DYPfwx0hYi+IQOOdHZBrIPdRlXAIyOdBRy6gae0hphv5I5uYyhqkMk0SqHoHOcNmlbMXelKObUuYhrTROs6zBqIow6aWYtUDcP3ig==
+ b=QljTL3N16dG+eJeAtB/HW4VTvM4zZMioiOgzhcN3HkJBgEak1fu7u5VSFuPhmmDdklFT0zOmK2w21LgYEaJXK/ZagO0RzRb1x4l/tPXRLH7ciZCQxKIQJjkXYpXpVY+8RQz758Hi3IV6JPViOtcjlOzGkouhjn2NOqMl+Pgyps9QbaCK9EJMIZ3FfFa/d3h7dQV0nhqr8PmKgeTZTJ6oVeUaqyuH8MT7UBLhDqLiYTxytbvT5nAoxhDod+vwTEJ5d4E+Y9IXns5rrgyOtL86G9MvnEG4T6MXPkISKW+ktzrtFpsS46t8jmN0tigN3br75STpMr0OBBjPdwys9fDTGg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Cu/cZyGIdTR2QkqayNlX5O32vheKkYfreRb0eOZgwWE=;
- b=Djg3freXlOVdG9foPbnvSaeM70/EUnOsedG/cwrhvRnFTZeKN4uaNTSAsAXIW3nRTTtNKlBNbKvqMe4duUl4WyNNVSprLSPuEFL6m0cd1RD7SX+AKOIJzM4tXcZDZD//j3jKG0mMwB+otlL7VV4Za39o2r2n5iiwFm1yNKkK3Uuh5dzNIWLoJ/pb5DwSy8/InuULJ0nKTt5jZduhtJnXNj+OJeVoYUrnD3JGjouI0pRm8k+CL7aMneXEn/bm6kIb31h3VkwAm6PvsTpkA7TPFsv0nGBPG8q3LQWJqMHz2hPY+9qfoDvNNTcG/OrFOBmJ+FuxOu8vD0eIFDzyyLisJg==
+ bh=rYyHHvxYCJYCaHE18U+tDhHoHsReyPl/j7KGMuxwRGw=;
+ b=UtMoG6RXVtdbjkDcEHxqh0OgDNzHEif5bA6wpaGqKx8WJUYlo5ZNMjKcJXVZB17m9Hma2XhwOoDQnEe07XOQF0ad2+aXEOAyJYZZeAnzNWTaENEmILjCzSznSk3V921wGY1x0iZPVCoylHWG4nXWaESmwVqDRB76XwY+BDhc4/w2rAYtemMUYhMUVktFkxKLKvjLQi4zJQJejzV6mT8zkQEJsQ8pwtdfiySwppzuGcTwTiDrkXTARInCI+vWFrqOpZi94WSKrGNWDHirqVdwRgw/ruLO1lTzvP/E3xblqj8frnw4bmNoSdbRb87xYw6YFKIDaoAh8n0SWIJKMDhSpg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cu/cZyGIdTR2QkqayNlX5O32vheKkYfreRb0eOZgwWE=;
- b=gaMYh1ms0Xz8PJvUtJHyURoCZx412/e2rp1tv6ungiku04Kvmg/Cp7N+rb9SS3e6jLbJmgOcEmYXCl86k5jvfJtWvneoeozB+PH02WCTszSSGO44iKtSQ7Ssm/Yh2XKVnuhT8oORyKtyX92mnPBn6Tc1/fp1ll8zk5eMg8XZ83BzWKJIvrpR+VP7JpsQWYV3V0vb31dGrIuMmYZLoWPkhVizaXGQpo4IVEcKyBClsmuOeibKFHK96S/5S3EE9qITBrVGs9CtM9fRJPJQCN+SslUT849A2bHlO8U9hzCI2AndLXenTsPYRqONrMthU71IZVTAdZLzRop1566Fw7x/Qg==
+ bh=rYyHHvxYCJYCaHE18U+tDhHoHsReyPl/j7KGMuxwRGw=;
+ b=WZJYJowB4RDMN4NwqrTBkaerHTxAI+ienGm20vUhYpMTrwNeIx5mPK2rWmfKdoF/YMr1dNxdh1lqKVdJwzuJ4NqQ4WUKO9H3gwhphe67IO2iP0+J+jVoyHtfpAM5k27/KCNQ5qkzoHHekTnN6wPyYq0+cpfhBvDRgJpdvlucovs=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB3176.namprd12.prod.outlook.com (2603:10b6:a03:134::26)
- by LV2PR12MB5895.namprd12.prod.outlook.com (2603:10b6:408:173::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.23; Tue, 30 May
- 2023 08:06:02 +0000
-Received: from BYAPR12MB3176.namprd12.prod.outlook.com
- ([fe80::f6e4:71a5:4998:e6b2]) by BYAPR12MB3176.namprd12.prod.outlook.com
- ([fe80::f6e4:71a5:4998:e6b2%5]) with mapi id 15.20.6433.022; Tue, 30 May 2023
- 08:06:02 +0000
-References: <3cece716fc09724793aa832e755abfc9d70a8bb3.1684892404.git-series.apopple@nvidia.com>
- <5d8e1f752051173d2d1b5c3e14b54eb3506ed3ef.1684892404.git-series.apopple@nvidia.com>
- <ZHKaBQt8623s9+VK@nvidia.com>
-User-agent: mu4e 1.8.10; emacs 28.2
-From:   Alistair Popple <apopple@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
-        catalin.marinas@arm.com, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, robin.murphy@arm.com,
-        nicolinc@nvidia.com, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>,
-        zhi.wang.linux@gmail.com, Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 2/2] arm64: Notify on pte permission upgrades
-Date:   Tue, 30 May 2023 18:05:41 +1000
-In-reply-to: <ZHKaBQt8623s9+VK@nvidia.com>
-Message-ID: <87pm6ii6qi.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0366.namprd03.prod.outlook.com
- (2603:10b6:a03:3a1::11) To BYAPR12MB3176.namprd12.prod.outlook.com
- (2603:10b6:a03:134::26)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB2843.namprd12.prod.outlook.com (2603:10b6:5:48::24) by
+ BN9PR12MB5035.namprd12.prod.outlook.com (2603:10b6:408:134::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6433.23; Tue, 30 May 2023 08:57:56 +0000
+Received: from DM6PR12MB2843.namprd12.prod.outlook.com
+ ([fe80::d2ef:d75e:d9b2:835f]) by DM6PR12MB2843.namprd12.prod.outlook.com
+ ([fe80::d2ef:d75e:d9b2:835f%7]) with mapi id 15.20.6433.022; Tue, 30 May 2023
+ 08:57:56 +0000
+Message-ID: <64336829-60c5-afe1-81ad-91b4f354aef3@amd.com>
+Date:   Tue, 30 May 2023 18:57:46 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.5.1
+Subject: Re: [PATCH kernel v5 5/6] KVM: SEV: Enable data breakpoints in SEV-ES
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Pankaj Gupta <pankaj.gupta@amd.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Santosh Shukla <santosh.shukla@amd.com>,
+        Carlos Bilbao <carlos.bilbao@amd.com>
+References: <20230411125718.2297768-1-aik@amd.com>
+ <20230411125718.2297768-6-aik@amd.com> <ZGv9Td4p1vtXC0Hy@google.com>
+ <719a6b42-fd91-8eb4-f773-9ed98d2fdb07@amd.com> <ZGzfWQub4FQOrEtw@google.com>
+ <fc82a8a7-af38-5037-1862-ba2315c4e5af@amd.com> <ZHDEkuaVjs/0kM6t@google.com>
+From:   Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <ZHDEkuaVjs/0kM6t@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SY5P282CA0134.AUSP282.PROD.OUTLOOK.COM
+ (2603:10c6:10:209::19) To DM6PR12MB2843.namprd12.prod.outlook.com
+ (2603:10b6:5:48::24)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3176:EE_|LV2PR12MB5895:EE_
-X-MS-Office365-Filtering-Correlation-Id: 551db2a2-8667-4009-e606-08db60e4b547
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2843:EE_|BN9PR12MB5035:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4441ea8e-9a3d-4ee6-482d-08db60ebf55e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FlZoAslYsD1AL+7YjTITuiS1pATnHlhE4AJTCkG8LT6DP8grYdBFvSUfEymreexwXKC23lb3BIf7Wsb/ghRwF0IIYL1EjIVHTlHtZxUheH6UxSlD/xhE8z//5DgdFZAJGc/S3jAIeM0/iUqvCR6xx0K84OI+M+rIubzRXSh0dR7LFq4YmuAFWmzBIa/vWDTlP6YglXgT/i7Brdnwklp8dHyWSAYTmc0F89sQM6oJ8sTNFpXzixHVS35qTqDMt3iPakUUuP0Xkl4iDZ88mv6SI5kkXSlIu8sbGT1ybbWBnx4zDY2IYxMrqfCxnyWw/HejnwZ484sQ6LYqAcXeReS7FU49L4QwNzaxpELGEWETSW8UbBPvQSnruq/Jz7X15zw0r2RkxgZAV9uZSIPR4bwdR2PM5aleZVLspRPTvkQa0INag+NTO81MAKqysfHfd2RddlX6EXuvMa9FOEp7BY1zyQb/a1ljwjN82SGnZWkdYZ66KyrNygeP8xhmZnrGxDdJj+2UcDPSOXhV1DHqI3T8UlsaGYagTbi+jTWBk5H8C66gIi/3naxo3yOQU17cS1IP51jNumH+UBewSqeY1s8Op03AxfW8ukT5IkJ4zhBqzf8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB3176.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(346002)(136003)(396003)(376002)(451199021)(38100700002)(41300700001)(316002)(6666004)(6512007)(6636002)(4326008)(86362001)(8936002)(2906002)(8676002)(6862004)(6486002)(7416002)(66946007)(2616005)(66556008)(36756003)(66476007)(54906003)(37006003)(6506007)(26005)(83380400001)(966005)(478600001)(5660300002)(186003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: hdkysryKo3h2hr5DBw4ixVRmsso4ZHZgmcK0LCtOt2glSH9RIncupn1eQV8CXaSJYmvK7abQDia5ed+ADLCwZtP784DiNCOUGhGk3BmJOENVzD+AgBkPWmjNhLqCxAhFKxefIPctSfTVgPy7cFG3ZJ5Q4LPFsLrk6OITS1g+xVMrkgqLnvE9t7nQe6RKxQDF7aLooYLL+KcmVy8AWBocNbmMFze6mWTVB3tBZ/6b8qoDqzKUhRFDfbMZ28s0so0usKz7aw2pK73ICffM0TAiEVMi9ivTXmuiVivoZQ0J0J7Rex+2CBXpb22ehNNccVL6nU4t2ERDm6LhdaCHRVTI2GPoewXLHTJFdDHqVA0ojfrHZMhVjQBHiITBPbZlK1reJTaU3IKNhpTgkb1fls2ezSqSUSyEfz9lsjL2zXTPA3aacfuPvu6noaKS5UaiJXWhPThfnlpRnSRhszx4CWnfAkx9usmmEMOSE4E9XjuaJTG7qq/QHjTzkUxT/NXNVWFr8UwDh+oPslD5WWV+hLD7dEFM63Q9jlm1N7oNdXVoupgQBHnXz6A8wPSPF43UG+BcyFcZjmTumcfXUHsqiAlZdpHr/3UbEcfgUALg+j5fKc9uuwA7R3p2S4ZUTpBanaXK9vgr0Co4HX2ZWak2Fw/1mw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2843.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(39860400002)(396003)(136003)(346002)(451199021)(2906002)(186003)(31686004)(53546011)(6512007)(6506007)(26005)(5660300002)(8936002)(54906003)(8676002)(38100700002)(83380400001)(2616005)(6486002)(31696002)(41300700001)(316002)(66946007)(6666004)(4326008)(36756003)(66476007)(66556008)(6916009)(478600001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5CHNArRb6WOrjeo3LhdHi+dmpmspmm9AwyflH+61qVoQsVfwINOB/6lYi7PX?=
- =?us-ascii?Q?qmqzRyx+JNLsVD9UXc64Lsr5hie0+PpPNUD5iSD6ioecRw6YxzfKsY/tS2Bw?=
- =?us-ascii?Q?cdCZnjHXjlTd8otPcX12/EX55FGtajNNWtTyhX95XWsYJp57syPXXZ9za81v?=
- =?us-ascii?Q?kwpa3w8Eg8dFG+wovzdevwLk5rFTrPQb8IoPyY6gZwDBpzhtM1cZdNloEg/8?=
- =?us-ascii?Q?GlO1nLmaD8JPPypRIdKx/eL8njY1J38nMqJqyfQ2WAfGuHaiTOSKb0uaimF7?=
- =?us-ascii?Q?fcXhqGHZ5EIHXFfiDPsVkRrdqur9d/CWS3c9c34ujstzhrv2Evt84jnyPlRV?=
- =?us-ascii?Q?ME3Bppmc5HFnrGSG2Edro9YFhB+u63702i7jEBfaEK7LT2LdZWtpGsYWMLXi?=
- =?us-ascii?Q?tZ5/VzLsdDpIW67aKeEQ5BEE0J/mdh12X9HIFV3k88bdYzUUqu6JaJMJw3D0?=
- =?us-ascii?Q?9nNnF5RyfY2Z/ZUYoxbghu0LWsRsAHlyDbq195NzROD6SmPLx7ZKwu3Yudak?=
- =?us-ascii?Q?tDqbiQH8Q51qyXLxVZq4tM6Bw5gptTBI1r//Z+nh00Bh9W8ar2r2xVHMOYXF?=
- =?us-ascii?Q?X255aM8bwcrlQWeJXGwjDBkNMTIN1L37NHZK6XVuBmqQB2EE+o2gc8TaCCR0?=
- =?us-ascii?Q?CMiCzQKfK8kMnsmUUdxxj88sFykQ+vbGrEZ69HwmwsC1NeoqMRKWbL5M95GP?=
- =?us-ascii?Q?ruIvNSYhgu+JMoXAKAln6qpuVT32GMj5zTEFOKmr/OCrIdHBRXudFnQPkuT/?=
- =?us-ascii?Q?t0WxWZWIzcgEOV/g9jBGf+8y0/WMKdh85pkHMAfjzAIArrUv+LTcBQL9pe+h?=
- =?us-ascii?Q?6/c9JqQaxFAyFnjT+oVOH+/nRhex3fyZ4iNftMWl13HVNYaJKZN8u1MPEwmb?=
- =?us-ascii?Q?QszQ1ZleF56FqBhIBwxFVplkyUqqd4nrI5KSGXvk3XpbiImgRZmiAj2YW2S8?=
- =?us-ascii?Q?DNo41QZbViiH+w6mCmaMUowiGjVWP5E3/zdeXroq7NCJk/0bT7LIrqD+R0yx?=
- =?us-ascii?Q?xFy0LqF64wz3+aTqxJ/J1JIE+UM/tox3JOJ4vnrD0pkKYwzj7BVd5f6wA01P?=
- =?us-ascii?Q?x+qit2C/Mj8FnUCXoRU/pT3eeUmuCeV6sTRFRRxsNEMvIXxtK/bg7WzH2tWE?=
- =?us-ascii?Q?rO5vvCvweC5Z/uUYuoCJdWpTW3o9sRL1kipvzwgFE4SEYfMYYMhFOy2uGt8L?=
- =?us-ascii?Q?Av53WW9iB6UAX78SD6LQcc2i0rH9puK2K0ixPTp8jMp4HgxuVEkYfoAh39Sb?=
- =?us-ascii?Q?R+TCrNpYsyyvFBxmNmtUBits+ycbNZNQ81nCeFm22D6Wgc/Ndq6SArGsWzxz?=
- =?us-ascii?Q?i4LSEOcyPMwLTgLRs7TQlLKUH9b6q3ooxnNlCk4JcvGd2ZktJ6Syrr9otQup?=
- =?us-ascii?Q?jOVuLXcsPfnfonRUngv6bwk9A6fzTPwyHUgRv6coILKtX2wDYvL0IQ7MA2Ni?=
- =?us-ascii?Q?FnXPks49pfuOa3B52juEYwxdjAsKZof5CFbQpeS43TS9Awtd5wcqbG2qNr8s?=
- =?us-ascii?Q?HOMkA4c8b18gdJwdsVpJ79XpNZKbolaLrpgAM4pveCuVrIbtOJb3VHi/q7rd?=
- =?us-ascii?Q?sPXGGA7P+CJu9WD8aJmFpAugwuu8ZaN8B6fD20I5?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 551db2a2-8667-4009-e606-08db60e4b547
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB3176.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N0ZmUElzQTNORkw5MGpyczVmblNhcDlydEhPemlmSVhQNDRUUjVtZWp1RmdP?=
+ =?utf-8?B?MnJpWjlzTjI4Z25FOHE1NFdhR0xrYm91RHlZcHkyNEZBaUkzSkxZL29sYmRt?=
+ =?utf-8?B?eEk4RnE4elFwcVRnR1c5YTFOdk1hTER2YWc5dG9XNGs5QnhzYW14cG1WZGN2?=
+ =?utf-8?B?aUpvN1RlTDFBVmZ6WmRBaWZhRGpWcTVLTEJnQnB0MTBQVHNNeXhVQVFxY3pN?=
+ =?utf-8?B?UjZYMHVFL3BXRGtiQXQ2eDRjc3B1Qjl2SEFCMGVRdkJWL2cwa242cDJCS3py?=
+ =?utf-8?B?blJDUi9ZK1ZwaElZTmkycDdUQm1uUHZjWGtVTG51clVaaUdGOVlBR3BLYjgr?=
+ =?utf-8?B?N1JWK200Ry8zUDBIZWlNWFhITUpEeXJ6dzRub01qZ1pDRVVYSVlVVHM5V3RK?=
+ =?utf-8?B?a3FNSlkxTW9qRG1tR2VzazdvQnNHcjhIWm9heFE2ZmRNOHVsekM0L1k2dC9P?=
+ =?utf-8?B?RmRWMTl2dzg5bnJ1aWJyWXpVbHJaR2tHZVVrU3NsRWlITlpLRGJlRzRFZllp?=
+ =?utf-8?B?NEZqOHE2TGJlNXIwYk1lMjFzY1pzSll4L0g2NWpTdlJoQ1JzTVZSRWkreHU3?=
+ =?utf-8?B?NWZzaWp4aWhrRFJWNEFxbUkwZjdjeTNSa2VQbXoxaUZCb3JNOWYwTE8xRFRl?=
+ =?utf-8?B?TS9LQy9nbHQzcjNwdXRBN3k2N1NodnQyanpZaUJ0bXhZTytIK0pGVDJTVkRj?=
+ =?utf-8?B?S1lQT0VNSGRGTis0Nk10TDBMZ0pRUjZEN1BRVmoxb3crYlNabXc2ZHlNMVRY?=
+ =?utf-8?B?MHpZek5FcmY2UVZjaHVMQ2JvbUd2OVoyZnpUeXZqTEtLZm13QjJ2N09OdUtl?=
+ =?utf-8?B?b0RCeUZ6a2Y0SmN3ZUlFb01BZW9TQ2psajJIeWJoYm5xMjNFZFBZdHNzRWJX?=
+ =?utf-8?B?dEJacXRYRTBERHpOYTNDSzBBMTJVU3hsZnNRU1lSaVB6clpJT25GYmZKNktU?=
+ =?utf-8?B?S05xSklRRWJqeHpyaXlhM1ZyUWhYbDZMTVJkWlZxWU1lM3dsY01ZTWpubjU4?=
+ =?utf-8?B?YUxFb2pEdjh0U2tMUElQYXFrV2FUc0s4NFJqYjNld2xuNk4wMDBDN3BRTy9Y?=
+ =?utf-8?B?YmhmcXM0RWVRa1dWeHV1TUs4a1h0YTZURTcwVjJlNklvbjZXcXgvZTBLOGpG?=
+ =?utf-8?B?NnRXclgvemhuVlo2OWRLeHNEV2M5RDArbCt1ZUpvN2pQZGl1ZU9BSVZwQmlW?=
+ =?utf-8?B?Y2N5ZHh1U1FRbllDRldSQVZlVENuRDcwRTFRWjErL1l2b1B3dmY5bnp4RHpN?=
+ =?utf-8?B?TDFEdkxXTC9jOXppZU5pamM0a1d1ZmczQndxU1pTbVFRM3lCcnhTN3lZSCt6?=
+ =?utf-8?B?THNWOXNqYXhTNTNDS3ZPU0VZd0sxdG40b0Y1MmE0UlJYaDBaY2xyMUFMZVZu?=
+ =?utf-8?B?Wjd3UWI2MDlqR1BrdDNwWkFqa2VKVlVyekozWHl4T1liN0h0dFIrSUlTbUd3?=
+ =?utf-8?B?cDlTMFU5VUkxQmw0MlFiQnNrS1pENXlldEJObHJDU0t3S09XTG5wekVwMGlI?=
+ =?utf-8?B?ZTQ0T0hKK1RRdll3WWNGUEZQbVp4cXlheEJYbVhxWEJSYnE0dzNPY3BYSVd4?=
+ =?utf-8?B?ejdyREpKQzBUdlhLOXRQUHIrS0RERnpBZC9RckRBemgyVjVOVTFUaEh3N09z?=
+ =?utf-8?B?c25jSWYyZzd2Y3JGWEtNRkJYelJJSnZ2M0hOcElxaUN5NlljQXJqMTZhUTdI?=
+ =?utf-8?B?VzVwVHErcGpSdFhFQnF0bnZtSkh6ODZ4N3dwNUtkNDNMc0k3TFNaZy9kMWdk?=
+ =?utf-8?B?L2IvZ0NaK21lZjA0V0lGZldITXh6NlhoNThacUgwOE9peWdPMFpDQjlOWlhn?=
+ =?utf-8?B?b1EvZjVaQlZRWDdIdHdiMHV2Y3NkeXBFd0U0WENweEhUU0NENE1aQy9sVDVm?=
+ =?utf-8?B?RUNyTE9qTDFHRzg0Wm1DTWdleU5qVnIvbDV2M2JLQS9PUmRiMis0UUx0amlI?=
+ =?utf-8?B?THpMQVpKWFUvSlhHRHI4VUc3MUtjN2loclRqNVJ4MG56NjNvUTUrYUFJVWpt?=
+ =?utf-8?B?b2hGVDJ2RmdVSmdkMDRRY1c0Ui9DODBUVzd3WlFPK0NCd2ljUGJKTXBLUlBB?=
+ =?utf-8?B?RnVSdlFHZ1dYQ0k1a0tZWmxMZG5ybHg1dGs0Q3JKS2NkbFEyZ0hnN25iRkta?=
+ =?utf-8?Q?ynuz/xslo3VesWYAKnrfdS3pE?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4441ea8e-9a3d-4ee6-482d-08db60ebf55e
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2843.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2023 08:06:01.5595
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2023 08:57:55.6282
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Tlm3XGR36qREhRvMGxV3pur+5KPLmbiKbnHaxz/drtxHnUDqh3GyrFPVFY3crRsYqHfoCIQ9AEOeO0b6bboMPw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5895
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: un1L9ub+qvApqMSvdiD+XIRPkYUgtDn8czJc9z1ldock1oLK7aXArVRRB2978tdO4qGMsqwn0VFTTrf8JJb27g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5035
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -120,73 +130,110 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-Jason Gunthorpe <jgg@nvidia.com> writes:
 
-> On Wed, May 24, 2023 at 11:47:29AM +1000, Alistair Popple wrote:
->> ARM64 requires TLB invalidates when upgrading pte permission from
->> read-only to read-write. However mmu_notifiers assume upgrades do not
->> need notifications and none are sent. This causes problems when a
->> secondary TLB such as implemented by an ARM SMMU doesn't support
->> broadcast TLB maintenance (BTM) and caches a read-only PTE.
->
-> I don't really like this design, but I see how you get here..
+On 27/5/23 00:39, Sean Christopherson wrote:
+> On Fri, May 26, 2023, Alexey Kardashevskiy wrote:
+>>
+>> On 24/5/23 01:44, Sean Christopherson wrote:
+>>> On Tue, May 23, 2023, Alexey Kardashevskiy wrote:
+>>>>> Actually, can't disabling #DB interception for DebugSwap SEV-ES guests be a
+>>>>> separate patch?  KVM can still inject #DBs for SEV-ES guests, no?
+>>>>
+>>>> Sorry for my ignorance but what is the point of injecting #DB if there is no
+>>>> way of changing the guest's DR7?
+>>>
+>>> Well, _injecting_ the #DB is necessary for correctness from the guest's perspective.
+>>> "What's the point of _intercepting_ #DB" is the real question.  And for SEV-ES guests
+>>> with DebugSwap, there is no point, which is why I agree that KVM should disable
+>>> interception in that case.  What I'm calling out is that disabling #Db interception
+>>> isn't _necessary_ for correctness (unless I'm missing something), which means that
+>>> it can and should go in a separate patch.
+>>
+>>
+>> About this. Instead of sev_es_init_vmcb(), I can toggle the #DB intercept
+>> when toggling guest_debug, see below. This
+>> kvm_x86_ops::update_exception_bitmap hook is called on vcpu reset and
+>> kvm_arch_vcpu_ioctl_set_guest_debug (which skips this call if
+>> guest_state_protected = true).
+> 
+> KVM also intercepts #DB when single-stepping over IRET to find an NMI window, so
+> you'd also have to factor in nmi_singlestep, and update svm_enable_nmi_window()
+> and disable_nmi_singlestep() to call svm_update_exception_bitmap().
 
-Not going to argue with that, I don't love it either but it seemed like
-the most straight forward approach.
+Uff. New can of worms for me :-/
 
-> mmu notifiers behavior should not be tied to the architecture, they
-> are supposed to be generic reflections of what the MM is doing so that
-> they can be hooked into by general purpose drivers.
 
-Interesting. I've always assumed mmu notifiers were primarly about
-keeping cache invalidations in sync with what the MM is doing. This is
-based on the fact that you can't use mmu notifiers to establish mappings
-and we instead have this rather complex dance with hmm_range_fault() to
-establish a mapping.
+>> Is there any downside?
+> 
+> Complexity is the main one.  The complexity is quite low, but the benefit to the
+> guest is likely even lower.  A #DB in the guest isn't likely to be performance
+> sensitive.  And on the flip side, opening an NMI window would be a tiny bit more
+> expensive, though I doubt that would be meaningful either.
+> 
+> All in all, I think it makes sense to just keep intercepting #DB for non-SEV-ES
+> guests.
+> 
+> Side topic, isn't there an existing bug regarding SEV-ES NMI windows?  KVM can't
+> actually single-step an SEV-ES guest, but tries to set RFLAGS.TF anyways. 
 
-My initial version [1] effectivly did add a generic event. Admittedly it
-was somewhat incomplete, because I didn't hook up the new mmu notifier
-event type to every user that could possibliy ignore it (eg. KVM). But
-that was part of the problem - it was hard to figure out which mmu
-notifier users can safely ignore it versus ones that can't, and that may
-depend on what architecture it's running on. Hence why I hooked it up to
-ptep_set_access_flags, because you get arch specific filtering as
-required.
+Why is it a "bug" and what does the patch fix? Sound to me as it is 
+pointless and the guest won't do single stepping and instead will run 
+till it exits somehow, what do I miss?
 
-Perhaps the better option is to introduce a new mmu notifier op and let
-drivers opt-in?
+> Blech,
+> and suppressing EFER.SVME in efer_trap() is a bit gross,
 
-> If you want to hardwire invalidate_range to be only for SVA cases that
-> actually share the page table itself and rely on some arch-defined
-> invalidation, then we should give the op a much better name and
-> discourage anyone else from abusing the new ops variable behavior.
+Why suppressed? svm_set_efer() sets it eventually anyway.
 
-Well that's the only use case I currently care about because we have hit
-this issue, so for now at least I'd much rather a straight forward fix
-we can backport.
+> but I suppose since the
+> GHCB doesn't allow for CLGI or STGI it's "fine".
 
-The problem is an invalidation isn't well defined. If we are to make
-this architecture independent then we need to be sending an invalidation
-for any PTE state change
-(ie. clean/dirty/writeable/read-only/present/not-present/etc) which we
-don't do currently.
+GHCB does not mention this, instead these are always intercepted in 
+init_vmcb().
 
->> As no notification is sent and the SMMU does not snoop TLB invalidates
->> it will continue to return read-only entries to a device even though
->> the CPU page table contains a writable entry. This leads to a
->> continually faulting device and no way of handling the fault.
->
-> Doesn't the fault generate a PRI/etc? If we get a PRI maybe we should
-> just have the iommu driver push an iotlb invalidation command before
-> it acks it? PRI is already really slow so I'm not sure a pipelined
-> invalidation is going to be a problem? Does the SMMU architecture
-> permit negative caching which would suggest we need it anyhow?
+> E.g. shouldn't KVM do this?
 
-Yes, SMMU architecture (which matches the ARM architecture in regards to
-TLB maintenance requirements) permits negative caching of some mapping
-attributes including the read-only attribute. Hence without the flushing
-we fault continuously.
+It sure can and I am happy to include this into the series, the commit 
+log is what I am struggling with :)
 
-> Jason
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index ca32389f3c36..4e4a49031efe 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3784,6 +3784,16 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+>          if (svm_get_nmi_mask(vcpu) && !svm->awaiting_iret_completion)
+>                  return; /* IRET will cause a vm exit */
+>   
+> +       /*
+> +        * KVM can't single-step SEV-ES guests and instead assumes that IRET
+> +        * in the guest will always succeed, 
 
-[1] - https://lore.kernel.org/linux-mm/ZGxg+I8FWz3YqBMk@infradead.org/T/
+It relies on GHCB's NMI_COMPLETE (which SVM than handles is it was IRET):
+
+         case SVM_VMGEXIT_NMI_COMPLETE:
+                 ret = svm_invoke_exit_handler(vcpu, SVM_EXIT_IRET);
+                 break;
+
+
+> i.e. clears NMI masking on the
+> +        * next VM-Exit.  Note, GIF is guaranteed to be '1' for SEV-ES guests
+> +        * as the GHCB doesn't allow for CLGI or STGI (and KVM suppresses
+> +        * EFER.SVME for good measure, see efer_trap()).
+
+SVM KVM seems to not enforce EFER.SVME, the guest does what it wants and 
+KVM is only told the new value via EFER_WRITE_TRAP. And "writes by 
+SEV-ES guests to EFER.SVME are always ignored by hardware" says the APM. 
+I must be missing the point here...
+
+
+> +        */
+> +       if (sev_es_guest(vcpu->kvm))
+> +               return;
+> +
+>          if (!gif_set(svm)) {
+>                  if (vgif)
+>                          svm_set_intercept(svm, INTERCEPT_STGI);
+
+-- 
+Alexey
