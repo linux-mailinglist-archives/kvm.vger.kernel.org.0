@@ -2,155 +2,371 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6D637169F5
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 18:43:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E010716A10
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 18:52:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232784AbjE3QnH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 12:43:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55574 "EHLO
+        id S232656AbjE3QwD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 12:52:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232771AbjE3QnE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 12:43:04 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0CFFEC;
-        Tue, 30 May 2023 09:43:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eEdrQeoVRVW4WHNsTXlE91m4drkqxrE8iEjNQgmCpFOWpWzOQFEYmYLQVq4uW9hzH9FQ8bF2XwRe1HamBqF1NkbC6VU12zQ0S7fkv5x6MZTpFbu3q0hS1sNMHfXMG8TKv7I5tZDPh8l2pJTP08JVGO8eNV7kSKUEOo2fQ3EYrVGmZVYV51waLEQ2aukpNl7MiUzCzgLUC4wat864XyyIPicAIomuy4M/Tr1vxMK2NrwfaZ4VeYMgUoHnWeIl84HLRi0nYtXnzPR2alLkgXVlOKtIVhnFiQPqvFlkt4yVi2+1hHcKcyC99jZiTN5qnne5Ly2UIyjAbMeAM8hI0Jxjfw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JP91f1MduvAlMfS9U7qsIj/aBxarTpjE6RMbZRkVrY8=;
- b=ce65ugLuG62mF03pZE03kqRi7i14zwm/umidsI2rJOewhkHL5DKHqJPW72vPFG3oOZXl8N3x7eayEFLnN8PdujVvSBDKWhNVlYihnNdHfqzmQ6xpfI52sDansoQhtuyRuzduX/IthRcOgmzu0nFjhNkcOF7i4ee0AE0OnkddfrAKXr+BdMxTA0zBvf9V78QLHxmfacc5MRzYFCx66KkuXwkbV4gP/Xk1wUvaL3eqlOzd29rUDz6CY6nDOkD8r5hxlnwK/rNuHArtF7THkEanug6M/jK/3WEIUqmKM6z74YzWQ4N5QOZzP2X9pdfqQj8RozIK1S8wDjmyQ8FXMq9JYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JP91f1MduvAlMfS9U7qsIj/aBxarTpjE6RMbZRkVrY8=;
- b=CAAjT2yaU3S7oFzUuN1kPmT/HcXzLSgmOiUnaLda7D5r4EFkmfFIcpP6hbuPIz07+WAQssEh1hilSop4XqQu7+H7mPc93QXEHlBkcu12rmJDcCyNTI8iR5H9mDle+TJTX6UA0kwwSIoa4UxBxNGayGu43ezT9jeXdeSW+JjVTlW/dt7DAHYTlZ6fqSthwZjpXjQKhmaMt6oy+zQbba436tJqNsZQprCuFBZXYksKKXV3rP4oiWhi4tBMuXhaIyfOrScJX+RVWxBh+E/nUpN+zqOGmnTvmhDqXx2sJdKUrAKkd5Ky9hrJMujS/p0mEIvTxNZ/yi+9gfNt1M7m5395Mw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA3PR12MB9199.namprd12.prod.outlook.com (2603:10b6:806:398::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.23; Tue, 30 May
- 2023 16:43:00 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6433.017; Tue, 30 May 2023
- 16:43:00 +0000
-Date:   Tue, 30 May 2023 13:42:57 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v3 00/10] Add Intel VT-d nested translation
-Message-ID: <ZHYnkckYAHI3EA/6@nvidia.com>
-References: <20230511145110.27707-1-yi.l.liu@intel.com>
- <BN9PR11MB52765FA8255FB8F8A1A6F11B8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZHTyNgnjj/bOkIgi@nvidia.com>
- <20230529181644.3a6a5c7b.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230529181644.3a6a5c7b.alex.williamson@redhat.com>
-X-ClientProxiedBy: SJ0PR13CA0240.namprd13.prod.outlook.com
- (2603:10b6:a03:2c1::35) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S230171AbjE3Qv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 12:51:59 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89C59C5
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 09:51:57 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1FCDE63024
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 16:51:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78F0FC433EF
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 16:51:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685465516;
+        bh=/Gy03ZF3ZHFei176bqQktd+JC64WhLRtmKlNUKh29Zw=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Fes/vBTAxy1gh72Y/lffJ86z2RvBWA9tV620BzRu1i2j5dGFIO0e0b2aWxEuowlhp
+         8DN7iVzWGkVosE2xDxr54FPmFr3lLYJtCvMnH4tAVCPdfgQReNvgq/PVP9ZHFXz3DK
+         /Oy1LAddsJM63HlWwasb/qsYtk9cC9ot7dNPQhVvDG8nGvJAbCpTvdBmZC5/RX/2qx
+         NoPFhNe1ewMmtaaG/Jh9vyvpfrSHITNFkYbGQ9PyT8ipBSQVPVKLsY2xYDjtKiBgR/
+         RhBA0Saw0PC+nwYV++BwpgRkThBJZCcWP5F4mIIREqTGAWa49s7CYEPDE+oykAtYy0
+         rLXIRUaJUUDVA==
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-4f3edc05aa5so5264396e87.3
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 09:51:56 -0700 (PDT)
+X-Gm-Message-State: AC+VfDxqBt5f/T1l2ojnAtPupLYAsJFau9Em058undhV4yut0Xv0L6iW
+        +kBqkQSjuB95l9FCCrqEyyGyuFoi+y4BV37lqD8=
+X-Google-Smtp-Source: ACHHUZ7vwP9yqqeQhSciB4UvaCzxf76iVICXvxuN4ocPpEoyCrjrl5+iN1bOowQOfpaKvNACGk9jOIfFu7pmGmxnlQI=
+X-Received: by 2002:ac2:442e:0:b0:4f3:8196:80c8 with SMTP id
+ w14-20020ac2442e000000b004f3819680c8mr969532lfl.1.1685465514510; Tue, 30 May
+ 2023 09:51:54 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA3PR12MB9199:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7457eff9-0ede-4d79-903a-08db612cede9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MR5h3F+KdJOE0xqAYPjb/Km3sX0KMuD/CqF96+vk+3i/x86nFNh9bj3OxcokTe8xpJBikF8DX73fZ9V33GqEhx9URuyB1kivfeNUaqWvcBLtXliMUbGEdVcwayAbGTvUTHPDtDcFlS46bWXooZXURCoNodoqxopJx7fCY2khxKaEMMzeU7kGMjMAk7w3/YjdRphnnvRA6VTp1NmxblCxAQTZ4g9QkHskMWX1ZFa0SWlPKghF6B7h0dya8cEEXd0hVWISOJmw2llStRPOJmEWqlHa6IjTQbBE/JCR19dLBW21ee6vLpOXruGmcL86UFnuzCV5z+xcoQLrI+36DI4jaiDCSTFdG+Jks3xVWQuSUzqn6rH457EueanIHSXXqh9LWIrNO9Y0tZjD4tV2G3HiM+96M5m7nJwAFspxsivxDrGrcnJLqVgyjDEXPu0SsyIAdpM2Gfx9S2UpcWDi3FGyzjVnwVp5dYAIx/T78zkiEWLjo2D8HlT0UN51WTD7SOANmZJgUQr3+p2p1i7jBx94d1jT8BHTHRYvp0lhDUv4nUHQxCxLEGPKBozOPCP9TPQb
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(39860400002)(346002)(366004)(376002)(451199021)(5660300002)(6666004)(316002)(36756003)(66476007)(66946007)(66556008)(7416002)(4326008)(6916009)(8936002)(8676002)(41300700001)(38100700002)(6486002)(86362001)(54906003)(2616005)(4744005)(2906002)(6506007)(186003)(6512007)(478600001)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?aF4zaN7Q2HfZhEh4ib+/ufwdqA+cqY1CEb/5/wdwDEiFdtWsxeyXE6/N0mI8?=
- =?us-ascii?Q?Fl84zjc9KVqKyryOXSvgo08QidhrlmtHQhMEf9kf/r/SI5JHS2Hjg5p95j8J?=
- =?us-ascii?Q?2wIVNLAcaCsAScUxhHQM3j78kD4weuQLT3qDC9dpF1982C+HF9JZ/PMR2lQ3?=
- =?us-ascii?Q?qSU4ZaT5+iXTF5mShKSU0cahZ7hLDhgOtXJXHpE4va6mN3CgCX6T7IGi3E9s?=
- =?us-ascii?Q?lrdezu8nxQTz0NMALa+SbkwnxHCEtcxYeCHNQUMRmcv+wUrxhFg3CtxuVimk?=
- =?us-ascii?Q?ug0RGt+JsOisKAOKJztcZvbbTWDdeTnZpZdTI2bTajUctKQqH3tfIyMM6LW/?=
- =?us-ascii?Q?TsTk2+MlZ9JpsHa8FrTbgN9L5bKJzqaKwYdSuvStst6YxpEsB9h7n5Qgk0Ye?=
- =?us-ascii?Q?AycQsbP534iRDy1CJeWCUC06j7en1/CSUGN5138Mcc1aDo9601a5fay7Dsfu?=
- =?us-ascii?Q?9717Q7zWsqkzVB+HNqlXMEbQv8RzQsvylpEwy0ZtfxuMey+nTMAESeThCJyW?=
- =?us-ascii?Q?BwElak1XZq5tbCLHNW3I0x1SLBj6ibj/o1PWo3/6ntRJDf3/lSsAN60dGkSJ?=
- =?us-ascii?Q?SDo7X+rtOhAkkGNyuOLeoj2gqT2W55cR4L08C3LlOmb+DPcT0CudSnvooYKx?=
- =?us-ascii?Q?/PtgwH5Moe2FJQPYmJVxyosZWYvPz6J5bPEEFVVT+iFgvMqUR6Uya/YETOHF?=
- =?us-ascii?Q?dQP+1WexXrBRTnT9hB21Hk3z5Ze6KmsKzh9FGA30L1RgtC+8UAGEXLSott9x?=
- =?us-ascii?Q?IAGVrqFLzj9EQvrsgi6LBHY9Ha5Yp0pTKyecj5vqXUvu49mlPkYAjUGak3Zb?=
- =?us-ascii?Q?3/5ohwniC0wOitdOncLpzAtZSQannw+yRqyfYYKNOwarW1a+EOCXrKnXs4Uu?=
- =?us-ascii?Q?EjOoyCT1L6yObWBfRCFsyMnLtkC7nZqmcLKEfqKSG9I57AP89n47v24wVWhG?=
- =?us-ascii?Q?C+dakFA+z77bbreU7QEXqU5BQzHbZWKZ6OsDuol7qasxnBUvTQMwtOZb3hMV?=
- =?us-ascii?Q?e3iAhNMB3/xLcEFapxwOOLhTRjzmrSqg9GQPGqQAKNn+3ceS9BACs0xY9rdL?=
- =?us-ascii?Q?CLD4I2oJ6KODI3P7m30PUB0c2n2NbmJiBRdruyXjB0c6cFVwkGee2Pla2nPg?=
- =?us-ascii?Q?Vn9dvDUUUzmcTCCzyYaXDpis+yuHl4DpaL1Ox0+wWSw3V/VHkQbHooseBb6e?=
- =?us-ascii?Q?okLWq2nZhnFus15seVnQScY/qO7GETO8WcoUlewcnhhJpuSYoM7bap0qExd1?=
- =?us-ascii?Q?n1f0ix0PEe1MeA54jRxKB0whrEVwBr8H1FSSogmWKYbzqtspRr5pB49mfKCe?=
- =?us-ascii?Q?VeVddYgvyXPwDSvb01Tvf9uBaPRUhEfQ4hgch5hutBeyKk3UFV4RDSUpU5LP?=
- =?us-ascii?Q?NT6UOLS9nyUsO6S7Zp+Mb+a/i3CSI+nhRx2YWK20g+B/vpbZXjWDI+ywp2pc?=
- =?us-ascii?Q?1yrWst5Rr7z3mVeLxRG6QrXMswvLrHktMAug76ns+09Abc6mQ2KzRpPY2+ff?=
- =?us-ascii?Q?q8AoFxwZIpHZbDH2Q/o+NF18aegVEAwzJbABbyGV4/yuGq0AN9unsiB47ZBf?=
- =?us-ascii?Q?u39bMHk5IpAfYN4y0eeANlARSTs1pWLzhUHt8Rcf?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7457eff9-0ede-4d79-903a-08db612cede9
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2023 16:43:00.3512
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: z5WsWsHKo0GYiqkhg/HyhL5E4YLc+qJFPtKcb4spZayXjjRqwU7rKALLprkvahjp
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9199
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+References: <20230518161949.11203-1-andy.chiu@sifive.com> <20230518161949.11203-12-andy.chiu@sifive.com>
+In-Reply-To: <20230518161949.11203-12-andy.chiu@sifive.com>
+From:   Guo Ren <guoren@kernel.org>
+Date:   Wed, 31 May 2023 00:51:43 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTTQz8kOkHUBqh50PBLTBY0-MTBGLJbuC7-YavCMz=V31Q@mail.gmail.com>
+Message-ID: <CAJF2gTTQz8kOkHUBqh50PBLTBY0-MTBGLJbuC7-YavCMz=V31Q@mail.gmail.com>
+Subject: Re: [PATCH -next v20 11/26] riscv: Allocate user's vector context in
+ the first-use trap
+To:     Andy Chiu <andy.chiu@sifive.com>
+Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
+        anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+        Liao Chang <liaochang1@huawei.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
+        Mattias Nissler <mnissler@rivosinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 29, 2023 at 06:16:44PM -0600, Alex Williamson wrote:
-> On Mon, 29 May 2023 15:43:02 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Wed, May 24, 2023 at 08:59:43AM +0000, Tian, Kevin wrote:
-> > 
-> > > At least this looks a reasonable tradeoff to some proprietary VMMs
-> > > which never adds RO mappings in stage-2 today.  
-> > 
-> > What is the reason for the RO anyhow?
-> > 
-> > Would it be so bad if it was DMA mapped as RW due to the errata?
-> 
-> What if it's the zero page?  Thanks,
+On Fri, May 19, 2023 at 12:21=E2=80=AFAM Andy Chiu <andy.chiu@sifive.com> w=
+rote:
+>
+> Vector unit is disabled by default for all user processes. Thus, a
+> process will take a trap (illegal instruction) into kernel at the first
+> time when it uses Vector. Only after then, the kernel allocates V
+> context and starts take care of the context for that user process.
+>
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Link: https://lore.kernel.org/r/3923eeee-e4dc-0911-40bf-84c34aee962d@lina=
+ro.org
+> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+> ---
+> Hey Heiko and Conor, I am dropping you guys' A-b, T-b, and R-b because I
+> added a check in riscv_v_first_use_handler().
+>
+> Changelog v20:
+>  - move has_vector() into vector.c for better code readibility
+>  - check elf_hwcap in the first-use trap because it might get turned off
+>    if cores have different VLENs.
+>
+> Changelog v18:
+>  - Add blank lines (Heiko)
+>  - Return immediately in insn_is_vector() if an insn matches (Heiko)
+> ---
+>  arch/riscv/include/asm/insn.h   | 29 ++++++++++
+>  arch/riscv/include/asm/vector.h |  2 +
+>  arch/riscv/kernel/traps.c       | 26 ++++++++-
+>  arch/riscv/kernel/vector.c      | 95 +++++++++++++++++++++++++++++++++
+>  4 files changed, 150 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/insn.h b/arch/riscv/include/asm/insn.=
+h
+> index 8d5c84f2d5ef..4e1505cef8aa 100644
+> --- a/arch/riscv/include/asm/insn.h
+> +++ b/arch/riscv/include/asm/insn.h
+> @@ -137,6 +137,26 @@
+>  #define RVG_OPCODE_JALR                0x67
+>  #define RVG_OPCODE_JAL         0x6f
+>  #define RVG_OPCODE_SYSTEM      0x73
+> +#define RVG_SYSTEM_CSR_OFF     20
+> +#define RVG_SYSTEM_CSR_MASK    GENMASK(12, 0)
+> +
+> +/* parts of opcode for RVF, RVD and RVQ */
+> +#define RVFDQ_FL_FS_WIDTH_OFF  12
+> +#define RVFDQ_FL_FS_WIDTH_MASK GENMASK(3, 0)
+> +#define RVFDQ_FL_FS_WIDTH_W    2
+> +#define RVFDQ_FL_FS_WIDTH_D    3
+> +#define RVFDQ_LS_FS_WIDTH_Q    4
+> +#define RVFDQ_OPCODE_FL                0x07
+> +#define RVFDQ_OPCODE_FS                0x27
+> +
+> +/* parts of opcode for RVV */
+> +#define RVV_OPCODE_VECTOR      0x57
+> +#define RVV_VL_VS_WIDTH_8      0
+> +#define RVV_VL_VS_WIDTH_16     5
+> +#define RVV_VL_VS_WIDTH_32     6
+> +#define RVV_VL_VS_WIDTH_64     7
+> +#define RVV_OPCODE_VL          RVFDQ_OPCODE_FL
+> +#define RVV_OPCODE_VS          RVFDQ_OPCODE_FS
+>
+>  /* parts of opcode for RVC*/
+>  #define RVC_OPCODE_C0          0x0
+> @@ -304,6 +324,15 @@ static __always_inline bool riscv_insn_is_branch(u32=
+ code)
+>         (RVC_X(x_, RVC_B_IMM_7_6_OPOFF, RVC_B_IMM_7_6_MASK) << RVC_B_IMM_=
+7_6_OFF) | \
+>         (RVC_IMM_SIGN(x_) << RVC_B_IMM_SIGN_OFF); })
+>
+> +#define RVG_EXTRACT_SYSTEM_CSR(x) \
+> +       ({typeof(x) x_ =3D (x); RV_X(x_, RVG_SYSTEM_CSR_OFF, RVG_SYSTEM_C=
+SR_MASK); })
+> +
+> +#define RVFDQ_EXTRACT_FL_FS_WIDTH(x) \
+> +       ({typeof(x) x_ =3D (x); RV_X(x_, RVFDQ_FL_FS_WIDTH_OFF, \
+> +                                  RVFDQ_FL_FS_WIDTH_MASK); })
+> +
+> +#define RVV_EXRACT_VL_VS_WIDTH(x) RVFDQ_EXTRACT_FL_FS_WIDTH(x)
+> +
+>  /*
+>   * Get the immediate from a J-type instruction.
+>   *
+> diff --git a/arch/riscv/include/asm/vector.h b/arch/riscv/include/asm/vec=
+tor.h
+> index ce6a75e9cf62..8e56da67b5cf 100644
+> --- a/arch/riscv/include/asm/vector.h
+> +++ b/arch/riscv/include/asm/vector.h
+> @@ -21,6 +21,7 @@
+>
+>  extern unsigned long riscv_v_vsize;
+>  int riscv_v_setup_vsize(void);
+> +bool riscv_v_first_use_handler(struct pt_regs *regs);
+>
+>  static __always_inline bool has_vector(void)
+>  {
+> @@ -165,6 +166,7 @@ struct pt_regs;
+>
+>  static inline int riscv_v_setup_vsize(void) { return -EOPNOTSUPP; }
+>  static __always_inline bool has_vector(void) { return false; }
+> +static inline bool riscv_v_first_use_handler(struct pt_regs *regs) { ret=
+urn false; }
+>  static inline bool riscv_v_vstate_query(struct pt_regs *regs) { return f=
+alse; }
+>  #define riscv_v_vsize (0)
+>  #define riscv_v_vstate_save(task, regs)                do {} while (0)
+> diff --git a/arch/riscv/kernel/traps.c b/arch/riscv/kernel/traps.c
+> index 8c258b78c925..05ffdcd1424e 100644
+> --- a/arch/riscv/kernel/traps.c
+> +++ b/arch/riscv/kernel/traps.c
+> @@ -26,6 +26,7 @@
+>  #include <asm/ptrace.h>
+>  #include <asm/syscall.h>
+>  #include <asm/thread_info.h>
+> +#include <asm/vector.h>
+>
+>  int show_unhandled_signals =3D 1;
+>
+> @@ -145,8 +146,29 @@ DO_ERROR_INFO(do_trap_insn_misaligned,
+>         SIGBUS, BUS_ADRALN, "instruction address misaligned");
+>  DO_ERROR_INFO(do_trap_insn_fault,
+>         SIGSEGV, SEGV_ACCERR, "instruction access fault");
+> -DO_ERROR_INFO(do_trap_insn_illegal,
+> -       SIGILL, ILL_ILLOPC, "illegal instruction");
+> +
+> +asmlinkage __visible __trap_section void do_trap_insn_illegal(struct pt_=
+regs *regs)
+> +{
+> +       if (user_mode(regs)) {
+> +               irqentry_enter_from_user_mode(regs);
+> +
+> +               local_irq_enable();
+> +
+> +               if (!riscv_v_first_use_handler(regs))
+> +                       do_trap_error(regs, SIGILL, ILL_ILLOPC, regs->epc=
+,
+> +                                     "Oops - illegal instruction");
+> +
+> +               irqentry_exit_to_user_mode(regs);
+> +       } else {
+> +               irqentry_state_t state =3D irqentry_nmi_enter(regs);
+> +
+> +               do_trap_error(regs, SIGILL, ILL_ILLOPC, regs->epc,
+> +                             "Oops - illegal instruction");
+> +
+> +               irqentry_nmi_exit(regs, state);
+> +       }
+> +}
+> +
+>  DO_ERROR_INFO(do_trap_load_fault,
+>         SIGSEGV, SEGV_ACCERR, "load access fault");
+>  #ifndef CONFIG_RISCV_M_MODE
+> diff --git a/arch/riscv/kernel/vector.c b/arch/riscv/kernel/vector.c
+> index 120f1ce9abf9..0080798e8d2e 100644
+> --- a/arch/riscv/kernel/vector.c
+> +++ b/arch/riscv/kernel/vector.c
+> @@ -4,10 +4,19 @@
+>   * Author: Andy Chiu <andy.chiu@sifive.com>
+>   */
+>  #include <linux/export.h>
+> +#include <linux/sched/signal.h>
+> +#include <linux/types.h>
+> +#include <linux/slab.h>
+> +#include <linux/sched.h>
+> +#include <linux/uaccess.h>
+>
+> +#include <asm/thread_info.h>
+> +#include <asm/processor.h>
+> +#include <asm/insn.h>
+>  #include <asm/vector.h>
+>  #include <asm/csr.h>
+>  #include <asm/elf.h>
+> +#include <asm/ptrace.h>
+>  #include <asm/bug.h>
+>
+>  unsigned long riscv_v_vsize __read_mostly;
+> @@ -34,3 +43,89 @@ int riscv_v_setup_vsize(void)
+>
+>         return 0;
+>  }
+> +
+> +static bool insn_is_vector(u32 insn_buf)
+> +{
+> +       u32 opcode =3D insn_buf & __INSN_OPCODE_MASK;
+> +       u32 width, csr;
+> +
+> +       /*
+> +        * All V-related instructions, including CSR operations are 4-Byt=
+e. So,
+> +        * do not handle if the instruction length is not 4-Byte.
+> +        */
+> +       if (unlikely(GET_INSN_LENGTH(insn_buf) !=3D 4))
+> +               return false;
+> +
+> +       switch (opcode) {
+> +       case RVV_OPCODE_VECTOR:
+> +               return true;
+> +       case RVV_OPCODE_VL:
+> +       case RVV_OPCODE_VS:
+> +               width =3D RVV_EXRACT_VL_VS_WIDTH(insn_buf);
+> +               if (width =3D=3D RVV_VL_VS_WIDTH_8 || width =3D=3D RVV_VL=
+_VS_WIDTH_16 ||
+> +                   width =3D=3D RVV_VL_VS_WIDTH_32 || width =3D=3D RVV_V=
+L_VS_WIDTH_64)
+> +                       return true;
+> +
+> +               break;
+> +       case RVG_OPCODE_SYSTEM:
+> +               csr =3D RVG_EXTRACT_SYSTEM_CSR(insn_buf);
+> +               if ((csr >=3D CSR_VSTART && csr <=3D CSR_VCSR) ||
+> +                   (csr >=3D CSR_VL && csr <=3D CSR_VLENB))
+> +                       return true;
+> +       }
+> +
+> +       return false;
+> +}
+> +
+> +static int riscv_v_thread_zalloc(void)
+> +{
+> +       void *datap;
+> +
+> +       datap =3D kzalloc(riscv_v_vsize, GFP_KERNEL);
+> +       if (!datap)
+> +               return -ENOMEM;
+> +
+> +       current->thread.vstate.datap =3D datap;
+> +       memset(&current->thread.vstate, 0, offsetof(struct __riscv_v_ext_=
+state,
+> +                                                   datap));
+> +       return 0;
+> +}
+> +
+> +bool riscv_v_first_use_handler(struct pt_regs *regs)
+> +{
+> +       u32 __user *epc =3D (u32 __user *)regs->epc;
+> +       u32 insn =3D (u32)regs->badaddr;
+> +
+> +       /* Do not handle if V is not supported, or disabled */
+> +       if (!has_vector() || !(elf_hwcap & COMPAT_HWCAP_ISA_V))
+> +               return false;
+> +
+> +       /* If V has been enabled then it is not the first-use trap */
+> +       if (riscv_v_vstate_query(regs))
+> +               return false;
+> +
+> +       /* Get the instruction */
+> +       if (!insn) {
+> +               if (__get_user(insn, epc))
+> +                       return false;
+> +       }
 
-GUP doesn't return the zero page if FOL_WRITE is specified
+As spec has said:
+4.1.11 Supervisor Trap Value (stval) Register
+...
+On an illegal instruction trap, stval may be written with the rst XLEN
+or ILEN bits of the faulting
+instruction as described below.
 
-Jason
+So
+u32 insn =3D (u32)regs->badaddr;
+is enough.
+
+Do you need an ALTERNATIVE fixup here?
+
+> +
+> +       /* Filter out non-V instructions */
+> +       if (!insn_is_vector(insn))
+> +               return false;
+> +
+> +       /* Sanity check. datap should be null by the time of the first-us=
+e trap */
+> +       WARN_ON(current->thread.vstate.datap);
+> +
+> +       /*
+> +        * Now we sure that this is a V instruction. And it executes in t=
+he
+> +        * context where VS has been off. So, try to allocate the user's =
+V
+> +        * context and resume execution.
+> +        */
+> +       if (riscv_v_thread_zalloc()) {
+> +               force_sig(SIGKILL);
+> +               return true;
+> +       }
+> +       riscv_v_vstate_on(regs);
+> +       return true;
+> +}
+> --
+> 2.17.1
+>
+
+
+--=20
+Best Regards
+ Guo Ren
