@@ -2,77 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BCA0715D1F
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 13:25:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ACF4715D60
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 13:38:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231910AbjE3LZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 07:25:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34846 "EHLO
+        id S230446AbjE3LiB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 07:38:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231903AbjE3LZG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 07:25:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC75124
-        for <kvm@vger.kernel.org>; Tue, 30 May 2023 04:24:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685445853;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FFKpZXmHv3EVEcNDqoXlVak203z2YTZFcHMcY6d15bo=;
-        b=TKwsr6dVPFOoTFhwRivD/dM5azroGX9EbK48TzjuvA9/dDbnsVM1UfgdvJItyqbcI2v8J7
-        v/LSaSWW+OQ3Oe4AUG/oODgepVkcPC1jnT0p019vgvx/nfPe0gQATRWd3gb08hQ/LmEonc
-        CXjsIZi1+Ka2Fz1WcbDjabv7vJgIb6c=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-92-4JwSl_KaOKKRyLvYSzwgrg-1; Tue, 30 May 2023 07:24:11 -0400
-X-MC-Unique: 4JwSl_KaOKKRyLvYSzwgrg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f60fb7b31fso16324945e9.2
-        for <kvm@vger.kernel.org>; Tue, 30 May 2023 04:24:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685445851; x=1688037851;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FFKpZXmHv3EVEcNDqoXlVak203z2YTZFcHMcY6d15bo=;
-        b=Vn+GWOyYKNuDiC4gUWoe7DXvHVwaWaCIENVIoqPyYxW5+wtM/hhSVOoUWTL4e7XMAb
-         rXhalZEhdnGquQzSo3SDm89OscSfHjI3ObkhMGhemKqYlw9MYTdUE4VeXx6T7ex1iuhI
-         ekUi2Rwv9HBAHcaGjVI/VkYkozE5ppce72DflI6aMieTrLXU8cOWrm6WZgg5Hl72GqHw
-         hPfbCBEbsHSs/CuH+skA+R0nT0axxOK2miTjxvkwxucCM6HCeZGndRwK7UC6c5v+NrFP
-         VPdHfFV+meJi0USrdnSB+garj4CFeMZfFI89UxgavzFHfkhgdFrj6BVgc/x5w31nnGWC
-         tKwg==
-X-Gm-Message-State: AC+VfDxQF9cE8KCsNz3oaVkx5AAGIJnnzQO6KK5rvuf6IFsrUYSFo0Yr
-        Fk0UHrCwF3MeUyNV9dLav62/C6n9GdeCFOwOABYHoOGGhD+XxoebykU6ufMWzzDJnLLc/mdnGcd
-        M5Kdqtjcy6cFQ
-X-Received: by 2002:a05:600c:228b:b0:3f6:13e1:16b7 with SMTP id 11-20020a05600c228b00b003f613e116b7mr1442243wmf.28.1685445850791;
-        Tue, 30 May 2023 04:24:10 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4olrB3T4242Hm657dR8k3m6TNwqGT1KzpvGbXMckpc6fTPwJMFCqvnLyJXIIbYPJ8cvXRQRA==
-X-Received: by 2002:a05:600c:228b:b0:3f6:13e1:16b7 with SMTP id 11-20020a05600c228b00b003f613e116b7mr1442231wmf.28.1685445850463;
-        Tue, 30 May 2023 04:24:10 -0700 (PDT)
-Received: from redhat.com ([2.52.11.69])
-        by smtp.gmail.com with ESMTPSA id k10-20020a7bc40a000000b003f606869603sm20719249wmi.6.2023.05.30.04.24.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 May 2023 04:24:09 -0700 (PDT)
-Date:   Tue, 30 May 2023 07:24:06 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     syzbot <syzbot+d0d442c22fa8db45ff0e@syzkaller.appspotmail.com>
-Cc:     jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org,
-        Stefano Garzarella <sgarzare@redhat.com>, stefanha@redhat.com
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] general protection fault in
- vhost_work_queue
-Message-ID: <20230530072310-mutt-send-email-mst@kernel.org>
-References: <0000000000001777f605fce42c5f@google.com>
+        with ESMTP id S231968AbjE3Lhx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 07:37:53 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60300110;
+        Tue, 30 May 2023 04:37:52 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34UAIBbd013228;
+        Tue, 30 May 2023 11:37:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=vjYoqejiVPHKggHLIdsJYAo6FHFAwNPlqn50a/DURag=;
+ b=RN9o/gxMATfQJ2mFLKyC4ORwugV6EUO5NEGJEJQNNtwOM78ksSqcpW1vuyq1SqVtGCk2
+ 4/p1dwzlJmMVhrA4obaFGkGkuR+NUqenbAuetvaiF5Z6mgivWBNtO+luwdSHf1fWpkSt
+ Us8f8xBpy4r4ffuNRE0RbEISyrrtVzoLy099ozzdDJkDcEM5HuIuyuR7ftuLe4ZHVDwq
+ w0Ske1O0A68Pa5oMMmLSpi4nsgGOYuMY62tgZ5taXNwxIMkjv8XtEY2jiBdNCbR8pht1
+ 5fLU9nrtwiNr5Dv5AWcV2x5GqiEr836W+tQRwfYND7yeEj8ULjZUy+g0QSZpceWPzlvA hA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwewptjh8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 May 2023 11:37:51 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34UBWHWP011985;
+        Tue, 30 May 2023 11:37:51 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwewptjgm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 May 2023 11:37:50 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34U8Vef8011440;
+        Tue, 30 May 2023 11:37:48 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3qu9g51ehp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 May 2023 11:37:48 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34UBbjMd21627544
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 May 2023 11:37:45 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 33E3A20043;
+        Tue, 30 May 2023 11:37:45 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 047D220040;
+        Tue, 30 May 2023 11:37:45 +0000 (GMT)
+Received: from [9.152.222.242] (unknown [9.152.222.242])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Tue, 30 May 2023 11:37:44 +0000 (GMT)
+Message-ID: <96ded654-4c60-88aa-6ff4-279547639c1d@linux.ibm.com>
+Date:   Tue, 30 May 2023 13:37:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0000000000001777f605fce42c5f@google.com>
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [kvm-unit-tests PATCH v2 1/1] s390x: sclp: consider monoprocessor
+ on read_info error
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com,
+        cohuck@redhat.com
+References: <20230427075450.6146-1-pmorel@linux.ibm.com>
+ <20230427075450.6146-2-pmorel@linux.ibm.com>
+ <168491719124.11225.12383147851123056702@t14-nrb>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <168491719124.11225.12383147851123056702@t14-nrb>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Z2be1OaNa1fecRkTTUXgE9ArTXwv4WIg
+X-Proofpoint-ORIG-GUID: YvxCa75GYSRFc_oxZiy1jVCC0aeZglXm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-05-30_08,2023-05-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ impostorscore=0 mlxscore=0 phishscore=0 mlxlogscore=999 lowpriorityscore=0
+ bulkscore=0 suspectscore=0 spamscore=0 adultscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2304280000
+ definitions=main-2305300095
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,130 +97,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 30, 2023 at 12:30:06AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    933174ae28ba Merge tag 'spi-fix-v6.4-rc3' of git://git.ker..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=138d4ae5280000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=f389ffdf4e9ba3f0
-> dashboard link: https://syzkaller.appspot.com/bug?extid=d0d442c22fa8db45ff0e
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/21a81b8c2660/disk-933174ae.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/b4951d89e238/vmlinux-933174ae.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/21eb405303cc/bzImage-933174ae.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+d0d442c22fa8db45ff0e@syzkaller.appspotmail.com
-> 
-> general protection fault, probably for non-canonical address 0xdffffc000000000e: 0000 [#1] PREEMPT SMP KASAN
-> KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
-> CPU: 0 PID: 29845 Comm: syz-executor.4 Not tainted 6.4.0-rc3-syzkaller-00032-g933174ae28ba #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/16/2023
-> RIP: 0010:vhost_work_queue drivers/vhost/vhost.c:259 [inline]
-> RIP: 0010:vhost_work_queue+0xfc/0x150 drivers/vhost/vhost.c:248
-> Code: 00 00 fc ff df 48 89 da 48 c1 ea 03 80 3c 02 00 75 56 48 b8 00 00 00 00 00 fc ff df 48 8b 1b 48 8d 7b 70 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 42 48 8b 7b 70 e8 95 9e ae f9 5b 5d 41 5c 41 5d e9
-> RSP: 0018:ffffc9000333faf8 EFLAGS: 00010202
-> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000d84d000
-> RDX: 000000000000000e RSI: ffffffff841221d7 RDI: 0000000000000070
-> RBP: ffff88804b6b95b0 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000001 R11: 0000000000000000 R12: ffff88804b6b00b0
-> R13: 0000000000000000 R14: ffff88804b6b95e0 R15: ffff88804b6b95c8
-> FS:  00007f3b445ec700(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000001b2e423000 CR3: 000000005d734000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 000000000000003b DR6: 00000000ffff0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  vhost_transport_send_pkt+0x268/0x520 drivers/vhost/vsock.c:288
->  virtio_transport_send_pkt_info+0x54c/0x820 net/vmw_vsock/virtio_transport_common.c:250
->  virtio_transport_connect+0xb1/0xf0 net/vmw_vsock/virtio_transport_common.c:813
->  vsock_connect+0x37f/0xcd0 net/vmw_vsock/af_vsock.c:1414
->  __sys_connect_file+0x153/0x1a0 net/socket.c:2003
->  __sys_connect+0x165/0x1a0 net/socket.c:2020
->  __do_sys_connect net/socket.c:2030 [inline]
->  __se_sys_connect net/socket.c:2027 [inline]
->  __x64_sys_connect+0x73/0xb0 net/socket.c:2027
->  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> RIP: 0033:0x7f3b4388c169
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007f3b445ec168 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-> RAX: ffffffffffffffda RBX: 00007f3b439ac050 RCX: 00007f3b4388c169
-> RDX: 0000000000000010 RSI: 0000000020000140 RDI: 0000000000000004
-> RBP: 00007f3b438e7ca1 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 00007f3b43acfb1f R14: 00007f3b445ec300 R15: 0000000000022000
->  </TASK>
-> Modules linked in:
-> ---[ end trace 0000000000000000 ]---
-> RIP: 0010:vhost_work_queue drivers/vhost/vhost.c:259 [inline]
-> RIP: 0010:vhost_work_queue+0xfc/0x150 drivers/vhost/vhost.c:248
-> Code: 00 00 fc ff df 48 89 da 48 c1 ea 03 80 3c 02 00 75 56 48 b8 00 00 00 00 00 fc ff df 48 8b 1b 48 8d 7b 70 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 42 48 8b 7b 70 e8 95 9e ae f9 5b 5d 41 5c 41 5d e9
-> RSP: 0018:ffffc9000333faf8 EFLAGS: 00010202
-> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000d84d000
-> RDX: 000000000000000e RSI: ffffffff841221d7 RDI: 0000000000000070
-> RBP: ffff88804b6b95b0 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000001 R11: 0000000000000000 R12: ffff88804b6b00b0
-> R13: 0000000000000000 R14: ffff88804b6b95e0 R15: ffff88804b6b95c8
-> FS:  00007f3b445ec700(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000001b2e428000 CR3: 000000005d734000 CR4: 00000000003506e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 000000000000003b DR6: 00000000ffff0ff0 DR7: 0000000000000400
-> ----------------
-> Code disassembly (best guess), 5 bytes skipped:
->    0:	48 89 da             	mov    %rbx,%rdx
->    3:	48 c1 ea 03          	shr    $0x3,%rdx
->    7:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
->    b:	75 56                	jne    0x63
->    d:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
->   14:	fc ff df
->   17:	48 8b 1b             	mov    (%rbx),%rbx
->   1a:	48 8d 7b 70          	lea    0x70(%rbx),%rdi
->   1e:	48 89 fa             	mov    %rdi,%rdx
->   21:	48 c1 ea 03          	shr    $0x3,%rdx
-> * 25:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
->   29:	75 42                	jne    0x6d
->   2b:	48 8b 7b 70          	mov    0x70(%rbx),%rdi
->   2f:	e8 95 9e ae f9       	callq  0xf9ae9ec9
->   34:	5b                   	pop    %rbx
->   35:	5d                   	pop    %rbp
->   36:	41 5c                	pop    %r12
->   38:	41 5d                	pop    %r13
->   3a:	e9                   	.byte 0xe9
 
-
-Stefano, Stefan, take a look?
-
-
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> 
-> If the bug is already fixed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want to change bug's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the bug is a duplicate of another bug, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
-
+On 5/24/23 10:33, Nico Boehr wrote:
+> Quoting Pierre Morel (2023-04-27 09:54:50)
+> [...]
+>> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
+>> index 390fde7..07523dc 100644
+>> --- a/lib/s390x/sclp.c
+>> +++ b/lib/s390x/sclp.c
+>> @@ -119,8 +119,9 @@ void sclp_read_info(void)
+>>   
+>>   int sclp_get_cpu_num(void)
+>>   {
+>> -       assert(read_info);
+>> -       return read_info->entries_cpu;
+>> +    if (read_info)
+>> +           return read_info->entries_cpu;
+>> +    return 1;
+> tab/spaces are mixed up here, please fix that.
+/o\ yes
