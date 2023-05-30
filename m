@@ -2,202 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 420AC71609A
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 14:53:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C56CA7160A1
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 14:54:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232399AbjE3Mxg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 08:53:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51570 "EHLO
+        id S232374AbjE3MyB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 08:54:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232392AbjE3Mx3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 08:53:29 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10AA1FC;
-        Tue, 30 May 2023 05:53:05 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34UCOgEL004816;
-        Tue, 30 May 2023 12:52:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=AwsM0KHoRY8ND2CYmfVHWD9IMFqjKUjDnDev17HtS10=;
- b=PCUMGLDngW85WYyeJvXyabC0cgMNC6vuSkvFPDXcOljqAxaVHF8m3tazseTN8gkCqekE
- GStsouXORSgV6PfFxgCLys5K++ylrYuNOR8vhyYElBp4f4GA/qjc7NXB2oVk9Adpjcgz
- tUF+yKlIzmq7+LZ2rytAG3+TQ3q4g9McT8uU9lcm+LbTvYkWWaGDBD4d+UQMROxIviLO
- kRqtd4bA5p/GNmRj+6y7UUsm4wrSJKNp7G8gaR6LgJXPc0Cwo5X72dg4v/P466bszXRy
- 4pLvxICZJVjxTC6r6hOcg8e9CgHmi7ttCR71NaT0UxtE6njRxhjrAGQxhb93DocHBLpT Vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwh4g8wmn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 May 2023 12:52:50 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34UCfZnP021102;
-        Tue, 30 May 2023 12:52:50 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwh4g8wkw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 May 2023 12:52:50 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34UC4m5u008343;
-        Tue, 30 May 2023 12:52:48 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3qu9g598fh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 May 2023 12:52:48 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34UCqivp34013948
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 May 2023 12:52:44 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CD8852004B;
-        Tue, 30 May 2023 12:52:44 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 92C222004F;
-        Tue, 30 May 2023 12:52:44 +0000 (GMT)
-Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com (unknown [9.152.222.242])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 30 May 2023 12:52:44 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH v4 2/2] s390x: sclp: Implement SCLP_RC_INSUFFICIENT_SCCB_LENGTH
-Date:   Tue, 30 May 2023 14:52:43 +0200
-Message-Id: <20230530125243.18883-3-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230530125243.18883-1-pmorel@linux.ibm.com>
-References: <20230530125243.18883-1-pmorel@linux.ibm.com>
+        with ESMTP id S232409AbjE3Mxz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 08:53:55 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 143D111C
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 05:53:36 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1ac65ab7432so323775ad.0
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 05:53:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685451211; x=1688043211;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6koIQhkVmhWdRRt+kcMPERrPT5zK+VP4WbBi9dIh878=;
+        b=0ZbKnBQb3RTmhl/iyyBZyhicWNfEy8GN3w/IM+LC/c5+R0wcT80mJyHr+vzegZhN8M
+         wSjPUB7vunHICRQ2x4sReR6XsInh2OzQZIhAuJD79P4KMrLtWmxA0+JKGKrdyNpPqjaI
+         AHlg6ySj7oHxPJyf9MgUL4hqQZE5LGBJRSEDj81zSl56Fe8PFKIv3ctYaf4OVW7/uNLX
+         x2TIERQDoL3aJsUsMBwa6bpjzxY4Igum6h2/S/csmbZuHbJBXooTwjUrg/jvyCp1xgPC
+         vzLmWIV3drEz76/vpbIw/t9ylGk/z02+kHHhuAiqB6G64OOYXdFKzCvFo/RvfVqOjy2t
+         3lIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685451211; x=1688043211;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6koIQhkVmhWdRRt+kcMPERrPT5zK+VP4WbBi9dIh878=;
+        b=HxtvhJ2YU3DajCLXM4vgJMDdAiQldM2461bpYHYKj95/U9dbcJvtpcxjR1pU2jG6sk
+         b4pZI1mMCVVMK0nMbXGHCO6MHKpFWFW07Ts0ym6/AyvslS+/rW9lzYYuIYxubbX0PDJU
+         3UeYBbIYkiP7icHIGteoKRNcjtixz5H1KOHPuQT7PD1o34iH8H0gg08HpkudrJf2VnX0
+         7X3ib4PtcPTjOfOjz3mQCltRfBmRsRH+Y9UMDGGrXIMjn+IS4ujDo6E9E2oRl83qLWt7
+         EskAL5LcGTWr24oTOT7EVF4YJysr3v/YSEfpuYZVqKpJKkyeHofcETmoNRZZ+TkP3XGB
+         7HgQ==
+X-Gm-Message-State: AC+VfDzujTkkTCjJj5uPy0TJa+UvnqIRxUmXHXxOKGrlLFtvd+dn01dT
+        t/iQ2qKvkwhtm4Kj/+M7XD5zEA==
+X-Google-Smtp-Source: ACHHUZ4R6ppmrf+7RXpaMp+0mg4mZEN9CR2Y1X0Xf0Sr/bTTTPh0apsP/evrOuSgMmI5bK0+koTmzw==
+X-Received: by 2002:a17:903:55:b0:1aa:ea22:8043 with SMTP id l21-20020a170903005500b001aaea228043mr113015pla.7.1685451211116;
+        Tue, 30 May 2023 05:53:31 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id 2-20020a631842000000b0052c22778e64sm8634695pgy.66.2023.05.30.05.53.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 May 2023 05:53:29 -0700 (PDT)
+Date:   Tue, 30 May 2023 05:53:24 -0700
+From:   Reiji Watanabe <reijiw@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 0/4] KVM: arm64: PMU: Fix PMUVer handling on
+ heterogeneous PMU systems
+Message-ID: <20230530125324.ijrwrvoll2detpus@google.com>
+References: <20230527040236.1875860-1-reijiw@google.com>
+ <87zg5njlyn.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Q-x_K94qSmGRRMktU4ap02eezBwXmktv
-X-Proofpoint-GUID: YGyGNFHWSVSBQSm7Sz-k9bSgudyVY4Kd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-30_08,2023-05-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- mlxscore=0 suspectscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
- lowpriorityscore=0 impostorscore=0 spamscore=0 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2304280000
- definitions=main-2305300103
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87zg5njlyn.wl-maz@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If SCLP_CMDW_READ_SCP_INFO fails due to a short buffer, retry
-with a greater buffer.
+Hi Marc,
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- lib/s390x/sclp.c | 58 +++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 50 insertions(+), 8 deletions(-)
+On Mon, May 29, 2023 at 02:39:28PM +0100, Marc Zyngier wrote:
+> On Sat, 27 May 2023 05:02:32 +0100,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> > 
+> > This series fixes issues with PMUVer handling for a guest with
+> > PMU configured on heterogeneous PMU systems.
+> > Specifically, it addresses the following two issues.
+> > 
+> > [A] The default value of ID_AA64DFR0_EL1.PMUVer of the vCPU is set
+> >     to its sanitized value.  This could be inappropriate on
+> >     heterogeneous PMU systems, as arm64_ftr_bits for PMUVer is defined
+> >     as FTR_EXACT with safe_val == 0 (when ID_AA64DFR0_EL1.PMUVer of all
+> >     PEs on the host is not uniform, the sanitized value will be 0).
+> 
+> Why is this a problem? The CPUs don't implement the same version of
+> the architecture, we don't get a PMU. Why should we try to do anything
+> better? I really don't think we should go out or out way and make the
+> code more complicated for something that doesn't really exist.
 
-diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-index 34a31da..9d51ca4 100644
---- a/lib/s390x/sclp.c
-+++ b/lib/s390x/sclp.c
-@@ -17,13 +17,14 @@
- #include "sclp.h"
- #include <alloc_phys.h>
- #include <alloc_page.h>
-+#include <asm/facility.h>
- 
- extern unsigned long stacktop;
- 
- static uint64_t storage_increment_size;
- static uint64_t max_ram_size;
- static uint64_t ram_size;
--char _read_info[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
-+char _read_info[2 * PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
- static ReadInfo *read_info;
- struct sclp_facilities sclp_facilities;
- 
-@@ -89,10 +90,41 @@ void sclp_clear_busy(void)
- 	spin_unlock(&sclp_lock);
- }
- 
--static void sclp_read_scp_info(ReadInfo *ri, int length)
-+static bool sclp_read_scp_info_extended(unsigned int command, ReadInfo *ri)
-+{
-+	int cc;
-+
-+	if (!test_facility(140)) {
-+		report_abort("S390_FEAT_EXTENDED_LENGTH_SCCB missing");
-+		return false;
-+	}
-+	if (ri->h.length > (2 * PAGE_SIZE)) {
-+		report_abort("SCLP_READ_INFO expected size too big");
-+		return false;
-+	}
-+
-+	sclp_mark_busy();
-+	memset(&ri->h, 0, sizeof(ri->h));
-+	ri->h.length = 2 * PAGE_SIZE;
-+
-+	cc = sclp_service_call(command, ri);
-+	if (cc) {
-+		report_abort("SCLP_READ_INFO error");
-+		return false;
-+	}
-+	if (ri->h.response_code != SCLP_RC_NORMAL_READ_COMPLETION) {
-+		report_abort("SCLP_READ_INFO error %02x", ri->h.response_code);
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+static void sclp_read_scp_info(ReadInfo *ri)
- {
- 	unsigned int commands[] = { SCLP_CMDW_READ_SCP_INFO_FORCED,
- 				    SCLP_CMDW_READ_SCP_INFO };
-+	int length = PAGE_SIZE;
- 	int i, cc;
- 
- 	for (i = 0; i < ARRAY_SIZE(commands); i++) {
-@@ -101,19 +133,29 @@ static void sclp_read_scp_info(ReadInfo *ri, int length)
- 		ri->h.length = length;
- 
- 		cc = sclp_service_call(commands[i], ri);
--		if (cc)
--			break;
--		if (ri->h.response_code == SCLP_RC_NORMAL_READ_COMPLETION)
-+		if (cc) {
-+			report_abort("SCLP_READ_INFO error");
- 			return;
--		if (ri->h.response_code != SCLP_RC_INVALID_SCLP_COMMAND)
-+		}
-+
-+		switch (ri->h.response_code) {
-+		case SCLP_RC_NORMAL_READ_COMPLETION:
-+			return;
-+		case SCLP_RC_INVALID_SCLP_COMMAND:
- 			break;
-+		case SCLP_RC_INSUFFICIENT_SCCB_LENGTH:
-+			sclp_read_scp_info_extended(commands[i], ri);
-+			return;
-+		default:
-+			report_abort("READ_SCP_INFO failed");
-+			return;
-+		}
- 	}
--	report_abort("READ_SCP_INFO failed");
- }
- 
- void sclp_read_info(void)
- {
--	sclp_read_scp_info((void *)_read_info, SCCB_SIZE);
-+	sclp_read_scp_info((void *)_read_info);
- 	read_info = (ReadInfo *)_read_info;
- }
- 
--- 
-2.31.1
+Even when the CPUs don't implement the same version of the architecture,
+if one of them implement PMUv3, KVM advertises KVM_CAP_ARM_PMU_V3,
+and allows userspace to configure PMU (KVM_ARM_VCPU_PMU_V3) for vCPUs.
 
+In this case, although KVM provides PMU emulations for the guest,
+the guest's ID_AA64DFR0_EL1.PMUVer will be zero.  Also,
+KVM_SET_ONE_REG for ID_AA64DFR0_EL1 will never work for vCPUs
+with PMU configured on such systems (since KVM also doesn't allow
+userspace to set the PMUVer to 0 for the vCPUs with PMU configured).
+
+I would think either ID_AA64DFR0_EL1.PMUVer for the guest should
+indicate PMUv3, or KVM should not allow userspace to configure PMU,
+in this case.
+
+This series is a fix for the former, mainly to keep the current
+behavior of KVM_CAP_ARM_PMU_V3 and KVM_ARM_VCPU_PMU_V3 on such
+systems, since I wasn't sure if such systems don't really exist :)
+(Also, I plan to implement a similar fix for PMCR_EL0.N on top of
+those changes)
+
+I could make a fix for the latter instead though. What do you think ?
+
+Thank you,
+Reiji
+
+> 
+> Or am I missing the problem altogether?
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
