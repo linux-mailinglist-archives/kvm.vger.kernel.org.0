@@ -2,177 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CD197156CC
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 09:31:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E52327156E3
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 09:35:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231238AbjE3HbO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 03:31:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56802 "EHLO
+        id S229873AbjE3Hfi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 03:35:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230152AbjE3Hag (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 03:30:36 -0400
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCE64E79
-        for <kvm@vger.kernel.org>; Tue, 30 May 2023 00:30:06 -0700 (PDT)
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-763c3442563so248347039f.1
-        for <kvm@vger.kernel.org>; Tue, 30 May 2023 00:30:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685431806; x=1688023806;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=a5KqC1edhiO7JepEHlmRT8WJ2yLfb5IhYu4wMi2/DSw=;
-        b=e9xklmdL4tUZF4ud9VEmlFO26Cia1PP0X4fS++iKAXd0iC1btF6eUWTQWI3fXWdIz9
-         j9avTjNWGS1sPYjX34OqnGvnbx7oUxoTBzpglhAQy5La7UwcrKerCJsOPa3ZvQ37ehL+
-         jZzOVSSsK6ePb5HLuZgcgcCG1c+Am9ciQuEWiuxPAZWBhErSDgHhWjFmTUOkiY3cGx65
-         BiRyJ8bxGFFj5Wt+/Yjj8ut4YEt3nhyJfUnXHsd5E1mqCEsnJzUEFqUMBO5bo0iW4aNo
-         dhh+A1RbEEXp1lTm/RMDPMSPeLaSr+wk32T9EG+NIYrX40fidnyJ9Gl2dMja4OBxAz7X
-         fYYA==
-X-Gm-Message-State: AC+VfDyBA6A61M10oMReZbDZm6TiQqWDq40qNNUwlyBtVvJMuMwIPxvh
-        Z/VtkT2zpORAQfOe7QRYa5+dfXIOiB9sUJX0PAIRK6PnJ1NN
-X-Google-Smtp-Source: ACHHUZ6jRHEI659u6OJ7MbdCGAh+CQGfbeSNkc55tbVwKziOOQu6jDaY06aEQMb2KBaFHwpJvFF4HAuWWIJIhwpznzrRpxwK6z8P
+        with ESMTP id S229552AbjE3HfU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 03:35:20 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECDF4A7;
+        Tue, 30 May 2023 00:35:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685432118; x=1716968118;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=r5otXTb0Rr9kV1sdVhCTLynkGsJvnsVpx1sTHMxmFB0=;
+  b=ayNPxu6lp5PRpDJGLI+Jqox5iBazXJNp4dJGNSn591qIQLM0NHv3Q7xX
+   7XJeSu8fayAPBEGzSDKQrjlOEZmn2piVdVag83M+oxl5ueVohlnWRoRfQ
+   gWg7jYTywE+GX38iuGjcJbVK3uI90wMjW5KxhEEW4C3ccazYQmZ3oWGiv
+   wWpDDGR34AMn7XdRyuYT3hQ5iXYoXf0bS1ziQh1q9ftj+qScX59C9lxPM
+   wLAhCITWixdrtZT3IERojjTZdfmo1R5a7sTQBGywlcqnNMMmYgA0v+EXy
+   5IdOyZsKilb+ykIpk8vqYCUHACt9lxNjM3Q1tVjIQxFh/hxNaJ7DemUKj
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10725"; a="420600554"
+X-IronPort-AV: E=Sophos;i="6.00,203,1681196400"; 
+   d="scan'208";a="420600554"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2023 00:34:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10725"; a="953015145"
+X-IronPort-AV: E=Sophos;i="6.00,203,1681196400"; 
+   d="scan'208";a="953015145"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga006.fm.intel.com with ESMTP; 30 May 2023 00:34:53 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 30 May 2023 00:34:52 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Tue, 30 May 2023 00:34:52 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Tue, 30 May 2023 00:34:52 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mKmhlLhxdeB8o05msaJe8HVqlwbWlKW1WzXfze5BVlApaz7hfWo4yb8rlRl9aQRMqPGP5oKfXhWEOUARxfDdegS5XR0DPY+BH3epgNS8cTiz6ge11piPXY5HHBQCJfcnhoszhWmUnYpPEU7P4Vhm2jhvklvFdlJg71thkThK6iw86GNdQeEiAiB8ppxjUG1WT7afJgs7EzxZPHq+I698jO013uPT2TTzzXVuWzO2jY37vPNINtlw44J/lysxcQQvG4sMLQSTax8b4FPTow0ScbQLCwcN2HER8IdDePyTQmKWJa6TiFDuUdvtXHZ0dr/LKAW6CmnoVx5kW+S9kwLyxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r5otXTb0Rr9kV1sdVhCTLynkGsJvnsVpx1sTHMxmFB0=;
+ b=HiVwo2IP+473WmDbtFBh64CDcXgbUPGSjG35SzV3JeuwLFA+GSDfZyzKkmY5C2HywUvC73tWb0c62vqXudgYWmxmrGa9HAjDyskeV0Ehf7vRHFbjrErO2vL2xEC6oGnBR/gcj55yOmgDXdIgOXsX4ZYe0tU7nEXKuAi0JMtwT1tSdegJMa30UmaTIY4ZVAutOJsdN274n+8r1Qtmp31ID5bzgGl/FsFdn0v7B6SBo9dxV5vqql+yL8+9fTlbcLsLnuAKgxq80Twdj0K6xDiG9cqqJN3T0jDYczHPa76qx+AJvdoVxsoDQ6/QrsgaAbK32uAgGEg952x1clgvUl89Dg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB6373.namprd11.prod.outlook.com (2603:10b6:8:cb::20) by
+ DS0PR11MB8181.namprd11.prod.outlook.com (2603:10b6:8:159::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6433.22; Tue, 30 May 2023 07:34:45 +0000
+Received: from DS0PR11MB6373.namprd11.prod.outlook.com
+ ([fe80::14c:205:c858:1ef6]) by DS0PR11MB6373.namprd11.prod.outlook.com
+ ([fe80::14c:205:c858:1ef6%7]) with mapi id 15.20.6411.021; Tue, 30 May 2023
+ 07:34:45 +0000
+From:   "Wang, Wei W" <wei.w.wang@intel.com>
+To:     "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>,
+        "Chen, Bo2" <chen.bo@intel.com>
+Subject: RE: [PATCH v14 000/113] KVM TDX basic feature support
+Thread-Topic: [PATCH v14 000/113] KVM TDX basic feature support
+Thread-Index: AQHZkeUAlR2dYIpUAkWLdmAkkWfx269yVJmg
+Date:   Tue, 30 May 2023 07:34:44 +0000
+Message-ID: <DS0PR11MB6373D94AE8420F45798E7D40DC4B9@DS0PR11MB6373.namprd11.prod.outlook.com>
+References: <cover.1685333727.git.isaku.yamahata@intel.com>
+In-Reply-To: <cover.1685333727.git.isaku.yamahata@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB6373:EE_|DS0PR11MB8181:EE_
+x-ms-office365-filtering-correlation-id: 7362abb1-9665-45d6-7c9f-08db60e056c8
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: cncmx/mJXWeMBP44ZLL7Y+msaCba3GJJ9ENUOy26zIlDI/GQJntN5y6tpRyM49apmHABNuav/AncPpNb5S+nC7lnfwrghK44M7rUy6Fy0fDI4YYItkJwW+eERoIdHKxGI8S96RzSlvlJZrIFM4FcrQTHjoO2WlAmLVnjW+VCBz2HlOdcy/h6bxDg7SJtZHLiUy4LPDewDBOKGx6sTgwx+ui3FjI5zw1RJXtppAEDVxBXg06dDYNc+0E54Ou4Z+516X3DI2WfIAHzi2w5ykGsZdE3cISC1TI2F5y/yVHSehl+faWa9IwdVFUIswFeJbod/KApbdMLe0N8LjnHMsquWigxWPyY916Sb5r+jbQYKTo8Oav5cSO9hxn5J/fZIN+gbp3/XPWrpiWKmedOXNYAEijb0L35u+xwdHhaPqDtFqs3tSF29bBc2r2gjf8W2Z4Gl6FiYUsDe8drwOLFnOtyWhpMJWfow2X5gOVPun4PHB6uJsgjN7DJEjmQFfwuWaoLLJj2fxv/4t1ytlHE9teJm18KFmm5q31lB/sihFAF+U1lf+Zo7n8hdp5QscAHjy8PSHZkxz2Wpu2CkbW70H2ditg97R5SsskP+asQneNyfIaZAC5f39UboJQ9AQfHUqJ00+0ejGvrCtl+jqHv54hfkg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB6373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(376002)(39860400002)(346002)(136003)(366004)(451199021)(82960400001)(122000001)(478600001)(38100700002)(76116006)(66476007)(64756008)(83380400001)(66556008)(66446008)(66946007)(38070700005)(54906003)(86362001)(110136005)(4326008)(2906002)(4744005)(7696005)(33656002)(316002)(186003)(26005)(71200400001)(6506007)(9686003)(53546011)(41300700001)(107886003)(5660300002)(52536014)(966005)(8676002)(8936002)(55016003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Oppj/eYyUOTspQJbCjF7JCwE7fhQufKm1MWXGgnCgnpKOZnApY8/k1yRw4G/?=
+ =?us-ascii?Q?Mw+z1BxMvHmBQCa56C8L1g3J/ljUAOiMdzOcLJy6LPI7rLvu1S+5Z1y+sXTV?=
+ =?us-ascii?Q?1rRTlGHpk2gSvmMB2ttqU9zIUoixtzLZxbM3jo6Xz6PQhmtVE6bwQ7Xb80L+?=
+ =?us-ascii?Q?4bEymNuuBCEjFQNm8sFzKE/3mX1rSpN/5VA3Zz0XfFbPWHU/cSO4l5I9hxFQ?=
+ =?us-ascii?Q?KGuJhPxcgC9zw2qklaPidMhjNNl5y34lgq2RSPFyBCtzgGYJZMAU1fONO1BZ?=
+ =?us-ascii?Q?PmRQX3lmNMYCdnw7i0sT+RbYV/DyrgZlnHHJtjllkn4ITMq1wOyhrQ+p+F3w?=
+ =?us-ascii?Q?z/TtkJoNEprGk4ik5e6zqZmylPpAEjczhXrE9nlvwbHDN1I9Qx57kSTm2DRF?=
+ =?us-ascii?Q?rKSn6bl5I6eZJJNeQJeSVLiZu4QyIzwC0BwpdRXr36KCl2gSe4gR6zxb/IW0?=
+ =?us-ascii?Q?TOA9AZ4iOmC5dfUhtEcSlEIplYd8vO5Q7x+i4ABv095lidwvBnl82GQdAL1n?=
+ =?us-ascii?Q?xDYCnSmfD1sHQxL4q7nOt0C9XjQR1IAp6QYcLtHuKzcm8AEoTJvSbNTY6kW+?=
+ =?us-ascii?Q?2ZKEJ7bDbasZOk9XMkSyos/33bxhr9LKOmYwVGWJxSvjd8c7cabzRacBnhQ/?=
+ =?us-ascii?Q?XCsVGkl0sObgcm+nkiJkCDy2UzkgMG42e/TDRPFcZrwTYTxKj183U9JKq23E?=
+ =?us-ascii?Q?QDGoZWuPyYlfXyP6VwYPI0VLuRY3Dt6Ur8dd3zCZzqZncHSpV/LU8nKQaAxl?=
+ =?us-ascii?Q?KazlX/YyLOhnYEURNjdI1e7oLokeV0LqTpa9rmFGPQOCQDjiGZYCTmNN6+M7?=
+ =?us-ascii?Q?BBhy8/VaAfRhRsRDdNcEMkfaugRA/yhf17D4okaDu1sIgReS686PoUnhp77O?=
+ =?us-ascii?Q?t9Ji2C7MQEVOEwOX0pAft3x5wnLxAZXMJghn+iqw7zwzfpZmfWGslytFXnWj?=
+ =?us-ascii?Q?gZIRx0yyMzDy7iydcpIsYUm4bM8qor0W4AZNFQDU6PAXwtmzbnU1GgvtiFAs?=
+ =?us-ascii?Q?nfFqWdl3MC3LWSTrrk2ftBUWGVs8gcNtoXyh3rgcD2tsvUoQSq+cFy/qKsPz?=
+ =?us-ascii?Q?FcIO0QzcV5FrfA36PMDqj95rx2YXyiycIcHQybLcFwqbxNicd4t5iA0xT1Pn?=
+ =?us-ascii?Q?uiHk/CdhpjnbLZmw1P2dOafC/J5y/y/CBqrN2C1sqetuzzBhbhh0PDzE2fuN?=
+ =?us-ascii?Q?06ZaYUp2vWk68+QaAkz8o1+nH/aeejVv/G6c9Nm3nX17lI9jmTsBcOqs0hxw?=
+ =?us-ascii?Q?508jGjAYAWNaqHtziQ2SkmF+KbHmMoJFiYpksnTBVnA+cnrq1hA96OvkBjTm?=
+ =?us-ascii?Q?EhwE0BgYnzmS0+39KVf9vTI7dGI8mlGipt6T8jW5bVQmjcy3fI7MFoSBn3Ga?=
+ =?us-ascii?Q?RnhMyp5r/lV1OKcReGWBYeuDAZ/ddIdmX73V8ZfHlcWfyA2eBumm1SaN/vr8?=
+ =?us-ascii?Q?yT+/d9GjMcskqLTw6N8h7kQtG3YtpaV9MAOD0EiWNWKA6YB+J5/QFwy5iPwc?=
+ =?us-ascii?Q?v2oW0k3rLdd5LPwd7oEbr5sLBUe78q9M1QJ9Cq7Zr3jvdgQLA9ksurmpQ2xZ?=
+ =?us-ascii?Q?1Uui7/St0xW2ZfUBN33dWl4Lx85hzQmgcEgstgEi?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1103:b0:41a:c455:f4c1 with SMTP id
- n3-20020a056638110300b0041ac455f4c1mr678488jal.4.1685431806029; Tue, 30 May
- 2023 00:30:06 -0700 (PDT)
-Date:   Tue, 30 May 2023 00:30:06 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001777f605fce42c5f@google.com>
-Subject: [syzbot] [kvm?] [net?] [virt?] general protection fault in vhost_work_queue
-From:   syzbot <syzbot+d0d442c22fa8db45ff0e@syzkaller.appspotmail.com>
-To:     jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB6373.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7362abb1-9665-45d6-7c9f-08db60e056c8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 May 2023 07:34:44.7624
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mHihsvbsmfEmGyrqKWwem8FcAcP0hv04Y3Pb+iat8MqaPvTG+W214P0cNyr8s4XCgwbqObrB/9E8dejgmainnQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8181
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Monday, May 29, 2023 12:19 PM, isaku.yamahata@intel.com wrote:
+> The tree can be found at https://github.com/intel/tdx/tree/kvm-upstream
+> The corresponding qemu branch is found at
+> https://github.com/yamahata/qemu/tree/tdx/qemu-upm
+> How to run/test: It's describe at https://github.com/intel/tdx/wiki/TDX-K=
+VM
 
-syzbot found the following issue on:
-
-HEAD commit:    933174ae28ba Merge tag 'spi-fix-v6.4-rc3' of git://git.ker..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=138d4ae5280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f389ffdf4e9ba3f0
-dashboard link: https://syzkaller.appspot.com/bug?extid=d0d442c22fa8db45ff0e
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/21a81b8c2660/disk-933174ae.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b4951d89e238/vmlinux-933174ae.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/21eb405303cc/bzImage-933174ae.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d0d442c22fa8db45ff0e@syzkaller.appspotmail.com
-
-general protection fault, probably for non-canonical address 0xdffffc000000000e: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
-CPU: 0 PID: 29845 Comm: syz-executor.4 Not tainted 6.4.0-rc3-syzkaller-00032-g933174ae28ba #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/16/2023
-RIP: 0010:vhost_work_queue drivers/vhost/vhost.c:259 [inline]
-RIP: 0010:vhost_work_queue+0xfc/0x150 drivers/vhost/vhost.c:248
-Code: 00 00 fc ff df 48 89 da 48 c1 ea 03 80 3c 02 00 75 56 48 b8 00 00 00 00 00 fc ff df 48 8b 1b 48 8d 7b 70 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 42 48 8b 7b 70 e8 95 9e ae f9 5b 5d 41 5c 41 5d e9
-RSP: 0018:ffffc9000333faf8 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000d84d000
-RDX: 000000000000000e RSI: ffffffff841221d7 RDI: 0000000000000070
-RBP: ffff88804b6b95b0 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: ffff88804b6b00b0
-R13: 0000000000000000 R14: ffff88804b6b95e0 R15: ffff88804b6b95c8
-FS:  00007f3b445ec700(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b2e423000 CR3: 000000005d734000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 000000000000003b DR6: 00000000ffff0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- vhost_transport_send_pkt+0x268/0x520 drivers/vhost/vsock.c:288
- virtio_transport_send_pkt_info+0x54c/0x820 net/vmw_vsock/virtio_transport_common.c:250
- virtio_transport_connect+0xb1/0xf0 net/vmw_vsock/virtio_transport_common.c:813
- vsock_connect+0x37f/0xcd0 net/vmw_vsock/af_vsock.c:1414
- __sys_connect_file+0x153/0x1a0 net/socket.c:2003
- __sys_connect+0x165/0x1a0 net/socket.c:2020
- __do_sys_connect net/socket.c:2030 [inline]
- __se_sys_connect net/socket.c:2027 [inline]
- __x64_sys_connect+0x73/0xb0 net/socket.c:2027
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f3b4388c169
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f3b445ec168 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00007f3b439ac050 RCX: 00007f3b4388c169
-RDX: 0000000000000010 RSI: 0000000020000140 RDI: 0000000000000004
-RBP: 00007f3b438e7ca1 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f3b43acfb1f R14: 00007f3b445ec300 R15: 0000000000022000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:vhost_work_queue drivers/vhost/vhost.c:259 [inline]
-RIP: 0010:vhost_work_queue+0xfc/0x150 drivers/vhost/vhost.c:248
-Code: 00 00 fc ff df 48 89 da 48 c1 ea 03 80 3c 02 00 75 56 48 b8 00 00 00 00 00 fc ff df 48 8b 1b 48 8d 7b 70 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 42 48 8b 7b 70 e8 95 9e ae f9 5b 5d 41 5c 41 5d e9
-RSP: 0018:ffffc9000333faf8 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000d84d000
-RDX: 000000000000000e RSI: ffffffff841221d7 RDI: 0000000000000070
-RBP: ffff88804b6b95b0 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: ffff88804b6b00b0
-R13: 0000000000000000 R14: ffff88804b6b95e0 R15: ffff88804b6b95c8
-FS:  00007f3b445ec700(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b2e428000 CR3: 000000005d734000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 000000000000003b DR6: 00000000ffff0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess), 5 bytes skipped:
-   0:	48 89 da             	mov    %rbx,%rdx
-   3:	48 c1 ea 03          	shr    $0x3,%rdx
-   7:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
-   b:	75 56                	jne    0x63
-   d:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  14:	fc ff df
-  17:	48 8b 1b             	mov    (%rbx),%rbx
-  1a:	48 8d 7b 70          	lea    0x70(%rbx),%rdi
-  1e:	48 89 fa             	mov    %rdi,%rdx
-  21:	48 c1 ea 03          	shr    $0x3,%rdx
-* 25:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  29:	75 42                	jne    0x6d
-  2b:	48 8b 7b 70          	mov    0x70(%rbx),%rdi
-  2f:	e8 95 9e ae f9       	callq  0xf9ae9ec9
-  34:	5b                   	pop    %rbx
-  35:	5d                   	pop    %rbp
-  36:	41 5c                	pop    %r12
-  38:	41 5d                	pop    %r13
-  3a:	e9                   	.byte 0xe9
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Seems the above wiki lacks some update, e.g. tdx needs to be enabled explic=
+itly
+when loading kvm_intel, example command line (e.g. private=3Dtrue for
+memoy-backend) to launch TD with gmem.
