@@ -2,165 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81610715556
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 08:05:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CD197156CC
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 09:31:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230421AbjE3GFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 02:05:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49922 "EHLO
+        id S231238AbjE3HbO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 03:31:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230013AbjE3GFd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 02:05:33 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C35F193;
-        Mon, 29 May 2023 23:05:06 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-2567b589d3bso1133505a91.0;
-        Mon, 29 May 2023 23:05:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685426705; x=1688018705;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LJ2FwZAiYnnxTMqhmBL3k/Q41PMPtvvS6ULSWDD5Mqc=;
-        b=HPC9KjgnqebMUM2BNBy9LntiMFDjIn1C7O0cXwicuTccC7Z49EDUW0+mbwiV+yK7Sz
-         352WqL5SSlwa5KrPN88g9CbT5Mkyc8U4gsJaV2hQIpKB/7rEHiPb/z7ll94OyOuwD+OG
-         TblY+xS3X/Az0L87SVJXNxMRGKE90q1YF0MlAreGQEJpq29KBhrQGenKJRJy+Yjk0ROx
-         qJ/c8mNNE5mT6F9JkQo8990lCK6M42t6TRXHk24YjdPktjITEEn2dMbLvprgjeKvyrYU
-         NL8XC6UizRS0YMoJ8ZTPFODqsfw4PC1hzVWuj44jSau2PiPIrurAMKnbxHPwK7fxMyfE
-         5gfQ==
+        with ESMTP id S230152AbjE3Hag (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 03:30:36 -0400
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCE64E79
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 00:30:06 -0700 (PDT)
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-763c3442563so248347039f.1
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 00:30:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685426705; x=1688018705;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LJ2FwZAiYnnxTMqhmBL3k/Q41PMPtvvS6ULSWDD5Mqc=;
-        b=I2S+o2TEOKZuiQsyB09vvlZKdrg4cygtmZf3mjU1E4zLEwIj4ixwcg0IFvKKRsomZB
-         vz0FZ/R552LoI4hnu0gfyv94DzjqZM8fWK3XU35tqslEbjOk+49KVU97XQcQUK2cIAip
-         /ySn3ceqcuek7RtBJetWlw5RMar3I3W3YiTokYZrWY/fEL4sPblASk48Ia6CfgOlVGAO
-         dif8iurQ2tMnK3x5mE6uVraNhnzLyWAyvQbxH+9xqVRSqvlenCOqTiCQvLvaJ+e6396i
-         3jm1p0rrScRVJ1JI8HYB1dWMG4NNnZrYUK4Wa2inb7F2QrLHTln5PyniDK7UUUTpWZrq
-         FkVw==
-X-Gm-Message-State: AC+VfDyyfeY3DlwihuCOJ94Se1jvCQrYH9nNV7C9m9wAKm84bPgvbhvR
-        YMNxwcTlLMveVULvlETAo6hzC2TJ/pS0Qhgpgug=
-X-Google-Smtp-Source: ACHHUZ4uS3H9sQQBMFqwjQNQ/rHgvhfvNYFF61L+vvlwZiSXcnFl+IHX3upZuBZaJttgC1bRUznrGQ==
-X-Received: by 2002:a17:90a:af97:b0:255:6ea7:7041 with SMTP id w23-20020a17090aaf9700b002556ea77041mr1385139pjq.41.1685426705637;
-        Mon, 29 May 2023 23:05:05 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id gw8-20020a17090b0a4800b00256b67208b1sm638072pjb.56.2023.05.29.23.05.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 May 2023 23:05:05 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>
-Subject: [PATCH v6 10/10] KVM: x86/cpuid: Add AMD CPUID ExtPerfMonAndDbg leaf 0x80000022
-Date:   Tue, 30 May 2023 14:04:23 +0800
-Message-Id: <20230530060423.32361-11-likexu@tencent.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230530060423.32361-1-likexu@tencent.com>
-References: <20230530060423.32361-1-likexu@tencent.com>
+        d=1e100.net; s=20221208; t=1685431806; x=1688023806;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=a5KqC1edhiO7JepEHlmRT8WJ2yLfb5IhYu4wMi2/DSw=;
+        b=e9xklmdL4tUZF4ud9VEmlFO26Cia1PP0X4fS++iKAXd0iC1btF6eUWTQWI3fXWdIz9
+         j9avTjNWGS1sPYjX34OqnGvnbx7oUxoTBzpglhAQy5La7UwcrKerCJsOPa3ZvQ37ehL+
+         jZzOVSSsK6ePb5HLuZgcgcCG1c+Am9ciQuEWiuxPAZWBhErSDgHhWjFmTUOkiY3cGx65
+         BiRyJ8bxGFFj5Wt+/Yjj8ut4YEt3nhyJfUnXHsd5E1mqCEsnJzUEFqUMBO5bo0iW4aNo
+         dhh+A1RbEEXp1lTm/RMDPMSPeLaSr+wk32T9EG+NIYrX40fidnyJ9Gl2dMja4OBxAz7X
+         fYYA==
+X-Gm-Message-State: AC+VfDyBA6A61M10oMReZbDZm6TiQqWDq40qNNUwlyBtVvJMuMwIPxvh
+        Z/VtkT2zpORAQfOe7QRYa5+dfXIOiB9sUJX0PAIRK6PnJ1NN
+X-Google-Smtp-Source: ACHHUZ6jRHEI659u6OJ7MbdCGAh+CQGfbeSNkc55tbVwKziOOQu6jDaY06aEQMb2KBaFHwpJvFF4HAuWWIJIhwpznzrRpxwK6z8P
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a05:6638:1103:b0:41a:c455:f4c1 with SMTP id
+ n3-20020a056638110300b0041ac455f4c1mr678488jal.4.1685431806029; Tue, 30 May
+ 2023 00:30:06 -0700 (PDT)
+Date:   Tue, 30 May 2023 00:30:06 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001777f605fce42c5f@google.com>
+Subject: [syzbot] [kvm?] [net?] [virt?] general protection fault in vhost_work_queue
+From:   syzbot <syzbot+d0d442c22fa8db45ff0e@syzkaller.appspotmail.com>
+To:     jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mst@redhat.com,
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+Hello,
 
-CPUID leaf 0x80000022 i.e. ExtPerfMonAndDbg advertises some new
-performance monitoring features for AMD processors.
+syzbot found the following issue on:
 
-Bit 0 of EAX indicates support for Performance Monitoring Version 2
-(PerfMonV2) features. If found to be set during PMU initialization,
-the EBX bits of the same CPUID function can be used to determine
-the number of available PMCs for different PMU types.
+HEAD commit:    933174ae28ba Merge tag 'spi-fix-v6.4-rc3' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=138d4ae5280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f389ffdf4e9ba3f0
+dashboard link: https://syzkaller.appspot.com/bug?extid=d0d442c22fa8db45ff0e
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-Expose the relevant bits via KVM_GET_SUPPORTED_CPUID so that
-guests can make use of the PerfMonV2 features.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Co-developed-by: Sandipan Das <sandipan.das@amd.com>
-Signed-off-by: Sandipan Das <sandipan.das@amd.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/21a81b8c2660/disk-933174ae.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b4951d89e238/vmlinux-933174ae.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/21eb405303cc/bzImage-933174ae.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d0d442c22fa8db45ff0e@syzkaller.appspotmail.com
+
+general protection fault, probably for non-canonical address 0xdffffc000000000e: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
+CPU: 0 PID: 29845 Comm: syz-executor.4 Not tainted 6.4.0-rc3-syzkaller-00032-g933174ae28ba #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/16/2023
+RIP: 0010:vhost_work_queue drivers/vhost/vhost.c:259 [inline]
+RIP: 0010:vhost_work_queue+0xfc/0x150 drivers/vhost/vhost.c:248
+Code: 00 00 fc ff df 48 89 da 48 c1 ea 03 80 3c 02 00 75 56 48 b8 00 00 00 00 00 fc ff df 48 8b 1b 48 8d 7b 70 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 42 48 8b 7b 70 e8 95 9e ae f9 5b 5d 41 5c 41 5d e9
+RSP: 0018:ffffc9000333faf8 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000d84d000
+RDX: 000000000000000e RSI: ffffffff841221d7 RDI: 0000000000000070
+RBP: ffff88804b6b95b0 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: ffff88804b6b00b0
+R13: 0000000000000000 R14: ffff88804b6b95e0 R15: ffff88804b6b95c8
+FS:  00007f3b445ec700(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b2e423000 CR3: 000000005d734000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 000000000000003b DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ vhost_transport_send_pkt+0x268/0x520 drivers/vhost/vsock.c:288
+ virtio_transport_send_pkt_info+0x54c/0x820 net/vmw_vsock/virtio_transport_common.c:250
+ virtio_transport_connect+0xb1/0xf0 net/vmw_vsock/virtio_transport_common.c:813
+ vsock_connect+0x37f/0xcd0 net/vmw_vsock/af_vsock.c:1414
+ __sys_connect_file+0x153/0x1a0 net/socket.c:2003
+ __sys_connect+0x165/0x1a0 net/socket.c:2020
+ __do_sys_connect net/socket.c:2030 [inline]
+ __se_sys_connect net/socket.c:2027 [inline]
+ __x64_sys_connect+0x73/0xb0 net/socket.c:2027
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f3b4388c169
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f3b445ec168 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: ffffffffffffffda RBX: 00007f3b439ac050 RCX: 00007f3b4388c169
+RDX: 0000000000000010 RSI: 0000000020000140 RDI: 0000000000000004
+RBP: 00007f3b438e7ca1 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f3b43acfb1f R14: 00007f3b445ec300 R15: 0000000000022000
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:vhost_work_queue drivers/vhost/vhost.c:259 [inline]
+RIP: 0010:vhost_work_queue+0xfc/0x150 drivers/vhost/vhost.c:248
+Code: 00 00 fc ff df 48 89 da 48 c1 ea 03 80 3c 02 00 75 56 48 b8 00 00 00 00 00 fc ff df 48 8b 1b 48 8d 7b 70 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 42 48 8b 7b 70 e8 95 9e ae f9 5b 5d 41 5c 41 5d e9
+RSP: 0018:ffffc9000333faf8 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000d84d000
+RDX: 000000000000000e RSI: ffffffff841221d7 RDI: 0000000000000070
+RBP: ffff88804b6b95b0 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: ffff88804b6b00b0
+R13: 0000000000000000 R14: ffff88804b6b95e0 R15: ffff88804b6b95c8
+FS:  00007f3b445ec700(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b2e428000 CR3: 000000005d734000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 000000000000003b DR6: 00000000ffff0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess), 5 bytes skipped:
+   0:	48 89 da             	mov    %rbx,%rdx
+   3:	48 c1 ea 03          	shr    $0x3,%rdx
+   7:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+   b:	75 56                	jne    0x63
+   d:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  14:	fc ff df
+  17:	48 8b 1b             	mov    (%rbx),%rbx
+  1a:	48 8d 7b 70          	lea    0x70(%rbx),%rdi
+  1e:	48 89 fa             	mov    %rdi,%rdx
+  21:	48 c1 ea 03          	shr    $0x3,%rdx
+* 25:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  29:	75 42                	jne    0x6d
+  2b:	48 8b 7b 70          	mov    0x70(%rbx),%rdi
+  2f:	e8 95 9e ae f9       	callq  0xf9ae9ec9
+  34:	5b                   	pop    %rbx
+  35:	5d                   	pop    %rbp
+  36:	41 5c                	pop    %r12
+  38:	41 5d                	pop    %r13
+  3a:	e9                   	.byte 0xe9
+
+
 ---
- arch/x86/kvm/cpuid.c   | 28 +++++++++++++++++++++++++++-
- arch/x86/kvm/svm/svm.c |  4 ++++
- 2 files changed, 31 insertions(+), 1 deletion(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 61bc71882f07..0e5584f4acd7 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -734,6 +734,10 @@ void kvm_set_cpu_caps(void)
- 		F(NULL_SEL_CLR_BASE) | F(AUTOIBRS) | 0 /* PrefetchCtlMsr */
- 	);
- 
-+	kvm_cpu_cap_init_kvm_defined(CPUID_8000_0022_EAX,
-+		F(PERFMON_V2)
-+	);
-+
- 	/*
- 	 * Synthesize "LFENCE is serializing" into the AMD-defined entry in
- 	 * KVM's supported CPUID if the feature is reported as supported by the
-@@ -1128,7 +1132,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		entry->edx = 0;
- 		break;
- 	case 0x80000000:
--		entry->eax = min(entry->eax, 0x80000021);
-+		entry->eax = min(entry->eax, 0x80000022);
- 		/*
- 		 * Serializing LFENCE is reported in a multitude of ways, and
- 		 * NullSegClearsBase is not reported in CPUID on Zen2; help
-@@ -1233,6 +1237,28 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		entry->ebx = entry->ecx = entry->edx = 0;
- 		cpuid_entry_override(entry, CPUID_8000_0021_EAX);
- 		break;
-+	/* AMD Extended Performance Monitoring and Debug */
-+	case 0x80000022: {
-+		union cpuid_0x80000022_ebx ebx;
-+
-+		entry->ecx = entry->edx = 0;
-+		if (!enable_pmu || !kvm_cpu_cap_has(X86_FEATURE_PERFMON_V2)) {
-+			entry->eax = entry->ebx;
-+			break;
-+		}
-+
-+		cpuid_entry_override(entry, CPUID_8000_0022_EAX);
-+
-+		if (kvm_cpu_cap_has(X86_FEATURE_PERFMON_V2))
-+			ebx.split.num_core_pmc = kvm_pmu_cap.num_counters_gp;
-+		else if (kvm_cpu_cap_has(X86_FEATURE_PERFCTR_CORE))
-+			ebx.split.num_core_pmc = AMD64_NUM_COUNTERS_CORE;
-+		else
-+			ebx.split.num_core_pmc = AMD64_NUM_COUNTERS;
-+
-+		entry->ebx = ebx.full;
-+		break;
-+	}
- 	/*Add support for Centaur's CPUID instruction*/
- 	case 0xC0000000:
- 		/*Just support up to 0xC0000004 now*/
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index d9669e3cc00a..ff48cdea1fbf 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -5036,6 +5036,10 @@ static __init void svm_set_cpu_caps(void)
- 							  kvm_pmu_cap.num_counters_gp);
- 		else
- 			kvm_cpu_cap_check_and_set(X86_FEATURE_PERFCTR_CORE);
-+
-+		if (kvm_pmu_cap.version != 2 ||
-+		    !kvm_cpu_cap_has(X86_FEATURE_PERFCTR_CORE))
-+			kvm_cpu_cap_clear(X86_FEATURE_PERFMON_V2);
- 	}
- 
- 	/* CPUID 0x8000001F (SME/SEV features) */
--- 
-2.40.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
