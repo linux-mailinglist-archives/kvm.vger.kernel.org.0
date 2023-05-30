@@ -2,154 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A206971633E
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 16:10:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF44A716448
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 16:35:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232958AbjE3OKP convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 30 May 2023 10:10:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53112 "EHLO
+        id S232706AbjE3Ofn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 10:35:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232951AbjE3OKN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 10:10:13 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EF20118
-        for <kvm@vger.kernel.org>; Tue, 30 May 2023 07:10:09 -0700 (PDT)
-Received: from lhrpeml100003.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QVvPC2ZFtz67blC;
-        Tue, 30 May 2023 22:07:59 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml100003.china.huawei.com (7.191.160.210) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 30 May 2023 15:10:06 +0100
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.023;
- Tue, 30 May 2023 15:10:06 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Joao Martins <joao.m.martins@oracle.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
-CC:     Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Lu Baolu" <baolu.lu@linux.intel.com>, Yi Liu <yi.l.liu@intel.com>,
-        Yi Y Sun <yi.y.sun@intel.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH RFCv2 24/24] iommu/arm-smmu-v3: Advertise
- IOMMU_DOMAIN_F_ENFORCE_DIRTY
-Thread-Topic: [PATCH RFCv2 24/24] iommu/arm-smmu-v3: Advertise
- IOMMU_DOMAIN_F_ENFORCE_DIRTY
-Thread-Index: AQHZicpBslUZ4SR8FEqbgFGqVge/dq9y6VZw
-Date:   Tue, 30 May 2023 14:10:06 +0000
-Message-ID: <244a1a22766e4b46b75a74d202254b0d@huawei.com>
-References: <20230518204650.14541-1-joao.m.martins@oracle.com>
- <20230518204650.14541-25-joao.m.martins@oracle.com>
-In-Reply-To: <20230518204650.14541-25-joao.m.martins@oracle.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.126.175.64]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        with ESMTP id S230349AbjE3Ofl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 10:35:41 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E40F8F;
+        Tue, 30 May 2023 07:35:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Hh6nfYGRw8Xo4sZYsBcKGggpg8AsAPYo0Fmyp3Zb2C8=; b=b7ZWeglVxXPgUC2IalnxW8QZFN
+        CJfyT1adD2qvortXSb64Dq95xjOfW+CqIcHD2hwXLUJgjM2Jcm0aCVkNEl+4D0d7kFi9tOPkvwR77
+        Q03x4AZfKAqK5Ex1sI8wMOmMNkdcJcJhl4cvNwxhtFGzTP86T5Ywi8TkmQumPO43FnAxmAXpVh8jL
+        owdx7z3MUDt0GBULgwunRwE/VKqfvaPMlGOjv+kvuj6RvfMdFLcd/k/dsM83oJvJK/bRwGDK1rO88
+        bxWkHdsOhI/x3kRHmUEkR6s92NeliMjQ1NcuYHcX4oDz9kVrTxXGNYdIQvBq8b8LERzqK1vDsiZ2p
+        ybOuykig==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1q40RG-00Dqv4-1c;
+        Tue, 30 May 2023 14:35:06 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id A59E7300194;
+        Tue, 30 May 2023 16:35:04 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 90029214873C1; Tue, 30 May 2023 16:35:04 +0200 (CEST)
+Date:   Tue, 30 May 2023 16:35:04 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Cc:     Tianyu Lan <ltykernel@gmail.com>, luto@kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
+        tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, ashish.kalra@amd.com,
+        srutherford@google.com, akpm@linux-foundation.org,
+        anshuman.khandual@arm.com, pawan.kumar.gupta@linux.intel.com,
+        adrian.hunter@intel.com, daniel.sneddon@linux.intel.com,
+        alexander.shishkin@linux.intel.com, sandipan.das@amd.com,
+        ray.huang@amd.com, brijesh.singh@amd.com, michael.roth@amd.com,
+        thomas.lendacky@amd.com, venu.busireddy@oracle.com,
+        sterritt@google.com, tony.luck@intel.com, samitolvanen@google.com,
+        fenghua.yu@intel.com, pangupta@amd.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
+Subject: Re: [RFC PATCH V6 01/14] x86/sev: Add a #HV exception handler
+Message-ID: <20230530143504.GA200197@hirez.programming.kicks-ass.net>
+References: <20230515165917.1306922-1-ltykernel@gmail.com>
+ <20230515165917.1306922-2-ltykernel@gmail.com>
+ <20230516093010.GC2587705@hirez.programming.kicks-ass.net>
+ <d43c14d9-a149-860c-71d6-e5c62b7c356f@amd.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d43c14d9-a149-860c-71d6-e5c62b7c356f@amd.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: Joao Martins [mailto:joao.m.martins@oracle.com]
-> Sent: 18 May 2023 21:47
-> To: iommu@lists.linux.dev
-> Cc: Jason Gunthorpe <jgg@nvidia.com>; Kevin Tian <kevin.tian@intel.com>;
-> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>; Lu
-> Baolu <baolu.lu@linux.intel.com>; Yi Liu <yi.l.liu@intel.com>; Yi Y Sun
-> <yi.y.sun@intel.com>; Eric Auger <eric.auger@redhat.com>; Nicolin Chen
-> <nicolinc@nvidia.com>; Joerg Roedel <joro@8bytes.org>; Jean-Philippe
-> Brucker <jean-philippe@linaro.org>; Suravee Suthikulpanit
-> <suravee.suthikulpanit@amd.com>; Will Deacon <will@kernel.org>; Robin
-> Murphy <robin.murphy@arm.com>; Alex Williamson
-> <alex.williamson@redhat.com>; kvm@vger.kernel.org; Joao Martins
-> <joao.m.martins@oracle.com>
-> Subject: [PATCH RFCv2 24/24] iommu/arm-smmu-v3: Advertise
-> IOMMU_DOMAIN_F_ENFORCE_DIRTY
+On Tue, May 30, 2023 at 02:16:55PM +0200, Gupta, Pankaj wrote:
 > 
-> Now that we probe, and handle the DBM bit modifier, unblock
-> the kAPI usage by exposing the IOMMU_DOMAIN_F_ENFORCE_DIRTY
-> and implement it's requirement of revoking device attachment
-> in the iommu_capable. Finally expose the IOMMU_CAP_DIRTY to
-> users (IOMMUFD_DEVICE_GET_CAPS).
+> > > Add a #HV exception handler that uses IST stack.
+> > > 
+> > 
+> > Urgh.. that is entirely insufficient. Like it doesn't even begin to
+> > start to cover things.
+> > 
+> > The whole existing VC IST stack abuse is already a nightmare and you're
+> > duplicating that.. without any explanation for why this would be needed
+> > and how it is correct.
+> > 
+> > Please try again.
 > 
-> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
-> ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index bf0aac333725..71dd95a687fd 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -2014,6 +2014,8 @@ static bool arm_smmu_capable(struct device *dev,
-> enum iommu_cap cap)
->  		return master->smmu->features &
-> ARM_SMMU_FEAT_COHERENCY;
->  	case IOMMU_CAP_NOEXEC:
->  		return true;
-> +	case IOMMU_CAP_DIRTY:
-> +		return arm_smmu_dbm_capable(master->smmu);
->  	default:
->  		return false;
->  	}
-> @@ -2430,6 +2432,11 @@ static int arm_smmu_attach_dev(struct
-> iommu_domain *domain, struct device *dev)
->  	master = dev_iommu_priv_get(dev);
->  	smmu = master->smmu;
-> 
-> +	if (domain->flags & IOMMU_DOMAIN_F_ENFORCE_DIRTY &&
-> +	    !arm_smmu_dbm_capable(smmu))
-> +		return -EINVAL;
-> +
-> +
+> #HV handler handles both #NMI & #MCE in the guest and nested #HV is never
+> raised by the hypervisor. 
 
-Since we have the supported_flags always set to " IOMMU_DOMAIN_F_ENFORCE_DIRTY"
-below, platforms that doesn't have DBM capability will fail here, right? Or the idea is to set
-domain flag only if the capability is reported true? But the iommu_domain_set_flags() doesn't
-seems to check the capability though. 
-
-(This seems to be causing problem with a rebased Qemu branch for ARM I have while sanity
-testing on a platform that doesn't have DBM. I need to double check though).
-
-Thanks,
-Shameer
-
-   
->  	/*
->  	 * Checking that SVA is disabled ensures that this device isn't bound to
->  	 * any mm, and can be safely detached from its old domain. Bonds
-> cannot
-> @@ -2913,6 +2920,7 @@ static void arm_smmu_remove_dev_pasid(struct
-> device *dev, ioasid_t pasid)
->  }
-> 
->  static struct iommu_ops arm_smmu_ops = {
-> +	.supported_flags	= IOMMU_DOMAIN_F_ENFORCE_DIRTY,
->  	.capable		= arm_smmu_capable,
->  	.domain_alloc		= arm_smmu_domain_alloc,
->  	.probe_device		= arm_smmu_probe_device,
-> --
-> 2.17.2
-
+I thought all this confidental computing nonsense was about not trusting
+the hypervisor, so how come we're now relying on the hypervisor being
+sane?
