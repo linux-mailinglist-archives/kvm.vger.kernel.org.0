@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9F3F7168E4
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 18:11:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BCF17168E9
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 18:11:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233370AbjE3QLa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 12:11:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57538 "EHLO
+        id S233413AbjE3QLp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 12:11:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233318AbjE3QL0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 12:11:26 -0400
+        with ESMTP id S233375AbjE3QLk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 12:11:40 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5DFFBFE
-        for <kvm@vger.kernel.org>; Tue, 30 May 2023 09:10:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B24D912D
+        for <kvm@vger.kernel.org>; Tue, 30 May 2023 09:11:17 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C46981758;
-        Tue, 30 May 2023 09:11:09 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 031261BB0;
+        Tue, 30 May 2023 09:11:11 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A8CC3F663;
-        Tue, 30 May 2023 09:10:23 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AB4DF3F663;
+        Tue, 30 May 2023 09:10:24 -0700 (PDT)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
 Cc:     pbonzini@redhat.com, alexandru.elisei@arm.com, ricarkol@google.com,
         shahuang@redhat.com
-Subject: [kvm-unit-tests PATCH v6 26/32] arm64: Use code from the gnu-efi when booting with EFI
-Date:   Tue, 30 May 2023 17:09:18 +0100
-Message-Id: <20230530160924.82158-27-nikos.nikoleris@arm.com>
+Subject: [kvm-unit-tests PATCH v6 27/32] lib: Avoid external dependency in libelf
+Date:   Tue, 30 May 2023 17:09:19 +0100
+Message-Id: <20230530160924.82158-28-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230530160924.82158-1-nikos.nikoleris@arm.com>
 References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
@@ -42,84 +42,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-arm/efi/crt0-efi-aarch64.S defines the header and the handover
-sequence from EFI to a efi_main. This change includes the whole file
-in arm/cstart64.S when we compile with EFI support.
-
-In addition, we change the handover code in arm/efi/crt0-efi-aarch64.S
-to align the stack pointer. This alignment is necessary because we
-make assumptions about cpu0's stack alignment and most importantly we
-place its thread_info at the bottom of this stack.
+There is just a small number of definitions we need from
+uapi/linux/elf.h and asm/elf.h and the relocation code is
+self-contained.
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
 ---
- arm/cstart64.S             |  6 ++++++
- arm/efi/crt0-efi-aarch64.S | 19 +++++++++++++++----
- 2 files changed, 21 insertions(+), 4 deletions(-)
+ lib/elf.h | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+ create mode 100644 lib/elf.h
 
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index 223c1092..cbd6b511 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -15,6 +15,10 @@
- #include <asm/thread_info.h>
- #include <asm/sysreg.h>
- 
-+#ifdef CONFIG_EFI
-+#include "efi/crt0-efi-aarch64.S"
-+#else
+diff --git a/lib/elf.h b/lib/elf.h
+new file mode 100644
+index 00000000..abd5cf4b
+--- /dev/null
++++ b/lib/elf.h
+@@ -0,0 +1,57 @@
++/* SPDX-License-Identifier: LGPL-2.0-or-later */
++/*
++ * Relevant definitions from uapi/linux/elf.h and asm/elf.h
++ */
 +
- .macro zero_range, tmp1, tmp2
- 9998:	cmp	\tmp1, \tmp2
- 	b.eq	9997f
-@@ -107,6 +111,8 @@ start:
- 	bl	exit
- 	b	halt
- 
-+#endif
++#ifndef _ELF_H_
++#define _ELF_H_
 +
- .text
- 
- /*
-diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
-index d50e78dd..5d0dc04a 100644
---- a/arm/efi/crt0-efi-aarch64.S
-+++ b/arm/efi/crt0-efi-aarch64.S
-@@ -111,10 +111,17 @@ section_table:
- 
- 	.align		12
- _start:
--	stp		x29, x30, [sp, #-32]!
-+	stp		x29, x30, [sp, #-16]!
++#include <libcflat.h>
 +
-+	/* Align sp; this is necessary due to way we store cpu0's thread_info */
- 	mov		x29, sp
-+	mov		x30, sp
-+	and		x30, x30, #THREAD_MASK
-+	mov		sp, x30
-+	str		x29, [sp, #-16]!
++/* 64-bit ELF base types. */
++typedef u64	Elf64_Addr;
++typedef u64	Elf64_Xword;
++typedef s64	Elf64_Sxword;
 +
-+	stp		x0, x1, [sp, #-16]!
- 
--	stp		x0, x1, [sp, #16]
- 	mov		x2, x0
- 	mov		x3, x1
- 	adr		x0, ImageBase
-@@ -123,8 +130,12 @@ _start:
- 	bl		_relocate
- 	cbnz		x0, 0f
- 
--	ldp		x0, x1, [sp, #16]
-+	ldp		x0, x1, [sp], #16
- 	bl		efi_main
- 
--0:	ldp		x29, x30, [sp], #32
-+	/* Restore sp */
-+	ldr		x30, [sp], #16
-+	mov             sp, x30
++typedef struct {
++	Elf64_Sxword d_tag;             /* entry tag value */
++	union {
++		Elf64_Xword d_val;
++		Elf64_Addr d_ptr;
++	} d_un;
++} Elf64_Dyn;
 +
-+0:	ldp		x29, x30, [sp], #16
- 	ret
++typedef struct elf64_rel {
++	Elf64_Addr r_offset;    /* Location at which to apply the action */
++	Elf64_Xword r_info;     /* index and type of relocation */
++} Elf64_Rel;
++
++typedef struct elf64_rela {
++	Elf64_Addr r_offset;    /* Location at which to apply the action */
++	Elf64_Xword r_info;     /* index and type of relocation */
++	Elf64_Sxword r_addend;  /* Constant addend used to compute value */
++} Elf64_Rela;
++
++/* This is the info that is needed to parse the dynamic section of the file */
++#define DT_NULL		0
++#define DT_RELA		7
++#define DT_RELASZ	8
++#define DT_RELAENT	9
++
++/* x86 relocation types. */
++#define R_X86_64_NONE		0       /* No reloc */
++#define R_X86_64_RELATIVE	8       /* Adjust by program base */
++
++
++/*
++ * AArch64 static relocation types.
++ */
++
++/* Miscellaneous. */
++#define R_AARCH64_NONE		256
++#define R_AARCH64_RELATIVE	1027
++
++/* The following are used with relocations */
++#define ELF64_R_TYPE(i)		((i) & 0xffffffff)
++
++#endif /* _ELF_H_ */
 -- 
 2.25.1
 
