@@ -2,144 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 375D77170C7
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 00:35:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40017717123
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 01:00:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233745AbjE3Wfw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 18:35:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50952 "EHLO
+        id S233353AbjE3XAO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 19:00:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233440AbjE3Wfr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 May 2023 18:35:47 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA0F393;
-        Tue, 30 May 2023 15:35:46 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34UKehde029395;
-        Tue, 30 May 2023 22:35:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=vyK0SFfPtxGTegWHGbHIf/of/w0CUmEM1+FAEBe90To=;
- b=ULbZQCyVxDg07PJ1+qIZsNdb1k93vVclmYUR9AdeFjnfOjP3L+OREBke6bMt7qyKVX7n
- iZYdXILJaiDMu6rWvpNTGNDJCYzfpsPe2L018iowDFG3ouc75V3YSdXW1jFevOlBZ6Ra
- d5TfrVrtzyqMORqJN0mdVJiQdm5XxlGy0tLwLEs4N5McqnGsq9HsqvHgjfB9AIihnCms
- ozy0/CvRnAg9S/SeHaXPqv22ctxkKwRdXBfirje40VnryAojaoP1cahAft9/joUU35Pe
- QHW8yV57iuS8glHP3w3V52hsLZa7UX8tJ8oiLLFsFmmvN4NbRMKyGdNNvGhXvbBskGyH DQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwm1pgrqg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 May 2023 22:35:45 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34UMQS2H024001;
-        Tue, 30 May 2023 22:35:45 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwm1pgrq0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 May 2023 22:35:45 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34UFPYm9017360;
-        Tue, 30 May 2023 22:35:44 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([9.208.130.99])
-        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3qu9g55tqx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 May 2023 22:35:44 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-        by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34UMZhZf22216984
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 May 2023 22:35:43 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 59AF55810B;
-        Tue, 30 May 2023 22:35:43 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9E8A95810A;
-        Tue, 30 May 2023 22:35:42 +0000 (GMT)
-Received: from li-2c1e724c-2c76-11b2-a85c-ae42eaf3cb3d.ibm.com.com (unknown [9.61.88.233])
-        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 30 May 2023 22:35:42 +0000 (GMT)
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, pasic@linux.ibm.com, farman@linux.ibm.com,
-        mjrosato@linux.ibm.com, alex.williamson@redhat.com,
-        borntraeger@linux.ibm.com
-Subject: [PATCH 3/3] s390/vfio-ap: Wire in the vfio_device_ops request callback
-Date:   Tue, 30 May 2023 18:35:38 -0400
-Message-Id: <20230530223538.279198-4-akrowiak@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230530223538.279198-1-akrowiak@linux.ibm.com>
-References: <20230530223538.279198-1-akrowiak@linux.ibm.com>
+        with ESMTP id S229794AbjE3XAN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 May 2023 19:00:13 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89788EC;
+        Tue, 30 May 2023 16:00:10 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-64d41d8bc63so4019806b3a.0;
+        Tue, 30 May 2023 16:00:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685487610; x=1688079610;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MhkmwhzVFv1bWKBw06RWKQ85zcFA8OuFNsMQdUaAwlA=;
+        b=SpDnqS/gyx977+0QYAk/5vk8jfE9dMGQ/M551BHZsK8DyLDbQTZRbPNaqHbUTosgD6
+         08mbQ8xhC4Fy7Xw6nbGvifDdJKh7CngQLD9t/qNgpIP/JrBJA+be7GG2JNhe/X78KC/+
+         IAmI2BctwsmQcvJ3IZHLoqgL4ezJyvzZZ3eRN0AEMA1VgNAq3gF+FlSu7Ej7/Oi2VKsg
+         TQ6K1prEtMK9KZnPn04boP7vhVdcrAYeKt55BCJvU1++ntA/fsjRi/NVyX7IUyY+E/G/
+         VjNYKh/QC1B6Fd9cBDkFfqTZHECT95nqNjikec+Dup1/yrhyNmEGQlnWn2lCWG7wwCyB
+         RT8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685487610; x=1688079610;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MhkmwhzVFv1bWKBw06RWKQ85zcFA8OuFNsMQdUaAwlA=;
+        b=Ox2sLzwMTzelxYY/S33nPs9gUwyEywa0oij69SBV1HqbWesZHK2CzbMfd9pjsRqJQi
+         u6P1hiu6tUhOBhvdwVyREdVxlvRccqNfhKEZdfw6Dl1IKnZARGE4eKN5pBSmr8JN913+
+         Isp161CjefT402JaXYeje8amc8hpYJwhX7rioYlVkRs8bMAKw+mDnctfe9c3n9z+8Odo
+         +osuIh711a2RaDIqIMpMpLB9ugtmRbpva1yNF1BZ1mVmFPNw5q8yWO18LAVAwEPfCLvS
+         +4YfkR5CpWg6C90nB8ob4o5DmpRJdVGKJ+sEXyjifFwb5b4bJjvdBcbyLY5h1tf52pNm
+         zE0Q==
+X-Gm-Message-State: AC+VfDxG4Q0IkWnHxbLprtoorepqe7bi1uE2CKkI8cEx8H0WVt4sJECN
+        NpOmbxPZopVxAPYFLh6Zj4Q=
+X-Google-Smtp-Source: ACHHUZ4Cx4GU4obSH7OFW8nhQ1JqeI8yoGHRoZr5v+gFueWC79mKY1HhqEJk3ylQNB7PNEm6qlUQ5g==
+X-Received: by 2002:a05:6a21:6704:b0:10a:9f45:e3f with SMTP id wh4-20020a056a21670400b0010a9f450e3fmr3879785pzb.12.1685487609828;
+        Tue, 30 May 2023 16:00:09 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id e2-20020a63ee02000000b00514256c05c2sm9445520pgi.7.2023.05.30.16.00.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 May 2023 16:00:09 -0700 (PDT)
+Date:   Tue, 30 May 2023 16:00:07 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, isaku.yamahata@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>
+Subject: Re: [PATCH v13 021/113] KVM: TDX: Make pmu_intel.c ignore guest TD
+ case
+Message-ID: <20230530230007.GF1234772@ls.amr.corp.intel.com>
+References: <cover.1678643051.git.isaku.yamahata@intel.com>
+ <017a06174fa054ae264a2caba6f7f55e00f258e8.1678643052.git.isaku.yamahata@intel.com>
+ <20230402115019.000046fd@gmail.com>
+ <36fb638a-c9ff-0139-3e8e-7e8ff0bbff1f@gmail.com>
+ <20230528082602.GC1234772@ls.amr.corp.intel.com>
+ <cd8b6ea4-1293-c57c-1bed-4f6dbdbc2722@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: xX-B1izHkR6zFY2YYoIuutFE6MDxWm5u
-X-Proofpoint-GUID: UKrVQEiqSptqVbE2baZZz3J5cSThbSWt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-30_16,2023-05-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- mlxlogscore=999 priorityscore=1501 bulkscore=0 mlxscore=0 suspectscore=0
- lowpriorityscore=0 spamscore=0 adultscore=0 malwarescore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2304280000
- definitions=main-2305300184
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cd8b6ea4-1293-c57c-1bed-4f6dbdbc2722@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The mdev device is being removed, so pass the request to userspace to
-ask for a graceful cleanup. This should free up the thread that
-would otherwise loop waiting for the device to be fully released.
+On Mon, May 29, 2023 at 10:19:16PM +0800,
+Like Xu <like.xu.linux@gmail.com> wrote:
 
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
----
- drivers/s390/crypto/vfio_ap_ops.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+> On 28/5/2023 4:26 pm, Isaku Yamahata wrote:
+> > On Wed, Apr 19, 2023 at 04:21:21PM +0800,
+> > Like Xu <like.xu.linux@gmail.com> wrote:
+> > 
+> > > On 2/4/2023 4:50 pm, Zhi Wang wrote:
+> > > > Hi Like:
+> > > > 
+> > > > Would you mind to take a look on this patch? It would be nice to have
+> > > > a r-b also from you. :)
+> > > > 
+> > > > On Sun, 12 Mar 2023 10:55:45 -0700
+> > > > isaku.yamahata@intel.com wrote:
+> > > > 
+> > > > > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > > > > 
+> > > > > Because TDX KVM doesn't support PMU yet (it's future work of TDX KVM
+> > > > > support as another patch series) and pmu_intel.c touches vmx specific
+> > > 
+> > > It would be nice to have pmu support for tdx-guest from the very beginning.
+> > 
+> > It's supported in the public github repo.
+> > https://github.com/intel/tdx/tree/kvm-upstream-workaround
+> > As this patch series has 100+ patches, I don't want to bloat this patch more.
+> 
+> I presume we are talking about 873e2391e729...63761adbf5aa for TD pmu:
+> 
+> A quick glance brought me at least these comments:
+> 
+> (1) how does intel_pmu_save/restore() handle the enabled host LBR/PEBS ?
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 44f159136891..a8f58e133e6e 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -1736,6 +1736,26 @@ static void vfio_ap_mdev_close_device(struct vfio_device *vdev)
- 	vfio_ap_mdev_unset_kvm(matrix_mdev);
- }
- 
-+static void vfio_ap_mdev_request(struct vfio_device *vdev, unsigned int count)
-+{
-+	struct device *dev = vdev->dev;
-+	struct ap_matrix_mdev *matrix_mdev;
-+
-+	matrix_mdev = container_of(vdev, struct ap_matrix_mdev, vdev);
-+
-+	if (matrix_mdev->req_trigger) {
-+		if (!(count % 10))
-+			dev_notice_ratelimited(dev,
-+					       "Relaying device request to user (#%u)\n",
-+					       count);
-+
-+		eventfd_signal(matrix_mdev->req_trigger, 1);
-+	} else if (count == 0) {
-+		dev_notice(dev,
-+			   "No device request registered, blocked until released by user\n");
-+	}
-+}
-+
- static int vfio_ap_mdev_get_device_info(unsigned long arg)
- {
- 	unsigned long minsz;
-@@ -1955,6 +1975,7 @@ static const struct vfio_device_ops vfio_ap_matrix_dev_ops = {
- 	.bind_iommufd = vfio_iommufd_emulated_bind,
- 	.unbind_iommufd = vfio_iommufd_emulated_unbind,
- 	.attach_ioas = vfio_iommufd_emulated_attach_ioas,
-+	.request = vfio_ap_mdev_request
- };
- 
- static struct mdev_driver vfio_ap_matrix_driver = {
+It's not handled yet. We need to save/restore those MSRs.
+
+
+> (2) guest PMI injection may be malicious and could the current guest pmu
+> driver handle it ?
+
+This isn't specific to PMI.  Malicious VMM can inject any interrupt to the
+guest at any time.  Guest should be prepared for it.
+
+
+> (3) how do we handle the case when host counters can be enabled before TDENTER
+> for debuggable TD and support the case like "perf-kvm for both guest and host" ?
+
+On TDEXIT, those are disabled. VMM has to restore MSRs and enable it again.
+There is a window where events can be missed.
+
+
+> My point is actually, changes to perf/core should be CC to the perf reviewers
+> as early as possible to prevent key player from killing the direction.
+
+Sure, agreed.
+
+
+> > > > > structure in vcpu initialization, as workaround add dummy structure to
+> > > > > struct vcpu_tdx and pmu_intel.c can ignore TDX case.
+> > > 
+> > > If the target is not to provide a workaround, how about other variants:
+> > > 	- struct lbr_desc lbr_desc;
+> > > 	- pebs ds_buffer;
+> > > ?
+> > > 
+> > > We also need tdx selftest to verify the unavailability of these features.
+> > > Also, it would be great to have TDX's "System Profiling Mode" featue back in
+> > > the specification.
+> 
+> Detailed TD (plus debuggable) PMU selftest would clearly speed up the review
+> process.
+
+The existing KVM PMU selftest can be utilized. Or do you have something else in
+mind?
+
 -- 
-2.31.1
-
+Isaku Yamahata <isaku.yamahata@gmail.com>
