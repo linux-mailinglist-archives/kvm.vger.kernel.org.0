@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26DE471554B
-	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 08:05:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF8BD715550
+	for <lists+kvm@lfdr.de>; Tue, 30 May 2023 08:05:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230393AbjE3GFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 May 2023 02:05:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49544 "EHLO
+        id S230326AbjE3GFV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 May 2023 02:05:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230335AbjE3GFD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230341AbjE3GFD (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 30 May 2023 02:05:03 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D485107;
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DBA1109;
         Mon, 29 May 2023 23:05:00 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-25687f44385so1462216a91.3;
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-64d247a023aso2924109b3a.2;
         Mon, 29 May 2023 23:05:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20221208; t=1685426699; x=1688018699;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=okCUbwauqIa1DTJDmeQLbGd8OQ9Kua7tSb7xsqMZiUI=;
-        b=U7+mSxeC/Yj44sP39TyH8ocQrCaAPwVNDwvLUuYbNK6d7KciKfwoJ1SpC8KGic4l/y
-         vn6+9o1vZHR6CEDCfNNXiu50KM5eL24b8lES0h02HYexL6Nill3Wl1ol9vHpBC3xR0t3
-         dGtE6wwi/NREVgHfny7XpYPp90EADRle9MApzyZWLjz22OIqOK7yk+xJPBx2etphVrBy
-         ECCsvniGapeneRFlTO6gBvj9nToSkkfQDDmdaUpz1DLkG50FCrPrLelZ3fPfJD7zF9/i
-         JF6A+lsUcV0z1LmL7aRD+zbW43UOfkbwHbPujoen92z0PZBdI9cvA5dEHtqf/5GPbsua
-         hopw==
+        bh=suUfujzWdFjqH2s+YoUsYzVbyOY1lZZXklDFsgzM+q8=;
+        b=LVl9B75ihUJfSeSleTrzsje5FRP5zNMdUotm/gX3MamDHkv4yaWCuiLZxOOj9avasm
+         zPD4RY9g5KNzT3kfqdLppfKmw8muOGyQ2aZAytdn+oe6BmrUPW3A5RaxQj391pTOFJ4h
+         yxwP0rGKSBWcGWfXzLdR84sucANpMxwKrFfrKNV6PUO18OzYoMq2UE2VQQY6SY3Wz6Dq
+         xAoAWp0ARAJu7k/w+ed/jI47icjAQ06RBUJ7iF31lLsKBC+4tzzPUYq7Rd7ruMBOyc61
+         N5z2rHx5wdK20EnecxC8cisFACdFpadL7wMB/u1MkMoCN/QK1yMFls9zwLoi3cI6ASYa
+         EClA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20221208; t=1685426699; x=1688018699;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=okCUbwauqIa1DTJDmeQLbGd8OQ9Kua7tSb7xsqMZiUI=;
-        b=V6d58yukfw0gVxTGUEvV8fQSBNfRGAsKc0rIv4HhmUn4hem4N7HzwiHzdneQSwtUbd
-         FehRpAHFqPqC295fl4UwItMzB2DkpKn7oB0GdSVGvA9zNBafzjKe72zedd2RNV0Rdw2S
-         C1SDs4K5Lolx8eqlc3124MQCdx1LAsnVHE4Z+qF106G1/qNSUtMDE8soDXE0RWWApH3l
-         50yuNNU0GVomqu2pgBDe2wsvq+XwNz74YtPx50pQPLAKaEh6+nz5fP+PPIu0Bc7H7Gxs
-         5Ylb+MpqDiTlhoDuXERA0AgYpoBadKJ5pVcIzsRHsKzysJTJa+mEIDpnpA6u2dSxZpdS
-         9yUQ==
-X-Gm-Message-State: AC+VfDwiVTUH1sEXzlerouxyKy90tMGodobThsAVY2H2oZ6Y44f8N39S
-        cepZhWwxbsIYn7r4RuW7eVQ=
-X-Google-Smtp-Source: ACHHUZ4T23R9zHhaB3Rx0O9ChMUitZIESI3yIzI1GOlKZtDq4ImOAitO5Kd1YJOaGQrUlmug+m8UCw==
-X-Received: by 2002:a17:90b:4f88:b0:253:8e59:a867 with SMTP id qe8-20020a17090b4f8800b002538e59a867mr1212256pjb.42.1685426697009;
-        Mon, 29 May 2023 23:04:57 -0700 (PDT)
+        bh=suUfujzWdFjqH2s+YoUsYzVbyOY1lZZXklDFsgzM+q8=;
+        b=gZRvDol3uR65YuMJN3abiBnGjbM5oHEayztLY4XF2gFp0QmF//ymJ6s5iT552jTAgI
+         JShbeBgS5ikMka7lEbZipi49ZVDqwgtD0s6H0nlHhk06cs5/h+hIRI3ps8Wj1kvU5R1c
+         8P6csR8qx2M5hPFiRfFXWu96V+lZte+6v3P5BSPbO/ljVem+ubJqThouZ0w0dqg3DjMT
+         +XGTTUuhzDxloA2ZOOU3JcZ/Vvs7XXcc3YgzLBvSmS1xGfkrh7e1PvPGqwos/6QlcvH9
+         PUmnySqraHwV5p4tATyWidZom3dKUVHrWeBEIWeTWUAGCigvE+/4B9fEYodBvL3CCxtG
+         qMiA==
+X-Gm-Message-State: AC+VfDxMUvc7vk4Jw5uENcVAZGyG+kenbix06NWgDtPakj3ehmq2e+o9
+        7aac8UuRIci2AMuEw6604uQ=
+X-Google-Smtp-Source: ACHHUZ5MGzKxtvYSlYVjd4gNhfy3M9efxfUCxfIyKUF5qgT9EhwrcnKmlKXDRchGHuJvkvT0uVAgng==
+X-Received: by 2002:a05:6a20:914e:b0:10f:500b:18a2 with SMTP id x14-20020a056a20914e00b0010f500b18a2mr1325854pzc.48.1685426699465;
+        Mon, 29 May 2023 23:04:59 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id gw8-20020a17090b0a4800b00256b67208b1sm638072pjb.56.2023.05.29.23.04.55
+        by smtp.gmail.com with ESMTPSA id gw8-20020a17090b0a4800b00256b67208b1sm638072pjb.56.2023.05.29.23.04.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 May 2023 23:04:56 -0700 (PDT)
+        Mon, 29 May 2023 23:04:59 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v6 06/10] KVM: x86/pmu: Forget PERFCTR_CORE if the min num of counters isn't met
-Date:   Tue, 30 May 2023 14:04:19 +0800
-Message-Id: <20230530060423.32361-7-likexu@tencent.com>
+Subject: [PATCH v6 07/10] KVM: x86/pmu: Constrain the num of guest counters with kvm_pmu_cap
+Date:   Tue, 30 May 2023 14:04:20 +0800
+Message-Id: <20230530060423.32361-8-likexu@tencent.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230530060423.32361-1-likexu@tencent.com>
 References: <20230530060423.32361-1-likexu@tencent.com>
@@ -74,46 +74,30 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-A sanity check on the number of counters enumerated by perf is added.
-PERFCTR_CORE support is explicitly dropped if the min number isn't met.
-E.g. if KVM needs 6 counters and perf says there are 4, then something
-is wrong and enumerating 6 to a guest is only going to cause more issues.
-
-Opportunistically, the kvm_cpu_cap_check_and_set() is applied to simplify
-the host check before setting the PERFCTR_CORE flag.
+A sanity check is added to limit the number of AMD guest counters,
+which help avoid a situation if KVM only has access to 4 counters, but
+user space sets guest X86_FEATURE_PERFCTR_CORE anyways.
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/svm/svm.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/pmu.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index ca32389f3c36..d9669e3cc00a 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -5025,9 +5025,18 @@ static __init void svm_set_cpu_caps(void)
- 	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
- 		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
+diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+index e5c69062a909..c03958063a76 100644
+--- a/arch/x86/kvm/svm/pmu.c
++++ b/arch/x86/kvm/svm/pmu.c
+@@ -170,6 +170,9 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
+ 	else
+ 		pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS;
  
--	/* AMD PMU PERFCTR_CORE CPUID */
--	if (enable_pmu && boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
--		kvm_cpu_cap_set(X86_FEATURE_PERFCTR_CORE);
-+	if (enable_pmu) {
-+		/*
-+		 * Enumerate support for PERFCTR_CORE if and only if KVM has
-+		 * access to enough counters to virtualize "core" support,
-+		 * otherwise limit vPMU support to the legacy number of counters.
-+		 */
-+		if (kvm_pmu_cap.num_counters_gp < AMD64_NUM_COUNTERS_CORE)
-+			kvm_pmu_cap.num_counters_gp = min(AMD64_NUM_COUNTERS,
-+							  kvm_pmu_cap.num_counters_gp);
-+		else
-+			kvm_cpu_cap_check_and_set(X86_FEATURE_PERFCTR_CORE);
-+	}
- 
- 	/* CPUID 0x8000001F (SME/SEV features) */
- 	sev_set_cpu_caps();
++	pmu->nr_arch_gp_counters = min_t(unsigned int, pmu->nr_arch_gp_counters,
++					 kvm_pmu_cap.num_counters_gp);
++
+ 	pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << 48) - 1;
+ 	pmu->reserved_bits = 0xfffffff000280000ull;
+ 	pmu->raw_event_mask = AMD64_RAW_EVENT_MASK;
 -- 
 2.40.1
 
