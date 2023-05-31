@@ -2,120 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F621717DE2
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 13:18:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B18B717E26
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 13:36:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235471AbjEaLSs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 07:18:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34456 "EHLO
+        id S234902AbjEaLgG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 07:36:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235544AbjEaLSo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 07:18:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CD1C1B0
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 04:17:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685531865;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3T2nAmOrVmwcKXZ6sK7jHxoUUbFeEl+9AVbRgRYZ+/4=;
-        b=eZKaeJBu5aS5nCa7NW1SvEH3BimNj2qmXGrx4Hj7EWe9QMbNOx+IDaaXib3mU5N7zCFCYH
-        wFnyxZ2NNKLThnR+t7y7F+RTZIazTxnNs5jW/RnQtqs9Gj3/09ZfveoOoJwvQErY9+Ti6f
-        P31OX69+7776pik8GHtwBXZ7kK4120k=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-621-1Q0KBTGbOnK1y7m6DnSD4g-1; Wed, 31 May 2023 07:17:43 -0400
-X-MC-Unique: 1Q0KBTGbOnK1y7m6DnSD4g-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-3f5df65fa35so25575465e9.3
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 04:17:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685531862; x=1688123862;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3T2nAmOrVmwcKXZ6sK7jHxoUUbFeEl+9AVbRgRYZ+/4=;
-        b=BUfgmYmwLzBEtmD1EiGCU5hGLVJ0gsYBj9gKaj9hpDGvuJ4Oh/pMruGqQG9xK4G+pe
-         k9kgSznsGv8UUbthYOBJCsp3iMoSn3oAjdYn4e9YqEbey3bnPhn0vcj+WvnNZ6cCTZNS
-         uypb/uUSWmOOOj9hP5ijcfWcxpuuhZKUvk7mb8Tib7iRm3v9CzDh/zp6fm70/NDqXYHe
-         /XB+n3SemLWGw+7dO5uZiyf5SK/DwPUQejTqSK6JxrUTPke4salhweQg18oc2RVU2vGf
-         nSgoP5KNqKlhJErMyCDvohamwcyEuG1lllXbVeTWutIR+47T34QfgsJPlTOuE2D5r4F6
-         8/Xw==
-X-Gm-Message-State: AC+VfDz8ptCMe2X2UrTXP0DXz1df2g5KD6JfBN+it3tm49LvXburJNLh
-        rmRLHt+CyEuCzw3Aq4Mnv59sUXlP8hi6ap0PiKXSdABBvrFROCPXJ48rotHfdx5MeaZ+xpCPUc6
-        +TRgMKkj5At2x
-X-Received: by 2002:a05:600c:2150:b0:3f6:e59:c04c with SMTP id v16-20020a05600c215000b003f60e59c04cmr4328169wml.24.1685531862833;
-        Wed, 31 May 2023 04:17:42 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6wYQ7AnW0Wf8Dqmh35rHKhfQbb3NA2hCURHLgqKb9xwnuVEQb92wXEeryHObSYyBuM7U3A3A==
-X-Received: by 2002:a05:600c:2150:b0:3f6:e59:c04c with SMTP id v16-20020a05600c215000b003f60e59c04cmr4328163wml.24.1685531862574;
-        Wed, 31 May 2023 04:17:42 -0700 (PDT)
-Received: from [192.168.0.3] (ip-109-43-178-4.web.vodafone.de. [109.43.178.4])
-        by smtp.gmail.com with ESMTPSA id q25-20020a7bce99000000b003f4268f51f5sm20577594wmj.0.2023.05.31.04.17.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 May 2023 04:17:42 -0700 (PDT)
-Message-ID: <66a9a0da-30c0-2894-5a57-c746af48a4ea@redhat.com>
-Date:   Wed, 31 May 2023 13:17:40 +0200
+        with ESMTP id S230341AbjEaLgF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 07:36:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D2C5B2;
+        Wed, 31 May 2023 04:36:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CE54E639EB;
+        Wed, 31 May 2023 11:36:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEED4C433EF;
+        Wed, 31 May 2023 11:35:59 +0000 (UTC)
+Date:   Wed, 31 May 2023 12:35:57 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Marc Zyngier <maz@kernel.org>, ankita@nvidia.com,
+        alex.williamson@redhat.com, naoya.horiguchi@nec.com,
+        oliver.upton@linux.dev, aniketa@nvidia.com, cjia@nvidia.com,
+        kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
+        acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
+        danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH v3 1/6] kvm: determine memory type from VMA
+Message-ID: <ZHcxHbCb439I1Uk2@arm.com>
+References: <20230405180134.16932-1-ankita@nvidia.com>
+ <20230405180134.16932-2-ankita@nvidia.com>
+ <86r0spl18x.wl-maz@kernel.org>
+ <ZDarrZmLWlA+BHQG@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [kvm-unit-tests PATCH v1] runtime: don't run pv-host tests when
- gen-se-header is unavailable
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, pbonzini@redhat.com,
-        andrew.jones@linux.dev, david@redhat.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20230531103227.1385324-1-nrb@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230531103227.1385324-1-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZDarrZmLWlA+BHQG@nvidia.com>
+X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/05/2023 12.32, Nico Boehr wrote:
-> When the gen-se-header tool is not given as an argument to configure,
-> all tests which act as a PV host will not be built by the makefiles.
+On Wed, Apr 12, 2023 at 10:01:33AM -0300, Jason Gunthorpe wrote:
+> On Wed, Apr 12, 2023 at 01:43:26PM +0100, Marc Zyngier wrote:
+> > What makes it safe? How does VFIO ensures that the memory type used is
+> > correct in all circumstances? This has to hold for *ANY* device, not
+> > just your favourite toy of the day. Nothing in this patch is horribly
+> > wrong, but the above question must be answered before we can consider
+> > any of this.
 > 
-> run_tests.sh will fail when a test binary is missing. This means
-> when we add the pv-host tests to unittest.cfg we will have FAILs when
-> gen-se-header is missing.
+> In VFIO we now have the concept of "variant drivers" which work with
+> specific PCI IDs. The variant drivers can inject device specific
+> knowledge into VFIO. In this series the driver injects the cachable
+> pgprot when it creates some of the VMAs because it knows the PCI IDs
+> it supports, parses the ACPI description, and knows for sure that the
+> memory it puts in the cachable VMA is linked with a cache coherent
+> interconnect.
 > 
-> Since it is desirable to have the tests in unittest.cfg, add a new group
-> pv-host which designates tests that act as a PV host. These will only
-> run if the gen-se-header tool is available.
-> 
-> The pv-host group is currently not used, but will be with Janoschs
-> series "s390x: Add PV SIE intercepts and ipl tests" here:
-> https://lore.kernel.org/all/20230502115931.86280-1-frankja@linux.ibm.com/
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   scripts/runtime.bash | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 07b62b0e1fe7..486dbeda8179 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -98,6 +98,11 @@ function run()
->           return
->       fi
->   
-> +    if [ -z "$GEN_SE_HEADER" ] && find_word "pv-host" "$groups"; then
-> +        print_result "SKIP" $testname "" "no gen-se-header available for pv-host test"
-> +        return
-> +    fi
+> The generic vfio-pci path is not changed, so 'any device' is not
+> relevant here.
+
+There were several off-list discussions, I'm trying to summarise my
+understanding here. This series aims to relax the VFIO mapping to
+cacheable and have KVM map it into the guest with the same attributes.
+Somewhat related past threads also tried to relax the KVM device
+pass-through mapping from Device_nGnRnE (pgprot_noncached) to Normal_NC
+(pgprot_writecombine). Those were initially using the PCIe prefetchable
+BAR attribute but that's not a reliable means to infer whether Normal vs
+Device is safe. Anyway, I think we'd need to unify these threads and
+come up with some common handling that can cater for various attributes
+required by devices/drivers. Therefore replying in this thread.
+
+Current status on arm64: vfio-pci user mapping (Qemu) of PCIe BARs is
+Device_nGnRnE. KVM also maps it at Stage 2 with the same attributes. The
+user mapping is fine since the VMM may not have detailed knowledge about
+how to safely map the BAR. KVM doesn't have such detailed knowledge
+either in the device pass-through case but for safety reasons it follows
+the same attributes as the user mapping.
+
+From a safety perspective, relaxing the KVM stage 2 mapping has some
+implications:
+
+1. It creates multiple memory aliases with different attributes.
+
+2. Speculative loads, unaligned accesses.
+
+3. Potentially new uncontained errors introduced by Normal NC vs Device
+   mappings.
+
+From the private discussions I had regarding point (3), Device doesn't
+really make any difference and it can be even worse. For example, Normal
+mappings would allow a contained error while Device would trigger an
+uncontained SError. So the only safe bet here is for the platform, root
+complex to behave properly when device pass-through is involved (e.g.
+PCIe to ignore writes, return 0xff on reads if there are errors). That's
+something Arm is working on to require in the BSA specs (base system
+architecture). Presumably cloud vendors allowing device pass-through
+already know their system well enough, no need for further policing in
+KVM (which it can't do properly anyway).
+
+As long as the errors are contained, point (2) becomes the
+responsibility of the guest, given its detailed knowledge of the device,
+using the appropriate attributes (whether x86 WC maps exactly onto arm64
+Normal NC is the subject of a separate discussion; so far that's the
+assumption we took in the arm64 kernel). Regarding vfio-pci, the user
+mapping must remain Device_nGnRnE on arm64 to avoid unexpected
+speculative loads.
+
+This leaves us with (1) and since the vfio-pci user mapping must remain
+Device, there's a potential mismatched alias if the guest maps the
+corresponding BAR as Normal NC. Luckily the Arm ARM constrains the
+hardware behaviour here to basically allowing the Device mapping in the
+VMM to behave somewhat the Normal NC mapping in the guest. IOW, the VMM
+loses the Device guarantees (non-speculation, ordering). That's not a
+problem for the device since the guest already deemed such mapping to be
+safe.
+
+While I think it's less likely for the VMM to access the same BAR that
+was mapped into the guest, if we want to be on the safe side from an ABI
+perspective (the returned mmap() now has different memory guarantees),
+we could make this an opt-in. That's pretty much the VMM stating that it
+is ok with losing some of the Device guarantees for the vfio-pci
+mapping. A question here is whether we want to this to be done at the
+vfio-pci level, the KVM memory slot or a big knob per VMM. Or whether we
+need to bother with this at all (if it's just theoretical, maybe we can
+have a global opt-out).
+
+Going back to this series, allowing Cacheable mapping in KVM has similar
+implications as above. (2) and (3) would be assumed safe by the platform
+vendors. Regarding (1), to avoid confusion, I would only allow it if FWB
+(force write-back) is present so that KVM can enforce a cacheable
+mapping at Stage 2 if the vfio variant driver also maps it as cacheable
+in user space.
+
+There were some other thoughts on only allowing different attributes in
+KVM if the user counterpart does not have any mapping (e.g. fd-based
+KVM memory slots). However, this won't work well with CXL-attached
+memory for example where the VMM may want access to it (e.g. virtio). So
+I wouldn't spend more thoughts on this.
 
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+The TL;DR summary of what I think we should do:
 
+a) Relax the KVM Stage 2 mapping for vfio-pci to Normal NC
+   (pgprot_writecombine). TBD whether we need a VMM opt-in is at the
+   vfio-pci level, KVM slot or per-VMM level. Another option is to do
+   this by default and have a global opt-out (cmdline). I don't think
+   the latter is such a bad idea since I find it unlikely for the VMM to
+   also touch the same PCIe BAR _and_ expect different memory ordering
+   guarantees than the guest device driver.
+
+b) Map the KVM stage 2 mapping as cacheable+FWB iff the VMM has a
+   corresponding cacheable mapping.
+
+Thoughts?
+
+-- 
+Catalin
