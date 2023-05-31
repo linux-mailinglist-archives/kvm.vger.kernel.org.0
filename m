@@ -2,336 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45524718754
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 18:28:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8058471875D
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 18:31:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229654AbjEaQ2U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 12:28:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53538 "EHLO
+        id S229684AbjEaQbB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 12:31:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229573AbjEaQ2S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 12:28:18 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B388798;
-        Wed, 31 May 2023 09:28:16 -0700 (PDT)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34VERXxD009437;
-        Wed, 31 May 2023 16:28:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : from : to : cc : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=N0oBKmF9mOIDzsHwBT2RTnpAXzj9dv9wuk/KR4n1jIs=;
- b=3BSLjPI1X/zcxmqReeft8w1+Lei2b27W+Am2qfV93YfcoaZjtVPnvF705chk0ixJoRi/
- LVynMmC/Yu9UP2iFiSrHjg/cqBpE4CltmKbS1OncdBJxyVonGnbhpUIWFed4zq1New1s
- W06Pv8y3CgN57DYmmVsd09ASwrBc3pvkhq4VAmxHAbxoO7RTP8675SD7uVxFi/BIuvFU
- /kE0zkfLJX/K8G+8TKK3DCkv78wausP8gxEZRBND9ZUiTZUOkk0FLbTLHiFr0SqEILIu
- 2/XLxvVN6j96vwhNLLANOtQaHW3PKRihKlXTPTEao7CR21/1sWils5MpGP9MIvme83Lj qw== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3qvhjkpbh4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 31 May 2023 16:27:17 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 34VFXfvP026076;
-        Wed, 31 May 2023 16:27:16 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2103.outbound.protection.outlook.com [104.47.58.103])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3qu8accr6v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 31 May 2023 16:27:16 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B840DYv8anILjXmwWKHPklFc1Aqn+/u2KgDWdqur5mhAofTtlXea7zS0r8ato/bX2Mo/aDt+5QuQXf22EVgCPi90d6BmZL6ZHmSXVqobMBnFTqrw+NbN/BgkIX5kH40m7NVDymDFVoZdhlcD3/+tDT4HCrcAnod4iarHmpofKgtw+3zpxgpkiZHjp0xe9wXCehUTTbHwnIGPQBfPY8Jo+6SywWQZRtuKUgRs3kUBQzf4J8lTZJN9kIouOBVggTZdgSW+Bk5xI/ocyNRMYjgCXwZTOaHX8xpQw0taT8agoJT9cm7ZGOv5Rh5lCav1esXRWpaGzUmPzPKiwJ1GWpVtZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N0oBKmF9mOIDzsHwBT2RTnpAXzj9dv9wuk/KR4n1jIs=;
- b=UuSc0ByI5VS3gs4Q6BGc8AIHASjw5mKFIfsRGJraOuZ6ZbiTpwtA2kQvL20wqbKNNqiKQh5G40OPTIxrknwFaxhKL/TdpsALM1G0yaX00iUxMuvvU149eaut/MxL7qwDeAFrRtNuPrpFzI3RXhhqBuGnnU/TlnkFq6dwJwb5D4dOofydRWEpwj7ND61Uc8NbONbMz9TYDfaw2uRoU8xbulChPnBp2UCfdwNtYJaXspL44Owwf5YzSMTh/DHUz2DynmaYAIpPgFv65QD3qYFTz+wVYIxgriCfWoqav1mEKg3lhlh1fYRHZUK59GKinaWANvYPnzSkCiP7vG7mTN5gDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        with ESMTP id S229502AbjEaQbA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 12:31:00 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09CC811F
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 09:30:58 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-556011695d1so105876827b3.1
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 09:30:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N0oBKmF9mOIDzsHwBT2RTnpAXzj9dv9wuk/KR4n1jIs=;
- b=aG5JDXB+eE1ToITrOtGXszTBvvQie2/1JGAyKLCLHyKTG5jlQ5XVkqXy1D+s7x/mzybkVUf5Qzb7KKYevwIYmGiDsTvINFNQc3Mz3wzvH/THaQGERr0D8qzvb45Imp4fLuzwMAXrSLlywUTrcFCtFHEidVfoPR5OtVrWZ7XUftk=
-Received: from CY8PR10MB7243.namprd10.prod.outlook.com (2603:10b6:930:7c::10)
- by DS7PR10MB5008.namprd10.prod.outlook.com (2603:10b6:5:3b1::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.23; Wed, 31 May
- 2023 16:27:14 +0000
-Received: from CY8PR10MB7243.namprd10.prod.outlook.com
- ([fe80::13d6:c3f3:2447:6559]) by CY8PR10MB7243.namprd10.prod.outlook.com
- ([fe80::13d6:c3f3:2447:6559%5]) with mapi id 15.20.6433.024; Wed, 31 May 2023
- 16:27:13 +0000
-Message-ID: <bbe697b6-dd9e-5a8d-21c5-315ab59f0456@oracle.com>
-Date:   Wed, 31 May 2023 11:27:12 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] general protection fault in
- vhost_work_queue
-From:   Mike Christie <michael.christie@oracle.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        syzbot <syzbot+d0d442c22fa8db45ff0e@syzkaller.appspotmail.com>,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org, stefanha@redhat.com
-References: <0000000000001777f605fce42c5f@google.com>
- <20230530072310-mutt-send-email-mst@kernel.org>
- <CAGxU2F7O7ef3mdvNXtiC0VtWiS2DMnoiGwSR=Z6SWbzqcrBF-g@mail.gmail.com>
- <CAGxU2F7HK5KRggiY7xnKHeXFRXJmqcKbjf3JnXC3mbmn9xqRtw@mail.gmail.com>
- <e4589879-1139-22cc-854f-fed22cc18693@oracle.com>
- <6p7pi6mf3db3gp3xqarap4uzrgwlzqiz7wgg5kn2ep7hvrw5pg@wxowhbw4e7w7>
- <035e3423-c003-3de9-0805-2091b9efb45d@oracle.com>
- <CAGxU2F5oTLY_weLixRKMQVqmjpDG_09yL6tS2rF8mwJ7K+xP0Q@mail.gmail.com>
- <43f67549-fe4d-e3ca-fbb0-33bea6e2b534@oracle.com>
-Content-Language: en-US
-In-Reply-To: <43f67549-fe4d-e3ca-fbb0-33bea6e2b534@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM6PR05CA0059.namprd05.prod.outlook.com
- (2603:10b6:5:335::28) To CY8PR10MB7243.namprd10.prod.outlook.com
- (2603:10b6:930:7c::10)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY8PR10MB7243:EE_|DS7PR10MB5008:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2112764b-fd59-45df-40ea-08db61f3e442
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gR1119R3H0mprnlkdSL6T1sZy5N46JmoVoWg3PwO3en3a44vcfJk91OCbCsUCzKGviUTTNGGBzn7Wuhkcv/UBZEqgg6cKZroLjoxfAOamw3bDv9gWB2IoKgr8sBbuugqiTY/VYerWWLIo269mWhGiBElsK34SOcmT1cUEiHFu52f2sCJ0lRWUDFOhM+FXGgwJWQKhz1MDUA80fENtdw8MF/umCjeaxreDE7K32onWdNCR7bb0wFezoW1tM7Weo8XU1XEVBR3guxJbpNoScwX6O+OjbZ0IlIKyI31pa/VKsHUaj1Mi3/b1hDnO8M8lRkxJIVx9W9TfGLPNiQfHiE0AooEte+L241E3Mxj95/40ZUdjQM+t3o3yuMl1fIGqxwefT2vn/W0JFYInkKYYhGtyvvwRcFJp2Cno23tFwHPsu/kzqV9vlYu5SCiea0s7d6w3BD0aQtdoiAt9W1wySUakfQXIcOHAxhJ+UUk4VdiaLoReiWksGvnm1tVVTmxvo1Xw3oJbgSn3cB8Isasf6Rt4yKpxQCnGbRJGaXrvtJuOpaKJQOWACynTr3SLw7OUgyIzZB8yE4qrCYB6ePd0FfGYwEaoyH4JTS5+WlBEZ2KvbjoUl9mXXsR+aw/ag0S+Km+7DA2Tr4bo34cNw2MuEkyhg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR10MB7243.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(396003)(346002)(39860400002)(376002)(366004)(451199021)(26005)(83380400001)(38100700002)(41300700001)(6486002)(186003)(53546011)(6512007)(31686004)(6506007)(2616005)(54906003)(478600001)(6916009)(66946007)(66476007)(66556008)(4326008)(316002)(86362001)(5660300002)(8936002)(8676002)(7416002)(31696002)(2906002)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MUE5QkJlL3dFWGlmdjhWSEdwUlpreW9HWFZaM2hWNXlGRlEwb2xJbnpCZ0g3?=
- =?utf-8?B?SVNiV3VPbnhtSysyaHljMlpDTThwMC9IVkF2eDZhbnZDdThGMDI5SkFkNDFR?=
- =?utf-8?B?UXVkMkpvcEVUc05ESTR4dHJGdW5abjY2TjYvWXZHak1yK1VqYTJnU2dvUUdk?=
- =?utf-8?B?Y1kwa3B6N2VqRGhya2ppN3ZUbGdDR0xlbSt6Z3c5RTdnSFN6VGV0WlZRaU5F?=
- =?utf-8?B?eFVTRG14NkNsUTFCRElFTllHdTFxUVJrVnhkd2k1V2lxZWliNmlGSUoyMXhN?=
- =?utf-8?B?Vk5vY2J4bStZRG8wUk1SbnllaWp4bEZ4dkZxOG9ES2FxVFZremdEMGtHVUs5?=
- =?utf-8?B?cm1WcUtuVzNGS01qUis5eE9RdkIwV3N0bGNNTnJzazVsUGZGOCtRakV3VEJD?=
- =?utf-8?B?ZmN2QXdTSHk3ODEvcHRVaGpQS2FHdENxRHNHQ08xMDc1Wnl0UHdKN2dETXpq?=
- =?utf-8?B?QW9HL1VtbzhtN1JOQ0Q3NlhvRlU4ZC9YLzVCMXBhNTBwOE5sTVU5NWc5dGtK?=
- =?utf-8?B?dkhSOGZpcG50NXJhVE8zM0ZUQS9EbUkrU1JKUTlEVG5UMmxwM0VyaWg2bzdp?=
- =?utf-8?B?NzVkYnJFRFpMSzlVQVRRbVFqMDUyQWp2amE0SStLWmM1WVRkOFIxazcwemtJ?=
- =?utf-8?B?MDBqQ3o0djE1UnFqUThabUVaeUlIYkVyTEFxNW02U1ZQTzlFT2txM0lOcysv?=
- =?utf-8?B?TUdMUkg3OFNSdzR1ODlBaktyUlkrcS85cWNTaXpTc0FMVWt4UTA1RDYzS2dF?=
- =?utf-8?B?UlNUQjFuYzFCd1pxWC9EdTRxVVpuR1JaTENteTVjRkNXUkcza0doTXhLcU9N?=
- =?utf-8?B?ZUF6bmZXNWgyMFlrSFVXWS9vcHVBdHFXRFoxbEpMcWpNZVhzdStZTjR6Ylg1?=
- =?utf-8?B?eUM5QWRpQkJtck1vdXF4NFRiVEVLNEYwb2VkM0FpZjI0c0ZIdTNsTk94TEVM?=
- =?utf-8?B?TjdaNFJxSVY1cnRyd3ZuM3VpNDJxMGRvTHdDclIwU3Q5Umo4NS9COC9EVHVP?=
- =?utf-8?B?WEkrak5RWldUazczSytuQldDU3hZTnRuUFVIcVhiUmNZcnJLQWlzSVVneXdB?=
- =?utf-8?B?YlI4VTZVa2hpRFdrdGhleEczYjgwVWliQlpuYTM4WTZJTytuK2ZMUlBRK1dE?=
- =?utf-8?B?VWxodSs1UC9TYVRra3ZmNmtkc201Um8xcGJQY0RIUkxiU0JJTTFLTHgxMzVJ?=
- =?utf-8?B?VzVkS1M5dFkxbktxQnk5cU1Tb29mUUszQzU3SnhBVE9Kd1hiZXoyVkRUUlZJ?=
- =?utf-8?B?NUdnMmYyKzlXRnRvb1k5U1FSUjErenUvcEN1K0s4aGdxbERzNWVvQUZoaS9M?=
- =?utf-8?B?eSt4aFJhUnllOUgxUFpQZFdjQTA1cVNRZTRNajFVS24wMVhmSVJaSDgzNmNO?=
- =?utf-8?B?MzV2M2dhOXBhbWVjYXpFRHB4TktLZjJyN2NQazMzUnNRaUVmWmd4eUUzWkJM?=
- =?utf-8?B?aE5OTWdSR0NWeXlxZTNzWXl3MmZNYnNQMFZNWlA3TEhqSGtBeUZRQnNPN3VW?=
- =?utf-8?B?Q3BEb0JRcGF1cXlxVUtpc051MkVwNjRlQXdWZmNEa1JsUHdFWUpHejZ1MFYv?=
- =?utf-8?B?U2Q3cUh6YnZaaTNieDVlY0MyUFFWN2src2w2M3Q0SExLOXRvaWxCU0tIOFVG?=
- =?utf-8?B?ak1QU1ZIWXJyMDhBK29Nd3ZXbUVUOGxCNjFXRUtYNzVqamxUMjA1cnhrVG1o?=
- =?utf-8?B?M3JBRk5LUnZxOHdjNDV4QkNISDZMVnZSY2ZIbTB0S21Galg5UHFGQ0l4K3l0?=
- =?utf-8?B?VENDSmNaWWdkQlZhdm9xSTl3UmlhZm54OCt2d2lzSzFkb292WnE0bFBQWmNx?=
- =?utf-8?B?TjZOeVVvb0xuUzlJaEszTndZNzZCd2RoRVd5MjNXQ21oc0pLVkV6ZWlmM0p5?=
- =?utf-8?B?SzZSaWkzVTdlWEJ3eTRBTHM4YnNlbTViRnd4MlRwNXNqeWtPVnhvc3hURlAx?=
- =?utf-8?B?dTljcUhWNkRjOVVvRkRjZnBwSk5lV254Ym01RExreVVxRWNiUFo1YWZBSkM3?=
- =?utf-8?B?d1E1cVFvSVM5MWVkbEQzaVJRbFFsOVVtblkvRE1acHRNRjJyaUU1ZUxRZmhl?=
- =?utf-8?B?OS9ackNObHRRSHJmRWJTTUtRdGRYR1gzZnZ0ZmtwYUtlbTI3VXhIcGNCVnk4?=
- =?utf-8?B?Qm9iQmNXNDZjWWNPaVRYeUtqY0ZORExjZ09zdklFZXgwYVhTajFITlFyWXJK?=
- =?utf-8?B?S3c9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?NDdobHc4ckZqcHdEWFdxSHFiR1NQMFhsa05GY2VFRzFTREk2cytYMTVaZXZ1?=
- =?utf-8?B?VDI2elpFb25QUm5sU0lJMkJLK1RlUklWajR2bWFSMTJ3dTRFL0JQK0hTaXFi?=
- =?utf-8?B?MzZhV1dxTmVRVWxDWVVYTlZwUThoaUQrTEVMWk1GM3hwVmZQL2ZHS3dRZW5B?=
- =?utf-8?B?SnVwNXlYVUN3YTRzdHU4M1gwWXIvRnVMRzM4T29ya1dSdmFPcEZjQnhJcUla?=
- =?utf-8?B?ZFRabmh1WnEwWlp0emNoT1IvYWdkSk05NFJNd0tpam5HWHhKbU5Gait0cHFs?=
- =?utf-8?B?cHZzdnVvdTVabHRneTR4N0s1b3p2a3FRalk1RGhtL0huSUMrSmtqL1ZJU3lM?=
- =?utf-8?B?KzJqbHE2ZGNJbzdXY2lQREZmcVhGa01YVkplYkJMR3NhL205TVNYWDhsVHJv?=
- =?utf-8?B?alZNeStadDJ0ZlBCVWROTnR6S1ZYWTIxaG5kY0VxMEExWndkNXVLeGc1a2Nj?=
- =?utf-8?B?QUxMSUVKSHV1RVltRy9OVm5yRVRQOWF4Ym9nUHhGcE91OHdZUDdrS1NCcllS?=
- =?utf-8?B?SExueXBxWUtvS2w2QVZpVUpaeU9NZm10NWpyRlJKSXZzZnFuOEkrcUVFQjI4?=
- =?utf-8?B?NWVHemxFQW9JdFF4NGFJUVpQOVN0V0FBMEVSSVFjNHljNFd3ZkJIMmVUMkhz?=
- =?utf-8?B?Rlh3RXFjQk8vTGYrRGdTSko0WEV6a2FRTXdFVS9KYnR5NHhCZDlSUmU0dEpZ?=
- =?utf-8?B?S1FkZitpNkExQTU4bWU4Y1VhR1lqd3M0aUdldTJmbndZSnVSM1p3NVJja2RH?=
- =?utf-8?B?T3JERHFvRHpKMVU2VERlVnZBVk9NQnhjaDZWcDUxakZNV2trZEVnZVljOGI1?=
- =?utf-8?B?WXVWcjhNZVViTFJDdzkrbUxuZ1NJKzU2T2N1SENNNTdRL2dkY1gxRWtwQ1RQ?=
- =?utf-8?B?MlltYkN3VWdXWUp3V0dQL3N1alkxK0s1M0lCR01jejZZRGdwQk0zcml2QnFi?=
- =?utf-8?B?S1ZVQi80allaazhwN05lQnEyVWJsTTZiUDhGSnI4VWJKU0RaaWhkOUV1VFFa?=
- =?utf-8?B?ZlJaZGJFRjVwQnE1OXdtQXg1REloZjhSWTMwSXlKYjhFWGxVd3lFKy9IY3Ex?=
- =?utf-8?B?WWNQSWMwN1dkY3F1MFNwMkJpSUhVMGE2MzhKQ1I3eHVYOS9IM3RTaDdkUlNJ?=
- =?utf-8?B?T2FPc3RSTStwSHpLeCtNei9jZ0VVbjlDdXpRZE5pQWpzRVVSN3Vnb3hmWXlR?=
- =?utf-8?B?ckZYYmQvbjJhbUhaamlJK0tMMXJqN3lhV0EvdnhsQmlHRE45RTRGWVg4ZVk0?=
- =?utf-8?B?a0JmVlEzMGhwVUNsK2pSSjhVWG1ZUmNaNUNQdFRPTGwxYUpNS0VHNkNneFZB?=
- =?utf-8?Q?YS6F3GTDaGSis=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2112764b-fd59-45df-40ea-08db61f3e442
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR10MB7243.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2023 16:27:13.8844
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: srN9aOIFf2Y9ZBUmJf0uUZtXh08ZHFqAn4fNgMDEaKzNwfbizZ/3N3iRsGvlHxSL0Ur3jmaiv7s8VwYUDxKq7TdDCSVRqOC1bncFl3cTguc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5008
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-31_11,2023-05-31_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 phishscore=0 spamscore=0
- adultscore=0 mlxlogscore=999 bulkscore=0 malwarescore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2304280000
- definitions=main-2305310140
-X-Proofpoint-ORIG-GUID: FWnCyAIaiNzu2Eszgb8D0ZWOkTvVyZyB
-X-Proofpoint-GUID: FWnCyAIaiNzu2Eszgb8D0ZWOkTvVyZyB
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        d=google.com; s=20221208; t=1685550657; x=1688142657;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4oMPwuBewXzucRhAy2k91jt6FR1Q3W1PQo5GZNd6lqM=;
+        b=ryeCZ321lBNpiYoS40S71CMHh8oGv0krJKIZpmIGsRIe+xGkwcAHYnzd9/aT6BnPjG
+         gaiFm7JRSiNpBjcX+wc1xbIiR6Nv5swrk3nawefNF3b/5dbY6OGYqJ+F2BxfxTYUyd6v
+         D6mf8CgTUcPhO15w70n9pgY36xb5L2RSXnfymapJLr3enxB9Cwr7TCYP9QAM3Wx4enBT
+         cmDWCxlbMpEaj0zNJ5C992qVuWpncecoglFbvm+Hj4HDMi8KYlgoqpBM2QKVwxk6ui15
+         qATljkSrWZcTGytOWYTwM9y7jUIFK9JzCGI4og+UAoZP4VUJmQk25c/1HVxPYepTTTIR
+         FV/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685550657; x=1688142657;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4oMPwuBewXzucRhAy2k91jt6FR1Q3W1PQo5GZNd6lqM=;
+        b=bEcKW8WAd8Zzf011klCDLVfcJhuFjqK3pzI/RKn0hadvXBjTIiKL14+I3ostO28m6V
+         nfY1L7ATfQrlLDMVdEfhsIv11OO0uoAAOsmKvjUdQBW96alMTtPB5zClPRhQgf/6NffL
+         5mng8/pQqxse5kY63pmXCB4a63hDEcqfi8BUoOnJyS1ZFFLIrLGzHQZ2NBQVX78TtqtQ
+         5y6a5flccUgDlQvvGltRbBHaz8LgMQSXhqc3XwlS4ocbomXlCrNAy7CWA2ghSS3ze75R
+         n3tMpYzh0OTlyF3MkNEkqGABTxWh7t6Hi+FKARF3RBYuZvwT8+a7Ph39Sip8BC76/fk0
+         6V7w==
+X-Gm-Message-State: AC+VfDwHWHNRA5GAawsyf9q9FsaSk1BfNrDY1JG0413jX6hQK5/JlbTD
+        54HXvUkaNgVGZFxeugTNlxOnbvdZKIc=
+X-Google-Smtp-Source: ACHHUZ6X8s1Ux+vAT7l47i65NzVwjyLzkDLJAboaHZnpw10xH1dcOU12nASDui2gP5eCl+mciulXyOP22sY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:b70c:0:b0:561:8e86:9818 with SMTP id
+ v12-20020a81b70c000000b005618e869818mr3513805ywh.7.1685550657211; Wed, 31 May
+ 2023 09:30:57 -0700 (PDT)
+Date:   Wed, 31 May 2023 09:30:55 -0700
+In-Reply-To: <F4AFC5EE-9967-4117-BA85-ED82C106575C@nutanix.com>
+Mime-Version: 1.0
+References: <20230530200152.18961-1-jon@nutanix.com> <2a6502e3-ba87-0355-af09-825e8467b81f@intel.com>
+ <F4AFC5EE-9967-4117-BA85-ED82C106575C@nutanix.com>
+Message-ID: <ZHd2P6D142rCByrm@google.com>
+Subject: Re: [PATCH] x86/fpu/xstate: clear XSAVE features if DISABLED_MASK set
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jon Kohler <jon@nutanix.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Kyle Huey <me@kylehuey.com>,
+        "neelnatu@google.com" <neelnatu@google.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/31/23 10:15 AM, Mike Christie wrote:
->>> rcu would work for your case and for what Jason had requested.
->> Yeah, so you already have some patches?
->>
->> Do you want to send it to solve this problem?
->>
-> Yeah, I'll break them out and send them later today when I can retest
-> rebased patches.
-> 
+On Wed, May 31, 2023, Jon Kohler wrote:
+>=20
+> > On May 30, 2023, at 6:22 PM, Dave Hansen <dave.hansen@intel.com> wrote:
+> >=20
+> > On 5/30/23 13:01, Jon Kohler wrote:
+> > Is that the only problem?  kvm_load_guest_xsave_state() seems to have
+> > some #ifdef CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS code and I can't
+> > imagine that KVM guests can even use PKRU if this code is compiled out.
 
-Just one question. Do you core vhost developers consider RCU more complex
-or switching to READ_ONCE/WRITE_ONCE? I am asking because for this immediate
-regression fix we could just switch to the latter like below to just fix
-the crash if we think that is more simple.
+...
 
-I think RCU is just a little more complex/invasive because it will have the
-extra synchronize_rcu calls.
+> >> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate=
+.c
+> >> index 0bab497c9436..211ef82b53e3 100644
+> >> --- a/arch/x86/kernel/fpu/xstate.c
+> >> +++ b/arch/x86/kernel/fpu/xstate.c
+> >> @@ -798,7 +798,8 @@ void __init fpu__init_system_xstate(unsigned int l=
+egacy_size)
+> >> 		unsigned short cid =3D xsave_cpuid_features[i];
+> >>=20
+> >> 		/* Careful: X86_FEATURE_FPU is 0! */
+> >> -		if ((i !=3D XFEATURE_FP && !cid) || !boot_cpu_has(cid))
+> >> +		if ((i !=3D XFEATURE_FP && !cid) || !boot_cpu_has(cid) ||
+> >> +		    DISABLED_MASK_BIT_SET(cid))
+> >> 			fpu_kernel_cfg.max_features &=3D ~BIT_ULL(i);
+> >> 	}
+> >=20
+> > I _think_ I'd rather this just be cpu_feature_enabled(cid) rather than
+> > using DISABLED_MASK_BIT_SET() directly.
 
++1, xstate.c uses cpu_feature_enabled() all over the place, and IMO effecti=
+vely
+open coding cpu_feature_enabled() yields less intuitive code.
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index a92af08e7864..03fd47a22a73 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -235,7 +235,7 @@ void vhost_dev_flush(struct vhost_dev *dev)
- {
- 	struct vhost_flush_struct flush;
- 
--	if (dev->worker) {
-+	if (READ_ONCE(dev->worker.vtsk)) {
- 		init_completion(&flush.wait_event);
- 		vhost_work_init(&flush.work, vhost_flush_work);
- 
-@@ -247,7 +247,9 @@ EXPORT_SYMBOL_GPL(vhost_dev_flush);
- 
- void vhost_work_queue(struct vhost_dev *dev, struct vhost_work *work)
- {
--	if (!dev->worker)
-+	struct vhost_task *vtsk = READ_ONCE(dev->worker.vtsk);
-+
-+	if (!vtsk)
- 		return;
- 
- 	if (!test_and_set_bit(VHOST_WORK_QUEUED, &work->flags)) {
-@@ -255,8 +257,8 @@ void vhost_work_queue(struct vhost_dev *dev, struct vhost_work *work)
- 		 * sure it was not in the list.
- 		 * test_and_set_bit() implies a memory barrier.
- 		 */
--		llist_add(&work->node, &dev->worker->work_list);
--		wake_up_process(dev->worker->vtsk->task);
-+		llist_add(&work->node, &dev->worker.work_list);
-+		wake_up_process(vtsk->task);
- 	}
- }
- EXPORT_SYMBOL_GPL(vhost_work_queue);
-@@ -264,7 +266,7 @@ EXPORT_SYMBOL_GPL(vhost_work_queue);
- /* A lockless hint for busy polling code to exit the loop */
- bool vhost_has_work(struct vhost_dev *dev)
- {
--	return dev->worker && !llist_empty(&dev->worker->work_list);
-+	return !llist_empty(&dev->worker.work_list);
- }
- EXPORT_SYMBOL_GPL(vhost_has_work);
- 
-@@ -468,7 +470,7 @@ void vhost_dev_init(struct vhost_dev *dev,
- 	dev->umem = NULL;
- 	dev->iotlb = NULL;
- 	dev->mm = NULL;
--	dev->worker = NULL;
-+	memset(&dev->worker, 0, sizeof(dev->worker));
- 	dev->iov_limit = iov_limit;
- 	dev->weight = weight;
- 	dev->byte_weight = byte_weight;
-@@ -542,46 +544,38 @@ static void vhost_detach_mm(struct vhost_dev *dev)
- 
- static void vhost_worker_free(struct vhost_dev *dev)
- {
--	struct vhost_worker *worker = dev->worker;
-+	struct vhost_task *vtsk = READ_ONCE(dev->worker.vtsk);
- 
--	if (!worker)
-+	if (!vtsk)
- 		return;
- 
--	dev->worker = NULL;
--	WARN_ON(!llist_empty(&worker->work_list));
--	vhost_task_stop(worker->vtsk);
--	kfree(worker);
-+	vhost_task_stop(vtsk);
-+	WARN_ON(!llist_empty(&dev->worker.work_list));
-+	WRITE_ONCE(dev->worker.vtsk, NULL);
- }
- 
- static int vhost_worker_create(struct vhost_dev *dev)
- {
--	struct vhost_worker *worker;
- 	struct vhost_task *vtsk;
- 	char name[TASK_COMM_LEN];
- 	int ret;
- 
--	worker = kzalloc(sizeof(*worker), GFP_KERNEL_ACCOUNT);
--	if (!worker)
--		return -ENOMEM;
--
--	dev->worker = worker;
--	worker->kcov_handle = kcov_common_handle();
--	init_llist_head(&worker->work_list);
-+	dev->worker.kcov_handle = kcov_common_handle();
-+	init_llist_head(&dev->worker.work_list);
- 	snprintf(name, sizeof(name), "vhost-%d", current->pid);
- 
--	vtsk = vhost_task_create(vhost_worker, worker, name);
-+	vtsk = vhost_task_create(vhost_worker, &dev->worker, name);
- 	if (!vtsk) {
- 		ret = -ENOMEM;
- 		goto free_worker;
- 	}
- 
--	worker->vtsk = vtsk;
-+	WRITE_ONCE(dev->worker.vtsk, vtsk);
- 	vhost_task_start(vtsk);
- 	return 0;
- 
- free_worker:
--	kfree(worker);
--	dev->worker = NULL;
-+	WRITE_ONCE(dev->worker.vtsk, NULL);
- 	return ret;
- }
- 
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index 0308638cdeee..305ec8593d46 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -154,7 +154,7 @@ struct vhost_dev {
- 	struct vhost_virtqueue **vqs;
- 	int nvqs;
- 	struct eventfd_ctx *log_ctx;
--	struct vhost_worker *worker;
-+	struct vhost_worker worker;
- 	struct vhost_iotlb *umem;
- 	struct vhost_iotlb *iotlb;
- 	spinlock_t iotlb_lock;
+And on the KVM side, we can and should replace the #ifdef with cpu_feature_=
+enabled()
+(I'll post a patch), as modern compilers are clever enough to completely op=
+timize
+out the code when CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS=3Dn.  At that poi=
+nt, using
+cpu_feature_enabled() in both KVM and xstate.c will provide a nice bit of s=
+ymmetry.
 
+Caveat #1: cpu_feature_enabled() has a flaw that's relevant to this code: i=
+n the
+unlikely scenario that the compiler doesn't resolve "cid" to a compile-time
+constant value, cpu_feature_enabled() won't query DISABLED_MASK_BIT_SET(). =
+ I don't
+see any other use of cpu_feature_enabled() without a hardcoded X86_FEATURE_=
+*, and
+the below compiles with my config, so I think/hope we can just require a co=
+mpile-time
+constant when using cpu_feature_enabled().
+
+diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufe=
+ature.h
+index ce0c8f7d3218..886200fbf8d9 100644
+--- a/arch/x86/include/asm/cpufeature.h
++++ b/arch/x86/include/asm/cpufeature.h
+@@ -141,8 +141,11 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
+  * supporting a possible guest feature where host support for it
+  * is not relevant.
+  */
+-#define cpu_feature_enabled(bit)       \
+-       (__builtin_constant_p(bit) && DISABLED_MASK_BIT_SET(bit) ? 0 : stat=
+ic_cpu_has(bit))
++#define cpu_feature_enabled(bit)                               \
++({                                                             \
++       BUILD_BUG_ON(!__builtin_constant_p(bit));               \
++       DISABLED_MASK_BIT_SET(bit) ? 0 : static_cpu_has(bit);   \
++})
+=20
+ #define boot_cpu_has(bit)      cpu_has(&boot_cpu_data, bit)
+=20
+Caveat #2: Using cpu_feature_enabled() could subtly break KVM, as KVM adver=
+tises
+support for features based on boot_cpu_data.  E.g. if a feature were disabl=
+ed by
+Kconfig but present in hardware, KVM would allow the guest to use the featu=
+re
+without properly context switching the data.  PKU isn't problematic because=
+ KVM
+explicitly gates PKU on boot_cpu_has(X86_FEATURE_OSPKE), but KVM learned th=
+at
+lesson the hard way (see commit c469268cd523, "KVM: x86: block guest protec=
+tion
+keys unless the host has them enabled").  Exposing a feature that's disable=
+d in
+the host isn't completely absurd, e.g. KVM already effectively does this fo=
+r MPX.
+The only reason using cpu_feature_enabled() wouldn't be problematic for MPX=
+ is
+because there's no longer a Kconfig for MPX.
+
+I'm totally ok gating xfeature bits on cpu_feature_enabled(), but there sho=
+uld be
+a prep patch for KVM to clear features bits in kvm_cpu_caps if the correspo=
+nding
+XCR0/XSS bit is not set in the host.  If KVM ever wants to expose an xstate=
+ feature
+(other than MPX) that's disabled in the host, then we can revisit
+fpu__init_system_xstate().  But we need to ensure the "failure" mode is tha=
+t
+KVM doesn't advertise the feature, as opposed to advertising a feature with=
+out
+without context switching its data.
+
+> > But, I guess this probably also isn't a big deal for _most_ people.  An=
+y
+> > sane distro kernel will just set CONFIG_X86_INTEL_MEMORY_PROTECTION_KEY=
+S
+> > since it's pretty widespread on modern CPUs and works across Intel and
+> > AMD now.
+>=20
+> Ack, I=E2=80=99m using PKU as the key example here, but looking forward t=
+his is more of a
+> correctness thing than anything else. If for any reason, any xsave featur=
+e is disabled
+> In the way that PKU is disabled, it will slip thru the cracks.
+
+I'd be careful about billing this as a correctness thing.  See above.
