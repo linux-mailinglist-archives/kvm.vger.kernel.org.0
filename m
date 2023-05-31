@@ -2,115 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1222B717A76
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 10:45:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0A84717A8C
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 10:47:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234726AbjEaIpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 04:45:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33040 "EHLO
+        id S235179AbjEaIrK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 04:47:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235070AbjEaIoi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 04:44:38 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C865610B
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 01:44:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685522666; x=1717058666;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=KkICQLUL0N6wno1F6DhwOg202/VMAVLCyaivtde70OQ=;
-  b=ICFXwmleUNZq8CFO/Hw5uV5e1xCKhPhWTlzi1Nj1745KsLIaMn8rZZo2
-   TYYV0ljMp1TWMDzWM7qckMPK9HCRhudcTFmoyPfjeEvsz1dFeRQ4yQrn0
-   VtKaPe/Vfen6bzPUfCmL7yaHYS0C0fYIrrw8LMUwCenfX5SEU7YS5ZDfX
-   KRiltcb+mLpcpuKvfOkC0glYj0OpWlRso+mP73UyGhLK1fIHGuLHkU1dK
-   Jedzai5n5Et119VdnJlTjj+3saWoBlYv3IUxq+DebpGEtWcQuAmIFpuhK
-   rH/yZxkllvc1h7FjiMrf+uAkeZ0v1p6/269a49665+K5Q93FSvRbxtJ9z
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10726"; a="418669325"
-X-IronPort-AV: E=Sophos;i="6.00,205,1681196400"; 
-   d="scan'208";a="418669325"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2023 01:43:32 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10726"; a="1036956500"
-X-IronPort-AV: E=Sophos;i="6.00,205,1681196400"; 
-   d="scan'208";a="1036956500"
-Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
-  by fmsmga005.fm.intel.com with ESMTP; 31 May 2023 01:43:30 -0700
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Chenyi Qiang <chenyi.qiang@intel.com>, lei4.wang@intel.com
-Subject: [PATCH v4 8/8] target/i386/intel-pt: Access MSR_IA32_RTIT_ADDRn based on guest CPUID configuration
-Date:   Wed, 31 May 2023 04:43:11 -0400
-Message-Id: <20230531084311.3807277-9-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230531084311.3807277-1-xiaoyao.li@intel.com>
-References: <20230531084311.3807277-1-xiaoyao.li@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S235082AbjEaIql (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 04:46:41 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8EB9125;
+        Wed, 31 May 2023 01:46:30 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5D91863852;
+        Wed, 31 May 2023 08:46:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC363C4339B;
+        Wed, 31 May 2023 08:46:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685522789;
+        bh=JMuzqmUBJoA/r5J0yK+sZwXSCkPl1O+bxFArwcnvsW0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=fDIwkCIj5dA38T2YdLDzsOvIZHNL6F8EXwkkFaKnevX4oe6gQsFkc+LVPhVu2rpTE
+         ZvHE8ISZCUhzsCQoyWDGDaboDQXQD+zyJIf4vNYmFvR7ra/26EuOo6BCBbZT6r82ob
+         2FlMJHlnifboxOAQZ+D0EfBUbBU/p1uUdA/Sc1rxjzE7GVyTT7qg8MKDTiQOyPF706
+         8/nRVcvAVD1hnFNWkjCoTB1WwhCdzLPOKfd7HsDdFCYZddmiFeiNyQBhAfRXx4wSXk
+         ozzW9dKVH0Fc3kewf0I9870I7htmRc+rw8QhnJjI6NqxRXqQl0oKtey9ZRrnwa5wTS
+         2KId/sKFf7LTg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q4HTP-001Z0N-JX;
+        Wed, 31 May 2023 09:46:27 +0100
+Date:   Wed, 31 May 2023 09:46:27 +0100
+Message-ID: <86zg5kc2ho.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
+In-Reply-To: <CAJHc60x0iFWOFxcCYpH6bG+CinBM2TmYxvADKwOqDsUFJCr0AA@mail.gmail.com>
+References: <20230519005231.3027912-1-rananta@google.com>
+        <20230519005231.3027912-4-rananta@google.com>
+        <87v8gbjkzn.wl-maz@kernel.org>
+        <CAJHc60x0iFWOFxcCYpH6bG+CinBM2TmYxvADKwOqDsUFJCr0AA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, ricarkol@google.com, pbonzini@redhat.com, jingzhangos@google.com, coltonlewis@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM only allows userspace to access legal number of MSR_IA32_RTIT_ADDRn,
-which is enumrated by guest's CPUID(0x14,0x1):EAX[2:0], i.e.,
-env->features[FEAT_14_1_EAX] & INTEL_PT_ADDR_RANGES_NUM_MASK
+On Tue, 30 May 2023 22:22:23 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+>=20
+> On Mon, May 29, 2023 at 7:00=E2=80=AFAM Marc Zyngier <maz@kernel.org> wro=
+te:
+> >
+> > On Fri, 19 May 2023 01:52:28 +0100,
+> > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > >
+> > > Implement kvm_arch_flush_remote_tlbs_range() for arm64
+> > > to invalidate the given range in the TLB.
+> > >
+> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h |  3 +++
+> > >  arch/arm64/kvm/hyp/nvhe/tlb.c     |  4 +---
+> > >  arch/arm64/kvm/mmu.c              | 11 +++++++++++
+> > >  3 files changed, 15 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/a=
+sm/kvm_host.h
+> > > index 81ab41b84f436..343fb530eea9c 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -1081,6 +1081,9 @@ struct kvm *kvm_arch_alloc_vm(void);
+> > >  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> > >  int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> > >
+> > > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> > > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gf=
+n, u64 pages);
+> > > +
+> > >  static inline bool kvm_vm_is_protected(struct kvm *kvm)
+> > >  {
+> > >       return false;
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/=
+tlb.c
+> > > index d4ea549c4b5c4..d2c7c1bc6d441 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > > @@ -150,10 +150,8 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mm=
+u *mmu,
+> > >               return;
+> > >       }
+> > >
+> > > -     dsb(ishst);
+> > > -
+> > >       /* Switch to requested VMID */
+> > > -     __tlb_switch_to_guest(mmu, &cxt);
+> > > +     __tlb_switch_to_guest(mmu, &cxt, false);
+> >
+> > This hunk is in the wrong patch, isn't it?
+> >
+> Ah, you are right. It should be part of the previous patch. I think I
+> introduced it accidentally when I rebased the series. I'll remove it
+> in the next spin.
+>=20
+>=20
+> > >
+> > >       __flush_tlb_range_op(ipas2e1is, start, pages, stride, 0, 0, fal=
+se);
+> > >
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index d0a0d3dca9316..e3673b4c10292 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -92,6 +92,17 @@ int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+> > >       return 0;
+> > >  }
+> > >
+> > > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gf=
+n, u64 pages)
+> > > +{
+> > > +     phys_addr_t start, end;
+> > > +
+> > > +     start =3D start_gfn << PAGE_SHIFT;
+> > > +     end =3D (start_gfn + pages) << PAGE_SHIFT;
+> > > +
+> > > +     kvm_call_hyp(__kvm_tlb_flush_vmid_range, &kvm->arch.mmu, start,=
+ end);
+> >
+> > So that's the point that I think is not right. It is the MMU code that
+> > should drive the invalidation method, and not the HYP code. The HYP
+> > code should be as dumb as possible, and the logic should be kept in
+> > the MMU code.
+> >
+> > So when a range invalidation is forwarded to HYP, it's a *valid* range
+> > invalidation. not something that can fallback to VMID-wide invalidation.
+> >
+> I'm guessing that you are referring to patch-2. Do you recommend
+> moving the 'pages >=3D MAX_TLBI_RANGE_PAGES' logic here and simply
+> return an error? How about for the other check:
+> system_supports_tlb_range()?
+> The idea was for __kvm_tlb_flush_vmid_range() to also implement a
+> fallback mechanism in case the system doesn't support the range-based
+> instructions. But if we end up calling __kvm_tlb_flush_vmid_range()
+> from multiple cases, we'd end up duplicating the checks. WDYT?
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
----
- target/i386/cpu.h     | 2 ++
- target/i386/kvm/kvm.c | 8 ++++----
- 2 files changed, 6 insertions(+), 4 deletions(-)
+My take is that there should be a single helper deciding to issue
+either a number of range-based TLBIs depending on start/end, or a
+single VMID-based TLBI. Having multiple calling sites is not a
+problem, and even if that code gets duplicated, big deal.
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 71b83102b75e..d745ba2ad77a 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -973,6 +973,8 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
- /* Packets which contain IP payload have LIP values */
- #define CPUID_14_0_ECX_LIP                      (1U << 31)
- 
-+#define INTEL_PT_ADDR_RANGES_NUM_MASK       0x7
-+
- /* CLZERO instruction */
- #define CPUID_8000_0008_EBX_CLZERO      (1U << 0)
- /* Always save/restore FP error pointers */
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index de531842f6b1..e68846100ddb 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -3561,8 +3561,8 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-             }
-         }
-         if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
--            int addr_num = kvm_arch_get_supported_cpuid(kvm_state,
--                                                    0x14, 1, R_EAX) & 0x7;
-+            int addr_num = env->features[FEAT_14_1_EAX] &
-+                           INTEL_PT_ADDR_RANGES_NUM_MASK;
- 
-             kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-                             env->msr_rtit_ctrl);
-@@ -4004,8 +4004,8 @@ static int kvm_get_msrs(X86CPU *cpu)
-     }
- 
-     if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
--        int addr_num =
--            kvm_arch_get_supported_cpuid(kvm_state, 0x14, 1, R_EAX) & 0x7;
-+        int addr_num = env->features[FEAT_14_1_EAX] &
-+                       INTEL_PT_ADDR_RANGES_NUM_MASK;
- 
-         kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL, 0);
-         kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS, 0);
--- 
-2.34.1
+But a hypercall that falls back to global invalidation based on a
+range evaluation error (more than MAX_TLBI_RANGE_PAGES) is papering
+over a latent bug.
 
+There should be no logic whatsoever in any of the two tlb.c files.
+Only a switch to the correct context, and the requested invalidation,
+which *must* be architecturally correct.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
