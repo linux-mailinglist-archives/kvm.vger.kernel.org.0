@@ -2,203 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8058471875D
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 18:31:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1AF37187F7
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 19:03:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229684AbjEaQbB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 12:31:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54964 "EHLO
+        id S229996AbjEaRDa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 13:03:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbjEaQbA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 12:31:00 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09CC811F
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 09:30:58 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-556011695d1so105876827b3.1
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 09:30:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685550657; x=1688142657;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4oMPwuBewXzucRhAy2k91jt6FR1Q3W1PQo5GZNd6lqM=;
-        b=ryeCZ321lBNpiYoS40S71CMHh8oGv0krJKIZpmIGsRIe+xGkwcAHYnzd9/aT6BnPjG
-         gaiFm7JRSiNpBjcX+wc1xbIiR6Nv5swrk3nawefNF3b/5dbY6OGYqJ+F2BxfxTYUyd6v
-         D6mf8CgTUcPhO15w70n9pgY36xb5L2RSXnfymapJLr3enxB9Cwr7TCYP9QAM3Wx4enBT
-         cmDWCxlbMpEaj0zNJ5C992qVuWpncecoglFbvm+Hj4HDMi8KYlgoqpBM2QKVwxk6ui15
-         qATljkSrWZcTGytOWYTwM9y7jUIFK9JzCGI4og+UAoZP4VUJmQk25c/1HVxPYepTTTIR
-         FV/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685550657; x=1688142657;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4oMPwuBewXzucRhAy2k91jt6FR1Q3W1PQo5GZNd6lqM=;
-        b=bEcKW8WAd8Zzf011klCDLVfcJhuFjqK3pzI/RKn0hadvXBjTIiKL14+I3ostO28m6V
-         nfY1L7ATfQrlLDMVdEfhsIv11OO0uoAAOsmKvjUdQBW96alMTtPB5zClPRhQgf/6NffL
-         5mng8/pQqxse5kY63pmXCB4a63hDEcqfi8BUoOnJyS1ZFFLIrLGzHQZ2NBQVX78TtqtQ
-         5y6a5flccUgDlQvvGltRbBHaz8LgMQSXhqc3XwlS4ocbomXlCrNAy7CWA2ghSS3ze75R
-         n3tMpYzh0OTlyF3MkNEkqGABTxWh7t6Hi+FKARF3RBYuZvwT8+a7Ph39Sip8BC76/fk0
-         6V7w==
-X-Gm-Message-State: AC+VfDwHWHNRA5GAawsyf9q9FsaSk1BfNrDY1JG0413jX6hQK5/JlbTD
-        54HXvUkaNgVGZFxeugTNlxOnbvdZKIc=
-X-Google-Smtp-Source: ACHHUZ6X8s1Ux+vAT7l47i65NzVwjyLzkDLJAboaHZnpw10xH1dcOU12nASDui2gP5eCl+mciulXyOP22sY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:b70c:0:b0:561:8e86:9818 with SMTP id
- v12-20020a81b70c000000b005618e869818mr3513805ywh.7.1685550657211; Wed, 31 May
- 2023 09:30:57 -0700 (PDT)
-Date:   Wed, 31 May 2023 09:30:55 -0700
-In-Reply-To: <F4AFC5EE-9967-4117-BA85-ED82C106575C@nutanix.com>
-Mime-Version: 1.0
-References: <20230530200152.18961-1-jon@nutanix.com> <2a6502e3-ba87-0355-af09-825e8467b81f@intel.com>
- <F4AFC5EE-9967-4117-BA85-ED82C106575C@nutanix.com>
-Message-ID: <ZHd2P6D142rCByrm@google.com>
-Subject: Re: [PATCH] x86/fpu/xstate: clear XSAVE features if DISABLED_MASK set
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jon Kohler <jon@nutanix.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
+        with ESMTP id S229978AbjEaRDY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 13:03:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692F4135
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 10:02:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685552554;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OT2ak97DrcQf51/tVihpvQaRSuLks2IFU+YAaT+zsqY=;
+        b=CCRMs5i7zNPee7xJYHuP/TOVl/0dy7ekxWr1gbMU7FX7MikySiYJkaQXeyMtDfLMZms2bW
+        Jr1hPxSGy0k44zRuM7dwwODqXatsDVnp1DmHejzjVOOKoExzoqI3BTj9dZhQ9bfaWjjZak
+        jRNUJ/ZOrRMT52rqmZmpcYXyIBekq20=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-65-veSlZ_RWPee6oPGV5mREtg-1; Wed, 31 May 2023 13:02:31 -0400
+X-MC-Unique: veSlZ_RWPee6oPGV5mREtg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C6AB63C14AB2;
+        Wed, 31 May 2023 17:02:29 +0000 (UTC)
+Received: from [10.18.17.153] (dhcp-17-153.bos.redhat.com [10.18.17.153])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4549C40C6EC4;
+        Wed, 31 May 2023 17:02:29 +0000 (UTC)
+Message-ID: <9d37ab07-97c6-5245-6939-9c1090b4b3a9@redhat.com>
+Date:   Wed, 31 May 2023 13:02:29 -0400
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v4] KVM: VMX: do not disable interception for
+ MSR_IA32_SPEC_CTRL on eIBRS
+Content-Language: en-US
+To:     Jon Kohler <jon@nutanix.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Kyle Huey <me@kylehuey.com>,
-        "neelnatu@google.com" <neelnatu@google.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Andrea Arcangeli <aarcange@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Josh Poimboeuf <jpoimboe@redhat.com>
+References: <20230531144128.73814-1-jon@nutanix.com>
+From:   Waiman Long <longman@redhat.com>
+In-Reply-To: <20230531144128.73814-1-jon@nutanix.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 31, 2023, Jon Kohler wrote:
->=20
-> > On May 30, 2023, at 6:22 PM, Dave Hansen <dave.hansen@intel.com> wrote:
-> >=20
-> > On 5/30/23 13:01, Jon Kohler wrote:
-> > Is that the only problem?  kvm_load_guest_xsave_state() seems to have
-> > some #ifdef CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS code and I can't
-> > imagine that KVM guests can even use PKRU if this code is compiled out.
+On 5/31/23 10:41, Jon Kohler wrote:
+> Avoid expensive rdmsr on every VM Exit for MSR_IA32_SPEC_CTRL on
+> eIBRS enabled systems iff the guest only sets IA32_SPEC_CTRL[0] (IBRS)
+> and not [1] (STIBP) or [2] (SSBD) by not disabling interception in
+> the MSR bitmap. Note: this logic is only for eIBRS, as Intel's guidance
+> has long been that eIBRS only needs to be set once, so most guests with
+> eIBRS awareness should behave nicely. We would not want to accidentally
+> regress misbehaving guests on pre-eIBRS systems, who might be spamming
+> IBRS MSR without the hypervisor being able to see it today.
+>
+> eIBRS enabled guests using just IBRS will only write SPEC_CTRL MSR
+> once or twice per vCPU on boot, so it is far better to take those
+> VM exits on boot than having to read and save this msr on every
+> single VM exit forever. This outcome was suggested on Andrea's commit
+> 2f46993d83ff ("x86: change default to spec_store_bypass_disable=prctl spectre_v2_user=prctl")
+> however, since interception is still unilaterally disabled, the rdmsr
+> tax is still there even after that commit.
+>
+> This is a significant win for eIBRS enabled systems as this rdmsr
+> accounts for roughly ~50% of time for vmx_vcpu_run() as observed
+> by perf top disassembly, and is in the critical path for all
+> VM-Exits, including fastpath exits.
+>
+> Opportunistically update comments for both MSR_IA32_SPEC_CTRL and
+> MSR_IA32_PRED_CMD to make it clear how L1 vs L2 handling works.
+>
+> Fixes: 2f46993d83ff ("x86: change default to spec_store_bypass_disable=prctl spectre_v2_user=prctl")
+> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Andrea Arcangeli <aarcange@redhat.com>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+> Cc: Waiman Long <longman@redhat.com>
+> ---
+> v1
+>   - https://lore.kernel.org/all/20220512174427.3608-1-jon@nutanix.com/
+> v1 -> v2:
+>   - https://lore.kernel.org/all/20220520195303.58692-1-jon@nutanix.com/
+>   - Addressed comments on approach from Sean.
+> v2 -> v3:
+>   - https://lore.kernel.org/kvm/20220520204115.67580-1-jon@nutanix.com/
+>   - Addressed comments on approach from Sean.
+> v3 -> v4:
+>   - Fixed inline code comments from Sean.
+>
+>   arch/x86/kvm/vmx/vmx.c | 35 ++++++++++++++++++++++++-----------
+>   1 file changed, 24 insertions(+), 11 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 44fb619803b8..5e643ac897bc 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2260,20 +2260,33 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   			return 1;
+>
+>   		vmx->spec_ctrl = data;
+> -		if (!data)
+> +
+> +		/*
+> +		 * Disable interception on the first non-zero write, except if
+> +		 * eIBRS is advertised to the guest and the guest is enabling
+> +		 * _only_ IBRS.  On eIBRS systems, kernels typically set IBRS
+> +		 * once at boot and never touch it post-boot.  All other bits,
+> +		 * and IBRS on non-eIBRS systems, are often set on a per-task
+> +		 * basis, i.e. change frequently, so the benefit of avoiding
+> +		 * VM-exits during guest context switches outweighs the cost of
+> +		 * RDMSR on every VM-Exit to save the guest's value.
+> +		 */
+> +		if (!data ||
+> +		    (data == SPEC_CTRL_IBRS &&
+> +		     (vcpu->arch.arch_capabilities & ARCH_CAP_IBRS_ALL)))
+>   			break;
+>
+>   		/*
+> -		 * For non-nested:
+> -		 * When it's written (to non-zero) for the first time, pass
+> -		 * it through.
+> -		 *
+> -		 * For nested:
+> -		 * The handling of the MSR bitmap for L2 guests is done in
+> -		 * nested_vmx_prepare_msr_bitmap. We should not touch the
+> -		 * vmcs02.msr_bitmap here since it gets completely overwritten
+> -		 * in the merging. We update the vmcs01 here for L1 as well
+> -		 * since it will end up touching the MSR anyway now.
+> +		 * Update vmcs01.msr_bitmap even if L2 is active, i.e. disable
+> +		 * interception for the vCPU on the first write regardless of
+> +		 * whether the WRMSR came from L1 or L2.  vmcs02's bitmap is a
+> +		 * combination of vmcs01 and vmcs12 bitmaps, and will be
+> +		 * recomputed by nested_vmx_prepare_msr_bitmap() on the next
+> +		 * nested VM-Enter.  Note, this does mean that future WRMSRs
+> +		 * from L2 will be intercepted until the next nested VM-Exit if
+> +		 * L2 was the first to write, but L1 exposing the MSR to L2
+> +		 * without first writing it is unlikely and not worth the
+> +		 * extra bit of complexity.
+>   		 */
+>   		vmx_disable_intercept_for_msr(vcpu,
+>   					      MSR_IA32_SPEC_CTRL,
 
-...
+I have 2 comments.
 
-> >> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate=
-.c
-> >> index 0bab497c9436..211ef82b53e3 100644
-> >> --- a/arch/x86/kernel/fpu/xstate.c
-> >> +++ b/arch/x86/kernel/fpu/xstate.c
-> >> @@ -798,7 +798,8 @@ void __init fpu__init_system_xstate(unsigned int l=
-egacy_size)
-> >> 		unsigned short cid =3D xsave_cpuid_features[i];
-> >>=20
-> >> 		/* Careful: X86_FEATURE_FPU is 0! */
-> >> -		if ((i !=3D XFEATURE_FP && !cid) || !boot_cpu_has(cid))
-> >> +		if ((i !=3D XFEATURE_FP && !cid) || !boot_cpu_has(cid) ||
-> >> +		    DISABLED_MASK_BIT_SET(cid))
-> >> 			fpu_kernel_cfg.max_features &=3D ~BIT_ULL(i);
-> >> 	}
-> >=20
-> > I _think_ I'd rather this just be cpu_feature_enabled(cid) rather than
-> > using DISABLED_MASK_BIT_SET() directly.
+1) Besides the IBRS, STIBP & SSBD bits, the SPEC_CTRL MSR may have the 
+RRSBA_DIS_S bit set in the future. I am not aware of any current Intel 
+processors having this capability yet, but a future Intel processor may 
+have this and the above patch will have to be modified accordingly. It 
+looks like that the RRSBA_DIS_S bit will be set once.
 
-+1, xstate.c uses cpu_feature_enabled() all over the place, and IMO effecti=
-vely
-open coding cpu_feature_enabled() yields less intuitive code.
+2) AMD has their own AutoIBRS capability in Genoa which is similar to 
+eIBRS but is not identified by the ARCH_CAP_IBRS_ALL bit. Instead it is 
+identified by the AUTOIBRS bit in MSR_EFER. Are you planning to support 
+that?
 
-And on the KVM side, we can and should replace the #ifdef with cpu_feature_=
-enabled()
-(I'll post a patch), as modern compilers are clever enough to completely op=
-timize
-out the code when CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS=3Dn.  At that poi=
-nt, using
-cpu_feature_enabled() in both KVM and xstate.c will provide a nice bit of s=
-ymmetry.
+Cheers,
+Longman
 
-Caveat #1: cpu_feature_enabled() has a flaw that's relevant to this code: i=
-n the
-unlikely scenario that the compiler doesn't resolve "cid" to a compile-time
-constant value, cpu_feature_enabled() won't query DISABLED_MASK_BIT_SET(). =
- I don't
-see any other use of cpu_feature_enabled() without a hardcoded X86_FEATURE_=
-*, and
-the below compiles with my config, so I think/hope we can just require a co=
-mpile-time
-constant when using cpu_feature_enabled().
-
-diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufe=
-ature.h
-index ce0c8f7d3218..886200fbf8d9 100644
---- a/arch/x86/include/asm/cpufeature.h
-+++ b/arch/x86/include/asm/cpufeature.h
-@@ -141,8 +141,11 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
-  * supporting a possible guest feature where host support for it
-  * is not relevant.
-  */
--#define cpu_feature_enabled(bit)       \
--       (__builtin_constant_p(bit) && DISABLED_MASK_BIT_SET(bit) ? 0 : stat=
-ic_cpu_has(bit))
-+#define cpu_feature_enabled(bit)                               \
-+({                                                             \
-+       BUILD_BUG_ON(!__builtin_constant_p(bit));               \
-+       DISABLED_MASK_BIT_SET(bit) ? 0 : static_cpu_has(bit);   \
-+})
-=20
- #define boot_cpu_has(bit)      cpu_has(&boot_cpu_data, bit)
-=20
-Caveat #2: Using cpu_feature_enabled() could subtly break KVM, as KVM adver=
-tises
-support for features based on boot_cpu_data.  E.g. if a feature were disabl=
-ed by
-Kconfig but present in hardware, KVM would allow the guest to use the featu=
-re
-without properly context switching the data.  PKU isn't problematic because=
- KVM
-explicitly gates PKU on boot_cpu_has(X86_FEATURE_OSPKE), but KVM learned th=
-at
-lesson the hard way (see commit c469268cd523, "KVM: x86: block guest protec=
-tion
-keys unless the host has them enabled").  Exposing a feature that's disable=
-d in
-the host isn't completely absurd, e.g. KVM already effectively does this fo=
-r MPX.
-The only reason using cpu_feature_enabled() wouldn't be problematic for MPX=
- is
-because there's no longer a Kconfig for MPX.
-
-I'm totally ok gating xfeature bits on cpu_feature_enabled(), but there sho=
-uld be
-a prep patch for KVM to clear features bits in kvm_cpu_caps if the correspo=
-nding
-XCR0/XSS bit is not set in the host.  If KVM ever wants to expose an xstate=
- feature
-(other than MPX) that's disabled in the host, then we can revisit
-fpu__init_system_xstate().  But we need to ensure the "failure" mode is tha=
-t
-KVM doesn't advertise the feature, as opposed to advertising a feature with=
-out
-without context switching its data.
-
-> > But, I guess this probably also isn't a big deal for _most_ people.  An=
-y
-> > sane distro kernel will just set CONFIG_X86_INTEL_MEMORY_PROTECTION_KEY=
-S
-> > since it's pretty widespread on modern CPUs and works across Intel and
-> > AMD now.
->=20
-> Ack, I=E2=80=99m using PKU as the key example here, but looking forward t=
-his is more of a
-> correctness thing than anything else. If for any reason, any xsave featur=
-e is disabled
-> In the way that PKU is disabled, it will slip thru the cracks.
-
-I'd be careful about billing this as a correctness thing.  See above.
