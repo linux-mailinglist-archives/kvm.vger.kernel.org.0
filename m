@@ -2,64 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 513667177A3
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 09:17:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B08E717805
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 09:24:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234565AbjEaHR0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 03:17:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59364 "EHLO
+        id S231514AbjEaHYb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 03:24:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234548AbjEaHRJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 03:17:09 -0400
+        with ESMTP id S234687AbjEaHYQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 03:24:16 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 176F012B
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 00:17:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722D51B5
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 00:24:13 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8FD6E63430
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 07:17:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E401BC433EF;
-        Wed, 31 May 2023 07:17:06 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0F62E61088
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 07:24:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5706DC433EF;
+        Wed, 31 May 2023 07:24:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685517427;
-        bh=tmaVEwOR1njCj6VixWX3ZnHGosVCCTCzU+UjS4/vFTo=;
+        s=k20201202; t=1685517852;
+        bh=cPobS0FDQDC2RM/4dx6AuvjAZHc07sjiueJgxoqErzE=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=FdRKB1mEF4/guS6f6jz0w0VvNUuScegW5mPEVDLXczSM7Iyr4PJs8MX7XKUg1m1QK
-         sAL1K48rJB7jcUselPRy35CB+Y+XCBaE5hH8oY/tXYq2Kc9ntCkjbzSyH6F9vjvB3c
-         fPCKbDVI5z5NNQnu3yqwEx14spu5N9/fr4wbr9YjInlJtZ+mA/V7Lpywspdip+XY2I
-         oLF8vklid0eL6fxXzppXuIlvXVcEB3/AP1QMi0I5ov91NJWICybxcbGylxNExgUeyV
-         xkn9Ze/Onglt3fxOEtp5O0ydc8jpWIsd0SKJhaL9OPgzNVgJ3D6hkP7hY0AY0n+36u
-         3i2JLxEmwTNIg==
+        b=V/hAxAD64Ao250VunieA9RR28JaZFX7DF0jJG7DoMp3sg462N9SHobK1FHf4eXC2U
+         6OkJZC8mFipA2BCETQEuaKm32nYDvfjbW//oHkBvvwZooXCjrZ3B99lHthjg1pJ0OS
+         MhmmS/QEBfHxqv8Ax36yLAvYmkKLP+Ya9GsDZSg0jPunSlmZ5WjA9xuZhSEYqleMYb
+         /w1+iyNj3PimxfaosIQUkblVafFBA0NiXN/iINXNluaW4qBzpJb3y/f2nhknbMCUJI
+         XLKAo7S4TZQinOXsWw/3YaZV6BBhIARzafe5Kn7jA9oi7nMQA/GY6thnu1VKlhkHEX
+         1gXg1TrzK1umw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1q4G4u-001Xcj-MO;
-        Wed, 31 May 2023 08:17:04 +0100
-Date:   Wed, 31 May 2023 08:17:04 +0100
-Message-ID: <865y89c6mn.wl-maz@kernel.org>
+        id 1q4GBl-001Xi0-Vr;
+        Wed, 31 May 2023 08:24:10 +0100
+Date:   Wed, 31 May 2023 08:24:09 +0100
+Message-ID: <864jntc6au.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 02/17] arm64: Prevent the use of is_kernel_in_hyp_mode() in hypervisor code
-In-Reply-To: <ZHZUi/4kXxRmCa7a@linux.dev>
-References: <20230526143348.4072074-1-maz@kernel.org>
-        <20230526143348.4072074-3-maz@kernel.org>
-        <ZHZUi/4kXxRmCa7a@linux.dev>
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v10 1/5] KVM: arm64: Save ID registers' sanitized value per guest
+In-Reply-To: <CAAdAUtinwccyd+URCLjowXq47_LP_SjLNEqm-F9GqycmTZrYuw@mail.gmail.com>
+References: <20230522221835.957419-1-jingzhangos@google.com>
+        <20230522221835.957419-2-jingzhangos@google.com>
+        <87ttvwok3d.wl-maz@kernel.org>
+        <CAAdAUtinwccyd+URCLjowXq47_LP_SjLNEqm-F9GqycmTZrYuw@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -72,47 +77,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 30 May 2023 20:54:51 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Hi Marc,
-> 
-> On Fri, May 26, 2023 at 03:33:33PM +0100, Marc Zyngier wrote:
-> > Using is_kernel_in_hyp_mode() in hypervisor code is a pretty bad
-> > mistake. This helper only checks for CurrentEL being EL2, which
-> > is always true.
-> > 
-> > Make the link fail if using the helper in hypervisor context
-> > by referencing a non-existent function. Whilst we're at it,
-> > flag the helper as __always_inline, which it really should be.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/virt.h | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> > index 4eb601e7de50..91029709d133 100644
-> > --- a/arch/arm64/include/asm/virt.h
-> > +++ b/arch/arm64/include/asm/virt.h
-> > @@ -110,8 +110,13 @@ static inline bool is_hyp_mode_mismatched(void)
-> >  	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
-> >  }
-> >  
-> > -static inline bool is_kernel_in_hyp_mode(void)
-> > +extern void gotcha_is_kernel_in_hyp_mode(void);
-> > +
-> > +static __always_inline bool is_kernel_in_hyp_mode(void)
-> >  {
-> > +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
-> > +	gotcha_is_kernel_in_hyp_mode();
-> > +#endif
-> >  	return read_sysreg(CurrentEL) == CurrentEL_EL2;
-> >  }
-> 
-> Would BUILD_BUG() work in this context, or have I missed something?
+On Tue, 30 May 2023 19:02:03 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
 
-Too obvious? :-) I'll fix that.
+[...]
+
+> > > +/*
+> > > + * Set the guest's ID registers with ID_SANITISED() to the host's sanitized value.
+> > > + */
+> > > +void kvm_arm_init_id_regs(struct kvm *kvm)
+> > > +{
+> > > +     const struct sys_reg_desc *idreg;
+> > > +     struct sys_reg_params params;
+> > > +     u32 id;
+> > > +
+> > > +     /* Find the first idreg (SYS_ID_PFR0_EL1) in sys_reg_descs. */
+> > > +     id = SYS_ID_PFR0_EL1;
+> > > +     params = encoding_to_params(id);
+> > > +     idreg = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+> > > +     if (WARN_ON(!idreg))
+> > > +             return;
+> >
+> > What is this trying to guard against? Not finding ID_PFR0_EL1 in the
+> > sysreg table? But this says nothing about the following registers (all
+> > 55 of them), so why do we need to special-case this one?
+> Here is to find the first idreg in the array and warn that no idregs
+> found in the array with the assumption that ID_PFR0_EL1 is the first
+> one defined and if it is not found, then no other idregs are defined
+> either.
+
+I didn't make my point clear. What we have is a purely static array.
+Why should we perform such a test on every single VM creation? Any
+structural validation should only happen once, at KVM init time.
+
+> Another way is to go through all the regs in array sys_reg_descs and
+> do the initialization if it is a idreg.
+
+That'd be a waste of precious cycles.
+
+This WARN_ON()+early return should go, but the rest is fine.
 
 Thanks,
 
