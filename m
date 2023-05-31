@@ -2,234 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63EBF718D20
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 23:35:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A4B0718DF7
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 00:02:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230505AbjEaVfK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 17:35:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40124 "EHLO
+        id S229748AbjEaWCL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 18:02:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231180AbjEaVeT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 17:34:19 -0400
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 138F8E62;
-        Wed, 31 May 2023 14:32:54 -0700 (PDT)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-568900c331aso743097b3.3;
-        Wed, 31 May 2023 14:32:54 -0700 (PDT)
+        with ESMTP id S229603AbjEaWCH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 18:02:07 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DCD2121
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 15:02:05 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-974265a1a40so316341866b.0
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 15:02:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685568736; x=1688160736;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0GxeAY3mx9RNm+XPUbEc94ZOjIpLa+PLxcZvSX9iQwI=;
-        b=L93fUoh1n2yrqqKzpBnTktVcBXm2pCKywXktnW0z1yiLQvKxqvmxEchYgF8OV+6QTv
-         0bzTf1A4OlAuxa/9dZerxpZsbwsI4TjqwMyAQcFuTYSuZJaeWyYJuEWFU5GYKhF/PssT
-         BviFKPz7vL/Fi2iPZINEIUsA7v2Occp7X58VFjDz42JLNThFo7xdGCGk1w6ybVnEIlHs
-         b72Ur/xMHtdJmjaw3M4Bie9pileXuOl23g9fXNIiRCDxPyqPbOwfW5Xk2DEao1nEkBYA
-         Y/k6knxGTbApmWF3bdrPaXzT+XUQklhHF/wdKHs0p7V2Zyj9EYf6Jf8ACh3np5J3xStV
-         TZFA==
+        d=streamhpc-com.20221208.gappssmtp.com; s=20221208; t=1685570524; x=1688162524;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z8eeVT9lQfqYQDRbZwP+cUlOL9m2gC6p9ms+5P8NhDs=;
+        b=cxavh/8gs41qzpYEPE2LH6mmR/3lwS8X27dDmjffXEDcmGBActirHDUFa9FTrRequX
+         ZaBimWq9quBGnudtwbOAqM4YFQbRQSqgYsUOaW/d3ENOBLUOlEOltqXsSN1kuryziEpf
+         c/CbOgqBOnmicQKcFnGagvVtiPvHCi13Clrm5916Bnv17eX1S4vsMqSyIe6zzV/RPza3
+         1crDuureHSEHFwm54fPLbELYamVkB26xNQlcffZL1PqoasQ7Abpsdn70Ttkwc8AqJW8Y
+         ap9YTHM0RlBswFDNSXgdyCyUDiYpiwHvlhtRfy524nroQvHV+LfH+ngZA42F1ysPJL5O
+         6jJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685568736; x=1688160736;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0GxeAY3mx9RNm+XPUbEc94ZOjIpLa+PLxcZvSX9iQwI=;
-        b=Nzyx810jD/b8A31gQHhRsp6I/6jYBBqvNKsFzoQvnRigRcsN/uZ1z3N4uGBR4wkUGj
-         07HlNAWQdDuqFMxpZijHQncTi4x9PkgRiIUWuCmhRCrC3NChZmHSGKF0Ug4OJrQFJfWq
-         DL+2nyx9Jq17JYPgvF36WvGE7EXcfFpPpWpiGDtpN7kO36iBYGEoFaEItOfY7I8ZCJGo
-         avBgJh9zZayFVCWNsXMeeQdQeUAvd7elCkgizDMDD3fm7YqIFpQUBTZRj8TyFmKoyFfE
-         2UMPxU5FnYGiY63T8OL/Y85v92pCd0bwu+smvqAfDPzYXAJmgYlTaIl7+S0N0wv+sNiy
-         WTTA==
-X-Gm-Message-State: AC+VfDxAe/7AJpEnvj4uSD+0qceAF3lSMovZxatRWfy5AmlvE7WDL6g+
-        vFEuiAP2G9MYzmvJwtvtuWk=
-X-Google-Smtp-Source: ACHHUZ5gNCrFPXlbEmiVTeSbnpNfi3te/9mQ7ozGamtiEd+qz1ysxTVS5h/CUcEwYIfry/bpNOrmaQ==
-X-Received: by 2002:a81:4f13:0:b0:565:ee73:7711 with SMTP id d19-20020a814f13000000b00565ee737711mr6829660ywb.46.1685568736548;
-        Wed, 31 May 2023 14:32:16 -0700 (PDT)
-Received: from unknowna0e70b2ca394.attlocal.net ([2600:1700:2f7d:1800::46])
-        by smtp.googlemail.com with ESMTPSA id t63-20020a0dd142000000b0055aafcef659sm658905ywd.5.2023.05.31.14.32.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 May 2023 14:32:16 -0700 (PDT)
-From:   "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>
-Cc:     linux-mm@kvack.org, linux-arch@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
-        linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
-        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-        linux-openrisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-um@lists.infradead.org, xen-devel@lists.xenproject.org,
-        kvm@vger.kernel.org,
-        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-Subject: [PATCH v3 34/34] mm: Remove pgtable_{pmd, pte}_page_{ctor, dtor}() wrappers
-Date:   Wed, 31 May 2023 14:30:32 -0700
-Message-Id: <20230531213032.25338-35-vishal.moola@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230531213032.25338-1-vishal.moola@gmail.com>
-References: <20230531213032.25338-1-vishal.moola@gmail.com>
+        d=1e100.net; s=20221208; t=1685570524; x=1688162524;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z8eeVT9lQfqYQDRbZwP+cUlOL9m2gC6p9ms+5P8NhDs=;
+        b=dE0r2T5JIcBHXXUi6F3Cz1kQBoNp5iwFiXC/f0YY5eduduiq8HJwgc/NkBKas1IWgI
+         pxqI7MbrF9szYHHjTRY3Ffk997Sh7wEkR61ZPnICbkvefH1boTYsIL/FljJubj/zP3FF
+         zky2XnnZTEdgROpHLBvdztzBw1ruVUmE3998whs4E5E6IWhr9kgyt5Fh+9+sWTlMSbuy
+         Opo/E8fGAnEzEEn/NSVn0oq067zHlovCu67jnJz9IhvurzipyGsCc7C36/pzTR/4tsaD
+         kbkdaVPkaM3EP/GWMxV8LN7P/Sa6Nbec+kWlKPZv6SiKSACexK8/TKkyiQrz/rvcI61C
+         3bcQ==
+X-Gm-Message-State: AC+VfDwtT93pk8Q/KkYFjDMJ2vLJ1F1U1mqLRlEaQpVjDduMzC7FA8pL
+        0X1WjN5VIHolP6DRHj/2qz6kak3XveEeHgfRBKE=
+X-Google-Smtp-Source: ACHHUZ6opGGsxrjzDxEmHpD4/7OreBpNqoFLSa9fKicUZ9C5K5wyIrg6u94m+dHDkZIYgwTf+9FXZw==
+X-Received: by 2002:a17:907:1c01:b0:96a:b6e1:66d9 with SMTP id nc1-20020a1709071c0100b0096ab6e166d9mr7405939ejc.7.1685570523887;
+        Wed, 31 May 2023 15:02:03 -0700 (PDT)
+Received: from [192.168.178.121] (dhcp-077-251-030-138.chello.nl. [77.251.30.138])
+        by smtp.gmail.com with ESMTPSA id s10-20020a170906a18a00b0096f00d79d6asm9630435ejy.54.2023.05.31.15.02.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 May 2023 15:02:03 -0700 (PDT)
+Message-ID: <d645e19b-6325-7be4-4320-e989305969ad@streamhpc.com>
+Date:   Thu, 1 Jun 2023 00:02:02 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [PATCH] vfio/pci-core: Add capability for AtomicOp copleter
+ support
+Content-Language: en-US
+To:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
+References: <20230519214748.402003-1-alex.williamson@redhat.com>
+From:   Robin Voetter <robin@streamhpc.com>
+In-Reply-To: <20230519214748.402003-1-alex.williamson@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These functions are no longer necessary. Remove them and cleanup
-Documentation referencing them.
+On 5/19/23 23:47, Alex Williamson wrote:
+> Test and enable PCIe AtomicOp completer support of various widths and
+> report via device-info capability to userspace.
+> 
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
----
- Documentation/mm/split_page_table_lock.rst    | 12 +++++------
- .../zh_CN/mm/split_page_table_lock.rst        | 14 ++++++-------
- include/linux/mm.h                            | 20 -------------------
- 3 files changed, 13 insertions(+), 33 deletions(-)
+Reviewed-by: Robin Voetter <robin@streamhpc.com>
+Tested-by: Robin Voetter <robin@streamhpc.com>
 
-diff --git a/Documentation/mm/split_page_table_lock.rst b/Documentation/mm/split_page_table_lock.rst
-index 50ee0dfc95be..4bffec728340 100644
---- a/Documentation/mm/split_page_table_lock.rst
-+++ b/Documentation/mm/split_page_table_lock.rst
-@@ -53,7 +53,7 @@ Support of split page table lock by an architecture
- ===================================================
- 
- There's no need in special enabling of PTE split page table lock: everything
--required is done by pgtable_pte_page_ctor() and pgtable_pte_page_dtor(), which
-+required is done by pagetable_pte_ctor() and pagetable_pte_dtor(), which
- must be called on PTE table allocation / freeing.
- 
- Make sure the architecture doesn't use slab allocator for page table
-@@ -63,8 +63,8 @@ This field shares storage with page->ptl.
- PMD split lock only makes sense if you have more than two page table
- levels.
- 
--PMD split lock enabling requires pgtable_pmd_page_ctor() call on PMD table
--allocation and pgtable_pmd_page_dtor() on freeing.
-+PMD split lock enabling requires pagetable_pmd_ctor() call on PMD table
-+allocation and pagetable_pmd_dtor() on freeing.
- 
- Allocation usually happens in pmd_alloc_one(), freeing in pmd_free() and
- pmd_free_tlb(), but make sure you cover all PMD table allocation / freeing
-@@ -72,7 +72,7 @@ paths: i.e X86_PAE preallocate few PMDs on pgd_alloc().
- 
- With everything in place you can set CONFIG_ARCH_ENABLE_SPLIT_PMD_PTLOCK.
- 
--NOTE: pgtable_pte_page_ctor() and pgtable_pmd_page_ctor() can fail -- it must
-+NOTE: pagetable_pte_ctor() and pagetable_pmd_ctor() can fail -- it must
- be handled properly.
- 
- page->ptl
-@@ -92,7 +92,7 @@ trick:
-    split lock with enabled DEBUG_SPINLOCK or DEBUG_LOCK_ALLOC, but costs
-    one more cache line for indirect access;
- 
--The spinlock_t allocated in pgtable_pte_page_ctor() for PTE table and in
--pgtable_pmd_page_ctor() for PMD table.
-+The spinlock_t allocated in pagetable_pte_ctor() for PTE table and in
-+pagetable_pmd_ctor() for PMD table.
- 
- Please, never access page->ptl directly -- use appropriate helper.
-diff --git a/Documentation/translations/zh_CN/mm/split_page_table_lock.rst b/Documentation/translations/zh_CN/mm/split_page_table_lock.rst
-index 4fb7aa666037..a2c288670a24 100644
---- a/Documentation/translations/zh_CN/mm/split_page_table_lock.rst
-+++ b/Documentation/translations/zh_CN/mm/split_page_table_lock.rst
-@@ -56,16 +56,16 @@ Hugetlb特定的辅助函数:
- 架构对分页表锁的支持
- ====================
- 
--没有必要特别启用PTE分页表锁：所有需要的东西都由pgtable_pte_page_ctor()
--和pgtable_pte_page_dtor()完成，它们必须在PTE表分配/释放时被调用。
-+没有必要特别启用PTE分页表锁：所有需要的东西都由pagetable_pte_ctor()
-+和pagetable_pte_dtor()完成，它们必须在PTE表分配/释放时被调用。
- 
- 确保架构不使用slab分配器来分配页表：slab使用page->slab_cache来分配其页
- 面。这个区域与page->ptl共享存储。
- 
- PMD分页锁只有在你有两个以上的页表级别时才有意义。
- 
--启用PMD分页锁需要在PMD表分配时调用pgtable_pmd_page_ctor()，在释放时调
--用pgtable_pmd_page_dtor()。
-+启用PMD分页锁需要在PMD表分配时调用pagetable_pmd_ctor()，在释放时调
-+用pagetable_pmd_dtor()。
- 
- 分配通常发生在pmd_alloc_one()中，释放发生在pmd_free()和pmd_free_tlb()
- 中，但要确保覆盖所有的PMD表分配/释放路径：即X86_PAE在pgd_alloc()中预先
-@@ -73,7 +73,7 @@ PMD分页锁只有在你有两个以上的页表级别时才有意义。
- 
- 一切就绪后，你可以设置CONFIG_ARCH_ENABLE_SPLIT_PMD_PTLOCK。
- 
--注意：pgtable_pte_page_ctor()和pgtable_pmd_page_ctor()可能失败--必
-+注意：pagetable_pte_ctor()和pagetable_pmd_ctor()可能失败--必
- 须正确处理。
- 
- page->ptl
-@@ -90,7 +90,7 @@ page->ptl用于访问分割页表锁，其中'page'是包含该表的页面struc
-    的指针并动态分配它。这允许在启用DEBUG_SPINLOCK或DEBUG_LOCK_ALLOC的
-    情况下使用分页锁，但由于间接访问而多花了一个缓存行。
- 
--PTE表的spinlock_t分配在pgtable_pte_page_ctor()中，PMD表的spinlock_t
--分配在pgtable_pmd_page_ctor()中。
-+PTE表的spinlock_t分配在pagetable_pte_ctor()中，PMD表的spinlock_t
-+分配在pagetable_pmd_ctor()中。
- 
- 请不要直接访问page->ptl - -使用适当的辅助函数。
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 2c7d27348ea9..218cad2041a6 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -2878,11 +2878,6 @@ static inline bool pagetable_pte_ctor(struct ptdesc *ptdesc)
- 	return true;
- }
- 
--static inline bool pgtable_pte_page_ctor(struct page *page)
--{
--	return pagetable_pte_ctor(page_ptdesc(page));
--}
--
- static inline void pagetable_pte_dtor(struct ptdesc *ptdesc)
- {
- 	struct folio *folio = ptdesc_folio(ptdesc);
-@@ -2892,11 +2887,6 @@ static inline void pagetable_pte_dtor(struct ptdesc *ptdesc)
- 	lruvec_stat_sub_folio(folio, NR_PAGETABLE);
- }
- 
--static inline void pgtable_pte_page_dtor(struct page *page)
--{
--	pagetable_pte_dtor(page_ptdesc(page));
--}
--
- #define pte_offset_map_lock(mm, pmd, address, ptlp)	\
- ({							\
- 	spinlock_t *__ptl = pte_lockptr(mm, pmd);	\
-@@ -2987,11 +2977,6 @@ static inline bool pagetable_pmd_ctor(struct ptdesc *ptdesc)
- 	return true;
- }
- 
--static inline bool pgtable_pmd_page_ctor(struct page *page)
--{
--	return pagetable_pmd_ctor(page_ptdesc(page));
--}
--
- static inline void pagetable_pmd_dtor(struct ptdesc *ptdesc)
- {
- 	struct folio *folio = ptdesc_folio(ptdesc);
-@@ -3001,11 +2986,6 @@ static inline void pagetable_pmd_dtor(struct ptdesc *ptdesc)
- 	lruvec_stat_sub_folio(folio, NR_PAGETABLE);
- }
- 
--static inline void pgtable_pmd_page_dtor(struct page *page)
--{
--	pagetable_pmd_dtor(page_ptdesc(page));
--}
--
- /*
-  * No scalability reason to split PUD locks yet, but follow the same pattern
-  * as the PMD locks to make it easier if we decide to.  The VM should not be
--- 
-2.40.1
+Kind regards,
 
+Robin Voetter
