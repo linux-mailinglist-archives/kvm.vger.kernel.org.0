@@ -2,202 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E22117188A0
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 19:41:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24B66718909
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 20:08:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230267AbjEaRlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 13:41:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37676 "EHLO
+        id S229910AbjEaSIe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 14:08:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230285AbjEaRks (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 13:40:48 -0400
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C53510CB
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 10:40:19 -0700 (PDT)
-Received: by mail-qk1-x734.google.com with SMTP id af79cd13be357-75b1975ea18so395946885a.3
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 10:40:19 -0700 (PDT)
+        with ESMTP id S229529AbjEaSIc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 14:08:32 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 404AD126
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 11:08:30 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1b025aaeddbso14265ad.1
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 11:08:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vultr.com; s=google; t=1685554819; x=1688146819;
-        h=content-transfer-encoding:in-reply-to:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yXp1RUK8ObiOcFYtO3+OuQ5bKcre6F1M14ngTQGctvQ=;
-        b=QVcAelLQ1/6ezCKuZMi8ImBzi0tpJfN7EGV8VDQ5e+a5cpPFT3AA7czS9FMArbT7VR
-         7FjfPgFgYD4GcK1/MaNTI1VobOgmnSLmawQnmU7U22pw/jbY+Sphg4nYVJEjaruvpJi7
-         /5axfecYhN9wmgdzrnx2X3snKOORTFydUBSBp8rGVJ1culR8PzXCkKQfweYB21zYXpjI
-         /xVPqbNsC0fEyBQOteFGMRlXV02XDCBZjgUGyzIDG9U3qh7y4WUuD17iG0Sf3gJn6fIQ
-         VUA7PmC06jY57/srnMroMVvAlZ8HE6gMoMTviblA2MTbD0qzI0RHJOEgvfMk5dd0Ejr/
-         SufQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685554819; x=1688146819;
-        h=content-transfer-encoding:in-reply-to:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1685556509; x=1688148509;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yXp1RUK8ObiOcFYtO3+OuQ5bKcre6F1M14ngTQGctvQ=;
-        b=NA6qPEBqclmtul+uJhizmjh9AywMswtf6PQ8NzITIZx5/uN9uq+6If/dhLQ7QI5qSd
-         y9IPeiTT13Y8WyDnVa8DZrPt00L+xqyntdhRyCp6ddW4HoXuC/fS8N6KHvfBulPQYTkT
-         b21OAdfFtyLCwKuyKfHz+qxFn62LaPxmxfqCPm6ftNWPfTd2Vo4qdvE4KWOdnitPmoid
-         zmlFVZinzUZcndL1sVUYYehxAzQSbhH8k9iCus1WVO3zFkN3lT9eEY2GyLCHW4WKShic
-         1m7+seJo/nCR3mh148rcSVBLxfLv0XphQfKB/AuxsEJPmhvb9DLPnz62HvLZZrMJx7aZ
-         Znkg==
-X-Gm-Message-State: AC+VfDxvvMoQHfK86N4Jr1LLdsOud7psxSSN2aIEH54CeoqRRYAV8Iz2
-        fe0fQgak8KDGowP76wHcdTnk4cWUlomBn5UBnFY=
-X-Google-Smtp-Source: ACHHUZ5fYbRU2/6vE2IuO78ZQ/GfPkdtDyD3+JoQ0116m8wexlZsUu6UrIuGzRdxOPIQRcOJa2mwAQ==
-X-Received: by 2002:a05:6214:5294:b0:625:7802:f382 with SMTP id kj20-20020a056214529400b006257802f382mr6502859qvb.50.1685554818814;
-        Wed, 31 May 2023 10:40:18 -0700 (PDT)
-Received: from [10.7.101.16] ([208.167.225.210])
-        by smtp.gmail.com with ESMTPSA id u7-20020ae9c007000000b0075784a8f13csm4962883qkk.96.2023.05.31.10.40.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 May 2023 10:40:18 -0700 (PDT)
-From:   Brian Rak <brak@vultr.com>
-X-Google-Original-From: Brian Rak <brak@gameservers.com>
-Message-ID: <7fb24485-5049-a64c-0f62-bedebbc5eec2@gameservers.com>
-Date:   Wed, 31 May 2023 13:40:17 -0400
+        bh=vSkNdiMP7jY6tlUh6I5KPB+Z+BpvSyNnxaiAhEVXtE0=;
+        b=EpHT/8ZRve1Wq26t+TAKx7SJQNT+fVySv2OMKjZYQ2b+in9M3Hk7qwSrnDtgSaSAdA
+         BTw0q6kgnioUg/lB6FVO3YhgBjF+Z79W8RhGrcwzlDC8iQOw3SMWDxXNwvgqYDLD9P1B
+         CBr+ezEAZy09kHGYPWtTSyMGlxosRk18+QdCs3QnlQ7X9CifFrugJEQIhYDiH1ZwvsTe
+         SATBHTtIkDlFDDjxhjOnFIrn9OCTTpKlVMDP1Sa3qo1PISxR2g1ly4R1vZIFthzRQ95/
+         m4QEEl1mjkFjqsHHO+ieTqeF0XF2RzwhuieNLRQrsSIgoC+jGzcnTq272IfcrkINunLy
+         v8Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685556509; x=1688148509;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vSkNdiMP7jY6tlUh6I5KPB+Z+BpvSyNnxaiAhEVXtE0=;
+        b=LDkESYkkqypI8kDkTgOTuYOBx1c7xXrnIhnFJ+0nzps3v9dlBA1suc6/puyAaLCZw5
+         JCk94yLsSo13aerTp40eszGBIwKBhqRrZ3l95Vd+ob1VgTZC2azvfJg4tvFOCNuDhI0h
+         Y+1p1LY+9feRd+QSf3AlbTgg36hO4JMWHt9vrdnYkMBeIl6FzDA5i89Zhp2fJEhRn2+V
+         UmMjE+1E4qNBjBcTAA15+2uyQcn0p7swpq3J2ny8TtlAxR3UgzIfTaGfr+GIQjdbqtAd
+         uMSWSZkCvT3c9OC03gUmkmRsZvaiXsmzNjAeXH4Xs4/gvJQ8BoBadn/ZiKR9N4A+8I8z
+         l6Eg==
+X-Gm-Message-State: AC+VfDxh5bK5+45HATYMIP3qFrLLdKd+vIuRbmQ1KXUONHb2sPtKn8Ck
+        MBYQfIunGTYSzVimOKV6aFfbGGaUTRDHIU2DDZrTqg==
+X-Google-Smtp-Source: ACHHUZ7+ljlYTpJXZCGgniPPfn+sq9vKSoC+Zj1HFZ7z4X280RcuLWI/5I+55qaJAIGHvh1q6W46K/ONzLBoMm22kjk=
+X-Received: by 2002:a17:902:d141:b0:1b0:26c0:757d with SMTP id
+ t1-20020a170902d14100b001b026c0757dmr8147plt.22.1685556509329; Wed, 31 May
+ 2023 11:08:29 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.11.0
-Reply-To: brak@gameservers.com
-Subject: Re: Deadlock due to EPT_VIOLATION
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-References: <f023d927-52aa-7e08-2ee5-59a2fbc65953@gameservers.com>
- <ZGzoUZLpPopkgvM0@google.com>
- <44ba516b-afe0-505d-1a87-90d489f9e03f@gameservers.com>
- <bce4b387-638d-7f3c-ca9b-12ff6e020bad@vultr.com>
- <ZHEefxsu5E3BsPni@google.com>
- <9fa11f06-bd55-b061-d16a-081351f04a13@gameservers.com>
- <ZHZCEUzr9Ak7rkjG@google.com>
-In-Reply-To: <ZHZCEUzr9Ak7rkjG@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20230531144128.73814-1-jon@nutanix.com> <9d37ab07-97c6-5245-6939-9c1090b4b3a9@redhat.com>
+ <ECE9A3B4-2CF3-452A-838A-99BE075D5E68@nutanix.com> <3cb96907-0d58-ba60-ed0e-6c17c69bd0f8@redhat.com>
+In-Reply-To: <3cb96907-0d58-ba60-ed0e-6c17c69bd0f8@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 31 May 2023 11:08:17 -0700
+Message-ID: <CALMp9eQNNCwUbPQGBfHzWnTAEJeRO-fjQAFxb9101SChe9F5rg@mail.gmail.com>
+Subject: Re: [PATCH v4] KVM: VMX: do not disable interception for
+ MSR_IA32_SPEC_CTRL on eIBRS
+To:     Waiman Long <longman@redhat.com>
+Cc:     Jon Kohler <jon@nutanix.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 5/30/2023 2:36 PM, Sean Christopherson wrote:
-> On Tue, May 30, 2023, Brian Rak wrote:
->> On 5/26/2023 5:02 PM, Sean Christopherson wrote:
->>> On Fri, May 26, 2023, Brian Rak wrote:
->>>> On 5/24/2023 9:39 AM, Brian Rak wrote:
->>>>> On 5/23/2023 12:22 PM, Sean Christopherson wrote:
->>>>>> The other thing that would be helpful would be getting kernel stack
->>>>>> traces of the
->>>>>> relevant tasks/threads.ï¿½ The vCPU stack traces won't be interesting,
->>>>>> but it'll
->>>>>> likely help to see what the fallocate() tasks are doing.
->>>>> I'll see what I can come up with here, I was running into some
->>>>> difficulty getting useful stack traces out of the VM
->>>> I didn't have any luck gathering guest-level stack traces - kaslr makes it
->>>> pretty difficult even if I have the guest kernel symbols.
->>> Sorry, I was hoping to get host stack traces, not guest stack traces.  I am hoping
->>> to see what the fallocate() in the *host* is doing.
->> Ah - here's a different instance of it with a full backtrace from the host:
-> Gah, I wasn't specific enough again.  Though there's no longer an fallocate() for
-> any of the threads', so that's probably a moot point.  What I wanted to see is what
-> exactly the host kernel was doing, e.g. if something in the host memory management
-> was indirectly preventing vCPUs from making forward progress.  But that doesn't
-> seem to be the case here, and I would expect other problems if fallocate() was
-> stuck.  So ignore that request for now.
+On Wed, May 31, 2023 at 10:22=E2=80=AFAM Waiman Long <longman@redhat.com> w=
+rote:
 >
->>> Another datapoint that might provide insight would be seeing if/how KVM's page
->>> faults stats change, e.g. look at /sys/kernel/debug/kvm/pf_* multiple times when
->>> the guest is stuck.
->> It looks like pf_taken is the only real one incrementing:
-> Drat.  That's what I expected, but it doesn't narrow down the search much.
->
->>> Are you able to run modified host kernels?  If so, the easiest next step, assuming
->>> stack traces don't provide a smoking gun, would be to add printks into the page
->>> fault path to see why KVM is retrying instead of installing a SPTE.
->> We can, but it can take quite some time from when we do the update to
->> actually seeing results.ï¿½ This problem is inconsistent at best, and even
->> though we're seeing it a ton of times a day, it's can show up anywhere.ï¿½
->> Even if we rolled it out today, we'd still be looking at weeks/months before
->> we had any significant number of machines on it.
-> Would you be able to run a bpftrace program on a host with a stuck guest?  If so,
-> I believe I could craft a program for the kvm_exit tracepoint that would rule out
-> or confirm two of the three likely culprits.
->
-> Can you also dump the kvm.ko module params?  E.g. `tail /sys/module/kvm/parameters/*`
+> On 5/31/23 13:13, Jon Kohler wrote:
+> >
+> >> On May 31, 2023, at 1:02 PM, Waiman Long <longman@redhat.com> wrote:
+> >>
+> >> On 5/31/23 10:41, Jon Kohler wrote:
+> >>> Avoid expensive rdmsr on every VM Exit for MSR_IA32_SPEC_CTRL on
+> >>> eIBRS enabled systems iff the guest only sets IA32_SPEC_CTRL[0] (IBRS=
+)
+> >>> and not [1] (STIBP) or [2] (SSBD) by not disabling interception in
+> >>> the MSR bitmap. Note: this logic is only for eIBRS, as Intel's guidan=
+ce
+> >>> has long been that eIBRS only needs to be set once, so most guests wi=
+th
+> >>> eIBRS awareness should behave nicely. We would not want to accidental=
+ly
+> >>> regress misbehaving guests on pre-eIBRS systems, who might be spammin=
+g
+> >>> IBRS MSR without the hypervisor being able to see it today.
+> >>>
+> >>> eIBRS enabled guests using just IBRS will only write SPEC_CTRL MSR
+> >>> once or twice per vCPU on boot, so it is far better to take those
+> >>> VM exits on boot than having to read and save this msr on every
+> >>> single VM exit forever. This outcome was suggested on Andrea's commit
+> >>> 2f46993d83ff ("x86: change default to spec_store_bypass_disable=3Dprc=
+tl spectre_v2_user=3Dprctl")
+> >>> however, since interception is still unilaterally disabled, the rdmsr
+> >>> tax is still there even after that commit.
+> >>>
+> >>> This is a significant win for eIBRS enabled systems as this rdmsr
+> >>> accounts for roughly ~50% of time for vmx_vcpu_run() as observed
+> >>> by perf top disassembly, and is in the critical path for all
+> >>> VM-Exits, including fastpath exits.
+> >>>
+> >>> Opportunistically update comments for both MSR_IA32_SPEC_CTRL and
+> >>> MSR_IA32_PRED_CMD to make it clear how L1 vs L2 handling works.
+> >>>
+> >>> Fixes: 2f46993d83ff ("x86: change default to spec_store_bypass_disabl=
+e=3Dprctl spectre_v2_user=3Dprctl")
+> >>> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> >>> Cc: Sean Christopherson <seanjc@google.com>
+> >>> Cc: Andrea Arcangeli <aarcange@redhat.com>
+> >>> Cc: Kees Cook <keescook@chromium.org>
+> >>> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+> >>> Cc: Waiman Long <longman@redhat.com>
+> >>> ---
+> >>> v1
+> >>>   - https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lore.kerne=
+l.org_all_20220512174427.3608-2D1-2Djon-40nutanix.com_&d=3DDwICaQ&c=3Ds883G=
+pUCOChKOHiocYtGcg&r=3DNGPRGGo37mQiSXgHKm5rCQ&m=3DPT1QjB8Lk_a3baDOwHBfedQG67=
+HsVDmOdmcWHlr5PrT8WyuS9e6PfHF5JxLxD0zw&s=3DjNnloZQgh0KG-n36uwVC0dJTmokvqsQd=
+YQCWYI8hVvM&e=3D v1 -> v2:
+> >>>   - https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lore.kerne=
+l.org_all_20220520195303.58692-2D1-2Djon-40nutanix.com_&d=3DDwICaQ&c=3Ds883=
+GpUCOChKOHiocYtGcg&r=3DNGPRGGo37mQiSXgHKm5rCQ&m=3DPT1QjB8Lk_a3baDOwHBfedQG6=
+7HsVDmOdmcWHlr5PrT8WyuS9e6PfHF5JxLxD0zw&s=3DRwi5NoHwaezlmzzLiGGCuI6QHuGQZ1B=
+VK2hs6-SZvzU&e=3D   - Addressed comments on approach from Sean.
+> >>> v2 -> v3:
+> >>>   - https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lore.kerne=
+l.org_kvm_20220520204115.67580-2D1-2Djon-40nutanix.com_&d=3DDwICaQ&c=3Ds883=
+GpUCOChKOHiocYtGcg&r=3DNGPRGGo37mQiSXgHKm5rCQ&m=3DPT1QjB8Lk_a3baDOwHBfedQG6=
+7HsVDmOdmcWHlr5PrT8WyuS9e6PfHF5JxLxD0zw&s=3DR2Ykxdv-DyeVGLWd8_pLpu43zEsnWzp=
+yvvBPEZ9lz-Y&e=3D   - Addressed comments on approach from Sean.
+> >>> v3 -> v4:
+> >>>   - Fixed inline code comments from Sean.
+> >>>
+> >>>   arch/x86/kvm/vmx/vmx.c | 35 ++++++++++++++++++++++++-----------
+> >>>   1 file changed, 24 insertions(+), 11 deletions(-)
+> >>>
+> >>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> >>> index 44fb619803b8..5e643ac897bc 100644
+> >>> --- a/arch/x86/kvm/vmx/vmx.c
+> >>> +++ b/arch/x86/kvm/vmx/vmx.c
+> >>> @@ -2260,20 +2260,33 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu,=
+ struct msr_data *msr_info)
+> >>>                     return 1;
+> >>>
+> >>>             vmx->spec_ctrl =3D data;
+> >>> -           if (!data)
+> >>> +
+> >>> +           /*
+> >>> +            * Disable interception on the first non-zero write, exce=
+pt if
+> >>> +            * eIBRS is advertised to the guest and the guest is enab=
+ling
+> >>> +            * _only_ IBRS.  On eIBRS systems, kernels typically set =
+IBRS
+> >>> +            * once at boot and never touch it post-boot.  All other =
+bits,
+> >>> +            * and IBRS on non-eIBRS systems, are often set on a per-=
+task
+> >>> +            * basis, i.e. change frequently, so the benefit of avoid=
+ing
+> >>> +            * VM-exits during guest context switches outweighs the c=
+ost of
+> >>> +            * RDMSR on every VM-Exit to save the guest's value.
+> >>> +            */
+> >>> +           if (!data ||
+> >>> +               (data =3D=3D SPEC_CTRL_IBRS &&
+> >>> +                (vcpu->arch.arch_capabilities & ARCH_CAP_IBRS_ALL)))
+> >>>                     break;
+> >>>
+> >>>             /*
+> >>> -            * For non-nested:
+> >>> -            * When it's written (to non-zero) for the first time, pa=
+ss
+> >>> -            * it through.
+> >>> -            *
+> >>> -            * For nested:
+> >>> -            * The handling of the MSR bitmap for L2 guests is done i=
+n
+> >>> -            * nested_vmx_prepare_msr_bitmap. We should not touch the
+> >>> -            * vmcs02.msr_bitmap here since it gets completely overwr=
+itten
+> >>> -            * in the merging. We update the vmcs01 here for L1 as we=
+ll
+> >>> -            * since it will end up touching the MSR anyway now.
+> >>> +            * Update vmcs01.msr_bitmap even if L2 is active, i.e. di=
+sable
+> >>> +            * interception for the vCPU on the first write regardles=
+s of
+> >>> +            * whether the WRMSR came from L1 or L2.  vmcs02's bitmap=
+ is a
+> >>> +            * combination of vmcs01 and vmcs12 bitmaps, and will be
+> >>> +            * recomputed by nested_vmx_prepare_msr_bitmap() on the n=
+ext
+> >>> +            * nested VM-Enter.  Note, this does mean that future WRM=
+SRs
+> >>> +            * from L2 will be intercepted until the next nested VM-E=
+xit if
+> >>> +            * L2 was the first to write, but L1 exposing the MSR to =
+L2
+> >>> +            * without first writing it is unlikely and not worth the
+> >>> +            * extra bit of complexity.
+> >>>              */
+> >>>             vmx_disable_intercept_for_msr(vcpu,
+> >>>                                           MSR_IA32_SPEC_CTRL,
+> >> I have 2 comments.
+> >>
+> >> 1) Besides the IBRS, STIBP & SSBD bits, the SPEC_CTRL MSR may have the=
+ RRSBA_DIS_S bit set in the future. I am not aware of any current Intel pro=
+cessors having this capability yet, but a future Intel processor may have t=
+his and the above patch will have to be modified accordingly. It looks like=
+ that the RRSBA_DIS_S bit will be set once.
+> > Agreed. Once that becomes pubic with future processors, this code can b=
+e fixed up in a fairly trivial manner. I don=E2=80=99t have any access to s=
+aid future processors, so I=E2=80=99d like to keep it as-is today rather th=
+an project it out too far. Is that ok?
+> That is certainly OK. I am just raising a question here.
 
-Yes, we can run bpftrace programs
+How difficult would it be to do a back of the envelope cost/benefit
+analysis, rather than relying on heuristics based on today's typical
+guest behavior?
 
-# tail /sys/module/kvm/parameters/*
-==> /sys/module/kvm/parameters/eager_page_split <==
-Y
+Say that it's a minimum of 1000 cycles to intercept this WRMSR. The
+tradeoff is the cost of a RDMSR on every VM-exit. How long does a
+RDMSR take these days? On the order of 50 cycles? So, if the guest
+consistently writes IA32_SPEC_CTRL more often than once every 20
+VM-exits, it's better not to intercept it.
 
-==> /sys/module/kvm/parameters/enable_pmu <==
-Y
+Most of the bookkeeping could be handled in the WRMSR(IA32_SPEC_CTRL)
+intercept. The only overhead we'd incur on every VM-exit would be the
+cost of incrementing a VM-exit counter.
 
-==> /sys/module/kvm/parameters/enable_vmware_backdoor <==
-N
-
-==> /sys/module/kvm/parameters/flush_on_reuse <==
-N
-
-==> /sys/module/kvm/parameters/force_emulation_prefix <==
-0
-
-==> /sys/module/kvm/parameters/halt_poll_ns <==
-200000
-
-==> /sys/module/kvm/parameters/halt_poll_ns_grow <==
-2
-
-==> /sys/module/kvm/parameters/halt_poll_ns_grow_start <==
-10000
-
-==> /sys/module/kvm/parameters/halt_poll_ns_shrink <==
-0
-
-==> /sys/module/kvm/parameters/ignore_msrs <==
-N
-
-==> /sys/module/kvm/parameters/kvmclock_periodic_sync <==
-Y
-
-==> /sys/module/kvm/parameters/lapic_timer_advance_ns <==
--1
-
-==> /sys/module/kvm/parameters/min_timer_period_us <==
-200
-
-==> /sys/module/kvm/parameters/mitigate_smt_rsb <==
-N
-
-==> /sys/module/kvm/parameters/mmio_caching <==
-Y
-
-==> /sys/module/kvm/parameters/nx_huge_pages <==
-Y
-
-==> /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms <==
-0
-
-==> /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio <==
-60
-
-==> /sys/module/kvm/parameters/pi_inject_timer <==
-0
-
-==> /sys/module/kvm/parameters/report_ignored_msrs <==
-Y
-
-==> /sys/module/kvm/parameters/tdp_mmu <==
-Y
-
-==> /sys/module/kvm/parameters/tsc_tolerance_ppm <==
-250
-
-==> /sys/module/kvm/parameters/vector_hashing <==
-Y
-
-
+It's a bit more complicated, but it directly addresses the issue, and
+it's more future-proof.
