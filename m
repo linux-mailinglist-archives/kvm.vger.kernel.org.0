@@ -2,88 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26ABF7176C1
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 08:20:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 513667177A3
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 09:17:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232198AbjEaGU4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 02:20:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35208 "EHLO
+        id S234565AbjEaHR0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 03:17:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229904AbjEaGUy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 02:20:54 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 299589F;
-        Tue, 30 May 2023 23:20:54 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34V5eGn3022066;
-        Wed, 31 May 2023 06:20:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references :
- subject : cc : from : to : message-id : date; s=pp1;
- bh=TNouXXGSf5zqOpDsKip1BhoCEFbovCJ08axIwZ84Qi0=;
- b=XoJYxgXClnvxTVFrKtyfXUBwl+aX3j4no28hpBJgmG95fxESppPmdnguCRTA7nNdTfzt
- HadetnXnVA/TsRKuM9fefceZqGeoRka1tltiJoS0Kbou4xeZxYbBtMOdHGa1P7M70zTY
- UoTb//KXif+S1tbcbSY7q2YFrLlRlNYigTC5lby3KddUHPQlue/4Iyhy0ZEY5LPJHsO9
- 1faXj/gWh7ZjfVYT5CFJ3DPjzQgCZt/OzFEvzwFbWmAmENxzpq4Ob8qDMzrYnGpT/DHa
- eiKNszpjY4Ij+BZUjhcSnn4J5AWwrhB0JNxLbLB6roJNlu6jWEYE0C5r9vPRvOWdtDyV Yw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwrpvjgf1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 31 May 2023 06:20:53 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34V65ewT025396;
-        Wed, 31 May 2023 06:20:53 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwrpvjgea-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 31 May 2023 06:20:53 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34V5EC60008423;
-        Wed, 31 May 2023 06:20:50 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3qu9g59h7j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 31 May 2023 06:20:50 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34V6Kk3T63766954
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 31 May 2023 06:20:46 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 67F7A2004B;
-        Wed, 31 May 2023 06:20:46 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 392E520043;
-        Wed, 31 May 2023 06:20:46 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.88.234])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 31 May 2023 06:20:46 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230530125243.18883-2-pmorel@linux.ibm.com>
-References: <20230530125243.18883-1-pmorel@linux.ibm.com> <20230530125243.18883-2-pmorel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v4 1/2] s390x: sclp: consider monoprocessor on read_info error
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com,
-        cohuck@redhat.com
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Message-ID: <168551404568.164254.6601837363136440455@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Wed, 31 May 2023 08:20:45 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8GfR1dANtLr0fwLBh1Lnz7Ngq0cIilv5
-X-Proofpoint-ORIG-GUID: aEl7JgQ52x7kJsAYTPElIak6Pc5JhENS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-31_02,2023-05-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 suspectscore=0 spamscore=0 mlxscore=0 phishscore=0
- mlxlogscore=999 malwarescore=0 priorityscore=1501 bulkscore=0 adultscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305310052
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        with ESMTP id S234548AbjEaHRJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 03:17:09 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 176F012B
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 00:17:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8FD6E63430
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 07:17:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E401BC433EF;
+        Wed, 31 May 2023 07:17:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685517427;
+        bh=tmaVEwOR1njCj6VixWX3ZnHGosVCCTCzU+UjS4/vFTo=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=FdRKB1mEF4/guS6f6jz0w0VvNUuScegW5mPEVDLXczSM7Iyr4PJs8MX7XKUg1m1QK
+         sAL1K48rJB7jcUselPRy35CB+Y+XCBaE5hH8oY/tXYq2Kc9ntCkjbzSyH6F9vjvB3c
+         fPCKbDVI5z5NNQnu3yqwEx14spu5N9/fr4wbr9YjInlJtZ+mA/V7Lpywspdip+XY2I
+         oLF8vklid0eL6fxXzppXuIlvXVcEB3/AP1QMi0I5ov91NJWICybxcbGylxNExgUeyV
+         xkn9Ze/Onglt3fxOEtp5O0ydc8jpWIsd0SKJhaL9OPgzNVgJ3D6hkP7hY0AY0n+36u
+         3i2JLxEmwTNIg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q4G4u-001Xcj-MO;
+        Wed, 31 May 2023 08:17:04 +0100
+Date:   Wed, 31 May 2023 08:17:04 +0100
+Message-ID: <865y89c6mn.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 02/17] arm64: Prevent the use of is_kernel_in_hyp_mode() in hypervisor code
+In-Reply-To: <ZHZUi/4kXxRmCa7a@linux.dev>
+References: <20230526143348.4072074-1-maz@kernel.org>
+        <20230526143348.4072074-3-maz@kernel.org>
+        <ZHZUi/4kXxRmCa7a@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -92,10 +72,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Pierre Morel (2023-05-30 14:52:42)
-> A test would hang if an abort happens before SCLP Read SCP
-> Information has completed.
->=20
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+On Tue, 30 May 2023 20:54:51 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hi Marc,
+> 
+> On Fri, May 26, 2023 at 03:33:33PM +0100, Marc Zyngier wrote:
+> > Using is_kernel_in_hyp_mode() in hypervisor code is a pretty bad
+> > mistake. This helper only checks for CurrentEL being EL2, which
+> > is always true.
+> > 
+> > Make the link fail if using the helper in hypervisor context
+> > by referencing a non-existent function. Whilst we're at it,
+> > flag the helper as __always_inline, which it really should be.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/virt.h | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+> > index 4eb601e7de50..91029709d133 100644
+> > --- a/arch/arm64/include/asm/virt.h
+> > +++ b/arch/arm64/include/asm/virt.h
+> > @@ -110,8 +110,13 @@ static inline bool is_hyp_mode_mismatched(void)
+> >  	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
+> >  }
+> >  
+> > -static inline bool is_kernel_in_hyp_mode(void)
+> > +extern void gotcha_is_kernel_in_hyp_mode(void);
+> > +
+> > +static __always_inline bool is_kernel_in_hyp_mode(void)
+> >  {
+> > +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
+> > +	gotcha_is_kernel_in_hyp_mode();
+> > +#endif
+> >  	return read_sysreg(CurrentEL) == CurrentEL_EL2;
+> >  }
+> 
+> Would BUILD_BUG() work in this context, or have I missed something?
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+Too obvious? :-) I'll fix that.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
