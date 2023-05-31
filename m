@@ -2,69 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C8ED718AE3
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 22:15:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B66B718AEB
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 22:16:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230134AbjEaUPj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 16:15:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45538 "EHLO
+        id S230240AbjEaUQM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 16:16:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229907AbjEaUPh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 16:15:37 -0400
+        with ESMTP id S230169AbjEaUQK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 16:16:10 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE0F013D
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 13:14:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78BED139
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 13:15:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685564095;
+        s=mimecast20190719; t=1685564122;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nTJ77IxJoCf3R6qu07kat3hn+MjqbGQgNapLEu9GtEI=;
-        b=Gy873x6muFst0xkg7wPJe7ZoH+gIaHpvhN11e2Ogis/zXDQf38PBfPsl6M645cxX2z938T
-        GMaXcVZhO0i62zA9tYn6WLaB8PRMhKHqVrBFMINOCvPZqdFS62htsDW4YxrwAQDgRgqHrT
-        tRQq8+ZlXumLAAFUzA8/XVfyl3OkD9M=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Wy2VTDOFfBFfIv996qVHfxz/WlxaTNdab27HpFP+20g=;
+        b=eLpK5iJO2TkRdxNr3xxySWQcCH051SZgRss5Hia85RuWcycMNc9NiE6pT7rDl6UziUGMvL
+        ZQj6HqckHlQucodzB+jj3oeh8A7LfIh0bRJaeORgLb3AQ/wcAmJhCtE7tClVo1uOxjhnwY
+        gfz3ZNRsq60KHd4LcP32jLVljwarIFU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-325-PBtJyNR1ONWDWSCHPi-YmQ-1; Wed, 31 May 2023 16:14:54 -0400
-X-MC-Unique: PBtJyNR1ONWDWSCHPi-YmQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f5fb41bc42so488085e9.1
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 13:14:54 -0700 (PDT)
+ us-mta-183-mS0Nq-xhP6qN5LTCod0rMQ-1; Wed, 31 May 2023 16:15:18 -0400
+X-MC-Unique: mS0Nq-xhP6qN5LTCod0rMQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3f6ffc45209so874455e9.0
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 13:15:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685564093; x=1688156093;
+        d=1e100.net; s=20221208; t=1685564118; x=1688156118;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nTJ77IxJoCf3R6qu07kat3hn+MjqbGQgNapLEu9GtEI=;
-        b=WQvkUGs3TZ1xUrHn743s2cmPytYZ01TJn5bXtj6DYMChusUliBt+HRauKVNaPwWWSy
-         6Y6s6ad5uh1y4YKuYe+YFJIrENuBlpbRsOXAL9wN0UjwwjJi5iKg7BKZRWunGSt3dScg
-         CPUVHtm68I5OvD87O0TA68x0aVea6WheepPaTbSFUoHPvmTK01CJuG6sS5pf+tCLhyt0
-         SMThBV3nHj7vOOyTyoixtpqQYcZV8QUPtzEHQNss2DICnSEHuAosYz6QtSupxqpnDunR
-         i0Jk65JFgji5BLbjIoHo/EjUFRdtoYFqyvMONEINPDV1+9wTukFyYAf1heVy6upw30nN
-         NDkQ==
-X-Gm-Message-State: AC+VfDxVyh8r25eD2sace7kX17dCGAR7pWSfiFjFo8wl7YbfzYT/Jnsm
-        EMAVdKYM5acwhnzd6ZjmtLvv0OTvS5lQ71zuFkmq4uwc9LPru5rkwJSh7vRKPck8OK0wcLjm0hl
-        WJpK748/GP8TE
-X-Received: by 2002:a05:600c:2187:b0:3f6:15c:96fc with SMTP id e7-20020a05600c218700b003f6015c96fcmr241488wme.17.1685564093250;
-        Wed, 31 May 2023 13:14:53 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5+R0GqxjLbGqYKkiI0OmLEj0ylpNNXiOUNparec4Ek/XM684Cdlf1oXcU19RgnhhawQ/X+9w==
-X-Received: by 2002:a05:600c:2187:b0:3f6:15c:96fc with SMTP id e7-20020a05600c218700b003f6015c96fcmr241479wme.17.1685564092987;
-        Wed, 31 May 2023 13:14:52 -0700 (PDT)
+        bh=Wy2VTDOFfBFfIv996qVHfxz/WlxaTNdab27HpFP+20g=;
+        b=U4jv6x/J5jc6oGHNhnIliVNPGFeY6KZY8hiPZg7ybhWJrHmxMMYOt0Ozsr9xpCkhAj
+         CWHIfVvLcKQcTMBo0Iq1N0xRN8oUaagwtlQOAyjHG+1bklJOUWux3tK9rXfSQzB5Ll0u
+         J6fGjygBZw7UU7KhVZs+pIHe2AG01vCq9+8Lq9B3c7XXmTFBmJsxE8gKoT+X5IvPCG2W
+         FswIgazSkPwHBZ50ZEYrDnGBxu6Su4DPrPgTncf1g3OqOkGIMHWdjDHLXZR/PVlbPS+x
+         s6p+WKkXHmHolJ8foTM80iV3ejS03Bh4izxcAypS5gd0tAxK8ksUuY8sLXWmG1pRxE5+
+         N6Pw==
+X-Gm-Message-State: AC+VfDxTFKEftomsqJXDAjcdT/Hp8968wOIhzWuh8cCHugksUEXJg5Fb
+        jBgzZNgNkW0pvjeChuwAEx9JlJYoE8gQt6bT/nT4u957orG4U8S24suALqnzXN/+wnIgclamFCu
+        y7wNOh0dnatxD
+X-Received: by 2002:a05:600c:4195:b0:3f7:1021:9312 with SMTP id p21-20020a05600c419500b003f710219312mr232734wmh.19.1685564117784;
+        Wed, 31 May 2023 13:15:17 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4S13U+4ejs/ejiQ8pAkmUas8XkrMsPXuoBlFznJd8Pg9nDfoPXEOC2FYrrYcsFWmF6KTD4Xg==
+X-Received: by 2002:a05:600c:4195:b0:3f7:1021:9312 with SMTP id p21-20020a05600c419500b003f710219312mr232724wmh.19.1685564117387;
+        Wed, 31 May 2023 13:15:17 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id m19-20020a7bcb93000000b003f605566610sm25488288wmi.13.2023.05.31.13.14.51
+        by smtp.gmail.com with ESMTPSA id bg22-20020a05600c3c9600b003f4283f5c1bsm5701802wmb.2.2023.05.31.13.15.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 May 2023 13:14:52 -0700 (PDT)
-Message-ID: <3b823b3a-16cf-058e-61cd-f02da2614314@redhat.com>
-Date:   Wed, 31 May 2023 22:14:51 +0200
+        Wed, 31 May 2023 13:15:16 -0700 (PDT)
+Message-ID: <b868258d-9467-be87-0e3a-db9fa322e117@redhat.com>
+Date:   Wed, 31 May 2023 22:15:15 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
 Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 3/6] arm: pmu: Add extra DSB barriers in
- the mem_access loop
+Subject: Re: [kvm-unit-tests PATCH 4/6] arm: pmu: Fix chain counter
+ enable/disable sequences
 Content-Language: en-US
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
@@ -72,18 +72,16 @@ Cc:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
         will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
         reijiw@google.com
 References: <20230315110725.1215523-1-eric.auger@redhat.com>
- <20230315110725.1215523-4-eric.auger@redhat.com>
- <ZEJkozep6M4EqxPW@monolith.localdoman>
- <48ea7b8f-8bc3-def5-3bfa-e4a1ee41971a@redhat.com>
- <ZEfO8DwsseerTKfK@monolith.localdoman>
+ <20230315110725.1215523-5-eric.auger@redhat.com>
+ <ZEJq_XNHi8Mx3CBy@monolith.localdoman>
 From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <ZEfO8DwsseerTKfK@monolith.localdoman>
+In-Reply-To: <ZEJq_XNHi8Mx3CBy@monolith.localdoman>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -91,58 +89,133 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Hi Alexandru,
-On 4/25/23 15:00, Alexandru Elisei wrote:
+
+On 4/21/23 12:52, Alexandru Elisei wrote:
 > Hi,
 >
-> On Mon, Apr 24, 2023 at 10:11:11PM +0200, Eric Auger wrote:
->> Hi Alexandru,
+> On Wed, Mar 15, 2023 at 12:07:23PM +0100, Eric Auger wrote:
+>> In some ARM ARM ddi0487 revisions it is said that
+>> disabling/enabling a pair of counters that are paired
+>> by a CHAIN event should follow a given sequence:
 >>
->> On 4/21/23 12:25, Alexandru Elisei wrote:
->>> Hi,
->>>
->>> On Wed, Mar 15, 2023 at 12:07:22PM +0100, Eric Auger wrote:
->>>> The mem access loop currently features ISB barriers only. However
->>>> the mem_access loop counts the number of accesses to memory. ISB
->>>> do not garantee the PE cannot reorder memory access. Let's
->>>> add a DSB ISH before the write to PMCR_EL0 that enables the PMU
->>>> and after the last iteration, before disabling the PMU.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>> Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>>>
->>>> ---
->>>>
->>>> This was discussed in https://lore.kernel.org/all/YzxmHpV2rpfaUdWi@monolith.localdoman/
->>>> ---
->>>>  arm/pmu.c | 2 ++
->>>>  1 file changed, 2 insertions(+)
->>>>
->>>> diff --git a/arm/pmu.c b/arm/pmu.c
->>>> index b88366a8..dde399e2 100644
->>>> --- a/arm/pmu.c
->>>> +++ b/arm/pmu.c
->>>> @@ -301,6 +301,7 @@ static void mem_access_loop(void *addr, long loop, uint32_t pmcr)
->>>>  {
->>>>  	uint64_t pmcr64 = pmcr;
->>>>  asm volatile(
->>>> +	"       dsb     ish\n"
->>> I think it might still be possible to reorder memory accesses which are
->>> part of the loop after the DSB above and before the PMU is enabled below.
->>> But the DSB above is needed to make sure previous memory accesses, which
->>> shouldn't be counted as part of the loop, are completed.
->>>
->>> I would put another DSB after the ISB which enables the PMU, that way all
->>> memory accesses are neatly sandwitches between two DSBs.
->>>
->>> Having 3 DSBs might look like overdoing it, but I reason it to be correct.
->>> What do you think?
->> I need more time to investigate this. I will come back to you next week
->> as I am OoO this week. Sorry for the inconvenience.
-> That's fine, I'm swamped too with other things, so don't expect a quick reply
-> :)
+>> Disable the low counter first, isb, disable the high counter
+>> Enable the high counter first, isb, enable low counter
+>>
+>> This was the case in Fc. However this is not written anymore
+>> in Ia revision.
+>>
+>> Introduce 2 helpers to execute those sequences and replace
+>> the existing PMCNTENCLR/ENSET calls.
+>>
+>> Also fix 2 write_sysreg_s(0x0, PMCNTENSET_EL0) in subtest 5 & 6
+>> and replace them by PMCNTENCLR writes since writing 0 in
+>> PMCNTENSET_EL0 has no effect.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  arm/pmu.c | 37 ++++++++++++++++++++++++++++---------
+>>  1 file changed, 28 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/arm/pmu.c b/arm/pmu.c
+>> index dde399e2..af679667 100644
+>> --- a/arm/pmu.c
+>> +++ b/arm/pmu.c
+>> @@ -730,6 +730,22 @@ static void test_chained_sw_incr(bool unused)
+>>  		    read_regn_el0(pmevcntr, 0), \
+>>  		    read_sysreg(pmovsclr_el0))
+>>  
+>> +static void enable_chain_counter(int even)
+>> +{
+>> +	write_sysreg_s(BIT(even), PMCNTENSET_EL0); /* Enable the high counter first */
+>> +	isb();
+>> +	write_sysreg_s(BIT(even + 1), PMCNTENSET_EL0); /* Enable the low counter */
+>> +	isb();
+>> +}
+> In ARM DDI 0487F.b, at the bottom of page D7-2727:
+>
+> "When enabling a pair of counters that are paired by a CHAIN event,
+> software must:
+>
+> 1. Enable the high counter, by setting PMCNTENCLR_EL0[n+1] to 0 and, if
+> necessary, setting PMCR_EL0.E to 1.
+> 2. Execute an ISB instruction, or perform another Context synchronization
+> event.
+> 3. Enable the low counter by setting PMCNTENCLR_EL0[n] to 0."
+>
+> Which matches the commit message, but not the code above. Am I
+> misunderstanding what is the high and low counter? In the example from the
+> Arm ARM, just before the snippet above, the odd numbered countered is
+> called the high counter.
+>
+> CHAIN is also defined as:
+>
+> [..] the odd-numbered event counter n+1 increments when an event increments
+> the preceding even-numbered counter n on the same PE and causes an unsigned
+> overflow of bits [31:0] of event counter n.
+>
+> So it would make sense to enable the odd counter first, then the even, so
+> no overflows are missed if the sequence was the other way around (even
+> counter enabled; overflow missed because odd counter disabled; odd counter
+> enabled).
+>
+> Same observation with disable_chain_counter().
 
-My apologies for following up so late. I took your suggestion into
-account and added this new DSB.
+yeah you're right, I mixed up. Comments were right but does not match
+the code.
+I corrected this.
+
+As for Marc's comment that this is not documented anymore that's correct
+and was mentionned in the commit msg. Introducing those helpers make the
+code a little bit simpler and I guess that executing those 'arbitrary'
+sequences cannot do any harm so I kept them.
+
+>
+>> +
+>> +static void disable_chain_counter(int even)
+>> +{
+>> +	write_sysreg_s(BIT(even + 1), PMCNTENCLR_EL0); /* Disable the low counter first*/
+>> +	isb();
+>> +	write_sysreg_s(BIT(even), PMCNTENCLR_EL0); /* Disable the high counter */
+>> +	isb();
+>> +}
+>> +
+>>  static void test_chain_promotion(bool unused)
+>>  {
+>>  	uint32_t events[] = {MEM_ACCESS, CHAIN};
+>> @@ -768,16 +784,17 @@ static void test_chain_promotion(bool unused)
+>>  	/* 1st COUNT with CHAIN enabled, next COUNT with CHAIN disabled */
+>>  	report_prefix_push("subtest3");
+>>  	pmu_reset();
+>> -	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
+>> -	isb();
+>> +	enable_chain_counter(0);
+>>  	PRINT_REGS("init");
+>>  
+>>  	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("After 1st loop");
+>>  
+>>  	/* disable the CHAIN event */
+>> -	write_sysreg_s(0x2, PMCNTENCLR_EL0);
+>> +	disable_chain_counter(0);
+>> +	write_sysreg_s(0x1, PMCNTENSET_EL0); /* Enable the low counter */
+>> +	isb();
+>>  	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("After 2d loop");
+>>  	report(read_sysreg(pmovsclr_el0) == 0x1,
+>> @@ -798,9 +815,11 @@ static void test_chain_promotion(bool unused)
+>>  	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("After 1st loop");
+>>  
+>> -	/* enable the CHAIN event */
+>> -	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>> +	/* Disable the even counter and enable the chain counter */
+>> +	write_sysreg_s(0x1, PMCNTENCLR_EL0); /* Disable the low counter first */
+> The comment says disable the even counter, but the odd counter is disabled.
+> Which Arm ARM refers to as the high counter. I'm properly confused about
+> the naming.
+
+fixed by using the 'low' terminology
 
 Thanks
 
@@ -151,25 +224,43 @@ Eric
 > Thanks,
 > Alex
 >
->> Thank you for the review!
+>>  	isb();
+>> +	enable_chain_counter(0);
+>> +
+>>  	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  
+>>  	PRINT_REGS("After 2d loop");
+>> @@ -824,10 +843,10 @@ static void test_chain_promotion(bool unused)
+>>  	PRINT_REGS("After 1st loop");
+>>  
+>>  	/* 0 becomes CHAINED */
+>> -	write_sysreg_s(0x0, PMCNTENSET_EL0);
+>> +	write_sysreg_s(0x3, PMCNTENCLR_EL0);
+>>  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
+>> -	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>>  	write_regn_el0(pmevcntr, 1, 0x0);
+>> +	enable_chain_counter(0);
+>>  
+>>  	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("After 2d loop");
+>> @@ -843,13 +862,13 @@ static void test_chain_promotion(bool unused)
+>>  	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
+>>  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
+>>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
+>> -	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>> +	enable_chain_counter(0);
+>>  	PRINT_REGS("init");
+>>  
+>>  	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
+>>  	PRINT_REGS("After 1st loop");
+>>  
+>> -	write_sysreg_s(0x0, PMCNTENSET_EL0);
+>> +	disable_chain_counter(0);
+>>  	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
+>>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>>  
+>> -- 
+>> 2.38.1
 >>
->> Eric
->>> Thanks,
->>> Alex
->>>
->>>>  	"       msr     pmcr_el0, %[pmcr]\n"
->>>>  	"       isb\n"
->>>>  	"       mov     x10, %[loop]\n"
->>>> @@ -308,6 +309,7 @@ asm volatile(
->>>>  	"       ldr	x9, [%[addr]]\n"
->>>>  	"       cmp     x10, #0x0\n"
->>>>  	"       b.gt    1b\n"
->>>> +	"       dsb     ish\n"
->>>>  	"       msr     pmcr_el0, xzr\n"
->>>>  	"       isb\n"
->>>>  	:
->>>> -- 
->>>> 2.38.1
->>>>
->>>>
+>>
 
