@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BBA271870F
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 18:09:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52E4571873C
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 18:22:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229561AbjEaQJ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 12:09:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45018 "EHLO
+        id S229567AbjEaQWf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 12:22:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbjEaQJZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 12:09:25 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2123.outbound.protection.outlook.com [40.107.94.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A405DB2;
-        Wed, 31 May 2023 09:09:23 -0700 (PDT)
+        with ESMTP id S229566AbjEaQWc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 12:22:32 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2107.outbound.protection.outlook.com [40.107.237.107])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37ED611F;
+        Wed, 31 May 2023 09:22:31 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e5gDheDCfyyjuaLE0CPauli+BRvkQadTUFUfVjeccpOxbFtgVNPIy6061mkxa5zB0gFUbvLia5OoG29/V0DcvtDHnsdgJQKGXv9nEZiNb2jqV+kxU+Kjl/Czjn+MFI2Jmi7+AvQtXUnmI1oWTdn69CuFWX0uxZ8ccJ9wCelk85ltwxEigM1r4uvAI8n12Bw/iKz+M88MuA9PiDsQWtPKd25WMcfpuQT35hkPPQOxUcoShsD96idnWPI9PgQNWdPjQJZYwgsOsybqon4hIFtlQKi30ZqUmH33Jp7xmT6mWPbHmIN/qDoYEyCZ28vx5a647Ff6cSqJ4JyVlnCuks1hcA==
+ b=MkJdLkPiEcOpZgc34EBWi4MWxnpxPaPfiJbZm0i4F0ly2+xXlf6g0b4mdLb2yuzn6zdzy4TyMFglfpNAac7zGfWSR8Te6W9MY7qGNa+AIFiHF5pj34FGXGzN33RLLXHuhQ6JM7B4bWN90ZkxxrOAfYv63jRqD8oPvlAGHgv5QaiNKsQTFa1GHWS5Xu4zGxwvcEfjRJYlmIbPoFCbI2UFbbDZr3toTrX0XIQ0nYtzB3RDc4/AXCBBdBRL8lvFxypCgpx0IW1O5nc1LjFoqtdHxJmggoj1KmEq/w1tZiPTHh8V/+rBzP/zHfGmWSKaMOBamsezDbdo8Ofr1rMSODMPSA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Js0vWXJbBaSGdt4e3s/Za31Kjb8CSpqUVTYpb8PrC5E=;
- b=Ne/lKHyCQ/+IvFoQpHVLrjexBkt8zAkgw+mRy51NoP+zeJlZqz8uP3URk4kV4HoZ1fThDu/wvvHEeETHrX8IXBYqDK8DEwm8U3MA0S/r2IY7vMdc862EjUik0CuyK2G9k31Ny/0Jrq3Awoj9eNRYMWau9gM6JKatTeEmnICs2xkT4OQrDxERkk+0aP13fTSJHF0JhqFG449zl+JoWU2rSooEa3IXlmVskDyS11Cse8JHGLkAPUK7jcN90ngcBygxddlqtuqmRmlYBLfgsMMNyBXJgr/C8mz8t1T1pjqojLSEIxONn6+aK4dPFYiKfHcUTIw/muDDe2uPTH8zUniLXg==
+ bh=+jiX4gOd+HKCSgYdLy/OMll4IUn+PDUpdkkx3aLcpWw=;
+ b=QM5+kETjC6h1GyDlYZHucTcomMds2y7nFP0aoFfkGLpyneVH/2BzK62jaKph2IrO4edNZV/syYXEcGfpf8BFDKtJwUA5JJWpGry+GylUZCXhAE+V2yKvRXz+NcfgeYEOZ07Y9a7fO5m4n3aqzDrTWeKI5WX9SyBhsuzM6YihmVUDpVEmDGZ6U8QA5E8t2Jy9MhvfUe83Z7EBTWc2Pafl0IcDPrikEJKpIN3dNs9OIP1VhcURNcghEBZ21DK9Fb41JGS1YvaHzqYhgIkYAi2eahY9iKjkq+yThcdhRKESfdqzDOwecOVafGJwo/1LIHcAtSVNTPEHUM7CJOnI732j7Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Js0vWXJbBaSGdt4e3s/Za31Kjb8CSpqUVTYpb8PrC5E=;
- b=eti4Y5iIoHq9DRz4PTqhILRxchWyaiuSEqNA3I5SNULIarVvLrXVZdgAmMx6rw3oI3xuOZUPLf2HpcQIvE9yNK7CPzFxHWj0no4rGSJTZktyPWVdlNw7KWx8RDCH34eNfq2hEbYaIrf0Hf7qoYll2mYPfnRuwr6AEdZqPgb6w3Y=
+ bh=+jiX4gOd+HKCSgYdLy/OMll4IUn+PDUpdkkx3aLcpWw=;
+ b=Z4tlrCcaaweNC0Ybchv+M+igDDbO+v52nIKlYp8FN998brgPDv3/H4JRm7/qiJiCa5sE0mWIi1aS56MZq8UhzY2PJQksz27fFPY4z+15K0/f0KhqPiuVqULMzuHhx8q83GIUeKLGEvJQ373gzTEJwdjjPOTJNwQsA8d0Y1+BuUk=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=corigine.com;
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by PH0PR13MB5700.namprd13.prod.outlook.com (2603:10b6:510:117::17) with
+ by CH2PR13MB3717.namprd13.prod.outlook.com (2603:10b6:610:9d::23) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.23; Wed, 31 May
- 2023 16:09:19 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.28; Wed, 31 May
+ 2023 16:22:27 +0000
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::5e55:9a39:751f:55f6]) by PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::5e55:9a39:751f:55f6%3]) with mapi id 15.20.6433.024; Wed, 31 May 2023
- 16:09:19 +0000
-Date:   Wed, 31 May 2023 18:09:11 +0200
+ 16:22:27 +0000
+Date:   Wed, 31 May 2023 18:22:19 +0200
 From:   Simon Horman <simon.horman@corigine.com>
 To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -59,67 +59,67 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org,
-        Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH RFC net-next v3 6/8] virtio/vsock: support dgrams
-Message-ID: <ZHdxJxjXDkkO03L4@corigine.com>
+        linux-hyperv@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v3 7/8] vsock: Add lockless sendmsg() support
+Message-ID: <ZHd0O1L7FH2XJEnd@corigine.com>
 References: <20230413-b4-vsock-dgram-v3-0-c2414413ef6a@bytedance.com>
- <20230413-b4-vsock-dgram-v3-6-c2414413ef6a@bytedance.com>
+ <20230413-b4-vsock-dgram-v3-7-c2414413ef6a@bytedance.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230413-b4-vsock-dgram-v3-6-c2414413ef6a@bytedance.com>
-X-ClientProxiedBy: AM3PR04CA0127.eurprd04.prod.outlook.com (2603:10a6:207::11)
- To PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+In-Reply-To: <20230413-b4-vsock-dgram-v3-7-c2414413ef6a@bytedance.com>
+X-ClientProxiedBy: AM9P193CA0022.EURP193.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21e::27) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH0PR13MB5700:EE_
-X-MS-Office365-Filtering-Correlation-Id: c8d32870-c90d-4c72-399f-08db61f16383
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH2PR13MB3717:EE_
+X-MS-Office365-Filtering-Correlation-Id: dafe0ad1-1ade-4b73-c472-08db61f33955
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Tc5XRF5F5FNjINoJ7gBs0RCHCL/KguV4FDtLktkb3pXqEWmIJilVv1p3rMyeP+yfdb37X02MmWtqgqOVIsbGxSOUHmW+HnFHnyyDiYuZ/RXBwe66z4xKystaZgfNUoc7sByFBvJC4OPZ7wBgigIqgkTrbstrVWgrPAOjh7Q82h2kHOuq4rumZsA1QFqj88bSP702L2FrkiR3K3ZnkqEaZX/dPRtrr9vMkHHQoA4fomDwKNS0+OTTpieJLS83CpPUDcIYyTShp/eL9qDbsxYoYDaYaDZpR8AezJDqQc7ELAqcy7MhRV35u4sVGXQD1DzkKpchv6X2YQFUEMB+2SKHuat1M6R4OobDCsn7FE5WJky1YWX+Wx3Olas/4KtV+RhfXrb9Ftse7kDCz7xU/kI3IQcNFkXYj+UWDnu4YXPVH1MLxwDYE0meVYDnHuZBJEq7UMKBI5gynv8QYy4VKM/jQrPhIZ1LJoqmI3KsM/wUJKP/bP5P2o130xFOZPtgWhbAENisjwgWGeZ2sf0zAOOLC/uBUDiTMQ/pONJR4fN+0ZpN0X+iO4ySPu+TbpQUSWY9
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(136003)(376002)(396003)(39840400004)(451199021)(54906003)(478600001)(5660300002)(7416002)(44832011)(8936002)(8676002)(36756003)(2906002)(86362001)(66556008)(66476007)(4326008)(66946007)(6916009)(316002)(41300700001)(38100700002)(186003)(6512007)(6506007)(6486002)(83380400001)(2616005)(6666004);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: qKmKnvy7fEaWPN7JatqObqxvLGdbf+x43AhsZUofHmTy9TSkNAvTiexF7lWOzJa70qMVPz5UYeeVQeu3An/bVLNZmM4oP5yViGgJfI2QqJMo1jNC69Pi+6Y1owZoyEJLkC5acQG6KajG1ceCZJB/HZhlgCqiX87odxq5+vL4JPLaLMhScyGMKtFD/j3AxydgI4fw7gD+xGb78gTYC4fpX4a0kTIvoLhqWozOo/CgCnNkLpNZrBH1Ur8uP2pBKQpYr3u4m25fBDn1Ulhv8JAq+ax5qGOiaO4ToVNdjh9iar3fKJgI1x1qf0qWB9FfgSn8cXqyOUjbxaQv1PFTov6J89CfzRZNxyiPnPvHeqIJbWaDk2bmaL5Par1NKmr0iozv+rED7lLLe2ZMlWcudqcPPo9wJnLTzrb4sHNACiQyHSmq8NdMzwYniilNjdYNDOCki2MMUX4u9VVsnATO2NZCssEa3ycIrjUdWtwpuQEzcYoT5zaR/z3Bi3t67JlwHAzCTvJ/KGvYB8Wsrnxx2rJEbfaeJApF2vFzRGlzyfnx4m289hObTUi87l86LCqC8OlF3Z1y0n2Fe0l0lmR/Nl4JktO+U9buTGmDsJxVtrkgh08=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(346002)(136003)(376002)(39840400004)(451199021)(36756003)(6666004)(38100700002)(41300700001)(6486002)(5660300002)(54906003)(478600001)(2616005)(6512007)(2906002)(44832011)(6506007)(86362001)(186003)(7416002)(83380400001)(4326008)(8936002)(66946007)(6916009)(66476007)(8676002)(316002)(66556008);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?UDdGFoMg3FFLRwJxK1m0L0zdiD9twr5j+GcFi7jf8Rw97CGwOLLnh40kSrnt?=
- =?us-ascii?Q?s0xjmc6E2LC3Nvwj4EWfNgrROkLyYyTeugbI+hhMLxeRzppsxKzBM6GoyKaS?=
- =?us-ascii?Q?eQ9ivDfS1gPKMzirqd/uO5HMtw616a1NRmO6YKcPtiaP3lz2Gl7gtBiXopy8?=
- =?us-ascii?Q?+kbsth9iq/0zrI0fXJsmk3JdoHanY8Zt1ftQip1G0ecT+co3DcSPGfpCPe5w?=
- =?us-ascii?Q?bvfk0LNkqR1KrkGINAlYEgjoV6UX+n5bSrGqBiPozx3qI66ribXVjFQrsMcR?=
- =?us-ascii?Q?E0zcyMwnFvkzTm9zdtcK6KmRroX8QcQDmKB3x/nA9wZcKlJUXV2JuOJPckE3?=
- =?us-ascii?Q?OqSRD+MjJuY7FM/8cmlWx3VkeyjQbtHRkpzAywx+n6R7iGtztF6v3p2xW9zC?=
- =?us-ascii?Q?domX7Cl7nSpw6kiFhYtBxiSkL+pvxAPaGP7fz0Sg4VHhXzJKIK7z5keBYxk0?=
- =?us-ascii?Q?FlruKlSPgLjEYWYwHweJJnGnNn8drBw3LwP/m3pM/oqCYq2D73O8ebS3xOq9?=
- =?us-ascii?Q?dj84OB0xjxHCasCxDILLuktcSaOMa4Y1JZ5trmcFA9ePmcl3KUbkPTwfqDf6?=
- =?us-ascii?Q?Ah3mHsM5j+w3hJ6/USM7OHMzULzLOGt+2NUNtcbuUubFN/JnAxX1n0M6D/02?=
- =?us-ascii?Q?fJ0jsy14R02eVUI7U5ONGdsRgxXtC4CQsAlwhDSaLvllhhSQCfioMd+gx2RX?=
- =?us-ascii?Q?AWB+pejT1gS6MdmodeujQa2/QmcoSe6bEWK0cgwSbbjqJOtVw2+Z0u4uY59u?=
- =?us-ascii?Q?twaxQN9HTP+pImALypHfUcgcKqdIVN9j66x1GBnan4XwUapoIenDV6C2VehU?=
- =?us-ascii?Q?r6pbq1ffxAj5cmhR9HSTTtnt9zxhWlJt1BIycvSsG1Jo9SzaFpnREpSMkV02?=
- =?us-ascii?Q?WJOnEG+cnTkvI7gPrWkhqhHSCf3YQVUOPkaGLEx7PtOJFtGdfcd15k8wAHJJ?=
- =?us-ascii?Q?iP2YYzm+4HFTTA2SUA6Y5X4uwHxV8XPKlOqRfkvzo4rnP4iAUj/5zMw9WLIQ?=
- =?us-ascii?Q?6NXyeWB+PfFjjNBOYnNFDkFfMhtp6pKhjRQqrJ1/hFMD4sKW+MnqmiHiTegr?=
- =?us-ascii?Q?UfZRfDMk/uCYH0v+YsA0CRvVMFz9rRsRrcBO2+jIAe2jmzY3roKuT6uSlibF?=
- =?us-ascii?Q?xdW4wxJoZIf01YmfXC8K2ZQtET+hePd+UwfAnHwwUPfMOO7WQ5iBlKiHh4wr?=
- =?us-ascii?Q?TK6tk8vr1+gZkhp9XfqHXprr00szHOsVVRhpKx142GAlmmonkTEvjiyxOn81?=
- =?us-ascii?Q?pOnI/NihDaBFUPYfhwbinqEwDolOXTNNWzSHayvAiIinSyNiwiIWhdtC/5Ff?=
- =?us-ascii?Q?i1lpfvtYGi2c0c/QwAw3fFho5uvcMDRwkfwcyIHbJlYoPkKx5H+zOy7TbKsx?=
- =?us-ascii?Q?uWU4s9vlDSSPNlV1fuoYgLOk5+oea8ENjDoa0GcfVtOgH98kXtpix7SAMLCx?=
- =?us-ascii?Q?CuRSsjHhQvxQFguq/15mV5JHuoOJ2XpB/0Ug29Y2T2iN6GKkeqsJ09PvV2IE?=
- =?us-ascii?Q?yQBXtait7V94fovDv2Z9rdIEgy+62yJAci9L2pePuOf49+4bYmheKCXnOtkD?=
- =?us-ascii?Q?zWK+gz/aDZKOMsE0L+EwCC7l+TrRiwqu1MiQlwd7p1wOzfHqt8qD07j56WrT?=
- =?us-ascii?Q?6pp+mBtTVrzO+Ronyr4mKCtQ1ob5ln4/t7mBN/ELVC+9wlGQ5WTYNCtupGod?=
- =?us-ascii?Q?CprG6Q=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?vg8sEP3ZReXmc0eHMfNOXBsnhq1I3zHEzEEEVsauF9Kctai/NS9rsxSkf5KU?=
+ =?us-ascii?Q?mW9KA4uTVUudzPKcKbuVyzRTLCeeeOsTiQOM/57DeC1V9vyHs3WpXQEuAzlo?=
+ =?us-ascii?Q?bK8swoLHOhpI+szypXjReR0BkOriNCkfFj2yOZALrgiWOqrKvL3AdqGOpbQX?=
+ =?us-ascii?Q?+SQH/PDtgKaj9mTBpLItMRB6266Me7O8C7WyByl+PsIzf2woSAZ7C0zC/M1H?=
+ =?us-ascii?Q?Pky6c8ZkGeWY4pgEWwREunKGSzyieVZhIL1iFl5xfIICwwBPxburryPaf99o?=
+ =?us-ascii?Q?/qu9L/9X1QlYPGu1QOjQiOt2PCmiXByjY+AwbBOsL3uGpv6nG0NmGkQPXLhE?=
+ =?us-ascii?Q?b5ZKFvKYoM5JorgD6VRnn0LPnwP3c/e2E+ljeXzoINfARkivfd3/9DPvp8vj?=
+ =?us-ascii?Q?lgtluAJJ/6cd9VQ/rcH181eu6+BeJ57HIA+LGamQ6Y+y5TVJ0XiYn92VilmU?=
+ =?us-ascii?Q?4v7Y60XwwQ17aEPc6DN+dHsWq0OqWskejmbwHHehRO1+K83j4ZaHn/bT2c4U?=
+ =?us-ascii?Q?0LbAe7ORguXdrWIDF3i9ydCreZsHIV2yCkpFczJrYeA8CuoTKx1oR44MVij/?=
+ =?us-ascii?Q?Oyvz/iKKbEJ24GvCS5IoQqDY109RIP7dx9ngTCyxovwadfscPV0GIgfFCDxt?=
+ =?us-ascii?Q?j/UiKrxTGbvFeaNuDKmd921TooEPHCKFvJQ8bG+3CZ/po7pH5cW/iuU6Wa6b?=
+ =?us-ascii?Q?TpLE+J0/l4TN6YntSwlesYA39StQl13AIDZs5iWu0EroVN2HwgWoWqphUImV?=
+ =?us-ascii?Q?emttUDiXDHgUw2K//Qad1SRYyMovsaIXql/i0x8/HQByxqlRMXKcIHdwUFx1?=
+ =?us-ascii?Q?eJ9mqN66HSqCfROW2rc18Yr/6L+e1xKdhe2ADe5oLe4eF7ZMqqPDYHGWJ+u/?=
+ =?us-ascii?Q?Sa+WnLdK0PvsyXI0pFDa0Z1zYBfmlL4NGLvG+1VhyetVEpVfk6k5kdW76Wa6?=
+ =?us-ascii?Q?weXBhsPWolg8eFjgThSaSdwXO0RH57AY7WAIAfPjW12e+qrxTuWqRomYgcOE?=
+ =?us-ascii?Q?3hYVe9Abpjv5ddnu+2WTb903lePGhP0zWjftRiVHa4u+dPKFVjOhuWWP3l92?=
+ =?us-ascii?Q?9QRYI5CIxyrUFtqbCjgH4kKMpiGfsEqddK3pKV4TeD7j8ZMnJVu4oIz66IZ+?=
+ =?us-ascii?Q?UdLf+k47bU7DRI0zC04QqvQUrN/CDxmNrkcNKn395AGZbqA+u8qbIf+BCoFs?=
+ =?us-ascii?Q?GnVvBbpIERNiYIC7jAk3o0KKMchNB51IFN2kT15kC7iiBSwkFUoezbLvTWFw?=
+ =?us-ascii?Q?7jzdExu31ea3nG2jJJRWxSUqC21JtJm04zbcJRgRyuYrVQ/j9D/MLFHy5LOq?=
+ =?us-ascii?Q?c36WFAZbfMp8dngH2uOwQnizON0BvkJvBHnNAE1aSNzqEIxxMiuu4ByPM72z?=
+ =?us-ascii?Q?6AIcEgrFUhw4tInZilSfVSYar1N/h+IIu2yFy0RX4fXwSmb1a/QhzRIehV1s?=
+ =?us-ascii?Q?ykgWBjPqhjfRaASCP21+Fb/KQtv1NmBoYoYjXHJhmEtztM7DvI3rO63/fsmZ?=
+ =?us-ascii?Q?+Lyowq4N4fJL92M0JqOEQdHi81dkDS0nzihJ+O+grqAbfgOHXcOMUyMewqXd?=
+ =?us-ascii?Q?lcz/zHgDKCal+haTP0YLyCsgkPpYhf88lS81oEQ4Mg6cgjMDlJV9wGZw1JMR?=
+ =?us-ascii?Q?bybClH9iRpRWWnXw72JA3oXcpJCwffwiwX/S/aRjBg5BwnSI7r7n/8t9DUDm?=
+ =?us-ascii?Q?bQ//9Q=3D=3D?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8d32870-c90d-4c72-399f-08db61f16383
+X-MS-Exchange-CrossTenant-Network-Message-Id: dafe0ad1-1ade-4b73-c472-08db61f33955
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2023 16:09:19.4374
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2023 16:22:27.2722
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WU8I58zo49duxBPC3laoKpiYIlqRRAlGQDsf1z3gfxaR6TZOu3KEUVqJRz3IhmX8YMypQw8lRDuwX5J1IIGu0zXBjAbDTsWW9uCXt7pU128=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB5700
+X-MS-Exchange-CrossTenant-UserPrincipalName: R1FzCkie19MjJwBjduRnvKipKA2NzRENuWeySDh1c+UDzJvWhyqMZP0HgtixiLhpaBdsrdTOVarFz7FMlj22wGYYB4CC5R3z6Dc0CUqc73I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR13MB3717
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
@@ -129,127 +129,119 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+ Dan Carpenter
-
-On Wed, May 31, 2023 at 12:35:10AM +0000, Bobby Eshleman wrote:
-> This commit adds support for datagrams over virtio/vsock.
-> 
-> Message boundaries are preserved on a per-skb and per-vq entry basis.
-> Messages are copied in whole from the user to an SKB, which in turn is
-> added to the scatterlist for the virtqueue in whole for the device.
-> Messages do not straddle skbs and they do not straddle packets.
-> Messages may be truncated by the receiving user if their buffer is
-> shorter than the message.
-> 
-> Other properties of vsock datagrams:
-> - Datagrams self-throttle at the per-socket sk_sndbuf threshold.
-> - The same virtqueue is used as is used for streams and seqpacket flows
-> - Credits are not used for datagrams
-> - Packets are dropped silently by the device, which means the virtqueue
->   will still get kicked even during high packet loss, so long as the
->   socket does not exceed sk_sndbuf.
-> 
-> Future work might include finding a way to reduce the virtqueue kick
-> rate for datagram flows with high packet loss.
-> 
-> Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+On Wed, May 31, 2023 at 12:35:11AM +0000, Bobby Eshleman wrote:
 
 ...
 
 Hi Bobby,
 
-some feedback from my side.
+some more feedback from my side.
 
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> Throughput metrics for single-threaded SOCK_DGRAM and
+> single/multi-threaded SOCK_STREAM showed no statistically signficant
+
+nit: s/signficant/significant/
+
+> throughput changes (lowest p-value reaching 0.27), with the range of the
+> mean difference ranging between -5% to +1%.
+> 
+> Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
 
 ...
 
-> @@ -730,11 +754,18 @@ int vsock_bind_stream(struct vsock_sock *vsk,
->  }
->  EXPORT_SYMBOL(vsock_bind_stream);
+> @@ -120,8 +125,8 @@ struct vsock_transport {
 >  
-> -static int __vsock_bind_dgram(struct vsock_sock *vsk,
-> -			      struct sockaddr_vm *addr)
-> +static int vsock_bind_dgram(struct vsock_sock *vsk,
-> +			    struct sockaddr_vm *addr)
->  {
-> -	if (!vsk->transport || !vsk->transport->dgram_bind)
-> -		return -EINVAL;
-> +	if (!vsk->transport || !vsk->transport->dgram_bind) {
-> +		int retval;
+>  	/* DGRAM. */
+>  	int (*dgram_bind)(struct vsock_sock *, struct sockaddr_vm *);
+> -	int (*dgram_enqueue)(struct vsock_sock *, struct sockaddr_vm *,
+> -			     struct msghdr *, size_t len);
+> +	int (*dgram_enqueue)(const struct vsock_transport *, struct vsock_sock *,
+> +			     struct sockaddr_vm *, struct msghdr *, size_t len);
 
-nit: blank line here
+Perhaps just a personal preference, but the arguments for these callbacks
+could have names.
 
-> +		spin_lock_bh(&vsock_dgram_table_lock);
-> +		retval = vsock_bind_common(vsk, addr, vsock_dgram_bind_table,
-> +					   VSOCK_HASH_SIZE);
-> +		spin_unlock_bh(&vsock_dgram_table_lock);
+>  	bool (*dgram_allow)(u32 cid, u32 port);
+>  	int (*dgram_get_cid)(struct sk_buff *skb, unsigned int *cid);
+>  	int (*dgram_get_port)(struct sk_buff *skb, unsigned int *port);
+> @@ -196,6 +201,17 @@ void vsock_core_unregister(const struct vsock_transport *t);
+>  /* The transport may downcast this to access transport-specific functions */
+>  const struct vsock_transport *vsock_core_get_transport(struct vsock_sock *vsk);
+>  
+> +static inline struct vsock_remote_info *
+> +vsock_core_get_remote_info(struct vsock_sock *vsk)
+> +{
 > +
-> +		return retval;
-> +	}
->  
->  	return vsk->transport->dgram_bind(vsk, addr);
->  }
 
-...
+nit: no blank line here
 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-
-...
-
-> @@ -47,7 +76,8 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
->  			   u32 src_cid,
->  			   u32 src_port,
->  			   u32 dst_cid,
-> -			   u32 dst_port)
-> +			   u32 dst_port,
-> +			   int *errp)
->  {
->  	const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM + len;
->  	struct virtio_vsock_hdr *hdr;
-> @@ -55,9 +85,21 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
->  	void *payload;
->  	int err;
->  
-> -	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
-> -	if (!skb)
-> +	/* dgrams do not use credits, self-throttle according to sk_sndbuf
-> +	 * using sock_alloc_send_skb. This helps avoid triggering the OOM.
+> +	/* vsk->remote_info may be accessed if the rcu read lock is held OR the
+> +	 * socket lock is held
 > +	 */
-> +	if (info->vsk && info->type == VIRTIO_VSOCK_TYPE_DGRAM) {
-> +		skb = virtio_transport_sock_alloc_send_skb(info, skb_len, GFP_KERNEL, &err);
-> +	} else {
-> +		skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
-> +		if (!skb)
-> +			err = -ENOMEM;
-> +	}
+> +	return rcu_dereference_check(vsk->remote_info,
+> +				     lockdep_sock_is_held(sk_vsock(vsk)));
+> +}
 > +
-> +	if (!skb) {
-> +		*errp = err;
->  		return NULL;
-> +	}
+>  /**** UTILS ****/
 >  
->  	hdr = virtio_vsock_hdr(skb);
->  	hdr->type	= cpu_to_le16(info->type);
-> @@ -102,6 +144,7 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
+>  /* vsock_table_lock must be held */
 
-Smatch that err may not be initialised in the out label below.
+...
 
-Just above this context the following appears:
-
-	if (info->vsk && !skb_set_owner_sk_safe(skb, sk_vsock(info->vsk))) {
-		WARN_ONCE(1, "failed to allocate skb on vsock socket with sk_refcnt == 0\n");
-		goto out;
-	}
-
-So I wonder if in that case err may not be initialised.
-
->  	return skb;
->  
->  out:
-> +	*errp = err;
->  	kfree_skb(skb);
->  	return NULL;
+> @@ -300,17 +449,36 @@ static void vsock_insert_unbound(struct vsock_sock *vsk)
+>  	spin_unlock_bh(&vsock_table_lock);
 >  }
+>  
+> -void vsock_insert_connected(struct vsock_sock *vsk)
+> +int vsock_insert_connected(struct vsock_sock *vsk)
+>  {
+> -	struct list_head *list = vsock_connected_sockets(
+> -		&vsk->remote_addr, &vsk->local_addr);
+> +	struct list_head *list;
+> +	struct vsock_remote_info *remote_info;
+
+nit: I know that this file doesn't follow the reverse xmas tree
+     scheme - longest line to shortest - for local variable declarations.
+     But as networking code I think it would be good towards towards
+     that scheme as code is changed.
+
+	struct vsock_remote_info *remote_info;
+	struct list_head *list;
+
+> +
+> +	rcu_read_lock();
+> +	remote_info = vsock_core_get_remote_info(vsk);
+> +	if (!remote_info) {
+> +		rcu_read_unlock();
+> +		return -EINVAL;
+> +	}
+> +	list = vsock_connected_sockets(&remote_info->addr, &vsk->local_addr);
+> +	rcu_read_unlock();
+>  
+>  	spin_lock_bh(&vsock_table_lock);
+>  	__vsock_insert_connected(list, vsk);
+>  	spin_unlock_bh(&vsock_table_lock);
+> +
+> +	return 0;
+>  }
+
+...
+
+> @@ -1120,7 +1122,9 @@ virtio_transport_recv_connecting(struct sock *sk,
+>  	case VIRTIO_VSOCK_OP_RESPONSE:
+>  		sk->sk_state = TCP_ESTABLISHED;
+>  		sk->sk_socket->state = SS_CONNECTED;
+> -		vsock_insert_connected(vsk);
+> +		err = vsock_insert_connected(vsk);
+> +		if (err)
+> +			goto destroy;
+
+The destroy label uses skerr, but it is uninitialised here.
+
+A W=1 or C=1 will probably tell you this.
+
+>  		sk->sk_state_change(sk);
+>  		break;
+>  	case VIRTIO_VSOCK_OP_INVALID:
 
 ...
