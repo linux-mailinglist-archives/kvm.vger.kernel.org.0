@@ -2,137 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC35E717909
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 09:53:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8D8C717A5F
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 10:43:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234813AbjEaHxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 03:53:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54900 "EHLO
+        id S234918AbjEaInW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 04:43:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232503AbjEaHwY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 03:52:24 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76A8C125;
-        Wed, 31 May 2023 00:51:13 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id d2e1a72fcca58-64d2467d640so6255620b3a.1;
-        Wed, 31 May 2023 00:51:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685519468; x=1688111468;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gdwwVTrlhtX+5DSC9fXBJMoGfz6wjbsQlSprVqEeSn8=;
-        b=sabBT9LSb+JP8+jmnubHp4wKdxjz44rRuVMYu17NCTV8v5bVTf17iIFVlBd68Cms/+
-         OA9YufLPvxMaxousG1Cxl0pPy1ni66HrNMqawkwYpW6Ji6NERoIZR9EBbsRYLE48iEQM
-         rEtG9pNqcFC6e5MWWMUfg2hhgMEdmHhu1KKbROV0gX6ChI3rr3gSmbWvpPlXZreep6Rr
-         o+gYbKDAryciO/Ksamc3UJg7VdwgoAoUV9QEZjeXBinSjeC7RJQsCGZTQac99bhZ1CYL
-         5GPtt9522aXo20R08cjxyikQwe4Nb6O94x7fVMXgbsL8jgjPPi7sz0s2BjOR4WggmBpN
-         ernw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685519468; x=1688111468;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gdwwVTrlhtX+5DSC9fXBJMoGfz6wjbsQlSprVqEeSn8=;
-        b=epktWWQ1nTbVcKVrSl46ri0X5rEWvx3k4Z+s3Swa6XIUWrYspN6++IQQt2gSKvTmag
-         VBKnPSYcveSlWrQ3a+HTR7LXLxy9GFVgcQnjTF0Uwz3iVQE7SSEJneP/LrCPXgFYTBaK
-         LtBr4RX0DINb+psYp7vWpHvOqXgdCfcp4X2TIeX0q7OpfkpRHIK3Hlrh0DGOw2yNSH4y
-         3PQqP753aU8dtly9vHKbaPf3tqwdfuWoO7d8GTD/wdNVz7hQTMp1/dcFewwzo0VZP1vb
-         ezU+6rjPzj68wbpRNAWZ2XHkKmDRGzxcB3bcmZV09RsueeDbxDvmt+QZ92UNHS9n4rKS
-         v7XQ==
-X-Gm-Message-State: AC+VfDzs6MrXj2tNk3+XXcllLaGHtugrUpj9f+6186j5ponMGwmzd4x8
-        55WXsTG12rMQoZXl+vsHt30=
-X-Google-Smtp-Source: ACHHUZ5THrdoAWJkwwwqtYPwycJnK4XFyJXky2kEOCWypNcTsm6C/jHfFkJisj3/MW2B0jspwFdwnw==
-X-Received: by 2002:a05:6a20:12c4:b0:10f:1f0:9b43 with SMTP id v4-20020a056a2012c400b0010f01f09b43mr5941801pzg.6.1685519467721;
-        Wed, 31 May 2023 00:51:07 -0700 (PDT)
-Received: from CLOUDLIANG-MB2.tencent.com ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id i9-20020aa79089000000b0064f95bc04d3sm2797803pfa.20.2023.05.31.00.51.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 May 2023 00:51:07 -0700 (PDT)
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3] KVM: x86/pmu: Add documentation for fixed ctr on PMU filter
-Date:   Wed, 31 May 2023 15:50:52 +0800
-Message-Id: <20230531075052.43239-1-cloudliang@tencent.com>
-X-Mailer: git-send-email 2.40.1
+        with ESMTP id S234886AbjEaInT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 04:43:19 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C9D710B
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 01:43:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685522598; x=1717058598;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+5VxqSApDTybbRqSSES1+Ai8coKoe4+HzHFHHa8plf8=;
+  b=ISopDs9ncwWHDv7koROV3LH9kxoyrkh41H1lydGRk1cIXpB74md34DwP
+   Stz0LqWq4VsBPX37xyLO3PM2penBRQb7EBWQyN1RzGvWqNugLxBJmXX4f
+   31zvc8LjwGVJbbRX9CJBOxOqr+tB6a/fwT6wVImwGWM9E5pwMH4j0pRs7
+   tpqHN4PWyhENj+Lknw1u/TJU/aIJHno7BX4vWqln36U4JQ5hIbf1Cuo31
+   tx8kN/ewBSzdl0D00eIKEfjHQzN2gV+6kj9hsJ5UD1EjzAscmLnyWmGGi
+   imC3zUUammbWIgZpidqCN/vuRCXMdywCXIxCMOI9vwbUxHdQNGEdsV9dx
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10726"; a="418669229"
+X-IronPort-AV: E=Sophos;i="6.00,205,1681196400"; 
+   d="scan'208";a="418669229"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2023 01:43:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10726"; a="1036956390"
+X-IronPort-AV: E=Sophos;i="6.00,205,1681196400"; 
+   d="scan'208";a="1036956390"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
+  by fmsmga005.fm.intel.com with ESMTP; 31 May 2023 01:43:15 -0700
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Chenyi Qiang <chenyi.qiang@intel.com>, lei4.wang@intel.com
+Subject: [PATCH v4 0/8] i386: Make Intel PT configurable 
+Date:   Wed, 31 May 2023 04:43:03 -0400
+Message-Id: <20230531084311.3807277-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jinrong Liang <cloudliang@tencent.com>
+Initial virtualization of Intel PT was added by making it as fixed
+feature set of ICX's capabilities. However, it breaks the Intel PT exposure
+on SPR machine because SPR has less PT capabilities of
+CPUID(0x14,1):EBX[15:0].
 
-Update the documentation for the KVM_SET_PMU_EVENT_FILTER ioctl
-to include a detailed description of how fixed performance events
-are handled in the pmu filter. The action and fixed_counter_bitmap
-members of the pmu filter to determine whether fixed performance
-events can be programmed by the guest. This information is helpful
-for correctly configuring the fixed_counter_bitmap and action fields
-to filter fixed performance events.
+This series aims to make Intel PT configurable that named CPU model can
+define its own PT feature set and "-cpu host/max" can use host pass-through
+feature set of Intel PT.
 
-Suggested-by: Like Xu <likexu@tencent.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Link: https://lore.kernel.org/oe-kbuild-all/202304150850.rx4UDDsB-lkp@intel.com
-Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
----
+At the same time, it also ensures existing named CPU model to generate
+the same PT CPUID set as before to not break live migration.
 
-v3:
-- Rebased to 5c291b93e5d6(tag: kvm-x86-next-2023.04.26)
-- Revise documentation to enhance user understanding. (Sean)
-- Post this patch separately from the selftests changes. (Sean)
+Changes in v4:
+- rebase to 51bdb0b57a2d "Merge tag 'pull-tcg-20230530' of https://gitlab.com/rth7680/qemu into staging"
+- cleanup Patch 6 by updating the commit message and remove unnecessary
+  handlng;
 
-v2:
-- Wrap the code from the documentation in a block of code; (Bagas Sanjaya)
+v3: https://lore.kernel.org/qemu-devel/20221208062513.2589476-1-xiaoyao.li@intel.com/
+- rebase to v7.2.0-rc4
+- Add bit 7 and 8 of FEAT_14_0_EBX in Patch 3
 
-v1:
-https://lore.kernel.org/kvm/20230414110056.19665-5-cloudliang@tencent.com
+v2: https://lore.kernel.org/qemu-devel/20220808085834.3227541-1-xiaoyao.li@intel.com/
+Changes in v2:
+- split out 3 patches (per Eduardo's comment)
+- determine if the named cpu model uses default Intel PT capabilities (to
+  be compatible with the old behavior) by condition that all PT feature
+  leaves are all zero.
 
- Documentation/virt/kvm/api.rst | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index a69e91088d76..9f680eb89b2b 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -5122,6 +5122,24 @@ Valid values for 'action'::
-   #define KVM_PMU_EVENT_ALLOW 0
-   #define KVM_PMU_EVENT_DENY 1
- 
-+Via this API, KVM userspace can also control the behavior of the VM's fixed
-+counters (if any) by configuring the "action" and "fixed_counter_bitmap" fields.
-+
-+Specifically, KVM follows the following pseudo-code when determining whether to
-+allow the guest FixCtr[i] to count its pre-defined fixed event::
-+
-+  FixCtr[i]_is_allowed = (action == ALLOW) && (bitmap & BIT(i)) ||
-+    (action == DENY) && !(bitmap & BIT(i));
-+  FixCtr[i]_is_denied = !FixCtr[i]_is_allowed;
-+
-+KVM always consumes fixed_counter_bitmap, it's userspace's responsibility to
-+ensure fixed_counter_bitmap is set correctly, e.g. if userspace wants to define
-+a filter that only affects general purpose counters.
-+
-+Note, the "events" field also applies to fixed counters' hardcoded event_select
-+and unit_mask values.  "fixed_counter_bitmap" has higher priority than "events"
-+if there is a contradiction between the two.
-+
- 4.121 KVM_PPC_SVM_OFF
- ---------------------
+v1: https://lore.kernel.org/qemu-devel/20210909144150.1728418-1-xiaoyao.li@intel.com/
 
 
-base-commit: 5c291b93e5d665380dbecc6944973583f9565ee5
+Xiaoyao Li (8):
+  target/i386: Print CPUID subleaf info for unsupported feature
+  target/i386/intel-pt: Fix INTEL_PT_ADDR_RANGES_NUM_MASK
+  target/i386/intel-pt: Introduce FeatureWordInfo for Intel PT CPUID
+    leaf 0x14
+  target/i386/intel-pt: print special message for
+    INTEL_PT_ADDR_RANGES_NUM
+  target/i386/intel-pt: Rework/rename the default INTEL-PT feature set
+  target/i386/intel-pt: Enable host pass through of Intel PT
+  target/i386/intel-pt: Define specific PT feature set for
+    IceLake-server, Snowridge and SapphireRapids
+  target/i386/intel-pt: Access MSR_IA32_RTIT_ADDRn based on guest CPUID
+    configuration
+
+ target/i386/cpu.c     | 293 +++++++++++++++++++++++++++++++-----------
+ target/i386/cpu.h     |  39 +++++-
+ target/i386/kvm/kvm.c |   8 +-
+ 3 files changed, 261 insertions(+), 79 deletions(-)
+
 -- 
-2.31.1
+2.34.1
 
