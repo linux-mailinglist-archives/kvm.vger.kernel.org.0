@@ -2,77 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB148718880
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 19:29:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E22117188A0
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 19:41:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230211AbjEaR3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 13:29:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32814 "EHLO
+        id S230267AbjEaRlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 13:41:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229899AbjEaR3n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 13:29:43 -0400
-Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAF36B3
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 10:29:37 -0700 (PDT)
-Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-19e82ae057eso4591289fac.3
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 10:29:37 -0700 (PDT)
+        with ESMTP id S230285AbjEaRks (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 13:40:48 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C53510CB
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 10:40:19 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id af79cd13be357-75b1975ea18so395946885a.3
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 10:40:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685554176; x=1688146176;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Oj2Fw5dSQp63bUWr4posajG7QB7Mr0N7IRLnkyA+AtY=;
-        b=yT+yxThUTe2JLkjFfuX0nVIEGilEqjQlrqrD+cr332oCJAMAWOKoWvFoCcZGZc739q
-         3GNusaXsZldOpWXjdz4xPOGubaCZJcHXqzA7YzmdXsVJHHE19wLXU4gO4QlNeZucavrV
-         +YxAgzMkIrax3QLo5WcLjYPDwqsl222zdDiOHX/+kK0BuHzYRNBVYcKUCwcom1PBzkRg
-         BKWfdox59KxgSZzEHkQDQsl9OKJkEge1qvGRNL7jklYmtoXfM1YTmE4Igo3RrPOX0Beh
-         UOUAVNWJpmO1NLdle3WkQLDKI9GjY9XM/c+ZiJ8lT8/PFN6vfvivKxovv0cv/0AL87sV
-         xYxw==
+        d=vultr.com; s=google; t=1685554819; x=1688146819;
+        h=content-transfer-encoding:in-reply-to:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yXp1RUK8ObiOcFYtO3+OuQ5bKcre6F1M14ngTQGctvQ=;
+        b=QVcAelLQ1/6ezCKuZMi8ImBzi0tpJfN7EGV8VDQ5e+a5cpPFT3AA7czS9FMArbT7VR
+         7FjfPgFgYD4GcK1/MaNTI1VobOgmnSLmawQnmU7U22pw/jbY+Sphg4nYVJEjaruvpJi7
+         /5axfecYhN9wmgdzrnx2X3snKOORTFydUBSBp8rGVJ1culR8PzXCkKQfweYB21zYXpjI
+         /xVPqbNsC0fEyBQOteFGMRlXV02XDCBZjgUGyzIDG9U3qh7y4WUuD17iG0Sf3gJn6fIQ
+         VUA7PmC06jY57/srnMroMVvAlZ8HE6gMoMTviblA2MTbD0qzI0RHJOEgvfMk5dd0Ejr/
+         SufQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685554176; x=1688146176;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Oj2Fw5dSQp63bUWr4posajG7QB7Mr0N7IRLnkyA+AtY=;
-        b=Q8IH1aC7IS8nnUdmBKvdG9yQFnU/TouVrXy8YZANXCcsS5qAEDtd9KQN4+KCs0OEm9
-         k0bb9e0dq3R+D2oHju+KVrt4tgMNUS/6Ya9ZcTrordQjHIfeDUoF5WC6qcU+N5rj6cfM
-         uNRsj3wi6Yw4ru8XOs82YEMCsPIOD722QkRifFy4PoZhy6jG27XZNxCQE906yfymLbZQ
-         wUdSxz4tziubULrAXSYnSc+tB1s7Omoh1BPNA9qQ06xqdJL2aQDeEO7Ee8GU4A7fI84Q
-         5y7xgpr2g0EiohidPuVxfj6BeYPezQtZMrite/VkRuQ5KDa1x08sSyZnHw3VLEpWJMeK
-         LHMQ==
-X-Gm-Message-State: AC+VfDyzWWf8bEIWyUz6AxqGdLL0cC8gbUOikQu4FfbVFP4tD0uN8cpe
-        ngK8o3qFGsg/Ma1+NETwWmdJFQ0dFzdjxrR+OS7M4g==
-X-Google-Smtp-Source: ACHHUZ7Ghm57psekUGggVXvqnjraOCgCTG4YKtIkmK4ZGcFmqhIkYJecoxryMwL62EWPoE+z7qd/cpdMv+pG2CN0RE0=
-X-Received: by 2002:a05:6870:e606:b0:19f:45a1:b5a2 with SMTP id
- q6-20020a056870e60600b0019f45a1b5a2mr3974220oag.49.1685554176435; Wed, 31 May
- 2023 10:29:36 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1685554819; x=1688146819;
+        h=content-transfer-encoding:in-reply-to:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yXp1RUK8ObiOcFYtO3+OuQ5bKcre6F1M14ngTQGctvQ=;
+        b=NA6qPEBqclmtul+uJhizmjh9AywMswtf6PQ8NzITIZx5/uN9uq+6If/dhLQ7QI5qSd
+         y9IPeiTT13Y8WyDnVa8DZrPt00L+xqyntdhRyCp6ddW4HoXuC/fS8N6KHvfBulPQYTkT
+         b21OAdfFtyLCwKuyKfHz+qxFn62LaPxmxfqCPm6ftNWPfTd2Vo4qdvE4KWOdnitPmoid
+         zmlFVZinzUZcndL1sVUYYehxAzQSbhH8k9iCus1WVO3zFkN3lT9eEY2GyLCHW4WKShic
+         1m7+seJo/nCR3mh148rcSVBLxfLv0XphQfKB/AuxsEJPmhvb9DLPnz62HvLZZrMJx7aZ
+         Znkg==
+X-Gm-Message-State: AC+VfDxvvMoQHfK86N4Jr1LLdsOud7psxSSN2aIEH54CeoqRRYAV8Iz2
+        fe0fQgak8KDGowP76wHcdTnk4cWUlomBn5UBnFY=
+X-Google-Smtp-Source: ACHHUZ5fYbRU2/6vE2IuO78ZQ/GfPkdtDyD3+JoQ0116m8wexlZsUu6UrIuGzRdxOPIQRcOJa2mwAQ==
+X-Received: by 2002:a05:6214:5294:b0:625:7802:f382 with SMTP id kj20-20020a056214529400b006257802f382mr6502859qvb.50.1685554818814;
+        Wed, 31 May 2023 10:40:18 -0700 (PDT)
+Received: from [10.7.101.16] ([208.167.225.210])
+        by smtp.gmail.com with ESMTPSA id u7-20020ae9c007000000b0075784a8f13csm4962883qkk.96.2023.05.31.10.40.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 May 2023 10:40:18 -0700 (PDT)
+From:   Brian Rak <brak@vultr.com>
+X-Google-Original-From: Brian Rak <brak@gameservers.com>
+Message-ID: <7fb24485-5049-a64c-0f62-bedebbc5eec2@gameservers.com>
+Date:   Wed, 31 May 2023 13:40:17 -0400
 MIME-Version: 1.0
-References: <20230522221835.957419-1-jingzhangos@google.com>
- <20230522221835.957419-6-jingzhangos@google.com> <87pm6kogx8.wl-maz@kernel.org>
- <CAAdAUtjJ8n8+jt=Y=oJFuRvERzRY4DQr6S7JThobU=wWMOYaRQ@mail.gmail.com> <86353dc5yr.wl-maz@kernel.org>
-In-Reply-To: <86353dc5yr.wl-maz@kernel.org>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Wed, 31 May 2023 10:29:24 -0700
-Message-ID: <CAAdAUtjj3MEzGPxVayezcd9x7_4EMsp2UUXZZHJWKLqbz75p5g@mail.gmail.com>
-Subject: Re: [PATCH v10 5/5] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.11.0
+Reply-To: brak@gameservers.com
+Subject: Re: Deadlock due to EPT_VIOLATION
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org
+References: <f023d927-52aa-7e08-2ee5-59a2fbc65953@gameservers.com>
+ <ZGzoUZLpPopkgvM0@google.com>
+ <44ba516b-afe0-505d-1a87-90d489f9e03f@gameservers.com>
+ <bce4b387-638d-7f3c-ca9b-12ff6e020bad@vultr.com>
+ <ZHEefxsu5E3BsPni@google.com>
+ <9fa11f06-bd55-b061-d16a-081351f04a13@gameservers.com>
+ <ZHZCEUzr9Ak7rkjG@google.com>
+In-Reply-To: <ZHZCEUzr9Ak7rkjG@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,110 +82,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-On Wed, May 31, 2023 at 12:31=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
-e:
+On 5/30/2023 2:36 PM, Sean Christopherson wrote:
+> On Tue, May 30, 2023, Brian Rak wrote:
+>> On 5/26/2023 5:02 PM, Sean Christopherson wrote:
+>>> On Fri, May 26, 2023, Brian Rak wrote:
+>>>> On 5/24/2023 9:39 AM, Brian Rak wrote:
+>>>>> On 5/23/2023 12:22 PM, Sean Christopherson wrote:
+>>>>>> The other thing that would be helpful would be getting kernel stack
+>>>>>> traces of the
+>>>>>> relevant tasks/threads.ï¿½ The vCPU stack traces won't be interesting,
+>>>>>> but it'll
+>>>>>> likely help to see what the fallocate() tasks are doing.
+>>>>> I'll see what I can come up with here, I was running into some
+>>>>> difficulty getting useful stack traces out of the VM
+>>>> I didn't have any luck gathering guest-level stack traces - kaslr makes it
+>>>> pretty difficult even if I have the guest kernel symbols.
+>>> Sorry, I was hoping to get host stack traces, not guest stack traces.  I am hoping
+>>> to see what the fallocate() in the *host* is doing.
+>> Ah - here's a different instance of it with a full backtrace from the host:
+> Gah, I wasn't specific enough again.  Though there's no longer an fallocate() for
+> any of the threads', so that's probably a moot point.  What I wanted to see is what
+> exactly the host kernel was doing, e.g. if something in the host memory management
+> was indirectly preventing vCPUs from making forward progress.  But that doesn't
+> seem to be the case here, and I would expect other problems if fallocate() was
+> stuck.  So ignore that request for now.
 >
-> On Tue, 30 May 2023 22:18:04 +0100,
-> Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Sun, May 28, 2023 at 4:05=E2=80=AFAM Marc Zyngier <maz@kernel.org> w=
-rote:
-> > >
-> > > On Mon, 22 May 2023 23:18:35 +0100,
-> > > Jing Zhang <jingzhangos@google.com> wrote:
-> > > >
-> > > > Refactor writings for ID_AA64PFR0_EL1.[CSV2|CSV3],
-> > > > ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon based on utilities
-> > > > specific to ID register.
-> > > >
-> > > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > > > ---
-> > > >  arch/arm64/include/asm/cpufeature.h |   1 +
-> > > >  arch/arm64/kernel/cpufeature.c      |   2 +-
-> > > >  arch/arm64/kvm/sys_regs.c           | 365 ++++++++++++++++++------=
-----
-> > > >  3 files changed, 243 insertions(+), 125 deletions(-)
-> > >
-> > > Reading the result after applying this series, I feel like a stuck
-> > > record. This final series still contains gems like this:
-> > >
-> > > static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> > >                                const struct sys_reg_desc *rd,
-> > >                                u64 val)
-> > > {
-> > >         u8 csv2, csv3;
-> > >
-> > >         /*
-> > >          * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long a=
-s
-> > >          * it doesn't promise more than what is actually provided (th=
-e
-> > >          * guest could otherwise be covered in ectoplasmic residue).
-> > >          */
-> > >         csv2 =3D cpuid_feature_extract_unsigned_field(val, ID_AA64PFR=
-0_EL1_CSV2_SHIFT);
-> > >         if (csv2 > 1 ||
-> > >             (csv2 && arm64_get_spectre_v2_state() !=3D SPECTRE_UNAFFE=
-CTED))
-> > >                 return -EINVAL;
-> > >
-> > >         /* Same thing for CSV3 */
-> > >         csv3 =3D cpuid_feature_extract_unsigned_field(val, ID_AA64PFR=
-0_EL1_CSV3_SHIFT);
-> > >         if (csv3 > 1 ||
-> > >             (csv3 && arm64_get_meltdown_state() !=3D SPECTRE_UNAFFECT=
-ED))
-> > >                 return -EINVAL;
-> > >
-> > >         return set_id_reg(vcpu, rd, val);
-> > > }
-> > >
-> > > Why do we have this? I've asked the question at least 3 times in the
-> > > previous versions, and I still see the same code.
-> > >
-> > > If we have sane limits, the call to arm64_check_features() in
-> > > set_id_reg() will catch the illegal write. So why do we have this at
-> > > all? The whole point of the exercise was to unify the handling. But
-> > > you're actually making it worse.
-> > >
-> > > So what's the catch?
-> > Sorry, I am only aware of one discussion of this code in v8. The
-> > reason I still keep the check here is that the arm64_check_features()
-> > can not catch all illegal writes as this code does.
-> > For example, for CSV2, one concern is:
-> > When arm64_get_spectre_v2_state() !=3D SPECTRE_UNAFFECTED, this code
-> > only allows guest CSV2 to be set to 0, any non-zero value would lead
-> > to -EINVAL. If we remove the check here, the guest CSV2 can be set to
-> > any value lower or equal to host CSV2.
+>>> Another datapoint that might provide insight would be seeing if/how KVM's page
+>>> faults stats change, e.g. look at /sys/kernel/debug/kvm/pf_* multiple times when
+>>> the guest is stuck.
+>> It looks like pf_taken is the only real one incrementing:
+> Drat.  That's what I expected, but it doesn't narrow down the search much.
 >
-> Sorry, this doesn't make sense. Lower is always fine. If you meant
-> 'higher', then I agree that it would be bad. But that doesn't make
-> keeping this code the right outcome.
-Got it. Then it would be good to remove the check here. Will do that.
+>>> Are you able to run modified host kernels?  If so, the easiest next step, assuming
+>>> stack traces don't provide a smoking gun, would be to add printks into the page
+>>> fault path to see why KVM is retrying instead of installing a SPTE.
+>> We can, but it can take quite some time from when we do the update to
+>> actually seeing results.ï¿½ This problem is inconsistent at best, and even
+>> though we're seeing it a ton of times a day, it's can show up anywhere.ï¿½
+>> Even if we rolled it out today, we'd still be looking at weeks/months before
+>> we had any significant number of machines on it.
+> Would you be able to run a bpftrace program on a host with a stuck guest?  If so,
+> I believe I could craft a program for the kvm_exit tracepoint that would rule out
+> or confirm two of the three likely culprits.
 >
-> > Of course, we can set the sane limit of CSV2 to 0 when
-> > arm64_get_spectre_v2_state() !=3D SPECTRE_UNAFFECTED in
-> > read_sanitised_id_aa64pfr0_el1(). Then we can remove all the checks
-> > here and no specific set_id function for AA64PFR0_EL1 is needed.
->
-> This is what I have been asking for all along: the "sanitised" view of
-> the register *must* return the absolute limit for the fields that are
-> flagged as writable by "mask".
->
-> If we need extra code, then something is really wrong. The core
-> feature code manages that without any special casing, and we should be
-> able to reach the same level.
-Understood.
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
-Thanks,
-Jing
+> Can you also dump the kvm.ko module params?  E.g. `tail /sys/module/kvm/parameters/*`
+
+Yes, we can run bpftrace programs
+
+# tail /sys/module/kvm/parameters/*
+==> /sys/module/kvm/parameters/eager_page_split <==
+Y
+
+==> /sys/module/kvm/parameters/enable_pmu <==
+Y
+
+==> /sys/module/kvm/parameters/enable_vmware_backdoor <==
+N
+
+==> /sys/module/kvm/parameters/flush_on_reuse <==
+N
+
+==> /sys/module/kvm/parameters/force_emulation_prefix <==
+0
+
+==> /sys/module/kvm/parameters/halt_poll_ns <==
+200000
+
+==> /sys/module/kvm/parameters/halt_poll_ns_grow <==
+2
+
+==> /sys/module/kvm/parameters/halt_poll_ns_grow_start <==
+10000
+
+==> /sys/module/kvm/parameters/halt_poll_ns_shrink <==
+0
+
+==> /sys/module/kvm/parameters/ignore_msrs <==
+N
+
+==> /sys/module/kvm/parameters/kvmclock_periodic_sync <==
+Y
+
+==> /sys/module/kvm/parameters/lapic_timer_advance_ns <==
+-1
+
+==> /sys/module/kvm/parameters/min_timer_period_us <==
+200
+
+==> /sys/module/kvm/parameters/mitigate_smt_rsb <==
+N
+
+==> /sys/module/kvm/parameters/mmio_caching <==
+Y
+
+==> /sys/module/kvm/parameters/nx_huge_pages <==
+Y
+
+==> /sys/module/kvm/parameters/nx_huge_pages_recovery_period_ms <==
+0
+
+==> /sys/module/kvm/parameters/nx_huge_pages_recovery_ratio <==
+60
+
+==> /sys/module/kvm/parameters/pi_inject_timer <==
+0
+
+==> /sys/module/kvm/parameters/report_ignored_msrs <==
+Y
+
+==> /sys/module/kvm/parameters/tdp_mmu <==
+Y
+
+==> /sys/module/kvm/parameters/tsc_tolerance_ppm <==
+250
+
+==> /sys/module/kvm/parameters/vector_hashing <==
+Y
+
+
