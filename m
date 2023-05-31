@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D3A9718AE4
+	by mail.lfdr.de (Postfix) with ESMTP id 67E96718AE5
 	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 22:15:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230224AbjEaUPq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 16:15:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45524 "EHLO
+        id S230236AbjEaUPr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 16:15:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbjEaUPp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 16:15:45 -0400
+        with ESMTP id S230211AbjEaUPq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 16:15:46 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E747C13E
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 13:14:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D2D6121
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 13:15:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685564097;
+        s=mimecast20190719; t=1685564100;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=X1+M7T6Odh2i5zf9nHT26H5Q4uJWOu5S7+RgtQe0rFw=;
-        b=EfP2L8pFlwnDmWurU5OhcKtnO0ApW+O/laGP11kQ4F9gTiyFAsgLggFe8xyyYYCDMo+IKE
-        yxQpheGsorhKNSjbkjEth2vREfB13lTPun69yc/y4qs/TcWwflYVhdvu4ha8jwyeRzpeau
-        fa6x1WT4IUNG7Lltzrl/1JwckLneDko=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=e/lJqPL58JT7TA1o3K6ckEmovJOzHARr6F5XfqlB8+I=;
+        b=KcOz+6+HaX6MJhrHhCKeJZdAF/0g1ZMMCgwFT+2qg9y+Lm7HiBEot7yccAqPOMzfdmFCQ0
+        z7VRQH9KKyYC3loWkEfhmQSBE25h4aWGHrbtZWTz9qjm3nJDF29UU6Ft1kPzlJjCLCTkLr
+        Pq4+3cs76dZdM1ktcpYtMRqJDydU6rI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-544-F48u5WuFMAGitiHcgKRB_Q-1; Wed, 31 May 2023 16:14:54 -0400
-X-MC-Unique: F48u5WuFMAGitiHcgKRB_Q-1
+ us-mta-562-o3ec14lEMd6dioqaELzRcg-1; Wed, 31 May 2023 16:14:56 -0400
+X-MC-Unique: o3ec14lEMd6dioqaELzRcg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 22C3F1C03DB6;
-        Wed, 31 May 2023 20:14:53 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7923E8032EF;
+        Wed, 31 May 2023 20:14:55 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.39.193.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 08C98407DEC0;
-        Wed, 31 May 2023 20:14:50 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 67EED407DEC0;
+        Wed, 31 May 2023 20:14:53 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -44,9 +44,9 @@ To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com,
         alexandru.elisei@arm.com
 Cc:     mark.rutland@arm.com
-Subject: [kvm-unit-tests PATCH v2 4/6] arm: pmu: Fix chain counter enable/disable sequences
-Date:   Wed, 31 May 2023 22:14:36 +0200
-Message-Id: <20230531201438.3881600-5-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v2 5/6] arm: pmu: Add pmu-mem-access-reliability test
+Date:   Wed, 31 May 2023 22:14:37 +0200
+Message-Id: <20230531201438.3881600-6-eric.auger@redhat.com>
 In-Reply-To: <20230531201438.3881600-1-eric.auger@redhat.com>
 References: <20230531201438.3881600-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -62,128 +62,140 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In some ARM ARM ddi0487 revisions it is said that
-disabling/enabling a pair of counters that are paired
-by a CHAIN event should follow a given sequence:
+Add a new basic test that runs MEM_ACCESS loop over
+100 iterations and make sure the number of measured
+MEM_ACCESS never overflows the margin. Some other
+pmu tests rely on this pattern and if the MEM_ACCESS
+measurement is not reliable, it is better to report
+it beforehand and not confuse the user any further.
 
-Enable the high counter first, isb, enable low counter
-Disable the low counter first, isb, disable the high counter
+Without the subsequent patch, this typically fails on
+ThunderXv2 with the following logs:
 
-This was the case in Fc. However this is not written anymore
-in subsequent revions such as Ia.
-
-Anyway, just in case, and because it also makes the code a
-little bit simpler, introduce 2 helpers to enable/disable chain
-counters that execute those sequences and replace the existing
-PMCNTENCLR/ENSET calls (at least this cannot do any harm).
-
-Also fix 2 write_sysreg_s(0x0, PMCNTENSET_EL0) in subtest 5 & 6
-and replace them by PMCNTENCLR writes since writing 0 in
-PMCNTENSET_EL0 has no effect.
+INFO: pmu: pmu-mem-access-reliability: 32-bit overflows:
+overflow=1 min=21 max=41 COUNT=20 MARGIN=15
+FAIL: pmu: pmu-mem-access-reliability: 32-bit overflows:
+mem_access count is reliable
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
 v1 -> v2:
-- fix the enable_chain_counter()/disable_chain_counter()
-  sequence, ie. swap n + 1 / n as reported by Alexandru.
-- fix an other comment using the 'low' terminology
+- use mem-access instead of memaccess as suggested by Mark
+- simplify the logic and add comments in the test loop
 ---
- arm/pmu.c | 37 ++++++++++++++++++++++++++++---------
- 1 file changed, 28 insertions(+), 9 deletions(-)
+ arm/pmu.c         | 58 +++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg |  6 +++++
+ 2 files changed, 64 insertions(+)
 
 diff --git a/arm/pmu.c b/arm/pmu.c
-index 74dd4c10..74c9f6f9 100644
+index 74c9f6f9..925f277c 100644
 --- a/arm/pmu.c
 +++ b/arm/pmu.c
-@@ -731,6 +731,22 @@ static void test_chained_sw_incr(bool unused)
- 		    read_regn_el0(pmevcntr, 0), \
- 		    read_sysreg(pmovsclr_el0))
+@@ -56,6 +56,7 @@
+ #define EXT_COMMON_EVENTS_HIGH	0x403F
  
-+static void enable_chain_counter(int even)
-+{
-+	write_sysreg_s(BIT(even + 1), PMCNTENSET_EL0); /* Enable the high counter first */
-+	isb();
-+	write_sysreg_s(BIT(even), PMCNTENSET_EL0); /* Enable the low counter */
-+	isb();
-+}
+ #define ALL_SET_32		0x00000000FFFFFFFFULL
++#define ALL_SET_64		0xFFFFFFFFFFFFFFFFULL
+ #define ALL_CLEAR		0x0000000000000000ULL
+ #define PRE_OVERFLOW_32		0x00000000FFFFFFF0ULL
+ #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
+@@ -67,6 +68,10 @@
+  * for some observed variability we take into account a given @MARGIN
+  */
+ #define PRE_OVERFLOW2_32		(ALL_SET_32 - COUNT - MARGIN)
++#define PRE_OVERFLOW2_64		(ALL_SET_64 - COUNT - MARGIN)
 +
-+static void disable_chain_counter(int even)
++#define PRE_OVERFLOW2(__overflow_at_64bits)				\
++	(__overflow_at_64bits ? PRE_OVERFLOW2_64 : PRE_OVERFLOW2_32)
+ 
+ #define PRE_OVERFLOW(__overflow_at_64bits)				\
+ 	(__overflow_at_64bits ? PRE_OVERFLOW_64 : PRE_OVERFLOW_32)
+@@ -747,6 +752,56 @@ static void disable_chain_counter(int even)
+ 	isb();
+ }
+ 
++/*
++ * This test checks that a mem access loop featuring COUNT accesses
++ * does not overflow with an init value of PRE_OVERFLOW2. It also
++ * records the min/max access count to see how much the counting
++ * is (un)reliable
++ */
++static void test_mem_access_reliability(bool overflow_at_64bits)
 +{
-+	write_sysreg_s(BIT(even), PMCNTENCLR_EL0); /* Disable the low counter first*/
-+	isb();
-+	write_sysreg_s(BIT(even + 1), PMCNTENCLR_EL0); /* Disable the high counter */
-+	isb();
++	uint32_t events[] = {MEM_ACCESS};
++	void *addr = malloc(PAGE_SIZE);
++	uint64_t count, delta, max = 0, min = pmevcntr_mask();
++	uint64_t pre_overflow2 = PRE_OVERFLOW2(overflow_at_64bits);
++	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
++	bool overflow = false;
++
++	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
++	    !check_overflow_prerequisites(overflow_at_64bits))
++		return;
++
++	pmu_reset();
++	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
++	for (int i = 0; i < 100; i++) {
++		pmu_reset();
++		write_regn_el0(pmevcntr, 0, pre_overflow2);
++		write_sysreg_s(0x1, PMCNTENSET_EL0);
++		isb();
++		mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
++		count = read_regn_el0(pmevcntr, 0);
++		if (count >= pre_overflow2) {
++			/* not counter overflow, as expected */
++			delta = count - pre_overflow2;
++		} else {
++			/*
++			 * unexpected counter overflow meaning the actual
++			 * mem access count, delta, is count + COUNT + MARGIN
++			 */
++			delta = count + COUNT + MARGIN;
++			overflow = true;
++			report_info("iter=%d count=%ld min=%ld max=%ld overflow!!!",
++				    i, delta, min, max);
++		}
++		/* record extreme value */
++		max = MAX(delta, max);
++		min = MIN(delta, min);
++	}
++	report_info("overflow=%d min=%ld max=%ld COUNT=%d MARGIN=%d",
++		    overflow, min, max, COUNT, MARGIN);
++	report(!overflow, "mem_access count is reliable");
 +}
 +
  static void test_chain_promotion(bool unused)
  {
  	uint32_t events[] = {MEM_ACCESS, CHAIN};
-@@ -769,16 +785,17 @@ static void test_chain_promotion(bool unused)
- 	/* 1st COUNT with CHAIN enabled, next COUNT with CHAIN disabled */
- 	report_prefix_push("subtest3");
- 	pmu_reset();
--	write_sysreg_s(0x3, PMCNTENSET_EL0);
- 	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
--	isb();
-+	enable_chain_counter(0);
- 	PRINT_REGS("init");
+@@ -1204,6 +1259,9 @@ int main(int argc, char *argv[])
+ 	} else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
+ 		run_event_test(argv[1], test_basic_event_count, false);
+ 		run_event_test(argv[1], test_basic_event_count, true);
++	} else if (strcmp(argv[1], "pmu-mem-access-reliability") == 0) {
++		run_event_test(argv[1], test_mem_access_reliability, false);
++		run_event_test(argv[1], test_mem_access_reliability, true);
+ 	} else if (strcmp(argv[1], "pmu-mem-access") == 0) {
+ 		run_event_test(argv[1], test_mem_access, false);
+ 		run_event_test(argv[1], test_mem_access, true);
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 5e67b558..fe601cbb 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -90,6 +90,12 @@ groups = pmu
+ arch = arm64
+ extra_params = -append 'pmu-mem-access'
  
- 	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
- 	PRINT_REGS("After 1st loop");
- 
- 	/* disable the CHAIN event */
--	write_sysreg_s(0x2, PMCNTENCLR_EL0);
-+	disable_chain_counter(0);
-+	write_sysreg_s(0x1, PMCNTENSET_EL0); /* Enable the low counter */
-+	isb();
- 	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
- 	PRINT_REGS("After 2nd loop");
- 	report(read_sysreg(pmovsclr_el0) == 0x1,
-@@ -799,9 +816,11 @@ static void test_chain_promotion(bool unused)
- 	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
- 	PRINT_REGS("After 1st loop");
- 
--	/* enable the CHAIN event */
--	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+	/* Disable the low counter first and enable the chain counter */
-+	write_sysreg_s(0x1, PMCNTENCLR_EL0);
- 	isb();
-+	enable_chain_counter(0);
++[pmu-mem-access-reliability]
++file = pmu.flat
++groups = pmu
++arch = arm64
++extra_params = -append 'pmu-mem-access-reliability'
 +
- 	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
- 
- 	PRINT_REGS("After 2nd loop");
-@@ -825,10 +844,10 @@ static void test_chain_promotion(bool unused)
- 	PRINT_REGS("After 1st loop");
- 
- 	/* 0 becomes CHAINED */
--	write_sysreg_s(0x0, PMCNTENSET_EL0);
-+	write_sysreg_s(0x3, PMCNTENCLR_EL0);
- 	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
--	write_sysreg_s(0x3, PMCNTENSET_EL0);
- 	write_regn_el0(pmevcntr, 1, 0x0);
-+	enable_chain_counter(0);
- 
- 	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
- 	PRINT_REGS("After 2nd loop");
-@@ -844,13 +863,13 @@ static void test_chain_promotion(bool unused)
- 	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
- 	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
- 	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2_32);
--	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+	enable_chain_counter(0);
- 	PRINT_REGS("init");
- 
- 	mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E);
- 	PRINT_REGS("After 1st loop");
- 
--	write_sysreg_s(0x0, PMCNTENSET_EL0);
-+	disable_chain_counter(0);
- 	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
- 	write_sysreg_s(0x3, PMCNTENSET_EL0);
- 
+ [pmu-sw-incr]
+ file = pmu.flat
+ groups = pmu
 -- 
 2.38.1
 
