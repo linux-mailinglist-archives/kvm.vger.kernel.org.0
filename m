@@ -2,85 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A4B0718DF7
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 00:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8063A718DFA
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 00:02:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbjEaWCL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 18:02:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55716 "EHLO
+        id S230298AbjEaWCe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 18:02:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbjEaWCH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 18:02:07 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DCD2121
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 15:02:05 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-974265a1a40so316341866b.0
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 15:02:05 -0700 (PDT)
+        with ESMTP id S229724AbjEaWCc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 18:02:32 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F2F511D
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 15:02:29 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-2566a1a11d0so8534a91.3
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 15:02:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamhpc-com.20221208.gappssmtp.com; s=20221208; t=1685570524; x=1688162524;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=z8eeVT9lQfqYQDRbZwP+cUlOL9m2gC6p9ms+5P8NhDs=;
-        b=cxavh/8gs41qzpYEPE2LH6mmR/3lwS8X27dDmjffXEDcmGBActirHDUFa9FTrRequX
-         ZaBimWq9quBGnudtwbOAqM4YFQbRQSqgYsUOaW/d3ENOBLUOlEOltqXsSN1kuryziEpf
-         c/CbOgqBOnmicQKcFnGagvVtiPvHCi13Clrm5916Bnv17eX1S4vsMqSyIe6zzV/RPza3
-         1crDuureHSEHFwm54fPLbELYamVkB26xNQlcffZL1PqoasQ7Abpsdn70Ttkwc8AqJW8Y
-         ap9YTHM0RlBswFDNSXgdyCyUDiYpiwHvlhtRfy524nroQvHV+LfH+ngZA42F1ysPJL5O
-         6jJA==
+        d=google.com; s=20221208; t=1685570549; x=1688162549;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KixHZBMA+6FI7Pfjf38bXK5H1vgh9ysGY6HKye84LxA=;
+        b=cKjCxybKIBlY6BvZhjgsMAJYJjgYSoSIDbguxswRODUBqYxXlbMS6zTlr3jKf2WWLO
+         a0iV7g8hPFwM/0DjIwrgyToe1Oy1xRVNqCNVKG86o9VWxLj6q/eTUzbwPINkD1J50LfQ
+         EUKiJxrXUqr5ZTX67Joo1YZleIP0mOgwAJ92X16sB0054X+V+llNUgvrezWbmKSmwBXL
+         z9FPpSEOtEuHpw5hhTjXww4kLrz/fYX7BCkJHueqgA2jlIaAer2rU/CYkg9HkAe3rUE3
+         Woqu7PjMGTA0e16oFwQtPeNmzYnY2QqY1SE9zzNOiFPaG5F0I3XQaEZWDcmwFPRw8ar4
+         BoBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685570524; x=1688162524;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z8eeVT9lQfqYQDRbZwP+cUlOL9m2gC6p9ms+5P8NhDs=;
-        b=dE0r2T5JIcBHXXUi6F3Cz1kQBoNp5iwFiXC/f0YY5eduduiq8HJwgc/NkBKas1IWgI
-         pxqI7MbrF9szYHHjTRY3Ffk997Sh7wEkR61ZPnICbkvefH1boTYsIL/FljJubj/zP3FF
-         zky2XnnZTEdgROpHLBvdztzBw1ruVUmE3998whs4E5E6IWhr9kgyt5Fh+9+sWTlMSbuy
-         Opo/E8fGAnEzEEn/NSVn0oq067zHlovCu67jnJz9IhvurzipyGsCc7C36/pzTR/4tsaD
-         kbkdaVPkaM3EP/GWMxV8LN7P/Sa6Nbec+kWlKPZv6SiKSACexK8/TKkyiQrz/rvcI61C
-         3bcQ==
-X-Gm-Message-State: AC+VfDwtT93pk8Q/KkYFjDMJ2vLJ1F1U1mqLRlEaQpVjDduMzC7FA8pL
-        0X1WjN5VIHolP6DRHj/2qz6kak3XveEeHgfRBKE=
-X-Google-Smtp-Source: ACHHUZ6opGGsxrjzDxEmHpD4/7OreBpNqoFLSa9fKicUZ9C5K5wyIrg6u94m+dHDkZIYgwTf+9FXZw==
-X-Received: by 2002:a17:907:1c01:b0:96a:b6e1:66d9 with SMTP id nc1-20020a1709071c0100b0096ab6e166d9mr7405939ejc.7.1685570523887;
-        Wed, 31 May 2023 15:02:03 -0700 (PDT)
-Received: from [192.168.178.121] (dhcp-077-251-030-138.chello.nl. [77.251.30.138])
-        by smtp.gmail.com with ESMTPSA id s10-20020a170906a18a00b0096f00d79d6asm9630435ejy.54.2023.05.31.15.02.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 May 2023 15:02:03 -0700 (PDT)
-Message-ID: <d645e19b-6325-7be4-4320-e989305969ad@streamhpc.com>
-Date:   Thu, 1 Jun 2023 00:02:02 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.1
-Subject: Re: [PATCH] vfio/pci-core: Add capability for AtomicOp copleter
- support
-Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
-References: <20230519214748.402003-1-alex.williamson@redhat.com>
-From:   Robin Voetter <robin@streamhpc.com>
-In-Reply-To: <20230519214748.402003-1-alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1685570549; x=1688162549;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KixHZBMA+6FI7Pfjf38bXK5H1vgh9ysGY6HKye84LxA=;
+        b=MeE5NujK3va2jSRWsb5Xa/Ar6qVFo+v6i8DNEFxFkmOhwcW6nn5muPUmUAMgdjAa8V
+         UfhaUbb3TcU6HgRMAQ3HcaUIARPuXErEkN68crPXCMaOJdkhclWjxHkuXOWFmnUWdIlh
+         fHnfX6i9SHRE+pP6emd91XAbn5gg4bqRfYc0T3R6EDcgZC6EPJFjIOowq/EoOMdIfSzn
+         bAo7bJ5bQPqzFOjmHRfh9jGVKCrmrhoBwHZmlCzAPlbGUVFs8OuxTj3t0gQlUyCBGx7K
+         lNP75tUeOe2OFKcjBe+RYv+AY3RCmSI3jJOy0Cwpf8ElZj/yyhqvasvZENZY5sroZ+ez
+         OPmw==
+X-Gm-Message-State: AC+VfDyqPnH/A/ve9xYmDz0SChLFNmHKO+R39bMqWyFgKrRnBOUTePAg
+        OrTYv4l9nf9Vx7odV4cqmEreEYXuP/w=
+X-Google-Smtp-Source: ACHHUZ6cPlRqjV7aURtrMNwlQNXtnj/y5NeekyPOAoESHt3+Na81kZydArmpyXvAJRO2BfdmGDl6AlroJsM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:943:b0:253:38f0:eff0 with SMTP id
+ dw3-20020a17090b094300b0025338f0eff0mr1461277pjb.0.1685570548974; Wed, 31 May
+ 2023 15:02:28 -0700 (PDT)
+Date:   Wed, 31 May 2023 15:02:27 -0700
+In-Reply-To: <20230531212907.GHZHe8I/DZUyzIXI2Q@fat_crate.local>
+Mime-Version: 1.0
+References: <20230530200152.18961-1-jon@nutanix.com> <2a6502e3-ba87-0355-af09-825e8467b81f@intel.com>
+ <F4AFC5EE-9967-4117-BA85-ED82C106575C@nutanix.com> <ZHd2P6D142rCByrm@google.com>
+ <E17EFDD7-C54A-4532-B1D3-D567557FC54B@nutanix.com> <ZHermsSGQBcDD07R@google.com>
+ <20230531212907.GHZHe8I/DZUyzIXI2Q@fat_crate.local>
+Message-ID: <ZHfD88N3PhqReu2z@google.com>
+Subject: Re: [PATCH] x86/fpu/xstate: clear XSAVE features if DISABLED_MASK set
+From:   Sean Christopherson <seanjc@google.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Jon Kohler <jon@nutanix.com>, Dave Hansen <dave.hansen@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Kyle Huey <me@kylehuey.com>,
+        "neelnatu@google.com" <neelnatu@google.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/19/23 23:47, Alex Williamson wrote:
-> Test and enable PCIe AtomicOp completer support of various widths and
-> report via device-info capability to userspace.
+On Wed, May 31, 2023, Borislav Petkov wrote:
+> On Wed, May 31, 2023 at 08:18:34PM +0000, Sean Christopherson wrote:
+> > Assert that the to-be-checked bit passed to cpu_feature_enabled() is a
+> > compile-time constant instead of applying the DISABLED_MASK_BIT_SET()
+> > logic if and only if the bit is a constant.  Conditioning the check on
+> > the bit being constant instead of requiring the bit to be constant could
+> > result in compiler specific kernel behavior, e.g. running on hardware that
+> > supports a disabled feature would return %false if the compiler resolved
+> > the bit to a constant, but %true if not.
 > 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> Uff, more mirroring CPUID inconsistencies.
+> 
+> So *actually*, we should clear all those build-time disabled bits from
+> x86_capability so that this doesn't happen.
 
-Reviewed-by: Robin Voetter <robin@streamhpc.com>
-Tested-by: Robin Voetter <robin@streamhpc.com>
+Heh, I almost suggested that, but there is a non-zero amount of code that wants
+to ignore the disabled bits and query the "raw" CPUID information.  In quotes
+because the kernel still massages x86_capability.  Changing that behavior will
+require auditing a lot of code, because in most cases any breakage will be mostly
+silent, e.g. loss of features/performance and not explosions.
 
-Kind regards,
+E.g. KVM emulates UMIP when it's not supported in hardware, and so advertises UMIP
+support irrespective of hardware/host support.  But emulating UMIP is imperfect
+and suboptimal (requires intercepting L*DT instructions), so KVM intercepts L*DT
+instructions iff UMIP is not supported in hardware, as detected by
+boot_cpu_has(X86_FEATURE_UMIP).
 
-Robin Voetter
+The comment for cpu_feature_enabled() even calls out this type of use case:
+
+  Use the cpu_has() family if you want true runtime testing of CPU features, like
+  in hypervisor code where you are supporting a possible guest feature where host
+  support for it is not relevant.
+
+That said, the behavior of cpu_has() is wildly inconsistent, e.g. LA57 is
+indirectly cleared in x86_capability if it's a disabled bit because of this code
+in early_identify_cpu().
+
+	if (!pgtable_l5_enabled())
+		setup_clear_cpu_cap(X86_FEATURE_LA57);
+
+KVM works around that by manually doing CPUID to query hardware directly:
+
+	/* Set LA57 based on hardware capability. */
+	if (cpuid_ecx(7) & F(LA57))
+		kvm_cpu_cap_set(X86_FEATURE_LA57);
+
+So yeah, I 100% agree the current state is messy and would love to have
+cpu_feature_enabled() be a pure optimization with respect to boot_cpu_has(), but
+it's not as trivial at it looks.
