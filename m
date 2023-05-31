@@ -2,69 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 632DD718EBF
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 00:47:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F13E718EC2
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 00:48:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229880AbjEaWq7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 18:46:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54668 "EHLO
+        id S230409AbjEaWs2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 18:48:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230300AbjEaWq5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 18:46:57 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 205449F;
-        Wed, 31 May 2023 15:46:55 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1685573213;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=62QRYD2JYjhVXeJKvz+pkD9g/8yVOTlXBJz91bvypxw=;
-        b=ZTWkydXm1wNQ5gZo7CxsTSYajGsGC0YzS9sTU6T0bztRYTaCYcG4H1U3UDnry+Xjkis7Jp
-        6fOrB6YPGVEJzXsuW7GxphBGncPYvXN46XMFtnnv7mVsef7vsxag6/w3hWi4RXXQw3oCHY
-        li9vZ/7OWEQYIqM66VfG0bdZxDoFxZBM1IaSB1DUD+vW13gy5Gldyow7yebpO1LCgr5mUe
-        +Dqpv9jKYYpBqVbgPS9TC6KBvRnjNNCPC8zFtFkwez2l+u17rkwcVT/HcNpPOLZyv8U0W4
-        sYSBQnoj9ZIY8QSSztGefOgtfRouphsL8ECMjEKeKj8XDW8VtbsqJjMsgUVPzw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1685573213;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=62QRYD2JYjhVXeJKvz+pkD9g/8yVOTlXBJz91bvypxw=;
-        b=OYdOVBuwhy9HPaq+iyeB6G5qd5KyWyZQl82e4O7qqtpxPvSA9guQpP5TjHmcz8Ah9suApN
-        d3qCwR44gPP8BVCw==
-To:     Peter Zijlstra <peterz@infradead.org>, bigeasy@linutronix.de
-Cc:     mark.rutland@arm.com, maz@kernel.org, catalin.marinas@arm.com,
-        will@kernel.org, chenhuacai@kernel.org, kernel@xen0n.name,
-        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-        borntraeger@linux.ibm.com, svens@linux.ibm.com,
-        pbonzini@redhat.com, wanpengli@tencent.com, vkuznets@redhat.com,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, jgross@suse.com,
-        boris.ostrovsky@oracle.com, daniel.lezcano@linaro.org,
-        kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-        decui@microsoft.com, rafael@kernel.org, peterz@infradead.org,
-        longman@redhat.com, boqun.feng@gmail.com, pmladek@suse.com,
-        senozhatsky@chromium.org, rostedt@goodmis.org,
-        john.ogness@linutronix.de, juri.lelli@redhat.com,
-        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-        bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
-        vschneid@redhat.com, jstultz@google.com, sboyd@kernel.org,
-        linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-pm@vger.kernel.org
-Subject: Re: [PATCH v2 08/13] x86/vdso: Fix gettimeofday masking
-In-Reply-To: <20230519102715.704767397@infradead.org>
-References: <20230519102058.581557770@infradead.org>
- <20230519102715.704767397@infradead.org>
-Date:   Thu, 01 Jun 2023 00:46:52 +0200
-Message-ID: <87v8g8dspv.ffs@tglx>
+        with ESMTP id S229915AbjEaWs1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 18:48:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0487311F;
+        Wed, 31 May 2023 15:48:26 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 91811634AD;
+        Wed, 31 May 2023 22:48:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E324C433EF;
+        Wed, 31 May 2023 22:48:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685573304;
+        bh=7+T+ESDx7lTbGl9478hJKHlghZjeUr+1ylaQB5WdoCw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=A4HZtknVVOdPtECvEG05BMFKO+8SJ/FmPZBB2VNpW35jTADntXWLW9mYsjgOBALQb
+         8vnXKDsH6Ddnwm3zNTX8ebXtauMHXuyo1IF6lXWA014CJ//cuZfkhIoNxJ343QokCP
+         UYYmG12bc3YqwbFRnSR3n3UvYGOwL1fcFBToVX6/TZsuw+yN7wqxClx8RbnfB6P+Y4
+         bqpcl5Pf/zcxrp7/gNbVgmCRQWt4u7kCjmXlvyQMg7NDjtzIia9w2K8Hxv4Oyrc1p9
+         tr0Ly6ssdaDo5sKICPS3+p0et0TqtvPOcvGTp3DVmTLQL1GQmQYFkYwRElIVYqrm9G
+         td03KiCTyg+bg==
+Date:   Wed, 31 May 2023 15:48:22 -0700
+From:   Josh Poimboeuf <jpoimboe@kernel.org>
+To:     Jon Kohler <jon@nutanix.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kees Cook <keescook@chromium.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Waiman Long <longman@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH v4] KVM: VMX: do not disable interception for
+ MSR_IA32_SPEC_CTRL on eIBRS
+Message-ID: <20230531224822.ceglenvl6w5wfiar@treble>
+References: <20230531144128.73814-1-jon@nutanix.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230531144128.73814-1-jon@nutanix.com>
+X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,11 +62,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 19 2023 at 12:21, Peter Zijlstra wrote:
-> to take wrapping into account, but per all the above, we don't
-> actually wrap on u64 anymore.
->
-> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+On Wed, May 31, 2023 at 10:41:28AM -0400, Jon Kohler wrote:
+> Avoid expensive rdmsr on every VM Exit for MSR_IA32_SPEC_CTRL on
+> eIBRS enabled systems iff the guest only sets IA32_SPEC_CTRL[0] (IBRS)
+> and not [1] (STIBP) or [2] (SSBD) by not disabling interception in
+> the MSR bitmap. Note: this logic is only for eIBRS, as Intel's guidance
+> has long been that eIBRS only needs to be set once, so most guests with
+> eIBRS awareness should behave nicely. We would not want to accidentally
+> regress misbehaving guests on pre-eIBRS systems, who might be spamming
+> IBRS MSR without the hypervisor being able to see it today.
+> 
+> eIBRS enabled guests using just IBRS will only write SPEC_CTRL MSR
+> once or twice per vCPU on boot, so it is far better to take those
+> VM exits on boot than having to read and save this msr on every
+> single VM exit forever. This outcome was suggested on Andrea's commit
+> 2f46993d83ff ("x86: change default to spec_store_bypass_disable=prctl spectre_v2_user=prctl")
+> however, since interception is still unilaterally disabled, the rdmsr
+> tax is still there even after that commit.
+> 
+> This is a significant win for eIBRS enabled systems as this rdmsr
+> accounts for roughly ~50% of time for vmx_vcpu_run() as observed
+> by perf top disassembly, and is in the critical path for all
+> VM-Exits, including fastpath exits.
+> 
+> Opportunistically update comments for both MSR_IA32_SPEC_CTRL and
+> MSR_IA32_PRED_CMD to make it clear how L1 vs L2 handling works.
+> 
+> Fixes: 2f46993d83ff ("x86: change default to spec_store_bypass_disable=prctl spectre_v2_user=prctl")
+> Signed-off-by: Jon Kohler <jon@nutanix.com>
 
-Tested-by: Thomas Gleixner <tglx@linutronix.de>
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+Acked-by: Josh Poimboeuf <jpoimboe@kernel.org>
+
+-- 
+Josh
