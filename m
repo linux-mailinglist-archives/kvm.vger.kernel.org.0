@@ -2,79 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 023F071783C
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 09:29:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E292717847
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 09:31:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234440AbjEaH30 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 03:29:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39586 "EHLO
+        id S234603AbjEaHba (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 03:31:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234594AbjEaH3L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 03:29:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB70E18F
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 00:28:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685518088;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=I/jcj1p+dPSX4LPtsNzKmq9GtWWjgKaTvB7WD/Tt27U=;
-        b=RYO+BX4XX3EvuqiVeJsxz6VaPTU+Wdl7Sc8TVz2xEvetWlsntNu0aKAIWlJaCblRguMdaU
-        xe9AKwzSL4BQWiEyqZ8PHp8RTfOhUfupOVP9og8YAhf2RWzmU0A7fk/lPGAnb2XboCxcy0
-        M1DrUtet1zeg6Qx3nbQLZG+nXIDp5fM=
-Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
- [209.85.219.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-468-W-Of7cdIMrmp_DRiR58xQA-1; Wed, 31 May 2023 03:28:07 -0400
-X-MC-Unique: W-Of7cdIMrmp_DRiR58xQA-1
-Received: by mail-yb1-f199.google.com with SMTP id 3f1490d57ef6-bb0d11a56abso2511591276.2
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 00:28:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685518086; x=1688110086;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I/jcj1p+dPSX4LPtsNzKmq9GtWWjgKaTvB7WD/Tt27U=;
-        b=Z5aY/4/04G6sEPf8KicUTyfKPYFKa504JCHIvFbI4vKf8fTEAKV7mjsuq9aGbIwohX
-         hFRM466QdnYBPM3lEgQHP/SK5lUda/xdaFyLcBoDgkc3GmAUokrcJHk8o3Jvrg2CTrDU
-         Zy6RiWD1q2UHJJiq4K+wZIZ+u9L8j4I9BdkcElIJVy/sjGtmiM7e1HHMOxFlfZr6myQG
-         GrsYH8fRcIT/MXhXIjmKQ9UUXLhLE0UQBCstUMxszEomJx7jcegNKFXBjURDB1i20DgH
-         1KOyQzV1P/wRPeDitCOXwpzYxRdeCWfl0vVx3InTtZ0BY4aD8vdID2HfFDf8aF9+pQaK
-         aPUA==
-X-Gm-Message-State: AC+VfDxETu0LaGgqKjA2zJGUrf1LwL5QsduPTkePF1yc42IMnNMgyPlh
-        apD/CmN4FUSb2XXK2eNvzKpicXPdlffxkaWRFfcbTonZRvh7EoZdkg//5VNid2jxXLCqVwp1Q4/
-        cf/4TXPQnkdpdKb22qzF6PnRqOFb/
-X-Received: by 2002:a25:e74a:0:b0:ba8:c000:3da8 with SMTP id e71-20020a25e74a000000b00ba8c0003da8mr5501241ybh.32.1685518086715;
-        Wed, 31 May 2023 00:28:06 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5Plgt9hmPFiSDXc0oeLAkYKsykTTqd4B5pwE2g+dpW8bCb+6KVSnOeDacyokQkuQP23w/NyGAste2scW2tm4Y=
-X-Received: by 2002:a25:e74a:0:b0:ba8:c000:3da8 with SMTP id
- e71-20020a25e74a000000b00ba8c0003da8mr5501224ybh.32.1685518086460; Wed, 31
- May 2023 00:28:06 -0700 (PDT)
-MIME-Version: 1.0
-References: <0000000000001777f605fce42c5f@google.com> <20230530072310-mutt-send-email-mst@kernel.org>
- <CAGxU2F7O7ef3mdvNXtiC0VtWiS2DMnoiGwSR=Z6SWbzqcrBF-g@mail.gmail.com>
- <CAGxU2F7HK5KRggiY7xnKHeXFRXJmqcKbjf3JnXC3mbmn9xqRtw@mail.gmail.com>
- <e4589879-1139-22cc-854f-fed22cc18693@oracle.com> <6p7pi6mf3db3gp3xqarap4uzrgwlzqiz7wgg5kn2ep7hvrw5pg@wxowhbw4e7w7>
- <035e3423-c003-3de9-0805-2091b9efb45d@oracle.com>
-In-Reply-To: <035e3423-c003-3de9-0805-2091b9efb45d@oracle.com>
-From:   Stefano Garzarella <sgarzare@redhat.com>
-Date:   Wed, 31 May 2023 09:27:54 +0200
-Message-ID: <CAGxU2F5oTLY_weLixRKMQVqmjpDG_09yL6tS2rF8mwJ7K+xP0Q@mail.gmail.com>
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] general protection fault in vhost_work_queue
-To:     michael.christie@oracle.com
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        syzbot <syzbot+d0d442c22fa8db45ff0e@syzkaller.appspotmail.com>,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org, stefanha@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S234510AbjEaHb3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 03:31:29 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD8F4123
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 00:31:27 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7AA6263768
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 07:31:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D82B3C433D2;
+        Wed, 31 May 2023 07:31:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685518286;
+        bh=HF7OKbXM2BGCGbyxMZ7v0Zp7UV6T2JLlyQvFgaWN0d8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=kzdyDYEZfiGiN0E3Bfb41AdhWH/bZ+GihR4qv7iFZZOpaM37vhemeovJc7CHYOHl3
+         ILIFb7e/JXHSa9Wp9x9NHyi9uBeDyN1szHlxtfEdiWiUSxF9cbVrSBLLORDWxubf42
+         0EBSPI53J6WplbvxbfA7m8hPvC4W1yliWNo0i9ydim58+psQgJjb8y4xtqIGI7ZAKI
+         T73sCIiUdCZPjfefrLflMNkkzncONG4UHDYqmIGcuLLxxlqNgQZpKqPphTR0j0gWGS
+         bbCnfZhaToYXwJkq6Nc+N4ro6F5q+RtGr/+cKHA1Dva4QUA3g8dAf1O+04iEOK3iiV
+         LQ8ru5FM44QMw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q4GIm-001Xqs-UU;
+        Wed, 31 May 2023 08:31:25 +0100
+Date:   Wed, 31 May 2023 08:31:24 +0100
+Message-ID: <86353dc5yr.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oupton@google.com>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v10 5/5] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
+In-Reply-To: <CAAdAUtjJ8n8+jt=Y=oJFuRvERzRY4DQr6S7JThobU=wWMOYaRQ@mail.gmail.com>
+References: <20230522221835.957419-1-jingzhangos@google.com>
+        <20230522221835.957419-6-jingzhangos@google.com>
+        <87pm6kogx8.wl-maz@kernel.org>
+        <CAAdAUtjJ8n8+jt=Y=oJFuRvERzRY4DQr6S7JThobU=wWMOYaRQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@google.com, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,50 +78,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 30, 2023 at 6:30=E2=80=AFPM <michael.christie@oracle.com> wrote=
-:
->
-> On 5/30/23 11:17 AM, Stefano Garzarella wrote:
-> > On Tue, May 30, 2023 at 11:09:09AM -0500, Mike Christie wrote:
-> >> On 5/30/23 11:00 AM, Stefano Garzarella wrote:
-> >>> I think it is partially related to commit 6e890c5d5021 ("vhost: use
-> >>> vhost_tasks for worker threads") and commit 1a5f8090c6de ("vhost: mov=
-e
-> >>> worker thread fields to new struct"). Maybe that commits just
-> >>> highlighted the issue and it was already existing.
-> >>
-> >> See my mail about the crash. Agree with your analysis about worker->vt=
-sk
-> >> not being set yet. It's a bug from my commit where I should have not s=
-et
-> >> it so early or I should be checking for
-> >>
-> >> if (dev->worker && worker->vtsk)
-> >>
-> >> instead of
-> >>
-> >> if (dev->worker)
+On Tue, 30 May 2023 22:18:04 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> On Sun, May 28, 2023 at 4:05=E2=80=AFAM Marc Zyngier <maz@kernel.org> wro=
+te:
 > >
-> > Yes, though, in my opinion the problem may persist depending on how the
-> > instructions are reordered.
->
-> Ah ok.
->
+> > On Mon, 22 May 2023 23:18:35 +0100,
+> > Jing Zhang <jingzhangos@google.com> wrote:
+> > >
+> > > Refactor writings for ID_AA64PFR0_EL1.[CSV2|CSV3],
+> > > ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon based on utilities
+> > > specific to ID register.
+> > >
+> > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/cpufeature.h |   1 +
+> > >  arch/arm64/kernel/cpufeature.c      |   2 +-
+> > >  arch/arm64/kvm/sys_regs.c           | 365 ++++++++++++++++++--------=
+--
+> > >  3 files changed, 243 insertions(+), 125 deletions(-)
 > >
-> > Should we protect dev->worker() with an RCU to be safe?
->
-> For those multiple worker patchsets Jason had asked me about supporting
-> where we don't have a worker while we are swapping workers around. To do
-> that I had added rcu around the dev->worker. I removed it in later patchs=
-ets
-> because I didn't think anyone would use it.
->
-> rcu would work for your case and for what Jason had requested.
+> > Reading the result after applying this series, I feel like a stuck
+> > record. This final series still contains gems like this:
+> >
+> > static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> >                                const struct sys_reg_desc *rd,
+> >                                u64 val)
+> > {
+> >         u8 csv2, csv3;
+> >
+> >         /*
+> >          * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
+> >          * it doesn't promise more than what is actually provided (the
+> >          * guest could otherwise be covered in ectoplasmic residue).
+> >          */
+> >         csv2 =3D cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_=
+EL1_CSV2_SHIFT);
+> >         if (csv2 > 1 ||
+> >             (csv2 && arm64_get_spectre_v2_state() !=3D SPECTRE_UNAFFECT=
+ED))
+> >                 return -EINVAL;
+> >
+> >         /* Same thing for CSV3 */
+> >         csv3 =3D cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_=
+EL1_CSV3_SHIFT);
+> >         if (csv3 > 1 ||
+> >             (csv3 && arm64_get_meltdown_state() !=3D SPECTRE_UNAFFECTED=
+))
+> >                 return -EINVAL;
+> >
+> >         return set_id_reg(vcpu, rd, val);
+> > }
+> >
+> > Why do we have this? I've asked the question at least 3 times in the
+> > previous versions, and I still see the same code.
+> >
+> > If we have sane limits, the call to arm64_check_features() in
+> > set_id_reg() will catch the illegal write. So why do we have this at
+> > all? The whole point of the exercise was to unify the handling. But
+> > you're actually making it worse.
+> >
+> > So what's the catch?
+> Sorry, I am only aware of one discussion of this code in v8. The
+> reason I still keep the check here is that the arm64_check_features()
+> can not catch all illegal writes as this code does.
+> For example, for CSV2, one concern is:
+> When arm64_get_spectre_v2_state() !=3D SPECTRE_UNAFFECTED, this code
+> only allows guest CSV2 to be set to 0, any non-zero value would lead
+> to -EINVAL. If we remove the check here, the guest CSV2 can be set to
+> any value lower or equal to host CSV2.
 
-Yeah, so you already have some patches?
+Sorry, this doesn't make sense. Lower is always fine. If you meant
+'higher', then I agree that it would be bad. But that doesn't make
+keeping this code the right outcome.
 
-Do you want to send it to solve this problem?
+> Of course, we can set the sane limit of CSV2 to 0 when
+> arm64_get_spectre_v2_state() !=3D SPECTRE_UNAFFECTED in
+> read_sanitised_id_aa64pfr0_el1(). Then we can remove all the checks
+> here and no specific set_id function for AA64PFR0_EL1 is needed.
+
+This is what I have been asking for all along: the "sanitised" view of
+the register *must* return the absolute limit for the fields that are
+flagged as writable by "mask".
+
+If we need extra code, then something is really wrong. The core
+feature code manages that without any special casing, and we should be
+able to reach the same level.
 
 Thanks,
-Stefano
 
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
