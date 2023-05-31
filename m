@@ -2,128 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49BE2717D41
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 12:37:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F03BE717D3B
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 12:36:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232537AbjEaKhY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 06:37:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43864 "EHLO
+        id S232261AbjEaKgK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 06:36:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231829AbjEaKhQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 06:37:16 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF41BB3;
-        Wed, 31 May 2023 03:37:15 -0700 (PDT)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34V9b6wr028808;
-        Wed, 31 May 2023 10:37:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : content-transfer-encoding : mime-version; s=pp1;
- bh=bKeT5GTqgF+vsiHsWxnmPry5jfAZQAR6idVy2R86zlU=;
- b=WwytYHzRVWhaj+/5kjkBDHFKNm2hxR9udN8w28dJPReu3dxBvMFFvRrO/BYnzX3833VV
- Cjyj/o4Va8cp8EKGTkDTBNM/7AWqbvoB/MNu06X2FFafLycrmSbIAnx6EkR4nyz2138r
- u4j2+G066ytvs96f4acKhbbD/55kwYS3rBJUFg9qlSyG4ev0xZYNTLREh6uLwH1bYG/e
- 2RsGNI13GnKoH0eIX+TX8SyK2+msJBswv3CbureO6EDT7yu7ehTm6sdtuZqBcbZRC/as
- v0RFg9VH6yzBnzOMUyh+oa/l6WskPOL41IT582p5fKV7/kMMXBRmVrobWbP75Yfw9IjX GA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwjvftvta-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 31 May 2023 10:37:12 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34VAa8EX023460;
-        Wed, 31 May 2023 10:37:12 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwjvfttq3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 31 May 2023 10:37:12 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34V48EEL008758;
-        Wed, 31 May 2023 10:32:32 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3qu94e9mea-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 31 May 2023 10:32:31 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34VAWSmg46072484
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 31 May 2023 10:32:28 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 644FC2004B;
-        Wed, 31 May 2023 10:32:28 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0D3CB20040;
-        Wed, 31 May 2023 10:32:28 +0000 (GMT)
-Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 31 May 2023 10:32:27 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
-        pbonzini@redhat.com, andrew.jones@linux.dev, david@redhat.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1] runtime: don't run pv-host tests when gen-se-header is unavailable
-Date:   Wed, 31 May 2023 12:32:27 +0200
-Message-Id: <20230531103227.1385324-1-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.39.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: WUJ_iLDaQOT9q3gQKkHIuEHYtHeaFc0Y
-X-Proofpoint-GUID: GPALIMW6yYBsieCiJHCI1gCGP4gCCz9y
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S229935AbjEaKgJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 06:36:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C20CD113
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 03:35:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685529318;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gYHVR8q7GPkHT/zLzUP2bY/8STQi3ZK3wYCNDXwLQn8=;
+        b=Uk492eFC/v8aAubg+y9BWa5m9T1XYKa4M/qyoDtG8RLh3c6OvQj1Cp7VpHO/IM+VFB+7mM
+        vr3f9aEdzBEWAY8DxqAaSyyZoRnnl3RHdzrGHFjYWST/5RJghBzfv5BvZS2Fl0ZfvnSOBj
+        MusX4Mhq5H5GyXjx8gEQdUJU7KafoBo=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-529-LCgoHUTnP96LH8ZdlTG4xg-1; Wed, 31 May 2023 06:35:17 -0400
+X-MC-Unique: LCgoHUTnP96LH8ZdlTG4xg-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-4edc7ab63ccso3226340e87.3
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 03:35:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685529316; x=1688121316;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gYHVR8q7GPkHT/zLzUP2bY/8STQi3ZK3wYCNDXwLQn8=;
+        b=cZ9XAKVlxL4m6SYRuM7vhxfNPa+5ogLUmm+OY/N8Jr4qQ62ZhKHX/RpfBri1jKcpqI
+         pmBQKY+QEduFs/hebkXjf9A+WxQv75zhhAMsAxDrv8JnDx+3qdfinbBprvksBVGKZPOH
+         vS+sCTKWyDkoFNv3lFocyWTuFPTVkvpGOilhLptb99s6z3HucjQJVQz8recHxXsA+mBe
+         /BBWTu7yX1Dkrja+XGBotOCRTNwIDPYKo+w1QUXai92TEXT8lxLTiK89irxkwNfNaLGw
+         HntUWl9mvPcZ7FDrmFpC1bxw4alVzI2S6gN2LzViaYfoxY9u5fd8bVQS1Yb9WpUZNu5I
+         9j5A==
+X-Gm-Message-State: AC+VfDzjoJS8iOfXJ67u+RFVda1Ea5ofeu63IkH+zVXak/HpJF258Ika
+        kWoqGgoG3XW+tX3kGFwwecGLwyrIRwKiRCQEsNg8B/yZhAAnPXmQqrVws8h+uS6oiUDgpg5xNXF
+        aL1neqfNqBomI1QgfNRHL
+X-Received: by 2002:ac2:5935:0:b0:4f3:a99f:1ea1 with SMTP id v21-20020ac25935000000b004f3a99f1ea1mr2395541lfi.45.1685529315937;
+        Wed, 31 May 2023 03:35:15 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4BinbmxD2hj5JGBEw3gbyqxIqScEPsApn13ZNzH1vCFbmx1++czjS5hGN5olVgYS6bzziuRA==
+X-Received: by 2002:ac2:5935:0:b0:4f3:a99f:1ea1 with SMTP id v21-20020ac25935000000b004f3a99f1ea1mr2395526lfi.45.1685529315582;
+        Wed, 31 May 2023 03:35:15 -0700 (PDT)
+Received: from starship ([89.237.102.231])
+        by smtp.gmail.com with ESMTPSA id l18-20020a05600c1d1200b003f61177faffsm3186266wms.0.2023.05.31.03.35.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 May 2023 03:35:15 -0700 (PDT)
+Message-ID: <5e18e1424868eec10f6dc396b88b65283b57278a.camel@redhat.com>
+Subject: Re: [Bug] AMD nested: commit broke VMware
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     jwarren@tutanota.com, Kvm <kvm@vger.kernel.org>
+Date:   Wed, 31 May 2023 13:35:13 +0300
+In-Reply-To: <CALMp9eSq1r87=jGWc1z85L-QGCTF-jpWgHEQxJ4sVCqCU_0KQQ@mail.gmail.com>
+References: <NWb_YOE--3-9@tutanota.com>
+         <357d135f9ed65f4e2970c82ae4e855547db70ad1.camel@redhat.com>
+         <CALMp9eTyx1Y0yc7G0c0BsAig=Amv4DYtcNnWPmD-9JHP=ChZiw@mail.gmail.com>
+         <CALMp9eSq1r87=jGWc1z85L-QGCTF-jpWgHEQxJ4sVCqCU_0KQQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-31_06,2023-05-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
- mlxlogscore=999 adultscore=0 priorityscore=1501 lowpriorityscore=0
- bulkscore=0 mlxscore=0 impostorscore=0 phishscore=0 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305310092
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the gen-se-header tool is not given as an argument to configure,
-all tests which act as a PV host will not be built by the makefiles.
+У вт, 2023-05-30 у 13:34 -0700, Jim Mattson пише:
+> On Tue, May 30, 2023 at 1:10 PM Jim Mattson <jmattson@google.com> wrote:
+> > On Mon, May 29, 2023 at 6:44 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> > > У пн, 2023-05-29 у 14:58 +0200, jwarren@tutanota.com пише:
+> > > > Hello,
+> > > > Since kernel 5.16 users can't start VMware VMs when it is nested under KVM on AMD CPUs.
+> > > > 
+> > > > User reports are here:
+> > > > https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2008583
+> > > > https://forums.unraid.net/topic/128868-vmware-7x-will-not-start-any-vms-under-unraid-6110/
+> > > > 
+> > > > I've pinpointed it to commit 174a921b6975ef959dd82ee9e8844067a62e3ec1 (appeared in 5.16rc1)
+> > > > "nSVM: Check for reserved encodings of TLB_CONTROL in nested VMCB"
+> > > > 
+> > > > I've confirmed that VMware errors out when it checks for TLB_CONTROL_FLUSH_ASID support and gets a 'false' answer.
+> > > > 
+> > > > First revisions of the patch in question had some support for TLB_CONTROL_FLUSH_ASID, but it was removed:
+> > > > https://lore.kernel.org/kvm/f7c2d5f5-3560-8666-90be-3605220cb93c@redhat.com/
+> > > > 
+> > > > I don't know what would be the best case here, maybe put a quirk there, so it doesn't break "userspace".
+> > > > Committer's email is dead, so I'm writing here.
+> > > > 
+> > > 
+> > > I have to say that I know about this for long time, because some time ago I used  to play with VMware player in a
+> > > VM on AMD on my spare time, on weekends
+> > > (just doing various crazy things with double nesting, running win98 nested, vfio stuff, etc, etc).
+> > > 
+> > > I didn't report it because its a bug in VMWARE - they set a bit in the tlb_control without checking CPUID's FLUSHBYASID
+> > > which states that KVM doesn't support setting this bit.
+> > 
+> > I am pretty sure that bit 1 is supposed to be ignored on hardware
+> > without FlushByASID, but I'll have to see if I can dig up an old APM
+> > to verify that.
+> 
+> I couldn't find an APM that old, but even today's APM does not specify
+> that any checks are performed on the TLB_CONTROL field by VMRUN.
+> 
+> While Intel likes to fail VM-entry for illegal VMCS state, AMD prefers
+> to massage the VMCB to render any illegal VMCB state legal. For
+> example, rather than fail VM-entry for a non-canonical address, AMD is
+> inclined to drop the high bits and sign-extend the low bits, so that
+> the address is canonical.
+> 
+> I'm willing to bet that modern CPUs continue to ignore the TLB_CONTROL
+> bits that were noted "reserved" in version 3.22 of the manual, and
+> that Krish simply manufactured the checks in commit 174a921b6975
+> ("nSVM: Check for reserved encodings of TLB_CONTROL in nested VMCB"),
+> without cause.
+> 
+> > > Supporting FLUSHBYASID would fix this, and make nesting faster too,
+> > > but it is far from a trivial job.
+> > > 
+> > > I hope that I will find time to do this soon.
+> > > 
+> > > Best regards,
+> > >         Maxim Levitsky
+> > > 
+> > > 
 
-run_tests.sh will fail when a test binary is missing. This means
-when we add the pv-host tests to unittest.cfg we will have FAILs when
-gen-se-header is missing.
+Yup...
 
-Since it is desirable to have the tests in unittest.cfg, add a new group
-pv-host which designates tests that act as a PV host. These will only
-run if the gen-se-header tool is available.
+After applying this horrible hack to KVM, the VM still boots just fine
+on bare metal.
 
-The pv-host group is currently not used, but will be with Janoschs
-series "s390x: Add PV SIE intercepts and ipl tests" here:
-https://lore.kernel.org/all/20230502115931.86280-1-frankja@linux.ibm.com/
-
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- scripts/runtime.bash | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 07b62b0e1fe7..486dbeda8179 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -98,6 +98,11 @@ function run()
-         return
-     fi
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index e7c7379d6ac7b0..2e45c1b747104a 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -170,10 +170,10 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ };
  
-+    if [ -z "$GEN_SE_HEADER" ] && find_word "pv-host" "$groups"; then
-+        print_result "SKIP" $testname "" "no gen-se-header available for pv-host test"
-+        return
-+    fi
-+
-     if [ -z "$only_group" ] && find_word nodefault "$groups" &&
-             skip_nodefault; then
-         print_result "SKIP" $testname "" "test marked as manual run only"
--- 
-2.39.1
+ 
+-#define TLB_CONTROL_DO_NOTHING 0
+-#define TLB_CONTROL_FLUSH_ALL_ASID 1
+-#define TLB_CONTROL_FLUSH_ASID 3
+-#define TLB_CONTROL_FLUSH_ASID_LOCAL 7
++#define TLB_CONTROL_DO_NOTHING 0xF0
++#define TLB_CONTROL_FLUSH_ALL_ASID 0xF1
++#define TLB_CONTROL_FLUSH_ASID 0xF3
++#define TLB_CONTROL_FLUSH_ASID_LOCAL 0xF7
+ 
+ #define V_TPR_MASK 0x0f
+ 
+
+Shall we revert the offending patch then?
+
+Best regards,
+	Maxim Levitsky
 
