@@ -2,190 +2,302 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B441571885D
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 19:22:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFC85718860
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 19:22:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230165AbjEaRWg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 13:22:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55932 "EHLO
+        id S229876AbjEaRWk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 13:22:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbjEaRWe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 13:22:34 -0400
+        with ESMTP id S230171AbjEaRWg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 13:22:36 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31AD711D
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 10:21:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BD50101
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 10:21:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685553706;
+        s=mimecast20190719; t=1685553710;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Aqycy5XGd/Zg3D6nCw9dbFWiEKfPLLpIUb43lPV1w3E=;
-        b=VpzJMDD3U2ovpeDG1qM7eqNC5u0o51XisWgx599Pw9LhD7x/AQIJbgCpXRMwsZDJtA73iu
-        FNcRURnI0smBnTAc9fKINo4jLF8t3xWafGzRHqUxMoGocqk98/acdzsGtPnTcPgxS8qtRC
-        0PY7wXZ+kku1uUK9u45+DmjcoxZA9ts=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-558-dIMpOH62PFGugHt06ZNGqw-1; Wed, 31 May 2023 13:21:41 -0400
-X-MC-Unique: dIMpOH62PFGugHt06ZNGqw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C44B43802140;
-        Wed, 31 May 2023 17:21:40 +0000 (UTC)
-Received: from [10.18.17.153] (dhcp-17-153.bos.redhat.com [10.18.17.153])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E08AC154D7;
-        Wed, 31 May 2023 17:21:40 +0000 (UTC)
-Message-ID: <3cb96907-0d58-ba60-ed0e-6c17c69bd0f8@redhat.com>
-Date:   Wed, 31 May 2023 13:21:40 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v4] KVM: VMX: do not disable interception for
- MSR_IA32_SPEC_CTRL on eIBRS
-Content-Language: en-US
-To:     Jon Kohler <jon@nutanix.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Andrea Arcangeli <aarcange@redhat.com>,
+        bh=unoADcy00HURTkExTqZPRFYBUmgfMnSVQyq5zSCV++k=;
+        b=jMpYoSUuoPoaHkpsmRra0eZNiNfEZEpitH7ZdRu8DnsMfqyWMPbBXVkKRj8CaaewZ9dBF4
+        AJip0bcV0nZ28gM4hBhIkZFdP2IgiUsvDXsYQ0abSwi6zm2rEmE2Fjx1CjHgWdwFTiuo8G
+        Xy2L4qFSY5zrnpi90cx4oGaEkW+Eh2E=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-464-fXuek4BGNwe3zUifi5fUAA-1; Wed, 31 May 2023 13:21:49 -0400
+X-MC-Unique: fXuek4BGNwe3zUifi5fUAA-1
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-33b372d1deeso24712955ab.3
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 10:21:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685553709; x=1688145709;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=unoADcy00HURTkExTqZPRFYBUmgfMnSVQyq5zSCV++k=;
+        b=ljX6LCrteAOOZiM7xUcXP4nwrFWtg9Bt+7SVNydEOROjdk/B4ftqZOCndSuuRnRSxJ
+         nPTA1OlAK2U/RTvb4Ep8LJr9lNCTOUxqbF40nrNeAQ8zbYqgfC6Ty5BgKBO2heOwmKmj
+         exxN29l47VlF7sHqggjU6e4VKYeVYOli82g8tG+kUEH+7RCl2p9WHSJQlQ/BmTqIemuO
+         8cLZCaSXshZIHl7O0e8qHr03pq1HI2dOz+MxmImzI0yDMZ9Y5tF3uuxlt0PppzYfIPBJ
+         B7zk4wb3Tp6eSp6LSU5aAwy9O6T2X586x7RgJh7ujBY+eu+0kWUiwNKSzcU5Rxvf6FkD
+         HvkA==
+X-Gm-Message-State: AC+VfDxFqi7vodhSNZzKS/ViCwKTug8AarK+7zrx7eRX0nMRSOONICi8
+        DfNuYdlFC+LgokhXLh+HtPt9GUhQdXiBOsRGTksOd6xPOYal6T9+tse0eBsebx3T8mDM5l+HCGz
+        UOTRTlA0e1dub
+X-Received: by 2002:a92:d405:0:b0:33b:f86:d2ac with SMTP id q5-20020a92d405000000b0033b0f86d2acmr2382580ilm.1.1685553708758;
+        Wed, 31 May 2023 10:21:48 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6P0oEgVKY8TVz/ygEwiXD57KJ2zlUOMBxDT4c1n3wyxsizN9qCiBQXW87HVXgkIWREJnNksQ==
+X-Received: by 2002:a92:d405:0:b0:33b:f86:d2ac with SMTP id q5-20020a92d405000000b0033b0f86d2acmr2382558ilm.1.1685553708472;
+        Wed, 31 May 2023 10:21:48 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id m2-20020a0566380dc200b0040fd1340997sm1614894jaj.140.2023.05.31.10.21.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 May 2023 10:21:47 -0700 (PDT)
+Date:   Wed, 31 May 2023 11:21:46 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>
-References: <20230531144128.73814-1-jon@nutanix.com>
- <9d37ab07-97c6-5245-6939-9c1090b4b3a9@redhat.com>
- <ECE9A3B4-2CF3-452A-838A-99BE075D5E68@nutanix.com>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <ECE9A3B4-2CF3-452A-838A-99BE075D5E68@nutanix.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "clegoate@redhat.com" <clegoate@redhat.com>
+Subject: Re: [PATCH v6 10/10] vfio/pci: Allow passing zero-length fd array
+ in VFIO_DEVICE_PCI_HOT_RESET
+Message-ID: <20230531112146.7950d01a.alex.williamson@redhat.com>
+In-Reply-To: <DS0PR11MB75298C069D298D29D9B7B459C34B9@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230522115751.326947-1-yi.l.liu@intel.com>
+        <20230522115751.326947-11-yi.l.liu@intel.com>
+        <20230524141956.3655fab5.alex.williamson@redhat.com>
+        <DS0PR11MB75298C069D298D29D9B7B459C34B9@DS0PR11MB7529.namprd11.prod.outlook.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/31/23 13:13, Jon Kohler wrote:
->
->> On May 31, 2023, at 1:02 PM, Waiman Long <longman@redhat.com> wrote:
->>
->> On 5/31/23 10:41, Jon Kohler wrote:
->>> Avoid expensive rdmsr on every VM Exit for MSR_IA32_SPEC_CTRL on
->>> eIBRS enabled systems iff the guest only sets IA32_SPEC_CTRL[0] (IBRS)
->>> and not [1] (STIBP) or [2] (SSBD) by not disabling interception in
->>> the MSR bitmap. Note: this logic is only for eIBRS, as Intel's guidance
->>> has long been that eIBRS only needs to be set once, so most guests with
->>> eIBRS awareness should behave nicely. We would not want to accidentally
->>> regress misbehaving guests on pre-eIBRS systems, who might be spamming
->>> IBRS MSR without the hypervisor being able to see it today.
->>>
->>> eIBRS enabled guests using just IBRS will only write SPEC_CTRL MSR
->>> once or twice per vCPU on boot, so it is far better to take those
->>> VM exits on boot than having to read and save this msr on every
->>> single VM exit forever. This outcome was suggested on Andrea's commit
->>> 2f46993d83ff ("x86: change default to spec_store_bypass_disable=prctl spectre_v2_user=prctl")
->>> however, since interception is still unilaterally disabled, the rdmsr
->>> tax is still there even after that commit.
->>>
->>> This is a significant win for eIBRS enabled systems as this rdmsr
->>> accounts for roughly ~50% of time for vmx_vcpu_run() as observed
->>> by perf top disassembly, and is in the critical path for all
->>> VM-Exits, including fastpath exits.
->>>
->>> Opportunistically update comments for both MSR_IA32_SPEC_CTRL and
->>> MSR_IA32_PRED_CMD to make it clear how L1 vs L2 handling works.
->>>
->>> Fixes: 2f46993d83ff ("x86: change default to spec_store_bypass_disable=prctl spectre_v2_user=prctl")
->>> Signed-off-by: Jon Kohler <jon@nutanix.com>
->>> Cc: Sean Christopherson <seanjc@google.com>
->>> Cc: Andrea Arcangeli <aarcange@redhat.com>
->>> Cc: Kees Cook <keescook@chromium.org>
->>> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
->>> Cc: Waiman Long <longman@redhat.com>
->>> ---
->>> v1
->>>   - https://urldefense.proofpoint.com/v2/url?u=https-3A__lore.kernel.org_all_20220512174427.3608-2D1-2Djon-40nutanix.com_&d=DwICaQ&c=s883GpUCOChKOHiocYtGcg&r=NGPRGGo37mQiSXgHKm5rCQ&m=PT1QjB8Lk_a3baDOwHBfedQG67HsVDmOdmcWHlr5PrT8WyuS9e6PfHF5JxLxD0zw&s=jNnloZQgh0KG-n36uwVC0dJTmokvqsQdYQCWYI8hVvM&e= v1 -> v2:
->>>   - https://urldefense.proofpoint.com/v2/url?u=https-3A__lore.kernel.org_all_20220520195303.58692-2D1-2Djon-40nutanix.com_&d=DwICaQ&c=s883GpUCOChKOHiocYtGcg&r=NGPRGGo37mQiSXgHKm5rCQ&m=PT1QjB8Lk_a3baDOwHBfedQG67HsVDmOdmcWHlr5PrT8WyuS9e6PfHF5JxLxD0zw&s=Rwi5NoHwaezlmzzLiGGCuI6QHuGQZ1BVK2hs6-SZvzU&e=   - Addressed comments on approach from Sean.
->>> v2 -> v3:
->>>   - https://urldefense.proofpoint.com/v2/url?u=https-3A__lore.kernel.org_kvm_20220520204115.67580-2D1-2Djon-40nutanix.com_&d=DwICaQ&c=s883GpUCOChKOHiocYtGcg&r=NGPRGGo37mQiSXgHKm5rCQ&m=PT1QjB8Lk_a3baDOwHBfedQG67HsVDmOdmcWHlr5PrT8WyuS9e6PfHF5JxLxD0zw&s=R2Ykxdv-DyeVGLWd8_pLpu43zEsnWzpyvvBPEZ9lz-Y&e=   - Addressed comments on approach from Sean.
->>> v3 -> v4:
->>>   - Fixed inline code comments from Sean.
->>>
->>>   arch/x86/kvm/vmx/vmx.c | 35 ++++++++++++++++++++++++-----------
->>>   1 file changed, 24 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>> index 44fb619803b8..5e643ac897bc 100644
->>> --- a/arch/x86/kvm/vmx/vmx.c
->>> +++ b/arch/x86/kvm/vmx/vmx.c
->>> @@ -2260,20 +2260,33 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>>   			return 1;
->>>
->>>   		vmx->spec_ctrl = data;
->>> -		if (!data)
->>> +
->>> +		/*
->>> +		 * Disable interception on the first non-zero write, except if
->>> +		 * eIBRS is advertised to the guest and the guest is enabling
->>> +		 * _only_ IBRS.  On eIBRS systems, kernels typically set IBRS
->>> +		 * once at boot and never touch it post-boot.  All other bits,
->>> +		 * and IBRS on non-eIBRS systems, are often set on a per-task
->>> +		 * basis, i.e. change frequently, so the benefit of avoiding
->>> +		 * VM-exits during guest context switches outweighs the cost of
->>> +		 * RDMSR on every VM-Exit to save the guest's value.
->>> +		 */
->>> +		if (!data ||
->>> +		    (data == SPEC_CTRL_IBRS &&
->>> +		     (vcpu->arch.arch_capabilities & ARCH_CAP_IBRS_ALL)))
->>>   			break;
->>>
->>>   		/*
->>> -		 * For non-nested:
->>> -		 * When it's written (to non-zero) for the first time, pass
->>> -		 * it through.
->>> -		 *
->>> -		 * For nested:
->>> -		 * The handling of the MSR bitmap for L2 guests is done in
->>> -		 * nested_vmx_prepare_msr_bitmap. We should not touch the
->>> -		 * vmcs02.msr_bitmap here since it gets completely overwritten
->>> -		 * in the merging. We update the vmcs01 here for L1 as well
->>> -		 * since it will end up touching the MSR anyway now.
->>> +		 * Update vmcs01.msr_bitmap even if L2 is active, i.e. disable
->>> +		 * interception for the vCPU on the first write regardless of
->>> +		 * whether the WRMSR came from L1 or L2.  vmcs02's bitmap is a
->>> +		 * combination of vmcs01 and vmcs12 bitmaps, and will be
->>> +		 * recomputed by nested_vmx_prepare_msr_bitmap() on the next
->>> +		 * nested VM-Enter.  Note, this does mean that future WRMSRs
->>> +		 * from L2 will be intercepted until the next nested VM-Exit if
->>> +		 * L2 was the first to write, but L1 exposing the MSR to L2
->>> +		 * without first writing it is unlikely and not worth the
->>> +		 * extra bit of complexity.
->>>   		 */
->>>   		vmx_disable_intercept_for_msr(vcpu,
->>>   					      MSR_IA32_SPEC_CTRL,
->> I have 2 comments.
->>
->> 1) Besides the IBRS, STIBP & SSBD bits, the SPEC_CTRL MSR may have the RRSBA_DIS_S bit set in the future. I am not aware of any current Intel processors having this capability yet, but a future Intel processor may have this and the above patch will have to be modified accordingly. It looks like that the RRSBA_DIS_S bit will be set once.
-> Agreed. Once that becomes pubic with future processors, this code can be fixed up in a fairly trivial manner. I don’t have any access to said future processors, so I’d like to keep it as-is today rather than project it out too far. Is that ok?
-That is certainly OK. I am just raising a question here.
->> 2) AMD has their own AutoIBRS capability in Genoa which is similar to eIBRS but is not identified by the ARCH_CAP_IBRS_ALL bit. Instead it is identified by the AUTOIBRS bit in MSR_EFER. Are you planning to support that?
-> This is a vmx-only optimization. AMD optimizations can certainly be picked up separately if they suffer from same interception type issue that is called out here, but that isn’t something I’m looking at this time.
+On Tue, 30 May 2023 04:23:12 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-Right, I forgot kvm has a different set of code for AMD CPUs. Since this 
-is Intel only, the patch looks sane to me.
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Thursday, May 25, 2023 4:20 AM
+> > 
+> > On Mon, 22 May 2023 04:57:51 -0700
+> > Yi Liu <yi.l.liu@intel.com> wrote:
+> >   
+> > > This is the way user to invoke hot-reset for the devices opened by cdev
+> > > interface. User should check the flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED
+> > > in the output of VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl before doing
+> > > hot-reset for cdev devices.
+> > >
+> > > Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> > > Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+> > > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> > > ---
+> > >  drivers/vfio/pci/vfio_pci_core.c | 56 +++++++++++++++++++++++++-------
+> > >  include/uapi/linux/vfio.h        | 14 ++++++++
+> > >  2 files changed, 59 insertions(+), 11 deletions(-)
+> > >
+> > > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> > > index 890065f846e4..67f1cb426505 100644
+> > > --- a/drivers/vfio/pci/vfio_pci_core.c
+> > > +++ b/drivers/vfio/pci/vfio_pci_core.c
+> > > @@ -181,7 +181,8 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device  
+> > *vdev)  
+> > >  struct vfio_pci_group_info;
+> > >  static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
+> > >  static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+> > > -				      struct vfio_pci_group_info *groups);
+> > > +				      struct vfio_pci_group_info *groups,
+> > > +				      struct iommufd_ctx *iommufd_ctx);
+> > >
+> > >  /*
+> > >   * INTx masking requires the ability to disable INTx signaling via PCI_COMMAND
+> > > @@ -1301,8 +1302,7 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct  
+> > vfio_pci_core_device *vdev,  
+> > >  	if (ret)
+> > >  		return ret;
+> > >
+> > > -	/* Somewhere between 1 and count is OK */
+> > > -	if (!array_count || array_count > count)
+> > > +	if (array_count > count || vfio_device_cdev_opened(&vdev->vdev))
+> > >  		return -EINVAL;
+> > >
+> > >  	group_fds = kcalloc(array_count, sizeof(*group_fds), GFP_KERNEL);
+> > > @@ -1351,7 +1351,7 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct  
+> > vfio_pci_core_device *vdev,  
+> > >  	info.count = array_count;
+> > >  	info.files = files;
+> > >
+> > > -	ret = vfio_pci_dev_set_hot_reset(vdev->vdev.dev_set, &info);
+> > > +	ret = vfio_pci_dev_set_hot_reset(vdev->vdev.dev_set, &info, NULL);
+> > >
+> > >  hot_reset_release:
+> > >  	for (file_idx--; file_idx >= 0; file_idx--)
+> > > @@ -1380,7 +1380,11 @@ static int vfio_pci_ioctl_pci_hot_reset(struct  
+> > vfio_pci_core_device *vdev,  
+> > >  	else if (pci_probe_reset_bus(vdev->pdev->bus))
+> > >  		return -ENODEV;
+> > >
+> > > -	return vfio_pci_ioctl_pci_hot_reset_groups(vdev, hdr.count, slot, arg);
+> > > +	if (hdr.count)
+> > > +		return vfio_pci_ioctl_pci_hot_reset_groups(vdev, hdr.count, slot, arg);
+> > > +
+> > > +	return vfio_pci_dev_set_hot_reset(vdev->vdev.dev_set, NULL,
+> > > +					  vfio_iommufd_device_ictx(&vdev->vdev));
+> > >  }
+> > >
+> > >  static int vfio_pci_ioctl_ioeventfd(struct vfio_pci_core_device *vdev,
+> > > @@ -2347,13 +2351,16 @@ const struct pci_error_handlers  
+> > vfio_pci_core_err_handlers = {  
+> > >  };
+> > >  EXPORT_SYMBOL_GPL(vfio_pci_core_err_handlers);
+> > >
+> > > -static bool vfio_dev_in_groups(struct vfio_pci_core_device *vdev,
+> > > +static bool vfio_dev_in_groups(struct vfio_device *vdev,
+> > >  			       struct vfio_pci_group_info *groups)
+> > >  {
+> > >  	unsigned int i;
+> > >
+> > > +	if (!groups)
+> > > +		return false;
+> > > +
+> > >  	for (i = 0; i < groups->count; i++)
+> > > -		if (vfio_file_has_dev(groups->files[i], &vdev->vdev))
+> > > +		if (vfio_file_has_dev(groups->files[i], vdev))
+> > >  			return true;
+> > >  	return false;
+> > >  }
+> > > @@ -2429,7 +2436,8 @@ static int vfio_pci_dev_set_pm_runtime_get(struct  
+> > vfio_device_set *dev_set)  
+> > >   * get each memory_lock.
+> > >   */
+> > >  static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+> > > -				      struct vfio_pci_group_info *groups)
+> > > +				      struct vfio_pci_group_info *groups,
+> > > +				      struct iommufd_ctx *iommufd_ctx)
+> > >  {
+> > >  	struct vfio_pci_core_device *cur_mem;
+> > >  	struct vfio_pci_core_device *cur_vma;
+> > > @@ -2459,11 +2467,37 @@ static int vfio_pci_dev_set_hot_reset(struct  
+> > vfio_device_set *dev_set,  
+> > >  		goto err_unlock;
+> > >
+> > >  	list_for_each_entry(cur_vma, &dev_set->device_list, vdev.dev_set_list) {
+> > > +		bool owned;
+> > > +
+> > >  		/*
+> > > -		 * Test whether all the affected devices are contained by the
+> > > -		 * set of groups provided by the user.
+> > > +		 * Test whether all the affected devices can be reset by the
+> > > +		 * user.
+> > > +		 *
+> > > +		 * If the user provides a set of groups, all the devices
+> > > +		 * in the dev_set should be contained by the set of groups
+> > > +		 * provided by the user.  
+> > 
+> > "If called from a group opened device and the user provides a set of
+> > groups,..."
+> >   
+> > > +		 *
+> > > +		 * If the user provides a zero-length group fd array, then  
+> > 
+> > "If called from a cdev opened device and the user provides a
+> > zero-length array,..."
+> > 
+> >   
+> > > +		 * all the devices in the dev_set must be bound to the same
+> > > +		 * iommufd_ctx as the input iommufd_ctx.  If there is any
+> > > +		 * device that has not been bound to iommufd_ctx yet, check
+> > > +		 * if its iommu_group has any device bound to the input
+> > > +		 * iommufd_ctx Such devices can be considered owned by  
+> > 
+> > "."...........................^  
+> 
+> Thanks, above comments well received.
+> 
+> > > +		 * the input iommufd_ctx as the device cannot be owned
+> > > +		 * by another iommufd_ctx when its iommu_group is owned.
+> > > +		 *
+> > > +		 * Otherwise, reset is not allowed.  
+> > 
+> > 
+> > In the case where a non-null array is provided,
+> > vfio_pci_ioctl_pci_hot_reset_groups() explicitly tests
+> > vfio_device_cdev_opened(), so we exclude cdev devices from providing a
+> > group list.   
+> 
+> Yes.
+> 
+> > However, what prevents a compat opened group device from
+> > providing a null array?  
+> 
+> I think I've asked this question before. What I got is seems no need
+> to prevent it[1].
+> 
+> [1] https://lore.kernel.org/kvm/BN9PR11MB5276ABE919C04E06A0326E8E8CBC9@BN9PR11MB5276.namprd11.prod.outlook.com/
+> 
+> Now, I intend to disallow it. If compat mode user binds the devices
+> to different containers, it shall be able to do hot reset as it can use
+> group fd to prove ownership. But if using the zero-length array, it
+> would be failed. So we may add below logic and remove the
+> vfio_device_cdev_opened() in vfio_pci_ioctl_pci_hot_reset_groups().
+> 
+> vfio_pci_ioctl_pci_hot_reset()
+> {
+> ...
+> 	if (!!hdr.count == !!vfio_device_cdev_opened(&vdev->vdev))
+> 		return -EINVAL;
+> 	if (hdr.count)
+> 		vfio_pci_ioctl_pci_hot_reset_groups(vdev, hdr.count, slot, arg);
+> 	return vfio_pci_dev_set_hot_reset(vdev->vdev.dev_set, NULL,
+> 					     vfio_iommufd_device_ictx(&vdev->vdev));
+> }
+> 
+> > 
+> > I thought it would be that this function is called with groups == NULL
+> > and therefore the vfio_dev_in_groups() test below fails, but I don't
+> > think that's true for a compat opened device.  Thanks,  
+> 
+> How about above logic?
 
-Thanks,
-Longman
+The double negating a function that already returns bool is a bit
+excessive.  I might also move the test closer to the other parameter
+checking with a comment noting the null array interface is only for
+cdev opened devices.  Thanks,
+
+Alex
 
