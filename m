@@ -2,145 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66E0A718207
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 15:36:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB559718529
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 16:41:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235000AbjEaNgw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 09:36:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52998 "EHLO
+        id S237161AbjEaOlW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 10:41:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229936AbjEaNgu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 09:36:50 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE19DC0;
-        Wed, 31 May 2023 06:36:49 -0700 (PDT)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34VDGd8D027853;
-        Wed, 31 May 2023 13:36:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references :
- subject : cc : from : to : message-id : date; s=pp1;
- bh=278oxwc42MF8qvWbiVtT1x5VRhiFGPiUPLXlAgzrKZc=;
- b=egetVAZUdsaRryLRYABCUmNnxNs+HJF8n768iGoqYj07bgwgA4TxZuAurfEqyLX4bhn0
- YUS/UvPjGdkYc88k4GahKUXJxqYLwHDziWXWOuP6Ys0tnBeAb2bYX3rLu/ok3MdtgfN4
- n2fmbQz6W1gJUrKEl+61rETjYhXKiZ0uvw4Kub6CrfCz6km8hq9uDe4kUXv5D8+v2cGN
- rRPC6KzORoXGPhz8O4055QPjTWIefUfy/avVYC+ZALLvXK2p/SDjpXeIuRtVqzjvArwM
- u06ob50Fkk+xI+JIqFWbrH1SAQX2tbSWRv76bn7P75IjUPF4PJGZLorDbGNnZrtC3Cky vA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qx4y3mr0u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 31 May 2023 13:36:48 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34VD9Ou0002474;
-        Wed, 31 May 2023 13:36:47 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qx4y3mqye-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 31 May 2023 13:36:47 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34VCa1DT022759;
-        Wed, 31 May 2023 13:36:45 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3qu94e9pg4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 31 May 2023 13:36:45 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34VDafLr44826996
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 31 May 2023 13:36:41 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9E11720043;
-        Wed, 31 May 2023 13:36:41 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72E6E20040;
-        Wed, 31 May 2023 13:36:41 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.88.234])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 31 May 2023 13:36:41 +0000 (GMT)
+        with ESMTP id S236642AbjEaOlV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 10:41:21 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72C80B2
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 07:41:18 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-53fa00ed93dso2358932a12.3
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 07:41:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685544078; x=1688136078;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ti837LRqDnqpbatqjoYClzKSIJAuB63XL95slvLWNWw=;
+        b=jbHrV8laR/9h4HJU6Oe0XOI8XhVtvHNwqSXwabnJ1B9TLJ1ikxm+VeMCoNOCAQhYy5
+         MOAsnUKZ/XEuZbvhSL8D3d0vv22bXbsnlZfWr/5eeQsU57f8usPlpmki4eOENzYxly3q
+         hekS0XSrg2VXycdgeH3XdrkWNMklvfVleAmKThYeH7PRy08zVNtHgr4MgoELArjZgSxg
+         D2G1cLJt+ndFNPnNsGscN3/DyRmg0KxhjNJZokj+NGrlNyaVLc796bmhKBZyj4JYb9YT
+         oRViTa0hh5fzmvK3msZHdR5RvIpVFt6XheLhQudK2Xmd+4JZny6bX3SlgyJGfM4rfSas
+         DHTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685544078; x=1688136078;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ti837LRqDnqpbatqjoYClzKSIJAuB63XL95slvLWNWw=;
+        b=GHqHPQxLt073axel0/xnz6C8RY3UuwVjIGdL8dQkAX6DJK2GI9QPdn2YELHR+E+QE0
+         04d8WnIDVSOrqtoMb25KrgsZgajC5xdMtKiby4WxriLV5C6yXjXdlnQpCBarTQpn7yDA
+         RvNwmfyD6v8+kRQdw7+yA4hPl3/TxfdcjlmEttp1SX7Vf5zCzyI6/XSklG00Qo7eO86A
+         ZSxrIvkl6xvP2IAI1W9HB6G6VOILsJZXxrGyd0DRIo6fHTTS6jaUX/Q3CA6LID3MhARH
+         G25p4xZC9CzE+l+CClIfFZsUITr0HGRqMrHD7yQZ5WHOLKKdtZ6xupQfQIgDFHVtJ0uq
+         KbKQ==
+X-Gm-Message-State: AC+VfDzE975SPSUX3JlCo6rzgRLH6ESg6/rtx+Ko4LGDwjvmsYYqeU/p
+        8aCJVJQ63dtVwutrWj3AfHsaJLyFf6o=
+X-Google-Smtp-Source: ACHHUZ4FBX6k6njlZVJF5P3Da8UtchtKVJtSG6TZhD6bq6TRIEPJllWxu07/YePjB7f/meQ/f+3/j7b539I=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:6d1:0:b0:520:ba5c:324b with SMTP id
+ 200-20020a6306d1000000b00520ba5c324bmr1149460pgg.2.1685544078008; Wed, 31 May
+ 2023 07:41:18 -0700 (PDT)
+Date:   Wed, 31 May 2023 07:41:16 -0700
+In-Reply-To: <5e18e1424868eec10f6dc396b88b65283b57278a.camel@redhat.com>
+Mime-Version: 1.0
+References: <NWb_YOE--3-9@tutanota.com> <357d135f9ed65f4e2970c82ae4e855547db70ad1.camel@redhat.com>
+ <CALMp9eTyx1Y0yc7G0c0BsAig=Amv4DYtcNnWPmD-9JHP=ChZiw@mail.gmail.com>
+ <CALMp9eSq1r87=jGWc1z85L-QGCTF-jpWgHEQxJ4sVCqCU_0KQQ@mail.gmail.com> <5e18e1424868eec10f6dc396b88b65283b57278a.camel@redhat.com>
+Message-ID: <ZHdcjFPJJwl9RoxF@google.com>
+Subject: Re: [Bug] AMD nested: commit broke VMware
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>, jwarren@tutanota.com,
+        Kvm <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230421113647.134536-2-frankja@linux.ibm.com>
-References: <20230421113647.134536-1-frankja@linux.ibm.com> <20230421113647.134536-2-frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 1/7] lib: s390x: uv: Introduce UV validity function
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        thuth@redhat.com, david@redhat.com
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Message-ID: <168554020111.164254.15682688367711474887@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Wed, 31 May 2023 15:36:41 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: tt-dtTb-yfu0E_X8KubpkcbHq-KuNLO2
-X-Proofpoint-ORIG-GUID: 8dodWGppsalfE-y2dms1X2kRB5XwBMdd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-31_08,2023-05-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- malwarescore=0 adultscore=0 phishscore=0 priorityscore=1501
- mlxlogscore=999 clxscore=1015 spamscore=0 impostorscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305310112
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2023-04-21 13:36:41)
-> PV related validities are in the 0x20** range but the last byte might
-> be implementation specific, so everytime we check for a UV validity we
-> need to mask the last byte.
->=20
-> Let's add a function that checks for a UV validity and returns a
-> boolean.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->  lib/s390x/uv.h | 7 +++++++
->  1 file changed, 7 insertions(+)
->=20
-> diff --git a/lib/s390x/uv.h b/lib/s390x/uv.h
-> index 5fe29bda..78b979b7 100644
-> --- a/lib/s390x/uv.h
-> +++ b/lib/s390x/uv.h
-> @@ -35,4 +35,11 @@ static inline void uv_setup_asces(void)
->         lctlg(13, asce);
->  }
-> =20
-> +static inline bool uv_validity_check(struct vm *vm)
-> +{
-> +       uint16_t vir =3D sie_get_validity(vm);
-> +
-> +       return vm->sblk->icptcode =3D=3D ICPT_VALIDITY && (vir & 0xff00) =
-=3D=3D 0x2000;
-> +}
-> +
+On Wed, May 31, 2023, Maxim Levitsky wrote:
+> =D0=A3 =D0=B2=D1=82, 2023-05-30 =D1=83 13:34 -0700, Jim Mattson =D0=BF=D0=
+=B8=D1=88=D0=B5:
+> > On Tue, May 30, 2023 at 1:10=E2=80=AFPM Jim Mattson <jmattson@google.co=
+m> wrote:
+> > > On Mon, May 29, 2023 at 6:44=E2=80=AFAM Maxim Levitsky <mlevitsk@redh=
+at.com> wrote:
+> > > > =D0=A3 =D0=BF=D0=BD, 2023-05-29 =D1=83 14:58 +0200, jwarren@tutanot=
+a.com =D0=BF=D0=B8=D1=88=D0=B5:
+> > > > > I don't know what would be the best case here, maybe put a quirk
+> > > > > there, so it doesn't break "userspace".  Committer's email is dea=
+d,
+> > > > > so I'm writing here.
+> > > > >=20
+> > > >=20
+> > > > I have to say that I know about this for long time, because some ti=
+me
+> > > > ago I used  to play with VMware player in a VM on AMD on my spare t=
+ime,
+> > > > on weekends (just doing various crazy things with double nesting,
+> > > > running win98 nested, vfio stuff, etc, etc).
+> > > >=20
+> > > > I didn't report it because its a bug in VMWARE - they set a bit in =
+the
+> > > > tlb_control without checking CPUID's FLUSHBYASID which states that =
+KVM
+> > > > doesn't support setting this bit.
+> > >=20
+> > > I am pretty sure that bit 1 is supposed to be ignored on hardware
+> > > without FlushByASID, but I'll have to see if I can dig up an old APM
+> > > to verify that.
+> >=20
+> > I couldn't find an APM that old, but even today's APM does not specify
+> > that any checks are performed on the TLB_CONTROL field by VMRUN.
+> >=20
+> > While Intel likes to fail VM-entry for illegal VMCS state, AMD prefers
+> > to massage the VMCB to render any illegal VMCB state legal. For
+> > example, rather than fail VM-entry for a non-canonical address, AMD is
+> > inclined to drop the high bits and sign-extend the low bits, so that
+> > the address is canonical.
+> >=20
+> > I'm willing to bet that modern CPUs continue to ignore the TLB_CONTROL
+> > bits that were noted "reserved" in version 3.22 of the manual, and
+> > that Krish simply manufactured the checks in commit 174a921b6975
+> > ("nSVM: Check for reserved encodings of TLB_CONTROL in nested VMCB"),
+> > without cause.
 
-I noticed a small issue with this. If no intercept occurs, we sie_get_valid=
-ity()
-will be called which will assert() when there's none.
+Ya.  The APM even provides a definition of "reserved" that explicitly calls=
+ out
+the different reserved qualifiers.  The only fields/values that KVM can act=
+ively
+enforce are things tagged MBZ.
 
-Please consider the following fixup (broken whitespace ahead):
+  reserved
+    Fields marked as reserved may be used at some future time.
+    To preserve compatibility with future processors, reserved fields requi=
+re special handling when
+    read or written by software. Software must not depend on the state of a=
+ reserved field (unless
+    qualified as RAZ), nor upon the ability of such fields to return a prev=
+iously written state.
+    If a field is marked reserved without qualification, software must not =
+change the state of that field;
+    it must reload that field with the same value returned from a prior rea=
+d.
+    Reserved fields may be qualified as IGN, MBZ, RAZ, or SBZ (see definiti=
+ons).
 
- static inline bool uv_validity_check(struct vm *vm)
- {
--       uint16_t vir =3D sie_get_validity(vm);
-+       uint16_t vir;
+> > > > Supporting FLUSHBYASID would fix this, and make nesting faster too,
+> > > > but it is far from a trivial job.
+> > > >=20
+> > > > I hope that I will find time to do this soon.
 
--       return vm->sblk->icptcode =3D=3D ICPT_VALIDITY && (vir & 0xff00) =
-=3D=3D 0x2000;
-+       /* must not use sie_get_validity() when there's no validity */
-+       if (vm->sblk->icptcode !=3D ICPT_VALIDITY)
-+               return false;
-+       vir =3D sie_get_validity(vm);
-+
-+       return (vir & 0xff00) =3D=3D 0x2000;
- }
+...
 
+> Shall we revert the offending patch then?
+
+Yes please.
