@@ -2,119 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A565571F6B8
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 01:40:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26ABF7176C1
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 08:20:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229689AbjFAXj7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 19:39:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41420 "EHLO
+        id S232198AbjEaGU4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 02:20:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232056AbjFAXjt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 19:39:49 -0400
-Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E178136;
-        Thu,  1 Jun 2023 16:39:48 -0700 (PDT)
-Received: by mail-oo1-xc36.google.com with SMTP id 006d021491bc7-5584f8ec30cso1085378eaf.0;
-        Thu, 01 Jun 2023 16:39:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685662788; x=1688254788;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y66S7nKcbyO9mw2veazWYNce7x29EbNWsEjy9gQwvT8=;
-        b=JgN6bMOPbZQQzmbjQOXjZR1MWbA658FbsmFwhmJTfIBw7YT4vVH5SbNbGOqDYNiykz
-         NsONTUM1dbTRUtPmxQi/H2LhtTn0Gt6DO8HcjDTOBUhoGjYv59NWvC5TZ17iskx80o1o
-         jZWxce7jFMBi1PMppTmfYEnMNSDmtgSD0HR7uL22/b+QOMO2srLfPklplvCwi4Zgpn/S
-         +RyIJ/nq+QgwVgiZe0DQp6ybDulRm25BGxz2VtBmAV3+cM3FYgqFrIm/4tiHZjNDFj3/
-         NVhs4YEuF3+R+IYByMBWLDGjNsegbKB3nzBunHXSaJIZCWh9PVtdIWIC9DuBPSNL49Un
-         OkfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685662788; x=1688254788;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y66S7nKcbyO9mw2veazWYNce7x29EbNWsEjy9gQwvT8=;
-        b=Kl6rnOXFgqoGrNqlLT8dnPnPlzHdmAVsxhGZhSVav0Wm46GJ6xbWllBqm5lNOhyCkD
-         kBlB5IuFgqe0C4Ckulu1zs30gpFrzI45AphfoPTzHPxCvEh/rr7/JBiKroR9X0x9eSqd
-         sxwBFRN2HfgxYvrcbEC/uQThpyvXsEhTq7Tco4jTgFgHJmkSfHxtBDUGq7wlbiymdSsM
-         YzoylbgJAWOATl2u1QDAffsgzoI381z7GTbvDU7xShkObfyNWiO7A000GaD7FrQKXqeE
-         tWXW4QvQE1Tv1Sft8mlgtuvy+NZqmUVpxCsLWIjdGZn+3kZrARd+6Fxzp4o3kWWKNJoA
-         M7QQ==
-X-Gm-Message-State: AC+VfDxIN6DIPPB9/MltVaGZlKkw8AjMC8H7vFnhhs8QYYIqJhNQ5f+2
-        rkwQh0PjKFJ+dYhud7rfZBFaG7GgPa5zbfRq
-X-Google-Smtp-Source: ACHHUZ5H3iz5f8fyOD3aj+Xa4IrVqtidCjhJ6HAZSYPdF8KVhqG0fRMzu2vPFMhJL5t8WczAz3B7Dw==
-X-Received: by 2002:a05:6358:9896:b0:123:5c29:c39a with SMTP id q22-20020a056358989600b001235c29c39amr7109173rwa.31.1685662787613;
-        Thu, 01 Jun 2023 16:39:47 -0700 (PDT)
-Received: from localhost (ec2-52-9-159-93.us-west-1.compute.amazonaws.com. [52.9.159.93])
-        by smtp.gmail.com with ESMTPSA id z15-20020aa791cf000000b0064d59e194c8sm5585299pfa.115.2023.06.01.16.39.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Jun 2023 16:39:47 -0700 (PDT)
-Date:   Wed, 31 May 2023 03:35:30 +0000
-From:   Bobby Eshleman <bobbyeshleman@gmail.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Eric Dumazet <edumazet@google.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net] virtio/vsock: fix sock refcnt bug on owner set
- failure
-Message-ID: <ZHbAgkvSHEiQlFs6@bullseye>
-References: <20230531-b4-vsock-fix-refcnt-v1-1-0ed7b697cca5@bytedance.com>
- <35xlmp65lxd4eoal2oy3lwyjxd3v22aeo2nbuyknc4372eljct@vkilkppadayd>
+        with ESMTP id S229904AbjEaGUy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 02:20:54 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 299589F;
+        Tue, 30 May 2023 23:20:54 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34V5eGn3022066;
+        Wed, 31 May 2023 06:20:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references :
+ subject : cc : from : to : message-id : date; s=pp1;
+ bh=TNouXXGSf5zqOpDsKip1BhoCEFbovCJ08axIwZ84Qi0=;
+ b=XoJYxgXClnvxTVFrKtyfXUBwl+aX3j4no28hpBJgmG95fxESppPmdnguCRTA7nNdTfzt
+ HadetnXnVA/TsRKuM9fefceZqGeoRka1tltiJoS0Kbou4xeZxYbBtMOdHGa1P7M70zTY
+ UoTb//KXif+S1tbcbSY7q2YFrLlRlNYigTC5lby3KddUHPQlue/4Iyhy0ZEY5LPJHsO9
+ 1faXj/gWh7ZjfVYT5CFJ3DPjzQgCZt/OzFEvzwFbWmAmENxzpq4Ob8qDMzrYnGpT/DHa
+ eiKNszpjY4Ij+BZUjhcSnn4J5AWwrhB0JNxLbLB6roJNlu6jWEYE0C5r9vPRvOWdtDyV Yw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwrpvjgf1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 31 May 2023 06:20:53 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34V65ewT025396;
+        Wed, 31 May 2023 06:20:53 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qwrpvjgea-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 31 May 2023 06:20:53 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34V5EC60008423;
+        Wed, 31 May 2023 06:20:50 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3qu9g59h7j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 31 May 2023 06:20:50 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34V6Kk3T63766954
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 31 May 2023 06:20:46 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 67F7A2004B;
+        Wed, 31 May 2023 06:20:46 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 392E520043;
+        Wed, 31 May 2023 06:20:46 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.88.234])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 31 May 2023 06:20:46 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <35xlmp65lxd4eoal2oy3lwyjxd3v22aeo2nbuyknc4372eljct@vkilkppadayd>
-X-Spam-Status: No, score=-0.8 required=5.0 tests=BAYES_00,DATE_IN_PAST_24_48,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230530125243.18883-2-pmorel@linux.ibm.com>
+References: <20230530125243.18883-1-pmorel@linux.ibm.com> <20230530125243.18883-2-pmorel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v4 1/2] s390x: sclp: consider monoprocessor on read_info error
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com,
+        cohuck@redhat.com
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
+Message-ID: <168551404568.164254.6601837363136440455@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Wed, 31 May 2023 08:20:45 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 8GfR1dANtLr0fwLBh1Lnz7Ngq0cIilv5
+X-Proofpoint-ORIG-GUID: aEl7JgQ52x7kJsAYTPElIak6Pc5JhENS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-05-31_02,2023-05-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 suspectscore=0 spamscore=0 mlxscore=0 phishscore=0
+ mlxlogscore=999 malwarescore=0 priorityscore=1501 bulkscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2305310052
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 01, 2023 at 09:58:47AM +0200, Stefano Garzarella wrote:
-> On Wed, May 31, 2023 at 07:47:32PM +0000, Bobby Eshleman wrote:
-> > Previous to setting the owner the socket is found via
-> > vsock_find_connected_socket(), which returns sk after a call to
-> > sock_hold().
-> > 
-> > If setting the owner fails, then sock_put() needs to be called.
-> > 
-> > Fixes: f9d2b1e146e0 ("virtio/vsock: fix leaks due to missing skb owner")
-> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> > ---
-> > net/vmw_vsock/virtio_transport_common.c | 1 +
-> > 1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > index b769fc258931..f01cd6adc5cb 100644
-> > --- a/net/vmw_vsock/virtio_transport_common.c
-> > +++ b/net/vmw_vsock/virtio_transport_common.c
-> > @@ -1343,6 +1343,7 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
-> > 
-> > 	if (!skb_set_owner_sk_safe(skb, sk)) {
-> > 		WARN_ONCE(1, "receiving vsock socket has sk_refcnt == 0\n");
-> > +		sock_put(sk);
-> 
-> Did you have any warning, issue here?
-> 
-> IIUC skb_set_owner_sk_safe() can return false only if the ref counter
-> is 0, so calling a sock_put() on it should have no effect except to
-> produce a warning.
-> 
+Quoting Pierre Morel (2023-05-30 14:52:42)
+> A test would hang if an abort happens before SCLP Read SCP
+> Information has completed.
+>=20
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 
-Oh yeah, you're totally right. I did not recall how
-skb_set_owner_sk_safe() worked internally and thought I'd introduced an
-uneven hold/put count with that prior patch when reading through the
-code again. I haven't seen any live issue, just misread the code.
-
-Sorry about that, feel free to ignore this patch.
-
-Best,
-Bobby
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
