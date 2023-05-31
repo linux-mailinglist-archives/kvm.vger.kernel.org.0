@@ -2,75 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11146718B30
-	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 22:30:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43B98718B84
+	for <lists+kvm@lfdr.de>; Wed, 31 May 2023 22:57:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230256AbjEaUaS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 May 2023 16:30:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53302 "EHLO
+        id S229729AbjEaU5K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 May 2023 16:57:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229633AbjEaUaR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 May 2023 16:30:17 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4763D101;
-        Wed, 31 May 2023 13:30:16 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id 46e09a7af769-6af6db17a27so116022a34.2;
-        Wed, 31 May 2023 13:30:16 -0700 (PDT)
+        with ESMTP id S229543AbjEaU5I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 May 2023 16:57:08 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EF95129
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 13:57:08 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-53fa2d0c2ebso49316a12.1
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 13:57:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685565015; x=1688157015;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TkKYKkqHcR+9f2etlgEJShv7Ao181m9IUBoJvwooid4=;
-        b=q3UJCkngDungWbExd8FMG+IqZ3el7slhuQ5k459Pj7t1aQWnHBfrXnV/O2nlhHW4NA
-         yVmr2WMTtFmRTpvV5Lg6y5Dssam9eGm4yLiPNjhP4QreDp8iy4EjF111Tt0UBB1+4wrh
-         INzptlB6b80GLLZ42TVeQ38KGWHkgu3cyIUIjHHZiyu289/jaGgLfLnPSqhvMYXpViE7
-         IjpHh4iTut9MBSTtyMsh3RWoTrtHX2lIWNlEcD/EURrceCLf9XihEsMLPhrGt81yi0As
-         S6r0t1UWQEt4YMZM/oqWk0Ocks2p9RdTaXIcj5i8nMGVmdYLaiM+jhFjaGJcz+snLL7+
-         4/Mw==
+        d=google.com; s=20221208; t=1685566627; x=1688158627;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hXSlW5uRq1euI1p2NcqjuOnX6YJKbiTwoTtcD+Lazoc=;
+        b=WlPBJkA/uDDPtLHMI6CoAg/7iA4M2p6Cd5SHv5FCSNAB4VZpfbRDqCcvJW5chltA/s
+         H9oOjT+4nPFyoQtr4e1dqUVmEihoRtKupba2QeP7qOFYHjTPA95oPVJIrZXvK4nfTcBM
+         Vud07Spx23Z6jGjJl/PXYGBn8t11x4kOewJg2wX1A6THCQBch1beNqxsF2mFIR4fzo0L
+         H5AWWD5pL5F5WT6a5+mAjHWDLK9eidHfHJS98oFI8unPRwkIPU+zhsPf3SgiGy4dI0En
+         qhECjFaSr+sKSsndvNj+ADT9RU41LsOrWR2eJdSNaBJj9I6cR0XqiqsmAbxT00TLmckF
+         C+ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685565015; x=1688157015;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TkKYKkqHcR+9f2etlgEJShv7Ao181m9IUBoJvwooid4=;
-        b=W602xVON+ILY0s+Qf9xAT4fpNuwChW7WdhNP4XAy9wxn1aoazexR5iRrS/Dfe/VRv8
-         LMMloYVUESMq7sDNtSwAb8zN7AYKXgRZN1P4nY34bo/SU5IWCCHtXgrw4OXJ4XQy5EX+
-         OkDWSIfSyaqkyvROAcyeGjYqO5UDEGyu6QQO3C0ox7t/847EITtv+hdIvlh8ohthw2yD
-         z/08JRZHHzPfiwoXsmlNEg8dBrqt09fVoLEilVd6+BmKXtMeLxLen+0SlOxrn13I682d
-         Gbc1/vz5Sh/FDCT0eQlzWqG9hmXD34XbVko3etM6J71uPqvnvaXtCl5VThbERA5BgT+9
-         1XFA==
-X-Gm-Message-State: AC+VfDyUZbVQDEFDmWYTmUCaoE+3bavdBGWGTNH4B1BEYd1+hHfbmFqE
-        Mvf3GNQj/Swb4bQdKLf+f3E=
-X-Google-Smtp-Source: ACHHUZ7z/vRygPB0842T2OD1oupQlVa7qdWy1B3CYPo4fysVtlk5UiHXG9Chk43oIADEQNyUzGxDdA==
-X-Received: by 2002:a05:6358:714:b0:123:36a2:7936 with SMTP id e20-20020a056358071400b0012336a27936mr865081rwj.27.1685565015312;
-        Wed, 31 May 2023 13:30:15 -0700 (PDT)
-Received: from localhost ([192.55.54.50])
-        by smtp.gmail.com with ESMTPSA id i8-20020a654848000000b0050f85ef50d1sm1585890pgs.26.2023.05.31.13.30.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 May 2023 13:30:14 -0700 (PDT)
-Date:   Wed, 31 May 2023 13:30:12 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
+        d=1e100.net; s=20221208; t=1685566627; x=1688158627;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hXSlW5uRq1euI1p2NcqjuOnX6YJKbiTwoTtcD+Lazoc=;
+        b=P/6dk25gcmG4JlDoqvGak6wbBhu4Bm1HOSwS1rF7McB9a/GOn6eZt9y6xFmbLxgHyc
+         VJFiqQItsxn1a3iJuOQhT23dsZwz57bhRLGV09UrvGcV1w3V0zZ4vZPQHNz30hwLpbjv
+         mVrDUrSxZUKB2rRYEJ9QzyGh46a0s9IjD8l8S3kwP/eW7txTBZqQ+w1FnXH0suWcWa5X
+         tNkTwfYv1We8HtMuW5GHOK/e10BIm8lKnU80a67DMmvsLhC29gmccxibjKW4YWR0/e6U
+         0iAjqHI+JW5ImHzegU7SxVDFbmjc0z8JTjLScxTkLWhSL8Tz5GnhnBU547lnZ/oHfanB
+         RFdQ==
+X-Gm-Message-State: AC+VfDyzUIy4Nwp/GNwe9CwflLzRAk6c4i4pe20xSWsW5VpKPUPYUbXw
+        u+VNN/Tb0x5TyAIevUE1rr+FqS2Fp+g=
+X-Google-Smtp-Source: ACHHUZ5MNteJStw5d6MwlhgtN/xew5EFBwUW7lK5ST++f2ZsQOJXUDIi7koAFEyRovowCLdqlpveZFjN5bg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:78a:0:b0:528:948b:8989 with SMTP id
+ 132-20020a63078a000000b00528948b8989mr1325006pgh.9.1685566627647; Wed, 31 May
+ 2023 13:57:07 -0700 (PDT)
+Date:   Wed, 31 May 2023 13:57:06 -0700
+In-Reply-To: <20230327212635.1684716-2-coltonlewis@google.com>
+Mime-Version: 1.0
+References: <20230327212635.1684716-1-coltonlewis@google.com> <20230327212635.1684716-2-coltonlewis@google.com>
+Message-ID: <ZHe0okW8G7Z2GrwV@google.com>
+Subject: Re: [PATCH v3 1/2] KVM: selftests: Provide generic way to read system counter
+From:   Sean Christopherson <seanjc@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>, chen.bo@intel.com
-Subject: Re: [PATCH v14 003/113] KVM: x86/vmx: Refactor KVM VMX module
- init/exit functions
-Message-ID: <20230531203012.GG1234772@ls.amr.corp.intel.com>
-References: <cover.1685333727.git.isaku.yamahata@intel.com>
- <4ef61085333e97e0ae48c3d7603042b9801e3608.1685333727.git.isaku.yamahata@intel.com>
- <20230531093950.00007e7d.zhi.wang.linux@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230531093950.00007e7d.zhi.wang.linux@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        Vipin Sharma <vipinsh@google.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Marc Zyngier <maz@kernel.org>, Ben Gardon <bgardon@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,79 +71,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 31, 2023 at 09:57:18AM +0800,
-Zhi Wang <zhi.wang.linux@gmail.com> wrote:
+On Mon, Mar 27, 2023, Colton Lewis wrote:
+> +uint64_t cycles_read(void);
 
-> > +static int __init vt_init(void)
-> > +{
-> > +	unsigned int vcpu_size, vcpu_align;
-> > +	int r;
-> > +
-> > +	if (!kvm_is_vmx_supported())
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	/*
-> > +	 * Note, hv_init_evmcs() touches only VMX knobs, i.e. there's nothing
-> > +	 * to unwind if a later step fails.
-> > +	 */
-> > +	hv_init_evmcs();
-> > +
-> > +	r = kvm_x86_vendor_init(&vt_init_ops);
-> > +	if (r)
-> > +		return r;
-> > +
-> > +	r = vmx_init();
-> > +	if (r)
-> > +		goto err_vmx_init;
-> > +
-> > +	/*
-> > +	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
-> > +	 * exposed to userspace!
-> > +	 */
-> > +	vcpu_size = sizeof(struct vcpu_vmx);
-> > +	vcpu_align = __alignof__(struct vcpu_vmx);
-> > +	r = kvm_init(vcpu_size, vcpu_align, THIS_MODULE);
-> > +	if (r)
-> > +		goto err_kvm_init;
-> > +
-> > +	return 0;
-> > +
-> ---------------------------------
-> > +err_kvm_init:
-> > +	vmx_exit();
-> > +err_vmx_init:
-> > +	kvm_x86_vendor_exit();
-> > +	return r;
-> > +}
-> > +module_init(vt_init);
-> > +
-> ----------------------------------
-> > +static void vt_exit(void)
-> > +{
-> > +	kvm_exit();
-> > +	kvm_x86_vendor_exit();
-> > +	vmx_exit();
-> ----------------------------------
-> 
-> It seems the exiting sequences above are a little bit different with
-> each other (PS: It is not a prob introduced in this patch):
-> 
-> vmx_exit()
-> kvm_x86_vendor_exit()
-> ....
-> 
-> and
-> 
-> ...
-> kvm_x86_vnedor_exit()
-> vmx_exit()
-> 
-> I was wondering which one should be correct. Literally, the exiting
-> sequence would be in reversing order of the initialization sequence.
+I would prefer something like get_system_counter() or read_system_counter()
+Pairing "read" after "cycles" can be read (lol) in past tense or current tense,
+e.g. "the number of cycles that were read" versus "read the current number of
+cycles".  I used guest_system_counter_read() in an example in v1[*], but that was
+just me copy+pasting from the patch.
 
-In theory, I think kvm_x86_vendor_exit() => vmx_exit() and
-vmx_init() => kvm_x86_vendor_exit() should be the right order.
-But in practice, it doesn't matter and I didn't want to touch the order with
-this patch series.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+And "cycles" is typically used to describe latency and elapsed time, e.g. doing
+
+	uint64_t time = cycles_to_ns(cycles_read());
+
+looks valid at a glance, e.g. "convert that number of cycles that were read into
+nanoseconds", but is nonsensical in most cases because it's current tense, and
+there's no baseline time.
+
+Sorry for not bringing this up in v2, I think I only looked at the implementation.
+
+[*] https://lore.kernel.org/kvm/Y9LPhs1BgBA4+kBY@google.com
+
+> +uint64_t cycles_to_ns(struct kvm_vcpu *vcpu, uint64_t cycles)
+> +{
+> +	TEST_ASSERT(cycles < 10000000000, "Conversion to ns may overflow");
+> +	return cycles * NSEC_PER_SEC / timer_get_cntfrq();
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index ae1e573d94ce..adef76bebff3 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -1270,3 +1270,16 @@ void kvm_selftest_arch_init(void)
+>  	host_cpu_is_intel = this_cpu_is_intel();
+>  	host_cpu_is_amd = this_cpu_is_amd();
+>  }
+> +
+> +uint64_t cycles_read(void)
+> +{
+> +	return rdtsc();
+> +}
+> +
+> +uint64_t cycles_to_ns(struct kvm_vcpu *vcpu, uint64_t cycles)
+> +{
+> +	uint64_t tsc_khz = __vcpu_ioctl(vcpu, KVM_GET_TSC_KHZ, NULL);
+> +
+> +	TEST_ASSERT(cycles < 10000000000, "Conversion to ns may overflow");
+
+Is it possible to calculate this programatically instead of hardcoding a magic
+number?
+
+> +	return cycles * NSEC_PER_SEC / (tsc_khz * 1000);
