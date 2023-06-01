@@ -2,118 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA511719CC7
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 14:57:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B63BD719D37
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 15:19:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233244AbjFAM5Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 08:57:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48096 "EHLO
+        id S232291AbjFANTp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 09:19:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232820AbjFAM5X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 08:57:23 -0400
+        with ESMTP id S233324AbjFANTn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 09:19:43 -0400
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB6C1123;
-        Thu,  1 Jun 2023 05:57:21 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 351CpSKJ023806;
-        Thu, 1 Jun 2023 12:57:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F002B97;
+        Thu,  1 Jun 2023 06:19:41 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 351DDSRk018568;
+        Thu, 1 Jun 2023 13:19:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : content-type :
  content-transfer-encoding : mime-version; s=pp1;
- bh=BhnFPD9WBpyKOH+EIz0yZ5u6juJOqEY0p6yS3SSS1KE=;
- b=LqemEYbxjAzoL4l51mevRW7W1Dg/eX0ZC18892oKfS3taSLxFCdRq3efxiLc3tUqlu6y
- FTrfX7AR937ewo0p578Ne9X4sqpj5hZsjxRLtZPvF/sf+eO4cntAV6/BUNElZDY7Wgj2
- zjlxGZD0ulITmG9Js1ZfwUB8wPQF5llYwhaF/Ekb/+HvYAd2z0M1SRAh8qKoZScZDYhe
- whH/adxea1loAPH1utzu44PH8fJ1/EWIRcKLrr7pDhC0Fvujap4dG0fq6r5LyTcA0d3p
- hF81LlyoTzd0LsprJPz0YZXTnne2p2GjHmWQ+E0PMvtMsr7HMCkPBinRDM+HNQzBdb95 2w== 
+ bh=tTBWxMHAGeJlpPAzqjw4yCDaupaYk6+WOuZ0r7RHXlQ=;
+ b=S/K5bR2wzWD8jF0s2LtK3vF/J1ec5Pw9lqbPdCL6ZXZARzxk77m6XthOAVrzcENBYS/e
+ ov9SEtmnnKsZTXa99Jk5hlMimhCPtmwo+YCJttdvMRkZI8Kj3tec3MJCAkANML7vJgEN
+ mm82HHoVVpteTT1109f2h3OEi5Dtya1+qWK/izBLKcrhp4adRtqmgRrMH7o6BtITpGsV
+ XQajjlwcskrHiNYJ0m2IzKlfajqLyEOsVlAvnpMojNTW61NI6Y/l6FXM9CcrwKrRoiRU
+ 5yYyiViugHG/GJk6Dj84G7GFPGbzxZudOaESQkF8/B03VEx03rqx3lIPkJn/GXcV7VmA dQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qxucrgwjn-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qxv1b0a39-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jun 2023 12:57:20 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 351CUoLH021478;
-        Thu, 1 Jun 2023 12:57:20 GMT
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qxucrgwj5-1
+        Thu, 01 Jun 2023 13:19:09 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 351DFUru001084;
+        Thu, 1 Jun 2023 13:19:09 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qxv1b0a25-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jun 2023 12:57:19 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 351CsoGL016816;
-        Thu, 1 Jun 2023 12:57:19 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
-        by ppma04dal.us.ibm.com (PPS) with ESMTPS id 3qu9g6yr45-1
+        Thu, 01 Jun 2023 13:19:08 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 351Ac6ca009714;
+        Thu, 1 Jun 2023 13:19:07 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3qu9g5a49c-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jun 2023 12:57:19 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 351CvH1B61276604
+        Thu, 01 Jun 2023 13:19:06 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 351DJ3fS23134818
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Jun 2023 12:57:17 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 18C1958051;
-        Thu,  1 Jun 2023 12:57:17 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 389875805E;
-        Thu,  1 Jun 2023 12:57:16 +0000 (GMT)
-Received: from [9.61.34.174] (unknown [9.61.34.174])
-        by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  1 Jun 2023 12:57:16 +0000 (GMT)
-Message-ID: <85a26195-1f75-6cae-14e4-b474afe780d2@linux.ibm.com>
-Date:   Thu, 1 Jun 2023 08:57:15 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 0/3] s390/vfio-ap: fix hang when mdev attached to guest is
- removed
-Content-Language: en-US
-To:     Anthony Krowiak <akrowiak@linux.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, alex.williamson@redhat.com
-Cc:     jjherne@linux.ibm.com, pasic@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, Heiko Carstens <hca@linux.ibm.com>,
+        Thu, 1 Jun 2023 13:19:03 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 330772004F;
+        Thu,  1 Jun 2023 13:19:03 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7D8E420040;
+        Thu,  1 Jun 2023 13:19:02 +0000 (GMT)
+Received: from thinkpad-T15 (unknown [9.152.212.238])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  1 Jun 2023 13:19:02 +0000 (GMT)
+Date:   Thu, 1 Jun 2023 15:19:00 +0200
+From:   Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
-        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>
-References: <20230530223538.279198-1-akrowiak@linux.ibm.com>
- <9837da27-e224-aded-fe3e-4f4db6b1599c@linux.ibm.com>
- <17cf1288-03c5-4143-c62b-9234ed9c4d9a@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <17cf1288-03c5-4143-c62b-9234ed9c4d9a@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hugh Dickins <hughd@google.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>
+Subject: Re: [PATCH v3 03/34] s390: Use pt_frag_refcount for pagetables
+Message-ID: <20230601151900.6f184e8c@thinkpad-T15>
+In-Reply-To: <20230531213032.25338-4-vishal.moola@gmail.com>
+References: <20230531213032.25338-1-vishal.moola@gmail.com>
+        <20230531213032.25338-4-vishal.moola@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-redhat-linux-gnu)
+Content-Type: text/plain; charset=US-ASCII
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: a0KaCMB5W9lSE1E8OilX4lGScHL3YP1-
-X-Proofpoint-ORIG-GUID: QEEHxB9iNyct_MeLtsoIY5Fwyws3v18t
+X-Proofpoint-ORIG-GUID: NZnx_8FojkhNAEEWitWpik8jaNZSNqYi
+X-Proofpoint-GUID: URInLnYnsG8BZV2VGVY1OnfgESTv3EvD
 Content-Transfer-Encoding: 7bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
  definitions=2023-06-01_08,2023-05-31_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- lowpriorityscore=0 impostorscore=0 spamscore=0 malwarescore=0 mlxscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=975 suspectscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306010111
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 spamscore=0
+ adultscore=0 priorityscore=1501 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 bulkscore=0 mlxscore=0 phishscore=0 mlxlogscore=692
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2306010115
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/1/23 8:15 AM, Anthony Krowiak wrote:
-> 
-> 
-> On 5/31/23 10:48 AM, Matthew Rosato wrote:
+ On Wed, 31 May 2023 14:30:01 -0700
+"Vishal Moola (Oracle)" <vishal.moola@gmail.com> wrote:
 
->> I also did some testing using the companion qemu series at
->> https://lore.kernel.org/qemu-devel/20230530225544.280031-1-akrowiak@linux.ibm.com
+> s390 currently uses _refcount to identify fragmented page tables.
+> The page table struct already has a member pt_frag_refcount used by
+> powerpc, so have s390 use that instead of the _refcount field as well.
+> This improves the safety for _refcount and the page table tracking.
 > 
-> Shall I credit you with Tested-by also?
-> 
+> This also allows us to simplify the tracking since we can once again use
+> the lower byte of pt_frag_refcount instead of the upper byte of _refcount.
 
-Sure.
+This would conflict with s390 impact of pte_free_defer() work from Hugh Dickins
+https://lore.kernel.org/lkml/35e983f5-7ed3-b310-d949-9ae8b130cdab@google.com/
+https://lore.kernel.org/lkml/6dd63b39-e71f-2e8b-7e0-83e02f3bcb39@google.com/
 
-Thanks,
-Matt
+There he uses pt_frag_refcount, or rather pt_mm in the same union, to save
+the mm_struct for deferred pte_free().
 
+I still need to look closer into both of your patch series, but so far it
+seems that you have no hard functional requirement to switch from _refcount
+to pt_frag_refcount here, for s390.
+
+If this is correct, and you do not e.g. need this to make some other use
+of _refcount, I would suggest to drop this patch.
