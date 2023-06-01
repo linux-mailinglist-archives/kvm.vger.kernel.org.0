@@ -2,213 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2D4371F23C
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 20:43:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DBA1071F280
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 20:59:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231972AbjFASnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 14:43:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42756 "EHLO
+        id S231690AbjFAS7e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 14:59:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbjFASno (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 14:43:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81630184
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 11:43:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685644980;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=VWv8qJdIHUdzD1kuOVxtkf1lAHbXHShxABd30VkBVcA=;
-        b=OGaB963Cy1RbybPpiBmMDXrjL29ovGlNidbtQMMYAe9EvDLSwUmp8SYFyB+Vw+7EKov5UU
-        jBywXpYxqQ3obC+RpNVTlR+OHRm8d9BDnlyo4XKBXi1dTeQdy+cbgFNpCAAUx3vQwOKnk9
-        6eovI6MjvxzuJKrzgyrrL7+AHid+WX4=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-81-bfj5yRAKOUKK92yFx4RW5A-1; Thu, 01 Jun 2023 14:42:59 -0400
-X-MC-Unique: bfj5yRAKOUKK92yFx4RW5A-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-3f8283a3a7aso2942101cf.1
-        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 11:42:59 -0700 (PDT)
+        with ESMTP id S230022AbjFAS7c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 14:59:32 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB1A818C
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 11:59:31 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-ba8337a578dso1643301276.1
+        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 11:59:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685645971; x=1688237971;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qJOx7I0xCkV35wIsNvYW7Jhj+8WWm8gR/LQFgLlS698=;
+        b=QNVtC9QVasf0ux3t9XaObgkbyYr54/RquLz9RESlY62kUgN17r/zEeoISMwmkL5BQy
+         KyhWRkyqjLGq8Fiu4/V344VDsBwi20d9IW/jEF1gn+rQU/4ah2ioMKZfX7n+2uZY+jrM
+         oA47tCSBhwtFZvmNEsdotujwXca+GrOZyiOuHRDsCMtdOdvBhJKYmWnONzvZXmPeh5jw
+         u0kJEee8nV6QdQkZjXvhbgFpSLIugppVNFioOdmbNbK1KUBCO0rJBGycymHj16WaW0cS
+         NHpCIwA8BWpC5TAFJaFAVktPh78P9D93VLd2iQPgq23+PUrRGv6tX9A023CzQ8jFfGiP
+         sO0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685644978; x=1688236978;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VWv8qJdIHUdzD1kuOVxtkf1lAHbXHShxABd30VkBVcA=;
-        b=laJZqzWYsLWpcDv5pZ71ya5+UlDbn7OkfIoUijmnJ2Rvrw295KJnipL2V6ZcP8OYaQ
-         5v1QxjCf23qeq6O1eKY5qVgau1EGT8W9FmyLhH+Kd1HYwIpdJ4rvkSzHpOgFr5oC9YYp
-         wKi3EYf60Zwuo25r1wC194qQHEIjktsTeD1ErvCpJXiEZ72HUlnycIbFCnM47QA8b/BU
-         wsNVntViLkDEKIufVBJDgieWmKwJUJBxXzS8DlIj3+rtut6DOuxSqSnmSmTYEydi67H2
-         d1mSZG1/tBCYUMnfQPUkqXG+4wcqeAJnS2JFbEU4YseJWku+Ucr5qAeNjPljCBhwXXox
-         Uwrg==
-X-Gm-Message-State: AC+VfDxpFWs9EXPh/BFgkcQbYndlAJGPoRzoMKDIBamKQQvhYx0bU4P5
-        RMdgDcuDgswZfAQbZPVr84353LH6Nv46TUw2Fsqw+SN6A1wOXXPcnAmzejTImg/tpxG67Jwz0EY
-        s8s+7lkP4+G2N7rNIYU96
-X-Received: by 2002:ad4:5966:0:b0:61b:76dd:b643 with SMTP id eq6-20020ad45966000000b0061b76ddb643mr6769790qvb.4.1685644978207;
-        Thu, 01 Jun 2023 11:42:58 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4taCFW5c1Qbd4oWSXHSpnchEF/DTJbznrlO+oTXZHORe+U/7qVfz9xLPKydbKakE7U4fmjtA==
-X-Received: by 2002:ad4:5966:0:b0:61b:76dd:b643 with SMTP id eq6-20020ad45966000000b0061b76ddb643mr6769776qvb.4.1685644977932;
-        Thu, 01 Jun 2023 11:42:57 -0700 (PDT)
-Received: from x1n.redhat.com (bras-base-aurron9127w-grc-62-70-24-86-62.dsl.bell.ca. [70.24.86.62])
-        by smtp.gmail.com with ESMTPSA id w1-20020ac84d01000000b003f6a0fa022bsm7947063qtv.51.2023.06.01.11.42.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Jun 2023 11:42:57 -0700 (PDT)
-From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     James Houghton <jthoughton@google.com>, peterx@redhat.com,
-        Sean Christopherson <seanjc@google.com>,
-        Anish Moorthy <amoorthy@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2] selftests/kvm: Allow specify physical cpu list in demand paging test
-Date:   Thu,  1 Jun 2023 14:42:56 -0400
-Message-Id: <20230601184256.180413-1-peterx@redhat.com>
-X-Mailer: git-send-email 2.40.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20221208; t=1685645971; x=1688237971;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qJOx7I0xCkV35wIsNvYW7Jhj+8WWm8gR/LQFgLlS698=;
+        b=iFM77L9U+pCTR2FqUeEfrq6H014fXzpO3NmyHgiAiEwGI5vpDgp5njqy11mxDGTl7/
+         8jloHoHo0QiAyieT5DLwuQ5vYYF81plCBGQq75p2hJ8KV953f02BKbShO2CzpQG00IW8
+         FiTTayRxqcg/755o2Gy9kgZ4xhQSGi4d3FIauZRt7YfrOvG0hW413mLgoR2ass/7FiR8
+         h0v63xX3VZnN2D6MRdUKNPsmrSRqByHsSErFPmTKajv9x51UI5afxKzyuMFtDR9nngv+
+         wZwqItOWJJNoUJaGQcFya+F6vAkc3NHgsAilPnil2ZWnknMgjVavviBpHVTZG7+KGza4
+         L6aA==
+X-Gm-Message-State: AC+VfDzd1ldVIX9PWSoOaxkDme0yTkrReTV6cLngVl2GeC0uiQtz95P7
+        F9nXtLNJrfStJ2pRBj1FZEU7NVM0DHE=
+X-Google-Smtp-Source: ACHHUZ776RIsLAJHtRxsT3JEXHMBTJHnaFb6fdlNSrbCtcvbGCZnuNmw5RA+Io6V5+yiGghbvGuUfeoRLTg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1546:b0:ba8:93c3:393b with SMTP id
+ r6-20020a056902154600b00ba893c3393bmr549272ybu.2.1685645971014; Thu, 01 Jun
+ 2023 11:59:31 -0700 (PDT)
+Date:   Thu, 1 Jun 2023 11:59:29 -0700
+In-Reply-To: <ZHjhSZFwEc+VfjGk@linux.dev>
+Mime-Version: 1.0
+References: <20230412213510.1220557-1-amoorthy@google.com> <20230412213510.1220557-18-amoorthy@google.com>
+ <ZHjhSZFwEc+VfjGk@linux.dev>
+Message-ID: <ZHjqkdEOVUiazj5d@google.com>
+Subject: Re: [PATCH v3 17/22] KVM: Introduce KVM_CAP_ABSENT_MAPPING_FAULT
+ without implementation
+From:   Sean Christopherson <seanjc@google.com>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Anish Moorthy <amoorthy@google.com>, pbonzini@redhat.com,
+        maz@kernel.org, jthoughton@google.com, bgardon@google.com,
+        dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com,
+        peterx@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Mimic dirty log test to allow specify physical cpu pinning for vcpu threads.
-Put the help message into a general helper as suggested by Sean.
+On Thu, Jun 01, 2023, Oliver Upton wrote:
+> Anish,
+> 
+> On Wed, Apr 12, 2023 at 09:35:05PM +0000, Anish Moorthy wrote:
+> > +7.35 KVM_CAP_ABSENT_MAPPING_FAULT
+> > +---------------------------------
+> > +
+> > +:Architectures: None
+> > +:Returns: -EINVAL.
+> > +
+> > +The presence of this capability indicates that userspace may pass the
+> > +KVM_MEM_ABSENT_MAPPING_FAULT flag to KVM_SET_USER_MEMORY_REGION to cause KVM_RUN
+> > +to fail (-EFAULT) in response to page faults for which the userspace page tables
+> > +do not contain present mappings. Attempting to enable the capability directly
+> > +will fail.
+> > +
+> > +The range of guest physical memory causing the fault is advertised to userspace
+> > +through KVM_CAP_MEMORY_FAULT_INFO (if it is enabled).
+> 
+> Maybe third time is the charm. I *really* do not like the
+> interdependence between NOWAIT exits and the completely orthogonal
+> annotation of existing EFAULT exits.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- tools/testing/selftests/kvm/demand_paging_test.c  | 15 +++++++++++++--
- tools/testing/selftests/kvm/dirty_log_perf_test.c | 12 +-----------
- .../testing/selftests/kvm/include/kvm_util_base.h |  1 +
- tools/testing/selftests/kvm/lib/kvm_util.c        | 15 +++++++++++++++
- 4 files changed, 30 insertions(+), 13 deletions(-)
+They're not completely orthogonal, because the touchpoints for NOWAIT are themselves
+existing EFAULT exits.
 
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index bdb8e0748154..8581478ed4eb 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -220,7 +220,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- static void help(char *name)
- {
- 	puts("");
--	printf("usage: %s [-h] [-m vm_mode] [-u uffd_mode] [-a]\n"
-+	printf("usage: %s [-h] [-m vm_mode] [-u uffd_mode] [-a] [-c cpu_list]\n"
- 		   "          [-d uffd_delay_usec] [-r readers_per_uffd] [-b memory]\n"
- 		   "          [-s type] [-v vcpus] [-o]\n", name);
- 	guest_modes_help();
-@@ -229,6 +229,7 @@ static void help(char *name)
- 	printf(" -a: Use a single userfaultfd for all of guest memory, instead of\n"
- 		   "     creating one for each region paged by a unique vCPU\n"
- 		   "     Set implicitly with -o, and no effect without -u.\n");
-+	kvm_vcpu_pinning_help();
- 	printf(" -d: add a delay in usec to the User Fault\n"
- 	       "     FD handler to simulate demand paging\n"
- 	       "     overheads. Ignored without -u.\n");
-@@ -247,6 +248,7 @@ static void help(char *name)
- int main(int argc, char *argv[])
- {
- 	int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
-+	const char *cpulist = NULL;
- 	struct test_params p = {
- 		.src_type = DEFAULT_VM_MEM_SRC,
- 		.partition_vcpu_memory_access = true,
-@@ -257,7 +259,7 @@ int main(int argc, char *argv[])
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "ahom:u:d:b:s:v:r:")) != -1) {
-+	while ((opt = getopt(argc, argv, "ac:hom:u:d:b:s:v:r:")) != -1) {
- 		switch (opt) {
- 		case 'm':
- 			guest_modes_cmdline(optarg);
-@@ -272,6 +274,9 @@ int main(int argc, char *argv[])
- 		case 'a':
- 			p.single_uffd = true;
- 			break;
-+		case 'c':
-+			cpulist = optarg;
-+			break;
- 		case 'd':
- 			p.uffd_delay = strtoul(optarg, NULL, 0);
- 			TEST_ASSERT(p.uffd_delay >= 0, "A negative UFFD delay is not supported.");
-@@ -309,6 +314,12 @@ int main(int argc, char *argv[])
- 		TEST_FAIL("userfaultfd MINOR mode requires shared memory; pick a different -s");
- 	}
- 
-+	if (cpulist) {
-+		kvm_parse_vcpu_pinning(cpulist, memstress_args.vcpu_to_pcpu,
-+				       nr_vcpus);
-+		memstress_args.pin_vcpus = true;
-+	}
-+
- 	for_each_guest_mode(run_test, &p);
- 
- 	return 0;
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index e9d6d1aecf89..a17d4ebebe55 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -402,17 +402,7 @@ static void help(char *name)
- 	       "     so -w X means each page has an X%% chance of writing\n"
- 	       "     and a (100-X)%% chance of reading.\n"
- 	       "     (default: 100 i.e. all pages are written to.)\n");
--	printf(" -c: Pin tasks to physical CPUs.  Takes a list of comma separated\n"
--	       "     values (target pCPU), one for each vCPU, plus an optional\n"
--	       "     entry for the main application task (specified via entry\n"
--	       "     <nr_vcpus + 1>).  If used, entries must be provided for all\n"
--	       "     vCPUs, i.e. pinning vCPUs is all or nothing.\n\n"
--	       "     E.g. to create 3 vCPUs, pin vCPU0=>pCPU22, vCPU1=>pCPU23,\n"
--	       "     vCPU2=>pCPU24, and pin the application task to pCPU50:\n\n"
--	       "         ./dirty_log_perf_test -v 3 -c 22,23,24,50\n\n"
--	       "     To leave the application task unpinned, drop the final entry:\n\n"
--	       "         ./dirty_log_perf_test -v 3 -c 22,23,24\n\n"
--	       "     (default: no pinning)\n");
-+	kvm_vcpu_pinning_help();
- 	puts("");
- 	exit(0);
- }
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index fbc2a79369b8..dc8afe64cfb7 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -734,6 +734,7 @@ struct kvm_vcpu *vm_recreate_with_one_vcpu(struct kvm_vm *vm);
- void kvm_pin_this_task_to_pcpu(uint32_t pcpu);
- void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
- 			    int nr_vcpus);
-+void kvm_vcpu_pinning_help(void);
- 
- unsigned long vm_compute_max_gfn(struct kvm_vm *vm);
- unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 8ec20ac33de0..5c9b9706f56a 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -489,6 +489,21 @@ static uint32_t parse_pcpu(const char *cpu_str, const cpu_set_t *allowed_mask)
- 	return pcpu;
- }
- 
-+void kvm_vcpu_pinning_help(void)
-+{
-+	printf(" -c: Pin tasks to physical CPUs.  Takes a list of comma separated\n"
-+	       "     values (target pCPU), one for each vCPU, plus an optional\n"
-+	       "     entry for the main application task (specified via entry\n"
-+	       "     <nr_vcpus + 1>).  If used, entries must be provided for all\n"
-+	       "     vCPUs, i.e. pinning vCPUs is all or nothing.\n\n"
-+	       "     E.g. to create 3 vCPUs, pin vCPU0=>pCPU22, vCPU1=>pCPU23,\n"
-+	       "     vCPU2=>pCPU24, and pin the application task to pCPU50:\n\n"
-+	       "         ./dirty_log_perf_test -v 3 -c 22,23,24,50\n\n"
-+	       "     To leave the application task unpinned, drop the final entry:\n\n"
-+	       "         ./dirty_log_perf_test -v 3 -c 22,23,24\n\n"
-+	       "     (default: no pinning)\n");
-+}
-+
- void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
- 			    int nr_vcpus)
- {
--- 
-2.40.1
+> How do we support a userspace that only cares about NOWAIT exits but
+> doesn't want other EFAULT exits to be annotated?
 
+We don't.  The proposed approach is to not change the return value, and the
+vcpu->run union currently holds random garbage on -EFAULT, so I don't see any reason
+to require userspace to opt-in, or to let userspace opt-out.  I.e. fill
+vcpu->run->memory_fault unconditionally (for the paths that are converted) and
+advertise to userspace that vcpu->run->memory_fault *may* contain useful info on
+-EFAULT when KVM_CAP_MEMORY_FAULT_INFO is supported.  And then we define KVM's
+ABI such that vcpu->run->memory_fault is guarateed to be valid if an -EFAULT occurs
+when faulting in guest memory (on supported architectures).
+
+> It is very likely that userspace will only know how to resolve NOWAIT exits
+> anyway. Since we do not provide a precise description of the conditions that
+> caused an exit, there's no way for userspace to differentiate between NOWAIT
+> exits and other exits it couldn't care less about.
+> 
+> NOWAIT exits w/o annotation (i.e. a 'bare' EFAULT) make even less sense
+> since userspace cannot even tell what address needs fixing at that
+> point.
+> 
+> This is why I had been suggesting we separate the two capabilities and
+> make annotated exits an unconditional property of NOWAIT exits.
+
+No, because as I've been stating ad nauseum, KVM cannot differentiate between a
+NOWAIT -EFAULT and an -EFAULT that would have occurred regardless of the NOWAIT
+behavior.  Defining the ABI to be that KVM fills memory_fault if and only if the
+slot has NOWAIT will create a mess, e.g. if an -EFAULT occurs while userspace
+is doing a KVM_SET_USER_MEMORY_REGION to set NOWAIT, userspace may or may not see
+valid memory_fault information depending on when the vCPU grabbed its memslot
+snapshot.
