@@ -2,101 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38AB371A1F6
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 17:09:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52F67719FD2
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 16:25:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234853AbjFAPFy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 11:05:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42450 "EHLO
+        id S234300AbjFAOZM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 10:25:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235334AbjFAPF2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 11:05:28 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3BA810E9;
-        Thu,  1 Jun 2023 08:04:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685631874; x=1717167874;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=Qobfjghbe5gi6AIkAjOe1SXmoivnNVnCI+24keSLXNs=;
-  b=ahgAhLOD/8SwtU/IAVU21c2CbVTj02Be++UwKkW0PFxjGhsvipBbRzOc
-   xsfTu8THe0sQ+ofqkGOVuoEwI3p3uoYUuGS82WVLpmzHsdAvCWVDXzrCq
-   8yAZNaJl8vWGrOA/xpOOd+386aShwmnsRLsCQuwd0ymMwEeNOv0/uvkke
-   43vQbHw8weCxf2UInOeWM09mqSuyJ9+efP6kwVLTI+tGdIR8qBdCxFWvH
-   P1S0zFBq0HcCZhvJPDKVH7m91EvtMfdauxdJHnMxVt8BD33D2dcLqVdIe
-   Lm2Bs52CBnSEtsoM04GxH4rUB/I9WsLwbicctXqXR3SGBu2U8TwBprnVS
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10728"; a="383853504"
-X-IronPort-AV: E=Sophos;i="6.00,210,1681196400"; 
-   d="scan'208";a="383853504"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2023 08:02:57 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10728"; a="657828278"
-X-IronPort-AV: E=Sophos;i="6.00,210,1681196400"; 
-   d="scan'208";a="657828278"
-Received: from arthur-vostro-3668.sh.intel.com ([10.238.200.123])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2023 08:02:54 -0700
-From:   Zeng Guang <guang.zeng@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        Zeng Guang <guang.zeng@intel.com>
-Subject: [PATCH v1 6/6] KVM: x86: Advertise LASS CPUID to user space
-Date:   Thu,  1 Jun 2023 22:23:09 +0800
-Message-Id: <20230601142309.6307-7-guang.zeng@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230601142309.6307-1-guang.zeng@intel.com>
-References: <20230601142309.6307-1-guang.zeng@intel.com>
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S234314AbjFAOZG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 10:25:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E7F598
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 07:24:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685629459;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1/krOFL7mbU4xxN3nyrKnczfe+skJNyHI4Z3YRHlsPI=;
+        b=T/50TVYFenchm8io+wG2QYPwBvgvpqJtkQlzhEPU3X/pnRiEoPBlCVd4i0oFp7ZVcy1qfc
+        ZnHvd77gBLA3V61HhgQGwyXZ8BBGmMR+XB7nUsDmKNgCOIahKyrQFhgk8DE7FzMDunqSR5
+        /3u2yDlMAABJ/3QssWvfyyDdT5iKMT0=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-669-029pKT92NpKj1XcRQQQhag-1; Thu, 01 Jun 2023 10:24:17 -0400
+X-MC-Unique: 029pKT92NpKj1XcRQQQhag-1
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-33b21c93c9dso6786355ab.2
+        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 07:24:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685629456; x=1688221456;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1/krOFL7mbU4xxN3nyrKnczfe+skJNyHI4Z3YRHlsPI=;
+        b=OU5yztMupTCUlfpQt32sptAtR3IFktRmYGH6bq8jBvz0nvj0Rb4jR5mE8S2wpLe3Iv
+         /it6Ze1K32EWBMiXOd3oGb18OcGGZagZcg0VKjz4X8BKtBimnOOHhl3MfuzXc75ifaYu
+         uZUJj4WJ+y+TK/T9t4jId12lDmqOIcZWwmsslXBZ9dKSzl/O7d+ZCBrbr1b3r7cZjNLA
+         /boXgHTXui1SnB/DQlzv6nEs6zKhU73Gt+K7ecI1E6HUzLc2dALiBNADjIQsB3RtW+mv
+         IZnagV6sWmn0TQr9XYBCHTPro9G3R5CkZXoPBj6yUKvZiYG8SBfbp9wy4q9b8Gr/GJJr
+         bkDw==
+X-Gm-Message-State: AC+VfDw099JPFG+ZGizG29BTlXAgtthILae7Nbwo4DhccSyKZfvoozgp
+        e6j5DGbzjdF95KQCdOmKhadW0CKaGmeE01mkikNT86KZiIWMLoOE1MTZTn5a46EFO98plN9KoJv
+        nCZypzsNFW1Ea
+X-Received: by 2002:a92:dc48:0:b0:33b:4518:855b with SMTP id x8-20020a92dc48000000b0033b4518855bmr4310383ilq.31.1685629456539;
+        Thu, 01 Jun 2023 07:24:16 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ49mx0D8pp1sKwN9GDBagNPW0M6MLwlKghfGbFuCVF3pvvmUFEMkFKSw6/5GH2X52ssF8T1Qw==
+X-Received: by 2002:a92:dc48:0:b0:33b:4518:855b with SMTP id x8-20020a92dc48000000b0033b4518855bmr4310346ilq.31.1685629456193;
+        Thu, 01 Jun 2023 07:24:16 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id cp12-20020a056638480c00b0040fd44d4011sm2289927jab.125.2023.06.01.07.24.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jun 2023 07:24:15 -0700 (PDT)
+Date:   Thu, 1 Jun 2023 08:24:13 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Baolu Lu <baolu.lu@linux.intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "clegoate@redhat.com" <clegoate@redhat.com>
+Subject: Re: [PATCH v6 09/10] vfio/pci: Extend
+ VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for vfio device cdev
+Message-ID: <20230601082413.22a55ac4.alex.williamson@redhat.com>
+In-Reply-To: <DS0PR11MB7529B223BD86210A21D142B2C3499@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230522115751.326947-1-yi.l.liu@intel.com>
+        <20230522115751.326947-10-yi.l.liu@intel.com>
+        <20230524135603.33ee3d91.alex.williamson@redhat.com>
+        <DS0PR11MB752935203F87D69D4468B890C3469@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <355a9f1e-64e6-d785-5a22-027b708b4935@linux.intel.com>
+        <ZHeZPPo/MWXV1L9Q@nvidia.com>
+        <DS0PR11MB7529B223BD86210A21D142B2C3499@DS0PR11MB7529.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-LASS (Linear-address space separation) is an independent mechanism
-to enforce the mode-based protection that can prevent user-mode
-accesses to supervisor-mode addresses, and vice versa. Because the
-LASS protections are applied before paging, malicious software can
-not acquire any paging-based timing information to compromise the
-security of system.
+On Thu, 1 Jun 2023 06:06:17 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-The CPUID bit definition to support LASS:
-CPUID.(EAX=07H.ECX=1):EAX.LASS[bit 6]
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Thursday, June 1, 2023 3:00 AM
+> > 
+> > On Fri, May 26, 2023 at 10:04:27AM +0800, Baolu Lu wrote:  
+> > > On 5/25/23 9:02 PM, Liu, Yi L wrote:  
+> > > > >   It's possible that requirement
+> > > > > might be relaxed in the new DMA ownership model, but as it is right
+> > > > > now, the code enforces that requirement and any new discussion about
+> > > > > what makes hot-reset available should note both the ownership and
+> > > > > dev_set requirement.  Thanks,  
+> > > > I think your point is that if an iommufd_ctx has acquired DMA ownerhisp
+> > > > of an iommu_group, it means the device is owned. And it should not
+> > > > matter whether all the devices in the iommu_group is present in the
+> > > > dev_set. It is allowed that some devices are bound to pci-stub or
+> > > > pcieport driver. Is it?
+> > > >
+> > > > Actually I have a doubt on it. IIUC, the above requirement on dev_set
+> > > > is to ensure the reset to the devices are protected by the dev_set->lock.
+> > > > So that either the reset issued by driver itself or a hot reset request
+> > > > from user, there is no race. But if a device is not in the dev_set, then
+> > > > hot reset request from user might race with the bound driver. DMA ownership
+> > > > only guarantees the drivers won't handle DMA via DMA API which would have
+> > > > conflict with DMA mappings from user. I'm not sure if it is able to
+> > > > guarantee reset is exclusive as well. I see pci-stub and pcieport driver
+> > > > are the only two drivers that set the driver_managed_dma flag besides the
+> > > > vfio drivers. pci-stub may be fine. not sure about pcieport driver.  
+> > >
+> > > commit c7d469849747 ("PCI: portdrv: Set driver_managed_dma") described
+> > > the criteria of adding driver_managed_dma to the pcieport driver.
+> > >
+> > > "
+> > > We achieve this by setting ".driver_managed_dma = true" in pci_driver
+> > > structure. It is safe because the portdrv driver meets below criteria:
+> > >
+> > > - This driver doesn't use DMA, as you can't find any related calls like
+> > >   pci_set_master() or any kernel DMA API (dma_map_*() and etc.).
+> > > - It doesn't use MMIO as you can't find ioremap() or similar calls. It's
+> > >   tolerant to userspace possibly also touching the same MMIO registers
+> > >   via P2P DMA access.
+> > > "
+> > >
+> > > pci_rest_device() definitely shouldn't be done by the kernel drivers
+> > > that have driver_managed_dma set.  
+> > 
+> > Right
+> > 
+> > The only time it is safe to reset is if you know there is no attached
+> > driver or you know VFIO is the attached driver and the caller owns the
+> > VFIO too.
+> > 
+> > We haven't done a no attached driver test due to races.  
+> 
+> Ok. @Alex, should we relax the above dev_set requirement now or should
+> be in a separate series?
 
-Advertise LASS to user space to support LASS virtualization.
 
-Signed-off-by: Zeng Guang <guang.zeng@intel.com>
-Tested-by: Xuelian Guo <xuelian.guo@intel.com>
----
- arch/x86/kvm/cpuid.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Sounds like no, you should be rejecting enhancements that increase
+scope at this point and I don't see consensus here.  My concern was
+that we're not correctly describing the dev_set restriction which is
+already in place but needs to be more explicitly described in an
+implied ownership model vs proof of ownership model.  Thanks,
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 0c9660a07b23..a7fafe99ffe4 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -646,9 +646,8 @@ void kvm_set_cpu_caps(void)
- 		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL_SSBD);
- 
- 	kvm_cpu_cap_mask(CPUID_7_1_EAX,
--		F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) |
--		F(FZRM) | F(FSRS) | F(FSRC) |
--		F(AMX_FP16) | F(AVX_IFMA)
-+		F(AVX_VNNI) | F(AVX512_BF16) | F(LASS) | F(CMPCCXADD) |
-+		F(FZRM) | F(FSRS) | F(FSRC) | F(AMX_FP16) | F(AVX_IFMA)
- 	);
- 
- 	kvm_cpu_cap_init_kvm_defined(CPUID_7_1_EDX,
--- 
-2.27.0
+Alex
 
