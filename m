@@ -2,72 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1E4C71F420
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 22:47:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2119471F428
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 22:48:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231600AbjFAUrS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 16:47:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33930 "EHLO
+        id S231890AbjFAUsJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 16:48:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbjFAUrQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 16:47:16 -0400
+        with ESMTP id S231599AbjFAUsI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 16:48:08 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7987E18C
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 13:46:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 063F71B0
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 13:47:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685652389;
+        s=mimecast20190719; t=1685652446;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mKfOoPxKXKTaQ3RA/2u3I6KvcI8YXFqEVhkLpnR7WjE=;
-        b=G+XPJJ8t3Gn0vdncwys81GZ7iZzbZp6buFOJ5favAH8aMc8roNghYIbVLvikLV7HRWK7iH
-        /fUrwnHtTmhQRTvANhj5OEUoUiq2xmoOpy7lPehERhmDd7LInY0j2vjyha4rPmtdCIaG3s
-        p+WYdUBdtuj37NbYHVVu2Uu0cI1lwHQ=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=rmRZRfKWVEY0SEozIOD2eDdbXyNH6CzhN64nvWsaek4=;
+        b=hcoGCZHX/bF7dj/+y+LhNr3cEo7qCC2h1wN64+IkzT1BpWyPosxhb3CSiUjkgz7LLjk7i0
+        fiDyNlIQP3jmMgcvW1hgl79RdruhK79oR+vNiKC69I6/Kwhc4lRNYLfxpmosOSQE5k+haW
+        OsK5BgKoECZazjNOZgi3ICq7km+hGf4=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-626-Uz1Fq1cFOWygwxZ_PJJSyA-1; Thu, 01 Jun 2023 16:46:28 -0400
-X-MC-Unique: Uz1Fq1cFOWygwxZ_PJJSyA-1
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-33b7a468d14so10289265ab.3
-        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 13:46:28 -0700 (PDT)
+ us-mta-132-zxGF5nVWPAWr3p1ujhTgCw-1; Thu, 01 Jun 2023 16:47:24 -0400
+X-MC-Unique: zxGF5nVWPAWr3p1ujhTgCw-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-777683e803bso29173039f.3
+        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 13:47:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685652387; x=1688244387;
+        d=1e100.net; s=20221208; t=1685652444; x=1688244444;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mKfOoPxKXKTaQ3RA/2u3I6KvcI8YXFqEVhkLpnR7WjE=;
-        b=UFKdVfC+VPjw8bHmry7/KCT2ne1doX+Eq/7/bIrNptbSISLmxWxzxtU6uW8L6rnf9w
-         LjJqKiPZ6zzuoH94n355DwhknnoQI0pjz2CgG0BBmvM+KTOg3uA+BFcaPrTMFysWPUxm
-         iZsEBsJQAyXb/dGWNFjFG4eOAcK8wVyD0wK9wmXI/9btd0wxRzvdbpZ17FW3hUlo2xbO
-         UC/SkiFpRRVQyebuc6U5EhMJFkpiWWz2tCKZqkS2DG6eJklnBTfxIdADfPltSu03+rJ6
-         L41mRGWyYZAgvXZ6iNXtAlzR+XrmvKNwMrUk5hR2myhS9FIdo2ZsSeX56ffnz2a00CQv
-         xZTw==
-X-Gm-Message-State: AC+VfDxBOg6WmXFiit3WzZG1yjKRSwqLwHcfd32q6D4PoRLcmqzffF3q
-        Xn1A0ozM1gsnwqhGl3fY2Syo5cWbts3TVJ7xVxZAlejilZRzVCatLa2k1HKpqOZC7sMJKm/llEC
-        G2IqdBppbX3ds
-X-Received: by 2002:a92:de0e:0:b0:33a:a6de:65be with SMTP id x14-20020a92de0e000000b0033aa6de65bemr5672190ilm.21.1685652387608;
-        Thu, 01 Jun 2023 13:46:27 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4ywpMG3vtlHLLEM1U239mV9AK6gm9PprEslu+sHDJULivPRXsgppL7UaHjCclklcKCTTg9FA==
-X-Received: by 2002:a92:de0e:0:b0:33a:a6de:65be with SMTP id x14-20020a92de0e000000b0033aa6de65bemr5672186ilm.21.1685652387435;
-        Thu, 01 Jun 2023 13:46:27 -0700 (PDT)
+        bh=rmRZRfKWVEY0SEozIOD2eDdbXyNH6CzhN64nvWsaek4=;
+        b=T5H//3lmG4mOSCYx3wL0i5iobudbDpm8S75Sa9fSlqDl5TZQd2tRD1IAHahrCceb40
+         nPcicDdlSXsro/WrgS7jOoKYjR6AYhL+FAsWWPtJ6F8oQapP+XQCOKZNq4E0DkJBZsmn
+         mW/hguQR3+l8u/BfRK8/1U2NQkEyJG73ZGiwiz6IAoQxiCU+462y3JFxuD3ai2Uric+a
+         H7coKPnFLhCYC9+f1KmGUdwSR4whipIyisesuuuA2EwcP/Eg3M2M0ANNpeYBJ+rFRBj3
+         Glyx8UTQUfmjMZVCuhpxXycD17WO2M9/zBCwQDpRjCDFSMmRiSv0Unl2ESu/EKFBUFVr
+         PdpQ==
+X-Gm-Message-State: AC+VfDwMpckIBcYPyE7Vg/tOvWlqC8Ltb5OSpRi/1Ibe/wkbmkKKBwYh
+        rJnWKm7cUi6SYfvS0afpIgxaDm0k/7TEyNiqQd8061EzspvcXDPi4y7D8aWDnkQQW9K+XkoLDh/
+        tIEEO7KnrtmF/kBE1Yg5k
+X-Received: by 2002:a6b:6314:0:b0:774:982e:cb0a with SMTP id p20-20020a6b6314000000b00774982ecb0amr439738iog.15.1685652443900;
+        Thu, 01 Jun 2023 13:47:23 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5SzX6PbeMg9q9vvXLKsxsPVcmec31tIfdfceJjEB6+21sbwbfrKA2JAoEEGHsUYkyz/sbdhA==
+X-Received: by 2002:a6b:6314:0:b0:774:982e:cb0a with SMTP id p20-20020a6b6314000000b00774982ecb0amr439722iog.15.1685652443672;
+        Thu, 01 Jun 2023 13:47:23 -0700 (PDT)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id u22-20020a056638135600b00411be337516sm2570727jad.24.2023.06.01.13.46.26
+        by smtp.gmail.com with ESMTPSA id l23-20020a056638221700b004164fe77c06sm2571841jas.26.2023.06.01.13.47.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Jun 2023 13:46:26 -0700 (PDT)
-Date:   Thu, 1 Jun 2023 14:46:26 -0600
+        Thu, 01 Jun 2023 13:47:23 -0700 (PDT)
+Date:   Thu, 1 Jun 2023 14:47:22 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        farman@linux.ibm.com, mjrosato@linux.ibm.com,
-        borntraeger@linux.ibm.com
-Subject: Re: [PATCH 1/3] vfio: ap: realize the VFIO_DEVICE_GET_IRQ_INFO
- ioctl
-Message-ID: <20230601144626.577a94d3.alex.williamson@redhat.com>
-In-Reply-To: <20230530223538.279198-2-akrowiak@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
+        jjherne@linux.ibm.com, pasic@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, Cedric Le Goater <clegoate@redhat.com>
+Subject: Re: [PATCH 0/3] s390/vfio-ap: fix hang when mdev attached to guest
+ is removed
+Message-ID: <20230601144722.6eba9c49.alex.williamson@redhat.com>
+In-Reply-To: <30741787-441a-034f-f8d4-9f1060841051@linux.ibm.com>
 References: <20230530223538.279198-1-akrowiak@linux.ibm.com>
-        <20230530223538.279198-2-akrowiak@linux.ibm.com>
+        <30741787-441a-034f-f8d4-9f1060841051@linux.ibm.com>
 X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -82,17 +85,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 30 May 2023 18:35:36 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Wed, 31 May 2023 10:51:54 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-> Realize the VFIO_DEVICE_GET_IRQ_INFO ioctl to retrieve the information for
-> the VFIO device request IRQ.
+> On 5/30/23 6:35 PM, Tony Krowiak wrote:
+> > When a user attempts to remove a vfio-ap mediated device attached to a
+> > guest, the operation hangs until the mdev's fd is closed by the guest
+> > (i.e., the hostdev is detached or the guest is shut down). This patch 
+> > series provides kernel-side code that allows userspace to set up a 
+> > communication channel that will allow the vfio_ap device driver to notify 
+> > userspace when a request to release the mdev is received, so that userspace
+> > can close the mdev fd and avoid the hang. The patch series provides the 
+> > following:  
+> > 
+> > 1. Introduces code to handle the VFIO_DEVICE_GET_IRQ_INFO and 
+> >    VFIO_DEVICE_SET_IRQS ioctl calls to set the eventfd_ctx for signaling a
+> >    device request to userspace. 
+> > 
+> > 2. Wires up the VFIO bus driver callback to request a release of the mdev.
+> >    When invoked, the vfio_ap device driver will use the eventfd_ctx set up
+> >    in #1 to signal a request to userspace to release the mdev.
+> >   
 > 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->  drivers/s390/crypto/vfio_ap_ops.c | 30 +++++++++++++++++++++++++++++-
->  include/uapi/linux/vfio.h         |  9 +++++++++
->  2 files changed, 38 insertions(+), 1 deletion(-)
+> As to how this series eventually reaches master...  It touches both s390 and vfio.  
+> 
+> @Alex/@s390 maintainers -- I suggest it go through s390 given the
+> diffstat, it's almost completely in s390 drivers code.  However there
+> is a uapi hit to vfio.h (in patch 1) that should get at least an ACK
+> from Alex beforehand.
 
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
+Ack'd, I'll expect this to go through the s390 tree.  Thanks,
+
+Alex
 
