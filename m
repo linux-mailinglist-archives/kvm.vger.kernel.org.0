@@ -2,68 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B50417191F8
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 06:46:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C37B271920D
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 07:02:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230022AbjFAEq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 00:46:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39722 "EHLO
+        id S231297AbjFAFCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 01:02:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjFAEq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 00:46:26 -0400
+        with ESMTP id S229603AbjFAFCq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 01:02:46 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5082BD1
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 21:46:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99AAC12C
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 22:02:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D785E64016
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 04:46:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DC05C433EF
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 04:46:24 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 30EF263FC9
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 05:02:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FB11C433EF;
+        Thu,  1 Jun 2023 05:02:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685594784;
-        bh=6PWxODOB5BjJ2+hJ5LQ+k3DS3JqdXw0tvj806HzZMps=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Yg/wTLmoK7DBqYcnP3Ib0Ubd2VVoLae5benlTL7SnxKl2HyMf/Ro2UPNqMeKpxLJM
-         KGlPOhY74cfdb7OPK7avVi3sBBWkiHEbUaMrGkluhprhI+xzIiE5itSxNrmzKuvmtX
-         vT8RiVkoNBSKlOD9Pd8bXptM18oBCMpcGRoXPqReaYdIfwFL4aV4HtKft8hQWWEOHq
-         mSXa+UI+elzU9QxhVJfL5hZxxdg48sRH2u8BR5vtOuvfJ1O7nOiNk+Sz9GY89Q04y9
-         fYKHQz5VeEXwbj7VUwpgrR7US6h2XC+kE+AUftl4vM6La6fu8jsN0L6JHonvoW4F7Q
-         6w0Z6pfvbddow==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-4f3b314b1d7so327227e87.1
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 21:46:24 -0700 (PDT)
-X-Gm-Message-State: AC+VfDygih6CyF2QmT8qK+PsqxFot3wmXjGVVGEG+eJyuNoLntFU0pzf
-        zKBYTQ8h/9rccuRVxWQAHi7vWTomS5yfy4/xeAU=
-X-Google-Smtp-Source: ACHHUZ7N6vBdj6gVyW7L8xDyB9SffvV07lFwdCsIsM3G5zOmwiFyTLV/4LGBiFc+iJJEUBO/+74+cgsZzpD1eAuWtPE=
-X-Received: by 2002:ac2:4c14:0:b0:4eb:42b7:8c18 with SMTP id
- t20-20020ac24c14000000b004eb42b78c18mr594264lfq.53.1685594782235; Wed, 31 May
- 2023 21:46:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230518161949.11203-1-andy.chiu@sifive.com> <20230518161949.11203-4-andy.chiu@sifive.com>
-In-Reply-To: <20230518161949.11203-4-andy.chiu@sifive.com>
-From:   Guo Ren <guoren@kernel.org>
-Date:   Thu, 1 Jun 2023 12:46:10 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTRpTdXeDXczaVCmZdd0fNQADBPpd3+VMnYsd+XcudHSXg@mail.gmail.com>
-Message-ID: <CAJF2gTRpTdXeDXczaVCmZdd0fNQADBPpd3+VMnYsd+XcudHSXg@mail.gmail.com>
-Subject: Re: [PATCH -next v20 03/26] riscv: hwprobe: Add support for probing V
- in RISCV_HWPROBE_KEY_IMA_EXT_0
-To:     Andy Chiu <andy.chiu@sifive.com>
-Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Jonathan Corbet <corbet@lwn.net>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Evan Green <evan@rivosinc.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Andrew Bresticker <abrestic@rivosinc.com>,
-        Celeste Liu <coelacanthus@outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        s=k20201202; t=1685595764;
+        bh=zs1I394rk/Mw+oYwq8XKLNXM/rtn1y1wKjDBN5Wu3MM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=siqfEj6c1V8QvOG2LpafSKdu3pq2p/RMWv3BrHquxF2BJ4xRahyb5wyQZlVBQJfYl
+         1fKnpO/xitKhnLsVyHpA8pzu47EdDtj/S8xKh7yVKmY8s7FQx/b2Xt8XEmHtqjuYPM
+         W1DfsB0nwOCMK4m+ag2nV1Q6LMi1++502gA+svo49nRBTDE75jTsgiCKSiqk5XYNYJ
+         f2W90MbSqMhqjksfMFeIGmYoisI7GOk51zdmjoV6JZma9fV2C5YKKBmYD9/G4y+gJY
+         KYZqdV21rQ3gozntxPFSsgTsazqNLxBIwJ/1DvcfoQz5chxrTJz6al7v/QtdPq4DV4
+         b3UpskHgb4q/Q==
+Received: from [62.252.176.218] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q4aSQ-001po8-4A;
+        Thu, 01 Jun 2023 06:02:42 +0100
+Date:   Thu, 01 Jun 2023 06:02:41 +0100
+Message-ID: <87mt1jkc5q.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 0/4] KVM: arm64: PMU: Fix PMUVer handling on heterogeneous PMU systems
+In-Reply-To: <20230530125324.ijrwrvoll2detpus@google.com>
+References: <20230527040236.1875860-1-reijiw@google.com>
+        <87zg5njlyn.wl-maz@kernel.org>
+        <20230530125324.ijrwrvoll2detpus@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.252.176.218
+X-SA-Exim-Rcpt-To: reijiw@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -74,86 +76,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 19, 2023 at 12:20=E2=80=AFAM Andy Chiu <andy.chiu@sifive.com> w=
-rote:
->
-> Probing kernel support for Vector extension is available now. This only
-> add detection for V only. Extenions like Zvfh, Zk are not in this scope.
->
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-Reviewed-by: Guo Ren <guoren@kernel.org>
+Hey Reiji,
 
-> ---
-> Changelog v20:
->  - Fix a typo in document, and remove duplicated probes (Heiko)
->  - probe V extension in RISCV_HWPROBE_KEY_IMA_EXT_0 key only (Palmer,
->    Evan)
-> ---
->  Documentation/riscv/hwprobe.rst       | 3 +++
->  arch/riscv/include/uapi/asm/hwprobe.h | 1 +
->  arch/riscv/kernel/sys_riscv.c         | 4 ++++
->  3 files changed, 8 insertions(+)
->
-> diff --git a/Documentation/riscv/hwprobe.rst b/Documentation/riscv/hwprob=
-e.rst
-> index 9f0dd62dcb5d..7431d9d01c73 100644
-> --- a/Documentation/riscv/hwprobe.rst
-> +++ b/Documentation/riscv/hwprobe.rst
-> @@ -64,6 +64,9 @@ The following keys are defined:
->    * :c:macro:`RISCV_HWPROBE_IMA_C`: The C extension is supported, as def=
-ined
->      by version 2.2 of the RISC-V ISA manual.
->
-> +  * :c:macro:`RISCV_HWPROBE_IMA_V`: The V extension is supported, as def=
-ined by
-> +    version 1.0 of the RISC-V Vector extension manual.
-> +
->  * :c:macro:`RISCV_HWPROBE_KEY_CPUPERF_0`: A bitmask that contains perfor=
-mance
->    information about the selected set of processors.
->
-> diff --git a/arch/riscv/include/uapi/asm/hwprobe.h b/arch/riscv/include/u=
-api/asm/hwprobe.h
-> index 8d745a4ad8a2..7c6fdcf7ced5 100644
-> --- a/arch/riscv/include/uapi/asm/hwprobe.h
-> +++ b/arch/riscv/include/uapi/asm/hwprobe.h
-> @@ -25,6 +25,7 @@ struct riscv_hwprobe {
->  #define RISCV_HWPROBE_KEY_IMA_EXT_0    4
->  #define                RISCV_HWPROBE_IMA_FD            (1 << 0)
->  #define                RISCV_HWPROBE_IMA_C             (1 << 1)
-> +#define                RISCV_HWPROBE_IMA_V             (1 << 2)
->  #define RISCV_HWPROBE_KEY_CPUPERF_0    5
->  #define                RISCV_HWPROBE_MISALIGNED_UNKNOWN        (0 << 0)
->  #define                RISCV_HWPROBE_MISALIGNED_EMULATED       (1 << 0)
-> diff --git a/arch/riscv/kernel/sys_riscv.c b/arch/riscv/kernel/sys_riscv.=
-c
-> index 5db29683ebee..88357a848797 100644
-> --- a/arch/riscv/kernel/sys_riscv.c
-> +++ b/arch/riscv/kernel/sys_riscv.c
-> @@ -10,6 +10,7 @@
->  #include <asm/cpufeature.h>
->  #include <asm/hwprobe.h>
->  #include <asm/sbi.h>
-> +#include <asm/vector.h>
->  #include <asm/switch_to.h>
->  #include <asm/uaccess.h>
->  #include <asm/unistd.h>
-> @@ -171,6 +172,9 @@ static void hwprobe_one_pair(struct riscv_hwprobe *pa=
-ir,
->                 if (riscv_isa_extension_available(NULL, c))
->                         pair->value |=3D RISCV_HWPROBE_IMA_C;
->
-> +               if (has_vector())
-> +                       pair->value |=3D RISCV_HWPROBE_IMA_V;
-> +
->                 break;
->
->         case RISCV_HWPROBE_KEY_CPUPERF_0:
-> --
-> 2.17.1
->
+On Tue, 30 May 2023 13:53:24 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Mon, May 29, 2023 at 02:39:28PM +0100, Marc Zyngier wrote:
+> > On Sat, 27 May 2023 05:02:32 +0100,
+> > Reiji Watanabe <reijiw@google.com> wrote:
+> > > 
+> > > This series fixes issues with PMUVer handling for a guest with
+> > > PMU configured on heterogeneous PMU systems.
+> > > Specifically, it addresses the following two issues.
+> > > 
+> > > [A] The default value of ID_AA64DFR0_EL1.PMUVer of the vCPU is set
+> > >     to its sanitized value.  This could be inappropriate on
+> > >     heterogeneous PMU systems, as arm64_ftr_bits for PMUVer is defined
+> > >     as FTR_EXACT with safe_val == 0 (when ID_AA64DFR0_EL1.PMUVer of all
+> > >     PEs on the host is not uniform, the sanitized value will be 0).
+> > 
+> > Why is this a problem? The CPUs don't implement the same version of
+> > the architecture, we don't get a PMU. Why should we try to do anything
+> > better? I really don't think we should go out or out way and make the
+> > code more complicated for something that doesn't really exist.
+> 
+> Even when the CPUs don't implement the same version of the architecture,
+> if one of them implement PMUv3, KVM advertises KVM_CAP_ARM_PMU_V3,
+> and allows userspace to configure PMU (KVM_ARM_VCPU_PMU_V3) for vCPUs.
 
+Ah, I see it now. The kernel will register the PMU even if it decides
+that advertising it is wrong, and then we pick it up. Great :-/.
 
---=20
-Best Regards
- Guo Ren
+> In this case, although KVM provides PMU emulations for the guest,
+> the guest's ID_AA64DFR0_EL1.PMUVer will be zero.  Also,
+> KVM_SET_ONE_REG for ID_AA64DFR0_EL1 will never work for vCPUs
+> with PMU configured on such systems (since KVM also doesn't allow
+> userspace to set the PMUVer to 0 for the vCPUs with PMU configured).
+> 
+> I would think either ID_AA64DFR0_EL1.PMUVer for the guest should
+> indicate PMUv3, or KVM should not allow userspace to configure PMU,
+> in this case.
+
+My vote is on the latter. Even if a PMU is available, we should rely
+on the feature exposed by the kernel to decide whether exposing a PMU
+or not.
+
+To be honest, this will affect almost nobody (I only know of a single
+one, an obscure ARMv8.0+ARMv8.2 system which is very unlikely to ever
+use KVM). I'm happy to take the responsibility to actively break those.
+
+> This series is a fix for the former, mainly to keep the current
+> behavior of KVM_CAP_ARM_PMU_V3 and KVM_ARM_VCPU_PMU_V3 on such
+> systems, since I wasn't sure if such systems don't really exist :)
+> (Also, I plan to implement a similar fix for PMCR_EL0.N on top of
+> those changes)
+> 
+> I could make a fix for the latter instead though. What do you think ?
+
+I think this would be valuable.
+
+Also, didn't you have patches for the EL0 side of the PMU? I've been
+trying to look for a new version, but couldn't find it...
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
