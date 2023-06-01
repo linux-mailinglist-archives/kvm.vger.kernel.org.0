@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DED271A208
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 17:09:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EBD871A20C
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 17:09:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234904AbjFAPF5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 11:05:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42418 "EHLO
+        id S234870AbjFAPFz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 11:05:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235125AbjFAPFG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 11:05:06 -0400
+        with ESMTP id S235146AbjFAPFI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 11:05:08 -0400
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C2EA1A8;
-        Thu,  1 Jun 2023 08:04:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00EF51B4;
+        Thu,  1 Jun 2023 08:04:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685631851; x=1717167851;
+  t=1685631852; x=1717167852;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=Zmsunkuwxh88Hrkvr7oFtCCzvzM6LSfleDwmcLdBVmk=;
-  b=JhTE1yv2UJB5Fhx+TWtrhodjF1CBniJDd/XOVkgqQmvPQnznlNmXTEZg
-   mAVrkKZ7qsepfVLqcAdSZj90ZN5BBwJf7suxuCXS+HDMlyFkIKMqNi6df
-   yA5NcWBUZPtwq77QaJYcC08i0VCSaMibT99htR/M4NfXIoPmz9tj/Sbch
-   qxKSmjS9wcdIh+hoXBGkA+9a9tf5Y3mlbYV1ZpZTrGAHNSMFj67sMhFMT
-   3sE6IAK2O6T5Gp9MyLuozmzBHRvB9hy8CyHj2fdjoDnRowxYeMwnlEpLn
-   DUZSI1dDhl6+IetuXby3woXxBZphj/5SOrOQHwb/Sg3vdP9Fcir7fGa8A
+  bh=nkbSB1DqlVzA+xpxNo2W+YNwCLxOpYOI0OFu6SLFydQ=;
+  b=b0ZuWlF8w5KCkq7mD60MOe+E9CdBnbTyPFqr+o6itALECBhv89e/iMKU
+   NDUnk4BXLYmGK6g4O4w0A5l4RkJdpo1uQtSx5kHQV9dR/QAs8k1ZfOOYI
+   +dGrfAHejz8Tq8gcniuONm25Qy69qGfuqOByOXayr9TC1sgm4n4jYIhUp
+   9/Jl6hwbXXiNuxeLZWlU8RAS2v5+M9ipoWZOIXvU/posPpbqDQhEH2ryS
+   Oc93onZ5T917N13QXu8STUu8XLyMlP5Gt511ymUhVCeINkq8v8W+5uyth
+   2xhSqz4OaQAZIFEVCQiErnk32tKqALZgOsf1PYGaSxTP4cwg1/shMkTQD
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10728"; a="383853441"
+X-IronPort-AV: E=McAfee;i="6600,9927,10728"; a="383853468"
 X-IronPort-AV: E=Sophos;i="6.00,210,1681196400"; 
-   d="scan'208";a="383853441"
+   d="scan'208";a="383853468"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2023 08:02:51 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2023 08:02:54 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10728"; a="657828231"
+X-IronPort-AV: E=McAfee;i="6600,9927,10728"; a="657828251"
 X-IronPort-AV: E=Sophos;i="6.00,210,1681196400"; 
-   d="scan'208";a="657828231"
+   d="scan'208";a="657828251"
 Received: from arthur-vostro-3668.sh.intel.com ([10.238.200.123])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2023 08:02:48 -0700
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2023 08:02:51 -0700
 From:   Zeng Guang <guang.zeng@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -47,9 +47,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
         Zeng Guang <guang.zeng@intel.com>
-Subject: [PATCH v1 4/6] KVM: x86: Add emulator helper for LASS violation check
-Date:   Thu,  1 Jun 2023 22:23:07 +0800
-Message-Id: <20230601142309.6307-5-guang.zeng@intel.com>
+Subject: [PATCH v1 5/6] KVM: x86: LASS protection on KVM emulation
+Date:   Thu,  1 Jun 2023 22:23:08 +0800
+Message-Id: <20230601142309.6307-6-guang.zeng@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230601142309.6307-1-guang.zeng@intel.com>
 References: <20230601142309.6307-1-guang.zeng@intel.com>
@@ -63,59 +63,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When LASS is enabled, KVM need apply LASS violation check to instruction
-emulations. Add helper for the usage of x86 emulator to perform LASS
-protection.
+Do LASS violation check for instructions emulated by KVM. Note that for
+instructions executed in the guest directly, hardware will perform the
+check.
+
+Not all instruction emulation leads to accesses to guest linear addresses
+because 1) some instructions like CPUID, RDMSR, don't take memory as
+operands 2) instruction fetch in most cases is already done inside the
+guest.
+
+Four cases in which KVM uses a linear address to access guest memory:
+- KVM emulates instruction fetches or data accesses
+- KVM emulates implicit data access to a system data structure
+- VMX instruction emulation
+- SGX ENCLS instruction emulation
+
+LASS violation check applies to these linear addresses so as to enforce
+mode-based protections as hardware behaves.
+
+As exceptions, the target memory address of emulation of invlpg, branch
+and call instructions doesn't require LASS violation check.
 
 Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 Tested-by: Xuelian Guo <xuelian.guo@intel.com>
 ---
- arch/x86/kvm/kvm_emulate.h |  1 +
- arch/x86/kvm/x86.c         | 12 ++++++++++++
- 2 files changed, 13 insertions(+)
+ arch/x86/kvm/emulate.c    | 30 ++++++++++++++++++++++++++++--
+ arch/x86/kvm/vmx/nested.c |  3 +++
+ arch/x86/kvm/vmx/sgx.c    |  4 ++++
+ 3 files changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index f1439ab7c14b..fd1c2b22867e 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -230,6 +230,7 @@ struct x86_emulate_ops {
- 	int (*leave_smm)(struct x86_emulate_ctxt *ctxt);
- 	void (*triple_fault)(struct x86_emulate_ctxt *ctxt);
- 	int (*set_xcr)(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr);
-+	bool (*check_lass)(struct x86_emulate_ctxt *ctxt, u64 access, u64 la, u32 flags);
- };
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 9508836e8a35..ed5191fa2079 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -698,6 +698,7 @@ static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
+ 	u8  va_bits;
+ 	bool fetch = !!(flags & X86EMUL_F_FETCH);
+ 	bool write = !!(flags & X86EMUL_F_WRITE);
++	u64 access = fetch ? PFERR_FETCH_MASK : 0;
  
- /* Type, address-of, and value of an instruction's operand. */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c0778ca39650..faf01fecc4ca 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8287,6 +8287,17 @@ static void emulator_vm_bugged(struct x86_emulate_ctxt *ctxt)
- 		kvm_vm_bugged(kvm);
+ 	la = seg_base(ctxt, addr.seg) + addr.ea;
+ 	*max_size = 0;
+@@ -743,6 +744,10 @@ static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
+ 		}
+ 		break;
+ 	}
++
++	if (ctxt->ops->check_lass(ctxt, access, *linear, flags))
++		goto bad;
++
+ 	if (la & (insn_alignment(ctxt, size) - 1))
+ 		return emulate_gp(ctxt, 0);
+ 	return X86EMUL_CONTINUE;
+@@ -774,7 +779,11 @@ static inline int assign_eip(struct x86_emulate_ctxt *ctxt, ulong dst)
+ 	unsigned max_size;
+ 	struct segmented_address addr = { .seg = VCPU_SREG_CS,
+ 					   .ea = dst };
+-	u32 flags = X86EMUL_F_FETCH;
++	/*
++	 * LASS doesn't apply to addresses that specify the targets of jump and
++	 * call instructions.
++	 */
++	u32 flags = X86EMUL_F_FETCH | X86EMUL_F_SKIPLASS;
+ 
+ 	if (ctxt->op_bytes != sizeof(unsigned long))
+ 		addr.ea = dst & ((1UL << (ctxt->op_bytes << 3)) - 1);
+@@ -853,6 +862,13 @@ static inline int jmp_rel(struct x86_emulate_ctxt *ctxt, int rel)
+ static int linear_read_system(struct x86_emulate_ctxt *ctxt, ulong linear,
+ 			      void *data, unsigned size)
+ {
++	if (ctxt->ops->check_lass(ctxt, PFERR_IMPLICIT_ACCESS, linear, 0)) {
++		ctxt->exception.vector = GP_VECTOR;
++		ctxt->exception.error_code = 0;
++		ctxt->exception.error_code_valid = true;
++		return X86EMUL_PROPAGATE_FAULT;
++	}
++
+ 	return ctxt->ops->read_std(ctxt, linear, data, size, &ctxt->exception, true);
  }
  
-+static bool emulator_check_lass(struct x86_emulate_ctxt *ctxt,
-+				u64 access, u64 la, u32 flags)
-+{
-+	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+@@ -860,6 +876,13 @@ static int linear_write_system(struct x86_emulate_ctxt *ctxt,
+ 			       ulong linear, void *data,
+ 			       unsigned int size)
+ {
++	if (ctxt->ops->check_lass(ctxt, PFERR_IMPLICIT_ACCESS, linear, 0)) {
++		ctxt->exception.vector = GP_VECTOR;
++		ctxt->exception.error_code = 0;
++		ctxt->exception.error_code_valid = true;
++		return X86EMUL_PROPAGATE_FAULT;
++	}
 +
-+	if (!is_long_mode(vcpu))
-+		return false;
-+
-+	return static_call(kvm_x86_check_lass)(vcpu, access, la, flags);
-+}
-+
- static const struct x86_emulate_ops emulate_ops = {
- 	.vm_bugged           = emulator_vm_bugged,
- 	.read_gpr            = emulator_read_gpr,
-@@ -8332,6 +8343,7 @@ static const struct x86_emulate_ops emulate_ops = {
- 	.leave_smm           = emulator_leave_smm,
- 	.triple_fault        = emulator_triple_fault,
- 	.set_xcr             = emulator_set_xcr,
-+	.check_lass          = emulator_check_lass,
- };
+ 	return ctxt->ops->write_std(ctxt, linear, data, size, &ctxt->exception, true);
+ }
  
- static void toggle_interruptibility(struct kvm_vcpu *vcpu, u32 mask)
+@@ -3448,8 +3471,11 @@ static int em_invlpg(struct x86_emulate_ctxt *ctxt)
+ {
+ 	int rc;
+ 	ulong linear;
++	unsigned max_size;
+ 
+-	rc = linearize(ctxt, ctxt->src.addr.mem, 1, false, &linear);
++	/* LASS doesn't apply to the memory address for invlpg */
++	rc = __linearize(ctxt, ctxt->src.addr.mem, &max_size, 1,
++			 X86EMUL_F_SKIPLASS, ctxt->mode, &linear);
+ 	if (rc == X86EMUL_CONTINUE)
+ 		ctxt->ops->invlpg(ctxt, linear);
+ 	/* Disable writeback. */
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index e35cf0bd0df9..bb1c3fa13c13 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4986,6 +4986,9 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
+ 		 * destination for long mode!
+ 		 */
+ 		exn = is_noncanonical_address(*ret, vcpu);
++
++		if (!exn)
++			exn = vmx_check_lass(vcpu, 0, *ret, 0);
+ 	} else {
+ 		/*
+ 		 * When not in long mode, the virtual/linear address is
+diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
+index 2261b684a7d4..3825275827eb 100644
+--- a/arch/x86/kvm/vmx/sgx.c
++++ b/arch/x86/kvm/vmx/sgx.c
+@@ -46,6 +46,10 @@ static int sgx_get_encls_gva(struct kvm_vcpu *vcpu, unsigned long offset,
+ 			((s.base != 0 || s.limit != 0xffffffff) &&
+ 			(((u64)*gva + size - 1) > s.limit + 1));
+ 	}
++
++	if (!fault && is_long_mode(vcpu))
++		fault = vmx_check_lass(vcpu, 0, *gva, 0);
++
+ 	if (fault)
+ 		kvm_inject_gp(vcpu, 0);
+ 	return fault ? -EINVAL : 0;
 -- 
 2.27.0
 
