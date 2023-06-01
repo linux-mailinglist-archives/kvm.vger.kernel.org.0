@@ -2,67 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D4AC7195CB
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 10:40:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E3EA719725
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 11:39:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232030AbjFAIkC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 04:40:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44348 "EHLO
+        id S232894AbjFAJiz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 05:38:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231995AbjFAIjc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 04:39:32 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 608031B3;
-        Thu,  1 Jun 2023 01:38:40 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-30789a4c537so534985f8f.0;
-        Thu, 01 Jun 2023 01:38:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685608719; x=1688200719;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RWj0okTmH1/Iwkq+XM29U+ErdzrXEOxYzcXAhUEQaJY=;
-        b=n7Skum7oCgWWlbn9Xt9Bum2UemlCyB+lov3V713Qv4hSHdaws4/CV5hL5FhY9KGtKm
-         kLl5jOfWtWSo3ayvQMvne8ejA1Qw1LPODhEdTUIHxtdDAZk+cxOnuzaF6TxHvQFQx7Lx
-         96pfzgpWACbCbppIOfiMl4gYRB4JWVIo9r2jf0jsjCApQ1nnuKAbMfQzEV1ebe0PzNVb
-         LlW8YcBUA47cTuYR5ebpQlBokje64LIDJnFI6A9bWs+1/DL1/Xf6lkAPfsbOE1CEo7Ej
-         M9Bqxtq/uxwMGPLPC6wqpKWXcTNs8HA9+aDL8t0iXSwLdTQPGhXPlGsFHJqVdPUM0rJg
-         017Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685608719; x=1688200719;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RWj0okTmH1/Iwkq+XM29U+ErdzrXEOxYzcXAhUEQaJY=;
-        b=RyIo3eJG924ypHJDiO4fGrlGuoSMlBOlfZMZVUI5L7kNI/1ROMoVy/CqxEDhLYsatX
-         FP5GziIYNFM2vrjMv1zvIPU7NssVtsxvVtFkTrzYBZH2R1iCnVTo7QqSJGq8ueFLWC2+
-         eKOZg2y7gaxj2Krs12tA69qlxd3u87wtTfNIYgExweU5xn33eVQnlv6LWrWy+NNxN7H3
-         mG3aQ2eLy2K13RBOjyrEgHjRtx4UY5TvDOTPXUnTUcMIfoVLUb1eyA+UnZOf6faRwzde
-         AR0ElV5AYp281tM1uwcbFAZfhvyX7eq9hS12Oi/r9DPeJoeiaE5SbM8Qf80GVKDrcrEG
-         veCw==
-X-Gm-Message-State: AC+VfDwePASBhneonh6nB6B7/DJakQqiVHTkltKyxylO0DGQUpIm6TTR
-        s8rmwhuq2mxJ9NnXK0yhdgRJAEBtAzYUdBBeTp4=
-X-Google-Smtp-Source: ACHHUZ41KegIhPxEAmnPEMAsOlewS4E1I9wNIROgrmATHvZQwrnLbLtdlrb6bxnhtmB1X9cC2trI3jl6qXBTMrTak/k=
-X-Received: by 2002:adf:ed83:0:b0:309:507a:3f5b with SMTP id
- c3-20020adfed83000000b00309507a3f5bmr1040562wro.8.1685608718320; Thu, 01 Jun
- 2023 01:38:38 -0700 (PDT)
+        with ESMTP id S232893AbjFAJis (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 05:38:48 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FDC2139;
+        Thu,  1 Jun 2023 02:38:45 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3519DUQm009993;
+        Thu, 1 Jun 2023 09:38:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=2h6XdwlF42uVTLMo3fFibWv4lmv2RtHqmk9EUx0o8IM=;
+ b=p2/+VCmBOc7K4cclIEEDqk42EPyf9cllSmH+Mxl5rPvZNsGNIhKfU7d9WjNiy9bTTh1Z
+ VixmkVWil9QFrvtDNBy0P7cCmXzFx21Er1uBiVIvPxbGhVNSYv874onWjaUfgYlxnGKV
+ 2GvG64vrFUG0lIPWkoKsOsKvQflrbz0mUbHFj7RIsYin93j986hu5ycAp9jrfLOYyer4
+ /MRHn6Lj0buX4NykMbGCp956xE5Zag0Dv9KU+Ey/EBTfeHyqBV1QrKgnuqACYn00HCc7
+ svD+DLUsGUdkELc+U5u2lnlimenUnkIa6rRBrh3eOOdmzo+bFboWo2H3Qk2/u9N3xx3b 3g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qxrgw0x06-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Jun 2023 09:38:44 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3519E4TA014850;
+        Thu, 1 Jun 2023 09:38:43 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qxrgw0wx8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Jun 2023 09:38:43 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3517SEmK023405;
+        Thu, 1 Jun 2023 09:38:42 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3qu94ea1j4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Jun 2023 09:38:41 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3519cc1V13173310
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 1 Jun 2023 09:38:38 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4AA902004D;
+        Thu,  1 Jun 2023 09:38:38 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D999E2004B;
+        Thu,  1 Jun 2023 09:38:37 +0000 (GMT)
+Received: from [9.171.14.211] (unknown [9.171.14.211])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  1 Jun 2023 09:38:37 +0000 (GMT)
+Message-ID: <fa415627-bfff-cc18-af94-cf55632973d5@linux.ibm.com>
+Date:   Thu, 1 Jun 2023 11:38:37 +0200
 MIME-Version: 1.0
-References: <CADpTngX9LESCdHVu_2mQkNGena_Ng2CphWNwsRGSMxzDsTjU2A@mail.gmail.com>
- <ZHNMsmpo2LWjnw1A@debian.me> <CADpTngWiXNh1wAFM_EYGm-Coa8nv61Tu=3TG+Z2dVCojp2K1yg@mail.gmail.com>
- <ZHY0WkNlui91Mxoj@google.com> <ZHaikcUjbkq7yVbi@google.com> <ZHarJCvD1KEkLVM+@google.com>
-In-Reply-To: <ZHarJCvD1KEkLVM+@google.com>
-From:   Fabio Coatti <fabio.coatti@gmail.com>
-Date:   Thu, 1 Jun 2023 10:38:26 +0200
-Message-ID: <CADpTngU+L_dECPRdPPM+DoRyVMwBLEowBmwg2cvKwu_BmTaoNw@mail.gmail.com>
-Subject: Re: WARNING trace at kvm_nx_huge_page_recovery_worker on 6.3.4
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>, stable@vger.kernel.org,
-        regressions@lists.linux.dev, kvm@vger.kernel.org,
-        Junaid Shahid <junaids@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [kvm-unit-tests PATCH v9 2/2] s390x: topology: Checking
+ Configuration Topology Information
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     thuth@redhat.com, kvm@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, nrb@linux.ibm.com, nsg@linux.ibm.com
+References: <20230519112236.14332-1-pmorel@linux.ibm.com>
+ <20230519112236.14332-3-pmorel@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20230519112236.14332-3-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: YBZfkvzYkaNcYubwRQHBqcC0eVE1niii
+X-Proofpoint-GUID: HgKLQbnNHKyks-q476gNyakkrZ7CLHMH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-06-01_06,2023-05-31_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 malwarescore=0 phishscore=0 impostorscore=0
+ suspectscore=0 mlxscore=0 priorityscore=1501 clxscore=1015 spamscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2304280000 definitions=main-2306010085
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,86 +95,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Il giorno mer 31 mag 2023 alle ore 04:04 Sean Christopherson
-<seanjc@google.com> ha scritto:
->
-> On Tue, May 30, 2023, Sean Christopherson wrote:
-> > On Tue, May 30, 2023, Sean Christopherson wrote:
-> > > On Tue, May 30, 2023, Fabio Coatti wrote:
-> > > > Il giorno dom 28 mag 2023 alle ore 14:44 Bagas Sanjaya
-> > > > <bagasdotme@gmail.com> ha scritto:
-> > > > > #regzbot ^introduced: v6.3.1..v6.3.2
-> > > > > #regzbot title: WARNING trace at kvm_nx_huge_page_recovery_worker when opening a new tab in Chrome
-> > > >
-> > > > Out of curiosity, I recompiled 6.3.4 after reverting the following
-> > > > commit mentioned in 6.3.2 changelog:
-> > > >
-> > > > commit 2ec1fe292d6edb3bd112f900692d9ef292b1fa8b
-> > > > Author: Sean Christopherson <seanjc@google.com>
-> > > > Date:   Wed Apr 26 15:03:23 2023 -0700
-> > > > KVM: x86: Preserve TDP MMU roots until they are explicitly invalidated
-> > > > commit edbdb43fc96b11b3bfa531be306a1993d9fe89ec upstream.
-> > > >
-> > > > And the WARN message no longer appears on my host kernel logs, at
-> > > > least so far :)
-> > >
-> > > Hmm, more than likely an NX shadow page is outliving a memslot update.  I'll take
-> > > another look at those flows to see if I can spot a race or leak.
-> >
-> > I didn't spot anything, and I couldn't reproduce the WARN even when dropping the
-> > dirty logging requirement and hacking KVM to periodically delete memslots.
->
-> Aha!  Apparently my brain was just waiting until I sat down for dinner to have
-> its lightbulb moment.
->
-> The memslot lookup isn't factoring in whether the shadow page is for non-SMM versus
-> SMM.  QEMU configures SMM to have memslots that do not exist in the non-SMM world,
-> so if kvm_recover_nx_huge_pages() encounters an SMM shadow page, the memslot lookup
-> can fail to find a memslot because it looks only in the set of non-SMM memslots.
->
-> Before commit 2ec1fe292d6e ("KVM: x86: Preserve TDP MMU roots until they are
-> explicitly invalidated"), KVM would zap all SMM TDP MMU roots and thus all SMM TDP
-> MMU shadow pages once all vCPUs exited SMM.  That made the window where this bug
-> could be encountered quite tiny, as the NX recovery thread would have to kick in
-> while at least one vCPU was in SMM.  QEMU VMs typically only use SMM during boot,
-> and so the "bad" shadow pages were gone by the time the NX recovery thread ran.
->
-> Now that KVM preserves TDP MMU roots until they are explicity invalidated (by a
-> memslot deletion), the window to encounter the bug is effectively never closed
-> because QEMU doesn't delete memslots after boot (except for a handful of special
-> scenarios.
->
-> Assuming I'm correct, this should fix the issue:
->
-> ---
->  arch/x86/kvm/mmu/mmu.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index d3812de54b02..d5c03f14cdc7 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -7011,7 +7011,10 @@ static void kvm_recover_nx_huge_pages(struct kvm *kvm)
->                  */
->                 slot = NULL;
->                 if (atomic_read(&kvm->nr_memslots_dirty_logging)) {
-> -                       slot = gfn_to_memslot(kvm, sp->gfn);
-> +                       struct kvm_memslots *slots;
+On 5/19/23 13:22, Pierre Morel wrote:
+> STSI with function code 15 is used to store the CPU configuration
+> topology.
+> 
+> We retrieve the maximum nested level with SCLP and use the
+> topology tree provided by the drawers, books, sockets, cores
+> arguments.
+> 
+> We check :
+> - if the topology stored is coherent between the QEMU -smp
+>    parameters and kernel parameters.
+> - the number of CPUs
+> - the maximum number of CPUs
+> - the number of containers of each levels for every STSI(15.1.x)
+>    instruction allowed by the machine.
+
+>   [topology]
+>   file = topology.elf
+> +# 3 CPUs on socket 0 with different CPU TLE (standard, dedicated, origin)
+> +# 1 CPU on socket 2
+> +extra_params = -smp 1,drawers=3,books=3,sockets=4,cores=4,maxcpus=144 -cpu z14,ctop=on -device z14-s390x-cpu,core-id=1,entitlement=low -device z14-s390x-cpu,core-id=2,dedicated=on -device z14-s390x-cpu,core-id=10 -device z14-s390x-cpu,core-id=20 -device z14-s390x-cpu,core-id=130,socket-id=0,book-id=0,drawer-id=0 -append '-drawers 3 -books 3 -sockets 4 -cores 4'
 > +
-> +                       slots = kvm_memslots_for_spte_role(kvm, sp->role);
-> +                       slot = __gfn_to_memslot(slots, sp->gfn);
->                         WARN_ON_ONCE(!slot);
->                 }
->
->
-> base-commit: 17f2d782f18c9a49943ea723d7628da1837c9204
+> +[topology-2]
+> +file = topology.elf
+> +extra_params = -smp 1,drawers=2,books=2,sockets=2,cores=30,maxcpus=240  -append '-drawers 2 -books 2 -sockets 2 -cores 30' -cpu z14,ctop=on -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=2,entitlement=low -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=3,entitlement=medium -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=4,entitlement=high -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=5,entitlement=high,dedicated=on -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=65,entitlement=low -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=66,entitlement=medium -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=67,entitlement=high -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=68,entitlement=high,dedicated=on
 
-I applied this patch on the same kernel I was using for testing
-(6.3.4) and indeed I'm no longer able to see the WARN message, so I
-assume that you are indeed correct :) . Many thanks, it seems to be
-fixed at least on my machine!
+Pardon my ignorance but I see z14 in there, will this work if we run on 
+a z13?
 
+Also, will this work/fail gracefully if the test is run with a quemu 
+that doesn't know about topology or will it crash?
 
-
--- 
-Fabio
