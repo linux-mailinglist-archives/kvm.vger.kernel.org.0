@@ -2,152 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5ECA1719CFD
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 15:10:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46606719C79
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 14:48:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233431AbjFANKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 09:10:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53358 "EHLO
+        id S233155AbjFAMst (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 08:48:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230151AbjFANKn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 09:10:43 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25F6197;
-        Thu,  1 Jun 2023 06:10:42 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 351D27Gp010106;
-        Thu, 1 Jun 2023 13:10:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=50iAErLBd9QkQaSNiM4jwwvCR5hnChu042Oo89biMpQ=;
- b=FK3ppwQ8D+ILlmn13uVqUEdn8JQ53zT95G9R2++WT7qoE2E/aQ6EuL54gzTukcz4ezIN
- NHL9ayy2cc85Kp/a1k1WywEyQJPe1Hrr3t7AXKhl7+9gPjyHlL2y3ILANoWOnxVJLbFd
- YJqXYi2YmZtS+I/ePkXcJ7I6oQ2IREdUkeAg69BO6sTN16Cvlqzn3kpnsb7yhGcAURh+
- tTuboi1Sx2DcWvnbdjxH5tzLNF5jBwOy0P9V73qRPNrSGsQ4Emqlq2l3MTDMNjKF6Oyr
- eO7/4Uy74kpfbnzsDcBNjGWsda6foseQI/vE7NAsHl3M7dsKWuMGE+JsP6Vs9yxs7Jft bQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qxuuvrqj2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jun 2023 13:10:40 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 351D3E29016939;
-        Thu, 1 Jun 2023 13:08:08 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qxuuvr9yg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jun 2023 13:08:07 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 351AaE5s014487;
-        Thu, 1 Jun 2023 12:32:35 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3qu9g5ah1c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jun 2023 12:32:34 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 351CWVdu62063008
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Jun 2023 12:32:31 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8CE9E20043;
-        Thu,  1 Jun 2023 12:32:31 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F068920040;
-        Thu,  1 Jun 2023 12:32:30 +0000 (GMT)
-Received: from [9.171.12.131] (unknown [9.171.12.131])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Thu,  1 Jun 2023 12:32:30 +0000 (GMT)
-Message-ID: <29237160-ca30-7f46-f7dc-9226726c8800@linux.ibm.com>
-Date:   Thu, 1 Jun 2023 14:32:30 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [kvm-unit-tests PATCH v3 1/2] s390x: sclp: consider monoprocessor
- on read_info error
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com,
-        cohuck@redhat.com
-References: <20230530124056.18332-1-pmorel@linux.ibm.com>
- <20230530124056.18332-2-pmorel@linux.ibm.com>
- <168562035629.164254.14237878033396575782@t14-nrb>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <168562035629.164254.14237878033396575782@t14-nrb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: cyLyX7Y4UsguViWNiaOguY3ePgK083Sy
-X-Proofpoint-GUID: i8TthFd7Glb-s5eZSLNNH7QoTQyDnaq0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-01_08,2023-05-31_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- clxscore=1015 impostorscore=0 phishscore=0 spamscore=0 mlxscore=0
- suspectscore=0 lowpriorityscore=0 priorityscore=1501 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306010115
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231585AbjFAMss (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 08:48:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 168AAE7
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 05:48:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A03D0611E3
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 12:48:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07D8DC4339C;
+        Thu,  1 Jun 2023 12:48:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685623726;
+        bh=GytX/y1oWBpj3Fnw5IPVnEW36hsGqBLos/gDLfBNgPE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=WWMfoVRvmQtGcdb6aSfWFhb+k3jKow/5CweUDUxQtxSLDvWt6D3jGflO2E1sPSC3r
+         MwKi47++HBrJ9DuktNUnRCZUt5Mzj19AtsnIm/3NenJ0sTUmIh60x1hsuXueJmwsHb
+         ZFw0PwcxQYNSvSaydkmkM/Q7oyUM2+6e8S5xZYg6aWS+kqhgrkAjKmdDupg4e+77Wc
+         iQDmTSb2oF0r4AlMV5tlGvnDaZn22shUdhVwnCCjVPxiL33rAa0863yW43Bz4TcN2T
+         Bf8MN61ncNeraKCcdzQIEvv2xtA7E/Fmelt3Kngnvt/4QJkc66D65QGVEp2aGNEnWD
+         Ft/WRYnNPeddg==
+Received: from 90.4.23.109.rev.sfr.net ([109.23.4.90] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q4hjP-0021eM-MP;
+        Thu, 01 Jun 2023 13:48:43 +0100
+Date:   Thu, 01 Jun 2023 13:48:42 +0100
+Message-ID: <87bkhzpcut.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 05/17] arm64: Don't enable VHE for the kernel if OVERRIDE_HVHE is set
+In-Reply-To: <ZHhJmJU/m//uTI9n@linux.dev>
+References: <20230526143348.4072074-1-maz@kernel.org>
+        <20230526143348.4072074-6-maz@kernel.org>
+        <ZHhJmJU/m//uTI9n@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 109.23.4.90
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 01 Jun 2023 08:32:40 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Fri, May 26, 2023 at 03:33:36PM +0100, Marc Zyngier wrote:
+> > If the OVERRIDE_HVHE SW override is set (as a precursor of
+> > the KVM_HVHE capability), do not enable VHE for the kernel
+> > and drop to EL1 as if VHE was either disabled or unavailable.
+> > 
+> > Further changes will enable VHE at EL2 only, with the kernel
+> > still running at EL1.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kernel/hyp-stub.S | 10 +++++++++-
+> >  1 file changed, 9 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+> > index 9439240c3fcf..5c71e1019545 100644
+> > --- a/arch/arm64/kernel/hyp-stub.S
+> > +++ b/arch/arm64/kernel/hyp-stub.S
+> > @@ -82,7 +82,15 @@ SYM_CODE_START_LOCAL(__finalise_el2)
+> >  	tbnz	x1, #0, 1f
+> >  
+> >  	// Needs to be VHE capable, obviously
+> > -	check_override id_aa64mmfr1 ID_AA64MMFR1_EL1_VH_SHIFT 2f 1f x1 x2
+> > +	check_override id_aa64mmfr1 ID_AA64MMFR1_EL1_VH_SHIFT 0f 1f x1 x2
+> > +
+> > +0:	// Check whether we only want the hypervisor to run VHE, not the kernel
+> > +	adr_l	x1, arm64_sw_feature_override
+> > +	ldr	x2, [x1, FTR_OVR_VAL_OFFSET]
+> > +	ldr	x1, [x1, FTR_OVR_MASK_OFFSET]
+> > +	and	x2, x2, x1
+> 
+> nit: is applying the mask even necessary? I get it in the context of an
+> overlay on top of an ID register, but the software features are more of
+> a synthetic ID register in their own right.
 
-On 6/1/23 13:52, Nico Boehr wrote:
-> Quoting Pierre Morel (2023-05-30 14:40:55)
->> A kvm-unit-test would hang if an abort happens before SCLP Read SCP
->> Information has completed if sclp_get_cpu_num() does not report at
->> least one CPU.
->> Since we obviously have one, report it.
-> Sorry for complaining again, in a discussion with Janosch we found that the
-> description and commit below can be easily misunderstood. I suggest the
-> following wording in the commit description:
->
-> s390x: sclp: treat system as single processor when read_info is NULL
->
-> When a test abort()s before SCLP read info is completed, the assertion on
-> read_info in sclp_read_info() will fail. Since abort() eventually calls
-> smp_teardown() which in turn calls sclp_get_cpu_num(), this will cause an
-> infinite abort() chain, causing the test to hang.
->
-> Fix this by considering the system single processor when read_info is missing.
->
-> [...]
+I guess I don't have a good reason just yet, but on the other hand it
+makes things predictable if the override code refuses the override for
+some reason other than not being VHE-capable (mask becomes 0 and val
+becomes 0xf).
 
-better, I take it
+Overall, I feel that this code is too hard to follow to do anything
+different from the "standard" case.
 
-thx
+Thanks,
 
+	M.
 
-
->> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
->> index 12919ca..34a31da 100644
->> --- a/lib/s390x/sclp.c
->> +++ b/lib/s390x/sclp.c
->> @@ -121,6 +121,12 @@ int sclp_get_cpu_num(void)
->>   {
->>          if (read_info)
->>                  return read_info->entries_cpu;
->> +       /*
->> +        * If we fail here and read_info has not being set,
->> +        * it means we failed early and we try to abort the test.
->> +        * We need to return at least one CPU, and obviously we have
->> +        * at least one, for the smp_teardown to correctly work.
->> +        */
-> Please make this:
->
-> Don't abort here if read_info is NULL since abort() calls smp_teardown() which
-> eventually calls this function and thus causes an infinite abort() chain,
-> causing the test to hang. Since we obviously have at least one CPU, just return
-> one.
->
-> With these changes:
->
-> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
->
-> Sorry for the back and forth.
+-- 
+Without deviation from the norm, progress is not possible.
