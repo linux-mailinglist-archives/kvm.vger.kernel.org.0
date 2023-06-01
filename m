@@ -2,125 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C085A719626
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 10:58:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A6D3719557
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 10:20:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231901AbjFAI6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 04:58:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54806 "EHLO
+        id S232100AbjFAIUc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 04:20:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231326AbjFAI6a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 04:58:30 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56447132;
-        Thu,  1 Jun 2023 01:58:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685609909; x=1717145909;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=lAcYtInKsopDQxJmwLovdpYraiB6bLABcfqZaZEP/bA=;
-  b=hr0E/i/Carr7jpUivviGHY0neE+xZHcet2QuN1XNukBmT92nT/QkvFVi
-   dlRRyrf7iqm4wYed0vJB+S191FHgMPQZJwAlpq5i3hOyYAUXc2VSWNb/1
-   mLA53OybmI8tkw1f0AMzQSpYRN72yxpjQ5jr0EKeOm7pTk8feh7b6MhHY
-   kKwk4fUZYGZFMy0W/udbLqBFC3rgsWXImnlBL93iu4OszNM67hij2MfvZ
-   uyKyNOgyzZKQo/4M+Bu9cgZ82CvaKlYbf5uSaT4DueKa9jEGs4MecJFVk
-   XdVoaqQqlntI+T9aqVwwWKjwX0pvLUnMHHZbk1RLwzXtdLu0JbThJlQGI
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="354354439"
-X-IronPort-AV: E=Sophos;i="6.00,209,1681196400"; 
-   d="scan'208";a="354354439"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2023 01:58:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="710411048"
-X-IronPort-AV: E=Sophos;i="6.00,209,1681196400"; 
-   d="scan'208";a="710411048"
-Received: from skxmcp01.bj.intel.com ([10.240.193.86])
-  by fmsmga007.fm.intel.com with ESMTP; 01 Jun 2023 01:58:25 -0700
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     seanjc@google.com, pbonzini@redhat.com, shuah@kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3] KVM: selftests: Add new CFLAGS to generate dependency files
-Date:   Thu,  1 Jun 2023 16:03:38 +0800
-Message-Id: <20230601080338.212942-1-yu.c.zhang@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S231823AbjFAIU3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 04:20:29 -0400
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9B73FB;
+        Thu,  1 Jun 2023 01:20:27 -0700 (PDT)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-565cfe4ece7so5707157b3.2;
+        Thu, 01 Jun 2023 01:20:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685607627; x=1688199627;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tS4a1xOgxMUMLEbnCg0V4q+ycCWx2xlztmESkIXckyo=;
+        b=bIHOxHzjZXokee9j5bbLR5t5pc8c2Z3iggLrV1+hE0XnEXAKfoXhCLHOSa/72NNKfd
+         6fz4mYEsaohJNpEL4Rs9VL4vNpL+O0IFENkKP8Ed1r56LzcraMW5AYAo4x/ntCtiU2p3
+         x22qNSqmdrlW4Y/tGkgjrEwyv71XC2UWZFG42WlTnI/gnlPQ9bm7CQBxLeRufsNGf3b3
+         aSnEcs9elD0+6oKwXRc6fHvLfsfn4GZRVVoYihKOLOoIEu2kuGpVvxaorPdvDNijmjMi
+         d1rL9Zr7ifZGWT0hflvFwiRNteKQuaUR21zo007VMcTBghI8tw53RKKaLOkzxLItE6zV
+         XEtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685607627; x=1688199627;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tS4a1xOgxMUMLEbnCg0V4q+ycCWx2xlztmESkIXckyo=;
+        b=P6624iUuxknMbJrZsQ3ZMydgHqG0EF6Y4Klj7Z9YB9SknB6aExFbEm4BeyRQ8Fr4OT
+         FcePSMUvBgmCUxJnRkDePWuqDVHEwCfXvzIyrkRz3O5bPyDzecGeHTP2vTnP1YMABU5W
+         BzYma4unLNGpOaZ5FbLYLDxyBSNlCpoNttKHATMEPBWz2GKgyIt2woWnK9Hj9p37FQk1
+         9WAyEv6kzBagsvAscMkn9UXbpLr8y+ZDg6xcYuliYRrNc2Cbx801FyAwtJsGvpJi5XhC
+         gYtmkvO1Cw6exEvcMqr4GXQgM+OuTwGVmzCpvocSwEEw4sjYtih/emdDNeTda3xEYFvY
+         zOgw==
+X-Gm-Message-State: AC+VfDwOYFvm0I8/lHUCUokTypzS94vc0DgNke+Ww32ZkdejKZmzpntl
+        TvLrdj1Cl5fKcWMz0W7BP8Heso6kl0CR4CinwAo=
+X-Google-Smtp-Source: ACHHUZ4IZT44NtIfRs/xlbKnWFcG4D7AEEUxUuudHP/RnlDvS1B/rq8axgox+tzLkd9y6rosB3Zw4KNqjFWW/wbAOr8=
+X-Received: by 2002:a81:7785:0:b0:565:7d7:1356 with SMTP id
+ s127-20020a817785000000b0056507d71356mr8254467ywc.22.1685607626688; Thu, 01
+ Jun 2023 01:20:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20230531213032.25338-1-vishal.moola@gmail.com>
+ <20230531213032.25338-26-vishal.moola@gmail.com> <CAMuHMdWCe=VsTJYNA_-k=JipeAGKzgBFjZ8i+XRK7U1DBei=7A@mail.gmail.com>
+In-Reply-To: <CAMuHMdWCe=VsTJYNA_-k=JipeAGKzgBFjZ8i+XRK7U1DBei=7A@mail.gmail.com>
+From:   Vishal Moola <vishal.moola@gmail.com>
+Date:   Thu, 1 Jun 2023 01:20:15 -0700
+Message-ID: <CAOzc2pzVEO_LSw1Ffwk1K3sXni_32wO0T+fEAnR6zVVB5x=vVA@mail.gmail.com>
+Subject: Re: [PATCH v3 25/34] m68k: Convert various functions to use ptdescs
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add "-MD" in CFLAGS to generate dependency files. Currently, each
-time a header file is updated in KVM selftest, we will have to run
-"make clean && make" to rebuild the whole test suite. By adding new
-compiling flags and dependent rules in Makefile, we do not need to
-make clean && make each time a header file is updated.
+On Thu, Jun 1, 2023 at 12:40=E2=80=AFAM Geert Uytterhoeven <geert@linux-m68=
+k.org> wrote:
+>
+> Hi Vishal,
+>
+> On Wed, May 31, 2023 at 11:32=E2=80=AFPM Vishal Moola (Oracle)
+> <vishal.moola@gmail.com> wrote:
+> > As part of the conversions to replace pgtable constructor/destructors w=
+ith
+> > ptdesc equivalents, convert various page table functions to use ptdescs=
+.
+> >
+> > Some of the functions use the *get*page*() helper functions. Convert
+> > these to use pagetable_alloc() and ptdesc_address() instead to help
+> > standardize page tables further.
+> >
+> > Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+>
+> Thanks for your patch!
+>
+> > --- a/arch/m68k/include/asm/mcf_pgalloc.h
+> > +++ b/arch/m68k/include/asm/mcf_pgalloc.h
+> > @@ -7,20 +7,19 @@
+> >
+> >  extern inline void pte_free_kernel(struct mm_struct *mm, pte_t *pte)
+> >  {
+> > -       free_page((unsigned long) pte);
+> > +       pagetable_free(virt_to_ptdesc(pte));
+> >  }
+> >
+> >  extern const char bad_pmd_string[];
+> >
+> >  extern inline pte_t *pte_alloc_one_kernel(struct mm_struct *mm)
+> >  {
+> > -       unsigned long page =3D __get_free_page(GFP_DMA);
+> > +       struct ptdesc *ptdesc =3D pagetable_alloc(GFP_DMA | __GFP_ZERO,=
+ 0);
+> >
+> > -       if (!page)
+> > +       if (!ptdesc)
+> >                 return NULL;
+> >
+> > -       memset((void *)page, 0, PAGE_SIZE);
+> > -       return (pte_t *) (page);
+> > +       return (pte_t *) (ptdesc_address(ptdesc));
+>
+> No need to cast "void *" when returning a different pointer type.
+>
+> >  }
+> >
+> >  extern inline pmd_t *pmd_alloc_kernel(pgd_t *pgd, unsigned long addres=
+s)
+> > @@ -35,36 +34,36 @@ extern inline pmd_t *pmd_alloc_kernel(pgd_t *pgd, u=
+nsigned long address)
+> >  static inline void __pte_free_tlb(struct mmu_gather *tlb, pgtable_t pg=
+table,
+> >                                   unsigned long address)
+> >  {
+> > -       struct page *page =3D virt_to_page(pgtable);
+> > +       struct ptdesc *ptdesc =3D virt_to_ptdesc(pgtable);
+> >
+> > -       pgtable_pte_page_dtor(page);
+> > -       __free_page(page);
+> > +       pagetable_pte_dtor(ptdesc);
+> > +       pagetable_free(ptdesc);
+> >  }
+> >
+> >  static inline pgtable_t pte_alloc_one(struct mm_struct *mm)
+> >  {
+> > -       struct page *page =3D alloc_pages(GFP_DMA, 0);
+> > +       struct ptdesc *ptdesc =3D pagetable_alloc(GFP_DMA, 0);
+> >         pte_t *pte;
+> >
+> > -       if (!page)
+> > +       if (!ptdesc)
+> >                 return NULL;
+> > -       if (!pgtable_pte_page_ctor(page)) {
+> > -               __free_page(page);
+> > +       if (!pagetable_pte_ctor(ptdesc)) {
+> > +               pagetable_free(ptdesc);
+> >                 return NULL;
+> >         }
+> >
+> > -       pte =3D page_address(page);
+> > -       clear_page(pte);
+> > +       pte =3D ptdesc_address(ptdesc);
+> > +       pagetable_clear(pte);
+> >
+> >         return pte;
+> >  }
+> >
+> >  static inline void pte_free(struct mm_struct *mm, pgtable_t pgtable)
+> >  {
+> > -       struct page *page =3D virt_to_page(pgtable);
+> > +       struct ptdesc *ptdesc =3D virt_to_ptdesc(ptdesc);
+>
+> virt_to_ptdesc(pgtable)
+>
+> (You can build this using m5475evb_defconfig)
+>
+> >
+> > -       pgtable_pte_page_dtor(page);
+> > -       __free_page(page);
+> > +       pagetable_pte_dtor(ptdesc);
+> > +       pagetable_free(ptdesc);
+> >  }
+> >
+> >  /*
+> > @@ -75,16 +74,18 @@ static inline void pte_free(struct mm_struct *mm, p=
+gtable_t pgtable)
+> >
+> >  static inline void pgd_free(struct mm_struct *mm, pgd_t *pgd)
+> >  {
+> > -       free_page((unsigned long) pgd);
+> > +       pagetable_free(virt_to_ptdesc(pgd));
+> >  }
+> >
+> >  static inline pgd_t *pgd_alloc(struct mm_struct *mm)
+> >  {
+> >         pgd_t *new_pgd;
+> > +       struct ptdesc *ptdesc =3D pagetable_alloc(GFP_DMA | GFP_NOWARN,=
+ 0);
+> >
+> > -       new_pgd =3D (pgd_t *)__get_free_page(GFP_DMA | __GFP_NOWARN);
+> > -       if (!new_pgd)
+> > +       if (!ptdesc)
+> >                 return NULL;
+> > +       new_pgd =3D (pgd_t *) ptdesc_address(ptdesc);
+>
+> No need to cast "void *" when assigning to a different pointer type.
+>
+> > +
+> >         memcpy(new_pgd, swapper_pg_dir, PTRS_PER_PGD * sizeof(pgd_t));
+> >         memset(new_pgd, 0, PAGE_OFFSET >> PGDIR_SHIFT);
+> >         return new_pgd;
+>
+> The rest LGTM.
 
-Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
-v3: Strip the $(OUTPUT) prefix from source files to fix the build
-    failure reported by kernel test robot <lkp@intel.com> in
-    https://lore.kernel.org/oe-kbuild-all/202305302015.D8PglEU7-lkp@intel.com/
+Thanks so much for the review! I'll make those changes in the next
+version.
 
-v2: Use "-MD" in CFLAGS instead of "EXTRA_CFLAGS". [Sean]
----
 
- tools/testing/selftests/kvm/Makefile | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 7a5ff646e7e7..dd16969aaf6c 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -183,6 +183,8 @@ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
- TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
- LIBKVM += $(LIBKVM_$(ARCH_DIR))
- 
-+OVERRIDE_TARGETS = 1
-+
- # lib.mak defines $(OUTPUT), prepends $(OUTPUT)/ to $(TEST_GEN_PROGS), and most
- # importantly defines, i.e. overwrites, $(CC) (unless `make -e` or `make CC=`,
- # which causes the environment variable to override the makefile).
-@@ -197,7 +199,7 @@ else
- LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
- endif
- CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
--	-Wno-gnu-variable-sized-type-not-at-end \
-+	-Wno-gnu-variable-sized-type-not-at-end -MD\
- 	-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
- 	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
- 	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
-@@ -224,7 +226,18 @@ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
- LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
- LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
- 
--EXTRA_CLEAN += $(LIBKVM_OBJS) cscope.*
-+TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
-+TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
-+TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_OBJ))
-+TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBKVM_OBJS))
-+-include $(TEST_DEP_FILES)
-+
-+$(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
-+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $< $(LIBKVM_OBJS) $(LDLIBS) -o $@
-+$(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
-+	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
-+
-+EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) cscope.*
- 
- x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
- $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
-
-base-commit: 56f413f2cd373d6ed7c4ecb2e0e3e740cc2fdc8c
--- 
-2.25.1
-
+> Gr{oetje,eeting}s,
+>
+>                         Geert
+>
+> --
+> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m6=
+8k.org
+>
+> In personal conversations with technical people, I call myself a hacker. =
+But
+> when I'm talking to journalists I just say "programmer" or something like=
+ that.
+>                                 -- Linus Torvalds
