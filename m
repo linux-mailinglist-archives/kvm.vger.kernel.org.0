@@ -2,186 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 31A9471F409
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 22:43:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F53071F412
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 22:43:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232538AbjFAUnb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 16:43:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60906 "EHLO
+        id S232626AbjFAUng (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 16:43:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbjFAUna (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 16:43:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FE98189
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 13:42:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685652163;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U8EfYdQY90bZ/cz7Bxbk7XK+QWwVW4LIw+R7rc15+JY=;
-        b=gC3b5nABy4zcVbO9UKi37dwWKL6q+sw+hhXTPl3PJtQdokhB09THFsieT7qwP+TH1ouRbQ
-        L0gdmXBEv5S3Ns/ohDlexXqIo5jbb0zoHNkhseC9F9rVuEkTjaOBDSH2mFfvSkkL9pC1jM
-        UBzPtdbYJWDr18idozHIQiNsHgwPnD0=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-515--5ZNt59rNUWtwlNVDMpi1w-1; Thu, 01 Jun 2023 16:42:41 -0400
-X-MC-Unique: -5ZNt59rNUWtwlNVDMpi1w-1
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-33b0ad1027aso10669885ab.0
-        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 13:42:41 -0700 (PDT)
+        with ESMTP id S232572AbjFAUne (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 16:43:34 -0400
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 617FF189;
+        Thu,  1 Jun 2023 13:43:32 -0700 (PDT)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-565a63087e9so13253237b3.2;
+        Thu, 01 Jun 2023 13:43:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685652211; x=1688244211;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F1D8lVOaAVBWbT9t2RmOD+26281abLHxtrNSt32Ap24=;
+        b=qLgbJbj5g8WGk9vr+h5GU3VAGYoZuUQfYy+Jk03a6BWdaBQStekzq99EEhSRb/apVE
+         r1wG5klq4xTuvlp4fzfvGwGvXsPOH5Z+EGzZ3xDm5VuokYBfnX2Z7EeXpvrNqoMOmFfA
+         JBLO6CGLz8pEI44d71tWawLxUIyiVrcZLnzOInnX4NDx0adjPFt4WqdjoFpvwTeJeP42
+         YdR8VtfFc5+TjUwWFHzsShyWmg/NGqDFZTc1nDT9EKaeGOrhYp9pTMhkn6c++xEXcw0Z
+         7/JenW6z+3FLVb69Ur5a6g5NHDXYEBFsl6KltuWvHl5pgiI7Ar5zj9KICtB4zwOfTiPP
+         PMcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685652161; x=1688244161;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1685652211; x=1688244211;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=U8EfYdQY90bZ/cz7Bxbk7XK+QWwVW4LIw+R7rc15+JY=;
-        b=HfD/UacC4/qO4r5keGtfHnenqd8lgKtZYTUDcYdOZau5gJYL3TOxhisfh8pjcknC/5
-         dCgadGc2tAY07ALgPHY/VXeW/M+mrRk74hQZNzobe2edGApuh0qiCh6KTmI0uNfOqfEP
-         33wMw/SeHDLX4Ln3lHG/GwpuEwjyO86WPXjCny1ct2u0HkgEH29KgduA6QEu82x/Rbvo
-         2FGMRNPG3fYuPxwD1Qb2Ns+BnNQqJIEV2AV916eK1n2agluUJXrHNagnOdFtTSiFjn6p
-         vUm0T1KV2eByOkHEGIYViAjZ//tjDM+nxe6jd6CcRPDJSdwWaBGUGSY9vldlHjqRZ4du
-         Kwdg==
-X-Gm-Message-State: AC+VfDzY9WtpXv0zVdwTEiuhg+5mwIJQf4JR57tEeqHOkVq4VU6xHI2A
-        K2dJalMKJ3gblB/JA/h4nJnKHYZUF9CpbIp5G92yCRncnijWceXaj3h6EvLPzXaib8UNaY7yr2G
-        m24t5VihPO7Zu
-X-Received: by 2002:a92:de10:0:b0:33a:a93f:a87e with SMTP id x16-20020a92de10000000b0033aa93fa87emr6595355ilm.14.1685652160769;
-        Thu, 01 Jun 2023 13:42:40 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5edWEdQwDdOisbQxqpaA8WClLh9K8917itQ49g5P0nUa2VhlOsSPWD0UneeoICGi+VJPIkzg==
-X-Received: by 2002:a92:de10:0:b0:33a:a93f:a87e with SMTP id x16-20020a92de10000000b0033aa93fa87emr6595341ilm.14.1685652160407;
-        Thu, 01 Jun 2023 13:42:40 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id p5-20020a92c105000000b003319d8574e2sm3952533ile.25.2023.06.01.13.42.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Jun 2023 13:42:39 -0700 (PDT)
-Date:   Thu, 1 Jun 2023 14:42:38 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Longfang Liu <liulongfang@huawei.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH] vfio: Fixup kconfig ordering for VFIO_PCI_CORE
-Message-ID: <20230601144238.77c2ad29.alex.williamson@redhat.com>
-In-Reply-To: <0-v1-7eacf832787f+86-vfio_pci_kconfig_jgg@nvidia.com>
-References: <0-v1-7eacf832787f+86-vfio_pci_kconfig_jgg@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        bh=F1D8lVOaAVBWbT9t2RmOD+26281abLHxtrNSt32Ap24=;
+        b=GOowg9yn12Q6SQlCdXA40g08sLFst1a8mGzJYQc/D+ZC9Cv2U4KHw5O8JXgIdyIf6t
+         CkDgwYmWXjjIQLVN66g8S46iRGAxfgeuACOMOXb1rjo+Nk38gC9zvNnX8Mu6Mtn7rOCK
+         60f9rGemU06TnD/1OlFLxVftsIaKncCha4VSdmCCYFyn7Cr0LAXaFscluQveBYHF8+Qw
+         jV8yv5Gjekgy4HnL13fOiqaUFg4vhGAs4al+h7471Q1JJ+74hIQyZo4ofSMyl3D+Zkdz
+         8JvBwdKQbUVTivEbq50q6u9owP0DcP1eS0gnbqbQ2fVxAvU2zI50G7f+mhB6C5Lr/RAS
+         axEg==
+X-Gm-Message-State: AC+VfDxPOzX26sLB2wS6GTh3JDg9tVa9nUNjVyyIL/vXD17t+m+HgPcY
+        of+dXb9FtqMQ8lyQ6dtTMD1JbR2mgvDN2u0MMj8olTx8p5Y=
+X-Google-Smtp-Source: ACHHUZ5DfuhGus+PqmBDfDw3I8CUwiopOPmtEZnOXp6mFa4otjE0OnORW5aklQp2qVjtyKAx2ImFFxSDC1ok71Q6xew=
+X-Received: by 2002:a0d:e84b:0:b0:565:f045:18c3 with SMTP id
+ r72-20020a0de84b000000b00565f04518c3mr10614817ywe.20.1685652211220; Thu, 01
+ Jun 2023 13:43:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230531213032.25338-1-vishal.moola@gmail.com>
+ <20230531213032.25338-4-vishal.moola@gmail.com> <20230601151900.6f184e8c@thinkpad-T15>
+In-Reply-To: <20230601151900.6f184e8c@thinkpad-T15>
+From:   Vishal Moola <vishal.moola@gmail.com>
+Date:   Thu, 1 Jun 2023 13:43:20 -0700
+Message-ID: <CAOzc2pyjLh_GV1PL7CPkkPGcASHULhir_rJgB+UhwzPgQZD8Bw@mail.gmail.com>
+Subject: Re: [PATCH v3 03/34] s390: Use pt_frag_refcount for pagetables
+To:     Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hugh Dickins <hughd@google.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 29 May 2023 14:47:59 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Thu, Jun 1, 2023 at 6:19=E2=80=AFAM Gerald Schaefer
+<gerald.schaefer@linux.ibm.com> wrote:
+>
+>  On Wed, 31 May 2023 14:30:01 -0700
+> "Vishal Moola (Oracle)" <vishal.moola@gmail.com> wrote:
+>
+> > s390 currently uses _refcount to identify fragmented page tables.
+> > The page table struct already has a member pt_frag_refcount used by
+> > powerpc, so have s390 use that instead of the _refcount field as well.
+> > This improves the safety for _refcount and the page table tracking.
+> >
+> > This also allows us to simplify the tracking since we can once again us=
+e
+> > the lower byte of pt_frag_refcount instead of the upper byte of _refcou=
+nt.
+>
+> This would conflict with s390 impact of pte_free_defer() work from Hugh D=
+ickins
+> https://lore.kernel.org/lkml/35e983f5-7ed3-b310-d949-9ae8b130cdab@google.=
+com/
+> https://lore.kernel.org/lkml/6dd63b39-e71f-2e8b-7e0-83e02f3bcb39@google.c=
+om/
+>
+> There he uses pt_frag_refcount, or rather pt_mm in the same union, to sav=
+e
+> the mm_struct for deferred pte_free().
+>
+> I still need to look closer into both of your patch series, but so far it
+> seems that you have no hard functional requirement to switch from _refcou=
+nt
+> to pt_frag_refcount here, for s390.
+>
+> If this is correct, and you do not e.g. need this to make some other use
+> of _refcount, I would suggest to drop this patch.
 
-> Make VFIO_PCI_CORE the top level menu choice and make it directly
-> selectable by the user.
-> 
-> This makes a sub menu with all the different PCI driver choices and causes
-> VFIO_PCI to be enabled by default if the user selects "VFIO support for
-> PCI devices"
-> 
-> Remove the duplicated 'depends on' from variant drivers and enclose all
-> the different sub driver choices (including S390 which was wrongly missing
-> a depends) in a single if block. This makes all the dependencies more
-> robust.
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/vfio/pci/Kconfig           | 17 ++++++++++++-----
->  drivers/vfio/pci/hisilicon/Kconfig |  1 -
->  drivers/vfio/pci/mlx5/Kconfig      |  1 -
->  3 files changed, 12 insertions(+), 7 deletions(-)
-> 
-> Slightly different than as discussed as this seem more robust at the cost of
-> adding another menu layer.
-> 
-> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-> index f9d0c908e738c3..5e9868d5ff1569 100644
-> --- a/drivers/vfio/pci/Kconfig
-> +++ b/drivers/vfio/pci/Kconfig
-> @@ -1,9 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  if PCI && MMU
-> -config VFIO_PCI_CORE
-> -	tristate
-> -	select VFIO_VIRQFD
-> -	select IRQ_BYPASS_MANAGER
->  
->  config VFIO_PCI_MMAP
->  	def_bool y if !S390
-> @@ -11,9 +7,19 @@ config VFIO_PCI_MMAP
->  config VFIO_PCI_INTX
->  	def_bool y if !S390
->  
-> +config VFIO_PCI_CORE
-> +	tristate "VFIO support for PCI devices"
-> +	select VFIO_VIRQFD
-> +	select IRQ_BYPASS_MANAGER
-> +	help
-> +	  Base support for VFIO drivers that support PCI devices. At least one
-> +	  of the implementation drivers must be selected.
+The goal of this preparation patch is to consolidate s390's usage of
+struct page fields so that struct ptdesc can be smaller. Its not particular=
+ly
+mandatory; leaving _refcount in ptdesc only increases the struct by
+8 bytes and can always be changed later.
 
-As enforced by what?
+However it is a little annoying since s390 is the only architecture
+that egregiously uses space throughout struct page for their page
+tables, rather than just the page table struct. For example, s390
+gmap uses page->index which also aliases with pt_mm and
+pt_frag_refcount. I'm not sure if/how gmap page tables interact
+with s390 process page tables at all, but if it does that could
+potentially cause problems with Hugh's patch as well :(
 
-This is just adding one more layer of dependencies in order to select
-the actual endpoint driver that is actually what anyone cares about.
-Despite the above help text, I think this also allows a kernel to be
-built with vfio-pci-core and nothing in-kernel that uses it.
-
-I don't see why we wouldn't just make each of the variant drivers
-select VFIO_PCI_CORE.  Thanks,
-
-Alex
-
-> +
-> +if VFIO_PCI_CORE
-> +
->  config VFIO_PCI
->  	tristate "Generic VFIO support for any PCI device"
-> -	select VFIO_PCI_CORE
-> +	default y
->  	help
->  	  Support for the generic PCI VFIO bus driver which can connect any
->  	  PCI device to the VFIO framework.
-> @@ -60,3 +66,4 @@ source "drivers/vfio/pci/mlx5/Kconfig"
->  source "drivers/vfio/pci/hisilicon/Kconfig"
->  
->  endif
-> +endif
-> diff --git a/drivers/vfio/pci/hisilicon/Kconfig b/drivers/vfio/pci/hisilicon/Kconfig
-> index 5daa0f45d2f99b..86826513765062 100644
-> --- a/drivers/vfio/pci/hisilicon/Kconfig
-> +++ b/drivers/vfio/pci/hisilicon/Kconfig
-> @@ -2,7 +2,6 @@
->  config HISI_ACC_VFIO_PCI
->  	tristate "VFIO PCI support for HiSilicon ACC devices"
->  	depends on ARM64 || (COMPILE_TEST && 64BIT)
-> -	depends on VFIO_PCI_CORE
->  	depends on PCI_MSI
->  	depends on CRYPTO_DEV_HISI_QM
->  	depends on CRYPTO_DEV_HISI_HPRE
-> diff --git a/drivers/vfio/pci/mlx5/Kconfig b/drivers/vfio/pci/mlx5/Kconfig
-> index 29ba9c504a7560..d36b18d3e21fe7 100644
-> --- a/drivers/vfio/pci/mlx5/Kconfig
-> +++ b/drivers/vfio/pci/mlx5/Kconfig
-> @@ -2,7 +2,6 @@
->  config MLX5_VFIO_PCI
->  	tristate "VFIO support for MLX5 PCI devices"
->  	depends on MLX5_CORE
-> -	depends on VFIO_PCI_CORE
->  	help
->  	  This provides migration support for MLX5 devices using the VFIO
->  	  framework.
-> 
-> base-commit: 8c1ee346da583718fb0a7791a1f84bdafb103caf
-
+I can add _refcount to ptdesc if we would like, but I still
+prefer if s390 could be simplified instead.
