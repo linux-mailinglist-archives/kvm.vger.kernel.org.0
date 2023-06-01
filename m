@@ -2,131 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8628171F3EE
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 22:35:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31A9471F409
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 22:43:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232390AbjFAUfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 16:35:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59016 "EHLO
+        id S232538AbjFAUnb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 16:43:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230022AbjFAUfx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 16:35:53 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E79BE8E
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 13:35:52 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-53f6e19f814so586492a12.3
-        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 13:35:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685651752; x=1688243752;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BQsmyQzEzHyUODjeF1Im8+Zrh4FhlDMcFejVWj5dlGY=;
-        b=joxSX0p8ogxk67cCS7PFajwKHZzRYWC5NMM8qC7ZQdrctoQEQo6IVtrYyVUg9AhDyj
-         itFopm/lq6NVXU575PkYvBBEXs0A8CJDsCgyvjUHy1Yw0423zgH8geusLAyFLOIT3IF6
-         ewPOd9Q8rp0XyvdbrfbETxTD/D6+LiAxC8ArFNpHKyCz+jWX+krZhqaZHU83jGuv3OtT
-         +HOZ6c9pHZh6htzGvgfZsHXruYI1hPotq+mnbGnpVX1MKY46id+UNHlJP4luwoRxELbk
-         is3Zn+TfRfI1ZqU7TItm3VIhf6wiEWfwKuCV0BAq/7ZdKfiMrFW6B0AIIRxt9Cdee3ff
-         Uz1g==
+        with ESMTP id S229463AbjFAUna (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 16:43:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FE98189
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 13:42:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685652163;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=U8EfYdQY90bZ/cz7Bxbk7XK+QWwVW4LIw+R7rc15+JY=;
+        b=gC3b5nABy4zcVbO9UKi37dwWKL6q+sw+hhXTPl3PJtQdokhB09THFsieT7qwP+TH1ouRbQ
+        L0gdmXBEv5S3Ns/ohDlexXqIo5jbb0zoHNkhseC9F9rVuEkTjaOBDSH2mFfvSkkL9pC1jM
+        UBzPtdbYJWDr18idozHIQiNsHgwPnD0=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515--5ZNt59rNUWtwlNVDMpi1w-1; Thu, 01 Jun 2023 16:42:41 -0400
+X-MC-Unique: -5ZNt59rNUWtwlNVDMpi1w-1
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-33b0ad1027aso10669885ab.0
+        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 13:42:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685651752; x=1688243752;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BQsmyQzEzHyUODjeF1Im8+Zrh4FhlDMcFejVWj5dlGY=;
-        b=AJ+O/X+SHkOwQdmIIkVHLzohyp2y9PEduWmleCWK0MmUbSdPFI6NyKNUnALqcjKrvR
-         0qSmn46FfUa8XHK1OUASbZ0NR1eEUG+yEpKC1Kgg0ktJStueLotxE4YYR+KX3xboMc+b
-         zEpzkRDujd4FY6uCUyLmJCaHVUfT1py6Ly3cECd0ZsEZiO/CGoHnBwqvGjRXEpZr4ppc
-         hXBKV9JIEwRP6D5UshtIhLxzYZXWr6hm7LTHNKDwCl/rnICKKIgDG6qwFSIUQ/U4Emn5
-         6Z2D+FYIVh0wG82rA1qcT9ZlYSfdcLwZqE6Sr1pA+BS7bahYaPQEjerqbhMTUkndh+Gl
-         XfEg==
-X-Gm-Message-State: AC+VfDwv28ErNEPHc4fuu3BAIuwIw3XJomjxg2VLLoImL/rvRLtGfsMK
-        EdpiVwz/l0AnfniNQEJWnJo/WkOOXdY=
-X-Google-Smtp-Source: ACHHUZ69pDPXzuIjV71lgfceFCUQY0VEO7bbEfEhdF5tcDPMpDyfDGGCaZeqHmNZ0XH1XXrUPwqKHCewFSc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:495f:0:b0:53f:7713:5e0e with SMTP id
- y31-20020a63495f000000b0053f77135e0emr1916195pgk.5.1685651752377; Thu, 01 Jun
- 2023 13:35:52 -0700 (PDT)
-Date:   Thu, 1 Jun 2023 13:35:51 -0700
-In-Reply-To: <CALMp9eQ247GCxHnn3VwFatKEswWq9cMaoZCOivC-OQ_asvFHZQ@mail.gmail.com>
-Mime-Version: 1.0
-References: <9d37ab07-97c6-5245-6939-9c1090b4b3a9@redhat.com>
- <ECE9A3B4-2CF3-452A-838A-99BE075D5E68@nutanix.com> <3cb96907-0d58-ba60-ed0e-6c17c69bd0f8@redhat.com>
- <CALMp9eQNNCwUbPQGBfHzWnTAEJeRO-fjQAFxb9101SChe9F5rg@mail.gmail.com>
- <623EC08D-A755-4520-B9BF-42B0E72570C1@nutanix.com> <CALMp9eQ17+XRpxJjMnmvPnKOC1VP1P=mU-KykoOzYZsgtGN8sQ@mail.gmail.com>
- <658D3EF0-B2D3-4492-A2A1-FC84A58B201D@nutanix.com> <ZHjYsKVBFLsOmHcF@google.com>
- <BF7121B7-B2AE-4391-9D1B-D944B5BC44D0@nutanix.com> <CALMp9eQ247GCxHnn3VwFatKEswWq9cMaoZCOivC-OQ_asvFHZQ@mail.gmail.com>
-Message-ID: <ZHkBJ+RdPYIZjolX@google.com>
-Subject: Re: [PATCH v4] KVM: VMX: do not disable interception for
- MSR_IA32_SPEC_CTRL on eIBRS
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Jon Kohler <jon@nutanix.com>, Waiman Long <longman@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1685652161; x=1688244161;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=U8EfYdQY90bZ/cz7Bxbk7XK+QWwVW4LIw+R7rc15+JY=;
+        b=HfD/UacC4/qO4r5keGtfHnenqd8lgKtZYTUDcYdOZau5gJYL3TOxhisfh8pjcknC/5
+         dCgadGc2tAY07ALgPHY/VXeW/M+mrRk74hQZNzobe2edGApuh0qiCh6KTmI0uNfOqfEP
+         33wMw/SeHDLX4Ln3lHG/GwpuEwjyO86WPXjCny1ct2u0HkgEH29KgduA6QEu82x/Rbvo
+         2FGMRNPG3fYuPxwD1Qb2Ns+BnNQqJIEV2AV916eK1n2agluUJXrHNagnOdFtTSiFjn6p
+         vUm0T1KV2eByOkHEGIYViAjZ//tjDM+nxe6jd6CcRPDJSdwWaBGUGSY9vldlHjqRZ4du
+         Kwdg==
+X-Gm-Message-State: AC+VfDzY9WtpXv0zVdwTEiuhg+5mwIJQf4JR57tEeqHOkVq4VU6xHI2A
+        K2dJalMKJ3gblB/JA/h4nJnKHYZUF9CpbIp5G92yCRncnijWceXaj3h6EvLPzXaib8UNaY7yr2G
+        m24t5VihPO7Zu
+X-Received: by 2002:a92:de10:0:b0:33a:a93f:a87e with SMTP id x16-20020a92de10000000b0033aa93fa87emr6595355ilm.14.1685652160769;
+        Thu, 01 Jun 2023 13:42:40 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5edWEdQwDdOisbQxqpaA8WClLh9K8917itQ49g5P0nUa2VhlOsSPWD0UneeoICGi+VJPIkzg==
+X-Received: by 2002:a92:de10:0:b0:33a:a93f:a87e with SMTP id x16-20020a92de10000000b0033aa93fa87emr6595341ilm.14.1685652160407;
+        Thu, 01 Jun 2023 13:42:40 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id p5-20020a92c105000000b003319d8574e2sm3952533ile.25.2023.06.01.13.42.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jun 2023 13:42:39 -0700 (PDT)
+Date:   Thu, 1 Jun 2023 14:42:38 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Longfang Liu <liulongfang@huawei.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH] vfio: Fixup kconfig ordering for VFIO_PCI_CORE
+Message-ID: <20230601144238.77c2ad29.alex.williamson@redhat.com>
+In-Reply-To: <0-v1-7eacf832787f+86-vfio_pci_kconfig_jgg@nvidia.com>
+References: <0-v1-7eacf832787f+86-vfio_pci_kconfig_jgg@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 01, 2023, Jim Mattson wrote:
-> On Thu, Jun 1, 2023 at 12:28=E2=80=AFPM Jon Kohler <jon@nutanix.com> wrot=
-e:
-> > > diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> > > index c544602d07a3..454bcbf5b543 100644
-> > > --- a/arch/x86/kvm/x86.h
-> > > +++ b/arch/x86/kvm/x86.h
-> > > @@ -492,7 +492,31 @@ static inline void kvm_machine_check(void)
-> > >
-> > > void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
-> > > void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
-> > > +
-> > > int kvm_spec_ctrl_test_value(u64 value);
-> > > +
-> > > +static inline bool kvm_account_msr_spec_ctrl_write(struct kvm_vcpu *=
-vcpu)
-> > > +{
-> > > +     if ((vcpu->stat.exits - vcpu->arch.spec_ctrl_nr_exits_snapshot)=
- < 20)
->=20
-> I think you mean 200 here. If it's bad to have more than 1
-> WRMSR(IA32_SPEC_CTRL) VM-exit in 20 VM-exits, then more than 10 such
-> VM-exits in 200 VM-exits represents sustained badness.
+On Mon, 29 May 2023 14:47:59 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-No?  The snapshot is updated on every write, i.e. this check is whether or =
-not
-the last wrmsr(SPEC_CTRL) was less than 20 cycles ago. =20
+> Make VFIO_PCI_CORE the top level menu choice and make it directly
+> selectable by the user.
+> 
+> This makes a sub menu with all the different PCI driver choices and causes
+> VFIO_PCI to be enabled by default if the user selects "VFIO support for
+> PCI devices"
+> 
+> Remove the duplicated 'depends on' from variant drivers and enclose all
+> the different sub driver choices (including S390 which was wrongly missing
+> a depends) in a single if block. This makes all the dependencies more
+> robust.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/vfio/pci/Kconfig           | 17 ++++++++++++-----
+>  drivers/vfio/pci/hisilicon/Kconfig |  1 -
+>  drivers/vfio/pci/mlx5/Kconfig      |  1 -
+>  3 files changed, 12 insertions(+), 7 deletions(-)
+> 
+> Slightly different than as discussed as this seem more robust at the cost of
+> adding another menu layer.
+> 
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index f9d0c908e738c3..5e9868d5ff1569 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -1,9 +1,5 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+>  if PCI && MMU
+> -config VFIO_PCI_CORE
+> -	tristate
+> -	select VFIO_VIRQFD
+> -	select IRQ_BYPASS_MANAGER
+>  
+>  config VFIO_PCI_MMAP
+>  	def_bool y if !S390
+> @@ -11,9 +7,19 @@ config VFIO_PCI_MMAP
+>  config VFIO_PCI_INTX
+>  	def_bool y if !S390
+>  
+> +config VFIO_PCI_CORE
+> +	tristate "VFIO support for PCI devices"
+> +	select VFIO_VIRQFD
+> +	select IRQ_BYPASS_MANAGER
+> +	help
+> +	  Base support for VFIO drivers that support PCI devices. At least one
+> +	  of the implementation drivers must be selected.
 
-       if ((vcpu->stat.exits - vcpu->arch.spec_ctrl_nr_exits_snapshot) < 20=
-)
-               vcpu->arch.nr_quick_spec_ctrl_writes++;
-       else
-               vcpu->arch.nr_quick_spec_ctrl_writes =3D 0;
+As enforced by what?
 
-       vcpu->arch.spec_ctrl_nr_exits_snapshot =3D vcpu->stat.exits;  <=3D n=
-ew snapshot
+This is just adding one more layer of dependencies in order to select
+the actual endpoint driver that is actually what anyone cares about.
+Despite the above help text, I think this also allows a kernel to be
+built with vfio-pci-core and nothing in-kernel that uses it.
 
-       return vcpu->arch.nr_quick_spec_ctrl_writes >=3D 10;
+I don't see why we wouldn't just make each of the variant drivers
+select VFIO_PCI_CORE.  Thanks,
 
-> (Although, as Sean noted, these numbers are just placeholders.)
+Alex
 
-And the logic is very off-the-cuff, e.g. it may be better to have a rolling=
- 200-exit
-window instead of 10 somewhat independent 20-exit windows.
+> +
+> +if VFIO_PCI_CORE
+> +
+>  config VFIO_PCI
+>  	tristate "Generic VFIO support for any PCI device"
+> -	select VFIO_PCI_CORE
+> +	default y
+>  	help
+>  	  Support for the generic PCI VFIO bus driver which can connect any
+>  	  PCI device to the VFIO framework.
+> @@ -60,3 +66,4 @@ source "drivers/vfio/pci/mlx5/Kconfig"
+>  source "drivers/vfio/pci/hisilicon/Kconfig"
+>  
+>  endif
+> +endif
+> diff --git a/drivers/vfio/pci/hisilicon/Kconfig b/drivers/vfio/pci/hisilicon/Kconfig
+> index 5daa0f45d2f99b..86826513765062 100644
+> --- a/drivers/vfio/pci/hisilicon/Kconfig
+> +++ b/drivers/vfio/pci/hisilicon/Kconfig
+> @@ -2,7 +2,6 @@
+>  config HISI_ACC_VFIO_PCI
+>  	tristate "VFIO PCI support for HiSilicon ACC devices"
+>  	depends on ARM64 || (COMPILE_TEST && 64BIT)
+> -	depends on VFIO_PCI_CORE
+>  	depends on PCI_MSI
+>  	depends on CRYPTO_DEV_HISI_QM
+>  	depends on CRYPTO_DEV_HISI_HPRE
+> diff --git a/drivers/vfio/pci/mlx5/Kconfig b/drivers/vfio/pci/mlx5/Kconfig
+> index 29ba9c504a7560..d36b18d3e21fe7 100644
+> --- a/drivers/vfio/pci/mlx5/Kconfig
+> +++ b/drivers/vfio/pci/mlx5/Kconfig
+> @@ -2,7 +2,6 @@
+>  config MLX5_VFIO_PCI
+>  	tristate "VFIO support for MLX5 PCI devices"
+>  	depends on MLX5_CORE
+> -	depends on VFIO_PCI_CORE
+>  	help
+>  	  This provides migration support for MLX5 devices using the VFIO
+>  	  framework.
+> 
+> base-commit: 8c1ee346da583718fb0a7791a1f84bdafb103caf
+
