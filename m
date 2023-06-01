@@ -2,64 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C88237191CF
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 06:24:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 630C77191EB
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 06:36:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229527AbjFAEYB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 00:24:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33992 "EHLO
+        id S231224AbjFAEgl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 00:36:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229562AbjFAEXw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 00:23:52 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36F701A7;
-        Wed, 31 May 2023 21:23:49 -0700 (PDT)
+        with ESMTP id S229527AbjFAEgj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 00:36:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7520D101;
+        Wed, 31 May 2023 21:36:38 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9B42D60FB2;
-        Thu,  1 Jun 2023 04:23:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69790C433D2;
-        Thu,  1 Jun 2023 04:23:47 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0737C63B94;
+        Thu,  1 Jun 2023 04:36:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6183CC433A4;
+        Thu,  1 Jun 2023 04:36:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685593428;
-        bh=Vmpu+tmCB/j9OAOBTooih5ZpKTBAnxG8w5d/DuPgqXI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=UCFdHtTH5VEzC1+pmZ3T87kKogT0MTYfFt7PRafT1FvG7D63uzz84O4mAi6U9G494
-         fY21pcXWnOUWPP6qxc5XGrxUQZDPG9M46HYaIUHYssG11DGwyU+QViWVcnVYeLj9Yl
-         MTvlqI/F1DgANamPu783SDAjFtdIJpL6+OT6rvHWRWgGCq0Vb0TkLgkBCXoW0GzTp2
-         X7lF18ta1lA16F84YbnT/lxEBLAFN9Hln/rcakNqWjM5eFEgldSEs2HRvS7W4dMQgM
-         WnMZfSLsI3giBUkPpSXcQofLILYK3IL1y46cLcWOvvxNoun45SPtG/bNe0k5wTKe57
-         qK3BV21uK31OQ==
-Date:   Wed, 31 May 2023 21:23:45 -0700
-From:   Josh Poimboeuf <jpoimboe@kernel.org>
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Andrew Cooper <andrew.cooper3@citrix.com>,
-        Jon Kohler <jon@nutanix.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        "kvm @ vger . kernel . org" <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: VMX: remove LFENCE in vmx_spec_ctrl_restore_host()
-Message-ID: <20230601042345.52s5337uz62p6aow@treble>
-References: <20230531150112.76156-1-jon@nutanix.com>
- <20230531231820.trrs2uugc24gegj4@treble>
- <F4BEBCAF-CBFC-4C3E-8B01-2ED84CF2E13A@nutanix.com>
- <20230601004202.63yulqs73kuh3ep6@treble>
- <846dd0c5-d431-e20e-fdb3-a4a26b6a22ca@citrix.com>
- <20230601012323.36te7hfv366danpf@desk>
+        s=k20201202; t=1685594197;
+        bh=QZIVYOfQMQfDIruN7rSg689YIbiJbkkfE8AKRfy2n5U=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=XjX+qO5TgZej3fh2HJQIqiOR5PxyL4koYuTQx2qeUwz0mw2WS7S8765bRMbrDCQVG
+         whIGCjOlXBTjeWiN2+LrCx+Or8mSlhjQdHY5MFaYnqKspwUjKhBsJekNkwwwC3A2tK
+         RRJ+PYWLTNVwk2Tc4E1sjjLY66LER3hFT6QIRdlz0YEtfE5QnejkEMpgjlFtCb1L5b
+         jav2+jHQW0E6lB/EBDYRssonNB4dhirDM2pvI3kpcWJ0B9czAKVTkvmbZ2ylsgGsMq
+         x3kGCiBqFY0IqxyFq7Pvs4DJbAWcMeNsAFCqYa1UhLYAOwr6LlCcKM6JbTbj+s1hsP
+         DnX5huppMSCjQ==
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5148f299105so1031967a12.1;
+        Wed, 31 May 2023 21:36:37 -0700 (PDT)
+X-Gm-Message-State: AC+VfDxwiT7C10j1GdEwYy4iVWtMNLpYz6Ki4JVdi3NqywTR8N1qLSdF
+        XgM4fxnK/8iEBfCLojzr5Ls7Jc1O2gyhWIXSzuc=
+X-Google-Smtp-Source: ACHHUZ7XdaYihX3P0occ4fimfrY7vXLE/b8sATTjW74eXROnZDFW1BQ/va3F8G7kmqLig8peXPPgGCGmqMpiLEgKGXM=
+X-Received: by 2002:a05:6402:3511:b0:4fc:97d9:18ec with SMTP id
+ b17-20020a056402351100b004fc97d918ecmr437472edd.21.1685594195535; Wed, 31 May
+ 2023 21:36:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230601012323.36te7hfv366danpf@desk>
-X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+References: <20230531213032.25338-1-vishal.moola@gmail.com> <20230531213032.25338-23-vishal.moola@gmail.com>
+In-Reply-To: <20230531213032.25338-23-vishal.moola@gmail.com>
+From:   Guo Ren <guoren@kernel.org>
+Date:   Thu, 1 Jun 2023 12:36:23 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTSEguewbRMD8w3u3tfSPt-Opy+i=jm_8W2+NtAP1OYSsA@mail.gmail.com>
+Message-ID: <CAJF2gTSEguewbRMD8w3u3tfSPt-Opy+i=jm_8W2+NtAP1OYSsA@mail.gmail.com>
+Subject: Re: [PATCH v3 22/34] csky: Convert __pte_free_tlb() to use ptdescs
+To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -68,26 +70,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 31, 2023 at 06:24:29PM -0700, Pawan Gupta wrote:
+Acked-by: Guo Ren <guoren@kernel.org>
 
-## 2023-05-31
-> On Thu, Jun 01, 2023 at 01:50:48AM +0100, Andrew Cooper wrote:
-> > On 01/06/2023 1:42 am, Josh Poimboeuf wrote:
-> > > So each LFENCE has a distinct purpose.  That said, there are no indirect
-> > > branches or unbalanced RETs between them.
-> > 
-> > How lucky are you feeling?
-> > 
-> > You're in C at this point, which means the compiler could have emitted a
-> > call to mem{cpy,cmp}() in place of a simple assignment/comparison.
-> 
-> Moving the second LFENCE to the else part of WRMSR should be possible?
-> So that the serialization can be achived either by WRMSR or LFENCE. This
-> saves an LFENCE when host and guest value of MSR_SPEC_CTRL differ.
+On Thu, Jun 1, 2023 at 5:34=E2=80=AFAM Vishal Moola (Oracle)
+<vishal.moola@gmail.com> wrote:
+>
+> Part of the conversions to replace pgtable constructor/destructors with
+> ptdesc equivalents.
+>
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> ---
+>  arch/csky/include/asm/pgalloc.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/csky/include/asm/pgalloc.h b/arch/csky/include/asm/pgal=
+loc.h
+> index 7d57e5da0914..9c84c9012e53 100644
+> --- a/arch/csky/include/asm/pgalloc.h
+> +++ b/arch/csky/include/asm/pgalloc.h
+> @@ -63,8 +63,8 @@ static inline pgd_t *pgd_alloc(struct mm_struct *mm)
+>
+>  #define __pte_free_tlb(tlb, pte, address)              \
+>  do {                                                   \
+> -       pgtable_pte_page_dtor(pte);                     \
+> -       tlb_remove_page(tlb, pte);                      \
+> +       pagetable_pte_dtor(page_ptdesc(pte));           \
+> +       tlb_remove_page_ptdesc(tlb, page_ptdesc(pte));  \
+>  } while (0)
+>
+>  extern void pagetable_init(void);
+> --
+> 2.40.1
+>
 
-Yes.  Though in practice it might not make much of a difference.  With
-wrmsr+lfence, the lfence has nothing to do so it might be almost
-instantaneous anyway.
 
--- 
-Josh
+--=20
+Best Regards
+ Guo Ren
