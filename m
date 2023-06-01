@@ -2,147 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C37B271920D
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 07:02:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6D987192C1
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 07:54:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231297AbjFAFCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 01:02:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42782 "EHLO
+        id S231777AbjFAFyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 01:54:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbjFAFCq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 01:02:46 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99AAC12C
-        for <kvm@vger.kernel.org>; Wed, 31 May 2023 22:02:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 30EF263FC9
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 05:02:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FB11C433EF;
-        Thu,  1 Jun 2023 05:02:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685595764;
-        bh=zs1I394rk/Mw+oYwq8XKLNXM/rtn1y1wKjDBN5Wu3MM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=siqfEj6c1V8QvOG2LpafSKdu3pq2p/RMWv3BrHquxF2BJ4xRahyb5wyQZlVBQJfYl
-         1fKnpO/xitKhnLsVyHpA8pzu47EdDtj/S8xKh7yVKmY8s7FQx/b2Xt8XEmHtqjuYPM
-         W1DfsB0nwOCMK4m+ag2nV1Q6LMi1++502gA+svo49nRBTDE75jTsgiCKSiqk5XYNYJ
-         f2W90MbSqMhqjksfMFeIGmYoisI7GOk51zdmjoV6JZma9fV2C5YKKBmYD9/G4y+gJY
-         KYZqdV21rQ3gozntxPFSsgTsazqNLxBIwJ/1DvcfoQz5chxrTJz6al7v/QtdPq4DV4
-         b3UpskHgb4q/Q==
-Received: from [62.252.176.218] (helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1q4aSQ-001po8-4A;
-        Thu, 01 Jun 2023 06:02:42 +0100
-Date:   Thu, 01 Jun 2023 06:02:41 +0100
-Message-ID: <87mt1jkc5q.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        with ESMTP id S231623AbjFAFx4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 01:53:56 -0400
+Received: from out-45.mta0.migadu.com (out-45.mta0.migadu.com [91.218.175.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A3C4129
+        for <kvm@vger.kernel.org>; Wed, 31 May 2023 22:52:26 -0700 (PDT)
+Date:   Thu, 1 Jun 2023 05:51:40 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1685598704;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kif2qeAXQCW7i+UsiaxamX1gDtjMAdvKI4QGcpfc7/o=;
+        b=dJ86w/hbV9/J6uvQdQoPyEKC4c1xOpHUDVpxgpa1uRSFOYpU9UasHMZfxl9xInPH18XlsU
+        /zgeuRpyAINH0GxgTMYJ6jhK6PZlYYsK+iJeueLzM3dxtfqGUQURoh1XoQt6mT8buM5Y9A
+        6Zf90Wan+PZSA9f6oS8I7f0mIepA0IM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Colton Lewis <coltonlewis@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 0/4] KVM: arm64: PMU: Fix PMUVer handling on heterogeneous PMU systems
-In-Reply-To: <20230530125324.ijrwrvoll2detpus@google.com>
-References: <20230527040236.1875860-1-reijiw@google.com>
-        <87zg5njlyn.wl-maz@kernel.org>
-        <20230530125324.ijrwrvoll2detpus@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 62.252.176.218
-X-SA-Exim-Rcpt-To: reijiw@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        David Matlack <dmatlack@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Marc Zyngier <maz@kernel.org>, Ben Gardon <bgardon@google.com>,
+        Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] KVM: selftests: Print summary stats of memory
+ latency distribution
+Message-ID: <ZHgx7GpYNoF/Go8O@linux.dev>
+References: <20230327212635.1684716-1-coltonlewis@google.com>
+ <20230327212635.1684716-3-coltonlewis@google.com>
+ <ZHe1wEIYC6qsgupI@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZHe1wEIYC6qsgupI@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Reiji,
-
-On Tue, 30 May 2023 13:53:24 +0100,
-Reiji Watanabe <reijiw@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Mon, May 29, 2023 at 02:39:28PM +0100, Marc Zyngier wrote:
-> > On Sat, 27 May 2023 05:02:32 +0100,
-> > Reiji Watanabe <reijiw@google.com> wrote:
-> > > 
-> > > This series fixes issues with PMUVer handling for a guest with
-> > > PMU configured on heterogeneous PMU systems.
-> > > Specifically, it addresses the following two issues.
-> > > 
-> > > [A] The default value of ID_AA64DFR0_EL1.PMUVer of the vCPU is set
-> > >     to its sanitized value.  This could be inappropriate on
-> > >     heterogeneous PMU systems, as arm64_ftr_bits for PMUVer is defined
-> > >     as FTR_EXACT with safe_val == 0 (when ID_AA64DFR0_EL1.PMUVer of all
-> > >     PEs on the host is not uniform, the sanitized value will be 0).
+On Wed, May 31, 2023 at 02:01:52PM -0700, Sean Christopherson wrote:
+> On Mon, Mar 27, 2023, Colton Lewis wrote:
+> > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > index f65e491763e0..d441f485e9c6 100644
+> > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > @@ -219,4 +219,14 @@ uint32_t guest_get_vcpuid(void);
+> >  uint64_t cycles_read(void);
+> >  uint64_t cycles_to_ns(struct kvm_vcpu *vcpu, uint64_t cycles);
 > > 
-> > Why is this a problem? The CPUs don't implement the same version of
-> > the architecture, we don't get a PMU. Why should we try to do anything
-> > better? I really don't think we should go out or out way and make the
-> > code more complicated for something that doesn't really exist.
+> > +#define MEASURE_CYCLES(x)			\
+> > +	({					\
+> > +		uint64_t start;			\
+> > +		start = cycles_read();		\
+> > +		isb();				\
 > 
-> Even when the CPUs don't implement the same version of the architecture,
-> if one of them implement PMUv3, KVM advertises KVM_CAP_ARM_PMU_V3,
-> and allows userspace to configure PMU (KVM_ARM_VCPU_PMU_V3) for vCPUs.
+> Would it make sense to put the necessary barriers inside the cycles_read() (or
+> whatever we end up calling it)?  Or does that not make sense on ARM?
 
-Ah, I see it now. The kernel will register the PMU even if it decides
-that advertising it is wrong, and then we pick it up. Great :-/.
++1. Additionally, the function should have a name that implies ordering,
+like read_system_counter_ordered() or similar.
 
-> In this case, although KVM provides PMU emulations for the guest,
-> the guest's ID_AA64DFR0_EL1.PMUVer will be zero.  Also,
-> KVM_SET_ONE_REG for ID_AA64DFR0_EL1 will never work for vCPUs
-> with PMU configured on such systems (since KVM also doesn't allow
-> userspace to set the PMUVer to 0 for the vCPUs with PMU configured).
+> > +		x;				\
+> > +		dsb(nsh);			\
+
+I assume you're doing this because you want to wait for outstanding
+loads and stores to complete due to 'x', right?
+
+My knee-jerk reaction was that you could just do an mb() and share the
+implementation between arches, but it would seem the tools/ flavor of
+the barrier demotes to a DMB because... reasons.
+
+> > +		cycles_read() - start;		\
+> > +	})
+> > +
+> >  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> ...
 > 
-> I would think either ID_AA64DFR0_EL1.PMUVer for the guest should
-> indicate PMUv3, or KVM should not allow userspace to configure PMU,
-> in this case.
-
-My vote is on the latter. Even if a PMU is available, we should rely
-on the feature exposed by the kernel to decide whether exposing a PMU
-or not.
-
-To be honest, this will affect almost nobody (I only know of a single
-one, an obscure ARMv8.0+ARMv8.2 system which is very unlikely to ever
-use KVM). I'm happy to take the responsibility to actively break those.
-
-> This series is a fix for the former, mainly to keep the current
-> behavior of KVM_CAP_ARM_PMU_V3 and KVM_ARM_VCPU_PMU_V3 on such
-> systems, since I wasn't sure if such systems don't really exist :)
-> (Also, I plan to implement a similar fix for PMCR_EL0.N on top of
-> those changes)
+> > diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> > index 5d977f95d5f5..7352e02db4ee 100644
+> > --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> > @@ -1137,4 +1137,14 @@ void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> >  uint64_t cycles_read(void);
+> >  uint64_t cycles_to_ns(struct kvm_vcpu *vcpu, uint64_t cycles);
+> > 
+> > +#define MEASURE_CYCLES(x)			\
+> > +	({					\
+> > +		uint64_t start;			\
+> > +		start = cycles_read();		\
+> > +		asm volatile("mfence");		\
 > 
-> I could make a fix for the latter instead though. What do you think ?
+> This is incorrect as placing the barrier after the RDTSC allows the RDTSC to be
+> executed before earlier loads, e.g. could measure memory accesses from whatever
+> was before MEASURE_CYCLES().  And per the kernel's rdtsc_ordered(), it sounds like
+> RDTSC can only be hoisted before prior loads, i.e. will be ordered with respect
+> to future loads and stores.
 
-I think this would be valuable.
+Same thing goes for the arm64 variant of the function... You want to
+insert an isb() immediately _before_ you read the counter register to
+avoid speculation.
 
-Also, didn't you have patches for the EL0 side of the PMU? I've been
-trying to look for a new version, but couldn't find it...
-
-Thanks,
-
-	M.
+arch_timer_read_cntvct_el0() back over in the kernel is a good example of
+this. You can very likely ignore the ECV alternative for now.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
