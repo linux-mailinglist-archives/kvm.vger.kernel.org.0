@@ -2,125 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DFE2719E4C
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 15:33:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74957719F66
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 16:15:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234144AbjFANdA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 09:33:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41254 "EHLO
+        id S233828AbjFAOPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 10:15:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233408AbjFANcq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 09:32:46 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5472AE5F;
-        Thu,  1 Jun 2023 06:32:37 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 351DDTk0018611;
-        Thu, 1 Jun 2023 13:32:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=vhd9EyMmatL80g2r4UYt6yaIWyyqCq9PEBicq4VSW50=;
- b=MEHyOEI7GxX8nGxy+vyZQC+WUvtH/1SoBvDibOGj/gqIbOXd5SGeCJ2N/ArqSCc2WQhS
- GnR9vzcDXBOXn3ECrkeuTZfXVy3N9rSU4U5NM/DviwRwTN9CUkhrhb1yZLoB2vsZ/1hh
- phe7KwwLWkrCMFw6/oYtTexrbynda0BIMJyca1ScKHMxdCSUwML/QVSWA1MiMmtsI1BT
- 5Fez3F/hC0Wuo5R34iq+3FL3eSVjS79WTQ6cvWTOYGGv2+T55f5bO9Mm09wSn2uImDU6
- H+oGeraW39zS9LtuY72Vy8WrlvJYuE9OL4HeZgGk7KtIiWUlV4qJoTjcIkBtFxOa0VSL Jg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qxv1b0sfr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jun 2023 13:32:36 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 351DDbab019247;
-        Thu, 1 Jun 2023 13:32:35 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qxv1b0seq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jun 2023 13:32:35 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3514Pmn5020346;
-        Thu, 1 Jun 2023 13:32:34 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3qu94e2j32-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jun 2023 13:32:33 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 351DWU1c36176556
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Jun 2023 13:32:30 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72EAD2004B;
-        Thu,  1 Jun 2023 13:32:30 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 02F4220040;
-        Thu,  1 Jun 2023 13:32:30 +0000 (GMT)
-Received: from [9.171.14.211] (unknown [9.171.14.211])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  1 Jun 2023 13:32:29 +0000 (GMT)
-Message-ID: <7da25454-bee4-2d4c-a5c2-ac98a44edff0@linux.ibm.com>
-Date:   Thu, 1 Jun 2023 15:32:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [kvm-unit-tests PATCH v3 2/2] s390x: sclp: Implement
- SCLP_RC_INSUFFICIENT_SCCB_LENGTH
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     thuth@redhat.com, kvm@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, nsg@linux.ibm.com, cohuck@redhat.com
-References: <20230530124056.18332-1-pmorel@linux.ibm.com>
- <20230530124056.18332-3-pmorel@linux.ibm.com>
- <3dc8e019-a3c1-8446-08ed-f76a9064f954@linux.ibm.com>
- <168562078341.164254.16306908045401776634@t14-nrb>
- <5d0ddebd-22ab-f916-2339-5edc880e5001@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <5d0ddebd-22ab-f916-2339-5edc880e5001@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 4sAd4KisSnhH0AZhQPPKb4tlFufvylCa
-X-Proofpoint-GUID: sx6PmKIIVovFNVeOdVt-byuM7Ogcd-cu
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S234123AbjFAOOo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 10:14:44 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB0E198
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 07:14:43 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id 5614622812f47-399e9455e9fso592456b6e.0
+        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 07:14:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1685628883; x=1688220883;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HYGEm9dTJE3ymA0S0F6ScwYwUPa35e2IAPbfTBCKcIU=;
+        b=EbAQ5Ei+h07qRmxJx0N7rdln8aAmyNZiqMxMPKukIo5oUEZWdXAB9gk0dKkOnoc6+k
+         mCou3qOqGOWXu4ul5gEwV/PEj3yr7iN9iZ+TBDemD/3XxVWV3+d3dy0+Nsxbq+vBjJpT
+         gh5Y+Ui/ZXnNUKHmz6iM/6A4YrNsCQSrJSKk6/ObouMYKejXT8fj3iH4iEBpZfWsws7U
+         N0I4pX+nNHGH3V7g4V/HxAOj/OYCzaMQDffH6TUEyl1tkDaoeCUPVsMLLeVbYbAC6P8N
+         sauBYfUmvEnqARonyjb9mhgnbuociYFnd1TrNC6o9cuWYe81RdkmYb/8u2nHMinU4fit
+         dybA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685628883; x=1688220883;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HYGEm9dTJE3ymA0S0F6ScwYwUPa35e2IAPbfTBCKcIU=;
+        b=Gl1jPmDTYgdJpAmaVk1ygZ8cT6HbCQJQPtR+Tr9VMTZwpZWyXUk11O0SvNzXbYtPQQ
+         tlq7DNXX43F6PLgiqFKgLjAy4U03qW3TL8va8LC2KVnolsehMUBqP1A97nga6VVPZSnl
+         DAmgClEVxGArHc6wkLnB2dWl4PfHnGoyDBWaESZyj5tKcqGO08D5BIsTx5EtkHe1+wo/
+         j+9p5CcGDC//NndZoDoo1fls0exhoW+nv5u1jqWe2FtR2TH96NjQfn5ZiEREXsNYFmOH
+         KD1mSeqAMBqz6mMwcKs94QO/V4Y2XIvf42N4gDHXkB2RfLwYZQgBKcDnngpg7Ub95k67
+         YXmg==
+X-Gm-Message-State: AC+VfDxTrxwTXutT3pQ441ydd40Nm0aZwJ1msGs5DqK5vHgDGKP4Jsw0
+        4bHFzllv04E6RPFGNOVSQvTQiw==
+X-Google-Smtp-Source: ACHHUZ6PrC66+GR4MdRjK6lCM7bCd/bfegu9TKXhQkF0BpUF2F8xbF/z6TLkeDy29ym4NZlrBWDDHw==
+X-Received: by 2002:a05:6808:3942:b0:398:57fa:9b23 with SMTP id en2-20020a056808394200b0039857fa9b23mr7366943oib.0.1685628883119;
+        Thu, 01 Jun 2023 07:14:43 -0700 (PDT)
+Received: from ziepe.ca ([206.223.160.26])
+        by smtp.gmail.com with ESMTPSA id pz14-20020ad4550e000000b0061b2a2f949bsm6018073qvb.61.2023.06.01.07.14.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jun 2023 07:14:42 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1q4j4b-001SU1-Jr;
+        Thu, 01 Jun 2023 11:14:41 -0300
+Date:   Thu, 1 Jun 2023 11:14:41 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Nipun Gupta <nipun.gupta@amd.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        masahiroy@kernel.org, nathan@kernel.org, ndesaulniers@google.com,
+        nicolas@fjasle.eu, git@amd.com, harpreet.anand@amd.com,
+        pieter.jansen-van-vuuren@amd.com, nikhil.agarwal@amd.com,
+        michal.simek@amd.com
+Subject: Re: [PATCH v6] vfio/cdx: add support for CDX bus
+Message-ID: <ZHin0Redl/YIgNFg@ziepe.ca>
+References: <20230517095718.16117-1-nipun.gupta@amd.com>
+ <20230524104529.28708ae8.alex.williamson@redhat.com>
+ <20230524134831.28dc97e2.alex.williamson@redhat.com>
+ <1bf0323b-1191-de11-061e-00227e09dc35@amd.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-01_08,2023-05-31_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- adultscore=0 priorityscore=1501 lowpriorityscore=0 suspectscore=0
- impostorscore=0 bulkscore=0 mlxscore=0 phishscore=0 mlxlogscore=968
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306010115
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1bf0323b-1191-de11-061e-00227e09dc35@amd.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/1/23 14:55, Pierre Morel wrote:
-> 
-> On 6/1/23 13:59, Nico Boehr wrote:
->> Quoting Janosch Frank (2023-06-01 10:03:06)
->>> On 5/30/23 14:40, Pierre Morel wrote:
->>>> If SCLP_CMDW_READ_SCP_INFO fails due to a short buffer, retry
->>>> with a greater buffer.
->>>>
->>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> Janosch, I think it makes sense if Pierre picks up Claudios suggestion from here:
->> https://lore.kernel.org/all/20230530173544.378a63c6@p-imbrenda/
->>
->> Do you agree?
-> 
-> from my side:
-> 
-> It simplifies greatly the code and tested without problem.
-> 
-> The documentation says the SCCB length is "at least"... so we can use a
-> greater size from the beginning.
+On Mon, May 29, 2023 at 01:36:30PM +0530, Nipun Gupta wrote:
 > 
 > 
+> On 5/25/2023 1:18 AM, Alex Williamson wrote:
+> > 
+> > On Wed, 24 May 2023 10:45:29 -0600
+> > Alex Williamson <alex.williamson@redhat.com> wrote:
+> > 
+> > > On Wed, 17 May 2023 15:27:18 +0530
+> > > Nipun Gupta <nipun.gupta@amd.com> wrote:
+> > > 
+> 
+> <snip>
+> 
+> > > > +
+> > > > +MODULE_DEVICE_TABLE(cdx, vfio_cdx_table);
+> > > > +
+> > > > +static struct cdx_driver vfio_cdx_driver = {
+> > > > +   .probe          = vfio_cdx_probe,
+> > > > +   .remove         = vfio_cdx_remove,
+> > > > +   .match_id_table = vfio_cdx_table,
+> > > > +   .driver = {
+> > > > +           .name   = "vfio-cdx",
+> > > > +           .owner  = THIS_MODULE,
+> > > > +   },
+> > > > +   .driver_managed_dma = true,
+> > 
+> > Hmm, looks like cdx bus is broken here, there's no actual
+> > implementation of a dma_configure callback and no setup of the IOMMU
+> > default domain for theoretical cdx drivers that might want to use the
+> > DMA API.  Without that, this driver_manged_dma flag doesn't provide any
+> > guarantees to a vfio driver that we have exclusive ownership of the
+> > group.  Please fix, this flag needs to actually have some meaning on
+> > cdx.  Thanks,
+> > 
+> > Alex
+> 
+> Agree, this change was missed on CDX bus and we are working on fixing this.
+> Shall I send this fix as a commit with this patch?
 
-Sounds good
+You should send it as a rc fixup for your already merged CDX bus stuff
+
+Jason
