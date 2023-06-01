@@ -2,143 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9D0771F42E
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 22:48:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FF0971F48B
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 23:23:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232124AbjFAUsq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 16:48:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34990 "EHLO
+        id S229648AbjFAVXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 17:23:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231758AbjFAUsk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 16:48:40 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2086.outbound.protection.outlook.com [40.107.223.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D37C189
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 13:48:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CcUKaElSr+j0JC2VaLL5C80uBT7+XJnZmt0b9bHhT1+1NoVSUsmjAotQCiByDI509/+NUUfVfE1ZisRJVeZFsmPptzTQh9vTnZISmBugtE9rWboGkwJr6wxiQz9hTu0WazZW+La52n9oPufIOieYmfgWql33ahMl908K4ka+o7mznO/9bpStAam5Oee68J5uPlnab/7OKttmb8aV2jKnZ+wKuYxl7xaxnIRgadiNYsA6Z3ceaJRXFz+uX1hUIBW7yKdvGCF5IoUxgf4eM9UHnxZZsgP/KXDxjcdEzkEmdc5ritfrsR0TjCz727J8VtXIOL/4XkHYx4NkQP0YLdeFKA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g7FnTqIaC5rPEtGlMnvlVMxUwuEJV5I3AnwxBEaturc=;
- b=UPGPdU/J7CRMWs/8orFHXqIMpiPGMAqZ1oVHFQ2t2qcZkfk7EwfoJctHoMlGYX7Nc/R4g/PZfJ63Is0rSTX02LrDzqZhsVKUP06FCvDCs7ourX/X3nhruf+Bzstmhz1D+wxRgPDELW9/CBe2te7zo6cJvGVM+KICT7WAakzjCzOfqD1nJRjyRHfwqnQaoplWXyNZCvX7es5xkbzsYN5Ez6YB8wmQG3FhCtBxKu3BGS5oYeji0PAFG08FZvqqtbK7SU+zAYIX4b19FSAxNK5QFFm4hXQ65QSjyQRgTwGQdAlexhK6uCcTQov9I0+0Tvvjy4Ev/AHBKbAvaOG7Q1HeVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g7FnTqIaC5rPEtGlMnvlVMxUwuEJV5I3AnwxBEaturc=;
- b=ot5V9Bb0y2yFXAVj2YI7D2Z7hDrH/u1s5sdP7kA2Gc6jH3A3OTQwbNZtw+z0oJKdlLwe9MUVFBXxPLb00ejlu7rbOJ3eXIgPWwjnofqxReDlojE62fVp+uoY3SU9ZP6slDuGGq2kpF8bD9ltq0wdsHrSin5D/WEEaCLI0E9/H1n6ELNZDZ5yvV6YfTLwIi1tYsJLiacUvr6mTz2m1as5F+p0a1v6Fktcc7k3Ri4ZNI5iyK56NekEjV8vtVRuEufZ9zvDlEx+GqStJA0PWdrwpQMqXEJ+cIxnu3t3zNdNzu9AfY2mt9vs006zn7XxeSz0wjgig4dN6bMzpqYB+vyPag==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB5877.namprd12.prod.outlook.com (2603:10b6:510:1d5::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.16; Thu, 1 Jun
- 2023 20:48:29 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6433.024; Thu, 1 Jun 2023
- 20:48:29 +0000
-Date:   Thu, 1 Jun 2023 17:48:27 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Longfang Liu <liulongfang@huawei.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH] vfio: Fixup kconfig ordering for VFIO_PCI_CORE
-Message-ID: <ZHkEG28EFVDKVb/Z@nvidia.com>
-References: <0-v1-7eacf832787f+86-vfio_pci_kconfig_jgg@nvidia.com>
- <20230601144238.77c2ad29.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230601144238.77c2ad29.alex.williamson@redhat.com>
-X-ClientProxiedBy: YT4PR01CA0151.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:ac::18) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S230467AbjFAVXn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 17:23:43 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25E3F1A2
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 14:23:38 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1a950b982d4so50265ad.0
+        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 14:23:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685654617; x=1688246617;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+anUQPQ5nwJea5x9S41SzUJzVAZ4hONAhzugoJuW63k=;
+        b=gf+KwotDEfn2Fr2bIkJVU9msFMj7Tcqe5rtZDxlimO0mw8cHxo22Jb+YfIPoUB9LYv
+         /pK/q/mTyV2kXEzJPwjaaSdv7GykOoP7OYogZUwsYcASZfdXHizPtCeqmMRkSeFHAgf4
+         rzgG2JUoD9vvh/S6yWJh51kJFXJqyDrvY226RrtE4mzVZPpyC/0zN/GXLT3EeQRfZxiq
+         QgfJyK2Q/vOPRM4kKY26Weoc49CkImkvPQ2y5BYn6fd4LwYski73cWMHgGx/NoRFGllq
+         Y5C58ftBUm8J2I0f2DRxdz8+7T+d0U+zdpRyzBX9LRD2oKKzHtSsieH3AeQu7hOcq6Yr
+         R8/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685654617; x=1688246617;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+anUQPQ5nwJea5x9S41SzUJzVAZ4hONAhzugoJuW63k=;
+        b=i9L6ZRnk/WpZc7HquvdfeFIcvzq8FU/C2ByCnWmeb/ZZmxRVd6jlUOZCIAIg4Wxijn
+         sK9vHrLv3y+wiY8CMLaZPHHDN4pjQXZZyv00z3zQ6WspTFhkmeonOOHGq9vcU5gVmec5
+         2lU2Dh4pCvsQXBhrEtTbe90AgJfO528VvoZkG4dXx4o5/KcPVv2LGTu3Wy5elwWqlvA/
+         InHGy2J6nM4R1Q84jZhiPM2Sp+bN68g8KrYYUI7sEtTI/kjzjr18rkHvADJdZGhkMGMk
+         hPK4YB5goqjP8jECW5pk3dEBjR7poUM0fhrKKBTzF7MI/4LQHsbCp5hOayhdn7lPZzB9
+         ScnQ==
+X-Gm-Message-State: AC+VfDyuss3NT4V2uLylkWcS9FOMGzAyLrMyqXOtDJt65+9gIF5V3EsE
+        tx8MWIQprQAJ14E1ALKRAapn367mE2Ui7gDlFOXJqEjSb3/7im/ySXc=
+X-Google-Smtp-Source: ACHHUZ49YwOiHVnPivj1UlyMIXNWd6YKixq9CTGwvl1CukOZ51h+EvZAq/xgXhV/G4Xc9X7W+TPvgiN5RNIO70s97v4=
+X-Received: by 2002:a17:903:27c7:b0:1b0:5304:5b6b with SMTP id
+ km7-20020a17090327c700b001b053045b6bmr62185plb.20.1685654617442; Thu, 01 Jun
+ 2023 14:23:37 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB5877:EE_
-X-MS-Office365-Filtering-Correlation-Id: ed29d077-cea7-4775-518f-08db62e18dda
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zuvwTySV0lzUB1VrCKVSsW46UJJ3NTKHKhhcVmc7A7k8bOcSVNmQ/CtvsdbQhdmnRttgkKFku9j9DTH3cLW+j30IWPHOokJVe3JnbsMaOAHN0YtDOy1kH/l1D0sjCLWAju23VDyHX1mdl3DccBjEL+pukprwLH/MsNLr7eL/pxN+Pt3IUSNn0cSzdkMCgtRZhkFq5r5laQpLaMrqCOT9gci0f8Jn10UcCgaU7jWDYg03f52H5apsFz9lDiRfD42pCOFTQyUKtGKyVgBPxieGsRHIBE+oKK8CcG64DTHXrKJGYYcl99MIfZN7cxHX8eESwa/p5xcUucUpTlzdVQBFxVcI1qc6BqocFz+SqjNjVzGGNGiiQE6xbSWXggkM+Wmom8tR2k6viVJZHHzgQLb+sIPlefZVUfR06hRrXJZY8Pj4fNVaSeiB56wLdG7FZmnD1YyfqfM47X+8r8XJp+ihqzaBrvtwW2Cduepd7dL6RPp9H93+Hsj+EdB54/EIxBK4DZtDrHVXWtMznvSySPoJNrd6vWftjYqKaD01c4ReulJrTZbKSiR6JRLbJXBkNvWR
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(376002)(366004)(136003)(396003)(451199021)(36756003)(54906003)(86362001)(66476007)(66946007)(66556008)(316002)(478600001)(6916009)(4326008)(8936002)(6486002)(5660300002)(41300700001)(26005)(8676002)(38100700002)(186003)(107886003)(6512007)(6506007)(83380400001)(2616005)(2906002)(4744005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mn3gxzd0AsM9uutMWhEB+ZufYcRvdOWugLscPV36fc+saippWg8fwRl+K7NZ?=
- =?us-ascii?Q?ZoD54vcTWoPydyG9a3c6pyjsqZsZp7wUikugGZz0YE1JHGLEQcOzjADOZvDZ?=
- =?us-ascii?Q?ab4JjPrxg9WYTYqI1J9MX1RtQ+hS4Vrqbw+kreLiTxXWfcMWcf21eCdai//b?=
- =?us-ascii?Q?NJns1bAzdE0TW7mkoaouBjp3/D/Se07GivGWWOdEFkZgJTZkv5hLWdeVbYNd?=
- =?us-ascii?Q?HHFs/k1yv9M7Y1Ln71pK9k+bWassT4eB1KfL1GIWhMTa3NXOgdCQFccvC0f/?=
- =?us-ascii?Q?T76Dd6I4eSg7NpGzGR9E4JINhp7a541S7qWNSrUe8SFXPAafAgHuR64Ekadc?=
- =?us-ascii?Q?dGsfVSURkDRgJszKshrCOjn+MgFU4P+ltYWrsrsg/ag74oTkPpM1ywMkvKzX?=
- =?us-ascii?Q?px0kdiWh+h9MeT1ISZUmJh+CkezKLUCI9b0Ml7LrUASI2kYAdRS+/jqnsoNh?=
- =?us-ascii?Q?r0r10CDSmzqTKx1YV452PU3d4Ze/jFJvY486Qa7A/AoexmzZQiRjEBA0x1a3?=
- =?us-ascii?Q?YWGqq/9APvQEeOfWGJHFjQE4DgKZqqEuzva8G1WFVQWyyrh7xhD25ApDU3Ni?=
- =?us-ascii?Q?mPF87nvNQ4qB17tebiYukZQjN8N+Jp84PzWRdqcJZ7AMzkUR6f6h5FldSinM?=
- =?us-ascii?Q?HSUeZYjLGcwzoOm7w+TTtYBi0j0LEbiETpYcc+m7VbuR99B33QLiQmiNHr9h?=
- =?us-ascii?Q?6cwjKg63ScJoOg3FlIl0FpGc+B+ajKyznwBVmACqFf5IolAV4GREuKh0gEp4?=
- =?us-ascii?Q?8c12Wm/vq68eiN54hbnmwvKoPmC82B6hHdxkHLsW9QAec/+L2OkuRmCMP0o0?=
- =?us-ascii?Q?75MLrO33yALAgPMRW943rPKdS0oOVXgameQmIlyIMMrM6MQ3y1JnF4/eQ42S?=
- =?us-ascii?Q?8NUg99Fd/a/f1yZgZlv6cS/68e5LFhFvhOvrAbpaKV0q56HtHhmw4UoySEj9?=
- =?us-ascii?Q?Ox54KupvueEU7j9hOQJ1yFpkYbv6kjMZ67DMm+uccl60VVybeWmEPt9Ksg2q?=
- =?us-ascii?Q?yw/2QUmWBnkrNsalsHrJuveOgyPYdxAdLufOSl8ToVXDF6D0Sq/QjVsw5pz1?=
- =?us-ascii?Q?2ZMCQXaSsXdw7FW8ZmeoDOdcWR4Jam1r5XzvRnoK0zIY3LgLl5jJa3Y81rvZ?=
- =?us-ascii?Q?RQOYVCwSCHRnTXbaRRGCmRwFwDh61GBBhL6Xh8q1snTRHA44fzJrV0ZYmfOa?=
- =?us-ascii?Q?WoHnzEJ0O4aNgfZ71+KjnexRGAe7CyvZDNPtZls7B9Jn/+PqBzl0DN+8tp1/?=
- =?us-ascii?Q?tHP+MAa/1gFGqZYj+B5Y4/ZUO1MnIQb1LfQ0IYoiWfO9ZCGNTs6PQFQyErMV?=
- =?us-ascii?Q?spLqFIyiEQ7yJPwVPxGWy+thdo4vHdCba5GYH681iCcqDQM53kpNYY8js/H8?=
- =?us-ascii?Q?/hDLfdIcxPopOFPp1Djcd3tf0VqD4VD6Id/taUnb+kImLSYNUhkd+QIxr7ld?=
- =?us-ascii?Q?NQ/er4qhhO8wKq2f7ZFguR3VjJXvHJm+JMxz4tFGNmngeRsOymzJPUkgL+e3?=
- =?us-ascii?Q?AHULah9GcsjHRYLu1KzRJK/cZLq6puQ+XKupjPBrPQrrwDRlf14iFlJSkmj6?=
- =?us-ascii?Q?LHgHKlgEiXCsjtjkCCpRNRTW/bLC3JiWeNtqHJFw?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed29d077-cea7-4775-518f-08db62e18dda
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jun 2023 20:48:29.1411
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qfKG9Orgp927saTNl7GQO/oUySv6i3v7pNthgtnmRIE+QgJ7/HMJ4wVrdaG91PSu
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5877
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+References: <9d37ab07-97c6-5245-6939-9c1090b4b3a9@redhat.com>
+ <ECE9A3B4-2CF3-452A-838A-99BE075D5E68@nutanix.com> <3cb96907-0d58-ba60-ed0e-6c17c69bd0f8@redhat.com>
+ <CALMp9eQNNCwUbPQGBfHzWnTAEJeRO-fjQAFxb9101SChe9F5rg@mail.gmail.com>
+ <623EC08D-A755-4520-B9BF-42B0E72570C1@nutanix.com> <CALMp9eQ17+XRpxJjMnmvPnKOC1VP1P=mU-KykoOzYZsgtGN8sQ@mail.gmail.com>
+ <658D3EF0-B2D3-4492-A2A1-FC84A58B201D@nutanix.com> <ZHjYsKVBFLsOmHcF@google.com>
+ <BF7121B7-B2AE-4391-9D1B-D944B5BC44D0@nutanix.com> <CALMp9eQ247GCxHnn3VwFatKEswWq9cMaoZCOivC-OQ_asvFHZQ@mail.gmail.com>
+ <ZHkBJ+RdPYIZjolX@google.com>
+In-Reply-To: <ZHkBJ+RdPYIZjolX@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 1 Jun 2023 14:23:26 -0700
+Message-ID: <CALMp9eTja2iFa8dW4vPdTeFAZkvMGQ2FD45239BYcTr-Nh88rA@mail.gmail.com>
+Subject: Re: [PATCH v4] KVM: VMX: do not disable interception for
+ MSR_IA32_SPEC_CTRL on eIBRS
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Jon Kohler <jon@nutanix.com>, Waiman Long <longman@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 01, 2023 at 02:42:38PM -0600, Alex Williamson wrote:
-> On Mon, 29 May 2023 14:47:59 -0300
-> > +config VFIO_PCI_CORE
-> > +	tristate "VFIO support for PCI devices"
-> > +	select VFIO_VIRQFD
-> > +	select IRQ_BYPASS_MANAGER
-> > +	help
-> > +	  Base support for VFIO drivers that support PCI devices. At least one
-> > +	  of the implementation drivers must be selected.
-> 
-> As enforced by what?
+On Thu, Jun 1, 2023 at 1:35=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Thu, Jun 01, 2023, Jim Mattson wrote:
+> > On Thu, Jun 1, 2023 at 12:28=E2=80=AFPM Jon Kohler <jon@nutanix.com> wr=
+ote:
+> > > > diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> > > > index c544602d07a3..454bcbf5b543 100644
+> > > > --- a/arch/x86/kvm/x86.h
+> > > > +++ b/arch/x86/kvm/x86.h
+> > > > @@ -492,7 +492,31 @@ static inline void kvm_machine_check(void)
+> > > >
+> > > > void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
+> > > > void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
+> > > > +
+> > > > int kvm_spec_ctrl_test_value(u64 value);
+> > > > +
+> > > > +static inline bool kvm_account_msr_spec_ctrl_write(struct kvm_vcpu=
+ *vcpu)
+> > > > +{
+> > > > +     if ((vcpu->stat.exits - vcpu->arch.spec_ctrl_nr_exits_snapsho=
+t) < 20)
+> >
+> > I think you mean 200 here. If it's bad to have more than 1
+> > WRMSR(IA32_SPEC_CTRL) VM-exit in 20 VM-exits, then more than 10 such
+> > VM-exits in 200 VM-exits represents sustained badness.
+>
+> No?  The snapshot is updated on every write, i.e. this check is whether o=
+r not
+> the last wrmsr(SPEC_CTRL) was less than 20 cycles ago.
+>
+>        if ((vcpu->stat.exits - vcpu->arch.spec_ctrl_nr_exits_snapshot) < =
+20)
+>                vcpu->arch.nr_quick_spec_ctrl_writes++;
+>        else
+>                vcpu->arch.nr_quick_spec_ctrl_writes =3D 0;
 
-Doesn't need to be enforced. Probably should have said "should"
+Okay, then maybe this else clause is too aggressive. Just because we
+went 21 VM-exits without seeing a WRMSR(IA32_SPEC_CTRL), we don't want
+to clobber all of our history.
 
-> This is just adding one more layer of dependencies in order to select
-> the actual endpoint driver that is actually what anyone cares about.
-
-This is making the kconfig more logical and the menu structure better
-organized. We eliminate the need for the drivers to set special
-depends because the if covers them all.
-
-> I don't see why we wouldn't just make each of the variant drivers
-> select VFIO_PCI_CORE.  Thanks,
-
-It can be done, but it seems more fragile.
-
-Jason
+>        vcpu->arch.spec_ctrl_nr_exits_snapshot =3D vcpu->stat.exits;  <=3D=
+ new snapshot
+>
+>        return vcpu->arch.nr_quick_spec_ctrl_writes >=3D 10;
+>
+> > (Although, as Sean noted, these numbers are just placeholders.)
+>
+> And the logic is very off-the-cuff, e.g. it may be better to have a rolli=
+ng 200-exit
+> window instead of 10 somewhat independent 20-exit windows.
