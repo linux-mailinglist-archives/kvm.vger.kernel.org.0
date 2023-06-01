@@ -2,108 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DF7D71F4A8
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 23:29:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E278071F511
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 23:50:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232235AbjFAV3l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 17:29:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48996 "EHLO
+        id S231179AbjFAVua (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 17:50:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230397AbjFAV3j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 17:29:39 -0400
-Received: from out-50.mta1.migadu.com (out-50.mta1.migadu.com [95.215.58.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DAEC184
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 14:29:38 -0700 (PDT)
-Date:   Thu, 1 Jun 2023 21:29:31 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1685654976;
+        with ESMTP id S232994AbjFAVuN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 17:50:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63F3AE76
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 14:49:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685656142;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=knI9AIkV5UPc98gICILs0zDsv+6LfXVKGVQS/To328I=;
-        b=hIZZwDG3D74IbuDYvfgBJ4WCCM6DB8SSgtKfWF+92G2+2bqm7w2rjTTlf1JxJKQ0O3oKGo
-        beJ/55KEYSDw/GQM9ELraMazMDKtWwW+Lfj7Iu7YEphpsyyfcMa2Y0tq/jUuqE/AQ4Bbf6
-        q50/lSein0U5FROit7jlsA1PomEVumE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     pbonzini@redhat.com, maz@kernel.org, seanjc@google.com,
-        jthoughton@google.com, bgardon@google.com, dmatlack@google.com,
-        ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 05/22] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-Message-ID: <ZHkNu6dWV+5iqTuy@linux.dev>
-References: <20230412213510.1220557-1-amoorthy@google.com>
- <20230412213510.1220557-6-amoorthy@google.com>
- <ZHj25HsCExz/uCo/@linux.dev>
- <CAF7b7mrK+SgyxjYqMyJC0PA4C8SFRX_Q=x7Db+Ck8i89wzvw8w@mail.gmail.com>
+        bh=PELrOUSaGQYkmJ7KQAjCHNVO7U9hEY8agkWV8L2aw1s=;
+        b=L4CbqqbekP6gJTuqpSA6hMY7Ix7vUE977IgNVGfEDzlU9uLzDPu4nd113uPSeyGFZgiVGB
+        pqdwoO7Dfct5+uJdscVbmdOiYOfNhgJcIUfykG3Xu8R5DbKuNVxv1gjsbun68EWeG9ro8Y
+        SScRmaDK2/KdQORFkm+4f/rmAQjJds0=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-588-jASmm308OJmKcJ-UVpSDEA-1; Thu, 01 Jun 2023 17:49:01 -0400
+X-MC-Unique: jASmm308OJmKcJ-UVpSDEA-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-769036b47a7so35770039f.0
+        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 14:49:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685656140; x=1688248140;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PELrOUSaGQYkmJ7KQAjCHNVO7U9hEY8agkWV8L2aw1s=;
+        b=I9bjreNDYXtJ8+qLXackM/z2Ajw0SmEseKRoHcfa1kJrZdQd3RIUnTAEznFrVEWPal
+         /ZQHeCWEWBU35iTie3Cyzgy27L3q57In3+2SyWPMakDRrUa+83dGY1l3S43YnDoXu1N6
+         RTVPFSboek4djUplae152DCY8g/uEL1DTzwYbDcP4UCxGsJiAntg74xreh0iBqa9ie2h
+         67P6v1+VQWq4CBI09TQ3vtwWeFVZWPspz/bJmrxxlWzS5uPiyWXRbqyAjyPZRbvFyour
+         KK+QnPT+ylLyR/x+6J9S6cHRGUB78ItVbeLLSiBZ0sVzvNV4uXepTaEw8YBNOpBJm2XC
+         x8ZA==
+X-Gm-Message-State: AC+VfDxauYDjR39QQh/9MvXJVUk80473whWE9GOp96xnzyo+jfxzqD5y
+        BT/GqsLfI6DNdaJ5PP8lUG6atEuKgUH6psZfSIGaOHbw4buYMwC6KTV3gjzYAmCX1ufmfdj8Lcu
+        3ZXeQjQE54gqTHOcErFX8
+X-Received: by 2002:a5d:884c:0:b0:717:ce6a:188a with SMTP id t12-20020a5d884c000000b00717ce6a188amr493388ios.18.1685656140016;
+        Thu, 01 Jun 2023 14:49:00 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6+NTs68CmLSK7I4KHPMaGzibqoBNcjTeCpMt/yqB5ULhUf+X6q0/msn0T+dpasC3GjmbM6aA==
+X-Received: by 2002:a5d:884c:0:b0:717:ce6a:188a with SMTP id t12-20020a5d884c000000b00717ce6a188amr493383ios.18.1685656139720;
+        Thu, 01 Jun 2023 14:48:59 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id k4-20020a02c644000000b004161870da90sm93920jan.151.2023.06.01.14.48.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jun 2023 14:48:59 -0700 (PDT)
+Date:   Thu, 1 Jun 2023 15:48:57 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Longfang Liu <liulongfang@huawei.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH] vfio: Fixup kconfig ordering for VFIO_PCI_CORE
+Message-ID: <20230601154857.62cbe199.alex.williamson@redhat.com>
+In-Reply-To: <ZHkEG28EFVDKVb/Z@nvidia.com>
+References: <0-v1-7eacf832787f+86-vfio_pci_kconfig_jgg@nvidia.com>
+        <20230601144238.77c2ad29.alex.williamson@redhat.com>
+        <ZHkEG28EFVDKVb/Z@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAF7b7mrK+SgyxjYqMyJC0PA4C8SFRX_Q=x7Db+Ck8i89wzvw8w@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 01, 2023 at 01:30:58PM -0700, Anish Moorthy wrote:
-> On Thu, Jun 1, 2023 at 12:52 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> >    Eventually, you can stuff a bit in there to advertise that all
-> >    EFAULTs are reliable.
+On Thu, 1 Jun 2023 17:48:27 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Thu, Jun 01, 2023 at 02:42:38PM -0600, Alex Williamson wrote:
+> > On Mon, 29 May 2023 14:47:59 -0300  
+> > > +config VFIO_PCI_CORE
+> > > +	tristate "VFIO support for PCI devices"
+> > > +	select VFIO_VIRQFD
+> > > +	select IRQ_BYPASS_MANAGER
+> > > +	help
+> > > +	  Base support for VFIO drivers that support PCI devices. At least one
+> > > +	  of the implementation drivers must be selected.  
+> > 
+> > As enforced by what?  
 > 
-> I don't think this is an objective: the idea is to annotate efaults
-> tracing back to user accesses (see [2]). Although the idea of
-> annotating with some "unrecoverable" flag set for other efaults has
-> been tossed around, so we may end up with that.
-
-Right, there's quite a bit of detail entailed by what such a bit
-means... In any case, the idea would be to have a forward-looking
-stance with the UAPI where we can bolt on more things to the existing
-CAP in the future.
-
-> [2] https://lore.kernel.org/kvm/20230412213510.1220557-1-amoorthy@google.com/T/#m5715f3a14a6a9ff9a4188918ec105592f0bfc69a
+> Doesn't need to be enforced. Probably should have said "should"
 > 
-> > [*] https://lore.kernel.org/kvmarm/ZHjqkdEOVUiazj5d@google.com/
-> >
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index cf7d3de6f3689..f3effc93cbef3 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -1142,6 +1142,7 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
-> > >       spin_lock_init(&kvm->mn_invalidate_lock);
-> > >       rcuwait_init(&kvm->mn_memslots_update_rcuwait);
-> > >       xa_init(&kvm->vcpu_array);
-> > > +     kvm->fill_efault_info = false;
-> > >
-> > >       INIT_LIST_HEAD(&kvm->gpc_list);
-> > >       spin_lock_init(&kvm->gpc_lock);
-> > > @@ -4096,6 +4097,8 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> > >                       put_pid(oldpid);
-> > >               }
-> > >               r = kvm_arch_vcpu_ioctl_run(vcpu);
-> > > +             WARN_ON_ONCE(r == -EFAULT &&
-> > > +                                      vcpu->run->exit_reason != KVM_EXIT_MEMORY_FAULT);
-> >
-> > This might be a bit overkill, as it will definitely fire on unsupported
-> > architectures. Instead you may want to condition this on an architecture
-> > actually selecting support for MEMORY_FAULT_INFO.
+> > This is just adding one more layer of dependencies in order to select
+> > the actual endpoint driver that is actually what anyone cares about.  
 > 
-> Ah, that's embarrassing. Thanks for the catch.
+> This is making the kconfig more logical and the menu structure better
+> organized. We eliminate the need for the drivers to set special
+> depends because the if covers them all.
 
-No problem at all. Pretty sure I've done a lot more actually egregious
-changes than you have ;)
+We can create a menu with a dummy config option, ex:
 
-While we're here, forgot to mention it before but please clean up that
-indentation too. I think you may've gotten in a fight with the Google3
-styling of your editor and lost :)
+config VFIO_PCI_DRIVERS
+        bool "VFIO support for PCI devices"
+        default y
 
--- 
-Thanks,
-Oliver
+if VFIO_PCI_DRIVERS
+...
+
+So the menu organization itself isn't sufficient for me to make
+VFIO_PCI_CORE to root of that menu.
+
+The flip side of requiring drivers to set a "special depends" is that
+it's possible we might have a PCI variant driver that doesn't use
+VFIO_PCI_CORE.  It would be a hard sell, but it's possible.  It also
+shouldn't be terribly subtle to the existing variant drivers relying on
+vfio-pci-core that this dependency exists.
+
+Allowing VFIO_PCI_CORE without building an in-kernel module that
+depends on it seals the deal for me that this is the wrong approach
+though.
+
+> > I don't see why we wouldn't just make each of the variant drivers
+> > select VFIO_PCI_CORE.  Thanks,  
+> 
+> It can be done, but it seems more fragile.
+
+How so?  Thanks,
+
+Alex
+
