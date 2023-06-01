@@ -2,105 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29FFD71A3AD
-	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 18:05:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8580A71EEA3
+	for <lists+kvm@lfdr.de>; Thu,  1 Jun 2023 18:21:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234606AbjFAQFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 12:05:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32938 "EHLO
+        id S231319AbjFAQVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 12:21:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234764AbjFAQEv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 12:04:51 -0400
-Received: from out-17.mta0.migadu.com (out-17.mta0.migadu.com [IPv6:2001:41d0:1004:224b::11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 191FBB3
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 09:04:49 -0700 (PDT)
-Date:   Thu, 1 Jun 2023 16:04:43 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1685635488;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HJ0BnJ5Z1HoNgG6VdWoHZwHdBQsBDD4dVK/Okzl/Wvo=;
-        b=uXGisnGfpdnhy6dHM6x0TkBItta0ube4Zqy3ePPn0XioEuOaO7arFQZLCCteh4MkyAJmzr
-        dSbGfMGVJBpmSPLO99K7PpGB3CCPE1KAGL+nDG3BvC833kadH/6TCmU+NsriJzY6yiUIVg
-        9vAvzQaMzkiEMmmMHbZk1U14DeDabo0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Anish Moorthy <amoorthy@google.com>, pbonzini@redhat.com,
-        maz@kernel.org, jthoughton@google.com, bgardon@google.com,
-        dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com,
-        peterx@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 17/22] KVM: Introduce KVM_CAP_ABSENT_MAPPING_FAULT
- without implementation
-Message-ID: <ZHjBm1DNK28B4Ujq@linux.dev>
-References: <20230412213510.1220557-1-amoorthy@google.com>
- <20230412213510.1220557-18-amoorthy@google.com>
- <ZEbueTfeJugSl31X@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZEbueTfeJugSl31X@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231192AbjFAQU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 12:20:59 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCB05134
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 09:20:58 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-561eb6c66f6so14519927b3.0
+        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 09:20:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685636456; x=1688228456;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=I8MtW2Q7n+8kVk0jNDBvQTtFEDaPcuPqWej2hGKW7Ww=;
+        b=ajNXyHBOUOC4trVOpRJKJj1vcm+0E379aucFQj2qjWrtdK8kMcjJVq6bwo/QPJJpsf
+         ixvGSXMSfV0z2Bk5Ec41a/v8skxddaBMr7chx4+mg9OK4C3WscU7DpDW+2Ts2pBLCPhK
+         KBGyb8U780xfJMXEN041JZvhKVFCH9McPcVt8xQ+UgtC8IaFVp1yh8+qXsdOPQxRiIep
+         cU46b/x8Sk0XBsoT2T7yMeZA66gdwKQnzimTkyBuveQ/qMTBw49LpeAPlQleXRLYVlu3
+         AMJ9WO7BiKhuv8+CTqgLwSHlSyAUID3JKCDsgcrldqjoUPsiTOFAVlTJF3Fb4ubz/pGX
+         isGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685636456; x=1688228456;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I8MtW2Q7n+8kVk0jNDBvQTtFEDaPcuPqWej2hGKW7Ww=;
+        b=W5D3hdvEuXah874omUrFwe2wF2ZsBfaHcYL04GIbIsjebkVEqkt0/W+dBmKQL3tlER
+         n5dC0OfCBgAq6VEcYhlfrZs8BqG7Dg0QXQ2MLNUYRmMnc+cmxdiPlSSgj0XIO3sEoIOz
+         b/56gTlaPLPyTYtcizmCMMkbgHf+lT+iNy8dYIvtKdQ3sxZTAsmFLLZEXiI/ozrDMK0K
+         bY2K+NJKzzYiVXwY02enVO6+mhdPkzBXOw6bhuQokyIPo352IKiOmlc4sH1thNcZo9Bh
+         SvrfwspsY/bSZZvwue905GJnctMTzCO5g0IrgLmoBvTtCxoIPUeBTvIufff4KuoxTodl
+         4Ckg==
+X-Gm-Message-State: AC+VfDzR33GARqsxRIY7EjhrASBMgHsbBLJe2h8QVV3ALcxUsah59rJC
+        NlopqgVaLwSRYO5l3bRdbYbtsvwwFhs=
+X-Google-Smtp-Source: ACHHUZ6YvIG3cYXg02rNK4YX0kLcjPJqydSFn7vmiEQVEqNHhuwarV6iA3Sv8RueaV8SWnVS5rkfcHytUGk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ad5c:0:b0:565:b7d6:712d with SMTP id
+ l28-20020a81ad5c000000b00565b7d6712dmr5681145ywk.2.1685636456512; Thu, 01 Jun
+ 2023 09:20:56 -0700 (PDT)
+Date:   Thu, 1 Jun 2023 09:20:54 -0700
+In-Reply-To: <DS0PR11MB6373F567D22270CA3CE86696DC499@DS0PR11MB6373.namprd11.prod.outlook.com>
+Mime-Version: 1.0
+References: <20230307135233.54684-1-wei.w.wang@intel.com> <ZAkZjzQ8pJQXQhJR@google.com>
+ <DS0PR11MB6373F567D22270CA3CE86696DC499@DS0PR11MB6373.namprd11.prod.outlook.com>
+Message-ID: <ZHjDra1HbG65o4uH@google.com>
+Subject: Re: [PATCH v2] KVM: allow KVM_BUG/KVM_BUG_ON to handle 64-bit cond
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wei W Wang <wei.w.wang@intel.com>
+Cc:     "dmatlack@google.com" <dmatlack@google.com>,
+        "mizhang@google.com" <mizhang@google.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Better late than never right? :)
-
-On Mon, Apr 24, 2023 at 02:02:49PM -0700, Sean Christopherson wrote:
-> On Wed, Apr 12, 2023, Anish Moorthy wrote:
-> > Add documentation, memslot flags, useful helper functions, and the
-> > actual new capability itself.
+On Thu, Jun 01, 2023, Wei W Wang wrote:
+> On Thursday, March 9, 2023 7:26 AM, Sean Christopherson wrote:
+> > On Tue, Mar 07, 2023, Wei Wang wrote:
+> > > Current KVM_BUG and KVM_BUG_ON assume that 'cond' passed from
+> > callers
+> > > is 32-bit as it casts 'cond' to the type of int.
 > > 
-> > Memory fault exits on absent mappings are particularly useful for
-> > userfaultfd-based postcopy live migration. When many vCPUs fault on a
-> > single userfaultfd the faults can take a while to surface to userspace
-> > due to having to contend for uffd wait queue locks. Bypassing the uffd
-> > entirely by returning information directly to the vCPU exit avoids this
-> > contention and improves the fault rate.
+> > You're very generous, I would have led with "Fix a badly done
+> > copy+paste ..." ;-)
 > > 
-> > Suggested-by: James Houghton <jthoughton@google.com>
-> > Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst | 31 ++++++++++++++++++++++++++++---
-> >  include/linux/kvm_host.h       |  7 +++++++
-> >  include/uapi/linux/kvm.h       |  2 ++
-> >  tools/include/uapi/linux/kvm.h |  1 +
-> >  virt/kvm/kvm_main.c            |  3 +++
-> >  5 files changed, 41 insertions(+), 3 deletions(-)
+> > > Fixes: 0b8f11737cff ("KVM: Add infrastructure and macro to mark VM as
+> > > bugged")
+> > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > ---
 > > 
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index f174f43c38d45..7967b9909e28b 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -1312,6 +1312,7 @@ yet and must be cleared on entry.
-> >    /* for kvm_userspace_memory_region::flags */
-> >    #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
-> >    #define KVM_MEM_READONLY	(1UL << 1)
-> > +  #define KVM_MEM_ABSENT_MAPPING_FAULT (1UL << 2)
+> > Reviewed-by: Sean Christopherson <seanjc@google.com>
 > 
-> This name is both too specific and too vague.  It's too specific because it affects
-> more than just "absent" mappings, it will affect any page fault that can't be
-> resolved by fast GUP, i.e. I'm objecting for all the same reasons I objected to
-> the exit reason being name KVM_MEMFAULT_REASON_ABSENT_MAPPING.  It's too vague
-> because it doesn't describe what behavior the flag actually enables in any way.
-> 
-> I liked the "nowait" verbiage from the RFC.  "fast_only" is an ok alternative,
-> but that's much more of a kernel-internal name.
-> 
-> Oliver, you had concerns with using "fault" in the name, is something like
-> KVM_MEM_NOWAIT_ON_PAGE_FAULT or KVM_MEM_NOWAIT_ON_FAULT palatable?  IMO, "fault"
-> is perfectly ok, we just need to ensure it's unlikely to be ambiguous for userspace.
+> Kind ping on this patch.
+> Seems it wasn't noticed for months. Just check if it would be good to be
+> merged or not proper for any reason?
 
-Yeah, I can get over it. Slight preference towards KVM_MEM_NOWAIT_ON_FAULT,
-fewer characters and still gets the point across.
-
--- 
-Thanks,
-Oliver
+I'll grab it for 6.5.
