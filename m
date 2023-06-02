@@ -2,130 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F133071FD5A
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 11:13:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96ACA71FD19
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 11:06:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235167AbjFBJNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 05:13:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36298 "EHLO
+        id S234991AbjFBJGa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 05:06:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234951AbjFBJMz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 05:12:55 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A8DBE53;
-        Fri,  2 Jun 2023 02:12:07 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3529C6lw007165;
-        Fri, 2 Jun 2023 09:12:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=BphDo7SYl4JXQoWm57B958TDvZRNRFZ9/el7jw7zdq0=;
- b=MPq9xYK/3zbZ6SBxhz+FWtw8VNUv/KfvoQ662tOFdg+kWU5wvSDZcvtUUW0R1C6zdfB7
- jV1E2Lmy01LiadHnEeiS1754wZExYCX8GN0CdeiL0TkD0VP7oxBHNhqOF/3P6t5ZSuZ0
- JHaUPDu9cCSs2VAfO9z7b9H1+ZlBZfAG82qsmqUUgG+hnYmx0bw3SMpvvpa/9cOlgEW1
- 2vg9U75YAOL6RDFnfFSWdNHXCe1GUmr5Xxh+OrrpR3mfpP7fT19x+IJezQvu6osqpzla
- gYuQvUy7G3oCG/AUkNaLoHalmQDp4EmTHWnfletDjdzVKRNfZXjwplM3Ht6wHb0tUPkQ WA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qyd0qrhxw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Jun 2023 09:03:51 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3528kGY6025906;
-        Fri, 2 Jun 2023 09:03:51 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qyd0qrhx3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Jun 2023 09:03:51 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3523bPAx014117;
-        Fri, 2 Jun 2023 09:03:49 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3qu94eaewj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Jun 2023 09:03:48 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35293jPx43778548
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 2 Jun 2023 09:03:45 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 41BC820043;
-        Fri,  2 Jun 2023 09:03:45 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC9F220040;
-        Fri,  2 Jun 2023 09:03:44 +0000 (GMT)
-Received: from [9.171.82.186] (unknown [9.171.82.186])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  2 Jun 2023 09:03:44 +0000 (GMT)
-Message-ID: <1cbd5a01-6a7a-38a0-5d41-422317dbe2c7@linux.ibm.com>
-Date:   Fri, 2 Jun 2023 11:03:44 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [kvm-unit-tests PATCH v9 2/2] s390x: topology: Checking
- Configuration Topology Information
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     thuth@redhat.com, kvm@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, nsg@linux.ibm.com
-References: <20230519112236.14332-1-pmorel@linux.ibm.com>
- <20230519112236.14332-3-pmorel@linux.ibm.com>
- <fa415627-bfff-cc18-af94-cf55632973d5@linux.ibm.com>
- <168569490681.252746.1049350277526238686@t14-nrb>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <168569490681.252746.1049350277526238686@t14-nrb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: fdjl7mhQ-yMyMHlNbMVJKn1Pc2-1bzXB
-X-Proofpoint-GUID: bI6_XymwVr4JVMT_6iv7MZjjuh7cBH5s
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-02_06,2023-05-31_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- lowpriorityscore=0 mlxlogscore=999 clxscore=1015 priorityscore=1501
- suspectscore=0 malwarescore=0 spamscore=0 impostorscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306020068
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S235015AbjFBJGF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 05:06:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD7CA172A
+        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 02:05:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8C08C64DB9
+        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 09:05:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFE24C43443;
+        Fri,  2 Jun 2023 09:05:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685696720;
+        bh=gV19WUb11hoo0vbk5f8hro1RpEfA3/kK52O1V4qHOEI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=QP9MiC0C+kAhfkwc0YMZLL5lrq2HgWy1MmkYXdNnHSyjOdLU0z6UgHz3a8h75p3J8
+         sNm/RvU8z8z5kC68Cv/LrgetZPdZ4zlzbjBp8HwjdxAfy9wlChD+m2q85jVc/3RCCA
+         bNDYC+rq4WMuBs73DbTg8kNv8zHUR8Wnw3oFmo9Psilv1jSViOyuBU0b+Q8LvGTM1O
+         4w5LU/EY05ouFmQ+y3iZSxrRz1DddZBvEkHMAWb4pZawX5mQ1NmG1MvrECZBGKJRV4
+         BY9EUG4hfgfNKU14DxPdFwTgnA8P7pRFg2fjYeTNU1ISJiPKb48cFjMRZg6UM+jqef
+         20ajp+aigv3RA==
+Received: from 90.4.23.109.rev.sfr.net ([109.23.4.90] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q50ii-002I6P-PL;
+        Fri, 02 Jun 2023 10:05:17 +0100
+Date:   Fri, 02 Jun 2023 10:05:15 +0100
+Message-ID: <874jnqp73o.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 0/4] KVM: arm64: PMU: Fix PMUVer handling on heterogeneous PMU systems
+In-Reply-To: <20230602052323.shjn3q2rslbuwcmc@google.com>
+References: <20230527040236.1875860-1-reijiw@google.com>
+        <87zg5njlyn.wl-maz@kernel.org>
+        <20230530125324.ijrwrvoll2detpus@google.com>
+        <87mt1jkc5q.wl-maz@kernel.org>
+        <20230602052323.shjn3q2rslbuwcmc@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 109.23.4.90
+X-SA-Exim-Rcpt-To: reijiw@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/2/23 10:35, Nico Boehr wrote:
-> Quoting Janosch Frank (2023-06-01 11:38:37)
-> [...]
->>>    [topology]
->>>    file = topology.elf
->>> +# 3 CPUs on socket 0 with different CPU TLE (standard, dedicated, origin)
->>> +# 1 CPU on socket 2
->>> +extra_params = -smp 1,drawers=3,books=3,sockets=4,cores=4,maxcpus=144 -cpu z14,ctop=on -device z14-s390x-cpu,core-id=1,entitlement=low -device z14-s390x-cpu,core-id=2,dedicated=on -device z14-s390x-cpu,core-id=10 -device z14-s390x-cpu,core-id=20 -device z14-s390x-cpu,core-id=130,socket-id=0,book-id=0,drawer-id=0 -append '-drawers 3 -books 3 -sockets 4 -cores 4'
->>> +
->>> +[topology-2]
->>> +file = topology.elf
->>> +extra_params = -smp 1,drawers=2,books=2,sockets=2,cores=30,maxcpus=240  -append '-drawers 2 -books 2 -sockets 2 -cores 30' -cpu z14,ctop=on -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=2,entitlement=low -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=3,entitlement=medium -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=4,entitlement=high -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=5,entitlement=high,dedicated=on -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=65,entitlement=low -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=66,entitlement=medium -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=67,entitlement=high -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=68,entitlement=high,dedicated=on
->>
->> Pardon my ignorance but I see z14 in there, will this work if we run on
->> a z13?
-> 
-> It causes a skip, I reproduced this on a z14 by changing to z15:
-> SKIP topology (qemu-system-s390x: unable to find CPU model 'z15')
-> 
-> If we can make this more generic so the tests run on older machines it would be
-> good, but if we can't it wouldn't break (i.e. FAIL) on older machines.
-> 
->> Also, will this work/fail gracefully if the test is run with a quemu
->> that doesn't know about topology or will it crash?
-> 
-> Just tried on my box, skips with:
-> SKIP topology (qemu-system-s390x: Parameter 'smp.books' is unexpected)
-> 
-> So I think we're good here.
+On Fri, 02 Jun 2023 06:23:23 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> On Thu, Jun 01, 2023 at 06:02:41AM +0100, Marc Zyngier wrote:
+> > Hey Reiji,
+> >=20
+> > On Tue, 30 May 2023 13:53:24 +0100,
+> > Reiji Watanabe <reijiw@google.com> wrote:
+> > >=20
+> > > Hi Marc,
+> > >=20
+> > > On Mon, May 29, 2023 at 02:39:28PM +0100, Marc Zyngier wrote:
+> > > > On Sat, 27 May 2023 05:02:32 +0100,
+> > > > Reiji Watanabe <reijiw@google.com> wrote:
+> > > > >=20
+> > > > > This series fixes issues with PMUVer handling for a guest with
+> > > > > PMU configured on heterogeneous PMU systems.
+> > > > > Specifically, it addresses the following two issues.
+> > > > >=20
+> > > > > [A] The default value of ID_AA64DFR0_EL1.PMUVer of the vCPU is set
+> > > > >     to its sanitized value.  This could be inappropriate on
+> > > > >     heterogeneous PMU systems, as arm64_ftr_bits for PMUVer is de=
+fined
+> > > > >     as FTR_EXACT with safe_val =3D=3D 0 (when ID_AA64DFR0_EL1.PMU=
+Ver of all
+> > > > >     PEs on the host is not uniform, the sanitized value will be 0=
+).
+> > > >=20
+> > > > Why is this a problem? The CPUs don't implement the same version of
+> > > > the architecture, we don't get a PMU. Why should we try to do anyth=
+ing
+> > > > better? I really don't think we should go out or out way and make t=
+he
+> > > > code more complicated for something that doesn't really exist.
+> > >=20
+> > > Even when the CPUs don't implement the same version of the architectu=
+re,
+> > > if one of them implement PMUv3, KVM advertises KVM_CAP_ARM_PMU_V3,
+> > > and allows userspace to configure PMU (KVM_ARM_VCPU_PMU_V3) for vCPUs.
+> >=20
+> > Ah, I see it now. The kernel will register the PMU even if it decides
+> > that advertising it is wrong, and then we pick it up. Great :-/.
+> >=20
+> > > In this case, although KVM provides PMU emulations for the guest,
+> > > the guest's ID_AA64DFR0_EL1.PMUVer will be zero.  Also,
+> > > KVM_SET_ONE_REG for ID_AA64DFR0_EL1 will never work for vCPUs
+> > > with PMU configured on such systems (since KVM also doesn't allow
+> > > userspace to set the PMUVer to 0 for the vCPUs with PMU configured).
+> > >=20
+> > > I would think either ID_AA64DFR0_EL1.PMUVer for the guest should
+> > > indicate PMUv3, or KVM should not allow userspace to configure PMU,
+> > > in this case.
+> >=20
+> > My vote is on the latter. Even if a PMU is available, we should rely
+> > on the feature exposed by the kernel to decide whether exposing a PMU
+> > or not.
+> >=20
+> > To be honest, this will affect almost nobody (I only know of a single
+> > one, an obscure ARMv8.0+ARMv8.2 system which is very unlikely to ever
+> > use KVM). I'm happy to take the responsibility to actively break those.
+>=20
+> Thank you for the information! Just curious, how about a mix of
+> cores with and without PMU ? (with the same ARMv8.x version)
+> I'm guessing there are very few if any though :)
 
-Perfect, thanks for checking!
+I don't know of any. Similar things for IMPDEF PMUs. And to be honest,
+I'd be very tempted to nuke that in KVM as well, because this is one
+of the worse decision I ever made.
+
+> > > This series is a fix for the former, mainly to keep the current
+> > > behavior of KVM_CAP_ARM_PMU_V3 and KVM_ARM_VCPU_PMU_V3 on such
+> > > systems, since I wasn't sure if such systems don't really exist :)
+> > > (Also, I plan to implement a similar fix for PMCR_EL0.N on top of
+> > > those changes)
+> > >=20
+> > > I could make a fix for the latter instead though. What do you think ?
+> >=20
+> > I think this would be valuable.
+>=20
+> Thank you for the comment! I will go with the latter.
+
+Thanks.
+
+> > Also, didn't you have patches for the EL0 side of the PMU? I've been
+> > trying to look for a new version, but couldn't find it...
+>=20
+> While I'm working on fixing the series based on the recent comment from
+> Oliver (https://lore.kernel.org/all/ZG%2Fw95pYjWnMJB62@linux.dev/),
+> I have a new PMU EL0 issue, which blocked my testing of the series.
+> So, I am debugging the new PMU EL0 issue.
+>=20
+> It appears that arch_perf_update_userpage() defined in
+> drivers/perf/arm_pmuv3.c isn't used, and instead, the weak one in
+> kernel/events/core.c is used.
+
+Wut??? How comes? /me disassembles the kernel:
+
+ffff8000082a1ab0 <arch_perf_update_userpage>:
+ffff8000082a1ab0:       d503201f        nop
+ffff8000082a1ab4:       d503201f        nop
+ffff8000082a1ab8:       d65f03c0        ret
+ffff8000082a1abc:       d503201f        nop
+ffff8000082a1ac0:       d503201f        nop
+ffff8000082a1ac4:       d503201f        nop
+
+What the hell is happening here???
+
+> This prevents cap_user_rdpmc (, etc)
+> from being set (This prevented my test program from directly
+> accessing counters).  This seems to be caused by the commit 7755cec63ade
+> ("arm64: perf: Move PMUv3 driver to drivers/perf").
+
+It is becoming more puzzling by the minute.
+
+>=20
+> I have not yet figured out why the one in arm_pmuv3.c isn't used
+> though (The weak one in core.c seems to take precedence over strong
+> ones under drivers/ somehow...).
+>=20
+> Anyway, I worked around the new issue for now, and ran the test for
+> my series though. I will post the new version of the EL0 series
+> tomorrow hopefully.
+
+I have a "fix" for this. It doesn't make any sense, but it seems to
+work here (GCC 10.2.1 from Debian). Can you please give it a shot?
+
+Thanks,
+
+	M.
+
+=46rom 236ac26bd0e03bf2ca3b40471b61a35b02272662 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Fri, 2 Jun 2023 09:52:25 +0100
+Subject: [PATCH] perf/core: Drop __weak attribute on arch-specific prototyp=
+es
+
+Reiji reports that the arm64 implementation of arch_perf_update_userpage()
+is now ignored and replaced by the dummy stub in core code.
+This seems to happen since the PMUv3 driver was moved to driver/perf.
+
+As it turns out, dropping the __weak attribute from the *prototype*
+of the function solves the problem. You're right, this doesn't seem
+to make much sense. And yet...
+
+With this, arm64 is able to enjoy arch_perf_update_userpage() again.
+
+And while we're at it, drop the same __weak attribute from the
+arch_perf_get_page_size() prototype.
+
+Reported-by: Reiji Watanabe <reijiw@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ include/linux/perf_event.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+index d5628a7b5eaa..1509aea69a16 100644
+--- a/include/linux/perf_event.h
++++ b/include/linux/perf_event.h
+@@ -1845,12 +1845,12 @@ int perf_event_exit_cpu(unsigned int cpu);
+ #define perf_event_exit_cpu	NULL
+ #endif
+=20
+-extern void __weak arch_perf_update_userpage(struct perf_event *event,
+-					     struct perf_event_mmap_page *userpg,
+-					     u64 now);
++extern void arch_perf_update_userpage(struct perf_event *event,
++				      struct perf_event_mmap_page *userpg,
++				      u64 now);
+=20
+ #ifdef CONFIG_MMU
+-extern __weak u64 arch_perf_get_page_size(struct mm_struct *mm, unsigned l=
+ong addr);
++extern u64 arch_perf_get_page_size(struct mm_struct *mm, unsigned long add=
+r);
+ #endif
+=20
+ /*
+--=20
+2.39.2
+
+
+--=20
+Without deviation from the norm, progress is not possible.
