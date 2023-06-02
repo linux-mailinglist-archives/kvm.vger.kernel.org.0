@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7359C720756
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 18:20:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D989720757
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 18:20:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235298AbjFBQUV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 12:20:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45120 "EHLO
+        id S235860AbjFBQUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 12:20:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236865AbjFBQT7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 12:19:59 -0400
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 543CDD3
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 09:19:58 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id af79cd13be357-75b3b759217so319059985a.1
-        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 09:19:58 -0700 (PDT)
+        with ESMTP id S236876AbjFBQUA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 12:20:00 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CCE8132
+        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 09:19:59 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-babb76a9831so2945702276.2
+        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 09:19:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685722797; x=1688314797;
+        d=google.com; s=20221208; t=1685722798; x=1688314798;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FXT5aMAcAtW/D2yhSA+7CF5prLM3G5exI8idyNJeqlQ=;
-        b=MrEIIigb/YWqQ92xzazuzi8enjhLzSd+deyqUfxtAuxGcNqxPI1zoRqcgcPsZY0in6
-         qI3YYemk7dYSuAVwReP578ivZLe/S+Vb2LcuohJjUFeOTbSYeRByh+dDUtwGlWd7bqiJ
-         DaF+LJTYubD/Il4ugc/2AikpfHGkcDTqSnLD7Au/SIooTtUGWzqZ8jw3NAlmur2U5N5F
-         Gi8UEFQVo81bXlMd3kDzyQgcnjMyuxHFAHBtWhXgkIj1fL4mmWbKeGkw5tRZomR5ScUp
-         oRXjUOSbG4XMo5NR2eWkCn9pKDfIrWQE8UmzWf7SrW9kbXzhzgVc13lSDq1ZHIf25HIU
-         1OEg==
+        bh=uBjGdxZGKqeTkEhLIRcA2ijpoB4ObDOso7jT09Bdmyk=;
+        b=tgIJe4LUodVd8sWxyV+CkHwf0yCW7CfowcU4dW/0jY/jUCD8U6qotmarbTupMGnEXK
+         Pimz2/Z158ToWRqHqrGh53nmsETixzBUMqGP55QlX8XqM4WclLWl00PCtOHlGHVDZniw
+         pi+KwqT1viiO9avRcfyJAHSDIKKcSAk94XnvZmTCClhJsoxAoCyEC7+LS2D8O7lTJ+Wm
+         hJvCeN60aNWM6dIc3oqPqGbLwzebcVF/WcwH3eVVVnUd/BewHuZbNX6v+mce7bTNIz69
+         y2+8XWWJli8LU0ko9/K+1Kp6PjLZ8sCqrH2OcH4ugUs6/Yr2YfDXZmIr90rhSeuK6QXl
+         arWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685722797; x=1688314797;
+        d=1e100.net; s=20221208; t=1685722798; x=1688314798;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FXT5aMAcAtW/D2yhSA+7CF5prLM3G5exI8idyNJeqlQ=;
-        b=QQ4ao1SplAp3NsOnVZ2VKPNzeuVHmjUS0fuHdPRDkj+zQ0MkLkvzWQHBTflBwLDYrJ
-         lKV7Hvjk2q0QK/3WN3V59r2dR1oXzj+cIDTxitgeZpKLtsTMbSD3KMfUJ8bxk4ylUOKU
-         hCJPfAYwURnpGtsq4TZMuZ9HPtLWAXRfw+dzXnGJTJLmf304OUN694H2XgZdztVM7MI5
-         3KCsYJuFBvMmASwFdiO155V566l9qWArCZf7ozBnvNU0UJM6+3R8EJKFJge6C/tAe7uj
-         L4oRUaW4Rbx4X6O182qo+M++Z8p1oXkw80LfpKnFAI3edrY0Poa2aHWkyucTjCiUaAfc
-         1J9g==
-X-Gm-Message-State: AC+VfDykOljjopeCvLyBzmDbONkTX/B0Z98qVKh0Ro4G2E90MQ9Amp7n
-        A9hxY5LdSFZu5LEVMeYOH6yMG/lKnwMzHA==
-X-Google-Smtp-Source: ACHHUZ59szArc2J5yzRQ+OH/b4av8GVrQhCDas0t1JFvDETpn96b9hqdXPaAc3D2wV6P4OkT5+sVUxvqNLjTZg==
+        bh=uBjGdxZGKqeTkEhLIRcA2ijpoB4ObDOso7jT09Bdmyk=;
+        b=DZ4wG7d0AVmfJAwtAJBWAFhT1cJzbvN9aXl44EY43tdnSHTOxM520r0lmX2YqKX3Lc
+         W0PZH6BmKTJM6pgZc5qzkFRozGk/TkIKBtIN/mFx3j1Onigaa7rD0RE5IdZJGJwe9ZBk
+         XO3nOn5cjVQh0DSQgtJOFSGR0bRSCfznSwIMpkR534hmigJGxx5decqy6Ns6iL7uNLaN
+         6e1a1XvCRYMeRZY4HHsJv91/9wakFd9BS5sXruMqpszsDWJS1zl5ZYmc6ITqNn0/vhY9
+         aZu0HKv4lUOH7XhOL0V/Bw7YZOo6lu6P7WAlO275+62xVnXpfnNle8v1npJS/1kePV7x
+         xNjQ==
+X-Gm-Message-State: AC+VfDy+pBAGiweV4lrYU0rze0OhowQlfeGUzjC2tjn/52QxV4CrAB/K
+        auBngI58KNSRUA2WFzlUC6Wlan6pJLBixQ==
+X-Google-Smtp-Source: ACHHUZ6hqKP9JyWyo3n6zvDrZCg7oqkFbVaKZzaVMEn43NzxaLbbSVdUk5kev4pbduM0axca+nM241uku9ASRA==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a05:620a:3950:b0:75b:3839:7176 with SMTP
- id qs16-20020a05620a395000b0075b38397176mr3883333qkn.13.1685722797500; Fri,
- 02 Jun 2023 09:19:57 -0700 (PDT)
-Date:   Fri,  2 Jun 2023 16:19:12 +0000
+ (user=amoorthy job=sendgmr) by 2002:a25:bc7:0:b0:ba8:cbd2:61b3 with SMTP id
+ 190-20020a250bc7000000b00ba8cbd261b3mr1233071ybl.5.1685722798429; Fri, 02 Jun
+ 2023 09:19:58 -0700 (PDT)
+Date:   Fri,  2 Jun 2023 16:19:13 +0000
 In-Reply-To: <20230602161921.208564-1-amoorthy@google.com>
 Mime-Version: 1.0
 References: <20230602161921.208564-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230602161921.208564-8-amoorthy@google.com>
-Subject: [PATCH v4 07/16] KVM: Simplify error handling in __gfn_to_pfn_memslot()
+Message-ID: <20230602161921.208564-9-amoorthy@google.com>
+Subject: [PATCH v4 08/16] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
 From:   Anish Moorthy <amoorthy@google.com>
 To:     seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org,
         kvmarm@lists.linux.dev
@@ -70,41 +70,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM_HVA_ERR_RO_BAD satisfies kvm_is_error_hva(), so there's no need to
-duplicate the "if (writable)" block. Fix this by bringing all
-kvm_is_error_hva() cases under one conditional.
+Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
+kvm_handle_error_pfn().
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- virt/kvm/kvm_main.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index b9d2606f9251..05d6e7e3994d 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2711,16 +2711,14 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
- 	if (hva)
- 		*hva = addr;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index c8961f45e3b1..cb71aae9aaec 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3291,6 +3291,10 @@ static void kvm_send_hwpoison_signal(struct kvm_memory_slot *slot, gfn_t gfn)
  
--	if (addr == KVM_HVA_ERR_RO_BAD) {
--		if (writable)
--			*writable = false;
--		return KVM_PFN_ERR_RO_FAULT;
--	}
--
- 	if (kvm_is_error_hva(addr)) {
- 		if (writable)
- 			*writable = false;
--		return KVM_PFN_NOSLOT;
+ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
++	uint64_t rounded_gfn;
++	uint64_t fault_size;
++	uint64_t fault_flags;
 +
-+		if (addr == KVM_HVA_ERR_RO_BAD)
-+			return KVM_PFN_ERR_RO_FAULT;
-+		else
-+			return KVM_PFN_NOSLOT;
+ 	if (is_sigpending_pfn(fault->pfn)) {
+ 		kvm_handle_signal_exit(vcpu);
+ 		return -EINTR;
+@@ -3309,6 +3313,15 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+ 		return RET_PF_RETRY;
  	}
  
- 	/* Do not map writable pfn in the readonly memslot. */
++	fault_size = KVM_HPAGE_SIZE(fault->goal_level);
++	rounded_gfn = round_down(fault->gfn * PAGE_SIZE, fault_size);
++
++	fault_flags = 0;
++	if (fault->write)
++		fault_flags |= KVM_MEMORY_FAULT_FLAG_WRITE;
++	if (fault->exec)
++		fault_flags |= KVM_MEMORY_FAULT_FLAG_EXEC;
++	kvm_populate_efault_info(vcpu, rounded_gfn, fault_size, fault_flags);
+ 	return -EFAULT;
+ }
+ 
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
