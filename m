@@ -2,61 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D04271F7B7
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 03:21:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 003BE71F7B9
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 03:22:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233363AbjFBBVt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 21:21:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46712 "EHLO
+        id S233346AbjFBBWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 21:22:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233353AbjFBBVp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 21:21:45 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865681B5
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 18:21:43 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-568a85f180dso20641297b3.2
-        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 18:21:43 -0700 (PDT)
+        with ESMTP id S233368AbjFBBWO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 21:22:14 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E314019A
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 18:22:03 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-bacfa4eefd3so2175215276.3
+        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 18:22:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685668902; x=1688260902;
+        d=google.com; s=20221208; t=1685668923; x=1688260923;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E8/ZQDn4lQxbq9Kv926uaNMZbM7Cblwtjn3q+UPTzec=;
-        b=Hwisx0vO5cMNabBWQp2fM/HSKoh10ML0abHqwJGGr0qB8l1kCZLWgirynab2M0p2Kv
-         L0k8RANoQwrjO2x6fWhtp7CePjL1odw4yrS6bY9qhGULjxlEpz89+YqwvlkE7FvXkQQn
-         0AaqwpzQHLEdf18s4pGnGN6NZt+oBYDaWHB6S9uTwiuB9YH50jZrZuLrSSpoVBtQUz6R
-         /u4zpXm5ER2jSETpYU970B34v2fHC6EX0ulAROmJx37lg3VCgGVr2DhjQLdpZKS4aTMz
-         p7zsIZwMUQMxcyx9f65zI4WaZ7Uo3e+jBvxefCOUwA2kxwhkDE0wbML83QtA9YPDgOeA
-         hypw==
+        bh=iVBRO/sr7nPUkpgW2sMt8Oln4tjdALcpHBCgSE+pX4I=;
+        b=25Wln+iz7J8nMLS9Y4U0wAjj/yic7eW9lOL1jZH3uTstFegI7CsJpfu1lRrNcjnex7
+         nxnud4PPmaOywgFA6Bs190uKUVcPDuZc8gleGyK9Go1n5/C1FuBXuO/SC+z40whpTgN6
+         O6n5vG+EISW/duET7bvpamo6xSQGrcM8FSms6Z0sEKReGQwdc3SF/3RBsLHAbrUt8zX/
+         nuWAhTf/VUHAG8Ebl/mXVHKDRguQCIh2H5EjTOr38oNup3s5UDvzjHmFjjCX1DXFlEb7
+         nvda/IRkJ308E1pQDiGHpdpiRFGfjWHeqX0xK21vaHuXNffa+nGY0WduFjhQ4Eu+xD6N
+         TrCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685668902; x=1688260902;
+        d=1e100.net; s=20221208; t=1685668923; x=1688260923;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E8/ZQDn4lQxbq9Kv926uaNMZbM7Cblwtjn3q+UPTzec=;
-        b=Qlpl+mW24Qs7JNqi+7ueZQSPQfk4n9eIZFaEVZcLWauB1t2yypenmGodwcMUXm92WB
-         fMNEbbVfROV+w+zH7czkzBGHFB3hvtFxBvOnnOfGKdi8N28O/fgZhs0NO4pmURcE8heg
-         PU9Va5Msziiw2VijbgoVeUpq3FtDwZ2lQ8YHFu8058AMZ6PfeVd7PI+dmXk9V6MG0Zct
-         AVdXTjYPEjD3KxKcKLZdAsIRP1TwZeb0ksH1iEJHKHdTEViPwH5yunkW+IFBWpdmMC0n
-         aC+ilg3vNPuCvHzCZtPqtNKIQjmc50KYLA7KQAr3gDFX1UB8/fu5j3jttwC7IAgN3ixQ
-         iKsQ==
-X-Gm-Message-State: AC+VfDy2mZmqr9FbPzup0w4WoEwzM3l+xRpZ6oEL1OotIMS+fq56ipOq
-        IZdaL00IeLSblZj27Yz+x2H+MQ6xaVc=
-X-Google-Smtp-Source: ACHHUZ5Bl/HGC1nLPCY/p9KC3Ia4ZxgrAdISshCOaKLBkJi2Wq89zZ5D1PHQOcWY9uGh7bNcHg9y577PwHQ=
+        bh=iVBRO/sr7nPUkpgW2sMt8Oln4tjdALcpHBCgSE+pX4I=;
+        b=eGvBgSDL23uJOU7CwBqQ2o9H4FzVk96tbQAW3ygBcX87BLcandH/CgQCo5Ns1DJlKg
+         Yv4b43fpBZZGDGEV/RHzxHQYrLQmrcPbnKpIpvKVSvLTa13lBnrMp72Kuv90EdNDTsqi
+         bM10eva7cg1ID3DXFG5Byl594lAOoqEDQRgnxsxVfAlTuUYMSLFP0XcKJAfm8GXoo9Jf
+         af/Z1eICvFkcnYzH1evIsRo/qId88xWCw9HYrXcdmESeGCz7fyuR0KJmsyDrcHng0MxK
+         Ch4VyGtnWCOQTT8tfNHCCJOzppT51ZiATYFpRAdy5cAk7thC/Ve9aohIss3gd/U8ANk6
+         Hr/Q==
+X-Gm-Message-State: AC+VfDxJZC6SvmTJummwJnhozRBU4As+31lOhksBqNkp5Ii28qwRvl5p
+        KCFkaOuYkTLfjzgUX97lmdjGjF52AJk=
+X-Google-Smtp-Source: ACHHUZ6arP/za1K/Ojosr8kzDmYWvA4Vfc35tM4z4txTPMGYoefnIRckF/7kQtWXZXh8ZfyCwITd6cOuJCI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:af15:0:b0:568:ee6d:3364 with SMTP id
- n21-20020a81af15000000b00568ee6d3364mr4016244ywh.4.1685668902772; Thu, 01 Jun
- 2023 18:21:42 -0700 (PDT)
-Date:   Thu,  1 Jun 2023 18:20:58 -0700
-In-Reply-To: <20230307135233.54684-1-wei.w.wang@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:70d:b0:ba8:37f6:a586 with SMTP id
+ k13-20020a056902070d00b00ba837f6a586mr1129876ybt.3.1685668923235; Thu, 01 Jun
+ 2023 18:22:03 -0700 (PDT)
+Date:   Thu,  1 Jun 2023 18:21:47 -0700
+In-Reply-To: <20230419021924.1342184-1-alexjlzheng@tencent.com>
 Mime-Version: 1.0
-References: <20230307135233.54684-1-wei.w.wang@intel.com>
+References: <20230419021924.1342184-1-alexjlzheng@tencent.com>
 X-Mailer: git-send-email 2.41.0.rc2.161.g9c6817b8e7-goog
-Message-ID: <168565180722.660019.15543226381784798973.b4-ty@google.com>
-Subject: Re: [PATCH v2] KVM: allow KVM_BUG/KVM_BUG_ON to handle 64-bit cond
+Message-ID: <168565225854.661985.17570727608473144728.b4-ty@google.com>
+Subject: Re: [PATCH v3] KVM: x86: Fix poll command
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, dmatlack@google.com,
-        mizhang@google.com, isaku.yamahata@gmail.com, pbonzini@redhat.com,
-        Wei Wang <wei.w.wang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To:     Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        alexjlzheng@gmail.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jinliang Zheng <alexjlzheng@tencent.com>
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -68,24 +70,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 07 Mar 2023 21:52:33 +0800, Wei Wang wrote:
-> Current KVM_BUG and KVM_BUG_ON assume that 'cond' passed from callers is
-> 32-bit as it casts 'cond' to the type of int. This will be wrong if 'cond'
-> provided by a caller is 64-bit, e.g. an error code of 0xc0000d0300000000
-> will be converted to 0, which is not expected.
+On Wed, 19 Apr 2023 10:19:25 +0800, alexjlzheng@gmail.com wrote:
+> According to the hardware manual, when the Poll command is issued, the
+> byte returned by the I/O read is 1 in Bit 7 when there is an interrupt,
+> and the highest priority binary code in Bits 2:0. The current pic
+> simulation code is not implemented strictly according to the above
+> expression.
 > 
-> Improves the implementation by using bool in KVM_BUG and KVM_BUG_ON.
-> 'bool' is preferred to 'int' as __ret is essentially used as a boolean
-> and coding-stytle.rst documents that use of bool is encouraged to improve
-> readability and is often a better option than 'int' for storing boolean
-> values.
+> Fix the implementation of pic_poll_read(), set Bit 7 when there is an
+> interrupt.
 > 
 > [...]
 
-Applied to kvm-x86 generic, thanks!
+Applied to kvm-x86 misc, thanks!
 
-[1/1] KVM: allow KVM_BUG/KVM_BUG_ON to handle 64-bit cond
-      https://github.com/kvm-x86/linux/commit/c9d601548603
+[1/1] KVM: x86: Fix poll command
+      https://github.com/kvm-x86/linux/commit/0d42522bdee7
 
 --
 https://github.com/kvm-x86/linux/tree/next
