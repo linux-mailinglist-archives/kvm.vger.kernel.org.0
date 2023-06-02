@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 620A2720B01
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 23:34:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EF38720AFF
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 23:34:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236470AbjFBVeh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 17:34:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42318 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236415AbjFBVef (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S236420AbjFBVef (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 2 Jun 2023 17:34:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69E481B5
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 14:33:47 -0700 (PDT)
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42330 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236126AbjFBVee (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 17:34:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64C061B9
+        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 14:33:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685741626;
+        s=mimecast20190719; t=1685741630;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=09I8yhssl+ry4Rcz3+C+czmXSbbdhoU5mkqI7qxVrm8=;
-        b=AWNrqx4AU5YKyJZg4YUIWN9dQYHQI+T8PlyE+UlwmnAe+ik5uBEQRHKnJDngjz+PT+TQNO
-        JCwpOEAtZzrdOoAbpnjy/o9nZ8NlLpbILASAat1U5SF2Viv88R2dXFFEL7owj/hBWxapsn
-        t4vFyJArYtmGwgvb1B9nF7+sEKIWOEI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=+M2AovfkhlbydsCpTeuPgxc/FZaOyBraUlRDQc4ANTw=;
+        b=MTY0/FxExKcNqhGP4UVHq1iVx/w6mx/HD8g1lPDtqjghYcC+JshUaIBe6TWWzUvRmkaDTP
+        BMxCJ1CzUodvgEjbMOYpT7zCvzRvTqYeQGOyl/L+Qcsgqti95YTlAmD83zBe7EHvFRB+cA
+        A/fUrxdKUADAAw8Bhzqo6D4JY9F8A34=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-644-6QVj60ayMj2Fzt48K8jajg-1; Fri, 02 Jun 2023 17:33:45 -0400
-X-MC-Unique: 6QVj60ayMj2Fzt48K8jajg-1
+ us-mta-401-7lYiTG97Oyq3UB1_RdDKcQ-1; Fri, 02 Jun 2023 17:33:47 -0400
+X-MC-Unique: 7lYiTG97Oyq3UB1_RdDKcQ-1
 Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1F34E3806707;
-        Fri,  2 Jun 2023 21:33:45 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A5CB1185A78E;
+        Fri,  2 Jun 2023 21:33:46 +0000 (UTC)
 Received: from omen.home.shazbot.org (unknown [10.22.33.254])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A4F7D48205E;
-        Fri,  2 Jun 2023 21:33:44 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A6F7400F16;
+        Fri,  2 Jun 2023 21:33:46 +0000 (UTC)
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Alex Williamson <alex.williamson@redhat.com>, jgg@nvidia.com,
-        clg@redhat.com, eric.auger@redhat.com
-Subject: [PATCH 2/3] vfio/platform: Cleanup Kconfig
-Date:   Fri,  2 Jun 2023 15:33:14 -0600
-Message-Id: <20230602213315.2521442-3-alex.williamson@redhat.com>
+        clg@redhat.com, diana.craciun@oss.nxp.com
+Subject: [PATCH 3/3] vfio/fsl: Create Kconfig sub-menu
+Date:   Fri,  2 Jun 2023 15:33:15 -0600
+Message-Id: <20230602213315.2521442-4-alex.williamson@redhat.com>
 In-Reply-To: <20230602213315.2521442-1-alex.williamson@redhat.com>
 References: <20230602213315.2521442-1-alex.williamson@redhat.com>
 MIME-Version: 1.0
@@ -59,96 +59,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Like vfio-pci, there's also a base module here where vfio-amba depends on
-vfio-platform, when really it only needs vfio-platform-base.  Create a
-sub-menu for platform drivers and a nested menu for reset drivers.  Cleanup
-Makefile to make use of new CONFIG_VFIO_PLATFORM_BASE for building the
-shared modules and traversing reset modules.
+For consistency with pci and platform, push the vfio-fsl-mc option into a
+sub-menu.
 
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- drivers/vfio/Makefile          |  2 +-
- drivers/vfio/platform/Kconfig  | 17 ++++++++++++++---
- drivers/vfio/platform/Makefile |  9 +++------
- 3 files changed, 18 insertions(+), 10 deletions(-)
+ drivers/vfio/fsl-mc/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
-index 151e816b2ff9..8da44aa1ea16 100644
---- a/drivers/vfio/Makefile
-+++ b/drivers/vfio/Makefile
-@@ -11,6 +11,6 @@ vfio-$(CONFIG_VFIO_VIRQFD) += virqfd.o
- obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
- obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
- obj-$(CONFIG_VFIO_PCI_CORE) += pci/
--obj-$(CONFIG_VFIO_PLATFORM) += platform/
-+obj-$(CONFIG_VFIO_PLATFORM_BASE) += platform/
- obj-$(CONFIG_VFIO_MDEV) += mdev/
- obj-$(CONFIG_VFIO_FSL_MC) += fsl-mc/
-diff --git a/drivers/vfio/platform/Kconfig b/drivers/vfio/platform/Kconfig
-index 331a5920f5ab..6d18faa66a2e 100644
---- a/drivers/vfio/platform/Kconfig
-+++ b/drivers/vfio/platform/Kconfig
-@@ -1,8 +1,14 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+menu "VFIO support for platform devices"
+diff --git a/drivers/vfio/fsl-mc/Kconfig b/drivers/vfio/fsl-mc/Kconfig
+index 597d338c5c8a..d2757a1114aa 100644
+--- a/drivers/vfio/fsl-mc/Kconfig
++++ b/drivers/vfio/fsl-mc/Kconfig
+@@ -1,3 +1,5 @@
++menu "VFIO support for FSL_MC bus devices"
 +
-+config VFIO_PLATFORM_BASE
-+	tristate
-+
- config VFIO_PLATFORM
--	tristate "VFIO support for platform devices"
-+	tristate "Generic VFIO support for any platform device"
- 	depends on ARM || ARM64 || COMPILE_TEST
- 	select VFIO_VIRQFD
-+	select VFIO_PLATFORM_BASE
- 	help
- 	  Support for platform devices with VFIO. This is required to make
- 	  use of platform devices present on the system using the VFIO
-@@ -10,10 +16,11 @@ config VFIO_PLATFORM
+ config VFIO_FSL_MC
+ 	tristate "VFIO support for QorIQ DPAA2 fsl-mc bus devices"
+ 	depends on FSL_MC_BUS
+@@ -8,3 +10,5 @@ config VFIO_FSL_MC
+ 	  fsl-mc bus devices using the VFIO framework.
  
  	  If you don't know what to do here, say N.
- 
--if VFIO_PLATFORM
- config VFIO_AMBA
- 	tristate "VFIO support for AMBA devices"
- 	depends on ARM_AMBA || COMPILE_TEST
-+	select VFIO_VIRQFD
-+	select VFIO_PLATFORM_BASE
- 	help
- 	  Support for ARM AMBA devices with VFIO. This is required to make
- 	  use of ARM AMBA devices present on the system using the VFIO
-@@ -21,5 +28,9 @@ config VFIO_AMBA
- 
- 	  If you don't know what to do here, say N.
- 
-+menu "VFIO platform reset drivers"
-+	depends on VFIO_PLATFORM_BASE
 +
- source "drivers/vfio/platform/reset/Kconfig"
--endif
 +endmenu
-+endmenu
-diff --git a/drivers/vfio/platform/Makefile b/drivers/vfio/platform/Makefile
-index 3f3a24e7c4ef..ee4fb6a82ca8 100644
---- a/drivers/vfio/platform/Makefile
-+++ b/drivers/vfio/platform/Makefile
-@@ -1,13 +1,10 @@
- # SPDX-License-Identifier: GPL-2.0
- vfio-platform-base-y := vfio_platform_common.o vfio_platform_irq.o
--vfio-platform-y := vfio_platform.o
-+obj-$(CONFIG_VFIO_PLATFORM_BASE) += vfio-platform-base.o
-+obj-$(CONFIG_VFIO_PLATFORM_BASE) += reset/
- 
-+vfio-platform-y := vfio_platform.o
- obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform.o
--obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform-base.o
--obj-$(CONFIG_VFIO_PLATFORM) += reset/
- 
- vfio-amba-y := vfio_amba.o
--
- obj-$(CONFIG_VFIO_AMBA) += vfio-amba.o
--obj-$(CONFIG_VFIO_AMBA) += vfio-platform-base.o
--obj-$(CONFIG_VFIO_AMBA) += reset/
 -- 
 2.39.2
 
