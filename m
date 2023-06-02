@@ -2,113 +2,300 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DDCF71FDB5
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 11:23:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9851D71FE65
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 11:56:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233971AbjFBJXs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 05:23:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43734 "EHLO
+        id S235023AbjFBJ43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 05:56:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233790AbjFBJW7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 05:22:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FCFE1BB
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 02:20:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685697627;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iyR4b7qVUKjcdPNYm3WXxs3lGfl5xurwb+jr3GBXDeg=;
-        b=FwNWWgNu4zqlDaARay4kldkmI8E5o2Q1pfpaSS8ndryIGcgfE5oFiaO1yw3gfEMyDevyfC
-        zk+JBWUencLcoR+FLElbb6d/Mih2dfHkmDyAbwdIQo54rG760NLAjejGHlAb5xREz6o+Qc
-        IoLNX1X5kHnDNUNDMRWUzALASHOTN1E=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-571-feN1j98qN7-hhvt4lJzSBg-1; Fri, 02 Jun 2023 05:20:25 -0400
-X-MC-Unique: feN1j98qN7-hhvt4lJzSBg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f42bcef2acso10351685e9.2
-        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 02:20:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685697625; x=1688289625;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iyR4b7qVUKjcdPNYm3WXxs3lGfl5xurwb+jr3GBXDeg=;
-        b=XPGJItOUqw11do7ASsXLL4DhcA3QNLPOJO4snutvtsCrI0TgZ7byLGT9bYQ5qW/EUY
-         pIaC9KvhUF1wEAEXPi+l8vauxaHAd8OkvCd2zoUoPTNexU8Hmfmv5iBiGqQuRMxMMGOU
-         gqWVWsnd5V6olvhrfhL8uI9k3KjrznFN9PVTCq8ePZo8hw2OLYwsorbOYEEbTzOXqQg8
-         2WGtCX7IFcAC38KUGT0gNTjVhIh4hcel+r0IDQBlj6YOF1qe48Gb8nb1mU0PH5byu3C/
-         4YB+8X8sNe62mvG3czCUsy6ueCQVXFA2xmZMg2+tRors2lwjuX3AhJ5lgQjN/L7FEIUz
-         8LIw==
-X-Gm-Message-State: AC+VfDxUa2+NghpElKXJ87CAYyDuSWPzYtv0MpXk2FLTIyZb1exwHU0n
-        L5XwwBpCeDf4x0rB77dwfVEQjIY+WuP1Suppc3NDK194WMcesiKNIX0xMSjnTGs9auA7O/H6YcX
-        iZ6GiuxfPFH3G
-X-Received: by 2002:a1c:6a07:0:b0:3f7:28d8:4326 with SMTP id f7-20020a1c6a07000000b003f728d84326mr185557wmc.31.1685697624877;
-        Fri, 02 Jun 2023 02:20:24 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ51/jsDzx9y2w14I8Dw1pW7tSM3jEUEPvw2oGPPnUXh5G+L2EcZ9xn1y+iUpRHbkwsD3iLQ0g==
-X-Received: by 2002:a1c:6a07:0:b0:3f7:28d8:4326 with SMTP id f7-20020a1c6a07000000b003f728d84326mr185546wmc.31.1685697624660;
-        Fri, 02 Jun 2023 02:20:24 -0700 (PDT)
-Received: from [192.168.0.3] (ip-109-43-176-14.web.vodafone.de. [109.43.176.14])
-        by smtp.gmail.com with ESMTPSA id 4-20020a05600c248400b003f604793989sm4886360wms.18.2023.06.02.02.20.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Jun 2023 02:20:24 -0700 (PDT)
-Message-ID: <308278c8-aae2-52ba-15f0-7dffa312b200@redhat.com>
-Date:   Fri, 2 Jun 2023 11:20:23 +0200
+        with ESMTP id S233971AbjFBJ42 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 05:56:28 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5729AC0;
+        Fri,  2 Jun 2023 02:56:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685699786; x=1717235786;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pAgKRoXqRVadaelHXWC7m0n4Mx4Yh4aRGVNZmKHtEd0=;
+  b=AtDlqxN9SV/clmUwdxRuBCDXthsSPDLAkq8CqTcEmlo/JWlilWLSE//7
+   7hn5FjZ8ppY8kHbOYTlZqNDQhUeU2iPxZFQaQzQwq+Qk5YfQU3OEBuaUh
+   wmvy0+3hkyj1/eygN5W1cNehVW3xtBCP/Im8XWcqSdxNU8khf6AnqPSyn
+   A1tMfNfBCmVPbuOu9/e920UvhM1K4I7z4ZULFhWYgUbCeiA5c17Og7izT
+   jhYjeYnm+/9K+maLJwM77RbIvJNeeJWg3Vy8iIpRsSPXqggidV2Xej5S7
+   imTS3/pVUP0t78R3eNFUnnFVjRouuLF6hcm9xnEvh67Sa4SBJkkf+vkJT
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10728"; a="353326335"
+X-IronPort-AV: E=Sophos;i="6.00,212,1681196400"; 
+   d="scan'208";a="353326335"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2023 02:56:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10728"; a="685267326"
+X-IronPort-AV: E=Sophos;i="6.00,212,1681196400"; 
+   d="scan'208";a="685267326"
+Received: from lkp-server01.sh.intel.com (HELO 15ab08e44a81) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 02 Jun 2023 02:56:22 -0700
+Received: from kbuild by 15ab08e44a81 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1q51W9-0000Ij-2r;
+        Fri, 02 Jun 2023 09:56:21 +0000
+Date:   Fri, 2 Jun 2023 17:56:12 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Shunsuke Mie <mie@igel.co.jp>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Rusty Russell <rusty@rustcorp.com.au>
+Cc:     oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Shunsuke Mie <mie@igel.co.jp>
+Subject: Re: [PATCH v4 1/1] vringh: IOMEM support
+Message-ID: <202306021725.3otSfXPF-lkp@intel.com>
+References: <20230602055211.309960-2-mie@igel.co.jp>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [kvm-unit-tests PATCH v9 2/2] s390x: topology: Checking
- Configuration Topology Information
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     kvm@vger.kernel.org, imbrenda@linux.ibm.com, david@redhat.com,
-        nsg@linux.ibm.com
-References: <20230519112236.14332-1-pmorel@linux.ibm.com>
- <20230519112236.14332-3-pmorel@linux.ibm.com>
- <fa415627-bfff-cc18-af94-cf55632973d5@linux.ibm.com>
- <168569490681.252746.1049350277526238686@t14-nrb>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <168569490681.252746.1049350277526238686@t14-nrb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230602055211.309960-2-mie@igel.co.jp>
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/06/2023 10.35, Nico Boehr wrote:
-> Quoting Janosch Frank (2023-06-01 11:38:37)
-> [...]
->>>    [topology]
->>>    file = topology.elf
->>> +# 3 CPUs on socket 0 with different CPU TLE (standard, dedicated, origin)
->>> +# 1 CPU on socket 2
->>> +extra_params = -smp 1,drawers=3,books=3,sockets=4,cores=4,maxcpus=144 -cpu z14,ctop=on -device z14-s390x-cpu,core-id=1,entitlement=low -device z14-s390x-cpu,core-id=2,dedicated=on -device z14-s390x-cpu,core-id=10 -device z14-s390x-cpu,core-id=20 -device z14-s390x-cpu,core-id=130,socket-id=0,book-id=0,drawer-id=0 -append '-drawers 3 -books 3 -sockets 4 -cores 4'
->>> +
->>> +[topology-2]
->>> +file = topology.elf
->>> +extra_params = -smp 1,drawers=2,books=2,sockets=2,cores=30,maxcpus=240  -append '-drawers 2 -books 2 -sockets 2 -cores 30' -cpu z14,ctop=on -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=2,entitlement=low -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=3,entitlement=medium -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=4,entitlement=high -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=5,entitlement=high,dedicated=on -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=65,entitlement=low -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=66,entitlement=medium -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=67,entitlement=high -device z14-s390x-cpu,drawer-id=1,book-id=0,socket-id=0,core-id=68,entitlement=high,dedicated=on
->>
->> Pardon my ignorance but I see z14 in there, will this work if we run on
->> a z13?
-> 
-> It causes a skip, I reproduced this on a z14 by changing to z15:
-> SKIP topology (qemu-system-s390x: unable to find CPU model 'z15')
-> 
-> If we can make this more generic so the tests run on older machines it would be
-> good, but if we can't it wouldn't break (i.e. FAIL) on older machines.
+Hi Shunsuke,
 
-Can't we simply use "-cpu max,ctop=on" ?
+kernel test robot noticed the following build warnings:
 
-  Thomas
+[auto build test WARNING on mst-vhost/linux-next]
+[also build test WARNING on linus/master horms-ipvs/master v6.4-rc4 next-20230602]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Shunsuke-Mie/vringh-IOMEM-support/20230602-135351
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+patch link:    https://lore.kernel.org/r/20230602055211.309960-2-mie%40igel.co.jp
+patch subject: [PATCH v4 1/1] vringh: IOMEM support
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20230602/202306021725.3otSfXPF-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 12.3.0
+reproduce (this is a W=1 build):
+        mkdir -p ~/bin
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/de2a1f5220c32e953400f225aba6bd294a8d41b8
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Shunsuke-Mie/vringh-IOMEM-support/20230602-135351
+        git checkout de2a1f5220c32e953400f225aba6bd294a8d41b8
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=alpha olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=alpha SHELL=/bin/bash drivers/
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306021725.3otSfXPF-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/vhost/vringh.c:1661:5: warning: no previous prototype for 'vringh_init_iomem' [-Wmissing-prototypes]
+    1661 | int vringh_init_iomem(struct vringh *vrh, u64 features, unsigned int num,
+         |     ^~~~~~~~~~~~~~~~~
+>> drivers/vhost/vringh.c:1683:5: warning: no previous prototype for 'vringh_getdesc_iomem' [-Wmissing-prototypes]
+    1683 | int vringh_getdesc_iomem(struct vringh *vrh, struct vringh_kiov *riov,
+         |     ^~~~~~~~~~~~~~~~~~~~
+>> drivers/vhost/vringh.c:1714:9: warning: no previous prototype for 'vringh_iov_pull_iomem' [-Wmissing-prototypes]
+    1714 | ssize_t vringh_iov_pull_iomem(struct vringh *vrh, struct vringh_kiov *riov,
+         |         ^~~~~~~~~~~~~~~~~~~~~
+>> drivers/vhost/vringh.c:1729:9: warning: no previous prototype for 'vringh_iov_push_iomem' [-Wmissing-prototypes]
+    1729 | ssize_t vringh_iov_push_iomem(struct vringh *vrh, struct vringh_kiov *wiov,
+         |         ^~~~~~~~~~~~~~~~~~~~~
+>> drivers/vhost/vringh.c:1744:6: warning: no previous prototype for 'vringh_abandon_iomem' [-Wmissing-prototypes]
+    1744 | void vringh_abandon_iomem(struct vringh *vrh, unsigned int num)
+         |      ^~~~~~~~~~~~~~~~~~~~
+>> drivers/vhost/vringh.c:1759:5: warning: no previous prototype for 'vringh_complete_iomem' [-Wmissing-prototypes]
+    1759 | int vringh_complete_iomem(struct vringh *vrh, u16 head, u32 len)
+         |     ^~~~~~~~~~~~~~~~~~~~~
+>> drivers/vhost/vringh.c:1777:6: warning: no previous prototype for 'vringh_notify_enable_iomem' [-Wmissing-prototypes]
+    1777 | bool vringh_notify_enable_iomem(struct vringh *vrh)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/vhost/vringh.c:1790:6: warning: no previous prototype for 'vringh_notify_disable_iomem' [-Wmissing-prototypes]
+    1790 | void vringh_notify_disable_iomem(struct vringh *vrh)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/vhost/vringh.c:1802:5: warning: no previous prototype for 'vringh_need_notify_iomem' [-Wmissing-prototypes]
+    1802 | int vringh_need_notify_iomem(struct vringh *vrh)
+         |     ^~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/vringh_init_iomem +1661 drivers/vhost/vringh.c
+
+  1647	
+  1648	/**
+  1649	 * vringh_init_iomem - initialize a vringh for a vring on io-memory.
+  1650	 * @vrh: the vringh to initialize.
+  1651	 * @features: the feature bits for this ring.
+  1652	 * @num: the number of elements.
+  1653	 * @weak_barriers: true if we only need memory barriers, not I/O.
+  1654	 * @desc: the userspace descriptor pointer.
+  1655	 * @avail: the userspace avail pointer.
+  1656	 * @used: the userspace used pointer.
+  1657	 *
+  1658	 * Returns an error if num is invalid: you should check pointers
+  1659	 * yourself!
+  1660	 */
+> 1661	int vringh_init_iomem(struct vringh *vrh, u64 features, unsigned int num,
+  1662			      bool weak_barriers, struct vring_desc *desc,
+  1663			      struct vring_avail *avail, struct vring_used *used)
+  1664	{
+  1665		return vringh_init_kern(vrh, features, num, weak_barriers, desc, avail,
+  1666					used);
+  1667	}
+  1668	EXPORT_SYMBOL(vringh_init_iomem);
+  1669	
+  1670	/**
+  1671	 * vringh_getdesc_iomem - get next available descriptor from vring on io-memory.
+  1672	 * @vrh: the vring on io-memory.
+  1673	 * @riov: where to put the readable descriptors (or NULL)
+  1674	 * @wiov: where to put the writable descriptors (or NULL)
+  1675	 * @head: head index we received, for passing to vringh_complete_iomem().
+  1676	 * @gfp: flags for allocating larger riov/wiov.
+  1677	 *
+  1678	 * Returns 0 if there was no descriptor, 1 if there was, or -errno.
+  1679	 *
+  1680	 * There some notes, and those are same with vringh_getdesc_kern(). Please see
+  1681	 * it.
+  1682	 */
+> 1683	int vringh_getdesc_iomem(struct vringh *vrh, struct vringh_kiov *riov,
+  1684				 struct vringh_kiov *wiov, u16 *head, gfp_t gfp)
+  1685	{
+  1686		int err;
+  1687	
+  1688		err = __vringh_get_head(vrh, getu16_iomem, &vrh->last_avail_idx);
+  1689		if (err < 0)
+  1690			return err;
+  1691	
+  1692		/* Empty... */
+  1693		if (err == vrh->vring.num)
+  1694			return 0;
+  1695	
+  1696		*head = err;
+  1697		err = __vringh_iov(vrh, *head, riov, wiov, no_range_check, NULL, gfp,
+  1698				   copydesc_iomem);
+  1699		if (err)
+  1700			return err;
+  1701	
+  1702		return 1;
+  1703	}
+  1704	EXPORT_SYMBOL(vringh_getdesc_iomem);
+  1705	
+  1706	/**
+  1707	 * vringh_iov_pull_iomem - copy bytes from vring_iov.
+  1708	 * @riov: the riov as passed to vringh_getdesc_iomem() (updated as we consume)
+  1709	 * @dst: the place to copy.
+  1710	 * @len: the maximum length to copy.
+  1711	 *
+  1712	 * Returns the bytes copied <= len or a negative errno.
+  1713	 */
+> 1714	ssize_t vringh_iov_pull_iomem(struct vringh *vrh, struct vringh_kiov *riov,
+  1715				      void *dst, size_t len)
+  1716	{
+  1717		return vringh_iov_xfer(vrh, riov, dst, len, xfer_from_iomem);
+  1718	}
+  1719	EXPORT_SYMBOL(vringh_iov_pull_iomem);
+  1720	
+  1721	/**
+  1722	 * vringh_iov_push_iomem - copy bytes into vring_iov.
+  1723	 * @wiov: the wiov as passed to vringh_getdesc_iomem() (updated as we consume)
+  1724	 * @src: the place to copy from.
+  1725	 * @len: the maximum length to copy.
+  1726	 *
+  1727	 * Returns the bytes copied <= len or a negative errno.
+  1728	 */
+> 1729	ssize_t vringh_iov_push_iomem(struct vringh *vrh, struct vringh_kiov *wiov,
+  1730				      const void *src, size_t len)
+  1731	{
+  1732		return vringh_iov_xfer(vrh, wiov, (void *)src, len, xfer_to_iomem);
+  1733	}
+  1734	EXPORT_SYMBOL(vringh_iov_push_iomem);
+  1735	
+  1736	/**
+  1737	 * vringh_abandon_iomem - we've decided not to handle the descriptor(s).
+  1738	 * @vrh: the vring.
+  1739	 * @num: the number of descriptors to put back (ie. num
+  1740	 *	 vringh_getdesc_iomem() to undo).
+  1741	 *
+  1742	 * The next vringh_get_kern() will return the old descriptor(s) again.
+  1743	 */
+> 1744	void vringh_abandon_iomem(struct vringh *vrh, unsigned int num)
+  1745	{
+  1746		vringh_abandon_kern(vrh, num);
+  1747	}
+  1748	EXPORT_SYMBOL(vringh_abandon_iomem);
+  1749	
+  1750	/**
+  1751	 * vringh_complete_iomem - we've finished with descriptor, publish it.
+  1752	 * @vrh: the vring.
+  1753	 * @head: the head as filled in by vringh_getdesc_iomem().
+  1754	 * @len: the length of data we have written.
+  1755	 *
+  1756	 * You should check vringh_need_notify_iomem() after one or more calls
+  1757	 * to this function.
+  1758	 */
+> 1759	int vringh_complete_iomem(struct vringh *vrh, u16 head, u32 len)
+  1760	{
+  1761		struct vring_used_elem used;
+  1762	
+  1763		used.id = cpu_to_vringh32(vrh, head);
+  1764		used.len = cpu_to_vringh32(vrh, len);
+  1765	
+  1766		return __vringh_complete(vrh, &used, 1, putu16_iomem, putused_iomem);
+  1767	}
+  1768	EXPORT_SYMBOL(vringh_complete_iomem);
+  1769	
+  1770	/**
+  1771	 * vringh_notify_enable_iomem - we want to know if something changes.
+  1772	 * @vrh: the vring.
+  1773	 *
+  1774	 * This always enables notifications, but returns false if there are
+  1775	 * now more buffers available in the vring.
+  1776	 */
+> 1777	bool vringh_notify_enable_iomem(struct vringh *vrh)
+  1778	{
+  1779		return __vringh_notify_enable(vrh, getu16_iomem, putu16_iomem);
+  1780	}
+  1781	EXPORT_SYMBOL(vringh_notify_enable_iomem);
+  1782	
+  1783	/**
+  1784	 * vringh_notify_disable_iomem - don't tell us if something changes.
+  1785	 * @vrh: the vring.
+  1786	 *
+  1787	 * This is our normal running state: we disable and then only enable when
+  1788	 * we're going to sleep.
+  1789	 */
+> 1790	void vringh_notify_disable_iomem(struct vringh *vrh)
+  1791	{
+  1792		__vringh_notify_disable(vrh, putu16_iomem);
+  1793	}
+  1794	EXPORT_SYMBOL(vringh_notify_disable_iomem);
+  1795	
+  1796	/**
+  1797	 * vringh_need_notify_iomem - must we tell the other side about used buffers?
+  1798	 * @vrh: the vring we've called vringh_complete_iomem() on.
+  1799	 *
+  1800	 * Returns -errno or 0 if we don't need to tell the other side, 1 if we do.
+  1801	 */
+> 1802	int vringh_need_notify_iomem(struct vringh *vrh)
+  1803	{
+  1804		return __vringh_need_notify(vrh, getu16_iomem);
+  1805	}
+  1806	EXPORT_SYMBOL(vringh_need_notify_iomem);
+  1807	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
