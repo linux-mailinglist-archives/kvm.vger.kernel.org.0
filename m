@@ -2,73 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E63B720A56
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 22:30:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A292720AA3
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 22:58:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232935AbjFBUal (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 16:30:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53684 "EHLO
+        id S236365AbjFBU6p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 16:58:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236104AbjFBUaj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 16:30:39 -0400
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD506E4A
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 13:30:33 -0700 (PDT)
-Received: by mail-ot1-x32a.google.com with SMTP id 46e09a7af769-6af6b5cf489so2252819a34.3
-        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 13:30:33 -0700 (PDT)
+        with ESMTP id S236158AbjFBU6o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 16:58:44 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A1E19B
+        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 13:58:43 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-974f4897d87so120703566b.0
+        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 13:58:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685737833; x=1688329833;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=10hRcwQ0GUO47GW14pu/UVUtmrspce6JF9a1n+Kc3qE=;
-        b=Zz8mOG+01aBDLhMelg/oVY0aJ+ahToA3CsO5FgnuWse/iLJYWAvzRW8Thv3erz8/Qm
-         Q8euilE9CNud+9F6VgkY9OI8T9W2gUKvmOWogqHWBfTbe+aokT5yvZcvGnEE3Om0BM8+
-         g7MPCtSE5Dg9KezwmDNrexeCYs+YCorqP3h9KgGjjUQNSMH1EKlH6FTkkdXfaztTFuCb
-         /chbxyT9iewP5HbgrkGQcogswZqYMjhBw169tZWg/WbH+F18r1M0WZ0yFkp9lfGmnUo2
-         vW5jhTWRJodkqlrdYrEaE83bczJj/UZqeXj5WVjY2aW4SvPk9mZsYdkUp0nBdUODl9bG
-         Si8A==
+        d=google.com; s=20221208; t=1685739522; x=1688331522;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=lEOehxHolb8X5C6iXhr+EWaD62m3RLxWc7FOFaBtkZ8=;
+        b=dHoGUlGb6XDm2/Otv+ZRHMw+mt1C/1deZYgmb1PbQDWcaUrmU2KmSAc2kc2BTjcEz2
+         NVc7Xgvx3W/QvWW+44JfAtHoxd1VbKB7KChHIbhaEnSuiSn2NptrvubUZkLhtXF0Z3N/
+         pLFeC99wzH7h4avZxAHDNCaTWNG66rdKwJospxaGXQ66eg+eDbMAFnTfW6PhYM5bIhR+
+         bFc1eqdXjHS0/bbevi0iBBmuyG5m+Yg1Sjkc5eXPPCP0MIAziQzo5OPzx7bnJLMuPmAH
+         C3m7/33P7BTRIEzOnELysCS3xEzRJY7vIPqDf24y+JQiYVE9kG0cs39LHmSxDbcqGFKO
+         JWdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685737833; x=1688329833;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=10hRcwQ0GUO47GW14pu/UVUtmrspce6JF9a1n+Kc3qE=;
-        b=YNBKV7YLdFaRipwB29VGSU0NgxpnxEleKzjIJojlyXIffqSA73awZjltRHR40gbgmX
-         Resf6wn0rIOcW0ikqMysStsFtspNx6c4f9Om303NHAmVvYqli4VHyuJmFS+UZNt7zlro
-         2qbqTcNpYMpwDIYFS1wdxp7cEmlas3y3ZDXlZpdN/1L7qa/owkv2W8b7omrWHewd1dqk
-         715tle+iNxmwAbAL3ZhTfjm0UOZGy7jA70as5PDuvYgy246vbHfPkUBCXCrC1SJOswV1
-         j14g+nx4u2XZPVbe1Bha50l5cK13/j4PvwAU4rRGt9pS+p+ZxKdIXJG+bCy9eXFfmwKY
-         R2Gg==
-X-Gm-Message-State: AC+VfDw9qtL60ELXvPHPsYL/7ciN2+pkGRwc1MYmbqQDreDQ2AQqSwL+
-        QddSIY2e/lk7yP0fDTiUx94=
-X-Google-Smtp-Source: ACHHUZ49DbSF/X0jUtqmRxmK9L5eLFTOBftgLIkXQIZHoEIa5ad6d0gDp0cQuMTvw0tf+FqPJTKLAg==
-X-Received: by 2002:a05:6830:3a92:b0:6b0:cde0:d9a with SMTP id dj18-20020a0568303a9200b006b0cde00d9amr3709371otb.21.1685737832986;
-        Fri, 02 Jun 2023 13:30:32 -0700 (PDT)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id 196-20020a6302cd000000b0053ef188c90bsm1628121pgc.89.2023.06.02.13.30.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jun 2023 13:30:32 -0700 (PDT)
-Date:   Fri, 2 Jun 2023 13:30:31 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        robert.hoo.linux@gmail.com, jthoughton@google.com,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-        isaku.yamahata@gmail.com
-Subject: Re: [PATCH v4 02/16] KVM: x86: Set vCPU exit reason to
- KVM_EXIT_UNKNOWN at the start of KVM_RUN
-Message-ID: <20230602203031.GK1234772@ls.amr.corp.intel.com>
-References: <20230602161921.208564-1-amoorthy@google.com>
- <20230602161921.208564-3-amoorthy@google.com>
+        d=1e100.net; s=20221208; t=1685739522; x=1688331522;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lEOehxHolb8X5C6iXhr+EWaD62m3RLxWc7FOFaBtkZ8=;
+        b=kVdSaDZZ8dqnircM+xfjgLtMV/pevm6mc6ksYKPQPhKXW93C/vV92eyK1VBFMnEcNE
+         YHuwQ+nH142XaxTd6tiO1awTbd6wqjgNAAOOolSwk17gGbMd9Rfm0r1PSULCmGOwU0aH
+         DZ62/6sU24u3xDZ0DXTjqDwCeGG2UPkt6+e41OkRW5hokcOOGYeKGOuduUp5xUQwvS54
+         ej5uHh36gdjQtrGKCWJmPtEgw2kDIgAf8L+i6SISAzEvt12Evcmj1s8wwJeSaVnJlT5W
+         5WocKCY0QwaZ5Drjz3uSonafakAOFXoQyXnZ6C2YK02JsM79euhYN2ILXtJT9gByvIBC
+         W1Bg==
+X-Gm-Message-State: AC+VfDy4yjRiA1jTy6qLt/2uJJt3ghMU26OoyjSidTI5922NlcmX7yBr
+        9Ryobai62FLOUwofuH+d0/AkP27wQ/vAmIUtL2OzLw==
+X-Google-Smtp-Source: ACHHUZ6T+VfpFr7aausPLCtKE/YyzZKqrUzoefeK1VCPalyfhekvDguhrF2kEC0Zgzs2X2kV0gHIegw+Vf9hSLzZ6Sk=
+X-Received: by 2002:a17:907:9449:b0:96f:608c:5bdf with SMTP id
+ dl9-20020a170907944900b0096f608c5bdfmr11859960ejc.64.1685739521701; Fri, 02
+ Jun 2023 13:58:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230602161921.208564-3-amoorthy@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+References: <20230602010550.785722-1-seanjc@google.com> <C8324338-FC07-454E-9A5A-1785141FEAB3@nutanix.com>
+ <CALMp9eTtkBL3Fb7Dq60go6CL+zGODNn0TTavr436Q-+=mpVFMA@mail.gmail.com>
+In-Reply-To: <CALMp9eTtkBL3Fb7Dq60go6CL+zGODNn0TTavr436Q-+=mpVFMA@mail.gmail.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Fri, 2 Jun 2023 13:58:05 -0700
+Message-ID: <CAL715WKm4t=y_UZZSZkd2=QPwXL8n-KnWzBS4A-ZJLQaWb0RKQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Use cpu_feature_enabled() for PKU instead of #ifdef
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Jon Kohler <jon@nutanix.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,58 +71,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 02, 2023 at 04:19:07PM +0000,
-Anish Moorthy <amoorthy@google.com> wrote:
+>
+> As we move towards enabling PKRU on the host, due to some customer
+> requests, I have to wonder if PKRU-disabled is the norm.
+>
+> In other words, is this a likely() or unlikely() optimization?
 
-> Give kvm_run.exit_reason a defined initial value on entry into KVM_RUN:
-> other architectures (riscv, arm64) already use KVM_EXIT_UNKNOWN for this
-> purpose, so copy that convention.
-> 
-> This gives vCPUs trying to fill the run struct a mechanism to avoid
-> overwriting already-populated data, albeit an imperfect one. Being able
-> to detect an already-populated KVM run struct will prevent at least some
-> bugs in the upcoming implementation of KVM_CAP_MEMORY_FAULT_INFO, which
-> will attempt to fill the run struct whenever a vCPU fails a guest memory
-> access.
-> 
-> Without the already-populated check, KVM_CAP_MEMORY_FAULT_INFO could
-> change kvm_run in any code paths which
-> 
-> 1. Populate kvm_run for some exit and prepare to return to userspace
-> 2. Access guest memory for some reason (but without returning -EFAULTs
->     to userspace)
-> 3. Finish the return to userspace set up in (1), now with the contents
->     of kvm_run changed to contain efault info.
-> 
+I think it should be likely() as PKU was introduced very early in the
+Skylake-SP server cores many years ago. Today I think all recent
+client CPUs should have PKU on default if I am not mistaken. So yeah,
+adding a likely() probably should help prevent the compiler from
+evicting this code chunk to the end of function.
 
-As vmx code uses KVM_EXIT_UNKNOWN with hardware_exit_reason=exit reason,
-Can we initialize hardware_exit_reason to -1.
-It's just in case.
-
-
-> Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> ---
->  arch/x86/kvm/x86.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ceb7c5e9cf9e..a7725d41570a 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11163,6 +11163,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  	if (r <= 0)
->  		goto out;
->  
-> +	kvm_run->exit_reason = KVM_EXIT_UNKNOWN;
-
-+	kvm_run->hardware_exit_reason = -1;     /* unused exit reason value */
-
->  	r = vcpu_run(vcpu);
->  
->  out:
-> -- 
-> 2.41.0.rc0.172.g3f132b7071-goog
-> 
-
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Thanks.
+-Mingwei
