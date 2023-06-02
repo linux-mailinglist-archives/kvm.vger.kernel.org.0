@@ -2,97 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DB58720142
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 14:13:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5634C72015A
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 14:15:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235789AbjFBMNl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 08:13:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54332 "EHLO
+        id S235829AbjFBMPZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 08:15:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234848AbjFBMNj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 08:13:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 425D31B4
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 05:13:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C333764F9F
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 12:13:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D19FC433D2
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 12:13:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685708011;
-        bh=zqZ30rwA8KlDQ3TjQDAlf2Ztoo8jO40arCyHNhRL/fA=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=CswzTGCTgX2HuSdzzJg3aHt7QN1NNrPE2o4JGEcQCKZAya9tm37JLbd5iEH0wy7Ml
-         KN6++gR9j1CvZz/oQqoP7sdvBVJlPY5Pb6bdbE3C5Z0mPeV2YH0mO5YqabBWDX/yel
-         trR8aCGZrcknhS612qQg47+QxE03KzyJJg+asPhFu+ooDRIJT7T+aoU1yf7tADUu3l
-         ET2N+8Ock72sg9fDlS7/ojMuFio+JLhCFe4crvqLU568Tak7a6SZbltUNUV6m0C5t2
-         NhV/eKyDHqKvnpxBdlYGfVxfzdtkb3pqrfRIzm/0sxoy3OIj9uUxevaRr/3ggX4PXW
-         m3AN2GD5UWb0Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 13AF0C43144; Fri,  2 Jun 2023 12:13:31 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 217516] FAIL: TSC reference precision test when do hyperv_clock
- test of kvm unit test
-Date:   Fri, 02 Jun 2023 12:13:30 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: bagasdotme@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-217516-28872-RrXA8OOkCM@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217516-28872@https.bugzilla.kernel.org/>
-References: <bug-217516-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S235801AbjFBMPV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 08:15:21 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6835D3;
+        Fri,  2 Jun 2023 05:15:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685708119; x=1717244119;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=jaq98164j/rBhMVM23GW5XTMHD8522zjxdU9EvovUys=;
+  b=SuGuefaqRshRHMgKP1WTz/uZCu5uzjbIWUVQqKkw34O9WcrIbEeLaV5w
+   1ecH9zKtXKchoZopbeLtVu4gnIkkKLO4UoQeYFi2RuxZWW+x/5U8bb1pG
+   8xHmh+6n6zOJGvQ5F7+lgDdfOu5N0vicGl9Y9hfdleiL8O++S/pcMmgr6
+   TR3dQJPq7CNqPfECNb6lILKcyHNaUTaZYLCsealu4Z0kMyL288BX/bB79
+   Kn3nC67mqSUzPSLB1liDYpoQDfDjJWADA+KhEttEm/oUL75QZawMe0yug
+   dKJi48csfhudWcXJkRYqeM4HovZMtfI7Qti6q1OEgMSIEmXl08J7B3gqo
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10728"; a="335467436"
+X-IronPort-AV: E=Sophos;i="6.00,212,1681196400"; 
+   d="scan'208";a="335467436"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2023 05:15:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10728"; a="772876447"
+X-IronPort-AV: E=Sophos;i="6.00,212,1681196400"; 
+   d="scan'208";a="772876447"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by fmsmga008.fm.intel.com with ESMTP; 02 Jun 2023 05:15:16 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
+Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+        yi.l.liu@intel.com, yi.y.sun@linux.intel.com, peterx@redhat.com,
+        jasowang@redhat.com, shameerali.kolothum.thodi@huawei.com,
+        lulu@redhat.com, suravee.suthikulpanit@amd.com,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
+        clegoate@redhat.com
+Subject: [PATCH v7 0/9] Enhance vfio PCI hot reset for vfio cdev device
+Date:   Fri,  2 Jun 2023 05:15:06 -0700
+Message-Id: <20230602121515.79374-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217516
+VFIO_DEVICE_PCI_HOT_RESET requires user to pass an array of group fds
+to prove that it owns all devices affected by resetting the calling
+device. While for cdev devices, user can use an iommufd-based ownership
+checking model and invoke VFIO_DEVICE_PCI_HOT_RESET with a zero-length
+fd array.
 
-Bagas Sanjaya (bagasdotme@gmail.com) changed:
+This series extends VFIO_DEVICE_GET_PCI_HOT_RESET_INFO to check ownership
+and return the check result and the devid of affected devices to user. In
+the end, extends the VFIO_DEVICE_PCI_HOT_RESET to accept zero-length fd
+array for hot-reset with cdev devices.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |bagasdotme@gmail.com
+The new hot reset method and updated _INFO ioctl are tested with the
+below qemu:
 
---- Comment #2 from Bagas Sanjaya (bagasdotme@gmail.com) ---
-(In reply to Ethan Xie from comment #0)
-> # cat /etc/redhat-release
-> CentOS Linux release 8.5.2111
->=20
-> # uname -r
-> 4.18.0-348.7.1.el8_5.x86_64
->=20
+https://github.com/yiliu1765/qemu/tree/iommufd_rfcv4.mig.reset.v4_var3
+(requires to test with the cdev kernel)
 
-CentOS 8 has been EOLed in 2021. Can you test with Rocky Linux 9 instead
-(and preferably latest mainline kernel)?
+Change log:
 
---=20
-You may reply to this email to add a comment.
+v7:
+ - Drop noiommu support (patch 01 of v6 is dropped)
+ - Remove helpers to get devid and ictx for iommufd_access
+ - Document the dev_set representative requirement in the
+   VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for the cdev opened device (Alex)
+ - zero-length fd array approach is only for cdev opened device (Alex)
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+v6: https://lore.kernel.org/kvm/20230522115751.326947-1-yi.l.liu@intel.com/
+ - Remove noiommu_access, reuse iommufd_access instead (Alex)
+ - vfio_iommufd_physical_ictx -> vfio_iommufd_device_ictx
+ - vfio_iommufd_physical_devid -> vfio_iommufd_device_hot_reset_devid
+ - Refine logic in patch 9 and 10 of v5, no uapi change. (Alex)
+ - Remove lockdep asset in vfio_pci_is_device_in_set (Cédric)
+ - Add t-b from Terrence (Tested GVT-g / GVT-d VFIO legacy mode / compat mode
+   / cdev mode, including negative tests. No regression be introduced.)
+
+v5: https://lore.kernel.org/kvm/20230513132136.15021-1-yi.l.liu@intel.com/
+ - Drop patch 01 of v4 (Alex)
+ - Create noiommu_access for noiommu devices (Jason)
+ - Reserve all negative iommufd IDs, hence VFIO can encode negative
+   values (Jason)
+ - Make vfio_iommufd_physical_devid() return -EINVAL if it's not called
+   with a physical device or a noiommu device.
+ - Add vfio_find_device_in_devset() in vfio_main.c (Alex)
+ - Add iommufd_ctx_has_group() to replace vfio_devset_iommufd_has_group().
+   Reason: vfio_devset_iommufd_has_group() only loops the devices within
+   the given devset to check the iommufd an iommu_group, but an iommu_group
+   can span into multiple devsets. So if failed to find the group in a
+   devset doesn't mean the group is not owned by the iommufd. So here either
+   needs to search all the devsets or add an iommufd API to check it. It
+   appears an iommufd API makes more sense.
+ - Adopt suggestions from Alex on patch 08 and 09 of v4, refine the hot-reset
+   uapi description and minor tweaks
+ - Use bitfields for bool members (Alex)
+
+v4: https://lore.kernel.org/kvm/20230426145419.450922-1-yi.l.liu@intel.com/
+ - Rename the patch series subject
+ - Patch 01 is moved from the cdev series
+ - Patch 02, 06 are new per review comments in v3
+ - Patch 03/04/05/07/08/09 are from v3 with updates
+
+v3: https://lore.kernel.org/kvm/20230401144429.88673-1-yi.l.liu@intel.com/
+ - Remove the new _INFO ioctl of v2, extend the existing _INFO ioctl to
+   report devid (Alex)
+ - Add r-b from Jason
+ - Add t-b from Terrence Xu and Yanting Jiang (mainly regression test)
+
+v2: https://lore.kernel.org/kvm/20230327093458.44939-1-yi.l.liu@intel.com/
+ - Split the patch 03 of v1 to be 03, 04 and 05 of v2 (Jaon)
+ - Add r-b from Kevin and Jason
+ - Add patch 10 to introduce a new _INFO ioctl for the usage of device
+   fd passing usage in cdev path (Jason, Alex)
+
+v1: https://lore.kernel.org/kvm/20230316124156.12064-1-yi.l.liu@intel.com/
+
+Regards,
+	Yi Liu
+
+Yi Liu (9):
+  vfio/pci: Update comment around group_fd get in
+    vfio_pci_ioctl_pci_hot_reset()
+  vfio/pci: Move the existing hot reset logic to be a helper
+  iommufd: Reserve all negative IDs in the iommufd xarray
+  iommufd: Add iommufd_ctx_has_group()
+  iommufd: Add helper to retrieve iommufd_ctx and devid
+  vfio: Mark cdev usage in vfio_device
+  vfio: Add helper to search vfio_device in a dev_set
+  vfio/pci: Extend VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for vfio device
+    cdev
+  vfio/pci: Allow passing zero-length fd array in
+    VFIO_DEVICE_PCI_HOT_RESET
+
+ drivers/iommu/iommufd/device.c   |  42 ++++++++
+ drivers/iommu/iommufd/main.c     |   2 +-
+ drivers/vfio/iommufd.c           |  49 +++++++++
+ drivers/vfio/pci/vfio_pci_core.c | 170 ++++++++++++++++++++++---------
+ drivers/vfio/vfio_main.c         |  15 +++
+ include/linux/iommufd.h          |  11 ++
+ include/linux/vfio.h             |  24 +++++
+ include/uapi/linux/vfio.h        |  64 +++++++++++-
+ 8 files changed, 328 insertions(+), 49 deletions(-)
+
+-- 
+2.34.1
+
