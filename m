@@ -2,596 +2,389 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DB7F720838
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 19:15:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3B39720846
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 19:19:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235825AbjFBRPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 13:15:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44352 "EHLO
+        id S236882AbjFBRT5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 13:19:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235529AbjFBRPs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 13:15:48 -0400
-Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F08771A2
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 10:15:46 -0700 (PDT)
-Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-1a1b95cc10eso2456493fac.0
-        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 10:15:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685726146; x=1688318146;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w+efdKjZMqTriW/c39VG7BsQ50ph9hjKVpeEjowQDww=;
-        b=UzHUl1cMzoc5+E/XONIL3rxge4eSLwsyd70FxKcoUcRIOaFIqqmL9YP6tlR9L8gruk
-         RwC9Mg8ULyDbieAwArPIcS2TqXtDOU/gwbeQriDjw+GpNFFX4nF5hJpbybXVbl6mH4HU
-         3zP2ZBebUauLL2r1e1Jyy1GR3YNpckVk9tdeqM9Vm0//pqdLtCsMU76x/rsOEUOajJBX
-         o17RWlnFoVgAprRcZ1gutXrn3Y9PgeyTRTiCiaiV2fBwh4jSXRLHc24X2JvFQdn7JmAk
-         jx+uaaVZmOOMO39kWbP8PqWjUcQaeUTGO0QGksYDULUpo6fYxLr1ZLY2mU38V0Rm3yC4
-         m6tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685726146; x=1688318146;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w+efdKjZMqTriW/c39VG7BsQ50ph9hjKVpeEjowQDww=;
-        b=RmxnLQSmLowapFBT7pXo6tIBqkFuMP4wq15yrVb4HKU+Vn/244U3TF4VROslmMLwks
-         imxp7og8TRgmHypkLBjpHIgP2Ao8UrpsDm4Re7sNcxQjM4AjfEXNuIf/kF+3LYCIaNDs
-         PLvp/HUlReMa/deJNEC8pUlD0bP3/EuZlvclULDXbrEInxS1zhNy+FpRISgEMjro8Nnu
-         8FNEfKpWBKebksPRt/kATdxOr1OS3nDWr/yC0yElZHQzXAygzjWwwvOnsVK75CKI1P+j
-         ordJivNkQ7hYowc/TcpRtqFf/6K/tUkpLRb066GfwR5A809guvKugFe2MX5dK8LaYste
-         PoOg==
-X-Gm-Message-State: AC+VfDyJc3LC1TNMfY5ed01uYOfye01ctnYCl1Xg/rlinzA9VkXmm3IS
-        ZNAccOHTcig0rIlsum6ftxjoERVIAmCIpmellXtW9JpAjg47+LoOYPw=
-X-Google-Smtp-Source: ACHHUZ6e7Ovj/gxAh4j0MR/m0ADkAVnmpRT099PmZ6Mlqmzs0WFhcNaptk1VkoPvidUlDYUzcuOIWp3Z2fe8UIL5/Ac=
-X-Received: by 2002:a05:6870:e145:b0:1a2:ae9a:749c with SMTP id
- z5-20020a056870e14500b001a2ae9a749cmr1091309oaa.42.1685726145787; Fri, 02 Jun
- 2023 10:15:45 -0700 (PDT)
+        with ESMTP id S235723AbjFBRTz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 13:19:55 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 727D01A2;
+        Fri,  2 Jun 2023 10:19:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685726393; x=1717262393;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=huQWIaGLCyDwNEyv4gbOkY32hoPagVTcWkg9cSo0J7c=;
+  b=XYuxQXVEAVXx0c0IdooSo6ty/eXLm4uPGNLBTpAbZCET07ohFXOHuGa2
+   Ve1Wj7PVDx9becFtpFYQspv0+gAiI53pY2oQmo6lhlx4+aKHtNQsDnfyX
+   U92buqKSSUWM2tGW5N52+DLf3piCBhXDgAqnXjLtsxdP0Gf0UowPRkeRm
+   BvepsJWkgMlA1okXzTWMzas+aPiLtqLmcekQg8iz63iwT+CpMP2eH6QBM
+   x4ZiYYT+8jqu/avge/pPyPO3miku5V0DeRtoOBo7fyHlLeESIVefPU9RN
+   MX29ufTc9Hmxa1HeQQyt3sJkEtctRvFjqEJUnf9lAyjk8ubLmiy4u0ta7
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10729"; a="419455142"
+X-IronPort-AV: E=Sophos;i="6.00,213,1681196400"; 
+   d="scan'208";a="419455142"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2023 10:19:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10729"; a="737615596"
+X-IronPort-AV: E=Sophos;i="6.00,213,1681196400"; 
+   d="scan'208";a="737615596"
+Received: from lkp-server01.sh.intel.com (HELO 15ab08e44a81) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 02 Jun 2023 10:19:50 -0700
+Received: from kbuild by 15ab08e44a81 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1q58RJ-0000lB-17;
+        Fri, 02 Jun 2023 17:19:49 +0000
+Date:   Sat, 3 Jun 2023 01:19:37 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Shunsuke Mie <mie@igel.co.jp>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Rusty Russell <rusty@rustcorp.com.au>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Shunsuke Mie <mie@igel.co.jp>
+Subject: Re: [PATCH v4 1/1] vringh: IOMEM support
+Message-ID: <202306030119.NG7CQmJ8-lkp@intel.com>
+References: <20230602055211.309960-2-mie@igel.co.jp>
 MIME-Version: 1.0
-References: <20230602005118.2899664-1-jingzhangos@google.com> <20230602005118.2899664-6-jingzhangos@google.com>
-In-Reply-To: <20230602005118.2899664-6-jingzhangos@google.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Fri, 2 Jun 2023 10:15:32 -0700
-Message-ID: <CAAdAUtiw91APuLbr=OWB0w0eD5n=_4_X=K3xtO4kXZZhOcdDQA@mail.gmail.com>
-Subject: Re: [PATCH v11 5/5] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
-To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oupton@google.com>, sjitindarsingh@gmail.com
-Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-14.3 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_SBL_CSS,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230602055211.309960-2-mie@igel.co.jp>
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Suraj,
+Hi Shunsuke,
 
-Let's continue the problem here you raised in the v9.
-For the SVE example, the problem would be gone by enabling the
-writable for SVE field? Since we are going to enable the writable for
-all ID regs one by one later.
-The double checking for CSV[2|3] is gone in this series.
+kernel test robot noticed the following build warnings:
 
-Thanks,
-Jing
+[auto build test WARNING on mst-vhost/linux-next]
+[also build test WARNING on linus/master horms-ipvs/master v6.4-rc4 next-20230602]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-On Thu, Jun 1, 2023 at 5:51=E2=80=AFPM Jing Zhang <jingzhangos@google.com> =
-wrote:
->
-> Refactor writings for ID_AA64PFR0_EL1.[CSV2|CSV3],
-> ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon based on utilities
-> specific to ID register.
->
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arch/arm64/include/asm/cpufeature.h |   1 +
->  arch/arm64/kernel/cpufeature.c      |   2 +-
->  arch/arm64/kvm/sys_regs.c           | 291 +++++++++++++++++++---------
->  3 files changed, 203 insertions(+), 91 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm=
-/cpufeature.h
-> index 6bf013fb110d..dc769c2eb7a4 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -915,6 +915,7 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
->         return 8;
->  }
->
-> +s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new, s64=
- cur);
->  struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
->
->  extern struct arm64_ftr_override id_aa64mmfr1_override;
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeatur=
-e.c
-> index 7d7128c65161..3317a7b6deac 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -798,7 +798,7 @@ static u64 arm64_ftr_set_value(const struct arm64_ftr=
-_bits *ftrp, s64 reg,
->         return reg;
->  }
->
-> -static s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 n=
-ew,
-> +s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new,
->                                 s64 cur)
->  {
->         s64 ret =3D 0;
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 1a534e0fc4ca..50d4e25f42d3 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -41,6 +41,7 @@
->   * 64bit interface.
->   */
->
-> +static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *=
-rd, u64 val);
->  static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 encoding=
-);
->  static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
->
-> @@ -1194,6 +1195,86 @@ static bool access_arch_timer(struct kvm_vcpu *vcp=
-u,
->         return true;
->  }
->
-> +static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits =
-*ftrp,
-> +                                   s64 new, s64 cur)
-> +{
-> +       struct arm64_ftr_bits kvm_ftr =3D *ftrp;
-> +
-> +       /* Some features have different safe value type in KVM than host =
-features */
-> +       switch (id) {
-> +       case SYS_ID_AA64DFR0_EL1:
-> +               if (kvm_ftr.shift =3D=3D ID_AA64DFR0_EL1_PMUVer_SHIFT)
-> +                       kvm_ftr.type =3D FTR_LOWER_SAFE;
-> +               break;
-> +       case SYS_ID_DFR0_EL1:
-> +               if (kvm_ftr.shift =3D=3D ID_DFR0_EL1_PerfMon_SHIFT)
-> +                       kvm_ftr.type =3D FTR_LOWER_SAFE;
-> +               break;
-> +       }
-> +
-> +       return arm64_ftr_safe_value(&kvm_ftr, new, cur);
-> +}
-> +
-> +/**
-> + * arm64_check_features() - Check if a feature register value constitute=
-s
-> + * a subset of features indicated by the idreg's KVM sanitised limit.
-> + *
-> + * This function will check if each feature field of @val is the "safe" =
-value
-> + * against idreg's KVM sanitised limit return from reset() callback.
-> + * If a field value in @val is the same as the one in limit, it is alway=
-s
-> + * considered the safe value regardless For register fields that are not=
- in
-> + * writable, only the value in limit is considered the safe value.
-> + *
-> + * Return: 0 if all the fields are safe. Otherwise, return negative errn=
-o.
-> + */
-> +static int arm64_check_features(struct kvm_vcpu *vcpu,
-> +                               const struct sys_reg_desc *rd,
-> +                               u64 val)
-> +{
-> +       const struct arm64_ftr_reg *ftr_reg;
-> +       const struct arm64_ftr_bits *ftrp =3D NULL;
-> +       u32 id =3D reg_to_encoding(rd);
-> +       u64 writable_mask =3D rd->val;
-> +       u64 limit =3D 0;
-> +       u64 mask =3D 0;
-> +
-> +       /* For hidden and unallocated idregs without reset, only val =3D =
-0 is allowed. */
-> +       if (rd->reset) {
-> +               limit =3D rd->reset(vcpu, rd);
-> +               ftr_reg =3D get_arm64_ftr_reg(id);
-> +               if (!ftr_reg)
-> +                       return -EINVAL;
-> +               ftrp =3D ftr_reg->ftr_bits;
-> +       }
-> +
-> +       for (; ftrp && ftrp->width; ftrp++) {
-> +               s64 f_val, f_lim, safe_val;
-> +               u64 ftr_mask;
-> +
-> +               ftr_mask =3D arm64_ftr_mask(ftrp);
-> +               if ((ftr_mask & writable_mask) !=3D ftr_mask)
-> +                       continue;
-> +
-> +               f_val =3D arm64_ftr_value(ftrp, val);
-> +               f_lim =3D arm64_ftr_value(ftrp, limit);
-> +               mask |=3D ftr_mask;
-> +
-> +               if (f_val =3D=3D f_lim)
-> +                       safe_val =3D f_val;
-> +               else
-> +                       safe_val =3D kvm_arm64_ftr_safe_value(id, ftrp, f=
-_val, f_lim);
-> +
-> +               if (safe_val !=3D f_val)
-> +                       return -E2BIG;
-> +       }
-> +
-> +       /* For fields that are not writable, values in limit are the safe=
- values. */
-> +       if ((val & ~mask) !=3D (limit & ~mask))
-> +               return -E2BIG;
-> +
-> +       return 0;
-> +}
-> +
->  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
->  {
->         if (kvm_vcpu_has_pmu(vcpu))
-> @@ -1231,9 +1312,17 @@ static u8 pmuver_to_perfmon(u8 pmuver)
->         }
->  }
->
-> -static void pmuver_update(struct kvm_vcpu *vcpu, u8 pmuver, bool valid_p=
-mu)
-> +static int pmuver_update(struct kvm_vcpu *vcpu,
-> +                         const struct sys_reg_desc *rd,
-> +                         u64 val,
-> +                         u8 pmuver,
-> +                         bool valid_pmu)
->  {
-> -       u64 val;
-> +       int ret;
-> +
-> +       ret =3D set_id_reg(vcpu, rd, val);
-> +       if (ret)
-> +               return ret;
->
->         if (valid_pmu) {
->                 val =3D IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
-> @@ -1249,6 +1338,8 @@ static void pmuver_update(struct kvm_vcpu *vcpu, u8=
- pmuver, bool valid_pmu)
->                 assign_bit(KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU, &vcpu->kvm=
-->arch.flags,
->                            pmuver =3D=3D ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
->         }
-> +
-> +       return 0;
->  }
->
->  static u64 general_read_kvm_sanitised_reg(struct kvm_vcpu *vcpu, const s=
-truct sys_reg_desc *rd)
-> @@ -1264,7 +1355,6 @@ static u64 kvm_arm_read_id_reg(const struct kvm_vcp=
-u *vcpu, u32 encoding)
->         case SYS_ID_AA64PFR0_EL1:
->                 if (!vcpu_has_sve(vcpu))
->                         val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_SVE)=
-;
-> -               val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
->                 if (kvm_vgic_global_state.type =3D=3D VGIC_V3) {
->                         val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_GIC)=
-;
->                         val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR=
-0_EL1_GIC), 1);
-> @@ -1291,15 +1381,10 @@ static u64 kvm_arm_read_id_reg(const struct kvm_v=
-cpu *vcpu, u32 encoding)
->                         val &=3D ~ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_WFx=
-T);
->                 break;
->         case SYS_ID_AA64DFR0_EL1:
-> -               /* Limit debug to ARMv8.0 */
-> -               val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer);
-> -               val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_De=
-bugVer), 6);
->                 /* Set PMUver to the required version */
->                 val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
->                 val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PM=
-UVer),
->                                   vcpu_pmuver(vcpu));
-> -               /* Hide SPE from guests */
-> -               val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer);
->                 break;
->         case SYS_ID_DFR0_EL1:
->                 val &=3D ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-> @@ -1398,38 +1483,56 @@ static unsigned int sve_visibility(const struct k=
-vm_vcpu *vcpu,
->         return REG_HIDDEN;
->  }
->
-> -static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> -                              const struct sys_reg_desc *rd,
-> -                              u64 val)
-> +static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> +                                         const struct sys_reg_desc *rd)
->  {
-> -       u64 new_val =3D val;
-> -       u8 csv2, csv3;
-> +       u64 val;
-> +       u32 id =3D reg_to_encoding(rd);
->
-> +       val =3D read_sanitised_ftr_reg(id);
->         /*
-> -        * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
-> -        * it doesn't promise more than what is actually provided (the
-> -        * guest could otherwise be covered in ectoplasmic residue).
-> +        * The default is to expose CSV2 =3D=3D 1 if the HW isn't affecte=
-d.
-> +        * Although this is a per-CPU feature, we make it global because
-> +        * asymmetric systems are just a nuisance.
-> +        *
-> +        * Userspace can override this as long as it doesn't promise
-> +        * the impossible.
->          */
-> -       csv2 =3D cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_EL=
-1_CSV2_SHIFT);
-> -       if (csv2 > 1 ||
-> -           (csv2 && arm64_get_spectre_v2_state() !=3D SPECTRE_UNAFFECTED=
-))
-> -               return -EINVAL;
-> +       if (arm64_get_spectre_v2_state() =3D=3D SPECTRE_UNAFFECTED) {
-> +               val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
-> +               val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CS=
-V2), 1);
-> +       }
-> +       if (arm64_get_meltdown_state() =3D=3D SPECTRE_UNAFFECTED) {
-> +               val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
-> +               val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CS=
-V3), 1);
-> +       }
->
-> -       /* Same thing for CSV3 */
-> -       csv3 =3D cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_EL=
-1_CSV3_SHIFT);
-> -       if (csv3 > 1 ||
-> -           (csv3 && arm64_get_meltdown_state() !=3D SPECTRE_UNAFFECTED))
-> -               return -EINVAL;
-> +       val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_AMU);
->
-> -       /* We can only differ with CSV[23], and anything else is an error=
- */
-> -       val ^=3D read_id_reg(vcpu, rd);
-> -       val &=3D ~(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2) |
-> -                ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3));
-> -       if (val)
-> -               return -EINVAL;
-> +       return val;
-> +}
->
-> -       IDREG(vcpu->kvm, reg_to_encoding(rd)) =3D new_val;
-> -       return 0;
-> +static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> +                                         const struct sys_reg_desc *rd)
-> +{
-> +       u64 val;
-> +       u32 id =3D reg_to_encoding(rd);
-> +
-> +       val =3D read_sanitised_ftr_reg(id);
-> +       /* Limit debug to ARMv8.0 */
-> +       val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer);
-> +       val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer),=
- 6);
-> +       /*
-> +        * Initialise the default PMUver before there is a chance to
-> +        * create an actual PMU.
-> +        */
-> +       val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> +       val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-> +                         kvm_arm_pmu_get_pmuver_limit());
-> +       /* Hide SPE from guests */
-> +       val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer);
-> +
-> +       return val;
->  }
->
->  static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> @@ -1457,14 +1560,35 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *v=
-cpu,
->         if (kvm_vcpu_has_pmu(vcpu) !=3D valid_pmu)
->                 return -EINVAL;
->
-> -       /* We can only differ with PMUver, and anything else is an error =
-*/
-> -       val ^=3D read_id_reg(vcpu, rd);
-> -       val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> -       if (val)
-> -               return -EINVAL;
-> +       if (!valid_pmu) {
-> +               /*
-> +                * Ignore the PMUVer field in @val. The PMUVer would be d=
-etermined
-> +                * by arch flags bit KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU,
-> +                */
-> +               pmuver =3D FIELD_GET(ID_AA64DFR0_EL1_PMUVer_MASK,
-> +                                  IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1))=
-;
-> +               val &=3D ~ID_AA64DFR0_EL1_PMUVer_MASK;
-> +               val |=3D FIELD_PREP(ID_AA64DFR0_EL1_PMUVer_MASK, pmuver);
-> +       }
->
-> -       pmuver_update(vcpu, pmuver, valid_pmu);
-> -       return 0;
-> +       return pmuver_update(vcpu, rd, val, pmuver, valid_pmu);
-> +}
-> +
-> +static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
-> +                                     const struct sys_reg_desc *rd)
-> +{
-> +       u64 val;
-> +       u32 id =3D reg_to_encoding(rd);
-> +
-> +       val =3D read_sanitised_ftr_reg(id);
-> +       /*
-> +        * Initialise the default PMUver before there is a chance to
-> +        * create an actual PMU.
-> +        */
-> +       val &=3D ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-> +       val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), kvm_=
-arm_pmu_get_pmuver_limit());
-> +
-> +       return val;
->  }
->
->  static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
-> @@ -1493,14 +1617,18 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
->         if (kvm_vcpu_has_pmu(vcpu) !=3D valid_pmu)
->                 return -EINVAL;
->
-> -       /* We can only differ with PerfMon, and anything else is an error=
- */
-> -       val ^=3D read_id_reg(vcpu, rd);
-> -       val &=3D ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-> -       if (val)
-> -               return -EINVAL;
-> +       if (!valid_pmu) {
-> +               /*
-> +                * Ignore the PerfMon field in @val. The PerfMon would be=
- determined
-> +                * by arch flags bit KVM_ARCH_FLAG_VCPU_HAS_IMP_DEF_PMU,
-> +                */
-> +               perfmon =3D FIELD_GET(ID_DFR0_EL1_PerfMon_MASK,
-> +                                   IDREG(vcpu->kvm, SYS_ID_DFR0_EL1));
-> +               val &=3D ~ID_DFR0_EL1_PerfMon_MASK;
-> +               val |=3D FIELD_PREP(ID_DFR0_EL1_PerfMon_MASK, perfmon);
-> +       }
->
-> -       pmuver_update(vcpu, perfmon_to_pmuver(perfmon), valid_pmu);
-> -       return 0;
-> +       return pmuver_update(vcpu, rd, val, perfmon_to_pmuver(perfmon), v=
-alid_pmu);
->  }
->
->  /*
-> @@ -1520,11 +1648,14 @@ static int get_id_reg(struct kvm_vcpu *vcpu, cons=
-t struct sys_reg_desc *rd,
->  static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *=
-rd,
->                       u64 val)
->  {
-> -       /* This is what we mean by invariant: you can't change it. */
-> -       if (val !=3D read_id_reg(vcpu, rd))
-> -               return -EINVAL;
-> +       u32 id =3D reg_to_encoding(rd);
-> +       int ret =3D 0;
->
-> -       return 0;
-> +       ret =3D arm64_check_features(vcpu, rd, val);
-> +       if (!ret)
-> +               IDREG(vcpu->kvm, id) =3D val;
-> +
-> +       return ret;
->  }
->
->  static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*rd,
-> @@ -1875,9 +2006,13 @@ static const struct sys_reg_desc sys_reg_descs[] =
-=3D {
->         /* CRm=3D1 */
->         AA32_ID_SANITISED(ID_PFR0_EL1),
->         AA32_ID_SANITISED(ID_PFR1_EL1),
-> -       { SYS_DESC(SYS_ID_DFR0_EL1), .access =3D access_id_reg,
-> -         .get_user =3D get_id_reg, .set_user =3D set_id_dfr0_el1,
-> -         .visibility =3D aa32_id_visibility, },
-> +       { SYS_DESC(SYS_ID_DFR0_EL1),
-> +         .access =3D access_id_reg,
-> +         .get_user =3D get_id_reg,
-> +         .set_user =3D set_id_dfr0_el1,
-> +         .visibility =3D aa32_id_visibility,
-> +         .reset =3D read_sanitised_id_dfr0_el1,
-> +         .val =3D ID_DFR0_EL1_PerfMon_MASK, },
->         ID_HIDDEN(ID_AFR0_EL1),
->         AA32_ID_SANITISED(ID_MMFR0_EL1),
->         AA32_ID_SANITISED(ID_MMFR1_EL1),
-> @@ -1906,8 +2041,12 @@ static const struct sys_reg_desc sys_reg_descs[] =
-=3D {
->
->         /* AArch64 ID registers */
->         /* CRm=3D4 */
-> -       { SYS_DESC(SYS_ID_AA64PFR0_EL1), .access =3D access_id_reg,
-> -         .get_user =3D get_id_reg, .set_user =3D set_id_aa64pfr0_el1, },
-> +       { SYS_DESC(SYS_ID_AA64PFR0_EL1),
-> +         .access =3D access_id_reg,
-> +         .get_user =3D get_id_reg,
-> +         .set_user =3D set_id_reg,
-> +         .reset =3D read_sanitised_id_aa64pfr0_el1,
-> +         .val =3D ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK,=
- },
->         ID_SANITISED(ID_AA64PFR1_EL1),
->         ID_UNALLOCATED(4,2),
->         ID_UNALLOCATED(4,3),
-> @@ -1917,8 +2056,12 @@ static const struct sys_reg_desc sys_reg_descs[] =
-=3D {
->         ID_UNALLOCATED(4,7),
->
->         /* CRm=3D5 */
-> -       { SYS_DESC(SYS_ID_AA64DFR0_EL1), .access =3D access_id_reg,
-> -         .get_user =3D get_id_reg, .set_user =3D set_id_aa64dfr0_el1, },
-> +       { SYS_DESC(SYS_ID_AA64DFR0_EL1),
-> +         .access =3D access_id_reg,
-> +         .get_user =3D get_id_reg,
-> +         .set_user =3D set_id_aa64dfr0_el1,
-> +         .reset =3D read_sanitised_id_aa64dfr0_el1,
-> +         .val =3D ID_AA64DFR0_EL1_PMUVer_MASK, },
->         ID_SANITISED(ID_AA64DFR1_EL1),
->         ID_UNALLOCATED(5,2),
->         ID_UNALLOCATED(5,3),
-> @@ -3454,38 +3597,6 @@ void kvm_arm_init_id_regs(struct kvm *kvm)
->                 idreg++;
->                 id =3D reg_to_encoding(idreg);
->         }
-> -
-> -       /*
-> -        * The default is to expose CSV2 =3D=3D 1 if the HW isn't affecte=
-d.
-> -        * Although this is a per-CPU feature, we make it global because
-> -        * asymmetric systems are just a nuisance.
-> -        *
-> -        * Userspace can override this as long as it doesn't promise
-> -        * the impossible.
-> -        */
-> -       val =3D IDREG(kvm, SYS_ID_AA64PFR0_EL1);
-> -
-> -       if (arm64_get_spectre_v2_state() =3D=3D SPECTRE_UNAFFECTED) {
-> -               val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV2);
-> -               val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CS=
-V2), 1);
-> -       }
-> -       if (arm64_get_meltdown_state() =3D=3D SPECTRE_UNAFFECTED) {
-> -               val &=3D ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
-> -               val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CS=
-V3), 1);
-> -       }
-> -
-> -       IDREG(kvm, SYS_ID_AA64PFR0_EL1) =3D val;
-> -       /*
-> -        * Initialise the default PMUver before there is a chance to
-> -        * create an actual PMU.
-> -        */
-> -       val =3D IDREG(kvm, SYS_ID_AA64DFR0_EL1);
-> -
-> -       val &=3D ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> -       val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-> -                         kvm_arm_pmu_get_pmuver_limit());
-> -
-> -       IDREG(kvm, SYS_ID_AA64DFR0_EL1) =3D val;
->  }
->
->  int __init kvm_sys_reg_table_init(void)
-> --
-> 2.41.0.rc0.172.g3f132b7071-goog
->
+url:    https://github.com/intel-lab-lkp/linux/commits/Shunsuke-Mie/vringh-IOMEM-support/20230602-135351
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+patch link:    https://lore.kernel.org/r/20230602055211.309960-2-mie%40igel.co.jp
+patch subject: [PATCH v4 1/1] vringh: IOMEM support
+config: hexagon-randconfig-r034-20230531 (https://download.01.org/0day-ci/archive/20230603/202306030119.NG7CQmJ8-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project 4faf3aaf28226a4e950c103a14f6fc1d1fdabb1b)
+reproduce (this is a W=1 build):
+        mkdir -p ~/bin
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/de2a1f5220c32e953400f225aba6bd294a8d41b8
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Shunsuke-Mie/vringh-IOMEM-support/20230602-135351
+        git checkout de2a1f5220c32e953400f225aba6bd294a8d41b8
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang ~/bin/make.cross W=1 O=build_dir ARCH=hexagon olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang ~/bin/make.cross W=1 O=build_dir ARCH=hexagon SHELL=/bin/bash drivers/vhost/
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306030119.NG7CQmJ8-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from drivers/vhost/vringh.c:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           val = __raw_readb(PCI_IOBASE + addr);
+                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+                                                           ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+   #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+                                                     ^
+   In file included from drivers/vhost/vringh.c:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+                                                           ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+   #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+                                                     ^
+   In file included from drivers/vhost/vringh.c:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           __raw_writeb(value, PCI_IOBASE + addr);
+                               ~~~~~~~~~~ ^
+   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+                                                         ~~~~~~~~~~ ^
+   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+                                                         ~~~~~~~~~~ ^
+>> drivers/vhost/vringh.c:1661:5: warning: no previous prototype for function 'vringh_init_iomem' [-Wmissing-prototypes]
+   int vringh_init_iomem(struct vringh *vrh, u64 features, unsigned int num,
+       ^
+   drivers/vhost/vringh.c:1661:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int vringh_init_iomem(struct vringh *vrh, u64 features, unsigned int num,
+   ^
+   static 
+>> drivers/vhost/vringh.c:1683:5: warning: no previous prototype for function 'vringh_getdesc_iomem' [-Wmissing-prototypes]
+   int vringh_getdesc_iomem(struct vringh *vrh, struct vringh_kiov *riov,
+       ^
+   drivers/vhost/vringh.c:1683:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int vringh_getdesc_iomem(struct vringh *vrh, struct vringh_kiov *riov,
+   ^
+   static 
+>> drivers/vhost/vringh.c:1714:9: warning: no previous prototype for function 'vringh_iov_pull_iomem' [-Wmissing-prototypes]
+   ssize_t vringh_iov_pull_iomem(struct vringh *vrh, struct vringh_kiov *riov,
+           ^
+   drivers/vhost/vringh.c:1714:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   ssize_t vringh_iov_pull_iomem(struct vringh *vrh, struct vringh_kiov *riov,
+   ^
+   static 
+>> drivers/vhost/vringh.c:1729:9: warning: no previous prototype for function 'vringh_iov_push_iomem' [-Wmissing-prototypes]
+   ssize_t vringh_iov_push_iomem(struct vringh *vrh, struct vringh_kiov *wiov,
+           ^
+   drivers/vhost/vringh.c:1729:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   ssize_t vringh_iov_push_iomem(struct vringh *vrh, struct vringh_kiov *wiov,
+   ^
+   static 
+>> drivers/vhost/vringh.c:1744:6: warning: no previous prototype for function 'vringh_abandon_iomem' [-Wmissing-prototypes]
+   void vringh_abandon_iomem(struct vringh *vrh, unsigned int num)
+        ^
+   drivers/vhost/vringh.c:1744:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   void vringh_abandon_iomem(struct vringh *vrh, unsigned int num)
+   ^
+   static 
+>> drivers/vhost/vringh.c:1759:5: warning: no previous prototype for function 'vringh_complete_iomem' [-Wmissing-prototypes]
+   int vringh_complete_iomem(struct vringh *vrh, u16 head, u32 len)
+       ^
+   drivers/vhost/vringh.c:1759:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int vringh_complete_iomem(struct vringh *vrh, u16 head, u32 len)
+   ^
+   static 
+>> drivers/vhost/vringh.c:1777:6: warning: no previous prototype for function 'vringh_notify_enable_iomem' [-Wmissing-prototypes]
+   bool vringh_notify_enable_iomem(struct vringh *vrh)
+        ^
+   drivers/vhost/vringh.c:1777:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   bool vringh_notify_enable_iomem(struct vringh *vrh)
+   ^
+   static 
+>> drivers/vhost/vringh.c:1790:6: warning: no previous prototype for function 'vringh_notify_disable_iomem' [-Wmissing-prototypes]
+   void vringh_notify_disable_iomem(struct vringh *vrh)
+        ^
+   drivers/vhost/vringh.c:1790:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   void vringh_notify_disable_iomem(struct vringh *vrh)
+   ^
+   static 
+>> drivers/vhost/vringh.c:1802:5: warning: no previous prototype for function 'vringh_need_notify_iomem' [-Wmissing-prototypes]
+   int vringh_need_notify_iomem(struct vringh *vrh)
+       ^
+   drivers/vhost/vringh.c:1802:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int vringh_need_notify_iomem(struct vringh *vrh)
+   ^
+   static 
+   15 warnings generated.
+
+
+vim +/vringh_init_iomem +1661 drivers/vhost/vringh.c
+
+  1647	
+  1648	/**
+  1649	 * vringh_init_iomem - initialize a vringh for a vring on io-memory.
+  1650	 * @vrh: the vringh to initialize.
+  1651	 * @features: the feature bits for this ring.
+  1652	 * @num: the number of elements.
+  1653	 * @weak_barriers: true if we only need memory barriers, not I/O.
+  1654	 * @desc: the userspace descriptor pointer.
+  1655	 * @avail: the userspace avail pointer.
+  1656	 * @used: the userspace used pointer.
+  1657	 *
+  1658	 * Returns an error if num is invalid: you should check pointers
+  1659	 * yourself!
+  1660	 */
+> 1661	int vringh_init_iomem(struct vringh *vrh, u64 features, unsigned int num,
+  1662			      bool weak_barriers, struct vring_desc *desc,
+  1663			      struct vring_avail *avail, struct vring_used *used)
+  1664	{
+  1665		return vringh_init_kern(vrh, features, num, weak_barriers, desc, avail,
+  1666					used);
+  1667	}
+  1668	EXPORT_SYMBOL(vringh_init_iomem);
+  1669	
+  1670	/**
+  1671	 * vringh_getdesc_iomem - get next available descriptor from vring on io-memory.
+  1672	 * @vrh: the vring on io-memory.
+  1673	 * @riov: where to put the readable descriptors (or NULL)
+  1674	 * @wiov: where to put the writable descriptors (or NULL)
+  1675	 * @head: head index we received, for passing to vringh_complete_iomem().
+  1676	 * @gfp: flags for allocating larger riov/wiov.
+  1677	 *
+  1678	 * Returns 0 if there was no descriptor, 1 if there was, or -errno.
+  1679	 *
+  1680	 * There some notes, and those are same with vringh_getdesc_kern(). Please see
+  1681	 * it.
+  1682	 */
+> 1683	int vringh_getdesc_iomem(struct vringh *vrh, struct vringh_kiov *riov,
+  1684				 struct vringh_kiov *wiov, u16 *head, gfp_t gfp)
+  1685	{
+  1686		int err;
+  1687	
+  1688		err = __vringh_get_head(vrh, getu16_iomem, &vrh->last_avail_idx);
+  1689		if (err < 0)
+  1690			return err;
+  1691	
+  1692		/* Empty... */
+  1693		if (err == vrh->vring.num)
+  1694			return 0;
+  1695	
+  1696		*head = err;
+  1697		err = __vringh_iov(vrh, *head, riov, wiov, no_range_check, NULL, gfp,
+  1698				   copydesc_iomem);
+  1699		if (err)
+  1700			return err;
+  1701	
+  1702		return 1;
+  1703	}
+  1704	EXPORT_SYMBOL(vringh_getdesc_iomem);
+  1705	
+  1706	/**
+  1707	 * vringh_iov_pull_iomem - copy bytes from vring_iov.
+  1708	 * @riov: the riov as passed to vringh_getdesc_iomem() (updated as we consume)
+  1709	 * @dst: the place to copy.
+  1710	 * @len: the maximum length to copy.
+  1711	 *
+  1712	 * Returns the bytes copied <= len or a negative errno.
+  1713	 */
+> 1714	ssize_t vringh_iov_pull_iomem(struct vringh *vrh, struct vringh_kiov *riov,
+  1715				      void *dst, size_t len)
+  1716	{
+  1717		return vringh_iov_xfer(vrh, riov, dst, len, xfer_from_iomem);
+  1718	}
+  1719	EXPORT_SYMBOL(vringh_iov_pull_iomem);
+  1720	
+  1721	/**
+  1722	 * vringh_iov_push_iomem - copy bytes into vring_iov.
+  1723	 * @wiov: the wiov as passed to vringh_getdesc_iomem() (updated as we consume)
+  1724	 * @src: the place to copy from.
+  1725	 * @len: the maximum length to copy.
+  1726	 *
+  1727	 * Returns the bytes copied <= len or a negative errno.
+  1728	 */
+> 1729	ssize_t vringh_iov_push_iomem(struct vringh *vrh, struct vringh_kiov *wiov,
+  1730				      const void *src, size_t len)
+  1731	{
+  1732		return vringh_iov_xfer(vrh, wiov, (void *)src, len, xfer_to_iomem);
+  1733	}
+  1734	EXPORT_SYMBOL(vringh_iov_push_iomem);
+  1735	
+  1736	/**
+  1737	 * vringh_abandon_iomem - we've decided not to handle the descriptor(s).
+  1738	 * @vrh: the vring.
+  1739	 * @num: the number of descriptors to put back (ie. num
+  1740	 *	 vringh_getdesc_iomem() to undo).
+  1741	 *
+  1742	 * The next vringh_get_kern() will return the old descriptor(s) again.
+  1743	 */
+> 1744	void vringh_abandon_iomem(struct vringh *vrh, unsigned int num)
+  1745	{
+  1746		vringh_abandon_kern(vrh, num);
+  1747	}
+  1748	EXPORT_SYMBOL(vringh_abandon_iomem);
+  1749	
+  1750	/**
+  1751	 * vringh_complete_iomem - we've finished with descriptor, publish it.
+  1752	 * @vrh: the vring.
+  1753	 * @head: the head as filled in by vringh_getdesc_iomem().
+  1754	 * @len: the length of data we have written.
+  1755	 *
+  1756	 * You should check vringh_need_notify_iomem() after one or more calls
+  1757	 * to this function.
+  1758	 */
+> 1759	int vringh_complete_iomem(struct vringh *vrh, u16 head, u32 len)
+  1760	{
+  1761		struct vring_used_elem used;
+  1762	
+  1763		used.id = cpu_to_vringh32(vrh, head);
+  1764		used.len = cpu_to_vringh32(vrh, len);
+  1765	
+  1766		return __vringh_complete(vrh, &used, 1, putu16_iomem, putused_iomem);
+  1767	}
+  1768	EXPORT_SYMBOL(vringh_complete_iomem);
+  1769	
+  1770	/**
+  1771	 * vringh_notify_enable_iomem - we want to know if something changes.
+  1772	 * @vrh: the vring.
+  1773	 *
+  1774	 * This always enables notifications, but returns false if there are
+  1775	 * now more buffers available in the vring.
+  1776	 */
+> 1777	bool vringh_notify_enable_iomem(struct vringh *vrh)
+  1778	{
+  1779		return __vringh_notify_enable(vrh, getu16_iomem, putu16_iomem);
+  1780	}
+  1781	EXPORT_SYMBOL(vringh_notify_enable_iomem);
+  1782	
+  1783	/**
+  1784	 * vringh_notify_disable_iomem - don't tell us if something changes.
+  1785	 * @vrh: the vring.
+  1786	 *
+  1787	 * This is our normal running state: we disable and then only enable when
+  1788	 * we're going to sleep.
+  1789	 */
+> 1790	void vringh_notify_disable_iomem(struct vringh *vrh)
+  1791	{
+  1792		__vringh_notify_disable(vrh, putu16_iomem);
+  1793	}
+  1794	EXPORT_SYMBOL(vringh_notify_disable_iomem);
+  1795	
+  1796	/**
+  1797	 * vringh_need_notify_iomem - must we tell the other side about used buffers?
+  1798	 * @vrh: the vring we've called vringh_complete_iomem() on.
+  1799	 *
+  1800	 * Returns -errno or 0 if we don't need to tell the other side, 1 if we do.
+  1801	 */
+> 1802	int vringh_need_notify_iomem(struct vringh *vrh)
+  1803	{
+  1804		return __vringh_need_notify(vrh, getu16_iomem);
+  1805	}
+  1806	EXPORT_SYMBOL(vringh_need_notify_iomem);
+  1807	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
