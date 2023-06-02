@@ -2,150 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3CD2720BC5
-	for <lists+kvm@lfdr.de>; Sat,  3 Jun 2023 00:12:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA174720BC8
+	for <lists+kvm@lfdr.de>; Sat,  3 Jun 2023 00:15:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236734AbjFBWMn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 18:12:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58580 "EHLO
+        id S236334AbjFBWPH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 18:15:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236536AbjFBWMm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 18:12:42 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 777001BB
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 15:12:39 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-bacfa4eefd2so3530576276.0
-        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 15:12:39 -0700 (PDT)
+        with ESMTP id S235469AbjFBWPF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 18:15:05 -0400
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB6C01BE
+        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 15:15:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685743958; x=1688335958;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hZOQLIvJzczYTMAnaTGjzB0ofTaMaErv1XOCluG82ws=;
-        b=ztnEwzy36DzIiYsf21ckOGWKoNk9x0+aF0krJRVhEGILD6FboIXDsRdHNE4nHzs8yQ
-         D0nQnrSycvryY8KmsmF2B9P+c4iKhgxXfpMIAYDhOOw8Z3YfjvifOVAHHXtSc+VA4lcv
-         vtJB58g21yx16+MjcUO0PWPLRYaen/R1GkwQ2R5DygvBCHRATnuSJUlx9qzrWJAfKbuJ
-         PDq3fVh+dV2cn7B7iX8gv4dOVqZwH8Jk56seTtG571ZyY1FT4iGz8sB+Ge3BmXFEKay0
-         2jChpUvDjsXGJDyGTqf9E4tDl+OsuY07liagomRKpZ9cdyEwbNKENiZZMzwTBN9qtJQx
-         Dnzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685743958; x=1688335958;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hZOQLIvJzczYTMAnaTGjzB0ofTaMaErv1XOCluG82ws=;
-        b=lCD4sTuiYrUnwE7NjaClkxtD3u+ie6NiUbmnAmaAklX1wRMaI0SO3CHAcP+9IqqAKO
-         sukBYqmSBbMI8F4wmftJx6RJOYl6/ooXptaYZSisgtydRYp12CjDivD88CHl4kR2vZhY
-         67frOHGjjjo9RU8vv6fwqhdPXFYOISj4FMBX7n3t5PrTTZAJc9oEeYX6aCktnXTwEVyL
-         hy5U3pEPHeQzDyH08upA0+BG0VmjA996QOrbEwPO1Zzr04fwi+8psbF556jD0XzCiTb+
-         gBQMec63aFy6zgnw5oBATt1N8q0+Mol5xm81rlh0DV8Tmzyh3rFPERvOO+kD0P9U5MUj
-         5qjA==
-X-Gm-Message-State: AC+VfDzOnCWLy0aNwDBk9BaPzHKEo5XH1GHHt4BmbR6fh5wDMRp7ZBk8
-        pXojK6SKEGnb6nHKeWrfEnjaMyX9yxU=
-X-Google-Smtp-Source: ACHHUZ5kEM4UotGbjNhuGYnPNZSPFcZdv+PhWsaBh77AzL3xpMn6mZn9HFXaERTjVE4vBhdvz3jiI7Tpz7A=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:728:b0:ba1:d0:7f7c with SMTP id
- l8-20020a056902072800b00ba100d07f7cmr1667909ybt.2.1685743958805; Fri, 02 Jun
- 2023 15:12:38 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  2 Jun 2023 15:12:36 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.rc2.161.g9c6817b8e7-goog
-Message-ID: <20230602221236.952888-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86/pmu: Rename global_ovf_ctrl_mask to global_status_mask
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu.linux@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1685744105; x=1717280105;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=pUszmKnf/mkyzTbf6VDD11A2hHjQ1yzaAxlpvgJ3/wA=;
+  b=s3iEMuEXCsMWd3rw8VlOmBrfK5TUOY04XKBWBUMx9yFMNjXMi7aC9XdQ
+   CbHXJLEqBy8tMpliCSzQyGy+3/S52AIdIMgEsrMG3c7VShzrgaCP+Z97I
+   9Y4I5mmryk37Q9CP/sVdQmiWpcjocFjvKPplz6LJeKVKTDx8gp0GldnWi
+   U=;
+X-IronPort-AV: E=Sophos;i="6.00,214,1681171200"; 
+   d="scan'208";a="338443037"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-3ef535ca.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2023 22:15:03 +0000
+Received: from EX19MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2a-m6i4x-3ef535ca.us-west-2.amazon.com (Postfix) with ESMTPS id 65CBE61319;
+        Fri,  2 Jun 2023 22:15:01 +0000 (UTC)
+Received: from EX19D030UWB002.ant.amazon.com (10.13.139.182) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 2 Jun 2023 22:14:58 +0000
+Received: from u1e958862c3245e.ant.amazon.com (10.187.170.26) by
+ EX19D030UWB002.ant.amazon.com (10.13.139.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 2 Jun 2023 22:14:58 +0000
+From:   Suraj Jitindar Singh <surajjs@amazon.com>
+To:     <jingzhangos@google.com>
+CC:     <alexandru.elisei@arm.com>, <james.morse@arm.com>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>,
+        <linux-arm-kernel@lists.infradead.org>, <maz@kernel.org>,
+        <oupton@google.com>, <pbonzini@redhat.com>, <rananta@google.com>,
+        <reijiw@google.com>, <suzuki.poulose@arm.com>, <tabba@google.com>,
+        <will@kernel.org>, <sjitindarsingh@gmail.com>,
+        "Suraj Jitindar Singh" <surajjs@amazon.com>
+Subject: [PATCH 0/3] RE: Support writable CPU ID registers from userspace [v11]
+Date:   Fri, 2 Jun 2023 15:14:44 -0700
+Message-ID: <20230602221447.1809849-1-surajjs@amazon.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230602005118.2899664-1-jingzhangos@google.com>
+References: <20230602005118.2899664-1-jingzhangos@google.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.187.170.26]
+X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
+ EX19D030UWB002.ant.amazon.com (10.13.139.182)
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename global_ovf_ctrl_mask to global_status_mask to avoid confusion now
-that Intel has renamed GLOBAL_OVF_CTRL to GLOBAL_STATUS_RESET in PMU v4.
-GLOBAL_OVF_CTRL and GLOBAL_STATUS_RESET are the same MSR index, i.e. are
-just different names for the same thing, but the SDM provides different
-entries in the IA-32 Architectural MSRs table, which gets really confusing
-when looking at PMU v4 definitions since it *looks* like GLOBAL_STATUS has
-bits that don't exist in GLOBAL_OVF_CTRL, but in reality the bits are
-simply defined in the GLOBAL_STATUS_RESET entry.
+With the patch set you posted I get some kvm unit tests failures due to
+being unable to update register values from userspace for tests using smp.
+The first patch addresses this.
 
-No functional change intended.
+The second 2 are optimisations/cleanups.
 
-Cc: Like Xu <like.xu.linux@gmail.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/vmx/pmu_intel.c    | 18 ++++++++++++++----
- 2 files changed, 15 insertions(+), 5 deletions(-)
+Based on "Support writable CPU ID registers from userspace" [1]
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index fb9d1f2d6136..28bd38303d70 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -523,7 +523,7 @@ struct kvm_pmu {
- 	u64 global_status;
- 	u64 counter_bitmask[2];
- 	u64 global_ctrl_mask;
--	u64 global_ovf_ctrl_mask;
-+	u64 global_status_mask;
- 	u64 reserved_bits;
- 	u64 raw_event_mask;
- 	struct kvm_pmc gp_counters[KVM_INTEL_PMC_MAX_GENERIC];
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 741efe2c497b..fb96cbfc9ae8 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -427,7 +427,11 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		}
- 		break;
- 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
--		if (data & pmu->global_ovf_ctrl_mask)
-+		/*
-+		 * GLOBAL_OVF_CTRL, a.k.a. GLOBAL STATUS_RESET, clears bits in
-+		 * GLOBAL_STATUS, and so the set of reserved bits is the same.
-+		 */
-+		if (data & pmu->global_status_mask)
- 			return 1;
- 
- 		if (!msr_info->host_initiated)
-@@ -531,7 +535,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	pmu->reserved_bits = 0xffffffff00200000ull;
- 	pmu->raw_event_mask = X86_RAW_EVENT_MASK;
- 	pmu->global_ctrl_mask = ~0ull;
--	pmu->global_ovf_ctrl_mask = ~0ull;
-+	pmu->global_status_mask = ~0ull;
- 	pmu->fixed_ctr_ctrl_mask = ~0ull;
- 	pmu->pebs_enable_mask = ~0ull;
- 	pmu->pebs_data_cfg_mask = ~0ull;
-@@ -585,11 +589,17 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	counter_mask = ~(((1ull << pmu->nr_arch_gp_counters) - 1) |
- 		(((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED));
- 	pmu->global_ctrl_mask = counter_mask;
--	pmu->global_ovf_ctrl_mask = pmu->global_ctrl_mask
-+
-+	/*
-+	 * GLOBAL_STATUS and GLOBAL_OVF_CONTROL (a.k.a. GLOBAL_STATUS_RESET)
-+	 * share reserved bit definitions.  The kernel just happens to use
-+	 * OVF_CTRL for the names.
-+	 */
-+	pmu->global_status_mask = pmu->global_ctrl_mask
- 			& ~(MSR_CORE_PERF_GLOBAL_OVF_CTRL_OVF_BUF |
- 			    MSR_CORE_PERF_GLOBAL_OVF_CTRL_COND_CHGD);
- 	if (vmx_pt_mode_is_host_guest())
--		pmu->global_ovf_ctrl_mask &=
-+		pmu->global_status_mask &=
- 				~MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI;
- 
- 	entry = kvm_find_cpuid_entry_index(vcpu, 7, 0);
+[1] https://lore.kernel.org/linux-arm-kernel/20230602005118.2899664-1-jingzhangos@google.com/
 
-base-commit: b9846a698c9aff4eb2214a06ac83638ad098f33f
+Suraj Jitindar Singh (3):
+  KVM: arm64: Update id_reg limit value based on per vcpu flags
+  KVM: arm64: Move non per vcpu flag checks out of
+    kvm_arm_update_id_reg()
+  KVM: arm64: Use per guest ID register for ID_AA64PFR1_EL1.MTE
+
+ arch/arm64/include/asm/kvm_host.h |  21 +++--
+ arch/arm64/kvm/arm.c              |  11 ++-
+ arch/arm64/kvm/sys_regs.c         | 122 +++++++++++++++++++++++++-----
+ 3 files changed, 121 insertions(+), 33 deletions(-)
+
 -- 
-2.41.0.rc2.161.g9c6817b8e7-goog
+2.34.1
 
