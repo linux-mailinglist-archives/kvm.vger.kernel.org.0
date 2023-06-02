@@ -2,194 +2,254 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 539E5720723
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 18:11:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1575672074F
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 18:20:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236888AbjFBQLS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 12:11:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36190 "EHLO
+        id S236285AbjFBQUL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 12:20:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236801AbjFBQK6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 12:10:58 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E8951B9
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 09:10:13 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-65320a6e904so380505b3a.0
-        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 09:10:13 -0700 (PDT)
+        with ESMTP id S236720AbjFBQTv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 12:19:51 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1447F134
+        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 09:19:49 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-ba82ed6e450so2974809276.2
+        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 09:19:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685722192; x=1688314192;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pnaTvciscS5chSJrFdy/XWmGw+v5DL+sKG313yn6vtE=;
-        b=3qM+gPLnKOcFkte53nrFJ4yxYHfRvj6VAQ74elJ+qIzLMj97WYlQnMm+LRqHDvoho4
-         8AW7RUIjuOvTDqJRc6MGpLfknZTHUVt0ac+jf1e4fznmqTNQB1YeAez2Pbf+vu4gX/wo
-         xA9uw3YiFJ59xCiKuG3PqvgkOpwn1kfOyfDGnV3P6/41gfMjzqB9OHhb0wbZKNfck3ux
-         QuubqPWPIMr2dr+usJ/0oHW/nWAg0PkVCfHTFjYBlz4FbohVSt4JZLXej+/lCcVIkw51
-         dikq26nIlv8414HoG8qlckcW0gk8fed5eU7B/bJPELllDOCa6K4cYwpu/yZBPdgX/sdW
-         NMYg==
+        d=google.com; s=20221208; t=1685722789; x=1688314789;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6XEBz9vZ4GaMwxLYRmjTfyz0gOAdRn9RA5RT2cb0IyA=;
+        b=ZMarG+U/DtT0dCKCKelXKtd0UYgq9QVipmuXlk7S7GeSvigVtlTPhIFVZJV0Ak7avW
+         YAMdzUm8c7pX7VjTlPU/QszCkVgn2q+2masw6Khbdgp4LNG9jmGPJX+p3ai1dZXTfmhS
+         ffbACinuHVjcSupnRJC1LJ59Fotd89fv6lJWZ8qPBop7d6bdPEEz1tzgI+FCZj3KTOUo
+         ehnoWJfXmxG9ppCCIFlk1vSc+cpLRhDgiCkIRpGmo9fVdVs0JM788LOwxXityfOUnHbU
+         HBo6yXuvObC3qHWfjNbE5xccqCiuhfUokuhv1L4MY/dKwWnh32lakD4FN5ZI0IEYSbK5
+         Cyew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685722192; x=1688314192;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pnaTvciscS5chSJrFdy/XWmGw+v5DL+sKG313yn6vtE=;
-        b=jxMR3giG8YuG0eU5fWsIjrze72HtzoTTZgYra1OH5A4K4kG0rnJ9QKaAPApjqNDbli
-         NfLUfPAE4I75QDxbmZ8jbsDHgxPeXB91l4qq/A77YxdejWD4yVUdWV2d80TJO62N6ZTh
-         5awCQxMSqUzd13cI6acseVEJ+3/9icopTqqetayS8ga6oC8HGOskOfQfCyZ1yo3HJiNr
-         QZEUhFVR1frhydK3ELANy6xuquWjall2aB156RffDt/KBiDlltjZ6iX9sXL/c8IYdz+N
-         uX0pvj/672+d9E6U5Atu7HEBPnBCuxDolHaSmZyBgEnIsO33RE9wD41FQjHCizo6r+0Z
-         fzkA==
-X-Gm-Message-State: AC+VfDznuGjcJ5BSFmNhkUirf4na0CF/uxdhPYVXc1cJc/hdOh8ZyKhI
-        cTKk2Xx+1CJiOA4Ig5A3BTrlzhOk0d3d
-X-Google-Smtp-Source: ACHHUZ7CrgQcXBBk0scZtBwPutYqwQ0i1jeHWFv03iHedZStcHfAHgjqtsGQJinldbGkFtIY3nwdqwhDBsPu
-X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a05:6a00:2e1a:b0:64f:9e1b:d4a8 with SMTP
- id fc26-20020a056a002e1a00b0064f9e1bd4a8mr4922796pfb.1.1685722192061; Fri, 02
- Jun 2023 09:09:52 -0700 (PDT)
-Date:   Fri,  2 Jun 2023 09:09:14 -0700
-In-Reply-To: <20230602160914.4011728-1-vipinsh@google.com>
+        d=1e100.net; s=20221208; t=1685722789; x=1688314789;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6XEBz9vZ4GaMwxLYRmjTfyz0gOAdRn9RA5RT2cb0IyA=;
+        b=Yoh61+cnDBEo/VRRKK4uqrJYFwVCTsXn3Pn4oXxe8cPQ7Iiaef4b0rJX1R552jUPWW
+         K3ztFYF9OYSCn+KW2SykJumrqRLdsYu2vXuIBhmRxe/He7L6SeJ53cHyUnfz30SY4jrf
+         C04A2hdQBaypDQQbr25/5SK/6gaNyLehlv2FSj35nNmWjWmqFd3rOzjyCgznntCFOkT6
+         9sZP4ZgXoRnd4/omaaWOM7JUvwF4FAf3fe8SZ9EYgy0C8ulOiHFGpEIr/1MYsD/rV0Q0
+         K0gtjzJNQKil3akSQGOx55Z5cpP9QpPWxuBmZ99gIpQRlAr5O13dyCtC8i9AyBbjVm1I
+         p84g==
+X-Gm-Message-State: AC+VfDyXPYnfDNmj+KzN0SUaTTjR2ZkEMCJGGBwtNWAWU87V/ZRel3Wy
+        +3sNUa4McFd+h2QQHsF0hdIvBZycQO+3RQ==
+X-Google-Smtp-Source: ACHHUZ65idIrfmcdEUCtjKqDV/SlpSwiiW7U+Ki4ZHZFgkxLpDvNeYMRIoBi2NBV/nyn9jrprKg1OxIkpnGJHw==
+X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
+ (user=amoorthy job=sendgmr) by 2002:a25:2402:0:b0:b9a:6508:1b5f with SMTP id
+ k2-20020a252402000000b00b9a65081b5fmr1275178ybk.11.1685722788928; Fri, 02 Jun
+ 2023 09:19:48 -0700 (PDT)
+Date:   Fri,  2 Jun 2023 16:19:05 +0000
 Mime-Version: 1.0
-References: <20230602160914.4011728-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230602160914.4011728-17-vipinsh@google.com>
-Subject: [PATCH v2 16/16] KVM: arm64: Split huge pages during clear-dirty-log
- under MMU read lock
-From:   Vipin Sharma <vipinsh@google.com>
-To:     maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
-        suzuki.poulose@arm.com, yuzenghui@huawei.com,
-        catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org,
-        aleksandar.qemu.devel@gmail.com, tsbogend@alpha.franken.de,
-        anup@brainfault.org, atishp@atishpatra.org,
-        paul.walmsley@sifive.com, palmer@dabbelt.com,
-        aou@eecs.berkeley.edu, seanjc@google.com, pbonzini@redhat.com,
-        dmatlack@google.com, ricarkol@google.com
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vipin Sharma <vipinsh@google.com>
+Message-ID: <20230602161921.208564-1-amoorthy@google.com>
+Subject: [PATCH v4 00/16] Improve scalability of KVM + userfaultfd live
+ migration via annotated memory faults.
+From:   Anish Moorthy <amoorthy@google.com>
+To:     seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev
+Cc:     pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com,
+        jthoughton@google.com, amoorthy@google.com, bgardon@google.com,
+        dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com,
+        peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Split huge pages under MMU read lock instead of write when clearing
-dirty log.
+Outstanding Issues
+~~~~~~~~~~~~~~~~~~
+- The list of annotation sites still needs feedback. My latest
+  assessment of which sites to annotate is in [4]
+- The WARNs introduced in the kvm_populate_efault_info() helper need
+  to be sorted out (gate behind kconfig?)
+- Probably more (but hopefully not too much more :)
 
-Running huge page split under read lock will unblock vCPUs execution and
-allow whole clear-dirty-log operation run parallelly to vCPUs.
+Cover Letter
+~~~~~~~~~~~~
+Due to serialization on internal wait queues, userfaultfd can be quite
+slow at delivering faults to userspace when many vCPUs fault on the same
+VMA/uffd: this problem only worsens as the number of vCPUs increases.
+This series allows page faults encountered in KVM_RUN to bypass
+userfaultfd (KVM_CAP_NOWAIT_ON_FAULT) and be delivered directly via
+VM exit to the faulting vCPU (KVM_CAP_MEMORY_FAULT_INFO), allowing much
+higher page-in rates during uffd-based postcopy.
 
-Note that splitting huge pages involves two walkers. First walker calls
-stage2_split_walker() callback on each huge page. This callback will call
-another walker which creates an unlinked page table. This commit makes
-first walker as shared page walker which means, -EAGAIN will be retried.
-Before this patch, -EAGAIN would have been ignored and walker would go
-to next huge page. In practice this would not happen as the first walker
-was holding MMU write lock. Inner walker is unchanged as it is working
-on unlinked page table so no other thread will have access to it.
+KVM_CAP_MEMORY_FAULT_INFO comes first. This capability delivers
+information to userspace on vCPU guest memory access failures. KVM_RUN
+currently just returns -1 and sets errno=EFAULT upon these failures.
 
-To improve confidence in correctness tested via dirty_log_test.
+Upon receiving an annotated EFAULT, userspace may diagnose and act to
+resolve the failed access. This might involve a MADV_POPULATE_READ|WRITE
+or, in the context of uffd-based live migration postcopy, a
+UFFDIO_COPY|CONTINUE.
 
-To measure performance improvement tested via dirty_log_perf_test.
+~~~~~~~~~~~~~~ IMPORTANT NOTE ~~~~~~~~~~~~~~
+The implementation strategy for KVM_CAP_MEMORY_FAULT_INFO has risks: for
+example, if there are any existing paths in KVM_RUN which cause a vCPU
+to (1) populate the kvm_run struct then (2) fail a vCPU guest memory
+access but ignore the failure and then (3) complete the exit to
+userspace set up in (1), then the contents of the kvm_run struct written
+in (1) will be corrupted.
 
-Set up:
--------
-Host: ARM Ampere Altra host (64 CPUs, 256 GB memory and single NUMA
-      node)
+Another example: if KVM_RUN fails a guest memory access for which the
+EFAULT is annotated but does not return the EFAULT to userspace, then
+later returns an *un*annotated EFAULT to userspace, then userspace will
+receive incorrect information.
 
-Test VM: 48 vCPU, 192 GB total memory.
+These are pathological and (hopefully) hypothetical cases, but awareness
+is important.
 
-Ran dirty_log_perf_test for 400 iterations.
- ./dirty_log_perf_test -k 192G -v 48 -b 4G -m 2 -i 4000 -s anonymous_hugetlb_2mb -j
+Rationale for taking this approach over the alternative strategy of
+filling the efault info only for verified return paths from KVM_RUN to
+userserspace occurred in [3].
+~~~~~~~~~~~~~~ END IMPORTANT NOTE ~~~~~~~~~~~~~~
 
-Observation:
-------------
+KVM_CAP_NOWAIT_ON_FAULT (originally proposed by James Houghton in [1])
+comes next. This capability causes KVM_RUN to error with errno=EFAULT
+when it encounters a page fault which would require the vCPU thread to
+sleep. During uffd-based postcopy this allows delivery of page faults
+directly to vCPU threads, bypassing the uffd wait queue and contention.
 
-+==================+=============================+===================+
-| Clear Chunk size | Clear dirty log time change | vCPUs improvement |
-+==================+=============================+===================+
-| 192GB            | 56%                         | 152%              |
-+------------------+-----------------------------+-------------------+
-| 1GB              | -81%                        | 72%               |
-+------------------+-----------------------------+-------------------+
+Side note" KVM_CAP_NOWAIT_ON_FAULT prevents async page faults, so
+userspace will likely want to limit its use to uffd-based postcopy.
 
-When larger chunks are used, clear dirty log time increases due to lots
-of cmpxchg() but vCPUs are also able to execute parallelly causing
-better performance of guest.
+KVM's demand paging self test is extended to demonstrate the benefits
+of the new caps to uffd-based postcopy. The performance samples below
+(rates in thousands of pages/s, avg of 5 runs), were gathered using [2]
+on an x86 machine with 256 cores.
 
-When chunk size is small, read lock is very fast in clearing dirty logs
-as it is not waiting for MMU write lock and vCPUs are also able to run
-parallelly.
+vCPUs, Average Paging Rate (w/o new caps), Average Paging Rate (w/ new caps)
+1       150     340
+2       191     477
+4       210     809
+8       155     1239
+16      130     1595
+32      108     2299
+64      86      3482
+128     62      4134
+256     36      4012
 
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
+Base Commit
+~~~~~~~~~~~
+This series is based off of kvm/next (39428f6ea9ea) with [5] applied
+
+Links/Notes
+~~~~~~~~~~~
+[1] https://lore.kernel.org/linux-mm/CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com/
+[2] ./demand_paging_test -b 64M -u MINOR -s shmem -a -v <n> -r <n> [-w]
+    A quick rundown of the new flags (also detailed in later commits)
+        -a registers all of guest memory to a single uffd.
+        -r species the number of reader threads for polling the uffd.
+        -w is what actually enables the new capabilities.
+    All data was collected after applying the entire series
+[3] https://lore.kernel.org/kvm/ZBTgnjXJvR8jtc4i@google.com/
+[4] https://lore.kernel.org/kvm/ZHkfDCItA8HUxOG1@linux.dev/T/#mfe28e6a5015b7cd8c5ea1c351b0ca194aeb33daf
+[5] https://lore.kernel.org/kvm/168556721574.515120.10821482819846567909.b4-ty@google.com/T/#t
+
 ---
- arch/arm64/kvm/mmu.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 6dd964e3682c..aa278f5d27a2 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -126,7 +126,10 @@ static int kvm_mmu_split_huge_pages(struct kvm *kvm, phys_addr_t addr,
- 	int ret, cache_capacity;
- 	u64 next, chunk_size;
- 
--	lockdep_assert_held_write(&kvm->mmu_lock);
-+	if (flags & KVM_PGTABLE_WALK_SHARED)
-+		lockdep_assert_held_read(&kvm->mmu_lock);
-+	else
-+		lockdep_assert_held_write(&kvm->mmu_lock);
- 
- 	chunk_size = kvm->arch.mmu.split_page_chunk_size;
- 	cache_capacity = kvm_mmu_split_nr_page_tables(chunk_size);
-@@ -138,13 +141,19 @@ static int kvm_mmu_split_huge_pages(struct kvm *kvm, phys_addr_t addr,
- 
- 	do {
- 		if (need_split_memcache_topup_or_resched(kvm)) {
--			write_unlock(&kvm->mmu_lock);
-+			if (flags & KVM_PGTABLE_WALK_SHARED)
-+				read_unlock(&kvm->mmu_lock);
-+			else
-+				write_unlock(&kvm->mmu_lock);
- 			cond_resched();
- 			/* Eager page splitting is best-effort. */
- 			ret = __kvm_mmu_topup_memory_cache(cache,
- 							   cache_capacity,
- 							   cache_capacity);
--			write_lock(&kvm->mmu_lock);
-+			if (flags & KVM_PGTABLE_WALK_SHARED)
-+				read_lock(&kvm->mmu_lock);
-+			else
-+				write_lock(&kvm->mmu_lock);
- 			if (ret)
- 				break;
- 		}
-@@ -1139,9 +1148,7 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 
- 	read_lock(&kvm->mmu_lock);
- 	stage2_wp_range(&kvm->arch.mmu, start, end, KVM_PGTABLE_WALK_SHARED);
--	read_unlock(&kvm->mmu_lock);
- 
--	write_lock(&kvm->mmu_lock);
- 	/*
- 	 * Eager-splitting is done when manual-protect is set.  We
- 	 * also check for initially-all-set because we can avoid
-@@ -1151,8 +1158,8 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 	 * again.
- 	 */
- 	if (kvm_dirty_log_manual_protect_and_init_set(kvm))
--		kvm_mmu_split_huge_pages(kvm, start, end, 0);
--	write_unlock(&kvm->mmu_lock);
-+		kvm_mmu_split_huge_pages(kvm, start, end, KVM_PGTABLE_WALK_SHARED);
-+	read_unlock(&kvm->mmu_lock);
- }
- 
- static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
+v4
+  - Fix excessive indentation [Robert, Oliver]
+  - Calculate final stats when uffd handler fn returns an error [Robert]
+  - Remove redundant info from uffd_desc [Robert]
+  - Fix various commit message typos [Robert]
+  - Add comment about suppressed EEXISTs in selftest [Robert]
+  - Add exit_reasons_known definition for KVM_EXIT_MEMORY_FAULT [Robert]
+  - Fix some include/logic issues in self test [Robert]
+  - Rename no-slow-gup cap to KVM_CAP_NOWAIT_ON_FAULT [Oliver, Sean]
+  - Make KVM_CAP_MEMORY_FAULT_INFO informational-only [Oliver, Sean]
+  - Drop most of the annotations from v3: see
+    https://lore.kernel.org/kvm/20230412213510.1220557-1-amoorthy@google.com/T/#mfe28e6a5015b7cd8c5ea1c351b0ca194aeb33daf
+  - Remove WARN on bare efaults [Sean, Oliver]
+  - Eliminate unnecessary UFFDIO_WAKE call from self test [James]
+
+v3: https://lore.kernel.org/kvm/ZEBXi5tZZNxA+jRs@x1n/T/#t
+  - Rework the implementation to be based on two orthogonal
+    capabilities (KVM_CAP_MEMORY_FAULT_INFO and
+    KVM_CAP_NOWAIT_ON_FAULT) [Sean, Oliver]
+  - Change return code of kvm_populate_efault_info [Isaku]
+  - Use kvm_populate_efault_info from arm code [Oliver]
+
+v2: https://lore.kernel.org/kvm/20230315021738.1151386-1-amoorthy@google.com/
+
+    This was a bit of a misfire, as I sent my WIP series on the mailing
+    list but was just targeting Sean for some feedback. Oliver Upton and
+    Isaku Yamahata ended up discovering the series and giving me some
+    feedback anyways, so thanks to them :) In the end, there was enough
+    discussion to justify retroactively labeling it as v2, even with the
+    limited cc list.
+
+  - Introduce KVM_CAP_X86_MEMORY_FAULT_EXIT.
+  - API changes:
+        - Gate KVM_CAP_MEMORY_FAULT_NOWAIT behind
+          KVM_CAP_x86_MEMORY_FAULT_EXIT (on x86 only: arm has no such
+          requirement).
+        - Switched to memslot flag
+  - Take Oliver's simplification to the "allow fast gup for readable
+    faults" logic.
+  - Slightly redefine the return code of user_mem_abort.
+  - Fix documentation errors brought up by Marc
+  - Reword commit messages in imperative mood
+
+v1: https://lore.kernel.org/kvm/20230215011614.725983-1-amoorthy@google.com/
+
+Anish Moorthy (16):
+  KVM: Allow hva_pfn_fast() to resolve read-only faults.
+  KVM: x86: Set vCPU exit reason to KVM_EXIT_UNKNOWN  at the start of
+    KVM_RUN
+  KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+  KVM: Add docstrings to __kvm_write_guest_page() and
+    __kvm_read_guest_page()
+  KVM: Annotate -EFAULTs from kvm_vcpu_write_guest_page()
+  KVM: Annotate -EFAULTs from kvm_vcpu_read_guest_page()
+  KVM: Simplify error handling in __gfn_to_pfn_memslot()
+  KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
+  KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without implementation
+  KVM: x86: Implement KVM_CAP_NOWAIT_ON_FAULT
+  KVM: arm64: Implement KVM_CAP_NOWAIT_ON_FAULT
+  KVM: selftests: Report per-vcpu demand paging rate from demand paging
+    test
+  KVM: selftests: Allow many vCPUs and reader threads per UFFD in demand
+    paging test
+  KVM: selftests: Use EPOLL in userfaultfd_util reader threads and
+    signal errors via TEST_ASSERT
+  KVM: selftests: Add memslot_flags parameter to memstress_create_vm()
+  KVM: selftests: Handle memory fault exits in demand_paging_test
+
+ Documentation/virt/kvm/api.rst                |  74 ++++-
+ arch/arm64/kvm/arm.c                          |   2 +
+ arch/arm64/kvm/mmu.c                          |  16 +-
+ arch/x86/kvm/mmu/mmu.c                        |  30 +-
+ arch/x86/kvm/x86.c                            |   3 +
+ include/linux/kvm_host.h                      |  15 +
+ include/uapi/linux/kvm.h                      |  15 +
+ tools/include/uapi/linux/kvm.h                |   8 +
+ .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
+ .../selftests/kvm/access_tracking_perf_test.c |   2 +-
+ .../selftests/kvm/demand_paging_test.c        | 285 ++++++++++++++----
+ .../selftests/kvm/dirty_log_perf_test.c       |   2 +-
+ .../testing/selftests/kvm/include/memstress.h |   2 +-
+ .../selftests/kvm/include/userfaultfd_util.h  |  17 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
+ tools/testing/selftests/kvm/lib/memstress.c   |   4 +-
+ .../selftests/kvm/lib/userfaultfd_util.c      | 159 ++++++----
+ .../kvm/memslot_modification_stress_test.c    |   2 +-
+ virt/kvm/kvm_main.c                           |  97 ++++--
+ 19 files changed, 564 insertions(+), 174 deletions(-)
+
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
