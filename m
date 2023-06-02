@@ -2,63 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B42BD71F7CA
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 03:25:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF12E71F7CE
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 03:25:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233506AbjFBBZS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 21:25:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50120 "EHLO
+        id S233501AbjFBBZ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 21:25:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233459AbjFBBZQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 21:25:16 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00062198
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 18:25:12 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1b01d7b3e80so14223405ad.3
-        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 18:25:12 -0700 (PDT)
+        with ESMTP id S231468AbjFBBZY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 21:25:24 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51127195
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 18:25:22 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5341081a962so1474246a12.2
+        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 18:25:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685669112; x=1688261112;
+        d=google.com; s=20221208; t=1685669122; x=1688261122;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y9ogo0ACLRXvN9mYdk6iIQOzAO0yNB55tAwPeqYZ6uA=;
-        b=fXFTlIW2NrYvQfix8ljatUPE1vnGf8igwXZjblSazTj1v7yw+YHbbG0YYLv6qEkHOD
-         AtjWpnV1P5frULvo6fEkTw6zDEtAcxUTw/04caL8ezjnLMYZWsqBJcD8NwcFqOauomVB
-         ybXs7sGlTvtBqTWWPMmxGfsm3jfZCW57xECjygrjCePaMIjyzPe/QQeBBN3LxQoFM2kY
-         IG87Cu13HtaHUTgCfIESH2OFILtui7imzIJs3k4Eao/BGUW8Dx7ooaB7DTkUh38IWxKS
-         nKJzxKoUWQapYg3X0aqy11J1MW/13BlNPWTElYoRIY86ZM0pvEKOJ2ceKVInUCLOEZ4w
-         4k9Q==
+        bh=aAeX2x25IEnYqDcyaaeygr5j/RLaW3VmX83LOkBX62w=;
+        b=jbC28+Kk7+GbdZAD1n0cOFaoxamdpSTEFpFL9n6fWhGNd1eXtqCZy2GPO3UhLfuIso
+         LuZVH1bk1JFiY6VmkOkHSSi653/6qASI6QLZfEy+l1C/wavY06zJ3PiiSblOYtplHFhY
+         qpsSlMydNAkrd276ftCjEEKJi1Mc0C/EEKEA36lb5b9bg+CILb6fMxzFfnmG8MmClm/j
+         erSCxIS8XEoxtisxmddOCQooO7I0zCsAw6TnFywGnDoOCDxHCRgRFLt0L2DE9SqJzkc4
+         3nJ+NacV4wGU2jVrarcjaCoTLIhoystDqFgsTRU8dbZW5mF7io3jMH2SA62O37Fd/Dlz
+         yVNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685669112; x=1688261112;
+        d=1e100.net; s=20221208; t=1685669122; x=1688261122;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y9ogo0ACLRXvN9mYdk6iIQOzAO0yNB55tAwPeqYZ6uA=;
-        b=c7a/R/vOmJuARdJu5LuqUwjWpQkz4Qpk8q4JK/Om7+PEZzfzFPvRuR3IbBfRMMnj3r
-         AZvOyaL8PHASoiGDhq6FDlxrZtFYPQvXMx53Gmp6ra0m2O6VLQ6+mMI8/HIvqk0Mc4uB
-         cuRhs7lDy2g6KE8VluxAIniuBeW0FFkNkO/THjCuyg0PsAJ/R5oI3ff/Y197MrkZSjCO
-         kxkjPTyRIY32xQbThbsoh9Yy6TBjgVImlS7+aM37Tc8yUbodBAuAmRSr6M1UYwKIefaa
-         fVPv4TQoH5/MiyilOWBKvJAHreNQN+t4muoE+DD4XdKUNO6URge2AMgsKZJOQTpklUZ/
-         /PNg==
-X-Gm-Message-State: AC+VfDzFG9VmiDgPgU2bkJ07yYrowkdmmmSyMe4lqjDBvErNlrYAwBz5
-        oB3VY+LZHO+XQdEsxYI09dbz/NEEAHM=
-X-Google-Smtp-Source: ACHHUZ5ON75IRIcN2tIJppeawkiG3e6QBxtwTIPutsCSCn/nqvH5ACl+7kjzQXtu5Tpy04tH/jiZI2DvMao=
+        bh=aAeX2x25IEnYqDcyaaeygr5j/RLaW3VmX83LOkBX62w=;
+        b=gTRqq/uy2x3gD2pg2tSrlw7NLOsx5qJvqsUF+IxPExmAUGTOzBwpNKOUOldKtIRZdO
+         KMMv7USRbLQ7ZmsSDIZ9cDXEVshcGeuIAxhhshELxZu4zaArSLOu+pwtkAWWTxvUioch
+         ajy7zZZPgaW/31nseowfJE98Sx8SuBXcQp6nvMBpXjT0GOn4NQD/uinEe/fSkCjaF1ob
+         S6E+60+EUkywurnQAm2WBo/ntx1+SCJ9pgTSUM0JIeMI6EjHEKYOpWBprPek2mxTKrCU
+         GrEgT1olKrpsFsa/cxetyuOKe8jC2yf/YDs4Rg9ryXLRKIW88vNxWa9r7Vv2KK7eHFeJ
+         IM8g==
+X-Gm-Message-State: AC+VfDy3R4uFA7qzrbkTkcsEFd0HNPHJxJv+Fm2rSOTniQStwRShWELt
+        hawQ5o/fNtFf44zEu29QpZioM2TT1RQ=
+X-Google-Smtp-Source: ACHHUZ6mdPKFdzG/VCK/fOCRl3UFXp7GQZZehhCor8qs5f4C1fSI7fJE390vyhN3BSJmeej6Dj75Gdm96tQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:c20d:b0:1ac:6a97:5286 with SMTP id
- 13-20020a170902c20d00b001ac6a975286mr277309pll.5.1685669112526; Thu, 01 Jun
- 2023 18:25:12 -0700 (PDT)
-Date:   Thu,  1 Jun 2023 18:23:34 -0700
-In-Reply-To: <20230417175322.53249-1-colin.i.king@gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a63:4450:0:b0:51b:2805:6d43 with SMTP id
+ t16-20020a634450000000b0051b28056d43mr418215pgk.1.1685669121776; Thu, 01 Jun
+ 2023 18:25:21 -0700 (PDT)
+Date:   Thu,  1 Jun 2023 18:23:36 -0700
+In-Reply-To: <20230412200913.1570873-1-pbonzini@redhat.com>
 Mime-Version: 1.0
-References: <20230417175322.53249-1-colin.i.king@gmail.com>
+References: <20230412200913.1570873-1-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.41.0.rc2.161.g9c6817b8e7-goog
-Message-ID: <168512562861.2752648.4897347510489297628.b4-ty@google.com>
-Subject: Re: [PATCH][next] KVM: selftests: Fix spelling mistake "miliseconds"
- -> "milliseconds"
+Message-ID: <168565340740.666768.10463587554285914493.b4-ty@google.com>
+Subject: Re: [PATCH] selftests/kvm: touch all pages of args on each memstress iteration
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
-        Colin Ian King <colin.i.king@gmail.com>
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     vipinsh@google.com, bgardon@google.com
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -70,15 +68,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 17 Apr 2023 18:53:22 +0100, Colin Ian King wrote:
-> There is a spelling mistake in the help for the -p option. Fix it.
+On Wed, 12 Apr 2023 16:09:13 -0400, Paolo Bonzini wrote:
+> Access the same memory addresses on each iteration of the memstress
+> guest code.  This ensures that the state of KVM's page tables
+> is the same after every iteration, including the pages that host the
+> guest page tables for args and vcpu_args.
 > 
+> This difference is visible on the dirty_log_page_splitting_test
+> on AMD machines.
 > 
+> [...]
 
 Applied to kvm-x86 selftests, thanks!
 
-[1/1] KVM: selftests: Fix spelling mistake "miliseconds" -> "milliseconds"
-      https://github.com/kvm-x86/linux/commit/56f413f2cd37
+[1/1] selftests/kvm: touch all pages of args on each memstress iteration
+      https://github.com/kvm-x86/linux/commit/07b4b2f4047f
 
 --
 https://github.com/kvm-x86/linux/tree/next
