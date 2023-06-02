@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FA5C720710
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 18:11:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEA3B720716
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 18:11:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236616AbjFBQLA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 12:11:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35822 "EHLO
+        id S236039AbjFBQLE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 12:11:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236529AbjFBQKl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 12:10:41 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 172F2E76
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 09:10:01 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-2565bf593e7so845489a91.2
-        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 09:10:01 -0700 (PDT)
+        with ESMTP id S236615AbjFBQKv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 12:10:51 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB6A010D0
+        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 09:10:06 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-568960f4596so34413587b3.1
+        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 09:10:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685722184; x=1688314184;
+        d=google.com; s=20221208; t=1685722186; x=1688314186;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dYi36v/YAwaQRjgMVH+8EY8FA7aBBtQ+BKuLP6eDkvQ=;
-        b=Dw12ocPSe9vJUzYvSsSf9AU3CWoiwTk/XWOJWSQ28tLpoS2cFvmMFQbSf/qpjpxy7v
-         oO7YPmr7slJeCTpuInsqqCsWP0mQqS3ua3oN9mzqlTzskeKCsUc+Eng3akxDWWH0DIw4
-         jhV0Z/aBx0lDztLRsncoYBKeU0QZUKmq2gyk1zRIGBfBu0xTC7gF0pRwGDV7061++Ztg
-         o5Q/lPpRn/0BOjk3RHl0WBfcrcdb3R1NScbQhD6quOJddTL53tPtBy4zB10NE0mDM/7t
-         Ap9iqqT0iz8St+1DIUrYSZSYDvTKdSKGgplDSGDJzXhKejoEUVmNl+mnTfSIjic7IX8O
-         rhDA==
+        bh=iiQKR5r12cEmfxEtqKB501qQ7U5/inaqlNqkSHrg1Dk=;
+        b=pa3mVvglr9ldo0oASWJgWygRLd3hw8lG1pjLeB+Qzm3K3zOU5BQU88aja7wxcgPXwA
+         AwayadZx6shxLAXjuJFrDzlMtsvb67kGNUVBIz8jQ9pcx5Jd6BF7pMABQixgPuk47qo/
+         QPSMIrvsitPTIbIvBs3Unmlez10KGpvyazPz0vuoWxeM0ddu7MUX6bOpsZv5FX/RHsfI
+         ab0UhQ4BKG9ohwFpekgRN7rsQtHAtMFU2PEbvOsbX5+K7m399sRVLlUcmEJAu36XrUm4
+         MIK72o4Xoc2dnSjS77GyfH7dzmpmSt4gmenJO3sxGLvRMkP8fiKXjBjSppWa9vRlnGfd
+         FwPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685722184; x=1688314184;
+        d=1e100.net; s=20221208; t=1685722186; x=1688314186;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dYi36v/YAwaQRjgMVH+8EY8FA7aBBtQ+BKuLP6eDkvQ=;
-        b=AenINZQOE6w2Gn58Xc+En57g+CkVZeX4WrhRm4ZygObZK6KLyqWpIqvIO7L/yfo+bo
-         Qm7WUAkbPqv4GaBCAjn7UBRB7N8x9/Kh1rc09naZt5zvzHejU2MfLaHVbAUdJ6a+YPa9
-         gwg6e9V23ynZdVlMrYs+X4CmDmrDeTo201S++/iIN/6KzPpLA8dcXGFYCWCbeMy6fPXJ
-         CTdzeLGNaDdkTnhomoYCAKE3LAPYB4EA3qYHGsQWbSQdPLBmI/QS8CsiaOx91h9p0mDW
-         agMsr2YTjuy0d7Am+w3ouEF23IIH9yyclaAQ2vVj5MoJCELlY4CP8AxtJZd3P3ZYyqVC
-         01hw==
-X-Gm-Message-State: AC+VfDwFMQ5FM15VCNvpQzuQXXXGSDjXPzNgo2PDX5SV2Lln0JMwl4ed
-        bDKiL5hYQfYhAHPtVV5c5doNQa1O8qSF
-X-Google-Smtp-Source: ACHHUZ4+c4f5xcGK/eLSU3xHgu8tOZbN6Cv39+hh+7NNc/cJ0dF1+UQE1gqaCbeHO9GT4u+sOrr9aoJh/Nwo
+        bh=iiQKR5r12cEmfxEtqKB501qQ7U5/inaqlNqkSHrg1Dk=;
+        b=jtQXkU1MRKuAegVwAHYyCZ4hZh9ud6RS3g13lY1DTYmT0iCpKalHGrUyecReQDEFYV
+         ZGvdBthFgIeAS9bf+aeThoO/l/3f3J7jmWaMGgbMJFAn9Ki6Uzcgx/YMEqz0bNw0ic/N
+         9EeX4yXDxKMrEOaXJ/xdjWFH705kgonC1D7ODLimLlAv61CGzDcgKsTI91CW1ZPP90hi
+         +2ayuA6QLayljLqOFLh1V5V5kT2fpR/GkWRIciDjYnZvOG1aPajLJV9S2xCEGBBxs8MH
+         E4QLRaIKNqc9E3Ixv1jRTZr1vsOmvRClcCEnaI01WGxqlJGBARxlZgnit/YwLBdoY/Nh
+         lmMQ==
+X-Gm-Message-State: AC+VfDwnuERw7KaEV9EBv2DuzqAMeOw6y2Y/GyGXxbbW9AsH4o51dZrP
+        5jyHumzaQB0uZAxNljRkN+sYc+Tk0jPX
+X-Google-Smtp-Source: ACHHUZ4B/VNE5B0Lzqq5kfdIQx5Z2vYuoQBh8/63RZRhZfWL9mTILlGstZ7p9kQje0NOJUJPGy2sE9Fs2xL/
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a17:90a:c08e:b0:252:733d:15dc with SMTP id
- o14-20020a17090ac08e00b00252733d15dcmr97816pjs.2.1685722183850; Fri, 02 Jun
- 2023 09:09:43 -0700 (PDT)
-Date:   Fri,  2 Jun 2023 09:09:10 -0700
+ (user=vipinsh job=sendgmr) by 2002:a05:6902:1545:b0:ba8:181b:2558 with SMTP
+ id r5-20020a056902154500b00ba8181b2558mr2255805ybu.4.1685722186031; Fri, 02
+ Jun 2023 09:09:46 -0700 (PDT)
+Date:   Fri,  2 Jun 2023 09:09:11 -0700
 In-Reply-To: <20230602160914.4011728-1-vipinsh@google.com>
 Mime-Version: 1.0
 References: <20230602160914.4011728-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230602160914.4011728-13-vipinsh@google.com>
-Subject: [PATCH v2 12/16] KVM: arm64: Retry shared page table walks outside of
- fault handler
+Message-ID: <20230602160914.4011728-14-vipinsh@google.com>
+Subject: [PATCH v2 13/16] KVM: arm64: Run clear-dirty-log under MMU read lock
 From:   Vipin Sharma <vipinsh@google.com>
 To:     maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
         suzuki.poulose@arm.com, yuzenghui@huawei.com,
@@ -78,136 +77,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For a shared page walker which is not fault handler, retry the walk if
-walker callback function returns -EAGAIN, or continue to the next SPTE
-if callback function return -ENOENT. Update the kvm_pgtable_walk
-documentation.
+Take MMU read lock for clearing dirty logs and use shared page table
+walker.
 
-For fault handler logic remains same, i.e. exit the walk and resume the
-guest when getting -EAGAIN and -ENOENT errors from walker callback
-function.
+Dirty logs are currently cleared using MMU write locks. This
+means vCPUs page faults, which takes MMU read lock,  will
+be blocked while dirty logs are being cleared. This causes guest
+degradation and especially noticeable on VMs with lot of vCPUs.
 
-Currently, there is no page walker which is shared and not a fault
-handler, but this will change in future patches when clear-dirty-log
-walker will use MMU read lock and run via shared walker.
+Taking MMU read lock will allow vCPUs to execute parallelly and reduces
+the impact on vCPUs performance.
 
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 23 ++++++++++-------
- arch/arm64/kvm/hyp/pgtable.c         | 38 +++++++++++++++++++++++-----
- 2 files changed, 46 insertions(+), 15 deletions(-)
+ arch/arm64/kvm/mmu.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 23e7e7851f1d..145be12a5fc2 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -716,15 +716,20 @@ int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
-  * type of the walker, i.e. shared walker (vCPU fault handlers) or non-shared
-  * walker.
-  *
-- * Walker Type  | Callback         | Walker action
-- * -------------|------------------|--------------
-- * Non-Shared   | 0                | Continue
-- * Non-Shared   | -EAGAIN          | Continue
-- * Non-Shared   | -ENOENT          | Continue
-- * Non-Shared   | Any other        | Exit
-- * -------------|------------------|--------------
-- * Shared       | 0                | Continue
-- * Shared       | Any other        | Exit
-+ * Walker Type            | Callback         | Walker action
-+ * -----------------------|------------------|--------------
-+ * Non-Shared             | 0                | Continue
-+ * Non-Shared             | -EAGAIN          | Continue
-+ * Non-Shared             | -ENOENT          | Continue
-+ * Non-Shared             | Any other        | Exit
-+ * -----------------------|------------------|--------------
-+ * Shared                 | 0                | Continue
-+ * Shared                 | -EAGAIN          | Retry
-+ * Shared                 | -ENOENT          | Continue
-+ * Shared                 | Any other        | Exit
-+ * -----------------------|------------------|--------------
-+ * Shared (Fault Handler) | 0                | Continue
-+ * Shared (Fault Handler) | Any other        | Exit
-  *
-  * Return: 0 on success, negative error code on failure.
-  */
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 7f80e953b502..23cda3de2dd4 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -191,15 +191,21 @@ static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
- 	 * Callbacks can also return ENOENT when PTE which is visited is not
- 	 * valid.
- 	 *
--	 * In the context of a shared walker interpret these as a signal
-+	 * In the context of a fault handler interpret these as a signal
- 	 * to retry guest execution.
- 	 *
--	 * Ignore these return codes altogether for walkers outside a fault
--	 * handler (e.g. write protecting a range of memory) and chug along
-+	 * In the context of a shared walker which is not fault handler
-+	 * interpret:
-+	 * 1. EAGAIN - A signal to retry walk again.
-+	 * 2. ENOENT - A signal to ignore and move on to next SPTE.
-+	 *
-+	 * Ignore these return codes altogether for other walkers and chug along
- 	 * with the page table walk.
- 	 */
--	if (r == -EAGAIN || r == -ENOENT)
-+	if (r == -EAGAIN)
- 		return !(walker->flags & KVM_PGTABLE_WALK_SHARED);
-+	if (r == -ENOENT)
-+		return !(walker->flags & KVM_PGTABLE_WALK_HANDLE_FAULT);
- 
- 	return !r;
- }
-@@ -260,24 +266,44 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
- 	return ret;
- }
- 
-+static bool kvm_pgtable_walk_retry(const struct kvm_pgtable_walker *walker,
-+				   int r)
-+{
-+	/*
-+	 * All shared page table walks where visitor callbacks return -EAGAIN
-+	 * should be retried with the exception of fault handler. In case of
-+	 * fault handler retry is achieved by resuming the guest.
-+	 */
-+	if (r == -EAGAIN)
-+		return (walker->flags & KVM_PGTABLE_WALK_SHARED) &&
-+				!(walker->flags & KVM_PGTABLE_WALK_HANDLE_FAULT);
-+
-+	return !r;
-+}
-+
- static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
- 			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, u32 level)
- {
- 	u32 idx;
- 	int ret = 0;
-+	kvm_pteref_t pteref;
- 
- 	if (WARN_ON_ONCE(level >= KVM_PGTABLE_MAX_LEVELS))
- 		return -EINVAL;
- 
- 	for (idx = kvm_pgtable_idx(data, level); idx < PTRS_PER_PTE; ++idx) {
--		kvm_pteref_t pteref = &pgtable[idx];
-+retry:
-+		pteref = &pgtable[idx];
- 
- 		if (data->addr >= data->end)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 356dc4131023..7c966f6f1a41 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -74,8 +74,12 @@ static int stage2_apply_range(struct kvm_s2_mmu *mmu, phys_addr_t addr,
+ 		if (ret)
  			break;
  
- 		ret = __kvm_pgtable_visit(data, mm_ops, pteref, level);
--		if (ret)
-+		if (ret) {
-+			if (kvm_pgtable_walk_retry(data->walker, ret))
-+				goto retry;
- 			break;
+-		if (resched && next != end)
+-			cond_resched_rwlock_write(&kvm->mmu_lock);
++		if (resched && next != end) {
++			if (flags & KVM_PGTABLE_WALK_SHARED)
++				cond_resched_rwlock_read(&kvm->mmu_lock);
++			else
++				cond_resched_rwlock_write(&kvm->mmu_lock);
 +		}
- 	}
+ 	} while (addr = next, addr != end);
  
  	return ret;
+@@ -1131,11 +1135,11 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
+ 	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
+ 
+-	write_lock(&kvm->mmu_lock);
+-	lockdep_assert_held_write(&kvm->mmu_lock);
+-
+-	stage2_wp_range(&kvm->arch.mmu, start, end, 0);
++	read_lock(&kvm->mmu_lock);
++	stage2_wp_range(&kvm->arch.mmu, start, end, KVM_PGTABLE_WALK_SHARED);
++	read_unlock(&kvm->mmu_lock);
+ 
++	write_lock(&kvm->mmu_lock);
+ 	/*
+ 	 * Eager-splitting is done when manual-protect is set.  We
+ 	 * also check for initially-all-set because we can avoid
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
