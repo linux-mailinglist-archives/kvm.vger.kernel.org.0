@@ -2,88 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37B1E71FBD0
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 10:25:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A6A171FC00
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 10:26:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234422AbjFBIY7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 04:24:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36342 "EHLO
+        id S234553AbjFBI0o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 04:26:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234431AbjFBIYr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 04:24:47 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1486D1A7;
-        Fri,  2 Jun 2023 01:24:46 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3528Hn7a017742;
-        Fri, 2 Jun 2023 08:24:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : from
- : cc : subject : to : message-id : date; s=pp1;
- bh=AJ5jfwjCkfHvixKCptzj1ugCsJ6w0iYOf7eS44f+tD8=;
- b=OWu4uBJGN/tAwsBRFYjoZQ2eWVYRwdsQnPJHsbdRbWXKVZfWPT1CpQOaf1BGdRogTF6c
- ZF4YIftEQyA1iDJ5/F03nvBFhEuG1CnNoQKJXOctW5zEw1o0uVSRiVXNHrPf+n6KV987
- CYrquYIWZQ5yEz0NAGluY1q7beddxrZKff6vqsslw6N2Kx+zEQtNchc69nDekFxuFnVw
- BKBktb/ETEtOf828J57jS6Yp7f08r6cxXbeuHbMGdySVYILMNIHgDPv0flZHvX8PtAFc
- 16zNprPWh4BPaIbV7I+4nc99kOWvt7cbaJJT89wAXs84a5lg3nfSP8T3t61pkdscwfUx lw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qycshr47c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Jun 2023 08:24:45 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3528JPJE023090;
-        Fri, 2 Jun 2023 08:24:45 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qycshr46n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Jun 2023 08:24:45 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3526JZIG018965;
-        Fri, 2 Jun 2023 08:24:42 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3qu9g52ep4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Jun 2023 08:24:42 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3528OdkI21627136
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 2 Jun 2023 08:24:39 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 168F820067;
-        Fri,  2 Jun 2023 08:24:39 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E7E6820065;
-        Fri,  2 Jun 2023 08:24:38 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.63.101])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  2 Jun 2023 08:24:38 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+        with ESMTP id S234601AbjFBI0E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 04:26:04 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBFD71A7;
+        Fri,  2 Jun 2023 01:25:42 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5897B64D23;
+        Fri,  2 Jun 2023 08:25:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F8C8C433D2;
+        Fri,  2 Jun 2023 08:25:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685694341;
+        bh=bNXlHhXedmdPPe/K+SVuaWMGRNYLUdQRKj6I74qlBrs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Xh7HYTpo4nMXKVmRIlBMtVQZAaJZlNJh8oodxpQMfUiZ7i03OAMyDN6rcJW+6KY67
+         nFaj4Vgy3gV2SAs2FFrgj6veNIZOhDoJBNnP+gW0309syLC6bxyNhZjS8BB+8BjgPa
+         vd/Wyj63PV1mkMuLUcHOdc+11P6LnkRWvaMJeMz+rwX4zO5CBLJ3Oldw+R5XCKeh0g
+         J/AdtophrHNobHJnSMOeV0fOALs6427GzA8qHOW81xwLuZH+XAUX/cNXavI4+kQI5+
+         HKc5qB9ke7zuoPIFMapN9VOS0jgv332F8kDDJ86FZUpZgRQ0zjwzaypZIvIkeg0BBA
+         bd40/xlROVi0A==
+Received: from 90.4.23.109.rev.sfr.net ([109.23.4.90] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q506N-002H9j-8n;
+        Fri, 02 Jun 2023 09:25:39 +0100
+Date:   Fri, 02 Jun 2023 09:25:37 +0100
+Message-ID: <875y86p8xq.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
+In-Reply-To: <CAJHc60wKDbfQsjmxkv9A6h56NXtU=DapDynFLDtdvChX_ueQeA@mail.gmail.com>
+References: <20230519005231.3027912-1-rananta@google.com>
+        <20230519005231.3027912-4-rananta@google.com>
+        <87v8gbjkzn.wl-maz@kernel.org>
+        <CAJHc60x0iFWOFxcCYpH6bG+CinBM2TmYxvADKwOqDsUFJCr0AA@mail.gmail.com>
+        <86zg5kc2ho.wl-maz@kernel.org>
+        <CAJHc60wKDbfQsjmxkv9A6h56NXtU=DapDynFLDtdvChX_ueQeA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230601164537.31769-1-pmorel@linux.ibm.com>
-References: <20230601164537.31769-1-pmorel@linux.ibm.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com,
-        cohuck@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v5 0/2] Fixing infinite loop on SCLP READ SCP INFO error
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Message-ID: <168569427857.252746.9448026786076856625@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Fri, 02 Jun 2023 10:24:38 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: MsmSTmP7WGQWgWu6RzW4GbMVqjx7aIOf
-X-Proofpoint-ORIG-GUID: lkb_x1lYmnguzeB4y3RSuZtUx8O5D111
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-02_05,2023-05-31_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- bulkscore=0 mlxlogscore=633 impostorscore=0 suspectscore=0
- lowpriorityscore=0 phishscore=0 priorityscore=1501 clxscore=1015
- adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306020061
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+X-SA-Exim-Connect-IP: 109.23.4.90
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, ricarkol@google.com, pbonzini@redhat.com, jingzhangos@google.com, coltonlewis@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -92,22 +78,166 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Pierre Morel (2023-06-01 18:45:35)
-> Aborting on SCLP READ SCP INFO error leads to a deadloop.
+On Fri, 02 Jun 2023 02:37:28 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
 >=20
-> The loop is:
-> abort() -> exit() -> smp_teardown() -> smp_query_num_cpus() ->
-> sclp_get_cpu_num() -> assert() -> abort()
->=20
-> Since smp_setup() is done after sclp_read_info() inside setup() this
-> loop only happens when only the start processor is running.
-> Let sclp_get_cpu_num() return 1 in this case.
->=20
-> Also provide a bigger buffer for SCLP READ INFO when we have the
-> extended-length-SCCB facility.
->=20
-> Pierre
+> On Wed, May 31, 2023 at 1:46=E2=80=AFAM Marc Zyngier <maz@kernel.org> wro=
+te:
+> >
+> > On Tue, 30 May 2023 22:22:23 +0100,
+> > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > >
+> > > On Mon, May 29, 2023 at 7:00=E2=80=AFAM Marc Zyngier <maz@kernel.org>=
+ wrote:
+> > > >
+> > > > On Fri, 19 May 2023 01:52:28 +0100,
+> > > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > > >
+> > > > > Implement kvm_arch_flush_remote_tlbs_range() for arm64
+> > > > > to invalidate the given range in the TLB.
+> > > > >
+> > > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > > > ---
+> > > > >  arch/arm64/include/asm/kvm_host.h |  3 +++
+> > > > >  arch/arm64/kvm/hyp/nvhe/tlb.c     |  4 +---
+> > > > >  arch/arm64/kvm/mmu.c              | 11 +++++++++++
+> > > > >  3 files changed, 15 insertions(+), 3 deletions(-)
+> > > > >
+> > > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/inclu=
+de/asm/kvm_host.h
+> > > > > index 81ab41b84f436..343fb530eea9c 100644
+> > > > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > > > @@ -1081,6 +1081,9 @@ struct kvm *kvm_arch_alloc_vm(void);
+> > > > >  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> > > > >  int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> > > > >
+> > > > > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> > > > > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t star=
+t_gfn, u64 pages);
+> > > > > +
+> > > > >  static inline bool kvm_vm_is_protected(struct kvm *kvm)
+> > > > >  {
+> > > > >       return false;
+> > > > > diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/n=
+vhe/tlb.c
+> > > > > index d4ea549c4b5c4..d2c7c1bc6d441 100644
+> > > > > --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > > > > +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > > > > @@ -150,10 +150,8 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s=
+2_mmu *mmu,
+> > > > >               return;
+> > > > >       }
+> > > > >
+> > > > > -     dsb(ishst);
+> > > > > -
+> > > > >       /* Switch to requested VMID */
+> > > > > -     __tlb_switch_to_guest(mmu, &cxt);
+> > > > > +     __tlb_switch_to_guest(mmu, &cxt, false);
+> > > >
+> > > > This hunk is in the wrong patch, isn't it?
+> > > >
+> > > Ah, you are right. It should be part of the previous patch. I think I
+> > > introduced it accidentally when I rebased the series. I'll remove it
+> > > in the next spin.
+> > >
+> > >
+> > > > >
+> > > > >       __flush_tlb_range_op(ipas2e1is, start, pages, stride, 0, 0,=
+ false);
+> > > > >
+> > > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > > > index d0a0d3dca9316..e3673b4c10292 100644
+> > > > > --- a/arch/arm64/kvm/mmu.c
+> > > > > +++ b/arch/arm64/kvm/mmu.c
+> > > > > @@ -92,6 +92,17 @@ int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+> > > > >       return 0;
+> > > > >  }
+> > > > >
+> > > > > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t star=
+t_gfn, u64 pages)
+> > > > > +{
+> > > > > +     phys_addr_t start, end;
+> > > > > +
+> > > > > +     start =3D start_gfn << PAGE_SHIFT;
+> > > > > +     end =3D (start_gfn + pages) << PAGE_SHIFT;
+> > > > > +
+> > > > > +     kvm_call_hyp(__kvm_tlb_flush_vmid_range, &kvm->arch.mmu, st=
+art, end);
+> > > >
+> > > > So that's the point that I think is not right. It is the MMU code t=
+hat
+> > > > should drive the invalidation method, and not the HYP code. The HYP
+> > > > code should be as dumb as possible, and the logic should be kept in
+> > > > the MMU code.
+> > > >
+> > > > So when a range invalidation is forwarded to HYP, it's a *valid* ra=
+nge
+> > > > invalidation. not something that can fallback to VMID-wide invalida=
+tion.
+> > > >
+> > > I'm guessing that you are referring to patch-2. Do you recommend
+> > > moving the 'pages >=3D MAX_TLBI_RANGE_PAGES' logic here and simply
+> > > return an error? How about for the other check:
+> > > system_supports_tlb_range()?
+> > > The idea was for __kvm_tlb_flush_vmid_range() to also implement a
+> > > fallback mechanism in case the system doesn't support the range-based
+> > > instructions. But if we end up calling __kvm_tlb_flush_vmid_range()
+> > > from multiple cases, we'd end up duplicating the checks. WDYT?
+> >
+> > My take is that there should be a single helper deciding to issue
+> > either a number of range-based TLBIs depending on start/end, or a
+> > single VMID-based TLBI. Having multiple calling sites is not a
+> > problem, and even if that code gets duplicated, big deal.
+> >
+> Hypothetically, if I move the check to this patch and return an error
+> if this situation occurs, since I'm dependending on David's common MMU
+> code [1], kvm_main.c would end of calling kvm_flush_remote_tlbs() and
+> we'd be doing a VMID-based TLBI.
+> One idea would be to issue a WARN_ON() and return 0 so that we don't
+> issue any TLBIs. Thoughts?
 
-Thanks for your patience Pierre.
+Then we should fix the infrastructure. And no, not issuing TLBs is
+not an acceptable outcome. Might as well panic the kernel, because
+silent memory corruption is not something I'm willing to entertain.
 
-Pushed to devel with the fixup to patch 2.
+My take is as follows:
+
+- either the core code doesn't specify a range, and we blow the whole
+  thing as we do today
+
+- or it specifies a range, and we apply range invalidation as permitted
+  by the architecture and the implementation (either a *series* of
+  range invalidation, or a full VMID invalidation).
+
+As for the "common MMU" stuff, something such as "flush_remote_tlbs"
+really shows that this code isn't common at all. It is just x86 creep,
+and I have zero problem ignoring it.
+
+>=20
+> > But a hypercall that falls back to global invalidation based on a
+> > range evaluation error (more than MAX_TLBI_RANGE_PAGES) is papering
+> > over a latent bug.
+> >
+> If I understand this correctly, MAX_TLBI_RANGE_PAGES is specifically
+> the capacity of the range-based instructions itself, isn't it? Is it
+> incorrect for the caller to request a higher range be invalidated even
+> on systems that do not support these instructions? Probably that's why
+> __flush_tlb_range() falls back to a global flush when the range
+> request is exceeded?
+
+This is indeed the architectural limit. But invalidating the whole
+VMID isn't necessarily the right thing either. If you can preserve
+some of the TLBs by only issuing a couple of range invalidation that
+span *in total* more than MAX_TLBI_RANGE_PAGES.
+
+Again, what I'm objecting to is the silent upgrading to VMID-wide
+invalidation being hidden away in the HYP code. That's just wrong. The
+HYP code is not the place for abstraction.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
