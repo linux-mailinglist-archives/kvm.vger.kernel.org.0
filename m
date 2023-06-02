@@ -2,183 +2,366 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A2AF7208DD
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 20:14:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D5937208FB
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 20:19:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236351AbjFBSN7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 14:13:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35660 "EHLO
+        id S236297AbjFBSTj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 14:19:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232628AbjFBSN5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 14:13:57 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63F1D196;
-        Fri,  2 Jun 2023 11:13:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685729636; x=1717265636;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=yIozrWDl/5hQ5vXZiPITasCQOwSsn+udVyA99ySkQ4Q=;
-  b=LMlhyRSGPVgdVQqJ/a0iR3F2ol5niq/zLCbDcE8VrFHR75vZ63iEtocu
-   pyCvxT020i0dAdsm7DqWDwkvLR3PpMYz+jfNKrlsBgupuCFmYEfp+XCUp
-   QdhnDEP9lgyw88WP6zQa/F7C2ySxJGadqSk5gS0cbKX7uueb0G4/7EbEl
-   hjXIb/S9dtqwIZZH1jKJSbq51D0bSozWKWjLmYlnvY5cA4FWcgmJasJTC
-   2aORBl22e9D+zRmHay4OIfs9rM9A4hAvPesru+ZI9AWwAQhjR6IKoDMT6
-   2ZROjRRCod2uhctE1XO8H+bOogKtN04kXXX7ZWgeiJX1LwiX+pFl9CDko
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10729"; a="354782633"
-X-IronPort-AV: E=Sophos;i="6.00,213,1681196400"; 
-   d="scan'208";a="354782633"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2023 11:13:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10729"; a="702034801"
-X-IronPort-AV: E=Sophos;i="6.00,213,1681196400"; 
-   d="scan'208";a="702034801"
-Received: from lkp-server01.sh.intel.com (HELO 15ab08e44a81) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 02 Jun 2023 11:13:53 -0700
-Received: from kbuild by 15ab08e44a81 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1q59Hc-0000oX-1d;
-        Fri, 02 Jun 2023 18:13:52 +0000
-Date:   Sat, 3 Jun 2023 02:13:07 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Shunsuke Mie <mie@igel.co.jp>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Rusty Russell <rusty@rustcorp.com.au>
-Cc:     oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Shunsuke Mie <mie@igel.co.jp>
-Subject: Re: [PATCH v4 1/1] vringh: IOMEM support
-Message-ID: <202306030216.bpWr6XV0-lkp@intel.com>
-References: <20230602055211.309960-2-mie@igel.co.jp>
+        with ESMTP id S236571AbjFBSTa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 14:19:30 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD2C81A1
+        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 11:19:03 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2af1822b710so34134411fa.1
+        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 11:19:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685729935; x=1688321935;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cFLBip0rXYVzmkQxhrZxBqTTTRzpwp6Ec+4ePpr28UE=;
+        b=L1tGtijkILSagPNle+rdISWwsz3O38nl1v2cDhWnnMdXclTZRlRHFmQG0fm8uctfgW
+         Q87845GyNa0TJgBV1ADgo8quuHxLzwE5fK3czUONxXuMtw8ANAm4UTU/zdjzKZwYAEJ1
+         P9yRSpO7vVoNRfKjZ9Zhz+dldExb5p4rAtVt3qucI3YaqgIdSD+x00W7sfgIEmIYwcKb
+         akwG9GxVsyNjeOhVLhj1rAskGSkv4DDMnkU1DFR84Y7TTb5OLI/hlRpD/4oIthkX/oYW
+         Nz0jy/jJ6q+IjwdsH/KLnJ5HBp6PeZ2jG7ekSZQ5K9nrlLDONEi7igjOEQb7kN6X8WVo
+         9U3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685729935; x=1688321935;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cFLBip0rXYVzmkQxhrZxBqTTTRzpwp6Ec+4ePpr28UE=;
+        b=beFaoJ0x0eRXIsl+FrSiLdqcdklDutLDaklybeqEFqJcZMlxJDg1Fc05N3uIiXOIGR
+         TilQPYWtZN/jo+1EYKQCvyPXbJmxs7x0dK2MkLh0vRnOcZgA0dQE2UMj96IP4ddDf8Og
+         kiykFU4ErHClcpZQckIkuIP25vrf5egz6MMDsYzILWJdAYN9ObwM+z4YxfGsMHQtSnqa
+         DOaxVOW8NwKcwnpcNsk8Q0BBkbqqFEBnvbaBRlXNII6cBNNr/pOOg3acytlHP/0RhyaP
+         FnF7QIheMB1BNED8z1KpVVJmbheJhyOTE4G6TGNK14fkVEdLKwWId9YxVgmK7ahS41ks
+         lp5g==
+X-Gm-Message-State: AC+VfDx1FsbJ+fcDrhubBx6Bk5Bdi/bLG3SOknWz8QT84IX+d2MemERH
+        FagGhSXdmtqJ0qX6hXofxom1My1BixWyu5x68bc=
+X-Google-Smtp-Source: ACHHUZ4D+NVU5tIhflX4LDmEO7sPEy1kMkng+glJgOwWwm8sS7OpohPaCgKW+1z6j5C/RFo/eKJF4vsuppl7x7wH+ZI=
+X-Received: by 2002:a2e:8783:0:b0:2ae:db65:2d01 with SMTP id
+ n3-20020a2e8783000000b002aedb652d01mr504681lji.23.1685729934212; Fri, 02 Jun
+ 2023 11:18:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230602055211.309960-2-mie@igel.co.jp>
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20230515160506.1776883-1-stefanha@redhat.com> <20230515160506.1776883-3-stefanha@redhat.com>
+ <8b0ced3c-2fb5-2479-fe78-f4956ac037a6@linux.ibm.com>
+In-Reply-To: <8b0ced3c-2fb5-2479-fe78-f4956ac037a6@linux.ibm.com>
+From:   Sam Li <faithilikerun@gmail.com>
+Date:   Sat, 3 Jun 2023 02:18:27 +0800
+Message-ID: <CAAAx-8Km7J8dfz_63y1W5wE8MH7hJXo04ajY1A-ctv--x9CpGA@mail.gmail.com>
+Subject: Re: [PULL v2 02/16] block/file-posix: introduce helper functions for
+ sysfs attributes
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
+        Richard Henderson <rth@twiddle.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        Julia Suvorova <jusual@redhat.com>,
+        Aarushi Mehta <mehta.aaru20@gmail.com>,
+        Kevin Wolf <kwolf@redhat.com>, kvm@vger.kernel.org,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Raphael Norwitz <raphael.norwitz@nutanix.com>,
+        qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Fam Zheng <fam@euphon.net>, Hannes Reinecke <hare@suse.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLY,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shunsuke,
+Matthew Rosato <mjrosato@linux.ibm.com> =E4=BA=8E2023=E5=B9=B46=E6=9C=881=
+=E6=97=A5=E5=91=A8=E5=9B=9B 02:21=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On 5/15/23 12:04 PM, Stefan Hajnoczi wrote:
+> > From: Sam Li <faithilikerun@gmail.com>
+> >
+> > Use get_sysfs_str_val() to get the string value of device
+> > zoned model. Then get_sysfs_zoned_model() can convert it to
+> > BlockZoneModel type of QEMU.
+> >
+> > Use get_sysfs_long_val() to get the long value of zoned device
+> > information.
+>
+> Hi Stefan, Sam,
+>
+> I am having an issue on s390x using virtio-blk-{pci,ccw} backed by an NVM=
+e partition, and I've bisected the root cause to this commit.
+>
+> I noticed that tests which use the partition e.g. /dev/nvme0n1p1 as a bac=
+king device would fail, but those that use the namespace e.g. /dev/nvme0n1 =
+would still succeed.  The root issue appears to be that the block device as=
+sociated with the partition does not have a "max_segments" attribute, and p=
+rior to this patch hdev_get_max_segment() would return -ENOENT in this case=
+.  After this patch, however, QEMU is instead crashing.  It looks like g_fi=
+le_get_contents is returning 0 with a len =3D=3D 0 if the specified sysfs p=
+ath does not exist.  The following diff on top seems to resolve the issue f=
+or me:
+>
+>
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 0ab158efba2..eeb0247c74e 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -1243,7 +1243,7 @@ static int get_sysfs_str_val(struct stat *st, const=
+ char *attribute,
+>                                  major(st->st_rdev), minor(st->st_rdev),
+>                                  attribute);
+>      ret =3D g_file_get_contents(sysfspath, val, &len, NULL);
+> -    if (ret =3D=3D -1) {
+> +    if (ret =3D=3D -1 || len =3D=3D 0) {
+>          return -ENOENT;
+>      }
+>
 
-kernel test robot noticed the following build errors:
+Hi Matthew,
 
-[auto build test ERROR on mst-vhost/linux-next]
-[also build test ERROR on linus/master horms-ipvs/master v6.4-rc4 next-20230602]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Thanks for the information. After some checking, I think the bug here
+is that g_file_get_contens returns g_boolean value and the error case
+will return 0 instead of -1 in my previous code. Can the following
+line fix your issue on the s390x device?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Shunsuke-Mie/vringh-IOMEM-support/20230602-135351
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-patch link:    https://lore.kernel.org/r/20230602055211.309960-2-mie%40igel.co.jp
-patch subject: [PATCH v4 1/1] vringh: IOMEM support
-config: i386-randconfig-i003-20230531 (https://download.01.org/0day-ci/archive/20230603/202306030216.bpWr6XV0-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/de2a1f5220c32e953400f225aba6bd294a8d41b8
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Shunsuke-Mie/vringh-IOMEM-support/20230602-135351
-        git checkout de2a1f5220c32e953400f225aba6bd294a8d41b8
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=i386 olddefconfig
-        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
++ if (ret =3D=3D FALSE) {
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202306030216.bpWr6XV0-lkp@intel.com/
+https://docs.gtk.org/glib/func.file_get_contents.html
 
-All errors (new ones prefixed by >>):
-
-   drivers/vhost/vringh.c: In function 'getu16_iomem':
->> drivers/vhost/vringh.c:1610:37: error: implicit declaration of function 'ioread16' [-Werror=implicit-function-declaration]
-    1610 |         *val = vringh16_to_cpu(vrh, ioread16(p));
-         |                                     ^~~~~~~~
-   drivers/vhost/vringh.c: In function 'putu16_iomem':
->> drivers/vhost/vringh.c:1616:9: error: implicit declaration of function 'iowrite16' [-Werror=implicit-function-declaration]
-    1616 |         iowrite16(cpu_to_vringh16(vrh, val), p);
-         |         ^~~~~~~~~
-   drivers/vhost/vringh.c: In function 'copydesc_iomem':
->> drivers/vhost/vringh.c:1623:9: error: implicit declaration of function 'memcpy_fromio'; did you mean 'memcpy_from_bvec'? [-Werror=implicit-function-declaration]
-    1623 |         memcpy_fromio(dst, src, len);
-         |         ^~~~~~~~~~~~~
-         |         memcpy_from_bvec
-   drivers/vhost/vringh.c: In function 'putused_iomem':
->> drivers/vhost/vringh.c:1630:9: error: implicit declaration of function 'memcpy_toio' [-Werror=implicit-function-declaration]
-    1630 |         memcpy_toio(dst, src, num * sizeof(*dst));
-         |         ^~~~~~~~~~~
-   drivers/vhost/vringh.c: At top level:
-   drivers/vhost/vringh.c:1661:5: warning: no previous prototype for 'vringh_init_iomem' [-Wmissing-prototypes]
-    1661 | int vringh_init_iomem(struct vringh *vrh, u64 features, unsigned int num,
-         |     ^~~~~~~~~~~~~~~~~
-   drivers/vhost/vringh.c:1683:5: warning: no previous prototype for 'vringh_getdesc_iomem' [-Wmissing-prototypes]
-    1683 | int vringh_getdesc_iomem(struct vringh *vrh, struct vringh_kiov *riov,
-         |     ^~~~~~~~~~~~~~~~~~~~
-   drivers/vhost/vringh.c:1714:9: warning: no previous prototype for 'vringh_iov_pull_iomem' [-Wmissing-prototypes]
-    1714 | ssize_t vringh_iov_pull_iomem(struct vringh *vrh, struct vringh_kiov *riov,
-         |         ^~~~~~~~~~~~~~~~~~~~~
-   drivers/vhost/vringh.c:1729:9: warning: no previous prototype for 'vringh_iov_push_iomem' [-Wmissing-prototypes]
-    1729 | ssize_t vringh_iov_push_iomem(struct vringh *vrh, struct vringh_kiov *wiov,
-         |         ^~~~~~~~~~~~~~~~~~~~~
-   drivers/vhost/vringh.c:1744:6: warning: no previous prototype for 'vringh_abandon_iomem' [-Wmissing-prototypes]
-    1744 | void vringh_abandon_iomem(struct vringh *vrh, unsigned int num)
-         |      ^~~~~~~~~~~~~~~~~~~~
-   drivers/vhost/vringh.c:1759:5: warning: no previous prototype for 'vringh_complete_iomem' [-Wmissing-prototypes]
-    1759 | int vringh_complete_iomem(struct vringh *vrh, u16 head, u32 len)
-         |     ^~~~~~~~~~~~~~~~~~~~~
-   drivers/vhost/vringh.c:1777:6: warning: no previous prototype for 'vringh_notify_enable_iomem' [-Wmissing-prototypes]
-    1777 | bool vringh_notify_enable_iomem(struct vringh *vrh)
-         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/vhost/vringh.c:1790:6: warning: no previous prototype for 'vringh_notify_disable_iomem' [-Wmissing-prototypes]
-    1790 | void vringh_notify_disable_iomem(struct vringh *vrh)
-         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/vhost/vringh.c:1802:5: warning: no previous prototype for 'vringh_need_notify_iomem' [-Wmissing-prototypes]
-    1802 | int vringh_need_notify_iomem(struct vringh *vrh)
-         |     ^~~~~~~~~~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
+Thanks,
+Sam
 
 
-vim +/ioread16 +1610 drivers/vhost/vringh.c
 
-  1606	
-  1607	static inline int getu16_iomem(const struct vringh *vrh, u16 *val,
-  1608				       const __virtio16 *p)
-  1609	{
-> 1610		*val = vringh16_to_cpu(vrh, ioread16(p));
-  1611		return 0;
-  1612	}
-  1613	
-  1614	static inline int putu16_iomem(const struct vringh *vrh, __virtio16 *p, u16 val)
-  1615	{
-> 1616		iowrite16(cpu_to_vringh16(vrh, val), p);
-  1617		return 0;
-  1618	}
-  1619	
-  1620	static inline int copydesc_iomem(const struct vringh *vrh, void *dst,
-  1621					 const void *src, size_t len)
-  1622	{
-> 1623		memcpy_fromio(dst, src, len);
-  1624		return 0;
-  1625	}
-  1626	
-  1627	static int putused_iomem(const struct vringh *vrh, struct vring_used_elem *dst,
-  1628				 const struct vring_used_elem *src, unsigned int num)
-  1629	{
-> 1630		memcpy_toio(dst, src, num * sizeof(*dst));
-  1631		return 0;
-  1632	}
-  1633	
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>
+>
+>
+> >
+> > Signed-off-by: Sam Li <faithilikerun@gmail.com>
+> > Reviewed-by: Hannes Reinecke <hare@suse.de>
+> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> > Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> > Acked-by: Kevin Wolf <kwolf@redhat.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Message-id: 20230508045533.175575-3-faithilikerun@gmail.com
+> > Message-id: 20230324090605.28361-3-faithilikerun@gmail.com
+> > [Adjust commit message prefix as suggested by Philippe Mathieu-Daud=C3=
+=A9
+> > <philmd@linaro.org>.
+> > --Stefan]
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  include/block/block_int-common.h |   3 +
+> >  block/file-posix.c               | 135 ++++++++++++++++++++++---------
+> >  2 files changed, 100 insertions(+), 38 deletions(-)
+> >
+> > diff --git a/include/block/block_int-common.h b/include/block/block_int=
+-common.h
+> > index 4909876756..c7ca5a83e9 100644
+> > --- a/include/block/block_int-common.h
+> > +++ b/include/block/block_int-common.h
+> > @@ -862,6 +862,9 @@ typedef struct BlockLimits {
+> >       * an explicit monitor command to load the disk inside the guest).
+> >       */
+> >      bool has_variable_length;
+> > +
+> > +    /* device zone model */
+> > +    BlockZoneModel zoned;
+> >  } BlockLimits;
+> >
+> >  typedef struct BdrvOpBlocker BdrvOpBlocker;
+> > diff --git a/block/file-posix.c b/block/file-posix.c
+> > index c7b723368e..97c597a2a0 100644
+> > --- a/block/file-posix.c
+> > +++ b/block/file-posix.c
+> > @@ -1202,15 +1202,89 @@ static int hdev_get_max_hw_transfer(int fd, str=
+uct stat *st)
+> >  #endif
+> >  }
+> >
+> > -static int hdev_get_max_segments(int fd, struct stat *st)
+> > +/*
+> > + * Get a sysfs attribute value as character string.
+> > + */
+> > +#ifdef CONFIG_LINUX
+> > +static int get_sysfs_str_val(struct stat *st, const char *attribute,
+> > +                             char **val) {
+> > +    g_autofree char *sysfspath =3D NULL;
+> > +    int ret;
+> > +    size_t len;
+> > +
+> > +    if (!S_ISBLK(st->st_mode)) {
+> > +        return -ENOTSUP;
+> > +    }
+> > +
+> > +    sysfspath =3D g_strdup_printf("/sys/dev/block/%u:%u/queue/%s",
+> > +                                major(st->st_rdev), minor(st->st_rdev)=
+,
+> > +                                attribute);
+> > +    ret =3D g_file_get_contents(sysfspath, val, &len, NULL);
+> > +    if (ret =3D=3D -1) {
+> > +        return -ENOENT;
+> > +    }
+> > +
+> > +    /* The file is ended with '\n' */
+> > +    char *p;
+> > +    p =3D *val;
+> > +    if (*(p + len - 1) =3D=3D '\n') {
+> > +        *(p + len - 1) =3D '\0';
+> > +    }
+> > +    return ret;
+> > +}
+> > +#endif
+> > +
+> > +static int get_sysfs_zoned_model(struct stat *st, BlockZoneModel *zone=
+d)
+> >  {
+> > +    g_autofree char *val =3D NULL;
+> > +    int ret;
+> > +
+> > +    ret =3D get_sysfs_str_val(st, "zoned", &val);
+> > +    if (ret < 0) {
+> > +        return ret;
+> > +    }
+> > +
+> > +    if (strcmp(val, "host-managed") =3D=3D 0) {
+> > +        *zoned =3D BLK_Z_HM;
+> > +    } else if (strcmp(val, "host-aware") =3D=3D 0) {
+> > +        *zoned =3D BLK_Z_HA;
+> > +    } else if (strcmp(val, "none") =3D=3D 0) {
+> > +        *zoned =3D BLK_Z_NONE;
+> > +    } else {
+> > +        return -ENOTSUP;
+> > +    }
+> > +    return 0;
+> > +}
+> > +
+> > +/*
+> > + * Get a sysfs attribute value as a long integer.
+> > + */
+> >  #ifdef CONFIG_LINUX
+> > -    char buf[32];
+> > +static long get_sysfs_long_val(struct stat *st, const char *attribute)
+> > +{
+> > +    g_autofree char *str =3D NULL;
+> >      const char *end;
+> > -    char *sysfspath =3D NULL;
+> > +    long val;
+> > +    int ret;
+> > +
+> > +    ret =3D get_sysfs_str_val(st, attribute, &str);
+> > +    if (ret < 0) {
+> > +        return ret;
+> > +    }
+> > +
+> > +    /* The file is ended with '\n', pass 'end' to accept that. */
+> > +    ret =3D qemu_strtol(str, &end, 10, &val);
+> > +    if (ret =3D=3D 0 && end && *end =3D=3D '\0') {
+> > +        ret =3D val;
+> > +    }
+> > +    return ret;
+> > +}
+> > +#endif
+> > +
+> > +static int hdev_get_max_segments(int fd, struct stat *st)
+> > +{
+> > +#ifdef CONFIG_LINUX
+> >      int ret;
+> > -    int sysfd =3D -1;
+> > -    long max_segments;
+> >
+> >      if (S_ISCHR(st->st_mode)) {
+> >          if (ioctl(fd, SG_GET_SG_TABLESIZE, &ret) =3D=3D 0) {
+> > @@ -1218,44 +1292,27 @@ static int hdev_get_max_segments(int fd, struct=
+ stat *st)
+> >          }
+> >          return -ENOTSUP;
+> >      }
+> > -
+> > -    if (!S_ISBLK(st->st_mode)) {
+> > -        return -ENOTSUP;
+> > -    }
+> > -
+> > -    sysfspath =3D g_strdup_printf("/sys/dev/block/%u:%u/queue/max_segm=
+ents",
+> > -                                major(st->st_rdev), minor(st->st_rdev)=
+);
+> > -    sysfd =3D open(sysfspath, O_RDONLY);
+> > -    if (sysfd =3D=3D -1) {
+> > -        ret =3D -errno;
+> > -        goto out;
+> > -    }
+> > -    ret =3D RETRY_ON_EINTR(read(sysfd, buf, sizeof(buf) - 1));
+> > -    if (ret < 0) {
+> > -        ret =3D -errno;
+> > -        goto out;
+> > -    } else if (ret =3D=3D 0) {
+> > -        ret =3D -EIO;
+> > -        goto out;
+> > -    }
+> > -    buf[ret] =3D 0;
+> > -    /* The file is ended with '\n', pass 'end' to accept that. */
+> > -    ret =3D qemu_strtol(buf, &end, 10, &max_segments);
+> > -    if (ret =3D=3D 0 && end && *end =3D=3D '\n') {
+> > -        ret =3D max_segments;
+> > -    }
+> > -
+> > -out:
+> > -    if (sysfd !=3D -1) {
+> > -        close(sysfd);
+> > -    }
+> > -    g_free(sysfspath);
+> > -    return ret;
+> > +    return get_sysfs_long_val(st, "max_segments");
+> >  #else
+> >      return -ENOTSUP;
+> >  #endif
+> >  }
+> >
+> > +static void raw_refresh_zoned_limits(BlockDriverState *bs, struct stat=
+ *st,
+> > +                                     Error **errp)
+> > +{
+> > +    BlockZoneModel zoned;
+> > +    int ret;
+> > +
+> > +    bs->bl.zoned =3D BLK_Z_NONE;
+> > +
+> > +    ret =3D get_sysfs_zoned_model(st, &zoned);
+> > +    if (ret < 0 || zoned =3D=3D BLK_Z_NONE) {
+> > +        return;
+> > +    }
+> > +    bs->bl.zoned =3D zoned;
+> > +}
+> > +
+> >  static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+> >  {
+> >      BDRVRawState *s =3D bs->opaque;
+> > @@ -1297,6 +1354,8 @@ static void raw_refresh_limits(BlockDriverState *=
+bs, Error **errp)
+> >              bs->bl.max_hw_iov =3D ret;
+> >          }
+> >      }
+> > +
+> > +    raw_refresh_zoned_limits(bs, &st, errp);
+> >  }
+> >
+> >  static int check_for_dasd(int fd)
+>
