@@ -2,59 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B05F71F71E
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 02:26:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C1C171F723
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 02:36:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231241AbjFBA05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jun 2023 20:26:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54860 "EHLO
+        id S232135AbjFBAf0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jun 2023 20:35:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229598AbjFBA04 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jun 2023 20:26:56 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 531BDE7
-        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 17:26:55 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-bad475920a8so6255105276.1
-        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 17:26:55 -0700 (PDT)
+        with ESMTP id S229800AbjFBAfY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jun 2023 20:35:24 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBD11E2
+        for <kvm@vger.kernel.org>; Thu,  1 Jun 2023 17:35:23 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-256a43693e7so622541a91.2
+        for <kvm@vger.kernel.org>; Thu, 01 Jun 2023 17:35:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685665614; x=1688257614;
+        d=google.com; s=20221208; t=1685666123; x=1688258123;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y38QyZ2+OO+G6/wRDJ/cj6gRY/Ta6idClmfzzAT8WBo=;
-        b=n+nOWFq8J3K8Nm/V1IVouabEMcA5NcQhTbDe1F6aFZyFxx2K25RM+S0wzBbQKVNbjs
-         huRPaQnuBGZTGC4pEmKMxjn27Os81oukMMZ7J+zgiNeu9yvUhpjf2UHYaIbaQJ3kEYfZ
-         8l8B1luaF3tl2ekZMvmb7k21EQ0a/n0qZjPF0Zn7Z+1kHZjAKgsmyk5EnKEdpK7WKxx/
-         Z/MlIiHCgXtA+XX+4JWsFzLAOqk3KOtv69vLUyMkcLG3lVzH5UA4c/j6URmgYHZyokew
-         ocpiUlmQJ9ncVUY1PibT9sJYp3Fa2du24S5xYjXRXjymxdYzlcuWu4RgcdFkDHP5WNFx
-         r0rg==
+        bh=tTnTxLfkvH/gJ5kA9fsR++JqlCYcfT8oB/4PY04nvMI=;
+        b=uXEDUxikT9tErjoPam1H1MfJxrs3mlCVZ/1igIn11ir1+yBdsgyuxPbIXZ3OlfEfao
+         uX2/DiGp8jeXfwcL4vD34Q0814tRMVZ7Ynb96VFwcFEFk0NUwsFYjt5il+eWy1XVb5GT
+         QJ4DcsmsdMzlDOpCZsfjhXe5XZWrMgR2vNM+/4f4qfCJgABZiLx3UBG7etNVIoDxJn4L
+         MEEwFdT4aYcDJ1nlb3ABPRcRIEnywSllc6a4h0KGnpYQ8pOETCxOLCs4eF4fx2VgglR5
+         np/C36i47s1BHItEf43+R7rRzAc6kvRT6fcvZPsYeOT3/yA8GLVFDvjW1cJ5xNnxSBbE
+         Y5Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685665614; x=1688257614;
+        d=1e100.net; s=20221208; t=1685666123; x=1688258123;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y38QyZ2+OO+G6/wRDJ/cj6gRY/Ta6idClmfzzAT8WBo=;
-        b=DeUIrkNz0yBRB1LrP1MvIfhTV2QZPHvxFgwHMozispwDYzM3pkO9TTLnLJDiO7XiUJ
-         Y8QcZtEO9RtdCuhDRttqy7kWXe9OIOngQ6PLst0EFVDivBVY3iheeGOpsQHXdz21xEVv
-         KpzYbb1wqrBJEXT0pTQMrivvMB84ClgoZJuDPPGjR2WZbG7HP8vjI79+/NmNRqj/KEOI
-         /QNJRwTuAmCgsmhAziwFRrNpHDHx7FlYM5cK2ifmOtVbx8C2nksiI5hzzmwJEjP72hNG
-         a1wi21kBgAOfjretqHsBu96YwBh5n2lRLpfg/YNmjYDMpmX83dTGz4R3nRlj+Xw9XoYr
-         zlrw==
-X-Gm-Message-State: AC+VfDzbk7es7D98pt/pfF4Ij6n7HhUmVYg8ictqCx2G2W4G8pqP3I09
-        dgQGTUgbS6UBWpuIk7sM16Lh6XDg+8k=
-X-Google-Smtp-Source: ACHHUZ4XR1o2lAYMvL1BdCFrgFE/MOy5l6xoAv863keciO+66dLqsSAFq13rsNESy8HsW9ONiMDT+AZhP0g=
+        bh=tTnTxLfkvH/gJ5kA9fsR++JqlCYcfT8oB/4PY04nvMI=;
+        b=fUHrg6CKKwzLj5n3+H+/arOG/zWhRDdeXqv4RvTAxzl2UKvkyM6GTrjmjF8qc4mAWn
+         NyaaMwpdY1zl99YCxKDNtJZKBU5MWjc5J2y2aGYjc7IJogMqwin5rBrca2aYhwwmfXza
+         o+BcLWwfDVRxXAqoIkGAVFaxx5iVhxOFgYVOT9zR08XzfxicmPnCH20n4DSaws0imcQn
+         34qKrbxbuNckAmkPTcNlJeYAREzOYFwx6UUcLcjp8aXroEjrUCoxUqftrTV7zJaGDYPL
+         lmNLaOFxe3xn0s1CiCmVjUc3RWXq+Vi07zdL+ieOxWczWoFB4JJVWvMBPjKqYAdLFDOj
+         BFMQ==
+X-Gm-Message-State: AC+VfDzw3oL2NT/831DlN8q3orPT+D8oSPGtkh1PFGGLkfHoI1vIntEj
+        VaYrL2WhQIas8CsUgJixl6o5R0evDPA=
+X-Google-Smtp-Source: ACHHUZ7KVY71AzRLObpOpEWUNlbUmZYU1696FqjQwmZZ8/LYnx7syxkxmRRoLEOqeZhm9BWKJ1gVa9PU3Qw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:6d56:0:b0:bb1:d903:eae9 with SMTP id
- i83-20020a256d56000000b00bb1d903eae9mr860460ybc.2.1685665614622; Thu, 01 Jun
- 2023 17:26:54 -0700 (PDT)
-Date:   Thu, 1 Jun 2023 17:26:52 -0700
-In-Reply-To: <814baa0c-1eaa-4503-129f-059917365e80@rbox.co>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:854c:b0:256:8fd6:1280 with SMTP id
+ a12-20020a17090a854c00b002568fd61280mr216074pjw.0.1685666123281; Thu, 01 Jun
+ 2023 17:35:23 -0700 (PDT)
+Date:   Thu, 1 Jun 2023 17:35:21 -0700
+In-Reply-To: <20230601142309.6307-1-guang.zeng@intel.com>
 Mime-Version: 1.0
-References: <20230525183347.2562472-1-mhal@rbox.co> <20230525183347.2562472-4-mhal@rbox.co>
- <ZHFDcUcgvRXB/w/g@google.com> <814baa0c-1eaa-4503-129f-059917365e80@rbox.co>
-Message-ID: <ZHk3TGyB2Vze4+Ou@google.com>
-Subject: Re: [PATCH 3/3] KVM: selftests: Add test for race in kvm_recalculate_apic_map()
+References: <20230601142309.6307-1-guang.zeng@intel.com>
+Message-ID: <ZHk5SRi6bFcHRyxV@google.com>
+Subject: Re: [PATCH v1 0/6] LASS KVM virtualization support
 From:   Sean Christopherson <seanjc@google.com>
-To:     Michal Luczaj <mhal@rbox.co>
-Cc:     pbonzini@redhat.com, shuah@kernel.org, kvm@vger.kernel.org
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -66,62 +70,9 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, May 28, 2023, Michal Luczaj wrote:
-> On 5/27/23 01:40, Sean Christopherson wrote:
-> > All of these open coded ioctl() calls is unnecessary.  Ditto for the fancy
-> > stuffing, which through trial and error I discovered is done to avoid having
-> > vCPUs with aliased xAPIC IDs, which would cause KVM to bail before triggering
-> > the bug.  It's much easier to just create the max number of vCPUs and enable
-> > x2APIC on all of them.
-> > ...
-> 
-> Yup, this looks way better, thanks.
-> (FWIW, the #defines were deliberately named to match enum lapic_mode.)
+On Thu, Jun 01, 2023, Zeng Guang wrote:
+> v0->v1
 
-I figured as much, but I find enum lapic_mode to be rather odd, and if that thing
-ever gets cleaned up I'd prefer not to have to go fixup selftests too.
-
-> In somewhat related news, I've hit kvm_recalculate_logical_map()'s
-> WARN_ON_ONCE(ldr != kvm_apic_calc_x2apic_ldr(kvm_x2apic_id(apic))):
-
-...
-
-> diff --git a/tools/testing/selftests/kvm/x86_64/recalc_apic_map_warn.c b/tools/testing/selftests/kvm/x86_64/recalc_apic_map_warn.c
-> new file mode 100644
-> index 000000000000..2845e1d9b865
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/recalc_apic_map_warn.c
-> @@ -0,0 +1,30 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * recalc_apic_map_warn
-> + *
-> + * Test for hitting WARN_ON_ONCE() in kvm_recalculate_logical_map().
-> + */
-> +
-> +#include "processor.h"
-> +#include "kvm_util.h"
-> +#include "apic.h"
-> +
-> +#define	LAPIC_X2APIC	(MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE)
-> +
-> +int main(void)
-> +{
-> +	struct kvm_lapic_state lapic = {};
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +
-> +	vm = vm_create_with_one_vcpu(&vcpu, NULL); /* vcpu_id = 0 */
-> +	vcpu_set_msr(vcpu, MSR_IA32_APICBASE, LAPIC_X2APIC);
-> +
-> +	*(u32 *)(lapic.regs + APIC_ID) = 1 << 24; /* != vcpu_id */
-> +	*(u32 *)(lapic.regs + APIC_SPIV) = APIC_SPIV_APIC_ENABLED;
-> +	vcpu_ioctl(vcpu, KVM_SET_LAPIC, &lapic);
-
-Blech.  There's a semi-known backdoor that lets userspace modify the x2APIC ID
-and thus the LDR.  Sort of.  KVM doesn't actually honor the modified ID except
-for guest RDMSR, e.g. KVM will never deliver interrupts to the unexpected ID.
-
-I'll send a patch (plus this test) to close that loophole, the odds of breaking
-an existing setup are basically nil, and it would be very nice to make the x2APIC
-ID (and LDR) fully readonly.
+Heh, the kernel process is a bit of a heathen and starts counting patch versions
+at '1', not '0'.  I.e. this should be v2, not v1.  No need to resend, just an FYI
+for the future.
