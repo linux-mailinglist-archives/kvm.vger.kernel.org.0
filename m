@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5D47720754
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 18:20:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7359C720756
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 18:20:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235616AbjFBQUU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 12:20:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45090 "EHLO
+        id S235298AbjFBQUV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 12:20:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236847AbjFBQT6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 12:19:58 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6A35D3
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 09:19:56 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-565d6824f2dso31904887b3.0
-        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 09:19:56 -0700 (PDT)
+        with ESMTP id S236865AbjFBQT7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 12:19:59 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 543CDD3
+        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 09:19:58 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id af79cd13be357-75b3b759217so319059985a.1
+        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 09:19:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685722796; x=1688314796;
+        d=google.com; s=20221208; t=1685722797; x=1688314797;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BbIws3TVOQ+ga2kyHnOYUuU4ZoW+MEWkftwOYAYwIko=;
-        b=LlVUGKyVTKSnyZBMTtGtTVFNYmhWxoozKLYiiqpPhrsXi6R1dgUdwUHOW51uXiGxxq
-         IPPODOiBarv7foL2YIn1iTk9NOhUa/Vmksxw2KwTyXhffKGPpqbupXrzJlwn4GjFO5+5
-         zKlpSEyY16Xg7ZBK7tFUvqSBrc71g6jFEqUf4x9XcPUGoh699nQiZLDPeAup6qIqL2Xk
-         Pj6A/PIBXtrU15rmncPbIFqAzVGWXGvAwqtXQO/4F03a7fB4bHzrLQuEMfcVNcNVy/G7
-         sF2VSxniYN7UnvLWnoKZMAsXhwXfnmkTCSym3IDXGLYw/qrcgx88OHqM2MffWgNqB5Wr
-         esDA==
+        bh=FXT5aMAcAtW/D2yhSA+7CF5prLM3G5exI8idyNJeqlQ=;
+        b=MrEIIigb/YWqQ92xzazuzi8enjhLzSd+deyqUfxtAuxGcNqxPI1zoRqcgcPsZY0in6
+         qI3YYemk7dYSuAVwReP578ivZLe/S+Vb2LcuohJjUFeOTbSYeRByh+dDUtwGlWd7bqiJ
+         DaF+LJTYubD/Il4ugc/2AikpfHGkcDTqSnLD7Au/SIooTtUGWzqZ8jw3NAlmur2U5N5F
+         Gi8UEFQVo81bXlMd3kDzyQgcnjMyuxHFAHBtWhXgkIj1fL4mmWbKeGkw5tRZomR5ScUp
+         oRXjUOSbG4XMo5NR2eWkCn9pKDfIrWQE8UmzWf7SrW9kbXzhzgVc13lSDq1ZHIf25HIU
+         1OEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685722796; x=1688314796;
+        d=1e100.net; s=20221208; t=1685722797; x=1688314797;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BbIws3TVOQ+ga2kyHnOYUuU4ZoW+MEWkftwOYAYwIko=;
-        b=LRVbuEJnOGc9iE19uvexguJToNfeu2CZ94Onyl4DlqTAxmD+wp+wmdJVpi13UNBI/R
-         33EXOCSUCRyVJKlRqkBs/iiMo4JbIBAapmVfuMJPkmGMKCTgnEJHy9W1QK9g1+yLuMeM
-         /9KanaXfbrhI+f3xyE4LM27fkmSfy0xdHkcc/iwhnTydhhRXcOeYkeyjJXl+tZ4XNoAO
-         /Bu4KSQxjMF3phsYVbJSyiIjIF0VPPedjrNhdpJixi0ywlwvdPDXBqEdbwx/of9JpGE2
-         2YKq1LaODNN+v+1VuD4rhoMiQWMLFuTYIX32tbTw9LmYb43ul7s7FSc2b73WC/WbkDS8
-         vJZw==
-X-Gm-Message-State: AC+VfDycE52DzagC92KzLJoavr6MDIlpm9/mWgT7lEMoEDQjPGgRxLnV
-        qLG8sFTXZo2l/gfz4/FnVFUGM1aEMQ37FA==
-X-Google-Smtp-Source: ACHHUZ7YQ7d8v8jTjhqkGsOOSbttWu/vTfPGkpdYjmI5de7T/VwKGMoMRbh3XrT/5dCI1cf4Fr89Z6/LlBLL0w==
+        bh=FXT5aMAcAtW/D2yhSA+7CF5prLM3G5exI8idyNJeqlQ=;
+        b=QQ4ao1SplAp3NsOnVZ2VKPNzeuVHmjUS0fuHdPRDkj+zQ0MkLkvzWQHBTflBwLDYrJ
+         lKV7Hvjk2q0QK/3WN3V59r2dR1oXzj+cIDTxitgeZpKLtsTMbSD3KMfUJ8bxk4ylUOKU
+         hCJPfAYwURnpGtsq4TZMuZ9HPtLWAXRfw+dzXnGJTJLmf304OUN694H2XgZdztVM7MI5
+         3KCsYJuFBvMmASwFdiO155V566l9qWArCZf7ozBnvNU0UJM6+3R8EJKFJge6C/tAe7uj
+         L4oRUaW4Rbx4X6O182qo+M++Z8p1oXkw80LfpKnFAI3edrY0Poa2aHWkyucTjCiUaAfc
+         1J9g==
+X-Gm-Message-State: AC+VfDykOljjopeCvLyBzmDbONkTX/B0Z98qVKh0Ro4G2E90MQ9Amp7n
+        A9hxY5LdSFZu5LEVMeYOH6yMG/lKnwMzHA==
+X-Google-Smtp-Source: ACHHUZ59szArc2J5yzRQ+OH/b4av8GVrQhCDas0t1JFvDETpn96b9hqdXPaAc3D2wV6P4OkT5+sVUxvqNLjTZg==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a81:af4c:0:b0:564:c5fd:6d98 with SMTP id
- x12-20020a81af4c000000b00564c5fd6d98mr174023ywj.10.1685722795889; Fri, 02 Jun
- 2023 09:19:55 -0700 (PDT)
-Date:   Fri,  2 Jun 2023 16:19:11 +0000
+ (user=amoorthy job=sendgmr) by 2002:a05:620a:3950:b0:75b:3839:7176 with SMTP
+ id qs16-20020a05620a395000b0075b38397176mr3883333qkn.13.1685722797500; Fri,
+ 02 Jun 2023 09:19:57 -0700 (PDT)
+Date:   Fri,  2 Jun 2023 16:19:12 +0000
 In-Reply-To: <20230602161921.208564-1-amoorthy@google.com>
 Mime-Version: 1.0
 References: <20230602161921.208564-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230602161921.208564-7-amoorthy@google.com>
-Subject: [PATCH v4 06/16] KVM: Annotate -EFAULTs from kvm_vcpu_read_guest_page()
+Message-ID: <20230602161921.208564-8-amoorthy@google.com>
+Subject: [PATCH v4 07/16] KVM: Simplify error handling in __gfn_to_pfn_memslot()
 From:   Anish Moorthy <amoorthy@google.com>
 To:     seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org,
         kvmarm@lists.linux.dev
@@ -70,65 +70,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement KVM_CAP_MEMORY_FAULT_INFO for uaccess failures within
-kvm_vcpu_read_guest_page().
+KVM_HVA_ERR_RO_BAD satisfies kvm_is_error_hva(), so there's no need to
+duplicate the "if (writable)" block. Fix this by bringing all
+kvm_is_error_hva() cases under one conditional.
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- virt/kvm/kvm_main.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ virt/kvm/kvm_main.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index ea27a8178f1a..b9d2606f9251 100644
+index b9d2606f9251..05d6e7e3994d 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -2986,9 +2986,12 @@ static int next_segment(unsigned long len, int offset)
+@@ -2711,16 +2711,14 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+ 	if (hva)
+ 		*hva = addr;
  
- /*
-  * Copy 'len' bytes from guest memory at '(gfn * PAGE_SIZE) + offset' to 'data'
-+ * If 'vcpu' is non-null, then may fill its run struct for a
-+ * KVM_EXIT_MEMORY_FAULT on uaccess failure.
-  */
--static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
--				 void *data, int offset, int len)
-+static int __kvm_read_guest_page(struct kvm_memory_slot *slot,
-+				 struct kvm_vcpu *vcpu,
-+				 gfn_t gfn, void *data, int offset, int len)
- {
- 	int r;
- 	unsigned long addr;
-@@ -2997,8 +3000,12 @@ static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
- 	if (kvm_is_error_hva(addr))
- 		return -EFAULT;
- 	r = __copy_from_user(data, (void __user *)addr + offset, len);
--	if (r)
-+	if (r) {
-+		if (vcpu)
-+			kvm_populate_efault_info(vcpu, gfn * PAGE_SIZE + offset,
-+						 len, 0);
- 		return -EFAULT;
-+	}
- 	return 0;
- }
+-	if (addr == KVM_HVA_ERR_RO_BAD) {
+-		if (writable)
+-			*writable = false;
+-		return KVM_PFN_ERR_RO_FAULT;
+-	}
+-
+ 	if (kvm_is_error_hva(addr)) {
+ 		if (writable)
+ 			*writable = false;
+-		return KVM_PFN_NOSLOT;
++
++		if (addr == KVM_HVA_ERR_RO_BAD)
++			return KVM_PFN_ERR_RO_FAULT;
++		else
++			return KVM_PFN_NOSLOT;
+ 	}
  
-@@ -3007,7 +3014,7 @@ int kvm_read_guest_page(struct kvm *kvm, gfn_t gfn, void *data, int offset,
- {
- 	struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
- 
--	return __kvm_read_guest_page(slot, gfn, data, offset, len);
-+	return __kvm_read_guest_page(slot, NULL, gfn, data, offset, len);
- }
- EXPORT_SYMBOL_GPL(kvm_read_guest_page);
- 
-@@ -3016,7 +3023,7 @@ int kvm_vcpu_read_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn, void *data,
- {
- 	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
- 
--	return __kvm_read_guest_page(slot, gfn, data, offset, len);
-+	return __kvm_read_guest_page(slot, vcpu, gfn, data, offset, len);
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_page);
- 
+ 	/* Do not map writable pfn in the readonly memslot. */
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
