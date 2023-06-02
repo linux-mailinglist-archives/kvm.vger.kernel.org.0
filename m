@@ -2,86 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A292720AA3
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 22:58:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 307E6720AFE
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 23:34:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236365AbjFBU6p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 16:58:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33716 "EHLO
+        id S236020AbjFBVe0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 17:34:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236158AbjFBU6o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 16:58:44 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A1E19B
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 13:58:43 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-974f4897d87so120703566b.0
-        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 13:58:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685739522; x=1688331522;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=lEOehxHolb8X5C6iXhr+EWaD62m3RLxWc7FOFaBtkZ8=;
-        b=dHoGUlGb6XDm2/Otv+ZRHMw+mt1C/1deZYgmb1PbQDWcaUrmU2KmSAc2kc2BTjcEz2
-         NVc7Xgvx3W/QvWW+44JfAtHoxd1VbKB7KChHIbhaEnSuiSn2NptrvubUZkLhtXF0Z3N/
-         pLFeC99wzH7h4avZxAHDNCaTWNG66rdKwJospxaGXQ66eg+eDbMAFnTfW6PhYM5bIhR+
-         bFc1eqdXjHS0/bbevi0iBBmuyG5m+Yg1Sjkc5eXPPCP0MIAziQzo5OPzx7bnJLMuPmAH
-         C3m7/33P7BTRIEzOnELysCS3xEzRJY7vIPqDf24y+JQiYVE9kG0cs39LHmSxDbcqGFKO
-         JWdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685739522; x=1688331522;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lEOehxHolb8X5C6iXhr+EWaD62m3RLxWc7FOFaBtkZ8=;
-        b=kVdSaDZZ8dqnircM+xfjgLtMV/pevm6mc6ksYKPQPhKXW93C/vV92eyK1VBFMnEcNE
-         YHuwQ+nH142XaxTd6tiO1awTbd6wqjgNAAOOolSwk17gGbMd9Rfm0r1PSULCmGOwU0aH
-         DZ62/6sU24u3xDZ0DXTjqDwCeGG2UPkt6+e41OkRW5hokcOOGYeKGOuduUp5xUQwvS54
-         ej5uHh36gdjQtrGKCWJmPtEgw2kDIgAf8L+i6SISAzEvt12Evcmj1s8wwJeSaVnJlT5W
-         5WocKCY0QwaZ5Drjz3uSonafakAOFXoQyXnZ6C2YK02JsM79euhYN2ILXtJT9gByvIBC
-         W1Bg==
-X-Gm-Message-State: AC+VfDy4yjRiA1jTy6qLt/2uJJt3ghMU26OoyjSidTI5922NlcmX7yBr
-        9Ryobai62FLOUwofuH+d0/AkP27wQ/vAmIUtL2OzLw==
-X-Google-Smtp-Source: ACHHUZ6T+VfpFr7aausPLCtKE/YyzZKqrUzoefeK1VCPalyfhekvDguhrF2kEC0Zgzs2X2kV0gHIegw+Vf9hSLzZ6Sk=
-X-Received: by 2002:a17:907:9449:b0:96f:608c:5bdf with SMTP id
- dl9-20020a170907944900b0096f608c5bdfmr11859960ejc.64.1685739521701; Fri, 02
- Jun 2023 13:58:41 -0700 (PDT)
+        with ESMTP id S234676AbjFBVeZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 17:34:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B41619B
+        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 14:33:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685741619;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=eiFr82ELAUqwoWKkAFiDOZ32c9riR0LTidkMAM8JY10=;
+        b=JuGJbCuPnqnzcXpD48/VPwV4oplo1dcVb9ucMdoUnVQNRMSaMKw+jerkn/x9IAFpOSOuCe
+        e51kjPPcUcOdj+yJi20xwxAM2vzYtZmrWTxjeLUDyn9CbNRWXuH/lCi5ytu4iwLinPhg5X
+        PqnG+YwRzuAVNIZNBzQkLkZYXfDTCNw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-80-26oQA8nWMcSsPc2OzjCsdQ-1; Fri, 02 Jun 2023 17:33:36 -0400
+X-MC-Unique: 26oQA8nWMcSsPc2OzjCsdQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BE5A98007D9;
+        Fri,  2 Jun 2023 21:33:35 +0000 (UTC)
+Received: from omen.home.shazbot.org (unknown [10.22.33.254])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E2887492B00;
+        Fri,  2 Jun 2023 21:33:34 +0000 (UTC)
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>, jgg@nvidia.com,
+        clg@redhat.com, eric.auger@redhat.com, diana.craciun@oss.nxp.com,
+        liulongfang@huawei.com, shameerali.kolothum.thodi@huawei.com,
+        yishaih@nvidia.com, kevin.tian@intel.com
+Subject: [PATCH 0/3] vfio: Cleanup Kconfigs
+Date:   Fri,  2 Jun 2023 15:33:12 -0600
+Message-Id: <20230602213315.2521442-1-alex.williamson@redhat.com>
 MIME-Version: 1.0
-References: <20230602010550.785722-1-seanjc@google.com> <C8324338-FC07-454E-9A5A-1785141FEAB3@nutanix.com>
- <CALMp9eTtkBL3Fb7Dq60go6CL+zGODNn0TTavr436Q-+=mpVFMA@mail.gmail.com>
-In-Reply-To: <CALMp9eTtkBL3Fb7Dq60go6CL+zGODNn0TTavr436Q-+=mpVFMA@mail.gmail.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Fri, 2 Jun 2023 13:58:05 -0700
-Message-ID: <CAL715WKm4t=y_UZZSZkd2=QPwXL8n-KnWzBS4A-ZJLQaWb0RKQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Use cpu_feature_enabled() for PKU instead of #ifdef
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Jon Kohler <jon@nutanix.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->
-> As we move towards enabling PKRU on the host, due to some customer
-> requests, I have to wonder if PKRU-disabled is the norm.
->
-> In other words, is this a likely() or unlikely() optimization?
+Create sub-menus for bus drivers and remove artificial dependencies
+between vfio-pci and vfio-platform and other variant drivers like
+vfio-amba, mlx5-vfio-pci, or hisi-acc-vfio-pci.
 
-I think it should be likely() as PKU was introduced very early in the
-Skylake-SP server cores many years ago. Today I think all recent
-client CPUs should have PKU on default if I am not mistaken. So yeah,
-adding a likely() probably should help prevent the compiler from
-evicting this code chunk to the end of function.
+This is an alternative proposal vs [1], which attempts to make the
+vfio-pci-core module individually selectable, even without built
+dependencies, in order to avoid the select per variant module.
 
-Thanks.
--Mingwei
+The solution presented here is my preference, I don't see the select as
+overly burdensome or error prone, we have very good randconfig test
+coverage, and I prefer to not allow building module which have no
+in-kernel requirements.  Thanks,
+
+Alex
+
+[1]https://lore.kernel.org/all/0-v1-7eacf832787f+86-vfio_pci_kconfig_jgg@nvidia.com/
+
+Alex Williamson (3):
+  vfio/pci: Cleanup Kconfig
+  vfio/platform: Cleanup Kconfig
+  vfio/fsl: Create Kconfig sub-menu
+
+ drivers/vfio/Makefile              |  4 ++--
+ drivers/vfio/fsl-mc/Kconfig        |  4 ++++
+ drivers/vfio/pci/Kconfig           |  8 ++++++--
+ drivers/vfio/pci/hisilicon/Kconfig |  4 ++--
+ drivers/vfio/pci/mlx5/Kconfig      |  2 +-
+ drivers/vfio/platform/Kconfig      | 17 ++++++++++++++---
+ drivers/vfio/platform/Makefile     |  9 +++------
+ 7 files changed, 32 insertions(+), 16 deletions(-)
+
+-- 
+2.39.2
+
