@@ -2,91 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DC9071FB5E
-	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 09:50:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DD4771FB91
+	for <lists+kvm@lfdr.de>; Fri,  2 Jun 2023 10:10:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233753AbjFBHuW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 03:50:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50272 "EHLO
+        id S234257AbjFBIKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 04:10:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232674AbjFBHuT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 03:50:19 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5EB5E7;
-        Fri,  2 Jun 2023 00:50:17 -0700 (PDT)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3527noKM011575;
-        Fri, 2 Jun 2023 07:50:17 GMT
+        with ESMTP id S232316AbjFBIKS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 04:10:18 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47D9513E;
+        Fri,  2 Jun 2023 01:10:16 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3527qc2I001666;
+        Fri, 2 Jun 2023 08:10:16 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=CU64DAJIjgCwupYA81L/b6oXDzWWTJR9yStFG1QIVn4=;
- b=e1vC/ctOd/mW9cYtGKtNWCxv5Qk6ZQVSL4z6PaTEx9aw251OGugE3SaZvdJJU5Q+Vm0m
- llc4qwdTjy8Ld5pPlb3GSJlu3KUuRnTQrAlY9IbRosRjiiGW35w2vh+Lxi8MBF1DJypy
- dsw/hS6OT+s1ZDDHdo0XiuL8Xiiz6w7oSaiiQYoDG15Si5HZI9vyZxTOtidPbvT36Yi2
- RnpgTiW87z1RJBPkFR5T5p6ixPSthDHQjwp4r8P1PIs+EcxNUrXp5mVdN4OER9A8b2Qj
- FDbZmB3OKFcDM0K64cEXLDp4xgM7C6A6OTxTaUyeNi+uChGSXpHBgMp4N7llmYJ7nPYB Kg== 
+ bh=Ziac00Ta0a1QyKeiWy07siCmxj/DG1Mi5ybwV496+fw=;
+ b=aiIfIFeQyRUEytDZJCP8zSGl2zHJ7nGX4ATGxMvj1OXhopqlF1xgrtHDPkeGnFdAJEfu
+ ot+ZpcBCSxbyCMiofHlm9mi0gb+rN2dPAtWBUwErTxkBXn4TXKaHRU01EfRka9A/0BT3
+ +31ULc7+W4VcnJzOlPr9Y2/f6UDaMf7Ih95EFqwm/OlEWFv4UTtBUXW4GA2ZhdwHIuNA
+ rtxmoJEfR/OIZPCBUqrOBijCVR6S0c3tllMvNK+GwcvvE73H0s6/KJkKjwGso9kVJZbq
+ HYWLLc+41zX10d9sgcPBfeH6OKXZJySC8C63GZB5r2g3r3p1BFDTD9Gu41Ci6HpabeLb 5w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qyccf008g-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qycdugfsx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Jun 2023 07:50:16 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3527oGTv012902;
-        Fri, 2 Jun 2023 07:50:16 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qyccf0088-1
+        Fri, 02 Jun 2023 08:10:15 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3528639V005406;
+        Fri, 2 Jun 2023 08:10:15 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qycdugfr8-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Jun 2023 07:50:16 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3525htol023377;
-        Fri, 2 Jun 2023 07:50:14 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3qu9g52ear-1
+        Fri, 02 Jun 2023 08:10:15 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3524RaKP009016;
+        Fri, 2 Jun 2023 08:10:12 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3qu9g5advf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Jun 2023 07:50:12 +0000
+        Fri, 02 Jun 2023 08:10:12 +0000
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3527o8K728967392
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3528A9pj10814112
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 2 Jun 2023 07:50:09 GMT
+        Fri, 2 Jun 2023 08:10:09 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AE7D820040;
-        Fri,  2 Jun 2023 07:50:08 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 01A3220040;
+        Fri,  2 Jun 2023 08:10:09 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 53BB02004B;
-        Fri,  2 Jun 2023 07:50:08 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id AEDB12005A;
+        Fri,  2 Jun 2023 08:10:08 +0000 (GMT)
 Received: from [9.171.82.186] (unknown [9.171.82.186])
         by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  2 Jun 2023 07:50:08 +0000 (GMT)
-Message-ID: <15f284ad-4b51-f634-8acf-2f4fc27c9734@linux.ibm.com>
-Date:   Fri, 2 Jun 2023 09:50:08 +0200
+        Fri,  2 Jun 2023 08:10:08 +0000 (GMT)
+Message-ID: <ffd0961e-fa5f-ce17-4e0a-3614f5e6968b@linux.ibm.com>
+Date:   Fri, 2 Jun 2023 10:10:08 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [kvm-unit-tests PATCH v9 2/2] s390x: topology: Checking
- Configuration Topology Information
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     thuth@redhat.com, kvm@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, nrb@linux.ibm.com, nsg@linux.ibm.com
-References: <20230519112236.14332-1-pmorel@linux.ibm.com>
- <20230519112236.14332-3-pmorel@linux.ibm.com>
- <fa415627-bfff-cc18-af94-cf55632973d5@linux.ibm.com>
- <5d8f2ecc-0858-4708-a6cd-bf9692218935@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 0/9] s390x: uv-host: Fixups and
+ extensions part 1
 Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        thuth@redhat.com, david@redhat.com
+References: <20230502130732.147210-1-frankja@linux.ibm.com>
+ <168554442988.164254.12199952661638322868@t14-nrb>
 From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <5d8f2ecc-0858-4708-a6cd-bf9692218935@linux.ibm.com>
+In-Reply-To: <168554442988.164254.12199952661638322868@t14-nrb>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: u5K84brqj31mR6ekLd5t3_zhophT849h
-X-Proofpoint-ORIG-GUID: WaHNLUs0lcuyUl9OxxAWC12zVc35RdGo
+X-Proofpoint-ORIG-GUID: dMH3DKpiHrLDJeSW2iqetOf-LvHRtgyW
+X-Proofpoint-GUID: pW6noZ-m09lIgQcINrdkxBYg7IEbWG7c
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-02_04,2023-05-31_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 spamscore=0 malwarescore=0 adultscore=0 bulkscore=0
- mlxlogscore=999 mlxscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306020057
+ definitions=2023-06-02_05,2023-05-31_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ spamscore=0 bulkscore=0 adultscore=0 priorityscore=1501 clxscore=1015
+ phishscore=0 lowpriorityscore=0 impostorscore=0 mlxscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2304280000
+ definitions=main-2306020061
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
         RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -97,70 +95,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gNi8xLzIzIDE5OjQxLCBQaWVycmUgTW9yZWwgd3JvdGU6DQo+IA0KPiBPbiA2LzEvMjMg
-MTE6MzgsIEphbm9zY2ggRnJhbmsgd3JvdGU6DQo+PiBPbiA1LzE5LzIzIDEzOjIyLCBQaWVy
-cmUgTW9yZWwgd3JvdGU6DQo+Pj4gU1RTSSB3aXRoIGZ1bmN0aW9uIGNvZGUgMTUgaXMgdXNl
-ZCB0byBzdG9yZSB0aGUgQ1BVIGNvbmZpZ3VyYXRpb24NCj4+PiB0b3BvbG9neS4NCj4+Pg0K
-Pj4+IFdlIHJldHJpZXZlIHRoZSBtYXhpbXVtIG5lc3RlZCBsZXZlbCB3aXRoIFNDTFAgYW5k
-IHVzZSB0aGUNCj4+PiB0b3BvbG9neSB0cmVlIHByb3ZpZGVkIGJ5IHRoZSBkcmF3ZXJzLCBi
-b29rcywgc29ja2V0cywgY29yZXMNCj4+PiBhcmd1bWVudHMuDQo+Pj4NCj4+PiBXZSBjaGVj
-ayA6DQo+Pj4gLSBpZiB0aGUgdG9wb2xvZ3kgc3RvcmVkIGlzIGNvaGVyZW50IGJldHdlZW4g
-dGhlIFFFTVUgLXNtcA0KPj4+ICDCoMKgIHBhcmFtZXRlcnMgYW5kIGtlcm5lbCBwYXJhbWV0
-ZXJzLg0KPj4+IC0gdGhlIG51bWJlciBvZiBDUFVzDQo+Pj4gLSB0aGUgbWF4aW11bSBudW1i
-ZXIgb2YgQ1BVcw0KPj4+IC0gdGhlIG51bWJlciBvZiBjb250YWluZXJzIG9mIGVhY2ggbGV2
-ZWxzIGZvciBldmVyeSBTVFNJKDE1LjEueCkNCj4+PiAgwqDCoCBpbnN0cnVjdGlvbiBhbGxv
-d2VkIGJ5IHRoZSBtYWNoaW5lLg0KPj4NCj4+PiAgwqAgW3RvcG9sb2d5XQ0KPj4+ICDCoCBm
-aWxlID0gdG9wb2xvZ3kuZWxmDQo+Pj4gKyMgMyBDUFVzIG9uIHNvY2tldCAwIHdpdGggZGlm
-ZmVyZW50IENQVSBUTEUgKHN0YW5kYXJkLCBkZWRpY2F0ZWQsDQo+Pj4gb3JpZ2luKQ0KPj4+
-ICsjIDEgQ1BVIG9uIHNvY2tldCAyDQo+Pj4gK2V4dHJhX3BhcmFtcyA9IC1zbXANCj4+PiAx
-LGRyYXdlcnM9Myxib29rcz0zLHNvY2tldHM9NCxjb3Jlcz00LG1heGNwdXM9MTQ0IC1jcHUg
-ejE0LGN0b3A9b24NCj4+PiAtZGV2aWNlIHoxNC1zMzkweC1jcHUsY29yZS1pZD0xLGVudGl0
-bGVtZW50PWxvdyAtZGV2aWNlDQo+Pj4gejE0LXMzOTB4LWNwdSxjb3JlLWlkPTIsZGVkaWNh
-dGVkPW9uIC1kZXZpY2UgejE0LXMzOTB4LWNwdSxjb3JlLWlkPTEwDQo+Pj4gLWRldmljZSB6
-MTQtczM5MHgtY3B1LGNvcmUtaWQ9MjAgLWRldmljZQ0KPj4+IHoxNC1zMzkweC1jcHUsY29y
-ZS1pZD0xMzAsc29ja2V0LWlkPTAsYm9vay1pZD0wLGRyYXdlci1pZD0wIC1hcHBlbmQNCj4+
-PiAnLWRyYXdlcnMgMyAtYm9va3MgMyAtc29ja2V0cyA0IC1jb3JlcyA0Jw0KPj4+ICsNCj4+
-PiArW3RvcG9sb2d5LTJdDQo+Pj4gK2ZpbGUgPSB0b3BvbG9neS5lbGYNCj4+PiArZXh0cmFf
-cGFyYW1zID0gLXNtcA0KPj4+IDEsZHJhd2Vycz0yLGJvb2tzPTIsc29ja2V0cz0yLGNvcmVz
-PTMwLG1heGNwdXM9MjQwwqAgLWFwcGVuZCAnLWRyYXdlcnMNCj4+PiAyIC1ib29rcyAyIC1z
-b2NrZXRzIDIgLWNvcmVzIDMwJyAtY3B1IHoxNCxjdG9wPW9uIC1kZXZpY2UNCj4+PiB6MTQt
-czM5MHgtY3B1LGRyYXdlci1pZD0xLGJvb2staWQ9MCxzb2NrZXQtaWQ9MCxjb3JlLWlkPTIs
-ZW50aXRsZW1lbnQ9bG93DQo+Pj4gLWRldmljZQ0KPj4+IHoxNC1zMzkweC1jcHUsZHJhd2Vy
-LWlkPTEsYm9vay1pZD0wLHNvY2tldC1pZD0wLGNvcmUtaWQ9MyxlbnRpdGxlbWVudD1tZWRp
-dW0NCj4+PiAtZGV2aWNlDQo+Pj4gejE0LXMzOTB4LWNwdSxkcmF3ZXItaWQ9MSxib29rLWlk
-PTAsc29ja2V0LWlkPTAsY29yZS1pZD00LGVudGl0bGVtZW50PWhpZ2gNCj4+PiAtZGV2aWNl
-DQo+Pj4gejE0LXMzOTB4LWNwdSxkcmF3ZXItaWQ9MSxib29rLWlkPTAsc29ja2V0LWlkPTAs
-Y29yZS1pZD01LGVudGl0bGVtZW50PWhpZ2gsZGVkaWNhdGVkPW9uDQo+Pj4gLWRldmljZQ0K
-Pj4+IHoxNC1zMzkweC1jcHUsZHJhd2VyLWlkPTEsYm9vay1pZD0wLHNvY2tldC1pZD0wLGNv
-cmUtaWQ9NjUsZW50aXRsZW1lbnQ9bG93DQo+Pj4gLWRldmljZQ0KPj4+IHoxNC1zMzkweC1j
-cHUsZHJhd2VyLWlkPTEsYm9vay1pZD0wLHNvY2tldC1pZD0wLGNvcmUtaWQ9NjYsZW50aXRs
-ZW1lbnQ9bWVkaXVtDQo+Pj4gLWRldmljZQ0KPj4+IHoxNC1zMzkweC1jcHUsZHJhd2VyLWlk
-PTEsYm9vay1pZD0wLHNvY2tldC1pZD0wLGNvcmUtaWQ9NjcsZW50aXRsZW1lbnQ9aGlnaA0K
-Pj4+IC1kZXZpY2UNCj4+PiB6MTQtczM5MHgtY3B1LGRyYXdlci1pZD0xLGJvb2staWQ9MCxz
-b2NrZXQtaWQ9MCxjb3JlLWlkPTY4LGVudGl0bGVtZW50PWhpZ2gsZGVkaWNhdGVkPW9uDQo+
-Pg0KPj4gUGFyZG9uIG15IGlnbm9yYW5jZSBidXQgSSBzZWUgejE0IGluIHRoZXJlLCB3aWxs
-IHRoaXMgd29yayBpZiB3ZSBydW4NCj4+IG9uIGEgejEzPw0KPiANCj4gSSB0aGluayBpdCB3
-aWxsLCB3ZSBkbyBub3QgdXNlIGFueXRoaW5nIHNwZWNpZmljIHRvIHRoZSBDUFUgYnV0IHRo
-ZQ0KPiBDb25maWd1cmF0aW9uIHRvcG9sb2d5IGZhY2lsaXR5IHdoaWNoIHN0YXJ0IHdpdGgg
-ejEwRUMNCj4gYW5kIEFGQUlVIFFFTVUgd2lsbCBhY2NlcHQgYSBwcm9jZXNzb3IgbmV3ZXIg
-dGhhbiB0aGUgb25lIG9mIHRoZSBob3N0LA0KPiBhdCBsZWFzdCBpdCBkb2VzIG9uIG15IExQ
-QVIgKFZNIHoxNmIgPiBob3N0IHoxNmEpDQo+IA0KPiBCdXQgd2UgY2FuIHVzZSB6MTMgYXMg
-YmFzaXMsIHdoaWNoIGFsc28gY292ZXJzIHRoZSBjYXNlIHdoZXJlIEkgZm9yZ290DQo+IHNv
-bWV0aGluZy4NCg0KSSBkb24ndCByZWFsbHkgY2FyZSB3aGF0IHdlIHVzZSBhcyBhIGJhc2Uu
-DQpCdXQgd2Ugc2hvdWxkIGF2b2lkIGEgIkZBSUwiIGlmIHRoZSB0ZXN0cyBhcmUgcnVuIG9u
-IGEgbWFjaGluZSB0aGF0J3MgDQpvbGRlciB0aGFuIHdoYXQncyBzcGVjaWZpZWQgaGVyZS4N
-Cg0KPiANCj4gDQo+Pg0KPj4gQWxzbywgd2lsbCB0aGlzIHdvcmsvZmFpbCBncmFjZWZ1bGx5
-IGlmIHRoZSB0ZXN0IGlzIHJ1biB3aXRoIGEgcXVlbXUNCj4+IHRoYXQgZG9lc24ndCBrbm93
-IGFib3V0IHRvcG9sb2d5IG9yIHdpbGwgaXQgY3Jhc2g/DQo+IA0KPiBJdCB3aWxsIGNyYXNo
-LCBRRU1VIHdpbGwgcmVmdXNlIHRoZSBkcmF3ZXJzIGFuZCBib29rIHBhcmFtZXRlcnMgaWYg
-dGhlDQo+IFFFTVUgcGF0Y2ggZm9yIHRvcG9sb2d5IGhhcyBub3QgYmVlbiBhcHBsaWVkLg0K
-PiANCj4gU28sIEkgc2hvdWxkIGZpcnN0IHByb3Bvc2UgYSBzaW1wbGUgdW5pdHRlc3RzLmNm
-ZyB3b3JraW5nIHdpdGggYm90aCwNCj4gd2hpY2ggd2lsbCBTS0lQIHdpdGggIlRvcG9sb2d5
-IGZhY2lsaXR5IG5vdCBwcmVzZW50IiB3aXRob3V0IHRoZSBwYXRjaC4NCj4gDQo+IFdoZW4g
-dGhlIHBhdGNoIGlzIGJlY29taW5nIHVzZWQgd2UgY2FuIGFkZCBtb3JlIHRlc3RpbmdzLg0K
-PiANCg0KQXMgc3RhdGVkIGFib3ZlLCB0aGUgdGVzdCBzaG91bGRuJ3QgZmFpbCBpZiB0aGUg
-UUVNVSBjb2RlIGlzIG1pc3NpbmcuDQpJZiB0aGVyZSdzIG5vIGNvbnZlbmllbnQgd2F5IHRv
-IGRvIGZlYXR1cmUgY2hlY2tpbmcgZm9yIHRoaXMsIHRoZW4gd2UgDQpjYW4gcHV0IHRob3Nl
-IHRlc3RzIGludG8gYSBzcGVjaWFsIGdyb3VwIGFuZCBtYWtlIHN1cmUgdGhhdCB0aGlzIGdy
-b3VwIA0KaXMgcnVuIGluIHRoZSBDSSBvbmNlIHRoZSBRRU1VIGNvZGUgaXMgdXBzdHJlYW0u
-DQo=
+On 5/31/23 16:47, Nico Boehr wrote:
+> Quoting Janosch Frank (2023-05-02 15:07:23)
+>> The uv-host test has a lot of historical growth problems which have
+>> largely been overlooked since running it is harder than running a KVM
+>> (guest 2) based test.
+>>
+>> This series fixes up smaller problems but still leaves the test with
+>> fails when running create config base and variable storage
+>> tests. Those problems will either be fixed up with the second series
+>> or with a firmware fix since I'm unsure on which side of the os/fw
+>> fence the problem exists.
+>>
+>> The series is based on my other series that introduces pv-ipl and
+>> pv-icpt. The memory allocation fix will be added to the new version of
+>> that series so all G1 tests are fixed.
+> 
+> I have also pushed this to our CI, thanks.
+> 
+> Also here, I took the liberty of adding
+> groups = pv-host
+> in the last patch. If you are OK with it, I can carry that when picking for the
+> PR.
+
+Sure, since Thomas reviewed the patch introducing the group I'm fine 
+with that.
