@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DAB57212D7
-	for <lists+kvm@lfdr.de>; Sat,  3 Jun 2023 22:55:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45F207212DC
+	for <lists+kvm@lfdr.de>; Sat,  3 Jun 2023 22:55:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233305AbjFCUzI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Jun 2023 16:55:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37900 "EHLO
+        id S233126AbjFCUzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Jun 2023 16:55:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232349AbjFCUy7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Jun 2023 16:54:59 -0400
+        with ESMTP id S232738AbjFCUzF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Jun 2023 16:55:05 -0400
 Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4EF1AD;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52E681B3;
         Sat,  3 Jun 2023 13:54:56 -0700 (PDT)
 Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id A6D9E5FD3A;
+        by mx.sberdevices.ru (Postfix) with ESMTP id E6C6C5FD3B;
         Sat,  3 Jun 2023 23:54:48 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
         s=mail; t=1685825688;
-        bh=qcm1rcspds6nBbsYu4uQ/1LCrKuUtxLK5dK/r7j7bP0=;
+        bh=s7f/CfLQJryGc9if2/VYU5WFEpGy8lqbWfJnGVRm084=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-        b=MmPb3KmOmDkAlNV7uQJUepnw9OHA0sbu+V9hSOt+o4uHHfRcTfkwCL7vVQHZecjf/
-         fz4LQ8/VsoT0rdtI7SQum1P2MpWfHGUIAVWncb8bZby02vbsO1G9+zBENFl0JTBlYC
-         2WRYJv0kDv7YSMr0DckwdUsXcRxBwaQSd0QhSLunG+Biu7ZzUo+gB3b8vk48YZtYPO
-         9j/RRyXAQxjLWQX+mJzGLhIoirDYwjUkY+qlVUH5odDLCfzASh5uzu+PxKjwLMK8Oh
-         3qcxsIwMIJS4sys8u6XnRtPn/1pAbAoMyRw5UIGYt7Dq15fT1T74dO5xp3omLGQaV0
-         Tmg/WZa4gz+wQ==
+        b=RycjFhViTCCFq7j0f484NCTdGFhR5aOYYJyrnGolcXq19hWg1MDLtcNa2f5NNUGEu
+         cBqptqlP4FZzR9rZubfb8PhQCA30pChiPty3bxB+/nELqpRVsf6LKsSnvUMUhlsM+e
+         skJ5TVarQ7GGpNbj0ppLHcCgMa/C8GVPg578oXNlkxkTrnYoxiYPadHsrJAz8tNu1D
+         mdwZK62T8RqgAzifwok2MYd5Kyg6nqIDTi1EyCM6wvgotlBj8lmA+L7PfGsYoZXwpW
+         0RzzQMbi30g0aPKC0JSb2UG0Tmoi5XQlXyyhhUSAnvcXUSxbE7TKgWYjC4OEpdgCs+
+         8U1nfszD18U2g==
 Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
         by mx.sberdevices.ru (Postfix) with ESMTP;
         Sat,  3 Jun 2023 23:54:48 +0300 (MSK)
@@ -45,9 +45,9 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@sberdevices.ru>,
         Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Subject: [RFC PATCH v4 10/17] vhost/vsock: support MSG_ZEROCOPY for transport
-Date:   Sat, 3 Jun 2023 23:49:32 +0300
-Message-ID: <20230603204939.1598818-11-AVKrasnov@sberdevices.ru>
+Subject: [RFC PATCH v4 11/17] vsock/virtio: support MSG_ZEROCOPY for transport
+Date:   Sat, 3 Jun 2023 23:49:33 +0300
+Message-ID: <20230603204939.1598818-12-AVKrasnov@sberdevices.ru>
 X-Mailer: git-send-email 2.35.0
 In-Reply-To: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
 References: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
@@ -74,37 +74,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add 'msgzerocopy_allow()' callback for vhost transport.
+Add 'msgzerocopy_allow()' callback for virtio transport.
 
 Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 ---
- drivers/vhost/vsock.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/vmw_vsock/virtio_transport.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index b254aa4b756a..318866713ef7 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -396,6 +396,11 @@ static bool vhost_vsock_more_replies(struct vhost_vsock *vsock)
- 	return val < vq->num;
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 6053d8341091..d9ffa16dda69 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -438,6 +438,11 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
+ 	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
  }
  
-+static bool vhost_transport_msgzerocopy_allow(void)
++static bool virtio_transport_msgzerocopy_allow(void)
 +{
 +	return true;
 +}
 +
- static bool vhost_transport_seqpacket_allow(u32 remote_cid);
+ static bool virtio_transport_seqpacket_allow(u32 remote_cid);
  
- static struct virtio_transport vhost_transport = {
-@@ -442,6 +447,7 @@ static struct virtio_transport vhost_transport = {
+ static struct virtio_transport virtio_transport = {
+@@ -484,6 +489,8 @@ static struct virtio_transport virtio_transport = {
  		.notify_buffer_size       = virtio_transport_notify_buffer_size,
  
  		.read_skb = virtio_transport_read_skb,
-+		.msgzerocopy_allow        = vhost_transport_msgzerocopy_allow,
++
++		.msgzerocopy_allow        = virtio_transport_msgzerocopy_allow,
  	},
  
- 	.send_pkt = vhost_transport_send_pkt,
+ 	.send_pkt = virtio_transport_send_pkt,
 -- 
 2.25.1
 
