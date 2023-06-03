@@ -2,440 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5E437212EA
-	for <lists+kvm@lfdr.de>; Sat,  3 Jun 2023 22:55:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DCCA7212C9
+	for <lists+kvm@lfdr.de>; Sat,  3 Jun 2023 22:52:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233212AbjFCUzb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Jun 2023 16:55:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38126 "EHLO
+        id S231156AbjFCUv7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Jun 2023 16:51:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232482AbjFCUzH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Jun 2023 16:55:07 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BFFA6;
-        Sat,  3 Jun 2023 13:55:00 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 849605FD41;
-        Sat,  3 Jun 2023 23:54:50 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1685825690;
-        bh=XeBcocw7Ow0J3zl/HOChhEU6WoykzJ9fUhXcW0cNTyA=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-        b=Qi+UKDrrk4uptXQrUkjbCjFMH1jc+/cOOur3ibO0CxS4znMKH2i6BYESMKIZuLDCH
-         mUasGCnY7jtIa1KVPx0J8PI43IvKoKoflxNJgPDnzRvIC2bpnf/+5P+Nnqna9fVRow
-         JTnXBN3Y+eMbrdzMgpi28DApiHLD/m2v58/SA3LSWDxHHQEuUDhNHOaEsviSXhKViU
-         y9yCsMLwTj1ddgPi6nkYpmbsqvDvMp81fqxqu1obS3NNnqlBUr+YP8YitYC6ySdWDI
-         nHIfydEBicaebFDbG8wU5OQEQiz2QyvQPB4kzS7uC3mE2qxlcViNweO2YswkOS2yK5
-         mtFnmCFEBB9AQ==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Sat,  3 Jun 2023 23:54:50 +0300 (MSK)
-From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
-        <avkrasnov@sberdevices.ru>,
-        Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Subject: [RFC PATCH v4 17/17] test/vsock: io_uring rx/tx tests
-Date:   Sat, 3 Jun 2023 23:49:39 +0300
-Message-ID: <20230603204939.1598818-18-AVKrasnov@sberdevices.ru>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
-References: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
+        with ESMTP id S229715AbjFCUv6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Jun 2023 16:51:58 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9036DA6;
+        Sat,  3 Jun 2023 13:51:56 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1685825514;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FYRhO5tm+egQGj0VtLRHygSd1rVDQErSuxLMnzfSdv8=;
+        b=0n4CvGExlFAiQOFUYi0WTfQCqKhHk3/3cfXG1uCEype+muRoJY8ntPSFJObHSIG5lyPK2y
+        05o9vviiz52SP2Lq28KQ3gL5eaKxKll/hYocC8nhF6V4+P5l2OX0VBU9r4H2FodUY/nN1k
+        3jRJ6cCexsq8npqf4Ftza0JePXpisUouT57oUcUMRIi6Jm/oKDFhogNbRagiJV85UtPN5d
+        3mpSpOVRIBGPr/hsaBpkh7nOF+oTL1EAz52M48ChogJpUKHKlK37YDlGRu+MJLE7nnGeCX
+        7HrEcUsin2F496AlKhi5LY9T1LHNESyK44VIZD2mgshCuhcHIRPNgtxdRTA8CA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1685825514;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FYRhO5tm+egQGj0VtLRHygSd1rVDQErSuxLMnzfSdv8=;
+        b=q1woBCgZZqp3xbfT7uoawg4xNoNsW6mH9m0273HBQZusqSUq0JaAjouD+KoDG/m+NhCfUZ
+        n5cw61h2vqU9NSDw==
+To:     Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, peterz@infradead.org, andrew.cooper3@citrix.com,
+        seanjc@google.com, pbonzini@redhat.com, ravi.v.shankar@intel.com,
+        jiangshanlai@gmail.com, shan.kang@intel.com
+Subject: Re: [PATCH v8 01/33] x86/traps: let common_interrupt() handle
+ IRQ_MOVE_CLEANUP_VECTOR
+In-Reply-To: <20230410081438.1750-2-xin3.li@intel.com>
+References: <20230410081438.1750-1-xin3.li@intel.com>
+ <20230410081438.1750-2-xin3.li@intel.com>
+Date:   Sat, 03 Jun 2023 22:51:54 +0200
+Message-ID: <87leh08e1h.ffs@tglx>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/06/03 16:55:00 #21417531
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds set of tests which use io_uring for rx/tx. This test suite is
-implemented as separated util like 'vsock_test' and has the same set of
-input arguments as 'vsock_test'. These tests only cover cases of data
-transmission (no connect/bind/accept etc).
+On Mon, Apr 10 2023 at 01:14, Xin Li wrote:
+> IRQ_MOVE_CLEANUP_VECTOR is the only one of the system IRQ vectors that
+> is *below* FIRST_SYSTEM_VECTOR. It is a slow path, so just push it
+> into common_interrupt() just before the spurious interrupt handling.
 
-Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
----
- tools/testing/vsock/Makefile           |   7 +-
- tools/testing/vsock/vsock_uring_test.c | 321 +++++++++++++++++++++++++
- 2 files changed, 327 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/vsock/vsock_uring_test.c
+This is a complete NOOP on not FRED enabled systems as the IDT entry is
+still separate. So this change makes no sense outside of the FRED
+universe. Can we pretty please make this consistent?
 
-diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
-index 0a78787d1d92..8621ae73051d 100644
---- a/tools/testing/vsock/Makefile
-+++ b/tools/testing/vsock/Makefile
-@@ -1,12 +1,17 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+ifeq ($(MAKECMDGOALS),vsock_uring_test)
-+LDFLAGS = -luring
-+endif
-+
- all: test vsock_perf
- test: vsock_test vsock_diag_test
- vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o
- vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
- vsock_perf: vsock_perf.o
-+vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o $(LDFLAGS)
- 
- CFLAGS += -g -O2 -Werror -Wall -I. -I../../include -I../../../usr/include -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -D_GNU_SOURCE
- .PHONY: all test clean
- clean:
--	${RM} *.o *.d vsock_test vsock_diag_test
-+	${RM} *.o *.d vsock_test vsock_diag_test vsock_uring_test
- -include *.d
-diff --git a/tools/testing/vsock/vsock_uring_test.c b/tools/testing/vsock/vsock_uring_test.c
-new file mode 100644
-index 000000000000..7637ff510490
---- /dev/null
-+++ b/tools/testing/vsock/vsock_uring_test.c
-@@ -0,0 +1,321 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* io_uring tests for vsock
-+ *
-+ * Copyright (C) 2023 SberDevices.
-+ *
-+ * Author: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-+ */
-+
-+#include <getopt.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <liburing.h>
-+#include <unistd.h>
-+#include <sys/mman.h>
-+#include <linux/kernel.h>
-+#include <error.h>
-+
-+#include "util.h"
-+#include "control.h"
-+
-+#define PAGE_SIZE		4096
-+#define RING_ENTRIES_NUM	4
-+
-+static struct vsock_test_data test_data_array[] = {
-+	/* All elements have page aligned base and size. */
-+	{
-+		.vecs_cnt = 3,
-+		{
-+			{ NULL, PAGE_SIZE },
-+			{ NULL, 2 * PAGE_SIZE },
-+			{ NULL, 3 * PAGE_SIZE },
-+		}
-+	},
-+	/* Middle element has both non-page aligned base and size. */
-+	{
-+		.vecs_cnt = 3,
-+		{
-+			{ NULL, PAGE_SIZE },
-+			{ (void *)1, 200  },
-+			{ NULL, 3 * PAGE_SIZE },
-+		}
-+	}
-+};
-+
-+static void vsock_io_uring_client(const struct test_opts *opts,
-+				  const struct vsock_test_data *test_data,
-+				  bool msg_zerocopy)
-+{
-+	struct io_uring_sqe *sqe;
-+	struct io_uring_cqe *cqe;
-+	struct io_uring ring;
-+	struct iovec *iovec;
-+	struct msghdr msg;
-+	int fd;
-+
-+	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (msg_zerocopy)
-+		enable_so_zerocopy(fd);
-+
-+	iovec = iovec_from_test_data(test_data);
-+
-+	if (io_uring_queue_init(RING_ENTRIES_NUM, &ring, 0))
-+		error(1, errno, "io_uring_queue_init");
-+
-+	if (io_uring_register_buffers(&ring, iovec, test_data->vecs_cnt))
-+		error(1, errno, "io_uring_register_buffers");
-+
-+	memset(&msg, 0, sizeof(msg));
-+	msg.msg_iov = iovec;
-+	msg.msg_iovlen = test_data->vecs_cnt;
-+	sqe = io_uring_get_sqe(&ring);
-+
-+	if (msg_zerocopy)
-+		io_uring_prep_sendmsg_zc(sqe, fd, &msg, 0);
-+	else
-+		io_uring_prep_sendmsg(sqe, fd, &msg, 0);
-+
-+	if (io_uring_submit(&ring) != 1)
-+		error(1, errno, "io_uring_submit");
-+
-+	if (io_uring_wait_cqe(&ring, &cqe))
-+		error(1, errno, "io_uring_wait_cqe");
-+
-+	io_uring_cqe_seen(&ring, cqe);
-+
-+	control_writeulong(iovec_hash_djb2(iovec, test_data->vecs_cnt));
-+
-+	control_writeln("DONE");
-+	io_uring_queue_exit(&ring);
-+	free_iovec_test_data(test_data, iovec);
-+	close(fd);
-+}
-+
-+static void vsock_io_uring_server(const struct test_opts *opts,
-+				  const struct vsock_test_data *test_data)
-+{
-+	unsigned long remote_hash;
-+	unsigned long local_hash;
-+	struct io_uring_sqe *sqe;
-+	struct io_uring_cqe *cqe;
-+	struct io_uring ring;
-+	struct iovec iovec;
-+	size_t data_len;
-+	void *data;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	data_len = iovec_bytes(test_data->vecs, test_data->vecs_cnt);
-+
-+	data = malloc(data_len);
-+	if (!data) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (io_uring_queue_init(RING_ENTRIES_NUM, &ring, 0))
-+		error(1, errno, "io_uring_queue_init");
-+
-+	sqe = io_uring_get_sqe(&ring);
-+	iovec.iov_base = data;
-+	iovec.iov_len = data_len;
-+
-+	io_uring_prep_readv(sqe, fd, &iovec, 1, 0);
-+
-+	if (io_uring_submit(&ring) != 1)
-+		error(1, errno, "io_uring_submit");
-+
-+	if (io_uring_wait_cqe(&ring, &cqe))
-+		error(1, errno, "io_uring_wait_cqe");
-+
-+	if (cqe->res != data_len) {
-+		fprintf(stderr, "expected %zu, got %u\n", data_len,
-+			cqe->res);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	local_hash = hash_djb2(data, data_len);
-+
-+	remote_hash = control_readulong();
-+	if (remote_hash != local_hash) {
-+		fprintf(stderr, "hash mismatch\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_expectln("DONE");
-+	io_uring_queue_exit(&ring);
-+	free(data);
-+}
-+
-+void test_stream_uring_server(const struct test_opts *opts)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
-+		vsock_io_uring_server(opts, &test_data_array[i]);
-+}
-+
-+void test_stream_uring_client(const struct test_opts *opts)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
-+		vsock_io_uring_client(opts, &test_data_array[i], false);
-+}
-+
-+void test_stream_uring_msg_zc_server(const struct test_opts *opts)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
-+		vsock_io_uring_server(opts, &test_data_array[i]);
-+}
-+
-+void test_stream_uring_msg_zc_client(const struct test_opts *opts)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
-+		vsock_io_uring_client(opts, &test_data_array[i], true);
-+}
-+
-+static struct test_case test_cases[] = {
-+	{
-+		.name = "SOCK_STREAM io_uring test",
-+		.run_server = test_stream_uring_server,
-+		.run_client = test_stream_uring_client,
-+	},
-+	{
-+		.name = "SOCK_STREAM io_uring MSG_ZEROCOPY test",
-+		.run_server = test_stream_uring_msg_zc_server,
-+		.run_client = test_stream_uring_msg_zc_client,
-+	},
-+	{},
-+};
-+
-+static const char optstring[] = "";
-+static const struct option longopts[] = {
-+	{
-+		.name = "control-host",
-+		.has_arg = required_argument,
-+		.val = 'H',
-+	},
-+	{
-+		.name = "control-port",
-+		.has_arg = required_argument,
-+		.val = 'P',
-+	},
-+	{
-+		.name = "mode",
-+		.has_arg = required_argument,
-+		.val = 'm',
-+	},
-+	{
-+		.name = "peer-cid",
-+		.has_arg = required_argument,
-+		.val = 'p',
-+	},
-+	{
-+		.name = "help",
-+		.has_arg = no_argument,
-+		.val = '?',
-+	},
-+	{},
-+};
-+
-+static void usage(void)
-+{
-+	fprintf(stderr, "Usage: vsock_uring_test [--help] [--control-host=<host>] --control-port=<port> --mode=client|server --peer-cid=<cid>\n"
-+		"\n"
-+		"  Server: vsock_uring_test --control-port=1234 --mode=server --peer-cid=3\n"
-+		"  Client: vsock_uring_test --control-host=192.168.0.1 --control-port=1234 --mode=client --peer-cid=2\n"
-+		"\n"
-+		"Run transmission tests using io_uring. Usage is the same as\n"
-+		"in ./vsock_test\n"
-+		"\n"
-+		"Options:\n"
-+		"  --help                 This help message\n"
-+		"  --control-host <host>  Server IP address to connect to\n"
-+		"  --control-port <port>  Server port to listen on/connect to\n"
-+		"  --mode client|server   Server or client mode\n"
-+		"  --peer-cid <cid>       CID of the other side\n"
-+		);
-+	exit(EXIT_FAILURE);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	const char *control_host = NULL;
-+	const char *control_port = NULL;
-+	struct test_opts opts = {
-+		.mode = TEST_MODE_UNSET,
-+		.peer_cid = VMADDR_CID_ANY,
-+	};
-+
-+	init_signals();
-+
-+	for (;;) {
-+		int opt = getopt_long(argc, argv, optstring, longopts, NULL);
-+
-+		if (opt == -1)
-+			break;
-+
-+		switch (opt) {
-+		case 'H':
-+			control_host = optarg;
-+			break;
-+		case 'm':
-+			if (strcmp(optarg, "client") == 0) {
-+				opts.mode = TEST_MODE_CLIENT;
-+			} else if (strcmp(optarg, "server") == 0) {
-+				opts.mode = TEST_MODE_SERVER;
-+			} else {
-+				fprintf(stderr, "--mode must be \"client\" or \"server\"\n");
-+				return EXIT_FAILURE;
-+			}
-+			break;
-+		case 'p':
-+			opts.peer_cid = parse_cid(optarg);
-+			break;
-+		case 'P':
-+			control_port = optarg;
-+			break;
-+		case '?':
-+		default:
-+			usage();
-+		}
-+	}
-+
-+	if (!control_port)
-+		usage();
-+	if (opts.mode == TEST_MODE_UNSET)
-+		usage();
-+	if (opts.peer_cid == VMADDR_CID_ANY)
-+		usage();
-+
-+	if (!control_host) {
-+		if (opts.mode != TEST_MODE_SERVER)
-+			usage();
-+		control_host = "0.0.0.0";
-+	}
-+
-+	control_init(control_host, control_port,
-+		     opts.mode == TEST_MODE_SERVER);
-+
-+	run_tests(test_cases, &opts);
-+
-+	control_cleanup();
-+
-+	return 0;
-+}
--- 
-2.25.1
+Aside of that the change comes with zero justification. I can see why
+this is done, i.e. to spare range checking in the FRED exception entry
+code, but that brings up an interesting question:
 
+IRQ_MOVE_CLEANUP_VECTOR is at vector 0x20 on purpose. 0x20 is the lowest
+priority vector so that the following (mostly theoretical) situation
+gets resolved:
+
+sysvec_irq_move_cleanup()
+  if (is_pending_in_apic_IRR(vector_to_clean_up))
+     apic->send_IPI_self(IRQ_MOVE_CLEANUP_VECTOR);
+
+I.e. when for whatever reasons the to be cleaned up vector is still
+pending in the local APIC IRR the function retriggers
+IRQ_MOVE_CLEANUP_VECTOR and returns. As the pending to be cleaned up
+vector has higher priority it gets handled _before_ the cleanup
+vector. Otherwise this ends up in a live lock.
+
+So the question is whether FRED is changing that priority scheme or not.
+
+> @@ -248,6 +248,10 @@ DEFINE_IDTENTRY_IRQ(common_interrupt)
+>  	desc = __this_cpu_read(vector_irq[vector]);
+>  	if (likely(!IS_ERR_OR_NULL(desc))) {
+>  		handle_irq(desc, regs);
+> +#ifdef CONFIG_SMP
+> +	} else if (vector == IRQ_MOVE_CLEANUP_VECTOR) {
+> +		sysvec_irq_move_cleanup(regs);
+
+This nests IDTENTRY:
+
+common_interrupt()
+  irqentry_enter();
+  kvm_set_cpu_l1tf_flush_l1d();
+  run_irq_on_irqstack_cond(__common_interrupt, ....)
+    __common_interrupt()
+        sysvec_irq_move_cleanup()
+          irqentry_enter();             <- FAIL
+          kvm_set_cpu_l1tf_flush_l1d(); <- WHY again?
+          run_sysvec_on_irqstack_cond(__sysvec_irq_move_cleanup);
+            __sysvec_irq_move_cleanup();
+          irqentry_exit();
+
+It does not matter whether the cleanup vector is a slow path or
+not. Regular interrupts are not nesting, period. Exceptions nest, but
+IRQ_MOVE_CLEANUP_VECTOR is not an exception and we don't make an
+exception for it.
+
+Stop this mindless hackery and clean it up so it is correct for all
+variants.
+
+Thanks,
+
+        tglx
