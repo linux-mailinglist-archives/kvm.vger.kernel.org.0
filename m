@@ -2,71 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73D597211D9
-	for <lists+kvm@lfdr.de>; Sat,  3 Jun 2023 21:17:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F27497211DA
+	for <lists+kvm@lfdr.de>; Sat,  3 Jun 2023 21:19:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229579AbjFCTRx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Jun 2023 15:17:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40754 "EHLO
+        id S229577AbjFCTTJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Jun 2023 15:19:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjFCTRv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Jun 2023 15:17:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49C3F1AD
-        for <kvm@vger.kernel.org>; Sat,  3 Jun 2023 12:16:52 -0700 (PDT)
+        with ESMTP id S229590AbjFCTTH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Jun 2023 15:19:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF3C99
+        for <kvm@vger.kernel.org>; Sat,  3 Jun 2023 12:18:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685819811;
+        s=mimecast20190719; t=1685819902;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=M4o0k3datcaUU/TmUVbwYLxyr5WzpSezN+J1D4IJgBE=;
-        b=Oz7AOpkFSDjCuvg0qlIrmbftH2YdXmJ+3rYI0Lc8KYGPTHwlx56rjavKjZN0vI1hE9vqgH
-        e7Gte4dHjtZiqF3WQoCDqReB9ZkPPXE5GTPFXnL8K9V6QNGvl6fTSd1pBgdWwaJ07ip9Y7
-        gL734lTkgHmMNox7L7PP8WaNCdSusNI=
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
- [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=dqO1FGZvfkOVbe8wev6AAfQQK2y1bKPXbA/9dfX2rKw=;
+        b=XS+u1MIPkPYPksJl+NeBAaxVr4c3REqBuY85yI036O3OQH8/P/SZlhvPs1fWEXYs0RjuaL
+        fYkCqEgX1pRvMgJoPnIODPfqSawNbS29/3aY+/0o/q4TW/n0/SsYEwv7xJ1/6XDCHKT37Z
+        Xg3Msp6RWOHhMXwVvatQZcV/BdXkWEI=
+Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
+ [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-567-_E2v8ATQOYi7tzsg_XFjwA-1; Sat, 03 Jun 2023 15:16:49 -0400
-X-MC-Unique: _E2v8ATQOYi7tzsg_XFjwA-1
-Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-789c45e1e51so900741241.0
-        for <kvm@vger.kernel.org>; Sat, 03 Jun 2023 12:16:49 -0700 (PDT)
+ us-mta-626-FiGQCGsIMTWYnnUxduYK0A-1; Sat, 03 Jun 2023 15:18:21 -0400
+X-MC-Unique: FiGQCGsIMTWYnnUxduYK0A-1
+Received: by mail-ua1-f72.google.com with SMTP id a1e0cc1a2514c-786d7ce5dd1so1156081241.2
+        for <kvm@vger.kernel.org>; Sat, 03 Jun 2023 12:18:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685819809; x=1688411809;
+        d=1e100.net; s=20221208; t=1685819900; x=1688411900;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=M4o0k3datcaUU/TmUVbwYLxyr5WzpSezN+J1D4IJgBE=;
-        b=Z89ScCFr5VTdQvSm8yeEo318yK792i13mj8ux/t2e9O6kxbtlTl/hxI2g5vHYrQhg9
-         /aPD445/CckgDSub7xAnyGJl/yS+aOWgA3svy/D6CDj6mJiPQ6Cfn/L83T5YcGgMsebT
-         Jrda9e2GokRCgQ+5YfXrwH6Zk5kLUOhEO8neP5LA2J+X7fViCcRrIq2yXLH43WQ/Uta4
-         pFnyyrMsIELqgszFKmUFXapj2cGqmeXnujtmJdJ0x6tHiASltYnONudr8eXi/fAe8v16
-         yKTsiTaFOpkpPqqCWPfK3J6Y3DZkHwxlfWkR2uvcwsrKBF4YzYZtGsnGgbqLdj6cwnKo
-         Klyg==
-X-Gm-Message-State: AC+VfDxxh6WUfU6WVtrmr2d9XO8msojsRYwL3oFK4sJYP1SP06xoRD2N
-        9LqOG739J7h19ET3wUH4dGehu/VUKKIFARn5W3amtigZMDUw74y+PtcByOMFTQsfKeEjWZzzsfm
-        lJl60fKJmLt5eBjLbVQPW+VsQJJXk
-X-Received: by 2002:a67:ead2:0:b0:43b:298f:ed6e with SMTP id s18-20020a67ead2000000b0043b298fed6emr1954650vso.30.1685819808758;
-        Sat, 03 Jun 2023 12:16:48 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7FcmiNdTHlNrtp/QP2ZTTg/GDP+onBpgDJrEavKZ/00QU2LrieG2uUGPDLsTfnTfpRUl42Q9tH6v0HzgnRY2I=
-X-Received: by 2002:a67:ead2:0:b0:43b:298f:ed6e with SMTP id
- s18-20020a67ead2000000b0043b298fed6emr1954638vso.30.1685819808536; Sat, 03
- Jun 2023 12:16:48 -0700 (PDT)
+        bh=dqO1FGZvfkOVbe8wev6AAfQQK2y1bKPXbA/9dfX2rKw=;
+        b=PhUc1g8osMsgDQvrB+B5QpFH/KqqWaVjZk5n6x+Ozg+T3FctzgG4grSHROx/zEQdf2
+         E8EHbN8nBP1yKJ2HX6PoHuJwE89bt+/q0nlh1TjN2qBYsZVzNBQvBWaSJb/MPBAM33rp
+         m5sFPSvV1GTMlg2/bzVwTsB6uEc0hakefZ8k2jYUV9GNCFO2PqXoOxSAtN1EerSWsQv0
+         n+43nuMFUo5X5CKS4FRynpUnb5PX19dDPwzE8BCfJ/WANn3C59MMH5KUbgTlN/q2p/En
+         XNRVoiLSsMYv1Br4cl1y18uLwVfxBItKrlllsUKs6Vm4rkTtAK5/PtMPdLJ+vH+PWnC2
+         Td3w==
+X-Gm-Message-State: AC+VfDzaqi+mgsWw/SO8P3qOCrgfX7CNVbDXcvoFZmmQytJNStmujnaH
+        cpXVYsxVXAEqJ0H/Y4ZaofKGPtmnx7GVJBcnHhCEa6vEtJW2oR0WDu6j5VC+4EiqkUPRtbHIWT+
+        HZQrnXgdlUoVL9kpripcnZmoIMerZGYa+MemJ
+X-Received: by 2002:a67:f516:0:b0:43b:1b47:670 with SMTP id u22-20020a67f516000000b0043b1b470670mr3978411vsn.20.1685819900352;
+        Sat, 03 Jun 2023 12:18:20 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4Gctzyz5KrXOCWsH/1M5/Fmk4uJXcEdHcz5wLacm4tpCes+Qcfu6OBqFw30h4REjbrXUPNUyrd/iUY/yt43WE=
+X-Received: by 2002:a67:f516:0:b0:43b:1b47:670 with SMTP id
+ u22-20020a67f516000000b0043b1b470670mr3978408vsn.20.1685819900083; Sat, 03
+ Jun 2023 12:18:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230531100305.430120-1-maz@kernel.org>
-In-Reply-To: <20230531100305.430120-1-maz@kernel.org>
+References: <20230603005213.1035921-2-seanjc@google.com>
+In-Reply-To: <20230603005213.1035921-2-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Sat, 3 Jun 2023 21:16:37 +0200
-Message-ID: <CABgObfbb0oPO1jv4OR-4xuXNfz-cKbPs9KgFRuuER9CHnaYAxg@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.4, take #3
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Akihiko Odaki <akihiko.odaki@daynix.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Yu Zhao <yuzhao@google.com>, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Date:   Sat, 3 Jun 2023 21:18:08 +0200
+Message-ID: <CABgObfa8PPv5FoHBFfszS_LAvawvMGsYbWu2TxEP-n+k_bL2tg@mail.gmail.com>
+Subject: Re: KVM: x86: Fixes for 6.4
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -79,68 +73,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 31, 2023 at 12:03=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrot=
-e:
+On Sat, Jun 3, 2023 at 2:52=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
 >
-> Paolo,
+> Please pull a few x86 fixes for 6.4.  Nothing ridiculously urgent, but th=
+e
+> vNMI fix in particular would be nice to get in 6.4.
 >
-> Here's the third batch of fixes for 6.4: yet another MMU-related fix,
-> an external debug bug fix and the obligatory PMU fix.
+> The following changes since commit b9846a698c9aff4eb2214a06ac83638ad098f3=
+3f:
 >
-> Note that since you don't seem to have pulled kvmarm-fixes-6.4-2[1]
-> just yet, pulling this will drag both tags.
->
-> Please pull,
->
->         M.
->
-> [1] https://lore.kernel.org/r/20230524125757.3631091-1-maz@kernel.org
->
-> The following changes since commit a9f0e3d5a089d0844abb679a5e99f15010d53e=
-25:
->
->   KVM: arm64: Reload PTE after invoking walker callback on preorder trave=
-rsal (2023-05-24 13:47:12 +0100)
+>   KVM: VMX: add MSR_IA32_TSX_CTRL into msrs_to_save (2023-05-21 04:05:51 =
+-0400)
 >
 > are available in the Git repository at:
 >
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-6.4-3
+>   https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-6.4
+>
+> for you to fetch changes up to 47d2804bc99ca873470df17c20737b28225a320d:
+>
+>   KVM: selftests: Add test for race in kvm_recalculate_apic_map() (2023-0=
+6-02 17:21:06 -0700)
 
-Pulled, thanks (a bit more speedily than #2, fortunately).
+Pulled, thanks.
 
 Paolo
 
-> for you to fetch changes up to 40e54cad454076172cc3e2bca60aa924650a3e4b:
->
->   KVM: arm64: Document default vPMU behavior on heterogeneous systems (20=
-23-05-31 10:29:56 +0100)
 >
 > ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.4, take #3
+> KVM x86 fixes for 6.4
 >
-> - Fix the reported address of a watchpoint forwarded to userspace
+>  - Fix a memslot lookup bug in the NX recovery thread that could
+>    theoretically let userspace bypass the NX hugepage mitigation
 >
-> - Fix the freeing of the root of stage-2 page tables
+>  - Fix a s/BLOCKING/PENDING bug in SVM's vNMI support
 >
-> - Stop creating spurious PMU events to perform detection of the
->   default PMU and use the existing PMU list instead.
+>  - Account exit stats for fastpath VM-Exits that never leave the super
+>    tight run-loop
+>
+>  - Fix an out-of-bounds bug in the optimized APIC map code, and add a
+>    regression test for the race.
 >
 > ----------------------------------------------------------------
-> Akihiko Odaki (1):
->       KVM: arm64: Populate fault info for watchpoint
+> Maciej S. Szmigiero (1):
+>       KVM: SVM: vNMI pending bit is V_NMI_PENDING_MASK not V_NMI_BLOCKING=
+_MASK
 >
-> Oliver Upton (3):
->       KVM: arm64: Drop last page ref in kvm_pgtable_stage2_free_removed()
->       KVM: arm64: Iterate arm_pmus list to probe for default PMU
->       KVM: arm64: Document default vPMU behavior on heterogeneous systems
+> Michal Luczaj (1):
+>       KVM: selftests: Add test for race in kvm_recalculate_apic_map()
 >
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  8 +++--
->  arch/arm64/kvm/hyp/nvhe/switch.c        |  2 ++
->  arch/arm64/kvm/hyp/pgtable.c            |  3 ++
->  arch/arm64/kvm/hyp/vhe/switch.c         |  1 +
->  arch/arm64/kvm/pmu-emul.c               | 58 +++++++++++++--------------=
-------
->  5 files changed, 35 insertions(+), 37 deletions(-)
+> Sean Christopherson (3):
+>       KVM: x86/mmu: Grab memslot for correct address space in NX recovery=
+ worker
+>       KVM: x86: Account fastpath-only VM-Exits in vCPU stats
+>       KVM: x86: Bail from kvm_recalculate_phys_map() if x2APIC ID is out-=
+of-bounds
+>
+>  arch/x86/kvm/lapic.c                               | 20 +++++-
+>  arch/x86/kvm/mmu/mmu.c                             |  5 +-
+>  arch/x86/kvm/svm/svm.c                             |  2 +-
+>  arch/x86/kvm/x86.c                                 |  3 +
+>  tools/testing/selftests/kvm/Makefile               |  1 +
+>  .../selftests/kvm/x86_64/recalc_apic_map_test.c    | 74 ++++++++++++++++=
+++++++
+>  6 files changed, 101 insertions(+), 4 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/recalc_apic_map_te=
+st.c
 >
 
