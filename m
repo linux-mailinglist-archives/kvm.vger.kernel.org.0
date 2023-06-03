@@ -2,183 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ACA2720C5F
-	for <lists+kvm@lfdr.de>; Sat,  3 Jun 2023 01:33:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE02A720C7B
+	for <lists+kvm@lfdr.de>; Sat,  3 Jun 2023 02:03:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236920AbjFBXdN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jun 2023 19:33:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49728 "EHLO
+        id S236572AbjFCADX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jun 2023 20:03:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236868AbjFBXdJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jun 2023 19:33:09 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C70E42
-        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 16:33:08 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-5341081a962so2545754a12.2
-        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 16:33:08 -0700 (PDT)
+        with ESMTP id S234452AbjFCADR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jun 2023 20:03:17 -0400
+Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13DE11BB
+        for <kvm@vger.kernel.org>; Fri,  2 Jun 2023 17:03:17 -0700 (PDT)
+Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-1a1fa977667so2864217fac.1
+        for <kvm@vger.kernel.org>; Fri, 02 Jun 2023 17:03:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685748788; x=1688340788;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=j6nYf/jOBntGS2igA5vSyIxcer0Y2dnZYEhcRt0bNGM=;
-        b=Wi3H0k9BpFJWJAoAjhZGH+/ORYMPc9rbgUFp0V7StYibnfR5Xj/2eL6uRo+vy2ORjC
-         t7IhWOLboZOtaFGAZUE5ovIvkiLsDV+67SAoJ01MJRK09U02fJoLAa4AUpOGsfC1kS7P
-         +hjP1kmcc8hDU9rMT9LiNwBTg5BYbmCeWKvHScZv9HRM/kblDg9yNpxucaTAI3D5S7nI
-         jQFbapqcnP3k3m32lzqRcCZH4s+IoewCx1fJp3P83YZ2/GpgKpGBLg6fcwxRiNZHIxPk
-         9nAJ5vbHtv8f6sqcuBQySNHOow5IdMVwxGuFB065jqUKW3dyVjnL9DouUtA0ENGMulPM
-         nIDg==
+        d=google.com; s=20221208; t=1685750596; x=1688342596;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7HShfi++5J2EhwWlVUZ0n0KinSTI5Empl7iSlltk47U=;
+        b=eeOjfV1pYEoTg2ArO6FIFiv7fWCWy+1mL3j3NuPxGHOc5m4ooNise/lzcD4UY18PqL
+         K5QHHZkuMXKD5WcArmWJWZyMBS1y3BQ/lyZ4VPcs0OxYDr73Vf8NEQbrqX8Rq/vdJUZF
+         yEF/Xig+o1owA2qNIkaIU3TGjDRecNfY5/8GGobfhkE0J6RCH/XBQpxRxiLTAyb+NkN6
+         +op/eFn+I/Y/mWAeCDzQJ0p2x9abkWtasVO0OLzHxhJBUUc37KuD0+1I14fyvZAoVIIS
+         XjY9IZpJPR7GcgeYV7d83wojijNT7Ct8DwVUX/NFaTB2JsXQCMgCI1T39JkCw80fEgfE
+         RJTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685748788; x=1688340788;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=j6nYf/jOBntGS2igA5vSyIxcer0Y2dnZYEhcRt0bNGM=;
-        b=YqPuFCDhItDZxy0q83PdUcbPNCPjDnOJjN+dihlzBu90CHQJybPv0KmIYc8egD4Ymm
-         1yhKcRaFzDQawk41GNMXdq8rl4DCIo+sQaaI3kZ2aBQSXBimuuv9qGu++21c9EOGxku/
-         Kxpkqc/dQHLBul+5HjbJjrlxXTgjSlrrIMuwsbwT5eheDXR5os00jmV3VlOYij3OdCtN
-         iYsuMz+kiyf6+vIfYr/J+drrywcPyjpF4wERmVv9/Tw9twvT8dg0fYU7mzK5pUCcJQV/
-         p4CkNhdMwnycpNWzUWLZLSksHCfRgeXbS5feZ+YFKIyb8MXMbCyGahg0yEEiCsgTni0b
-         arJA==
-X-Gm-Message-State: AC+VfDx6/MpHYu9UVd0LExuiHMVEGF8Y/p7Ovf9rEJZaOuG8RKTSGAWz
-        NqLakcXq4WKI0ztNOG6Ajja34mp1Vos=
-X-Google-Smtp-Source: ACHHUZ5RQW9bPamlFEzYIenvVcUlgxBxW5xO/KEOYWb6HOpyK20P4kwc3nv+mQDuMb0Bq7zPa45xizLoZzA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:4284:0:b0:542:96b5:b5e4 with SMTP id
- j4-20020a654284000000b0054296b5b5e4mr648446pgp.11.1685748787993; Fri, 02 Jun
- 2023 16:33:07 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  2 Jun 2023 16:32:50 -0700
-In-Reply-To: <20230602233250.1014316-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230602233250.1014316-1-seanjc@google.com>
-X-Mailer: git-send-email 2.41.0.rc2.161.g9c6817b8e7-goog
-Message-ID: <20230602233250.1014316-4-seanjc@google.com>
-Subject: [PATCH v3 3/3] KVM: selftests: Add test for race in kvm_recalculate_apic_map()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Michal Luczaj <mhal@rbox.co>
+        d=1e100.net; s=20221208; t=1685750596; x=1688342596;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7HShfi++5J2EhwWlVUZ0n0KinSTI5Empl7iSlltk47U=;
+        b=TjKVdyBvuIXhG1Hieh9hkRLxyUus20XyZDkrA9rNHfs+UmxGfavh8N07glk4ob8kox
+         jIZx17UtdnrLrYCnkHs1f3ISz10Ujx8f492SK9InSZdHutBF8CWeA7F8yonSETAOoweL
+         e7AzlOohbgpuu5Neo5hlL3cZH+OD3Mqzm9GctBFVhYBGGNJ4soIuVSvMriBkEEsH/5v/
+         Z0VBm877W+JuoEcICGhtXjTFFh4uLklnRnYIb16cXBC81rYTPyIclwZx17mBRDNymSHZ
+         qJkJ3jKICpV6NhOhZ9++CBiQcDtG6rBiGHcPWRVLuWiv5CpAmSpNNQ4ynKBTwDCXCxYX
+         yQHg==
+X-Gm-Message-State: AC+VfDwIdiGUZfZNDSci832J84rTwr3cxtfPU2Uj9auXRhCa0u/sA0Bj
+        PeOv4HBVbuus+SewPihVwKV5R9pHRT9rFln0Sfr61y6Z7vrLosdJ3kA=
+X-Google-Smtp-Source: ACHHUZ44cUV4eYucBKN3GuJX5jHZxrspSPJYCrKqKuQg9wG/63bUKJcf+/F6/ilanpB2b7C6tSLKXooDC1BXarhaxTs=
+X-Received: by 2002:a05:6870:c7a5:b0:18e:8a68:fe41 with SMTP id
+ dy37-20020a056870c7a500b0018e8a68fe41mr3285243oab.56.1685750596342; Fri, 02
+ Jun 2023 17:03:16 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230602005118.2899664-1-jingzhangos@google.com>
+ <20230602005118.2899664-6-jingzhangos@google.com> <f314beb1e53c1cbdc46909e857a246bab242b153.camel@amazon.com>
+In-Reply-To: <f314beb1e53c1cbdc46909e857a246bab242b153.camel@amazon.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Fri, 2 Jun 2023 17:03:04 -0700
+Message-ID: <CAAdAUtgbNax4s-Yix6ZybhyG0boxE_2O9NQGRQEsSZ-Q2BBqKQ@mail.gmail.com>
+Subject: Re: [PATCH v11 5/5] KVM: arm64: Refactor writings for PMUVer/CSV2/CSV3
+To:     "Jitindar Singh, Suraj" <surajjs@amazon.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "oupton@google.com" <oupton@google.com>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        "rananta@google.com" <rananta@google.com>,
+        "tabba@google.com" <tabba@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "reijiw@google.com" <reijiw@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-14.3 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_SBL_CSS,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Michal Luczaj <mhal@rbox.co>
-
-Keep switching between LAPIC_MODE_X2APIC and LAPIC_MODE_DISABLED during
-APIC map construction to hunt for TOCTOU bugs in KVM.  KVM's optimized map
-recalc makes multiple passes over the list of vCPUs, and the calculations
-ignore vCPU's whose APIC is hardware-disabled, i.e. there's a window where
-toggling LAPIC_MODE_DISABLED is quite interesting.
-
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../kvm/x86_64/recalc_apic_map_test.c         | 74 +++++++++++++++++++
- 2 files changed, 75 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/recalc_apic_map_test.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 7a5ff646e7e7..4761b768b773 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -116,6 +116,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/sev_migrate_tests
- TEST_GEN_PROGS_x86_64 += x86_64/amx_test
- TEST_GEN_PROGS_x86_64 += x86_64/max_vcpuid_cap_test
- TEST_GEN_PROGS_x86_64 += x86_64/triple_fault_event_test
-+TEST_GEN_PROGS_x86_64 += x86_64/recalc_apic_map_test
- TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
-diff --git a/tools/testing/selftests/kvm/x86_64/recalc_apic_map_test.c b/tools/testing/selftests/kvm/x86_64/recalc_apic_map_test.c
-new file mode 100644
-index 000000000000..4c416ebe7d66
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/recalc_apic_map_test.c
-@@ -0,0 +1,74 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Test edge cases and race conditions in kvm_recalculate_apic_map().
-+ */
-+
-+#include <sys/ioctl.h>
-+#include <pthread.h>
-+#include <time.h>
-+
-+#include "processor.h"
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "apic.h"
-+
-+#define TIMEOUT		5	/* seconds */
-+
-+#define LAPIC_DISABLED	0
-+#define LAPIC_X2APIC	(MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE)
-+#define MAX_XAPIC_ID	0xff
-+
-+static void *race(void *arg)
-+{
-+	struct kvm_lapic_state lapic = {};
-+	struct kvm_vcpu *vcpu = arg;
-+
-+	while (1) {
-+		/* Trigger kvm_recalculate_apic_map(). */
-+		vcpu_ioctl(vcpu, KVM_SET_LAPIC, &lapic);
-+		pthread_testcancel();
-+	}
-+
-+	return NULL;
-+}
-+
-+int main(void)
-+{
-+	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
-+	struct kvm_vcpu *vcpuN;
-+	struct kvm_vm *vm;
-+	pthread_t thread;
-+	time_t t;
-+	int i;
-+
-+	kvm_static_assert(KVM_MAX_VCPUS > MAX_XAPIC_ID);
-+
-+	/*
-+	 * Create the max number of vCPUs supported by selftests so that KVM
-+	 * has decent amount of work to do when recalculating the map, i.e. to
-+	 * make the problematic window large enough to hit.
-+	 */
-+	vm = vm_create_with_vcpus(KVM_MAX_VCPUS, NULL, vcpus);
-+
-+	/*
-+	 * Enable x2APIC on all vCPUs so that KVM doesn't bail from the recalc
-+	 * due to vCPUs having aliased xAPIC IDs (truncated to 8 bits).
-+	 */
-+	for (i = 0; i < KVM_MAX_VCPUS; i++)
-+		vcpu_set_msr(vcpus[i], MSR_IA32_APICBASE, LAPIC_X2APIC);
-+
-+	ASSERT_EQ(pthread_create(&thread, NULL, race, vcpus[0]), 0);
-+
-+	vcpuN = vcpus[KVM_MAX_VCPUS - 1];
-+	for (t = time(NULL) + TIMEOUT; time(NULL) < t;) {
-+		vcpu_set_msr(vcpuN, MSR_IA32_APICBASE, LAPIC_X2APIC);
-+		vcpu_set_msr(vcpuN, MSR_IA32_APICBASE, LAPIC_DISABLED);
-+	}
-+
-+	ASSERT_EQ(pthread_cancel(thread), 0);
-+	ASSERT_EQ(pthread_join(thread, NULL), 0);
-+
-+	kvm_vm_free(vm);
-+
-+	return 0;
-+}
--- 
-2.41.0.rc2.161.g9c6817b8e7-goog
-
+On Fri, Jun 2, 2023 at 12:22=E2=80=AFPM Jitindar Singh, Suraj
+<surajjs@amazon.com> wrote:
+>
+> On Fri, 2023-06-02 at 00:51 +0000, Jing Zhang wrote:
+> > Refactor writings for ID_AA64PFR0_EL1.[CSV2|CSV3],
+> > ID_AA64DFR0_EL1.PMUVer and ID_DFR0_ELF.PerfMon based on utilities
+> > specific to ID register.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/include/asm/cpufeature.h |   1 +
+> >  arch/arm64/kernel/cpufeature.c      |   2 +-
+> >  arch/arm64/kvm/sys_regs.c           | 291 +++++++++++++++++++-------
+> > --
+> >  3 files changed, 203 insertions(+), 91 deletions(-)
+> >
+> >
+> > +
+> > +static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
+> > +                                     const struct sys_reg_desc *rd)
+> > +{
+> > +       u64 val;
+> > +       u32 id =3D reg_to_encoding(rd);
+> > +
+> > +       val =3D read_sanitised_ftr_reg(id);
+> > +       /*
+> > +        * Initialise the default PMUver before there is a chance to
+> > +        * create an actual PMU.
+> > +        */
+> > +       val &=3D ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
+> > +       val |=3D FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon),
+> > kvm_arm_pmu_get_pmuver_limit());
+>
+> Maybe it's never possible, but does this need a:
+> pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit()) ?
+Yes, will fix it and also update the comment above it.
+>
+> > +
+> > +       return val;
+> >  }
+> >
+> >
+> Thanks
+> - Suraj
+Thanks,
+Jing
