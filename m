@@ -2,57 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AF657213E2
-	for <lists+kvm@lfdr.de>; Sun,  4 Jun 2023 02:30:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A71172158E
+	for <lists+kvm@lfdr.de>; Sun,  4 Jun 2023 10:26:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229755AbjFDAaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Jun 2023 20:30:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60734 "EHLO
+        id S230411AbjFDIXv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Jun 2023 04:23:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbjFDAaD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Jun 2023 20:30:03 -0400
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DB0A19A
-        for <kvm@vger.kernel.org>; Sat,  3 Jun 2023 17:30:01 -0700 (PDT)
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1q5bd8-007gYS-Ev; Sun, 04 Jun 2023 02:29:58 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-        bh=ajmFOvwxptlWBTZW4DWkzyimVQmkTbolr3tsod6TmuY=; b=D6C5KOOFud2dCyCRvWq8yvA0M5
-        3Qdd2ChbHfPYr6iWwpQtq7q/I8ROPJiFd2XtNQ5wHkSr6JqfKUafkGDHn7bzTypkvAhZEKrBWHqKz
-        P4+i3GWWmIRhDJXk/PEvfXsbNaMBsuItGQco5Xz1ERCaV8bD84r7tF9TapYQLg86bYn0ojPiQGeBO
-        82Wa7EwqVG+D8g8RQLSyYGH95MGtQW5/ERxbj/qKstVGpq5JIpGwZ9gecWn6xazC0U5ZzF0RLH1o2
-        mfb9bQeNKtfahXFdPtVNDl/IddZ8PghjTCO7Ngq6hZZYKTwFQ3o/Rtpe+tBALiRUSVCfUPCtSLrJC
-        LCxC7vFQ==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1q5bd7-00034M-VD; Sun, 04 Jun 2023 02:29:58 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1q5bcz-0002z3-Co; Sun, 04 Jun 2023 02:29:49 +0200
-Message-ID: <002f1c33-e899-1d17-bfb4-24a116451fe6@rbox.co>
-Date:   Sun, 4 Jun 2023 02:29:48 +0200
-MIME-Version: 1.0
-User-Agent: Thunderbird
-Subject: Re: [PATCH v3 2/3] KVM: x86: Retry APIC optimized map recalc if vCPU
- is added/enabled
-Content-Language: pl-PL, en-GB
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230602233250.1014316-1-seanjc@google.com>
- <20230602233250.1014316-3-seanjc@google.com>
-From:   Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <20230602233250.1014316-3-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        with ESMTP id S229891AbjFDIXt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Jun 2023 04:23:49 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25077135;
+        Sun,  4 Jun 2023 01:23:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A420B60BC3;
+        Sun,  4 Jun 2023 08:23:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC518C433EF;
+        Sun,  4 Jun 2023 08:23:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685867026;
+        bh=0o/Sg7LuWV2tXQmiYJm5thgkVxTQtCibmRXbS1usirY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=df2rk5iuYxLPAV1plu/eo3/bECha8oi2VdbrqlbT6kwMdiAU9cI+Bm8L0J7XkgUFs
+         XVGCobHYCAcew+sKuVe2ZhE2wvHZYAbk0gQ6y9w6pfcRMGUUB/1bdbi0Q+oAE5vzE1
+         JvmJaiLL8UIpvkgxDXIJmPQijdsDUf2rRAzUt1zVCc5unkBAfqObfnudtmzLOkNw4Z
+         uvq3PYyYphRGykWwSVJDKysDZr9Zyf1PnNEfQTwqNPe/57FSj1IJNexasvMknKv28n
+         dJGAISg/5OpefG98K8ea1fRPM9Svdx6DnVvzjGIWGaFJBnhiXBB3yyI5E8vih2grgT
+         qvwtY9WRr6CPA==
+Received: from [37.166.236.89] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q5j1a-002gi6-HG;
+        Sun, 04 Jun 2023 09:23:43 +0100
+Date:   Sun, 04 Jun 2023 09:23:39 +0100
+Message-ID: <87sfb7octw.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvmarm@lists.linux.dev
+Subject: Re: [PATCH 3/3] KVM: arm64: Skip break phase when we have FEAT_BBM level 2
+In-Reply-To: <20230602170147.1541355-4-coltonlewis@google.com>
+References: <20230602170147.1541355-1-coltonlewis@google.com>
+        <20230602170147.1541355-4-coltonlewis@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 37.166.236.89
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -61,19 +72,158 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/3/23 01:32, Sean Christopherson wrote:
-> +	 * Read kvm->arch.apic_map_dirty before kvm->arch.apic_map (if clean)
-> +	 * or the APIC registers (if dirty).  Note, on retry the map may have
-> +	 * not yet been marked dirty by whatever task changed a vCPU's x2APIC
-> +	 * ID, i.e. the map may still show up as in-progress.  In that case
-> +	 * this task still needs to retry and copmlete its calculation.
+On Fri, 02 Jun 2023 18:01:47 +0100,
+Colton Lewis <coltonlewis@google.com> wrote:
+> 
+> Skip the break phase of break-before-make when the CPU has FEAT_BBM
+> level 2. This allows skipping some expensive invalidation and
+> serialization and should result in significant performance
+> improvements when changing block size.
+> 
+> The ARM manual section D5.10.1 specifically states under heading
+> "Support levels for changing block size" that FEAT_BBM Level 2 support
+> means changing block size does not break coherency, ordering
+> guarantees, or uniprocessor semantics.
 
-s/copmlete/complete ?
+I'd like to have that sort of reference in the code itself (spelling
+out the revision on the ARM ARM this is taken from, as this section is
+in D8.14.2 in DDI0487J.a). I'd also like it to point out that this
+only applies when the *output addresses* are the same.
 
-Speaking of nits, if you're planning to do some more work around
-kvm_recalculate_phys_map(), there's that old comment typo I've failed
-to notice earlier:
+> 
+> Because a compare-and-exchange operation was used in the break phase
+> to serialize access to the PTE, an analogous compare-and-exchange is
+> introduced in the make phase to ensure serialization remains even if
+> the break phase is skipped and proper handling is introduced to
+> account for this function now having a way to fail.
+> 
+> Considering the possibility that the new pte has different permissions
+> than the old pte, the minimum necessary tlb invalidations are used.
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 58 +++++++++++++++++++++++++++++++-----
+>  1 file changed, 51 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 8acab89080af9..6778e3df697f7 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -643,6 +643,11 @@ static bool stage2_has_fwb(struct kvm_pgtable *pgt)
+>  	return !(pgt->flags & KVM_PGTABLE_S2_NOFWB);
+>  }
+> 
+> +static bool stage2_has_bbm_level2(void)
+> +{
+> +	return cpus_have_const_cap(ARM64_HAS_STAGE2_BBM2);
 
-"Apply KVM's hotplug hack if userspace has enable 32-bit APIC IDs."
+By the time we look at unmapping things from S2, the capabilities
+should be finalised, so this should read cpus_have_final_cap()
+instead.
 
-enabled?
+> +}
+> +
+>  #define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fwb(pgt))
+> 
+>  static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot prot,
+> @@ -730,7 +735,7 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+>   * @ctx: context of the visited pte.
+>   * @mmu: stage-2 mmu
+>   *
+> - * Returns: true if the pte was successfully broken.
+> + * Returns: true if the pte was successfully broken or there is no need.
+
+No need of what? Why? The rationale should be captured in the comments
+below.
+
+>   *
+>   * If the removed pte was valid, performs the necessary serialization and TLB
+>   * invalidation for the old value. For counted ptes, drops the reference count
+> @@ -750,6 +755,10 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+>  		return false;
+>  	}
+> 
+> +	/* There is no need to break the pte. */
+> +	if (stage2_has_bbm_level2())
+> +		return true;
+> +
+>  	if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
+>  		return false;
+> 
+> @@ -771,16 +780,45 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+>  	return true;
+>  }
+> 
+> -static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
+> +static bool stage2_pte_perms_equal(kvm_pte_t p1, kvm_pte_t p2)
+> +{
+> +	u64 perms1 = p1 & KVM_PGTABLE_PROT_RWX;
+> +	u64 perms2 = p2 & KVM_PGTABLE_PROT_RWX;
+
+Huh? The KVM_PGTABLE_PROT_* constants are part of an *enum*, and do
+*not* represent the bit layout of the PTE.
+
+How did you test this code?
+
+> +
+> +	return perms1 == perms2;
+> +}
+> +
+> +/**
+> + * stage2_try_make_pte() - Attempts to install a new pte.
+> + *
+> + * @ctx: context of the visited pte.
+> + * @new: new pte to install
+> + *
+> + * Returns: true if the pte was successfully installed
+> + *
+> + * If the old pte had different permissions, perform appropriate TLB
+> + * invalidation for the old value. For counted ptes, drops the
+> + * reference count on the containing table page.
+> + */
+> +static bool stage2_try_make_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu, kvm_pte_t new)
+>  {
+>  	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> 
+> -	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
+> +	if (!stage2_has_bbm_level2())
+> +		WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
+> +
+> +	if (!stage2_try_set_pte(ctx, new))
+> +		return false;
+> +
+> +	if (kvm_pte_table(ctx->old, ctx->level))
+> +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> +	else if (kvm_pte_valid(ctx->old) && !stage2_pte_perms_equal(ctx->old, new))
+> +		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, mmu, ctx->addr, ctx->level);
+
+Why a non-shareable invalidation? Nothing in this code captures the
+rationale for it. What if the permission change was a *restriction* of
+the permission? It should absolutely be global, and not local.
+
+>
+>  	if (stage2_pte_is_counted(new))
+>  		mm_ops->get_page(ctx->ptep);
+> 
+> -	smp_store_release(ctx->ptep, new);
+> +	return true;
+>  }
+> 
+>  static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
+> @@ -879,7 +917,8 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>  	    stage2_pte_executable(new))
+>  		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+> 
+> -	stage2_make_pte(ctx, new);
+> +	if (!stage2_try_make_pte(ctx, data->mmu, new))
+> +		return -EAGAIN;
+
+So we don't have forward-progress guarantees anymore? I'm not sure
+this is a change I'm overly fond of.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
