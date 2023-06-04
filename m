@@ -2,75 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98042721738
-	for <lists+kvm@lfdr.de>; Sun,  4 Jun 2023 15:08:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18B387217A8
+	for <lists+kvm@lfdr.de>; Sun,  4 Jun 2023 16:28:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231902AbjFDNIo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Jun 2023 09:08:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34750 "EHLO
+        id S230437AbjFDO2D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Jun 2023 10:28:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231898AbjFDNIm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Jun 2023 09:08:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB0FC1A7
-        for <kvm@vger.kernel.org>; Sun,  4 Jun 2023 06:07:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685884071;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hrilbVhzeqYu8+8oI8uUU54vBgEQeOHbDR8gAItYK2E=;
-        b=TGbz0pcO6saIvfuelfc8ZbJAT3G0PlLpypDAWkrGDnxP4NqmXoZnD2dE2w16txidlJ2SvP
-        F7x4ziEM4HaaSmaJCEvfKWT7kusdgAzZAABVtR3qQFLKBOP97BsrslPUws1kvoOogJhLMT
-        V+87Uv3XZMHMfgcPZdJsNY72XPqXDLU=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-584-eg_7giJlOJCvvCtvrziL8w-1; Sun, 04 Jun 2023 09:07:46 -0400
-X-MC-Unique: eg_7giJlOJCvvCtvrziL8w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C12CC3806738;
-        Sun,  4 Jun 2023 13:07:44 +0000 (UTC)
-Received: from localhost (ovpn-12-83.pek2.redhat.com [10.72.12.83])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A7A672026D49;
-        Sun,  4 Jun 2023 13:07:42 +0000 (UTC)
-Date:   Sun, 4 Jun 2023 21:07:39 +0800
-From:   Baoquan He <bhe@redhat.com>
-To:     Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>,
-        Eric Biederman <ebiederm@xmission.com>,
-        kexec@lists.infradead.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 00/10] x86/sev: KEXEC/KDUMP support for SEV-ES guests
-Message-ID: <ZHyMm0iVyB2EFIsJ@MiWiFi-R3L-srv>
-References: <20220127101044.13803-1-joro@8bytes.org>
+        with ESMTP id S229806AbjFDO2B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Jun 2023 10:28:01 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D66B8B6;
+        Sun,  4 Jun 2023 07:27:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685888879; x=1717424879;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=q+r4L7YKHO4A+c4ToLOo+OnQVFVuiFm9JBkNTxDqa4M=;
+  b=VOvvWcRsesdWWbC3s4BNr70Tq6ClYyQVoKNwcYmLNOs9pxRCKZnPWDOI
+   VCwK+13XdwuD4YW4DAOluUd5RSFqaNL8O9VwI/Zgysq9Qctym4+HorVYN
+   a/s72+UWcZ4Vdc1dXuLduDa6hI2IHZKtJlL0pSQLSVU12CLLbTKPgoZK1
+   f03YLNBh2bHvAz9/wNx01JE+u24D/Zt2kd1EhcV95Iqujk/RQ1+bDw2RE
+   3j3kWMsmD5eI0L5obUJYlKWn4lCcViLaKwhk4GFks0/k4ut7kcWB+8eq7
+   MYjR3JNYElQjLXdTttp4l9bKnrzsVdREfVdBZa7ZlPU38c0VLDBNRkH8P
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10731"; a="353683380"
+X-IronPort-AV: E=Sophos;i="6.00,217,1681196400"; 
+   d="scan'208";a="353683380"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2023 07:27:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10731"; a="1038500979"
+X-IronPort-AV: E=Sophos;i="6.00,217,1681196400"; 
+   d="scan'208";a="1038500979"
+Received: from tdhastx-mobl2.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.50.31])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2023 07:27:54 -0700
+From:   Kai Huang <kai.huang@intel.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, dave.hansen@intel.com,
+        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
+        peterz@infradead.org, tglx@linutronix.de, seanjc@google.com,
+        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, ying.huang@intel.com,
+        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com, kai.huang@intel.com
+Subject: [PATCH v11 00/20] TDX host kernel support
+Date:   Mon,  5 Jun 2023 02:27:13 +1200
+Message-Id: <cover.1685887183.git.kai.huang@intel.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220127101044.13803-1-joro@8bytes.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,126 +65,371 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Joerg and Tom,
+Intel Trusted Domain Extensions (TDX) protects guest VMs from malicious
+host and certain physical attacks.  TDX specs are available in [1].
 
-On 01/27/22 at 11:10am, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
-> 
-> Hi,
-> 
-> here are changes to enable kexec/kdump in SEV-ES guests. The biggest
-> problem for supporting kexec/kdump under SEV-ES is to find a way to
-> hand the non-boot CPUs (APs) from one kernel to another.
-> 
-> Without SEV-ES the first kernel parks the CPUs in a HLT loop until
-> they get reset by the kexec'ed kernel via an INIT-SIPI-SIPI sequence.
-> For virtual machines the CPU reset is emulated by the hypervisor,
-> which sets the vCPU registers back to reset state.
+This series is the initial support to enable TDX with minimal code to
+allow KVM to create and run TDX guests.  KVM support for TDX is being
+developed separately[2].  A new "userspace inaccessible memfd" approach
+to support TDX private memory is also being developed[3].  The KVM will
+only support the new "userspace inaccessible memfd" as TDX guest memory.
 
-Is there any plan for this patchset to proceed? Without this patchset,
-it does fail kexec and kdump with multiple cpus.
+This series doesn't aim to support all functionalities, and doesn't aim
+to resolve all things perfectly.  All other optimizations will be posted
+as follow-up once this initial TDX support is upstreamed.
 
-Thanks
-Baoquan
+Also, the patch to add the new kernel comline tdx="force" isn't included
+in this initial version, as Dave suggested it isn't mandatory.  But I
+will add one once this initial version gets merged.
 
-> 
-> This does not work under SEV-ES, because the hypervisor has no access
-> to the vCPU registers and can't make modifications to them. So an
-> SEV-ES guest needs to reset the vCPU itself and park it using the
-> AP-reset-hold protocol. Upon wakeup the guest needs to jump to
-> real-mode and to the reset-vector configured in the AP-Jump-Table.
-> 
-> The code to do this is the main part of this patch-set. It works by
-> placing code on the AP Jump-Table page itself to park the vCPU and for
-> jumping to the reset vector upon wakeup. The code on the AP Jump Table
-> runs in 16-bit protected mode with segment base set to the beginning
-> of the page. The AP Jump-Table is usually not within the first 1MB of
-> memory, so the code can't run in real-mode.
-> 
-> The AP Jump-Table is the best place to put the parking code, because
-> the memory is owned, but read-only by the firmware and writeable by
-> the OS. Only the first 4 bytes are used for the reset-vector, leaving
-> the rest of the page for code/data/stack to park a vCPU. The code
-> can't be in kernel memory because by the time the vCPU wakes up the
-> memory will be owned by the new kernel, which might have overwritten it
-> already.
-> 
-> The other patches add initial GHCB Version 2 protocol support, because
-> kexec/kdump need the MSR-based (without a GHCB) AP-reset-hold VMGEXIT,
-> which is a GHCB protocol version 2 feature.
-> 
-> The kexec'ed kernel is also entered via the decompressor and needs
-> MMIO support there, so this patch-set also adds MMIO #VC support to
-> the decompressor and support for handling CLFLUSH instructions.
-> 
-> Finally there is also code to disable kexec/kdump support at runtime
-> when the environment does not support it (e.g. no GHCB protocol
-> version 2 support or AP Jump Table over 4GB).
-> 
-> The diffstat looks big, but most of it is moving code for MMIO #VC
-> support around to make it available to the decompressor.
-> 
-> The previous version of this patch-set can be found here:
-> 
-> 	https://lore.kernel.org/lkml/20210913155603.28383-1-joro@8bytes.org/
-> 
-> Please review.
-> 
-> Thanks,
-> 
-> 	Joerg
-> 
-> Changes v2->v3:
-> 
-> 	- Rebased to v5.17-rc1
-> 	- Applied most review comments by Boris
-> 	- Use the name 'AP jump table' consistently
-> 	- Make kexec-disabling for unsupported guests x86-specific
-> 	- Cleanup and consolidate patches to detect GHCB v2 protocol
-> 	  support
-> 
-> Joerg Roedel (10):
->   x86/kexec/64: Disable kexec when SEV-ES is active
->   x86/sev: Save and print negotiated GHCB protocol version
->   x86/sev: Set GHCB data structure version
->   x86/sev: Cache AP Jump Table Address
->   x86/sev: Setup code to park APs in the AP Jump Table
->   x86/sev: Park APs on AP Jump Table with GHCB protocol version 2
->   x86/sev: Use AP Jump Table blob to stop CPU
->   x86/sev: Add MMIO handling support to boot/compressed/ code
->   x86/sev: Handle CLFLUSH MMIO events
->   x86/kexec/64: Support kexec under SEV-ES with AP Jump Table Blob
-> 
->  arch/x86/boot/compressed/sev.c          |  45 +-
->  arch/x86/include/asm/insn-eval.h        |   1 +
->  arch/x86/include/asm/realmode.h         |   5 +
->  arch/x86/include/asm/sev-ap-jumptable.h |  29 +
->  arch/x86/include/asm/sev.h              |  11 +-
->  arch/x86/kernel/machine_kexec_64.c      |  12 +
->  arch/x86/kernel/process.c               |   8 +
->  arch/x86/kernel/sev-shared.c            | 233 +++++-
->  arch/x86/kernel/sev.c                   | 404 +++++------
->  arch/x86/lib/insn-eval-shared.c         | 913 ++++++++++++++++++++++++
->  arch/x86/lib/insn-eval.c                | 909 +----------------------
->  arch/x86/realmode/Makefile              |   9 +-
->  arch/x86/realmode/rm/Makefile           |  11 +-
->  arch/x86/realmode/rm/header.S           |   3 +
->  arch/x86/realmode/rm/sev.S              |  85 +++
->  arch/x86/realmode/rmpiggy.S             |   6 +
->  arch/x86/realmode/sev/Makefile          |  33 +
->  arch/x86/realmode/sev/ap_jump_table.S   | 131 ++++
->  arch/x86/realmode/sev/ap_jump_table.lds |  24 +
->  19 files changed, 1730 insertions(+), 1142 deletions(-)
->  create mode 100644 arch/x86/include/asm/sev-ap-jumptable.h
->  create mode 100644 arch/x86/lib/insn-eval-shared.c
->  create mode 100644 arch/x86/realmode/rm/sev.S
->  create mode 100644 arch/x86/realmode/sev/Makefile
->  create mode 100644 arch/x86/realmode/sev/ap_jump_table.S
->  create mode 100644 arch/x86/realmode/sev/ap_jump_table.lds
-> 
-> 
-> base-commit: e783362eb54cd99b2cac8b3a9aeac942e6f6ac07
-> -- 
-> 2.34.1
-> 
+(For memory hotplug, sorry for broadcasting widely but I cc'ed the
+linux-mm@kvack.org following Kirill's suggestion so MM experts can also
+help to provide comments.)
+
+Hi Dave, Kirill, Tony, Peter, Thomas, Dan (and Intel reviewers),
+
+The new relaxed TDX per-cpu initialization flow has been verified.  The
+TDX module can be initialized when there are offline cpus, and the
+TDH.SYS.LP.INIT SEAMCALL can be made successfully later after module
+initialization when the offline cpu is up.
+
+This series mainly added code to handle the new TDX "partial write
+machine check" erratum (SPR113) in [4].
+
+And I would appreciate reviewed-by or acked-by tags if the patches look
+good to you.  Thanks in advance!
+
+----- Changelog history: ------
+
+- v10 -> v11:
+
+ - Addressed comments in v10
+ - Added patches to handle TDX "partial write machine check" erratum.
+ - Added a new patch to handle running out of entropy in common code.
+ - Fixed a bug in kexec() support.
+
+ v10: https://lore.kernel.org/kvm/cover.1678111292.git.kai.huang@intel.com/
+
+- v9 -> v10:
+
+ - Changed the per-cpu initalization handling
+   - Gave up "ensuring all online cpus are TDX-runnable when TDX module
+     is initialized", but just provide two basic functions, tdx_enable()
+     and tdx_cpu_enable(), to let the user of TDX to make sure the
+     tdx_cpu_enable() has been done successfully when the user wants to
+     use particular cpu for TDX.
+   - Thus, moved per-cpu initialization out of tdx_enable().  Now
+     tdx_enable() just assumes VMXON and tdx_cpu_enable() has been done
+     on all online cpus before calling it.
+   - Merged the tdx_enable() skeleton patch and per-cpu initialization
+     patch together to tell better story.
+   - Moved "SEAMCALL infrastructure" patch before the tdx_enable() patch.
+
+ v9: https://lore.kernel.org/lkml/cover.1676286526.git.kai.huang@intel.com/
+
+- v8 -> v9:
+
+ - Added patches to handle TDH.SYS.INIT and TDH.SYS.LP.INIT back.
+ - Other changes please refer to changelog histroy in individual patches.
+
+ v8: https://lore.kernel.org/lkml/cover.1670566861.git.kai.huang@intel.com/
+
+- v7 -> v8:
+
+ - 200+ LOC removed (from 1800+ -> 1600+).
+ - Removed patches to do TDH.SYS.INIT and TDH.SYS.LP.INIT
+   (Dave/Peter/Thomas).
+ - Removed patch to shut down TDX module (Sean).
+ - For memory hotplug, changed to reject non-TDX memory from
+   arch_add_memory() to memory_notifier (Dan/David).
+ - Simplified the "skeletion patch" as a result of removing
+   TDH.SYS.LP.INIT patch.
+ - Refined changelog/comments for most of the patches (to tell better
+   story, remove silly comments, etc) (Dave).
+ - Added new 'struct tdmr_info_list' struct, and changed all TDMR related
+   patches to use it (Dave).
+ - Effectively merged patch "Reserve TDX module global KeyID" and
+   "Configure TDX module with TDMRs and global KeyID", and removed the
+   static variable 'tdx_global_keyid', following Dave's suggestion on
+   making tdx_sysinfo local variable.
+ - For detailed changes please see individual patch changelog history.
+
+ v7: https://lore.kernel.org/lkml/529a22d05e21b9218dc3f29c17ac5a176334cac1.camel@intel.com/T/
+
+- v6 -> v7:
+  - Added memory hotplug support.
+  - Changed how to choose the list of "TDX-usable" memory regions from at
+    kernel boot time to TDX module initialization time.
+  - Addressed comments received in previous versions. (Andi/Dave).
+  - Improved the commit message and the comments of kexec() support patch,
+    and the patch handles returnning PAMTs back to the kernel when TDX
+    module initialization fails. Please also see "kexec()" section below.
+  - Changed the documentation patch accordingly.
+  - For all others please see individual patch changelog history.
+
+ v6: https://lore.kernel.org/lkml/529a22d05e21b9218dc3f29c17ac5a176334cac1.camel@intel.com/T/
+
+- v5 -> v6:
+
+  - Removed ACPI CPU/memory hotplug patches. (Intel internal discussion)
+  - Removed patch to disable driver-managed memory hotplug (Intel
+    internal discussion).
+  - Added one patch to introduce enum type for TDX supported page size
+    level to replace the hard-coded values in TDX guest code (Dave).
+  - Added one patch to make TDX depends on X2APIC being enabled (Dave).
+  - Added one patch to build all boot-time present memory regions as TDX
+    memory during kernel boot.
+  - Added Reviewed-by from others to some patches.
+  - For all others please see individual patch changelog history.
+
+ v5: https://lore.kernel.org/lkml/529a22d05e21b9218dc3f29c17ac5a176334cac1.camel@intel.com/T/
+
+- v4 -> v5:
+
+  This is essentially a resent of v4.  Sorry I forgot to consult
+  get_maintainer.pl when sending out v4, so I forgot to add linux-acpi
+  and linux-mm mailing list and the relevant people for 4 new patches.
+
+  There are also very minor code and commit message update from v4:
+
+  - Rebased to latest tip/x86/tdx.
+  - Fixed a checkpatch issue that I missed in v4.
+  - Removed an obsoleted comment that I missed in patch 6.
+  - Very minor update to the commit message of patch 12.
+
+  For other changes to individual patches since v3, please refer to the
+  changelog histroy of individual patches (I just used v3 -> v5 since
+  there's basically no code change to v4).
+
+ v4: https://lore.kernel.org/lkml/98c84c31d8f062a0b50a69ef4d3188bc259f2af2.1654025431.git.kai.huang@intel.com/T/
+
+- v3 -> v4 (addressed Dave's comments, and other comments from others):
+
+ - Simplified SEAMRR and TDX keyID detection.
+ - Added patches to handle ACPI CPU hotplug.
+ - Added patches to handle ACPI memory hotplug and driver managed memory
+   hotplug.
+ - Removed tdx_detect() but only use single tdx_init().
+ - Removed detecting TDX module via P-SEAMLDR.
+ - Changed from using e820 to using memblock to convert system RAM to TDX
+   memory.
+ - Excluded legacy PMEM from TDX memory.
+ - Removed the boot-time command line to disable TDX patch.
+ - Addressed comments for other individual patches (please see individual
+   patches).
+ - Improved the documentation patch based on the new implementation.
+
+ v3: https://lore.kernel.org/lkml/529a22d05e21b9218dc3f29c17ac5a176334cac1.camel@intel.com/T/
+
+- V2 -> v3:
+
+ - Addressed comments from Isaku.
+  - Fixed memory leak and unnecessary function argument in the patch to
+    configure the key for the global keyid (patch 17).
+  - Enhanced a little bit to the patch to get TDX module and CMR
+    information (patch 09).
+  - Fixed an unintended change in the patch to allocate PAMT (patch 13).
+ - Addressed comments from Kevin:
+  - Slightly improvement on commit message to patch 03.
+ - Removed WARN_ON_ONCE() in the check of cpus_booted_once_mask in
+   seamrr_enabled() (patch 04).
+ - Changed documentation patch to add TDX host kernel support materials
+   to Documentation/x86/tdx.rst together with TDX guest staff, instead
+   of a standalone file (patch 21)
+ - Very minor improvement in commit messages.
+
+ v2: https://lore.kernel.org/lkml/529a22d05e21b9218dc3f29c17ac5a176334cac1.camel@intel.com/T/
+
+- RFC (v1) -> v2:
+  - Rebased to Kirill's latest TDX guest code.
+  - Fixed two issues that are related to finding all RAM memory regions
+    based on e820.
+  - Minor improvement on comments and commit messages.
+
+ v1: https://lore.kernel.org/lkml/529a22d05e21b9218dc3f29c17ac5a176334cac1.camel@intel.com/T/
+
+== Background ==
+
+TDX introduces a new CPU mode called Secure Arbitration Mode (SEAM)
+and a new isolated range pointed by the SEAM Ranger Register (SEAMRR).
+A CPU-attested software module called 'the TDX module' runs in the new
+isolated region as a trusted hypervisor to create/run protected VMs.
+
+TDX also leverages Intel Multi-Key Total Memory Encryption (MKTME) to
+provide crypto-protection to the VMs.  TDX reserves part of MKTME KeyIDs
+as TDX private KeyIDs, which are only accessible within the SEAM mode.
+
+TDX is different from AMD SEV/SEV-ES/SEV-SNP, which uses a dedicated
+secure processor to provide crypto-protection.  The firmware runs on the
+secure processor acts a similar role as the TDX module.
+
+The host kernel communicates with SEAM software via a new SEAMCALL
+instruction.  This is conceptually similar to a guest->host hypercall,
+except it is made from the host to SEAM software instead.
+
+Before being able to manage TD guests, the TDX module must be loaded
+and properly initialized.  This series assumes the TDX module is loaded
+by BIOS before the kernel boots.
+
+How to initialize the TDX module is described at TDX module 1.0
+specification, chapter "13.Intel TDX Module Lifecycle: Enumeration,
+Initialization and Shutdown".
+
+== Design Considerations ==
+
+1. Initialize the TDX module at runtime
+
+There are basically two ways the TDX module could be initialized: either
+in early boot, or at runtime before the first TDX guest is run.  This
+series implements the runtime initialization.
+
+Also, TDX requires a per-cpu initialization SEAMCALL to be done before
+making any SEAMCALL on that cpu.
+
+This series adds two functions: tdx_cpu_enable() and tdx_enable() to do
+per-cpu initialization and module initialization respectively.
+
+2. CPU hotplug
+
+DX doesn't support physical (ACPI) CPU hotplug.  A non-buggy BIOS should
+never support hotpluggable CPU devicee and/or deliver ACPI CPU hotplug
+event to the kernel.  This series doesn't handle physical (ACPI) CPU
+hotplug at all but depends on the BIOS to behave correctly.
+
+Also, tdx_cpu_enable() will simply return error for any hot-added cpu if
+something insane happened.
+
+Note TDX works with CPU logical online/offline, thus this series still
+allows to do logical CPU online/offline.
+
+3. Kernel policy on TDX memory
+
+The TDX module reports a list of "Convertible Memory Region" (CMR) to
+indicate which memory regions are TDX-capable.  The TDX architecture
+allows the VMM to designate specific convertible memory regions as usable
+for TDX private memory.
+
+The initial support of TDX guests will only allocate TDX private memory
+from the global page allocator.  This series chooses to designate _all_
+system RAM in the core-mm at the time of initializing TDX module as TDX
+memory to guarantee all pages in the page allocator are TDX pages.
+
+4. Memory Hotplug
+
+After the kernel passes all "TDX-usable" memory regions to the TDX
+module, the set of "TDX-usable" memory regions are fixed during module's
+runtime.  No more "TDX-usable" memory can be added to the TDX module
+after that.
+
+To achieve above "to guarantee all pages in the page allocator are TDX
+pages", this series simply choose to reject any non-TDX-usable memory in
+memory hotplug.
+
+5. Physical Memory Hotplug
+
+Note TDX assumes convertible memory is always physically present during
+machine's runtime.  A non-buggy BIOS should never support hot-removal of
+any convertible memory.  This implementation doesn't handle ACPI memory
+removal but depends on the BIOS to behave correctly.
+
+Also, if something insane really happened, 4) makes sure either TDX
+cannot be enabled or hot-added memory will be rejected after TDX gets
+enabled.
+
+6. Kexec()
+
+Similar to AMD's SME, in kexec() kernel needs to flush dirty cachelines
+of TDX private memory otherwise they may silently corrupt the new kernel.
+
+7. TDX erratum
+
+The first few generations of TDX hardware have an erratum.  A partial
+write to a TDX private memory cacheline will silently "poison" the
+line.  Subsequent reads will consume the poison and generate a machine
+check.
+
+The fast warm reset reboot doesn't reset TDX private memory.  With this
+erratum, all TDX private pages needs to be converted back to normal
+before a fast warm reset reboot or booting to the new kernel in kexec().
+Otherwise, the new kernel may get unexpected machine check.
+
+In normal condition, triggering the erratum in Linux requires some kind
+of kernel bug involving relatively exotic memory writes to TDX private
+memory and will manifest via spurious-looking machine checks when
+reading the affected memory.  Machine check handler is improved to deal
+with such machine check.
+
+
+[1]: TDX specs
+https://software.intel.com/content/www/us/en/develop/articles/intel-trust-domain-extensions.html
+
+[2]: KVM TDX basic feature support
+https://lore.kernel.org/kvm/cover.1685333727.git.isaku.yamahata@intel.com/T/#t
+
+[3]: KVM: mm: fd-based approach for supporting KVM
+https://lore.kernel.org/kvm/20221202061347.1070246-1-chao.p.peng@linux.intel.com/
+
+[4]: TDX erratum
+https://cdrdv2.intel.com/v1/dl/getContent/772415?explicitVersion=true
+
+
+
+Kai Huang (20):
+  x86/tdx: Define TDX supported page sizes as macros
+  x86/virt/tdx: Detect TDX during kernel boot
+  x86/virt/tdx: Make INTEL_TDX_HOST depend on X86_X2APIC
+  x86/cpu: Detect TDX partial write machine check erratum
+  x86/virt/tdx: Add SEAMCALL infrastructure
+  x86/virt/tdx: Handle SEAMCALL running out of entropy error
+  x86/virt/tdx: Add skeleton to enable TDX on demand
+  x86/virt/tdx: Get information about TDX module and TDX-capable memory
+  x86/virt/tdx: Use all system memory when initializing TDX module as
+    TDX memory
+  x86/virt/tdx: Add placeholder to construct TDMRs to cover all TDX
+    memory regions
+  x86/virt/tdx: Fill out TDMRs to cover all TDX memory regions
+  x86/virt/tdx: Allocate and set up PAMTs for TDMRs
+  x86/virt/tdx: Designate reserved areas for all TDMRs
+  x86/virt/tdx: Configure TDX module with the TDMRs and global KeyID
+  x86/virt/tdx: Configure global KeyID on all packages
+  x86/virt/tdx: Initialize all TDMRs
+  x86/kexec: Flush cache of TDX private memory
+  x86: Handle TDX erratum to reset TDX private memory during kexec() and
+    reboot
+  x86/mce: Improve error log of kernel space TDX #MC due to erratum
+  Documentation/x86: Add documentation for TDX host support
+
+ Documentation/arch/x86/tdx.rst     |  186 +++-
+ arch/x86/Kconfig                   |   15 +
+ arch/x86/Makefile                  |    2 +
+ arch/x86/coco/tdx/tdx.c            |    6 +-
+ arch/x86/include/asm/cpufeatures.h |    1 +
+ arch/x86/include/asm/msr-index.h   |    3 +
+ arch/x86/include/asm/tdx.h         |   23 +
+ arch/x86/include/asm/x86_init.h    |    1 +
+ arch/x86/kernel/cpu/intel.c        |   21 +
+ arch/x86/kernel/cpu/mce/core.c     |   33 +
+ arch/x86/kernel/process.c          |    7 +-
+ arch/x86/kernel/reboot.c           |   16 +
+ arch/x86/kernel/setup.c            |    2 +
+ arch/x86/kernel/x86_init.c         |    2 +
+ arch/x86/virt/Makefile             |    2 +
+ arch/x86/virt/vmx/Makefile         |    2 +
+ arch/x86/virt/vmx/tdx/Makefile     |    2 +
+ arch/x86/virt/vmx/tdx/seamcall.S   |   52 +
+ arch/x86/virt/vmx/tdx/tdx.c        | 1526 ++++++++++++++++++++++++++++
+ arch/x86/virt/vmx/tdx/tdx.h        |  161 +++
+ arch/x86/virt/vmx/tdx/tdxcall.S    |   19 +-
+ 21 files changed, 2065 insertions(+), 17 deletions(-)
+ create mode 100644 arch/x86/virt/Makefile
+ create mode 100644 arch/x86/virt/vmx/Makefile
+ create mode 100644 arch/x86/virt/vmx/tdx/Makefile
+ create mode 100644 arch/x86/virt/vmx/tdx/seamcall.S
+ create mode 100644 arch/x86/virt/vmx/tdx/tdx.c
+ create mode 100644 arch/x86/virt/vmx/tdx/tdx.h
+
+
+base-commit: 122333d6bd229af279cdb35d1b874b71b3b9ccfb
+-- 
+2.40.1
 
