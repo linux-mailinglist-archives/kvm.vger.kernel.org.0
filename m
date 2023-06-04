@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2D3A7217CA
-	for <lists+kvm@lfdr.de>; Sun,  4 Jun 2023 16:31:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BEB2D7217C3
+	for <lists+kvm@lfdr.de>; Sun,  4 Jun 2023 16:31:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232419AbjFDObL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Jun 2023 10:31:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51662 "EHLO
+        id S232250AbjFDOa4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Jun 2023 10:30:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231874AbjFDOan (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Jun 2023 10:30:43 -0400
+        with ESMTP id S231786AbjFDOam (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Jun 2023 10:30:42 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF64B1BB;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF55E1B8;
         Sun,  4 Jun 2023 07:30:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1685889035; x=1717425035;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2acFdh8Y1N4LJriSc5TNMCWEQYU2QM2INyk/4DortCw=;
-  b=lFV04aG27CrLpu+xqyqeda9Gb4c4C9CP7PnQ7kaxIiQARDwXLxoIpDDi
-   OgAXhmRTAn54XqGechHSha2MTFwpF61SQvhc1esLlL/mXco/q01qKvMtK
-   kZpL0pVYgHoygab39U8qlDPMJFOtSlpsfPq31hfIsc1As0q+xYE8XqJVU
-   Q95mbXD4fjQ8b3JmvUT7qPx6mOrmfumrsMNXgDWCo3q6ma1D0h7cQDqoj
-   W57MpNAnVgY3LbNy2/ujoFiWNJtszfN1cHFg7h8mCKE4bJe2IewhQLWZk
-   EnmZ38/lrk9EG2uJaBfuJxoTcvUA47b2fdrgAWsCOmvJMKYnTlozC+uf+
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10731"; a="353683686"
+  bh=FaVM6SLOSHqfwOzsrSInUMJZns3IWGAfasrKkA6dHGQ=;
+  b=gNNk92Eb2j/TX3O8c/hxZ2G7t7K9G0IYqZVXvjL/zx5AYiU0vOugr9Bt
+   Li1BWDE27JME/GwDAcC2L2o9YKF1pJlWuHy1ZUsJnflZ0ocBgljgiwE2C
+   A95dRbhXeryRukhyOr6OY3FivTo8Yi7heHIYsfH5MrFhlrrWPSYcKwJlR
+   idzrDGBHR1SMRqFbnEF6qMAbZuBiZGOSRBLXkoAGgptDwaqulK3/EaaVM
+   n6H2ftQR6v9/u18O/Ipvw2sqonwCOrmF49/ApqZaTXEVA1y3rrbOlEqvg
+   dGvj1n12R16m+BhDsvE378PD9QN8x9uOBox/CSYoj1uXVLu7CevaR685i
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10731"; a="353683710"
 X-IronPort-AV: E=Sophos;i="6.00,217,1681196400"; 
-   d="scan'208";a="353683686"
+   d="scan'208";a="353683710"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2023 07:29:23 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2023 07:29:28 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10731"; a="1038501215"
+X-IronPort-AV: E=McAfee;i="6600,9927,10731"; a="1038501221"
 X-IronPort-AV: E=Sophos;i="6.00,217,1681196400"; 
-   d="scan'208";a="1038501215"
+   d="scan'208";a="1038501221"
 Received: from tdhastx-mobl2.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.50.31])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2023 07:29:19 -0700
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2023 07:29:23 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, dave.hansen@intel.com,
@@ -49,9 +49,9 @@ Cc:     linux-mm@kvack.org, dave.hansen@intel.com,
         isaku.yamahata@intel.com, chao.gao@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
         sagis@google.com, imammedo@redhat.com, kai.huang@intel.com
-Subject: [PATCH v11 18/20] x86: Handle TDX erratum to reset TDX private memory during kexec() and reboot
-Date:   Mon,  5 Jun 2023 02:27:31 +1200
-Message-Id: <5aa7506d4fedbf625e3fe8ceeb88af3be1ce97ea.1685887183.git.kai.huang@intel.com>
+Subject: [PATCH v11 19/20] x86/mce: Improve error log of kernel space TDX #MC due to erratum
+Date:   Mon,  5 Jun 2023 02:27:32 +1200
+Message-Id: <116cafb15625ac0bcda7b47143921d0c42061b69.1685887183.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <cover.1685887183.git.kai.huang@intel.com>
 References: <cover.1685887183.git.kai.huang@intel.com>
@@ -67,11 +67,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The first few generations of TDX hardware have an erratum.  A partial
-write to a TDX private memory cacheline will silently "poison" the
-line.  Subsequent reads will consume the poison and generate a machine
-check.  According to the TDX hardware spec, neither of these things
-should have happened.
+The first few generations of TDX hardware have an erratum.  Triggering
+it in Linux requires some kind of kernel bug involving relatively exotic
+memory writes to TDX private memory and will manifest via
+spurious-looking machine checks when reading the affected memory.
 
 == Background ==
 
@@ -88,56 +87,78 @@ CPU by devices doing partial writes via DMA.
 
 == Problem ==
 
-A fast warm reset doesn't reset TDX private memory.  Kexec() can also
-boot into the new kernel directly.  Thus if the old kernel has enabled
-TDX on the platform with this erratum, the new kernel may get unexpected
-machine check.
+A partial write to a TDX private memory cacheline will silently "poison"
+the line.  Subsequent reads will consume the poison and generate a
+machine check.  According to the TDX hardware spec, neither of these
+things should have happened.
 
-Note that w/o this erratum any kernel read/write on TDX private memory
-should never cause machine check, thus it's OK for the old kernel to
-leave TDX private pages as is.
+To add insult to injury, the Linux machine code will present these as a
+literal "Hardware error" when they were, in fact, a software-triggered
+issue.
 
 == Solution ==
 
-In short, with this erratum, the kernel needs to explicitly convert all
-TDX private pages back to normal to give the new kernel a clean slate
-after either a fast warm reset or kexec().
+In the end, this issue is hard to trigger.  Rather than do something
+rash (and incomplete) like unmap TDX private memory from the direct map,
+improve the machine check handler.
 
-There's no existing infrastructure to track TDX private pages, which
-could be PAMT pages, TDX guest private pages, or SEPT (secure EPT)
-pages.  The latter two are yet to be implemented thus it's not certain
-how to track them for now.
+Currently, the #MC handler doesn't distinguish whether the memory is
+TDX private memory or not but just dump, for instance, below message:
 
-It's not feasible to query the TDX module either because VMX has already
-been stopped when KVM receives the reboot notifier.
+ [...] mce: [Hardware Error]: CPU 147: Machine Check Exception: f Bank 1: bd80000000100134
+ [...] mce: [Hardware Error]: RIP 10:<ffffffffadb69870> {__tlb_remove_page_size+0x10/0xa0}
+ 	...
+ [...] mce: [Hardware Error]: Run the above through 'mcelog --ascii'
+ [...] mce: [Hardware Error]: Machine check: Data load in unrecoverable area of kernel
+ [...] Kernel panic - not syncing: Fatal local machine check
 
-Another option is to blindly convert all memory pages.  But this may
-bring non-trivial latency to machine reboot and kexec() on large memory
-systems (especially when the number of TDX private pages is small).  A
-final solution should be tracking TDX private pages and only converting
-them.  Also, it's problematic to convert all memory pages because not
-all pages are mapped as writable in the direct-mapping.  Thus to do so
-would require switching to a new page table which maps all pages as
-writable.  Such page table can either be a new page table, or the
-identical mapping table built during kexec().  Using either seems too
-dramatic, especially considering the kernel should eventually be able
-to track all TDX private pages in which case the direct-mapping can be
-directly used.
+Which says "Hardware Error" and "Data load in unrecoverable area of
+kernel".
 
-So for now just convert PAMT pages.  Converting TDX guest private pages
-and SEPT pages can be added when supporting TDX guests is added to the
-kernel.
+Ideally, it's better for the log to say "software bug around TDX private
+memory" instead of "Hardware Error".  But in reality the real hardware
+memory error can happen, and sadly such software-triggered #MC cannot be
+distinguished from the real hardware error.  Also, the error message is
+used by userspace tool 'mcelog' to parse, so changing the output may
+break userspace.
 
-Introduce a new "x86_platform_ops::memory_shutdown()" callback as a
-placeholder to convert all TDX private memory, and call it at the end of
-machine_shutdown() after all remote cpus have been stopped (thus no more
-TDX activities) and all dirty cachelines of TDX private memory have been
-flushed (thus no more later cacheline writeback).
+So keep the "Hardware Error".  The "Data load in unrecoverable area of
+kernel" is also helpful, so keep it too.
 
-Implement the default callback as a noop function.  Replace the callback
-with TDX's own implementation when the platform has this erratum in TDX
-early boot-time initialization.  In this way only the platforms with
-this erratum carry this additional memory conversion burden.
+Instead of modifying above error log, improve the error log by printing
+additional TDX related message to make the log like:
+
+  ...
+ [...] mce: [Hardware Error]: Machine check: Data load in unrecoverable area of kernel
+ [...] mce: [Hardware Error]: Machine Check: Memory error from TDX private memory. May be result of CPU erratum.
+
+Adding this additional message requires determination of whether the
+memory page is TDX private memory.  There is no existing infrastructure
+to do that.  Add an interface to query the TDX module to fill this gap.
+
+== Impact ==
+
+This issue requires some kind of kernel bug to trigger.
+
+TDX private memory should never be mapped UC/WC.  A partial write
+originating from these mappings would require *two* bugs, first mapping
+the wrong page, then writing the wrong memory.  It would also be
+detectable using traditional memory corruption techniques like
+DEBUG_PAGEALLOC.
+
+MOVNTI (and friends) could cause this issue with something like a simple
+buffer overrun or use-after-free on the direct map.  It should also be
+detectable with normal debug techniques.
+
+The one place where this might get nasty would be if the CPU read data
+then wrote back the same data.  That would trigger this problem but
+would not, for instance, set off mechanisms like slab redzoning because
+it doesn't actually corrupt data.
+
+With an IOMMU at least, the DMA exposure is similar to the UC/WC issue.
+TDX private memory would first need to be incorrectly mapped into the
+I/O space and then a later DMA to that mapping would actually cause the
+poisoning event.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
@@ -146,138 +167,220 @@ v10 -> v11:
  - New patch
 
 ---
- arch/x86/include/asm/x86_init.h |  1 +
- arch/x86/kernel/reboot.c        |  1 +
- arch/x86/kernel/x86_init.c      |  2 ++
- arch/x86/virt/vmx/tdx/tdx.c     | 57 +++++++++++++++++++++++++++++++++
- 4 files changed, 61 insertions(+)
+ arch/x86/include/asm/tdx.h     |   2 +
+ arch/x86/kernel/cpu/mce/core.c |  33 +++++++++++
+ arch/x86/virt/vmx/tdx/tdx.c    | 100 +++++++++++++++++++++++++++++++++
+ arch/x86/virt/vmx/tdx/tdx.h    |   6 ++
+ 4 files changed, 141 insertions(+)
 
-diff --git a/arch/x86/include/asm/x86_init.h b/arch/x86/include/asm/x86_init.h
-index 88085f369ff6..d2c6742b185a 100644
---- a/arch/x86/include/asm/x86_init.h
-+++ b/arch/x86/include/asm/x86_init.h
-@@ -299,6 +299,7 @@ struct x86_platform_ops {
- 	void (*get_wallclock)(struct timespec64 *ts);
- 	int (*set_wallclock)(const struct timespec64 *ts);
- 	void (*iommu_shutdown)(void);
-+	void (*memory_shutdown)(void);
- 	bool (*is_untracked_pat_range)(u64 start, u64 end);
- 	void (*nmi_init)(void);
- 	unsigned char (*get_nmi_reason)(void);
-diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
-index b3d0e015dae2..6aadfec8df7a 100644
---- a/arch/x86/kernel/reboot.c
-+++ b/arch/x86/kernel/reboot.c
-@@ -720,6 +720,7 @@ void native_machine_shutdown(void)
+diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+index 03f74851608f..a20d9ca99e31 100644
+--- a/arch/x86/include/asm/tdx.h
++++ b/arch/x86/include/asm/tdx.h
+@@ -104,10 +104,12 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
+ bool platform_tdx_enabled(void);
+ int tdx_cpu_enable(void);
+ int tdx_enable(void);
++bool tdx_is_private_mem(unsigned long phys);
+ #else	/* !CONFIG_INTEL_TDX_HOST */
+ static inline bool platform_tdx_enabled(void) { return false; }
+ static inline int tdx_cpu_enable(void) { return -ENODEV; }
+ static inline int tdx_enable(void)  { return -ENODEV; }
++static inline bool tdx_is_private_mem(unsigned long phys) { return false; }
+ #endif	/* CONFIG_INTEL_TDX_HOST */
  
- #ifdef CONFIG_X86_64
- 	x86_platform.iommu_shutdown();
-+	x86_platform.memory_shutdown();
- #endif
+ #endif /* !__ASSEMBLY__ */
+diff --git a/arch/x86/kernel/cpu/mce/core.c b/arch/x86/kernel/cpu/mce/core.c
+index 2eec60f50057..5ad7b563632f 100644
+--- a/arch/x86/kernel/cpu/mce/core.c
++++ b/arch/x86/kernel/cpu/mce/core.c
+@@ -52,6 +52,7 @@
+ #include <asm/mce.h>
+ #include <asm/msr.h>
+ #include <asm/reboot.h>
++#include <asm/tdx.h>
+ 
+ #include "internal.h"
+ 
+@@ -228,11 +229,34 @@ static void wait_for_panic(void)
+ 	panic("Panicing machine check CPU died");
  }
  
-diff --git a/arch/x86/kernel/x86_init.c b/arch/x86/kernel/x86_init.c
-index d82f4fa2f1bf..344250b35a5d 100644
---- a/arch/x86/kernel/x86_init.c
-+++ b/arch/x86/kernel/x86_init.c
-@@ -31,6 +31,7 @@ void x86_init_noop(void) { }
- void __init x86_init_uint_noop(unsigned int unused) { }
- static int __init iommu_init_noop(void) { return 0; }
- static void iommu_shutdown_noop(void) { }
-+static void memory_shutdown_noop(void) { }
- bool __init bool_x86_init_noop(void) { return false; }
- void x86_op_int_noop(int cpu) { }
- int set_rtc_noop(const struct timespec64 *now) { return -EINVAL; }
-@@ -142,6 +143,7 @@ struct x86_platform_ops x86_platform __ro_after_init = {
- 	.get_wallclock			= mach_get_cmos_time,
- 	.set_wallclock			= mach_set_cmos_time,
- 	.iommu_shutdown			= iommu_shutdown_noop,
-+	.memory_shutdown		= memory_shutdown_noop,
- 	.is_untracked_pat_range		= is_ISA_range,
- 	.nmi_init			= default_nmi_init,
- 	.get_nmi_reason			= default_get_nmi_reason,
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 8ff07256a515..0aa413b712e8 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -587,6 +587,14 @@ static int tdmr_set_up_pamt(struct tdmr_info *tdmr,
- 		tdmr_pamt_base += pamt_size[pgsz];
- 	}
- 
-+	/*
-+	 * tdx_memory_shutdown() also reads TDMR's PAMT during
-+	 * kexec() or reboot, which could happen at anytime, even
-+	 * during this particular code.  Make sure pamt_4k_base
-+	 * is firstly set otherwise tdx_memory_shutdown() may
-+	 * get an invalid PAMT base when it sees a valid number
-+	 * of PAMT pages.
-+	 */
- 	tdmr->pamt_4k_base = pamt_base[TDX_PS_4K];
- 	tdmr->pamt_4k_size = pamt_size[TDX_PS_4K];
- 	tdmr->pamt_2m_base = pamt_base[TDX_PS_2M];
-@@ -1318,6 +1326,46 @@ static struct notifier_block tdx_memory_nb = {
- 	.notifier_call = tdx_memory_notifier,
- };
- 
-+static void tdx_memory_shutdown(void)
++static const char *mce_memory_info(struct mce *m)
 +{
-+	/*
-+	 * Convert all TDX private pages back to normal if the platform
-+	 * has "partial write machine check" erratum.
-+	 *
-+	 * For now there's no existing infrastructure to tell whether
-+	 * a page is TDX private memory.  Using SEAMCALL to query TDX
-+	 * module isn't feasible either because: 1) VMX has been turned
-+	 * off by reaching here so SEAMCALL cannot be made; 2) Even
-+	 * SEAMCALL can be made the result from TDX module may not be
-+	 * accurate (e.g., remote CPU can be stopped while the kernel
-+	 * is in the middle of reclaiming one TDX private page and doing
-+	 * MOVDIR64B).
-+	 *
-+	 * One solution could be just converting all memory pages, but
-+	 * this may bring non-trivial latency on large memory systems
-+	 * (especially when the number of TDX private pages is small).
-+	 * Looks eventually the kernel should track TDX private pages and
-+	 * only convert these.
-+	 *
-+	 * Also, not all pages are mapped as writable in direct mapping,
-+	 * thus it's problematic to do so.  It can be done by switching
-+	 * to the identical mapping page table built for kexec(), which
-+	 * maps all pages as writable, but the complexity looks overkill.
-+	 *
-+	 * Thus instead of doing something dramatic to convert all pages,
-+	 * only convert PAMTs for now as for now TDX private pages can
-+	 * only be PAMT.  Converting TDX guest private pages and Secure
-+	 * EPT pages can be added later when the kernel has a proper way
-+	 * to track these pages.
-+	 *
-+	 * All other cpus are already dead, thus it's safe to read TDMRs
-+	 * to find PAMTs w/o holding any kind of locking here.
-+	 */
-+	WARN_ON_ONCE(num_online_cpus() != 1);
++	if (!m || !mce_is_memory_error(m) || !mce_usable_address(m))
++		return NULL;
 +
-+	tdmrs_reset_pamt_all(&tdx_tdmr_list);
++	/*
++	 * Certain initial generations of TDX-capable CPUs have an
++	 * erratum.  A kernel non-temporal partial write to TDX private
++	 * memory poisons that memory, and a subsequent read of that
++	 * memory triggers #MC.
++	 *
++	 * However such #MC caused by software cannot be distinguished
++	 * from the real hardware #MC.  Just print additional message
++	 * to show such #MC may be result of the CPU erratum.
++	 */
++	if (!boot_cpu_has_bug(X86_BUG_TDX_PW_MCE))
++		return NULL;
++
++	return !tdx_is_private_mem(m->addr) ? NULL :
++		"Memory error from TDX private memory. May be result of CPU erratum.";
 +}
 +
- static int __init tdx_init(void)
+ static noinstr void mce_panic(const char *msg, struct mce *final, char *exp)
  {
- 	u32 tdx_keyid_start, nr_tdx_keyids;
-@@ -1356,6 +1404,15 @@ static int __init tdx_init(void)
- 	tdx_guest_keyid_start = ++tdx_keyid_start;
- 	tdx_nr_guest_keyids = --nr_tdx_keyids;
+ 	struct llist_node *pending;
+ 	struct mce_evt_llist *l;
+ 	int apei_err = 0;
++	const char *memmsg;
  
+ 	/*
+ 	 * Allow instrumentation around external facilities usage. Not that it
+@@ -283,6 +307,15 @@ static noinstr void mce_panic(const char *msg, struct mce *final, char *exp)
+ 	}
+ 	if (exp)
+ 		pr_emerg(HW_ERR "Machine check: %s\n", exp);
 +	/*
-+	 * On the platform with erratum all TDX private pages need to
-+	 * be converted back to normal before rebooting (warm reset) or
-+	 * before kexec() booting to the new kernel, otherwise the (new)
-+	 * kernel may get unexpected SRAR machine check exception.
++	 * Confidential computing platforms such as TDX platforms
++	 * may occur MCE due to incorrect access to confidential
++	 * memory.  Print additional information for such error.
 +	 */
-+	if (boot_cpu_has_bug(X86_BUG_TDX_PW_MCE))
-+		x86_platform.memory_shutdown = tdx_memory_shutdown;
++	memmsg = mce_memory_info(final);
++	if (memmsg)
++		pr_emerg(HW_ERR "Machine check: %s\n", memmsg);
 +
- 	return 0;
- no_tdx:
- 	return -ENODEV;
+ 	if (!fake_panic) {
+ 		if (panic_timeout == 0)
+ 			panic_timeout = mca_cfg.panic_timeout;
+diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+index 0aa413b712e8..4aa41352edfc 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.c
++++ b/arch/x86/virt/vmx/tdx/tdx.c
+@@ -1250,6 +1250,106 @@ int tdx_enable(void)
+ }
+ EXPORT_SYMBOL_GPL(tdx_enable);
+ 
++static bool is_pamt_page(unsigned long phys)
++{
++	struct tdmr_info_list *tdmr_list = &tdx_tdmr_list;
++	unsigned long pfn;
++	int i;
++
++	/*
++	 * This function is called from #MC handler, and theoretically
++	 * it could run in parallel with the TDX module initialization
++	 * on other logical cpus.  But it's not OK to hold mutex here
++	 * so just blindly check module status.  This should work most
++	 * of the time.
++	 */
++	if (tdx_module_status != TDX_MODULE_INITIALIZED)
++		return false;
++
++	pfn = phys >> PAGE_SHIFT;
++	for (i = 0; i < tdmr_list->nr_consumed_tdmrs; i++) {
++		unsigned long pamt_pfn, npages;
++
++		tdmr_get_pamt(tdmr_entry(tdmr_list, i), &pamt_pfn, &npages);
++
++		if (pfn >= pamt_pfn && pfn < (pamt_pfn + npages))
++			return true;
++	}
++
++	return false;
++}
++
++/*
++ * Return whether the memory page at the given physical address is
++ * TDX private memory or not.  This function is called from #MC
++ * handler do_machine_check() with IRQ disabled.
++ *
++ * Note this function may not return accurate result in rare cases, but
++ * this is fine as the #MC handler doesn't need a 100% accurate result
++ * because it cannot distinguish #MC between software bug and real
++ * hardware error anyway.
++ */
++bool tdx_is_private_mem(unsigned long phys)
++{
++	struct tdx_module_output out;
++	u64 sret;
++
++	if (!platform_tdx_enabled())
++		return false;
++
++	/* Get page type via TDH.PHYMEM.PAGE.RDMD SEAMCALL. */
++	sret = __seamcall(TDH_PHYMEM_PAGE_RDMD, phys & PAGE_MASK,
++			0, 0, 0, &out);
++	/*
++	 * Handle the case that CPU isn't in VMX operation.
++	 *
++	 * KVM guarantees no VM is running (thus no TDX guest)
++	 * when there's any online CPU isn't in VMX operation.
++	 * This means there will be no TDX guest private memory
++	 * and Secure-EPT pages.  However the TDX module may have
++	 * been initialized and the memory page could be PAMT.
++	 */
++	if (sret == TDX_SEAMCALL_UD)
++		return is_pamt_page(phys);
++
++	/*
++	 * Any other failure means:
++	 *
++	 * 1) TDX module not loaded; or
++	 * 2) Memory page isn't managed by the TDX module.
++	 *
++	 * In either case, the memory page cannot be a TDX
++	 * private page.
++	 */
++	if (sret)
++		return false;
++
++	/*
++	 * SEAMCALL was successful -- read page type (via RCX):
++	 *
++	 *  - PT_NDA:	Page is not used by the TDX module
++	 *  - PT_RSVD:	Reserved for Non-TDX use
++	 *  - Others:	Page is used by the TDX module
++	 *
++	 * Note PAMT pages are marked as PT_RSVD but they are also TDX
++	 * private memory.
++	 *
++	 * Note: Even page type is PT_NDA, the memory page could still
++	 * be associated with TDX private KeyID if the kernel hasn't
++	 * explicitly used MOVDIR64B to clear the page.  Assume KVM
++	 * always does that after reclaiming any private page from TDX
++	 * gusets.
++	 */
++	switch (out.rcx) {
++	case PT_NDA:
++		return false;
++	case PT_RSVD:
++		return is_pamt_page(phys);
++	default:
++		return true;
++	}
++}
++
+ static int __init record_keyid_partitioning(u32 *tdx_keyid_start,
+ 					    u32 *nr_tdx_keyids)
+ {
+diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+index 012153067440..93fbef634ac9 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.h
++++ b/arch/x86/virt/vmx/tdx/tdx.h
+@@ -28,6 +28,12 @@
+ #define TDH_SYS_KEY_CONFIG	31
+ #define TDH_SYS_TDMR_INIT	36
+ 
++#define TDH_PHYMEM_PAGE_RDMD	24
++
++/* TDX page types */
++#define	PT_NDA		0x0
++#define	PT_RSVD		0x1
++
+ struct cmr_info {
+ 	u64	base;
+ 	u64	size;
 -- 
 2.40.1
 
