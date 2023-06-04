@@ -2,56 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DCCA7212C9
-	for <lists+kvm@lfdr.de>; Sat,  3 Jun 2023 22:52:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AF657213E2
+	for <lists+kvm@lfdr.de>; Sun,  4 Jun 2023 02:30:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231156AbjFCUv7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Jun 2023 16:51:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36956 "EHLO
+        id S229755AbjFDAaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Jun 2023 20:30:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229715AbjFCUv6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Jun 2023 16:51:58 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9036DA6;
-        Sat,  3 Jun 2023 13:51:56 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1685825514;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FYRhO5tm+egQGj0VtLRHygSd1rVDQErSuxLMnzfSdv8=;
-        b=0n4CvGExlFAiQOFUYi0WTfQCqKhHk3/3cfXG1uCEype+muRoJY8ntPSFJObHSIG5lyPK2y
-        05o9vviiz52SP2Lq28KQ3gL5eaKxKll/hYocC8nhF6V4+P5l2OX0VBU9r4H2FodUY/nN1k
-        3jRJ6cCexsq8npqf4Ftza0JePXpisUouT57oUcUMRIi6Jm/oKDFhogNbRagiJV85UtPN5d
-        3mpSpOVRIBGPr/hsaBpkh7nOF+oTL1EAz52M48ChogJpUKHKlK37YDlGRu+MJLE7nnGeCX
-        7HrEcUsin2F496AlKhi5LY9T1LHNESyK44VIZD2mgshCuhcHIRPNgtxdRTA8CA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1685825514;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FYRhO5tm+egQGj0VtLRHygSd1rVDQErSuxLMnzfSdv8=;
-        b=q1woBCgZZqp3xbfT7uoawg4xNoNsW6mH9m0273HBQZusqSUq0JaAjouD+KoDG/m+NhCfUZ
-        n5cw61h2vqU9NSDw==
-To:     Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, kvm@vger.kernel.org
-Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, peterz@infradead.org, andrew.cooper3@citrix.com,
-        seanjc@google.com, pbonzini@redhat.com, ravi.v.shankar@intel.com,
-        jiangshanlai@gmail.com, shan.kang@intel.com
-Subject: Re: [PATCH v8 01/33] x86/traps: let common_interrupt() handle
- IRQ_MOVE_CLEANUP_VECTOR
-In-Reply-To: <20230410081438.1750-2-xin3.li@intel.com>
-References: <20230410081438.1750-1-xin3.li@intel.com>
- <20230410081438.1750-2-xin3.li@intel.com>
-Date:   Sat, 03 Jun 2023 22:51:54 +0200
-Message-ID: <87leh08e1h.ffs@tglx>
+        with ESMTP id S229658AbjFDAaD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Jun 2023 20:30:03 -0400
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DB0A19A
+        for <kvm@vger.kernel.org>; Sat,  3 Jun 2023 17:30:01 -0700 (PDT)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1q5bd8-007gYS-Ev; Sun, 04 Jun 2023 02:29:58 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=ajmFOvwxptlWBTZW4DWkzyimVQmkTbolr3tsod6TmuY=; b=D6C5KOOFud2dCyCRvWq8yvA0M5
+        3Qdd2ChbHfPYr6iWwpQtq7q/I8ROPJiFd2XtNQ5wHkSr6JqfKUafkGDHn7bzTypkvAhZEKrBWHqKz
+        P4+i3GWWmIRhDJXk/PEvfXsbNaMBsuItGQco5Xz1ERCaV8bD84r7tF9TapYQLg86bYn0ojPiQGeBO
+        82Wa7EwqVG+D8g8RQLSyYGH95MGtQW5/ERxbj/qKstVGpq5JIpGwZ9gecWn6xazC0U5ZzF0RLH1o2
+        mfb9bQeNKtfahXFdPtVNDl/IddZ8PghjTCO7Ngq6hZZYKTwFQ3o/Rtpe+tBALiRUSVCfUPCtSLrJC
+        LCxC7vFQ==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1q5bd7-00034M-VD; Sun, 04 Jun 2023 02:29:58 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1q5bcz-0002z3-Co; Sun, 04 Jun 2023 02:29:49 +0200
+Message-ID: <002f1c33-e899-1d17-bfb4-24a116451fe6@rbox.co>
+Date:   Sun, 4 Jun 2023 02:29:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+User-Agent: Thunderbird
+Subject: Re: [PATCH v3 2/3] KVM: x86: Retry APIC optimized map recalc if vCPU
+ is added/enabled
+Content-Language: pl-PL, en-GB
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230602233250.1014316-1-seanjc@google.com>
+ <20230602233250.1014316-3-seanjc@google.com>
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20230602233250.1014316-3-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -59,65 +61,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 10 2023 at 01:14, Xin Li wrote:
-> IRQ_MOVE_CLEANUP_VECTOR is the only one of the system IRQ vectors that
-> is *below* FIRST_SYSTEM_VECTOR. It is a slow path, so just push it
-> into common_interrupt() just before the spurious interrupt handling.
+On 6/3/23 01:32, Sean Christopherson wrote:
+> +	 * Read kvm->arch.apic_map_dirty before kvm->arch.apic_map (if clean)
+> +	 * or the APIC registers (if dirty).  Note, on retry the map may have
+> +	 * not yet been marked dirty by whatever task changed a vCPU's x2APIC
+> +	 * ID, i.e. the map may still show up as in-progress.  In that case
+> +	 * this task still needs to retry and copmlete its calculation.
 
-This is a complete NOOP on not FRED enabled systems as the IDT entry is
-still separate. So this change makes no sense outside of the FRED
-universe. Can we pretty please make this consistent?
+s/copmlete/complete ?
 
-Aside of that the change comes with zero justification. I can see why
-this is done, i.e. to spare range checking in the FRED exception entry
-code, but that brings up an interesting question:
+Speaking of nits, if you're planning to do some more work around
+kvm_recalculate_phys_map(), there's that old comment typo I've failed
+to notice earlier:
 
-IRQ_MOVE_CLEANUP_VECTOR is at vector 0x20 on purpose. 0x20 is the lowest
-priority vector so that the following (mostly theoretical) situation
-gets resolved:
+"Apply KVM's hotplug hack if userspace has enable 32-bit APIC IDs."
 
-sysvec_irq_move_cleanup()
-  if (is_pending_in_apic_IRR(vector_to_clean_up))
-     apic->send_IPI_self(IRQ_MOVE_CLEANUP_VECTOR);
-
-I.e. when for whatever reasons the to be cleaned up vector is still
-pending in the local APIC IRR the function retriggers
-IRQ_MOVE_CLEANUP_VECTOR and returns. As the pending to be cleaned up
-vector has higher priority it gets handled _before_ the cleanup
-vector. Otherwise this ends up in a live lock.
-
-So the question is whether FRED is changing that priority scheme or not.
-
-> @@ -248,6 +248,10 @@ DEFINE_IDTENTRY_IRQ(common_interrupt)
->  	desc = __this_cpu_read(vector_irq[vector]);
->  	if (likely(!IS_ERR_OR_NULL(desc))) {
->  		handle_irq(desc, regs);
-> +#ifdef CONFIG_SMP
-> +	} else if (vector == IRQ_MOVE_CLEANUP_VECTOR) {
-> +		sysvec_irq_move_cleanup(regs);
-
-This nests IDTENTRY:
-
-common_interrupt()
-  irqentry_enter();
-  kvm_set_cpu_l1tf_flush_l1d();
-  run_irq_on_irqstack_cond(__common_interrupt, ....)
-    __common_interrupt()
-        sysvec_irq_move_cleanup()
-          irqentry_enter();             <- FAIL
-          kvm_set_cpu_l1tf_flush_l1d(); <- WHY again?
-          run_sysvec_on_irqstack_cond(__sysvec_irq_move_cleanup);
-            __sysvec_irq_move_cleanup();
-          irqentry_exit();
-
-It does not matter whether the cleanup vector is a slow path or
-not. Regular interrupts are not nesting, period. Exceptions nest, but
-IRQ_MOVE_CLEANUP_VECTOR is not an exception and we don't make an
-exception for it.
-
-Stop this mindless hackery and clean it up so it is correct for all
-variants.
-
-Thanks,
-
-        tglx
+enabled?
