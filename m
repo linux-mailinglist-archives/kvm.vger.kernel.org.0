@@ -2,50 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1697722885
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 16:15:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7077172288A
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 16:15:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234450AbjFEONp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 10:13:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41624 "EHLO
+        id S231742AbjFEOPe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 10:15:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234453AbjFEON2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 10:13:28 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0E33199F;
-        Mon,  5 Jun 2023 07:12:41 -0700 (PDT)
+        with ESMTP id S234965AbjFEOPV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 10:15:21 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E77FE8;
+        Mon,  5 Jun 2023 07:15:20 -0700 (PDT)
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1685974290;
+        s=2020; t=1685974518;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=X+4SrU6DsqFWnfII4h+3uCwsRVwxeJlfoNAM29p88Hc=;
-        b=cfc1TGFIOq3GkZmxix152Ox9eE2l5LJoLY1uoKd30Ng5Gl8D6tUiuIIodWpcOkxZB9vZi2
-        32I6GJSyGicJFzwt9mjcSin9tgsI5GirIc5m1Y2x1/SZTOz7o4R/udgjePYCI5YDawwTLt
-        IFyBHO1Tt1VBNpxNGCZLnUDvJCPrKTTzbpXUBorr0b3xixt3PzRwW2wlIgEDVDhfQyeljM
-        4JixXPWR1xAf4mNg2VVCHYyQ7GMEAhFo9U7D7S8kX1DKlrn1Zw5l2Lm+3ZStv0wx+x4Jul
-        rBugVLBHhK+bxOJy9vGZECO8+g+J+tdTjBuMyi3H8tyx8LBYF2mQ6VrzsdCrCg==
+        bh=QxfN8XhVYQPBZK7oM9kZ2tYIqv/AxYIE9gW+GsDBqhM=;
+        b=GjrnM9wzipOA/AXN/iLgCqL0XO1MOvh3zVdqwlbfcK9sMeTjJvVQYYwAfWcYyK7dg/z60f
+        CEn+Cg/EqaUMi7GxzS1X5GnALYAiO8UqfkphzoYUtu2bt4u15DxRGn070Z4X+HOB7xzo5X
+        80Ctt+9S6M4gti+GHFSN91z7kq1Xy3WAIEsPfRArvBg2W+kfoWod4nN9igpcDqjo3xmvm3
+        QZAms+qqzy4yC5HP3l1Q5iuYsLS64HeuDNS/XXSgDM9DJenX+HZQqCrYEuI6G9W4lJSgCP
+        Zyiaq4Q3IPo/TkD/8EW8UFduldggpIOwSBY9hX2GaJa/OFPzISlsOO/uln1vEw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1685974290;
+        s=2020e; t=1685974518;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=X+4SrU6DsqFWnfII4h+3uCwsRVwxeJlfoNAM29p88Hc=;
-        b=JpyzuNuozBw3352cB58J1TgX/docpZU3Bc626EFoyKlYiym9df5VgyXdLEfEW6HGAXQJ/Z
-        A5kLRRml7Cc7G6Dw==
+        bh=QxfN8XhVYQPBZK7oM9kZ2tYIqv/AxYIE9gW+GsDBqhM=;
+        b=CMo2JQQgahrYCw5CqsRO5yAvF5V6Vgv8Fbw0I3yCdOnpbWevU2HClv5zicUaV6NxXyrYyH
+        4kCcswHclc51wWCg==
 To:     Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org,
         x86@kernel.org, kvm@vger.kernel.org
 Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         hpa@zytor.com, peterz@infradead.org, andrew.cooper3@citrix.com,
         seanjc@google.com, pbonzini@redhat.com, ravi.v.shankar@intel.com,
         jiangshanlai@gmail.com, shan.kang@intel.com
-Subject: Re: [PATCH v8 30/33] x86/fred: allow dynamic stack frame size
-In-Reply-To: <20230410081438.1750-31-xin3.li@intel.com>
+Subject: Re: [PATCH v8 31/33] x86/fred: BUG() when ERETU with %rsp not equal
+ to that when the ring 3 event was just delivered
+In-Reply-To: <20230410081438.1750-32-xin3.li@intel.com>
 References: <20230410081438.1750-1-xin3.li@intel.com>
- <20230410081438.1750-31-xin3.li@intel.com>
-Date:   Mon, 05 Jun 2023 16:11:30 +0200
-Message-ID: <87wn0i578t.ffs@tglx>
+ <20230410081438.1750-32-xin3.li@intel.com>
+Date:   Mon, 05 Jun 2023 16:15:18 +0200
+Message-ID: <87ttvm572h.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -59,27 +60,19 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Apr 10 2023 at 01:14, Xin Li wrote:
-> A FRED stack frame could contain different amount of information for
-> different event types, or perhaps even for different instances of the
-> same event type. Thus we need to eliminate the need of any advance
-> information of the stack frame size to allow dynamic stack frame size.
+> A FRED stack frame generated by a ring 3 event should never be messed up, and
+> the first thing we must make sure is that at the time an ERETU instruction is
+> executed, %rsp must have the same address as that when the user level event
+> was just delivered.
 >
-> Implement it through:
->   1) add a new field user_pt_regs to thread_info, and initialize it
->      with a pointer to a virtual pt_regs structure at the top of a
->      thread stack.
->   2) save a pointer to the user-space pt_regs structure created by
->      fred_entrypoint_user() to user_pt_regs in fred_entry_from_user().
->   3) initialize the init_thread_info's user_pt_regs with a pointer to
->      a virtual pt_regs structure at the top of init stack.
->
-> This approach also works for IDT, thus we unify the code.
+> However we don't want to bother the normal code path of ERETU because it's on
+> the hotest code path, a good choice is to do this check when ERETU
+> faults.
 
-And thereby remove the useful comment and replace it with an
-undocumented macro mess.
+Which might be not catching bugs where the wrong frame makes ERETU not
+fault.
 
-I'm simply refusing to review this. It's not my job to understand this
-undocumented hackery.
+We have CONFIG_DEBUG_ENTRY for catching this at the proper place.
 
 Thanks,
 
