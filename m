@@ -2,191 +2,277 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEC5B722666
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 14:53:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4603722669
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 14:54:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233383AbjFEMxh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 08:53:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45088 "EHLO
+        id S233523AbjFEMyF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 08:54:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232930AbjFEMxf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 08:53:35 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6C0ACCD;
-        Mon,  5 Jun 2023 05:53:33 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.170])
-        by gateway (Coremail) with SMTP id _____8DxtfDM2n1kqxcAAA--.240S3;
-        Mon, 05 Jun 2023 20:53:32 +0800 (CST)
-Received: from [10.20.42.170] (unknown [10.20.42.170])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8AxKeXL2n1kmX0AAA--.2481S3;
-        Mon, 05 Jun 2023 20:53:31 +0800 (CST)
-Message-ID: <2ed84603-f046-202e-dc1c-d6fcfc36662d@loongson.cn>
-Date:   Mon, 5 Jun 2023 20:53:31 +0800
+        with ESMTP id S233452AbjFEMyE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 08:54:04 -0400
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5863EA1;
+        Mon,  5 Jun 2023 05:54:01 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-977fae250easo5889666b.1;
+        Mon, 05 Jun 2023 05:54:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685969640; x=1688561640;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KzPCNkAV8qDQrMk6ufehDtxGAXb1czA1SgsO+wfzRYA=;
+        b=rSGZWxgYqmvS0d6q2X2AJVbs0La7jVbFc+2magSPiCOum8/XkVU5BI9dWKu1SFacA+
+         2xjYcYXBbUZqaIB5ZsxO+T98LbIKIne8Ld4Zz538Xe7HGzvjJEWlmcTN6FW0hHkv9ezM
+         id0A3q4XYZnmTIpRRcIBTvIYuXKOk59iY/k9SsMCledx6qxmO5021CvUx1BFPFmM6duV
+         dxvB3yigQPIo1CG/1E5FxbNfI2fyddFyPGn1WQJjpQpOeTV4KDMVbRneFD/cTFaBL3Bh
+         uaDziYeFyfX78dDCEyVGkassr5+9hWKnkCn7WBGmzM94JyZJlThi/dhi/eEmA8IxYAcM
+         +jmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685969640; x=1688561640;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KzPCNkAV8qDQrMk6ufehDtxGAXb1czA1SgsO+wfzRYA=;
+        b=F6mjC2GFfSdStX8wnQ0O1RmIbZfMXS43wRXOU9NXUInFHYkeLW/QbsP2jssClZ6bCP
+         YYxgX6Cd4bbo4uoyiY7DQnnr+bmXVkkaejM/j0bU3egx1P2cI5TtS1CVgCRNYvjkzbiH
+         ziLHz3e83MC/2xt2KPXzTtJxn29a/paIzdbVYSEVzB6OCNDMhs10FSWhBUmBuM/NIeQ7
+         AD25fNwHKfQPPAI0YKzh4D7VCFCjYJY8h7GkV7+Hku+85XUrnY3kLveuGtcn0+HBNWr2
+         TM0nfBdz0iy4+4LO1iBTB6TuMU+pHClJYWskiir1fUlJ9Qe/jW/IjVsuQc9HPesNkZT4
+         NAhg==
+X-Gm-Message-State: AC+VfDzq/0AmTYsMtbLqqEChLDELKAyC1+0M57Q7MgzK7/cfxiAd8X5G
+        Bb2f/5OLMwDgR+E6BSBh0Z8=
+X-Google-Smtp-Source: ACHHUZ4iMK9BL7Lq5y+VTWox45b7vTaIX3GKK3b8zGp/TKvuXUTREPIIxlScgTSj5arEwJiPi10Wvw==
+X-Received: by 2002:a17:906:74d4:b0:977:c867:489b with SMTP id z20-20020a17090674d400b00977c867489bmr4883952ejl.0.1685969639496;
+        Mon, 05 Jun 2023 05:53:59 -0700 (PDT)
+Received: from localhost ([134.191.220.83])
+        by smtp.gmail.com with ESMTPSA id u22-20020a170906069600b009767c4235absm3384566ejb.219.2023.06.05.05.53.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jun 2023 05:53:59 -0700 (PDT)
+Date:   Mon, 5 Jun 2023 20:53:42 +0800
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>
+Cc:     Zeng Guang <guang.zeng@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 3/6] KVM: VMX: Add new ops in kvm_x86_ops for LASS
+ violation check
+Message-ID: <20230605205342.00000e41.zhi.wang.linux@gmail.com>
+In-Reply-To: <3b3d9106-9e4f-8a76-30ee-29540b06022a@linux.intel.com>
+References: <20230601142309.6307-1-guang.zeng@intel.com>
+        <20230601142309.6307-4-guang.zeng@intel.com>
+        <3b3d9106-9e4f-8a76-30ee-29540b06022a@linux.intel.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v12 07/31] LoongArch: KVM: Implement vcpu run interface
-Content-Language: en-US
-To:     Tianrui Zhao <zhaotianrui@loongson.cn>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Xi Ruoyao <xry111@xry111.site>
-References: <20230530015223.147755-1-zhaotianrui@loongson.cn>
- <20230530015223.147755-8-zhaotianrui@loongson.cn>
-From:   "bibo, mao" <maobibo@loongson.cn>
-In-Reply-To: <20230530015223.147755-8-zhaotianrui@loongson.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8AxKeXL2n1kmX0AAA--.2481S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxCw15GrWDAF4fXw15Kr47WrX_yoW5Cr48pa
-        y8CwnI9rWrJ34xG34fJrs09rs0qrWkKr17Za4xtFW3Jr4qy34Dur48KrWDAFWfA3s5X3WS
-        vF1rKF47CFyDt3cCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUPqb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-        xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-        AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-        tVWrXwAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
-        xGrwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAK
-        I48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrV
-        AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
-        c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26ryj6F1UMIIF0xvE2Ix0cI8IcVCY1x0267
-        AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Cr0_
-        Gr1UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07j873
-        kUUUUU=
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 5 Jun 2023 11:31:48 +0800
+Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
+>=20
+>=20
+> On 6/1/2023 10:23 PM, Zeng Guang wrote:
+> > Intel introduces LASS (Linear Address Separation) feature providing
+>  =A0=A0=A0 =A0=A0=A0 =A0=A0=A0 =A0=A0=A0 =A0=A0=A0 =A0 ^
+>  =A0missing "Space" here
+> > an independent mechanism to achieve the mode-based protection.
+> >
+> > LASS partitions 64-bit linear address space into two halves, user-mode
+> > address (LA[bit 63]=3D0) and supervisor-mode address (LA[bit 63]=3D1). =
+It
+> > stops any code execution or conditional data access[1]
+> >      1. from user mode to supervisor-mode address space
+> >      2. from supervisor mode to user-mode address space
+> > and generates LASS violation fault accordingly.
+> >
+> > [1]A supervisor mode data access causes a LASS violation only if superv=
+isor
+> > mode access protection is enabled (CR4.SMAP =3D 1) and either RFLAGS.AC=
+ =3D 0
+> > or the access implicitly accesses a system data structure.
+> >
+> > Following are the rules of LASS violation check on the linear address(L=
+A).
+> > User access to supervisor-mode address space:
+> >      LA[bit 63] && (CPL =3D=3D 3)
+> > Supervisor access to user-mode address space:
+> >      Instruction fetch: !LA[bit 63] && (CPL < 3)
+> >      Data access: !LA[bit 63] && (CR4.SMAP=3D=3D1) && ((RFLAGS.AC =3D=
+=3D 0 &&
+> >                   CPL < 3) || Implicit supervisor access)
+> >
+> > Add new ops in kvm_x86_ops to do LASS violation check.
+> >
+> > Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> > Tested-by: Xuelian Guo <xuelian.guo@intel.com>
+> > ---
+> >   arch/x86/include/asm/kvm-x86-ops.h |  3 +-
+> >   arch/x86/include/asm/kvm_host.h    |  2 ++
+> >   arch/x86/kvm/kvm_emulate.h         |  1 +
+> >   arch/x86/kvm/vmx/vmx.c             | 47 ++++++++++++++++++++++++++++++
+> >   arch/x86/kvm/vmx/vmx.h             |  2 ++
+> >   5 files changed, 54 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/=
+kvm-x86-ops.h
+> > index 13bc212cd4bc..8980a3bfa687 100644
+> > --- a/arch/x86/include/asm/kvm-x86-ops.h
+> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> > @@ -132,7 +132,8 @@ KVM_X86_OP_OPTIONAL(migrate_timers)
+> >   KVM_X86_OP(msr_filter_changed)
+> >   KVM_X86_OP(complete_emulated_msr)
+> >   KVM_X86_OP(vcpu_deliver_sipi_vector)
+> > -KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+> > +KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons)
+> > +KVM_X86_OP_OPTIONAL_RET0(check_lass)
+> >  =20
+> >   #undef KVM_X86_OP
+> >   #undef KVM_X86_OP_OPTIONAL
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
+_host.h
+> > index 92d8e65fe88c..98666d1e7727 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1731,6 +1731,8 @@ struct kvm_x86_ops {
+> >   	 * Returns vCPU specific APICv inhibit reasons
+> >   	 */
+> >   	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcp=
+u);
+> > +
+> > +	bool (*check_lass)(struct kvm_vcpu *vcpu, u64 access, u64 la, u32 fla=
+gs);
+> >   };
+> >  =20
+> >   struct kvm_x86_nested_ops {
+> > diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+> > index 5b9ec610b2cb..f1439ab7c14b 100644
+> > --- a/arch/x86/kvm/kvm_emulate.h
+> > +++ b/arch/x86/kvm/kvm_emulate.h
+> > @@ -91,6 +91,7 @@ struct x86_instruction_info {
+> >   /* x86-specific emulation flags */
+> >   #define X86EMUL_F_FETCH			BIT(0)
+> >   #define X86EMUL_F_WRITE			BIT(1)
+> > +#define X86EMUL_F_SKIPLASS		BIT(2)
+> >  =20
+> >   struct x86_emulate_ops {
+> >   	void (*vm_bugged)(struct x86_emulate_ctxt *ctxt);
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index a33205ded85c..876997e8448e 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -8130,6 +8130,51 @@ static void vmx_vm_destroy(struct kvm *kvm)
+> >   	free_pages((unsigned long)kvm_vmx->pid_table, vmx_get_pid_table_orde=
+r(kvm));
+> >   }
+> >  =20
+> > +/*
+> > + * Determine whether an access to the linear address causes a LASS vio=
+lation.
+> > + * LASS protection is only effective in long mode. As a prerequisite, =
+caller
+> > + * should make sure vCPU running in long mode and invoke this api to d=
+o LASS
+> > + * violation check.
+> > + */
+> > +bool vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u32 fla=
+gs)
+> > +{
+> > +	bool user_mode, user_as, rflags_ac;
+> > +
+> > +	if (!!(flags & X86EMUL_F_SKIPLASS) ||
+> > +	    !kvm_is_cr4_bit_set(vcpu, X86_CR4_LASS))
+> > +		return false;
+> > +
+> > +	WARN_ON_ONCE(!is_long_mode(vcpu));
+> IMHO, it's better to skip the following checks and return false if it is=
+=20
+> out of long mode.
+>
+The check of long mode is in the caller implemented in in the next patch. :)
 
-在 2023/5/30 09:51, Tianrui Zhao 写道:
-> Implement vcpu run interface, handling mmio, iocsr reading fault
-> and deliver interrupt, lose fpu before vcpu enter guest.
-> 
-> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
-> ---
->  arch/loongarch/kvm/vcpu.c | 86 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 86 insertions(+)
-> 
-> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> index 24b5b00266a1..eca8b96a3e6e 100644
-> --- a/arch/loongarch/kvm/vcpu.c
-> +++ b/arch/loongarch/kvm/vcpu.c
-> @@ -17,6 +17,44 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
->  	return 0;
->  }
->  
-> +/* Returns 1 if the guest TLB may be clobbered */
-> +static int _kvm_check_requests(struct kvm_vcpu *vcpu, int cpu)
-> +{
-> +	int ret = 0;
-> +
-> +	if (!kvm_request_pending(vcpu))
-> +		return 0;
-> +
-> +	if (kvm_check_request(KVM_REQ_TLB_FLUSH, vcpu)) {
-> +		/* Drop vpid for this vCPU */
-> +		vcpu->arch.vpid = 0;
-> +		/* This will clobber guest TLB contents too */
-> +		ret = 1;
-> +	}
-> +
-> +	return ret;
-> +}
-can parameter cpu in function _kvm_check_requests be removed since it is not used here?
++	if (!is_long_mode(vcpu))
++		return false;
 
-Regards
-Bibo, Mao
-> +
-> +static void kvm_pre_enter_guest(struct kvm_vcpu *vcpu)
-> +{
-> +	int cpu;
-> +
-> +	/*
-> +	 * handle vcpu timer, interrupts, check requests and
-> +	 * check vmid before vcpu enter guest
-> +	 */
-> +	kvm_acquire_timer(vcpu);
-> +	_kvm_deliver_intr(vcpu);
-> +	/* make sure the vcpu mode has been written */
-> +	smp_store_mb(vcpu->mode, IN_GUEST_MODE);
-> +	cpu = smp_processor_id();
-> +	_kvm_check_requests(vcpu, cpu);
-> +	_kvm_check_vmid(vcpu, cpu);
-> +	vcpu->arch.host_eentry = csr_read64(LOONGARCH_CSR_EENTRY);
-> +	/* clear KVM_LARCH_CSR as csr will change when enter guest */
-> +	vcpu->arch.aux_inuse &= ~KVM_LARCH_CSR;
-> +}
-> +
->  int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  {
->  	unsigned long timer_hz;
-> @@ -86,3 +124,51 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  			context->last_vcpu = NULL;
->  	}
->  }
-> +
-> +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> +{
-> +	int r = -EINTR;
-> +	struct kvm_run *run = vcpu->run;
-> +
-> +	vcpu_load(vcpu);
-> +
-> +	kvm_sigset_activate(vcpu);
-> +
-> +	if (vcpu->mmio_needed) {
-> +		if (!vcpu->mmio_is_write)
-> +			_kvm_complete_mmio_read(vcpu, run);
-> +		vcpu->mmio_needed = 0;
-> +	}
-> +
-> +	if (run->exit_reason == KVM_EXIT_LOONGARCH_IOCSR) {
-> +		if (!run->iocsr_io.is_write)
-> +			_kvm_complete_iocsr_read(vcpu, run);
-> +	}
-> +
-> +	/* clear exit_reason */
-> +	run->exit_reason = KVM_EXIT_UNKNOWN;
-> +	if (run->immediate_exit)
-> +		goto out;
-> +
-> +	lose_fpu(1);
-> +
-> +	local_irq_disable();
-> +	guest_timing_enter_irqoff();
-> +
-> +	kvm_pre_enter_guest(vcpu);
-> +	trace_kvm_enter(vcpu);
-> +
-> +	guest_state_enter_irqoff();
-> +	r = kvm_loongarch_ops->enter_guest(run, vcpu);
-> +
-> +	/* guest_state_exit_irqoff() already done.  */
-> +	trace_kvm_out(vcpu);
-> +	guest_timing_exit_irqoff();
-> +	local_irq_enable();
-> +
-> +out:
-> +	kvm_sigset_deactivate(vcpu);
-> +
-> +	vcpu_put(vcpu);
-> +	return r;
-> +}
+> > +
+> > +	user_as =3D !(la >> 63);
+> It's better to describe how LASS treat linear address in compatibility=20
+> mode in changelog or/and in comment,
+> i.e. for a linear address with only 32 bits (or 16 bits), the processor=20
+> treats bit 63 as if it were 0.
+>
+>=20
+> > +
+> > +	/*
+> > +	 * An access is a supervisor-mode access if CPL < 3 or if it implicit=
+ly
+> > +	 * accesses a system data structure. For implicit accesses to system
+> > +	 * data structure, the processor acts as if RFLAGS.AC is clear.
+> > +	 */
+> > +	if (access & PFERR_IMPLICIT_ACCESS) {
+> > +		user_mode =3D false;
+> > +		rflags_ac =3D false;
+> > +	} else {
+> > +		user_mode =3D vmx_get_cpl(vcpu) =3D=3D 3;
+> > +		if (!user_mode)
+> > +			rflags_ac =3D !!(kvm_get_rflags(vcpu) & X86_EFLAGS_AC);
+> > +	}
+> > +
+> > +	if (user_mode =3D=3D user_as)
+> > +		return false;
+> > +
+> > +	/*
+> > +	 * Supervisor-mode _data_ accesses to user address space
+> > +	 * cause LASS violations only if SMAP is enabled.
+> > +	 */
+> > +	if (!user_mode && !(access & PFERR_FETCH_MASK))
+> > +		return kvm_is_cr4_bit_set(vcpu, X86_CR4_SMAP) && !rflags_ac;
+> > +
+> > +	return true;
+> > +}
+> > +
+> >   static struct kvm_x86_ops vmx_x86_ops __initdata =3D {
+> >   	.name =3D KBUILD_MODNAME,
+> >  =20
+> > @@ -8269,6 +8314,8 @@ static struct kvm_x86_ops vmx_x86_ops __initdata =
+=3D {
+> >   	.complete_emulated_msr =3D kvm_complete_insn_gp,
+> >  =20
+> >   	.vcpu_deliver_sipi_vector =3D kvm_vcpu_deliver_sipi_vector,
+> > +
+> > +	.check_lass =3D vmx_check_lass,
+> >   };
+> >  =20
+> >   static unsigned int vmx_handle_intel_pt_intr(void)
+> > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> > index 9e66531861cf..f2e775b9849b 100644
+> > --- a/arch/x86/kvm/vmx/vmx.h
+> > +++ b/arch/x86/kvm/vmx/vmx.h
+> > @@ -433,6 +433,8 @@ void vmx_enable_intercept_for_msr(struct kvm_vcpu *=
+vcpu, u32 msr, int type);
+> >   u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu);
+> >   u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
+> >  =20
+> > +bool vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u32 fla=
+gs);
+> > +
+> >   static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u=
+32 msr,
+> >   					     int type, bool value)
+> >   {
+>=20
 
