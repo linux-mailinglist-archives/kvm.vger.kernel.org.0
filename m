@@ -2,152 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91C72723304
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 00:16:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAD4E723349
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 00:41:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232845AbjFEWQZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 18:16:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58760 "EHLO
+        id S230459AbjFEWlZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 18:41:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231764AbjFEWQX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 18:16:23 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFA3310B;
-        Mon,  5 Jun 2023 15:16:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686003379; x=1717539379;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=j6OmYXev5dSof4jSEuXxwO0jYGsXKhESRMOiQiPGbO8=;
-  b=mC6TBdQLFdpYDYhvAwVefcc6CubhmVJbtt8JgmfYE7ODIWhMZ99FprbB
-   zrkGvmNM8NmdDnsu8yJuSNx1iDJb9oeeXTzBF19RN+SxZAOCGn+JbHU/s
-   KwxWALxTO0wcAHJazhztoKJe7bwZrMySWcHpKhqy69VUOPfADaLha2oqo
-   +utgT/T1mKQx2UJZ7P5r9+DXmvNJm574ENKJLACdJIYWJv6RDSfrDpvrW
-   wKkjEx0+1pb2yHttBGb0hb7i5nnjIP604VpvYRPrYOTPzTU4jf1Rt8Rgr
-   1Ow4MHDpYEHuz0kX7yHmBKQ+tkyv3ikRRdY56NEUQc329quCy2F/M5FtZ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="359812693"
-X-IronPort-AV: E=Sophos;i="6.00,218,1681196400"; 
-   d="scan'208";a="359812693"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2023 15:16:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="686267039"
-X-IronPort-AV: E=Sophos;i="6.00,218,1681196400"; 
-   d="scan'208";a="686267039"
-Received: from twgeistx-mobl.ger.corp.intel.com (HELO intel.com) ([10.249.42.176])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2023 15:16:09 -0700
-Date:   Tue, 6 Jun 2023 00:16:04 +0200
-From:   Andi Shyti <andi.shyti@linux.intel.com>
-To:     Sui Jingfeng <15330273260@189.cn>
-Cc:     Alex Deucher <alexander.deucher@amd.com>,
-        Christian Konig <christian.koenig@amd.com>,
-        Pan Xinhui <Xinhui.Pan@amd.com>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        Karol Herbst <kherbst@redhat.com>,
-        Lyude Paul <lyude@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Hawking Zhang <Hawking.Zhang@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Lijo Lazar <lijo.lazar@amd.com>,
-        YiPeng Chai <YiPeng.Chai@amd.com>,
-        Andrey Grodzovsky <andrey.grodzovsky@amd.com>,
-        Somalapuram Amaranath <Amaranath.Somalapuram@amd.com>,
-        Bokun Zhang <Bokun.Zhang@amd.com>,
-        Ville Syrjala <ville.syrjala@linux.intel.com>,
-        Li Yi <liyi@loongson.cn>,
-        Sui Jingfeng <suijingfeng@loongson.cn>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Yi Liu <yi.l.liu@intel.com>, kvm@vger.kernel.org,
-        nouveau@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        loongson-kernel@lists.loongnix.cn, amd-gfx@lists.freedesktop.org,
-        linux-pci@vger.kernel.org
-Subject: Re: [Intel-gfx] [PATCH v2 1/2] vgaarb: various coding style and
- comments fix
-Message-ID: <ZH5epG6rfTOWT6CS@ashyti-mobl2.lan>
-References: <20230604205831.3357596-1-15330273260@189.cn>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230604205831.3357596-1-15330273260@189.cn>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229791AbjFEWlX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 18:41:23 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17BF7F3
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 15:41:23 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-659bb123ccfso1629296b3a.0
+        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 15:41:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686004882; x=1688596882;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bYZ0pyGD8sQGgJeNv8i3hV96TIZDFnh++53o9m2bsLI=;
+        b=TGLyJfuV9X9oyz66tSzhQEUendm3MC7j/sHQNXWedLgCqXseJjc4gv2x+mjGMR6hMh
+         KbmDI3/yVhHnXySQRMonQiU8m8cEvmfy3nCOwl/1LzWiS80v+MN+bjor8R+NUCHOkA+t
+         xsND+o3MsHSlbEqjb5rms6I3QmX+CHv0X3csT3DNpvKiOsg1DKkko1+eqCoZEIYaTdxm
+         US+wewf7zEW5JOixMoS2vPmFftkGSOv13gEGMRPvDI3OKBRXWXLLcwkx6uiAoZL/URhe
+         3Su/eI+9CuPmLUO9POa7ZobxffUHBDmyZAiyGeC6LQGTaVS4lJiZHXmJIX9Cp30PK9He
+         Or+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686004882; x=1688596882;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bYZ0pyGD8sQGgJeNv8i3hV96TIZDFnh++53o9m2bsLI=;
+        b=CXccbsWyXn+0WAEVknkQB2r0T4IZXZ9rMukPHVI4ARjF4+9H8Zeod9suU57cGDuU1V
+         ODA9zer23LsBCYM5ITFgu9Q5EkdlS5HIpzfXKwKQtgzMZKYs4mVz3cuSzWiT8ubV47sT
+         Q6g+xSRpb+gcEjTObwsI+ZnB/C0gyCvLyBeEoeU4GtmP/2EE9YzUEnWnS9JoKMa1twvW
+         DauUMrmKVBgIGyWJBysC/Ygkl3w9rbAQjEACTTJ3G/Rgxj5b+KOj/G4EmSfLTVCY3aWK
+         JL1CIitupabtFvbszDgxLbjYcim0aqyuqnthXhiXaIwoQfSbOFHfBtgW1tTNTZwlNSvp
+         do4Q==
+X-Gm-Message-State: AC+VfDytWMD2IVzmkpFbnN096yrmwrgXSwnP8+WJ9hGNMfifG1+yAL2s
+        nOv0u4QPZrZQjSX2IYhupwUQD32bAFM=
+X-Google-Smtp-Source: ACHHUZ4t5ZDDOwcDuQXexqRMIlRY3ThksD0p+p/dnsWpfMkM6af09yo1Uj8CcXWqI6hpFVgq9asHUp9zhnI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:179b:b0:64f:c0b1:6967 with SMTP id
+ s27-20020a056a00179b00b0064fc0b16967mr18027pfg.1.1686004882605; Mon, 05 Jun
+ 2023 15:41:22 -0700 (PDT)
+Date:   Mon, 5 Jun 2023 15:41:20 -0700
+In-Reply-To: <20230424225854.4023978-6-aaronlewis@google.com>
+Mime-Version: 1.0
+References: <20230424225854.4023978-1-aaronlewis@google.com> <20230424225854.4023978-6-aaronlewis@google.com>
+Message-ID: <ZH5kkIWHCfDQy3EI@google.com>
+Subject: Re: [PATCH v2 5/6] KVM: selftests: Add ucall_fmt2()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sui,
+On Mon, Apr 24, 2023, Aaron Lewis wrote:
+> Add a second ucall_fmt() function that takes two format strings instead
+> of one.  This provides more flexibility because the string format in
+> GUEST_ASSERT_FMT() is no linger limited to only using literals.
 
-On Mon, Jun 05, 2023 at 04:58:30AM +0800, Sui Jingfeng wrote:
-> From: Sui Jingfeng <suijingfeng@loongson.cn>
-> 
-> To keep consistent with vga_iostate_to_str() function, the third argument
-> of vga_str_to_iostate() function should be 'unsigned int *'.
+...
 
-I think the real reason is not to keep consistent with
-vga_iostate_to_str() but because vga_str_to_iostate() is actually
-only taking "unsigned int *" parameters.
+> -#define __GUEST_ASSERT_FMT(_condition, _condstr, _fmt, _args...)		  \
+> -do {										  \
+> -	if (!(_condition))							  \
+> -		ucall_fmt(UCALL_ABORT,						  \
+> -			  "Failed guest assert: " _condstr " at %s:%ld\n  " _fmt, \
+> -			  , __FILE__, __LINE__, ##_args);			  \
+> +#define __GUEST_ASSERT_FMT(_condition, _condstr, _fmt, _args...)	     \
+> +do {									     \
+> +	if (!(_condition))						     \
+> +		ucall_fmt2(UCALL_ABORT,					     \
+> +			   "Failed guest assert: " _condstr " at %s:%ld\n  ",\
 
-> Signed-off-by: Sui Jingfeng <suijingfeng@loongson.cn>
-> ---
->  drivers/pci/vgaarb.c   | 29 +++++++++++++++--------------
->  include/linux/vgaarb.h |  8 +++-----
->  2 files changed, 18 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/pci/vgaarb.c b/drivers/pci/vgaarb.c
-> index 5a696078b382..e40e6e5e5f03 100644
-> --- a/drivers/pci/vgaarb.c
-> +++ b/drivers/pci/vgaarb.c
-> @@ -61,7 +61,6 @@ static bool vga_arbiter_used;
->  static DEFINE_SPINLOCK(vga_lock);
->  static DECLARE_WAIT_QUEUE_HEAD(vga_wait_queue);
+I don't see any reason to add ucall_fmt2(), just do the string smushing in
+__GUEST_ASSERT_FMT().  I doubt there will be many, if any, uses for this outside
+of GUEST_ASSERT_FMT().  Even your test example is contrived, e.g. it would be
+just as easy, and arguably more robusted, to #define the expected vs. actual formats
+as it is to assign them to global variables.
+
+In other words, this 
+
+#define __GUEST_ASSERT_FMT(_condition, _str, _fmt, _args...)	     		\
+do {										\
+	char fmt_buffer[512];							\
+										\
+	if (!(_condition)) {							\
+		kvm_snprintf(fmt_buffer, sizeof(fmt_buffer), "%s\n  %s",	\
+			     "Failed guest assert: " _str " at %s:%ld", _fmt);	\
+		ucall_fmt(UCALL_ABORT, fmt_buffer, __FILE__, __LINE__, ##_args);\
+	}									\
+} while (0)
+
+is a preferable to copy+pasting an entirely new ucall_fmt2().  (Feel free to use
+a different name for the on-stack array, e.g. just "fmt").
+
+> +			   _fmt, __FILE__, __LINE__, ##_args);		     \
+>  } while (0)
 >  
-> -
-
-drop this change
-
->  static const char *vga_iostate_to_str(unsigned int iostate)
->  {
->  	/* Ignore VGA_RSRC_IO and VGA_RSRC_MEM */
-> @@ -77,10 +76,12 @@ static const char *vga_iostate_to_str(unsigned int iostate)
->  	return "none";
+>  #define GUEST_ASSERT_FMT(_condition, _fmt, _args...)	\
+> diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+> index c09e57c8ef77..d0f1ad6c0c44 100644
+> --- a/tools/testing/selftests/kvm/lib/ucall_common.c
+> +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+> @@ -76,6 +76,30 @@ static void ucall_free(struct ucall *uc)
+>  	clear_bit(uc - ucall_pool->ucalls, ucall_pool->in_use);
 >  }
 >  
-> -static int vga_str_to_iostate(char *buf, int str_size, int *io_state)
-> +static int vga_str_to_iostate(char *buf, int str_size, unsigned int *io_state)
+> +void ucall_fmt2(uint64_t cmd, const char *fmt1, const char *fmt2, ...)
+> +{
+> +	const int fmt_len = 128;
+> +	char fmt[fmt_len];
 
-this is OK, it's actually what you are describing in the commit
-log, but...
+Just do 
 
->  {
-> -	/* we could in theory hand out locks on IO and mem
-> -	 * separately to userspace but it can cause deadlocks */
-> +	/*
-> +	 * we could in theory hand out locks on IO and mem
-> +	 * separately to userspace but it can cause deadlocks
-> +	 */
+	char fmt[128];
 
-... all the rest needs to go on different patches as it doesn't
-have anything to do with what you describe.
+(or whatever size is chosen)
 
-Andi
+> +	struct ucall *uc;
+> +	va_list va;
+> +	int len;
+> +
+> +	len = kvm_snprintf(fmt, fmt_len, "%s%s", fmt1, fmt2);
+
+and then here do sizeof(fmt).  It's self-documenting, and makes it really, really
+hard to screw up and use the wrong format.
+
+Regarding the size, can you look into why using 1024 for the buffer fails?  This
+really should use the max allowed UCALL buffer size, but I'm seeing shutdowns when
+pushing above 512 bytes (I didn't try to precisely find the threshold).  Selftests
+are supposed to allocate 5 * 4KiB stacks, so the guest shouldn't be getting anywhere
+near a stack overflow.
+
+> +	if (len > fmt_len)
+
+For KVM selftests use case, callers shouldn't need to sanity check, that should be
+something kvm_snprintf() itself handles.  I'll follow-up in that patch.
