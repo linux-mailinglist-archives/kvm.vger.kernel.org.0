@@ -2,203 +2,322 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD2BA722739
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 15:20:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB7BA722741
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 15:22:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229572AbjFENUR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 09:20:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36588 "EHLO
+        id S234051AbjFENWI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 09:22:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234066AbjFENT7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 09:19:59 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 155DDA6;
-        Mon,  5 Jun 2023 06:19:58 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 355CqTHH010626;
-        Mon, 5 Jun 2023 13:19:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=UX/seApaMwCV5AdOHDETDgg1s3TtWbsyNOhrnZ/AQk8=;
- b=BEf7mpcH8ma4SIbK+to96xRYjKpsnmHKesC3gGnntuCcq/otvrKimKVOtALvVgeekBbs
- wglO9c2A7yq242A+iLmpK/nQG4CFDG817EPIbTXp2nDXjcUTBhMVOx0cizWmUfBFDUTP
- LGA/Gl91oDI3DmYUZ1z18MPMm+YN88X0OlVSr2U+MXQ1kLDRMwPDwkclAi7audvxd1I7
- +8/dTCZ+SwYQqD1GbnZlBmeTg38i5qxBNYugbZ6Q/tvtKH0MtGlHbaV14hRKXTMIjWqV
- TDdho6xU9GXrnWnYy9ALieAQRpizEKAcH3JUuwZXwswx7KIz2a1vMKz7KJPBj+M/Gr/b cw== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r1g3jrnc7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Jun 2023 13:19:56 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3554gbGB001935;
-        Mon, 5 Jun 2023 13:19:55 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3qyxg2hc3q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Jun 2023 13:19:55 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 355DJpZZ36438382
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 5 Jun 2023 13:19:51 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 737462004B;
-        Mon,  5 Jun 2023 13:19:51 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E75B720040;
-        Mon,  5 Jun 2023 13:19:50 +0000 (GMT)
-Received: from [9.171.39.161] (unknown [9.171.39.161])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  5 Jun 2023 13:19:50 +0000 (GMT)
-Message-ID: <76f45ab9-deed-a24c-9949-c6786daa2c10@linux.ibm.com>
-Date:   Mon, 5 Jun 2023 15:19:50 +0200
+        with ESMTP id S234049AbjFENWD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 09:22:03 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEF0DA6;
+        Mon,  5 Jun 2023 06:22:00 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1685971319;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=W7i9GT2S5V5kPFQ9ynmoaH2oh68oVG88GxgQhO0L2r0=;
+        b=FC2fz5Hw2DawTfhyAgMP7CIHQylN+gXXrfD4fYeAD8Vs6bcXX5W8G/FDLDF9Y9CwXjQoBl
+        toMeLyHwHgz+ob+RHTUotbhJCq/g2OSbIUVWepD+Uqq+IW9YbPyXlwgdoGeWgCjfdlXFa8
+        02bHeq9BqWlYrzeZ3P9+ErwmPbQFpLrTQWzcWxEQvl0+wBSwbS5WW/auR2NKwnrd3HazBy
+        7mH4o5scHMUtm4BK6nw0RYhu4IU45Izkxet57Xz1FaptV3BlJUkk8gdMHF/t4O+sJTXP1y
+        8SQdZvjjU9Vyk/lVsKetze2YggMKolV1c532dT5tHcciQjiqxivRVv24guue9Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1685971319;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=W7i9GT2S5V5kPFQ9ynmoaH2oh68oVG88GxgQhO0L2r0=;
+        b=/fITta9sPx5iuy0knJVvC8GsJHywX+CKmnOx8iJk8BgKAJ+upOYhm9WyyCGPPOSJT1MKYP
+        Jd5CklRgFPZ/YHAw==
+To:     Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, peterz@infradead.org, andrew.cooper3@citrix.com,
+        seanjc@google.com, pbonzini@redhat.com, ravi.v.shankar@intel.com,
+        jiangshanlai@gmail.com, shan.kang@intel.com
+Subject: Re: [PATCH v8 20/33] x86/fred: FRED entry/exit and dispatch code
+In-Reply-To: <20230410081438.1750-21-xin3.li@intel.com>
+References: <20230410081438.1750-1-xin3.li@intel.com>
+ <20230410081438.1750-21-xin3.li@intel.com>
+Date:   Mon, 05 Jun 2023 15:21:58 +0200
+Message-ID: <87fs766o3t.ffs@tglx>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Content-Language: en-US
-To:     Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>
-References: <20230519093708.810957-1-seiden@linux.ibm.com>
- <20230519093708.810957-3-seiden@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v2 2/6] s390/uvdevice: Add 'Add Secret' UVC
-In-Reply-To: <20230519093708.810957-3-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Sdom5LAgZUtvmQFLJDZ2q8WnpvYBpeg7
-X-Proofpoint-GUID: Sdom5LAgZUtvmQFLJDZ2q8WnpvYBpeg7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-03_08,2023-06-02_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
- suspectscore=0 priorityscore=1501 phishscore=0 impostorscore=0 mlxscore=0
- mlxlogscore=999 bulkscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2304280000
- definitions=main-2306050114
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/19/23 11:37, Steffen Eiden wrote:
-> Userspace can call the Add Secret Ultravisor Call
-> using IOCTLs on the uvdevice.
-> During the handling of the new IOCTL nr the uvdevice will do some sanity
-> checks first. Then, copy the request data to kernel space, perform the
-> Ultravisor command, and copy the return codes to userspace.
-> If the Add Secret UV facility is not present,
-> UV will return invalid command rc. This won't be fenced in the driver
-> and does not result in a negative return value. This is also true for
-> any other possible error code the UV can return.
-> 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> ---
->   arch/s390/include/asm/uv.h            | 14 +++++++
->   arch/s390/include/uapi/asm/uvdevice.h |  4 ++
->   drivers/s390/char/uvdevice.c          | 58 +++++++++++++++++++++++++++
->   3 files changed, 76 insertions(+)
-> 
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index 28a9ad57b6f1..a7dff64e1e24 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -58,6 +58,7 @@
->   #define UVC_CMD_SET_SHARED_ACCESS	0x1000
->   #define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
->   #define UVC_CMD_RETR_ATTEST		0x1020
-> +#define UVC_CMD_ADD_SECRET		0x1031
->   
->   /* Bits in installed uv calls */
->   enum uv_cmds_inst {
-> @@ -88,6 +89,7 @@ enum uv_cmds_inst {
->   	BIT_UVC_CMD_DUMP_CPU = 26,
->   	BIT_UVC_CMD_DUMP_COMPLETE = 27,
->   	BIT_UVC_CMD_RETR_ATTEST = 28,
-> +	BIT_UVC_CMD_ADD_SECRET = 29,
->   };
->   
->   enum uv_feat_ind {
-> @@ -292,6 +294,18 @@ struct uv_cb_dump_complete {
->   	u64 reserved30[5];
->   } __packed __aligned(8);
->   
+On Mon, Apr 10 2023 at 01:14, Xin Li wrote:
+> +/* SPDX-License-Identifier: GPL-2.0 */
 > +/*
-> + * A common call for pv guests that contains a single address
+> + * arch/x86/entry/entry_fred.c
 
-control block struct
+Please do not add these completely pointless file names. They are
+useless _and_ never get updated when a file is moved.
 
-> + * Examples:
-> + * Add Secret
+> + *
+> + * This contains the dispatch functions called from the entry point
+> + * assembly.
 > + */
-> +struct uv_cb_guest_addr {
-> +	struct uv_cb_header header;
-> +	u64 reserved08[3];
-> +	u64 addr;
-> +	u64 reserved28[4];
-> +} __packed __aligned(8);
 > +
-[...]
+> +#include <linux/kernel.h>
+> +#include <linux/kdebug.h>		/* oops_begin/end, ... */
 
-> +static int uvio_add_secret(struct uvio_ioctl_cb *uv_ioctl)
+Please remove this useless tail comment. We really do not have to list
+which particular things are pulled in from which header file.
+
+> +#include <linux/nospec.h>
+
+New line between linux and asm includes please.
+
+> +#include <asm/event-type.h>
+> +#include <asm/fred.h>
+> +#include <asm/idtentry.h>
+> +#include <asm/syscall.h>
+> +#include <asm/trapnr.h>
+> +#include <asm/traps.h>
+> +#include <asm/kdebug.h>
+> +
+> +/*
+> + * Badness...
+
+Really useful comment. Not.
+
+> +
+> +noinstr void fred_exc_double_fault(struct pt_regs *regs)
+
+Has to be global because the only user is the table below, right?
+
 > +{
-> +	void __user *user_buf_arg = (void __user *)uv_ioctl->argument_addr;
-> +	struct uv_cb_guest_addr uvcb = {
-> +		.header.len = sizeof(uvcb),
-> +		.header.cmd = UVC_CMD_ADD_SECRET,
+> +	exc_double_fault(regs, regs->orig_ax);
+> +}
+
+Also why is this here and not next to the double fault implementation?
+
+> +/*
+> + * Exception entry
+> + */
+> +static DEFINE_FRED_HANDLER(fred_exception)
+
+Lacks noinstr as most of the functions here.
+
+> +{
+> +	/*
+> +	 * Exceptions that cannot happen on FRED h/w are set to fred_bad_event().
+> +	 */
+> +	static const fred_handler exception_handlers[NUM_EXCEPTION_VECTORS] = {
+> +		[X86_TRAP_DE] = exc_divide_error,
+> +		[X86_TRAP_DB] = fred_exc_debug,
+> +		[X86_TRAP_NMI] = fred_bad_event, /* A separate event type, not handled here */
+
+Please make this tabular aligned and get rid of these horrible tail
+comments.
+
+> +		[X86_TRAP_BP] = exc_int3,
+> +		[X86_TRAP_OF] = exc_overflow,
+> +		[X86_TRAP_BR] = exc_bounds,
+> +		[X86_TRAP_UD] = exc_invalid_op,
+> +		[X86_TRAP_NM] = exc_device_not_available,
+> +		[X86_TRAP_DF] = fred_exc_double_fault,
+> +		[X86_TRAP_OLD_MF] = fred_bad_event, /* 387 only! */
+> +		[X86_TRAP_TS] = fred_exc_invalid_tss,
+> +		[X86_TRAP_NP] = fred_exc_segment_not_present,
+> +		[X86_TRAP_SS] = fred_exc_stack_segment,
+> +		[X86_TRAP_GP] = fred_exc_general_protection,
+> +		[X86_TRAP_PF] = fred_exc_page_fault,
+> +		[X86_TRAP_SPURIOUS] = fred_bad_event, /* Interrupts are their own event type */
+> +		[X86_TRAP_MF] = exc_coprocessor_error,
+> +		[X86_TRAP_AC] = fred_exc_alignment_check,
+> +		[X86_TRAP_MC] = fred_exc_machine_check,
+> +		[X86_TRAP_XF] = exc_simd_coprocessor_error,
+
+> +		[X86_TRAP_VE...NUM_EXCEPTION_VECTORS-1] = fred_bad_event
+
+Can we please have something which makes it entirely clear that anything
+from #VE on are exceptions which are installed during boot?
+
 > +	};
-> +	void *asrcb = NULL;
-> +	int ret;
-> +
-> +	if (uv_ioctl->argument_len > UVIO_ADD_SECRET_MAX_LEN)
-> +		return -EINVAL;
-> +	if (uv_ioctl->argument_len == 0)
-> +		return -EINVAL;
-> +
-> +	asrcb = kvzalloc(uv_ioctl->argument_len, GFP_KERNEL);
-> +	if (!asrcb)
-> +		return -EINVAL;
+> +	u8 vector = array_index_nospec((u8)regs->vector, NUM_EXCEPTION_VECTORS);
 
--ENOMEM
+This only "works" when NUM_EXCEPTION_VECTORS is power of two. Also what
+catches an out of bounds vector? I.e. vector 0x20 will end up as vector
+0x0 due to array_index_nospec(). I know, FRED hardware is going to be
+perfect...
 
-> +
-> +	ret = -EFAULT;
-> +	if (copy_from_user(asrcb, user_buf_arg, uv_ioctl->argument_len))
-> +		goto out;
-> +
-> +	ret = 0;
-> +	uvcb.addr = (u64)asrcb;
-> +	uv_call_sched(0, (u64)&uvcb);
-> +	uv_ioctl->uv_rc = uvcb.header.rc;
-> +	uv_ioctl->uv_rrc = uvcb.header.rrc;
-> +
-> +out:
-> +	kvfree(asrcb);
-> +	return ret;
+> +	exception_handlers[vector](regs);
 > +}
 > +
->   static int uvio_copy_and_check_ioctl(struct uvio_ioctl_cb *ioctl, void __user *argp,
->   				     unsigned long cmd)
->   {
-> @@ -275,6 +330,9 @@ static long uvio_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
->   	case UVIO_IOCTL_ATT_NR:
->   		ret = uvio_attestation(&uv_ioctl);
->   		break;
-> +	case UVIO_IOCTL_ADD_SECRET_NR:
-> +		ret = uvio_add_secret(&uv_ioctl);
-> +		break;
->   	default:
->   		ret = -ENOIOCTLCMD;
->   		break;
+> +static __always_inline void fred_emulate_trap(struct pt_regs *regs)
+> +{
+> +	regs->type = EVENT_TYPE_SWFAULT;
 
+This type information is used where?
+
+> +	regs->orig_ax = 0;
+> +	fred_exception(regs);
+> +}
+> +
+> +static __always_inline void fred_emulate_fault(struct pt_regs *regs)
+> +{
+> +	regs->ip -= regs->instr_len;
+> +	fred_emulate_trap(regs);
+> +}
+> +
+> +/*
+> + * Emulate SYSENTER if applicable. This is not the preferred system
+> + * call in 32-bit mode under FRED, rather int $0x80 is preferred and
+> + * exported in the vdso. SYSCALL proper has a hard-coded early out in
+> + * fred_entry_from_user().
+
+So we have it nicely distributed all over the code....
+
+> + */
+> +static DEFINE_FRED_HANDLER(fred_syscall_slow)
+> +{
+> +	if (IS_ENABLED(CONFIG_IA32_EMULATION) &&
+> +	    likely(regs->vector == FRED_SYSENTER)) {
+> +		/* Convert frame to a syscall frame */
+> +		regs->orig_ax = regs->ax;
+> +		regs->ax = -ENOSYS;
+> +		do_fast_syscall_32(regs);
+> +	} else {
+> +		regs->vector = X86_TRAP_UD;
+> +		fred_emulate_fault(regs);
+> +	}
+> +}
+> +
+> +/*
+> + * Some software exceptions can also be triggered as int instructions,
+> + * for historical reasons. Implement those here. The performance-critical
+> + * int $0x80 (32-bit system call) has a hard-coded early out.
+
+This comment starts to annoy me. Can you put comments next to the code
+where they actually make sense?
+
+> + */
+> +static DEFINE_FRED_HANDLER(fred_sw_interrupt_user)
+> +{
+
+i.e.
+
+        /*
+         * In compat mode INT $0x80 (32bit system call) is
+         * performance-critical. Handle it first.
+         */
+
+> +	if (IS_ENABLED(CONFIG_IA32_EMULATION) &&
+> +	    likely(regs->vector == IA32_SYSCALL_VECTOR)) {
+> +		/* Convert frame to a syscall frame */
+> +		regs->orig_ax = regs->ax;
+> +		regs->ax = -ENOSYS;
+> +		return do_int80_syscall_32(regs);
+
+> +	}
+> +
+> +	switch (regs->vector) {
+> +	case X86_TRAP_BP:
+> +	case X86_TRAP_OF:
+> +		fred_emulate_trap(regs);
+> +		break;
+> +	default:
+> +		regs->vector = X86_TRAP_GP;
+> +		fred_emulate_fault(regs);
+> +		break;
+> +	}
+> +}
+> +
+> +static DEFINE_FRED_HANDLER(fred_hw_interrupt)
+> +{
+> +	irqentry_state_t state = irqentry_enter(regs);
+> +
+> +	instrumentation_begin();
+> +	external_interrupt(regs);
+> +	instrumentation_end();
+> +	irqentry_exit(regs, state);
+> +}
+> +
+> +__visible noinstr void fred_entry_from_user(struct pt_regs *regs)
+> +{
+> +	static const fred_handler user_handlers[FRED_EVENT_TYPE_COUNT] =
+> +	{
+> +		[EVENT_TYPE_HWINT]	= fred_hw_interrupt,
+> +		[EVENT_TYPE_RESERVED]	= fred_bad_event,
+> +		[EVENT_TYPE_NMI]	= fred_exc_nmi,
+> +		[EVENT_TYPE_SWINT]	= fred_sw_interrupt_user,
+> +		[EVENT_TYPE_HWFAULT]	= fred_exception,
+> +		[EVENT_TYPE_SWFAULT]	= fred_exception,
+> +		[EVENT_TYPE_PRIVSW]	= fred_exception,
+> +		[EVENT_TYPE_OTHER]	= fred_syscall_slow
+> +	};
+> +
+> +	/*
+> +	 * FRED employs a two-level event dispatch mechanism, with
+> +	 * the first-level on the type of an event and the second-level
+> +	 * on its vector. Thus a dispatch typically induces 2 calls.
+> +	 * We optimize it by using early outs for the most frequent
+> +	 * events, and syscalls are the first. We may also need early
+> +	 * outs for page faults.
+
+I'm not really convinced that adding more special cases and conditionals
+is a win. This should be a true two-level dispatch first for _all_ event
+types and then in a separate step optimizations with proper performance
+numbers and justifications. Premature optimization is the enemy of
+correctness. Don't do it.
+
+> +	 */
+> +	if (likely(regs->type == EVENT_TYPE_OTHER &&
+> +		   regs->vector == FRED_SYSCALL)) {
+> +		/* Convert frame to a syscall frame */
+> +		regs->orig_ax = regs->ax;
+> +		regs->ax = -ENOSYS;
+> +		do_syscall_64(regs, regs->orig_ax);
+> +	} else {
+> +		/* Not a system call */
+> +		u8 type = array_index_nospec((u8)regs->type, FRED_EVENT_TYPE_COUNT);
+
+What's the u8 buying here and in all the other places? This has the same
+table issue as all other table handling in this file.
+
+> +		user_handlers[type](regs);
+> +	}
+> +}
+
+> diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
+> index 2876ddae02bc..bd43866f9c3e 100644
+> --- a/arch/x86/include/asm/idtentry.h
+> +++ b/arch/x86/include/asm/idtentry.h
+> @@ -82,6 +82,7 @@ static __always_inline void __##func(struct pt_regs *regs)
+>  #define DECLARE_IDTENTRY_ERRORCODE(vector, func)			\
+>  	asmlinkage void asm_##func(void);				\
+>  	asmlinkage void xen_asm_##func(void);				\
+> +	__visible void fred_##func(struct pt_regs *regs);		\
+
+Wants to be a separate change.
+
+>  	__visible void func(struct pt_regs *regs, unsigned long error_code)
+>  
+>  /**
+> @@ -106,6 +107,11 @@ __visible noinstr void func(struct pt_regs *regs,			\
+>  	irqentry_exit(regs, state);					\
+>  }									\
+>  									\
+> +__visible noinstr void fred_##func(struct pt_regs *regs)		\
+> +{									\
+> +	func (regs, regs->orig_ax);					\
+
+  func() ....
+
+Thanks,
+
+        tglx
