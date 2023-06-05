@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD5917225FB
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 14:35:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 573547225FC
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 14:35:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233450AbjFEMf4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 08:35:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60658 "EHLO
+        id S233540AbjFEMf5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 08:35:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233600AbjFEMft (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 08:35:49 -0400
+        with ESMTP id S233617AbjFEMfu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 08:35:50 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C00103
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 05:35:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64D23131
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 05:35:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 83C38611EE
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 12:35:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 353C2C433D2;
-        Mon,  5 Jun 2023 12:35:15 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BBE2A6237D
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 12:35:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59A54C4339B;
+        Mon,  5 Jun 2023 12:35:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685968516;
-        bh=YO4kZjmUvbXAnDKPdDvWLdTAf8U+N9HRehr/42w6f58=;
+        s=k20201202; t=1685968519;
+        bh=vyf9dpzIpcTT5CD+N7Yb/DEe7mgX+DjWnHFGmmhpb9Y=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LfOtbCT5BCEiUIpQkUW6rItahIiZoxlXaWV3r6bsBEPFIYD7srLkdiMZz/tdSeNBc
-         Bsgf0hzYEv5ferLiW0eey69XKQiw0sKW9964rlAcJQc0e/AIMnTXdmOTkpzrn6eWg6
-         ySdeG0MBVPahuT6TKJQc7fOS455Yt5TKHPFbaWqLf/0fCMsFvILMQWoycHwSlBBByV
-         IIhsiUUhUfXzkbPJxf/QmQe6PURnzaQwqfRALYFT0JQ9PxSwmo6PsTO8mdJjtJjWMF
-         9ah3jx6HBDDhaKAWiaXv2IoB1MxP6ddnxqy/hlqXEDQit7XuzO7gjbV/xNBPe5Ys7W
-         wS+UbTzOqzcwQ==
+        b=pYlS4rymrjpbxOsjEdcN7Iqp4fArKHCKVaDqOE4F/KWJbvEwMp8j1pRUOPUo9cd/t
+         Gkt9MUtgb82N91YlmI/OqAR0U0rrAC+Arowg4GSfHMZM0icrdnq3gVdVIzHTfF7DrD
+         6/ggZJZb7fTpQuOd4GEdc2/64zc74SEublgjA8LScmiRNZr1qB5IenXxM1ecWi2jJq
+         XnFuE9fjMCVNQ36QmWfkv4DUm1mpNJYFOuyofFuh2nPW9pR9QH8s35WPq206LQcx8u
+         Y54E1Z9vVJhyL1covieFLCQzjClsUrR/rA0b+M7KTsqOx73eDdSEh2vNfCkzzYIB46
+         1n9aKCF/TYu8Q==
 From:   Will Deacon <will@kernel.org>
 To:     Andre Przywara <andre.przywara@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>
 Cc:     catalin.marinas@arm.com, kernel-team@android.com,
-        Will Deacon <will@kernel.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Will Deacon <will@kernel.org>, kvm@vger.kernel.org,
+        Sami Mujawar <sami.mujawar@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH kvmtool 0/2] Fix builds with clang
-Date:   Mon,  5 Jun 2023 13:35:11 +0100
-Message-Id: <168596774694.3021087.14677709843430607064.b4-ty@kernel.org>
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: Re: [PATCH kvmtool v3 0/2] Fix virtio/rng handling in low entropy situations
+Date:   Mon,  5 Jun 2023 13:35:12 +0100
+Message-Id: <168596748381.3019987.14273263311363710129.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20230525144827.679651-1-andre.przywara@arm.com>
-References: <20230525144827.679651-1-andre.przywara@arm.com>
+In-Reply-To: <20230524112207.586101-1-andre.przywara@arm.com>
+References: <20230524112207.586101-1-andre.przywara@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -59,27 +59,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 25 May 2023 15:48:25 +0100, Andre Przywara wrote:
-> When trying to build kvmtool with clang, it warned about two problems,
-> which are fatal since we use "-Werror".
-> 
-> Patch 1/2 is an easy one fixing an obvious bug (not sure why GCC didn't
-> warn). Patch 2/2 removes an ugly hack which clang didn't want to let
-> pass. This patch admittedly implements the most tedious solution to this
-> problem, but I didn't want to just throw in a "__maybe_unused" (or
-> "__used", as kvmtool puts it). If that solution is a bit over the top,
-> let me know, maybe there is better solution which doesn't require to
-> touch every user of the virtio endianess conversion functions - or
-> __maybe_unused is OK after all.
+On Wed, 24 May 2023 12:22:05 +0100, Andre Przywara wrote:
+> At the moment kvmtool uses the /dev/random device to back the randomness
+> provided by our virtio/rng implementation. We run it in non-blocking
+> mode, so are not affected by the nasty "can block indefinitely"
+> behaviour of that file. However:
+> - If /dev/random WOULD block, it returns EAGAIN, and we reflect that by
+>   adding 0 bytes of entropy to the virtio queue. However the virtio 1.x
+>   spec clearly says this is not allowed, and that we should always provide
+>   at least one random byte.
+> - If the guest is waiting for the random numbers, we still run into an
+>   effective blocking situation, because the buffer will only be filled
+>   very slowly, effectively stalling or blocking the guest. EDK II shows
+>   that behaviour, when servicing the EFI_RNG_PROTOCOL runtime service
+>   call, called by the kernel very early on boot.
 > 
 > [...]
 
 Applied to kvmtool (master), thanks!
 
-[1/2] option parsing: fix type of empty .argh parameter
-      https://git.kernel.org/will/kvmtool/c/c1eecc61558d
-[2/2] virtio: sanitise virtio endian wrappers
-      https://git.kernel.org/will/kvmtool/c/b17552ee6c97
+[1/2] virtio/rng: switch to using /dev/urandom
+      https://git.kernel.org/will/kvmtool/c/62ba372b0e67
+[2/2] virtio/rng: return at least one byte of entropy
+      https://git.kernel.org/will/kvmtool/c/bc23b9d9b152
 
 Cheers,
 -- 
