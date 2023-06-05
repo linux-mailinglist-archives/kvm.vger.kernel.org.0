@@ -2,123 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C03D7722823
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 16:03:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28E1D72286E
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 16:11:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234341AbjFEODd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 10:03:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32768 "EHLO
+        id S234544AbjFEOK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 10:10:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234288AbjFEODP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 10:03:15 -0400
-Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B92A131
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 07:03:00 -0700 (PDT)
-Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-19f6f8c840bso4439389fac.3
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 07:03:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1685973779; x=1688565779;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UIYA8beJZmA2NMdlgIpBmajMkuQ+bKy8H3Ug9/MSXpA=;
-        b=IR/B/9KGcyrqBc4r//pqz1RV710rbcmsdYU8ISLpYI5nmpvcVOsg+vLcY3xl/w+Xm/
-         brnbyjQpPH33FbOUEJjI0V2+U7Q77TTUKRYYMUJa79cyCirE6IWN89YA+KmRkjR/C57N
-         OSJqlRVrMcpoWTpguGIszayxv2+vXbG7YtxE2Hfr/F+xtkr6fqyhESFysm/c0FhaSmqv
-         jRlpOriP+v+YNMyE2qMFi68UgdwRl5Hqtj1Uvy9kdwcgoxt2lZdrjv2pZtogOYWT3VrQ
-         zoviC4UVL7AxOm6vY1u7EDlktqauZ9EG9J5610Nfl7mFbc5uwL2fe87r6/UTMeVqNTtF
-         e72w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685973779; x=1688565779;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UIYA8beJZmA2NMdlgIpBmajMkuQ+bKy8H3Ug9/MSXpA=;
-        b=IwoOTcINFsCdce5Hli3h8KCngWQlcToIJYXdqyK1N71kzpHn+l31G7Qt1K5Lw7vLLd
-         EjohqRJpXc+zib2a1lBz+d9y75i4sMstnlWJ8WNBSEtolLb3wK9GiPcTHOHVjuC3VoaD
-         Db8MH0yc/VP7cBOhg/JGNQfdDciPfx5HfjKiv+eiqbpQkf7WegQ32yoDx4yA7dhIS7IW
-         BQvwEsGZ5us+KqRTqgy8rgvPmZJIJ/zpg07+St53zClHU6eeBAsKS+l7kgU/+1oUxa/Z
-         twb9J4jUX2cYGVL0O8LiKx0jbORzBcHrDYnXtBmvYiRlnyxrCfetNMaJsjOeeJZjtn9M
-         8SyA==
-X-Gm-Message-State: AC+VfDxCJ/EOnVp367AG+FX2Se2jBJ7lOPCnf+7uo0rt3bqzhgZmpIrw
-        +kEG0BoKRkIFoWZgAKODn3HMxg==
-X-Google-Smtp-Source: ACHHUZ4sRiUl8ZQ9Iel6R3RROXwWDQyrvXV1swcdDxV3nhK1shTguwNVIeCoxaUdLSKwUZtJTgbMug==
-X-Received: by 2002:a05:6870:a242:b0:19f:63d1:3d4e with SMTP id g2-20020a056870a24200b0019f63d13d4emr9841870oai.33.1685973779564;
-        Mon, 05 Jun 2023 07:02:59 -0700 (PDT)
-Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id f12-20020a4ace8c000000b0055ab0abaf31sm454787oos.19.2023.06.05.07.02.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 07:02:57 -0700 (PDT)
-From:   Anup Patel <apatel@ventanamicro.com>
-To:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
-        maz@kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH v2 8/8] riscv: Fix guest RAM alloc size computation for RV32
-Date:   Mon,  5 Jun 2023 19:32:08 +0530
-Message-Id: <20230605140208.272027-9-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230605140208.272027-1-apatel@ventanamicro.com>
-References: <20230605140208.272027-1-apatel@ventanamicro.com>
+        with ESMTP id S234879AbjFEOKW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 10:10:22 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC3AB1991;
+        Mon,  5 Jun 2023 07:09:14 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 355E8vRH012291;
+        Mon, 5 Jun 2023 14:09:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=6u+liUSvDBY+5lMgkcI56mqdM/C6fRklXDnjVEcYhcI=;
+ b=JWBx2ih86sIUOCWz9C4WvpntHeQFsTcfsP5lNyyHnxSWaDigWJbH9Jm/9pds0SQfj9xs
+ UsM3rK2vh3BK4/iDqWiL1e+bEReFWzDfDSx3zzDXqLhkMVP+wIWH5VuwHrQzvwkgE8AR
+ gLj8EMA8Pz50HZMGnd+8czkt17qhcjWPlZXgOnRKdw20E3+q0ZqZ3cKIiKY4jjAUMdDj
+ x7PmOaX1U/kMqS4ouN6MhATSzVG4sibVrthVQNV4B6GZCfn0eWToRw7mspnRveDww+d3
+ lErgCHFHOd4k3jAOQjXi/P90zsWYUW1x97URPsPKVXrOewVkrT5qTlZssmX0OFkXJJnG dA== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r1h0n8973-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jun 2023 14:09:07 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3554gbHi001935;
+        Mon, 5 Jun 2023 14:04:01 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3qyxg2hcx2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jun 2023 14:04:00 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 355E3vui20513534
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Jun 2023 14:03:57 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 76AD12004E;
+        Mon,  5 Jun 2023 14:03:57 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E847720040;
+        Mon,  5 Jun 2023 14:03:56 +0000 (GMT)
+Received: from [9.171.39.161] (unknown [9.171.39.161])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon,  5 Jun 2023 14:03:56 +0000 (GMT)
+Message-ID: <3eab8065-41e7-94b8-a6da-18222f711fa0@linux.ibm.com>
+Date:   Mon, 5 Jun 2023 16:03:56 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: *
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2 6/6] s390/uv: Update query for secret-UVCs
+Content-Language: en-US
+To:     Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>
+Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>
+References: <20230519093708.810957-1-seiden@linux.ibm.com>
+ <20230519093708.810957-7-seiden@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20230519093708.810957-7-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: PQHJ-krbWCCqJH5qRE1uL2f82fV0DpjP
+X-Proofpoint-ORIG-GUID: PQHJ-krbWCCqJH5qRE1uL2f82fV0DpjP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-06-05_28,2023-06-02_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ phishscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999 adultscore=0
+ spamscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2306050123
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, we ensure that guest RAM alloc size is at least 2M for
-THP which works well for RV64 but breaks hugepage support for RV32.
-To fix this, we use 4M as hugepage size for RV32.
+On 5/19/23 11:37, Steffen Eiden wrote:
+> Update the query struct such that secret-UVC related
+> information can be parsed.
+> Add sysfs files for these new values.
+> 
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 
-Fixes: 867159a7963b ("riscv: Implement Guest/VM arch functions")
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
----
- riscv/kvm.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+You should add a bit of information about the fields.
+Not a large amount but having no info doesn't help anyone without access 
+to our design documents.
 
-diff --git a/riscv/kvm.c b/riscv/kvm.c
-index 4d6f5cb..8daad94 100644
---- a/riscv/kvm.c
-+++ b/riscv/kvm.c
-@@ -61,16 +61,25 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
- {
- }
- 
-+#if __riscv_xlen == 64
-+#define HUGEPAGE_SIZE	SZ_2M
-+#else
-+#define HUGEPAGE_SIZE	SZ_4M
-+#endif
-+
- void kvm__arch_init(struct kvm *kvm)
- {
- 	/*
- 	 * Allocate guest memory. We must align our buffer to 64K to
- 	 * correlate with the maximum guest page size for virtio-mmio.
--	 * If using THP, then our minimal alignment becomes 2M.
--	 * 2M trumps 64K, so let's go with that.
-+	 * If using THP, then our minimal alignment becomes hugepage
-+	 * size. The hugepage size is always greater than 64K, so
-+	 * let's go with that.
- 	 */
- 	kvm->ram_size = min(kvm->cfg.ram_size, (u64)RISCV_MAX_MEMORY(kvm));
--	kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
-+	kvm->arch.ram_alloc_size = kvm->ram_size;
-+	if (!kvm->cfg.hugetlbfs_path)
-+		kvm->arch.ram_alloc_size += HUGEPAGE_SIZE;
- 	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm,
- 						kvm->cfg.hugetlbfs_path,
- 						kvm->arch.ram_alloc_size);
--- 
-2.34.1
+> ---
+
+[...]
+
+>   extern struct uv_info uv_info;
+> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+> index d5b5d7e83c17..c0a1bfb01135 100644
+> --- a/arch/s390/kernel/uv.c
+> +++ b/arch/s390/kernel/uv.c
+> @@ -571,6 +571,42 @@ static ssize_t uv_query_supp_att_pflags(struct kobject *kobj,
+>   static struct kobj_attribute uv_query_supp_att_pflags_attr =
+>   	__ATTR(supp_att_pflags, 0444, uv_query_supp_att_pflags, NULL);
+>   
+> +static ssize_t uv_query_supp_add_secret_req_ver(struct kobject *kobj,
+> +						struct kobj_attribute *attr, char *page)
+
+s/page/buf/ for the whole lot.
+
+> +{
+> +	return sysfs_emit(page, "%lx\n", uv_info.supp_add_secret_req_ver);
+> +}
+> +
+> +static struct kobj_attribute uv_query_supp_add_secret_req_ver_attr =
+> +	__ATTR(supp_add_secret_req_ver, 0444, uv_query_supp_add_secret_req_ver, NULL);
+> +
+> +static ssize_t uv_query_supp_add_secret_pcf(struct kobject *kobj,
+> +					    struct kobj_attribute *attr, char *page)
+> +{
+> +	return sysfs_emit(page, "%lx\n", uv_info.supp_add_secret_pcf);
+> +}
+> +
+> +static struct kobj_attribute uv_query_supp_add_secret_pcf_attr =
+> +	__ATTR(supp_add_secret_pcf, 0444, uv_query_supp_add_secret_pcf, NULL);
+> +
+> +static ssize_t uv_query_supp_secret_types(struct kobject *kobj,
+> +					  struct kobj_attribute *attr, char *page)
+> +{
+> +	return sysfs_emit(page, "%lx\n", uv_info.supp_secret_types);
+> +}
+> +
+> +static struct kobj_attribute uv_query_supp_secret_types_attr =
+> +	__ATTR(supp_secret_types, 0444, uv_query_supp_secret_types, NULL);
+> +
+
+> +static ssize_t uv_query_max_secrets(struct kobject *kobj,
+> +				    struct kobj_attribute *attr, char *page)
+> +{
+> +	return sysfs_emit(page, "%d\n", uv_info.max_secrets);
+> +}
+
+uv_query_max_secrets
+but then
+uv_query_max_num_secrets_attr
+
+To num or not to num. That's the question
+
+> +
+> +static struct kobj_attribute uv_query_max_num_secrets_attr =
+> +	__ATTR(max_secrets, 0444, uv_query_max_secrets, NULL);
+
+And here the num is gone again.
+
+> +
+>   static struct attribute *uv_query_attrs[] = {
+>   	&uv_query_facilities_attr.attr,
+>   	&uv_query_feature_indications_attr.attr,
+> @@ -584,6 +620,10 @@ static struct attribute *uv_query_attrs[] = {
+>   	&uv_query_dump_cpu_len_attr.attr,
+>   	&uv_query_supp_att_req_hdr_ver_attr.attr,
+>   	&uv_query_supp_att_pflags_attr.attr,
+> +	&uv_query_supp_add_secret_req_ver_attr.attr,
+> +	&uv_query_supp_add_secret_pcf_attr.attr,
+> +	&uv_query_supp_secret_types_attr.attr,
+> +	&uv_query_max_num_secrets_attr.attr,
+>   	NULL,
+>   };
+>   
 
