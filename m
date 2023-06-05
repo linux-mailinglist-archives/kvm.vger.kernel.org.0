@@ -2,146 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 087A27228EA
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 16:36:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1111D7229EB
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 16:55:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234180AbjFEOgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 10:36:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57176 "EHLO
+        id S234581AbjFEOzW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 10:55:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234127AbjFEOgI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 10:36:08 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 346EBED;
-        Mon,  5 Jun 2023 07:36:06 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-50d897af77bso684379a12.1;
-        Mon, 05 Jun 2023 07:36:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685975764; x=1688567764;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/nEIx2pKx8MANmuUD53PuQCkyn4NP8umHBPTpshdhtE=;
-        b=X4pOGtiEGzl58GIFHbyV096t93IrJzELqcypLc4QMyHeBwAan/aALSMopAZ+lqPIs/
-         PZNtR1f+KboWQSY8gUKV8bP6VLPOPyLj9X+PcDBik6Rb1GkoW1dQzGRxs/VB+cefUAHk
-         oqOoq9ZzN1ix9J54M/O922WWDlAgpQE5AKeuQY1UWV5aftGRdFXROUT/wO25J2bq7tvJ
-         ntDFTIewi2nWrpz4P99jP9etHFIKzZEQQ2s93Ttnro2HDYWUBGQU+f9mpHNbRQ5IlJbB
-         1OEzF7yvggyK3Clsj7G1B3wcFoRHXo6xJ+JId++mQ9eGPjlFHkVYB7SLL19lfxy+iJ6r
-         HQbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685975764; x=1688567764;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/nEIx2pKx8MANmuUD53PuQCkyn4NP8umHBPTpshdhtE=;
-        b=SdyEPM1jdpO9UOjc0wb88OGty/2k7gzfz84pMrlR/hf04x2sNQsdH1kLGenOSnkhxC
-         Xed8E54J/t3ug3QhcTKKK9S6FyI+GU2Nfdy8cGyACpdQSsAJJ5OFZ1LEYjBQIb0EkKQI
-         tJJXJxCHPvOLDAw4vDc4XhESB+5cK7+73Rb3lgOuasUOzGUJK37tQ2cXI1+WCiuxAInz
-         o181SDEEJ3+Vhd+oKmOzYltAwTl6rm6kl+wGo0zJEQpEs6aEkoZ59zeV0cjGMG3vAhlx
-         alKcLY3f9/woPFYXzZHbAJgs4sRWY+Oz0rP4+K7vORK2mCY8PoBfWMRqewxfYcGb40WL
-         mClg==
-X-Gm-Message-State: AC+VfDwVqPXhfqSKpU9vMuVKLCbgVychtSfjpQQQ9MfKX1HXgt/fCgeD
-        EPuFSTDv/gyQV+PxqlAhg+c=
-X-Google-Smtp-Source: ACHHUZ64cK7Y08p9XC1fThPd/qyz85iOAi9xrRj76BmDStiQbKH5iM+XYS3Sd25RTQiQg9fupo3QbA==
-X-Received: by 2002:a17:906:7a17:b0:974:56cb:9dfc with SMTP id d23-20020a1709067a1700b0097456cb9dfcmr9788715ejo.1.1685975764343;
-        Mon, 05 Jun 2023 07:36:04 -0700 (PDT)
-Received: from localhost ([134.191.220.83])
-        by smtp.gmail.com with ESMTPSA id i21-20020a170906851500b00965e9a23f2bsm4364473ejx.134.2023.06.05.07.35.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 07:36:04 -0700 (PDT)
-Date:   Mon, 5 Jun 2023 22:35:20 +0800
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
-        suzuki.poulose@arm.com, yuzenghui@huawei.com,
-        catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org,
-        aleksandar.qemu.devel@gmail.com, tsbogend@alpha.franken.de,
-        anup@brainfault.org, atishp@atishpatra.org,
-        paul.walmsley@sifive.com, palmer@dabbelt.com,
-        aou@eecs.berkeley.edu, seanjc@google.com, pbonzini@redhat.com,
-        dmatlack@google.com, ricarkol@google.com,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 09/16] KVM: arm64: Document the page table walker
- actions based on the callback's return value
-Message-ID: <20230605223520.00007fbd.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230602160914.4011728-10-vipinsh@google.com>
-References: <20230602160914.4011728-1-vipinsh@google.com>
-        <20230602160914.4011728-10-vipinsh@google.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S234176AbjFEOzR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 10:55:17 -0400
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CFF211B
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 07:55:12 -0700 (PDT)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1q6Bbx-00BsX1-PD; Mon, 05 Jun 2023 16:55:09 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=7Pbf8SsxGF+K+f05cyGtz00cKCtpJ+QFkP0vW0jy+v8=; b=PuaBp+TzTclLdW4D4YLADmvDrR
+        eux6B0g+CkMMP+ioNo/CKrxj2d52addDwvSHasRvW7RHithd3Zz+KmkmmLKmqHMKl9MHHXp9zAH/1
+        UsB/R5I0RUTVJA1VSf6ONMSmA6L/0wUqHRqzYPXc3d1zc/OtyQCghGt7HmyEfDRIC581FozAxxfCr
+        vhOuEPG3Gfr90OF8kRq7Yb/aFXM/Ra6/e4W9V4qiunp/VHLLo57ejNaIC0I16r6VAz766PZDLvmxX
+        egRYgHF+HF8VsJtIWzwkx4sr7pPtfoA9WGjLrGQ+fYvLBkb3z5EgWbKQk5eUURCbSutVVyAQ4leQJ
+        Y0qrtFRA==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1q6Bbw-0007Wp-Pw; Mon, 05 Jun 2023 16:55:09 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1q6Bbh-0000o9-TA; Mon, 05 Jun 2023 16:54:53 +0200
+Message-ID: <585cb687-54e5-90f3-36f2-0c356183db89@rbox.co>
+Date:   Mon, 5 Jun 2023 16:54:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Thunderbird
+Subject: Re: [PATCH] KVM: Clean up kvm_vm_ioctl_create_vcpu()
+Content-Language: pl-PL, en-GB
+To:     Yuan Yao <yuan.yao@linux.intel.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
+References: <20230605114852.288964-1-mhal@rbox.co>
+ <20230605130333.gzhjx4gbw7nkqbm2@yy-desk-7060>
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20230605130333.gzhjx4gbw7nkqbm2@yy-desk-7060>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri,  2 Jun 2023 09:09:07 -0700
-Vipin Sharma <vipinsh@google.com> wrote:
-
-> Document what the page table walker do when walker callback function returns
-> a value.
+On 6/5/23 15:03, Yuan Yao wrote:
+> On Mon, Jun 05, 2023 at 01:44:19PM +0200, Michal Luczaj wrote:
+>> Since c9d601548603 ("KVM: allow KVM_BUG/KVM_BUG_ON to handle 64-bit cond")
+>> 'cond' is internally converted to boolean, so caller's explicit conversion
+>> from void* is unnecessary.
+>>
+>> Remove the double bang.
+>> ...
+>> -	if (KVM_BUG_ON(!!xa_store(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, 0), kvm)) {
+>> +	if (KVM_BUG_ON(xa_store(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, 0), kvm)) {
 > 
-> Current documentation is not correct as negative error of -EAGAIN on a
-> non-shared page table walker doesn't terminate the walker and continues
-> to the next step.
+> Looks the only one place for KVM_BUG_ON().
 > 
-> There might be a better place to keep this information, for now this
-> documentation will work as a reference guide until a better way is
-> found.
->
-
-After reading the whole patch series, I was thinking it might be a good
-time to improve the way how the visitor function and page table walker
-talk to each other. The error code is good enough before, but its meaning
-seems limited and vague when the visitor function wants to express more about
-what exactly happens inside. I am not sure if it is a good idea to continue
-that way: 1. found a new situation. 2. choosing a error code for visitor
-function. 3. walker translates the error code into the situation to
-handle. 4. document the error code and its actual meaning.
-
-Eventually I am afraid that we are going to abuse the error code.
-
-What about introducing a set of flags for the visitor function to express
-what happened and simplify the existing error code?
-
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
+> Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 8ef7e8f3f054..957bc20dab00 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -711,8 +711,19 @@ int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
->   * after invoking the walker callback, allowing the walker to descend into
->   * a newly installed table.
->   *
-> - * Returning a negative error code from the walker callback function will
-> - * terminate the walk immediately with the same error code.
-> + * Depending on the return value from the walker callback function, the page
-> + * table walk will continue or exit the walk. This is also dependent on the
-> + * type of the walker, i.e. shared walker (vCPU fault handlers) or non-shared
-> + * walker.
-> + *
-> + * Walker Type  | Callback         | Walker action
-> + * -------------|------------------|--------------
-> + * Non-Shared   | 0                | Continue
-> + * Non-Shared   | -EAGAIN          | Continue
-> + * Non-Shared   | Any other        | Exit
-> + * -------------|------------------|--------------
-> + * Shared       | 0                | Continue
-> + * Shared       | Any other        | Exit
->   *
->   * Return: 0 on success, negative error code on failure.
->   */
+> BTW: svm_get_lbr_msr() is using KVM_BUG(false, ...) and
+> handle_cr() is using KVM_BUG(1, ...), a chance to
+> change them to same style ?
 
+Sure, but KVM_BUG(false, ...) is a no-op, right? Would you like me to fix it
+separately with KVM_BUG(1, ...) as a (hardly significant) functional change?
+
+Also, am I correct to assume that (1, ) is the preferred style?
+arch/powerpc/kvm/book3s_64_mmu_host.c:kvmppc_mmu_map_page() seems to be the only
+exception (within KVM) with a `WARN_ON(true)`.
