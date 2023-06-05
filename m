@@ -2,75 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E40F721BA3
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 03:51:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A271721BB8
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 03:57:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232053AbjFEBvl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Jun 2023 21:51:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45766 "EHLO
+        id S232351AbjFEB5s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Jun 2023 21:57:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230070AbjFEBvk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Jun 2023 21:51:40 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16FEDBC
-        for <kvm@vger.kernel.org>; Sun,  4 Jun 2023 18:51:39 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id e9e14a558f8ab-33b9a56e261so16429605ab.0
-        for <kvm@vger.kernel.org>; Sun, 04 Jun 2023 18:51:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=igel-co-jp.20221208.gappssmtp.com; s=20221208; t=1685929898; x=1688521898;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nn/2raZaCEyxkUMRUrTbO96sBipL80hG5ePyrz6qFx0=;
-        b=vLTLo9Hga0Ar/isQv1thQ6LMwe4TSJJTmb7rjkogfP78xWUerUFwJaFlInNN9Rsbzl
-         dV3v3LxF/3LdvZNssfF5mechwpN6sod6eFwCoqa7HtKcHPuPRa7K45x+vrJl8H7NSh7J
-         SKxSlhKhnaKyUjqxey0rcUj2iDvQ4aqXRWBlGgBtJemIoMoJdEJhtkzT/XbQDP0vyvWO
-         UzKUdFE+vNvkmZQlYZF0/l/ScJmT7Axe37yNY59/I/EzH1+1zDSZx78qAuTda7bY1vuH
-         G+oPjEz37oRdwRPJZL7qx321ELEIQWoAeqUm5KJBPrMQAUQkpq3YuWiKkabMXOAjRaI5
-         BqgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685929898; x=1688521898;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nn/2raZaCEyxkUMRUrTbO96sBipL80hG5ePyrz6qFx0=;
-        b=EVApJAq0ztGz2I/Y/NVoMVYusRv6AKis93rsEo5j7KJFf/FyTZ+ivfKuOR7vHYYrPX
-         iRairylrpT4haAsZK6JrgKUsG2QE3dkyverC7ly4vexuvXnrxCqNMarGQJAs4Cud8poa
-         BnhFInp707vGOnzs4gC1iw6nFGIOz5WTX5mS/JzMRQiQ4KkBNjjpVHTVvn9+CSmqWxgd
-         tNh43pVoNB5SclfiA1vmqRle+zSYaQ3gz0zCrqtTPfgyvm7lLJIy69btKPNVCZoRFFKk
-         e1DUUauotzM+Rv+CpPMYzEx/L5GW9QuJ+OEkBsjFXDzBbYzvhswWLLyQ26H9k42zxDge
-         tJEw==
-X-Gm-Message-State: AC+VfDz+84Ci5obe9tdiQ1KxrvvUM3uTOXjts1kPIvwOKhFr1Ki1PMLs
-        Y/0RUnikB0ds88EvqjLoHmY2EA==
-X-Google-Smtp-Source: ACHHUZ6j59fPcF9quNXpef0zZealPMWzACLlBgD6zknXufz/5SoUGHY373Tr8l3QoY7c6Dv6Vp7NDg==
-X-Received: by 2002:a92:d20d:0:b0:33d:ab70:3447 with SMTP id y13-20020a92d20d000000b0033dab703447mr3111921ily.19.1685929898002;
-        Sun, 04 Jun 2023 18:51:38 -0700 (PDT)
-Received: from [10.16.161.199] (napt.igel.co.jp. [219.106.231.132])
-        by smtp.gmail.com with ESMTPSA id 4-20020aa79244000000b0065d2f009f9esm56628pfp.115.2023.06.04.18.51.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 04 Jun 2023 18:51:37 -0700 (PDT)
-Message-ID: <78f77d87-5499-b68c-298d-d49e740a2cc1@igel.co.jp>
-Date:   Mon, 5 Jun 2023 10:51:34 +0900
+        with ESMTP id S229449AbjFEB5r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Jun 2023 21:57:47 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 478389E;
+        Sun,  4 Jun 2023 18:57:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685930266; x=1717466266;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=QBoebP1n4VeEjg1QFqOqDuX/jdvuOnD7tkDfTVYNhA8=;
+  b=XXXO4XikMcYE/zQGSvSZsvaAr75VTbHrsOs105MpZcvoSr5INt1LDCvq
+   Ge0n2p6v1dt6LbVFSjBa4OUHCllvENwAh/qK3II4YvbcOTlcCbPjpb+V0
+   l9z9H44lhHKzEz16WTMZty5vZk9I2QLq57E+aESEfBTB8z+IMed2J4pzs
+   4sfxuGqzgoy4pQQbdvkjbl6YhebLZjonIqtYXDq+zN92Do377Snm2Chxs
+   6VYdUu8FOmAOjo3K+VfF8HtueSvsdEb/FAU5mFm3mv+onHyqbE8CMdPaT
+   WaP96T1zqI/NnHu+fI8PzW9qtp0F9/oEoBbau5Q9vushw6y5acke8BTJ0
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10731"; a="340893871"
+X-IronPort-AV: E=Sophos;i="6.00,217,1681196400"; 
+   d="scan'208";a="340893871"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2023 18:57:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10731"; a="852807827"
+X-IronPort-AV: E=Sophos;i="6.00,217,1681196400"; 
+   d="scan'208";a="852807827"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.1.148]) ([10.238.1.148])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2023 18:57:43 -0700
+Message-ID: <7335a53b-5b6a-f186-d3b9-99569aa2559c@linux.intel.com>
+Date:   Mon, 5 Jun 2023 09:57:40 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.11.0
-Subject: Re: [PATCH v4 1/1] vringh: IOMEM support
-Content-Language: en-US
-To:     Simon Horman <simon.horman@corigine.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230602055211.309960-1-mie@igel.co.jp>
- <20230602055211.309960-2-mie@igel.co.jp> <ZHtQybyy3qg+xw10@corigine.com>
-From:   Shunsuke Mie <mie@igel.co.jp>
-In-Reply-To: <ZHtQybyy3qg+xw10@corigine.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v1 2/6] KVM: x86: Virtualize CR4.LASS
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+References: <20230601142309.6307-1-guang.zeng@intel.com>
+ <20230601142309.6307-3-guang.zeng@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230601142309.6307-3-guang.zeng@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,57 +68,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Simon-san,
 
-On 2023/06/03 23:40, Simon Horman wrote:
-> On Fri, Jun 02, 2023 at 02:52:11PM +0900, Shunsuke Mie wrote:
->> Introduce a new memory accessor for vringh. It is able to use vringh to
->> virtio rings located on io-memory region.
->>
->> Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
-> ...
->
->> +/**
->> + * vringh_iov_pull_iomem - copy bytes from vring_iov.
-> Hi Mie-san,
->
-> as it looks like there will be a v2,
-> please consider documenting the vrh parameter here.
-It was missing an explanation. I will address that and review this patch.
-Thank you.
->
->> + * @riov: the riov as passed to vringh_getdesc_iomem() (updated as we consume)
->> + * @dst: the place to copy.
->> + * @len: the maximum length to copy.
->> + *
->> + * Returns the bytes copied <= len or a negative errno.
->> + */
->> +ssize_t vringh_iov_pull_iomem(struct vringh *vrh, struct vringh_kiov *riov,
->> +			      void *dst, size_t len)
->> +{
->> +	return vringh_iov_xfer(vrh, riov, dst, len, xfer_from_iomem);
->> +}
->> +EXPORT_SYMBOL(vringh_iov_pull_iomem);
->> +
->> +/**
->> + * vringh_iov_push_iomem - copy bytes into vring_iov.
-> And here.
-I do the same.
->> + * @wiov: the wiov as passed to vringh_getdesc_iomem() (updated as we consume)
->> + * @src: the place to copy from.
->> + * @len: the maximum length to copy.
->> + *
->> + * Returns the bytes copied <= len or a negative errno.
->> + */
->> +ssize_t vringh_iov_push_iomem(struct vringh *vrh, struct vringh_kiov *wiov,
->> +			      const void *src, size_t len)
->> +{
->> +	return vringh_iov_xfer(vrh, wiov, (void *)src, len, xfer_to_iomem);
->> +}
->> +EXPORT_SYMBOL(vringh_iov_push_iomem);
-> ...
 
-Best regards,
+On 6/1/2023 10:23 PM, Zeng Guang wrote:
+> Virtualize CR4.LASS[bit 27] under KVM control instead of being guest-owned
+> as CR4.LASS generally set once for each vCPU at boot time and won't be
+> toggled at runtime. Besides, only if VM has LASS capability enumerated with
+> CPUID.(EAX=07H.ECX=1):EAX.LASS[bit 6], KVM allows guest software to be able
+> to set CR4.LASS.
+>
+> Updating cr4_fixed1 to set CR4.LASS bit in the emulated IA32_VMX_CR4_FIXED1
+> MSR for guests and allow guests to enable LASS in nested VMX operaion as well.
+s/operaion/operation
 
-Shunsuke
+>
+> Notes: Setting CR4.LASS to 1 enable LASS in IA-32e mode. It doesn't take
+> effect in legacy mode even if CR4.LASS is set.
+>
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h | 2 +-
+>   arch/x86/kvm/vmx/vmx.c          | 3 +++
+>   arch/x86/kvm/x86.h              | 2 ++
+>   3 files changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index fb9d1f2d6136..92d8e65fe88c 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -125,7 +125,7 @@
+>   			  | X86_CR4_PGE | X86_CR4_PCE | X86_CR4_OSFXSR | X86_CR4_PCIDE \
+>   			  | X86_CR4_OSXSAVE | X86_CR4_SMEP | X86_CR4_FSGSBASE \
+>   			  | X86_CR4_OSXMMEXCPT | X86_CR4_LA57 | X86_CR4_VMXE \
+> -			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP))
+> +			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP | X86_CR4_LASS))
+Suppose there is some bare-matel linux patch to define the LASS related 
+macros.
+May be better to describe the dependent patch(es) in cover letter.
+
+
+>   
+>   #define CR8_RESERVED_BITS (~(unsigned long)X86_CR8_TPR)
+>   
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 44fb619803b8..a33205ded85c 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7603,6 +7603,9 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
+>   	cr4_fixed1_update(X86_CR4_UMIP,       ecx, feature_bit(UMIP));
+>   	cr4_fixed1_update(X86_CR4_LA57,       ecx, feature_bit(LA57));
+>   
+> +	entry = kvm_find_cpuid_entry_index(vcpu, 0x7, 1);
+> +	cr4_fixed1_update(X86_CR4_LASS,       eax, feature_bit(LASS));
+> +
+>   #undef cr4_fixed1_update
+>   }
+>   
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index c544602d07a3..e1295f490308 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -529,6 +529,8 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type);
+>   		__reserved_bits |= X86_CR4_VMXE;        \
+>   	if (!__cpu_has(__c, X86_FEATURE_PCID))          \
+>   		__reserved_bits |= X86_CR4_PCIDE;       \
+> +	if (!__cpu_has(__c, X86_FEATURE_LASS))          \
+> +		__reserved_bits |= X86_CR4_LASS;        \
+>   	__reserved_bits;                                \
+>   })
+>   
 
