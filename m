@@ -2,106 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D287722EAB
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 20:28:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96017722EBE
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 20:31:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234769AbjFES20 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 14:28:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47790 "EHLO
+        id S235444AbjFESbo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 14:31:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229895AbjFES2Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 14:28:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18AF2D3
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 11:27:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685989655;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NLqF+FP9XKGLY/N8TYvolkTUJ/XX2aaQacQy9cI24wI=;
-        b=cbx1B7Mk8qzL95Y4II46wxyl0djxz9qFVaaIiX3LI8CVsRWYi+Xc/PsQE9sO/yGN6Zfesy
-        ynLGeEarxJTQMRjLGYeZPw4occm6v93e33tdqcrDbrC4Y2ya6VmdiYxah8Y4EBAMqPSJrm
-        6Lh5AZuxksgU6mg9w+v0BFJQ5V8zu0I=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-592-FKxiZjGQOqGymE86dI9FKg-1; Mon, 05 Jun 2023 14:27:34 -0400
-X-MC-Unique: FKxiZjGQOqGymE86dI9FKg-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-51566dc6066so3378931a12.3
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 11:27:33 -0700 (PDT)
+        with ESMTP id S235422AbjFESbl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 14:31:41 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD24411B
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 11:31:37 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-bacfa4eefd2so8196295276.0
+        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 11:31:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685989897; x=1688581897;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IO/Fs3eGWzo23DrzeVi6xYXoO5D8M7e0QwyLF6JWXrg=;
+        b=ycRoK2OfE9MEm1ayzDiR63HOQqu8GiIfBSQVBKpNGRHXt5GdzNLQRrq7NwCVD6vG3U
+         ZQWh4PjDb5hstSmguBpzROCAC+EnQQfgZbqXUCOuPoMCqVALO9JHWg0EPyz2UPOuzDvg
+         eP9kjPGLYVCejjfWdVh9/11Ea8S8eTMEfBDOCDXbovxOJ/XsvTL0J58jwVfMYRq5w5oB
+         9q++eh1qTFl1szhzEBhCYIT1W0LM5yGC575YzxsZ4VWd+TUFUP53RQHECjtVW+f+kIm/
+         myhvUEVRvdfpwdilcp0kaQ6s1aMZVgHMSa/LUtGFpY9k1gGTPOA5mAZXVtv4bOJPNp2G
+         GVLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685989653; x=1688581653;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NLqF+FP9XKGLY/N8TYvolkTUJ/XX2aaQacQy9cI24wI=;
-        b=E+veYuRscwBUXTl4D2EfCog6LbhCiIA2njqfaZtK0QcwaTXbUcEUYw26ELOv4CwwNe
-         AK/ikdAfhdXolgCT66thRuaxGhNsEDylEEXLFPxZ35LR++baVASY1b6MgTZni8geaxk7
-         k88Goag0KDxrjMQFTA5ju3L6atanB+2mx0NfQ7RZxP+Uif92wWgcpb5W727BACP2NS7c
-         zXQS46VVGxqGr+EZhaRLkz4PlbRkdsiGlGGU5Mo9Pxz3HzDAGrZmewgcAgG1ACj3U8L+
-         dFmCl7X2O+rFGBk8UKzQrF9N9mq4/SHa2Q6gEs6quoehMt4vVbuGmhfRoik9NXfM4acC
-         n6Bw==
-X-Gm-Message-State: AC+VfDwepGfkNMpMY9a2VunxmsMBUR6fC6O6OlIUDamshaCruQGDCw7K
-        ntyEb7hecNvGY+cQwJJptdAgnp3TPjFvCgHNgrlhxCIA8LVkYzXrMYgwyRy6duIw0qHpmueRo20
-        WFEomFWAPhc5l
-X-Received: by 2002:aa7:d051:0:b0:514:9dd7:4bcc with SMTP id n17-20020aa7d051000000b005149dd74bccmr36026edo.14.1685989652940;
-        Mon, 05 Jun 2023 11:27:32 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ40LZ2pka/pHDfXINckd39P6zW4VjPB1HZOEZInL2ZhFkwFzNmdd9ivBw6YCEmTf5+BOFbxmQ==
-X-Received: by 2002:aa7:d051:0:b0:514:9dd7:4bcc with SMTP id n17-20020aa7d051000000b005149dd74bccmr36018edo.14.1685989652626;
-        Mon, 05 Jun 2023 11:27:32 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id v12-20020aa7cd4c000000b0050bc6983041sm4057277edw.96.2023.06.05.11.27.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jun 2023 11:27:31 -0700 (PDT)
-Message-ID: <3b7194b7-4616-0585-9a4a-91d42eebea9a@redhat.com>
-Date:   Mon, 5 Jun 2023 20:27:30 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH] KVM: x86/mmu: Remove KVM MMU write lock when accessing
- indirect_shadow_pages
-Content-Language: en-US
-To:     Ben Gardon <bgardon@google.com>, Jim Mattson <jmattson@google.com>
-Cc:     Mingwei Zhang <mizhang@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230605004334.1930091-1-mizhang@google.com>
- <CALMp9eSQgcKd=SN4q2QRYbveKoayKzuYEQPM0Xu+FgQ_Mja8-g@mail.gmail.com>
- <CANgfPd9kKxq1146F3mX_u7KCC0HrWfgYrxZd6c9Dh7s19E4Eog@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CANgfPd9kKxq1146F3mX_u7KCC0HrWfgYrxZd6c9Dh7s19E4Eog@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1685989897; x=1688581897;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IO/Fs3eGWzo23DrzeVi6xYXoO5D8M7e0QwyLF6JWXrg=;
+        b=G7tul42IX7cRQ0JG6ynRCxrKBexmHJdgDGydUhItGkeS7yLbobJuuHZNerpKb4K/4J
+         6p32LZuQzo4k49Q/muY1x7CkczeIYngfDt9zYOLFRNMw+mREKQ5wemqYjgtRAEtGugDH
+         mZCqCCuFGc7MP0f1HJ704mqdrfoHgumAAVe/vTRzdn5Ne5wFRVaEN3234bq9Pux22Xw0
+         0m/YzFaB+uRweoR6DWpXCrvaW37KYCoN+IhSU9EIyN5HMu3W8LsdVDg4uwq+rk/FIlqC
+         gL/ilOecs1zX6wOukdRQD0jcE9MUPyL044FClmP4Oc612yrxPqlhgRGvGhNkXWxMks6S
+         fD5w==
+X-Gm-Message-State: AC+VfDxj8telUP4VT0fPJ64IID0PSv6SlU/1JAlKXc3G+gkRgjQgeN4G
+        VYruHMPhv36G2K02VsrLyk95gvtJzBQ=
+X-Google-Smtp-Source: ACHHUZ4NBu7vF5TjFZr2Ug3j35ct3jGPLL/h6oWgYrrkJtBc0ZMdj9ipL/l+ZEawI0+Z0CWUZEe/C9ODobI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:120d:b0:bb0:f056:cf43 with SMTP id
+ s13-20020a056902120d00b00bb0f056cf43mr4262890ybu.1.1685989896966; Mon, 05 Jun
+ 2023 11:31:36 -0700 (PDT)
+Date:   Mon, 5 Jun 2023 11:31:34 -0700
+In-Reply-To: <20230605173101.iflfly3bt6ydvvyk@desk>
+Mime-Version: 1.0
+References: <20230531231820.trrs2uugc24gegj4@treble> <F4BEBCAF-CBFC-4C3E-8B01-2ED84CF2E13A@nutanix.com>
+ <20230601004202.63yulqs73kuh3ep6@treble> <846dd0c5-d431-e20e-fdb3-a4a26b6a22ca@citrix.com>
+ <20230601012323.36te7hfv366danpf@desk> <20230601042345.52s5337uz62p6aow@treble>
+ <21D1D290-7DE9-4864-A05B-A36779D9DC26@nutanix.com> <20230605163552.hi5kvh5wijegmus6@treble>
+ <E704D6D6-3B03-40FA-8CDB-5FB58871BABC@nutanix.com> <20230605173101.iflfly3bt6ydvvyk@desk>
+Message-ID: <ZH4qBjLi0egsuC1D@google.com>
+Subject: Re: [PATCH] KVM: VMX: remove LFENCE in vmx_spec_ctrl_restore_host()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc:     Jon Kohler <jon@nutanix.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        "kvm @ vger . kernel . org" <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/5/23 19:17, Ben Gardon wrote:
->>> -               if (indirect_shadow_pages)
->>> +               if (READ_ONCE(vcpu->kvm->arch.indirect_shadow_pages))
->> I don't understand the need for READ_ONCE() here. That implies that
->> there is something tricky going on, and I don't think that's the case.
-> Agree this doesn't need a READ_ONCE. Just a read is fine.
-> kvm_mmu_unprotect_page starts by acquiring the MMU lock, so there's
-> not much room to reorder anything anyway.
+On Mon, Jun 05, 2023, Pawan Gupta wrote:
+> On Mon, Jun 05, 2023 at 04:39:02PM +0000, Jon Kohler wrote:
+> > >>> Yes.  Though in practice it might not make much of a difference.  W=
+ith
+> > >>> wrmsr+lfence, the lfence has nothing to do so it might be almost
+> > >>> instantaneous anyway.
+> > >>>=20
+> > >>> --=20
+> > >>> Josh
+> > >>=20
+> > >> Coming back to this, what if we hoisted call vmx_spec_ctrl_restore_h=
+ost above
+> > >> FILL_RETURN_BUFFER, and dropped this LFENCE as I did here?
+> > >>=20
+> > >> That way, we wouldn=E2=80=99t have to mess with the internal LFENCE =
+in nospec-branch.h,
+> > >> and that would act as the =E2=80=9Cfinal line of defense=E2=80=9D LF=
+ENCE.
+> > >>=20
+> > >> Would that be acceptable? Or does FILL_RETURN_BUFFER *need* to occur
+> > >> before any sort of calls no matter what?
+> > >=20
+> > > If we go by Intel's statement that only unbalanced RETs are a concern=
+,
+> > > that *might* be ok as long as there's a nice comment above the
+> > > FILL_RETURN_BUFFER usage site describing the two purposes for the
+> > > LFENCE.
+>=20
+> We would then need FILL_RETURN_BUFFER to unconditionally execute LFENCE
+> to account for wrmsr branch misprediction. Currently LFENCE is not
+> executed for !X86_BUG_EIBRS_PBRSB.
+>=20
+> > > However, based on Andy's concerns, which I've discussed with him
+> > > privately (but I'm not qualified to agree or disagree with), we may w=
+ant
+> > > to just convert vmx_spec_ctrl_restore_host() to asm.  Better safe tha=
+n
+> > > sorry.  My original implementation of that function was actually asm.=
+  I
+> > > can try to dig up that code.
+>=20
+> Note:
+>=20
+>   VMexit
+>   CALL
+>     RET
+>   RET    <---- This is also a problem if the first call hasn't retired ye=
+t.
+>   LFENCE
+>=20
+> Converting vmx_spec_ctrl_restore_host() to ASM should be able to take car=
+e
+> of this.
 
-I agree that "there's not much room to reorder anything", but it's not a 
-particularly formal/reassuring statement :) and READ_ONCE/WRITE_ONCE 
-have documentation value too.
-
-Or maybe it's because I've become used to the C11 memory model.  Either 
-way, I like the idea to use READ_ONCE/WRITE_ONCE more explicitly 
-whenever there can be concurrent accesses (which would be data races in 
-the C11 model), and I think Linux is moving in that direction too.
-
-Paolo
-
+Is there an actual bug here, or are we just micro-optimizing something that=
+ may or
+may not need additional optimization?  Unless there's a bug to be fixed, mo=
+ving
+code into ASM and increasing complexity doesn't seem worthwhile.
