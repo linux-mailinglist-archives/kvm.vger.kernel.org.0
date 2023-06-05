@@ -2,72 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37477722294
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 11:50:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F5067222C3
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 11:58:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229902AbjFEJuW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 05:50:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33322 "EHLO
+        id S231387AbjFEJ6I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 05:58:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjFEJuU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 05:50:20 -0400
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80BD6BD;
-        Mon,  5 Jun 2023 02:50:19 -0700 (PDT)
-Received: by mail-oo1-xc31.google.com with SMTP id 006d021491bc7-558b04141e2so985318eaf.0;
-        Mon, 05 Jun 2023 02:50:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685958619; x=1688550619;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tdwcVZdaoW7TosGAkP5MUtQ1CLIdAVBMtQGHP5dQ97Y=;
-        b=Sz2HZhAFjt2rnDllYzg9isU3HRYu56zhE2aHk0kWUSQ6NMsJUW/ZxNMHtRhBVQxI+X
-         A5kw3Xthy1NWnhGiUToYhVKpnfIZqbkR3mn+a5pivLdlIFKgyHP80hD6rHA0xE6vDGC/
-         xy4Hsq/TWVavDvnTU76d64OpM/6+2tyAV6JO907GaXf0SharLfDM+2EUoh5CovbKGNxW
-         C95ZpQO/K7R0xitN8KXDJUwLKXg/hpc6ba8kQg3p46aFCDWXUk9BZg9ZhZi8AO2Ek/wU
-         eJE7C5ZzUIApRgggtUDaLQF/NhY202HQuUDygtCE+b1GcbqzNCsPKqq1svAy+xEKUBU6
-         50mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685958619; x=1688550619;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tdwcVZdaoW7TosGAkP5MUtQ1CLIdAVBMtQGHP5dQ97Y=;
-        b=T0QCMqzLHVjtOcSDF+huIktgOHJXWpAZAAk0HwJnhQR0z/92uA0Yt4nLzVnsHeElqy
-         7gVAkMQe62iuD3prou4KwZ2tatf00nCJQRE1DaD5sYlACDyc1WeGFkIv4RG6Qsor62gT
-         2WhTPSuEh4v2lBc26Huao0nD69yruxBMhIycFQWlhoKrJu4nDgLt0MTAsnoF6GsHrP5X
-         RthcxG0f8XzXy3Dc8Kz14Pd3rP7HV6IqUTZmhDdORS0Y59s1xI/0oX5s+09Zs2Mcqfeo
-         GclO6vhlrFU2ivGQ05kPwC4jgOqpUAnWkzIFu0IQP9GYAuM1e6MXWhmZCghQbk1s/bB7
-         BKvg==
-X-Gm-Message-State: AC+VfDw+seL1625AA3bzXHYVM0QugcRPWbaAzZB0fLtMXcM0FYF2QAtr
-        ZDVz8LlZAA2EzzI6Y/MmaPk=
-X-Google-Smtp-Source: ACHHUZ6+m88LQ/iA48skVkGmZtJMXGUKulOzHQzVJg4ZloukJWAHYdmk2CmUy5tkexFvrsXuHcpWvQ==
-X-Received: by 2002:a05:6359:29:b0:127:f2f6:ef35 with SMTP id en41-20020a056359002900b00127f2f6ef35mr9266432rwb.3.1685958618563;
-        Mon, 05 Jun 2023 02:50:18 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id 30-20020a630b1e000000b0050f85ef50d1sm5357933pgl.26.2023.06.05.02.50.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jun 2023 02:50:17 -0700 (PDT)
-Message-ID: <c9beecb6-be6b-198e-1bc7-848473972534@gmail.com>
-Date:   Mon, 5 Jun 2023 17:50:10 +0800
+        with ESMTP id S231228AbjFEJ6H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 05:58:07 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E35E3B0;
+        Mon,  5 Jun 2023 02:58:05 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3559WYNO011829;
+        Mon, 5 Jun 2023 09:58:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=fVa6IukZ9YgyHpSHhY9ocJmun8aGyKG/yUriSrCVhLA=;
+ b=ah5vmgHhhgCbQbABnmuCjcrBi9kHhwiIEfh8wB2fYgtMwfE7l8HsKMdbQn7H9Mkbg0GY
+ U7jHkRdgnLcxUQ17bLWc34My8HpOee4AMHZoU5qutuTM9SrazK3IjhYZgj169HqaCItf
+ YE6BQA/61gEkFuvGhWGIovIPuY4RtUM2p+8bRES2NdoZ4RsEkXaXpdl/uI1otBd0pUIr
+ /xQf7WRtJ+b7pOe4/dmdvqNldAwdkE3cs9DRTMLwHVR0LVdKFWOqB71SLjUuMIVCOjFt
+ D9VCZXR5j1p0h+RIlREyzJ1UF8+us14WFaunnoZhJQXSvU08oCAr/SxN5VvKkbjYM7Kv Hg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r1d5hrjnn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jun 2023 09:58:05 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3559cNie001654;
+        Mon, 5 Jun 2023 09:58:04 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r1d5hrjn3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jun 2023 09:58:04 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3554gb9E001935;
+        Mon, 5 Jun 2023 09:58:02 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3qyxg2h8x4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jun 2023 09:58:02 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3559vxDA13894272
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Jun 2023 09:57:59 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A5452004B;
+        Mon,  5 Jun 2023 09:57:59 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AF3D720049;
+        Mon,  5 Jun 2023 09:57:58 +0000 (GMT)
+Received: from [9.171.39.161] (unknown [9.171.39.161])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon,  5 Jun 2023 09:57:58 +0000 (GMT)
+Message-ID: <ab1047c5-77f1-d68b-cf05-4bcda44909ed@linux.ibm.com>
+Date:   Mon, 5 Jun 2023 11:57:58 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.11.2
-Subject: Re: [PATCH v2 00/15] Introduce Architectural LBR for vPMU
-To:     Sean Christopherson <seanjc@google.com>, xiong.y.zhang@intel.com
-Cc:     pbonzini@redhat.com, jmattson@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kan.liang@linux.intel.com
-References: <20221125040604.5051-1-weijiang.yang@intel.com>
- <Y9RUOvJ5dkCU9J8C@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
 Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <Y9RUOvJ5dkCU9J8C@google.com>
+To:     Nico Boehr <nrb@linux.ibm.com>, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20230601070202.152094-1-nrb@linux.ibm.com>
+ <20230601070202.152094-7-nrb@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 6/6] s390x: add a test for SIE without
+ MSO/MSL
+In-Reply-To: <20230601070202.152094-7-nrb@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kZ3KB1dD7F19hmztpp1-0ipbBm75s06A
+X-Proofpoint-GUID: 0xAmwVUvMU5oIEF3SvmTIl9Rmz5S93hk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-06-03_08,2023-06-02_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 clxscore=1015 priorityscore=1501 mlxlogscore=999 phishscore=0
+ impostorscore=0 bulkscore=0 malwarescore=0 mlxscore=0 suspectscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2306050086
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,102 +95,228 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+xiongzha to follow up.
+On 6/1/23 09:02, Nico Boehr wrote:
+> Since we now have the ability to run guests without MSO/MSL, add a test
+> to make sure this doesn't break.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>   s390x/Makefile             |   2 +
+>   s390x/sie-dat.c            | 120 +++++++++++++++++++++++++++++++++++++
+>   s390x/snippets/c/sie-dat.c |  58 ++++++++++++++++++
+>   s390x/unittests.cfg        |   3 +
+>   4 files changed, 183 insertions(+)
+>   create mode 100644 s390x/sie-dat.c
+>   create mode 100644 s390x/snippets/c/sie-dat.c
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index a80db538810e..4921669ee4c3 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -40,6 +40,7 @@ tests += $(TEST_DIR)/panic-loop-pgm.elf
+>   tests += $(TEST_DIR)/migration-sck.elf
+>   tests += $(TEST_DIR)/exittime.elf
+>   tests += $(TEST_DIR)/ex.elf
+> +tests += $(TEST_DIR)/sie-dat.elf
+>   
+>   pv-tests += $(TEST_DIR)/pv-diags.elf
+>   
+> @@ -120,6 +121,7 @@ snippet_lib = $(snippet_asmlib) lib/auxinfo.o
+>   # perquisites (=guests) for the snippet hosts.
+>   # $(TEST_DIR)/<snippet-host>.elf: snippets = $(SNIPPET_DIR)/<c/asm>/<snippet>.gbin
+>   $(TEST_DIR)/mvpg-sie.elf: snippets = $(SNIPPET_DIR)/c/mvpg-snippet.gbin
+> +$(TEST_DIR)/sie-dat.elf: snippets = $(SNIPPET_DIR)/c/sie-dat.gbin
+>   $(TEST_DIR)/spec_ex-sie.elf: snippets = $(SNIPPET_DIR)/c/spec_ex.gbin
+>   
+>   $(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-pv-diag-yield.gbin
+> diff --git a/s390x/sie-dat.c b/s390x/sie-dat.c
+> new file mode 100644
+> index 000000000000..c490a2aa825c
+> --- /dev/null
+> +++ b/s390x/sie-dat.c
+> @@ -0,0 +1,120 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Tests SIE with paging.
+> + *
+> + * Copyright 2023 IBM Corp.
+> + *
+> + * Authors:
+> + *    Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +#include <libcflat.h>
+> +#include <vmalloc.h>
+> +#include <asm/asm-offsets.h>
 
-On 28/1/2023 6:46 am, Sean Christopherson wrote:
-> On Thu, Nov 24, 2022, Yang Weijiang wrote:
->> Intel CPU model-specific LBR(Legacy LBR) has evolved to Architectural
->> LBR(Arch LBR [0]), it's the replacement of legacy LBR on new platforms.
->> The native support patches were merged into 5.9 kernel tree, and this
->> patch series is to enable Arch LBR in vPMU so that guest can benefit
->> from the feature.
->>
->> The main advantages of Arch LBR are [1]:
->> - Faster context switching due to XSAVES support and faster reset of
->>    LBR MSRs via the new DEPTH MSR
->> - Faster LBR read for a non-PEBS event due to XSAVES support, which
->>    lowers the overhead of the NMI handler.
->> - Linux kernel can support the LBR features without knowing the model
->>    number of the current CPU.
->>
->>  From end user's point of view, the usage of Arch LBR is the same as
->> the Legacy LBR that has been merged in the mainline.
->>
->> Note, in this series, there's one restriction for guest Arch LBR, i.e.,
->> guest can only set its LBR record depth the same as host's. This is due
->> to the special behavior of MSR_ARCH_LBR_DEPTH:
->> 1) On write to the MSR, it'll reset all Arch LBR recording MSRs to 0s.
->> 2) XRSTORS resets all record MSRs to 0s if the saved depth mismatches
->> MSR_ARCH_LBR_DEPTH.
->> Enforcing the restriction keeps KVM Arch LBR vPMU working flow simple
->> and straightforward.
->>
->> Paolo refactored the old series and the resulting patches became the
->> base of this new series, therefore he's the author of some patches.
-> 
-> To be very blunt, this series is a mess.  I don't want to point fingers as there
-> is plenty of blame to go around.  The existing LBR support is a confusing mess,
-> vPMU as a whole has been neglected for too long, review feedback has been relatively
-> non-existent, and I'm sure some of the mess is due to Paolo trying to hastily fix
-> things up back when this was temporarily queued.
-> 
-> However, for arch LBR support to be merged, things need to change.
-> 
-> First and foremost, the existing LBR support needs to be documented.  Someone,
-> I don't care who, needs to provide a detailed writeup of the contract between KVM
-> and perf.  Specifically, I want to know:
-> 
->    1. When exactly is perf allowed to take control of LBR MRS.  Task switch?  IRQ?
->       NMI?
-> 
->    2. What is the expected behavior when perf is using LBRs?  Is the guest supposed
->       to be traced?
-> 
->    3. Why does KVM snapshot DEBUGCTL with IRQs enabled, but disables IRQs when
->       accessing LBR MSRs?
-> 
-> It doesn't have to be polished, e.g. I'll happily wordsmith things into proper
-> documentation, but I want to have a very clear understanding of how LBR support
-> is _intended_ to function and how it all _actually_ functions without having to
-> make guesses.
+I only did a cursory glance and wasn't able to see a use for this include.
 
-This is a very good topic for LPC KVM Microconference.
+> +#include <asm-generic/barrier.h>
+> +#include <asm/pgtable.h>
+> +#include <mmu.h>
+> +#include <asm/page.h>
+> +#include <asm/facility.h>
 
-Many thanks to Sean for ranting about something that only I was thinking
-about before. Having host and guest be able to use PMU at the same time
-in peace (hybrid profiling mode) is a very use-case worthy goal rather than
-introducing exclusivity, and it's clear that kvm+perf lacks reasonable and
-well-documented support when there is host perf user interference.
+The sclp.h include should be enough, no?
+You're not using test_facility() as far as I can see.
 
-Ref: https://lpc.events/event/17/page/200-proposed-microconferences#kvm
+> +#include <asm/interrupt.h>
+> +#include <asm/mem.h>
+> +#include <alloc_page.h>
+> +#include <sclp.h> > +#include <sie.h>
+> +#include <snippet.h>
+> +
+> +static struct vm vm;
+> +static pgd_t *guest_root;
+> +
+> +/* keep in sync with TEST_PAGE_COUNT in s390x/snippets/c/sie-dat.c */
+> +#define GUEST_TEST_PAGE_COUNT 10
+> +
+> +/* keep in sync with TOTAL_PAGE_COUNT in s390x/snippets/c/sie-dat.c */
+> +#define GUEST_TOTAL_PAGE_COUNT 256
+> +
+> +static void test_sie_dat(void)
+> +{
+> +	uint8_t r1;
+> +	bool contents_match;
+> +	uint64_t test_page_gpa, test_page_hpa;
+> +	uint8_t *test_page_hva;
+> +
+> +	/* guest will tell us the guest physical address of the test buffer */
+> +	sie(&vm);
+> +
+> +	r1 = (vm.sblk->ipa & 0xf0) >> 4;
+> +	test_page_gpa = vm.save_area.guest.grs[r1];
+> +	test_page_hpa = virt_to_pte_phys(guest_root, (void*)test_page_gpa);
+> +	test_page_hva = __va(test_page_hpa);
+> +	report(vm.sblk->icptcode == ICPT_INST &&
+> +	       (vm.sblk->ipa & 0xFF00) == 0x8300 && vm.sblk->ipb == 0x9c0000,
+> +	       "test buffer gpa=0x%lx hva=%p", test_page_gpa, test_page_hva);
 
-> 
-> And depending on the answers, I want to revisit KVM's LBR implementation before
-> tackling arch LBRs.  Letting perf usurp LBRs while KVM has the vCPU loaded is
-> frankly ridiculous.  Just have perf set a flag telling KVM that it needs to take
-> control of LBRs and have KVM service the flag as a request or something.  Stealing
-> the LBRs back in IRQ context adds a stupid amount of complexity without much value,
-> e.g. waiting a few branches for KVM to get to a safe place isn't going to meaningfully
-> change the traces.  If that can't actually happen, then why on earth does KVM need
-> to disable IRQs to read MSRs?
-> 
-> And AFAICT, since KVM unconditionally loads the guest's DEBUGCTL, whether or not
-> guest branches show up in the LBRs when the host is tracing is completely up to
-> the whims of the guest.  If that's correct, then again, what's the point of the
-> dance between KVM and perf?
-> 
-> Beyond the "how does this work" issues, there needs to be tests.  At the absolute
-> minimum, there needs to be selftests showing that this stuff actually works, that
-> save/restore (migration) works, that the MSRs can/can't be accessed when guest
-> CPUID is (in)correctly configured, etc. And I would really, really like to have
-> tests that force contention between host and guests, e.g. to make sure that KVM
-> isn't leaking host state or outright exploding, but I can understand that those
-> types of tests would be very difficult to write.
-> 
-> I've pushed a heavily reworked, but definitely broken, version to
-> 
->    git@github.com:sean-jc/linux.git x86/arch_lbrs
-> 
-> It compiles, but it's otherwise untested and there are known gaps.  E.g. I omitted
-> toggling load+clear of ARCH_LBR_CTL because I couldn't figure out the intended
-> behavior.
+You could rebase on my pv_icptdata.h patch.
+Also the report string and boolean don't really relate to each other.
+
+Not every exit needs to be a report.
+Some should rather be asserts() or report_info()s.
+
+> +
+> +	/* guest will now write to the test buffer and we verify the contents */
+> +	sie(&vm);
+> +	report(vm.sblk->icptcode == ICPT_INST &&
+> +	       vm.sblk->ipa == 0x8300 && vm.sblk->ipb == 0x440000,
+> +	       "guest wrote to test buffer");
+
+Yup pv_icptdata.h
+
+> +
+> +	contents_match = true;
+> +	for (unsigned int i = 0; i < GUEST_TEST_PAGE_COUNT; i++) {
+> +		uint8_t expected_val = 42 + i;
+
+Just because you can doesn't mean that you have to.
+At least leave a \n when declaring new variables...
+
+> +		if (test_page_hva[i * PAGE_SIZE] != expected_val) {
+> +			report_fail("page %u mismatch actual_val=%x expected_val=%x",
+> +				    i, test_page_hva[i], expected_val);
+> +			contents_match = false;
+> +		}
+> +	}
+> +	report(contents_match, "test buffer contents match");
+> +
+> +	/* the guest will now write to an unmapped address and we check that this causes a segment translation exception */
+> +	report_prefix_push("guest write to unmapped");
+> +	expect_pgm_int();
+> +	sie(&vm);
+> +	check_pgm_int_code(PGM_INT_CODE_SEGMENT_TRANSLATION);
+> +	report_prefix_pop();
+> +}
+> +
+
+[...]
+
+> +}
+> diff --git a/s390x/snippets/c/sie-dat.c b/s390x/snippets/c/sie-dat.c
+> new file mode 100644
+> index 000000000000..e156d0c36c4c
+> --- /dev/null
+> +++ b/s390x/snippets/c/sie-dat.c
+> @@ -0,0 +1,58 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Snippet used by the sie-dat.c test to verify paging without MSO/MSL
+> + *
+> + * Copyright (c) 2023 IBM Corp
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +#include <stddef.h>
+> +#include <inttypes.h>
+> +#include <string.h>
+> +#include <asm-generic/page.h>
+> +
+> +/* keep in sync with GUEST_TEST_PAGE_COUNT in s390x/sie-dat.c */
+> +#define TEST_PAGE_COUNT 10
+> +static uint8_t test_page[TEST_PAGE_COUNT * PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
+> +
+> +/* keep in sync with GUEST_TOTAL_PAGE_COUNT in s390x/sie-dat.c */
+> +#define TOTAL_PAGE_COUNT 256
+> +
+> +static inline void force_exit(void)
+> +{
+> +	asm volatile("diag	0,0,0x44\n");
+> +}
+> +
+> +static inline void force_exit_value(uint64_t val)
+> +{
+> +	asm volatile(
+> +		"diag	%[val],0,0x9c\n"
+> +		: : [val] "d"(val)
+> +	);
+> +}
+
+It feels like these need to go into a snippet lib.
+
+> +
+> +__attribute__((section(".text"))) int main(void)
+
+The attribute shouldn't be needed anymore.
+
+> +{
+> +	uint8_t *invalid_ptr;
+> +
+> +	memset(test_page, 0, sizeof(test_page));
+> +	/* tell the host the page's physical address (we're running DAT off) */
+> +	force_exit_value((uint64_t)test_page);
+> +
+> +	/* write some value to the page so the host can verify it */
+> +	for (size_t i = 0; i < TEST_PAGE_COUNT; i++)
+
+Why is i a size_t type?
+
+> +		test_page[i * PAGE_SIZE] = 42 + i;
+> +
+> +	/* indicate we've written all pages */
+> +	force_exit();
+> +
+> +	/* the first unmapped address */
+> +	invalid_ptr = (uint8_t *)(TOTAL_PAGE_COUNT * PAGE_SIZE);
+> +	*invalid_ptr = 42;
+> +
+> +	/* indicate we've written the non-allowed page (should never get here) */
+> +	force_exit();
+> +
+> +	return 0;
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index b61faf0737c3..24cd27202a08 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -218,3 +218,6 @@ extra_params = -append '--parallel'
+>   
+>   [execute]
+>   file = ex.elf
+> +
+> +[sie-dat]
+> +file = sie-dat.elf
+
