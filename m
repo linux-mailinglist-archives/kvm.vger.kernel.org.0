@@ -2,92 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D20EF722230
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 11:30:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37477722294
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 11:50:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230324AbjFEJas (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 05:30:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54250 "EHLO
+        id S229902AbjFEJuW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 05:50:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbjFEJaq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 05:30:46 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77EFBA7;
-        Mon,  5 Jun 2023 02:30:44 -0700 (PDT)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3559KwCR029837;
-        Mon, 5 Jun 2023 09:30:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=nnFmlSPcS+xchhXxCXzdOQtU1A6t1VR9jgnrh4Of91U=;
- b=KUrruGMzFIGkJASRz9dxGmN+uH5yCbuctIMp6I+pDpR6HF2dunbxPBjiCQEySP1FrpWm
- mteW2wBKsGvjAue1MtxWFsfdGP7gPqoXlUIdeANHT3pNjkRNW421T2hwz2GmgZxA9i6K
- E9ksMGWS02CQdTCXG/oVy70VpgeW12AtmEKgUACFG3tGMIP3UYLlaZuOyvvoRo2gpepU
- x9SQBmyreQg0I7Tcy/xIdieMg8MBPPSwO2bXC4EzMv14H0rchvLB1AdzDInD5+Mf9GZ2
- h+qqYf7gRTrWdeQo+WBqcW5/nA8Y+ka/uMfAOcMpWHVUZaKXsjQ3Fdr+mm0GuDJ5olMh UA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r1d0dr721-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Jun 2023 09:30:43 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3559Lch8001310;
-        Mon, 5 Jun 2023 09:30:43 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r1d0dr717-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Jun 2023 09:30:43 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3555Wg1t025024;
-        Mon, 5 Jun 2023 09:30:41 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3qyxdfh08g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Jun 2023 09:30:40 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3559Ub8R16450064
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 5 Jun 2023 09:30:37 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 51CFD2004F;
-        Mon,  5 Jun 2023 09:30:37 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0621C2004E;
-        Mon,  5 Jun 2023 09:30:37 +0000 (GMT)
-Received: from [9.171.39.161] (unknown [9.171.39.161])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  5 Jun 2023 09:30:36 +0000 (GMT)
-Message-ID: <baf4bb04-b258-f8b4-e49d-5d400e498bbf@linux.ibm.com>
-Date:   Mon, 5 Jun 2023 11:30:36 +0200
+        with ESMTP id S229459AbjFEJuU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 05:50:20 -0400
+Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80BD6BD;
+        Mon,  5 Jun 2023 02:50:19 -0700 (PDT)
+Received: by mail-oo1-xc31.google.com with SMTP id 006d021491bc7-558b04141e2so985318eaf.0;
+        Mon, 05 Jun 2023 02:50:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685958619; x=1688550619;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tdwcVZdaoW7TosGAkP5MUtQ1CLIdAVBMtQGHP5dQ97Y=;
+        b=Sz2HZhAFjt2rnDllYzg9isU3HRYu56zhE2aHk0kWUSQ6NMsJUW/ZxNMHtRhBVQxI+X
+         A5kw3Xthy1NWnhGiUToYhVKpnfIZqbkR3mn+a5pivLdlIFKgyHP80hD6rHA0xE6vDGC/
+         xy4Hsq/TWVavDvnTU76d64OpM/6+2tyAV6JO907GaXf0SharLfDM+2EUoh5CovbKGNxW
+         C95ZpQO/K7R0xitN8KXDJUwLKXg/hpc6ba8kQg3p46aFCDWXUk9BZg9ZhZi8AO2Ek/wU
+         eJE7C5ZzUIApRgggtUDaLQF/NhY202HQuUDygtCE+b1GcbqzNCsPKqq1svAy+xEKUBU6
+         50mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685958619; x=1688550619;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tdwcVZdaoW7TosGAkP5MUtQ1CLIdAVBMtQGHP5dQ97Y=;
+        b=T0QCMqzLHVjtOcSDF+huIktgOHJXWpAZAAk0HwJnhQR0z/92uA0Yt4nLzVnsHeElqy
+         7gVAkMQe62iuD3prou4KwZ2tatf00nCJQRE1DaD5sYlACDyc1WeGFkIv4RG6Qsor62gT
+         2WhTPSuEh4v2lBc26Huao0nD69yruxBMhIycFQWlhoKrJu4nDgLt0MTAsnoF6GsHrP5X
+         RthcxG0f8XzXy3Dc8Kz14Pd3rP7HV6IqUTZmhDdORS0Y59s1xI/0oX5s+09Zs2Mcqfeo
+         GclO6vhlrFU2ivGQ05kPwC4jgOqpUAnWkzIFu0IQP9GYAuM1e6MXWhmZCghQbk1s/bB7
+         BKvg==
+X-Gm-Message-State: AC+VfDw+seL1625AA3bzXHYVM0QugcRPWbaAzZB0fLtMXcM0FYF2QAtr
+        ZDVz8LlZAA2EzzI6Y/MmaPk=
+X-Google-Smtp-Source: ACHHUZ6+m88LQ/iA48skVkGmZtJMXGUKulOzHQzVJg4ZloukJWAHYdmk2CmUy5tkexFvrsXuHcpWvQ==
+X-Received: by 2002:a05:6359:29:b0:127:f2f6:ef35 with SMTP id en41-20020a056359002900b00127f2f6ef35mr9266432rwb.3.1685958618563;
+        Mon, 05 Jun 2023 02:50:18 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id 30-20020a630b1e000000b0050f85ef50d1sm5357933pgl.26.2023.06.05.02.50.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Jun 2023 02:50:17 -0700 (PDT)
+Message-ID: <c9beecb6-be6b-198e-1bc7-848473972534@gmail.com>
+Date:   Mon, 5 Jun 2023 17:50:10 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.11.2
+Subject: Re: [PATCH v2 00/15] Introduce Architectural LBR for vPMU
+To:     Sean Christopherson <seanjc@google.com>, xiong.y.zhang@intel.com
+Cc:     pbonzini@redhat.com, jmattson@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kan.liang@linux.intel.com
+References: <20221125040604.5051-1-weijiang.yang@intel.com>
+ <Y9RUOvJ5dkCU9J8C@google.com>
 Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, imbrenda@linux.ibm.com,
-        thuth@redhat.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20230601070202.152094-1-nrb@linux.ibm.com>
- <20230601070202.152094-6-nrb@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 5/6] s390x: lib: sie: don't reenter SIE
- on pgm int
-In-Reply-To: <20230601070202.152094-6-nrb@linux.ibm.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <Y9RUOvJ5dkCU9J8C@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: PrdkkASx7ji4uL5MjpdxhwRm8pTIUsbj
-X-Proofpoint-GUID: zE249KAgQTTRN2Dj5Mm5g0B7LAr4Soqf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-03_08,2023-06-02_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0 adultscore=0
- phishscore=0 mlxscore=0 mlxlogscore=496 impostorscore=0 clxscore=1015
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306050081
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -95,113 +75,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/1/23 09:02, Nico Boehr wrote:
-> At the moment, when a PGM int occurs while in SIE, we will just reenter
-> SIE after the interrupt handler was called.
++xiongzha to follow up.
+
+On 28/1/2023 6:46 am, Sean Christopherson wrote:
+> On Thu, Nov 24, 2022, Yang Weijiang wrote:
+>> Intel CPU model-specific LBR(Legacy LBR) has evolved to Architectural
+>> LBR(Arch LBR [0]), it's the replacement of legacy LBR on new platforms.
+>> The native support patches were merged into 5.9 kernel tree, and this
+>> patch series is to enable Arch LBR in vPMU so that guest can benefit
+>> from the feature.
+>>
+>> The main advantages of Arch LBR are [1]:
+>> - Faster context switching due to XSAVES support and faster reset of
+>>    LBR MSRs via the new DEPTH MSR
+>> - Faster LBR read for a non-PEBS event due to XSAVES support, which
+>>    lowers the overhead of the NMI handler.
+>> - Linux kernel can support the LBR features without knowing the model
+>>    number of the current CPU.
+>>
+>>  From end user's point of view, the usage of Arch LBR is the same as
+>> the Legacy LBR that has been merged in the mainline.
+>>
+>> Note, in this series, there's one restriction for guest Arch LBR, i.e.,
+>> guest can only set its LBR record depth the same as host's. This is due
+>> to the special behavior of MSR_ARCH_LBR_DEPTH:
+>> 1) On write to the MSR, it'll reset all Arch LBR recording MSRs to 0s.
+>> 2) XRSTORS resets all record MSRs to 0s if the saved depth mismatches
+>> MSR_ARCH_LBR_DEPTH.
+>> Enforcing the restriction keeps KVM Arch LBR vPMU working flow simple
+>> and straightforward.
+>>
+>> Paolo refactored the old series and the resulting patches became the
+>> base of this new series, therefore he's the author of some patches.
 > 
-> This is because sie() has a loop which checks icptcode and re-enters SIE
-> if it is zero.
+> To be very blunt, this series is a mess.  I don't want to point fingers as there
+> is plenty of blame to go around.  The existing LBR support is a confusing mess,
+> vPMU as a whole has been neglected for too long, review feedback has been relatively
+> non-existent, and I'm sure some of the mess is due to Paolo trying to hastily fix
+> things up back when this was temporarily queued.
 > 
-> However, this behaviour is quite undesirable for SIE tests, since it
-> doesn't give the host the chance to assert on the PGM int. Instead, we
-> will just re-enter SIE, on nullifing conditions even causing the
-> exception again.
+> However, for arch LBR support to be merged, things need to change.
+> 
+> First and foremost, the existing LBR support needs to be documented.  Someone,
+> I don't care who, needs to provide a detailed writeup of the contract between KVM
+> and perf.  Specifically, I want to know:
+> 
+>    1. When exactly is perf allowed to take control of LBR MRS.  Task switch?  IRQ?
+>       NMI?
+> 
+>    2. What is the expected behavior when perf is using LBRs?  Is the guest supposed
+>       to be traced?
+> 
+>    3. Why does KVM snapshot DEBUGCTL with IRQs enabled, but disables IRQs when
+>       accessing LBR MSRs?
+> 
+> It doesn't have to be polished, e.g. I'll happily wordsmith things into proper
+> documentation, but I want to have a very clear understanding of how LBR support
+> is _intended_ to function and how it all _actually_ functions without having to
+> make guesses.
 
-That's the reason why we set an invalid PGM PSW new for the assembly 
-snippets. Seems like I didn't add it for C snippets for some reason -_-
+This is a very good topic for LPC KVM Microconference.
 
-This code is fine but it doesn't fully fix the usability aspect and 
-leaves a few questions open:
-  - Do we want to stick to the code 8 handling?
-  - Do we want to assert like with validities and PGMs outside of SIE?
-  - Should sie() have a int return code like in KVM?
+Many thanks to Sean for ranting about something that only I was thinking
+about before. Having host and guest be able to use PMU at the same time
+in peace (hybrid profiling mode) is a very use-case worthy goal rather than
+introducing exclusivity, and it's clear that kvm+perf lacks reasonable and
+well-documented support when there is host perf user interference.
+
+Ref: https://lpc.events/event/17/page/200-proposed-microconferences#kvm
 
 > 
-> In sie(), check whether a pgm int code is set in lowcore. If it has,
-> exit the loop so the test can react to the interrupt. Add a new function
-> read_pgm_int_code() to obtain the interrupt code.
+> And depending on the answers, I want to revisit KVM's LBR implementation before
+> tackling arch LBRs.  Letting perf usurp LBRs while KVM has the vCPU loaded is
+> frankly ridiculous.  Just have perf set a flag telling KVM that it needs to take
+> control of LBRs and have KVM service the flag as a request or something.  Stealing
+> the LBRs back in IRQ context adds a stupid amount of complexity without much value,
+> e.g. waiting a few branches for KVM to get to a safe place isn't going to meaningfully
+> change the traces.  If that can't actually happen, then why on earth does KVM need
+> to disable IRQs to read MSRs?
 > 
-> Note that this introduces a slight oddity with sie and pgm int in
-> certain cases: If a PGM int occurs between a expect_pgm_int() and sie(),
-> we will now never enter SIE until the pgm_int_code is cleared by e.g.
-> clear_pgm_int().
+> And AFAICT, since KVM unconditionally loads the guest's DEBUGCTL, whether or not
+> guest branches show up in the LBRs when the host is tracing is completely up to
+> the whims of the guest.  If that's correct, then again, what's the point of the
+> dance between KVM and perf?
 > 
-> Also add missing include of facility.h to mem.h.
-
-?
-
+> Beyond the "how does this work" issues, there needs to be tests.  At the absolute
+> minimum, there needs to be selftests showing that this stuff actually works, that
+> save/restore (migration) works, that the MSRs can/can't be accessed when guest
+> CPUID is (in)correctly configured, etc. And I would really, really like to have
+> tests that force contention between host and guests, e.g. to make sure that KVM
+> isn't leaking host state or outright exploding, but I can understand that those
+> types of tests would be very difficult to write.
 > 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   lib/s390x/asm/interrupt.h | 14 ++++++++++++++
->   lib/s390x/asm/mem.h       |  1 +
->   lib/s390x/sie.c           |  4 +++-
->   3 files changed, 18 insertions(+), 1 deletion(-)
+> I've pushed a heavily reworked, but definitely broken, version to
 > 
-> diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
-> index 55759002dce2..fb4283a40a1b 100644
-> --- a/lib/s390x/asm/interrupt.h
-> +++ b/lib/s390x/asm/interrupt.h
-> @@ -99,4 +99,18 @@ static inline void low_prot_disable(void)
->   	ctl_clear_bit(0, CTL0_LOW_ADDR_PROT);
->   }
->   
-> +/**
-> + * read_pgm_int_code - Get the program interruption code of the last pgm int
-> + * on the current CPU.
-
-All of the other functions are in the c file.
-
-> + *
-> + * This is similar to clear_pgm_int(), except that it doesn't clear the
-> + * interruption information from lowcore.
-> + *
-> + * Returns 0 when none occured.
-
-s/r/rr/
-
-> + */
-> +static inline uint16_t read_pgm_int_code(void)
-> +{
-
-No mb()?
-
-> +	return lowcore.pgm_int_code;
-> +}
-> +
->   #endif
-> diff --git a/lib/s390x/asm/mem.h b/lib/s390x/asm/mem.h
-> index 64ef59b546a4..94d58c34f53f 100644
-> --- a/lib/s390x/asm/mem.h
-> +++ b/lib/s390x/asm/mem.h
-> @@ -8,6 +8,7 @@
->   #ifndef _ASMS390X_MEM_H_
->   #define _ASMS390X_MEM_H_
->   #include <asm/arch_def.h>
-> +#include <asm/facility.h>
->   
->   /* create pointer while avoiding compiler warnings */
->   #define OPAQUE_PTR(x) ((void *)(((uint64_t)&lowcore) + (x)))
-> diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
-> index ffa8ec91a423..632740edd431 100644
-> --- a/lib/s390x/sie.c
-> +++ b/lib/s390x/sie.c
-> @@ -13,6 +13,7 @@
->   #include <libcflat.h>
->   #include <sie.h>
->   #include <asm/page.h>
-> +#include <asm/interrupt.h>
->   #include <libcflat.h>
->   #include <alloc_page.h>
->   
-> @@ -65,7 +66,8 @@ void sie(struct vm *vm)
->   	/* also handle all interruptions in home space while in SIE */
->   	irq_set_dat_mode(IRQ_DAT_ON, AS_HOME);
->   
-> -	while (vm->sblk->icptcode == 0) {
-> +	/* leave SIE when we have an intercept or an interrupt so the test can react to it */
-> +	while (vm->sblk->icptcode == 0 && !read_pgm_int_code()) {
->   		sie64a(vm->sblk, &vm->save_area);
->   		sie_handle_validity(vm);
->   	}
-
+>    git@github.com:sean-jc/linux.git x86/arch_lbrs
+> 
+> It compiles, but it's otherwise untested and there are known gaps.  E.g. I omitted
+> toggling load+clear of ARCH_LBR_CTL because I couldn't figure out the intended
+> behavior.
