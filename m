@@ -2,176 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0ECCC723095
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 22:01:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8C3F723097
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 22:01:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234769AbjFEUBD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 16:01:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38252 "EHLO
+        id S236195AbjFEUB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 16:01:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229878AbjFEUBC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 16:01:02 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C1ADF2
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 13:01:01 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b04600cac6so20254445ad.1
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 13:01:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685995261; x=1688587261;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LuPYpZQoANGWHsbwqH61DHG0i0j2jZ97nfjqkAOX2qw=;
-        b=2V4KKudnlkHdWj9IYRf5i3PWTgBuQqeLOdQQfRC/cBjyUX9g+zX5I/93VliURq0os7
-         R4FnWqJvx7TGJNTRlGpMprKN0+dNqkWdBYkoUHg7zcj86Mp13o3ItyT17F/llVA8fRyk
-         uyRvcVc95strFheLfRuMX1qM/CVZ1gPDOrlXiaNzqaUbF8zlDp/iejHeDiRsm+bZ0Y1N
-         nn+B2Cs/eoWsUroam5as3a+uQhbLk2rMg1fFg2O78oynIvclCTiYGBG+xCOie7hn186K
-         04rr7qrNHdsWz+DDwm1JO6Xw3mVuEJGk0XbXU4MMg3R3hG1Dp6q3Iw62ZO244zIzOMJk
-         AFrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685995261; x=1688587261;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LuPYpZQoANGWHsbwqH61DHG0i0j2jZ97nfjqkAOX2qw=;
-        b=N5OUn4/hjZwZWqtUXnBATNu3nawcG+zOQdPF09Nkq/Xtq6kNCMM8peO4xPPV5kIQAT
-         0rQ6XpGdRGn/7dg96lwWzqSurMYsuanJ5CQBSFIWGFQolZS1clGlyHF/zNBGdUkrxc/m
-         8TOIx52HAdTAdqni8Lyf/aXVgY2Qmpcz40lF8+MQ0Tr3Mgp18IMrAvDlIXZUcY1r3GFM
-         uX5sU/AzrkwUjZSzH0//TXYO46KMvyoJInVjcY6i+jEi+IbPrHf/vQa81m2Q2gQrhWtG
-         0fCTsUpozi7UOKJcDpEs50A+SIxs5XPKoUnsfCxfBQIBejvryNlEfJGv/oKnd7CBmSf1
-         lEAw==
-X-Gm-Message-State: AC+VfDywYKiT9rLYAtE+GgD5z31zrLYmcQpxDN/0AP4WcoL4wMQ+J8aR
-        qiqTNdplja36sDCAs1PAR6OMp2ghUck=
-X-Google-Smtp-Source: ACHHUZ4jtSqeu15kHbopZolL5qbjlkS1Lh6tJRhhFWunpeo8o8vQW1iIjPZeANhZXuu8zD+BBIExO5qoQW0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:8684:b0:1a5:32f3:ca95 with SMTP id
- g4-20020a170902868400b001a532f3ca95mr2114668plo.8.1685995260873; Mon, 05 Jun
- 2023 13:01:00 -0700 (PDT)
-Date:   Mon, 5 Jun 2023 13:00:59 -0700
-In-Reply-To: <20230518091339.1102-3-binbin.wu@linux.intel.com>
-Mime-Version: 1.0
-References: <20230518091339.1102-1-binbin.wu@linux.intel.com> <20230518091339.1102-3-binbin.wu@linux.intel.com>
-Message-ID: <ZH4++07thYZk/AX9@google.com>
-Subject: Re: [PATCH v2 2/3] KVM: x86: Fix comments that refer to the out-dated msrs_to_save_all
-From:   Sean Christopherson <seanjc@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229878AbjFEUBY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 16:01:24 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64B57F4;
+        Mon,  5 Jun 2023 13:01:23 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E66E862A36;
+        Mon,  5 Jun 2023 20:01:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD78AC4339B;
+        Mon,  5 Jun 2023 20:01:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685995282;
+        bh=Rop4hq74GRwWhsXb0QXS+k7/UPpghpcfqR8C8dfnc6Q=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=I99t1p6D0VYx+REdn09N1xV+RxvI0o0rKvobOgl7DE2JomrnYcMoh24rgvFFv1bVs
+         jElDBjnECkFCkjwTN6aHm+tsF5kBQxzMAAWZRTzBQHFVUIYrxrKsBfDUXcx99Jr2Yt
+         eFH8+5Ih+TYVZCr9Ygs6vERKIm2nfha67Fyl5CYtBSLeAJXvSvaGGgVxxyfwUvALLY
+         fztWaP2/3hTmkccbWqLT3qMG5f/ltCoqpwc88uiHEX6AgdBgcL9MO5iTWToWCxZlFw
+         5tS7uc8s6XN7TEJiR36zlRfmdfsLudGF1p+lD1lQGgOX0/tBYy4oqORdGbMtRD+PJj
+         7aMjBSE7V25xw==
+Date:   Mon, 5 Jun 2023 13:01:19 -0700
+From:   Josh Poimboeuf <jpoimboe@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Jon Kohler <jon@nutanix.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        "kvm @ vger . kernel . org" <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KVM: VMX: remove LFENCE in vmx_spec_ctrl_restore_host()
+Message-ID: <20230605200119.pepmnpvoej4tfdky@treble>
+References: <F4BEBCAF-CBFC-4C3E-8B01-2ED84CF2E13A@nutanix.com>
+ <20230601004202.63yulqs73kuh3ep6@treble>
+ <846dd0c5-d431-e20e-fdb3-a4a26b6a22ca@citrix.com>
+ <20230601012323.36te7hfv366danpf@desk>
+ <20230601042345.52s5337uz62p6aow@treble>
+ <21D1D290-7DE9-4864-A05B-A36779D9DC26@nutanix.com>
+ <20230605163552.hi5kvh5wijegmus6@treble>
+ <E704D6D6-3B03-40FA-8CDB-5FB58871BABC@nutanix.com>
+ <20230605173101.iflfly3bt6ydvvyk@desk>
+ <ZH4qBjLi0egsuC1D@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZH4qBjLi0egsuC1D@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 18, 2023, Binbin Wu wrote:
-> msrs_to_save_all is out-dated after commit 2374b7310b66
-> (KVM: x86/pmu: Use separate array for defining "PMU MSRs to save").
-> 
-> Update the comments to msrs_to_save_base.
-> 
-> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-> ---
->  arch/x86/kvm/x86.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ceb7c5e9cf9e..ca7cff5252ae 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1432,7 +1432,7 @@ EXPORT_SYMBOL_GPL(kvm_emulate_rdpmc);
->   *
->   * The three MSR lists(msrs_to_save, emulated_msrs, msr_based_features)
->   * extract the supported MSRs from the related const lists.
-> - * msrs_to_save is selected from the msrs_to_save_all to reflect the
-> + * msrs_to_save is selected from the msrs_to_save_base to reflect the
+On Mon, Jun 05, 2023 at 11:31:34AM -0700, Sean Christopherson wrote:
+> Is there an actual bug here, or are we just micro-optimizing something that may or
+> may not need additional optimization?  Unless there's a bug to be fixed, moving
+> code into ASM and increasing complexity doesn't seem worthwhile.
 
-A straight conversion isn't correct, msrs_to_save isn't selected from *just*
-msrs_to_save_base.
+I can't really argue with that.  FWIW, here's the (completely untested)
+patch.
 
->   * capabilities of the host cpu. This capabilities test skips MSRs that are
->   * kvm-specific. Those are put in emulated_msrs_all; filtering of emulated_msrs
+---8<---
 
-This "kvm-specific" blurb is also stale.
+From: Josh Poimboeuf <jpoimboe@kernel.org>
+Subject: [PATCH] KVM: VMX: Convert vmx_spec_ctrl_restore_host() to assembly
 
->   * may depend on host virtualization features rather than host cpu features.
-> @@ -1535,7 +1535,7 @@ static const u32 emulated_msrs_all[] = {
->  	 * by arch/x86/kvm/vmx/nested.c based on CPUID or other MSRs.
->  	 * We always support the "true" VMX control MSRs, even if the host
->  	 * processor does not, so I am putting these registers here rather
-> -	 * than in msrs_to_save_all.
-> +	 * than in msrs_to_save_base.
+Convert vmx_spec_ctrl_restore_host() to assembly.  This allows the
+removal of a redundant LFENCE.  It also "feels" safer as it doesn't
+allow the compiler to insert any surprises.  And it's more symmetrical
+with the pre-vmentry SPEC_CTRL handling, which is also done in assembly.
 
-And this entire comment is rather weird, e.g. I have no idea what MSRs the part
-about CPUID and other MSRs is referring to.
-
-Rather than do a blind replacement, how about this?
-
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Mon, 5 Jun 2023 12:56:46 -0700
-Subject: [PATCH] KVM: x86: Update comments about MSR lists exposed to
- userspace
-
-Refresh comments about msrs_to_save, emulated_msrs, and msr_based_features
-to remove stale references left behind by commit 2374b7310b66 (KVM:
-x86/pmu: Use separate array for defining "PMU MSRs to save"), and to
-better reflect the current reality, e.g. emulated_msrs is no longer just
-for MSRs that are "kvm-specific".
-
-Reported-by: Binbin Wu <binbin.wu@linux.intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Josh Poimboeuf <jpoimboe@kernel.org>
 ---
- arch/x86/kvm/x86.c | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+ arch/x86/kvm/vmx/vmenter.S | 71 ++++++++++++++++++++++++++++++++------
+ arch/x86/kvm/vmx/vmx.c     | 25 --------------
+ arch/x86/kvm/vmx/vmx.h     |  1 -
+ 3 files changed, 61 insertions(+), 36 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5ad55ef71433..c77f72cf6dc8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1427,15 +1427,14 @@ int kvm_emulate_rdpmc(struct kvm_vcpu *vcpu)
- EXPORT_SYMBOL_GPL(kvm_emulate_rdpmc);
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index 631fd7da2bc3..977f3487469c 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -108,7 +108,7 @@ SYM_FUNC_START(__vmx_vcpu_run)
+ 	lea (%_ASM_SP), %_ASM_ARG2
+ 	call vmx_update_host_rsp
  
- /*
-- * List of msr numbers which we expose to userspace through KVM_GET_MSRS
-- * and KVM_SET_MSRS, and KVM_GET_MSR_INDEX_LIST.
-- *
-- * The three MSR lists(msrs_to_save, emulated_msrs, msr_based_features)
-- * extract the supported MSRs from the related const lists.
-- * msrs_to_save is selected from the msrs_to_save_all to reflect the
-- * capabilities of the host cpu. This capabilities test skips MSRs that are
-- * kvm-specific. Those are put in emulated_msrs_all; filtering of emulated_msrs
-- * may depend on host virtualization features rather than host cpu features.
-+ * The three MSR lists(msrs_to_save, emulated_msrs, msr_based_features) track
-+ * the set of MSRs that KVM exposes to userspace through KVM_GET_MSRS,
-+ * KVM_SET_MSRS, and KVM_GET_MSR_INDEX_LIST.  msrs_to_save holds MSRs that
-+ * require host support, i.e. should be probed via RDMSR.  emulated_msrs holds
-+ * MSRs that emulates without strictly requiring host support.
-+ * msr_based_features holds MSRs that enumerate features, i.e. are effectively
-+ * CPUID leafs.  Note, msr_based_features isn't mutually exclusive with
-+ * msrs_to_save and emulated_msrs.
-  */
- 
- static const u32 msrs_to_save_base[] = {
-@@ -1531,11 +1530,11 @@ static const u32 emulated_msrs_all[] = {
- 	MSR_IA32_UCODE_REV,
+-	ALTERNATIVE "jmp .Lspec_ctrl_done", "", X86_FEATURE_MSR_SPEC_CTRL
++	ALTERNATIVE "jmp .Lguest_spec_ctrl_done", "", X86_FEATURE_MSR_SPEC_CTRL
  
  	/*
--	 * The following list leaves out MSRs whose values are determined
--	 * by arch/x86/kvm/vmx/nested.c based on CPUID or other MSRs.
--	 * We always support the "true" VMX control MSRs, even if the host
--	 * processor does not, so I am putting these registers here rather
--	 * than in msrs_to_save_all.
-+	 * KVM always supports the "true" VMX control MSRs, even if the host
-+	 * does not.  The VMX MSRs as a whole are considered "emulated" as KVM
-+	 * doesn't strictly require them to exist in the host (ignoring that
-+	 * KVM would refuse to load in the first place if the core set of MSRs
-+	 * aren't supported).
- 	 */
- 	MSR_IA32_VMX_BASIC,
- 	MSR_IA32_VMX_TRUE_PINBASED_CTLS,
-
-base-commit: 31b4fc3bc64aadd660c5bfa5178c86a7ba61e0f7
+ 	 * SPEC_CTRL handling: if the guest's SPEC_CTRL value differs from the
+@@ -122,13 +122,13 @@ SYM_FUNC_START(__vmx_vcpu_run)
+ 	movl VMX_spec_ctrl(%_ASM_DI), %edi
+ 	movl PER_CPU_VAR(x86_spec_ctrl_current), %esi
+ 	cmp %edi, %esi
+-	je .Lspec_ctrl_done
++	je .Lguest_spec_ctrl_done
+ 	mov $MSR_IA32_SPEC_CTRL, %ecx
+ 	xor %edx, %edx
+ 	mov %edi, %eax
+ 	wrmsr
+ 
+-.Lspec_ctrl_done:
++.Lguest_spec_ctrl_done:
+ 
+ 	/*
+ 	 * Since vmentry is serializing on affected CPUs, there's no need for
+@@ -253,9 +253,65 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
+ #endif
+ 
+ 	/*
+-	 * IMPORTANT: RSB filling and SPEC_CTRL handling must be done before
+-	 * the first unbalanced RET after vmexit!
++	 * IMPORTANT: The below SPEC_CTRL handling and RSB filling must be done
++	 * before the first RET after vmexit!
++	 */
++
++	ALTERNATIVE "jmp .Lhost_spec_ctrl_done", "", X86_FEATURE_MSR_SPEC_CTRL
++
++	pop %_ASM_SI	/* @flags */
++	pop %_ASM_DI	/* @vmx */
++
++	/*
++	 * if (flags & VMX_RUN_SAVE_SPEC_CTRL)
++	 *	vmx->spec_ctrl = __rdmsr(MSR_IA32_SPEC_CTRL);
++	 */
++	test $VMX_RUN_SAVE_SPEC_CTRL, %_ASM_SI
++	jz .Lhost_spec_ctrl_check
++
++	mov $MSR_IA32_SPEC_CTRL, %ecx
++	rdmsr
++	mov %eax, VMX_spec_ctrl(%_ASM_DI)
++
++.Lhost_spec_ctrl_check:
++	/*
++	 * If the guest/host SPEC_CTRL values differ, restore the host value.
+ 	 *
++	 * For legacy IBRS, the IBRS bit always needs to be written after
++	 * transitioning from a less privileged predictor mode, regardless of
++	 * whether the guest/host values differ.
++	 *
++	 * if (cpu_feature_enabled(X86_FEATURE_KERNEL_IBRS) ||
++	 *     vmx->spec_ctrl != this_cpu_read(x86_spec_ctrl_current))
++	 *	native_wrmsrl(MSR_IA32_SPEC_CTRL, hostval);
++	 */
++	ALTERNATIVE "", "jmp .Lhost_spec_ctrl_write", X86_FEATURE_KERNEL_IBRS
++	movl VMX_spec_ctrl(%_ASM_DI), %edi
++	movl PER_CPU_VAR(x86_spec_ctrl_current), %esi
++	cmp %edi, %esi
++	je .Lhost_spec_ctrl_done_lfence
++
++.Lhost_spec_ctrl_write:
++	mov $MSR_IA32_SPEC_CTRL, %ecx
++	xor %edx, %edx
++	mov %esi, %eax
++	wrmsr
++
++.Lhost_spec_ctrl_done_lfence:
++	/*
++	 * This ensures that speculative execution doesn't incorrectly bypass
++	 * the above SPEC_CTRL wrmsr by mispredicting the 'je'.
++	 *
++	 * It's only needed if the below FILL_RETURN_BUFFER doesn't do an
++	 * LFENCE.  Thus the X86_FEATURE_RSB_VMEXIT{_LITE} alternatives.
++	 */
++	ALTERNATIVE_2 "lfence", \
++		      "", X86_FEATURE_RSB_VMEXIT, \
++		      "", X86_FEATURE_RSB_VMEXIT_LITE
++
++.Lhost_spec_ctrl_done:
++
++	/*
+ 	 * For retpoline or IBRS, RSB filling is needed to prevent poisoned RSB
+ 	 * entries and (in some cases) RSB underflow.
+ 	 *
+@@ -267,11 +323,6 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
+ 	FILL_RETURN_BUFFER %_ASM_CX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT,\
+ 			   X86_FEATURE_RSB_VMEXIT_LITE
+ 
+-	pop %_ASM_ARG2	/* @flags */
+-	pop %_ASM_ARG1	/* @vmx */
+-
+-	call vmx_spec_ctrl_restore_host
+-
+ 	/* Put return value in AX */
+ 	mov %_ASM_BX, %_ASM_AX
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 44fb619803b8..d353b0e23918 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7109,31 +7109,6 @@ void noinstr vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
+ 	}
+ }
+ 
+-void noinstr vmx_spec_ctrl_restore_host(struct vcpu_vmx *vmx,
+-					unsigned int flags)
+-{
+-	u64 hostval = this_cpu_read(x86_spec_ctrl_current);
+-
+-	if (!cpu_feature_enabled(X86_FEATURE_MSR_SPEC_CTRL))
+-		return;
+-
+-	if (flags & VMX_RUN_SAVE_SPEC_CTRL)
+-		vmx->spec_ctrl = __rdmsr(MSR_IA32_SPEC_CTRL);
+-
+-	/*
+-	 * If the guest/host SPEC_CTRL values differ, restore the host value.
+-	 *
+-	 * For legacy IBRS, the IBRS bit always needs to be written after
+-	 * transitioning from a less privileged predictor mode, regardless of
+-	 * whether the guest/host values differ.
+-	 */
+-	if (cpu_feature_enabled(X86_FEATURE_KERNEL_IBRS) ||
+-	    vmx->spec_ctrl != hostval)
+-		native_wrmsrl(MSR_IA32_SPEC_CTRL, hostval);
+-
+-	barrier_nospec();
+-}
+-
+ static fastpath_t vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
+ {
+ 	switch (to_vmx(vcpu)->exit_reason.basic) {
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 9e66531861cf..f9fab33f4d76 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -420,7 +420,6 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
+ struct vmx_uret_msr *vmx_find_uret_msr(struct vcpu_vmx *vmx, u32 msr);
+ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu);
+ void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
+-void vmx_spec_ctrl_restore_host(struct vcpu_vmx *vmx, unsigned int flags);
+ unsigned int __vmx_vcpu_run_flags(struct vcpu_vmx *vmx);
+ bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs,
+ 		    unsigned int flags);
 -- 
+2.40.1
 
