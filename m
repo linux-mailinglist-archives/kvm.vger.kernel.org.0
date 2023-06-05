@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A8BC72281A
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 16:02:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CAEE72281B
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 16:02:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234236AbjFEOCr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 10:02:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60492 "EHLO
+        id S232929AbjFEOCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 10:02:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233559AbjFEOCo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 10:02:44 -0400
-Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09BA7E8
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 07:02:30 -0700 (PDT)
-Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1a27ffe9dcdso4538363fac.2
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 07:02:30 -0700 (PDT)
+        with ESMTP id S232792AbjFEOCp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 10:02:45 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F6141A5
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 07:02:35 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id 46e09a7af769-6b28fc7a6dcso291311a34.0
+        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 07:02:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1685973749; x=1688565749;
+        d=ventanamicro.com; s=google; t=1685973754; x=1688565754;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I4RvkKA5HMlJ9jiuvmt347v/0/0kHBcwrduLKYcFeXM=;
-        b=o8zXo6I2enEhYoq6xCVzWR+61NgSWEADvYkoeXeWwgVXrFLO/osOBK1W9kPhuEBeRn
-         Ad0fZmdfSdw4HEIn7DXaI0b5wF2T4XJiHXMMUD73QcwR3aBC6Y7EnwG7RdGCSFLYAv1l
-         C9JPZflXEAfFYVNBCCvO7cMtuysosPMgKHtRiZ8DZuNdAl1SOyV0pce9tfEXeZa/HEs2
-         uaqSBR1vRdfk7BnhqnFuYdpOXLL7m9/5h6CtyK5wBos3kI0n9kUdVCHGTg+ZEhQnBxEE
-         SaSoAt9E56d1R4QozhDjUpv1QXN3cj+5S6NlF8UG8s/l3xi+I/h+vTQ/iWLdXz86fKDu
-         2n8g==
+        bh=eHiYWY9bvHP4MwqbxGKa7jevzatL3qS57fs5xuP7yzI=;
+        b=TSmxWN+zb6NbsJHRAnCzSILXZERvDyVbAUZP33jBQNswZXODDAAkLijpsvMBWSMzm7
+         dI1dbnlep2VOKReBRN2tEQ/hzJuYa37P0oWzpml6q0q5bNXeDzo/TJQeJqWvbm8k3EFI
+         MgrMd0fTPussC1OjztoexRcr8fGzUpCg7HUKp7ZV/BUs1jhhJ247lcD9rNJUsh8hxRE+
+         kTkU4dGoEYYDRmcLz+l5w6KizUbx6JSvyGO467qEkBh+2f0QsxY2Tmod+ZCP2vUL4fKs
+         EjMoEAlGRUgRo1xljWfugYuiYQMHDj9iDAKnimUmOOWvJSQRD1l5aF/O6ojp3RN4ulab
+         Yobg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685973749; x=1688565749;
+        d=1e100.net; s=20221208; t=1685973754; x=1688565754;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I4RvkKA5HMlJ9jiuvmt347v/0/0kHBcwrduLKYcFeXM=;
-        b=XbnasLLkooNj9Cg3+s30ghSoNQvTSmIeS0ResJwMz6n+dhZd5N6OWxe7l+TvTIHH7D
-         kA1YUzrKL1QUOQggZM8fne9rH58rUu7GMfNcMgUf+qw+ZN3Mkczztey1l8vjvu5zIsfg
-         07F4upJb869dNuawAY/kIgP1x8c2L5nXODRfQ+a5anj/5Cs4mVMXhKyXyH8qcIxGM4VI
-         sN4/kQb81a0XIav8hnaeTKSY/Iz9Z7kK0ClKTk+cLvUeZPAtJC3ad92IKgcHTsBRqxbr
-         4VGLf9tPc1U8aKLozYeBiYk7GhdZztS1wo8YI+nIuBiENE1RZmHGMdr3SlLBqDFk5h+s
-         NDEA==
-X-Gm-Message-State: AC+VfDwNWRMemVEM6NfwXb4/TUZzIg0qzzuX9e0sKO1xUSHlgSjBVKu5
-        BiOj7YKOMB51kHfzqN0/CsXHXEipE2FUqGHhXTtrjg==
-X-Google-Smtp-Source: ACHHUZ7lcWZTWvQoUMzo5DxUPH9Nfg4IozbEh8CJ57qToq9u42py0flQCRmZa4eeEvxgbuEFj/94sQ==
-X-Received: by 2002:a05:6870:1ab3:b0:1a2:c149:99c7 with SMTP id ef51-20020a0568701ab300b001a2c14999c7mr6245946oab.11.1685973749219;
-        Mon, 05 Jun 2023 07:02:29 -0700 (PDT)
+        bh=eHiYWY9bvHP4MwqbxGKa7jevzatL3qS57fs5xuP7yzI=;
+        b=jadS6NvHAU5GrYCR/XVTJexNYApziXNsfaAdEgMtQAcBG7Fahp2loFm94Bd7A0ylXb
+         G94BBT9kS1JpJW9I8nEoOfZyPsUdyxukhfX/7pBl9pmJo52Gu6rL1FEVfUMEogoxYY24
+         Vs+onYO/eoh6q9F8j3wSSFTxPHOWuuyzHc42XqMIru3AfUBUCETCJlWu2Yf2hrsA2CiJ
+         nR+zQbMlvqBfYOMAB/lkWK/iSkMcAtBG0zzclg6gzRD2greiE7tJS72U3qeXcBjXkVik
+         XtMW5drd03DH3bkMcbNIeRSqYWZGMoqhyo7f10th+5lQ6wxdZMgKDhqh8ibp8bonYNMm
+         lbrw==
+X-Gm-Message-State: AC+VfDzTXNMs+kxO12X4VTpyhZpO46FsrHpUM+a+eV//Fd7PChpmpiPN
+        MYu+MBLetNVR78HxA5WUJ+9O6w==
+X-Google-Smtp-Source: ACHHUZ5kmZOB/3SgTzcfBKUqqzauC2hVa0g51mPKT/K1GhzVPkS1lkFkkIgZQ/7uC8YKhqqLyyfqBA==
+X-Received: by 2002:a05:6870:c794:b0:19f:774a:6063 with SMTP id dy20-20020a056870c79400b0019f774a6063mr9583856oab.3.1685973754454;
+        Mon, 05 Jun 2023 07:02:34 -0700 (PDT)
 Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id f12-20020a4ace8c000000b0055ab0abaf31sm454787oos.19.2023.06.05.07.02.24
+        by smtp.gmail.com with ESMTPSA id f12-20020a4ace8c000000b0055ab0abaf31sm454787oos.19.2023.06.05.07.02.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 07:02:28 -0700 (PDT)
+        Mon, 05 Jun 2023 07:02:33 -0700 (PDT)
 From:   Anup Patel <apatel@ventanamicro.com>
 To:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
         maz@kernel.org
@@ -57,104 +57,166 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Andrew Jones <ajones@ventanamicro.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH v2 2/8] riscv: Allow setting custom mvendorid, marchid, and mimpid
-Date:   Mon,  5 Jun 2023 19:32:02 +0530
-Message-Id: <20230605140208.272027-3-apatel@ventanamicro.com>
+Subject: [PATCH v2 3/8] riscv: Allow disabling SBI extensions for Guest
+Date:   Mon,  5 Jun 2023 19:32:03 +0530
+Message-Id: <20230605140208.272027-4-apatel@ventanamicro.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230605140208.272027-1-apatel@ventanamicro.com>
 References: <20230605140208.272027-1-apatel@ventanamicro.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: *
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We add command-line parameter to set custom mvendorid, marchid, and
-mimpid so that users can show fake CPU type to Guest/VM which does
-not match underlying Host CPU.
+We add "--disable-sbi-<xyz>" options to disable various SBI extensions
+visible to the Guest. This allows users to disable deprecated/redundant
+SBI extensions.
 
 Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 ---
- riscv/include/kvm/kvm-config-arch.h | 12 ++++++++++++
- riscv/kvm-cpu.c                     | 26 +++++++++++++++++++++++++-
- 2 files changed, 37 insertions(+), 1 deletion(-)
+ riscv/include/kvm/kvm-config-arch.h | 30 ++++++++++++++++++++++++++++-
+ riscv/include/kvm/kvm-cpu-arch.h    | 19 +++++++++++-------
+ riscv/kvm-cpu.c                     | 19 +++++++++++++++++-
+ 3 files changed, 59 insertions(+), 9 deletions(-)
 
 diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
-index 188125c..e64e3ca 100644
+index e64e3ca..56676e3 100644
 --- a/riscv/include/kvm/kvm-config-arch.h
 +++ b/riscv/include/kvm/kvm-config-arch.h
-@@ -5,6 +5,9 @@
- 
- struct kvm_config_arch {
- 	const char	*dump_dtb_filename;
-+	u64		custom_mvendorid;
-+	u64		custom_marchid;
-+	u64		custom_mimpid;
+@@ -9,6 +9,7 @@ struct kvm_config_arch {
+ 	u64		custom_marchid;
+ 	u64		custom_mimpid;
  	bool		ext_disabled[KVM_RISCV_ISA_EXT_MAX];
++	bool		sbi_ext_disabled[KVM_RISCV_SBI_EXT_MAX];
  };
  
-@@ -12,6 +15,15 @@ struct kvm_config_arch {
- 	pfx,								\
- 	OPT_STRING('\0', "dump-dtb", &(cfg)->dump_dtb_filename,		\
- 		   ".dtb file", "Dump generated .dtb to specified file"),\
-+	OPT_U64('\0', "custom-mvendorid",				\
-+		&(cfg)->custom_mvendorid,				\
-+		"Show custom mvendorid to Guest VCPU"),			\
-+	OPT_U64('\0', "custom-marchid",					\
-+		&(cfg)->custom_marchid,					\
-+		"Show custom marchid to Guest VCPU"),			\
-+	OPT_U64('\0', "custom-mimpid",					\
-+		&(cfg)->custom_mimpid,					\
-+		"Show custom mimpid to Guest VCPU"),			\
- 	OPT_BOOLEAN('\0', "disable-sstc",				\
- 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_SSTC],	\
- 		    "Disable Sstc Extension"),				\
+ #define OPT_ARCH_RUN(pfx, cfg)						\
+@@ -38,6 +39,33 @@ struct kvm_config_arch {
+ 		    "Disable Zicbom Extension"),			\
+ 	OPT_BOOLEAN('\0', "disable-zihintpause",			\
+ 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZIHINTPAUSE],\
+-		    "Disable Zihintpause Extension"),
++		    "Disable Zihintpause Extension"),			\
++	OPT_BOOLEAN('\0', "disable-sbi-legacy",				\
++		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_V01],	\
++		    "Disable SBI Legacy Extensions"),			\
++	OPT_BOOLEAN('\0', "disable-sbi-time",				\
++		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_TIME],	\
++		    "Disable SBI Time Extension"),			\
++	OPT_BOOLEAN('\0', "disable-sbi-ipi",				\
++		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_IPI],	\
++		    "Disable SBI IPI Extension"),			\
++	OPT_BOOLEAN('\0', "disable-sbi-rfence",				\
++		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_RFENCE],	\
++		    "Disable SBI RFence Extension"),			\
++	OPT_BOOLEAN('\0', "disable-sbi-srst",				\
++		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_SRST],	\
++		    "Disable SBI SRST Extension"),			\
++	OPT_BOOLEAN('\0', "disable-sbi-hsm",				\
++		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_HSM],	\
++		    "Disable SBI HSM Extension"),			\
++	OPT_BOOLEAN('\0', "disable-sbi-pmu",				\
++		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_PMU],	\
++		    "Disable SBI PMU Extension"),			\
++	OPT_BOOLEAN('\0', "disable-sbi-experimental",			\
++		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_EXPERIMENTAL],\
++		    "Disable SBI Experimental Extensions"),		\
++	OPT_BOOLEAN('\0', "disable-sbi-vendor",				\
++		    &(cfg)->sbi_ext_disabled[KVM_RISCV_SBI_EXT_VENDOR],	\
++		    "Disable SBI Vendor Extensions"),
+ 
+ #endif /* KVM__KVM_CONFIG_ARCH_H */
+diff --git a/riscv/include/kvm/kvm-cpu-arch.h b/riscv/include/kvm/kvm-cpu-arch.h
+index e014839..1e9a7b0 100644
+--- a/riscv/include/kvm/kvm-cpu-arch.h
++++ b/riscv/include/kvm/kvm-cpu-arch.h
+@@ -7,9 +7,10 @@
+ 
+ #include "kvm/kvm.h"
+ 
+-static inline __u64 __kvm_reg_id(__u64 type, __u64 idx, __u64  size)
++static inline __u64 __kvm_reg_id(__u64 type, __u64 subtype,
++				 __u64 idx, __u64  size)
+ {
+-	return KVM_REG_RISCV | type | idx | size;
++	return KVM_REG_RISCV | type | subtype | idx | size;
+ }
+ 
+ #if __riscv_xlen == 64
+@@ -18,25 +19,29 @@ static inline __u64 __kvm_reg_id(__u64 type, __u64 idx, __u64  size)
+ #define KVM_REG_SIZE_ULONG	KVM_REG_SIZE_U32
+ #endif
+ 
+-#define RISCV_CONFIG_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CONFIG, \
++#define RISCV_CONFIG_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CONFIG, 0, \
+ 					     KVM_REG_RISCV_CONFIG_REG(name), \
+ 					     KVM_REG_SIZE_ULONG)
+ 
+-#define RISCV_ISA_EXT_REG(id)	__kvm_reg_id(KVM_REG_RISCV_ISA_EXT, \
++#define RISCV_ISA_EXT_REG(id)	__kvm_reg_id(KVM_REG_RISCV_ISA_EXT, 0, \
+ 					     id, KVM_REG_SIZE_ULONG)
+ 
+-#define RISCV_CORE_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CORE, \
++#define RISCV_CORE_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CORE, 0, \
+ 					     KVM_REG_RISCV_CORE_REG(name), \
+ 					     KVM_REG_SIZE_ULONG)
+ 
+-#define RISCV_CSR_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CSR, \
++#define RISCV_CSR_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CSR, 0, \
+ 					     KVM_REG_RISCV_CSR_REG(name), \
+ 					     KVM_REG_SIZE_ULONG)
+ 
+-#define RISCV_TIMER_REG(name)	__kvm_reg_id(KVM_REG_RISCV_TIMER, \
++#define RISCV_TIMER_REG(name)	__kvm_reg_id(KVM_REG_RISCV_TIMER, 0, \
+ 					     KVM_REG_RISCV_TIMER_REG(name), \
+ 					     KVM_REG_SIZE_U64)
+ 
++#define RISCV_SBI_EXT_REG(subtype, id)	\
++				__kvm_reg_id(KVM_REG_RISCV_SBI_EXT, subtype, \
++					     id, KVM_REG_SIZE_ULONG)
++
+ struct kvm_cpu {
+ 	pthread_t	thread;
+ 
 diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
-index f98bd7a..89122b4 100644
+index 89122b4..540baec 100644
 --- a/riscv/kvm-cpu.c
 +++ b/riscv/kvm-cpu.c
-@@ -22,7 +22,7 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- {
+@@ -23,7 +23,8 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
  	struct kvm_cpu *vcpu;
  	u64 timebase = 0;
--	unsigned long isa = 0;
-+	unsigned long isa = 0, id = 0;
- 	int coalesced_offset, mmap_size;
+ 	unsigned long isa = 0, id = 0;
+-	int coalesced_offset, mmap_size;
++	unsigned long masks[KVM_REG_RISCV_SBI_MULTI_REG_LAST + 1] = { 0 };
++	int i, coalesced_offset, mmap_size;
  	struct kvm_one_reg reg;
  
-@@ -64,6 +64,30 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
- 		die("KVM_SET_ONE_REG failed (config.isa)");
+ 	vcpu = calloc(1, sizeof(struct kvm_cpu));
+@@ -88,6 +89,22 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ 			die("KVM_SET_ONE_REG failed (config.mimpid)");
+ 	}
  
-+	if (kvm->cfg.arch.custom_mvendorid) {
-+		id = kvm->cfg.arch.custom_mvendorid;
-+		reg.id = RISCV_CONFIG_REG(mvendorid);
-+		reg.addr = (unsigned long)&id;
-+		if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-+			die("KVM_SET_ONE_REG failed (config.mvendorid)");
++	for (i = 0; i < KVM_RISCV_SBI_EXT_MAX; i++) {
++		if (!kvm->cfg.arch.sbi_ext_disabled[i])
++			continue;
++		masks[KVM_REG_RISCV_SBI_MULTI_REG(i)] |=
++					KVM_REG_RISCV_SBI_MULTI_MASK(i);
 +	}
++	for (i = 0; i <= KVM_REG_RISCV_SBI_MULTI_REG_LAST; i++) {
++		if (!masks[i])
++			continue;
 +
-+	if (kvm->cfg.arch.custom_marchid) {
-+		id = kvm->cfg.arch.custom_marchid;
-+		reg.id = RISCV_CONFIG_REG(marchid);
-+		reg.addr = (unsigned long)&id;
++		reg.id = RISCV_SBI_EXT_REG(KVM_REG_RISCV_SBI_MULTI_DIS, i);
++		reg.addr = (unsigned long)&masks[i];
 +		if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-+			die("KVM_SET_ONE_REG failed (config.marchid)");
-+	}
-+
-+	if (kvm->cfg.arch.custom_mimpid) {
-+		id = kvm->cfg.arch.custom_mimpid;
-+		reg.id = RISCV_CONFIG_REG(mimpid);
-+		reg.addr = (unsigned long)&id;
-+		if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
-+			die("KVM_SET_ONE_REG failed (config.mimpid)");
++			die("KVM_SET_ONE_REG failed (sbi_ext %d)", i);
 +	}
 +
  	/* Populate the vcpu structure. */
