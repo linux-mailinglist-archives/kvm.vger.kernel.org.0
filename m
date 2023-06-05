@@ -2,184 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 151AB722766
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 15:30:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41351722771
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 15:31:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232428AbjFENaE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 09:30:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42204 "EHLO
+        id S234061AbjFENbb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 09:31:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230282AbjFENaD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 09:30:03 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82BFDCD;
-        Mon,  5 Jun 2023 06:30:02 -0700 (PDT)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 355DKxjd015993;
-        Mon, 5 Jun 2023 13:30:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=h08ZUZge0V2LjuVc7Yhcn6I/LBABMkL/LoHYysfR98c=;
- b=QJoKRDXiDTIaTEUGHszjVWr32R779Pj61+gUD7gq2bx8wVgF/BF1Va1Suon0pS0Xqc/r
- kLs/fmtSWEd7kZ3lPvCdnWJ2qC3JCUaXtBN7JYex7/9F+7cgszyKHIWxLuNIZGXsYBMh
- DAqAzybPgJqHblLLXIwKIw1dstrbi07cDnIbY0egqP6YrtRL72Le2CM9426pr4YFmb/E
- 621rehEu9vAZkoNN9fLth/2xBjWYgB9/um5a/PdYxKwbcpKEPQdpscY/223/DdtVWtFL
- ZY0ttfNvhcbUteUNq5SG6lZXCFnAmu2cksNIaPtO8rXBz+2l4Mnle+i46m7qUK5Lvxm4 NA== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r1ggx075h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Jun 2023 13:30:01 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 354GnjHr023638;
-        Mon, 5 Jun 2023 13:29:58 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3qyxg2hc8n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Jun 2023 13:29:58 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 355DTtCg51839330
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 5 Jun 2023 13:29:55 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 363D52004D;
-        Mon,  5 Jun 2023 13:29:55 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A69DD20043;
-        Mon,  5 Jun 2023 13:29:54 +0000 (GMT)
-Received: from [9.171.39.161] (unknown [9.171.39.161])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  5 Jun 2023 13:29:54 +0000 (GMT)
-Message-ID: <c19ee46b-4f89-172e-95d4-093145cff34d@linux.ibm.com>
-Date:   Mon, 5 Jun 2023 15:29:54 +0200
+        with ESMTP id S229641AbjFENb3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 09:31:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 860A6EA
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 06:30:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685971844;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=09h7AR4TuCkDh4zJT0E+2xZhXl8jzj6eU3ZdjKoNbek=;
+        b=gmS4diiYn7Pm676p7UuGn+xWBH7IrpP9pEBE/qaXOsQf+V5KZA89Y379YFE0t1vUZt9YMS
+        naiPfy5exKaWj+EESF6tEaLXQqpvc7vDj1r/wVjfmgKG5qg3WPcRoncJ59VD0lBNckY2eS
+        cJpSC7g31RzM/Gi0fr2gnxrBtFfdt1w=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-127-lFduemw8Pee8JSE9PamKUA-1; Mon, 05 Jun 2023 09:30:43 -0400
+X-MC-Unique: lFduemw8Pee8JSE9PamKUA-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6260b40eac6so34484076d6.0
+        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 06:30:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685971843; x=1688563843;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=09h7AR4TuCkDh4zJT0E+2xZhXl8jzj6eU3ZdjKoNbek=;
+        b=OoPM1V54LBDF3H548djyeBL8Avzz+LLaF16bHEMjriJC7M78vAuHxaphMgo1UiQU6N
+         SuLTW2G96cSO4JRfq0S+PmCPLcSRhZUHGXxJ44pCnooOZZPSHch+ysNhvghb7F9fHc/T
+         g9SPNIpQ/2RtmUpEZ+ETOVWw60eaon0FUXfNzZPPqbJBsvre9e+AK8LgtlbfNuRYPjqo
+         FoAoYpxim/8slLEqIXP2Y/2io0QkFa8wYy/ZW8t9WtlNXcRDVriDuTvcrq6cURnNXPyi
+         XnB7lWZaoKOR2df+YVXF3v7jZzuWe5mlx6iiHsbWJAsxJQ3QxykNLj9UsjY7sL3WcAJR
+         AX5w==
+X-Gm-Message-State: AC+VfDykG1oDu3lvnWGC+R//ViicM5ogAFtle8LfmvTfuGx7YT8ZK1Z0
+        4ZNKO1Jsu2C08jaVACKdKwcWudVuC9gF8dZ29H0yhdUv++d2j+rOS774QR9h3OtaZii3E6mUzLs
+        kwucQkjs078hV
+X-Received: by 2002:a05:6214:240b:b0:623:9a08:4edd with SMTP id fv11-20020a056214240b00b006239a084eddmr8345311qvb.25.1685971843173;
+        Mon, 05 Jun 2023 06:30:43 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ59eKAQLHTpxMz4/t5AgUGvFz9F83N7jM9XvbTEJ6IWLoINLpCKUzwbDeHXyzeu5z0HI4vP9w==
+X-Received: by 2002:a05:6214:240b:b0:623:9a08:4edd with SMTP id fv11-20020a056214240b00b006239a084eddmr8345276qvb.25.1685971842889;
+        Mon, 05 Jun 2023 06:30:42 -0700 (PDT)
+Received: from sgarzare-redhat ([5.77.94.106])
+        by smtp.gmail.com with ESMTPSA id ph12-20020a0562144a4c00b0061c83f00767sm4623347qvb.3.2023.06.05.06.30.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jun 2023 06:30:42 -0700 (PDT)
+Date:   Mon, 5 Jun 2023 15:30:35 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Shannon Nelson <shannon.nelson@amd.com>
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>,
+        Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+        Tiwei Bie <tiwei.bie@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost-vdpa: filter VIRTIO_F_RING_PACKED feature
+Message-ID: <gi2hngx3ndsgz5d2rpqjywdmou5vxhd7xgi5z2lbachr7yoos4@kpifz37oz2et>
+References: <20230605110644.151211-1-sgarzare@redhat.com>
+ <20230605084104-mutt-send-email-mst@kernel.org>
+ <24fjdwp44hovz3d3qkzftmvjie45er3g3boac7aezpvzbwvuol@lmo47ydvnqau>
+ <20230605085840-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Content-Language: en-US
-To:     Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>
-References: <20230519093708.810957-1-seiden@linux.ibm.com>
- <20230519093708.810957-4-seiden@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v2 3/6] s390/uvdevice: Add 'List Secrets' UVC
-In-Reply-To: <20230519093708.810957-4-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: pAs3NGx-YsPr4v4MsFEln9R8pzIRRVpG
-X-Proofpoint-ORIG-GUID: pAs3NGx-YsPr4v4MsFEln9R8pzIRRVpG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-03_08,2023-06-02_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
- adultscore=0 suspectscore=0 clxscore=1015 impostorscore=0 mlxscore=0
- malwarescore=0 lowpriorityscore=0 priorityscore=1501 mlxlogscore=982
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306050114
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230605085840-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/19/23 11:37, Steffen Eiden wrote:
-> Userspace can call the List Secrets Ultravisor Call
-> using IOCTLs on the uvdevice.
-> During the handling of the new IOCTL nr the uvdevice will do some sanity
-> checks first. Then, perform the Ultravisor command, and copy the answer
-> to userspace.
-> If the List Secrets UV facility is not present, UV will return
-> invalid command rc. This won't be fenced in the driver and does not
-> result in a negative return value. This is also true for any other
-> possible error code the UV can return.
-> 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> ---
->[...]
-> +/** uvio_list_secrets() - perform a List Secret UVC
-> + *
-> + * @uv_ioctl: ioctl control block
-> + *
-> + * uvio_list_secrets() performs the List Secret Ultravisor Call.
-> + * It verifies that the given userspace argument address is valid and its size
-> + * is sane. Every other check is made by the Ultravisor (UV) and won't result
-> + * in a negative return value. It builds the request, performs the UV-call,
-> + * and copies the result to userspace.
-> + *
-> + * The argument specifies the location for the result of the UV-Call.
-> + *
-> + * If the List Secrets UV facility is not present,
-> + * UV will return invalid command rc. This won't be fenced in the driver
-> + * and does not result in a negative return value.
-> + *
-> + * Context: might sleep
-> + *
-> + * Return: 0 on success or a negative error code on error.
-> + */
-> +static int uvio_list_secrets(struct uvio_ioctl_cb *uv_ioctl)
-> +{
-> +	void __user *user_buf_arg = (void __user *)uv_ioctl->argument_addr;
-> +	struct uv_cb_guest_addr uvcb = {
-> +		.header.len = sizeof(uvcb),
-> +		.header.cmd = UVC_CMD_LIST_SECRETS,
-> +	};
-> +	void *secrets = NULL;
-> +	int ret;
+On Mon, Jun 05, 2023 at 09:00:25AM -0400, Michael S. Tsirkin wrote:
+>On Mon, Jun 05, 2023 at 02:54:20PM +0200, Stefano Garzarella wrote:
+>> On Mon, Jun 05, 2023 at 08:41:54AM -0400, Michael S. Tsirkin wrote:
+>> > On Mon, Jun 05, 2023 at 01:06:44PM +0200, Stefano Garzarella wrote:
+>> > > vhost-vdpa IOCTLs (eg. VHOST_GET_VRING_BASE, VHOST_SET_VRING_BASE)
+>> > > don't support packed virtqueue well yet, so let's filter the
+>> > > VIRTIO_F_RING_PACKED feature for now in vhost_vdpa_get_features().
+>> > >
+>> > > This way, even if the device supports it, we don't risk it being
+>> > > negotiated, then the VMM is unable to set the vring state properly.
+>> > >
+>> > > Fixes: 4c8cf31885f6 ("vhost: introduce vDPA-based backend")
+>> > > Cc: stable@vger.kernel.org
+>> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> > > ---
+>> > >
+>> > > Notes:
+>> > >     This patch should be applied before the "[PATCH v2 0/3] vhost_vdpa:
+>> > >     better PACKED support" series [1] and backported in stable branches.
+>> > >
+>> > >     We can revert it when we are sure that everything is working with
+>> > >     packed virtqueues.
+>> > >
+>> > >     Thanks,
+>> > >     Stefano
+>> > >
+>> > >     [1] https://lore.kernel.org/virtualization/20230424225031.18947-1-shannon.nelson@amd.com/
+>> >
+>> > I'm a bit lost here. So why am I merging "better PACKED support" then?
+>>
+>> To really support packed virtqueue with vhost-vdpa, at that point we would
+>> also have to revert this patch.
+>>
+>> I wasn't sure if you wanted to queue the series for this merge window.
+>> In that case do you think it is better to send this patch only for stable
+>> branches?
+>> > Does this patch make them a NOP?
+>>
+>> Yep, after applying the "better PACKED support" series and being sure 
+>> that
+>> the IOCTLs of vhost-vdpa support packed virtqueue, we should revert this
+>> patch.
+>>
+>> Let me know if you prefer a different approach.
+>>
+>> I'm concerned that QEMU uses vhost-vdpa IOCTLs thinking that the kernel
+>> interprets them the right way, when it does not.
+>>
+>> Thanks,
+>> Stefano
+>>
+>
+>If this fixes a bug can you add Fixes tags to each of them? Then it's ok
+>to merge in this window. Probably easier than the elaborate
+>mask/unmask dance.
 
-int ret = 0;
+CCing Shannon (the original author of the "better PACKED support"
+series).
 
-> +
-> +	if (uv_ioctl->argument_len != UVIO_LIST_SECRETS_LEN)
-> +		return -EINVAL;
+IIUC Shannon is going to send a v3 of that series to fix the
+documentation, so Shannon can you also add the Fixes tags?
 
-I'd be less uneasy if you 
-s/uv_ioctl->argument_len/UVIO_LIST_SECRETS_LEN/ below. Yes, you check 
-the length above but it still feels weird to use a variable when we have 
-a perfectly fine constant just waiting to be used.
-
-> +
-> +	secrets = kvzalloc(uv_ioctl->argument_len, GFP_KERNEL);
-> +	if (!secrets)
-> +		return -ENOMEM;
-> +
-> +	uvcb.addr = (u64)secrets;
-> +	uv_call_sched(0, (u64)&uvcb);
-> +	uv_ioctl->uv_rc = uvcb.header.rc;
-> +	uv_ioctl->uv_rrc = uvcb.header.rrc;
-> +
-> +	if (copy_to_user(user_buf_arg, secrets, uv_ioctl->argument_len))
-> +		ret = -EFAULT;
-
-and remove the else
-
-> +	else
-> +		ret = 0;
-> +
-> +	kvfree(secrets);
-> +	return ret;
-> +}
-> +
->   static int uvio_copy_and_check_ioctl(struct uvio_ioctl_cb *ioctl, void __user *argp,
->   				     unsigned long cmd)
->   {
-> @@ -333,6 +385,9 @@ static long uvio_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
->   	case UVIO_IOCTL_ADD_SECRET_NR:
->   		ret = uvio_add_secret(&uv_ioctl);
->   		break;
-> +	case UVIO_IOCTL_LIST_SECRETS_NR:
-> +		ret = uvio_list_secrets(&uv_ioctl);
-> +		break;
->   	default:
->   		ret = -ENOIOCTLCMD;
->   		break;
+Thanks,
+Stefano
 
