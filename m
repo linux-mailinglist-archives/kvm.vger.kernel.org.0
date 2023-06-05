@@ -2,160 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B4137227F7
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 15:55:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F10857227F4
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 15:55:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234222AbjFENzy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 09:55:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56596 "EHLO
+        id S234206AbjFENzo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 09:55:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234231AbjFENzu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 09:55:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B1C91
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 06:55:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685973304;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jb5+j0WuGaWQLAokH8FJzOfd9IpoIc69UMNApn2Um/Q=;
-        b=Dxfh8soU2MojWuonyjetGUN6NDhxhGjPNIx541Csp9cytow+8jMV4M1KsgpNbfIsppxZye
-        fomarvyTa2/rJTiYf/5DOGjBv6+fpVUJd0PM9JlatWMcpvOBk99dv7q1JvSZHpss6J16+5
-        +lJZtqzBXZUUP47rHKl/e++pVBY8D5A=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-665--JzdXTuUPFSJfJ6z3xEjoQ-1; Mon, 05 Jun 2023 09:55:03 -0400
-X-MC-Unique: -JzdXTuUPFSJfJ6z3xEjoQ-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-30ae42628cfso2203447f8f.3
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 06:55:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685973302; x=1688565302;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jb5+j0WuGaWQLAokH8FJzOfd9IpoIc69UMNApn2Um/Q=;
-        b=fzxUhEkMRaFHpITY7GaYyg+f/atSfzji+xBp1jajQlNxKrreA3ALsCV2zSiRdKLfAZ
-         H/hRqP14jwpIP9DtB8K33RBIewPEeIe3f/L9FWEWxsyLqfw6KcZMqnL3YvwxJiQR3Ku/
-         cHT3triEXfee0Bjgx05R0H1gYmDmxmLCdCyBOA6kshwnDsv0IO3ebJMKM9MmOdQFqG+q
-         LsG46Lsh/EUIzeqDwKEoESAG2MoPT2yi6s4BFE7SCjl3UaekrTnivSQTFo950p4QUj0m
-         Mc034J/VnPN7Gl7m2yzZA8kh7HgtpKUp0P4q1rnQFK1S8yFnhN2hhnXOaAUVKUpOa+p6
-         TqVw==
-X-Gm-Message-State: AC+VfDyB+fBEMyHAlBdB24QJEIo/gZgyPWtaj5ubcoz9QPeWR24HLWc0
-        8LCMX3MEt7PtDE6DuS0f22Ye3PZii909b+Y0JmTIJhgsx0gYfa7L9V4CgQMVl8qwRgqe+hHcSiG
-        OPvaIhfdOuuO2
-X-Received: by 2002:a5d:6203:0:b0:309:a4e:52d3 with SMTP id y3-20020a5d6203000000b003090a4e52d3mr5095729wru.5.1685973301861;
-        Mon, 05 Jun 2023 06:55:01 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6ZHD4gDUdlfGTiduMiqY+ojv/UUc0qqNDYq2hzP027LaDqgTMXJjGDzbnCN0fSb2MNMtWn6g==
-X-Received: by 2002:a5d:6203:0:b0:309:a4e:52d3 with SMTP id y3-20020a5d6203000000b003090a4e52d3mr5095714wru.5.1685973301499;
-        Mon, 05 Jun 2023 06:55:01 -0700 (PDT)
-Received: from redhat.com ([2.55.41.2])
-        by smtp.gmail.com with ESMTPSA id t18-20020a05600001d200b0030ae09c5efdsm9932198wrx.42.2023.06.05.06.54.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 06:55:00 -0700 (PDT)
-Date:   Mon, 5 Jun 2023 09:54:57 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Shannon Nelson <shannon.nelson@amd.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>,
-        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-        Tiwei Bie <tiwei.bie@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost-vdpa: filter VIRTIO_F_RING_PACKED feature
-Message-ID: <20230605095404-mutt-send-email-mst@kernel.org>
-References: <20230605110644.151211-1-sgarzare@redhat.com>
- <20230605084104-mutt-send-email-mst@kernel.org>
- <24fjdwp44hovz3d3qkzftmvjie45er3g3boac7aezpvzbwvuol@lmo47ydvnqau>
- <20230605085840-mutt-send-email-mst@kernel.org>
- <gi2hngx3ndsgz5d2rpqjywdmou5vxhd7xgi5z2lbachr7yoos4@kpifz37oz2et>
+        with ESMTP id S231308AbjFENzn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 09:55:43 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24F0E5;
+        Mon,  5 Jun 2023 06:55:41 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 355D9SnI025450;
+        Mon, 5 Jun 2023 13:55:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=uk/Ph7nyQQjzXgnz5FCxkok2A043KfR/00Z42hy/kLU=;
+ b=JeRvxbc//zM0YdYkU0ScxMD9Ijnz8Dq9wWRafIEzFy5rsrOlIFUwIRjQL7xW7EujMkPe
+ /P4pDCMXxF2jMXDwrHitLl6fDoJDX4bDFFbsUwU6kKJqaLHKd29a91QekHwA9nPinZUA
+ sUiYaJiS94wYF7cUf8nt+EoXD4fiNZb0aNgAV21yHcqT0cZCQkW4IdwxOaFRySL4QUqb
+ g+VfyTRReqppxa6pO5vjgKABLeZgAGQ6CHGnI1GmEz34Yr1uoTOXqGOaP7hz1gyPmRPl
+ uDhtNW37iNrgbXOujB+HlsZ/81DXKPMqSpXId/V1EMFFScurhRyIBzjDunNFEKnnbKyK Cw== 
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r1f9vk022-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jun 2023 13:55:40 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3553pLUI000328;
+        Mon, 5 Jun 2023 13:55:39 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3qyxmyhd4r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jun 2023 13:55:38 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 355DtZD263832516
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Jun 2023 13:55:35 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6908720040;
+        Mon,  5 Jun 2023 13:55:35 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DBA4220043;
+        Mon,  5 Jun 2023 13:55:34 +0000 (GMT)
+Received: from [9.171.39.161] (unknown [9.171.39.161])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon,  5 Jun 2023 13:55:34 +0000 (GMT)
+Message-ID: <2fca9573-5989-d61e-52ec-552f4e176971@linux.ibm.com>
+Date:   Mon, 5 Jun 2023 15:55:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <gi2hngx3ndsgz5d2rpqjywdmou5vxhd7xgi5z2lbachr7yoos4@kpifz37oz2et>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Content-Language: en-US
+To:     Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>
+Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>
+References: <20230519093708.810957-1-seiden@linux.ibm.com>
+ <20230519093708.810957-6-seiden@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v2 5/6] s390/uv: replace scnprintf with sysfs_emit
+In-Reply-To: <20230519093708.810957-6-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: i3wboSr1suuijq0IkIwwm39ULCQWE8DZ
+X-Proofpoint-ORIG-GUID: i3wboSr1suuijq0IkIwwm39ULCQWE8DZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-06-05_28,2023-06-02_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 bulkscore=0 mlxlogscore=999 spamscore=0 malwarescore=0
+ phishscore=0 impostorscore=0 mlxscore=0 priorityscore=1501 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2306050118
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 05, 2023 at 03:30:35PM +0200, Stefano Garzarella wrote:
-> On Mon, Jun 05, 2023 at 09:00:25AM -0400, Michael S. Tsirkin wrote:
-> > On Mon, Jun 05, 2023 at 02:54:20PM +0200, Stefano Garzarella wrote:
-> > > On Mon, Jun 05, 2023 at 08:41:54AM -0400, Michael S. Tsirkin wrote:
-> > > > On Mon, Jun 05, 2023 at 01:06:44PM +0200, Stefano Garzarella wrote:
-> > > > > vhost-vdpa IOCTLs (eg. VHOST_GET_VRING_BASE, VHOST_SET_VRING_BASE)
-> > > > > don't support packed virtqueue well yet, so let's filter the
-> > > > > VIRTIO_F_RING_PACKED feature for now in vhost_vdpa_get_features().
-> > > > >
-> > > > > This way, even if the device supports it, we don't risk it being
-> > > > > negotiated, then the VMM is unable to set the vring state properly.
-> > > > >
-> > > > > Fixes: 4c8cf31885f6 ("vhost: introduce vDPA-based backend")
-> > > > > Cc: stable@vger.kernel.org
-> > > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > > > ---
-> > > > >
-> > > > > Notes:
-> > > > >     This patch should be applied before the "[PATCH v2 0/3] vhost_vdpa:
-> > > > >     better PACKED support" series [1] and backported in stable branches.
-> > > > >
-> > > > >     We can revert it when we are sure that everything is working with
-> > > > >     packed virtqueues.
-> > > > >
-> > > > >     Thanks,
-> > > > >     Stefano
-> > > > >
-> > > > >     [1] https://lore.kernel.org/virtualization/20230424225031.18947-1-shannon.nelson@amd.com/
-> > > >
-> > > > I'm a bit lost here. So why am I merging "better PACKED support" then?
-> > > 
-> > > To really support packed virtqueue with vhost-vdpa, at that point we would
-> > > also have to revert this patch.
-> > > 
-> > > I wasn't sure if you wanted to queue the series for this merge window.
-> > > In that case do you think it is better to send this patch only for stable
-> > > branches?
-> > > > Does this patch make them a NOP?
-> > > 
-> > > Yep, after applying the "better PACKED support" series and being
-> > > sure that
-> > > the IOCTLs of vhost-vdpa support packed virtqueue, we should revert this
-> > > patch.
-> > > 
-> > > Let me know if you prefer a different approach.
-> > > 
-> > > I'm concerned that QEMU uses vhost-vdpa IOCTLs thinking that the kernel
-> > > interprets them the right way, when it does not.
-> > > 
-> > > Thanks,
-> > > Stefano
-> > > 
-> > 
-> > If this fixes a bug can you add Fixes tags to each of them? Then it's ok
-> > to merge in this window. Probably easier than the elaborate
-> > mask/unmask dance.
+On 5/19/23 11:37, Steffen Eiden wrote:
+> Replace scnprintf(page, PAGE_SIZE, ...) with the page size aware
+> sysfs_emit(page, ...) which adds some sanity checks.
 > 
-> CCing Shannon (the original author of the "better PACKED support"
-> series).
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>   arch/s390/kernel/uv.c | 36 +++++++++++++++---------------------
+>   1 file changed, 15 insertions(+), 21 deletions(-)
 > 
-> IIUC Shannon is going to send a v3 of that series to fix the
-> documentation, so Shannon can you also add the Fixes tags?
-> 
-> Thanks,
-> Stefano
+> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+> index cb2ee06df286..d5b5d7e83c17 100644
+> --- a/arch/s390/kernel/uv.c
+> +++ b/arch/s390/kernel/uv.c
+> @@ -462,11 +462,11 @@ EXPORT_SYMBOL_GPL(arch_make_page_accessible);
+>   static ssize_t uv_query_facilities(struct kobject *kobj,
+>   				   struct kobj_attribute *attr, char *page)
 
-Well this is in my tree already. Just reply with
-Fixes: <>
-to each and I will add these tags.
+The last argument is called buf so let's also change that over to make 
+all of the functions look the same.
 
-If I start dropping and rebasing this won't make it in this window.
-
--- 
-MST
+>   {
+> -	return scnprintf(page, PAGE_SIZE, "%lx\n%lx\n%lx\n%lx\n",
+> -			uv_info.inst_calls_list[0],
+> -			uv_info.inst_calls_list[1],
+> -			uv_info.inst_calls_list[2],
+> -			uv_info.inst_calls_list[3]);
+> +	return sysfs_emit(page, "%lx\n%lx\n%lx\n%lx\n",
+> +			  uv_info.inst_calls_list[0],
+> +			  uv_info.inst_calls_list[1],
+> +			  uv_info.inst_calls_list[2],
+> +			  uv_info.inst_calls_list[3]);
+>   }
+>   
+>   static struct kobj_attribute uv_query_facilities_attr =
+> @@ -493,8 +493,7 @@ static struct kobj_attribute uv_query_supp_se_hdr_pcf_attr =
+>   static ssize_t uv_query_dump_cpu_len(struct kobject *kobj,
+>   				     struct kobj_attribute *attr, char *page)
+>   {
+> -	return scnprintf(page, PAGE_SIZE, "%lx\n",
+> -			uv_info.guest_cpu_stor_len);
+> +	return sysfs_emit(page, "%lx\n", uv_info.guest_cpu_stor_len);
+>   }
+>   
+>   static struct kobj_attribute uv_query_dump_cpu_len_attr =
+> @@ -503,8 +502,7 @@ static struct kobj_attribute uv_query_dump_cpu_len_attr =
+>   static ssize_t uv_query_dump_storage_state_len(struct kobject *kobj,
+>   					       struct kobj_attribute *attr, char *page)
+>   {
+> -	return scnprintf(page, PAGE_SIZE, "%lx\n",
+> -			uv_info.conf_dump_storage_state_len);
+> +	return sysfs_emit(page, "%lx\n", uv_info.conf_dump_storage_state_len);
+>   }
+>   
+>   static struct kobj_attribute uv_query_dump_storage_state_len_attr =
+> @@ -513,8 +511,7 @@ static struct kobj_attribute uv_query_dump_storage_state_len_attr =
+>   static ssize_t uv_query_dump_finalize_len(struct kobject *kobj,
+>   					  struct kobj_attribute *attr, char *page)
+>   {
+> -	return scnprintf(page, PAGE_SIZE, "%lx\n",
+> -			uv_info.conf_dump_finalize_len);
+> +	return sysfs_emit(page, "%lx\n", uv_info.conf_dump_finalize_len);
+>   }
+>   
+>   static struct kobj_attribute uv_query_dump_finalize_len_attr =
+> @@ -532,8 +529,7 @@ static struct kobj_attribute uv_query_feature_indications_attr =
+>   static ssize_t uv_query_max_guest_cpus(struct kobject *kobj,
+>   				       struct kobj_attribute *attr, char *page)
+>   {
+> -	return scnprintf(page, PAGE_SIZE, "%d\n",
+> -			uv_info.max_guest_cpu_id + 1);
+> +	return sysfs_emit(page, "%d\n", uv_info.max_guest_cpu_id + 1);
+>   }
+>   
+>   static struct kobj_attribute uv_query_max_guest_cpus_attr =
+> @@ -542,8 +538,7 @@ static struct kobj_attribute uv_query_max_guest_cpus_attr =
+>   static ssize_t uv_query_max_guest_vms(struct kobject *kobj,
+>   				      struct kobj_attribute *attr, char *page)
+>   {
+> -	return scnprintf(page, PAGE_SIZE, "%d\n",
+> -			uv_info.max_num_sec_conf);
+> +	return sysfs_emit(page, "%d\n", uv_info.max_num_sec_conf);
+>   }
+>   
+>   static struct kobj_attribute uv_query_max_guest_vms_attr =
+> @@ -552,8 +547,7 @@ static struct kobj_attribute uv_query_max_guest_vms_attr =
+>   static ssize_t uv_query_max_guest_addr(struct kobject *kobj,
+>   				       struct kobj_attribute *attr, char *page)
+>   {
+> -	return scnprintf(page, PAGE_SIZE, "%lx\n",
+> -			uv_info.max_sec_stor_addr);
+> +	return sysfs_emit(page, "%lx\n", uv_info.max_sec_stor_addr);
+>   }
+>   
+>   static struct kobj_attribute uv_query_max_guest_addr_attr =
+> @@ -562,7 +556,7 @@ static struct kobj_attribute uv_query_max_guest_addr_attr =
+>   static ssize_t uv_query_supp_att_req_hdr_ver(struct kobject *kobj,
+>   					     struct kobj_attribute *attr, char *page)
+>   {
+> -	return scnprintf(page, PAGE_SIZE, "%lx\n", uv_info.supp_att_req_hdr_ver);
+> +	return sysfs_emit(page, "%lx\n", uv_info.supp_att_req_hdr_ver);
+>   }
+>   
+>   static struct kobj_attribute uv_query_supp_att_req_hdr_ver_attr =
+> @@ -571,7 +565,7 @@ static struct kobj_attribute uv_query_supp_att_req_hdr_ver_attr =
+>   static ssize_t uv_query_supp_att_pflags(struct kobject *kobj,
+>   					struct kobj_attribute *attr, char *page)
+>   {
+> -	return scnprintf(page, PAGE_SIZE, "%lx\n", uv_info.supp_att_pflags);
+> +	return sysfs_emit(page, "%lx\n", uv_info.supp_att_pflags);
+>   }
+>   
+>   static struct kobj_attribute uv_query_supp_att_pflags_attr =
+> @@ -605,7 +599,7 @@ static ssize_t uv_is_prot_virt_guest(struct kobject *kobj,
+>   #ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
+>   	val = prot_virt_guest;
+>   #endif
+> -	return scnprintf(page, PAGE_SIZE, "%d\n", val);
+> +	return sysfs_emit(page, "%d\n", val);
+>   }
+>   
+>   static ssize_t uv_is_prot_virt_host(struct kobject *kobj,
+> @@ -617,7 +611,7 @@ static ssize_t uv_is_prot_virt_host(struct kobject *kobj,
+>   	val = prot_virt_host;
+>   #endif
+>   
+> -	return scnprintf(page, PAGE_SIZE, "%d\n", val);
+> +	return sysfs_emit(page, "%d\n", val);
+>   }
+>   
+>   static struct kobj_attribute uv_prot_virt_guest =
 
