@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1465872281C
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 16:02:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B19E72281E
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 16:02:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234242AbjFEOCt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 10:02:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60526 "EHLO
+        id S231341AbjFEOCw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 10:02:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233098AbjFEOCq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 10:02:46 -0400
-Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11E1CE6
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 07:02:40 -0700 (PDT)
-Received: by mail-oo1-xc36.google.com with SMTP id 006d021491bc7-557d4a08bbaso2891540eaf.2
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 07:02:40 -0700 (PDT)
+        with ESMTP id S233098AbjFEOCt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 10:02:49 -0400
+Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AAF6114
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 07:02:44 -0700 (PDT)
+Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-1a1fa977667so5177736fac.1
+        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 07:02:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1685973759; x=1688565759;
+        d=ventanamicro.com; s=google; t=1685973763; x=1688565763;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ur/4nc0WWZqL23flua+8noNR16SuSLq+XhY4yLBLAT8=;
-        b=fP+SisgpNt7Lh2fyGzljyBPtkLHWkFIAndtkm4QK8WSMK5dd3PIzlHilLytjCnJQt3
-         hbhXX0Jo1AoUKol7laQN+rOSWj8qkmI2vzLqDs1nS3tWN6xkTaTaXRskb9sDKOQREovN
-         JuMP5z7OwmjOW2+4x715Yd6eCxofwo0l9jyByNUGtgUgWjI8DpeN71V5h6uFLhhjcQqX
-         zQ7BjUWaOe9X4a/cwRaAt5wFAXli1fw6eXlU3MVpagEHDIVMuzkCkWxsPW0ifjXCTFKj
-         NR+mzGlDBa5oKS8r/fBxSpX4FONPylwWuo8osR1OiJEad4XNBlD2AxJ/vaN+EEYhrnFn
-         l+rQ==
+        bh=jPQWdMrB3vJlDcEi+yFf+uGq+ry4kW1YJbGepQr4/gM=;
+        b=YnMic8R/yZ2JVJq8xDm1NbuZhbrmUInzp4NxsbCyD9Y/uhknauvqBYsipxf9OwCqSE
+         X2yMBEliAjKYzjQJyf10+ssPVmUfpeP1gnneO2BimxdplXmDutEIs64W4nwL0SIhX2Vi
+         Z4wfB534s/sna4RuIBaBGfSa2FP/u0gstwdv47iLt2jhvkPL5Otd6HcXcrJdgODS8grG
+         gL6Bze4n+rP5HymtAUZWWWb6DlSgSmDIqQYpQZwUSpWF3K83ljltO6PIi08TKKvXmzq0
+         Pkoi7qmL9mhknLoJ1xU9Or/8M6glMuxXquJGtZ7q+7T3Mgt8gdhX/jJ0PoyJWd/6rA8V
+         hy+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685973759; x=1688565759;
+        d=1e100.net; s=20221208; t=1685973763; x=1688565763;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ur/4nc0WWZqL23flua+8noNR16SuSLq+XhY4yLBLAT8=;
-        b=BHJZsSmzZf2Bz4qlo7nTsJP6fONT8oKB8po24r+2PPKtNIgCbraypASO6BFh5HP6Yy
-         y4WhwX08gyilRv8zQbDBO4xkdeyA7DYXb4kvO2peLrMq/VI06+MV4aOBNKtgDG/M+naZ
-         pj3w7B2/7dxaGAvrHkg3jjJPM1lEiOLQSXHFDo3kp6CV4dbIwpYe5gcE2PPSNGfbJmMe
-         wOFOr90ytOZHNApGPPcFOzMC89GQ5Y5UtWOAjuubPChVPlN9n0yrj9KxmXYSphIPInZF
-         Ozpy6Jo03n8kh9hU3nnJ/pRnRpB1dpBIwFUQ51Yq7FAu+lcBqfkimU/Ad36RT8oqaYJe
-         StKQ==
-X-Gm-Message-State: AC+VfDyPF4RerS9z0dXajMADlAFdS1DE5qmMylywdyZm1dfc0rfi0N1e
-        lT6d/6jVu+vzIHnINLl2fFFlVg==
-X-Google-Smtp-Source: ACHHUZ7JHPcqP/KJZW5Gtw/RbrqWj/PsANmRbOGLyQKnlFtu6R3GuOvRZADl3r3k58Lv26G1MJnkOQ==
-X-Received: by 2002:a4a:bd98:0:b0:558:aa98:df34 with SMTP id k24-20020a4abd98000000b00558aa98df34mr2872760oop.9.1685973758908;
-        Mon, 05 Jun 2023 07:02:38 -0700 (PDT)
+        bh=jPQWdMrB3vJlDcEi+yFf+uGq+ry4kW1YJbGepQr4/gM=;
+        b=NFadzVHqDLNVZqUsZAgJJV0es0q5PGiTzyVejQhzl1HMyDGzVK8MK5Kw/IHog8jKyM
+         P16p/HT/GIbTwzeuOgOTCHRbe7FM/zBY+wXTE2oNMSvaxijsiZ7qjvxWwDw/jWVG/VMc
+         KvO6Lf7N8xiR/0XhNdztu6M+cQgC+knvpkAmx+b9FwdLxBo7gpX5gIdBn+JC1d3Ee2Yr
+         mWP4esmofD2tUHEdgutdsCx8TXd5a1M7JVVannyg6tuNN650ecKovPySVar1Rd9Noweg
+         +QYrytM1v/E91Ts8TlcqSzLqkQM7y5XGuEaGid7QHTmSErdIFR9O2XbeAB5RLYmUOE83
+         /ggQ==
+X-Gm-Message-State: AC+VfDxoE+3uTVgp1Wvz1b+D/WikFTgRYjg1xBAf59EgSxpmBT9qzh/6
+        R1wjl11ymNF5g3WpRN2z3+LOztjbpP6+QAcO5qFYQw==
+X-Google-Smtp-Source: ACHHUZ6mwht1zonH2R3L/qxR+M13wiFxhacllWrDC6onv1y7/5hNJsknvAbpW3d7+TuMIU0AGMdMWQ==
+X-Received: by 2002:a05:6870:4146:b0:1a3:74e:7863 with SMTP id r6-20020a056870414600b001a3074e7863mr2319857oad.4.1685973763467;
+        Mon, 05 Jun 2023 07:02:43 -0700 (PDT)
 Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id f12-20020a4ace8c000000b0055ab0abaf31sm454787oos.19.2023.06.05.07.02.34
+        by smtp.gmail.com with ESMTPSA id f12-20020a4ace8c000000b0055ab0abaf31sm454787oos.19.2023.06.05.07.02.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 07:02:38 -0700 (PDT)
+        Mon, 05 Jun 2023 07:02:43 -0700 (PDT)
 From:   Anup Patel <apatel@ventanamicro.com>
 To:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
         maz@kernel.org
@@ -57,51 +57,61 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Andrew Jones <ajones@ventanamicro.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH v2 4/8] riscv: Sort the ISA extension array alphabetically
-Date:   Mon,  5 Jun 2023 19:32:04 +0530
-Message-Id: <20230605140208.272027-5-apatel@ventanamicro.com>
+Subject: [PATCH v2 5/8] riscv: Add zbb extension support
+Date:   Mon,  5 Jun 2023 19:32:05 +0530
+Message-Id: <20230605140208.272027-6-apatel@ventanamicro.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230605140208.272027-1-apatel@ventanamicro.com>
 References: <20230605140208.272027-1-apatel@ventanamicro.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let us follow alphabetical order for listing ISA extensions in
-the isa_info_arr[] array.
+The zbb extension allows software to use basic bitmanip instructions.
+Let us add the zbb extension to the Guest device tree whenever it is
+supported by the host.
 
 Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 ---
- riscv/fdt.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ riscv/fdt.c                         | 1 +
+ riscv/include/kvm/kvm-config-arch.h | 3 +++
+ 2 files changed, 4 insertions(+)
 
 diff --git a/riscv/fdt.c b/riscv/fdt.c
-index 3cdb95c..977e962 100644
+index 977e962..17d6757 100644
 --- a/riscv/fdt.c
 +++ b/riscv/fdt.c
-@@ -15,11 +15,12 @@ struct isa_ext_info {
- };
- 
- struct isa_ext_info isa_info_arr[] = {
--	{"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT},
-+	/* sorted alphabetically */
+@@ -19,6 +19,7 @@ struct isa_ext_info isa_info_arr[] = {
  	{"sstc", KVM_RISCV_ISA_EXT_SSTC},
  	{"svinval", KVM_RISCV_ISA_EXT_SVINVAL},
--	{"zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE},
-+	{"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT},
+ 	{"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT},
++	{"zbb", KVM_RISCV_ISA_EXT_ZBB},
  	{"zicbom", KVM_RISCV_ISA_EXT_ZICBOM},
-+	{"zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE},
+ 	{"zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE},
  };
- 
- static void dump_fdt(const char *dtb_file, void *fdt)
+diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
+index 56676e3..8448b1a 100644
+--- a/riscv/include/kvm/kvm-config-arch.h
++++ b/riscv/include/kvm/kvm-config-arch.h
+@@ -34,6 +34,9 @@ struct kvm_config_arch {
+ 	OPT_BOOLEAN('\0', "disable-svpbmt",				\
+ 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_SVPBMT],	\
+ 		    "Disable Svpbmt Extension"),			\
++	OPT_BOOLEAN('\0', "disable-zbb",				\
++		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBB],	\
++		    "Disable Zbb Extension"),				\
+ 	OPT_BOOLEAN('\0', "disable-zicbom",				\
+ 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZICBOM],	\
+ 		    "Disable Zicbom Extension"),			\
 -- 
 2.34.1
 
