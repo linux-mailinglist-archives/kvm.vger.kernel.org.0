@@ -2,169 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 18595722618
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 14:39:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61AF6722623
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 14:42:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233161AbjFEMji (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 08:39:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35888 "EHLO
+        id S232929AbjFEMmp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 08:42:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232924AbjFEMjf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 08:39:35 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BB81A1;
-        Mon,  5 Jun 2023 05:39:34 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 355CGkXw003839;
-        Mon, 5 Jun 2023 12:39:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=E66XeiwmOkh+c6855Qhsf1UQLKfUMHAjv3cY+q0Hu7E=;
- b=if/rjP84XTqrQZXm8+RJtcJgYsXdki54QVpIKpP9wToFXeNEn6AlxMqPImf4rZ7YNc5q
- ZPlS6Dp9J2rGHVFijZTqWjezWm6EblF+icn63t27S6NF6bq0xnzU8xpa7l275aQlzp2f
- PR0RgSTFLZJE0Cs1DO3JY5NQZGpEHS97hXx2WkH7FPfGw1nLSjmQ1eNRkC5uKeo0K24u
- +MyqZTr/Z4feWYh+M1Jxgr301sqe8doitHixHZQJOq/cZ4T/86WjDr+oXcHBYtZFNCZh
- Z9cgMKty5Gm5HsjFjuEf4rzL3hlrre/dAW2w1UFhVKZ+XNr0AlUFF7rC4WB6uwW7qrKo nQ== 
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r1fju0mtm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Jun 2023 12:39:33 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3558ZbGN023557;
-        Mon, 5 Jun 2023 12:39:31 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3qyx5q92mh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Jun 2023 12:39:31 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 355CdRN518809380
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 5 Jun 2023 12:39:27 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C8AB42004F;
-        Mon,  5 Jun 2023 12:39:27 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 44B7320040;
-        Mon,  5 Jun 2023 12:39:27 +0000 (GMT)
-Received: from [9.171.39.161] (unknown [9.171.39.161])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  5 Jun 2023 12:39:27 +0000 (GMT)
-Message-ID: <ddb1e8bf-fb4d-0899-3884-15be2d34c852@linux.ibm.com>
-Date:   Mon, 5 Jun 2023 14:39:26 +0200
+        with ESMTP id S230193AbjFEMmn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 08:42:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47703A1
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 05:42:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685968923;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mOmw6tP0FZFUTC7PGHcbRuETRmz8QZ6Xd4tQSfJHTaA=;
+        b=eSOuq0veM0RkMS9CbNANbnmn/5mVaTYmE2qlArlpkXSGkumjzsShA6v72+VsryGif8NRHJ
+        We0ZcZxvn6VMbFezGlhmWxrsLkWClyXuZWn3PlEIYEUJB/Eeg1KrwbMU51Ji8FzC9C6Tsa
+        /56tskaJ42/cauDCCdoau0p05KV4GW0=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-354-cfmDs3T6MVqa4mpd5a7JAQ-1; Mon, 05 Jun 2023 08:42:00 -0400
+X-MC-Unique: cfmDs3T6MVqa4mpd5a7JAQ-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-4f617f00f27so1536446e87.2
+        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 05:42:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685968919; x=1688560919;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mOmw6tP0FZFUTC7PGHcbRuETRmz8QZ6Xd4tQSfJHTaA=;
+        b=MTe1BqXLNILJjxvh2hrQmBKAb8HYlwwxlwmbqMRIlWI5tF8Khq3aCFnzWozm5TxxKy
+         SlJ5hRLNo91XuvcW09wvZi57ha0m0/TWAzg7NpLWVr/qB6w0ooMGwaIUY2zKKb+ZGpAg
+         NioZPa2yPO0DC5wlDjCMQpx421l2KKw23DBZ549W19GQaFKuOkbPP0cgZXDhQQoK2zJg
+         OJ+ZMrOxR5FMMZ5cqFD21phOnEIQkEX6HXz10GsKpX2NNq3Ig99/xkEu2mBDcogN+ZRN
+         fK0EVM/uk8yDbW6YlIZg3LdBZUckUbcHSwyqXAnHfdaa+kVn7KGJajR4iOPckCUPNm7S
+         yr5Q==
+X-Gm-Message-State: AC+VfDyquqsQi7Zw123i6oa8IJ/siW6BcGJ0L0Xkl85EQPsa9lF+ShYd
+        XDrCbWxWJk0p56N0szVSzOzuVTmjiRyyZ7meKjFXWCawHtMkCBnvgAZZ58bfv3Q+fKiX5UvEBh2
+        g3c1zg83uNC0U
+X-Received: by 2002:a05:6512:96c:b0:4f5:a181:97b8 with SMTP id v12-20020a056512096c00b004f5a18197b8mr4498042lft.25.1685968918877;
+        Mon, 05 Jun 2023 05:41:58 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7c02ynCF81jcSmROQilZ0qb05p4TMq5PV+aVib550acBLMoEwSQbxeF+apcaXIC3Jw7wScGQ==
+X-Received: by 2002:a05:6512:96c:b0:4f5:a181:97b8 with SMTP id v12-20020a056512096c00b004f5a18197b8mr4498025lft.25.1685968918475;
+        Mon, 05 Jun 2023 05:41:58 -0700 (PDT)
+Received: from redhat.com ([2.55.4.169])
+        by smtp.gmail.com with ESMTPSA id 24-20020a05600c231800b003f6041f5a6csm10669207wmo.12.2023.06.05.05.41.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jun 2023 05:41:58 -0700 (PDT)
+Date:   Mon, 5 Jun 2023 08:41:54 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+        Tiwei Bie <tiwei.bie@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost-vdpa: filter VIRTIO_F_RING_PACKED feature
+Message-ID: <20230605084104-mutt-send-email-mst@kernel.org>
+References: <20230605110644.151211-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Content-Language: en-US
-To:     Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>
-References: <20230519093708.810957-1-seiden@linux.ibm.com>
- <20230519093708.810957-2-seiden@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v2 1/6] s390/uvdevice: Add info IOCTL
-In-Reply-To: <20230519093708.810957-2-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: q5TAtzMyJrjH5SN3W9TvahBTJzE979cy
-X-Proofpoint-ORIG-GUID: q5TAtzMyJrjH5SN3W9TvahBTJzE979cy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-03_08,2023-06-02_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- mlxlogscore=999 bulkscore=0 suspectscore=0 priorityscore=1501 spamscore=0
- impostorscore=0 lowpriorityscore=0 clxscore=1015 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306050110
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230605110644.151211-1-sgarzare@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/19/23 11:37, Steffen Eiden wrote:
-> Add an IOCTL that allows userspace to find out which IOCTLs the uvdevice
-> supports without trial and error.
+On Mon, Jun 05, 2023 at 01:06:44PM +0200, Stefano Garzarella wrote:
+> vhost-vdpa IOCTLs (eg. VHOST_GET_VRING_BASE, VHOST_SET_VRING_BASE)
+> don't support packed virtqueue well yet, so let's filter the
+> VIRTIO_F_RING_PACKED feature for now in vhost_vdpa_get_features().
 > 
-> Explicitly expose the IOCTL nr for the request types.
+> This way, even if the device supports it, we don't risk it being
+> negotiated, then the VMM is unable to set the vring state properly.
 > 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> Fixes: 4c8cf31885f6 ("vhost: introduce vDPA-based backend")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
-[...]
->   #endif /* __S390_ASM_UVDEVICE_H */
-> diff --git a/drivers/s390/char/uvdevice.c b/drivers/s390/char/uvdevice.c
-> index 1d40457c7b10..61c7f284c5c5 100644
-> --- a/drivers/s390/char/uvdevice.c
-> +++ b/drivers/s390/char/uvdevice.c
-> @@ -20,6 +20,7 @@
->    *  channel for userspace to the Ultravisor.
->    */
->   
-> +#include "asm-generic/ioctl.h"
->   #include <linux/module.h>
->   #include <linux/kernel.h>
->   #include <linux/miscdevice.h>
-> @@ -32,6 +33,51 @@
->   #include <asm/uvdevice.h>
->   #include <asm/uv.h>
->   
-> +/* Mapping from IOCTL-nr to UVC-bit */
-> +static const u64 ioctl_nr_to_uvc_bit[] __initconst = {
+> 
+> Notes:
+>     This patch should be applied before the "[PATCH v2 0/3] vhost_vdpa:
+>     better PACKED support" series [1] and backported in stable branches.
+>     
+>     We can revert it when we are sure that everything is working with
+>     packed virtqueues.
+>     
+>     Thanks,
+>     Stefano
+>     
+>     [1] https://lore.kernel.org/virtualization/20230424225031.18947-1-shannon.nelson@amd.com/
 
-This can be u32 since cmds are u16.
+I'm a bit lost here. So why am I merging "better PACKED support" then?
+Does this patch make them a NOP?
 
-> +	[UVIO_IOCTL_UVDEV_INFO_NR] = -1UL,
-
-#define BIT_UVIO_INTERNAL U32_MAX
-
-> +	[UVIO_IOCTL_ATT_NR] = BIT_UVC_CMD_RETR_ATTEST,
-> +};
+>  drivers/vhost/vdpa.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 8c1aefc865f0..ac2152135b23 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -397,6 +397,12 @@ static long vhost_vdpa_get_features(struct vhost_vdpa *v, u64 __user *featurep)
+>  
+>  	features = ops->get_device_features(vdpa);
+>  
+> +	/*
+> +	 * IOCTLs (eg. VHOST_GET_VRING_BASE, VHOST_SET_VRING_BASE) don't support
+> +	 * packed virtqueue well yet, so let's filter the feature for now.
+> +	 */
+> +	features &= ~BIT_ULL(VIRTIO_F_RING_PACKED);
 > +
-> +static_assert(ARRAY_SIZE(ioctl_nr_to_uvc_bit) == UVIO_IOCTL_NUM_IOCTLS);
-> +
-> +static struct uvio_uvdev_info uvdev_info = {
-> +	.supp_uvio_cmds = GENMASK_ULL(UVIO_IOCTL_NUM_IOCTLS - 1, 0),
-> +};
-> +
-> +static void __init set_supp_uv_cmds(struct uvio_uvdev_info *info)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < UVIO_IOCTL_NUM_IOCTLS; i++) {
-> +		if (ioctl_nr_to_uvc_bit[i] == -1UL)
+>  	if (copy_to_user(featurep, &features, sizeof(features)))
+>  		return -EFAULT;
+>  
+> 
+> base-commit: 9561de3a55bed6bdd44a12820ba81ec416e705a7
+> -- 
+> 2.40.1
 
-BIT_UVIO_INTERNAL
-
-> +			continue;
-> +		if (!test_bit_inv(ioctl_nr_to_uvc_bit[i], uv_info.inst_calls_list))
-> +			continue;
-> +		__set_bit(i, (unsigned long *)&info->supp_uv_cmds);
-
-Move the cast to the caller and make this function take a "unsigned long 
-*)" argument.
-
-> +	}
-> +}
-> +
-> +/**
-> + * uvio_uvdev_info() - get information about the uvdevice
-> + *
-> + * @uv_ioctl: ioctl control block
-> + *
-> + * Lists all supported IOCTLs by this uvdevice
-
-Lists all IOCTLs that are supported by this uvdevice
-
-[...]
-
-Rest seems fine to me.
