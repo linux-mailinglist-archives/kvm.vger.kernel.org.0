@@ -2,150 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DA0F7220F9
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 10:27:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8A0672211C
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 10:35:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbjFEI1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 04:27:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58066 "EHLO
+        id S230127AbjFEIfE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 04:35:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbjFEI1p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 04:27:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43138DA
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 01:27:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685953620;
+        with ESMTP id S230045AbjFEIfB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 04:35:01 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E971B0;
+        Mon,  5 Jun 2023 01:35:00 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1685954098;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=J8at3jyLYspjW7I0pCXUj/ZCT3YmM7eGZSNtKBL6MtI=;
-        b=ZC7P/pVtDCPvndICFSArghp24mpRlh8fIJ3JU8ug9Jg0xUPa7FIhsJhRj5Qm8oZIuzAuZR
-        GlBvUloe4lJBVpnB2dO4FRx4vcnzWZPm5sKOIdJn2yS1Qu9FaT3GTGLlSJfgogPcQJtzlc
-        fektKEu6cYz39uv0isaKoZSQQ1m7JSw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-382-63UJ_43ANISXNWWewUQLDQ-1; Mon, 05 Jun 2023 04:26:58 -0400
-X-MC-Unique: 63UJ_43ANISXNWWewUQLDQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3f611d31577so23544345e9.0
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 01:26:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685953617; x=1688545617;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J8at3jyLYspjW7I0pCXUj/ZCT3YmM7eGZSNtKBL6MtI=;
-        b=MsBYdXQlaL+Pg09DQJX7L/47TIPmysgqRcnlWQY8vVRFcaDpNLi9TtWsytHL4CyAR2
-         5MbR6y5WoOhafW6NSzyVARpjtaQmXmiJKkiW4YM/IT5Fy8bRAPnHohSuhvLFrF5JFCgI
-         H/DsrzowV+QBKdTrYJhPsu+6eMrVmH8lEv+ubacfFYFvtfD7odL6RkUDGv63c/oT5lQ0
-         ZgRJc7TtUySZTmCE3YPpLG6UsiH7m+s+XcnQ84pUc/seyMEIJSxE+kCk0dWPhs0y/CZt
-         CJ4OYV+F8VnJGV2FayrMtu0qoEYdY0QSBmGOc873Tlob5WmhocClR2rmzHzIhri8FizY
-         NYjA==
-X-Gm-Message-State: AC+VfDxxce4FGWmtIHPqjLGEbpcWs77Y/gPlt7O3rJzATQR4IuErRDZ4
-        mTkY1o4UAMVfMrmWY/JuBy+ZQFZbi2pdFM+ZphGe/MMX7SzcGKl6zveBmyauv85eiEXtRZ+Ii84
-        tzd8mjJ2qmuS/
-X-Received: by 2002:a05:600c:1d98:b0:3f7:367a:38cb with SMTP id p24-20020a05600c1d9800b003f7367a38cbmr3232786wms.2.1685953617682;
-        Mon, 05 Jun 2023 01:26:57 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7VE8iVjNCuqsNoEIKvM2en0FHwV2THTF/MEveUKF9yun03XpX+3wMK7X0sxFjbHVuiakb1jg==
-X-Received: by 2002:a05:600c:1d98:b0:3f7:367a:38cb with SMTP id p24-20020a05600c1d9800b003f7367a38cbmr3232772wms.2.1685953617428;
-        Mon, 05 Jun 2023 01:26:57 -0700 (PDT)
-Received: from sgarzare-redhat ([5.77.94.106])
-        by smtp.gmail.com with ESMTPSA id y5-20020adfd085000000b003095bd71159sm9123063wrh.7.2023.06.05.01.26.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 01:26:56 -0700 (PDT)
-Date:   Mon, 5 Jun 2023 10:26:54 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Mike Christie <michael.christie@oracle.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        syzbot <syzbot+d0d442c22fa8db45ff0e@syzkaller.appspotmail.com>,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org, stefanha@redhat.com
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] general protection fault in
- vhost_work_queue
-Message-ID: <4rqrebfglyif4d7i4ufdnj2uqnubvljkeciqmelvotti5iu5ja@fryxznjicgn6>
-References: <CAGxU2F7O7ef3mdvNXtiC0VtWiS2DMnoiGwSR=Z6SWbzqcrBF-g@mail.gmail.com>
- <CAGxU2F7HK5KRggiY7xnKHeXFRXJmqcKbjf3JnXC3mbmn9xqRtw@mail.gmail.com>
- <e4589879-1139-22cc-854f-fed22cc18693@oracle.com>
- <6p7pi6mf3db3gp3xqarap4uzrgwlzqiz7wgg5kn2ep7hvrw5pg@wxowhbw4e7w7>
- <035e3423-c003-3de9-0805-2091b9efb45d@oracle.com>
- <CAGxU2F5oTLY_weLixRKMQVqmjpDG_09yL6tS2rF8mwJ7K+xP0Q@mail.gmail.com>
- <43f67549-fe4d-e3ca-fbb0-33bea6e2b534@oracle.com>
- <bbe697b6-dd9e-5a8d-21c5-315ab59f0456@oracle.com>
- <7vk2uizpmf4fi54tmmopnbwwb7fs2xg6vae6ynrcvs26hjmshb@hpjzu4jfj35i>
- <b5a845e9-1fa0-ea36-98c4-b5da989c44c6@oracle.com>
+        bh=E8n9ePnUhtnsNw0/UoOy8KZA0t9F5cn2eYE4giKiTxQ=;
+        b=ZYLMwKJonIHpbWbqUCUtNKvKVLq4FP6ro5oS/wilSBp/vqjxGVCpcgLTYoa1RhxoCJnFPm
+        vxMEYmJhPorHuS/9bsQLXG+h+xrcxlXgJyrHYl6wjLVRyW+sa3UAQQx0x72Sc+aD3QOWNu
+        M6M5n333FFxZ1oXfESc8AZVrsULI2XFJYINjt4WCX5IWUTSD38VRTKmhb+gli3XIyDA+Rf
+        CvoTPDZENltfWrOlu4xOG/89O1D8oVnVJInPiWcvq2sAtPQ43RN8P0CuyCtyk6ov3d3/We
+        mpRDy+TJxK/mtJdBJeX290BhCCGYQAjXPAXwKzUQ0JddPcVTqWrxdrM1fTeEzA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1685954098;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=E8n9ePnUhtnsNw0/UoOy8KZA0t9F5cn2eYE4giKiTxQ=;
+        b=54x6bmSB+5xXMohPCz/svOxKGcZmUS+Ga0otaExKp5Egqb7huWQ3gf7RNn8sDHvn6xoUpl
+        xXid46SPiohH4BCQ==
+To:     Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, peterz@infradead.org, andrew.cooper3@citrix.com,
+        seanjc@google.com, pbonzini@redhat.com, ravi.v.shankar@intel.com,
+        jiangshanlai@gmail.com, shan.kang@intel.com
+Subject: Re: [PATCH v8 03/33] x86/traps: add a system interrupt table for
+ system interrupt dispatch
+In-Reply-To: <20230410081438.1750-4-xin3.li@intel.com>
+References: <20230410081438.1750-1-xin3.li@intel.com>
+ <20230410081438.1750-4-xin3.li@intel.com>
+Date:   Mon, 05 Jun 2023 10:34:58 +0200
+Message-ID: <877csi8fyl.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b5a845e9-1fa0-ea36-98c4-b5da989c44c6@oracle.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 01, 2023 at 11:33:09AM -0500, Mike Christie wrote:
->On 6/1/23 2:47 AM, Stefano Garzarella wrote:
->>>
->>> static void vhost_worker_free(struct vhost_dev *dev)
->>> {
->>> -    struct vhost_worker *worker = dev->worker;
->>> +    struct vhost_task *vtsk = READ_ONCE(dev->worker.vtsk);
->>>
->>> -    if (!worker)
->>> +    if (!vtsk)
->>>         return;
->>>
->>> -    dev->worker = NULL;
->>> -    WARN_ON(!llist_empty(&worker->work_list));
->>> -    vhost_task_stop(worker->vtsk);
->>> -    kfree(worker);
->>> +    vhost_task_stop(vtsk);
->>> +    WARN_ON(!llist_empty(&dev->worker.work_list));
->>> +    WRITE_ONCE(dev->worker.vtsk, NULL);
->>
->> The patch LGTM, I just wonder if we should set dev->worker to zero here,
->
->We might want to just set kcov_handle to zero for now.
->
->In 6.3 and older, I think we could do:
->
->1. vhost_dev_set_owner could successfully set dev->worker.
->2. vhost_transport_send_pkt runs vhost_work_queue and sees worker
->is set and adds the vhost_work to the work_list.
->3. vhost_dev_set_owner fails in vhost_attach_cgroups, so we stop
->the worker before the work can be run and set worker to NULL.
->4. We clear kcov_handle and return.
->
->We leave the work on the work_list.
->
->5. Userspace can then retry vhost_dev_set_owner. If that works, then the
->work gets executed ok eventually.
->
->OR
->
->Userspace can just close the device. vhost_vsock_dev_release would
->eventually call vhost_dev_cleanup (vhost_dev_flush won't see a worker
->so will just return), and that will hit the WARN_ON but we would
->proceed ok.
->
->If I do a memset of the worker, then if userspace were to retry
->VHOST_SET_OWNER, we would lose the queued work since the work_list would
->get zero'd. I think it's unlikely this ever happens, but you know best
->so let me know if this a real issue.
->
+On Mon, Apr 10 2023 at 01:14, Xin Li wrote:
+>  
+>  /**
+>   * DECLARE_IDTENTRY_IRQ - Declare functions for device interrupt IDT entry
+> - *			  points (common/spurious)
+> + *			  points (common/spurious) and their corresponding
+> + *			  software based dispatch handlers in the non-noinstr
+> + *			  text section
+>   * @vector:	Vector number (ignored for C)
+>   * @func:	Function name of the entry point
+>   *
+> - * Maps to DECLARE_IDTENTRY_ERRORCODE()
+> + * Maps to DECLARE_IDTENTRY_ERRORCODE(), plus a dispatch function prototype
+>   */
+>  #define DECLARE_IDTENTRY_IRQ(vector, func)				\
+> -	DECLARE_IDTENTRY_ERRORCODE(vector, func)
+> +	DECLARE_IDTENTRY_ERRORCODE(vector, func);			\
+> +	void dispatch_##func(struct pt_regs *regs, unsigned long
+>  error_code)
 
-I don't think it's a problem, though, you're right, we could hide the 
-warning and thus future bugs, better as you proposed.
+Can these IDTENTRY changes please be separate from the actual table
+implementation?
+  
+>  
+> +#ifdef CONFIG_X86_64
+> +
+> +#ifndef CONFIG_X86_LOCAL_APIC
+
+Seriously? You _cannot_ disable local APIC on x8664 builds.
+
+> +/*
+> + * Used when local APIC is not configured to build into the kernel, but
+> + * dispatch_table_spurious_interrupt() needs
+> dispatch_spurious_interrupt().
+
+What? If you there is something which is not used in a certain
+configuration then just exclude it via #ifdef in the table or provide a
+
+#define foo   NULL
+
+if you want to spare the #ifdeffery.
+
+> + */
+> +DEFINE_IDTENTRY_IRQ(spurious_interrupt)
+> +{
+> +	pr_info("Spurious interrupt (vector 0x%x) on CPU#%d, should never happen.\n",
+> +		vector, smp_processor_id());
+> +}
+
+But mindlessly copying code which is even never compiled is a pretty
+pointless exercise.
+
+> +#endif
+> +
+> +static void dispatch_table_spurious_interrupt(struct pt_regs *regs)
+> +{
+> +	dispatch_spurious_interrupt(regs, regs->vector);
+> +}
+> +
+> +#define SYSV(x,y) [(x) - FIRST_SYSTEM_VECTOR] = y
+> +
+> +static system_interrupt_handler system_interrupt_handlers[NR_SYSTEM_VECTORS] = {
+> +	[0 ... NR_SYSTEM_VECTORS-1]		= dispatch_table_spurious_interrupt,
+> +#ifdef CONFIG_SMP
+> +	SYSV(RESCHEDULE_VECTOR,			dispatch_table_sysvec_reschedule_ipi),
+> +	SYSV(CALL_FUNCTION_VECTOR,		dispatch_table_sysvec_call_function),
+> +	SYSV(CALL_FUNCTION_SINGLE_VECTOR,	dispatch_table_sysvec_call_function_single),
+> +	SYSV(REBOOT_VECTOR,			dispatch_table_sysvec_reboot),
+> +#endif
+> +
+> +#ifdef CONFIG_X86_THERMAL_VECTOR
+> +	SYSV(THERMAL_APIC_VECTOR,		dispatch_table_sysvec_thermal),
+> +#endif
+> +
+> +#ifdef CONFIG_X86_MCE_THRESHOLD
+> +	SYSV(THRESHOLD_APIC_VECTOR,		dispatch_table_sysvec_threshold),
+> +#endif
+> +
+> +#ifdef CONFIG_X86_MCE_AMD
+> +	SYSV(DEFERRED_ERROR_VECTOR,		dispatch_table_sysvec_deferred_error),
+> +#endif
+> +
+> +#ifdef CONFIG_X86_LOCAL_APIC
+> +	SYSV(LOCAL_TIMER_VECTOR,		dispatch_table_sysvec_apic_timer_interrupt),
+> +	SYSV(X86_PLATFORM_IPI_VECTOR,		dispatch_table_sysvec_x86_platform_ipi),
+> +# ifdef CONFIG_HAVE_KVM
+> +	SYSV(POSTED_INTR_VECTOR,		dispatch_table_sysvec_kvm_posted_intr_ipi),
+> +	SYSV(POSTED_INTR_WAKEUP_VECTOR,		dispatch_table_sysvec_kvm_posted_intr_wakeup_ipi),
+> +	SYSV(POSTED_INTR_NESTED_VECTOR,		dispatch_table_sysvec_kvm_posted_intr_nested_ipi),
+> +# endif
+> +# ifdef CONFIG_IRQ_WORK
+> +	SYSV(IRQ_WORK_VECTOR,			dispatch_table_sysvec_irq_work),
+> +# endif
+> +	SYSV(SPURIOUS_APIC_VECTOR,		dispatch_table_sysvec_spurious_apic_interrupt),
+
+This is clearly in the #ifdef CONFIG_X86_LOCAL_APIC, so what is the
+above hackery useful for?
+
+> +	SYSV(ERROR_APIC_VECTOR,			dispatch_table_sysvec_error_interrupt),
+> +#endif
+> +};
 
 Thanks,
-Stefano
 
+        tglx
