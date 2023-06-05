@@ -2,130 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A887722D12
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 18:55:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7763A722D15
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 18:56:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234995AbjFEQz3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 12:55:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58474 "EHLO
+        id S235025AbjFEQ4E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 12:56:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234284AbjFEQzY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 12:55:24 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCA54F3
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 09:55:22 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-3f98276f89cso531cf.1
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 09:55:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685984122; x=1688576122;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o2y10YuUFmG8KRHYWCAPkl6GMbIuHJBgvVBZeZ3IUOI=;
-        b=Egaxijz25IFotxjFqZJVSc5/ZObLF+Dbgfr0DLhKTjOC/hST1y0UjlH9vMBNlaN6ol
-         i9V+qeM+4sDnQmT3Dv6Fdx0YZoH3wHjTZDzAkLNvRpl82rtLqttyEXhfJkSmfShODU0Y
-         3/piup5l5NaeweKvRw24482R3KmZqYcNZ8MptR8zGidQvQ04zr8XSZxfSb/ah0CS0KyC
-         IIhRubwyLD2i3i2mAIvfgxd5iGUXTuoqsjyH8JQgu6ZnWW1ZUy0/FpWLIOABhrV7A4zq
-         2u3YKHsJmshUsmzTzrMzpI/yc90NBLFPzDW+Iac7W7Rznpsaa3HkJb9yb6pW44eM0bZn
-         lOWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685984122; x=1688576122;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o2y10YuUFmG8KRHYWCAPkl6GMbIuHJBgvVBZeZ3IUOI=;
-        b=dRCPXjMv7QQYAsUJ+x34/NJEQ3YVhDThtVBtMTmDO3bgUq8rhphgNNmcHTeWpjUMXW
-         x9CnfVGqqpbF2R6ggT3xV70vAwLk4PFfiOUUzJBZoCA394YUhEH3RE4AeJ+Zcagkycb8
-         5MSFZXagcbnjvH8YrKykf+58Ot7gQ3zp3kCxqtzxS457gbPJRjHGN8lK6J82VikJ3OS4
-         TEiaSmC7hucQ0/tcvl7h47X6Ed1J+FhWKW4Trb13GWI2sAMLz/xhZAT8jLJMAV+Sn0A1
-         81K0VzsbqbJZ6UEa5A+M5zkPWY0ePo//v4/fQYpfh4mDiY+Bd2Z+MiZ0Z7EyhOHvJNna
-         MXnA==
-X-Gm-Message-State: AC+VfDxToFMDi1yljbY2C3WJGqr9n8iRQK7hKXuUosBe3jl1JQywF9PT
-        IBgMSlcTZMMqKvWPKtKSLp9tHvC0XBqHDOxLjbgR2w==
-X-Google-Smtp-Source: ACHHUZ7gOrwQJeZtk6yMaDaxSB932Rw8X+QudMZQUB4UKkVEH5FwVCVR1s/S5qOQwxikCa/kcOCZ/HnZnQaaUVJYNXg=
-X-Received: by 2002:a05:622a:1d5:b0:3f9:a986:f3a4 with SMTP id
- t21-20020a05622a01d500b003f9a986f3a4mr146271qtw.25.1685984121608; Mon, 05 Jun
- 2023 09:55:21 -0700 (PDT)
+        with ESMTP id S233729AbjFEQ4D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 12:56:03 -0400
+Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A46FE8;
+        Mon,  5 Jun 2023 09:56:02 -0700 (PDT)
+Received: from [172.27.2.41] ([73.231.166.163])
+        (authenticated bits=0)
+        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 355Gtg3v3944865
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Mon, 5 Jun 2023 09:55:42 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 355Gtg3v3944865
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+        s=2023051001; t=1685984144;
+        bh=KcP52s6Jw81oN0ddZllHGZWFTWEw/h5qK+0sGBKaOvQ=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=GdQsEfqH+ayBj0hAAn8mpzHQWafKlnObqngLYYTdkre0rsaSsmWB6UIxeTlTGLO0V
+         VNsnnBiJQ6dWpKMDr3XN4cd9XTfy1zwN4pA9T+fA1eQcAqDphst2LFrSeyrfbXkFow
+         q5MnSobQSYrLM5nyzvn+nCBDtJ75nu2sW+za7DcvdF7d1TS8RqSdrBJuFvUZNV+HWg
+         DtXi9no/UF1dauuKoKYuw7N2u8Cv9UtrLyruHK5RdPBI3XIk5oNlg7warB0ikLoCPY
+         8u4TFdjsbPQytToeL2I9Z1L3TEpuhMcOPp0awscThA2b/iC1XZE37m/MlijLazwGoT
+         YilmBo9KmoDlg==
+Message-ID: <2d069dc4-6383-57f2-819c-23b7d65f460e@zytor.com>
+Date:   Mon, 5 Jun 2023 09:55:40 -0700
 MIME-Version: 1.0
-References: <20230605004334.1930091-1-mizhang@google.com>
-In-Reply-To: <20230605004334.1930091-1-mizhang@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 5 Jun 2023 09:55:10 -0700
-Message-ID: <CALMp9eSQgcKd=SN4q2QRYbveKoayKzuYEQPM0Xu+FgQ_Mja8-g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Remove KVM MMU write lock when accessing indirect_shadow_pages
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v8 29/33] x86/fred: allow FRED systems to use interrupt
+ vectors 0x10-0x1f
+Content-Language: en-US
+To:     Thomas Gleixner <tglx@linutronix.de>, Xin Li <xin3.li@intel.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        peterz@infradead.org, andrew.cooper3@citrix.com, seanjc@google.com,
+        pbonzini@redhat.com, ravi.v.shankar@intel.com,
+        jiangshanlai@gmail.com, shan.kang@intel.com
+References: <20230410081438.1750-1-xin3.li@intel.com>
+ <20230410081438.1750-30-xin3.li@intel.com> <87zg5e57go.ffs@tglx>
+From:   "H. Peter Anvin" <hpa@zytor.com>
+In-Reply-To: <87zg5e57go.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 4, 2023 at 5:43=E2=80=AFPM Mingwei Zhang <mizhang@google.com> w=
-rote:
->
-> Remove KVM MMU write lock when accessing indirect_shadow_pages counter wh=
-en
-> page role is direct because this counter value is used as a coarse-graine=
-d
-> heuristics to check if there is nested guest active. Racing with this
-> heuristics without mmu lock will be harmless because the corresponding
-> indirect shadow sptes for the GPA will either be zapped by this thread or
-> some other thread who has previously zapped all indirect shadow pages and
-> makes the value to 0.
->
-> Because of that, remove the KVM MMU write lock pair to potentially reduce
-> the lock contension and improve the performance of nested VM. In addition
-> opportunistically change the comment of 'direct mmu' to make the
-> description consistent with other places.
->
-> Reported-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  arch/x86/kvm/x86.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5ad55ef71433..97cfa5a00ff2 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8585,15 +8585,9 @@ static bool reexecute_instruction(struct kvm_vcpu =
-*vcpu, gpa_t cr2_or_gpa,
->
->         kvm_release_pfn_clean(pfn);
->
-> -       /* The instructions are well-emulated on direct mmu. */
-> +       /* The instructions are well-emulated on Direct MMUs. */
->         if (vcpu->arch.mmu->root_role.direct) {
-> -               unsigned int indirect_shadow_pages;
-> -
-> -               write_lock(&vcpu->kvm->mmu_lock);
-> -               indirect_shadow_pages =3D vcpu->kvm->arch.indirect_shadow=
-_pages;
-> -               write_unlock(&vcpu->kvm->mmu_lock);
-> -
-> -               if (indirect_shadow_pages)
-> +               if (READ_ONCE(vcpu->kvm->arch.indirect_shadow_pages))
 
-I don't understand the need for READ_ONCE() here. That implies that
-there is something tricky going on, and I don't think that's the case.
 
->                         kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa)=
-);
->
->                 return true;
->
-> base-commit: 31b4fc3bc64aadd660c5bfa5178c86a7ba61e0f7
-> --
-> 2.41.0.rc0.172.g3f132b7071-goog
->
+On 6/5/23 07:06, Thomas Gleixner wrote:
+> On Mon, Apr 10 2023 at 01:14, Xin Li wrote:
+>> From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
+>>
+>> FRED inherits the Intel VT-x enhancement of classified events with
+>> a two-level event dispatch logic. The first-level dispatch is on
+>> the event type, and the second-level is on the event vector. This
+>> also means that vectors in different event types are orthogonal,
+>> thus, vectors 0x10-0x1f become available as hardware interrupts.
+>>
+>> Enable interrupt vectors 0x10-0x1f on FRED systems (interrupt 0x80 is
+>> already enabled.) Most of these changes are about removing the
+>> assumption that the lowest-priority vector is hard-wired to 0x20.
+> 
+> I'm not really interested in this again premature optimization.
+> 
+> Can we please clarify how the final result of FRED vector layout will
+> look like?
+> 
+> I rather give up on reclaiming these 16 vectors than making _all_ system
+> vectors dynamically assignable to avoid an extra partitioning of the
+> vector space.
+> 
+
+So this patch was meant to go *after* the FRED patch set proper.
+
+This patch does not change any of the system vectors except, by 
+necessity, IRQ_MOVE_CLEANUP_VECTOR, nor does it change the way they are 
+assigned to fixed vectors today.
+
+It does make the lowest *non*-system vector a variable, but the system 
+vectors are at the end.
+
+This is something that should be commented: the setting of bits in 
+system_vector is really misleading: those aren't "system vectors", they 
+are the vectors reserved for hardware use. On IDT, this means vectors 
+0-31 because they are used for exceptions, but on FRED interrupts and 
+exceptions are separate; however vectors 0-15 still need to be reserved 
+because the APIC doesn't support them.
+
+We *could* change that, but that is completely independent of this.
+
+	-hpa
