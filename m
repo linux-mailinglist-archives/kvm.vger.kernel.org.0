@@ -2,117 +2,248 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE3AD722799
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 15:36:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 920E07227A7
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 15:41:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232695AbjFENgt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 09:36:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45012 "EHLO
+        id S232731AbjFENlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 09:41:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234172AbjFENer (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 09:34:47 -0400
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5008CE6
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 06:34:39 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-565ee3d14c2so53261037b3.2
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 06:34:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1685972078; x=1688564078;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=61/hRwwDiVfwBZI92q2cZ8+24tNEQi99T5NZsq9+Ezo=;
-        b=OCulsvhZDKk6hcSm39Xm5mdOYLw5QtoBiY2N5zPCYBumKKGN4S8Ww6IqmD3fBZek+f
-         Ts3eiOHTzSgxueQUl47yeKgmG6Yndv/T6wwTbXyHoH1GL/3Cu490XA3REXOky4wYwr0P
-         PQaWSE6Qaxpn7B6GYrP2MhbPJIr9S46+Umd+AqOr41Q6vTAChJ5kQpg6rjgBwBt/NsjE
-         f/7RfGk2zBx7neRp3yrP2PBW7VagKD3yWTULqB00wPnt1yUjZ4D4IQi+jdbP5A68EEWQ
-         p+0MPeluVxxwTwv2p1/NnRuBuzNjQglUQDyP4o8WvUk0XvjskyE8zDlpkuoCaxxUboy7
-         QNGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685972078; x=1688564078;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=61/hRwwDiVfwBZI92q2cZ8+24tNEQi99T5NZsq9+Ezo=;
-        b=LpSqH8KJdPXQZb77hvJU9KqOqV72QCTVT1Q1/Zx93I/rGeEhbp2NF1ok30GmD/6Pb+
-         TYUu3c83aYiWacr3touIxVE7xhmzc8jfx4dDUSiCbYSEsTgKsyajDYy8gE1RN0s7kYwN
-         YOvKwMdwKRnqr7Cpz+y/sviLO2w7r1CCPyNa/8IwneVhluNwfY8EjrojsHWVs7XOW9/B
-         Qj15o0X3LW3C6q3rf8vJu/zSW0aq1TOKbSN5zqGdP2aPqEUWAOQbI8/GCdn6stWxoP1q
-         onQDcxi17q6D9zOI3xb2Jg9si4B4lTxEGOqNaoefzQ30rFYtlNKWI601iJwfFrl9bBr7
-         wAAA==
-X-Gm-Message-State: AC+VfDycKyHOfmd2TCfWZwFXGiREf96liODGUA91sw4HZ/YFFcgJPjvH
-        BwUUB0sJ628teUM0d5qi7RrRUukY6YdCiMpnPuQ0bQ==
-X-Google-Smtp-Source: ACHHUZ7sX6DmU1vMLTN1BNL4dYMpNke3/qdY0fr9LGgBIeURfHdExanL2J4IVzIfVy+F2ZF9uaoL51TVeinWT7O5s8E=
-X-Received: by 2002:a81:69d5:0:b0:561:b595:100e with SMTP id
- e204-20020a8169d5000000b00561b595100emr9573851ywc.37.1685972078307; Mon, 05
- Jun 2023 06:34:38 -0700 (PDT)
+        with ESMTP id S231346AbjFENlk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 09:41:40 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C5B692;
+        Mon,  5 Jun 2023 06:41:39 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1685972497;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=o7YMnuPT/PoUCy2frs3isEXM8tusYD1fNAt1WEsbd9Y=;
+        b=KRajMS3wG1CVnZeOHrppxjrE5Qdwie9fH6q/fl7klVaJGyhAfRB7pCuWZ2wP+0OCLWuU5l
+        cyGwXTehS5kQaxNfkmK1bw06xDLPeSq1EaR0M4oSxOMKEqFlDkUO6nBvqH2+Drn5fY+ALk
+        GqZkO1JUCVEekI6VYV0n2cetXdfRgaRYzXM1I8cRbfV14Ow3yns4/Kajs1MV2GQiYCUSeh
+        ZRswm+cmyyK/+ZFs4qAAhagmq0q2voe4LlhcUFIqHd6niy4Da1ntBvbWEO0X+Tj5j7PYoI
+        8cObjGVOaO1mnvyF1j3za+rxe0nxu2hpTJQQEcyyyqT2grUEXNntLBpH6Nn7xw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1685972497;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=o7YMnuPT/PoUCy2frs3isEXM8tusYD1fNAt1WEsbd9Y=;
+        b=H6czvWRQjMvQehgzL3tVQDTlQt0YcfckcB8sGQMuOStzUW7iQYFPdy5v2AXad3dYvQ3FSW
+        DhEMNujBdZ7K8fAA==
+To:     Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, peterz@infradead.org, andrew.cooper3@citrix.com,
+        seanjc@google.com, pbonzini@redhat.com, ravi.v.shankar@intel.com,
+        jiangshanlai@gmail.com, shan.kang@intel.com
+Subject: Re: [PATCH v8 21/33] x86/fred: FRED initialization code
+In-Reply-To: <20230410081438.1750-22-xin3.li@intel.com>
+References: <20230410081438.1750-1-xin3.li@intel.com>
+ <20230410081438.1750-22-xin3.li@intel.com>
+Date:   Mon, 05 Jun 2023 15:41:37 +0200
+Message-ID: <87cz2a6n72.ffs@tglx>
 MIME-Version: 1.0
-References: <20230510083748.1056704-1-apatel@ventanamicro.com>
- <20230510083748.1056704-2-apatel@ventanamicro.com> <20230605121221.GA20843@willie-the-truck>
-In-Reply-To: <20230605121221.GA20843@willie-the-truck>
-From:   Anup Patel <apatel@ventanamicro.com>
-Date:   Mon, 5 Jun 2023 19:04:27 +0530
-Message-ID: <CAK9=C2WfNSsW-OODnNVrrxq9YvxBqjT94tWp81pBiKj5e-jjVQ@mail.gmail.com>
-Subject: Re: [PATCH kvmtool 1/8] Sync-up headers with Linux-6.4-rc1
-To:     Will Deacon <will@kernel.org>
-Cc:     julien.thierry.kdev@gmail.com, maz@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will,
+On Mon, Apr 10 2023 at 01:14, Xin Li wrote:
+>  
+> +/*
+> + * The actual assembly entry and exit points
+> + */
+> +extern __visible void fred_entrypoint_user(void);
 
-On Mon, Jun 5, 2023 at 5:42=E2=80=AFPM Will Deacon <will@kernel.org> wrote:
->
-> On Wed, May 10, 2023 at 02:07:41PM +0530, Anup Patel wrote:
-> > We sync-up Linux headers to get latest KVM RISC-V headers having
-> > SBI extension enable/disable, Zbb, Zicboz, and Ssaia support.
-> >
-> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> > ---
-> >  arm/aarch64/include/asm/kvm.h |  38 ++++++++++++
-> >  include/linux/kvm.h           |  57 +++++++++++-------
-> >  include/linux/virtio_blk.h    | 105 ++++++++++++++++++++++++++++++++++
-> >  include/linux/virtio_config.h |   6 ++
-> >  include/linux/virtio_net.h    |   5 ++
-> >  riscv/include/asm/kvm.h       |  56 +++++++++++++++++-
-> >  x86/include/asm/kvm.h         |  50 ++++++++++++----
-> >  7 files changed, 286 insertions(+), 31 deletions(-)
->
-> This breaks the build for x86:
->
-> Makefile:386: Skipping optional libraries: vncserver SDL
->   CC       builtin-balloon.o
-> In file included from include/linux/kvm.h:15,
->                  from include/kvm/pci.h:5,
->                  from include/kvm/vfio.h:6,
->                  from include/kvm/kvm-config.h:5,
->                  from include/kvm/kvm.h:6,
->                  from builtin-balloon.c:9:
-> x86/include/asm/kvm.h:511:17: error: expected specifier-qualifier-list be=
-fore =E2=80=98__DECLARE_FLEX_ARRAY=E2=80=99
->   511 |                 __DECLARE_FLEX_ARRAY(struct kvm_vmx_nested_state_=
-data, vmx);
->       |                 ^~~~~~~~~~~~~~~~~~~~
-> make: *** [Makefile:508: builtin-balloon.o] Error 1
+Why is this defined in this patch and not at the point where the
+function is introduced?
 
-It seems __DECLARE_FLEX_ARRAY() is not defined in
-include/linux/stddef.h header of KVMTOOL.
+> +/*
+> + * Initialization
+> + */
+> +void cpu_init_fred_exceptions(void);
+> +void fred_setup_apic(void);
+> +
+>  #endif /* __ASSEMBLY__ */
+>  
+> +#else
+> +#define cpu_init_fred_exceptions() BUG()
+> +#define fred_setup_apic() BUG()
 
-I will send v2 series with this fixed.
+static inline stubs please.
+
+> @@ -2054,28 +2055,6 @@ static void wrmsrl_cstar(unsigned long val)
+>  /* May not be marked __init: used by software suspend */
+>  void syscall_init(void)
+>  {
+> -	wrmsr(MSR_STAR, 0, (__USER32_CS << 16) | __KERNEL_CS);
+> -	wrmsrl(MSR_LSTAR, (unsigned long)entry_SYSCALL_64);
+> -
+> -#ifdef CONFIG_IA32_EMULATION
+> -	wrmsrl_cstar((unsigned long)entry_SYSCALL_compat);
+> -	/*
+> -	 * This only works on Intel CPUs.
+> -	 * On AMD CPUs these MSRs are 32-bit, CPU truncates MSR_IA32_SYSENTER_EIP.
+> -	 * This does not cause SYSENTER to jump to the wrong location, because
+> -	 * AMD doesn't allow SYSENTER in long mode (either 32- or 64-bit).
+> -	 */
+> -	wrmsrl_safe(MSR_IA32_SYSENTER_CS, (u64)__KERNEL_CS);
+> -	wrmsrl_safe(MSR_IA32_SYSENTER_ESP,
+> -		    (unsigned long)(cpu_entry_stack(smp_processor_id()) + 1));
+> -	wrmsrl_safe(MSR_IA32_SYSENTER_EIP, (u64)entry_SYSENTER_compat);
+> -#else
+> -	wrmsrl_cstar((unsigned long)ignore_sysret);
+> -	wrmsrl_safe(MSR_IA32_SYSENTER_CS, (u64)GDT_ENTRY_INVALID_SEG);
+> -	wrmsrl_safe(MSR_IA32_SYSENTER_ESP, 0ULL);
+> -	wrmsrl_safe(MSR_IA32_SYSENTER_EIP, 0ULL);
+> -#endif
+> -
+>  	/*
+>  	 * Flags to clear on syscall; clear as much as possible
+>  	 * to minimize user space-kernel interference.
+> @@ -2086,6 +2065,41 @@ void syscall_init(void)
+>  	       X86_EFLAGS_IF|X86_EFLAGS_DF|X86_EFLAGS_OF|
+>  	       X86_EFLAGS_IOPL|X86_EFLAGS_NT|X86_EFLAGS_RF|
+>  	       X86_EFLAGS_AC|X86_EFLAGS_ID);
+> +
+> +	/*
+> +	 * The default user and kernel segments
+> +	 */
+> +	wrmsr(MSR_STAR, 0, (__USER32_CS << 16) | __KERNEL_CS);
+> +
+> +	if (cpu_feature_enabled(X86_FEATURE_FRED)) {
+> +		/* Both sysexit and sysret cause #UD when FRED is enabled */
+> +		wrmsrl_safe(MSR_IA32_SYSENTER_CS, (u64)GDT_ENTRY_INVALID_SEG);
+> +		wrmsrl_safe(MSR_IA32_SYSENTER_ESP, 0ULL);
+> +		wrmsrl_safe(MSR_IA32_SYSENTER_EIP, 0ULL);
+> +	} else {
+> +		wrmsrl(MSR_LSTAR, (unsigned long)entry_SYSCALL_64);
+> +
+> +#ifdef CONFIG_IA32_EMULATION
+> +		wrmsrl_cstar((unsigned long)entry_SYSCALL_compat);
+> +		/*
+> +		 * This only works on Intel CPUs.
+> +		 * On AMD CPUs these MSRs are 32-bit, CPU truncates
+> +		 * MSR_IA32_SYSENTER_EIP.
+> +		 * This does not cause SYSENTER to jump to the wrong
+> +		 * location, because AMD doesn't allow SYSENTER in
+> +		 * long mode (either 32- or 64-bit).
+> +		 */
+> +		wrmsrl_safe(MSR_IA32_SYSENTER_CS, (u64)__KERNEL_CS);
+> +		wrmsrl_safe(MSR_IA32_SYSENTER_ESP,
+> +			    (unsigned long)(cpu_entry_stack(smp_processor_id()) + 1));
+> +		wrmsrl_safe(MSR_IA32_SYSENTER_EIP, (u64)entry_SYSENTER_compat);
+> +#else
+> +		wrmsrl_cstar((unsigned long)ignore_sysret);
+> +		wrmsrl_safe(MSR_IA32_SYSENTER_CS, (u64)GDT_ENTRY_INVALID_SEG);
+> +		wrmsrl_safe(MSR_IA32_SYSENTER_ESP, 0ULL);
+> +		wrmsrl_safe(MSR_IA32_SYSENTER_EIP, 0ULL);
+> +#endif
+> +	}
+>  }
+
+Sigh. Can you please split this into
+
+static void idt_syscall_init(void)
+{
+        All the existing gunk
+}
+
+void syscall_init(void)
+{
+	/* The default user and kernel segments */
+	wrmsr(MSR_STAR, 0, (__USER32_CS << 16) | __KERNEL_CS);
+
+        idt_syscall_init();
+}
+
+in a first step and then in the next patch add the FRED muck?
+
+> +/*
+> + * Initialize FRED on this CPU. This cannot be __init as it is called
+> + * during CPU hotplug.
+
+Really no need to repeat this comment vs. __init all over the place.
+
+> + */
+> +void cpu_init_fred_exceptions(void)
+> +{
+> +	wrmsrl(MSR_IA32_FRED_CONFIG,
+> +	       FRED_CONFIG_REDZONE | /* Reserve for CALL emulation */
+
+Please don't use tail comments. Nowhere.
+
+> +	       FRED_CONFIG_INT_STKLVL(0) |
+> +	       FRED_CONFIG_ENTRYPOINT(fred_entrypoint_user));
+> +
+> +/*
+> + * Initialize system vectors from a FRED perspective, so
+> + * lapic_assign_system_vectors() can do its job.
+> + */
+> +void __init fred_setup_apic(void)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < FIRST_EXTERNAL_VECTOR; i++)
+> +		set_bit(i, system_vectors);
+
+> +	/*
+> +	 * Don't set the non assigned system vectors in the
+> +	 * system_vectors bitmap. Otherwise they show up in
+> +	 * /proc/interrupts.
+> +	 */
+> +#ifdef CONFIG_SMP
+> +	set_bit(IRQ_MOVE_CLEANUP_VECTOR, system_vectors);
+> +#endif
+> +
+> +	for (i = 0; i < NR_SYSTEM_VECTORS; i++) {
+> +		if (get_system_interrupt_handler(i) != NULL) {
+
+This _cannot be NULL. The system vector table must be fully populated
+with either the real handler or the spurious handler. Otherwise you need
+a NULL pointer check in the dispatch path.
+
+> +			set_bit(i + FIRST_SYSTEM_VECTOR, system_vectors);
+> +		}
+> +	}
+
+
+> +
+> +	/* The rest are fair game... */
+
+Can you please refrain from adding useless comments. Commenting the
+obvious is a distraction and not helpful in any way. Comment the things
+which are not obvious in the first place.
+
+> --- a/arch/x86/kernel/traps.c
+> +++ b/arch/x86/kernel/traps.c
+> @@ -1537,6 +1537,14 @@ static system_interrupt_handler system_interrupt_handlers[NR_SYSTEM_VECTORS] = {
+>  
+>  #undef SYSV
+>  
+> +system_interrupt_handler get_system_interrupt_handler(unsigned int i)
+> +{
+> +	if (i >= NR_SYSTEM_VECTORS)
+> +		return NULL;
+
+Seriously?
+
+> +	return system_interrupt_handlers[i];
+
+Get rid of this completely confusing and useless function and look the
+table up at the only call site. I'm all for defensive programming, but
+this is hideous.
 
 Thanks,
-Anup
+
+        tglx
