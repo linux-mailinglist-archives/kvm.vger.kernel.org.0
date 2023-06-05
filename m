@@ -2,142 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 906C27231B3
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 22:47:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CDE272319B
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 22:43:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233465AbjFEUrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 16:47:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60476 "EHLO
+        id S232802AbjFEUnW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 16:43:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231877AbjFEUrI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 16:47:08 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 569FDFD;
-        Mon,  5 Jun 2023 13:47:05 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 335C65FD21;
-        Mon,  5 Jun 2023 23:47:02 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1685998022;
-        bh=9ATC+GxW8KMEIiHiF6ecJMk0sOenmSubs/SZ/yQ2/y0=;
-        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
-        b=K9EnAk+J1wH+cYPUXAMNufinG+iVezeNRNWTqHdXbSzRlA6+zhToK67+XSsWRyesN
-         K6nuQFG2JC6hnCSryQInquMb02IFsXO41w/tLq7Gv6QmBEBBOYpic4xPL+nOl6HfLV
-         0ljgDI6MBVPlBQCTgHCz18HWMhVBdz8eUbwA9OZiWa9GZJsQ/pr2tVknUq7VdAq2bZ
-         3jGtUwiQKnBogUUuAFQMbk2H4GM6D0vH2c21u5/50TmWB0QitQHkm61Zn1cl7cuugC
-         PQzUMc1A0HIZDRmMQg/1AW8SOB/y0VBBFCYOpBUWFeyS1xFViBcl9cn/wxXNxM5+QG
-         KzNrDwusABegQ==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Mon,  5 Jun 2023 23:46:58 +0300 (MSK)
-Message-ID: <2830ac58-fd77-7e5f-5565-eb47dd027d81@sberdevices.ru>
-Date:   Mon, 5 Jun 2023 23:42:06 +0300
+        with ESMTP id S231667AbjFEUnT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 16:43:19 -0400
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9489AA7
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 13:43:18 -0700 (PDT)
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1q6H2k-00CZCa-Te; Mon, 05 Jun 2023 22:43:10 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=v4Bi7tyyUd+tjqQMljkfix7e2ZExX/wnrFV+XOW9EBo=; b=fsBLH7sbx0GB/OI9OLBiFm18h1
+        zi96BbiX5fCLMBT7yeuu4vAbghAgVnav/RSvdejSlfAiVbL82JGE3DJHtmXQrBswvg+VAc3uYOIsP
+        jyoabMRGp6Jbin0xJfl6oQ9Vqy2sYWmoU9HqRsm3Da3G1Ygfg2B3D9JyFli2mPpWK52J08G9oUXfn
+        SL2YDKPbNFomdNIpdAXlRDcDyczVjtQNfsBZTFOvAv6FTynydbu4DWw6l67HGArw5vR9eHdhJ5AYL
+        tdCaNKgl76nRmAdlcPOFJuAfQzO1WYAAjUenQjYCAyxf0Qk9Mr6Fx7Q3te9IQ3BM6B3xBJgJfl0zU
+        lt3jgvbA==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1q6H2k-0007Tg-1U; Mon, 05 Jun 2023 22:43:10 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1q6H2b-0004Fs-82; Mon, 05 Jun 2023 22:43:01 +0200
+Message-ID: <80f7f3dc-285f-39c3-655e-fd4a499f81a1@rbox.co>
+Date:   Mon, 5 Jun 2023 22:42:59 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Content-Language: en-US
-In-Reply-To: <20230413-b4-vsock-dgram-v3-0-c2414413ef6a@bytedance.com>
-To:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Bryan Tan <bryantan@vmware.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-hyperv@vger.kernel.org>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-Subject: Re: [PATCH RFC net-next v3 0/8] virtio/vsock: support datagrams
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Thunderbird
+Subject: Re: [PATCH v2] KVM: allow KVM_BUG/KVM_BUG_ON to handle 64-bit cond
+Content-Language: pl-PL, en-GB
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     dmatlack@google.com, mizhang@google.com, isaku.yamahata@gmail.com,
+        pbonzini@redhat.com, Wei Wang <wei.w.wang@intel.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230307135233.54684-1-wei.w.wang@intel.com>
+ <168565180722.660019.15543226381784798973.b4-ty@google.com>
+ <8f319a1e-a869-b666-b606-c0b4764ef7b1@rbox.co> <ZHofVKJxjaUxIDUN@google.com>
+ <7a4a503d-9fc4-d366-02b4-bc145943bd45@rbox.co> <ZH39H0gpNX4ak6yM@google.com>
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <ZH39H0gpNX4ak6yM@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/06/05 17:23:00 #21436105
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Bobby!
+On 6/5/23 17:19, Sean Christopherson wrote:
+> On Mon, Jun 05, 2023, Michal Luczaj wrote:
+>> OK, so xa_store() aside[*], I see some bool-to-bools:
+>>
+>> arch/x86/kvm/x86.c:
+>> 	kvm_msr_allowed():allowed = !!test_bit(index - start, bitmap);
+>> arch/x86/kvm/hyperv.c:
+>> 	kvm_hv_hypercall():hc.rep = !!(hc.rep_cnt || hc.rep_idx);
+>> arch/x86/kvm/mmu/mmu.c:
+>> 	update_pkru_bitmask():
+>> 		pkey_bits = !!check_pkey;
+>> 		pkey_bits |= (!!check_write) << 1;
+>> arch/x86/kvm/svm/svm.c:
+>> 	msr_write_intercepted():return !!test_bit(bit_write,  &tmp);
+>> 	svm_vcpu_after_set_cpuid():
+>> 		2x set_msr_interception...
+>> tools/testing/selftests/kvm/x86_64/vmx_exception_with_invalid_guest_state.c:
+>> 	set_or_clear_invalid_guest_state():sregs.tr.unusable = !!set;
+>>
+>> But perhaps this is a matter of style and those were meant to be this kind-of
+>> explicit?
+> 
+> I doubt it, I'm guessing most cases are due to the author being overzealous for
+> one reason or another, e.g. I suspect the test_bit() ones are due to the original
+> author incorrectly assuming test_bit() returned an unsigned long, i.e. the bit,
+> as opposed to the bool.
+> 
+> If you want to clean these up, I'd say "fix" the test_bit() cases, but leave the
+> others alone.  The test_bit() ones are clearly redundant, and IMO can be actively
+> due to implying test_bit() returns something other than a bool.
 
-Thanks for this patchset, really interesting!
-
-I applied it on head:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d20dd0ea14072e8a90ff864b2c1603bd68920b4b
-
-And tried to run ./vsock_test (client in the guest, server in the host), I had the following crash:
-
-Control socket connected to 192.168.1.1:12345.                          
-0 - SOCK_STREAM connection reset...                                     
-[    8.050215] BUG: kernel NULL pointer derefer                         
-[    8.050960] #PF: supervisor read access in kernel mode               
-[    8.050960] #PF: error_code(0x0000) - not-present page               
-[    8.050960] PGD 0 P4D 0                                              
-[    8.050960] Oops: 0000 [#1] PREEMPT SMP PTI                          
-[    8.050960] CPU: 0 PID: 109 Comm: vsock_test Not tainted 6.4.0-rc3-gd707c220a700
-[    8.050960] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14
-[    8.050960] RIP: 0010:static_key_count+0x0/0x20                      
-[    8.050960] Code: 04 4c 8b 46 08 49 29 c0 4c 01 c8 4c 89 47 08 89 0e 89 56 04 4f
-[    8.050960] RSP: 0018:ffffa9a1c021bdc0 EFLAGS: 00010202              
-[    8.050960] RAX: ffffffffac309880 RBX: ffffffffc02fc140 RCX: 0000000000000000
-[    8.050960] RDX: ffff9a5eff944600 RSI: 0000000000000000 RDI: 0000000000000000
-[    8.050960] RBP: ffff9a5ec2371900 R08: ffffa9a1c021bd30 R09: ffff9a5eff98e0c0
-[    8.050960] R10: 0000000000001000 R11: 0000000000000000 R12: ffffa9a1c021be80
-[    8.050960] R13: 0000000000000000 R14: 0000000000000002 R15: ffff9a5ec1cfca80
-[    8.050960] FS:  00007fa9bf88c5c0(0000) GS:ffff9a5efe400000(0000) knlGS:00000000
-[    8.050960] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033        
-[    8.050960] CR2: 0000000000000000 CR3: 00000000023e0000 CR4: 00000000000006f0
-[    8.050960] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[    8.050960] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[    8.050960] Call Trace:                                              
-[    8.050960]  <TASK>                                                  
-[    8.050960]  once_deferred+0xd/0x30                                  
-[    8.050960]  vsock_assign_transport+0xa2/0x1b0 [vsock]               
-[    8.050960]  vsock_connect+0xb4/0x3a0 [vsock]                        
-[    8.050960]  ? var_wake_function+0x60/0x60                           
-[    8.050960]  __sys_connect+0x9e/0xd0                                 
-[    8.050960]  ? _raw_spin_unlock_irq+0xe/0x30                         
-[    8.050960]  ? do_setitimer+0x128/0x1f0                              
-[    8.050960]  ? alarm_setitimer+0x4c/0x90                             
-[    8.050960]  ? fpregs_assert_state_consistent+0x1d/0x50              
-[    8.050960]  ? exit_to_user_mode_prepare+0x36/0x130                  
-[    8.050960]  __x64_sys_connect+0x11/0x20                             
-[    8.050960]  do_syscall_64+0x3b/0xc0                                 
-[    8.050960]  entry_SYSCALL_64_after_hwframe+0x4b/0xb5                
-[    8.050960] RIP: 0033:0x7fa9bf7c4d13                                 
-[    8.050960] Code: 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 48
-[    8.050960] RSP: 002b:00007ffdf2d96cc8 EFLAGS: 00000246 ORIG_RAX: 0000000000000a
-[    8.050960] RAX: ffffffffffffffda RBX: 0000560c305d0020 RCX: 00007fa9bf7c4d13
-[    8.050960] RDX: 0000000000000010 RSI: 00007ffdf2d96ce0 RDI: 0000000000000004
-[    8.050960] RBP: 0000000000000004 R08: 0000560c317dc018 R09: 0000000000000000
-[    8.050960] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-[    8.050960] R13: 0000560c305ccc2d R14: 00007ffdf2d96ce0 R15: 00007ffdf2d96d70
-[    8.050960]  </TASK>  
-
-
-I guess crash is somewhere near:
-
-old_info->transport->release(vsk); in vsock_assign_transport(). May be my config is wrong...
-
-Thanks, Arseniy
+Done: https://lore.kernel.org/kvm/20230605200158.118109-1-mhal@rbox.co/
