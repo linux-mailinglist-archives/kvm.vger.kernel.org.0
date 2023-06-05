@@ -2,64 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A8AD722DFC
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 19:55:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E411F722E63
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 20:12:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235488AbjFERyt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 13:54:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58950 "EHLO
+        id S235109AbjFESMH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 14:12:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231196AbjFERyn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 13:54:43 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8352C10C
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 10:54:28 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-977c72b116fso353176266b.3
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 10:54:28 -0700 (PDT)
+        with ESMTP id S229895AbjFESMF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 14:12:05 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 057B9D3
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 11:12:04 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id e9e14a558f8ab-33dea7d5424so17945ab.1
+        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 11:12:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685987667; x=1688579667;
+        d=google.com; s=20221208; t=1685988723; x=1688580723;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I0rxC/AXZcDVD2p/332O86/6MCSD5wZD13+g0GaeIO8=;
-        b=KHNZv6ltj0ezKfmsQaupIYuKlJIvLTAfNfpsI5wcLa+/yHxK/k4k870asv3XmhoqYa
-         sNQb9ZBniophZjwPKlrN2LTO1viassQOLNrE0KJ7qen10QMZQ57Onr7zMuqTPhwQGuUc
-         TAfMMfzNxMvHkDpCxRFwefg63hbvFo52LOxNLCGJKfL4RYQY1+amKeYbRjXsaWi7l3IX
-         2HyyuBiguCGIobVNozDBEngq4kslCdAAJNNOHL7KfAzGzGwJ2avrUEL8GKCba+i3ig3j
-         MfUw6xZbETNbVkj0zmg6m0QglxcBrrYpi5u11UvD1kFKsrrX0ECvn/59XiUQjqZwH/Xu
-         3vDQ==
+        bh=1v9H+aU/5MHg3n8/buk5HlYHhoHgA0ZUnQMJqGpMQJA=;
+        b=gw03rkY2VpY+Vru936UGtYoAX16IZyS5hd3OHHog78K7Dvpq4TBluKU7gtif/3w5rp
+         ye0RfevEZZ6jTOGi5G7VLdTevL4ZMODtlV8xlZGLD9DJz+i37yh6rv/JH5y5X6agRpXe
+         fV8TWvMcjLK3PNCeAQrS93sWoYofkauour4Aazx5Z0IxnN1XUt8Eeq1eBDJmUXtGpZjG
+         kDu9knKK33Ge2wQag5BQycHWxOa3SvPfV5AZ/UEbzSRQVa1QOSQlGefOlY4T2eGbLv5E
+         QWDOaDjXT5rvKzZOFKi4fgTveJ7ov5u2N4YabOK16pcVDAc96eejtpjhCCZ++4+mIJVz
+         Pjbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685987667; x=1688579667;
+        d=1e100.net; s=20221208; t=1685988723; x=1688580723;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I0rxC/AXZcDVD2p/332O86/6MCSD5wZD13+g0GaeIO8=;
-        b=C8uL4FfHb7UnjxJGPBjPmN+ZOPw2W5Zlq65Gd+/TrR2rAgE5lE9uzfhOLRXcWMc4q8
-         0G8cinKyk6lsG+xbCXhwZAFQvBNC7T7jXWlealjaVskR6kPLg6WMKLOhF4WcOxuT0b+U
-         q9ouP4EL/osj0lZ61OL7T70wajD/2B51l33mFBiRYuUs/rmg1pofxYlki9FBiM0cNhkw
-         9AllBCqOo/R3tAbowUoKyKD2B16clpY0hLti0BgWCMCNaCq4fHHXw2TxHrHufyMS0M4E
-         ub0kv/9TYglbunZ7gxWeRy7cSgtd8O4j8CZAMNstvtTTHx0G/SGM89AxxO90cj7CZU2S
-         a4SA==
-X-Gm-Message-State: AC+VfDynbL/dfdPZalEimDZb/SdSDCwxH6Qq1IjWNMawDAgTyjQNr3uM
-        iwi/UYTguMgON9f7RFoOP26L230G4zxEnPM5W1TvQQ==
-X-Google-Smtp-Source: ACHHUZ7XfC1DgJ1vxU9jd4Il/BLV6t7V1cC3bN5yBhKGVQrT58fFZ8dnfxHNlnoNvgBcdPQ6N4l+ZCFTha5QEtAzHsQ=
-X-Received: by 2002:a17:907:97cf:b0:96a:8412:a44d with SMTP id
- js15-20020a17090797cf00b0096a8412a44dmr7560270ejc.36.1685987666868; Mon, 05
- Jun 2023 10:54:26 -0700 (PDT)
+        bh=1v9H+aU/5MHg3n8/buk5HlYHhoHgA0ZUnQMJqGpMQJA=;
+        b=aP1NTWjMstOn6RS9r7cQsQB6ALSoNWNM77h2hsiY9etCKW09hInNzDxdBWbBINB1yC
+         uSiIjHh/tCGvOwQm8ZuGxbT9Bzla+d/DmdyJF0RmOCF83pTe+Mv2kqlUiyaveYSAWTgM
+         gQ2J/hWvkuwwKV2gzaItBTo27hcDhdXo9nl3ogu5Kz2KoM2XVZPZuwUj2HF05ZSlVcvC
+         J9XsejPxaD1R1/ZhHuvWm4R55TN24a4PewkiZA56SgXd7PfyybShzXuiW6RRnsxOsHUx
+         2rbCDsz3/m1AkVCjBH5di0JI6HQw42+FtajpB9m2Cb85LhGEL+inzsoPV+irv23LHPhK
+         HiMw==
+X-Gm-Message-State: AC+VfDxsaxdYh3dpJDyp02IIJv2bBvEivDr0aC7fCGvXXvi3tJS6kz9p
+        FSN9cofAxieXEWh1ZnLtSU72I8HYkgJok/229PqnLw==
+X-Google-Smtp-Source: ACHHUZ672rcdLzlt2TMtoZbpzHauyvyUWezDXI8ZRdcdXNwd9xa7Gpvfgbo3dXGDPFoIev1sMhSHkIoArtW1/9/Ol1s=
+X-Received: by 2002:a92:c24b:0:b0:33d:b6ed:8bf3 with SMTP id
+ k11-20020a92c24b000000b0033db6ed8bf3mr17037ilo.27.1685988723232; Mon, 05 Jun
+ 2023 11:12:03 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230605004334.1930091-1-mizhang@google.com> <CALMp9eSQgcKd=SN4q2QRYbveKoayKzuYEQPM0Xu+FgQ_Mja8-g@mail.gmail.com>
- <CANgfPd9kKxq1146F3mX_u7KCC0HrWfgYrxZd6c9Dh7s19E4Eog@mail.gmail.com>
-In-Reply-To: <CANgfPd9kKxq1146F3mX_u7KCC0HrWfgYrxZd6c9Dh7s19E4Eog@mail.gmail.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Mon, 5 Jun 2023 10:53:50 -0700
-Message-ID: <CAL715WLyuQDg7LBmj=xqUbqZC_x2ZGUb4N6qZ_tvPhAAzggYng@mail.gmail.com>
+ <CAL715WJowYL=W40SWmtPoz1F9WVBFDG7TQwbsV2Bwf9-cS77=Q@mail.gmail.com>
+In-Reply-To: <CAL715WJowYL=W40SWmtPoz1F9WVBFDG7TQwbsV2Bwf9-cS77=Q@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 5 Jun 2023 11:11:51 -0700
+Message-ID: <CALMp9eRRzQKoFVHvgY8VfpS-8=RY6HYOanBuGYLRbRQ+9V8zng@mail.gmail.com>
 Subject: Re: [PATCH] KVM: x86/mmu: Remove KVM MMU write lock when accessing indirect_shadow_pages
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>,
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
@@ -73,8 +72,8 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 5, 2023 at 10:17=E2=80=AFAM Ben Gardon <bgardon@google.com> wro=
-te:
+On Mon, Jun 5, 2023 at 10:42=E2=80=AFAM Mingwei Zhang <mizhang@google.com> =
+wrote:
 >
 > On Mon, Jun 5, 2023 at 9:55=E2=80=AFAM Jim Mattson <jmattson@google.com> =
 wrote:
@@ -119,14 +118,39 @@ cpu *vcpu, gpa_t cr2_or_gpa,
 > > >
 > > > -       /* The instructions are well-emulated on direct mmu. */
 > > > +       /* The instructions are well-emulated on Direct MMUs. */
+> > >         if (vcpu->arch.mmu->root_role.direct) {
+> > > -               unsigned int indirect_shadow_pages;
+> > > -
+> > > -               write_lock(&vcpu->kvm->mmu_lock);
+> > > -               indirect_shadow_pages =3D vcpu->kvm->arch.indirect_sh=
+adow_pages;
+> > > -               write_unlock(&vcpu->kvm->mmu_lock);
+> > > -
+> > > -               if (indirect_shadow_pages)
+> > > +               if (READ_ONCE(vcpu->kvm->arch.indirect_shadow_pages))
+> >
+> > I don't understand the need for READ_ONCE() here. That implies that
+> > there is something tricky going on, and I don't think that's the case.
 >
-> Nit: Internally within Google, on older kernels, we have the "Direct
-> MMU" which was the precursor to the TDP MMU we all know and love. This
-> comment however does not refer to the Direct MMU. Direct here just
-> refers to the direct role bit being set. Since it's just descriptive,
-> direct should not be capitalized in this comment, so no reason to
-> change this line.
+> READ_ONCE() is just telling the compiler not to remove the read. Since
+> this is reading a global variable,  the compiler might just read a
+> previous copy if the value has already been read into a local
+> variable. But that is not the case here...
 
-You are right., it is incorrect to uppercase the 'direct', since that
-generates confusions with our internal MMU implementation. So, I will
-just uppercase the 'mmu' here in the next version.
+Not a global variable, actually, but that's not relevant. What would
+be wrong with using a previously read copy?
+
+We don't always wrap reads in READ_ONCE(). It's actually pretty rare.
+So, there should be an explicit and meaningful reason.
+
+> Note I see there is another READ_ONCE for
+> kvm->arch.indirect_shadow_pages, so I am reusing the same thing.
+
+That's not a good reason. "If all of your friends jumped off a cliff,
+would you?"
+
+> I did check the reordering issue but it should be fine because when
+> 'we' see indirect_shadow_pages as 0, the shadow pages must have
+> already been zapped. Not only because of the locking, but also the
+> program order in __kvm_mmu_prepare_zap_page() shows that it will zap
+> shadow pages first before updating the stats.
