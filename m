@@ -2,98 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A2377224F2
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 13:53:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92F237224F8
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 13:56:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232907AbjFELxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 07:53:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34432 "EHLO
+        id S232956AbjFEL4O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 07:56:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232698AbjFELxV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 07:53:21 -0400
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDEB1A7;
-        Mon,  5 Jun 2023 04:53:19 -0700 (PDT)
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1q68lx-00BV67-DW; Mon, 05 Jun 2023 13:53:17 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-        bh=z6InhYcFfQV4kfNF3EKRRmV6b/y4TH6TyIbYstwZzDg=; b=frT7bzA0QICy8T4dPdgzjpMs8+
-        OL9JFeOPhv8J4pRRDHKX6cHZ1eZ0VFKtZHVicBAhUAqBEyIPkQKogo1XHw7OZOU5DPNpb0Y3cYosS
-        XWpQ/CpXst/+tNAS9nyWyn2jSwkeREAzBtMBN/7c4qMhK5weP/2LMxep7KECyav3aIde87SOA9ih5
-        Z8puFwlsXyW55PBU699Xz5uU86y4NqCfP+nAgJ4NdLXvzbzipAv+X5G+whgpkZLhCqiYF5iI4oy9s
-        pS7NVQOaLVVqjtvJ36oiDeZI5uNm7+4IsP5B0S7Rz35HKN87xFD3BMgzRbRLS6MYbER8yzYDzjGiJ
-        rJyJ4bIQ==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1q68lw-00070x-LP; Mon, 05 Jun 2023 13:53:16 +0200
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1q68lu-0002P0-No; Mon, 05 Jun 2023 13:53:14 +0200
-Message-ID: <7a4a503d-9fc4-d366-02b4-bc145943bd45@rbox.co>
-Date:   Mon, 5 Jun 2023 13:53:13 +0200
+        with ESMTP id S232753AbjFEL4M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 07:56:12 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E0369C;
+        Mon,  5 Jun 2023 04:56:11 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1685966168;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=p9Tml1V4RSPC7qDnk/kmiBF7Kh2SuiVuJ3mG8ZUlnf4=;
+        b=NQKly6a3QMGV5jln9Z9QXvUl/Mc6GnI0e+XGgHcnkInUw6wHpFP704HQTPtkaUt1zXwArs
+        ga+GuvVEzMW2fABmXH5erPpiOMJpymDuxTFv+RUat2xpEQQAsnxCFGVPOMdlOZWA8L6ZeE
+        mX0q5b8ylcCnJd16Cl4IkZ7hL/Uoi/4DyDM4UFCxEAxEdy/JETxIHTHIK10dx1NeEK1iqf
+        WiiWhqJxLB6Lsn8Rxfr4X99Xi48YHdypzl2sey8ab/KsvYT1y+fBqVUNSESJoc2qdhjR+Q
+        PkiBGFgeqjSDBFytdjjt7GHaKHcQCjnbiluUOw9rV36xkpb/Oryx9xlTfIbDkw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1685966168;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=p9Tml1V4RSPC7qDnk/kmiBF7Kh2SuiVuJ3mG8ZUlnf4=;
+        b=knnT5Q+dgC9LrjR9Tt7MOnZSYwr8QxLW4MDQzgKDMKnF5qnQyGjdFNO/DafA56Ap8tRIxO
+        tZUXqK2IbZyWYFAg==
+To:     Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, peterz@infradead.org, andrew.cooper3@citrix.com,
+        seanjc@google.com, pbonzini@redhat.com, ravi.v.shankar@intel.com,
+        jiangshanlai@gmail.com, shan.kang@intel.com
+Subject: Re: [PATCH v8 05/33] x86/traps: add external_interrupt() to
+ dispatch external interrupts
+In-Reply-To: <20230410081438.1750-6-xin3.li@intel.com>
+References: <20230410081438.1750-1-xin3.li@intel.com>
+ <20230410081438.1750-6-xin3.li@intel.com>
+Date:   Mon, 05 Jun 2023 13:56:08 +0200
+Message-ID: <87ttvm6s2v.ffs@tglx>
 MIME-Version: 1.0
-User-Agent: Thunderbird
-Subject: Re: [PATCH v2] KVM: allow KVM_BUG/KVM_BUG_ON to handle 64-bit cond
-Content-Language: pl-PL, en-GB
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     dmatlack@google.com, mizhang@google.com, isaku.yamahata@gmail.com,
-        pbonzini@redhat.com, Wei Wang <wei.w.wang@intel.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230307135233.54684-1-wei.w.wang@intel.com>
- <168565180722.660019.15543226381784798973.b4-ty@google.com>
- <8f319a1e-a869-b666-b606-c0b4764ef7b1@rbox.co> <ZHofVKJxjaUxIDUN@google.com>
-From:   Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <ZHofVKJxjaUxIDUN@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/2/23 18:56, Sean Christopherson wrote:
-> On Fri, Jun 02, 2023, Michal Luczaj wrote:
->> I guess this makes the !! in kvm_vm_ioctl_create_vcpu() unnecessary:
->>
->> KVM_BUG_ON(!!xa_store(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, 0)...
-> 
-> Ya, I saw that, which in addition to Wei's ping, is what reminded me that the
-> KVM_BUG_ON() fix hadn't been merged.
-> 
->> Is it worth a patch (perhaps along with chopping off !! in
->> kvm_msr_allowed() and few other places)?
-> 
-> Yes, I think so.
+On Mon, Apr 10 2023 at 01:14, Xin Li wrote:
+> Add external_interrupt() to dispatch external interrupts to their handlers.
+>
+> If an external interrupt is a system interrupt, dipatch it through
+> system_interrupt_handlers table, otherwise to
+> dispatch_common_interrupt().
 
-OK, so xa_store() aside[*], I see some bool-to-bools:
+This naming convention sucks. external interrupts which can be system
+interrupts. Come on.
 
-arch/x86/kvm/x86.c:
-	kvm_msr_allowed():allowed = !!test_bit(index - start, bitmap);
-arch/x86/kvm/hyperv.c:
-	kvm_hv_hypercall():hc.rep = !!(hc.rep_cnt || hc.rep_idx);
-arch/x86/kvm/mmu/mmu.c:
-	update_pkru_bitmask():
-		pkey_bits = !!check_pkey;
-		pkey_bits |= (!!check_write) << 1;
-arch/x86/kvm/svm/svm.c:
-	msr_write_intercepted():return !!test_bit(bit_write,  &tmp);
-	svm_vcpu_after_set_cpuid():
-		2x set_msr_interception...
-tools/testing/selftests/kvm/x86_64/vmx_exception_with_invalid_guest_state.c:
-	set_or_clear_invalid_guest_state():sregs.tr.unusable = !!set;
+> +/*
+> + * External interrupt dispatch function.
+> + *
+> + * Until/unless dispatch_common_interrupt() can be taught to deal with the
+> + * special system vectors, split the dispatch.
 
-But perhaps this is a matter of style and those were meant to be this kind-of
-explicit?
+More gibberish. It's not useful to add your sloppy personal notes which
+are not understandable for anyone else. That comment might eventually
+make some sense right in the code where the condition is.
 
-[*] https://lore.kernel.org/kvm/20230605114852.288964-1-mhal@rbox.co/
+> + * Note: dispatch_common_interrupt() already deals with IRQ_MOVE_CLEANUP_VECTOR.
+> + */
+> +int external_interrupt(struct pt_regs *regs)
+> +{
+> +	unsigned int vector = regs->vector;
+> +	unsigned int sysvec = vector - FIRST_SYSTEM_VECTOR;
+> +
+> +	if (vector < FIRST_EXTERNAL_VECTOR) {
+
+unlikely(...)
+
+> +		pr_err("invalid external interrupt vector %d\n", vector);
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (sysvec < NR_SYSTEM_VECTORS)
+> +		system_interrupt_handlers[sysvec](regs);
+> +	else
+> +		dispatch_common_interrupt(regs, vector);
+
+How is this supposed to work once the vector space gets extended in a
+later version of FRED?
+
+Can we please think about this _now_ and not rewrite all of this two
+years down the road? 
+
+Even if that's not fully specified yet, here is the obvious question:
+
+ What are we going to do with the system vectors. Are they going to
+ stay just in the middle of the expanded vector space?
+
+That would be completely non-sensical as we'd end up with yet another
+segmentation of the vector space.
+
+So the obvious solution is to segment the vector space in the following
+way:
+
+  0  - 31   Exceptions/traps        - Cannot be moved
+ 32         IRQ_MOVE_CLEANUP_VECTOR
+ 33  - X    System vectors including APIC_SPURIOUS
+ X+1 - MAX  External interrupts
+
+This spares the IRQ_MOVE_CLEANUP_VECTOR hackery. It requires to move the
+ISA vectors, but that's not rocket science.
+
+That makes the external interrupt vector space trivially expandable, no?
+
+Coming back to that comment:
+
+> + * Until/unless dispatch_common_interrupt() can be taught to deal with the
+> + * special system vectors, split the dispatch.
+
+That's simply wishful thinking. Because all what this would achieve is
+moving the condition and table lookup into dispatch_common_interrupt().
+
+What's the win aside of convoluted code?
+
+There are only two options to deal with that:
+
+    1) Have the condition in external_interrupt()
+
+       if (unlikely(vector < LEGACY_MAX_EXCEPTION_VECTORS))
+            yell_and_bail();
+
+       if (vector < FIRST_DEVICE_VECTOR)
+            sysvec_handler[vector](regs)
+       else
+            fred_common_interrupt(regs, vector);
+
+    2) Make the sysvec_handler[] fred wrapper functions take the vector
+       argument and allocate the sysvec_handler[] array dynamically
+       sized based on the maximum number of supported vectors in a
+       particular [FRED]APIC implementation.
+
+       Not sure whether that's worth it as FRED allows up to 64k vectors
+       if I understand the reserved space layout in the spec correctly
+       and that would cost 512k memory just for the table.
+
+Why has all of the above not been thought through and addressed _before_
+posting this pile?
+
+<Kernel development educational template #11>
+
+  1) Implementing a Prove of Concept for early validation is perfectly
+     fine.
+
+  2) Trying to sell that PoC upstream by polishing it a bit is doomed.
+
+  3) The proper tools for upstream development are brain and taste, not
+     duct tape and stapler.
+
+</Kernel development educational template #11>
+
+Thanks,
+
+        tglx
