@@ -2,116 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA6EF722345
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 12:19:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8DB27223CA
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 12:47:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231849AbjFEKTn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 06:19:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45500 "EHLO
+        id S230300AbjFEKrc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 06:47:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230084AbjFEKTm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 06:19:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18C44F3
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 03:18:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685960329;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=k2I42yHoa8cBG+5F/vO+XJiYcKmCOnxhW9y167l+rbY=;
-        b=G70VAKgPHOcvqqh5JhKGnKW3ZRsZaCy3IdZJAvsfVU480thw/DvvefVQXUXbbwyEOI37GD
-        Mekns7PXk7rGkTIUJ+NoOa5QX+k5HPKzVj8y6O3Xah1ZPlmQ9jNXEAlnm5HKJ0O1HMtPxL
-        dPwNyzywb3WdTTO/afVe2vtw0W4WSu4=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-375-aJ4k7JdCMPSPMl2RjG2Ezg-1; Mon, 05 Jun 2023 06:18:48 -0400
-X-MC-Unique: aJ4k7JdCMPSPMl2RjG2Ezg-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-977eabfc3ccso43736566b.1
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 03:18:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685960327; x=1688552327;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k2I42yHoa8cBG+5F/vO+XJiYcKmCOnxhW9y167l+rbY=;
-        b=GcMbCj5Pi6oa+edrNdglxzkwa4mbCK8TooIoP4uLs3Bjj77N9krQQDkJcC45S1PBQ1
-         nbboiAxAFDO8p/RUmkzyOSwi0eTklH6Qhaa1dQcWNpgeq9OnAlu7Kmd6IuDgc9l3dXmE
-         sluWGp90QwX3BlN5He2bTCuel/0cyavxecrjtmcATxOHSv4IBFob32hRHaaKdWKakh6Y
-         61PRlCLpB96EKZs6nqogpAwJQfw27kpPQ5s6pk0xqQZou6+m5tRhNb4XKMpu0wTj2coy
-         T52GyC1efooO029Q4SRl5HBUigWO/KZe04ajnfiPXqhqV3WWOOcyrHzwUfHpWjV3Eayh
-         /YDg==
-X-Gm-Message-State: AC+VfDx0LVo9e6QUppkTlqAbXmXVKOB9Ees/kPUIZ/9Arnnpr9jg6m3o
-        AmxfuxPL7WCZNCCt2zz2zScdylYimgLUouRqjw3I/4CzmRfdmNbSe2Mhh4P7M3DP2UlyKehFk1n
-        8jYSJU+yc1g2R
-X-Received: by 2002:a17:906:58d2:b0:974:5a12:546 with SMTP id e18-20020a17090658d200b009745a120546mr5892872ejs.23.1685960327179;
-        Mon, 05 Jun 2023 03:18:47 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4y5FTZMdHhj+OpYwDLDbO7vzaJvoyV4RaoadpCqeL/iBSSvEhdT6Qn1T/bEdAIbL9INizO6w==
-X-Received: by 2002:a17:906:58d2:b0:974:5a12:546 with SMTP id e18-20020a17090658d200b009745a120546mr5892862ejs.23.1685960326938;
-        Mon, 05 Jun 2023 03:18:46 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id y11-20020a17090629cb00b009660e775691sm4063967eje.151.2023.06.05.03.18.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jun 2023 03:18:46 -0700 (PDT)
-Message-ID: <e013dd26-40e5-0da7-8648-83fd9906b207@redhat.com>
-Date:   Mon, 5 Jun 2023 12:18:45 +0200
+        with ESMTP id S229967AbjFEKrb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 06:47:31 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34836EA;
+        Mon,  5 Jun 2023 03:47:30 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 355AL2OP009143;
+        Mon, 5 Jun 2023 10:47:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=j5qejy42J0uW3MhDxE4QmFyI3t6cuZ/IarPawSMMZyw=;
+ b=Ec48oqj8hWfXCxyEVaSMtsFDxxcynZng/2Bj2BiEsR75Hbs/ePCw//hQ5vFTpxRcL8by
+ Ndq4SSzAEbOGxfuoaLEhv3avUXeaz72e4AUdSNkqE9uT7JdwFjNpB+1+pn/0Ao9G9TnB
+ aZ4rT3YozJynqJUvFk7U7BZtYubNODqTRkmGa2M6I5PIhlZkcmsBY6lvJBjIMUZ6nKFR
+ AqcI1Q6YjN1ppKXuj7ha1N4cVFATa57kAKlMvcw/SrdFxrMpmqgs3M5V1DMPQQq3Hs1B
+ V+ERCXzq+j+za1gNPWS3XcE8Eg9mHOyRlvzx10JuWfpjXcreqIZobSLrwU3Jk9dKm/Ou fQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r1dvjrfn2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jun 2023 10:47:29 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 355AicP3027756;
+        Mon, 5 Jun 2023 10:47:29 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r1dvjrfkr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jun 2023 10:47:29 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 355407GW007430;
+        Mon, 5 Jun 2023 10:47:26 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3qyx8xh0ux-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jun 2023 10:47:26 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 355AlN5J18612864
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Jun 2023 10:47:23 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3081E20040;
+        Mon,  5 Jun 2023 10:47:23 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0756A2004D;
+        Mon,  5 Jun 2023 10:47:23 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon,  5 Jun 2023 10:47:22 +0000 (GMT)
+Date:   Mon, 5 Jun 2023 12:35:55 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     Nico Boehr <nrb@linux.ibm.com>, thuth@redhat.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v3 1/6] lib: s390x: introduce bitfield
+ for PSW mask
+Message-ID: <20230605123555.4f865f2c@p-imbrenda>
+In-Reply-To: <3667d7af-f9ba-fbb6-537d-e6143f63ac43@linux.ibm.com>
+References: <20230601070202.152094-1-nrb@linux.ibm.com>
+        <20230601070202.152094-2-nrb@linux.ibm.com>
+        <3667d7af-f9ba-fbb6-537d-e6143f63ac43@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v12 01/31] LoongArch: KVM: Add kvm related header files
-Content-Language: en-US
-To:     Huacai Chen <chenhuacai@kernel.org>,
-        Tianrui Zhao <zhaotianrui@loongson.cn>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>
-References: <20230530015223.147755-1-zhaotianrui@loongson.cn>
- <20230530015223.147755-2-zhaotianrui@loongson.cn>
- <CAAhV-H6B9M3iN7ugR9hFVxSpDHMgD=biZJbsArx_Uncgk3OHcg@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAAhV-H6B9M3iN7ugR9hFVxSpDHMgD=biZJbsArx_Uncgk3OHcg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: A4ep7Yx_Yd8w1vSb9nAT-Sz1mZfYId8R
+X-Proofpoint-GUID: exBYvJaftsKcGvka91wlUwH7Xvtbgmha
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-06-03_08,2023-06-02_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ adultscore=0 clxscore=1015 suspectscore=0 spamscore=0 malwarescore=0
+ bulkscore=0 impostorscore=0 mlxlogscore=913 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2306050094
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/5/23 07:00, Huacai Chen wrote:
-> I found something like this in our internal repo.
+On Thu, 1 Jun 2023 09:42:48 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
+
+[...]
+
+> Hrm, since I already made the mistake of introducing bitfields with and 
+> without spaces between the ":" I'm in no position to complain here.
 > 
-> #define KVM_CAP_LOONGARCH_FPU 228
-> #define KVM_CAP_LOONGARCH_LSX 229
-> #define KVM_CAP_LOONGARCH_VZ 230
-> #define KVM_LOONGARCH_GET_VCPU_STATE    _IOR(KVMIO,   0xd0, struct
-> kvm_loongarch_vcpu_state)
-> #define KVM_LOONGARCH_SET_VCPU_STATE    _IOW(KVMIO,   0xd1, struct
-> kvm_loongarch_vcpu_state)
-> #define KVM_LOONGARCH_GET_CPUCFG           _IOR(KVMIO,   0xd2, struct
-> kvm_cpucfg)
-> #define KVM_LOONGARCH_GET_IOCSR              _IOR(KVMIO,   0xd3,
-> struct kvm_iocsr_entry)
-> #define KVM_LOONGARCH_SET_IOCSR              _IOW(KVMIO,   0xd4,
-> struct kvm_iocsr_entry)
-> #define KVM_LOONGARCH_SET_CPUCFG           _IOR(KVMIO,   0xd5, struct
-> kvm_cpucfg)
+> I'm also not sure what the consensus is.
+
+tbh I don't really have an opinion, I don't mind either, to the point
+that I don't even care if we mix them
+
 > 
-> These are all UAPI definitions, if they are needed (at present or in
-> future), they should be merged in the first wave of KVM.
+> > +		};
+> > +	};
+> >   	uint64_t	addr;
+> >   };  
+> 
+> I've come to like static asserts for huge structs and bitfields since 
+> they can safe you from a *lot* of headaches.
 
-No, dead definitions should never be mergd.
+you mean statically asserting that the size is what it should be?
+in that case fully agree
 
-Paolo
-
+[...]
