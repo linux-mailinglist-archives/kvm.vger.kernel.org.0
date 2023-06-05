@@ -2,92 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8EF472254C
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 14:12:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAE3A722554
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 14:15:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232828AbjFEMMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 08:12:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45738 "EHLO
+        id S232272AbjFEMP3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 08:15:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230265AbjFEMM3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 08:12:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F923A7
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 05:12:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F1498614CB
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 12:12:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9941EC433EF;
-        Mon,  5 Jun 2023 12:12:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685967147;
-        bh=8V6HacXfdCoXzgcDlqOFaczG0LhaeVnYkaq32ntonqc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=XY34OQ/5113SW9o2AfEPGzvmH3dG+ZQQE6gUKJr9iH4E4w/61HbQOPBwgDhb+lWdr
-         inicFqMym3t8fxGnYUW5WM7iuUSkuGLon6MtVNGDsyLYTa+GVpvI1jX6mQ3x1frAoK
-         yBnpywS42bvYirqRHNCr7Z5z/hFMBdhbcEEhyW1k4s/dKfEGjyEW7RZnUd9X7tXdnU
-         uus7MIM9WVbU51aE1/ckvzw5WkgL64e/tUakrPjogdt85R8OZljzi/tJ6OCglr1WTK
-         qFIJC5UgOdboBJC9EDNNUaaHmuopyC0pWwIAZyr3fn6qqcfTmW8K691SMDQvmCRCRH
-         95r038Pw9+Y/Q==
-Date:   Mon, 5 Jun 2023 13:12:21 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     julien.thierry.kdev@gmail.com, maz@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH kvmtool 1/8] Sync-up headers with Linux-6.4-rc1
-Message-ID: <20230605121221.GA20843@willie-the-truck>
-References: <20230510083748.1056704-1-apatel@ventanamicro.com>
- <20230510083748.1056704-2-apatel@ventanamicro.com>
+        with ESMTP id S233200AbjFEMP2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 08:15:28 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29E999C;
+        Mon,  5 Jun 2023 05:15:27 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1685967325;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JoudT+AdU0Ws+QSwN1SBTdwy6Vmg7eTtWGfmIGNYxT8=;
+        b=jUWdFgaFbghhqynIQWDCI6OaFTOq39+leYg3swzXM8amANFKHqT2rFnvK5IzPWqwffJ9lz
+        WWLK563F0/1iZHR6SkgtTLXi8yd/gjnqt14XE8M1ZgRS0LrGdNL60ur52z7EB3p3wX7fdG
+        +44dciYN00d2HD+gnDssnuXM7lg3Tojd+4Myiwx/yBujqwdD8z0Rd1TVjgfQIFfltokncF
+        0gwNyGs4k8cxLIBOaovNMHekaFdUOpunIS02ydN7i41D9yK7mErOMcZ8GAaJt+x+6/+xoo
+        ZLuUctDpy3tsdPk/2PXCvgrrQ+oNsOGk0f5O/21EHupTOrjf/sxi5e/5+/LwyQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1685967325;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JoudT+AdU0Ws+QSwN1SBTdwy6Vmg7eTtWGfmIGNYxT8=;
+        b=b5TK60DL6+9N2hDuMdzVIjQrfXCDUjO0EoEqoOgjqkuvZej0u8i+Ld/yQX20qddnLKMNVD
+        FaX8eBrX0gfnIyDg==
+To:     Xin Li <xin3.li@intel.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, peterz@infradead.org, andrew.cooper3@citrix.com,
+        seanjc@google.com, pbonzini@redhat.com, ravi.v.shankar@intel.com,
+        jiangshanlai@gmail.com, shan.kang@intel.com
+Subject: Re: [PATCH v8 21/33] x86/fred: FRED initialization code
+In-Reply-To: <20230410081438.1750-22-xin3.li@intel.com>
+References: <20230410081438.1750-1-xin3.li@intel.com>
+ <20230410081438.1750-22-xin3.li@intel.com>
+Date:   Mon, 05 Jun 2023 14:15:25 +0200
+Message-ID: <87jzwi6r6q.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230510083748.1056704-2-apatel@ventanamicro.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 10, 2023 at 02:07:41PM +0530, Anup Patel wrote:
-> We sync-up Linux headers to get latest KVM RISC-V headers having
-> SBI extension enable/disable, Zbb, Zicboz, and Ssaia support.
-> 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  arm/aarch64/include/asm/kvm.h |  38 ++++++++++++
->  include/linux/kvm.h           |  57 +++++++++++-------
->  include/linux/virtio_blk.h    | 105 ++++++++++++++++++++++++++++++++++
->  include/linux/virtio_config.h |   6 ++
->  include/linux/virtio_net.h    |   5 ++
->  riscv/include/asm/kvm.h       |  56 +++++++++++++++++-
->  x86/include/asm/kvm.h         |  50 ++++++++++++----
->  7 files changed, 286 insertions(+), 31 deletions(-)
+On Mon, Apr 10 2023 at 01:14, Xin Li wrote:
+> From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
+>
+> The code to initialize FRED when it's available and _not_ disabled.
+>
+> cpu_init_fred_exceptions() is the core function to initialize FRED,
+> which
+>   1. Sets up FRED entrypoints for events happening in ring 0 and 3.
+>   2. Sets up a default stack for event handling.
+>   3. Sets up dedicated event stacks for DB/NMI/MC/DF, equivalent to
+>      the IDT IST stacks.
+>   4. Forces 32-bit system calls to use "int $0x80" only.
+>   5. Enables FRED and invalidtes IDT.
+>
+> When the FRED is used, cpu_init_exception_handling() initializes FRED
+> through calling cpu_init_fred_exceptions(), otherwise it sets up TSS
+> IST and loads IDT.
+>
+> As FRED uses the ring 3 FRED entrypoint for SYSCALL and SYSENTER,
+> it skips setting up SYSCALL/SYSENTER related MSRs, e.g., MSR_LSTAR.
 
-This breaks the build for x86:
+So how is this supposed to work? FRED is enabled in Kconfig, the feature
+is detected and FRED is initialized _before_ the rest of the required
+changes is in place.
 
-Makefile:386: Skipping optional libraries: vncserver SDL
-  CC       builtin-balloon.o
-In file included from include/linux/kvm.h:15,
-                 from include/kvm/pci.h:5,
-                 from include/kvm/vfio.h:6,
-                 from include/kvm/kvm-config.h:5,
-                 from include/kvm/kvm.h:6,
-                 from builtin-balloon.c:9:
-x86/include/asm/kvm.h:511:17: error: expected specifier-qualifier-list before ‘__DECLARE_FLEX_ARRAY’
-  511 |                 __DECLARE_FLEX_ARRAY(struct kvm_vmx_nested_state_data, vmx);
-      |                 ^~~~~~~~~~~~~~~~~~~~
-make: *** [Makefile:508: builtin-balloon.o] Error 1
+Documentation/process/* is not just there because people have nothing
+better to do than writing pointless documents.
 
-Will
+Thanks,
+
+        tglx
+
+
