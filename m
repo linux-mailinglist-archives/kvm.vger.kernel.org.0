@@ -2,110 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16CF972322A
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 23:23:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F682723257
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 23:36:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232253AbjFEVXI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 17:23:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41336 "EHLO
+        id S231836AbjFEVgM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 17:36:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229790AbjFEVXG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 17:23:06 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6BE1D9;
-        Mon,  5 Jun 2023 14:23:05 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-64d57cd373fso4629350b3a.1;
-        Mon, 05 Jun 2023 14:23:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686000185; x=1688592185;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fzeZkrlpXedAtX9zdkw2APzq4njcn3CbLsY5JQUPv/E=;
-        b=LcWPNPiFdDNEam3MgEvXZJysFMGjW0Uymb6gNIOGgQFEu+NORbzBEdr1tU/ddkywXG
-         so5o+glctNhw8fcdXV/8I9YMsNRvehFTLsE5WmAyFkoz5E0kQBhqZ1VpLhMcbmr6Clry
-         YHF6e/RuNM8flkHRpxU+sfO8RHdblJb15c5sTEuqHuTPr6REOdCfKK3d1KFOWTq0xZ9i
-         PRFwW2li65f8aoU1M087kkNpuHHROwzNGregTHPHePyf6N1svx/dhqvbVHwJflUnzlFA
-         qLmIUXFlbtF6u6tIXvJZ4FvYlZgVZQlR1/qpmVpxRllJVRDcEMFido+bA70pls4USDNs
-         wnXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686000185; x=1688592185;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fzeZkrlpXedAtX9zdkw2APzq4njcn3CbLsY5JQUPv/E=;
-        b=CPpDUvky/ho3jz1MMrOyjkpJ9U2hLzltVcYPhGtjM5u95ypRp6Wxv1bbPFLRfwa2+5
-         iCsZ+L9DhreRhMcx72LNeM8GAeSCj6U6qf7HLwJzgqpKtrfKRX3HxNeK7noseqRog7od
-         TgO0Tayv6Polq00Rd2XvV/aIjKthop8oGXW/62eHBYgvlV9bBsrwpwbTUfXt5qAlRAGO
-         FrFXNpmJgX1P3S+e3K9jzwDkApKAMlARhfaWLN5gUtBUa5oqDV636crYrxlK7dDmKpNf
-         1901qjZoG4s1QNnjpEP92ksmMsQXvc5qWDgc9tiT0S/HFgwYTCVSjyebfizC0jGLTHVw
-         n1hg==
-X-Gm-Message-State: AC+VfDys3WmEMvbX4tpMP9q0/tCRx1+TtDMOMCekx0oKqHOIO+r/X/S2
-        v6C91gQzgrLdkE3xpLDdoVg=
-X-Google-Smtp-Source: ACHHUZ7Ag4FEFdhlo/sRHRCtwhPl5JAsLXJ7S3PP2Q54h6gfKU5gCeBO9z20RSJRwX6F1YVDWFuEIw==
-X-Received: by 2002:a05:6a20:8f1f:b0:105:2e9e:b13a with SMTP id b31-20020a056a208f1f00b001052e9eb13amr253759pzk.8.1686000185056;
-        Mon, 05 Jun 2023 14:23:05 -0700 (PDT)
-Received: from localhost ([192.55.54.50])
-        by smtp.gmail.com with ESMTPSA id d16-20020aa78690000000b006519b6ba20bsm5655054pfo.3.2023.06.05.14.23.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 14:23:04 -0700 (PDT)
-Date:   Mon, 5 Jun 2023 14:23:03 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-mm@kvack.org, dave.hansen@intel.com,
-        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
-        peterz@infradead.org, tglx@linutronix.de, seanjc@google.com,
-        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, ying.huang@intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com, isaku.yamahata@gmail.com
-Subject: Re: [PATCH v11 07/20] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Message-ID: <20230605212303.GA2244082@ls.amr.corp.intel.com>
-References: <cover.1685887183.git.kai.huang@intel.com>
- <21b3a45cb73b4e1917c1eba75b7769781a15aa14.1685887183.git.kai.huang@intel.com>
+        with ESMTP id S229544AbjFEVgK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 17:36:10 -0400
+Received: from out-55.mta1.migadu.com (out-55.mta1.migadu.com [IPv6:2001:41d0:203:375::37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D6B1D9
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 14:36:08 -0700 (PDT)
+Date:   Mon, 5 Jun 2023 14:36:00 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1686000966;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=F3VFFG2jfkJ+ZSun0OC3Y7zPGm32YzSkJrZqM1qWhVA=;
+        b=AKtHFvLGYetRZ3XpqKzpBdah7sAcjqnBOU9TjP+acvw6U7AEqPZzbNU8j0dzPdjoAOsS4W
+        B5VR1VGKyhepBc014ps58qYlAdvQeKgRmg7rz7j46+XH3+ZRyG02WE1+na6gQc17CfWhL4
+        ScwjexcMx1YV6lOv4klwEW1R+9shFfI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvmarm@lists.linux.dev
+Subject: Re: [PATCH 3/3] KVM: arm64: Skip break phase when we have FEAT_BBM
+ level 2
+Message-ID: <ZH5VQMEoiHEITmF4@linux.dev>
+References: <20230602170147.1541355-1-coltonlewis@google.com>
+ <20230602170147.1541355-4-coltonlewis@google.com>
+ <87sfb7octw.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <21b3a45cb73b4e1917c1eba75b7769781a15aa14.1685887183.git.kai.huang@intel.com>
+In-Reply-To: <87sfb7octw.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 05, 2023 at 02:27:20AM +1200,
-Kai Huang <kai.huang@intel.com> wrote:
+On Sun, Jun 04, 2023 at 09:23:39AM +0100, Marc Zyngier wrote:
+> On Fri, 02 Jun 2023 18:01:47 +0100, Colton Lewis <coltonlewis@google.com> wrote:
+> > +static bool stage2_try_make_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu, kvm_pte_t new)
+> >  {
+> >  	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> > 
+> > -	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
+> > +	if (!stage2_has_bbm_level2())
+> > +		WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
+> > +
+> > +	if (!stage2_try_set_pte(ctx, new))
+> > +		return false;
+> > +
+> > +	if (kvm_pte_table(ctx->old, ctx->level))
+> > +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> > +	else if (kvm_pte_valid(ctx->old) && !stage2_pte_perms_equal(ctx->old, new))
+> > +		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, mmu, ctx->addr, ctx->level);
+> 
+> Why a non-shareable invalidation? Nothing in this code captures the
+> rationale for it. What if the permission change was a *restriction* of
+> the permission? It should absolutely be global, and not local.
 
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index b489b5b9de5d..03f74851608f 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -102,8 +102,12 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
->  
->  #ifdef CONFIG_INTEL_TDX_HOST
->  bool platform_tdx_enabled(void);
-> +int tdx_cpu_enable(void);
-> +int tdx_enable(void);
->  #else	/* !CONFIG_INTEL_TDX_HOST */
->  static inline bool platform_tdx_enabled(void) { return false; }
-> +static inline int tdx_cpu_enable(void) { return -ENODEV; }
-> +static inline int tdx_enable(void)  { return -ENODEV; }
->  #endif	/* CONFIG_INTEL_TDX_HOST */
->  
->  #endif /* !__ASSEMBLY__ */
+IIRC, Colton was testing largely with permission relaxation, and had
+forward progress issues b.c. the stale TLB entry was never invalidated
+in response to a permission fault.
 
-Please include errno.h.
-In the case of !INTEL_TDX_HOST && INTEL_TDX_GUEST,
-drivers/virt/coco/tdx-guest/tdx-guest.c results in compile error.
+Nonetheless, I very much agree with your suggestion. Non-Shareable
+invalidations should only be applied after exhausting all other
+invalidation requirements for a particular manipulation to the stage-2
+tables.
 
-Although there are other files that include asm/tdx.h, they seem to luckily
-include errno.h directly or indirectly.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+> >
+> >  	if (stage2_pte_is_counted(new))
+> >  		mm_ops->get_page(ctx->ptep);
+> > 
+> > -	smp_store_release(ctx->ptep, new);
+> > +	return true;
+> >  }
+> > 
+> >  static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
+> > @@ -879,7 +917,8 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+> >  	    stage2_pte_executable(new))
+> >  		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+> > 
+> > -	stage2_make_pte(ctx, new);
+> > +	if (!stage2_try_make_pte(ctx, data->mmu, new))
+> > +		return -EAGAIN;
+> 
+> So we don't have forward-progress guarantees anymore? I'm not sure
+> this is a change I'm overly fond of.
+
+I'll take the blame for the clunky wording here, though I do not believe
+there are any real changes to our forward progress guarantees relative to
+the existing code.
+
+Previously, we did the CAS on the break side of things to have a fault
+handler 'take ownership' of a PTE. The CAS now needs to move onto the
+make end when doing a BBM=2 style manipulation.
+
+Would you rather see something explicitly keyed on the BBM capability
+here? Then we could use a helper that implies unconditional success for
+BBM!=2 systems.
+
+--
+Thanks,
+Oliver
