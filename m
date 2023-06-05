@@ -2,86 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 029C97230B7
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 22:09:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 906C27231B3
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 22:47:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231610AbjFEUJK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 16:09:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42068 "EHLO
+        id S233465AbjFEUrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 16:47:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231420AbjFEUJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 16:09:09 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 491F999
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 13:09:07 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-565c380565dso114723817b3.1
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 13:09:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1685995746; x=1688587746;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=waSzY/YBXUDNVBBxcyEWarzX7p9eOgWdNZXiEb6mO3I=;
-        b=ftfhgS76kYFI1mQHwaqA99pxljTeUef2aRxb9nE9ZdNHslcvV6Ae9Jmo3UfDRV6LAv
-         XaPgBs99dJcCaC3rNQFSf2vwQEvOZMWByDS0g7wsb//nYXowIBD10o4ami/OE8n75Yh1
-         /a8Z0oKsUDmk6yv0Vbtg45fH+JFBDuykDNpnoJrg0Ko97/VIgaeRFbjnyJFnsGE//UDP
-         MKkhQlUCSHgk4n1fmFcYPHU/5//asEYP/+vqdEJkyPF/AKnHcUE5wkLfte6i4jCrv0Mk
-         +YDtiGePZrz29eR7TMn5TPNrUBUhRZkd3b1XLbZhmoiko+aFwnwuiq5TVXTiCYfYB2av
-         Dyfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685995746; x=1688587746;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=waSzY/YBXUDNVBBxcyEWarzX7p9eOgWdNZXiEb6mO3I=;
-        b=ZxM9Y959Vexjlvrg5vVpSmKGSa/ZFz9CcIHISutk+OiwjhF1FuCNm37dIySbNlp0b3
-         l8wTPCqItfYd+VT2s4t4mYyMeMTD8J6/LGivHVwQfIdbaBg0Bpp5AlgqVN8g9Dqr/50d
-         CfIZVhlPUZARIR4rBxuYzV5+DuDjk9BF3cOSCv1qlIh6Skh0C+DjVYe18oQhwsG6+3CT
-         VfY4R1mEIh7qjD8LOyBjHhV6Q7Uv/tTSTPMlU8o70sFbxJmTOPkNRGhQe//lRnGZ+cMe
-         j4KwIUGK+rQp++LH9LIZnrYwzP2zf6+90elY86IkOcFbEFlwQ/k8mHhF4bWQLUADIt19
-         mNmg==
-X-Gm-Message-State: AC+VfDxjj5o1Hlev2SXv6i5lGz+5NURMzd7SWdjcKnZKRQGVaNGh+61V
-        XEemzfz50HHlXZFhF/PFmXzsFZUWmWE=
-X-Google-Smtp-Source: ACHHUZ7XPe+A4mVVEv2cg2BdI9QXuQ2EEGF6oe+DvxtmbipaTMfs9SkxHwoX+bLJiyHRJF71iOnZiOsTGMA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ca13:0:b0:559:d859:d749 with SMTP id
- p19-20020a81ca13000000b00559d859d749mr36958ywi.5.1685995746567; Mon, 05 Jun
- 2023 13:09:06 -0700 (PDT)
-Date:   Mon,  5 Jun 2023 13:08:58 -0700
-In-Reply-To: <20230518091339.1102-1-binbin.wu@linux.intel.com>
-Mime-Version: 1.0
-References: <20230518091339.1102-1-binbin.wu@linux.intel.com>
-X-Mailer: git-send-email 2.41.0.rc2.161.g9c6817b8e7-goog
-Message-ID: <168599391997.1128436.16066419374996262965.b4-ty@google.com>
-Subject: Re: [PATCH v2 0/3] KVM: Fix some comments
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     pbonzini@redhat.com
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231877AbjFEUrI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 16:47:08 -0400
+Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 569FDFD;
+        Mon,  5 Jun 2023 13:47:05 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mx.sberdevices.ru (Postfix) with ESMTP id 335C65FD21;
+        Mon,  5 Jun 2023 23:47:02 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1685998022;
+        bh=9ATC+GxW8KMEIiHiF6ecJMk0sOenmSubs/SZ/yQ2/y0=;
+        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
+        b=K9EnAk+J1wH+cYPUXAMNufinG+iVezeNRNWTqHdXbSzRlA6+zhToK67+XSsWRyesN
+         K6nuQFG2JC6hnCSryQInquMb02IFsXO41w/tLq7Gv6QmBEBBOYpic4xPL+nOl6HfLV
+         0ljgDI6MBVPlBQCTgHCz18HWMhVBdz8eUbwA9OZiWa9GZJsQ/pr2tVknUq7VdAq2bZ
+         3jGtUwiQKnBogUUuAFQMbk2H4GM6D0vH2c21u5/50TmWB0QitQHkm61Zn1cl7cuugC
+         PQzUMc1A0HIZDRmMQg/1AW8SOB/y0VBBFCYOpBUWFeyS1xFViBcl9cn/wxXNxM5+QG
+         KzNrDwusABegQ==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mx.sberdevices.ru (Postfix) with ESMTP;
+        Mon,  5 Jun 2023 23:46:58 +0300 (MSK)
+Message-ID: <2830ac58-fd77-7e5f-5565-eb47dd027d81@sberdevices.ru>
+Date:   Mon, 5 Jun 2023 23:42:06 +0300
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+In-Reply-To: <20230413-b4-vsock-dgram-v3-0-c2414413ef6a@bytedance.com>
+To:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-hyperv@vger.kernel.org>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Subject: Re: [PATCH RFC net-next v3 0/8] virtio/vsock: support datagrams
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/06/05 17:23:00 #21436105
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 May 2023 17:13:36 +0800, Binbin Wu wrote:
-> Fix comments for KVM_ENABLE_CAP.
-> Update msrs_to_save_all to msrs_to_save_base in comments.
-> Fix a typo in x86/mmu.rst
-> 
+Hello Bobby!
 
-Applied [1/3] to kvm-x86 generic, and [3/3] to kvm-x86 misc.  I'll post a
-separate patch for [2/3], thanks!
+Thanks for this patchset, really interesting!
 
-[1/3] KVM: Fix comment for KVM_ENABLE_CAP
-      https://github.com/kvm-x86/linux/commit/22725266bdf9
+I applied it on head:
 
-[3/3] KVM: Documentation: Fix a typo in Documentation/virt/kvm/x86/mmu.rst
-      https://github.com/kvm-x86/linux/commit/06b66e050095
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d20dd0ea14072e8a90ff864b2c1603bd68920b4b
 
---
-https://github.com/kvm-x86/linux/tree/next
-https://github.com/kvm-x86/linux/tree/fixes
+And tried to run ./vsock_test (client in the guest, server in the host), I had the following crash:
+
+Control socket connected to 192.168.1.1:12345.                          
+0 - SOCK_STREAM connection reset...                                     
+[    8.050215] BUG: kernel NULL pointer derefer                         
+[    8.050960] #PF: supervisor read access in kernel mode               
+[    8.050960] #PF: error_code(0x0000) - not-present page               
+[    8.050960] PGD 0 P4D 0                                              
+[    8.050960] Oops: 0000 [#1] PREEMPT SMP PTI                          
+[    8.050960] CPU: 0 PID: 109 Comm: vsock_test Not tainted 6.4.0-rc3-gd707c220a700
+[    8.050960] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14
+[    8.050960] RIP: 0010:static_key_count+0x0/0x20                      
+[    8.050960] Code: 04 4c 8b 46 08 49 29 c0 4c 01 c8 4c 89 47 08 89 0e 89 56 04 4f
+[    8.050960] RSP: 0018:ffffa9a1c021bdc0 EFLAGS: 00010202              
+[    8.050960] RAX: ffffffffac309880 RBX: ffffffffc02fc140 RCX: 0000000000000000
+[    8.050960] RDX: ffff9a5eff944600 RSI: 0000000000000000 RDI: 0000000000000000
+[    8.050960] RBP: ffff9a5ec2371900 R08: ffffa9a1c021bd30 R09: ffff9a5eff98e0c0
+[    8.050960] R10: 0000000000001000 R11: 0000000000000000 R12: ffffa9a1c021be80
+[    8.050960] R13: 0000000000000000 R14: 0000000000000002 R15: ffff9a5ec1cfca80
+[    8.050960] FS:  00007fa9bf88c5c0(0000) GS:ffff9a5efe400000(0000) knlGS:00000000
+[    8.050960] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033        
+[    8.050960] CR2: 0000000000000000 CR3: 00000000023e0000 CR4: 00000000000006f0
+[    8.050960] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[    8.050960] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[    8.050960] Call Trace:                                              
+[    8.050960]  <TASK>                                                  
+[    8.050960]  once_deferred+0xd/0x30                                  
+[    8.050960]  vsock_assign_transport+0xa2/0x1b0 [vsock]               
+[    8.050960]  vsock_connect+0xb4/0x3a0 [vsock]                        
+[    8.050960]  ? var_wake_function+0x60/0x60                           
+[    8.050960]  __sys_connect+0x9e/0xd0                                 
+[    8.050960]  ? _raw_spin_unlock_irq+0xe/0x30                         
+[    8.050960]  ? do_setitimer+0x128/0x1f0                              
+[    8.050960]  ? alarm_setitimer+0x4c/0x90                             
+[    8.050960]  ? fpregs_assert_state_consistent+0x1d/0x50              
+[    8.050960]  ? exit_to_user_mode_prepare+0x36/0x130                  
+[    8.050960]  __x64_sys_connect+0x11/0x20                             
+[    8.050960]  do_syscall_64+0x3b/0xc0                                 
+[    8.050960]  entry_SYSCALL_64_after_hwframe+0x4b/0xb5                
+[    8.050960] RIP: 0033:0x7fa9bf7c4d13                                 
+[    8.050960] Code: 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 48
+[    8.050960] RSP: 002b:00007ffdf2d96cc8 EFLAGS: 00000246 ORIG_RAX: 0000000000000a
+[    8.050960] RAX: ffffffffffffffda RBX: 0000560c305d0020 RCX: 00007fa9bf7c4d13
+[    8.050960] RDX: 0000000000000010 RSI: 00007ffdf2d96ce0 RDI: 0000000000000004
+[    8.050960] RBP: 0000000000000004 R08: 0000560c317dc018 R09: 0000000000000000
+[    8.050960] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+[    8.050960] R13: 0000560c305ccc2d R14: 00007ffdf2d96ce0 R15: 00007ffdf2d96d70
+[    8.050960]  </TASK>  
+
+
+I guess crash is somewhere near:
+
+old_info->transport->release(vsk); in vsock_assign_transport(). May be my config is wrong...
+
+Thanks, Arseniy
