@@ -2,96 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CDE272319B
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 22:43:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 759D972319F
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 22:43:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232802AbjFEUnW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 16:43:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58036 "EHLO
+        id S233285AbjFEUnb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 16:43:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231667AbjFEUnT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 16:43:19 -0400
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9489AA7
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 13:43:18 -0700 (PDT)
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1q6H2k-00CZCa-Te; Mon, 05 Jun 2023 22:43:10 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-        bh=v4Bi7tyyUd+tjqQMljkfix7e2ZExX/wnrFV+XOW9EBo=; b=fsBLH7sbx0GB/OI9OLBiFm18h1
-        zi96BbiX5fCLMBT7yeuu4vAbghAgVnav/RSvdejSlfAiVbL82JGE3DJHtmXQrBswvg+VAc3uYOIsP
-        jyoabMRGp6Jbin0xJfl6oQ9Vqy2sYWmoU9HqRsm3Da3G1Ygfg2B3D9JyFli2mPpWK52J08G9oUXfn
-        SL2YDKPbNFomdNIpdAXlRDcDyczVjtQNfsBZTFOvAv6FTynydbu4DWw6l67HGArw5vR9eHdhJ5AYL
-        tdCaNKgl76nRmAdlcPOFJuAfQzO1WYAAjUenQjYCAyxf0Qk9Mr6Fx7Q3te9IQ3BM6B3xBJgJfl0zU
-        lt3jgvbA==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1q6H2k-0007Tg-1U; Mon, 05 Jun 2023 22:43:10 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1q6H2b-0004Fs-82; Mon, 05 Jun 2023 22:43:01 +0200
-Message-ID: <80f7f3dc-285f-39c3-655e-fd4a499f81a1@rbox.co>
-Date:   Mon, 5 Jun 2023 22:42:59 +0200
-MIME-Version: 1.0
-User-Agent: Thunderbird
-Subject: Re: [PATCH v2] KVM: allow KVM_BUG/KVM_BUG_ON to handle 64-bit cond
-Content-Language: pl-PL, en-GB
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     dmatlack@google.com, mizhang@google.com, isaku.yamahata@gmail.com,
-        pbonzini@redhat.com, Wei Wang <wei.w.wang@intel.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230307135233.54684-1-wei.w.wang@intel.com>
- <168565180722.660019.15543226381784798973.b4-ty@google.com>
- <8f319a1e-a869-b666-b606-c0b4764ef7b1@rbox.co> <ZHofVKJxjaUxIDUN@google.com>
- <7a4a503d-9fc4-d366-02b4-bc145943bd45@rbox.co> <ZH39H0gpNX4ak6yM@google.com>
-From:   Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <ZH39H0gpNX4ak6yM@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232964AbjFEUn3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 16:43:29 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 721A5EC
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 13:43:28 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-568960f4596so87616367b3.1
+        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 13:43:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1685997807; x=1688589807;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ICeGZIs40frckeRMgP118BFqvwVxt76v5BvLpjWGtEE=;
+        b=AGGvGj4kbhTcDK6teOtsJ8pOGUFJqw7a0bsRyQTqH9V7iS0KIHVI3hCKq1GKNhycjH
+         jLTi/eOJlyUUO93XrauBBjK9eaX4lsqatX16BOBA1SKOzYtGZ5cOIeAel6Z8hqJ4vO9l
+         FpnM7zWNKuhwVyY82qhwSiTuqJKVKudLtG7Ys3AaR4oGvNGjTnloIY8MXWqb2mT+Z4co
+         p2oatktkP04Pdui5QjzMDLAZ0//7t/qSj/uNOyCwm/Rb0uxvNH3cp9oi5DWNCg3IH9k8
+         fwfVwNPLn4jhIs/2YnnLKaVDnDqmNudJ9vi2ZznkBxgA3fM3F8EpO6A09z2NiLev/G1D
+         rXQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685997807; x=1688589807;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ICeGZIs40frckeRMgP118BFqvwVxt76v5BvLpjWGtEE=;
+        b=UumU3AiwVrI6Vkqzm6jUB5a/DqPi/mSXsjj+haUkPK0q8Eb1Ray9YfOKqXD4Ne8TvL
+         8UghVU3Qw19oNcMd5M6xKJhaSP9OTbsYSo2f+YwecUrAMtOrYhkhvgJzyzrU3snte3+E
+         npek1Qrds1YkneeDZ3vKf+URlXrjVON7Fv4tdqYzTtWDzBbu3x1IJ5IVbAixkAJYY+5S
+         +1dd1YQpa4uEVbajf/XLzfuSox7j4i7CLXmv/OMxP9ZpZw05OdUoLdjevr+jbmR+iFJa
+         fJUhxssOoyEw8THc+MKUY0+7xJEFYXSFnNiPYF/1+Lzc57IELUnSLXyy+/qHrywRUVuH
+         I/yg==
+X-Gm-Message-State: AC+VfDzXq+Yl2uIFWzqD7Vd+4ZHW+sR0lNXFxxEYovcp4SH8jjTPjmLG
+        BB0KRJWsERq77m4tKX3hs6y2eaouRgE=
+X-Google-Smtp-Source: ACHHUZ5Y6uNx7raB+b8cOh1cZPGPMICHINl67pBE3CnRSWyuk0uYk4gqIBKJkpyLzOmSFt11urQuIsG3rBo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:c08f:0:b0:ba8:93c3:2e3 with SMTP id
+ c137-20020a25c08f000000b00ba893c302e3mr7576051ybf.13.1685997807753; Mon, 05
+ Jun 2023 13:43:27 -0700 (PDT)
+Date:   Mon, 5 Jun 2023 13:43:25 -0700
+In-Reply-To: <20230424225854.4023978-4-aaronlewis@google.com>
+Mime-Version: 1.0
+References: <20230424225854.4023978-1-aaronlewis@google.com> <20230424225854.4023978-4-aaronlewis@google.com>
+Message-ID: <ZH5I7e6SwYDnAreK@google.com>
+Subject: Re: [PATCH v2 3/6] KVM: selftests: Add additional pages to the guest
+ to accommodate ucall
+From:   Sean Christopherson <seanjc@google.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/5/23 17:19, Sean Christopherson wrote:
-> On Mon, Jun 05, 2023, Michal Luczaj wrote:
->> OK, so xa_store() aside[*], I see some bool-to-bools:
->>
->> arch/x86/kvm/x86.c:
->> 	kvm_msr_allowed():allowed = !!test_bit(index - start, bitmap);
->> arch/x86/kvm/hyperv.c:
->> 	kvm_hv_hypercall():hc.rep = !!(hc.rep_cnt || hc.rep_idx);
->> arch/x86/kvm/mmu/mmu.c:
->> 	update_pkru_bitmask():
->> 		pkey_bits = !!check_pkey;
->> 		pkey_bits |= (!!check_write) << 1;
->> arch/x86/kvm/svm/svm.c:
->> 	msr_write_intercepted():return !!test_bit(bit_write,  &tmp);
->> 	svm_vcpu_after_set_cpuid():
->> 		2x set_msr_interception...
->> tools/testing/selftests/kvm/x86_64/vmx_exception_with_invalid_guest_state.c:
->> 	set_or_clear_invalid_guest_state():sregs.tr.unusable = !!set;
->>
->> But perhaps this is a matter of style and those were meant to be this kind-of
->> explicit?
+On Mon, Apr 24, 2023, Aaron Lewis wrote:
+> Add additional pages to the guest to account for the number of pages
+> the ucall framework uses.
 > 
-> I doubt it, I'm guessing most cases are due to the author being overzealous for
-> one reason or another, e.g. I suspect the test_bit() ones are due to the original
-> author incorrectly assuming test_bit() returned an unsigned long, i.e. the bit,
-> as opposed to the bool.
-> 
-> If you want to clean these up, I'd say "fix" the test_bit() cases, but leave the
-> others alone.  The test_bit() ones are clearly redundant, and IMO can be actively
-> due to implying test_bit() returns something other than a bool.
+> This is done in preparation for adding string formatting options to
+> the guest through ucall helpers.
 
-Done: https://lore.kernel.org/kvm/20230605200158.118109-1-mhal@rbox.co/
+IIUC, this is a bug fix, but things work today because the ucall overhead is small
+enough to be covered by the arbitrary 512 page buffer.  If that's correct, please
+state that in the changelog.
