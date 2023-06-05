@@ -2,135 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 537F9722836
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 16:07:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BA77722869
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 16:10:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234012AbjFEOHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 10:07:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35920 "EHLO
+        id S233868AbjFEOK0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 10:10:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233657AbjFEOH1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 10:07:27 -0400
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84418E51
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 07:07:04 -0700 (PDT)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-565a6837a0bso53725797b3.3
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 07:07:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1685974023; x=1688566023;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=22URbF900EBd4icpqPzx3Q5fCps0hcQuXxW2iJbAl4c=;
-        b=W/mRSqfJctGPWaId4D6Y6/E2gyd+EQQdG0jI5tOxk00x7tcpnlaoZ+k6bLEM1hvo3o
-         Km+ysnriKJopRLz9K2d4jLJCIX7QZDxg2yk0loJl2VIVD5cnJdxRzxhclXU4NZ1WT8rm
-         GwlfnaXbDZa/T48d/ljBugcAQbZpJdupLJe3wXs5XADMT62oC6Pg5iVxtH0BRhhXfvKT
-         ON+4AIclq8VoE+0I3XTdV8W7OSGNrqnmIh6oTUh2TjTftLX30muPrX57uAJ9Zejm/QcD
-         fzm+Ry9uIBq0xN9BidJMSme3dYnH5sjolAfzGDyjLCokkImeTL6LgB9efqxTTf90nDsB
-         lMKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685974023; x=1688566023;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=22URbF900EBd4icpqPzx3Q5fCps0hcQuXxW2iJbAl4c=;
-        b=WFGztnskmCl61baoUz4j79hfxA9sFbbeouCa/FPJKkzPnCpQxjeznfp/gWUjZpPZ6j
-         XxrWmr+fGlknbvmRmQsd/mQ6UuCnDHYTX5++IE/lWxP/Cb8e4UYbiIzWA1SBViKMVuwT
-         ff7eeDLrSUwYaFKWRBty1ygkWBirpZMNhq01esGO0DqqNmf3E5oAL8ZSJlKJGIQ45Nr2
-         LdMviCwBzXioq86kjUZ8Q1qpsvlK65LZ8owzOP8ZjMISARF9HPZhwUgUDdPuDtGDFKgB
-         Nql28X/EOfVxCG4rf/OOLaAHDPFng05sAMQCO3cM/TwlSaA1KZtvgxW3wlceTgZyQNsh
-         d8kA==
-X-Gm-Message-State: AC+VfDyKJT/vG3XLAaOwnoz0bBVtONx9vHmeteYPGDzKcapyQLwXiMNb
-        4ibjD1lNInV5PJPsRzS1PgkInxqOCq0n2Iw56CCnrQ==
-X-Google-Smtp-Source: ACHHUZ4+yWZUP1bmbjIaklr8eQbioKSYJIvRVs7VOTy6ZFuFIq8RstzWeV8Rj8CITOGwCcP1AepesLBgFnaTTxuPid0=
-X-Received: by 2002:a81:92cc:0:b0:565:d3f9:209e with SMTP id
- j195-20020a8192cc000000b00565d3f9209emr9414177ywg.34.1685974023316; Mon, 05
- Jun 2023 07:07:03 -0700 (PDT)
+        with ESMTP id S234567AbjFEOJu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 10:09:50 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C26C410C9;
+        Mon,  5 Jun 2023 07:08:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685974136; x=1717510136;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Aj5xU0E8HM6ruKdnFvz1ex49rnTP0xoMbsNDzlocswU=;
+  b=kQ4YzbklciIK5QCQvmmhSu2BzXjBZ6bgKxNBZAdKQSEBii6qgbUrAyrP
+   MOpHecXysrObkz4Li2ZZ9KuGK0eKkLCfkCIFooyLjTOsoG4ioIy+L/jtI
+   0bwAgfbq5yyks+cBJFIuxBcz+qlXEnS0cd1A3bBuIsNobFWZXjPgwRbc6
+   xPaFbhyLxTEBS+EyRW2Eags1YA4L9+7cijlCsMfytjXhwF+9AgML+CHM1
+   NfXdHQfBeAIoLDpr5HCYvvM4HDP0mfRty9ETNaJQQJ6wjFzCUZwgDypmc
+   FoY5tCzUOulbyJ/1XpK8jkzf4iKeLjSCKUpcVJsQW464WX9kFkWrOkNf2
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="345968045"
+X-IronPort-AV: E=Sophos;i="6.00,217,1681196400"; 
+   d="scan'208";a="345968045"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2023 07:07:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="708662638"
+X-IronPort-AV: E=Sophos;i="6.00,217,1681196400"; 
+   d="scan'208";a="708662638"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orsmga002.jf.intel.com with ESMTP; 05 Jun 2023 07:07:26 -0700
+Date:   Mon, 5 Jun 2023 22:07:25 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 3/6] KVM: VMX: Add new ops in kvm_x86_ops for LASS
+ violation check
+Message-ID: <20230605140725.32ogo6gbhqyl4kfl@yy-desk-7060>
+References: <20230601142309.6307-1-guang.zeng@intel.com>
+ <20230601142309.6307-4-guang.zeng@intel.com>
 MIME-Version: 1.0
-References: <20230510083748.1056704-1-apatel@ventanamicro.com>
- <20230510083748.1056704-2-apatel@ventanamicro.com> <20230605121221.GA20843@willie-the-truck>
- <CAK9=C2WfNSsW-OODnNVrrxq9YvxBqjT94tWp81pBiKj5e-jjVQ@mail.gmail.com> <20230605134938.GA21212@willie-the-truck>
-In-Reply-To: <20230605134938.GA21212@willie-the-truck>
-From:   Anup Patel <apatel@ventanamicro.com>
-Date:   Mon, 5 Jun 2023 19:36:52 +0530
-Message-ID: <CAK9=C2VtB+usAivCiQFi37y=aRxwJpFRwSKk7Z=f1tY4LV4d+g@mail.gmail.com>
-Subject: Re: [PATCH kvmtool 1/8] Sync-up headers with Linux-6.4-rc1
-To:     Will Deacon <will@kernel.org>
-Cc:     julien.thierry.kdev@gmail.com, maz@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230601142309.6307-4-guang.zeng@intel.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 5, 2023 at 7:19=E2=80=AFPM Will Deacon <will@kernel.org> wrote:
+On Thu, Jun 01, 2023 at 10:23:06PM +0800, Zeng Guang wrote:
+> Intel introduces LASS (Linear Address Separation) feature providing
+> an independent mechanism to achieve the mode-based protection.
 >
-> On Mon, Jun 05, 2023 at 07:04:27PM +0530, Anup Patel wrote:
-> > On Mon, Jun 5, 2023 at 5:42=E2=80=AFPM Will Deacon <will@kernel.org> wr=
-ote:
-> > > On Wed, May 10, 2023 at 02:07:41PM +0530, Anup Patel wrote:
-> > > > We sync-up Linux headers to get latest KVM RISC-V headers having
-> > > > SBI extension enable/disable, Zbb, Zicboz, and Ssaia support.
-> > > >
-> > > > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> > > > ---
-> > > >  arm/aarch64/include/asm/kvm.h |  38 ++++++++++++
-> > > >  include/linux/kvm.h           |  57 +++++++++++-------
-> > > >  include/linux/virtio_blk.h    | 105 ++++++++++++++++++++++++++++++=
-++++
-> > > >  include/linux/virtio_config.h |   6 ++
-> > > >  include/linux/virtio_net.h    |   5 ++
-> > > >  riscv/include/asm/kvm.h       |  56 +++++++++++++++++-
-> > > >  x86/include/asm/kvm.h         |  50 ++++++++++++----
-> > > >  7 files changed, 286 insertions(+), 31 deletions(-)
-> > >
-> > > This breaks the build for x86:
-> > >
-> > > Makefile:386: Skipping optional libraries: vncserver SDL
-> > >   CC       builtin-balloon.o
-> > > In file included from include/linux/kvm.h:15,
-> > >                  from include/kvm/pci.h:5,
-> > >                  from include/kvm/vfio.h:6,
-> > >                  from include/kvm/kvm-config.h:5,
-> > >                  from include/kvm/kvm.h:6,
-> > >                  from builtin-balloon.c:9:
-> > > x86/include/asm/kvm.h:511:17: error: expected specifier-qualifier-lis=
-t before =E2=80=98__DECLARE_FLEX_ARRAY=E2=80=99
-> > >   511 |                 __DECLARE_FLEX_ARRAY(struct kvm_vmx_nested_st=
-ate_data, vmx);
-> > >       |                 ^~~~~~~~~~~~~~~~~~~~
-> > > make: *** [Makefile:508: builtin-balloon.o] Error 1
-> >
-> > It seems __DECLARE_FLEX_ARRAY() is not defined in
-> > include/linux/stddef.h header of KVMTOOL.
-> >
-> > I will send v2 series with this fixed.
+> LASS partitions 64-bit linear address space into two halves, user-mode
+> address (LA[bit 63]=0) and supervisor-mode address (LA[bit 63]=1). It
+> stops any code execution or conditional data access[1]
+>     1. from user mode to supervisor-mode address space
+>     2. from supervisor mode to user-mode address space
+> and generates LASS violation fault accordingly.
 >
-> Alternatively, you could take a look at the series from Oliver which
-> also pulls in the -rc1 headers (I've not had chance to test it out yet,
-> though).
+> [1]A supervisor mode data access causes a LASS violation only if supervisor
+> mode access protection is enabled (CR4.SMAP = 1) and either RFLAGS.AC = 0
+> or the access implicitly accesses a system data structure.
 >
-> https://lore.kernel.org/r/20230526221712.317287-1-oliver.upton@linux.dev
-
-
-I did not try this series but I think we will get x86 compile error with th=
-is
-series as well because this series does not add __DECLARE_FLEX_ARRAY()
-define.
-
-Regards,
-Anup
-
+> Following are the rules of LASS violation check on the linear address(LA).
+> User access to supervisor-mode address space:
+>     LA[bit 63] && (CPL == 3)
+> Supervisor access to user-mode address space:
+>     Instruction fetch: !LA[bit 63] && (CPL < 3)
+>     Data access: !LA[bit 63] && (CR4.SMAP==1) && ((RFLAGS.AC == 0 &&
+>                  CPL < 3) || Implicit supervisor access)
 >
-> Will
+> Add new ops in kvm_x86_ops to do LASS violation check.
+>
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
+> ---
+>  arch/x86/include/asm/kvm-x86-ops.h |  3 +-
+>  arch/x86/include/asm/kvm_host.h    |  2 ++
+>  arch/x86/kvm/kvm_emulate.h         |  1 +
+>  arch/x86/kvm/vmx/vmx.c             | 47 ++++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/vmx.h             |  2 ++
+>  5 files changed, 54 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index 13bc212cd4bc..8980a3bfa687 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -132,7 +132,8 @@ KVM_X86_OP_OPTIONAL(migrate_timers)
+>  KVM_X86_OP(msr_filter_changed)
+>  KVM_X86_OP(complete_emulated_msr)
+>  KVM_X86_OP(vcpu_deliver_sipi_vector)
+> -KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+> +KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons)
+> +KVM_X86_OP_OPTIONAL_RET0(check_lass)
+>
+>  #undef KVM_X86_OP
+>  #undef KVM_X86_OP_OPTIONAL
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 92d8e65fe88c..98666d1e7727 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1731,6 +1731,8 @@ struct kvm_x86_ops {
+>  	 * Returns vCPU specific APICv inhibit reasons
+>  	 */
+>  	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
+> +
+> +	bool (*check_lass)(struct kvm_vcpu *vcpu, u64 access, u64 la, u32 flags);
+>  };
+>
+>  struct kvm_x86_nested_ops {
+> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+> index 5b9ec610b2cb..f1439ab7c14b 100644
+> --- a/arch/x86/kvm/kvm_emulate.h
+> +++ b/arch/x86/kvm/kvm_emulate.h
+> @@ -91,6 +91,7 @@ struct x86_instruction_info {
+>  /* x86-specific emulation flags */
+>  #define X86EMUL_F_FETCH			BIT(0)
+>  #define X86EMUL_F_WRITE			BIT(1)
+> +#define X86EMUL_F_SKIPLASS		BIT(2)
+>
+>  struct x86_emulate_ops {
+>  	void (*vm_bugged)(struct x86_emulate_ctxt *ctxt);
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index a33205ded85c..876997e8448e 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -8130,6 +8130,51 @@ static void vmx_vm_destroy(struct kvm *kvm)
+>  	free_pages((unsigned long)kvm_vmx->pid_table, vmx_get_pid_table_order(kvm));
+>  }
+>
+> +/*
+> + * Determine whether an access to the linear address causes a LASS violation.
+> + * LASS protection is only effective in long mode. As a prerequisite, caller
+> + * should make sure vCPU running in long mode and invoke this api to do LASS
+> + * violation check.
+> + */
+> +bool vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u32 flags)
+> +{
+> +	bool user_mode, user_as, rflags_ac;
+> +
+> +	if (!!(flags & X86EMUL_F_SKIPLASS) ||
+> +	    !kvm_is_cr4_bit_set(vcpu, X86_CR4_LASS))
+> +		return false;
+> +
+> +	WARN_ON_ONCE(!is_long_mode(vcpu));
+> +
+> +	user_as = !(la >> 63);
+> +
+> +	/*
+> +	 * An access is a supervisor-mode access if CPL < 3 or if it implicitly
+> +	 * accesses a system data structure. For implicit accesses to system
+> +	 * data structure, the processor acts as if RFLAGS.AC is clear.
+> +	 */
+> +	if (access & PFERR_IMPLICIT_ACCESS) {
+> +		user_mode = false;
+> +		rflags_ac = false;
+> +	} else {
+> +		user_mode = vmx_get_cpl(vcpu) == 3;
+> +		if (!user_mode)
+> +			rflags_ac = !!(kvm_get_rflags(vcpu) & X86_EFLAGS_AC);
+> +	}
+> +
+> +	if (user_mode == user_as)
+
+Confused by user_as, it's role of address(U/S) so how about
+"user_addr" ? "if (user_mode == user_addr)" looks more clear
+to me.
+
+> +		return false;
+> +
+> +	/*
+> +	 * Supervisor-mode _data_ accesses to user address space
+> +	 * cause LASS violations only if SMAP is enabled.
+> +	 */
+> +	if (!user_mode && !(access & PFERR_FETCH_MASK))
+> +		return kvm_is_cr4_bit_set(vcpu, X86_CR4_SMAP) && !rflags_ac;
+> +
+> +	return true;
+> +}
+> +
+>  static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>  	.name = KBUILD_MODNAME,
+>
+> @@ -8269,6 +8314,8 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>  	.complete_emulated_msr = kvm_complete_insn_gp,
+>
+>  	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
+> +
+> +	.check_lass = vmx_check_lass,
+>  };
+>
+>  static unsigned int vmx_handle_intel_pt_intr(void)
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index 9e66531861cf..f2e775b9849b 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -433,6 +433,8 @@ void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type);
+>  u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu);
+>  u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
+>
+> +bool vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u32 flags);
+> +
+>  static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr,
+>  					     int type, bool value)
+>  {
+> --
+> 2.27.0
+>
