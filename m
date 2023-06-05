@@ -2,67 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 170CF722B66
-	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 17:40:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A09B722B68
+	for <lists+kvm@lfdr.de>; Mon,  5 Jun 2023 17:40:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234898AbjFEPkQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 11:40:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43546 "EHLO
+        id S233258AbjFEPkb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 11:40:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233845AbjFEPkJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 11:40:09 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FF8118E
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 08:40:07 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1b01dac1a82so24970465ad.2
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 08:40:07 -0700 (PDT)
+        with ESMTP id S234868AbjFEPkW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 11:40:22 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD1CF131
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 08:40:13 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-53f9a376f3eso4371515a12.0
+        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 08:40:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1685979607; x=1688571607;
+        d=sifive.com; s=google; t=1685979613; x=1688571613;
         h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=peA7uNBICYxq78TCCLilok9fr+B5gTYL7MG+xHpLNFU=;
-        b=RFh4xAkvYh3f6QR+0XxnxTmnNZRh6PgSSh0DDSPDE2PjLKjQokrhAYmYM5dILHmT2u
-         tdSPgkHZiI8CmClOVVxAULvfDeIbjr8jgO3uD4jLNGrSufutHHAziJXxKCQW8OGX7KgC
-         svpNkOdKQImWBoYlOc3uNdgyZ/4OLsAEbwZrctVF05JaMmLTw2JLLE07biXaKWdXU9gG
-         An2uwwe+AI9eY2IGufvCqOqVCE/LGcBcImLt0r98qPSBE0hxN3jF0/aOitmiaV+pSGuw
-         RaoxlggCBAIczXH9A0UCHRR9xRBTQ480h6WZt9E5JZHTfdbHdYiLfUQLShQlwcIHlgYU
-         lemw==
+        bh=FRXZE7cUr4vJpRYfnGIy+KdEpJQsKyQubDyjJds5WmA=;
+        b=KXDBMuXNRHN6JZLLghcXJyvyn1zh00oaVAe1p59PxzuFAYdYJ8f27/TP1uvAINptqH
+         nlcYcAkf+nJGFg9F+LyYqP0Ymo2Lij+XAmL0HH+Cqp92M6UdeXErSfZ7PYKmP7rYsaA6
+         7GQoibFMEo+e9BZCqbS77OBneeYePiXGgsN12CiPPQCRazNM4xoQ/iFocSjGVEZmK4M7
+         tkZUw2BhKyzNhLADu9McrKQmlX9tJTB5AleLiuKcPRH3GudtLqADDazxwOcVuo1Jex4Q
+         B2gRWXR2EXEvHqK1khlKXmReI3jvkYgACmQxyQZlHagbbk77z2fEM87K1RP76tszm8cl
+         cXoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685979607; x=1688571607;
+        d=1e100.net; s=20221208; t=1685979613; x=1688571613;
         h=references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=peA7uNBICYxq78TCCLilok9fr+B5gTYL7MG+xHpLNFU=;
-        b=aS6+zcZ2WA/lfhRSz94nw+muzlLwJ3x5DzDcatKA2UWky+p5sJ3UINTrbIu6D2fT6v
-         Qa/i0Th2Svsvsn8rJwfyo2XX3NPJkDQWArQA789joZUidhmA58E86fehIj4hP2u4eXNW
-         Tv5hLDzs+ITiIIykNbkrP6zRC0o3ukB9mhiMs0URFJ/2pph9ND6Y9EjR7U6issW4kzGW
-         H0SnZoeAyh6eZZzMwURFKoyH8dGqw+3xV7+Ib7ESoBz2N8OTEWWNyA3mmBPBnwzxnu3b
-         97vZMUXIdLXI7qU/ueVeH0TGR6cmw1vSVnqQjlhYd7erOIMbPucILl0HxpFUJhlD2e2U
-         784Q==
-X-Gm-Message-State: AC+VfDxOI8l1i5LUiBjbQkrd9y0FDx6Auxg64UfXGRTW8UrJz/+e0bNz
-        sOFC8+eGv5N6sAIJ4C56TwChMg==
-X-Google-Smtp-Source: ACHHUZ7gYODQ3SKlK35nN9OhEisobMlQaL3fKtJqvAH701pPC6rDPo6Jb5H+GX2b1PvrbT1TdvrUXQ==
-X-Received: by 2002:a17:902:fe01:b0:1b0:307c:e6fe with SMTP id g1-20020a170902fe0100b001b0307ce6femr3421831plj.10.1685979607093;
-        Mon, 05 Jun 2023 08:40:07 -0700 (PDT)
+        bh=FRXZE7cUr4vJpRYfnGIy+KdEpJQsKyQubDyjJds5WmA=;
+        b=PyrNaepIndIhIpKe2ZjrTdYm8pLyoVe1AJqy/D1YKGogUwgdDmNb/GlGEdbI+ykU5w
+         knd94OzwtGPnmdeIcIoAnY03xSTGMmYvqnIUclT+Aeyj2dMHGdcejBBTmK6Ptk9UNVpH
+         myk+vQ0M6zm7HoA1eFviQKT+Ld0C16spELMSJiFWuzalZGESBD39lpn7DNlwXExPuhGe
+         zX01vWdYP1uv7eE8Yy/XXR5On0pFQGES4EotzWkWvkuLuKjRhTnnZkoBsaJM9Rn1rbRa
+         L2Jf41gOVmMNTK50WtUKIgTxfLUDsPVtzw/LOlw85w/yRJ7Yv+wR7TqpknQjs9yvKECF
+         aKbg==
+X-Gm-Message-State: AC+VfDw8ECMgtj1MtWqkuKAIrc5D62PNxY3cE6fGRW9ZLq/w3DcIaXzI
+        ZyIBC4lnKdEH04qQw3bpL4krRA==
+X-Google-Smtp-Source: ACHHUZ4j8vLA1CQX4UCgLtGjbolr0/w7QSNG9j2AAzYc8zViCUwWht91Jm831ibcZIARgx8zaguymA==
+X-Received: by 2002:a17:902:d506:b0:1b1:9233:bbf5 with SMTP id b6-20020a170902d50600b001b19233bbf5mr10010498plg.57.1685979613098;
+        Mon, 05 Jun 2023 08:40:13 -0700 (PDT)
 Received: from hsinchu26.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id jk19-20020a170903331300b001b0aec3ed59sm6725962plb.256.2023.06.05.08.40.03
+        by smtp.gmail.com with ESMTPSA id jk19-20020a170903331300b001b0aec3ed59sm6725962plb.256.2023.06.05.08.40.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 08:40:06 -0700 (PDT)
+        Mon, 05 Jun 2023 08:40:12 -0700 (PDT)
 From:   Andy Chiu <andy.chiu@sifive.com>
 To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
         anup@brainfault.org, atishp@atishpatra.org,
         kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
 Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
+        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
+        Han-Kuan Chen <hankuan.chen@sifive.com>,
+        Andy Chiu <andy.chiu@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
+        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
+        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@rivosinc.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Andrew Bresticker <abrestic@rivosinc.com>,
         Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Vincent Chen <vincent.chen@sifive.com>,
         Conor Dooley <conor.dooley@microchip.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Guo Ren <guoren@kernel.org>
-Subject: [PATCH -next v21 05/27] riscv: Clear vector regfile on bootup
-Date:   Mon,  5 Jun 2023 11:07:02 +0000
-Message-Id: <20230605110724.21391-6-andy.chiu@sifive.com>
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH -next v21 06/27] riscv: Disable Vector Instructions for kernel itself
+Date:   Mon,  5 Jun 2023 11:07:03 +0000
+Message-Id: <20230605110724.21391-7-andy.chiu@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230605110724.21391-1-andy.chiu@sifive.com>
 References: <20230605110724.21391-1-andy.chiu@sifive.com>
@@ -76,67 +81,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Greentime Hu <greentime.hu@sifive.com>
+From: Guo Ren <guoren@linux.alibaba.com>
 
-clear vector registers on boot if kernel supports V.
+Disable vector instructions execution for kernel mode at its entrances.
+This helps find illegal uses of vector in the kernel space, which is
+similar to the fpu.
 
+Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
+Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
+Co-developed-by: Han-Kuan Chen <hankuan.chen@sifive.com>
+Signed-off-by: Han-Kuan Chen <hankuan.chen@sifive.com>
+Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
 Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
 Signed-off-by: Vineet Gupta <vineetg@rivosinc.com>
 Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 Reviewed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 Tested-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
 ---
- arch/riscv/kernel/head.S | 27 +++++++++++++++++++++++++--
- 1 file changed, 25 insertions(+), 2 deletions(-)
+Changelog V19:
+ - Add description in commit msg (Heiko's suggestion on v17)
+---
+ arch/riscv/kernel/entry.S |  6 +++---
+ arch/riscv/kernel/head.S  | 12 ++++++------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
+diff --git a/arch/riscv/kernel/entry.S b/arch/riscv/kernel/entry.S
+index 3fbb100bc9e4..e9ae284a55c1 100644
+--- a/arch/riscv/kernel/entry.S
++++ b/arch/riscv/kernel/entry.S
+@@ -48,10 +48,10 @@ _save_context:
+ 	 * Disable user-mode memory access as it should only be set in the
+ 	 * actual user copy routines.
+ 	 *
+-	 * Disable the FPU to detect illegal usage of floating point in kernel
+-	 * space.
++	 * Disable the FPU/Vector to detect illegal usage of floating point
++	 * or vector in kernel space.
+ 	 */
+-	li t0, SR_SUM | SR_FS
++	li t0, SR_SUM | SR_FS_VS
+ 
+ 	REG_L s0, TASK_TI_USER_SP(tp)
+ 	csrrc s1, CSR_STATUS, t0
 diff --git a/arch/riscv/kernel/head.S b/arch/riscv/kernel/head.S
-index 4bf6c449d78b..3fd6a4bd9c3e 100644
+index 3fd6a4bd9c3e..e16bb2185d55 100644
 --- a/arch/riscv/kernel/head.S
 +++ b/arch/riscv/kernel/head.S
-@@ -392,7 +392,7 @@ ENTRY(reset_regs)
- #ifdef CONFIG_FPU
- 	csrr	t0, CSR_MISA
- 	andi	t0, t0, (COMPAT_HWCAP_ISA_F | COMPAT_HWCAP_ISA_D)
--	beqz	t0, .Lreset_regs_done
-+	beqz	t0, .Lreset_regs_done_fpu
+@@ -140,10 +140,10 @@ secondary_start_sbi:
+ 	.option pop
  
- 	li	t1, SR_FS
- 	csrs	CSR_STATUS, t1
-@@ -430,8 +430,31 @@ ENTRY(reset_regs)
- 	fmv.s.x	f31, zero
- 	csrw	fcsr, 0
- 	/* note that the caller must clear SR_FS */
-+.Lreset_regs_done_fpu:
- #endif /* CONFIG_FPU */
--.Lreset_regs_done:
-+
-+#ifdef CONFIG_RISCV_ISA_V
-+	csrr	t0, CSR_MISA
-+	li	t1, COMPAT_HWCAP_ISA_V
-+	and	t0, t0, t1
-+	beqz	t0, .Lreset_regs_done_vector
-+
-+	/*
-+	 * Clear vector registers and reset vcsr
-+	 * VLMAX has a defined value, VLEN is a constant,
-+	 * and this form of vsetvli is defined to set vl to VLMAX.
-+	 */
-+	li	t1, SR_VS
-+	csrs	CSR_STATUS, t1
-+	csrs	CSR_VCSR, x0
-+	vsetvli t1, x0, e8, m8, ta, ma
-+	vmv.v.i v0, 0
-+	vmv.v.i v8, 0
-+	vmv.v.i v16, 0
-+	vmv.v.i v24, 0
-+	/* note that the caller must clear SR_VS */
-+.Lreset_regs_done_vector:
-+#endif /* CONFIG_RISCV_ISA_V */
- 	ret
- END(reset_regs)
- #endif /* CONFIG_RISCV_M_MODE */
+ 	/*
+-	 * Disable FPU to detect illegal usage of
+-	 * floating point in kernel space
++	 * Disable FPU & VECTOR to detect illegal usage of
++	 * floating point or vector in kernel space
+ 	 */
+-	li t0, SR_FS
++	li t0, SR_FS_VS
+ 	csrc CSR_STATUS, t0
+ 
+ 	/* Set trap vector to spin forever to help debug */
+@@ -234,10 +234,10 @@ pmp_done:
+ .option pop
+ 
+ 	/*
+-	 * Disable FPU to detect illegal usage of
+-	 * floating point in kernel space
++	 * Disable FPU & VECTOR to detect illegal usage of
++	 * floating point or vector in kernel space
+ 	 */
+-	li t0, SR_FS
++	li t0, SR_FS_VS
+ 	csrc CSR_STATUS, t0
+ 
+ #ifdef CONFIG_RISCV_BOOT_SPINWAIT
 -- 
 2.17.1
 
