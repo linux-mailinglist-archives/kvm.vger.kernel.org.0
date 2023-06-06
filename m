@@ -2,57 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33D16724DAE
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 22:09:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3E69724DFF
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 22:26:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239653AbjFFUJK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 16:09:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44672 "EHLO
+        id S239363AbjFFU0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 16:26:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234163AbjFFUJH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 16:09:07 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12BBB10F3;
-        Tue,  6 Jun 2023 13:09:06 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1686082144;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dKfeNRDWpLHUEEC01i9Rlsx18vHA0whT8VRGD7XtedM=;
-        b=xLBE8261NbfQa21cZUhMzi4zbsJZJpSuXjRrLztVj9Eo9+RaVlRlHYAG3+Wt81IgfFP9gO
-        RjPvWQZZA/B2ZoDu5plQstMi9yqH+ZM+LdIs64WVmb2E9NFY/Q79mZ2IRvBV1iK6KuntJF
-        IteSC6RFbrrFH9lnLMKS2uXCYIJHqG1K6aj/JvbOVLZ2vvYd+JpCyBZDv0qMiPzWVN2h24
-        FoABQpRJbPNRSw7UWEZKryMgPtOLdZ9lRqTSBP7rmc5DwHkyYs+0Pbg0yNXDI3sOEXiayj
-        p1LPEb2/6jIwLYjxYbiWp3vAxu6kRgQXWiF/JYu7PS08TWeEsBCyl0BRgzzr2g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1686082144;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dKfeNRDWpLHUEEC01i9Rlsx18vHA0whT8VRGD7XtedM=;
-        b=ZOzeXIJdsqhx4kcEoZWhZeQ+p2mmum1y7Ixvn0vCSKKuP8V/s2NuKBC2tvxNDRRbPbW5YY
-        gS5bN76qyyKR5nAw==
-To:     "H. Peter Anvin" <hpa@zytor.com>, Xin Li <xin3.li@intel.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
-Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        peterz@infradead.org, andrew.cooper3@citrix.com, seanjc@google.com,
-        pbonzini@redhat.com, ravi.v.shankar@intel.com,
-        jiangshanlai@gmail.com, shan.kang@intel.com
-Subject: Re: [PATCH v8 01/33] x86/traps: let common_interrupt() handle
- IRQ_MOVE_CLEANUP_VECTOR
-In-Reply-To: <70ef07f1-e3b7-7c4e-01ac-11f159a87a6b@zytor.com>
-References: <20230410081438.1750-1-xin3.li@intel.com>
- <20230410081438.1750-2-xin3.li@intel.com> <87leh08e1h.ffs@tglx>
- <87edmp6doh.ffs@tglx> <70ef07f1-e3b7-7c4e-01ac-11f159a87a6b@zytor.com>
-Date:   Tue, 06 Jun 2023 22:09:03 +0200
-Message-ID: <877csgl5eo.ffs@tglx>
+        with ESMTP id S238484AbjFFU0P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 16:26:15 -0400
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46532E5B;
+        Tue,  6 Jun 2023 13:26:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1686083174; x=1717619174;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=v1GnwDotzgDvCEpzlZKh4p4TBu2ATvhr3nGE68dLeoo=;
+  b=paFie8CHAlrxv3FQ5M+vHccY6qYPMv/s9UuFUhl5EBr5hCga5zGJbKyb
+   xFxC0oOLD3UwxldolqgxbxFqrAUlY1OvpJk0jYn+Uu4Ii4FAy81p6yKDE
+   Z6rPnKaZ8YsnJt4jQr48ozEL7geojwCja0o85lohaPT0ljs76+0WSj6UA
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.00,221,1681171200"; 
+   d="scan'208";a="585996238"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-153b24bc.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 20:26:11 +0000
+Received: from EX19MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1d-m6i4x-153b24bc.us-east-1.amazon.com (Postfix) with ESMTPS id DA565C3B8B;
+        Tue,  6 Jun 2023 20:26:08 +0000 (UTC)
+Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 6 Jun 2023 20:26:08 +0000
+Received: from dev-dsk-luizcap-1d-37beaf15.us-east-1.amazon.com (10.39.210.33)
+ by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Tue, 6 Jun 2023 20:26:08 +0000
+Received: by dev-dsk-luizcap-1d-37beaf15.us-east-1.amazon.com (Postfix, from userid 23276196)
+        id E63A223; Tue,  6 Jun 2023 20:26:07 +0000 (UTC)
+Date:   Tue, 6 Jun 2023 20:26:07 +0000
+From:   Luiz Capitulino <luizcap@amazon.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Li RongQing <lirongqing@baidu.com>,
+        Yong He <zhuangel570@gmail.com>,
+        Robert Hoo <robert.hoo.linux@gmail.com>,
+        Kai Huang <kai.huang@intel.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Add "never" option to allow sticky
+ disabling of nx_huge_pages
+Message-ID: <20230606202557.GA71782@dev-dsk-luizcap-1d-37beaf15.us-east-1.amazon.com>
+References: <20230602005859.784190-1-seanjc@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230602005859.784190-1-seanjc@google.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,296 +67,173 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 05 2023 at 10:09, H. Peter Anvin wrote:
-> On 6/5/23 10:07, Thomas Gleixner wrote:
->> There is zero reason for this to be an IPI. This can be delegated to a
->> worker or whatever delayed mechanism.
->> 
-> As we discussed offline, I agree that this is a better solution (and 
-> should be a separate changeset before the FRED one.)
+On Thu, Jun 01, 2023 at 05:58:59PM -0700, Sean Christopherson wrote:
+> Add a "never" option to the nx_huge_pages module param to allow userspace
+> to do a one-way hard disabling of the mitigation, and don't create the
+> per-VM recovery threads when the mitigation is hard disabled.  Letting
+> userspace pinky swear that userspace doesn't want to enable NX mitigation
+> (without reloading KVM) allows certain use cases to avoid the latency
+> problems associated with spawning a kthread for each VM.
+> 
+> E.g. in FaaS use cases, the guest kernel is trusted and the host may
+> create 100+ VMs per logical CPU, which can result in 100ms+ latencies when
+> a burst of VMs is created.
 
-The untested below should do the trick. Wants to be split in several
-patches, but you get the idea.
+Tested-by: Luiz Capitulino <luizcap@amazon.com>
 
-Thanks,
+Without this patch I can see the 100ms+ latencies on KVM_CREATE_VM even
+with a single VM.
 
-        tglx
----
-Subject: x86/vector: Get rid of IRQ_MOVE_CLEANUP_VECTOR
-From: Thomas Gleixner <tglx@linutronix.de>
+Just run a VM with with strace -T and grep for KVM_CREATE_VM. When using
+kvmtool I get (latency in seconds - kernel HEAD is a4d7d70112):
 
-No point to waste a vector for cleaning up the leftovers of a moved
-interrupt. Aside of that this must be the lowest priority of all vectors
-which makes FRED systems utilizing vectors 0x10-0x1f more complicated
-than necessary.
+  ioctl(3, KVM_CREATE_VM, 0)              = 4 <0.023567>
+  
+  ioctl(3, KVM_CREATE_VM, 0)              = 4 <0.076709>
+  
+  ioctl(3, KVM_CREATE_VM, 0)              = 4 <0.109109>
 
-Schedule a timer instead.
+With this patch and nx_huge_page=never:
 
-Not-Yet-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
----
- arch/x86/include/asm/hw_irq.h       |    4 -
- arch/x86/include/asm/idtentry.h     |    1 
- arch/x86/include/asm/irq_vectors.h  |    7 ---
- arch/x86/kernel/apic/vector.c       |   83 ++++++++++++++++++++++++++----------
- arch/x86/kernel/idt.c               |    1 
- arch/x86/platform/uv/uv_irq.c       |    2 
- drivers/iommu/amd/iommu.c           |    2 
- drivers/iommu/hyperv-iommu.c        |    4 -
- drivers/iommu/intel/irq_remapping.c |    2 
- 9 files changed, 68 insertions(+), 38 deletions(-)
+  ioctl(3, KVM_CREATE_VM, 0)              = 4 <0.000518>
+  
+  ioctl(3, KVM_CREATE_VM, 0)              = 4 <0.000495>
+  
+  ioctl(3, KVM_CREATE_VM, 0)              = 4 <0.000513>
 
---- a/arch/x86/include/asm/hw_irq.h
-+++ b/arch/x86/include/asm/hw_irq.h
-@@ -97,10 +97,10 @@ extern struct irq_cfg *irqd_cfg(struct i
- extern void lock_vector_lock(void);
- extern void unlock_vector_lock(void);
- #ifdef CONFIG_SMP
--extern void send_cleanup_vector(struct irq_cfg *);
-+extern void vector_schedule_cleanup(struct irq_cfg *);
- extern void irq_complete_move(struct irq_cfg *cfg);
- #else
--static inline void send_cleanup_vector(struct irq_cfg *c) { }
-+static inline void vector_schedule_cleanup(struct irq_cfg *c) { }
- static inline void irq_complete_move(struct irq_cfg *c) { }
- #endif
- 
---- a/arch/x86/include/asm/idtentry.h
-+++ b/arch/x86/include/asm/idtentry.h
-@@ -648,7 +648,6 @@ DECLARE_IDTENTRY_SYSVEC(X86_PLATFORM_IPI
- 
- #ifdef CONFIG_SMP
- DECLARE_IDTENTRY(RESCHEDULE_VECTOR,			sysvec_reschedule_ipi);
--DECLARE_IDTENTRY_SYSVEC(IRQ_MOVE_CLEANUP_VECTOR,	sysvec_irq_move_cleanup);
- DECLARE_IDTENTRY_SYSVEC(REBOOT_VECTOR,			sysvec_reboot);
- DECLARE_IDTENTRY_SYSVEC(CALL_FUNCTION_SINGLE_VECTOR,	sysvec_call_function_single);
- DECLARE_IDTENTRY_SYSVEC(CALL_FUNCTION_VECTOR,		sysvec_call_function);
---- a/arch/x86/include/asm/irq_vectors.h
-+++ b/arch/x86/include/asm/irq_vectors.h
-@@ -35,13 +35,6 @@
-  */
- #define FIRST_EXTERNAL_VECTOR		0x20
- 
--/*
-- * Reserve the lowest usable vector (and hence lowest priority)  0x20 for
-- * triggering cleanup after irq migration. 0x21-0x2f will still be used
-- * for device interrupts.
-- */
--#define IRQ_MOVE_CLEANUP_VECTOR		FIRST_EXTERNAL_VECTOR
--
- #define IA32_SYSCALL_VECTOR		0x80
- 
- /*
---- a/arch/x86/kernel/apic/vector.c
-+++ b/arch/x86/kernel/apic/vector.c
-@@ -44,7 +44,18 @@ static cpumask_var_t vector_searchmask;
- static struct irq_chip lapic_controller;
- static struct irq_matrix *vector_matrix;
- #ifdef CONFIG_SMP
--static DEFINE_PER_CPU(struct hlist_head, cleanup_list);
-+
-+static void vector_cleanup_callback(struct timer_list *tmr);
-+
-+struct vector_cleanup {
-+	struct hlist_head	head;
-+	struct timer_list	timer;
-+};
-+
-+static DEFINE_PER_CPU(struct vector_cleanup, vector_cleanup) = {
-+	.head	= HLIST_HEAD_INIT,
-+	.timer	= __TIMER_INITIALIZER(vector_cleanup_callback, TIMER_PINNED),
-+};
- #endif
- 
- void lock_vector_lock(void)
-@@ -843,8 +854,12 @@ void lapic_online(void)
- 
- void lapic_offline(void)
- {
-+	struct vector_cleanup *cl = this_cpu_ptr(&vector_cleanup);
-+
- 	lock_vector_lock();
- 	irq_matrix_offline(vector_matrix);
-+	WARN_ON_ONCE(try_to_del_timer_sync(&cl->timer) < 0);
-+	WARN_ON_ONCE(!hlist_empty(&cl->head));
- 	unlock_vector_lock();
- }
- 
-@@ -934,62 +949,86 @@ static void free_moved_vector(struct api
- 	apicd->move_in_progress = 0;
- }
- 
--DEFINE_IDTENTRY_SYSVEC(sysvec_irq_move_cleanup)
-+static void vector_cleanup_callback(struct timer_list *tmr)
- {
--	struct hlist_head *clhead = this_cpu_ptr(&cleanup_list);
-+	struct vector_cleanup *cl = container_of(tmr, typeof(*cl), timer);
- 	struct apic_chip_data *apicd;
- 	struct hlist_node *tmp;
-+	bool rearm = false;
- 
--	ack_APIC_irq();
- 	/* Prevent vectors vanishing under us */
--	raw_spin_lock(&vector_lock);
-+	raw_spin_lock_irq(&vector_lock);
- 
--	hlist_for_each_entry_safe(apicd, tmp, clhead, clist) {
-+	hlist_for_each_entry_safe(apicd, tmp, &cl->head, clist) {
- 		unsigned int irr, vector = apicd->prev_vector;
- 
- 		/*
- 		 * Paranoia: Check if the vector that needs to be cleaned
--		 * up is registered at the APICs IRR. If so, then this is
--		 * not the best time to clean it up. Clean it up in the
--		 * next attempt by sending another IRQ_MOVE_CLEANUP_VECTOR
--		 * to this CPU. IRQ_MOVE_CLEANUP_VECTOR is the lowest
--		 * priority external vector, so on return from this
--		 * interrupt the device interrupt will happen first.
-+		 * up is registered at the APICs IRR. That's clearly a
-+		 * hardware issue if the vector arrived on the old target
-+		 * _after_ interrupts were disabled above. Keep @apicd
-+		 * on the list and schedule the timer again to give the CPU
-+		 * a chance to handle the pending interrupt.
- 		 */
- 		irr = apic_read(APIC_IRR + (vector / 32 * 0x10));
- 		if (irr & (1U << (vector % 32))) {
--			apic->send_IPI_self(IRQ_MOVE_CLEANUP_VECTOR);
-+			pr_warn_once("Moved interrupt pending in old target APIC %u\n", apicd->irq);
-+			rearm = true;
- 			continue;
- 		}
- 		free_moved_vector(apicd);
- 	}
- 
--	raw_spin_unlock(&vector_lock);
-+	/*
-+	 * Must happen under vector_lock to make the timer_pending() check
-+	 * in __vector_schedule_cleanup() race free against the rearm here.
-+	 */
-+	if (rearm)
-+		mod_timer(tmr, jiffies + 1);
-+
-+	raw_spin_unlock_irq(&vector_lock);
- }
- 
--static void __send_cleanup_vector(struct apic_chip_data *apicd)
-+static void __vector_schedule_cleanup(struct apic_chip_data *apicd)
- {
--	unsigned int cpu;
-+	unsigned int cpu = apicd->prev_cpu;
- 
- 	raw_spin_lock(&vector_lock);
- 	apicd->move_in_progress = 0;
--	cpu = apicd->prev_cpu;
- 	if (cpu_online(cpu)) {
--		hlist_add_head(&apicd->clist, per_cpu_ptr(&cleanup_list, cpu));
--		apic->send_IPI(cpu, IRQ_MOVE_CLEANUP_VECTOR);
-+		struct vector_cleanup *cl = per_cpu_ptr(&vector_cleanup, cpu);
-+
-+		/*
-+		 * The lockless timer_pending() check is safe here. If it
-+		 * returns true, then the callback will observe this new
-+		 * apic data in the hlist as everything is serialized by
-+		 * vector lock.
-+		 *
-+		 * If it returns false then the timer is either not armed
-+		 * or the other CPU executes the callback, which again
-+		 * would be blocked on vector lock. Rearming it in the
-+		 * latter case makes it fire for nothing.
-+		 *
-+		 * This is also safe against the callback rearming the timer
-+		 * because that's serialized via vector lock too.
-+		 */
-+		if (!timer_pending(&cl->timer)) {
-+			cl->timer.expires = jiffies + 1;
-+			add_timer_on(&cl->timer, cpu);
-+		}
- 	} else {
- 		apicd->prev_vector = 0;
- 	}
- 	raw_spin_unlock(&vector_lock);
- }
- 
--void send_cleanup_vector(struct irq_cfg *cfg)
-+void vector_schedule_cleanup(struct irq_cfg *cfg)
- {
- 	struct apic_chip_data *apicd;
- 
- 	apicd = container_of(cfg, struct apic_chip_data, hw_irq_cfg);
- 	if (apicd->move_in_progress)
--		__send_cleanup_vector(apicd);
-+		__vector_schedule_cleanup(apicd);
- }
- 
- void irq_complete_move(struct irq_cfg *cfg)
-@@ -1007,7 +1046,7 @@ void irq_complete_move(struct irq_cfg *c
- 	 * on the same CPU.
- 	 */
- 	if (apicd->cpu == smp_processor_id())
--		__send_cleanup_vector(apicd);
-+		__vector_schedule_cleanup(apicd);
- }
- 
- /*
---- a/arch/x86/kernel/idt.c
-+++ b/arch/x86/kernel/idt.c
-@@ -131,7 +131,6 @@ static const __initconst struct idt_data
- 	INTG(RESCHEDULE_VECTOR,			asm_sysvec_reschedule_ipi),
- 	INTG(CALL_FUNCTION_VECTOR,		asm_sysvec_call_function),
- 	INTG(CALL_FUNCTION_SINGLE_VECTOR,	asm_sysvec_call_function_single),
--	INTG(IRQ_MOVE_CLEANUP_VECTOR,		asm_sysvec_irq_move_cleanup),
- 	INTG(REBOOT_VECTOR,			asm_sysvec_reboot),
- #endif
- 
---- a/arch/x86/platform/uv/uv_irq.c
-+++ b/arch/x86/platform/uv/uv_irq.c
-@@ -58,7 +58,7 @@ uv_set_irq_affinity(struct irq_data *dat
- 	ret = parent->chip->irq_set_affinity(parent, mask, force);
- 	if (ret >= 0) {
- 		uv_program_mmr(cfg, data->chip_data);
--		send_cleanup_vector(cfg);
-+		vector_schedule_cleanup(cfg);
- 	}
- 
- 	return ret;
---- a/drivers/iommu/amd/iommu.c
-+++ b/drivers/iommu/amd/iommu.c
-@@ -3639,7 +3639,7 @@ static int amd_ir_set_affinity(struct ir
- 	 * at the new destination. So, time to cleanup the previous
- 	 * vector allocation.
- 	 */
--	send_cleanup_vector(cfg);
-+	vector_schedule_cleanup(cfg);
- 
- 	return IRQ_SET_MASK_OK_DONE;
- }
---- a/drivers/iommu/hyperv-iommu.c
-+++ b/drivers/iommu/hyperv-iommu.c
-@@ -51,7 +51,7 @@ static int hyperv_ir_set_affinity(struct
- 	if (ret < 0 || ret == IRQ_SET_MASK_OK_DONE)
- 		return ret;
- 
--	send_cleanup_vector(cfg);
-+	vector_schedule_cleanup(cfg);
- 
- 	return 0;
- }
-@@ -257,7 +257,7 @@ static int hyperv_root_ir_set_affinity(s
- 	if (ret < 0 || ret == IRQ_SET_MASK_OK_DONE)
- 		return ret;
- 
--	send_cleanup_vector(cfg);
-+	vector_schedule_cleanup(cfg);
- 
- 	return 0;
- }
---- a/drivers/iommu/intel/irq_remapping.c
-+++ b/drivers/iommu/intel/irq_remapping.c
-@@ -1180,7 +1180,7 @@ intel_ir_set_affinity(struct irq_data *d
- 	 * at the new destination. So, time to cleanup the previous
- 	 * vector allocation.
- 	 */
--	send_cleanup_vector(cfg);
-+	vector_schedule_cleanup(cfg);
- 
- 	return IRQ_SET_MASK_OK_DONE;
- }
+Now, I debugged down the single VM case before seeing this patch and it
+can be avoided by building the kernel with CONFIG_CGROUP_FAVOR_DYNMODS=y
+or mounting the cgroup v2 mount point with the favordynmods mount option.
+
+This is because the high latency is coming from a call to
+cgroup_attach_task_all() in:
+
+kvm_vm_worker_thread()
+  cgroup_attach_task_all()
+    percpu_down_write(&cgroup_threadgroup_rwsem)
+      /* calls synchronize_rcu() */
+
+This happens while kvm_vm_create_worker_thread() is waiting on a completion.
+See commit 6a010a49b63a for more information.
+
+This patch is preferable because the favordynmods solution has a trade-off.
+However, why don't we make nx_huge_pages=never the default behavior if the
+CPU is not vulnerable? If there are concerns about not being able to restart
+the worker thread, then maybe we could make this a .config option?
+
+- Luiz
+
+
+> 
+> Reported-by: Li RongQing <lirongqing@baidu.com>
+> Closes: https://lore.kernel.org/all/1679555884-32544-1-git-send-email-lirongqing@baidu.com
+> Cc: Yong He <zhuangel570@gmail.com>
+> Cc: Robert Hoo <robert.hoo.linux@gmail.com>
+> Cc: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 41 ++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 36 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index c8961f45e3b1..2ed38916b904 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -58,6 +58,8 @@
+>  
+>  extern bool itlb_multihit_kvm_mitigation;
+>  
+> +static bool nx_hugepage_mitigation_hard_disabled;
+> +
+>  int __read_mostly nx_huge_pages = -1;
+>  static uint __read_mostly nx_huge_pages_recovery_period_ms;
+>  #ifdef CONFIG_PREEMPT_RT
+> @@ -67,12 +69,13 @@ static uint __read_mostly nx_huge_pages_recovery_ratio = 0;
+>  static uint __read_mostly nx_huge_pages_recovery_ratio = 60;
+>  #endif
+>  
+> +static int get_nx_huge_pages(char *buffer, const struct kernel_param *kp);
+>  static int set_nx_huge_pages(const char *val, const struct kernel_param *kp);
+>  static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel_param *kp);
+>  
+>  static const struct kernel_param_ops nx_huge_pages_ops = {
+>  	.set = set_nx_huge_pages,
+> -	.get = param_get_bool,
+> +	.get = get_nx_huge_pages,
+>  };
+>  
+>  static const struct kernel_param_ops nx_huge_pages_recovery_param_ops = {
+> @@ -6844,6 +6847,14 @@ static void mmu_destroy_caches(void)
+>  	kmem_cache_destroy(mmu_page_header_cache);
+>  }
+>  
+> +static int get_nx_huge_pages(char *buffer, const struct kernel_param *kp)
+> +{
+> +	if (nx_hugepage_mitigation_hard_disabled)
+> +		return sprintf(buffer, "never\n");
+> +
+> +	return param_get_bool(buffer, kp);
+> +}
+> +
+>  static bool get_nx_auto_mode(void)
+>  {
+>  	/* Return true when CPU has the bug, and mitigations are ON */
+> @@ -6860,15 +6871,29 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+>  	bool old_val = nx_huge_pages;
+>  	bool new_val;
+>  
+> +	if (nx_hugepage_mitigation_hard_disabled)
+> +		return -EPERM;
+> +
+>  	/* In "auto" mode deploy workaround only if CPU has the bug. */
+> -	if (sysfs_streq(val, "off"))
+> +	if (sysfs_streq(val, "off")) {
+>  		new_val = 0;
+> -	else if (sysfs_streq(val, "force"))
+> +	} else if (sysfs_streq(val, "force")) {
+>  		new_val = 1;
+> -	else if (sysfs_streq(val, "auto"))
+> +	} else if (sysfs_streq(val, "auto")) {
+>  		new_val = get_nx_auto_mode();
+> -	else if (kstrtobool(val, &new_val) < 0)
+> +	} else if (sysfs_streq(val, "never")) {
+> +		new_val = 0;
+> +
+> +		mutex_lock(&kvm_lock);
+> +		if (!list_empty(&vm_list)) {
+> +			mutex_unlock(&kvm_lock);
+> +			return -EBUSY;
+> +		}
+> +		nx_hugepage_mitigation_hard_disabled = true;
+> +		mutex_unlock(&kvm_lock);
+> +	} else if (kstrtobool(val, &new_val) < 0) {
+>  		return -EINVAL;
+> +	}
+>  
+>  	__set_nx_huge_pages(new_val);
+>  
+> @@ -7006,6 +7031,9 @@ static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel
+>  	uint old_period, new_period;
+>  	int err;
+>  
+> +	if (nx_hugepage_mitigation_hard_disabled)
+> +		return -EPERM;
+> +
+>  	was_recovery_enabled = calc_nx_huge_pages_recovery_period(&old_period);
+>  
+>  	err = param_set_uint(val, kp);
+> @@ -7161,6 +7189,9 @@ int kvm_mmu_post_init_vm(struct kvm *kvm)
+>  {
+>  	int err;
+>  
+> +	if (nx_hugepage_mitigation_hard_disabled)
+> +		return 0;
+> +
+>  	err = kvm_vm_create_worker_thread(kvm, kvm_nx_huge_page_recovery_worker, 0,
+>  					  "kvm-nx-lpage-recovery",
+>  					  &kvm->arch.nx_huge_page_recovery_thread);
+> 
+> base-commit: 39428f6ea9eace95011681628717062ff7f5eb5f
+> -- 
+> 2.41.0.rc2.161.g9c6817b8e7-goog
+> 
