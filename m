@@ -2,144 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AFCC8723628
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 06:20:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA3D8723682
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 06:59:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233873AbjFFEUO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 00:20:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57162 "EHLO
+        id S232670AbjFFE7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 00:59:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229681AbjFFEUL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 00:20:11 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBE7219C;
-        Mon,  5 Jun 2023 21:20:09 -0700 (PDT)
+        with ESMTP id S229693AbjFFE72 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 00:59:28 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85940196;
+        Mon,  5 Jun 2023 21:59:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686025209; x=1717561209;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=nnz9fZvyDWSFCGNXmQbJTPH46HIsD8UF+79vDgHHkkE=;
-  b=ebKEmJoN3pr7fJvr5aS66vdBwRHY7PZfKchFUxL933DpGECr0x8Fe7BZ
-   od36wVa7gjL0eptRVb8EBIy2n824FrMNypgicXgirXrag0cGlehBsMrCf
-   QrfymbjKpdWSGAVX9ZT+1ZRXeq2g7x+zwEFOIsedUSnZo/p1PtD6aFKrQ
-   I5WKohvxm7HcOvTyLrBLWk4wo3BFOht+CpIWb6sFACYQZVWBrfAndp393
-   0kSK0qlBT6bML2VEQmrN7G+7V96Sd1+rYJIZg46562Shbo9EbU79dOzvi
-   TOe1kXhjxj0qsVYMpwjrL0001sRiDTfRvSrWHuXVWbgNF/2iFryITPvgX
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="346154734"
+  t=1686027567; x=1717563567;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7YqIXOEFk6+LSNMwIOYXhRVCF5tOS5Mo1Nr0nwPD3FU=;
+  b=ZJqWpqQMpMOIRNo2bansYhzGHkwC5D4wRSJcKUeIrpY8XNVGr9cT/epx
+   Xd/kqU3F0r5ew0Ooa8JhU1RQH32xNp45hUWqVTBJwi+uTJmyEJsfMMGRx
+   G8V7IW7FZSTr/ze4DbEx+vilt0xAIZu75wPSxXXmK7Vvk5H231GOjwAM5
+   NJnxNxoVtc8tsrWWLBD40GOMdHiHU06oDNQh3t+YCqErEDTFrQ1xLfvGO
+   7h/4LpBxwwqM1RQzQYQ9evOSOzmVv2Sn3OR6U4yn0N2iFMUBgT6xNpzxs
+   f3upuuc+6diH3sLl43bU9hP49asi8RZr4kGtxPCtNK0toWvf9XHuJl3/u
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="336920624"
 X-IronPort-AV: E=Sophos;i="6.00,219,1681196400"; 
-   d="scan'208";a="346154734"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2023 21:20:08 -0700
+   d="scan'208";a="336920624"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2023 21:59:27 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="955590355"
+X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="712056414"
 X-IronPort-AV: E=Sophos;i="6.00,219,1681196400"; 
-   d="scan'208";a="955590355"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.254.210.225]) ([10.254.210.225])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2023 21:20:05 -0700
-Message-ID: <a8e89abd-3480-8568-afcb-2645d2cd3d31@linux.intel.com>
-Date:   Tue, 6 Jun 2023 12:20:03 +0800
+   d="scan'208";a="712056414"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by fmsmga007.fm.intel.com with ESMTP; 05 Jun 2023 21:59:24 -0700
+Date:   Tue, 6 Jun 2023 12:59:23 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v14 031/113] KVM: x86/mmu: Replace hardcoded value 0 for
+ the initial value for SPTE
+Message-ID: <20230606045923.ol5kjhagiimqksmn@yy-desk-7060>
+References: <cover.1685333727.git.isaku.yamahata@intel.com>
+ <8b4f21e2fada944d041ffee0f27d527e0e447cbb.1685333727.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH v1 5/6] KVM: x86: LASS protection on KVM emulation
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-References: <20230601142309.6307-1-guang.zeng@intel.com>
- <20230601142309.6307-6-guang.zeng@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20230601142309.6307-6-guang.zeng@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8b4f21e2fada944d041ffee0f27d527e0e447cbb.1685333727.git.isaku.yamahata@intel.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 6/1/2023 10:23 PM, Zeng Guang wrote:
-> Do LASS violation check for instructions emulated by KVM. Note that for
-> instructions executed in the guest directly, hardware will perform the
-> check.
+On Sun, May 28, 2023 at 09:19:13PM -0700, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
-> Not all instruction emulation leads to accesses to guest linear addresses
-> because 1) some instructions like CPUID, RDMSR, don't take memory as
-> operands 2) instruction fetch in most cases is already done inside the
-> guest.
+> The TDX support will need the "suppress #VE" bit (bit 63) set as the
+> initial value for SPTE.  To reduce code change size, introduce a new macro
+> SHADOW_NONPRESENT_VALUE for the initial value for the shadow page table
+> entry (SPTE) and replace hard-coded value 0 for it.  Initialize shadow page
+> tables with their value.
 >
-> Four cases in which KVM uses a linear address to access guest memory:
-> - KVM emulates instruction fetches or data accesses
-> - KVM emulates implicit data access to a system data structure
-> - VMX instruction emulation
-> - SGX ENCLS instruction emulation
+> The plan is to unconditionally set the "suppress #VE" bit for both AMD and
+> Intel as: 1) AMD hardware uses the bit 63 as NX for present SPTE and
+> ignored for non-present SPTE; 2) for conventional VMX guests, KVM never
+> enables the "EPT-violation #VE" in VMCS control and "suppress #VE" bit is
+> ignored by hardware.
 >
-> LASS violation check applies to these linear addresses so as to enforce
-> mode-based protections as hardware behaves.
->
-> As exceptions, the target memory address of emulation of invlpg, branch
-> and call instructions doesn't require LASS violation check.
-I think LASS doesn't apply to the target addresses in the descriptors of 
-INVPCID and INVVPID.
-Although no code change needed, IMHO, it's better to describe it in the 
-changelog or/and comments.
-
->
-> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
-> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
->   arch/x86/kvm/emulate.c    | 30 ++++++++++++++++++++++++++++--
->   arch/x86/kvm/vmx/nested.c |  3 +++
->   arch/x86/kvm/vmx/sgx.c    |  4 ++++
->   3 files changed, 35 insertions(+), 2 deletions(-)
+>  arch/x86/kvm/mmu/mmu.c         | 20 +++++++++++++++-----
+>  arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+>  arch/x86/kvm/mmu/spte.h        |  2 ++
+>  arch/x86/kvm/mmu/tdp_mmu.c     | 14 +++++++-------
+>  4 files changed, 25 insertions(+), 13 deletions(-)
 >
-[...]
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index e35cf0bd0df9..bb1c3fa13c13 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4986,6 +4986,9 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
->   		 * destination for long mode!
->   		 */
->   		exn = is_noncanonical_address(*ret, vcpu);
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index dc2b9a2f717c..1b6fd4434e96 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -576,9 +576,9 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+>
+>  	if (!is_shadow_present_pte(old_spte) ||
+>  	    !spte_has_volatile_bits(old_spte))
+> -		__update_clear_spte_fast(sptep, 0ull);
+> +		__update_clear_spte_fast(sptep, SHADOW_NONPRESENT_VALUE);
+>  	else
+> -		old_spte = __update_clear_spte_slow(sptep, 0ull);
+> +		old_spte = __update_clear_spte_slow(sptep, SHADOW_NONPRESENT_VALUE);
+>
+>  	if (!is_shadow_present_pte(old_spte))
+>  		return old_spte;
+> @@ -612,7 +612,7 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+>   */
+>  static void mmu_spte_clear_no_track(u64 *sptep)
+>  {
+> -	__update_clear_spte_fast(sptep, 0ull);
+> +	__update_clear_spte_fast(sptep, SHADOW_NONPRESENT_VALUE);
+>  }
+>
+>  static u64 mmu_spte_get_lockless(u64 *sptep)
+> @@ -1969,7 +1969,8 @@ static bool kvm_sync_page_check(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+>
+>  static int kvm_sync_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
+>  {
+> -	if (!sp->spt[i])
+> +	/* sp->spt[i] has initial value of shadow page table allocation */
+> +	if (sp->spt[i] != SHADOW_NONPRESENT_VALUE)
+
+This should be "sp->spt[i] == SHADOW_NONPRESENT_VALUE" ? Looks all present spt[i]
+are skipped without sync for shadow paging.
+
+>  		return 0;
+>
+>  	return vcpu->arch.mmu->sync_spte(vcpu, sp, i);
+> @@ -6120,7 +6121,16 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
+>  	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
+>
+> -	vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
+> +	/*
+> +	 * When X86_64, initial SEPT entries are initialized with
+> +	 * SHADOW_NONPRESENT_VALUE.  Otherwise zeroed.  See
+> +	 * mmu_memory_cache_alloc_obj().
+> +	 */
+> +	if (IS_ENABLED(CONFIG_X86_64))
+> +		vcpu->arch.mmu_shadow_page_cache.init_value =
+> +			SHADOW_NONPRESENT_VALUE;
+> +	if (!vcpu->arch.mmu_shadow_page_cache.init_value)
+> +		vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
+>
+>  	vcpu->arch.mmu = &vcpu->arch.root_mmu;
+>  	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 0662e0278e70..ef8124bd2f11 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -892,7 +892,7 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
+>  	gpa_t pte_gpa;
+>  	gfn_t gfn;
+>
+> -	if (WARN_ON_ONCE(!sp->spt[i]))
+> +	if (WARN_ON_ONCE(sp->spt[i] == SHADOW_NONPRESENT_VALUE))
+>  		return 0;
+>
+>  	first_pte_gpa = FNAME(get_level1_sp_gpa)(sp);
+> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> index 1279db2eab44..a99eb7d4ae5d 100644
+> --- a/arch/x86/kvm/mmu/spte.h
+> +++ b/arch/x86/kvm/mmu/spte.h
+> @@ -148,6 +148,8 @@ static_assert(MMIO_SPTE_GEN_LOW_BITS == 8 && MMIO_SPTE_GEN_HIGH_BITS == 11);
+>
+>  #define MMIO_SPTE_GEN_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_BITS + MMIO_SPTE_GEN_HIGH_BITS - 1, 0)
+>
+> +#define SHADOW_NONPRESENT_VALUE	0ULL
 > +
-> +		if (!exn)
-> +			exn = vmx_check_lass(vcpu, 0, *ret, 0);
-Can be simpler by using logical-or:
-
-exn = is_noncanonical_address(*ret, vcpu) || vmx_check_lass(vcpu, 0, *ret, 0);
-
-
-
->   	} else {
->   		/*
->   		 * When not in long mode, the virtual/linear address is
-> diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
-> index 2261b684a7d4..3825275827eb 100644
-> --- a/arch/x86/kvm/vmx/sgx.c
-> +++ b/arch/x86/kvm/vmx/sgx.c
-> @@ -46,6 +46,10 @@ static int sgx_get_encls_gva(struct kvm_vcpu *vcpu, unsigned long offset,
->   			((s.base != 0 || s.limit != 0xffffffff) &&
->   			(((u64)*gva + size - 1) > s.limit + 1));
->   	}
-> +
-> +	if (!fault && is_long_mode(vcpu))
-> +		fault = vmx_check_lass(vcpu, 0, *gva, 0);
-> +
->   	if (fault)
->   		kvm_inject_gp(vcpu, 0);
->   	return fault ? -EINVAL : 0;
-
+>  extern u64 __read_mostly shadow_host_writable_mask;
+>  extern u64 __read_mostly shadow_mmu_writable_mask;
+>  extern u64 __read_mostly shadow_nx_mask;
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 3000ef6d79ea..ddd995885dd3 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -627,7 +627,7 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
+>  	 * here since the SPTE is going from non-present to non-present.  Use
+>  	 * the raw write helper to avoid an unnecessary check on volatile bits.
+>  	 */
+> -	__kvm_tdp_mmu_write_spte(iter->sptep, 0);
+> +	__kvm_tdp_mmu_write_spte(iter->sptep, SHADOW_NONPRESENT_VALUE);
+>
+>  	return 0;
+>  }
+> @@ -764,8 +764,8 @@ static void __tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
+>  			continue;
+>
+>  		if (!shared)
+> -			tdp_mmu_iter_set_spte(kvm, &iter, 0);
+> -		else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0))
+> +			tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
+> +		else if (tdp_mmu_set_spte_atomic(kvm, &iter, SHADOW_NONPRESENT_VALUE))
+>  			goto retry;
+>  	}
+>  }
+> @@ -821,8 +821,8 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+>  	if (WARN_ON_ONCE(!is_shadow_present_pte(old_spte)))
+>  		return false;
+>
+> -	tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte, 0,
+> -			 sp->gfn, sp->role.level + 1);
+> +	tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte,
+> +			 SHADOW_NONPRESENT_VALUE, sp->gfn, sp->role.level + 1);
+>
+>  	return true;
+>  }
+> @@ -856,7 +856,7 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+>  		    !is_last_spte(iter.old_spte, iter.level))
+>  			continue;
+>
+> -		tdp_mmu_iter_set_spte(kvm, &iter, 0);
+> +		tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
+>  		flush = true;
+>  	}
+>
+> @@ -1250,7 +1250,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
+>  	 * invariant that the PFN of a present * leaf SPTE can never change.
+>  	 * See handle_changed_spte().
+>  	 */
+> -	tdp_mmu_iter_set_spte(kvm, iter, 0);
+> +	tdp_mmu_iter_set_spte(kvm, iter, SHADOW_NONPRESENT_VALUE);
+>
+>  	if (!pte_write(range->pte)) {
+>  		new_spte = kvm_mmu_changed_pte_notifier_make_spte(iter->old_spte,
+> --
+> 2.25.1
+>
