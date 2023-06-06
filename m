@@ -2,168 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E19327250E4
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 01:40:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDF847250EA
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 01:41:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239862AbjFFXkr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 19:40:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33408 "EHLO
+        id S239898AbjFFXlc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 19:41:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239658AbjFFXko (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 19:40:44 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C580A170B
-        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 16:40:42 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5693861875fso101740087b3.1
-        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 16:40:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686094842; x=1688686842;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ub7lhejOg/lDdTY+htbdM3tFIdBZH/I/WvN3Xdx1uV0=;
-        b=x3+7d7dOxbuMsgi4YuWRxiMypQc2TrTU2D9YB3UiXYC+EUc7Y9pseC434rQBLcpXAL
-         GdebpzGU+Ppi+3pg/sPm2opKG0AIj3TpKgdafc0t7y19pnJwnX6lnXEW0+OoUhdwqDwE
-         Z4ysfR37q5DV4NBHLSUb535QOnfJ37VpXUT0s/YKbyEmYt6p3WurjeOIxM5TXMaanlts
-         Dbq1Z9rC6GiKn/Ofl3HttKVh+kDIVJTeUF0OknTzUCQHCr+pmySor7NykqACcPQcQ0xy
-         DY4ddSj00fmaOy6VUmaFhckuswO05xoX5292LnCzhz9+pCxJfgV+HS3Cr0N3cRaGlaIo
-         JIXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686094842; x=1688686842;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Ub7lhejOg/lDdTY+htbdM3tFIdBZH/I/WvN3Xdx1uV0=;
-        b=CbYDyY0PLu4+dvHR2/mxt1DbhSVJv53et5jO7bPQYNgQmGMVN8YDrzUJYM/vVmUgIe
-         +OoKhH6qX7x5cE36m3GwM+63Y7qORWuDhMsNuSgfpZJxGEbF3Rq7GxojJbooT9fqqKUk
-         4lhW0EClwl049p9LLbVEg32hj0dMObhk9AS2LooirRoYaLgP+OqQPSeMhL6l+eS2ICoc
-         zUMtzOU+o5FSgDkhr4HoKTNx/xFuc4v/KQx8Unr+U27sjLVoq8MCO5vOVdsjngnHMD2z
-         8C02g9ECM/JKWMU9Utilln6HzShsCutRV6fWo4XzKr1AjR+bM09dP69aEpts90tbSj+q
-         7g/w==
-X-Gm-Message-State: AC+VfDw2sPA00STX1OHxu1NTVaJc67ayo4tImQOEKUAYMi1M56grA56W
-        aBBWRr47jnetXPmAqL1g9y+k95M+EMM=
-X-Google-Smtp-Source: ACHHUZ4t4b8ZaKk9b7bDtFeK18uGx3qsOG0WbmPPzW7N60k5P+UvNaqfyxvCrb9uJeLbM2s4DI7dL+WqIoo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:d007:0:b0:568:a244:d8e5 with SMTP id
- v7-20020a81d007000000b00568a244d8e5mr1898740ywi.9.1686094841928; Tue, 06 Jun
- 2023 16:40:41 -0700 (PDT)
-Date:   Tue, 6 Jun 2023 16:40:40 -0700
-In-Reply-To: <8AE71A62-1BE3-4D6F-B57C-B5FCEA93169F@nutanix.com>
-Mime-Version: 1.0
-References: <20230530200152.18961-1-jon@nutanix.com> <2a6502e3-ba87-0355-af09-825e8467b81f@intel.com>
- <F4AFC5EE-9967-4117-BA85-ED82C106575C@nutanix.com> <ZHd2P6D142rCByrm@google.com>
- <E17EFDD7-C54A-4532-B1D3-D567557FC54B@nutanix.com> <ZHermsSGQBcDD07R@google.com>
- <CBFC095A-10D1-4925-9F28-DEDEBBB38EF8@nutanix.com> <8AE71A62-1BE3-4D6F-B57C-B5FCEA93169F@nutanix.com>
-Message-ID: <ZH/D+JP2OGFtCUBy@google.com>
-Subject: Re: [PATCH] x86/fpu/xstate: clear XSAVE features if DISABLED_MASK set
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jon Kohler <jon@nutanix.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Kyle Huey <me@kylehuey.com>,
-        "neelnatu@google.com" <neelnatu@google.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S234333AbjFFXl2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 19:41:28 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79125E5B;
+        Tue,  6 Jun 2023 16:41:27 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0E3A36312C;
+        Tue,  6 Jun 2023 23:41:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B538C433EF;
+        Tue,  6 Jun 2023 23:41:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686094886;
+        bh=rrITP7p0FWQ2ewrkDnu1CPZRryxU1CRoRzlhmNWeEhI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=sohfO1j9PlzPojlxWhLFK57mTg9hXWvOJFkQsGNKTZT582RvooGmd/u5XKOEfseIa
+         /UOzpYjREl+6vcboIzeJwQZdPD5FH7slqYWUxxX/PfE74ikpjhRUrnKMVyZvp2fa9I
+         Qt5XD4v3I1C1NyWUcrs4Rb4wq+HqJPpbmOqFaOLYI6wz8FDKGxnHLkZYTnNSua1GI5
+         5cG4vR11QRnApB6Ire/H7C/vgCLSrFA5VTurl9j9tgEC+MQ/OUZuSve/EAObnivniE
+         AiHFhodDWKfme+8uqWduL7OLbr/F4pScxNEFlutODQoc71EW7xKbqCApApDwKfuDAt
+         gVsxwU2Wv4eaA==
+Date:   Tue, 6 Jun 2023 18:41:24 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     "Patel, Nirmal" <nirmal.patel@linux.intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        linux-acpi@vger.kernel.org, Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: Re: FW: [Bug 217472] New: ACPI _OSC features have different values
+ in Host OS and Guest OS
+Message-ID: <20230606234124.GA1147990@bhelgaas>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c49ed344-f521-b4b9-8a7a-a70600002358@linux.intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 05, 2023, Jon Kohler wrote:
-> > On May 31, 2023, at 5:09 PM, Jon Kohler <jon@nutanix.com> wrote:
-> >> The CPUID bits that enumerate support for a feature are independent fr=
-om the CPUID
-> >> bits that enumerate what XCR0 bits are supported, i.e. what features c=
-an be saved
-> >> and restored via XSAVE/XRSTOR.
-> >>=20
-> >> KVM does mostly account for host XCR0, but in a very ad hoc way.  E.g.=
- MPX is
-> >> handled by manually checking host XCR0.
-> >>=20
-> >> 	if (kvm_mpx_supported())
-> >> 		kvm_cpu_cap_check_and_set(X86_FEATURE_MPX);
-> >>=20
-> >> PKU manually checks too, but indirectly by looking at whether or not t=
-he kernel
-> >> has enabled CR4.OSPKE.
-> >>=20
-> >> 	if (!tdp_enabled || !boot_cpu_has(X86_FEATURE_OSPKE))
-> >> 		kvm_cpu_cap_clear(X86_FEATURE_PKU);
-> >>=20
-> >> But unless I'm missing something, the various AVX and AMX bits rely so=
-lely on
-> >> boot_cpu_data, i.e. would break if someone added CONFIG_X86_AVX or CON=
-FIG_X86_AMX.
-> >=20
-> > What if we simply moved static unsigned short xsave_cpuid_features[] =
-=E2=80=A6 into
-> > xstate.h, which is already included in arch/x86/kvm/cpuid.c, and do
-> > something similar to what I=E2=80=99m proposing in this patch already
-> >=20
-> > This would future proof such breakages I=E2=80=99d imagine?
-> >=20
-> > void kvm_set_cpu_caps(void)
-> > {
-> > ...
-> >    /*
-> >     * Clear CPUID for XSAVE features that are disabled.
-> >     */
-> >    for (i =3D 0; i < ARRAY_SIZE(xsave_cpuid_features); i++) {
-> >        unsigned short cid =3D xsave_cpuid_features[i];
-> >=20
-> >        /* Careful: X86_FEATURE_FPU is 0! */
-> >        if ((i !=3D XFEATURE_FP && !cid) || !boot_cpu_has(cid) ||
-> >            !cpu_feature_enabled(cid))
-> >            kvm_cpu_cap_clear(cid);
-> >    }
-> > =E2=80=A6
-> > }
-> >=20
->=20
-> Sean - following up on this rough idea code above, wanted to validate tha=
-t
-> this was the direction you were thinking of having kvm_set_cpu_caps() cle=
-ar
-> caps when a particular xsave feature was disabled?
+[+cc Bagas]
 
-Ya, more or or less.  But for KVM, that should be kvm_cpu_cap_has(), not bo=
-ot_cpu_has().
-And then I think KVM could actually WARN on a feature being disabled, i.e. =
-put up
-a tripwire to detect if things change in the future and the kernel lets the=
- user
-disable a feature that KVM wants to expose to a guest.
+On Thu, May 25, 2023 at 01:33:27PM -0700, Patel, Nirmal wrote:
+> On 5/25/2023 1:19 PM, Patel, Nirmal wrote:
+> >> On Tue, 23 May 2023 12:21:25 -0500
+> >> Bjorn Helgaas <helgaas@kernel.org> wrote:
+> >>> On Mon, May 22, 2023 at 04:32:03PM +0000, bugzilla-daemon@kernel.org wrote:
+> >>>> https://bugzilla.kernel.org/show_bug.cgi?id=217472
+> >>>> ...  
+> >>>> Created attachment 304301  
+> >>>>   --> 
+> >>>> https://bugzilla.kernel.org/attachment.cgi?id=304301&action=edit
+> >>>> Rhel9.1_Guest_dmesg
+> >>>>
+> >>>> Issue:
+> >>>> NVMe Drives are still present after performing hotplug in guest
+> >>>> OS.  We have tested with different combination of OSes, drives
+> >>>> and Hypervisor. The issue is present across all the OSes.   
+> >>>
+> >>> Maybe attach the specific commands to reproduce the problem in one of 
+> >>> these scenarios to the bugzilla?  I'm a virtualization noob, so I 
+> >>> can't visualize all the usual pieces.
+> >>>
+> >>>> The following patch was added to honor ACPI _OSC values set by BIOS 
+> >>>> and the patch helped to bring the issue out in VM/ Guest OS.
+> >>>>
+> >>>> https://git.kernel.org/pub/scm/linux/kernel/git/helgaas/pci.git/comm
+> >>>> it/drivers/pci/controller/vmd.c?id=04b12ef163d10e348db664900ae7f611b
+> >>>> 83c7a0e
+> >>>>
+> >>>>
+> >>>> I also compared the values of the parameters in the patch in
+> >>>> Host and Guest OS.  The parameters with different values in
+> >>>> Host and Guest OS are:
+> >>>>
+> >>>> native_pcie_hotplug
+> >>>> native_shpc_hotplug
+> >>>> native_aer
+> >>>> native_ltr
+> >>>>
+> >>>> i.e.
+> >>>> value of native_pcie_hotplug in Host OS is 1.
+> >>>> value of native_pcie_hotplug in Guest OS is 0.
+> >>>>
+> >>>> I am not sure why "native_pcie_hotplug" is changed to 0 in guest.
+> >>>> Isn't it OSC_ managed parameter? If that is the case, it should have 
+> >>>> same value in Host and Guest OS.
+> >>>
+> >>> From your dmesg:
+> >>>  
+> >>>   DMI: Red Hat KVM/RHEL, BIOS 1.16.0-4.el9 04/01/2014
+> >>>   _OSC: OS supports [ExtendedConfig ASPM ClockPM Segments MSI EDR HPX-Type3]
+> >>>   _OSC: platform does not support [PCIeHotplug LTR DPC]
+> >>>   _OSC: OS now controls [SHPCHotplug PME AER PCIeCapability]
+> >>>   acpiphp: Slot [0] registered
+> >>>   virtio_blk virtio3: [vda] 62914560 512-byte logical blocks (32.2 
+> >>> GB/30.0 GiB)
+> >>>
+> >>> So the DMI ("KVM/RHEL ...") is the BIOS seen by the guest.  Doesn't 
+> >>> mean anything to me, but the KVM folks would know about it.  In any 
+> >>> event, the guest BIOS is different from the host BIOS, so I'm not 
+> >>> surprised that _OSC is different.
+> >>
+> >> Right, the premise of the issue that guest and host should have
+> >> the same OSC features is flawed.  The guest is a virtual machine
+> >> that can present an entirely different feature set from the host.
+> >> A software hotplug on the guest can occur without any bearing to
+> >> the slot status on the host.
+> >>
+> >>> That guest BIOS _OSC declined to grant control of PCIe native
+> >>> hotplug to the guest OS, so the guest will use acpiphp (not
+> >>> pciehp, which would be used if native_pcie_hotplug were set).
+> >>>
+> >>> The dmesg doesn't mention the nvme driver.  Are you using
+> >>> something like virtio_blk with qemu pointed at an NVMe drive?
+> >>> And you hot-remove the NVMe device, but the guest OS thinks it's
+> >>> still present?
+> >>>
+> >>> Since the guest is using acpiphp, I would think a hot-remove of
+> >>> a host NVMe device should be noticed by qemu and turned into an
+> >>> ACPI notification that the guest OS would consume.  But I don't
+> >>> know how those connections work.
+> >>
+> >> If vfio-pci is involved, a cooperative hot-unplug will attempt to
+> >> unbind the host driver, which triggers a device request through
+> >> vfio, which is ultimately seen as a hotplug eject operation by
+> >> the guest.  Surprise hotplugs of assigned devices are not
+> >> supported.  There's not enough info in the bz to speculate how
+> >> this VM is wired or what actions are taken.  Thanks,
+> 
+> Thanks Bjorn and Alex for quick response.
+> I agree with the analysis about guest BIOS not giving control of
+> PCIe native hotplug to guest OS.
 
-Side topic, I find the "cid" nomenclature super confusing, and the establis=
-hed
-name in KVM is x86_feature.
+Can I back up and try to understand the problem better?  I'm sure I'm
+asking dumb questions, so please correct me:
 
-Something like this?
+  - Can you add more details in the bz about what you're doing and
+    what is failing?
 
-	for (i =3D 0; i < ARRAY_SIZE(xsave_cpuid_features); i++) {
-		unsigned int x86_feature =3D xsave_cpuid_features[i];
+  - I have the impression that the hotplug worked before 04b12ef163d1
+    ("PCI: vmd: Honor ACPI _OSC on PCIe features") but fails after?
 
-		if (i !=3D XFEATURE_FP && !x86_feature)
-			continue;
+  - Can you attach dmesg logs from before and after 04b12ef163d1?
 
-		if (!kvm_cpu_cap_has(x86_feature))
-			continue;
+  - What sort of virtualized guest is this?  qemu?
 
-		if (WARN_ON_ONCE(!cpu_feature_enabled(x86_feature)))
-			kvm_cpu_cap_clear(x86_feature);
-	}
+  - How is the NVMe drive passed to the guest?  vfio-pci?
+
+  - Apparently the problem is with a hot-remove in the guest?  How are
+    you doing this?  Sysfs "remove" file?  qemu "device_del"?
+
+  - I assume this hot-remove is only from the *guest* and there's no
+    hotplug event for the *host*?
+
+> Adding some background about the patch f611b83c7a0e PCI: vmd: Honor
+> ACPI _OSC on PCIe features.
+
+Tangent, "f611b83c7a0e" is not a valid SHA1, so I was lost for a minute :)
+I guess you're referring to 04b12ef163d10e348db664900ae7f611b83c7a0e,
+where f611b83c7a0e is at the *end* of the SHA1.  You can abbreviate
+it, but you have to quote the *beginning*, not the end.  E.g., the
+conventional style would be 04b12ef163d1 ("PCI: vmd: Honor ACPI _OSC
+on PCIe features").
+
+Bjorn
