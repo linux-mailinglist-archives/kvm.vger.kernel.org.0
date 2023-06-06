@@ -2,185 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E5647249C1
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 19:06:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B98C97249F7
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 19:16:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238424AbjFFRGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 13:06:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50408 "EHLO
+        id S238578AbjFFRQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 13:16:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231824AbjFFRF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 13:05:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC25310F2
-        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 10:05:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686071114;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Klr9ojsS6vgNV/bJIZFbnwpXw/q2jytqsbFFwKeEH40=;
-        b=bLLr6INGpCJs/tD9MOjM4omqohJGWszokUMLrBBTEKiQIiMwBXwJkq4KeOXtcGtbh3Y1/8
-        8FJOJlFNHsfvi9VTmj9dkGOVXGLi9zwZjiUXyQsnDUl7KlZcKt3tsP0ECsIP0zwvjaEEuA
-        8z7QwG5Nd2oSiQNkyeCbjlCTKUjtaA4=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-379-vr2uQTNWOzOuoZFFYpj5Gg-1; Tue, 06 Jun 2023 13:05:13 -0400
-X-MC-Unique: vr2uQTNWOzOuoZFFYpj5Gg-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7775a282e25so436278739f.0
-        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 10:05:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686071112; x=1688663112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Klr9ojsS6vgNV/bJIZFbnwpXw/q2jytqsbFFwKeEH40=;
-        b=O7qjP3z595VIph9Di5aOaZd3Cmtu4f6VDN1PcE96RkS7YuNX0X6Dck9NZTCPH/wjec
-         yBxWqq0f42d58TWJ9yn0Wfu4yPkTn2/i9opYnStBf3VHM494uNhUsVWU32WHY9RFyBWN
-         bSRFfmMzaLnXXRPd+HHnZ2fFJbmsH+0Rpo/V7v5JHJlgYM3TIGoic6KgJYkpi938xX3I
-         qV8MNeqKPH3c/n39GWJ0luzga7l9pCPDfWGrIvMO5mlUaZZKwnfgoOQ/MayLL4ujQeNo
-         OoNoLcLpFlwSzQcSIDp/wA1nQaIxkWfFOQ9pGu/mBUhQ5aO1fO2VS22oc2GFnmXd3pCZ
-         S0Dw==
-X-Gm-Message-State: AC+VfDyrbkZHxwHM9KJFsXfd15GWAu6ICsUEgwAUd8NvZs8MTOTtKb7V
-        Nh8YSMbGNhXz7ExJHij5QX/MiJ/uN/mOb6TiPT4GKO28SK2ADom4jzQ+3HvYgkI/VajxZom7s/k
-        g1+/7sToLbCUn
-X-Received: by 2002:a92:dc8b:0:b0:335:c544:a1a7 with SMTP id c11-20020a92dc8b000000b00335c544a1a7mr2871911iln.0.1686071112406;
-        Tue, 06 Jun 2023 10:05:12 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5yq6k08lcp3LSMa8oKyF/fjsPILIefcMLDuqKrnu3BgvX/2jpbtzwjN8wvkImSfQ4fBctN/A==
-X-Received: by 2002:a92:dc8b:0:b0:335:c544:a1a7 with SMTP id c11-20020a92dc8b000000b00335c544a1a7mr2871886iln.0.1686071112145;
-        Tue, 06 Jun 2023 10:05:12 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id z11-20020a92d6cb000000b0033bea7559ffsm3112615ilp.53.2023.06.06.10.05.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jun 2023 10:05:11 -0700 (PDT)
-Date:   Tue, 6 Jun 2023 11:05:10 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
+        with ESMTP id S238366AbjFFRQt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 13:16:49 -0400
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2066.outbound.protection.outlook.com [40.107.102.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A0A518E;
+        Tue,  6 Jun 2023 10:16:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aOxrfD5F4Bj5HfWhOhfb6bdPdfAU1Fs0RqyumX4lflQb2qGd+pRme7Yo2FcLQmFzMeKChYHDf/MZTPWHDHFTzP4L4yIcqeqMWuzqaRFJIvs3NzaVl6FCHynKeSH0yFGbp0fKbk4VLAnXfsRXKw5yqEbYb4YSD57tEmdx8/hz+HDaD+mTRIKoWc21W4k3XDJE+AWQxYc42WXyEiEK7bQYDS/a+Trn/I2icy3O/OzcWGqDIa5UjgTfcEjKgZC7CCI8TBuKXE3RJtilDSELaAu0ptODY4aINcDH9ElUcChz3o7dl0eEdE4FBgYv4LlBk/bM9ai7SS9cOzYrWZ+crw0D5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dx82KZLcT/tjdpR75f169l6rVXphPQxUcdJfn/F/qm8=;
+ b=mhukIVCE0kMduqtZ69XszouTBqaE8VyxZxdUQe0i5wIfgIhGLTa/aHd2nu2sh9Oc0XlethFlOqUDYr2EQgQj8FKEoNmklveE7HASWvUVN2tfsE3uXfVYUl8VvpF6rL2s/umoJ3BN+xdtUz8TrQotslMSCcIUwf4RfnggDpdjFKmvYAYynbPDtPkewSv1Z9z0QUZM1LicQTbWKs9lTXkwh6MplE7+0LTjPutxBJUuT2PDohx3g0Ub9cJdg7cSnJVIjE5BKuDMx5MqOA1oAV1zgTE1yIZdkuBxdcDfjVkQOf/b9gyUL6YVXPOyX/XYmvfDwlSb4JcSZIxu9J+niYzmLA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dx82KZLcT/tjdpR75f169l6rVXphPQxUcdJfn/F/qm8=;
+ b=fLMcL89lRn0NJ5a9chJOqiB3IPoyQ3Zx9TwxSKjibJca8ZlnBO2FbTI/KwvVEANazQOzpz+FPN56JzjwYowsFZT9DEYYrTaLYKEUWFqwoJ88Q1domJ1WtV6vUhBdqW70F4c+iGG1FwUzMJTiHHRg68YZiseKOvdmyF/xcFHQ8T5Ii7650wLkZQlSwzT+p/cpvpaBdtzgJeiwLmTXHTDUm4SviNvVblJyxyJoBfqtjhA0JrBh/EzozX9vMfTDgsohM6Tc2/bXLVXRIcVb/SG5snaP3yibx8g6E1BpkbcS31DnXeDXfzEQU2hoQgxNWlo2cuBxqiGTynXmJ3zd0Ggngw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SJ0PR12MB5487.namprd12.prod.outlook.com (2603:10b6:a03:301::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.32; Tue, 6 Jun
+ 2023 17:16:46 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6455.028; Tue, 6 Jun 2023
+ 17:16:46 +0000
+Date:   Tue, 6 Jun 2023 14:16:42 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
 Cc:     ankita@nvidia.com, aniketa@nvidia.com, cjia@nvidia.com,
         kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
         acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
         danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/1] vfio/nvgpu: Add vfio pci variant module for
- grace hopper
-Message-ID: <20230606110510.0f87952c.alex.williamson@redhat.com>
-In-Reply-To: <ZH9RfXhbuED2IUgJ@nvidia.com>
+Subject: Re: [PATCH v3 1/1] vfio/nvgpu: Add vfio pci variant module for grace
+ hopper
+Message-ID: <ZH9p+giEs6bCYfw8@nvidia.com>
 References: <20230606025320.22647-1-ankita@nvidia.com>
-        <20230606083238.48ea50e9.alex.williamson@redhat.com>
-        <ZH9RfXhbuED2IUgJ@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+ <20230606083238.48ea50e9.alex.williamson@redhat.com>
+ <ZH9RfXhbuED2IUgJ@nvidia.com>
+ <20230606110510.0f87952c.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230606110510.0f87952c.alex.williamson@redhat.com>
+X-ClientProxiedBy: SJ0PR03CA0268.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a0::33) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ0PR12MB5487:EE_
+X-MS-Office365-Filtering-Correlation-Id: 50763ff7-91c4-4691-c49f-08db66b1ce36
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xMbtzJAGi0QG3uKGS3z/PozlukYD8uEqkyTdGpMwFRltKHUsWLobjXLdtvs44ByqObRoenvI82t0290rsLRO6rgf+s05DYOp9F0I8XBrtEO9UpmsFtvPMkSrBB37e0KSDns51HmSNbZwMVxsWV99esqsg2hiV+rejqsmHMV+0mjQ7PuDTG+51F6irbuQeZ+ri6Yk2YKhXz0uHugUj2QO8ZSM5AxEDaK+hL7sabFNJ9AyADawLOfC48yLfzvo1GTd3hJpoAlC54pNKPoI9GjId4KaV4lhI0VJ9lPV2Lvz3crnQTKo2HLjh1rDIjRQG4VsauI52PhLzJCzR6A48jpEtXopawXSf3ZzP2dl1Bf+bAVftmgMO/a4ApRoq7XE6M497QLzxWpovh9Y8njjFOv6O1b6qy6Z42N4TdlM+v8eSn9wVo6LEO4L0Vk9viwq0aLyK0NBFC4re7gqyqkI2Y+TpiSvDJ6SKwhUNxZkVw4zG2ealx7kx9G9fEt2TLHTRSDhTMXSvB9LTO7/vrAxs2VD1FbVsBfpvUSbpyCD6WlXVOTM677EvEyj2tpHOfGZhJqpokzbIra9P+/KRqcVf0nJzGlcsof8tjlV7h1d+RTCLWrCf5b71JUPtO6FIas+BFu7NWhljJSpBnf5Wrts2RK2rQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(376002)(39860400002)(346002)(366004)(451199021)(8676002)(316002)(2906002)(5660300002)(8936002)(66556008)(4326008)(6916009)(66946007)(66476007)(41300700001)(6486002)(966005)(6666004)(6512007)(6506007)(26005)(36756003)(186003)(2616005)(478600001)(38100700002)(86362001)(67856001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?iJu6teF7LSK1u/m8HKIwYET7hNba3kJdyhgQ6UAiFsBNLVUgFYcnRpNb8kXW?=
+ =?us-ascii?Q?7PdfokJG7A9jDeDe2fvHkQoAxPS7haXSJWFjVNvE8xBdrM/AEHnvAFeWHRT6?=
+ =?us-ascii?Q?A9o7yNSnjkzjd77I5qQaZ+sDX/HOlZGgcEWptndinfTkDyBGtkPtw8FTyxmU?=
+ =?us-ascii?Q?s3vTse29hYmQ4h+rCUNcdNrSkz9+zo62ZwgjAhGgoD1uF5ypWH1A1bFcyWU1?=
+ =?us-ascii?Q?NTCkVxvuuZxvYlm5LICzYMJKDYA4wPn4MPCB1xTurj2vkc0lU5HxjVEwnqff?=
+ =?us-ascii?Q?yrZunPS1LMbajA7KZd6TZALZ3rCRp6l2F0vbuWrNwHpYeJtwYanILqwHsKvu?=
+ =?us-ascii?Q?RqrHrO5hxVJm8iine+micNzBT8pg3ih+QDczwJfVgSFnLCfX7gJiHwD/b168?=
+ =?us-ascii?Q?Dzl0XnnqL02K4bn83Hriy/UnjKrnzWghai618/MvirQiru2T3S5a80LsHqYJ?=
+ =?us-ascii?Q?w1RVLqooear65abgiyMBHRZKvHAhwINy8JO6yqTP2l6U92XJ3Jn7C87uNdsi?=
+ =?us-ascii?Q?XCsERQk1AuzhBw7eVZPHjxMrw9+CyGCCJvHH0eI9KP5wORv/aDjFAHRtyHs9?=
+ =?us-ascii?Q?Hk+FdnmTBehRq9SKxCoSq1HH6TMB9/xsQV1gnyna4FAx4OU8wzsQvbG16BsT?=
+ =?us-ascii?Q?TGHaU/kX8lC6STvtxYy5mxG258UcDbykhTSXQfzmmSbXcUBfrWWG9ylniWG9?=
+ =?us-ascii?Q?w0yHJ6FMUipYI/u+TG03/GwDPgwrs6JTusA4nx37pt2hw3FQanRHhv3rvH7L?=
+ =?us-ascii?Q?vumKwPA0b1/klbTQqFVIM3NsTRBjeoBsdSqBnFLn4yFWT3JqwCA3JQIhvP59?=
+ =?us-ascii?Q?XOnPHxsgoxpGU3p0jn2VjaSXToxnW0Eer1cb4aYmFmVMF76B3qlQ2lNAftpk?=
+ =?us-ascii?Q?dcFZfjC9hAPqN3tcei5GaRouTabPDRkzytV7HeCHtEKTz51s7AEa62ZaZelT?=
+ =?us-ascii?Q?7SoVfl/Y+T2UEozljT2k7RgcCaO+TzAaopbyqZecoyIOmZ/3WLchRY5ACQid?=
+ =?us-ascii?Q?uwh76QXrLEyfy5D1nFlH9XWr8+1dQ6kHNxsfQNIAzF8YFWrggnljxQSqdWWF?=
+ =?us-ascii?Q?V5Iul8jalMnGMMSxwqxvZq38Lbau6O/iJnpOy/jqRNkxMRYwUYqg9ZLry4ru?=
+ =?us-ascii?Q?oANfqbZZOVGYjnQrwZTeDphdJm3M+okrZB9SgKGGlbC3xJP19HrrkD5/83v/?=
+ =?us-ascii?Q?2Puafv7ltnF1wUpMr1MkaskIhU+94qmmakvAk+TrOuyWi6uxdjqblg2IRIEa?=
+ =?us-ascii?Q?B3Z9mNjqZLfCwks4B9zAA0TDCZcXlImpsq7v+XgM/mvN/b+SF/usIeR9j2Cx?=
+ =?us-ascii?Q?w8DgsaHSv+3cEN1vJyNCSQItkA1MsZbowIIdj6dVBYPTXAzJY4gXB27VE/c/?=
+ =?us-ascii?Q?6FYgVgBIPprw/vmqKRvMxVqqvl8I7BzHaDHfdyZ+WMPidBUgz6U3QDjhFx4G?=
+ =?us-ascii?Q?s2JKsGXEABL+lCdUx8UoOr1Y3XdvqHhag4Kou4PBvrtDvTJN3/34KesOegZF?=
+ =?us-ascii?Q?Q87qMRm31W8DZVjIw0md9f8I6djTLE06/V7DEJySZ1+vHw598SK7imERRm7L?=
+ =?us-ascii?Q?oJLWuIoCDz6TYPWke/PlTBbgc2H+BJ4uI6a5rSRf?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50763ff7-91c4-4691-c49f-08db66b1ce36
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2023 17:16:46.0436
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sCCVvMhrRBL4X4V2XViufDOWXHuGf6vpJTWpy+ysdqggSlHpbm+v66kU/EnbpVSb
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5487
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 6 Jun 2023 12:32:13 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Tue, Jun 06, 2023 at 11:05:10AM -0600, Alex Williamson wrote:
 
-> On Tue, Jun 06, 2023 at 08:32:38AM -0600, Alex Williamson wrote:
-> > On Mon, 5 Jun 2023 19:53:20 -0700
-> > <ankita@nvidia.com> wrote:
-> >   
-> > > From: Ankit Agrawal <ankita@nvidia.com>
-> > > 
-> > > NVIDIA's upcoming Grace Hopper Superchip provides a PCI-like device
-> > > for the on-chip GPU that is the logical OS representation of the
-> > > internal proprietary cache coherent interconnect.
-> > > 
-> > > This representation has a number of limitations compared to a real PCI
-> > > device, in particular, it does not model the coherent GPU memory
-> > > aperture as a PCI config space BAR, and PCI doesn't know anything
-> > > about cacheable memory types.
-> > > 
-> > > Provide a VFIO PCI variant driver that adapts the unique PCI
-> > > representation into a more standard PCI representation facing
-> > > userspace. The GPU memory aperture is obtained from ACPI using
-> > > device_property_read_u64(), according to the FW specification,
-> > > and exported to userspace as a separate VFIO_REGION. Since the device
-> > > implements only one 64-bit BAR (BAR0), the GPU memory aperture is mapped
-> > > to the next available PCI BAR (BAR2). Qemu will then naturally generate a
-> > > PCI device in the VM with two 64-bit BARs (where the cacheable aperture
-> > > reported in BAR2).
-> > > 
-> > > Since this memory region is actually cache coherent with the CPU, the
-> > > VFIO variant driver will mmap it into VMA using a cacheable mapping. The
-> > > mapping is done using remap_pfn_range().
-> > > 
-> > > PCI BAR are aligned to the power-of-2, but the actual memory on the
-> > > device may not. The physical address from the last device PFN up to the
-> > > next power-of-2 aligned PA thus is mapped to a dummy PFN through
-> > > vm_operations fault.  
-> > 
-> > As noted in the QEMU series, this all suggests to me that we should
-> > simply expose a device specific region for this coherent memory which
-> > QEMU can then choose to expose to the VM as a BAR, or not.    
+> It actually seems more complicated this way.  We're masquerading this
+> region as a BAR, but then QEMU needs to know based on device IDs that
+> it's really not a BAR, it has special size properties, mapping
+> attributes, error handling, etc.  
+
+This seems like something has gone wrong then. ie the SIGUBS error
+handling stuff should be totally generic in the qemu side. Mapping
+attributes are set by the kernel, qemu shouldn't know, doesn't need to
+know.
+
+The size issue is going to a be a problem in future anyhow, I expect
+some new standards coming to support non-power-two sizes and they will
+want to map to PCI devices in VMs still.
+
+It seems OK to me if qemu can do this generically for any "BAR"
+region, at least creating an entire "nvidia only" code path just for
+non power 2 BAR sizing seems like a bad ABI choice.
+
+> I'm not privy to a v1, the earliest I see is this (v3):
 > 
-> It doesn't expose as a BAR on bare metal due to a HW limitation. When
-> we look toward VFIO CXL devices I would expect them to have proper
-> BARs and not this ACPI hack.
+> https://lore.kernel.org/all/20230405180134.16932-1-ankita@nvidia.com/
 > 
-> So the approach is to compartmentalize the hack to the bare metal
-> kernel driver and let the ABI and qemu parts be closer to what CXL
-> will eventually need.
-> 
-> > It's clearly not a BAR on bare metal, so if we need to go to all the
-> > trouble to create ACPI tables to further define the coherent memory
-> > space,  
-> 
-> The ACPI tables shouldn't relate to the "BAR", they are needed to
-> overcome the NUMA problems in the kernel in the same way real device
-> FW does.
-> 
-> > what's the benefit of pretending that it's a PCI BAR?  ie. Why should a
-> > VM view this as a BAR rather than follow the same semantics as bare
-> > metal?  
-> 
-> Primarily it is a heck of a lot simpler in qemu and better aligned
-> with where things are going.
+> That outlines that we have a proprietary interconnect exposing cache
+> coherent memory which requires use of special mapping attributes vs a
+> standard PCI BAR and participates in ECC.  All of which seems like it
+> would be easier to setup in QEMU if the vfio-pci representation of the
+> device didn't masquerade this regions as a standard BAR.  In fact it
+> also reminds me of NVlink2 coherent RAM on POWER machines that was
+> similarly handled as device specific regions.  
 
-It actually seems more complicated this way.  We're masquerading this
-region as a BAR, but then QEMU needs to know based on device IDs that
-it's really not a BAR, it has special size properties, mapping
-attributes, error handling, etc.  Maybe we should have taken the hint
-that it's not affected by the PCI config space memory enable bit that a
-BAR region is not the right way for vfio to compose the device.
+It wasn't so good on POWER and if some of that stuff has been done
+more generally we would have been further ahead here..
 
-It's really beside the point whether you want QEMU to expose the memory
-region to the VM as a BAR, but the more I see how this works the more
-it makes sense to me that this should be a device specific region that
-is the trigger for QEMU to setup these special properties.  It is
-trivial for QEMU to expose a region as a BAR and then it can manage the
-size issues for mapping, keeping things like an overflow page out of
-the kernel.
-
-> > We can then have a discussion whether this even needs to be a variant
-> > driver versus a vfio-pci quirk if this device specific region is the
-> > only feature provided (ie. is migration in the future for this
-> > driver?).    
-> 
-> There is alot more here, go back to the original v1 posting to see it
-> all. This is way too much to be just a quirk.
-
-I'm not privy to a v1, the earliest I see is this (v3):
-
-https://lore.kernel.org/all/20230405180134.16932-1-ankita@nvidia.com/
-
-That outlines that we have a proprietary interconnect exposing cache
-coherent memory which requires use of special mapping attributes vs a
-standard PCI BAR and participates in ECC.  All of which seems like it
-would be easier to setup in QEMU if the vfio-pci representation of the
-device didn't masquerade this regions as a standard BAR.  In fact it
-also reminds me of NVlink2 coherent RAM on POWER machines that was
-similarly handled as device specific regions.  Thanks,
-
-Alex
-
+Jason
