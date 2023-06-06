@@ -2,135 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9F4372498D
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 18:55:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E5647249C1
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 19:06:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238337AbjFFQyq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 12:54:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45300 "EHLO
+        id S238424AbjFFRGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 13:06:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238194AbjFFQyc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 12:54:32 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4111110EA
-        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 09:54:29 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-565d6824f2dso93877177b3.0
-        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 09:54:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686070468; x=1688662468;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vWfghhT+K/VvYdIHsaVVRXfigb3NJPqkB0cgBd8gNOA=;
-        b=iEDqIHuxrXw0gIUvL9P7CFRGySn8VWahksHLrzLIsF04F3kpysyg/ZXXPgX1/Oq0Cg
-         uNZwWVM0lmG1i9F7IvLGtcvDZxah8CCzeFmyYd8JeZI2cirpwt8HxgWG6YNxcZ/oyeHa
-         Shr68eC/Tvns2OgiaZBrBLT4BmA8I7jF4xpC5y8+kZuzzOkVQcp5L55EaqRj+XlgqlfZ
-         Gv17+BTmWt1BakRBdxSu5TYg8+VYNMtb+aPTYbMhfPJ/FZ2xN1jI3sKNVB31LT/1zIzf
-         AT1jmu9pwQeIqWTDkhnxgRX4LBjvB9V3rKWEN9NGRmT9IyKYu0qddHc/5qvolsBdo1QK
-         u8Ow==
+        with ESMTP id S231824AbjFFRF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 13:05:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC25310F2
+        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 10:05:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686071114;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Klr9ojsS6vgNV/bJIZFbnwpXw/q2jytqsbFFwKeEH40=;
+        b=bLLr6INGpCJs/tD9MOjM4omqohJGWszokUMLrBBTEKiQIiMwBXwJkq4KeOXtcGtbh3Y1/8
+        8FJOJlFNHsfvi9VTmj9dkGOVXGLi9zwZjiUXyQsnDUl7KlZcKt3tsP0ECsIP0zwvjaEEuA
+        8z7QwG5Nd2oSiQNkyeCbjlCTKUjtaA4=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-379-vr2uQTNWOzOuoZFFYpj5Gg-1; Tue, 06 Jun 2023 13:05:13 -0400
+X-MC-Unique: vr2uQTNWOzOuoZFFYpj5Gg-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7775a282e25so436278739f.0
+        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 10:05:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686070468; x=1688662468;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vWfghhT+K/VvYdIHsaVVRXfigb3NJPqkB0cgBd8gNOA=;
-        b=fuumx0gG4KTb7n5bMPhENpuDsGw2rc+Gotb7N1Nur1ScPyFbEg/rXq3lgaUiijh1Pq
-         zr8NAtiGz37Nj8ntz1ltuLEIHLAEgw6d0NrdxysdN8LWoEtvhQjYrF9TsczUfi1/kJTt
-         KRKrN8HTwn+gmTJHb6miw8TtDp2fUw6hSf4hPLJoH1PKhD9v5PyWJTk9hjwf4qRVwsEg
-         7/l+kGPEAoe35yhvXut3XZY5+EZbh8Nmfs4h6k9gLcMepMBLEF6iaEDnuGHBt4zskRf5
-         JL255G2wbOuhlvPxhQu5hZC7gXIlxpXKOWS40o83XtnnYlLrwYS3mMj2BxHiapxqhr8f
-         C9SQ==
-X-Gm-Message-State: AC+VfDz4Rs/G9AUx6fS1KId0F7G7tBKliacfbhM0YqlSaX7veyN/zuYe
-        3VLNzVAC8gk5JTjbSYv7O6KgqTkca5Y=
-X-Google-Smtp-Source: ACHHUZ735NOAxJ3G3HjCYdRPxFLDWLMm4QKxC+twRQjzhCgzbcYWiG6wj9pxN63ErpW9hCrFilnr+ZskZ6M=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:d208:0:b0:564:c5fd:6d98 with SMTP id
- x8-20020a81d208000000b00564c5fd6d98mr1286497ywi.10.1686070468519; Tue, 06 Jun
- 2023 09:54:28 -0700 (PDT)
-Date:   Tue, 6 Jun 2023 09:54:26 -0700
-In-Reply-To: <ZHQdlSY2tsdGyCPs@chao-email>
-Mime-Version: 1.0
-References: <20230506030435.80262-1-chao.gao@intel.com> <b472b58d-0469-8a55-985c-1d966ce66419@intel.com>
- <ZGZhW/x5OWPmx1qD@google.com> <ZHQdlSY2tsdGyCPs@chao-email>
-Message-ID: <ZH9kwlg2Ac9IER7Y@google.com>
-Subject: Re: [PATCH] KVM: x86: Track supported ARCH_CAPABILITIES in kvm_caps
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1686071112; x=1688663112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Klr9ojsS6vgNV/bJIZFbnwpXw/q2jytqsbFFwKeEH40=;
+        b=O7qjP3z595VIph9Di5aOaZd3Cmtu4f6VDN1PcE96RkS7YuNX0X6Dck9NZTCPH/wjec
+         yBxWqq0f42d58TWJ9yn0Wfu4yPkTn2/i9opYnStBf3VHM494uNhUsVWU32WHY9RFyBWN
+         bSRFfmMzaLnXXRPd+HHnZ2fFJbmsH+0Rpo/V7v5JHJlgYM3TIGoic6KgJYkpi938xX3I
+         qV8MNeqKPH3c/n39GWJ0luzga7l9pCPDfWGrIvMO5mlUaZZKwnfgoOQ/MayLL4ujQeNo
+         OoNoLcLpFlwSzQcSIDp/wA1nQaIxkWfFOQ9pGu/mBUhQ5aO1fO2VS22oc2GFnmXd3pCZ
+         S0Dw==
+X-Gm-Message-State: AC+VfDyrbkZHxwHM9KJFsXfd15GWAu6ICsUEgwAUd8NvZs8MTOTtKb7V
+        Nh8YSMbGNhXz7ExJHij5QX/MiJ/uN/mOb6TiPT4GKO28SK2ADom4jzQ+3HvYgkI/VajxZom7s/k
+        g1+/7sToLbCUn
+X-Received: by 2002:a92:dc8b:0:b0:335:c544:a1a7 with SMTP id c11-20020a92dc8b000000b00335c544a1a7mr2871911iln.0.1686071112406;
+        Tue, 06 Jun 2023 10:05:12 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5yq6k08lcp3LSMa8oKyF/fjsPILIefcMLDuqKrnu3BgvX/2jpbtzwjN8wvkImSfQ4fBctN/A==
+X-Received: by 2002:a92:dc8b:0:b0:335:c544:a1a7 with SMTP id c11-20020a92dc8b000000b00335c544a1a7mr2871886iln.0.1686071112145;
+        Tue, 06 Jun 2023 10:05:12 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id z11-20020a92d6cb000000b0033bea7559ffsm3112615ilp.53.2023.06.06.10.05.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jun 2023 10:05:11 -0700 (PDT)
+Date:   Tue, 6 Jun 2023 11:05:10 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     ankita@nvidia.com, aniketa@nvidia.com, cjia@nvidia.com,
+        kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
+        acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
+        danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/1] vfio/nvgpu: Add vfio pci variant module for
+ grace hopper
+Message-ID: <20230606110510.0f87952c.alex.williamson@redhat.com>
+In-Reply-To: <ZH9RfXhbuED2IUgJ@nvidia.com>
+References: <20230606025320.22647-1-ankita@nvidia.com>
+        <20230606083238.48ea50e9.alex.williamson@redhat.com>
+        <ZH9RfXhbuED2IUgJ@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 29, 2023, Chao Gao wrote:
-> On Thu, May 18, 2023 at 10:33:15AM -0700, Sean Christopherson wrote:
-> >FWIW, this trainwreck is another reason why I'm not going to look at the proposed
-> >"Intel IA32_SPEC_CTRL Virtualization" crud until external forces dictate that I
-> >do so.  I have zero confidence that a paravirt interface defined by hardware
-> >vendors to fiddle with mitigations will be sane, flexible, and extensible.
-> 
-> Hi Sean,
-> 
-> Just to confirm we are on the same page:
-> 
-> "Intel IA32_SPEC_CTRL Virtualization" series consists of 3 parts:
-> 
-> 1. Expose BHI_CTRL, RRSBA_CTRL to guests. They are hardware mitigations to
->    disable BHI and RRSBA behaviors and can be used by both guest/host.
-> 
-> 2. Enable IA32_SPEC_CTRL Virtualization which is a VMX feature. This is for KVM
->    to effectively lock some bits of IA32_SPEC_CTRL MSR when guests are running.
-> 
-> 3. Implement the paravirt interface (the virtual MSRs) for guests to report
->    software mitigations in-use. KVM can utilize such information to enable
->    hardware mitigations for guests transparently to address software mitigation
->    effectiveness issues caused by CPU microarchitecture changes (RRSBA behavior,
->    size of branch history table).
-> 
-> As per my understanding, your concerns are primarily focused on #3, the
-> paravirt interface, rather than the entire series. Am I correct in assuming that
-> you do not oppose #1 and #2?
+On Tue, 6 Jun 2023 12:32:13 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Yes, correct.  I definitely recommend posting #1 and #2 separately from the
-paravirt interface, I ignored the entire series without realizing there is real
-hardware support in there.
-
-> You previously mentioned that the paravirt interface was not common [1], and
-> this time, you expressed an expectation for the interface to be "sane, flexible,
-> and extensible." To ensure clarity, I want to confirm my interpretation of
-> your expectations:
+> On Tue, Jun 06, 2023 at 08:32:38AM -0600, Alex Williamson wrote:
+> > On Mon, 5 Jun 2023 19:53:20 -0700
+> > <ankita@nvidia.com> wrote:
+> >   
+> > > From: Ankit Agrawal <ankita@nvidia.com>
+> > > 
+> > > NVIDIA's upcoming Grace Hopper Superchip provides a PCI-like device
+> > > for the on-chip GPU that is the logical OS representation of the
+> > > internal proprietary cache coherent interconnect.
+> > > 
+> > > This representation has a number of limitations compared to a real PCI
+> > > device, in particular, it does not model the coherent GPU memory
+> > > aperture as a PCI config space BAR, and PCI doesn't know anything
+> > > about cacheable memory types.
+> > > 
+> > > Provide a VFIO PCI variant driver that adapts the unique PCI
+> > > representation into a more standard PCI representation facing
+> > > userspace. The GPU memory aperture is obtained from ACPI using
+> > > device_property_read_u64(), according to the FW specification,
+> > > and exported to userspace as a separate VFIO_REGION. Since the device
+> > > implements only one 64-bit BAR (BAR0), the GPU memory aperture is mapped
+> > > to the next available PCI BAR (BAR2). Qemu will then naturally generate a
+> > > PCI device in the VM with two 64-bit BARs (where the cacheable aperture
+> > > reported in BAR2).
+> > > 
+> > > Since this memory region is actually cache coherent with the CPU, the
+> > > VFIO variant driver will mmap it into VMA using a cacheable mapping. The
+> > > mapping is done using remap_pfn_range().
+> > > 
+> > > PCI BAR are aligned to the power-of-2, but the actual memory on the
+> > > device may not. The physical address from the last device PFN up to the
+> > > next power-of-2 aligned PA thus is mapped to a dummy PFN through
+> > > vm_operations fault.  
+> > 
+> > As noted in the QEMU series, this all suggests to me that we should
+> > simply expose a device specific region for this coherent memory which
+> > QEMU can then choose to expose to the VM as a BAR, or not.    
 > 
-> 1. The interface should not be tied to a specific CPU vendor but instead be
->    beneficial for Intel and AMD (and even ARM, and potentially others).
+> It doesn't expose as a BAR on bare metal due to a HW limitation. When
+> we look toward VFIO CXL devices I would expect them to have proper
+> BARs and not this ACPI hack.
 > 
-> 2. The interface should have the capability to solve other issues (e.g,
->    coordinate mitigations in guest/host to address other perf/function issues),
->    not limited to software mitigation effectiveness on Intel CPUs.
-> 3. The interface should be extendable by VMMs rather than relying on hardware
->    vendors rolling out new spec. This enables VMM developers to propose new
->    ideas to coordinate mitigations in guest/host.
-
-Ya, that's more or less my opinion.  Even more than allowing VMM developers to
-extend/define the interface, I want the definition of the interace to be a
-community/collaborative effort.  LKML has active representatives from all of the
-major (known) hypervisors, so it shouldn't be *that* hard to figure out a way to
-make the interface community driven.
-
-Note that it doesn't necessarily have to be VMM developers, e.g. many of the
-people that are intimately familiar with the mitigations aren't virtualization
-folks.
-
-> Please let me know if I missed any key points or if any of the above statements
-> do not align with your expectations. 
+> So the approach is to compartmentalize the hack to the bare metal
+> kernel driver and let the ABI and qemu parts be closer to what CXL
+> will eventually need.
 > 
-> [1]: https://lore.kernel.org/all/Y6Sin1bmLN10yvMw@google.com/ 
+> > It's clearly not a BAR on bare metal, so if we need to go to all the
+> > trouble to create ACPI tables to further define the coherent memory
+> > space,  
+> 
+> The ACPI tables shouldn't relate to the "BAR", they are needed to
+> overcome the NUMA problems in the kernel in the same way real device
+> FW does.
+> 
+> > what's the benefit of pretending that it's a PCI BAR?  ie. Why should a
+> > VM view this as a BAR rather than follow the same semantics as bare
+> > metal?  
+> 
+> Primarily it is a heck of a lot simpler in qemu and better aligned
+> with where things are going.
+
+It actually seems more complicated this way.  We're masquerading this
+region as a BAR, but then QEMU needs to know based on device IDs that
+it's really not a BAR, it has special size properties, mapping
+attributes, error handling, etc.  Maybe we should have taken the hint
+that it's not affected by the PCI config space memory enable bit that a
+BAR region is not the right way for vfio to compose the device.
+
+It's really beside the point whether you want QEMU to expose the memory
+region to the VM as a BAR, but the more I see how this works the more
+it makes sense to me that this should be a device specific region that
+is the trigger for QEMU to setup these special properties.  It is
+trivial for QEMU to expose a region as a BAR and then it can manage the
+size issues for mapping, keeping things like an overflow page out of
+the kernel.
+
+> > We can then have a discussion whether this even needs to be a variant
+> > driver versus a vfio-pci quirk if this device specific region is the
+> > only feature provided (ie. is migration in the future for this
+> > driver?).    
+> 
+> There is alot more here, go back to the original v1 posting to see it
+> all. This is way too much to be just a quirk.
+
+I'm not privy to a v1, the earliest I see is this (v3):
+
+https://lore.kernel.org/all/20230405180134.16932-1-ankita@nvidia.com/
+
+That outlines that we have a proprietary interconnect exposing cache
+coherent memory which requires use of special mapping attributes vs a
+standard PCI BAR and participates in ECC.  All of which seems like it
+would be easier to setup in QEMU if the vfio-pci representation of the
+device didn't masquerade this regions as a standard BAR.  In fact it
+also reminds me of NVlink2 coherent RAM on POWER machines that was
+similarly handled as device specific regions.  Thanks,
+
+Alex
+
