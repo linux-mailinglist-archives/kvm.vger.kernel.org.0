@@ -2,79 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26E8A724BDA
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 20:53:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E912C724C0C
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 21:04:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239130AbjFFSxR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 14:53:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33358 "EHLO
+        id S239216AbjFFTEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 15:04:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239099AbjFFSxP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 14:53:15 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81F6710FA
-        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 11:53:14 -0700 (PDT)
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com [209.85.128.197])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 9F5013F15C
-        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 18:53:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1686077592;
-        bh=O7c9jllOavC2DNF1C1Xfog7N8o3vExmBU6I3qtmzVS0=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=dXkfxz24gMbtKm/i9mcxtikQ4QXaxOnJIkBlFbwI+3leSjBJMZHLGkIFfIhqQRBwg
-         hlhYqSzxv8yUsUTUtUvV78wG6ghgu2psLnaTWtzFGgoFmqwMAzycL30eqWa1PrWpRI
-         4LpoHXALEQGiAkR6RK9JdJ1cyGVdYklkrUgkg3x5KqRmIHvnRDHPG3MXnw/me86JPm
-         BFJ0R0IwJi4O75/u6a0SDAH+cUbfpJIasYBQSy4/4fwBLgBryPSg4qiE1ouyIc6QfC
-         W0e8BX41uZAmWkY6K8KHIfNHvqYiiZsoNb8Q4h6ZGVLMCEiK/NA5mPZIjpawPmSsey
-         nev+RIKQFfyWA==
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-568ae92e492so106231497b3.3
-        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 11:53:12 -0700 (PDT)
+        with ESMTP id S239120AbjFFTEQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 15:04:16 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D93A010FA
+        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 12:04:13 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-ba8337ade1cso10278472276.2
+        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 12:04:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686078253; x=1688670253;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/joJEhBBdzxQgynNGH7peDx/QfEr6GsPkjZ482ouABQ=;
+        b=MCnDuiOdaiqemGK+B9Wcg2SOCR5FqYrZoFyJJMxj8OcQTvGJd46LgU8813yFq4OLu7
+         oxHawS6NtHSn47FD97mwhGbAiG58ujpvOTG0QKQ4duIfdH2pTgFT7ia1AZxbbcr3ih+7
+         R0vp77j8ghcoOJNy8K3dZ61GW2OiUnJ991eqFbjtcZnx3wsx6YbEjQH50Ze0UWl2SR14
+         x0iygVg9EVNacsgk4nhQ62VJMBm+3y9KBWw+Gq9TnkIyJiGCZqpaH27nWgEGB+3I3Sui
+         4bYDl+vG7ScgFNu0van73yt1DCU3OG2JXehWtrcz9fihEkacxto7+YCuNAN9BCX1WiGD
+         qdxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686077589; x=1688669589;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O7c9jllOavC2DNF1C1Xfog7N8o3vExmBU6I3qtmzVS0=;
-        b=TbGbQHfprICYuNekbQ48koJ1Ta+g87PsUfhuZxwVTfNwZqxedMUopspHfz8hQGCN1D
-         HXvttk1QWvZqDqNCzAyv1zpg/OxJE+0ECNKIhGt6iIoMncZyaW00RYUsFSCcjFKt3DKx
-         1WLy7BiVOBQm9xq1JKsDpJ1nLtfopjKSzctwRK+QFdphagyEd/2Cl8fr5UBAdIG6xm/x
-         rpwbUtZkK+jEe+1nEkU46k/sWfEHoh5SHnNLo/YqI3y//OqhQbcz3cNV0lPGcDXnKZCH
-         F+qAeKr1Fw2Ov2H7BKD/+R6C2jHW7r6LLNrNwcucgz1MdIjQ4ObNH3QvA6f8hkBb0MhB
-         aoyw==
-X-Gm-Message-State: AC+VfDxlc5zfkWDdu785XM01mToED7/J6HAaJL9XgdVwKA4jOHO+VZPm
-        7VTFju9ujBRxAqfjzSXLLI8LY2hGB5/lWgC1BxdbXqHfw8yY9QztLGu0DNVtdxH5lgEWN6bFUTO
-        yJeS9KXPotmJmajHw1DFTP94UkcTehQ54nbbdCWFgABrjnA==
-X-Received: by 2002:a81:8506:0:b0:561:a41d:61cd with SMTP id v6-20020a818506000000b00561a41d61cdmr3256228ywf.46.1686077589645;
-        Tue, 06 Jun 2023 11:53:09 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ638ntLkmBVo/7tTRDckMwwNJGVc7B1PrmgadtZVGh4at7ds3Tk7ua8R6RCLE+v3356OnvzxJS6MixFILTtwa8=
-X-Received: by 2002:a81:8506:0:b0:561:a41d:61cd with SMTP id
- v6-20020a818506000000b00561a41d61cdmr3256210ywf.46.1686077589449; Tue, 06 Jun
- 2023 11:53:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230522161249.800829-1-aleksandr.mikhalitsyn@canonical.com>
- <20230522161249.800829-3-aleksandr.mikhalitsyn@canonical.com> <ZH9/Drgo+sDYTGIG@google.com>
-In-Reply-To: <ZH9/Drgo+sDYTGIG@google.com>
-From:   Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Date:   Tue, 6 Jun 2023 20:52:58 +0200
-Message-ID: <CAEivzxeOYX+W4oBDdbOB7b2bRKFLf7YxFHzpR_8HFu2jN7puiA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] KVM: SVM: enhance info printk's in SEV init
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com,
-        =?UTF-8?Q?St=C3=A9phane_Graber?= <stgraber@ubuntu.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
+        d=1e100.net; s=20221208; t=1686078253; x=1688670253;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/joJEhBBdzxQgynNGH7peDx/QfEr6GsPkjZ482ouABQ=;
+        b=SjTJE32Uuk17tUdEFmtAZm6p33Fqh8O+WUYViEHiXRUQ1A0R7IvSk5X9dLcOYwVZ0n
+         TVnqz2cJUGs99YLnYCf+Omu1oBMY/U1XXpgbPgnoO6lKUsdO5emGpHnrB/meUhF8wfhu
+         2WfWjyy0OTP0aY+RlW5QEVT9BGnXRG0ewRRZeeJvYw+jZrtAb9FbgwFfY0c8AYBZoN/Q
+         RKakihuMiCmlbP7FMoZE8jfzRHamLs16mOQJtXAwqnr3E+6MWlgeZRFiPkI9dySjZMis
+         Og0HmAeXbCV2kFXpQqjBzuiyS4ZiATXluhvDgSYWoQHvEGSMQtUGNqiOyRJhx2CktmKL
+         7bLw==
+X-Gm-Message-State: AC+VfDxNM4nyBiONQNVQ509gvpNh5UPYrhJN6sx08WNRK0ql8Bc3VlQh
+        0RQmap8uvoYLIgVvbI21kXdYtNEG27KBfEp/qw==
+X-Google-Smtp-Source: ACHHUZ4mPNkOsDu9C8Eiuye4FOnWmREtZe3ZknvM1VWa8zvgrZkllOp4bORlEobPosGcDw7BEWu+PuC75l4g5O+J5Q==
+X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
+ (user=ackerleytng job=sendgmr) by 2002:a25:b53:0:b0:ba8:918a:ceec with SMTP
+ id 80-20020a250b53000000b00ba8918aceecmr1077064ybl.4.1686078252995; Tue, 06
+ Jun 2023 12:04:12 -0700 (PDT)
+Date:   Tue,  6 Jun 2023 19:03:45 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
+Message-ID: <cover.1686077275.git.ackerleytng@google.com>
+Subject: [RFC PATCH 00/19] hugetlb support for KVM guest_mem
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     akpm@linux-foundation.org, mike.kravetz@oracle.com,
+        muchun.song@linux.dev, pbonzini@redhat.com, seanjc@google.com,
+        shuah@kernel.org, willy@infradead.org
+Cc:     brauner@kernel.org, chao.p.peng@linux.intel.com,
+        coltonlewis@google.com, david@redhat.com, dhildenb@redhat.com,
+        dmatlack@google.com, erdemaktas@google.com, hughd@google.com,
+        isaku.yamahata@gmail.com, jarkko@kernel.org, jmattson@google.com,
+        joro@8bytes.org, jthoughton@google.com, jun.nakajima@intel.com,
+        kirill.shutemov@linux.intel.com, liam.merwick@oracle.com,
+        mail@maciej.szmigiero.name, mhocko@suse.com, michael.roth@amd.com,
+        qperret@google.com, rientjes@google.com, rppt@kernel.org,
+        steven.price@arm.com, tabba@google.com, vannapurve@google.com,
+        vbabka@suse.cz, vipinsh@google.com, vkuznets@redhat.com,
+        wei.w.wang@intel.com, yu.c.zhang@linux.intel.com,
+        kvm@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-mm@kvack.org,
+        qemu-devel@nongnu.org, x86@kernel.org,
+        Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,53 +81,137 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 6, 2023 at 8:46=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Mon, May 22, 2023, Alexander Mikhalitsyn wrote:
-> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > index cc832a8d1bca..fff63d1f2a34 100644
-> > --- a/arch/x86/kvm/svm/sev.c
-> > +++ b/arch/x86/kvm/svm/sev.c
-> > @@ -2224,7 +2224,6 @@ void __init sev_hardware_setup(void)
-> >               goto out;
-> >       }
-> >
-> > -     pr_info("SEV supported: %u ASIDs\n", sev_asid_count);
-> >       sev_supported =3D true;
-> >
-> >       /* SEV-ES support requested? */
-> > @@ -2252,10 +2251,16 @@ void __init sev_hardware_setup(void)
-> >       if (misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))
-> >               goto out;
-> >
-> > -     pr_info("SEV-ES supported: %u ASIDs\n", sev_es_asid_count);
-> >       sev_es_supported =3D true;
-> >
-> >  out:
-> > +     if (boot_cpu_has(X86_FEATURE_SEV))
-> > +             pr_info("SEV %s (ASIDs %u - %u)\n",
-> > +                     sev_supported ? "enabled" : "disabled", min_sev_a=
-sid, max_sev_asid);
-> > +     if (boot_cpu_has(X86_FEATURE_SEV_ES))
-> > +             pr_info("SEV-ES %s (ASIDs %u - %u)\n",
-> > +                     sev_es_supported ? "enabled" : "disabled", 1, min=
-_sev_asid - 1);
->
-> The min should print '0' if min_sev_asid<=3D1, otherwise the output will =
-be
->
->         SEV-ES disabled (ASIDs 1 - 0)
->
-> which is confusing.  That would also align with what gets printed out for=
- SEV
-> when it's not supported at all (min=3D=3Dmax=3D0).
->
-> No need for v3, I'll fixup when applying.
+Hello,
 
-Got it. Ok!
+This patchset builds upon a soon-to-be-published WIP patchset that Sean
+published at https://github.com/sean-jc/linux/tree/x86/kvm_gmem_solo, mentioned
+at [1].
 
-Thanks again for looking into that.
+The tree can be found at:
+https://github.com/googleprodkernel/linux-cc/tree/gmem-hugetlb-rfc-v1
 
-Kind regards,
-Alex
+In this patchset, hugetlb support for KVM's guest_mem (aka gmem) is introduced,
+allowing VM private memory (for confidential computing) to be backed by hugetlb
+pages.
+
+guest_mem provides userspace with a handle, with which userspace can allocate
+and deallocate memory for confidential VMs without mapping the memory into
+userspace.
+
+Why use hugetlb instead of introducing a new allocator, like gmem does for 4K
+and transparent hugepages?
+
++ hugetlb provides the following useful functionality, which would otherwise
+  have to be reimplemented:
+    + Allocation of hugetlb pages at boot time, including
+        + Parsing of kernel boot parameters to configure hugetlb
+        + Tracking of usage in hstate
+        + gmem will share the same system-wide pool of hugetlb pages, so users
+          don't have to have separate pools for hugetlb and gmem
+    + Page accounting with subpools
+        + hugetlb pages are tracked in subpools, which gmem uses to reserve
+          pages from the global hstate
+    + Memory charging
+        + hugetlb provides code that charges memory to cgroups
+    + Reporting: hugetlb usage and availability are available at /proc/meminfo,
+      etc
+
+The first 11 patches in this patchset is a series of refactoring to decouple
+hugetlb and hugetlbfs.
+
+The central thread binding the refactoring is that some functions (like
+inode_resv_map(), inode_subpool(), inode_hstate(), etc) rely on a hugetlbfs
+concept, that the resv_map, subpool, hstate, are in a specific field in a
+hugetlb inode.
+
+Refactoring to parametrize functions by hstate, subpool, resv_map will allow
+hugetlb to be used by gmem and in other places where these data structures
+aren't necessarily stored in the same positions in the inode.
+
+The refactoring proposed here is just the minimum required to get a
+proof-of-concept working with gmem. I would like to get opinions on this
+approach before doing further refactoring. (See TODOs)
+
+TODOs:
+
++ hugetlb/hugetlbfs refactoring
+    + remove_inode_hugepages() no longer needs to be exposed, it is hugetlbfs
+      specific and used only in inode.c
+    + remove_mapping_hugepages(), remove_inode_single_folio(),
+      hugetlb_unreserve_pages() shouldn't need to take inode as a parameter
+        + Updating inode->i_blocks can be refactored to a separate function and
+          called from hugetlbfs and gmem
+    + alloc_hugetlb_folio_from_subpool() shouldn't need to be parametrized by
+      vma
+    + hugetlb_reserve_pages() should be refactored to be symmetric with
+      hugetlb_unreserve_pages()
+        + It should be parametrized by resv_map
+        + alloc_hugetlb_folio_from_subpool() could perhaps use
+          hugetlb_reserve_pages()?
++ gmem
+    + Figure out if resv_map should be used by gmem at all
+        + Probably needs more refactoring to decouple resv_map from hugetlb
+          functions
+
+Questions for the community:
+
+1. In this patchset, every gmem file backed with hugetlb is given a new
+   subpool. Is that desirable?
+    + In hugetlbfs, a subpool always belongs to a mount, and hugetlbfs has one
+      mount per hugetlb size (2M, 1G, etc)
+    + memfd_create(MFD_HUGETLB) effectively returns a full hugetlbfs file, so it
+      (rightfully) uses the hugetlbfs kernel mounts and their subpools
+    + I gave each file a subpool mostly to speed up implementation and still be
+      able to reserve hugetlb pages from the global hstate based on the gmem
+      file size.
+    + gmem, unlike hugetlbfs, isn't meant to be a full filesystem, so
+        + Should there be multiple mounts, one for each hugetlb size?
+        + Will the mounts be initialized on boot or on first gmem file creation?
+        + Or is one subpool per gmem file fine?
+2. Should resv_map be used for gmem at all, since gmem doesn't allow userspace
+   reservations?
+
+[1] https://lore.kernel.org/lkml/ZEM5Zq8oo+xnApW9@google.com/
+
+---
+
+Ackerley Tng (19):
+  mm: hugetlb: Expose get_hstate_idx()
+  mm: hugetlb: Move and expose hugetlbfs_zero_partial_page
+  mm: hugetlb: Expose remove_inode_hugepages
+  mm: hugetlb: Decouple hstate, subpool from inode
+  mm: hugetlb: Allow alloc_hugetlb_folio() to be parametrized by subpool
+    and hstate
+  mm: hugetlb: Provide hugetlb_filemap_add_folio()
+  mm: hugetlb: Refactor vma_*_reservation functions
+  mm: hugetlb: Refactor restore_reserve_on_error
+  mm: hugetlb: Use restore_reserve_on_error directly in filesystems
+  mm: hugetlb: Parametrize alloc_hugetlb_folio_from_subpool() by
+    resv_map
+  mm: hugetlb: Parametrize hugetlb functions by resv_map
+  mm: truncate: Expose preparation steps for truncate_inode_pages_final
+  KVM: guest_mem: Refactor kvm_gmem fd creation to be in layers
+  KVM: guest_mem: Refactor cleanup to separate inode and file cleanup
+  KVM: guest_mem: hugetlb: initialization and cleanup
+  KVM: guest_mem: hugetlb: allocate and truncate from hugetlb
+  KVM: selftests: Add basic selftests for hugetlbfs-backed guest_mem
+  KVM: selftests: Support various types of backing sources for private
+    memory
+  KVM: selftests: Update test for various private memory backing source
+    types
+
+ fs/hugetlbfs/inode.c                          | 102 ++--
+ include/linux/hugetlb.h                       |  86 ++-
+ include/linux/mm.h                            |   1 +
+ include/uapi/linux/kvm.h                      |  25 +
+ mm/hugetlb.c                                  | 324 +++++++-----
+ mm/truncate.c                                 |  24 +-
+ .../testing/selftests/kvm/guest_memfd_test.c  |  33 +-
+ .../testing/selftests/kvm/include/test_util.h |  14 +
+ tools/testing/selftests/kvm/lib/test_util.c   |  74 +++
+ .../kvm/x86_64/private_mem_conversions_test.c |  38 +-
+ virt/kvm/guest_mem.c                          | 488 ++++++++++++++----
+ 11 files changed, 882 insertions(+), 327 deletions(-)
+
+--
+2.41.0.rc0.172.g3f132b7071-goog
