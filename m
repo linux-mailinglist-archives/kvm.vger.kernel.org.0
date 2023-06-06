@@ -2,83 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A3DE1724A1B
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 19:22:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB07D724A44
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 19:31:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238712AbjFFRWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 13:22:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33560 "EHLO
+        id S238767AbjFFRbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 13:31:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238731AbjFFRWU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 13:22:20 -0400
+        with ESMTP id S238772AbjFFRbE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 13:31:04 -0400
 Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C1171705
-        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 10:22:16 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-53f06f7cc74so3455748a12.1
-        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 10:22:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38BB010F0
+        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 10:30:55 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-53fa2d0c2ebso1946848a12.1
+        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 10:30:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686072136; x=1688664136;
+        d=google.com; s=20221208; t=1686072654; x=1688664654;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mRpAkL7dAZj37Xfm4jemHK02mHerX93Wk1k4AInL4jM=;
-        b=RwZkWCk7kdV86E5yWrMaMCVoVT+BSkAzKG8Bsg+fP3JPmhNI5gLndL89s48ZjrZAC1
-         fkRkYJJrH3GKGrEL0Tt4MRw+H64kU1/aDvwlIKwPN4cnpcYgQnKOlIrpBaKYLe5SwRWl
-         OBVGplsQUh9tGhp/Pp6fXpiu4GCnI5+k7Q1EebsGUYjf+ETDgUSttBTnIOkabhuALJWg
-         9kvN/hy8ZGB5XhuMRtnZ31dEPSX7s/hKySTXEsZJN5voqCDBEX5Zv/MZsTF/Xs6bMVTH
-         dh3wfvnO2ClN5qH14Wd9oBGxvoWES7Nl5HvJLHT7znyUFYyUtsaKwne687J45rLlOgZt
-         fXAA==
+        bh=dXKYuUg7HoIp7PZjxrN4e8/tttddAPBgDCmI9zzNWIM=;
+        b=SdF8/Z8EJeQRk6nebFYNKI2ucCPZHcq5xy8rfaeU4njQPuJ7kQD4azGin/4+gcsoYN
+         T9nCw0DFwLMYDwiicyCl+XEXq94tp9cQFrvkr7ZFTRPM/JB+daXfx0nXheK8kXrPF/dc
+         /aC6zuULKdGJLxMhHBrUt+V4MzKkdO4sAQe+keAXvWNSCMaApSLvB3SBe+8DVBkjOYes
+         P5hTSpCcJmIzeoyw+GZbX6//R83wPKpDiFqvMwtkpzDpUg9qrBi290KMuxvUwJuagkIm
+         TzQoatrZ8G21t/ztprM6CizXlJOLzoQt+N/156P0Wvc97YTtFzZ242UvZXCanXGzqmri
+         RQpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686072136; x=1688664136;
+        d=1e100.net; s=20221208; t=1686072654; x=1688664654;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mRpAkL7dAZj37Xfm4jemHK02mHerX93Wk1k4AInL4jM=;
-        b=BZMh6pYOrz0x3P5bXPg/X1JzDzT1hkQgzbegQUa7S92LM/DdjhKXYjwfZoA4Pem7zX
-         kbDfdP75HRpl7x1s9UQ3HgONCRvZLx8gygsNLHAVjind2pY6Yu34x4dLKJv3O90f459I
-         +J4/Mt/Y24RSFalPunCrNWhuez6iAWvQs0JLHjJtEWRmKbOodN9LLm4tAWwlBoNE24O6
-         FErYEs4NBT96eGmgvXgl/SgxSYCRWx9Rc4J+7YAV3ZxyufwCTzPGFNLNtRfK7TichBoC
-         DEj3E3Vg9/lJcRettShWTTK/rAO9N95/UI5SiMKuCyOPJnxA4gxvgqE1hvCQRqNptj3p
-         vFyw==
-X-Gm-Message-State: AC+VfDxX9Ae7VotCtTKG+uUCaNXsXpF7jucKpaumVBw230KZ+FfsSaEX
-        dYRII2YqomlHSbt49HaEPbs4PnktaQg=
-X-Google-Smtp-Source: ACHHUZ5CdTWpaz9pAirrwFFOkiNuHjSMrxxHITHdSJZQnqUWOhi1md3VO+FsZQFTjgBjAEQXf6cw2hKbbqw=
+        bh=dXKYuUg7HoIp7PZjxrN4e8/tttddAPBgDCmI9zzNWIM=;
+        b=eCw1h/mbmEmJKv0YpLkcHDJUYP6lgIQ8HdxCjDNE1I5HKovIekH9V6FQyg9lpwqgjH
+         oPq7lfuXwOGc416vVHxL5e+C2nBhIPZLYstOE0wWV8kgxNN3N67hPTztASdNQRhl5LAS
+         G2z6sEkKTi/dxxlHoiiNlR6jmVxkIq9BbWUHySa5kyp92gnjZcQ2c3KpoKwtPm5LBieM
+         qXkakg9kbY34hbUHo6N4duxno/sHbIT0KRM7ytIv7zM/gjNMUw9hGG4EsHuscoSyO8vD
+         gI5Xkh6NqsMpndy+BjluQyZhK27PnXhd4Sx6ItiQ9k+7FRdJLaj/HiU3C84pyMhXB6GK
+         SE7g==
+X-Gm-Message-State: AC+VfDwzIxFy7mnmWGOFF5ImY//2QseKviygQgOLSI5piRsKBd7Ss41m
+        26uG6MLUd1pbg7KPOIgfk/d5aL5oEdo=
+X-Google-Smtp-Source: ACHHUZ4i/DCFPvysT54z4dqzO5kTYCE62ZranopSaW8d8GEcgURpwx2SFcJj3U6mfewoMduvG5M7OXMP73Y=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:5848:0:b0:53f:b200:6b57 with SMTP id
- s8-20020a655848000000b0053fb2006b57mr903490pgr.3.1686072135778; Tue, 06 Jun
- 2023 10:22:15 -0700 (PDT)
-Date:   Tue, 6 Jun 2023 10:22:14 -0700
-In-Reply-To: <87wn0hnxh7.fsf@nvidia.com>
+ (user=seanjc job=sendgmr) by 2002:a65:58c5:0:b0:540:ca81:4a1d with SMTP id
+ e5-20020a6558c5000000b00540ca814a1dmr571812pgu.11.1686072654653; Tue, 06 Jun
+ 2023 10:30:54 -0700 (PDT)
+Date:   Tue,  6 Jun 2023 10:26:57 -0700
+In-Reply-To: <20230524061634.54141-1-chao.gao@intel.com>
 Mime-Version: 1.0
-References: <20230602011518.787006-1-seanjc@google.com> <20230602011518.787006-2-seanjc@google.com>
- <87wn0hnxh7.fsf@nvidia.com>
-Message-ID: <ZH9rRnU8h+gDZZuB@google.com>
-Subject: Re: [PATCH 1/3] KVM: VMX: Retry APIC-access page reload if
- invalidation is in-progress
+References: <20230524061634.54141-1-chao.gao@intel.com>
+X-Mailer: git-send-email 2.41.0.rc2.161.g9c6817b8e7-goog
+Message-ID: <168607240700.1276728.3313479971658390819.b4-ty@google.com>
+Subject: Re: [PATCH v2 0/3] MSR_IA32_ARCH_CAPABILITIES cleanups
 From:   Sean Christopherson <seanjc@google.com>
-To:     Alistair Popple <apopple@nvidia.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>
-Content-Type: text/plain; charset="us-ascii"
+To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        x86@kernel.org, Chao Gao <chao.gao@intel.com>
+Cc:     xiaoyao.li@intel.com,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 06, 2023, Alistair Popple wrote:
+On Wed, 24 May 2023 14:16:30 +0800, Chao Gao wrote:
+> Do some cleanups about MSR_IA32_ARCH_CAPABILITIES in KVM e.g, fix stale
+> comments, elimite open-coded MSR reads, track features that can be exposed to
+> guests to avoid computing them runtime. They are found when reading the code.
 > 
-> Thanks for doing this. I'm not overly familiar with KVM implementation
-> but am familiar with mmu notifiers so read through the KVM usage. Looks
-> like KVM is sort of doing something similar to what mmu_interval_notifiers
-> do and I wonder if some of that could be shared.
+> No functional change intented.
+> 
+> Changes from v1 -> v2:
+> 1. toggle ARCH_CAP_SKIP_VMENTRY_L1DFLUSH bit when l1tf mitigation state is
+>    changed by module param. [Xiaoyao, Sean]
+> 2. add more cleanups (patch 2/3)
+> 
+> [...]
 
-They're very, very similar.  At a glance, KVM likely could be moved over to the
-common interval tree implementation, but it would require a substantial amount of
-work in KVM, and various extensions to the mmu notifiers too.  I definitely wouldn't
-be opposed to converging KVM if someone wants to put in the effort, but at the same
-time I wouldn't recommend that anyone actually do the work as the ROI is likely
-very low.
+Applied [2/3] to kvm-x86 misc, no need for that one to wait for the dust to
+settle on the "supported" snapshot.  Thanks!
+
+[2/3] KVM: x86: Correct the name for skipping VMENTER l1d flush
+      https://github.com/kvm-x86/linux/commit/02f1b0b73660
+
+--
+https://github.com/kvm-x86/linux/tree/next
+https://github.com/kvm-x86/linux/tree/fixes
