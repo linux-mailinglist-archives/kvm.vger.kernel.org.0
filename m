@@ -2,369 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B06472451D
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 16:00:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA2B9724550
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 16:09:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237340AbjFFOAU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 10:00:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43284 "EHLO
+        id S236500AbjFFOJG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 10:09:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237461AbjFFOAS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 10:00:18 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B9910CB;
-        Tue,  6 Jun 2023 07:00:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686060016; x=1717596016;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=0Z2hFQUSlOeh6Fizk5wKOQ7R2MUTlRwgXY3AHyOVcgE=;
-  b=Fcgg83ycxnTN2XCfgjWu8ftr7AqVn9NYfpC2uOxYZ4LvnheyminPdxeI
-   qsw3imf5n8HxL8+jyFvbFyIAJtkJcoU00SeoOddrrzg5WuQ4Jq8LuP6E9
-   JoZJK113TxGi9fmQL3BftT15TBaCp0zVG0bTa4mnEKLdVjokHjmqvq53T
-   H1sH0aHEKhv0oktPHvH9JlrIpIofhTS3Ext1jctiRujGsjIxzkV2DwC4d
-   JT8l9VtpOdwuHSdDqT1Z6hcyUtiWVTEZJdehpU7BT9RgAwaBrzfG2mxqF
-   RLAetviTkks/xEuFYFfPJ52CpR3uFyRNw/Z6Y2mwEC8vU9ykjT6WZpYcD
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="336302715"
-X-IronPort-AV: E=Sophos;i="6.00,221,1681196400"; 
-   d="scan'208";a="336302715"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 07:00:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="742158866"
-X-IronPort-AV: E=Sophos;i="6.00,221,1681196400"; 
-   d="scan'208";a="742158866"
-Received: from kumarr2-mobl1.amr.corp.intel.com (HELO [10.212.218.68]) ([10.212.218.68])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 07:00:15 -0700
-Message-ID: <a2da8af2-41a9-a0cf-dbe9-7f0a14bf05fe@linux.intel.com>
-Date:   Tue, 6 Jun 2023 07:00:14 -0700
+        with ESMTP id S237843AbjFFOIu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 10:08:50 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2052.outbound.protection.outlook.com [40.107.93.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14ECF139;
+        Tue,  6 Jun 2023 07:08:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PSn6vWR6Rc2SBe6zcjKOUTYUpWjOrxayhkYb9cYj8/KqYXHEyLyr5jodc/R+t4bRnK6QwTucCqgWtuuxbcUlPfdIKTTmNkNt9GdgslMyEdIPMIgg6yzC4BiUAJakL2OjGhyNQ9it3b0yYqooMwdS7kLsDNYQMq1u5JhlHiiBEIIL0EkXwwvj4u1A5KJDXRtFrgzGWXDWs5fIc7qhZMfZqtYdcMIzKuHEx3ieObYysc9BD9WlfIaa1kQ4wujpX9Nb0JmE/d0vp+zbqAhRhTjO9ieMEnxwBw5NFxHBqKXUIK0oUt129c8aXR0g1OpXnCcZdTqEYVJ3EvuFlbOAFU3T5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=avFlAWeSP6eqgQGjd9uhV0P0U5lGZ4EXqx+DzJ41PDc=;
+ b=EKT0F+YFjtyU3dSPZwk4OHIzW2Ry59L8/HbbK+r1R2zFQlFXcGsTghEvCAnduQfOORYQ6k0lXwsa1A1gxizFzJpYKQVlexX97o7AlCK3hlOXqp//hzdn1JhPy+HSZ/gfGveC1IPnhvJKCwpGHNrTTEMCeUeS4Jx0P8ZQ+AHIkFoNkxXVnudRToih+wtaXnW6R0HHX/drRxNIVYVKwDS0i3auoPAiJmWPMuZsIwmE/DLWvY7mNQUIH4lCD92pLe4E6bt/nXNPiszFn05OhC18htNHchV+oTk3eTFK0Zw1GjH+CVtOaYarTsKBNT2PggF5eDHB562O/0TtXLJoZsvAZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=avFlAWeSP6eqgQGjd9uhV0P0U5lGZ4EXqx+DzJ41PDc=;
+ b=PyOFzCl+wLLGIXeOdvag1oppokY0NUeMCbqIrUHvv//kDFnq7e5TRhKx3Rgif8bZIETq+RD2fx1aDFIiVcpmepprt3eABYKnokNBQa1nW62ZI0PGYUfTpzMYmy8+aIT8ZGDYUNEx+3QLoy/4zj5rpPH/FHoOg/iEBki5/pHQzzDcgRNKHLK85sJ4sv2i2Ec/0imvoBa/TSGfLFmNoMvXqUpJ5gEJD0dj7xutuNTbiPMCcCFf61xYbR7DOHbz/KRo+8E0aKNEYovvdqmtdIQeR+KLM8mduIjLBlNNxm22555Z9/vBk/n6rudC40I5d68cOkR+46gBM+UL7FEQjLhMFQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM4PR12MB6424.namprd12.prod.outlook.com (2603:10b6:8:be::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.32; Tue, 6 Jun
+ 2023 14:08:47 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6455.028; Tue, 6 Jun 2023
+ 14:08:46 +0000
+Date:   Tue, 6 Jun 2023 11:08:44 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v2 01/11] iommu: Add new iommu op to create domains owned
+ by userspace
+Message-ID: <ZH897AGywGVbt51Z@nvidia.com>
+References: <20230511143844.22693-1-yi.l.liu@intel.com>
+ <20230511143844.22693-2-yi.l.liu@intel.com>
+ <BL1PR11MB5271B553140BB729AF4389AB8C7C9@BL1PR11MB5271.namprd11.prod.outlook.com>
+ <ZGfDrRDI50oGih2r@Asurada-Nvidia>
+ <BN9PR11MB52766A760580E6FBB995A33F8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZG2fVj41GgosR1dk@Asurada-Nvidia>
+ <BN9PR11MB5276F1410A11ED631CE6824F8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZG681VohNlw2vvLD@Asurada-Nvidia>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZG681VohNlw2vvLD@Asurada-Nvidia>
+X-ClientProxiedBy: YT3PR01CA0067.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:84::26) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.11.0
-Subject: Re: [PATCH v11 02/20] x86/virt/tdx: Detect TDX during kernel boot
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, dave.hansen@intel.com,
-        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
-        peterz@infradead.org, tglx@linutronix.de, seanjc@google.com,
-        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, ying.huang@intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, chao.gao@intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com
-References: <cover.1685887183.git.kai.huang@intel.com>
- <af4e428ab1245e9441031438e606c14472daf927.1685887183.git.kai.huang@intel.com>
-From:   Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-In-Reply-To: <af4e428ab1245e9441031438e606c14472daf927.1685887183.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB6424:EE_
+X-MS-Office365-Filtering-Correlation-Id: 57346cde-b778-402d-24d9-08db66978b52
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: iKYHDArzlwULlu58riQb892LUOinv9cPvdVw3lxqab7O8JBr6P8KOve4DIRDFsJ/oCpZLhlIZwKVd+t6qDOnP1qUTKeTat59Z3Csnj7TehxEQXeR3EFbmUNXAbsBJdQwP8UP5gu9toP8SurOtxF4AdsI0qCBD2JeNcmcDho/KKpffJ+JRnEGPed8n0bW1B06hu4zi7auvN6YK2huoCAaG2xqEiZ+yHjDCFMTt1Xu6A59kqkLnPt5WCQDsMm8G8IiZUIbvrGJb9WJwLEnzHs66ZH7nhqu9qwJ+kbevQwBGmi7RQl55Lyw9nK4kx0E5c2Bx86B00TRICt6Wh+weyGUFwoawucotsd/0pGZN6CV9IvJS03zeuviB7qlQUQLFYvI1FZciqOrCXojjB0n/j6u9qmC4/FoEuR2iQU8gnMDhJZOCgjTgxkyow97IZ/fUiVXAMqo6NlZAjOPicl3lWWc5iCVmzftgTrHzO7YmupKVazeBEMgE50UqPmrzR9mRFKsb2foO2hTmZ4DASsCFZ2k7YX9xfN6u1mk7L1aGvvIgOGKZec+1x+EcTuJxZeSyX4Y
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(396003)(136003)(346002)(366004)(451199021)(2906002)(2616005)(558084003)(86362001)(36756003)(38100700002)(6486002)(41300700001)(5660300002)(316002)(8936002)(8676002)(6862004)(54906003)(37006003)(478600001)(66556008)(66946007)(66476007)(4326008)(6512007)(66899021)(6506007)(6636002)(26005)(186003)(7416002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AUfZ3Th7SWRjvV3p6QH0JVZNj8B1b6ybdcDtqGuxYecnkw4kiluTrNOcJTlh?=
+ =?us-ascii?Q?n0VY3LK+K5NnXzC4qdeXop9pQcE0ciriBW2RHtXNacW7Kf7WQfK9E51rJcgr?=
+ =?us-ascii?Q?MleLkyw8cwpde6NMHOZx/15QaM2qDdpOiWRiBsdSFUnPOAyll3gRKASFoiM5?=
+ =?us-ascii?Q?iztRWfYB1SgsdjOdzlOdW+MKPDhdRciM0VEoHqYso1P2aWK2DbS0wT1yC0NY?=
+ =?us-ascii?Q?LUkWXJFtg98ZU1ZK9nVlMRwwIvVZmbbv4tRf1Y/vG4gXZHLxmia8bC+nxxWV?=
+ =?us-ascii?Q?XFfMMMtkZLvC2Q2a1AcypGdprOnytgqDuX7d0YalH/jn67flRTC5/31VKIFq?=
+ =?us-ascii?Q?QkZ0PaiyVWAZ+g7qPRq1VKD+Y57YTanwJuSUDxV3dtx7pk+bsSvRbY/nur61?=
+ =?us-ascii?Q?8BtCm0XxLhxgZfCVmaHYr13FWVvIxFP34dBBK1hhpDXx0tinkZbc4ODaxqww?=
+ =?us-ascii?Q?ddayUw7eWEWh2jL78M21mk+A6cIaEYiNS8plYfnyywGdjasvJCEpH5cKeohD?=
+ =?us-ascii?Q?L/F6uicudo1v20W5JK2D0yBBdXzUZVZI77NByjBFc1YzWwQSy1JY06VRio95?=
+ =?us-ascii?Q?+JqInwyZJL2xbkPCIm8Im1syxFpl56qn09MQTsse5EzAWrNkT1haJtrQINER?=
+ =?us-ascii?Q?YuzBI20q6pfuMOeU+k8HNQ7SN0b4a1t6E9bRIfgCK/Pxm2VipjRYqJTEMftN?=
+ =?us-ascii?Q?Q1w8nUMjjV/A98EzA0vDzj5YL+Gx9zsLQDdYIdLTFwjnY2kb6xtp/WYvSqBN?=
+ =?us-ascii?Q?Abj3VR3XyRxGzlekUrAgqvp+zE+6pI6zZc2L0xV6pkaoSyPRkcyKWBj+OX9c?=
+ =?us-ascii?Q?2ZXl50myQZGMiDAfC6BqAzk/+FmxDQ6ddfcouKjBzwaOKQRK6wBlvXPZ987I?=
+ =?us-ascii?Q?MlgSosNph/RlRM4DYAAE5XxUUcJC4onWsB7TyT3j6fpsRcaoVajD+abr/Ecq?=
+ =?us-ascii?Q?W0YuLcxRoEGxM9sooR7hPLGF03zyhYEc6kWddiMUxQ3UmnBpdr3oAHBNVYio?=
+ =?us-ascii?Q?KtlpJjKMwzACjoeSWivynYZz43hN+9/5bWqeEyyDR/C2FwMIjz6WBG5qdpkT?=
+ =?us-ascii?Q?kyH/aBDau9zIqShUv7EP1ZidNIEju/t4bhBc8QfXUIQItXP312PKTU6eNz1x?=
+ =?us-ascii?Q?pKZngFSxr0wzIOdOmT6eYByKCmqMfZx3469vJWIMtbvk//TB3EaGNTh3z9aK?=
+ =?us-ascii?Q?a0b1UAOBhCiTsvE1XNlxcwFTj3WcXguDswU47iffKYU0Y7NeT2cypfqhdzk9?=
+ =?us-ascii?Q?5yVYkWTmUPDnizguxZ1HlQJhC/MwAHzGsII6NpFc7Euo/HvpdZYOGnbMismD?=
+ =?us-ascii?Q?Ho9yIPrc9LKxDoCUrkpKpVPSSTKFGGCDmhFE4GqZzfB4ckOBg9TyB3LxjuRZ?=
+ =?us-ascii?Q?Q3EnciuE9Kub8LwvjQiKKYfOV47Lcw0Lxqb8a2i5+S5mocmx/WIqb0pRzynq?=
+ =?us-ascii?Q?cu2OjZ5q8OM9xC9uJpI7MtWFOy05XS625f+KYDsMwg2IDoX1wpBzp4fDd8lC?=
+ =?us-ascii?Q?WRR2I1mE/DYCy5emx7YRrGUzr+qX+y3GfYLIo1xoti2NtyG8MOYwdkS2gWha?=
+ =?us-ascii?Q?7PBQq2H5DHEetAGzxzrgiJgo3TVvJfrvKezfKhwa?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 57346cde-b778-402d-24d9-08db66978b52
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2023 14:08:46.8969
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zSZt8AllVIUHrg1ULRIPSwpzJQqKOpSAXS84QG8rGKv0nYH/hq39OWSs+6ZUzsRg
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6424
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-HI,
+On Wed, May 24, 2023 at 06:41:41PM -0700, Nicolin Chen wrote:
 
-On 6/4/23 7:27 AM, Kai Huang wrote:
-> Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
-> host and certain physical attacks.  A CPU-attested software module
-> called 'the TDX module' runs inside a new isolated memory range as a
-> trusted hypervisor to manage and run protected VMs.
-> 
-> Pre-TDX Intel hardware has support for a memory encryption architecture
-> called MKTME.  The memory encryption hardware underpinning MKTME is also
-> used for Intel TDX.  TDX ends up "stealing" some of the physical address
-> space from the MKTME architecture for crypto-protection to VMs.  The
-> BIOS is responsible for partitioning the "KeyID" space between legacy
-> MKTME and TDX.  The KeyIDs reserved for TDX are called 'TDX private
-> KeyIDs' or 'TDX KeyIDs' for short.
-> 
-> TDX doesn't trust the BIOS.  During machine boot, TDX verifies the TDX
-> private KeyIDs are consistently and correctly programmed by the BIOS
-> across all CPU packages before it enables TDX on any CPU core.  A valid
-> TDX private KeyID range on BSP indicates TDX has been enabled by the
-> BIOS, otherwise the BIOS is buggy.
-> 
-> The TDX module is expected to be loaded by the BIOS when it enables TDX,
-> but the kernel needs to properly initialize it before it can be used to
-> create and run any TDX guests.  The TDX module will be initialized by
-> the KVM subsystem when KVM wants to use TDX.
-> 
-> Add a new early_initcall(tdx_init) to detect the TDX by detecting TDX
-> private KeyIDs.  Also add a function to report whether TDX is enabled by
-> the BIOS.  Similar to AMD SME, kexec() will use it to determine whether
-> cache flush is needed.
-> 
-> The TDX module itself requires one TDX KeyID as the 'TDX global KeyID'
-> to protect its metadata.  Each TDX guest also needs a TDX KeyID for its
-> own protection.  Just use the first TDX KeyID as the global KeyID and
-> leave the rest for TDX guests.  If no TDX KeyID is left for TDX guests,
-> disable TDX as initializing the TDX module alone is useless.
-> 
-> To start to support TDX, create a new arch/x86/virt/vmx/tdx/tdx.c for
-> TDX host kernel support.  Add a new Kconfig option CONFIG_INTEL_TDX_HOST
-> to opt-in TDX host kernel support (to distinguish with TDX guest kernel
-> support).  So far only KVM uses TDX.  Make the new config option depend
-> on KVM_INTEL.
-> 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> ---
-> 
-> v10 -> v11 (David):
->  - "host kernel" -> "the host kernel"
->  - "protected VM" -> "confidential VM".
->  - Moved setting tdx_global_keyid to the end of tdx_init().
-> 
-> v9 -> v10:
->  - No change.
-> 
-> v8 -> v9:
->  - Moved MSR macro from local tdx.h to <asm/msr-index.h> (Dave).
->  - Moved reserving the TDX global KeyID from later patch to here.
->  - Changed 'tdx_keyid_start' and 'nr_tdx_keyids' to
->    'tdx_guest_keyid_start' and 'tdx_nr_guest_keyids' to represent KeyIDs
->    can be used by guest. (Dave)
->  - Slight changelog update according to above changes.
-> 
-> v7 -> v8: (address Dave's comments)
->  - Improved changelog:
->     - "KVM user" -> "The TDX module will be initialized by KVM when ..."
->     - Changed "tdx_int" part to "Just say what this patch is doing"
->     - Fixed the last sentence of "kexec()" paragraph
->   - detect_tdx() -> record_keyid_partitioning()
->   - Improved how to calculate tdx_keyid_start.
->   - tdx_keyid_num -> nr_tdx_keyids.
->   - Improved dmesg printing.
->   - Add comment to clear_tdx().
-> 
-> v6 -> v7:
->  - No change.
-> 
-> v5 -> v6:
->  - Removed SEAMRR detection to make code simpler.
->  - Removed the 'default N' in the KVM_TDX_HOST Kconfig (Kirill).
->  - Changed to use 'obj-y' in arch/x86/virt/vmx/tdx/Makefile (Kirill).
-> 
-> 
-> ---
->  arch/x86/Kconfig                 | 12 +++++
->  arch/x86/Makefile                |  2 +
->  arch/x86/include/asm/msr-index.h |  3 ++
->  arch/x86/include/asm/tdx.h       |  7 +++
->  arch/x86/virt/Makefile           |  2 +
->  arch/x86/virt/vmx/Makefile       |  2 +
->  arch/x86/virt/vmx/tdx/Makefile   |  2 +
->  arch/x86/virt/vmx/tdx/tdx.c      | 92 ++++++++++++++++++++++++++++++++
->  8 files changed, 122 insertions(+)
->  create mode 100644 arch/x86/virt/Makefile
->  create mode 100644 arch/x86/virt/vmx/Makefile
->  create mode 100644 arch/x86/virt/vmx/tdx/Makefile
->  create mode 100644 arch/x86/virt/vmx/tdx/tdx.c
-> 
-> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> index 53bab123a8ee..191587f75810 100644
-> --- a/arch/x86/Kconfig
-> +++ b/arch/x86/Kconfig
-> @@ -1952,6 +1952,18 @@ config X86_SGX
->  
->  	  If unsure, say N.
->  
-> +config INTEL_TDX_HOST
-> +	bool "Intel Trust Domain Extensions (TDX) host support"
-> +	depends on CPU_SUP_INTEL
-> +	depends on X86_64
-> +	depends on KVM_INTEL
-> +	help
-> +	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
-> +	  host and certain physical attacks.  This option enables necessary TDX
-> +	  support in the host kernel to run confidential VMs.
-> +
-> +	  If unsure, say N.
-> +
->  config EFI
->  	bool "EFI runtime service support"
->  	depends on ACPI
-> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-> index b39975977c03..ec0e71d8fa30 100644
-> --- a/arch/x86/Makefile
-> +++ b/arch/x86/Makefile
-> @@ -252,6 +252,8 @@ archheaders:
->  
->  libs-y  += arch/x86/lib/
->  
-> +core-y += arch/x86/virt/
-> +
->  # drivers-y are linked after core-y
->  drivers-$(CONFIG_MATH_EMULATION) += arch/x86/math-emu/
->  drivers-$(CONFIG_PCI)            += arch/x86/pci/
-> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> index 3aedae61af4f..6d8f15b1552c 100644
-> --- a/arch/x86/include/asm/msr-index.h
-> +++ b/arch/x86/include/asm/msr-index.h
-> @@ -523,6 +523,9 @@
->  #define MSR_RELOAD_PMC0			0x000014c1
->  #define MSR_RELOAD_FIXED_CTR0		0x00001309
->  
-> +/* KeyID partitioning between MKTME and TDX */
-> +#define MSR_IA32_MKTME_KEYID_PARTITIONING	0x00000087
-> +
->  /*
->   * AMD64 MSRs. Not complete. See the architecture manual for a more
->   * complete list.
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index 25fd6070dc0b..4dfe2e794411 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -94,5 +94,12 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
->  	return -ENODEV;
->  }
->  #endif /* CONFIG_INTEL_TDX_GUEST && CONFIG_KVM_GUEST */
-> +
-> +#ifdef CONFIG_INTEL_TDX_HOST
-> +bool platform_tdx_enabled(void);
-> +#else	/* !CONFIG_INTEL_TDX_HOST */
-> +static inline bool platform_tdx_enabled(void) { return false; }
-> +#endif	/* CONFIG_INTEL_TDX_HOST */
-> +
->  #endif /* !__ASSEMBLY__ */
->  #endif /* _ASM_X86_TDX_H */
-> diff --git a/arch/x86/virt/Makefile b/arch/x86/virt/Makefile
-> new file mode 100644
-> index 000000000000..1e36502cd738
-> --- /dev/null
-> +++ b/arch/x86/virt/Makefile
-> @@ -0,0 +1,2 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +obj-y	+= vmx/
-> diff --git a/arch/x86/virt/vmx/Makefile b/arch/x86/virt/vmx/Makefile
-> new file mode 100644
-> index 000000000000..feebda21d793
-> --- /dev/null
-> +++ b/arch/x86/virt/vmx/Makefile
-> @@ -0,0 +1,2 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +obj-$(CONFIG_INTEL_TDX_HOST)	+= tdx/
-> diff --git a/arch/x86/virt/vmx/tdx/Makefile b/arch/x86/virt/vmx/tdx/Makefile
-> new file mode 100644
-> index 000000000000..93ca8b73e1f1
-> --- /dev/null
-> +++ b/arch/x86/virt/vmx/tdx/Makefile
-> @@ -0,0 +1,2 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +obj-y += tdx.o
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> new file mode 100644
-> index 000000000000..2d91e7120c90
-> --- /dev/null
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -0,0 +1,92 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright(c) 2023 Intel Corporation.
-> + *
-> + * Intel Trusted Domain Extensions (TDX) support
-> + */
-> +
-> +#define pr_fmt(fmt)	"tdx: " fmt
-> +
-> +#include <linux/types.h>
-> +#include <linux/cache.h>
-> +#include <linux/init.h>
-> +#include <linux/errno.h>
-> +#include <linux/printk.h>
-> +#include <asm/msr-index.h>
-> +#include <asm/msr.h>
-> +#include <asm/tdx.h>
-> +
-> +static u32 tdx_global_keyid __ro_after_init;
-> +static u32 tdx_guest_keyid_start __ro_after_init;
-> +static u32 tdx_nr_guest_keyids __ro_after_init;
-> +
-> +static int __init record_keyid_partitioning(u32 *tdx_keyid_start,
-> +					    u32 *nr_tdx_keyids)
-> +{
-> +	u32 _nr_mktme_keyids, _tdx_keyid_start, _nr_tdx_keyids;
-> +	int ret;
-> +
-> +	/*
-> +	 * IA32_MKTME_KEYID_PARTIONING:
-> +	 *   Bit [31:0]:	Number of MKTME KeyIDs.
-> +	 *   Bit [63:32]:	Number of TDX private KeyIDs.
-> +	 */
-> +	ret = rdmsr_safe(MSR_IA32_MKTME_KEYID_PARTITIONING, &_nr_mktme_keyids,
-> +			&_nr_tdx_keyids);
-> +	if (ret)
-> +		return -ENODEV;
-> +
-> +	if (!_nr_tdx_keyids)
-> +		return -ENODEV;
-> +
-> +	/* TDX KeyIDs start after the last MKTME KeyID. */
-> +	_tdx_keyid_start = _nr_mktme_keyids + 1;
-> +
-> +	*tdx_keyid_start = _tdx_keyid_start;
-> +	*nr_tdx_keyids = _nr_tdx_keyids;
-> +
-> +	return 0;
-> +}
-> +
-> +static int __init tdx_init(void)
-> +{
-> +	u32 tdx_keyid_start, nr_tdx_keyids;
-> +	int err;
-> +
-> +	err = record_keyid_partitioning(&tdx_keyid_start, &nr_tdx_keyids);
-> +	if (err)
-> +		return err;
-> +
-> +	pr_info("BIOS enabled: private KeyID range [%u, %u)\n",
-> +			tdx_keyid_start, tdx_keyid_start + nr_tdx_keyids);
-> +
-> +	/*
-> +	 * The TDX module itself requires one 'global KeyID' to protect
-> +	 * its metadata.  If there's only one TDX KeyID, there won't be
-> +	 * any left for TDX guests thus there's no point to enable TDX
-> +	 * at all.
-> +	 */
-> +	if (nr_tdx_keyids < 2) {
-> +		pr_info("initialization failed: too few private KeyIDs available.\n");
-> +		goto no_tdx;
+> Upon a quick check, I think we could. Though it'd be slightly
+> mismatched with the domain_alloc op, it should be fine since
+> iommufd is likely to be the only caller.
 
-I think you can return -ENODEV directly here. Maybe this goto is added to adapt to next
-patches. But for this patch, I don't think you need it.
+Ideally the main op would return ERR_PTR too
 
-> +	}
-> +
-> +	/*
-> +	 * Just use the first TDX KeyID as the 'global KeyID' and
-> +	 * leave the rest for TDX guests.
-> +	 */
-> +	tdx_global_keyid = tdx_keyid_start;
-> +	tdx_guest_keyid_start = ++tdx_keyid_start;
-> +	tdx_nr_guest_keyids = --nr_tdx_keyids;
-> +
-> +	return 0;
-> +no_tdx:
-> +	return -ENODEV;
-> +}
-> +early_initcall(tdx_init);
-> +
-> +/* Return whether the BIOS has enabled TDX */
-> +bool platform_tdx_enabled(void)
-> +{
-> +	return !!tdx_global_keyid;
-> +}
-
--- 
-Sathyanarayanan Kuppuswamy
-Linux Kernel Developer
+Jason
