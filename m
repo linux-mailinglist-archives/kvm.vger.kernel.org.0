@@ -2,68 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52F287243AB
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 15:05:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4841B724430
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 15:19:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237971AbjFFNFt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 09:05:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34246 "EHLO
+        id S238086AbjFFNTe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 09:19:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237957AbjFFNFZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 09:05:25 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08DDFE78
-        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 06:05:23 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3f739ec88b2so21792495e9.1
-        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 06:05:23 -0700 (PDT)
+        with ESMTP id S235590AbjFFNTc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 09:19:32 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02C21126;
+        Tue,  6 Jun 2023 06:19:32 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1b04706c974so52656185ad.2;
+        Tue, 06 Jun 2023 06:19:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1686056722; x=1688648722;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pdfytQloM9GeRF7CxB2XjlnNueBYEnZCkjNuVpc2Ttw=;
-        b=lSQpQlaZ8OdCRKVxOclE35LDsH9mDXhUQNEpYW1nGHq+pQ+7fSuQQ+0AmcEoRi4ZaZ
-         NgPQhlAMV5TGnFqV7HIwNH+xdpsEu1gTcANWSf3DYZMyHB9Zc0LBGZTLZhFoA+Swdm0H
-         LtJRg6jyV29b9s+8L485hM+ThB3RyqJHPCG0kb3p0pfa9/VOw/2YRlo+Y78ZuErVnGnr
-         dMUyxwNuOZY/vc4Q/04l+2B9c3D6u1oGs0HJuQs4vnQtBMQ03ZLUrnyPbBF5ZEQdWYI3
-         bUYJV3KflDPVsk8Rk/aqLIY2gDi+zoD8ww4U/e40Gdq+4q0sTjY+fMJEENbav0YZd0WN
-         zz0w==
+        d=gmail.com; s=20221208; t=1686057571; x=1688649571;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+J0YyEG+Bc29nQ2RIHEkbLv3QWk8xBsAd1vdT8IvS7g=;
+        b=Ec4yMwnyrZjdH/+gIXXH/c8NWhC0USVFjAN4xFs3QCzZXrho2aZMH2pc7xn6MNsBV4
+         oHHNnYV5JbsDFuBqO/HJiUH3srguDl3NLu4nbGdkNqLbccRJHvGHnQ6kjAcg2vYtlXla
+         bm13S/yN/uIAhqOM7MSv6yfic5pDHuonX7MbIEbmVIaoCgddBtTy4Zh2Z8Vnm0kCbHZn
+         +QMbYfeNvioTnv0eTEI+AVX49dKc8mYRwCWefRxeHHRY1+QPzXnSMeoX0v+JybbexJsY
+         xQWJPZo2c3UY2V/i9Cku8C+HlnRE0DWWtWapuHk3MXouGrC+dxK0kkdjiaFJXy/fm+b5
+         iRRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686056722; x=1688648722;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pdfytQloM9GeRF7CxB2XjlnNueBYEnZCkjNuVpc2Ttw=;
-        b=j6PiV0LOU0XmW2lB6YA3MXEzjky3g8eqTYkyH+3pc2/SfJHb8JQhziNqCtGCZMc7FT
-         swW+RtfranuG3CX0EZWpOzEw9ZN/ilTeFmVs9KtYG2JS9Sm6Z2BYwvI3nKTqFkP525ab
-         LzTOWzvq+XgdTgnCaJ3mU6laq0gw5KXXt5ty5vDFrpk3uKPtjQm2B2rWj3wEz0K9rNiL
-         YnCF7ldgr2xvKU467qsR6Nm+kwj1KvCzGiHJTM8cmMddcbXq5lm53S1uV/91kL9utcxx
-         3nM3yqpjpWyt0xKJdAl3ntqSl3TWDtvZ8xBVO+SffTaTzkNH4M6xgt6+GyLreM0jnP9l
-         q9ag==
-X-Gm-Message-State: AC+VfDxe2G+P+JJh2y85De+dXIm0gdS0SxTtnA+9qNabNvdDWb5gpt5u
-        eBdiLSPfO6LpAX5HTbhqhGJad1E0oSZBg8QGPBg2IQ==
-X-Google-Smtp-Source: ACHHUZ73Fj0AX18apnyC3Af20nKXQt8bwuhd/9TkJB8q7tAZX1RkHMyF8uueo3TnlEJqUHz0pwp/5A==
-X-Received: by 2002:adf:ec43:0:b0:30e:4265:c903 with SMTP id w3-20020adfec43000000b0030e4265c903mr1626264wrn.66.1686056722490;
-        Tue, 06 Jun 2023 06:05:22 -0700 (PDT)
-Received: from localhost.localdomain (5750a5b3.skybroadband.com. [87.80.165.179])
-        by smtp.gmail.com with ESMTPSA id h14-20020a5d504e000000b00300aee6c9cesm12636125wrt.20.2023.06.06.06.05.22
+        d=1e100.net; s=20221208; t=1686057571; x=1688649571;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+J0YyEG+Bc29nQ2RIHEkbLv3QWk8xBsAd1vdT8IvS7g=;
+        b=UWykpg4sjQqiSvqBloi6Q9uOWnDIC/mWn78a/fU8UyhbHUNAJ/D/jMr8ZVQn+Aytz4
+         N+qLXzOngVRpLtWn7MBLtPsbQefZBQN45TFuOsIVxok/G3MOT6ts1JCpTSKjlXh0vs3l
+         bokqc6sG23fNmvYX9A47vQK6hNmO26jImcsp3Mcqbb8al/eMqsYoNEemcrYEoUyH8VZ6
+         YAVJHq4DOwT+2joT5UyD0Ziv6nkQfU0GEFlzAAaf60ETGr7PIWqyh98dkSyr5thhFHB3
+         c6kb+BaALYJwVHXoKl2g+4quTviqoKSSGm7eIn3rn6vpVBnDCshtIXSorG5vgwtyT6K2
+         VPhg==
+X-Gm-Message-State: AC+VfDy35K35arX7Tutn0wDSPOzjvUK0752Zv6eXm+1KZp6U0Qv9k+J/
+        3ik0w4q7JvtL8uNDbXVPykQ=
+X-Google-Smtp-Source: ACHHUZ7ZZfaFDdXqM05a0itePPSLYv0CvztkAVEuUDRYYwe01/8+sXJpFV38aXfaT6/onULzozX3SA==
+X-Received: by 2002:a17:902:e742:b0:1ad:cb4b:1d50 with SMTP id p2-20020a170902e74200b001adcb4b1d50mr2723294plf.43.1686057571118;
+        Tue, 06 Jun 2023 06:19:31 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id r2-20020a1709028bc200b001afd6647a77sm8496482plo.155.2023.06.06.06.19.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jun 2023 06:05:22 -0700 (PDT)
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     kvm@vger.kernel.org, will@kernel.org
-Cc:     andre.przywara@arm.com,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [PATCH kvmtool v2 17/17] virtio/vhost: Clear VIRTIO_F_ACCESS_PLATFORM
-Date:   Tue,  6 Jun 2023 14:04:26 +0100
-Message-Id: <20230606130426.978945-18-jean-philippe@linaro.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230606130426.978945-1-jean-philippe@linaro.org>
-References: <20230606130426.978945-1-jean-philippe@linaro.org>
+        Tue, 06 Jun 2023 06:19:30 -0700 (PDT)
+Date:   Tue, 6 Jun 2023 06:19:29 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Yuan Yao <yuan.yao@linux.intel.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v14 031/113] KVM: x86/mmu: Replace hardcoded value 0 for
+ the initial value for SPTE
+Message-ID: <20230606131929.GA2403361@ls.amr.corp.intel.com>
+References: <cover.1685333727.git.isaku.yamahata@intel.com>
+ <8b4f21e2fada944d041ffee0f27d527e0e447cbb.1685333727.git.isaku.yamahata@intel.com>
+ <20230606045923.ol5kjhagiimqksmn@yy-desk-7060>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230606045923.ol5kjhagiimqksmn@yy-desk-7060>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,117 +80,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vhost interprets the VIRTIO_F_ACCESS_PLATFORM flag as if accesses need
-to use vhost-iotlb, and since kvmtool does not implement vhost-iotlb,
-vhost will fail to access the virtqueue.
+On Tue, Jun 06, 2023 at 12:59:23PM +0800,
+Yuan Yao <yuan.yao@linux.intel.com> wrote:
 
-This fix is preventive. Kvmtool does not set VIRTIO_F_ACCESS_PLATFORM at
-the moment but the Arm CCA and pKVM changes will likely hit the issue
-(as experienced with the CCA development tree), so we might as well fix
-it now.
+> On Sun, May 28, 2023 at 09:19:13PM -0700, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> >
+> > The TDX support will need the "suppress #VE" bit (bit 63) set as the
+> > initial value for SPTE.  To reduce code change size, introduce a new macro
+> > SHADOW_NONPRESENT_VALUE for the initial value for the shadow page table
+> > entry (SPTE) and replace hard-coded value 0 for it.  Initialize shadow page
+> > tables with their value.
+> >
+> > The plan is to unconditionally set the "suppress #VE" bit for both AMD and
+> > Intel as: 1) AMD hardware uses the bit 63 as NX for present SPTE and
+> > ignored for non-present SPTE; 2) for conventional VMX guests, KVM never
+> > enables the "EPT-violation #VE" in VMCS control and "suppress #VE" bit is
+> > ignored by hardware.
+> >
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c         | 20 +++++++++++++++-----
+> >  arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+> >  arch/x86/kvm/mmu/spte.h        |  2 ++
+> >  arch/x86/kvm/mmu/tdp_mmu.c     | 14 +++++++-------
+> >  4 files changed, 25 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index dc2b9a2f717c..1b6fd4434e96 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -576,9 +576,9 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+> >
+> >  	if (!is_shadow_present_pte(old_spte) ||
+> >  	    !spte_has_volatile_bits(old_spte))
+> > -		__update_clear_spte_fast(sptep, 0ull);
+> > +		__update_clear_spte_fast(sptep, SHADOW_NONPRESENT_VALUE);
+> >  	else
+> > -		old_spte = __update_clear_spte_slow(sptep, 0ull);
+> > +		old_spte = __update_clear_spte_slow(sptep, SHADOW_NONPRESENT_VALUE);
+> >
+> >  	if (!is_shadow_present_pte(old_spte))
+> >  		return old_spte;
+> > @@ -612,7 +612,7 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+> >   */
+> >  static void mmu_spte_clear_no_track(u64 *sptep)
+> >  {
+> > -	__update_clear_spte_fast(sptep, 0ull);
+> > +	__update_clear_spte_fast(sptep, SHADOW_NONPRESENT_VALUE);
+> >  }
+> >
+> >  static u64 mmu_spte_get_lockless(u64 *sptep)
+> > @@ -1969,7 +1969,8 @@ static bool kvm_sync_page_check(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+> >
+> >  static int kvm_sync_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
+> >  {
+> > -	if (!sp->spt[i])
+> > +	/* sp->spt[i] has initial value of shadow page table allocation */
+> > +	if (sp->spt[i] != SHADOW_NONPRESENT_VALUE)
+> 
+> This should be "sp->spt[i] == SHADOW_NONPRESENT_VALUE" ? Looks all present spt[i]
+> are skipped without sync for shadow paging.
 
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
----
- include/kvm/virtio.h |  1 +
- virtio/net.c         | 16 +++++-----------
- virtio/scsi.c        |  3 +--
- virtio/vhost.c       | 11 +++++++++++
- virtio/vsock.c       |  4 ++--
- 5 files changed, 20 insertions(+), 15 deletions(-)
+Oop, you're right. Will fix it.
 
-diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-index 1fa33e5b..95b5142b 100644
---- a/include/kvm/virtio.h
-+++ b/include/kvm/virtio.h
-@@ -273,6 +273,7 @@ void virtio_vhost_set_vring_irqfd(struct kvm *kvm, u32 gsi,
- 				  struct virt_queue *queue);
- void virtio_vhost_reset_vring(struct kvm *kvm, int vhost_fd, u32 index,
- 			      struct virt_queue *queue);
-+int virtio_vhost_set_features(int vhost_fd, u64 features);
- 
- int virtio_transport_parser(const struct option *opt, const char *arg, int unset);
- 
-diff --git a/virtio/net.c b/virtio/net.c
-index 2b4b3661..f09dd0a4 100644
---- a/virtio/net.c
-+++ b/virtio/net.c
-@@ -517,23 +517,17 @@ static u64 get_host_features(struct kvm *kvm, void *dev)
- 	return features;
- }
- 
--static int virtio_net__vhost_set_features(struct net_dev *ndev)
--{
--	/* VHOST_NET_F_VIRTIO_NET_HDR clashes with VIRTIO_F_ANY_LAYOUT! */
--	u64 features = ndev->vdev.features &
--			~(1UL << VHOST_NET_F_VIRTIO_NET_HDR);
--
--	return ioctl(ndev->vhost_fd, VHOST_SET_FEATURES, &features);
--}
--
- static void virtio_net_start(struct net_dev *ndev)
- {
-+	/* VHOST_NET_F_VIRTIO_NET_HDR clashes with VIRTIO_F_ANY_LAYOUT! */
-+	u64 features = ndev->vdev.features & ~(1UL << VHOST_NET_F_VIRTIO_NET_HDR);
-+
- 	if (ndev->mode == NET_MODE_TAP) {
- 		if (!virtio_net__tap_init(ndev))
- 			die_perror("TAP device initialized failed because");
- 
--		if (ndev->vhost_fd &&
--				virtio_net__vhost_set_features(ndev) != 0)
-+		if (ndev->vhost_fd && virtio_vhost_set_features(ndev->vhost_fd,
-+								features))
- 			die_perror("VHOST_SET_FEATURES failed");
- 	} else {
- 		ndev->info.vnet_hdr_len = virtio_net_hdr_len(ndev);
-diff --git a/virtio/scsi.c b/virtio/scsi.c
-index 27cb3798..a842290b 100644
---- a/virtio/scsi.c
-+++ b/virtio/scsi.c
-@@ -69,8 +69,7 @@ static void notify_status(struct kvm *kvm, void *dev, u32 status)
- 	u16 endian = vdev->endian;
- 
- 	if (status & VIRTIO__STATUS_START) {
--		r = ioctl(sdev->vhost_fd, VHOST_SET_FEATURES,
--			  &sdev->vdev.features);
-+		r = virtio_vhost_set_features(sdev->vhost_fd, sdev->vdev.features);
- 		if (r != 0)
- 			die_perror("VHOST_SET_FEATURES failed");
- 
-diff --git a/virtio/vhost.c b/virtio/vhost.c
-index 0049003b..ea640fa6 100644
---- a/virtio/vhost.c
-+++ b/virtio/vhost.c
-@@ -196,3 +196,14 @@ void virtio_vhost_reset_vring(struct kvm *kvm, int vhost_fd, u32 index,
- 	close(queue->irqfd);
- 	queue->irqfd = 0;
- }
-+
-+int virtio_vhost_set_features(int vhost_fd, u64 features)
-+{
-+	/*
-+	 * vhost interprets VIRTIO_F_ACCESS_PLATFORM as meaning there is an
-+	 * iotlb. Since this is not the case for kvmtool, mask it.
-+	 */
-+	u64 masked_feat = features & ~(1ULL << VIRTIO_F_ACCESS_PLATFORM);
-+
-+	return ioctl(vhost_fd, VHOST_SET_FEATURES, &masked_feat);
-+}
-diff --git a/virtio/vsock.c b/virtio/vsock.c
-index 5d22bd24..7d4053a1 100644
---- a/virtio/vsock.c
-+++ b/virtio/vsock.c
-@@ -107,8 +107,8 @@ static void notify_status(struct kvm *kvm, void *dev, u32 status)
- 	if (status & VIRTIO__STATUS_START) {
- 		start = 1;
- 
--		r = ioctl(vdev->vhost_fd, VHOST_SET_FEATURES,
--			  &vdev->vdev.features);
-+		r = virtio_vhost_set_features(vdev->vhost_fd,
-+					      vdev->vdev.features);
- 		if (r != 0)
- 			die_perror("VHOST_SET_FEATURES failed");
- 	} else if (status & VIRTIO__STATUS_STOP) {
+Thanks,
 -- 
-2.40.1
-
+Isaku Yamahata <isaku.yamahata@gmail.com>
