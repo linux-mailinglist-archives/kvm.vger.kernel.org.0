@@ -2,88 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1417723865
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 09:08:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58F3F723906
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 09:31:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235835AbjFFHIX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 03:08:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59358 "EHLO
+        id S235442AbjFFHa6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 03:30:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235822AbjFFHIV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 03:08:21 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19607B2
-        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 00:08:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686035301; x=1717571301;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=g803pMNA2wmAwc/9nZuEs5fpVitT7acZiO6TMXeDKZk=;
-  b=RZKm74g0+UG1006nWOCVZNfAaNgJ5l+wyvCrQ5WNg00Xfpa9Me4CQTL/
-   BYPowMVyODkRF/6vcF+aMlJnHv235QWE9ht7d9dpohX/1jQjT2BWJFM+S
-   Yzh5ZFQNVB9ZYY6B5T/lAVPxSS4UQ9NMPfZJT3bLsgjIcopsgJKmKynOT
-   0DM8Y1xVKbL1dd3j5QWq4ZrbjiGb9D6OYdIDLhYE4VDmBuoeqdAdt0p4Q
-   So2Y/uYKW90BUqfCspmikgFqD32D6Fs74XyT5ymN+nUhN/5mhUyUEWk6g
-   JxP9EGvCAL8LAddHpUuJyMPs0HxT2gsd6n58+S1fkJkWuOCn2OC2TBpoY
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="336945213"
-X-IronPort-AV: E=Sophos;i="6.00,219,1681196400"; 
-   d="scan'208";a="336945213"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 00:08:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="955637446"
-X-IronPort-AV: E=Sophos;i="6.00,219,1681196400"; 
-   d="scan'208";a="955637446"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.249.170.159]) ([10.249.170.159])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 00:08:19 -0700
-Message-ID: <bf0996fa-9c12-fb72-e471-e914f6a32ad0@linux.intel.com>
-Date:   Tue, 6 Jun 2023 15:08:17 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH v5 4/4] x86: Add test case for INVVPID with LAM
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        robert.hu@linux.intel.com
-References: <20230530024356.24870-1-binbin.wu@linux.intel.com>
- <20230530024356.24870-5-binbin.wu@linux.intel.com>
- <ZH3hqvoaQkQ8qK/n@chao-email>
- <fa4a405f-0ee6-c6de-7947-e56c4ee22734@linux.intel.com>
- <ZH7aGywSih+TcFyu@chao-email>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <ZH7aGywSih+TcFyu@chao-email>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S232496AbjFFHa5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 03:30:57 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE7B118
+        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 00:30:56 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A554962D2C
+        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 07:30:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AF17C433EF;
+        Tue,  6 Jun 2023 07:30:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686036655;
+        bh=rO+/sQIGRRdehRdleQZnp1sl7uLZSD6lohy5Rq9t20I=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=B/dKhXQRDFrD2OgwZ7k3IZT1d5V46+HiNX2fAQcacX7rmpQpe4v/pE+oa2fc5oqEW
+         n3/URPbh2dM3wLXHN+pqG4nKkhBFHB148Nb7tjzD+zqJbg9d2EuPewKMHIEZ1PxyAJ
+         OmAQAUwVuEWfRxDAPdyXPOIwSPBJDoGcPk2UWhovFwX/bRocg8NnkafaQcjeRwpy0G
+         wj42VXXYYpyRDrV6pdwUVT0b2zngPrXrwErCUMad0uXXcB7G+OCne6t+a2itezu987
+         SiJPFGYp33a5BURb8S/fRL2p2ZOxMZ/RFYH180I2XKLDE6v1ESG3nWKXoli7Itp9xV
+         JFRX3ldxxazzg==
+Received: from 152.5.30.93.rev.sfr.net ([93.30.5.152] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q6R9Y-0036r9-BZ;
+        Tue, 06 Jun 2023 08:30:52 +0100
+Date:   Tue, 06 Jun 2023 08:30:50 +0100
+Message-ID: <87r0qpnj2t.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Eric Auger <eauger@redhat.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
+In-Reply-To: <9cf2356b-f990-1cd2-c7e6-a984e9f604c6@redhat.com>
+References: <20230515173103.1017669-1-maz@kernel.org>
+        <9cf2356b-f990-1cd2-c7e6-a984e9f604c6@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 93.30.5.152
+X-SA-Exim-Rcpt-To: eauger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hey Eric,
 
+On Mon, 05 Jun 2023 12:28:12 +0100,
+Eric Auger <eauger@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 5/15/23 19:30, Marc Zyngier wrote:
+> > This is the 4th drop of NV support on arm64 for this year.
+> > 
+> > For the previous episodes, see [1].
+> > 
+> > What's changed:
+> > 
+> > - New framework to track system register traps that are reinjected in
+> >   guest EL2. It is expected to replace the discrete handling we have
+> >   enjoyed so far, which didn't scale at all. This has already fixed a
+> >   number of bugs that were hidden (a bunch of traps were never
+> >   forwarded...). Still a work in progress, but this is going in the
+> >   right direction.
+> > 
+> > - Allow the L1 hypervisor to have a S2 that has an input larger than
+> >   the L0 IPA space. This fixes a number of subtle issues, depending on
+> >   how the initial guest was created.
+> > 
+> > - Consequently, the patch series has gone longer again. Boo. But
+> >   hopefully some of it is easier to review...
+> > 
+> > [1] https://lore.kernel.org/r/20230405154008.3552854-1-maz@kernel.org
+> > 
+> > Andre Przywara (1):
+> >   KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
+> 
+> I guess you have executed kselftests on L1 guests. Have all the tests
+> passed there? On my end it stalls in the KVM_RUN.
 
-On 6/6/2023 3:02 PM, Chao Gao wrote:
-> On Tue, Jun 06, 2023 at 01:47:07PM +0800, Binbin Wu wrote:
->>>> +	try_invvpid(INVVPID_ADDR, 0xffff, NONCANONICAL);
->>> shouldn't we use a kernel address here? e.g., vaddr. otherwise, we
->>> cannot tell if there is an error in KVM's emulation because in this
->>> test, LAM is enabled only for kernel address while INVVPID_ADDR is a
->>> userspace address.
->> INVVPID_ADDR is the invalidation type, not the address.
->> The address used  here is NONCANONICAL, which is 0xaaaaaaaaaaaaaaaaull and
->> is considered as kernel address.
-> Yes. Sorry about this misunderstanding.
->
-> Do you need the address to be canonical after masking metadata?
+No, I hardly run any kselftest, because they are just not designed to
+run at EL2 at all. There's some work to be done there, but I just
+don't have the bandwidth for that (hint, wink...)
 
-You are right, I will use set_la_non_canonical(), which is added in 2/4 
-to pass a proper address for test.
-Thanks.
+> 
+> for instance
+> tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c fails in
+> test_guest_raz(vcpu) on the KVM_RUN. Even with a basic
+> 
+> static void guest_main(void)
+> {
+> GUEST_DONE();
+> }
 
+My guess is that the test harness expects things to run at EL1.
+Depending on the value you get for HCR_EL2, you could get all sort of
+odd behaviours. Also, the harness configures EL1 only, which is
+unlikely to work at EL2. My conclusion is that "processor.c" needs to
+be taught about EL2, at the very least.
 
+> 
+> I get
+>  aarch32_id_regs-768     [002] .....   410.544665: kvm_exit: IRQ:
+> HSR_EC: 0x0000 (UNKNOWN), PC: 0x0000000000401ec4
+>  aarch32_id_regs-768     [002] d....   410.544666: kvm_entry: PC:
+> 0x0000000000401ec4
+>  aarch32_id_regs-768     [002] .....   410.544675: kvm_exit: IRQ:
+> HSR_EC: 0x0000 (UNKNOWN), PC: 0x0000000000401ec4
+>  aarch32_id_regs-768     [002] d....   410.544676: kvm_entry: PC:
+> 0x0000000000401ec4
+>  aarch32_id_regs-768     [002] .....   410.544685: kvm_exit: IRQ:
+> HSR_EC: 0x0000 (UNKNOWN), PC: 0x0000000000401ec4
+> 
+> looping forever instead of
+> 
+> aarch32_id_regs-1085576 [079] d..1. 1401295.068739: kvm_entry: PC:
+> 0x0000000000401ec4
+>  aarch32_id_regs-1085576 [079] ...1. 1401295.068745: kvm_exit: TRAP:
+> HSR_EC: 0x0020 (IABT_LOW), PC: 0x0000000000401ec4
+>  aarch32_id_regs-1085576 [079] d..1. 1401295.068790: kvm_entry: PC:
+> 0x0000000000401ec4
+>  aarch32_id_regs-1085576 [079] ...1. 1401295.068792: kvm_exit: TRAP:
+> HSR_EC: 0x0020 (IABT_LOW), PC: 0x0000000000401ec4
+>  aarch32_id_regs-1085576 [079] d..1. 1401295.068794: kvm_entry: PC:
+> 0x0000000000401ec4
+>  aarch32_id_regs-1085576 [079] ...1. 1401295.068795: kvm_exit: TRAP:
+> HSR_EC: 0x0020 (IABT_LOW), PC: 0x0000000000401ec4
+>  aarch32_id_regs-1085576 [079] d..1. 1401295.068797: kvm_entry: PC:
+> 0x0000000000401ec4
+> ../..
+> 
+> Any idea or any known restriction wrt kselftests?
+
+See above. I'd love someone to actually start looking into it and
+devise a testing harness that would run both at EL{0,1,2} *at the same
+time* so that we can start exercising some of the trap behaviours that
+the architecture mandates.
+
+Also, Alexandru had a some KUT tests a few years ago, but I don't know
+what happened of them.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
