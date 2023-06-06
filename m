@@ -2,103 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7702C724828
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 17:47:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 551757248DF
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 18:22:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237854AbjFFPrG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 11:47:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34962 "EHLO
+        id S233443AbjFFQWM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 12:22:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237603AbjFFPrB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 11:47:01 -0400
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7441210D4;
-        Tue,  6 Jun 2023 08:47:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1686066420; x=1717602420;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=a7OcS8+yumWTq/BlaF7JXHbMEqlIKENdhEJ0HlWByrY=;
-  b=o8ejMYsQeh7e3GinWoPh89a0ZHnIzVGm2EYW3qwv8pkEWI8wTUlwE4qH
-   Wo9cfGU9rlnlzOAJjHw5NjRVTAsCUAZNrwtwjUbg8F4xloD3+KQ/JlAOx
-   6zPglRYVZlL/9PaHE04c0nPafCuwCicu9i0fbvING7x3vUzQVWZDgpW5R
-   g=;
-X-IronPort-AV: E=Sophos;i="6.00,221,1681171200"; 
-   d="scan'208";a="339446680"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-d40ec5a9.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 15:46:55 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2a-m6i4x-d40ec5a9.us-west-2.amazon.com (Postfix) with ESMTPS id 939D14155D;
-        Tue,  6 Jun 2023 15:46:54 +0000 (UTC)
-Received: from EX19D002ANA003.ant.amazon.com (10.37.240.141) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 6 Jun 2023 15:46:45 +0000
-Received: from b0f1d8753182.ant.amazon.com.com (10.106.82.24) by
- EX19D002ANA003.ant.amazon.com (10.37.240.141) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 6 Jun 2023 15:46:41 +0000
-From:   Takahiro Itazuri <itazur@amazon.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>
-CC:     Dave Martin <Dave.Martin@arm.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        <linux-doc@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <zulinx86@gmail.com>,
-        Takahiro Itazuri <itazur@amazon.com>
-Subject: [PATCH v2] docs: KVM: Fix register ID of SPSR_FIQ
-Date:   Tue, 6 Jun 2023 16:46:28 +0100
-Message-ID: <20230606154628.95498-1-itazur@amazon.com>
-X-Mailer: git-send-email 2.38.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.82.24]
-X-ClientProxiedBy: EX19D044UWB002.ant.amazon.com (10.13.139.188) To
- EX19D002ANA003.ant.amazon.com (10.37.240.141)
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S237697AbjFFQWK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 12:22:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE316FB
+        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 09:22:06 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5EBDA6292C
+        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 16:22:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC4AEC433EF;
+        Tue,  6 Jun 2023 16:22:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686068525;
+        bh=fSQG8PElKqmUmE2jmLjjguImLMrx4MO3J5T6s68QSBQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=axONMmfbs/GxPS4Vqsz3sLeZ0YFLag3LHhkB5vmznI12/0ueriMqW/fP3odPa1Uhr
+         rr6G1MMRPNBiiKlZb6FKgNWks5+86gyfM3ZYVzG9u5l0/z4MvqEHqmzLjHSoEW4CjJ
+         Oq3QNNTHl6SdJCBz66SCaWgh4i0zkWEEaFIYhEIvHW/zZEK1aZ92JfaLn/yQ9yealP
+         +7p1J5+gLN/w0DvbbRDPhPBMyw7U+3iQ4z3cZ39URwDanCuT21PEkfDP503iPgbMa8
+         1gIpnmMTkkcS49+CU06jIDn9KigOMl/F7S/wTJBxjd9cBySPPS611fyGP6G974dHvu
+         rb5DcWyCOg93w==
+Received: from 152.5.30.93.rev.sfr.net ([93.30.5.152] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q6ZRb-003G6y-CJ;
+        Tue, 06 Jun 2023 17:22:03 +0100
+Date:   Tue, 06 Jun 2023 17:22:01 +0100
+Message-ID: <87o7lso91y.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Eric Auger <eauger@redhat.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
+In-Reply-To: <c46da9eb-a02d-1b1d-9c1b-9f900a5e9e6d@redhat.com>
+References: <20230515173103.1017669-1-maz@kernel.org>
+        <9cf2356b-f990-1cd2-c7e6-a984e9f604c6@redhat.com>
+        <87r0qpnj2t.wl-maz@kernel.org>
+        <c46da9eb-a02d-1b1d-9c1b-9f900a5e9e6d@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 93.30.5.152
+X-SA-Exim-Rcpt-To: eauger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fixes the register ID of SPSR_FIQ.
+On Tue, 06 Jun 2023 10:29:36 +0100,
+Eric Auger <eauger@redhat.com> wrote:
+> 
+> Hi Marc,
+> On 6/6/23 09:30, Marc Zyngier wrote:
+> > Hey Eric,
+> > 
+> > On Mon, 05 Jun 2023 12:28:12 +0100,
+> > Eric Auger <eauger@redhat.com> wrote:
+> >>
+> >> Hi Marc,
+> >>
+> >> On 5/15/23 19:30, Marc Zyngier wrote:
+> >>> This is the 4th drop of NV support on arm64 for this year.
+> >>>
+> >>> For the previous episodes, see [1].
+> >>>
+> >>> What's changed:
+> >>>
+> >>> - New framework to track system register traps that are reinjected in
+> >>>   guest EL2. It is expected to replace the discrete handling we have
+> >>>   enjoyed so far, which didn't scale at all. This has already fixed a
+> >>>   number of bugs that were hidden (a bunch of traps were never
+> >>>   forwarded...). Still a work in progress, but this is going in the
+> >>>   right direction.
+> >>>
+> >>> - Allow the L1 hypervisor to have a S2 that has an input larger than
+> >>>   the L0 IPA space. This fixes a number of subtle issues, depending on
+> >>>   how the initial guest was created.
+> >>>
+> >>> - Consequently, the patch series has gone longer again. Boo. But
+> >>>   hopefully some of it is easier to review...
+> >>>
+> >>> [1] https://lore.kernel.org/r/20230405154008.3552854-1-maz@kernel.org
+> >>>
+> >>> Andre Przywara (1):
+> >>>   KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
+> >>
+> >> I guess you have executed kselftests on L1 guests. Have all the tests
+> >> passed there? On my end it stalls in the KVM_RUN.
+> > 
+> > No, I hardly run any kselftest, because they are just not designed to
+> > run at EL2 at all. There's some work to be done there, but I just
+> > don't have the bandwidth for that (hint, wink...)
+> 
+> oh OK, I missed that point. If nobody is working on this I can start
+> looking at it. Would be interesting to run them on nested guest too.
 
-SPSR_FIQ is a 64-bit register and the 64-bit register size mask is
-0x0030000000000000ULL.
+If you want to pick this up, it would be extremely helpful. And no,
+nobody is really looking into it at the moment, so it's all yours!
 
-Fixes: fd3bc912d3d1 ("KVM: Documentation: Document arm64 core registers in detail")
-Signed-off-by: Takahiro Itazuri <itazur@amazon.com>
+Thanks,
 
----
-Changes from v1
-- Add a description about the 64-bit register size mask in the commit
-  message.
-- Link: https://lore.kernel.org/all/20230410121927.26953-1-itazur@amazon.com/
+	M.
 
----
- Documentation/virt/kvm/api.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index a5c803f39832..65dad2581751 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -2535,7 +2535,7 @@ Specifically:
-   0x6030 0000 0010 004a SPSR_ABT    64  spsr[KVM_SPSR_ABT]
-   0x6030 0000 0010 004c SPSR_UND    64  spsr[KVM_SPSR_UND]
-   0x6030 0000 0010 004e SPSR_IRQ    64  spsr[KVM_SPSR_IRQ]
--  0x6060 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
-+  0x6030 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
-   0x6040 0000 0010 0054 V0         128  fp_regs.vregs[0]    [1]_
-   0x6040 0000 0010 0058 V1         128  fp_regs.vregs[1]    [1]_
-   ...
 -- 
-2.38.0
-
+Without deviation from the norm, progress is not possible.
