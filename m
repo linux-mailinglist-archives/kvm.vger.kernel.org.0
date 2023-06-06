@@ -2,149 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 59966724D6E
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 21:45:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8955724D83
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 21:49:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239317AbjFFTpd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 15:45:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34674 "EHLO
+        id S239548AbjFFTts (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 15:49:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239166AbjFFTpF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 15:45:05 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2059.outbound.protection.outlook.com [40.107.244.59])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D900B2134;
-        Tue,  6 Jun 2023 12:44:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P8S2yfE1N66eB57k9hwfEMtzCakBEPy2xNyX+YcsLS+pWBCm6PvW6mpU3k62raZONFL/5XDo/5B2B7BXCoq+Fjdkizr/rDF3c6slf7Vt9JFIEAgxRNSnqxAbSrgR0Xdyowdr9JK2fPoBiblgwzDQRYnn9Wr60o3AYMv+zPJRzCb+6Vfaip6Su7iu6HV3d+kItVihKgrv8sMAbg5kFyF9rdIvysj+8p8xWgpEDE1kVbEGUYWs5YGom4TeBp7IC+rwCFSNH6Ot7gPOfUtmMRw5vATf3OpNBRPbeQNHY+rbgoe8ZAlxPx2pWjTEYRluD++0nc37xk5eTTyMOHy+9SbqlQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NzwLM7tqhc9OKLlV9fUwWpLi98qt50iX+1TF65zsujg=;
- b=ZtbgeU2h2/2q4MIAgV5/j32H4ZDPLzGAeu5sDqEO55stGfDvp3LNZxx+dMg3aSaFsXYayCo+gfoBJzlkPQ/MAtJRi4hITvEJ1s9A2vSQrFL+xFlgSNm+DYIf8d+zJi49joaei5guFQ1VMQBx4JgWuMQRHENsrVDIE3AxUIHBC3tj/JfucbF7aUwlN/Epd3eDuvRhlSA2gvPqgA8A9MYnBaUN1IVPsFAb4Khkx1Ko50gYkibKvjs2xvIslqRiUyJYcotl7n2k83qyRlgIU5rCBURYuw0UiLF3ug6pkBhbAxm1LZK12a5zabNr12/Cap5daZukvmYRpwfltdRkQ4QdQA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NzwLM7tqhc9OKLlV9fUwWpLi98qt50iX+1TF65zsujg=;
- b=Z6WdesgTKAHbaURcYnsN1mzhXb4GBuyJwelEoOj3L7ZDRoV6ANcCGjAlBMmfO2oJamtt09ncdcK394cGx+13eGU8dc6V+l6xdQkcsFVetblZOw9EiV2VLNhBvPLtSYE85MeFYBA8P9+ONpfAzIGB3b+lfgjDuBAIBttUPomp3jm21ZDlPifQ1b+DdSVTeV8OYpknBIF4HL4bPVrlhc7QQgw6TIL487blQbfk3ornGg2BMQF8yudqiarzQpT+nnGISF5vYAX88JjPk0KiFmHDIR0dySYLXyvkTh6t+1MXYC//+XF/3boUGZQY9aRhd9S/0bQxKpFF59gYvmtno1oyHg==
-Received: from BYAPR11CA0049.namprd11.prod.outlook.com (2603:10b6:a03:80::26)
- by DS0PR12MB7874.namprd12.prod.outlook.com (2603:10b6:8:141::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.28; Tue, 6 Jun
- 2023 19:44:04 +0000
-Received: from DM6NAM11FT011.eop-nam11.prod.protection.outlook.com
- (2603:10b6:a03:80:cafe::17) by BYAPR11CA0049.outlook.office365.com
- (2603:10b6:a03:80::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.36 via Frontend
- Transport; Tue, 6 Jun 2023 19:44:03 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DM6NAM11FT011.mail.protection.outlook.com (10.13.172.108) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6455.33 via Frontend Transport; Tue, 6 Jun 2023 19:44:03 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 6 Jun 2023
- 12:43:47 -0700
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 6 Jun 2023
- 12:43:46 -0700
-Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.9)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
- Transport; Tue, 6 Jun 2023 12:43:45 -0700
-Date:   Tue, 6 Jun 2023 12:43:44 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v2 01/11] iommu: Add new iommu op to create domains owned
- by userspace
-Message-ID: <ZH+McCPS14Wc25JL@Asurada-Nvidia>
-References: <20230511143844.22693-1-yi.l.liu@intel.com>
- <20230511143844.22693-2-yi.l.liu@intel.com>
- <BL1PR11MB5271B553140BB729AF4389AB8C7C9@BL1PR11MB5271.namprd11.prod.outlook.com>
- <ZGfDrRDI50oGih2r@Asurada-Nvidia>
- <BN9PR11MB52766A760580E6FBB995A33F8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZG2fVj41GgosR1dk@Asurada-Nvidia>
- <BN9PR11MB5276F1410A11ED631CE6824F8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZG681VohNlw2vvLD@Asurada-Nvidia>
- <ZH897AGywGVbt51Z@nvidia.com>
+        with ESMTP id S239547AbjFFTte (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 15:49:34 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70E3610F2;
+        Tue,  6 Jun 2023 12:49:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EF87B63799;
+        Tue,  6 Jun 2023 19:49:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22544C433D2;
+        Tue,  6 Jun 2023 19:49:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686080963;
+        bh=pbIbz4/tc0Rq6Sy3ly+bzAO4xmFxE3ciFF0GfdmXFBI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=E4U6lVYqlhekeW3u/0dM8shOTdRaShUhgAE4YQMPUQTzSh3LHrvZwaPYvl2dhjAET
+         WPV8DqyvjoKuBIdDnyDIpmDQsniskymtjKrWlOkzg5qXGIAQmqLw7N4WEx5g65xC9V
+         hClqEzeTSafaEiu2/E95qwmKUqSeLLQxydJmHgApphwCzWJnDfQ1TV7MnAvvUVlH4J
+         sITvP9IMTddL1S/66qiiVLnOf58x4/Sta6Xf2qKsbjFW/LqQRqXqNeMI2yB83s/Ooj
+         SYujT0vnhtU1m7idliZPEQQZqcLDK7iZ7OM7xoQoZW/TzUXEESrkF3jvvgyj0f1mlz
+         2J8SpOPxGoCyA==
+Date:   Tue, 6 Jun 2023 14:49:21 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Sui Jingfeng <15330273260@189.cn>
+Cc:     Alex Deucher <alexander.deucher@amd.com>,
+        Christian Konig <christian.koenig@amd.com>,
+        Pan Xinhui <Xinhui.Pan@amd.com>,
+        David Airlie <airlied@gmail.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Karol Herbst <kherbst@redhat.com>,
+        Lyude Paul <lyude@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Hawking Zhang <Hawking.Zhang@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        Lijo Lazar <lijo.lazar@amd.com>,
+        YiPeng Chai <YiPeng.Chai@amd.com>,
+        Andrey Grodzovsky <andrey.grodzovsky@amd.com>,
+        Somalapuram Amaranath <Amaranath.Somalapuram@amd.com>,
+        Bokun Zhang <Bokun.Zhang@amd.com>,
+        Ville Syrjala <ville.syrjala@linux.intel.com>,
+        Li Yi <liyi@loongson.cn>,
+        Sui Jingfeng <suijingfeng@loongson.cn>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Yi Liu <yi.l.liu@intel.com>, kvm@vger.kernel.org,
+        nouveau@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        loongson-kernel@lists.loongnix.cn, amd-gfx@lists.freedesktop.org,
+        linux-pci@vger.kernel.org
+Subject: Re: [Intel-gfx] [PATCH v2 1/2] vgaarb: various coding style and
+ comments fix
+Message-ID: <20230606194921.GA1139774@bhelgaas>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZH897AGywGVbt51Z@nvidia.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT011:EE_|DS0PR12MB7874:EE_
-X-MS-Office365-Filtering-Correlation-Id: de3576b0-930e-4642-5b42-08db66c661d6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EBhlW+md1V6cTSKeaRdIj/WeTxh3jBMlTYGXtKGEKNqu5ab7zqXE1fJ+yu4DqDzugc2luV3qgsoJ8fraPJBb9Bamkro7RAz6phG0fLGGg3p1YWuOlIw52c0FwtB69J14uP1xlhAT4Cvue2vPF8QnNeOFFh1Qqljt1VG++JWa054g5nHdkiVi8Y/Bxhs7qKtLI2dGUjggJHGKOWf/sMkoBJnEVbYWE2Yyw89PUx6d47fsKST/sZR946dOwVzfkBVc54v90Kd3eSi6RrN1zdxJkU930sFjGx6MvFD4yl46Ks0dCN5JL+evfoii6sAGV0WmDXwrNamIduk4sGEHaNGFyKdQE5N65dxjZPR1/SnqZVGWme1YtGO1OaRt+XS7D7Z1JIpamROJdt486c79QolREqnq2Cw4iuKwozP5d6ZO6sF/fysTJhtbhJ/LQpKAN32EzFNvSVbjhXA8L3Oj3keXNAVLA+XQUSQaV3vTQswDw4Qx7O36MwjzO+XGOfL3ShfLDc9uFBgzQ6viokc13kmPOmhAmyZoHKkYquj1a01gOoDJlXqb9e0kcBM9ff9ORfSsN8DA1yJnQ8LrcxY4EOYbRdX+At9t/GsOH/XF4bH2g2xQtD3fVVgl2wYfjetZKJEQfZddveaJiWeiiLsAsxC2LWMwCf9iYKO+pfmnjC9lyim0jGcgCdFCchuXCIxE/rN25o8miVfeneqScG6lJe0K2XIi1sSLnqVFhtLHlVPyM/McFVRBrpcpqpGkG8P1kYos9Iafb22Fg5tyRb1Qfyrdmw==
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(39860400002)(396003)(451199021)(36840700001)(46966006)(40470700004)(7416002)(6862004)(5660300002)(8676002)(8936002)(4326008)(41300700001)(4744005)(2906002)(70206006)(6636002)(70586007)(316002)(54906003)(26005)(426003)(336012)(9686003)(186003)(66899021)(47076005)(36860700001)(356005)(33716001)(478600001)(7636003)(82740400003)(40460700003)(82310400005)(55016003)(40480700001)(86362001)(67856001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2023 19:44:03.2646
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: de3576b0-930e-4642-5b42-08db66c661d6
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT011.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7874
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+In-Reply-To: <20230604205831.3357596-1-15330273260@189.cn>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 06, 2023 at 11:08:44AM -0300, Jason Gunthorpe wrote:
-> On Wed, May 24, 2023 at 06:41:41PM -0700, Nicolin Chen wrote:
+Match the subject line style:
+
+  $ git log --oneline drivers/pci/vgaarb.c
+  f321c35feaee PCI/VGA: Replace full MIT license text with SPDX identifier
+  d5109fe4d1ec PCI/VGA: Use unsigned format string to print lock counts
+  4e6c91847a7f PCI/VGA: Log bridge control messages when adding devices
+  dc593fd48abb PCI/VGA: Remove empty vga_arb_device_card_gone()
+  ...
+
+Subject line should be a summary of the commit log, not just "various
+style fixes".  This one needs to say something about
+vga_str_to_iostate().
+
+On Mon, Jun 05, 2023 at 04:58:30AM +0800, Sui Jingfeng wrote:
+> From: Sui Jingfeng <suijingfeng@loongson.cn>
 > 
-> > Upon a quick check, I think we could. Though it'd be slightly
-> > mismatched with the domain_alloc op, it should be fine since
-> > iommufd is likely to be the only caller.
+> To keep consistent with vga_iostate_to_str() function, the third argument
+> of vga_str_to_iostate() function should be 'unsigned int *'.
 > 
-> Ideally the main op would return ERR_PTR too
+> Signed-off-by: Sui Jingfeng <suijingfeng@loongson.cn>
+> ---
+>  drivers/pci/vgaarb.c   | 29 +++++++++++++++--------------
+>  include/linux/vgaarb.h |  8 +++-----
+>  2 files changed, 18 insertions(+), 19 deletions(-)
+> 
+> diff --git a/drivers/pci/vgaarb.c b/drivers/pci/vgaarb.c
+> index 5a696078b382..e40e6e5e5f03 100644
+> --- a/drivers/pci/vgaarb.c
+> +++ b/drivers/pci/vgaarb.c
+> @@ -61,7 +61,6 @@ static bool vga_arbiter_used;
+>  static DEFINE_SPINLOCK(vga_lock);
+>  static DECLARE_WAIT_QUEUE_HEAD(vga_wait_queue);
+>  
+> -
+>  static const char *vga_iostate_to_str(unsigned int iostate)
+>  {
+>  	/* Ignore VGA_RSRC_IO and VGA_RSRC_MEM */
+> @@ -77,10 +76,12 @@ static const char *vga_iostate_to_str(unsigned int iostate)
+>  	return "none";
+>  }
+>  
+> -static int vga_str_to_iostate(char *buf, int str_size, int *io_state)
+> +static int vga_str_to_iostate(char *buf, int str_size, unsigned int *io_state)
+>  {
+> -	/* we could in theory hand out locks on IO and mem
+> -	 * separately to userspace but it can cause deadlocks */
+> +	/*
+> +	 * we could in theory hand out locks on IO and mem
+> +	 * separately to userspace but it can cause deadlocks
+> +	 */
 
-Yea. It just seems to be a bit painful to change it for that.
+Omit all the comment formatting changes.  They are distractions from the
+vga_str_to_iostate() parameter change.
 
-Worth a big series?
+I think this patch should be the single line change to the
+vga_str_to_iostate() prototype so it matches the callers.
 
-Thanks
-Nic
+If you want to do the other comment formatting changes, they're fine,
+but they should be all together in a separate patch that clearly
+doesn't change the generated code.
+
+Bjorn
