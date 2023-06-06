@@ -2,71 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA25372358C
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 05:00:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F168723599
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 05:09:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234452AbjFFDAB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 23:00:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34712 "EHLO
+        id S234498AbjFFDJW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 23:09:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230215AbjFFDAA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 23:00:00 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6A33C102;
-        Mon,  5 Jun 2023 19:59:58 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.86])
-        by gateway (Coremail) with SMTP id _____8AxyvEsoX5kOFkAAA--.1329S3;
-        Tue, 06 Jun 2023 10:59:56 +0800 (CST)
-Received: from [10.20.42.86] (unknown [10.20.42.86])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxNeQroX5k26oBAA--.7388S3;
-        Tue, 06 Jun 2023 10:59:56 +0800 (CST)
-Subject: Re: [PATCH v12 20/31] LoongArch: KVM: Implement handle csr excption
-To:     "bibo, mao" <maobibo@loongson.cn>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20230530015223.147755-1-zhaotianrui@loongson.cn>
- <20230530015223.147755-21-zhaotianrui@loongson.cn>
- <4831764b-c53a-188f-cdd2-6764c76fc627@loongson.cn>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Xi Ruoyao <xry111@xry111.site>
-From:   Tianrui Zhao <zhaotianrui@loongson.cn>
-Message-ID: <6c44a0d7-d6c0-95c6-3959-f423040c3e08@loongson.cn>
-Date:   Tue, 6 Jun 2023 10:59:55 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
- Thunderbird/45.4.0
+        with ESMTP id S232629AbjFFDJU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 23:09:20 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF7A118;
+        Mon,  5 Jun 2023 20:09:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686020956; x=1717556956;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ZjPiHD2dLaeUV1DyYVTrMSjB4gNCH7qHbTFOV0ktpik=;
+  b=mBymGkh6FrurtWg7NOk6vAQcdttcK01yTxzYFIMh3V2Dd0FAqmN2KqKd
+   SHcvCQ4Ag0k22XL/INFnLUjk+GR73JfP0/w+blKvj16JiLcTqjHfIXRy9
+   yIcBYJ8qlpID+Ffw2A15LTTRBTJGmuVgOmOF64vdt3dYFidT3VSA1BjlC
+   BME2pZP5q0ZITsmCspVI+0kTmkn3Be3ckbGGuTXZ97hnJYDzQpjXmFgfO
+   6yy6BY6hw6iDi94DAxuTiQ8Nx2kj/5mo3eqlKDk8cUFD4BaE+PwbZmHRK
+   rhBWqHBToMpnQh/TBZsgXCWke/wqVumsMfy9Ow0sU8Wt2EjuGX71n41do
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="346145155"
+X-IronPort-AV: E=Sophos;i="6.00,219,1681196400"; 
+   d="scan'208";a="346145155"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2023 20:09:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="659345977"
+X-IronPort-AV: E=Sophos;i="6.00,219,1681196400"; 
+   d="scan'208";a="659345977"
+Received: from zengguan-mobl1.ccr.corp.intel.com (HELO [10.249.170.218]) ([10.249.170.218])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2023 20:09:12 -0700
+Message-ID: <2a7bd52d-441e-a8da-9c1b-dbc60f6bad7e@intel.com>
+Date:   Tue, 6 Jun 2023 11:08:57 +0800
 MIME-Version: 1.0
-In-Reply-To: <4831764b-c53a-188f-cdd2-6764c76fc627@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8BxNeQroX5k26oBAA--.7388S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxCFWDAw1fCFyrGF1fArW8AFc_yoWrJF1DpF
-        ykC3W5Ca18Xw1xt34SqrsIqFn8Xr95Gr12yFW7ta45ZwnFyr1fGFWkKryDur1DtFs3XF1I
-        vay5trn3CFs0yFXCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-        xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-        AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-        tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-        8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67
-        AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-        rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14
-        v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4Xo7DU
-        UUU
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v1 3/6] KVM: VMX: Add new ops in kvm_x86_ops for LASS
+ violation check
+Content-Language: en-US
+To:     Yuan Yao <yuan.yao@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        H Peter Anvin <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20230601142309.6307-1-guang.zeng@intel.com>
+ <20230601142309.6307-4-guang.zeng@intel.com>
+ <20230605140725.32ogo6gbhqyl4kfl@yy-desk-7060>
+From:   Zeng Guang <guang.zeng@intel.com>
+In-Reply-To: <20230605140725.32ogo6gbhqyl4kfl@yy-desk-7060>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SCC_BODY_URI_ONLY,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -74,133 +75,53 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-
-在 2023年06月06日 09:35, bibo, mao 写道:
->
-> 在 2023/5/30 09:52, Tianrui Zhao 写道:
->> Implement kvm handle LoongArch vcpu exit caused by reading and
->> writing csr. Using csr structure to emulate the registers.
+On 6/5/2023 10:07 PM, Yuan Yao wrote:
+> On Thu, Jun 01, 2023 at 10:23:06PM +0800, Zeng Guang wrote:
+>> Intel introduces LASS (Linear Address Separation) feature providing
+>> an independent mechanism to achieve the mode-based protection.
 >>
->> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
->> ---
->>   arch/loongarch/kvm/exit.c | 98 +++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 98 insertions(+)
->>   create mode 100644 arch/loongarch/kvm/exit.c
+>> LASS partitions 64-bit linear address space into two halves, user-mode
+>> address (LA[bit 63]=0) and supervisor-mode address (LA[bit 63]=1). It
+>> stops any code execution or conditional data access[1]
+>>      1. from user mode to supervisor-mode address space
+>>      2. from supervisor mode to user-mode address space
+>> and generates LASS violation fault accordingly.
 >>
->> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
->> new file mode 100644
->> index 000000000000..508cbce31aa5
->> --- /dev/null
->> +++ b/arch/loongarch/kvm/exit.c
->> @@ -0,0 +1,98 @@
->> +// SPDX-License-Identifier: GPL-2.0
 >> +/*
->> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+>> + * Determine whether an access to the linear address causes a LASS violation.
+>> + * LASS protection is only effective in long mode. As a prerequisite, caller
+>> + * should make sure vCPU running in long mode and invoke this api to do LASS
+>> + * violation check.
 >> + */
->> +
->> +#include <linux/errno.h>
->> +#include <linux/err.h>
->> +#include <linux/module.h>
->> +#include <linux/preempt.h>
->> +#include <linux/vmalloc.h>
->> +#include <asm/fpu.h>
->> +#include <asm/inst.h>
->> +#include <asm/time.h>
->> +#include <asm/tlb.h>
->> +#include <asm/loongarch.h>
->> +#include <asm/numa.h>
->> +#include <asm/kvm_vcpu.h>
->> +#include <asm/kvm_csr.h>
->> +#include <linux/kvm_host.h>
->> +#include <asm/mmzone.h>
->> +#include "trace.h"
->> +
->> +static unsigned long _kvm_emu_read_csr(struct kvm_vcpu *vcpu, int csrid)
+>> +bool vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u32 flags)
 >> +{
->> +	struct loongarch_csrs *csr = vcpu->arch.csr;
->> +	unsigned long val = 0;
+>> +	bool user_mode, user_as, rflags_ac;
 >> +
->> +	if (csrid < 4096 && (get_gcsr_flag(csrid) & SW_GCSR))
->> +		val = kvm_read_sw_gcsr(csr, csrid);
->> +	else
->> +		pr_warn_once("Unsupport csrread 0x%x with pc %lx\n",
->> +			csrid, vcpu->arch.pc);
->> +	return val;
->> +}
-> can 4096 be replace with macro, or be wrapped in function get_gcsr_flag and add GCSR_VALID flag?
-Thanks, I will wrap the condition "csr < 4096" in the get_gcsr_flag 
-function.
-
-Thanks
-Tianrui Zhao
+>> +	if (!!(flags & X86EMUL_F_SKIPLASS) ||
+>> +	    !kvm_is_cr4_bit_set(vcpu, X86_CR4_LASS))
+>> +		return false;
 >> +
->> +static void _kvm_emu_write_csr(struct kvm_vcpu *vcpu, int csrid,
->> +	unsigned long val)
->> +{
->> +	struct loongarch_csrs *csr = vcpu->arch.csr;
+>> +	WARN_ON_ONCE(!is_long_mode(vcpu));
 >> +
->> +	if (csrid < 4096 && (get_gcsr_flag(csrid) & SW_GCSR))
->> +		kvm_write_sw_gcsr(csr, csrid, val);
->> +	else
->> +		pr_warn_once("Unsupport csrwrite 0x%x with pc %lx\n",
->> +				csrid, vcpu->arch.pc);
->> +}
-> ditto
->
->> +
->> +static void _kvm_emu_xchg_csr(struct kvm_vcpu *vcpu, int csrid,
->> +	unsigned long csr_mask, unsigned long val)
->> +{
->> +	struct loongarch_csrs *csr = vcpu->arch.csr;
->> +
->> +	if (csrid < 4096 && (get_gcsr_flag(csrid) & SW_GCSR)) {
->> +		unsigned long orig;
->> +
->> +		orig = kvm_read_sw_gcsr(csr, csrid);
->> +		orig &= ~csr_mask;
->> +		orig |= val & csr_mask;
->> +		kvm_write_sw_gcsr(csr, csrid, orig);
->> +	} else
->> +		pr_warn_once("Unsupport csrxchg 0x%x with pc %lx\n",
->> +				csrid, vcpu->arch.pc);
->> +}
-> ditto
->
-> Regards
-> Bibo, Mao
->> +
->> +static int _kvm_handle_csr(struct kvm_vcpu *vcpu, larch_inst inst)
->> +{
->> +	unsigned int rd, rj, csrid;
->> +	unsigned long csr_mask;
->> +	unsigned long val = 0;
+>> +	user_as = !(la >> 63);
 >> +
 >> +	/*
->> +	 * CSR value mask imm
->> +	 * rj = 0 means csrrd
->> +	 * rj = 1 means csrwr
->> +	 * rj != 0,1 means csrxchg
+>> +	 * An access is a supervisor-mode access if CPL < 3 or if it implicitly
+>> +	 * accesses a system data structure. For implicit accesses to system
+>> +	 * data structure, the processor acts as if RFLAGS.AC is clear.
 >> +	 */
->> +	rd = inst.reg2csr_format.rd;
->> +	rj = inst.reg2csr_format.rj;
->> +	csrid = inst.reg2csr_format.csr;
->> +
->> +	/* Process CSR ops */
->> +	if (rj == 0) {
->> +		/* process csrrd */
->> +		val = _kvm_emu_read_csr(vcpu, csrid);
->> +		vcpu->arch.gprs[rd] = val;
->> +	} else if (rj == 1) {
->> +		/* process csrwr */
->> +		val = vcpu->arch.gprs[rd];
->> +		_kvm_emu_write_csr(vcpu, csrid, val);
+>> +	if (access & PFERR_IMPLICIT_ACCESS) {
+>> +		user_mode = false;
+>> +		rflags_ac = false;
 >> +	} else {
->> +		/* process csrxchg */
->> +		val = vcpu->arch.gprs[rd];
->> +		csr_mask = vcpu->arch.gprs[rj];
->> +		_kvm_emu_xchg_csr(vcpu, csrid, csr_mask, val);
+>> +		user_mode = vmx_get_cpl(vcpu) == 3;
+>> +		if (!user_mode)
+>> +			rflags_ac = !!(kvm_get_rflags(vcpu) & X86_EFLAGS_AC);
 >> +	}
 >> +
->> +	return EMULATE_DONE;
->> +}
-
+>> +	if (user_mode == user_as)
+> Confused by user_as, it's role of address(U/S) so how about
+> "user_addr" ? "if (user_mode == user_addr)" looks more clear
+> to me.
+>
+Actually "as" stands for "address space". I suppose it more precise. :)
