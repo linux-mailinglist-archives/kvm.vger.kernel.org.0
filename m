@@ -2,248 +2,483 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0A4E723DB4
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 11:35:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CE9E723DED
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 11:40:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236441AbjFFJfg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 05:35:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43438 "EHLO
+        id S234899AbjFFJjw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 05:39:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237604AbjFFJey (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 05:34:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 049121990
-        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 02:33:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686044022;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kL+DqJUm5U6TFHuhQj83O46KkLfEwvC4DLSR18DYPSM=;
-        b=NVHQ+D8MS8EWoz0xO4T53AgSgT2zAhUMOOQ50JflMz7knUvmOxManeT4tS5QsRKCWt9j8p
-        rop/iodpJ+MIqAzF0Atc2n7uyX9eFBlxT27mymQQy/al2iqJU2kVlADilqyt2hK/wVuP4r
-        oPZB67HTgG62P9a71mrGpGn/Dktsr14=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-113-Uv6j_nMrNrGlEiZt13i2fQ-1; Tue, 06 Jun 2023 05:33:41 -0400
-X-MC-Unique: Uv6j_nMrNrGlEiZt13i2fQ-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-75ebf897d16so187252385a.3
-        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 02:33:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686044020; x=1688636020;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kL+DqJUm5U6TFHuhQj83O46KkLfEwvC4DLSR18DYPSM=;
-        b=OEJKfjxnYNewJwaT9J4+sLxB4lo3RoTV2tn1nVvHvai/ZaCVJA8zRTALZldGX+NPZw
-         bkIArO0txWCa+IBes+nRJm8X0b/kmAZsd0hVEcqu5/yU7o6hTJm9Rj5dwBk/3tASt2ET
-         yR2y+WzKwX1Ugg2tWnESYLX6mDRBpqtxIyIscyFTcy10Isa8lUffOy64SB3DuZc9oeRc
-         CT40bNL1JaoUH2/TE9QbaHGR4TXBG90kz5jUGqE5DfbxsuCJF9E5rb7OvzeuDnDkrxxQ
-         wJWdxsZAp67SG6SGnarxiOX0HqyrBsD/p96JUhc0XJ2o1tM87vR+awarfmkYxse1OCYJ
-         gUGQ==
-X-Gm-Message-State: AC+VfDxWjPJ2hgAh2VyEJnNXdaEDZ/gF4/e9fH0Y8erymYLNPQesUUkQ
-        3WTUDILGUfqKhwrTUrBFLEthVlQ2Y3IoAIgNwpWV9y+VjmLZq7Abx10NgBRmAqqDjQznAHetGsy
-        YVraMZbvKGQzT
-X-Received: by 2002:ac8:5f83:0:b0:3f6:ac1b:47b3 with SMTP id j3-20020ac85f83000000b003f6ac1b47b3mr1420831qta.34.1686044020445;
-        Tue, 06 Jun 2023 02:33:40 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5IHSNH2kXYClfPF7+eeeWzQy0YgraKLLPOiKH8WekEnx/oDm1lUrlT+4XRcDVYDiENLu6dww==
-X-Received: by 2002:ac8:5f83:0:b0:3f6:ac1b:47b3 with SMTP id j3-20020ac85f83000000b003f6ac1b47b3mr1420820qta.34.1686044020204;
-        Tue, 06 Jun 2023 02:33:40 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id i6-20020ac87646000000b003f6b0562ad7sm5423861qtr.16.2023.06.06.02.33.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jun 2023 02:33:39 -0700 (PDT)
-Message-ID: <0cb4ac7a-6dcf-db68-69e9-dd6a01678aed@redhat.com>
-Date:   Tue, 6 Jun 2023 11:33:33 +0200
+        with ESMTP id S237237AbjFFJjh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 05:39:37 -0400
+Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 895CD1733;
+        Tue,  6 Jun 2023 02:39:21 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mx.sberdevices.ru (Postfix) with ESMTP id C33345FD1B;
+        Tue,  6 Jun 2023 12:39:18 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1686044358;
+        bh=VsLRnna6tc/S+J2EUt6rD5Z2Q76GP290WHdkcRtMHVU=;
+        h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
+        b=VwpBMG7cM9eD1ivCA/6Pys2s/QQ5okpKOxGuoP7RMZ2oQDNS2uaw5DLrv1sReyt2g
+         Hl3CHyqL32Q16oIyERngK4hk9tfCXdM01nEx3y3PkB1Ub2zpGobrr3nXPuYVWbivgY
+         mrmO9J9oJ+r1lGS768cfzeq3q6FG4OCVgVL+/h7ig8UcNOnAPL6lleASrLHaxKDizq
+         sZDi4ZjLw8IzYC72InmSiJm/g2AZPUwloSrHYQhSXDwezccHWHDSPOVpJ3rMn7sbCj
+         fL2YsNeTx2MeOwCwzO4I7+m9tsEw9udMcytQy9XPUVbdts6RYyCYesnmGutU/KHlPN
+         FKTbYc3+Lk7sQ==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mx.sberdevices.ru (Postfix) with ESMTP;
+        Tue,  6 Jun 2023 12:39:14 +0300 (MSK)
+Message-ID: <0bd40fd8-e666-e2a3-04da-501a0e7b97a9@sberdevices.ru>
+Date:   Tue, 6 Jun 2023 12:34:22 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v10 06/59] arm64: Add TLBI operation encodings
+ Thunderbird/102.7.1
+Subject: Re: [PATCH RFC net-next v3 8/8] tests: add vsock dgram tests
 Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20230515173103.1017669-1-maz@kernel.org>
- <20230515173103.1017669-7-maz@kernel.org>
-From:   Eric Auger <eauger@redhat.com>
-In-Reply-To: <20230515173103.1017669-7-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+To:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>, <kvm@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-hyperv@vger.kernel.org>
+References: <7dbec78e-ea44-4684-6d02-5d6d5051187e@sberdevices.ru>
+In-Reply-To: <7dbec78e-ea44-4684-6d02-5d6d5051187e@sberdevices.ru>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/06/06 07:40:00 #21442908
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Sorry, CC mailing lists
 
-On 5/15/23 19:30, Marc Zyngier wrote:
-> Add all the TLBI encodings that are usable from Non-Secure.
+On 06.06.2023 12:29, Arseniy Krasnov wrote:
+> Hello Bobby and Jiang! Small remarks(sorry for this letter layout, I add multiple newline over comments):
 > 
-
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
-> ---
->  arch/arm64/include/asm/sysreg.h | 128 ++++++++++++++++++++++++++++++++
->  1 file changed, 128 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 28ccc379a172..2727e68dd65b 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -568,6 +568,134 @@
+> diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+> index 01b636d3039a..45e35da48b40 100644
+> --- a/tools/testing/vsock/util.c
+> +++ b/tools/testing/vsock/util.c
+> @@ -260,6 +260,57 @@ void send_byte(int fd, int expected_ret, int flags)
+>  	}
+>  }
 >  
->  #define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
->  
-> +/* TLBI instructions */
-> +#define OP_TLBI_VMALLE1OS		sys_insn(1, 0, 8, 1, 0)
-> +#define OP_TLBI_VAE1OS			sys_insn(1, 0, 8, 1, 1)
-> +#define OP_TLBI_ASIDE1OS		sys_insn(1, 0, 8, 1, 2)
-> +#define OP_TLBI_VAAE1OS			sys_insn(1, 0, 8, 1, 3)
-> +#define OP_TLBI_VALE1OS			sys_insn(1, 0, 8, 1, 5)
-> +#define OP_TLBI_VAALE1OS		sys_insn(1, 0, 8, 1, 7)
-> +#define OP_TLBI_RVAE1IS			sys_insn(1, 0, 8, 2, 1)
-> +#define OP_TLBI_RVAAE1IS		sys_insn(1, 0, 8, 2, 3)
-> +#define OP_TLBI_RVALE1IS		sys_insn(1, 0, 8, 2, 5)
-> +#define OP_TLBI_RVAALE1IS		sys_insn(1, 0, 8, 2, 7)
-> +#define OP_TLBI_VMALLE1IS		sys_insn(1, 0, 8, 3, 0)
-> +#define OP_TLBI_VAE1IS			sys_insn(1, 0, 8, 3, 1)
-> +#define OP_TLBI_ASIDE1IS		sys_insn(1, 0, 8, 3, 2)
-> +#define OP_TLBI_VAAE1IS			sys_insn(1, 0, 8, 3, 3)
-> +#define OP_TLBI_VALE1IS			sys_insn(1, 0, 8, 3, 5)
-> +#define OP_TLBI_VAALE1IS		sys_insn(1, 0, 8, 3, 7)
-> +#define OP_TLBI_RVAE1OS			sys_insn(1, 0, 8, 5, 1)
-> +#define OP_TLBI_RVAAE1OS		sys_insn(1, 0, 8, 5, 3)
-> +#define OP_TLBI_RVALE1OS		sys_insn(1, 0, 8, 5, 5)
-> +#define OP_TLBI_RVAALE1OS		sys_insn(1, 0, 8, 5, 7)
-> +#define OP_TLBI_RVAE1			sys_insn(1, 0, 8, 6, 1)
-> +#define OP_TLBI_RVAAE1			sys_insn(1, 0, 8, 6, 3)
-> +#define OP_TLBI_RVALE1			sys_insn(1, 0, 8, 6, 5)
-> +#define OP_TLBI_RVAALE1			sys_insn(1, 0, 8, 6, 7)
-> +#define OP_TLBI_VMALLE1			sys_insn(1, 0, 8, 7, 0)
-> +#define OP_TLBI_VAE1			sys_insn(1, 0, 8, 7, 1)
-> +#define OP_TLBI_ASIDE1			sys_insn(1, 0, 8, 7, 2)
-> +#define OP_TLBI_VAAE1			sys_insn(1, 0, 8, 7, 3)
-> +#define OP_TLBI_VALE1			sys_insn(1, 0, 8, 7, 5)
-> +#define OP_TLBI_VAALE1			sys_insn(1, 0, 8, 7, 7)
-> +#define OP_TLBI_VMALLE1OSNXS		sys_insn(1, 0, 9, 1, 0)
-> +#define OP_TLBI_VAE1OSNXS		sys_insn(1, 0, 9, 1, 1)
-> +#define OP_TLBI_ASIDE1OSNXS		sys_insn(1, 0, 9, 1, 2)
-> +#define OP_TLBI_VAAE1OSNXS		sys_insn(1, 0, 9, 1, 3)
-> +#define OP_TLBI_VALE1OSNXS		sys_insn(1, 0, 9, 1, 5)
-> +#define OP_TLBI_VAALE1OSNXS		sys_insn(1, 0, 9, 1, 7)
-> +#define OP_TLBI_RVAE1ISNXS		sys_insn(1, 0, 9, 2, 1)
-> +#define OP_TLBI_RVAAE1ISNXS		sys_insn(1, 0, 9, 2, 3)
-> +#define OP_TLBI_RVALE1ISNXS		sys_insn(1, 0, 9, 2, 5)
-> +#define OP_TLBI_RVAALE1ISNXS		sys_insn(1, 0, 9, 2, 7)
-> +#define OP_TLBI_VMALLE1ISNXS		sys_insn(1, 0, 9, 3, 0)
-> +#define OP_TLBI_VAE1ISNXS		sys_insn(1, 0, 9, 3, 1)
-> +#define OP_TLBI_ASIDE1ISNXS		sys_insn(1, 0, 9, 3, 2)
-> +#define OP_TLBI_VAAE1ISNXS		sys_insn(1, 0, 9, 3, 3)
-> +#define OP_TLBI_VALE1ISNXS		sys_insn(1, 0, 9, 3, 5)
-> +#define OP_TLBI_VAALE1ISNXS		sys_insn(1, 0, 9, 3, 7)
-> +#define OP_TLBI_RVAE1OSNXS		sys_insn(1, 0, 9, 5, 1)
-> +#define OP_TLBI_RVAAE1OSNXS		sys_insn(1, 0, 9, 5, 3)
-> +#define OP_TLBI_RVALE1OSNXS		sys_insn(1, 0, 9, 5, 5)
-> +#define OP_TLBI_RVAALE1OSNXS		sys_insn(1, 0, 9, 5, 7)
-> +#define OP_TLBI_RVAE1NXS		sys_insn(1, 0, 9, 6, 1)
-> +#define OP_TLBI_RVAAE1NXS		sys_insn(1, 0, 9, 6, 3)
-> +#define OP_TLBI_RVALE1NXS		sys_insn(1, 0, 9, 6, 5)
-> +#define OP_TLBI_RVAALE1NXS		sys_insn(1, 0, 9, 6, 7)
-> +#define OP_TLBI_VMALLE1NXS		sys_insn(1, 0, 9, 7, 0)
-> +#define OP_TLBI_VAE1NXS			sys_insn(1, 0, 9, 7, 1)
-> +#define OP_TLBI_ASIDE1NXS		sys_insn(1, 0, 9, 7, 2)
-> +#define OP_TLBI_VAAE1NXS		sys_insn(1, 0, 9, 7, 3)
-> +#define OP_TLBI_VALE1NXS		sys_insn(1, 0, 9, 7, 5)
-> +#define OP_TLBI_VAALE1NXS		sys_insn(1, 0, 9, 7, 7)
-> +#define OP_TLBI_IPAS2E1IS		sys_insn(1, 4, 8, 0, 1)
-> +#define OP_TLBI_RIPAS2E1IS		sys_insn(1, 4, 8, 0, 2)
-> +#define OP_TLBI_IPAS2LE1IS		sys_insn(1, 4, 8, 0, 5)
-> +#define OP_TLBI_RIPAS2LE1IS		sys_insn(1, 4, 8, 0, 6)
-> +#define OP_TLBI_ALLE2OS			sys_insn(1, 4, 8, 1, 0)
-> +#define OP_TLBI_VAE2OS			sys_insn(1, 4, 8, 1, 1)
-> +#define OP_TLBI_ALLE1OS			sys_insn(1, 4, 8, 1, 4)
-> +#define OP_TLBI_VALE2OS			sys_insn(1, 4, 8, 1, 5)
-> +#define OP_TLBI_VMALLS12E1OS		sys_insn(1, 4, 8, 1, 6)
-> +#define OP_TLBI_RVAE2IS			sys_insn(1, 4, 8, 2, 1)
-> +#define OP_TLBI_RVALE2IS		sys_insn(1, 4, 8, 2, 5)
-> +#define OP_TLBI_ALLE2IS			sys_insn(1, 4, 8, 3, 0)
-> +#define OP_TLBI_VAE2IS			sys_insn(1, 4, 8, 3, 1)
-> +#define OP_TLBI_ALLE1IS			sys_insn(1, 4, 8, 3, 4)
-> +#define OP_TLBI_VALE2IS			sys_insn(1, 4, 8, 3, 5)
-> +#define OP_TLBI_VMALLS12E1IS		sys_insn(1, 4, 8, 3, 6)
-> +#define OP_TLBI_IPAS2E1OS		sys_insn(1, 4, 8, 4, 0)
-> +#define OP_TLBI_IPAS2E1			sys_insn(1, 4, 8, 4, 1)
-> +#define OP_TLBI_RIPAS2E1		sys_insn(1, 4, 8, 4, 2)
-> +#define OP_TLBI_RIPAS2E1OS		sys_insn(1, 4, 8, 4, 3)
-> +#define OP_TLBI_IPAS2LE1OS		sys_insn(1, 4, 8, 4, 4)
-> +#define OP_TLBI_IPAS2LE1		sys_insn(1, 4, 8, 4, 5)
-> +#define OP_TLBI_RIPAS2LE1		sys_insn(1, 4, 8, 4, 6)
-> +#define OP_TLBI_RIPAS2LE1OS		sys_insn(1, 4, 8, 4, 7)
-> +#define OP_TLBI_RVAE2OS			sys_insn(1, 4, 8, 5, 1)
-> +#define OP_TLBI_RVALE2OS		sys_insn(1, 4, 8, 5, 5)
-> +#define OP_TLBI_RVAE2			sys_insn(1, 4, 8, 6, 1)
-> +#define OP_TLBI_RVALE2			sys_insn(1, 4, 8, 6, 5)
-> +#define OP_TLBI_ALLE2			sys_insn(1, 4, 8, 7, 0)
-> +#define OP_TLBI_VAE2			sys_insn(1, 4, 8, 7, 1)
-> +#define OP_TLBI_ALLE1			sys_insn(1, 4, 8, 7, 4)
-> +#define OP_TLBI_VALE2			sys_insn(1, 4, 8, 7, 5)
-> +#define OP_TLBI_VMALLS12E1		sys_insn(1, 4, 8, 7, 6)
-> +#define OP_TLBI_IPAS2E1ISNXS		sys_insn(1, 4, 9, 0, 1)
-> +#define OP_TLBI_RIPAS2E1ISNXS		sys_insn(1, 4, 9, 0, 2)
-> +#define OP_TLBI_IPAS2LE1ISNXS		sys_insn(1, 4, 9, 0, 5)
-> +#define OP_TLBI_RIPAS2LE1ISNXS		sys_insn(1, 4, 9, 0, 6)
-> +#define OP_TLBI_ALLE2OSNXS		sys_insn(1, 4, 9, 1, 0)
-> +#define OP_TLBI_VAE2OSNXS		sys_insn(1, 4, 9, 1, 1)
-> +#define OP_TLBI_ALLE1OSNXS		sys_insn(1, 4, 9, 1, 4)
-> +#define OP_TLBI_VALE2OSNXS		sys_insn(1, 4, 9, 1, 5)
-> +#define OP_TLBI_VMALLS12E1OSNXS		sys_insn(1, 4, 9, 1, 6)
-> +#define OP_TLBI_RVAE2ISNXS		sys_insn(1, 4, 9, 2, 1)
-> +#define OP_TLBI_RVALE2ISNXS		sys_insn(1, 4, 9, 2, 5)
-> +#define OP_TLBI_ALLE2ISNXS		sys_insn(1, 4, 9, 3, 0)
-> +#define OP_TLBI_VAE2ISNXS		sys_insn(1, 4, 9, 3, 1)
-> +#define OP_TLBI_ALLE1ISNXS		sys_insn(1, 4, 9, 3, 4)
-> +#define OP_TLBI_VALE2ISNXS		sys_insn(1, 4, 9, 3, 5)
-> +#define OP_TLBI_VMALLS12E1ISNXS		sys_insn(1, 4, 9, 3, 6)
-> +#define OP_TLBI_IPAS2E1OSNXS		sys_insn(1, 4, 9, 4, 0)
-> +#define OP_TLBI_IPAS2E1NXS		sys_insn(1, 4, 9, 4, 1)
-> +#define OP_TLBI_RIPAS2E1NXS		sys_insn(1, 4, 9, 4, 2)
-> +#define OP_TLBI_RIPAS2E1OSNXS		sys_insn(1, 4, 9, 4, 3)
-> +#define OP_TLBI_IPAS2LE1OSNXS		sys_insn(1, 4, 9, 4, 4)
-> +#define OP_TLBI_IPAS2LE1NXS		sys_insn(1, 4, 9, 4, 5)
-> +#define OP_TLBI_RIPAS2LE1NXS		sys_insn(1, 4, 9, 4, 6)
-> +#define OP_TLBI_RIPAS2LE1OSNXS		sys_insn(1, 4, 9, 4, 7)
-> +#define OP_TLBI_RVAE2OSNXS		sys_insn(1, 4, 9, 5, 1)
-> +#define OP_TLBI_RVALE2OSNXS		sys_insn(1, 4, 9, 5, 5)
-> +#define OP_TLBI_RVAE2NXS		sys_insn(1, 4, 9, 6, 1)
-> +#define OP_TLBI_RVALE2NXS		sys_insn(1, 4, 9, 6, 5)
-> +#define OP_TLBI_ALLE2NXS		sys_insn(1, 4, 9, 7, 0)
-> +#define OP_TLBI_VAE2NXS			sys_insn(1, 4, 9, 7, 1)
-> +#define OP_TLBI_ALLE1NXS		sys_insn(1, 4, 9, 7, 4)
-> +#define OP_TLBI_VALE2NXS		sys_insn(1, 4, 9, 7, 5)
-> +#define OP_TLBI_VMALLS12E1NXS		sys_insn(1, 4, 9, 7, 6)
+> +/* Transmit one byte and check the return value.
+> + *
+> + * expected_ret:
+> + *  <0 Negative errno (for testing errors)
+> + *   0 End-of-file
+> + *   1 Success
+> + */
+> +void sendto_byte(int fd, const struct sockaddr *dest_addr, int len, int expected_ret,
+> +		 int flags)
+> +{
+> +	const uint8_t byte = 'A';
+> +	ssize_t nwritten;
 > +
->  /* Common SCTLR_ELx flags. */
->  #define SCTLR_ELx_ENTP2	(BIT(60))
->  #define SCTLR_ELx_DSSBS	(BIT(44))
-
+> +	timeout_begin(TIMEOUT);
+> +	do {
+> +		nwritten = sendto(fd, &byte, sizeof(byte), flags, dest_addr,
+> +				  len);
+> +		timeout_check("write");
+> +	} while (nwritten < 0 && errno == EINTR);
+> +	timeout_end();
+> +
+> +	if (expected_ret < 0) {
+> +		if (nwritten != -1) {
+> +			fprintf(stderr, "bogus sendto(2) return value %zd\n",
+> +				nwritten);
+> +			exit(EXIT_FAILURE);
+> +		}
+> +		if (errno != -expected_ret) {
+> +			perror("write");
+> +			exit(EXIT_FAILURE);
+> +		}
+> +		return;
+> +	}
+> +
+> +	if (nwritten < 0) {
+> +		perror("write");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +	if (nwritten == 0) {
+> +		if (expected_ret == 0)
+> +			return;
+> +
+> +		fprintf(stderr, "unexpected EOF while sending byte\n");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +	if (nwritten != sizeof(byte)) {
+> +		fprintf(stderr, "bogus sendto(2) return value %zd\n", nwritten);
+> +		exit(EXIT_FAILURE);
+> +
+> 	}
+> 
+> 
+> 
+> ^^^
+> May be short check that 'nwritten' != 'expected_ret' will be enough? Then print expected and
+> real value. Here and in 'recvfrom_byte()' below.
+> 
+> 
+> 
+> 
+> +}
+> +
+>  /* Receive one byte and check the return value.
+>   *
+>   * expected_ret:
+> @@ -313,6 +364,60 @@ void recv_byte(int fd, int expected_ret, int flags)
+>  	}
+>  }
+>  
+> +/* Receive one byte and check the return value.
+> + *
+> + * expected_ret:
+> + *  <0 Negative errno (for testing errors)
+> + *   0 End-of-file
+> + *   1 Success
+> + */
+> +void recvfrom_byte(int fd, struct sockaddr *src_addr, socklen_t *addrlen,
+> +		   int expected_ret, int flags)
+> +{
+> +	uint8_t byte;
+> +	ssize_t nread;
+> +
+> +	timeout_begin(TIMEOUT);
+> +	do {
+> +		nread = recvfrom(fd, &byte, sizeof(byte), flags, src_addr, addrlen);
+> +		timeout_check("read");
+> +	} while (nread < 0 && errno == EINTR);
+> +	timeout_end();
+> +
+> +	if (expected_ret < 0) {
+> +		if (nread != -1) {
+> +			fprintf(stderr, "bogus recvfrom(2) return value %zd\n",
+> +				nread);
+> +			exit(EXIT_FAILURE);
+> +		}
+> +		if (errno != -expected_ret) {
+> +			perror("read");
+> +			exit(EXIT_FAILURE);
+> +		}
+> +		return;
+> +	}
+> +
+> +	if (nread < 0) {
+> +		perror("read");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +	if (nread == 0) {
+> +		if (expected_ret == 0)
+> +			return;
+> +
+> +		fprintf(stderr, "unexpected EOF while receiving byte\n");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +	if (nread != sizeof(byte)) {
+> +		fprintf(stderr, "bogus recvfrom(2) return value %zd\n", nread);
+> +		exit(EXIT_FAILURE);
+> +	}
+> +	if (byte != 'A') {
+> +		fprintf(stderr, "unexpected byte read %c\n", byte);
+> +		exit(EXIT_FAILURE);
+> +	}
+> +}
+> +
+>  /* Run test cases.  The program terminates if a failure occurs. */
+>  void run_tests(const struct test_case *test_cases,
+>  	       const struct test_opts *opts)
+> diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+> index fb99208a95ea..6e5cd610bf05 100644
+> --- a/tools/testing/vsock/util.h
+> +++ b/tools/testing/vsock/util.h
+> @@ -43,7 +43,11 @@ int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
+>  			   struct sockaddr_vm *clientaddrp);
+>  void vsock_wait_remote_close(int fd);
+>  void send_byte(int fd, int expected_ret, int flags);
+> +void sendto_byte(int fd, const struct sockaddr *dest_addr, int len, int expected_ret,
+> +		 int flags);
+>  void recv_byte(int fd, int expected_ret, int flags);
+> +void recvfrom_byte(int fd, struct sockaddr *src_addr, socklen_t *addrlen,
+> +		   int expected_ret, int flags);
+>  void run_tests(const struct test_case *test_cases,
+>  	       const struct test_opts *opts);
+>  void list_tests(const struct test_case *test_cases);
+> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+> index ac1bd3ac1533..851c3d65178d 100644
+> --- a/tools/testing/vsock/vsock_test.c
+> +++ b/tools/testing/vsock/vsock_test.c
+> @@ -202,6 +202,113 @@ static void test_stream_server_close_server(const struct test_opts *opts)
+>  	close(fd);
+>  }
+>  
+> +static void test_dgram_sendto_client(const struct test_opts *opts)
+> +{
+> +	union {
+> +		struct sockaddr sa;
+> +		struct sockaddr_vm svm;
+> +	} addr = {
+> +		.svm = {
+> +			.svm_family = AF_VSOCK,
+> +			.svm_port = 1234,
+> +			.svm_cid = opts->peer_cid,
+> +		},
+> +	};
+> +	int fd;
+> +
+> +	/* Wait for the server to be ready */
+> +	control_expectln("BIND");
+> +
+> +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
+> +	if (fd < 0) {
+> +		perror("socket");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +
+> +	sendto_byte(fd, &addr.sa, sizeof(addr.svm), 1, 0);
+> +
+> +	/* Notify the server that the client has finished */
+> +	control_writeln("DONE");
+> +
+> +	close(fd);
+> +}
+> +
+> +static void test_dgram_sendto_server(const struct test_opts *opts)
+> +{
+> +	union {
+> +		struct sockaddr sa;
+> +		struct sockaddr_vm svm;
+> +	} addr = {
+> +		.svm = {
+> +			.svm_family = AF_VSOCK,
+> +			.svm_port = 1234,
+> +			.svm_cid = VMADDR_CID_ANY,
+> +		},
+> +	};
+> +	int fd;
+> +	int len = sizeof(addr.sa);
+> +
+> +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
+> 
+> 
+> 
+> ^^^
+> I think we can check 'socket()' return value;
+> 
+> 
+> 
+> 
+> +
+> +	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
+> +		perror("bind");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +
+> +	/* Notify the client that the server is ready */
+> +	control_writeln("BIND");
+> +
+> +	recvfrom_byte(fd, &addr.sa, &len, 1, 0);
+> +
+> +	/* Wait for the client to finish */
+> +	control_expectln("DONE");
+> +
+> +	close(fd);
+> +}
+> +
+> +static void test_dgram_connect_client(const struct test_opts *opts)
+> +{
+> +	union {
+> +		struct sockaddr sa;
+> +		struct sockaddr_vm svm;
+> +	} addr = {
+> +		.svm = {
+> +			.svm_family = AF_VSOCK,
+> +			.svm_port = 1234,
+> +			.svm_cid = opts->peer_cid,
+> +		},
+> +	};
+> +	int fd;
+> +	int ret;
+> +
+> +	/* Wait for the server to be ready */
+> +	control_expectln("BIND");
+> +
+> +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
+> +	if (fd < 0) {
+> +		perror("bind");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +
+> +	ret = connect(fd, &addr.sa, sizeof(addr.svm));
+> +	if (ret < 0) {
+> +		perror("connect");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +
+> +	send_byte(fd, 1, 0);
+> +
+> +	/* Notify the server that the client has finished */
+> +	control_writeln("DONE");
+> +
+> +	close(fd);
+> +}
+> +
+> +static void test_dgram_connect_server(const struct test_opts *opts)
+> +{
+> +	test_dgram_sendto_server(opts);
+> +}
+> +
+>  /* With the standard socket sizes, VMCI is able to support about 100
+>   * concurrent stream connections.
+>   */
+> @@ -255,6 +362,77 @@ static void test_stream_multiconn_server(const struct test_opts *opts)
+>  		close(fds[i]);
+>  }
+>  
+> +static void test_dgram_multiconn_client(const struct test_opts *opts)
+> +{
+> +	int fds[MULTICONN_NFDS];
+> +	int i;
+> +	union {
+> +		struct sockaddr sa;
+> +		struct sockaddr_vm svm;
+> +	} addr = {
+> +		.svm = {
+> +			.svm_family = AF_VSOCK,
+> +			.svm_port = 1234,
+> +			.svm_cid = opts->peer_cid,
+> +		},
+> +	};
+> +
+> +	/* Wait for the server to be ready */
+> +	control_expectln("BIND");
+> +
+> +	for (i = 0; i < MULTICONN_NFDS; i++) {
+> +		fds[i] = socket(AF_VSOCK, SOCK_DGRAM, 0);
+> +		if (fds[i] < 0) {
+> +			perror("socket");
+> +			exit(EXIT_FAILURE);
+> +		}
+> +	}
+> +
+> +	for (i = 0; i < MULTICONN_NFDS; i++)
+> +		sendto_byte(fds[i], &addr.sa, sizeof(addr.svm), 1, 0);
+> +
+> +	/* Notify the server that the client has finished */
+> +	control_writeln("DONE");
+> +
+> +	for (i = 0; i < MULTICONN_NFDS; i++)
+> +		close(fds[i]);
+> +}
+> +
+> +static void test_dgram_multiconn_server(const struct test_opts *opts)
+> +{
+> +	union {
+> +		struct sockaddr sa;
+> +		struct sockaddr_vm svm;
+> +	} addr = {
+> +		.svm = {
+> +			.svm_family = AF_VSOCK,
+> +			.svm_port = 1234,
+> +			.svm_cid = VMADDR_CID_ANY,
+> +		},
+> +	};
+> +	int fd;
+> +	int len = sizeof(addr.sa);
+> +	int i;
+> +
+> +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
+> 
+> 
+> 
+> ^^^
+> I think we can check 'socket()' return value;
+> 
+> 
+> 
+> +
+> +	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
+> +		perror("bind");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +
+> +	/* Notify the client that the server is ready */
+> +	control_writeln("BIND");
+> +
+> +	for (i = 0; i < MULTICONN_NFDS; i++)
+> +		recvfrom_byte(fd, &addr.sa, &len, 1, 0);
+> +
+> +	/* Wait for the client to finish */
+> +	control_expectln("DONE");
+> +
+> +	close(fd);
+> +}
+> +
+>  static void test_stream_msg_peek_client(const struct test_opts *opts)
+>  {
+>  	int fd;
+> @@ -1128,6 +1306,21 @@ static struct test_case test_cases[] = {
+>  		.run_client = test_stream_virtio_skb_merge_client,
+>  		.run_server = test_stream_virtio_skb_merge_server,
+>  	},
+> +	{
+> +		.name = "SOCK_DGRAM client close",
+> +		.run_client = test_dgram_sendto_client,
+> +		.run_server = test_dgram_sendto_server,
+> +	},
+> +	{
+> +		.name = "SOCK_DGRAM client connect",
+> +		.run_client = test_dgram_connect_client,
+> +		.run_server = test_dgram_connect_server,
+> +	},
+> +	{
+> +		.name = "SOCK_DGRAM multiple connections",
+> +		.run_client = test_dgram_multiconn_client,
+> +		.run_server = test_dgram_multiconn_server,
+> +	},
+> 
+> 
+> 
+> 
+> SOCK_DGRAM guarantees message bounds, I think it will be good to add such test like in SOCK_SEQPACKET tests.
+> 
+> Thanks, Arseniy
+> 
+> 
+>  	{},
+>  };
+>  
+> 
