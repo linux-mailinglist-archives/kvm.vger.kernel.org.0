@@ -2,148 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9562F7235B2
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 05:21:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F7737235C0
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 05:31:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234572AbjFFDVD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 23:21:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40606 "EHLO
+        id S232207AbjFFDbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 23:31:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234567AbjFFDVA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 23:21:00 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B2DAEE40;
-        Mon,  5 Jun 2023 20:20:56 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.86])
-        by gateway (Coremail) with SMTP id _____8AxB_EXpn5krFoAAA--.1121S3;
-        Tue, 06 Jun 2023 11:20:55 +0800 (CST)
-Received: from [10.20.42.86] (unknown [10.20.42.86])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxluQVpn5kObABAA--.7496S3;
-        Tue, 06 Jun 2023 11:20:53 +0800 (CST)
-Subject: Re: [PATCH v12 10/31] LoongArch: KVM: Implement vcpu ENABLE_CAP ioctl
- interface
-To:     "bibo, mao" <maobibo@loongson.cn>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20230530015223.147755-1-zhaotianrui@loongson.cn>
- <20230530015223.147755-11-zhaotianrui@loongson.cn>
- <3f352d6f-2d4f-0b41-f015-991ba8421007@loongson.cn>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Xi Ruoyao <xry111@xry111.site>
-From:   Tianrui Zhao <zhaotianrui@loongson.cn>
-Message-ID: <9ab60c16-8276-c46e-951a-434e936264c8@loongson.cn>
-Date:   Tue, 6 Jun 2023 11:20:53 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
- Thunderbird/45.4.0
+        with ESMTP id S229476AbjFFDbj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 23:31:39 -0400
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 954B9127
+        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 20:31:38 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-51458187be1so8477974a12.2
+        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 20:31:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20221208.gappssmtp.com; s=20221208; t=1686022297; x=1688614297;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4wndiCL3ooX0unGrdnlGJh/CooZNsl4DJY/nw60Bvyg=;
+        b=4TRPlzmgxwVP4N8fCb9RZqV8HP2cOLntI5VkdodB0q2HH1Nh3nliJ06uBXogZqvlRh
+         n0Ux0Sg/MwrolvFP0BlIZBqOOMuEawIj0/4iHJnz2AIIkh4EIpYwcXNQY2yHffTqjSwK
+         ub+KmHvGOASUEhHANwD2GWK/czhgqWLIZoor/CjWQvsmNZQN1GHtz0V73BNKvrpIIbWQ
+         LhOMozGqRslMCUgEf9ZBTaJ0JI3fUmRe9u/AQWBayZYhtLGZZw5d+Zn+Ztmx4VxC8PHV
+         UM58F5k1N9OCzT7+2aZrnm9+mMUeANgphTgzhJX8R8/6kx2zFDHtzkqYhNcSJ2RMkScc
+         vF4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686022297; x=1688614297;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4wndiCL3ooX0unGrdnlGJh/CooZNsl4DJY/nw60Bvyg=;
+        b=OTjzJgNmH9/r8x8BVO/cRRMcEKS+wSXkg32jC4lXOWPBqFTb43oDzCRJyu/crgf1TH
+         Q6JbAZKXyJ33BZv3mvoJWQjlCuA8ZPhD71IuMP+XEiaVL0dTgbm9+LcQEhM+eSsHZMlD
+         5GUecfLLWJEL4d5YkUpFdUKgjfEUmzJp5bqcew/EdHEwv3z1+26GR0f4Q2SbmBX06d5+
+         FzXezUv0ni8i8I8sQ5UqQJCOqY2+QH92zSTKeeuQNyNyH6g1ZHok9YacoG9MUX+spLJI
+         nRpzqCH0yq5flgMnuMpWD1ANjtsGrMYTtVPA1xQZIU5Us4ddtfpOdfWDSU3sXn5bwfLK
+         7+xg==
+X-Gm-Message-State: AC+VfDzHylAoMGq52i6OmPIGe/ykTlnz9qp5GJg41m9sa0OJF/5DwcZ/
+        ohJiFFLNIDMIk/AcZFm0dEXOzli917ONGTIoi+R2STXHOSHkjlGFHFo=
+X-Google-Smtp-Source: ACHHUZ7QVZa3RQDP+a9VtfAzcQwf4YFT2UhxLoxBDM/IYolOEXUPpKLOggoV+GzyCKjIgfGl5Xi5Ec22NKzBN859hBs=
+X-Received: by 2002:a17:907:c11:b0:973:8afb:634a with SMTP id
+ ga17-20020a1709070c1100b009738afb634amr899934ejc.54.1686022296937; Mon, 05
+ Jun 2023 20:31:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <3f352d6f-2d4f-0b41-f015-991ba8421007@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8DxluQVpn5kObABAA--.7496S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7ZFW3ZF1kJF43Aw1UJrW3twc_yoW8CFyxpF
-        WkCan8WrWrJrW2gwnIqws3WrnIqrWkKr4xZF9rJa45JFnFkryrKFyFkrZrCFW5Awn5uF1x
-        ZF1Fq3Wa9F98AacCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUPqb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-        xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-        AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-        AVWUtwAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
-        xGrwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAK
-        I48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrV
-        AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
-        c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267
-        AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Cr0_
-        Gr1UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jb_-
-        PUUUUU=
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <202305061710302032748@zte.com.cn>
+In-Reply-To: <202305061710302032748@zte.com.cn>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Tue, 6 Jun 2023 09:01:25 +0530
+Message-ID: <CAAhSdy3isg4788uz=fP6DCTD3LgVbXz9Ud7aoi2VmEbRKYkW6w@mail.gmail.com>
+Subject: Re: [PATCH] RISC-V: KVM: use bitmap_zero() API
+To:     ye.xingchen@zte.com.cn
+Cc:     atishp@atishpatra.org, paul.walmsley@sifive.com,
+        palmer@dabbelt.com, aou@eecs.berkeley.edu, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-在 2023年06月05日 21:12, bibo, mao 写道:
+On Sat, May 6, 2023 at 2:40=E2=80=AFPM <ye.xingchen@zte.com.cn> wrote:
 >
-> 在 2023/5/30 09:52, Tianrui Zhao 写道:
->> Implement LoongArch vcpu KVM_ENABLE_CAP ioctl interface.
->>
->> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
->> ---
->>   arch/loongarch/kvm/vcpu.c | 26 ++++++++++++++++++++++++++
->>   1 file changed, 26 insertions(+)
->>
->> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
->> index 278fbafc59b4..5a88f815c412 100644
->> --- a/arch/loongarch/kvm/vcpu.c
->> +++ b/arch/loongarch/kvm/vcpu.c
->> @@ -186,6 +186,23 @@ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
->>   	return 0;
->>   }
->>   
->> +static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
->> +				     struct kvm_enable_cap *cap)
->> +{
->> +	int r = 0;
->> +
->> +	if (!kvm_vm_ioctl_check_extension(vcpu->kvm, cap->cap))
->> +		return -EINVAL;
-> It is a little strange to check extension of the whole vm in enable vcap capability.
-> can we change to usage like  general architectures?
-Thanks, I look up this interface of other archs and re-consider it, and 
-I think it should be removed.
-
-Thanks
-Tianrui Zhao
+> From: Ye Xingchen <ye.xingchen@zte.com.cn>
 >
->> +	if (cap->flags)
->> +		return -EINVAL;
->> +	if (cap->args[0])
->> +		return -EINVAL;
->> +	if (cap->cap)
->> +		return -EINVAL;
-> Do we need check args[0] and cap here ?
+> bitmap_zero() is faster than bitmap_clear(), so use bitmap_zero()
+> instead of bitmap_clear().
 >
-> Regards
-> Bibo, Mao
-No need, I will remove the two conditions.
+> Signed-off-by: Ye Xingchen <ye.xingchen@zte.com.cn>
 
-Thanks
-Tianrui Zhao
->> +
->> +	return r;
->> +}
->> +
->>   long kvm_arch_vcpu_ioctl(struct file *filp,
->>   			 unsigned int ioctl, unsigned long arg)
->>   {
->> @@ -209,6 +226,15 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->>   			r = _kvm_get_reg(vcpu, &reg);
->>   		break;
->>   	}
->> +	case KVM_ENABLE_CAP: {
->> +		struct kvm_enable_cap cap;
->> +
->> +		r = -EFAULT;
->> +		if (copy_from_user(&cap, argp, sizeof(cap)))
->> +			break;
->> +		r = kvm_vcpu_ioctl_enable_cap(vcpu, &cap);
->> +		break;
->> +	}
->>   	default:
->>   		r = -ENOIOCTLCMD;
->>   		break;
+Queued this patch for 6.5
 
+Thanks,
+Anup
+
+> ---
+>  arch/riscv/kvm/tlb.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/riscv/kvm/tlb.c b/arch/riscv/kvm/tlb.c
+> index 0e5479600695..44bc324aeeb0 100644
+> --- a/arch/riscv/kvm/tlb.c
+> +++ b/arch/riscv/kvm/tlb.c
+> @@ -296,7 +296,7 @@ static void make_xfence_request(struct kvm *kvm,
+>         unsigned int actual_req =3D req;
+>         DECLARE_BITMAP(vcpu_mask, KVM_MAX_VCPUS);
+>
+> -       bitmap_clear(vcpu_mask, 0, KVM_MAX_VCPUS);
+> +       bitmap_zero(vcpu_mask, KVM_MAX_VCPUS);
+>         kvm_for_each_vcpu(i, vcpu, kvm) {
+>                 if (hbase !=3D -1UL) {
+>                         if (vcpu->vcpu_id < hbase)
+> --
+> 2.25.1
