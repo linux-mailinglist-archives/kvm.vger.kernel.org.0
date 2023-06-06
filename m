@@ -2,86 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0263272411C
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 13:37:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74D13724257
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 14:38:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236927AbjFFLh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 07:37:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58794 "EHLO
+        id S237584AbjFFMif (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 08:38:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236710AbjFFLhq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 07:37:46 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31ECFE5B;
-        Tue,  6 Jun 2023 04:37:45 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 356BMlw8017605;
-        Tue, 6 Jun 2023 11:37:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=hQvxa/208GGap2m5CEKlCdSeXsPpBXC4SNfyCCt+N5k=;
- b=TAygvyywlkIeZn6Bnb1yIKxt9ftLERVRuoDnBnAg7ZEHJdSbFo00AZVoqKQMwo9OuSoO
- 6xChaX7aO43/sveea35pCMceMyWzUnPcJYH6Eub9IbeQcvarcodY6okrKNTTa6C5EiDG
- MkAcu8QaMadRvMfpndzV1b95HkN0o2gRVWSSmOETOqc7C2WX4tMZbmVp+9LXKBJyTzDR
- FP2O1yt8SOCu/mlUtU9YOXDOJ7ufSYp/P1JQ3eepNmOaTawfT6d784ctXgZ3c/mURDST
- 2YLTREku3rc3QYWn2vQKiA0TEWuwFVed16Lu5eYMEJzKTSQ60t9soeGcuQnrooN40/3x Hg== 
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r23v9rb2v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Jun 2023 11:37:44 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3569muLn017239;
-        Tue, 6 Jun 2023 11:37:42 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3qyx8xhgfr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Jun 2023 11:37:42 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 356BbcQ838076754
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 6 Jun 2023 11:37:39 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D4C9A2004B;
-        Tue,  6 Jun 2023 11:37:38 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 952722004E;
-        Tue,  6 Jun 2023 11:37:38 +0000 (GMT)
-Received: from a46lp73.lnxne.boe (unknown [9.152.108.100])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  6 Jun 2023 11:37:38 +0000 (GMT)
-From:   Steffen Eiden <seiden@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>
-Subject: [PATCH v3 6/6] s390/uv: Update query for secret-UVCs
-Date:   Tue,  6 Jun 2023 13:37:36 +0200
-Message-Id: <20230606113736.2934503-7-seiden@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230606113736.2934503-1-seiden@linux.ibm.com>
-References: <20230606113736.2934503-1-seiden@linux.ibm.com>
+        with ESMTP id S236529AbjFFMic (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 08:38:32 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB1B810C3;
+        Tue,  6 Jun 2023 05:38:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686055110; x=1717591110;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=H/iH/hJMR3hBdZN5X97g2WPo8WuAVbo2nUSQSiOHU6s=;
+  b=nxAl6eEkM0osgc4vsR9f1X6K/l6B8w9IVVnSAShDkD3KMWDEBTVa/32l
+   qT479vaobQqZsy6SZZW0knkxNFF3aWpHP+conA8Prp6hsYoX5aVVkhEt+
+   DkinxDtA3yGbMkigxPWKtTb8voKa1JMwbBQaPGJqQgxuc1BtIA3sxUbhU
+   lpBb24hptoy+3S3vHc6Oq+t9SopOg29X8f7Qox421TDtrwyR4ePNCElaG
+   vCWOBlglOq0Yjt9m9lbLQPwB1CtcU91rI/EMqe4K9EPl6VjbbNOY1OiE5
+   OJAnaS1sadRswXrx30qAybrzTl93UvvHxbeeHwLlwo2OIsqpejO+pS2h6
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="420200541"
+X-IronPort-AV: E=Sophos;i="6.00,221,1681196400"; 
+   d="scan'208";a="420200541"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 05:38:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="703144717"
+X-IronPort-AV: E=Sophos;i="6.00,221,1681196400"; 
+   d="scan'208";a="703144717"
+Received: from rgraefe-mobl1.ger.corp.intel.com (HELO box.shutemov.name) ([10.252.58.173])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 05:38:24 -0700
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id 5AB7D10A6A4; Tue,  6 Jun 2023 15:38:21 +0300 (+03)
+Date:   Tue, 6 Jun 2023 15:38:21 +0300
+From:   kirill.shutemov@linux.intel.com
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-mm@kvack.org, dave.hansen@intel.com, tony.luck@intel.com,
+        peterz@infradead.org, tglx@linutronix.de, seanjc@google.com,
+        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, ying.huang@intel.com,
+        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+Subject: Re: [PATCH v11 04/20] x86/cpu: Detect TDX partial write machine
+ check erratum
+Message-ID: <20230606123821.exit7gyxs42dxotz@box.shutemov.name>
+References: <cover.1685887183.git.kai.huang@intel.com>
+ <86f2a8814240f4bbe850f6a09fc9d0b934979d1b.1685887183.git.kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MNrnFtwaXe_K-WiMyvd0EfT4VTLPXb7L
-X-Proofpoint-GUID: MNrnFtwaXe_K-WiMyvd0EfT4VTLPXb7L
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-06_07,2023-06-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 clxscore=1015 mlxscore=0 mlxlogscore=999 lowpriorityscore=0
- adultscore=0 phishscore=0 suspectscore=0 priorityscore=1501 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306060093
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86f2a8814240f4bbe850f6a09fc9d0b934979d1b.1685887183.git.kai.huang@intel.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,141 +71,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Update the query struct such that secret-UVC related
-information can be parsed.
-Add sysfs files for these new values.
+On Mon, Jun 05, 2023 at 02:27:17AM +1200, Kai Huang wrote:
+> TDX memory has integrity and confidentiality protections.  Violations of
+> this integrity protection are supposed to only affect TDX operations and
+> are never supposed to affect the host kernel itself.  In other words,
+> the host kernel should never, itself, see machine checks induced by the
+> TDX integrity hardware.
+> 
+> Alas, the first few generations of TDX hardware have an erratum.  A
+> "partial" write to a TDX private memory cacheline will silently "poison"
+> the line.  Subsequent reads will consume the poison and generate a
+> machine check.  According to the TDX hardware spec, neither of these
+> things should have happened.
+> 
+> Virtually all kernel memory accesses operations happen in full
+> cachelines.  In practice, writing a "byte" of memory usually reads a 64
+> byte cacheline of memory, modifies it, then writes the whole line back.
+> Those operations do not trigger this problem.
+> 
+> This problem is triggered by "partial" writes where a write transaction
+> of less than cacheline lands at the memory controller.  The CPU does
+> these via non-temporal write instructions (like MOVNTI), or through
+> UC/WC memory mappings.  The issue can also be triggered away from the
+> CPU by devices doing partial writes via DMA.
+> 
+> With this erratum, there are additional things need to be done around
+> machine check handler and kexec(), etc.  Similar to other CPU bugs, use
+> a CPU bug bit to indicate this erratum, and detect this erratum during
+> early boot.  Note this bug reflects the hardware thus it is detected
+> regardless of whether the kernel is built with TDX support or not.
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+> 
+> v10 -> v11:
+>  - New patch
+> 
+> ---
+>  arch/x86/include/asm/cpufeatures.h |  1 +
+>  arch/x86/kernel/cpu/intel.c        | 21 +++++++++++++++++++++
+>  2 files changed, 22 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> index cb8ca46213be..dc8701f8d88b 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -483,5 +483,6 @@
+>  #define X86_BUG_RETBLEED		X86_BUG(27) /* CPU is affected by RETBleed */
+>  #define X86_BUG_EIBRS_PBRSB		X86_BUG(28) /* EIBRS is vulnerable to Post Barrier RSB Predictions */
+>  #define X86_BUG_SMT_RSB			X86_BUG(29) /* CPU is vulnerable to Cross-Thread Return Address Predictions */
+> +#define X86_BUG_TDX_PW_MCE		X86_BUG(30) /* CPU may incur #MC if non-TD software does partial write to TDX private memory */
+>  
+>  #endif /* _ASM_X86_CPUFEATURES_H */
+> diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+> index 1c4639588ff9..251b333e53d2 100644
+> --- a/arch/x86/kernel/cpu/intel.c
+> +++ b/arch/x86/kernel/cpu/intel.c
+> @@ -1552,3 +1552,24 @@ u8 get_this_hybrid_cpu_type(void)
+>  
+>  	return cpuid_eax(0x0000001a) >> X86_HYBRID_CPU_TYPE_ID_SHIFT;
+>  }
+> +
+> +/*
+> + * These CPUs have an erratum.  A partial write from non-TD
+> + * software (e.g. via MOVNTI variants or UC/WC mapping) to TDX
+> + * private memory poisons that memory, and a subsequent read of
+> + * that memory triggers #MC.
+> + */
+> +static const struct x86_cpu_id tdx_pw_mce_cpu_ids[] __initconst = {
+> +	X86_MATCH_INTEL_FAM6_MODEL(SAPPHIRERAPIDS_X, NULL),
+> +	X86_MATCH_INTEL_FAM6_MODEL(EMERALDRAPIDS_X, NULL),
+> +	{ }
+> +};
+> +
+> +static int __init tdx_erratum_detect(void)
+> +{
+> +	if (x86_match_cpu(tdx_pw_mce_cpu_ids))
+> +		setup_force_cpu_bug(X86_BUG_TDX_PW_MCE);
+> +
+> +	return 0;
+> +}
+> +early_initcall(tdx_erratum_detect);
 
-'supp_add_secret_req_ver' notes the supported versions for the
-Add Secret UVC. Bit 0 indicates that version 0x100 is supported,
-bit 1 indicates 0x200, and so on.
+Initcall? Don't we already have a codepath to call it directly?
+Maybe cpu_set_bug_bits()?
 
-'supp_add_secret_pcf' notes the supported plaintext flags for
-the Add Secret UVC.
-
-'supp_secret_types' notes the supported types of secrets.
-Bit 0 indicates secret type 1, bit 1 indicates type 2, and so on.
-
-'max_secrets' notes the maximum amount of secrets the secret store can
-store per pv guest.
-
-Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
----
- arch/s390/boot/uv.c        |  4 ++++
- arch/s390/include/asm/uv.h | 13 +++++++++++--
- arch/s390/kernel/uv.c      | 40 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 55 insertions(+), 2 deletions(-)
-
-diff --git a/arch/s390/boot/uv.c b/arch/s390/boot/uv.c
-index 0a077c0a2056..323b5cae3cf1 100644
---- a/arch/s390/boot/uv.c
-+++ b/arch/s390/boot/uv.c
-@@ -47,6 +47,10 @@ void uv_query_info(void)
- 		uv_info.conf_dump_finalize_len = uvcb.conf_dump_finalize_len;
- 		uv_info.supp_att_req_hdr_ver = uvcb.supp_att_req_hdr_ver;
- 		uv_info.supp_att_pflags = uvcb.supp_att_pflags;
-+		uv_info.supp_add_secret_req_ver = uvcb.supp_add_secret_req_ver;
-+		uv_info.supp_add_secret_pcf = uvcb.supp_add_secret_pcf;
-+		uv_info.supp_secret_types = uvcb.supp_secret_types;
-+		uv_info.max_secrets = uvcb.max_num_secrets;
- 	}
- 
- #ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
-diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-index 3203ffbdde6b..d71eb9b887d3 100644
---- a/arch/s390/include/asm/uv.h
-+++ b/arch/s390/include/asm/uv.h
-@@ -123,7 +123,7 @@ struct uv_cb_qui {
- 	u32 reserved70[3];			/* 0x0070 */
- 	u32 max_num_sec_conf;			/* 0x007c */
- 	u64 max_guest_stor_addr;		/* 0x0080 */
--	u8  reserved88[158 - 136];		/* 0x0088 */
-+	u8  reserved88[0x9e - 0x88];		/* 0x0088 */
- 	u16 max_guest_cpu_id;			/* 0x009e */
- 	u64 uv_feature_indications;		/* 0x00a0 */
- 	u64 reserveda8;				/* 0x00a8 */
-@@ -135,7 +135,12 @@ struct uv_cb_qui {
- 	u64 reservedd8;				/* 0x00d8 */
- 	u64 supp_att_req_hdr_ver;		/* 0x00e0 */
- 	u64 supp_att_pflags;			/* 0x00e8 */
--	u8 reservedf0[256 - 240];		/* 0x00f0 */
-+	u64 reservedf0;				/* 0x00f0 */
-+	u64 supp_add_secret_req_ver;		/* 0x00f8 */
-+	u64 supp_add_secret_pcf;		/* 0x0100 */
-+	u64 supp_secret_types;			/* 0x0180 */
-+	u16 max_num_secrets;			/* 0x0110 */
-+	u8 reserved112[0x120 - 0x112];		/* 0x0112 */
- } __packed __aligned(8);
- 
- /* Initialize Ultravisor */
-@@ -384,6 +389,10 @@ struct uv_info {
- 	unsigned long conf_dump_finalize_len;
- 	unsigned long supp_att_req_hdr_ver;
- 	unsigned long supp_att_pflags;
-+	unsigned long supp_add_secret_req_ver;
-+	unsigned long supp_add_secret_pcf;
-+	unsigned long supp_secret_types;
-+	unsigned short max_secrets;
- };
- 
- extern struct uv_info uv_info;
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index cd3a591edab3..7043c0318960 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -571,6 +571,42 @@ static ssize_t uv_query_supp_att_pflags(struct kobject *kobj,
- static struct kobj_attribute uv_query_supp_att_pflags_attr =
- 	__ATTR(supp_att_pflags, 0444, uv_query_supp_att_pflags, NULL);
- 
-+static ssize_t uv_query_supp_add_secret_req_ver(struct kobject *kobj,
-+						struct kobj_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%lx\n", uv_info.supp_add_secret_req_ver);
-+}
-+
-+static struct kobj_attribute uv_query_supp_add_secret_req_ver_attr =
-+	__ATTR(supp_add_secret_req_ver, 0444, uv_query_supp_add_secret_req_ver, NULL);
-+
-+static ssize_t uv_query_supp_add_secret_pcf(struct kobject *kobj,
-+					    struct kobj_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%lx\n", uv_info.supp_add_secret_pcf);
-+}
-+
-+static struct kobj_attribute uv_query_supp_add_secret_pcf_attr =
-+	__ATTR(supp_add_secret_pcf, 0444, uv_query_supp_add_secret_pcf, NULL);
-+
-+static ssize_t uv_query_supp_secret_types(struct kobject *kobj,
-+					  struct kobj_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%lx\n", uv_info.supp_secret_types);
-+}
-+
-+static struct kobj_attribute uv_query_supp_secret_types_attr =
-+	__ATTR(supp_secret_types, 0444, uv_query_supp_secret_types, NULL);
-+
-+static ssize_t uv_query_max_secrets(struct kobject *kobj,
-+				    struct kobj_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%d\n", uv_info.max_secrets);
-+}
-+
-+static struct kobj_attribute uv_query_max_secrets_attr =
-+	__ATTR(max_secrets, 0444, uv_query_max_secrets, NULL);
-+
- static struct attribute *uv_query_attrs[] = {
- 	&uv_query_facilities_attr.attr,
- 	&uv_query_feature_indications_attr.attr,
-@@ -584,6 +620,10 @@ static struct attribute *uv_query_attrs[] = {
- 	&uv_query_dump_cpu_len_attr.attr,
- 	&uv_query_supp_att_req_hdr_ver_attr.attr,
- 	&uv_query_supp_att_pflags_attr.attr,
-+	&uv_query_supp_add_secret_req_ver_attr.attr,
-+	&uv_query_supp_add_secret_pcf_attr.attr,
-+	&uv_query_supp_secret_types_attr.attr,
-+	&uv_query_max_secrets_attr.attr,
- 	NULL,
- };
- 
 -- 
-2.40.1
-
+  Kiryl Shutsemau / Kirill A. Shutemov
