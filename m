@@ -2,71 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35CE2723DAE
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 11:35:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0A4E723DB4
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 11:35:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235392AbjFFJfe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 05:35:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42714 "EHLO
+        id S236441AbjFFJfg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 05:35:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236835AbjFFJeq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 05:34:46 -0400
+        with ESMTP id S237604AbjFFJey (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 05:34:54 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8666D1734
-        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 02:33:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 049121990
+        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 02:33:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686044014;
+        s=mimecast20190719; t=1686044022;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NfCVlNZr5FMM7IYZiy0Efi0L7IH3DzTFtcUbvK87ioM=;
-        b=d2pXKN9m1YM1xDrlHUYZ2LBo+kKBceAjWJ6MldiJDtGO6e27h4/a0p/yGnmmYvcZ9Au4vk
-        k0szG4jM4JgNitoHSAabDdsSawUx+TaLRlWM0DqD2NqpWIKDR3i3RojoFdq8hw489ntsTv
-        1Aco0Mth7+PTGBx0O0WR0SQJS9mhWK0=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=kL+DqJUm5U6TFHuhQj83O46KkLfEwvC4DLSR18DYPSM=;
+        b=NVHQ+D8MS8EWoz0xO4T53AgSgT2zAhUMOOQ50JflMz7knUvmOxManeT4tS5QsRKCWt9j8p
+        rop/iodpJ+MIqAzF0Atc2n7uyX9eFBlxT27mymQQy/al2iqJU2kVlADilqyt2hK/wVuP4r
+        oPZB67HTgG62P9a71mrGpGn/Dktsr14=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-353-dbkc3YO-OUKVmcW0LBiUmA-1; Tue, 06 Jun 2023 05:33:33 -0400
-X-MC-Unique: dbkc3YO-OUKVmcW0LBiUmA-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-3f8390332c0so89124371cf.3
-        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 02:33:33 -0700 (PDT)
+ us-mta-113-Uv6j_nMrNrGlEiZt13i2fQ-1; Tue, 06 Jun 2023 05:33:41 -0400
+X-MC-Unique: Uv6j_nMrNrGlEiZt13i2fQ-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-75ebf897d16so187252385a.3
+        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 02:33:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686044012; x=1688636012;
+        d=1e100.net; s=20221208; t=1686044020; x=1688636020;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NfCVlNZr5FMM7IYZiy0Efi0L7IH3DzTFtcUbvK87ioM=;
-        b=Pd2xcXYS4rWYxQqooF5nD1eDHiNWIIrhJg0j9jsjp2QGuQ1rSrnM2skpC7aiXfMs5o
-         XIjNJNKrYkQWmdpkp4HX1OHr1WoQWDCwhOk1Pv4yUG3wUhMadc6Q8mxuuoqUuD0ti+5x
-         g4iArVqi+TEJwfvo+XT+zzqmLQzAHPAzcJT3LaqYMlktewzwPHGncFWfXIyt2YilRquu
-         xZCh3uSRmN62Ew2jzAPVHtpXIeQNGGk9DH7mHHXa4Mcl8CmScZCyacyMb4l1YpHgjVzG
-         UWHAXLqoFWUn2tCgoyB/vdLckFTTVwFy2kpqodTrYKzQrVE8DJC4TIRxSkCuOlsHxYqk
-         pH6w==
-X-Gm-Message-State: AC+VfDw1NoYDdF3HqS5YJp70DS//3N4NU/OI4nOR3tVP8q1j9HFLzelg
-        kcsBJ4e+9+SH5vIYxn9+AK9+3tLTszm7jX1YojB8krwKd+Fyk2SjDMZAHkjQSftky02uu5e/llW
-        IQucmrQUmJfZo
-X-Received: by 2002:ac8:7c54:0:b0:3f5:1626:6a3d with SMTP id o20-20020ac87c54000000b003f516266a3dmr1313724qtv.42.1686044012697;
-        Tue, 06 Jun 2023 02:33:32 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5n5fSaR9rhGQJeywpdZviphMffC6+N0hasH8JtAg/z6WKXKQqm2K/P4sycA2R8M1LOqxyk5Q==
-X-Received: by 2002:ac8:7c54:0:b0:3f5:1626:6a3d with SMTP id o20-20020ac87c54000000b003f516266a3dmr1313701qtv.42.1686044012476;
-        Tue, 06 Jun 2023 02:33:32 -0700 (PDT)
+        bh=kL+DqJUm5U6TFHuhQj83O46KkLfEwvC4DLSR18DYPSM=;
+        b=OEJKfjxnYNewJwaT9J4+sLxB4lo3RoTV2tn1nVvHvai/ZaCVJA8zRTALZldGX+NPZw
+         bkIArO0txWCa+IBes+nRJm8X0b/kmAZsd0hVEcqu5/yU7o6hTJm9Rj5dwBk/3tASt2ET
+         yR2y+WzKwX1Ugg2tWnESYLX6mDRBpqtxIyIscyFTcy10Isa8lUffOy64SB3DuZc9oeRc
+         CT40bNL1JaoUH2/TE9QbaHGR4TXBG90kz5jUGqE5DfbxsuCJF9E5rb7OvzeuDnDkrxxQ
+         wJWdxsZAp67SG6SGnarxiOX0HqyrBsD/p96JUhc0XJ2o1tM87vR+awarfmkYxse1OCYJ
+         gUGQ==
+X-Gm-Message-State: AC+VfDxWjPJ2hgAh2VyEJnNXdaEDZ/gF4/e9fH0Y8erymYLNPQesUUkQ
+        3WTUDILGUfqKhwrTUrBFLEthVlQ2Y3IoAIgNwpWV9y+VjmLZq7Abx10NgBRmAqqDjQznAHetGsy
+        YVraMZbvKGQzT
+X-Received: by 2002:ac8:5f83:0:b0:3f6:ac1b:47b3 with SMTP id j3-20020ac85f83000000b003f6ac1b47b3mr1420831qta.34.1686044020445;
+        Tue, 06 Jun 2023 02:33:40 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5IHSNH2kXYClfPF7+eeeWzQy0YgraKLLPOiKH8WekEnx/oDm1lUrlT+4XRcDVYDiENLu6dww==
+X-Received: by 2002:ac8:5f83:0:b0:3f6:ac1b:47b3 with SMTP id j3-20020ac85f83000000b003f6ac1b47b3mr1420820qta.34.1686044020204;
+        Tue, 06 Jun 2023 02:33:40 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id r12-20020ac85e8c000000b003f9ad6acba4sm634844qtx.79.2023.06.06.02.33.28
+        by smtp.gmail.com with ESMTPSA id i6-20020ac87646000000b003f6b0562ad7sm5423861qtr.16.2023.06.06.02.33.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jun 2023 02:33:31 -0700 (PDT)
-Message-ID: <bdcf630c-b6a7-0649-8419-15f98f6b1a0c@redhat.com>
-Date:   Tue, 6 Jun 2023 11:33:27 +0200
+        Tue, 06 Jun 2023 02:33:39 -0700 (PDT)
+Message-ID: <0cb4ac7a-6dcf-db68-69e9-dd6a01678aed@redhat.com>
+Date:   Tue, 6 Jun 2023 11:33:33 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
- support
+Subject: Re: [PATCH v10 06/59] arm64: Add TLBI operation encodings
 Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Andre Przywara <andre.przywara@arm.com>,
         Chase Conklin <chase.conklin@arm.com>,
         Christoffer Dall <christoffer.dall@arm.com>,
@@ -80,12 +78,9 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
 References: <20230515173103.1017669-1-maz@kernel.org>
- <16d9fda4-3ead-7d5e-9f54-ef29fbd932ac@redhat.com>
- <87zg64nhqh.wl-maz@kernel.org>
- <d0b77823-c04c-4ee0-cb55-2cc20a48903b@redhat.com>
- <86r0rfkpwd.wl-maz@kernel.org>
+ <20230515173103.1017669-7-maz@kernel.org>
 From:   Eric Auger <eauger@redhat.com>
-In-Reply-To: <86r0rfkpwd.wl-maz@kernel.org>
+In-Reply-To: <20230515173103.1017669-7-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -98,101 +93,157 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Hi,
 
-On 5/17/23 16:12, Marc Zyngier wrote:
-> On Wed, 17 May 2023 09:59:45 +0100,
-> Eric Auger <eauger@redhat.com> wrote:
->>
->> Hi Marc,
->>Hi Marc,
->> On 5/16/23 22:28, Marc Zyngier wrote:
->>> On Tue, 16 May 2023 17:53:14 +0100,
->>> Eric Auger <eauger@redhat.com> wrote:
->>>>
->>>> Hi Marc,
->>>>
->>>> On 5/15/23 19:30, Marc Zyngier wrote:
->>>>> This is the 4th drop of NV support on arm64 for this year.
->>>>>
->>>>> For the previous episodes, see [1].
->>>>>
->>>>> What's changed:
->>>>>
->>>>> - New framework to track system register traps that are reinjected in
->>>>>   guest EL2. It is expected to replace the discrete handling we have
->>>>>   enjoyed so far, which didn't scale at all. This has already fixed a
->>>>>   number of bugs that were hidden (a bunch of traps were never
->>>>>   forwarded...). Still a work in progress, but this is going in the
->>>>>   right direction.
->>>>>
->>>>> - Allow the L1 hypervisor to have a S2 that has an input larger than
->>>>>   the L0 IPA space. This fixes a number of subtle issues, depending on
->>>>>   how the initial guest was created.
->>>>>
->>>>> - Consequently, the patch series has gone longer again. Boo. But
->>>>>   hopefully some of it is easier to review...
->>>>>
->>>>> [1] https://lore.kernel.org/r/20230405154008.3552854-1-maz@kernel.org
->>>>
->>>> I have started testing this and when booting my fedora guest I get
->>>>
->>>> [  151.796544] kvm [7617]: Unsupported guest sys_reg access at:
->>>> 23f425fd0 [80000209]
->>>> [  151.796544]  { Op0( 3), Op1( 3), CRn(14), CRm( 3), Op2( 1), func_write },
->>>>
->>>> as soon as the host has kvm-arm.mode=nested
->>>>
->>>> This seems to be triggered very early by EDK2
->>>> (ArmPkg/Drivers/TimerDxe/TimerDxe.c).
->>>>
->>>> If I am not wrong this CNTV_CTL_EL0. Do you have any idea?
->>>
->>> So here's my current analysis:
->>>
->>> I assume you are running EDK2 as the L1 guest in a nested
->>> configuration. I also assume that you are not running on an Apple
->>> CPU. If these assumptions are correct, then EDK2 runs at vEL2, and is
->>> in nVHE mode.
->>>
->>> Finally, I'm going to assume that your implementation has FEAT_ECV and
->>> FEAT_NV2, because I can't see how it could fail otherwise.
->> all the above is correct.
->>>
->>> In these precise conditions, KVM sets the CNTHCTL_EL2.EL1TVT bit so
->>> that we can trap the EL0 virtual timer and faithfully emulate it (it
->>> is otherwise written to memory, which isn't very helpful).
->>
->> indeed
->>>
->>> As it turns out, we don't handle these traps. I didn't spot it because
->>> my test machines are all Apple boxes that don't have a nVHE mode, so
->>> nothing on the nVHE path is getting *ANY* coverage. Hint: having
->>> access to such a machine would help (shipping address on request!).
->>> Otherwise, I'll eventually kill the nVHE support altogether.
->>>
->>> I have written the following patch, which compiles, but that I cannot
->>> test with my current setup. Could you please give it a go?
->>
->> with the patch below, my guest boots nicely. You did it great on the 1st
->> shot!!! So this fixes my issue. I will continue testing the v10.
+On 5/15/23 19:30, Marc Zyngier wrote:
+> Add all the TLBI encodings that are usable from Non-Secure.
 > 
-> Thanks a lot for reporting the issue and testing my hacks. I'll
-> eventually fold it into the rest of the series.
-> 
-> By the way, what are you using as your VMM? I'd really like to
-> reproduce your setup.
-Sorry I missed your reply. I am using libvirt + qemu (feat Miguel's RFC)
-and fedora L1 guest.
 
-Thanks to your fix, this boots fine. But at the moment it does not
-reboot and hangs in edk2 I think. Unfortunately this time I have no
-trace on host :-( While looking at your series I will add some traces.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
+> ---
+>  arch/arm64/include/asm/sysreg.h | 128 ++++++++++++++++++++++++++++++++
+>  1 file changed, 128 insertions(+)
 > 
-> Cheers,
-> 
-> 	M.
-> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 28ccc379a172..2727e68dd65b 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -568,6 +568,134 @@
+>  
+>  #define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
+>  
+> +/* TLBI instructions */
+> +#define OP_TLBI_VMALLE1OS		sys_insn(1, 0, 8, 1, 0)
+> +#define OP_TLBI_VAE1OS			sys_insn(1, 0, 8, 1, 1)
+> +#define OP_TLBI_ASIDE1OS		sys_insn(1, 0, 8, 1, 2)
+> +#define OP_TLBI_VAAE1OS			sys_insn(1, 0, 8, 1, 3)
+> +#define OP_TLBI_VALE1OS			sys_insn(1, 0, 8, 1, 5)
+> +#define OP_TLBI_VAALE1OS		sys_insn(1, 0, 8, 1, 7)
+> +#define OP_TLBI_RVAE1IS			sys_insn(1, 0, 8, 2, 1)
+> +#define OP_TLBI_RVAAE1IS		sys_insn(1, 0, 8, 2, 3)
+> +#define OP_TLBI_RVALE1IS		sys_insn(1, 0, 8, 2, 5)
+> +#define OP_TLBI_RVAALE1IS		sys_insn(1, 0, 8, 2, 7)
+> +#define OP_TLBI_VMALLE1IS		sys_insn(1, 0, 8, 3, 0)
+> +#define OP_TLBI_VAE1IS			sys_insn(1, 0, 8, 3, 1)
+> +#define OP_TLBI_ASIDE1IS		sys_insn(1, 0, 8, 3, 2)
+> +#define OP_TLBI_VAAE1IS			sys_insn(1, 0, 8, 3, 3)
+> +#define OP_TLBI_VALE1IS			sys_insn(1, 0, 8, 3, 5)
+> +#define OP_TLBI_VAALE1IS		sys_insn(1, 0, 8, 3, 7)
+> +#define OP_TLBI_RVAE1OS			sys_insn(1, 0, 8, 5, 1)
+> +#define OP_TLBI_RVAAE1OS		sys_insn(1, 0, 8, 5, 3)
+> +#define OP_TLBI_RVALE1OS		sys_insn(1, 0, 8, 5, 5)
+> +#define OP_TLBI_RVAALE1OS		sys_insn(1, 0, 8, 5, 7)
+> +#define OP_TLBI_RVAE1			sys_insn(1, 0, 8, 6, 1)
+> +#define OP_TLBI_RVAAE1			sys_insn(1, 0, 8, 6, 3)
+> +#define OP_TLBI_RVALE1			sys_insn(1, 0, 8, 6, 5)
+> +#define OP_TLBI_RVAALE1			sys_insn(1, 0, 8, 6, 7)
+> +#define OP_TLBI_VMALLE1			sys_insn(1, 0, 8, 7, 0)
+> +#define OP_TLBI_VAE1			sys_insn(1, 0, 8, 7, 1)
+> +#define OP_TLBI_ASIDE1			sys_insn(1, 0, 8, 7, 2)
+> +#define OP_TLBI_VAAE1			sys_insn(1, 0, 8, 7, 3)
+> +#define OP_TLBI_VALE1			sys_insn(1, 0, 8, 7, 5)
+> +#define OP_TLBI_VAALE1			sys_insn(1, 0, 8, 7, 7)
+> +#define OP_TLBI_VMALLE1OSNXS		sys_insn(1, 0, 9, 1, 0)
+> +#define OP_TLBI_VAE1OSNXS		sys_insn(1, 0, 9, 1, 1)
+> +#define OP_TLBI_ASIDE1OSNXS		sys_insn(1, 0, 9, 1, 2)
+> +#define OP_TLBI_VAAE1OSNXS		sys_insn(1, 0, 9, 1, 3)
+> +#define OP_TLBI_VALE1OSNXS		sys_insn(1, 0, 9, 1, 5)
+> +#define OP_TLBI_VAALE1OSNXS		sys_insn(1, 0, 9, 1, 7)
+> +#define OP_TLBI_RVAE1ISNXS		sys_insn(1, 0, 9, 2, 1)
+> +#define OP_TLBI_RVAAE1ISNXS		sys_insn(1, 0, 9, 2, 3)
+> +#define OP_TLBI_RVALE1ISNXS		sys_insn(1, 0, 9, 2, 5)
+> +#define OP_TLBI_RVAALE1ISNXS		sys_insn(1, 0, 9, 2, 7)
+> +#define OP_TLBI_VMALLE1ISNXS		sys_insn(1, 0, 9, 3, 0)
+> +#define OP_TLBI_VAE1ISNXS		sys_insn(1, 0, 9, 3, 1)
+> +#define OP_TLBI_ASIDE1ISNXS		sys_insn(1, 0, 9, 3, 2)
+> +#define OP_TLBI_VAAE1ISNXS		sys_insn(1, 0, 9, 3, 3)
+> +#define OP_TLBI_VALE1ISNXS		sys_insn(1, 0, 9, 3, 5)
+> +#define OP_TLBI_VAALE1ISNXS		sys_insn(1, 0, 9, 3, 7)
+> +#define OP_TLBI_RVAE1OSNXS		sys_insn(1, 0, 9, 5, 1)
+> +#define OP_TLBI_RVAAE1OSNXS		sys_insn(1, 0, 9, 5, 3)
+> +#define OP_TLBI_RVALE1OSNXS		sys_insn(1, 0, 9, 5, 5)
+> +#define OP_TLBI_RVAALE1OSNXS		sys_insn(1, 0, 9, 5, 7)
+> +#define OP_TLBI_RVAE1NXS		sys_insn(1, 0, 9, 6, 1)
+> +#define OP_TLBI_RVAAE1NXS		sys_insn(1, 0, 9, 6, 3)
+> +#define OP_TLBI_RVALE1NXS		sys_insn(1, 0, 9, 6, 5)
+> +#define OP_TLBI_RVAALE1NXS		sys_insn(1, 0, 9, 6, 7)
+> +#define OP_TLBI_VMALLE1NXS		sys_insn(1, 0, 9, 7, 0)
+> +#define OP_TLBI_VAE1NXS			sys_insn(1, 0, 9, 7, 1)
+> +#define OP_TLBI_ASIDE1NXS		sys_insn(1, 0, 9, 7, 2)
+> +#define OP_TLBI_VAAE1NXS		sys_insn(1, 0, 9, 7, 3)
+> +#define OP_TLBI_VALE1NXS		sys_insn(1, 0, 9, 7, 5)
+> +#define OP_TLBI_VAALE1NXS		sys_insn(1, 0, 9, 7, 7)
+> +#define OP_TLBI_IPAS2E1IS		sys_insn(1, 4, 8, 0, 1)
+> +#define OP_TLBI_RIPAS2E1IS		sys_insn(1, 4, 8, 0, 2)
+> +#define OP_TLBI_IPAS2LE1IS		sys_insn(1, 4, 8, 0, 5)
+> +#define OP_TLBI_RIPAS2LE1IS		sys_insn(1, 4, 8, 0, 6)
+> +#define OP_TLBI_ALLE2OS			sys_insn(1, 4, 8, 1, 0)
+> +#define OP_TLBI_VAE2OS			sys_insn(1, 4, 8, 1, 1)
+> +#define OP_TLBI_ALLE1OS			sys_insn(1, 4, 8, 1, 4)
+> +#define OP_TLBI_VALE2OS			sys_insn(1, 4, 8, 1, 5)
+> +#define OP_TLBI_VMALLS12E1OS		sys_insn(1, 4, 8, 1, 6)
+> +#define OP_TLBI_RVAE2IS			sys_insn(1, 4, 8, 2, 1)
+> +#define OP_TLBI_RVALE2IS		sys_insn(1, 4, 8, 2, 5)
+> +#define OP_TLBI_ALLE2IS			sys_insn(1, 4, 8, 3, 0)
+> +#define OP_TLBI_VAE2IS			sys_insn(1, 4, 8, 3, 1)
+> +#define OP_TLBI_ALLE1IS			sys_insn(1, 4, 8, 3, 4)
+> +#define OP_TLBI_VALE2IS			sys_insn(1, 4, 8, 3, 5)
+> +#define OP_TLBI_VMALLS12E1IS		sys_insn(1, 4, 8, 3, 6)
+> +#define OP_TLBI_IPAS2E1OS		sys_insn(1, 4, 8, 4, 0)
+> +#define OP_TLBI_IPAS2E1			sys_insn(1, 4, 8, 4, 1)
+> +#define OP_TLBI_RIPAS2E1		sys_insn(1, 4, 8, 4, 2)
+> +#define OP_TLBI_RIPAS2E1OS		sys_insn(1, 4, 8, 4, 3)
+> +#define OP_TLBI_IPAS2LE1OS		sys_insn(1, 4, 8, 4, 4)
+> +#define OP_TLBI_IPAS2LE1		sys_insn(1, 4, 8, 4, 5)
+> +#define OP_TLBI_RIPAS2LE1		sys_insn(1, 4, 8, 4, 6)
+> +#define OP_TLBI_RIPAS2LE1OS		sys_insn(1, 4, 8, 4, 7)
+> +#define OP_TLBI_RVAE2OS			sys_insn(1, 4, 8, 5, 1)
+> +#define OP_TLBI_RVALE2OS		sys_insn(1, 4, 8, 5, 5)
+> +#define OP_TLBI_RVAE2			sys_insn(1, 4, 8, 6, 1)
+> +#define OP_TLBI_RVALE2			sys_insn(1, 4, 8, 6, 5)
+> +#define OP_TLBI_ALLE2			sys_insn(1, 4, 8, 7, 0)
+> +#define OP_TLBI_VAE2			sys_insn(1, 4, 8, 7, 1)
+> +#define OP_TLBI_ALLE1			sys_insn(1, 4, 8, 7, 4)
+> +#define OP_TLBI_VALE2			sys_insn(1, 4, 8, 7, 5)
+> +#define OP_TLBI_VMALLS12E1		sys_insn(1, 4, 8, 7, 6)
+> +#define OP_TLBI_IPAS2E1ISNXS		sys_insn(1, 4, 9, 0, 1)
+> +#define OP_TLBI_RIPAS2E1ISNXS		sys_insn(1, 4, 9, 0, 2)
+> +#define OP_TLBI_IPAS2LE1ISNXS		sys_insn(1, 4, 9, 0, 5)
+> +#define OP_TLBI_RIPAS2LE1ISNXS		sys_insn(1, 4, 9, 0, 6)
+> +#define OP_TLBI_ALLE2OSNXS		sys_insn(1, 4, 9, 1, 0)
+> +#define OP_TLBI_VAE2OSNXS		sys_insn(1, 4, 9, 1, 1)
+> +#define OP_TLBI_ALLE1OSNXS		sys_insn(1, 4, 9, 1, 4)
+> +#define OP_TLBI_VALE2OSNXS		sys_insn(1, 4, 9, 1, 5)
+> +#define OP_TLBI_VMALLS12E1OSNXS		sys_insn(1, 4, 9, 1, 6)
+> +#define OP_TLBI_RVAE2ISNXS		sys_insn(1, 4, 9, 2, 1)
+> +#define OP_TLBI_RVALE2ISNXS		sys_insn(1, 4, 9, 2, 5)
+> +#define OP_TLBI_ALLE2ISNXS		sys_insn(1, 4, 9, 3, 0)
+> +#define OP_TLBI_VAE2ISNXS		sys_insn(1, 4, 9, 3, 1)
+> +#define OP_TLBI_ALLE1ISNXS		sys_insn(1, 4, 9, 3, 4)
+> +#define OP_TLBI_VALE2ISNXS		sys_insn(1, 4, 9, 3, 5)
+> +#define OP_TLBI_VMALLS12E1ISNXS		sys_insn(1, 4, 9, 3, 6)
+> +#define OP_TLBI_IPAS2E1OSNXS		sys_insn(1, 4, 9, 4, 0)
+> +#define OP_TLBI_IPAS2E1NXS		sys_insn(1, 4, 9, 4, 1)
+> +#define OP_TLBI_RIPAS2E1NXS		sys_insn(1, 4, 9, 4, 2)
+> +#define OP_TLBI_RIPAS2E1OSNXS		sys_insn(1, 4, 9, 4, 3)
+> +#define OP_TLBI_IPAS2LE1OSNXS		sys_insn(1, 4, 9, 4, 4)
+> +#define OP_TLBI_IPAS2LE1NXS		sys_insn(1, 4, 9, 4, 5)
+> +#define OP_TLBI_RIPAS2LE1NXS		sys_insn(1, 4, 9, 4, 6)
+> +#define OP_TLBI_RIPAS2LE1OSNXS		sys_insn(1, 4, 9, 4, 7)
+> +#define OP_TLBI_RVAE2OSNXS		sys_insn(1, 4, 9, 5, 1)
+> +#define OP_TLBI_RVALE2OSNXS		sys_insn(1, 4, 9, 5, 5)
+> +#define OP_TLBI_RVAE2NXS		sys_insn(1, 4, 9, 6, 1)
+> +#define OP_TLBI_RVALE2NXS		sys_insn(1, 4, 9, 6, 5)
+> +#define OP_TLBI_ALLE2NXS		sys_insn(1, 4, 9, 7, 0)
+> +#define OP_TLBI_VAE2NXS			sys_insn(1, 4, 9, 7, 1)
+> +#define OP_TLBI_ALLE1NXS		sys_insn(1, 4, 9, 7, 4)
+> +#define OP_TLBI_VALE2NXS		sys_insn(1, 4, 9, 7, 5)
+> +#define OP_TLBI_VMALLS12E1NXS		sys_insn(1, 4, 9, 7, 6)
+> +
+>  /* Common SCTLR_ELx flags. */
+>  #define SCTLR_ELx_ENTP2	(BIT(60))
+>  #define SCTLR_ELx_DSSBS	(BIT(44))
 
