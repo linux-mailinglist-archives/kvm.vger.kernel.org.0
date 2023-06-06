@@ -2,86 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43CD3724AED
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 20:09:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E59B1724B00
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 20:14:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233629AbjFFSJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 14:09:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58816 "EHLO
+        id S238106AbjFFSOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 14:14:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238952AbjFFSJZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 14:09:25 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82B311990;
-        Tue,  6 Jun 2023 11:08:59 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 356I0FJ0024652;
-        Tue, 6 Jun 2023 18:08:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=dXrMtkvICnqH+Ulhuul153pdtw7woKyfMpo34Nrm6j4=;
- b=lEvKy+xWIcoYFG0/3IMGfGcgDEmDBIG5rA24PDBEwlxO9AvWC9TauPexA8OxS4xryGuM
- anrAyeMXk5wRAulFXEUpXBlpKGRHhBm+2fr694ar/4aTz+R5c6wBfG0kJyX2INnVlYLT
- 2qXHkqQu5x0PWPBPojPdsA5NLZN4/Zc5hx83n1mVfhiJCXyHm3lavsvNx/4rjV/pGrCn
- bJD8zfBJcN5OJnjUevsDbpsJbh9wovUXWKi/Moqqzrzahh9ICwgAwDUwGH0OpgjPkIaV
- GF942/goyIcP0Ngmnq+rHRlnKFgT/oCxRP+I/mA7yVeaR2KZXC7D7aoYc6T8I9qDp4u1 7w== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r29pn8999-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Jun 2023 18:08:55 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3562AjCe010427;
-        Tue, 6 Jun 2023 18:08:24 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3qyxg2j8ks-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Jun 2023 18:08:24 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 356I8LEd21561982
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 6 Jun 2023 18:08:21 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E30DC20043;
-        Tue,  6 Jun 2023 18:08:20 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7EC142004F;
-        Tue,  6 Jun 2023 18:08:20 +0000 (GMT)
-Received: from a46lp73.lnxne.boe (unknown [9.152.108.100])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  6 Jun 2023 18:08:20 +0000 (GMT)
-From:   Steffen Eiden <seiden@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>
-Subject: [PATCH v4 6/6] s390/uv: Update query for secret-UVCs
-Date:   Tue,  6 Jun 2023 20:08:17 +0200
-Message-Id: <20230606180817.3019077-7-seiden@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230606180817.3019077-1-seiden@linux.ibm.com>
-References: <20230606180817.3019077-1-seiden@linux.ibm.com>
+        with ESMTP id S236354AbjFFSOg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 14:14:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A687610CE
+        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 11:13:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686075232;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7uLli3yz1DYI1/D8uLJjLkh+ys9q2UvcidB0MAb3VgM=;
+        b=CxD/kQMdzDakP17AK/FcSaVDV8hbShnMyG2DpcW7PA69AFMAoPEPOlvBSEnUPgcsibKejJ
+        tqZTPwj2aiO8KkhrR+DI5G/9C/3jB9mkAKERQDO0EpIDBS4ZhNRZmGuSYa86AEf2w6DZUj
+        JBDoOx77LbjE1eYC4PiS17/IonZBj8Y=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-629-Vq3pPw4GNhu0DtQOMEeaTg-1; Tue, 06 Jun 2023 14:13:51 -0400
+X-MC-Unique: Vq3pPw4GNhu0DtQOMEeaTg-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-777a9ffdcd7so194702339f.0
+        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 11:13:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686075231; x=1688667231;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7uLli3yz1DYI1/D8uLJjLkh+ys9q2UvcidB0MAb3VgM=;
+        b=aPm6lx4nTwTxzHEPEvE/YxiDdfYNvETrd52hc6C5+mSmxZelAXGDRzhsntVxqxufmj
+         rTL9PfxQoTr1qK19hL0cBtOo1pPAcYn2XPZ0l4fahphS/auGhffuBWGVnu1LiQ+VhbB6
+         ZjUlFlPN6XX4CG9+SYWxgJ7IdkBoLKQyJbsyfFoaet+iQ638mz/L1sq62ju3QrbrBuWv
+         oM4n6khh40emRg8HAsiQklb4DZS/D1fISRbArYLx6VohVynL3oKfnxXIvDN4dtvYdOMz
+         smQLzpBOHcfC+kc3ZktEM6fBfwfOtNam7nAG2meXV3cT/CztBaJOopoZM2lAjwJgV41P
+         ncBA==
+X-Gm-Message-State: AC+VfDyLnPIpFmDJhV5B61h8dfok1mrHqWhRibRu/632jdfI35xGw9kH
+        ogExHNyTgprAlQcwCsspBUHZB9PjkNc45ZeYVhFe168nkThqFIM7cbR4Gnho/DAvGCQXslHEo4k
+        cheYfyUSnLvZB
+X-Received: by 2002:a05:6e02:128c:b0:331:85fa:74c5 with SMTP id y12-20020a056e02128c00b0033185fa74c5mr2620086ilq.1.1686075231123;
+        Tue, 06 Jun 2023 11:13:51 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7k+blw9vPOLpvg+3qppUSS4w3PTeZqEhsRV5Mhqk3Ou+cjFTQOKYmh9jBA+88W34/P7aBrLg==
+X-Received: by 2002:a05:6e02:128c:b0:331:85fa:74c5 with SMTP id y12-20020a056e02128c00b0033185fa74c5mr2620069ilq.1.1686075230879;
+        Tue, 06 Jun 2023 11:13:50 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id a22-20020a056638019600b0041abd81975bsm2931075jaq.153.2023.06.06.11.13.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jun 2023 11:13:50 -0700 (PDT)
+Date:   Tue, 6 Jun 2023 12:13:48 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     ankita@nvidia.com, aniketa@nvidia.com, cjia@nvidia.com,
+        kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
+        acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
+        danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/1] vfio/nvgpu: Add vfio pci variant module for
+ grace hopper
+Message-ID: <20230606121348.670229ff.alex.williamson@redhat.com>
+In-Reply-To: <ZH9p+giEs6bCYfw8@nvidia.com>
+References: <20230606025320.22647-1-ankita@nvidia.com>
+        <20230606083238.48ea50e9.alex.williamson@redhat.com>
+        <ZH9RfXhbuED2IUgJ@nvidia.com>
+        <20230606110510.0f87952c.alex.williamson@redhat.com>
+        <ZH9p+giEs6bCYfw8@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Sa-aNjcMnSTAkgX_F8CnbWSI05isdPXr
-X-Proofpoint-GUID: Sa-aNjcMnSTAkgX_F8CnbWSI05isdPXr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-06_13,2023-06-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 bulkscore=0 malwarescore=0 clxscore=1015 priorityscore=1501
- adultscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306060156
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,141 +85,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Update the query struct such that secret-UVC related
-information can be parsed.
-Add sysfs files for these new values.
+On Tue, 6 Jun 2023 14:16:42 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-'supp_add_secret_req_ver' notes the supported versions for the
-Add Secret UVC. Bit 0 indicates that version 0x100 is supported,
-bit 1 indicates 0x200, and so on.
+> On Tue, Jun 06, 2023 at 11:05:10AM -0600, Alex Williamson wrote:
+> 
+> > It actually seems more complicated this way.  We're masquerading this
+> > region as a BAR, but then QEMU needs to know based on device IDs that
+> > it's really not a BAR, it has special size properties, mapping
+> > attributes, error handling, etc.    
+> 
+> This seems like something has gone wrong then. ie the SIGUBS error
+> handling stuff should be totally generic in the qemu side. Mapping
+> attributes are set by the kernel, qemu shouldn't know, doesn't need to
+> know.
 
-'supp_add_secret_pcf' notes the supported plaintext flags for
-the Add Secret UVC.
+You asked me to look at the v1 posting to see why there's so much more
+going on here than a quirk.  That's what I read from the first public
+posting, a coherent memory region masqueraded as a BAR which requires
+different memory mapping and participates in ECC.  I agree that the
+actual mapping is done by the kernel, but it doesn't really make a
+difference if that's a vfio-pci variant driver providing a different
+mmap callback for a BAR region or a device specific region handler.
 
-'supp_secret_types' notes the supported types of secrets.
-Bit 0 indicates secret type 1, bit 1 indicates type 2, and so on.
+> The size issue is going to a be a problem in future anyhow, I expect
+> some new standards coming to support non-power-two sizes and they will
+> want to map to PCI devices in VMs still.
 
-'max_secrets' notes the maximum amount of secrets the secret store can
-store per pv guest.
-
-Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
----
- arch/s390/boot/uv.c        |  4 ++++
- arch/s390/include/asm/uv.h | 13 +++++++++++--
- arch/s390/kernel/uv.c      | 40 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 55 insertions(+), 2 deletions(-)
-
-diff --git a/arch/s390/boot/uv.c b/arch/s390/boot/uv.c
-index 0a077c0a2056..cdffc395f1cd 100644
---- a/arch/s390/boot/uv.c
-+++ b/arch/s390/boot/uv.c
-@@ -47,6 +47,10 @@ void uv_query_info(void)
- 		uv_info.conf_dump_finalize_len = uvcb.conf_dump_finalize_len;
- 		uv_info.supp_att_req_hdr_ver = uvcb.supp_att_req_hdr_ver;
- 		uv_info.supp_att_pflags = uvcb.supp_att_pflags;
-+		uv_info.supp_add_secret_req_ver = uvcb.supp_add_secret_req_ver;
-+		uv_info.supp_add_secret_pcf = uvcb.supp_add_secret_pcf;
-+		uv_info.supp_secret_types = uvcb.supp_secret_types;
-+		uv_info.max_secrets = uvcb.max_secrets
- 	}
+Ok, but a PCI BAR has specific constraints and a non-power-of-2 BAR is
+not software compatible with those constraints.  That's obviously not
+to say that a new capability couldn't expose arbitrary resources sizes
+on a PCI-like device though.  I don't see how a non-power-of-2 BAR at
+this stage helps or fits within any spec, which is exactly what's
+being proposed through this BAR masquerade.
  
- #ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
-diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-index 3203ffbdde6b..d6bb2f4f78d1 100644
---- a/arch/s390/include/asm/uv.h
-+++ b/arch/s390/include/asm/uv.h
-@@ -123,7 +123,7 @@ struct uv_cb_qui {
- 	u32 reserved70[3];			/* 0x0070 */
- 	u32 max_num_sec_conf;			/* 0x007c */
- 	u64 max_guest_stor_addr;		/* 0x0080 */
--	u8  reserved88[158 - 136];		/* 0x0088 */
-+	u8  reserved88[0x9e - 0x88];		/* 0x0088 */
- 	u16 max_guest_cpu_id;			/* 0x009e */
- 	u64 uv_feature_indications;		/* 0x00a0 */
- 	u64 reserveda8;				/* 0x00a8 */
-@@ -135,7 +135,12 @@ struct uv_cb_qui {
- 	u64 reservedd8;				/* 0x00d8 */
- 	u64 supp_att_req_hdr_ver;		/* 0x00e0 */
- 	u64 supp_att_pflags;			/* 0x00e8 */
--	u8 reservedf0[256 - 240];		/* 0x00f0 */
-+	u64 reservedf0;				/* 0x00f0 */
-+	u64 supp_add_secret_req_ver;		/* 0x00f8 */
-+	u64 supp_add_secret_pcf;		/* 0x0100 */
-+	u64 supp_secret_types;			/* 0x0180 */
-+	u16 max_secrets;			/* 0x0110 */
-+	u8 reserved112[0x120 - 0x112];		/* 0x0112 */
- } __packed __aligned(8);
- 
- /* Initialize Ultravisor */
-@@ -384,6 +389,10 @@ struct uv_info {
- 	unsigned long conf_dump_finalize_len;
- 	unsigned long supp_att_req_hdr_ver;
- 	unsigned long supp_att_pflags;
-+	unsigned long supp_add_secret_req_ver;
-+	unsigned long supp_add_secret_pcf;
-+	unsigned long supp_secret_types;
-+	unsigned short max_secrets;
- };
- 
- extern struct uv_info uv_info;
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index 23fa2f2e90fc..d8b25cda5471 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -571,6 +571,42 @@ static ssize_t uv_query_supp_att_pflags(struct kobject *kobj,
- static struct kobj_attribute uv_query_supp_att_pflags_attr =
- 	__ATTR(supp_att_pflags, 0444, uv_query_supp_att_pflags, NULL);
- 
-+static ssize_t uv_query_supp_add_secret_req_ver(struct kobject *kobj,
-+						struct kobj_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%lx\n", uv_info.supp_add_secret_req_ver);
-+}
-+
-+static struct kobj_attribute uv_query_supp_add_secret_req_ver_attr =
-+	__ATTR(supp_add_secret_req_ver, 0444, uv_query_supp_add_secret_req_ver, NULL);
-+
-+static ssize_t uv_query_supp_add_secret_pcf(struct kobject *kobj,
-+					    struct kobj_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%lx\n", uv_info.supp_add_secret_pcf);
-+}
-+
-+static struct kobj_attribute uv_query_supp_add_secret_pcf_attr =
-+	__ATTR(supp_add_secret_pcf, 0444, uv_query_supp_add_secret_pcf, NULL);
-+
-+static ssize_t uv_query_supp_secret_types(struct kobject *kobj,
-+					  struct kobj_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%lx\n", uv_info.supp_secret_types);
-+}
-+
-+static struct kobj_attribute uv_query_supp_secret_types_attr =
-+	__ATTR(supp_secret_types, 0444, uv_query_supp_secret_types, NULL);
-+
-+static ssize_t uv_query_max_secrets(struct kobject *kobj,
-+				    struct kobj_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%d\n", uv_info.max_secrets);
-+}
-+
-+static struct kobj_attribute uv_query_max_secrets_attr =
-+	__ATTR(max_secrets, 0444, uv_query_max_secrets, NULL);
-+
- static struct attribute *uv_query_attrs[] = {
- 	&uv_query_facilities_attr.attr,
- 	&uv_query_feature_indications_attr.attr,
-@@ -584,6 +620,10 @@ static struct attribute *uv_query_attrs[] = {
- 	&uv_query_dump_cpu_len_attr.attr,
- 	&uv_query_supp_att_req_hdr_ver_attr.attr,
- 	&uv_query_supp_att_pflags_attr.attr,
-+	&uv_query_supp_add_secret_req_ver_attr.attr,
-+	&uv_query_supp_add_secret_pcf_attr.attr,
-+	&uv_query_supp_secret_types_attr.attr,
-+	&uv_query_max_secrets_attr.attr,
- 	NULL,
- };
- 
--- 
-2.40.1
+> It seems OK to me if qemu can do this generically for any "BAR"
+> region, at least creating an entire "nvidia only" code path just for
+> non power 2 BAR sizing seems like a bad ABI choice.
+
+Have you looked at Ankit's QEMU series?  It's entirely NVIDIA-only code
+paths.  Also nothing here precludes that shared code in QEMU might
+expose some known arbitrary sized regions as a BAR, or whatever spec
+defined thing allows that in the future.  It would only be a slight
+modification in the QEMU code to key on the presence of a device
+specific region rather than PCI vendor and device IDs, to then register
+that region as a PCI BAR and proceed with all this NVIDIA specific
+PXM/SRAT setup. IMO it makes a lot more sense to create memory-only
+NUMA nodes based on a device specific region than it does a PCI BAR.
+
+> > I'm not privy to a v1, the earliest I see is this (v3):
+> > 
+> > https://lore.kernel.org/all/20230405180134.16932-1-ankita@nvidia.com/
+> > 
+> > That outlines that we have a proprietary interconnect exposing cache
+> > coherent memory which requires use of special mapping attributes vs a
+> > standard PCI BAR and participates in ECC.  All of which seems like it
+> > would be easier to setup in QEMU if the vfio-pci representation of the
+> > device didn't masquerade this regions as a standard BAR.  In fact it
+> > also reminds me of NVlink2 coherent RAM on POWER machines that was
+> > similarly handled as device specific regions.    
+> 
+> It wasn't so good on POWER and if some of that stuff has been done
+> more generally we would have been further ahead here..
+
+Specifics?  Nothing here explained why masquerading the coherent memory
+as a BAR in the vfio-pci ABI is anything more than a hack that QEMU
+could assemble on its own with a device specific region.  Thanks,
+
+Alex
 
