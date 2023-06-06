@@ -2,62 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E8B57236F0
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 07:47:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5126D723711
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 08:01:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233748AbjFFFr0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 01:47:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50014 "EHLO
+        id S232490AbjFFGA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 02:00:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233891AbjFFFrN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 01:47:13 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B9CB0
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 22:47:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686030431; x=1717566431;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=83Rj93jkR1HTPLlo3NBLnWf+4pu0cA9y29h88jLuWR0=;
-  b=mpzVqiZ24J6fC/ywhmhgaV7YdODKj5r2gp8SYt/RzNK9D2vqi3RvG+qO
-   U3WNtb3lnqhemBIe7D7O6r9ymSTkGSkS7M/NWFXbDTZcrNxlIYxgClAQ+
-   4yetpAqB29yRH7jSm4svtOIOkVRZuMxN5927GnZBdete7lz4wWPcumkiU
-   YzGKbski86pL8haxsFft2mOeoMxJXqMouRKflVDSkCaFtsjaupsnhBCbA
-   2Xbf97YlcHqcwMHuRl/m+RgthmAGV0Zo5xu6AxQWqnnHD7EKah/YVaIVw
-   9k9diu5m7WzJbePdNHtrVGEC3RhqPtRk2V+TA8qkM9eKkiGu47ZD1RUWY
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="420119216"
-X-IronPort-AV: E=Sophos;i="6.00,219,1681196400"; 
-   d="scan'208";a="420119216"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2023 22:47:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="955610184"
-X-IronPort-AV: E=Sophos;i="6.00,219,1681196400"; 
-   d="scan'208";a="955610184"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.249.170.159]) ([10.249.170.159])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2023 22:47:09 -0700
-Message-ID: <fa4a405f-0ee6-c6de-7947-e56c4ee22734@linux.intel.com>
-Date:   Tue, 6 Jun 2023 13:47:07 +0800
-MIME-Version: 1.0
+        with ESMTP id S229693AbjFFGA4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 02:00:56 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2061.outbound.protection.outlook.com [40.107.93.61])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7BC811B;
+        Mon,  5 Jun 2023 23:00:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=N6S+AAhkP4AFOfQrWm72UHGt/ZbrKVtXR/2Z8ZspencfJKMK6a+V1CHAW++dFnoasQm1H833qO1uKLFQcJH364TtAZCwPF+7ewwZnghOnYWU19HGyJHP+LlErd7HKwSEG+3R456fp37bEd2vPWuyjX2m++lLJ7B+JVGH70iT7IiFBy6HNDAq7beN76A1EA+T6dSPFKBHseV25ZaV2h0km9MRH7kf3Sdaove90wVyCfe80wpr26hzpCHufNZbxxg7qx3sAAk+CSuijpkMlGSIsaX0EzdDby6FW3vefDMfApRyJzaaoaYzrD0WkEG0ASPw/XFNMedx9kZLny8Ir63S4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eaQIe6F6uD7CL4fyYjzh+i3viPVKI/oRSGoWzMHr/Vs=;
+ b=lBSMC7TY6RiL85WwTxRs0Xh+hLM0G+hJ5+gxxf11ZpelGPHwGGwkUjCSauByPDxHnHBTB27N6kI4d54Aw+DB1HTa3saPhxA1MQf5EwCl+ZRkm8/C+uX48XO7id6ccimdgx+Aoyg/zxkuV2s+uS/VFZgh2MMM03ooD8HGgNVR0O+a36+ui2GhQbTKR4R7osOu91KCjhqkHE/hjwyZRvLhVwlj2iIMDnFFpPJ9j7kR0qhpsrD1yFPYI/PT1lZw2zjZpN6TcBWgX3V1fw32P2GQIlD5HuX5W4nJUBnmoW/4uxezN2FF06+DjFtHymw7PQ4bOw6/D1ZEmZp3Sfb4R4k83g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eaQIe6F6uD7CL4fyYjzh+i3viPVKI/oRSGoWzMHr/Vs=;
+ b=VRyIPeaeypZ7hFYo5J/qwYbFQjUNUN8+jH40jghT8f3bXsmfP4vYOXis5Z3PG5db/uZKPCC8d/FatE0tPPNywm4xVjoxaTYh+hP/jmhE24XG0SuRGqt7O4jai1nCJErt3hKopRDXKj5AFIsYTNqYLl122eDY3lr3rLDprYJYbsA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB2810.namprd12.prod.outlook.com (2603:10b6:5:41::21) by
+ SA1PR12MB6970.namprd12.prod.outlook.com (2603:10b6:806:24d::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6455.32; Tue, 6 Jun 2023 06:00:51 +0000
+Received: from DM6PR12MB2810.namprd12.prod.outlook.com
+ ([fe80::2a9c:fc67:a9fd:bea5]) by DM6PR12MB2810.namprd12.prod.outlook.com
+ ([fe80::2a9c:fc67:a9fd:bea5%6]) with mapi id 15.20.6455.030; Tue, 6 Jun 2023
+ 06:00:51 +0000
+Message-ID: <54fa0a4f-9b3e-50d7-57cb-e0d2d39b7761@amd.com>
+Date:   Tue, 6 Jun 2023 08:00:32 +0200
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH v5 4/4] x86: Add test case for INVVPID with LAM
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        robert.hu@linux.intel.com
-References: <20230530024356.24870-1-binbin.wu@linux.intel.com>
- <20230530024356.24870-5-binbin.wu@linux.intel.com>
- <ZH3hqvoaQkQ8qK/n@chao-email>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <ZH3hqvoaQkQ8qK/n@chao-email>
+ Thunderbird/102.6.0
+From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Subject: Re: [RFC PATCH V6 01/14] x86/sev: Add a #HV exception handler
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Tianyu Lan <ltykernel@gmail.com>, luto@kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
+        tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, ashish.kalra@amd.com,
+        srutherford@google.com, akpm@linux-foundation.org,
+        anshuman.khandual@arm.com, pawan.kumar.gupta@linux.intel.com,
+        adrian.hunter@intel.com, daniel.sneddon@linux.intel.com,
+        alexander.shishkin@linux.intel.com, sandipan.das@amd.com,
+        ray.huang@amd.com, brijesh.singh@amd.com, michael.roth@amd.com,
+        venu.busireddy@oracle.com, sterritt@google.com,
+        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com,
+        pangupta@amd.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-arch@vger.kernel.org
+References: <20230515165917.1306922-1-ltykernel@gmail.com>
+ <20230515165917.1306922-2-ltykernel@gmail.com>
+ <20230516093010.GC2587705@hirez.programming.kicks-ass.net>
+ <d43c14d9-a149-860c-71d6-e5c62b7c356f@amd.com>
+ <20230530143504.GA200197@hirez.programming.kicks-ass.net>
+ <0f0ab135-cdd0-0691-e0c1-42645671fe15@amd.com>
+ <20230530185232.GA211927@hirez.programming.kicks-ass.net>
+Content-Language: en-US
+In-Reply-To: <20230530185232.GA211927@hirez.programming.kicks-ass.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0147.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:98::12) To DM6PR12MB2810.namprd12.prod.outlook.com
+ (2603:10b6:5:41::21)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2810:EE_|SA1PR12MB6970:EE_
+X-MS-Office365-Filtering-Correlation-Id: 07e64908-2c13-4cdd-2955-08db66536194
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: b/O/9ULZuEB+3/s4KKiRU0fEbEuC/hqjWusGuS9MK8aq4F4OnzQ3m21+H03m4qazPD70SVNkdStHilaufCxvA8AMw6x6CV9DREp4Iyxa35XeQZWknK+K0SF/i2EBIxP6qDOIKkDT5ip1tra3pUEU1zK+hdozGz8BR3yva3Nrb3t2aQY6JMkgBqXc1LHS3cVliucaV6YeOoD5DzmBQ9AazR6gDPP50Dx2U+uyLjMYRLU9h/zXKC4jgA0JBNi6/8544TjFlrUpbPSXHOk2RS/BKUd92hzUuD8FZ5T7Mz9UP5l7mPTpyB/knF6Q19O+z7YuKklF0PhDRXXkeAJ1fCcu4xdPVrWdM6uLQ1SZFsEFMhQLjydohaZg3cjD64v8VO8i3iRq7pdNk/0cwQsddCPnIyxYd2UNr3+J5lAHQxgJMZnxIeskmlEbqsCkxz1t8iftgp1OLQglx3qAPMaaHUYOzKfl+izRD4guCOfeDyw1ZCnlmCOor5Du54Thbp6vwXndz9uR7cmznH9PqB9+a13ovZNSMB15iMGmjq74bWMehC8cMKgvdJ8bOkkXUEN2GnTaBrT6JssOb5ONDNloER6PGJt1sm6eaSx1sbfjGbgzO+g3oJp1dJe6N1ZGdsjCD6xg3AfT7x7EBYhrH00ibttANw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2810.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(346002)(396003)(136003)(376002)(451199021)(478600001)(2906002)(6486002)(36756003)(6666004)(2616005)(83380400001)(6506007)(6512007)(86362001)(31696002)(38100700002)(26005)(186003)(5660300002)(316002)(31686004)(7416002)(7406005)(8676002)(8936002)(66946007)(4326008)(66556008)(6636002)(66476007)(110136005)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TzJvTHdMdjBBMytRUVBpSlBldHdSeWZBTVVJdzYwekw0Rnl4a0NObGlSZXdQ?=
+ =?utf-8?B?a0U3YVROb245bU5hM3pDbHE4WGVBZ3JqYWd1YjRVQTR3Tjh6MFJDOGs2S0ZP?=
+ =?utf-8?B?NmJCR1RYcmp4a1lWRzFKOFhLSWNJTGNTeW05YU5sMGljQXNWUnhFWE5RWUdJ?=
+ =?utf-8?B?bEI3TWJrVjV2d3BGYzcxQ1hKaS92dzZHZ2RSd1g5aEIzMFVYb1BGc0ZWL0Nx?=
+ =?utf-8?B?blFqVjFCWjdmZm1UQVhUSFhOWVZBNUphRTJmeDBvRXNhNDFheG9BUElkSGpq?=
+ =?utf-8?B?QzlaQ044ZUoyekduLzVQSHZVS0k5YkEzSFdXZkVlTG1iVm12Uko0ZE5kTjRj?=
+ =?utf-8?B?MHhZZkRLWG51WTY5TDlZdUpsdmtUayt0MXl0dUxLQi8xUzdzVUxvaGhtVE9O?=
+ =?utf-8?B?WjNLVjF2MkVSaEh6Z3NIRThHdENsODNjbkJjczQ4NW13ZjZGTU9DclFUZEg1?=
+ =?utf-8?B?VEVrcS8rU09EUy9UN3R3QUc1SnNiUGl0UTFkZDdOUy9mWnYwY3RIanVzaFc2?=
+ =?utf-8?B?R3QvMkhMQmdxOEE2R2hkTGlsZGRJQzdLckljM3Naa2NmU21PNk5obm9KWDI2?=
+ =?utf-8?B?dDdBM2JMZTh0bVR6WG1USjdNZktRY2lZckdIemdTVzhSU2M4U2tna0c5Mld2?=
+ =?utf-8?B?VTBBOXZVVWg1Tk0xWGp2NHRUd2ZwSHNUZkt1T1pOZ0p0K1Z4RGpzbVlNc3Vi?=
+ =?utf-8?B?a2hHSEJpQnNicEZHNGV4bDY4dzRKamdQRUpRVEpZMWxmcFpPYmcrVmJCT1Bn?=
+ =?utf-8?B?NWlCSFFtR3VVU1V1cnZmTnRlUVdyemJoZXZDcitGb2ZtNnVENW5NU0k4OG53?=
+ =?utf-8?B?MTZva1loUHM1aC9SQWdNc1dSeTFjMjVWY3diWUNhQUNseVQ1MC9JT0xveG52?=
+ =?utf-8?B?cThmTll2YS85WEJJQkZpRldTSG90WGh5Z3VLWUZnYXhJenkrMldDalEralh2?=
+ =?utf-8?B?UUlUNVNwUkZueWluVTBCblI4cUNvMkhjWENsOWlITU1KaFNkRk5YcXB0Tm1q?=
+ =?utf-8?B?ZmFNR0pwUE1xcDBQTjY2VzNTM0h2RmdFNHh0WDBwdmFkNkUyVldCRUNibDMr?=
+ =?utf-8?B?T0dHaTBla2Q5Z1dkMmVFRSs1OU9WaWdEa0dGYytIOUpXM3pVR1V1WjYyaG5Z?=
+ =?utf-8?B?OVVndmdxUVRvYWVDMCsxdEwyUUpQeWF2S1NMUmNPZWhPcWlMMklSVjdDZmNx?=
+ =?utf-8?B?TmY0cFcrUTlnWk9iNWpCWm1ITVMzUngrdXRjakN3d0xSZU5BVkUwdlFXbXBh?=
+ =?utf-8?B?bEJyZHZ0TVhMMmdLcUtWV2tiZlg1Qjc0MjdGYTZ0aFNCSkUxSkxwa1VHeDNT?=
+ =?utf-8?B?R0hmOHl0SzN6V1doOFJ6T3dSL25QRWNmYVpWZ2FTN0dMNTh1MWE5dFZUcUZn?=
+ =?utf-8?B?NlpMMDJ6MFIyQ1J6VnlZanFiY2VVampCWVUyTVE4dm5KN1lOZldqZ2ErSUx2?=
+ =?utf-8?B?L055aG5sT1cyRkZwMmllRm5DRWJ5VlVMVEtOZmJjUE1YVTh6eTlKcTFHNXZ6?=
+ =?utf-8?B?WHFBNDZKUEdkeGMrdTdlbDdmekxMUWFvb2Qrdk56eWw3cmJCeUh3L2s3ZmQ5?=
+ =?utf-8?B?cGNTdXY5NWxoL2p6dGlMUUVWUU9xYTJGS0JSQndSQWxPUnlvSmFzOFRBK01n?=
+ =?utf-8?B?eXM5V1dISmMvaVRHa0V4OFh3SFNRSklzcFRUdlByblVqTURJSzR6SzJETEhm?=
+ =?utf-8?B?SnJ4QjN1bjV5Rzg1NEl6bll6R1MwbWcvazJPVlhtcC8wUFNMeVZVRFBpd2Ex?=
+ =?utf-8?B?d0RuU09meGVRZzV3T1BXME9zYlN2cGtmb3daNWVmWUFsSnhPYUlVcVF4UGd2?=
+ =?utf-8?B?Kyt5OGVuQUtRSWhlYVdocU8xNkFWazVhL1RhN3F2azZSaXdML01EUnFEY2FJ?=
+ =?utf-8?B?QUkyOXJ5VUVaYXB5UWpVL1pWMVZGWEFySDBFRmo2VFRPMFpQeDdtcFZIVVNt?=
+ =?utf-8?B?NEYwNkZGdlFRTXF0a2xkY1IyNHdwSVh0cEUzeWV3cGU4VWtCSUhvNUhLNWtl?=
+ =?utf-8?B?cUp5OTA3bG1EdGN5QXdOK0RMaWc5cm5xbFJCQkNHNWJyei8wQjNCSW13NFNM?=
+ =?utf-8?B?R01KaXpiRGkvU3VRZVQ4cGpsRUg5ejBuY29tMlRiZFdFRkJqdlF1V25RckpD?=
+ =?utf-8?Q?82HzRgbAibPsOAMsIwwPEE1Mj?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 07e64908-2c13-4cdd-2955-08db66536194
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2810.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2023 06:00:51.0983
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0LAgusRfzToqpamc/H1DSZYae6jjyjpzmHzw+vaXZ2C0/4DGe/w2nMk+Jwm/rnilMOwjG/R0ayLUtNIHal9JFQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6970
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -65,125 +145,36 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+>> That should really say that a nested #HV should never be raised by the
+>> hypervisor, but if it is, then the guest should detect that and
+>> self-terminate knowing that the hypervisor is possibly being malicious.
+> 
+> I've yet to see code that can do that reliably.
 
-On 6/5/2023 9:22 PM, Chao Gao wrote:
-> On Tue, May 30, 2023 at 10:43:56AM +0800, Binbin Wu wrote:
->> LAM applies to the linear address of INVVPID operand, however,
->> it doesn't apply to the linear address in the INVVPID descriptor.
->>
->> The added cases use tagged operand or tagged target invalidation
->> address to make sure the behaviors are expected when LAM is on.
->>
->> Also, INVVPID case using tagged operand can be used as the common
->> test cases for VMX instruction VMExits.
->>
->> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
->> ---
->> x86/vmx_tests.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
->> 1 file changed, 45 insertions(+), 1 deletion(-)
->>
->> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
->> index 217befe..3f3f203 100644
->> --- a/x86/vmx_tests.c
->> +++ b/x86/vmx_tests.c
->> @@ -3225,6 +3225,48 @@ static void invvpid_test_not_in_vmx_operation(void)
->> 	TEST_ASSERT(!vmx_on());
->> }
->>
->> +/* LAM applies to the target address inside the descriptor of invvpid */
-> This isn't correct. LAM doesn't apply to that address. Right?
-Oops, will fix it, thanks.
+- Currently, we are detecting the direct nested #HV with below check and
+   guest self terminate.
 
->
->> +static void invvpid_test_lam(void)
->> +{
->> +	void *vaddr;
->> +	struct invvpid_operand *operand;
->> +	u64 lam_mask = LAM48_MASK;
->> +	bool fault;
->> +
->> +	if (!this_cpu_has(X86_FEATURE_LAM)) {
->> +		report_skip("LAM is not supported, skip INVVPID with LAM");
->> +		return;
->> +	}
->> +	write_cr4_safe(read_cr4() | X86_CR4_LAM_SUP);
-> why write_cr4_safe()?
->
-> This should succeed if LAM is supported. So it is better to use
-> write_cr4() because write_cr4() has an assertion which can catch
-> unexpected exceptions.
-OK.
+   <snip>
+	if (get_stack_info_noinstr(stack, current, &info) &&
+	    (info.type == (STACK_TYPE_EXCEPTION + ESTACK_HV) ||
+	     info.type == (STACK_TYPE_EXCEPTION + ESTACK_HV2)))
+		panic("Nested #HV exception, HV IST corrupted, stack
+                 type = %d\n", info.type);
+   </snip>
 
->
->> +
->> +	if (this_cpu_has(X86_FEATURE_LA57) && read_cr4() & X86_CR4_LA57)
->> +		lam_mask = LAM57_MASK;
->> +
->> +	vaddr = alloc_vpage();
->> +	install_page(current_page_table(), virt_to_phys(alloc_page()), vaddr);
->> +	/*
->> +	 * Since the stack memory address in KUT doesn't follow kernel address
->> +	 * space partition rule, reuse the memory address for descriptor and
->> +	 * the target address in the descriptor of invvpid.
->> +	 */
->> +	operand = (struct invvpid_operand *)vaddr;
->> +	operand->vpid = 0xffff;
->> +	operand->gla = (u64)vaddr;
->> +	operand = (struct invvpid_operand *)set_la_non_canonical((u64)operand,
->> +								 lam_mask);
->> +	fault = test_for_exception(GP_VECTOR, ds_invvpid, operand);
->> +	report(!fault, "INVVPID (LAM on): tagged operand");
->> +
->> +	/*
->> +	 * LAM doesn't apply to the address inside the descriptor, expected
->> +	 * failure and VMXERR_INVALID_OPERAND_TO_INVEPT_INVVPID set in
->> +	 * VMX_INST_ERROR.
->> +	 */
-> Maybe
->
-> 	/*
-> 	 * Verify that LAM doesn't apply to the address inside the descriptor
-> 	 * even when LAM is enabled. i.e., the address in the descriptor should
-> 	 * be canonical.
-> 	 */
->> +	try_invvpid(INVVPID_ADDR, 0xffff, NONCANONICAL);
-> shouldn't we use a kernel address here? e.g., vaddr. otherwise, we
-> cannot tell if there is an error in KVM's emulation because in this
-> test, LAM is enabled only for kernel address while INVVPID_ADDR is a
-> userspace address.
+- Thinking about below solution to detect the nested
+   #HV reliably:
 
-INVVPID_ADDR is the invalidation type, not the address.
-The address used  here is NONCANONICAL, which is 0xaaaaaaaaaaaaaaaaull and
-is considered as kernel address.
+   -- Make reliable IST stack switching for #VC -> #HV -> #VC case
+      (similar to done in __sev_es_ist_enter/__sev_es_ist_exit for NMI
+      IST stack).
 
->
->> +
->> +	write_cr4_safe(read_cr4() & ~X86_CR4_LAM_SUP);
-> ditto.
->
-> With all above fixed:
->
-> Reviewed-by: Chao Gao <chao.gao@intel.com>
->
->
->> +}
->> +
->> /*
->>   * This does not test real-address mode, virtual-8086 mode, protected mode,
->>   * or CPL > 0.
->> @@ -3274,8 +3316,10 @@ static void invvpid_test(void)
->> 	/*
->> 	 * The gla operand is only validated for single-address INVVPID.
->> 	 */
->> -	if (types & (1u << INVVPID_ADDR))
->> +	if (types & (1u << INVVPID_ADDR)) {
->> 		try_invvpid(INVVPID_ADDR, 0xffff, NONCANONICAL);
->> +		invvpid_test_lam();
->> +	}
->>
->> 	invvpid_test_gp();
->> 	invvpid_test_ss();
->> -- 
->> 2.25.1
->>
+   -- In addition to this, we can make nested #HV detection (with another
+      exception type) more reliable with refcounting (percpu?).
+
+Need your inputs before I implement this solution. Or any other idea in 
+software you have in mind?
+
+Thanks,
+Pankaj
 
