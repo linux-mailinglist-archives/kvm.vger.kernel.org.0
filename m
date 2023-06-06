@@ -2,59 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA7A37246C8
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 16:50:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F1AB7246C6
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 16:50:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237579AbjFFOux (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 10:50:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52900 "EHLO
+        id S238191AbjFFOuZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 10:50:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238409AbjFFOtn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S237856AbjFFOtn (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 6 Jun 2023 10:49:43 -0400
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F35E21BEC
-        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 07:48:48 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-3f6d38a140bso45132495e9.1
-        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 07:48:48 -0700 (PDT)
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 836031712
+        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 07:48:49 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-30aeee7c8a0so4508365f8f.1
+        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 07:48:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1686062927; x=1688654927;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DPx6RoiDg2178/44lvCJMLJejOkunBomhyeXmtgxOuk=;
-        b=qR+QAAcTY9gi3HA98YU6dyamAX88ilr4x4rMA69lALtIQwTQJkW67nBTwoKfT8WLAF
-         8xbZgRSDfXqpByD/OnKROecvvBLJzI5v4Zty+OE9TWnCKhCNhoPmj6Hsir5QzdcL68/A
-         eHTraG0bSE4/u+sAg5OAYaeieBsRXPd7igPE1SdjT+FRGpXpdwEoAJTatSbUavAX7Hl6
-         uvYIg0CoYk1ZrEbvpToErz2DltgJlCvH79kCt8FcqeKlL6TrL2yyxGF3H7l/LK9ZX8P4
-         lj/ruWDn4S9tTdzW3LPE9fVMOyD8w8nV70YBDnFT8wfo3RyOPB+YA2oIglYwESqmoyum
-         MUpQ==
+        d=linaro.org; s=google; t=1686062928; x=1688654928;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aSOjU/peLBkZFAWfQ1yaQPRur2Vz8IL+LTbwDYZRyv4=;
+        b=oi3fFDF5AYQ3Qbn4ovBhoFRM/iaiHlWG5LkCAFue091YkR2wPknZjq6SNIq/bRqWwQ
+         uxM82ldwbfG88QsCRX1JMMsYcBwmiDeYnUSc6I37ALF4ckOaSH5glpjwwGcICv0MZYhV
+         Erxj2eL8gKrGLBPszi2abOe36VvQmxuoBUAhHoUsFltrBimX3CSmz8gX9ouvurIkRFqb
+         DuT9zPLCVm4gI5jAdu5o81EC2E2BNKAYul9nQEIka8+iwFBODCIf8puLIHfQkFhtey3z
+         B1KC9s/1ltTbb8ipTWuKgp69xF/ccf7KuMVghaHgxSQPdwxqGVzhCmGtCeK8951kpIRi
+         fEFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686062927; x=1688654927;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DPx6RoiDg2178/44lvCJMLJejOkunBomhyeXmtgxOuk=;
-        b=aKtrlBkj5y5mcQpk8bJyoa3I50dryvtnlm3eVMwgpxTsslEMmu1xlrjjEiPY9otMr5
-         QPa16rAZs8/Nhf1S2jE7vBamlsjecLXbmIViGtj8RXa/9BudE0E4Y/xiUMrRIyFdN11S
-         b4aXYnWYt28mEnwzffPWqaoUJKzAMoEZv6SEDd5L59RCULr7wEUMFNafyOAxDmRdT2hF
-         2a3I8PrxYnWvhDHFFryHkj5N4q2qI2/TxQhDKoUkBnzafIX6M7xO99MPVnavagFrlXdy
-         FQGvzqSNmPcH8imd0jrIn5vJfC6Dt+WcNESDsyUpzh2FC9c/ZWuiJcpj4gcqByZIYFkn
-         XJ+A==
-X-Gm-Message-State: AC+VfDytXLRb519RoX0Syr1mq/EFPYJzyVas86reu4jIqkthwOWXA/+N
-        Oqs4p8kxDLPWJH60l7R/1Pab9s1LgS0FFaLbLh2QAQ==
-X-Google-Smtp-Source: ACHHUZ6afG1HWPWCD/9PjsHut5NjcmAtPE7mZnpDXc4sVyX9UAnddd5u2iAfUCJpP/eiNDAD4jiBWA==
-X-Received: by 2002:a05:600c:3ca6:b0:3f6:b44:3163 with SMTP id bg38-20020a05600c3ca600b003f60b443163mr11017157wmb.12.1686062927385;
+        d=1e100.net; s=20221208; t=1686062928; x=1688654928;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aSOjU/peLBkZFAWfQ1yaQPRur2Vz8IL+LTbwDYZRyv4=;
+        b=N2SK2uU7rKDLYPXUCC58FLBhxTNhmw0EkyYANurIE8c6Q6xBkV8xrc7QUjA/CsnfM/
+         BLeBR/sYLVohDTIlP6DgMt+xkqQG1L2p/5zM/ngb1ywvAcUrNohnWWI5HlZYfynm587s
+         uQW2lnqrwwbP3aqMdCH3w31uHLLZFdehvlKLGzDxCueUGlM7uFDsFWsT7/hmAoMEdxop
+         C3wzYiPaF4Im+w393PNjH/YX184T7KW8ZnCM7IOcO9bg8dQ7ksq3l7aV7Z+iQSAG5KBo
+         iI75YbRDGwSi7C1mskceQQUDWXQCDIIq2q67nBKNzz1RUyyx0jkwy6KCyf2TQ96fPhzj
+         /Uaw==
+X-Gm-Message-State: AC+VfDxO2Q4zOmh/JCEOfxv3NX93GYBL6SKX2MyCm1wf8d8mALJgd48o
+        NlBNIEIbxCKkcXxeh4fnr3hoyBL1vplXxI0As2BXKQ==
+X-Google-Smtp-Source: ACHHUZ6VjSEJGxNDtpYJTns8vjQUNPaYPEapkvMG2LCJZW4VOAQ5GL5myVffYJO4ITAUOWTfDTSeTQ==
+X-Received: by 2002:a5d:5581:0:b0:309:48eb:993d with SMTP id i1-20020a5d5581000000b0030948eb993dmr8923125wrv.15.1686062927841;
         Tue, 06 Jun 2023 07:48:47 -0700 (PDT)
 Received: from localhost.localdomain (5750a5b3.skybroadband.com. [87.80.165.179])
-        by smtp.gmail.com with ESMTPSA id o9-20020a05600c378900b003f7e4d143cfsm5722692wmr.15.2023.06.06.07.48.46
+        by smtp.gmail.com with ESMTPSA id o9-20020a05600c378900b003f7e4d143cfsm5722692wmr.15.2023.06.06.07.48.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jun 2023 07:48:46 -0700 (PDT)
+        Tue, 06 Jun 2023 07:48:47 -0700 (PDT)
 From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
 To:     kvm@vger.kernel.org, will@kernel.org
 Cc:     Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [PATCH kvmtool 0/3] Build fixes
-Date:   Tue,  6 Jun 2023 15:37:33 +0100
-Message-Id: <20230606143733.994679-1-jean-philippe@linaro.org>
+Subject: [PATCH kvmtool 1/3] Makefile: Refine -s handling in the make parameters
+Date:   Tue,  6 Jun 2023 15:37:34 +0100
+Message-Id: <20230606143733.994679-2-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230606143733.994679-1-jean-philippe@linaro.org>
+References: <20230606143733.994679-1-jean-philippe@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -67,19 +70,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A few build fixes for kvmtool. They apply independently from the vhost
-fixes series I sent today.
+When looking for the silent flag 's' in MAKEFLAGS we accidentally catch
+variable definitions like "ARCH=mips" or "CROSS_COMPILE=/cross/...",
+causing several test builds to be silent.
 
-Jean-Philippe Brucker (3):
-  Makefile: Refine -s handling in the make parameters
-  arm/kvm-cpu: Fix new build warning
-  virtio/rng: Fix build warning from min()
+MAKEFLAGS contains the single-letter make flags (without the dash),
+followed by flags that don't have a single-letter equivalent such as
+"--warn-undefined-variables" (with the dashes), followed by "--" and
+command-line variables. For example `make ARCH=mips -k' results in
+MAKEFLAGS "k -- ARCH=mips". Running $(filter-out --%) on this does not
+discard ARCH=mips, only "--". However adding $(firstword) ensures that
+we run the filter either on the single-letter flags or on something
+beginning with "--", and avoids silent builds.
 
- Makefile      | 2 +-
- arm/kvm-cpu.c | 3 +--
- virtio/rng.c  | 2 +-
- 3 files changed, 3 insertions(+), 4 deletions(-)
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/Makefile b/Makefile
+index 6b742369..e711670d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -3,7 +3,7 @@
+ #
+ 
+ ifeq ($(strip $(V)),)
+-	ifeq ($(findstring s,$(filter-out --%,$(MAKEFLAGS))),)
++	ifeq ($(findstring s,$(filter-out --%,$(firstword $(MAKEFLAGS)))),)
+ 		E = @echo
+ 	else
+ 		E = @\#
 -- 
 2.40.1
 
