@@ -2,89 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D7C97244A6
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 15:39:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45A387244BB
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 15:46:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237447AbjFFNjB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 09:39:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58954 "EHLO
+        id S233532AbjFFNqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 09:46:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237744AbjFFNi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 09:38:56 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 629B410F1;
-        Tue,  6 Jun 2023 06:38:44 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 356DGwCG020986;
-        Tue, 6 Jun 2023 13:38:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=46n7lg100dSUJohI1inMeAPhUrgIQOl7+5M4mbM/d/g=;
- b=JueLAffdXfIvkDRnDdfJUyScCxorl9D48NfAYJ3i8qMMPFQV7k/MXQMvxNpabbzIkAq1
- qjBl0xrPJneh+qpW/Fuj+SbDnwnP5QvhLjwmOdRqlK2KmCK88eOXX1OSFxylZOLuNFs8
- EyYFINXGh1U57nDKDjn868uIRCX5FMO+A4rHdwTjX1gwPCF9Hs08roSOFkF5eADiZ3ZA
- aDWMcB+k5tUSq9dEcMdST9Mkt2h87ovWilpdJwTZ/kh6i32zsV7ECKD67D8PP6R9UEwF
- gPCYPpl99fDiApDA/3ThpxLNDD3a/4Pl6HJp7LKm/9qJ5TXMao3cru46xIIOahc6Ov42 gw== 
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r25hyrmr9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Jun 2023 13:38:43 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3569VfT9001840;
-        Tue, 6 Jun 2023 13:33:36 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3qyxbu9j97-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Jun 2023 13:33:36 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 356DXWSj44761666
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 6 Jun 2023 13:33:33 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9CA4520040;
-        Tue,  6 Jun 2023 13:33:32 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1FB2520043;
-        Tue,  6 Jun 2023 13:33:32 +0000 (GMT)
-Received: from [9.171.79.116] (unknown [9.171.79.116])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  6 Jun 2023 13:33:32 +0000 (GMT)
-Message-ID: <259a64f0-cdd4-ab96-f96e-baf00eb71e46@linux.ibm.com>
-Date:   Tue, 6 Jun 2023 15:33:31 +0200
+        with ESMTP id S231259AbjFFNqC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 09:46:02 -0400
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D567E7D
+        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 06:45:59 -0700 (PDT)
+Received: by mail-oi1-x232.google.com with SMTP id 5614622812f47-392116b8f31so3330991b6e.2
+        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 06:45:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1686059158; x=1688651158;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=itnC8pZM051W8Bgsl1usZo+NiqwRO3BOc/xPpYs/5bw=;
+        b=C7YBAI71ppiB9hMBLvm2ya79uVRgD+/a6AqrBpYxxwgjqeRoRPmIowZBciLY8NID5h
+         YTn1qcbjXwMle45b05V5s5RUygBPnH1tMnAhs8tVfCbr9rK4rJUJFLQrsHPSI0Jn5ygB
+         pKEGX9Lw/Mx3q7E3KqoeRWq1zD2kEUw2joHaCqZrgjKjvtI7MP0ZCXHGQ6/eIJHwGaeJ
+         4Je4qlltwxPT8HXaRyNawJrfGJtibIhOnTTisKKLnp3dI+VO0IpEuUeIo3UNZ8OxMHlg
+         JykUI3cnV7HfUBL9+I57cvKJJnblvJ1M7uAt47NFKL/fjmYSrv/ZDYSGrFVfJ6hkzybY
+         nTrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686059158; x=1688651158;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=itnC8pZM051W8Bgsl1usZo+NiqwRO3BOc/xPpYs/5bw=;
+        b=hdlZ7f0cDfvCvYjv30Mb0LuJRiu7fPeHfP42FZAYk3lz8RWie3sDlD+Vrz4zdP0bgd
+         3q5CJYqTue/F8cXiZJXvr+zKllhazDcBQrrt2iRNL9AkRQeGewBiYEdmRGHki8Xp/m1f
+         3BHxcEHE1JVLo/thuCpyiT9kcQX8GFaqqwFN8UhpaZottwwZWSrwL7MQlK52quI6zWS0
+         c2o3h04DvkkBIv+0ma+xx5PvcJEZAExYjrz5BZmCNjLF3eBcZPKMp7jbuglvYFkBcAIY
+         7t0xmvcDrgFQ5qavBu66ZrcVPMQCq0uppo10fHoaOk+xym1yohX8j9VpMPdKPwb6xptY
+         6PUQ==
+X-Gm-Message-State: AC+VfDzHhb3s8Cv9wS+dHwi3MthSkNOqXN9OJXrRroA9ElpszCXqJ28F
+        X8xHZmCBu2dL5eNzFU27iDORoA==
+X-Google-Smtp-Source: ACHHUZ7BiSKxVxnyhl5fKgvFGlkIlTbVdAE3sGePptPLlhsY1EjYMTnAGdlAAR6r/OXqA3hqz/euEQ==
+X-Received: by 2002:a54:4715:0:b0:398:4336:4342 with SMTP id k21-20020a544715000000b0039843364342mr1499735oik.33.1686059158697;
+        Tue, 06 Jun 2023 06:45:58 -0700 (PDT)
+Received: from [192.168.68.107] ([177.170.117.52])
+        by smtp.gmail.com with ESMTPSA id y126-20020aca3284000000b0038cff7034c0sm4521181oiy.27.2023.06.06.06.45.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Jun 2023 06:45:58 -0700 (PDT)
+Message-ID: <a715b6d1-d28a-1e04-34c5-5d6c1fb2696e@ventanamicro.com>
+Date:   Tue, 6 Jun 2023 10:45:53 -0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v3 1/6] s390/uvdevice: Add info IOCTL
-To:     Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>
-References: <20230606113736.2934503-1-seiden@linux.ibm.com>
- <20230606113736.2934503-2-seiden@linux.ibm.com>
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v3 4/6] target/riscv: Create an KVM AIA irqchip
 Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20230606113736.2934503-2-seiden@linux.ibm.com>
+To:     Yong-Xuan Wang <yongxuan.wang@sifive.com>, qemu-devel@nongnu.org,
+        qemu-riscv@nongnu.org, rkanwal@rivosinc.com, anup@brainfault.org,
+        atishp@atishpatra.org, vincent.chen@sifive.com,
+        greentime.hu@sifive.com, frank.chang@sifive.com, jim.shu@sifive.com
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Bin Meng <bin.meng@windriver.com>,
+        Weiwei Li <liweiwei@iscas.ac.cn>,
+        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20230526062509.31682-1-yongxuan.wang@sifive.com>
+ <20230526062509.31682-5-yongxuan.wang@sifive.com>
+From:   Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+In-Reply-To: <20230526062509.31682-5-yongxuan.wang@sifive.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Gq6Y4KcQm2DnkbTbe6WzSiDM8Nhtk4Yx
-X-Proofpoint-GUID: Gq6Y4KcQm2DnkbTbe6WzSiDM8Nhtk4Yx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-06_08,2023-06-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 mlxscore=0 adultscore=0 suspectscore=0 priorityscore=1501
- phishscore=0 spamscore=0 bulkscore=0 clxscore=1015 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306060115
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -92,196 +82,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/6/23 13:37, Steffen Eiden wrote:
-> Add an IOCTL that allows userspace to find out which IOCTLs the uvdevice
-> supports without trial and error.
-> 
-> Explicitly expose the IOCTL nr for the request types.
-> 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
+On 5/26/23 03:25, Yong-Xuan Wang wrote:
+> implement a function to create an KVM AIA chip
+> 
+> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+> Reviewed-by: Jim Shu <jim.shu@sifive.com>
 > ---
->   arch/s390/include/uapi/asm/uvdevice.h | 42 ++++++++++++++-
->   drivers/s390/char/uvdevice.c          | 77 ++++++++++++++++++++++++---
->   2 files changed, 111 insertions(+), 8 deletions(-)
+>   target/riscv/kvm.c       | 83 ++++++++++++++++++++++++++++++++++++++++
+>   target/riscv/kvm_riscv.h |  3 ++
+>   2 files changed, 86 insertions(+)
 > 
-> diff --git a/arch/s390/include/uapi/asm/uvdevice.h b/arch/s390/include/uapi/asm/uvdevice.h
-> index 10a5ac918e02..9d9b684836c2 100644
-> --- a/arch/s390/include/uapi/asm/uvdevice.h
-> +++ b/arch/s390/include/uapi/asm/uvdevice.h
-> @@ -32,6 +32,33 @@ struct uvio_attest {
->   	__u16 reserved136;				/* 0x0136 */
->   };
->   
-> +/**
-> + * uvio_uvdev_info - Information of supported functions
-> + * @supp_uvio_cmds - supported IOCTLs by this device
-> + * @supp_uv_cmds - supported UVCs corresponding to the IOCTL
-> + *
-> + * UVIO request to get information about supported request types by this
-> + * uvdevice and the Ultravisor.  Everything is output. Bits are in LSB0
-> + * ordering.  If the bit is set in both, @supp_uvio_cmds and @supp_uv_cmds, the
-> + * uvdevice and the Ultravisor support that call.
-> + *
-> + * Note that bit 0 (UVIO_IOCTL_UVDEV_INFO_NR) is always zero for `supp_uv_cmds`
-> + * as there is no corresponding UV-call.
-> + */
-> +struct uvio_uvdev_info {
-> +	/*
-> +	 * If bit `n` is set, this device supports the IOCTL with nr `n`.
-> +	 */
-> +	__u64 supp_uvio_cmds;
-> +	/*
-> +	 * If bit `n` is set, the Ultravisor(UV) supports the UV-call
-> +	 * corresponding to the IOCTL with nr `n` in the calling contextx (host
-> +	 * or guest).  The value is only valid if the corresponding bit in
-> +	 * @supp_uvio_cmds is set as well.
-> +	 */
-> +	__u64 supp_uv_cmds;
-> +};
+> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
+> index eb469e8ca5..ead121154f 100644
+> --- a/target/riscv/kvm.c
+> +++ b/target/riscv/kvm.c
+> @@ -34,6 +34,7 @@
+>   #include "exec/address-spaces.h"
+>   #include "hw/boards.h"
+>   #include "hw/irq.h"
+> +#include "hw/intc/riscv_imsic.h"
+>   #include "qemu/log.h"
+>   #include "hw/loader.h"
+>   #include "kvm_riscv.h"
+> @@ -548,3 +549,85 @@ bool kvm_arch_cpu_check_are_resettable(void)
+>   void kvm_arch_accel_class_init(ObjectClass *oc)
+>   {
+>   }
 > +
->   /*
->    * The following max values define an upper length for the IOCTL in/out buffers.
->    * However, they do not represent the maximum the Ultravisor allows which is
-> @@ -46,6 +73,19 @@ struct uvio_attest {
->   #define UVIO_DEVICE_NAME "uv"
->   #define UVIO_TYPE_UVC 'u'
->   
-> -#define UVIO_IOCTL_ATT _IOWR(UVIO_TYPE_UVC, 0x01, struct uvio_ioctl_cb)
-> +enum UVIO_IOCTL_NR {
-> +	UVIO_IOCTL_UVDEV_INFO_NR = 0x00,
-> +	UVIO_IOCTL_ATT_NR,
-> +	/* must be the last entry */
-> +	UVIO_IOCTL_NUM_IOCTLS
-> +};
-> +
-> +#define UVIO_IOCTL(nr)		_IOWR(UVIO_TYPE_UVC, nr, struct uvio_ioctl_cb)
-> +#define UVIO_IOCTL_UVDEV_INFO	UVIO_IOCTL(UVIO_IOCTL_UVDEV_INFO_NR)
-> +#define UVIO_IOCTL_ATT		UVIO_IOCTL(UVIO_IOCTL_ATT_NR)
-> +
-> +#define UVIO_SUPP_CALL(nr)	(1ULL << (nr))
-> +#define UVIO_SUPP_UDEV_INFO	UVIO_SUPP_CALL(UVIO_IOCTL_UDEV_INFO_NR)
-> +#define UVIO_SUPP_ATT		UVIO_SUPP_CALL(UVIO_IOCTL_ATT_NR)
->   
->   #endif /* __S390_ASM_UVDEVICE_H */
-> diff --git a/drivers/s390/char/uvdevice.c b/drivers/s390/char/uvdevice.c
-> index 1d40457c7b10..4efeebcaf382 100644
-> --- a/drivers/s390/char/uvdevice.c
-> +++ b/drivers/s390/char/uvdevice.c
-> @@ -32,6 +32,52 @@
->   #include <asm/uvdevice.h>
->   #include <asm/uv.h>
->   
-> +#define BIT_UVIO_INTERNAL U32_MAX
-> +/* Mapping from IOCTL-nr to UVC-bit */
-> +static const u32 ioctl_nr_to_uvc_bit[] __initconst = {
-> +	[UVIO_IOCTL_UVDEV_INFO_NR] = BIT_UVIO_INTERNAL,
-> +	[UVIO_IOCTL_ATT_NR] = BIT_UVC_CMD_RETR_ATTEST,
-> +};
-> +
-> +static_assert(ARRAY_SIZE(ioctl_nr_to_uvc_bit) == UVIO_IOCTL_NUM_IOCTLS);
-> +
-> +static struct uvio_uvdev_info uvdev_info = {
-> +	.supp_uvio_cmds = GENMASK_ULL(UVIO_IOCTL_NUM_IOCTLS - 1, 0),
-> +};
-> +
-> +static void __init set_supp_uv_cmds(unsigned long *supp_uv_cmds)
+> +void kvm_riscv_aia_create(DeviceState *aplic_s, bool msimode, int socket,
+> +                          uint64_t aia_irq_num, uint64_t hart_count,
+> +                          uint64_t aplic_base, uint64_t imsic_base)
 > +{
-> +	int i;
+> +    int ret;
+> +    int aia_fd = -1;
+> +    uint64_t aia_mode;
+> +    uint64_t aia_nr_ids;
+> +    uint64_t aia_hart_bits = find_last_bit(&hart_count, BITS_PER_LONG) + 1;
 > +
-> +	for (i = 0; i < UVIO_IOCTL_NUM_IOCTLS; i++) {
-> +		if (ioctl_nr_to_uvc_bit[i] == BIT_UVIO_INTERNAL)
-> +			continue;
-> +		if (!test_bit_inv(ioctl_nr_to_uvc_bit[i], uv_info.inst_calls_list))
-> +			continue;
-> +		__set_bit(i, supp_uv_cmds);
-> +	}
-> +}
+> +    if (!msimode) {
+> +        error_report("Currently KVM AIA only supports aplic_imsic mode");
+> +        exit(1);
+> +    }
 > +
-> +/**
-> + * uvio_uvdev_info() - get information about the uvdevice
-> + *
-> + * @uv_ioctl: ioctl control block
-> + *
-> + * Lists all IOCTLs that are supported by this uvdevice
-> + */
-> +static int uvio_uvdev_info(struct uvio_ioctl_cb *uv_ioctl)
-> +{
-> +	void __user *user_buf_arg = (void __user *)uv_ioctl->argument_addr;
+> +    aia_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_RISCV_AIA, false);
 > +
-> +	if (uv_ioctl->argument_len < sizeof(uvdev_info))
-> +		return -EINVAL;
-> +	if (copy_to_user(user_buf_arg, &uvdev_info, sizeof(uvdev_info)))
-> +		return -EFAULT;
+> +    if (aia_fd < 0) {
+> +        error_report("Unable to create in-kernel irqchip");
+> +        exit(1);
+> +    }
 > +
-> +	uv_ioctl->uv_rc = UVC_RC_EXECUTED;
-> +	return  0;
-> +}
+> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
+> +                            KVM_DEV_RISCV_AIA_CONFIG_MODE,
+> +                            &aia_mode, false, NULL);
 > +
->   static int uvio_build_uvcb_attest(struct uv_cb_attest *uvcb_attest, u8 *arcb,
->   				  u8 *meas, u8 *add_data, struct uvio_attest *uvio_attest)
->   {
-> @@ -185,8 +231,19 @@ static int uvio_attestation(struct uvio_ioctl_cb *uv_ioctl)
->   	return ret;
->   }
->   
-> -static int uvio_copy_and_check_ioctl(struct uvio_ioctl_cb *ioctl, void __user *argp)
-> +static int uvio_copy_and_check_ioctl(struct uvio_ioctl_cb *ioctl, void __user *argp,
-> +				     unsigned long cmd)
->   {
-> +	u8 nr = _IOC_NR(cmd);
+> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
+> +                            KVM_DEV_RISCV_AIA_CONFIG_IDS,
+> +                            &aia_nr_ids, false, NULL);
 > +
-> +	if (_IOC_DIR(cmd) != (_IOC_READ | _IOC_WRITE))
-> +		return -ENOIOCTLCMD;
-> +	if (_IOC_TYPE(cmd) != UVIO_TYPE_UVC)
-> +		return -ENOIOCTLCMD;
-> +	if (nr >= UVIO_IOCTL_NUM_IOCTLS)
-> +		return -ENOIOCTLCMD;
-> +	if (_IOC_SIZE(cmd) != sizeof(*ioctl))
-> +		return -ENOIOCTLCMD;
->   	if (copy_from_user(ioctl, argp, sizeof(*ioctl)))
->   		return -EFAULT;
->   	if (ioctl->flags != 0)
-> @@ -194,7 +251,7 @@ static int uvio_copy_and_check_ioctl(struct uvio_ioctl_cb *ioctl, void __user *a
->   	if (memchr_inv(ioctl->reserved14, 0, sizeof(ioctl->reserved14)))
->   		return -EINVAL;
->   
-> -	return 0;
-> +	return nr;
->   }
->   
->   /*
-> @@ -205,12 +262,17 @@ static long uvio_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
->   	void __user *argp = (void __user *)arg;
->   	struct uvio_ioctl_cb uv_ioctl = { };
->   	long ret;
-> +	int nr;
-> +
-> +	nr = uvio_copy_and_check_ioctl(&uv_ioctl, argp, cmd);
-> +	if (nr < 0)
-> +		return nr;
->   
-> -	switch (cmd) {
-> -	case UVIO_IOCTL_ATT:
-> -		ret = uvio_copy_and_check_ioctl(&uv_ioctl, argp);
-> -		if (ret)
-> -			return ret;
-> +	switch (nr) {
-> +	case UVIO_IOCTL_UVDEV_INFO_NR:
-> +		ret = uvio_uvdev_info(&uv_ioctl);
-> +		break;
-> +	case UVIO_IOCTL_ATT_NR:
->   		ret = uvio_attestation(&uv_ioctl);
->   		break;
->   	default:
-> @@ -245,6 +307,7 @@ static void __exit uvio_dev_exit(void)
->   
->   static int __init uvio_dev_init(void)
->   {
-> +	set_supp_uv_cmds((unsigned long *)&uvdev_info.supp_uv_cmds);
->   	return misc_register(&uvio_dev_miscdev);
->   }
->   
+> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
+> +                            KVM_DEV_RISCV_AIA_CONFIG_SRCS,
+> +                            &aia_irq_num, true, NULL);
+> +    if (ret < 0) {
+> +        error_report("KVM AIA: fail to set number input irq lines");
+> +        exit(1);
+> +    }
 
+I see that you didn't check 'ret' for the first 2 calls of kvm_device_access().
+Is it intentional?
+
+Since you're setting customized error messages for every step I think it's worth
+also handling the case where we fail to set aia_mode and aia_nr_ids.
+
+
+Thanks,
+
+
+Daniel
+
+
+> +
+> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
+> +                            KVM_DEV_RISCV_AIA_CONFIG_HART_BITS,
+> +                            &aia_hart_bits, true, NULL);
+> +    if (ret < 0) {
+> +        error_report("KVM AIA: fail to set number of harts");
+> +        exit(1);
+> +    }
+> +
+> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_ADDR,
+> +                            KVM_DEV_RISCV_AIA_ADDR_APLIC,
+> +                            &aplic_base, true, NULL);
+> +    if (ret < 0) {
+> +        error_report("KVM AIA: fail to set the base address of APLIC");
+> +        exit(1);
+> +    }
+> +
+> +    for (int i = 0; i < hart_count; i++) {
+> +        uint64_t imsic_addr = imsic_base + i * IMSIC_HART_SIZE(0);
+> +        ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_ADDR,
+> +                                KVM_DEV_RISCV_AIA_ADDR_IMSIC(i),
+> +                                &imsic_addr, true, NULL);
+> +        if (ret < 0) {
+> +            error_report("KVM AIA: fail to set the base address of IMSICs");
+> +            exit(1);
+> +        }
+> +    }
+> +
+> +    if (kvm_has_gsi_routing()) {
+> +        for (uint64_t idx = 0; idx < aia_irq_num + 1; ++idx) {
+> +            kvm_irqchip_add_irq_route(kvm_state, idx, socket, idx);
+> +        }
+> +        kvm_gsi_routing_allowed = true;
+> +        kvm_irqchip_commit_routes(kvm_state);
+> +    }
+> +
+> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CTRL,
+> +                            KVM_DEV_RISCV_AIA_CTRL_INIT,
+> +                            NULL, true, NULL);
+> +    if (ret < 0) {
+> +        error_report("KVM AIA: initialized fail");
+> +        exit(1);
+> +    }
+> +}
+> diff --git a/target/riscv/kvm_riscv.h b/target/riscv/kvm_riscv.h
+> index 606968a4b7..6067adff51 100644
+> --- a/target/riscv/kvm_riscv.h
+> +++ b/target/riscv/kvm_riscv.h
+> @@ -21,6 +21,9 @@
+>   
+>   void kvm_riscv_reset_vcpu(RISCVCPU *cpu);
+>   void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level);
+> +void kvm_riscv_aia_create(DeviceState *aplic_s, bool msimode, int socket,
+> +                          uint64_t aia_irq_num, uint64_t hart_count,
+> +                          uint64_t aplic_base, uint64_t imsic_base);
+>   
+>   #define KVM_DEV_RISCV_AIA_GRP_CONFIG            0
+>   #define KVM_DEV_RISCV_AIA_CONFIG_MODE           0
