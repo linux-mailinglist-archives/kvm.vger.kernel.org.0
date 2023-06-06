@@ -2,167 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 54C1D723C8E
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 11:08:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7789B723CA4
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 11:12:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230013AbjFFJIw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 05:08:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52616 "EHLO
+        id S231940AbjFFJMQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 05:12:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbjFFJIv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 05:08:51 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8122C8F;
-        Tue,  6 Jun 2023 02:08:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686042530; x=1717578530;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=feLSl6vjh71Vq3uq6HMGwtZXo84U/oxY4wcAbiFtXv0=;
-  b=W/A8Si1zPuAqJCLnv0cSSupEThKchInu7ZSDDOIccqcUORWkIJzMY9QJ
-   vsuEbR4sRX+DOB880Vh8bpozKg77FjgCI6OT/3hWwqZ3RUl4eDPQSabDd
-   RMtI/l1n3xMG9cbkVxhQaiyOjh4tRZfWoE+yAaJnWmz7YvI0W/KDSHW71
-   QyjnKDlT915EQiJrqvXOQMMd/U3vbYaO/WaBoLmTiIUG2zfKpySvh5jj2
-   owVFupY9BSKm9XgdyxWfN5/sspo2QQbdggVPOQ/+oPZFDk+bsacXyhryN
-   uUyx7XUp5MFriFValdPO6ypWFQtzAZabf4ClZiFh7ZLkAW+MpKzNRONvN
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="384920281"
-X-IronPort-AV: E=Sophos;i="6.00,219,1681196400"; 
-   d="scan'208";a="384920281"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 02:08:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="1039102280"
-X-IronPort-AV: E=Sophos;i="6.00,219,1681196400"; 
-   d="scan'208";a="1039102280"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga005.fm.intel.com with ESMTP; 06 Jun 2023 02:08:48 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 6 Jun 2023 02:08:47 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 6 Jun 2023 02:08:47 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Tue, 6 Jun 2023 02:08:47 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.104)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Tue, 6 Jun 2023 02:08:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bUXfSa37mX06gNCVZCCwF6MJm2RDqwceFn0r3giEUflg3OH7AdMMvBT6s+sp0J98pHHWNtrGxQgui2sg17Ag1WkI7sY1k1sfWAGcAMF/9AcmBqZv5oY2UnTNJXBijaZCMvSymdGOTO6Rbp4V8+f6+I2S7CWgHCvkTvk12GJiyTAYFq5OPOrjr6OVcAd2ba/m6cDuT5XdrR15bOuahO59bRmDfOX/6FlQl8MyhqFpQXDgLmEV4fLLtqGzGys3a9FhioW8Kf/5luXwDGollgas4IsxOdi76pgP88EmqUtZWAgaShXlbYxDhrAiylrDvZEEhAmEoy9b7/Alc4b3JAV8ww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=feLSl6vjh71Vq3uq6HMGwtZXo84U/oxY4wcAbiFtXv0=;
- b=lA6llOo6dZ40dqpMWiEKQpjhcUZib8BArCrs2RweT2yu2E1R2c/u8aTMdWtqU8JCovcGAX/oqpk9CG/R3g9oFAx5aXgQcaIx+lpsFYGRiSG8gYZG9fZbLaFMw4ElEvjm0i6SfkKruCzF3Z+1yVC71zPQq0fq7Qj7icluT7dm8Lokl6qKjnK6KYqrdD0dNk/pk5TthGLLtEwMm+PBSptm+DSErlk0quN9N3Aa3EdLODY0x+iUT8ZkrfPcyiFVhtyxHJObi1v6Yddln2vZllqL3X9o20JDXSGN34Bj5kQ9ghadMPiYAIMdqfoNGSF02jh/X5y3S387b8Y/oUqIWI53gQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by SA1PR11MB6941.namprd11.prod.outlook.com (2603:10b6:806:2bd::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.32; Tue, 6 Jun
- 2023 09:08:43 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::5817:cb8f:c2b7:f1e5]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::5817:cb8f:c2b7:f1e5%4]) with mapi id 15.20.6455.028; Tue, 6 Jun 2023
- 09:08:43 +0000
-Date:   Tue, 6 Jun 2023 17:08:32 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-CC:     <seanjc@google.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <peterz@infradead.org>,
-        <rppt@kernel.org>, <binbin.wu@linux.intel.com>,
-        <rick.p.edgecombe@intel.com>, <john.allen@amd.com>
-Subject: Re: [PATCH v3 10/21] KVM:x86: Add #CP support in guest exception
- classification
-Message-ID: <ZH73kDx6VCaBFiyh@chao-email>
-References: <20230511040857.6094-1-weijiang.yang@intel.com>
- <20230511040857.6094-11-weijiang.yang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230511040857.6094-11-weijiang.yang@intel.com>
-X-ClientProxiedBy: SG2PR02CA0052.apcprd02.prod.outlook.com
- (2603:1096:4:54::16) To PH8PR11MB6780.namprd11.prod.outlook.com
- (2603:10b6:510:1cb::11)
+        with ESMTP id S229913AbjFFJMO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 05:12:14 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ADB70FA;
+        Tue,  6 Jun 2023 02:12:12 -0700 (PDT)
+Received: from loongson.cn (unknown [10.20.42.86])
+        by gateway (Coremail) with SMTP id _____8Cx_epq+H5ktQ8AAA--.367S3;
+        Tue, 06 Jun 2023 17:12:10 +0800 (CST)
+Received: from [10.20.42.86] (unknown [10.20.42.86])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Bx+ORo+H5kMhECAA--.9044S3;
+        Tue, 06 Jun 2023 17:12:09 +0800 (CST)
+Subject: Re: [PATCH v12 09/31] LoongArch: KVM: Implement vcpu get, vcpu set
+ registers
+To:     Youling Tang <tangyouling@loongson.cn>
+References: <20230530015223.147755-1-zhaotianrui@loongson.cn>
+ <20230530015223.147755-10-zhaotianrui@loongson.cn>
+ <4bb703e2-3255-f6c1-5451-ef16c6f0f52a@loongson.cn>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
+        Xi Ruoyao <xry111@xry111.site>
+From:   Tianrui Zhao <zhaotianrui@loongson.cn>
+Message-ID: <f67ccb6d-df9a-e35a-ac2e-7ec8aabd5cc5@loongson.cn>
+Date:   Tue, 6 Jun 2023 17:12:08 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|SA1PR11MB6941:EE_
-X-MS-Office365-Filtering-Correlation-Id: ef7ee797-ae5f-42cf-3228-08db666da00d
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HOkBLfsdP/pzIVK2MXRQ/on7LKwSNUozaGJJaU1IQPvj86MTMqxw8bcKL7YFk3p1vDHx5H3wjS5nksCgZXxOB4B4Cphm5lm7OT+IRr+atwXhWt3tmb5RKVkeCzwwFAna4uGMhMoe/4hxR8hG4koL+tpm78/fKZc7eqFxLK73/j8ns7NYGnV0c3ztjs7XVhKHlbiEGewQQcW1W2jxxHgTeKphbKmSjM+QKRZMAlayn0GqGGsv1eF5qspMwPoYuAPWeRRidQkbPCP7k9FUX9hZ+APuGjpY54trGOhHCo+sjiPn0qzxRmeTadtQjZAbEixSKiqeEz1DHP0jFBQHzcs/N6AZUyFG+7iEN11CHYtiTdN7e+VLkUg9UiTgIaMTT3f1zvHq7UN3gcBkn9HLufWgXNpuudSqUbUG3noArNNiJGO5yZRCX0k7DVu8bkPXqV+N31mUW2KtWyiB3xu9B3X//s5b3+sp8NvaJxn/rT5JM0+YZ3ivoT3RHeDLrH2ZM1Z7SW9xC/9lBj1ukUobXKO0bcjfDaa84dYzIasoTCcBqqYicL21vOprUzuWTH8xDgRp
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(346002)(396003)(136003)(376002)(366004)(39860400002)(451199021)(6512007)(9686003)(6506007)(26005)(86362001)(38100700002)(186003)(82960400001)(33716001)(44832011)(41300700001)(2906002)(4326008)(478600001)(66946007)(66476007)(8936002)(6862004)(6636002)(4744005)(8676002)(316002)(5660300002)(6486002)(66556008)(6666004);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SwA15aZH9HEdMfmbnnRCrU8n2gWOhWNc6/iYHWBAuqZY/205us6/9Jzj6fbC?=
- =?us-ascii?Q?gsZw0ZKoUNaEzA5jGk8gteNKHhzRX/krXRUTPsHvNG6BUI30gEUPlKq6gmyX?=
- =?us-ascii?Q?FMLqKiUq3p057DdD2y/GVbH/AvXY85gmiSXr1YW0HJRRmrfQ0OxBVom0L2On?=
- =?us-ascii?Q?E7xE6RGFu9z9Lmglj5zGowBKwrgdItbYHvxF25gdQoI8DmuJTfaVBGTiW/T5?=
- =?us-ascii?Q?+xjoreIQkX3rPfc6v9nzOVnvPaonKr7PSWcv+pa2E04lXxJj7w97UMSjwgKX?=
- =?us-ascii?Q?meQRu/p+sm0lrp9vnoYOowOBWjCEh5aU9iXzlnyKpsrr07REfri7XnXCYRS7?=
- =?us-ascii?Q?05m4xbCcs62fY1FF3C1AWu4B6IYytHaXwWw2Ck2SoVHN/07tz2/zGmVNZyWf?=
- =?us-ascii?Q?ueSyJ+nniKXvncd0Anj+3zkUmnR0cDbSCjQLEWwRzO2Gkrk8WtvW51MS9Z2d?=
- =?us-ascii?Q?UkqJhWunik8f7p1wNKd+Yv92u+eOc49EScivBwqLoZytDAVhC5YDS9u8sA2H?=
- =?us-ascii?Q?ezzR87L5W5DYOQON+hTrzQrm/pQ1pv94mC8HJl2dEd0tyOOf5AmhEk/VpwFX?=
- =?us-ascii?Q?BeJpYguiMw2OyUxeYyQlrK9g6ajeiZeQ1r/QMpSwFZ5DTOoQZpZoN92ASacQ?=
- =?us-ascii?Q?NNU9RPnQlniDx4Z1srATKUgaxUuiruxZvKCfeGR0EhL9USwk/ZdvVfrcbvMv?=
- =?us-ascii?Q?UC9IIrlhYOaBiLV8RhshuOXlwDxa6cr9MbufoYszZJ0v5zQe+mrV1chgl25b?=
- =?us-ascii?Q?VTIgIdvbJSwuU8+XYpFXSUHMgF+a51GHAnwkM4DUbJ6+h8F2DRajg8kkZXgN?=
- =?us-ascii?Q?2AqCod6fwB9i2ZgZt/PHUKiKMJuR4fX3QF1qvgp3idC5o6JxOtFuColoMOax?=
- =?us-ascii?Q?4Scnv6t5e8/tJGhVd0nNicJwo0/qfD8wpEyG/P8bXWPMKtBt0YTiXGA837ug?=
- =?us-ascii?Q?ZqHQeJlHJ6NfQim2Jy8UtKU5PgCFjqKj9Qnq2z2ErcbOPSm9QZN+Q5ZPSnvQ?=
- =?us-ascii?Q?unDxJvARRaIY8qtx7JnsFTmO7YvsL2KBoynbdz4lEV045wFpjbG2bA0VvWoO?=
- =?us-ascii?Q?N7ftDrmN4s4Mb8AF3015hVamyJ0yeWeeFK26FJ9K5mA9G5UwMO8oUldBIdQE?=
- =?us-ascii?Q?eY7zx92Y2qfFBXKq8IpB6cG+tKMWQFas4XZBjKd8ezAcll0nTmLjX2MaztPd?=
- =?us-ascii?Q?Da6It+SccAyNiQT+jyoEWunVvMh2w8KAA99Ex9e3OLOpdISn+SaR+kUTG8NN?=
- =?us-ascii?Q?5OrLN8IKdljWBSN2x3Q+xaJB5FMaG+g8paTQwfYX93hHUYVnyGVJ/6prL1ny?=
- =?us-ascii?Q?OFZey+QLxJv7SbZCxaCj8BsvUxIQqY/3TjWfkBLqCDHfDgCTA/PQPZOHUNRz?=
- =?us-ascii?Q?Qo/mKnDOErH5r82t7tJziSbBWeJ5AHs3OhVxm1G7TP421MMx01xAFgvdnko3?=
- =?us-ascii?Q?DZq8/5SbMT2y4ek6Vje6184fUd+Gfz/XUtZoSFLiscrbMkaPyNGlizl75azK?=
- =?us-ascii?Q?EM5euJvxGVy5TznKerIlWA4ZU9i+N07xnVe6K2qRhGH9yszu33bI4GVD0t1d?=
- =?us-ascii?Q?OnMWhfwXGjrOH4VGxPtTbP7fqfpvCbipcRoUeWqz?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: ef7ee797-ae5f-42cf-3228-08db666da00d
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2023 09:08:42.9261
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: muUhB0zVfvlrH8ye+XFcA9Usn2l7xbaSUGC99KXO8JXFyjEPqfhikj2ShYvWgqP9GezYfzWoE6BT8CYN99ypVQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6941
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <4bb703e2-3255-f6c1-5451-ef16c6f0f52a@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8Bx+ORo+H5kMhECAA--.9044S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxArykXF1rXr17tw1ruF47Jrc_yoW5XrykpF
+        1UC3Z5Ka10gry7AF1fXan8Cr13Cr93Kry2g3W3Ca4qyFy7KryjyFyF9r9xGF97tFW5Ar10
+        va4UXas29Fs8J3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+        0xBIdaVrnRJUUUPSb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+        xVWxJr0_GcWln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+        xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
+        6r1DMcIj6I8E87Iv67AKxVWxJVW8Jr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+        8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
+        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67
+        AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+        rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
+        v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWxJVW8
+        Jr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8oGQD
+        UUUUU==
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 11, 2023 at 12:08:46AM -0400, Yang Weijiang wrote:
->Add handling for Control Protection (#CP) exceptions(vector 21).
->The new vector is introduced for Intel's Control-Flow Enforcement
->Technology (CET) relevant violation cases.
+
+
+在 2023年06月06日 14:41, Youling Tang 写道:
 >
+>
+> On 05/30/2023 09:52 AM, Tianrui Zhao wrote:
+>> Implement LoongArch vcpu get registers and set registers operations, it
+>> is called when user space use the ioctl interface to get or set regs.
+>>
+>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+>> ---
+>>  arch/loongarch/kvm/csr_ops.S |  76 +++++++++++++
+>>  arch/loongarch/kvm/vcpu.c    | 206 +++++++++++++++++++++++++++++++++++
+>>  2 files changed, 282 insertions(+)
+>>  create mode 100644 arch/loongarch/kvm/csr_ops.S
+>>
+>> diff --git a/arch/loongarch/kvm/csr_ops.S b/arch/loongarch/kvm/csr_ops.S
+>> new file mode 100644
+>> index 000000000000..962b96d8291a
+>> --- /dev/null
+>> +++ b/arch/loongarch/kvm/csr_ops.S
+>> @@ -0,0 +1,76 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/*
+>> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+>> + */
+>> +
+>> +#include <asm/regdef.h>
+>> +#include <linux/linkage.h>
+>> +    .text
+>> +    .section        .text
+>> +    .cfi_sections   .debug_frame
+>> +/*
+>> + * we have splited hw gcsr into three parts, so we can
+>> + * calculate the code offset by gcsrid and jump here to
+>> + * run the gcsrwr instruction.
+>> + */
+>> +SYM_FUNC_START(set_hw_gcsr)
+>> +    addi.d      t0,   a0,   0
+>> +    addi.w      t1,   zero, 96
+>> +    bltu        t1,   t0,   1f
+>> +    la.pcrel    t0,   10f
+>> +    alsl.d      t0,   a0,   t0, 3
+>> +    jirl        zero, t0,   0
+> jr t0
+Thanks, I will fix those instructions.
 
->Although #CP belongs contributory exception class, but the actual
->effect is conditional on CET being exposed to guest. If CET is not
->available to guest, #CP falls back to non-contributory and doesn't
->have an error code.
+Thanks
+Tianrui Zhao
+>
+>> +1:
+>> +    addi.w      t1,   a0,   -128
+>> +    addi.w      t2,   zero, 15
+>> +    bltu        t2,   t1,   2f
+>> +    la.pcrel    t0,   11f
+>> +    alsl.d      t0,   t1,   t0, 3
+>> +    jirl        zero, t0,   0
+> jr t0
+>
+>> +2:
+>> +    addi.w      t1,   a0,   -384
+>> +    addi.w      t2,   zero, 3
+>> +    bltu        t2,   t1,   3f
+>> +    la.pcrel    t0,   12f
+>> +    alsl.d      t0,   t1,   t0, 3
+>> +    jirl        zero, t0,   0
+> jr t0
+>
+>> +3:
+>> +    addi.w      a0,   zero, -1
+>> +    jirl        zero, ra,   0
+> jr ra
+>
+>> +/*
+>> + * write guest csr
+>> + * 0x05000000 | (LOONGARCH_CSR_XXX << 10) | 1 << 5 | a1
+>> + * range from 0x0(KVM_CSR_CRMD) to 0x60 (KVM_CSR_LLBCTL)
+>> + */
+>> +10:
+>> +    csrnum = 0
+>> +    .rept 0x61
+>> +        .word 0x05000020 | csrnum << 10 | 5
+>> +        jirl zero, ra, 0
+> ditto.
+>> +        csrnum = csrnum + 1
+>> +    .endr
+>> +/*
+>> + * write guest csr
+>> + * 0x05000000 | (LOONGARCH_CSR_XXX << 10) | 1<<5 | a1
+>> + * range from 0x80 (KVM_CSR_IMPCTL1) to 0x8f (KVM_CSR_TLBRPRMD)
+>> + */
+>> +11:
+>> +    csrnum = 0x80
+>> +    .rept 0x10
+>> +        .word 0x05000020 | csrnum << 10 | 5
+>> +        jirl zero, ra, 0
+> ditto.
+>> +        csrnum = csrnum + 1
+>> +    .endr
+>> +/*
+>> + * write guest csr
+>> + * 0x05000000 | (LOONGARCH_CSR_XXX << 10) | 1<<5 | a1
+>> + * range from 0x180(KVM_CSR_DMWIN0) to 0x183(KVM_CSR_DMWIN3)
+>> + */
+>> +12:
+>> +    csrnum = 0x180
+>> +    .rept 0x4
+>> +        .word 0x05000020 | csrnum << 10 | 5
+>> +        jirl zero, ra, 0
+> ditto.
+>
+> Thanks,
+> Youling
+>> +        csrnum = csrnum + 1
+>> +    .endr
+>> +SYM_FUNC_END(set_hw_gcsr)
 
-This sounds weird. is this the hardware behavior? If yes, could you
-point us to where this behavior is documented?
