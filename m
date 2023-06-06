@@ -2,136 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 440D272496C
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 18:43:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9F4372498D
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 18:55:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238093AbjFFQnp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jun 2023 12:43:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40292 "EHLO
+        id S238337AbjFFQyq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jun 2023 12:54:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237744AbjFFQno (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jun 2023 12:43:44 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2081.outbound.protection.outlook.com [40.107.96.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42CF710EC;
-        Tue,  6 Jun 2023 09:43:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XY1/aCpjy0zCqtFUfrBUhnvtKGlorIdsVcjk4r1s1/Emf+xQ6T1Uswr39L4F9bZSbVZuDAzqDL1NcLst0uDUdymnxfWU1sgT/GmoZvLAEKrCxAAvidiK0SKQYCUK4xQbHtr1l3gqrO0n1VRlkUdnk20aCTSYxHvcURewE17R+VIL9HU3rB15933mEVQe+skqsRxNLHdWzbupVYGMS61qsKiBOHSnQiiB8onlWRFqso36NujXcn6amU6jiHqWeM3qDgm8bXE3fbGn/nnMzjBa0u/3YG9uL7qQVURK9+cyGoxsilCqKRmfyUdz1m5v9/b9JAuMnHRVK7hsqldzGUdFXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7h4sST+Glcyb9qBGFCy1C/62yJiIMu+HOXDIAf0AyQ4=;
- b=ZEZ2WJlc626cvpia64n6W2uCD91Mt0po2V8+It0R7TOrMckVqGhoJOCqhrmI8He+JYGfUXWGmaor7TtnPzO0oHS6DudBO4PKvcAkY9xAgQ7KF2SQdsnD6iBIckE30KjesqGb7MvYn6bJoIWKk14lC8OLtkqiqNfhnF+M9fCRv9NT+abUghltf5Yvhj9QOKZqYJIYCxUKSYfxDPeqdD4WQqjnrdexhald5InrO0CzqYisUki29mOpoxALFCPAMPhIKkMtEpk4SijOSg7CqC3be8/LUYXtUvp3J9wAQppkIEvjqP3t7RnpRTCtSFCNvGwJHjPSbNPaDh2BbcAwKnKpmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7h4sST+Glcyb9qBGFCy1C/62yJiIMu+HOXDIAf0AyQ4=;
- b=mu0U9xxnLwIIhS63Aca/heuyFpnOWaDcLQPnEXDwc6gXHUl3K+dQqVaNvENmUfufDhbyJLotLyGthjLf9M55sGmeccEZ9NQ9ZSvw5Jb/qkMc8NOOMLh8apwM3janWkc+TLsZyAhVS1p77VBgrUlg2Lz9afNR30hg92FVoTwfT8doB0h9d3BZKEBetvVY+HENfyZWX4+4DW1LIf3UAKGGWrQaU3TWhiFFSsFE9CW/vVYMldt0E/GGtdGHcyAJXaMCpTgWJYzh3lxTDZfLyhhwm+xrdc6iTmj1tW4Tr9TEeIJYwdqR0z4ww3GRlX3oyIlM5I72N3nDWoDMDbXUmWvouw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BY5PR12MB4917.namprd12.prod.outlook.com (2603:10b6:a03:1d1::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33; Tue, 6 Jun
- 2023 16:43:35 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6455.028; Tue, 6 Jun 2023
- 16:43:35 +0000
-Date:   Tue, 6 Jun 2023 13:43:32 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Alistair Popple <apopple@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH 0/3] KVM: x86: Use "standard" mmu_notifier hook for APIC
- page
-Message-ID: <ZH9iNAPRBESPVmPA@nvidia.com>
-References: <20230602011518.787006-1-seanjc@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230602011518.787006-1-seanjc@google.com>
-X-ClientProxiedBy: SJ0PR13CA0034.namprd13.prod.outlook.com
- (2603:10b6:a03:2c2::9) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BY5PR12MB4917:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6799e05d-4858-4545-9259-08db66ad2bcd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RHqAj9V77KUG72eo3ynzlQE41X4RKTJKXWULy8TwsydudqrIBVizLjlaVFq9ezX7xbys10tsZ/bGikPHYcc5+/pgqvfdslD4Uv4AuF9LjiYJAjWAmwiZGY8tnJ3HKZarUtihjs/ewAW/UZW0h8yEcdc1YTSPUkMDNFmG6Rfi3OFICE5DLkGEowh09/f3L1BeVY2m+ArL9Ge31hDIutUg4Ut9bWXtQtsX8WO1YhbmmPguqmpFuryMgdlrDtWdOfD9ED8F0GvW6wWfl5W3Pigx5TWLKOM1ircUdeVxroksPbnqV5+43+tfNmOWEfvYg9xXv47Fz4IL+S7HRcgkHhpnSgA/EOZ3fLT73/XxDyKkkraP2/0Vm1jk4Xo5NUJcPtrZSGMESAbg4DLib0g7eMEN9eBExzHw7v9qnSvFESIsq+H5h+1Y4khV4Yl9+5iEY97+nkNkMlk4UDRtoy9h+TwVT2T8B26o9iHrXoNR1+JulsM5yNUB8+DONodGZ4sok0zP7cyz/cV+QhGYTxaiMM5UuTSOTkrt61R+5C1z/XsNWcctz8lva2C/wooaLGvqXzdv
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(376002)(136003)(396003)(366004)(451199021)(41300700001)(316002)(478600001)(4744005)(2906002)(36756003)(66476007)(66946007)(8936002)(66556008)(8676002)(86362001)(5660300002)(6916009)(38100700002)(4326008)(54906003)(6486002)(6666004)(186003)(83380400001)(2616005)(6512007)(26005)(6506007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?hGpmJhniPYvjvR1I9br1+hulroONaHjIORDNumeNYIhcGRc/3SwsTYran9xJ?=
- =?us-ascii?Q?roYhwAGIf97zy4D6Z61yxENH3CJBvnkpoC2RliPyZU6YO+fL3a5PjFdExUem?=
- =?us-ascii?Q?hx2TKJlYWuWRwPYK4BXkhC55GKDI8g8XF0D9lJIB2KB1cMaiAYAALmdlkI5F?=
- =?us-ascii?Q?3axOBdf1YHiUbBlT880n5Ic3s0LlEOlyANjX91WQVildQDqR15CTqIDnSQB8?=
- =?us-ascii?Q?DmiO9bsQG0KVCQjCvxDatJrQG/j67Jy0AJjt0tGC/YdeA38JBFoM7i/Lykqi?=
- =?us-ascii?Q?WKGEHq/BwMXW8g01Ayoo8ILIdDM9UTWPZ7XBEXLwQ5lp8hOp+UKvAEn5LYcP?=
- =?us-ascii?Q?sMF0nQWhQHxbuSyVA3m2QaEw5vsqQ6bJsLj5PN3nT8ztasUdrIE1Wo6uUR5K?=
- =?us-ascii?Q?MDtQ1pnAB3pHhQafi7YYVHAGtu/BHYADKfg36wXYeme0RKpFYUslpTHzFROt?=
- =?us-ascii?Q?L5UlKjHQMPC7Wiwov9ifUaBcePWhM9jVv+iGbxLsyKObA+SQMHMmkAEcVby/?=
- =?us-ascii?Q?Wjhds2GQTFch3E8X6/iUsJRFy58IH6YeZqDy3MoeNvemmCBT7YAYirkpCzoZ?=
- =?us-ascii?Q?bHZBbygYDnYy0ZuACmpEDjt5nVI5mPhzZeKlHec59irQx9LuToSRGsemoJ/R?=
- =?us-ascii?Q?Nre3PDEySNOP/u36m8/+w2l6YAI8TqwvAxa785es8ySlAS/sqBf2ZvRHyjx6?=
- =?us-ascii?Q?tgSVhn4qxXb2sRnZc6Ky3hZFb8C0uDieoFRt9pXWC9dvrctTi95eZyFEXXAz?=
- =?us-ascii?Q?1HaVbdh2SDBP+EM0EtSbSFg0mBsIyxoWWxQTwLnbCpoKRAG/IFCwtaPoyxYj?=
- =?us-ascii?Q?B2QwNScho6WiuwkRONIOe4laU1YDso5+2PX6WrojstANjb8G33nAV6GVi5CE?=
- =?us-ascii?Q?gfsrbLWkrziHExbPcjyBHp6ADBDeVhP3IE9rXAcqn6hQoQegn23KGIdEKpDQ?=
- =?us-ascii?Q?R/QZGFeAtB50p9KMDxCOCKYnCSq9PRY3MvdOexp00jZliyDdSXmYISI28+LJ?=
- =?us-ascii?Q?1lalzpsksJXz3uPD/45uX1gtZwBh5H3HidjAVAcTeL6MIvk09wp+9dOGBDBE?=
- =?us-ascii?Q?n0ZYpdgH5z3H40RaTK+dTYIAHaT4bb/BG74YhAQyjSvOTOwMhSOhZ8iHKYnU?=
- =?us-ascii?Q?j7fcxcSKKgFDijqt0+xwiDv2Ba9t9Kz5j0YfqVBxgCnW5+ecinbCpsvQnWze?=
- =?us-ascii?Q?xhxoBP7zyEzlAnebydNX6MXtNmEuOhNyEl7FQ3dC/fZfin+qCad86e9ur3Jr?=
- =?us-ascii?Q?D1k3Qp4N4/YupFeHqkRCX8tCAPYYstn26jx0CZ2KzyV0iJU5RzIQnlT6r0TP?=
- =?us-ascii?Q?t6ZB2EJyPckeUmsAeXFVCc1JPX0HdMjvc8RWE1yYkjvINsDAn7Z8HISPQt7x?=
- =?us-ascii?Q?wbZPBVlsXUKLz5BWNzd20cGLcd0Rf0uH6C6rIPzE4EYiI7dTkKYS3mFw15da?=
- =?us-ascii?Q?+P//i6nLoxRufmUVQ0y3XWpmH1v/SLfPCSP0usdwefbOK8ut7vWCqeyMbmvP?=
- =?us-ascii?Q?iXtpZh2AGmvb1k41GLUBHqZ9o05G2KLBVvgQsrW+wdVgBQBWyT9vD5GjZVjd?=
- =?us-ascii?Q?k/ixtjXOVRBBDXkprMh1MfUJN7eDMZpTlcutBP4Z?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6799e05d-4858-4545-9259-08db66ad2bcd
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2023 16:43:35.4556
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aT765da7iCtu9U0Y0lvhheTolc8Y6LIRjC0OKtsMvcqRYVe2vHiAp7tQyWf6dPHR
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4917
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+        with ESMTP id S238194AbjFFQyc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jun 2023 12:54:32 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4111110EA
+        for <kvm@vger.kernel.org>; Tue,  6 Jun 2023 09:54:29 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-565d6824f2dso93877177b3.0
+        for <kvm@vger.kernel.org>; Tue, 06 Jun 2023 09:54:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686070468; x=1688662468;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vWfghhT+K/VvYdIHsaVVRXfigb3NJPqkB0cgBd8gNOA=;
+        b=iEDqIHuxrXw0gIUvL9P7CFRGySn8VWahksHLrzLIsF04F3kpysyg/ZXXPgX1/Oq0Cg
+         uNZwWVM0lmG1i9F7IvLGtcvDZxah8CCzeFmyYd8JeZI2cirpwt8HxgWG6YNxcZ/oyeHa
+         Shr68eC/Tvns2OgiaZBrBLT4BmA8I7jF4xpC5y8+kZuzzOkVQcp5L55EaqRj+XlgqlfZ
+         Gv17+BTmWt1BakRBdxSu5TYg8+VYNMtb+aPTYbMhfPJ/FZ2xN1jI3sKNVB31LT/1zIzf
+         AT1jmu9pwQeIqWTDkhnxgRX4LBjvB9V3rKWEN9NGRmT9IyKYu0qddHc/5qvolsBdo1QK
+         u8Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686070468; x=1688662468;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vWfghhT+K/VvYdIHsaVVRXfigb3NJPqkB0cgBd8gNOA=;
+        b=fuumx0gG4KTb7n5bMPhENpuDsGw2rc+Gotb7N1Nur1ScPyFbEg/rXq3lgaUiijh1Pq
+         zr8NAtiGz37Nj8ntz1ltuLEIHLAEgw6d0NrdxysdN8LWoEtvhQjYrF9TsczUfi1/kJTt
+         KRKrN8HTwn+gmTJHb6miw8TtDp2fUw6hSf4hPLJoH1PKhD9v5PyWJTk9hjwf4qRVwsEg
+         7/l+kGPEAoe35yhvXut3XZY5+EZbh8Nmfs4h6k9gLcMepMBLEF6iaEDnuGHBt4zskRf5
+         JL255G2wbOuhlvPxhQu5hZC7gXIlxpXKOWS40o83XtnnYlLrwYS3mMj2BxHiapxqhr8f
+         C9SQ==
+X-Gm-Message-State: AC+VfDz4Rs/G9AUx6fS1KId0F7G7tBKliacfbhM0YqlSaX7veyN/zuYe
+        3VLNzVAC8gk5JTjbSYv7O6KgqTkca5Y=
+X-Google-Smtp-Source: ACHHUZ735NOAxJ3G3HjCYdRPxFLDWLMm4QKxC+twRQjzhCgzbcYWiG6wj9pxN63ErpW9hCrFilnr+ZskZ6M=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:d208:0:b0:564:c5fd:6d98 with SMTP id
+ x8-20020a81d208000000b00564c5fd6d98mr1286497ywi.10.1686070468519; Tue, 06 Jun
+ 2023 09:54:28 -0700 (PDT)
+Date:   Tue, 6 Jun 2023 09:54:26 -0700
+In-Reply-To: <ZHQdlSY2tsdGyCPs@chao-email>
+Mime-Version: 1.0
+References: <20230506030435.80262-1-chao.gao@intel.com> <b472b58d-0469-8a55-985c-1d966ce66419@intel.com>
+ <ZGZhW/x5OWPmx1qD@google.com> <ZHQdlSY2tsdGyCPs@chao-email>
+Message-ID: <ZH9kwlg2Ac9IER7Y@google.com>
+Subject: Re: [PATCH] KVM: x86: Track supported ARCH_CAPABILITIES in kvm_caps
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 01, 2023 at 06:15:15PM -0700, Sean Christopherson wrote:
-> Convert VMX's handling of mmu_notifier invalidations of the APIC-access page
-> from invalidate_range() to KVM's standard invalidate_range_{start,end}().
+On Mon, May 29, 2023, Chao Gao wrote:
+> On Thu, May 18, 2023 at 10:33:15AM -0700, Sean Christopherson wrote:
+> >FWIW, this trainwreck is another reason why I'm not going to look at the proposed
+> >"Intel IA32_SPEC_CTRL Virtualization" crud until external forces dictate that I
+> >do so.  I have zero confidence that a paravirt interface defined by hardware
+> >vendors to fiddle with mitigations will be sane, flexible, and extensible.
 > 
-> KVM (ab)uses invalidate_range() to fudge around not stalling vCPUs until
-> relevant in-flight invalidations complete.  Abusing invalidate_range() works,
-> but it requires one-off code in KVM, sets a bad precedent in KVM, and is
-> blocking improvements to mmu_notifier's definition of invalidate_range()
-> due to KVM's usage diverging wildly from the original intent of notifying
-> IOMMUs of changes to shared page tables.
+> Hi Sean,
 > 
-> Clean up the mess by hooking x86's implementation of kvm_unmap_gfn_range()
-> and stalling vCPUs by re-requesting KVM_REQ_APIC_PAGE_RELOAD until the
-> invalidation completes.
+> Just to confirm we are on the same page:
+> 
+> "Intel IA32_SPEC_CTRL Virtualization" series consists of 3 parts:
+> 
+> 1. Expose BHI_CTRL, RRSBA_CTRL to guests. They are hardware mitigations to
+>    disable BHI and RRSBA behaviors and can be used by both guest/host.
+> 
+> 2. Enable IA32_SPEC_CTRL Virtualization which is a VMX feature. This is for KVM
+>    to effectively lock some bits of IA32_SPEC_CTRL MSR when guests are running.
+> 
+> 3. Implement the paravirt interface (the virtual MSRs) for guests to report
+>    software mitigations in-use. KVM can utilize such information to enable
+>    hardware mitigations for guests transparently to address software mitigation
+>    effectiveness issues caused by CPU microarchitecture changes (RRSBA behavior,
+>    size of branch history table).
+> 
+> As per my understanding, your concerns are primarily focused on #3, the
+> paravirt interface, rather than the entire series. Am I correct in assuming that
+> you do not oppose #1 and #2?
 
-I don't know much about kvm, but this looks like what I had in mind
-and is a good way to use mmu notifiers
+Yes, correct.  I definitely recommend posting #1 and #2 separately from the
+paravirt interface, I ignored the entire series without realizing there is real
+hardware support in there.
 
-Thanks,
-Jason
+> You previously mentioned that the paravirt interface was not common [1], and
+> this time, you expressed an expectation for the interface to be "sane, flexible,
+> and extensible." To ensure clarity, I want to confirm my interpretation of
+> your expectations:
+> 
+> 1. The interface should not be tied to a specific CPU vendor but instead be
+>    beneficial for Intel and AMD (and even ARM, and potentially others).
+> 
+> 2. The interface should have the capability to solve other issues (e.g,
+>    coordinate mitigations in guest/host to address other perf/function issues),
+>    not limited to software mitigation effectiveness on Intel CPUs.
+> 3. The interface should be extendable by VMMs rather than relying on hardware
+>    vendors rolling out new spec. This enables VMM developers to propose new
+>    ideas to coordinate mitigations in guest/host.
+
+Ya, that's more or less my opinion.  Even more than allowing VMM developers to
+extend/define the interface, I want the definition of the interace to be a
+community/collaborative effort.  LKML has active representatives from all of the
+major (known) hypervisors, so it shouldn't be *that* hard to figure out a way to
+make the interface community driven.
+
+Note that it doesn't necessarily have to be VMM developers, e.g. many of the
+people that are intimately familiar with the mitigations aren't virtualization
+folks.
+
+> Please let me know if I missed any key points or if any of the above statements
+> do not align with your expectations. 
+> 
+> [1]: https://lore.kernel.org/all/Y6Sin1bmLN10yvMw@google.com/ 
