@@ -2,129 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 603AC723427
-	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 02:51:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08D9B723461
+	for <lists+kvm@lfdr.de>; Tue,  6 Jun 2023 03:13:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233008AbjFFAv4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jun 2023 20:51:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45112 "EHLO
+        id S232182AbjFFBNW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jun 2023 21:13:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231936AbjFFAvy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jun 2023 20:51:54 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0A9BEE
-        for <kvm@vger.kernel.org>; Mon,  5 Jun 2023 17:51:53 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-bb39aebdd87so30348276.0
-        for <kvm@vger.kernel.org>; Mon, 05 Jun 2023 17:51:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686012713; x=1688604713;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VaC1BVyiTSACOimpWYxrbewiqoPZUcVuky2w3w58ifU=;
-        b=5gX+/+yCPmRKoyOpvv4Qx644IBMjX8OPyZ30BerYR6ft9ojiTI5Yf0eDv07NXMuCBD
-         8kygK5apPu19nj6ZM9wZh9H7qyqxfV0RqplndC6aItojYMcf4jCEeV2OvQFcORsvb97Q
-         nDzNk1mfdCHznJfYBwkxnkolKh8f5cp2usCe4koQDHjp7Bpflwnf3imWGgR21UxtyL83
-         ztonG340JXI0D4rgyYc7c7DKCFPrKOUQ/d2rE/fN36E9/ox6IgrFOWTr5jZmM8ENkuli
-         T9J6CZv8WKTD2eHyrZVe7oySyIc905jZs9WhVbnfGrQIglax+ItrqGPZzNbQY6KuC2a2
-         5fCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686012713; x=1688604713;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VaC1BVyiTSACOimpWYxrbewiqoPZUcVuky2w3w58ifU=;
-        b=iKAGv+5V2U5KaGhrHLo95VxBVVeJ46G6n9Jwk52T3ueUXD3bz82WG+tNOhPfFYJlaJ
-         kanCzCyDlw0/p236yAl8jQyHSkYfirNsRPVMOXJHBR5Qvw94Hf5ZilzBhGwUdrUtErNL
-         Vb1itHxOpcAa6UIfPMf/tgaF4ir1MolVDGyHL1RqjYNkXCpbj3YIjNiq4XcMKUQAN57b
-         VuvAocaI9/cZCsEthe5Hf746GVhQnSCyVs7d3PGShHaWD33IXNRNvhanxT1dl+jTivWz
-         QEai46crz477Qa/ts+DDB8WZ7MJMGDnle7oemyV0YI43cPzWR8BNrKghxYWfbeAC/UYO
-         f6RQ==
-X-Gm-Message-State: AC+VfDwouAuPPQ0qnY4FCfr6xATa+Tcrf8N4qotC1+uR9hGozlgy6bP+
-        jG0UJIOSfN8eUZ1dYfnmeNaJxGs27dk=
-X-Google-Smtp-Source: ACHHUZ6iy3FTgGekRu7R4qlbm+XMy4B1g6+nEKn8HnJOc/2cdntWuI34dSn7U6uz6hk+9Y0M1vhbXIrs150=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:b7ce:0:b0:bb1:569c:f381 with SMTP id
- u14-20020a25b7ce000000b00bb1569cf381mr429767ybj.1.1686012713004; Mon, 05 Jun
- 2023 17:51:53 -0700 (PDT)
-Date:   Mon, 5 Jun 2023 17:51:51 -0700
-In-Reply-To: <20230504120042.785651-1-rkagan@amazon.de>
-Mime-Version: 1.0
-References: <20230504120042.785651-1-rkagan@amazon.de>
-Message-ID: <ZH6DJ8aFq/LM6Bk9@google.com>
-Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
-From:   Sean Christopherson <seanjc@google.com>
-To:     Roman Kagan <rkagan@amazon.de>
-Cc:     kvm@vger.kernel.org, Dave Hansen <dave.hansen@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Like Xu <likexu@tencent.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Eric Hankland <ehankland@google.com>,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229698AbjFFBNV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jun 2023 21:13:21 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 79CF5F3;
+        Mon,  5 Jun 2023 18:13:19 -0700 (PDT)
+Received: from loongson.cn (unknown [10.20.42.170])
+        by gateway (Coremail) with SMTP id _____8CxaPEtiH5kKUgAAA--.1166S3;
+        Tue, 06 Jun 2023 09:13:17 +0800 (CST)
+Received: from [10.20.42.170] (unknown [10.20.42.170])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Bx+OQsiH5kKYEBAA--.6897S3;
+        Tue, 06 Jun 2023 09:13:16 +0800 (CST)
+Message-ID: <cf630105-aa83-730e-2cb5-2e33d364a212@loongson.cn>
+Date:   Tue, 6 Jun 2023 09:13:16 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v12 16/31] LoongArch: KVM: Implement update VM id function
+Content-Language: en-US
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Xi Ruoyao <xry111@xry111.site>
+References: <20230530015223.147755-1-zhaotianrui@loongson.cn>
+ <20230530015223.147755-17-zhaotianrui@loongson.cn>
+From:   "bibo, mao" <maobibo@loongson.cn>
+In-Reply-To: <20230530015223.147755-17-zhaotianrui@loongson.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8Bx+OQsiH5kKYEBAA--.6897S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW7tFy3ur18CrW8Gry3Zr1UurX_yoW8KFyUpF
+        WxCwn3Gr4fXr17A3sxtw1FqFn093ykKF12qa47J3WFyr17t3s8CrWkKrWDAFyxJr1rJr1I
+        qF1YyF4jkr1DA3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+        0xBIdaVrnRJUUUPYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+        IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+        Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+        kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
+        twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+        k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l
+        4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxV
+        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
+        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+        42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jeq2NUUUUU=
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 04, 2023, Roman Kagan wrote:
-> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> index 5c7bbf03b599..6a91e1afef5a 100644
-> --- a/arch/x86/kvm/pmu.h
-> +++ b/arch/x86/kvm/pmu.h
-> @@ -60,6 +60,12 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
->  	return counter & pmc_bitmask(pmc);
->  }
->  
-> +static inline void pmc_set_counter(struct kvm_pmc *pmc, u64 val)
+Reviewed-by: Bibo, Mao <maobibo@loongson.cn>
+
+在 2023/5/30 09:52, Tianrui Zhao 写道:
+> Implement kvm check vmid and update vmid, the vmid should be checked before
+> vcpu enter guest.
+> 
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> ---
+>  arch/loongarch/kvm/vmid.c | 64 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 64 insertions(+)
+>  create mode 100644 arch/loongarch/kvm/vmid.c
+> 
+> diff --git a/arch/loongarch/kvm/vmid.c b/arch/loongarch/kvm/vmid.c
+> new file mode 100644
+> index 000000000000..6fef81b28a48
+> --- /dev/null
+> +++ b/arch/loongarch/kvm/vmid.c
+> @@ -0,0 +1,64 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +#include "trace.h"
+> +
+> +static void _kvm_update_vpid(struct kvm_vcpu *vcpu, int cpu)
 > +{
-> +	pmc->counter += val - pmc_read_counter(pmc);
+> +	struct kvm_context *context;
+> +	unsigned long vpid;
+> +
+> +	context = per_cpu_ptr(vcpu->kvm->arch.vmcs, cpu);
+> +	vpid = context->vpid_cache + 1;
+> +	if (!(vpid & vpid_mask)) {
+> +		/* finish round of 64 bit loop */
+> +		if (unlikely(!vpid))
+> +			vpid = vpid_mask + 1;
+> +
+> +		/* vpid 0 reserved for root */
+> +		++vpid;
+> +
+> +		/* start new vpid cycle */
+> +		kvm_flush_tlb_all();
+> +	}
+> +
+> +	context->vpid_cache = vpid;
+> +	vcpu->arch.vpid = vpid;
+> +}
+> +
+> +void _kvm_check_vmid(struct kvm_vcpu *vcpu, int cpu)
+> +{
+> +	struct kvm_context *context;
+> +	bool migrated;
+> +	unsigned long ver, old, vpid;
+> +
+> +	/*
+> +	 * Are we entering guest context on a different CPU to last time?
+> +	 * If so, the vCPU's guest TLB state on this CPU may be stale.
+> +	 */
+> +	context = per_cpu_ptr(vcpu->kvm->arch.vmcs, cpu);
+> +	migrated = (vcpu->arch.last_exec_cpu != cpu);
+> +	vcpu->arch.last_exec_cpu = cpu;
+> +
+> +	/*
+> +	 * Check if our vpid is of an older version
+> +	 *
+> +	 * We also discard the stored vpid if we've executed on
+> +	 * another CPU, as the guest mappings may have changed without
+> +	 * hypervisor knowledge.
+> +	 */
+> +	ver = vcpu->arch.vpid & ~vpid_mask;
+> +	old = context->vpid_cache  & ~vpid_mask;
+> +	if (migrated || (ver != old)) {
+> +		_kvm_update_vpid(vcpu, cpu);
+> +		trace_kvm_vpid_change(vcpu, vcpu->arch.vpid);
+> +	}
+> +
+> +	/* Restore GSTAT(0x50).vpid */
+> +	vpid = (vcpu->arch.vpid & vpid_mask)
+> +		<< CSR_GSTAT_GID_SHIFT;
+> +	change_csr_gstat(vpid_mask << CSR_GSTAT_GID_SHIFT, vpid);
+> +}
 
-Ugh, not your code, but I don't see how the current code can possibly be correct.
-
-The above unpacks to
-
-	counter = pmc->counter;
-	if (pmc->perf_event && !pmc->is_paused)
-		counter += perf_event_read_value(pmc->perf_event,
-						 &enabled, &running);
-	pmc->counter += val - (counter & pmc_bitmask(pmc));
-
-which distills down to
-
-	counter = 0;
-	if (pmc->perf_event && !pmc->is_paused)
-		counter += perf_event_read_value(pmc->perf_event,
-						 &enabled, &running);
-	pmc->counter = val - (counter & pmc_bitmask(pmc));
-
-or more succinctly
-
-	if (pmc->perf_event && !pmc->is_paused)
-		val -= perf_event_read_value(pmc->perf_event, &enabled, &running);
-
-	pmc->counter = val;
-
-which is obviously wrong.  E.g. if the guest writes '0' to an active counter, the
-adjustment will cause pmc->counter to be loaded with a large (in unsigned terms)
-value, and thus quickly overflow after a write of '0'.
-
-I assume the intent it to purge any accumulated counts that occurred since the
-last read, but *before* the write, but then shouldn't this just be:
-
-	/* Purge any events that were acculumated before the write. */
-	if (pmc->perf_event && !pmc->is_paused)
-		(void)perf_event_read_value(pmc->perf_event, &enabled, &running);
-
-	pmc->counter = val & pmc_bitmask(pmc);
-
-Am I missing something?
-
-I'd like to get this sorted out before applying this patch, because I really want
-to document what on earth this new helper is doing.  Seeing a bizarre partial
-RMW operation in a helper with "set" as the verb is super weird.
