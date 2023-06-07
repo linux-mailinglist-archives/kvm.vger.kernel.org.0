@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82FD6726952
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 20:59:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75EF5726950
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 20:59:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232281AbjFGS7P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 14:59:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34540 "EHLO
+        id S231697AbjFGS7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 14:59:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231766AbjFGS7O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 14:59:14 -0400
-Received: from out-41.mta1.migadu.com (out-41.mta1.migadu.com [IPv6:2001:41d0:203:375::29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E5D01BEC
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 11:59:09 -0700 (PDT)
+        with ESMTP id S229580AbjFGS7L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 14:59:11 -0400
+Received: from out-7.mta0.migadu.com (out-7.mta0.migadu.com [91.218.175.7])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B801C1BF1
+        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 11:59:10 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1686164347;
+        t=1686164348;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Wzo9Zb54Peqok5A7q67D4Ki/JABbQcqy7ot1VdQjGro=;
-        b=icMMB5lQ29Gl1dqFe4YUANxtj76I3r1N4oYp/pgJUvs5D/jR/AOakc9glTKblCht42IHet
-        /t01CIWQ0bnmZ4AMNQUHZY6FWs3PFnmOdx1d90DwvAA2aZnLvR2HPQIS97p1WG03uTjTmv
-        mgm6NHLA2ZAYjlwuCsZ3Itty3gWHsn4=
+        bh=R2mcgVGU7qYfFK9K8YC8zHT3+BWJ0PSMo7hBgDcImhE=;
+        b=Ik8znPXcXHK6uVj4HvcnKJrCGaEylCpGijJYBnYQpYry7Gz/ZH/uRVSK/Vfi/jQBcS/lNv
+        smKTkTmPIBQ4/Dlm5ULPlPKW4g2DhyTfrZJrui2dgakzp/5bEpXjHrqntDQfDhEZUMjqvu
+        4uco64pHnw7lOmmEbjalcp+rT3slaNE=
 From:   Andrew Jones <andrew.jones@linux.dev>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
         Nikos Nikoleris <nikos.nikoleris@arm.com>
-Subject: [kvm-unit-tests PATCH 1/3] arch-run: Extend timeout when booting with UEFI
-Date:   Wed,  7 Jun 2023 20:59:03 +0200
-Message-Id: <20230607185905.32810-2-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH 2/3] arm/efi/run: Add Fedora's path to QEMU_EFI
+Date:   Wed,  7 Jun 2023 20:59:04 +0200
+Message-Id: <20230607185905.32810-3-andrew.jones@linux.dev>
 In-Reply-To: <20230607185905.32810-1-andrew.jones@linux.dev>
 References: <20230607185905.32810-1-andrew.jones@linux.dev>
 MIME-Version: 1.0
@@ -49,36 +49,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Booting UEFI can take a long time. Give the timeout some extra time
-to compensate for it.
+Try Fedora's default path too.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- scripts/arch-run.bash | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ arm/efi/run | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 51e4b97b27d1..72ce718b1170 100644
---- a/scripts/arch-run.bash
-+++ b/scripts/arch-run.bash
-@@ -94,7 +94,17 @@ run_qemu_status ()
+diff --git a/arm/efi/run b/arm/efi/run
+index c61da31183a7..f75ef157acf3 100755
+--- a/arm/efi/run
++++ b/arm/efi/run
+@@ -15,8 +15,14 @@ source config.mak
+ source scripts/arch-run.bash
+ source scripts/common.bash
  
- timeout_cmd ()
- {
-+	local s
++if [ -f /usr/share/qemu-efi-aarch64/QEMU_EFI.fd ]; then
++	DEFAULT_UEFI=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd
++elif [ -f /usr/share/edk2/aarch64/QEMU_EFI.silent.fd ]; then
++	DEFAULT_UEFI=/usr/share/edk2/aarch64/QEMU_EFI.silent.fd
++fi
 +
- 	if [ "$TIMEOUT" ] && [ "$TIMEOUT" != "0" ]; then
-+		if [ "$CONFIG_EFI" = 'y' ]; then
-+			s=${TIMEOUT: -1}
-+			if [ "$s" = 's' ]; then
-+				TIMEOUT=${TIMEOUT:0:-1}
-+				((TIMEOUT += 10)) # Add 10 seconds for booting UEFI
-+				TIMEOUT="${TIMEOUT}s"
-+			fi
-+		fi
- 		echo "timeout -k 1s --foreground $TIMEOUT"
- 	fi
- }
+ : "${EFI_SRC:=$(realpath "$(dirname "$0")/../")}"
+-: "${EFI_UEFI:=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd}"
++: "${EFI_UEFI:=$DEFAULT_UEFI}"
+ : "${EFI_TEST:=efi-tests}"
+ : "${EFI_CASE:=$(basename $1 .efi)}"
+ : "${EFI_VAR_GUID:=97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
+@@ -24,9 +30,8 @@ source scripts/common.bash
+ [ "$EFI_USE_ACPI" = "y" ] || EFI_USE_DTB=y
+ 
+ if [ ! -f "$EFI_UEFI" ]; then
+-	echo "UEFI firmware not found: $EFI_UEFI"
+-	echo "Please install the UEFI firmware to this path"
+-	echo "Or specify the correct path with the env variable EFI_UEFI"
++	echo "UEFI firmware not found."
++	echo "Please specify the path with the env variable EFI_UEFI"
+ 	exit 2
+ fi
+ 
 -- 
 2.40.1
 
