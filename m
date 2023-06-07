@@ -2,135 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E7287269FB
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 21:41:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 243BA726A0B
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 21:46:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231232AbjFGTlb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 15:41:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52838 "EHLO
+        id S231449AbjFGTqA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 15:46:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229991AbjFGTl3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 15:41:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0380F1FF7
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 12:40:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686166843;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xbU25VUQynMT3slsK2/nQ+8fSGgRHVMsd4tx/DGJLfQ=;
-        b=Kj0s+6dHW9CfuFXQAz8r3xm5TeAIJLNP5gNuvwJvaAaTqfZuABH/c7YszVOl9ykH0hcMML
-        YdL041P6B5jOIEGyS75G9XKj3VEqV3LEq/5VUQY1PBp8v6QnWPuXwuaihgi7G9DnXvUco/
-        92gd3bAsueT2UhbJpK0TcCCDqxEmOnw=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-339-txfuTHszOHmnWJu1prbUgA-1; Wed, 07 Jun 2023 15:40:39 -0400
-X-MC-Unique: txfuTHszOHmnWJu1prbUgA-1
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-33bbffccf69so13617395ab.3
-        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 12:40:39 -0700 (PDT)
+        with ESMTP id S231423AbjFGTp6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 15:45:58 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17DA61FF7
+        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 12:45:58 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-65a971d7337so711514b3a.1
+        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 12:45:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686167157; x=1688759157;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=aPgsero69xFwJck0QKcCtV9CkkDCHybrauN68WHLy4A=;
+        b=0A1Gsrces1skjswFsF50lVK2JnRk4tWOxR3MV+vcU6MJ2VWsqnwLTGQTi5DUD6N4Tm
+         AJqBBH8FlWGmBNje8EQDCdql8N3cksHKiTRBxIhvaymhDkRV8zNLBNn/G+nYmvsbgjnZ
+         STTQwiqz1grZqjk7XeQRIoJ9XdKxKpuVTPPtNCwpCQWABAytR+77MQ0Vg5vGq06osEQh
+         yqPq+QKph9ugRXDTZshpK9pQZscYfiSAPtLYluUenFItsEid0QoRfBEDAUKbjR0ORjGX
+         gxnSOzJ1nxT82tsjGK4RviJ/p8RCpLY8HZyW3jKypnYe4mWIITRS9pgrQfKMurJns8qv
+         b74w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686166839; x=1688758839;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+        d=1e100.net; s=20221208; t=1686167157; x=1688759157;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=xbU25VUQynMT3slsK2/nQ+8fSGgRHVMsd4tx/DGJLfQ=;
-        b=bMH7dyzKMOo1N9DQiGvmTTk2US0CKh43VF3haC+tnTFLD6UJabBNiekuWAA68bp1qk
-         B/31J3evAXTV8pWs+48Goc6b7RvtPthpSr4e0WTHFLzYJouTSb4N1CnGBag8LVMaxQw+
-         Y6abH+6mOlUZy/y7Wy+P5OKRHxLmtpiPQjBwEIkdHeqrSW7+WlP/7/4wPmsVRYO+1USs
-         Cjg5kDz7M8QEGAZmlYxBbSqCP0IKETajMPugCDThnXC7kj9t1wE/wWKI1a4Y6zAXLD6R
-         wF2Qqd5hT1+eNrem/IKmIVmGY6IEMrhzXgmuXJWPGPsGYeJoNbks54H+e4X1mmR646C4
-         suOQ==
-X-Gm-Message-State: AC+VfDwrb3Fuj5EYruMf0CzNJFjMaCVdpOf4Y5dBtjPUfUjTK00cFkOz
-        UT+fdM7p7dwH5kFKj0fx+l8EwSTeGV9wPj1v7wbMRDqNp4S6DMhwQS4Fg4b25J6NU+C8hcQ6sOu
-        7qRJwq6QdKeBb
-X-Received: by 2002:a92:cd09:0:b0:33a:efd3:add3 with SMTP id z9-20020a92cd09000000b0033aefd3add3mr9827693iln.14.1686166839106;
-        Wed, 07 Jun 2023 12:40:39 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ686iaUSEVIw2mng9KjfEMkG2q1AoxviyUpqCStb+u2fAzpVxvjPUUf6+ZQ/LNPk7il5eN1Zw==
-X-Received: by 2002:a92:cd09:0:b0:33a:efd3:add3 with SMTP id z9-20020a92cd09000000b0033aefd3add3mr9827681iln.14.1686166838890;
-        Wed, 07 Jun 2023 12:40:38 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id n12-20020a92d9cc000000b0032f240a0802sm3849063ilq.48.2023.06.07.12.40.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jun 2023 12:40:38 -0700 (PDT)
-Date:   Wed, 7 Jun 2023 13:40:37 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Sidhartha Kumar <sidhartha.kumar@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        khalid.aziz@oracle.com
-Subject: Re: [PATCH] vfio/iommu_type1: acquire iommu lock in
- vfio_iommu_type1_release()
-Message-ID: <20230607134037.6d81e288.alex.williamson@redhat.com>
-In-Reply-To: <20230607190752.216801-1-sidhartha.kumar@oracle.com>
-References: <20230607190752.216801-1-sidhartha.kumar@oracle.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        bh=aPgsero69xFwJck0QKcCtV9CkkDCHybrauN68WHLy4A=;
+        b=BT3LQlLE3OAjbEp7QKnwmikel81/yIGuCLMA9mzZ/Zmn/Krvhhvh3TZQB3FnX5Ry2H
+         dzFv3tt8UsoN2vaoLM69hqUgoYIWkQ/RFTsLUjiY6Kkoh4Sb4yFN6HnqR+ViTmUe3tQq
+         UY465ZTv8EEcSYwrzDOIqoH+ZH0zTzpfXBbe24lTnu7ld8DUaj96TDDnEbda5tS3szgp
+         ViccBE8/mQ9RBuuBv2WfKYaiwLVVaeCbj24rZt/GAwclWOb6VLVZhJvuP5TF5CM6/BQc
+         jstvUekA45elklTia/H5Wlik9CT37qti20wQfAk21OLFJr2q13jaCILHxhYCpdveuMq5
+         66DA==
+X-Gm-Message-State: AC+VfDyHkcdP2BJzKGuBBjXsAVBpgAyc5bMGSxHcuH+lNGzpelb6SekI
+        b3Jd4mqPVvm2yzKKXVtPcAFG7uwhZ43GIQaY9CtOoOEHsB2t8CDeSe+UAEL6Zl3yNKV47hOIzrz
+        PUsUwO/9AiOm76zPbHQu1xssAPXmSFJcLVOwXrR0yI/tpsCYK+ukVWmQJ0tFHu6Pxey4TVRA=
+X-Google-Smtp-Source: ACHHUZ6Jdfp4KijOKoJc8iKkNnAT7j0Cg3mZuagkHodcduTq2g3SvL98qNbl8Vxb4j+cbgqMwwZpEe1BEtzg62RjVg==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a05:6a00:2e0e:b0:64f:5406:d5a2 with
+ SMTP id fc14-20020a056a002e0e00b0064f5406d5a2mr25720pfb.0.1686167157264; Wed,
+ 07 Jun 2023 12:45:57 -0700 (PDT)
+Date:   Wed,  7 Jun 2023 19:45:50 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
+Message-ID: <20230607194554.87359-1-jingzhangos@google.com>
+Subject: [PATCH v4 0/4] Enable writable for idregs DFR0,PFR0, MMFR{0,1,2}
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
+Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>,
+        Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  7 Jun 2023 12:07:52 -0700
-Sidhartha Kumar <sidhartha.kumar@oracle.com> wrote:
 
-> From vfio_iommu_type1_release() there is a code path:
-> 
-> vfio_iommu_unmap_unpin_all()
->  vfio_remove_dma()
->     vfio_unmap_unpin()
->       unmap_unpin_slow()
->         vfio_unpin_pages_remote()
->           vfio_find_vpfn()
-> 
-> This path is taken without acquiring the iommu lock so it could lead to
-> a race condition in the traversal of the pfn_list rb tree.
+This patch series enable userspace writable for below idregs:
+ID_AA64DFR0_EL1, ID_DFR0_EL1, ID_AA64PFR0_EL1, ID_AA64MMFR{0, 1, 2}_EL1.
 
-What's the competing thread for the race, vfio_remove_dma() tests:
+It is based on below series [2] which add infrastructure for writable idregs.
 
-	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
+---
 
-The fix is not unreasonable, but is this a theoretical fix upstream
-that's tickled by some downstream additions, or are we actually
-competing against page pinning by an mdev driver after the container is
-released?  Thanks,
+* v3 -> v4
+  - Rebase on v11 of writable idregs series at [2].
 
-Alex
+* v2 -> v3
+  - Rebase on v6 of writable idregs series.
+  - Enable writable for ID_AA64PFR0_EL1 and ID_AA64MMFR{0, 1, 2}_EL1.
 
-> The lack of
-> the iommu lock in vfio_iommu_type1_release() was confirmed by adding a
-> 
-> WARN_ON(!mutex_is_locked(&iommu->lock))
-> 
-> which was reported in dmesg. Fix this potential race by adding a iommu
-> lock and release in vfio_iommu_type1_release().
-> 
-> Suggested-by: Khalid Aziz <khalid.aziz@oracle.com>
-> Signed-off-by: Sidhartha Kumar <sidhartha.kumar@oracle.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 306e6f1d1c70e..7d2fea1b483dc 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2601,7 +2601,9 @@ static void vfio_iommu_type1_release(void *iommu_data)
->  		kfree(group);
->  	}
->  
-> +	mutex_lock(&iommu->lock);
->  	vfio_iommu_unmap_unpin_all(iommu);
-> +	mutex_unlock(&iommu->lock);
->  
->  	list_for_each_entry_safe(domain, domain_tmp,
->  				 &iommu->domain_list, next) {
+* v1 -> v2
+  - Rebase on latest patch series [1] of enabling writable ID register.
+
+[1] https://lore.kernel.org/all/20230402183735.3011540-1-jingzhangos@google.com
+[2] https://lore.kernel.org/all/20230602005118.2899664-1-jingzhangos@google.com
+
+[v1] https://lore.kernel.org/all/20230326011950.405749-1-jingzhangos@google.com
+[v2] https://lore.kernel.org/all/20230403003723.3199828-1-jingzhangos@google.com
+[v3] https://lore.kernel.org/all/20230405172146.297208-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (4):
+  KVM: arm64: Enable writable for ID_AA64DFR0_EL1
+  KVM: arm64: Enable writable for ID_DFR0_EL1
+  KVM: arm64: Enable writable for ID_AA64PFR0_EL1
+  KVM: arm64: Enable writable for ID_AA64MMFR{0, 1, 2}_EL1
+
+ arch/arm64/kvm/sys_regs.c | 78 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 67 insertions(+), 11 deletions(-)
+
+
+base-commit: 01b532e41af091a48287dd45f763db4b887bcdfc
+-- 
+2.41.0.rc0.172.g3f132b7071-goog
 
