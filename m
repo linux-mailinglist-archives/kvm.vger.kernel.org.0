@@ -2,127 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AFDC9726724
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 19:23:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63EB672673A
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 19:25:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229729AbjFGRXU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 13:23:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56462 "EHLO
+        id S231264AbjFGRZr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 13:25:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229815AbjFGRXS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 13:23:18 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 046FB1FE2;
-        Wed,  7 Jun 2023 10:23:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686158597; x=1717694597;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Raa3CMHXB9WrqI2ttWxq6HepaOwkLt4ZQ6ht8uAn8rU=;
-  b=Y/YRCTzzSaibOYubarB712k5lHTjLWI2EE9u48xy19vuZEhC05UPVUw1
-   KAE+O9wTFl4L5mFenAN4zsIUITwh+ee090u8NFcTKiu6t6M3vesZ4VUPe
-   PrtERSUS6MRnB9BMiRqilP2HsKuvBumTXQ66XfSDzXWB2i2V0nwqXmdKD
-   qXzm8CLPJb0iCKlr5i7DOJkiwlZHc6CxlpVmW9s1Wf+TsunSR80TasFd5
-   oKDVenKeUhx6D3TgH4m7STlpDRclNPDTwm0Bp1oHeN7J0rNCf6enhdZvR
-   LvHXwJxyx5/b/mjzTR0FKuFmxfxu7qZ56K5Q4t5KKe0Q5yNCXNTxcx6JA
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10734"; a="359524236"
-X-IronPort-AV: E=Sophos;i="6.00,224,1681196400"; 
-   d="scan'208";a="359524236"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2023 10:23:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10734"; a="956378738"
-X-IronPort-AV: E=Sophos;i="6.00,224,1681196400"; 
-   d="scan'208";a="956378738"
-Received: from jli128-mobl1.ccr.corp.intel.com (HELO localhost) ([10.254.211.124])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2023 10:23:13 -0700
-Date:   Thu, 8 Jun 2023 01:23:11 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH 1/3] KVM: VMX: Retry APIC-access page reload if
- invalidation is in-progress
-Message-ID: <20230607172243.c2bkw43hcet4sfnb@linux.intel.com>
-References: <20230602011518.787006-1-seanjc@google.com>
- <20230602011518.787006-2-seanjc@google.com>
- <20230607073728.vggwcoylibj3cp6s@linux.intel.com>
- <ZICUbIF2+Cvbb9GM@google.com>
+        with ESMTP id S231745AbjFGRZf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 13:25:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 557562113
+        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 10:24:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686158664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Qwwhpcf8WOTXyKUHwJfhM5kOdULMbQnXHWx83ndVdoU=;
+        b=diHwT/g1z5iW236eB6Zm3sPbn2uGJDm/06hFSN9cVuxdPVfSbnQ8SM2j5FVkx1wHxOuDBa
+        Vg6oYbl9JXKOiS0g7dk/d344z+hMRspEZpfP7YZ8zFOMyU5zyLmj2qARwl0W+8tvwWrZFV
+        SAfslN8zgTr/45E/7lk99dZPjlVrlEM=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-275-TY_ki6t9O6OVaCJqTC5O-A-1; Wed, 07 Jun 2023 13:24:22 -0400
+X-MC-Unique: TY_ki6t9O6OVaCJqTC5O-A-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-766655c2cc7so581167339f.3
+        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 10:24:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686158661; x=1688750661;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Qwwhpcf8WOTXyKUHwJfhM5kOdULMbQnXHWx83ndVdoU=;
+        b=OW44VcjGBRLSCZDoBIU9bXKD9aJeto3obofeauxQ7S38QFkJL9sfrG6fSVGXKnvqoo
+         dKRKrBj/dYNHlrvGhzjy5772SkBSGHAl3jrGNECZJWCtxd3c69oB8E91GkA3XTGD6vlP
+         VJl8uWOGnTchHIdvcwAAGsjx40qUjRCVml9euOJ8AYGQTQvdmzfLl2KMDemhxG/Hy2Cm
+         Nowxjv1YEmkpMcGAt4AVbJ2d1vizEqVgeUO2Rfyf6ebQT8olr0ymnmSvjiZQOaYMWtfa
+         o4wUqZiTqojq6RV7g9+C7/rBbq++a76SEVrcDaJJYBdMC00ofPk0kL3YyXH8C2b3GLki
+         qM+w==
+X-Gm-Message-State: AC+VfDz6QhiMXyiVeMbz54bY3en/bl7MWIDUsTt2wJQLLvtXusHSDLRW
+        F4mOL9AVfDnoCKwPCcCMW9GT4zQMYTIsso8GVe++QGu41OuU4n5gH/oLKTi2P/RYLmHL58yEXHL
+        QKPHUjpHozQ2a
+X-Received: by 2002:a5e:8715:0:b0:76f:48f2:49bf with SMTP id y21-20020a5e8715000000b0076f48f249bfmr8608482ioj.0.1686158661430;
+        Wed, 07 Jun 2023 10:24:21 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6a3SiSGyuXsN8qtkoudjyhRcTCn4o6nMXrgKH8Kja0SEzHb7LtW/Y6touaelnbxa2nclGuJw==
+X-Received: by 2002:a5e:8715:0:b0:76f:48f2:49bf with SMTP id y21-20020a5e8715000000b0076f48f249bfmr8608471ioj.0.1686158661197;
+        Wed, 07 Jun 2023 10:24:21 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id a17-20020a5d9ed1000000b0077024f8772esm3884637ioe.51.2023.06.07.10.24.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jun 2023 10:24:20 -0700 (PDT)
+Date:   Wed, 7 Jun 2023 11:24:17 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     kvm@vger.kernel.org, clg@redhat.com, liulongfang@huawei.com,
+        shameerali.kolothum.thodi@huawei.com, yishaih@nvidia.com,
+        kevin.tian@intel.com
+Subject: Re: [PATCH 1/3] vfio/pci: Cleanup Kconfig
+Message-ID: <20230607112417.1139a954.alex.williamson@redhat.com>
+In-Reply-To: <ZH/A7X45jJprLEHx@nvidia.com>
+References: <20230602213315.2521442-1-alex.williamson@redhat.com>
+        <20230602213315.2521442-2-alex.williamson@redhat.com>
+        <ZH4U6ElPSC3wIp1E@nvidia.com>
+        <20230605132518.2d536373.alex.williamson@redhat.com>
+        <ZH9BvcgHvX7HFBAa@nvidia.com>
+        <20230606155704.037a1f60.alex.williamson@redhat.com>
+        <ZH/A7X45jJprLEHx@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZICUbIF2+Cvbb9GM@google.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Pending requests block KVM from actually entering the guest.  If a request comes
-> in after vcpu_enter_guest()'s initial handling of requests, KVM will bail before
-> VM-Enter and go back through the entire "outer" run loop.
+On Tue, 6 Jun 2023 20:27:41 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Tue, Jun 06, 2023 at 03:57:04PM -0600, Alex Williamson wrote:
+> > > Not really, maybe it creates a sysfs class, but it certainly doesn't
+> > > do anything useful unless there is a vfio driver also selected.  
+> > 
+> > Sorry, I wasn't referring to vfio "core" here, I was thinking more
+> > along the lines of when we include the PCI or IOMMU subsystem there's
+> > a degree of base functionality included there regardless of what
+> > additional options or drivers are selected.    
 > 
-> This isn't necessarily the most efficient way to handle the stall, e.g. KVM does
-> a fair bit of prep for VM-Enter before detecting the pending request.  The
-> alternative would be to have kvm_vcpu_reload_apic_access_page() return value
-> instructing vcpu_enter_guest() whether to bail immediately or continue on.  I
-> elected for the re-request approach because (a) it didn't require redefining the
-> kvm_x86_ops vendor hook, (b) this should be a rare situation and not performance
-> critical overall, and (c) there's no guarantee that bailing immediately would
-> actually yield better performance from the guest's perspective, e.g. if there are
-> other pending requests/work, then the KVM can handle those items while the vCPU
-> is stalled instead of waiting until the invalidation completes to proceed.
+> Lots of other cases are just like VFIO where it is the subsystem core
+> that really doesn't do anything. Look at tpm, infiniband, drm, etc
+
+This is getting a bit absurd, the build system should not be building
+modules that have no users.  Maybe it's not a high enough priority to go
+to excessive lengths to prevent it, but I don't see that we're doing
+that here.
+ 
+> > The current state is that we cannot build vfio-pci-core.ko without
+> > vfio-pci.ko, so there's always an in-kernel user.    
 > 
+> I think I might have done that, and it wasn't done for that reason.. I
+> just messed it up and didn't follow the normal pattern - and this
+> caused these troubles with the wrong/missing depends/selects.
 
-Wah! Thank you so much! Especially for the code snippets below! :)
+I didn't assume this was intentional, but the result of requiring a
+built user of vfio-pci-core is not entirely bad.
 
-> > One more dumb question - why does KVM not just pin the APIC access page?
-> 
-> Definitely not a dumb question, I asked myself the same thing multiple times when
-> looking at this :-)  Pinning the page would be easier, and KVM actually did that
-> in the original implementation.  The issue is in how KVM allocates the backing
-> page.  It's not a traditional kernel allocation, but is instead anonymous memory
-> allocated by way of vm_mmap(), i.e. for all intents and purposes it's a user
-> allocation.  That means the kernel expects it to be a regular movable page, e.g.
-> it's entirely possible the page (if it were pinned) could be the only page in a
-> 2MiB chunk preventing the kernel from migrating/compacting and creating a hugepage.
-> 
-> In hindsight, I'm not entirely convinced that unpinning the page was the right
-> choice, as it resulted in a handful of nasty bugs.  But, now that we've fixed all
-> those bugs (knock wood), there's no good argument for undoing all of that work.
-> Because while the code is subtle and requires hooks in a few paths, it's not *that*
-> complex and for the most part doesn't require active maintenance.
-> 
+> I view following the usual pattern as more valuable than a one off fix
+> for what is really a systemic issue in kconfig. Which is why I made
+> the patch to align with how CONFIG_VFIO works :)
 
-Thanks again! One more thing that bothers me when reading the mmu notifier,
-is about the TLB flush request. After the APIC access page is reloaded, the
-TLB will be flushed (a single-context EPT invalidation on not-so-outdated
-CPUs) in vmx_set_apic_access_page_addr(). But the mmu notifier will send the
-KVM_REQ_TLB_FLUSH as well, by kvm_mmu_notifier_invalidate_range_start() ->
-__kvm_handle_hva_range(), therefore causing the vCPU to trigger another TLB
-flush - normally a global EPT invalidation I guess.
+Is using a menu and having drivers select the config option for the
+core module they depend on really that unusual?  This all seems like
+Kconfig 101.
 
-But, is this necessary?
+Perhaps we should be more sensitive to this in vfio than other parts of
+the kernel exactly because we're providing a userspace driver
+interface.  We should disable as much as we can of that interface when
+there are no in-kernel users of it.
 
-Could we try to return false in kvm_unmap_gfn_range() to indicate no more
-flush is needed, if the range to be unmapped falls within guest APIC base,
-and leaving the TLB invalidation work to vmx_set_apic_access_page_addr()?
+I'm failing to see how "this is the way we do things" makes it correct
+when we can trivially eliminate the possibility of building this
+particular shared module when it has no users.  Thanks,
 
-But there are multiple places in vmx_set_apic_access_page_addr() to return
-earlier(e.g., if xapic mode is disabled for this vCPU) with no TLB flush being
-triggered, I am not sure if doing so would cause more problems... Any comment?
-Thanks!
-
-B.R.
-Yu
+Alex
 
