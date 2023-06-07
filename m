@@ -2,360 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F030725785
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 10:26:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 056CC7257A0
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 10:28:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239287AbjFGI0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 04:26:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36202 "EHLO
+        id S239520AbjFGI2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 04:28:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239263AbjFGI0p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 04:26:45 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C75A95;
-        Wed,  7 Jun 2023 01:26:43 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id 5614622812f47-39a3f165ac5so6158812b6e.3;
-        Wed, 07 Jun 2023 01:26:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686126403; x=1688718403;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q0OyKL8u76cOWS8rMkXzpr40joVTVvs+ER4J7F7RIUc=;
-        b=gx1AjEIRVKwC+e/wYi+5OJVPxwD24AqcSgDNzNjEGmxN9LybTFcLwReCPofBu/oU27
-         TPsIqdI18Y4gzDn/PamlyLMVjXB/SlBoYCZ3e012AKFP3ibEDLJ3GBZLHPmiYmZlIqwA
-         MOZtje7230z9BYI3KPM1WQP+xH4cQkApMzFMGPc8vL0LzuPup1PRUxK90PD6usWANsz0
-         5Eb9fFwRPl01u+1z/6IOKHu2eBgaZBk8XDosHmv/3dxCU05kZLyc/0CwtW61Fx3Xf1F9
-         76eRKSm3Vc27Ryz+mfY71QPAYWkwiYyGjg65YH89dYjA23NMGzNhLjCj7TKZ+e7HlO9R
-         /KQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686126403; x=1688718403;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=q0OyKL8u76cOWS8rMkXzpr40joVTVvs+ER4J7F7RIUc=;
-        b=Phn77kdlkCCbGI7fZwWLn9AAPpiGM6xQIqJLR6HjM2T+j+vYO19edJDDA7lYk2cIgC
-         c9mr/0QNP4hoZtOtN8yD3QpiLEK0ygGvychSw+Yb7JyL8Qg/UzVyLfUMFlbn6cTmSPyG
-         a9IcBFEiN/z23+Egou0UQIJD3ynBS8acOtYYVDIhlKpGdtXF0R/ukDgVu9cAoMJ/R6WL
-         5anbz00tU8BnjSqesmiR+3ySdgvJ4wMMvk+GZg+Dh8vgMy+EFLi1ig59uzEwb4LK0+tK
-         +/HPCyx0auiLHu2Y9lbA6N8AJLxuNceCNsJ0hs0XgB7CMAu5ezMUFqGz+fcrS0RvStdz
-         nr9g==
-X-Gm-Message-State: AC+VfDwIkfhQ7QWt3ZNv6mCzRC2bA7VssdwyjNEwnixLK47fBJ5Ci5G+
-        sOfIA4W7UcZvXrS2IBkmdcs=
-X-Google-Smtp-Source: ACHHUZ52S9FmYHylCGUBDHU6A/rnvTKpdnJxmZbNyuim1YSbqrzR0jOjQly/hHUgV49Csb4p+rh46A==
-X-Received: by 2002:a54:418f:0:b0:398:57ac:23fe with SMTP id 15-20020a54418f000000b0039857ac23femr4810602oiy.10.1686126402630;
-        Wed, 07 Jun 2023 01:26:42 -0700 (PDT)
-Received: from localhost (58-6-224-112.tpgi.com.au. [58.6.224.112])
-        by smtp.gmail.com with ESMTPSA id z3-20020a170903018300b001b1a2bf5277sm9843062plg.39.2023.06.07.01.26.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jun 2023 01:26:41 -0700 (PDT)
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Wed, 07 Jun 2023 18:26:35 +1000
-Message-Id: <CT69X8Q3NVVO.GXEUNFGVDL08@wheely>
-Subject: Re: [RFC PATCH v2 4/6] KVM: PPC: Add helper library for Guest State
- Buffers
-From:   "Nicholas Piggin" <npiggin@gmail.com>
-To:     "Jordan Niethe" <jpn@linux.vnet.ibm.com>,
-        <linuxppc-dev@lists.ozlabs.org>
-Cc:     <kvm@vger.kernel.org>, <kvm-ppc@vger.kernel.org>,
-        <mikey@neuling.org>, <paulus@ozlabs.org>,
-        <kautuk.consul.1980@gmail.com>, <vaibhav@linux.ibm.com>,
-        <sbhat@linux.ibm.com>
-X-Mailer: aerc 0.14.0
-References: <20230605064848.12319-1-jpn@linux.vnet.ibm.com>
- <20230605064848.12319-5-jpn@linux.vnet.ibm.com>
-In-Reply-To: <20230605064848.12319-5-jpn@linux.vnet.ibm.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S238263AbjFGI2H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 04:28:07 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2063.outbound.protection.outlook.com [40.107.93.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D0FEE49;
+        Wed,  7 Jun 2023 01:28:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YZ0fLDNjPGKQkwbSxdOfXR3JAmgr3NQsB0SVHhLS6gkcvk8mSi8DIVqJMDdn0zoHzZ6m1buH8Xopv7Bp59nQW4Eavw95GdTUwWe/kQTNcwTL5H6Dn2PRk609856MSn8uhqrfpQ7nt0UtvJKIHsrkj6D4iLPUtSMr+yn+y7//8ONOwyP8mKcf8zBuUPwiBtR/ZaGY27s9NyqbBxy0HQ+VVIYQaB7Gs72RKYBKE4BdrAKK5kncU4NGxmJpu1WBRnvACL4clGhIkXFETnsiXEYlo1dzlkQv0C96Eiovi/9MMr15SBYq3GMLVKxfPntSkSGB3s4jqp0x978MpDsyNDF2Xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CaYIxssfxfHh2QEB13/cmS5a8wYMWFbsQoAgjU1O6Xw=;
+ b=dYvSamxhE3Lo/A9X4k+P5HW8ZmlERBZuRAhwHtZPC5Gcui9FroAYupxth4UAEAlPt1NUHfEZMEiFkrtbE0VxwCFrVwYY+CYTVNOerbG7T6ryx6EWIttYQdjqQupyAMtUoxRywfbLguYdA7A2C40+hRZz2VIRF6rs9d7YAOLjWY1+tCiMeDBTwc0uCu9t+Q39oZ4yGRVF++ueYxrcXl3QtrhvZcHEhh5LbYYtyikYkh6Bh+LF1i1qIKuZv9w9XQX9tUMMsy5nF4nqLLA3McbCzxdxuflLFbAeqSPM3KawrXQehu2wSS9TJDji/QwmhJEVYzOnM5FpIgCY/cdYJMtmVQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CaYIxssfxfHh2QEB13/cmS5a8wYMWFbsQoAgjU1O6Xw=;
+ b=ed3hzXy0O0dExY5ia3y2rBZTeV50yp0eCjs4/+gvI5K/Z8aaQ5YEpf/TJJ/wFjsu8+Zuo886atIGQ92fM8SStKxYAQDYdR7WQE3l1yolW97LNab0HPb6QkA28G0nJxfI/VFw296PRAALjQ9kzTEQPF4w8Kd8Yf0RpQGhfCck4kS2IKEQ6keXXIuDEg2d/UMssdoqEDUvoKGjWP9DgvHEECkwc/AS5AJUZriXt7NxmSH27nYRmKb15xd0iGaUihTXZB6BM0Alc+TvdOJL7UolZP3aWcn1m7dT5XMg/iDHIInwalvzzurvZNfp/+4HRrMpg4dtHLRzWKLlD2cKZvqgZQ==
+Received: from BN9PR03CA0367.namprd03.prod.outlook.com (2603:10b6:408:f7::12)
+ by SN7PR12MB7418.namprd12.prod.outlook.com (2603:10b6:806:2a5::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33; Wed, 7 Jun
+ 2023 08:28:02 +0000
+Received: from BN8NAM11FT029.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:f7:cafe::5b) by BN9PR03CA0367.outlook.office365.com
+ (2603:10b6:408:f7::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33 via Frontend
+ Transport; Wed, 7 Jun 2023 08:28:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN8NAM11FT029.mail.protection.outlook.com (10.13.177.68) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6477.22 via Frontend Transport; Wed, 7 Jun 2023 08:28:01 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 7 Jun 2023
+ 01:27:48 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 7 Jun 2023
+ 01:27:47 -0700
+Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Wed, 7 Jun 2023 01:27:46 -0700
+Date:   Wed, 7 Jun 2023 01:27:45 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+CC:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+        <kevin.tian@intel.com>, <joro@8bytes.org>, <robin.murphy@arm.com>,
+        <cohuck@redhat.com>, <eric.auger@redhat.com>,
+        <kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+        <chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
+        <peterx@redhat.com>, <jasowang@redhat.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
+        <suravee.suthikulpanit@amd.com>,
+        <intel-gvt-dev@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>, <linux-s390@vger.kernel.org>,
+        <xudong.hao@intel.com>, <yan.y.zhao@intel.com>,
+        <terrence.xu@intel.com>, <yanting.jiang@intel.com>,
+        <zhenzhong.duan@intel.com>, <clegoate@redhat.com>
+Subject: Re: [PATCH v12 00/24] Add vfio_device cdev for iommufd support
+Message-ID: <ZIA/gV2w4btZCJir@Asurada-Nvidia>
+References: <20230602121653.80017-1-yi.l.liu@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230602121653.80017-1-yi.l.liu@intel.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT029:EE_|SN7PR12MB7418:EE_
+X-MS-Office365-Filtering-Correlation-Id: dd3f35dc-6b6f-4b11-8a78-08db67311bc9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6pmS8SbD21czLk8r9tb/CQ0V92oKG3HMAR2bthdijXvicetKMJoZM4Q5gDNvSdQmwIJiQw0WahK/lQ1fXXKJgSXeTO/VU/6w3BmJQo2gbflyF8/xBrdufyu8CqT7Yc0jLH5HhSKRIXaIJdOo0KzfVh29+/wfB0uf4fyLZkWfUsjYOyD04OYM9Y43h9tSA9exD0ipNMjC9XJZz9P+Nlx4DNRM+i+J3I+t8cbw7GzVJH/ZNVa0ofJbx+kYdjRT5ccB9hFKmpO9HbjR+aa9s5cUnMhWgRWR8pForsVmoaHegm5KC5vn7+debwHwQA5OWXl3LuWqEdGh+CyVTBFvFA/aDgHiofzSybLffQUyaoX0uZK4kSFAsg6IsVdGgLcLsE3gshwo9lgzofF5CJVuXIAyR3vGSJz00APTAx/qne4cdIuqrrjI6DCuklPrd66CEAgdRxUEDxVzLVLT+JytdqoJlxThtiEkWnwJ43IEMpFBvTrDuPaUX6wFxQ9jKcDpzUyRvJbKgmCfV/m1eC1k/a3tR7zZSu2YUR9wiTqq0HJg4U/j5SQFNffjejtixyTOGv2CqzjTJk5B9uBd7EYysmbfdz07BWMw1iJJitr0S2H1BbqxGn/R+YlRZQhTyYXsV8F2TbeUXHAskxK8d9ZUpxxYhs4qiprnizi1o1DmPv6eodR9r78ZuMk29Ukb4iAwtMnpXAaIJGzdHiPmBDmuYnm/jloNM0BFrSCYcUpplV0LoyyiCI1R+gWefM+4SjagcqT5BX8Q/mxP706MyoDrUg2AUt1Pdtdkv6UhvS0gA9fH3Bc2MVfdRNJz+03qs3QO8T9z
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(136003)(39860400002)(376002)(396003)(346002)(451199021)(36840700001)(40470700004)(46966006)(83380400001)(2906002)(40460700003)(47076005)(336012)(426003)(82310400005)(86362001)(33716001)(7636003)(356005)(82740400003)(36860700001)(40480700001)(55016003)(966005)(316002)(5660300002)(41300700001)(8676002)(8936002)(4326008)(54906003)(478600001)(70206006)(70586007)(6916009)(9686003)(26005)(186003)(7416002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jun 2023 08:28:01.8277
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd3f35dc-6b6f-4b11-8a78-08db67311bc9
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT029.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7418
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon Jun 5, 2023 at 4:48 PM AEST, Jordan Niethe wrote:
-> The new PAPR nested guest API introduces the concept of a Guest State
-> Buffer for communication about L2 guests between L1 and L0 hosts.
->
-> In the new API, the L0 manages the L2 on behalf of the L1. This means
-> that if the L1 needs to change L2 state (e.g. GPRs, SPRs, partition
-> table...), it must request the L0 perform the modification. If the
-> nested host needs to read L2 state likewise this request must
-> go through the L0.
->
-> The Guest State Buffer is a Type-Length-Value style data format defined
-> in the PAPR which assigns all relevant partition state a unique
-> identity. Unlike a typical TLV format the length is redundant as the
-> length of each identity is fixed but is included for checking
-> correctness.
->
-> A guest state buffer consists of an element count followed by a stream
-> of elements, where elements are composed of an ID number, data length,
-> then the data:
->
->   Header:
->
->    <---4 bytes--->
->   +----------------+-----
->   | Element Count  | Elements...
->   +----------------+-----
->
->   Element:
->
->    <----2 bytes---> <-2 bytes-> <-Length bytes->
->   +----------------+-----------+----------------+
->   | Guest State ID |  Length   |      Data      |
->   +----------------+-----------+----------------+
->
-> Guest State IDs have other attributes defined in the PAPR such as
-> whether they are per thread or per guest, or read-only.
->
-> Introduce a library for using guest state buffers. This includes support
-> for actions such as creating buffers, adding elements to buffers,
-> reading the value of elements and parsing buffers. This will be used
-> later by the PAPR nested guest support.
+On Fri, Jun 02, 2023 at 05:16:29AM -0700, Yi Liu wrote:
 
-This is a tour de force in one of these things, so I hate to be
-the "me smash with club" guy, but what if you allocated buffers
-with enough room for all the state (or 99% of cases, in which
-case an overflow would make an hcall)?
+> Existing VFIO provides group-centric user APIs for userspace. Userspace
+> opens the /dev/vfio/$group_id first before getting device fd and hence
+> getting access to device. This is not the desired model for iommufd. Per
+> the conclusion of community discussion[1], iommufd provides device-centric
+> kAPIs and requires its consumer (like VFIO) to be device-centric user
+> APIs. Such user APIs are used to associate device with iommufd and also
+> the I/O address spaces managed by the iommufd.
+> 
+> This series first introduces a per device file structure to be prepared
+> for further enhancement and refactors the kvm-vfio code to be prepared
+> for accepting device file from userspace. After this, adds a mechanism for
+> blocking device access before iommufd bind. Then refactors the vfio to be
+> able to handle cdev path (e.g. iommufd binding, no-iommufd, [de]attach ioas).
+> This refactor includes making the device_open exclusive between the group
+> and the cdev path, only allow single device open in cdev path; vfio-iommufd
+> code is also refactored to support cdev. e.g. split the vfio_iommufd_bind()
+> into two steps. Eventually, adds the cdev support for vfio device and the
+> new ioctls, then makes group infrastructure optional as it is not needed
+> when vfio device cdev is compiled.
+> 
+> This series is based on some preparation works done to vfio emulated devices[2]
+> and vfio pci hot reset enhancements[3].
+> 
+> This series is a prerequisite for iommu nesting for vfio device[4] [5].
+> 
+> The complete code can be found in below branch, simple tests done to the
+> legacy group path and the cdev path. Draft QEMU branch can be found at[6]
+> However, the noiommu mode test is only done with some hacks in kernel and
+> qemu to check if qemu can boot with noiommu devices.
+> 
+> https://github.com/yiliu1765/iommufd/tree/vfio_device_cdev_v12
+> (config CONFIG_IOMMUFD=y CONFIG_VFIO_DEVICE_CDEV=y)
+ 
+Rebased our nesting branch, and tested with an updated QEMU
+branch on ARM64 (SMMUv3):
+https://github.com/nicolinc/iommufd/commits/wip/iommufd_nesting-06052023-cdev-v12-nic
+https://github.com/nicolinc/qemu/commits/wip/iommufd_nesting-06062023
 
-What's actually a fast-path that we don't get from the interrupt
-return buffer? Getting and setting a few regs for MMIO emulation?
+Tested-by: Nicolin Chen <nicolinc@nvidia.com>
 
-
-> Signed-off-by: Jordan Niethe <jpn@linux.vnet.ibm.com>
-> ---
-> v2:
->   - Add missing #ifdef CONFIG_VSXs
->   - Move files from lib/ to kvm/
->   - Guard compilation on CONFIG_KVM_BOOK3S_HV_POSSIBLE
->   - Use kunit for guest state buffer tests
->   - Add configuration option for the tests
->   - Use macros for contiguous id ranges like GPRs
->   - Add some missing EXPORTs to functions
->   - HEIR element is a double word not a word
-> ---
->  arch/powerpc/Kconfig.debug                    |  12 +
->  arch/powerpc/include/asm/guest-state-buffer.h | 901 ++++++++++++++++++
->  arch/powerpc/include/asm/kvm_book3s.h         |   2 +
->  arch/powerpc/kvm/Makefile                     |   3 +
->  arch/powerpc/kvm/guest-state-buffer.c         | 563 +++++++++++
->  arch/powerpc/kvm/test-guest-state-buffer.c    | 321 +++++++
->  6 files changed, 1802 insertions(+)
->  create mode 100644 arch/powerpc/include/asm/guest-state-buffer.h
->  create mode 100644 arch/powerpc/kvm/guest-state-buffer.c
->  create mode 100644 arch/powerpc/kvm/test-guest-state-buffer.c
->
-> diff --git a/arch/powerpc/Kconfig.debug b/arch/powerpc/Kconfig.debug
-> index 6aaf8dc60610..ed830a714720 100644
-> --- a/arch/powerpc/Kconfig.debug
-> +++ b/arch/powerpc/Kconfig.debug
-> @@ -82,6 +82,18 @@ config MSI_BITMAP_SELFTEST
->  	bool "Run self-tests of the MSI bitmap code"
->  	depends on DEBUG_KERNEL
-> =20
-> +config GUEST_STATE_BUFFER_TEST
-> +	def_tristate n
-> +	prompt "Enable Guest State Buffer unit tests"
-> +	depends on KUNIT
-> +	depends on KVM_BOOK3S_HV_POSSIBLE
-> +	default KUNIT_ALL_TESTS
-> +	help
-> +	  The Guest State Buffer is a data format specified in the PAPR.
-> +	  It is by hcalls to communicate the state of L2 guests between
-> +	  the L1 and L0 hypervisors. Enable unit tests for the library
-> +	  used to create and use guest state buffers.
-> +
->  config PPC_IRQ_SOFT_MASK_DEBUG
->  	bool "Include extra checks for powerpc irq soft masking"
->  	depends on PPC64
-> diff --git a/arch/powerpc/include/asm/guest-state-buffer.h b/arch/powerpc=
-/include/asm/guest-state-buffer.h
-> new file mode 100644
-> index 000000000000..65a840abf1bb
-> --- /dev/null
-> +++ b/arch/powerpc/include/asm/guest-state-buffer.h
-> @@ -0,0 +1,901 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Interface based on include/net/netlink.h
-> + */
-> +#ifndef _ASM_POWERPC_GUEST_STATE_BUFFER_H
-> +#define _ASM_POWERPC_GUEST_STATE_BUFFER_H
-> +
-> +#include <linux/gfp.h>
-> +#include <linux/bitmap.h>
-> +#include <asm/plpar_wrappers.h>
-> +
-> +/***********************************************************************=
-***
-> + * Guest State Buffer Constants
-> + ***********************************************************************=
-***/
-> +#define GSID_BLANK			0x0000
-
-The namespaces are a little abbreviated. KVM_PAPR_ might be nice if
-you're calling the API that.
-
-> +
-> +#define GSID_HOST_STATE_SIZE		0x0001 /* Size of Hypervisor Internal Form=
-at VCPU state */
-> +#define GSID_RUN_OUTPUT_MIN_SIZE	0x0002 /* Minimum size of the Run VCPU =
-output buffer */
-> +#define GSID_LOGICAL_PVR		0x0003 /* Logical PVR */
-> +#define GSID_TB_OFFSET			0x0004 /* Timebase Offset */
-> +#define GSID_PARTITION_TABLE		0x0005 /* Partition Scoped Page Table */
-> +#define GSID_PROCESS_TABLE		0x0006 /* Process Table */
-
-> +
-> +#define GSID_RUN_INPUT			0x0C00 /* Run VCPU Input Buffer */
-> +#define GSID_RUN_OUTPUT			0x0C01 /* Run VCPU Out Buffer */
-> +#define GSID_VPA			0x0C02 /* HRA to Guest VCPU VPA */
-> +
-> +#define GSID_GPR(x)			(0x1000 + (x))
-> +#define GSID_HDEC_EXPIRY_TB		0x1020
-> +#define GSID_NIA			0x1021
-> +#define GSID_MSR			0x1022
-> +#define GSID_LR				0x1023
-> +#define GSID_XER			0x1024
-> +#define GSID_CTR			0x1025
-> +#define GSID_CFAR			0x1026
-> +#define GSID_SRR0			0x1027
-> +#define GSID_SRR1			0x1028
-> +#define GSID_DAR			0x1029
-
-It's a shame you have to rip up all your wrapper functions now to
-shoehorn these in.
-
-If you included names analogous to the reg field names in the kvm
-structures, the wrappers could do macro expansions that get them.
-
-#define __GSID_WRAPPER_dar		GSID_DAR
-
-Or similar.
-
-And since of course you have to explicitly enumerate all these, I
-wouldn't mind defining the types and lengths up-front rather than
-down in the type function. You'd like to be able to go through the
-spec and eyeball type, number, size.
-
-[snip]
-
-> +/**
-> + * gsb_paddress() - the physical address of buffer
-> + * @gsb: guest state buffer
-> + *
-> + * Returns the physical address of the buffer.
-> + */
-> +static inline u64 gsb_paddress(struct gs_buff *gsb)
-> +{
-> +	return __pa(gsb_header(gsb));
-> +}
-
-> +/**
-> + * __gse_put_reg() - add a register type guest state element to a buffer
-> + * @gsb: guest state buffer to add element to
-> + * @iden: guest state ID
-> + * @val: host endian value
-> + *
-> + * Adds a register type guest state element. Uses the guest state ID for
-> + * determining the length of the guest element. If the guest state ID ha=
-s
-> + * bits that can not be set they will be cleared.
-> + */
-> +static inline int __gse_put_reg(struct gs_buff *gsb, u16 iden, u64 val)
-> +{
-> +	val &=3D gsid_mask(iden);
-> +	if (gsid_size(iden) =3D=3D sizeof(u64))
-> +		return gse_put_u64(gsb, iden, val);
-> +
-> +	if (gsid_size(iden) =3D=3D sizeof(u32)) {
-> +		u32 tmp;
-> +
-> +		tmp =3D (u32)val;
-> +		if (tmp !=3D val)
-> +			return -EINVAL;
-> +
-> +		return gse_put_u32(gsb, iden, tmp);
-> +	}
-> +	return -EINVAL;
-> +}
-
-There is a clever accessor that derives the length from the type, but
-then you fall back to this.
-
-> +/**
-> + * gse_put - add a guest state element to a buffer
-> + * @gsb: guest state buffer to add to
-> + * @iden: guest state identity
-> + * @v: generic value
-> + */
-> +#define gse_put(gsb, iden, v)					\
-> +	(_Generic((v),						\
-> +		  u64 : __gse_put_reg,				\
-> +		  long unsigned int : __gse_put_reg,		\
-> +		  u32 : __gse_put_reg,				\
-> +		  struct gs_buff_info : gse_put_buff_info,	\
-> +		  struct gs_proc_table : gse_put_proc_table,	\
-> +		  struct gs_part_table : gse_put_part_table,	\
-> +		  vector128 : gse_put_vector128)(gsb, iden, v))
-> +
-> +/**
-> + * gse_get - return the data of a guest state element
-> + * @gsb: guest state element to add to
-> + * @v: generic value pointer to return in
-> + */
-> +#define gse_get(gse, v)						\
-> +	(*v =3D (_Generic((v),					\
-> +			u64 * : __gse_get_reg,			\
-> +			unsigned long * : __gse_get_reg,	\
-> +			u32 * : __gse_get_reg,			\
-> +			vector128 * : gse_get_vector128)(gse)))
-
-I don't see the benefit of this. Caller always knows the type doesn't
-it? It seems like the right function could be called directly. It
-makes the calling convention a bit clunky too. I know there's similar
-precedent for uaccess functions, but not sure I like it for this.
-
-> +struct gs_buff *gsb_new(size_t size, unsigned long guest_id,
-> +			unsigned long vcpu_id, gfp_t flags)
-> +{
-> +	struct gs_buff *gsb;
-> +
-> +	gsb =3D kzalloc(sizeof(*gsb), flags);
-> +	if (!gsb)
-> +		return NULL;
-> +
-> +	size =3D roundup_pow_of_two(size);
-> +	gsb->hdr =3D kzalloc(size, GFP_KERNEL);
-> +	if (!gsb->hdr)
-> +		goto free;
-> +
-> +	gsb->capacity =3D size;
-> +	gsb->len =3D sizeof(struct gs_header);
-> +	gsb->vcpu_id =3D vcpu_id;
-> +	gsb->guest_id =3D guest_id;
-> +
-> +	gsb->hdr->nelems =3D cpu_to_be32(0);
-> +
-> +	return gsb;
-> +
-> +free:
-> +	kfree(gsb);
-> +	return NULL;
-> +}
-> +EXPORT_SYMBOL(gsb_new);
-
-Should all be GPL exports.
-
-Needs more namespace too, I reckon (not just exports but any kernel-wide
-name this short and non-descriptive needs a kvmppc or kvm_papr or
-something).
-
-Thanks,
-Nick
+Thanks
+Nicolin
