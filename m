@@ -2,95 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0202272657A
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 18:08:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 657F27265B8
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 18:19:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241019AbjFGQIy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 12:08:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37446 "EHLO
+        id S231629AbjFGQTl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 12:19:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241502AbjFGQIw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 12:08:52 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 522CF1BFE;
-        Wed,  7 Jun 2023 09:08:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686154115; x=1717690115;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=im+3eUPzIUN6Pb8pnWR5VHxFF1tSqQ19oIm6GDJixTg=;
-  b=eQVZb+lLJjlXtjYGz29T7pcyb2AsjElup1EXZ74mdDhDIJzcUOTdA+qS
-   DN6hjMCYqCiAkCU5BFNiPAXeqkCII6rbZ9VQ/LMZDcQqbnb2G/aX+Tq5f
-   9xre8iv5BmUO7qlz2xERCP11kZdbqp1mBKXcTDKCtxW5HBZaf3pfAkews
-   EOm4HTZvDm5aWYLnH6QKbDVC6645T7smoBjbpC7tPOMoVCzR8P2C+VBeH
-   tL6BUg6kEN6UFmIUi4QkDYjVaMgU703xApw3/Mn37SMT/7VIyjC1Rz8kX
-   N7hPfEQBTjZ4pJehy0eJCP2WqcEKi8M/vIDG1uU6YPVpHYcK50lxhdm9+
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10734"; a="355886185"
-X-IronPort-AV: E=Sophos;i="6.00,224,1681196400"; 
-   d="scan'208";a="355886185"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2023 09:05:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10734"; a="799436682"
-X-IronPort-AV: E=Sophos;i="6.00,224,1681196400"; 
-   d="scan'208";a="799436682"
-Received: from vsmyers-mobl2.amr.corp.intel.com (HELO [10.212.146.233]) ([10.212.146.233])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2023 09:05:15 -0700
-Message-ID: <0600959d-9e10-fb1f-b3a9-862a51b9d8e1@intel.com>
-Date:   Wed, 7 Jun 2023 09:05:14 -0700
+        with ESMTP id S230496AbjFGQTj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 12:19:39 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D8251BFE;
+        Wed,  7 Jun 2023 09:19:37 -0700 (PDT)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 357GHXpZ008720;
+        Wed, 7 Jun 2023 16:19:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=CMNTOr6sBD8r6vaC63/KBTECjHasOvKZLafa9AVPN18=;
+ b=e7CMS7YJ1fEMCYxIA8GHPIXRGzYAGac0MQAE5hN9HVKJn8t73CKWPbkKV+E+tTKDwz9P
+ HTmXHuKqX5/TRLAXPKMrxKnOABYi9NRzgakbLuIKqAQe5tZDGkZLRWwkTTwrfP93S21b
+ 9jtgZitPr+rj0C+3v7YVueFMvspiV5rMo6dPZHKMztYsniAd+UnN6P9oF5v5C2AVBefr
+ 83xe6Cm8egcKw0L8WjaXYXqaASnb1UjorQemRlpVlVj0nfHMHLv0RqNS6gD00JHEf7Iy
+ MifUGyDNTSgUsXhfu9j6//Qx3RXG4LFG1Dhvpm3eYK0istyIF7gc4jDWXsQeBTx5czsg cA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r2w9e00v4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Jun 2023 16:19:36 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 357GIYuK014026;
+        Wed, 7 Jun 2023 16:19:36 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r2w9e00uq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Jun 2023 16:19:36 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3577s6mj007661;
+        Wed, 7 Jun 2023 16:19:34 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3r2a7a0e6y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Jun 2023 16:19:33 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 357GJUd950331998
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 7 Jun 2023 16:19:30 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3277E20043;
+        Wed,  7 Jun 2023 16:19:30 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EAE0320040;
+        Wed,  7 Jun 2023 16:19:29 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed,  7 Jun 2023 16:19:29 +0000 (GMT)
+Date:   Wed, 7 Jun 2023 18:19:28 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, thuth@redhat.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v3 1/6] lib: s390x: introduce bitfield
+ for PSW mask
+Message-ID: <20230607181928.75d20898@p-imbrenda>
+In-Reply-To: <168615337335.127716.6745745533225595281@t14-nrb>
+References: <20230601070202.152094-1-nrb@linux.ibm.com>
+        <20230601070202.152094-2-nrb@linux.ibm.com>
+        <3667d7af-f9ba-fbb6-537d-e6143f63ac43@linux.ibm.com>
+        <168615337335.127716.6745745533225595281@t14-nrb>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v11 11/20] x86/virt/tdx: Fill out TDMRs to cover all TDX
- memory regions
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, kirill.shutemov@linux.intel.com,
-        tony.luck@intel.com, peterz@infradead.org, tglx@linutronix.de,
-        seanjc@google.com, pbonzini@redhat.com, david@redhat.com,
-        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
-        ying.huang@intel.com, reinette.chatre@intel.com,
-        len.brown@intel.com, ak@linux.intel.com, isaku.yamahata@intel.com,
-        chao.gao@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
-References: <cover.1685887183.git.kai.huang@intel.com>
- <927ec9871721d2a50f1aba7d1cf7c3be50e4f49b.1685887183.git.kai.huang@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <927ec9871721d2a50f1aba7d1cf7c3be50e4f49b.1685887183.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: FeKWB12d_yMac4a0q6qBZubRk9yz8nF1
+X-Proofpoint-ORIG-GUID: NCh3ZXQjwk_gQYJZbYZRHI2cM3xVJYCB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-06-07_07,2023-06-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ spamscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0
+ priorityscore=1501 mlxlogscore=959 phishscore=0 adultscore=0 clxscore=1015
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2306070137
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/4/23 07:27, Kai Huang wrote:
-> +	/*
-> +	 * Loop over TDX memory regions and fill out TDMRs to cover them.
-> +	 * To keep it simple, always try to use one TDMR to cover one
-> +	 * memory region.
-> +	 *
-> +	 * In practice TDX1.0 supports 64 TDMRs, which is big enough to
-> +	 * cover all memory regions in reality if the admin doesn't use
-> +	 * 'memmap' to create a bunch of discrete memory regions.  When
-> +	 * there's a real problem, enhancement can be done to merge TDMRs
-> +	 * to reduce the final number of TDMRs.
-> +	 */
+On Wed, 07 Jun 2023 17:56:13 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-Rather than focus in on one specific command-line parameter, let's just say:
+> Quoting Janosch Frank (2023-06-01 09:42:48)
+> [...]
+> > I've come to like static asserts for huge structs and bitfields since 
+> > they can safe you from a *lot* of headaches.  
+> 
+> I generally agree and I add a _Static_assert but I want to mention the
+> usefulness is a bit limited in this case, since we have a bitfield inside a
+> union. So it only really helps if you manage to exceed the size of mask.
 
-	In practice TDX supports at least 64 TDMRs.  A 2-socket system
-	typically only consumes <NUMBER> of those.  This code is dumb
-	and simple and may use more TMDRs than is strictly required.
+better than nothing :)
 
-Let's also put a pr_warn() in here if we exceed, say 1/2 or maybe 3/4 of
-the 64.  We'll hopefully start to get reports somewhat in advance if
-systems get close to the limit.
+if the struct becomes too big, the assert will catch it
+
+> 
+> There really is no way around the stuff I put in the selftests.
+> 
+> I could of course try to make that code _Static_asserts but it will not be
+> pretty.
+
+I think just a couple of asserts to make sure things aren't __too__
+crazy would be good enough
