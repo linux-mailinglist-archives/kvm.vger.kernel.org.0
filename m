@@ -2,61 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A89A27272ED
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 01:27:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC05F7272EE
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 01:27:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233051AbjFGX1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 19:27:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40514 "EHLO
+        id S233089AbjFGX1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 19:27:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232518AbjFGX1A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 19:27:00 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FF56101
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 16:26:59 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-bb2fae9b286so102128276.3
-        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 16:26:59 -0700 (PDT)
+        with ESMTP id S232518AbjFGX1S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 19:27:18 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 328542109
+        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 16:27:17 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5655d99da53so1788037b3.0
+        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 16:27:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686180418; x=1688772418;
+        d=google.com; s=20221208; t=1686180436; x=1688772436;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hipvymSgC3OX9XscE62QY5GyqZo7Ih960ndTbPccN4E=;
-        b=3rk7sXjwFNwdy4CXE+SpgvjG0ai/VWk0FGR1So2AqSnbINfFhC+wOOQtG0xb1LDAgo
-         Z0tlUdhEiILjRTQpR+8uHoVLvQIXEAQ2ZEWDLj7etyuKQaWGlT6VYHWbpr6CNPVn1f9j
-         zEXy9mH7bRQW18rCOBYILz1awiZXIMn9K1jFwbrpoSoXx8qYqvJN+5zX1PZL8mMwYXMQ
-         h7haAV9LNrCoEEJ9vDAefSP2jlx8dHJY7krB4DJA7UmUSGBXVVnxOdUoWdIUcgbKHQaV
-         DCPDP5z1GcfKsPVhdizLogNi2g6viWkxLont95HeDG34MX/E0hLN4ZWzWTRqzZ0sFxvj
-         1WHQ==
+        bh=IkZBoX8htxyFu9zdTbtouog4VuAI3fRedhhd5geunXw=;
+        b=NqAmhoZIUTuPDbTVmUESmYgHkm4IwbzYC3Cc5EamzB8S0vAg9GcWAOKbEyoWiUBYpq
+         KRaEaiTmv6P5l6ec+zlZNaFQTsuzEi7SWALtOu2au9v3NQwYGHFFBL7K9ypM6PDDfCbh
+         jYGwYsBjDGAvlxoYQpMxeZhwpUl2JrnHXZBDarsfDEoQUVxViqN6UvCZZn7ZjzxFzosJ
+         ogdUwQvVOZhpV9+HDSHuRGIhIjAcH1hgtk4EjVLfaXeP9sA5ZP9/G2D564Ne5qYN3Sel
+         PfqXpuHp2hn/O9S1phMf623uXAz8vv3YI8fxIc0Gjt7inSkGpZj21dJcI8OMkFQ66/Wl
+         BSGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686180418; x=1688772418;
+        d=1e100.net; s=20221208; t=1686180436; x=1688772436;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hipvymSgC3OX9XscE62QY5GyqZo7Ih960ndTbPccN4E=;
-        b=bhr5ARywiXZOUFzxAyWLvIvKMqmIiTst1NIwSdpuWbqvxTrqEyp3VYiBy+5g/i7Rq2
-         BEwBqJol2CvcEhcuScHxP7fnxQMI5NMFYMlCXFuXtTHNtB5hdIYIfbseat83bXwNz3Zm
-         ehhyjX3GduPvmHd/NrdcylYTNPSZqweSV80Jfc314xc84toVPxB9ETztUlJnGk3R9o7x
-         s3+WLVZWChTZCrpYjODzbaK7UsyrHoTYK/mbcJQjRx0rZnDtzvK/Ios7sqo41/PGsEAb
-         d5gGeiuC2ktc54oanKI2Z3LuCo9SQ1DEp8bG39iEVcc441zSlhkUXdvPu6ytBHzYp3re
-         T7Iw==
-X-Gm-Message-State: AC+VfDzsaE3x2MubKkYyRzszlx+vqjqAPgQPUGwAJ7Y4ZRXSxw64f2kF
-        vyzAGy4fodnUcQ6lUBJ4E0Lu7JkcH/s=
-X-Google-Smtp-Source: ACHHUZ6MTHjB6Hp5KmA4dZoWVjNkt3pipzfCrA9H5u5vGHlsUSPzIP2IAqUOfwD3QElSLaEiqMdUYuNNVcw=
+        bh=IkZBoX8htxyFu9zdTbtouog4VuAI3fRedhhd5geunXw=;
+        b=Gh9HXTmUB+qjxpWVUnTMjl7rtyqWkRlRmnuXRlzbIoQxQvmFWW9NKOVW5/k2utSVWz
+         4D5npPR6mwDtDSVgn2NQt6jloDWWKZax7Y1jlK+LmSoW2L9WIQZAwTE1hR2wTbcw4J2G
+         5EttVCp/0lHDpv2OLcEOgQ0i+rBMvq9nZ/3oFz40J7+4f6ZfK6RqTidiSe2+muR6OsEy
+         0+i0XlmK4gEkocO60xb3jVUVdsOsy8ZLCiX1qAOs7pg8JY3EtgMgtKemvEDDg8yxCPuU
+         4Ku/gbPVi0DbKyEEqkcuJfMKhX8ij3/X2LrbJ5FrTL1rZTA2E8BOK8NRpihbCXYRY4w4
+         n3pQ==
+X-Gm-Message-State: AC+VfDz5Nk1JUwvWvWv6Ggjbv2id3exRYPjc9bWPlLfCWV/1Jt8CrD09
+        4mEh3VVWR8cdqXIdewUfD7YzEAeFapQ=
+X-Google-Smtp-Source: ACHHUZ6fQHIZRylq7gJPgy4r0THvLHfYnO2vwpL789MGrKiR+EJ9sEmuAZgJ+PieTXlVTIqT7rj3DwVzRik=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:150e:b0:bac:adb8:a605 with SMTP id
- q14-20020a056902150e00b00bacadb8a605mr2655905ybu.2.1686180418450; Wed, 07 Jun
- 2023 16:26:58 -0700 (PDT)
-Date:   Wed,  7 Jun 2023 16:25:52 -0700
-In-Reply-To: <20221226075412.61167-1-likexu@tencent.com>
+ (user=seanjc job=sendgmr) by 2002:a81:ce07:0:b0:557:616:7d63 with SMTP id
+ t7-20020a81ce07000000b0055706167d63mr323400ywi.1.1686180436473; Wed, 07 Jun
+ 2023 16:27:16 -0700 (PDT)
+Date:   Wed,  7 Jun 2023 16:25:54 -0700
+In-Reply-To: <20221122161152.293072-1-mlevitsk@redhat.com>
 Mime-Version: 1.0
-References: <20221226075412.61167-1-likexu@tencent.com>
+References: <20221122161152.293072-1-mlevitsk@redhat.com>
 X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
-Message-ID: <168617889079.1602120.263410071839545933.b4-ty@google.com>
-Subject: Re: [kvm-unit-tests PATCH 0/2] x86/pmu: Add TSX testcase and fix force_emulation_prefix
+Message-ID: <168617899162.1602813.11898597003154958715.b4-ty@google.com>
+Subject: Re: [kvm-unit-tests PATCH v3 00/27] kvm-unit-tests: set of fixes and
+ new tests
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
+To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Andrew Jones <drjones@redhat.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Like Xu <like.xu.linux@gmail.com>
-Cc:     kvm@vger.kernel.org
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        "=?UTF-8?q?Alex=20Benn=C3=A9e?=" <alex.bennee@linaro.org>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Cathy Avery <cavery@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -68,22 +76,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 26 Dec 2022 15:54:10 +0800, Like Xu wrote:
-> We have adopted a test-driven development approach for vPMU's features,
-> and these two fixes below cover the paths for at least two corner use cases.
+On Tue, 22 Nov 2022 18:11:25 +0200, Maxim Levitsky wrote:
+> This is set of fixes and new unit tests that I developed for the
+> KVM unit tests.
 > 
-> Like Xu (2):
->   x86/pmu: Add Intel Guest Transactional (commited) cycles testcase
->   x86/pmu: Wrap the written counter value with gp_counter_width
+> I also did some work to separate the SVM code into a minimal
+> support library so that you could use it from an arbitrary test.
+> 
+> V2:
 > 
 > [...]
 
-Applied to kvm-x86 next, thanks!
+Applied select patches to kvm-x86 next, mostly things that are smallish and
+straightforward.
 
-[1/2] x86/pmu: Add Intel Guest Transactional (commited) cycles testcase
-      https://github.com/kvm-x86/kvm-unit-tests/commit/ece17cfebc27
-[2/2] x86/pmu: Wrap the written counter value with gp_counter_width
-      https://github.com/kvm-x86/linux/commit/15507bb0
+Please, please split all of this stuff into more manageable series, with
+one theme per series.  Even with the patches I applied out of the way, there
+are at least 4 or 5 distinct series here.
+
+[01/27] x86: replace irq_{enable|disable}() with sti()/cli()
+        https://github.com/kvm-x86/kvm-unit-tests/commit/ed31b56333aa
+[02/27] x86: introduce sti_nop() and sti_nop_cli()
+        https://github.com/kvm-x86/kvm-unit-tests/commit/a159f4c91608
+[03/27] x86: add few helper functions for apic local timer
+        https://github.com/kvm-x86/kvm-unit-tests/commit/7a507c9f5b74
+[04/27] svm: remove nop after stgi/clgi
+        https://github.com/kvm-x86/kvm-unit-tests/commit/783f817a17f1
+[05/27] svm: make svm_intr_intercept_mix_if/gif test a bit more robust
+        https://github.com/kvm-x86/kvm-unit-tests/commit/d0ffdee8f95b
+[06/27] svm: use apic_start_timer/apic_stop_timer instead of open coding it
+        https://github.com/kvm-x86/kvm-unit-tests/commit/2e4e8a4fe921
+[09/27] svm: add simple nested shutdown test.
+        https://github.com/kvm-x86/kvm-unit-tests/commit/e5bedc838c3b
+
+[13/27] svm: remove get_npt_pte extern
+        https://github.com/kvm-x86/kvm-unit-tests/commit/cc15e55699e9
 
 --
 https://github.com/kvm-x86/kvm-unit-tests/tree/next
