@@ -2,99 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2669727051
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 23:10:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71FD0727053
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 23:10:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232665AbjFGVKV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 17:10:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42078 "EHLO
+        id S236062AbjFGVKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 17:10:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236305AbjFGVKE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 17:10:04 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7437A92
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 14:10:02 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-65313d304e6so2035197b3a.0
-        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 14:10:02 -0700 (PDT)
+        with ESMTP id S236333AbjFGVKG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 17:10:06 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A05B0D1
+        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 14:10:04 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-568ae92e492so131447467b3.3
+        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 14:10:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686172202; x=1688764202;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yI/eiJnVBRg9pCkgFUkTmEwoLDo9Vh826wMkw5iSGNo=;
-        b=BxlaTfzZRF+T0DFeciPEZJULVwlOrq/kHqKdNZ0QITpxpRjjaAHWKVry1jUrmB0Fz3
-         rSZZ0K3xGQW4xHXF9bqpLN7tGjA79QXYROIv2PLSzI1uEue2NbLqH5kkBi4TFoBy7Gaf
-         Yh/Hh/RdPFlayw7QnT+eSL+cft7BBCKELxJkyJM29LMK64JjJUIPDNSrez/sxwu2bowU
-         bY4t/liSvitJWKalysW5v92PZCIdPq8i/lNKVPw9Oi6pRpLcY8NwNIksCT3Kt+yP7r7+
-         h8EVvJ1dJSbxyETDe79t6f7emQu9J8gQgpRoaRfqy0iPcEpXx2TawcfrYkBWlMJOo8FH
-         /z9A==
+        d=google.com; s=20221208; t=1686172204; x=1688764204;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=kwoI54QcezUdtPGH+B3kTK9cn/G+XyWgh9otzTVHM6g=;
+        b=IEW353KOSjOnR+DRz3XKoGyx4G0I6vR54WGb/64rnNVHL0XBF8TcM8oAYKCltFI10j
+         cQlfnPKRm9N5q+XOKuCyp13pNM343f6hfsMsXsxcg7Gzh5Ylq0737Ps/06HjNz+/xnUY
+         aMg91gHcENdXo1LGgkfjfJgr6yF4KcAv06eZJU8juZwKdlGxkkT5Qcj4nsTB4Q4QPlXH
+         9DVu1r/sh4pkHHYHQmw7MxGdz0yBkiceHIHxQOBbt1hGsM1CiC/dgoi/I9bEZGtR6xSi
+         SwcWfrGja1XRtfuqoxtbB47cwbT9AY6/PnxdUahW+dgEmbIMezVVf/mpIx1M5wzTGUhs
+         hPdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686172202; x=1688764202;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yI/eiJnVBRg9pCkgFUkTmEwoLDo9Vh826wMkw5iSGNo=;
-        b=F8dYwxCpyx2MNFnC4pPszvEAAGboizPE2XYipypwIDNn4736Ddp9M+WXZUyvxfOBJQ
-         0F5VbMTMgYpG5XqINmLOeXBRdS9TFyxBTOb2TjVhVfD8hrVt4cwnf7GrK2TGxHm46A/9
-         t7LyiNAje4cPRmX3YqZhf7nUW6k6U0CK4SbelGyEnKL7Foj2VQ9G+p77zsYQLEvaJQP8
-         fzZctFsqtXLo+3vHb/mTe41G5wA58PLSqQpc3Qo+X05zII+BwbWh+blAEu4sIA1kiMZz
-         VJe63FFKBOCNepTIduL09deMtToZqZhqi3UyixtTqBpJ8XrAouL7fEqKeIIHu79tuqIP
-         aS8A==
-X-Gm-Message-State: AC+VfDxSaqMYAd10aI/IFz0rjAhK7xQWwx4neEkWb/EwkYc1az9Ew6zT
-        tnPYN1WSvyBbLCWR69rCin2o3KpSMkQ=
-X-Google-Smtp-Source: ACHHUZ4/chXcqWVnaGT5F02U5w/9xmfrZIDEIYICbhtfmjPHQiEBhR9ADpPdHZnrTCPcb7JbM3jeJ51foes=
+        d=1e100.net; s=20221208; t=1686172204; x=1688764204;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kwoI54QcezUdtPGH+B3kTK9cn/G+XyWgh9otzTVHM6g=;
+        b=D9TTOOtR036ss0COWw6gzeMaW1Rfpp/G6iskA4Sgd5D8xZdv6dEd4hY4SKmYqIXCRI
+         ZV7PvaBm2XAyTTKBpXBSB2URuIZHaRVFT1/5Nc4FpoSilsI988rTH88ylk1LcqmguKmK
+         hXED65i2nbnrsqolfmK72bqHIkwkuK12N93oUN9DfOfn9cEtIikK5Qs5pKnmaTNjiKCR
+         lSrc9Qdasi0unKa/q9fwH71OKrC/o724faDJbJzJp6cpnoV4qGnwRz2oq7Rm5pcwJ9MR
+         JRrmauB8r88tz0Fy7hNNbnRSeAHzuy1/DqwyT/aIS5t5S8b7pmY/JnbPrDz+tg1N+4At
+         gnRQ==
+X-Gm-Message-State: AC+VfDwB/Ed7AcMT6EaWM3hL5qRIdnNRnyxl3XQ3dxAbwOWV4To3SuE9
+        +NDp5p2LIxwHXjpYfu7rj8C6jcTVT0I=
+X-Google-Smtp-Source: ACHHUZ7Lkc+NTEQZs5QNVBrIJweAURD23w8nL2L6BSAb0JUumRF9XpBFRehRCTHnoy35AVRZ/RBOyZwDgQ8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1354:b0:64d:2cb0:c623 with SMTP id
- k20-20020a056a00135400b0064d2cb0c623mr2757678pfu.4.1686172201977; Wed, 07 Jun
- 2023 14:10:01 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:dbc1:0:b0:ba8:54dc:9d0 with SMTP id
+ g184-20020a25dbc1000000b00ba854dc09d0mr2377689ybf.12.1686172203894; Wed, 07
+ Jun 2023 14:10:03 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  7 Jun 2023 14:09:53 -0700
+Date:   Wed,  7 Jun 2023 14:09:54 -0700
+In-Reply-To: <20230607210959.1577847-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20230607210959.1577847-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
-Message-ID: <20230607210959.1577847-1-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 0/6] x86: nSVM: Fix bugs in LBRV tests
+Message-ID: <20230607210959.1577847-2-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 1/6] x86: nSVM: Set up a guest stack in LBRV tests
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-9.5 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,URIBL_SBL_A,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix bugs in the LBRV tests, and try to make them a bit less painful to
-debug (goes from "excruitating" to just "awful").  The tests have been
-failing on our Milan systems for quite some time, but debugging them was
-painful and I wasn't sufficiently motivated until I wanted to clean up
-KVM's code :-/
+Add a helper to configure save.rip and save.rsp, and use it in the LBRV
+tests, which use a "bare" VMRUN to avoid branches around VMRUN.  This
+fixes a bug where the LBRV tests explode in confusing ways if the
+compiler generates guest code that touches the stack in *any* way.
 
-The Milan failures are due to AMD shoving a "mispredict" bit in the LBR
-records, i.e. the tests fail if the CPU mispredicts the branch being
-tested.  Debug was especially difficult because the tests also neglected
-to setup a guest stack, i.e. adding debug code created a completely
-different failure that looked similar at first glance.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ x86/svm.c       | 7 ++++++-
+ x86/svm.h       | 2 +-
+ x86/svm_tests.c | 8 ++++----
+ 3 files changed, 11 insertions(+), 6 deletions(-)
 
-Sean Christopherson (6):
-  x86: nSVM: Set up a guest stack in LBRV tests
-  lib: Expose a subset of VMX's assertion macros
-  x86: Add defines for the various LBR record bit definitions
-  x86: nSVM: Ignore mispredict bit in LBR records
-  x86: nSVM: Replace check_dbgctl() with TEST_EXPECT_EQ() in LBRV test
-  x86: nSVM: Print out RIP and LBRs from VMCB if LBRV guest test fails
-
- lib/util.h      |  31 ++++++++++++++
- lib/x86/msr.h   |  11 +++++
- x86/svm.c       |   7 +++-
- x86/svm.h       |   2 +-
- x86/svm_tests.c | 108 +++++++++++++++++++++---------------------------
- x86/vmx.h       |  32 ++------------
- 6 files changed, 99 insertions(+), 92 deletions(-)
-
-
-base-commit: 02d8befe99f8205d4caea402d8b0800354255681
+diff --git a/x86/svm.c b/x86/svm.c
+index ba435b4a..c24cb97c 100644
+--- a/x86/svm.c
++++ b/x86/svm.c
+@@ -212,10 +212,15 @@ struct svm_test *v2_test;
+ 
+ u64 guest_stack[10000];
+ 
+-int __svm_vmrun(u64 rip)
++void svm_setup_vmrun(u64 rip)
+ {
+ 	vmcb->save.rip = (ulong)rip;
+ 	vmcb->save.rsp = (ulong)(guest_stack + ARRAY_SIZE(guest_stack));
++}
++
++int __svm_vmrun(u64 rip)
++{
++	svm_setup_vmrun(rip);
+ 	regs.rdi = (ulong)v2_test;
+ 
+ 	asm volatile (
+diff --git a/x86/svm.h b/x86/svm.h
+index 766ff7e3..4857212b 100644
+--- a/x86/svm.h
++++ b/x86/svm.h
+@@ -425,8 +425,8 @@ void inc_test_stage(struct svm_test *test);
+ void vmcb_ident(struct vmcb *vmcb);
+ struct regs get_regs(void);
+ void vmmcall(void);
++void svm_setup_vmrun(u64 rip);
+ int __svm_vmrun(u64 rip);
+-void __svm_bare_vmrun(void);
+ int svm_vmrun(void);
+ void test_set_guest(test_guest_func func);
+ u64* get_npt_pte(u64 *pml4, u64 guest_addr, int level);
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 27ce47b4..e20f6697 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -2895,7 +2895,7 @@ static void svm_lbrv_test1(void)
+ {
+ 	report(true, "Test that without LBRV enabled, guest LBR state does 'leak' to the host(1)");
+ 
+-	vmcb->save.rip = (ulong)svm_lbrv_test_guest1;
++	svm_setup_vmrun((u64)svm_lbrv_test_guest1);
+ 	vmcb->control.virt_ext = 0;
+ 
+ 	wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);
+@@ -2917,7 +2917,7 @@ static void svm_lbrv_test2(void)
+ {
+ 	report(true, "Test that without LBRV enabled, guest LBR state does 'leak' to the host(2)");
+ 
+-	vmcb->save.rip = (ulong)svm_lbrv_test_guest2;
++	svm_setup_vmrun((u64)svm_lbrv_test_guest2);
+ 	vmcb->control.virt_ext = 0;
+ 
+ 	wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);
+@@ -2945,7 +2945,7 @@ static void svm_lbrv_nested_test1(void)
+ 	}
+ 
+ 	report(true, "Test that with LBRV enabled, guest LBR state doesn't leak (1)");
+-	vmcb->save.rip = (ulong)svm_lbrv_test_guest1;
++	svm_setup_vmrun((u64)svm_lbrv_test_guest1);
+ 	vmcb->control.virt_ext = LBR_CTL_ENABLE_MASK;
+ 	vmcb->save.dbgctl = DEBUGCTLMSR_LBR;
+ 
+@@ -2978,7 +2978,7 @@ static void svm_lbrv_nested_test2(void)
+ 	}
+ 
+ 	report(true, "Test that with LBRV enabled, guest LBR state doesn't leak (2)");
+-	vmcb->save.rip = (ulong)svm_lbrv_test_guest2;
++	svm_setup_vmrun((u64)svm_lbrv_test_guest2);
+ 	vmcb->control.virt_ext = LBR_CTL_ENABLE_MASK;
+ 
+ 	vmcb->save.dbgctl = 0;
 -- 
 2.41.0.162.gfafddb0af9-goog
 
