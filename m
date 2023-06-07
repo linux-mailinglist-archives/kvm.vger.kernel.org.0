@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DF9E7271EE
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 00:45:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 236A07271EF
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 00:45:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232978AbjFGWpa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 18:45:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50788 "EHLO
+        id S233007AbjFGWpd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 18:45:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230479AbjFGWp3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 18:45:29 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5584E19AC
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 15:45:28 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-528ab7097afso6875824a12.1
-        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 15:45:28 -0700 (PDT)
+        with ESMTP id S232995AbjFGWpb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 18:45:31 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1026B1BCE
+        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 15:45:30 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-53feeb13975so3104497a12.0
+        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 15:45:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686177928; x=1688769928;
+        d=google.com; s=20221208; t=1686177929; x=1688769929;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8LMsdweGtjazuBg5g5mPUO7EVRtXft0hLcztlezlTzI=;
-        b=RDh9x/Bj8VCgWH+1cb/sncXTGcXbUL1Xhy2erVQYKOWJ2Z0meiQXFzyAiSJ6YUQagg
-         3OkV4ERvcdWm3S5VuiY26+i6a78Bu7xt7TNujJRM3ZDnLkX/ksmswhzDKSHSgcuBu+48
-         VcWfshZ5LLZAW/r8qGE93/CERnnKhBnEV88ajPWbHpze3VFNzIhAUZikncz+pNUSoNw7
-         sLLJohLyQxfszkc9nBeHcWf0nPqIRxi2jkzRi2LoxgFODUT+yjTkzfSVm6mBWcTd0ynX
-         UVQPPoBFGgqlZ6/BLyzxXu1oovzzQ2hvy7cxL0o4c+ja1Hfg6eWk9DRqVjctJjbx+7Ek
-         S/KQ==
+        bh=vHN1EB9Pz0wYRGAClVk5phIwLmb5scjxhf2nuPTbv8E=;
+        b=UZb133IrKwO1aXFhHgSOeibmNQGQhT29PTXfI5vi18qVzF14egC/FKhZUCGdfig5pD
+         qRS6jQT/ny+83XL04h+D6VMidCSZaLT+j6M/JqZDFywOmZLtGdsCLOapT3srnna1o9Sy
+         D3RMSMm7f6PYMRhBvNbRfUjaiEzX0x7qDSrv4daFSYvAz9RbwExdn4cNCV+uroZPHEZk
+         jXZz93gZZ41Dn/YjEG+oD3fpy4N1OzRdvUjfvQHUt/bSdLeSUQl+i2+SFahavugthstE
+         hoABwHnZOHFnoxEHL/S4SMdlObXdbCWV2f3MfyxfMSTiPqW5/brQIFxEAHgCBiyi9+vu
+         oCKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686177928; x=1688769928;
+        d=1e100.net; s=20221208; t=1686177929; x=1688769929;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8LMsdweGtjazuBg5g5mPUO7EVRtXft0hLcztlezlTzI=;
-        b=ETZui5N2aTFIl2EoDX/qwHWi7NZ+QOYiDWO5xsuH2Qj/G7fcbYh7Mel8c48PfYXR8m
-         cJBT+CLtnRh905F6Nv1WZjDQkS2gq6shrePHHMS5CX1EYdNMV8cahvzCXEI5hclpO49x
-         zsQd3W64vBWzcHkX6kY5rIxkS6CXiv+Z7lJ+qsVcSGYR3gBs4wevoa5BDbrvdd1FOZL0
-         3gP0lZxiMEulC6Y3zNi50Q8cfcdGtketitQ9g0Uq069vdVkB5lChnW1HynsOrT7EaNU0
-         1gxlbbiK9pfQfWfunn5sOQCDr4ZJqSPdWbT75HK99d4D7yXHueonFwM302hHbS9//mvK
-         w2bA==
-X-Gm-Message-State: AC+VfDxIOm/716cn962iQSIrcRrQc8K5sSU8XKum7bFToY/VYEAXdrGi
-        QBNpd+KoFN6GOuK2mJzXBfpcUtRA7d2vQyV9cKMR8FK6d17PKnOMzhmrz855Xl6VDZPrc4uKNb6
-        oqWGhC31dnkN5QeZaxHb4PJpwan42xJcd/MP+dtmhiosI6euu8Hg2F4ZRNAsiKXbcNl+b
-X-Google-Smtp-Source: ACHHUZ6L1lgws8x1fKeTDpJhBYd6TbHLB/bSmW/bUm3evRPTTOjLUc6fA/LE/DvBwQF5Kc7ARAlFodDNDYc5fQ3b
+        bh=vHN1EB9Pz0wYRGAClVk5phIwLmb5scjxhf2nuPTbv8E=;
+        b=RSRKtB5q7taHxZptmjd/UYQRSg4hrnpKdDEP51wDOcSLyrEodKbRZ01r6rRAfRU3ic
+         wNPMsmCs704HNcNPBke1VwYEixBtnSFIG4//OpU7faZD588KEfKAtlg4A7TYdVSAjvn9
+         oZf++Md6LOlJB46/+/EnqcGiYv3isWfjzrHxfP/WOcUiYN8oQI3SdkjxJXNV/cXDImt0
+         4Xy9Y6yIPWscIR7yoKjo8BUrpn3Q45uqEU1OeMmEU3/NGW6+xOJJUJ4ct7ZbpOp0wME8
+         vD5LEBHk9xIac/t1g1SSHv6wGHvvzVmeqOB8A8j8FgTB35uNOO1jZvyjXc/d4i1sIU8b
+         awyg==
+X-Gm-Message-State: AC+VfDx9BOKeD3iJoR+TH01dGLq+JPdEyN1DNi+8lmRQuYUjLU3bj/EI
+        i9HrZ6r59SMcns/VPDE7QmGlhoOjggNi75EoJgsxxIWSliFNxOcQYJaBuGxF8Vm6xuNSODhIdZ5
+        z8eLj2ucBf+1dXHMdKh1hYr3OsUzXMmVZetaYIs40afTtD3SFU8/gGrdZaekGLoTYjsM8
+X-Google-Smtp-Source: ACHHUZ6wEY7C9rr6apdqE1PzgttrSSN31BGvYJ1zy2VlsMN2QMpbRrS5gCqp3yyujUCtVyDmFxBkZHH/Ix7M2dY0
 X-Received: from aaronlewis-2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:519c])
- (user=aaronlewis job=sendgmr) by 2002:a65:408d:0:b0:52c:999a:fce2 with SMTP
- id t13-20020a65408d000000b0052c999afce2mr1519992pgp.10.1686177927694; Wed, 07
- Jun 2023 15:45:27 -0700 (PDT)
-Date:   Wed,  7 Jun 2023 22:45:17 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a63:4c1b:0:b0:530:3a44:1581 with SMTP
+ id z27-20020a634c1b000000b005303a441581mr1522106pga.9.1686177929443; Wed, 07
+ Jun 2023 15:45:29 -0700 (PDT)
+Date:   Wed,  7 Jun 2023 22:45:18 +0000
 In-Reply-To: <20230607224520.4164598-1-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20230607224520.4164598-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230607224520.4164598-3-aaronlewis@google.com>
-Subject: [PATCH v3 2/5] KVM: selftests: Add guest_snprintf() to KVM selftests
+Message-ID: <20230607224520.4164598-4-aaronlewis@google.com>
+Subject: [PATCH v3 3/5] KVM: selftests: Add additional pages to the guest to
+ accommodate ucall
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -68,369 +69,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a local version of guest_snprintf() for use in the guest.
+Add additional pages to the guest to account for the number of pages
+the ucall headers need.  The only reason things worked before is the
+ucall headers are fairly small.  If they were ever to increase in
+size the guest could run out of memory.
 
-Having a local copy allows the guest access to string formatting
-options without dependencies on LIBC.  LIBC is problematic because
-it heavily relies on both AVX-512 instructions and a TLS, neither of
-which are guaranteed to be set up in the guest.
+This is done in preparation for adding string formatting options to
+the guest through the ucall framework which increases the size of
+the ucall headers.
 
-The file guest_sprintf.c was lifted from arch/x86/boot/printf.c and
-adapted to work in the guest, including the addition of buffer length.
-I.e. s/sprintf/snprintf/
-
-The functions where prefixed with "guest_" to allow guests to
-explicitly call them.
-
-A string formatted by this function is expected to succeed or die.  If
-something goes wrong during the formatting process a GUEST_ASSERT()
-will be thrown.
-
+Fixes: 426729b2cf2e ("KVM: selftests: Add ucall pool based implementation")
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../testing/selftests/kvm/include/test_util.h |   3 +
- .../testing/selftests/kvm/lib/guest_sprintf.c | 307 ++++++++++++++++++
- 3 files changed, 311 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/lib/guest_sprintf.c
+ tools/testing/selftests/kvm/include/ucall_common.h | 1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c         | 4 ++++
+ tools/testing/selftests/kvm/lib/ucall_common.c     | 5 +++++
+ 3 files changed, 10 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index adbf94cbc67e..efbe7e6d8f9b 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -23,6 +23,7 @@ LIBKVM += lib/guest_modes.c
- LIBKVM += lib/io.c
- LIBKVM += lib/kvm_util.c
- LIBKVM += lib/memstress.c
-+LIBKVM += lib/guest_sprintf.c
- LIBKVM += lib/rbtree.c
- LIBKVM += lib/sparsebit.c
- LIBKVM += lib/test_util.c
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index a6e9f215ce70..89ecacec328a 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -186,4 +186,7 @@ static inline uint32_t atoi_non_negative(const char *name, const char *num_str)
- 	return num;
+diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+index 1a6aaef5ccae..bcbb362aa77f 100644
+--- a/tools/testing/selftests/kvm/include/ucall_common.h
++++ b/tools/testing/selftests/kvm/include/ucall_common.h
+@@ -34,6 +34,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
+ void ucall(uint64_t cmd, int nargs, ...);
+ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
+ void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
++int ucall_nr_pages_required(uint64_t page_size);
+ 
+ /*
+  * Perform userspace call without any associated data.  This bare call avoids
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 298c4372fb1a..80b3df2a79e6 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -312,6 +312,7 @@ static uint64_t vm_nr_pages_required(enum vm_guest_mode mode,
+ 				     uint32_t nr_runnable_vcpus,
+ 				     uint64_t extra_mem_pages)
+ {
++	uint64_t page_size = vm_guest_mode_params[mode].page_size;
+ 	uint64_t nr_pages;
+ 
+ 	TEST_ASSERT(nr_runnable_vcpus,
+@@ -340,6 +341,9 @@ static uint64_t vm_nr_pages_required(enum vm_guest_mode mode,
+ 	 */
+ 	nr_pages += (nr_pages + extra_mem_pages) / PTES_PER_MIN_PAGE * 2;
+ 
++	/* Account for the number of pages needed by ucall. */
++	nr_pages += ucall_nr_pages_required(page_size);
++
+ 	return vm_adjust_num_guest_pages(mode, nr_pages);
  }
  
-+int guest_vsnprintf(char *buf, int n, const char *fmt, va_list args);
-+int guest_snprintf(char *buf, int n, const char *fmt, ...);
-+
- #endif /* SELFTEST_KVM_TEST_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/lib/guest_sprintf.c b/tools/testing/selftests/kvm/lib/guest_sprintf.c
-new file mode 100644
-index 000000000000..c4a69d8aeb68
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/guest_sprintf.c
-@@ -0,0 +1,307 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "ucall_common.h"
-+
-+#define APPEND_BUFFER_SAFE(str, end, v) \
-+do {					\
-+	GUEST_ASSERT(str < end);	\
-+	*str++ = (v);			\
-+} while (0)
-+
-+static int isdigit(int ch)
+diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+index 2f0e2ea941cc..77ada362273d 100644
+--- a/tools/testing/selftests/kvm/lib/ucall_common.c
++++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+@@ -11,6 +11,11 @@ struct ucall_header {
+ 	struct ucall ucalls[KVM_MAX_VCPUS];
+ };
+ 
++int ucall_nr_pages_required(uint64_t page_size)
 +{
-+	return (ch >= '0') && (ch <= '9');
++	return align_up(sizeof(struct ucall_header), page_size) / page_size;
 +}
 +
-+static int skip_atoi(const char **s)
-+{
-+	int i = 0;
-+
-+	while (isdigit(**s))
-+		i = i * 10 + *((*s)++) - '0';
-+	return i;
-+}
-+
-+#define ZEROPAD	1		/* pad with zero */
-+#define SIGN	2		/* unsigned/signed long */
-+#define PLUS	4		/* show plus */
-+#define SPACE	8		/* space if plus */
-+#define LEFT	16		/* left justified */
-+#define SMALL	32		/* Must be 32 == 0x20 */
-+#define SPECIAL	64		/* 0x */
-+
-+#define __do_div(n, base)				\
-+({							\
-+	int __res;					\
-+							\
-+	__res = ((uint64_t) n) % (uint32_t) base;	\
-+	n = ((uint64_t) n) / (uint32_t) base;		\
-+	__res;						\
-+})
-+
-+static char *number(char *str, const char *end, long num, int base, int size,
-+		    int precision, int type)
-+{
-+	/* we are called with base 8, 10 or 16, only, thus don't need "G..."  */
-+	static const char digits[16] = "0123456789ABCDEF"; /* "GHIJKLMNOPQRSTUVWXYZ"; */
-+
-+	char tmp[66];
-+	char c, sign, locase;
-+	int i;
-+
-+	/*
-+	 * locase = 0 or 0x20. ORing digits or letters with 'locase'
-+	 * produces same digits or (maybe lowercased) letters
-+	 */
-+	locase = (type & SMALL);
-+	if (type & LEFT)
-+		type &= ~ZEROPAD;
-+	if (base < 2 || base > 16)
-+		return NULL;
-+	c = (type & ZEROPAD) ? '0' : ' ';
-+	sign = 0;
-+	if (type & SIGN) {
-+		if (num < 0) {
-+			sign = '-';
-+			num = -num;
-+			size--;
-+		} else if (type & PLUS) {
-+			sign = '+';
-+			size--;
-+		} else if (type & SPACE) {
-+			sign = ' ';
-+			size--;
-+		}
-+	}
-+	if (type & SPECIAL) {
-+		if (base == 16)
-+			size -= 2;
-+		else if (base == 8)
-+			size--;
-+	}
-+	i = 0;
-+	if (num == 0)
-+		tmp[i++] = '0';
-+	else
-+		while (num != 0)
-+			tmp[i++] = (digits[__do_div(num, base)] | locase);
-+	if (i > precision)
-+		precision = i;
-+	size -= precision;
-+	if (!(type & (ZEROPAD + LEFT)))
-+		while (size-- > 0)
-+			APPEND_BUFFER_SAFE(str, end, ' ');
-+	if (sign)
-+		APPEND_BUFFER_SAFE(str, end, sign);
-+	if (type & SPECIAL) {
-+		if (base == 8)
-+			APPEND_BUFFER_SAFE(str, end, '0');
-+		else if (base == 16) {
-+			APPEND_BUFFER_SAFE(str, end, '0');
-+			APPEND_BUFFER_SAFE(str, end, 'x');
-+		}
-+	}
-+	if (!(type & LEFT))
-+		while (size-- > 0)
-+			APPEND_BUFFER_SAFE(str, end, c);
-+	while (i < precision--)
-+		APPEND_BUFFER_SAFE(str, end, '0');
-+	while (i-- > 0)
-+		APPEND_BUFFER_SAFE(str, end, tmp[i]);
-+	while (size-- > 0)
-+		APPEND_BUFFER_SAFE(str, end, ' ');
-+
-+	return str;
-+}
-+
-+int guest_vsnprintf(char *buf, int n, const char *fmt, va_list args)
-+{
-+	char *str, *end;
-+	const char *s;
-+	uint64_t num;
-+	int i, base;
-+	int len;
-+
-+	int flags;		/* flags to number() */
-+
-+	int field_width;	/* width of output field */
-+	int precision;		/*
-+				 * min. # of digits for integers; max
-+				 * number of chars for from string
-+				 */
-+	int qualifier;		/* 'h', 'l', or 'L' for integer fields */
-+
-+	end = buf + n;
-+	GUEST_ASSERT(buf < end);
-+	GUEST_ASSERT(n > 0);
-+
-+	for (str = buf; *fmt; ++fmt) {
-+		if (*fmt != '%') {
-+			APPEND_BUFFER_SAFE(str, end, *fmt);
-+			continue;
-+		}
-+
-+		/* process flags */
-+		flags = 0;
-+repeat:
-+		++fmt;		/* this also skips first '%' */
-+		switch (*fmt) {
-+		case '-':
-+			flags |= LEFT;
-+			goto repeat;
-+		case '+':
-+			flags |= PLUS;
-+			goto repeat;
-+		case ' ':
-+			flags |= SPACE;
-+			goto repeat;
-+		case '#':
-+			flags |= SPECIAL;
-+			goto repeat;
-+		case '0':
-+			flags |= ZEROPAD;
-+			goto repeat;
-+		}
-+
-+		/* get field width */
-+		field_width = -1;
-+		if (isdigit(*fmt))
-+			field_width = skip_atoi(&fmt);
-+		else if (*fmt == '*') {
-+			++fmt;
-+			/* it's the next argument */
-+			field_width = va_arg(args, int);
-+			if (field_width < 0) {
-+				field_width = -field_width;
-+				flags |= LEFT;
-+			}
-+		}
-+
-+		/* get the precision */
-+		precision = -1;
-+		if (*fmt == '.') {
-+			++fmt;
-+			if (isdigit(*fmt))
-+				precision = skip_atoi(&fmt);
-+			else if (*fmt == '*') {
-+				++fmt;
-+				/* it's the next argument */
-+				precision = va_arg(args, int);
-+			}
-+			if (precision < 0)
-+				precision = 0;
-+		}
-+
-+		/* get the conversion qualifier */
-+		qualifier = -1;
-+		if (*fmt == 'h' || *fmt == 'l' || *fmt == 'L') {
-+			qualifier = *fmt;
-+			++fmt;
-+		}
-+
-+		/* default base */
-+		base = 10;
-+
-+		switch (*fmt) {
-+		case 'c':
-+			if (!(flags & LEFT))
-+				while (--field_width > 0)
-+					APPEND_BUFFER_SAFE(str, end, ' ');
-+			APPEND_BUFFER_SAFE(str, end,
-+					    (uint8_t)va_arg(args, int));
-+			while (--field_width > 0)
-+				APPEND_BUFFER_SAFE(str, end, ' ');
-+			continue;
-+
-+		case 's':
-+			s = va_arg(args, char *);
-+			len = strnlen(s, precision);
-+
-+			if (!(flags & LEFT))
-+				while (len < field_width--)
-+					APPEND_BUFFER_SAFE(str, end, ' ');
-+			for (i = 0; i < len; ++i)
-+				APPEND_BUFFER_SAFE(str, end, *s++);
-+			while (len < field_width--)
-+				APPEND_BUFFER_SAFE(str, end, ' ');
-+			continue;
-+
-+		case 'p':
-+			if (field_width == -1) {
-+				field_width = 2 * sizeof(void *);
-+				flags |= SPECIAL | SMALL | ZEROPAD;
-+			}
-+			str = number(str, end,
-+				     (uint64_t)va_arg(args, void *), 16,
-+				     field_width, precision, flags);
-+			continue;
-+
-+		case 'n':
-+			if (qualifier == 'l') {
-+				long *ip = va_arg(args, long *);
-+				*ip = (str - buf);
-+			} else {
-+				int *ip = va_arg(args, int *);
-+				*ip = (str - buf);
-+			}
-+			continue;
-+
-+		case '%':
-+			APPEND_BUFFER_SAFE(str, end, '%');
-+			continue;
-+
-+		/* integer number formats - set up the flags and "break" */
-+		case 'o':
-+			base = 8;
-+			break;
-+
-+		case 'x':
-+			flags |= SMALL;
-+		case 'X':
-+			base = 16;
-+			break;
-+
-+		case 'd':
-+		case 'i':
-+			flags |= SIGN;
-+		case 'u':
-+			break;
-+
-+		default:
-+			APPEND_BUFFER_SAFE(str, end, '%');
-+			if (*fmt)
-+				APPEND_BUFFER_SAFE(str, end, *fmt);
-+			else
-+				--fmt;
-+			continue;
-+		}
-+		if (qualifier == 'l')
-+			num = va_arg(args, uint64_t);
-+		else if (qualifier == 'h') {
-+			num = (uint16_t)va_arg(args, int);
-+			if (flags & SIGN)
-+				num = (int16_t)num;
-+		} else if (flags & SIGN)
-+			num = va_arg(args, int);
-+		else
-+			num = va_arg(args, uint32_t);
-+		str = number(str, end, num, base, field_width, precision, flags);
-+	}
-+
-+	GUEST_ASSERT(str < end);
-+	*str = '\0';
-+	return str - buf;
-+}
-+
-+int guest_snprintf(char *buf, int n, const char *fmt, ...)
-+{
-+	va_list va;
-+	int len;
-+
-+	va_start(va, fmt);
-+	len = guest_vsnprintf(buf, n, fmt, va);
-+	va_end(va);
-+
-+	return len;
-+}
+ /*
+  * ucall_pool holds per-VM values (global data is duplicated by each VM), it
+  * must not be accessed from host code.
 -- 
 2.41.0.rc0.172.g3f132b7071-goog
 
