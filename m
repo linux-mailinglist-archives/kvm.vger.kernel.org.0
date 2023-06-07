@@ -2,55 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF08B7270B8
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 23:51:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59E5C7270BA
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 23:51:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231192AbjFGVvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 17:51:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53670 "EHLO
+        id S231561AbjFGVvh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 17:51:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjFGVvU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 17:51:20 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 244051BFA
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 14:51:18 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5651d8acfe2so131773707b3.2
-        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 14:51:18 -0700 (PDT)
+        with ESMTP id S229499AbjFGVvg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 17:51:36 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692691BFF
+        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 14:51:35 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-53fa00ed93dso6842220a12.3
+        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 14:51:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686174677; x=1688766677;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HPoB19C6ibhFiFvtqKdPYRflB1cnMy01ONw01MJz9ZU=;
-        b=l5bkZSntV/XsE3QFg+W6V7XRcolH1ybyXMCGM0fzLlTOBljHh1KGjUYlCbrr0L03GS
-         dZf4vXCJiOaEdSK/Q6RoDe8ORZBjV2R38WnDqrvGcWd5OFfohP8To6ORdrykFYk4VM5J
-         GnkhVubOp6besx2x5ODeCtMST0J+BERlioYAH2FeQ26lqd4bCdLXHCsKOGzHAXxHaQnv
-         NPOWYqvPLEReoZAEGzaZpNEmNyXjYuTM45jmiNZwUyZnfCmN7mgyz61EWNSFg6E2LwjZ
-         rRiSAhO97+Tzl0dvnMS0S0pHwTGjiB+QfOOEQbbodwGhBIYyYELxP9tkTNsPzFxpVhGT
-         QFaA==
+        d=google.com; s=20221208; t=1686174695; x=1688766695;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mky0TyVJplhbL0ZA6QSy0bQSeQb6MNLQdLcVynl0ssM=;
+        b=oyE2FzzZOz9lRKO8sXPzYP3huVz2tuX6S5wWvSbKqr8c7kuyQ31MVUtpLjgukXrl5z
+         MvjkzFXD/8Qz531LgxaEmIDipAunYy0jJQal3XlIZoAs8Z/ppUZM4KUfDzgJPc1EoXUa
+         VT5OS+RIaEROMNkSQ0kuP8meLGjreuZabxu1RBBs2o7d/qq3ktIKOEZK3P0K95RDBxV5
+         LNabn2yVQQdNdiaCCQJ7Pxx+qVhHQhhxRwsYpzLggrOYxMF5A2f/40Pj7Q40CDgK2QkO
+         l9ng45ycvEnthD1ODq4NZ8jLfa3lhc5E1N+7BbGsTYgiN/h4u9P4EfrnT8muRYc+XEXz
+         7JwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686174677; x=1688766677;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HPoB19C6ibhFiFvtqKdPYRflB1cnMy01ONw01MJz9ZU=;
-        b=EFPvt04NbNvCcN/mE64DCGGYEwZv/mvtzBJg+i/2JMSL+D/rQWhjLdrM3eMRUmoJ9P
-         UfE1RK5Ofh9qek28NTaC9QPTQmK/Cc4poxDjpUsQO3NJRNLxqgfZNNv3MhO3GWzJdRp8
-         RrVE+6ZiSwEtU79kfDr47bBmMY2BeFH21lDKpeEypkjjJJNDO4Pcv9kbPdXIOhY0MgVK
-         C4FzRKh0lBpfLzigwH6IVnflIH6YFyov4O/R313gq93ZqbDdvucfdQ0XY+iUSexhcX/Q
-         p7J+cQ0HSNLQXlrBTQtMpIPzs8CYzRp0E+AHA4EsoLJkGVoWB4TOwWk2bhQ4pp9Qa410
-         4RnQ==
-X-Gm-Message-State: AC+VfDzybw0TVcmUP1+JCyY1Uid4m62Z5TvuBvJPwmoNSkNeABAPa0IU
-        J8TJZaIETC0m2j/YF2u2bzjY24QtDrA=
-X-Google-Smtp-Source: ACHHUZ5gnk53tnfHK0UOyah+G8KrjK0CynNigYHOzxluz1SOc35gRBgM3nxFXELtCw8WZNaCa5zKY3oReh4=
+        d=1e100.net; s=20221208; t=1686174695; x=1688766695;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Mky0TyVJplhbL0ZA6QSy0bQSeQb6MNLQdLcVynl0ssM=;
+        b=cPoE6kkFDBW5eKMS67ut2QZtgVJVJDXCsyTNjCgsI7hknK+dp5nb0QfA0XnUZLnLf7
+         3sTW9o3yzoIn64F9fscOkSXzConleIj+21Q6dMEHAc2ICsggpyD8FyQ8TfiR6+LLNRAs
+         TKVoXFPW8D5QTstUTzRUjRkp+zp3wvdlP4utChTOBLjH2PV+S+uRzh1Ssm26Xzq6hlqP
+         x44SgcjNmLHadkig3qPAHwrebBP/ry7cNGraXmehozW4Pr6aEyW+G0p4/9wNICMX+qs2
+         CmQfPhV8gLxHVDNRN2vqYhzJnHpzetMiWx1MByGyCiSooaClM5l6Dczm5lrbqjXIDZIq
+         GDcw==
+X-Gm-Message-State: AC+VfDzj6ckUxz7RbrKyDRqcfUTQrGE/GChy2pzQeF9kcikI2ehh3Hn2
+        dfBtNOSNXSAo8sNyhjkCaizkk6WLv78=
+X-Google-Smtp-Source: ACHHUZ4MvLOB581PkvPGah8I7ZhsiM+TdZHqgXRWPr5Fgn1XaEwBDO7yepmj4Esp6Y1iWdw41Ls1d2yQQ7Q=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1006:b0:bac:3439:4f59 with SMTP id
- w6-20020a056902100600b00bac34394f59mr3876651ybt.2.1686174677388; Wed, 07 Jun
- 2023 14:51:17 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a63:116:0:b0:53f:2302:8f6a with SMTP id
+ 22-20020a630116000000b0053f23028f6amr1513697pgb.8.1686174694968; Wed, 07 Jun
+ 2023 14:51:34 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  7 Jun 2023 14:51:12 -0700
+Date:   Wed,  7 Jun 2023 14:51:13 -0700
+In-Reply-To: <20230607215114.1586228-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20230607215114.1586228-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
-Message-ID: <20230607215114.1586228-1-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 0/2] runtime: x86: Require vPMU for x86/pmu tests
+Message-ID: <20230607215114.1586228-2-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 1/2] runtime: Convert "check" from string to
+ array so that iterating works
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -66,19 +70,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix a bug in runtime.bash that makes it not play nice with testcases that have
-multiple dependencies, and make x86's PMU tests depend on KVM enabling a vPMU.
+Convert "check" from a string to an array so that splitting on whitespace
+for iteration works as expected, i.e. so that testcases can have multiple
+requirements.
 
-Sean Christopherson (2):
-  runtime: Convert "check" from string to array so that iterating works
-  x86/pmu: Make PMU testcases dependent on vPMU being enabled in KVM
-
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
  scripts/runtime.bash | 1 +
- x86/unittests.cfg    | 7 +++----
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ 1 file changed, 1 insertion(+)
 
-
-base-commit: 02d8befe99f8205d4caea402d8b0800354255681
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index 07b62b0e..1cfc5bfd 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -120,6 +120,7 @@ function run()
+     # the check line can contain multiple files to check separated by a space
+     # but each check parameter needs to be of the form <path>=<value>
+     if [ "$check" ]; then
++        check=($check)
+         for check_param in "${check[@]}"; do
+             path=${check_param%%=*}
+             value=${check_param#*=}
 -- 
 2.41.0.162.gfafddb0af9-goog
 
