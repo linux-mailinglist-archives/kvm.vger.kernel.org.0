@@ -2,137 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3240472693B
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 20:53:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D904E72693E
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 20:54:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233070AbjFGSxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 14:53:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59830 "EHLO
+        id S233048AbjFGSyC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 14:54:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233041AbjFGSxV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 14:53:21 -0400
-Received: from out-28.mta1.migadu.com (out-28.mta1.migadu.com [95.215.58.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC1321BD8
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 11:53:19 -0700 (PDT)
-Date:   Wed, 7 Jun 2023 20:53:16 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1686163997;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uZriKRSNBbzvJHJtIENKwxHY6qma95a+SzevJ1d0sZU=;
-        b=Obvn7QhCH0nPk/AqET+xjZel4gBk1D7AgZS9WWgfpiUTvNwdwQaWpmCeFyRxMMbq6JLlVM
-        wyryjmNPVs9na3YDvP+vJdPecKr4NsE/ZJTXINNu9i5hv9oQnI7C2cvnLqNwDAorOPymkG
-        EcQpDG0gT/MKF4nKRsinTqu6Ir5L7zw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v2] arm64: Make vector_table and
- vector_stub weak symbols
-Message-ID: <20230607-5a5ef657ae5d4c001b388b26@orel>
-References: <20230523135325.1081036-1-nikos.nikoleris@arm.com>
+        with ESMTP id S230193AbjFGSx7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 14:53:59 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBC841BD6;
+        Wed,  7 Jun 2023 11:53:57 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-653436fcc1bso3376312b3a.2;
+        Wed, 07 Jun 2023 11:53:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686164037; x=1688756037;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CWlI8O5y17mVIgSckRO28rpjnfk78X92V4g11ktEnnQ=;
+        b=LrSIqPYIl2O2Vb7lnDHMQaAJbXiVOZhw8EnOdrmM+4Yq6NcCwopRy54dAnHyLKik1N
+         vKHSVT487M6ibmwfs5fmti5ThA0U6IlWp+XMlljGp2Vb52tp+h9/TXHDcYlDQEaZkLvC
+         QHMRKHS5z+P+e94aRD5q5oIuMQ1z/q5JSyiD7IfN0G+7JpjsVFs/che2oi9MKW8suAEf
+         R7cmM15MdF3Ep3Z98w2ypVreOu9VaGXAgrhRtIGSTwN0tswPxKMd0ZUdhfSO5OJ6ldeO
+         6fS/KBCqzZA6oDXAPw8KwQw1raW/6FMFjNZ6whQZo7dmu9uXUuJOpQLAE1iHj6Y2tZJy
+         32PQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686164037; x=1688756037;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CWlI8O5y17mVIgSckRO28rpjnfk78X92V4g11ktEnnQ=;
+        b=U3368yENAOx8LMqtOQLfeQzSmjHWSnpfgYoghpgAO4XZFiRz4NoyQ7hCgl+5UZf2R2
+         Zvt+kK+efImvWSb40gmI1KYAk1HAZC268ID6Z6Kg0huDHxEp7g8NOAuCRmrLy+DjeX3N
+         /R4QsJnb55PXWnQu0lZd6vk0hKO78U01cLNAlrod7tYWV+TMCt++QkJIikfYsejmYPkj
+         5nHNXb3hSifcWNfZBri5+3LjKdyBDNHR36HHrAp1S/pt4mU3swgKkOcg8iUoeyqW7hH5
+         B4WmhNu4Sixqp+/ijSWDt/w4HTWA5T3ufxkHOdB9yRxm0/xgiMORt9ONXnjXrusAO2no
+         pSgw==
+X-Gm-Message-State: AC+VfDxGsGm0I61vwdfzW327SpCitfleObbUKlJ36CoPGahVvlZrkNtr
+        4OK3w0ZqNBHbMMvzJfAKUYvXH9bEkUFWEA==
+X-Google-Smtp-Source: ACHHUZ74yVXNTUyi/V0LeKw31FQ74c28oWW2Gy0sH1FOyjyS4+1dENhhE4ZRoViIU8ul9JyRxCWSBA==
+X-Received: by 2002:a05:6a00:1252:b0:660:523a:8fef with SMTP id u18-20020a056a00125200b00660523a8fefmr2920833pfi.13.1686164037156;
+        Wed, 07 Jun 2023 11:53:57 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id n35-20020a635923000000b0051303d3e3c5sm9372544pgb.42.2023.06.07.11.53.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jun 2023 11:53:56 -0700 (PDT)
+Date:   Wed, 7 Jun 2023 11:53:55 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
+        peterz@infradead.org, tglx@linutronix.de, seanjc@google.com,
+        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, ying.huang@intel.com,
+        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com, isaku.yamahata@gmail.com
+Subject: Re: [PATCH v11 05/20] x86/virt/tdx: Add SEAMCALL infrastructure
+Message-ID: <20230607185355.GH2244082@ls.amr.corp.intel.com>
+References: <cover.1685887183.git.kai.huang@intel.com>
+ <ec640452a4385d61bec97f8b761ed1ff38898504.1685887183.git.kai.huang@intel.com>
+ <92e19d74-447f-19e0-d9ec-8a3f12f04927@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230523135325.1081036-1-nikos.nikoleris@arm.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <92e19d74-447f-19e0-d9ec-8a3f12f04927@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 23, 2023 at 02:53:25PM +0100, Nikos Nikoleris wrote:
-> This changes allows a test to define and override the declared symbols,
-> taking control of all or some execptions.
-> 
-> With the ability to override specific exception handlers, litmus7 [1] a
-> tool used to generate c sources for a given memory model litmus test,
-> can override the el1h_sync symbol to implement tests with explicit
-> exception handlers. For example:
-> 
-> AArch64 LDRv0+I2V-dsb.ishst-once
-> {
->   [PTE(x)]=(oa:PA(x),valid:0);
->   x=1;
-> 
->   0:X1=x;
->   0:X3=PTE(x);
->   0:X2=(oa:PA(x),valid:1);
-> }
->  P0          | P0.F           ;
-> L0:          | ADD X8,X8,#1   ;
->  LDR W0,[X1] | STR X2,[X3]    ;
->              | DSB ISHST      ;
->              | ADR X9,L0      ;
->              | MSR ELR_EL1,X9 ;
->              | ERET           ;
-> exists(0:X0=0 \/ 0:X8!=1)
-> 
-> In this test, a thread running in core P0 executes a load to a memory
-> location x. The PTE of the virtual address x is initially invalid.  The
-> execution of the load causes a synchronous EL1 exception which is
-> handled by the code in P0.F. P0.F increments a counter which is
-> maintained in X8, updates the PTE of x and makes it valid, executes a
-> DSB ISHST and calls ERET which is expected to return and retry the
-> execution of the load in P0:L0.
-> 
-> The postcondition checks if there is any execution where the load wasn't
-> executed (X0 its destination register is not update), or that the P0.F
-> handler was invoked more than once (the counter X8 is not 1).
-> 
-> For this tests, litmus7 needs to control the el1h_sync. Calling
-> install_exception_handler() would be suboptimal because the
-> vector_stub would wrap around the code of P0.F and perturb the test.
-> 
-> [1]: https://diy.inria.fr/doc/litmus.html
-> 
-> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> ---
->  arm/cstart64.S | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index e4ab7d06..eda0daa5 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -275,8 +275,11 @@ exceptions_init:
->  /*
->   * Vector stubs
->   * Adapted from arch/arm64/kernel/entry.S
-> + * Declare as weak to allow external tests to redefine and override a
-> + * vector_stub.
->   */
->  .macro vector_stub, name, vec
-> +.weak \name
->  \name:
->  	stp	 x0,  x1, [sp, #-S_FRAME_SIZE]!
->  	stp	 x2,  x3, [sp,  #16]
-> @@ -369,7 +372,13 @@ vector_stub	el0_error_32, 15
->  	b	\label
->  .endm
->  
-> +
-> +/*
-> + * Declare as weak to allow external tests to redefine and override the
-> + * default vector table.
-> + */
->  .align 11
-> +.weak vector_table
->  vector_table:
->  	ventry	el1t_sync			// Synchronous EL1t
->  	ventry	el1t_irq			// IRQ EL1t
-> -- 
-> 2.25.1
->
+On Wed, Jun 07, 2023 at 07:24:23AM -0700,
+Dave Hansen <dave.hansen@intel.com> wrote:
 
-Applied to arm/queue. Thanks!
+> On 6/4/23 07:27, Kai Huang wrote:
+> > TDX introduces a new CPU mode: Secure Arbitration Mode (SEAM).  This
+> > mode runs only the TDX module itself or other code to load the TDX
+> > module.
+> > 
+> > The host kernel communicates with SEAM software via a new SEAMCALL
+> > instruction.  This is conceptually similar to a guest->host hypercall,
+> > except it is made from the host to SEAM software instead.  The TDX
+> > module establishes a new SEAMCALL ABI which allows the host to
+> > initialize the module and to manage VMs.
+> > 
+> > Add infrastructure to make SEAMCALLs.  The SEAMCALL ABI is very similar
+> > to the TDCALL ABI and leverages much TDCALL infrastructure.
+> > 
+> > SEAMCALL instruction causes #GP when TDX isn't BIOS enabled, and #UD
+> > when CPU is not in VMX operation.  Currently, only KVM code mocks with
+> 
+> "mocks"?  Did you mean "mucks"?
+> 
+> > VMX enabling, and KVM is the only user of TDX.  This implementation
+> > chooses to make KVM itself responsible for enabling VMX before using
+> > TDX and let the rest of the kernel stay blissfully unaware of VMX.
+> > 
+> > The current TDX_MODULE_CALL macro handles neither #GP nor #UD.  The
+> > kernel would hit Oops if SEAMCALL were mistakenly made w/o enabling VMX
+> > first.  Architecturally, there is no CPU flag to check whether the CPU
+> > is in VMX operation.  Also, if a BIOS were buggy, it could still report
+> > valid TDX private KeyIDs when TDX actually couldn't be enabled.
+> 
+> I'm not sure this is a great justification.  If the BIOS is lying to the
+> OS, we _should_ oops.
+> 
+> How else can this happen other than silly kernel bugs.  It's OK to oops
+> in the face of silly kernel bugs.
 
-https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/arm/queue
+TDX KVM + reboot can hit #UD.  On reboot, VMX is disabled (VMXOFF) via
+syscore.shutdown callback.  However, guest TD can be still running to issue
+SEAMCALL resulting in #UD.
 
-drew
+Or we can postpone the change and make the TDX KVM patch series carry a patch
+for it.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
