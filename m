@@ -2,128 +2,485 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB26E72591A
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 11:01:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7C047259A7
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 11:10:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238790AbjFGJBM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 05:01:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54318 "EHLO
+        id S234483AbjFGJKi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 05:10:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239217AbjFGJAq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 05:00:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA3CC2D66
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 01:58:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686128307;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JZlBm9K/eDsGZdtktFZEDp+gLxlecPmXApRL0wxE0aA=;
-        b=UDuDU6bkzBp9Agzv7beQwWN7nfSf0zcyK0qH15V0wEKd51xRANpJs1KfPO46XgbMM/Kee5
-        dXuwlHO+KCjlLmwPF2EhtrtK0ZfXrtuYjHt/J2XY26L2flrJhLJZ3HXMaseQ/nMz/1U/EG
-        lDFvzS5R5gKSX5vkZTGSZdMl+4XG0o4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-454-NCaaZ_IBPDq50JQGeyKT9w-1; Wed, 07 Jun 2023 04:58:25 -0400
-X-MC-Unique: NCaaZ_IBPDq50JQGeyKT9w-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-30e3ee8a42eso1517161f8f.1
-        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 01:58:25 -0700 (PDT)
+        with ESMTP id S239872AbjFGJJ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 05:09:56 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2240F1721;
+        Wed,  7 Jun 2023 02:08:49 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1b1806264e9so37292985ad.0;
+        Wed, 07 Jun 2023 02:08:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686128928; x=1688720928;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h7zdMICOOfXCMagTI3X9zTXWZ0bDy7cb5wAVqax4nXo=;
+        b=fz5R9Os5W2YAM1xaOxzO3LKuXeh3EizcUiXRZKufgYFnaxI/St+Eg3ZzhOQNOkItdW
+         ueeufDQmUxRJgYF+Pm+mPeYN+3mj4tsAaHwR3ue4egFLGtxJP6iAIL9W2U5qeOyLg0vE
+         7V+OyFERqS5OK7COsRQX9iIxdsBdBd18BGmo1/wBA8rQtlW4tEGTT4I9/vVvzG5OPT5x
+         FpSdTRnXKS8cGQzM0WEKBijY6+albls3h0AuJWX2UtABma27r+5+y7VhrUTBeRctUFAf
+         ynHx6RkT8qRG8zwZFcdnsog6EXrrodC6DW1zSaZx2ZUuBWQXy5C7M01P6BjJ6S0sWaLw
+         UB0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686128305; x=1688720305;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JZlBm9K/eDsGZdtktFZEDp+gLxlecPmXApRL0wxE0aA=;
-        b=kBCd1PkAMaSd8HmJhJO9Ue3SJQpM8VE18wzFEs58x6bxlnXdjn5fryDWxhPbuV2exE
-         V+04H5Of9NrLEDZbRu5SL8wOLLCyKYBNSe4YirBV8kexSvgtHSif3kqjciw+43jtQJPQ
-         RqYsxQY5G5IBSRWUIRdX+NZxWvyPRHt+kFOn56uZJDQf55nNdqn3OuOUuHyTDkcvZv9q
-         uovs0dDjOaXFfKu+e0fD757P4ZhgqwFN3tuSHTLQUvsa97Mvny14CZcb2++WnCD4HHUj
-         UxUCZSL9NkaUZEy8r9+VAGdoYDt5gzeahgTzOzLU14usrwwTOkLuYfSLLiWVigZfIHi7
-         60DQ==
-X-Gm-Message-State: AC+VfDx3/abVBXQDX7v3ilIn+GLTOqSg9082xklDJ1oYTuQYAvIVIeuJ
-        j5LEfCa/eUUSwGsOImKJzR9Nu0/iL0y1beglyegiIutbForNs9oMvKaES8ZsqmWRssXfbFF4843
-        KWXFBlSu23TXK
-X-Received: by 2002:a5d:4573:0:b0:30d:efe0:5395 with SMTP id a19-20020a5d4573000000b0030defe05395mr3930897wrc.47.1686128304834;
-        Wed, 07 Jun 2023 01:58:24 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4gsMslc9ahJC8zUHAGJ/RP7BQSmGZi72AZv76jXK1i6rRbHtaqjZeOnSvI17kebHXmkLvWiw==
-X-Received: by 2002:a5d:4573:0:b0:30d:efe0:5395 with SMTP id a19-20020a5d4573000000b0030defe05395mr3930845wrc.47.1686128304503;
-        Wed, 07 Jun 2023 01:58:24 -0700 (PDT)
-Received: from vschneid.remote.csb ([208.178.8.98])
-        by smtp.gmail.com with ESMTPSA id u19-20020a05600c00d300b003f70a7b4537sm1382812wmm.36.2023.06.07.01.58.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jun 2023 01:58:24 -0700 (PDT)
-From:   Valentin Schneider <vschneid@redhat.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     bigeasy@linutronix.de, mark.rutland@arm.com, maz@kernel.org,
-        catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org,
-        kernel@xen0n.name, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, pbonzini@redhat.com, wanpengli@tencent.com,
-        vkuznets@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, jgross@suse.com, boris.ostrovsky@oracle.com,
-        daniel.lezcano@linaro.org, kys@microsoft.com,
-        haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-        rafael@kernel.org, longman@redhat.com, boqun.feng@gmail.com,
-        pmladek@suse.com, senozhatsky@chromium.org, rostedt@goodmis.org,
-        john.ogness@linutronix.de, juri.lelli@redhat.com,
-        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-        bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
-        jstultz@google.com, sboyd@kernel.org, linux-kernel@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-pm@vger.kernel.org
-Subject: Re: [PATCH v2 04/13] arm64/arch_timer: Provide noinstr
- sched_clock_read() functions
-In-Reply-To: <20230602115451.GG620383@hirez.programming.kicks-ass.net>
-References: <20230519102058.581557770@infradead.org>
- <20230519102715.435618812@infradead.org>
- <xhsmho7m9ptrk.mognet@vschneid.remote.csb>
- <20230602115451.GG620383@hirez.programming.kicks-ass.net>
-Date:   Wed, 07 Jun 2023 09:58:22 +0100
-Message-ID: <xhsmhsfb3odht.mognet@vschneid.remote.csb>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1686128928; x=1688720928;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=h7zdMICOOfXCMagTI3X9zTXWZ0bDy7cb5wAVqax4nXo=;
+        b=BDcHcrexpEOT/85BxHftxHc0hnzP821ZCKgrqa59v/6pEP5YVm0OFbBXqJ/LWWlNd8
+         m1n4AczFazP9xvxaJqJc6j6q3/CHD+huNJF7gdlB/uaPCcd4YESfgtz+8r7nT4afBPGc
+         q6o2mh/WqV3rKhKRuEvaa3xemGXm8x4NxWFsVhtym02S9+zonMiJzH3vMN9frHrXYh98
+         +z8wk5HBU29IU4ns17pfiv4MDv+Rf2vTP12D54Xv7JSqGt7koDJv2hD1G7FCRDQkCwqb
+         bQlivmiRC545+BIBRpIhbZqAgq/lI9EqAe+c/0lIwqsW6SGvljkm4IVBRcjJqu+224kY
+         xblQ==
+X-Gm-Message-State: AC+VfDz+2pv0mOEZH+lgO4MqsNyXhzAwuVyVxlMNWXczVkCDV9pbVKj9
+        +CkoxoSzYM1PDUQKTzgQquRvzxz5lBQ=
+X-Google-Smtp-Source: ACHHUZ6JgFxx+wi/jgTYI3jaqO5bvm6eTxnvR5CVmefpcjcfIkrAvEAw0p15C3rnM8+zUnfHM0jKpw==
+X-Received: by 2002:a05:6a21:9182:b0:10f:759d:c5b2 with SMTP id tp2-20020a056a21918200b0010f759dc5b2mr739557pzb.45.1686128928064;
+        Wed, 07 Jun 2023 02:08:48 -0700 (PDT)
+Received: from localhost (58-6-224-112.tpgi.com.au. [58.6.224.112])
+        by smtp.gmail.com with ESMTPSA id f11-20020a170902860b00b001b045c9abd2sm9904994plo.143.2023.06.07.02.08.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Jun 2023 02:08:47 -0700 (PDT)
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date:   Wed, 07 Jun 2023 19:08:40 +1000
+Message-Id: <CT6ATGRN6KJU.12QZ7TJGGX7LC@wheely>
+Cc:     <kvm@vger.kernel.org>, <kvm-ppc@vger.kernel.org>,
+        <mikey@neuling.org>, <paulus@ozlabs.org>,
+        <kautuk.consul.1980@gmail.com>, <vaibhav@linux.ibm.com>,
+        <sbhat@linux.ibm.com>
+Subject: Re: [RFC PATCH v2 5/6] KVM: PPC: Add support for nested PAPR guests
+From:   "Nicholas Piggin" <npiggin@gmail.com>
+To:     "Jordan Niethe" <jpn@linux.vnet.ibm.com>,
+        <linuxppc-dev@lists.ozlabs.org>
+X-Mailer: aerc 0.14.0
+References: <20230605064848.12319-1-jpn@linux.vnet.ibm.com>
+ <20230605064848.12319-6-jpn@linux.vnet.ibm.com>
+In-Reply-To: <20230605064848.12319-6-jpn@linux.vnet.ibm.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/06/23 13:54, Peter Zijlstra wrote:
-> On Wed, May 24, 2023 at 05:40:47PM +0100, Valentin Schneider wrote:
->>
->> So this bit sent me on a little spelunking session :-)
->>
->> From a control flow perspective the initialization isn't required, but then
->> I looked into the comment and found it comes from the
->> arch_timer_read_counter() definition... Which itself doesn't get used by
->> sched_clock() until the sched_clock_register() below!
->>
->> So AFAICT that comment was true as of
->>
->>   220069945b29 ("clocksource: arch_timer: Add support for memory mapped timers")
->>
->> but not after a commit that came 2 months later:
->>
->>   65cd4f6c99c1 ("arch_timer: Move to generic sched_clock framework")
->>
->> which IIUC made arm/arm64 follow the default approach of using the
->> jiffy-based sched_clock() before probing DT/ACPI and registering a "proper"
->> sched_clock.
->>
->> All of that to say: the comment about arch_timer_read_counter() vs early
->> sched_clock() doesn't apply anymore, but I think we need to keep its
->> initalization around for stuff like get_cycles(). This initialization here
->> should be OK to put to the bin, though.
+On Mon Jun 5, 2023 at 4:48 PM AEST, Jordan Niethe wrote:
+> A series of hcalls have been added to the PAPR which allow a regular
+> guest partition to create and manage guest partitions of its own. Add
+> support to KVM to utilize these hcalls to enable running nested guests.
 >
-> Something like the below folded in then?
+> Overview of the new hcall usage:
 >
+> - L1 and L0 negotiate capabilities with
+>   H_GUEST_{G,S}ET_CAPABILITIES()
+>
+> - L1 requests the L0 create a L2 with
+>   H_GUEST_CREATE() and receives a handle to use in future hcalls
+>
+> - L1 requests the L0 create a L2 vCPU with
+>   H_GUEST_CREATE_VCPU()
+>
+> - L1 sets up the L2 using H_GUEST_SET and the
+>   H_GUEST_VCPU_RUN input buffer
+>
+> - L1 requests the L0 runs the L2 vCPU using H_GUEST_VCPU_RUN()
+>
+> - L2 returns to L1 with an exit reason and L1 reads the
+>   H_GUEST_VCPU_RUN output buffer populated by the L0
+>
+> - L1 handles the exit using H_GET_STATE if necessary
+>
+> - L1 reruns L2 vCPU with H_GUEST_VCPU_RUN
+>
+> - L1 frees the L2 in the L0 with H_GUEST_DELETE()
+>
+> Support for the new API is determined by trying
+> H_GUEST_GET_CAPABILITIES. On a successful return, the new API will then
+> be used.
+>
+> Use the vcpu register state setters for tracking modified guest state
+> elements and copy the thread wide values into the H_GUEST_VCPU_RUN input
+> buffer immediately before running a L2. The guest wide
+> elements can not be added to the input buffer so send them with a
+> separate H_GUEST_SET call if necessary.
+>
+> Make the vcpu register getter load the corresponding value from the real
+> host with H_GUEST_GET. To avoid unnecessarily calling H_GUEST_GET, track
+> which values have already been loaded between H_GUEST_VCPU_RUN calls. If
+> an element is present in the H_GUEST_VCPU_RUN output buffer it also does
+> not need to be loaded again.
+>
+> There is existing support for running nested guests on KVM
+> with powernv. However the interface used for this is not supported by
+> other PAPR hosts. This existing API is still supported.
+>
+> Signed-off-by: Jordan Niethe <jpn@linux.vnet.ibm.com>
+> ---
+> v2:
+>   - Declare op structs as static
+>   - Use expressions in switch case with local variables
+>   - Do not use the PVR for the LOGICAL PVR ID
+>   - Handle emul_inst as now a double word
+>   - Use new GPR(), etc macros
+>   - Determine PAPR nested capabilities from cpu features
+> ---
+>  arch/powerpc/include/asm/guest-state-buffer.h | 105 +-
+>  arch/powerpc/include/asm/hvcall.h             |  30 +
+>  arch/powerpc/include/asm/kvm_book3s.h         | 122 ++-
+>  arch/powerpc/include/asm/kvm_book3s_64.h      |   6 +
+>  arch/powerpc/include/asm/kvm_host.h           |  21 +
+>  arch/powerpc/include/asm/kvm_ppc.h            |  64 +-
+>  arch/powerpc/include/asm/plpar_wrappers.h     | 198 ++++
+>  arch/powerpc/kvm/Makefile                     |   1 +
+>  arch/powerpc/kvm/book3s_hv.c                  | 126 ++-
+>  arch/powerpc/kvm/book3s_hv.h                  |  74 +-
+>  arch/powerpc/kvm/book3s_hv_nested.c           |  38 +-
+>  arch/powerpc/kvm/book3s_hv_papr.c             | 940 ++++++++++++++++++
+>  arch/powerpc/kvm/emulate_loadstore.c          |   4 +-
+>  arch/powerpc/kvm/guest-state-buffer.c         |  49 +
+>  14 files changed, 1684 insertions(+), 94 deletions(-)
+>  create mode 100644 arch/powerpc/kvm/book3s_hv_papr.c
+>
+> diff --git a/arch/powerpc/include/asm/guest-state-buffer.h b/arch/powerpc=
+/include/asm/guest-state-buffer.h
+> index 65a840abf1bb..116126edd8e2 100644
+> --- a/arch/powerpc/include/asm/guest-state-buffer.h
+> +++ b/arch/powerpc/include/asm/guest-state-buffer.h
+> @@ -5,6 +5,7 @@
+>  #ifndef _ASM_POWERPC_GUEST_STATE_BUFFER_H
+>  #define _ASM_POWERPC_GUEST_STATE_BUFFER_H
+> =20
+> +#include "asm/hvcall.h"
+>  #include <linux/gfp.h>
+>  #include <linux/bitmap.h>
+>  #include <asm/plpar_wrappers.h>
+> @@ -14,16 +15,16 @@
+>   ***********************************************************************=
+***/
+>  #define GSID_BLANK			0x0000
+> =20
+> -#define GSID_HOST_STATE_SIZE		0x0001 /* Size of Hypervisor Internal Form=
+at VCPU state */
+> -#define GSID_RUN_OUTPUT_MIN_SIZE	0x0002 /* Minimum size of the Run VCPU =
+output buffer */
+> -#define GSID_LOGICAL_PVR		0x0003 /* Logical PVR */
+> -#define GSID_TB_OFFSET			0x0004 /* Timebase Offset */
+> -#define GSID_PARTITION_TABLE		0x0005 /* Partition Scoped Page Table */
+> -#define GSID_PROCESS_TABLE		0x0006 /* Process Table */
+> +#define GSID_HOST_STATE_SIZE		0x0001
+> +#define GSID_RUN_OUTPUT_MIN_SIZE	0x0002
+> +#define GSID_LOGICAL_PVR		0x0003
+> +#define GSID_TB_OFFSET			0x0004
+> +#define GSID_PARTITION_TABLE		0x0005
+> +#define GSID_PROCESS_TABLE		0x0006
 
-Much better, thank you!
+You lost your comments.
 
+> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include=
+/asm/kvm_book3s.h
+> index 0ca2d8b37b42..c5c57552b447 100644
+> --- a/arch/powerpc/include/asm/kvm_book3s.h
+> +++ b/arch/powerpc/include/asm/kvm_book3s.h
+> @@ -12,6 +12,7 @@
+>  #include <linux/types.h>
+>  #include <linux/kvm_host.h>
+>  #include <asm/kvm_book3s_asm.h>
+> +#include <asm/guest-state-buffer.h>
+> =20
+>  struct kvmppc_bat {
+>  	u64 raw;
+> @@ -316,6 +317,57 @@ long int kvmhv_nested_page_fault(struct kvm_vcpu *vc=
+pu);
+> =20
+>  void kvmppc_giveup_fac(struct kvm_vcpu *vcpu, ulong fac);
+> =20
+> +
+> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+> +
+> +extern bool __kvmhv_on_papr;
+> +
+> +static inline bool kvmhv_on_papr(void)
+> +{
+> +	return __kvmhv_on_papr;
+> +}
+
+It's a nitpick, but kvmhv_on_pseries() is because we're runnning KVM-HV
+on a pseries guest kernel. Which is a papr guest kernel. So this kind of
+doesn't make sense if you read it the same way.
+
+kvmhv_nested_using_papr() or something like that might read a bit
+better.
+
+This could be a static key too.
+
+> @@ -575,6 +593,7 @@ struct kvm_vcpu_arch {
+>  	ulong dscr;
+>  	ulong amr;
+>  	ulong uamor;
+> +	ulong amor;
+>  	ulong iamr;
+>  	u32 ctrl;
+>  	u32 dabrx;
+
+This belongs somewhere else.
+
+> @@ -829,6 +848,8 @@ struct kvm_vcpu_arch {
+>  	u64 nested_hfscr;	/* HFSCR that the L1 requested for the nested guest *=
+/
+>  	u32 nested_vcpu_id;
+>  	gpa_t nested_io_gpr;
+> +	/* For nested APIv2 guests*/
+> +	struct kvmhv_papr_host papr_host;
+>  #endif
+
+This is not exactly a papr host. Might have to come up with a better
+name especially if we implement a L0 things could get confusing.
+
+> @@ -342,6 +343,203 @@ static inline long plpar_get_cpu_characteristics(st=
+ruct h_cpu_char_result *p)
+>  	return rc;
+>  }
+> =20
+> +static inline long plpar_guest_create(unsigned long flags, unsigned long=
+ *guest_id)
+> +{
+> +	unsigned long retbuf[PLPAR_HCALL_BUFSIZE];
+> +	unsigned long token;
+> +	long rc;
+> +
+> +	token =3D -1UL;
+> +	while (true) {
+> +		rc =3D plpar_hcall(H_GUEST_CREATE, retbuf, flags, token);
+> +		if (rc =3D=3D H_SUCCESS) {
+> +			*guest_id =3D retbuf[0];
+> +			break;
+> +		}
+> +
+> +		if (rc =3D=3D H_BUSY) {
+> +			token =3D retbuf[0];
+> +			cpu_relax();
+> +			continue;
+> +		}
+> +
+> +		if (H_IS_LONG_BUSY(rc)) {
+> +			token =3D retbuf[0];
+> +			mdelay(get_longbusy_msecs(rc));
+
+All of these things need a non-sleeping delay? Can we sleep instead?
+Or if not, might have to think about going back to the caller and it
+can retry.
+
+get/set state might be a bit inconvenient, although I don't expect
+that should potentially take so long as guest and vcpu create/delete,
+so at least those ones would be good if they're called while
+preemptable.
+
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 521d84621422..f22ee582e209 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -383,6 +383,11 @@ static void kvmppc_core_vcpu_put_hv(struct kvm_vcpu =
+*vcpu)
+>  	spin_unlock_irqrestore(&vcpu->arch.tbacct_lock, flags);
+>  }
+> =20
+> +static void kvmppc_set_pvr_hv(struct kvm_vcpu *vcpu, u32 pvr)
+> +{
+> +	vcpu->arch.pvr =3D pvr;
+> +}
+
+Didn't you lose this in a previous patch? I thought it must have moved
+to a header but it reappears.
+
+> +
+>  /* Dummy value used in computing PCR value below */
+>  #define PCR_ARCH_31    (PCR_ARCH_300 << 1)
+> =20
+> @@ -1262,13 +1267,14 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu=
+)
+>  			return RESUME_HOST;
+>  		break;
+>  #endif
+> -	case H_RANDOM:
+> +	case H_RANDOM: {
+>  		unsigned long rand;
+> =20
+>  		if (!arch_get_random_seed_longs(&rand, 1))
+>  			ret =3D H_HARDWARE;
+>  		kvmppc_set_gpr(vcpu, 4, rand);
+>  		break;
+> +	}
+>  	case H_RPT_INVALIDATE:
+>  		ret =3D kvmppc_h_rpt_invalidate(vcpu, kvmppc_get_gpr(vcpu, 4),
+>  					      kvmppc_get_gpr(vcpu, 5),
+
+Compile fix for a previous patch.
+
+> @@ -2921,14 +2927,21 @@ static int kvmppc_core_vcpu_create_hv(struct kvm_=
+vcpu *vcpu)
+>  	vcpu->arch.shared_big_endian =3D false;
+>  #endif
+>  #endif
+> -	kvmppc_set_mmcr_hv(vcpu, 0, MMCR0_FC);
+> =20
+> +	if (kvmhv_on_papr()) {
+> +		err =3D kvmhv_papr_vcpu_create(vcpu, &vcpu->arch.papr_host);
+> +		if (err < 0)
+> +			return err;
+> +	}
+> +
+> +	kvmppc_set_mmcr_hv(vcpu, 0, MMCR0_FC);
+>  	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
+>  		kvmppc_set_mmcr_hv(vcpu, 0, kvmppc_get_mmcr_hv(vcpu, 0) | MMCR0_PMCCEX=
+T);
+>  		kvmppc_set_mmcra_hv(vcpu, MMCRA_BHRB_DISABLE);
+>  	}
+> =20
+>  	kvmppc_set_ctrl_hv(vcpu, CTRL_RUNLATCH);
+> +	kvmppc_set_amor_hv(vcpu, ~0);
+
+This AMOR thing should go somewhere else. Not actually sure why it needs
+to be added to the vcpu since it's always ~0. Maybe just put that in a
+#define somewhere and use that.
+
+> @@ -4042,6 +4059,50 @@ static void vcpu_vpa_increment_dispatch(struct kvm=
+_vcpu *vcpu)
+>  	}
+>  }
+> =20
+> +static int kvmhv_vcpu_entry_papr(struct kvm_vcpu *vcpu, u64 time_limit, =
+unsigned long lpcr, u64 *tb)
+> +{
+> +	struct kvmhv_papr_host *ph;
+> +	unsigned long msr, i;
+> +	int trap;
+> +	long rc;
+> +
+> +	ph =3D &vcpu->arch.papr_host;
+> +
+> +	msr =3D mfmsr();
+> +	kvmppc_msr_hard_disable_set_facilities(vcpu, msr);
+> +	if (lazy_irq_pending())
+> +		return 0;
+> +
+> +	kvmhv_papr_flush_vcpu(vcpu, time_limit);
+> +
+> +	accumulate_time(vcpu, &vcpu->arch.in_guest);
+> +	rc =3D plpar_guest_run_vcpu(0, vcpu->kvm->arch.lpid, vcpu->vcpu_id,
+> +				  &trap, &i);
+> +
+> +	if (rc !=3D H_SUCCESS) {
+> +		pr_err("KVM Guest Run VCPU hcall failed\n");
+> +		if (rc =3D=3D H_INVALID_ELEMENT_ID)
+> +			pr_err("KVM: Guest Run VCPU invalid element id at %ld\n", i);
+> +		else if (rc =3D=3D H_INVALID_ELEMENT_SIZE)
+> +			pr_err("KVM: Guest Run VCPU invalid element size at %ld\n", i);
+> +		else if (rc =3D=3D H_INVALID_ELEMENT_VALUE)
+> +			pr_err("KVM: Guest Run VCPU invalid element value at %ld\n", i);
+> +		return 0;
+> +	}
+
+This needs the proper error handling. Were you going to wait until I
+sent that up for existing code?
+
+> @@ -5119,6 +5183,7 @@ static void kvmppc_core_commit_memory_region_hv(str=
+uct kvm *kvm,
+>   */
+>  void kvmppc_update_lpcr(struct kvm *kvm, unsigned long lpcr, unsigned lo=
+ng mask)
+>  {
+> +	struct kvm_vcpu *vcpu;
+>  	long int i;
+>  	u32 cores_done =3D 0;
+> =20
+> @@ -5139,6 +5204,12 @@ void kvmppc_update_lpcr(struct kvm *kvm, unsigned =
+long lpcr, unsigned long mask)
+>  		if (++cores_done >=3D kvm->arch.online_vcores)
+>  			break;
+>  	}
+> +
+> +	if (kvmhv_on_papr()) {
+> +		kvm_for_each_vcpu(i, vcpu, kvm) {
+> +			kvmppc_set_lpcr_hv(vcpu, vcpu->arch.vcore->lpcr);
+> +		}
+> +	}
+>  }
+
+vcpu define could go in that scope I guess.
+
+> @@ -5405,15 +5476,43 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm=
+)
+> =20
+>  	/* Allocate the guest's logical partition ID */
+> =20
+> -	lpid =3D kvmppc_alloc_lpid();
+> -	if ((long)lpid < 0)
+> -		return -ENOMEM;
+> -	kvm->arch.lpid =3D lpid;
+> +	if (!kvmhv_on_papr()) {
+> +		lpid =3D kvmppc_alloc_lpid();
+> +		if ((long)lpid < 0)
+> +			return -ENOMEM;
+> +		kvm->arch.lpid =3D lpid;
+> +	}
+> =20
+>  	kvmppc_alloc_host_rm_ops();
+> =20
+>  	kvmhv_vm_nested_init(kvm);
+> =20
+> +	if (kvmhv_on_papr()) {
+> +		long rc;
+> +		unsigned long guest_id;
+> +
+> +		rc =3D plpar_guest_create(0, &guest_id);
+> +
+> +		if (rc !=3D H_SUCCESS)
+> +			pr_err("KVM: Create Guest hcall failed, rc=3D%ld\n", rc);
+> +
+> +		switch (rc) {
+> +		case H_PARAMETER:
+> +		case H_FUNCTION:
+> +		case H_STATE:
+> +			return -EINVAL;
+> +		case H_NOT_ENOUGH_RESOURCES:
+> +		case H_ABORTED:
+> +			return -ENOMEM;
+> +		case H_AUTHORITY:
+> +			return -EPERM;
+> +		case H_NOT_AVAILABLE:
+> +			return -EBUSY;
+> +		}
+> +		kvm->arch.lpid =3D guest_id;
+> +	}
+
+I wouldn't mind putting lpid/guest_id in different variables. guest_id
+is 64-bit isn't it? LPIDR is 32. If nothing else that could cause
+issues if the hypervisor does something clever with the token.
+
+> @@ -5573,10 +5675,14 @@ static void kvmppc_core_destroy_vm_hv(struct kvm =
+*kvm)
+>  		kvm->arch.process_table =3D 0;
+>  		if (kvm->arch.secure_guest)
+>  			uv_svm_terminate(kvm->arch.lpid);
+> -		kvmhv_set_ptbl_entry(kvm->arch.lpid, 0, 0);
+> +		if (!kvmhv_on_papr())
+> +			kvmhv_set_ptbl_entry(kvm->arch.lpid, 0, 0);
+>  	}
+
+Would be nice to have a +ve test for the "existing" API. All we have to
+do is think of a name for it.
+
+Thanks,
+Nick
