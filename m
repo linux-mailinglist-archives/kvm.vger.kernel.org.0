@@ -2,250 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08F4D725425
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 08:29:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93C7F725497
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 08:44:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234278AbjFGG32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 02:29:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52632 "EHLO
+        id S237728AbjFGGo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 02:44:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234210AbjFGG3V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 02:29:21 -0400
+        with ESMTP id S237737AbjFGGot (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 02:44:49 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D58F1FCA;
-        Tue,  6 Jun 2023 23:29:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76BE8196;
+        Tue,  6 Jun 2023 23:44:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686119347; x=1717655347;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=8s4/A/li4xc6E8e+qolexVNkC6cEYlX78umXHVQ4tug=;
-  b=JC1PJLYG/JeamTxlDwYJsF6yjTHNgsxLtgdMPE6vGZPdRAYZg3ZkrJaJ
-   h30W3cscfwvYfiW71aYbW7ePx935oIG56Znuiyi0IJt5A9nHZGP4eLQA0
-   ykLWcOwixqJFJFdOjx/DQBFJyqXRDewWdF+O145f4dCEYq3VyfObhaXhi
-   dTjBjoCpknxJCsY4wYCdl78UQGFkzEy6ADk+NV/Zq53HaldH7Z4FBSWjg
-   oQB9vJLvJzF8S6ymbuHfttXeoBy0fS7rGAV8NdY0WBeFiggxNpudcw7oq
-   dnupToA1dUGAe69Bs0em3jRdCmgEkLfFwWBQ5estgntFWhl0ZnljXOfsZ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10733"; a="354392635"
+  t=1686120288; x=1717656288;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4tki/V8b+YyMtWB/3hCmjlsI9h+GFezHEZ6clq56P3o=;
+  b=hFjCdm5wy8LPU92a30nx1h7gfH1fTIUT1n7R0ZjL4VYahSSoKMtUw/QU
+   R3A1TU18Rmtr4Dwesodh6L0A0FzPejctZbwfL/hfMOv/4GwY+gb07MazO
+   96YNAouuo4FQdkB0I3zaCmLaDOi3QPOJQSqopa5DJVIuoaiUusK0zpfLW
+   kTVkLaTKXKQWb0PnW3FC1SHDI38ZavQw9+oIgcdYN40UM89kiOg4qeS+8
+   wUvM1zzDIDKmPMm7PgKW4Eo5QyS3d7WpS6fxlD9ZXIuPqcSkKXGz4BiuI
+   0W4UbF8axay0TU4iLXOC4QppjUoFtW5NTyHz6kranP70JIXJ9jxmmzV6z
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10733"; a="354395965"
 X-IronPort-AV: E=Sophos;i="6.00,223,1681196400"; 
-   d="scan'208";a="354392635"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 23:29:06 -0700
+   d="scan'208";a="354395965"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 23:44:48 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10733"; a="799175329"
+X-IronPort-AV: E=McAfee;i="6600,9927,10733"; a="956089496"
 X-IronPort-AV: E=Sophos;i="6.00,223,1681196400"; 
-   d="scan'208";a="799175329"
-Received: from zengguan-mobl1.ccr.corp.intel.com (HELO [10.238.0.196]) ([10.238.0.196])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 23:29:04 -0700
-Message-ID: <ab5de923-db2e-5137-6df8-16af7a2af333@intel.com>
-Date:   Wed, 7 Jun 2023 14:28:54 +0800
+   d="scan'208";a="956089496"
+Received: from lkp-server01.sh.intel.com (HELO 15ab08e44a81) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 06 Jun 2023 23:44:45 -0700
+Received: from kbuild by 15ab08e44a81 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1q6muS-0006Gr-0t;
+        Wed, 07 Jun 2023 06:44:44 +0000
+Date:   Wed, 7 Jun 2023 14:43:45 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>
+Cc:     oe-kbuild-all@lists.linux.dev,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>
+Subject: Re: [PATCH v4 6/6] s390/uv: Update query for secret-UVCs
+Message-ID: <202306071439.xUNkOsqy-lkp@intel.com>
+References: <20230606180817.3019077-7-seiden@linux.ibm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH v1 3/6] KVM: VMX: Add new ops in kvm_x86_ops for LASS
- violation check
-Content-Language: en-US
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20230601142309.6307-1-guang.zeng@intel.com>
- <20230601142309.6307-4-guang.zeng@intel.com>
- <3b3d9106-9e4f-8a76-30ee-29540b06022a@linux.intel.com>
-From:   Zeng Guang <guang.zeng@intel.com>
-In-Reply-To: <3b3d9106-9e4f-8a76-30ee-29540b06022a@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230606180817.3019077-7-seiden@linux.ibm.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Steffen,
 
-On 6/5/2023 11:31 AM, Binbin Wu wrote:
->
-> On 6/1/2023 10:23 PM, Zeng Guang wrote:
->> Intel introduces LASS (Linear Address Separation) feature providing
->                         ^
->    missing "Space" here
-Thanks.
->> an independent mechanism to achieve the mode-based protection.
->>
->> LASS partitions 64-bit linear address space into two halves, user-mode
->> address (LA[bit 63]=0) and supervisor-mode address (LA[bit 63]=1). It
->> stops any code execution or conditional data access[1]
->>       1. from user mode to supervisor-mode address space
->>       2. from supervisor mode to user-mode address space
->> and generates LASS violation fault accordingly.
->>
->> [1]A supervisor mode data access causes a LASS violation only if supervisor
->> mode access protection is enabled (CR4.SMAP = 1) and either RFLAGS.AC = 0
->> or the access implicitly accesses a system data structure.
->>
->> Following are the rules of LASS violation check on the linear address(LA).
->> User access to supervisor-mode address space:
->>       LA[bit 63] && (CPL == 3)
->> Supervisor access to user-mode address space:
->>       Instruction fetch: !LA[bit 63] && (CPL < 3)
->>       Data access: !LA[bit 63] && (CR4.SMAP==1) && ((RFLAGS.AC == 0 &&
->>                    CPL < 3) || Implicit supervisor access)
->>
->> Add new ops in kvm_x86_ops to do LASS violation check.
->>
->> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
->> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
->> ---
->>    arch/x86/include/asm/kvm-x86-ops.h |  3 +-
->>    arch/x86/include/asm/kvm_host.h    |  2 ++
->>    arch/x86/kvm/kvm_emulate.h         |  1 +
->>    arch/x86/kvm/vmx/vmx.c             | 47 ++++++++++++++++++++++++++++++
->>    arch/x86/kvm/vmx/vmx.h             |  2 ++
->>    5 files changed, 54 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
->> index 13bc212cd4bc..8980a3bfa687 100644
->> --- a/arch/x86/include/asm/kvm-x86-ops.h
->> +++ b/arch/x86/include/asm/kvm-x86-ops.h
->> @@ -132,7 +132,8 @@ KVM_X86_OP_OPTIONAL(migrate_timers)
->>    KVM_X86_OP(msr_filter_changed)
->>    KVM_X86_OP(complete_emulated_msr)
->>    KVM_X86_OP(vcpu_deliver_sipi_vector)
->> -KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
->> +KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons)
->> +KVM_X86_OP_OPTIONAL_RET0(check_lass)
->>    
->>    #undef KVM_X86_OP
->>    #undef KVM_X86_OP_OPTIONAL
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 92d8e65fe88c..98666d1e7727 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -1731,6 +1731,8 @@ struct kvm_x86_ops {
->>    	 * Returns vCPU specific APICv inhibit reasons
->>    	 */
->>    	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
->> +
->> +	bool (*check_lass)(struct kvm_vcpu *vcpu, u64 access, u64 la, u32 flags);
->>    };
->>    
->>    struct kvm_x86_nested_ops {
->> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
->> index 5b9ec610b2cb..f1439ab7c14b 100644
->> --- a/arch/x86/kvm/kvm_emulate.h
->> +++ b/arch/x86/kvm/kvm_emulate.h
->> @@ -91,6 +91,7 @@ struct x86_instruction_info {
->>    /* x86-specific emulation flags */
->>    #define X86EMUL_F_FETCH			BIT(0)
->>    #define X86EMUL_F_WRITE			BIT(1)
->> +#define X86EMUL_F_SKIPLASS		BIT(2)
->>    
->>    struct x86_emulate_ops {
->>    	void (*vm_bugged)(struct x86_emulate_ctxt *ctxt);
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index a33205ded85c..876997e8448e 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -8130,6 +8130,51 @@ static void vmx_vm_destroy(struct kvm *kvm)
->>    	free_pages((unsigned long)kvm_vmx->pid_table, vmx_get_pid_table_order(kvm));
->>    }
->>    
->> +/*
->> + * Determine whether an access to the linear address causes a LASS violation.
->> + * LASS protection is only effective in long mode. As a prerequisite, caller
->> + * should make sure vCPU running in long mode and invoke this api to do LASS
->> + * violation check.
->> + */
->> +bool vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u32 flags)
->> +{
->> +	bool user_mode, user_as, rflags_ac;
->> +
->> +	if (!!(flags & X86EMUL_F_SKIPLASS) ||
->> +	    !kvm_is_cr4_bit_set(vcpu, X86_CR4_LASS))
->> +		return false;
->> +
->> +	WARN_ON_ONCE(!is_long_mode(vcpu));
-> IMHO, it's better to skip the following checks and return false if it is
-> out of long mode.
-In some cases , cpu mode check already exists before invoking LASS violation
-detect, e.g. vmx instruction emulation. So it's designed to make 
-vmx_check_lass()
-focusing on LASS violation alone, and leave it to caller taking care of 
-cpu mode
-in advance.
+kernel test robot noticed the following build errors:
 
-The purpose is to avoid duplicating cpu mode check though the impact 
-seems not
-significant. :)
->> +
->> +	user_as = !(la >> 63);
-> It's better to describe how LASS treat linear address in compatibility
-> mode in changelog or/and in comment,
-> i.e. for a linear address with only 32 bits (or 16 bits), the processor
-> treats bit 63 as if it were 0.
->
-OK, will add comments on specific treatment in compatibility mode.
->> +
->> +	/*
->> +	 * An access is a supervisor-mode access if CPL < 3 or if it implicitly
->> +	 * accesses a system data structure. For implicit accesses to system
->> +	 * data structure, the processor acts as if RFLAGS.AC is clear.
->> +	 */
->> +	if (access & PFERR_IMPLICIT_ACCESS) {
->> +		user_mode = false;
->> +		rflags_ac = false;
->> +	} else {
->> +		user_mode = vmx_get_cpl(vcpu) == 3;
->> +		if (!user_mode)
->> +			rflags_ac = !!(kvm_get_rflags(vcpu) & X86_EFLAGS_AC);
->> +	}
->> +
->> +	if (user_mode == user_as)
->> +		return false;
->> +
->> +	/*
->> +	 * Supervisor-mode _data_ accesses to user address space
->> +	 * cause LASS violations only if SMAP is enabled.
->> +	 */
->> +	if (!user_mode && !(access & PFERR_FETCH_MASK))
->> +		return kvm_is_cr4_bit_set(vcpu, X86_CR4_SMAP) && !rflags_ac;
->> +
->> +	return true;
->> +}
->> +
->>    static struct kvm_x86_ops vmx_x86_ops __initdata = {
->>    	.name = KBUILD_MODNAME,
->>    
->> @@ -8269,6 +8314,8 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
->>    	.complete_emulated_msr = kvm_complete_insn_gp,
->>    
->>    	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
->> +
->> +	.check_lass = vmx_check_lass,
->>    };
->>    
->>    static unsigned int vmx_handle_intel_pt_intr(void)
->> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
->> index 9e66531861cf..f2e775b9849b 100644
->> --- a/arch/x86/kvm/vmx/vmx.h
->> +++ b/arch/x86/kvm/vmx/vmx.h
->> @@ -433,6 +433,8 @@ void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type);
->>    u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu);
->>    u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
->>    
->> +bool vmx_check_lass(struct kvm_vcpu *vcpu, u64 access, u64 la, u32 flags);
->> +
->>    static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr,
->>    					     int type, bool value)
->>    {
+[auto build test ERROR on kvms390/next]
+[also build test ERROR on s390/features mst-vhost/linux-next linus/master v6.4-rc5 next-20230607]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Steffen-Eiden/s390-uvdevice-Add-info-IOCTL/20230607-021159
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git next
+patch link:    https://lore.kernel.org/r/20230606180817.3019077-7-seiden%40linux.ibm.com
+patch subject: [PATCH v4 6/6] s390/uv: Update query for secret-UVCs
+config: s390-defconfig (https://download.01.org/0day-ci/archive/20230607/202306071439.xUNkOsqy-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 12.3.0
+reproduce (this is a W=1 build):
+        mkdir -p ~/bin
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        git remote add kvms390 https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git
+        git fetch kvms390 next
+        git checkout kvms390/next
+        b4 shazam https://lore.kernel.org/r/20230606180817.3019077-7-seiden@linux.ibm.com
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=s390 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=s390 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306071439.xUNkOsqy-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   arch/s390/boot/uv.c: In function 'uv_query_info':
+>> arch/s390/boot/uv.c:53:55: error: expected ';' before '}' token
+      53 |                 uv_info.max_secrets = uvcb.max_secrets
+         |                                                       ^
+         |                                                       ;
+      54 |         }
+         |         ~                                              
+
+
+vim +53 arch/s390/boot/uv.c
+
+    18	
+    19	void uv_query_info(void)
+    20	{
+    21		struct uv_cb_qui uvcb = {
+    22			.header.cmd = UVC_CMD_QUI,
+    23			.header.len = sizeof(uvcb)
+    24		};
+    25	
+    26		if (!test_facility(158))
+    27			return;
+    28	
+    29		/* rc==0x100 means that there is additional data we do not process */
+    30		if (uv_call(0, (uint64_t)&uvcb) && uvcb.header.rc != 0x100)
+    31			return;
+    32	
+    33		if (IS_ENABLED(CONFIG_KVM)) {
+    34			memcpy(uv_info.inst_calls_list, uvcb.inst_calls_list, sizeof(uv_info.inst_calls_list));
+    35			uv_info.uv_base_stor_len = uvcb.uv_base_stor_len;
+    36			uv_info.guest_base_stor_len = uvcb.conf_base_phys_stor_len;
+    37			uv_info.guest_virt_base_stor_len = uvcb.conf_base_virt_stor_len;
+    38			uv_info.guest_virt_var_stor_len = uvcb.conf_virt_var_stor_len;
+    39			uv_info.guest_cpu_stor_len = uvcb.cpu_stor_len;
+    40			uv_info.max_sec_stor_addr = ALIGN(uvcb.max_guest_stor_addr, PAGE_SIZE);
+    41			uv_info.max_num_sec_conf = uvcb.max_num_sec_conf;
+    42			uv_info.max_guest_cpu_id = uvcb.max_guest_cpu_id;
+    43			uv_info.uv_feature_indications = uvcb.uv_feature_indications;
+    44			uv_info.supp_se_hdr_ver = uvcb.supp_se_hdr_versions;
+    45			uv_info.supp_se_hdr_pcf = uvcb.supp_se_hdr_pcf;
+    46			uv_info.conf_dump_storage_state_len = uvcb.conf_dump_storage_state_len;
+    47			uv_info.conf_dump_finalize_len = uvcb.conf_dump_finalize_len;
+    48			uv_info.supp_att_req_hdr_ver = uvcb.supp_att_req_hdr_ver;
+    49			uv_info.supp_att_pflags = uvcb.supp_att_pflags;
+    50			uv_info.supp_add_secret_req_ver = uvcb.supp_add_secret_req_ver;
+    51			uv_info.supp_add_secret_pcf = uvcb.supp_add_secret_pcf;
+    52			uv_info.supp_secret_types = uvcb.supp_secret_types;
+  > 53			uv_info.max_secrets = uvcb.max_secrets
+    54		}
+    55	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
