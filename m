@@ -2,96 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB74472683E
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 20:16:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42176726840
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 20:16:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231605AbjFGSQB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 14:16:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60794 "EHLO
+        id S232455AbjFGSQQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 14:16:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231415AbjFGSP6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 14:15:58 -0400
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B8F91FE6
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 11:15:28 -0700 (PDT)
-Received: by mail-il1-x136.google.com with SMTP id e9e14a558f8ab-33b5dba8c6cso4659385ab.2
-        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 11:15:28 -0700 (PDT)
+        with ESMTP id S232351AbjFGSQL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 14:16:11 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E23F626A1;
+        Wed,  7 Jun 2023 11:15:48 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6532671ccc7so6831622b3a.2;
+        Wed, 07 Jun 2023 11:15:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686161677; x=1688753677;
-        h=to:subject:message-id:date:from:sender:mime-version:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u5iMSeOKpFSmRZGHk7AHtYahJMrc6/q+PHYUICyADXw=;
-        b=YAlZ/+mozlG80V/t2BtfDtl+iFp+40Mi7LNkiZiZ6FbnFdcPJlRcQLWv2SZ4eQ8eU8
-         4578xZybWU8uML4gjwp89xsLfU3C4ALPD0ZmovzjbzlCi38H4GfzbgJR9lcaRVe93fcR
-         4T1kdBau/SZx+K94afUk1WqnNgyDpjYXUr+NbzDkZ0t8B1WecJwQb/tXMUzWZPcDUcvt
-         Bs+79G97jt5pdDU/iNhVx5SivsGs/jCA1R4dUe13/bYwUl2u3YCbNJa9e/GzBW08Z47f
-         h3RcHkjEEVcNULBdp1s6JGjiIDdlt42ko4IwyvaAym0k2WlpnPJKFO4viavnmZpxmbr/
-         JAzA==
+        d=gmail.com; s=20221208; t=1686161739; x=1688753739;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=I1Bdx56ELbJV6dVhyhR5X8oZi1hZNlzrjaEbVK43zt0=;
+        b=n+4h+HLEv7EtmjMbv4XFFywlwFrltstBuM8BlVU6O6baPWbwsPuzB8CIDradodZ9sk
+         oovi1r+vTq+81F5PPTMSE7Pk+xfLqed6d8UntW66P5fxjDpqZzkmqcG7h1PBjpeO0+Hd
+         4bksgwvv/ULOalVkUPeZM5m/Jp3SQiHOekKOaFQdzGNzCTkgE8LO2soreHroIBOxRUlC
+         Nr5H+zrh1ndKXPxNTdFeMAeqNn1wCpgmF1uqP11eZD3JEkGfSs/QrmEUO6UNZ71jDoUm
+         Da0uv69LcxBjL3PbCo87IVTkgOJXB+O8t8mHAcSU3lPMRQv+j+utjBNcU37uU9Y2mzTL
+         W53Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686161677; x=1688753677;
-        h=to:subject:message-id:date:from:sender:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u5iMSeOKpFSmRZGHk7AHtYahJMrc6/q+PHYUICyADXw=;
-        b=ey2CCmFGEjwByrHYwB+sNhkpEbEgXV2g0EwzEauseqjhlP26+0YS8l64Cep7gHKV91
-         jWv43Es9FpvgHp8A2SRenqbjU9pOQDMWRZRnzO1k1iOwBBQcFBZiYbhZZGa5ZUvLc5EW
-         DHqbiOQnSOP19RIHhPW0fNxuDH/Cf+n/iC69ix++r4ffTK0T1zM3G569eTnmz7YzbxSZ
-         hIf/uJIAxX5yjNZjra4g/1bU0fIEKRiCGm78rvk2sNiRtaKvogbX+HvqKsZHSFhJFqCF
-         MsGkf9MvNysbfZlR8s/eMO1Rb4LPZQeZZaEhAoRrQhkfcxZjsDK7dR3vjuEZ+n53vW2J
-         qnWQ==
-X-Gm-Message-State: AC+VfDzgtpDvQfkrmJtz5/PQi1U54ih3uzDJUrXMRRVkfjtLaY8XSpE9
-        Ydi7s240xOz0Hv6UrxUqoMx5VUO9kkAZv/sQdpg=
-X-Google-Smtp-Source: ACHHUZ6O0IM+kDh47Z0qfaejhYM3dW6HZQEgax2Yhuq1CRHKG0ydV1txYIzcA1tParE02p8+m2AFYYWuMWG8lL/rg18=
-X-Received: by 2002:a05:6e02:810:b0:33d:67c8:aebe with SMTP id
- u16-20020a056e02081000b0033d67c8aebemr4789690ilm.31.1686161676978; Wed, 07
- Jun 2023 11:14:36 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1686161739; x=1688753739;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I1Bdx56ELbJV6dVhyhR5X8oZi1hZNlzrjaEbVK43zt0=;
+        b=A9TDFy6tkL82jdXHXF+OyFSkh9FFq5x/CEgH5/+ogeH4vSkfS9XkRLQwumjPCs6d9q
+         gDr/UcSpirIWTx+s5oZBHJFUCYYwu7/oWSAMBQXOx01QaT2FOnD/SR+vskIuJ65OqXf0
+         Rq4KUhv9XqizxYMOPrpgu1AyG0dGhAu3R2viDai0ObtxcALgS4vkog3KiidI2y1G5K0k
+         36hRaK7jVsTQz3KuVbiJRqlbClRUk0QH2yj0e0DmFJHg/IJ7PkDIdn1zmtZSVywiFtAT
+         AxavCqGBhQxvClMrISM6Nk7b2KC21obHmxI3clHEnVNyparp15kS7fEm5ZOryEDv8VjM
+         L08Q==
+X-Gm-Message-State: AC+VfDwqHoOhTowKnDJ/nK7cferX0WywTStZhaZMFo48yQYewbOzEDPg
+        puenZfWP2yt1TpV8CpP5l3zTgB75AozANQ==
+X-Google-Smtp-Source: ACHHUZ5/l4PYL/diZnBXO47WKC1iNZQbpyhoKSRt8h8KKmprcUXYCD2dnCbnJWNxoM6wWCRQ43cCyg==
+X-Received: by 2002:a05:6a00:180f:b0:663:13a9:9504 with SMTP id y15-20020a056a00180f00b0066313a99504mr162246pfa.10.1686161739462;
+        Wed, 07 Jun 2023 11:15:39 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id b17-20020aa78111000000b0064dbf805ff7sm2587545pfi.72.2023.06.07.11.15.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jun 2023 11:15:38 -0700 (PDT)
+Date:   Wed, 7 Jun 2023 11:15:37 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Wang, Wei W" <wei.w.wang@intel.com>
+Cc:     "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>,
+        "Chen, Bo2" <chen.bo@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v14 011/113] KVM: TDX: Add C wrapper functions for
+ SEAMCALLs to the TDX module
+Message-ID: <20230607181537.GG2244082@ls.amr.corp.intel.com>
+References: <cover.1685333727.git.isaku.yamahata@intel.com>
+ <37b118268ccf73d8e9cc1ef8f9fb7376fb732d60.1685333727.git.isaku.yamahata@intel.com>
+ <DS0PR11MB6373872D1536D6469B29159CDC4DA@DS0PR11MB6373.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Sender: kimleemoon20@gmail.com
-Received: by 2002:a92:c503:0:b0:335:7c2e:10df with HTTP; Wed, 7 Jun 2023
- 11:14:36 -0700 (PDT)
-From:   Aisha Algaddafi <algaddafiaisha247@gmail.com>
-Date:   Wed, 7 Jun 2023 19:14:36 +0100
-X-Google-Sender-Auth: W6RpFxSvbXMCoqyf85jLPUpoAcE
-Message-ID: <CALPmVKL2w_0hEO9K=xbGP5Ehk9e0GQM8Jzo-NTw_TCHv_oNgvA@mail.gmail.com>
-Subject: PLEASE I NEED YOUR HELP.
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=4.2 required=5.0 tests=BAYES_60,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORM_FRAUD_5,
-        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,LOTS_OF_MONEY,
-        MONEY_FORM_SHORT,MONEY_FRAUD_5,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,SUBJ_ALL_CAPS,T_FILL_THIS_FORM_SHORT,T_SCC_BODY_TEXT_LINE,
-        UNDISC_MONEY,URG_BIZ,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
-X-Spam-Level: ****
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <DS0PR11MB6373872D1536D6469B29159CDC4DA@DS0PR11MB6373.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I want to use this medium to open a mutual conversations  with you
-seeking for your acceptance towards investing in your country under
-your management as my partner,
+On Mon, Jun 05, 2023 at 03:20:19PM +0000,
+"Wang, Wei W" <wei.w.wang@intel.com> wrote:
 
-My name is Aisha  Gaddaf and presently living in Oman, i am a Widow
-and single Mother with three Children, the only biological Daughter of
-late Libyan President (Late Colonel Muammar Gaddafi) and presently i
-am under political asylum protection by the Omani Government.
+> > diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
+> > new file mode 100644 index 000000000000..893cc6c25f3b
+> > --- /dev/null
+> > +++ b/arch/x86/kvm/vmx/tdx_ops.h
+> > @@ -0,0 +1,202 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/* constants/data definitions for TDX SEAMCALLs */
+> > +
+> > +#ifndef __KVM_X86_TDX_OPS_H
+> > +#define __KVM_X86_TDX_OPS_H
+> > +
+> > +#include <linux/compiler.h>
+> > +
+> > +#include <asm/cacheflush.h>
+> > +#include <asm/asm.h>
+> > +#include <asm/kvm_host.h>
+> > +
+> > +#include "tdx_errno.h"
+> > +#include "tdx_arch.h"
+> > +#include "x86.h"
+> > +
+> > +static inline u64 kvm_seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9,
+> > +			       struct tdx_module_output *out) {
+> > +	u64 ret;
+> > +
+> > +	ret = __seamcall(op, rcx, rdx, r8, r9, out);
+> > +	if (unlikely(ret == TDX_SEAMCALL_UD)) {
+> > +		/*
+> > +		 * TDX requires VMXON or #UD.  In the case of reboot or
+> > kexec,
+> > +		 * VMX is made off (VMXOFF) by kvm reboot notifier,
+> > +		 * kvm_reboot(), while TDs are still running.  The callers
+> > check
+> > +		 * the returned error and complain.  Suppress it by returning 0.
+> > +		 */
+> 
+> Curious how do the callers check the returned error when " Suppress
+> it by returning 0" here.
 
-I have funds worth " [ $7.500.000.00 US Dollars ] " [ $7.500.000.00 US
-Dollars ] which I want to entrust to you for investment projects in
-your country. If you are willing to handle this project on my behalf,
-kindly reply urgent to enable me provide you more details to start the
-transfer process, I shall appreciate your urgent response through my
-private email address below:
-
-algaddafiaisha247@gmail.com
-
-You can know more through the BBC news links below:
-
-http://www.bbc.com/news/world-africa-19966059
-
-
-Thanks
-Yours Truly
-Aisha Gaddafi
+It doesn't make sense for the caller to check the error and warn when
+kvm_rebooting = true.
+Let's make it "return kvm_rebooting ? 0 : ret;" instread of "return 0;".
+Does it make sense?
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
