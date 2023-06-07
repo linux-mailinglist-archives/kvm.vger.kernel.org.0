@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3ACE87272F9
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 01:29:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78AC57272FA
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 01:29:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233268AbjFGX3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 19:29:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41456 "EHLO
+        id S233217AbjFGX3Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 19:29:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233217AbjFGX26 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 19:28:58 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E03D212E
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 16:28:55 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-568ab5c813eso130676027b3.2
-        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 16:28:55 -0700 (PDT)
+        with ESMTP id S229889AbjFGX3X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 19:29:23 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEA5E2683
+        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 16:29:21 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-258caf97a4eso4824a91.1
+        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 16:29:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686180534; x=1688772534;
+        d=google.com; s=20221208; t=1686180561; x=1688772561;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X00Y0MbHB0g1SUbGMkZR+sXMq7kcBl70hBJO92BwPM8=;
-        b=u1xRVHlmrBFWIVHlqPHClZdUg9ouqpwEQhS+/u6zbP00mRZiy3LomvMdp81w2wr8wg
-         SWD1MWb1nw07SoEvMI9tcz/m4BdZnhMkh1MKJNYLu1z5TZp/VXkWlZB4+H93GEoqCo5s
-         B52EQ4gtpdmCRzUwY8yhSAl435Sx53Rib2EYWxxU8aMGlso32BBwaQOEqjyuBgqbVrBh
-         uA36TeW+4ZUKGL9ux1fz9wZtMOt7BlU0MdRWzAFPtakM5Ar3EkIgSWKSjZe65BH34zcD
-         3ohRrev++oo+Y2vvnxpFquANhNAJGPkTJbbjNxGZer3dv1VjaieqHkzbIA384T+Wiz5G
-         O9fA==
+        bh=Il4eA7Xpqt9LrUsV5a0licRHCPGUr83rDIk37Ke/P4s=;
+        b=nzGdQHk5IXpHb5JtzU4WFZWQxr6RfR1K5gc2YR22e0jgBQGaLL7AmC7AM61pEHM7hY
+         ClTulBKrmhsTBzVTLCQJQgV995gcAav3UBcXeMShJZ1kKb8AOP4RCXh1+UUSYIJkJxYB
+         w0c7SX/21dsoOiqSme1OY8zBdmeGMMG6zUMWpyHjbxy45ShDSGbQDL+5Ibr3c8pLKAro
+         TFEqdMVgQyCpyVtbPvohtX7fO3zCrBD/bCz6dXeBzqngAK9qMzalyxROi8qZUZQ1E0xc
+         BalkNxPVmF6kZfD7IFSqA4tyMqnGF40QJj3q4TJm/JF+gBCb/K33whJ6emDYjRaoFlOX
+         y8Wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686180534; x=1688772534;
+        d=1e100.net; s=20221208; t=1686180561; x=1688772561;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X00Y0MbHB0g1SUbGMkZR+sXMq7kcBl70hBJO92BwPM8=;
-        b=eLMcasDqrC20BhbM+3nLxICnFr/fxSzFooQ1qPQclZUEjxxfNJ1CRObObyqNV8Ndwa
-         KWUQlloPkDA9TI2KMDYxddstE+hqCUJa3fcFaa5bN2lyzjfrJJXjPX7eatdRmmnfYSCT
-         5T/r7qX+A5tsbY/FFtMZPpMKQluv4WX5MInqVkkIpYoQZQk8z0mrHVBT5yPGWOtWdbEI
-         V8tJpgH9CzRV+/2NxT7dzDhw/3auYe65RA1/x7AwpZFR7MfamGA9nwRMG+gDVvgTEFse
-         keHJqrg2MIMdKmlZH3MCMhMYBeBqVRAMmf0rfzaivVwXoo0FqD1hc4XhfHYSkAB37k1l
-         /aNA==
-X-Gm-Message-State: AC+VfDwVvjsLkbKWqb/FLTw24YVBQl1OybxJGb8vyKWzgtueL3hhP2i3
-        EiIG5JF+s8dq4jK9maWNMHEcBaYSSdc=
-X-Google-Smtp-Source: ACHHUZ7znmd7aeXsuH34ZTHH19gg1+n+chjL1y+QqZdYSKo68+TMZeHtJUGjyT5DCc2yMSHr0MXcDbjkWhw=
+        bh=Il4eA7Xpqt9LrUsV5a0licRHCPGUr83rDIk37Ke/P4s=;
+        b=T4IMrphwaFHVP9gmn8nojmMs6Famq2IBsn5sg/B6JPQAxA/gxoXuLu8njNTw+mP13g
+         Arw6KU7gv5fq7sPAJQCNLVDWbjdN03WpW8UZOwns9l+iEw5Uq7ox21ZjTMz6xxe96YYT
+         Z5Ny8tFKceV/7CEnr3TnsKgk1Ne+CBCTqSgXTO+7VzJoTSAmpJkQKkq6Z5DMKPcoGOrH
+         1yuDY1Cnzrc9fVnhD3ELCQaaQQqR8UaVQyYvJjENw/YkdoiG2fMF2widAXc+8AqMp1sw
+         A5V1EEx8qA6a0BRpAZbJNz8gTZLsfIGig9KVBFWdvXADc+MUMgK8wi9vER/iOfKsDL+v
+         6jYA==
+X-Gm-Message-State: AC+VfDyHjh/3dQz9Q1ZriTcEU3rLyvbUEWLdahq3WWp5hKW4/Jv2yCGB
+        baV+vDKiVbxs3EC2V5/o23RCsEJ/Idc=
+X-Google-Smtp-Source: ACHHUZ7+lLwdoilk+3aHfhgGaQZPjGnSdjEy6Fj84hpUa3JG74mmTbDygjWF/FuAAxQtTDDrvd55zS5ovUg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:a702:0:b0:565:bf4b:de20 with SMTP id
- e2-20020a81a702000000b00565bf4bde20mr3696786ywh.2.1686180534435; Wed, 07 Jun
- 2023 16:28:54 -0700 (PDT)
-Date:   Wed,  7 Jun 2023 16:25:56 -0700
-In-Reply-To: <20230607215114.1586228-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:c306:b0:256:2b11:1c9f with SMTP id
+ g6-20020a17090ac30600b002562b111c9fmr1814469pjt.6.1686180561107; Wed, 07 Jun
+ 2023 16:29:21 -0700 (PDT)
+Date:   Wed,  7 Jun 2023 16:25:58 -0700
+In-Reply-To: <20230406025117.738014-1-seanjc@google.com>
 Mime-Version: 1.0
-References: <20230607215114.1586228-1-seanjc@google.com>
+References: <20230406025117.738014-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
-Message-ID: <168617898831.1602737.13287714543268080917.b4-ty@google.com>
-Subject: Re: [kvm-unit-tests PATCH 0/2] runtime: x86: Require vPMU for x86/pmu tests
+Message-ID: <168617888523.1602036.1833500387937919302.b4-ty@google.com>
+Subject: Re: [kvm-unit-tests PATCH 0/5] x86: Add "safe" macros to wrap ASM_TRY()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
+Cc:     kvm@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -67,25 +67,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 07 Jun 2023 14:51:12 -0700, Sean Christopherson wrote:
-> Fix a bug in runtime.bash that makes it not play nice with testcases that have
-> multiple dependencies, and make x86's PMU tests depend on KVM enabling a vPMU.
+On Wed, 05 Apr 2023 19:51:12 -0700, Sean Christopherson wrote:
+> Provide macros to wrap single instructions with ASM_TRY(), and to
+> automagically report success/fault as appropriate.  In other words, make
+> it easier to write code for testing (non)faulting instruction behavior.
 > 
-> Sean Christopherson (2):
->   runtime: Convert "check" from string to array so that iterating works
->   x86/pmu: Make PMU testcases dependent on vPMU being enabled in KVM
+> Sean Christopherson (5):
+>   x86: Add macros to wrap ASM_TRY() for single instructions
+>   x86: Convert inputs-only "safe" instruction helpers to asm_safe()
+>   x86: Add macros to wrap ASM_TRY() for single instructions with
+>     output(s)
+>   x86: Move invpcid_safe() to processor.h and convert to asm_safe()
+>   x86: Move XSETBV and XGETBV "safe" helpers to processor.h
 > 
 > [...]
 
-Applied to kvm-x86 next.  I'm OOO the rest of this week, thus the super quick
-application.  I won't send a pull request until next week, so there's still
-plenty of time to object in case I've done something odd with runtime.bash in
-particular.
+Applied to kvm-x86 next, thanks!
 
-[1/2] runtime: Convert "check" from string to array so that iterating works
-      https://github.com/kvm-x86/kvm-unit-tests/commit/e1b27810b555
-[2/2] x86/pmu: Make PMU testcases dependent on vPMU being enabled in KVM
-      https://github.com/kvm-x86/kvm-unit-tests/commit/dbbfaf80b8ff
+[1/5] x86: Add macros to wrap ASM_TRY() for single instructions
+      https://github.com/kvm-x86/kvm-unit-tests/commit/72e2642f2aaf
+[2/5] x86: Convert inputs-only "safe" instruction helpers to asm_safe()
+      https://github.com/kvm-x86/kvm-unit-tests/commit/b470217dd120
+[3/5] x86: Add macros to wrap ASM_TRY() for single instructions with output(s)
+      https://github.com/kvm-x86/kvm-unit-tests/commit/82f7d076088b
+[4/5] x86: Move invpcid_safe() to processor.h and convert to asm_safe()
+      https://github.com/kvm-x86/kvm-unit-tests/commit/8ddc0f0c2d39
+[5/5] x86: Move XSETBV and XGETBV "safe" helpers to processor.h
+      https://github.com/kvm-x86/kvm-unit-tests/commit/700c2b7e5007
 
 --
 https://github.com/kvm-x86/kvm-unit-tests/tree/next
