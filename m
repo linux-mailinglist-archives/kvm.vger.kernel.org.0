@@ -2,99 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3710072662F
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 18:41:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB9A9726687
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 18:55:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229774AbjFGQlf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 12:41:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59834 "EHLO
+        id S230169AbjFGQzg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 12:55:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229641AbjFGQld (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 12:41:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2B161FC1
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 09:40:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686156049;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Fpkg50D6BVyUdGWRdCuQ66DDXaJBlAuKv87LtulExp0=;
-        b=B+i/hZOdfanFCz9PHzmh9fCdmeoi8jEuWM4HjoBzBbMT3WV4FTh9iSO/9526+hg3pKwy8s
-        0IjGFHI5bI1T64nUA8eDU8lP9oHyykKt2xHw0wvEFWNGZ9A92TzJ2uP4Y5W6Mn2lqe0+M4
-        avBFs308H2krF4Gpb31wQ2amem7ZKv0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-73-bZKRSZHIPz2VervrFq7qjw-1; Wed, 07 Jun 2023 12:40:48 -0400
-X-MC-Unique: bZKRSZHIPz2VervrFq7qjw-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3f6f2f18ecbso36242885e9.0
-        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 09:40:47 -0700 (PDT)
+        with ESMTP id S229590AbjFGQze (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 12:55:34 -0400
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B48B1188
+        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 09:55:33 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3f7e81f0624so2635e9.0
+        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 09:55:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686156932; x=1688748932;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ruE04cfvVeW8CCsUWxHjT2VIGz9iXx0ct6ERdVykOrs=;
+        b=mTM9stELptDetTxhlwwSyjv/kIr0WOri0zWnGPqEdxd0zir3q2uh2H3etl1h+QlUnx
+         IOP4eyJHhBlxRG0zLcAgasGPRhMK1dWYb3JlIAcTRVk5kbI5QT60Lxn1O+NBWFmUlFVG
+         tuAL20xCY0Q7slo5hhjz3kv9f4pgfO6gydFBh1uLgZbd3SZ4vWbSW91dkrjZJtdzIGC6
+         4uzcG5TzSzElRfdo1WgyS5wqwMaDv8OlJ0PdGjinXZbKj8bzfrBpwS8T2AkNwfdOwB2u
+         u8sYJ8aiTCHQilgKHhUgDsIdnEilPdcK4xedwAk2BAr2kMMKUhWKP5S/jGGk9yWL95EQ
+         hv9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686156047; x=1688748047;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fpkg50D6BVyUdGWRdCuQ66DDXaJBlAuKv87LtulExp0=;
-        b=gQwVoqVkLT9I5u7xqzebtlVT3IvHDKtOjmUCbZzUX1Daub8DMMGvCWHJTL6eoXya3s
-         cjrLDnaC8s9eCbGCtBRgaGEehubhr5umZHOs6oCDifUtXTm7jv0y3+pb01fQ3CXOF/Rp
-         dsu0T1C3MlLSwauLMURtxUhLnDSGRUICj4qGRUDw8GgVjRkw1adyvRbif4AwQnpkEaQy
-         SbQcghmGdEKYRHIrNYROKVViBJyxZl5t14U89BrXbVa1haeg7XqQVZChmCYCBxs5E/fX
-         BJlNbpxosBZkhuPj+GqH5DH3a/x+gOXRJQrECl4W3Qe6Fn5PLPDEpq0VRxxyieH0WeY0
-         qK3Q==
-X-Gm-Message-State: AC+VfDzWoOnWZkyQ43jr99mQZkn8aDWbNkUpVmQ4xxIEKtp7ZHnGtYCi
-        9peKE1qJizqlDULeu3n3Q2Tdlg41eykgIIz1EwOXhR/6t5HtcRs3pL0Ng8gzu2amnXyMfpHlvfp
-        /ZcAbQii/2HoY
-X-Received: by 2002:a05:6000:1cce:b0:30d:efef:a40f with SMTP id bf14-20020a0560001cce00b0030defefa40fmr4915596wrb.62.1686156046908;
-        Wed, 07 Jun 2023 09:40:46 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5XMneL4EviomZ4OYMrrfdd3d8PQXtvG7fWds6bVLPZsT+ziKUWyAOoGfsD7MMkowwkUBkpKg==
-X-Received: by 2002:a05:6000:1cce:b0:30d:efef:a40f with SMTP id bf14-20020a0560001cce00b0030defefa40fmr4915568wrb.62.1686156046566;
-        Wed, 07 Jun 2023 09:40:46 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id n2-20020a5d4c42000000b00306415ac69asm15802982wrt.15.2023.06.07.09.40.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jun 2023 09:40:46 -0700 (PDT)
-Message-ID: <14268e71-686d-9c51-901b-6985ad91537f@redhat.com>
-Date:   Wed, 7 Jun 2023 18:40:44 +0200
+        d=1e100.net; s=20221208; t=1686156932; x=1688748932;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ruE04cfvVeW8CCsUWxHjT2VIGz9iXx0ct6ERdVykOrs=;
+        b=iGklQ73q27r2Rp9Dz/mXx96uptWjlxi5Gc7kllxVOROUi8eCXvLrsgDF193n/Sj/J0
+         9cwsHen0z4mUnvTxgy27aIfcmlDC20sar6lSd/N+J9htEZc1vppqkf6gPdEt4AAYfWwk
+         qfTPJ5vdnymd1rvPM/ztucLZrOYZeTlOLaViECqreBcFjAEgEbp+hqDpUZV4gAJHwAXL
+         o3QIC6blQWfAeltprDIlr5EXK8TvKHUMRty5sxBOdbqbEUjumM6Y1Js8Mr10kT7SQ83i
+         z9XBj1i0M4XZd7yumK+QmL2uTTJ80uJhEYvPviMFa6YIty2C1EdbmJSmyzlLLESbPtjo
+         sh3g==
+X-Gm-Message-State: AC+VfDwEFloOV/0xszBYIWu0KOgv4q4khfEWxNXmrjjoU63TulBxMiNo
+        0HSdbsRgzsOjVE+Z7mBPs4yWbWUhkv7wYt1Zx19nJA==
+X-Google-Smtp-Source: ACHHUZ7mNacqlI+5GpD43LnhGP0aMi7pLJK+ei3+31ZToKc7B6sAVLAcuZHV5bElNjHD4r4sF148npi9I/1uh1Mi/LQ=
+X-Received: by 2002:a05:600c:880f:b0:3f7:e4d8:2569 with SMTP id
+ gy15-20020a05600c880f00b003f7e4d82569mr175583wmb.5.1686156932014; Wed, 07 Jun
+ 2023 09:55:32 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
- support
-Content-Language: en-US
-To:     Miguel Luis <miguel.luis@oracle.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20230515173103.1017669-1-maz@kernel.org>
- <16d9fda4-3ead-7d5e-9f54-ef29fbd932ac@redhat.com>
- <87zg64nhqh.wl-maz@kernel.org>
- <d0b77823-c04c-4ee0-cb55-2cc20a48903b@redhat.com>
- <86r0rfkpwd.wl-maz@kernel.org>
- <bdcf630c-b6a7-0649-8419-15f98f6b1a0c@redhat.com>
- <054769EB-0722-45FB-8670-23CC7915AAA9@oracle.com>
-From:   Eric Auger <eauger@redhat.com>
-In-Reply-To: <054769EB-0722-45FB-8670-23CC7915AAA9@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+References: <20230424225854.4023978-1-aaronlewis@google.com>
+ <20230424225854.4023978-5-aaronlewis@google.com> <ZH5XVOIb2GtwAKNC@google.com>
+In-Reply-To: <ZH5XVOIb2GtwAKNC@google.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Wed, 7 Jun 2023 16:55:20 +0000
+Message-ID: <CAAAPnDEr+w0N9jis_D9i5Hx1nQswqyg0Wq_0QRNFMuhL6yo3Mw@mail.gmail.com>
+Subject: Re: [PATCH v2 4/6] KVM: selftests: Add string formatting options to ucall
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -102,130 +69,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Miguel,
+On Mon, Jun 5, 2023 at 9:44=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Mon, Apr 24, 2023, Aaron Lewis wrote:
+> > Add more flexibility to guest debugging and testing by adding
+> > GUEST_PRINTF() and GUEST_ASSERT_FMT() to the ucall framework.
+> >
+> > A buffer to hold the formatted string was added to the ucall struct.
+> > That allows the guest/host to avoid the problem of passing an
+> > arbitrary number of parameters between themselves when resolving the
+> > string.  Instead, the string is resolved in the guest then passed
+> > back to the host to be logged.
+> >
+> > The formatted buffer is set to 1024 bytes which increases the size
+> > of the ucall struct.  As a result, this will increase the number of
+> > pages requested for the guest.
+> >
+> > The buffer size was chosen to accommodate most use cases, and based on
+> > similar usage.  E.g. printf() uses the same size buffer in
+> > arch/x86/boot/printf.c.
+>
+> ...
+> >  #define UCALL_MAX_ARGS 7
+> > +#define UCALL_BUFFER_LEN 1024
+> >
+> >  struct ucall {
+> >       uint64_t cmd;
+> >       uint64_t args[UCALL_MAX_ARGS];
+> > +     char buffer[UCALL_BUFFER_LEN];
+>
+> ...
+>
+> > diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/tes=
+ting/selftests/kvm/lib/ucall_common.c
+> > index 77ada362273d..c09e57c8ef77 100644
+> > --- a/tools/testing/selftests/kvm/lib/ucall_common.c
+> > +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+> > @@ -55,6 +55,7 @@ static struct ucall *ucall_alloc(void)
+> >               if (!test_and_set_bit(i, ucall_pool->in_use)) {
+> >                       uc =3D &ucall_pool->ucalls[i];
+> >                       memset(uc->args, 0, sizeof(uc->args));
+> > +                     memset(uc->buffer, 0, sizeof(uc->buffer));
+>
+> The use in boot/printf.c isn't a great reference point.  That "allocation=
+" is
+> on-stack and effectively free, whereas the use here "requires" zeroing th=
+e buffer
+> during allocation.  I usually tell people to not worry about selftests pe=
+rformance,
+> but zeroing 1KiB on every ucall seems a bit excessive.
+>
+> However, that's more of an argument to not zero than it is to try and squ=
+eak by
+> with a smaller size.  The guest really should explicitly tell the host ho=
+w much
+> of the buffer.  And with that, there should be no need to zero the buffer=
+ because
+> the host isn't relying on the memory being zeroed.
 
-On 6/6/23 19:52, Miguel Luis wrote:
-> Hello Eric, Marc,
-> 
->> On 6 Jun 2023, at 09:33, Eric Auger <eauger@redhat.com> wrote:
->>
->> Hi Marc,
->>
->> On 5/17/23 16:12, Marc Zyngier wrote:
->>> On Wed, 17 May 2023 09:59:45 +0100,
->>> Eric Auger <eauger@redhat.com> wrote:
->>>>
->>>> Hi Marc,
->>>> Hi Marc,
->>>> On 5/16/23 22:28, Marc Zyngier wrote:
->>>>> On Tue, 16 May 2023 17:53:14 +0100,
->>>>> Eric Auger <eauger@redhat.com> wrote:
->>>>>>
->>>>>> Hi Marc,
->>>>>>
->>>>>> On 5/15/23 19:30, Marc Zyngier wrote:
->>>>>>> This is the 4th drop of NV support on arm64 for this year.
->>>>>>>
->>>>>>> For the previous episodes, see [1].
->>>>>>>
->>>>>>> What's changed:
->>>>>>>
->>>>>>> - New framework to track system register traps that are reinjected in
->>>>>>>  guest EL2. It is expected to replace the discrete handling we have
->>>>>>>  enjoyed so far, which didn't scale at all. This has already fixed a
->>>>>>>  number of bugs that were hidden (a bunch of traps were never
->>>>>>>  forwarded...). Still a work in progress, but this is going in the
->>>>>>>  right direction.
->>>>>>>
->>>>>>> - Allow the L1 hypervisor to have a S2 that has an input larger than
->>>>>>>  the L0 IPA space. This fixes a number of subtle issues, depending on
->>>>>>>  how the initial guest was created.
->>>>>>>
->>>>>>> - Consequently, the patch series has gone longer again. Boo. But
->>>>>>>  hopefully some of it is easier to review...
->>>>>>>
->>>>>>> [1] https://lore.kernel.org/r/20230405154008.3552854-1-maz@kernel.org
->>>>>>
->>>>>> I have started testing this and when booting my fedora guest I get
->>>>>>
->>>>>> [  151.796544] kvm [7617]: Unsupported guest sys_reg access at:
->>>>>> 23f425fd0 [80000209]
->>>>>> [  151.796544]  { Op0( 3), Op1( 3), CRn(14), CRm( 3), Op2( 1), func_write },
->>>>>>
->>>>>> as soon as the host has kvm-arm.mode=nested
->>>>>>
->>>>>> This seems to be triggered very early by EDK2
->>>>>> (ArmPkg/Drivers/TimerDxe/TimerDxe.c).
->>>>>>
->>>>>> If I am not wrong this CNTV_CTL_EL0. Do you have any idea?
->>>>>
->>>>> So here's my current analysis:
->>>>>
->>>>> I assume you are running EDK2 as the L1 guest in a nested
->>>>> configuration. I also assume that you are not running on an Apple
->>>>> CPU. If these assumptions are correct, then EDK2 runs at vEL2, and is
->>>>> in nVHE mode.
->>>>>
->>>>> Finally, I'm going to assume that your implementation has FEAT_ECV and
->>>>> FEAT_NV2, because I can't see how it could fail otherwise.
->>>> all the above is correct.
->>>>>
->>>>> In these precise conditions, KVM sets the CNTHCTL_EL2.EL1TVT bit so
->>>>> that we can trap the EL0 virtual timer and faithfully emulate it (it
->>>>> is otherwise written to memory, which isn't very helpful).
->>>>
->>>> indeed
->>>>>
->>>>> As it turns out, we don't handle these traps. I didn't spot it because
->>>>> my test machines are all Apple boxes that don't have a nVHE mode, so
->>>>> nothing on the nVHE path is getting *ANY* coverage. Hint: having
->>>>> access to such a machine would help (shipping address on request!).
->>>>> Otherwise, I'll eventually kill the nVHE support altogether.
->>>>>
->>>>> I have written the following patch, which compiles, but that I cannot
->>>>> test with my current setup. Could you please give it a go?
->>>>
->>>> with the patch below, my guest boots nicely. You did it great on the 1st
->>>> shot!!! So this fixes my issue. I will continue testing the v10.
->>>
->>> Thanks a lot for reporting the issue and testing my hacks. I'll
->>> eventually fold it into the rest of the series.
->>>
->>> By the way, what are you using as your VMM? I'd really like to
->>> reproduce your setup.
->> Sorry I missed your reply. I am using libvirt + qemu (feat Miguel's RFC)
->> and fedora L1 guest.
->>
-> 
-> Following this subject, I’ve forward ported Alexandru’s KUT patches
-> ( and I encourage others to do it also =) ) which expose an EL2 test that
+I don't think zeroing the buffer is actually necessary.  It is more of
+a nice-to-have for extra paranoia.  The printf function ensures the
+string is NULL terminated, so I think it should be safe to just drop
+it and save the cycles.
 
-Do you have a branch available with Alexandru's rebased kut series?
+With the added assert in patch 2, plus a few more I'm planning on
+adding, guest_printf() either properly writes a string or dies.  You
+brought up a good point in that selftests generally fail hard rather
+than hiding errors, so asserting makes sense there.  That also means
+there is no real need to pass the length of the string to the host.
+The string should be properly written if guest_printf() returns
+successfully.
 
-Thanks
+>
+> On a somehwat related topic, this patch should also introduce a macro/hel=
+per to
+> retrieve and print the buffer on the backend.  Partly to reduce copy+past=
+e, partly
+> to make it easier to review (i.e. show the end-to-end), and partly so tha=
+t the
+> ucall code can craft a more explicit contract.
 
-Eric
-> does three checks:
-> 
-> - whether VHE is supported and enabled
-> - disable VHE
-> - re-enable VHE  
-> 
-> I’m running qemu with virtualization=on as well to run this test and it is passing although
-> problems seem to happen when running with virtualization=off, which I’m still looking into it.
-> 
-> Thanks
-> Miguel
-> 
->> Thanks to your fix, this boots fine. But at the moment it does not
->> reboot and hangs in edk2 I think. Unfortunately this time I have no
->> trace on host :-( While looking at your series I will add some traces.
->>
->> Eric
->>>
->>> Cheers,
->>>
->>> M.
-> 
-> 
+If guest_printf() returns successfully, then the expectation is that
+the string was correctly written, which makes the contract pretty
+simple.  I'm thinking something like this?
 
+#define REPORT_GUEST_PRINTF(_ucall) pr_info("%s", _ucall.buffer)
