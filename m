@@ -2,143 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3365725B50
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 12:10:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59037725B57
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 12:14:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238521AbjFGKKC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 06:10:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40850 "EHLO
+        id S236918AbjFGKOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 06:14:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233418AbjFGKKA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 06:10:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3163C1BC9
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 03:09:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686132559;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BeQhaSHu7cWs6XucEltOCfbvT3TUoRppwvtRNtAUuIY=;
-        b=KqqPaWohd4tImIJmJhpklkCjsTplhuVxjjzPNRRl2lWU989scCwUTH85Ha9IDc+qBHcLcl
-        6UwtrE5Pb4zVTTbzqqp7sRhZgldwDowqxUmSP1xZXJeUG3kf9RuJxBosvGcZG265qqPxbx
-        m5o1PBWcZV3pOaqymprRcuzFuvLCkLE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-612-Oj4KIRh6NymDk4IfVC_MTA-1; Wed, 07 Jun 2023 06:09:16 -0400
-X-MC-Unique: Oj4KIRh6NymDk4IfVC_MTA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6488485A5BB;
-        Wed,  7 Jun 2023 10:09:15 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DB292026D49;
-        Wed,  7 Jun 2023 10:09:15 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Suraj Jitindar Singh <surajjs@amazon.com>, jingzhangos@google.com,
-        alexandru.elisei@arm.com, james.morse@arm.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        oupton@google.com, pbonzini@redhat.com, rananta@google.com,
-        reijiw@google.com, suzuki.poulose@arm.com, tabba@google.com,
-        will@kernel.org, sjitindarsingh@gmail.com
-Subject: Re: [PATCH 3/3] KVM: arm64: Use per guest ID register for
- ID_AA64PFR1_EL1.MTE
-In-Reply-To: <87legwo83z.wl-maz@kernel.org>
-Organization: Red Hat GmbH
-References: <20230602005118.2899664-1-jingzhangos@google.com>
- <20230602221447.1809849-1-surajjs@amazon.com>
- <20230602221447.1809849-4-surajjs@amazon.com>
- <873539ospa.wl-maz@kernel.org> <87h6rl50dl.fsf@redhat.com>
- <87legwo83z.wl-maz@kernel.org>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Wed, 07 Jun 2023 12:09:14 +0200
-Message-ID: <87wn0fmvn9.fsf@redhat.com>
+        with ESMTP id S234210AbjFGKOB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 06:14:01 -0400
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0597C1BCA;
+        Wed,  7 Jun 2023 03:13:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazon201209;
+  t=1686132840; x=1717668840;
+  h=message-id:date:mime-version:to:cc:references:from:
+   subject:in-reply-to:content-transfer-encoding;
+  bh=G7tXsJgQL2dp1Z2qVO87BdtC4KV1AU/HrZ3Nz1hNKas=;
+  b=YVOc384QUkESg2au1r+BPK4t8H9aHW0DRDoU6+TP1GTxzzaS1/aJz74H
+   d/nuI3P3zJBmbSBk8hKqR06B7u2a4HYaMNyQYFXYWhW14cKK9sgJemjCD
+   lKI8QiBamQu9cq0ogwBD7RSEUopvCKnnPkwqthownUF2G1rq/4IBTRd64
+   M=;
+X-IronPort-AV: E=Sophos;i="6.00,223,1681171200"; 
+   d="scan'208";a="589390051"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2023 10:13:57 +0000
+Received: from EX19D001EUA001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com (Postfix) with ESMTPS id 4964C803BC;
+        Wed,  7 Jun 2023 10:13:56 +0000 (UTC)
+Received: from EX19D037EUB003.ant.amazon.com (10.252.61.119) by
+ EX19D001EUA001.ant.amazon.com (10.252.50.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 7 Jun 2023 10:13:53 +0000
+Received: from [192.168.30.121] (10.1.212.27) by EX19D037EUB003.ant.amazon.com
+ (10.252.61.119) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Wed, 7 Jun
+ 2023 10:13:49 +0000
+Message-ID: <150e1ad0-3d59-762b-6032-897d5630a3bf@amazon.es>
+Date:   Wed, 7 Jun 2023 12:13:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.11.2
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Alexander Graf <graf@amazon.de>,
+        "Cali, Marco" <xmarcalx@amazon.co.uk>
+References: <2f19f26e-20e5-8198-294e-27ea665b706f@redhat.com>
+Content-Language: en-US
+From:   Babis Chalios <bchalios@amazon.es>
+Subject: Re: [ANNOUNCE] KVM Microconference at LPC 2023
+In-Reply-To: <2f19f26e-20e5-8198-294e-27ea665b706f@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.1.212.27]
+X-ClientProxiedBy: EX19D045UWC003.ant.amazon.com (10.13.139.198) To
+ EX19D037EUB003.ant.amazon.com (10.252.61.119)
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 06 2023, Marc Zyngier <maz@kernel.org> wrote:
 
-> On Mon, 05 Jun 2023 17:39:50 +0100,
-> Cornelia Huck <cohuck@redhat.com> wrote:
->> 
->> On Sat, Jun 03 2023, Marc Zyngier <maz@kernel.org> wrote:
->> 
->> > On Fri, 02 Jun 2023 23:14:47 +0100,
->> > Suraj Jitindar Singh <surajjs@amazon.com> wrote:
->> >> 
->> >> With per guest ID registers, MTE settings from userspace can be stored in
->> >> its corresponding ID register.
->> >> 
->> >> No functional change intended.
->> >> 
->> >> Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
->> >> ---
->> >>  arch/arm64/include/asm/kvm_host.h | 21 ++++++++++-----------
->> >>  arch/arm64/kvm/arm.c              | 11 ++++++++++-
->> >>  arch/arm64/kvm/sys_regs.c         |  5 +++++
->> >>  3 files changed, 25 insertions(+), 12 deletions(-)
->> >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> >> index ca18c09ccf82..6fc4190559d1 100644
->> >> --- a/arch/arm64/kvm/arm.c
->> >> +++ b/arch/arm64/kvm/arm.c
->> >> @@ -80,8 +80,17 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->> >>  		if (!system_supports_mte() || kvm->created_vcpus) {
->> >>  			r = -EINVAL;
->> >>  		} else {
->> >> +			u64 val;
->> >> +
->> >> +			/* Protects the idregs against modification */
->> >> +			mutex_lock(&kvm->arch.config_lock);
->> >> +
->> >> +			val = IDREG(kvm, SYS_ID_AA64PFR1_EL1);
->> >> +			val |= FIELD_PREP(ID_AA64PFR1_EL1_MTE_MASK, 1);
->> >
->> > The architecture specifies 3 versions of MTE in the published ARM ARM,
->> > with a 4th coming up as part of the 2022 extensions.
->> 
->> Is that the one that adds some more MTE<foo> bits in AA64PFR1 and
->> AA64PFR2?
+
+On 9/5/23 11:55, Paolo Bonzini wrote:
+> Hi all!
 >
-> Yeah, that. You get ID_AA64PFR1_EL1.{MTE,MTE_frac,MTEX}, plus
-> ID_AA64PFR2_EL1.{MTEFAR,MTESTOREONLY,MTEPERM}... It this sounds like a
-> train wreck, then it probably is one!
-
-With that many features, what could possibly go wrong!
-
+> We are planning on submitting a CFP to host a KVM Microconference at
+> Linux Plumbers Conference 2023. To help justify the proposal, we would
+> like to gather a list of folks that would likely attend, and crowdsource
+> a list of topics to include in the proposal.
 >
->> 
->> > Why are you
->> > actively crippling the MTE version presented to the guest, and
->> > potentially introduce unexpected behaviours?
->> 
->> While the code does not look correct here, I think we'll need some way to
->> control which version of MTE is presented to the guest for compatibility
->> handling; does it make sense to control this per-cpu, or does it need to
->> be a vm-wide setting?
+> For both this year and future years, the intent is that a KVM
+> Microconference will complement KVM Forum, *NOT* supplant it. As you
+> probably noticed, KVM Forum is going through a somewhat radical change in
+> how it's organized; the conference is now free and (with some help from
+> Red Hat) organized directly by the KVM and QEMU communities. Despite the
+> unexpected changes and some teething pains, community response to KVM
+> Forum continues to be overwhelmingly positive! KVM Forum will remain
+> the venue of choice for KVM/userspace collaboration, for educational
+> content covering both KVM and userspace, and to discuss new features in
+> QEMU and other userspace projects.
 >
-> It absolutely needs to be VM-wide. Only having half the vcpus
-> supporting tags wouldn't make much sense.
+> At least on the x86 side, however, the success of KVM Forum led us
+> virtualization folks to operate in relative isolation. KVM depends on
+> and impacts multiple subsystems (MM, scheduler, perf) in profound ways,
+> and recently we’ve seen more and more ideas/features that require
+> non-trivial changes outside KVM and buy-in from stakeholders that
+> (typically) do not attend KVM Forum. Linux Plumbers Conference is a
+> natural place to establish such collaboration within the kernel.
 >
-> But the problem is that the various versions of MTE are not
-> necessarily compatible, as MTE4 makes MTE3 optional (with a fallback
-> to MTE2)... There are more subtleties around the what instructions are
-> available in which mode, and whether the various subfeatures can be
-> configured or not.
+> Therefore, the aim of the KVM Microconference will be:
+> * to provide a setting in which to discuss KVM and kernel internals
+> * to increase collaboration and reduce friction with other subsystems
+> * to discuss system virtualization issues that require coordination with
+> other subsystems (such as VFIO, or guest support in arch/)
+>
+> Below is a rough draft of the planned CFP submission.
+>
+> Thanks!
+>
+> Paolo Bonzini (KVM Maintainer)
+> Sean Christopherson (KVM x86 Co-Maintainer)
+> Marc Zyngier (KVM ARM Co-Maintainer)
+>
+>
+> ===================
+> KVM Microconference
+> ===================
+>
+> KVM (Kernel-based Virtual Machine) enables the use of hardware features
+> to improve the efficiency, performance, and security of virtual machines
+> created and managed by userspace.  KVM was originally developed to host
+> and accelerate "full" virtual machines running a traditional kernel and
+> operating system, but has long since expanded to cover a wide array of 
+> use
+> cases, e.g. hosting real time workloads, sandboxing untrusted workloads,
+> deprivileging third party code, reducing the trusted computed base of
+> security sensitive workloads, etc.  As KVM's use cases have grown, so too
+> have the requirements placed on KVM and the interactions between it and
+> other kernel subsystems.
+>
+> The KVM Microconference will focus on how to evolve KVM and adjacent
+> subsystems in order to satisfy new and upcoming requirements: serving
+> guest memory that cannot be accessed by host userspace[1], providing
+> accurate, feature-rich PMU/perf virtualization in cloud VMs[2], etc.
+>
+>
+> Potential Topics:
+>   - Serving inaccessible/unmappable memory for KVM guests (protected VMs)
+>   - Optimizing mmu_notifiers, e.g. reducing TLB flushes and spurious 
+> zapping
+>   - Supporting multiple KVM modules (for non-disruptive upgrades)
+>   - Improving and hardening KVM+perf interactions
+>   - Implementing arch-agnostic abstractions in KVM (e.g. MMU)
+>   - Defining KVM requirements for hardware vendors
+>   - Utilizing "fault" injection to increase test coverage of edge cases
+>   - KVM vs VFIO (e.g. memory types, a rather hot topic on the ARM side)
+>
+>
+> Key Attendees:
+>   - Paolo Bonzini <pbonzini@redhat.com> (KVM Maintainer)
+>   - Sean Christopherson <seanjc@google.com>  (KVM x86 Co-Maintainer)
+>   - Your name could be here!
+>
+> [1] 
+> https://lore.kernel.org/all/20221202061347.1070246-1-chao.p.peng@linux.intel.com
+> [2] 
+> https://lore.kernel.org/all/CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com
+>
 
-So I guess we'll have to expose all of that to userspace, so that it can
-actually configure the various configurations that will surely show up
-in the wild...
+Hi Paolo,
 
+I think this idea is great!
+
+On our side, we 've been working on providing ways to let VMs (kernel 
+and user space)
+know that they have been cloned/snapshotted/restored from snapshots[1].
+
+This is tightly coupled with PRNGs both in kernel and user space and 
+there needs to be some
+collaboration with random.c to tie everything together [2][3]. It sounds 
+like it could be a good
+fit for this MC (?).
+
+It would be interested to figure out whether such notifications would be 
+interested to other
+parts of the kernel as well.
+
+Cheers,
+Babis
+
+[1] https://www.spinics.net/lists/kernel/msg4808187.html
+[2] 
+https://www.mail-archive.com/virtio-dev@lists.oasis-open.org/msg09016.html
+[3] 
+https://lore.kernel.org/lkml/65d872db2e1be29bb03b43ed606e7cc9e74ec08d.camel@infradead.org/T/
