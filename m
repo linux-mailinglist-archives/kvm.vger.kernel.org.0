@@ -2,73 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7C047259A7
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 11:10:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5740725A07
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 11:21:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234483AbjFGJKi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 05:10:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33508 "EHLO
+        id S239235AbjFGJVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 05:21:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239872AbjFGJJ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 05:09:56 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2240F1721;
-        Wed,  7 Jun 2023 02:08:49 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1b1806264e9so37292985ad.0;
-        Wed, 07 Jun 2023 02:08:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686128928; x=1688720928;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h7zdMICOOfXCMagTI3X9zTXWZ0bDy7cb5wAVqax4nXo=;
-        b=fz5R9Os5W2YAM1xaOxzO3LKuXeh3EizcUiXRZKufgYFnaxI/St+Eg3ZzhOQNOkItdW
-         ueeufDQmUxRJgYF+Pm+mPeYN+3mj4tsAaHwR3ue4egFLGtxJP6iAIL9W2U5qeOyLg0vE
-         7V+OyFERqS5OK7COsRQX9iIxdsBdBd18BGmo1/wBA8rQtlW4tEGTT4I9/vVvzG5OPT5x
-         FpSdTRnXKS8cGQzM0WEKBijY6+albls3h0AuJWX2UtABma27r+5+y7VhrUTBeRctUFAf
-         ynHx6RkT8qRG8zwZFcdnsog6EXrrodC6DW1zSaZx2ZUuBWQXy5C7M01P6BjJ6S0sWaLw
-         UB0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686128928; x=1688720928;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=h7zdMICOOfXCMagTI3X9zTXWZ0bDy7cb5wAVqax4nXo=;
-        b=BDcHcrexpEOT/85BxHftxHc0hnzP821ZCKgrqa59v/6pEP5YVm0OFbBXqJ/LWWlNd8
-         m1n4AczFazP9xvxaJqJc6j6q3/CHD+huNJF7gdlB/uaPCcd4YESfgtz+8r7nT4afBPGc
-         q6o2mh/WqV3rKhKRuEvaa3xemGXm8x4NxWFsVhtym02S9+zonMiJzH3vMN9frHrXYh98
-         +z8wk5HBU29IU4ns17pfiv4MDv+Rf2vTP12D54Xv7JSqGt7koDJv2hD1G7FCRDQkCwqb
-         bQlivmiRC545+BIBRpIhbZqAgq/lI9EqAe+c/0lIwqsW6SGvljkm4IVBRcjJqu+224kY
-         xblQ==
-X-Gm-Message-State: AC+VfDz+2pv0mOEZH+lgO4MqsNyXhzAwuVyVxlMNWXczVkCDV9pbVKj9
-        +CkoxoSzYM1PDUQKTzgQquRvzxz5lBQ=
-X-Google-Smtp-Source: ACHHUZ6JgFxx+wi/jgTYI3jaqO5bvm6eTxnvR5CVmefpcjcfIkrAvEAw0p15C3rnM8+zUnfHM0jKpw==
-X-Received: by 2002:a05:6a21:9182:b0:10f:759d:c5b2 with SMTP id tp2-20020a056a21918200b0010f759dc5b2mr739557pzb.45.1686128928064;
-        Wed, 07 Jun 2023 02:08:48 -0700 (PDT)
-Received: from localhost (58-6-224-112.tpgi.com.au. [58.6.224.112])
-        by smtp.gmail.com with ESMTPSA id f11-20020a170902860b00b001b045c9abd2sm9904994plo.143.2023.06.07.02.08.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jun 2023 02:08:47 -0700 (PDT)
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Wed, 07 Jun 2023 19:08:40 +1000
-Message-Id: <CT6ATGRN6KJU.12QZ7TJGGX7LC@wheely>
-Cc:     <kvm@vger.kernel.org>, <kvm-ppc@vger.kernel.org>,
-        <mikey@neuling.org>, <paulus@ozlabs.org>,
-        <kautuk.consul.1980@gmail.com>, <vaibhav@linux.ibm.com>,
-        <sbhat@linux.ibm.com>
-Subject: Re: [RFC PATCH v2 5/6] KVM: PPC: Add support for nested PAPR guests
-From:   "Nicholas Piggin" <npiggin@gmail.com>
-To:     "Jordan Niethe" <jpn@linux.vnet.ibm.com>,
-        <linuxppc-dev@lists.ozlabs.org>
-X-Mailer: aerc 0.14.0
-References: <20230605064848.12319-1-jpn@linux.vnet.ibm.com>
- <20230605064848.12319-6-jpn@linux.vnet.ibm.com>
-In-Reply-To: <20230605064848.12319-6-jpn@linux.vnet.ibm.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        with ESMTP id S239310AbjFGJVN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 05:21:13 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B5731712;
+        Wed,  7 Jun 2023 02:21:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686129670; x=1717665670;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=r4QfkHNteOb2dAMatCWf0Gtn/i2Oiz1FHrCnoNlIwpU=;
+  b=GOrf5o5ccZVmXyOpJkt7B9+IWjuD12ExgrPY2cO/OKrMFYRx1/8NUKuF
+   +cjM8BhUz4xtWdtySftX5gqzsE8BfZA/0ACCM5kX0qrjene7HQIphds5L
+   +splI1zVmRQrhdwq9zJTMvk8abyGPgYiLjHsqD00wRzSS8kFYOCGJek4T
+   Kr05LLUB06YcGFBdvmVr9nQRRrVaccQrrcBrCJdWH8KkOQpkOznfIcrTw
+   jDfksFGz4eWk0A6OaTwb5L7+SsEGrAoDAjmRiJwmxh++Y8dZ+pyPVJyxE
+   /p/vos0VyhmRnipOtJMcYVup94s8XzwV3zbSTfbsgqop8xckhcugQEvWc
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10733"; a="336559109"
+X-IronPort-AV: E=Sophos;i="6.00,223,1681196400"; 
+   d="scan'208";a="336559109"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2023 02:21:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10733"; a="659858303"
+X-IronPort-AV: E=Sophos;i="6.00,223,1681196400"; 
+   d="scan'208";a="659858303"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga003.jf.intel.com with ESMTP; 07 Jun 2023 02:21:09 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Wed, 7 Jun 2023 02:21:08 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Wed, 7 Jun 2023 02:21:08 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Wed, 7 Jun 2023 02:21:08 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.174)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Wed, 7 Jun 2023 02:21:08 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j1EL6abe14d9R2EZF4LyAzHT2Oc2O/omcUU1+PZtqSlr9q7Yy4Ths4QBrGNj711lk42g0v1ST43H4cQO1EIhoMt4uNJSkirXDdz8wrTyR0AejF0Yr7foloyTFBb+W92J7b+9z89doA5ywXAHC2XaWWLybWDG/qMYKxULzD6WkQUOIQL0PvefUhRcEsdvpRg0FBFBbZweVHstF/quYCxXLfjL28gbRoOdcSsDoj6ocESYHS/PAuNfFDfCeGhB2rI2qPAHiXqAthjyHMKCzJZ5IbWQhCQsi7YPonQsGor7M/e3HJBrBu7EDe3xAe4EdChsHDBPxfDpSalateaV/N0jtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r4QfkHNteOb2dAMatCWf0Gtn/i2Oiz1FHrCnoNlIwpU=;
+ b=FgAIxZQSkn9sqjqglqrc3gxC73BuHdueJWVSSkoy1xMDHk0dPYIa8XrKE18B2PE/D23eaqdx9T44mi8rBvnV8MJ4fmZLnPXTK+a7gxYJIocBpEc9qCDJcfeQfPdcVWMdS9BV1nkrSAg/eT1WOBl6s4iAPQutRtTGV4ycfurN6QkDDYaK4E7patvjrn4Jn+rzV9e4JllARM1Fn+MRW8K48Qhqe8TwDm8z7phphydDAdbNJYHHs7fFMaYGFe5q7PfpdQchOIoqi7sDQcw4rCr4syo0e2EoT9rAXV8XykejciPBT9tGcPxXlII+FTvEEEHoAzzJqTlve7QGq0kERy0dXw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by MW4PR11MB7162.namprd11.prod.outlook.com (2603:10b6:303:212::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33; Wed, 7 Jun
+ 2023 09:21:00 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::19b7:466f:32ac:b764]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::19b7:466f:32ac:b764%3]) with mapi id 15.20.6455.030; Wed, 7 Jun 2023
+ 09:21:00 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "David.Laight@ACULAB.COM" <David.Laight@ACULAB.COM>
+Subject: Re: [PATCH v9 2/6] KVM: x86: Virtualize CR4.LAM_SUP
+Thread-Topic: [PATCH v9 2/6] KVM: x86: Virtualize CR4.LAM_SUP
+Thread-Index: AQHZmFfuANh3ioR480+bw2zBFwe+E69+svKAgAAU64CAAEougA==
+Date:   Wed, 7 Jun 2023 09:20:59 +0000
+Message-ID: <b92e080b85c21edcea5d47caf2e8502b8be46bb1.camel@intel.com>
+References: <20230606091842.13123-1-binbin.wu@linux.intel.com>
+         <20230606091842.13123-3-binbin.wu@linux.intel.com>
+         <fbc522e315d261607869b1996adc05e3646e535e.camel@intel.com>
+         <4c8c0d6e-8bb4-495f-3f41-6dee8c358124@linux.intel.com>
+In-Reply-To: <4c8c0d6e-8bb4-495f-3f41-6dee8c358124@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.48.2 (3.48.2-1.fc38) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|MW4PR11MB7162:EE_
+x-ms-office365-filtering-correlation-id: 17aa5572-9e83-4f95-ccff-08db673881db
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: q1BDVJ1PB7XJAgujIHMaFApret6+Ad5Vf6MNJEGzxpOPjewCdS+/M/rUX1LBEdy12yGV22SFLgaygn6epH5mk/bOGNF50UI5kAKoZ0/X8PEdFfwwN+YeSZejIT7yrjKLw9drX44urAQz9DFrrGGxOBaDLCUP+TOVD3HEuLbZduzC4KBCBsKBbP9bPWkwBh+5FsmL316van9upGVViFBNqvYPyRRGeYeReCmBOsUz7u62YYDZslse2INlB2TuFzXxw/n9fBqKxBvWM58ab7AzXK5Ie35DAtRLFVhOwR9zGp+YhTxvqXC+mEieoDPAzq33FYlpTL9MY3CbhB8O6viqdp7CnD4dqD1pgwccEQk6WCz4R+yOYKRFwwprav8q1s8F/iJBOQymxSFCLO1008oLMcAVBY6uz95LY0YS4po7nM3GbWantbi72yWZeRPzreKu4qk2JLW88GWbf5dS5rF3Ko1ztiI1v8tRHQs7hItgFmhZ1M1zppL2YFKKWEHL7k8Zg/9QuaLKo9odVTAYI5sQGaNENwykgfcF+T/pvgUw5L8C/6HqzT4/JTrp4VgE38HeuTG09XmeYvUTTl4+10VPmaH5g1wVAvkd26ZEpZqfX2I=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(376002)(136003)(39860400002)(396003)(366004)(451199021)(478600001)(66446008)(71200400001)(38100700002)(36756003)(82960400001)(76116006)(91956017)(66946007)(122000001)(4326008)(6916009)(66476007)(54906003)(86362001)(8676002)(8936002)(5660300002)(64756008)(2906002)(38070700005)(316002)(41300700001)(83380400001)(66556008)(2616005)(966005)(6506007)(26005)(6512007)(53546011)(186003)(6486002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?L1NNS0JlNU1OWnJkRjZuL0czNUtiRDQyNzhZT25NS3IyZjFoTVBPamVaVGZq?=
+ =?utf-8?B?OWJBSW5aOUpvWlc2WDUxeUNYQXFYbk4xdDh1UVRkSUhjKzBHOU0zRkhOZDAr?=
+ =?utf-8?B?TlhTaFZtL0dUUUsvY0NJYTZzdlZNUURYb21xRFpJN1ZkL2xuYnBtTm80a0kx?=
+ =?utf-8?B?TnB4c09jaFd4UkFwaGJqbXZLV0x4T1hRaHJzQmtEUEovTEFMQUxDVkZlbVdS?=
+ =?utf-8?B?YmxZRkgzdHJja1BpRk9qQ28zUGc4WFdSbTlmYkM3V1NZb2RYUHc3OWErUkZX?=
+ =?utf-8?B?V1BkVTByOHZFQ2M1RDNEMW9ZajA4UmhHVTVWYlB4VGFZdmxsZ05rdnpPSTNq?=
+ =?utf-8?B?ZllORUdjZklMMWRaNHhOejlsa3BGaEhkTFBqYnZCczM4ZlU2YUZCRGg1VVhh?=
+ =?utf-8?B?T1JCSnZjcTM0MmR6WVo0NVgwMHdXMGhaVmIvN2ZwRmg0UlI0WnhONmJsd0Ns?=
+ =?utf-8?B?akRhYUdqT0RYMGFzT3NiVVUxUmxoaVF4WEhhdGhBVkE5dS81aWhiTUVhUEZR?=
+ =?utf-8?B?dzdrUnB2NlRLN0VRM0d6VnpJU2xYNHJkaGxjKzM0M1d3L3ZObkFseHQ4TXhF?=
+ =?utf-8?B?ZnoxclZyNm04WTRYTUR3UXlYb2kzelpmdUxxWGVnSTFJcUhPM2hKTHBPTHh2?=
+ =?utf-8?B?Tzh5TUtQYkxCendBeUliRTNnUGdib3BnRTl1ZGU5ZXVRd1ErNnZXeURGMUQy?=
+ =?utf-8?B?a2JrSk9aYmdsK3k3ZDJuR25HdWM3T0plS2pOM0xDU2g0ampGakI0MnU4ZVJn?=
+ =?utf-8?B?TENreUZzZUptZFNWU2NqRkNNOS9EVXRBMGd0ZThJbTBieHoxWkpBbXYyWDll?=
+ =?utf-8?B?RGJia1VrNys3aE5pNWFMOGxQdFVjVXgweDJvVFZNK1ZkT05QQ29wWVNiVjdN?=
+ =?utf-8?B?YTJIeWxzNXZyWnhVWnc0eXR1alljSTZBRWxScXF0YnZ2dVVvWmJnR1l3QkJl?=
+ =?utf-8?B?TFhlVjJSc1MxSmdoNzRLaEh6eUloU3E3Y0ZhaTRYeC84NjhuMnhDUjRmUWdS?=
+ =?utf-8?B?cTBGMlFyV2syMVRZdkdPdHd0MVJ2dVNDWk5Uc3RlL3lGdkhpbVNYcS9BVG9C?=
+ =?utf-8?B?Q3ZrUXNpNFIxSSt3d1UwVkRTMllpWWxUdFRGNEhPelhXOVpZcTJWaE1xMVEy?=
+ =?utf-8?B?aWJVZUkxWk9ZZDhyR25XUDB3c2JyTEhIb1oyeXMrckUxOENpbG9uMEwralJu?=
+ =?utf-8?B?QTJGTERLUXEzSDYybXJuQ3p4ZlBENEVtZXlSZ2VzbEZyRjBKMWdwZ3RjUk5p?=
+ =?utf-8?B?SlJMMVVoeVVHaENVSFR3aE1Fd3pqYWF0TlplQVk2aC9wOW9rTy9hcEhRVStQ?=
+ =?utf-8?B?Z1ZJTllkRmpoVU9jR21TRHhLSzdKTGovbkNVOTNMZ3dyOUFJaFNHa2pKVElF?=
+ =?utf-8?B?b1M4REZaUGY4RWM4WUZjbC9jU3UvdUtsbFd2VkxwaVl0UDdSUXRjSituajNp?=
+ =?utf-8?B?cG05V2dVdUJoaUZPWVZaQ3FONjVWdEZOdVREOG42dHNncFNram5CTFF1S0hN?=
+ =?utf-8?B?d0xkRFVPYTZnODJPbHZLWkJRYlJWUnhITVk5dWduVkV0dHJFcnI5Zjl6RkN2?=
+ =?utf-8?B?Zmh4RllSa3JjTjVQY2ltREtRRWU5S1hQeGZ0MExOa2RFdkJ0d1N6M1VIamRY?=
+ =?utf-8?B?WTBWbUcwRWFCNEpjclVLLzJYT2VyNXp5bmV5dElrdjI3bCtKODJYVXRqaFQ1?=
+ =?utf-8?B?UjJRSHBGeUNnSDhPWFJqQ1BaMi9mQW5hUUFDTkhNOWNGUGRLOExESXFhOUxK?=
+ =?utf-8?B?ZXhBVjN2TGZRSk9scGdIR3BoeTdTNWVVbXk3UjNPcGRLZnRxVDdqMkYxcVNx?=
+ =?utf-8?B?QUwxUTZkUEhJZDY1TE9aOWZWMXpGY0oyZmQ2QWNOQ2JZNnE2Ujd3VXJOVitG?=
+ =?utf-8?B?OGhYWnlQRkc3OWthVnVETUl6QWFWM3BvdFBvanFrdXRxQlAybFBDaW9WbFlV?=
+ =?utf-8?B?eUNCa1ZSYllUVmo5WUVoWWJMcEFaeGtoQWJaVGkrcUdDVHUwWDVZeVp2NE1X?=
+ =?utf-8?B?UWRzaFljUjkyRVlIeCt2NGNBVXdUM2lqcHQ0TEo5ZVU3bm1CMWsvekxxdGV4?=
+ =?utf-8?B?STNqblNKeGtoR0lneUl1K3pDVzhTTDcvcFduRWNiWmxoMGVEL0Y2c1c3K1VI?=
+ =?utf-8?B?N1BvNUxnYWRaMlBXL015Mko4NGg4cktGbzI4cFVCUnVUZ1AxdzRBSTNJcVVl?=
+ =?utf-8?B?bVE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6BAB07634CDDD348BB4EE89112BAFC1E@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17aa5572-9e83-4f95-ccff-08db673881db
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2023 09:20:59.7305
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2kEev/HlIYPwBrTr2uiFdU/z0vDFIbBpBuqgX2qZcscKS014DWkZ66mhxqhcmrK/kX1bLnd/sZdntfgdXMX85w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB7162
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,411 +172,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon Jun 5, 2023 at 4:48 PM AEST, Jordan Niethe wrote:
-> A series of hcalls have been added to the PAPR which allow a regular
-> guest partition to create and manage guest partitions of its own. Add
-> support to KVM to utilize these hcalls to enable running nested guests.
->
-> Overview of the new hcall usage:
->
-> - L1 and L0 negotiate capabilities with
->   H_GUEST_{G,S}ET_CAPABILITIES()
->
-> - L1 requests the L0 create a L2 with
->   H_GUEST_CREATE() and receives a handle to use in future hcalls
->
-> - L1 requests the L0 create a L2 vCPU with
->   H_GUEST_CREATE_VCPU()
->
-> - L1 sets up the L2 using H_GUEST_SET and the
->   H_GUEST_VCPU_RUN input buffer
->
-> - L1 requests the L0 runs the L2 vCPU using H_GUEST_VCPU_RUN()
->
-> - L2 returns to L1 with an exit reason and L1 reads the
->   H_GUEST_VCPU_RUN output buffer populated by the L0
->
-> - L1 handles the exit using H_GET_STATE if necessary
->
-> - L1 reruns L2 vCPU with H_GUEST_VCPU_RUN
->
-> - L1 frees the L2 in the L0 with H_GUEST_DELETE()
->
-> Support for the new API is determined by trying
-> H_GUEST_GET_CAPABILITIES. On a successful return, the new API will then
-> be used.
->
-> Use the vcpu register state setters for tracking modified guest state
-> elements and copy the thread wide values into the H_GUEST_VCPU_RUN input
-> buffer immediately before running a L2. The guest wide
-> elements can not be added to the input buffer so send them with a
-> separate H_GUEST_SET call if necessary.
->
-> Make the vcpu register getter load the corresponding value from the real
-> host with H_GUEST_GET. To avoid unnecessarily calling H_GUEST_GET, track
-> which values have already been loaded between H_GUEST_VCPU_RUN calls. If
-> an element is present in the H_GUEST_VCPU_RUN output buffer it also does
-> not need to be loaded again.
->
-> There is existing support for running nested guests on KVM
-> with powernv. However the interface used for this is not supported by
-> other PAPR hosts. This existing API is still supported.
->
-> Signed-off-by: Jordan Niethe <jpn@linux.vnet.ibm.com>
-> ---
-> v2:
->   - Declare op structs as static
->   - Use expressions in switch case with local variables
->   - Do not use the PVR for the LOGICAL PVR ID
->   - Handle emul_inst as now a double word
->   - Use new GPR(), etc macros
->   - Determine PAPR nested capabilities from cpu features
-> ---
->  arch/powerpc/include/asm/guest-state-buffer.h | 105 +-
->  arch/powerpc/include/asm/hvcall.h             |  30 +
->  arch/powerpc/include/asm/kvm_book3s.h         | 122 ++-
->  arch/powerpc/include/asm/kvm_book3s_64.h      |   6 +
->  arch/powerpc/include/asm/kvm_host.h           |  21 +
->  arch/powerpc/include/asm/kvm_ppc.h            |  64 +-
->  arch/powerpc/include/asm/plpar_wrappers.h     | 198 ++++
->  arch/powerpc/kvm/Makefile                     |   1 +
->  arch/powerpc/kvm/book3s_hv.c                  | 126 ++-
->  arch/powerpc/kvm/book3s_hv.h                  |  74 +-
->  arch/powerpc/kvm/book3s_hv_nested.c           |  38 +-
->  arch/powerpc/kvm/book3s_hv_papr.c             | 940 ++++++++++++++++++
->  arch/powerpc/kvm/emulate_loadstore.c          |   4 +-
->  arch/powerpc/kvm/guest-state-buffer.c         |  49 +
->  14 files changed, 1684 insertions(+), 94 deletions(-)
->  create mode 100644 arch/powerpc/kvm/book3s_hv_papr.c
->
-> diff --git a/arch/powerpc/include/asm/guest-state-buffer.h b/arch/powerpc=
-/include/asm/guest-state-buffer.h
-> index 65a840abf1bb..116126edd8e2 100644
-> --- a/arch/powerpc/include/asm/guest-state-buffer.h
-> +++ b/arch/powerpc/include/asm/guest-state-buffer.h
-> @@ -5,6 +5,7 @@
->  #ifndef _ASM_POWERPC_GUEST_STATE_BUFFER_H
->  #define _ASM_POWERPC_GUEST_STATE_BUFFER_H
-> =20
-> +#include "asm/hvcall.h"
->  #include <linux/gfp.h>
->  #include <linux/bitmap.h>
->  #include <asm/plpar_wrappers.h>
-> @@ -14,16 +15,16 @@
->   ***********************************************************************=
-***/
->  #define GSID_BLANK			0x0000
-> =20
-> -#define GSID_HOST_STATE_SIZE		0x0001 /* Size of Hypervisor Internal Form=
-at VCPU state */
-> -#define GSID_RUN_OUTPUT_MIN_SIZE	0x0002 /* Minimum size of the Run VCPU =
-output buffer */
-> -#define GSID_LOGICAL_PVR		0x0003 /* Logical PVR */
-> -#define GSID_TB_OFFSET			0x0004 /* Timebase Offset */
-> -#define GSID_PARTITION_TABLE		0x0005 /* Partition Scoped Page Table */
-> -#define GSID_PROCESS_TABLE		0x0006 /* Process Table */
-> +#define GSID_HOST_STATE_SIZE		0x0001
-> +#define GSID_RUN_OUTPUT_MIN_SIZE	0x0002
-> +#define GSID_LOGICAL_PVR		0x0003
-> +#define GSID_TB_OFFSET			0x0004
-> +#define GSID_PARTITION_TABLE		0x0005
-> +#define GSID_PROCESS_TABLE		0x0006
-
-You lost your comments.
-
-> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include=
-/asm/kvm_book3s.h
-> index 0ca2d8b37b42..c5c57552b447 100644
-> --- a/arch/powerpc/include/asm/kvm_book3s.h
-> +++ b/arch/powerpc/include/asm/kvm_book3s.h
-> @@ -12,6 +12,7 @@
->  #include <linux/types.h>
->  #include <linux/kvm_host.h>
->  #include <asm/kvm_book3s_asm.h>
-> +#include <asm/guest-state-buffer.h>
-> =20
->  struct kvmppc_bat {
->  	u64 raw;
-> @@ -316,6 +317,57 @@ long int kvmhv_nested_page_fault(struct kvm_vcpu *vc=
-pu);
-> =20
->  void kvmppc_giveup_fac(struct kvm_vcpu *vcpu, ulong fac);
-> =20
-> +
-> +#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> +
-> +extern bool __kvmhv_on_papr;
-> +
-> +static inline bool kvmhv_on_papr(void)
-> +{
-> +	return __kvmhv_on_papr;
-> +}
-
-It's a nitpick, but kvmhv_on_pseries() is because we're runnning KVM-HV
-on a pseries guest kernel. Which is a papr guest kernel. So this kind of
-doesn't make sense if you read it the same way.
-
-kvmhv_nested_using_papr() or something like that might read a bit
-better.
-
-This could be a static key too.
-
-> @@ -575,6 +593,7 @@ struct kvm_vcpu_arch {
->  	ulong dscr;
->  	ulong amr;
->  	ulong uamor;
-> +	ulong amor;
->  	ulong iamr;
->  	u32 ctrl;
->  	u32 dabrx;
-
-This belongs somewhere else.
-
-> @@ -829,6 +848,8 @@ struct kvm_vcpu_arch {
->  	u64 nested_hfscr;	/* HFSCR that the L1 requested for the nested guest *=
-/
->  	u32 nested_vcpu_id;
->  	gpa_t nested_io_gpr;
-> +	/* For nested APIv2 guests*/
-> +	struct kvmhv_papr_host papr_host;
->  #endif
-
-This is not exactly a papr host. Might have to come up with a better
-name especially if we implement a L0 things could get confusing.
-
-> @@ -342,6 +343,203 @@ static inline long plpar_get_cpu_characteristics(st=
-ruct h_cpu_char_result *p)
->  	return rc;
->  }
-> =20
-> +static inline long plpar_guest_create(unsigned long flags, unsigned long=
- *guest_id)
-> +{
-> +	unsigned long retbuf[PLPAR_HCALL_BUFSIZE];
-> +	unsigned long token;
-> +	long rc;
-> +
-> +	token =3D -1UL;
-> +	while (true) {
-> +		rc =3D plpar_hcall(H_GUEST_CREATE, retbuf, flags, token);
-> +		if (rc =3D=3D H_SUCCESS) {
-> +			*guest_id =3D retbuf[0];
-> +			break;
-> +		}
-> +
-> +		if (rc =3D=3D H_BUSY) {
-> +			token =3D retbuf[0];
-> +			cpu_relax();
-> +			continue;
-> +		}
-> +
-> +		if (H_IS_LONG_BUSY(rc)) {
-> +			token =3D retbuf[0];
-> +			mdelay(get_longbusy_msecs(rc));
-
-All of these things need a non-sleeping delay? Can we sleep instead?
-Or if not, might have to think about going back to the caller and it
-can retry.
-
-get/set state might be a bit inconvenient, although I don't expect
-that should potentially take so long as guest and vcpu create/delete,
-so at least those ones would be good if they're called while
-preemptable.
-
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 521d84621422..f22ee582e209 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -383,6 +383,11 @@ static void kvmppc_core_vcpu_put_hv(struct kvm_vcpu =
-*vcpu)
->  	spin_unlock_irqrestore(&vcpu->arch.tbacct_lock, flags);
->  }
-> =20
-> +static void kvmppc_set_pvr_hv(struct kvm_vcpu *vcpu, u32 pvr)
-> +{
-> +	vcpu->arch.pvr =3D pvr;
-> +}
-
-Didn't you lose this in a previous patch? I thought it must have moved
-to a header but it reappears.
-
-> +
->  /* Dummy value used in computing PCR value below */
->  #define PCR_ARCH_31    (PCR_ARCH_300 << 1)
-> =20
-> @@ -1262,13 +1267,14 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu=
-)
->  			return RESUME_HOST;
->  		break;
->  #endif
-> -	case H_RANDOM:
-> +	case H_RANDOM: {
->  		unsigned long rand;
-> =20
->  		if (!arch_get_random_seed_longs(&rand, 1))
->  			ret =3D H_HARDWARE;
->  		kvmppc_set_gpr(vcpu, 4, rand);
->  		break;
-> +	}
->  	case H_RPT_INVALIDATE:
->  		ret =3D kvmppc_h_rpt_invalidate(vcpu, kvmppc_get_gpr(vcpu, 4),
->  					      kvmppc_get_gpr(vcpu, 5),
-
-Compile fix for a previous patch.
-
-> @@ -2921,14 +2927,21 @@ static int kvmppc_core_vcpu_create_hv(struct kvm_=
-vcpu *vcpu)
->  	vcpu->arch.shared_big_endian =3D false;
->  #endif
->  #endif
-> -	kvmppc_set_mmcr_hv(vcpu, 0, MMCR0_FC);
-> =20
-> +	if (kvmhv_on_papr()) {
-> +		err =3D kvmhv_papr_vcpu_create(vcpu, &vcpu->arch.papr_host);
-> +		if (err < 0)
-> +			return err;
-> +	}
-> +
-> +	kvmppc_set_mmcr_hv(vcpu, 0, MMCR0_FC);
->  	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
->  		kvmppc_set_mmcr_hv(vcpu, 0, kvmppc_get_mmcr_hv(vcpu, 0) | MMCR0_PMCCEX=
-T);
->  		kvmppc_set_mmcra_hv(vcpu, MMCRA_BHRB_DISABLE);
->  	}
-> =20
->  	kvmppc_set_ctrl_hv(vcpu, CTRL_RUNLATCH);
-> +	kvmppc_set_amor_hv(vcpu, ~0);
-
-This AMOR thing should go somewhere else. Not actually sure why it needs
-to be added to the vcpu since it's always ~0. Maybe just put that in a
-#define somewhere and use that.
-
-> @@ -4042,6 +4059,50 @@ static void vcpu_vpa_increment_dispatch(struct kvm=
-_vcpu *vcpu)
->  	}
->  }
-> =20
-> +static int kvmhv_vcpu_entry_papr(struct kvm_vcpu *vcpu, u64 time_limit, =
-unsigned long lpcr, u64 *tb)
-> +{
-> +	struct kvmhv_papr_host *ph;
-> +	unsigned long msr, i;
-> +	int trap;
-> +	long rc;
-> +
-> +	ph =3D &vcpu->arch.papr_host;
-> +
-> +	msr =3D mfmsr();
-> +	kvmppc_msr_hard_disable_set_facilities(vcpu, msr);
-> +	if (lazy_irq_pending())
-> +		return 0;
-> +
-> +	kvmhv_papr_flush_vcpu(vcpu, time_limit);
-> +
-> +	accumulate_time(vcpu, &vcpu->arch.in_guest);
-> +	rc =3D plpar_guest_run_vcpu(0, vcpu->kvm->arch.lpid, vcpu->vcpu_id,
-> +				  &trap, &i);
-> +
-> +	if (rc !=3D H_SUCCESS) {
-> +		pr_err("KVM Guest Run VCPU hcall failed\n");
-> +		if (rc =3D=3D H_INVALID_ELEMENT_ID)
-> +			pr_err("KVM: Guest Run VCPU invalid element id at %ld\n", i);
-> +		else if (rc =3D=3D H_INVALID_ELEMENT_SIZE)
-> +			pr_err("KVM: Guest Run VCPU invalid element size at %ld\n", i);
-> +		else if (rc =3D=3D H_INVALID_ELEMENT_VALUE)
-> +			pr_err("KVM: Guest Run VCPU invalid element value at %ld\n", i);
-> +		return 0;
-> +	}
-
-This needs the proper error handling. Were you going to wait until I
-sent that up for existing code?
-
-> @@ -5119,6 +5183,7 @@ static void kvmppc_core_commit_memory_region_hv(str=
-uct kvm *kvm,
->   */
->  void kvmppc_update_lpcr(struct kvm *kvm, unsigned long lpcr, unsigned lo=
-ng mask)
->  {
-> +	struct kvm_vcpu *vcpu;
->  	long int i;
->  	u32 cores_done =3D 0;
-> =20
-> @@ -5139,6 +5204,12 @@ void kvmppc_update_lpcr(struct kvm *kvm, unsigned =
-long lpcr, unsigned long mask)
->  		if (++cores_done >=3D kvm->arch.online_vcores)
->  			break;
->  	}
-> +
-> +	if (kvmhv_on_papr()) {
-> +		kvm_for_each_vcpu(i, vcpu, kvm) {
-> +			kvmppc_set_lpcr_hv(vcpu, vcpu->arch.vcore->lpcr);
-> +		}
-> +	}
->  }
-
-vcpu define could go in that scope I guess.
-
-> @@ -5405,15 +5476,43 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm=
-)
-> =20
->  	/* Allocate the guest's logical partition ID */
-> =20
-> -	lpid =3D kvmppc_alloc_lpid();
-> -	if ((long)lpid < 0)
-> -		return -ENOMEM;
-> -	kvm->arch.lpid =3D lpid;
-> +	if (!kvmhv_on_papr()) {
-> +		lpid =3D kvmppc_alloc_lpid();
-> +		if ((long)lpid < 0)
-> +			return -ENOMEM;
-> +		kvm->arch.lpid =3D lpid;
-> +	}
-> =20
->  	kvmppc_alloc_host_rm_ops();
-> =20
->  	kvmhv_vm_nested_init(kvm);
-> =20
-> +	if (kvmhv_on_papr()) {
-> +		long rc;
-> +		unsigned long guest_id;
-> +
-> +		rc =3D plpar_guest_create(0, &guest_id);
-> +
-> +		if (rc !=3D H_SUCCESS)
-> +			pr_err("KVM: Create Guest hcall failed, rc=3D%ld\n", rc);
-> +
-> +		switch (rc) {
-> +		case H_PARAMETER:
-> +		case H_FUNCTION:
-> +		case H_STATE:
-> +			return -EINVAL;
-> +		case H_NOT_ENOUGH_RESOURCES:
-> +		case H_ABORTED:
-> +			return -ENOMEM;
-> +		case H_AUTHORITY:
-> +			return -EPERM;
-> +		case H_NOT_AVAILABLE:
-> +			return -EBUSY;
-> +		}
-> +		kvm->arch.lpid =3D guest_id;
-> +	}
-
-I wouldn't mind putting lpid/guest_id in different variables. guest_id
-is 64-bit isn't it? LPIDR is 32. If nothing else that could cause
-issues if the hypervisor does something clever with the token.
-
-> @@ -5573,10 +5675,14 @@ static void kvmppc_core_destroy_vm_hv(struct kvm =
-*kvm)
->  		kvm->arch.process_table =3D 0;
->  		if (kvm->arch.secure_guest)
->  			uv_svm_terminate(kvm->arch.lpid);
-> -		kvmhv_set_ptbl_entry(kvm->arch.lpid, 0, 0);
-> +		if (!kvmhv_on_papr())
-> +			kvmhv_set_ptbl_entry(kvm->arch.lpid, 0, 0);
->  	}
-
-Would be nice to have a +ve test for the "existing" API. All we have to
-do is think of a name for it.
-
-Thanks,
-Nick
+T24gV2VkLCAyMDIzLTA2LTA3IGF0IDEyOjU1ICswODAwLCBCaW5iaW4gV3Ugd3JvdGU6DQo+IA0K
+PiBPbiA2LzcvMjAyMyAxMTo0MCBBTSwgSHVhbmcsIEthaSB3cm90ZToNCj4gPiBPbiBUdWUsIDIw
+MjMtMDYtMDYgYXQgMTc6MTggKzA4MDAsIEJpbmJpbiBXdSB3cm90ZToNCj4gPiA+IE1vdmUgQ1I0
+LkxBTV9TVVAgb3V0IG9mIENSNF9SRVNFUlZFRF9CSVRTIGFuZCBpdHMgcmVzZXJ2YXRpb24gZGVw
+ZW5kcyBvbiB2Y3B1DQo+ID4gPiBzdXBwb3J0aW5nIExBTSBmZWF0dXJlIG9yIG5vdC4gTGVhdmUg
+dGhlIGJpdCBpbnRlcmNlcHRlZCB0byBhdm9pZCB2bXJlYWQgZXZlcnkNCj4gPiA+IHRpbWUgd2hl
+biBLVk0gZmV0Y2hlcyBpdHMgdmFsdWUsIHdpdGggdGhlIGV4cGVjdGF0aW9uIHRoYXQgZ3Vlc3Qg
+d29uJ3QgdG9nZ2xlDQo+ID4gPiB0aGUgYml0IGZyZXF1ZW50bHkuDQo+ID4gS1ZNIG9ubHkgbmVl
+ZHMgdG8gZG8gdm1yZWFkIG9uY2UgdG8gY2FjaGUgZ3Vlc3QncyBDUjQsIGFuZCBwcmVzdW1hYmxl
+IHZtcmVhZCBpcw0KPiA+IGEgbG90IGNoZWFwZXIgdGhhbiBhIFZNRVhJVC4gIFNvIEkgZG9uJ3Qg
+c2VlIHRoZSB2YWx1ZSBvZiBpbnRlcmNlcHRpbmcgaXQgaWYNCj4gPiB0aGVyZSdzIG5vIG5lZWQg
+dG8gZG8uDQo+IEhlcmUgaXMgdGhlIGRpc2N1c3Npb24gYWJvdXQgdGhlIGdlbmVyYWwgcnVsZSBv
+ZiBpbnRlcmNlcHRpb24gb2YgQ1I0IGJpdC4NCj4gU2VhbiBtZW50aW9uZWQ6wqAgIkFzIGEgYmFz
+ZQ0KPiBydWxlLCBLVk0gaW50ZXJjZXB0cyBDUjQgYml0cyB1bmxlc3MgdGhlcmUncyBhIHJlYXNv
+biBub3QgdG8sIGUuZy4gaWYgDQo+IHRoZSBDUjQgYml0DQo+IGluIHF1ZXN0aW9uIGlzIHdyaXR0
+ZW4gZnJlcXVlbnRseSBieSByZWFsIGd1ZXN0cyBhbmQvb3IgbmV2ZXIgY29uc3VtZWQgDQo+IGJ5
+IEtWTS4iDQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2FsbC9ZN3hBNTNzTHhDd3pmdmdEQGdv
+b2dsZS5jb20vDQo+IA0KPiBBbmQgQ1I0LkxBTV9TVVAgdmFsdWUgd2lsbCBiZSB1c2VkIHRvIGRl
+dGVybWluIHRoZSBMQU0gbW9kZSB3aGVuIGFwcGx5IA0KPiBMQU0gbWFza2luZyBpbiBpbnN0cnVj
+dGlvbiBlbXVsYXRpb25zIC8gVk1FeGl0IGhhbmRsZXJzLA0KPiBhbmQgaWYgdGhlIGJpdCBpcyBw
+YXNzZWQtdGhyb3VnaCwgaXQgd2lsbCBiZSBhIHZtcmVhZCBpbiB0aGVzZSBwYXRoZXMuDQoNClll
+YWggYWdyZWVkLg0KDQo+IA0KPiA+IA0KPiA+IEJ1dCBwcmVzdW1hYmx5IEkgdGhpbmsgd2UgY2Fu
+bm90IGFsbG93IGd1ZXN0IHRvIG93biB0aGlzIGJpdCBiZWNhdXNlIEtWTSB3YW50cw0KPiA+IHRv
+IHJldHVybiBhIHZhbGlkIENSNCBpZiBMQU0gaXNuJ3QgZXhwb3NlZCB0byBndWVzdD8gIE90aGVy
+d2lzZSBndWVzdCBjYW4gc3RpbGwNCj4gPiBzZXQgdGhpcyBiaXQgZXZlbiBMQU0gaXNuJ3QgZXhw
+b3NlZCB0byBndWVzdC4NCj4gPiANCj4gPiBBbSBJIG1pc3Npbmcgc29tZXRoaW5nPw0KPiBSaWdo
+dCwgdGhpcyBpcyBhbHNvIGEgcmVhc29uIHdoeSB0aGUgQ1I0LkxBTV9TVVAgYml0IHNob3VsZCBi
+ZSBpbnRlcmNlcHRlZC4NCj4gV2lsbCB1cGRhdGUgdGhlIGp1c3RpZmljYXRpb24uDQo+IEkgc3Vw
+cG9zZSB0aGlzIHJlYXNvbiBpcyBlbm91Z2ggZm9yIGp1c3RpZmljYXRpb24sIHdpbGwgcmVtb3Zl
+IHRoZSANCj4gcGVyZm9ybWFuY2UgcGFydCBpbiBjaGFuZ2Vsb2cuDQoNCkFueXdheSwNCg0KUmV2
+aWV3ZWQtYnk6IEthaSBIdWFuZyA8a2FpLmh1YW5nQGludGVsLmNvbT4NCg0KDQo=
