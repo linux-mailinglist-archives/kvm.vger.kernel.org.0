@@ -2,74 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6F64726A10
-	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 21:46:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA5FC726A1E
+	for <lists+kvm@lfdr.de>; Wed,  7 Jun 2023 21:47:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231772AbjFGTqS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 15:46:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54814 "EHLO
+        id S231799AbjFGTr3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 15:47:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231605AbjFGTqI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 15:46:08 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 974DC1FF7
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 12:46:06 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-543a4a54469so1275450a12.1
-        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 12:46:06 -0700 (PDT)
+        with ESMTP id S231596AbjFGTr1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 15:47:27 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C0AE101;
+        Wed,  7 Jun 2023 12:47:24 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-51b4ef5378bso7011968a12.1;
+        Wed, 07 Jun 2023 12:47:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686167166; x=1688759166;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kt9Re8VhD2+c+e08bfchTfKK01Rj2MUePQIf0sCv4Xg=;
-        b=qnLVcf4LBOV1GocAfKmE7OOXWzG9JXsx+o5fD5NyUihLa4ZmEEtGXBCpzgiwnDFzpW
-         3i9IE5h6ihvg8wwHtLHRzRrmvSiqyq53LJ5VdfHiV/e3LDQnWSjiBl2omUAEyOSXHCvb
-         CHDx0jkRuYbIVXezwbq9YBlEropjp33Q5X5v8O3ixEuMOEQeQ8f1dVDxgyOFKJPD+e8v
-         8eqaxzIAlQKYECNoDAZ2EDzO7PmAJgcbwIXx6TA6P1gNq8IfNTK8hknyk2zzl5/syfVP
-         N64VmdmpBXc9YSc4MaxWzquMO6VleuSWpfh2cPXzcRKY2zF8umgZx0vTVuieF++qHdj4
-         q5Pg==
+        d=gmail.com; s=20221208; t=1686167244; x=1688759244;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jcZW7HM4Z+VTpJgqxtgAswvzaTnMfZjVuQ9QEZa6vH4=;
+        b=IGFnu//niFMk5TiITkVoJUsAqE/6IcQ5sIU++gOt2HZ/2WOLAsyj9D9YiNEQvJxM7l
+         OxxP680fQmNGmkclthwx7/6esh6O5yyZ1JSEgHEdHN+SFwcW3LzgyhD1seTnQ2KRGBZV
+         0vBtS9DjAYkj4n8kjft0FQlxhd1U4ce+4ne0APWum+YX462FQUou6h+2g6nuDs23lK83
+         e9aEizsHeBcZHDYr34EGrqpwGEgfBLDy/YqkHRM3+CkVelzkfLCCslkaX5u8eKOJ2lFu
+         woFoOYystmK1Gxy5jrC1E7ZVbOLVcTfgjT/R7udmBChKvxgvYwJAcyZ8ic42oOoK3HMB
+         lshA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686167166; x=1688759166;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kt9Re8VhD2+c+e08bfchTfKK01Rj2MUePQIf0sCv4Xg=;
-        b=h0M9pfdUldmHTaJEgft3ENFi3FJi7NFrLEiIJS0jFT4Ph4t6SPJ4iibgKelRCat4VE
-         LwEY73CkWbykqVw01IpKsSDfwzZOnXuJn7IeXOmJwdjBUHIKgOsU5xb0BpXkohYv48T1
-         HR21f0tkgY/TT7BJsP3hj/prjUEIERcdaRtY+lcBpwz5lpdMGEPJNuxDFqf1foA2I51m
-         G7z4p4/leCwrXzp6rPn9xYS5wcefRpEMAr/ae+5aUvh+/g7nqJbBb5/8rDpR/llAW+gk
-         Y+fzrpJFPYHuzwdLlJQG6emuL9OR1hB+Hz5Hm/62GL8ZIKd9GGtg1G7x5yhCZlgd2X66
-         vJBg==
-X-Gm-Message-State: AC+VfDx9wbNZ6PRBheFz7e3NhU9FrvkaBYEp1rsehG9xVa8lBnbrR/nv
-        UNuGnUUgTVI3R8sGlcspJRjyN5ySN0WCaaqifNDnnQMklMEGha7XzjXA6FPzl+syCKTRQVvZt6X
-        R0sBwDStvHLp6hitbh5/zhJP20qN8pi5wbdyEgkg8U7KDTUgHq4N6BEC/gqyZt0U8kByOjiY=
-X-Google-Smtp-Source: ACHHUZ6AdZhHVsK3gBqZ29mngq3wYJzUe8nyFBCy0MXmvWuiKLwI//W+KPq7fWqN45t7RWSqbJlvv7QNt3JQHgOuqw==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:902:db02:b0:1b0:4af9:9032 with
- SMTP id m2-20020a170902db0200b001b04af99032mr2121642plx.0.1686167165934; Wed,
- 07 Jun 2023 12:46:05 -0700 (PDT)
-Date:   Wed,  7 Jun 2023 19:45:54 +0000
-In-Reply-To: <20230607194554.87359-1-jingzhangos@google.com>
-Mime-Version: 1.0
-References: <20230607194554.87359-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.41.0.rc0.172.g3f132b7071-goog
-Message-ID: <20230607194554.87359-5-jingzhangos@google.com>
-Subject: [PATCH v4 4/4] KVM: arm64: Enable writable for ID_AA64MMFR{0, 1, 2}_EL1
-From:   Jing Zhang <jingzhangos@google.com>
-To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@google.com>
-Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>,
-        Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        d=1e100.net; s=20221208; t=1686167244; x=1688759244;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jcZW7HM4Z+VTpJgqxtgAswvzaTnMfZjVuQ9QEZa6vH4=;
+        b=Ck6DY0S0NhIgtHdjSqZT4EfBMfb3uTGPEvNdiGPdV6hV6NGecwPMCZeL2vEgarWTXD
+         +g3m7KM7rPbw1wpnRohDXxYC3T/UyqxxzahfHM84LVWrEWjltwsdYdm82TCMWbFAPUW0
+         i72TK+6k/EWHwOxKUqrK+ckOal30x6XeLMQyUJGVTOW22uY7t3V6/Phh317ABXA/BiXH
+         u2fSD/wAEO3/AnBu1vlh3t1HhX+h5E2NWenlvlRDqTvMRqZ4MPi5uk9HJRcYU52+Y4+O
+         bibV8NSkIgEVrnmLlbBHLpxrD9UZEle1kCd9Z2F2Nc1GeDeRBDLdKYws+ce6J93LjslT
+         iR7Q==
+X-Gm-Message-State: AC+VfDy8Jr9OItRF/krx3qU2ly2ps8FLlmjak1IrsZ8zlEY9RAysiD3V
+        xDRtD++EGX1t8xsRzkCgd4M=
+X-Google-Smtp-Source: ACHHUZ4iCwdXBq6qN9fQHvCx/Cnsqn/cVFFgxIJTLHi516LAiFZQLtd3kKIDR8MnHYa9wtTRSXQGpw==
+X-Received: by 2002:a05:6a20:a5a9:b0:10e:d134:d686 with SMTP id bc41-20020a056a20a5a900b0010ed134d686mr4352946pzb.6.1686167243612;
+        Wed, 07 Jun 2023 12:47:23 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id b20-20020aa78114000000b00660f0e4da6esm2758909pfi.183.2023.06.07.12.47.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jun 2023 12:47:23 -0700 (PDT)
+Date:   Wed, 7 Jun 2023 12:47:21 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
+        peterz@infradead.org, tglx@linutronix.de, seanjc@google.com,
+        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, ying.huang@intel.com,
+        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+Subject: Re: [PATCH v11 05/20] x86/virt/tdx: Add SEAMCALL infrastructure
+Message-ID: <20230607194721.GI2244082@ls.amr.corp.intel.com>
+References: <cover.1685887183.git.kai.huang@intel.com>
+ <ec640452a4385d61bec97f8b761ed1ff38898504.1685887183.git.kai.huang@intel.com>
+ <92e19d74-447f-19e0-d9ec-8a3f12f04927@intel.com>
+ <20230607185355.GH2244082@ls.amr.corp.intel.com>
+ <f7ef157e-8f26-8d7b-a9b8-cb8de7f7aa2b@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f7ef157e-8f26-8d7b-a9b8-cb8de7f7aa2b@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,82 +83,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Enable writable from userspace for ID_AA64MMFR{0, 1, 2}_EL1.
-Added a macro for defining general writable idregs.
+On Wed, Jun 07, 2023 at 12:27:33PM -0700,
+Dave Hansen <dave.hansen@intel.com> wrote:
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- arch/arm64/kvm/sys_regs.c | 36 ++++++++++++++++++++++++++++++------
- 1 file changed, 30 insertions(+), 6 deletions(-)
+> On 6/7/23 11:53, Isaku Yamahata wrote:
+> >>> VMX enabling, and KVM is the only user of TDX.  This implementation
+> >>> chooses to make KVM itself responsible for enabling VMX before using
+> >>> TDX and let the rest of the kernel stay blissfully unaware of VMX.
+> >>>
+> >>> The current TDX_MODULE_CALL macro handles neither #GP nor #UD.  The
+> >>> kernel would hit Oops if SEAMCALL were mistakenly made w/o enabling VMX
+> >>> first.  Architecturally, there is no CPU flag to check whether the CPU
+> >>> is in VMX operation.  Also, if a BIOS were buggy, it could still report
+> >>> valid TDX private KeyIDs when TDX actually couldn't be enabled.
+> >> I'm not sure this is a great justification.  If the BIOS is lying to the
+> >> OS, we _should_ oops.
+> >>
+> >> How else can this happen other than silly kernel bugs.  It's OK to oops
+> >> in the face of silly kernel bugs.
+> > TDX KVM + reboot can hit #UD.  On reboot, VMX is disabled (VMXOFF) via
+> > syscore.shutdown callback.  However, guest TD can be still running to issue
+> > SEAMCALL resulting in #UD.
+> > 
+> > Or we can postpone the change and make the TDX KVM patch series carry a patch
+> > for it.
+> 
+> How does the existing KVM use of VMLAUNCH/VMRESUME avoid that problem?
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 8f3ad9c12b27..54c762c95983 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1391,9 +1391,6 @@ static u64 kvm_arm_read_id_reg(const struct kvm_vcpu *vcpu, u32 encoding)
- 		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon),
- 				  pmuver_to_perfmon(vcpu_pmuver(vcpu)));
- 		break;
--	case SYS_ID_AA64MMFR2_EL1:
--		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
--		break;
- 	case SYS_ID_MMFR4_EL1:
- 		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
- 		break;
-@@ -1663,6 +1660,18 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	return pmuver_update(vcpu, rd, val, perfmon_to_pmuver(perfmon), valid_pmu);
- }
- 
-+static u64 read_sanitised_id_aa64mmfr2_el1(struct kvm_vcpu *vcpu,
-+					   const struct sys_reg_desc *rd)
-+{
-+	u64 val;
-+	u32 id = reg_to_encoding(rd);
-+
-+	val = read_sanitised_ftr_reg(id);
-+	val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
-+
-+	return val;
-+}
-+
- /*
-  * cpufeature ID register user accessors
-  *
-@@ -1898,6 +1907,16 @@ static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
- 	.val = 0,				\
- }
- 
-+#define ID_SANITISED_WRITABLE(name) {		\
-+	SYS_DESC(SYS_##name),			\
-+	.access	= access_id_reg,		\
-+	.get_user = get_id_reg,			\
-+	.set_user = set_id_reg,			\
-+	.visibility = id_visibility,		\
-+	.reset = general_read_kvm_sanitised_reg,\
-+	.val = GENMASK(63, 0),			\
-+}
-+
- /* sys_reg_desc initialiser for known cpufeature ID registers */
- #define AA32_ID_SANITISED(name) {		\
- 	SYS_DESC(SYS_##name),			\
-@@ -2113,9 +2132,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	ID_UNALLOCATED(6,7),
- 
- 	/* CRm=7 */
--	ID_SANITISED(ID_AA64MMFR0_EL1),
--	ID_SANITISED(ID_AA64MMFR1_EL1),
--	ID_SANITISED(ID_AA64MMFR2_EL1),
-+	ID_SANITISED_WRITABLE(ID_AA64MMFR0_EL1),
-+	ID_SANITISED_WRITABLE(ID_AA64MMFR1_EL1),
-+	{ SYS_DESC(SYS_ID_AA64MMFR2_EL1),
-+	  .access = access_id_reg,
-+	  .get_user = get_id_reg,
-+	  .set_user = set_id_reg,
-+	  .reset = read_sanitised_id_aa64mmfr2_el1,
-+	  .val = GENMASK(63, 0), },
- 	ID_UNALLOCATED(7,3),
- 	ID_UNALLOCATED(7,4),
- 	ID_UNALLOCATED(7,5),
+extable. From arch/x86/kvm/vmx/vmenter.S
+
+.Lvmresume:
+        vmresume
+        jmp .Lvmfail
+
+.Lvmlaunch:
+        vmlaunch
+        jmp .Lvmfail
+
+        _ASM_EXTABLE(.Lvmresume, .Lfixup)
+        _ASM_EXTABLE(.Lvmlaunch, .Lfixup)
+
+
 -- 
-2.41.0.rc0.172.g3f132b7071-goog
-
+Isaku Yamahata <isaku.yamahata@gmail.com>
