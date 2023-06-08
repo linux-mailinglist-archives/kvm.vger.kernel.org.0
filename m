@@ -2,145 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0ED7D727C09
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 11:58:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E20D0727C74
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 12:12:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235687AbjFHJ6y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 05:58:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54260 "EHLO
+        id S235924AbjFHKMa convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 8 Jun 2023 06:12:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235696AbjFHJ6w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 05:58:52 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F8022707
-        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 02:58:50 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-30ae141785bso414305f8f.3
-        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 02:58:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1686218329; x=1688810329;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bro8SCdRCjEHWuDcBtldZHsndfar0M9rwEdZ8SQ0W0s=;
-        b=DWLlXBMjR+In9QMk6WByU+4r6ZJwRxIdZLTZafSYiCKOJbbbT6swcxcbDLzxBWXjSp
-         1fbhQV7xgyvNNKARmYmQiulH1nZx4WLvUTDj3K4StImn2hgIxDj2+ikZyPIKdWisMOTf
-         POkUvZLouPzWG0TFB+pG8Fqpf4v308cP9MheL82rSXAkIQHV8FTqswIFUo3ofKEZH1T5
-         gBAYnPnURVTOhHfQfMReB4ybwIfvFPWb9VgzTP9BzQ4nEZKp69qw8Fh1mVAeJnQ4O6Qb
-         hvdyiWTomMIhVCmxq/xcYY3sZSRGDpAgFxYDyLLQmROw3quJagxDYH4kZcjPI1PfZRLY
-         vJdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686218329; x=1688810329;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bro8SCdRCjEHWuDcBtldZHsndfar0M9rwEdZ8SQ0W0s=;
-        b=CMhi6QxRb8mtsFAiEvKjIE42wl8gMWuPvmdKnt6fdZqUC4y6+KkJHZVnzSvXxIVG0i
-         3ZXawRKwj9oUleOhqa6UN/i4z81KEf+oGoNGs5J1uF/ZNwld1ITGqDh5fBh9wFmlR+QE
-         e3pY9SYBxolbzF9Ga4YAiq+wF/bqoppdtsMyInJCbvKWZDfitjS+tVR9+JL/5rIbEAJP
-         RTdffomX34tcZcNbN6Hde7IE5tpWKNOBRM6RL/DwmKZCh8OKtRIfgbdusa0LEVFFGG76
-         nmUlIAFjtZy+cClxZ13oVckGESgvVIOrfj8/En1AIViV9RVtc89NHK+MaMz4LRKSKd3U
-         ywRQ==
-X-Gm-Message-State: AC+VfDyqxiVlQ91zHxunCNameJSlptg8gcvUL0qJs0zdd8QGt5Ua9DWd
-        xEptEvyi89VrQfyg0NlNlSDedw==
-X-Google-Smtp-Source: ACHHUZ6f6RLGsz44l11hXuy9AWjs8GZ3O0KJYqBLOUqFSQ6jSeZDCKr+qhXxSeHoE89ty7CpeH4xmQ==
-X-Received: by 2002:a5d:6550:0:b0:30a:9014:838d with SMTP id z16-20020a5d6550000000b0030a9014838dmr6419901wrv.11.1686218329062;
-        Thu, 08 Jun 2023 02:58:49 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id q12-20020a05600000cc00b002ff2c39d072sm1065586wrx.104.2023.06.08.02.58.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jun 2023 02:58:48 -0700 (PDT)
-Date:   Thu, 8 Jun 2023 11:58:47 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Haibo Xu <xiaobo55x@gmail.com>
-Cc:     Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org,
-        oliver.upton@linux.dev, seanjc@google.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 11/11] KVM: riscv: selftests: Add get-reg-list test
-Message-ID: <20230608-344953a953eeb63ef6c26fb8@orel>
-References: <cover.1684999824.git.haibo1.xu@intel.com>
- <da390e6200e838fce320a2a43b2f87951b4e0bbb.1684999824.git.haibo1.xu@intel.com>
- <20230525-2bab5376987792eab73507ac@orel>
- <CAJve8okR_iH4vF9DV9zTkDaeYe25kP7KUcKQphmjG5q-iVb-KA@mail.gmail.com>
+        with ESMTP id S235782AbjFHKMW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 06:12:22 -0400
+Received: from outpost1.zedat.fu-berlin.de (outpost1.zedat.fu-berlin.de [130.133.4.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B05A01FE9;
+        Thu,  8 Jun 2023 03:12:19 -0700 (PDT)
+Received: from inpost2.zedat.fu-berlin.de ([130.133.4.69])
+          by outpost.zedat.fu-berlin.de (Exim 4.95)
+          with esmtps (TLS1.3)
+          tls TLS_AES_256_GCM_SHA384
+          (envelope-from <glaubitz@zedat.fu-berlin.de>)
+          id 1q7Cck-000hkd-IA; Thu, 08 Jun 2023 12:12:10 +0200
+Received: from p57bd96d9.dip0.t-ipconnect.de ([87.189.150.217] helo=[192.168.178.81])
+          by inpost2.zedat.fu-berlin.de (Exim 4.95)
+          with esmtpsa (TLS1.3)
+          tls TLS_AES_256_GCM_SHA384
+          (envelope-from <glaubitz@physik.fu-berlin.de>)
+          id 1q7Cck-0049Nn-9l; Thu, 08 Jun 2023 12:12:10 +0200
+Message-ID: <0e74974450a15870f13ff36ab5dd60924368c0d9.camel@physik.fu-berlin.de>
+Subject: Re: [PATCH v3 30/34] sh: Convert pte_free_tlb() to use ptdescs
+From:   John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     linux-mm@kvack.org, linux-arch@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
+        linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
+        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
+        linux-openrisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-um@lists.infradead.org, xen-devel@lists.xenproject.org,
+        kvm@vger.kernel.org, Yoshinori Sato <ysato@users.sourceforge.jp>
+Date:   Thu, 08 Jun 2023 12:12:09 +0200
+In-Reply-To: <20230531213032.25338-31-vishal.moola@gmail.com>
+References: <20230531213032.25338-1-vishal.moola@gmail.com>
+         <20230531213032.25338-31-vishal.moola@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+User-Agent: Evolution 3.48.2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJve8okR_iH4vF9DV9zTkDaeYe25kP7KUcKQphmjG5q-iVb-KA@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UPPERCASE_50_75
-        autolearn=no autolearn_force=no version=3.4.6
+X-Original-Sender: glaubitz@physik.fu-berlin.de
+X-Originating-IP: 87.189.150.217
+X-ZEDAT-Hint: PO
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 08, 2023 at 05:45:21PM +0800, Haibo Xu wrote:
-> On Fri, May 26, 2023 at 1:18 AM Andrew Jones <ajones@ventanamicro.com> wrote:
-> >
+On Wed, 2023-05-31 at 14:30 -0700, Vishal Moola (Oracle) wrote:
+> Part of the conversions to replace pgtable constructor/destructors with
+> ptdesc equivalents. Also cleans up some spacing issues.
 > 
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(mode),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_REG(sstatus),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_REG(sie),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_REG(stvec),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_REG(sscratch),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_REG(sepc),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_REG(scause),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_REG(stval),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_REG(sip),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_REG(satp),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_REG(scounteren),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_RISCV_TIMER_REG(frequency),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_RISCV_TIMER_REG(time),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_RISCV_TIMER_REG(compare),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_RISCV_TIMER_REG(state),
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_A,
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_C,
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_D,
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_F,
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_H,
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_I,
-> > > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_M,
-> >
-> > I think all the above should have the size KVM_REG_SIZE_ULONG. Please also
-> > test with a 32-bit host.
-> >
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> ---
+>  arch/sh/include/asm/pgalloc.h | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 > 
-> Hi Andrew,
-> 
-> Just noticed the RISC-V 32-bit kvm selftests was not supported currently.
+> diff --git a/arch/sh/include/asm/pgalloc.h b/arch/sh/include/asm/pgalloc.h
+> index a9e98233c4d4..5d8577ab1591 100644
+> --- a/arch/sh/include/asm/pgalloc.h
+> +++ b/arch/sh/include/asm/pgalloc.h
+> @@ -2,6 +2,7 @@
+>  #ifndef __ASM_SH_PGALLOC_H
+>  #define __ASM_SH_PGALLOC_H
+>  
+> +#include <linux/mm.h>
+>  #include <asm/page.h>
+>  
+>  #define __HAVE_ARCH_PMD_ALLOC_ONE
+> @@ -31,10 +32,10 @@ static inline void pmd_populate(struct mm_struct *mm, pmd_t *pmd,
+>  	set_pmd(pmd, __pmd((unsigned long)page_address(pte)));
+>  }
+>  
+> -#define __pte_free_tlb(tlb,pte,addr)			\
+> -do {							\
+> -	pgtable_pte_page_dtor(pte);			\
+> -	tlb_remove_page((tlb), (pte));			\
+> +#define __pte_free_tlb(tlb, pte, addr)				\
+> +do {								\
+> +	pagetable_pte_dtor(page_ptdesc(pte));			\
+> +	tlb_remove_page_ptdesc((tlb), (page_ptdesc(pte)));	\
+>  } while (0)
+>  
+>  #endif /* __ASM_SH_PGALLOC_H */
 
-Oh, right.
+Acked-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-> Even though I tried to remove the below check for 32-bit, there were
-> still many warning and error messages during compiling.
-> It seems 32-bit KVM selftests was not supported either for ARM/x86. Do
-> we have a plan to support it on risc-v?
-
-No plan and, if there was, it would be super low priority. So for stuff
-like using KVM_REG_SIZE_ULONG, we'll just have to try and get it right
-without testing. If somebody adds 32-bit support to these tests someday,
-then, hopefully, it'll just work (I'm allowed one overly optimistic
-comment per day).
-
-Thanks,
-drew
+-- 
+ .''`.  John Paul Adrian Glaubitz
+: :' :  Debian Developer
+`. `'   Physicist
+  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
