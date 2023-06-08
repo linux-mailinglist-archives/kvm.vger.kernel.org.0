@@ -2,163 +2,248 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB9B7727F42
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 13:45:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECF0A72802A
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 14:37:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235190AbjFHLpw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 07:45:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60562 "EHLO
+        id S236045AbjFHMhY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 08:37:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234262AbjFHLpv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 07:45:51 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E4AF52132;
-        Thu,  8 Jun 2023 04:45:14 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.111])
-        by gateway (Coremail) with SMTP id _____8DxCeorv4Fk_oIAAA--.1878S3;
-        Thu, 08 Jun 2023 19:44:43 +0800 (CST)
-Received: from zhaotianrui$loongson.cn ( [10.20.42.111] ) by
- ajax-webmail-localhost.localdomain (Coremail) ; Thu, 8 Jun 2023 19:44:40
- +0800 (GMT+08:00)
-X-Originating-IP: [10.20.42.111]
-Date:   Thu, 8 Jun 2023 19:44:40 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From:   =?UTF-8?B?6LW15aSp55Ge?= <zhaotianrui@loongson.cn>
-To:     "Youling Tang" <tangyouling@loongson.cn>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        "Huacai Chen" <chenhuacai@kernel.org>,
-        "WANG Xuerui" <kernel@xen0n.name>,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, "Jens Axboe" <axboe@kernel.dk>,
-        "Mark Brown" <broonie@kernel.org>,
-        "Alex Deucher" <alexander.deucher@amd.com>,
-        "Oliver Upton" <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        "Xi Ruoyao" <xry111@xry111.site>
-Subject: Re: Re: [PATCH v12 26/31] LoongArch: KVM: Implement kvm exception
- vector
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220411(feba7c69)
- Copyright (c) 2002-2023 www.mailtech.cn .loongson.cn
-In-Reply-To: <b0e8a311-d988-a1be-a256-130adcdbbfc6@loongson.cn>
-References: <20230530015223.147755-1-zhaotianrui@loongson.cn>
- <20230530015223.147755-27-zhaotianrui@loongson.cn>
- <b0e8a311-d988-a1be-a256-130adcdbbfc6@loongson.cn>
-Content-Transfer-Encoding: base64
-X-CM-CTRLDATA: 7YaRS2Zvb3Rlcl90eHQ9MzczMTo2MTI=
-Content-Type: text/plain; charset=UTF-8
+        with ESMTP id S234372AbjFHMhX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 08:37:23 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4FC1E62;
+        Thu,  8 Jun 2023 05:37:21 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 358CHOXA028165;
+        Thu, 8 Jun 2023 12:37:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=fsd0e+83dm6G5og5UYRQp+4H7dINEmgeUwftwVBRy50=;
+ b=QucOWYyUAQSdSJuKjqCHSQk6/W/mB29QWlABK9EnqjaV0ivUTX+LNmam86NXLADXRJ3b
+ dYPXlO5NlAQRqx+WPzIdt0aH+dezTWAXcve+BJs3nDQYDgQfxvlSLoGzsEmV7SYlgm13
+ 2BGCBZaFj1wsdXGDZa5xK1DbJS/BeNp1MktTb9wdZfYV4ozT4ICWE66TMtR2604sncb6
+ tsVFv4hCLcVKlZlY1kEmaNxvQEVnBReBrdF1UefFrD+SCTKV3Y7UkUDMKCAELotNUCP7
+ sRCJEHDbj6hflA36b66jchVv3lrrEJzgB8MZVXjIv8PJDde7l5faDFrx876RMXwWlmKr TQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r3ev20d1q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Jun 2023 12:37:12 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 358CJCWm000910;
+        Thu, 8 Jun 2023 12:37:11 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r3ev20cym-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Jun 2023 12:37:11 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 358BKL4n005897;
+        Thu, 8 Jun 2023 12:34:58 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3r2a790vp6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Jun 2023 12:34:58 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 358CYuQm8782508
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 8 Jun 2023 12:34:56 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E18E20043;
+        Thu,  8 Jun 2023 12:34:56 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6194C20040;
+        Thu,  8 Jun 2023 12:34:54 +0000 (GMT)
+Received: from r223l.aus.stglabs.ibm.com (unknown [9.3.109.14])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  8 Jun 2023 12:34:54 +0000 (GMT)
+From:   Kautuk Consul <kconsul@linux.vnet.ibm.com>
+To:     Nicholas Piggin <npiggin@gmail.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>, jpn@linux.vnet.ibm.com,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-doc@vger.kernel.org,
+        Kautuk Consul <kconsul@linux.vnet.ibm.com>
+Subject: [PATCH] KVM: ppc64: Enable ring-based dirty memory tracking
+Date:   Thu,  8 Jun 2023 08:34:48 -0400
+Message-Id: <20230608123448.71861-1-kconsul@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Message-ID: <592bfebe.ac52.1889ad2b799.Coremail.zhaotianrui@loongson.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID: AQAAf8Bxt+Qov4FkRXUHAA--.665W
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/1tbiAQAQAGSAc4EYygABsU
-X-Coremail-Antispam: 1Uk129KBj93XoWxCw4DZr45AF1DZFyUJF4UKFX_yoWrXF1fpF
-        yfCw1jkr4UW342v3W2kr4q9F13A3yxKr17CrsrK345Zw4vvr95J3yvq39akFsxKryqvF1x
-        ZayDtr1Y9a1UG3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUQab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-        xVWxJr0_GcWln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-        xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
-        6r1DMcIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-        vIr41lFcxC0VAYjxAxZF0Ew4CEw7xC0wACY4xI67k04243AVC20s07MxkF7I0En4kS14v2
-        6r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14
-        v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-        IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JwCE64xvF2
-        IEb7IF0Fy7YxBIdaVFxhVjvjDU0xZFpf9x07jYiihUUUUU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: v8X-d65sqIc0h91LpFoHj7sGmGqn-Z7y
+X-Proofpoint-ORIG-GUID: KMfzz0lN4-_Wt50y0eaFbQgynUHQz74N
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-06-08_08,2023-06-08_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ mlxscore=0 malwarescore=0 adultscore=0 mlxlogscore=901 priorityscore=1501
+ clxscore=1011 suspectscore=0 impostorscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2306080109
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgoKPiAtLS0tLeWOn+Wni+mCruS7ti0tLS0tCj4g5Y+R5Lu25Lq6OiAiWW91bGluZyBUYW5nIiA8
-dGFuZ3lvdWxpbmdAbG9vbmdzb24uY24+Cj4g5Y+R6YCB5pe26Ze0OjIwMjMtMDYtMDYgMTU6MDA6
-MTEgKOaYn+acn+S6jCkKPiDmlLbku7bkuro6ICJUaWFucnVpIFpoYW8iIDx6aGFvdGlhbnJ1aUBs
-b29uZ3Nvbi5jbj4KPiDmioTpgIE6IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcsIGt2bUB2
-Z2VyLmtlcm5lbC5vcmcsICJQYW9sbyBCb256aW5pIiA8cGJvbnppbmlAcmVkaGF0LmNvbT4sICJI
-dWFjYWkgQ2hlbiIgPGNoZW5odWFjYWlAa2VybmVsLm9yZz4sICJXQU5HIFh1ZXJ1aSIgPGtlcm5l
-bEB4ZW4wbi5uYW1lPiwgIkdyZWcgS3JvYWgtSGFydG1hbiIgPGdyZWdraEBsaW51eGZvdW5kYXRp
-b24ub3JnPiwgbG9vbmdhcmNoQGxpc3RzLmxpbnV4LmRldiwgIkplbnMgQXhib2UiIDxheGJvZUBr
-ZXJuZWwuZGs+LCAiTWFyayBCcm93biIgPGJyb29uaWVAa2VybmVsLm9yZz4sICJBbGV4IERldWNo
-ZXIiIDxhbGV4YW5kZXIuZGV1Y2hlckBhbWQuY29tPiwgIk9saXZlciBVcHRvbiIgPG9saXZlci51
-cHRvbkBsaW51eC5kZXY+LCBtYW9iaWJvQGxvb25nc29uLmNuLCAiWGkgUnVveWFvIiA8eHJ5MTEx
-QHhyeTExMS5zaXRlPgo+IOS4u+mimDogUmU6IFtQQVRDSCB2MTIgMjYvMzFdIExvb25nQXJjaDog
-S1ZNOiBJbXBsZW1lbnQga3ZtIGV4Y2VwdGlvbiB2ZWN0b3IKPiAKPiAKPiAKPiBPbiAwNS8zMC8y
-MDIzIDA5OjUyIEFNLCBUaWFucnVpIFpoYW8gd3JvdGU6Cj4gPiBJbXBsZW1lbnQga3ZtIGV4Y2Vw
-dGlvbiB2ZWN0b3IsIHVzaW5nIF9rdm1fZmF1bHRfdGFibGVzIGFycmF5IHRvIHNhdmUKPiA+IHRo
-ZSBoYW5kbGUgZnVuY3Rpb24gcG9pbnRlciBhbmQgaXQgaXMgdXNlZCB3aGVuIHZjcHUgaGFuZGxl
-IGV4aXQuCj4gPgo+ID4gU2lnbmVkLW9mZi1ieTogVGlhbnJ1aSBaaGFvIDx6aGFvdGlhbnJ1aUBs
-b29uZ3Nvbi5jbj4KPiA+IC0tLQo+ID4gIGFyY2gvbG9vbmdhcmNoL2t2bS9leGl0LmMgfCA0OCAr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysKPiA+ICAxIGZpbGUgY2hhbmdl
-ZCwgNDggaW5zZXJ0aW9ucygrKQo+ID4KPiA+IGRpZmYgLS1naXQgYS9hcmNoL2xvb25nYXJjaC9r
-dm0vZXhpdC5jIGIvYXJjaC9sb29uZ2FyY2gva3ZtL2V4aXQuYwo+ID4gaW5kZXggMTBmOTkyMmE3
-ZTc2Li42MjUwNDVmYzk1YzggMTAwNjQ0Cj4gPiAtLS0gYS9hcmNoL2xvb25nYXJjaC9rdm0vZXhp
-dC5jCj4gPiArKysgYi9hcmNoL2xvb25nYXJjaC9rdm0vZXhpdC5jCj4gPiBAQCAtNjU3LDMgKzY1
-Nyw1MSBAQCBzdGF0aWMgaW50IF9rdm1faGFuZGxlX2ZwdV9kaXNhYmxlZChzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUpCj4gPiAgCWt2bV9vd25fZnB1KHZjcHUpOwo+ID4gIAlyZXR1cm4gUkVTVU1FX0dV
-RVNUOwo+ID4gIH0KPiA+ICsKPiA+ICsvKgo+ID4gKyAqIExvb25nYXJjaCBLVk0gY2FsbGJhY2sg
-aGFuZGxpbmcgZm9yIG5vdCBpbXBsZW1lbnRlZCBndWVzdCBleGl0aW5nCj4gPiArICovCj4gPiAr
-c3RhdGljIGludCBfa3ZtX2ZhdWx0X25pKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiA+ICt7Cj4g
-PiArCXVuc2lnbmVkIGxvbmcgZXN0YXQsIGJhZHY7Cj4gPiArCXVuc2lnbmVkIGludCBleGNjb2Rl
-LCBpbnN0Owo+ID4gKwo+ID4gKwkvKgo+ID4gKwkgKiAgRmV0Y2ggdGhlIGluc3RydWN0aW9uLgo+
-ID4gKwkgKi8KPiA+ICsJYmFkdiA9IHZjcHUtPmFyY2guYmFkdjsKPiA+ICsJZXN0YXQgPSB2Y3B1
-LT5hcmNoLmhvc3RfZXN0YXQ7Cj4gPiArCWV4Y2NvZGUgPSAoZXN0YXQgJiBDU1JfRVNUQVRfRVhD
-KSA+PiBDU1JfRVNUQVRfRVhDX1NISUZUOwo+ID4gKwlpbnN0ID0gdmNwdS0+YXJjaC5iYWRpOwo+
-ID4gKwlrdm1fZXJyKCJFeGNjb2RlOiAlZCBQQz0lI2x4IGluc3Q9MHglMDh4IEJhZFZhZGRyPSUj
-bHggZXN0YXQ9JSNseFxuIiwKPiA+ICsJCQlleGNjb2RlLCB2Y3B1LT5hcmNoLnBjLCBpbnN0LCBi
-YWR2LCByZWFkX2djc3JfZXN0YXQoKSk7Cj4gPiArCWt2bV9hcmNoX3ZjcHVfZHVtcF9yZWdzKHZj
-cHUpOwo+ID4gKwl2Y3B1LT5ydW4tPmV4aXRfcmVhc29uID0gS1ZNX0VYSVRfSU5URVJOQUxfRVJS
-T1I7Cj4gPiArCj4gPiArCXJldHVybiBSRVNVTUVfSE9TVDsKPiA+ICt9Cj4gPiArCj4gPiArc3Rh
-dGljIGV4aXRfaGFuZGxlX2ZuIF9rdm1fZmF1bHRfdGFibGVzW0VYQ0NPREVfSU5UX1NUQVJUXSA9
-IHsKPiA+ICsJW0VYQ0NPREVfVExCTF0JCT0gX2t2bV9oYW5kbGVfcmVhZF9mYXVsdCwKPiA+ICsJ
-W0VYQ0NPREVfVExCSV0JCT0gX2t2bV9oYW5kbGVfcmVhZF9mYXVsdCwKPiA+ICsJW0VYQ0NPREVf
-VExCTlJdCQk9IF9rdm1faGFuZGxlX3JlYWRfZmF1bHQsCj4gPiArCVtFWENDT0RFX1RMQk5YXQkJ
-PSBfa3ZtX2hhbmRsZV9yZWFkX2ZhdWx0LAo+ID4gKwlbRVhDQ09ERV9UTEJTXQkJPSBfa3ZtX2hh
-bmRsZV93cml0ZV9mYXVsdCwKPiA+ICsJW0VYQ0NPREVfVExCTV0JCT0gX2t2bV9oYW5kbGVfd3Jp
-dGVfZmF1bHQsCj4gPiArCVtFWENDT0RFX0ZQRElTXQkJPSBfa3ZtX2hhbmRsZV9mcHVfZGlzYWJs
-ZWQsCj4gPiArCVtFWENDT0RFX0dTUFJdCQk9IF9rdm1faGFuZGxlX2dzcHIsCj4gPiArfTsKPiBJ
-dCBjYW4gYmUgbW9kaWZpZWQgYXMgZm9sbG93cyBhbmQgcmVtb3ZlIF9rdm1faW5pdF9mYXVsdCgp
-Lgo+IAo+IHN0YXRpYyBleGl0X2hhbmRsZV9mbiBfa3ZtX2ZhdWx0X3RhYmxlc1tFWENDT0RFX0lO
-VF9TVEFSVF0gPSB7Cj4gCVswIC4uLiBFWENDT0RFX0lOVF9TVEFSVCAtIDFdCT0gX2t2bV9mYXVs
-dF9uaSwKPiAKPiAJW0VYQ0NPREVfVExCTF0JCQk9IF9rdm1faGFuZGxlX3JlYWRfZmF1bHQsCj4g
-CVtFWENDT0RFX1RMQkldCQkJPSBfa3ZtX2hhbmRsZV9yZWFkX2ZhdWx0LAo+IAlbRVhDQ09ERV9U
-TEJOUl0JCQk9IF9rdm1faGFuZGxlX3JlYWRfZmF1bHQsCj4gCVtFWENDT0RFX1RMQk5YXQkJCT0g
-X2t2bV9oYW5kbGVfcmVhZF9mYXVsdCwKPiAJW0VYQ0NPREVfVExCU10JCQk9IF9rdm1faGFuZGxl
-X3dyaXRlX2ZhdWx0LAo+IAlbRVhDQ09ERV9UTEJNXQkJCT0gX2t2bV9oYW5kbGVfd3JpdGVfZmF1
-bHQsCj4gCVtFWENDT0RFX0ZQRElTXQkJCT0gX2t2bV9oYW5kbGVfZnB1X2Rpc2FibGVkLAo+IAlb
-RVhDQ09ERV9HU1BSXQkJCT0gX2t2bV9oYW5kbGVfZ3NwciwKPiB9Owo+IAo+IFRoYW5rcywKPiBZ
-b3VsaW5nCkhpIFlvdWxpbmcsCldoZW4gSSBjb21waWxlIHRoaXMgY29kZSB3aXRoIFc9MSwgdGhl
-cmUgaXMgYSB3YXJuaW5nOiBpbml0aWFsaXplZCBmaWVsZCBvdmVyd3JpdHRlbiBbLVdvdmVycmlk
-ZS1pbml0XSwgc28gY29uc2lkZXJpbmcgdGhpcyBwcm9ibGVtIEkgdGhpbmsgd2UgaGF2ZSB0byBr
-ZWVwIHRoZSBwcmV2aW91cyBfa3ZtX2luaXRfZmF1bHQsIHdoYXQgZG8geW91IHRoaW5rIG9mIGl0
-PwoKVGhhbmtzClRpYW5ydWkgWmhhbwo+IAo+ID4gKwo+ID4gK2ludCBfa3ZtX2hhbmRsZV9mYXVs
-dChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGludCBmYXVsdCkKPiA+ICt7Cj4gPiArCXJldHVybiBf
-a3ZtX2ZhdWx0X3RhYmxlc1tmYXVsdF0odmNwdSk7Cj4gPiArfQo+ID4gKwo+ID4gK3ZvaWQgX2t2
-bV9pbml0X2ZhdWx0KHZvaWQpCj4gPiArewo+ID4gKwlpbnQgaTsKPiA+ICsKPiA+ICsJZm9yIChp
-ID0gMDsgaSA8IEVYQ0NPREVfSU5UX1NUQVJUOyBpKyspCj4gPiArCQlpZiAoIV9rdm1fZmF1bHRf
-dGFibGVzW2ldKQo+ID4gKwkJCV9rdm1fZmF1bHRfdGFibGVzW2ldID0gX2t2bV9mYXVsdF9uaTsK
-PiA+ICt9Cj4gPgoNCg0K5pys6YKu5Lu25Y+K5YW26ZmE5Lu25ZCr5pyJ6b6Z6Iqv5Lit56eR55qE
-5ZWG5Lia56eY5a+G5L+h5oGv77yM5LuF6ZmQ5LqO5Y+R6YCB57uZ5LiK6Z2i5Zyw5Z2A5Lit5YiX
-5Ye655qE5Liq5Lq65oiW576k57uE44CC56aB5q2i5Lu75L2V5YW25LuW5Lq65Lul5Lu75L2V5b2i
-5byP5L2/55So77yI5YyF5ous5L2G5LiN6ZmQ5LqO5YWo6YOo5oiW6YOo5YiG5Zyw5rOE6Zyy44CB
-5aSN5Yi25oiW5pWj5Y+R77yJ5pys6YKu5Lu25Y+K5YW26ZmE5Lu25Lit55qE5L+h5oGv44CC5aaC
-5p6c5oKo6ZSZ5pS25pys6YKu5Lu277yM6K+35oKo56uL5Y2z55S16K+d5oiW6YKu5Lu26YCa55+l
-5Y+R5Lu25Lq65bm25Yig6Zmk5pys6YKu5Lu244CCIA0KVGhpcyBlbWFpbCBhbmQgaXRzIGF0dGFj
-aG1lbnRzIGNvbnRhaW4gY29uZmlkZW50aWFsIGluZm9ybWF0aW9uIGZyb20gTG9vbmdzb24gVGVj
-aG5vbG9neSAsIHdoaWNoIGlzIGludGVuZGVkIG9ubHkgZm9yIHRoZSBwZXJzb24gb3IgZW50aXR5
-IHdob3NlIGFkZHJlc3MgaXMgbGlzdGVkIGFib3ZlLiBBbnkgdXNlIG9mIHRoZSBpbmZvcm1hdGlv
-biBjb250YWluZWQgaGVyZWluIGluIGFueSB3YXkgKGluY2x1ZGluZywgYnV0IG5vdCBsaW1pdGVk
-IHRvLCB0b3RhbCBvciBwYXJ0aWFsIGRpc2Nsb3N1cmUsIHJlcHJvZHVjdGlvbiBvciBkaXNzZW1p
-bmF0aW9uKSBieSBwZXJzb25zIG90aGVyIHRoYW4gdGhlIGludGVuZGVkIHJlY2lwaWVudChzKSBp
-cyBwcm9oaWJpdGVkLiBJZiB5b3UgcmVjZWl2ZSB0aGlzIGVtYWlsIGluIGVycm9yLCBwbGVhc2Ug
-bm90aWZ5IHRoZSBzZW5kZXIgYnkgcGhvbmUgb3IgZW1haWwgaW1tZWRpYXRlbHkgYW5kIGRlbGV0
-ZSBpdC4g
+- Enable CONFIG_HAVE_KVM_DIRTY_RING_ACQ_REL as ppc64 is weakly
+  ordered.
+- Enable CONFIG_NEED_KVM_DIRTY_RING_WITH_BITMAP because the
+  kvmppc_xive_native_set_attr is called in the context of an ioctl
+  syscall and will call kvmppc_xive_native_eq_sync for setting the
+  KVM_DEV_XIVE_EQ_SYNC attribute which will call mark_dirty_page()
+  when there isn't a running vcpu. Implemented the
+  kvm_arch_allow_write_without_running_vcpu to always return true
+  to allow mark_page_dirty_in_slot to mark the page dirty in the
+  memslot->dirty_bitmap in this case.
+- Set KVM_DIRTY_LOG_PAGE_OFFSET for the ring buffer's physical page
+  offset.
+- Implement the kvm_arch_mmu_enable_log_dirty_pt_masked function required
+  for the generic KVM code to call.
+- Add a check to kvmppc_vcpu_run_hv for checking whether the dirty
+  ring is soft full.
+- Implement the kvm_arch_flush_remote_tlbs_memslot function to support
+  the CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT config option.
+
+On testing with live migration it was found that there is around
+150-180 ms improvment in overall migration time with this patch.
+
+Signed-off-by: Kautuk Consul <kconsul@linux.vnet.ibm.com>
+---
+ Documentation/virt/kvm/api.rst      |  2 +-
+ arch/powerpc/include/uapi/asm/kvm.h |  2 ++
+ arch/powerpc/kvm/Kconfig            |  2 ++
+ arch/powerpc/kvm/book3s_64_mmu_hv.c | 42 +++++++++++++++++++++++++++++
+ arch/powerpc/kvm/book3s_hv.c        |  3 +++
+ include/linux/kvm_dirty_ring.h      |  5 ++++
+ 6 files changed, 55 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index add067793b90..ce1ebc513bae 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -8114,7 +8114,7 @@ regardless of what has actually been exposed through the CPUID leaf.
+ 8.29 KVM_CAP_DIRTY_LOG_RING/KVM_CAP_DIRTY_LOG_RING_ACQ_REL
+ ----------------------------------------------------------
+ 
+-:Architectures: x86, arm64
++:Architectures: x86, arm64, ppc64
+ :Parameters: args[0] - size of the dirty log ring
+ 
+ KVM is capable of tracking dirty memory using ring buffers that are
+diff --git a/arch/powerpc/include/uapi/asm/kvm.h b/arch/powerpc/include/uapi/asm/kvm.h
+index 9f18fa090f1f..f722309ed7fb 100644
+--- a/arch/powerpc/include/uapi/asm/kvm.h
++++ b/arch/powerpc/include/uapi/asm/kvm.h
+@@ -33,6 +33,8 @@
+ /* Not always available, but if it is, this is the correct offset.  */
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+ 
++#define KVM_DIRTY_LOG_PAGE_OFFSET 64
++
+ struct kvm_regs {
+ 	__u64 pc;
+ 	__u64 cr;
+diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
+index 902611954200..c93354ec3bd5 100644
+--- a/arch/powerpc/kvm/Kconfig
++++ b/arch/powerpc/kvm/Kconfig
+@@ -26,6 +26,8 @@ config KVM
+ 	select IRQ_BYPASS_MANAGER
+ 	select HAVE_KVM_IRQ_BYPASS
+ 	select INTERVAL_TREE
++	select HAVE_KVM_DIRTY_RING_ACQ_REL
++	select NEED_KVM_DIRTY_RING_WITH_BITMAP
+ 
+ config KVM_BOOK3S_HANDLER
+ 	bool
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index 7f765d5ad436..c92e8022e017 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -2147,3 +2147,45 @@ void kvmppc_mmu_book3s_hv_init(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu->arch.hflags |= BOOK3S_HFLAG_SLB;
+ }
++
++/*
++ * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
++ * dirty pages.
++ *
++ * It write protects selected pages to enable dirty logging for them.
++ */
++void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
++					     struct kvm_memory_slot *slot,
++					     gfn_t gfn_offset,
++					     unsigned long mask)
++{
++	phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
++	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
++	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
++
++	while (start < end) {
++		pte_t *ptep;
++		unsigned int shift;
++
++		ptep = find_kvm_secondary_pte(kvm, start, &shift);
++
++		*ptep = __pte(pte_val(*ptep) & ~(_PAGE_WRITE));
++
++		start += PAGE_SIZE;
++	}
++}
++
++#ifdef CONFIG_NEED_KVM_DIRTY_RING_WITH_BITMAP
++bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
++{
++	return true;
++}
++#endif
++
++#ifdef CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
++void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
++					const struct kvm_memory_slot *memslot)
++{
++	kvm_flush_remote_tlbs(kvm);
++}
++#endif
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 130bafdb1430..1d1264ea72c4 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -4804,6 +4804,9 @@ static int kvmppc_vcpu_run_hv(struct kvm_vcpu *vcpu)
+ 		return -EINTR;
+ 	}
+ 
++	if (kvm_dirty_ring_check_request(vcpu))
++		return 0;
++
+ #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
+ 	/*
+ 	 * Don't allow entry with a suspended transaction, because
+diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
+index 4862c98d80d3..a00301059da5 100644
+--- a/include/linux/kvm_dirty_ring.h
++++ b/include/linux/kvm_dirty_ring.h
+@@ -69,6 +69,11 @@ static inline void kvm_dirty_ring_free(struct kvm_dirty_ring *ring)
+ {
+ }
+ 
++static inline bool kvm_dirty_ring_check_request(struct kvm_vcpu *vcpu)
++{
++	return false;
++}
++
+ #else /* CONFIG_HAVE_KVM_DIRTY_RING */
+ 
+ int kvm_cpu_dirty_log_size(void);
+-- 
+2.39.2
 
