@@ -2,226 +2,305 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73A2E72894A
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 22:18:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34FB472899B
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 22:42:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230096AbjFHUSA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 16:18:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36668 "EHLO
+        id S234046AbjFHUmO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 16:42:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231747AbjFHUR7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 16:17:59 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02E1F30C1
-        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 13:17:45 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-510d6b939bfso1849615a12.0
-        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 13:17:45 -0700 (PDT)
+        with ESMTP id S233454AbjFHUmN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 16:42:13 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42547E4D
+        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 13:42:11 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-653bed78635so775991b3a.0
+        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 13:42:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686255464; x=1688847464;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1686256931; x=1688848931;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yFfOuXxs8iGOdfT2qhI1JEq3SXtax8RxnY5/Fc1nskw=;
-        b=tOrPL690XMDizppt1902CZdnVhRRGiAVY2h6pQOMPMquGW96yGqxA0WIbSxFO2hzYj
-         QJWnaa2e9gObU8AZ2JFs1RnUAEJIDlYvyz3Vk0eN8oMhXzeUPdODFYrHIciSsxP+IkvB
-         jQwIzPalMrRq9DKz/4lf8td/DpbRjoc5ifdZhGCvIzaMTootBnpupjCsIyoRUICz4e/t
-         s7DCsNccifNfK4D9fga3PZMYqo8cjQOHa1g5+0GmjGcyvRnrUycsTbOan/Dr+m5rK0cw
-         99nId16qyeJxOEnOuTWeiopCyGHCtsnDGSzjOlTPx/PNiWyaKL9qyVPA3bhi1oIBq4wV
-         bWXw==
+        bh=OJc7v2gd1zqw9e9bXf/VJ7wneJW7ODsFhMJ4UoXicLA=;
+        b=iFL9SJTHPhDtJAMHT5UcHxie49cfExl7x/YdNXtwsgagji48BOma96AV8tdHcdTiNy
+         a1vShxLaY/FyfFzHTCD3z18X1lL+idX0cFKVNEuAryukWPFBSzYNR1s+/Z2FOSTki3OZ
+         gZXB57arsO9wgclWML5w5uR4NM8TjK2afXA/8+gOQnogugAHr/VTZe9hQvdoKOcgYS0n
+         h7Pyyyze7Urfs3xb4C682RXJ91ZcTKedPprQXyOZC8QglK4XB5Af4gFHqavoHrDWkykS
+         THxK6FCQPP1k99ce5pXXIJt/NHtiHvueMMvZD9MQf+/Sq5oqWrfaa0CH4MlhziEgbye1
+         SbIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686255464; x=1688847464;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1686256931; x=1688848931;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yFfOuXxs8iGOdfT2qhI1JEq3SXtax8RxnY5/Fc1nskw=;
-        b=jeJshzQVPgYF3DI7Iim26xFE4WRLxDMzqfuVT/Xo7iaN8vKLH68bnVfpJS4eweYpTO
-         RJ44m7L26DYdzVYKo8h9CRQSHUEi5NAFlK9380SnSWZVRoTjLi8PgaTwCgY6Ue622dTA
-         heWsg1V9BC+UmAZC7xu1k2OI3wdgf2v2ewUSqvFG/Rs2AzqEVsBPnNtX0RbqM5r+NJJv
-         aRGDfRx2mITp7HJEF9RqxMeWnUrFVdNSQOr1c//+i8Yu4EAXlInXU1JuygMbAb9rMDDZ
-         4lcAvhmuXceRQRadM1K1CVlMmshvv/apYAC7YkZaZtxcCDlspU0TZAew2c9KHwDn6UGZ
-         o12A==
-X-Gm-Message-State: AC+VfDzgn/HXpfhiCmdaa9qFZNMD2bLaHa6V24kVkRqCuSJK0UFXXPq0
-        mgrUC0z3zqyVFb8ZjHeOxzRvu2o+dFYp5inNnmFVmA==
-X-Google-Smtp-Source: ACHHUZ5rIRRCqsHv8Mj5sYTFvVoPuCCGYYh1ahL9p64lBD/iRVAni/xzcUb+JGKF5FFtYateiNco/3eYHVsT49XamTA=
-X-Received: by 2002:a17:907:c13:b0:973:d846:cd5d with SMTP id
- ga19-20020a1709070c1300b00973d846cd5dmr154165ejc.74.1686255464184; Thu, 08
- Jun 2023 13:17:44 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230602160914.4011728-1-vipinsh@google.com> <20230602160914.4011728-10-vipinsh@google.com>
- <20230605223520.00007fbd.zhi.wang.linux@gmail.com> <ZH9tQjQk7QLyhUQR@google.com>
- <20230607203711.000054ae.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230607203711.000054ae.zhi.wang.linux@gmail.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Thu, 8 Jun 2023 13:17:08 -0700
-Message-ID: <CAHVum0dtZ2wW+itsOE=a7wwATu4VcGN-dQH1zF7Pz1LYy7J4UQ@mail.gmail.com>
-Subject: Re: [PATCH v2 09/16] KVM: arm64: Document the page table walker
- actions based on the callback's return value
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
-        suzuki.poulose@arm.com, yuzenghui@huawei.com,
-        catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org,
-        aleksandar.qemu.devel@gmail.com, tsbogend@alpha.franken.de,
-        anup@brainfault.org, atishp@atishpatra.org,
-        paul.walmsley@sifive.com, palmer@dabbelt.com,
-        aou@eecs.berkeley.edu, seanjc@google.com, pbonzini@redhat.com,
-        dmatlack@google.com, ricarkol@google.com,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        bh=OJc7v2gd1zqw9e9bXf/VJ7wneJW7ODsFhMJ4UoXicLA=;
+        b=PVWevf3k035O89OBvOTeFKT/4bsQWrQ4SAug+45ys67/zdXpyeXjvnlndq8IohO4Pv
+         hZL7r5zhXANA+nS8UJU8IrwetovufC39LYf09pEkpOBqDzoQL9ET4fYm+1ZFGmZ2Yt1s
+         tzY+FBRidapncIs+d056g4Ar9rbABxa3bIDoi+uGl2kce/UUcvSYmRSx+nA9X9vdn3qR
+         NoamnhIKf3KnWsMWPl34qTrbxYYctB+7o5EzPXFczQ2/UKWeOZ8NdHrVbkOvRU48RcFG
+         /blPm0jfWK+/EwMtexfy8FYQAaDU0XuNHoTKivB9EYtfz8OZ21dgvZJ+68ST54jgLZkG
+         8rdQ==
+X-Gm-Message-State: AC+VfDzWu7jm5t6u1IDxsc2lrQNTnAP6+Pcay6PAb92YrO9RYU555TKQ
+        z0+zDGWKUAKXifcL2mQQrr0=
+X-Google-Smtp-Source: ACHHUZ6eV8Cg3uXBSyDetZpxlRVx+tS8gqRI4k8h37IQMzMrSLgRCaMDbvwv31xXOT8jQJsFtdyhLA==
+X-Received: by 2002:a17:903:41d0:b0:1af:df8e:d534 with SMTP id u16-20020a17090341d000b001afdf8ed534mr3591931ple.27.1686256930335;
+        Thu, 08 Jun 2023 13:42:10 -0700 (PDT)
+Received: from smtpclient.apple ([66.170.99.113])
+        by smtp.gmail.com with ESMTPSA id d15-20020a170902cecf00b001ab09f5ca61sm1841183plg.55.2023.06.08.13.42.09
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 08 Jun 2023 13:42:09 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
+Subject: Re: [kvm-unit-tests PATCH v6 28/32] arm64: Add support for efi in
+ Makefile
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20230530160924.82158-29-nikos.nikoleris@arm.com>
+Date:   Thu, 8 Jun 2023 13:41:58 -0700
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        andrew.jones@linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
+        alexandru.elisei@arm.com, ricarkol@google.com, shahuang@redhat.com
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Message-Id: <197A5432-65EA-49A7-AD6D-1AFCB58D30D0@gmail.com>
+References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
+ <20230530160924.82158-29-nikos.nikoleris@arm.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+X-Mailer: Apple Mail (2.3731.600.7)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 7, 2023 at 5:37=E2=80=AFAM Zhi Wang <zhi.wang.linux@gmail.com> =
-wrote:
->
-> On Tue, 6 Jun 2023 10:30:42 -0700
-> Vipin Sharma <vipinsh@google.com> wrote:
->
-> > On Mon, Jun 05, 2023 at 10:35:20PM +0800, Zhi Wang wrote:
-> > > On Fri,  2 Jun 2023 09:09:07 -0700
-> > > Vipin Sharma <vipinsh@google.com> wrote:
-> > >
-> > > > Document what the page table walker do when walker callback functio=
-n returns
-> > > > a value.
-> > > >
-> > > > Current documentation is not correct as negative error of -EAGAIN o=
-n a
-> > > > non-shared page table walker doesn't terminate the walker and conti=
-nues
-> > > > to the next step.
-> > > >
-> > > > There might be a better place to keep this information, for now thi=
-s
-> > > > documentation will work as a reference guide until a better way is
-> > > > found.
-> > > >
-> > >
-> > > After reading the whole patch series, I was thinking it might be a go=
-od
-> > > time to improve the way how the visitor function and page table walke=
-r
-> > > talk to each other. The error code is good enough before, but its mea=
-ning
-> > > seems limited and vague when the visitor function wants to express mo=
-re about
-> > > what exactly happens inside. I am not sure if it is a good idea to co=
-ntinue
-> > > that way: 1. found a new situation. 2. choosing a error code for visi=
-tor
-> > > function. 3. walker translates the error code into the situation to
-> > > handle. 4. document the error code and its actual meaning.
-> > >
-> > > Eventually I am afraid that we are going to abuse the error code.
-> >
-> > I agree that error numbers are not sufficient and this will become more
-> > difficult and cumbersome for more cases in future if we need different
-> > behavior based on different error codes for different visitor functions=
-.
-> >
-> > >
-> > > What about introducing a set of flags for the visitor function to exp=
-ress
-> > > what happened and simplify the existing error code?
-> > >
-> >
-> > If I understood correctly what you meant, I think this will also end up
-> > having the same issue down the line, we are just switching errors with
-> > flags as they might not be able to express everything.
-> >
-> > "Flags for visitor function to express what happened"  - This is what
-> > ret val and errors do.
-> >
->
-> Thanks so much for the efforts of the sample code.
->
-> But when the "ret val" is an error code for pgtable matters, It turns vag=
-ue.
-> We have -EAGAIN to represent "retry" and "-ENONET" to represent PTE not t=
-here,
-> and they seems end up with different behaviors in different types of pgta=
-ble
-> walk. That is what I feels off.
->
-> visitor_cb has two different requirements of returning the status: 1)
-> something wrong happens *not* related to the pgtable, e.g. failing to
-> allocate memory. 2) something happens related to the pgtable. e.g PTE doe=
-sn't
-> exists.
->
-> For 1) It is natural to return an error code and the caller might just ba=
-il out
-> via its error handling path.
->
-> I think the core problem is: the two different usages are mixed and they =
-don't
-> actually fit with each other. 2) is requiring more details in the future =
-other
-> than a simple error code.
->
->
-> For 2) I think it is better have a set of flags. the name of the flags ca=
-n
-> carry more explicit meanings than error code. E.g.:
->
-> ------------------
->
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/as=
-m/kvm_pgtable.h
-> index 4cd6762bda80..b3f24b321cd7 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -204,6 +204,15 @@ enum kvm_pgtable_walk_flags {
->         KVM_PGTABLE_WALK_HANDLE_FAULT           =3D BIT(4),
->  };
->
-> +struct kvm_pgtable_walk_status {
-> +       union {
-> +               u8 raw;
-> +               struct {
-> +                       unsigned retry:1;
-> +                       unsigned stop:1;
-> +                       unsigned ignore:1;
-> +                       /* more to come */
-> +               };
-> +       };
-> +};
-> +
->  struct kvm_pgtable_visit_ctx {
->         kvm_pte_t                               *ptep;
->         kvm_pte_t                               old;
-> @@ -213,8 +222,10 @@ struct kvm_pgtable_visit_ctx {
->         u64                                     end;
->         u32                                     level;
->         enum kvm_pgtable_walk_flags             flags;
-> +       struct kvm_pgtable_walk_status          *status;
->  };
->
->  typedef int (*kvm_pgtable_visitor_fn_t)(const struct kvm_pgtable_visit_c=
-tx *ctx,
->                                         enum kvm_pgtable_walk_flags visit=
-);
->
-> ----------------
->
-> Visitor functions sets the flags via ctx->status and kvm_pgtable_walk_xxx=
- can
-> check the bits in the ctx to decide what to do for the next.
->
-> I can cook a patch for re-factoring this part if we think it is a good id=
-ea.
->
 
-This can also be one option. I will wait till others also weigh in on
-how to make walkers and callbacks work together for more use cases.
+
+> On May 30, 2023, at 9:09 AM, Nikos Nikoleris <nikos.nikoleris@arm.com> =
+wrote:
+>=20
+> Users can now build kvm-unit-tests as efi apps by supplying an extra
+> argument when invoking configure:
+>=20
+> $> ./configure --enable-efi
+>=20
+> This patch is based on an earlier version by
+> Andrew Jones <drjones@redhat.com>
+>=20
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> Reviewed-by: Ricardo Koller <ricarkol@google.com>
+> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+> configure           | 17 +++++++++++++----
+> arm/Makefile.arm    |  6 ++++++
+> arm/Makefile.arm64  | 18 ++++++++++++++----
+> arm/Makefile.common | 45 ++++++++++++++++++++++++++++++++++-----------
+> 4 files changed, 67 insertions(+), 19 deletions(-)
+>=20
+> diff --git a/configure b/configure
+> index c36fd290..b665f7d5 100755
+> --- a/configure
+> +++ b/configure
+> @@ -86,7 +86,7 @@ usage() {
+>               pl011,mmio32,ADDR
+>                           Specify a PL011 compatible UART at address =
+ADDR. Supported
+>                           register stride is 32 bit only.
+> -    --[enable|disable]-efi Boot and run from UEFI (disabled by =
+default, x86_64 only)
+> +    --[enable|disable]-efi Boot and run from UEFI (disabled by =
+default, x86_64 and arm64 only)
+>    --[enable|disable]-werror
+>                           Select whether to compile with the -Werror =
+compiler flag
+> EOF
+> @@ -208,14 +208,19 @@ else
+>     fi
+> fi
+>=20
+> -if [ "$efi" ] && [ "$arch" !=3D "x86_64" ]; then
+> +if [ "$efi" ] && [ "$arch" !=3D "x86_64" ] && [ "$arch" !=3D "arm64" =
+]; then
+>     echo "--[enable|disable]-efi is not supported for $arch"
+>     usage
+> fi
+>=20
+> if [ -z "$page_size" ]; then
+> -    [ "$arch" =3D "arm64" ] && page_size=3D"65536"
+> -    [ "$arch" =3D "arm" ] && page_size=3D"4096"
+> +    if [ "$efi" =3D 'y' ] && [ "$arch" =3D "arm64" ]; then
+> +        page_size=3D"4096"
+> +    elif [ "$arch" =3D "arm64" ]; then
+> +        page_size=3D"65536"
+> +    elif [ "$arch" =3D "arm" ]; then
+> +        page_size=3D"4096"
+> +    fi
+> else
+>     if [ "$arch" !=3D "arm64" ]; then
+>         echo "--page-size is not supported for $arch"
+> @@ -230,6 +235,10 @@ else
+>         echo "arm64 doesn't support page size of $page_size"
+>         usage
+>     fi
+> +    if [ "$efi" =3D 'y' ] && [ "$page_size" !=3D "4096" ]; then
+> +        echo "efi must use 4K pages"
+> +        exit 1
+> +    fi
+> fi
+>=20
+> [ -z "$processor" ] && processor=3D"$arch"
+> diff --git a/arm/Makefile.arm b/arm/Makefile.arm
+> index 01fd4c7b..2ce00f52 100644
+> --- a/arm/Makefile.arm
+> +++ b/arm/Makefile.arm
+> @@ -7,6 +7,10 @@ bits =3D 32
+> ldarch =3D elf32-littlearm
+> machine =3D -marm -mfpu=3Dvfp
+>=20
+> +ifeq ($(CONFIG_EFI),y)
+> +$(error Cannot build arm32 tests as EFI apps)
+> +endif
+> +
+> # stack.o relies on frame pointers.
+> KEEP_FRAME_POINTER :=3D y
+>=20
+> @@ -32,6 +36,8 @@ cflatobjs +=3D lib/arm/stack.o
+> cflatobjs +=3D lib/ldiv32.o
+> cflatobjs +=3D lib/arm/ldivmod.o
+>=20
+> +exe =3D flat
+> +
+> # arm specific tests
+> tests =3D
+>=20
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 6dff6cad..eada7f9a 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -31,11 +31,21 @@ endif
+>=20
+> OBJDIRS +=3D lib/arm64
+>=20
+> +ifeq ($(CONFIG_EFI),y)
+> +# avoid jump tables before all relocations have been processed
+> +arm/efi/reloc_aarch64.o: CFLAGS +=3D -fno-jump-tables
+> +cflatobjs +=3D arm/efi/reloc_aarch64.o
+> +
+> +exe =3D efi
+> +else
+> +exe =3D flat
+> +endif
+> +
+> # arm64 specific tests
+> -tests =3D $(TEST_DIR)/timer.flat
+> -tests +=3D $(TEST_DIR)/micro-bench.flat
+> -tests +=3D $(TEST_DIR)/cache.flat
+> -tests +=3D $(TEST_DIR)/debug.flat
+> +tests =3D $(TEST_DIR)/timer.$(exe)
+> +tests +=3D $(TEST_DIR)/micro-bench.$(exe)
+> +tests +=3D $(TEST_DIR)/cache.$(exe)
+> +tests +=3D $(TEST_DIR)/debug.$(exe)
+>=20
+> include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+>=20
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index 647b0fb1..a133309d 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -4,14 +4,14 @@
+> # Authors: Andrew Jones <drjones@redhat.com>
+> #
+>=20
+> -tests-common  =3D $(TEST_DIR)/selftest.flat
+> -tests-common +=3D $(TEST_DIR)/spinlock-test.flat
+> -tests-common +=3D $(TEST_DIR)/pci-test.flat
+> -tests-common +=3D $(TEST_DIR)/pmu.flat
+> -tests-common +=3D $(TEST_DIR)/gic.flat
+> -tests-common +=3D $(TEST_DIR)/psci.flat
+> -tests-common +=3D $(TEST_DIR)/sieve.flat
+> -tests-common +=3D $(TEST_DIR)/pl031.flat
+> +tests-common  =3D $(TEST_DIR)/selftest.$(exe)
+> +tests-common +=3D $(TEST_DIR)/spinlock-test.$(exe)
+> +tests-common +=3D $(TEST_DIR)/pci-test.$(exe)
+> +tests-common +=3D $(TEST_DIR)/pmu.$(exe)
+> +tests-common +=3D $(TEST_DIR)/gic.$(exe)
+> +tests-common +=3D $(TEST_DIR)/psci.$(exe)
+> +tests-common +=3D $(TEST_DIR)/sieve.$(exe)
+> +tests-common +=3D $(TEST_DIR)/pl031.$(exe)
+>=20
+> tests-all =3D $(tests-common) $(tests)
+> all: directories $(tests-all)
+> @@ -54,6 +54,9 @@ cflatobjs +=3D lib/arm/smp.o
+> cflatobjs +=3D lib/arm/delay.o
+> cflatobjs +=3D lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
+> cflatobjs +=3D lib/arm/timer.o
+> +ifeq ($(CONFIG_EFI),y)
+> +cflatobjs +=3D lib/efi.o
+> +endif
+>=20
+> OBJDIRS +=3D lib/arm
+>=20
+> @@ -61,6 +64,25 @@ libeabi =3D lib/arm/libeabi.a
+> eabiobjs =3D lib/arm/eabi_compat.o
+>=20
+> FLATLIBS =3D $(libcflat) $(LIBFDT_archive) $(libeabi)
+> +
+> +ifeq ($(CONFIG_EFI),y)
+> +%.so: EFI_LDFLAGS +=3D -defsym=3DEFI_SUBSYSTEM=3D0xa --no-undefined
+> +%.so: %.o $(FLATLIBS) $(SRCDIR)/arm/efi/elf_aarch64_efi.lds =
+$(cstart.o)
+> + $(CC) $(CFLAGS) -c -o $(@:.so=3D.aux.o) $(SRCDIR)/lib/auxinfo.c \
+> + -DPROGNAME=3D\"$(@:.so=3D.efi)\" -DAUXFLAGS=3D$(AUXFLAGS)
+> + $(LD) $(EFI_LDFLAGS) -o $@ -T $(SRCDIR)/arm/efi/elf_aarch64_efi.lds =
+\
+> + $(filter %.o, $^) $(FLATLIBS) $(@:.so=3D.aux.o) \
+> + $(EFI_LIBS)
+> + $(RM) $(@:.so=3D.aux.o)
+> +
+> +%.efi: %.so
+> + $(call arch_elf_check, $^)
+> + $(OBJCOPY) \
+> + -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
+> + -j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
+> + -j .reloc \
+> + -O binary $^ $@
+
+I really appreciate your work Nikos, and I might be late since I see =
+Drew
+already applied it to his queue. So consider this email, my previous =
+one, and
+others that might follow more as grievances that can easily be addressed =
+later.
+
+So: It would=E2=80=99ve been nice to keep the symbols and debug =
+information in a
+separate file. Something like:
+
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index d60cf8c..f904702 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -69,7 +69,7 @@ FLATLIBS =3D $(libcflat) $(LIBFDT_archive) $(libeabi)
+ ifeq ($(CONFIG_EFI),y)
+ %.so: EFI_LDFLAGS +=3D -defsym=3DEFI_SUBSYSTEM=3D0xa --no-undefined
+ %.so: %.o $(FLATLIBS) $(SRCDIR)/arm/efi/elf_aarch64_efi.lds $(cstart.o)
+-       $(CC) $(CFLAGS) -c -o $(@:.so=3D.aux.o) $(SRCDIR)/lib/auxinfo.c =
+\
++       $(CC) $(CFLAGS) -c -g -o $(@:.so=3D.aux.o) =
+$(SRCDIR)/lib/auxinfo.c \
+                -DPROGNAME=3D\"$(@:.so=3D.efi)\" -DAUXFLAGS=3D$(AUXFLAGS)
+        $(LD) $(EFI_LDFLAGS) -o $@ -T =
+$(SRCDIR)/arm/efi/elf_aarch64_efi.lds \
+                $(filter %.o, $^) $(FLATLIBS) $(@:.so=3D.aux.o) \
+@@ -78,6 +78,9 @@ ifeq ($(CONFIG_EFI),y)
+   %.efi: %.so
+        $(call arch_elf_check, $^)
++       $(OBJCOPY) --only-keep-debug $^ $@.debug
++       $(OBJCOPY) --strip-debug $^
++       $(OBJCOPY) --add-gnu-debuglink=3D$@.debug $^
+        $(OBJCOPY) \
+                -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
+                -j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* =
+\=
