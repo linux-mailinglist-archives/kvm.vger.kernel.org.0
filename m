@@ -2,186 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DDB3728234
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 16:06:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C032D7281AA
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 15:47:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236809AbjFHOGc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 10:06:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44478 "EHLO
+        id S236442AbjFHNrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 09:47:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234375AbjFHOG3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 10:06:29 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B32702726;
-        Thu,  8 Jun 2023 07:06:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686233188; x=1717769188;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=TmBDcLd5Xfp9VvdnTTxpDHAil2WXF25OsQyhgty2URs=;
-  b=W8zaLGNrbX5K3lUAv0/7t79jQ6TQtpv7mwnyTyAekgWH97G7qT3nxVR0
-   vURnS0O7XkvDAbESWuAU7wg/XQGKhSuOHl2K6UjRGxzHgZ3EDGM/iGy3n
-   HENUbjI0SRfh2B3SdipAz/QwUeTSGGQsLZ5RBQrwMGcJfZ3Ap9tCLD9z0
-   tQGQ30VwWLN6AJcV5x4u2yuHq3pXs5qLlUR7N5GOI02MSeLUYs/7MbRqG
-   O0fsItPePMVkrjQsmHl1Eu6NzYo9UVhffIJTgCLFpGdyWMXu6JfpPdBo3
-   iHYjgejl4bY9FisNUruvglDXxGO/Q3pZHPBpSUTQNbPA+CIFxbmJjp5zs
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10734"; a="420887667"
-X-IronPort-AV: E=Sophos;i="6.00,226,1681196400"; 
-   d="scan'208";a="420887667"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2023 06:43:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10734"; a="854354478"
-X-IronPort-AV: E=Sophos;i="6.00,226,1681196400"; 
-   d="scan'208";a="854354478"
-Received: from swalker-mobl1.amr.corp.intel.com (HELO [10.209.22.184]) ([10.209.22.184])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2023 06:43:30 -0700
-Message-ID: <d2b3bc5e-1371-0c50-8ecb-64fc70917d42@intel.com>
-Date:   Thu, 8 Jun 2023 06:43:29 -0700
+        with ESMTP id S235440AbjFHNrU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 09:47:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9219426AD
+        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 06:46:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686231996;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=73nshEeWhw2n5gdRpaAAi9lUSo+UIEZBfmddmf0WSo8=;
+        b=QW7DacbZLKltZ0A87clNL628uRPcUz25ngxSTalGoe4kh7W4hThrZprVZLTvrIdxlZUHY6
+        a8WjDEgQNGAeZG5Aqw4qqIt77yKZeliVZY+QfZ89uZI3X7orHm3cTBfUL6At2rRJmZIQVB
+        srdwxCfB446gOJaEpjTBRohRdZOixrs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-117-SdbZFRiWOkWEroZ97xW-9w-1; Thu, 08 Jun 2023 09:46:35 -0400
+X-MC-Unique: SdbZFRiWOkWEroZ97xW-9w-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-30aeef6f601so256277f8f.0
+        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 06:46:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686231994; x=1688823994;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=73nshEeWhw2n5gdRpaAAi9lUSo+UIEZBfmddmf0WSo8=;
+        b=g9Sfjyn7ascEia4bRJfZct4Esy4EFoaGIeivigYuHqcvYmzvaHUoW1QAaRwrYIJl7M
+         o2ui1Ex261F+Z7F8bKy2IGTqJxzuEZDcaLZ4oGGClNrz0sn45J/wqZtiaexzkW2mKXNl
+         leyFcPaCNmoMOB1s9vEcRDyL3Lrbi68UmPKgyApli2aPa9Kucanu/ld74oQFa07gmMN5
+         NukaPyG1iATKOLBc5f+VEoJvfXYmiWLuhhGxyCBvIyUpPMxp4xRC++XqiQ/Xe09iid4u
+         St9m/cC3EoWDFUtjTGTFw0qnt+Y7dSHCDwW/ylRn4J2cTM9v5R9NPDmb6+we0Rfwsdh7
+         SfQA==
+X-Gm-Message-State: AC+VfDxgME6EU7kQtr1LmZiNv1YV8DEJByN+9Taa8+SdkkoRJIu6P2nz
+        C/2YxVDJ0Qmf27ICLvOwF8vC2m7dchDW3rAwdvPdDhOG7y7yX7JfF5KYpLe2xphecQtNQny8xYO
+        fdGz9f3DVgQwY
+X-Received: by 2002:adf:f547:0:b0:309:38af:91c6 with SMTP id j7-20020adff547000000b0030938af91c6mr7519234wrp.68.1686231994184;
+        Thu, 08 Jun 2023 06:46:34 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6nvd4pWYZsLG/t7CXB3KRL7ulTzo9Pl/yJm2BKU29KvWQFi9FA8ZY1S13xxeI6s5mULDgI/w==
+X-Received: by 2002:adf:f547:0:b0:309:38af:91c6 with SMTP id j7-20020adff547000000b0030938af91c6mr7519218wrp.68.1686231993887;
+        Thu, 08 Jun 2023 06:46:33 -0700 (PDT)
+Received: from redhat.com ([2.55.41.2])
+        by smtp.gmail.com with ESMTPSA id i1-20020adfefc1000000b0030647449730sm1671162wrp.74.2023.06.08.06.46.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jun 2023 06:46:33 -0700 (PDT)
+Date:   Thu, 8 Jun 2023 09:46:28 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Stefano Garzarella <sgarzare@redhat.com>,
+        Shannon Nelson <shannon.nelson@amd.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+        Tiwei Bie <tiwei.bie@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost-vdpa: filter VIRTIO_F_RING_PACKED feature
+Message-ID: <20230608094528-mutt-send-email-mst@kernel.org>
+References: <32ejjuvhvcicv7wjuetkv34qtlpa657n4zlow4eq3fsi2twozk@iqnd2t5tw2an>
+ <CACGkMEu3PqQ99UoKF5NHgVADD3q=BF6jhLiyumeT4S1QCqN1tw@mail.gmail.com>
+ <20230606085643-mutt-send-email-mst@kernel.org>
+ <CAGxU2F7fkgL-HpZdj=5ZEGNWcESCHQpgRAYQA3W2sPZaoEpNyQ@mail.gmail.com>
+ <20230607054246-mutt-send-email-mst@kernel.org>
+ <CACGkMEuUapKvUYiJiLwtsN+x941jafDKS9tuSkiNrvkrrSmQkg@mail.gmail.com>
+ <20230608020111-mutt-send-email-mst@kernel.org>
+ <CACGkMEt4=3BRVNX38AD+mJU8v3bmqO-CdNj5NkFP-SSvsuy2Hg@mail.gmail.com>
+ <5giudxjp6siucr4l3i4tggrh2dpqiqhhihmdd34w3mq2pm5dlo@mrqpbwckpxai>
+ <CACGkMEtqn1dbrQZn3i-W_7sVikY4sQjwLRC5xAhMnyqkc3jwOw@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v11 07/20] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Content-Language: en-US
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc:     "Luck, Tony" <tony.luck@intel.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-References: <cover.1685887183.git.kai.huang@intel.com>
- <21b3a45cb73b4e1917c1eba75b7769781a15aa14.1685887183.git.kai.huang@intel.com>
- <e7c21694-d31b-4dbe-f75b-5a7c0127f5c8@intel.com>
- <963deb7f6bcadbf2848ef54540ba1758b43731d6.camel@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <963deb7f6bcadbf2848ef54540ba1758b43731d6.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEtqn1dbrQZn3i-W_7sVikY4sQjwLRC5xAhMnyqkc3jwOw@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/7/23 19:10, Huang, Kai wrote:
-> On Wed, 2023-06-07 at 08:22 -0700, Dave Hansen wrote:
->> On 6/4/23 07:27, Kai Huang wrote:
->> ...
->>> +static int try_init_module_global(void)
->>> +{
->>> +   unsigned long flags;
->>> +   int ret;
->>> +
->>> +   /*
->>> +    * The TDX module global initialization only needs to be done
->>> +    * once on any cpu.
->>> +    */
->>> +   raw_spin_lock_irqsave(&tdx_global_init_lock, flags);
->>
->> Why is this "raw_"?
->>
->> There's zero mention of it anywhere.
+On Thu, Jun 08, 2023 at 05:00:00PM +0800, Jason Wang wrote:
+> On Thu, Jun 8, 2023 at 4:00 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+> >
+> > On Thu, Jun 08, 2023 at 03:46:00PM +0800, Jason Wang wrote:
+> >
+> > [...]
+> >
+> > >> > > > > I have a question though, what if down the road there
+> > >> > > > > is a new feature that needs more changes? It will be
+> > >> > > > > broken too just like PACKED no?
+> > >> > > > > Shouldn't vdpa have an allowlist of features it knows how
+> > >> > > > > to support?
+> > >> > > >
+> > >> > > > It looks like we had it, but we took it out (by the way, we were
+> > >> > > > enabling packed even though we didn't support it):
+> > >> > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6234f80574d7569444d8718355fa2838e92b158b
+> > >> > > >
+> > >> > > > The only problem I see is that for each new feature we have to modify
+> > >> > > > the kernel.
+> > >> > > > Could we have new features that don't require handling by vhost-vdpa?
+> > >> > > >
+> > >> > > > Thanks,
+> > >> > > > Stefano
+> > >> > >
+> > >> > > Jason what do you say to reverting this?
+> > >> >
+> > >> > I may miss something but I don't see any problem with vDPA core.
+> > >> >
+> > >> > It's the duty of the parents to advertise the features it has. For example,
+> > >> >
+> > >> > 1) If some kernel version that is packed is not supported via
+> > >> > set_vq_state, parents should not advertise PACKED features in this
+> > >> > case.
+> > >> > 2) If the kernel has support packed set_vq_state(), but it's emulated
+> > >> > cvq doesn't support, parents should not advertise PACKED as well
+> > >> >
+> > >> > If a parent violates the above 2, it looks like a bug of the parents.
+> > >> >
+> > >> > Thanks
+> > >>
+> > >> Yes but what about vhost_vdpa? Talking about that not the core.
+> > >
+> > >Not sure it's a good idea to workaround parent bugs via vhost-vDPA.
+> >
+> > Sorry, I'm getting lost...
+> > We were talking about the fact that vhost-vdpa doesn't handle
+> > SET_VRING_BASE/GET_VRING_BASE ioctls well for packed virtqueue before
+> > that series [1], no?
+> >
+> > The parents seem okay, but maybe I missed a few things.
+> >
+> > [1] https://lore.kernel.org/virtualization/20230424225031.18947-1-shannon.nelson@amd.com/
 > 
-> Isaku pointed out the normal spinlock_t is converted to sleeping lock for
-> PREEMPT_RT kernel.  KVM calls this with IRQ disabled, thus requires a non-
-> sleeping lock.
+> Yes, more below.
 > 
-> How about adding below comment here?
+> >
+> > >
+> > >> Should that not have a whitelist of features
+> > >> since it interprets ioctls differently depending on this?
+> > >
+> > >If there's a bug, it might only matter the following setup:
+> > >
+> > >SET_VRING_BASE/GET_VRING_BASE + VDUSE.
+> > >
+> > >This seems to be broken since VDUSE was introduced. If we really want
+> > >to backport something, it could be a fix to filter out PACKED in
+> > >VDUSE?
+> >
+> > mmm it doesn't seem to be a problem in VDUSE, but in vhost-vdpa.
+> > I think VDUSE works fine with packed virtqueue using virtio-vdpa
+> > (I haven't tried), so why should we filter PACKED in VDUSE?
 > 
->         /*
->          * Normal spinlock_t is converted to sleeping lock in PREEMPT_RT
->          * kernel.  Use raw_spinlock_t instead so this function can be called
->          * even when IRQ is disabled in any kernel configuration.
->          */
-
-Go look at *EVERY* *OTHER* raw_spinlock_t in the kernel.  Do any of them
-say this?
-
-Comment the function, say that it's always called with interrupts and
-preempt disabled.  Leaves it at that.  *Maybe* add on that it needs raw
-spinlocks because of it.  But don't (try to) explain the background of
-the lock type.
-
-
-
-
->>> +int tdx_cpu_enable(void)
->>> +{
->>> +   unsigned int lp_status;
->>> +   int ret;
->>> +
->>> +   if (!platform_tdx_enabled())
->>> +           return -EINVAL;
->>> +
->>> +   lp_status = __this_cpu_read(tdx_lp_init_status);
->>> +
->>> +   /* Already done */
->>> +   if (lp_status & TDX_LP_INIT_DONE)
->>> +           return lp_status & TDX_LP_INIT_FAILED ? -EINVAL : 0;
->>> +
->>> +   /*
->>> +    * The TDX module global initialization is the very first step
->>> +    * to enable TDX.  Need to do it first (if hasn't been done)
->>> +    * before doing the per-cpu initialization.
->>> +    */
->>> +   ret = try_init_module_global();
->>> +
->>> +   /*
->>> +    * If the module global initialization failed, there's no point
->>> +    * to do the per-cpu initialization.  Just mark it as done but
->>> +    * failed.
->>> +    */
->>> +   if (ret)
->>> +           goto update_status;
->>> +
->>> +   /* All '0's are just unused parameters */
->>> +   ret = seamcall(TDH_SYS_LP_INIT, 0, 0, 0, 0, NULL, NULL);
->>> +
->>> +update_status:
->>> +   lp_status = TDX_LP_INIT_DONE;
->>> +   if (ret)
->>> +           lp_status |= TDX_LP_INIT_FAILED;
->>> +
->>> +   this_cpu_write(tdx_lp_init_status, lp_status);
->>> +
->>> +   return ret;
->>> +}
->>> +EXPORT_SYMBOL_GPL(tdx_cpu_enable);
->>
->> You danced around it in the changelog, but the reason for the exports is
->> not clear.
+> I don't think we need any filtering since:
 > 
-> I'll add one sentence to the changelog to explain:
+> PACKED features has been advertised to userspace via uAPI since
+> 6234f80574d7569444d8718355fa2838e92b158b. Once we relax in uAPI, it
+> would be very hard to restrict it again. For the userspace that tries
+> to negotiate PACKED:
 > 
->         Export both tdx_cpu_enable() and tdx_enable() as KVM will be the kernel
->         component to use TDX.
+> 1) if it doesn't use SET_VRING_BASE/GET_VRING_BASE, everything works well
+> 2) if it uses SET_VRING_BASE/GET_VRING_BASE. it might fail or break silently
+> 
+> If we backport the fixes to -stable, we may break the application at
+> least in the case 1).
+> 
+> Thanks
 
-Intel doesn't pay me by the word.  Do you get paid that way?  If not,
-please just say:
 
-	Export both tdx_cpu_enable() and tdx_enable() for KVM use.
+I am less concerned about stable, and much more concerned about the
+future. Assume we add a new ring format. It will be silently passed
+to vhost-vdpa and things break again.
+This is why I think we need an allowlist in vhost-vdpa.
+
+
+> >
+> > Thanks,
+> > Stefano
+> >
+
