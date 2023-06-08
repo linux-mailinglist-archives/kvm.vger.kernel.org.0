@@ -2,125 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A480E7281F8
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 15:59:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60CBE72821C
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 16:03:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233626AbjFHN7Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 09:59:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39064 "EHLO
+        id S236602AbjFHODk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 10:03:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236489AbjFHN7V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 09:59:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E51B26B3
-        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 06:58:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686232719;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=L+Cl85dFCgG9tl5CrXHNcJkL4NHE9KnC3wRcD0zMwGE=;
-        b=eMF+ALdTblMRiaV7JJ5Ked/TP/FmfZV5j/n/nJQQBShU8P+AWcXzv9znFkpnpThJXiFFXK
-        UBtbmNUbs9rLCfwDb6ya/rP/zg35/6Z0UFJO8dzVCFVOMKLPZI5y5z3YPFN/g/XpPGaUxC
-        azw34dzgTfavvtC5/4DC+voIM559CAY=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-582-TComUaNDPJWaTYFo7Dqrqg-1; Thu, 08 Jun 2023 09:58:38 -0400
-X-MC-Unique: TComUaNDPJWaTYFo7Dqrqg-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-777ab76f328so46689239f.1
-        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 06:58:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686232717; x=1688824717;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=L+Cl85dFCgG9tl5CrXHNcJkL4NHE9KnC3wRcD0zMwGE=;
-        b=WjstYnA/EEM5bSR0NEA7LUltlrgkUbTw9cd+3T7W0QRDmsx/hHY3rTlzvqGSZfI/fj
-         jRl6vjN8huTl7WyBBpOXTjeLSVSL6F8/Jff01ndK1PIwGMGpgh0LRuCIYd8Pz5waSynZ
-         fYzrHA0LSWoKVSrlyRWpWqJtfjQfdBHcwNVxTaBClUNQRXUVLIrbbQl3oLq/awHKwObO
-         5iQc9uYZCt9Rnddj+xKr8KO8EG6IB18GYg2lTAfHIQvJi8kVEVY8durNrStFoDjmRzC+
-         wRZKHUw5P60sM+iMutP04YbpWMEQfUlqW3aQWUHZQ+hoY8Q/yNQ4c4s1zWiMxwYoQJx6
-         Pcsw==
-X-Gm-Message-State: AC+VfDwGmM3wc+doUsqrolq+YZ3V4IO9hPvsX3CzJGUVtamfQCZ1YWtK
-        Gj/4e8o+m5qqX/GG70Is7s/ScfULyCQSyTYFV8q61zEkPglgMz/nMkqy2j2/wqRSZKAzIXuThEN
-        Q5RljI0zlWK0T
-X-Received: by 2002:a5d:8b5a:0:b0:774:8d6c:9fe7 with SMTP id c26-20020a5d8b5a000000b007748d6c9fe7mr1290982iot.3.1686232717394;
-        Thu, 08 Jun 2023 06:58:37 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ73R/3+otuTd62ObvF1u5obbP0KM6i0OhUC6Kg9yUiAmHf3DyQqGxxg5M8dzDPP0ynU49ldiA==
-X-Received: by 2002:a5d:8b5a:0:b0:774:8d6c:9fe7 with SMTP id c26-20020a5d8b5a000000b007748d6c9fe7mr1290976iot.3.1686232717180;
-        Thu, 08 Jun 2023 06:58:37 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id s23-20020a02ad17000000b00411af6e8091sm301466jan.66.2023.06.08.06.58.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jun 2023 06:58:36 -0700 (PDT)
-Date:   Thu, 8 Jun 2023 07:58:35 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@redhat.com>
-Cc:     kvm@vger.kernel.org, jgg@nvidia.com, eric.auger@redhat.com,
-        diana.craciun@oss.nxp.com
-Subject: Re: [PATCH v2 3/3] vfio/fsl: Create Kconfig sub-menu
-Message-ID: <20230608075835.4c7359bf.alex.williamson@redhat.com>
-In-Reply-To: <d1722794-c0d3-1f7f-4195-334608165ff9@redhat.com>
-References: <20230607230918.3157757-1-alex.williamson@redhat.com>
-        <20230607230918.3157757-4-alex.williamson@redhat.com>
-        <d1722794-c0d3-1f7f-4195-334608165ff9@redhat.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S236555AbjFHODj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 10:03:39 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E92F6198C;
+        Thu,  8 Jun 2023 07:03:36 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 921EA21A14;
+        Thu,  8 Jun 2023 14:03:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1686233015; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=xLZHfs84yXjkQpWBr2AnjtulNIQynm+15xDEC6bGzuQ=;
+        b=B1BzVMJKO7TeqDYmcc2zaHSMN6eIb/lygNZttFSrSJoMUQLDWuQmBUvxa3GM+u6Ar6tK8D
+        fxHuEZv/8kO6nBmS7dq40Wp9OJc49L42sD6N3s2LIzcNQx7M1ECOJ0ObJASujCtaIrUlpM
+        8COeN5AFtNL1FH3j3PVvtFzlinSONV0=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1B625138E6;
+        Thu,  8 Jun 2023 14:03:35 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 21U+BbffgWRCbwAAMHmgww
+        (envelope-from <jgross@suse.com>); Thu, 08 Jun 2023 14:03:35 +0000
+From:   Juergen Gross <jgross@suse.com>
+To:     linux-kernel@vger.kernel.org, x86@kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Cc:     Juergen Gross <jgross@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Srivatsa S. Bhat (VMware)" <srivatsa@csail.mit.edu>,
+        Alexey Makhalov <amakhalov@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        xen-devel@lists.xenproject.org
+Subject: [RFC PATCH 0/3] x86/paravirt: Get rid of paravirt patching
+Date:   Thu,  8 Jun 2023 16:03:30 +0200
+Message-Id: <20230608140333.4083-1-jgross@suse.com>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 8 Jun 2023 09:25:26 +0200
-C=C3=A9dric Le Goater <clg@redhat.com> wrote:
+This is a small series getting rid of paravirt patching by switching
+completely to alternative patching for the same functionality.
 
-> On 6/8/23 01:09, Alex Williamson wrote:
-> > For consistency with pci and platform, push the vfio-fsl-mc option into=
- a
-> > sub-menu.
-> >=20
-> > Reviewed-by: C=C3=A9dric Le Goater <clg@redhat.com>
-> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > ---
-> >   drivers/vfio/fsl-mc/Kconfig | 4 ++++
-> >   1 file changed, 4 insertions(+)
-> >=20
-> > diff --git a/drivers/vfio/fsl-mc/Kconfig b/drivers/vfio/fsl-mc/Kconfig
-> > index 597d338c5c8a..d2757a1114aa 100644
-> > --- a/drivers/vfio/fsl-mc/Kconfig
-> > +++ b/drivers/vfio/fsl-mc/Kconfig
-> > @@ -1,3 +1,5 @@
-> > +menu "VFIO support for FSL_MC bus devices"
-> > + =20
->=20
-> The menu entry can be empty on arches not supporting the FSL-MC bus.
-> I think this needs an extra :
->=20
-> 	depends on ARM64 || COMPILE_TEST
+The basic idea is to add the capability to switch from indirect to
+direct calls via a special alternative patching option.
 
-Good catch, but shouldn't we just move up the FSL_MC_BUS depends to the
-menu level?  Thanks,
+This removes _some_ of the paravirt macro maze, but most of it needs
+to stay due to the need of hiding the call instructions from the
+compiler in order to avoid needless register save/restore.
 
-Alex
+What is going away is the nasty stacking of alternative and paravirt
+patching and (of course) the special .parainstructions linker section.
 
-> >   config VFIO_FSL_MC
-> >   	tristate "VFIO support for QorIQ DPAA2 fsl-mc bus devices"
-> >   	depends on FSL_MC_BUS
-> > @@ -8,3 +10,5 @@ config VFIO_FSL_MC
-> >   	  fsl-mc bus devices using the VFIO framework.
-> >  =20
-> >   	  If you don't know what to do here, say N.
-> > +
-> > +endmenu =20
->=20
+I have tested the series on bare metal and as Xen PV domain to still
+work.
+
+RFC because I'm quite sure there will be some objtool work needed
+(at least removing the specific paravirt handling).
+
+Juergen Gross (3):
+  x86/paravirt: move some functions and defines to alternative
+  x86/alternative: add indirect call patching
+  x86/paravirt: switch mixed paravirt/alternative calls to alternative_2
+
+ arch/x86/include/asm/alternative.h        | 26 +++++-
+ arch/x86/include/asm/paravirt.h           | 39 ++-------
+ arch/x86/include/asm/paravirt_types.h     | 68 +++-------------
+ arch/x86/include/asm/qspinlock_paravirt.h |  4 +-
+ arch/x86/include/asm/text-patching.h      | 12 ---
+ arch/x86/kernel/alternative.c             | 99 +++++++++++------------
+ arch/x86/kernel/callthunks.c              | 17 ++--
+ arch/x86/kernel/kvm.c                     |  4 +-
+ arch/x86/kernel/module.c                  | 20 ++---
+ arch/x86/kernel/paravirt.c                | 54 ++-----------
+ arch/x86/kernel/vmlinux.lds.S             | 13 ---
+ arch/x86/tools/relocs.c                   |  2 +-
+ arch/x86/xen/irq.c                        |  2 +-
+ 13 files changed, 111 insertions(+), 249 deletions(-)
+
+-- 
+2.35.3
 
