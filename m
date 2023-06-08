@@ -2,99 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D833E728636
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 19:21:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAA45728641
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 19:24:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236941AbjFHRVW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 13:21:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46232 "EHLO
+        id S237027AbjFHRY0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 13:24:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231144AbjFHRVU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 13:21:20 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE587E59;
-        Thu,  8 Jun 2023 10:21:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4AC5664FAA;
-        Thu,  8 Jun 2023 17:21:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBBADC433EF;
-        Thu,  8 Jun 2023 17:21:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686244878;
-        bh=+1JMZudb5uniaYe3Y3wFcz2tkfuMGhPDOo6QPhGbJeI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hvsQRNBUpffh2bzrvN4vsPMPOZ/NuzUw6AHwjYs+TmO/+5bq/B1NLn/y9DvjM3vhD
-         qSYXcAB1x479VEs7sJKgWqnpn1IxrjyvRCEHsQpzVJ2wAtqfyTdzWnp2kqDYhndLTF
-         7lNh5AlZn4b7Gp1kiAVotShPo4PJIvxx5SJexnBt7DGohA6CcKd2HCSbS0Y09VYk6M
-         y5iOpEOFO7lRNIFm9ZNMfqWzNmIBEOylkDaVyxyf5C+GS0RZkmTx2ywWbtBx80IMXu
-         aFRCzIeUuHSohx/8P4St1qor5bg+AYU8lVoMceWtUHz66aZlJ1OC/N/AgBafHJP/j1
-         +WU4ndAfymBuA==
-Date:   Thu, 8 Jun 2023 18:21:13 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvmarm@lists.linux.dev
-Subject: Re: [PATCH 3/3] KVM: arm64: Skip break phase when we have FEAT_BBM
- level 2
-Message-ID: <20230608172112.GA1606@willie-the-truck>
-References: <20230602170147.1541355-1-coltonlewis@google.com>
- <20230602170147.1541355-4-coltonlewis@google.com>
- <87sfb7octw.wl-maz@kernel.org>
- <ZH5VQMEoiHEITmF4@linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZH5VQMEoiHEITmF4@linux.dev>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231459AbjFHRYZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 13:24:25 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA3EA1BDF
+        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 10:24:24 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-53fa455cd94so445615a12.2
+        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 10:24:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686245064; x=1688837064;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XL9bsC//gXuc7C5OzuzU0d50fzWgPEd1BsIEsVnXnhE=;
+        b=rYGyLuoP4Kkzt9M/GDqS8KCUwQPNzaazOWhKXdvuy9QlWEmPpWhs5o3gix5PYVRmT4
+         GswcLn8C9ttTFBwcTM25aR+WPf7vjE0p1GoFzBUfuSCG6/Lek8DEGC3tnYva6lOQlXGj
+         YE7MGgIwcsMX7EVCTp+kt5R8DER2vI/M2w4peW7MiqE3OdQlkasL55NUG5Qvwk7aFI4K
+         hLYFPhA/cOh56eXHQfFAvtsT+TSRPDvSsJfxabl/RXONG3IfWYaEAVDw6pORrDnPT9DA
+         DDDXAQErQd/0Re0Ey4l2G/UR6E/ndZf2lP1yO/Jvny0o8S0sU+dg0K3QRCfLkERafB6e
+         +q6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686245064; x=1688837064;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XL9bsC//gXuc7C5OzuzU0d50fzWgPEd1BsIEsVnXnhE=;
+        b=TLwWyn/+DbDVOpu4wKgvs0p32+iuD1IxqfMIFBK3/NbDovGVo17Gd1zOWkTONudWhu
+         5WpCiaRv2YkReUAf7LDpcXyVSGBckDLJgFLgl4AWpDA9IvG62lKdtj3FCh9dDWuSaEbb
+         zZj3pBDQ5RrOPynXHbvU0ToYFtWuFdEBgv2yLRZeLlz9ROC7DbbqNwA192a2F+6WAdud
+         pBa69vOjptiqiYAegKnrJpZy2VhNEYs0ya83ggfOR3z3mphGz0OD8zh0tkSx1jZuAlvi
+         72EW2eRDGklMxcw5KxejXT3GIsjieyilJdijv1Hstiw20toH6KV+uQOQkgD5I2oidl+g
+         kr8Q==
+X-Gm-Message-State: AC+VfDzyN6OlvHlmO9o59QvnbUclM0oXtjzUF3Oq/H7yPj9MkHtGN5KX
+        VxjdjkEFHtTv7APYvtXSOuc=
+X-Google-Smtp-Source: ACHHUZ6CzWfNWAROq8fvBWQOGQH9Net4T3vU6TxOvUP/DQ2oGfEPtYQn+AO91Tgkyn6pWYg7r/FU8g==
+X-Received: by 2002:a05:6a20:3944:b0:106:c9b7:c932 with SMTP id r4-20020a056a20394400b00106c9b7c932mr4999752pzg.1.1686245063924;
+        Thu, 08 Jun 2023 10:24:23 -0700 (PDT)
+Received: from smtpclient.apple ([66.170.99.113])
+        by smtp.gmail.com with ESMTPSA id d3-20020aa78143000000b0064d681c753csm1352967pfn.40.2023.06.08.10.24.22
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 08 Jun 2023 10:24:23 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
+Subject: Re: [kvm-unit-tests PATCH v6 12/32] arm64: Add support for
+ discovering the UART through ACPI
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <7DA92888-3042-4036-A769-E9F941AF98A5@gmail.com>
+Date:   Thu, 8 Jun 2023 10:24:11 -0700
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        andrew.jones@linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
+        alexandru.elisei@arm.com, ricarkol@google.com, shahuang@redhat.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <BB231709-0C9D-4085-ABFA-B6C37EF537CA@gmail.com>
+References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
+ <20230530160924.82158-13-nikos.nikoleris@arm.com>
+ <7DA92888-3042-4036-A769-E9F941AF98A5@gmail.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+X-Mailer: Apple Mail (2.3731.600.7)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 05, 2023 at 02:36:00PM -0700, Oliver Upton wrote:
-> On Sun, Jun 04, 2023 at 09:23:39AM +0100, Marc Zyngier wrote:
-> > On Fri, 02 Jun 2023 18:01:47 +0100, Colton Lewis <coltonlewis@google.com> wrote:
-> > > +static bool stage2_try_make_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu, kvm_pte_t new)
-> > >  {
-> > >  	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> > > 
-> > > -	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
-> > > +	if (!stage2_has_bbm_level2())
-> > > +		WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
-> > > +
-> > > +	if (!stage2_try_set_pte(ctx, new))
-> > > +		return false;
-> > > +
-> > > +	if (kvm_pte_table(ctx->old, ctx->level))
-> > > +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> > > +	else if (kvm_pte_valid(ctx->old) && !stage2_pte_perms_equal(ctx->old, new))
-> > > +		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, mmu, ctx->addr, ctx->level);
-> > 
-> > Why a non-shareable invalidation? Nothing in this code captures the
-> > rationale for it. What if the permission change was a *restriction* of
-> > the permission? It should absolutely be global, and not local.
-> 
-> IIRC, Colton was testing largely with permission relaxation, and had
-> forward progress issues b.c. the stale TLB entry was never invalidated
-> in response to a permission fault.
 
-Would the series at:
 
-https://lore.kernel.org/r/5d8e1f752051173d2d1b5c3e14b54eb3506ed3ef.1684892404.git-series.apopple@nvidia.com
+> On Jun 8, 2023, at 10:18 AM, Nadav Amit <nadav.amit@gmail.com> wrote:
+>=20
+>=20
+> On May 30, 2023, at 9:09 AM, Nikos Nikoleris <nikos.nikoleris@arm.com> =
+wrote:
+>=20
+>>=20
+>> +static void uart0_init_acpi(void)
+>> +{
+>> + struct spcr_descriptor *spcr =3D =
+find_acpi_table_addr(SPCR_SIGNATURE);
+>> +
+>> + assert_msg(spcr, "Unable to find ACPI SPCR");
+>> + uart0_base =3D ioremap(spcr->serial_port.address, =
+spcr->serial_port.bit_width);
+>> +}
+>=20
+> Is it possible as a fallback, is SPCR is not available, to =
+UART_EARLY_BASE as
+> address and bit_width as bit-width?
+>=20
+> I would appreciate it, since it would help my setup.
+>=20
 
-help with that?
+Ugh - typo, 8 as bit-width for the fallback (ioremap with these =
+parameters to
+make my request clear).
 
-Will
