@@ -2,127 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A546D728445
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 17:53:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D22AE7284B6
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 18:19:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236892AbjFHPxl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 11:53:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41978 "EHLO
+        id S233538AbjFHQTg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 12:19:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236629AbjFHPxh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 11:53:37 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 888351702
-        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 08:53:08 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 67CB361864
-        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 15:53:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC887C433EF;
-        Thu,  8 Jun 2023 15:53:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686239587;
-        bh=eM0r7LYZ4B4QPeMwyPpJr5eyhDkivEWbzbqklj2jVoY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=R3qgBH2Yr4nTEIq4BcMwCHY14gD1SdwiSYB3GWouB0FG1t1/qLlvMFEbHAoQwL0xm
-         R7GeVeRb9mmTaGFCsHU8zErJDofuWe2HYa7HKN78H1UJBsCKtCd3MrB6SdiGEsUEF8
-         lhAESqDwYtPzRlyqAZDmE+53i1LxibM6hubEaZ9V4CaTTt2AIDPncvrEx8HIh2jwWo
-         Ui8CBvTKCMM/6ZZKPNlIsvCk+Aj6tyUFmVEoetcALcWRVS+UAAdaKux2upPTVWrgF6
-         SuvqDUhMU1IcGaLj/OL3C7kCpmD/iIIPFxMevyc+gyvYt0IiSOgZAMQg1Vl4VcqTC4
-         yJAlKLGKvBZwA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1q7Hwf-003pzj-GO;
-        Thu, 08 Jun 2023 16:53:05 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Reiji Watanabe <reijiw@google.com>,
-        Sebastian Ott <sebott@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.4, take #4
-Date:   Thu,  8 Jun 2023 16:52:55 +0100
-Message-Id: <20230608155255.1850620-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S231465AbjFHQTe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 12:19:34 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 254A0193
+        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 09:19:33 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-3f732d37d7bso5824795e9.0
+        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 09:19:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686241171; x=1688833171;
+        h=content-transfer-encoding:mime-version:message-id:date:reply-to
+         :user-agent:references:in-reply-to:subject:cc:to:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LwKUa8ldcngen6GFhrQGPs6NKhjNvVO+0IjnDh0+dEg=;
+        b=mV2eb4QebznzdXRTfSzI4mPrQEtLf8gVIPxQXUG067rrb2dVARQIZBxwl23g6jNAhm
+         A33vpQ/OfXnm3neQUSO1FdVXcw9hr6leZYjPLVgALH7vsfp09cQMM2+TrTf6tVHbxh33
+         K8QbkaA9pLo6O+EKzzsTkp6IHjBHDiosyWogNIt9XaVHyVpM8FjndK0bhC7ELd0yFYUW
+         BHnFZYpylBnI4gk2TSOaJOPdeFmQsNYnNBYE1ZTRVHJDfFpbJQXM9arvRwuZIF1yv6K4
+         VXchAtohrWRNTESO5NzyZiUo3fI7m+3ffHrm7gT44jUb4VNht4Pss7YhWxn9OInqgTKR
+         FWuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686241171; x=1688833171;
+        h=content-transfer-encoding:mime-version:message-id:date:reply-to
+         :user-agent:references:in-reply-to:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LwKUa8ldcngen6GFhrQGPs6NKhjNvVO+0IjnDh0+dEg=;
+        b=hZz4blyk7tpRMUksG/vugsSpX6q37QmRNvvVvjGcAzMnwyKeUIo3YiklXycsaVG1pr
+         8Ot0NQwEjXr9LSeE5J+cxjWrcQnTeXJHfnQ0EFVhyg+ovyGnLEUJfPBqyYsaClwqW1yu
+         uOOJOPdjZT/RrFdMcKkb68lCp5xreaEGuXXZA6p/9xXx+kgqA3mKE0864zs+U0UcuHnQ
+         ke5uPHClvOriUVjqF9goVmtgFYY6uP+QAcF8Ah02jxcy7iqs+R2gq9Yrb8ketmXKhIpd
+         OqPsIQWyTuMnZGFFtNo7+6PbVpTOC4DnG7LsTHD5V3IL1Yw87swpGC/iYILD3bCzeEWP
+         INIQ==
+X-Gm-Message-State: AC+VfDxjorSu6R706BHSgcw0XtsHhbOCoUJWlp39FzcyWDaHrYZXX9U2
+        Gwu4Us0y0rJtHRuh5sSRKo8=
+X-Google-Smtp-Source: ACHHUZ4hBlwqvctG0hExxD75HdW9a7pGh9GgL5+7XoQjO0fqFANjfyUlIJpXYnEIRqN9Gdc6N7Xh4w==
+X-Received: by 2002:a7b:ce92:0:b0:3f6:683:628b with SMTP id q18-20020a7bce92000000b003f60683628bmr1905349wmj.3.1686241171203;
+        Thu, 08 Jun 2023 09:19:31 -0700 (PDT)
+Received: from gmail.com ([47.60.45.125])
+        by smtp.gmail.com with ESMTPSA id n6-20020a7bcbc6000000b003f6f6a6e769sm73800wmi.17.2023.06.08.09.19.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jun 2023 09:19:30 -0700 (PDT)
+From:   Juan Quintela <juan.quintela@gmail.com>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Cc:     afaerber@suse.de, ale@rev.ng, anjo@rev.ng, bazulay@redhat.com,
+        bbauman@redhat.com, chao.p.peng@linux.intel.com, cjia@nvidia.com,
+        cw@f00f.org, david.edmondson@oracle.com,
+        dustin.kirkland@canonical.com, eblake@redhat.com,
+        edgar.iglesias@gmail.com, elena.ufimtseva@oracle.com,
+        eric.auger@redhat.com, f4bug@amsat.org,
+        Felipe Franciosi <felipe.franciosi@nutanix.com>,
+        "iggy@theiggy.com" <iggy@kws1.com>, Warner Losh <wlosh@bsdimp.com>,
+        jan.kiszka@web.de, jgg@nvidia.com, jidong.xiao@gmail.com,
+        jjherne@linux.vnet.ibm.com, joao.m.martins@oracle.com,
+        konrad.wilk@oracle.com, kvm@vger.kernel.org,
+        mburton@qti.qualcomm.com, mdean@redhat.com,
+        mimu@linux.vnet.ibm.com, peter.maydell@linaro.org,
+        qemu-devel@nongnu.org, richard.henderson@linaro.org,
+        shameerali.kolothum.thodi@huawei.com, stefanha@gmail.com,
+        wei.w.wang@intel.com, z.huo@139.com, zwu.kernel@gmail.com
+Subject: Re: QEMU developers fortnightly conference call for 2023-06-13
+In-Reply-To: <673a858e-8437-24e0-1ca5-3a2f956bb42c@linaro.org> ("Philippe
+        =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed, 7 Jun 2023 17:17:14
+ +0200")
+References: <calendar-123b3e98-a357-4d85-ac0b-ecce92087a35@google.com>
+        <673a858e-8437-24e0-1ca5-3a2f956bb42c@linaro.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+Reply-To: juan.quintela@gmail.com
+Date:   Thu, 08 Jun 2023 18:19:28 +0200
+Message-ID: <87sfb2apv3.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, mark.rutland@arm.com, nathan@kernel.org, oliver.upton@linux.dev, reijiw@google.com, sebott@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FSL_HELO_FAKE,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> wrote:
+> Hi Juan,
+>
+> On 7/6/23 15:55, juan.quintela@gmail.com wrote:
+>> QEMU developers fortnightly conference call
+>> Hi
+>> Here is the wiki for whover that wants to add topics to the agenda.
+>> https://wiki.qemu.org/QEMUCall#Call_for_agenda_for_2023-06-13
+>> <https://wiki.qemu.org/QEMUCall#Call_for_agenda_for_2023-06-13>
+>> We already have a topic that is "Live Update", so please join.
+>> Later, Juan.
+>
+> KVM Forum 2023 is on Wed 14 and Thu 15, so we can expect people
+> interested to assist being traveling on Tue 13.
 
-Here's yet another batch of fixes, two of them addressing pretty
-recent regressions: GICv2 emulation on GICv3 was accidently killed,
-and the PMU rework needed some tweaking.
+OK, I am moving this to next week.  Being in a call without people
+involved is not going to be good.
 
-The last two patches address an annoying PMU (again) problem where
-the KVM requirements were never factored in when PMU counters were
-directly exposed to userspace. Reiji has been working on a fix, which
-is now readdy to be merged.
+> There will be Birds of a Feather sessions on Wed 14 from 15:45
+> to 17:45 (Europe/Prague), perhaps this is a better replacement
+> (assuming someone from each session volunteer to stream for
+> remote audience).
 
-Please pull,
+I am not assisting to KVM Forum, but it there is a meeting that I can
+join online I will do.
 
-        M.
+Better if anyone on KVM Forum organize this.
 
-The following changes since commit 40e54cad454076172cc3e2bca60aa924650a3e4b:
-
-  KVM: arm64: Document default vPMU behavior on heterogeneous systems (2023-05-31 10:29:56 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.4-4
-
-for you to fetch changes up to 30c60dda219ddda0bc6ff6ac55d493d9db8be4fa:
-
-  KVM: arm64: Use raw_smp_processor_id() in kvm_pmu_probe_armpmu() (2023-06-07 16:48:34 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.4, take #4
-
-- Correctly save/restore PMUSERNR_EL0 when host userspace is using
-  PMU counters directly
-
-- Fix GICv2 emulation on GICv3 after the locking rework
-
-- Don't use smp_processor_id() in kvm_pmu_probe_armpmu(), and
-  document why...
-
-----------------------------------------------------------------
-Marc Zyngier (1):
-      KVM: arm64: Restore GICv2-on-GICv3 functionality
-
-Oliver Upton (1):
-      KVM: arm64: Use raw_smp_processor_id() in kvm_pmu_probe_armpmu()
-
-Reiji Watanabe (2):
-      KVM: arm64: PMU: Restore the host's PMUSERENR_EL0
-      KVM: arm64: PMU: Don't overwrite PMUSERENR with vcpu loaded
-
- arch/arm/include/asm/arm_pmuv3.h        |  5 +++++
- arch/arm64/include/asm/kvm_host.h       |  7 +++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 15 +++++++++++++--
- arch/arm64/kvm/hyp/vhe/switch.c         | 14 ++++++++++++++
- arch/arm64/kvm/pmu-emul.c               | 20 +++++++++++++++++++-
- arch/arm64/kvm/pmu.c                    | 27 +++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-init.c         | 11 +++++++----
- drivers/perf/arm_pmuv3.c                | 21 ++++++++++++++++++---
- 8 files changed, 110 insertions(+), 10 deletions(-)
+Thanks, Juan.
