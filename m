@@ -2,67 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 084DB727964
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 10:00:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88EFE727966
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 10:00:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234123AbjFHIAF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 04:00:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49066 "EHLO
+        id S234155AbjFHIAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 04:00:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234070AbjFHH7q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 03:59:46 -0400
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 902C52139
-        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 00:59:23 -0700 (PDT)
-Received: by mail-qt1-x82c.google.com with SMTP id d75a77b69052e-3f9baa69682so3091111cf.3
-        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 00:59:23 -0700 (PDT)
+        with ESMTP id S233970AbjFHH7s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 03:59:48 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC6622709
+        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 00:59:24 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-662f0feafb2so251552b3a.1
+        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 00:59:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686211159; x=1688803159;
+        d=gmail.com; s=20221208; t=1686211163; x=1688803163;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=l7rOGqXC37gafOauEwa0cFMpL8/CjScf7tEvGqgJo8o=;
-        b=rfwHuFdRzuVr3mppnWLIdGnUEfW/ROFYDxVVAaVFXYspZT/EMsu8z331uOagMlXrrJ
-         OscjyYJCrcxJUXflpUnpyKB9qSNkZSgnR+AhrULdQ3vJATnJPCrhawIH+NwZZMU+Hogc
-         MFqJ8zcaj8OdbBB51uRWeVWQajFzl3MU+pfCz/9tYomBEmiKvjws5uyfpUDJXrIGE8Ne
-         QwS9v/Q4mlaFFHcVgyJvx48c/T7lcnXRaXlYElPFjbUfBpoPKBkqs4hZwNk9fwCZ6/sr
-         w3wu0uIFQrSxeHRZqKUiuPiCQsmcOn7eRPzkTi10XNq15hcqMGYMx5cgWnyDPZZrUeAl
-         FEXA==
+        bh=gIf7mMUq3IomvCRzE/BwBbmr5XmOTNpFkv4p84CsDuY=;
+        b=jsPmE4fa/vT9fHYhtvIl+4+1qBxxy9x9h7KJous9XPUnlMoK2Yq84qaDVaYAgzdGsv
+         wwzj9dh1JSY3RVDhi/CFgfB69g4HrwyEaHKcxW2Wj5JDpBmRfOT0mhRoEtc+XLq8vXE9
+         9F1JUrsDZXZ5oaAqZiF4NOvaROlEKlmclayf5q4alYReCrxdDy8uhu14teAPlnc0sH7z
+         YiCaHdTlV2oWOU97+MdATNnkpUJ+qJM0Fe7wCzHoNghxfGfSqJfQ5ZHHET9gO3vQr8Ts
+         AHhN5WQCMI2IgqpuqshQxUFf9CSgvmgEap3OI7UV6vERYP5duwMbmQSskAGbzNn3olBd
+         hQ7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686211159; x=1688803159;
+        d=1e100.net; s=20221208; t=1686211163; x=1688803163;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=l7rOGqXC37gafOauEwa0cFMpL8/CjScf7tEvGqgJo8o=;
-        b=hFRokeQpbdhHxxkIOj+qjlyGwEXma6kPKaeqJcVgr1NyVy15Fwyh+ztEdVCd73D/sS
-         tp3qAsAwbNOZ0bl2e7tn71fAQliuKmKWM1xiQ5GFiwD03Cye6YNv2bUZ0zLPLR8qDWR3
-         lE/U/OcOz/AMJm7ICrU/HH5Vf/qmUBKXAWzlf3kd+gHpJPMp4mcVTno8OixglIna67kv
-         NwWCL3zEzQcdyt8U3p1OaBgXJVvqNseEnXTd4WZcg0CoNi6jQIjg4BaeQ8wuNb3YPQKd
-         UPRM/9GMb7EwowD0ETXcp2Wm9hV66WLNfi2wv/Ialkx4pbZYs3RFbJ8cSvaU+QjWL8oS
-         GXbw==
-X-Gm-Message-State: AC+VfDzYQlRuuxlGoZI8PAUqb5uIhGtMavO+NJQMTeG72ASezIWDgwm6
-        0whIfszR+L2SsJlMUu63f/S2y4C/7QI=
-X-Google-Smtp-Source: ACHHUZ4j8hBP4dC23PNbC/OKxYRz34uWel4HlrIonxyuc5wJwjuoLHdQeFkH0csrz9N44+pI2OPrzA==
-X-Received: by 2002:ac8:5a93:0:b0:3f6:b760:f3dd with SMTP id c19-20020ac85a93000000b003f6b760f3ddmr6981840qtc.33.1686211159233;
-        Thu, 08 Jun 2023 00:59:19 -0700 (PDT)
+        bh=gIf7mMUq3IomvCRzE/BwBbmr5XmOTNpFkv4p84CsDuY=;
+        b=MbCRp34Ov0Q/B6VDAyxawWVu8iAEFRtN4WUiDL5fpmV1GfIl4ap7Ao3Bgi9wFea5X7
+         oBaoPmJjX4H/w3YILx2Oyan4dQXWHf3XDMqb0vuPrOFxTHpN4F2Fy2PDvIUA4zg1hUH3
+         XHM2+uusS2wmU9//KtY1fU4Q3+NZJH0e+/qOXPbQNr2r+f5d+X1QB4UUnHYKTZjwOnWm
+         02CxUO69RD1ZxfX0II7IRFNpPhMtgWmlreq5m5OHcPLgcHO5aF/E7SKiZZG1e8K8QbEM
+         gaDKqzqlfHwSiqEbPE3IxJIUabytgIKtMnnEE3msE6K11i4PgeMwC8EZmSzL6L9+DRgG
+         nIXw==
+X-Gm-Message-State: AC+VfDwn+00S38mG84zQLWUB/5/smriYe1/rJ4SGAF9jupOH6YKX6kVK
+        q230JNjluG/NB7DPKBwRgrlJFyqOiHQ=
+X-Google-Smtp-Source: ACHHUZ7j9tL8nMT4K1M5MLI0aYyAcL3vvSvos/iW3DoAZcAQYrxGQJhr3f0xfPBxEk3BSMBsxI26nQ==
+X-Received: by 2002:a05:6a20:8405:b0:103:b585:b587 with SMTP id c5-20020a056a20840500b00103b585b587mr1786346pzd.13.1686211163017;
+        Thu, 08 Jun 2023 00:59:23 -0700 (PDT)
 Received: from wheely.local0.net ([1.146.34.117])
-        by smtp.gmail.com with ESMTPSA id 17-20020a630011000000b00542d7720a6fsm673182pga.88.2023.06.08.00.59.15
+        by smtp.gmail.com with ESMTPSA id 17-20020a630011000000b00542d7720a6fsm673182pga.88.2023.06.08.00.59.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jun 2023 00:59:18 -0700 (PDT)
+        Thu, 08 Jun 2023 00:59:22 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm@vger.kernel.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
         Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Subject: [kvm-unit-tests v4 11/12] powerpc: Support powernv machine with QEMU TCG
-Date:   Thu,  8 Jun 2023 17:58:25 +1000
-Message-Id: <20230608075826.86217-12-npiggin@gmail.com>
+        Thomas Huth <thuth@redhat.com>
+Subject: [kvm-unit-tests v4 12/12] powerpc/sprs: Test hypervisor registers on powernv machine
+Date:   Thu,  8 Jun 2023 17:58:26 +1000
+Message-Id: <20230608075826.86217-13-npiggin@gmail.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230608075826.86217-1-npiggin@gmail.com>
 References: <20230608075826.86217-1-npiggin@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
@@ -74,467 +72,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a basic first pass at powernv support using OPAL (skiboot)
-firmware.
+This enables HV privilege registers to be tested with the powernv
+machine.
 
-The ACCEL is a bit clunky, defaulting to kvm for powernv machine, which
-isn't right and has to be manually overridden. It also does not yet run
-in the run_tests.sh batch process, more work is needed to exclude
-certain tests (e.g., rtas) and adjust parameters (e.g., increase memory
-size) to allow powernv to work. For now it can run single test cases.
-
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Acked-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
-Since v3:
-- Typo fix [Thomas]
+ powerpc/sprs.c | 33 +++++++++++++++++++++++++--------
+ 1 file changed, 25 insertions(+), 8 deletions(-)
 
- lib/powerpc/asm/ppc_asm.h   |  5 +++
- lib/powerpc/asm/processor.h | 10 +++++
- lib/powerpc/hcall.c         |  4 +-
- lib/powerpc/io.c            | 27 +++++++++++++-
- lib/powerpc/io.h            |  6 +++
- lib/powerpc/processor.c     | 10 +++++
- lib/powerpc/setup.c         |  8 ++--
- lib/ppc64/asm/opal.h        | 15 ++++++++
- lib/ppc64/opal-calls.S      | 46 +++++++++++++++++++++++
- lib/ppc64/opal.c            | 74 +++++++++++++++++++++++++++++++++++++
- powerpc/Makefile.ppc64      |  2 +
- powerpc/cstart64.S          |  7 ++++
- powerpc/run                 | 35 ++++++++++++++++--
- 13 files changed, 238 insertions(+), 11 deletions(-)
- create mode 100644 lib/ppc64/asm/opal.h
- create mode 100644 lib/ppc64/opal-calls.S
- create mode 100644 lib/ppc64/opal.c
-
-diff --git a/lib/powerpc/asm/ppc_asm.h b/lib/powerpc/asm/ppc_asm.h
-index 46b4be00..63f11d13 100644
---- a/lib/powerpc/asm/ppc_asm.h
-+++ b/lib/powerpc/asm/ppc_asm.h
-@@ -39,7 +39,12 @@
- #define SPR_HSRR1	0x13B
+diff --git a/powerpc/sprs.c b/powerpc/sprs.c
+index d5664201..07a4e759 100644
+--- a/powerpc/sprs.c
++++ b/powerpc/sprs.c
+@@ -199,16 +199,16 @@ static const struct spr sprs_power_common[1024] = {
+ [190] = {"HFSCR",	64,	HV_RW, },
+ [256] = {"VRSAVE",	32,	RW, },
+ [259] = {"SPRG3",	64,	RO, },
+-[284] = {"TBL",		32,	HV_WO, },
+-[285] = {"TBU",		32,	HV_WO, },
+-[286] = {"TBU40",	64,	HV_WO, },
++[284] = {"TBL",		32,	HV_WO, }, /* Things can go a bit wonky with */
++[285] = {"TBU",		32,	HV_WO, }, /* Timebase changing. Should save */
++[286] = {"TBU40",	64,	HV_WO, }, /* and restore it. */
+ [304] = {"HSPRG0",	64,	HV_RW, },
+ [305] = {"HSPRG1",	64,	HV_RW, },
+ [306] = {"HDSISR",	32,	HV_RW,		SPR_INT, },
+ [307] = {"HDAR",	64,	HV_RW,		SPR_INT, },
+ [308] = {"SPURR",	64,	HV_RW | OS_RO,	SPR_ASYNC, },
+ [309] = {"PURR",	64,	HV_RW | OS_RO,	SPR_ASYNC, },
+-[313] = {"HRMOR",	64,	HV_RW, },
++[313] = {"HRMOR",	64,	HV_RW,		SPR_HARNESS, }, /* Harness can't cope with HRMOR changing */
+ [314] = {"HSRR0",	64,	HV_RW,		SPR_INT, },
+ [315] = {"HSRR1",	64,	HV_RW,		SPR_INT, },
+ [318] = {"LPCR",	64,	HV_RW, },
+@@ -306,7 +306,7 @@ static const struct spr sprs_power9_10[1024] = {
+ [921] = {"TSCR",	32,	HV_RW, },
+ [922] = {"TTR",		64,	HV_RW, },
+ [1006]= {"TRACE",	64,	WO, },
+-[1008]= {"HID",		64,	HV_RW, },
++[1008]= {"HID",		64,	HV_RW,		SPR_HARNESS, }, /* At least HILE would be unhelpful to change */
+ };
  
- /* Machine State Register definitions: */
-+#define MSR_LE_BIT	0
- #define MSR_EE_BIT	15			/* External Interrupts Enable */
-+#define MSR_HV_BIT	60			/* Hypervisor mode */
- #define MSR_SF_BIT	63			/* 64-bit mode */
+ /* This covers POWER8 and POWER9 PMUs */
+@@ -350,6 +350,22 @@ static const struct spr sprs_power10_pmu[1024] = {
  
-+#define SPR_HSRR0	0x13A
-+#define SPR_HSRR1	0x13B
-+
- #endif /* _ASMPOWERPC_PPC_ASM_H */
-diff --git a/lib/powerpc/asm/processor.h b/lib/powerpc/asm/processor.h
-index 4ad6612b..9b318c3e 100644
---- a/lib/powerpc/asm/processor.h
-+++ b/lib/powerpc/asm/processor.h
-@@ -3,6 +3,7 @@
+ static struct spr sprs[1024];
  
- #include <libcflat.h>
- #include <asm/ptrace.h>
-+#include <asm/ppc_asm.h>
- 
- #ifndef __ASSEMBLY__
- void handle_exception(int trap, void (*func)(struct pt_regs *, void *), void *);
-@@ -43,6 +44,15 @@ static inline void mtmsr(uint64_t msr)
- 	asm volatile ("mtmsrd %[msr]" :: [msr] "r" (msr) : "memory");
- }
- 
-+/*
-+ * This returns true on PowerNV / OPAL machines which run in hypervisor
-+ * mode. False on pseries / PAPR machines that run in guest mode.
-+ */
-+static inline bool machine_is_powernv(void)
-+{
-+	return !!(mfmsr() & (1ULL << MSR_HV_BIT));
-+}
-+
- static inline uint64_t get_tb(void)
- {
- 	return mfspr(SPR_TB);
-diff --git a/lib/powerpc/hcall.c b/lib/powerpc/hcall.c
-index 711cb1b0..37e52f54 100644
---- a/lib/powerpc/hcall.c
-+++ b/lib/powerpc/hcall.c
-@@ -25,7 +25,7 @@ int hcall_have_broken_sc1(void)
- 	return r3 == (unsigned long)H_PRIVILEGE;
- }
- 
--void putchar(int c)
-+void papr_putchar(int c)
- {
- 	unsigned long vty = 0;		/* 0 == default */
- 	unsigned long nr_chars = 1;
-@@ -34,7 +34,7 @@ void putchar(int c)
- 	hcall(H_PUT_TERM_CHAR, vty, nr_chars, chars);
- }
- 
--int __getchar(void)
-+int __papr_getchar(void)
- {
- 	register unsigned long r3 asm("r3") = H_GET_TERM_CHAR;
- 	register unsigned long r4 asm("r4") = 0; /* 0 == default vty */
-diff --git a/lib/powerpc/io.c b/lib/powerpc/io.c
-index a381688b..ab7bb843 100644
---- a/lib/powerpc/io.c
-+++ b/lib/powerpc/io.c
-@@ -9,13 +9,33 @@
- #include <asm/spinlock.h>
- #include <asm/rtas.h>
- #include <asm/setup.h>
-+#include <asm/processor.h>
- #include "io.h"
- 
- static struct spinlock print_lock;
- 
-+void putchar(int c)
++static bool spr_read_perms(int spr)
 +{
 +	if (machine_is_powernv())
-+		opal_putchar(c);
++		return !!(sprs[spr].access & SPR_HV_READ);
 +	else
-+		papr_putchar(c);
++		return !!(sprs[spr].access & SPR_OS_READ);
 +}
 +
-+int __getchar(void)
++static bool spr_write_perms(int spr)
 +{
 +	if (machine_is_powernv())
-+		return __opal_getchar();
++		return !!(sprs[spr].access & SPR_HV_WRITE);
 +	else
-+		return __papr_getchar();
++		return !!(sprs[spr].access & SPR_OS_WRITE);
 +}
 +
- void io_init(void)
+ static void setup_sprs(void)
  {
--	rtas_init();
-+	if (machine_is_powernv())
-+		assert(!opal_init());
-+	else
-+		rtas_init();
- }
+ 	uint32_t pvr = mfspr(287);	/* Processor Version Register */
+@@ -466,7 +482,7 @@ static void get_sprs(uint64_t *v)
+ 	int i;
  
- void puts(const char *s)
-@@ -38,7 +58,10 @@ void exit(int code)
- // FIXME: change this print-exit/rtas-poweroff to chr_testdev_exit(),
- //        maybe by plugging chr-testdev into a spapr-vty.
- 	printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
--	rtas_power_off();
-+	if (machine_is_powernv())
-+		opal_power_off();
-+	else
-+		rtas_power_off();
- 	halt(code);
- 	__builtin_unreachable();
- }
-diff --git a/lib/powerpc/io.h b/lib/powerpc/io.h
-index d4f21ba1..943bf142 100644
---- a/lib/powerpc/io.h
-+++ b/lib/powerpc/io.h
-@@ -8,6 +8,12 @@
- #define _POWERPC_IO_H_
+ 	for (i = 0; i < 1024; i++) {
+-		if (!(sprs[i].access & SPR_OS_READ))
++		if (!spr_read_perms(i))
+ 			continue;
+ 		v[i] = __mfspr(i);
+ 	}
+@@ -477,8 +493,9 @@ static void set_sprs(uint64_t val)
+ 	int i;
  
- extern void io_init(void);
-+extern int opal_init(void);
-+extern void opal_power_off(void);
- extern void putchar(int c);
-+extern void opal_putchar(int c);
-+extern void papr_putchar(int c);
-+extern int __opal_getchar(void);
-+extern int __papr_getchar(void);
+ 	for (i = 0; i < 1024; i++) {
+-		if (!(sprs[i].access & SPR_OS_WRITE))
++		if (!spr_write_perms(i))
+ 			continue;
++
+ 		if (sprs[i].type & SPR_HARNESS)
+ 			continue;
+ 		if (!strcmp(sprs[i].name, "MMCR0")) {
+@@ -550,7 +567,7 @@ int main(int argc, char **argv)
+ 	for (i = 0; i < 1024; i++) {
+ 		bool pass = true;
  
- #endif
-diff --git a/lib/powerpc/processor.c b/lib/powerpc/processor.c
-index 64d7ae01..58fea8cf 100644
---- a/lib/powerpc/processor.c
-+++ b/lib/powerpc/processor.c
-@@ -71,6 +71,16 @@ void sleep_tb(uint64_t cycles)
- {
- 	uint64_t start, end, now;
+-		if (!(sprs[i].access & SPR_OS_READ))
++		if (!spr_read_perms(i))
+ 			continue;
  
-+	if (machine_is_powernv()) {
-+		/*
-+		 * Could use 'stop' to sleep here which would be interesting.
-+		 * stop with ESL=0 should be simple enough, ESL=1 would require
-+		 * SRESET based wakeup which is more involved.
-+		 */
-+		delay(cycles);
-+		return;
-+	}
-+
- 	start = now = get_tb();
- 	end = start + cycles;
- 
-diff --git a/lib/powerpc/setup.c b/lib/powerpc/setup.c
-index 1be4c030..dd758db4 100644
---- a/lib/powerpc/setup.c
-+++ b/lib/powerpc/setup.c
-@@ -18,6 +18,7 @@
- #include <argv.h>
- #include <asm/setup.h>
- #include <asm/page.h>
-+#include <asm/processor.h>
- #include <asm/hcall.h>
- #include "io.h"
- 
-@@ -97,12 +98,13 @@ static void cpu_init(void)
- 	tb_hz = params.tb_hz;
- 
- 	/* Interrupt Endianness */
--
-+	if (!machine_is_powernv()) {
- #if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
--        hcall(H_SET_MODE, 1, 4, 0, 0);
-+		hcall(H_SET_MODE, 1, 4, 0, 0);
- #else
--        hcall(H_SET_MODE, 0, 4, 0, 0);
-+		hcall(H_SET_MODE, 0, 4, 0, 0);
- #endif
-+	}
- }
- 
- static void mem_init(phys_addr_t freemem_start)
-diff --git a/lib/ppc64/asm/opal.h b/lib/ppc64/asm/opal.h
-new file mode 100644
-index 00000000..7b1299f7
---- /dev/null
-+++ b/lib/ppc64/asm/opal.h
-@@ -0,0 +1,15 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+#ifndef _ASMPPC64_HCALL_H_
-+#define _ASMPPC64_HCALL_H_
-+
-+#define OPAL_SUCCESS				0
-+
-+#define OPAL_CONSOLE_WRITE			1
-+#define OPAL_CONSOLE_READ			2
-+#define OPAL_CEC_POWER_DOWN			5
-+#define OPAL_POLL_EVENTS			10
-+#define OPAL_REINIT_CPUS			70
-+# define OPAL_REINIT_CPUS_HILE_BE		(1 << 0)
-+# define OPAL_REINIT_CPUS_HILE_LE		(1 << 1)
-+
-+#endif
-diff --git a/lib/ppc64/opal-calls.S b/lib/ppc64/opal-calls.S
-new file mode 100644
-index 00000000..1833358c
---- /dev/null
-+++ b/lib/ppc64/opal-calls.S
-@@ -0,0 +1,46 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Copyright (c) 2016 IBM Corporation.
-+ */
-+
-+#include <asm/ppc_asm.h>
-+
-+	.text
-+	.globl opal_call
-+opal_call:
-+	mr	r0,r3
-+	mr	r3,r4
-+	mr	r4,r5
-+	mr	r5,r6
-+	mr	r6,r7
-+	mflr	r11
-+	std	r11,16(r1)
-+	mfcr	r12
-+	stw	r12,8(r1)
-+	mr	r13,r2
-+
-+	/* Set opal return address */
-+	LOAD_REG_ADDR(r11, opal_return)
-+	mtlr	r11
-+	mfmsr	r12
-+
-+	/* switch to BE when we enter OPAL */
-+	li	r11,(1 << MSR_LE_BIT)
-+	andc	r12,r12,r11
-+	mtspr	SPR_HSRR1,r12
-+
-+	/* load the opal call entry point and base */
-+	LOAD_REG_ADDR(r11, opal)
-+	ld	r12,8(r11)
-+	ld	r2,0(r11)
-+	mtspr	SPR_HSRR0,r12
-+	hrfid
-+
-+opal_return:
-+	FIXUP_ENDIAN
-+	mr	r2,r13;
-+	lwz	r11,8(r1);
-+	ld	r12,16(r1)
-+	mtcr	r11;
-+	mtlr	r12
-+	blr
-diff --git a/lib/ppc64/opal.c b/lib/ppc64/opal.c
-new file mode 100644
-index 00000000..84ab97b8
---- /dev/null
-+++ b/lib/ppc64/opal.c
-@@ -0,0 +1,74 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * OPAL call helpers
-+ */
-+#include <asm/opal.h>
-+#include <libcflat.h>
-+#include <libfdt/libfdt.h>
-+#include <devicetree.h>
-+#include <asm/io.h>
-+#include "../powerpc/io.h"
-+
-+struct opal {
-+	uint64_t base;
-+	uint64_t entry;
-+} opal;
-+
-+extern int64_t opal_call(int64_t token, int64_t arg1, int64_t arg2, int64_t arg3);
-+
-+int opal_init(void)
-+{
-+	const struct fdt_property *prop;
-+	int node, len;
-+
-+	node = fdt_path_offset(dt_fdt(), "/ibm,opal");
-+	if (node < 0)
-+		return -1;
-+
-+	prop = fdt_get_property(dt_fdt(), node, "opal-base-address", &len);
-+	if (!prop)
-+		return -1;
-+	opal.base = fdt64_to_cpu(*(uint64_t *)prop->data);
-+
-+	prop = fdt_get_property(dt_fdt(), node, "opal-entry-address", &len);
-+	if (!prop)
-+		return -1;
-+	opal.entry = fdt64_to_cpu(*(uint64_t *)prop->data);
-+
-+#if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-+	if (opal_call(OPAL_REINIT_CPUS, OPAL_REINIT_CPUS_HILE_LE, 0, 0) != OPAL_SUCCESS)
-+		return -1;
-+#endif
-+
-+	return 0;
-+}
-+
-+extern void opal_power_off(void)
-+{
-+	opal_call(OPAL_CEC_POWER_DOWN, 0, 0, 0);
-+	while (true)
-+		opal_call(OPAL_POLL_EVENTS, 0, 0, 0);
-+}
-+
-+void opal_putchar(int c)
-+{
-+	unsigned long vty = 0;		/* 0 == default */
-+	unsigned long nr_chars = cpu_to_be64(1);
-+	char ch = c;
-+
-+	opal_call(OPAL_CONSOLE_WRITE, (int64_t)vty, (int64_t)&nr_chars, (int64_t)&ch);
-+}
-+
-+int __opal_getchar(void)
-+{
-+	unsigned long vty = 0;		/* 0 == default */
-+	unsigned long nr_chars = cpu_to_be64(1);
-+	char ch;
-+	int rc;
-+
-+	rc = opal_call(OPAL_CONSOLE_READ, (int64_t)vty, (int64_t)&nr_chars, (int64_t)&ch);
-+	if (rc != OPAL_SUCCESS)
-+		return -1;
-+
-+	return ch;
-+}
-diff --git a/powerpc/Makefile.ppc64 b/powerpc/Makefile.ppc64
-index b0ed2b10..06a7cf67 100644
---- a/powerpc/Makefile.ppc64
-+++ b/powerpc/Makefile.ppc64
-@@ -17,6 +17,8 @@ cstart.o = $(TEST_DIR)/cstart64.o
- reloc.o  = $(TEST_DIR)/reloc64.o
- 
- OBJDIRS += lib/ppc64
-+cflatobjs += lib/ppc64/opal.o
-+cflatobjs += lib/ppc64/opal-calls.o
- 
- # ppc64 specific tests
- tests = $(TEST_DIR)/spapr_vpa.elf
-diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
-index e18ae9a2..185ebad5 100644
---- a/powerpc/cstart64.S
-+++ b/powerpc/cstart64.S
-@@ -92,6 +92,13 @@ start:
- 	sync
- 	isync
- 
-+	/* powernv machine does not check broken_sc1 */
-+	mfmsr	r3
-+	li	r4,1
-+	sldi	r4,r4,MSR_HV_BIT
-+	and.	r3,r3,r4
-+	bne	1f
-+
- 	/* patch sc1 if needed */
- 	bl	hcall_have_broken_sc1
- 	cmpwi	r3, 0
-diff --git a/powerpc/run b/powerpc/run
-index ee38e075..f4ddd39c 100755
---- a/powerpc/run
-+++ b/powerpc/run
-@@ -1,5 +1,14 @@
- #!/usr/bin/env bash
- 
-+get_qemu_machine ()
-+{
-+	if [ "$MACHINE" ]; then
-+		echo $MACHINE
-+	else
-+		echo pseries
-+	fi
-+}
-+
- if [ -z "$KUT_STANDALONE" ]; then
- 	if [ ! -f config.mak ]; then
- 		echo "run ./configure && make first. See ./configure -h"
-@@ -12,17 +21,35 @@ fi
- ACCEL=$(get_qemu_accelerator) ||
- 	exit $?
- 
-+MACHINE=$(get_qemu_machine) ||
-+	exit $?
-+
-+if [[ "$MACHINE" == "powernv"* ]] && [ "$ACCEL" = "kvm" ]; then
-+	echo "PowerNV machine does not support KVM. ACCEL=tcg must be specified."
-+	exit 2
-+fi
-+
- qemu=$(search_qemu_binary) ||
- 	exit $?
- 
--if ! $qemu -machine '?' 2>&1 | grep 'pseries' > /dev/null; then
--	echo "$qemu doesn't support pSeries ('-machine pseries'). Exiting."
-+if ! $qemu -machine '?' 2>&1 | grep $MACHINE > /dev/null; then
-+	echo "$qemu doesn't support '-machine $MACHINE'. Exiting."
- 	exit 2
- fi
- 
--M='-machine pseries'
-+M="-machine $MACHINE"
- M+=",accel=$ACCEL"
--command="$qemu -nodefaults $M -bios $FIRMWARE"
-+B=""
-+if [[ "$MACHINE" == "pseries"* ]] ; then
-+	B+="-bios $FIRMWARE"
-+fi
-+
-+D=""
-+if [[ "$MACHINE" == "powernv"* ]] ; then
-+	D+="-device ipmi-bmc-sim,id=bmc0 -device isa-ipmi-bt,bmc=bmc0,irq=10"
-+fi
-+
-+command="$qemu -nodefaults $M $B $D"
- command+=" -display none -serial stdio -kernel"
- command="$(migration_cmd) $(timeout_cmd) $command"
- 
+ 		if (sprs[i].width == 32) {
 -- 
 2.40.1
 
