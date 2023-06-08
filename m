@@ -2,173 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CB11727BCC
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 11:45:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7126E727BDE
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 11:49:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235644AbjFHJpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 05:45:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47622 "EHLO
+        id S234793AbjFHJs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 05:48:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235383AbjFHJps (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 05:45:48 -0400
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8A94213C;
-        Thu,  8 Jun 2023 02:45:33 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-19f268b1d83so334794fac.1;
-        Thu, 08 Jun 2023 02:45:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686217533; x=1688809533;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KWfXcI9qpNRXyZ49c1qVkzQX/sqIlGyUNHOIKGAzDQA=;
-        b=OoOYd2Yl2fvO4CeoY9SXHmrdO/GnjLe13sWCrJ7lGe1yhDuyXVDlqo0aUAKF0FKt9F
-         uEbaKxjDxSqxqK3VGqMeVp/mo6E9VAG1KNWCB0Y1+PWB/moUVnUjS1NHX3MLj8gLWZ6z
-         SsE9OQSfsUMJoyg9sQB2EtUigZho4LxaKSjdF4sCvz6wVdlD4AGj9a0TH/W8c5cYCVQP
-         4kTNx9yq3tD7FM3+jK+lGWxjLs98WKyMsVCvksXQYHXH/ArNdQ0oQUlPlOSpbl04LXv5
-         8Urqn++vTFktCKLCVxhFq0WA7NQuJmzpA31w40ViBGkfOQ8lMcSiN/BxLM8WpSOTLZL5
-         6DiA==
+        with ESMTP id S234703AbjFHJs5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 05:48:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F35D2273E
+        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 02:48:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686217682;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qJkqbDxJbGuLRNFoh+RhZZol0vchzC/C3TXtJPnBQMs=;
+        b=AdloyzYUx0BsUo+9XtBjGdeFdBptXhk7e5MHmTIhGAQ7CW00AOf5QnNGZMLTdeRbYBuU4k
+        k2JB5y/bKUMjE+ND5A+ATAYzhoJJ2KRKS44TvlI26eOusqo+E8jEiDdG/dG7icJ/08+E2T
+        OYXVKiDBkqejV+RNyFay36/M4me1Z1w=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-422-ephnN-pGOXiEe9kXeHs57w-1; Thu, 08 Jun 2023 05:48:01 -0400
+X-MC-Unique: ephnN-pGOXiEe9kXeHs57w-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-514b05895f7so475308a12.0
+        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 02:48:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686217533; x=1688809533;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KWfXcI9qpNRXyZ49c1qVkzQX/sqIlGyUNHOIKGAzDQA=;
-        b=VnAMV3JHdzpAQMJU6260SpIBIlG2aajNoebrUXeiqLhYiYOucXyggdTiFxTg2vR7zc
-         77fVkRxt9YzSl4ceYPbWGG08WEqi4uVndWkXrDJWz9tLoOZ1Rxu9KhXHqZbj8VLy/HzK
-         nLlY6ZhLwO1nGRQNS8WTmPgMl5OVwVKabERFa8MMB3ktIg8goJMsQVaOi7Wex+wGwOV4
-         1EgAk5RLHwgNHXiUNNy1CGm3LE2edQhjOE7sdiVBh4PIyf8qx9X1sonWGjfD7B1j6lu6
-         1l2vuFNuph/lyabQMdjy/YrE1CUPfj6uXUR0CEzvT1q0OURy6SEyuLN3JNLUK9XDKo4Q
-         CneA==
-X-Gm-Message-State: AC+VfDzeBamlQKYWvt63YKUW/+DcGcjTj65x8yDAM703QRi2vsuIjseX
-        f6mfjApxLDEdd2XHFYG6AEjF5JzIXVBbNsbb+Mo=
-X-Google-Smtp-Source: ACHHUZ5IWgmj+LEHtiTJyB5L+4nONSN43H9fR9QcrJW/5jde8UjA7NnpuuS9XpaB5O5YV3svfxnb3boBreWg1R1DcOk=
-X-Received: by 2002:a05:6808:315:b0:39a:62f7:9463 with SMTP id
- i21-20020a056808031500b0039a62f79463mr4776127oie.41.1686217532902; Thu, 08
- Jun 2023 02:45:32 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1686217680; x=1688809680;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qJkqbDxJbGuLRNFoh+RhZZol0vchzC/C3TXtJPnBQMs=;
+        b=cdM96oNlFvENpRqcO3ylPCvLWdBV3Zd7yv+5v5rlzvwb9V+2PSdvkM20g6h1XB4yIL
+         Rlb8agRatfdp7G7DBVcy6666vRBZH6HPiAw02Y2RLvSlhqqd77ZZI1geJ752efEJ38lx
+         oL4L3xF4YFZXsMz30EHbV6N6Z1+xGdmsQ+1RdooC+ZX7caunH0zhKa79Eyhv3scyg+PR
+         WiqcLupQOoAitwidAvXPc6cSw1h4IR1cubrMTsC3d8URQTCnsa967dS3uBMP4qjk5r94
+         KH9Xrana7QMyf8PsvF0cQF0IpGmnSbjtUS9aLxl4WKhWf0+pgInrShLGEFVqiUlrRbbt
+         WC3g==
+X-Gm-Message-State: AC+VfDzBQieMDDD2yrsPHpKvf4jrgRVnx3LSez6pUG3Z/P3Ra4nZZaS3
+        sgmOF9JQE8/HLbUC7mcGo3FlGLmCHYw4POrSLkqCzTuldJz9F5ApbKovIZlTS7JGZLQ+WtLYb3T
+        25YXAZAzPyeW1
+X-Received: by 2002:a17:906:fe4d:b0:969:e9ec:9a0 with SMTP id wz13-20020a170906fe4d00b00969e9ec09a0mr8201387ejb.77.1686217679953;
+        Thu, 08 Jun 2023 02:47:59 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6NJp+wlr+w+M7l9N5lK1cvOGgUHySBO4evePM0JMqeGlWTtsRtzk3HhVko4gsZJNpXU4WPjA==
+X-Received: by 2002:a17:906:fe4d:b0:969:e9ec:9a0 with SMTP id wz13-20020a170906fe4d00b00969e9ec09a0mr8201367ejb.77.1686217679599;
+        Thu, 08 Jun 2023 02:47:59 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-25-111.business.telecomitalia.it. [87.12.25.111])
+        by smtp.gmail.com with ESMTPSA id t7-20020a1c7707000000b003f6cf9afc25sm4641635wmi.40.2023.06.08.02.47.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jun 2023 02:47:59 -0700 (PDT)
+Date:   Thu, 8 Jun 2023 11:47:56 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Shannon Nelson <shannon.nelson@amd.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+        Tiwei Bie <tiwei.bie@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost-vdpa: filter VIRTIO_F_RING_PACKED feature
+Message-ID: <t6ci7ek54zwss2w3kxaduirfi7vp5df5ydjxjlnr5fhv4ji3c5@aw26xy66pjc7>
+References: <20230606085643-mutt-send-email-mst@kernel.org>
+ <CAGxU2F7fkgL-HpZdj=5ZEGNWcESCHQpgRAYQA3W2sPZaoEpNyQ@mail.gmail.com>
+ <20230607054246-mutt-send-email-mst@kernel.org>
+ <CACGkMEuUapKvUYiJiLwtsN+x941jafDKS9tuSkiNrvkrrSmQkg@mail.gmail.com>
+ <20230608020111-mutt-send-email-mst@kernel.org>
+ <CACGkMEt4=3BRVNX38AD+mJU8v3bmqO-CdNj5NkFP-SSvsuy2Hg@mail.gmail.com>
+ <5giudxjp6siucr4l3i4tggrh2dpqiqhhihmdd34w3mq2pm5dlo@mrqpbwckpxai>
+ <CACGkMEtqn1dbrQZn3i-W_7sVikY4sQjwLRC5xAhMnyqkc3jwOw@mail.gmail.com>
+ <lw3nmkdszqo6jjtneyp4kjlmutooozz7xj2fqyxgh4v2ralptc@vkimgnbfafvi>
+ <CACGkMEt1yRV9qOLBqtQQmJA_UoRLCpznT=Gvd5D51Uaz2jakHA@mail.gmail.com>
 MIME-Version: 1.0
-References: <cover.1684999824.git.haibo1.xu@intel.com> <da390e6200e838fce320a2a43b2f87951b4e0bbb.1684999824.git.haibo1.xu@intel.com>
- <20230525-2bab5376987792eab73507ac@orel>
-In-Reply-To: <20230525-2bab5376987792eab73507ac@orel>
-From:   Haibo Xu <xiaobo55x@gmail.com>
-Date:   Thu, 8 Jun 2023 17:45:21 +0800
-Message-ID: <CAJve8okR_iH4vF9DV9zTkDaeYe25kP7KUcKQphmjG5q-iVb-KA@mail.gmail.com>
-Subject: Re: [PATCH v2 11/11] KVM: riscv: selftests: Add get-reg-list test
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org,
-        oliver.upton@linux.dev, seanjc@google.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        UPPERCASE_50_75 autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEt1yRV9qOLBqtQQmJA_UoRLCpznT=Gvd5D51Uaz2jakHA@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 26, 2023 at 1:18=E2=80=AFAM Andrew Jones <ajones@ventanamicro.c=
-om> wrote:
+On Thu, Jun 08, 2023 at 05:29:58PM +0800, Jason Wang wrote:
+>On Thu, Jun 8, 2023 at 5:21 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> On Thu, Jun 08, 2023 at 05:00:00PM +0800, Jason Wang wrote:
+>> >On Thu, Jun 8, 2023 at 4:00 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>> >>
+>> >> On Thu, Jun 08, 2023 at 03:46:00PM +0800, Jason Wang wrote:
+>> >>
+>> >> [...]
+>> >>
+>> >> >> > > > > I have a question though, what if down the road there
+>> >> >> > > > > is a new feature that needs more changes? It will be
+>> >> >> > > > > broken too just like PACKED no?
+>> >> >> > > > > Shouldn't vdpa have an allowlist of features it knows how
+>> >> >> > > > > to support?
+>> >> >> > > >
+>> >> >> > > > It looks like we had it, but we took it out (by the way, we were
+>> >> >> > > > enabling packed even though we didn't support it):
+>> >> >> > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6234f80574d7569444d8718355fa2838e92b158b
+>> >> >> > > >
+>> >> >> > > > The only problem I see is that for each new feature we have to modify
+>> >> >> > > > the kernel.
+>> >> >> > > > Could we have new features that don't require handling by vhost-vdpa?
+>> >> >> > > >
+>> >> >> > > > Thanks,
+>> >> >> > > > Stefano
+>> >> >> > >
+>> >> >> > > Jason what do you say to reverting this?
+>> >> >> >
+>> >> >> > I may miss something but I don't see any problem with vDPA core.
+>> >> >> >
+>> >> >> > It's the duty of the parents to advertise the features it has. For example,
+>> >> >> >
+>> >> >> > 1) If some kernel version that is packed is not supported via
+>> >> >> > set_vq_state, parents should not advertise PACKED features in this
+>> >> >> > case.
+>> >> >> > 2) If the kernel has support packed set_vq_state(), but it's emulated
+>> >> >> > cvq doesn't support, parents should not advertise PACKED as well
+>> >> >> >
+>> >> >> > If a parent violates the above 2, it looks like a bug of the parents.
+>> >> >> >
+>> >> >> > Thanks
+>> >> >>
+>> >> >> Yes but what about vhost_vdpa? Talking about that not the core.
+>> >> >
+>> >> >Not sure it's a good idea to workaround parent bugs via vhost-vDPA.
+>> >>
+>> >> Sorry, I'm getting lost...
+>> >> We were talking about the fact that vhost-vdpa doesn't handle
+>> >> SET_VRING_BASE/GET_VRING_BASE ioctls well for packed virtqueue before
+>> >> that series [1], no?
+>> >>
+>> >> The parents seem okay, but maybe I missed a few things.
+>> >>
+>> >> [1] https://lore.kernel.org/virtualization/20230424225031.18947-1-shannon.nelson@amd.com/
+>> >
+>> >Yes, more below.
+>> >
+>> >>
+>> >> >
+>> >> >> Should that not have a whitelist of features
+>> >> >> since it interprets ioctls differently depending on this?
+>> >> >
+>> >> >If there's a bug, it might only matter the following setup:
+>> >> >
+>> >> >SET_VRING_BASE/GET_VRING_BASE + VDUSE.
+>> >> >
+>> >> >This seems to be broken since VDUSE was introduced. If we really want
+>> >> >to backport something, it could be a fix to filter out PACKED in
+>> >> >VDUSE?
+>> >>
+>> >> mmm it doesn't seem to be a problem in VDUSE, but in vhost-vdpa.
+>> >> I think VDUSE works fine with packed virtqueue using virtio-vdpa
+>> >> (I haven't tried), so why should we filter PACKED in VDUSE?
+>> >
+>> >I don't think we need any filtering since:
+>> >
+>> >PACKED features has been advertised to userspace via uAPI since
+>> >6234f80574d7569444d8718355fa2838e92b158b. Once we relax in uAPI, it
+>> >would be very hard to restrict it again. For the userspace that tries
+>> >to negotiate PACKED:
+>> >
+>> >1) if it doesn't use SET_VRING_BASE/GET_VRING_BASE, everything works well
+>> >2) if it uses SET_VRING_BASE/GET_VRING_BASE. it might fail or break silently
+>> >
+>> >If we backport the fixes to -stable, we may break the application at
+>> >least in the case 1).
+>>
+>> Okay, I see now, thanks for the details!
+>>
+>> Maybe instead of "break silently", we can return an explicit error for
+>> SET_VRING_BASE/GET_VRING_BASE in stable branches.
+>> But if there are not many cases, we can leave it like that.
+>
+>A second thought, if we need to do something for stable. is it better
+>if we just backport Shannon's series to stable?
+
+I tried to look at it, but it looks like we have to backport quite a few
+patches, I wrote a few things here:
+
+https://lore.kernel.org/virtualization/32ejjuvhvcicv7wjuetkv34qtlpa657n4zlow4eq3fsi2twozk@iqnd2t5tw2an/
+
+But if you think it's the best way, though, we can take a better look
+at how many patches are to backport and whether it's risky or not.
+
+>
+>>
+>> I was just concerned about how does the user space understand that it
+>> can use SET_VRING_BASE/GET_VRING_BASE for PACKED virtqueues in a given
+>> kernel or not.
+>
+>My understanding is that if packed is advertised, the application
+>should assume SET/GET_VRING_BASE work.
 >
 
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CORE | KVM_REG_R=
-ISCV_CORE_REG(mode),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
-SCV_CSR_REG(sstatus),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
-SCV_CSR_REG(sie),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
-SCV_CSR_REG(stvec),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
-SCV_CSR_REG(sscratch),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
-SCV_CSR_REG(sepc),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
-SCV_CSR_REG(scause),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
-SCV_CSR_REG(stval),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
-SCV_CSR_REG(sip),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
-SCV_CSR_REG(satp),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_CSR | KVM_REG_RI=
-SCV_CSR_REG(scounteren),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_=
-RISCV_TIMER_REG(frequency),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_=
-RISCV_TIMER_REG(time),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_=
-RISCV_TIMER_REG(compare),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_=
-RISCV_TIMER_REG(state),
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
-SCV_ISA_EXT_A,
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
-SCV_ISA_EXT_C,
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
-SCV_ISA_EXT_D,
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
-SCV_ISA_EXT_F,
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
-SCV_ISA_EXT_H,
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
-SCV_ISA_EXT_I,
-> > +     KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_ISA_EXT | KVM_RI=
-SCV_ISA_EXT_M,
->
-> I think all the above should have the size KVM_REG_SIZE_ULONG. Please als=
-o
-> test with a 32-bit host.
->
+Same here. So as an alternative to backporting a large set of patches,
+I proposed to completely disable packed for stable branches where
+vhost-vdpa IOCTLs doesn't support them very well.
 
-Hi Andrew,
+Thanks,
+Stefano
 
-Just noticed the RISC-V 32-bit kvm selftests was not supported currently.
-Even though I tried to remove the below check for 32-bit, there were
-still many warning and error messages during compiling.
-It seems 32-bit KVM selftests was not supported either for ARM/x86. Do
-we have a plan to support it on risc-v?
-
-Regards,
-Haibo
-
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h
-b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index ac4aaa21deee..a32ccc06435b 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -205,9 +205,9 @@ extern enum vm_guest_mode vm_mode_default;
-
- #elif defined(__riscv)
-
--#if __riscv_xlen =3D=3D 32
--#error "RISC-V 32-bit kvm selftests not supported"
--#endif
-+//#if __riscv_xlen =3D=3D 32
-+//#error "RISC-V 32-bit kvm selftests not supported"
-+//#endif
-
->
-> Thanks,
-> drew
