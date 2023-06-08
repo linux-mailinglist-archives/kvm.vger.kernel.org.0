@@ -2,76 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A3CC4728A51
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 23:38:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55276728A5B
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 23:41:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235612AbjFHViI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 17:38:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39202 "EHLO
+        id S229829AbjFHVlq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 17:41:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234340AbjFHViH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 17:38:07 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B29C12D7B
-        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 14:38:05 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4f619c2ba18so1338784e87.1
-        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 14:38:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google; t=1686260284; x=1688852284;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jptUUroiLQfnhvX6xuvSOB6GWKC0IUevkabzP7688Xw=;
-        b=ki/0goVXuxBLZwZqhEP2LNlL+ZfMUqYKfpyedOsYjIKx1EealYljoV/T3mBfp4F/zC
-         OtG4j/fDIEwFqdKxTMVw1j7gkFg23S3PjO2Zk8wpRXlnTU97g9K9jdk/ksrx/f+5xoRF
-         GpWJYjc+l0uNzkwz77gG0uUl6Amq8IB9QAB0Ibs42kT65gqymyICD62FApqx4giZxUHp
-         S9WbmiyonPJnsS8YNv0PlEAEeA7XYO/f/pmmewv7DzgPN2kGLBbwRwwfs0tnwB+4mrXC
-         8AMnw9NwjZlyWNS84XOpcrlm0Are9r+kMqaEz3pQ9tUQH1v4K9MrcA472Y/5onSOM8Pj
-         2gAQ==
+        with ESMTP id S229632AbjFHVln (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 17:41:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E155B2D7B
+        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 14:40:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686260456;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=th2bvhX62hzxRrLB1ybsAs0POe7Ojvtoj9i9GhxJpv4=;
+        b=MNeICA5NpSs/CJVXIw4cZw/kuqN1A0cW88ic4bAMkWIRmsBGcLaElJ0sGzVKBLYJkbU0Z+
+        UgipIXRVOoPcI90nL3AgJumN/AHvI6LYFVr02FF1f700DYWe7ueoNuRGGsfgVvUkNJsalB
+        GyKSgb8FG+SH7hS8acW9vBOrpd1R5xw=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-161-c60qRvT6NriieFpQTc7s3g-1; Thu, 08 Jun 2023 17:40:54 -0400
+X-MC-Unique: c60qRvT6NriieFpQTc7s3g-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-77ad4f28a23so71452839f.3
+        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 14:40:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686260284; x=1688852284;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jptUUroiLQfnhvX6xuvSOB6GWKC0IUevkabzP7688Xw=;
-        b=BusZjLGbnlxP8Xu1hUQe6l2Bf6SQ763JFmc/VE0q7bm4OWkpgXS8HlXh090SWqnFxb
-         iKkpNlPgrybyujReqtvG0dmWNvH/bivRmb7TiNjsCT2AjuoqOSZWm5Gz9mNjiPn64r6U
-         LYFF9FyONNjtk3LEOMne/EFKxdY6cYlMdlJLOMYOha/Gl77z3EoALHbA0vf/jvWz1ISB
-         nZk8akH/WvBVAD5aKYZbME0hGnwQEoy1lvdss9VQ5MRidJAYv+pd83qOMUkKggPwdRXR
-         yMwrNTatPgwRNuRH7v5kaTCoW9BVlelZrJ33zpDE4Jg2rtvs4xmFhXMipE5N8MlDoggs
-         kdjA==
-X-Gm-Message-State: AC+VfDy+yPTxjpp3J6BBU3Qn706p/R2BKG6vWtd+fzlWxzvz5pQ2YsA0
-        XO/dwzGpp6QZp9JpDb+ISSKmOQ==
-X-Google-Smtp-Source: ACHHUZ5XQ6R3FGG7WoFwU/xErS0wYzuU2dRsvrSZ4zP2pB1fiUHfH7POydtDgGF61atpnqiQjQhHVQ==
-X-Received: by 2002:a19:e307:0:b0:4f6:4f9a:706e with SMTP id a7-20020a19e307000000b004f64f9a706emr157792lfh.15.1686260283911;
-        Thu, 08 Jun 2023 14:38:03 -0700 (PDT)
-Received: from [10.43.1.253] ([83.142.187.84])
-        by smtp.gmail.com with ESMTPSA id w11-20020ac2598b000000b004f252f48e5fsm312307lfn.40.2023.06.08.14.38.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jun 2023 14:38:03 -0700 (PDT)
-Message-ID: <75a6b0b3-156b-9648-582b-27a9aaf92ef1@semihalf.com>
-Date:   Thu, 8 Jun 2023 23:38:01 +0200
+        d=1e100.net; s=20221208; t=1686260454; x=1688852454;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=th2bvhX62hzxRrLB1ybsAs0POe7Ojvtoj9i9GhxJpv4=;
+        b=Z/yMUqT6Pag7ESuNzyrcOQr8UXzSv6n3g3fP7UA1W1c8mh8n/pM+iZjgQ/wMLIztog
+         D7J5Yp05dZsmtrgW27HtVgXMDCDxIrrpxcD/62RA88jXh9W9E02T9cYObiEYd4QWeAEH
+         U1LZMxaFGxGgSIWUkjAlwEXK+MkVu/1lQwCh/SCPWm3FHyTwQ3mni8AhvR5YzrEcMOjf
+         yNhfnvX9J4Xp2XaDkLSuVuK8yTo5vJgc3mXG17fZOYjqXCFyhg26lqTSMcz3EYcy7R/n
+         o+Y8vXxYWwHHoLROI9SOZlT1JYMwnLHsQ4V1HmQfMU9yFDeOa6mFuMp7qnRibm+XEv6y
+         VqPQ==
+X-Gm-Message-State: AC+VfDxapltl0FDUf09WijJPvL/Qi5f8AU6YSFyFPtTUkWXCQl20XhU9
+        ii6oU4Bj6gOXBw/lgBfoOwOmhMf6QYV22J5Ide1G94My1Ik7fuhZ4APuRWP4RPZCXpWdZ3UKHoC
+        Slk4iLqevz8VT
+X-Received: by 2002:a5e:8345:0:b0:777:ab8e:7039 with SMTP id y5-20020a5e8345000000b00777ab8e7039mr7756620iom.15.1686260454145;
+        Thu, 08 Jun 2023 14:40:54 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6UUVLC5rbROJu7mWqoujxWOhqO8BOzy7CP85v3updJvqBKZ/ov8Q2c1LG3o15l/VOOm831qQ==
+X-Received: by 2002:a5e:8345:0:b0:777:ab8e:7039 with SMTP id y5-20020a5e8345000000b00777ab8e7039mr7756585iom.15.1686260453798;
+        Thu, 08 Jun 2023 14:40:53 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id h2-20020a02cd22000000b00420cda3fd2esm510972jaq.155.2023.06.08.14.40.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jun 2023 14:40:53 -0700 (PDT)
+Date:   Thu, 8 Jun 2023 15:40:51 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, kevin.tian@intel.com, joro@8bytes.org,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
+        clegoate@redhat.com
+Subject: Re: [PATCH v7 4/9] iommufd: Add iommufd_ctx_has_group()
+Message-ID: <20230608154051.0f0e4449.alex.williamson@redhat.com>
+In-Reply-To: <20230602121515.79374-5-yi.l.liu@intel.com>
+References: <20230602121515.79374-1-yi.l.liu@intel.com>
+        <20230602121515.79374-5-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [RFC PATCH part-5 00/22] VMX emulation
-To:     Jason Chen CJ <jason.cj.chen@intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, android-kvm@google.com,
-        Dmitry Torokhov <dtor@chromium.org>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Grzegorz Jaszczyk <jaz@semihalf.com>,
-        Keir Fraser <keirf@google.com>
-References: <20230312180303.1778492-1-jason.cj.chen@intel.com>
- <ZA9WM3xA6Qu5Q43K@google.com> <ZBCg6Ql1/hdclfDd@jiechen-ubuntu-dev>
-Content-Language: en-US
-From:   Dmytro Maluka <dmy@semihalf.com>
-In-Reply-To: <ZBCg6Ql1/hdclfDd@jiechen-ubuntu-dev>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,77 +88,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/14/23 17:29, Jason Chen CJ wrote:
-> On Mon, Mar 13, 2023 at 09:58:27AM -0700, Sean Christopherson wrote:
->> On Mon, Mar 13, 2023, Jason Chen CJ wrote:
->>> This patch set is part-5 of this RFC patches. It introduces VMX
->>> emulation for pKVM on Intel platform.
->>>
->>> Host VM wants the capability to run its guest, it needs VMX support.
->>
->> No, the host VM only needs a way to request pKVM to run a VM.  If we go down the
->> rabbit hole of pKVM on x86, I think we should take the red pill[*] and go all the
->> way down said rabbit hole by heavily paravirtualizing the KVM=>pKVM interface.
+On Fri,  2 Jun 2023 05:15:10 -0700
+Yi Liu <yi.l.liu@intel.com> wrote:
+
+> This adds the helper to check if any device within the given iommu_group
+> has been bound with the iommufd_ctx. This is helpful for the checking on
+> device ownership for the devices which have not been bound but cannot be
+> bound to any other iommufd_ctx as the iommu_group has been bound.
 > 
-> hi, Sean,
+> Tested-by: Terrence Xu <terrence.xu@intel.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/iommu/iommufd/device.c | 30 ++++++++++++++++++++++++++++++
+>  include/linux/iommufd.h        |  8 ++++++++
+>  2 files changed, 38 insertions(+)
 > 
-> Like I mentioned in the reply for "[RFC PATCH part-1 0/5] pKVM on Intel
-> Platform Introduction", we hope VMX emulation can be there at least for
-> normal VM support.
-> 
->>
->> Except for VMCALL vs. VMMCALL, it should be possible to eliminate all traces of
->> VMX and SVM from the interface.  That means no VMCS emulation, no EPT shadowing,
->> etc.  As a bonus, any paravirt stuff we do for pKVM x86 would also be usable for
->> KVM-on-KVM nested virtualization.
->>
->> E.g. an idea floating around my head is to add a paravirt paging interface for
->> KVM-on-KVM so that L1's (KVM-high in this RFC) doesn't need to maintain its own
->> TDP page tables.  I haven't pursued that idea in any real capacity since most
->> nested virtualization use cases for KVM involve running an older L1 kernel and/or
->> a non-KVM L1 hypervisor, i.e. there's no concrete use case to justify the development
->> and maintenance cost.  But if the PV code is "needed" by pKVM anyways...
-> 
-> Yes, I agree, we could have performance & mem cost benefit by using
-> paravirt stuff for KVM-on-KVM nested virtualization. May I know do I
-> miss other benefit you saw?
+> diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
+> index 4f9b2142274c..4571344c8508 100644
+> --- a/drivers/iommu/iommufd/device.c
+> +++ b/drivers/iommu/iommufd/device.c
+> @@ -98,6 +98,36 @@ struct iommufd_device *iommufd_device_bind(struct iommufd_ctx *ictx,
+>  }
+>  EXPORT_SYMBOL_NS_GPL(iommufd_device_bind, IOMMUFD);
+>  
+> +/**
+> + * iommufd_ctx_has_group - True if any device within the group is bound
+> + *                         to the ictx
+> + * @ictx: iommufd file descriptor
+> + * @group: Pointer to a physical iommu_group struct
+> + *
+> + * True if any device within the group has been bound to this ictx, ex. via
+> + * iommufd_device_bind(), therefore implying ictx ownership of the group.
+> + */
+> +bool iommufd_ctx_has_group(struct iommufd_ctx *ictx, struct iommu_group *group)
+> +{
+> +	struct iommufd_object *obj;
+> +	unsigned long index;
+> +
+> +	if (!ictx || !group)
+> +		return false;
+> +
+> +	xa_lock(&ictx->objects);
+> +	xa_for_each(&ictx->objects, index, obj) {
+> +		if (obj->type == IOMMUFD_OBJ_DEVICE &&
+> +		    container_of(obj, struct iommufd_device, obj)->group == group) {
+> +			xa_unlock(&ictx->objects);
+> +			return true;
+> +		}
+> +	}
+> +	xa_unlock(&ictx->objects);
+> +	return false;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(iommufd_ctx_has_group, IOMMUFD);
+> +
+>  /**
+>   * iommufd_device_unbind - Undo iommufd_device_bind()
+>   * @idev: Device returned by iommufd_device_bind()
+> diff --git a/include/linux/iommufd.h b/include/linux/iommufd.h
+> index 1129a36a74c4..33fe57e95e42 100644
+> --- a/include/linux/iommufd.h
+> +++ b/include/linux/iommufd.h
+> @@ -16,6 +16,7 @@ struct page;
+>  struct iommufd_ctx;
+>  struct iommufd_access;
+>  struct file;
+> +struct iommu_group;
+>  
+>  struct iommufd_device *iommufd_device_bind(struct iommufd_ctx *ictx,
+>  					   struct device *dev, u32 *id);
+> @@ -50,6 +51,7 @@ void iommufd_ctx_get(struct iommufd_ctx *ictx);
+>  #if IS_ENABLED(CONFIG_IOMMUFD)
+>  struct iommufd_ctx *iommufd_ctx_from_file(struct file *file);
+>  void iommufd_ctx_put(struct iommufd_ctx *ictx);
+> +bool iommufd_ctx_has_group(struct iommufd_ctx *ictx, struct iommu_group *group);
+>  
+>  int iommufd_access_pin_pages(struct iommufd_access *access, unsigned long iova,
+>  			     unsigned long length, struct page **out_pages,
+> @@ -71,6 +73,12 @@ static inline void iommufd_ctx_put(struct iommufd_ctx *ictx)
+>  {
+>  }
+>  
+> +static inline bool iommufd_ctx_has_group(struct iommufd_ctx *ictx,
+> +					 struct iommu_group *group)
+> +{
+> +	return false;
+> +}
+> +
+>  static inline int iommufd_access_pin_pages(struct iommufd_access *access,
+>  					   unsigned long iova,
+>  					   unsigned long length,
 
-As I see it, the advantages of a PV design for pKVM are:
+It looks like the v12 cdev series no longer requires this stub?  We
+haven't used this function except from iommufd specific code since v5.
+Thanks,
 
-- performance
-- memory cost
-- code simplicity (of the pKVM hypervisor, first of all)
-- better alignment with the pKVM on ARM
+Alex
 
-Regarding performance, I actually suspect it may even be the least significant
-of the above. I guess with a PV design we'd have roughly as many extra vmexits
-as we have now (just due to hypercalls instead of traps on emulated VMX
-instructions etc), so perhaps the performance improvement would be not as big
-as we might expect (am I wrong?).
-
-But the memory cost advantage seems to be very attractive. With the emulated
-design pKVM needs to maintain shadow page tables (and other shadow structures
-too, but page tables are the most memory demanding). Moreover, the number of
-shadow page tables is obviously proportional to the number of VMs running, and
-since pKVM reserves all its memory upfront preparing for the worst case, we
-have pretty restrictive limits on the maximum number of VMs [*] (and if we run
-fewer VMs than this limit, we waste memory).
-
-To give some numbers, on a machine with 8GB of RAM, on ChromeOS with this
-pKVM-on-x86 PoC currently we have pKVM memory cost of 229MB (and it only allows
-up to 10 VMs running simultaneously), while on Android (ARM) it is afaik only
-44MB. According to my analysis, if we get rid of all the shadow tables in pKVM,
-we should have 44MB on x86 too (regardless of the maximum number of VMs).
-
-[*] And some other limits too, e.g. on the maximum number of DMA-capable
-devices, since pKVM also needs shadow IOMMU page tables if we have only 1-stage
-IOMMU.
-
-> 
->>
->> [*] You take the blue pill, the story ends, you wake up in your bed and believe
->>     whatever you want to believe. You take the red pill, you stay in wonderland,
->>     and I show you how deep the rabbit hole goes.
->>
->>     -Morpheus
-> 
