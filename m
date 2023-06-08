@@ -2,60 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4ED27275B3
+	by mail.lfdr.de (Postfix) with ESMTP id 262727275B1
 	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 05:25:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234055AbjFHDZM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 23:25:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34572 "EHLO
+        id S233648AbjFHDZR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 23:25:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234074AbjFHDYx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 23:24:53 -0400
-Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 590032696
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 20:24:52 -0700 (PDT)
-Received: by mail-oo1-xc29.google.com with SMTP id 006d021491bc7-559b0ddcd4aso105351eaf.0
-        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 20:24:52 -0700 (PDT)
+        with ESMTP id S234117AbjFHDZB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 23:25:01 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5474926A2
+        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 20:24:56 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-25669acf1b0so123722a91.0
+        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 20:24:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686194691; x=1688786691;
+        d=gmail.com; s=20221208; t=1686194695; x=1688786695;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3v5N2Gk/tK5Dqm+6ABW1i0aRZErobVuh2y73QQLA8DA=;
-        b=IZ+1xuk2Et+yIaWvje2+vuvg7PBWGy5k/xKqQk5mltdMS4ldReJ7L/8OQDFov3M6gq
-         i/bOCkKzV+LVT0oG4u9Fa7oqxh4P+fio8c9cF1+blPoWf92m58X4+uj32vMBb7gpaGQs
-         vl2OubVnUtr4KOW+X+S82mWkjcnxFNnF30kvduQp5w2UlMt3NB9Rrws7/cxjcZETdVbx
-         c005UuAwaTUDl41AOeu1wWnwUqO81jHwnhb+z6fKGpSY8KyAA9KjqfBmu8LuOe9P35k5
-         R1APwNwR6cZlTOtwYYze+aiz45G1STlj52oC86rc4hO43b5StCAowPkEoJP4VW4WcfaB
-         UrXA==
+        bh=mtkn8MG1l6d0rnDrKg50x+C49aCaIkLucrOXa80nT/k=;
+        b=V3stYaLM6PVapxKi5aRX9P/lJi1xylmQzw3KYmDO7XEzUlPyt1stDvmmVOh/a5fNFQ
+         z/vRjEJ/P+q+jOYfp2z7FVumostFaXImY8n9qisiuTSpXyGkarykZtwzHjSpsErE3lUL
+         5FfLwaKjztr8oLBJxbbE0in/s8pQm+0nx3UehpRJSIwnQChrrBeZdIgCtEQrQzx9UBuy
+         T4neAPWs0Q+mBauXMQHi82s8HUaqNp3LTSEWetsXt7PPQea/R7sMQ+rjj+ZW9jnuFZeD
+         4vkTyinNiNgDSLjTjkCpri+rBhKPuL2pEFUMWuURiXB+yAQ8jn4zjRNrwL0MEID2CzDq
+         JNcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686194691; x=1688786691;
+        d=1e100.net; s=20221208; t=1686194695; x=1688786695;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3v5N2Gk/tK5Dqm+6ABW1i0aRZErobVuh2y73QQLA8DA=;
-        b=Jpi9OMWA7CWEx7jXgmZvGlcysdXXT+S2QZiEphNoo9JjrDh1DBdJV+JRQ+4QYq4hic
-         uYwh6xJqZKIAAOJ0Z516Qmre+Og1tALZ4ykrCMFqwUan5SMqfJWJt/S4Vy2aXEBbcPX+
-         CQ/DIRT+gN/4v7mFItTXIBZWWBhET68UQgs5ml/8JLOEO6UmGKUEZILdQWNuh7XEeesL
-         LQNO6Ierxy0K9nbqXrSDCEy8reyU35GL+hVHNAkZR61MRvli7n8sgYtx7tHbTmfUGCti
-         846wBK8TW7nHS+nAifQz10/ExyEhKYIWxQEKG113y+V9ktL5iUHwqbRLuNCc53HnwcHm
-         AMDg==
-X-Gm-Message-State: AC+VfDwwXFH9ihauIMy7ex+ZleA6R3K6O5vthjJvaRoYzSunm3zQMQoz
-        SUoJ2d7HCjF9kNc9Cu7thuYRJ7BhltI=
-X-Google-Smtp-Source: ACHHUZ5o+e8ue7wuHb9eVXQby1L7Zndb4Fuw4DizRxGk+rlHYuzENWN0b42aAhY3rjEHq8COTJYSUw==
-X-Received: by 2002:a05:6808:11a:b0:398:132b:7462 with SMTP id b26-20020a056808011a00b00398132b7462mr6606689oie.54.1686194691127;
-        Wed, 07 Jun 2023 20:24:51 -0700 (PDT)
+        bh=mtkn8MG1l6d0rnDrKg50x+C49aCaIkLucrOXa80nT/k=;
+        b=Wz3GP7U2g/pmbmOXrGi9l/A0+s3ZPHa5Tw6HBkpgNFYnOEQFUGJk0UChFUGZTVQlq5
+         3T/4D4ptuMlA/c+MK0hQsQWbXbhyLkQIBoF1GpvjHgfKovd2kWOMXD6HX/8MEcLU+b92
+         R/wwP49tbCN9KvO5ew1+G0NJ0KXAY99jjDcjdFljN+nrpOApp33FoPcuAmRM+dNrSEir
+         PxKoU0UWKe4oIRE7gXk6BfcsdpAFiHQmj5CK9M9mAYCgRcuKf+g574zcW4aYq2ZLLA+x
+         R70Pd/AjANI5dgmHQ8LDIeTw9a6Xw1sWF7TPw5VURQK39s3d+AOigOaOgf8sSUaG5TWW
+         uMPQ==
+X-Gm-Message-State: AC+VfDytdtINPhZOxc5qXeFlkxVOO/NYuvtEooIlMX9ir056KwuTY+ZJ
+        cT/VTTntA0Qo8MD/vXF4osnUgTnZgE4=
+X-Google-Smtp-Source: ACHHUZ6Ux01aJrb26kNNuYZTHJe9RtcE09reTQxW8rVOcqTYksMpZ22HkHCycmfnzX2MS6V2yty44w==
+X-Received: by 2002:a17:90a:a42:b0:259:224a:9cf9 with SMTP id o60-20020a17090a0a4200b00259224a9cf9mr6677604pjo.36.1686194695062;
+        Wed, 07 Jun 2023 20:24:55 -0700 (PDT)
 Received: from wheely.local0.net (58-6-224-112.tpgi.com.au. [58.6.224.112])
-        by smtp.gmail.com with ESMTPSA id s12-20020a17090a5d0c00b0025930e50e28sm2015629pji.41.2023.06.07.20.24.47
+        by smtp.gmail.com with ESMTPSA id s12-20020a17090a5d0c00b0025930e50e28sm2015629pji.41.2023.06.07.20.24.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jun 2023 20:24:50 -0700 (PDT)
+        Wed, 07 Jun 2023 20:24:54 -0700 (PDT)
 From:   Nicholas Piggin <npiggin@gmail.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: [PATCH v3 4/6] KVM: PPC: selftests: add selftests sanity tests
-Date:   Thu,  8 Jun 2023 13:24:23 +1000
-Message-Id: <20230608032425.59796-5-npiggin@gmail.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v3 5/6] KVM: PPC: selftests: Add a TLBIEL virtualisation tester
+Date:   Thu,  8 Jun 2023 13:24:24 +1000
+Message-Id: <20230608032425.59796-6-npiggin@gmail.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230608032425.59796-1-npiggin@gmail.com>
 References: <20230608032425.59796-1-npiggin@gmail.com>
@@ -71,59 +70,219 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add tests that exercise very basic functions of the kvm selftests
-framework, guest creation, ucalls, hcalls, copying data between guest
-and host, interrupts and page faults.
+TLBIEL virtualisation has been a source of difficulty. The TLBIEL
+instruction operates on the TLB of the hardware thread which
+executes it, but the behaviour expected by the guest environment
 
-These don't stress KVM so much as being useful when developing support
-for powerpc.
-
-Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- tools/testing/selftests/kvm/Makefile          |   2 +
- .../selftests/kvm/include/powerpc/hcall.h     |   2 +
- .../testing/selftests/kvm/powerpc/null_test.c | 166 ++++++++++++++++++
- .../selftests/kvm/powerpc/rtas_hcall.c        | 136 ++++++++++++++
- 4 files changed, 306 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/powerpc/null_test.c
- create mode 100644 tools/testing/selftests/kvm/powerpc/rtas_hcall.c
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/powerpc/processor.h |   7 +
+ .../selftests/kvm/lib/powerpc/processor.c     | 108 +++-
+ .../selftests/kvm/powerpc/tlbiel_test.c       | 508 ++++++++++++++++++
+ 4 files changed, 621 insertions(+), 3 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/powerpc/tlbiel_test.c
 
 diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 53cd3ce63dec..efb8700b9752 100644
+index efb8700b9752..aa3a8ca676c2 100644
 --- a/tools/testing/selftests/kvm/Makefile
 +++ b/tools/testing/selftests/kvm/Makefile
-@@ -184,6 +184,8 @@ TEST_GEN_PROGS_riscv += kvm_page_table_test
- TEST_GEN_PROGS_riscv += set_memory_region_test
- TEST_GEN_PROGS_riscv += kvm_binary_stats_test
+@@ -186,6 +186,7 @@ TEST_GEN_PROGS_riscv += kvm_binary_stats_test
  
-+TEST_GEN_PROGS_powerpc += powerpc/null_test
-+TEST_GEN_PROGS_powerpc += powerpc/rtas_hcall
+ TEST_GEN_PROGS_powerpc += powerpc/null_test
+ TEST_GEN_PROGS_powerpc += powerpc/rtas_hcall
++TEST_GEN_PROGS_powerpc += powerpc/tlbiel_test
  TEST_GEN_PROGS_powerpc += access_tracking_perf_test
  TEST_GEN_PROGS_powerpc += demand_paging_test
  TEST_GEN_PROGS_powerpc += dirty_log_test
-diff --git a/tools/testing/selftests/kvm/include/powerpc/hcall.h b/tools/testing/selftests/kvm/include/powerpc/hcall.h
-index ba119f5a3fef..04c7d2d13020 100644
---- a/tools/testing/selftests/kvm/include/powerpc/hcall.h
-+++ b/tools/testing/selftests/kvm/include/powerpc/hcall.h
-@@ -12,6 +12,8 @@
- #define UCALL_R4_UCALL	0x5715 // regular ucall, r5 contains ucall pointer
- #define UCALL_R4_SIMPLE	0x0000 // simple exit usable by asm with no ucall data
+diff --git a/tools/testing/selftests/kvm/include/powerpc/processor.h b/tools/testing/selftests/kvm/include/powerpc/processor.h
+index ce5a23525dbd..92ef6476a9ef 100644
+--- a/tools/testing/selftests/kvm/include/powerpc/processor.h
++++ b/tools/testing/selftests/kvm/include/powerpc/processor.h
+@@ -7,6 +7,7 @@
  
-+#define H_RTAS		0xf000
+ #include <linux/compiler.h>
+ #include "ppc_asm.h"
++#include "kvm_util_base.h"
+ 
+ extern unsigned char __interrupts_start[];
+ extern unsigned char __interrupts_end[];
+@@ -31,6 +32,12 @@ struct ex_regs {
+ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+ 			void (*handler)(struct ex_regs *));
+ 
++vm_paddr_t virt_pt_duplicate(struct kvm_vm *vm);
++void set_radix_proc_table(struct kvm_vm *vm, int pid, vm_paddr_t pgd);
++bool virt_wrprotect_pte(struct kvm_vm *vm, uint64_t gva);
++bool virt_wrenable_pte(struct kvm_vm *vm, uint64_t gva);
++bool virt_remap_pte(struct kvm_vm *vm, uint64_t gva, vm_paddr_t gpa);
 +
- int64_t hcall0(uint64_t token);
- int64_t hcall1(uint64_t token, uint64_t arg1);
- int64_t hcall2(uint64_t token, uint64_t arg1, uint64_t arg2);
-diff --git a/tools/testing/selftests/kvm/powerpc/null_test.c b/tools/testing/selftests/kvm/powerpc/null_test.c
+ static inline void cpu_relax(void)
+ {
+ 	asm volatile("" ::: "memory");
+diff --git a/tools/testing/selftests/kvm/lib/powerpc/processor.c b/tools/testing/selftests/kvm/lib/powerpc/processor.c
+index 02db2ff86da8..17ea440f9026 100644
+--- a/tools/testing/selftests/kvm/lib/powerpc/processor.c
++++ b/tools/testing/selftests/kvm/lib/powerpc/processor.c
+@@ -23,7 +23,7 @@ static void set_proc_table(struct kvm_vm *vm, int pid, uint64_t dw0, uint64_t dw
+ 	proc_table[pid * 2 + 1] = cpu_to_be64(dw1);
+ }
+ 
+-static void set_radix_proc_table(struct kvm_vm *vm, int pid, vm_paddr_t pgd)
++void set_radix_proc_table(struct kvm_vm *vm, int pid, vm_paddr_t pgd)
+ {
+ 	set_proc_table(vm, pid, pgd | RADIX_TREE_SIZE | RADIX_PGD_INDEX_SIZE, 0);
+ }
+@@ -146,9 +146,69 @@ static uint64_t *virt_get_pte(struct kvm_vm *vm, vm_paddr_t pt,
+ #define PDE_NLS		0x0000000000000011ull
+ #define PDE_PT_MASK	0x0fffffffffffff00ull
+ 
+-void virt_arch_pg_map(struct kvm_vm *vm, uint64_t gva, uint64_t gpa)
++static uint64_t *virt_lookup_pte(struct kvm_vm *vm, uint64_t gva)
+ {
+ 	vm_paddr_t pt = vm->pgd;
++	uint64_t *ptep;
++	int level;
++
++	for (level = 1; level <= 3; level++) {
++		uint64_t nls;
++		uint64_t *pdep = virt_get_pte(vm, pt, gva, level, &nls);
++		uint64_t pde = be64_to_cpu(*pdep);
++
++		if (pde) {
++			TEST_ASSERT((pde & PDE_VALID) && !(pde & PTE_LEAF),
++				"Invalid PDE at level: %u gva: 0x%lx pde:0x%lx\n",
++				level, gva, pde);
++			pt = pde & PDE_PT_MASK;
++			continue;
++		}
++
++		return NULL;
++	}
++
++	ptep = virt_get_pte(vm, pt, gva, level, NULL);
++
++	return ptep;
++}
++
++static bool virt_modify_pte(struct kvm_vm *vm, uint64_t gva, uint64_t clr, uint64_t set)
++{
++	uint64_t *ptep, pte;
++
++	ptep = virt_lookup_pte(vm, gva);
++	if (!ptep)
++		return false;
++
++	pte = be64_to_cpu(*ptep);
++	if (!(pte & PTE_VALID))
++		return false;
++
++	pte = (pte & ~clr) | set;
++	*ptep = cpu_to_be64(pte);
++
++	return true;
++}
++
++bool virt_remap_pte(struct kvm_vm *vm, uint64_t gva, vm_paddr_t gpa)
++{
++	return virt_modify_pte(vm, gva, PTE_PAGE_MASK, (gpa & PTE_PAGE_MASK));
++}
++
++bool virt_wrprotect_pte(struct kvm_vm *vm, uint64_t gva)
++{
++	return virt_modify_pte(vm, gva, PTE_RW, 0);
++}
++
++bool virt_wrenable_pte(struct kvm_vm *vm, uint64_t gva)
++{
++	return virt_modify_pte(vm, gva, 0, PTE_RW);
++}
++
++static void __virt_arch_pg_map(struct kvm_vm *vm, vm_paddr_t pgd, uint64_t gva, uint64_t gpa)
++{
++	vm_paddr_t pt = pgd;
+ 	uint64_t *ptep, pte;
+ 	int level;
+ 
+@@ -187,6 +247,49 @@ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t gva, uint64_t gpa)
+ 	*ptep = cpu_to_be64(pte);
+ }
+ 
++void virt_arch_pg_map(struct kvm_vm *vm, uint64_t gva, uint64_t gpa)
++{
++	__virt_arch_pg_map(vm, vm->pgd, gva, gpa);
++}
++
++static void __virt_pt_duplicate(struct kvm_vm *vm, vm_paddr_t pgd, vm_paddr_t pt, vm_vaddr_t va, int level)
++{
++	uint64_t *page_table;
++	int size, idx;
++
++	page_table = addr_gpa2hva(vm, pt);
++	size = 1U << pt_shift(vm, level);
++	for (idx = 0; idx < size; idx++) {
++		uint64_t pte = be64_to_cpu(page_table[idx]);
++		if (pte & PTE_VALID) {
++			if (pte & PTE_LEAF) {
++				__virt_arch_pg_map(vm, pgd, va, pte & PTE_PAGE_MASK);
++			} else {
++				__virt_pt_duplicate(vm, pgd, pte & PDE_PT_MASK, va, level + 1);
++			}
++		}
++		va += pt_entry_coverage(vm, level);
++	}
++}
++
++vm_paddr_t virt_pt_duplicate(struct kvm_vm *vm)
++{
++	vm_paddr_t pgtb;
++	uint64_t *page_table;
++	size_t pgd_pages;
++
++	pgd_pages = 1UL << ((RADIX_PGD_INDEX_SIZE + 3) >> vm->page_shift);
++	TEST_ASSERT(pgd_pages == 1, "PGD allocation must be single page");
++	pgtb = vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
++				 vm->memslots[MEM_REGION_PT]);
++	page_table = addr_gpa2hva(vm, pgtb);
++	memset(page_table, 0, vm->page_size * pgd_pages);
++
++	__virt_pt_duplicate(vm, pgtb, vm->pgd, 0, 1);
++
++	return pgtb;
++}
++
+ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+ {
+ 	vm_paddr_t pt = vm->pgd;
+@@ -244,7 +347,6 @@ static void virt_dump_pt(FILE *stream, struct kvm_vm *vm, vm_paddr_t pt,
+ 				     level + 1, indent + 2);
+ 		}
+ 	}
+-
+ }
+ 
+ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+diff --git a/tools/testing/selftests/kvm/powerpc/tlbiel_test.c b/tools/testing/selftests/kvm/powerpc/tlbiel_test.c
 new file mode 100644
-index 000000000000..31db0b6becd6
+index 000000000000..63ffcff15617
 --- /dev/null
-+++ b/tools/testing/selftests/kvm/powerpc/null_test.c
-@@ -0,0 +1,166 @@
++++ b/tools/testing/selftests/kvm/powerpc/tlbiel_test.c
+@@ -0,0 +1,508 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * Tests for guest creation, run, ucall, interrupt, and vm dumping.
++ * Test TLBIEL virtualisation. The TLBIEL instruction operates on cached
++ * translations of the hardware thread and/or core which executes it, but the
++ * behaviour required of the guest is that it should invalidate cached
++ * translations visible to the vCPU that executed it. The instruction can
++ * not be trapped by the hypervisor.
++ *
++ * This requires that when a vCPU is migrated to a different hardware thread,
++ * KVM must ensure that no potentially stale translations be visible on
++ * the new hardware thread. Implementing this has been a source of
++ * difficulty.
++ *
++ * This test tries to create and invalidate different kinds oftranslations
++ * while moving vCPUs between CPUs, and checking for stale translations.
 + */
 +
 +#define _GNU_SOURCE /* for program_invocation_short_name */
@@ -131,7 +290,11 @@ index 000000000000..31db0b6becd6
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <string.h>
++#include <sched.h>
 +#include <sys/ioctl.h>
++#include <sys/time.h>
++#include <sys/sysinfo.h>
++#include <signal.h>
 +
 +#include "test_util.h"
 +#include "kvm_util.h"
@@ -139,137 +302,460 @@ index 000000000000..31db0b6becd6
 +#include "processor.h"
 +#include "helpers.h"
 +
-+extern void guest_code_asm(void);
-+asm(".global guest_code_asm");
-+asm(".balign 4");
-+asm("guest_code_asm:");
-+asm("li 3,0"); // H_UCALL
-+asm("li 4,0"); // UCALL_R4_SIMPLE
-+asm("sc 1");
++static int nr_cpus;
++static int *cpu_array;
 +
-+static void test_asm(void)
++static void set_cpu(int cpu)
++{
++	cpu_set_t set;
++
++	CPU_ZERO(&set);
++	CPU_SET(cpu, &set);
++
++	if (sched_setaffinity(0, sizeof(set), &set) == -1) {
++		perror("sched_setaffinity");
++		exit(1);
++	}
++}
++
++static void set_random_cpu(void)
++{
++	set_cpu(cpu_array[random() % nr_cpus]);
++}
++
++static void init_sched_cpu(void)
++{
++	cpu_set_t possible_mask;
++	int i, cnt, nproc;
++
++	nproc = get_nprocs_conf();
++
++	TEST_ASSERT(!sched_getaffinity(0, sizeof(possible_mask), &possible_mask),
++		"sched_getaffinity failed, errno = %d (%s)", errno, strerror(errno));
++
++	nr_cpus = CPU_COUNT(&possible_mask);
++	cpu_array = malloc(nr_cpus * sizeof(int));
++
++	cnt = 0;
++	for (i = 0; i < nproc; i++) {
++		if (CPU_ISSET(i, &possible_mask)) {
++			cpu_array[cnt] = i;
++			cnt++;
++		}
++	}
++}
++
++static volatile bool timeout;
++
++static void set_timer(int sec)
++{
++	struct itimerval timer;
++
++	timeout = false;
++
++	timer.it_value.tv_sec  = sec;
++	timer.it_value.tv_usec = 0;
++	timer.it_interval = timer.it_value;
++	TEST_ASSERT(setitimer(ITIMER_REAL, &timer, NULL) == 0,
++			"setitimer failed %s", strerror(errno));
++}
++
++static void sigalrm_handler(int sig)
++{
++	timeout = true;
++}
++
++static void init_timers(void)
++{
++	TEST_ASSERT(signal(SIGALRM, sigalrm_handler) != SIG_ERR,
++		    "Failed to register SIGALRM handler, errno = %d (%s)",
++		    errno, strerror(errno));
++}
++
++static inline void virt_invalidate_tlb(uint64_t gva)
++{
++	unsigned long rb, rs;
++	unsigned long is = 2, ric = 0, prs = 1, r = 1;
++
++	rb = is << 10;
++	rs = 0;
++
++	asm volatile("ptesync ; .machine push ; .machine power9 ; tlbiel %0,%1,%2,%3,%4 ; .machine pop ; ptesync"
++			:: "r"(rb), "r"(rs), "i"(ric), "i"(prs), "i"(r)
++			: "memory");
++}
++
++static inline void virt_invalidate_pwc(uint64_t gva)
++{
++	unsigned long rb, rs;
++	unsigned long is = 2, ric = 1, prs = 1, r = 1;
++
++	rb = is << 10;
++	rs = 0;
++
++	asm volatile("ptesync ; .machine push ; .machine power9 ; tlbiel %0,%1,%2,%3,%4 ; .machine pop ; ptesync"
++			:: "r"(rb), "r"(rs), "i"(ric), "i"(prs), "i"(r)
++			: "memory");
++}
++
++static inline void virt_invalidate_all(uint64_t gva)
++{
++	unsigned long rb, rs;
++	unsigned long is = 2, ric = 2, prs = 1, r = 1;
++
++	rb = is << 10;
++	rs = 0;
++
++	asm volatile("ptesync ; .machine push ; .machine power9 ; tlbiel %0,%1,%2,%3,%4 ; .machine pop ; ptesync"
++			:: "r"(rb), "r"(rs), "i"(ric), "i"(prs), "i"(r)
++			: "memory");
++}
++
++static inline void virt_invalidate_page(uint64_t gva)
++{
++	unsigned long rb, rs;
++	unsigned long is = 0, ric = 0, prs = 1, r = 1;
++	unsigned long ap = 0x5;
++	unsigned long epn = gva & ~0xffffUL;
++	unsigned long pid = 0;
++
++	rb = epn | (is << 10) | (ap << 5);
++	rs = pid << 32;
++
++	asm volatile("ptesync ; .machine push ; .machine power9 ; tlbiel %0,%1,%2,%3,%4 ; .machine pop ; ptesync"
++			:: "r"(rb), "r"(rs), "i"(ric), "i"(prs), "i"(r)
++			: "memory");
++}
++
++enum {
++	SYNC_BEFORE_LOAD1,
++	SYNC_BEFORE_LOAD2,
++	SYNC_BEFORE_STORE,
++	SYNC_BEFORE_INVALIDATE,
++	SYNC_DSI,
++};
++
++static void remap_dsi_handler(struct ex_regs *regs)
++{
++	GUEST_ASSERT(0);
++}
++
++#define PAGE1_VAL 0x1234567890abcdef
++#define PAGE2_VAL 0x5c5c5c5c5c5c5c5c
++
++static void remap_guest_code(vm_vaddr_t page)
++{
++	unsigned long *mem = (void *)page;
++
++	for (;;) {
++		unsigned long tmp;
++
++		GUEST_SYNC(SYNC_BEFORE_LOAD1);
++		asm volatile("ld %0,%1" : "=r"(tmp) : "m"(*mem));
++		GUEST_ASSERT(tmp == PAGE1_VAL);
++		GUEST_SYNC(SYNC_BEFORE_INVALIDATE);
++		virt_invalidate_page(page);
++		GUEST_SYNC(SYNC_BEFORE_LOAD2);
++		asm volatile("ld %0,%1" : "=r"(tmp) : "m"(*mem));
++		GUEST_ASSERT(tmp == PAGE2_VAL);
++		GUEST_SYNC(SYNC_BEFORE_INVALIDATE);
++		virt_invalidate_page(page);
++	}
++}
++
++static void remap_test(void)
 +{
 +	struct kvm_vcpu *vcpu;
 +	struct kvm_vm *vm;
++	vm_vaddr_t vaddr;
++	vm_paddr_t pages[2];
++	uint64_t *hostptr;
 +
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_asm);
++	/* Create VM */
++	vm = vm_create_with_one_vcpu(&vcpu, remap_guest_code);
++	vm_install_exception_handler(vm, 0x300, remap_dsi_handler);
 +
-+	vcpu_run(vcpu);
-+	handle_ucall(vcpu, UCALL_NONE);
++	vaddr = vm_vaddr_alloc_page(vm);
++	pages[0] = addr_gva2gpa(vm, vaddr);
++	pages[1] = vm_phy_page_alloc(vm, 0, vm->memslots[MEM_REGION_DATA]);
 +
-+	kvm_vm_free(vm);
-+}
++	hostptr = addr_gpa2hva(vm, pages[0]);
++	*hostptr = PAGE1_VAL;
 +
-+static void guest_code_ucall(void)
-+{
-+	GUEST_DONE();
-+}
++	hostptr = addr_gpa2hva(vm, pages[1]);
++	*hostptr = PAGE2_VAL;
 +
-+static void test_ucall(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
++	vcpu_args_set(vcpu, 1, vaddr);
 +
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_ucall);
++	set_random_cpu();
++	set_timer(10);
 +
-+	vcpu_run(vcpu);
-+	handle_ucall(vcpu, UCALL_DONE);
++	while (!timeout) {
++		vcpu_run(vcpu);
 +
-+	kvm_vm_free(vm);
-+}
++		host_sync(vcpu, SYNC_BEFORE_LOAD1);
++		set_random_cpu();
++		vcpu_run(vcpu);
 +
-+static void trap_handler(struct ex_regs *regs)
-+{
-+	GUEST_SYNC(1);
-+	regs->nia += 4;
-+}
++		host_sync(vcpu, SYNC_BEFORE_INVALIDATE);
++		set_random_cpu();
++		TEST_ASSERT(virt_remap_pte(vm, vaddr, pages[1]), "Remap page1 failed");
++		vcpu_run(vcpu);
 +
-+static void guest_code_trap(void)
-+{
-+	GUEST_SYNC(0);
-+	asm volatile("trap");
-+	GUEST_DONE();
-+}
++		host_sync(vcpu, SYNC_BEFORE_LOAD2);
++		set_random_cpu();
++		vcpu_run(vcpu);
 +
-+static void test_trap(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_trap);
-+	vm_install_exception_handler(vm, 0x700, trap_handler);
-+
-+	vcpu_run(vcpu);
-+	host_sync(vcpu, 0);
-+	vcpu_run(vcpu);
-+	host_sync(vcpu, 1);
-+	vcpu_run(vcpu);
-+	handle_ucall(vcpu, UCALL_DONE);
-+
-+	vm_install_exception_handler(vm, 0x700, NULL);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void dsi_handler(struct ex_regs *regs)
-+{
-+	GUEST_SYNC(1);
-+	regs->nia += 4;
-+}
-+
-+static void guest_code_dsi(void)
-+{
-+	GUEST_SYNC(0);
-+	asm volatile("stb %r0,0(0)");
-+	GUEST_DONE();
-+}
-+
-+static void test_dsi(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_dsi);
-+	vm_install_exception_handler(vm, 0x300, dsi_handler);
-+
-+	vcpu_run(vcpu);
-+	host_sync(vcpu, 0);
-+	vcpu_run(vcpu);
-+	host_sync(vcpu, 1);
-+	vcpu_run(vcpu);
-+	handle_ucall(vcpu, UCALL_DONE);
++		host_sync(vcpu, SYNC_BEFORE_INVALIDATE);
++		TEST_ASSERT(virt_remap_pte(vm, vaddr, pages[0]), "Remap page0 failed");
++		set_random_cpu();
++	}
 +
 +	vm_install_exception_handler(vm, 0x300, NULL);
 +
 +	kvm_vm_free(vm);
 +}
 +
-+static void test_dump(void)
++static void wrprotect_dsi_handler(struct ex_regs *regs)
++{
++	GUEST_SYNC(SYNC_DSI);
++	regs->nia += 4;
++}
++
++static void wrprotect_guest_code(vm_vaddr_t page)
++{
++	volatile char *mem = (void *)page;
++
++	for (;;) {
++		GUEST_SYNC(SYNC_BEFORE_STORE);
++		asm volatile("stb %1,%0" : "=m"(*mem) : "r"(1));
++		GUEST_SYNC(SYNC_BEFORE_INVALIDATE);
++		virt_invalidate_page(page);
++	}
++}
++
++static void wrprotect_test(void)
 +{
 +	struct kvm_vcpu *vcpu;
 +	struct kvm_vm *vm;
++	vm_vaddr_t page;
++	void *hostptr;
 +
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_ucall);
++	/* Create VM */
++	vm = vm_create_with_one_vcpu(&vcpu, wrprotect_guest_code);
++	vm_install_exception_handler(vm, 0x300, wrprotect_dsi_handler);
 +
-+	vcpu_run(vcpu);
-+	handle_ucall(vcpu, UCALL_DONE);
++	page = vm_vaddr_alloc_page(vm);
++	hostptr = addr_gva2hva(vm, page);
++	memset(hostptr, 0, vm->page_size);
 +
-+	printf("Testing vm_dump...\n");
-+	vm_dump(stderr, vm, 2);
++	vcpu_args_set(vcpu, 1, page);
++
++	set_random_cpu();
++	set_timer(10);
++
++	while (!timeout) {
++		vcpu_run(vcpu);
++		host_sync(vcpu, SYNC_BEFORE_STORE);
++
++		vcpu_run(vcpu);
++		host_sync(vcpu, SYNC_BEFORE_INVALIDATE);
++
++		TEST_ASSERT(virt_wrprotect_pte(vm, page), "Wrprotect page failed");
++		/* Invalidate on different CPU */
++		set_random_cpu();
++		vcpu_run(vcpu);
++		host_sync(vcpu, SYNC_BEFORE_STORE);
++
++		/* Store on different CPU */
++		set_random_cpu();
++		vcpu_run(vcpu);
++		host_sync(vcpu, SYNC_DSI);
++		vcpu_run(vcpu);
++		host_sync(vcpu, SYNC_BEFORE_INVALIDATE);
++
++		TEST_ASSERT(virt_wrenable_pte(vm, page), "Wrenable page failed");
++
++		/* Invalidate on different CPU when we go around */
++		set_random_cpu();
++	}
++
++	vm_install_exception_handler(vm, 0x300, NULL);
 +
 +	kvm_vm_free(vm);
 +}
 +
++static void wrp_mt_dsi_handler(struct ex_regs *regs)
++{
++	GUEST_SYNC(SYNC_DSI);
++	regs->nia += 4;
++}
++
++static void wrp_mt_guest_code(vm_vaddr_t page, bool invalidates)
++{
++	volatile char *mem = (void *)page;
++
++	for (;;) {
++		GUEST_SYNC(SYNC_BEFORE_STORE);
++		asm volatile("stb %1,%0" : "=m"(*mem) : "r"(1));
++		if (invalidates) {
++			GUEST_SYNC(SYNC_BEFORE_INVALIDATE);
++			virt_invalidate_page(page);
++		}
++	}
++}
++
++static void wrp_mt_test(void)
++{
++	struct kvm_vcpu *vcpu[2];
++	struct kvm_vm *vm;
++	vm_vaddr_t page;
++	void *hostptr;
++
++	/* Create VM */
++	vm = vm_create_with_vcpus(2, wrp_mt_guest_code, vcpu);
++	vm_install_exception_handler(vm, 0x300, wrp_mt_dsi_handler);
++
++	page = vm_vaddr_alloc_page(vm);
++	hostptr = addr_gva2hva(vm, page);
++	memset(hostptr, 0, vm->page_size);
++
++	vcpu_args_set(vcpu[0], 2, page, 1);
++	vcpu_args_set(vcpu[1], 2, page, 0);
++
++	set_random_cpu();
++	set_timer(10);
++
++	while (!timeout) {
++		/* Run vcpu[1] only when page is writable, should never fault */
++		vcpu_run(vcpu[1]);
++		host_sync(vcpu[1], SYNC_BEFORE_STORE);
++
++		vcpu_run(vcpu[0]);
++		host_sync(vcpu[0], SYNC_BEFORE_STORE);
++
++		vcpu_run(vcpu[0]);
++		host_sync(vcpu[0], SYNC_BEFORE_INVALIDATE);
++
++		TEST_ASSERT(virt_wrprotect_pte(vm, page), "Wrprotect page failed");
++		/* Invalidate on different CPU */
++		set_random_cpu();
++		vcpu_run(vcpu[0]);
++		host_sync(vcpu[0], SYNC_BEFORE_STORE);
++
++		/* Store on different CPU */
++		set_random_cpu();
++		vcpu_run(vcpu[0]);
++		host_sync(vcpu[0], SYNC_DSI);
++		vcpu_run(vcpu[0]);
++		host_sync(vcpu[0], SYNC_BEFORE_INVALIDATE);
++
++		TEST_ASSERT(virt_wrenable_pte(vm, page), "Wrenable page failed");
++		/* Invalidate on different CPU when we go around */
++		set_random_cpu();
++	}
++
++	vm_install_exception_handler(vm, 0x300, NULL);
++
++	kvm_vm_free(vm);
++}
++
++static void proctbl_dsi_handler(struct ex_regs *regs)
++{
++	GUEST_SYNC(SYNC_DSI);
++	regs->nia += 4;
++}
++
++static void proctbl_guest_code(vm_vaddr_t page)
++{
++	volatile char *mem = (void *)page;
++
++	for (;;) {
++		GUEST_SYNC(SYNC_BEFORE_STORE);
++		asm volatile("stb %1,%0" : "=m"(*mem) : "r"(1));
++		GUEST_SYNC(SYNC_BEFORE_INVALIDATE);
++		virt_invalidate_all(page);
++	}
++}
++
++static void proctbl_test(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	vm_vaddr_t page;
++	vm_paddr_t orig_pgd;
++	vm_paddr_t alternate_pgd;
++	void *hostptr;
++
++	/* Create VM */
++	vm = vm_create_with_one_vcpu(&vcpu, proctbl_guest_code);
++	vm_install_exception_handler(vm, 0x300, proctbl_dsi_handler);
++
++	page = vm_vaddr_alloc_page(vm);
++	hostptr = addr_gva2hva(vm, page);
++	memset(hostptr, 0, vm->page_size);
++
++	orig_pgd = vm->pgd;
++	alternate_pgd = virt_pt_duplicate(vm);
++
++	/* Write protect the original PTE */
++	TEST_ASSERT(virt_wrprotect_pte(vm, page), "Wrprotect page failed");
++
++	vm->pgd = alternate_pgd;
++	set_radix_proc_table(vm, 0, vm->pgd);
++
++	vcpu_args_set(vcpu, 1, page);
++
++	set_random_cpu();
++	set_timer(10);
++
++	while (!timeout) {
++		vcpu_run(vcpu);
++		host_sync(vcpu, SYNC_BEFORE_STORE);
++
++		vcpu_run(vcpu);
++		host_sync(vcpu, SYNC_BEFORE_INVALIDATE);
++		/* Writeable store succeeds */
++
++		/* Swap page tables to write protected one */
++		vm->pgd = orig_pgd;
++		set_radix_proc_table(vm, 0, vm->pgd);
++
++		/* Invalidate on different CPU */
++		set_random_cpu();
++		vcpu_run(vcpu);
++		host_sync(vcpu, SYNC_BEFORE_STORE);
++
++		/* Store on different CPU */
++		set_random_cpu();
++		vcpu_run(vcpu);
++		host_sync(vcpu, SYNC_DSI);
++		vcpu_run(vcpu);
++		host_sync(vcpu, SYNC_BEFORE_INVALIDATE);
++
++		/* Swap page tables to write enabled one */
++		vm->pgd = alternate_pgd;
++		set_radix_proc_table(vm, 0, vm->pgd);
++
++		/* Invalidate on different CPU when we go around */
++		set_random_cpu();
++	}
++	vm->pgd = orig_pgd;
++	set_radix_proc_table(vm, 0, vm->pgd);
++
++	vm_install_exception_handler(vm, 0x300, NULL);
++
++	kvm_vm_free(vm);
++}
 +
 +struct testdef {
 +	const char *name;
 +	void (*test)(void);
 +} testlist[] = {
-+	{ "null asm test", test_asm},
-+	{ "null ucall test", test_ucall},
-+	{ "trap test", test_trap},
-+	{ "page fault test", test_dsi},
-+	{ "vm dump test", test_dump},
++	{ "tlbiel wrprotect test", wrprotect_test},
++	{ "tlbiel wrprotect 2-vCPU test", wrp_mt_test},
++	{ "tlbiel process table update test", proctbl_test},
++	{ "tlbiel remap test", remap_test},
 +};
 +
 +int main(int argc, char *argv[])
@@ -280,153 +766,14 @@ index 000000000000..31db0b6becd6
 +
 +	ksft_set_plan(ARRAY_SIZE(testlist));
 +
++	init_sched_cpu();
++	init_timers();
++
 +	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
 +		testlist[idx].test();
 +		ksft_test_result_pass("%s\n", testlist[idx].name);
 +	}
 +
-+	ksft_finished();	/* Print results and exit() accordingly */
-+}
-diff --git a/tools/testing/selftests/kvm/powerpc/rtas_hcall.c b/tools/testing/selftests/kvm/powerpc/rtas_hcall.c
-new file mode 100644
-index 000000000000..05af22c711cb
---- /dev/null
-+++ b/tools/testing/selftests/kvm/powerpc/rtas_hcall.c
-@@ -0,0 +1,136 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Test the KVM H_RTAS hcall and copying buffers between guest and host.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "kselftest.h"
-+#include "hcall.h"
-+
-+struct rtas_args {
-+	__be32 token;
-+	__be32 nargs;
-+	__be32 nret;
-+	__be32 args[16];
-+        __be32 *rets;     /* Pointer to return values in args[]. */
-+};
-+
-+static void guest_code(void)
-+{
-+	struct rtas_args r;
-+	int64_t rc;
-+
-+	r.token = cpu_to_be32(0xdeadbeef);
-+	r.nargs = cpu_to_be32(3);
-+	r.nret = cpu_to_be32(2);
-+	r.rets = &r.args[3];
-+	r.args[0] = cpu_to_be32(0x1000);
-+	r.args[1] = cpu_to_be32(0x1001);
-+	r.args[2] = cpu_to_be32(0x1002);
-+	rc = hcall1(H_RTAS, (uint64_t)&r);
-+	GUEST_ASSERT(rc == 0);
-+	GUEST_ASSERT_1(be32_to_cpu(r.rets[0]) == 0xabc, be32_to_cpu(r.rets[0]));
-+	GUEST_ASSERT_1(be32_to_cpu(r.rets[1]) == 0x123, be32_to_cpu(r.rets[1]));
-+
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_regs regs;
-+	struct rtas_args *r;
-+	vm_vaddr_t rtas_vaddr;
-+	struct ucall uc;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	uint64_t tmp;
-+	int ret;
-+
-+	ksft_print_header();
-+
-+	ksft_set_plan(1);
-+
-+	/* Create VM */
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+
-+	ret = _vcpu_run(vcpu);
-+	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+	switch ((tmp = get_ucall(vcpu, &uc))) {
-+	case UCALL_NONE:
-+		break; // good
-+	case UCALL_DONE:
-+		TEST_FAIL("Unexpected final guest exit %lu\n", tmp);
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT_N(uc, "values: %lu (0x%lx)\n",
-+				      GUEST_ASSERT_ARG(uc, 0),
-+				      GUEST_ASSERT_ARG(uc, 0));
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected guest exit %lu\n", tmp);
-+	}
-+
-+	TEST_ASSERT(vcpu->run->exit_reason == KVM_EXIT_PAPR_HCALL,
-+		    "Expected PAPR_HCALL exit, got %s\n",
-+		    exit_reason_str(vcpu->run->exit_reason));
-+	TEST_ASSERT(vcpu->run->papr_hcall.nr == H_RTAS,
-+		    "Expected H_RTAS exit, got %lld\n",
-+		    vcpu->run->papr_hcall.nr);
-+
-+	vcpu_regs_get(vcpu, &regs);
-+	rtas_vaddr = regs.gpr[4];
-+
-+	r = addr_gva2hva(vm, rtas_vaddr);
-+
-+	TEST_ASSERT(r->token == cpu_to_be32(0xdeadbeef),
-+		    "Expected RTAS token 0xdeadbeef, got 0x%x\n",
-+		    be32_to_cpu(r->token));
-+	TEST_ASSERT(r->nargs == cpu_to_be32(3),
-+		    "Expected RTAS nargs 3, got %u\n",
-+		    be32_to_cpu(r->nargs));
-+	TEST_ASSERT(r->nret == cpu_to_be32(2),
-+		    "Expected RTAS nret 2, got %u\n",
-+		    be32_to_cpu(r->nret));
-+	TEST_ASSERT(r->args[0] == cpu_to_be32(0x1000),
-+		    "Expected args[0] to be 0x1000, got 0x%x\n",
-+		    be32_to_cpu(r->args[0]));
-+	TEST_ASSERT(r->args[1] == cpu_to_be32(0x1001),
-+		    "Expected args[1] to be 0x1001, got 0x%x\n",
-+		    be32_to_cpu(r->args[1]));
-+	TEST_ASSERT(r->args[2] == cpu_to_be32(0x1002),
-+		    "Expected args[2] to be 0x1002, got 0x%x\n",
-+		    be32_to_cpu(r->args[2]));
-+
-+	r->args[3] = cpu_to_be32(0xabc);
-+	r->args[4] = cpu_to_be32(0x123);
-+
-+	regs.gpr[3] = 0;
-+	vcpu_regs_set(vcpu, &regs);
-+
-+	ret = _vcpu_run(vcpu);
-+	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+	switch ((tmp = get_ucall(vcpu, &uc))) {
-+	case UCALL_DONE:
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT_N(uc, "values: %lu (0x%lx)\n",
-+				      GUEST_ASSERT_ARG(uc, 0),
-+				      GUEST_ASSERT_ARG(uc, 0));
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected guest exit %lu\n", tmp);
-+	}
-+
-+	kvm_vm_free(vm);
-+
-+	ksft_test_result_pass("%s\n", "rtas buffer copy test");
 +	ksft_finished();	/* Print results and exit() accordingly */
 +}
 -- 
