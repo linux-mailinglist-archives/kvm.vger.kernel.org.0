@@ -2,229 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78A32728942
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 22:17:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73A2E72894A
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 22:18:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236338AbjFHUQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 16:16:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35872 "EHLO
+        id S230096AbjFHUSA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 16:18:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjFHUQz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 16:16:55 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83380273E;
-        Thu,  8 Jun 2023 13:16:20 -0700 (PDT)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 358IoWUK008528;
-        Thu, 8 Jun 2023 20:16:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=mdhoyti+J63lmwFbsjZ7TtZLt/mMblgVnJI2KW1s5sg=;
- b=im5wVe3Jf3qUekkcJnNwEpsrxVZyBMEm2ucNwgz68TjmgRGHbZkKJyiuVgnKw3ewl4ay
- RU4z3btKFtwG3VwYow2/+sZYL2h4u32Og5lidS/tRjqIrdxS/wH+HY/dXqm9O5nBCDVX
- 5/Wb6Ve1Ufo9bOV14aojUTKYQilSP73jURk5OAYsSfiTaZSx5bwdPG59UbJYC+GUxxC7
- 8M+NnUoUga4Ig7ebVXI+kOxJ+dNTClMclErNCb9SMLH4yfbxVNMJfXMQKAWT/r8tn6Ya
- mPw3l8ax7upCoZau+Wh50Bz5oV65+NPSikfdcGCpvhowoaLJorml6lGkuI3gjTSsXNf6 TQ== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3r2a6ud1wx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 08 Jun 2023 20:16:18 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 358J5iej035890;
-        Thu, 8 Jun 2023 20:16:17 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2100.outbound.protection.outlook.com [104.47.55.100])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3r2a6tc5an-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 08 Jun 2023 20:16:17 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=L4z5dZLfcSwTUo0cjBiP+QSUkRTkkHcRSbh9NODsQ/o0fCpDQfpNYGdl2kusSHb6e+MXeyr6dSXdsrB1cUJdR/P24NZlzpElsQy9OCrX/JSwVrJdwC0hH9IEIPzgc/eqgiys/gaX09hvS/HNnLX+7LGbRUI9UKMbvio2bPSP7McHyvl/17BpqfggPh/QK1s5V/PuqDhQ5WX2P9hdsG1FLwRNA+GsWH6HKj3i2DbOTKZf1pHMspGTgfhFV3zGP7rPjuvln4ZuUYf4k6zdmR74kCpmPb9JGUAtw0kmiXjWMP6cxU9+kWDy8GSU1WRB67chDb/OQUs70f5jmq5aebZ/VQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mdhoyti+J63lmwFbsjZ7TtZLt/mMblgVnJI2KW1s5sg=;
- b=JtQCul8J8iOU9sNMXNslVsEFOD4Nm8Ay/EI4ShRh9AhBk/hLOOW0EREWAg14bMi3ANweCIDb6m5ONMm7jOBPWQJ8z/uogYkv1Cmop9u3ieOkl603DsIc9q+ETV+cLtgSijqgLftKZ0sddvRDO4bFoFOdoMZvRMQo0DYsoFxENlLeYh/NmMM7ieRWa220vWvW5VI+fQeWmSQfqLiKcjVaWhtXtzE9GM5lpgwNR/NE9wdjpmSQiq1iOZjkzCUfRrrVX7gqNZYkaxOES3V5SZLuAABazSEem7ZYseuiFj9zD1ugRDTTZ6KcGmY/0usRELE1N3E6tXtx81zWnToHXnlJrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        with ESMTP id S231747AbjFHUR7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 16:17:59 -0400
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02E1F30C1
+        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 13:17:45 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-510d6b939bfso1849615a12.0
+        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 13:17:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mdhoyti+J63lmwFbsjZ7TtZLt/mMblgVnJI2KW1s5sg=;
- b=JFITVQlhd3ioZbyAYvbyX+uWuDKl1kZed+Z0ST76BP8JGVTwnbjYd4MKaIsDFvubxN1EoNBTYGvCBpdiF7ni8LM86I0tbFhCCiz1krWCZhr0zVL36OgG+ywXulSHf6VSggMyONkdOnRbKSfXWkXPh22C0nGVm89WwHnc4Nh1FwA=
-Received: from CH0PR10MB5113.namprd10.prod.outlook.com (2603:10b6:610:c9::8)
- by LV3PR10MB7771.namprd10.prod.outlook.com (2603:10b6:408:1b0::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.26; Thu, 8 Jun
- 2023 20:16:14 +0000
-Received: from CH0PR10MB5113.namprd10.prod.outlook.com
- ([fe80::d9c0:689a:147b:ced5]) by CH0PR10MB5113.namprd10.prod.outlook.com
- ([fe80::d9c0:689a:147b:ced5%4]) with mapi id 15.20.6455.030; Thu, 8 Jun 2023
- 20:16:14 +0000
-Message-ID: <8bf63ad2-43fd-41cd-c3dc-0507701eb5c1@oracle.com>
-Date:   Thu, 8 Jun 2023 13:16:12 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] vfio/iommu_type1: acquire iommu lock in
- vfio_iommu_type1_release()
-Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        khalid.aziz@oracle.com
-References: <20230607190752.216801-1-sidhartha.kumar@oracle.com>
- <20230607134037.6d81e288.alex.williamson@redhat.com>
-From:   Sidhartha Kumar <sidhartha.kumar@oracle.com>
-In-Reply-To: <20230607134037.6d81e288.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0223.namprd03.prod.outlook.com
- (2603:10b6:a03:39f::18) To CH0PR10MB5113.namprd10.prod.outlook.com
- (2603:10b6:610:c9::8)
+        d=google.com; s=20221208; t=1686255464; x=1688847464;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yFfOuXxs8iGOdfT2qhI1JEq3SXtax8RxnY5/Fc1nskw=;
+        b=tOrPL690XMDizppt1902CZdnVhRRGiAVY2h6pQOMPMquGW96yGqxA0WIbSxFO2hzYj
+         QJWnaa2e9gObU8AZ2JFs1RnUAEJIDlYvyz3Vk0eN8oMhXzeUPdODFYrHIciSsxP+IkvB
+         jQwIzPalMrRq9DKz/4lf8td/DpbRjoc5ifdZhGCvIzaMTootBnpupjCsIyoRUICz4e/t
+         s7DCsNccifNfK4D9fga3PZMYqo8cjQOHa1g5+0GmjGcyvRnrUycsTbOan/Dr+m5rK0cw
+         99nId16qyeJxOEnOuTWeiopCyGHCtsnDGSzjOlTPx/PNiWyaKL9qyVPA3bhi1oIBq4wV
+         bWXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686255464; x=1688847464;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yFfOuXxs8iGOdfT2qhI1JEq3SXtax8RxnY5/Fc1nskw=;
+        b=jeJshzQVPgYF3DI7Iim26xFE4WRLxDMzqfuVT/Xo7iaN8vKLH68bnVfpJS4eweYpTO
+         RJ44m7L26DYdzVYKo8h9CRQSHUEi5NAFlK9380SnSWZVRoTjLi8PgaTwCgY6Ue622dTA
+         heWsg1V9BC+UmAZC7xu1k2OI3wdgf2v2ewUSqvFG/Rs2AzqEVsBPnNtX0RbqM5r+NJJv
+         aRGDfRx2mITp7HJEF9RqxMeWnUrFVdNSQOr1c//+i8Yu4EAXlInXU1JuygMbAb9rMDDZ
+         4lcAvhmuXceRQRadM1K1CVlMmshvv/apYAC7YkZaZtxcCDlspU0TZAew2c9KHwDn6UGZ
+         o12A==
+X-Gm-Message-State: AC+VfDzgn/HXpfhiCmdaa9qFZNMD2bLaHa6V24kVkRqCuSJK0UFXXPq0
+        mgrUC0z3zqyVFb8ZjHeOxzRvu2o+dFYp5inNnmFVmA==
+X-Google-Smtp-Source: ACHHUZ5rIRRCqsHv8Mj5sYTFvVoPuCCGYYh1ahL9p64lBD/iRVAni/xzcUb+JGKF5FFtYateiNco/3eYHVsT49XamTA=
+X-Received: by 2002:a17:907:c13:b0:973:d846:cd5d with SMTP id
+ ga19-20020a1709070c1300b00973d846cd5dmr154165ejc.74.1686255464184; Thu, 08
+ Jun 2023 13:17:44 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH0PR10MB5113:EE_|LV3PR10MB7771:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7f64f52e-1f8a-47b7-6d38-08db685d35b7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /BDdscFSbwWOvRRmOESEzP86ykJ01ssT6PLdxRq7qSpW4P3xOeGabrlZU7a0zotE1o6N9kYcTtc3WHYHQt3txI6GewVt8txIeMZGC89nViwUpqxPyH33OGhK8vOtYZ73i9J7YT2RB8R0te0gXnSYA8rFTpUk1GcTI8dGlA4UKVqXXDj2rCv1hd+NRgzlr6tkDGas16VCm9TcBz9SSqRuESkhET9nP/+u8kPzYFQTXDFCVBt5R3Z9W9DT781m3S1df1JU+TtBLlYshrX/M9jvsvkvejyavCVkWS7X8Pxjz/4NADJwBtS8eZpMz6uGauNZilcjMeQ3iSoFCZ8BbDgXMiEGfdxpuhuqo5ZaKsqvaCvN4YeUi2uGPVmnGORJP3Z5ULCimuT+eLF8xJuswLYxVeuDYnxQDfJXE1XBUdrHyff/b+VSeq21KRmAX7ccKe/b1Umcuf4WKvrS9YODPz1jyK/dxafW4N0kYELCXFoEUjJa/wvBZXkAZglF4w6EcHspaFGPhSOikacLGeM7BRhnBNyh1r00Nt2f3ljJhZ5kdNdQNHypL2WAqAwxIosw+TxDS+AlGvGSrn2FFGn2KVSyWm878tSisa8gah+5VftOTucd5aqWVMCOIoCZfxrATWZ/EKwP9vVSLfZ8U6MLeBbGcg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5113.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(39860400002)(396003)(346002)(366004)(136003)(451199021)(2616005)(6506007)(5660300002)(8676002)(53546011)(38100700002)(8936002)(6512007)(26005)(83380400001)(2906002)(107886003)(44832011)(4326008)(66476007)(31696002)(6486002)(66946007)(41300700001)(66556008)(478600001)(86362001)(36756003)(31686004)(186003)(316002)(6916009)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SmpJc0htQUtGWXJBNVk2MjBGWktvWXc0dGFHbjhzcTBLN0dwOThzL1dEc2pw?=
- =?utf-8?B?UzBwbmZiSHpFUzZVVkZmZ25KUjMwRGxQRlZNVmpLYmRiMlk0VGV0TUh6ZUhs?=
- =?utf-8?B?b1pwU25WdmV0TzFCcDZqSUZTdXlwK2NudUNqWDhMUDEzWVF2TGxJZlo0UDNx?=
- =?utf-8?B?WGYyQjd2b0VwRDR2NFVCRFhCbTZDNXlLU2FhM25vV3FYLzdEQXplaTF4VTFz?=
- =?utf-8?B?TGg0bFBiMGhreisvcUw1TUROWDY4YkJoVHp4TWg0Qk4yZlhiYmdxbS9HekdS?=
- =?utf-8?B?WFN6b2dsMENlZ3lwdnVmZTRCMjlUaFgrRXFsNkYvUk12U0x1SnVEVXAzKzB4?=
- =?utf-8?B?QzZLVm15RzBvVnViNzBOM3RjMDgyaDNyOUszMEF6cU43dWtQUUdoK25JWGFB?=
- =?utf-8?B?SUxmVndSMFpEWEpjd3Y0Um5yanBGWUxPaUpISnFMY1dsNTJTcUdULzc0SkQ5?=
- =?utf-8?B?MitIVlphcHZTN2NSeGV1bUFVVnp6Um1LTlY0MmhyeTM1ejVzakNiM3Y0dGJC?=
- =?utf-8?B?cDJZYVdmU21qM1QrMDA4bTZKZ0FjSHNxVk92TlFYcmRoWUpCS1E0NFVuK0FF?=
- =?utf-8?B?cW1IVVE5WWxkYVdTK3ZZYTdOMlVuT01RNStKdWgxcjdkZHFBZlVPYnVBS1JO?=
- =?utf-8?B?Rms2SkVWb3JhR3owY1lXUE9UM1JjeE1xTmxHZW8zYitHSlYvc3BVSVZCbEhR?=
- =?utf-8?B?U1d0cCs0V1Bqdjd3cldkakFYTEdOVkEvNHgwMGNoblVBc2xLbnRzUng3d0JD?=
- =?utf-8?B?MGUxTGtjNmlKTUtjZFkyZUxET05HcndEQXFibXk0b2dab1BJY3NqSUNMeWZi?=
- =?utf-8?B?alhpR3grM2diRWxSdWpsK0dQcUhDdHBXZTR2OHRZeEhJcXkwTmdVb0VXblhO?=
- =?utf-8?B?SnRISmJKZm1BdVpKZWpGeTFmb29UUHNqZ2luczVjdkE0SnBPRFBnSmc3NU5m?=
- =?utf-8?B?ekZnalpoNzRaNW80SStTQUI4TGFMTEIwUE1QNzcwQUkzN2JqaHFTTUExejdy?=
- =?utf-8?B?VzdjNlhZM08raWR1RXNOQmZldjNlcDY4MmY2aEs2Zno2WmYyZS9xZGlGWTNj?=
- =?utf-8?B?MVNSMjNTSE1yVE8rLzg4SW43MWZkSkkyOXAwckkvYnJ5L0NETEZIcC9CVDVI?=
- =?utf-8?B?L2RkOHZ1MTBablFpMlpHUUlmdlpoV3Z6cFNyYlBJbkVOWTVLUmdiSkNxVC82?=
- =?utf-8?B?VkZwZ05aUjJZbTZ2bVg4SGxkWFNzZ3hXaU9XVklyZGsweGpGNXBSU2VUS0ZZ?=
- =?utf-8?B?ZGlYbVJOenl2aUwrWkIzdy9hVDZ3ZGtqUHM1SnArS0RXdXlQb21NY0I2VGM5?=
- =?utf-8?B?L0VRY2hFOUVMZmlYWVM2UzJVNmhxbjhuaWdxNEZ5MmliMlp0aWRyODNXZHYx?=
- =?utf-8?B?a3ZrVWVlbGV6eUZOcEFLYjcrWnc2R2xWeURFa2dPOG53TWFNZS85ZzllRGZ1?=
- =?utf-8?B?c3NURjJ0Y0tHV0ZJVGdJL0NOTVl3Ulo5WkgyOERXSzZYSVlrT2hjMWhIdnlr?=
- =?utf-8?B?VldVdWFOU3RyWUs5RTJJQ0Z2QkdBVmpNS1hCaEZSR3llWGRLTmJVVXZhVW1a?=
- =?utf-8?B?SnViUXROM0tlU0IyL0VqWFpVdWJXajJMQWdVQnpVczVobTFOYm96Y0cxbkdN?=
- =?utf-8?B?MnlOd0hNbXc2T3hhQStQa0gyYW8xSnJWT3VpY2pWRWFVTDBGc2RaTDg0Tnl1?=
- =?utf-8?B?dEJYdXJNT1JzbHBVMXB6VzJubFU1dVhHOXM1ZEZnemJzblBEeWh3ZXA4U0Fk?=
- =?utf-8?B?NjN5S2hyVkNNV1NrVk50NUErNjc3WHBuZWJHNDJCdlRUVGNSYWYwT01SR2NL?=
- =?utf-8?B?NGd2U09nV1JvVXhwQU1pcXp2SFlBT3A4MlRLdHVNbTcrMWs4VldLSXdTSEVj?=
- =?utf-8?B?WlBUWWJEekZPajgwamFmU1dJU2dFRkNSSmd0VTBCU2o1SGJyZWdyNG5iNXhS?=
- =?utf-8?B?eWdmdFdtWFdSdi8yRWFRbE9ZcVE5V3pGYWZiQ0hrcU5COXdwR1hKNjA2MWRR?=
- =?utf-8?B?WFNzTXFuK0E3RHpBMnZKN2xKQndQRldYMkdGYW5GVnlERlpCbCtoNjZ5YUs2?=
- =?utf-8?B?RndxV0NsRHgzSW9xOFBVV2JmTVh4ZEZjK1ZGaU1TTFI1MS85UWdQc3RNb1dy?=
- =?utf-8?B?ajh6NW53djJ2cUgwejJjRVBZU0NRbXR2azRuaEFjbGVLS3ZuTlpnNm9qZGI5?=
- =?utf-8?B?UVE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: Q2eHLcI4Q0YoHr/O88EngigtDqO65JjaXF6+4u5RCDgCgaIYXce2D+R2ZVnfIWH9ciejuWSBtALHowmJCmRJW856jHsT2KuCaEiz7T/JINeGRA5L+mksIJlro01UK8+vfFXQ8ZQatAnXSjtE681zFBxAqWULdxATK0OVn1+oqIBoDHwukJ+jC/1gXwI/kY2x8O9O7FB1geAWIyV/rUK5KpKY4UuyfT5Ll6NBSANZsY39eMVF5MEt5KluDNUpLMjHKtJZF2L1SkDsTe9iiqwkx0XoHYSrbzIL80r+sSWLxbvKyC4AqMRHDtPaHTT4PG4b7gqSwSd9Yd+VrN7kbraVvH6kJrRIC32WSIEUQU0NxB/YGzBNlAmsGvXvckoYEUr7N1Givt8N1gscwF7LQZLPTTEsJm8uTVaeJkmN26TYDMEUCD72ZOmC0szZSq7wfsCrtPGfbGgMG8czrFBDrGya7AIpzdvxzGbey6oJOJn95zf9ZXRBxir++45oumNvTMyj1/l4tlPe/KdtBFjDRM1sWvNXoO28y00DUX58FO+KrP4YSc0I3tkM/ydjIt5iCQahbVw0QK1t/NrdzsYLZHQHseAnD0pEaLrI+qvb4l6vNzQ5Sw9vM0/Hi0Fynee7vATL8zC8MveZaY9rDwOoFTqyAc+g/wLyMXzajbJFnWdvT0cQFDaYy01ciWmD/zFWkRYT+CUTVzJ3X88Sa26Xdatz7Tsmb+2Q76bdHyg4pe2hVH2mn1nvOCo7gE1I2a9V9kpEPXunGk5r/HxVk7vYBPlovcv616XZXfv+/etxE9Ra+LE=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f64f52e-1f8a-47b7-6d38-08db685d35b7
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5113.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2023 20:16:14.8016
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +F9yeSuaCE/T/syO4U7P/tFjDR0h4h2Uft9ck9dW59QN/BeYWcGuxN4/pqi8mHkzxMUWlCXibULWa5PrT01B8TPHOmJJTVoVT87wMc0HBsQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR10MB7771
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-08_15,2023-06-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
- malwarescore=0 bulkscore=0 adultscore=0 mlxscore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306080176
-X-Proofpoint-GUID: HTl0GXnyeqOWzdQLYvpHIzwQ1_X1mzKO
-X-Proofpoint-ORIG-GUID: HTl0GXnyeqOWzdQLYvpHIzwQ1_X1mzKO
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230602160914.4011728-1-vipinsh@google.com> <20230602160914.4011728-10-vipinsh@google.com>
+ <20230605223520.00007fbd.zhi.wang.linux@gmail.com> <ZH9tQjQk7QLyhUQR@google.com>
+ <20230607203711.000054ae.zhi.wang.linux@gmail.com>
+In-Reply-To: <20230607203711.000054ae.zhi.wang.linux@gmail.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Thu, 8 Jun 2023 13:17:08 -0700
+Message-ID: <CAHVum0dtZ2wW+itsOE=a7wwATu4VcGN-dQH1zF7Pz1LYy7J4UQ@mail.gmail.com>
+Subject: Re: [PATCH v2 09/16] KVM: arm64: Document the page table walker
+ actions based on the callback's return value
+To:     Zhi Wang <zhi.wang.linux@gmail.com>
+Cc:     maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
+        suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org,
+        aleksandar.qemu.devel@gmail.com, tsbogend@alpha.franken.de,
+        anup@brainfault.org, atishp@atishpatra.org,
+        paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, seanjc@google.com, pbonzini@redhat.com,
+        dmatlack@google.com, ricarkol@google.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/7/23 12:40 PM, Alex Williamson wrote:
-> On Wed,  7 Jun 2023 12:07:52 -0700
-> Sidhartha Kumar <sidhartha.kumar@oracle.com> wrote:
-> 
->>  From vfio_iommu_type1_release() there is a code path:
->>
->> vfio_iommu_unmap_unpin_all()
->>   vfio_remove_dma()
->>      vfio_unmap_unpin()
->>        unmap_unpin_slow()
->>          vfio_unpin_pages_remote()
->>            vfio_find_vpfn()
->>
->> This path is taken without acquiring the iommu lock so it could lead to
->> a race condition in the traversal of the pfn_list rb tree.
-> 
-> What's the competing thread for the race, vfio_remove_dma() tests:
-> 
-> 	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
-> 
-> The fix is not unreasonable, but is this a theoretical fix upstream
-> that's tickled by some downstream additions, or are we actually
-> competing against page pinning by an mdev driver after the container is
-> released?  Thanks,
-> 
+On Wed, Jun 7, 2023 at 5:37=E2=80=AFAM Zhi Wang <zhi.wang.linux@gmail.com> =
+wrote:
+>
+> On Tue, 6 Jun 2023 10:30:42 -0700
+> Vipin Sharma <vipinsh@google.com> wrote:
+>
+> > On Mon, Jun 05, 2023 at 10:35:20PM +0800, Zhi Wang wrote:
+> > > On Fri,  2 Jun 2023 09:09:07 -0700
+> > > Vipin Sharma <vipinsh@google.com> wrote:
+> > >
+> > > > Document what the page table walker do when walker callback functio=
+n returns
+> > > > a value.
+> > > >
+> > > > Current documentation is not correct as negative error of -EAGAIN o=
+n a
+> > > > non-shared page table walker doesn't terminate the walker and conti=
+nues
+> > > > to the next step.
+> > > >
+> > > > There might be a better place to keep this information, for now thi=
+s
+> > > > documentation will work as a reference guide until a better way is
+> > > > found.
+> > > >
+> > >
+> > > After reading the whole patch series, I was thinking it might be a go=
+od
+> > > time to improve the way how the visitor function and page table walke=
+r
+> > > talk to each other. The error code is good enough before, but its mea=
+ning
+> > > seems limited and vague when the visitor function wants to express mo=
+re about
+> > > what exactly happens inside. I am not sure if it is a good idea to co=
+ntinue
+> > > that way: 1. found a new situation. 2. choosing a error code for visi=
+tor
+> > > function. 3. walker translates the error code into the situation to
+> > > handle. 4. document the error code and its actual meaning.
+> > >
+> > > Eventually I am afraid that we are going to abuse the error code.
+> >
+> > I agree that error numbers are not sufficient and this will become more
+> > difficult and cumbersome for more cases in future if we need different
+> > behavior based on different error codes for different visitor functions=
+.
+> >
+> > >
+> > > What about introducing a set of flags for the visitor function to exp=
+ress
+> > > what happened and simplify the existing error code?
+> > >
+> >
+> > If I understood correctly what you meant, I think this will also end up
+> > having the same issue down the line, we are just switching errors with
+> > flags as they might not be able to express everything.
+> >
+> > "Flags for visitor function to express what happened"  - This is what
+> > ret val and errors do.
+> >
+>
+> Thanks so much for the efforts of the sample code.
+>
+> But when the "ret val" is an error code for pgtable matters, It turns vag=
+ue.
+> We have -EAGAIN to represent "retry" and "-ENONET" to represent PTE not t=
+here,
+> and they seems end up with different behaviors in different types of pgta=
+ble
+> walk. That is what I feels off.
+>
+> visitor_cb has two different requirements of returning the status: 1)
+> something wrong happens *not* related to the pgtable, e.g. failing to
+> allocate memory. 2) something happens related to the pgtable. e.g PTE doe=
+sn't
+> exists.
+>
+> For 1) It is natural to return an error code and the caller might just ba=
+il out
+> via its error handling path.
+>
+> I think the core problem is: the two different usages are mixed and they =
+don't
+> actually fit with each other. 2) is requiring more details in the future =
+other
+> than a simple error code.
+>
+>
+> For 2) I think it is better have a set of flags. the name of the flags ca=
+n
+> carry more explicit meanings than error code. E.g.:
+>
+> ------------------
+>
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/as=
+m/kvm_pgtable.h
+> index 4cd6762bda80..b3f24b321cd7 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -204,6 +204,15 @@ enum kvm_pgtable_walk_flags {
+>         KVM_PGTABLE_WALK_HANDLE_FAULT           =3D BIT(4),
+>  };
+>
+> +struct kvm_pgtable_walk_status {
+> +       union {
+> +               u8 raw;
+> +               struct {
+> +                       unsigned retry:1;
+> +                       unsigned stop:1;
+> +                       unsigned ignore:1;
+> +                       /* more to come */
+> +               };
+> +       };
+> +};
+> +
+>  struct kvm_pgtable_visit_ctx {
+>         kvm_pte_t                               *ptep;
+>         kvm_pte_t                               old;
+> @@ -213,8 +222,10 @@ struct kvm_pgtable_visit_ctx {
+>         u64                                     end;
+>         u32                                     level;
+>         enum kvm_pgtable_walk_flags             flags;
+> +       struct kvm_pgtable_walk_status          *status;
+>  };
+>
+>  typedef int (*kvm_pgtable_visitor_fn_t)(const struct kvm_pgtable_visit_c=
+tx *ctx,
+>                                         enum kvm_pgtable_walk_flags visit=
+);
+>
+> ----------------
+>
+> Visitor functions sets the flags via ctx->status and kvm_pgtable_walk_xxx=
+ can
+> check the bits in the ctx to decide what to do for the next.
+>
+> I can cook a patch for re-factoring this part if we think it is a good id=
+ea.
+>
 
-Hello,
-
-In a stress test of starting and stopping multiple VMs for a few days we 
-observed a memory leak that occurs after a few days. These guests have 
-their memory pinned via the pin_user_pages_remote() call in 
-vaddr_get_pfns(). From examining the vfio/iommu_type1 code this 
-potential race condition was noticed, but we have not root caused this 
-race to be the cause of the memory leak.
-
-Thanks,
-Sidhartha Kumar
-> Alex
-> 
->> The lack of
->> the iommu lock in vfio_iommu_type1_release() was confirmed by adding a
->>
->> WARN_ON(!mutex_is_locked(&iommu->lock))
->>
->> which was reported in dmesg. Fix this potential race by adding a iommu
->> lock and release in vfio_iommu_type1_release().
->>
->> Suggested-by: Khalid Aziz <khalid.aziz@oracle.com>
->> Signed-off-by: Sidhartha Kumar <sidhartha.kumar@oracle.com>
->> ---
->>   drivers/vfio/vfio_iommu_type1.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 306e6f1d1c70e..7d2fea1b483dc 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -2601,7 +2601,9 @@ static void vfio_iommu_type1_release(void *iommu_data)
->>   		kfree(group);
->>   	}
->>   
->> +	mutex_lock(&iommu->lock);
->>   	vfio_iommu_unmap_unpin_all(iommu);
->> +	mutex_unlock(&iommu->lock);
->>   
->>   	list_for_each_entry_safe(domain, domain_tmp,
->>   				 &iommu->domain_list, next) {
-> 
-
+This can also be one option. I will wait till others also weigh in on
+how to make walkers and callbacks work together for more use cases.
