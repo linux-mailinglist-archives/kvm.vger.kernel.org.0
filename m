@@ -2,162 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F1787289B9
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 22:57:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA5997289DE
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 23:04:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236417AbjFHU5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 16:57:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52086 "EHLO
+        id S236892AbjFHVEJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 17:04:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229927AbjFHU5W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 16:57:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 921C7E61
-        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 13:56:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686257796;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9PJ8juZ8Q2bIBQLeKki4qKbKgEzmr7QQFLcUkAqFdNw=;
-        b=BAas7k9qYbuKVWEIc1HVjimMbooxzQMZGcl0PV0MBmUcI71Mhr+Qy2Q5G5O5wgBP6O/Dsf
-        q2u1vweIaYnFQizneIDl6s+cvvdfaA4dL/UUYp44wU0zenQskZZbhJqu9yShFtUBHFflCD
-        7mjowXX6hZvBepsuF3jW0Ccw78pUGKM=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-638-4wegk0ynPj-01koG41z5fQ-1; Thu, 08 Jun 2023 16:56:35 -0400
-X-MC-Unique: 4wegk0ynPj-01koG41z5fQ-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-77accdaa0e0so90233339f.0
-        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 13:56:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686257794; x=1688849794;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9PJ8juZ8Q2bIBQLeKki4qKbKgEzmr7QQFLcUkAqFdNw=;
-        b=Vf9VDo6mjDLC+K4hfDJ6wcgpyo8w7UYSNVk2xSKkWaBy16prBX845AVa7/dVAMMj8R
-         g10vmJb5SPhOMd/WrW1Qh9SfZwh8WLgVTUaBzYR1gc+2mM5S3Fg2ZcguPkEaZK4x2JNV
-         7tcPDpw5mwy9LWuh/QKBLg3ZA2O2cb9wbvr8pzpSLTLV1jeIhY1AlNVRCKf5BG8p7vBp
-         Y+ZqTKCTTiWoUkXpzkVhm0SFN1iGc7xbXXzpHsxS9ET2DYxUDb3w5lHzFyoLT1kL5DSp
-         WUgueoscs9aM9FAHqGCNwDH3FVCZ/Y6fjYK6UL0Qv1Xoyn2qg273s19hv5oHd/kgcHFQ
-         G1ng==
-X-Gm-Message-State: AC+VfDwMgoKAIPVBl3D380T/1HJLxf/mCsTsxT1nL1bnvaq5yQiMsDUp
-        TDw8z3SI2lsqkFwYp26Z+O7+nOJ4Tv887tc6+SOv9iseTVLJkW+ePMVu302xjPLyjgvdbPJDELI
-        3F60d7/CVfq4lpatpngRg
-X-Received: by 2002:a5e:c119:0:b0:774:84b5:cb77 with SMTP id v25-20020a5ec119000000b0077484b5cb77mr9289133iol.18.1686257794566;
-        Thu, 08 Jun 2023 13:56:34 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6yHRVXjAqAJolQVpnfr2/GQx0sufa8nbZ0eSOaJTxwUDlR7eYX4gxYCo5VzmpdSZirAgmwPA==
-X-Received: by 2002:a5e:c119:0:b0:774:84b5:cb77 with SMTP id v25-20020a5ec119000000b0077484b5cb77mr9289129iol.18.1686257794339;
-        Thu, 08 Jun 2023 13:56:34 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id z20-20020a029f14000000b00408b3bc8061sm500297jal.43.2023.06.08.13.56.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jun 2023 13:56:33 -0700 (PDT)
-Date:   Thu, 8 Jun 2023 14:56:32 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Sidhartha Kumar <sidhartha.kumar@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        khalid.aziz@oracle.com
-Subject: Re: [PATCH] vfio/iommu_type1: acquire iommu lock in
- vfio_iommu_type1_release()
-Message-ID: <20230608145632.41073b65.alex.williamson@redhat.com>
-In-Reply-To: <8bf63ad2-43fd-41cd-c3dc-0507701eb5c1@oracle.com>
-References: <20230607190752.216801-1-sidhartha.kumar@oracle.com>
-        <20230607134037.6d81e288.alex.williamson@redhat.com>
-        <8bf63ad2-43fd-41cd-c3dc-0507701eb5c1@oracle.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S230459AbjFHVEH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 17:04:07 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C9D2728;
+        Thu,  8 Jun 2023 14:04:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686258246; x=1717794246;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=7I2bMMLXfOY5FSRQBIV6jQInEbWZkrrAFBkie4VaDnc=;
+  b=dT83CEJrTME8YAl857iaPhlv/ce5N4w2BirvSaSU+KrdDKTbmKOn0+NZ
+   RpbH71MySV5aUAJ/EyAfM8Gw3lhDzKNCrtI/O2UeTMeJ6IDLTqfN+EGMe
+   SKK83Bu3ZY0S6JBGXFbte72XtMUO48GL3MZq3C5Hglckm/aqu3D2IUTGZ
+   IK+WlDz6voQMLSedkV54eemry2jfY/t5S5ghgIW2u8dP7bRurwEVUuXZ0
+   sfmrIhBzW9AESI8Jwx6Q61LizFrYrfLNG/9DI3cYJreAUJp7K1PAmpuA6
+   wZ4e3B5cq6GR3Z45NkG77NrHWIXejh6/cjbzVUL5nS93mFyp87jb44Auc
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10735"; a="360789745"
+X-IronPort-AV: E=Sophos;i="6.00,227,1681196400"; 
+   d="scan'208";a="360789745"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2023 14:04:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10735"; a="704284798"
+X-IronPort-AV: E=Sophos;i="6.00,227,1681196400"; 
+   d="scan'208";a="704284798"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga007.jf.intel.com with ESMTP; 08 Jun 2023 14:04:04 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Thu, 8 Jun 2023 14:04:04 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Thu, 8 Jun 2023 14:04:04 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Thu, 8 Jun 2023 14:04:04 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Thu, 8 Jun 2023 14:04:04 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=StyB9gmlSsXydsqr1eM4N7Lr8y6hbb8riedhhSZYISUdJgQ6X2CmDamp+X3DwTc7faBy+cxgzPS2/tALa+ZQFU3aMYad6+DOe7cny52rdHG79xPE0t+LzwJ9N0sBqErsyZTe+EtBZUUuw7Yq/bCSJU2Ho8iR4ZtN3JbfmRRbBrqkY1fI0hlpJiwxMrXdH86+w74aWvgNm2Bjos8H3e9WvoERZBCDjA+AXk8VWl61OCof95cQewAc3v0LR13Jm6SyrXamRBBtg78nG5ociWOds+Vjse+zepfxSzInZj0fqHfFYrLU67DpT+EU9Eug66TKbamgFLOl8JaKL5OSlqgcHQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XLZDQuSbBUSTxHa6LocLQQCkJCs5mVEXl7vkrcjZLKU=;
+ b=QdWGLqc7+dsDOQlFNIjUhw3/OYnyKUJUx07o+h5AxPJX328iXmyZIH/imR3WB3i3bSIgoHlePwyoQDXcVkpM85/34PwDuQi6AzGk5ZqwtHQBMH0O3hr1WQH/G1EY3nSClkUHOL2hWwXQWPy2R/pb8zos8yrwXuBSoPOFGrAIPHGXQTFSOf4AILOwpV12QmU7CTin7G51mKVe9LWC3nSBiPRpkVSpSm9uxdylMOepnvckT/Xut1WVgxm8JqMhHIzU/CgMVYdl/EZXKmQnrtI5M9KVU0s0xiaGblrXy5tnEY+O5YgWZwqPR7zfRUABDvoyPGEZQPh7k+6GZA/8s+A3mQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by SJ0PR11MB5038.namprd11.prod.outlook.com (2603:10b6:a03:2d8::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.36; Thu, 8 Jun
+ 2023 21:04:03 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::95c6:c77e:733b:eee5]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::95c6:c77e:733b:eee5%5]) with mapi id 15.20.6455.030; Thu, 8 Jun 2023
+ 21:04:02 +0000
+Date:   Thu, 8 Jun 2023 14:03:56 -0700
+From:   Dan Williams <dan.j.williams@intel.com>
+To:     Kai Huang <kai.huang@intel.com>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>
+CC:     <linux-mm@kvack.org>, <dave.hansen@intel.com>,
+        <kirill.shutemov@linux.intel.com>, <tony.luck@intel.com>,
+        <peterz@infradead.org>, <tglx@linutronix.de>, <seanjc@google.com>,
+        <pbonzini@redhat.com>, <david@redhat.com>,
+        <dan.j.williams@intel.com>, <rafael.j.wysocki@intel.com>,
+        <ying.huang@intel.com>, <reinette.chatre@intel.com>,
+        <len.brown@intel.com>, <ak@linux.intel.com>,
+        <isaku.yamahata@intel.com>, <chao.gao@intel.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <bagasdotme@gmail.com>, <sagis@google.com>, <imammedo@redhat.com>,
+        <kai.huang@intel.com>
+Subject: RE: [PATCH v11 00/20] TDX host kernel support
+Message-ID: <6482423c7c52a_142af8294a6@dwillia2-xfh.jf.intel.com.notmuch>
+References: <cover.1685887183.git.kai.huang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <cover.1685887183.git.kai.huang@intel.com>
+X-ClientProxiedBy: SJ0PR03CA0190.namprd03.prod.outlook.com
+ (2603:10b6:a03:2ef::15) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|SJ0PR11MB5038:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6cfc1c91-b5b7-49ec-5298-08db6863e293
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nMAUijXRytibV4BF2T20VHVp1Pe0/Tha7NZcSb8wqIWt9ATF3wDqGr1vl+K9ombeJcy4vjEHSHyzElewUlXXqNcXUhdXSCl7N/14FBh7CxDIn5I3SYdX2FRJdSvKsRY+4YF3LNN7jB2UttSDPtYuYL88X+BWPgEiNi0LPkVSLzDZfaSaUd/xfBX7ildgrX3q2H3y29Kk0EhmXl6BOqx33BVVEO6avrqO8jcEglR6V4CPBzi1d3Jyp0PHfVAadnBAwt3kHOIAN33AlfLl3ZfDOiMMF6sWazWkzOdJFd5U2tgauqUwKx6Hv6KCcRAXV+WxpY/6aolJbYXDAOyAGdC1GcfM++494fnJCh/j/oMPZVjioJdiiBmkJ7T9lInK0RkEzE8mv6bcigWmWT46HvqpTBVr2Rfv4XzLnHYBg4bIheTBmPNkMrIBLSZKkNrKFesk688eM09FOP+orDyOHsEPU71smCdc+P49rG8vy35XDlyRaju/BdzXsZ5fyQhirHw3MzEL5LXErfZHoNpUSZD8zW5wM0Au8aG0QHMeea+1MSg=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(376002)(346002)(136003)(396003)(366004)(451199021)(26005)(6506007)(6512007)(9686003)(966005)(83380400001)(186003)(6666004)(6486002)(66946007)(66556008)(66476007)(82960400001)(2906002)(7416002)(38100700002)(8936002)(8676002)(5660300002)(41300700001)(478600001)(86362001)(316002)(4326008);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AYFa7YxFMuhxOyUgdiQf8vBWdoQJkzddubsfox6t525CEGKxyEj+yP773bED?=
+ =?us-ascii?Q?At8t6j9znUTiK/3GW3TbaAiVBujHGgw6I9iJ2Ztxo7NHkOTF52kD/UGgILtO?=
+ =?us-ascii?Q?t+7K/xRL8AEAqbTY40/nsd2dhYJazO+IEFLOg0WxT6LkuiwHMyDRuLOLwjPr?=
+ =?us-ascii?Q?YSH7hmrsSR3wolbqAQs0B2Aw2ubLLhRL2BRPwnWJnBS2nf2J+ge8arpT7ufi?=
+ =?us-ascii?Q?G/WQWmrtzZo3wlJfpaPJFs+DY2vhqVisEmfAoPHthvsdfo2NM5ZrEE4axCjm?=
+ =?us-ascii?Q?E7bm6JBJYJeGxkMrxfSL13DBGAYXyZ5a0ptj06A0ADPLfo9Q2kffbGqbZgn7?=
+ =?us-ascii?Q?yM2kWLItPJMzlOUPaidYks9nYVQe2Q65x6jxDkD5sNehHfPIYhItQYBQqC1s?=
+ =?us-ascii?Q?ajqaNuIF3TbnRuVquSTbFohEGbTPdMVPp2Wlwnm91YELb6lnR6Q2JuxU/+if?=
+ =?us-ascii?Q?6NfQr2MTPMku6YFi4ZvI1Jswbe8vhm0/v5ENa0vzEU5ENd79m3VblR4GG9Ds?=
+ =?us-ascii?Q?G0VmgiuuiQu4+oVHpHoL4KLPF8frg0PjBxexo+3t/qWd5EYOWaH1TN77M01L?=
+ =?us-ascii?Q?6b77zusVEh1y15ZttAM/sFCwXLshtTr0RAByhZEMHONF08AlO8bZ6oG77EYD?=
+ =?us-ascii?Q?brjzU5slpSl2gc0s1dattAJ01/3DCTMT6QxaFO7pdRpOlvxR0wBHPL8xxf+X?=
+ =?us-ascii?Q?k8uiq8VOvw1NShvnQTy9yp9fosrAqrl278V9/gcrdFpBP0AERULX3QC4cmD0?=
+ =?us-ascii?Q?/nKk0L76LYYjOT9M1JfUeuTW76RJhi1M/gCG9XjKAvUAq+zlHcE4sHeogYFD?=
+ =?us-ascii?Q?Z5ReHAm7CsfC3aDA+/SS3nNjhzaiAUr0M6gCfug0ziY/tE8mq9A1aqho7zY6?=
+ =?us-ascii?Q?9A8AK/ri57EoOQLWaSxRYl3RXwUDqOeJ3kBzlCe911mu4JwLLV3bo+Tjc9Y2?=
+ =?us-ascii?Q?MFZDaJNYuWX5O5HBtQeIyRFamoz/3fK/OeOkUvncQXWncjBffiiMrwOCVmK5?=
+ =?us-ascii?Q?K2yFhWJGUpd5KZ4SfBnM+lz2aK6Oe1Uy3il5kPV1vpXDTxYJQCx+C82cjfvi?=
+ =?us-ascii?Q?awAKARHg9f2WFsY/TeTIQoLrCf6b8l1IUhCqge05ow00xPLmAsc5MKTnfD+C?=
+ =?us-ascii?Q?F/CR3jYpWQjfNiygQviMVFpPaHwp63BVBMT5cvd5oYXr1UU0qZK8N3iHzNMN?=
+ =?us-ascii?Q?XzlKMFl/FKERrgro9WRvoq0Vn4w5Kgd9ZApBy1O9RLb7bvgISjuPS7SeWQLZ?=
+ =?us-ascii?Q?3s+kFkxmwZPwJbPv222qSkojJDJFJ8hhvTZxFZqxymuhqtpVq+tuH/+VGOpB?=
+ =?us-ascii?Q?4ty7YRAaKVsXLb9g8CEKVWw2JKSYw/1aHlXG021+o25sueVx0TcorWQM1I3+?=
+ =?us-ascii?Q?0RSvRXXrHQvSf5qgZ4OsJw0786XuW4mby6eFaoE9PF30wxU4iwt+52+2J4VX?=
+ =?us-ascii?Q?ZICanO1ofSSGcRwb/EX+iuzs0sKHDzmHZXlS9zFS6LxnGpy5qLo5E0vK7Ugr?=
+ =?us-ascii?Q?/0KGeM1imRNsp3gHyOfOlNCoaRHgEIrVALMOgUWIqFcmkCHE3FRUkJn3veyt?=
+ =?us-ascii?Q?yJP9iWcUDMfl7zCpMRJDJ3Q6a1uR2esYF3z+QQ/QxuwSEPmmuNliXYXtwzGy?=
+ =?us-ascii?Q?1A=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6cfc1c91-b5b7-49ec-5298-08db6863e293
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2023 21:04:02.0681
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2F4Nb9Ex58uyqOfTnyL3j3ZCJiZ/3n4KvYA4bAXDWXnWVLuvRqWXsRB4KSaP8/JU1vWI+jjE5Lfkb8qB9ij8C3HGvboGvSV6nzNZfcGiLfQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5038
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 8 Jun 2023 13:16:12 -0700
-Sidhartha Kumar <sidhartha.kumar@oracle.com> wrote:
-
-> On 6/7/23 12:40 PM, Alex Williamson wrote:
-> > On Wed,  7 Jun 2023 12:07:52 -0700
-> > Sidhartha Kumar <sidhartha.kumar@oracle.com> wrote:
-> >   
-> >>  From vfio_iommu_type1_release() there is a code path:
-> >>
-> >> vfio_iommu_unmap_unpin_all()
-> >>   vfio_remove_dma()
-> >>      vfio_unmap_unpin()
-> >>        unmap_unpin_slow()
-> >>          vfio_unpin_pages_remote()
-> >>            vfio_find_vpfn()
-> >>
-> >> This path is taken without acquiring the iommu lock so it could lead to
-> >> a race condition in the traversal of the pfn_list rb tree.  
-> > 
-> > What's the competing thread for the race, vfio_remove_dma() tests:
-> > 
-> > 	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
-> > 
-> > The fix is not unreasonable, but is this a theoretical fix upstream
-> > that's tickled by some downstream additions, or are we actually
-> > competing against page pinning by an mdev driver after the container is
-> > released?  Thanks,
-> >   
+Kai Huang wrote:
+> Intel Trusted Domain Extensions (TDX) protects guest VMs from malicious
+> host and certain physical attacks.  TDX specs are available in [1].
 > 
-> Hello,
-> 
-> In a stress test of starting and stopping multiple VMs for a few days we 
-> observed a memory leak that occurs after a few days. These guests have 
-> their memory pinned via the pin_user_pages_remote() call in 
-> vaddr_get_pfns(). From examining the vfio/iommu_type1 code this 
-> potential race condition was noticed, but we have not root caused this 
-> race to be the cause of the memory leak.
+> This series is the initial support to enable TDX with minimal code to
+> allow KVM to create and run TDX guests.  KVM support for TDX is being
+> developed separately[2].  A new "userspace inaccessible memfd" approach
+> to support TDX private memory is also being developed[3].  The KVM will
+> only support the new "userspace inaccessible memfd" as TDX guest memory.
 
-Ok, I think we're going to need to wait for that root cause.  It's
-trivial to hold the lock here, but we're imminently freeing the object
-hosting that lock, so we have bigger problems than threads stepping on
-each other in the pfn_list if this lock were to actually resolve
-anything.  It's not an oversight that we don't hold the lock here,
-there should be no outstanding references to the iommu object at this
-point.  Thanks,
+This memfd approach is incompatible with one of the primary ways that
+new memory topologies like high-bandwidth-memory and CXL are accessed,
+via a device-special-file mapping. There is already precedent for mmap()
+to only be used for communicating address value and not CPU accessible
+memory. See "Userspace P2PDMA with O_DIRECT NVMe devices" [1].
 
-Alex
- 
-> >> The lack of
-> >> the iommu lock in vfio_iommu_type1_release() was confirmed by adding a
-> >>
-> >> WARN_ON(!mutex_is_locked(&iommu->lock))
-> >>
-> >> which was reported in dmesg. Fix this potential race by adding a iommu
-> >> lock and release in vfio_iommu_type1_release().
-> >>
-> >> Suggested-by: Khalid Aziz <khalid.aziz@oracle.com>
-> >> Signed-off-by: Sidhartha Kumar <sidhartha.kumar@oracle.com>
-> >> ---
-> >>   drivers/vfio/vfio_iommu_type1.c | 2 ++
-> >>   1 file changed, 2 insertions(+)
-> >>
-> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> >> index 306e6f1d1c70e..7d2fea1b483dc 100644
-> >> --- a/drivers/vfio/vfio_iommu_type1.c
-> >> +++ b/drivers/vfio/vfio_iommu_type1.c
-> >> @@ -2601,7 +2601,9 @@ static void vfio_iommu_type1_release(void *iommu_data)
-> >>   		kfree(group);
-> >>   	}
-> >>   
-> >> +	mutex_lock(&iommu->lock);
-> >>   	vfio_iommu_unmap_unpin_all(iommu);
-> >> +	mutex_unlock(&iommu->lock);
-> >>   
-> >>   	list_for_each_entry_safe(domain, domain_tmp,
-> >>   				 &iommu->domain_list, next) {  
-> >   
-> 
+So before this memfd requirement becomes too baked in to the design I
+want to understand if "userspace inaccessible" is the only requirement
+so I can look to add that to the device-special-file interface for
+"device" / "Soft Reserved" memory like HBM and CXL.
 
+[1]: https://lore.kernel.org/all/20221021174116.7200-1-logang@deltatee.com/
