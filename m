@@ -2,103 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3C9072751F
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 04:45:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2ECC72757C
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 05:13:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233661AbjFHCpP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jun 2023 22:45:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47824 "EHLO
+        id S233982AbjFHDND (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jun 2023 23:13:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233655AbjFHCpO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jun 2023 22:45:14 -0400
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF0B82126
-        for <kvm@vger.kernel.org>; Wed,  7 Jun 2023 19:45:12 -0700 (PDT)
-Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-75d5469c856so8540585a.2
-        for <kvm@vger.kernel.org>; Wed, 07 Jun 2023 19:45:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686192312; x=1688784312;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=teN9p0t9Py9PEukUc7/cqagMxz/5d+anLF3de3OjgMs=;
-        b=JyKG9gVIrKRNvg08FK0kze79jE+HPGg14Ppzb0B87BxKnQTHTcgU05NSJw/u+1OiNC
-         qNs9ope2ux+R/3VumkcD5W8q0tVfR3vowKfKXIyOfN7+0itWGFz82ba8wHsl43SpfsgA
-         WrSVxEvKOcTcsLLrIUSy9kXaMRg/QAzVS7xzU560e9WoflWDJmcgi9T6IbkfFldbM5Sy
-         VIor5qle13B3gjcYydJ+71yiJYAk+0J0QSBpH2P20IdOg9F5EiJBQgWIhTahq4KIybQq
-         unrLP2gYRdX9Ix3VYpjQsg7X0wyHaMqescICLJvWTkw4/Va/RAlPoR33hrl0KVfE3qH6
-         SfXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686192312; x=1688784312;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=teN9p0t9Py9PEukUc7/cqagMxz/5d+anLF3de3OjgMs=;
-        b=IS0X+ObVxsUYIqz0Ji3IInKGJAeE1C2a5kCUL6sA0vLbr2s8gFrhS1Wxy96q00+eHl
-         aLW2Kp/hejUeaMQW2c0P+YrqTkzfJaDyyeT1ajhIDF1ohS7vTX/YYGVSxC+OD0+DMhlf
-         7DJbN412qGJMr44aP0eSaRFE0AzeTSw1FUw7rg9kZW/eDv47GH1bSHpEnN45OhXoABhO
-         bKqV15u2G8L6+i5dk0mhF9OmNAuUYTyVqguIKstetkznPwe3fogTkacJn6Ew9UbsjFro
-         Dv+yVX0H9ZQoESafZ06HaBN38yTxq+lqZQq07jdAVt2bZ5iX/olg+/uET0ZUZB0kZORx
-         Spjg==
-X-Gm-Message-State: AC+VfDwqeJIvT4szB5THBK7lubBE9gLlQz6oj725E4BoaZlJ4nc8yTZE
-        PJoli/lV7m+Wz47Jn3CTaWI=
-X-Google-Smtp-Source: ACHHUZ5U53tkB/Ijo7k2JmytjfmtxBzc/YSVbJKsamc7Fx4I05POeWa4lQTTG1qRKoS80xXM2zYKRQ==
-X-Received: by 2002:a05:620a:4690:b0:75d:5321:fa40 with SMTP id bq16-20020a05620a469000b0075d5321fa40mr4207972qkb.51.1686192311907;
-        Wed, 07 Jun 2023 19:45:11 -0700 (PDT)
-Received: from wheely.local0.net (58-6-224-112.tpgi.com.au. [58.6.224.112])
-        by smtp.gmail.com with ESMTPSA id gt1-20020a17090af2c100b002591b957641sm173870pjb.41.2023.06.07.19.45.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jun 2023 19:45:11 -0700 (PDT)
-From:   Nicholas Piggin <npiggin@gmail.com>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
-Subject: [PATCH] KVM: PPC: Update MAINTAINERS
-Date:   Thu,  8 Jun 2023 12:45:04 +1000
-Message-Id: <20230608024504.58189-1-npiggin@gmail.com>
-X-Mailer: git-send-email 2.40.1
+        with ESMTP id S233829AbjFHDMs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jun 2023 23:12:48 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95C772694;
+        Wed,  7 Jun 2023 20:12:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686193966; x=1717729966;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=sMbXuX3lu3dVqH5f33IbRDEXVtqf2GKK2B0SZ+tGM3E=;
+  b=VJ/qNtTZh1JHfsZ8G+b7JcNEI4wsANCNN3pX3+GN1AWItDGrdahK/IBX
+   m7eZF2drUVks+Hb8FLx9QVNcfZeAsBUt/HxfQCrXV1GUDumrVb7IjE4NF
+   kOn56WQ+7HT0JSLezwgVSgEk4SHoUIyers3eV/AMyKSez0NlPL9lcb4K9
+   4PcP/kEoggTh6ayOjExaC4xBonpYjYWka7LzowC0o5/29aqS2mCyHSOjm
+   3mDwe4vcf+HI/R1Aj430zPVWpbXbp93OKHW82gT9JvL7Lq2ZXY7rpzsZI
+   MTsAluZj/lvN37lGNm6zZiTwDP1pQJ8jv3WR3refS5meuERj+zIF3e6Ee
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10734"; a="354672848"
+X-IronPort-AV: E=Sophos;i="6.00,226,1681196400"; 
+   d="scan'208";a="354672848"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2023 20:12:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10734"; a="833993166"
+X-IronPort-AV: E=Sophos;i="6.00,226,1681196400"; 
+   d="scan'208";a="833993166"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.254.214.110]) ([10.254.214.110])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2023 20:12:44 -0700
+Message-ID: <02d97490-9e59-8e78-8a54-0139d316d3b7@intel.com>
+Date:   Thu, 8 Jun 2023 11:12:41 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.11.2
+Subject: Re: [PATCH 1/2] KVM: x86: Snapshot host's MSR_IA32_ARCH_CAPABILITIES
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Chao Gao <chao.gao@intel.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+References: <20230607004311.1420507-1-seanjc@google.com>
+ <20230607004311.1420507-2-seanjc@google.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20230607004311.1420507-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Michael is merging KVM PPC patches via the powerpc tree and KVM topic
-branches. He doesn't necessarily have time to be across all of KVM so
-is reluctant to call himself maintainer, but for the mechanics of how
-patches flow upstream, it is maintained and does make sense to have
-some contact people in MAINTAINERS.
+On 6/7/2023 8:43 AM, Sean Christopherson wrote:
+> Snapshot the host's MSR_IA32_ARCH_CAPABILITIES, if it's supported, instead
+> of reading the MSR every time KVM wants to query the host state, e.g. when
+> initializing the default value during vCPU creation.  The paths that query
+> ARCH_CAPABILITIES aren't particularly performance sensitive, but creating
+> vCPUs is a frequent enough operation that burning 8 bytes is a good
+> trade-off.
+> 
+> Alternatively, KVM could add a field in kvm_caps and thus skip the
+> on-demand calculations entirely, but a pure snapshot isn't possible due to
+> the way KVM handles the l1tf_vmx_mitigation module param.  And unlike the
+> other "supported" fields in kvm_caps, KVM doesn't enforce the "supported"
+> value, i.e. KVM treats ARCH_CAPABILITIES like a CPUID leaf and lets
+> userspace advertise whatever it wants.  Those problems are solvable, but
+> it's not clear there is real benefit versus snapshotting the host value,
+> and grabbing the host value will allow additional cleanup of KVM's
+> FB_CLEAR_CTRL code.
 
-So add Michael Ellerman as KVM PPC maintainer and myself as reviewer.
-Split out the subarchs that don't get so much attention.
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0dab9737ec16..44417acd2936 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11379,7 +11379,13 @@ F:	arch/mips/include/uapi/asm/kvm*
- F:	arch/mips/kvm/
- 
- KERNEL VIRTUAL MACHINE FOR POWERPC (KVM/powerpc)
-+M:	Michael Ellerman <mpe@ellerman.id.au>
-+R:	Nicholas Piggin <npiggin@gmail.com>
- L:	linuxppc-dev@lists.ozlabs.org
-+L:	kvm@vger.kernel.org
-+S:	Maintained (Book3S 64-bit HV)
-+S:	Odd fixes (Book3S 64-bit PR)
-+S:	Orphan (Book3E and 32-bit)
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git topic/ppc-kvm
- F:	arch/powerpc/include/asm/kvm*
- F:	arch/powerpc/include/uapi/asm/kvm*
--- 
-2.40.1
+> Link: https://lore.kernel.org/all/20230524061634.54141-2-chao.gao@intel.com
+> Cc: Chao Gao <chao.gao@intel.com>
+> Cc: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/vmx/vmx.c | 22 ++++++----------------
+>   arch/x86/kvm/x86.c     | 13 +++++++------
+>   arch/x86/kvm/x86.h     |  1 +
+>   3 files changed, 14 insertions(+), 22 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 2d9d155691a7..42d1148f933c 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -255,14 +255,9 @@ static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
+>   		return 0;
+>   	}
+>   
+> -	if (boot_cpu_has(X86_FEATURE_ARCH_CAPABILITIES)) {
+> -		u64 msr;
+> -
+> -		rdmsrl(MSR_IA32_ARCH_CAPABILITIES, msr);
+> -		if (msr & ARCH_CAP_SKIP_VMENTRY_L1DFLUSH) {
+> -			l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_NOT_REQUIRED;
+> -			return 0;
+> -		}
+> +	if (host_arch_capabilities & ARCH_CAP_SKIP_VMENTRY_L1DFLUSH) {
+> +		l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_NOT_REQUIRED;
+> +		return 0;
+>   	}
+>   
+>   	/* If set to auto use the default l1tf mitigation method */
+> @@ -373,15 +368,10 @@ static int vmentry_l1d_flush_get(char *s, const struct kernel_param *kp)
+>   
+>   static void vmx_setup_fb_clear_ctrl(void)
+>   {
+> -	u64 msr;
+> -
+> -	if (boot_cpu_has(X86_FEATURE_ARCH_CAPABILITIES) &&
+> +	if ((host_arch_capabilities & ARCH_CAP_FB_CLEAR_CTRL) &&
+>   	    !boot_cpu_has_bug(X86_BUG_MDS) &&
+> -	    !boot_cpu_has_bug(X86_BUG_TAA)) {
+> -		rdmsrl(MSR_IA32_ARCH_CAPABILITIES, msr);
+> -		if (msr & ARCH_CAP_FB_CLEAR_CTRL)
+> -			vmx_fb_clear_ctrl_available = true;
+> -	}
+> +	    !boot_cpu_has_bug(X86_BUG_TAA))
+> +		vmx_fb_clear_ctrl_available = true;
+>   }
+>   
+>   static __always_inline void vmx_disable_fb_clear(struct vcpu_vmx *vmx)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7c7be4815eaa..7c2e796fa460 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -237,6 +237,9 @@ EXPORT_SYMBOL_GPL(enable_apicv);
+>   u64 __read_mostly host_xss;
+>   EXPORT_SYMBOL_GPL(host_xss);
+>   
+> +u64 __read_mostly host_arch_capabilities;
+> +EXPORT_SYMBOL_GPL(host_arch_capabilities);
+> +
+>   const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>   	KVM_GENERIC_VM_STATS(),
+>   	STATS_DESC_COUNTER(VM, mmu_shadow_zapped),
+> @@ -1612,12 +1615,7 @@ static bool kvm_is_immutable_feature_msr(u32 msr)
+>   
+>   static u64 kvm_get_arch_capabilities(void)
+>   {
+> -	u64 data = 0;
+> -
+> -	if (boot_cpu_has(X86_FEATURE_ARCH_CAPABILITIES)) {
+> -		rdmsrl(MSR_IA32_ARCH_CAPABILITIES, data);
+> -		data &= KVM_SUPPORTED_ARCH_CAP;
+> -	}
+> +	u64 data = host_arch_capabilities & KVM_SUPPORTED_ARCH_CAP;
+>   
+>   	/*
+>   	 * If nx_huge_pages is enabled, KVM's shadow paging will ensure that
+> @@ -9492,6 +9490,9 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>   
+>   	kvm_init_pmu_capability(ops->pmu_ops);
+>   
+> +	if (boot_cpu_has(X86_FEATURE_ARCH_CAPABILITIES))
+> +		rdmsrl(MSR_IA32_ARCH_CAPABILITIES, host_arch_capabilities);
+> +
+>   	r = ops->hardware_setup();
+>   	if (r != 0)
+>   		goto out_mmu_exit;
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 82e3dafc5453..1e7be1f6ab29 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -323,6 +323,7 @@ fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu);
+>   
+>   extern u64 host_xcr0;
+>   extern u64 host_xss;
+> +extern u64 host_arch_capabilities;
+>   
+>   extern struct kvm_caps kvm_caps;
+>   
 
