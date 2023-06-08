@@ -2,198 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F89D727B17
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 11:21:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38D98727B20
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 11:22:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235248AbjFHJVJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 05:21:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60282 "EHLO
+        id S232198AbjFHJWi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 05:22:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231224AbjFHJVH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 05:21:07 -0400
-X-Greylist: delayed 537 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 08 Jun 2023 02:21:05 PDT
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [IPv6:2a01:4f8:150:2161:1:b009:f23e:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 081B418F
-        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 02:21:04 -0700 (PDT)
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-         client-signature RSA-PSS (4096 bits) client-digest SHA256)
-        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
-        by bmailout3.hostsharing.net (Postfix) with ESMTPS id 36899100F00EE;
-        Thu,  8 Jun 2023 11:12:03 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-        id 00322D4F60; Thu,  8 Jun 2023 11:12:02 +0200 (CEST)
-Date:   Thu, 8 Jun 2023 11:12:02 +0200
-From:   Lukas Wunner <lukas@wunner.de>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        "Giani, Dhaval" <Dhaval.Giani@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Kardashevskiy, Alexey" <Alexey.Kardashevskiy@amd.com>,
-        "Kaplan, David" <David.Kaplan@amd.com>,
-        "steffen.eiden@ibm.com" <steffen.eiden@ibm.com>,
-        "yilun.xu@intel.com" <yilun.xu@intel.com>,
-        Suzuki K P <suzuki.kp@gmail.com>,
-        "Powell, Jeremy" <Jeremy.Powell@amd.com>,
-        "atishp04@gmail.com" <atishp04@gmail.com>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: RE: KVM Forum BoF on I/O + secure virtualization
-Message-ID: <20230608091202.GA962@wunner.de>
-References: <c2db1a80-722b-c807-76b5-b8672cb0db09@redhat.com>
- <MW4PR12MB7213E05A15C3F45CA6F9E93B8D4EA@MW4PR12MB7213.namprd12.prod.outlook.com>
- <647e9d4be14dd_142af8294b2@dwillia2-xfh.jf.intel.com.notmuch>
- <d1269899-7e74-f33c-97bf-be0c708d2465@amd.com>
+        with ESMTP id S235284AbjFHJWf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 05:22:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29A5B1FCC
+        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 02:21:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686216105;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wciZzZhI8oXg7Yuw9Rr2DJCHC9/Z7EBEfdGZiOUWtDk=;
+        b=Oa2SKuatqQBqQqYqy2nk4cGd+kmYJTCj06Nk24d48F5lIlvRwKWr9WOclIkHo1Jo+9NzB6
+        eVNQWCarWlqcDogEsyZOX1lq/5Si2mqHxtyv8VmgrLjC8bXsHqVwbO28rY4eZ/j6erjErs
+        84JnW5waz8/ZLGmUMk35YsHSt665sAI=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-175-up8Cs9CYOqKmDWGg1J-rGw-1; Thu, 08 Jun 2023 05:21:43 -0400
+X-MC-Unique: up8Cs9CYOqKmDWGg1J-rGw-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-75d6b90f933so56130985a.0
+        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 02:21:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686216102; x=1688808102;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wciZzZhI8oXg7Yuw9Rr2DJCHC9/Z7EBEfdGZiOUWtDk=;
+        b=BsuITmsOBHw+o492omYU7TegNKYljNuL6qTVRwzco0ZYd06dska9xFotolQApD3G3l
+         AILiupjQUTgLWp50QWkzec3P+bequ4fdXBxLP3ZM9/RNCyRNoGD8PpOy1eBKtF9ugQwa
+         tMaufqrmEgR1NgQtZXhhgzCh83XPcteq47wdjr9v46CXpSKua8dSu4ItnwVAKwdU7Lwx
+         Xrom6AEUYbxY2wJJUn+LWqVSsYn5BNqeVNJNQ6cNFHXzvhnm6+mE9Cb0RfSZxvxwb5uf
+         H7s9auHw2AZEQL7v7Mel4SIEZBwL3FNhait5n7Qli1EaF3vmGO03vJtXTSijxsiWma/j
+         J7eg==
+X-Gm-Message-State: AC+VfDx4yY7HTpv30r65FkOXx0Pz0brRZwIoojupz3ZKLRZ2IgOSvLO4
+        YguxAYZeuQHDVRb9hxAssa0cGdtjkBeikLLxYVSH3MYIeewDIpb+zxsPpBdoM9HkuzMdSzqH5ye
+        /0R6mqWudjVIT
+X-Received: by 2002:a05:620a:8395:b0:75b:23a1:3668 with SMTP id pb21-20020a05620a839500b0075b23a13668mr4482008qkn.41.1686216102501;
+        Thu, 08 Jun 2023 02:21:42 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4bhyfn7UJWLUNBv8vKAKxl3tIW7+FDTT6J28VyZbWi/o5E0G9yWUmjDAKtkWbyk9CcvIR9Vg==
+X-Received: by 2002:a05:620a:8395:b0:75b:23a1:3668 with SMTP id pb21-20020a05620a839500b0075b23a13668mr4481995qkn.41.1686216102220;
+        Thu, 08 Jun 2023 02:21:42 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-25-111.business.telecomitalia.it. [87.12.25.111])
+        by smtp.gmail.com with ESMTPSA id g9-20020a05620a13c900b007463509f94asm201231qkl.55.2023.06.08.02.21.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jun 2023 02:21:41 -0700 (PDT)
+Date:   Thu, 8 Jun 2023 11:21:36 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Shannon Nelson <shannon.nelson@amd.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+        Tiwei Bie <tiwei.bie@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost-vdpa: filter VIRTIO_F_RING_PACKED feature
+Message-ID: <lw3nmkdszqo6jjtneyp4kjlmutooozz7xj2fqyxgh4v2ralptc@vkimgnbfafvi>
+References: <32ejjuvhvcicv7wjuetkv34qtlpa657n4zlow4eq3fsi2twozk@iqnd2t5tw2an>
+ <CACGkMEu3PqQ99UoKF5NHgVADD3q=BF6jhLiyumeT4S1QCqN1tw@mail.gmail.com>
+ <20230606085643-mutt-send-email-mst@kernel.org>
+ <CAGxU2F7fkgL-HpZdj=5ZEGNWcESCHQpgRAYQA3W2sPZaoEpNyQ@mail.gmail.com>
+ <20230607054246-mutt-send-email-mst@kernel.org>
+ <CACGkMEuUapKvUYiJiLwtsN+x941jafDKS9tuSkiNrvkrrSmQkg@mail.gmail.com>
+ <20230608020111-mutt-send-email-mst@kernel.org>
+ <CACGkMEt4=3BRVNX38AD+mJU8v3bmqO-CdNj5NkFP-SSvsuy2Hg@mail.gmail.com>
+ <5giudxjp6siucr4l3i4tggrh2dpqiqhhihmdd34w3mq2pm5dlo@mrqpbwckpxai>
+ <CACGkMEtqn1dbrQZn3i-W_7sVikY4sQjwLRC5xAhMnyqkc3jwOw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <d1269899-7e74-f33c-97bf-be0c708d2465@amd.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEtqn1dbrQZn3i-W_7sVikY4sQjwLRC5xAhMnyqkc3jwOw@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[cc += Jonathan, Sean]
+On Thu, Jun 08, 2023 at 05:00:00PM +0800, Jason Wang wrote:
+>On Thu, Jun 8, 2023 at 4:00 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> On Thu, Jun 08, 2023 at 03:46:00PM +0800, Jason Wang wrote:
+>>
+>> [...]
+>>
+>> >> > > > > I have a question though, what if down the road there
+>> >> > > > > is a new feature that needs more changes? It will be
+>> >> > > > > broken too just like PACKED no?
+>> >> > > > > Shouldn't vdpa have an allowlist of features it knows how
+>> >> > > > > to support?
+>> >> > > >
+>> >> > > > It looks like we had it, but we took it out (by the way, we were
+>> >> > > > enabling packed even though we didn't support it):
+>> >> > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6234f80574d7569444d8718355fa2838e92b158b
+>> >> > > >
+>> >> > > > The only problem I see is that for each new feature we have to modify
+>> >> > > > the kernel.
+>> >> > > > Could we have new features that don't require handling by vhost-vdpa?
+>> >> > > >
+>> >> > > > Thanks,
+>> >> > > > Stefano
+>> >> > >
+>> >> > > Jason what do you say to reverting this?
+>> >> >
+>> >> > I may miss something but I don't see any problem with vDPA core.
+>> >> >
+>> >> > It's the duty of the parents to advertise the features it has. For example,
+>> >> >
+>> >> > 1) If some kernel version that is packed is not supported via
+>> >> > set_vq_state, parents should not advertise PACKED features in this
+>> >> > case.
+>> >> > 2) If the kernel has support packed set_vq_state(), but it's emulated
+>> >> > cvq doesn't support, parents should not advertise PACKED as well
+>> >> >
+>> >> > If a parent violates the above 2, it looks like a bug of the parents.
+>> >> >
+>> >> > Thanks
+>> >>
+>> >> Yes but what about vhost_vdpa? Talking about that not the core.
+>> >
+>> >Not sure it's a good idea to workaround parent bugs via vhost-vDPA.
+>>
+>> Sorry, I'm getting lost...
+>> We were talking about the fact that vhost-vdpa doesn't handle
+>> SET_VRING_BASE/GET_VRING_BASE ioctls well for packed virtqueue before
+>> that series [1], no?
+>>
+>> The parents seem okay, but maybe I missed a few things.
+>>
+>> [1] https://lore.kernel.org/virtualization/20230424225031.18947-1-shannon.nelson@amd.com/
+>
+>Yes, more below.
+>
+>>
+>> >
+>> >> Should that not have a whitelist of features
+>> >> since it interprets ioctls differently depending on this?
+>> >
+>> >If there's a bug, it might only matter the following setup:
+>> >
+>> >SET_VRING_BASE/GET_VRING_BASE + VDUSE.
+>> >
+>> >This seems to be broken since VDUSE was introduced. If we really want
+>> >to backport something, it could be a fix to filter out PACKED in
+>> >VDUSE?
+>>
+>> mmm it doesn't seem to be a problem in VDUSE, but in vhost-vdpa.
+>> I think VDUSE works fine with packed virtqueue using virtio-vdpa
+>> (I haven't tried), so why should we filter PACKED in VDUSE?
+>
+>I don't think we need any filtering since:
+>
+>PACKED features has been advertised to userspace via uAPI since
+>6234f80574d7569444d8718355fa2838e92b158b. Once we relax in uAPI, it
+>would be very hard to restrict it again. For the userspace that tries
+>to negotiate PACKED:
+>
+>1) if it doesn't use SET_VRING_BASE/GET_VRING_BASE, everything works well
+>2) if it uses SET_VRING_BASE/GET_VRING_BASE. it might fail or break silently
+>
+>If we backport the fixes to -stable, we may break the application at
+>least in the case 1).
 
-On Thu, Jun 08, 2023 at 09:18:12AM +1000, Alexey Kardashevskiy wrote:
-> On 6/6/23 12:43, Dan Williams wrote:
-> > Giani, Dhaval wrote:
-> > > We have proposed a trusted I/O BoF session at KVM forum this year.
-> > > I wanted to kick off the discussion to maximize the 25 mins we have.
-> > > 
-> > > By trusted I/O, I mean using TDISP to have "trusted" communications
-> > > with a device using something like AMD SEV-TIO [1] or Intel's
-> > > TDX connect [2].
-> > > 
-> > > Some topics we would like to discuss are
-> > > o What is the device model like?
-> > > o Do we enlighten the PCI subsystem?
-> > > o Do we enlighten device drivers?
-> > 
-> > One observation in relation to these first questions is something that
-> > has been brewing since SPDM and IDE were discussed at Plumbers 2022.
-> > 
-> > https://lpc.events/event/16/contributions/1304/
-> > 
-> > Namely, that there is value in the base specs on the way to the full
-> > vendor TSM implementations. I.e. that if the Linux kernel can aspire to
-> > the role of a TSM it becomes easier to incrementally add proxying to a
-> > platform TSM later. In the meantime, platforms and endpoints that
-> > support CMA / SPDM and PCIe/CXL IDE but not full "trusted I/O" still
-> > gain incremental benefit.
-> 
-> TSM on the AMD hardware is a PSP firmware and it is going to implement all
-> of SPDM/IDE and the only proxying the host kernel will do is PCI DOE.
+Okay, I see now, thanks for the details!
 
-Sean has voiced a scathing critique of this model where a firmware does
-all the attestation and hence needs to be trusted:
+Maybe instead of "break silently", we can return an explicit error for
+SET_VRING_BASE/GET_VRING_BASE in stable branches.
+But if there are not many cases, we can leave it like that.
 
-https://lore.kernel.org/all/Y+aP8rHr6H3LIf%2Fc@google.com/
-https://lore.kernel.org/all/ZEfrjtgGgm1lpadq@google.com/
-
-I think we need to entertain the idea that Linux does the attestation
-and encryption setup itself.  Reliance on a "trusted" hardware module
-should be optional.
-
-That also works for KVM:  The guest can perform attestation on its own
-behalf, setup encryption and drive the TDISP state machine.  If the
-guest's memory is encrypted with SEV or TDX, the IDE keys generated by
-the guest are invisible to the VMM and hence confidentiality is achieved.
-The guest can communicate the keys securely to the device via IDE_KM and
-the guest can ask the device to lock down via TDISP.
-
-Yes, the guest may need to rely on the PSP firmware to program the
-IDE key into the Root Port.  Can you provide that as a service from
-the PSP firmware?
-
-What you seem to be arguing for is a "fat" firmware which does all
-the attestation.  The host kernel is relegated to being a mere DOE proxy.
-And the guest is relegated to being a "dumb" receiver of the firmware's
-attestation results.
-
-What I'm arguing for is a "thin" firmware which provides a minimized
-set of services (such as selecting a free IDE stream in the Root Port
-and writing keys into it).
-
-The host kernel can perform attestation and set up encryption for
-devices it wants to use itself.  Once it passes through a device to
-a guest, the host kernel no longer performs any SPDM exchanges with
-the device as it's now owned by the guest.  The guest is responsible
-for performing attestation and set up encryption for itself, possibly
-with the help of firmware.
-
-If there is no firmware to program IDE keys into the Root Port,
-the guest must ask the VMM to do that.  The VMM then becomes part
-of the guest's TCB, but that trade-off is unavoidable if there's
-no firmware assistance.  Some customers (such as Sean) seem to
-prefer that to trusting a vendor-provided firmware.
-
-Remember, this must work for everyone, not just for people who are
-happy with AMD's and Intel's shrink-wrapped offerings.
-
-We can discuss an _OSC bit to switch between firmware-driven attestation
-and OS-native attestation, similar to the existing bits for PCIe hotplug,
-DPC etc.
-
-However, past experience with firmware-handled hotplug and DPC has
-generally been negative and I believe most everyone is preferring the
-OS-native variant nowadays.  The OS has a better overall knowledge of
-the system state than the firmware.  E.g. the kernel can detect hotplug
-events caused by DPC and ignore them (see commit a97396c6eb13).
-
-Similarly, the CMA-SPDM patches I'm working on reauthenticate devices
-after a DPC-induced Hot Reset or after resume from D3cold.  I imagine
-it may be difficult to achieve the same if attestation is handled by
-firmware.
-
-I'm talking about commit "PCI/CMA: Reauthenticate devices on reset and
-resume" on this development branch:
-
-https://github.com/l1k/linux/commits/doe
+I was just concerned about how does the user space understand that it
+can use SET_VRING_BASE/GET_VRING_BASE for PACKED virtqueues in a given
+kernel or not.
 
 Thanks,
+Stefano
 
-Lukas
-
-> > The first proof point for that idea is teaching the PCI core to perform
-> > CMA / SPDM session establishment and provide that result to drivers.
-> > 
-> > That is what Lukas has been working on after picking up Jonathan's
-> > initial SPDM RFC. I expect the discussion on those forthcoming patches
-> > starts to answer device-model questions around attestation.
-> 
-> Those SPDM patches should work on the AMD hw (as they do not need any
-> additional host PCI support) but that's about it - IDE won't be possible
-> that way as there is no way to program the IDE keys to PCI RC without the
-> PSP.
-> 
-> If we want reuse any of that code to provide
-> certificates/measurements/reports for the host kernel, then that will need
-> to allow skipping the bits that the firmware implements (SPDM, IDE) +
-> calling the firmware instead. And TDISP is worse as it is based on the idea
-> of not trusting the VMM (is there any use for TDISP for the host-only config
-> at all?) so such SPDM-enabled linux has to not run KVM.
-> 
-> > > o What does the guest need to know from the device?
-> > > o How does the attestation workflow work?
-> > > o Generic vs vendor specific TSMs
-> > > 
-> > > Some of these topics may be better suited for LPC,
-> > 
-> > Maybe, but there's so much to discuss that the more opportunities to
-> > collaborate on the details the better.
-> > 
-> > > however we want to get the discussion going from the KVM perspective
-> > > and continue wider discussions at LPC.
-> > 
-> > While I worry that my points above are more suited to something like a
-> > PCI Micro-conference than a KVM BoF, I think the nature of "trusted I/O"
-> > requires those tribes to talk more to each other.
