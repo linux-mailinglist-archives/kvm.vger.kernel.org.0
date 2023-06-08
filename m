@@ -2,120 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 93CA67278BF
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 09:26:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5ED57278DF
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 09:33:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234439AbjFHH03 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 03:26:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60252 "EHLO
+        id S235384AbjFHHd4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 03:33:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234776AbjFHH02 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 03:26:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08EB71BEB
-        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 00:25:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686209130;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IQgryE09vT80Eu7xZQdbepp/P91F23fI9IC3Yf7nVhc=;
-        b=GiIgmSt7IqvBavj4doJoYfC9/lMdkzNMuUlqeaaeDXcWJIlvgtfvQTkg8eTTUTaeex5LQB
-        ZBoLscaXdx7X+fcRsy/qyjOaC83Ku82FYdx8msqEb5psd3lKDROwGwvK7hsLw25d3w5Mcv
-        a/ShCmlglNq5rQuAZNAChTn8k7G5AT4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-269-_ZEbN7kEPhqn_Hpv2g2Feg-1; Thu, 08 Jun 2023 03:25:29 -0400
-X-MC-Unique: _ZEbN7kEPhqn_Hpv2g2Feg-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-30c5d31b567so123355f8f.2
-        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 00:25:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686209128; x=1688801128;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IQgryE09vT80Eu7xZQdbepp/P91F23fI9IC3Yf7nVhc=;
-        b=A55tWqJMe3hyqqp5GEvyCl5vwVN12fXt+ud68J1nR3J3jslk34n6ceYb/u8jzDXuyL
-         IvuRmMQQM6DzFLU1XzngzvqyBdudLL7uIC+ox16WYiXHb8xP6DHYT5zsU54CxMAbtfhy
-         8wjDqk/gwSVTSp0alaM55hitUvKWHmkRq5OGgnPEcWtZ+S0CiuiYRXIry0/azkDoCbd7
-         efZMgw/6xk/rBwLOJ8LIqwS+itQJPoxVnIeB3fb1R103g8IEYCDeRP4hcoFu/tM60gWc
-         ZZiUqJ4dPDxUKLIKDaFo8TMj+X+pARyCMwcWhVrvGr/H7SE9H5AdUJFBNGPd+BpFitLD
-         MLVQ==
-X-Gm-Message-State: AC+VfDzdamreZSr2Spz3NckdIsbYEY/5ClQP5NhmdbrqHBhZC/cx9OST
-        MRj43eP8uN9lG7WUVxLHqVe4/qVbyZJ8vRswHDzOUIiDxelm+YCQNU732IjIDXZxBZFbid6pkz4
-        9AR0/GrUY0Onq
-X-Received: by 2002:adf:f1d2:0:b0:309:5029:b071 with SMTP id z18-20020adff1d2000000b003095029b071mr6213263wro.45.1686209127961;
-        Thu, 08 Jun 2023 00:25:27 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6jFEKwWuY/s6j9vUnOjxVzBS7STTB0OPeOfjZw6cGPbIqejnT+Vq8uMy5eXRAgZHhqzNkyEQ==
-X-Received: by 2002:adf:f1d2:0:b0:309:5029:b071 with SMTP id z18-20020adff1d2000000b003095029b071mr6213247wro.45.1686209127696;
-        Thu, 08 Jun 2023 00:25:27 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:9e2:9000:9283:b79f:cbb3:327a? ([2a01:e0a:9e2:9000:9283:b79f:cbb3:327a])
-        by smtp.gmail.com with ESMTPSA id t18-20020adfeb92000000b003093a412310sm640202wrn.92.2023.06.08.00.25.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jun 2023 00:25:27 -0700 (PDT)
-Message-ID: <d1722794-c0d3-1f7f-4195-334608165ff9@redhat.com>
-Date:   Thu, 8 Jun 2023 09:25:26 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v2 3/3] vfio/fsl: Create Kconfig sub-menu
-To:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
-Cc:     jgg@nvidia.com, eric.auger@redhat.com, diana.craciun@oss.nxp.com
+        with ESMTP id S232721AbjFHHdz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 03:33:55 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C46F5E6C
+        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 00:33:52 -0700 (PDT)
+Received: from kwepemm000008.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4QcGCr2jpvzTlG4;
+        Thu,  8 Jun 2023 15:33:28 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ kwepemm000008.china.huawei.com (7.193.23.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Thu, 8 Jun 2023 15:33:49 +0800
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.023;
+ Thu, 8 Jun 2023 08:33:47 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
+        "clg@redhat.com" <clg@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>
+Subject: RE: [PATCH v2 1/3] vfio/pci: Cleanup Kconfig
+Thread-Topic: [PATCH v2 1/3] vfio/pci: Cleanup Kconfig
+Thread-Index: AQHZmZUhIbzKmD7di0W2z0FFWpRKIq+AgjgA
+Date:   Thu, 8 Jun 2023 07:33:47 +0000
+Message-ID: <6325cf9955524b848091c8446829e51f@huawei.com>
 References: <20230607230918.3157757-1-alex.williamson@redhat.com>
- <20230607230918.3157757-4-alex.williamson@redhat.com>
+ <20230607230918.3157757-2-alex.williamson@redhat.com>
+In-Reply-To: <20230607230918.3157757-2-alex.williamson@redhat.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@redhat.com>
-In-Reply-To: <20230607230918.3157757-4-alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.178]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/8/23 01:09, Alex Williamson wrote:
-> For consistency with pci and platform, push the vfio-fsl-mc option into a
-> sub-menu.
-> 
-> Reviewed-by: Cédric Le Goater <clg@redhat.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->   drivers/vfio/fsl-mc/Kconfig | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/vfio/fsl-mc/Kconfig b/drivers/vfio/fsl-mc/Kconfig
-> index 597d338c5c8a..d2757a1114aa 100644
-> --- a/drivers/vfio/fsl-mc/Kconfig
-> +++ b/drivers/vfio/fsl-mc/Kconfig
-> @@ -1,3 +1,5 @@
-> +menu "VFIO support for FSL_MC bus devices"
-> +
-
-The menu entry can be empty on arches not supporting the FSL-MC bus.
-I think this needs an extra :
-
-	depends on ARM64 || COMPILE_TEST
-
-Thanks,
-
-C.
-
-
->   config VFIO_FSL_MC
->   	tristate "VFIO support for QorIQ DPAA2 fsl-mc bus devices"
->   	depends on FSL_MC_BUS
-> @@ -8,3 +10,5 @@ config VFIO_FSL_MC
->   	  fsl-mc bus devices using the VFIO framework.
->   
->   	  If you don't know what to do here, say N.
-> +
-> +endmenu
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQWxleCBXaWxsaWFtc29u
+IFttYWlsdG86YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb21dDQo+IFNlbnQ6IDA4IEp1bmUgMjAy
+MyAwMDowOQ0KPiBUbzoga3ZtQHZnZXIua2VybmVsLm9yZw0KPiBDYzogQWxleCBXaWxsaWFtc29u
+IDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbT47IGpnZ0BudmlkaWEuY29tOw0KPiBjbGdAcmVk
+aGF0LmNvbTsgZXJpYy5hdWdlckByZWRoYXQuY29tOyBsaXVsb25nZmFuZw0KPiA8bGl1bG9uZ2Zh
+bmdAaHVhd2VpLmNvbT47IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkNCj4gPHNoYW1lZXJhbGku
+a29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT47IHlpc2hhaWhAbnZpZGlhLmNvbTsNCj4ga2V2aW4u
+dGlhbkBpbnRlbC5jb20NCj4gU3ViamVjdDogW1BBVENIIHYyIDEvM10gdmZpby9wY2k6IENsZWFu
+dXAgS2NvbmZpZw0KPiANCj4gSXQgc2hvdWxkIGJlIHBvc3NpYmxlIHRvIHNlbGVjdCB2ZmlvLXBj
+aSB2YXJpYW50IGRyaXZlcnMgd2l0aG91dCBidWlsZGluZw0KPiB2ZmlvLXBjaSBpdHNlbGYsIHdo
+aWNoIGltcGxpZXMgZWFjaCB2YXJpYW50IGRyaXZlciBzaG91bGQgc2VsZWN0DQo+IHZmaW8tcGNp
+LWNvcmUuDQo+IA0KPiBGaXggdGhlIHRvcCBsZXZlbCB2ZmlvIE1ha2VmaWxlIHRvIHRyYXZlcnNl
+IHBjaSBiYXNlZCBvbiB2ZmlvLXBjaS1jb3JlDQo+IHJhdGhlciB0aGFuIHZmaW8tcGNpLg0KPiAN
+Cj4gTWFyayBNTUFQIGFuZCBJTlRYIG9wdGlvbnMgZGVwZW5kaW5nIG9uIHZmaW8tcGNpLWNvcmUg
+dG8gY2xlYW51cA0KPiByZXN1bHRpbmcNCj4gY29uZmlnIGlmIGNvcmUgaXMgbm90IGVuYWJsZWQu
+DQo+IA0KPiBQdXNoIGFsbCBQQ0kgcmVsYXRlZCB2ZmlvIG9wdGlvbnMgdG8gYSBzdWItbWVudSBh
+bmQgbWFrZSBkZXNjcmlwdGlvbnMNCj4gY29uc2lzdGVudC4NCj4gDQo+IFJldmlld2VkLWJ5OiBD
+w6lkcmljIExlIEdvYXRlciA8Y2xnQHJlZGhhdC5jb20+DQo+IFJldmlld2VkLWJ5OiBFcmljIEF1
+Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IEFsZXggV2lsbGlh
+bXNvbiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAgZHJpdmVycy92Zmlv
+L01ha2VmaWxlICAgICAgICAgICAgICB8IDIgKy0NCj4gIGRyaXZlcnMvdmZpby9wY2kvS2NvbmZp
+ZyAgICAgICAgICAgfCA4ICsrKysrKy0tDQo+ICBkcml2ZXJzL3ZmaW8vcGNpL2hpc2lsaWNvbi9L
+Y29uZmlnIHwgNCArKy0tDQo+ICBkcml2ZXJzL3ZmaW8vcGNpL21seDUvS2NvbmZpZyAgICAgIHwg
+MiArLQ0KPiAgNCBmaWxlcyBjaGFuZ2VkLCAxMCBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygt
+KQ0KPiANCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmZpby9NYWtlZmlsZSBiL2RyaXZlcnMvdmZp
+by9NYWtlZmlsZQ0KPiBpbmRleCA3MGU3ZGNiMzAyZWYuLjE1MWU4MTZiMmZmOSAxMDA2NDQNCj4g
+LS0tIGEvZHJpdmVycy92ZmlvL01ha2VmaWxlDQo+ICsrKyBiL2RyaXZlcnMvdmZpby9NYWtlZmls
+ZQ0KPiBAQCAtMTAsNyArMTAsNyBAQCB2ZmlvLSQoQ09ORklHX1ZGSU9fVklSUUZEKSArPSB2aXJx
+ZmQubw0KPiANCj4gIG9iai0kKENPTkZJR19WRklPX0lPTU1VX1RZUEUxKSArPSB2ZmlvX2lvbW11
+X3R5cGUxLm8NCj4gIG9iai0kKENPTkZJR19WRklPX0lPTU1VX1NQQVBSX1RDRSkgKz0gdmZpb19p
+b21tdV9zcGFwcl90Y2Uubw0KPiAtb2JqLSQoQ09ORklHX1ZGSU9fUENJKSArPSBwY2kvDQo+ICtv
+YmotJChDT05GSUdfVkZJT19QQ0lfQ09SRSkgKz0gcGNpLw0KPiAgb2JqLSQoQ09ORklHX1ZGSU9f
+UExBVEZPUk0pICs9IHBsYXRmb3JtLw0KPiAgb2JqLSQoQ09ORklHX1ZGSU9fTURFVikgKz0gbWRl
+di8NCj4gIG9iai0kKENPTkZJR19WRklPX0ZTTF9NQykgKz0gZnNsLW1jLw0KPiBkaWZmIC0tZ2l0
+IGEvZHJpdmVycy92ZmlvL3BjaS9LY29uZmlnIGIvZHJpdmVycy92ZmlvL3BjaS9LY29uZmlnDQo+
+IGluZGV4IGY5ZDBjOTA4ZTczOC4uODZiYjc4MzVjZjNjIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJz
+L3ZmaW8vcGNpL0tjb25maWcNCj4gKysrIGIvZHJpdmVycy92ZmlvL3BjaS9LY29uZmlnDQo+IEBA
+IC0xLDUgKzEsNyBAQA0KPiAgIyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMC1vbmx5
+DQo+IC1pZiBQQ0kgJiYgTU1VDQo+ICttZW51ICJWRklPIHN1cHBvcnQgZm9yIFBDSSBkZXZpY2Vz
+Ig0KPiArCWRlcGVuZHMgb24gUENJICYmIE1NVQ0KPiArDQo+ICBjb25maWcgVkZJT19QQ0lfQ09S
+RQ0KPiAgCXRyaXN0YXRlDQo+ICAJc2VsZWN0IFZGSU9fVklSUUZEDQo+IEBAIC03LDkgKzksMTEg
+QEAgY29uZmlnIFZGSU9fUENJX0NPUkUNCj4gDQo+ICBjb25maWcgVkZJT19QQ0lfTU1BUA0KPiAg
+CWRlZl9ib29sIHkgaWYgIVMzOTANCj4gKwlkZXBlbmRzIG9uIFZGSU9fUENJX0NPUkUNCj4gDQo+
+ICBjb25maWcgVkZJT19QQ0lfSU5UWA0KPiAgCWRlZl9ib29sIHkgaWYgIVMzOTANCj4gKwlkZXBl
+bmRzIG9uIFZGSU9fUENJX0NPUkUNCj4gDQo+ICBjb25maWcgVkZJT19QQ0kNCj4gIAl0cmlzdGF0
+ZSAiR2VuZXJpYyBWRklPIHN1cHBvcnQgZm9yIGFueSBQQ0kgZGV2aWNlIg0KPiBAQCAtNTksNCAr
+NjMsNCBAQCBzb3VyY2UgImRyaXZlcnMvdmZpby9wY2kvbWx4NS9LY29uZmlnIg0KPiANCj4gIHNv
+dXJjZSAiZHJpdmVycy92ZmlvL3BjaS9oaXNpbGljb24vS2NvbmZpZyINCj4gDQo+IC1lbmRpZg0K
+PiArZW5kbWVudQ0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92ZmlvL3BjaS9oaXNpbGljb24vS2Nv
+bmZpZw0KPiBiL2RyaXZlcnMvdmZpby9wY2kvaGlzaWxpY29uL0tjb25maWcNCj4gaW5kZXggNWRh
+YTBmNDVkMmY5Li5jYmYxYzMyZjZlYmYgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvdmZpby9wY2kv
+aGlzaWxpY29uL0tjb25maWcNCj4gKysrIGIvZHJpdmVycy92ZmlvL3BjaS9oaXNpbGljb24vS2Nv
+bmZpZw0KPiBAQCAtMSwxMyArMSwxMyBAQA0KPiAgIyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjog
+R1BMLTIuMC1vbmx5DQo+ICBjb25maWcgSElTSV9BQ0NfVkZJT19QQ0kNCj4gLQl0cmlzdGF0ZSAi
+VkZJTyBQQ0kgc3VwcG9ydCBmb3IgSGlTaWxpY29uIEFDQyBkZXZpY2VzIg0KPiArCXRyaXN0YXRl
+ICJWRklPIHN1cHBvcnQgZm9yIEhpU2lsaWNvbiBBQ0MgUENJIGRldmljZXMiDQoNClRoYW5rcyBm
+b3IgY29ycmVjdGluZyB0aGlzLg0KDQo+ICAJZGVwZW5kcyBvbiBBUk02NCB8fCAoQ09NUElMRV9U
+RVNUICYmIDY0QklUKQ0KPiAtCWRlcGVuZHMgb24gVkZJT19QQ0lfQ09SRQ0KPiAgCWRlcGVuZHMg
+b24gUENJX01TSQ0KPiAgCWRlcGVuZHMgb24gQ1JZUFRPX0RFVl9ISVNJX1FNDQo+ICAJZGVwZW5k
+cyBvbiBDUllQVE9fREVWX0hJU0lfSFBSRQ0KPiAgCWRlcGVuZHMgb24gQ1JZUFRPX0RFVl9ISVNJ
+X1NFQzINCj4gIAlkZXBlbmRzIG9uIENSWVBUT19ERVZfSElTSV9aSVANCj4gKwlzZWxlY3QgVkZJ
+T19QQ0lfQ09SRQ0KPiAgCWhlbHANCj4gIAkgIFRoaXMgcHJvdmlkZXMgZ2VuZXJpYyBQQ0kgc3Vw
+cG9ydCBmb3IgSGlTaWxpY29uIEFDQyBkZXZpY2VzDQo+ICAJICB1c2luZyB0aGUgVkZJTyBmcmFt
+ZXdvcmsuDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3ZmaW8vcGNpL21seDUvS2NvbmZpZyBiL2Ry
+aXZlcnMvdmZpby9wY2kvbWx4NS9LY29uZmlnDQo+IGluZGV4IDI5YmE5YzUwNGE3NS4uNzA4OGVk
+YzRmYjI4IDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL3ZmaW8vcGNpL21seDUvS2NvbmZpZw0KPiAr
+KysgYi9kcml2ZXJzL3ZmaW8vcGNpL21seDUvS2NvbmZpZw0KPiBAQCAtMiw3ICsyLDcgQEANCj4g
+IGNvbmZpZyBNTFg1X1ZGSU9fUENJDQo+ICAJdHJpc3RhdGUgIlZGSU8gc3VwcG9ydCBmb3IgTUxY
+NSBQQ0kgZGV2aWNlcyINCj4gIAlkZXBlbmRzIG9uIE1MWDVfQ09SRQ0KPiAtCWRlcGVuZHMgb24g
+VkZJT19QQ0lfQ09SRQ0KPiArCXNlbGVjdCBWRklPX1BDSV9DT1JFDQo+ICAJaGVscA0KPiAgCSAg
+VGhpcyBwcm92aWRlcyBtaWdyYXRpb24gc3VwcG9ydCBmb3IgTUxYNSBkZXZpY2VzIHVzaW5nIHRo
+ZSBWRklPDQo+ICAJICBmcmFtZXdvcmsuDQoNClJldmlld2VkLWJ5OiBTaGFtZWVyIEtvbG90aHVt
+IDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+DQoNClRoYW5rcywNClNoYW1l
+ZXINCg==
