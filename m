@@ -2,200 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08A63727970
-	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 10:01:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E7AB727971
+	for <lists+kvm@lfdr.de>; Thu,  8 Jun 2023 10:01:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234915AbjFHIBQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 04:01:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49420 "EHLO
+        id S234587AbjFHIBa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 04:01:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234655AbjFHIAx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 04:00:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD4452102
-        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 00:59:44 -0700 (PDT)
+        with ESMTP id S234304AbjFHIBN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 04:01:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 985902D51
+        for <kvm@vger.kernel.org>; Thu,  8 Jun 2023 01:00:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686211184;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        s=mimecast20190719; t=1686211213;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=bcpfobnsnpwSGK7FBh1zGhAcLR+bKyGszV5tqgJqm/U=;
-        b=YnEM7lbOAFivhlEk8sRfINyb35xpk6rTryioY52UMtgMHaBwO0F55kUblsFIvoGhyIBkOL
-        oishG3IGN6pXSFkEcry5hzKldCM1NOs2pMf4weOGuCDJftboofe+61kTUqJUA6ud9y9C1n
-        HM+YPGMn6yahU627xR3aGjKAaG2IV5M=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=FNDbmGsJ3mpkLEzox86FiotwEXbzoL7gRModpMEFp+s=;
+        b=BT8w+VOzZJHehLw4A2iw26WHu6HXD5iaZvQeXxh2g0XeDm5EJmJ5fZxM1DeGQfEOFy1Ey+
+        uc6SL9S3rqNZIUIhpc211vRgLjHB/nvfz06sCPV1rTAstx5nbUhGjT1TQgo0ILiwcVNNKy
+        Hc86RC9HdTieQqljRO2+Nfl8EJ93L/E=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-467-0bnJXfyUOvmZvh0bpfkJQA-1; Thu, 08 Jun 2023 03:59:42 -0400
-X-MC-Unique: 0bnJXfyUOvmZvh0bpfkJQA-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-3f9c3168ed4so3431351cf.2
-        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 00:59:42 -0700 (PDT)
+ us-mta-330-eZHCtlBAOFa0czNpnPGTFw-1; Thu, 08 Jun 2023 04:00:12 -0400
+X-MC-Unique: eZHCtlBAOFa0czNpnPGTFw-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-977c516686aso50795866b.1
+        for <kvm@vger.kernel.org>; Thu, 08 Jun 2023 01:00:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686211182; x=1688803182;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bcpfobnsnpwSGK7FBh1zGhAcLR+bKyGszV5tqgJqm/U=;
-        b=Dyfxa+11+lqeY3Fl0RW5kc9oISEi2VBzyzeYGtUp7pb1f6sy6vQ9AZI9KUxHpzfhSK
-         wZWOyu68030xaO9Nm3QbjpY7EtxgDAWr/YM/djTXwUTAjJYlI8+qPRY580tCu9THCJkh
-         wMuI94KumgFFNahsmLjLLgEgUjtKbyoIXxPdp5AFhl59nK1hMSUDWXRrgzZAdcvS1oOD
-         NTxWXLkB2BhpypTsoLyrKCLCdB3TFRfs9HiyQRv+ky6f+EI34cst6WAeZoNHyz4aT8uX
-         VtSr4MRFUOXN3LzoZ8CMdgIC+rjujzRHpxHVWVa2Z5K9mK8O1O8Kxa7JhasL1r9CeQdi
-         aNpQ==
-X-Gm-Message-State: AC+VfDxnnYbQY6ixWyAhLkxS1UKU7pbWR0iJVLIupn+w/z4juv5GxyDw
-        Tj2XxrJ8Nu22KGWgZegX6J9nIemEo3ZOgWl0l3OQLUEuZhbzjTDcuSf1HXDblgkgftqJUeB20la
-        aSZYMjSxMmD3g
-X-Received: by 2002:a05:622a:202:b0:3f8:6c15:c3a5 with SMTP id b2-20020a05622a020200b003f86c15c3a5mr5349260qtx.33.1686211181797;
-        Thu, 08 Jun 2023 00:59:41 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5aLJOX/fnYU/US4MrlU2mrgTuWb0MKVnR5oa9Qq0ddQFjcE7UzMUj+yPWUJInmeZsolZJJhA==
-X-Received: by 2002:a05:622a:202:b0:3f8:6c15:c3a5 with SMTP id b2-20020a05622a020200b003f86c15c3a5mr5349247qtx.33.1686211181471;
-        Thu, 08 Jun 2023 00:59:41 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id d23-20020ac847d7000000b003f4f6ac0052sm148654qtr.95.2023.06.08.00.59.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jun 2023 00:59:40 -0700 (PDT)
-Message-ID: <ed625bfd-821e-1f3d-b7af-b0e614230916@redhat.com>
-Date:   Thu, 8 Jun 2023 09:59:37 +0200
+        d=1e100.net; s=20221208; t=1686211210; x=1688803210;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FNDbmGsJ3mpkLEzox86FiotwEXbzoL7gRModpMEFp+s=;
+        b=aKdajLMZGyKd+lXtOLm2slciVqFEmpi6hnTg+vXxjOOEwuA2l84LG/zoPR6SZmMWRz
+         p99fyPB5XhJVtQ1dEohK5wCA/gNIZr3hTazP73eHSM8epVZUJ9Yq4ZSpLmfmur090MRg
+         PbjaUcE1/fmtueRnMHxuqjsU6fUJ/D3JAS/bJCQum12EkaxyqQxnQ6HVA+kKyfdkDpub
+         wPCy1vdpVtv8sR4i9t3XMuUASNcL/vnwZHDAUiEnGAXpwSdrcXl/kX2ntEJFMBQMIJsl
+         d3iJ5vbr5EwDcNpwpW9DHzjdr4I8KCRng9jDOERfpB5D7CaHPmE63cJMOrJQj+QHpdet
+         TzCw==
+X-Gm-Message-State: AC+VfDz3IBfDGlwqqkr3bxX4K/EctSh1s79ObjWpVnxxY0YMp7PyeIu/
+        Tm+INDxhIPNXoznpGCBgweVjtiXGQamQ4Bzx7BGAOxmcEYKo3Py0Hw5XbB6+A+3qpkhENz/eptO
+        6FuPa0wCxjMxR
+X-Received: by 2002:a17:907:e92:b0:978:9b09:ccaf with SMTP id ho18-20020a1709070e9200b009789b09ccafmr1684185ejc.14.1686211209900;
+        Thu, 08 Jun 2023 01:00:09 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4iYx/Ymtxl9ZzpcCCqLWJ3wFdcVDKXynlxsTc5fgKIP2plln1Gn+TgS5Yvth3Zl/mptkx4nQ==
+X-Received: by 2002:a17:907:e92:b0:978:9b09:ccaf with SMTP id ho18-20020a1709070e9200b009789b09ccafmr1684157ejc.14.1686211209532;
+        Thu, 08 Jun 2023 01:00:09 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-25-111.business.telecomitalia.it. [87.12.25.111])
+        by smtp.gmail.com with ESMTPSA id jt26-20020a170906dfda00b00978993e0d21sm351480ejc.78.2023.06.08.01.00.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jun 2023 01:00:08 -0700 (PDT)
+Date:   Thu, 8 Jun 2023 09:59:49 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Shannon Nelson <shannon.nelson@amd.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+        Tiwei Bie <tiwei.bie@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost-vdpa: filter VIRTIO_F_RING_PACKED feature
+Message-ID: <5giudxjp6siucr4l3i4tggrh2dpqiqhhihmdd34w3mq2pm5dlo@mrqpbwckpxai>
+References: <gi2hngx3ndsgz5d2rpqjywdmou5vxhd7xgi5z2lbachr7yoos4@kpifz37oz2et>
+ <20230605095404-mutt-send-email-mst@kernel.org>
+ <32ejjuvhvcicv7wjuetkv34qtlpa657n4zlow4eq3fsi2twozk@iqnd2t5tw2an>
+ <CACGkMEu3PqQ99UoKF5NHgVADD3q=BF6jhLiyumeT4S1QCqN1tw@mail.gmail.com>
+ <20230606085643-mutt-send-email-mst@kernel.org>
+ <CAGxU2F7fkgL-HpZdj=5ZEGNWcESCHQpgRAYQA3W2sPZaoEpNyQ@mail.gmail.com>
+ <20230607054246-mutt-send-email-mst@kernel.org>
+ <CACGkMEuUapKvUYiJiLwtsN+x941jafDKS9tuSkiNrvkrrSmQkg@mail.gmail.com>
+ <20230608020111-mutt-send-email-mst@kernel.org>
+ <CACGkMEt4=3BRVNX38AD+mJU8v3bmqO-CdNj5NkFP-SSvsuy2Hg@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v2 2/3] vfio/platform: Cleanup Kconfig
-Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
-Cc:     jgg@nvidia.com, clg@redhat.com
-References: <20230607230918.3157757-1-alex.williamson@redhat.com>
- <20230607230918.3157757-3-alex.williamson@redhat.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230607230918.3157757-3-alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CACGkMEt4=3BRVNX38AD+mJU8v3bmqO-CdNj5NkFP-SSvsuy2Hg@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+On Thu, Jun 08, 2023 at 03:46:00PM +0800, Jason Wang wrote:
 
-On 6/8/23 01:09, Alex Williamson wrote:
-> Like vfio-pci, there's also a base module here where vfio-amba depends on
-> vfio-platform, when really it only needs vfio-platform-base.  Create a
-> sub-menu for platform drivers and a nested menu for reset drivers.  Cleanup
-> Makefile to make use of new CONFIG_VFIO_PLATFORM_BASE for building the
-> shared modules and traversing reset modules.
+[...]
+
+>> > > > > I have a question though, what if down the road there
+>> > > > > is a new feature that needs more changes? It will be
+>> > > > > broken too just like PACKED no?
+>> > > > > Shouldn't vdpa have an allowlist of features it knows how
+>> > > > > to support?
+>> > > >
+>> > > > It looks like we had it, but we took it out (by the way, we were
+>> > > > enabling packed even though we didn't support it):
+>> > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6234f80574d7569444d8718355fa2838e92b158b
+>> > > >
+>> > > > The only problem I see is that for each new feature we have to modify
+>> > > > the kernel.
+>> > > > Could we have new features that don't require handling by vhost-vdpa?
+>> > > >
+>> > > > Thanks,
+>> > > > Stefano
+>> > >
+>> > > Jason what do you say to reverting this?
+>> >
+>> > I may miss something but I don't see any problem with vDPA core.
+>> >
+>> > It's the duty of the parents to advertise the features it has. For example,
+>> >
+>> > 1) If some kernel version that is packed is not supported via
+>> > set_vq_state, parents should not advertise PACKED features in this
+>> > case.
+>> > 2) If the kernel has support packed set_vq_state(), but it's emulated
+>> > cvq doesn't support, parents should not advertise PACKED as well
+>> >
+>> > If a parent violates the above 2, it looks like a bug of the parents.
+>> >
+>> > Thanks
+>>
+>> Yes but what about vhost_vdpa? Talking about that not the core.
 >
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-looks good to me
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>Not sure it's a good idea to workaround parent bugs via vhost-vDPA.
 
-Thanks
+Sorry, I'm getting lost...
+We were talking about the fact that vhost-vdpa doesn't handle
+SET_VRING_BASE/GET_VRING_BASE ioctls well for packed virtqueue before
+that series [1], no?
 
-Eric
-> ---
->  drivers/vfio/Makefile               |  2 +-
->  drivers/vfio/platform/Kconfig       | 18 ++++++++++++++----
->  drivers/vfio/platform/Makefile      |  9 +++------
->  drivers/vfio/platform/reset/Kconfig |  2 ++
->  4 files changed, 20 insertions(+), 11 deletions(-)
+The parents seem okay, but maybe I missed a few things.
+
+[1] https://lore.kernel.org/virtualization/20230424225031.18947-1-shannon.nelson@amd.com/
+
 >
-> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
-> index 151e816b2ff9..8da44aa1ea16 100644
-> --- a/drivers/vfio/Makefile
-> +++ b/drivers/vfio/Makefile
-> @@ -11,6 +11,6 @@ vfio-$(CONFIG_VFIO_VIRQFD) += virqfd.o
->  obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
->  obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
->  obj-$(CONFIG_VFIO_PCI_CORE) += pci/
-> -obj-$(CONFIG_VFIO_PLATFORM) += platform/
-> +obj-$(CONFIG_VFIO_PLATFORM_BASE) += platform/
->  obj-$(CONFIG_VFIO_MDEV) += mdev/
->  obj-$(CONFIG_VFIO_FSL_MC) += fsl-mc/
-> diff --git a/drivers/vfio/platform/Kconfig b/drivers/vfio/platform/Kconfig
-> index 331a5920f5ab..88fcde51f024 100644
-> --- a/drivers/vfio/platform/Kconfig
-> +++ b/drivers/vfio/platform/Kconfig
-> @@ -1,8 +1,14 @@
->  # SPDX-License-Identifier: GPL-2.0-only
-> -config VFIO_PLATFORM
-> -	tristate "VFIO support for platform devices"
-> +menu "VFIO support for platform devices"
->  	depends on ARM || ARM64 || COMPILE_TEST
-> +
-> +config VFIO_PLATFORM_BASE
-> +	tristate
->  	select VFIO_VIRQFD
-> +
-> +config VFIO_PLATFORM
-> +	tristate "Generic VFIO support for any platform device"
-> +	select VFIO_PLATFORM_BASE
->  	help
->  	  Support for platform devices with VFIO. This is required to make
->  	  use of platform devices present on the system using the VFIO
-> @@ -10,10 +16,10 @@ config VFIO_PLATFORM
->  
->  	  If you don't know what to do here, say N.
->  
-> -if VFIO_PLATFORM
->  config VFIO_AMBA
->  	tristate "VFIO support for AMBA devices"
->  	depends on ARM_AMBA || COMPILE_TEST
-> +	select VFIO_PLATFORM_BASE
->  	help
->  	  Support for ARM AMBA devices with VFIO. This is required to make
->  	  use of ARM AMBA devices present on the system using the VFIO
-> @@ -21,5 +27,9 @@ config VFIO_AMBA
->  
->  	  If you don't know what to do here, say N.
->  
-> +menu "VFIO platform reset drivers"
-> +	depends on VFIO_PLATFORM_BASE
-> +
->  source "drivers/vfio/platform/reset/Kconfig"
-> -endif
-> +endmenu
-> +endmenu
-> diff --git a/drivers/vfio/platform/Makefile b/drivers/vfio/platform/Makefile
-> index 3f3a24e7c4ef..ee4fb6a82ca8 100644
-> --- a/drivers/vfio/platform/Makefile
-> +++ b/drivers/vfio/platform/Makefile
-> @@ -1,13 +1,10 @@
->  # SPDX-License-Identifier: GPL-2.0
->  vfio-platform-base-y := vfio_platform_common.o vfio_platform_irq.o
-> -vfio-platform-y := vfio_platform.o
-> +obj-$(CONFIG_VFIO_PLATFORM_BASE) += vfio-platform-base.o
-> +obj-$(CONFIG_VFIO_PLATFORM_BASE) += reset/
->  
-> +vfio-platform-y := vfio_platform.o
->  obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform.o
-> -obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform-base.o
-> -obj-$(CONFIG_VFIO_PLATFORM) += reset/
->  
->  vfio-amba-y := vfio_amba.o
-> -
->  obj-$(CONFIG_VFIO_AMBA) += vfio-amba.o
-> -obj-$(CONFIG_VFIO_AMBA) += vfio-platform-base.o
-> -obj-$(CONFIG_VFIO_AMBA) += reset/
-> diff --git a/drivers/vfio/platform/reset/Kconfig b/drivers/vfio/platform/reset/Kconfig
-> index 12f5f3d80387..dcc08dc145a5 100644
-> --- a/drivers/vfio/platform/reset/Kconfig
-> +++ b/drivers/vfio/platform/reset/Kconfig
-> @@ -1,4 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0-only
-> +if VFIO_PLATFORM
->  config VFIO_PLATFORM_CALXEDAXGMAC_RESET
->  	tristate "VFIO support for calxeda xgmac reset"
->  	help
-> @@ -21,3 +22,4 @@ config VFIO_PLATFORM_BCMFLEXRM_RESET
->  	  Enables the VFIO platform driver to handle reset for Broadcom FlexRM
->  
->  	  If you don't know what to do here, say N.
-> +endif
+>> Should that not have a whitelist of features
+>> since it interprets ioctls differently depending on this?
+>
+>If there's a bug, it might only matter the following setup:
+>
+>SET_VRING_BASE/GET_VRING_BASE + VDUSE.
+>
+>This seems to be broken since VDUSE was introduced. If we really want
+>to backport something, it could be a fix to filter out PACKED in
+>VDUSE?
+
+mmm it doesn't seem to be a problem in VDUSE, but in vhost-vdpa.
+I think VDUSE works fine with packed virtqueue using virtio-vdpa
+(I haven't tried), so why should we filter PACKED in VDUSE?
+
+Thanks,
+Stefano
 
