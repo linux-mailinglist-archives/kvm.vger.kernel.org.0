@@ -2,76 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B104772A10A
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 19:14:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FDF172A181
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 19:43:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229628AbjFIROy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 13:14:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34274 "EHLO
+        id S230012AbjFIRn5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 13:43:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230327AbjFIROx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jun 2023 13:14:53 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 882181FFE
-        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 10:14:44 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-256a41d3e81so863193a91.1
-        for <kvm@vger.kernel.org>; Fri, 09 Jun 2023 10:14:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686330884; x=1688922884;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8Sw7MOr+3hnVEmOQlDXydslwjILda+scHccINsHsaSw=;
-        b=mG/nfttSkrdk7C0BSGSr7wCIQeMKSTBtKlye3RaAwU6LncIf6g/898kAUadZsiYvF7
-         BhTF29dwuQ9nNl9vinDfD92+2MgGWOMm7zttIDy8YxDe517xcUNSl9DbkE4YxRbiys1I
-         vOYHP+nVUrqKBaa2aPywvEWu0FyQvbZhbE7QHT5g1EobVzI/sj1wj7VExGmDGxFtQDBf
-         r3nX/MjBQCZcP2edeA8njFSfACzGQFpjVct+LoAeQbQAcAKExT4YrtXGwvAhUva8nvSv
-         NLLyCR0+eOSaxca/4wbZz3ndCR4g5TyLJZ6qgp+WfQ/+IRy4eqNpUIhAymSDJAjJweMY
-         o+2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686330884; x=1688922884;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8Sw7MOr+3hnVEmOQlDXydslwjILda+scHccINsHsaSw=;
-        b=ixhK1Y0vGHIfYXij2d3Mgq0jvJ1lGlokEtgBW04kn7cUG8UC+nRR5Em3o5+kzcASvo
-         XZk71+oBp0+pJ1aS6H1IUidpWmM1e95MO4FXGFktwfGJE2wKGkzbd3i1bxtm+KeVN5N0
-         Bl03EFJJc0Q9wEsOIAS9kerhnwHQb5xNzg+LVuRkAjgVTDU7UxZmxYNSw1NffrY6yJt9
-         B9oxIVKPSs5mAcdxG5svH9qCajY2GShb2jD4jiazRcR/PlEWIzxwoULKFHHSY0W5a6tT
-         LW9j9YG+1/pCPbCNE+Ea9wIX/LrXRdg4zuHgrwcRma85BDt5yoD99MmBg882M4+zHGwV
-         Krag==
-X-Gm-Message-State: AC+VfDwOLcFTJUmwtHjX5YicP6emmLWkecx91GmdJVBno4EQ6A+XE4E2
-        OPiH9b6pCZ+KY4cSwJWkXca2+DCR8S0=
-X-Google-Smtp-Source: ACHHUZ6LD2YKs6nr9I9wxjQHET90p4R47jYGk6zWEjv3TEEgWiIuKzmmbCdSsqb0wBL8oiyQndc+cQ==
-X-Received: by 2002:a17:90a:7104:b0:255:d878:704a with SMTP id h4-20020a17090a710400b00255d878704amr1861381pjk.4.1686330883399;
-        Fri, 09 Jun 2023 10:14:43 -0700 (PDT)
-Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id b16-20020a17090a551000b0024e026444b6sm6779121pji.2.2023.06.09.10.14.42
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 09 Jun 2023 10:14:42 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
-Subject: Re: [kvm-unit-tests PATCH v6 28/32] arm64: Add support for efi in
- Makefile
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20230609-2c01e3ece17d5c6b3005ee4e@orel>
-Date:   Fri, 9 Jun 2023 10:14:31 -0700
-Cc:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
-        alexandru.elisei@arm.com, ricarkol@google.com, shahuang@redhat.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E89A8FE9-E27D-422B-84FE-1F69AD3C239C@gmail.com>
-References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
- <20230530160924.82158-29-nikos.nikoleris@arm.com>
- <197A5432-65EA-49A7-AD6D-1AFCB58D30D0@gmail.com>
- <20230609-2c01e3ece17d5c6b3005ee4e@orel>
-To:     Andrew Jones <andrew.jones@linux.dev>
-X-Mailer: Apple Mail (2.3731.600.7)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229503AbjFIRny (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jun 2023 13:43:54 -0400
+Received: from 189.cn (ptr.189.cn [183.61.185.102])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E6B5E35B3;
+        Fri,  9 Jun 2023 10:43:44 -0700 (PDT)
+HMM_SOURCE_IP: 10.64.8.43:47690.1937665454
+HMM_ATTACHE_NUM: 0000
+HMM_SOURCE_TYPE: SMTP
+Received: from clientip-114.242.206.180 (unknown [10.64.8.43])
+        by 189.cn (HERMES) with SMTP id AEDBE100212;
+        Sat, 10 Jun 2023 01:43:39 +0800 (CST)
+Received: from  ([114.242.206.180])
+        by gateway-151646-dep-75648544bd-7vx9t with ESMTP id 0877e90f4b584cbe94a878d807b39f22 for helgaas@kernel.org;
+        Sat, 10 Jun 2023 01:43:43 CST
+X-Transaction-ID: 0877e90f4b584cbe94a878d807b39f22
+X-Real-From: 15330273260@189.cn
+X-Receive-IP: 114.242.206.180
+X-MEDUSA-Status: 0
+Sender: 15330273260@189.cn
+Message-ID: <2cf50ad0-e4fa-17a3-3e22-7fd8d4a316ed@189.cn>
+Date:   Sat, 10 Jun 2023 01:43:39 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [Intel-gfx] [PATCH v3 4/4] PCI/VGA: introduce is_boot_device
+ function callback to vga_client_register
+To:     Bjorn Helgaas <helgaas@kernel.org>,
+        Sui Jingfeng <suijingfeng@loongson.cn>
+Cc:     Somalapuram Amaranath <Amaranath.Somalapuram@amd.com>,
+        Karol Herbst <kherbst@redhat.com>,
+        nouveau@lists.freedesktop.org,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        dri-devel@lists.freedesktop.org, YiPeng Chai <YiPeng.Chai@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        David Airlie <airlied@gmail.com>,
+        Ville Syrjala <ville.syrjala@linux.intel.com>,
+        Yi Liu <yi.l.liu@intel.com>, kvm@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
+        Ben Skeggs <bskeggs@redhat.com>, linux-pci@vger.kernel.org,
+        Andrey Grodzovsky <andrey.grodzovsky@amd.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Lijo Lazar <lijo.lazar@amd.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Bokun Zhang <Bokun.Zhang@amd.com>,
+        intel-gfx@lists.freedesktop.org,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        loongson-kernel@lists.loongnix.cn,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Yishai Hadas <yishaih@nvidia.com>, Li Yi <liyi@loongson.cn>,
+        Pan Xinhui <Xinhui.Pan@amd.com>, linux-kernel@vger.kernel.org,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian Konig <christian.koenig@amd.com>,
+        Hawking Zhang <Hawking.Zhang@amd.com>
+References: <20230609164850.GA1251187@bhelgaas>
+Content-Language: en-US
+From:   Sui Jingfeng <15330273260@189.cn>
+In-Reply-To: <20230609164850.GA1251187@bhelgaas>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
+        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,FROM_LOCAL_DIGITS,
+        FROM_LOCAL_HEX,NICE_REPLY_A,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -79,70 +88,66 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 2023/6/10 00:48, Bjorn Helgaas wrote:
+> On Fri, Jun 09, 2023 at 10:27:39AM +0800, Sui Jingfeng wrote:
+>> On 2023/6/9 03:19, Bjorn Helgaas wrote:
+>>> On Thu, Jun 08, 2023 at 07:43:22PM +0800, Sui Jingfeng wrote:
+>>>> From: Sui Jingfeng <suijingfeng@loongson.cn>
+>>>>
+>>>> The vga_is_firmware_default() function is arch-dependent, which doesn't
+>>>> sound right. At least, it also works on the Mips and LoongArch platforms.
+>>>> Tested with the drm/amdgpu and drm/radeon drivers. However, it's difficult
+>>>> to enumerate all arch-driver combinations. I'm wrong if there is only one
+>>>> exception.
+>>>>
+>>>> With the observation that device drivers typically have better knowledge
+>>>> about which PCI bar contains the firmware framebuffer, which could avoid
+>>>> the need to iterate all of the PCI BARs.
+>>>>
+>>>> But as a PCI function at pci/vgaarb.c, vga_is_firmware_default() is
+>>>> probably not suitable to make such an optimization for a specific device.
+>>>>
+>>>> There are PCI display controllers that don't have a dedicated VRAM bar,
+>>>> this function will lose its effectiveness in such a case. Luckily, the
+>>>> device driver can provide an accurate workaround.
+>>>>
+>>>> Therefore, this patch introduces a callback that allows the device driver
+>>>> to tell the VGAARB if the device is the default boot device. This patch
+>>>> only intends to introduce the mechanism, while the implementation is left
+>>>> to the device driver authors. Also honor the comment: "Clients have two
+>>>> callback mechanisms they can use"
+>>> s/bar/BAR/ (several)
+>>>
+>>> Nothing here uses the callback.  I don't want to merge this until we
+>>> have a user.
+>> This is chicken and egg question.
+>>
+>> If you could help get this merge first, I will show you the first user.
+>>
+>>> I'm not sure why the device driver should know whether its device is
+>>> the default boot device.
+>> It's not that the device driver should know,
+>>
+>> but it's about that the device driver has the right to override.
+>>
+>> Device driver may have better approach to identify the default boot
+>> device.
+> The way we usually handle this is to include the new callback in the
+> same series as the first user of it.  That has two benefits:
+> (1) everybody can review the whole picture and possibly suggest
+> different approaches, and (2) when we merge the infrastructure,
+> we also merge a user of it at the same time, so the whole thing can be
+> tested and we don't end up with unused code.
 
-> On Jun 9, 2023, at 12:36 AM, Andrew Jones <andrew.jones@linux.dev> =
-wrote:
->=20
-> On Thu, Jun 08, 2023 at 01:41:58PM -0700, Nadav Amit wrote:
-> ...
->>> +%.efi: %.so
->>> + $(call arch_elf_check, $^)
->>> + $(OBJCOPY) \
->>> + -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
->>> + -j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
->>> + -j .reloc \
->>> + -O binary $^ $@
->>=20
->> I really appreciate your work Nikos, and I might be late since I see =
-Drew
->> already applied it to his queue.
->=20
-> It's not too late. arm/queue isn't stable so we can apply fixes while =
-it
-> bakes there.
->=20
->> So consider this email, my previous one, and
->> others that might follow more as grievances that can easily be =
-addressed later.
->>=20
->> So: It would=E2=80=99ve been nice to keep the symbols and debug =
-information in a
->> separate file. Something like:
->>=20
->> diff --git a/arm/Makefile.common b/arm/Makefile.common
->> index d60cf8c..f904702 100644
->> --- a/arm/Makefile.common
->> +++ b/arm/Makefile.common
->> @@ -69,7 +69,7 @@ FLATLIBS =3D $(libcflat) $(LIBFDT_archive) =
-$(libeabi)
->> ifeq ($(CONFIG_EFI),y)
->> %.so: EFI_LDFLAGS +=3D -defsym=3DEFI_SUBSYSTEM=3D0xa --no-undefined
->> %.so: %.o $(FLATLIBS) $(SRCDIR)/arm/efi/elf_aarch64_efi.lds =
-$(cstart.o)
->> -       $(CC) $(CFLAGS) -c -o $(@:.so=3D.aux.o) =
-$(SRCDIR)/lib/auxinfo.c \
->> +       $(CC) $(CFLAGS) -c -g -o $(@:.so=3D.aux.o) =
-$(SRCDIR)/lib/auxinfo.c \
->>                -DPROGNAME=3D\"$(@:.so=3D.efi)\" =
--DAUXFLAGS=3D$(AUXFLAGS)
->>        $(LD) $(EFI_LDFLAGS) -o $@ -T =
-$(SRCDIR)/arm/efi/elf_aarch64_efi.lds \
->>                $(filter %.o, $^) $(FLATLIBS) $(@:.so=3D.aux.o) \
->> @@ -78,6 +78,9 @@ ifeq ($(CONFIG_EFI),y)
->>   %.efi: %.so
->>        $(call arch_elf_check, $^)
->> +       $(OBJCOPY) --only-keep-debug $^ $@.debug
->> +       $(OBJCOPY) --strip-debug $^
->> +       $(OBJCOPY) --add-gnu-debuglink=3D$@.debug $^
->>        $(OBJCOPY) \
->>                -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
->>                -j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j =
-.rela* \
->=20
-> This is nice, but I think it can wait and be posted later.
->=20
+OK, acceptable
 
-Sure thing. Thanks. I still got few problems I need to finish resolving,
-and some other minor improvements, so I will post them all later.
+I will try to prepare the user code of this callback and respin the patch.
 
+I may resend it with another patch set in the future, this series 
+already drop it,
 
+see v5[1]
+
+[1] https://patchwork.freedesktop.org/series/119134/
+
+> Bjorn
