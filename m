@@ -2,215 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DCC0F728DA8
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 04:12:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB9F1728D72
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 04:06:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238363AbjFICM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jun 2023 22:12:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36934 "EHLO
+        id S238101AbjFICGO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jun 2023 22:06:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238369AbjFICMW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jun 2023 22:12:22 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E617E3AA4;
-        Thu,  8 Jun 2023 19:11:47 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.43])
-        by gateway (Coremail) with SMTP id _____8DxCepYioJkBdgAAA--.2655S3;
-        Fri, 09 Jun 2023 10:11:36 +0800 (CST)
-Received: from [10.20.42.43] (unknown [10.20.42.43])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxbMpXioJk2nYJAA--.20758S3;
-        Fri, 09 Jun 2023 10:11:35 +0800 (CST)
-Message-ID: <83b2f92f-eab5-a19c-7d6b-3a70e66b9aae@loongson.cn>
-Date:   Fri, 9 Jun 2023 10:11:34 +0800
+        with ESMTP id S229784AbjFICGN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jun 2023 22:06:13 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7BED30D2;
+        Thu,  8 Jun 2023 19:06:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686276372; x=1717812372;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yf/goSKZB9+Tho1Vqu1nbwxS6JRsN/UDlhFgsPkydz8=;
+  b=ZhmJ0RpBdfrMKU0SYtsaNKZzlruL/A5A6ghA6LspeOKIT5hlzAaPvjdh
+   p7RMu69C4IU1ot6Kf/MQ1atO+XVbThWjXKNKnSgRUrSOsdNRVBrobKjXK
+   v6kOl4ajIM/jJGXe9aBasgBHlS4UQRJFDJ512L7FeVX0QeKM4gMkk1p87
+   rce5FHWXZE1zjy2vj3mhuscF7nrGUTvSD+e9D+FMM22X7WL8PG2zwwpTa
+   KM8f3bCCmL59mbhKD73CDDrUrrTI3mYKy2UkJseT2ToV+Xct81C6P7NG2
+   LSoOA/h3LbbUhYe0HWRIXjHvble5+7uTB3drqmws6qv8+v21fJSRLf6Zm
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10735"; a="359975109"
+X-IronPort-AV: E=Sophos;i="6.00,228,1681196400"; 
+   d="scan'208";a="359975109"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2023 19:06:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10735"; a="713334272"
+X-IronPort-AV: E=Sophos;i="6.00,228,1681196400"; 
+   d="scan'208";a="713334272"
+Received: from haibo-optiplex-7090.sh.intel.com ([10.239.159.132])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2023 19:06:05 -0700
+From:   Haibo Xu <haibo1.xu@intel.com>
+Cc:     xiaobo55x@gmail.com, haibo1.xu@intel.com, ajones@ventanamicro.com,
+        maz@kernel.org, oliver.upton@linux.dev, seanjc@google.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Shuah Khan <shuah@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: [PATCH v3 00/10] RISCV: Add KVM_GET_REG_LIST API
+Date:   Fri,  9 Jun 2023 10:12:08 +0800
+Message-Id: <cover.1686275310.git.haibo1.xu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [Intel-gfx] [PATCH v3 3/4] PCI/VGA: only deal with VGA class
- devices
-Content-Language: en-US
-To:     Bjorn Helgaas <helgaas@kernel.org>,
-        Sui Jingfeng <15330273260@189.cn>
-Cc:     Alex Deucher <alexander.deucher@amd.com>,
-        Christian Konig <christian.koenig@amd.com>,
-        Pan Xinhui <Xinhui.Pan@amd.com>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        Karol Herbst <kherbst@redhat.com>,
-        Lyude Paul <lyude@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Hawking Zhang <Hawking.Zhang@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Lijo Lazar <lijo.lazar@amd.com>,
-        YiPeng Chai <YiPeng.Chai@amd.com>,
-        Andrey Grodzovsky <andrey.grodzovsky@amd.com>,
-        Somalapuram Amaranath <Amaranath.Somalapuram@amd.com>,
-        Bokun Zhang <Bokun.Zhang@amd.com>,
-        Ville Syrjala <ville.syrjala@linux.intel.com>,
-        Li Yi <liyi@loongson.cn>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Yi Liu <yi.l.liu@intel.com>, kvm@vger.kernel.org,
-        nouveau@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        loongson-kernel@lists.loongnix.cn, amd-gfx@lists.freedesktop.org,
-        linux-pci@vger.kernel.org
-References: <20230608191221.GA1209912@bhelgaas>
-From:   Sui Jingfeng <suijingfeng@loongson.cn>
-Organization: Loongson
-In-Reply-To: <20230608191221.GA1209912@bhelgaas>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: AQAAf8DxbMpXioJk2nYJAA--.20758S3
-X-CM-SenderInfo: xvxlyxpqjiv03j6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxXrWDXr1fCry3ArW5uF4Dtrc_yoW5Kry8pa
-        yrGayFkFW8W347Gry2qF4UZFyavrWkta4Syr4Yk34FkFWqkF18tFyrCry5Z343ArZ5GF1I
-        qay2yF17Ww45tagCm3ZEXasCq-sJn29KB7ZKAUJUUUUd529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUPqb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-        xVW8Jr0_Cr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-        AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-        tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-        8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Wrv_ZF1l42xK82IYc2Ij64vI
-        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67
-        AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26rWY6r4UJwCI
-        c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY1x0267
-        AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_
-        Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07bUzu
-        AUUUUU=
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+KVM_GET_REG_LIST will dump all register IDs that are available to
+KVM_GET/SET_ONE_REG and It's very useful to identify some platform
+regression issue during VM migration.
 
-On 2023/6/9 03:12, Bjorn Helgaas wrote:
-> Start with verb and capitalize to match ("Deal only with ...")
->
-> On Thu, Jun 08, 2023 at 07:43:21PM +0800, Sui Jingfeng wrote:
->> From: Sui Jingfeng <suijingfeng@loongson.cn>
->>
->> vgaarb only deal with the VGA devcie(pdev->class == 0x0300), so replace the
->> pci_get_subsys() function with pci_get_class(). Filter the non pci display
->> device out. There no need to process the non display PCI device.
-> s/non pci/non-PCI/
-> s/non display/non-display/
+Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
+of the code as common test framework that can be shared by riscv.
 
-Will be fixed at next version, thanks for the strict checking,
+Patch 8 enabled the KVM_GET_REG_LIST API in riscv and patch 9-10 added
+the corresponding kselftest for checking possible register regressions.
 
-I will try to bring this rigorous to the other patch of myself in the 
-future.
+The get-reg-list kvm selftest was ported from aarch64 and tested with
+Linux 6.4-rc5 on a Qemu riscv64 virt machine.
 
-> This is fine, and I'll merge this, but someday I would like to get rid
-> of the bus_register_notifier() and call vga_arbiter_add_pci_device()
-> and vga_arbiter_del_pci_device() directly from the PCI core.
->
-> Or if you wanted to do that now, that would be even better :)
+---
+Changed since v2:
+  * Rebase to Linux 6.4-rc5
+  * Filter out ZICBO* config and ISA_EXT registers report if the
+    extensions were not supported in host
+  * Enable AIA CSR test
+  * Move vCPU extension check_supported() to finalize_vcpu() per
+    Andrew's suggestion
+  * Switch to use KVM_REG_SIZE_ULONG for most registers' definition
 
-I think, I probably should only do what I'm good at.
+---
+Changed since v1:
+   * rebase to Andrew's changes
+   * fix coding style
 
+Andrew Jones (7):
+  KVM: arm64: selftests: Replace str_with_index with strdup_printf
+  KVM: arm64: selftests: Drop SVE cap check in print_reg
+  KVM: arm64: selftests: Remove print_reg's dependency on vcpu_config
+  KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
+  KVM: arm64: selftests: Delete core_reg_fixup
+  KVM: arm64: selftests: Split get-reg-list test code
+  KVM: arm64: selftests: Finish generalizing get-reg-list
 
-The "good at" here means that It's under prepared,
+Haibo Xu (3):
+  KVM: riscv: Add KVM_GET_REG_LIST API support
+  KVM: riscv: selftests: Skip some registers set operation
+  KVM: riscv: selftests: Add get-reg-list test
 
-already matured with thinking(or consideration) by myself.
+ Documentation/virt/kvm/api.rst                |   2 +-
+ arch/riscv/kvm/vcpu.c                         | 378 +++++++++++
+ tools/testing/selftests/kvm/Makefile          |  11 +-
+ .../selftests/kvm/aarch64/get-reg-list.c      | 540 ++--------------
+ tools/testing/selftests/kvm/get-reg-list.c    | 421 ++++++++++++
+ .../selftests/kvm/include/kvm_util_base.h     |  16 +
+ .../selftests/kvm/include/riscv/processor.h   |   3 +
+ .../testing/selftests/kvm/include/test_util.h |   2 +
+ tools/testing/selftests/kvm/lib/test_util.c   |  15 +
+ .../selftests/kvm/riscv/get-reg-list.c        | 611 ++++++++++++++++++
+ 10 files changed, 1499 insertions(+), 500 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/get-reg-list.c
+ create mode 100644 tools/testing/selftests/kvm/riscv/get-reg-list.c
 
-And also including testing(on two or three architecture).
-
-
-That idea is belong to you, I would like to see how does it going to 
-happen only.
-
-> Bjorn
->
->> Signed-off-by: Sui Jingfeng <suijingfeng@loongson.cn>
->> ---
->>   drivers/pci/vgaarb.c | 22 ++++++++++++----------
->>   1 file changed, 12 insertions(+), 10 deletions(-)
->>
->> diff --git a/drivers/pci/vgaarb.c b/drivers/pci/vgaarb.c
->> index 7f0347f4f6fd..b0bf4952a95d 100644
->> --- a/drivers/pci/vgaarb.c
->> +++ b/drivers/pci/vgaarb.c
->> @@ -756,10 +756,6 @@ static bool vga_arbiter_add_pci_device(struct pci_dev *pdev)
->>   	struct pci_dev *bridge;
->>   	u16 cmd;
->>   
->> -	/* Only deal with VGA class devices */
->> -	if ((pdev->class >> 8) != PCI_CLASS_DISPLAY_VGA)
->> -		return false;
->> -
->>   	/* Allocate structure */
->>   	vgadev = kzalloc(sizeof(struct vga_device), GFP_KERNEL);
->>   	if (vgadev == NULL) {
->> @@ -1499,7 +1495,9 @@ static int pci_notify(struct notifier_block *nb, unsigned long action,
->>   	struct pci_dev *pdev = to_pci_dev(dev);
->>   	bool notify = false;
->>   
->> -	vgaarb_dbg(dev, "%s\n", __func__);
->> +	/* Only deal with VGA class devices */
->> +	if ((pdev->class >> 8) != PCI_CLASS_DISPLAY_VGA)
->> +		return 0;
->>   
->>   	/* For now we're only intereted in devices added and removed. I didn't
->>   	 * test this thing here, so someone needs to double check for the
->> @@ -1509,6 +1507,8 @@ static int pci_notify(struct notifier_block *nb, unsigned long action,
->>   	else if (action == BUS_NOTIFY_DEL_DEVICE)
->>   		notify = vga_arbiter_del_pci_device(pdev);
->>   
->> +	vgaarb_dbg(dev, "%s: action = %lu\n", __func__, action);
->> +
->>   	if (notify)
->>   		vga_arbiter_notify_clients();
->>   	return 0;
->> @@ -1533,8 +1533,8 @@ static struct miscdevice vga_arb_device = {
->>   
->>   static int __init vga_arb_device_init(void)
->>   {
->> +	struct pci_dev *pdev = NULL;
->>   	int rc;
->> -	struct pci_dev *pdev;
->>   
->>   	rc = misc_register(&vga_arb_device);
->>   	if (rc < 0)
->> @@ -1545,11 +1545,13 @@ static int __init vga_arb_device_init(void)
->>   	/* We add all PCI devices satisfying VGA class in the arbiter by
->>   	 * default
->>   	 */
->> -	pdev = NULL;
->> -	while ((pdev =
->> -		pci_get_subsys(PCI_ANY_ID, PCI_ANY_ID, PCI_ANY_ID,
->> -			       PCI_ANY_ID, pdev)) != NULL)
->> +	while (1) {
->> +		pdev = pci_get_class(PCI_CLASS_DISPLAY_VGA << 8, pdev);
->> +		if (!pdev)
->> +			break;
->> +
->>   		vga_arbiter_add_pci_device(pdev);
->> +	};
->>   
->>   	pr_info("loaded\n");
->>   	return rc;
->> -- 
->> 2.25.1
->>
 -- 
-Jingfeng
+2.34.1
 
