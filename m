@@ -2,160 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B0FD72A08C
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 18:48:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F05972A097
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 18:49:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230048AbjFIQsN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 12:48:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51720 "EHLO
+        id S229671AbjFIQtD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 12:49:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229954AbjFIQsK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jun 2023 12:48:10 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28D8D3AA9;
-        Fri,  9 Jun 2023 09:47:50 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 359GhFSl008705;
-        Fri, 9 Jun 2023 16:47:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=lZbdk4xyFKSpLnTzVbMkGLvASS//Im1J101xKTmXJ6A=;
- b=Rh/Fbpl52BobgLZnOm/GhJFdhtl0sMETGy1sHPSBL9ZA9v8X7BaY0Nq5Iwuhmgi66xFT
- 8Jpa9tep0hd+fmkBH192lLugpuoQEcw7y3nWhdu+Irm3CVMnOdFaGpEM6HT09DnK0KXA
- i4+P+nWDBi+8b3d9WotAyxy2C65zaidTy+tfkLEjA4yUUUcD7fxEyuDo4V+i9KrkTmlM
- 26PIcCMNX0mqsx+HHLUKEXPsscqvSRosOC31yWyb1G1dLcGEpCWj6V4J81N39mJVS+4O
- m/qZd5nHl9Ru7KayX8bv4r6NW9mmTZfbXe7nKMGLv/XddKwHJY05C5xwCjUklJgDwO8A kw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r47jc0e85-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Jun 2023 16:47:26 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 359GhQw4009260;
-        Fri, 9 Jun 2023 16:47:26 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r47jc0e6j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Jun 2023 16:47:26 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 359EPMgx004580;
-        Fri, 9 Jun 2023 16:47:25 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([9.208.130.98])
-        by ppma01wdc.us.ibm.com (PPS) with ESMTPS id 3r2a74ekm9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Jun 2023 16:47:24 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 359GlNLN65339710
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 9 Jun 2023 16:47:24 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D303458055;
-        Fri,  9 Jun 2023 16:47:23 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1B91F5804B;
-        Fri,  9 Jun 2023 16:47:21 +0000 (GMT)
-Received: from [9.61.27.227] (unknown [9.61.27.227])
-        by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  9 Jun 2023 16:47:20 +0000 (GMT)
-Message-ID: <7c6b0eef-4413-56c1-22d1-bbd51ff51cd0@linux.ibm.com>
-Date:   Fri, 9 Jun 2023 12:47:20 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v12 00/24] Add vfio_device cdev for iommufd support
-Content-Language: en-US
-To:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        jgg@nvidia.com, kevin.tian@intel.com
-Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
-        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
-        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
-        clegoate@redhat.com
-References: <20230602121653.80017-1-yi.l.liu@intel.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20230602121653.80017-1-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: eIFuRLKC-g7TXHBFbUqvlbSOksUSiWkh
-X-Proofpoint-GUID: WXA4XS928uuiv_e705QuA6zw3biN1B2H
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S229956AbjFIQs7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jun 2023 12:48:59 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C640F3A8C;
+        Fri,  9 Jun 2023 09:48:52 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 58DC665A02;
+        Fri,  9 Jun 2023 16:48:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7117EC433EF;
+        Fri,  9 Jun 2023 16:48:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686329331;
+        bh=wj6ps6y4ft6WvpJQrBdcLusOhuloDy4bHnascQVlTT0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=O4xMnvyru9ylkQLSbinraMlwoqqoCRzqiohujByEGtJFDGMM2+bIqDUl5eHnyQxXo
+         rY6Jt+s9J9b2BJMm3LdqlppNkZafwg1ABQk0do5vWtrwv0HjpULglS2SDN2D6aMymp
+         CWxzgfiCmay+hbv7MVTWZ0mdVEp8uqGYXaqtxKSQkL5P7BHI2KgvO4BKLhYRuItyUe
+         b1MGXu2c7L7tT5+p5OajerVERb9IENBTZBVZNst9tkM+K3jNo95v+iyFA8Z0Q9QZCe
+         4IkGGUvPbx+9E+dUiQyq/RGdROHaFJmb7Ilr8VJ8sFWFpVVNEi3FletAovP7YIwJSa
+         +jJM45seUVXUw==
+Date:   Fri, 9 Jun 2023 11:48:50 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Sui Jingfeng <suijingfeng@loongson.cn>
+Cc:     Sui Jingfeng <15330273260@189.cn>,
+        Somalapuram Amaranath <Amaranath.Somalapuram@amd.com>,
+        Karol Herbst <kherbst@redhat.com>,
+        nouveau@lists.freedesktop.org,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        dri-devel@lists.freedesktop.org, YiPeng Chai <YiPeng.Chai@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        David Airlie <airlied@gmail.com>,
+        Ville Syrjala <ville.syrjala@linux.intel.com>,
+        Yi Liu <yi.l.liu@intel.com>, kvm@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
+        Ben Skeggs <bskeggs@redhat.com>, linux-pci@vger.kernel.org,
+        Andrey Grodzovsky <andrey.grodzovsky@amd.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Lijo Lazar <lijo.lazar@amd.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Bokun Zhang <Bokun.Zhang@amd.com>,
+        intel-gfx@lists.freedesktop.org,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        loongson-kernel@lists.loongnix.cn,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Yishai Hadas <yishaih@nvidia.com>, Li Yi <liyi@loongson.cn>,
+        Pan Xinhui <Xinhui.Pan@amd.com>, linux-kernel@vger.kernel.org,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian Konig <christian.koenig@amd.com>,
+        Hawking Zhang <Hawking.Zhang@amd.com>
+Subject: Re: [Intel-gfx] [PATCH v3 4/4] PCI/VGA: introduce is_boot_device
+ function callback to vga_client_register
+Message-ID: <20230609164850.GA1251187@bhelgaas>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-09_12,2023-06-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 suspectscore=0 phishscore=0 mlxlogscore=999
- priorityscore=1501 impostorscore=0 spamscore=0 bulkscore=0 adultscore=0
- clxscore=1011 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306090140
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0d2ba099-9817-13be-c85b-997211443119@loongson.cn>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/2/23 8:16 AM, Yi Liu wrote:
-> Existing VFIO provides group-centric user APIs for userspace. Userspace
-> opens the /dev/vfio/$group_id first before getting device fd and hence
-> getting access to device. This is not the desired model for iommufd. Per
-> the conclusion of community discussion[1], iommufd provides device-centric
-> kAPIs and requires its consumer (like VFIO) to be device-centric user
-> APIs. Such user APIs are used to associate device with iommufd and also
-> the I/O address spaces managed by the iommufd.
+On Fri, Jun 09, 2023 at 10:27:39AM +0800, Sui Jingfeng wrote:
+> On 2023/6/9 03:19, Bjorn Helgaas wrote:
+> > On Thu, Jun 08, 2023 at 07:43:22PM +0800, Sui Jingfeng wrote:
+> > > From: Sui Jingfeng <suijingfeng@loongson.cn>
+> > > 
+> > > The vga_is_firmware_default() function is arch-dependent, which doesn't
+> > > sound right. At least, it also works on the Mips and LoongArch platforms.
+> > > Tested with the drm/amdgpu and drm/radeon drivers. However, it's difficult
+> > > to enumerate all arch-driver combinations. I'm wrong if there is only one
+> > > exception.
+> > > 
+> > > With the observation that device drivers typically have better knowledge
+> > > about which PCI bar contains the firmware framebuffer, which could avoid
+> > > the need to iterate all of the PCI BARs.
+> > > 
+> > > But as a PCI function at pci/vgaarb.c, vga_is_firmware_default() is
+> > > probably not suitable to make such an optimization for a specific device.
+> > > 
+> > > There are PCI display controllers that don't have a dedicated VRAM bar,
+> > > this function will lose its effectiveness in such a case. Luckily, the
+> > > device driver can provide an accurate workaround.
+> > > 
+> > > Therefore, this patch introduces a callback that allows the device driver
+> > > to tell the VGAARB if the device is the default boot device. This patch
+> > > only intends to introduce the mechanism, while the implementation is left
+> > > to the device driver authors. Also honor the comment: "Clients have two
+> > > callback mechanisms they can use"
+> > s/bar/BAR/ (several)
+> > 
+> > Nothing here uses the callback.  I don't want to merge this until we
+> > have a user.
 > 
-> This series first introduces a per device file structure to be prepared
-> for further enhancement and refactors the kvm-vfio code to be prepared
-> for accepting device file from userspace. After this, adds a mechanism for
-> blocking device access before iommufd bind. Then refactors the vfio to be
-> able to handle cdev path (e.g. iommufd binding, no-iommufd, [de]attach ioas).
-> This refactor includes making the device_open exclusive between the group
-> and the cdev path, only allow single device open in cdev path; vfio-iommufd
-> code is also refactored to support cdev. e.g. split the vfio_iommufd_bind()
-> into two steps. Eventually, adds the cdev support for vfio device and the
-> new ioctls, then makes group infrastructure optional as it is not needed
-> when vfio device cdev is compiled.
+> This is chicken and egg question.
 > 
-> This series is based on some preparation works done to vfio emulated devices[2]
-> and vfio pci hot reset enhancements[3].
+> If you could help get this merge first, I will show you the first user.
 > 
-> This series is a prerequisite for iommu nesting for vfio device[4] [5].
+> > I'm not sure why the device driver should know whether its device is
+> > the default boot device.
 > 
-> The complete code can be found in below branch, simple tests done to the
-> legacy group path and the cdev path. Draft QEMU branch can be found at[6]
-> However, the noiommu mode test is only done with some hacks in kernel and
-> qemu to check if qemu can boot with noiommu devices.
+> It's not that the device driver should know,
 > 
-> https://github.com/yiliu1765/iommufd/tree/vfio_device_cdev_v12
-> (config CONFIG_IOMMUFD=y CONFIG_VFIO_DEVICE_CDEV=y)
+> but it's about that the device driver has the right to override.
 > 
-> base-commit: 0948fa29d62eca627a19d5b1534262a6d93d4181
-> 
+> Device driver may have better approach to identify the default boot
+> device.
 
-Hi Yi,
+The way we usually handle this is to include the new callback in the
+same series as the first user of it.  That has two benefits:
+(1) everybody can review the whole picture and possibly suggest
+different approaches, and (2) when we merge the infrastructure,
+we also merge a user of it at the same time, so the whole thing can be
+tested and we don't end up with unused code.
 
-I gave a tested-by some time ago, and have been running with various versions in between -- but there have been enough changes that by now the testing seems worth reaffirming.
-
-So, on this version (along with the QEMU test counterpart) I have tested the following on s390:
-
-1) default vfio container testing using vfio-pci, vfio-ap, vfio-ccw
-2) iommufd vfio compat testing using vfio-pci, vfio-ap, vfio-ccw (via group)
-3) iommufd vfio compat testing using vfio-pci (via cdev)
-4) iommufd + s390 nesting WIP kernel+QEMU series (built on top of intel and SMMUv3 nesting series) using vfio-pci
-
-
-Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-
-
-Thanks,
-Matt
-
-
+Bjorn
