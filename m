@@ -2,145 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB13E72A0BC
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 18:57:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B104772A10A
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 19:14:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229814AbjFIQ5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 12:57:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55536 "EHLO
+        id S229628AbjFIROy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 13:14:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbjFIQ5l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jun 2023 12:57:41 -0400
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 780153A89
-        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 09:57:40 -0700 (PDT)
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 359Bkucn021097;
-        Fri, 9 Jun 2023 16:57:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=2mON5YaCpuJiTPHDiQh+dmnmKCyyn5pqG0jrlirOFJ0=;
- b=Ainfx6vszdCsRQWj987y77nPT1VpRo94HI1qd1Y43h2U5aVPciIfNiyIJ9VWe0wJpWZt
- b07zGrohlbwBpMwbUdZvM92jrE5lZ2VGSKprm8Tmjh1Rd0TpUH5+a7thhWsVdW8MwWoB
- gPYQAxYz8YWo7VnzRmTP2U1wjfCHVviJXGox367Lzemd8dqoDOygL6wg4LMvMMiHFiUx
- sKvjpnLY9UEBu16RqhJOCjov3xLYNGS5o+TdVgIcWnGB7ZWaEMgn/2HOvP1kUUnd7ILf
- ve0Gg0ZXq03QnWyR42LLYznG5Ofb22xBtA9KmPmPTRSmKUGTdedsbwjT3YEg3HzLcHPm Qw== 
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3r3vu4hd39-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Jun 2023 16:57:35 +0000
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-        by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 359GvYrf025700
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 9 Jun 2023 16:57:34 GMT
-Received: from [10.110.16.202] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.42; Fri, 9 Jun 2023
- 09:57:33 -0700
-Message-ID: <bbc0b864-8a5f-50dd-40a2-14a8ae18af3b@quicinc.com>
-Date:   Fri, 9 Jun 2023 09:57:33 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [RFC PATCH part-1 0/5] pKVM on Intel Platform Introduction
-To:     Dmytro Maluka <dmy@semihalf.com>, Keir Fraser <keirf@google.com>,
-        Sean Christopherson <seanjc@google.com>
-CC:     Jason Chen CJ <jason.cj.chen@intel.com>, <kvm@vger.kernel.org>,
-        <android-kvm@google.com>, Dmitry Torokhov <dtor@chromium.org>,
-        Tomasz Nowicki <tn@semihalf.com>,
-        Grzegorz Jaszczyk <jaz@semihalf.com>
-References: <20230312180048.1778187-1-jason.cj.chen@intel.com>
- <ZA9QZcADubkx/3Ev@google.com> <ZBCeH5JB14Gl3wOM@jiechen-ubuntu-dev>
- <ZBCC3qEPHGWnx2JO@google.com> <ZB17s69rC9ioomF7@google.com>
- <883b7419-b8ac-f16a-e102-d3408c29bbff@semihalf.com>
-Content-Language: en-US
-From:   Trilok Soni <quic_tsoni@quicinc.com>
-In-Reply-To: <883b7419-b8ac-f16a-e102-d3408c29bbff@semihalf.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: u7NRFiCagMJmbzFNQLfD8RF4luKj12Ji
-X-Proofpoint-ORIG-GUID: u7NRFiCagMJmbzFNQLfD8RF4luKj12Ji
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-09_12,2023-06-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- lowpriorityscore=0 phishscore=0 priorityscore=1501 clxscore=1011
- suspectscore=0 spamscore=0 mlxscore=0 adultscore=0 malwarescore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306090143
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S230327AbjFIROx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jun 2023 13:14:53 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 882181FFE
+        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 10:14:44 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-256a41d3e81so863193a91.1
+        for <kvm@vger.kernel.org>; Fri, 09 Jun 2023 10:14:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686330884; x=1688922884;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8Sw7MOr+3hnVEmOQlDXydslwjILda+scHccINsHsaSw=;
+        b=mG/nfttSkrdk7C0BSGSr7wCIQeMKSTBtKlye3RaAwU6LncIf6g/898kAUadZsiYvF7
+         BhTF29dwuQ9nNl9vinDfD92+2MgGWOMm7zttIDy8YxDe517xcUNSl9DbkE4YxRbiys1I
+         vOYHP+nVUrqKBaa2aPywvEWu0FyQvbZhbE7QHT5g1EobVzI/sj1wj7VExGmDGxFtQDBf
+         r3nX/MjBQCZcP2edeA8njFSfACzGQFpjVct+LoAeQbQAcAKExT4YrtXGwvAhUva8nvSv
+         NLLyCR0+eOSaxca/4wbZz3ndCR4g5TyLJZ6qgp+WfQ/+IRy4eqNpUIhAymSDJAjJweMY
+         o+2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686330884; x=1688922884;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8Sw7MOr+3hnVEmOQlDXydslwjILda+scHccINsHsaSw=;
+        b=ixhK1Y0vGHIfYXij2d3Mgq0jvJ1lGlokEtgBW04kn7cUG8UC+nRR5Em3o5+kzcASvo
+         XZk71+oBp0+pJ1aS6H1IUidpWmM1e95MO4FXGFktwfGJE2wKGkzbd3i1bxtm+KeVN5N0
+         Bl03EFJJc0Q9wEsOIAS9kerhnwHQb5xNzg+LVuRkAjgVTDU7UxZmxYNSw1NffrY6yJt9
+         B9oxIVKPSs5mAcdxG5svH9qCajY2GShb2jD4jiazRcR/PlEWIzxwoULKFHHSY0W5a6tT
+         LW9j9YG+1/pCPbCNE+Ea9wIX/LrXRdg4zuHgrwcRma85BDt5yoD99MmBg882M4+zHGwV
+         Krag==
+X-Gm-Message-State: AC+VfDwOLcFTJUmwtHjX5YicP6emmLWkecx91GmdJVBno4EQ6A+XE4E2
+        OPiH9b6pCZ+KY4cSwJWkXca2+DCR8S0=
+X-Google-Smtp-Source: ACHHUZ6LD2YKs6nr9I9wxjQHET90p4R47jYGk6zWEjv3TEEgWiIuKzmmbCdSsqb0wBL8oiyQndc+cQ==
+X-Received: by 2002:a17:90a:7104:b0:255:d878:704a with SMTP id h4-20020a17090a710400b00255d878704amr1861381pjk.4.1686330883399;
+        Fri, 09 Jun 2023 10:14:43 -0700 (PDT)
+Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
+        by smtp.gmail.com with ESMTPSA id b16-20020a17090a551000b0024e026444b6sm6779121pji.2.2023.06.09.10.14.42
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 09 Jun 2023 10:14:42 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
+Subject: Re: [kvm-unit-tests PATCH v6 28/32] arm64: Add support for efi in
+ Makefile
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20230609-2c01e3ece17d5c6b3005ee4e@orel>
+Date:   Fri, 9 Jun 2023 10:14:31 -0700
+Cc:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
+        alexandru.elisei@arm.com, ricarkol@google.com, shahuang@redhat.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <E89A8FE9-E27D-422B-84FE-1F69AD3C239C@gmail.com>
+References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
+ <20230530160924.82158-29-nikos.nikoleris@arm.com>
+ <197A5432-65EA-49A7-AD6D-1AFCB58D30D0@gmail.com>
+ <20230609-2c01e3ece17d5c6b3005ee4e@orel>
+To:     Andrew Jones <andrew.jones@linux.dev>
+X-Mailer: Apple Mail (2.3731.600.7)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/8/2023 2:06 PM, Dmytro Maluka wrote:
-> On 3/24/23 11:30, Keir Fraser wrote:
->> On Tue, Mar 14, 2023 at 07:21:18AM -0700, Sean Christopherson wrote:
->>> On Tue, Mar 14, 2023, Jason Chen CJ wrote:
->>>> On Mon, Mar 13, 2023 at 09:33:41AM -0700, Sean Christopherson wrote:
->>>>
->>>>> On Mon, Mar 13, 2023, Jason Chen CJ wrote:
->>>>>> There are similar use cases on x86 platforms requesting protected
->>>>>> environment which is isolated from host OS for confidential computing.
->>>>>
->>>>> What exactly are those use cases?  The more details you can provide, the better.
->>>>> E.g. restricting the isolated VMs to 64-bit mode a la TDX would likely simplify
->>>>> the pKVM implementation.
->>>>
->>>> Thanks Sean for your comments, I am very appreciated!
->>>>
->>>> We are expected
->>>
->>> Who is "we"?  Unless Intel is making a rather large pivot, I doubt Intel is the
->>> end customer of pKVM-on-x86.  If you aren't at liberty to say due NDA/confidentiality,
->>> then please work with whoever you need to in order to get permission to fully
->>> disclose the use case.  Because realistically, without knowing exactly what is
->>> in scope and why, this is going nowhere.
->>
->> This is being seriously evaluated by ChromeOS as an alternative to
->> their existing ManaTEE design. Compared with that (hypervisor == full
->> Linux) the pKVM design is pretty attractive: smaller TCB, host Linux
->> "VM" runs closer to native and without nested scheduling, demonstrated
->> better performance, and closer alignment with Android virtualisation
->> (that's my team, which of course is ARM focused, but we'd love to see
->> broader uptake of pKVM in the kernel).
-> 
-> Right, we (Google with the help of Semihalf and Intel) have been
-> evaluating pKVM for ChromeOS on Intel platforms (using this Intel's
-> pKVM-on-x86 PoC) as a platform for running secure workloads in VMs
-> protected from the untrusted ChromeOS host, and it looks quite promising
-> so far, in terms of both performance and design simplicity.
-> 
-> The primary use cases for those secure workloads on Chromebooks are for
-> protection of sensitive biometric data (e.g. fingerprints, face
-> authentication), which means that we expect pKVM to provide not just the
-> basic memory protection for secure VMs but also protection of secure
-> devices assigned to those VMs (e.g. fingerprint sensor, secure camera).
 
 
-Very interesting usecases. I would be interested to know how you plan to
-paravirt the clocks and regulators required for these devices on the 
-guest VM (Protected VM) on x86. On ARM, we have SCMI specification w/
-virtio-scmi, it is possible to do the clock and regulators paravirt.
+> On Jun 9, 2023, at 12:36 AM, Andrew Jones <andrew.jones@linux.dev> =
+wrote:
+>=20
+> On Thu, Jun 08, 2023 at 01:41:58PM -0700, Nadav Amit wrote:
+> ...
+>>> +%.efi: %.so
+>>> + $(call arch_elf_check, $^)
+>>> + $(OBJCOPY) \
+>>> + -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
+>>> + -j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
+>>> + -j .reloc \
+>>> + -O binary $^ $@
+>>=20
+>> I really appreciate your work Nikos, and I might be late since I see =
+Drew
+>> already applied it to his queue.
+>=20
+> It's not too late. arm/queue isn't stable so we can apply fixes while =
+it
+> bakes there.
+>=20
+>> So consider this email, my previous one, and
+>> others that might follow more as grievances that can easily be =
+addressed later.
+>>=20
+>> So: It would=E2=80=99ve been nice to keep the symbols and debug =
+information in a
+>> separate file. Something like:
+>>=20
+>> diff --git a/arm/Makefile.common b/arm/Makefile.common
+>> index d60cf8c..f904702 100644
+>> --- a/arm/Makefile.common
+>> +++ b/arm/Makefile.common
+>> @@ -69,7 +69,7 @@ FLATLIBS =3D $(libcflat) $(LIBFDT_archive) =
+$(libeabi)
+>> ifeq ($(CONFIG_EFI),y)
+>> %.so: EFI_LDFLAGS +=3D -defsym=3DEFI_SUBSYSTEM=3D0xa --no-undefined
+>> %.so: %.o $(FLATLIBS) $(SRCDIR)/arm/efi/elf_aarch64_efi.lds =
+$(cstart.o)
+>> -       $(CC) $(CFLAGS) -c -o $(@:.so=3D.aux.o) =
+$(SRCDIR)/lib/auxinfo.c \
+>> +       $(CC) $(CFLAGS) -c -g -o $(@:.so=3D.aux.o) =
+$(SRCDIR)/lib/auxinfo.c \
+>>                -DPROGNAME=3D\"$(@:.so=3D.efi)\" =
+-DAUXFLAGS=3D$(AUXFLAGS)
+>>        $(LD) $(EFI_LDFLAGS) -o $@ -T =
+$(SRCDIR)/arm/efi/elf_aarch64_efi.lds \
+>>                $(filter %.o, $^) $(FLATLIBS) $(@:.so=3D.aux.o) \
+>> @@ -78,6 +78,9 @@ ifeq ($(CONFIG_EFI),y)
+>>   %.efi: %.so
+>>        $(call arch_elf_check, $^)
+>> +       $(OBJCOPY) --only-keep-debug $^ $@.debug
+>> +       $(OBJCOPY) --strip-debug $^
+>> +       $(OBJCOPY) --add-gnu-debuglink=3D$@.debug $^
+>>        $(OBJCOPY) \
+>>                -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
+>>                -j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j =
+.rela* \
+>=20
+> This is nice, but I think it can wait and be posted later.
+>=20
 
-Camera may have need more h/w dependencies than clocks and regulators 
-like flash LEDs, gpios, IOMMUs, I2C on top of the camera driver pipeline 
-itself.
+Sure thing. Thanks. I still got few problems I need to finish resolving,
+and some other minor improvements, so I will post them all later.
 
-Do you have any proof-of-concept for above usecases to check and 
-reproduce on the chrome w/ x86?
 
-Do we have the recording of the PUCK meeting?
-
----Trilok Soni
