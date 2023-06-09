@@ -2,99 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0ED6C729AF5
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 15:04:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 405F3729B57
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 15:18:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240004AbjFINEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 09:04:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33330 "EHLO
+        id S240122AbjFINSG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 09:18:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238814AbjFINEf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jun 2023 09:04:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06B052D72;
-        Fri,  9 Jun 2023 06:04:35 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 97BBB61234;
-        Fri,  9 Jun 2023 13:04:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC01EC433EF;
-        Fri,  9 Jun 2023 13:04:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686315874;
-        bh=90rVHTRs/3F5on7zL7vvDRpDwafaR4yvoFsAW9sVsUU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ct18ILo60TPRsRZeRF0MA6HqVV541momQ/jF4nftPln9ac11WPptBUohnWBmUvWqE
-         vnbarfiPcuydHingkmODEEfgyBqMNPOYeP2WxeWyeZBtXUQLPWlTQiK3YoRCoQuOkz
-         ykp2yROWej+XaTRvcPNC1Mj4JCwFi/idPxZcvWKMzoJB4BmjIGu9z7nSlgQ6TTTjIl
-         qP4PTzdDzoU3b8crpqEvZ0W3ktzTOLFYBKjsvJzANfoNoi8mgwX007iMF+sc9WNoo4
-         c5+GV/8GYH3NerKeEbysr3Xjw/+GD6dgRglU5pvXYup5qB/zjHokXJytURgg3jzfRS
-         C5Xro19M414WQ==
-Received: from 152.5.30.93.rev.sfr.net ([93.30.5.152] helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1q7bn5-0045UR-GR;
-        Fri, 09 Jun 2023 14:04:31 +0100
-Date:   Fri, 09 Jun 2023 14:04:27 +0100
-Message-ID: <873530okh0.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Yu Zhao <yuzhao@google.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        Anup Patel <anup@brainfault.org>,
-        Ben Gardon <bgardon@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Gaosheng Cui <cuigaosheng1@huawei.com>,
-        Gavin Shan <gshan@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michael Larabel <michael@michaellarabel.com>,
-        Mike Rapoport <rppt@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
-        linux-trace-kernel@vger.kernel.org, x86@kernel.org,
-        linux-mm@google.com
-Subject: Re: kvm/arm64: Spark benchmark
-In-Reply-To: <20230609005935.42390-1-yuzhao@google.com>
-References: <20230526234435.662652-1-yuzhao@google.com>
-        <20230609005935.42390-1-yuzhao@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 93.30.5.152
-X-SA-Exim-Rcpt-To: yuzhao@google.com, akpm@linux-foundation.org, pbonzini@redhat.com, apopple@nvidia.com, anup@brainfault.org, bgardon@google.com, bp@alien8.de, catalin.marinas@arm.com, chao.p.peng@linux.intel.com, christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com, farosas@linux.ibm.com, cuigaosheng1@huawei.com, gshan@redhat.com, hpa@zytor.com, mingo@redhat.com, james.morse@arm.com, Jason@zx2c4.com, jgg@ziepe.ca, corbet@lwn.net, mhiramat@kernel.org, mpe@ellerman.id.au, michael@michaellarabel.com, rppt@kernel.org, npiggin@gmail.com, oliver.upton@linux.dev, paulus@ozlabs.org, peterx@redhat.com, seanjc@google.com, rostedt@goodmis.org, suzuki.poulose@arm.com, tglx@linutronix.de, thuth@redhat.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org, x86@kernel.org, linux-m
- m@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        with ESMTP id S231135AbjFINSF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jun 2023 09:18:05 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 263DBA3;
+        Fri,  9 Jun 2023 06:18:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686316684; x=1717852684;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8UyLEibmXUqgyndyzdA99iRsyIpRFb+3EGRyOqrRvVk=;
+  b=Uc+/Oe1GCQnw/2KeIfC97kekGce7fN7vhFydgGKkaExiVb/LRIl+RLFr
+   VbDxG+/APYz/IiuioR++3ILVSbMabdZEVUVtBoPrzPJUNzJLugqCswNwW
+   BkKjU09FHiidCmSB9k7yhFGSmHCmM1rysyKSI++eYmiL4G9NpUvmZOu64
+   10sYxEv6ORyO9q7E4Z2Bfsz7m1UO4XYAYjPTMm/ziz7NHGZOqb076x9qT
+   LlMo647KCYPG6rOOk0hJpnlpnb1EcovOxciZACvKlokCge3kdXxi1fhm/
+   Ly0C3+6rzzzuQPz678WNJZqMe1RPHeRaCuLeP1wkXAEWnGVK1PQCWhC4R
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10736"; a="421186418"
+X-IronPort-AV: E=Sophos;i="6.00,229,1681196400"; 
+   d="scan'208";a="421186418"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2023 06:18:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10736"; a="743484861"
+X-IronPort-AV: E=Sophos;i="6.00,229,1681196400"; 
+   d="scan'208";a="743484861"
+Received: from mbahx-mobl1.ger.corp.intel.com (HELO box.shutemov.name) ([10.249.43.216])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2023 06:17:57 -0700
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id A7B32109B7B; Fri,  9 Jun 2023 16:17:54 +0300 (+03)
+Date:   Fri, 9 Jun 2023 16:17:54 +0300
+From:   kirill.shutemov@linux.intel.com
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-mm@kvack.org, dave.hansen@intel.com, tony.luck@intel.com,
+        peterz@infradead.org, tglx@linutronix.de, seanjc@google.com,
+        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, ying.huang@intel.com,
+        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+Subject: Re: [PATCH v11 19/20] x86/mce: Improve error log of kernel space TDX
+ #MC due to erratum
+Message-ID: <20230609131754.dhii5ctfwtzx667o@box.shutemov.name>
+References: <cover.1685887183.git.kai.huang@intel.com>
+ <116cafb15625ac0bcda7b47143921d0c42061b69.1685887183.git.kai.huang@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <116cafb15625ac0bcda7b47143921d0c42061b69.1685887183.git.kai.huang@intel.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -102,21 +71,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 09 Jun 2023 01:59:35 +0100,
-Yu Zhao <yuzhao@google.com> wrote:
+On Mon, Jun 05, 2023 at 02:27:32AM +1200, Kai Huang wrote:
+> The first few generations of TDX hardware have an erratum.  Triggering
+> it in Linux requires some kind of kernel bug involving relatively exotic
+> memory writes to TDX private memory and will manifest via
+> spurious-looking machine checks when reading the affected memory.
 > 
-> TLDR
-> ====
-> Apache Spark spent 12% less time sorting four billion random integers twenty times (in ~4 hours) after this patchset [1].
+> == Background ==
+> 
+> Virtually all kernel memory accesses operations happen in full
+> cachelines.  In practice, writing a "byte" of memory usually reads a 64
+> byte cacheline of memory, modifies it, then writes the whole line back.
+> Those operations do not trigger this problem.
+> 
+> This problem is triggered by "partial" writes where a write transaction
+> of less than cacheline lands at the memory controller.  The CPU does
+> these via non-temporal write instructions (like MOVNTI), or through
+> UC/WC memory mappings.  The issue can also be triggered away from the
+> CPU by devices doing partial writes via DMA.
+> 
+> == Problem ==
+> 
+> A partial write to a TDX private memory cacheline will silently "poison"
+> the line.  Subsequent reads will consume the poison and generate a
+> machine check.  According to the TDX hardware spec, neither of these
+> things should have happened.
+> 
+> To add insult to injury, the Linux machine code will present these as a
+> literal "Hardware error" when they were, in fact, a software-triggered
+> issue.
+> 
+> == Solution ==
+> 
+> In the end, this issue is hard to trigger.  Rather than do something
+> rash (and incomplete) like unmap TDX private memory from the direct map,
+> improve the machine check handler.
+> 
+> Currently, the #MC handler doesn't distinguish whether the memory is
+> TDX private memory or not but just dump, for instance, below message:
+> 
+>  [...] mce: [Hardware Error]: CPU 147: Machine Check Exception: f Bank 1: bd80000000100134
+>  [...] mce: [Hardware Error]: RIP 10:<ffffffffadb69870> {__tlb_remove_page_size+0x10/0xa0}
+>  	...
+>  [...] mce: [Hardware Error]: Run the above through 'mcelog --ascii'
+>  [...] mce: [Hardware Error]: Machine check: Data load in unrecoverable area of kernel
+>  [...] Kernel panic - not syncing: Fatal local machine check
+> 
+> Which says "Hardware Error" and "Data load in unrecoverable area of
+> kernel".
+> 
+> Ideally, it's better for the log to say "software bug around TDX private
+> memory" instead of "Hardware Error".  But in reality the real hardware
+> memory error can happen, and sadly such software-triggered #MC cannot be
+> distinguished from the real hardware error.  Also, the error message is
+> used by userspace tool 'mcelog' to parse, so changing the output may
+> break userspace.
+> 
+> So keep the "Hardware Error".  The "Data load in unrecoverable area of
+> kernel" is also helpful, so keep it too.
+> 
+> Instead of modifying above error log, improve the error log by printing
+> additional TDX related message to make the log like:
+> 
+>   ...
+>  [...] mce: [Hardware Error]: Machine check: Data load in unrecoverable area of kernel
+>  [...] mce: [Hardware Error]: Machine Check: Memory error from TDX private memory. May be result of CPU erratum.
 
-Why are the 3 architectures you have considered being evaluated with 3
-different benchmarks? I am not suspecting you to have cherry-picked
-the best results, but I'd really like to see a variety of benchmarks
-that exercise this stuff differently.
-
-Thanks,
-
-	M.
+The message mentions one part of issue -- CPU erratum -- but misses the
+other required part -- kernel bug that makes kernel access the memory it
+not suppose to.
 
 -- 
-Without deviation from the norm, progress is not possible.
+  Kiryl Shutsemau / Kirill A. Shutemov
