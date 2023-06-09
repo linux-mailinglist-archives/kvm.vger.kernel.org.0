@@ -2,49 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A76917293F1
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 10:56:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD02D729411
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 11:03:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238871AbjFII4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 04:56:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53574 "EHLO
+        id S239246AbjFIJDp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 05:03:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241196AbjFIIz4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jun 2023 04:55:56 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D5AF7469F;
-        Fri,  9 Jun 2023 01:54:46 -0700 (PDT)
-Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8BxL_DM6IJksvoAAA--.3020S3;
-        Fri, 09 Jun 2023 16:54:36 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8Bx+OTK6IJkGGgKAA--.31915S2;
-        Fri, 09 Jun 2023 16:54:35 +0800 (CST)
-From:   Tianrui Zhao <zhaotianrui@loongson.cn>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>, zhaotianrui@loongson.cn,
-        tangyouling@loongson.cn
-Subject: [PATCH v13 00/30] Add KVM LoongArch support
-Date:   Fri,  9 Jun 2023 16:54:04 +0800
-Message-Id: <20230609085434.2130272-1-zhaotianrui@loongson.cn>
-X-Mailer: git-send-email 2.39.1
+        with ESMTP id S240760AbjFIJD0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jun 2023 05:03:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAF48172E
+        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 02:02:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686301339;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KFUrvRJxbyJqWngYaxvlUzMLa4tqCQ/bULikB/U9Ubg=;
+        b=HemBzSIY3AU6Juqs9M56s+4y5qnnXH9qpJdWW+eLccW4a23LKoJaXdWngGt3QIxKnEcvA2
+        ktpeCuPLyyp+fHN6ZRT9poE2K73w0pWYVd0as3W0oT66VrE1PF8o7dO8t6wvIZCX/I5u3w
+        LI4x8Vp8GdVgrohrmDRHGrSKARApiDo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-438-Ze96RZroN1qKUeDr-_I-ng-1; Fri, 09 Jun 2023 05:02:16 -0400
+X-MC-Unique: Ze96RZroN1qKUeDr-_I-ng-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D7490185A793;
+        Fri,  9 Jun 2023 09:02:15 +0000 (UTC)
+Received: from [10.64.54.168] (vpn2-54-168.bne.redhat.com [10.64.54.168])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F6F4492B00;
+        Fri,  9 Jun 2023 09:02:11 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH] KVM: Avoid illegal stage2 mapping on invalid memory slot
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        seanjc@google.com, oliver.upton@linux.dev, hshuai@redhat.com,
+        zhenyzha@redhat.com, shan.gavin@gmail.com,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        David Hildenbrand <david@redhat.com>
+References: <20230608090348.414990-1-gshan@redhat.com>
+ <87bkhqnhzm.wl-maz@kernel.org>
+ <695fe5a2-a295-4105-b31b-4cc92b089659@redhat.com>
+ <877csdnjoz.wl-maz@kernel.org>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <295a2c95-d75a-6857-0b24-e33e387fec95@redhat.com>
+Date:   Fri, 9 Jun 2023 19:02:10 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8Bx+OTK6IJkGGgKAA--.31915S2
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-        ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-        nUUI43ZEXa7xR_UUUUUUUUU==
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+In-Reply-To: <877csdnjoz.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -52,243 +74,145 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series adds KVM LoongArch support. Loongson 3A5000 supports hardware
-assisted virtualization. With cpu virtualization, there are separate
-hw-supported user mode and kernel mode in guest mode. With memory
-virtualization, there are two-level hw mmu table for guest mode and host
-mode. Also there is separate hw cpu timer with consant frequency in
-guest mode, so that vm can migrate between hosts with different freq.
-Currently, we are able to boot LoongArch Linux Guests.
+On 6/9/23 6:06 PM, Marc Zyngier wrote:
+> On Fri, 09 Jun 2023 00:17:34 +0100,
+> Gavin Shan <gshan@redhat.com> wrote:
+>> On 6/9/23 12:31 AM, Marc Zyngier wrote:
+>>> On Thu, 08 Jun 2023 10:03:48 +0100,
+>>> Gavin Shan <gshan@redhat.com> wrote:
+>>>>
+>>>> We run into guest hang in edk2 firmware when KSM is kept as running
+>>>> on the host. The edk2 firmware is waiting for status 0x80 from QEMU's
+>>>> pflash device (TYPE_PFLASH_CFI01) during the operation for sector
+>>>> erasing or buffered write. The status is returned by reading the
+>>>> memory region of the pflash device and the read request should
+>>>> have been forwarded to QEMU and emulated by it. Unfortunately, the
+>>>> read request is covered by an illegal stage2 mapping when the guest
+>>>> hang issue occurs. The read request is completed with QEMU bypassed and
+>>>> wrong status is fetched.
+>>>>
+>>>> The illegal stage2 mapping is populated due to same page mering by
+>>>> KSM at (C) even the associated memory slot has been marked as invalid
+>>>> at (B).
+>>>>
+>>>>     CPU-A                    CPU-B
+>>>>     -----                    -----
+>>>>                              ioctl(kvm_fd, KVM_SET_USER_MEMORY_REGION)
+>>>>                              kvm_vm_ioctl_set_memory_region
+>>>>                              kvm_set_memory_region
+>>>>                              __kvm_set_memory_region
+>>>>                              kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE)
+>>>>                                kvm_invalidate_memslot
+>>>>                                  kvm_copy_memslot
+>>>>                                  kvm_replace_memslot
+>>>>                                  kvm_swap_active_memslots        (A)
+>>>>                                  kvm_arch_flush_shadow_memslot   (B)
+>>>>     same page merging by KSM
+>>>>     kvm_mmu_notifier_change_pte
+>>>>     kvm_handle_hva_range
+>>>>     __kvm_handle_hva_range       (C)
+>>>>
+>>>> Fix the issue by skipping the invalid memory slot at (C) to avoid the
+>>>> illegal stage2 mapping. Without the illegal stage2 mapping, the read
+>>>> request for the pflash's status is forwarded to QEMU and emulated by
+>>>> it. The correct pflash's status can be returned from QEMU to break
+>>>> the infinite wait in edk2 firmware.
+>>>
+>>> Huh, nice one :-(.
+>>>
+>>
+>> Yeah, it's a sneaky one :)
+>>
+>>>>
+>>>> Cc: stable@vger.kernel.org # v5.13+
+>>>> Fixes: 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
+>>>> Reported-by: Shuai Hu <hshuai@redhat.com>
+>>>> Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
+>>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>>> ---
+>>>>    virt/kvm/kvm_main.c | 3 +++
+>>>>    1 file changed, 3 insertions(+)
+>>>>
+>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>>> index 479802a892d4..7f81a3a209b6 100644
+>>>> --- a/virt/kvm/kvm_main.c
+>>>> +++ b/virt/kvm/kvm_main.c
+>>>> @@ -598,6 +598,9 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+>>>>    			unsigned long hva_start, hva_end;
+>>>>      			slot = container_of(node, struct
+>>>> kvm_memory_slot, hva_node[slots->node_idx]);
+>>>> +			if (slot->flags & KVM_MEMSLOT_INVALID)
+>>>> +				continue;
+>>>> +
+>>>>    			hva_start = max(range->start, slot->userspace_addr);
+>>>>    			hva_end = min(range->end, slot->userspace_addr +
+>>>>    						  (slot->npages << PAGE_SHIFT));
+>>>
+>>> I don't immediately see what makes it safer. If we're not holding one
+>>> of slots_{,arch_}lock in the notifier, we can still race against the
+>>> update, can't we?  I don't think holding the srcu lock helps us here.
+>>>
+> 
+> [...]
+> 
+>> change_pte() is always surrounded by invalidate_range_start and
+>> invalidate_range_end(). It means kvm->mn_active_invalidate_count is always
+>> larger than zero when change_pte() is called. With this condition
+>> (kvm->mn_active_invalidate_count > 0), The swapping between the inactive
+>> and active memory slots by kvm_swap_active_memslots() can't be done.
+>> So there are two cases for one memory slot when change_pte() is called:
+>> (a) it has been marked as KVM_MEMSLOT_INVALID in the active memory slots
+>> by kvm_invalidate_memslot(), called before invalidate_range_start();
+>> (b) the memory slot has been deleted from the active memory slots. We're
+>> only concerned by (a) when the active memory slots are iterated in
+>> __kvm_handle_hva_range().
+> 
+> OK, so to sum it up:
+> 
+> - the memslot cannot be swapped while we're walking the active
+>    memslots because kvm->mn_active_invalidate_count is elevated, and
+>    kvm_swap_active_memslots() will busy loop until this has reached 0
+>    again
+> 
+> - holding the srcu read_lock prevents an overlapping memslot update
+>    from being published at the wrong time (synchronize_srcu_expedited()
+>    in kvm_swap_active_memslots())
+> 
+> If the above holds, then I agree the fix looks correct. I'd definitely
+> want to see some of this rationale captured in the commit message
+> though.
+> 
 
-Few key aspects of KVM LoongArch added by this series are:
-1. Enable kvm hardware function when kvm module is loaded.
-2. Implement VM and vcpu related ioctl interface such as vcpu create,
-   vcpu run etc. GET_ONE_REG/SET_ONE_REG ioctl commands are use to
-   get general registers one by one.
-3. Hardware access about MMU, timer and csr are emulated in kernel.
-4. Hardwares such as mmio and iocsr device are emulated in user space
-   such as APIC, IPI, pci devices etc.
+Yes, your summary is exactly what I understood. I will improve the
+changelog to include the rationale in v2.
 
-The running environment of LoongArch virt machine:
-1. Cross tools to build kernel and uefi:
-   $ wget https://github.com/loongson/build-tools/releases/download/2022.09.06/loongarch64-clfs-6.3-cross-tools-gcc-glibc.tar.xz
-   tar -vxf loongarch64-clfs-6.3-cross-tools-gcc-glibc.tar.xz  -C /opt
-   export PATH=/opt/cross-tools/bin:$PATH
-   export LD_LIBRARY_PATH=/opt/cross-tools/lib:$LD_LIBRARY_PATH
-   export LD_LIBRARY_PATH=/opt/cross-tools/loongarch64-unknown-linux-gnu/lib/:$LD_LIBRARY_PATH
-2. This series is based on the linux source code:
-   https://github.com/loongson/linux-loongarch-kvm
-   Build command:
-   git checkout kvm-loongarch
-   make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu- loongson3_defconfig
-   make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu-
-3. QEMU hypervisor with LoongArch supported:
-   https://github.com/loongson/qemu
-   Build command:
-   git checkout kvm-loongarch
-   ./configure --target-list="loongarch64-softmmu"  --enable-kvm
-   make
-4. Uefi bios of LoongArch virt machine:
-   Link: https://github.com/tianocore/edk2-platforms/tree/master/Platform/Loongson/LoongArchQemuPkg#readme
-5. you can also access the binary files we have already build:
-   https://github.com/yangxiaojuan-loongson/qemu-binary
-The command to boot loongarch virt machine:
-   $ qemu-system-loongarch64 -machine virt -m 4G -cpu la464 \
-   -smp 1 -bios QEMU_EFI.fd -kernel vmlinuz.efi -initrd ramdisk \
-   -serial stdio   -monitor telnet:localhost:4495,server,nowait \
-   -append "root=/dev/ram rdinit=/sbin/init console=ttyS0,115200" \
-   --nographic
-
-Changes for v13:
-1. Remove patch-28 "Implement probe virtualization when cpu init", as the
-virtualization information about FPU,PMP,LSX in guest.options,options_dyn
-is not used and the gcfg reg value can be read in kvm_hardware_enable, so
-remove the previous cpu_probe_lvz function.
-2. Fix vcpu_enable_cap interface, it should return -EINVAL directly, as
-FPU cap is enable by default, and do not support any other caps now.
-3. Simplify the jirl instruction with jr when without return addr,
-simplify case HW0 ... HW7 statment in interrupt.c
-4. Rename host_stack,host_gp in kvm_vcpu_arch to host_sp,host_tp.
-5. Remove 'cpu' parameter in _kvm_check_requests, as 'cpu' is not used,
-and remove 'cpu' parameter in kvm_check_vmid function, as it can get
-cpu number by itself.
-
-Changes for v12:
-1. Improve the gcsr write/read/xchg interface to avoid the previous
-instruction statment like parse_r and make the code easy understanding,
-they are implemented in asm/insn-def.h and the instructions consistent
-of "opcode" "rj" "rd" "simm14" arguments.
-2. Fix the maintainers list of LoongArch KVM.
-
-Changes for v11:
-1. Add maintainers for LoongArch KVM.
-
-Changes for v10:
-1. Fix grammatical problems in LoongArch documentation.
-2. It is not necessary to save or restore the LOONGARCH_CSR_PGD when
-vcpu put and vcpu load, so we remove it.
-
-Changes for v9:
-1. Apply the new defined interrupt number macros in loongarch.h to kvm,
-such as INT_SWI0, INT_HWI0, INT_TI, INT_IPI, etc. And remove the
-previous unused macros.
-2. Remove unused variables in kvm_vcpu_arch, and reorder the variables
-to make them more standard.
-
-Changes for v8:
-1. Adjust the cpu_data.guest.options structure, add the ases flag into
-it, and remove the previous guest.ases. We do this to keep consistent
-with host cpu_data.options structure.
-2. Remove the "#include <asm/kvm_host.h>" in some files which also
-include the "<linux/kvm_host.h>". As linux/kvm_host.h already include
-the asm/kvm_host.h.
-3. Fix some unstandard spelling and grammar errors in comments, and
-improve a little code format to make it easier and standard.
-
-Changes for v7:
-1. Fix the kvm_save/restore_hw_gcsr compiling warnings reported by
-kernel test robot. The report link is:
-https://lore.kernel.org/oe-kbuild-all/202304131526.iXfLaVZc-lkp@intel.com/
-2. Fix loongarch kvm trace related compiling problems.
-
-Changes for v6:
-1. Fix the Documentation/virt/kvm/api.rst compile warning about
-loongarch parts.
-
-Changes for v5:
-1. Implement get/set mp_state ioctl interface, and only the
-KVM_MP_STATE_RUNNABLE state is supported now, and other states
-will be completed in the future. The state is also used when vcpu
-run idle instruction, if vcpu state is changed to RUNNABLE, the
-vcpu will have the possibility to be woken up.
-2. Supplement kvm document about loongarch-specific part, such as add
-api introduction for GET/SET_ONE_REG, GET/SET_FPU, GET/SET_MP_STATE,
-etc.
-3. Improve the kvm_switch_to_guest function in switch.S, remove the
-previous tmp,tmp1 arguments and replace it with t0,t1 reg.
-
-Changes for v4:
-1. Add a csr_need_update flag in _vcpu_put, as most csr registers keep
-unchanged during process context switch, so we need not to update it
-every time. We can do this only if the soft csr is different form hardware.
-That is to say all of csrs should update after vcpu enter guest, as for
-set_csr_ioctl, we have written soft csr to keep consistent with hardware.
-2. Improve get/set_csr_ioctl interface, we set SW or HW or INVALID flag
-for all csrs according to it's features when kvm init. In get/set_csr_ioctl,
-if csr is HW, we use gcsrrd/ gcsrwr instruction to access it, else if csr is
-SW, we use software to emulate it, and others return false.
-3. Add set_hw_gcsr function in csr_ops.S, and it is used in set_csr_ioctl.
-We have splited hw gcsr into three parts, so we can calculate the code offset
-by gcsrid and jump here to run the gcsrwr instruction. We use this function to
-make the code easier and avoid to use the previous SET_HW_GCSR(XXX) interface.
-4. Improve kvm mmu functions, such as flush page table and make clean page table
-interface.
-
-Changes for v3:
-1. Remove the vpid array list in kvm_vcpu_arch and use a vpid variable here,
-because a vpid will never be recycled if a vCPU migrates from physical CPU A
-to B and back to A.
-2. Make some constant variables in kvm_context to global such as vpid_mask,
-guest_eentry, enter_guest, etc.
-3. Add some new tracepoints, such as kvm_trace_idle, kvm_trace_cache,
-kvm_trace_gspr, etc.
-4. There are some duplicate codes in kvm_handle_exit and kvm_vcpu_run,
-so we move it to a new function kvm_pre_enter_guest.
-5. Change the RESUME_HOST, RESUME_GUEST value, return 1 for resume guest
-and "<= 0" for resume host.
-6. Fcsr and fpu registers are saved/restored together.
-
-Changes for v2:
-1. Seprate the original patch-01 and patch-03 into small patches, and the
-patches mainly contain kvm module init, module exit, vcpu create, vcpu run,
-etc.
-2. Remove the original KVM_{GET,SET}_CSRS ioctl in the kvm uapi header,
-and we use the common KVM_{GET,SET}_ONE_REG to access register.
-3. Use BIT(x) to replace the "1 << n_bits" statement.
-
-Tianrui Zhao (30):
-  LoongArch: KVM: Add kvm related header files
-  LoongArch: KVM: Implement kvm module related interface
-  LoongArch: KVM: Implement kvm hardware enable, disable interface
-  LoongArch: KVM: Implement VM related functions
-  LoongArch: KVM: Add vcpu related header files
-  LoongArch: KVM: Implement vcpu create and destroy interface
-  LoongArch: KVM: Implement vcpu run interface
-  LoongArch: KVM: Implement vcpu handle exit interface
-  LoongArch: KVM: Implement vcpu get, vcpu set registers
-  LoongArch: KVM: Implement vcpu ENABLE_CAP ioctl interface
-  LoongArch: KVM: Implement fpu related operations for vcpu
-  LoongArch: KVM: Implement vcpu interrupt operations
-  LoongArch: KVM: Implement misc vcpu related interfaces
-  LoongArch: KVM: Implement vcpu load and vcpu put operations
-  LoongArch: KVM: Implement vcpu status description
-  LoongArch: KVM: Implement update VM id function
-  LoongArch: KVM: Implement virtual machine tlb operations
-  LoongArch: KVM: Implement vcpu timer operations
-  LoongArch: KVM: Implement kvm mmu operations
-  LoongArch: KVM: Implement handle csr excption
-  LoongArch: KVM: Implement handle iocsr exception
-  LoongArch: KVM: Implement handle idle exception
-  LoongArch: KVM: Implement handle gspr exception
-  LoongArch: KVM: Implement handle mmio exception
-  LoongArch: KVM: Implement handle fpu exception
-  LoongArch: KVM: Implement kvm exception vector
-  LoongArch: KVM: Implement vcpu world switch
-  LoongArch: KVM: Enable kvm config and add the makefile
-  LoongArch: KVM: Supplement kvm document about LoongArch-specific part
-  LoongArch: KVM: Add maintainers for LoongArch KVM
-
- Documentation/virt/kvm/api.rst             |  71 +-
- MAINTAINERS                                |  12 +
- arch/loongarch/Kbuild                      |   1 +
- arch/loongarch/Kconfig                     |   2 +
- arch/loongarch/configs/loongson3_defconfig |   2 +
- arch/loongarch/include/asm/insn-def.h      |  55 ++
- arch/loongarch/include/asm/inst.h          |  16 +
- arch/loongarch/include/asm/kvm_csr.h       | 231 ++++++
- arch/loongarch/include/asm/kvm_host.h      | 253 ++++++
- arch/loongarch/include/asm/kvm_types.h     |  11 +
- arch/loongarch/include/asm/kvm_vcpu.h      |  97 +++
- arch/loongarch/include/asm/loongarch.h     |  20 +-
- arch/loongarch/include/uapi/asm/kvm.h      | 106 +++
- arch/loongarch/kernel/asm-offsets.c        |  32 +
- arch/loongarch/kvm/Kconfig                 |  38 +
- arch/loongarch/kvm/Makefile                |  22 +
- arch/loongarch/kvm/csr_ops.S               |  76 ++
- arch/loongarch/kvm/exit.c                  | 707 +++++++++++++++++
- arch/loongarch/kvm/interrupt.c             | 113 +++
- arch/loongarch/kvm/main.c                  | 347 ++++++++
- arch/loongarch/kvm/mmu.c                   | 725 +++++++++++++++++
- arch/loongarch/kvm/switch.S                | 301 +++++++
- arch/loongarch/kvm/timer.c                 | 266 +++++++
- arch/loongarch/kvm/tlb.c                   |  32 +
- arch/loongarch/kvm/trace.h                 | 168 ++++
- arch/loongarch/kvm/vcpu.c                  | 869 +++++++++++++++++++++
- arch/loongarch/kvm/vm.c                    |  76 ++
- arch/loongarch/kvm/vmid.c                  |  66 ++
- include/uapi/linux/kvm.h                   |   9 +
- 29 files changed, 4710 insertions(+), 14 deletions(-)
- create mode 100644 arch/loongarch/include/asm/insn-def.h
- create mode 100644 arch/loongarch/include/asm/kvm_csr.h
- create mode 100644 arch/loongarch/include/asm/kvm_host.h
- create mode 100644 arch/loongarch/include/asm/kvm_types.h
- create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
- create mode 100644 arch/loongarch/include/uapi/asm/kvm.h
- create mode 100644 arch/loongarch/kvm/Kconfig
- create mode 100644 arch/loongarch/kvm/Makefile
- create mode 100644 arch/loongarch/kvm/csr_ops.S
- create mode 100644 arch/loongarch/kvm/exit.c
- create mode 100644 arch/loongarch/kvm/interrupt.c
- create mode 100644 arch/loongarch/kvm/main.c
- create mode 100644 arch/loongarch/kvm/mmu.c
- create mode 100644 arch/loongarch/kvm/switch.S
- create mode 100644 arch/loongarch/kvm/timer.c
- create mode 100644 arch/loongarch/kvm/tlb.c
- create mode 100644 arch/loongarch/kvm/trace.h
- create mode 100644 arch/loongarch/kvm/vcpu.c
- create mode 100644 arch/loongarch/kvm/vm.c
- create mode 100644 arch/loongarch/kvm/vmid.c
-
--- 
-2.39.1
+Thanks,
+Gavin
+> 
+>>
+>> static void kvm_mmu_notifier_change_pte(...)
+>> {
+>>          :
+>>          /*
+>>           * .change_pte() must be surrounded by .invalidate_range_{start,end}().
+>>           * If mmu_invalidate_in_progress is zero, then no in-progress
+>>           * invalidations, including this one, found a relevant memslot at
+>>           * start(); rechecking memslots here is unnecessary.  Note, a false
+>>           * positive (count elevated by a different invalidation) is sub-optimal
+>>           * but functionally ok.
+>>           */
+>>          WARN_ON_ONCE(!READ_ONCE(kvm->mn_active_invalidate_count));
+>>          if (!READ_ONCE(kvm->mmu_invalidate_in_progress))
+>>                  return;
+>>          :
+>> }
+>>
+>>
+>> The srcu lock in __kvm_handle_hva_range() prevents the swapping of
+>> the active and inactive memory slots by kvm_swap_active_memslots(). For
+>> this particular case, it's not relevant because the swapping between
+>> the inactive and active memory slots has been done for once, before
+>> invalidate_range_start() is called.
+> 
+> 
 
