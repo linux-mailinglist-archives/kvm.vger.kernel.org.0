@@ -2,81 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F05972A097
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 18:49:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CB5872A0AE
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 18:54:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229671AbjFIQtD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 12:49:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52522 "EHLO
+        id S230044AbjFIQyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 12:54:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229956AbjFIQs7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jun 2023 12:48:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C640F3A8C;
-        Fri,  9 Jun 2023 09:48:52 -0700 (PDT)
+        with ESMTP id S229518AbjFIQya (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jun 2023 12:54:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1461993
+        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 09:54:29 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 58DC665A02;
-        Fri,  9 Jun 2023 16:48:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7117EC433EF;
-        Fri,  9 Jun 2023 16:48:51 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F18206593B
+        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 16:54:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58AEAC433EF;
+        Fri,  9 Jun 2023 16:54:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686329331;
-        bh=wj6ps6y4ft6WvpJQrBdcLusOhuloDy4bHnascQVlTT0=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=O4xMnvyru9ylkQLSbinraMlwoqqoCRzqiohujByEGtJFDGMM2+bIqDUl5eHnyQxXo
-         rY6Jt+s9J9b2BJMm3LdqlppNkZafwg1ABQk0do5vWtrwv0HjpULglS2SDN2D6aMymp
-         CWxzgfiCmay+hbv7MVTWZ0mdVEp8uqGYXaqtxKSQkL5P7BHI2KgvO4BKLhYRuItyUe
-         b1MGXu2c7L7tT5+p5OajerVERb9IENBTZBVZNst9tkM+K3jNo95v+iyFA8Z0Q9QZCe
-         4IkGGUvPbx+9E+dUiQyq/RGdROHaFJmb7Ilr8VJ8sFWFpVVNEi3FletAovP7YIwJSa
-         +jJM45seUVXUw==
-Date:   Fri, 9 Jun 2023 11:48:50 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Sui Jingfeng <suijingfeng@loongson.cn>
-Cc:     Sui Jingfeng <15330273260@189.cn>,
-        Somalapuram Amaranath <Amaranath.Somalapuram@amd.com>,
-        Karol Herbst <kherbst@redhat.com>,
-        nouveau@lists.freedesktop.org,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        dri-devel@lists.freedesktop.org, YiPeng Chai <YiPeng.Chai@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        David Airlie <airlied@gmail.com>,
-        Ville Syrjala <ville.syrjala@linux.intel.com>,
-        Yi Liu <yi.l.liu@intel.com>, kvm@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
-        Ben Skeggs <bskeggs@redhat.com>, linux-pci@vger.kernel.org,
-        Andrey Grodzovsky <andrey.grodzovsky@amd.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Lijo Lazar <lijo.lazar@amd.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Bokun Zhang <Bokun.Zhang@amd.com>,
-        intel-gfx@lists.freedesktop.org,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        loongson-kernel@lists.loongnix.cn,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Yishai Hadas <yishaih@nvidia.com>, Li Yi <liyi@loongson.cn>,
-        Pan Xinhui <Xinhui.Pan@amd.com>, linux-kernel@vger.kernel.org,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian Konig <christian.koenig@amd.com>,
-        Hawking Zhang <Hawking.Zhang@amd.com>
-Subject: Re: [Intel-gfx] [PATCH v3 4/4] PCI/VGA: introduce is_boot_device
- function callback to vga_client_register
-Message-ID: <20230609164850.GA1251187@bhelgaas>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0d2ba099-9817-13be-c85b-997211443119@loongson.cn>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        s=k20201202; t=1686329668;
+        bh=VEAIm3KCiR+BrjqeYaNfEcUH21Zmuw15Ud5A/ghy6dw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=P7nlIQsTe+zKQOBoDoQNrZgVEnVxaaQCSazIQlrw1L/K6o3AIqG2KdShyOph+t3Ak
+         g0UmYlP65doFVX9/WWLq/IULDVnLcKNkIYPZ44XMio1CAD1JHvEgkg1UBjDsbkXyjK
+         qQpTwinC1bofjIUqHMHt8VMvgQB1aaNlIcXZwcWnnoh79htFsZd7FTfyJU+pac7ink
+         WrcQP+5W6jREfEXGQ9LuBvZWR+M2qZ9H48/GTS7H8WCSyGKx9erqDrjU6rlucSY+46
+         TSNrUz8HWHkOenaJ5VyJWeoKRniMh2+HN0SNt6o5i8GbhmkXNPmod9aHobjadlW8Cg
+         EsW3NG6tRTtXA==
+Received: from 152.5.30.93.rev.sfr.net ([93.30.5.152] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q7fNZ-0048zH-Kn;
+        Fri, 09 Jun 2023 17:54:26 +0100
+Date:   Fri, 09 Jun 2023 17:54:23 +0100
+Message-ID: <87zg58mv9c.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 00/17] KVM: arm64: Allow using VHE in the nVHE hypervisor
+In-Reply-To: <20230609162200.2024064-1-maz@kernel.org>
+References: <20230609162200.2024064-1-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 93.30.5.152
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -85,57 +71,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 09, 2023 at 10:27:39AM +0800, Sui Jingfeng wrote:
-> On 2023/6/9 03:19, Bjorn Helgaas wrote:
-> > On Thu, Jun 08, 2023 at 07:43:22PM +0800, Sui Jingfeng wrote:
-> > > From: Sui Jingfeng <suijingfeng@loongson.cn>
-> > > 
-> > > The vga_is_firmware_default() function is arch-dependent, which doesn't
-> > > sound right. At least, it also works on the Mips and LoongArch platforms.
-> > > Tested with the drm/amdgpu and drm/radeon drivers. However, it's difficult
-> > > to enumerate all arch-driver combinations. I'm wrong if there is only one
-> > > exception.
-> > > 
-> > > With the observation that device drivers typically have better knowledge
-> > > about which PCI bar contains the firmware framebuffer, which could avoid
-> > > the need to iterate all of the PCI BARs.
-> > > 
-> > > But as a PCI function at pci/vgaarb.c, vga_is_firmware_default() is
-> > > probably not suitable to make such an optimization for a specific device.
-> > > 
-> > > There are PCI display controllers that don't have a dedicated VRAM bar,
-> > > this function will lose its effectiveness in such a case. Luckily, the
-> > > device driver can provide an accurate workaround.
-> > > 
-> > > Therefore, this patch introduces a callback that allows the device driver
-> > > to tell the VGAARB if the device is the default boot device. This patch
-> > > only intends to introduce the mechanism, while the implementation is left
-> > > to the device driver authors. Also honor the comment: "Clients have two
-> > > callback mechanisms they can use"
-> > s/bar/BAR/ (several)
-> > 
-> > Nothing here uses the callback.  I don't want to merge this until we
-> > have a user.
-> 
-> This is chicken and egg question.
-> 
-> If you could help get this merge first, I will show you the first user.
-> 
-> > I'm not sure why the device driver should know whether its device is
-> > the default boot device.
-> 
-> It's not that the device driver should know,
-> 
-> but it's about that the device driver has the right to override.
-> 
-> Device driver may have better approach to identify the default boot
-> device.
++ Catalin, as this changes a bunch of arch stuff (nothing major, but
+still...)
 
-The way we usually handle this is to include the new callback in the
-same series as the first user of it.  That has two benefits:
-(1) everybody can review the whole picture and possibly suggest
-different approaches, and (2) when we merge the infrastructure,
-we also merge a user of it at the same time, so the whole thing can be
-tested and we don't end up with unused code.
+On Fri, 09 Jun 2023 17:21:43 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> KVM (on ARMv8.0) and pKVM (on all revisions of the architecture) use
+> the split hypervisor model that makes the EL2 code more or less
+> standalone. In the later case, we totally ignore the VHE mode and
+> stick with the good old v8.0 EL2 setup.
+> 
+> This is all good, but means that the EL2 code is limited in what it
+> can do with its own address space. This series proposes to remove this
+> limitation and to allow VHE to be used even with the split hypervisor
+> model. This has some potential isolation benefits[1], and eventually
+> allow systems that do not support HCR_EL2.E2H==0 to run pKVM.
+> 
+> We introduce a new "mode" for KVM called hVHE, in reference to the
+> nVHE mode, and indicating that only the hypervisor is using VHE. Note
+> that this is all this series does. No effort is made to improve the VA
+> space management, which will be the subject of another series if this
+> one ever makes it.
+> 
+> This has been tested on a M1 box (bare metal) as well as as a nested
+> guest on M2, both with the standard nVHE and protected modes, with no
+> measurable change in performance.
+> 
+> Note: the last patch of this series is not a merge candidate.
+> 
+> Thanks,
+> 
+>         M.
+> 
+> [1] https://www.youtube.com/watch?v=1F_Mf2j9eIo&list=PLbzoR-pLrL6qWL3v2KOcvwZ54-w0z5uXV&index=11
+> 
+> * From v2:
+>   - Use BUILD_BUG_ON() to prevent the use of is_kernel_in_hyp_mode()
+>     form hypervisor context
+>   - Validate that all CPUs are VHE-capable before flipping the
+>     capability
+> 
+> * From v1:
+>   - Fixed CNTHCTL_EL2 setup when switching from E2H=0 to E2H=1
+>     Amusingly, this was found on NV...
+>   - Rebased on 6.4-rc2
+> 
+> Marc Zyngier (17):
+>   KVM: arm64: Drop is_kernel_in_hyp_mode() from
+>     __invalidate_icache_guest_page()
+>   arm64: Prevent the use of is_kernel_in_hyp_mode() in hypervisor code
+>   arm64: Turn kaslr_feature_override into a generic SW feature override
+>   arm64: Add KVM_HVHE capability and has_hvhe() predicate
+>   arm64: Don't enable VHE for the kernel if OVERRIDE_HVHE is set
+>   arm64: Allow EL1 physical timer access when running VHE
+>   arm64: Use CPACR_EL1 format to set CPTR_EL2 when E2H is set
+>   KVM: arm64: Remove alternatives from sysreg accessors in VHE
+>     hypervisor context
+>   KVM: arm64: Key use of VHE instructions in nVHE code off
+>     ARM64_KVM_HVHE
+>   KVM: arm64: Force HCR_EL2.E2H when ARM64_KVM_HVHE is set
+>   KVM: arm64: Disable TTBR1_EL2 when using ARM64_KVM_HVHE
+>   KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is set
+>   KVM: arm64: Rework CPTR_EL2 programming for HVHE configuration
+>   KVM: arm64: Program the timer traps with VHE layout in hVHE mode
+>   KVM: arm64: Force HCR_E2H in guest context when ARM64_KVM_HVHE is set
+>   arm64: Allow arm64_sw.hvhe on command line
+>   KVM: arm64: Terrible timer hack for M1 with hVHE
+> 
+>  arch/arm64/include/asm/arch_timer.h     |  8 ++++
+>  arch/arm64/include/asm/cpufeature.h     |  5 +++
+>  arch/arm64/include/asm/el2_setup.h      | 26 ++++++++++++-
+>  arch/arm64/include/asm/kvm_arm.h        |  4 +-
+>  arch/arm64/include/asm/kvm_asm.h        |  1 +
+>  arch/arm64/include/asm/kvm_emulate.h    | 33 +++++++++++++++-
+>  arch/arm64/include/asm/kvm_hyp.h        | 37 +++++++++++++-----
+>  arch/arm64/include/asm/kvm_mmu.h        |  3 +-
+>  arch/arm64/include/asm/virt.h           | 12 +++++-
+>  arch/arm64/kernel/cpufeature.c          | 21 +++++++++++
+>  arch/arm64/kernel/hyp-stub.S            | 10 ++++-
+>  arch/arm64/kernel/idreg-override.c      | 25 ++++++++-----
+>  arch/arm64/kernel/image-vars.h          |  3 ++
+>  arch/arm64/kernel/kaslr.c               |  6 +--
+>  arch/arm64/kvm/arch_timer.c             |  5 +++
+>  arch/arm64/kvm/arm.c                    | 12 +++++-
+>  arch/arm64/kvm/fpsimd.c                 |  4 +-
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-init.S      |  9 +++++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 17 ++++++++-
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c          | 27 ++++++++++---
+>  arch/arm64/kvm/hyp/nvhe/switch.c        | 28 ++++++++------
+>  arch/arm64/kvm/hyp/nvhe/timer-sr.c      | 25 +++++++++++--
+>  arch/arm64/kvm/hyp/pgtable.c            |  6 ++-
+>  arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
+>  arch/arm64/kvm/sys_regs.c               |  2 +-
+>  arch/arm64/tools/cpucaps                |  1 +
+>  drivers/irqchip/irq-apple-aic.c         | 50 ++++++++++++++++++++++++-
+>  28 files changed, 320 insertions(+), 64 deletions(-)
+> 
+> -- 
+> 2.34.1
+> 
+> 
+> 
 
-Bjorn
+-- 
+Without deviation from the norm, progress is not possible.
