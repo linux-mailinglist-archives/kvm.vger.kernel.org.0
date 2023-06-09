@@ -2,84 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90149729A0D
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 14:31:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97CFC729A18
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 14:33:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231858AbjFIMba (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 08:31:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41410 "EHLO
+        id S239872AbjFIMdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 08:33:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231898AbjFIMb1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jun 2023 08:31:27 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B4E02D7E
-        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 05:30:50 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4f640e48bc3so2095520e87.2
-        for <kvm@vger.kernel.org>; Fri, 09 Jun 2023 05:30:50 -0700 (PDT)
+        with ESMTP id S231244AbjFIMdh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jun 2023 08:33:37 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 361C23586
+        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 05:33:04 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id e9e14a558f8ab-33d31ab00bdso7220075ab.3
+        for <kvm@vger.kernel.org>; Fri, 09 Jun 2023 05:33:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1686313843; x=1688905843;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8h26DQt30aCyEhPT/ooAbXH6FQid93QFBSmTC7V6R+4=;
-        b=A1lJFrFXashPyOVE6TwjfXwLaFl61XNjBlCsCbs7HxXdXlscKu2aQeb9jnMUEWsnFP
-         Gqa4zxdJoUevS4rlfUKzeXGooNKBl4E8McMllHfEube1l2jxq71XlpYKaEuc/AZTzZGU
-         FsJEx0y3rWxOwbP1p8DZ4JU1y29iK9r7H2K4jK3YiLEIbADb92nGDzMy8FKbGTP1EjBu
-         3917iiGGQ3TOwK7VW37L0tpiNLdcO/xRJYaSVn899cvVXqbC0NpJnY27H3fNnzr7Hp3R
-         YkdzhR8Zn3sKS5jyM7PVZnwGzGYfrvHrwJrvRUDWtwkbk8efwrHQ7bTVrSq6sPp2DS0N
-         OEaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686313843; x=1688905843;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=semihalf.com; s=google; t=1686313981; x=1688905981;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8h26DQt30aCyEhPT/ooAbXH6FQid93QFBSmTC7V6R+4=;
-        b=OfBb21eXf0rND1nsCV+fpBmo3cV10/TRMmJKfU2HQIjvNvi40q9MP+nO3Irhy0BUvb
-         DTes4gFfoLTv685Xmx68Al3uhzfoPL1WzSUjvHpIqWh08C/FsM3WexvrDRKRBdIffzNV
-         BHakPGLltQ4zBNiGUczn89g+mzGzr+jDfrWe2ur8tzy9hheYm1gRdu9QCiaDte/2+vsn
-         vwAdWLEKufBdPyNeOEtiHUOjEk6ajHvJpHhAq6qbAUDGzOC8exQzuH93Dj2ZoeMpImoq
-         v/iA8ozC66CU786wucI4BVtgDlyYUo0Y9KXIPqZirpdpQpW3Zc08TyhVuGd9ZX4aQ2j8
-         XdKA==
-X-Gm-Message-State: AC+VfDz2FD4EPqCAjtV5Iz7hNd/5k7a6j9WbVPtAvIoU3Cl12xpV2HFU
-        KwB1rph0OSQgKQP1ZXFEm9fouA==
-X-Google-Smtp-Source: ACHHUZ7LLidgDgGdihFdLBcYHtdurgJJ/J4UsIY+yeDDqqFfP2vMmCiYedKW6YkV6nfEzVsYqhM/Ow==
-X-Received: by 2002:ac2:5bd0:0:b0:4f2:40dd:e2cf with SMTP id u16-20020ac25bd0000000b004f240dde2cfmr773184lfn.55.1686313843048;
-        Fri, 09 Jun 2023 05:30:43 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id v26-20020aa7dbda000000b0050cc4461fc5sm1703120edt.92.2023.06.09.05.30.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jun 2023 05:30:42 -0700 (PDT)
-Date:   Fri, 9 Jun 2023 14:30:41 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Haibo Xu <haibo1.xu@intel.com>
-Cc:     xiaobo55x@gmail.com, maz@kernel.org, oliver.upton@linux.dev,
-        seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 07/10] KVM: arm64: selftests: Finish generalizing
- get-reg-list
-Message-ID: <20230609-b900162a66c26a004b751b1f@orel>
-References: <cover.1686275310.git.haibo1.xu@intel.com>
- <450cb59db52ebeaa68f3d77f1bd995618f3612b8.1686275310.git.haibo1.xu@intel.com>
+        bh=JXB1jevBys4Ftezaza8BYRJlJZrQuu9+lUaTu+i5qYs=;
+        b=Pqv8C27/GNDQjLi+Fnckk0+j0pIGzZMo55dEK+1MhWZz548qoVOUKtOMsr1m6LzOBz
+         G53/zGLdECuO19REgeFLSiOqBGQcSYONnRIDi94H9XrbWUhQnJcGjr7Kbe86GGE96ftT
+         BjMEpLdMVFBDshQ8gQN76S0dlnK81EYe0vrecF1MClzeX3iERrJqbM5GF8l+7ZQvWKju
+         Wk0zL9y8PIVDt2oc3K50q1VDm3UJGGMGY+g9p/htQ29FZoIPcr7neZqrITWgeeioE4ZY
+         s7S6CRlBP1dkb/O8dUrzThNymfliLgMQqp4HFncHIzsRN4Y5s06eolzMk/Uix+WiHJ7Z
+         ukPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686313981; x=1688905981;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JXB1jevBys4Ftezaza8BYRJlJZrQuu9+lUaTu+i5qYs=;
+        b=YUut341/9hGKP6aB1mFxU173roWYiXWFX/c0Dbz3XSdnP9Gtzm6gYFYXuMoSoHLUlZ
+         380VWZ2Z6NlP06qRKGWP51t6lVIhe4grN6ChhCeMO2zwMFe/0r2Pc1AnK+lQMC+k/wTz
+         YE3I77LGqCDCHVs1QGopei/Shj0XkK54wcY3DgwJ36UbRnIekFYOfi6vtlVfSLIC0xgV
+         ZGFg0s4UtHTfvTFAkeBDREbL5vib54Aua8huY3dc4Ku/KYx5ofwRZZKzg7Ov/FfBJw8N
+         xJ51VuXja4VFHb2KFn/JW8an5aVJUQLxFcrkI/AxD3LuxsO7EuWTGFpt1EinuMKR13ID
+         B2BA==
+X-Gm-Message-State: AC+VfDxlqdqP214CwDjYe6vIe6BWHuml6wBtbewC4iMcIZIhs44rAaAZ
+        AMLBV9lmyoSjgFL76lg09auLRNc5ze4I3a8YqS7EGw==
+X-Google-Smtp-Source: ACHHUZ4xWFpqYrjonUzfRcw2CZpBf9V3xq+uhIYWp1OCR1yRWXKCbpIkPfb/ktcu+qui1ljxefUpEyxXmjTORhNMS0Q=
+X-Received: by 2002:a92:cb11:0:b0:338:b887:b674 with SMTP id
+ s17-20020a92cb11000000b00338b887b674mr1379277ilo.2.1686313981219; Fri, 09 Jun
+ 2023 05:33:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <450cb59db52ebeaa68f3d77f1bd995618f3612b8.1686275310.git.haibo1.xu@intel.com>
+References: <20230522165811.123417-1-jaz@semihalf.com> <20230525144055.15d06a0b.alex.williamson@redhat.com>
+ <CAH76GKPu-5r=Fh+xFGumyKhp_FFdgzNj9Hxoo_hWEdta3dJRTA@mail.gmail.com>
+ <CAH76GKNtCSdBOgTY2GLg2k2EOJCLYu8FUE66YNUbJMDAkze8-w@mail.gmail.com> <20230607162655.103e067d.alex.williamson@redhat.com>
+In-Reply-To: <20230607162655.103e067d.alex.williamson@redhat.com>
+From:   Grzegorz Jaszczyk <jaz@semihalf.com>
+Date:   Fri, 9 Jun 2023 14:32:50 +0200
+Message-ID: <CAH76GKN+hC0w_KZjmHkPfYjp+32ZmqWR3yRZasCjygEHPT8Puw@mail.gmail.com>
+Subject: Re: [PATCH v4] vfio/pci: Propagate ACPI notifications to user-space
+ via eventfd
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, dmy@semihalf.com, tn@semihalf.com,
+        dbehr@google.com, dbehr@chromium.org, upstream@semihalf.com,
+        dtor@google.com, jgg@ziepe.ca, kevin.tian@intel.com,
+        cohuck@redhat.com, abhsahu@nvidia.com, yishaih@nvidia.com,
+        yi.l.liu@intel.com, kvm@vger.kernel.org, libvir-list@redhat.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com,
+        mjrosato@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
@@ -90,88 +76,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 09, 2023 at 10:12:15AM +0800, Haibo Xu wrote:
-> From: Andrew Jones <ajones@ventanamicro.com>
-> 
-> Add some unfortunate #ifdeffery to ensure the common get-reg-list.c
-> can be compiled and run with other architectures. The next
-> architecture to support get-reg-list should now only need to provide
-> $(ARCH_DIR)/get-reg-list.c where arch-specific print_reg() and
-> vcpu_configs[] get defined.
-> 
-> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
-> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> ---
->  tools/testing/selftests/kvm/get-reg-list.c | 24 ++++++++++++++++++----
->  1 file changed, 20 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing/selftests/kvm/get-reg-list.c
-> index 69bb91087081..c4bd5a5259da 100644
-> --- a/tools/testing/selftests/kvm/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/get-reg-list.c
-> @@ -98,6 +98,7 @@ void __weak print_reg(const char *prefix, __u64 id)
->  	printf("\t0x%llx,\n", id);
->  }
->  
-> +#ifdef __aarch64__
->  static void prepare_vcpu_init(struct vcpu_reg_list *c, struct kvm_vcpu_init *init)
->  {
->  	struct vcpu_reg_sublist *s;
-> @@ -120,6 +121,24 @@ static void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
->  	}
->  }
->  
-> +static struct kvm_vcpu *vcpu_config_get_vcpu(struct vcpu_reg_list *c, struct kvm_vm *vm)
-> +{
-> +	struct kvm_vcpu_init init = { .target = -1, };
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	prepare_vcpu_init(c, &init);
-> +	vcpu = __vm_vcpu_add(vm, 0);
-> +	aarch64_vcpu_setup(vcpu, &init);
-> +
-> +	return vcpu;
-> +}
-> +#else
-> +static struct kvm_vcpu *vcpu_config_get_vcpu(struct vcpu_reg_list *c, struct kvm_vm *vm)
-> +{
-> +	return __vm_vcpu_add(vm, 0);
-> +}
-> +#endif
-> +
->  static void check_supported(struct vcpu_reg_list *c)
->  {
->  	struct vcpu_reg_sublist *s;
-> @@ -139,7 +158,6 @@ static bool print_filtered;
->  
->  static void run_test(struct vcpu_reg_list *c)
->  {
-> -	struct kvm_vcpu_init init = { .target = -1, };
->  	int new_regs = 0, missing_regs = 0, i, n;
->  	int failed_get = 0, failed_set = 0, failed_reject = 0;
->  	struct kvm_vcpu *vcpu;
-> @@ -149,9 +167,7 @@ static void run_test(struct vcpu_reg_list *c)
->  	check_supported(c);
->  
->  	vm = vm_create_barebones();
-> -	prepare_vcpu_init(c, &init);
-> -	vcpu = __vm_vcpu_add(vm, 0);
-> -	aarch64_vcpu_setup(vcpu, &init);
-> +	vcpu = vcpu_config_get_vcpu(c, vm);
->  	finalize_vcpu(vcpu, c);
+czw., 8 cze 2023 o 00:27 Alex Williamson <alex.williamson@redhat.com>
+napisa=C5=82(a):
+>
+> On Wed, 7 Jun 2023 22:22:12 +0200
+> Grzegorz Jaszczyk <jaz@semihalf.com> wrote:
+> > > >
+> > > > Can we drop the NTFY and just use VFIO_PCI_ACPI_IRQ_INDEX?
+> > >
+> > > ACPI_IRQ at first glance could be confused with SCI, which is e.g.
+> > > registered as "acpi" irq seen in /proc/interrupts, maybe it is worth
+> > > keeping NTFY here to emphasise the "Notify" part?
+> >
+> > Please let me know if you prefer VFIO_PCI_ACPI_IRQ_INDEX or
+> > VFIO_PCI_ACPI_NTFY_IRQ_INDEX taking into account the above.
+>
+> This is a device level ACPI interrupt, so it doesn't seem like it would
+> be confused with SCI.  What other ACPI related interrupts would a
+> device have?  I'm still partial to dropping the NTFY but if you're
+> attached to it, let's not abbreviate it, make it NOTIFY and do the same
+> for function names.
 
-I just noticed that this has been modified from what I posted to leave
-the finalize_vcpu() call here, despite it now being inside the #ifdef
-__aarch64__. That breaks the purpose of the patch. Please make sure this
-file compiles for other architectures without requiring additional
-patches, which would keep the commit message honest. You can either
-revert this to what I posted, and then readd the finalize_vcpu() call in
-another patch, or you can add a finalize_vcpu() stub to the #else part
-of the ifdef in this patch.
+Ok, I will use VFIO_PCI_ACPI_IRQ_INDEX then.
 
-Also please don't modify patches authored by others without calling out
-the modifications somewhere, either the commit message or under the ---
-of the patch or in the cover letter.
+>
+> ...
+> > > > > +     } else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
+> > > > > +             u32 notification_val;
+> > > > > +
+> > > > > +             if (!count)
+> > > > > +                     return -EINVAL;
+> > > > > +
+> > > > > +             notification_val =3D *(u32 *)data;
+> > > >
+> > > > DATA_BOOL is defined as a u8, and of course also as a bool, so we
+> > > > expect only zero/non-zero.  I think a valid interpretation would be=
+ any
+> > > > non-zero value generates a device check notification value.
+> > >
+> > > Maybe it would be helpful and ease testing if we could use u8 as a
+> > > notification value placeholder so it would be more flexible?
+> > > Notification values from 0x80 to 0xBF are device-specific, 0xC0 and
+> > > above are reserved for definition by hardware vendors for hardware
+> > > specific notifications and BTW in practice I didn't see notification
+> > > values that do not fit in u8 but even if exist we can limit to u8 and
+> > > gain some flexibility anyway. Please let me know what you think.
+> >
+> > Does the above seem ok for you?
+>
+> The data type is only a u8 for practicality, it's still labeled as a
+> bool which suggests it's interpreted as either zero or non-zero.  We
+> also need to reconcile DATA_NONE, which should trigger the interrupt,
+> but with an implicit notification value.  I see the utility in what
+> you're proposing, but it logically implies an extension of the SET_IRQS
+> ioctl for a new data type which has hardly any practical value.  Thanks,
 
-Thanks,
-drew
+Ok I will generate device check notification value as you earlier suggested=
+.
+
+Thank you,
+Grzegorz
