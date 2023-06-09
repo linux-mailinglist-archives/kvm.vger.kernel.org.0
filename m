@@ -2,76 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D038172924F
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 10:10:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AEF99729351
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 10:37:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230199AbjFIIKV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 04:10:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43700 "EHLO
+        id S239428AbjFIIfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 04:35:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240059AbjFIIJN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jun 2023 04:09:13 -0400
+        with ESMTP id S241152AbjFIIfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jun 2023 04:35:09 -0400
 Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4F5421B
-        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 01:08:43 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4effb818c37so1839331e87.3
-        for <kvm@vger.kernel.org>; Fri, 09 Jun 2023 01:08:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89D8E2737
+        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 01:34:55 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4f642a24555so1853710e87.3
+        for <kvm@vger.kernel.org>; Fri, 09 Jun 2023 01:34:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google; t=1686298122; x=1688890122;
+        d=semihalf.com; s=google; t=1686299693; x=1688891693;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=UYadoATDuSxIkUTsVnx83inug0Nps0NQ8Z+2SNpfwB8=;
-        b=Fs1efqGB1pgLN6smoE5cCiv+RwUe/raHxnXJnRxPAUQI7fq5vrk7no5c5LiqqOQNHJ
-         BbKoS7Q4plZrixJf02/fiDmSxGxXMIi78KFwVTbSzIcnWeyl76ipm7Fgyklsg48cKpz3
-         UR9+QzvutQ0ztgmh7suxwh3u72u8qaGjOHaq4G1vhcaJKQp1AmWAfPbxmSOZ7sa8AJnd
-         SsC7ac6TqKu8/PrOCNhB3ifU1gB5lN96tpCc5icRqREQLezZBibkrzrDY8u2MwV0gLPS
-         mJKCzeYgUsNKOrMkNM43r5W17yAJ19PDpT106QXGZkLLss9VhVqyRL7II05orJ5+DvKj
-         UNoA==
+        bh=WbM628bP3t+SmXXdafEY5TLBtuPvLSscbLIFzAKuHgE=;
+        b=V2teVxxEboacjhC2rqBw7AUja6rqjHpgVMATJse5HOKqVNot2dbUroK+6u7jN3qkms
+         U8E4jiqQMEH45MuXd7YvrUy02eQsIlC6cW/iZRWsatSrBigX5tcKuLTwQhFhvFZ3ia0B
+         OFKr/NTg1uhwuaDG24JpqpQahmI9wODNuQR9/wVaYvr3CvIAV4eR7NdxTIa4DM7YN9gd
+         KuNZsZ1l2cLocVW8TjmvlA07aDniWfkCL/Z5NyhA5K4tCU15zREz06bkQ0SSCCGJ/kNp
+         8DqoTxJjhOy5tpBuiTFy3Agglk6niyY2fOaUbeaN0i/EWPOezTx/FuPhcaFmRE0uXHHr
+         Srpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686298122; x=1688890122;
+        d=1e100.net; s=20221208; t=1686299693; x=1688891693;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UYadoATDuSxIkUTsVnx83inug0Nps0NQ8Z+2SNpfwB8=;
-        b=SWf+ILvjbkRT0q3Jz0cvCMX39cLeKFu9/wrj9/o2N8XVYGPdEXJ1hMaoZyU2CjRXcx
-         u4+rzmlJL3WzTUNqImWJ/Q9o+gGu9wDf22hev6xmDOKRFcr5EGpg4+hJgo65xKLFD6Mb
-         nndEcxoOfCToFg+pXPSDR/0fUs94FEbZGgcqcOZxC4fPqugF4tLrX+7KkA/cMgcW5/dp
-         pc4KjKzoFbdVyiGVonyvBgR1hvhWH3t5wc+/+Pp1Wl0slABTpn8NZ50ceQRnNZDexcnE
-         zIdz6cxGODi9RD1pAQBoKXcWeitLfpoMUfV7CIloWVfzLxQcvI2FRe31ezfV/ye9ctNK
-         DrpQ==
-X-Gm-Message-State: AC+VfDxQ5jr/L4CjjyJjljrwAzT7/KPxwPHiCqqhVUsD6rgsb4xqjaFT
-        2fmP746f5rCGRDWwH17nRstvaA==
-X-Google-Smtp-Source: ACHHUZ7dExDOIVWfCGNNkfXXQ2mYwtgRYbtv6rHSXgNY33WSmo6i22e7rSjVYFOProiJ5+QQbsGuMA==
-X-Received: by 2002:a05:6512:475:b0:4ef:eb50:4d3d with SMTP id x21-20020a056512047500b004efeb504d3dmr446347lfd.18.1686298121788;
-        Fri, 09 Jun 2023 01:08:41 -0700 (PDT)
+        bh=WbM628bP3t+SmXXdafEY5TLBtuPvLSscbLIFzAKuHgE=;
+        b=CgPT2FB33WzyjOyRBXg7dIGt0gxve5xmAHIVCbFAgsRWYN5gQf8ZCYEw3jR2Ht4uKX
+         15OZV6xjbMlQ8oIMXIotHrxq5wuqQMSF25CxXELB8Pvg6rmK4s7tlQXMb4QZ6V5aNkae
+         9IAtQBwvHnZbcBgCc/FnDp9DqDRKdge/gTOSDHxkn0jtW5t4tdrwe/wSebJn4OAVJzQv
+         OAGDUx/n1GQ6UofaBMhBif3vlrmY2t9FWaP83FqgFgCrlLpAjC5YNmxMkbQhJabvUBgn
+         SHTbpQTIpUIbJUaoCG3J4aOs1qFUqZTri122pbBRs2tR6Zh5JmtgOHLq+uBT+2/DjVXo
+         ZtJQ==
+X-Gm-Message-State: AC+VfDxjNMs5svX6IQXLRcDMk3Outj3ij9Aurnta+4NfJOnrPbcWYtQW
+        Z0Cp3JzcHKfyeBPZiZ/fsi6lt79ePfYFU4cnglk=
+X-Google-Smtp-Source: ACHHUZ5g9kja+sfgeBFikeSnnj4HmfAIckn/3ZOafcbapByPwQMhBJAkda1ZJPQS8rMSCjCKJnp88A==
+X-Received: by 2002:a19:5f0e:0:b0:4dd:9f86:859d with SMTP id t14-20020a195f0e000000b004dd9f86859dmr442756lfb.13.1686299693612;
+        Fri, 09 Jun 2023 01:34:53 -0700 (PDT)
 Received: from ?IPV6:2a02:a31b:2041:8680:1268:c8b0:5fcc:bf13? ([2a02:a31b:2041:8680:1268:c8b0:5fcc:bf13])
-        by smtp.gmail.com with ESMTPSA id u26-20020ac243da000000b004f4d5003e8dsm459076lfl.7.2023.06.09.01.08.40
+        by smtp.gmail.com with ESMTPSA id f2-20020ac25322000000b004f138ab93c7sm462856lfh.264.2023.06.09.01.34.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Jun 2023 01:08:41 -0700 (PDT)
-Message-ID: <49c3c20b-5683-2ef8-a9bf-87e0415c18cf@semihalf.com>
-Date:   Fri, 9 Jun 2023 10:08:39 +0200
+        Fri, 09 Jun 2023 01:34:53 -0700 (PDT)
+Message-ID: <309da807-2fdb-69ea-3b1b-ff36fc1d67ec@semihalf.com>
+Date:   Fri, 9 Jun 2023 10:34:51 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.3.0
-Subject: Re: [RFC PATCH part-1 0/5] pKVM on Intel Platform Introduction
+Subject: Re: [RFC PATCH part-5 00/22] VMX emulation
 Content-Language: en-US
-To:     "tina.zhang" <tina.zhang@intel.com>,
-        Keir Fraser <keirf@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Jason Chen CJ <jason.cj.chen@intel.com>, kvm@vger.kernel.org,
-        android-kvm@google.com, Dmitry Torokhov <dtor@chromium.org>,
+To:     "Chen, Jason CJ" <jason.cj.chen@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "android-kvm@google.com" <android-kvm@google.com>,
+        Dmitry Torokhov <dtor@chromium.org>,
         Tomasz Nowicki <tn@semihalf.com>,
-        Grzegorz Jaszczyk <jaz@semihalf.com>
-References: <20230312180048.1778187-1-jason.cj.chen@intel.com>
- <ZA9QZcADubkx/3Ev@google.com> <ZBCeH5JB14Gl3wOM@jiechen-ubuntu-dev>
- <ZBCC3qEPHGWnx2JO@google.com> <ZB17s69rC9ioomF7@google.com>
- <883b7419-b8ac-f16a-e102-d3408c29bbff@semihalf.com>
- <d0900265-6ae6-2430-8185-4f9d153ec105@intel.com>
+        Grzegorz Jaszczyk <jaz@semihalf.com>,
+        Keir Fraser <keirf@google.com>
+References: <20230312180303.1778492-1-jason.cj.chen@intel.com>
+ <ZA9WM3xA6Qu5Q43K@google.com> <ZBCg6Ql1/hdclfDd@jiechen-ubuntu-dev>
+ <75a6b0b3-156b-9648-582b-27a9aaf92ef1@semihalf.com>
+ <SA1PR11MB59230DB019B11C89C334F8F2BF51A@SA1PR11MB5923.namprd11.prod.outlook.com>
 From:   Dmytro Maluka <dmy@semihalf.com>
-In-Reply-To: <d0900265-6ae6-2430-8185-4f9d153ec105@intel.com>
+In-Reply-To: <SA1PR11MB59230DB019B11C89C334F8F2BF51A@SA1PR11MB5923.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
@@ -82,122 +82,131 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/9/23 01:02, tina.zhang wrote:
-> 
-> 
-> On 6/9/23 05:06, Dmytro Maluka wrote:
->> On 3/24/23 11:30, Keir Fraser wrote:
->>> On Tue, Mar 14, 2023 at 07:21:18AM -0700, Sean Christopherson wrote:
->>>> On Tue, Mar 14, 2023, Jason Chen CJ wrote:
->>>>> On Mon, Mar 13, 2023 at 09:33:41AM -0700, Sean Christopherson wrote:
+On 6/9/23 04:07, Chen, Jason CJ wrote:
+>> -----Original Message-----
+>> From: Dmytro Maluka <dmy@semihalf.com>
+>> Sent: Friday, June 9, 2023 5:38 AM
+>> To: Chen, Jason CJ <jason.cj.chen@intel.com>; Christopherson,, Sean
+>> <seanjc@google.com>
+>> Cc: kvm@vger.kernel.org; android-kvm@google.com; Dmitry Torokhov
+>> <dtor@chromium.org>; Tomasz Nowicki <tn@semihalf.com>; Grzegorz Jaszczyk
+>> <jaz@semihalf.com>; Keir Fraser <keirf@google.com>
+>> Subject: Re: [RFC PATCH part-5 00/22] VMX emulation
+>>
+>> On 3/14/23 17:29, Jason Chen CJ wrote:
+>>> On Mon, Mar 13, 2023 at 09:58:27AM -0700, Sean Christopherson wrote:
+>>>> On Mon, Mar 13, 2023, Jason Chen CJ wrote:
+>>>>> This patch set is part-5 of this RFC patches. It introduces VMX
+>>>>> emulation for pKVM on Intel platform.
 >>>>>
->>>>>> On Mon, Mar 13, 2023, Jason Chen CJ wrote:
->>>>>>> There are similar use cases on x86 platforms requesting protected
->>>>>>> environment which is isolated from host OS for confidential
->>>>>>> computing.
->>>>>>
->>>>>> What exactly are those use cases?  The more details you can
->>>>>> provide, the better.
->>>>>> E.g. restricting the isolated VMs to 64-bit mode a la TDX would
->>>>>> likely simplify
->>>>>> the pKVM implementation.
->>>>>
->>>>> Thanks Sean for your comments, I am very appreciated!
->>>>>
->>>>> We are expected
+>>>>> Host VM wants the capability to run its guest, it needs VMX support.
 >>>>
->>>> Who is "we"?  Unless Intel is making a rather large pivot, I doubt
->>>> Intel is the
->>>> end customer of pKVM-on-x86.  If you aren't at liberty to say due
->>>> NDA/confidentiality,
->>>> then please work with whoever you need to in order to get permission
->>>> to fully
->>>> disclose the use case.  Because realistically, without knowing
->>>> exactly what is
->>>> in scope and why, this is going nowhere.
+>>>> No, the host VM only needs a way to request pKVM to run a VM.  If we
+>>>> go down the rabbit hole of pKVM on x86, I think we should take the
+>>>> red pill[*] and go all the way down said rabbit hole by heavily paravirtualizing
+>> the KVM=>pKVM interface.
 >>>
->>> This is being seriously evaluated by ChromeOS as an alternative to
->>> their existing ManaTEE design. Compared with that (hypervisor == full
->>> Linux) the pKVM design is pretty attractive: smaller TCB, host Linux
->>> "VM" runs closer to native and without nested scheduling, demonstrated
->>> better performance, and closer alignment with Android virtualisation
->>> (that's my team, which of course is ARM focused, but we'd love to see
->>> broader uptake of pKVM in the kernel).
+>>> hi, Sean,
+>>>
+>>> Like I mentioned in the reply for "[RFC PATCH part-1 0/5] pKVM on
+>>> Intel Platform Introduction", we hope VMX emulation can be there at
+>>> least for normal VM support.
+>>>
+>>>>
+>>>> Except for VMCALL vs. VMMCALL, it should be possible to eliminate all
+>>>> traces of VMX and SVM from the interface.  That means no VMCS
+>>>> emulation, no EPT shadowing, etc.  As a bonus, any paravirt stuff we
+>>>> do for pKVM x86 would also be usable for KVM-on-KVM nested virtualization.
+>>>>
+>>>> E.g. an idea floating around my head is to add a paravirt paging
+>>>> interface for KVM-on-KVM so that L1's (KVM-high in this RFC) doesn't
+>>>> need to maintain its own TDP page tables.  I haven't pursued that
+>>>> idea in any real capacity since most nested virtualization use cases
+>>>> for KVM involve running an older L1 kernel and/or a non-KVM L1
+>>>> hypervisor, i.e. there's no concrete use case to justify the development and
+>> maintenance cost.  But if the PV code is "needed" by pKVM anyways...
+>>>
+>>> Yes, I agree, we could have performance & mem cost benefit by using
+>>> paravirt stuff for KVM-on-KVM nested virtualization. May I know do I
+>>> miss other benefit you saw?
 >>
->> Right, we (Google with the help of Semihalf and Intel) have been
->> evaluating pKVM for ChromeOS on Intel platforms (using this Intel's
->> pKVM-on-x86 PoC) as a platform for running secure workloads in VMs
->> protected from the untrusted ChromeOS host, and it looks quite promising
->> so far, in terms of both performance and design simplicity.
+>> As I see it, the advantages of a PV design for pKVM are:
 >>
->> The primary use cases for those secure workloads on Chromebooks are for
->> protection of sensitive biometric data (e.g. fingerprints, face
->> authentication), which means that we expect pKVM to provide not just the
->> basic memory protection for secure VMs but also protection of secure
->> devices assigned to those VMs (e.g. fingerprint sensor, secure camera).
+>> - performance
+>> - memory cost
+>> - code simplicity (of the pKVM hypervisor, first of all)
+>> - better alignment with the pKVM on ARM
 >>
->> Summarizing what we discussed at PUCK [1] regarding the existing pKVM
->> design (with kernel deprivileging) vs pKVM using SEAM (please correct me
->> if I'm missing something):
->>
->> - As we are interested in pKVM for client-side platforms (Chromebooks)
->>    which have no SEAM hardware, using SEAM does not seem to be an option
->>    at all. And even if it was, we still prefer the current (software
->>    based) pKVM design, since we need not just memory protection but also
->>    device protection, and generally we prefer to have more flexibility.
->>
->> - Sean had a concern that kernel deprivileging may require intrusive
->>    changes in the common x86 arch code outside KVM, but IIUC it's not
->>    quite the case. AFAICT the code needed for deprivileging (i.e. making
->>    the kernel run in VMX non-root as a VM) is almost fully contained
->>    within KVM, i.e. the rest of the kernel can remain largely agnostic of
->>    the fact that it is running in VMX non-root. (Jason, please correct me
->>    if I'm wrong.)
->>
->> Outside KVM, there is a bit of changes in drivers/intel/iommu/ for a bit
->> of PV stuff for IOMMU in pKVM (not sure if that is already included in
->> this RFC), and if we go with a more PV based design [2] and not just for
->> VMX and EPT but also for IOMMU, then I expect we're gonna have more of
->> such PV changes for pKVM there, but still contained within Intel IOMMU
->> driver.
-> Thanks Dmytro for the summarizing. I just want to add a bit update about
-> the PV stuff for Intel IOMMU driver: we took deep look into the
-> solution[1] proposed by pKVM-ARM folks and we think it's promising
-> especially for the platforms that have no hardware IOMMU nested
-> translation support. If PV is going to be the direction, we'd like to
-> try the solution on pKVM-IA.
+>> Regarding performance, I actually suspect it may even be the least significant of
+>> the above. I guess with a PV design we'd have roughly as many extra vmexits as
+>> we have now (just due to hypercalls instead of traps on emulated VMX
+>> instructions etc), so perhaps the performance improvement would be not as big
+>> as we might expect (am I wrong?).
+> 
+> I think with PV design, we can benefit from skip shadowing. For example, a TLB flush
+> could be done in hypervisor directly, while shadowing EPT need emulate it by destroy
+> shadow EPT page table entries then do next shadowing upon ept violation.
 
-Hi Tina,
+Yeah indeed, good point.
 
-Thanks for the info, looks quite interesting. Yeah, I agree that PV
-seems to be the best way to go. Also, using (fully or partially) the
-same PV interface as on ARM is probably a good idea too.
+Is my understanding correct: TLB flush is still gonna be requested by
+the host VM via a hypercall, but the benefit is that the hypervisor
+merely needs to do INVEPT?
 
 > 
-> [1]:
-> https://lore.kernel.org/linux-arm-kernel/20230201125328.2186498-14-jean-philippe@linaro.org/T/
+> Based on PV, with well-designed interfaces, I suppose we can also make some general
+> design for nested support on KVM-on-hypervisor (e.g., we can do first for KVM-on-KVM
+> then extend to support KVM-on-pKVM and others)
+
+Yep, as Sean suggested. Forgot to mention this too.
+
 > 
-> Regards,
-> -Tina
 >>
->> [1]
->> https://lore.kernel.org/kvm/20230606181525.1295020-1-seanjc@google.com/
->> [2] https://lore.kernel.org/all/ZA9WM3xA6Qu5Q43K@google.com/
+>> But the memory cost advantage seems to be very attractive. With the emulated
+>> design pKVM needs to maintain shadow page tables (and other shadow
+>> structures too, but page tables are the most memory demanding). Moreover,
+>> the number of shadow page tables is obviously proportional to the number of
+>> VMs running, and since pKVM reserves all its memory upfront preparing for the
+>> worst case, we have pretty restrictive limits on the maximum number of VMs [*]
+>> (and if we run fewer VMs than this limit, we waste memory).
 >>
->> Thanks,
->> Dmytro
+>> To give some numbers, on a machine with 8GB of RAM, on ChromeOS with this
+>> pKVM-on-x86 PoC currently we have pKVM memory cost of 229MB (and it only
+>> allows up to 10 VMs running simultaneously), while on Android (ARM) it is afaik
+>> only 44MB. According to my analysis, if we get rid of all the shadow tables in
+>> pKVM, we should have 44MB on x86 too (regardless of the maximum number of
+>> VMs).
+>>
+>> [*] And some other limits too, e.g. on the maximum number of DMA-capable
+>> devices, since pKVM also needs shadow IOMMU page tables if we have only 1-
+>> stage IOMMU.
+> 
+> I may not capture your meaning. Do you mean device want 2-stage while we only
+> have 1-stage IOMMU? If so, not sure if there is real use case.
+> 
+> Per my understanding, if for PV IOMMU, the simplest implementation is just
+> maintain 1-stage DMA mapping in the hypervisor as guest most likely just want 
+> 1-stage DMA mapping for its device,  so if for IOMMU w/ nested capability meantime
+> guest want use its nested capability (e.g., for vSVA), we can further extend the PV
+> IOMMU interfaces.
+
+Sorry, I wasn't clear enough. I mean, on the host or guest side we need
+just 1-stage IOMMU, but pKVM needs to ensure memory protection. So if
+2-stage is available, pKVM can just use it, but if not, currently in
+pKVM on Intel we use shadow page tables for that (just as a consequence
+of the overall "mostly emulated" design). (So as a result, in
+particular, pKVM memory footprint depends on the max number of PCI
+devices allowed by pKVM.) And yeah, with a PV IOMMU we can avoid the
+need for shadow page tables while still having only 1-stage IOMMU,
+that's exactly my point.
+
+> 
 >>
 >>>
->>>   -- Keir
+>>>>
+>>>> [*] You take the blue pill, the story ends, you wake up in your bed and believe
+>>>>     whatever you want to believe. You take the red pill, you stay in wonderland,
+>>>>     and I show you how deep the rabbit hole goes.
+>>>>
+>>>>     -Morpheus
 >>>
->>>>> to run protected VM with general OS and may with pass-thru secure
->>>>> devices support.
->>>>
->>>> Why?  What is the actual use case?
->>>>
->>>>> May I know your suggestion of "utilize SEAM" is to follow TDX SPEC
->>>>> then
->>>>> work out a SW-TDX solution, or just do some leverage from SEAM code?
->>>>
->>>> Throw away TDX and let KVM run its own code in SEAM.
->>>>
