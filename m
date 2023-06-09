@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7D1E72A01B
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 18:22:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C34C672A01A
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 18:22:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242180AbjFIQW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 12:22:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37270 "EHLO
+        id S242009AbjFIQWZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 12:22:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242134AbjFIQWP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S242123AbjFIQWP (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 9 Jun 2023 12:22:15 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34E963A81
-        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 09:22:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B82F735A7
+        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 09:22:13 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7D8BF659D8
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 57CED659E3
         for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 16:22:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E19E2C433AF;
-        Fri,  9 Jun 2023 16:22:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22AEFC4339C;
+        Fri,  9 Jun 2023 16:22:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686327731;
-        bh=UaDqzpeXMxTsA0h1VeMgRA4blxON31O7kP8OlVYUq/E=;
+        s=k20201202; t=1686327732;
+        bh=kD0iyRxdqfv2pvJX3Hjwo3JKxYWjJAruZ+EvPdKsFjc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=MQx339FkvGKc764l2LE1I0Y0uiAPNfR5N+VijH6pniKl4bVTdLL8ptr0X4rv41cut
-         vaJ5/hyGjPiHT7TsM+jGeVzNm+UitXovcKmJi+FR7ACmn8wGXJWrq+wczWwkhpbnT7
-         3e+vqyJ9m2Zqeo2HxcV2p5hrnW3HYHacGdHgcUMwbILeokUfcBQG4aZu5C24bhsErL
-         zn80Xyr/7oUKIZTTg8yx/uSGzJ2DLKzIN7EnlGLc/2nmr8/svLKIN6jf11epSI35dt
-         ggmbR7b6RqGn4NWxE2Kp0Bx3+atOqBg8GXy4J7szhtC5SZr3GoeIis+ETag+yT9+Es
-         eYUAYMDFNdX/w==
+        b=T77I4xNyTP4kfLvFsfAACsVOKobtphgj2ize8XFYx9gEyi0umuz2k7u/h9Vf7mCaE
+         5NIOCl5mjuMNciHw2oancboQJVpyOOO1F8h1SxD8b7Fe+NIzf38sD5yJnfPXCVpWht
+         N4ZwaJ0SrdafPg2i+2b9rO3MVHNIV6/d24Nhq1AnBwL5hfgqSzzZ6F8Bsrg9IVCLMy
+         m7l2dda0HbPRYAK6t7ofG04XZuiYZyNz3BGDp8VllsHmlLo7N+k5HZnoHFRQvVtvL3
+         xslSZiBB3gqPE5+FK07S1cAVP+6YIrzYyAxrQvA3GsobovE71qeBXAlHY1gi690jcX
+         NSELVd9m3majA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1q7esM-0048L7-3r;
+        id 1q7esM-0048L7-AB;
         Fri, 09 Jun 2023 17:22:10 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -46,9 +46,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
         Quentin Perret <qperret@google.com>,
         Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
-Subject: [PATCH v3 08/17] KVM: arm64: Remove alternatives from sysreg accessors in VHE hypervisor context
-Date:   Fri,  9 Jun 2023 17:21:51 +0100
-Message-Id: <20230609162200.2024064-9-maz@kernel.org>
+Subject: [PATCH v3 09/17] KVM: arm64: Key use of VHE instructions in nVHE code off ARM64_KVM_HVHE
+Date:   Fri,  9 Jun 2023 17:21:52 +0100
+Message-Id: <20230609162200.2024064-10-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230609162200.2024064-1-maz@kernel.org>
 References: <20230609162200.2024064-1-maz@kernel.org>
@@ -68,64 +68,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In the VHE hypervisor code, we should be using the remapped VHE
-accessors, no ifs, no buts. No need to generate any alternative.
+We can now start with the fun stuff: if we enable VHE *only* for
+the hypervisor, we need to generate the VHE instructions when
+accessing the system registers.
+
+For this, reporpose the alternative sequence to be keyed off
+ARM64_KVM_HVHE in the nVHE hypervisor code, and only there.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index bdd9cf546d95..fea04eb25cb4 100644
+index fea04eb25cb4..b7238c72a04c 100644
 --- a/arch/arm64/include/asm/kvm_hyp.h
 +++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -16,6 +16,23 @@ DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
- DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+@@ -33,12 +33,18 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
  
-+/*
-+ * Unified accessors for registers that have a different encoding
-+ * between VHE and non-VHE. They must be specified without their "ELx"
-+ * encoding, but with the SYS_ prefix, as defined in asm/sysreg.h.
-+ */
-+
-+#if defined(__KVM_VHE_HYPERVISOR__)
-+
-+#define read_sysreg_el0(r)	read_sysreg_s(r##_EL02)
-+#define write_sysreg_el0(v,r)	write_sysreg_s(v, r##_EL02)
-+#define read_sysreg_el1(r)	read_sysreg_s(r##_EL12)
-+#define write_sysreg_el1(v,r)	write_sysreg_s(v, r##_EL12)
-+#define read_sysreg_el2(r)	read_sysreg_s(r##_EL1)
-+#define write_sysreg_el2(v,r)	write_sysreg_s(v, r##_EL1)
-+
-+#else // !__KVM_VHE_HYPERVISOR__
+ #else // !__KVM_VHE_HYPERVISOR__
+ 
++#if defined(__KVM_NVHE_HYPERVISOR__)
++#define VHE_ALT_KEY	ARM64_KVM_HVHE
++#else
++#define VHE_ALT_KEY	ARM64_HAS_VIRT_HOST_EXTN
++#endif
 +
  #define read_sysreg_elx(r,nvh,vh)					\
  	({								\
  		u64 reg;						\
-@@ -35,12 +52,6 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+-		asm volatile(ALTERNATIVE(__mrs_s("%0", r##nvh),	\
++		asm volatile(ALTERNATIVE(__mrs_s("%0", r##nvh),		\
+ 					 __mrs_s("%0", r##vh),		\
+-					 ARM64_HAS_VIRT_HOST_EXTN)	\
++					 VHE_ALT_KEY)			\
+ 			     : "=r" (reg));				\
+ 		reg;							\
+ 	})
+@@ -48,7 +54,7 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+ 		u64 __val = (u64)(v);					\
+ 		asm volatile(ALTERNATIVE(__msr_s(r##nvh, "%x0"),	\
+ 					 __msr_s(r##vh, "%x0"),		\
+-					 ARM64_HAS_VIRT_HOST_EXTN)	\
++					 VHE_ALT_KEY)			\
  					 : : "rZ" (__val));		\
  	} while (0)
  
--/*
-- * Unified accessors for registers that have a different encoding
-- * between VHE and non-VHE. They must be specified without their "ELx"
-- * encoding, but with the SYS_ prefix, as defined in asm/sysreg.h.
-- */
--
- #define read_sysreg_el0(r)	read_sysreg_elx(r, _EL0, _EL02)
- #define write_sysreg_el0(v,r)	write_sysreg_elx(v, r, _EL0, _EL02)
- #define read_sysreg_el1(r)	read_sysreg_elx(r, _EL1, _EL12)
-@@ -48,6 +59,8 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- #define read_sysreg_el2(r)	read_sysreg_elx(r, _EL2, _EL1)
- #define write_sysreg_el2(v,r)	write_sysreg_elx(v, r, _EL2, _EL1)
- 
-+#endif	// __KVM_VHE_HYPERVISOR__
-+
- /*
-  * Without an __arch_swab32(), we fall back to ___constant_swab32(), but the
-  * static inline can allow the compiler to out-of-line this. KVM always wants
 -- 
 2.34.1
 
