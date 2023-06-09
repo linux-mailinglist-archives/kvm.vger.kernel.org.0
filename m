@@ -2,60 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AEF71729ABE
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 14:55:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0ED6C729AF5
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 15:04:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240955AbjFIMzN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 08:55:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55840 "EHLO
+        id S240004AbjFINEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 09:04:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239243AbjFIMzK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jun 2023 08:55:10 -0400
+        with ESMTP id S238814AbjFINEf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jun 2023 09:04:35 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD3630CD;
-        Fri,  9 Jun 2023 05:54:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06B052D72;
+        Fri,  9 Jun 2023 06:04:35 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A9D026168A;
-        Fri,  9 Jun 2023 12:53:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06DD9C433D2;
-        Fri,  9 Jun 2023 12:53:22 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 97BBB61234;
+        Fri,  9 Jun 2023 13:04:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC01EC433EF;
+        Fri,  9 Jun 2023 13:04:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686315202;
-        bh=7jChBWuCMk9Nu99JqVR5Rs9FVFSJLpKrOg+HaaHj1bg=;
+        s=k20201202; t=1686315874;
+        bh=90rVHTRs/3F5on7zL7vvDRpDwafaR4yvoFsAW9sVsUU=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ekp7Ryaf3YCnAGMZqmI0TWgkg09/MVSmUZmkQUv2bPK5AYOgNbTtX9V5Z8iJuoGF0
-         DrAhYN8yUu7/2Mh+KDfGVrExN/AMEhr3FQLJ/NDk2hkEDckwD2ZGPFYlA5+x1N6xbB
-         tMXAc2/fb7ce5TjoMGstvgceZCjv5L3GuYCnaGi3mOiVflW/zII6Zwf3yTth1utHqk
-         zr+7BqWXC9LW/50BODJNXBFsOyt+XJnjqGzciyELzuMmq4xI+Emz2w4U7BQ6myBb6n
-         tExY+kG1VdXPceoZwLTy6VaQEPg+aDH4ls3A4W7W0LHlL12Jetw3DU8qk5+plTty0d
-         ftdrtd6MfehXQ==
+        b=ct18ILo60TPRsRZeRF0MA6HqVV541momQ/jF4nftPln9ac11WPptBUohnWBmUvWqE
+         vnbarfiPcuydHingkmODEEfgyBqMNPOYeP2WxeWyeZBtXUQLPWlTQiK3YoRCoQuOkz
+         ykp2yROWej+XaTRvcPNC1Mj4JCwFi/idPxZcvWKMzoJB4BmjIGu9z7nSlgQ6TTTjIl
+         qP4PTzdDzoU3b8crpqEvZ0W3ktzTOLFYBKjsvJzANfoNoi8mgwX007iMF+sc9WNoo4
+         c5+GV/8GYH3NerKeEbysr3Xjw/+GD6dgRglU5pvXYup5qB/zjHokXJytURgg3jzfRS
+         C5Xro19M414WQ==
 Received: from 152.5.30.93.rev.sfr.net ([93.30.5.152] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1q7bcF-0045MN-KL;
-        Fri, 09 Jun 2023 13:53:19 +0100
-Date:   Fri, 09 Jun 2023 13:53:17 +0100
-Message-ID: <874jngokzm.wl-maz@kernel.org>
+        id 1q7bn5-0045UR-GR;
+        Fri, 09 Jun 2023 14:04:31 +0100
+Date:   Fri, 09 Jun 2023 14:04:27 +0100
+Message-ID: <873530okh0.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        seanjc@google.com, oliver.upton@linux.dev, aarcange@redhat.com,
-        peterx@redhat.com, david@redhat.com, hshuai@redhat.com,
-        zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v2] KVM: Avoid illegal stage2 mapping on invalid memory slot
-In-Reply-To: <20230609100420.521351-1-gshan@redhat.com>
-References: <20230609100420.521351-1-gshan@redhat.com>
+To:     Yu Zhao <yuzhao@google.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alistair Popple <apopple@nvidia.com>,
+        Anup Patel <anup@brainfault.org>,
+        Ben Gardon <bgardon@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Gaosheng Cui <cuigaosheng1@huawei.com>,
+        Gavin Shan <gshan@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michael Larabel <michael@michaellarabel.com>,
+        Mike Rapoport <rppt@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
+        linux-trace-kernel@vger.kernel.org, x86@kernel.org,
+        linux-mm@google.com
+Subject: Re: kvm/arm64: Spark benchmark
+In-Reply-To: <20230609005935.42390-1-yuzhao@google.com>
+References: <20230526234435.662652-1-yuzhao@google.com>
+        <20230609005935.42390-1-yuzhao@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 93.30.5.152
-X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com, oliver.upton@linux.dev, aarcange@redhat.com, peterx@redhat.com, david@redhat.com, hshuai@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Rcpt-To: yuzhao@google.com, akpm@linux-foundation.org, pbonzini@redhat.com, apopple@nvidia.com, anup@brainfault.org, bgardon@google.com, bp@alien8.de, catalin.marinas@arm.com, chao.p.peng@linux.intel.com, christophe.leroy@csgroup.eu, dave.hansen@linux.intel.com, farosas@linux.ibm.com, cuigaosheng1@huawei.com, gshan@redhat.com, hpa@zytor.com, mingo@redhat.com, james.morse@arm.com, Jason@zx2c4.com, jgg@ziepe.ca, corbet@lwn.net, mhiramat@kernel.org, mpe@ellerman.id.au, michael@michaellarabel.com, rppt@kernel.org, npiggin@gmail.com, oliver.upton@linux.dev, paulus@ozlabs.org, peterx@redhat.com, seanjc@google.com, rostedt@goodmis.org, suzuki.poulose@arm.com, tglx@linutronix.de, thuth@redhat.com, will@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, linux-trace-kernel@vger.kernel.org, x86@kernel.org, linux-m
+ m@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -68,68 +102,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 09 Jun 2023 11:04:20 +0100,
-Gavin Shan <gshan@redhat.com> wrote:
+On Fri, 09 Jun 2023 01:59:35 +0100,
+Yu Zhao <yuzhao@google.com> wrote:
 > 
-> We run into guest hang in edk2 firmware when KSM is kept as running on
-> the host. The edk2 firmware is waiting for status 0x80 from QEMU's pflash
-> device (TYPE_PFLASH_CFI01) during the operation of sector erasing or
-> buffered write. The status is returned by reading the memory region of
-> the pflash device and the read request should have been forwarded to QEMU
-> and emulated by it. Unfortunately, the read request is covered by an
-> illegal stage2 mapping when the guest hang issue occurs. The read request
-> is completed with QEMU bypassed and wrong status is fetched. The edk2
-> firmware runs into an infinite loop with the wrong status.
-> 
-> The illegal stage2 mapping is populated due to same page sharing by KSM
-> at (C) even the associated memory slot has been marked as invalid at (B)
-> when the memory slot is requested to be deleted. It's notable that the
-> active and inactive memory slots can't be swapped when we're in the middle
-> of kvm_mmu_notifier_change_pte() because kvm->mn_active_invalidate_count
-> is elevated, and kvm_swap_active_memslots() will busy loop until it reaches
-> to zero again. Besides, the swapping from the active to the inactive memory
-> slots is also avoided by holding &kvm->srcu in __kvm_handle_hva_range(),
-> corresponding to synchronize_srcu_expedited() in kvm_swap_active_memslots().
-> 
->   CPU-A                    CPU-B
->   -----                    -----
->                            ioctl(kvm_fd, KVM_SET_USER_MEMORY_REGION)
->                            kvm_vm_ioctl_set_memory_region
->                            kvm_set_memory_region
->                            __kvm_set_memory_region
->                            kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE)
->                              kvm_invalidate_memslot
->                                kvm_copy_memslot
->                                kvm_replace_memslot
->                                kvm_swap_active_memslots        (A)
->                                kvm_arch_flush_shadow_memslot   (B)
->   same page sharing by KSM
->   kvm_mmu_notifier_invalidate_range_start
->         :
->   kvm_mmu_notifier_change_pte
->     kvm_handle_hva_range
->     __kvm_handle_hva_range       (C)
->         :
->   kvm_mmu_notifier_invalidate_range_end
-> 
-> Fix the issue by skipping the invalid memory slot at (C) to avoid the
-> illegal stage2 mapping so that the read request for the pflash's status
-> is forwarded to QEMU and emulated by it. In this way, the correct pflash's
-> status can be returned from QEMU to break the infinite loop in the edk2
-> firmware.
-> 
-> Cc: stable@vger.kernel.org # v5.13+
-> Fixes: 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
-> Reported-by: Shuai Hu <hshuai@redhat.com>
-> Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
-> v2: Improved changelog suggested by Marc
-> ---
->  virt/kvm/kvm_main.c | 3 +++
->  1 file changed, 3 insertions(+)
+> TLDR
+> ====
+> Apache Spark spent 12% less time sorting four billion random integers twenty times (in ~4 hours) after this patchset [1].
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Why are the 3 architectures you have considered being evaluated with 3
+different benchmarks? I am not suspecting you to have cherry-picked
+the best results, but I'd really like to see a variety of benchmarks
+that exercise this stuff differently.
+
+Thanks,
 
 	M.
 
