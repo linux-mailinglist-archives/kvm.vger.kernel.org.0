@@ -2,841 +2,715 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 151C3729BAF
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 15:35:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E4A5729BC0
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 15:40:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238847AbjFINfy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 09:35:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50816 "EHLO
+        id S240379AbjFINkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 09:40:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238452AbjFINfw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jun 2023 09:35:52 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1351270B
-        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 06:35:43 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3f6e68cc738so13643045e9.1
-        for <kvm@vger.kernel.org>; Fri, 09 Jun 2023 06:35:43 -0700 (PDT)
+        with ESMTP id S240125AbjFINkT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jun 2023 09:40:19 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B509C3580
+        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 06:40:16 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2b1ba50e50bso19405961fa.1
+        for <kvm@vger.kernel.org>; Fri, 09 Jun 2023 06:40:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1686317742; x=1688909742;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L6t0TvZfDLoqeIOaTnZ9oEVfgP8U8M4IOz1T+NhsED0=;
-        b=UDjeaXrUquBlqG/iLwmk4H6WGbSpSDsoayFDZ4iD1+lhgaPzF/60UM9fxIsG9Zckh0
-         BfNulAZmBlKAxgU54ih5JLw3TKzrnwRsys6BsenHiX+OIT+UDtLtROmC1h6pH6cf3jRd
-         Wt0Bz1CQQocRc9xrBg4tEh6wQfRPc1iFV3u1YiWS90y/ys2GXHktyQS3q8UHh8sCtYjJ
-         wTMFI8r3mkQEM7pGGnQJnf5bPODBsBUB6Vwi5WdX40OubcQa9nKsoDNzYamcIykhd5EA
-         G1rLzFJgZt2mpKNy/cJukniuhovE38Y9WrBqInN7ZVXSFaqbuItyzuLHckRe9qiaaIEH
-         T7FA==
+        d=semihalf.com; s=google; t=1686318015; x=1688910015;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3wINVz/vBk49ZPuP6WqVVeknMa1LbSzb7fhaKfu96U0=;
+        b=KwfBV6pSk/l1oHH9CiVEY1wyIjtMZEyOkXSnbwqmPgyEjhoVgbxYUkdovi70jiD8pn
+         0kSA3Zq53eYQ2qAbLcz4VVsyrrlpkS0xlAe46xIZvg+LlfxnqA+ij8YsUycvTOi2e8pZ
+         5+ZkfZfJneCzoZVtg4oYGzWqHYq+nPUUCUPhDl61GBWXKSoLAy8xLfiTjJQq9zPEhsrz
+         Slp1mFFXwzzTJpFpFBWJt67hmu/hEskCuZ434fmjteCtvAmmBRhMm+IRfQmw40NkHd1p
+         ecsboxmzRP1Y6QgUAK0CnGjnE91Srj1FyB5k/N2Ije8rCBdqgujiwE58Q4AHPNkwJ3zy
+         pelA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686317742; x=1688909742;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L6t0TvZfDLoqeIOaTnZ9oEVfgP8U8M4IOz1T+NhsED0=;
-        b=FkgjriJMEMbbxZtC+TIGtTmv/lpt6W5ybdyO7bhaI/XmqApY57mKkUiTP/NEO1m+C6
-         1WYL4snXHrdwlwiLmq0QhILHViPxy2b5+m5xn0LNvmyIf1HLj5ALb3xGO3bqGKnl9M6c
-         y+QKQcAHdkvYTt31v5NH9cGhXYpTmYxDcJtXFO4apyn77QAFDDXN4ooHGxeM0CUo6PBb
-         w1ztwq1CjK4q3a+uriaaDNePEmBziH3q+kMQ9c9aufEaO7x/SBma0K7CTnsXJ2dMMos+
-         DVl9tIRgVrOoXbqMZzDQsmrv4XSqR81VmOWEDgsz56FmWTyoURulxlzQ0ygtGPzR5+ge
-         99iw==
-X-Gm-Message-State: AC+VfDyvm7jt4qxnzgun3PwKMJsCcHaNGYIjZJrlhmerVb0IZQ9yYJ7n
-        ZXL6rIAEJDMYhyCHWRRWMRYnoQ==
-X-Google-Smtp-Source: ACHHUZ6hiAFKkE7FcjpFt0LINwnF/AhTiGnsZx+u808m01j+9mQStUlez2+3eUcm37JBRA/+4cmyKg==
-X-Received: by 2002:a7b:cd86:0:b0:3f6:be1:b8d6 with SMTP id y6-20020a7bcd86000000b003f60be1b8d6mr963244wmj.9.1686317742176;
-        Fri, 09 Jun 2023 06:35:42 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id u9-20020a05600c00c900b003f72468833esm2736963wmm.26.2023.06.09.06.35.41
+        d=1e100.net; s=20221208; t=1686318015; x=1688910015;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3wINVz/vBk49ZPuP6WqVVeknMa1LbSzb7fhaKfu96U0=;
+        b=icYIPS8hK2eW6ur+kaACglLvghWSsBQRq1Goj70aQj6LVSR9F7/3VPmADNgSce4c41
+         fksp8VtwUjouz86KRt5BA78ils7fwtc6JZwiIjFFGlbUojXRAwJKEFOqde01TUzT7Yh3
+         fTtwZGChTEFIPFBHKChce9qipR+avjUcQMQmQJXbJTwINZ+bq8/xBxw5PtvSSjVXNlIs
+         OhTQmGhUI4IBMR4YlmLVFkd+pI3SzD/e20vf/FIm65aK6SCkxM/R9QKTXe9s4hFEeoK7
+         2uehALfEyhdBOdpFpV93rWRvcWB6Nk+HZnXxKaZVNTsbfuk1tgDq0bvX91W82FFgL/7s
+         IkiA==
+X-Gm-Message-State: AC+VfDwa4i05Zp4DpZxlxTXo6kUXt3dAZiaVf7f8WjdRWY2VZv1Fl9od
+        ciclpuMHhtm7xZrOwIR+pacEIjlgX3gntfL6YXNQcg==
+X-Google-Smtp-Source: ACHHUZ48/ZTmwysZbY2FguIcyWjyXFXp7+jP6VpIe5zVRWYTafHMlLI6sS/QkRcPDJ//yp1cwRnnoA==
+X-Received: by 2002:a2e:3505:0:b0:2ad:d291:72e1 with SMTP id z5-20020a2e3505000000b002add29172e1mr1232076ljz.18.1686318014662;
+        Fri, 09 Jun 2023 06:40:14 -0700 (PDT)
+Received: from jazctssd.c.googlers.com.com (138.58.228.35.bc.googleusercontent.com. [35.228.58.138])
+        by smtp.gmail.com with ESMTPSA id d16-20020a2e3610000000b002b20f4e515bsm394685lja.31.2023.06.09.06.40.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jun 2023 06:35:41 -0700 (PDT)
-Date:   Fri, 9 Jun 2023 15:35:40 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Haibo Xu <haibo1.xu@intel.com>
-Cc:     xiaobo55x@gmail.com, maz@kernel.org, oliver.upton@linux.dev,
-        seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 10/10] KVM: riscv: selftests: Add get-reg-list test
-Message-ID: <20230609-fba04b424a4d46574e04e587@orel>
-References: <cover.1686275310.git.haibo1.xu@intel.com>
- <8cd4ce50f5f4a639f4508085959aae222d4d4386.1686275310.git.haibo1.xu@intel.com>
+        Fri, 09 Jun 2023 06:40:14 -0700 (PDT)
+From:   Grzegorz Jaszczyk <jaz@semihalf.com>
+To:     linux-kernel@vger.kernel.org, alex.williamson@redhat.com
+Cc:     dmy@semihalf.com, tn@semihalf.com, dbehr@google.com,
+        dbehr@chromium.org, upstream@semihalf.com, dtor@google.com,
+        jgg@ziepe.ca, kevin.tian@intel.com, cohuck@redhat.com,
+        abhsahu@nvidia.com, yishaih@nvidia.com, yi.l.liu@intel.com,
+        kvm@vger.kernel.org, libvir-list@redhat.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, mjrosato@linux.ibm.com,
+        Grzegorz Jaszczyk <jaz@semihalf.com>
+Subject: [PATCH v5] vfio/pci: Propagate ACPI notifications to user-space via eventfd
+Date:   Fri,  9 Jun 2023 13:39:50 +0000
+Message-ID: <20230609133950.2197552-1-jaz@semihalf.com>
+X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8cd4ce50f5f4a639f4508085959aae222d4d4386.1686275310.git.haibo1.xu@intel.com>
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UPPERCASE_50_75,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 09, 2023 at 10:12:18AM +0800, Haibo Xu wrote:
-> get-reg-list test is used to check for KVM registers regressions
-> during VM migration which happens when destination host kernel
-> missing registers that the source host kernel has. The blessed
-> list registers was created by running on v6.4-rc5.
-> 
-> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  tools/testing/selftests/kvm/get-reg-list.c    |  28 +
->  .../selftests/kvm/include/riscv/processor.h   |   3 +
->  .../selftests/kvm/riscv/get-reg-list.c        | 611 ++++++++++++++++++
->  4 files changed, 643 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/riscv/get-reg-list.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index d90cad19c9ee..f7bcda903dd9 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -174,6 +174,7 @@ TEST_GEN_PROGS_s390x += kvm_binary_stats_test
->  
->  TEST_GEN_PROGS_riscv += demand_paging_test
->  TEST_GEN_PROGS_riscv += dirty_log_test
-> +TEST_GEN_PROGS_riscv += get-reg-list
->  TEST_GEN_PROGS_riscv += kvm_create_max_vcpus
->  TEST_GEN_PROGS_riscv += kvm_page_table_test
->  TEST_GEN_PROGS_riscv += set_memory_region_test
-> diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing/selftests/kvm/get-reg-list.c
-> index abacb95c21c6..73f40e0842b8 100644
-> --- a/tools/testing/selftests/kvm/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/get-reg-list.c
-> @@ -133,6 +133,34 @@ static struct kvm_vcpu *vcpu_config_get_vcpu(struct vcpu_reg_list *c, struct kvm
->  	return vcpu;
->  }
->  #else
-> +static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> +{
-> +	int ret;
-> +	unsigned long value;
-> +
-> +	ret = __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> +	if (ret) {
-> +		printf("Failed to get ext %d", ext);
-> +		return false;
-> +	}
-> +
-> +	return !!value;
-> +}
-> +
-> +static void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
-> +{
-> +	struct vcpu_reg_sublist *s;
-> +
-> +	for_each_sublist(c, s) {
-> +		if (!s->feature)
-> +			continue;
+To allow pass-through devices receiving ACPI notifications, permit to
+register ACPI notify handler (via VFIO_DEVICE_SET_IRQS) for a given
+device. The handler role is to receive and propagate such ACPI
+notifications to the user-space through the user provided eventfd. This
+allows VMM to receive and propagate them further to the VM, where the
+actual driver for pass-through device resides and can react to device
+specific notifications accordingly.
 
-Using zero to mean "not specified" means we can't test for
-KVM_RISCV_ISA_EXT_A, but that's probably OK, since Linux always has 'a',
-so we'll never need to check for it.
+The eventfd usage ensures VMM and device isolation: it allows to use a
+dedicated channel associated with the device for such events, such that
+the VMM has direct access.
 
-> +
-> +		__TEST_REQUIRE(vcpu_has_ext(vcpu, s->feature),
-> +			       "%s: %s not available, skipping tests\n",
-> +			       config_name(c), s->name);
-> +	}
-> +}
-> +
->  static struct kvm_vcpu *vcpu_config_get_vcpu(struct vcpu_reg_list *c, struct kvm_vm *vm)
->  {
->  	return __vm_vcpu_add(vm, 0);
-> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
-> index d00d213c3805..5b62a3d2aa9b 100644
-> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
-> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-> @@ -38,6 +38,9 @@ static inline uint64_t __kvm_reg_id(uint64_t type, uint64_t idx,
->  					     KVM_REG_RISCV_TIMER_REG(name), \
->  					     KVM_REG_SIZE_U64)
->  
-> +#define RISCV_ISA_EXT_REG(idx)	__kvm_reg_id(KVM_REG_RISCV_ISA_EXT, \
-> +					     idx, KVM_REG_SIZE_ULONG)
-> +
->  /* L3 index Bit[47:39] */
->  #define PGTBL_L3_INDEX_MASK			0x0000FF8000000000ULL
->  #define PGTBL_L3_INDEX_SHIFT			39
-> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> new file mode 100644
-> index 000000000000..0f371d99d471
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> @@ -0,0 +1,611 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Check for KVM_GET_REG_LIST regressions.
-> + *
-> + * Copyright (C) 2020, Red Hat, Inc.
+Since the eventfd counter is used as ACPI notification value
+placeholder, the eventfd signaling needs to be serialized in order to
+not end up with notification values being coalesced. Therefore ACPI
+notification values are buffered and signalized one by one, when the
+previous notification value has been consumed.
 
-I don't think we need the Red Hat copyright. This is a completely new
-work.
+Signed-off-by: Grzegorz Jaszczyk <jaz@semihalf.com>
+---
+Changelog v4..v5
+Address Alex Williamson's feedback:
+- s/vfio_acpi_notify.{c,o}/acpi_notify.{c,o}
+- Do not put acpi_notify to its own module but fold it into main
+  vfio.ko. Additionally select it from VFIO_PCI_CORE instead of VFIO_PCI.
+- Cleanup acpi notify under igate mutex (in vfio_pci_core_close_device).
+- Add extra check for ACPI companion in vfio_pci_get_irq_count and
+  extend vfio_pci_ioctl_get_irq_info.
+- Drop acpi.h include - linux/vfio_acpi_notify.h includes it already.
+- Send device check notification value for DATA_NONE and non-zero count
+  and for DATA_BOOL and non-zero count  (as for loopback testing).
+- Drop some redundant !acpi_notify->acpi_notify_trigger checks.
+- Move some common code to new helper functions:
+  1) acpi_notification_dequeue
+  2) vfio_acpi_notify_cleanup and rename previous
+     vfio_acpi_notify_cleanup into vfio_remove_acpi_notify which uses it
+- Add rate limited logging for dropped notifications.
+- Move vdev->acpi_notification pointer cleanup to the
+  vfio_acpi_notify_cleanup function this also fixes two bigger issues
+  caught by Alex.
+- Allow the eventfd to be swapped.
+- s/GFP_KERNEL/GFP_KERNEL_ACCOUNT.
+- s/VFIO_PCI_ACPI_NTFY_IRQ_INDEX/VFIO_PCI_ACPI_IRQ_INDEX.
+- Add header protection for multiple includes.
+- v4: https://patchwork.kernel.org/project/kvm/patch/20230522165811.123417-1-jaz@semihalf.com/
 
-> + * Copyright (c) 2023 Intel Corporation
-> + *
-> + */
-> +#include <stdio.h>
-> +#include "kvm_util.h"
-> +#include "test_util.h"
-> +#include "processor.h"
-> +
-> +#define REG_MASK (KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK)
-> +
-> +static const char *config_id_to_str(__u64 id)
-> +{
-> +	/* reg_off is the offset into struct kvm_riscv_config */
-> +	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_CONFIG);
-> +
-> +	switch (reg_off) {
-> +	case KVM_REG_RISCV_CONFIG_REG(isa):
-> +		return "KVM_REG_RISCV_CONFIG_REG(isa)";
-> +	case KVM_REG_RISCV_CONFIG_REG(zicbom_block_size):
-> +		return "KVM_REG_RISCV_CONFIG_REG(zicbom_block_size)";
-> +	case KVM_REG_RISCV_CONFIG_REG(zicboz_block_size):
-> +		return "KVM_REG_RISCV_CONFIG_REG(zicboz_block_size)";
-> +	case KVM_REG_RISCV_CONFIG_REG(mvendorid):
-> +		return "KVM_REG_RISCV_CONFIG_REG(mvendorid)";
-> +	case KVM_REG_RISCV_CONFIG_REG(marchid):
-> +		return "KVM_REG_RISCV_CONFIG_REG(marchid)";
-> +	case KVM_REG_RISCV_CONFIG_REG(mimpid):
-> +		return "KVM_REG_RISCV_CONFIG_REG(mimpid)";
-> +	}
-> +
-> +	/*
-> +	 * Config regs would grow regularly with new pseudo reg added, so
-> +	 * just show raw id to indicate a new pseudo config reg.
-> +	 */
-> +	return strdup_printf("KVM_REG_RISCV_CONFIG_REG(%lld) /* UNKNOWN */", reg_off);
-> +}
-> +
-> +static const char *core_id_to_str(const char *prefix, __u64 id)
-> +{
-> +	/* reg_off is the offset into struct kvm_riscv_core */
-> +	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_CORE);
-> +
-> +	switch (reg_off) {
-> +	case KVM_REG_RISCV_CORE_REG(regs.pc):
-> +		return "KVM_REG_RISCV_CORE_REG(regs.pc)";
-> +	case KVM_REG_RISCV_CORE_REG(regs.ra):
-> +		return "KVM_REG_RISCV_CORE_REG(regs.ra)";
-> +	case KVM_REG_RISCV_CORE_REG(regs.sp):
-> +		return "KVM_REG_RISCV_CORE_REG(regs.sp)";
-> +	case KVM_REG_RISCV_CORE_REG(regs.gp):
-> +		return "KVM_REG_RISCV_CORE_REG(regs.gp)";
-> +	case KVM_REG_RISCV_CORE_REG(regs.tp):
-> +		return "KVM_REG_RISCV_CORE_REG(regs.tp)";
-> +	case KVM_REG_RISCV_CORE_REG(regs.t0) ... KVM_REG_RISCV_CORE_REG(regs.t2):
-> +		return strdup_printf("KVM_REG_RISCV_CORE_REG(regs.t%lld)",
-> +			   reg_off - KVM_REG_RISCV_CORE_REG(regs.t0));
-> +	case KVM_REG_RISCV_CORE_REG(regs.s0) ... KVM_REG_RISCV_CORE_REG(regs.s1):
-> +		return strdup_printf("KVM_REG_RISCV_CORE_REG(regs.s%lld)",
-> +			   reg_off - KVM_REG_RISCV_CORE_REG(regs.s0));
-> +	case KVM_REG_RISCV_CORE_REG(regs.a0) ... KVM_REG_RISCV_CORE_REG(regs.a7):
-> +		return strdup_printf("KVM_REG_RISCV_CORE_REG(regs.a%lld)",
-> +			   reg_off - KVM_REG_RISCV_CORE_REG(regs.a0));
-> +	case KVM_REG_RISCV_CORE_REG(regs.s2) ... KVM_REG_RISCV_CORE_REG(regs.s11):
-> +		return strdup_printf("KVM_REG_RISCV_CORE_REG(regs.s%lld)",
-> +			   reg_off - KVM_REG_RISCV_CORE_REG(regs.s2) + 2);
-> +	case KVM_REG_RISCV_CORE_REG(regs.t3) ... KVM_REG_RISCV_CORE_REG(regs.t6):
-> +		return strdup_printf("KVM_REG_RISCV_CORE_REG(regs.t%lld)",
-> +			   reg_off - KVM_REG_RISCV_CORE_REG(regs.t3) + 3);
-> +	case KVM_REG_RISCV_CORE_REG(mode):
-> +		return "KVM_REG_RISCV_CORE_REG(mode)";
-> +	}
-> +
-> +	TEST_FAIL("%s: Unknown core reg id: 0x%llx", prefix, id);
-> +	return NULL;
-> +}
-> +
-> +#define RISCV_CSR_GENERAL(csr) \
-> +	"KVM_REG_RISCV_CSR_GENERAL | KVM_REG_RISCV_CSR_REG(" #csr ")"
-> +#define RISCV_CSR_AIA(csr) \
-> +	"KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_REG(" #csr ")"
-> +
-> +static const char *general_csr_id_to_str(__u64 reg_off)
-> +{
-> +	/* reg_off is the offset into struct kvm_riscv_csr */
-> +	switch (reg_off) {
-> +	case KVM_REG_RISCV_CSR_REG(sstatus):
-> +		return RISCV_CSR_GENERAL(sstatus);
-> +	case KVM_REG_RISCV_CSR_REG(sie):
-> +		return RISCV_CSR_GENERAL(sie);
-> +	case KVM_REG_RISCV_CSR_REG(stvec):
-> +		return RISCV_CSR_GENERAL(stvec);
-> +	case KVM_REG_RISCV_CSR_REG(sscratch):
-> +		return RISCV_CSR_GENERAL(sscratch);
-> +	case KVM_REG_RISCV_CSR_REG(sepc):
-> +		return RISCV_CSR_GENERAL(sepc);
-> +	case KVM_REG_RISCV_CSR_REG(scause):
-> +		return RISCV_CSR_GENERAL(scause);
-> +	case KVM_REG_RISCV_CSR_REG(stval):
-> +		return RISCV_CSR_GENERAL(stval);
-> +	case KVM_REG_RISCV_CSR_REG(sip):
-> +		return RISCV_CSR_GENERAL(sip);
-> +	case KVM_REG_RISCV_CSR_REG(satp):
-> +		return RISCV_CSR_GENERAL(satp);
-> +	case KVM_REG_RISCV_CSR_REG(scounteren):
-> +		return RISCV_CSR_GENERAL(scounteren);
-> +	}
-> +
-> +	TEST_FAIL("Unknown general csr reg: 0x%llx", reg_off);
-> +	return NULL;
-> +}
-> +
-> +static const char *aia_csr_id_to_str(__u64 reg_off)
-> +{
-> +	/* reg_off is the offset into struct kvm_riscv_aia_csr */
-> +	switch (reg_off) {
-> +	case KVM_REG_RISCV_CSR_AIA_REG(siselect):
-> +		return RISCV_CSR_AIA(siselect);
-> +	case KVM_REG_RISCV_CSR_AIA_REG(iprio1):
-> +		return RISCV_CSR_AIA(iprio1);
-> +	case KVM_REG_RISCV_CSR_AIA_REG(iprio2):
-> +		return RISCV_CSR_AIA(iprio2);
-> +	case KVM_REG_RISCV_CSR_AIA_REG(sieh):
-> +		return RISCV_CSR_AIA(sieh);
-> +	case KVM_REG_RISCV_CSR_AIA_REG(siph):
-> +		return RISCV_CSR_AIA(siph);
-> +	case KVM_REG_RISCV_CSR_AIA_REG(iprio1h):
-> +		return RISCV_CSR_AIA(iprio1h);
-> +	case KVM_REG_RISCV_CSR_AIA_REG(iprio2h):
-> +		return RISCV_CSR_AIA(iprio2h);
-> +	}
-> +
-> +	TEST_FAIL("Unknown aia csr reg: 0x%llx", reg_off);
-> +	return NULL;
-> +}
-> +
-> +static const char *csr_id_to_str(const char *prefix, __u64 id)
-> +{
-> +	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_CSR);
-> +	__u64 reg_subtype = reg_off & KVM_REG_RISCV_SUBTYPE_MASK;
-> +
-> +	reg_off &= ~KVM_REG_RISCV_SUBTYPE_MASK;
-> +
-> +	switch (reg_subtype) {
-> +	case KVM_REG_RISCV_CSR_GENERAL:
-> +		return general_csr_id_to_str(reg_off);
-> +	case KVM_REG_RISCV_CSR_AIA:
-> +		return aia_csr_id_to_str(reg_off);
-> +	}
-> +
-> +	TEST_FAIL("%s: Unknown csr subtype: 0x%llx", prefix, reg_subtype);
-> +	return NULL;
-> +}
-> +
-> +static const char *timer_id_to_str(const char *prefix, __u64 id)
-> +{
-> +	/* reg_off is the offset into struct kvm_riscv_timer */
-> +	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_TIMER);
-> +
-> +	switch (reg_off) {
-> +	case KVM_REG_RISCV_TIMER_REG(frequency):
-> +		return "KVM_REG_RISCV_TIMER_REG(frequency)";
-> +	case KVM_REG_RISCV_TIMER_REG(time):
-> +		return "KVM_REG_RISCV_TIMER_REG(time)";
-> +	case KVM_REG_RISCV_TIMER_REG(compare):
-> +		return "KVM_REG_RISCV_TIMER_REG(compare)";
-> +	case KVM_REG_RISCV_TIMER_REG(state):
-> +		return "KVM_REG_RISCV_TIMER_REG(state)";
-> +	}
-> +
-> +	TEST_FAIL("%s: Unknown timer reg id: 0x%llx", prefix, id);
-> +	return NULL;
-> +}
-> +
-> +static const char *fp_f_id_to_str(const char *prefix, __u64 id)
-> +{
-> +	/* reg_off is the offset into struct __riscv_f_ext_state */
-> +	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_FP_F);
-> +
-> +	switch (reg_off) {
-> +	case KVM_REG_RISCV_FP_F_REG(f[0]) ...
-> +	     KVM_REG_RISCV_FP_F_REG(f[31]):
-> +		return strdup_printf("KVM_REG_RISCV_FP_F_REG(f[%lld])", reg_off);
-> +	case KVM_REG_RISCV_FP_F_REG(fcsr):
-> +		return "KVM_REG_RISCV_FP_F_REG(fcsr)";
-> +	}
-> +
-> +	TEST_FAIL("%s: Unknown fp_f reg id: 0x%llx", prefix, id);
-> +	return NULL;
-> +}
-> +
-> +static const char *fp_d_id_to_str(const char *prefix, __u64 id)
-> +{
-> +	/* reg_off is the offset into struct __riscv_d_ext_state */
-> +	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_FP_D);
-> +
-> +	switch (reg_off) {
-> +	case KVM_REG_RISCV_FP_D_REG(f[0]) ...
-> +	     KVM_REG_RISCV_FP_D_REG(f[31]):
-> +		return strdup_printf("KVM_REG_RISCV_FP_D_REG(f[%lld])", reg_off);
-> +	case KVM_REG_RISCV_FP_D_REG(fcsr):
-> +		return "KVM_REG_RISCV_FP_D_REG(fcsr)";
-> +	}
-> +
-> +	TEST_FAIL("%s: Unknown fp_d reg id: 0x%llx", prefix, id);
-> +	return NULL;
-> +}
-> +
-> +static const char *isa_ext_id_to_str(__u64 id)
-> +{
-> +	/* reg_off is the offset into unsigned long kvm_isa_ext_arr[] */
-> +	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_ISA_EXT);
-> +
-> +	static const char * const kvm_isa_ext_reg_name[] = {
-> +		"KVM_RISCV_ISA_EXT_A",
-> +		"KVM_RISCV_ISA_EXT_C",
-> +		"KVM_RISCV_ISA_EXT_D",
-> +		"KVM_RISCV_ISA_EXT_F",
-> +		"KVM_RISCV_ISA_EXT_H",
-> +		"KVM_RISCV_ISA_EXT_I",
-> +		"KVM_RISCV_ISA_EXT_M",
-> +		"KVM_RISCV_ISA_EXT_SVPBMT",
-> +		"KVM_RISCV_ISA_EXT_SSTC",
-> +		"KVM_RISCV_ISA_EXT_SVINVAL",
-> +		"KVM_RISCV_ISA_EXT_ZIHINTPAUSE",
-> +		"KVM_RISCV_ISA_EXT_ZICBOM",
-> +		"KVM_RISCV_ISA_EXT_ZICBOZ",
-> +		"KVM_RISCV_ISA_EXT_ZBB",
-> +		"KVM_RISCV_ISA_EXT_SSAIA",
-> +	};
-> +
-> +	if (reg_off >= ARRAY_SIZE(kvm_isa_ext_reg_name)) {
-> +		/*
-> +		 * isa_ext regs would grow regularly with new isa extension added, so
-> +		 * just show "reg" to indicate a new extension.
-> +		 */
-> +		return strdup_printf("%lld /* UNKNOWN */", reg_off);
-> +	}
-> +
-> +	return kvm_isa_ext_reg_name[reg_off];
-> +}
-> +
-> +static const char *sbi_ext_single_id_to_str(__u64 reg_off)
-> +{
-> +	/* reg_off is KVM_RISCV_SBI_EXT_ID */
-> +	static const char * const kvm_sbi_ext_reg_name[] = {
-> +		"KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_V01",
-> +		"KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_TIME",
-> +		"KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_IPI",
-> +		"KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_RFENCE",
-> +		"KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_SRST",
-> +		"KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_HSM",
-> +		"KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_PMU",
-> +		"KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_EXPERIMENTAL",
-> +		"KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_VENDOR",
-> +	};
-> +
-> +	if (reg_off >= ARRAY_SIZE(kvm_sbi_ext_reg_name)) {
-> +		/*
-> +		 * sbi_ext regs would grow regularly with new sbi extension added, so
-> +		 * just show "reg" to indicate a new extension.
-> +		 */
-> +		return strdup_printf("KVM_REG_RISCV_SBI_SINGLE | %lld /* UNKNOWN */", reg_off);
-> +	}
-> +
-> +	return kvm_sbi_ext_reg_name[reg_off];
-> +}
-> +
-> +static const char *sbi_ext_multi_id_to_str(__u64 reg_subtype, __u64 reg_off)
-> +{
-> +	if (reg_off > KVM_REG_RISCV_SBI_MULTI_REG_LAST) {
-> +		/*
-> +		 * sbi_ext regs would grow regularly with new sbi extension added, so
-> +		 * just show "reg" to indicate a new extension.
-> +		 */
-> +		return strdup_printf("%lld /* UNKNOWN */", reg_off);
-> +	}
-> +
-> +	switch (reg_subtype) {
-> +	case KVM_REG_RISCV_SBI_MULTI_EN:
-> +		return strdup_printf("KVM_REG_RISCV_SBI_MULTI_EN | %lld", reg_off);
-> +	case KVM_REG_RISCV_SBI_MULTI_DIS:
-> +		return strdup_printf("KVM_REG_RISCV_SBI_MULTI_DIS | %lld", reg_off);
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +static const char *sbi_ext_id_to_str(const char *prefix, __u64 id)
-> +{
-> +	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_SBI_EXT);
-> +	__u64 reg_subtype = reg_off & KVM_REG_RISCV_SUBTYPE_MASK;
-> +
-> +	reg_off &= ~KVM_REG_RISCV_SUBTYPE_MASK;
-> +
-> +	switch (reg_subtype) {
-> +	case KVM_REG_RISCV_SBI_SINGLE:
-> +		return sbi_ext_single_id_to_str(reg_off);
-> +	case KVM_REG_RISCV_SBI_MULTI_EN:
-> +	case KVM_REG_RISCV_SBI_MULTI_DIS:
-> +		return sbi_ext_multi_id_to_str(reg_subtype, reg_off);
-> +	}
-> +
-> +	TEST_FAIL("%s: Unknown sbi ext subtype: 0x%llx", prefix, reg_subtype);
-> +	return NULL;
-> +}
-> +
-> +void print_reg(const char *prefix, __u64 id)
-> +{
-> +	const char *reg_size = NULL;
-> +
-> +	TEST_ASSERT((id & KVM_REG_ARCH_MASK) == KVM_REG_RISCV,
-> +		    "%s: KVM_REG_RISCV missing in reg id: 0x%llx", prefix, id);
-> +
-> +	switch (id & KVM_REG_SIZE_MASK) {
-> +	case KVM_REG_SIZE_U32:
-> +		reg_size = "KVM_REG_SIZE_U32";
-> +		break;
-> +	case KVM_REG_SIZE_U64:
-> +		reg_size = "KVM_REG_SIZE_U64";
-> +		break;
-> +	case KVM_REG_SIZE_U128:
-> +		reg_size = "KVM_REG_SIZE_U128";
-> +		break;
-> +	default:
-> +		TEST_FAIL("%s: Unexpected reg size: 0x%llx in reg id: 0x%llx",
-> +			  prefix, (id & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT, id);
-> +	}
-> +
-> +	switch (id & KVM_REG_RISCV_TYPE_MASK) {
-> +	case KVM_REG_RISCV_CONFIG:
-> +		printf("\tKVM_REG_RISCV | %s | KVM_REG_RISCV_CONFIG | %s,\n",
+Changelog v3..v4
+Address Alex Williamson feedback:
+- Instead of introducing new ioctl used for eventfd registration, take
+  advantage of VFIO_DEVICE_SET_IRQS which already supports virtual IRQs
+  for things like error notification and device release requests.
+- Introduced mechanism preventing creation of large queues.
+Other:
+- Move the implementation into the newly introduced VFIO_ACPI_NOTIFY
+  helper module. It is actually not bound to VFIO_PCI but VFIO_PCI
+  enables it whenever ACPI support is enabled. This change is introduced
+  since ACPI notifications are not limited to PCI devices, making it PCI
+  independent will allow to re-use it also for other VFIO_* like
+  supports: e.g. VFIO_PLATFORM in the future if needed. Moving it out of
+  drivers/vfio/pci/ was also suggested offline.
+- s/notify_val_next/node
+- v3: https://patchwork.kernel.org/project/kvm/patch/20230502132700.654528-1-jaszczyk@google.com/
 
-All the work to try and use KVM_REG_SIZE_ULONG in the right places will be
-lost if we print a reg list and then copy+paste it as a blessed list. On
-64-bit, the only thing supported now, we'll get U64, but if we ever
-supported 32-bit, then we'd get U32. This is unfortunate, but there's
-nothing we can do about it. Either we can't have a true print+copy+paste
-workflow or we should assume we'll only support 64-bit and only use U64
-in the blessed lists (from a copy+paste). But, we've already got ULONG
-in there now, so we can just leave it and burn this bridge later.
+Changelog v2..v3:
+- Fix compilation warnings when building with "W=1"
 
-> +				reg_size, config_id_to_str(id));
-> +		break;
-> +	case KVM_REG_RISCV_CORE:
-> +		printf("\tKVM_REG_RISCV | %s | KVM_REG_RISCV_CORE | %s,\n",
-> +				reg_size, core_id_to_str(prefix, id));
-> +		break;
-> +	case KVM_REG_RISCV_CSR:
-> +		printf("\tKVM_REG_RISCV | %s | KVM_REG_RISCV_CSR | %s,\n",
-> +				reg_size, csr_id_to_str(prefix, id));
-> +		break;
-> +	case KVM_REG_RISCV_TIMER:
-> +		printf("\tKVM_REG_RISCV | %s | KVM_REG_RISCV_TIMER | %s,\n",
-> +				reg_size, timer_id_to_str(prefix, id));
-> +		break;
-> +	case KVM_REG_RISCV_FP_F:
-> +		printf("\tKVM_REG_RISCV | %s | KVM_REG_RISCV_FP_F | %s,\n",
-> +				reg_size, fp_f_id_to_str(prefix, id));
-> +		break;
-> +	case KVM_REG_RISCV_FP_D:
-> +		printf("\tKVM_REG_RISCV | %s | KVM_REG_RISCV_FP_D | %s,\n",
-> +				reg_size, fp_d_id_to_str(prefix, id));
-> +		break;
-> +	case KVM_REG_RISCV_ISA_EXT:
-> +		printf("\tKVM_REG_RISCV | %s | KVM_REG_RISCV_ISA_EXT | %s,\n",
-> +				reg_size, isa_ext_id_to_str(id));
-> +		break;
-> +	case KVM_REG_RISCV_SBI_EXT:
-> +		printf("\tKVM_REG_RISCV | %s | KVM_REG_RISCV_SBI_EXT | %s,\n",
-> +				reg_size, sbi_ext_id_to_str(prefix, id));
-> +		break;
-> +	default:
-> +		TEST_FAIL("%s: Unexpected reg type: 0x%llx in reg id: 0x%llx", prefix,
-> +				(id & KVM_REG_RISCV_TYPE_MASK) >> KVM_REG_RISCV_TYPE_SHIFT, id);
-> +	}
-> +}
-> +
-> +/*
-> + * The current blessed list was primed with the output of kernel version
-> + * v6.4-rc5 and then later updated with new registers.
-> + */
-> +static __u64 base_regs[] = {
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CONFIG | KVM_REG_RISCV_CONFIG_REG(isa),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CONFIG | KVM_REG_RISCV_CONFIG_REG(mvendorid),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CONFIG | KVM_REG_RISCV_CONFIG_REG(marchid),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CONFIG | KVM_REG_RISCV_CONFIG_REG(mimpid),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.pc),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.ra),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.sp),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.gp),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.tp),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.t0),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.t1),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.t2),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s0),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s1),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.a0),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.a1),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.a2),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.a3),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.a4),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.a5),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.a6),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.a7),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s2),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s3),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s4),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s5),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s6),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s7),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s8),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s9),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s10),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.s11),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.t3),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.t4),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.t5),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(regs.t6),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CORE | KVM_REG_RISCV_CORE_REG(mode),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_GENERAL | KVM_REG_RISCV_CSR_REG(sstatus),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_GENERAL | KVM_REG_RISCV_CSR_REG(sie),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_GENERAL | KVM_REG_RISCV_CSR_REG(stvec),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_GENERAL | KVM_REG_RISCV_CSR_REG(sscratch),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_GENERAL | KVM_REG_RISCV_CSR_REG(sepc),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_GENERAL | KVM_REG_RISCV_CSR_REG(scause),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_GENERAL | KVM_REG_RISCV_CSR_REG(stval),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_GENERAL | KVM_REG_RISCV_CSR_REG(sip),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_GENERAL | KVM_REG_RISCV_CSR_REG(satp),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_GENERAL | KVM_REG_RISCV_CSR_REG(scounteren),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_RISCV_TIMER_REG(frequency),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_RISCV_TIMER_REG(time),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_RISCV_TIMER_REG(compare),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_RISCV_TIMER_REG(state),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_A,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_C,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_D,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_F,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_I,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_M,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_V01,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_TIME,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_IPI,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_RFENCE,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_SRST,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_HSM,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_PMU,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_EXPERIMENTAL,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_VENDOR,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_MULTI_EN | 0,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_MULTI_DIS | 0,
-> +};
-> +
-> +/*
-> + * The rejects_set list registers that should skip set test.
-> + *  - KVM_REG_RISCV_TIMER_REG(state): set would fail if it was not initialized properly.
-> + *  - KVM_REG_RISCV_TIMER_REG(frequency): set not supported
-> + *  - KVM_REG_RISCV_CONFIG_REG(zicbom_block_size): set not supported
-> + *  - KVM_REG_RISCV_CONFIG_REG(zicboz_block_size): set not supported
-> + *  - KVM_RISCV_ISA_EXT_SVPBMT: set not supported
-> + *  - KVM_RISCV_ISA_EXT_SVINVA: set not supported
-> + *  - KVM_RISCV_ISA_EXT_SSAIA: set not supported
-> + */
-> +static __u64 base_rejects_set[] = {
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CONFIG | KVM_REG_RISCV_CONFIG_REG(zicbom_block_size),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CONFIG | KVM_REG_RISCV_CONFIG_REG(zicboz_block_size),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_RISCV_TIMER_REG(frequency),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_REG_RISCV_TIMER_REG(state),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVPBMT,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVINVAL,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SSAIA,
+Changelog v1..v2:
+- The v2 implementation is actually completely different then v1:
+  instead of using acpi netlink events for propagating ACPI
+  notifications to the user space take advantage of eventfd, which can
+  provide better VMM and device isolation: it allows to use a dedicated
+  channel associated with the device for such events, such that the VMM
+  has direct access.
+- Using eventfd counter as notification value placeholder was suggested
+  in v1 and requires additional serialization logic introduced in v2.
+- Since the vfio-pci supports non-ACPI platforms address !CONFIG_ACPI
+  case.
+- v1 discussion: https://patchwork.kernel.org/project/kvm/patch/20230307220553.631069-1-jaz@semihalf.com/
+---
+ drivers/vfio/Kconfig              |   5 +
+ drivers/vfio/Makefile             |   1 +
+ drivers/vfio/acpi_notify.c        | 249 ++++++++++++++++++++++++++++++
+ drivers/vfio/pci/Kconfig          |   1 +
+ drivers/vfio/pci/vfio_pci_core.c  |  13 ++
+ drivers/vfio/pci/vfio_pci_intrs.c |  85 ++++++++++
+ include/linux/vfio_acpi_notify.h  |  45 ++++++
+ include/linux/vfio_pci_core.h     |   1 +
+ include/uapi/linux/vfio.h         |   1 +
+ 9 files changed, 401 insertions(+)
+ create mode 100644 drivers/vfio/acpi_notify.c
+ create mode 100644 include/linux/vfio_acpi_notify.h
 
-These aren't all base registers. I think we should divide the reject lists
-up too, especially considering the idea I wrote in the last patch, which
-is to test setting the rejects to ensure the expected error is returned.
-The error may be different for a rejected set of a supported register vs.
-that of an unsupported register.
+diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+index 89e06c981e43..cd9df43a4eb4 100644
+--- a/drivers/vfio/Kconfig
++++ b/drivers/vfio/Kconfig
+@@ -12,6 +12,11 @@ menuconfig VFIO
+ 	  If you don't know what to do here, say N.
+ 
+ if VFIO
++config VFIO_ACPI_NOTIFY
++	bool
++	depends on ACPI
++	default n
++
+ config VFIO_CONTAINER
+ 	bool "Support for the VFIO container /dev/vfio/vfio"
+ 	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
+diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+index 70e7dcb302ef..003c2b041785 100644
+--- a/drivers/vfio/Makefile
++++ b/drivers/vfio/Makefile
+@@ -7,6 +7,7 @@ vfio-y += vfio_main.o \
+ vfio-$(CONFIG_IOMMUFD) += iommufd.o
+ vfio-$(CONFIG_VFIO_CONTAINER) += container.o
+ vfio-$(CONFIG_VFIO_VIRQFD) += virqfd.o
++vfio-$(CONFIG_VFIO_ACPI_NOTIFY) += acpi_notify.o
+ 
+ obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+ obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+diff --git a/drivers/vfio/acpi_notify.c b/drivers/vfio/acpi_notify.c
+new file mode 100644
+index 000000000000..8d3f063502fe
+--- /dev/null
++++ b/drivers/vfio/acpi_notify.c
+@@ -0,0 +1,249 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * VFIO ACPI notification propagation
++ *
++ * Author: Grzegorz Jaszczyk <jaz@semihalf.com>
++ */
++#include <linux/vfio_acpi_notify.h>
++
++#define NOTIFICATION_QUEUE_SIZE 20
++
++struct notification_queue {
++	int notification_val;
++	struct list_head node;
++};
++
++static int vfio_eventfd_wakeup(wait_queue_entry_t *wait, unsigned int mode,
++				   int sync, void *key)
++{
++	struct vfio_acpi_notification *acpi_notify =
++		container_of(wait, struct vfio_acpi_notification, wait);
++	__poll_t flags = key_to_poll(key);
++
++	/*
++	 * eventfd_read signalize EPOLLOUT at the end of its function - this
++	 * means previous eventfd with its notification value was consumed so
++	 * the next notification can be signalized now if pending - schedule
++	 * proper work.
++	 */
++	if (flags & EPOLLOUT) {
++		mutex_unlock(&acpi_notify->notification_lock);
++		schedule_work(&acpi_notify->acpi_notification_work);
++	}
++
++	return 0;
++}
++
++static void vfio_ptable_queue_proc(struct file *file,
++				       wait_queue_head_t *wqh, poll_table *pt)
++{
++	struct vfio_acpi_notification *acpi_notify =
++		container_of(pt, struct vfio_acpi_notification, pt);
++
++	add_wait_queue(wqh, &acpi_notify->wait);
++}
++
++static struct notification_queue *
++acpi_notification_dequeue(struct vfio_acpi_notification *acpi_notify)
++{
++	struct notification_queue *oldest_entry;
++
++	oldest_entry = list_first_entry(&acpi_notify->notification_list,
++					struct notification_queue,
++					node);
++	list_del(&oldest_entry->node);
++	acpi_notify->notification_queue_count--;
++
++	return oldest_entry;
++}
++
++static void acpi_notification_work_fn(struct work_struct *work)
++{
++	struct vfio_acpi_notification *acpi_notify;
++	struct notification_queue *entry;
++
++	acpi_notify = container_of(work, struct vfio_acpi_notification,
++				   acpi_notification_work);
++
++	mutex_lock(&acpi_notify->notification_list_lock);
++	if (list_empty(&acpi_notify->notification_list))
++		goto out;
++
++	/*
++	 * If the previous eventfd was not yet consumed by user-space lets hold
++	 * on and exit. The notification function will be rescheduled when
++	 * signaling eventfd will be possible (when the EPOLLOUT will be
++	 * signalized and unlocks notify_events).
++	 */
++	if (!mutex_trylock(&acpi_notify->notification_lock))
++		goto out;
++
++	entry = acpi_notification_dequeue(acpi_notify);
++
++	mutex_unlock(&acpi_notify->notification_list_lock);
++
++	eventfd_signal(acpi_notify->acpi_notify_trigger, entry->notification_val);
++
++	kfree(entry);
++
++	return;
++out:
++	mutex_unlock(&acpi_notify->notification_list_lock);
++}
++
++static void
++vfio_acpi_notify_cleanup(struct vfio_acpi_notification **acpi_notify_ptr,
++			 struct acpi_device *adev)
++{
++	struct vfio_acpi_notification *acpi_notify = *acpi_notify_ptr;
++	struct notification_queue *entry, *entry_tmp;
++	u64 cnt;
++
++	eventfd_ctx_remove_wait_queue(acpi_notify->acpi_notify_trigger,
++				      &acpi_notify->wait, &cnt);
++
++	flush_work(&acpi_notify->acpi_notification_work);
++
++	mutex_lock(&acpi_notify->notification_list_lock);
++	list_for_each_entry_safe(entry, entry_tmp,
++				 &acpi_notify->notification_list,
++				 node) {
++		list_del(&entry->node);
++		kfree(entry);
++	}
++	mutex_unlock(&acpi_notify->notification_list_lock);
++
++	eventfd_ctx_put(acpi_notify->acpi_notify_trigger);
++
++	kfree(acpi_notify);
++
++	*acpi_notify_ptr = NULL;
++}
++
++void vfio_acpi_notify(acpi_handle handle, u32 event, void *data)
++{
++	struct vfio_acpi_notification *acpi_notify = (struct vfio_acpi_notification *)data;
++	struct notification_queue *entry;
++
++	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry)
++		return;
++
++	entry->notification_val = event;
++	INIT_LIST_HEAD(&entry->node);
++
++	mutex_lock(&acpi_notify->notification_list_lock);
++	if (acpi_notify->notification_queue_count > NOTIFICATION_QUEUE_SIZE) {
++		struct notification_queue *oldest_entry =
++			acpi_notification_dequeue(acpi_notify);
++
++		if (printk_ratelimit())
++			acpi_handle_warn(handle,
++					 "dropping notification value %d\n",
++					 oldest_entry->notification_val);
++
++		kfree(oldest_entry);
++	}
++	list_add_tail(&entry->node, &acpi_notify->notification_list);
++	acpi_notify->notification_queue_count++;
++	mutex_unlock(&acpi_notify->notification_list_lock);
++
++	schedule_work(&acpi_notify->acpi_notification_work);
++}
++EXPORT_SYMBOL_GPL(vfio_acpi_notify);
++
++void vfio_remove_acpi_notify(struct vfio_acpi_notification **acpi_notify_ptr,
++			     struct acpi_device *adev)
++{
++	struct vfio_acpi_notification *acpi_notify = *acpi_notify_ptr;
++
++	if (!acpi_notify)
++		return;
++
++	acpi_remove_notify_handler(adev->handle, ACPI_DEVICE_NOTIFY,
++				   vfio_acpi_notify);
++
++	vfio_acpi_notify_cleanup(acpi_notify_ptr, adev);
++}
++EXPORT_SYMBOL_GPL(vfio_remove_acpi_notify);
++
++int vfio_register_acpi_notify_handler(struct vfio_acpi_notification **acpi_notify_ptr,
++					  struct acpi_device *adev, int32_t fd)
++{
++	struct vfio_acpi_notification *acpi_notify = *acpi_notify_ptr;
++	struct file *acpi_notify_trigger_file;
++	struct eventfd_ctx *efdctx;
++	acpi_status status;
++
++	if (fd < -1)
++		return -EINVAL;
++	else if (fd == -1) {
++		vfio_remove_acpi_notify(acpi_notify_ptr, adev);
++		return 0;
++	}
++
++	efdctx = eventfd_ctx_fdget(fd);
++	if (IS_ERR(efdctx))
++		return PTR_ERR(efdctx);
++
++	/* Allow eventfd to be swapped */
++	if (acpi_notify) {
++		u64 cnt;
++
++		acpi_notify_trigger_file = eventfd_fget(fd);
++
++		mutex_lock(&acpi_notify->notification_lock);
++		eventfd_ctx_remove_wait_queue(acpi_notify->acpi_notify_trigger,
++					      &acpi_notify->wait, &cnt);
++		eventfd_ctx_put(acpi_notify->acpi_notify_trigger);
++		acpi_notify->acpi_notify_trigger = efdctx;
++		vfs_poll(acpi_notify_trigger_file, &acpi_notify->pt);
++		mutex_unlock(&acpi_notify->notification_lock);
++
++		/*
++		 * The ACPI notifications could arrive and be queued during
++		 * eventfd swap, retrigger the worker after notification
++		 * replication unlocking.
++		 */
++		schedule_work(&acpi_notify->acpi_notification_work);
++
++		return 0;
++	}
++
++	acpi_notify = kzalloc(sizeof(*acpi_notify), GFP_KERNEL_ACCOUNT);
++	if (!acpi_notify)
++		return -ENOMEM;
++
++	*acpi_notify_ptr = acpi_notify;
++
++	INIT_WORK(&acpi_notify->acpi_notification_work, acpi_notification_work_fn);
++	INIT_LIST_HEAD(&acpi_notify->notification_list);
++
++	acpi_notify->acpi_notify_trigger = efdctx;
++
++	mutex_init(&acpi_notify->notification_lock);
++
++	/*
++	 * Install custom wake-up handler to be notified whenever underlying
++	 * eventfd is consumed by the user-space.
++	 */
++	init_waitqueue_func_entry(&acpi_notify->wait, vfio_eventfd_wakeup);
++	init_poll_funcptr(&acpi_notify->pt, vfio_ptable_queue_proc);
++
++	acpi_notify_trigger_file = eventfd_fget(fd);
++	vfs_poll(acpi_notify_trigger_file, &acpi_notify->pt);
++
++	status = acpi_install_notify_handler(adev->handle, ACPI_DEVICE_NOTIFY,
++					vfio_acpi_notify, (void *)acpi_notify);
++	if (ACPI_FAILURE(status)) {
++		dev_err(&adev->dev, "Failed to install notify handler: %s",
++			acpi_format_exception(status));
++
++		vfio_acpi_notify_cleanup(acpi_notify_ptr, adev);
++
++		return -ENODEV;
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(vfio_register_acpi_notify_handler);
+diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+index f9d0c908e738..f03ca773dfd9 100644
+--- a/drivers/vfio/pci/Kconfig
++++ b/drivers/vfio/pci/Kconfig
+@@ -4,6 +4,7 @@ config VFIO_PCI_CORE
+ 	tristate
+ 	select VFIO_VIRQFD
+ 	select IRQ_BYPASS_MANAGER
++	select VFIO_ACPI_NOTIFY if ACPI
+ 
+ config VFIO_PCI_MMAP
+ 	def_bool y if !S390
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index a5ab416cf476..1cc4a9c05403 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -27,6 +27,7 @@
+ #include <linux/vgaarb.h>
+ #include <linux/nospec.h>
+ #include <linux/sched/mm.h>
++#include <linux/vfio_acpi_notify.h>
+ #if IS_ENABLED(CONFIG_EEH)
+ #include <asm/eeh.h>
+ #endif
+@@ -683,6 +684,7 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
+ {
+ 	struct vfio_pci_core_device *vdev =
+ 		container_of(core_vdev, struct vfio_pci_core_device, vdev);
++	struct acpi_device *adev = ACPI_COMPANION(&vdev->pdev->dev);
+ 
+ 	if (vdev->sriov_pf_core_dev) {
+ 		mutex_lock(&vdev->sriov_pf_core_dev->vf_token->lock);
+@@ -704,6 +706,8 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
+ 		eventfd_ctx_put(vdev->req_trigger);
+ 		vdev->req_trigger = NULL;
+ 	}
++	if (adev)
++		vfio_remove_acpi_notify(&vdev->acpi_notification, adev);
+ 	mutex_unlock(&vdev->igate);
+ }
+ EXPORT_SYMBOL_GPL(vfio_pci_core_close_device);
+@@ -725,6 +729,8 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_finish_enable);
+ 
+ static int vfio_pci_get_irq_count(struct vfio_pci_core_device *vdev, int irq_type)
+ {
++	struct acpi_device *adev = ACPI_COMPANION(&vdev->pdev->dev);
++
+ 	if (irq_type == VFIO_PCI_INTX_IRQ_INDEX) {
+ 		u8 pin;
+ 
+@@ -761,6 +767,8 @@ static int vfio_pci_get_irq_count(struct vfio_pci_core_device *vdev, int irq_typ
+ 			return 1;
+ 	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX) {
+ 		return 1;
++	} else if (adev && irq_type == VFIO_PCI_ACPI_IRQ_INDEX) {
++		return 1;
+ 	}
+ 
+ 	return 0;
+@@ -1084,6 +1092,7 @@ static int vfio_pci_ioctl_get_irq_info(struct vfio_pci_core_device *vdev,
+ 				       struct vfio_irq_info __user *arg)
+ {
+ 	unsigned long minsz = offsetofend(struct vfio_irq_info, count);
++	struct acpi_device *adev = ACPI_COMPANION(&vdev->pdev->dev);
+ 	struct vfio_irq_info info;
+ 
+ 	if (copy_from_user(&info, arg, minsz))
+@@ -1096,6 +1105,10 @@ static int vfio_pci_ioctl_get_irq_info(struct vfio_pci_core_device *vdev,
+ 	case VFIO_PCI_INTX_IRQ_INDEX ... VFIO_PCI_MSIX_IRQ_INDEX:
+ 	case VFIO_PCI_REQ_IRQ_INDEX:
+ 		break;
++	case VFIO_PCI_ACPI_IRQ_INDEX:
++		if (adev)
++			break;
++		return -EINVAL;
+ 	case VFIO_PCI_ERR_IRQ_INDEX:
+ 		if (pci_is_pcie(vdev->pdev))
+ 			break;
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index bffb0741518b..410f517f8b2c 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -19,6 +19,7 @@
+ #include <linux/vfio.h>
+ #include <linux/wait.h>
+ #include <linux/slab.h>
++#include <linux/vfio_acpi_notify.h>
+ 
+ #include "vfio_pci_priv.h"
+ 
+@@ -667,6 +668,76 @@ static int vfio_pci_set_req_trigger(struct vfio_pci_core_device *vdev,
+ 					       count, flags, data);
+ }
+ 
++static int
++vfio_pci_set_acpi_ntfy_trigger(struct vfio_pci_core_device *vdev,
++			       unsigned int index, unsigned int start,
++			       unsigned int count, uint32_t flags, void *data)
++{
++	struct acpi_device *adev = ACPI_COMPANION(&vdev->pdev->dev);
++	acpi_handle handle;
++
++	if (index != VFIO_PCI_ACPI_IRQ_INDEX || start != 0 || count > 1)
++		return -EINVAL;
++
++	if (!adev)
++		return -ENODEV;
++
++	if (!vdev->acpi_notification)
++		return -EINVAL;
++
++#if IS_ENABLED(CONFIG_ACPI)
++	handle = adev->handle;
++#endif
++
++	/*
++	 * Disable notifications: flags = (DATA_NONE|ACTION_TRIGGER), count = 0
++	 * Enable loopback testing: (DATA_BOOL|ACTION_TRIGGER) or
++	 *			    (DATA_NONE|ACTION_TRIGGER), count != 0
++	 */
++	if (flags & VFIO_IRQ_SET_DATA_NONE) {
++		if (count)
++			vfio_acpi_notify(handle, ACPI_NOTIFY_DEVICE_CHECK,
++					 vdev->acpi_notification);
++		else
++			vfio_remove_acpi_notify(&vdev->acpi_notification, adev);
++
++		return 0;
++	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
++		uint8_t trigger;
++
++		if (!count)
++			return -EINVAL;
++
++		trigger = *(uint8_t *)data;
++		if (trigger)
++			vfio_acpi_notify(handle, ACPI_NOTIFY_DEVICE_CHECK,
++					 vdev->acpi_notification);
++
++		return 0;
++	}
++
++	return -EINVAL;
++}
++
++static int
++vfio_pci_set_acpi_ntfy_eventfd_trigger(struct vfio_pci_core_device *vdev,
++				       unsigned int index, unsigned int start,
++				       unsigned int count, uint32_t flags, void *data)
++{
++	struct acpi_device *adev = ACPI_COMPANION(&vdev->pdev->dev);
++	int32_t fd;
++
++	if (index != VFIO_PCI_ACPI_IRQ_INDEX || start != 0 || count != 1)
++		return -EINVAL;
++
++	if (!adev)
++		return -ENODEV;
++
++	fd = *(int32_t *)data;
++
++	return vfio_register_acpi_notify_handler(&vdev->acpi_notification, adev, fd);
++}
++
+ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
+ 			    unsigned index, unsigned start, unsigned count,
+ 			    void *data)
+@@ -716,6 +787,20 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
+ 			break;
+ 		}
+ 		break;
++	case VFIO_PCI_ACPI_IRQ_INDEX:
++		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
++		case VFIO_IRQ_SET_ACTION_TRIGGER:
++			switch (flags & VFIO_IRQ_SET_DATA_TYPE_MASK) {
++			case VFIO_IRQ_SET_DATA_BOOL:
++			case VFIO_IRQ_SET_DATA_NONE:
++				func = vfio_pci_set_acpi_ntfy_trigger;
++				break;
++			case VFIO_IRQ_SET_DATA_EVENTFD:
++				func = vfio_pci_set_acpi_ntfy_eventfd_trigger;
++				break;
++			}
++		}
++		break;
+ 	}
+ 
+ 	if (!func)
+diff --git a/include/linux/vfio_acpi_notify.h b/include/linux/vfio_acpi_notify.h
+new file mode 100644
+index 000000000000..4bf1d055a014
+--- /dev/null
++++ b/include/linux/vfio_acpi_notify.h
+@@ -0,0 +1,45 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * VFIO ACPI notification replication
++ *
++ * Author: Grzegorz Jaszczyk <jaz@semihalf.com>
++ */
++#include <linux/acpi.h>
++#include <linux/eventfd.h>
++#include <linux/poll.h>
++
++#ifndef VFIO_ACPI_NOTIFY_H
++#define VFIO_ACPI_NOTIFY_H
++
++struct vfio_acpi_notification {
++	struct eventfd_ctx	*acpi_notify_trigger;
++	struct work_struct	acpi_notification_work;
++	struct list_head	notification_list;
++	struct mutex		notification_list_lock;
++	struct mutex		notification_lock;
++	int			notification_queue_count;
++	poll_table		pt;
++	wait_queue_entry_t	wait;
++};
++
++#if IS_ENABLED(CONFIG_ACPI)
++void vfio_acpi_notify(acpi_handle handle, u32 event, void *data);
++int vfio_register_acpi_notify_handler(struct vfio_acpi_notification **acpi_notify,
++				      struct acpi_device *adev, int32_t fd);
++void vfio_remove_acpi_notify(struct vfio_acpi_notification **acpi_notify,
++			     struct acpi_device *adev);
++#else
++static inline void vfio_acpi_notify(acpi_handle handle, u32 event, void *data) {}
++static inline int
++vfio_register_acpi_notify_handler(struct vfio_acpi_notification **acpi_notify,
++				  struct acpi_device *adev, int32_t fd)
++{
++	return -ENODEV;
++}
++
++static inline void
++vfio_remove_acpi_notify(struct vfio_acpi_notification **acpi_notify,
++			struct acpi_device *adev) {}
++#endif /* CONFIG_ACPI */
++
++#endif /* VFIO_ACPI_NOTIFY_H */
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+index 367fd79226a3..a4491b3d8064 100644
+--- a/include/linux/vfio_pci_core.h
++++ b/include/linux/vfio_pci_core.h
+@@ -96,6 +96,7 @@ struct vfio_pci_core_device {
+ 	struct mutex		vma_lock;
+ 	struct list_head	vma_list;
+ 	struct rw_semaphore	memory_lock;
++	struct vfio_acpi_notification	*acpi_notification;
+ };
+ 
+ /* Will be exported for vfio pci drivers usage */
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 0552e8dcf0cb..6b20ef3d202c 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -625,6 +625,7 @@ enum {
+ 	VFIO_PCI_MSIX_IRQ_INDEX,
+ 	VFIO_PCI_ERR_IRQ_INDEX,
+ 	VFIO_PCI_REQ_IRQ_INDEX,
++	VFIO_PCI_ACPI_IRQ_INDEX,
+ 	VFIO_PCI_NUM_IRQS
+ };
+ 
+-- 
+2.41.0.162.gfafddb0af9-goog
 
-> +};
-> +
-> +static __u64 zicbom_regs[] = {
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CONFIG | KVM_REG_RISCV_CONFIG_REG(zicbom_block_size),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICBOM,
-> +};
-> +
-> +static __u64 zicboz_regs[] = {
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CONFIG | KVM_REG_RISCV_CONFIG_REG(zicboz_block_size),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICBOZ,
-> +};
-> +
-> +static __u64 aia_csr_regs[] = {
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(siselect),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(iprio1),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(iprio2),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(sieh),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(siph),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(iprio1h),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(iprio2h),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SSAIA,
-> +};
-> +
-> +static __u64 fp_f_regs[] = {
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[0]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[1]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[2]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[3]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[4]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[5]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[6]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[7]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[8]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[9]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[10]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[11]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[12]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[13]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[14]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[15]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[16]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[17]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[18]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[19]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[20]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[21]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[22]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[23]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[24]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[25]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[26]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[27]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[28]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[29]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[30]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[31]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(fcsr),
-> +};
-> +
-> +static __u64 fp_d_regs[] = {
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[0]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[1]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[2]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[3]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[4]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[5]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[6]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[7]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[8]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[9]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[10]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[11]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[12]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[13]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[14]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[15]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[16]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[17]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[18]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[19]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[20]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[21]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[22]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[23]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[24]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[25]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[26]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[27]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[28]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[29]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[30]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(f[31]),
-> +	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_D | KVM_REG_RISCV_FP_D_REG(fcsr),
-> +};
-> +
-> +#define BASE_SUBLIST \
-> +	{"base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), \
-> +		.rejects_set = base_rejects_set, .rejects_set_n = ARRAY_SIZE(base_rejects_set),}
-> +#define ZICBOM_REGS_SUBLIST \
-> +	{"zicbom", .feature = KVM_RISCV_ISA_EXT_ZICBOM, .regs = zicbom_regs, \
-> +		.regs_n = ARRAY_SIZE(zicbom_regs),}
-> +#define ZICBOZ_REGS_SUBLIST \
-> +	{"zicboz", .feature = KVM_RISCV_ISA_EXT_ZICBOZ, .regs = zicboz_regs, \
-> +		.regs_n = ARRAY_SIZE(zicboz_regs),}
-> +#define AIA_REGS_SUBLIST \
-> +	{"aia", .feature = KVM_RISCV_ISA_EXT_SSAIA, .regs = aia_csr_regs, \
-> +		.regs_n = ARRAY_SIZE(aia_csr_regs),}
-> +#define FP_F_REGS_SUBLIST \
-> +	{"fp_f", .feature = KVM_RISCV_ISA_EXT_F, .regs = fp_f_regs, \
-> +		.regs_n = ARRAY_SIZE(fp_f_regs),}
-> +#define FP_D_REGS_SUBLIST \
-> +	{"fp_d", .feature = KVM_RISCV_ISA_EXT_D, .regs = fp_d_regs, \
-> +		.regs_n = ARRAY_SIZE(fp_d_regs),}
-> +
-> +static struct vcpu_reg_list zicbo_config = {
-> +	.sublists = {
-> +	BASE_SUBLIST,
-> +	ZICBOM_REGS_SUBLIST,
-> +	ZICBOZ_REGS_SUBLIST,
-
-It's possible to have zicbom without zicboz and vice-versa. Since
-finalize_vcpu() will skip the whole test when it detects a missing
-feature for a config, then we won't be able to test one without the
-other. It's a bit annoying, but I think we may need a separate config
-for each independent extension.
-
-> +	{0},
-> +	},
-> +};
-> +
-> +static struct vcpu_reg_list aia_config = {
-> +	.sublists = {
-> +	BASE_SUBLIST,
-> +	AIA_REGS_SUBLIST,
-> +	{0},
-> +	},
-> +};
-> +
-> +static struct vcpu_reg_list fp_f_d_config = {
-> +	.sublists = {
-> +	BASE_SUBLIST,
-> +	FP_F_REGS_SUBLIST,
-> +	FP_D_REGS_SUBLIST,
-> +	{0},
-> +	},
-> +};
-> +
-> +struct vcpu_reg_list *vcpu_configs[] = {
-> +	&zicbo_config,
-> +	&aia_config,
-> +	&fp_f_d_config,
-> +};
-> +int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
-> -- 
-> 2.34.1
->
-
-I see we have a bit of a problem with the configs for riscv. Since we
-don't disable anything we're not testing, then for any test that is
-missing, for example, the f and d registers, we'll get output like
-"There are 66 new registers. Consider adding them to the blessed reg
-list with the following lines:" and then a dump of all the f and d
-registers. The test doesn't fail, but it's messy and confusing. Ideally
-we'd disable all registers of all sublists not in the config, probably
-by starting by disabling everything and then only reenabling the ones
-in the config.
-
-Anything that can't be disabled is either a KVM bug, i.e. we should
-be able to disable it, because we can't expect every host to have it,
-or it needs to be in the base register sublist (meaning every host
-will always have it).
-
-Thanks,
-drew
