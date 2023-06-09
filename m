@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13A7472A08A
-	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 18:47:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E87472A089
+	for <lists+kvm@lfdr.de>; Fri,  9 Jun 2023 18:47:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229603AbjFIQr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 12:47:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51134 "EHLO
+        id S229978AbjFIQrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 12:47:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229935AbjFIQr1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jun 2023 12:47:27 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 151033C16
-        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 09:47:12 -0700 (PDT)
+        with ESMTP id S229935AbjFIQrU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jun 2023 12:47:20 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 709D53A9B
+        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 09:47:10 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 27BEB6164C
-        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 16:47:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AED1C4339C;
-        Fri,  9 Jun 2023 16:47:11 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EE9CD65A0D
+        for <kvm@vger.kernel.org>; Fri,  9 Jun 2023 16:47:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62BA2C4339B;
+        Fri,  9 Jun 2023 16:47:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686329231;
-        bh=XkWyzW+sSMEWSg65caOPf/zhuNHxIwdjYYA7HpLQriM=;
+        s=k20201202; t=1686329229;
+        bh=pIsFPoCBZ48P727b1+I4FozFVGrWdz7nAwou3bvDdps=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Wi0yJCh1JNMzkI2EZVWEC7w6mOyvB8mtUmtueCaBbF1qwmoK2hgxNQRobsuhE2Ppn
-         rgCwB04pzTmN/Ip0Gv+K9CABH0Yb02qikj97+sPplninGfN+vGKoFMTCXhZTQdqcQx
-         chTtaTR1tnTjqYlfP0ElCpN/gc69KbKT5lkViXuzEXxg1p5VWefOggD0iggNoJAw/a
-         J20mMIfGANa7gM6pHBVbSwzuRl9dKZPknNBiHXP2HxlLJZqC3/71buDXMY5xe2aer8
-         ExDW/g342lUHONopvc9P8k06/gpVMQJPG15npLU4wqCnO6wPHwBSaWVeOtAyaK9nOD
-         cECaTrbud+SMg==
+        b=I0LlD0EVonaKSbCEb1epGg/85UFd6dLc42UIkCBu23lDCAyJq0bfdlYC/pPhT9Ulp
+         dC1blpGSnFYzLKPGYglJMGFfgLBOMpOl3hTpoGIgojXIfs+RKRVEuT9+O5RI9O9Rko
+         /Zjrw5Id0XPmdiMuoH/5pnpLEN2gk6yQgTHv+YMgB13N58b7NTi6I4khvscsfK7MFA
+         76dP8u0sqdTMDE/6R26jUpEVrd20dGUYcs9qWl40XdO6moxBjycCEluG0UI7aPmBcZ
+         p3KKOz7iex97fyM+Ax1dIGgc7OAftKmHhnvqu3pZ5Bo2bXRPc+b59Vpc8AhVZoH9yq
+         ywzO/0NkcVFIQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1q7esM-0048L7-Ov;
-        Fri, 09 Jun 2023 17:22:10 +0100
+        id 1q7esM-0048L7-VP;
+        Fri, 09 Jun 2023 17:22:11 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -46,9 +46,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
         Quentin Perret <qperret@google.com>,
         Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
-Subject: [PATCH v3 11/17] KVM: arm64: Disable TTBR1_EL2 when using ARM64_KVM_HVHE
-Date:   Fri,  9 Jun 2023 17:21:54 +0100
-Message-Id: <20230609162200.2024064-12-maz@kernel.org>
+Subject: [PATCH v3 12/17] KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is set
+Date:   Fri,  9 Jun 2023 17:21:55 +0100
+Message-Id: <20230609162200.2024064-13-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230609162200.2024064-1-maz@kernel.org>
 References: <20230609162200.2024064-1-maz@kernel.org>
@@ -58,8 +58,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -68,36 +68,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When using hVHE, we end-up with two TTBRs at EL2. That's great,
-but we're not quite ready for this just yet.
+El2 stage-1 page-table format is subtly (and annoyingly) different
+when HCR_EL2.E2H is set.
 
-Disable TTBR1_EL2 by setting TCR_EL2.EPD1 so that we only
-translate via TTBR0_EL2.
+Take the ARM64_KVM_HVHE configuration into account when setting
+the AP bits.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/pgtable.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index c12276dd2cf4..35b32cb6faa5 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1666,7 +1666,13 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 95dae02ccc2e..b5edd27c7f97 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -21,8 +21,10 @@
  
- 	params->mair_el2 = read_sysreg(mair_el1);
- 
--	tcr = (read_sysreg(tcr_el1) & TCR_EL2_MASK) | TCR_EL2_RES1;
-+	tcr = read_sysreg(tcr_el1);
-+	if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
-+		tcr |= TCR_EPD1_MASK;
-+	} else {
-+		tcr &= TCR_EL2_MASK;
-+		tcr |= TCR_EL2_RES1;
-+	}
- 	tcr &= ~TCR_T0SZ_MASK;
- 	tcr |= TCR_T0SZ(hyp_va_bits);
- 	params->tcr_el2 = tcr;
+ #define KVM_PTE_LEAF_ATTR_LO_S1_ATTRIDX	GENMASK(4, 2)
+ #define KVM_PTE_LEAF_ATTR_LO_S1_AP	GENMASK(7, 6)
+-#define KVM_PTE_LEAF_ATTR_LO_S1_AP_RO	3
+-#define KVM_PTE_LEAF_ATTR_LO_S1_AP_RW	1
++#define KVM_PTE_LEAF_ATTR_LO_S1_AP_RO		\
++	({ cpus_have_final_cap(ARM64_KVM_HVHE) ? 2 : 3; })
++#define KVM_PTE_LEAF_ATTR_LO_S1_AP_RW		\
++	({ cpus_have_final_cap(ARM64_KVM_HVHE) ? 0 : 1; })
+ #define KVM_PTE_LEAF_ATTR_LO_S1_SH	GENMASK(9, 8)
+ #define KVM_PTE_LEAF_ATTR_LO_S1_SH_IS	3
+ #define KVM_PTE_LEAF_ATTR_LO_S1_AF	BIT(10)
 -- 
 2.34.1
 
