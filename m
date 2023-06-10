@@ -2,63 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A887572A791
-	for <lists+kvm@lfdr.de>; Sat, 10 Jun 2023 03:40:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB41772A7BE
+	for <lists+kvm@lfdr.de>; Sat, 10 Jun 2023 03:46:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231618AbjFJBkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jun 2023 21:40:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37118 "EHLO
+        id S232543AbjFJBqm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jun 2023 21:46:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbjFJBkB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jun 2023 21:40:01 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 288DAE46;
-        Fri,  9 Jun 2023 18:40:00 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id 98e67ed59e1d1-256cda5c1c1so952760a91.1;
-        Fri, 09 Jun 2023 18:40:00 -0700 (PDT)
+        with ESMTP id S229522AbjFJBql (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jun 2023 21:46:41 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0163926B9;
+        Fri,  9 Jun 2023 18:46:41 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-25692ff86cdso1216278a91.2;
+        Fri, 09 Jun 2023 18:46:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686361199; x=1688953199;
+        d=gmail.com; s=20221208; t=1686361600; x=1688953600;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ilYlb2adszjrCfZbp1GJc8mPc6w5JCghOVHqrO8o/h4=;
-        b=RBjvFWTHApfdQov2X/c3QLEY084FGbar8zfS02I93bYnC158D+Ip7clwMw7Q/MO4r/
-         HP3REa9MgeEA1rl0dyldzmK7wEMCeBSC7hMSjXTG+deCgH9hGEZd6w5ppWTBpFSzOj0i
-         +KIige/Cso2qINKwNt6tx1nXK38RG192MwPzytFzwZkJHGN1zcR1GJmuD1857wf3+pjz
-         g5eeKJ52l71UFKTDrUFjjPx0HLHLMk6yJVM9Z5byjX1tjOEHNeSgGkzRN8uX3WgaKQjZ
-         sveL7H9NsYExURsrdynaeuuW5qWOnz3sjSkB158JYautOSvQz4qoNXEwHjHkzoje00rF
-         ATvQ==
+        bh=nO6vzid1K69dvPDtrTKEIUfMDvueRgprm9O2MIgWICA=;
+        b=LNV/FdI5PMCvcEXV+WiQ+PVKs5xxGkDes2/0Quu5bksLuYJi7BOzosmvDCYr9IfN2c
+         xdAbrSB3r2a2KrDL2+YcW16r6MV+OSUYbFtfSWZL3V3PqINLhXVcMsfMFvlpL5l8/If2
+         iYn+PYlKqcdMRQ36S4FNOaUyLe1rUxlv1ayysLrccRG91tHreSjZHSmVmi3vbgbnsBvQ
+         E8X1nXQsvqF0peRhameHI38vUHivkri9PcbLfZqjaYF+1rC6ulntc7ruMfPWV9EMrU+4
+         iRXbO3Ea9BxOSChhB2SLsAv2JS6erW15Ej3NmSRX8PKr9LClomq9ysZvKumnYxPl3D1c
+         V2Mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686361199; x=1688953199;
+        d=1e100.net; s=20221208; t=1686361600; x=1688953600;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ilYlb2adszjrCfZbp1GJc8mPc6w5JCghOVHqrO8o/h4=;
-        b=Y4I0WWMpvv12KX/kX0zATfZy6pKvO2ebLY3BaqpmuND6k8rQ9w8xH73IxS5F7vqRTy
-         CCCPpaz39bnxc8cCy0/S/FsydunTUVupMdZ6FqC8kgJXOLY9KLRZgjaVPrGENBK9vPhl
-         QJI5K6vOiXwCcBIhp9dEsmulkkl8XWXfEwGsWhQPzRX/W/JpEccblARMn9IHzF7XDgU3
-         AiPCWfoS4LWPe3JAaCmW70/iDAhLSxjpfABxMbyligfu2F9QzzdTdMkRuRJcv0Mg1KsX
-         oyKF5WOk7DlairVaYAe6hffom5YtfH9Hzal8FpO5BgoeqNAX0M77nt8oWqoJgNAXRWrA
-         exOg==
-X-Gm-Message-State: AC+VfDywe2z9nXNQ5F0Y+X97GCm9pHDbrjDRVBS0k0nBnaWIHub07qTw
-        grj2vEluxz7yZYaz59VeLRmZNaauz3/TREiGiG8ZgIko+y4=
-X-Google-Smtp-Source: ACHHUZ7INTCboDgVuF7P5x88qVN9qFFNzPldzh4k7rPJ9MfdaiyaByfTOjR0AmXqcxHKn97c7V0g5Ol1dqw4qFEvjLA=
-X-Received: by 2002:a17:90b:38ca:b0:24d:ff56:f8c1 with SMTP id
- nn10-20020a17090b38ca00b0024dff56f8c1mr2301690pjb.13.1686361199544; Fri, 09
- Jun 2023 18:39:59 -0700 (PDT)
+        bh=nO6vzid1K69dvPDtrTKEIUfMDvueRgprm9O2MIgWICA=;
+        b=NijUcrJiF/HHrSaOKmZHMNBb/OgI5mI5uX483omuoxQfIE+kIdrYQvuHkQjb+XqS9e
+         hbz9B/1BG3qUGqqg8JjEFePh32TpPkfOslYVtZNRbsa7R8isHqBxggGHYvjusq4Jrzik
+         S7IDvqu/e/vkq5eInV81Lg7mlldT9oonmRtzGAxJaGoeac9mjzLMutmvs0wKP68eQYN5
+         iYTbi/faYgE1H6+qdPQnLjiQrOoM2KSaIaYeMJuO9E6QEMTKBY5tKh0MHFnZzZ0SepoJ
+         3XX+7XkdtynxnhF6cCS6txFPL5xUX88ht7ZVSjDDQGku59OiZB5HQDo3ygD9a+786ibg
+         tTHQ==
+X-Gm-Message-State: AC+VfDxFCsVn+F67tHUzoWByNrKxJp3UkR9oZU/jTryfAdyiDniaYHjc
+        QF1QpCRFunta7/UmYdhEDYszNMx2eCh4MFX4yXk=
+X-Google-Smtp-Source: ACHHUZ48tqUVwDz9/d14iBGqnipYCI/liB2uXObdEuicH3caZ5C/h2oTO6YKZ4sD24Q33UWiGN9OCQLFD9t5U7l/W6g=
+X-Received: by 2002:a17:90b:ed8:b0:250:2311:1535 with SMTP id
+ gz24-20020a17090b0ed800b0025023111535mr2814927pjb.24.1686361600430; Fri, 09
+ Jun 2023 18:46:40 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230605064848.12319-1-jpn@linux.vnet.ibm.com>
- <20230605064848.12319-7-jpn@linux.vnet.ibm.com> <ZIAXpMpjb3V852rB@li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com>
-In-Reply-To: <ZIAXpMpjb3V852rB@li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com>
+References: <20230605064848.12319-1-jpn@linux.vnet.ibm.com> <CT6641NE8LNV.20P6CCOLXZEP@wheely>
+In-Reply-To: <CT6641NE8LNV.20P6CCOLXZEP@wheely>
 From:   Jordan Niethe <jniethe5@gmail.com>
-Date:   Sat, 10 Jun 2023 11:39:47 +1000
-Message-ID: <CACzsE9qbRC1JoDFRozspGjxR=nLgJCSE6ygNz-sDfFSDoAjqzw@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 6/6] docs: powerpc: Document nested KVM on POWER
-To:     Gautam Menghani <gautam@linux.ibm.com>
-Cc:     Jordan Niethe <jpn@linux.vnet.ibm.com>, mikey@neuling.org,
+Date:   Sat, 10 Jun 2023 11:46:28 +1000
+Message-ID: <CACzsE9rTBTVtdTwSom-mL5ZV0PU86V8epnGvsxdcbJcGeXj5+A@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 0/6] KVM: PPC: Nested PAPR guests
+To:     Nicholas Piggin <npiggin@gmail.com>
+Cc:     Jordan Niethe <jpn@linux.vnet.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org, mikey@neuling.org,
         kautuk.consul.1980@gmail.com, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, npiggin@gmail.com, sbhat@linux.ibm.com,
-        vaibhav@linux.ibm.com, linuxppc-dev@lists.ozlabs.org
+        kvm-ppc@vger.kernel.org, sbhat@linux.ibm.com, vaibhav@linux.ibm.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -71,53 +70,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 7, 2023 at 3:38=E2=80=AFPM Gautam Menghani <gautam@linux.ibm.co=
-m> wrote:
+On Wed, Jun 7, 2023 at 3:54=E2=80=AFPM Nicholas Piggin <npiggin@gmail.com> =
+wrote:
 >
-> On Mon, Jun 05, 2023 at 04:48:48PM +1000, Jordan Niethe wrote:
-> > From: Michael Neuling <mikey@neuling.org>
+> On Mon Jun 5, 2023 at 4:48 PM AEST, Jordan Niethe wrote:
+> > There is existing support for nested guests on powernv hosts however th=
+e
+> > hcall interface this uses is not support by other PAPR hosts.
 >
-> Hi,
-> There are some minor typos in the documentation pointed out below
+> I kind of liked it being called nested-HV v1 and v2 APIs as short and
+> to the point, but I suppose that's ambiguous with version 2 of the v1
+> API, so papr is okay. What's the old API called in this scheme, then?
+> "Existing API" is not great after patches go upstream.
 
-Thank you, will correct in the next revision.
+Yes I was trying for a more descriptive name but it is just more
+confusing and I'm struggling for a better alternative.
 
+In the next revision I'll use v1 and v2. For version 2 of v1
+we now call it v1.2 or something like that?
+
+>
+> And, you've probably explained it pretty well but slightly more of
+> a background first up could be helpful. E.g.,
+>
+>   A nested-HV API for PAPR has been developed based on the KVM-specific
+>   nested-HV API that is upstream in Linux/KVM and QEMU. The PAPR API
+>   had to break compatibility to accommodate implementation in other
+>   hypervisors and partitioning firmware.
+>
+> And key overall differences
+>
+>   The control flow and interrupt processing between L0, L1, and L2
+>   in the new PAPR API are conceptually unchanged. Where the old API
+>   is almost stateless, the PAPR API is stateful, with the L1 registering
+>   L2 virtual machines and vCPUs with the L0. Supervisor-privileged
+>   register switching duty is now the responsibility for the L0, which
+>   holds canonical L2 register state and handles all switching. This
+>   new register handling motivates the "getters and setters" wrappers
+>   ...
+
+I'll include something along those lines.
+
+Thanks,
 Jordan
+
 >
->
-> > +H_GUEST_GET_STATE()
-> > +-------------------
-> > +
-> > +This is called to get state associated with an L2 (Guest-wide or vCPU =
-specific).
-> > +This info is passed via the Guest State Buffer (GSB), a standard forma=
-t as
-> > +explained later in this doc, necessary details below:
-> > +
-> > +This can set either L2 wide or vcpu specific information. Examples of
->
-> We are getting the info about vcpu here : s/set/get
->
-> > +H_GUEST_RUN_VCPU()
-> > +------------------
-> > +
-> > +This is called to run an L2 vCPU. The L2 and vCPU IDs are passed in as
-> > +parameters. The vCPU run with the state set previously using
->
-> Minor nit : s/run/runs
->
-> > +H_GUEST_SET_STATE(). When the L2 exits, the L1 will resume from this
-> > +hcall.
-> > +
-> > +This hcall also has associated input and output GSBs. Unlike
-> > +H_GUEST_{S,G}ET_STATE(), these GSB pointers are not passed in as
-> > +parameters to the hcall (This was done in the interest of
-> > +performance). The locations of these GSBs must be preregistered using
-> > +the H_GUEST_SET_STATE() call with ID 0x0c00 and 0x0c01 (see table
-> > +below).
-> > +
-> >
-> > --
-> > 2.31.1
-> >
+> Thanks,
+> Nick
 >
