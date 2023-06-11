@@ -2,55 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14EED72B050
-	for <lists+kvm@lfdr.de>; Sun, 11 Jun 2023 07:06:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F48F72B0A6
+	for <lists+kvm@lfdr.de>; Sun, 11 Jun 2023 09:47:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232736AbjFKFDh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 11 Jun 2023 01:03:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45694 "EHLO
+        id S233161AbjFKHrb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 11 Jun 2023 03:47:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229552AbjFKFDf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 11 Jun 2023 01:03:35 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09ED12720
-        for <kvm@vger.kernel.org>; Sat, 10 Jun 2023 22:03:35 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1b3b9413baaso28405ad.1
-        for <kvm@vger.kernel.org>; Sat, 10 Jun 2023 22:03:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686459814; x=1689051814;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qi24DtFAZsmrHNEajEMdxjivstNNvDufpgTl6tgbS4Q=;
-        b=vDdGiQM9kknKiSTNdri3wDlj3hkc5o2RYQEvLzGZN/lzVybEkCVqMcaTiQIPXoUCPv
-         BdnPZWCOXtY1RYRiY4pKHIF75foWlXuELw6wZDQMK0qgFJTWHDQO/NepoMI9MeUW7AhP
-         H5/14D1DQfmyF3kLUdh3plDwF5y4RjjUF82ptcZtIjNMyHGsjeJEPlz+XlHYCllAyPLq
-         173Ym0P+uC8jJHa96C24lzTEf7bYMvmX8j9PIDkltIF027u7XETReqia4Z2+HPpH6RXb
-         knPUm1pnVo4K6C35XJW7d9cWqmxouSTr4vZ3ZhUVKuA96o68ueM6Lcpx4FGSJwpy8+5N
-         2VRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686459814; x=1689051814;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qi24DtFAZsmrHNEajEMdxjivstNNvDufpgTl6tgbS4Q=;
-        b=IT2haEgujp9EqT3NlR9xKqv0oDGxjGmHzueZqpRnmFOdmo1Mv+9ns0rlXC2QXGqjr8
-         5fb/eQgvCwBKC1ZLCzBZ16uCyL8hnqIW3WEqhP9AwHEZrr38UUkzOHd7FuY82FlnbXhW
-         TW/WIhUs5oFqjR0QEp1sixSS9Pfi6pgXeyRyj4Bx8c+krBI9Onxa5RqOrsTNzk2AE+au
-         4QnCPH/xsHWOfzwH+BaXwWR+qmhHVz4UHH6ZpMD6Y6UaCCgyn0vkiggMW8pYJfIveLBi
-         IZ6RVGeXu/AaMXWjUWJpmfRtqJqgyOG7iHlOBrnw9sZHxLg/iw9r4veQMsxW21uSjiaE
-         BWug==
-X-Gm-Message-State: AC+VfDyhKQkRN0eil3qsq0dX7qv9hzYjrJzQcJSkyNDdBFx1CCvwRpIx
-        JcYZQdvrAkgvIKjhzZi8LRZALg==
-X-Google-Smtp-Source: ACHHUZ7m5wKCwbG46Igxsl4l4bkC+p8WBdNwdgSwmJpMXakjdWkTqdovzDL6QSXuqmxFwa4srv1CGw==
-X-Received: by 2002:a17:902:e74e:b0:1b0:2670:7d49 with SMTP id p14-20020a170902e74e00b001b026707d49mr120852plf.16.1686459814091;
-        Sat, 10 Jun 2023 22:03:34 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id u1-20020aa78381000000b0064f7c56d8b7sm4764643pfm.219.2023.06.10.22.03.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Jun 2023 22:03:33 -0700 (PDT)
-Date:   Sat, 10 Jun 2023 22:03:28 -0700
-From:   Reiji Watanabe <reijiw@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
+        with ESMTP id S229562AbjFKHra (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 11 Jun 2023 03:47:30 -0400
+Received: from out-39.mta1.migadu.com (out-39.mta1.migadu.com [IPv6:2001:41d0:203:375::27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E7671BB
+        for <kvm@vger.kernel.org>; Sun, 11 Jun 2023 00:47:28 -0700 (PDT)
+Date:   Sun, 11 Jun 2023 00:47:07 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1686469646;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=f1NGpbUo/gM6H6eBSE2EH01L3jc1cZA5mb5MGiUOMt4=;
+        b=chuldjFfWrSHCn+IgRls2M2SAZtSMWKB289cK9WZI/741ov09YbIEe1ksnfAUlyHH+Y5Sg
+        IxSnB7y6uMMBqNjc2SsFgc8MuILd+HyqMKDAowvVVW4Dnj+pmGA8nPcnCeZm1eVkGm19Ah
+        EQQxN43X3yphskIkWjUp2+6A72X38BQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Reiji Watanabe <reijiw@google.com>
 Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         James Morse <james.morse@arm.com>,
@@ -59,76 +35,79 @@ Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Jing Zhang <jingzhangos@google.com>,
         Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: PMU: Disallow vPMU on non-uniform PMUVer
- systems
-Message-ID: <20230611050328.jr65a56n4mmb6xk7@google.com>
-References: <20230610061520.3026530-1-reijiw@google.com>
- <20230610061520.3026530-3-reijiw@google.com>
- <ZIUx5c//d4txXbUB@linux.dev>
+Subject: Re: [PATCH 1/1] KVM: arm64: PMU: Avoid inappropriate use of host's
+ PMUVer
+Message-ID: <ZIV7+yKUdRticwfF@linux.dev>
+References: <20230610194510.4146549-1-reijiw@google.com>
+ <ZIUb/ozyloOm6DfY@linux.dev>
+ <20230611045430.evkcp4py4yuw5qgr@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZIUx5c//d4txXbUB@linux.dev>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230611045430.evkcp4py4yuw5qgr@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
-
-On Sat, Jun 10, 2023 at 07:32:42PM -0700, Oliver Upton wrote:
-> On Fri, Jun 09, 2023 at 11:15:20PM -0700, Reiji Watanabe wrote:
-> > Disallow userspace from configuring vPMU for guests on systems
-> > where the PMUVer is not uniform across all PEs.
-> > KVM has not been advertising PMUv3 to the guests with vPMU on
-> > such systems anyway, and such systems would be extremely
-> > uncommon and unlikely to even use KVM.
+On Sat, Jun 10, 2023 at 09:54:30PM -0700, Reiji Watanabe wrote:
+> On Sat, Jun 10, 2023 at 05:57:34PM -0700, Oliver Upton wrote:
+> > Hi Reiji,
+> > 
+> > On Sat, Jun 10, 2023 at 12:45:10PM -0700, Reiji Watanabe wrote:
+> > > @@ -735,7 +736,7 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+> > >  		 * Don't advertise STALL_SLOT, as PMMIR_EL0 is handled
+> > >  		 * as RAZ
+> > >  		 */
+> > > -		if (vcpu->kvm->arch.arm_pmu->pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P4)
+> > > +		if (vcpu->kvm->arch.dfr0_pmuver.imp >= ID_AA64DFR0_EL1_PMUVer_V3P4)
+> > >  			val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
+> > 
+> > I don't think this conditional masking is correct in the first place,
 > 
-> Ok... Now your changes are starting to make sense. This patch is rather
-> relevant context for interpreting the other PMU fix [*], so I'd
-> recommend you send this as a combined series going forward.
+> I'm not sure why this conditional masking is correct.
+> Could you please elaborate ?
 
-Sure, I will include the patch [*] in this series.
+On second thought, the original code works, but for a rather non-obvious
+reason. I was concerned about the case where kvm->arch.arm_pmu->pmuver does
+not match the current CPU, but as you say we hide PMU from the guest in this
+case.
 
+My concern remains, though, for the proposed fix.
+
+> > and this change would only make it worse.
+> > 
+> > We emulate reads of PMCEID1_EL0 using the literal value of the CPU. The
+> > _advertised_ PMU version has no bearing on the core PMU version. So,
+> > assuming we hit this on a v3p5+ part with userspace (stupidly)
+> > advertising an older implementation level, we never clear the bit for
+> > STALL_SLOT.
 > 
-> [*]  https://lore.kernel.org/kvmarm/20230610194510.4146549-1-reijiw@google.com/
-> 
-> > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> > index eef17de966da..af1fe2b53fbb 100644
-> > --- a/include/kvm/arm_pmu.h
-> > +++ b/include/kvm/arm_pmu.h
-> > @@ -105,6 +105,14 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
-> >  
-> >  u8 kvm_arm_pmu_get_pmuver_limit(void);
-> >  
-> > +static inline void kvm_arm_set_support_pmu_v3(void)
-> > +{
-> > +	u8 pmuver = kvm_arm_pmu_get_pmuver_limit();
-> > +
-> > +	if (pmu_v3_is_supported(pmuver))
-> > +		static_branch_enable(&kvm_arm_pmu_available);
-> > +}
-> > +
-> >  #else
-> >  struct kvm_pmu {
-> >  };
-> > @@ -114,6 +122,8 @@ static inline bool kvm_arm_support_pmu_v3(void)
-> >  	return false;
-> >  }
-> >  
-> > +static inline void kvm_arm_set_support_pmu_v3(void) {};
-> > +
-> 
-> nit: Give this thing a more generic name (e.g. kvm_pmu_init()) in case
-> we wind up needing more boot-time PMU initialization.
+> I'm not sure if I understand this comment correctly.
+> When the guest's PMUVer is older than v3p4, I don't think we need
+> to clear the bit for STALL_SLOT, as PMMIR_EL1 is not implemented
+> for the guest (PMMIR_EL1 is implemented only on v3p4 or newer).
+> Or am I missing something ?
 
-Sure, thank you for the suggestion!
+The guest's PMU version has no influence on the *hardware* value of
+PMCEID1_EL0.
 
-Thank you,
-Reiji
+Suppose KVM is running on a v3p5+ implementation, but userspace has set
+ID_AA64DFR0_EL1.PMUVer to v3p0. In this case the read of PMCEID1_EL0 on
+the preceding line would advertise the STALL_SLOT event, and KVM fails
+to mask it due to the ID register value. The fact we do not support the
+event is an invariant, and in the worst case we wind up clearing a bit
+that's already 0.
+
+This is why I'd suggested just unconditionally clearing the bit. While
+we're on the topic, doesn't the same reasoning hold for
+STALL_SLOT_{FRONTEND,BACKEND}? We probably want to hide those too.
+
+--
+Thanks,
+Oliver
