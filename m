@@ -2,118 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B11772C2D8
-	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 13:34:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5516E72C31F
+	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 13:39:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229900AbjFLLeN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jun 2023 07:34:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52112 "EHLO
+        id S232086AbjFLLjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jun 2023 07:39:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230486AbjFLLeC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jun 2023 07:34:02 -0400
-Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE3A1822B
-        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 04:10:55 -0700 (PDT)
-Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-1a49716e9c5so2102893fac.1
-        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 04:10:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1686568255; x=1689160255;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zL7XkrZyqya8n0rx7DgOZlvul+j+rHB3G7NIYCr/fJ4=;
-        b=Cu8HvVsL3Oo1kBqetVxfB8kxfDzsr/6mR6QXuR/GV6F3dSI2mMfAfYmUdskwrE+YsA
-         H5Xpd2MWKbgGnHgAlzwLyQGRzDOcQ0Lc/c4rMu/XtI2+d33IF5dIjqFbD0aMM8f+jRMt
-         zbnZ6+0uRsLg4nUomzgoSWkHxaJEwmsHgC8C0xNYgzV7UnT5kbB5fGUIP90W8/x25Usl
-         JDx2Hv4KBbxi140bn/X+aovN+bd/5S42CXTgrweuu7HZzeDwgXczUzzZSyVj/aR9WUxl
-         DQtCVdeDP6NxSOe7fs/+A/rghZs/zkufpNgWpQnpa1lrrFtP5B0rtCZUGUf0YRULaxhY
-         oTAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686568255; x=1689160255;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zL7XkrZyqya8n0rx7DgOZlvul+j+rHB3G7NIYCr/fJ4=;
-        b=MRsWK/EYI8CgOKdbWdMGh66+VvCMcT6K/DS3/kAjmfCFrDc31Ci/3IusuH5tIH5+E0
-         5S+aKhEhAo3WpJLPFp1Ib420WwCffQC4dGOXgSwT3mlk0kCT0qEBHPTfyYAlBlkS6Be1
-         u9GPYgrylzUSdQrQRtIpCxBKC1iJm7gJ4VWmEmJ4rUSia0ZNZxOaJDWgQgWSmeVbHDyT
-         yEz4xTKmdG8EnsCxkK68slfd7Es33xWYriW/+bOgvJDHv5lyGihNND+XRlbi9+QGQFmN
-         71Qxo9ZmCQHMQzhACQNYd4ZuY/NCzoJYsbKFRznKN/01wyFbSuRE/yjrN4+UbjQR9b9f
-         jiqg==
-X-Gm-Message-State: AC+VfDxPLswjQJVpUkRunrL7xk6wY8Ka+tI+UM7D33DLUF0l4mcFPzn4
-        Y6g2V/qDnLsQm/v3o74qO9iTOw==
-X-Google-Smtp-Source: ACHHUZ4gRLnvcXL/JEGjteWqrP6XC6G4pxlYpyz+2HznJdMy7z5H1TyKvw56mBzuGJaiSuGr3hPVzQ==
-X-Received: by 2002:a05:6870:4353:b0:196:4cb3:7b7 with SMTP id x19-20020a056870435300b001964cb307b7mr5797393oah.43.1686568255008;
-        Mon, 12 Jun 2023 04:10:55 -0700 (PDT)
-Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id c8-20020a056870c08800b0017fea9c156esm5715955oad.18.2023.06.12.04.10.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jun 2023 04:10:54 -0700 (PDT)
-From:   Anup Patel <apatel@ventanamicro.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH] RISC-V: KVM: Allow Svnapot extension for Guest/VM
-Date:   Mon, 12 Jun 2023 16:40:44 +0530
-Message-Id: <20230612111044.87775-1-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S236430AbjFLLiW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jun 2023 07:38:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DFB97A9F
+        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 04:18:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686568727;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=36d2tYssi0iWXab/pB5scxxolTXYqFelDGqk9IVpbfg=;
+        b=ev+2P/mPnXdwfkmxWrlKuBIUnSq9C7kApoLdcwqTBg309SU+XUl5ZZPrZsfAqWMoMS8UW4
+        WRz8/kjGq6zHjXxst3mX28nyXl8R1dpLkmWX2tJR2WVMxmPMod51hg0D3eQIWw3nT0IHnW
+        HbwdUF9uc3zglIi6YK8NrVSbLM9CkI0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-215-WFFF9uCqO_iBEVhnCIfLcQ-1; Mon, 12 Jun 2023 07:18:44 -0400
+X-MC-Unique: WFFF9uCqO_iBEVhnCIfLcQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 05E838032FE;
+        Mon, 12 Jun 2023 11:18:44 +0000 (UTC)
+Received: from [10.64.54.97] (vpn2-54-97.bne.redhat.com [10.64.54.97])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 83EFB492CAC;
+        Mon, 12 Jun 2023 11:18:41 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] runtime: Allow to specify properties for
+ accelerator
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+        nrb@linux.ibm.com, thuth@redhat.com, shan.gavin@gmail.com
+References: <20230612050708.584111-1-gshan@redhat.com>
+ <20230612-4c2e1b03885ddc0f55eb1988@orel>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <46ee043a-1ef4-4786-459c-f1b9e6fe7e96@redhat.com>
+Date:   Mon, 12 Jun 2023 21:18:39 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20230612-4c2e1b03885ddc0f55eb1988@orel>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We extend the KVM ISA extension ONE_REG interface to allow KVM
-user space to detect and enable Svnapot extension for Guest/VM.
+Hi Drew,
 
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
----
- arch/riscv/include/uapi/asm/kvm.h | 1 +
- arch/riscv/kvm/vcpu.c             | 2 ++
- 2 files changed, 3 insertions(+)
+On 6/12/23 6:27 PM, Andrew Jones wrote:
+> On Mon, Jun 12, 2023 at 03:07:08PM +1000, Gavin Shan wrote:
+>> There are extra properties for accelerators to enable the specific
+>> features. For example, the dirty ring for KVM accelerator can be
+>> enabled by "-accel kvm,dirty-ring-size=65536". Unfortuntely, the
+>> extra properties for the accelerators aren't supported. It makes
+>> it's impossible to test the combination of KVM and dirty ring
+>> as the following error message indicates.
+>>
+>>    # cd /home/gavin/sandbox/kvm-unit-tests/tests
+>>    # QEMU=/home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
+>>      ACCEL=kvm,dirty-ring-size=65536 ./its-migration
+>>       :
+>>    BUILD_HEAD=2fffb37e
+>>    timeout -k 1s --foreground 90s /home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
+>>    -nodefaults -machine virt -accel kvm,dirty-ring-size=65536 -cpu cortex-a57             \
+>>    -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd   \
+>>    -device pci-testdev -display none -serial stdio -kernel _NO_FILE_4Uhere_ -smp 160      \
+>>    -machine gic-version=3 -append its-pending-migration # -initrd /tmp/tmp.gfDLa1EtWk
+>>    qemu-system-aarch64: kvm_init_vcpu: kvm_arch_init_vcpu failed (0): Invalid argument
+>>
+>> Allow to specify extra properties for accelerators. With this, the
+>> "its-migration" can be tested for the combination of KVM and dirty
+>> ring.
+>>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>>   arm/run               | 4 ++--
+>>   scripts/arch-run.bash | 4 ++--
+>>   2 files changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arm/run b/arm/run
+>> index c6f25b8..bbf80e0 100755
+>> --- a/arm/run
+>> +++ b/arm/run
+>> @@ -35,13 +35,13 @@ fi
+>>   
+>>   M='-machine virt'
+>>   
+>> -if [ "$ACCEL" = "kvm" ]; then
+>> +if [[ "$ACCEL" =~ ^kvm.* ]]; then
+>>   	if $qemu $M,\? | grep -q gic-version; then
+>>   		M+=',gic-version=host'
+>>   	fi
+>>   fi
+>>   
+>> -if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
+>> +if [[ "$ACCEL" =~ ^kvm.* ]] || [[ "$ACCEL" =~ ^hvf.* ]]; then
+>>   	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
+>>   		processor="host"
+>>   		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
+>> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+>> index 51e4b97..e20b965 100644
+>> --- a/scripts/arch-run.bash
+>> +++ b/scripts/arch-run.bash
+>> @@ -412,11 +412,11 @@ hvf_available ()
+>>   
+>>   get_qemu_accelerator ()
+>>   {
+>> -	if [ "$ACCEL" = "kvm" ] && ! kvm_available; then
+>> +	if [[ "$ACCEL" =~ ^kvm.* ]] && [[ ! kvm_available ]]; then
+>>   		echo "KVM is needed, but not available on this host" >&2
+>>   		return 2
+>>   	fi
+>> -	if [ "$ACCEL" = "hvf" ] && ! hvf_available; then
+>> +	if [[ "$ACCEL" =~ ^hvf.* ]] && [[ ! hvf_available ]]; then
+>>   		echo "HVF is needed, but not available on this host" >&2
+>>   		return 2
+>>   	fi
+>> -- 
+> 
+> I'd prefer that when we want to match 'kvm', 'tcg', etc. that we split
+> on the first comma, rather than use a regular expression that allows
+> arbitrary characters to follow the pattern. Actually
+> get_qemu_accelerator() could do the splitting itself, providing two
+> variables, ACCEL (only kvm, tcg, etc.) and ACCEL_PROPS (which is
+> either null or has a leading comma). Then command lines just need
+> to use $ACCEL$ACCEL_PROPS. If we do that, then get_qemu_accelerator()
+> should also allow the user to pre-split, i.e.
+> 
+>    ACCEL=kvm ACCEL_PROPS=dirty-ring-size=65536 arm/run ...
+> 
+> Finally, did you also test this with the accel property in the
+> unittests.cfg file run with run_tests.sh?
+> 
 
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-index 61d7fecc4899..a1ca18408bbd 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -122,6 +122,7 @@ enum KVM_RISCV_ISA_EXT_ID {
- 	KVM_RISCV_ISA_EXT_ZICBOZ,
- 	KVM_RISCV_ISA_EXT_ZBB,
- 	KVM_RISCV_ISA_EXT_SSAIA,
-+	KVM_RISCV_ISA_EXT_SVNAPOT,
- 	KVM_RISCV_ISA_EXT_MAX,
- };
- 
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 2db62c6c0d3e..7b355900f235 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -61,6 +61,7 @@ static const unsigned long kvm_isa_ext_arr[] = {
- 	KVM_ISA_EXT_ARR(SSAIA),
- 	KVM_ISA_EXT_ARR(SSTC),
- 	KVM_ISA_EXT_ARR(SVINVAL),
-+	KVM_ISA_EXT_ARR(SVNAPOT),
- 	KVM_ISA_EXT_ARR(SVPBMT),
- 	KVM_ISA_EXT_ARR(ZBB),
- 	KVM_ISA_EXT_ARR(ZIHINTPAUSE),
-@@ -102,6 +103,7 @@ static bool kvm_riscv_vcpu_isa_disable_allowed(unsigned long ext)
- 	case KVM_RISCV_ISA_EXT_SSAIA:
- 	case KVM_RISCV_ISA_EXT_SSTC:
- 	case KVM_RISCV_ISA_EXT_SVINVAL:
-+	case KVM_RISCV_ISA_EXT_SVNAPOT:
- 	case KVM_RISCV_ISA_EXT_ZIHINTPAUSE:
- 	case KVM_RISCV_ISA_EXT_ZBB:
- 		return false;
--- 
-2.34.1
+Thanks for your quick comments. I think we can be smart to split
+$ACCEL in get_qemu_accelarator() into $ACCEL and $ACCEL_PROPS if you
+agree. It's not free to maintain another user visible property for
+$ACCEL_PROPS.
+
+I forgot to run "./runtest.sh" to make sure nothing is broken. I will
+do this before v2 is posted. Note that v2 will be posted shortly :)
+
+Thanks,
+Gavin
+
+
+
 
