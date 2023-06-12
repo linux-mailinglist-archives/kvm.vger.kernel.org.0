@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECC7E72B7B8
-	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 07:40:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3993D72B7BC
+	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 07:40:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236281AbjFLFkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jun 2023 01:40:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40820 "EHLO
+        id S235484AbjFLFkz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jun 2023 01:40:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235824AbjFLFkD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jun 2023 01:40:03 -0400
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67492E67
-        for <kvm@vger.kernel.org>; Sun, 11 Jun 2023 22:39:57 -0700 (PDT)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-19f8af9aa34so2433557fac.1
-        for <kvm@vger.kernel.org>; Sun, 11 Jun 2023 22:39:57 -0700 (PDT)
+        with ESMTP id S235599AbjFLFkG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jun 2023 01:40:06 -0400
+Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C233A10E3
+        for <kvm@vger.kernel.org>; Sun, 11 Jun 2023 22:39:59 -0700 (PDT)
+Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-1a6847c6036so585079fac.3
+        for <kvm@vger.kernel.org>; Sun, 11 Jun 2023 22:39:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1686548393; x=1689140393;
+        d=ventanamicro.com; s=google; t=1686548398; x=1689140398;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=O5HbPVR3QtNXxU1oKHkD/V666BtdibNb7IDtcLf2Zqk=;
-        b=QajJYa9QoTEHD/yYxnDPcawzXqqnQnmuLT8Kw8H/4KK2ECidGvM36nKjdds7OJR+sn
-         yC3LsW02F/8LIl44ONYuLP/3OOk+vtePSdreKkGHTpGBMhn4osn68ugx/We//EpvXTsy
-         DDa8PThHxL42OrPjon69ohpU9grQHjHifSKpePc/uLGxZz9DrEEknKxGPkQUMeaISzaU
-         jIJH+xXUFXJflGXD1mLLWBQKvGzZG6wmPOd0U1SpFqGRp5e7A1c9cGXQkoXCs1IfC0x8
-         PWkKpU4O3gkB5Gu56BrmqIcnb0cltpjtKcH6szWt8AWbKcgIHNVB8N29V0saGTN53/Zw
-         4AfQ==
+        bh=n5vQwpyR3/1vG/MlBdXYEenCvwMIo2s7ZFYf5nDLaQE=;
+        b=ZyfxYqMM0W3OMxKPrxCUyAqJqZUedm09S/hgWYlTNUjmk1lt/PAZaWYOl3RBSjc3P9
+         fLE+te6gevh1tGcgCGwh9pomh5vVqWVYR3SNK2c9a0Jdrmjqu7U/DicwzwaIHUDPa28R
+         fT6PmcP7ePMJzzNJ7aMJOTayJNr/QVRovWdVgI7Auw9we1utiIUWQ85Dj7azGba8Hfu9
+         eaqOZAJsYaDPjr6V/5iIcAeZ/sbTUvbB3XzUTicbdtSix0e+hbEZ9eF4vwXrac+eURtM
+         GGjvFB6wf12a9Ioal/9mRjwRH/ONVGnlZssqpD5jsRfnhuLoTuXZ9efsPSJMqJoYudBE
+         MBJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686548393; x=1689140393;
+        d=1e100.net; s=20221208; t=1686548398; x=1689140398;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=O5HbPVR3QtNXxU1oKHkD/V666BtdibNb7IDtcLf2Zqk=;
-        b=COOGt1WHLkOMl2hnGtRNVGYl/dGNHtEnlKOVj9zHWuNWqrq1BJJYgNkx/f+t/GBsB9
-         QPorSW86wFB2Nss2zhx4yH8S1E6yIVoXWob4KrjXuUQcNDrY5uHA8uDY3PCRAg8CqI7v
-         mJm1s1X3rkytVxbAb5Dc6xcNLHdjkLFX1fve2jHy5oIfFfInfgY/xDbIxFXMhEhRnus6
-         NnfsZCkRlWbZkEypx8p7OFLKb8HEh/ylsdPtmUOJzvJUK3PmE8ymM85qnD7oEgeD2n/I
-         +yo9DckAaEKfziuxJGZDuuLB4tKF9szKagUQphjTg624rEKUSXDYPB30cEodfpApsIzX
-         riNA==
-X-Gm-Message-State: AC+VfDy8MMcnhhR4aigDLbbtcHaMo9fGmxNnXE77r5gpcxGQV5TOUt4d
-        9Dt6K9aspnvsWTOLFG527+lgsw==
-X-Google-Smtp-Source: ACHHUZ405rOJxSDSxLbeGiqOzwinOWwn+/amhGI3Cdn79CxDkbbvcTTQFANnLEtHuYBSlFaqJ0cJPg==
-X-Received: by 2002:a05:6870:4c3:b0:177:dfdb:63 with SMTP id u3-20020a05687004c300b00177dfdb0063mr5371977oam.44.1686548392701;
-        Sun, 11 Jun 2023 22:39:52 -0700 (PDT)
+        bh=n5vQwpyR3/1vG/MlBdXYEenCvwMIo2s7ZFYf5nDLaQE=;
+        b=Fk7CIYgzDnGHTukl1MdesZvMuyEwkq78arOoneNxGUKVbWhTkQiFbF7ckxkEVH2v++
+         flKZWtMyK8oRb9+JQih7V2rWPkg+caeq0BvcFWrDDLUIy1JtXfmHRDYkq27/j8fdfPiO
+         KWlR8XJQvyWda93kwqBpYPIkRuURtzaA8veCTtxHtoFiDLRji2i0E4sfCs5AWwAc0lD3
+         J6SfTuhutKvy7m2Y/ytTw6PdRCVXfnzquCmbAGuI4XwMIT5uqWbi5RBDf41PMULFcSR1
+         XUv4SX6zEUD4zFbZHE61yujxO7wtLFCMh6k5LYjzFYT9Ik9UNs2Uk7kMRjuwvIvF9sgC
+         BXTA==
+X-Gm-Message-State: AC+VfDxsIvr7n4cXmJQP1TatfDC1Bm1GofmfmJHH//FePOK4Zv4FlZya
+        y3miYN7Jf0alHZ0dCO+UlIaQDQ==
+X-Google-Smtp-Source: ACHHUZ6hNnfLTutLBApy3ZYFF4oPh2xc1Whmz0Ha4z6+g9y2w3zVx0DmRzQWRqL7d3LLjPWIpK+MxQ==
+X-Received: by 2002:a05:6870:8544:b0:19f:7917:fe5a with SMTP id w4-20020a056870854400b0019f7917fe5amr4409038oaj.46.1686548397700;
+        Sun, 11 Jun 2023 22:39:57 -0700 (PDT)
 Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id lv19-20020a056871439300b001a30d846520sm5534869oab.7.2023.06.11.22.39.48
+        by smtp.gmail.com with ESMTPSA id lv19-20020a056871439300b001a30d846520sm5534869oab.7.2023.06.11.22.39.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Jun 2023 22:39:52 -0700 (PDT)
+        Sun, 11 Jun 2023 22:39:57 -0700 (PDT)
 From:   Anup Patel <apatel@ventanamicro.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Atish Patra <atishp@atishpatra.org>
@@ -58,9 +58,9 @@ Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
         kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
         linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>,
         Atish Patra <atishp@rivosinc.com>
-Subject: [PATCH v2 02/10] RISC-V: KVM: Add IMSIC related defines
-Date:   Mon, 12 Jun 2023 11:09:24 +0530
-Message-Id: <20230612053932.58604-3-apatel@ventanamicro.com>
+Subject: [PATCH v2 03/10] RISC-V: KVM: Add APLIC related defines
+Date:   Mon, 12 Jun 2023 11:09:25 +0530
+Message-Id: <20230612053932.58604-4-apatel@ventanamicro.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230612053932.58604-1-apatel@ventanamicro.com>
 References: <20230612053932.58604-1-apatel@ventanamicro.com>
@@ -76,24 +76,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We add IMSIC related defines in a separate header so that different
+We add APLIC related defines in a separate header so that different
 parts of KVM code can share it. Once AIA drivers are merged will
-have a common IMSIC header shared by both KVM and IRQCHIP driver.
+have a common APLIC header shared by both KVM and IRQCHIP driver.
 
 Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 Reviewed-by: Atish Patra <atishp@rivosinc.com>
 ---
- arch/riscv/include/asm/kvm_aia_imsic.h | 38 ++++++++++++++++++++++++++
- arch/riscv/kvm/aia.c                   |  3 +-
- 2 files changed, 39 insertions(+), 2 deletions(-)
- create mode 100644 arch/riscv/include/asm/kvm_aia_imsic.h
+ arch/riscv/include/asm/kvm_aia_aplic.h | 58 ++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
+ create mode 100644 arch/riscv/include/asm/kvm_aia_aplic.h
 
-diff --git a/arch/riscv/include/asm/kvm_aia_imsic.h b/arch/riscv/include/asm/kvm_aia_imsic.h
+diff --git a/arch/riscv/include/asm/kvm_aia_aplic.h b/arch/riscv/include/asm/kvm_aia_aplic.h
 new file mode 100644
-index 000000000000..da5881d2bde0
+index 000000000000..6dd1a4809ec1
 --- /dev/null
-+++ b/arch/riscv/include/asm/kvm_aia_imsic.h
-@@ -0,0 +1,38 @@
++++ b/arch/riscv/include/asm/kvm_aia_aplic.h
+@@ -0,0 +1,58 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright (C) 2021 Western Digital Corporation or its affiliates.
@@ -102,57 +101,56 @@ index 000000000000..da5881d2bde0
 +#ifndef __KVM_RISCV_AIA_IMSIC_H
 +#define __KVM_RISCV_AIA_IMSIC_H
 +
-+#include <linux/types.h>
-+#include <asm/csr.h>
++#include <linux/bitops.h>
 +
-+#define IMSIC_MMIO_PAGE_SHIFT		12
-+#define IMSIC_MMIO_PAGE_SZ		(1UL << IMSIC_MMIO_PAGE_SHIFT)
-+#define IMSIC_MMIO_PAGE_LE		0x00
-+#define IMSIC_MMIO_PAGE_BE		0x04
++#define APLIC_MAX_IDC			BIT(14)
++#define APLIC_MAX_SOURCE		1024
 +
-+#define IMSIC_MIN_ID			63
-+#define IMSIC_MAX_ID			2048
++#define APLIC_DOMAINCFG			0x0000
++#define APLIC_DOMAINCFG_RDONLY		0x80000000
++#define APLIC_DOMAINCFG_IE		BIT(8)
++#define APLIC_DOMAINCFG_DM		BIT(2)
++#define APLIC_DOMAINCFG_BE		BIT(0)
 +
-+#define IMSIC_EIDELIVERY		0x70
++#define APLIC_SOURCECFG_BASE		0x0004
++#define APLIC_SOURCECFG_D		BIT(10)
++#define APLIC_SOURCECFG_CHILDIDX_MASK	0x000003ff
++#define APLIC_SOURCECFG_SM_MASK	0x00000007
++#define APLIC_SOURCECFG_SM_INACTIVE	0x0
++#define APLIC_SOURCECFG_SM_DETACH	0x1
++#define APLIC_SOURCECFG_SM_EDGE_RISE	0x4
++#define APLIC_SOURCECFG_SM_EDGE_FALL	0x5
++#define APLIC_SOURCECFG_SM_LEVEL_HIGH	0x6
++#define APLIC_SOURCECFG_SM_LEVEL_LOW	0x7
 +
-+#define IMSIC_EITHRESHOLD		0x72
++#define APLIC_IRQBITS_PER_REG		32
 +
-+#define IMSIC_EIP0			0x80
-+#define IMSIC_EIP63			0xbf
-+#define IMSIC_EIPx_BITS			32
++#define APLIC_SETIP_BASE		0x1c00
++#define APLIC_SETIPNUM			0x1cdc
 +
-+#define IMSIC_EIE0			0xc0
-+#define IMSIC_EIE63			0xff
-+#define IMSIC_EIEx_BITS			32
++#define APLIC_CLRIP_BASE		0x1d00
++#define APLIC_CLRIPNUM			0x1ddc
 +
-+#define IMSIC_FIRST			IMSIC_EIDELIVERY
-+#define IMSIC_LAST			IMSIC_EIE63
++#define APLIC_SETIE_BASE		0x1e00
++#define APLIC_SETIENUM			0x1edc
 +
-+#define IMSIC_MMIO_SETIPNUM_LE		0x00
-+#define IMSIC_MMIO_SETIPNUM_BE		0x04
++#define APLIC_CLRIE_BASE		0x1f00
++#define APLIC_CLRIENUM			0x1fdc
++
++#define APLIC_SETIPNUM_LE		0x2000
++#define APLIC_SETIPNUM_BE		0x2004
++
++#define APLIC_GENMSI			0x3000
++
++#define APLIC_TARGET_BASE		0x3004
++#define APLIC_TARGET_HART_IDX_SHIFT	18
++#define APLIC_TARGET_HART_IDX_MASK	0x3fff
++#define APLIC_TARGET_GUEST_IDX_SHIFT	12
++#define APLIC_TARGET_GUEST_IDX_MASK	0x3f
++#define APLIC_TARGET_IPRIO_MASK	0xff
++#define APLIC_TARGET_EIID_MASK	0x7ff
 +
 +#endif
-diff --git a/arch/riscv/kvm/aia.c b/arch/riscv/kvm/aia.c
-index 1cee75a8c883..c78c06d99e39 100644
---- a/arch/riscv/kvm/aia.c
-+++ b/arch/riscv/kvm/aia.c
-@@ -15,6 +15,7 @@
- #include <linux/percpu.h>
- #include <linux/spinlock.h>
- #include <asm/hwcap.h>
-+#include <asm/kvm_aia_imsic.h>
- 
- struct aia_hgei_control {
- 	raw_spinlock_t lock;
-@@ -364,8 +365,6 @@ static int aia_rmw_iprio(struct kvm_vcpu *vcpu, unsigned int isel,
- 	return KVM_INSN_CONTINUE_NEXT_SEPC;
- }
- 
--#define IMSIC_FIRST	0x70
--#define IMSIC_LAST	0xff
- int kvm_riscv_vcpu_aia_rmw_ireg(struct kvm_vcpu *vcpu, unsigned int csr_num,
- 				unsigned long *val, unsigned long new_val,
- 				unsigned long wr_mask)
 -- 
 2.34.1
 
