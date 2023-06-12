@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C249272B6F6
-	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 07:01:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F1A472B700
+	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 07:01:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234977AbjFLE6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jun 2023 00:58:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54202 "EHLO
+        id S235601AbjFLE6v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jun 2023 00:58:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235767AbjFLE5x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jun 2023 00:57:53 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2064.outbound.protection.outlook.com [40.107.100.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C30F3C1B;
-        Sun, 11 Jun 2023 21:56:53 -0700 (PDT)
+        with ESMTP id S235797AbjFLE6N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jun 2023 00:58:13 -0400
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2067.outbound.protection.outlook.com [40.107.95.67])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA7832D6B;
+        Sun, 11 Jun 2023 21:57:20 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g5ybTzg6orqF1L1+74qH7RXySg/JqLZ9uQrEzI2egNB/A7BpiUKI0oEZf2QDXD7Go0fZjWlI/FBTn7CFeVixVZH/VzBa5trRgchB6fsGaio8BFGgH0wpU90iFN5xCv2Hw2YViAM/E1JpiT4ECD0cSugKnlNNoITQ4y0iM1nxleo/1Y8KY4Npzk2SQ3yA7ghQOne0HcVvFOp5mzEwAxiOYThFcOmgo1WUsvUAqC8INMtQ5jOp8UBkPv2a8PHiJuoJW62b+zJHJLjbugZjzEKLKEtEui0kwPuPYJYwOXVjrug7WLFIrkhBC70aCW440P/9bJf71FDOyUK2jGNG2oK4Ag==
+ b=h7QwnoHsLQAel88XQqN7XTNHE5m4nCWOLANeKr5Qi+aGYKRz5NJNLVdA2YrW2YnWlyb9Vg3glh5KCiCvpJBoRYL/2z5IknPPhSnhiJE+ClY7h+VR3zIXKpOd/VvX+CZTAdciMwTMDFFaxEKn6URJ8q/HBky1KptBKrxevUrP1cbIN8Y9GpsciH403CfvgacW9xCkt6nHpqmXmlefmv74blUCRDJr7X0spG4c9vVaTpl9z6a0cXYL9/npk+ovLE73w+9rplzXwNbx2cMfT7HNmXD3F34IG757DsjqBa3R+R0ztOKiZ9IhXmHVuwXOCZNuZKA4xsM7r0A7AjLHN/4tCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MOjQ9OR6FXBKvOm3ej71JfND9jQgatXW3QKky35AJQE=;
- b=QmnmY17XM0+Iv+D5RYndHp9UL7cJjFK0wGdcSuNP+qrtoepM/NZ/n5uA8FqMBRJcRg8IgCjaKfNBo+fNjFLtMxBy8VxMfNK4owVsAQ6o1HE+9GBQrm5JfD2rQX+PPX4Cw+J7Usi/5VDkU1E9VlnOsLXYIGlVzvg4gjiiR0hTlI4cL+qaG9qM3YXGfUGak/X15h111DqhKweXSf7kfO9OjN9jCW65GWkxKHhFpO44pblsK+K8EaJcuvAqXwlIvC3ekRRTwuwLLuYOVsVwClzJHCkboBEYj+td53NFb87hm/tDABs7C/zSqAwEbWRVcFVmdK3xrPuOwFyKxrAxKfQYPQ==
+ bh=RjrtDRnX4hUbBvCvwo1i1y/QPZ+dHBYmNvNtfJMhRak=;
+ b=EkDCqPgU43oi3TPjnEN5S+ijm64HMCu/0+rYqzBFReN+N5+Nc31Ff7jy57+Gx2CHolXAfo/yTAq//S35Tn0/5kHDhBItxYZ8OVO44tmSI8Vdjj0sOqcmMQy4KUIxvwPCckTD4uqKFfWTOg7Qo5qLLRzjpL10iCupQfPotJYXrR8TCFBuN/8guNOUrlRq8PJqT90Ly+Em4doy38VOEWk3binJfDKeIceeLLfzv9wZGx4mOGbIr38AW1LLEgixZ3MF80KrHDdzvqOfCBEB7FAbXqe0HY3Na1TALXBBbptiotmjXHw+1z1Q9M5VxSKNILLNMm0HEdITngpQkipgxJAw/w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MOjQ9OR6FXBKvOm3ej71JfND9jQgatXW3QKky35AJQE=;
- b=LLGvTi+qj7M3SOC8/I9lZ1zOVzIAWlwMggN7gZ3F1UesWm9Ub8njHdEMcxvj0TXJwz4zolVaoniyScV5G1sS3K7rxF+LMt95yeRMdnhfc+uBHa0PVHhtIAptUEj9P1q1Yy4p/n/X1rV/5jjABHUv3icHmZcSPsiRg54dkhZrkbg=
-Received: from CYXPR03CA0092.namprd03.prod.outlook.com (2603:10b6:930:d3::18)
- by DM4PR12MB6040.namprd12.prod.outlook.com (2603:10b6:8:af::14) with
+ bh=RjrtDRnX4hUbBvCvwo1i1y/QPZ+dHBYmNvNtfJMhRak=;
+ b=md+6pjLMK2ykrkM0a/b+89M7rIa2mvsvbVjUWPp4T4lkWySrLx3VYg636nFoMpZFdH2H9xE2PLvnMI2d2rz3SpEpZiwboB9yyPzxF6kXHNg9PYhBzICl1PgQFh9HTx6hpnZtMwWc1hJbhkonz+tl6hH+1V4NMOpMGl6DwJvkxX8=
+Received: from CYXPR03CA0077.namprd03.prod.outlook.com (2603:10b6:930:d3::19)
+ by CH0PR12MB5249.namprd12.prod.outlook.com (2603:10b6:610:d0::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33; Mon, 12 Jun
- 2023 04:56:45 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.42; Mon, 12 Jun
+ 2023 04:57:10 +0000
 Received: from CY4PEPF0000E9D6.namprd05.prod.outlook.com
- (2603:10b6:930:d3:cafe::1d) by CYXPR03CA0092.outlook.office365.com
- (2603:10b6:930:d3::18) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:930:d3:cafe::d5) by CYXPR03CA0077.outlook.office365.com
+ (2603:10b6:930:d3::19) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.33 via Frontend
- Transport; Mon, 12 Jun 2023 04:56:45 +0000
+ Transport; Mon, 12 Jun 2023 04:57:09 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,11 +48,11 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CY4PEPF0000E9D6.mail.protection.outlook.com (10.167.241.80) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6500.22 via Frontend Transport; Mon, 12 Jun 2023 04:56:45 +0000
+ 15.20.6500.22 via Frontend Transport; Mon, 12 Jun 2023 04:57:09 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Sun, 11 Jun
- 2023 23:56:14 -0500
+ 2023 23:57:07 -0500
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -71,11 +71,10 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
         <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
         <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Alexey Kardashevskiy <aik@amd.com>
-Subject: [PATCH RFC v9 50/51] KVM: SVM: Provide support for SNP_GUEST_REQUEST NAE event
-Date:   Sun, 11 Jun 2023 23:25:58 -0500
-Message-ID: <20230612042559.375660-51-michael.roth@amd.com>
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH RFC v9 51/51] crypto: ccp: Add debug support for decrypting pages
+Date:   Sun, 11 Jun 2023 23:25:59 -0500
+Message-ID: <20230612042559.375660-52-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230612042559.375660-1-michael.roth@amd.com>
 References: <20230612042559.375660-1-michael.roth@amd.com>
@@ -87,23 +86,23 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D6:EE_|DM4PR12MB6040:EE_
-X-MS-Office365-Filtering-Correlation-Id: 39def5c7-7280-43f6-5017-08db6b016c08
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D6:EE_|CH0PR12MB5249:EE_
+X-MS-Office365-Filtering-Correlation-Id: 499dbd1a-db19-494a-8345-08db6b017a88
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 55sn1+nspxoKvDHHysY6nbWoCVhkRUsJLiUDe7i9mZ8MHZHGw0i2IE17i+h2XTXI2Cd9mJtz/K1UZvBp7NR2EdGfbZqJ7Z19a/raelWFguWJbJGJ3B1VYSc2saWjlQtoL8zxziX5i+4t7PE7fB6MBeLtJCzuz9TMTjBBkcyJYaEX+ZKoVXvAFM0W1cddWWjQd1Q8yRD3SSptLaxH7nsx3yu5poLcfOOtqFz2M3lPdmW16v+XgfzXa16R1L3iaQbWeR/rzhuW/+2z2WfD+QtnRnjoFq+zVHAkGozZqPG5AQuSCaAn23zh2oE/iI+I5z0EOoQp31z/Svtg5imwETInzOGAmg/uaMNypBTyw7mI3uVnUgqkwuT3F/UzrxK43vbt3HOayFuZTwqlfClTl/SAbzC3bpoFTou86uOowBydU+QOWVBSJNmbCM2v5tG5JUxNuHabtgMgWIY6OkWNHQv9zm7gjadZ2B1dHveiPl4zLbXh6BWEsheWk2Y3us6iNoJiKDqfLhhakdTH2f3x7KW1tgilam1+xGaMFRmzey9wHeZeU1wM58kdWiHlBhhYBR/NV/Vlk6jfRiuzkdnU9Tu0XJb5C6Pk/x0HAEHRmFBdXZ5v+xHGqAmZYA6cuVDqoT41llq3QnLcxXVxy/tZlyKdmRPRuUgmL8ftBfKFO5gLXYwS4lPKgVyVgJhgUq1YLKjU5WrEc/ADxF3VRwrKG896VtC1cdCfM2CRpdkSu5xU5dSnNNRB9vXQbQtSNFRf0E2i6cjMeL6oHUwrEQdMarrx/w==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(346002)(376002)(39860400002)(396003)(451199021)(36840700001)(40470700004)(46966006)(186003)(8676002)(8936002)(54906003)(478600001)(6666004)(5660300002)(41300700001)(316002)(16526019)(26005)(44832011)(1076003)(7416002)(7406005)(70586007)(70206006)(6916009)(4326008)(2616005)(83380400001)(40460700003)(2906002)(426003)(336012)(47076005)(82740400003)(81166007)(40480700001)(356005)(36860700001)(86362001)(82310400005)(36756003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 71t+1axCyvSl/V6S59kONElavhM4jLvegT9GfJXF519MRl0ZhzWRf0RmHqL0U8U4jv/iq52DGbgm13fWzwMeLlhu3mB7SikkcGkuUhUm6l0pDcMcY0eR7hoys9oP3+hHbNtFRJKT63oDbzmDcqq32Qq2UaYQmxx1D4TWtChYzkmqK5A9bSWxQ1r/t7eePnSryFBcNiPxKX3bgP9pb0A0T7+3Gmnveqau5X+QRvhVyESyhzeIRK9kS87j8fyFGgxRKGOj0t+gEpDQ/sZQPxiRiM0xsx0KPSADx+fu+44Yir5r/W6Kot34PCo4TPG733wY3DIFF5P7YlvKiPiu5WyCRumeGXaU5mUHCSqZszyhdVb8RTICGh8le46ezuUebuTom1Xpo9tpDEsTMh9VmM3Rs23jdtXT/NT3QedmaviPX9MMGyl0l6TiDoUIAvAZYw8yYp1cpyD6HC7E5mV8Rul9SjcQneujZ7VwD5MHu7fCvI+0pRD40060pbBvgpOOFTD6ZNPLQKPdHBwpedaED+5+JAzSy8AKLFOLuxL9X1IWDlDWY3c2XR7ChDnMSCZXgOpJ0HkWooKevUmPFiefWi+CZSFTpS9QeyJLwrmrbp76nLwr6XShajkaNUiVpv+RLHD5ixEPFGbJZ9jlCJJSfXGfu6jggqWwAvftDe2pxUO+vzTjzsXPuaP2nNlVgXmeuoNtpHLEcd7C2VlpnvGeCzA0ZaUkGEvJbLsysPwUzbtcOVqh+wULmBvm2PIcJRLvSmicr4UTVjP0yQNS1ijQRcBGDnYo1UPZwr92wlHvbZRk0bI=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(136003)(346002)(376002)(451199021)(36840700001)(40470700004)(46966006)(2616005)(36756003)(2906002)(7406005)(82310400005)(86362001)(44832011)(7416002)(40480700001)(6666004)(47076005)(16526019)(36860700001)(186003)(83380400001)(40460700003)(5660300002)(336012)(26005)(426003)(1076003)(82740400003)(356005)(81166007)(478600001)(54906003)(70586007)(4326008)(70206006)(6916009)(41300700001)(316002)(8676002)(8936002)(36900700001)(134885004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2023 04:56:45.3274
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2023 04:57:09.6400
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39def5c7-7280-43f6-5017-08db6b016c08
+X-MS-Exchange-CrossTenant-Network-Message-Id: 499dbd1a-db19-494a-8345-08db6b017a88
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000E9D6.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6040
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5249
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -116,296 +115,98 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-Version 2 of GHCB specification added the support for two SNP Guest
-Request Message NAE events. The events allows for an SEV-SNP guest to
-make request to the SEV-SNP firmware through hypervisor using the
-SNP_GUEST_REQUEST API define in the SEV-SNP firmware specification.
+Add support to decrypt guest encrypted memory. These API interfaces can
+be used for example to dump VMCBs on SNP guest exit.
 
-The SNP_EXT_GUEST_REQUEST is similar to SNP_GUEST_REQUEST with the
-difference of an additional certificate blob that can be passed through
-the SNP_SET_CONFIG ioctl defined in the CCP driver. The CCP driver
-provides snp_guest_ext_guest_request() that is used by the KVM to get
-both the report and certificate data at once.
-
-Co-developed-by: Alexey Kardashevskiy <aik@amd.com>
-Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-[mdr: ensure FW command failures are indicated to guest]
+[mdr: minor commit fixups]
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/sev.c       | 175 +++++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.h       |   1 +
- drivers/crypto/ccp/sev-dev.c |  15 +++
- include/linux/psp-sev.h      |   1 +
- 4 files changed, 192 insertions(+)
+ drivers/crypto/ccp/sev-dev.c | 32 ++++++++++++++++++++++++++++++++
+ include/linux/psp-sev.h      | 19 +++++++++++++++++++
+ 2 files changed, 51 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index bdf32aa971d8..9f7defce1988 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -328,6 +328,8 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		ret = verify_snp_init_flags(kvm, argp);
- 		if (ret)
- 			goto e_free;
-+
-+		mutex_init(&sev->guest_req_lock);
- 	}
- 
- 	ret = sev_platform_init(&argp->error);
-@@ -2321,8 +2323,10 @@ static int snp_get_instance_certs(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 
- static void snp_replace_certs(struct kvm_sev_info *sev, struct sev_snp_certs *snp_certs)
- {
-+	mutex_lock(&sev->guest_req_lock);
- 	sev_snp_certs_put(sev->snp_certs);
- 	sev->snp_certs = snp_certs;
-+	mutex_unlock(&sev->guest_req_lock);
- }
- 
- static int snp_set_instance_certs(struct kvm *kvm, struct kvm_sev_cmd *argp)
-@@ -3171,6 +3175,8 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 	case SVM_VMGEXIT_HV_FEATURES:
- 	case SVM_VMGEXIT_PSC:
-+	case SVM_VMGEXIT_GUEST_REQUEST:
-+	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
- 		break;
- 	default:
- 		reason = GHCB_ERR_INVALID_EVENT;
-@@ -3604,6 +3610,163 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
- 	return ret;
- }
- 
-+static unsigned long snp_setup_guest_buf(struct vcpu_svm *svm,
-+					 struct sev_data_snp_guest_request *data,
-+					 gpa_t req_gpa, gpa_t resp_gpa)
-+{
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	struct kvm *kvm = vcpu->kvm;
-+	kvm_pfn_t req_pfn, resp_pfn;
-+	struct kvm_sev_info *sev;
-+
-+	sev = &to_kvm_svm(kvm)->sev_info;
-+
-+	if (!IS_ALIGNED(req_gpa, PAGE_SIZE) || !IS_ALIGNED(resp_gpa, PAGE_SIZE))
-+		return SEV_RET_INVALID_PARAM;
-+
-+	req_pfn = gfn_to_pfn(kvm, gpa_to_gfn(req_gpa));
-+	if (is_error_noslot_pfn(req_pfn))
-+		return SEV_RET_INVALID_ADDRESS;
-+
-+	resp_pfn = gfn_to_pfn(kvm, gpa_to_gfn(resp_gpa));
-+	if (is_error_noslot_pfn(resp_pfn))
-+		return SEV_RET_INVALID_ADDRESS;
-+
-+	if (rmp_make_private(resp_pfn, 0, PG_LEVEL_4K, 0, true))
-+		return SEV_RET_INVALID_ADDRESS;
-+
-+	data->gctx_paddr = __psp_pa(sev->snp_context);
-+	data->req_paddr = __sme_set(req_pfn << PAGE_SHIFT);
-+	data->res_paddr = __sme_set(resp_pfn << PAGE_SHIFT);
-+
-+	return 0;
-+}
-+
-+static void snp_cleanup_guest_buf(struct sev_data_snp_guest_request *data, unsigned long *rc)
-+{
-+	u64 pfn = __sme_clr(data->res_paddr) >> PAGE_SHIFT;
-+	int ret;
-+
-+	ret = snp_page_reclaim(pfn);
-+	if (ret)
-+		*rc = SEV_RET_INVALID_ADDRESS;
-+
-+	ret = rmp_make_shared(pfn, PG_LEVEL_4K);
-+	if (ret)
-+		*rc = SEV_RET_INVALID_ADDRESS;
-+}
-+
-+static void snp_handle_guest_request(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_gpa)
-+{
-+	struct sev_data_snp_guest_request data = {0};
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	struct kvm *kvm = vcpu->kvm;
-+	struct kvm_sev_info *sev;
-+	unsigned long rc;
-+	int err;
-+
-+	if (!sev_snp_guest(vcpu->kvm)) {
-+		rc = SEV_RET_INVALID_GUEST;
-+		goto e_fail;
-+	}
-+
-+	sev = &to_kvm_svm(kvm)->sev_info;
-+
-+	mutex_lock(&sev->guest_req_lock);
-+
-+	rc = snp_setup_guest_buf(svm, &data, req_gpa, resp_gpa);
-+	if (rc)
-+		goto unlock;
-+
-+	rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, &err);
-+	if (rc)
-+		/* Ensure an error value is returned to guest. */
-+		rc = err ? err : SEV_RET_INVALID_ADDRESS;
-+
-+	snp_cleanup_guest_buf(&data, &rc);
-+
-+unlock:
-+	mutex_unlock(&sev->guest_req_lock);
-+
-+e_fail:
-+	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, rc);
-+}
-+
-+static void snp_handle_ext_guest_request(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_gpa)
-+{
-+	struct sev_data_snp_guest_request req = {0};
-+	struct sev_snp_certs *snp_certs = NULL;
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	struct kvm *kvm = vcpu->kvm;
-+	unsigned long data_npages;
-+	struct kvm_sev_info *sev;
-+	unsigned long exitcode = 0;
-+	u64 data_gpa;
-+	int err, rc;
-+
-+	if (!sev_snp_guest(vcpu->kvm)) {
-+		rc = SEV_RET_INVALID_GUEST;
-+		goto e_fail;
-+	}
-+
-+	sev = &to_kvm_svm(kvm)->sev_info;
-+
-+	data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
-+	data_npages = vcpu->arch.regs[VCPU_REGS_RBX];
-+
-+	if (!IS_ALIGNED(data_gpa, PAGE_SIZE)) {
-+		exitcode = SEV_RET_INVALID_ADDRESS;
-+		goto e_fail;
-+	}
-+
-+	mutex_lock(&sev->guest_req_lock);
-+
-+	rc = snp_setup_guest_buf(svm, &req, req_gpa, resp_gpa);
-+	if (rc)
-+		goto unlock;
-+
-+	/*
-+	 * If a VMM-specific certificate blob hasn't been provided, grab the
-+	 * host-wide one.
-+	 */
-+	snp_certs = sev_snp_certs_get(sev->snp_certs);
-+	if (!snp_certs)
-+		snp_certs = sev_snp_global_certs_get();
-+
-+	/*
-+	 * If there is a host-wide or VMM-specific certificate blob available,
-+	 * make sure the guest has allocated enough space to store it.
-+	 * Otherwise, inform the guest how much space is needed.
-+	 */
-+	if (snp_certs && (data_npages << PAGE_SHIFT) < snp_certs->len) {
-+		vcpu->arch.regs[VCPU_REGS_RBX] = snp_certs->len >> PAGE_SHIFT;
-+		exitcode = SNP_GUEST_REQ_INVALID_LEN;
-+		goto cleanup;
-+	}
-+
-+	rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &req, &err);
-+	if (rc) {
-+		/* pass the firmware error code */
-+		exitcode = err;
-+		goto cleanup;
-+	}
-+
-+	/* Copy the certificate blob in the guest memory */
-+	if (sev->snp_certs &&
-+	    kvm_write_guest(kvm, data_gpa, sev->snp_certs->data, sev->snp_certs->len))
-+		exitcode = SEV_RET_INVALID_ADDRESS;
-+
-+cleanup:
-+	sev_snp_certs_put(snp_certs);
-+	snp_cleanup_guest_buf(&req, &exitcode);
-+
-+unlock:
-+	mutex_unlock(&sev->guest_req_lock);
-+
-+e_fail:
-+	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, exitcode);
-+}
-+
- static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- {
- 	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -3863,6 +4026,18 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 						SVM_EVTINJ_VALID);
- 		}
- 
-+		ret = 1;
-+		break;
-+	case SVM_VMGEXIT_GUEST_REQUEST:
-+		snp_handle_guest_request(svm, control->exit_info_1, control->exit_info_2);
-+
-+		ret = 1;
-+		break;
-+	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
-+		snp_handle_ext_guest_request(svm,
-+					     control->exit_info_1,
-+					     control->exit_info_2);
-+
- 		ret = 1;
- 		break;
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 72be0c440b16..31cd8b3e6877 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -96,6 +96,7 @@ struct kvm_sev_info {
- 	void *snp_context;      /* SNP guest context page */
- 	u64 sev_features;	/* Features set at VMSA creation */
- 	struct sev_snp_certs *snp_certs;
-+	struct mutex guest_req_lock; /* Lock for guest request handling */
- };
- 
- struct kvm_svm {
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 175c24163ba0..096ba15d0740 100644
+index 096ba15d0740..3c8cd2d20016 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -2109,6 +2109,21 @@ void sev_snp_certs_put(struct sev_snp_certs *certs)
+@@ -2061,6 +2061,38 @@ int sev_guest_df_flush(int *error)
  }
- EXPORT_SYMBOL_GPL(sev_snp_certs_put);
+ EXPORT_SYMBOL_GPL(sev_guest_df_flush);
  
-+struct sev_snp_certs *sev_snp_global_certs_get(void)
++int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error)
 +{
++	struct sev_data_snp_dbg data = {0};
 +	struct sev_device *sev;
++	int ret;
 +
 +	if (!psp_master || !psp_master->sev_data)
-+		return NULL;
++		return -ENODEV;
 +
 +	sev = psp_master->sev_data;
++
 +	if (!sev->snp_initialized)
-+		return NULL;
++		return -EINVAL;
 +
-+	return sev_snp_certs_get(sev->snp_certs);
++	data.gctx_paddr = sme_me_mask | (gctx_pfn << PAGE_SHIFT);
++	data.src_addr = sme_me_mask | (src_pfn << PAGE_SHIFT);
++	data.dst_addr = sme_me_mask | (dst_pfn << PAGE_SHIFT);
++
++	/* The destination page must be in the firmware state. */
++	if (rmp_mark_pages_firmware(data.dst_addr, 1, false))
++		return -EIO;
++
++	ret = sev_do_cmd(SEV_CMD_SNP_DBG_DECRYPT, &data, error);
++
++	/* Restore the page state */
++	if (snp_reclaim_pages(data.dst_addr, 1, false))
++		ret = -EIO;
++
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(sev_snp_global_certs_get);
++EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt_page);
 +
- static void sev_exit(struct kref *ref)
+ static void sev_snp_certs_release(struct kref *kref)
  {
- 	misc_deregister(&misc_dev->misc);
+ 	struct sev_snp_certs *certs = container_of(kref, struct sev_snp_certs, kref);
 diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 7b65dd5808a1..1235eb3110cb 100644
+index 1235eb3110cb..55f6dfc2580d 100644
 --- a/include/linux/psp-sev.h
 +++ b/include/linux/psp-sev.h
-@@ -33,6 +33,7 @@ struct sev_snp_certs {
- struct sev_snp_certs *sev_snp_certs_new(void *data, u32 len);
- struct sev_snp_certs *sev_snp_certs_get(struct sev_snp_certs *certs);
- void sev_snp_certs_put(struct sev_snp_certs *certs);
-+struct sev_snp_certs *sev_snp_global_certs_get(void);
+@@ -916,6 +916,20 @@ int sev_guest_decommission(struct sev_data_decommission *data, int *error);
+  */
+ int sev_do_cmd(int cmd, void *data, int *psp_ret);
  
- /**
-  * SEV platform state
++/**
++ * snp_guest_dbg_decrypt_page - perform SEV SNP_DBG_DECRYPT command
++ *
++ * @sev_ret: sev command return code
++ *
++ * Returns:
++ * 0 if the SEV successfully processed the command
++ * -%ENODEV    if the SEV device is not available
++ * -%ENOTSUPP  if the SEV does not support SEV
++ * -%ETIMEDOUT if the SEV command timed out
++ * -%EIO       if the SEV returned a non-zero return code
++ */
++int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error);
++
+ void *psp_copy_user_blob(u64 uaddr, u32 len);
+ void *snp_alloc_firmware_page(gfp_t mask);
+ void snp_free_firmware_page(void *addr);
+@@ -946,6 +960,11 @@ sev_issue_cmd_external_user(struct file *filep, unsigned int id, void *data, int
+ 
+ static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_PTR(-EINVAL); }
+ 
++static inline int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error)
++{
++	return -ENODEV;
++}
++
+ static inline void *snp_alloc_firmware_page(gfp_t mask)
+ {
+ 	return NULL;
 -- 
 2.25.1
 
