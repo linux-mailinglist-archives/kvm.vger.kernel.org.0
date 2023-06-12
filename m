@@ -2,33 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 293C172C5A9
-	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 15:18:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0A6F72C650
+	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 15:47:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233750AbjFLNSV convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 12 Jun 2023 09:18:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51166 "EHLO
+        id S235874AbjFLNrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jun 2023 09:47:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234749AbjFLNSU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jun 2023 09:18:20 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62B59D3
-        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 06:18:17 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-173-0FOEeq_-OMq-Pc0lsQH2SA-1; Mon, 12 Jun 2023 14:18:14 +0100
-X-MC-Unique: 0FOEeq_-OMq-Pc0lsQH2SA-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 12 Jun
- 2023 14:18:01 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Mon, 12 Jun 2023 14:18:01 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     "'kirill.shutemov@linux.intel.com'" <kirill.shutemov@linux.intel.com>,
-        "Huang, Kai" <kai.huang@intel.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
+        with ESMTP id S235749AbjFLNrM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jun 2023 09:47:12 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB0C810D3;
+        Mon, 12 Jun 2023 06:47:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686577629; x=1718113629;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=tEEMAOv5y1FNh96KVITEe1drEbJjSixD47uAg1phk68=;
+  b=eqr6dqHSLAp8AWvuJlx/L8H2pldfqPjY+ZqU8f8VvJ+ve9Z7Ov4gNNIV
+   v8lG43Fi5IG9BxVjOR9Y71LtiDRawLy5AG2i7YnzkWqRZ4i/6IZjdUmLJ
+   wQ2hNKmZl7aq32x26fpH5ZjeINVe545/wvTNga19TtcxBaBKeBREdbpAI
+   cYHSoCGpG06FXgoglwT5eESJqlwmmAPCcwZDsWQ2s3odDIVonHzYxfBkk
+   QX7H9lFvkRt7o13/99aSzy449XVRK0uOc/G/GsQBG7EpJJY9MxJ3K06/k
+   TtEgqTAEl4fl2zpHd2dfy/IpQtpgTqPLWxbSmBcHvUXSOIwIOvVYYGLIz
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="358035649"
+X-IronPort-AV: E=Sophos;i="6.00,236,1681196400"; 
+   d="scan'208";a="358035649"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2023 06:47:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="705388478"
+X-IronPort-AV: E=Sophos;i="6.00,236,1681196400"; 
+   d="scan'208";a="705388478"
+Received: from spmantha-mobl1.amr.corp.intel.com (HELO [10.209.43.2]) ([10.209.43.2])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2023 06:47:08 -0700
+Message-ID: <48d5a29a-878c-665d-6ac2-6f0563bf6f3c@intel.com>
+Date:   Mon, 12 Jun 2023 06:47:08 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v11 18/20] x86: Handle TDX erratum to reset TDX private
+ memory during kexec() and reboot
+Content-Language: en-US
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "david@redhat.com" <david@redhat.com>,
         "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
         "ak@linux.intel.com" <ak@linux.intel.com>,
@@ -50,64 +70,32 @@ CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         "Huang, Ying" <ying.huang@intel.com>,
         "Williams, Dan J" <dan.j.williams@intel.com>
-Subject: RE: [PATCH v11 18/20] x86: Handle TDX erratum to reset TDX private
- memory during kexec() and reboot
-Thread-Topic: [PATCH v11 18/20] x86: Handle TDX erratum to reset TDX private
- memory during kexec() and reboot
-Thread-Index: AQHZnSRWXDaSmJ22okO690LL2Ubsg6+HJc9w
-Date:   Mon, 12 Jun 2023 13:18:01 +0000
-Message-ID: <fc4930150f3242e69dcb007c0b23cfd2@AcuMS.aculab.com>
 References: <cover.1685887183.git.kai.huang@intel.com>
  <5aa7506d4fedbf625e3fe8ceeb88af3be1ce97ea.1685887183.git.kai.huang@intel.com>
  <20230609132301.uvvp27yr5kpenl6f@box.shutemov.name>
  <58f34b4b81b6d6b37d3386dec0f073e6eb7a97ff.camel@intel.com>
  <20230612075830.jbrdd6ysz4qq7wdf@box.shutemov.name>
  <4c7effc3abe71aa1cbee41f3bd46b97aed40be26.camel@intel.com>
- <20230612114843.n7vvoh7m2rk4la56@box.shutemov.name>
-In-Reply-To: <20230612114843.n7vvoh7m2rk4la56@box.shutemov.name>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <4c7effc3abe71aa1cbee41f3bd46b97aed40be26.camel@intel.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: kirill.shutemov@linux.intel.com
-> Sent: 12 June 2023 12:49
+On 6/12/23 03:27, Huang, Kai wrote:
+> So I think a __mb() after setting tdmr->pamt_4k_base should be good enough, as
+> it guarantees when setting to any pamt_*_size happens, the valid pamt_4k_base
+> will be seen by other cpus.
 > 
-> On Mon, Jun 12, 2023 at 10:27:44AM +0000, Huang, Kai wrote:
-> > Does it make sense?
-> 
-> I understand your logic. AFAICS, it is correct (smp_mb() instead of __mb()
-> would be better), but it is not justified from complexity PoV.
+> Does it make sense?
 
-Given that x86 performs writes pretty much in code order.
-Do you need anything more than a compile barrier?
-
-> This lockless exercise gave me a pause to understand.
-> 
-> Lockless doesn't buy you anything here, only increases complexity.
-> Just take a lock.
-
-Indeed...
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+Just use a normal old atomic_t or set_bit()/test_bit().  They have
+built-in memory barriers are are less likely to get botched.
