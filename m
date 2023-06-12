@@ -2,42 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9608472B5B2
-	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 05:08:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC97872B5B3
+	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 05:08:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234257AbjFLDIW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 11 Jun 2023 23:08:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45648 "EHLO
+        id S234118AbjFLDIZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 11 Jun 2023 23:08:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233094AbjFLDIR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233318AbjFLDIR (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 11 Jun 2023 23:08:17 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70AB4E5F;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 710E3E62;
         Sun, 11 Jun 2023 20:08:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=kYsaDINwgGyBkCQoDFNAkvO4v5df2UfOXAdRONE+VsA=; b=cuhGQNGphwJUwp0UMhVoYyu2tM
-        H9F7lOZDO201p3qw3R1q8bQtHyuWu0Ww+eKkYHBp2SnCKuOjfD6kgi6m69yXk4p8uoAisA9qsHuMv
-        NZ+EO4hMOMVyYXlSs63l3oG5dPiJ78trxjJexR5Sfy8VX8lTb2HSP6n5JCMPs1BrMk2t353Ht4z7y
-        ajHHQh6qV3BcUH7Np9z/Hyh/VfcsEyJLb2dEfJQ7sbKUTpS2sgvFs+l5wj+LyR9ojtmX1GZtq1CuV
-        93PdN6DAikYuO8xL+WRqN403rR53yreatar8GTfojD5i+4Meicwk0sy7/jFlbJgYm2fwuoD1f6VgC
-        oUxdexdQ==;
+        bh=V5veyfA2KKdGawPZUrWbJWEmsvc+vf30GCw8DAtjIos=; b=TIJfE/QEphsK3LIjhTNK9jlRrX
+        6NYuvunBk9ad9NfKeNCIe6/RAC6TibowZIQY48PJD5w/2wBTDwN4lwlOJvBktSMhd/66Hk9opcrQw
+        z59i0BVg4wz10n5LG8CgzJoMpCoSJZ46xHtOXQG08brjfmJ9YcY6avmP2RuQewetROFQsf8kzuu36
+        ouySaslQkrvCrEhhPAwch4C2N96DIp0Rnzgce2zIgmz5EOVtCuSJtzYNz+0t7AtW05wc93y/wYTll
+        foJ+dUGzsmMBM95sJ+YBh0niUUJUNun/XYLt2b04ls3Qalu2r8jSXONQYlMVxDuIL6Tx3fGLbm/Q6
+        L78Qwgqw==;
 Received: from [2601:1c2:980:9ec0::2764] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q8Xuf-002P78-1j;
-        Mon, 12 Jun 2023 03:08:13 +0000
+        id 1q8Xuf-002P78-34;
+        Mon, 12 Jun 2023 03:08:14 +0000
 From:   Randy Dunlap <rdunlap@infradead.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-Subject: [PATCH 1/4] Documentation: KVM: make corrections to halt-polling.rst
-Date:   Sun, 11 Jun 2023 20:08:07 -0700
-Message-ID: <20230612030810.23376-2-rdunlap@infradead.org>
+Subject: [PATCH 2/4] Documentation: KVM: make corrections to locking.rst
+Date:   Sun, 11 Jun 2023 20:08:08 -0700
+Message-ID: <20230612030810.23376-3-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230612030810.23376-1-rdunlap@infradead.org>
 References: <20230612030810.23376-1-rdunlap@infradead.org>
@@ -53,55 +52,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Module parameters are in sysfs, not debugfs, so change that.
-
-Remove superfluous "that" following "Note:".
-Hyphenate "system-wide" values.
-Hyphenate "trade-off".
-
-Don't treat "denial of service" as a verb.
+Correct grammar and punctuation.
+Use "read-only" for consistency.
 
 Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org
 Cc: Jonathan Corbet <corbet@lwn.net>
 Cc: linux-doc@vger.kernel.org
 ---
- Documentation/virt/kvm/halt-polling.rst |   10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Q: What is spte.HOST_WRITEABLE supposed to be? It is not used anywhere
+  else in the kernel source tree.
 
-diff -- a/Documentation/virt/kvm/halt-polling.rst b/Documentation/virt/kvm/halt-polling.rst
---- a/Documentation/virt/kvm/halt-polling.rst
-+++ b/Documentation/virt/kvm/halt-polling.rst
-@@ -112,11 +112,11 @@ powerpc kvm-hv case.
- |			| function.		    |			      |
- +-----------------------+---------------------------+-------------------------+
+ Documentation/virt/kvm/locking.rst |   18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff -- a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
+--- a/Documentation/virt/kvm/locking.rst
++++ b/Documentation/virt/kvm/locking.rst
+@@ -67,7 +67,7 @@ following two cases:
+ 2. Write-Protection: The SPTE is present and the fault is caused by
+    write-protect. That means we just need to change the W bit of the spte.
  
--These module parameters can be set from the debugfs files in:
-+These module parameters can be set from the sysfs files in:
+-What we use to avoid all the race is the Host-writable bit and MMU-writable bit
++What we use to avoid all the races is the Host-writable bit and MMU-writable bit
+ on the spte:
  
- 	/sys/module/kvm/parameters/
+ - Host-writable means the gfn is writable in the host kernel page tables and in
+@@ -130,7 +130,7 @@ to gfn.  For indirect sp, we disabled fa
+ A solution for indirect sp could be to pin the gfn, for example via
+ kvm_vcpu_gfn_to_pfn_atomic, before the cmpxchg.  After the pinning:
  
--Note: that these module parameters are system wide values and are not able to
-+Note: these module parameters are system-wide values and are not able to
-       be tuned on a per vm basis.
+-- We have held the refcount of pfn that means the pfn can not be freed and
++- We have held the refcount of pfn; that means the pfn can not be freed and
+   be reused for another gfn.
+ - The pfn is writable and therefore it cannot be shared between different gfns
+   by KSM.
+@@ -186,22 +186,22 @@ writable between reading spte and updati
+ The Dirty bit is lost in this case.
  
- Any changes to these parameters will be picked up by new and existing vCPUs the
-@@ -142,12 +142,12 @@ Further Notes
-   global max polling interval (halt_poll_ns) then the host will always poll for the
-   entire block time and thus cpu utilisation will go to 100%.
+ In order to avoid this kind of issue, we always treat the spte as "volatile"
+-if it can be updated out of mmu-lock, see spte_has_volatile_bits(), it means,
++if it can be updated out of mmu-lock [see spte_has_volatile_bits()]; it means
+ the spte is always atomically updated in this case.
  
--- Halt polling essentially presents a trade off between power usage and latency and
-+- Halt polling essentially presents a trade-off between power usage and latency and
-   the module parameters should be used to tune the affinity for this. Idle cpu time is
-   essentially converted to host kernel time with the aim of decreasing latency when
-   entering the guest.
+ 3) flush tlbs due to spte updated
  
- - Halt polling will only be conducted by the host when no other tasks are runnable on
-   that cpu, otherwise the polling will cease immediately and schedule will be invoked to
--  allow that other task to run. Thus this doesn't allow a guest to denial of service the
--  cpu.
-+  allow that other task to run. Thus this doesn't allow a guest to cause denial of service
-+  of the cpu.
+-If the spte is updated from writable to readonly, we should flush all TLBs,
++If the spte is updated from writable to read-only, we should flush all TLBs,
+ otherwise rmap_write_protect will find a read-only spte, even though the
+ writable spte might be cached on a CPU's TLB.
+ 
+ As mentioned before, the spte can be updated to writable out of mmu-lock on
+-fast page fault path, in order to easily audit the path, we see if TLBs need
+-be flushed caused by this reason in mmu_spte_update() since this is a common
++fast page fault path. In order to easily audit the path, we see if TLBs needing
++to be flushed caused this reason in mmu_spte_update() since this is a common
+ function to update spte (present -> present).
+ 
+ Since the spte is "volatile" if it can be updated out of mmu-lock, we always
+-atomically update the spte, the race caused by fast page fault can be avoided,
++atomically update the spte and the race caused by fast page fault can be avoided.
+ See the comments in spte_has_volatile_bits() and mmu_spte_update().
+ 
+ Lockless Access Tracking:
+@@ -283,9 +283,9 @@ time it will be set using the Dirty trac
+ :Arch:		x86
+ :Protects:	wakeup_vcpus_on_cpu
+ :Comment:	This is a per-CPU lock and it is used for VT-d posted-interrupts.
+-		When VT-d posted-interrupts is supported and the VM has assigned
++		When VT-d posted-interrupts are supported and the VM has assigned
+ 		devices, we put the blocked vCPU on the list blocked_vcpu_on_cpu
+-		protected by blocked_vcpu_on_cpu_lock, when VT-d hardware issues
++		protected by blocked_vcpu_on_cpu_lock. When VT-d hardware issues
+ 		wakeup notification event since external interrupts from the
+ 		assigned devices happens, we will find the vCPU on the list to
+ 		wakeup.
