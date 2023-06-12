@@ -2,146 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B393172BACB
-	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 10:35:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EE4672BB78
+	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 11:01:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233103AbjFLIfw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jun 2023 04:35:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42814 "EHLO
+        id S229784AbjFLJBf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jun 2023 05:01:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232868AbjFLIfj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jun 2023 04:35:39 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5B78DE;
-        Mon, 12 Jun 2023 01:35:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686558939; x=1718094939;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=bT6O2cPBKL9wWvt0ZECXZcc2XFRp90hO6lwZK983o1o=;
-  b=iXaRqubKQ18NuFai6y1eiZagIPKASsM/hk0Ti3AN0ACalz0eZiAGFL3z
-   iJ0TkqxkEZ+jP/Naw4Lj7/oIMBpWhBrVIBtOIXL/zFRSzSfkNeIXfmHX/
-   /LhZFapHJ9M0gHTxSTMGUYY+/zFoz/xYqDwqSJI0ZZiMNEFc7KBdGpTzz
-   MIqKZ4zkWKMEtFZi9s5lMe0UkPC+UnGXsev5sXHMLbrpdZOa5tgICti3D
-   fWEQVQXoPZvynM3ENQsDhMoK6Ihz8EinRV50RxxkV6iVGKbbV+02jDEjP
-   nRkpP4r0vmqbYpLQYMp1uUl7TVSsXplpM+gk+ZOLfD+Lx3cfawxMl74NQ
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10738"; a="355477104"
-X-IronPort-AV: E=Sophos;i="6.00,236,1681196400"; 
-   d="scan'208";a="355477104"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2023 01:35:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10738"; a="661504969"
-X-IronPort-AV: E=Sophos;i="6.00,236,1681196400"; 
-   d="scan'208";a="661504969"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga003.jf.intel.com with ESMTP; 12 Jun 2023 01:35:37 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Mon, 12 Jun 2023 01:35:36 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Mon, 12 Jun 2023 01:35:35 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Mon, 12 Jun 2023 01:35:35 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Mon, 12 Jun 2023 01:35:34 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bZmfNhN+VT7SLTHjFeZ+b4+2N2+eNJO6JkLHGT80jRemWCo0TY45IMxRaYXKzbjc/LYWFm3Nfca8jNmso0cW61nHqsHciUJyLZWDWb1HznPFazBImOfrftiZYckp12vxb6/hfuhEKc2mLjHxC94fBkzYF+C28vHHezl5A64idRpQN086ky1FZBuSZ66yPBo1X6AYkT16WFq4IT/um/LIk/DJtoceAzwJk8UweJ/a8ckDpeFc9XAL78GH6yRwIFlwg7GXB3qzZVtlIqG8juaPF0r0aPW03nU8/TRCrUnfmbLIV57fIV+HhObFW5ZpZSilubp3Z1KrVTcNM4Y6jpIwLA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kkVYROVDuWUoaBv4MGqQ/kqsCIufwnqiKyOpe0kAo0E=;
- b=HtTJPSJP8a1MTbYtJpN5200gWm6BW3ITZUtnRZdvrK7muDEcNy4hCzmcbFKhPkyNTI8qNRNOEHn7X+4XmjCyvoN+1u4qrWYszL/5FkcEHdzNuEUfK2GygMSh7ipF/MEXmjhar054QBUpqc0Nt6M6xbS8ZX2arqiuFfft0Y3WKU+kwtW0152m+h4kJ/hUDkbUVhMr/FDwAIa2+YXlOQIFFPMSOhLTp8PKzoQeRmEnZOWkNmKSgxuKszOVZfJ/WUt6ymrsznvyrflVhpddH37YxA2BXlUI8t+idj84rP3bBWeGVjWPIUl4356mco6G3roWr0avEqISm5EUbjdB5OsapQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by DS7PR11MB6224.namprd11.prod.outlook.com (2603:10b6:8:97::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6477.29; Mon, 12 Jun 2023 08:35:06 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::5817:cb8f:c2b7:f1e5]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::5817:cb8f:c2b7:f1e5%4]) with mapi id 15.20.6455.028; Mon, 12 Jun 2023
- 08:35:06 +0000
-Date:   Mon, 12 Jun 2023 16:34:56 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Xiaoyao Li <xiaoyao.li@intel.com>,
-        "Pawan Gupta" <pawan.kumar.gupta@linux.intel.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Snapshot host's MSR_IA32_ARCH_CAPABILITIES
-Message-ID: <ZIbYsBv43EcwLavy@chao-email>
-References: <20230607004311.1420507-1-seanjc@google.com>
- <20230607004311.1420507-2-seanjc@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230607004311.1420507-2-seanjc@google.com>
-X-ClientProxiedBy: SI2PR02CA0032.apcprd02.prod.outlook.com
- (2603:1096:4:195::12) To PH8PR11MB6780.namprd11.prod.outlook.com
- (2603:10b6:510:1cb::11)
+        with ESMTP id S235039AbjFLJAx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jun 2023 05:00:53 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85D9835BE
+        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 01:57:13 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9788554a8c9so723044166b.2
+        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 01:57:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1686560232; x=1689152232;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Vq/s2M0H1YpBEWwWc84/BK1dGfh4JEMbe1jCjTxpQG8=;
+        b=Zvx3pTxmhOCcdamy0jWfgspLI2c3P25QDH2fEU6KcaeNBB6wCOvuCsH1DfCXlY2rix
+         GrwNavx2wp06jiwkRSKkY0N5B2CJfz55RsHEgCIsDB3+MxNeZjdXEhFet1Xw+Y67EmwQ
+         K3Zab7ithsSmsFQ+z/qGmc+xLIZJmCPFrejmURK9QPWLkpm2U8CoXlxYW7BO4TnXyqEr
+         XoE1E14eGPqZvGCegno53VJkXOqjTQwLAyadxhZGk1AWPRKR0WnMFXAa7tXgdbgq2A5W
+         Aqanwi7bsKdI/iUh2wwfo7IuP5Dq+f8i+kydMxd2M2oShZ+176nddxHBzoxVQGr2esz6
+         VdvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686560232; x=1689152232;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vq/s2M0H1YpBEWwWc84/BK1dGfh4JEMbe1jCjTxpQG8=;
+        b=QIItXw8zeYG5q27qUNbUDTbZoO6jTc5qjtpHgpmPu2J6NtdjkdeHGbny+ySshOS40H
+         hnyIqOOmddQ0O3K80GbU9f+LTnLri/MZb/OU1A3lBqTERfmPv89vR/jerYfBcahWcxUE
+         KYB0SJKLOYVV/YYVS1aDS5j2nR2sXSKzU4z9iTfGru2hWexTkVI0aI45JMJy3bJDodB5
+         TUloKSyrSGCqKdXlumJ+NpffgObzvRxDA4ktgTWpSHXxleY2RDSdPUtj0arhXIWUyjsv
+         ZQiLoqORjwZoR8y7dOUlkoIe6YKRWezqdxBaLK+4n2CYuNmGZjHQOAjrxz6y8T1oC1PT
+         rA9g==
+X-Gm-Message-State: AC+VfDyFYbuW5XeGgjbBEEzUuHLoWQNkULyofECxlO2bbTCtHFs2j0vP
+        I5e2c7BO9O36YnaDntUDRoZNeg==
+X-Google-Smtp-Source: ACHHUZ4FOO/LVl8AgQkKecgccHHS4sYRKVgWaVzPYmir3ayy2BYmRbvmSwzE3ppomAG9QgpBstEahg==
+X-Received: by 2002:a17:906:7945:b0:978:8e58:e1b9 with SMTP id l5-20020a170906794500b009788e58e1b9mr9960520ejo.74.1686560231841;
+        Mon, 12 Jun 2023 01:57:11 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id e25-20020a170906081900b0094ee3e4c934sm4849967ejd.221.2023.06.12.01.57.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jun 2023 01:57:11 -0700 (PDT)
+Date:   Mon, 12 Jun 2023 10:57:10 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Haibo Xu <xiaobo55x@gmail.com>
+Cc:     Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org,
+        oliver.upton@linux.dev, seanjc@google.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Shuah Khan <shuah@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 09/10] KVM: riscv: selftests: Skip some registers set
+ operation
+Message-ID: <20230612-05314de3b73277af1ee729b0@orel>
+References: <cover.1686275310.git.haibo1.xu@intel.com>
+ <73045958d9ab71d5266d012f1e13061afa8c5331.1686275310.git.haibo1.xu@intel.com>
+ <20230609-05521f954b0485c69612f00b@orel>
+ <CAJve8omPV_XgCSvw8POZwisb6uTOFMJU4FyAKArryui2SAsqtw@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|DS7PR11MB6224:EE_
-X-MS-Office365-Filtering-Correlation-Id: 57046e16-b2b6-45da-02df-08db6b1fec65
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WT3x7ATkLLY4q1lekFrKI+C8vi//CdrbGROCpM1lNslGPIQFz8Pf8b4aY4p4fMJP0RVVEVSYYQ6aBrgpA9nwNkeDAIczPQN8r5GJHxTZ8HQKEqdxgqbEyXDUcuJy4MNIZv1AYWiMeOdj0Ngo4/ID47/e9o+tpwra8teb6TnfhMwLKnhIjRBBw4h6SpiCKCzBPXMddqtoeDvmlDfTHdgdTGxnnnd7iN/38IcORKnUoPR7xxawLYgjRmwaWLGc2b6N4sP93gdUVquwvt3gSHzUNpTYm1WMWhrDbDQQS5DtBejVulWnEqZP3ITYZKU3Mq9PbFS2CHuOLOCZ1bW2IHOYR5LvcqMhdWLGL0P1x+1BaPUvPf5Fmj476SwMdM7VLP/moMCp9En5jXc3A1fH2acgqGw0iEU6mwD8t08gbd/o6A9OBOPJy1ofyo1HLvWXJdMFo1RghyJMw6wf6giDaQCS/mu8RDlbPeAZ5AunqmLehZ6JIeZS8eT1hSesqVRxkf0JZIN6ozbcpilXj96wVGYjJ/nNBiyMyJMvOIbVUCKVZGo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(396003)(39860400002)(346002)(376002)(366004)(136003)(451199021)(86362001)(66556008)(6916009)(478600001)(4326008)(54906003)(316002)(6666004)(66476007)(66946007)(966005)(6486002)(8676002)(8936002)(41300700001)(5660300002)(2906002)(44832011)(33716001)(82960400001)(38100700002)(9686003)(6512007)(26005)(6506007)(186003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?OjYk1q9GSbzOaljU0SIg1W67rWpPVAX7frz2z+ZZOwlDbGWNbPOZHvenbJPV?=
- =?us-ascii?Q?szOCAK9Om/+6zurfllJmFqKmUhyi7Y7cgEXwTBo4tYG2MftoIzfKUBCINnLm?=
- =?us-ascii?Q?RnJNfq/bh6p61W88x1VLLtXMTBsfPsQVE9H4EERptzESNObwFOoRp6PtLHle?=
- =?us-ascii?Q?2Ye3wuuJxx3WId1hUMjVZ8Xsa7W/RbnCAP295melNSdp63NiBwBBohy46Fzf?=
- =?us-ascii?Q?a4Z7K/tb57imf5QG87WRkGk/uArKSydjAkyYigFLa4T0Uw4Dgjged0mZ9T2s?=
- =?us-ascii?Q?4sldNKM7PLrojdF2mCmRXgY+Y+G1XlqsEn6jn5zatSvt8dQg0wX2dDD7Jzz5?=
- =?us-ascii?Q?ziIDEYn4sFIw4v8GsmJr7KUw0gHizZji6zlRrP8oXQwMOPhzXFiyYlDHra2x?=
- =?us-ascii?Q?0zg2nGkXF4Zk2Ki+mKIRMgJQizXMyClN6RVQBpdcXWNfxah4RzZfCOMDoTf7?=
- =?us-ascii?Q?/buGlxgCA+hQ8YKViLcIMsQpU6SBQoU8cqc9t7F7laHzXE3UAdReuSpBjBDD?=
- =?us-ascii?Q?Sc9jlqt7GqpaTMIhmj5x1lg05S3f008rxWFSk/IPQnmClL6R5R4tzjekBuuJ?=
- =?us-ascii?Q?InQTJ34nr8ZzYB0Iu5s6JENKBF7PmGfU/eNhwpupYJWZWfdCtIkE8FvgS/XZ?=
- =?us-ascii?Q?97ghKST8nQQql1KwP3mwLfHLCl0YvXyldayQyax7ha2Uxu5Lc3yrF5vSD2Bw?=
- =?us-ascii?Q?mD0Bp+Z4XHTY2Lafdzpp7Xqm9uZMDiVTWmoHFGxzjJjlhJLNRVDlqHvyuVWX?=
- =?us-ascii?Q?BUbc61woe35LEwp2OZSgnkiIeuDS5ShItgK9CylVgVTn0+zC7Hilk2QuJhuu?=
- =?us-ascii?Q?CgrLejJcZwEAFa2+X85+pC4VAVr8761ReWoYK1RD36dWSlhLqVG676kqRz1h?=
- =?us-ascii?Q?ZWTkTujs2x3GZFmDTfcAFz6f05ixLWFlYeI7jHo42UgHfQe3l7o/e8+zXw2r?=
- =?us-ascii?Q?mk9wPIodvvACReMRAY3ThPZ7PidslvJ3ghhfrS59R7/fFJN42ZPeb21Oouxg?=
- =?us-ascii?Q?AMyGNmVULexFf/cR9gUZgme8IkUI6vfNc2SpbhB9VMafIeMkceNgnphCvjm6?=
- =?us-ascii?Q?aKwb8Cnhk6e5HXtGwqzOc7hkgt1H7T6wO8Z0hHUuRSHDw2VT/sjJ/IjzsSQQ?=
- =?us-ascii?Q?A+Ozi9kgps9QRJP6jpGbPxBVqsBe6J7xmMtVdfAV3lIOm5WqQRx6F2CsX658?=
- =?us-ascii?Q?M4IeDWg25DKa7Oh/NeCTnIRElDMugJdgcNWKyd2aJmqq6eKtvnuH1cLK6D2Y?=
- =?us-ascii?Q?hRyFGfR3Jm8V5peG2VlcukAw7l2ztOvojNeauz+a5FT00DNaWn0tJnQUX/t0?=
- =?us-ascii?Q?DTYRCLjOuSL5DFJdYXZDFObVlnXgM1jLIpCipzATFnZ2IS6HCY9hklD1ndIr?=
- =?us-ascii?Q?7TXiCzekUx2BGGb3bEk9DZ6u7nURpcu8DpZOAZlHnTor0tJ3tzKE/O9inHPa?=
- =?us-ascii?Q?Krm7J/G3kat9+sWo80D/z5/qx8OdwHWbPeds1v1mk8UNPlCI2DVHZo2tDw52?=
- =?us-ascii?Q?yoSJS8fuVDqzvlOLa6RG/Lwxy7uKyo2dJNXIh6F5XA5q4xwbmAmb5JXthOug?=
- =?us-ascii?Q?5/LMRbngQOmcFxPXyHxU6NOg+fujVILY/emsVI8/?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 57046e16-b2b6-45da-02df-08db6b1fec65
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2023 08:35:05.9901
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Rk6Rvf43+ntq179NNni+VfjKD6ROwMNIAMpxvEAg34XPt+eEKI7YjX7UiexyBQ6ARXU8oMnxiuxzKfNotj57bg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6224
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJve8omPV_XgCSvw8POZwisb6uTOFMJU4FyAKArryui2SAsqtw@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -149,27 +95,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 06, 2023 at 05:43:09PM -0700, Sean Christopherson wrote:
->Snapshot the host's MSR_IA32_ARCH_CAPABILITIES, if it's supported, instead
->of reading the MSR every time KVM wants to query the host state, e.g. when
->initializing the default value during vCPU creation.  The paths that query
->ARCH_CAPABILITIES aren't particularly performance sensitive, but creating
->vCPUs is a frequent enough operation that burning 8 bytes is a good
->trade-off.
->
->Alternatively, KVM could add a field in kvm_caps and thus skip the
->on-demand calculations entirely, but a pure snapshot isn't possible due to
->the way KVM handles the l1tf_vmx_mitigation module param.  And unlike the
->other "supported" fields in kvm_caps, KVM doesn't enforce the "supported"
->value, i.e. KVM treats ARCH_CAPABILITIES like a CPUID leaf and lets
->userspace advertise whatever it wants.  Those problems are solvable, but
->it's not clear there is real benefit versus snapshotting the host value,
->and grabbing the host value will allow additional cleanup of KVM's
->FB_CLEAR_CTRL code.
->
->Link: https://lore.kernel.org/all/20230524061634.54141-2-chao.gao@intel.com
->Cc: Chao Gao <chao.gao@intel.com>
->Cc: Xiaoyao Li <xiaoyao.li@intel.com>
->Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Sat, Jun 10, 2023 at 10:35:24AM +0800, Haibo Xu wrote:
+> On Fri, Jun 9, 2023 at 5:24 PM Andrew Jones <ajones@ventanamicro.com> wrote:
+> >
+> > On Fri, Jun 09, 2023 at 10:12:17AM +0800, Haibo Xu wrote:
+> > > Set operation on some riscv registers(mostly pesudo ones) was not
+> > > supported and should be skipped in the get-reg-list test. Just
+> > > reuse the rejects_set utilities to handle it in riscv.
+> > >
+> > > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> > > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> > > ---
+> > >  tools/testing/selftests/kvm/get-reg-list.c | 20 +++++++++++++-------
+> > >  1 file changed, 13 insertions(+), 7 deletions(-)
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing/selftests/kvm/get-reg-list.c
+> > > index c4bd5a5259da..abacb95c21c6 100644
+> > > --- a/tools/testing/selftests/kvm/get-reg-list.c
+> > > +++ b/tools/testing/selftests/kvm/get-reg-list.c
+> > > @@ -211,16 +211,22 @@ static void run_test(struct vcpu_reg_list *c)
+> > >                       ++failed_get;
+> > >               }
+> > >
+> > > -             /* rejects_set registers are rejected after KVM_ARM_VCPU_FINALIZE */
+> > > +             /*
+> > > +              * rejects_set registers are rejected after KVM_ARM_VCPU_FINALIZE on aarch64,
+> > > +              * or registers that should skip set operation on riscv.
+> > > +              */
+> > >               for_each_sublist(c, s) {
+> > >                       if (s->rejects_set && find_reg(s->rejects_set, s->rejects_set_n, reg.id)) {
+> > >                               reject_reg = true;
+> > > -                             ret = __vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
+> > > -                             if (ret != -1 || errno != EPERM) {
+> > > -                                     printf("%s: Failed to reject (ret=%d, errno=%d) ", config_name(c), ret, errno);
+> > > -                                     print_reg(config_name(c), reg.id);
+> > > -                                     putchar('\n');
+> > > -                                     ++failed_reject;
+> > > +                             if ((reg.id & KVM_REG_ARCH_MASK) == KVM_REG_ARM64) {
+> > > +                                     ret = __vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
+> > > +                                     if (ret != -1 || errno != EPERM) {
+> > > +                                             printf("%s: Failed to reject (ret=%d, errno=%d) ",
+> > > +                                                             config_name(c), ret, errno);
+> > > +                                             print_reg(config_name(c), reg.id);
+> > > +                                             putchar('\n');
+> > > +                                             ++failed_reject;
+> > > +                                     }
+> >
+> > Thinking about this some more, shouldn't we attempt the set ioctl for
+> > riscv reject registers as well, but look for different error numbers?
+> >
+> 
+> Yes, we can. Currently, 2 different errno(EOPNOTSUPP/EINVAL) would be
+> reported for the rejected registers in risc-v.
+> These 2 errnos can be handled specially like below:
+> 
+> diff --git a/tools/testing/selftests/kvm/get-reg-list.c
+> b/tools/testing/selftests/kvm/get-reg-list.c
+> index 73f40e0842b8..f3f2c4519318 100644
+> --- a/tools/testing/selftests/kvm/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/get-reg-list.c
+> @@ -255,6 +255,15 @@ static void run_test(struct vcpu_reg_list *c)
+>                                                 putchar('\n');
+>                                                 ++failed_reject;
+>                                         }
+> +                } else {
+> +                                       ret = __vcpu_ioctl(vcpu,
+> KVM_SET_ONE_REG, &reg);
+> +                                       if (ret != -1 || (errno !=
+> EINVAL && errno != EOPNOTSUPP)) {
+> +                                               printf("%s: Failed to
+> reject (ret=%d, errno=%d) ",
+> +
+> config_name(c), ret, errno);
+> +
+> print_reg(config_name(c), reg.id);
+> +                                               putchar('\n');
+> +                                               ++failed_reject;
+> +                                       }
 
-Reviewed-by: Chao Gao <chao.gao@intel.com>
+Instead of duplicating the code Arm uses, we just need an errno check
+function, preferably one that takes the register as an input, so we
+can check for specific errnos for specific registers.
+
+> 
+> One possible issue for the above change is that when new registers
+> that don't support sets were added, we need
+> to add them to the reject registers list, or the test would fail.
+> 
+> Initially, in the v1 patch, the design was to just skip the EOPNOTSUPP
+> errno in set operations for all registers
+> since it's a known errno for registers that don't support sets. This
+> change cover all the registers even for future
+> new ones.
+> 
+> What's your opinion?
+
+I think we should only do the get/set tests on present, blessed list
+registers, since if it's a new register we don't know its capabilities.
+
+So, instead of
+
+  for_each_reg(i) {
+     /* get/set tests */
+  }
+
+we do
+  
+  for_each_present_blessed_reg(i) {
+     /* get/set tests */
+  }
+
+where we have
+
+ #define for_each_present_blessed_reg(i) \
+     for ((i) = 0; (i) < blessed_n; ++(i)) \
+         if (find_reg(reg_list->reg, reg_list->n, blessed_reg[i]))
+
+
+Changing run_test() to work this way should be a separate patch.
+
+Thanks,
+drew
