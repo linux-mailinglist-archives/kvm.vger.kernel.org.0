@@ -2,165 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 622CF72B895
-	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 09:25:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 331BC72B920
+	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 09:50:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232382AbjFLHYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jun 2023 03:24:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42648 "EHLO
+        id S235628AbjFLHuf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jun 2023 03:50:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbjFLHYl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jun 2023 03:24:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4B2C11C
-        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 00:19:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686554073;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AKMBSH67N5nwF8dvLnk58o69SrrghR5lWZu+UnhiuP4=;
-        b=d4tJOAfB1my2q3jW1ZTa9wulYyGHsVaJzfYCcwl1x5fTU+uyzJKBXr9+NaEb124M1lPlR/
-        xd7+ioJGI8KT+R8pf4D0pAEbptQAdZDfScnv6/vpnyxNsCW7w8Mr67ZUPcLZgwkPWoH+nS
-        D1pUJcPaFnUbNPYETIo+kalX5+soMlc=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-561-hjQ7KuvrOY2VwNE15CrHyg-1; Mon, 12 Jun 2023 03:11:19 -0400
-X-MC-Unique: hjQ7KuvrOY2VwNE15CrHyg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f7ef2456dfso15869225e9.1
-        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 00:11:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686553878; x=1689145878;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AKMBSH67N5nwF8dvLnk58o69SrrghR5lWZu+UnhiuP4=;
-        b=GP1yFx8GpRPpbJGeonIahJ+MKAqyoDf+cb8Lnm7Jd3NxCfgF8cVE5//3QoJlXhjJ47
-         yOjOLvdnUTQmwnnN2+IhKTlCRC92lMopcEePTdupoTxzi90Uwaw8dVBOvgoAaUEOR3CV
-         57FKmFIeb8DGSH6rxXw3bW6IqGYOqijE4ANs23q5oIYxYEu1GqckYmBRXAe3I5EQZujw
-         dNWNFwjjPkwcTyGBtEBCCylXlpMGul4CHf4iO/qZ5bySf+xtzh7U6tH/LQziO3MJMTRo
-         dEjBF21uju8KIxA26k7/5AmO8tKCJTHM/OsO/xZXXIgT1MhzjzSOdBnb070cn0oa9afg
-         kVQQ==
-X-Gm-Message-State: AC+VfDzrCYvtvs2EDttvXmEecbc3zPK18ZoLPhsYzIXdK7EAHIqDfTwj
-        d1hxDaqFPdHdkmlEsHlHTHDwwWDq7fZ8vZysHw6z6aEKGlAgF2bHoJWdj92wy3DV/Umq5Zeo9Lu
-        45I49gCeB8KEbFWI0tZAh
-X-Received: by 2002:a7b:c347:0:b0:3f7:e7d5:6123 with SMTP id l7-20020a7bc347000000b003f7e7d56123mr5568187wmj.41.1686553878260;
-        Mon, 12 Jun 2023 00:11:18 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7BPeYfMTdMXJlr39jBPXTAxqY1TcRxt8GNzF1y3FLQS/h17pJgr+hsbhDCBxa27Wi7VdEMhA==
-X-Received: by 2002:a7b:c347:0:b0:3f7:e7d5:6123 with SMTP id l7-20020a7bc347000000b003f7e7d56123mr5568167wmj.41.1686553877878;
-        Mon, 12 Jun 2023 00:11:17 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c74e:1600:4f67:25b2:3e8c:2a4e? (p200300cbc74e16004f6725b23e8c2a4e.dip0.t-ipconnect.de. [2003:cb:c74e:1600:4f67:25b2:3e8c:2a4e])
-        by smtp.gmail.com with ESMTPSA id m13-20020a7bce0d000000b003f42a75ac2asm10411399wmc.23.2023.06.12.00.11.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jun 2023 00:11:17 -0700 (PDT)
-Message-ID: <338e88e6-bbed-f3bb-ead7-f15399f44285@redhat.com>
-Date:   Mon, 12 Jun 2023 09:11:16 +0200
+        with ESMTP id S235924AbjFLHtr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jun 2023 03:49:47 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C934BB
+        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 00:49:14 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 397FD22850;
+        Mon, 12 Jun 2023 07:48:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1686556091; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=c8kwzDIIBDr3fel/kfXlCHjmh+lpX2M0y16Mob/akTo=;
+        b=0AssJnx4mjikpWU+wQ01lhjrCNnvd2IjjM2pj66IH0pZPvUpqR8J6pemHTcDyGQJURK/gH
+        TkarJhMT4FkrsQraWFoLxmHQZWmUtytVTRzOsb5r82MlcttrmU8fnlJD2DUppIGT0KMKb+
+        +Wr6VUAOEjxnJ1TLQIEgGSIpPRnv2mU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1686556091;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=c8kwzDIIBDr3fel/kfXlCHjmh+lpX2M0y16Mob/akTo=;
+        b=MVYwuZu+AnIN+k0z2LiWHlQzyVss/yOxunG0PD2EmmojkYkbRc5d2PsuLgWmUgOiEA6Khp
+        7Jq1qgJp76qLv2Cw==
+Received: from vasant-suse.fritz.box (unknown [10.163.24.134])
+        by relay2.suse.de (Postfix) with ESMTP id 942522C141;
+        Mon, 12 Jun 2023 07:48:10 +0000 (UTC)
+From:   Vasant Karasulli <vkarasulli@suse.de>
+To:     pbonzini@redhat.com
+Cc:     Thomas.Lendacky@amd.com, drjones@redhat.com, erdemaktas@google.com,
+        jroedel@suse.de, kvm@vger.kernel.org, marcorr@google.com,
+        rientjes@google.com, seanjc@google.com, zxwang42@gmail.com,
+        Vasant Karasulli <vkarasulli@suse.de>
+Subject: [PATCH v4 00/11] Add #VC exception handling for AMD SEV-ES
+Date:   Mon, 12 Jun 2023 09:47:47 +0200
+Message-Id: <20230612074758.9177-1-vkarasulli@suse.de>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v2] KVM: Avoid illegal stage2 mapping on invalid memory
- slot
-Content-Language: en-US
-To:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, maz@kernel.org, seanjc@google.com,
-        oliver.upton@linux.dev, aarcange@redhat.com, peterx@redhat.com,
-        hshuai@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-References: <20230609100420.521351-1-gshan@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20230609100420.521351-1-gshan@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09.06.23 12:04, Gavin Shan wrote:
-> We run into guest hang in edk2 firmware when KSM is kept as running on
-> the host. The edk2 firmware is waiting for status 0x80 from QEMU's pflash
-> device (TYPE_PFLASH_CFI01) during the operation of sector erasing or
-> buffered write. The status is returned by reading the memory region of
-> the pflash device and the read request should have been forwarded to QEMU
-> and emulated by it. Unfortunately, the read request is covered by an
-> illegal stage2 mapping when the guest hang issue occurs. The read request
-> is completed with QEMU bypassed and wrong status is fetched. The edk2
-> firmware runs into an infinite loop with the wrong status.
-> 
-> The illegal stage2 mapping is populated due to same page sharing by KSM
-> at (C) even the associated memory slot has been marked as invalid at (B)
-> when the memory slot is requested to be deleted. It's notable that the
-> active and inactive memory slots can't be swapped when we're in the middle
-> of kvm_mmu_notifier_change_pte() because kvm->mn_active_invalidate_count
-> is elevated, and kvm_swap_active_memslots() will busy loop until it reaches
-> to zero again. Besides, the swapping from the active to the inactive memory
-> slots is also avoided by holding &kvm->srcu in __kvm_handle_hva_range(),
-> corresponding to synchronize_srcu_expedited() in kvm_swap_active_memslots().
-> 
->    CPU-A                    CPU-B
->    -----                    -----
->                             ioctl(kvm_fd, KVM_SET_USER_MEMORY_REGION)
->                             kvm_vm_ioctl_set_memory_region
->                             kvm_set_memory_region
->                             __kvm_set_memory_region
->                             kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE)
->                               kvm_invalidate_memslot
->                                 kvm_copy_memslot
->                                 kvm_replace_memslot
->                                 kvm_swap_active_memslots        (A)
->                                 kvm_arch_flush_shadow_memslot   (B)
->    same page sharing by KSM
->    kvm_mmu_notifier_invalidate_range_start
->          :
->    kvm_mmu_notifier_change_pte
->      kvm_handle_hva_range
->      __kvm_handle_hva_range       (C)
->          :
->    kvm_mmu_notifier_invalidate_range_end
-> 
-> Fix the issue by skipping the invalid memory slot at (C) to avoid the
-> illegal stage2 mapping so that the read request for the pflash's status
-> is forwarded to QEMU and emulated by it. In this way, the correct pflash's
-> status can be returned from QEMU to break the infinite loop in the edk2
-> firmware.
-> 
-> Cc: stable@vger.kernel.org # v5.13+
-> Fixes: 3039bcc74498 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
-> Reported-by: Shuai Hu <hshuai@redhat.com>
-> Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
-> v2: Improved changelog suggested by Marc
-> ---
->   virt/kvm/kvm_main.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 479802a892d4..7f81a3a209b6 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -598,6 +598,9 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
->   			unsigned long hva_start, hva_end;
->   
->   			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
-> +			if (slot->flags & KVM_MEMSLOT_INVALID)
-> +				continue;
-> +
->   			hva_start = max(range->start, slot->userspace_addr);
->   			hva_end = min(range->end, slot->userspace_addr +
->   						  (slot->npages << PAGE_SHIFT));
+For AMD SEV-ES, kvm-unit-tests currently rely on UEFI to set up a
+#VC exception handler. This leads to the following problems:
 
-Nice debugging!
+1) The test's page table needs to map the firmware and the shared
+   GHCB used by the firmware.
+2) The firmware needs to keep its #VC handler in the current IDT
+   so that kvm-unit-tests can copy the #VC entry into its own IDT.
+3) The firmware #VC handler might use state which is not available
+   anymore after ExitBootServices.
+4) After ExitBootServices, the firmware needs to get the GHCB address
+   from the GHCB MSR if it needs to use the kvm-unit-test GHCB. This
+   requires keeping an identity mapping, and the GHCB address must be
+   in the MSR at all times where a #VC could happen.
 
-LGTM
+Problems 1) and 2) were temporarily mitigated via commits b114aa57ab
+("x86 AMD SEV-ES: Set up GHCB page") and 706ede1833 ("x86 AMD SEV-ES:
+Copy UEFI #VC IDT entry") respectively.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+However, to make kvm-unit-tests reliable against 3) and 4), the tests
+must supply their own #VC handler [1][2].
 
--- 
-Cheers,
+This series adds #VC exception processing from Linux into kvm-unit-tests,
+and makes it the default way of handling #VC exceptions.
 
-David / dhildenb
+If --amdsev-efi-vc is passed during ./configure, the tests will continue
+using the UEFI #VC handler.
+
+[1] https://lore.kernel.org/all/Yf0GO8EydyQSdZvu@suse.de/
+[2] https://lore.kernel.org/all/YSA%2FsYhGgMU72tn+@google.com/
+
+v4:
+- Rebased the patches on top of the current state of the test suite
+- Rebased the insn decoder on linux kernel v6.4
+
+v3:
+- Reduce the diff between insn decoder code imported into kvm-unit-tests
+  and the original code in Linux; cleanup #VC handling.
+
+v2:
+- Drop #VC processing code for RDTSC/RDTSCP and WBINVD (seanjc). KVM does
+  not trap RDTSC/RDTSCP, and the tests do not produce a WBINVD exit to be
+  handled.
+- Clarify the rationale for tests needing their own #VC handler (marcorr).
+
+Vasant Karasulli (11):
+  x86: AMD SEV-ES: Setup #VC exception handler for AMD SEV-ES
+  x86: Move svm.h to lib/x86/
+  lib: Define unlikely()/likely() macros in libcflat.h
+  lib: x86: Import insn decoder from Linux
+  x86: AMD SEV-ES: Pull related GHCB definitions and helpers from Linux
+  x86: AMD SEV-ES: Prepare for #VC processing
+  lib/x86: Move xsave helpers to lib/
+  x86: AMD SEV-ES: Handle CPUID #VC
+  x86: AMD SEV-ES: Handle MSR #VC
+  x86: AMD SEV-ES: Handle IOIO #VC
+  x86: AMD SEV-ES: Handle string IO for IOIO #VC
+
+ .gitignore                         |    2 +
+ Makefile                           |    3 +
+ configure                          |   21 +
+ lib/libcflat.h                     |    3 +
+ lib/x86/amd_sev.c                  |   13 +-
+ lib/x86/amd_sev.h                  |   98 +++
+ lib/x86/amd_sev_vc.c               |  494 ++++++++++++
+ lib/x86/desc.c                     |   17 +
+ lib/x86/desc.h                     |    1 +
+ lib/x86/insn/README                |   23 +
+ lib/x86/insn/gen-insn-attr-x86.awk |  443 +++++++++++
+ lib/x86/insn/inat.c                |   86 ++
+ lib/x86/insn/inat.h                |  233 ++++++
+ lib/x86/insn/inat_types.h          |   18 +
+ lib/x86/insn/insn.c                |  749 +++++++++++++++++
+ lib/x86/insn/insn.h                |  279 +++++++
+ lib/x86/insn/insn_glue.h           |   32 +
+ lib/x86/insn/x86-opcode-map.txt    | 1191 ++++++++++++++++++++++++++++
+ lib/x86/msr.h                      |    1 +
+ lib/x86/processor.h                |   15 +
+ lib/x86/setup.c                    |    8 +
+ {x86 => lib/x86}/svm.h             |   40 +-
+ lib/x86/xsave.c                    |   40 +
+ lib/x86/xsave.h                    |   16 +
+ x86/Makefile.common                |   16 +-
+ x86/Makefile.x86_64                |    1 +
+ x86/kvmclock.c                     |    4 -
+ x86/svm.c                          |    2 +-
+ x86/svm_tests.c                    |    2 +-
+ x86/xsave.c                        |   42 +-
+ 30 files changed, 3835 insertions(+), 58 deletions(-)
+ create mode 100644 lib/x86/amd_sev_vc.c
+ create mode 100644 lib/x86/insn/README
+ create mode 100644 lib/x86/insn/gen-insn-attr-x86.awk
+ create mode 100644 lib/x86/insn/inat.c
+ create mode 100644 lib/x86/insn/inat.h
+ create mode 100644 lib/x86/insn/inat_types.h
+ create mode 100644 lib/x86/insn/insn.c
+ create mode 100644 lib/x86/insn/insn.h
+ create mode 100644 lib/x86/insn/insn_glue.h
+ create mode 100644 lib/x86/insn/x86-opcode-map.txt
+ rename {x86 => lib/x86}/svm.h (94%)
+ create mode 100644 lib/x86/xsave.c
+ create mode 100644 lib/x86/xsave.h
+
+--
+2.34.1
 
