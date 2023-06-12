@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E893672B6A6
-	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 06:41:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC5DD72B6C4
+	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 06:48:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234681AbjFLElD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jun 2023 00:41:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42210 "EHLO
+        id S235016AbjFLEmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jun 2023 00:42:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235500AbjFLEk2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jun 2023 00:40:28 -0400
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2080.outbound.protection.outlook.com [40.107.102.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D07C19AF;
-        Sun, 11 Jun 2023 21:39:30 -0700 (PDT)
+        with ESMTP id S234822AbjFLElh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jun 2023 00:41:37 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2053.outbound.protection.outlook.com [40.107.223.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F9FF1724;
+        Sun, 11 Jun 2023 21:41:01 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NPi3DdT2PUo1OlJ+MiySWa7ZyCAQoxHyDwiJLMgT4bFeSQxnVte4gjr0i+o1HDxe0aP+VpSYSRSnwRjnEWPaomvX/JrZ8ScJ25jzj+Z25/0z8kaQijzr+DIJGOVpyjIyWX++k+qX9soDp6REMBGslhbyYbXlA2tw8qnNONScFKkqfX+q9HADKUXXtfNgl9uBncwxM3D5PUiYPlkJxhQs9mSh9dJFU6DrMrtNQHhcQzoQIcgnwhlemqVs4mFs/7WqaqpFIoV1UUzB5p3qHAmBFzkrBaRF7H7dzeMMdnhTHiJ+vetHX1SF3yCaqtUj5ALVEKuw+G4C8DC2UTn95P9f9Q==
+ b=U681qMlhTPyX4zBte/1J08WgQdSXtpNRC8GHMG0lZwz6PaTHoR/NtPZddqCxvIKkJNbinV3auUC43G78ahxCQlVAzO4/LaB+MN/JutX4tTrpGoZARZ85v/SlxBMZl0XGGNDzoLqFi+ifT1D7yyqxfaCuF6QJtZlFamF7KG4Gkw+2wtRnh/38Ns3GhRPzX9VIytaxs04PcSOtWQWvz6OGKhiz2oVL7+h1PsFV8onvNjZhL/KnXMAwmG/mO3f8wbsN3cEpqX2dIuqn6oLVrQLbTEcEhGD6/QMDSW8+EB2Xkp4wqyW+1zXHlgNZhirHOegB0fWF6A0B6Nr+OkHr7YqIhg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eHNcgb3bW0RGuw2lf/r2QANgbsO2xqcPD/u1M2WbB/M=;
- b=g5mZMjYIulpTeandK60uHJQtTnOPx2LTYje7ns5VW2kwNvuu1C5J046mFjXWw8NPiVMguJ7i2SCNr0txjAq11j2IjVdmA3ucXOv2iQmrdlIm3/MiqWPeiFUgPum8A2qd5UyCwE4mC++jsKwD7RaVDe+CfiHya7RVFFqB08HXUPH53KTf26fO0TUJORabvWJVCKPYA31HBsSa+wo6WI7kzm9nH1zidZtgTuDip/nppgdiMg7CyY6sI3nI6D05KMrNc4Wk9tXOdbjDh6ge9pQCSSLppkIBEZeFeKhuvwoja2pyE4ORZEDmadhQ6IfCL3czZHC5+5RTUfjJKTQvlNZ6fg==
+ bh=28cE1nFtQUfuCs5Hi5DEX8uBfUlxeTHiFFKicSfKOZU=;
+ b=TDBUsMiWw0LylSoax6yvRNF1u01EEn+zzdc/m5xR3B8uYHl9U+zBn0I/dUGy/mvxpffJjWx2x9h7BHgf5HdruSoNDP9KgDAUG1mKwFvcoVcMe/Uui1Pdkw/Ym3jKZeMiQku3yJwFdBkUROBDsCnb2dCMkZJHMML4UyynAynRTf9P+26RJCzuvTpS4uUIQnY9g1KCADh3o4HVjTfNrJyuvT6vJzFoAoCPmgqJhIXb3tr6gxs5Z1ntL34lgTE1TjX/5lv+GNdGUeLTywcqevh95zEIz9Xn2SKI+wxqJurANE1AEw0auOlNzWwjnNIkQ/7jS/4Q+v3GmPhYoT2J9TGTYA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eHNcgb3bW0RGuw2lf/r2QANgbsO2xqcPD/u1M2WbB/M=;
- b=mWEiunBIUYm5h3yljexd3mZ6hGY0lEc/viKTVhNo5PUPfPqQfwk/s1oCiuc/ofwqfBh2ULiYFslFfrwX0EH8+5YB9WOXz87uO8ITRRibB2Pep9BLdUVqFqAB78fXypfGuReP3nzCKsvRBG4j9bzqa2LFWJaE0FYauBed7atIAeM=
-Received: from MW4PR03CA0003.namprd03.prod.outlook.com (2603:10b6:303:8f::8)
- by CH2PR12MB4873.namprd12.prod.outlook.com (2603:10b6:610:63::22) with
+ bh=28cE1nFtQUfuCs5Hi5DEX8uBfUlxeTHiFFKicSfKOZU=;
+ b=P47QNxkfRU0oZJ6vNm7Wqx/m0Iu0Vsyv44k5mZOB4QiIDM6s+zu/0iVzPQIIBKAsTtkl08BMIk6V9Yaypy6ZwLoEzI1hX1KlKU63rUZuVqLv76eEoZW9aDKZmespl+2ZAIiI94DpLqCSiM93fLyWvUTP69ARxK3ATUAPGmlca+I=
+Received: from MW4PR04CA0233.namprd04.prod.outlook.com (2603:10b6:303:87::28)
+ by LV2PR12MB5752.namprd12.prod.outlook.com (2603:10b6:408:14d::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.29; Mon, 12 Jun
- 2023 04:39:26 +0000
-Received: from CO1PEPF000042AE.namprd03.prod.outlook.com
- (2603:10b6:303:8f:cafe::d3) by MW4PR03CA0003.outlook.office365.com
- (2603:10b6:303:8f::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.44; Mon, 12 Jun
+ 2023 04:40:59 +0000
+Received: from CO1PEPF000042A7.namprd03.prod.outlook.com
+ (2603:10b6:303:87:cafe::4) by MW4PR04CA0233.outlook.office365.com
+ (2603:10b6:303:87::28) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.33 via Frontend
- Transport; Mon, 12 Jun 2023 04:39:26 +0000
+ Transport; Mon, 12 Jun 2023 04:40:58 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,13 +46,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000042AE.mail.protection.outlook.com (10.167.243.43) with Microsoft
+ CO1PEPF000042A7.mail.protection.outlook.com (10.167.243.36) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6500.22 via Frontend Transport; Mon, 12 Jun 2023 04:39:26 +0000
+ 15.20.6500.22 via Frontend Transport; Mon, 12 Jun 2023 04:40:58 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Sun, 11 Jun
- 2023 23:39:23 -0500
+ 2023 23:40:53 -0500
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -70,11 +70,10 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
         <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-        Vishal Annapurve <vannapurve@google.com>
-Subject: [PATCH RFC v9 30/51] KVM: Add HVA range operator
-Date:   Sun, 11 Jun 2023 23:25:38 -0500
-Message-ID: <20230612042559.375660-31-michael.roth@amd.com>
+        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>
+Subject: [PATCH RFC v9 31/51] KVM: Split out memory attribute xarray updates to helper function
+Date:   Sun, 11 Jun 2023 23:25:39 -0500
+Message-ID: <20230612042559.375660-32-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230612042559.375660-1-michael.roth@amd.com>
 References: <20230612042559.375660-1-michael.roth@amd.com>
@@ -86,23 +85,23 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000042AE:EE_|CH2PR12MB4873:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5e65158f-8517-41a6-9a81-08db6aff00bd
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042A7:EE_|LV2PR12MB5752:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3062944b-838f-4225-c420-08db6aff37b9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /13cltSALSFlfzZt1R+Xu8figwINoNYALkqfZNNREKs963ny4VOWlyKZ3mv8mVuBHneJDOpqFLJKms8nCy38XsAKGVnKoD4L9UbSGDLwILyT4j0RWsblsM7EU8ffvy3hLterW+n8RK3DMEstvcFWrren5+wQOFMRTrWACQOyCq8FAhghYrfZjS1Cy8AxE1FQ5NFKV0O/qSbC9sblYDk9uwP2NgSd0L4kx+hoA3aRdiQbPLMXaeI+6MfjcOINQjNFr5JI4isHSrRzr5473WZ/uYNEODZiw+DqD05enRuCLTA+WU/A2Ylju/8/rK2P92bs8sTbzCNoxwMwHCo/DH/Mv9XAzgZSwbdV0katiImI2WOdErShobcIinGmWEedAbK+J3U2mDRjcJsuvmMaqtVFi0kGazxkuzaJOp1f7V2fSssJVNfjZlBGKHgqJ+qgR04dtiY2QU6wZ4z+p1CZv5qkwqDG3f5L1mIu59omczQBEw4PArEXaAbExfUQCODGfWEbEoKNutLALoqrcmF5TOMffY6cmCymoGNqrfzLJ48K946x3Nr0hQdK/RxSMlnEaM8CO86e4cGVjlqCpoFWTT46K2lydTkKxuK5IiIX8LiNkxIlA5+2ir8w5FxOYiG5Q2xGmEQeCSrFXeWN2Z+km7g7RrA3dqNMRrV14PntUFZERbwiixKrbYcqlz/GVAIHd1Qr/w5nxZu7NLFwW+0Im7iAFo+GHBu7Tm7/31qenbj9+vmrzuxERln+lXJJPfZpyHpvrzmfTmRW453YZR9IUfnuKQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(376002)(346002)(396003)(136003)(451199021)(36840700001)(46966006)(40470700004)(426003)(336012)(2616005)(47076005)(83380400001)(36860700001)(82740400003)(356005)(40480700001)(86362001)(82310400005)(81166007)(36756003)(40460700003)(478600001)(44832011)(54906003)(4326008)(6666004)(8936002)(8676002)(2906002)(5660300002)(7416002)(7406005)(70206006)(70586007)(6916009)(41300700001)(316002)(16526019)(186003)(1076003)(26005)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 8k/qp+GwPlSpluzG5rMPQ0v1hvJXRBpRDZBx2Tg5D6MifWTeMcZ2SR3HqrxFSkvLXRA26DJNPHvCbQVwBrBLCGRn50F2N4qLClJA+r286oKWvPnDSXf0tTBXGCA9SUJUu6x97S3xD1CQ+KgRqws2Iu1tdDbZKysOt1tJ9OmsdXf1CUzqKuQLEZgTS95Z4NcblhCPFp3XhxdZyOyblNzTDB9XjEPBJheG7KohvRJhDBrShthEjDDPS8shnIpUpIQ2uYZ3ZhL5d3nPdb3RIF2j9Lvpp3ce7kILcpC48wig6kYAAK2c4H/GH03bnY3r12RXvBJxSPh5coprTwgb5kHZthirdLs85xPW5TNMvZReDmdDedLZsVfKFcNXSRK2XR/5KlUBSEpKZfZ3OKGPAIMUR2XGgyi+SIW5IEgH3cCbfvMYg5OLX9bjM/aEGJ0WgV7X6dLLzovqs6OWhqsYxmwTVKSb4xP9JWKAIXu7UyHpbe1l/ZCDqFp2Gfkp3SFgATcLpIl2vc+9ElnO1n77XQzZotqnQ+MeTSdaV3c0RBPblp8RGVpXuk8XEuGiLkkuCS53C4kfyr0jUkW1BG5zkIgi+hvAPZU1WgND++KqPZthR9dV1PzTLavAqFYoBkrNGxJiFzQAbJF6fK4rzlyjXxMjeH6ahpaQCrL+fQ7pwheAI0tY9UFOCsRySCXCuReBVfHGeMIAf3KAa4OCycgPVGRLTJRFmnaYDx4pCamG+taXZ2Et7pub069/Grv694eiVYgrmgSKJV6jehH+r7BrsWIu2g==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(396003)(39860400002)(136003)(451199021)(46966006)(40470700004)(36840700001)(6916009)(4326008)(44832011)(316002)(7406005)(7416002)(70586007)(15650500001)(41300700001)(70206006)(186003)(16526019)(2906002)(54906003)(478600001)(8676002)(8936002)(5660300002)(6666004)(40460700003)(1076003)(82740400003)(356005)(81166007)(40480700001)(36860700001)(26005)(83380400001)(426003)(336012)(47076005)(36756003)(86362001)(82310400005)(2616005)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2023 04:39:26.3281
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2023 04:40:58.5776
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e65158f-8517-41a6-9a81-08db6aff00bd
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3062944b-838f-4225-c420-08db6aff37b9
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF000042AE.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF000042A7.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4873
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5752
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -113,96 +112,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vishal Annapurve <vannapurve@google.com>
+This will be useful to other callers that need to update memory
+attributes for things like setting up the initial private memory payload
+for a guest.
 
-Introduce HVA range operator so that other KVM subsystems
-can operate on HVA range.
-
-Signed-off-by: Vishal Annapurve <vannapurve@google.com>
-[mdr: minor checkpatch alignment fixups]
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- include/linux/kvm_host.h |  6 +++++
- virt/kvm/kvm_main.c      | 49 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 55 insertions(+)
+ include/linux/kvm_host.h |  1 +
+ virt/kvm/kvm_main.c      | 26 ++++++++++++++++++--------
+ 2 files changed, 19 insertions(+), 8 deletions(-)
 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 7de06add2235..9a9d4141ba74 100644
+index 9a9d4141ba74..56055692cdfa 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -1400,6 +1400,12 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm);
- void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
- void kvm_mmu_invalidate_end(struct kvm *kvm);
+@@ -991,6 +991,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module);
+ void kvm_exit(void);
  
-+typedef int (*kvm_hva_range_op_t)(struct kvm *kvm,
-+				struct kvm_gfn_range *range, void *data);
-+
-+int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
-+			   unsigned long hva_end, kvm_hva_range_op_t handler, void *data);
-+
- long kvm_arch_dev_ioctl(struct file *filp,
- 			unsigned int ioctl, unsigned long arg);
- long kvm_arch_vcpu_ioctl(struct file *filp,
+ void kvm_get_kvm(struct kvm *kvm);
++int kvm_vm_set_region_attr(struct kvm *kvm, gfn_t start, gfn_t end, u64 attributes);
+ bool kvm_get_kvm_safe(struct kvm *kvm);
+ void kvm_put_kvm(struct kvm *kvm);
+ bool file_is_kvm(struct file *file);
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 422d49634c56..48beffca6b67 100644
+index 48beffca6b67..0c0a75affab6 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -642,6 +642,55 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- 	return (int)ret;
+@@ -2466,12 +2466,28 @@ static void kvm_mem_attrs_changed(struct kvm *kvm, unsigned long attrs,
+ 		kvm_flush_remote_tlbs(kvm);
  }
  
-+int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
-+			   unsigned long hva_end, kvm_hva_range_op_t handler, void *data)
++int kvm_vm_set_region_attr(struct kvm *kvm, gfn_t start, gfn_t end,
++			   u64 attributes)
 +{
-+	int ret = 0;
-+	struct kvm_gfn_range gfn_range;
-+	struct kvm_memory_slot *slot;
-+	struct kvm_memslots *slots;
-+	int i, idx;
++	gfn_t index;
++	void *entry;
 +
-+	if (WARN_ON_ONCE(hva_end <= hva_start))
-+		return -EINVAL;
++	entry = attributes ? xa_mk_value(attributes) : NULL;
 +
-+	idx = srcu_read_lock(&kvm->srcu);
++	for (index = start; index < end; index++)
++		if (xa_err(xa_store(&kvm->mem_attr_array, index, entry,
++				    GFP_KERNEL_ACCOUNT)))
++			break;
 +
-+	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
-+		struct interval_tree_node *node;
-+
-+		slots = __kvm_memslots(kvm, i);
-+		kvm_for_each_memslot_in_hva_range(node, slots,
-+						  hva_start, hva_end - 1) {
-+			unsigned long start, end;
-+
-+			slot = container_of(node, struct kvm_memory_slot,
-+					    hva_node[slots->node_idx]);
-+			start = max(hva_start, slot->userspace_addr);
-+			end = min(hva_end, slot->userspace_addr +
-+						  (slot->npages << PAGE_SHIFT));
-+
-+			/*
-+			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
-+			 * {gfn_start, gfn_start+1, ..., gfn_end-1}.
-+			 */
-+			gfn_range.start = hva_to_gfn_memslot(start, slot);
-+			gfn_range.end = hva_to_gfn_memslot(end + PAGE_SIZE - 1, slot);
-+			gfn_range.slot = slot;
-+
-+			ret = handler(kvm, &gfn_range, data);
-+			if (ret)
-+				goto e_ret;
-+		}
-+	}
-+
-+e_ret:
-+	srcu_read_unlock(&kvm->srcu, idx);
-+
-+	return ret;
++	return index;
 +}
-+EXPORT_SYMBOL_GPL(kvm_vm_do_hva_range_op);
++EXPORT_SYMBOL_GPL(kvm_vm_set_region_attr);
 +
- static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
- 						unsigned long start,
- 						unsigned long end,
+ static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+ 					   struct kvm_memory_attributes *attrs)
+ {
+ 	gfn_t start, end;
+ 	unsigned long i;
+-	void *entry;
+ 
+ 	/* flags is currently not used. */
+ 	if (attrs->flags)
+@@ -2486,8 +2502,6 @@ static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+ 	start = attrs->address >> PAGE_SHIFT;
+ 	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+ 
+-	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
+-
+ 	mutex_lock(&kvm->slots_lock);
+ 
+ 	KVM_MMU_LOCK(kvm);
+@@ -2495,11 +2509,7 @@ static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+ 	kvm_mmu_invalidate_range_add(kvm, start, end);
+ 	KVM_MMU_UNLOCK(kvm);
+ 
+-	for (i = start; i < end; i++) {
+-		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+-				    GFP_KERNEL_ACCOUNT)))
+-			break;
+-	}
++	i = kvm_vm_set_region_attr(kvm, start, end, attrs->attributes);
+ 
+ 	KVM_MMU_LOCK(kvm);
+ 	if (i > start)
 -- 
 2.25.1
 
