@@ -2,128 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F0FC172CC12
-	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 19:08:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26B8E72CC39
+	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 19:16:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237147AbjFLRIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jun 2023 13:08:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53372 "EHLO
+        id S234579AbjFLRQp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jun 2023 13:16:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235943AbjFLRIa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jun 2023 13:08:30 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0579210E7
-        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 10:08:25 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4f58444a410so152e87.0
-        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 10:08:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686589703; x=1689181703;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hPHA2iInW/5MWEIDY5sRw7hsczk67ay7y9vys8rDT34=;
-        b=JGfnzKQxNy5ZG+svk3pKWyN7ndYnw6Cg9NfAVLy+p80Ss4DBGYrgTioADx2kTru1sI
-         Jiw4Cq4n4CvBniPpQdYSG0bgvTXC/lCBZWwzRI7ImGoniwCx5RT1mmyE3fAVGSZuo6rl
-         kOLCwE/HMFlIkIC68lxhIo0g1ynyfizgcrAin0y7fQOFLdZJL5qPtHBMIMc9HeTz8j3C
-         FV6Fe3V1rWxDiUqDjzbJEvoouy9sNYhVLzaF2X0FSyMHSmG8McHmXGU1sd5SgwDQWOqk
-         lh1TtdgZNNeeCJXKMM8jvJSHzd5f0xl+QTVGjqiepFPlYV7S5SME39tqQGLNNvDwTNuQ
-         OaSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686589703; x=1689181703;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hPHA2iInW/5MWEIDY5sRw7hsczk67ay7y9vys8rDT34=;
-        b=hrgZTKhzBx889VLR0ErFt1cGr+7YTTWhF1J0sZrU28D32TWASDE2NfPEF2l+kUvPlZ
-         xibEgYV/oyXUKWq4HEYhwiH9bGkwWGjfwvOCCqK9tN9y8PweuDbm2cdp9KeClX/QMjgB
-         1IQBcoBniTkKkYMX19Smw+Khd8RSW+htdPKCu12mX+jlqcAaCNxfV3Uke8RQhVDL3WAZ
-         qkRfVNw2MS6kUnQ3Xgc+XD9Dubfzjphfl3eTNUAiQ3r1QLbKu2DqTvvF6c+PT/+nGIor
-         8l36xeaCFe631slS/ZZl1NbyYt6Ki7mTyQaNQF5TDcV3XGAKBeTqtmzIJb+syf15WFOX
-         Z7dQ==
-X-Gm-Message-State: AC+VfDwx24XPjXMoCcthQAKfgVbzsEr8QKeysRagHlOk0lgDHNrCHKwE
-        FORgUIYGn+QmCPrJhJHoA/aQvnkZRV2C9B8WI+fB5w==
-X-Google-Smtp-Source: ACHHUZ75qxKnzvhiDDf0D5IcWH78fHsJ5oE2uWNN4sR3H9U9eFd+mPr5PWjgybS2SATgWNhLMY+e7X97TQ0uvb78OYc=
-X-Received: by 2002:ac2:4c39:0:b0:4f6:1722:d73a with SMTP id
- u25-20020ac24c39000000b004f61722d73amr147507lfq.5.1686589702990; Mon, 12 Jun
- 2023 10:08:22 -0700 (PDT)
+        with ESMTP id S233361AbjFLRQj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jun 2023 13:16:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98CAA1727
+        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 10:16:23 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2F86862087
+        for <kvm@vger.kernel.org>; Mon, 12 Jun 2023 17:16:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6DA5C433D2;
+        Mon, 12 Jun 2023 17:16:20 +0000 (UTC)
+Date:   Mon, 12 Jun 2023 18:16:18 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v3 03/17] arm64: Turn kaslr_feature_override into a
+ generic SW feature override
+Message-ID: <ZIdS4o1H6ePRLaKp@arm.com>
+References: <20230609162200.2024064-1-maz@kernel.org>
+ <20230609162200.2024064-4-maz@kernel.org>
 MIME-Version: 1.0
-References: <20230612042559.375660-1-michael.roth@amd.com> <20230612042559.375660-30-michael.roth@amd.com>
-In-Reply-To: <20230612042559.375660-30-michael.roth@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Mon, 12 Jun 2023 11:08:11 -0600
-Message-ID: <CAMkAt6qQ73ah0UW2sTh8CYNgMhWRMQ7bVxH5bWpVfCR-ncnZuQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v9 29/51] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_START command
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230609162200.2024064-4-maz@kernel.org>
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +
-> +static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> +{
-> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +       struct sev_data_snp_launch_start start = {0};
-> +       struct kvm_sev_snp_launch_start params;
-> +       int rc;
-> +
-> +       if (!sev_snp_guest(kvm))
-> +               return -ENOTTY;
-> +
-> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
-> +               return -EFAULT;
-> +
-> +       sev->snp_context = snp_context_create(kvm, argp);
-> +       if (!sev->snp_context)
-> +               return -ENOTTY;
+On Fri, Jun 09, 2023 at 05:21:46PM +0100, Marc Zyngier wrote:
+> diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+> index 370ab84fd06e..8c93b6198bf5 100644
+> --- a/arch/arm64/kernel/idreg-override.c
+> +++ b/arch/arm64/kernel/idreg-override.c
+> @@ -138,15 +138,11 @@ static const struct ftr_set_desc smfr0 __initconst = {
+>  	},
+>  };
+>  
+> -extern struct arm64_ftr_override kaslr_feature_override;
+> -
+> -static const struct ftr_set_desc kaslr __initconst = {
+> -	.name		= "kaslr",
+> -#ifdef CONFIG_RANDOMIZE_BASE
+> -	.override	= &kaslr_feature_override,
+> -#endif
+> +static const struct ftr_set_desc sw_features __initconst = {
+> +	.name		= "arm64_sw",
+> +	.override	= &arm64_sw_feature_override,
+>  	.fields		= {
+> -		FIELD("disabled", 0, NULL),
+> +		FIELD("nokaslr", ARM64_SW_FEATURE_OVERRIDE_NOKASLR, NULL),
+>  		{}
+>  	},
+>  };
+> @@ -158,7 +154,7 @@ static const struct ftr_set_desc * const regs[] __initconst = {
+>  	&isar1,
+>  	&isar2,
+>  	&smfr0,
+> -	&kaslr,
+> +	&sw_features,
+>  };
+>  
+>  static const struct {
+> @@ -175,7 +171,7 @@ static const struct {
+>  	  "id_aa64isar1.api=0 id_aa64isar1.apa=0 "
+>  	  "id_aa64isar2.gpa3=0 id_aa64isar2.apa3=0"	   },
+>  	{ "arm64.nomte",		"id_aa64pfr1.mte=0" },
+> -	{ "nokaslr",			"kaslr.disabled=1" },
+> +	{ "nokaslr",			"arm64_sw.nokaslr=1" },
+>  };
 
+I think structuring it as a sw feature makes more sense and I don't
+think it breaks anything (as long as people only used "nokaslr").
 
-I commented on a  previous series but I think the bug is still here. I
-think users can repeatedly call KVM_SEV_SNP_LAUNCH_START to have KVM
-keep allocating more snp_contexts above.
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 
-Should we check if the VM already has a |snp_context| and error out if so?
+As a side note, I was wondering if we should add a SW_FIELD macro to
+define width of 1 for such fields (and probably the field extraction
+functions need some tweaking) so that we define
+ARM64_SW_FEATURE_OVERRIDE_* in increments of 1 rather than 4. Anyway,
+that's something to worry if we get too many such software features.
 
->
-> +
-> +       start.gctx_paddr = __psp_pa(sev->snp_context);
-> +       start.policy = params.policy;
-> +       memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
-> +       rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_START, &start, &argp->error);
-> +       if (rc)
-> +               goto e_free_context;
-> +
-> +       sev->fd = argp->sev_fd;
-> +       rc = snp_bind_asid(kvm, &argp->error);
-> +       if (rc)
-> +               goto e_free_context;
-> +
-> +       return 0;
-> +
-> +e_free_context:
-> +       snp_decommission_context(kvm);
-> +
-> +       return rc;
-> +}
-> +
+-- 
+Catalin
