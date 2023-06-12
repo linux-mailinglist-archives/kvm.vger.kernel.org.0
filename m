@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF62872CB37
-	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 18:14:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5B8372CB75
+	for <lists+kvm@lfdr.de>; Mon, 12 Jun 2023 18:27:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235613AbjFLQOk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jun 2023 12:14:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53000 "EHLO
+        id S236122AbjFLQ1D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jun 2023 12:27:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231488AbjFLQOW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jun 2023 12:14:22 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D25951BC7;
-        Mon, 12 Jun 2023 09:14:15 -0700 (PDT)
+        with ESMTP id S233277AbjFLQ1B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jun 2023 12:27:01 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6A3598;
+        Mon, 12 Jun 2023 09:27:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686586455; x=1718122455;
+  t=1686587220; x=1718123220;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=nxVNBn+XWFWeEHcN8pf1WYBMgr4o1yAKNG8v2o0cHHw=;
-  b=JLFnb+nCWWyfIXGAqAwkc/zTQh+tc5f1oIBfQloqo0/ec7KItbbMjJHw
-   hdH3or2aAFoS89DfYEqzQT600buQVnIrjiWN5U82ICbVJFrf2n8clvg+P
-   X6jEKSo/ozHR7logih0JF8xCjyMpdLcpe6koaoUUR4C7Kf/R6UKk4b0A2
-   /x0+kks3uLJhKh+wrbYbdS4mRLPphQ42tODo/iIvkQ7Y0QEQkcMtjViZS
-   zBpdM+Zwr9lCQ1bAqddLgVd1iYfPtxT9qw/OCsy5BGLeb5rXpYMH0OKzy
-   A/ojQ/+AYHqLK6I7UaylDYadeJlLIXzTnnYEbs5rhJ9RwewvyFQq9CM6a
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="356976308"
+  bh=Uat8NMUncmqciNyRT9NRmiG7E1sO/Fvnt3OOx8fsnxw=;
+  b=dlvAq7Gtsz/y/mRHYTw1kzu+xyxA9XKOH63k9qcZ3wSeMZI7VMGpyNcG
+   UF3lhzm9RC80DuNbdf0ndwe5TT+0l/5fN/3adjRAIbtPQKPL/vMzD3O9h
+   prm4Tf/HdVC7LT4Y5npUREk9DK7dNIU4/WVcNGrEdn04jfrNIM0R5/uh3
+   q2vbHSjnWYU8oHtO4fbQQ+asF/HBwbed9a298vcQSsddaveatanxlUeU+
+   WUBiW6ID3knvyq/Z5JpJKoyxuhJSOlF5Tuizjxtan0Ski8qppCMhmJuvc
+   eTacdynFG6Xmx069Peqa12hm2eQDQMJlOXDv3t0xtsai4qZ8WFHjLzY5g
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="358089513"
 X-IronPort-AV: E=Sophos;i="6.00,236,1681196400"; 
-   d="scan'208";a="356976308"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2023 09:12:35 -0700
+   d="scan'208";a="358089513"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2023 09:26:59 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="705457138"
+X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="661638856"
 X-IronPort-AV: E=Sophos;i="6.00,236,1681196400"; 
-   d="scan'208";a="705457138"
+   d="scan'208";a="661638856"
 Received: from spmantha-mobl1.amr.corp.intel.com (HELO [10.209.43.2]) ([10.209.43.2])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2023 09:12:34 -0700
-Message-ID: <15148682-e2fd-8176-563b-74acf9815b6d@intel.com>
-Date:   Mon, 12 Jun 2023 09:12:34 -0700
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2023 09:26:58 -0700
+Message-ID: <7bf4b9a6-d75b-8e96-14cf-79df2fae8694@intel.com>
+Date:   Mon, 12 Jun 2023 09:26:58 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [PATCH RFC v9 10/51] x86/fault: Add helper for dumping RMP
- entries
+Subject: Re: [PATCH RFC v9 11/51] x86/traps: Define RMP violation #PF error
+ code
 Content-Language: en-US
 To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
 Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -63,15 +63,15 @@ Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
         nikunj.dadhania@amd.com, liam.merwick@oracle.com,
         zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
 References: <20230612042559.375660-1-michael.roth@amd.com>
- <20230612042559.375660-11-michael.roth@amd.com>
+ <20230612042559.375660-12-michael.roth@amd.com>
 From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230612042559.375660-11-michael.roth@amd.com>
+In-Reply-To: <20230612042559.375660-12-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -79,32 +79,34 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 6/11/23 21:25, Michael Roth wrote:
-> +	/*
-> +	 * If the RMP entry at the faulting pfn was not assigned, then not sure
-> +	 * what caused the RMP violation. To get some useful debug information,
-> +	 * iterate through the entire 2MB region, and dump the RMP entries if
-> +	 * one of the bit in the RMP entry is set.
-> +	 */
-> +	pfn = pfn & ~(PTRS_PER_PMD - 1);
-> +	pfn_end = pfn + PTRS_PER_PMD;
-> +
-> +	while (pfn < pfn_end) {
-> +		ret = __snp_lookup_rmpentry(pfn, &e, &level);
-> +		if (ret) {
-> +			pr_info("Failed to read RMP entry for PFN 0x%llx\n", pfn);
-> +			pfn++;
-> +			continue;
-> +		}
-> +
-> +		if (e.low || e.high)
-> +			pr_info("RMPEntry paddr 0x%llx: [high=0x%016llx low=0x%016llx]\n",
-> +				pfn << PAGE_SHIFT, e.high, e.low);
-> +		pfn++;
-> +	}
-> +}
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> Bit 31 in the page fault-error bit will be set when processor encounters
+> an RMP violation.
+> 
+> While at it, use the BIT_ULL() macro.
+...
+>  enum x86_pf_error_code {
+> -	X86_PF_PROT	=		1 << 0,
+> -	X86_PF_WRITE	=		1 << 1,
+> -	X86_PF_USER	=		1 << 2,
+> -	X86_PF_RSVD	=		1 << 3,
+> -	X86_PF_INSTR	=		1 << 4,
+> -	X86_PF_PK	=		1 << 5,
+> -	X86_PF_SGX	=		1 << 15,
+> +	X86_PF_PROT	=		BIT(0),
+> +	X86_PF_WRITE	=		BIT(1),
+> +	X86_PF_USER	=		BIT(2),
+> +	X86_PF_RSVD	=		BIT(3),
+> +	X86_PF_INSTR	=		BIT(4),
+> +	X86_PF_PK	=		BIT(5),
+> +	X86_PF_SGX	=		BIT(15),
+> +	X86_PF_RMP	=		BIT(31),
+>  };
 
-Dumping 511 lines of (possible) junk into the dmesg buffer seems a _bit_
-rude here.  I can see dumping out the 2M RMP entry, but not the other 510.
+It would be nice if the changelog "BIT_ULL()" matched the code "BIT()".  :)
 
-This also destroys the information about which pfn was being targeted
-for the dump in the first place.  That seems unfortunate.
+With that fixed,
+
+Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+
