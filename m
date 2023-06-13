@@ -2,164 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0F7072E9D5
-	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 19:33:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42FEB72E9D9
+	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 19:33:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239102AbjFMRb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jun 2023 13:31:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57640 "EHLO
+        id S235021AbjFMRb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 13:31:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230322AbjFMRbv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231946AbjFMRbv (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 13 Jun 2023 13:31:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5208BC9
-        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 10:30:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686677432;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5rNyoH/Y9EWvlZq1BBIGJddx9uEaRVCPkhuzBz1faSI=;
-        b=BOwi7AmtVGZgTJCqhNBYo9t74UhSjDn8kxgOEy8uoWEKtDYhCafk9ybbKctlB2Zcy2TJ1S
-        Gp4E3ErQ2tRYVYYUvFG5vpZfzI2XL2pZ+WKpjEWkrVGPqbVtLwaJ39RUc3kPYP/Wxwizl6
-        BLAtzM6Gs6b33ZkIC5DyPxVsuTTj7UI=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-204-GfkV-xnHNPuIxDO3Bi0tiw-1; Tue, 13 Jun 2023 13:30:30 -0400
-X-MC-Unique: GfkV-xnHNPuIxDO3Bi0tiw-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7775a282e25so648812139f.0
-        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 10:30:28 -0700 (PDT)
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95BAE1FC4;
+        Tue, 13 Jun 2023 10:31:21 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-65131e85be4so6148572b3a.1;
+        Tue, 13 Jun 2023 10:31:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686677481; x=1689269481;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9gwggrrTCd3fmtnE+bDUolvMX6NQ3t3WZmbENaeJBoM=;
+        b=PISkHaBuS3mRUYJlO4nJJs7GW6ULLaJcmEcYK1UIEEcfaZPNHdb7TIS1uQAL9tSLPJ
+         GscNqJZNr+ILzf+T2SYDXkT216YFYs97ZituBxQxKE4B5sYouyWgEvUdDpuGMpoNBp0v
+         WBSwt8+sT7HEcKUYZH/ue4Ljlzc5PkDElKr0qyYWSRqc48HNdJINpbj2WlSvpVN+yHtV
+         f6t8D/SPU7JHpM7mJ/0XM7KPTstiKv3TwCXXAsIgrJZW69wkn7mPS+B7vGu3CpaJ/j3M
+         nKeHTApU5NehqHJTbdaHZidg+oFytWYhqJMAN8QaFWWp2Q76S9aLqLg6PVkCYL1JDo+l
+         QofQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686677428; x=1689269428;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5rNyoH/Y9EWvlZq1BBIGJddx9uEaRVCPkhuzBz1faSI=;
-        b=C2jIqBA5or1/drPazEp/JLgzEGhbAVgD3WOaX0oY2GNTqs681krYzWLRPa7VBYHA9I
-         U7yZQj/rpdx24P9yc1PS/upSJ7hb+NhBvw365e1uOygkgKSZYBrYQIM5X4xsfURaJJH5
-         13XqHpqVv9xUUT5DnZWkZVQ91FqzwOQ3qe2O+ZtIs8H/iYNgA+NHUWcTVWQZHyXqchHr
-         dd5YZ40X03xVf5WC7mAq5FsJpkG56q0iavc1udKCdCkD3F60dMjpQ3WAoEKflW+EvT2l
-         RkzxB/r9NDC5qleZmb2RXp83xufTKjSlzeafvDkTkeT5zkF1OUvArXW/EjQy+04Ts8Fr
-         wwTA==
-X-Gm-Message-State: AC+VfDwmG4aIqc4ktOS6XGPthYA625RyT3IZgniBaFtmeymiLeHSNsjg
-        qOoOIDLV0xG6fo5MyxaAzWQivndo1l+vRtYqgVAhpCGC7IfxE4sR8S0nq8QnrkEfghb32rhUsHC
-        xVKLIP9nTIYhI
-X-Received: by 2002:a6b:904:0:b0:77a:de11:9725 with SMTP id t4-20020a6b0904000000b0077ade119725mr9574448ioi.15.1686677427778;
-        Tue, 13 Jun 2023 10:30:27 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5BkMZ9qiNe1FeXH/PJLIwHPPeNkq0P/IdFrUDbi6Jh6yHJTHPsdlC06uC/X4+f1OrZwQUOEQ==
-X-Received: by 2002:a6b:904:0:b0:77a:de11:9725 with SMTP id t4-20020a6b0904000000b0077ade119725mr9574417ioi.15.1686677427520;
-        Tue, 13 Jun 2023 10:30:27 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id y26-20020a056602201a00b007791e286fdbsm4013655iod.21.2023.06.13.10.30.26
+        d=1e100.net; s=20221208; t=1686677481; x=1689269481;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9gwggrrTCd3fmtnE+bDUolvMX6NQ3t3WZmbENaeJBoM=;
+        b=Zwfp/f7qCt7oIZr8uo7OC0Hx1fnpOPCGkh0sYrYdKJMC5WEpqOMARtOE6TMjgDvFwd
+         RgjDtLEFXz7R0r34gmSv1Mpgk5a/DcAecp0VcvUutGMH+luMSD1w0UvSE1uszabwIpdx
+         0ZhgrpTbsyVL1wjBaPI4bq7O3uXrdFc1CJe8USuNVvoVqmw9znq++LpoE5IPOSqCVP5l
+         LGAUAMrIldvSiT7PIethO0e1bLAdB/BZ5VfXK0j17FCvkweM3GsKQhPTGa0AyIaSzdTn
+         g1JGfLvAjZa3d8kw7cKDk1Vhb7SbCTgW9vQWMw/1IHaxR5eGJjw18u6YfYtGk/fk3Yfq
+         fZMw==
+X-Gm-Message-State: AC+VfDwjZxkgMQvErCYIxhqchaT5juS+groV0hcjnTRNilsxmD17aajQ
+        u/TYOq9etYcd5ssaS5gXYX4=
+X-Google-Smtp-Source: ACHHUZ4wIeo/npYX82XmWso98Ha4rFtX2QJThPCERDu1LAATOythu3zoC4U4Z9S8/aK8iNpxx06pkQ==
+X-Received: by 2002:a05:6a20:8e13:b0:10b:4539:fa0a with SMTP id y19-20020a056a208e1300b0010b4539fa0amr17104140pzj.1.1686677480710;
+        Tue, 13 Jun 2023 10:31:20 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id v12-20020aa7850c000000b00639fc7124c2sm1059516pfn.148.2023.06.13.10.31.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jun 2023 10:30:26 -0700 (PDT)
-Date:   Tue, 13 Jun 2023 11:30:25 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "clegoate@redhat.com" <clegoate@redhat.com>
-Subject: Re: [PATCH v12 24/24] docs: vfio: Add vfio device cdev description
-Message-ID: <20230613113025.377411ee.alex.williamson@redhat.com>
-In-Reply-To: <DS0PR11MB7529C440A84B75234E49C77CC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230602121653.80017-1-yi.l.liu@intel.com>
-        <20230602121653.80017-25-yi.l.liu@intel.com>
-        <20230612170628.661ab2a6.alex.williamson@redhat.com>
-        <DS0PR11MB7529B0A71849EA06DA953BBCC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230613082427.453748f5.alex.williamson@redhat.com>
-        <DS0PR11MB75297AC071F2EF4F49D85999C355A@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230613090403.1eecd1a3.alex.williamson@redhat.com>
-        <DS0PR11MB7529C440A84B75234E49C77CC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        Tue, 13 Jun 2023 10:31:19 -0700 (PDT)
+Date:   Tue, 13 Jun 2023 10:31:18 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chen, Bo2" <chen.bo@intel.com>, "Shahar, Sagi" <sagis@google.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dmatlack@google.com" <dmatlack@google.com>,
+        "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>
+Subject: Re: [PATCH v14 111/113] RFC: KVM: x86, TDX: Add check for setting
+ CPUID
+Message-ID: <20230613173118.GO2244082@ls.amr.corp.intel.com>
+References: <cover.1685333727.git.isaku.yamahata@intel.com>
+ <00f3770050fb0751273a48eb17804a7a1a697e75.1685333728.git.isaku.yamahata@intel.com>
+ <05da9ce1eacab59e81801acca146b5f4949b98ac.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <05da9ce1eacab59e81801acca146b5f4949b98ac.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 13 Jun 2023 15:11:06 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+On Tue, Jun 06, 2023 at 11:57:35PM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Tuesday, June 13, 2023 11:04 PM
-> >   
-> > > > >  
-> > > > > >
-> > > > > > Unless I missed it, we've not described that vfio device cdev access is
-> > > > > > still bound by IOMMU group semantics, ie. there can be one DMA owner
-> > > > > > for the group.  That's a pretty common failure point for multi-function
-> > > > > > consumer device use cases, so the why, where, and how it fails should
-> > > > > > be well covered.  
-> > > > >
-> > > > > Yes. this needs to be documented. How about below words:
-> > > > >
-> > > > > vfio device cdev access is still bound by IOMMU group semantics, ie. there
-> > > > > can be only one DMA owner for the group.  Devices belonging to the same
-> > > > > group can not be bound to multiple iommufd_ctx.  
-> > > >
-> > > > ... or shared between native kernel and vfio drivers.  
-> > >
-> > > I suppose you mean the devices in one group are bound to different
-> > > drivers. right?  
+> On Sun, 2023-05-28 at 21:20 -0700, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
 > > 
-> > Essentially, but we need to be careful that we're developing multiple
-> > vfio drivers for a given bus now, which is why I try to distinguish
-> > between the two sets of drivers.  Thanks,  
+> > Add a hook to setting CPUID for additional consistency check of
+> > KVM_SET_CPUID2.
+> > 
+> > Because intel TDX or AMD SNP has restriction on the value of cpuid.  Some
+> > value can't be changed after boot.  Some can be only set at the VM
+> > creation time and can't be changed later.  Check if the new values are
+> > consistent with the old values.
 > 
-> Indeed. There are a set of vfio drivers. Even pci-stub can be considered
-> in this set? Perhaps, it is more precise to say : or shared between drivers
-> that set the struct pci_driver::driver_managed_dma flag and the drivers
-> that do not.
+> You might want to use some grammar tool to check against the changelog.
+> 
+> Also, personally I think it's better to briefly mention why we choose this
+> design but not another (e.g., why we just don't make KVM remember all CPUIDs in
+> TDH.MNG.INIT and simply ignores/rejects further KVM_SET_CPUID2).  It would be
+> helpful for the reviewer, or some git blamer in the future.
+> 
 
-Yeah, I wish there was a less technical way to describe this.  This is
-essentially why we have the VIABLE flag on VFIO_GROUP_GET_STATUS in the
-legacy interface, which is what QEMU uses to generate the warning
-specific to binding all devices to vfio bus drivers.
+> And why this patch is placed at the very bottom of this series? This logic
+> should belong to TD creation part which should be at a relative earlier position
+> in this series.
 
-Technically there are some exceptions, like pci-stub or "no driver" that
-can be used to prevent direct access to devices within the group, but
-except for that narrow use case a vfio driver is generally recommended,
-and is currently required for certain things like the dev_set test
-during hot-reset.
+Because this is nice-to-have, not necessary for this patch series to work.  
 
-If we want to be accurate without being too pedantic, perhaps it would
-be something like "vfio bus driver or other driver supporting the
-driver_manged_dma flag".  Note the flag is supported for several
-drivers other than pci_driver.  Thanks,
 
-Alex
+> > @@ -32,6 +32,13 @@ struct kvm_tdx {
+> >  	atomic_t tdh_mem_track;
+> >  
+> >  	u64 tsc_offset;
+> > +
+> > +	/*
+> > +	 * For KVM_SET_CPUID to check consistency. Remember the one passed to
+> > +	 * TDH.MNG_INIT
+> > +	 */
+> > +	int cpuid_nent;
+> > +	struct kvm_cpuid_entry2 *cpuid;
+> 
+> Since these CPUIDs may only be part of the vcpu's CPUIDs, you may want a more
+> specific name, for instance, consistent_cpuid?
+> 
+> Also if you want this be common to AMD, then perhaps the comment should be
+> improved too to be more generic.
 
+Because I don't see apparent constraint on cpuid for SEV case in the spec, I
+doubt they want it.  Please correct me if I'm wrong.
+
+Given tdx_vcpu_check_cpuid() doesn't do much meaningful check, let's postpone
+this patch for now.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
