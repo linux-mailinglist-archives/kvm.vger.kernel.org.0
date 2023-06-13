@@ -2,48 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE3A272E940
-	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 19:19:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0F7072E9D5
+	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 19:33:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238243AbjFMRTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jun 2023 13:19:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48772 "EHLO
+        id S239102AbjFMRb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 13:31:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238578AbjFMRTZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jun 2023 13:19:25 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2041.outbound.protection.outlook.com [40.107.93.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A30C1BD7;
-        Tue, 13 Jun 2023 10:19:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S5Ze9vq5fdzUEMtEMQUmHsmWLyaWoWR6hx++4ntrrpdlYAwvF1spFYtsRNhZd+1zsWnez6Av3Zo30iVq7slgoUEM11+1xik/ZDPWTM0VpJgxHksEvgwreDgzVaiJTZRFG9NHtPB++spfdN0TZ45TX3BWwRPd965LLR27yFBSU6WLH4FkTYUjUf9VIFBmhzjv79B188Afm04eMCnjg812Bf9SX98TJoPSCOQK4UpIhAQv4ipNoeTlWdEIRYxcvVlpTpqSBkxnpnriwAKRKnXFGr7JAnU9j1JfVMFzB7JjwIBfvwFy0XJDZYDc8581XSun8fnF4gNwnckEhLmhcfrrgQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MiHpt4wGrwxfPLRKG9n1lxQlm1FUR5bXALPlMSwo0oE=;
- b=YGPnmaZ3NphcA1gxRk4zCfayCSJJhs1n2AbYNDpBmpba8Wg7OZ0Vgxv99PABE3nPvXlqqEZLTiZcM0aUvHq2u3N9lNKSfdSFZI2blkUKquMzhBfUqJbfKM8KauLUrOEbGKFyZwIZyXlt+qKYqHJf1wIvHei3Bkg9+soDA3vlFjumbtZoZr0KxJGCBVodlzf6OB7qfE5CbXTVYZjeJUSU+bh5wmN4nUwrEzqUsn+pimcu90TrKGcN1GXyKc9w48gzC75v/dw3wYF4wPgMaisOb0jjODijae9FQV4EEaSNrsnXeduiPOqXzZXMWUjFw/IUCQAzpv5O3WSfdUD4PPSq/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MiHpt4wGrwxfPLRKG9n1lxQlm1FUR5bXALPlMSwo0oE=;
- b=eDXpRaoSjDCofJpHhkgMQVycfZYArDdSC3Yboi06R8Hipf4xqhHC77MJiV7Pko+d5K7oQYbXeB/+onUsOpTl0Sm24qLdT9DGPRZhQ26lQljybe40+Rw5VR9Gi0I7axiIWH+3kjJXujFBZNF6qpwz/LW6xMAx0VT+zT5Lokp2qnJOxbRPXGglM/UjlfM7Du1ccvpMnr90reSnT/sVNJwnXUV25U7CSJkCJ1+JgcxuM1fHhAi23G6QRJfi3PxDpZ2/rvzKjHgt8KDfgliINB+8vF1jB/lYVEzLs5hrVx6AnHDjcu4zYmxN4UIUq5Ei7SRyXVgucBiWRx7XlYCgJO7jnw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH2PR12MB4860.namprd12.prod.outlook.com (2603:10b6:610:6c::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.29; Tue, 13 Jun
- 2023 17:19:19 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6455.030; Tue, 13 Jun 2023
- 17:19:19 +0000
-Date:   Tue, 13 Jun 2023 14:19:17 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        with ESMTP id S230322AbjFMRbv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jun 2023 13:31:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5208BC9
+        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 10:30:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686677432;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5rNyoH/Y9EWvlZq1BBIGJddx9uEaRVCPkhuzBz1faSI=;
+        b=BOwi7AmtVGZgTJCqhNBYo9t74UhSjDn8kxgOEy8uoWEKtDYhCafk9ybbKctlB2Zcy2TJ1S
+        Gp4E3ErQ2tRYVYYUvFG5vpZfzI2XL2pZ+WKpjEWkrVGPqbVtLwaJ39RUc3kPYP/Wxwizl6
+        BLAtzM6Gs6b33ZkIC5DyPxVsuTTj7UI=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-204-GfkV-xnHNPuIxDO3Bi0tiw-1; Tue, 13 Jun 2023 13:30:30 -0400
+X-MC-Unique: GfkV-xnHNPuIxDO3Bi0tiw-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7775a282e25so648812139f.0
+        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 10:30:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686677428; x=1689269428;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5rNyoH/Y9EWvlZq1BBIGJddx9uEaRVCPkhuzBz1faSI=;
+        b=C2jIqBA5or1/drPazEp/JLgzEGhbAVgD3WOaX0oY2GNTqs681krYzWLRPa7VBYHA9I
+         U7yZQj/rpdx24P9yc1PS/upSJ7hb+NhBvw365e1uOygkgKSZYBrYQIM5X4xsfURaJJH5
+         13XqHpqVv9xUUT5DnZWkZVQ91FqzwOQ3qe2O+ZtIs8H/iYNgA+NHUWcTVWQZHyXqchHr
+         dd5YZ40X03xVf5WC7mAq5FsJpkG56q0iavc1udKCdCkD3F60dMjpQ3WAoEKflW+EvT2l
+         RkzxB/r9NDC5qleZmb2RXp83xufTKjSlzeafvDkTkeT5zkF1OUvArXW/EjQy+04Ts8Fr
+         wwTA==
+X-Gm-Message-State: AC+VfDwmG4aIqc4ktOS6XGPthYA625RyT3IZgniBaFtmeymiLeHSNsjg
+        qOoOIDLV0xG6fo5MyxaAzWQivndo1l+vRtYqgVAhpCGC7IfxE4sR8S0nq8QnrkEfghb32rhUsHC
+        xVKLIP9nTIYhI
+X-Received: by 2002:a6b:904:0:b0:77a:de11:9725 with SMTP id t4-20020a6b0904000000b0077ade119725mr9574448ioi.15.1686677427778;
+        Tue, 13 Jun 2023 10:30:27 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5BkMZ9qiNe1FeXH/PJLIwHPPeNkq0P/IdFrUDbi6Jh6yHJTHPsdlC06uC/X4+f1OrZwQUOEQ==
+X-Received: by 2002:a6b:904:0:b0:77a:de11:9725 with SMTP id t4-20020a6b0904000000b0077ade119725mr9574417ioi.15.1686677427520;
+        Tue, 13 Jun 2023 10:30:27 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id y26-20020a056602201a00b007791e286fdbsm4013655iod.21.2023.06.13.10.30.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Jun 2023 10:30:26 -0700 (PDT)
+Date:   Tue, 13 Jun 2023 11:30:25 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
         "Tian, Kevin" <kevin.tian@intel.com>,
         "joro@8bytes.org" <joro@8bytes.org>,
         "robin.murphy@arm.com" <robin.murphy@arm.com>,
@@ -70,72 +85,25 @@ Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
         "Jiang, Yanting" <yanting.jiang@intel.com>,
         "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
         "clegoate@redhat.com" <clegoate@redhat.com>
-Subject: Re: [PATCH v12 07/24] vfio: Block device access via device fd until
- device is opened
-Message-ID: <ZIilFVb3sKnBgH2F@nvidia.com>
+Subject: Re: [PATCH v12 24/24] docs: vfio: Add vfio device cdev description
+Message-ID: <20230613113025.377411ee.alex.williamson@redhat.com>
+In-Reply-To: <DS0PR11MB7529C440A84B75234E49C77CC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
 References: <20230602121653.80017-1-yi.l.liu@intel.com>
- <20230602121653.80017-8-yi.l.liu@intel.com>
- <20230612155210.5fd3579f.alex.williamson@redhat.com>
- <DS0PR11MB75293327BDE6D268996FFFCCC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
- <20230613081647.740f5217.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230613081647.740f5217.alex.williamson@redhat.com>
-X-ClientProxiedBy: CH0P223CA0023.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:610:116::22) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        <20230602121653.80017-25-yi.l.liu@intel.com>
+        <20230612170628.661ab2a6.alex.williamson@redhat.com>
+        <DS0PR11MB7529B0A71849EA06DA953BBCC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <20230613082427.453748f5.alex.williamson@redhat.com>
+        <DS0PR11MB75297AC071F2EF4F49D85999C355A@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <20230613090403.1eecd1a3.alex.williamson@redhat.com>
+        <DS0PR11MB7529C440A84B75234E49C77CC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH2PR12MB4860:EE_
-X-MS-Office365-Filtering-Correlation-Id: b28267c3-500d-41cc-5c53-08db6c325297
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sVjSneo+Qj83b8YdVa0wRRB5ab+ea6ee/Kxq0qVKorYK2wVE4+s5j49PSf9OQ1aJUjck+TrxT9r0QvhTQD5NpCY+7iaHbNs2bpbTMNuuWW8Hy8PO+arYQDBnHeGy0dX1gpw26eRb975KyRUmwbjJEB9fF85jnTLBRdczWWuxmUG31zEXV6Y7UQJFiF0HDUI917hSQt0HNSFisZGrvzVqaHvHCfOCUr9dexAkI/pJivpMrxlz0GAp70IDZxWv6qnTEzltxzNAlxTwPZ6qtCCyi7t6LfvapordvHI8PLYjEQdhtImZQUKFIBp7aUbP6Xxj41uX3b3K1OP73uoiC9Umfq+dQuIPzFCXl8IxKT2LGQj1ED0X1wV0eCQ1kw7A7/+bGvJw+jWkg2XEPX02JiPmOixdNsxqfGxuSACUygMhIwbGKGOyu+uo1OQYzPrhYSM9ljZhnvpjHqWwIeQfgHhFZYJNRKFg1XseZ/GKOktZGL6TKwQpL1fBMvPjz0v5ZrryPifADVUJfEuVyv5gesPoQZRecLM3jKFA9urDqmZ0lxGVQPhj1o5ROUcF6dQBuj4y
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(346002)(39860400002)(136003)(366004)(451199021)(7416002)(5660300002)(8676002)(4744005)(2906002)(8936002)(66556008)(66476007)(66946007)(54906003)(6486002)(4326008)(26005)(6506007)(6512007)(41300700001)(186003)(316002)(6916009)(83380400001)(2616005)(478600001)(36756003)(38100700002)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yy8ZFNp5CMPkyri3cVVYik9Jdq/gq/bfVUzgZoOT3z+9wGC+Fh+Unr2HOXI2?=
- =?us-ascii?Q?v8KcwK/VAvZgTyVelMdVooLtlu0eUyZKQ9J7B8lShLM1DWgurSwjyF00CeCB?=
- =?us-ascii?Q?IAn6sJ1UvmCRzvnf6m1+S5RX0eQpdmGXK8scOebG6ZlFVywA/icUtleLXD5z?=
- =?us-ascii?Q?rWPbZPRY0IFeyi/RiP2v9VuuJdm5pMIRo48lxUe+D0i76Yf1vFnl2BdyrWrr?=
- =?us-ascii?Q?Yu7WM2OW2N4TnBrN07H5BAcDSg0oJql2TOKXt5iHTYXKJgK5buow2MUqkTK/?=
- =?us-ascii?Q?bc6+2Kl+SEh6Hy94tl8qjhCVJSbNKCQRuOI28GBYl6R+OKpCe2tGnhuAbe3+?=
- =?us-ascii?Q?3m6nkT0fjd2ABEiU8jlKcneFIzmXQvtV2fm/d9u4RDXMBHta4pJKVi1urVz+?=
- =?us-ascii?Q?D5Mo7xoXP0H4f83KdfB+m6mROLM3zGvSTovdCZiRp/W8mooV2uosJZjfZ7Xu?=
- =?us-ascii?Q?pTP9rikJYu6dHm+dk6yUsIL+rnX9ywxoZYXR2FOCrZavtKNE5SQtjUxcs/cr?=
- =?us-ascii?Q?r6DFqAJRCiPqWAqw49ejDCKiEo+R/MHgtAtjSY5bNj6G1rsSDoU84cL9vh1x?=
- =?us-ascii?Q?bla/8kQ1lC/DbMGHCqFEkUfLG1elx8BhSd+aKfO55V+SKFLjtZqmAE5KhWVN?=
- =?us-ascii?Q?AuYcKfMggXHdvThFKrwZ4NPDeF7sBwSTBGcKVm8GUlRiC38X3vv4gpoyDd9L?=
- =?us-ascii?Q?/45VuOdLH8Umygn52HsiaDSo7m2AzX3AjRP93y1nAnCEAOwQvx1MzK03iM5y?=
- =?us-ascii?Q?L138j5UYBHs/cxV/nDSWevepzn0AUU0Sd4snLwC0ytGuJiAbxnUypvj55c1H?=
- =?us-ascii?Q?B9j9Vgr5OUKTXaE4e++CjRi/HHGGj2XJLBcOnsGNWCmtRch+e55qfrDnhjQe?=
- =?us-ascii?Q?zwiY3ghiqNKG/RvNHnQFwrear7iVdkL+kFyBVhJY+/R5NMQ+KxYktcAqAQL8?=
- =?us-ascii?Q?hlCaCbY3YDgBj/fWGENkxbNfxWlRJvH5CEDWJwQklCldeI7Q2O16bz16T+Z4?=
- =?us-ascii?Q?E7P0b0dKq+uzwLKiNQejNVpW1fx4qoPaSieX8A/Z2zmRTL6bkCaitYkDRaTf?=
- =?us-ascii?Q?AbXeixdwxU12jx1mlTXqGcTCNJ+lw0RC2nfycXuJYY0ApjQh7ZWjkTpx4agL?=
- =?us-ascii?Q?G76grBIb01wY5O1SlKTJ1mVdniIEWEnKBnc4xVDh7bQ8E7fdgHE+po7HvG6V?=
- =?us-ascii?Q?Ot1+Y53LpUp3MnneAOX2fFQVqvai+BLVyD+VPMn80NY5zbZXEZFPxWbvpKVX?=
- =?us-ascii?Q?YhY1WLk7zMZXh2LlLBGgAvFQEGIdSOSjWBbt14cCJhGNKHwSWGhDz08iytpK?=
- =?us-ascii?Q?fNAt+jLZI2xiuNQUaj5DV7vYb7Q+nl0vCaNFdaSOt6wIcI6gfM+spqG6kEGl?=
- =?us-ascii?Q?q92TKVoyvSeqMEQQSPU+C+3qnqixE9Hakf+Wh8zSPMBryHSI0Ub0s/lnO6Qn?=
- =?us-ascii?Q?8lZS1sDZ70c84hz4GHoXK73/Pm1kbshaASRElH3zs2v920REhcD6Pp4NpHHa?=
- =?us-ascii?Q?D2ZUq67XkqLZFzsN+dGCVDAj2oPxlfo4QjjjVKaHcsMIidONb0yrV1orGkao?=
- =?us-ascii?Q?vd9cocJlSkhDmS858S53RXqCjZFZo0uvb4llhEgd?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b28267c3-500d-41cc-5c53-08db6c325297
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2023 17:19:19.6731
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fMlUgCqIaqNVRwlF8a+N5fIe5o+EEN9I/y8rCnm5K0UxQamQr58Sazmj9XoKeNAG
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4860
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -143,17 +111,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 13, 2023 at 08:16:47AM -0600, Alex Williamson wrote:
+On Tue, 13 Jun 2023 15:11:06 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-> > Not quite get why bit field is going to be incompatible with smp
-> > lockless operations. Could you elaborate a bit? And should I define
-> > the access_granted as u8 or "u8:1"?
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Tuesday, June 13, 2023 11:04 PM
+> >   
+> > > > >  
+> > > > > >
+> > > > > > Unless I missed it, we've not described that vfio device cdev access is
+> > > > > > still bound by IOMMU group semantics, ie. there can be one DMA owner
+> > > > > > for the group.  That's a pretty common failure point for multi-function
+> > > > > > consumer device use cases, so the why, where, and how it fails should
+> > > > > > be well covered.  
+> > > > >
+> > > > > Yes. this needs to be documented. How about below words:
+> > > > >
+> > > > > vfio device cdev access is still bound by IOMMU group semantics, ie. there
+> > > > > can be only one DMA owner for the group.  Devices belonging to the same
+> > > > > group can not be bound to multiple iommufd_ctx.  
+> > > >
+> > > > ... or shared between native kernel and vfio drivers.  
+> > >
+> > > I suppose you mean the devices in one group are bound to different
+> > > drivers. right?  
+> > 
+> > Essentially, but we need to be careful that we're developing multiple
+> > vfio drivers for a given bus now, which is why I try to distinguish
+> > between the two sets of drivers.  Thanks,  
 > 
-> Perhaps FUD on my part, but load-acquire type operations have specific
-> semantics and it's not clear to me that they interest with compiler
-> generated bit operations.  Thanks,
+> Indeed. There are a set of vfio drivers. Even pci-stub can be considered
+> in this set? Perhaps, it is more precise to say : or shared between drivers
+> that set the struct pci_driver::driver_managed_dma flag and the drivers
+> that do not.
 
-They won't compile if you target bit ops, you can't take the address
-of a bitfield.
+Yeah, I wish there was a less technical way to describe this.  This is
+essentially why we have the VIABLE flag on VFIO_GROUP_GET_STATUS in the
+legacy interface, which is what QEMU uses to generate the warning
+specific to binding all devices to vfio bus drivers.
 
-Jason
+Technically there are some exceptions, like pci-stub or "no driver" that
+can be used to prevent direct access to devices within the group, but
+except for that narrow use case a vfio driver is generally recommended,
+and is currently required for certain things like the dev_set test
+during hot-reset.
+
+If we want to be accurate without being too pedantic, perhaps it would
+be something like "vfio bus driver or other driver supporting the
+driver_manged_dma flag".  Note the flag is supported for several
+drivers other than pci_driver.  Thanks,
+
+Alex
+
