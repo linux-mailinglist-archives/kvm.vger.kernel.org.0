@@ -2,142 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA01E72DE9D
-	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 11:59:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EFBD72DF11
+	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 12:19:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241964AbjFMJ7R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jun 2023 05:59:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39374 "EHLO
+        id S233000AbjFMKTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 06:19:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241999AbjFMJ6v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jun 2023 05:58:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8232C19B6
-        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 02:57:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686650251;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=d24qNgsK4YI73pNJSGPXOXGrlkTr7CIQRglIpszf5fE=;
-        b=S1jywrRWcBVubMBmY3pcXSoPkuLi2kS3pgHgCsKsaGWabuVD02ZWnzb87TtVadEWVD0Eg0
-        Y6X2ywtLDik+zlihUCpNXoCvNo67HqxGo43Jt8o7RBp/LHw0WtBk52aH5kMeUSX16il5z2
-        5ymZGaOy8151qBIxkERphyRpw9cKcX4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-57-SLIQwljZM8un4fBwkNGW5w-1; Tue, 13 Jun 2023 05:57:30 -0400
-X-MC-Unique: SLIQwljZM8un4fBwkNGW5w-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f73936c258so7043895e9.1
-        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 02:57:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686650249; x=1689242249;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=d24qNgsK4YI73pNJSGPXOXGrlkTr7CIQRglIpszf5fE=;
-        b=PMEg8a+ACA80mksD631bhxZEup/HfgHSx7+uzZF0DFi6HxJv/n0/o6F9rjeiwaMgRM
-         u+kloC9LdmqSDK1O9CvvzysRdDJ8IaqOfi1h1iLIv4FQbvmxf7TP3seOlwPJ9MlF5rwS
-         ZwUAsuoCWqqbzrppWrL/Pk1foOMmcDk1x7eImXUjk4bRVa9lA3j1BJ0KOyWz+gkRA1Rc
-         7C2rQ0LJv4YJhFwYt9Fz4rNkoxBcIu0XSBvQqYFYBs2oi5X64guX5S2aDVTruj0NE0+K
-         RXgp08n1CRD/5hyEGLhxnbky7nTLaL5P7t5/yjhtTNHzJuHIbpuAqmmqoINgtAzwrlwy
-         3RCw==
-X-Gm-Message-State: AC+VfDwORRtuGtEEnnIiS2aDInMR8HL1UFeZuxgO7jBA8sb8B29mo/m2
-        mm822jjJkoXZsS3PFTGe2RgrVDVlOpP/g5jvdWsgpF3jk0j8dow4tbTsbKItv4zU6ivFG3NOLGR
-        PlF9FJEWFjC8Y
-X-Received: by 2002:a05:600c:3843:b0:3f7:1483:b229 with SMTP id s3-20020a05600c384300b003f71483b229mr9712649wmr.3.1686650249190;
-        Tue, 13 Jun 2023 02:57:29 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5DWlGtfOHfyQjcabrgMLJ7MLmCh6LzHVrUWcE9P78XidO1dSdo0iXISnggfacCEipbLVgi+A==
-X-Received: by 2002:a05:600c:3843:b0:3f7:1483:b229 with SMTP id s3-20020a05600c384300b003f71483b229mr9712637wmr.3.1686650248918;
-        Tue, 13 Jun 2023 02:57:28 -0700 (PDT)
-Received: from [10.66.61.39] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id z10-20020a05600c114a00b003f7e60622f0sm13922898wmz.6.2023.06.13.02.57.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jun 2023 02:57:28 -0700 (PDT)
-Message-ID: <92b65190-b39b-e410-1831-31d63a6aa129@redhat.com>
-Date:   Tue, 13 Jun 2023 17:57:21 +0800
+        with ESMTP id S235053AbjFMKTJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jun 2023 06:19:09 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 704F613A;
+        Tue, 13 Jun 2023 03:19:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686651548; x=1718187548;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PQ9SSE+dMfofmg/Jm7X/ua46UeTu5f5xwyyaNzG+ZSc=;
+  b=fM/mHGb6GDnk/g60hDBkrzcGWKFb6bZ9K/d399yZ7NbvDlXlDXQsrn3y
+   l/as1yhkHZ/EW/IOKjJ4oK4Mwu9O/ieW7b1Abfch5zJ3kWzqdYwXjuhHq
+   fa2N7JArtO/fCyAqSp4BGouU3DgL81LSUIxqwn2UstiQATfJXqExnHJDj
+   HKx8htr1jENkSol3shFen6PUgtq69+UlXXjBSAbGTd4nRKBmgYQTAqozw
+   D/88WANQDE5tg0FetMkMCqphRO+REQErM8ah4Wc8nBpAOBDOK5m/s6Tpp
+   TU2O9M6+pJWEGVUnX/SRQxvNEaQ2yWt4Y/Zg+8sQxcKF4fdNsc+30LrTN
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="360769962"
+X-IronPort-AV: E=Sophos;i="6.00,239,1681196400"; 
+   d="scan'208";a="360769962"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2023 03:19:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="1041703071"
+X-IronPort-AV: E=Sophos;i="6.00,239,1681196400"; 
+   d="scan'208";a="1041703071"
+Received: from attilavx-mobl2.ger.corp.intel.com (HELO box.shutemov.name) ([10.252.62.33])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2023 03:19:02 -0700
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id B7E8D10BB6B; Tue, 13 Jun 2023 13:18:59 +0300 (+03)
+Date:   Tue, 13 Jun 2023 13:18:59 +0300
+From:   "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v11 11/20] x86/virt/tdx: Fill out TDMRs to cover all TDX
+ memory regions
+Message-ID: <20230613101859.lwqlwa4t72sthvwk@box.shutemov.name>
+References: <cover.1685887183.git.kai.huang@intel.com>
+ <927ec9871721d2a50f1aba7d1cf7c3be50e4f49b.1685887183.git.kai.huang@intel.com>
+ <0600959d-9e10-fb1f-b3a9-862a51b9d8e1@intel.com>
+ <ddbcadf36016bb60a695f54b28f5c9e9af53a07f.camel@intel.com>
+ <201af662-f700-9145-c113-563e378074ad@intel.com>
+ <89c99e7360dc2acfe5fb56c2bbb40e074e1f94d5.camel@intel.com>
+ <20230612143355.sur7zc7byu7omxal@box.shutemov.name>
+ <3e188621d97af794f03072e5261dcc9f589900aa.camel@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v3 09/17] KVM: arm64: Key use of VHE instructions in nVHE
- code off ARM64_KVM_HVHE
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
-References: <20230609162200.2024064-1-maz@kernel.org>
- <20230609162200.2024064-10-maz@kernel.org>
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230609162200.2024064-10-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3e188621d97af794f03072e5261dcc9f589900aa.camel@intel.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Mon, Jun 12, 2023 at 10:10:39PM +0000, Huang, Kai wrote:
+> On Mon, 2023-06-12 at 17:33 +0300, kirill.shutemov@linux.intel.com wrote:
+> > On Mon, Jun 12, 2023 at 02:33:58AM +0000, Huang, Kai wrote:
+> > > 
+> > > > 
+> > > > Maybe not even a pr_warn(), but something that's a bit ominous and has a
+> > > > chance of getting users to act.
+> > > 
+> > > Sorry I am not sure how to do.  Could you give some suggestion?
+> > 
+> > Maybe something like this would do?
+> > 
+> > I'm struggle with the warning message. Any suggestion is welcome.
+> 
+> I guess it would be helpful to print out the actual consumed TDMRs?
+> 
+> 	pr_warn("consumed TDMRs reaching limit: %d used (out of %d)\n",
+>                                               tdmr_idx, tdmr_list->max_tdmrs);
 
-On 6/10/23 00:21, Marc Zyngier wrote:
-> We can now start with the fun stuff: if we enable VHE *only* for
-> the hypervisor, we need to generate the VHE instructions when
-> accessing the system registers.
-> 
-> For this, reporpose the alternative sequence to be keyed off
-s/reporpose/repropose or s/reporpose/repurpose ?
-> ARM64_KVM_HVHE in the nVHE hypervisor code, and only there.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   arch/arm64/include/asm/kvm_hyp.h | 12 +++++++++---
->   1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index fea04eb25cb4..b7238c72a04c 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -33,12 +33,18 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
->   
->   #else // !__KVM_VHE_HYPERVISOR__
->   
-> +#if defined(__KVM_NVHE_HYPERVISOR__)
-> +#define VHE_ALT_KEY	ARM64_KVM_HVHE
-> +#else
-> +#define VHE_ALT_KEY	ARM64_HAS_VIRT_HOST_EXTN
-> +#endif
-> +
->   #define read_sysreg_elx(r,nvh,vh)					\
->   	({								\
->   		u64 reg;						\
-> -		asm volatile(ALTERNATIVE(__mrs_s("%0", r##nvh),	\
-> +		asm volatile(ALTERNATIVE(__mrs_s("%0", r##nvh),		\
->   					 __mrs_s("%0", r##vh),		\
-> -					 ARM64_HAS_VIRT_HOST_EXTN)	\
-> +					 VHE_ALT_KEY)			\
->   			     : "=r" (reg));				\
->   		reg;							\
->   	})
-> @@ -48,7 +54,7 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
->   		u64 __val = (u64)(v);					\
->   		asm volatile(ALTERNATIVE(__msr_s(r##nvh, "%x0"),	\
->   					 __msr_s(r##vh, "%x0"),		\
-> -					 ARM64_HAS_VIRT_HOST_EXTN)	\
-> +					 VHE_ALT_KEY)			\
->   					 : : "rZ" (__val));		\
->   	} while (0)
->   
+It is off-by-one. It supposed to be tdmr_idx + 1.
 
 -- 
-Shaoqin
-
+  Kiryl Shutsemau / Kirill A. Shutemov
