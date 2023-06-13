@@ -2,329 +2,526 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EC3372D994
-	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 07:53:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B0C972D9DB
+	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 08:25:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238415AbjFMFx5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jun 2023 01:53:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54922 "EHLO
+        id S239788AbjFMGZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 02:25:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237495AbjFMFxt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jun 2023 01:53:49 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E55F18E;
-        Mon, 12 Jun 2023 22:53:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686635627; x=1718171627;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=piEg9HiUG9phlgTjXwD3XaCoBACdgToEB/jcHdoA7ys=;
-  b=JxvfhmSJQq7MMycz2RjItXtHZ4Z1CiowOrCdkyY83G3F2JbTFtAP+lfU
-   1OjTH5Gd1PnQZq9YIdmQBRsAZFUlr4nG3iUsYX9byuABppgyI6uudblRl
-   9deWmrsxVe0PyFlqoXkP3eYGd6S/TkmDcaTD1XqAfRFQ1k+fsooKYSS9w
-   tTCNfQod5qf7EQ5N/Bli42yuzcwNf+d5EFUdOgrIJcs85BF6HOo/yZeG9
-   4p2GwgBkkj7UcBX+Gko0rCILgxy4HCbAUJH/xbaZMi0X/s3qdv4GeAGXq
-   y/6Cq+tugfOGW/j34dI5736pYMN+hkVh3KaNrZ3luTSXZusMjU/L4s1e9
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="424118979"
-X-IronPort-AV: E=Sophos;i="6.00,238,1681196400"; 
-   d="scan'208";a="424118979"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2023 22:53:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="705666302"
-X-IronPort-AV: E=Sophos;i="6.00,238,1681196400"; 
-   d="scan'208";a="705666302"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga007.jf.intel.com with ESMTP; 12 Jun 2023 22:53:45 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Mon, 12 Jun 2023 22:53:45 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Mon, 12 Jun 2023 22:53:44 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Mon, 12 Jun 2023 22:53:44 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.170)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Mon, 12 Jun 2023 22:53:44 -0700
+        with ESMTP id S239787AbjFMGZB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jun 2023 02:25:01 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2069.outbound.protection.outlook.com [40.107.243.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD8310E9;
+        Mon, 12 Jun 2023 23:24:59 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iWXLiVMhlXRsTvZIa/32NLk2gmdKApDMbWMASqdSh/Z5VMbldqY68Te+kd+P0+VqeNKDR6sKF8Nvt01JAYbtppAY25SYhYQ5EgfcSsPhUdh5E0rHBUngLd8sJtMhYm+MxR0bCh18iIAM81BENI2wI1IuZVKVPqZKWlsqycWfpisIzdtJjgFNRuDlNINqted9nur3sgdk//coUBbviaRxFHXMPZ2YZPnAcERns3oUn2vjftSDCJKzz5Pei4uuRRSd2R6/1E58FKJam3NJf6vJe2+nOPb0p3/RzhC0QEv4RV+YfCJUXE4SmVCTqTggbR1+RwK4r+QL6yoJjKZLuAguRw==
+ b=agQVqb2QiWmI9Qleefmkvl77cxuF0R1FmrFTvuvYqg2FUbxBpaVIbAaTgw4g5RSC3vhcMOk0P2k074+vyeTRu5VOjJ5muqtl42MlyCmZAQ3TM7mPW8lbkxaeHfjE+/MyVNipwPJTtFfnruCfBCF0F39qZHHfDnhv3ABd7ItW4BepVjT2U44hwN0QiNy2tpwqKSIzpYIUUfVy88fsTTxyVbjEwAopGOGAuO3Z3WQdwp2yOlQ557rrW8fhDrsxxo5nTtKf5CzMfBrRR2S8dTkUkEGiGVEDWP20DFEk5nyl7JfC6HNbQLb5YbBzqkBFW+VfGlR8/AkCldJ7d2xZshiTsg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rJeEnRGdw4RlnaeszE22+fmZBz2eB9nwiE/g+WlRUpc=;
- b=KP0RgNs9w1qeDwqrpl78K3VUPqSBJ1llB5it6qh0vR2puXAd7IvphH1VJBm88b1LNxP532b/eHnsv6K0wFp650IN2enrT7UOO1D9gIXEUnfu7To/aaem9BmUvjgyw79hu/9zz+fCJYUxN8KbG91ZyoLe5kiW53V4xnPIapzMEv4X0oMb5PPLpI/PkqnEqhECFLx1GmWQMRJ5CyXKO+jhgHXr1kPFYoY0LRVq+Nf0hj+UFWrEXzjzU5jPf9B4CSgK6SP+s0NrRWKokhuvKe0tFWsCbw2Rf3rhQZSJ9l3vEop3+WzROXBWZk2Af7nw3hAM8NlEfpUmB+aRAPUx7nClEA==
+ bh=AZrdoT+SmpCpw+oRibw3ifLtz3GMBwNulXQaObwZcDI=;
+ b=WBCmlXCwpepftG77+Kg27RN9wOXUKzXNVLhBI9VWosnWQS9j7UCkaMsOtVYSsvWcbD1yZjNMQo7hGH7XQWKY54LYcPWCIHGly8V47jTlF2tSwi0UE2MkXvZd3Tmyoluo9Z5AhTvmbLOn494m73DvbNyHb5k0eRL/je2X3JOC9czlOwoLmcZwYpkj2U7V5UJRIcu4rK2bl15LbxvJ/XdEukn9ZcpOxnO6rQPbzxw+o9D7ZnipBrXqw6QTdhD5SUpfmCSG1s2+obokZcFbGdaVXGGL9O8vDiC+jwTlY8atMpNSKMxnDvuiWtWZvTlcOKnLqSNbmbq7BjoBQjpvU90/4A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by CH3PR11MB8093.namprd11.prod.outlook.com (2603:10b6:610:139::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33; Tue, 13 Jun
- 2023 05:53:42 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::5b44:8f52:dbeb:18e5]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::5b44:8f52:dbeb:18e5%3]) with mapi id 15.20.6455.045; Tue, 13 Jun 2023
- 05:53:42 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "clegoate@redhat.com" <clegoate@redhat.com>
-Subject: RE: [PATCH v12 21/24] vfio: Determine noiommu device in
- __vfio_register_dev()
-Thread-Topic: [PATCH v12 21/24] vfio: Determine noiommu device in
- __vfio_register_dev()
-Thread-Index: AQHZlUw5Bdx6t/Ptjk+i/O1PZ4IdNK+H07wAgAB3NRA=
-Date:   Tue, 13 Jun 2023 05:53:42 +0000
-Message-ID: <DS0PR11MB7529AE3701E154BF4C092E57C355A@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230602121653.80017-1-yi.l.liu@intel.com>
-        <20230602121653.80017-22-yi.l.liu@intel.com>
- <20230612164228.65b500e0.alex.williamson@redhat.com>
-In-Reply-To: <20230612164228.65b500e0.alex.williamson@redhat.com>
-Accept-Language: en-US
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AZrdoT+SmpCpw+oRibw3ifLtz3GMBwNulXQaObwZcDI=;
+ b=l5eD/AMcYU1DuFEP8s/zBHCC50qWmONHeq4T4cGKjOzB6yb7uvQjentHk9FYEsKc+KYNIXZxHGW39h5wHe7b3RHym+trTD/bNA8kRdFBWAHev+KcpfZguAZrRa4kI+GYtF/bQnTl/PYqEzjVV3b1jtMTcrlUExs2ylSSdSfRuBg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB2843.namprd12.prod.outlook.com (2603:10b6:5:48::24) by
+ PH8PR12MB8608.namprd12.prod.outlook.com (2603:10b6:510:1bc::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6455.33; Tue, 13 Jun 2023 06:24:57 +0000
+Received: from DM6PR12MB2843.namprd12.prod.outlook.com
+ ([fe80::ff22:cffa:293:5cef]) by DM6PR12MB2843.namprd12.prod.outlook.com
+ ([fe80::ff22:cffa:293:5cef%3]) with mapi id 15.20.6455.045; Tue, 13 Jun 2023
+ 06:24:57 +0000
+Message-ID: <ec1880ea-4b81-faf8-054e-220d58ac9775@amd.com>
+Date:   Tue, 13 Jun 2023 16:24:41 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.5.1
+Subject: Re: [PATCH RFC v9 48/51] crypto: ccp: Add the
+ SNP_{SET,GET}_EXT_CONFIG command
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|CH3PR11MB8093:EE_
-x-ms-office365-filtering-correlation-id: e149ee9e-941a-4881-d0e3-08db6bd28af9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: U7niYBROswOPFag8xnbGTf000SKM+YNXWnr6+0h9wiWFY1ovDwtkOCBn1S4JLkDGwrV9IJpdCOud6A/8PSo+4b0GD83mlPYW043M0Wi5JxBFWrYGcR6J+RVNQ41lWLzq+p1kI+WWBee/OzfrywpYtMCratHI4HrDHWuOeuQCwiwXNvbgtCmjeZ5qG0jqRGylbxUTSrzXBr9bRf0UdhjsPu6CBd8mf5OM9OBLrzzUIQV1PlI2mzJX5mLH4hWjVUX+iEXAkITY7e+4ew7+n2eeosPYdozAAfBgFK761EM64mEMufl1UyylD+YCQRkjrSKQvx8eKkXGyuIR4WHnvrtb2VCb2XIUMDWX9kQdU1RROj/E123D6SUh7GrUO1BEmRhtexw0xgnm6euEwxMwFCrmffJeji/6hyQvGgUhMh5B2ooFY8Mam3/cWHYpaniMKGoA09ZcG3Ut1/WX+87ivz9qHfFJ388IhLszbdKMLpiwNDCltfhL6QvymZUZw+tQm5OY1XmgC7YYgXNxRY1l278enrxyIQURFIGrqIxjQqqpw9kxYGGDdvHNM84gLjri9P0P+wUQ6CZFzE+SSRw1l1uXQan/y+7VgFekTAOqMFn2VDWmy5JHC0Yq0vadpAOxBGvh
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(39860400002)(366004)(136003)(346002)(396003)(451199021)(6916009)(66476007)(4326008)(66946007)(478600001)(76116006)(2906002)(64756008)(8936002)(316002)(41300700001)(8676002)(5660300002)(66446008)(54906003)(66556008)(52536014)(7416002)(71200400001)(7696005)(9686003)(86362001)(26005)(6506007)(55016003)(122000001)(186003)(83380400001)(38100700002)(82960400001)(38070700005)(33656002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?yXGKcoWTNPkcSO7w2F1THqYCsQsa0TiAS0thsFi3KNnUJ3V9LjQRVJJxHTHL?=
- =?us-ascii?Q?pALg3V/17YnCEq5/AaTWL+NICKJT6qhwKE/O1JI99mI4wzcQjdFStvht3N79?=
- =?us-ascii?Q?OqkCe4lj14nXTK8Y2piQ0pC0BsDBhr7ob8dyM/XYI9UXTYXMcXZmu+7FfSay?=
- =?us-ascii?Q?IYq0KJKeTyGG4egWs6blb7L278XxwVrJXG4TrAZbnhsZdSmtkWCWV+sqt9+Z?=
- =?us-ascii?Q?FEolaN7HlwQ8tvQ3ylNPnZbB5pktEiFvvvYf8J52o88e3KF0ryQKWjee4O3u?=
- =?us-ascii?Q?KtUYriuO24MqrIr9NBwVp/2IYTnhs3vnx8gQVLnIoTC98K7RYpE2pfusekc7?=
- =?us-ascii?Q?SrS/NVVDSOSx+UZobdG3QGeZJkBllYExVgMK2vOQHRaME2Q2nyP2fhgjvyzJ?=
- =?us-ascii?Q?BhuY8GqexZ63oFweB94kW6/ATY2dG01IfXuEyMLEkMHSScw95iNtDk7OaAjD?=
- =?us-ascii?Q?jNCYKsmr8tN+Wizc74rjI9Zj/bdOe2HJET9Ad6oL9UFU42x3dj8IpmHF1ww6?=
- =?us-ascii?Q?zvSWzvizrmuZKdydJiIgR3RTXufBl5ob0MPhKL3Qui7E0s9UDRC/7PEcgmgY?=
- =?us-ascii?Q?dnfIY4/bJ1ic7326WJfEwmAFKsYnuGVoZHb+sJ9UieAgOPzyfrN0ZAOMfccY?=
- =?us-ascii?Q?hmlmO8JFonxEhqSMLJ3mZpMb7YnqPPIncfd0Sp+5wkEQdyr830S/FwRUzm/q?=
- =?us-ascii?Q?2Gkx5WFGBH6W+mtpuCKSyt9zJ+i80Ci25q8WfULHPoMJGnWf24Sxw0AtlUzU?=
- =?us-ascii?Q?Z9XCZcU06IzN/IxFiq9nb/PEv5UHJ1C+4+nVJgmaDG5uymQFFvMf0QfYy6sH?=
- =?us-ascii?Q?uEgSC3YNu2eoMXf1uEEYWFYr6avVacB7n03GKpszgE8HdWyVf55j8FJHVgca?=
- =?us-ascii?Q?8sIPl+RrZUNJuD62+uwk/um5afhxqLtt+gv0SbqJdH7iVRNfVtvNqUD6OvE3?=
- =?us-ascii?Q?6z9wfLnV8E8H6aiuw2CYLPEH6yt5BElzAVhGMKBmfDdlFdEUlEAzyB+Ce8x1?=
- =?us-ascii?Q?0HaR7cK4Xt7XPde/LOKg5joegLhXsKvEKHVVln0EksFlrQ4b0TfZjqHs0Opu?=
- =?us-ascii?Q?UyfraN5zAQ9+VC+EVaPCeSeJ5Whw5eK9YuADnaDEXmiDrNzO97Aczml1vYv0?=
- =?us-ascii?Q?ME2QGmP+0VMs6ODierrRNEusdYprHMud4s0oWxL5uoxV5hG31fjK9A+8Fpt9?=
- =?us-ascii?Q?f+jwah2vNNJf1cqlmgIZ4sIGW8AToPtNCBxgmh97Zp1jVCkbVU8XcjYtMSTe?=
- =?us-ascii?Q?E0IMKxT+hUm012d6cexmyIWB0k86DCLnLuxKQ+2cAHNCoX1vgE0OnRXHZRIQ?=
- =?us-ascii?Q?WCSa1UE1Jamn5HWnX6reBVp2zFa5/BtVmuRKMlqAsuS/w4e4rioSPZXEs4Z3?=
- =?us-ascii?Q?7CHoyuCxYLP7xiwiwTMkiW1189X21QucMA9BNk4ws44iofSzW5R5M9CbdDKj?=
- =?us-ascii?Q?bp9z8fLUoqogYvhL7SoCLl2Co2PqQxnoLTHb5jFUBB91Q/rhITN88zBRewGv?=
- =?us-ascii?Q?dWjGPQHDJKxVBJxCzF9TBXHfIrdEh9JRHCGgaNZKEB4adv0pmp1zgFu65x7F?=
- =?us-ascii?Q?vZO7QhhxDARJ9itNcO/3VcwQMFHC0yKomsCiNN0I?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>,
+        Dionna Glaze <dionnaglaze@google.com>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-49-michael.roth@amd.com>
+From:   Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <20230612042559.375660-49-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SY6PR01CA0034.ausprd01.prod.outlook.com
+ (2603:10c6:10:eb::21) To DM6PR12MB2843.namprd12.prod.outlook.com
+ (2603:10b6:5:48::24)
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2843:EE_|PH8PR12MB8608:EE_
+X-MS-Office365-Filtering-Correlation-Id: dfdcce69-16c3-4802-15f9-08db6bd6e81a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WjWWQVOMRbHvOY/tNqIjXQYMqRNW6KixoS/vt3OXaSgdfYI47/qqzbLrAXBCQ/ZAjoXYnZIRjEHOIYzPWiyetO1TOSPBQK0mtmMtFF7FHPHM4aM0tBWfhmC9SnEdn3rvmn0Y0q11quk+PpLYbU4tgFd5R8TrYBqR0NoXkS6omsoT8CoTEYPMz5XSBWWJ0z53gAy3JIZwPT61KSTxW7ijHc9Nb0a9zg8dLTgfT20BU9PelnECFasmj4hTBNrrF2N+T/EbFHormHW2hjLqFNpAji/Z9StBo9VYFp4WaMRs8iruoDZxCX1td2LISjzhYifY2vvTwr9aWGMLJZp3Rdzk8hrTW+zimjZJ2vtF2S200lgW2g6qbtWhESCZC4y22rDBAIipghwTKOWsh9LhFCneZuNGTzYBL550yuka7I6MqApSZCnMeLGgR6rB19PhgLmj0tOrlr9lLIKoCgUo6W5QZFVTFY5yXvTk0B+KAACHi/G5953bwOKoXp82WGpOO5CIsdEVIPcENU781MUEWI3/Q8ZE4HXEp6rvnIVxTzILhwsVdAxUobwq6F+ifrkITDvEFsEGb8aFpZ7B2LuOtFLJJDwLSagfkDxpyfMs6m5KybL/uzLEFakhvh55liv1tF393u59izGNqbg4QSY3qEJNGA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2843.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(366004)(39860400002)(346002)(136003)(451199021)(6506007)(2616005)(6666004)(31686004)(26005)(53546011)(6512007)(54906003)(478600001)(186003)(6486002)(83380400001)(66946007)(4326008)(66556008)(316002)(8676002)(38100700002)(8936002)(5660300002)(7406005)(7416002)(2906002)(66476007)(30864003)(41300700001)(31696002)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RGt3MVByNmoybkZZeGY0M0w5OXpDVEg1QU83ZysyNm9rUHRjSGJYd3loT1o3?=
+ =?utf-8?B?Vmh3US9KYTdZRGJaN3EybmRDT0ZwMlVGMzlsZ3MzOXZEcFJGVTN3RkhTNFgr?=
+ =?utf-8?B?OHdoMXZYM094VzhiRit1c3UxUVZWRVp2ektHQmhiKzdtdUZPY2EzaFhGdkFU?=
+ =?utf-8?B?Y2h0aUp2QnVZYjcvVFBMZG1icmF0YnpkdGNFQTM0TTFrMWRJaDQxUnhRQ1dL?=
+ =?utf-8?B?SzUvRlE5R0J6N2lwY0tLbEthVW1vZ3h4dTF2TlNWQ3I4M2g0NmZaZnlpU1Rm?=
+ =?utf-8?B?T0k5Q0RZdWRqV2VrbFYxZnFpT2dRNzJwMG91RUFMSFkraVpNellVeXgzdGdW?=
+ =?utf-8?B?YXBobUFkMlJ5b3Y3S3dDbG9JNmVoeXUxTWNGTG5aTjdKYkdaUk9idmVjUEtE?=
+ =?utf-8?B?R1p2OFBZQ290czFKTTcrdFppait3VWJPRjFFdzEva0FiRmpXbHdHSWVnbmtB?=
+ =?utf-8?B?U05KUjNkYTJjOGxKY3pEenJsTllReVdBSjZyY1lXMzBnU0FJajlZMWNPdGpT?=
+ =?utf-8?B?Y28vZCtiRjhFWmd3em5oTmsrQ3ZHVElIN0RJMlZYdTdBdHNHTDVwaHo4aW16?=
+ =?utf-8?B?TnZTb1ZYZExRWDRwRUFBYjVpa01oVU4xUUVwSnhQYXFzKzZ5TlFZekdvUmhw?=
+ =?utf-8?B?VXlWSVhwbzZuZUxWT0ppRjRWSWVtR3VJTnVtcTZRSVUybHl4T3NUZlFMei9m?=
+ =?utf-8?B?eFhoTGp6SnB3YXhGTVpnS2hwR21SNVl4S3dKbFY0QUZ0RzVyNXV3bUJRdjRv?=
+ =?utf-8?B?bXpXdjJWVFlMM0hXWTZod1BNQ2hyN0E3UGZYbWEyTXo4WWFIcDlOUkVRdHJ5?=
+ =?utf-8?B?ZStzQk5yS3ZsQWoybWE4eG1UZjUzNjA2azFKcFBaQThYUStDU3R1enkwWGZm?=
+ =?utf-8?B?TVBVVkV1NTVLVENXbWFvdnUxTzlvUlltcjI2QUJ3NkJSdmV3dmhDOVhhWTd0?=
+ =?utf-8?B?UDJtV1JYeER5TE12RHUxOEF1L1dVSk9NVTFRMk5WL0R3L2ZhT3IyZ1lIV2ZR?=
+ =?utf-8?B?TXZ5WldBTHFmdEM2RHBtb1hWbnBtMTU0R20zL0JNSG5VeFJreUQ4K3o0VzAy?=
+ =?utf-8?B?TTRFU2w0REVUK1dEdHZ2c2xwanZvTlFrMkNKcjlrbUNQYnNRNm9uWjUwa0FW?=
+ =?utf-8?B?YXRyU043SERiR0NQd1hOTGZiUHZDWW42eHEyUzBmbzM0aU55aThEa1pSR29o?=
+ =?utf-8?B?THJJVWgvczlFZU9iYlU0TzAwQ1NPT1p4VzJ5RlBYN1diUFdaMzBxTWxxZWNw?=
+ =?utf-8?B?Wk80bklIOUVMZjdxMy9DUWFiVCsrandmS1pUeXR0NktYTEM4cnJDWnFpZkRs?=
+ =?utf-8?B?ZDkrekU1eFltZ3N0N2FmT0dWS2pwL0FGZEQ3Qm1QbHM4ZGdlQkhodHdZNFZq?=
+ =?utf-8?B?V3NzVy91eFlESnNIRWMyVG96WEFXQVArT1NDeWFYRFY5MjZIZmJRMFhKc3Jq?=
+ =?utf-8?B?OEsySWw2OHl5QklPVVhqQkFnd0pTbG9nbW50MGZRdUNENnhMckIxYS95RjFV?=
+ =?utf-8?B?b255RS8wbURXRC9mOXhnMG9CclNPZis0eW9lenFDQXZ2YnRiYndkV1U4eHNa?=
+ =?utf-8?B?d2RkT0V6UU9YMHA1QjdwZnhjWnhGK0RGUExicDZ3RW80ZTNyc3FPOGtYT3Ny?=
+ =?utf-8?B?ZW42T2FuT1ZLR0w4M241dEdwM3B5VndXQi92NVdQalVNeU1VYTVuZmk4MHVG?=
+ =?utf-8?B?bUliMVkwajVXWVJMS3RZZG9lYTBoYXV3RjU1ODRSbkNpN0tad2hYQk1RSGlV?=
+ =?utf-8?B?dGF0enhuM1MwU3c3RDBWMkxyTHJaTUt3NVZPT05SdUlxNStiejBJR29Edy9Q?=
+ =?utf-8?B?WkFmQzQxRDdTaFhkc0NYa3YxSEtvR054aGYycHg0WUszdzhQNEFTZ0dnNS9H?=
+ =?utf-8?B?UDA2TjFlNS81cFUxUE9lcldRNUtpbU9xWVZ5dVY5MWV2MW52NEJPODRkQnMy?=
+ =?utf-8?B?U3lPU0NNZForR09lcVZDVTZsZ0crSFBPcEE2OW1jdDlUOW1zVEtNQmlxemo1?=
+ =?utf-8?B?cjZ3b1dQSkJkMjZ2VlpjWm1PU3lxTS9TZENEeUI1WGg0VFNreGNlUHVKendN?=
+ =?utf-8?B?SXloNHVmSlRXeG5wQ1VEcFlVVnVTUkRUUHBLSDZCaGlmYWRLUnRGbU13cElF?=
+ =?utf-8?Q?dyCogLYYewhSGJCLCgFOTCT18?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dfdcce69-16c3-4802-15f9-08db6bd6e81a
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2843.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e149ee9e-941a-4881-d0e3-08db6bd28af9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2023 05:53:42.1418
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2023 06:24:56.9329
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 7rPnDtCSFZN+5fCOLP6Qbxb8Slnuuo6BVPSPy97aICgmY5oxY7cgBwM1bzgKsuMAgm67P7Ggq1wQTlR0EmpIDg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8093
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bTSTd25kpiCSjunftAf/+K+XvJW1+Vct3N7BuL24Wrs1mMa3EKDIywQT8FTnc6l5kdj8bXm5PVBQloW7YpIYUA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB8608
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Tuesday, June 13, 2023 6:42 AM
->=20
-> On Fri,  2 Jun 2023 05:16:50 -0700
-> Yi Liu <yi.l.liu@intel.com> wrote:
->=20
-> > This moves the noiommu device determination and noiommu taint out of
-> > vfio_group_find_or_alloc(). noiommu device is determined in
-> > __vfio_register_dev() and result is stored in flag vfio_device->noiommu=
-,
-> > the noiommu taint is added in the end of __vfio_register_dev().
-> >
-> > This is also a preparation for compiling out vfio_group infrastructure
-> > as it makes the noiommu detection and taint common between the cdev pat=
-h
-> > and group path though cdev path does not support noiommu.
->=20
-> Does this really still make sense?  The motivation for the change is
-> really not clear without cdev support for noiommu.  Thanks,
 
-I think it still makes sense. When CONFIG_VFIO_GROUP=3D=3Dn, the kernel
-only supports cdev interface. If there is noiommu device, vfio should
-fail the registration. So, the noiommu determination is still needed. But
-I'd admit the taint might still be in the group code.
 
-Regards,
-Yi Liu
+On 12/6/23 14:25, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> The SEV-SNP firmware provides the SNP_CONFIG command used to set the
+> system-wide configuration value for SNP guests. The information includes
+> the TCB version string to be reported in guest attestation reports.
+> 
+> Version 2 of the GHCB specification adds an NAE (SNP extended guest
+> request) that a guest can use to query the reports that include additional
+> certificates.
+> 
+> In both cases, userspace provided additional data is included in the
+> attestation reports. The userspace will use the SNP_SET_EXT_CONFIG
+> command to give the certificate blob and the reported TCB version string
+> at once. Note that the specification defines certificate blob with a
+> specific GUID format; the userspace is responsible for building the
+> proper certificate blob. The ioctl treats it an opaque blob.
+> 
+> While it is not defined in the spec, but let's add SNP_GET_EXT_CONFIG
+> command that can be used to obtain the data programmed through the
+> SNP_SET_EXT_CONFIG.
+> 
+> Co-developed-by: Alexey Kardashevskiy <aik@amd.com>
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+> Co-developed-by: Dionna Glaze <dionnaglaze@google.com>
+> Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> [mdr: squash in doc patch from Dionna]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>   Documentation/virt/coco/sev-guest.rst |  27 ++++
+>   drivers/crypto/ccp/sev-dev.c          | 178 ++++++++++++++++++++++++++
+>   drivers/crypto/ccp/sev-dev.h          |   2 +
+>   include/linux/psp-sev.h               |  10 ++
+>   include/uapi/linux/psp-sev.h          |  17 +++
+>   5 files changed, 234 insertions(+)
+> 
+> diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/coco/sev-guest.rst
+> index 11ea67c944df..6cad4226c348 100644
+> --- a/Documentation/virt/coco/sev-guest.rst
+> +++ b/Documentation/virt/coco/sev-guest.rst
+> @@ -145,6 +145,33 @@ The SNP_PLATFORM_STATUS command is used to query the SNP platform status. The
+>   status includes API major, minor version and more. See the SEV-SNP
+>   specification for further details.
+>   
+> +2.5 SNP_SET_EXT_CONFIG
+> +----------------------
+> +:Technology: sev-snp
+> +:Type: hypervisor ioctl cmd
+> +:Parameters (in): struct sev_data_snp_ext_config
+> +:Returns (out): 0 on success, -negative on error
+> +
+> +The SNP_SET_EXT_CONFIG is used to set the system-wide configuration such as
+> +reported TCB version in the attestation report. The command is similar to
+> +SNP_CONFIG command defined in the SEV-SNP spec. The main difference is the
+> +command also accepts an additional certificate blob defined in the GHCB
+> +specification.
+> +
+> +If the certs_address is zero, then the previous certificate blob will deleted.
+> +For more information on the certificate blob layout, see the GHCB spec
+> +(extended guest request message).
+> +
+> +2.6 SNP_GET_EXT_CONFIG
+> +----------------------
+> +:Technology: sev-snp
+> +:Type: hypervisor ioctl cmd
+> +:Parameters (in): struct sev_data_snp_ext_config
+> +:Returns (out): 0 on success, -negative on error
+> +
+> +The SNP_GET_EXT_CONFIG is used to query the system-wide configuration set
+> +through the SNP_SET_EXT_CONFIG.
+> +
+>   3. SEV-SNP CPUID Enforcement
+>   ============================
+>   
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index b8e8c4da4025..175c24163ba0 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -1491,6 +1491,10 @@ static int __sev_snp_shutdown_locked(int *error)
+>   	data.length = sizeof(data);
+>   	data.iommu_snp_shutdown = 1;
+>   
+> +	/* Free the memory used for caching the certificate data */
+> +	sev_snp_certs_put(sev->snp_certs);
+> +	sev->snp_certs = NULL;
+> +
+>   	wbinvd_on_all_cpus();
+>   
+>   retry:
+> @@ -1829,6 +1833,126 @@ static int sev_ioctl_snp_platform_status(struct sev_issue_cmd *argp)
+>   	return ret;
+>   }
+>   
+> +static int sev_ioctl_snp_get_config(struct sev_issue_cmd *argp)
+> +{
+> +	struct sev_device *sev = psp_master->sev_data;
+> +	struct sev_user_data_ext_snp_config input;
 
-> Alex
->=20
-> > Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-> > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> > ---
-> >  drivers/vfio/group.c     | 15 ---------------
-> >  drivers/vfio/vfio_main.c | 31 ++++++++++++++++++++++++++++++-
-> >  include/linux/vfio.h     |  1 +
-> >  3 files changed, 31 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
-> > index 653b62f93474..64cdd0ea8825 100644
-> > --- a/drivers/vfio/group.c
-> > +++ b/drivers/vfio/group.c
-> > @@ -668,21 +668,6 @@ static struct vfio_group *vfio_group_find_or_alloc=
-(struct
-> device *dev)
-> >  	struct vfio_group *group;
-> >
-> >  	iommu_group =3D iommu_group_get(dev);
-> > -	if (!iommu_group && vfio_noiommu) {
-> > -		/*
-> > -		 * With noiommu enabled, create an IOMMU group for devices that
-> > -		 * don't already have one, implying no IOMMU hardware/driver
-> > -		 * exists.  Taint the kernel because we're about to give a DMA
-> > -		 * capable device to a user without IOMMU protection.
-> > -		 */
-> > -		group =3D vfio_noiommu_group_alloc(dev, VFIO_NO_IOMMU);
-> > -		if (!IS_ERR(group)) {
-> > -			add_taint(TAINT_USER, LOCKDEP_STILL_OK);
-> > -			dev_warn(dev, "Adding kernel taint for vfio-noiommu group on
-> device\n");
-> > -		}
-> > -		return group;
-> > -	}
-> > -
-> >  	if (!iommu_group)
-> >  		return ERR_PTR(-EINVAL);
-> >
-> > diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> > index 6d8f9b0f3637..00a699b9f76b 100644
-> > --- a/drivers/vfio/vfio_main.c
-> > +++ b/drivers/vfio/vfio_main.c
-> > @@ -265,6 +265,18 @@ static int vfio_init_device(struct vfio_device *de=
-vice, struct
-> device *dev,
-> >  	return ret;
-> >  }
-> >
-> > +static int vfio_device_set_noiommu(struct vfio_device *device)
-> > +{
-> > +	struct iommu_group *iommu_group =3D iommu_group_get(device->dev);
-> > +
-> > +	if (!iommu_group && !vfio_noiommu)
-> > +		return -EINVAL;
-> > +
-> > +	device->noiommu =3D !iommu_group;
-> > +	iommu_group_put(iommu_group); /* Accepts NULL */
-> > +	return 0;
-> > +}
-> > +
-> >  static int __vfio_register_dev(struct vfio_device *device,
-> >  			       enum vfio_group_type type)
-> >  {
-> > @@ -277,6 +289,13 @@ static int __vfio_register_dev(struct vfio_device =
-*device,
-> >  		     !device->ops->detach_ioas)))
-> >  		return -EINVAL;
-> >
-> > +	/* Only physical devices can be noiommu device */
-> > +	if (type =3D=3D VFIO_IOMMU) {
-> > +		ret =3D vfio_device_set_noiommu(device);
-> > +		if (ret)
-> > +			return ret;
-> > +	}
-> > +
-> >  	/*
-> >  	 * If the driver doesn't specify a set then the device is added to a
-> >  	 * singleton set just for itself.
-> > @@ -288,7 +307,8 @@ static int __vfio_register_dev(struct vfio_device *=
-device,
-> >  	if (ret)
-> >  		return ret;
-> >
-> > -	ret =3D vfio_device_set_group(device, type);
-> > +	ret =3D vfio_device_set_group(device,
-> > +				    device->noiommu ? VFIO_NO_IOMMU : type);
-> >  	if (ret)
-> >  		return ret;
-> >
-> > @@ -301,6 +321,15 @@ static int __vfio_register_dev(struct vfio_device =
-*device,
-> >
-> >  	vfio_device_group_register(device);
-> >
-> > +	if (device->noiommu) {
-> > +		/*
-> > +		 * noiommu deivces have no IOMMU hardware/driver.  Taint the
-> > +		 * kernel because we're about to give a DMA capable device to
-> > +		 * a user without IOMMU protection.
-> > +		 */
-> > +		add_taint(TAINT_USER, LOCKDEP_STILL_OK);
-> > +		dev_warn(device->dev, "Adding kernel taint for vfio-noiommu on
-> device\n");
-> > +	}
-> >  	return 0;
-> >  err_out:
-> >  	vfio_device_remove_group(device);
-> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> > index e80a8ac86e46..183e620009e7 100644
-> > --- a/include/linux/vfio.h
-> > +++ b/include/linux/vfio.h
-> > @@ -67,6 +67,7 @@ struct vfio_device {
-> >  	bool iommufd_attached;
-> >  #endif
-> >  	bool cdev_opened:1;
-> > +	bool noiommu:1;
-> >  };
-> >
-> >  /**
+input = {0} would do as well as the memset() below but shorter.
 
+> +	struct sev_snp_certs *snp_certs;
+> +	int ret;
+> +
+> +	if (!sev->snp_initialized || !argp->data)
+> +		return -EINVAL;
+> +
+> +	memset(&input, 0, sizeof(input));
+
+
+but this memset() seems useless anyway because of copy_from_user() below.
+
+> +
+> +	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+> +		return -EFAULT;
+> +
+> +	/* Copy the TCB version programmed through the SET_CONFIG to userspace */
+> +	if (input.config_address) {
+> +		if (copy_to_user((void * __user)input.config_address,
+> +				 &sev->snp_config, sizeof(struct sev_user_data_snp_config)))
+> +			return -EFAULT;
+> +	}
+> +
+> +	snp_certs = sev_snp_certs_get(sev->snp_certs);
+> +
+> +	/* Copy the extended certs programmed through the SNP_SET_CONFIG */
+> +	if (input.certs_address && snp_certs) {
+> +		if (input.certs_len < snp_certs->len) {
+> +			/* Return the certs length to userspace */
+> +			input.certs_len = snp_certs->len;
+> +
+> +			ret = -EIO;
+> +			goto e_done;
+> +		}
+> +
+> +		if (copy_to_user((void * __user)input.certs_address,
+> +				 snp_certs->data, snp_certs->len)) {
+> +			ret = -EFAULT;
+> +			goto put_exit;
+> +		}
+> +	}
+> +
+> +	ret = 0;
+> +
+> +e_done:
+> +	if (copy_to_user((void __user *)argp->data, &input, sizeof(input)))
+> +		ret = -EFAULT;
+> +
+> +put_exit:
+> +	sev_snp_certs_put(snp_certs);
+> +
+> +	return ret;
+> +}
+> +
+> +static int sev_ioctl_snp_set_config(struct sev_issue_cmd *argp, bool writable)
+> +{
+> +	struct sev_device *sev = psp_master->sev_data;
+> +	struct sev_user_data_ext_snp_config input;
+> +	struct sev_user_data_snp_config config;
+> +	struct sev_snp_certs *snp_certs = NULL;
+> +	void *certs = NULL;
+> +	int ret = 0;
+
+This '0' is not used below - it is always overwritten when "goto e_free" 
+and the good exit is "return 0" and not "return ret". I'd suggest either 
+not initializing it and letting gcc barf when some future change uses 
+it, or initialize to something like -EFAULT.
+
+
+> +
+> +	if (!sev->snp_initialized || !argp->data)
+> +		return -EINVAL;
+> +
+> +	if (!writable)
+> +		return -EPERM;
+> +
+> +	memset(&input, 0, sizeof(input));
+
+same here.
+
+> +
+> +	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+> +		return -EFAULT;
+> +
+> +	/* Copy the certs from userspace */
+> +	if (input.certs_address) {
+> +		if (!input.certs_len || !IS_ALIGNED(input.certs_len, PAGE_SIZE))
+> +			return -EINVAL;
+> +
+> +		certs = psp_copy_user_blob(input.certs_address, input.certs_len);
+> +		if (IS_ERR(certs))
+> +			return PTR_ERR(certs);
+> +	}
+> +
+> +	/* Issue the PSP command to update the TCB version using the SNP_CONFIG. */
+> +	if (input.config_address) {
+> +		memset(&config, 0, sizeof(config));
+
+
+and here.
+
+> +		if (copy_from_user(&config,
+> +				   (void __user *)input.config_address, sizeof(config))) {
+> +			ret = -EFAULT;
+> +			goto e_free;
+> +		}
+> +
+> +		ret = __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
+> +		if (ret)
+> +			goto e_free;
+> +
+> +		memcpy(&sev->snp_config, &config, sizeof(config));
+> +	}
+> +
+> +	/*
+> +	 * If the new certs are passed then cache it else free the old certs.
+> +	 */
+> +	if (input.certs_len) {
+> +		snp_certs = sev_snp_certs_new(certs, input.certs_len);
+> +		if (!snp_certs) {
+> +			ret = -ENOMEM;
+> +			goto e_free;
+> +		}
+> +	}
+> +
+> +	sev_snp_certs_put(sev->snp_certs);
+> +	sev->snp_certs = snp_certs;
+> +
+> +	return 0;
+> +
+> +e_free:
+> +	kfree(certs);
+> +	return ret;
+> +}
+> +
+>   static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>   {
+>   	void __user *argp = (void __user *)arg;
+> @@ -1883,6 +2007,12 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>   	case SNP_PLATFORM_STATUS:
+>   		ret = sev_ioctl_snp_platform_status(&input);
+>   		break;
+> +	case SNP_SET_EXT_CONFIG:
+> +		ret = sev_ioctl_snp_set_config(&input, writable);
+> +		break;
+> +	case SNP_GET_EXT_CONFIG:
+> +		ret = sev_ioctl_snp_get_config(&input);
+> +		break;
+>   	default:
+>   		ret = -EINVAL;
+>   		goto out;
+> @@ -1931,6 +2061,54 @@ int sev_guest_df_flush(int *error)
+>   }
+>   EXPORT_SYMBOL_GPL(sev_guest_df_flush);
+>   
+> +static void sev_snp_certs_release(struct kref *kref)
+> +{
+> +	struct sev_snp_certs *certs = container_of(kref, struct sev_snp_certs, kref);
+> +
+> +	kfree(certs->data);
+> +	kfree(certs);
+> +}
+> +
+> +struct sev_snp_certs *sev_snp_certs_new(void *data, u32 len)
+> +{
+> +	struct sev_snp_certs *certs;
+> +
+> +	if (!len || !data)
+> +		return NULL;
+> +
+> +	certs = kzalloc(sizeof(*certs), GFP_KERNEL);
+> +	if (!certs)
+> +		return NULL;
+> +
+> +	certs->data = data;
+> +	certs->len = len;
+> +	kref_init(&certs->kref);
+> +
+> +	return certs;
+> +}
+> +EXPORT_SYMBOL_GPL(sev_snp_certs_new);
+> +
+> +struct sev_snp_certs *sev_snp_certs_get(struct sev_snp_certs *certs)
+> +{
+> +	if (!certs)
+> +		return NULL;
+> +
+> +	if (!kref_get_unless_zero(&certs->kref))
+> +		return NULL;
+> +
+> +	return certs;
+> +}
+> +EXPORT_SYMBOL_GPL(sev_snp_certs_get);
+> +
+> +void sev_snp_certs_put(struct sev_snp_certs *certs)
+> +{
+> +	if (!certs)
+> +		return;
+> +
+> +	kref_put(&certs->kref, sev_snp_certs_release);
+> +}
+> +EXPORT_SYMBOL_GPL(sev_snp_certs_put);
+> +
+>   static void sev_exit(struct kref *ref)
+>   {
+>   	misc_deregister(&misc_dev->misc);
+> diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
+> index 19d79f9d4212..22374f3d3e2e 100644
+> --- a/drivers/crypto/ccp/sev-dev.h
+> +++ b/drivers/crypto/ccp/sev-dev.h
+> @@ -66,6 +66,8 @@ struct sev_device {
+>   
+>   	bool snp_initialized;
+>   	struct snp_host_map snp_host_map[MAX_SNP_HOST_MAP_BUFS];
+> +	struct sev_snp_certs *snp_certs;
+> +	struct sev_user_data_snp_config snp_config;
+>   };
+>   
+>   int sev_dev_init(struct psp_device *psp);
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 5ae61de96e44..2191d8b5423a 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -24,6 +24,16 @@
+>   
+>   #define SEV_FW_BLOB_MAX_SIZE	0x4000	/* 16KB */
+>   
+> +struct sev_snp_certs {
+> +	void *data;
+> +	u32 len;
+> +	struct kref kref;
+> +};
+> +
+> +struct sev_snp_certs *sev_snp_certs_new(void *data, u32 len);
+> +struct sev_snp_certs *sev_snp_certs_get(struct sev_snp_certs *certs);
+> +void sev_snp_certs_put(struct sev_snp_certs *certs);
+> +
+>   /**
+>    * SEV platform state
+>    */
+> diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+> index 4dc6a3e7b3d5..d1e6a0615546 100644
+> --- a/include/uapi/linux/psp-sev.h
+> +++ b/include/uapi/linux/psp-sev.h
+> @@ -29,6 +29,8 @@ enum {
+>   	SEV_GET_ID,	/* This command is deprecated, use SEV_GET_ID2 */
+>   	SEV_GET_ID2,
+>   	SNP_PLATFORM_STATUS,
+> +	SNP_SET_EXT_CONFIG,
+> +	SNP_GET_EXT_CONFIG,
+>   
+>   	SEV_MAX,
+>   };
+> @@ -201,6 +203,21 @@ struct sev_user_data_snp_config {
+>   	__u8 rsvd1[52];
+>   } __packed;
+>   
+> +/**
+> + * struct sev_data_snp_ext_config - system wide configuration value for SNP.
+> + *
+> + * @config_address: address of the struct sev_user_data_snp_config or 0 when
+> + *		reported_tcb does not need to be updated.
+> + * @certs_address: address of extended guest request certificate chain or
+> + *              0 when previous certificate should be removed on SNP_SET_EXT_CONFIG.
+> + * @certs_len: length of the certs
+> + */
+> +struct sev_user_data_ext_snp_config {
+> +	__u64 config_address;		/* In */
+> +	__u64 certs_address;		/* In */
+> +	__u32 certs_len;		/* In */
+> +};
+
+__packed or padding missing (there are other places like btw, I remember 
+seeing quite a few of those). Thanks,
+
+
+> +
+>   /**
+>    * struct sev_issue_cmd - SEV ioctl parameters
+>    *
+
+-- 
+Alexey
