@@ -2,437 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21AAC72E6C0
+	by mail.lfdr.de (Postfix) with ESMTP id 7777772E6C1
 	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 17:11:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236388AbjFMPLO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jun 2023 11:11:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39054 "EHLO
+        id S234367AbjFMPLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 11:11:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234367AbjFMPLL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jun 2023 11:11:11 -0400
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2078.outbound.protection.outlook.com [40.107.104.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 649AA1734
-        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 08:11:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rIPA1XMqfRB8e0hYGw9NXjuLUjzUjF/hoJYvecm3LVE=;
- b=4aY9XQrFedAhgIUZ36Fi0U5csmpuVttpJDEC9s0hotB1xrN6/yDYeE59S5XfdfrVLo2gbnjP2puFvfBx0PlzjmZFy6cVYdmWdg2OmXP+f4W9NcojsucOR8NWlj1bLjYqNodNs6vZyZFxZc09KCfjz1+DxEc54ySDqY4leiauk3g=
-Received: from AS9PR06CA0173.eurprd06.prod.outlook.com (2603:10a6:20b:45c::7)
- by PAXPR08MB7393.eurprd08.prod.outlook.com (2603:10a6:102:2bd::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.32; Tue, 13 Jun
- 2023 15:10:57 +0000
-Received: from AM7EUR03FT023.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:20b:45c:cafe::43) by AS9PR06CA0173.outlook.office365.com
- (2603:10a6:20b:45c::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.34 via Frontend
- Transport; Tue, 13 Jun 2023 15:10:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
- pr=C
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM7EUR03FT023.mail.protection.outlook.com (100.127.140.73) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6500.23 via Frontend Transport; Tue, 13 Jun 2023 15:10:54 +0000
-Received: ("Tessian outbound 5bb4c51d5a1f:v136"); Tue, 13 Jun 2023 15:10:54 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: edb2e63d90049da8
-X-CR-MTA-TID: 64aa7808
-Received: from 325d364791b6.1
-        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 83763F12-B74F-42E2-B97B-3F2F4A7D3B16.1;
-        Tue, 13 Jun 2023 15:10:48 +0000
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 325d364791b6.1
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Tue, 13 Jun 2023 15:10:48 +0000
+        with ESMTP id S239762AbjFMPLN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jun 2023 11:11:13 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 936291739;
+        Tue, 13 Jun 2023 08:11:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686669072; x=1718205072;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=b4jnKfK1H4bpV3FZuepNPutRBfqeTgYorYXnXujS/wo=;
+  b=EviekFkPkJ/v01+kprij8JHfBAYSPqwgsLJ2rgCkiUlfhsIGikIYo4tA
+   7OgdjZ16+0zXCPyx+n0WPVRkAX+lXR7RaZxXwRXOFYc2BrIRx9aED9nB3
+   xBpaksmC5Esgx+/yTyMu6sgfTfFxzVcf87/Z1r2/YRqVnGh0Jgvhz7xe+
+   gPO7YG0JJE8rTe2RHuRHB8J300Z2O3fUujXVVKyV1vwBKBMpBMmRPwsGr
+   tcnLUIozZc6FkRfzkbJFbvewstvkIEuu5EMVsbc6Sywk7H6Z8XeEtQFfs
+   6kC+Eae5M8J06CRW5KitBAFeTXNNeDfmrIM7rLZjtkovQO+BN82zDjg64
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="338000291"
+X-IronPort-AV: E=Sophos;i="6.00,240,1681196400"; 
+   d="scan'208";a="338000291"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2023 08:11:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="1041802772"
+X-IronPort-AV: E=Sophos;i="6.00,240,1681196400"; 
+   d="scan'208";a="1041802772"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga005.fm.intel.com with ESMTP; 13 Jun 2023 08:11:09 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 13 Jun 2023 08:11:08 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Tue, 13 Jun 2023 08:11:08 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.174)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Tue, 13 Jun 2023 08:11:07 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ToYwiAvnBZbLnn3ZtcWYuNkzVIISbbUwYFI05KbuAjktXLQB8EWVDabXfwCvIU8lnPXZf4NeSkOGQg85CrYY/SAX3Z6w5Z4B1z+Z1T5slpc+KAgdv4i7+VKdJGaVUmheqqEkJ/VrcudUbKqXFZDIpL5RhU1p+/HEhiLjjSSKiPl0zjw/xeMFl3AiDJ/aBZXA9MPe91Y/qTjreDyLh3ZMpbwvUimUb7A4YrA0h6LIEYdmgq+RHiGTuolCOGOP/Hpw81BYnYgin7ricbtxz0sQEZ+lRkFtWpDYOQ/7HDWWV+NxD+onx/bA2t2TCMHF/soh7Lnv/8M5p1GwEja0dntJBg==
+ b=KyUcFPuA+k1FSmAeNMCnnrszqd526XCMcW3mAhDzxtOC/NUU065JYFUKV+ntZKm1XYluVKBOiJ326b0vnCLbdOdi2oz38Ra51EusBpp3GT7hUXVVT09OUifXKkybOtrElXV2b+qxp76iMdXURK2l+/wy/6HRrvysfx+KBrBrrr6xeG6WQzJLMm4cWqzGsChJpfw84TnwymMWZuxM1sAD5QBrzriqG2R8OiRKH+04z5X9Cqd6DvbJmjIXA59Py///EootZzrnu6SaKspIEYDcWNn/rvQiq0LDn4TON8lMNWMv+rEz5rbNudVBLovuBrLHbCbdVcdsOs6Vvny663PkIA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rIPA1XMqfRB8e0hYGw9NXjuLUjzUjF/hoJYvecm3LVE=;
- b=E66JqnmRYMbgox0sRzeJWCQ+OOBsmPqoEOJGGFAmV0Aoc5bs2BmVzXWuT7E9XotTOuLQh/+2TV7Q9Bl90KfsjKdvKcl7mRw8RX8Q4/6bGc1PNQttbwDAVohX/EiO9xjId7xgv86utlRTmLVzTR41gArC4v4D8R9TUTBucjV5H5n+1uOMGba5qcpctvir/Mi49ssRSzaRQt8koukhTcFSDUsJ2vWtB86UvmwHTAyrTXOs0piVaJPy+A5q8SSNru+usvFRxoHpdvfNmFayKC18QKhnnQ7KwF/bRFtEdF7O3WDT1QFbUH0pgbuDQNbSI0g5b4b8J3ezGYB1QE3111lHRw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 40.67.248.234) smtp.rcpttodomain=linux.dev smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rIPA1XMqfRB8e0hYGw9NXjuLUjzUjF/hoJYvecm3LVE=;
- b=4aY9XQrFedAhgIUZ36Fi0U5csmpuVttpJDEC9s0hotB1xrN6/yDYeE59S5XfdfrVLo2gbnjP2puFvfBx0PlzjmZFy6cVYdmWdg2OmXP+f4W9NcojsucOR8NWlj1bLjYqNodNs6vZyZFxZc09KCfjz1+DxEc54ySDqY4leiauk3g=
-Received: from DB6PR0501CA0013.eurprd05.prod.outlook.com (2603:10a6:4:8f::23)
- by DB4PR08MB8198.eurprd08.prod.outlook.com (2603:10a6:10:382::20) with
+ bh=9AcgFtkDRQUklAUIqLNLjAp/uqKfnwC8fwRIak0ZAOY=;
+ b=Y6ouNzeW//sBbW21JTdoMyZRt8OEvR4x5hjbQ8ELzeHn+nHEu9W7ZGXn271cMfLZYKeJSS+AXJs3QBXem4MRSlnQv7GRdRZfJ/B5oZQSqkTQE+2tmz6G0ndj2Y+po12OqG0mIXzeK25M2+ZhR2By3AXdLRnvPmQ2Qpu3vmFYLkPTJqM84FKx35iG3lCLS9aUXqIOKu/RT79xkEfXQdtc3xjyjOXxoxBqvRsfZ+42nNQGRmgFxCv8jEyf7fASIMMYRpFMKwSVl8xw5/Nce9vvypVBN4Iinjj68uDCrevEREVDp9pyzLfjr2oNVVqU7d+IskMG4iR8Cs26Uz6fQjukdw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by CY5PR11MB6236.namprd11.prod.outlook.com (2603:10b6:930:23::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.29; Tue, 13 Jun
- 2023 15:10:44 +0000
-Received: from DBAEUR03FT054.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:4:8f:cafe::df) by DB6PR0501CA0013.outlook.office365.com
- (2603:10a6:4:8f::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.28 via Frontend
- Transport; Tue, 13 Jun 2023 15:10:44 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 40.67.248.234)
- smtp.mailfrom=arm.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 40.67.248.234 as permitted sender) receiver=protection.outlook.com;
- client-ip=40.67.248.234; helo=nebula.arm.com; pr=C
-Received: from nebula.arm.com (40.67.248.234) by
- DBAEUR03FT054.mail.protection.outlook.com (100.127.142.218) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6500.23 via Frontend Transport; Tue, 13 Jun 2023 15:10:44 +0000
-Received: from AZ-NEU-EX03.Arm.com (10.251.24.31) by AZ-NEU-EX04.Arm.com
- (10.251.24.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Tue, 13 Jun
- 2023 15:10:43 +0000
-Received: from e124191.cambridge.arm.com (10.1.197.45) by mail.arm.com
- (10.251.24.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23 via Frontend
- Transport; Tue, 13 Jun 2023 15:10:43 +0000
-Date:   Tue, 13 Jun 2023 16:10:41 +0100
-From:   Joey Gouly <joey.gouly@arm.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-CC:     <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        "Salil Mehta" <salil.mehta@huawei.com>, <nd@arm.com>
-Subject: Re: [PATCH kvmtool 14/21] aarch64: Add skeleton implementation for
- PSCI
-Message-ID: <20230613151041.GA2636717@e124191.cambridge.arm.com>
-References: <20230526221712.317287-1-oliver.upton@linux.dev>
- <20230526221712.317287-15-oliver.upton@linux.dev>
-MIME-Version: 1.0
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.38; Tue, 13 Jun
+ 2023 15:11:06 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::5b44:8f52:dbeb:18e5]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::5b44:8f52:dbeb:18e5%3]) with mapi id 15.20.6455.045; Tue, 13 Jun 2023
+ 15:11:06 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "clegoate@redhat.com" <clegoate@redhat.com>
+Subject: RE: [PATCH v12 24/24] docs: vfio: Add vfio device cdev description
+Thread-Topic: [PATCH v12 24/24] docs: vfio: Add vfio device cdev description
+Thread-Index: AQHZlUw9Uf04nacAO0q7EN/OKT++06+H2nAAgADVnWCAACregIAABjdggAAE2oCAAAB1wA==
+Date:   Tue, 13 Jun 2023 15:11:06 +0000
+Message-ID: <DS0PR11MB7529C440A84B75234E49C77CC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230602121653.80017-1-yi.l.liu@intel.com>
+        <20230602121653.80017-25-yi.l.liu@intel.com>
+        <20230612170628.661ab2a6.alex.williamson@redhat.com>
+        <DS0PR11MB7529B0A71849EA06DA953BBCC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <20230613082427.453748f5.alex.williamson@redhat.com>
+        <DS0PR11MB75297AC071F2EF4F49D85999C355A@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <20230613090403.1eecd1a3.alex.williamson@redhat.com>
+In-Reply-To: <20230613090403.1eecd1a3.alex.williamson@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|CY5PR11MB6236:EE_
+x-ms-office365-filtering-correlation-id: 115abc68-8845-42ce-e14c-08db6c20691a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: A3Rap2Ncfzzkhfnmvir1i29bHJjSsW/i9z0sXNsS8Q0Z+u4dZFC7bLFzuEbg+exKFysVBuDdURkKJ9iv/+mVmn72LI7F4Zht6wLv8t+s4f2uWMDKf9/EvSQceBTa68wQDVxDuTvBVpInfS+CnCsVU53y/IehxQ/5znmxUf70FhgC9t5X4T9zBkz2X+lJ2/6DpVIAl72E6AyvNYN+xy6rHKj+Q/PgLalc6X/eLQhhF1Wf7SkNK23zFZRhOy/uDBzR3cBAd3BhLbwxOQQcAMIzO6WAUwYyRn/BTZuCmFYGPndRQEB9WtFxBOt+IxvYGKQ2hacShuX99zoqSZwD0q6f+sDj/3o4IEIF3KJ/+p9Uu+rCim9slNFzsjyIMwpBHzlYdkxEC5tFZU5yQxkZs35jmVtSn9qWAjxeTTf3FVCg/NBIvW+H5JK3IifUMSbwJUqXUBn5CkDj7aaidKRbgB60aELK7bNJR7oEWBZM9HAn11I9dbCWJG6Yhg2acw4dbg6G1FTel+iXFCDaepmZA+yptUPmpAvCZQvr3VLR9NPc6rfNtsLsB4e8hrXCnQ4cDolZDB87snJPbwizilRjJ8Hvkk4c2rU/58hySDCSaP+A4iKr8HA4Hu+qggaW1XsM+fY8
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(366004)(136003)(396003)(376002)(346002)(451199021)(66476007)(66946007)(316002)(64756008)(76116006)(71200400001)(66446008)(4326008)(86362001)(66556008)(6916009)(478600001)(54906003)(33656002)(38070700005)(83380400001)(9686003)(186003)(26005)(55016003)(6506007)(8936002)(2906002)(8676002)(5660300002)(82960400001)(7696005)(41300700001)(52536014)(7416002)(38100700002)(122000001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Q1oxrOSFBvGuw43p5GNCUSJWaUJqZkTWhAwuWI3XRvqg5skBNJK22lu76Edc?=
+ =?us-ascii?Q?xNWVySw10D97gAPomK8uKrCl5Wmn4tLGJglYTIk1oS8JQAE3vg58tiC//lms?=
+ =?us-ascii?Q?3uLSZoZlY6daJ31I5o3uJMM6QadqjVpNJMacMWC0DHHiQmM1jl3peQv9iYdp?=
+ =?us-ascii?Q?WlM4BQ7WvUcvl5N2HVw/DyPZTamntRrF4F5ea3D1CJQP7HC5hSLewqR6ZyXQ?=
+ =?us-ascii?Q?VlZcU4Rngy9D308LAK7oBAz2MtQjT2xYcWmwPX5StjsQEptI2Kym1Q0SE4qC?=
+ =?us-ascii?Q?XnZ3jbiJy054TFAlcuDlOtXE98BTIysz9+GEx3UVTzG0kMDtXsARXP7F8HSV?=
+ =?us-ascii?Q?X9zB+ve0/kNYevgaYBcGZavO7gjRPkKFL3M8JgbQLlkG0tIVjxiWkNQAfvUl?=
+ =?us-ascii?Q?wizeMX9QzbSi7kXU8UuRdJt8Rus+WoF/0Ph/QkOEAuYBshOYy50nTga1bqfE?=
+ =?us-ascii?Q?jQbL4cNv0A+1glNmxb7Gju2VsdNRJSia3GYzqdGSSJSraNtFKoIT7G6MPoTU?=
+ =?us-ascii?Q?qGrJZ1Lo8mjWx3+PCsPPUIm2qNz9cNJGNHkQZeevz6JCaVloEUOvyJjvGAXN?=
+ =?us-ascii?Q?e9lThcHA6g7oZNeWDJeEpGTemiJFo6zfkDbKpr7vrNQSbXlfhWaCCVxvadY+?=
+ =?us-ascii?Q?eH/dk3+dj368vQbINnB12Fu+j+wPfTMuXIlS0dP0ux8eEiBYH/grHronU1U6?=
+ =?us-ascii?Q?LPoYN6qQwaO1iI2lpAdZuxvWfLAMoMzs4rszQoWiEiKTfgKQsaKcImOIVh+3?=
+ =?us-ascii?Q?pvCfd9TXK3P0wcJSc3R5s2KSLNuWHn+zrYzQQ+XKHK9ayx+WyPEnR/L/apfH?=
+ =?us-ascii?Q?sogRmVXg35ADCQbHL4vUZBt0xiW+It8BnMbche7/jQ1ai0Trig9CUcogEEiQ?=
+ =?us-ascii?Q?FxVZ1rVM2V2opwg+o6rPIHngJoXobmQc40Rv2zxSb6P1cdhazATc8Kb39wo3?=
+ =?us-ascii?Q?UHYJ2RR4gSGMWUzJXRbpCYcoYKCp0mk+cw66AOrd+NQhxeh09BdPjFgqpRu6?=
+ =?us-ascii?Q?2MihJXFOpU7HLF3snpkhkzJkqgDd09c2ihNcERw9TFylshY15fhON8wov1hs?=
+ =?us-ascii?Q?TOV0wjF8o3i7HMsCdmbsM/zcXM9sV5kZqsPKczKCWDUQ9T/tOBExfew7TP1B?=
+ =?us-ascii?Q?NkJ8ND70vOAfaHBT7ynK9AYNJ56A2ZPxenlAK8iznRDJmLAOkV1Iobs6M/ly?=
+ =?us-ascii?Q?2t76B0aCFaDAen7FdfXHILEsp3dlKywjFohUBe39ccQTYO95bRSo4BJUzBVe?=
+ =?us-ascii?Q?rdekXu2VCpy3lkL4HsarNUEpq+c4pb45PeQ4WoFmYOB8osnyhnitt4/A046J?=
+ =?us-ascii?Q?nSdHGLm4sEW82HNdGgIdFMBgXF00bKvPyzDFR2MimGCZkBm8yoiJHMtj7nQI?=
+ =?us-ascii?Q?FZoH2Tuj2gJTSgqfd2OUZ6qs3HpNFhFRMQx9lxXDSeNnbixle3oq34r0CCTy?=
+ =?us-ascii?Q?Z3Qj9hhD39r5ePZMglKsDHKxM8L76QD3PSJUnDiK30umyMZikxKAjfGoVA3C?=
+ =?us-ascii?Q?lXfiKyTSsTStdrp/9ieWEpI1QzQZyokMUTyL+iiiobluv10CrHVtbb1b8b4W?=
+ =?us-ascii?Q?oZMqBGCR28hCeC7m6LkQuihdrwWO4NNfCXGFO0ZJ?=
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230526221712.317287-15-oliver.upton@linux.dev>
-X-EOPAttributedMessage: 1
-X-MS-TrafficTypeDiagnostic: DBAEUR03FT054:EE_|DB4PR08MB8198:EE_|AM7EUR03FT023:EE_|PAXPR08MB7393:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1ab4fbaa-f087-4453-a1fa-08db6c20627b
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original: EuQUbMp2R2xTplraInoCQz+6OtozJky/DD326LRei+fWA8nKJXOIkxNbOwQVvrJuKw5ZfJjnK5YUCQyDfNBiJzne2wfM+1BKqONpybT2XklA+aMO3gRo3ZUtsOM+P9ASs12mqdwxasyq98aeJRSLSyS+KZIpYzthOZeJ7xxcYCUS/XR66LwOMFkxRsew5m9zoU57P7R31dT2Q0b7TWAwsAeGiFp/b6goszpmzNgg3UVLBr7vGUD6QW733D2cC7vzvsa7hijvO5cbr9lS4ev/kN6gtz4L0wNvRYCnL5OudqF8jtXIJpjxKKyfxSoYRk8XSOEk8sOeuY4IAw9eKqnPM2YDIGxZ2Q9ZCozaQrdGPWS8BLO3KlOu1NZldZq5JhnBZpSwvPbxLknPsmXWV0x3Pk04nPD0CAfTruY0YkuynAMmGqIuRtFboz0UkgHpxtdzbB0CqMUNf70gTwhxOSF19eBu6++exAAWI+WAPbZ/sJ2BN+cAl1hITQ4NF3dlTPH2zzKmcou1Vj/23eh/WoBCVjs/1E5JcJvLMioxvEO6d2XaVPgdiuiO0Ja3fTCHAlKo4sl+eYGimQJxK+aApK7fqUWmIpvhD3otAkeROTJVnvCVFcc6QwvRrF0tb3YCehbeELLLfWUrFPmaoacQ8wqTJTO/IGtqmfgmGFEI7QyLZotIt+F5YeYtoTf5sV3dJM2iV4ZiIL41oW4tZfiGj9ZLGAh+hXvoJrIs4DDcRBXkNcGUTIK+Z05vdee3F7hoPblq
-X-Forefront-Antispam-Report-Untrusted: CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(346002)(39860400002)(136003)(451199021)(36840700001)(46966006)(5660300002)(8676002)(8936002)(2906002)(70206006)(70586007)(54906003)(44832011)(7696005)(4326008)(26005)(1076003)(41300700001)(316002)(6916009)(186003)(36860700001)(82740400003)(356005)(336012)(426003)(47076005)(83380400001)(478600001)(40480700001)(33656002)(86362001)(55016003)(82310400005)(81166007)(36900700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB4PR08MB8198
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM7EUR03FT023.eop-EUR03.prod.protection.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs: 9fbf28f5-9bfd-420f-20d7-08db6c205c15
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GRf61bQGGzP0hrn3mv6B173Et7YICMIP8OlXorxI6zbCi9dTf1CioedvqkRDBcnuGooekHp1N1v1DBaQJAoJpKVoSJmYRaI1v/4s9wmC7hrEX3LgQObHjP5+Ln+ZQXE3wOQPZlKFpXOOFRd17LG/aqWRvi5A0HogE/E9aVB7WQ55IrSItyiAgdR1Z8Gcapi72/CgkSN5Ylzq/jwiMfAbWKzOny9rejp9hBC1w60bytIKPP9zi6KqwUGbLgyi7K3g6aSi2OrMvieSgQylEhMg7XqcugSaNUdr296L15wmvneVFpKz7/f3d8ig32PzrJapuB4CVUvalzd4nIiKfYu3yV+z7shoA2zhNBLdw+a3ZtMIaKj+cWFL8D9hnptwPqZIlH9v0U6jsGTZ+V6AtU76CXKTyjMzlsEmCB88vLkwyB7cPWgZ3ZsIYj1bDbHNSBeV0Vgr9CDrpK7feGQUfnsFknajaq+2bCmsDg1t8m5VZFRD91rN3d2aK161PdUnYI0YlOH5T163g1/NdG5M/Ar/JXVGCIoqSOTtidBXm9vLZQow8hwVV2pbKsjSrgZ1sPAwMoDbAtqYiRhNzJCQE3llvpKmxp+bn5Kz+c/JPKWxHNiwaKQAMQyYJrywIRm9hHeKINn4hKnCdL/nG2miFs0GpX2rqSM8i6NQ8mJcrLzmidmbRYBoOaVSzsjImTHBN64BPUnAjDizjjrmnpUZGIkHmXKxpaY3SjlOZRl9BKgaCdylPbB61sUPLFuk2oxbYjvL
-X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(346002)(396003)(39860400002)(451199021)(46966006)(36840700001)(40470700004)(316002)(7696005)(41300700001)(426003)(82310400005)(86362001)(83380400001)(47076005)(26005)(44832011)(186003)(1076003)(33656002)(2906002)(81166007)(40480700001)(55016003)(36860700001)(82740400003)(40460700003)(336012)(8936002)(5660300002)(8676002)(6862004)(70586007)(70206006)(478600001)(54906003)(4326008);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2023 15:10:54.9455
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 115abc68-8845-42ce-e14c-08db6c20691a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2023 15:11:06.0670
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1ab4fbaa-f087-4453-a1fa-08db6c20627b
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource: AM7EUR03FT023.eop-EUR03.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR08MB7393
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Zw60lp1Owzo4iWQsAoF9Sw0bVWl3hC+7fvD2eJyDZjgORHzPbmMQ692FKX/uF2MbM26cr3hjLry7hfYeu8vNtA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6236
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Tuesday, June 13, 2023 11:04 PM
+>=20
+> > > >
+> > > > >
+> > > > > Unless I missed it, we've not described that vfio device cdev acc=
+ess is
+> > > > > still bound by IOMMU group semantics, ie. there can be one DMA ow=
+ner
+> > > > > for the group.  That's a pretty common failure point for multi-fu=
+nction
+> > > > > consumer device use cases, so the why, where, and how it fails sh=
+ould
+> > > > > be well covered.
+> > > >
+> > > > Yes. this needs to be documented. How about below words:
+> > > >
+> > > > vfio device cdev access is still bound by IOMMU group semantics, ie=
+. there
+> > > > can be only one DMA owner for the group.  Devices belonging to the =
+same
+> > > > group can not be bound to multiple iommufd_ctx.
+> > >
+> > > ... or shared between native kernel and vfio drivers.
+> >
+> > I suppose you mean the devices in one group are bound to different
+> > drivers. right?
+>=20
+> Essentially, but we need to be careful that we're developing multiple
+> vfio drivers for a given bus now, which is why I try to distinguish
+> between the two sets of drivers.  Thanks,
 
-On Fri, May 26, 2023 at 10:17:05PM +0000, Oliver Upton wrote:
-> Add an extremely barebones implementation for handling PSCI, where the
-> only supported call is PSCI_VERSION.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  Makefile                        |  4 +-
->  arm/aarch32/kvm-cpu.c           |  5 +++
->  arm/aarch64/include/asm/smccc.h | 65 +++++++++++++++++++++++++++++++++
->  arm/aarch64/kvm-cpu.c           | 14 +++++++
->  arm/aarch64/kvm.c               |  2 +
->  arm/aarch64/psci.c              | 36 ++++++++++++++++++
->  arm/aarch64/smccc.c             | 45 +++++++++++++++++++++++
->  arm/kvm-cpu.c                   |  5 ---
->  8 files changed, 170 insertions(+), 6 deletions(-)
->  create mode 100644 arm/aarch64/include/asm/smccc.h
->  create mode 100644 arm/aarch64/psci.c
->  create mode 100644 arm/aarch64/smccc.c
-> 
-> diff --git a/Makefile b/Makefile
-> index ed2414bd8d1a..fa4836aebc5e 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -190,8 +190,10 @@ ifeq ($(ARCH), arm64)
->  	OBJS		+= arm/aarch64/arm-cpu.o
->  	OBJS		+= arm/aarch64/kvm-cpu.o
->  	OBJS		+= arm/aarch64/kvm.o
-> -	OBJS		+= arm/aarch64/pvtime.o
->  	OBJS		+= arm/aarch64/pmu.o
-> +	OBJS		+= arm/aarch64/psci.o
-> +	OBJS		+= arm/aarch64/pvtime.o
-> +	OBJS		+= arm/aarch64/smccc.o
->  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
->  	ARCH_INCLUDE	+= -Iarm/aarch64/include
->  
-> diff --git a/arm/aarch32/kvm-cpu.c b/arm/aarch32/kvm-cpu.c
-> index 95fb1da5ba3d..1063b9e5b6a9 100644
-> --- a/arm/aarch32/kvm-cpu.c
-> +++ b/arm/aarch32/kvm-cpu.c
-> @@ -130,3 +130,8 @@ void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
->  		die("KVM_GET_ONE_REG failed (LR_svc)");
->  	dprintf(debug_fd, " LR_svc:  0x%x\n", data);
->  }
-> +
-> +bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
-> +{
-> +	return false;
-> +}
-> diff --git a/arm/aarch64/include/asm/smccc.h b/arm/aarch64/include/asm/smccc.h
-> new file mode 100644
-> index 000000000000..c1be21a7d6f6
-> --- /dev/null
-> +++ b/arm/aarch64/include/asm/smccc.h
-> @@ -0,0 +1,65 @@
-> +#ifndef __ARM_SMCCC_H__
-> +#define __ARM_SMCCC_H__
-> +
-> +#include "kvm/kvm-cpu.h"
-> +
-> +#include <linux/arm-smccc.h>
-> +#include <linux/types.h>
-> +
-> +static inline bool smccc_is_64bit(struct kvm_cpu *vcpu)
-> +{
-> +	return ARM_SMCCC_IS_64(vcpu->kvm_run->hypercall.nr);
-> +}
-> +
-> +static inline bool smccc_calling_conv_allowed(struct kvm_cpu *vcpu, u32 fn)
-> +{
-> +	return !(vcpu->kvm->cfg.arch.aarch32_guest && ARM_SMCCC_IS_64(fn));
-> +}
-> +
-> +static inline u64 smccc_get_arg(struct kvm_cpu *vcpu, u8 arg)
-> +{
-> +	u64 val;
-> +	struct kvm_one_reg reg = {
-> +		.id	= ARM64_CORE_REG(regs.regs[arg]),
-> +		.addr	= (u64)&val,
-> +	};
-> +
-> +	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg))
-> +		die_perror("KVM_GET_ONE_REG failed");
-> +
-> +	if (!smccc_is_64bit(vcpu))
-> +		val = (u32)val;
-> +
-> +	return val;
-> +}
-> +
-> +static inline void smccc_return_result(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
-> +{
-> +	unsigned long *vals = (unsigned long *)res;
-> +	unsigned long i;
-> +
-> +	/*
-> +	 * The author was lazy and chose to abuse the layout of struct
-> +	 * arm_smccc_res to write a loop set the retvals.
-> +	 */
-> +	for (i = 0; i < sizeof(*res) / sizeof(unsigned long); i++) {
-> +		u64 val = vals[i];
-> +		struct kvm_one_reg reg = {
-> +			.id	= ARM64_CORE_REG(regs.regs[i]),
-> +			.addr	= (u64)&val,
-> +		};
-> +
-> +		if (!smccc_is_64bit(vcpu))
-> +			val = (u32)val;
-> +
-> +		if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg))
-> +			die_perror("KVM_SET_ONE_REG failed");
-> +	}
-> +}
-> +
-> +bool handle_hypercall(struct kvm_cpu *vcpu);
-> +void handle_psci(struct kvm_cpu *vcpu, struct arm_smccc_res *res);
-> +
-> +void kvm__setup_smccc(struct kvm *kvm);
-> +
-> +#endif /* __ARM_SMCCC_H__ */
-> diff --git a/arm/aarch64/kvm-cpu.c b/arm/aarch64/kvm-cpu.c
-> index 1e5a6cfdaf40..4feed9f41cb0 100644
-> --- a/arm/aarch64/kvm-cpu.c
-> +++ b/arm/aarch64/kvm-cpu.c
-> @@ -1,3 +1,4 @@
-> +#include "asm/smccc.h"
->  #include "kvm/kvm-cpu.h"
->  #include "kvm/kvm.h"
->  #include "kvm/virtio.h"
-> @@ -261,3 +262,16 @@ void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
->  		die("KVM_GET_ONE_REG failed (lr)");
->  	dprintf(debug_fd, " LR:    0x%lx\n", data);
->  }
-> +
-> +bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
-> +{
-> +	struct kvm_run *run = vcpu->kvm_run;
-> +
-> +	switch (run->exit_reason) {
-> +	case KVM_EXIT_HYPERCALL:
-> +		handle_hypercall(vcpu);
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-> index 4929ce48843b..ce917ed01349 100644
-> --- a/arm/aarch64/kvm.c
-> +++ b/arm/aarch64/kvm.c
-> @@ -1,3 +1,4 @@
-> +#include "asm/smccc.h"
->  #include "kvm/kvm.h"
->  #include "kvm/kvm-cpu.h"
->  
-> @@ -165,6 +166,7 @@ static void kvm__arch_enable_mte(struct kvm *kvm)
->  void __kvm__arm_init(struct kvm *kvm)
->  {
->  	kvm__arch_enable_mte(kvm);
-> +	kvm__setup_smccc(kvm);
->  }
->  
->  struct kvm_cpu *kvm__arch_mpidr_to_vcpu(struct kvm *kvm, u64 target_mpidr)
-> diff --git a/arm/aarch64/psci.c b/arm/aarch64/psci.c
-> new file mode 100644
-> index 000000000000..482b9a7442c6
-> --- /dev/null
-> +++ b/arm/aarch64/psci.c
-> @@ -0,0 +1,36 @@
-> +#include "asm/smccc.h"
-> +#include "kvm/kvm.h"
-> +#include "kvm/kvm-cpu.h"
-> +#include "kvm/util.h"
-> +
-> +#include <linux/psci.h>
-> +#include <linux/types.h>
-> +
-> +static void psci_features(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
-> +{
-> +	u32 arg = smccc_get_arg(vcpu, 1);
-> +
-> +	res->a0 = PSCI_RET_NOT_SUPPORTED;
-> +	if (!smccc_calling_conv_allowed(vcpu, arg))
-> +		return;
-> +
-> +	switch (arg) {
-> +	case ARM_SMCCC_VERSION_FUNC_ID:
-> +		res->a0 = PSCI_RET_SUCCESS;
-> +		break;
-> +	}
-> +}
-> +
-> +void handle_psci(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
-> +{
-> +	switch (vcpu->kvm_run->hypercall.nr) {
-> +	case PSCI_0_2_FN_PSCI_VERSION:
-> +		res->a0 = PSCI_VERSION(1, 0);
-> +		break;
-> +	case PSCI_1_0_FN_PSCI_FEATURES:
-> +		psci_features(vcpu, res);
-> +		break;
-> +	default:
-> +		res->a0 = PSCI_RET_NOT_SUPPORTED;
-> +	}
-> +}
-> diff --git a/arm/aarch64/smccc.c b/arm/aarch64/smccc.c
-> new file mode 100644
-> index 000000000000..b95077305ffa
-> --- /dev/null
-> +++ b/arm/aarch64/smccc.c
-> @@ -0,0 +1,45 @@
-> +#include "asm/smccc.h"
-> +#include "kvm/kvm.h"
-> +#include "kvm/kvm-cpu.h"
-> +#include "kvm/util.h"
-> +
-> +#include <linux/types.h>
-> +
-> +static void handle_std_call(struct kvm_cpu *vcpu, struct arm_smccc_res *res)
-> +{
-> +	u32 fn = vcpu->kvm_run->hypercall.nr;
-> +
-> +	switch (ARM_SMCCC_FUNC_NUM(fn)) {
-> +	/* PSCI */
-> +	case 0x00 ... 0x1F:
-> +		handle_psci(vcpu, res);
-> +		break;
-> +	}
-> +}
-> +
-> +bool handle_hypercall(struct kvm_cpu *vcpu)
-> +{
-> +	u32 fn = vcpu->kvm_run->hypercall.nr;
-> +	struct arm_smccc_res res = {
-> +		.a0	= SMCCC_RET_NOT_SUPPORTED,
-> +	};
-> +
-> +	if (!smccc_calling_conv_allowed(vcpu, fn))
-> +		goto out;
-> +
-> +	switch (ARM_SMCCC_OWNER_NUM(fn)) {
-> +	case ARM_SMCCC_OWNER_STANDARD:
-> +		handle_std_call(vcpu, &res);
-> +		break;
-> +	default:
+Indeed. There are a set of vfio drivers. Even pci-stub can be considered
+in this set? Perhaps, it is more precise to say : or shared between drivers
+that set the struct pci_driver::driver_managed_dma flag and the drivers
+that do not.
 
-I get the following error while compiling (adding a `break;` fixes things):
-
-	arm/aarch64/smccc.c: In function 'handle_hypercall':
-	arm/aarch64/smccc.c:34:2: error: label at end of compound statement
-	   34 |  default:
-	      |  ^~~~~~~
-
-> +	}
-> +
-> +out:
-> +	smccc_return_result(vcpu, &res);
-> +	return true;
-> +}
-> +
-> +void kvm__setup_smccc(struct kvm *kvm)
-> +{
-> +
-> +}
-> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-> index 12a366b9b38b..3e383065ddaa 100644
-> --- a/arm/kvm-cpu.c
-> +++ b/arm/kvm-cpu.c
-> @@ -158,11 +158,6 @@ void kvm_cpu__delete(struct kvm_cpu *vcpu)
->  	free(vcpu);
->  }
->  
-> -bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
-> -{
-> -	return false;
-> -}
-> -
->  void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
->  {
->  }
-
-Thanks,
-Joey
+Regards,
+Yi Liu
