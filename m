@@ -2,130 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FCAA72E9DA
-	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 19:33:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2D7F72E9F0
+	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 19:35:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233202AbjFMRdF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jun 2023 13:33:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
+        id S239463AbjFMRdc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 13:33:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238745AbjFMRc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jun 2023 13:32:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 618E319BF
-        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 10:31:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686677509;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UFob1aFAu0uRDZrX0tACTzFE1GhOsHEDLUDxSxQ/iS8=;
-        b=NEd08Y0tdgUaC5hY6VqWaovuJtlHXWnaxUcaydjKV2UHBaL/Tx5f1KQ5+BGzq7GIjrZh2q
-        CXZdeYv9FaRKa9z6wm9hWtzVAu7a8tDNqu/tgma/txhy2QSMj1iwcZIYgGzbvB4h45zsoS
-        tGT0Zr+fBIslkwQtGFbAJYE7XrA7l34=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-335-vPPpDri9NpiDxbcD1RXZ2A-1; Tue, 13 Jun 2023 13:31:48 -0400
-X-MC-Unique: vPPpDri9NpiDxbcD1RXZ2A-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-766655c2cc7so622455739f.3
-        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 10:31:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686677507; x=1689269507;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        with ESMTP id S239547AbjFMRdP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jun 2023 13:33:15 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 725751FC4
+        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 10:33:11 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-54290091339so2706668a12.3
+        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 10:33:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686677591; x=1689269591;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UFob1aFAu0uRDZrX0tACTzFE1GhOsHEDLUDxSxQ/iS8=;
-        b=FFPmfcyDBH9xlcm1SYYK/GpXUbKv0F1wmQKr1IWIAoy9ZUqIHKYkyxBGFLgHH07d51
-         7evgA7mgbHR/+Bv+c27Gqwzj4YFfudtfVdPF1fy67OBiuAbm8Q5uVl7vixSHbM956blf
-         PWpxJlsA2slOlzetP1003u81ldweBymOK9lbyJXODAdcyB/EZv8itXi9pAq748Ajqror
-         kCUY/gVr72MM+LwyCS/6tExmgpwq1UNO+SG0aMldyr6gEWtvgryqy2FpZB9RRwgAgUUy
-         /WhlYqAJom6w4B7RyNAmqOyxXYugtUiBN6b6guENrRZhZm+TlECw88Bu5oTkxed+6kxD
-         II+g==
-X-Gm-Message-State: AC+VfDwpCAcEOZJzsMW/0K9zeXPYQeVhKKFleRdtbc6HPxJEpgSRQgHv
-        R6n/Fumb+tNhpP/V0QglfkC9IgNcaexOHBTLOInO8sRC+2Sb9bmVEjr0jBY1OmR4A1uBnppPLQg
-        2+/KEGZOJiYsl
-X-Received: by 2002:a6b:6611:0:b0:774:ae01:fe1a with SMTP id a17-20020a6b6611000000b00774ae01fe1amr11606432ioc.7.1686677507009;
-        Tue, 13 Jun 2023 10:31:47 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6bJFfYsjTQdozyUeq9/qeGnMAlrvVCxaIfEt3FiroYG03nbc7MFTmdssUxFLgFVi603YCgtg==
-X-Received: by 2002:a6b:6611:0:b0:774:ae01:fe1a with SMTP id a17-20020a6b6611000000b00774ae01fe1amr11606418ioc.7.1686677506733;
-        Tue, 13 Jun 2023 10:31:46 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id z3-20020a5ec903000000b0077ac811b20dsm3980818iol.38.2023.06.13.10.31.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jun 2023 10:31:46 -0700 (PDT)
-Date:   Tue, 13 Jun 2023 11:31:45 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "clegoate@redhat.com" <clegoate@redhat.com>
-Subject: Re: [PATCH v12 07/24] vfio: Block device access via device fd until
- device is opened
-Message-ID: <20230613113145.66b02d0f.alex.williamson@redhat.com>
-In-Reply-To: <ZIilFVb3sKnBgH2F@nvidia.com>
-References: <20230602121653.80017-1-yi.l.liu@intel.com>
-        <20230602121653.80017-8-yi.l.liu@intel.com>
-        <20230612155210.5fd3579f.alex.williamson@redhat.com>
-        <DS0PR11MB75293327BDE6D268996FFFCCC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230613081647.740f5217.alex.williamson@redhat.com>
-        <ZIilFVb3sKnBgH2F@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        bh=VH3BFFQPXMCmHgq4sTEkJiB5nlc/oTUMOeHBDQraoRg=;
+        b=4GIIZmokLWx0sKcscVZ/WqRILAZmvgM67vXFEKRHBzyu5m0n9vru+WeePzg6h1VSfW
+         NeNKYuIYEbM3Ooi8rYAYUgjOxEIK3oC35W0k9WKGXNk7U0Q6/QYqwRf6cnWcxPH2dmG7
+         Ywhi/pUEMeyoJCwjNDLyAqAcK2Fu6QcGIpHL0EsPLAwr5u72PfE359HmDZAQie/fEqXR
+         FSe272BX1Uep7Qo83vQHXfSfcm9mhe/B3JN/Kwkmo4R05pPLfREFUYqWzX9N2i5zGUP2
+         1528wtFuWIT6J4pIYi4TDePJ9+PBNysMe9/R24DITpnKj9Z/ydxW8OnS2yimzFjdzzxh
+         m+DQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686677591; x=1689269591;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VH3BFFQPXMCmHgq4sTEkJiB5nlc/oTUMOeHBDQraoRg=;
+        b=lkS9VmaCVn58W+tB3syX4sOndLx89fNOFpksDelCcA8RtJOm0ZhyZj2BB+Np3NWPwP
+         xj/OMxBAlA1GgAhvC6S7Y3TFoBI7V8bAUdgWQLtTmHo6oucbCtpddk9fPe6yuE+Wnuto
+         I4+HhGaZqRu/gmirdjQJ2tJyFMzFoBsYs2qlCrqyq2S6AYiKKYxUifyGDQ2OPZLlVaMn
+         24rfoXnNp3QJw2UPooW3zK9Uo3ps5u3icW3ImVMc7Ifb1RS010QNqdsOtca1YGzrOAKT
+         CT3S2foA3d7O0tozAL8bHvXhw8Q9bGJ819eWa6+LyuWch+lKLR5RPlp/5nnGIV2JgdK4
+         ieAg==
+X-Gm-Message-State: AC+VfDwTAv2r+ZK4vqwktKeYRTpmIHiOhI7mEuxYbyOaZD/6ZGzkm1vi
+        v8YvLUZyGACnBx0P+uUDHSxzHW6QLO3NWOSYTSoB6c3NKU4fbWELUabAPqfjp8YxVKrHeWXMTiO
+        v3RGir+lmlmDgxdfD8ZmRg3Usufx/6j59r+Z/nsd2rv6IbI+jeaYeyV+MbA==
+X-Google-Smtp-Source: ACHHUZ40LZhuQyxtqTrzU0E5CVOKoCrXel1ms4oJrdweGCGHs4yjvb5eL9IveRDb17zbaD5p5K1fURK3kTk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:8a90:b0:1ae:4d1c:1282 with SMTP id
+ p16-20020a1709028a9000b001ae4d1c1282mr1741443plo.7.1686677590757; Tue, 13 Jun
+ 2023 10:33:10 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 13 Jun 2023 10:33:05 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
+Message-ID: <20230613173305.1935490-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Notes - 2023.06.07 - pKVM on x86
+From:   Sean Christopherson <seanjc@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 13 Jun 2023 14:19:17 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+Apologies for the slow update, I was waiting for the recording to become
+available and was OOO Th/F last week.
 
-> On Tue, Jun 13, 2023 at 08:16:47AM -0600, Alex Williamson wrote:
-> 
-> > > Not quite get why bit field is going to be incompatible with smp
-> > > lockless operations. Could you elaborate a bit? And should I define
-> > > the access_granted as u8 or "u8:1"?  
-> > 
-> > Perhaps FUD on my part, but load-acquire type operations have specific
-> > semantics and it's not clear to me that they interest with compiler
-> > generated bit operations.  Thanks,  
-> 
-> They won't compile if you target bit ops, you can't take the address
-> of a bitfield.
+Key Takeaways:
+ - Primary use case is to secure workloads that process/handle sensitive
+   biometric data (e.g. fingerprints, face authentication).
+ - SEAM is a poor fit as it doesn't provide mechanisms to restrict access to
+   non-DRAM "memory", e.g. access to the hardware devices that provide biometric
+   data.  And there's no line of sight to an AMD equivalent.
+ - pKVM support requires few changes outside of KVM (though the changes to KVM
+   are extensive).
 
-Yup, that's what I was assuming but was too lazy to prove it.  Thanks,
+Next Steps:
+ - Re-assess in 3-4 weeks after people have had a chance to read through and
+   review the RFC patches.
 
-Alex
-
+Recording:
+https://drive.google.com/file/d/1JZ6e8ZgR2gUfB4uBYxsJUxp1KVL5YEA_/view?usp=drive_link&resourcekey=0-MGjMLec-8JEIFC3-vmZeLg
