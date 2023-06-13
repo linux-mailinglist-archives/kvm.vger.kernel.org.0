@@ -2,223 +2,743 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C58B72E357
-	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 14:51:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ACF072E35D
+	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 14:51:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238315AbjFMMuw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jun 2023 08:50:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48858 "EHLO
+        id S242339AbjFMMvY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 08:51:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242453AbjFMMut (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jun 2023 08:50:49 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F17610FA;
-        Tue, 13 Jun 2023 05:50:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686660649; x=1718196649;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=rXqXvxTBBCW5a9QHBwQNtqEc3Yye3iHgGBTPmpfgTe8=;
-  b=VaiFDiWURZ2e90hBbrNThlJtaMESZPcl5pWLaY5D1n/aP/4Fe2uA5Zvm
-   9UXjGz3/8erwt0EseGPajbyUPqamQpq3UOLS4PIaOANdkZaSBxgknH7Bu
-   cpbVZ1AVQlUPKw6swB2ByfPGP9hetZwu1GLC7P4l9d3+icF0vT77D5v93
-   /2azI03oNmm6TbKybAg11Qul13aGwb5TiwdLio92EwSeuypYM7I/mOOhC
-   jHpyddhcrn4SRaukunu5atxgdF5zk3NjBPh+9OUZIs8ksXRdws9ayygMd
-   JIlcf9Xa6Y1lSXTLmHeoqjVtRRZLQdNiWKsQmG4Pzv28LIqEZeAARKiVz
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="421913697"
-X-IronPort-AV: E=Sophos;i="6.00,239,1681196400"; 
-   d="scan'208";a="421913697"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2023 05:50:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="1041758057"
-X-IronPort-AV: E=Sophos;i="6.00,239,1681196400"; 
-   d="scan'208";a="1041758057"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga005.fm.intel.com with ESMTP; 13 Jun 2023 05:50:47 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 13 Jun 2023 05:50:46 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Tue, 13 Jun 2023 05:50:46 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.46) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Tue, 13 Jun 2023 05:50:45 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=X5kDKuHVLasrLwqTpWzdQl5kbSvwzyq8eL06f2MQbmpncQK1aj7ubiaR277siqpDLgJKUIsa8GIfywxo1FdiO5qqwhX7kawSsxVrPhAzHaFw4B9nAi9BS26uf1waps075vE8VS0hPl9gubxafgYuSgiTB07YB0khDxJoN3hC1A4hqpbtFvepXyVSoIaG6XOIkz18BFPou5srLjC5FRX3lzURpl24HhkCPpL1PBWD8Ze6cSQ33QmqUVoVS3sk3ZCJv8QozrJlzZtAeHTkXm00aZ15sDSpoHxg8Z9X8NT+8EQuFw4L3XpP1KyrQ/DiMEXG/EYvwMRPuxxKYY067EeJ5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HJlf4IYghfxxR/bbzJ59cZiSCURezIpUMaC1n2653G4=;
- b=aI48mlrlGj79nMxKKg6WMZrF03QVpcCJuTQ+ZbaoefjYes61Vu0eT1n1PLfnfOcXmtEhIngePFeT+8z4BqXPAkAepbtEZbwEV3DYUiIgSbuE9wzp2ed/FnhGie4nyJtk7VQ5su8Ec6zfInv2Fa7cqzFzBCtMaolLoaOboR0eyytpzdpbBWtvn9Ju0VJ8v653HGL904Odipbp/b/zxk8TkhbvC4k8cNyXLuNm4WmPlEWLXD4qh+4pv2E5VPFp7a3J9iJKNsIkOjUOD2P8L8PsvuFekm9O8z1Zrvuho3d1RalbuGuVgC11P+3+F43eKfhKE7ECC/ky5zZeRdso/84Q3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by IA1PR11MB6419.namprd11.prod.outlook.com (2603:10b6:208:3a9::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33; Tue, 13 Jun
- 2023 12:50:44 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::5b44:8f52:dbeb:18e5]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::5b44:8f52:dbeb:18e5%3]) with mapi id 15.20.6455.045; Tue, 13 Jun 2023
- 12:50:43 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "clegoate@redhat.com" <clegoate@redhat.com>
-Subject: RE: [PATCH v7 8/9] vfio/pci: Extend
- VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for vfio device cdev
-Thread-Topic: [PATCH v7 8/9] vfio/pci: Extend
- VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for vfio device cdev
-Thread-Index: AQHZlUvxjWjQHBtl702niB2RsWbvNK+IruwAgAARHmA=
-Date:   Tue, 13 Jun 2023 12:50:43 +0000
-Message-ID: <DS0PR11MB7529CFADCF0D6D6451E4F92AC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230602121515.79374-1-yi.l.liu@intel.com>
- <20230602121515.79374-9-yi.l.liu@intel.com> <ZIhXMmYjCyUdlGxe@nvidia.com>
-In-Reply-To: <ZIhXMmYjCyUdlGxe@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|IA1PR11MB6419:EE_
-x-ms-office365-filtering-correlation-id: 8c89c224-cb40-43c3-3dcd-08db6c0cccfb
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: E2EWtzIkEdrzlsc/loNV+FR4W1SZfJszW3suA+JsdzhFoJGVtVk+GggxENzA4wUUYzJH5N3CUYvRhpmv6WC76p4H8CL7hOOC/QjbLZEjKfNo2KGXgG+erkCrVDgJ6XfbMbwvLzZkfrlbzE2jyzCghgdTBWUBWISf0u++Aia7DyHg5wtCqrBSM8J1/t5ekGxHgz+MPW+lMslZa+HJugFMpantPSRBHbQWbuSxJKdUTZh1nxrHJY+uNBj303/JhDNGN/lfRm/t+4WIIeMT4EwZM/hTDOQCjNp7IIY6FAm87vykEVFaAQEJiWRu1fRrRIILFFNuwyorTn83MMXU+X5+ZmJLlt0/i5bpRT+W+ymydiyK0Ref2ba/1lTX88KrTy72GSQZaBaAP9vi4iOK8r/zIb2eAJwxNPiK1iC88fZkHMv5N63exAunYreSydfESTkJJW90HmHNT9BV7X/OmWXHc9fZdVyhPtGn9nI8DW8vVv2k+UtLgl+vbUI5cGLIJu55GWKJL+0D9/oF7UHongHuZgeU9l5Xw04wo7iG6PAz//BD1CPb/4bnvL+Mo7HoX1R42ZhFNn9jxNDvc4hqaOhgzqbyNzBjn6imuIiRuST6aCMlL0nPrJB985NpFgJcfxHg
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(136003)(366004)(376002)(346002)(396003)(451199021)(38070700005)(83380400001)(122000001)(55016003)(33656002)(38100700002)(86362001)(82960400001)(478600001)(54906003)(71200400001)(5660300002)(7696005)(64756008)(8676002)(52536014)(2906002)(66446008)(4326008)(66556008)(6916009)(41300700001)(8936002)(7416002)(76116006)(66946007)(316002)(66476007)(6506007)(26005)(9686003)(186003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?xKglft5pVPMPSZj1GPZ9sOZy4Mm/4mMHH7jIlUEA9kufh84Yb+gSJj3HSaUL?=
- =?us-ascii?Q?w6OcKCcMIErDZDVpYVyaZqG1GGl1UiVLYSoBX5gZOsSBTQKGhTLocghv2rcm?=
- =?us-ascii?Q?TdNMG9OylgQpQYLZfgXModADcigw4mvBw5BR61r3V1RM0CEQHw9+T6aHuJX3?=
- =?us-ascii?Q?WTqqF5j1FY8FBDQGt4ZYPNowoT29e0WV/wKNxNtqhBnfZ4PawL4Q3x6iIK92?=
- =?us-ascii?Q?oIrXWEPVDQw5ZvSzHs4lBq7R73jn+CvTSpJzfFbh23Rqs3+14SlqYooOPDge?=
- =?us-ascii?Q?Hgfbm8oUXwlEvjHKQXe280BQCzwJ0n7Y1rYpRB/+CwKRhTSoO0lOYjW8sWN6?=
- =?us-ascii?Q?QfbU4avwrM7rqcO+d/mN6yzWe1z2JVPvR+Dh/P1YVPNBnjdVI15bzgUccc3k?=
- =?us-ascii?Q?7P8VzC5XMGzmtrQro9rU8CaAtBzTt02PtKPjK7xVorBu3KDNQfptLaNCzmKb?=
- =?us-ascii?Q?qvLs88BD+xm0MNlzsuJuEjLA+Ue7Bo6vRovzb4sfOs/AHciFpKmyQbJbES3z?=
- =?us-ascii?Q?gC32Ywi2fB7EnSmAVDiRcz7BKNzORc2XtKH7Hz0g+P29Kuo87urhkyxnpyXS?=
- =?us-ascii?Q?17T/+Qlq9vljHXeTiik6akH9jY9u/vocI5JWRVcSZhzlM+PtmRBHF+UF8t5m?=
- =?us-ascii?Q?P4TciPg0vpZTX4zVSCfmEDPtS8uaVmpaLnib6QJPdjrluWqXYp+7FHZwFsLB?=
- =?us-ascii?Q?5Gdnmjlp3SMMkHS6hqBgFwSLtGd0FuhHTBKMDJ3/NaMevew6YwXRO2ZFRQxx?=
- =?us-ascii?Q?Zde6SOtLO6HiFIxIulH9RsAAmWGA2mq1aWZ1SUkpAtwWwjygP4lawEKYvITt?=
- =?us-ascii?Q?Vb93o1R3f3M78bvz0zDSxb/0+zDyAY/8/Lvu+XYuAjYEwR3I2DEVLe3EiL37?=
- =?us-ascii?Q?IVWwsJCSytISCPSDJx/mOfCF2N+7eYnXfGBAsQ9TOgrm8Eac4rS+UhuSPO2U?=
- =?us-ascii?Q?qstPhye1+KmdmH5oeprIeyUzT4c2Ak1tBgCtCFPhMrbRXI7Df3XhM0Y9abM1?=
- =?us-ascii?Q?+AJWb+oqbJXND1JXQyZXOM6CkxW6QxqduH8AIzhvV3Xpi1aVK+izlSG7WMse?=
- =?us-ascii?Q?039mJJA4cBJe9iQ3Row6BjaBmZ3V7Jk768m+anJGzJKMM/CbImGoAumbq2/X?=
- =?us-ascii?Q?o+I49SBQ5amBT9uha9GXwcv3ewhwSRgkLNZ0WpJvBo/HmN+Zz/UdoPGgkZ3x?=
- =?us-ascii?Q?LqBAitqC+V0slesevuQenahLZd0iEAA7qS5JCNaLWEC3DgflmtSeCNGiY+IQ?=
- =?us-ascii?Q?FJrkSYu8Tq6vJ0Jj3oArb+tKTZYk0oORFLD3UEutInS7H6Vcxbkc4WWAKQZs?=
- =?us-ascii?Q?RXY4uiglU8IahJNvJgBfF4D7lTzgSQnGERbqr7c7KRiRb7h5agpa7S7V9RnX?=
- =?us-ascii?Q?Jt7OVFlUz89+/jaxDYMpF+oiNcuGA85SDfJvtN69vtRSSxbdLT1V6sKkxVwu?=
- =?us-ascii?Q?Cm23AcJxDtE1xjKw9spuVjqU+sDmLVxcmRkDad+8kkNV2TMTUTfJWl/E7uKW?=
- =?us-ascii?Q?RbsDmW9TYrXiBzSKQh4x9lgRhjiS2LEiErmZJN8nfL4ndjW+I8b8njeCEIza?=
- =?us-ascii?Q?iF/YKV15J7meOnCsc/DSE+SNosXmQWSPZAQL0jDV?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S240019AbjFMMvW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jun 2023 08:51:22 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DD9EE4;
+        Tue, 13 Jun 2023 05:51:19 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4f629ccb8ebso6688810e87.1;
+        Tue, 13 Jun 2023 05:51:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686660678; x=1689252678;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=W4on0E6IbCLvYz+Ec98S0w4Tx2nOxkZXDyoUVv9x2qM=;
+        b=o8FhhagoJ69zsnp+SX3Q4IGwrfUJXXF+LVLA7z4u2UDQqbbwvLMfqFgcx1c4ZUREPZ
+         Wp89YY90PjP7dHHN3+Df2gnr9oUlv642wbGA5cQgaR5RWm8JQaOuvQaXMRwuF4rjpMDf
+         8tkd4vhJ/RUBa5r0nnSrFmegKX68sgfZDrPe5iX7ah0yit5mnSaX6EOBJ5gZEOvBLRJM
+         WS0mzOvoeOLB0usXR/aleLrO84HaCU7TawPMeKYgvqhxlN4XZJcB37BGY0LElP4dmjvI
+         ++3ov6qzahOuUpvVPVYFlofgBAaB39ZILfP6/yhaav592pYSkKWhf4jmWUlRB2A4NQ0Z
+         GMEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686660678; x=1689252678;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W4on0E6IbCLvYz+Ec98S0w4Tx2nOxkZXDyoUVv9x2qM=;
+        b=EU6egNxIzW128QwSBe6IjZ3Jug5ICNkMRAOjaOCy0l+vhRuBk2SfjDJ+VYfGbCXFR/
+         zo8Xobm+Ss1gRttjNc9nT00ig28fupzuP+RJQoMVacipRh7EaCjdVflcym9+4PbyG0/E
+         Ba6fbScPD8Vp/yAquEwcXS1CC523PLfkRKjxgGWB5F03Mos08BMXFvWQqFzCDb9G9CNR
+         Vr45xtQE/vcRBqbpbbOu4m49LwEGdRE1mOJRrbyWmc0/5fafTQbll8dPw8iLv/fpp2gY
+         g75MVLjdHKtGv4tEef69Vl2pe6iUep2HLLllJm4bbFYK4yEmAumK6Eb635gUTzLZL1Xz
+         Mv9A==
+X-Gm-Message-State: AC+VfDyGU429193TDFqSBiyYcmJCM6Sq48947QlA7Wx2VAb5Es+XE2kC
+        9L/edb+Om1+MvEtP3cJHKC4=
+X-Google-Smtp-Source: ACHHUZ5byOUPhNlR6EshdTkv8rFcDHtXz32NsfwKKm6XQCG6oNUcHmODhGw7YIpWBV2dp0mAbtNc8A==
+X-Received: by 2002:a2e:3207:0:b0:2af:1944:3913 with SMTP id y7-20020a2e3207000000b002af19443913mr4046120ljy.37.1686660677216;
+        Tue, 13 Jun 2023 05:51:17 -0700 (PDT)
+Received: from ?IPV6:2a0b:6204:4302:5f00:4dab:3483:4506:9a0e? ([2a0b:6204:4302:5f00:4dab:3483:4506:9a0e])
+        by smtp.gmail.com with ESMTPSA id i1-20020a2e9401000000b002b323126037sm1196417ljh.81.2023.06.13.05.51.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Jun 2023 05:51:16 -0700 (PDT)
+From:   "bibo, mao" <bibo.mao@gmail.com>
+X-Google-Original-From: "bibo, mao" <maobibo@loongson.cn>
+Message-ID: <33bfacb0-374a-37ee-b0a9-fa089809e7cf@loongson.cn>
+Date:   Tue, 13 Jun 2023 20:51:12 +0800
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8c89c224-cb40-43c3-3dcd-08db6c0cccfb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2023 12:50:43.6885
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kPc0GDVvc0MuT8F9cM2VygccoaTNw51/eGlQeqSX7H++u3Qo0Yoi81/FQ+VAA3iYMdfdKtnHal0RDB9vvHc9DA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6419
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v13 05/30] LoongArch: KVM: Add vcpu related header files
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Xi Ruoyao <xry111@xry111.site>, tangyouling@loongson.cn,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20230609090832.2131037-1-zhaotianrui@loongson.cn>
+ <20230609090832.2131037-6-zhaotianrui@loongson.cn>
+In-Reply-To: <20230609090832.2131037-6-zhaotianrui@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Tuesday, June 13, 2023 7:47 PM
->=20
-> On Fri, Jun 02, 2023 at 05:15:14AM -0700, Yi Liu wrote:
-> > +/*
-> > + * Return devid for a device which is affected by hot-reset.
-> > + * - valid devid > 0 for the device that is bound to the input
-> > + *   iommufd_ctx.
-> > + * - devid =3D=3D VFIO_PCI_DEVID_OWNED for the device that has not
-> > + *   been bound to any iommufd_ctx but other device within its
-> > + *   group has been bound to the input iommufd_ctx.
-> > + * - devid =3D=3D VFIO_PCI_DEVID_NOT_OWNED for others. e.g. device
-> > + *   is bound to other iommufd_ctx etc.
-> > + */
-> > +int vfio_iommufd_device_hot_reset_devid(struct vfio_device *vdev,
-> > +					struct iommufd_ctx *ictx)
-> > +{
-> > +	struct iommu_group *group;
-> > +	int devid;
-> > +
-> > +	if (vfio_iommufd_device_ictx(vdev) =3D=3D ictx)
-> > +		return vfio_iommufd_device_id(vdev);
-> > +
-> > +	group =3D iommu_group_get(vdev->dev);
-> > +	if (!group)
-> > +		return VFIO_PCI_DEVID_NOT_OWNED;
-> > +
-> > +	if (iommufd_ctx_has_group(ictx, group))
-> > +		devid =3D VFIO_PCI_DEVID_OWNED;
-> > +	else
-> > +		devid =3D VFIO_PCI_DEVID_NOT_OWNED;
-> > +
-> > +	iommu_group_put(group);
-> > +
-> > +	return devid;
-> > +}
-> > +EXPORT_SYMBOL_GPL(vfio_iommufd_device_hot_reset_devid);
->=20
-> This function really should not be in the core iommufd.c file - it is
-> a purely vfio-pci function - why did you have to place it here?
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
 
-Put it here can avoid calling iommufd_ctx_has_group() in vfio-pci,
-which requires to import IOMMUFD_NS. If this reason is not so
-strong I can move it back to vfio-pci code.
 
-Regards,
-Yi Liu
+Regards
+Bibo, Mao
 
+在 2023/6/9 17:08, Tianrui Zhao 写道:
+> Add LoongArch vcpu related header files, including vcpu csr
+> information, irq number defines, and some vcpu interfaces.
+> 
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> ---
+>   arch/loongarch/include/asm/insn-def.h  |  55 ++++++
+>   arch/loongarch/include/asm/kvm_csr.h   | 231 +++++++++++++++++++++++++
+>   arch/loongarch/include/asm/kvm_vcpu.h  |  97 +++++++++++
+>   arch/loongarch/include/asm/loongarch.h |  20 ++-
+>   arch/loongarch/kvm/trace.h             | 168 ++++++++++++++++++
+>   5 files changed, 566 insertions(+), 5 deletions(-)
+>   create mode 100644 arch/loongarch/include/asm/insn-def.h
+>   create mode 100644 arch/loongarch/include/asm/kvm_csr.h
+>   create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
+>   create mode 100644 arch/loongarch/kvm/trace.h
+> 
+> diff --git a/arch/loongarch/include/asm/insn-def.h b/arch/loongarch/include/asm/insn-def.h
+> new file mode 100644
+> index 000000000000..e285ee108fb0
+> --- /dev/null
+> +++ b/arch/loongarch/include/asm/insn-def.h
+> @@ -0,0 +1,55 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +
+> +#ifndef __ASM_INSN_DEF_H
+> +#define __ASM_INSN_DEF_H
+> +
+> +#include <linux/stringify.h>
+> +#include <asm/gpr-num.h>
+> +#include <asm/asm.h>
+> +
+> +#define INSN_STR(x)		__stringify(x)
+> +#define CSR_RD_SHIFT		0
+> +#define CSR_RJ_SHIFT		5
+> +#define CSR_SIMM14_SHIFT	10
+> +#define CSR_OPCODE_SHIFT	24
+> +
+> +#define DEFINE_INSN_CSR							\
+> +	__DEFINE_ASM_GPR_NUMS						\
+> +"	.macro insn_csr, opcode, rj, rd, simm14\n"			\
+> +"	.4byte	((\\opcode << " INSN_STR(CSR_OPCODE_SHIFT) ") |"	\
+> +"		 (.L__gpr_num_\\rj << " INSN_STR(CSR_RJ_SHIFT) ") |"	\
+> +"		 (.L__gpr_num_\\rd << " INSN_STR(CSR_RD_SHIFT) ") |"	\
+> +"		 (\\simm14 << " INSN_STR(CSR_SIMM14_SHIFT) "))\n"	\
+> +"	.endm\n"
+> +
+> +#define UNDEFINE_INSN_CSR						\
+> +"	.purgem insn_csr\n"
+> +
+> +#define __INSN_CSR(opcode, rj, rd, simm14)				\
+> +	DEFINE_INSN_CSR							\
+> +	"insn_csr " opcode ", " rj ", " rd ", " simm14 "\n"		\
+> +	UNDEFINE_INSN_CSR
+> +
+> +
+> +#define INSN_CSR(opcode, rj, rd, simm14)				\
+> +	__INSN_CSR(LARCH_##opcode, LARCH_##rj, LARCH_##rd,		\
+> +		   LARCH_##simm14)
+> +
+> +#define __ASM_STR(x)		#x
+> +#define LARCH_OPCODE(v)		__ASM_STR(v)
+> +#define LARCH_SIMM14(v)		__ASM_STR(v)
+> +#define __LARCH_REG(v)		__ASM_STR(v)
+> +#define LARCH___RD(v)		__LARCH_REG(v)
+> +#define LARCH___RJ(v)		__LARCH_REG(v)
+> +#define LARCH_OPCODE_GCSR	LARCH_OPCODE(5)
+> +
+> +#define GCSR_read(csr, rd)						\
+> +	INSN_CSR(OPCODE_GCSR, __RJ(zero), __RD(rd), SIMM14(csr))
+> +
+> +#define GCSR_write(csr, rd)						\
+> +	INSN_CSR(OPCODE_GCSR, __RJ($r1), __RD(rd), SIMM14(csr))
+> +
+> +#define GCSR_xchg(csr, rj, rd)						\
+> +	INSN_CSR(OPCODE_GCSR, __RJ(rj), __RD(rd), SIMM14(csr))
+> +
+> +#endif /* __ASM_INSN_DEF_H */
+> diff --git a/arch/loongarch/include/asm/kvm_csr.h b/arch/loongarch/include/asm/kvm_csr.h
+> new file mode 100644
+> index 000000000000..10dba5bc6df1
+> --- /dev/null
+> +++ b/arch/loongarch/include/asm/kvm_csr.h
+> @@ -0,0 +1,231 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+> + */
+> +
+> +#ifndef __ASM_LOONGARCH_KVM_CSR_H__
+> +#define __ASM_LOONGARCH_KVM_CSR_H__
+> +#include <asm/loongarch.h>
+> +#include <asm/kvm_vcpu.h>
+> +#include <linux/uaccess.h>
+> +#include <linux/kvm_host.h>
+> +
+> +/*
+> + * Instructions will be available in binutils later
+> + * read val from guest csr register %[csr]
+> + * gcsrrd %[val], %[csr]
+> + */
+> +#define gcsr_read(csr)						\
+> +({								\
+> +	register unsigned long __v;				\
+> +	__asm__ __volatile__ (GCSR_read(csr, %0)		\
+> +				: "=r" (__v) :			\
+> +				: "memory");			\
+> +	__v;							\
+> +})
+> +
+> +/*
+> + * Instructions will be available in binutils later
+> + * write val to guest csr register %[csr]
+> + * gcsrwr %[val], %[csr]
+> + */
+> +#define gcsr_write(val, csr)					\
+> +({								\
+> +	register unsigned long __v = val;			\
+> +	__asm__ __volatile__ (GCSR_write(csr, %0)		\
+> +				: "+r" (__v) :			\
+> +				: "memory");			\
+> +})
+> +
+> +/*
+> + * Instructions will be available in binutils later
+> + * replace masked bits of guest csr register %[csr] with val
+> + * gcsrxchg %[val], %[mask], %[csr]
+> + */
+> +#define gcsr_xchg(val, mask, csr)				\
+> +({								\
+> +	register unsigned long __v = val;			\
+> +	__asm__ __volatile__ (GCSR_xchg(csr, %1, %0)		\
+> +				: "+r" (__v)			\
+> +				: "r"  (mask)			\
+> +				: "memory");			\
+> +	__v;							\
+> +})
+> +
+> +/* Guest CSRS read and write */
+> +#define read_gcsr_crmd()		gcsr_read(LOONGARCH_CSR_CRMD)
+> +#define write_gcsr_crmd(val)		gcsr_write(val, LOONGARCH_CSR_CRMD)
+> +#define read_gcsr_prmd()		gcsr_read(LOONGARCH_CSR_PRMD)
+> +#define write_gcsr_prmd(val)		gcsr_write(val, LOONGARCH_CSR_PRMD)
+> +#define read_gcsr_euen()		gcsr_read(LOONGARCH_CSR_EUEN)
+> +#define write_gcsr_euen(val)		gcsr_write(val, LOONGARCH_CSR_EUEN)
+> +#define read_gcsr_misc()		gcsr_read(LOONGARCH_CSR_MISC)
+> +#define write_gcsr_misc(val)		gcsr_write(val, LOONGARCH_CSR_MISC)
+> +#define read_gcsr_ecfg()		gcsr_read(LOONGARCH_CSR_ECFG)
+> +#define write_gcsr_ecfg(val)		gcsr_write(val, LOONGARCH_CSR_ECFG)
+> +#define read_gcsr_estat()		gcsr_read(LOONGARCH_CSR_ESTAT)
+> +#define write_gcsr_estat(val)		gcsr_write(val, LOONGARCH_CSR_ESTAT)
+> +#define read_gcsr_era()			gcsr_read(LOONGARCH_CSR_ERA)
+> +#define write_gcsr_era(val)		gcsr_write(val, LOONGARCH_CSR_ERA)
+> +#define read_gcsr_badv()		gcsr_read(LOONGARCH_CSR_BADV)
+> +#define write_gcsr_badv(val)		gcsr_write(val, LOONGARCH_CSR_BADV)
+> +#define read_gcsr_badi()		gcsr_read(LOONGARCH_CSR_BADI)
+> +#define write_gcsr_badi(val)		gcsr_write(val, LOONGARCH_CSR_BADI)
+> +#define read_gcsr_eentry()		gcsr_read(LOONGARCH_CSR_EENTRY)
+> +#define write_gcsr_eentry(val)		gcsr_write(val, LOONGARCH_CSR_EENTRY)
+> +
+> +#define read_gcsr_tlbidx()		gcsr_read(LOONGARCH_CSR_TLBIDX)
+> +#define write_gcsr_tlbidx(val)		gcsr_write(val, LOONGARCH_CSR_TLBIDX)
+> +#define read_gcsr_tlbhi()		gcsr_read(LOONGARCH_CSR_TLBEHI)
+> +#define write_gcsr_tlbhi(val)		gcsr_write(val, LOONGARCH_CSR_TLBEHI)
+> +#define read_gcsr_tlblo0()		gcsr_read(LOONGARCH_CSR_TLBELO0)
+> +#define write_gcsr_tlblo0(val)		gcsr_write(val, LOONGARCH_CSR_TLBELO0)
+> +#define read_gcsr_tlblo1()		gcsr_read(LOONGARCH_CSR_TLBELO1)
+> +#define write_gcsr_tlblo1(val)		gcsr_write(val, LOONGARCH_CSR_TLBELO1)
+> +
+> +#define read_gcsr_asid()		gcsr_read(LOONGARCH_CSR_ASID)
+> +#define write_gcsr_asid(val)		gcsr_write(val, LOONGARCH_CSR_ASID)
+> +#define read_gcsr_pgdl()		gcsr_read(LOONGARCH_CSR_PGDL)
+> +#define write_gcsr_pgdl(val)		gcsr_write(val, LOONGARCH_CSR_PGDL)
+> +#define read_gcsr_pgdh()		gcsr_read(LOONGARCH_CSR_PGDH)
+> +#define write_gcsr_pgdh(val)		gcsr_write(val, LOONGARCH_CSR_PGDH)
+> +#define write_gcsr_pgd(val)		gcsr_write(val, LOONGARCH_CSR_PGD)
+> +#define read_gcsr_pgd()			gcsr_read(LOONGARCH_CSR_PGD)
+> +#define read_gcsr_pwctl0()		gcsr_read(LOONGARCH_CSR_PWCTL0)
+> +#define write_gcsr_pwctl0(val)		gcsr_write(val, LOONGARCH_CSR_PWCTL0)
+> +#define read_gcsr_pwctl1()		gcsr_read(LOONGARCH_CSR_PWCTL1)
+> +#define write_gcsr_pwctl1(val)		gcsr_write(val, LOONGARCH_CSR_PWCTL1)
+> +#define read_gcsr_stlbpgsize()		gcsr_read(LOONGARCH_CSR_STLBPGSIZE)
+> +#define write_gcsr_stlbpgsize(val)	gcsr_write(val, LOONGARCH_CSR_STLBPGSIZE)
+> +#define read_gcsr_rvacfg()		gcsr_read(LOONGARCH_CSR_RVACFG)
+> +#define write_gcsr_rvacfg(val)		gcsr_write(val, LOONGARCH_CSR_RVACFG)
+> +
+> +#define read_gcsr_cpuid()		gcsr_read(LOONGARCH_CSR_CPUID)
+> +#define write_gcsr_cpuid(val)		gcsr_write(val, LOONGARCH_CSR_CPUID)
+> +#define read_gcsr_prcfg1()		gcsr_read(LOONGARCH_CSR_PRCFG1)
+> +#define write_gcsr_prcfg1(val)		gcsr_write(val, LOONGARCH_CSR_PRCFG1)
+> +#define read_gcsr_prcfg2()		gcsr_read(LOONGARCH_CSR_PRCFG2)
+> +#define write_gcsr_prcfg2(val)		gcsr_write(val, LOONGARCH_CSR_PRCFG2)
+> +#define read_gcsr_prcfg3()		gcsr_read(LOONGARCH_CSR_PRCFG3)
+> +#define write_gcsr_prcfg3(val)		gcsr_write(val, LOONGARCH_CSR_PRCFG3)
+> +
+> +#define read_gcsr_kscratch0()		gcsr_read(LOONGARCH_CSR_KS0)
+> +#define write_gcsr_kscratch0(val)	gcsr_write(val, LOONGARCH_CSR_KS0)
+> +#define read_gcsr_kscratch1()		gcsr_read(LOONGARCH_CSR_KS1)
+> +#define write_gcsr_kscratch1(val)	gcsr_write(val, LOONGARCH_CSR_KS1)
+> +#define read_gcsr_kscratch2()		gcsr_read(LOONGARCH_CSR_KS2)
+> +#define write_gcsr_kscratch2(val)	gcsr_write(val, LOONGARCH_CSR_KS2)
+> +#define read_gcsr_kscratch3()		gcsr_read(LOONGARCH_CSR_KS3)
+> +#define write_gcsr_kscratch3(val)	gcsr_write(val, LOONGARCH_CSR_KS3)
+> +#define read_gcsr_kscratch4()		gcsr_read(LOONGARCH_CSR_KS4)
+> +#define write_gcsr_kscratch4(val)	gcsr_write(val, LOONGARCH_CSR_KS4)
+> +#define read_gcsr_kscratch5()		gcsr_read(LOONGARCH_CSR_KS5)
+> +#define write_gcsr_kscratch5(val)	gcsr_write(val, LOONGARCH_CSR_KS5)
+> +#define read_gcsr_kscratch6()		gcsr_read(LOONGARCH_CSR_KS6)
+> +#define write_gcsr_kscratch6(val)	gcsr_write(val, LOONGARCH_CSR_KS6)
+> +#define read_gcsr_kscratch7()		gcsr_read(LOONGARCH_CSR_KS7)
+> +#define write_gcsr_kscratch7(val)	gcsr_write(val, LOONGARCH_CSR_KS7)
+> +
+> +#define read_gcsr_timerid()		gcsr_read(LOONGARCH_CSR_TMID)
+> +#define write_gcsr_timerid(val)		gcsr_write(val, LOONGARCH_CSR_TMID)
+> +#define read_gcsr_timercfg()		gcsr_read(LOONGARCH_CSR_TCFG)
+> +#define write_gcsr_timercfg(val)	gcsr_write(val, LOONGARCH_CSR_TCFG)
+> +#define read_gcsr_timertick()		gcsr_read(LOONGARCH_CSR_TVAL)
+> +#define write_gcsr_timertick(val)	gcsr_write(val, LOONGARCH_CSR_TVAL)
+> +#define read_gcsr_timeroffset()		gcsr_read(LOONGARCH_CSR_CNTC)
+> +#define write_gcsr_timeroffset(val)	gcsr_write(val, LOONGARCH_CSR_CNTC)
+> +
+> +#define read_gcsr_llbctl()		gcsr_read(LOONGARCH_CSR_LLBCTL)
+> +#define write_gcsr_llbctl(val)		gcsr_write(val, LOONGARCH_CSR_LLBCTL)
+> +
+> +#define read_gcsr_tlbrentry()		gcsr_read(LOONGARCH_CSR_TLBRENTRY)
+> +#define write_gcsr_tlbrentry(val)	gcsr_write(val, LOONGARCH_CSR_TLBRENTRY)
+> +#define read_gcsr_tlbrbadv()		gcsr_read(LOONGARCH_CSR_TLBRBADV)
+> +#define write_gcsr_tlbrbadv(val)	gcsr_write(val, LOONGARCH_CSR_TLBRBADV)
+> +#define read_gcsr_tlbrera()		gcsr_read(LOONGARCH_CSR_TLBRERA)
+> +#define write_gcsr_tlbrera(val)		gcsr_write(val, LOONGARCH_CSR_TLBRERA)
+> +#define read_gcsr_tlbrsave()		gcsr_read(LOONGARCH_CSR_TLBRSAVE)
+> +#define write_gcsr_tlbrsave(val)	gcsr_write(val, LOONGARCH_CSR_TLBRSAVE)
+> +#define read_gcsr_tlbrelo0()		gcsr_read(LOONGARCH_CSR_TLBRELO0)
+> +#define write_gcsr_tlbrelo0(val)	gcsr_write(val, LOONGARCH_CSR_TLBRELO0)
+> +#define read_gcsr_tlbrelo1()		gcsr_read(LOONGARCH_CSR_TLBRELO1)
+> +#define write_gcsr_tlbrelo1(val)	gcsr_write(val, LOONGARCH_CSR_TLBRELO1)
+> +#define read_gcsr_tlbrehi()		gcsr_read(LOONGARCH_CSR_TLBREHI)
+> +#define write_gcsr_tlbrehi(val)		gcsr_write(val, LOONGARCH_CSR_TLBREHI)
+> +#define read_gcsr_tlbrprmd()		gcsr_read(LOONGARCH_CSR_TLBRPRMD)
+> +#define write_gcsr_tlbrprmd(val)	gcsr_write(val, LOONGARCH_CSR_TLBRPRMD)
+> +
+> +#define read_gcsr_directwin0()		gcsr_read(LOONGARCH_CSR_DMWIN0)
+> +#define write_gcsr_directwin0(val)	gcsr_write(val, LOONGARCH_CSR_DMWIN0)
+> +#define read_gcsr_directwin1()		gcsr_read(LOONGARCH_CSR_DMWIN1)
+> +#define write_gcsr_directwin1(val)	gcsr_write(val, LOONGARCH_CSR_DMWIN1)
+> +#define read_gcsr_directwin2()		gcsr_read(LOONGARCH_CSR_DMWIN2)
+> +#define write_gcsr_directwin2(val)	gcsr_write(val, LOONGARCH_CSR_DMWIN2)
+> +#define read_gcsr_directwin3()		gcsr_read(LOONGARCH_CSR_DMWIN3)
+> +#define write_gcsr_directwin3(val)	gcsr_write(val, LOONGARCH_CSR_DMWIN3)
+> +
+> +/* Guest related CSRs */
+> +#define read_csr_gtlbc()		csr_read64(LOONGARCH_CSR_GTLBC)
+> +#define write_csr_gtlbc(val)		csr_write64(val, LOONGARCH_CSR_GTLBC)
+> +#define read_csr_trgp()			csr_read64(LOONGARCH_CSR_TRGP)
+> +#define read_csr_gcfg()			csr_read64(LOONGARCH_CSR_GCFG)
+> +#define write_csr_gcfg(val)		csr_write64(val, LOONGARCH_CSR_GCFG)
+> +#define read_csr_gstat()		csr_read64(LOONGARCH_CSR_GSTAT)
+> +#define write_csr_gstat(val)		csr_write64(val, LOONGARCH_CSR_GSTAT)
+> +#define read_csr_gintc()		csr_read64(LOONGARCH_CSR_GINTC)
+> +#define write_csr_gintc(val)		csr_write64(val, LOONGARCH_CSR_GINTC)
+> +#define read_csr_gcntc()		csr_read64(LOONGARCH_CSR_GCNTC)
+> +#define write_csr_gcntc(val)		csr_write64(val, LOONGARCH_CSR_GCNTC)
+> +
+> +#define __BUILD_GCSR_OP(name)		__BUILD_CSR_COMMON(gcsr_##name)
+> +
+> +__BUILD_GCSR_OP(llbctl)
+> +__BUILD_GCSR_OP(tlbidx)
+> +__BUILD_CSR_OP(gcfg)
+> +__BUILD_CSR_OP(gstat)
+> +__BUILD_CSR_OP(gtlbc)
+> +__BUILD_CSR_OP(gintc)
+> +
+> +#define set_gcsr_estat(val)	\
+> +	gcsr_xchg(val, val, LOONGARCH_CSR_ESTAT)
+> +#define clear_gcsr_estat(val)	\
+> +	gcsr_xchg(~(val), val, LOONGARCH_CSR_ESTAT)
+> +
+> +#define kvm_read_hw_gcsr(id)		gcsr_read(id)
+> +#define kvm_write_hw_gcsr(csr, id, val)	gcsr_write(val, id)
+> +
+> +int _kvm_getcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 *v);
+> +int _kvm_setcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 v);
+> +
+> +int _kvm_emu_iocsr(larch_inst inst, struct kvm_run *run, struct kvm_vcpu *vcpu);
+> +
+> +#define kvm_save_hw_gcsr(csr, gid)	(csr->csrs[gid] = gcsr_read(gid))
+> +#define kvm_restore_hw_gcsr(csr, gid)	(gcsr_write(csr->csrs[gid], gid))
+> +
+> +static __always_inline unsigned long kvm_read_sw_gcsr(struct loongarch_csrs *csr, int gid)
+> +{
+> +	return csr->csrs[gid];
+> +}
+> +
+> +static __always_inline void kvm_write_sw_gcsr(struct loongarch_csrs *csr,
+> +					      int gid, unsigned long val)
+> +{
+> +	csr->csrs[gid] = val;
+> +}
+> +
+> +static __always_inline void kvm_set_sw_gcsr(struct loongarch_csrs *csr,
+> +					    int gid, unsigned long val)
+> +{
+> +	csr->csrs[gid] |= val;
+> +}
+> +
+> +static __always_inline void kvm_change_sw_gcsr(struct loongarch_csrs *csr,
+> +					       int gid, unsigned long mask,
+> +					       unsigned long val)
+> +{
+> +	unsigned long _mask = mask;
+> +
+> +	csr->csrs[gid] &= ~_mask;
+> +	csr->csrs[gid] |= val & _mask;
+> +}
+> +#endif	/* __ASM_LOONGARCH_KVM_CSR_H__ */
+> diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/include/asm/kvm_vcpu.h
+> new file mode 100644
+> index 000000000000..74deaf55d22c
+> --- /dev/null
+> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
+> @@ -0,0 +1,97 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+> + */
+> +
+> +#ifndef __ASM_LOONGARCH_KVM_VCPU_H__
+> +#define __ASM_LOONGARCH_KVM_VCPU_H__
+> +
+> +#include <linux/kvm_host.h>
+> +#include <asm/loongarch.h>
+> +
+> +/* Controlled by 0x5 guest exst */
+> +#define CPU_SIP0			(_ULCAST_(1))
+> +#define CPU_SIP1			(_ULCAST_(1) << 1)
+> +#define CPU_PMU				(_ULCAST_(1) << 10)
+> +#define CPU_TIMER			(_ULCAST_(1) << 11)
+> +#define CPU_IPI				(_ULCAST_(1) << 12)
+> +
+> +/* Controlled by 0x52 guest exception VIP
+> + * aligned to exst bit 5~12
+> + */
+> +#define CPU_IP0				(_ULCAST_(1))
+> +#define CPU_IP1				(_ULCAST_(1) << 1)
+> +#define CPU_IP2				(_ULCAST_(1) << 2)
+> +#define CPU_IP3				(_ULCAST_(1) << 3)
+> +#define CPU_IP4				(_ULCAST_(1) << 4)
+> +#define CPU_IP5				(_ULCAST_(1) << 5)
+> +#define CPU_IP6				(_ULCAST_(1) << 6)
+> +#define CPU_IP7				(_ULCAST_(1) << 7)
+> +
+> +#define MNSEC_PER_SEC			(NSEC_PER_SEC >> 20)
+> +
+> +/* KVM_IRQ_LINE irq field index values */
+> +#define KVM_LOONGSON_IRQ_TYPE_SHIFT	24
+> +#define KVM_LOONGSON_IRQ_TYPE_MASK	0xff
+> +#define KVM_LOONGSON_IRQ_VCPU_SHIFT	16
+> +#define KVM_LOONGSON_IRQ_VCPU_MASK	0xff
+> +#define KVM_LOONGSON_IRQ_NUM_SHIFT	0
+> +#define KVM_LOONGSON_IRQ_NUM_MASK	0xffff
+> +
+> +/* Irq_type field */
+> +#define KVM_LOONGSON_IRQ_TYPE_CPU_IP	0
+> +#define KVM_LOONGSON_IRQ_TYPE_CPU_IO	1
+> +#define KVM_LOONGSON_IRQ_TYPE_HT	2
+> +#define KVM_LOONGSON_IRQ_TYPE_MSI	3
+> +#define KVM_LOONGSON_IRQ_TYPE_IOAPIC	4
+> +#define KVM_LOONGSON_IRQ_TYPE_ROUTE	5
+> +
+> +/* Out-of-kernel GIC cpu interrupt injection irq_number field */
+> +#define KVM_LOONGSON_IRQ_CPU_IRQ	0
+> +#define KVM_LOONGSON_IRQ_CPU_FIQ	1
+> +#define KVM_LOONGSON_CPU_IP_NUM		8
+> +
+> +typedef union loongarch_instruction  larch_inst;
+> +typedef int (*exit_handle_fn)(struct kvm_vcpu *);
+> +
+> +int  _kvm_emu_mmio_write(struct kvm_vcpu *vcpu, larch_inst inst);
+> +int  _kvm_emu_mmio_read(struct kvm_vcpu *vcpu, larch_inst inst);
+> +int  _kvm_complete_mmio_read(struct kvm_vcpu *vcpu, struct kvm_run *run);
+> +int  _kvm_complete_iocsr_read(struct kvm_vcpu *vcpu, struct kvm_run *run);
+> +int  _kvm_emu_idle(struct kvm_vcpu *vcpu);
+> +int  _kvm_handle_pv_hcall(struct kvm_vcpu *vcpu);
+> +int  _kvm_pending_timer(struct kvm_vcpu *vcpu);
+> +int  _kvm_handle_fault(struct kvm_vcpu *vcpu, int fault);
+> +void _kvm_deliver_intr(struct kvm_vcpu *vcpu);
+> +
+> +void kvm_own_fpu(struct kvm_vcpu *vcpu);
+> +void kvm_lose_fpu(struct kvm_vcpu *vcpu);
+> +void kvm_save_fpu(struct loongarch_fpu *fpu);
+> +void kvm_restore_fpu(struct loongarch_fpu *fpu);
+> +void kvm_restore_fcsr(struct loongarch_fpu *fpu);
+> +
+> +void kvm_acquire_timer(struct kvm_vcpu *vcpu);
+> +void kvm_reset_timer(struct kvm_vcpu *vcpu);
+> +enum hrtimer_restart kvm_count_timeout(struct kvm_vcpu *vcpu);
+> +void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long hz);
+> +void kvm_restore_timer(struct kvm_vcpu *vcpu);
+> +void kvm_save_timer(struct kvm_vcpu *vcpu);
+> +
+> +int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
+> +			struct kvm_loongarch_interrupt *irq);
+> +/*
+> + * Loongarch KVM guest interrupt handling
+> + */
+> +static inline void _kvm_queue_irq(struct kvm_vcpu *vcpu, unsigned int irq)
+> +{
+> +	set_bit(irq, &vcpu->arch.irq_pending);
+> +	clear_bit(irq, &vcpu->arch.irq_clear);
+> +}
+> +
+> +static inline void _kvm_dequeue_irq(struct kvm_vcpu *vcpu, unsigned int irq)
+> +{
+> +	clear_bit(irq, &vcpu->arch.irq_pending);
+> +	set_bit(irq, &vcpu->arch.irq_clear);
+> +}
+> +
+> +#endif /* __ASM_LOONGARCH_KVM_VCPU_H__ */
+> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
+> index b3323ab5b78d..35ae5c2be8b6 100644
+> --- a/arch/loongarch/include/asm/loongarch.h
+> +++ b/arch/loongarch/include/asm/loongarch.h
+> @@ -11,6 +11,7 @@
+>   
+>   #ifndef __ASSEMBLY__
+>   #include <larchintrin.h>
+> +#include <asm/insn-def.h>
+>   
+>   /*
+>    * parse_r var, r - Helper assembler macro for parsing register names.
+> @@ -309,6 +310,7 @@ static __always_inline void iocsr_write64(u64 val, u32 reg)
+>   #define LOONGARCH_CSR_ECFG		0x4	/* Exception config */
+>   #define  CSR_ECFG_VS_SHIFT		16
+>   #define  CSR_ECFG_VS_WIDTH		3
+> +#define  CSR_ECFG_VS_SHIFT_END		(CSR_ECFG_VS_SHIFT + CSR_ECFG_VS_WIDTH - 1)
+>   #define  CSR_ECFG_VS			(_ULCAST_(0x7) << CSR_ECFG_VS_SHIFT)
+>   #define  CSR_ECFG_IM_SHIFT		0
+>   #define  CSR_ECFG_IM_WIDTH		14
+> @@ -397,13 +399,14 @@ static __always_inline void iocsr_write64(u64 val, u32 reg)
+>   #define  CSR_TLBLO1_V			(_ULCAST_(0x1) << CSR_TLBLO1_V_SHIFT)
+>   
+>   #define LOONGARCH_CSR_GTLBC		0x15	/* Guest TLB control */
+> -#define  CSR_GTLBC_RID_SHIFT		16
+> -#define  CSR_GTLBC_RID_WIDTH		8
+> -#define  CSR_GTLBC_RID			(_ULCAST_(0xff) << CSR_GTLBC_RID_SHIFT)
+> +#define  CSR_GTLBC_TGID_SHIFT		16
+> +#define  CSR_GTLBC_TGID_WIDTH		8
+> +#define  CSR_GTLBC_TGID_SHIFT_END	(CSR_GTLBC_TGID_SHIFT + CSR_GTLBC_TGID_WIDTH - 1)
+> +#define  CSR_GTLBC_TGID			(_ULCAST_(0xff) << CSR_GTLBC_TGID_SHIFT)
+>   #define  CSR_GTLBC_TOTI_SHIFT		13
+>   #define  CSR_GTLBC_TOTI			(_ULCAST_(0x1) << CSR_GTLBC_TOTI_SHIFT)
+> -#define  CSR_GTLBC_USERID_SHIFT		12
+> -#define  CSR_GTLBC_USERID		(_ULCAST_(0x1) << CSR_GTLBC_USERID_SHIFT)
+> +#define  CSR_GTLBC_USETGID_SHIFT	12
+> +#define  CSR_GTLBC_USETGID		(_ULCAST_(0x1) << CSR_GTLBC_USETGID_SHIFT)
+>   #define  CSR_GTLBC_GMTLBSZ_SHIFT	0
+>   #define  CSR_GTLBC_GMTLBSZ_WIDTH	6
+>   #define  CSR_GTLBC_GMTLBSZ		(_ULCAST_(0x3f) << CSR_GTLBC_GMTLBSZ_SHIFT)
+> @@ -555,6 +558,7 @@ static __always_inline void iocsr_write64(u64 val, u32 reg)
+>   #define LOONGARCH_CSR_GSTAT		0x50	/* Guest status */
+>   #define  CSR_GSTAT_GID_SHIFT		16
+>   #define  CSR_GSTAT_GID_WIDTH		8
+> +#define  CSR_GSTAT_GID_SHIFT_END	(CSR_GSTAT_GID_SHIFT + CSR_GSTAT_GID_WIDTH - 1)
+>   #define  CSR_GSTAT_GID			(_ULCAST_(0xff) << CSR_GSTAT_GID_SHIFT)
+>   #define  CSR_GSTAT_GIDBIT_SHIFT		4
+>   #define  CSR_GSTAT_GIDBIT_WIDTH		6
+> @@ -605,6 +609,12 @@ static __always_inline void iocsr_write64(u64 val, u32 reg)
+>   #define  CSR_GCFG_MATC_GUEST		(_ULCAST_(0x0) << CSR_GCFG_MATC_SHITF)
+>   #define  CSR_GCFG_MATC_ROOT		(_ULCAST_(0x1) << CSR_GCFG_MATC_SHITF)
+>   #define  CSR_GCFG_MATC_NEST		(_ULCAST_(0x2) << CSR_GCFG_MATC_SHITF)
+> +#define  CSR_GCFG_MATP_NEST_SHIFT	2
+> +#define  CSR_GCFG_MATP_NEST		(_ULCAST_(0x1) << CSR_GCFG_MATP_NEST_SHIFT)
+> +#define  CSR_GCFG_MATP_ROOT_SHIFT	1
+> +#define  CSR_GCFG_MATP_ROOT		(_ULCAST_(0x1) << CSR_GCFG_MATP_ROOT_SHIFT)
+> +#define  CSR_GCFG_MATP_GUEST_SHIFT	0
+> +#define  CSR_GCFG_MATP_GUEST		(_ULCAST_(0x1) << CSR_GCFG_MATP_GUEST_SHIFT)
+>   
+>   #define LOONGARCH_CSR_GINTC		0x52	/* Guest interrupt control */
+>   #define  CSR_GINTC_HC_SHIFT		16
+> diff --git a/arch/loongarch/kvm/trace.h b/arch/loongarch/kvm/trace.h
+> new file mode 100644
+> index 000000000000..17b28d94d569
+> --- /dev/null
+> +++ b/arch/loongarch/kvm/trace.h
+> @@ -0,0 +1,168 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+> + */
+> +
+> +#if !defined(_TRACE_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
+> +#define _TRACE_KVM_H
+> +
+> +#include <linux/tracepoint.h>
+> +#include <asm/kvm_csr.h>
+> +
+> +#undef	TRACE_SYSTEM
+> +#define TRACE_SYSTEM	kvm
+> +
+> +/*
+> + * Tracepoints for VM enters
+> + */
+> +DECLARE_EVENT_CLASS(kvm_transition,
+> +	TP_PROTO(struct kvm_vcpu *vcpu),
+> +	TP_ARGS(vcpu),
+> +	TP_STRUCT__entry(
+> +		__field(unsigned long, pc)
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__entry->pc = vcpu->arch.pc;
+> +	),
+> +
+> +	TP_printk("PC: 0x%08lx",
+> +		  __entry->pc)
+> +);
+> +
+> +DEFINE_EVENT(kvm_transition, kvm_enter,
+> +	     TP_PROTO(struct kvm_vcpu *vcpu),
+> +	     TP_ARGS(vcpu));
+> +
+> +DEFINE_EVENT(kvm_transition, kvm_reenter,
+> +	     TP_PROTO(struct kvm_vcpu *vcpu),
+> +	     TP_ARGS(vcpu));
+> +
+> +DEFINE_EVENT(kvm_transition, kvm_out,
+> +	     TP_PROTO(struct kvm_vcpu *vcpu),
+> +	     TP_ARGS(vcpu));
+> +
+> +/* Further exit reasons */
+> +#define KVM_TRACE_EXIT_IDLE		64
+> +#define KVM_TRACE_EXIT_CACHE		65
+> +#define KVM_TRACE_EXIT_SIGNAL		66
+> +
+> +/* Tracepoints for VM exits */
+> +#define kvm_trace_symbol_exit_types			\
+> +	{ KVM_TRACE_EXIT_IDLE,		"IDLE" },	\
+> +	{ KVM_TRACE_EXIT_CACHE,		"CACHE" },	\
+> +	{ KVM_TRACE_EXIT_SIGNAL,	"Signal" }
+> +
+> +TRACE_EVENT(kvm_exit_gspr,
+> +	    TP_PROTO(struct kvm_vcpu *vcpu, unsigned int inst_word),
+> +	    TP_ARGS(vcpu, inst_word),
+> +	    TP_STRUCT__entry(
+> +			__field(unsigned int, inst_word)
+> +	    ),
+> +
+> +	    TP_fast_assign(
+> +			__entry->inst_word = inst_word;
+> +	    ),
+> +
+> +	    TP_printk("inst word: 0x%08x",
+> +		      __entry->inst_word)
+> +);
+> +
+> +
+> +DECLARE_EVENT_CLASS(kvm_exit,
+> +	    TP_PROTO(struct kvm_vcpu *vcpu, unsigned int reason),
+> +	    TP_ARGS(vcpu, reason),
+> +	    TP_STRUCT__entry(
+> +			__field(unsigned long, pc)
+> +			__field(unsigned int, reason)
+> +	    ),
+> +
+> +	    TP_fast_assign(
+> +			__entry->pc = vcpu->arch.pc;
+> +			__entry->reason = reason;
+> +	    ),
+> +
+> +	    TP_printk("[%s]PC: 0x%08lx",
+> +		      __print_symbolic(__entry->reason,
+> +				       kvm_trace_symbol_exit_types),
+> +		      __entry->pc)
+> +);
+> +
+> +DEFINE_EVENT(kvm_exit, kvm_exit_idle,
+> +	     TP_PROTO(struct kvm_vcpu *vcpu, unsigned int reason),
+> +	     TP_ARGS(vcpu, reason));
+> +
+> +DEFINE_EVENT(kvm_exit, kvm_exit_cache,
+> +	     TP_PROTO(struct kvm_vcpu *vcpu, unsigned int reason),
+> +	     TP_ARGS(vcpu, reason));
+> +
+> +DEFINE_EVENT(kvm_exit, kvm_exit,
+> +	     TP_PROTO(struct kvm_vcpu *vcpu, unsigned int reason),
+> +	     TP_ARGS(vcpu, reason));
+> +
+> +#define KVM_TRACE_AUX_RESTORE		0
+> +#define KVM_TRACE_AUX_SAVE		1
+> +#define KVM_TRACE_AUX_ENABLE		2
+> +#define KVM_TRACE_AUX_DISABLE		3
+> +#define KVM_TRACE_AUX_DISCARD		4
+> +
+> +#define KVM_TRACE_AUX_FPU		1
+> +
+> +#define kvm_trace_symbol_aux_op				\
+> +	{ KVM_TRACE_AUX_RESTORE,	"restore" },	\
+> +	{ KVM_TRACE_AUX_SAVE,		"save" },	\
+> +	{ KVM_TRACE_AUX_ENABLE,		"enable" },	\
+> +	{ KVM_TRACE_AUX_DISABLE,	"disable" },	\
+> +	{ KVM_TRACE_AUX_DISCARD,	"discard" }
+> +
+> +#define kvm_trace_symbol_aux_state			\
+> +	{ KVM_TRACE_AUX_FPU,     "FPU" }
+> +
+> +TRACE_EVENT(kvm_aux,
+> +	    TP_PROTO(struct kvm_vcpu *vcpu, unsigned int op,
+> +		     unsigned int state),
+> +	    TP_ARGS(vcpu, op, state),
+> +	    TP_STRUCT__entry(
+> +			__field(unsigned long, pc)
+> +			__field(u8, op)
+> +			__field(u8, state)
+> +	    ),
+> +
+> +	    TP_fast_assign(
+> +			__entry->pc = vcpu->arch.pc;
+> +			__entry->op = op;
+> +			__entry->state = state;
+> +	    ),
+> +
+> +	    TP_printk("%s %s PC: 0x%08lx",
+> +		      __print_symbolic(__entry->op,
+> +				       kvm_trace_symbol_aux_op),
+> +		      __print_symbolic(__entry->state,
+> +				       kvm_trace_symbol_aux_state),
+> +		      __entry->pc)
+> +);
+> +
+> +TRACE_EVENT(kvm_vpid_change,
+> +	    TP_PROTO(struct kvm_vcpu *vcpu, unsigned long vpid),
+> +	    TP_ARGS(vcpu, vpid),
+> +	    TP_STRUCT__entry(
+> +			__field(unsigned long, vpid)
+> +	    ),
+> +
+> +	    TP_fast_assign(
+> +			__entry->vpid = vpid;
+> +	    ),
+> +
+> +	    TP_printk("vpid: 0x%08lx",
+> +		      __entry->vpid)
+> +);
+> +
+> +#endif /* _TRACE_LOONGARCH64_KVM_H */
+> +
+> +#undef TRACE_INCLUDE_PATH
+> +#define TRACE_INCLUDE_PATH ../../arch/loongarch/kvm
+> +#undef TRACE_INCLUDE_FILE
+> +#define TRACE_INCLUDE_FILE trace
+> +
+> +/* This part must be outside protection */
+> +#include <trace/define_trace.h>
