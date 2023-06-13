@@ -2,209 +2,350 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 514E072EFE9
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 01:20:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB62972EFEB
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 01:20:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230496AbjFMXT7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jun 2023 19:19:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55568 "EHLO
+        id S240755AbjFMXUB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 19:20:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241688AbjFMXT5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jun 2023 19:19:57 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E7E719A7;
-        Tue, 13 Jun 2023 16:19:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686698394; x=1718234394;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=0Do0YMB150GJFRITzPsM/ZbLj1IP44p0ARQb4wq2VgA=;
-  b=W8vJzkflQmFSQpcFgRe/v1r0xB945eSg4CwRT9UE814H6pmmTTBo2qxe
-   vkIsbU6EUkLk8yZqGrq6+5uQ6Lc4h0gKDljBK9xnCOKJ7owIUfECprWlr
-   YkEDq4LrGz5M9GoSAmDtRUeOqrJv8XWbPWFdUJdJuKtRLGUpRTsMNKuSM
-   nvfsVIp3lbp2gH6nDkLC3N7Y1m+kwWORnGbC7TYOAej5myZd65QFRw+Ea
-   RUCZy4nDzEi6cufgVm1FvWOnp+QDamIatG2z24+iYAZvryttOE4y/d2++
-   KR1/Wzg+w0zqvZIMbCkzB2FWwfAy8VBpsOTZ4KZtOe5lZneqLonmYPHQv
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="338106133"
-X-IronPort-AV: E=Sophos;i="6.00,241,1681196400"; 
-   d="scan'208";a="338106133"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2023 16:19:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="714975672"
-X-IronPort-AV: E=Sophos;i="6.00,241,1681196400"; 
-   d="scan'208";a="714975672"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga007.fm.intel.com with ESMTP; 13 Jun 2023 16:19:53 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 13 Jun 2023 16:19:52 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Tue, 13 Jun 2023 16:19:52 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.109)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Tue, 13 Jun 2023 16:19:50 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jKoVUL158AtjSmcka09x+AdtIwVa7Hj4VWN8x74VEfW/lQl720nO4/yzPMupdHO7ZecPuvEq+NhUP0Lvndsh9qAMEsw5R9NrW+bBknmeiZaCDs44A8SQkj0mIDl3ZQAhQm73MaqDWZe8tT5y7fHXvu8hiEb8Wt/JKe/Y0ksmkDr0dWz6+X7yl+AE1aqvu9a/iHP6sUeT1Ak7Y3eTlCb64iOgckaWobOf99q5rAlfhGmK7AUATpuL7KWdrMLQhRjX/tYjMIHFRdFmzTSiWeIewJD1L/njsa21ZoCFgjKzYGOc4ztEno8/GlkIJ87YrJjZuchq7ZQAHvB4T8Jw9IssbQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0Do0YMB150GJFRITzPsM/ZbLj1IP44p0ARQb4wq2VgA=;
- b=klRt7cvFpCeiJvxSh1Q3lZXlt2BIcUgT8/1w6rdynzGrzcr9AsqTNRzGkiBQnKuLktXdY+Sbcdwv0xRKk1BM6Q3zNgQwL3Isv0zlHu3D/0z8oCi7YR32rFD5SYbnbjiwsffreQO902tTimMDVFf4TS2UIHXx3MEKS+MxYbsr3OUpILI95/F5Lq1E9NBxdbYfwRWb0UxeSDTvGLAupUDMsLIc3Z7qStDZ9qQsXC2rDVeOFRtb1OdgPzfzzFAXeaVv1XcCoZfqJmZe8z8FBuvzOoIXF1gY+SIHrUvFg0ivBtUfxs+Jhus3CIkG9q5EB5yXgfWpPk0rGfBAgRUPtMU9+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by PH8PR11MB6683.namprd11.prod.outlook.com (2603:10b6:510:1c6::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33; Tue, 13 Jun
- 2023 23:19:45 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::19b7:466f:32ac:b764]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::19b7:466f:32ac:b764%3]) with mapi id 15.20.6455.043; Tue, 13 Jun 2023
- 23:19:45 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-Subject: Re: [PATCH v11 11/20] x86/virt/tdx: Fill out TDMRs to cover all TDX
- memory regions
-Thread-Topic: [PATCH v11 11/20] x86/virt/tdx: Fill out TDMRs to cover all TDX
- memory regions
-Thread-Index: AQHZlu+2r84uqtF1H0SFKn93tuC1FK9/hdAAgAE59ICAACfHgIAFl0EAgADJKYCAAH+agIAAy4CAgADaI4A=
-Date:   Tue, 13 Jun 2023 23:19:45 +0000
-Message-ID: <e027617f9a4da63ab27639dcac5f1dcf07a4d628.camel@intel.com>
-References: <cover.1685887183.git.kai.huang@intel.com>
-         <927ec9871721d2a50f1aba7d1cf7c3be50e4f49b.1685887183.git.kai.huang@intel.com>
-         <0600959d-9e10-fb1f-b3a9-862a51b9d8e1@intel.com>
-         <ddbcadf36016bb60a695f54b28f5c9e9af53a07f.camel@intel.com>
-         <201af662-f700-9145-c113-563e378074ad@intel.com>
-         <89c99e7360dc2acfe5fb56c2bbb40e074e1f94d5.camel@intel.com>
-         <20230612143355.sur7zc7byu7omxal@box.shutemov.name>
-         <3e188621d97af794f03072e5261dcc9f589900aa.camel@intel.com>
-         <20230613101859.lwqlwa4t72sthvwk@box.shutemov.name>
-In-Reply-To: <20230613101859.lwqlwa4t72sthvwk@box.shutemov.name>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.48.2 (3.48.2-1.fc38) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|PH8PR11MB6683:EE_
-x-ms-office365-filtering-correlation-id: fdff9f44-3f5f-410d-3417-08db6c64acc7
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: f0LctEtvkBcVB71KbPuiRE/oR8QFs+E/9Zp0GQq9fGBRY8Lcm977XCBVF9gVIv0mE9CdAtzhAQ8a4j6pZB9ZlQZw+e34RfvoypbPbKLjJm911o7HW2EahWpkYVbM4SZMXLre5CfRfs9OGpdHIq8g2m1wR7xZMbeaR4RG5iwamHMeMRFJVMncbftAZ7+fCshj99pTUVToMkSY/id/3L1LHpQxM8jb5YJIyxPAsVZGJMwuy5tViAG2s9CQqUOkw9EOZWDqKRen+nYh6Psd/NVrLvNTs9BOwOdsjhLY6ebXZrwdoAmP6Ln//ThLbnlP4amtXVf+w/dQ1gBWjr7QvMThYObSGR4/jmP32K5DZsfs7fufNiDAWTq6/E6BGjpLyDv3r2/CxLqKl9PZUUvP6z1+E4mAy21ZuqGsfqLLLgwLMThykpEy4wRi02ZE7Ph8uiLXphPSK8E0NCHbT52qP5x8jrneK0ocgmfLLgF2F+OyWCGbW1TzEt5df2xGLZlKZW78a0wmyYqahR7/jvVrGwsGlt4ujrPtzHOa4x4Vo02Uso5oqGdW8kRmzMcyptsjYYzU1QwruBFfJ4BSNNGAwb2yRqccuRg8vj6fLd4iji6X5qrIWvwSYHLt2P+FkC3NLzAH
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(366004)(39860400002)(376002)(136003)(396003)(451199021)(38070700005)(83380400001)(122000001)(38100700002)(86362001)(82960400001)(478600001)(6486002)(54906003)(71200400001)(5660300002)(64756008)(8676002)(91956017)(2906002)(66446008)(66556008)(6916009)(41300700001)(8936002)(66476007)(4326008)(7416002)(76116006)(316002)(66946007)(4744005)(66899021)(2616005)(6506007)(6512007)(26005)(36756003)(186003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Ym9CT3ZvWTJTYmZ1ZGFBM3RDNE84TTNuZmJPOXJBbzhYWExNY25hU2hCSThE?=
- =?utf-8?B?bDN2YXZHcVVwSS9LNDdqSHpkVmZWL1NRazQvOFBEbDd3aUExc1VBSHhDaXR5?=
- =?utf-8?B?bksyRjBqbVBHcmFpbitjeFR6Y0xadjBCdUlzSE0xd2ZJZVNVT1F6OVkrMGcy?=
- =?utf-8?B?RGs3eEhCenZaRWsrc3RuMjI0Z2pLTmY5WDcrNXo3TkgzN3dDUTBBTkV4Tjgz?=
- =?utf-8?B?UXdBMkhOd040RGFITHFHTlMwYkhEeU1KRXZFUTY1aHhvZTM4NmJkSVUwRkdW?=
- =?utf-8?B?VlRReVpWYm5xMEJsZzVleXNacElnd2tMTUtQdi9kdDE0WVRpOEFGelpFNml1?=
- =?utf-8?B?bXNFbFRJYUsySTNORzVHNEZsY2MxOTQxUFU0WFBZMU5xRWtINTFmTENDcFhG?=
- =?utf-8?B?MG5sazJFWWV5amtWeTd5Q0kvRnlRS2k1VDVRVUVMVXZCbUVidmNCQTkzeVVX?=
- =?utf-8?B?ZmJoY09TeUpoYUhDTjJmZ2tlN2VoMVhsbndCeEdISGMwR21seENVOEZLeU55?=
- =?utf-8?B?by8vSGdBSnhYanNnZzNsTmF2Z0hxSUVGQUdWR2I4akNoQmMybjBPdDcxdUUw?=
- =?utf-8?B?cDBIZUk5Z2IyVnRFTEx0MTJyRnk4UVZLa2h2VG9Ca1MzVnRpMEdta2xUUzM1?=
- =?utf-8?B?MGo4VFNWaUlvTVYvN1RYd2tFRkFheU1GcVNpVUdyMm50YUFkTzVsZ1UxRE4z?=
- =?utf-8?B?eVVRTkowbkVoR1ovcXU1eXVzbi9YdTgwZjc2OGN0ZkU2NUpzVVB0d0xCMXp0?=
- =?utf-8?B?elFEYnJQY0hCRmk3T0hWYjhUQkkrYlYwQU56ZlpnSUFJQVBtZmxUTG5yWXNQ?=
- =?utf-8?B?TEkvdkxlOVg0Q3hnOVFVWEt6bTJPUHpZOTBqZnM4NEF0dzZkWElYeXE3Sm41?=
- =?utf-8?B?aTlrMFZwT0g1eE1jNmxKRDFWcCtkMXdkZzNiM1BpbkhHcFdpNFNiSVdaSTc1?=
- =?utf-8?B?bjJLZzNZU0ZJSWZJNHFrZUpiMEJJSTB2RUl5Q1dlTWJUN0VhZHZiMk9ZM3Fw?=
- =?utf-8?B?U280a3JBSS9MNzhSQlBsT0VnVG5PTTFCTlVRZHcxS0kyKzQ1aUhCZ2VzUFJh?=
- =?utf-8?B?Y2xLSEw3cDhaaUdPTkxPZ3cwTUc3NWVpUjVXYVhYUW1oOHFPNTNLNXYreEJ4?=
- =?utf-8?B?YkEvQWphQ00rN0dvcE50Q29ES1FyOGR1SzB1RnpOQVlQbnNnUmVaSmpiVGQw?=
- =?utf-8?B?M01QbGZGb3U4ZWE2WVczUVh2VTAzNEJDNWV4dHZSSnRHZk9Rd1ZBYVg1Q2xt?=
- =?utf-8?B?WXN1TUtzaVJhZWN4ZVloQkp0TjdDOWRHbHNrekF4SkNBRmRIV0JubWRTRmNv?=
- =?utf-8?B?cGdFMCs1dE9xbitEbktxMWNxczJISHBQRTh1SzZxaWRGNGJ2WTdpQVdBVW54?=
- =?utf-8?B?NUo2ZTUrTW1pWXhYRVh2RHZCdzcxVGxJRTkvcWJLS0VQcmdBZEJ6ck5zaUJw?=
- =?utf-8?B?MXlScFJORzJ0bDRqNFEyWjk1cFpCd0E4WFp2NE0ycFZwT0ljZlo0V0R5cFo1?=
- =?utf-8?B?b2RWU01pTG5hTmFsRTFvaWd6SnhnZWFnTEJ6T0RhV1pNT055L2JIeWlic3FO?=
- =?utf-8?B?cllxR2pDUStKWURmTWh3aVN4Z3BFWXZlM2FjdThhR0NIc3E1TlhzWFVsNDJl?=
- =?utf-8?B?bWk0UkExekMyVGVYdWRVOFpJQlZSWnRreFlSeGdmZStOMFhMY0o2cTdncTNn?=
- =?utf-8?B?VGRqczhVengzTmIyOHFsM1dNbEh5Z2lBWit4eGlIWXI4bVkrRTl2NEZQTUxV?=
- =?utf-8?B?SFVEeUsrT3NKaWQ1MERpWVQ4STllamxPR1lFcit3WXplWnVIMExJU3MyRUYv?=
- =?utf-8?B?QkhoN3B4ZTBFTjVWYTg3dkRJQ1NTRTIvZjJGS2s1cGN2MWhDeFRoQTk3c3p0?=
- =?utf-8?B?RXdvbC9EM1h5OFZJZ2JQVmhYZlZpOVhXdXR3TXJ5dkdmbEUwUG9yWVhkNk5v?=
- =?utf-8?B?aC9lcko3bDZBZ1IzRzVtU2JoVkh2YUc4dFVKKzhteHZsZldqYzB5TnF1eEZu?=
- =?utf-8?B?cldwdkFkUTEzR2daSm4rVkdGOG1YUHB6MVZ2bVI3Z2U3Ylh6eDBYZWFlYXdo?=
- =?utf-8?B?eDJlMU9lbXdQbjNwWEtSZnZmNVNaV3EzakJkTHlPakwzbWI2aVpxQWVrc3Zj?=
- =?utf-8?Q?DGxvdnwQ9kApqHY69PWxqq5dG?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <857BA1B87BA9E34B932A5F25DA59BD48@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fdff9f44-3f5f-410d-3417-08db6c64acc7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2023 23:19:45.3784
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dBEjXfN45wcbtwNeQck0zSI8S30EXGoddiXvW5zZrD3J4u67JLPt+sclK8KxwFRsftuR6H2Yap9xRfjQgGEd4Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6683
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S233025AbjFMXT6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jun 2023 19:19:58 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B1551BC3
+        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 16:19:57 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-65252a80823so3613383b3a.1
+        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 16:19:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686698396; x=1689290396;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JkQ9jDzdkfw8kDMXLyweZ1MunDOJDJDEoHZrAtEzt+E=;
+        b=XVd+zE15yfQ+17ZfxDi+KI7BvefSYsbnEQGVgcHc/rgWYZqumb/xLuGir1rePIn3er
+         /FPPPkhf5gcDOi5VZpF+9rLWzgZWKXKbSlxbzyGoFqNarKs5wFhLnUiIvUnpkWaCJIm1
+         gU9iI515mdfBgRW71XjgCjfdxJuLehPGM5cyYjWIATitkWcasFFvGpqs5IUWxuJzwW87
+         tXultnM6OEL7meT6lNJ9btE9Hni4DE4y8w5b1i8dY+rAamOPhbbMnBtnKXOkXEGKat3V
+         IGcdlCobi5KWG5Yf3U/jfr0136BrrlponazLzS+Z9EQVjHf8UAYpdc4dBh35p8LdXA49
+         jRwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686698396; x=1689290396;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JkQ9jDzdkfw8kDMXLyweZ1MunDOJDJDEoHZrAtEzt+E=;
+        b=RIT7ozIgfVR+a/2QK1LTarQEXwjQlBJp+/DtwXhUP55gfH8SndfeaOhKcntH0RX/NG
+         tm18glhNbAP9SDfLjoY29zBLRnfIxIaGi34E3k7iH3jQDZGQAjJfHXD3f2huxJE0r1ZQ
+         ry8LgCnwuCOOxTT1OzXVODPDTNns+HAxoUhyy7u2KQ6/dL2VJ+Q5ba7sCEpySnrAbz+/
+         tKpm5Vnxpz26P91plxXEdRi/bkz59sxQbTDPWp0szNqPDPUoJfb5b+aFnr43tUSiPDlg
+         RrWzeW9p3JyRbyJUGsRbLwj2g0arn4XnOl+xJp4AIBZRYzpdqk8NSu0Q2Vp2jq+UgUxi
+         YBRQ==
+X-Gm-Message-State: AC+VfDyZPM9nlT07SutV7gJW9BcU1RuxPj3+WUXyK+Cdh2FWvX+G+0Uc
+        HqXjy2wdR1qsZpLs7ORGsShCUk7C+jI=
+X-Google-Smtp-Source: ACHHUZ7uRu6vjmISuq8l1TDjCnEZ+Jvrzhyj1RqXhJ1l74AbwFhDTE2oa4/Yvd26MppB1/H50IOyi1DuBGw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1252:b0:643:ae47:9bc0 with SMTP id
+ u18-20020a056a00125200b00643ae479bc0mr82041pfi.3.1686698396483; Tue, 13 Jun
+ 2023 16:19:56 -0700 (PDT)
+Date:   Tue, 13 Jun 2023 16:19:54 -0700
+In-Reply-To: <5e7c6b3d-2c69-59ca-1b9f-2459430e2643@amd.com>
+Mime-Version: 1.0
+References: <20230411125718.2297768-1-aik@amd.com> <20230411125718.2297768-6-aik@amd.com>
+ <ZGv9Td4p1vtXC0Hy@google.com> <719a6b42-fd91-8eb4-f773-9ed98d2fdb07@amd.com>
+ <ZGzfWQub4FQOrEtw@google.com> <fc82a8a7-af38-5037-1862-ba2315c4e5af@amd.com>
+ <ZHDEkuaVjs/0kM6t@google.com> <64336829-60c5-afe1-81ad-91b4f354aef3@amd.com> <5e7c6b3d-2c69-59ca-1b9f-2459430e2643@amd.com>
+Message-ID: <ZIj5ms+DohcLyXHE@google.com>
+Subject: Re: [PATCH kernel v5 5/6] KVM: SEV: Enable data breakpoints in SEV-ES
+From:   Sean Christopherson <seanjc@google.com>
+To:     Alexey Kardashevskiy <aik@amd.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Pankaj Gupta <pankaj.gupta@amd.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Santosh Shukla <santosh.shukla@amd.com>,
+        Carlos Bilbao <carlos.bilbao@amd.com>
+Content-Type: multipart/mixed; charset="UTF-8"; boundary="Tsz77BKxl4wQNE2/"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MISSING_MIME_HB_SEP,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gVHVlLCAyMDIzLTA2LTEzIGF0IDEzOjE4ICswMzAwLCBraXJpbGwuc2h1dGVtb3ZAbGludXgu
-aW50ZWwuY29tIHdyb3RlOg0KPiBPbiBNb24sIEp1biAxMiwgMjAyMyBhdCAxMDoxMDozOVBNICsw
-MDAwLCBIdWFuZywgS2FpIHdyb3RlOg0KPiA+IE9uIE1vbiwgMjAyMy0wNi0xMiBhdCAxNzozMyAr
-MDMwMCwga2lyaWxsLnNodXRlbW92QGxpbnV4LmludGVsLmNvbSB3cm90ZToNCj4gPiA+IE9uIE1v
-biwgSnVuIDEyLCAyMDIzIGF0IDAyOjMzOjU4QU0gKzAwMDAsIEh1YW5nLCBLYWkgd3JvdGU6DQo+
-ID4gPiA+IA0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IE1heWJlIG5vdCBldmVuIGEgcHJfd2Fybigp
-LCBidXQgc29tZXRoaW5nIHRoYXQncyBhIGJpdCBvbWlub3VzIGFuZCBoYXMgYQ0KPiA+ID4gPiA+
-IGNoYW5jZSBvZiBnZXR0aW5nIHVzZXJzIHRvIGFjdC4NCj4gPiA+ID4gDQo+ID4gPiA+IFNvcnJ5
-IEkgYW0gbm90IHN1cmUgaG93IHRvIGRvLiAgQ291bGQgeW91IGdpdmUgc29tZSBzdWdnZXN0aW9u
-Pw0KPiA+ID4gDQo+ID4gPiBNYXliZSBzb21ldGhpbmcgbGlrZSB0aGlzIHdvdWxkIGRvPw0KPiA+
-ID4gDQo+ID4gPiBJJ20gc3RydWdnbGUgd2l0aCB0aGUgd2FybmluZyBtZXNzYWdlLiBBbnkgc3Vn
-Z2VzdGlvbiBpcyB3ZWxjb21lLg0KPiA+IA0KPiA+IEkgZ3Vlc3MgaXQgd291bGQgYmUgaGVscGZ1
-bCB0byBwcmludCBvdXQgdGhlIGFjdHVhbCBjb25zdW1lZCBURE1Scz8NCj4gPiANCj4gPiAJcHJf
-d2FybigiY29uc3VtZWQgVERNUnMgcmVhY2hpbmcgbGltaXQ6ICVkIHVzZWQgKG91dCBvZiAlZClc
-biIsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRk
-bXJfaWR4LCB0ZG1yX2xpc3QtPm1heF90ZG1ycyk7DQo+IA0KPiBJdCBpcyBvZmYtYnktb25lLiBJ
-dCBzdXBwb3NlZCB0byBiZSB0ZG1yX2lkeCArIDEuDQo+IA0KDQpJbiB5b3VyIGNvZGUsIHllcy4g
-IFRoYW5rcyBmb3IgcG9pbnRpbmcgb3V0LiAgSSBjb3BpZWQgaXQgZnJvbSBteSBjb2RlLg0KDQo=
+
+--Tsz77BKxl4wQNE2/
+Content-Type: text/plain; charset=3Diso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+
+On Fri, Jun 02, 2023, Alexey Kardashevskiy wrote:
+> Sean, ping?
+>=20
+> I wonder if this sev-es-not-singlestepping is a showstopper or it is alri=
+ght
+> to repost this patchset without it? Thanks,
+
+Ah, shoot, I completely lost this in my inbox.  Sorry :-/
+
+> > > Side topic, isn't there an existing bug regarding SEV-ES NMI windows?
+> > > KVM can't actually single-step an SEV-ES guest, but tries to set
+> > > RFLAGS.TF anyways.
+> >=20
+> > Why is it a "bug" and what does the patch fix? Sound to me as it is
+> > pointless and the guest won't do single stepping and instead will run
+> > till it exits somehow, what do I miss?
+
+The bug is benign in the end, but it's still a bug.  I'm not worried about =
+fixing
+any behavior, but I dislike having dead, misleading code, especially for so=
+mething
+like this where both NMI virtualization and SEV-ES are already crazy comple=
+x and
+subtle.  I think it's safe to say that I've spent more time digging through=
+ SEV-ES
+and NMI virtualization than most KVM developers, and as evidenced by the nu=
+mber of
+things I got wrong below, I'm still struggling to keep track of the bigger =
+picture.
+Developers that are new to all of this need as much help as they can get.
+
+> > > Blech, and suppressing EFER.SVME in efer_trap() is a bit gross,
+> >=20
+> > Why suppressed? svm_set_efer() sets it eventually anyway.
+
+svm_set_efer() sets SVME in hardware, but KVM's view of the guest's value t=
+hat's
+stored in vcpu->arch.efer doesn't have SVME set.  E.g. from the guest's per=
+spective,
+EFER.SVME will have "Reserved Read As Zero" semantics.
+
+> > > but I suppose since the GHCB doesn't allow for CLGI or STGI it's "fin=
+e".
+> >=20
+> > GHCB does not mention this, instead these are always intercepted in
+> > init_vmcb().
+
+Right, I'm calling out that the absense of protocol support for requesting =
+CLGI
+or STGI emulation means dropping the guest's EFER.SVME is ok (though gross =
+:-) ).
+
+> > > E.g. shouldn't KVM do this?
+> >=20
+> > It sure can and I am happy to include this into the series, the commit
+> > log is what I am struggling with :)
+> >=20
+> > >=20
+> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > > index ca32389f3c36..4e4a49031efe 100644
+> > > --- a/arch/x86/kvm/svm/svm.c
+> > > +++ b/arch/x86/kvm/svm/svm.c
+> > > @@ -3784,6 +3784,16 @@ static void svm_enable_nmi_window(struct
+> > > kvm_vcpu *vcpu)
+> > > =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
+=BD if (svm_get_nmi_mask(vcpu) && !svm->awaiting_iret_completion)
+> > > =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
+=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=
+ return; /* IRET will cause a vm exit */
+> > > +=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD /*
+> > > +=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD * KV=
+M can't single-step SEV-ES guests and instead assumes
+> > > that IRET
+> > > +=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD * in=
+ the guest will always succeed,
+> >=20
+> > It relies on GHCB's NMI_COMPLETE (which SVM than handles is it was IRET=
+):
+> >=20
+> >  =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD case S=
+VM_VMGEXIT_NMI_COMPLETE:
+> >  =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
+=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD ret =3D =
+svm_invoke_exit_handler(vcpu, SVM_EXIT_IRET);
+> >  =EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=
+=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD break;
+
+Ah, right, better to say that the guest is responsible for signaling that i=
+t's
+ready to accept NMIs, which KVM handles by "emulating" IRET.
+
+> > > i.e. clears NMI masking on the
+> > > +=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD * ne=
+xt VM-Exit.=EF=BF=BD Note, GIF is guaranteed to be '1' for
+> > > SEV-ES guests
+> > > +=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD * as=
+ the GHCB doesn't allow for CLGI or STGI (and KVM suppresses
+> > > +=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD * EF=
+ER.SVME for good measure, see efer_trap()).
+> >=20
+> > SVM KVM seems to not enforce EFER.SVME, the guest does what it wants an=
+d
+> > KVM is only told the new value via EFER_WRITE_TRAP. And "writes by
+> > SEV-ES guests to EFER.SVME are always ignored by hardware" says the APM=
+.
+
+Ahhh, that blurb in the APM is what I'm missing.
+
+Actually, there's a real bug here.  KVM doesn't immediately unmask NMIs in =
+response
+to NMI_COMPLETE, and instead goes through the whole awaiting_iret_completio=
+n =3D>
+svm_complete_interrupts(), which means that KVM doesn't unmask NMIs until t=
+he
+*next* VM-Exit.  Theoretically, that could be never, e.g. if the host is ti=
+ckless
+and the guest is configured to busy wait idle CPUs.
+
+Attached patches are compile tested only.
+
+--Tsz77BKxl4wQNE2/
+Content-Type: text/x-diff; charset=3Dus-ascii
+Content-Disposition: attachment;
+	filename=3D"0001-KVM-SVM-Don-t-defer-NMI-unblocking-until-next-exit-f.patc=
+h"
+
+From eb126f1c02b418df0b5dce9e3cdbd984fc4b0611 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Tue, 13 Jun 2023 16:08:18 -0700
+Subject: [PATCH 1/2] KVM: SVM: Don't defer NMI unblocking until next exit f=
+or
+ SEV-ES guests
+
+Immediately mark NMIs as unmasked in response to #VMGEXIT(NMI complete)
+instead of setting awaiting_iret_completion and waiting until the *next*
+VM-Exit to unmask NMIs.  The whole point of "NMI complete" is that the
+guest is responsible for telling the hypervisor when it's safe to inject
+an NMI, i.e. there's no need to wait.  And because there's no IRET to
+single-step, the next VM-Exit could be a long time coming, i.e. KVM could
+incorrectly hold an NMI pending for far longer than what is required and
+expected.
+
+Opportunistically fix a stale reference to HF_IRET_MASK.
+
+Fixes: 4444dfe4050b ("KVM: SVM: Add NMI support for an SEV-ES guest")
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/sev.c |  5 ++++-
+ arch/x86/kvm/svm/svm.c | 10 +++++-----
+ 2 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index d65578d8784d..9a0e74cb6cb9 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2887,7 +2887,10 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 					    svm->sev_es.ghcb_sa);
+ 		break;
+ 	case SVM_VMGEXIT_NMI_COMPLETE:
+-		ret =3D svm_invoke_exit_handler(vcpu, SVM_EXIT_IRET);
++		++vcpu->stat.nmi_window_exits;
++		svm->nmi_masked =3D false;
++		kvm_make_request(KVM_REQ_EVENT, vcpu);
++		ret =3D 1;
+ 		break;
+ 	case SVM_VMGEXIT_AP_HLT_LOOP:
+ 		ret =3D kvm_emulate_ap_reset_hold(vcpu);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index b29d0650582e..b284706edde2 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2508,12 +2508,13 @@ static int iret_interception(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm =3D to_svm(vcpu);
+=20
++	WARN_ON_ONCE(sev_es_guest(vcpu->kvm));
++
+ 	++vcpu->stat.nmi_window_exits;
+ 	svm->awaiting_iret_completion =3D true;
+=20
+ 	svm_clr_iret_intercept(svm);
+-	if (!sev_es_guest(vcpu->kvm))
+-		svm->nmi_iret_rip =3D kvm_rip_read(vcpu);
++	svm->nmi_iret_rip =3D kvm_rip_read(vcpu);
+=20
+ 	kvm_make_request(KVM_REQ_EVENT, vcpu);
+ 	return 1;
+@@ -3916,12 +3917,11 @@ static void svm_complete_interrupts(struct kvm_vcpu=
+ *vcpu)
+ 	svm->soft_int_injected =3D false;
+=20
+ 	/*
+-	 * If we've made progress since setting HF_IRET_MASK, we've
++	 * If we've made progress since setting awaiting_iret_completion, we've
+ 	 * executed an IRET and can allow NMI injection.
+ 	 */
+ 	if (svm->awaiting_iret_completion &&
+-	    (sev_es_guest(vcpu->kvm) ||
+-	     kvm_rip_read(vcpu) !=3D svm->nmi_iret_rip)) {
++	    kvm_rip_read(vcpu) !=3D svm->nmi_iret_rip) {
+ 		svm->awaiting_iret_completion =3D false;
+ 		svm->nmi_masked =3D false;
+ 		kvm_make_request(KVM_REQ_EVENT, vcpu);
+
+base-commit: 5e74470e279654d9fa8742184c8c89837b899078
+--=20
+2.41.0.162.gfafddb0af9-goog
+
+
+--Tsz77BKxl4wQNE2/
+Content-Type: text/x-diff; charset=3Dus-ascii
+Content-Disposition: attachment;
+	filename=3D"0002-KVM-SVM-Don-t-try-to-pointlessly-single-step-SEV-ES-.patc=
+h"
+
+From fe7634942b49a243ec42ca1aaa8b9354c126b2a3 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Tue, 13 Jun 2023 15:50:44 -0700
+Subject: [PATCH 2/2] KVM: SVM: Don't try to pointlessly single-step SEV-ES
+ guests for NMI window
+
+Bail early from svm_enable_nmi_window() for SEV-ES guests without trying
+to enable single-step of the guest, as single-stepping an SEV-ES guest is
+impossible and the guest is responsible for *telling* KVM when it is ready
+for an new NMI to be injected.
+
+Functionally, setting TF and RF in svm->vmcb->save.rflags is benign as the
+field is ignored by hardware, but it's all kinds of confusing.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/svm.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index b284706edde2..06d50c9c1e48 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3768,6 +3768,20 @@ static void svm_enable_nmi_window(struct kvm_vcpu *v=
+cpu)
+ 	if (svm_get_nmi_mask(vcpu) && !svm->awaiting_iret_completion)
+ 		return; /* IRET will cause a vm exit */
+=20
++	/*
++	 * SEV-ES guests are responsible for signaling when a vCPU is ready to
++	 * receive a new NMI, as SEV-ES guests can't be single-stepped, i.e.
++	 * KVM can't intercept and single-step IRET to detect when NMIs are
++	 * unblocked (architecturally speaking).  See SVM_VMGEXIT_NMI_COMPLETE.
++	 *
++	 * Note, GIF is guaranteed to be '1' for SEV-ES guests as hardware
++	 * ignores SEV-ES guest writes to EFER.SVME, KVM suppresses EFER.SVME
++	 * (see efer_trap()), *and* CLGI/STGI are not supported NAEs in the
++	 * GHCB protocol.
++	 */
++	if (sev_es_guest(vcpu->kvm))
++		return;
++
+ 	if (!gif_set(svm)) {
+ 		if (vgif)
+ 			svm_set_intercept(svm, INTERCEPT_STGI);
+--=20
+2.41.0.162.gfafddb0af9-goog
+
+
+--Tsz77BKxl4wQNE2/--
