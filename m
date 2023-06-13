@@ -2,89 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B85272EE7E
-	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 23:59:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DFBF72EF08
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 00:17:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239026AbjFMV7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jun 2023 17:59:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47082 "EHLO
+        id S233102AbjFMWRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 18:17:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239795AbjFMV7B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jun 2023 17:59:01 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DE322968
-        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 14:58:24 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-bc68c4e046aso82810276.0
-        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 14:58:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686693498; x=1689285498;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jl3T9X01wbOvln0P81lpxrPxbx876fBi8hsjBo6kZSE=;
-        b=Fo8TNWHW+0x6UYXvqaix0T2gAuHxiszbzFgrJ8TGUs/r/lMFxHpnKS8Wu6BBFvHypL
-         0QydELvdjzgPzYURsqdbLXpSizM2X6XXzHxMdHMPBybmutkulpmmDMn/AMBFDo2IxidZ
-         C1Yyj+0rYZsBdeWQReqbV2tsynw8ot5DwfcNYLu/a1qOvJOBS6pwIxzxxAMT6sYRsqux
-         XhP2PNVChhWm9NWGB1DvGpFltt6cvNa8l5hmmCQFPriEkrAI/iYTR9mD06jHchA25sXU
-         TqgLeJGDebiDJRcfcrPkW25siw1mmZhqk6XcFdgwvHDmvNoh1toDWQV/HTStuNasxiJF
-         FOpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686693498; x=1689285498;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jl3T9X01wbOvln0P81lpxrPxbx876fBi8hsjBo6kZSE=;
-        b=fnkB/r0bIWpviB4HIa3GQiBORK9ihyik4pQjegfa23w7gANBmzlp5IWpkqZakHgWhO
-         bzVSX8Z53WmtweoF/jKN06fE1azj3d8puyQujnEqRmYUOCWuNX5eu66WzNwhWXZzTuMh
-         BAqJndFIHtHiIK3eneANcZdVf8ezyuPjL7GwCP2qxO2iFXVM5kSZYlWYzJl95RQk3z5w
-         zEvUzh29Oc1Gd7fZxe8q9Cyu4ggS9DqbR974yYaRE8+V9Ub1SiS1RMdZoaMGS4elQ/y6
-         AyGzvqvLq07f9DdYhec+HtpKEwsnJYIGHZ9YcHcy6kWjoRaa5sbCWVAzTJ5kKqcrEf9G
-         dQ0w==
-X-Gm-Message-State: AC+VfDys/snHhV0PsBCT1LQefiy1Dp3N97z/m4tYaosIRIkdgSCllGa5
-        VZ81dwSc+as2fpUE7jCUieGO2rxWtRI=
-X-Google-Smtp-Source: ACHHUZ6YA3mqzLR6OTagfaklpQ7TWS7PGMnhyzkYvYNCOMsF+i+pa+Js5h5eZURnRO9IMq5g1+lv3Rtn1S4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d604:0:b0:bc5:4150:8e8d with SMTP id
- n4-20020a25d604000000b00bc541508e8dmr72755ybg.4.1686693498786; Tue, 13 Jun
- 2023 14:58:18 -0700 (PDT)
-Date:   Tue, 13 Jun 2023 14:58:16 -0700
-In-Reply-To: <b75c9696-9abb-7a3f-0fb2-56af8ef21bb6@redhat.com>
-Mime-Version: 1.0
-References: <20230525153204.27960-1-rdunlap@infradead.org> <ZHqSYbYscprsU2qT@google.com>
- <b75c9696-9abb-7a3f-0fb2-56af8ef21bb6@redhat.com>
-Message-ID: <ZIjmeC4binNWlYoi@google.com>
-Subject: Re: [PATCH v2] KVM: MAINTAINERS: note that linux-kvm.org isn't current
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229785AbjFMWQ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jun 2023 18:16:57 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B86C3E3;
+        Tue, 13 Jun 2023 15:16:56 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A14AB62012;
+        Tue, 13 Jun 2023 22:16:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 155E5C433C8;
+        Tue, 13 Jun 2023 22:16:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686694614;
+        bh=u1U2JS+u6wM6OBhkKijCKkdxF/PQ2U4e1EnjjkO0qgU=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=hQuqhvJn3yNLy2Olxjnd1xuxCkh0wfTthUElblk3SWD5APhbp2A8h/GrhfZUDe0CA
+         msAOI8lTM4SDCJH4Jw/egXw9kHffrgpSBDU2Lq/B7FL9Ncb4kZlGiVq95JuesT+7qf
+         YEh5WOURMYPSU7yAQJlo+F3GFXuLwUg0ZCA7ynIU6Zby2JiopTRsMlBw6pN58eDxfr
+         P7S7QpyZ+fotvuzUysUkJnW2doGlPUjxnxuveW2tzsGyBUdpBclirEyYiSIpPiSYAo
+         M8uN4PP8S1NMMmXoKD0EuORe3OhQDCHvxGL87kEJWcKBMzzECpxbOCX8TRFljoINsE
+         8Ubz3n0NLn6FQ==
+Message-ID: <e52c7a74-da68-08d2-54e2-f95a8c5b52e7@kernel.org>
+Date:   Tue, 13 Jun 2023 17:16:50 -0500
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v4 27/34] nios2: Convert __pte_free_tlb() to use ptdescs
+Content-Language: en-US
+To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     linux-mm@kvack.org, linux-arch@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
+        linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
+        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
+        linux-openrisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-um@lists.infradead.org, xen-devel@lists.xenproject.org,
+        kvm@vger.kernel.org, Hugh Dickins <hughd@google.com>
+References: <20230612210423.18611-1-vishal.moola@gmail.com>
+ <20230612210423.18611-28-vishal.moola@gmail.com>
+From:   Dinh Nguyen <dinguyen@kernel.org>
+In-Reply-To: <20230612210423.18611-28-vishal.moola@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 05, 2023, Paolo Bonzini wrote:
-> On 6/3/23 03:07, Sean Christopherson wrote:
-> > It's definitely stale, though unless Red Hat (presumed hoster) plans on decomissioning
-> > the site, I'd prefer to keep the reference and instead improve the site.  We (Google)
-> > are planning on committing resources to update KVM documentation that doesn't belong
-> > in the kernel itself, and updatingwww.linux-kvm.org  instead of creating something new
-> > seems like a no-brainer.  I can't promise an updates will happen super quickly, but I
-> > will do what I can to make 'em happen sooner than later.
-> 
-> We don't plan to decommission the website (especially not the old KVM Forum
-> content), though we might move it over to the same (container-based) setup
-> as wiki.qemu.org.
-> 
-> What content do you have in mind that doesn't fit in the kernel
-> Documentation/ tree?
 
-Mostly developer focused stuff, e.g. using KVM to test/debug kernels and/or KVM
-itself, using 9PFS to hoist modules from into a VM without having to install the
-kernel in the guest image, in-depth walkthroughs of various code flows (e.g. how
-KVM takes an EPT violation and turns that into a mapping), etc.
+
+On 6/12/23 16:04, Vishal Moola (Oracle) wrote:
+> Part of the conversions to replace pgtable constructor/destructors with
+> ptdesc equivalents.
+> 
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> ---
+>   arch/nios2/include/asm/pgalloc.h | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/nios2/include/asm/pgalloc.h b/arch/nios2/include/asm/pgalloc.h
+> index ecd1657bb2ce..ce6bb8e74271 100644
+> --- a/arch/nios2/include/asm/pgalloc.h
+> +++ b/arch/nios2/include/asm/pgalloc.h
+> @@ -28,10 +28,10 @@ static inline void pmd_populate(struct mm_struct *mm, pmd_t *pmd,
+>   
+>   extern pgd_t *pgd_alloc(struct mm_struct *mm);
+>   
+> -#define __pte_free_tlb(tlb, pte, addr)				\
+> -	do {							\
+> -		pgtable_pte_page_dtor(pte);			\
+> -		tlb_remove_page((tlb), (pte));			\
+> +#define __pte_free_tlb(tlb, pte, addr)					\
+> +	do {								\
+> +		pagetable_pte_dtor(page_ptdesc(pte));			\
+> +		tlb_remove_page_ptdesc((tlb), (page_ptdesc(pte)));	\
+>   	} while (0)
+>   
+>   #endif /* _ASM_NIOS2_PGALLOC_H */
+
+Applied!
+
+Thanks,
+Dinh
