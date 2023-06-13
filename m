@@ -2,368 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A418972EA05
-	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 19:39:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5C5E72EA0F
+	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 19:41:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239303AbjFMRjA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jun 2023 13:39:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35684 "EHLO
+        id S231954AbjFMRkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 13:40:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234961AbjFMRi7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jun 2023 13:38:59 -0400
-Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9381E92;
-        Tue, 13 Jun 2023 10:38:57 -0700 (PDT)
-Received: by mail-oo1-xc30.google.com with SMTP id 006d021491bc7-55b3a245359so4070133eaf.2;
-        Tue, 13 Jun 2023 10:38:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686677937; x=1689269937;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oyOAYNwVkM9HUvnjcsU6Sed1pY4ZELlXPdhcPMMxRNQ=;
-        b=HtE6LkDQzqAroSxVz1WSGUQgxRqBGs1BAAt/3QddS0BVWlUONyAiP25CSjJIwz+TwP
-         03zbNqGvPtpC9o3hQ2dPhHArP43btCX81GSdxa74E+wgpt+bdqkMstCY72zjJJ5+5eWd
-         FAf6QyRgFZ3Kl4mzkqlDdPncEkYpBxYOtkLGFPmdCYrAmn0omlBzLv1UOoNv6hH8lKin
-         lufkrncrH1W3W0UaUFm59d6Rw9rrZJI3pJ2ShLMyCVQEJNNY/eUiX06BlpuhaCz7Z3yC
-         tTe8rr4+FGYWZDns5e51RhDrJxURAXTp+Elpx0LyHSD1HPQ5Dl3+YVQzQGYzC3Aq810+
-         8/mQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686677937; x=1689269937;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oyOAYNwVkM9HUvnjcsU6Sed1pY4ZELlXPdhcPMMxRNQ=;
-        b=RplUsCDZyPLfpSGsmTqmpuy22/PjaZNczSYrLGy55LyEbyiGY9Uf6LgGYdcmRALakT
-         tGMY7xQDw+9zANTfaOI5YrF1OaCPD+LOCeDn9Z2Z/OJSQpBFsG1ujvMKCM5GMLwiLYSO
-         1IQDzRyEHqriAmsu3kE9kfJyaD2OehubTDTylvOtmkSXmmckIQ0xmIdmVYQB5tmLQ2ts
-         1LTPwuGFDTTukFAnIPJeI2W/JxAa+22ueMWof4U7IGdzxnHrewuopq5aWl3IaAwldOkS
-         Mf0qfVPR5RZcp1SWMOXUDQieODQJvMtP9uebE4a1OZb/AE9hPtHUR+q1pee3k1KpCaV/
-         AffQ==
-X-Gm-Message-State: AC+VfDz5mtPryt/NIl+yOCXmWJwvQxNn9gpj83woRJgb6c+GlYIAMGZY
-        OcOonGqNrathwHKIDEBKQn0=
-X-Google-Smtp-Source: ACHHUZ5aaBEo+mtY0JtXxeGFVVHLQbdNB0zHalhcuSeuJrsLjXPmcXl4cqFf0clS0qyIAD396VD/7Q==
-X-Received: by 2002:a05:6808:b0c:b0:39c:71fc:4cb4 with SMTP id s12-20020a0568080b0c00b0039c71fc4cb4mr6706788oij.58.1686677936711;
-        Tue, 13 Jun 2023 10:38:56 -0700 (PDT)
-Received: from localhost ([192.55.54.50])
-        by smtp.gmail.com with ESMTPSA id u16-20020a63f650000000b00502f4c62fd3sm9685685pgj.33.2023.06.13.10.38.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jun 2023 10:38:56 -0700 (PDT)
-Date:   Tue, 13 Jun 2023 10:38:54 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chen, Bo2" <chen.bo@intel.com>, "Shahar, Sagi" <sagis@google.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Aktas, Erdem" <erdemaktas@google.com>,
+        with ESMTP id S240199AbjFMRkS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jun 2023 13:40:18 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2052.outbound.protection.outlook.com [40.107.223.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2CFDAA;
+        Tue, 13 Jun 2023 10:40:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SHqeDR1Nb78D6wPQ3BXRuhPu2J95SiuZCz1XMmTlna6OEQKF9hJhHUi+NSsp30S/vR6XrL5T+Wf5InL62eK3jPUzzwg3lpHGFxiM6yWbrVLNddmM3R4XkYfQ7iVDWVNY3K+V4bhkAIKh7sXS9fhy1uVI5nplCdez1Nn4z0O2ZKxI7s9rgR2usxncPErlugweKS3qo+Ka7tKbf5goGvm0zMcxaFsAEWwQWWLmLbP+WxAcE8ByI4cbcmVsYbvMC5qVJcDKcfH8yzos4pnHSzQSHcRXyjSTBNPWrqG4MX8/g8e5c+FdsazoipvTk0M/K96xJTyuMU+ZZP+znFlTtKo1ag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tVj50uJtxUbR8LsKpR2S9+yMnv5LAyOfTnZCqu6d74w=;
+ b=lhW03x+8gIAG5uKYcK3hRZUlwj4hXSsj9KgHfNWYClfg+C7FlmGvlxaD5CA5EcCRZy+swdEG5a814yFucEds1FjqwGOmbhZI7Ebey75zpBFoF5jV08dwXq8k2gUwHBwfGtLZ0Ea/ddcAePEBdeVe5k6QETGMaa0O6uQ94lt+JEGAvHsXtIb9VdZIVIkHli3RHfX2D0xGLEs6z3iWiMEyH6ss2EdT+sFe/7bflvlET3opuDgx/vo74isLrtWUO0PPDICaE6Irg6c8KBX3d9rfKLC1EsZzgb2TdzBk3DKc+fZH/DELbXWPcO7S0ovUQYiX94OaSQci9hlg0HhlYia9eg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tVj50uJtxUbR8LsKpR2S9+yMnv5LAyOfTnZCqu6d74w=;
+ b=Te2V/eIpcT1QGtR/N76xxY3HgtefbE4PRpcyndjrNXzsi9i/k6UC62iAtrTRO56/glqiMLKxY43jQ4tzFq63nKSqTl4KpknrPZqvH3bbJSqgOQ+DB4MHLGTgLQQdkusB/SKNgpciyU0hJkpdeE0/LDFH2e3kJ0JEoyUzEqgMqX+adDrOAI0je4dpJ4TflpHDNX0iwBr2Yhu5LH/rHkyp93m9KUOmIJdHVv8m5JwziaQoVXIEu/VGXi1ldkrIxDAOfuPZuZwMSUIGRXIlbi9kTYonxRSNxgdQBzBW+1nkim71VjlgKTadAYmXbnxboMpJrdXbsN7YuY3WdPveIU014w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SJ2PR12MB8690.namprd12.prod.outlook.com (2603:10b6:a03:540::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.38; Tue, 13 Jun
+ 2023 17:40:14 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%6]) with mapi id 15.20.6455.030; Tue, 13 Jun 2023
+ 17:40:14 +0000
+Date:   Tue, 13 Jun 2023 14:40:10 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "dmatlack@google.com" <dmatlack@google.com>,
-        "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>
-Subject: Re: [PATCH v14 004/113] KVM: TDX: Initialize the TDX module when
- loading the KVM intel kernel module
-Message-ID: <20230613173854.GP2244082@ls.amr.corp.intel.com>
-References: <cover.1685333727.git.isaku.yamahata@intel.com>
- <e628e2d235d9b6c00b9bd5d81bb69136b77d13c4.1685333727.git.isaku.yamahata@intel.com>
- <3d8355ae582119486ac7ec129c4ba18d2cdf3ccb.camel@intel.com>
- <20230607180616.GF2244082@ls.amr.corp.intel.com>
- <6b60200b23fa3eac689a140abb92506410b14531.camel@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "clegoate@redhat.com" <clegoate@redhat.com>
+Subject: Re: [PATCH v7 8/9] vfio/pci: Extend
+ VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for vfio device cdev
+Message-ID: <ZIip+nGKr8+jZb1z@nvidia.com>
+References: <20230602121515.79374-1-yi.l.liu@intel.com>
+ <20230602121515.79374-9-yi.l.liu@intel.com>
+ <ZIhXMmYjCyUdlGxe@nvidia.com>
+ <DS0PR11MB7529CFADCF0D6D6451E4F92AC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <20230613083229.44a3f3ec.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6b60200b23fa3eac689a140abb92506410b14531.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230613083229.44a3f3ec.alex.williamson@redhat.com>
+X-ClientProxiedBy: BY5PR20CA0032.namprd20.prod.outlook.com
+ (2603:10b6:a03:1f4::45) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ2PR12MB8690:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87b9f322-a4c2-4e01-a7e5-08db6c353e07
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 569GWIK6NbY84ZvZ4faiB/ED2kPl0F74scdPRGWTOi83GcrZy18qZS1iQP96ulmlcI7KFttUAGv7rjrtJRvv/kIcuEd11CTdlg9GpLcrM27+MQJpQo8cBohKxuCssrPoUBsxj5GpToMd3u0XLM/ZbzSemS1Tlj9W2s+rDUeE3UvzkJY3AA5aKZNBWEHjMOaRcd5Wz5mHzjN3Gr749LtsPqngFqNwdgvHs1fm/FF/GyjD3CM1IL40cERKirngK/foa897S6lILCkMG5unu+Frv05EWzhC0OQ7y6J4HWolI/8tGZnd68GuqkGmty+5quYJ0ezCQArvdu8ujlLgU5CdasnQVvQDMj2QqRCIOYelH+f+GkZw9JUNbF+jOCXFSyb21hwEnJwxp69GyrBnENFMghknscbXs4acsEadyClCprcLCp4OU+AwSWSytkeNmi5UxVAcQoaG9cHrolAnrz/E8OJI9BT9D7hRdU2FvwlDZiJkpMSDDAuSwuANLq3Ec+Qu+feHoY1hTWycZew1tWy0sQfloyaKBq2B8uYiKM7MqMf9z1bfD9RSQu1+QqoMbLh/
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(396003)(136003)(366004)(346002)(451199021)(36756003)(2906002)(7416002)(86362001)(6916009)(6506007)(83380400001)(6666004)(5660300002)(26005)(6512007)(316002)(66556008)(186003)(54906003)(66946007)(478600001)(4326008)(66476007)(38100700002)(6486002)(41300700001)(8936002)(2616005)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LgvwNPrgXJorT6BCSwVBX7LGxzfT0DBqWs7Y5rh4c+WjV7xRXyPEXCRpvWH9?=
+ =?us-ascii?Q?7g/uetW6ftc2NCbck0Pn+5P2TAeCc2a7MCe+yHGnzI5h9o5Dp5OtplOxapSl?=
+ =?us-ascii?Q?aqbRZ+ZvPkGYERX1y3wqGrREabHT4OJSm00d8qSKEqpr2+hppk7qq8emsgqe?=
+ =?us-ascii?Q?wlVFLnm62EMDD1r3WydkxBggxFbuML+UEKJ1HSvhiQjIpgWrS78XaAXyRm7a?=
+ =?us-ascii?Q?r1ev01nUQq+X93tAvvZQ6qelON9Hal9OBhOo4mqFEqPwV08RvX+IuLc4cNKE?=
+ =?us-ascii?Q?W4WzvyOYQYAMKCitHPwVv0msUKctAtxwwPTToHURqC+QvNooMwf1eLwRcz6x?=
+ =?us-ascii?Q?KtnGeNEuC2sN7BO5B26s7g8+jBjI8Ho+Z2YVdOHL35k0AVpAgf/KwSczkMmR?=
+ =?us-ascii?Q?/C1xJ/86JJRKZmlK0tNT6JLILJa7/uZe/2YgVfFYhDfp2KQtldzhNZ69/xGb?=
+ =?us-ascii?Q?dlJSR7akYVXHxfe+fvc/u42csSAWEHRBf2+269TSEFjR1ZLfu0a/Yvstq4cX?=
+ =?us-ascii?Q?Re8jyB6SQdnhy1KK2d3qOr8TeudlZYoEayPaka7hC8HJ7UWDb4uHGvfCpILt?=
+ =?us-ascii?Q?X9tZZUxV9Cu5dwtboHro0BDq62QQbb0fXiJvH9oAybxjzZg8TihPSx0nO5OI?=
+ =?us-ascii?Q?Qc65T/n+t11DlJLrm1qTVWwHqOkxYbnhrkLRS4hIkmYktCUBhj0QAf78vVXe?=
+ =?us-ascii?Q?YhAUi7pdhU2k+xe0Dfpg6V4NnJFOGdIM5RpAVSaD5n/qzGFkOgR9lyxQONiX?=
+ =?us-ascii?Q?Apnmx38XPuq9bjVcY0FIhNtjTJ0VilhvAZqto0fJOfH7gFBM+s0I3/PKBpnc?=
+ =?us-ascii?Q?jVFWpRD6duvUFoFkukLlSbqDa6uAZNMLfC6wBSvrT+BkQtsWijrqQktb0bS1?=
+ =?us-ascii?Q?yojdZDH0eSxnYTBb0Jn/8BetV4meyKk/HzMVX+MJmhhbz0jjXFcRRoQEffV+?=
+ =?us-ascii?Q?4PReLNEtFueHlupdcdaK0jyfRyOWipRckfHHUsdwnbssSvUmyVtvuPkTI1F2?=
+ =?us-ascii?Q?qt+uW4V5+pw1etb4nGcw6Fga/vwW+JNp+VUuNlbGR/QQKFRUXFsK4ynqm24E?=
+ =?us-ascii?Q?YYi50ojS8qfeSIqsykFm/CgF35Q9p0kThZGvWJNI5AiPDP5ESP9zFDLYX/q7?=
+ =?us-ascii?Q?sGNxVqR4sDlCiQyIXkbOgx80tsDpHLVxTvJVQND66t50Lwsc66oHnyb/NUKw?=
+ =?us-ascii?Q?K6euNrhT8lfeP1+XFLLVoE4Vm+jKQNq5d0v5oi5Lyax4UGSJ2r8Q6wEyeYVV?=
+ =?us-ascii?Q?lcGV2FD8LqegvKm+KyAwv6kTTYKk+tfENtHpcBmTmDKTbJTUph9N3Xec03Pe?=
+ =?us-ascii?Q?hAWOqmIu1r68xtc0D6AKbousc9LtiGk2jbB31/a1RCy3SwFbowq74iNaedZU?=
+ =?us-ascii?Q?Bll1T3DYvqBo/zjuFM/uhgabmyDZ2uqsymMAHuyRjgYh0zQqwSyBoe9HUfP4?=
+ =?us-ascii?Q?jMlFl74rQRwGhYO3VOO6SIsJpqQrmSHZk6YKHd6puXigYego1hvCOfm4sc4x?=
+ =?us-ascii?Q?Yb+2wFbPJ+Fg9o0QF1e5NpcLdQ6jjG5PH5WRfy5N+whqpvUsNEKqsFsMkQkU?=
+ =?us-ascii?Q?URPkOvjF9jgqNMGD+NpSCsQy6R02dqItiZyFoGvm?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87b9f322-a4c2-4e01-a7e5-08db6c353e07
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2023 17:40:13.4231
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: t/iEmoD54tpWPUEn+xqRIQYqMe7cWaijIBvEr5m3EHiIlHyQJtRb20do66dtIRX4
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8690
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 12, 2023 at 11:55:14PM +0000,
-"Huang, Kai" <kai.huang@intel.com> wrote:
-
-> On Wed, 2023-06-07 at 11:06 -0700, Isaku Yamahata wrote:
-> > Thanks for pointing it out. The following is the fix.
+On Tue, Jun 13, 2023 at 08:32:29AM -0600, Alex Williamson wrote:
+> On Tue, 13 Jun 2023 12:50:43 +0000
+> "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> 
+> > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > Sent: Tuesday, June 13, 2023 7:47 PM
+> > > 
+> > > On Fri, Jun 02, 2023 at 05:15:14AM -0700, Yi Liu wrote:  
+> > > > +/*
+> > > > + * Return devid for a device which is affected by hot-reset.
+> > > > + * - valid devid > 0 for the device that is bound to the input
+> > > > + *   iommufd_ctx.
+> > > > + * - devid == VFIO_PCI_DEVID_OWNED for the device that has not
+> > > > + *   been bound to any iommufd_ctx but other device within its
+> > > > + *   group has been bound to the input iommufd_ctx.
+> > > > + * - devid == VFIO_PCI_DEVID_NOT_OWNED for others. e.g. device
+> > > > + *   is bound to other iommufd_ctx etc.
+> > > > + */
+> > > > +int vfio_iommufd_device_hot_reset_devid(struct vfio_device *vdev,
+> > > > +					struct iommufd_ctx *ictx)
+> > > > +{
+> > > > +	struct iommu_group *group;
+> > > > +	int devid;
+> > > > +
+> > > > +	if (vfio_iommufd_device_ictx(vdev) == ictx)
+> > > > +		return vfio_iommufd_device_id(vdev);
+> > > > +
+> > > > +	group = iommu_group_get(vdev->dev);
+> > > > +	if (!group)
+> > > > +		return VFIO_PCI_DEVID_NOT_OWNED;
+> > > > +
+> > > > +	if (iommufd_ctx_has_group(ictx, group))
+> > > > +		devid = VFIO_PCI_DEVID_OWNED;
+> > > > +	else
+> > > > +		devid = VFIO_PCI_DEVID_NOT_OWNED;
+> > > > +
+> > > > +	iommu_group_put(group);
+> > > > +
+> > > > +	return devid;
+> > > > +}
+> > > > +EXPORT_SYMBOL_GPL(vfio_iommufd_device_hot_reset_devid);  
+> > > 
+> > > This function really should not be in the core iommufd.c file - it is
+> > > a purely vfio-pci function - why did you have to place it here?  
 > > 
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index 8a1d0755d275..b0d3f646afb1 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -4499,26 +4499,39 @@ u64 tdx_non_arch_field_switch(u64 field)
-> >  	}
-> >  }
-> >  
-> > -static void __init vmx_tdx_on(void *info)
-> > +struct vmx_tdx_enabled {
-> > +	cpumask_var_t vmx_enabled;
-> > +	atomic_t *err;
-> > +};
-> > +
+> > Put it here can avoid calling iommufd_ctx_has_group() in vfio-pci,
+> > which requires to import IOMMUFD_NS. If this reason is not so
+> > strong I can move it back to vfio-pci code.
 > 
-> Sorry for late reply.
-> 
-> I think you just need to mimic hardware_enable_all() -- using a per-cpu
-> variable.  In this way you can get rid of this structure.
-> 
-> But again, we have listed a couple of options in the v13 discussion [1]:
-> 
-> 1) Call kvm_ops_update() twice before and after hardware_setup() in order to use
-> hardware_enable_all() directly.
-> 
-> 2) Expose kvm_x86_ops as symbol so VMX can set hardware_{enable|disable}()
-> callback before hardware_setup() in order to use hardware_enable_all().
-> 
-> 3) Implement VMX's own hardware_enable_all() logic as shown in this patch.
-> 
-> 4) ???
-> 
-> I think it would be better if Sean can provide some comments here, but until he
-> does, we can keep using option 3) (this patch).
-> 
-> [1]
-> https://lore.kernel.org/lkml/5dc84a2601a47ccc29ef43200cf3ec0d1b485d23.camel@intel.com/
+> The PCI-isms here are the name of the function and the return value,
+> otherwise this is simply a "give me the devid for this device in this
+> context".  The function name is trivial to change and we can define the
+> internal errno usage such that the vfio-pci-core code can interpret the
+> correct uAPI value.  For example, -EXDEV ("Cross-device link") could
+> maybe be interpreted as owned and any other errno is not-owned, -ENODEV
+> maybe being the default.
 
-Ok, makes sense. Here is the updated version with the fix for the error you
-pointed out.  Introduce cpu bitmap to track which cpu enable VMX(VMXON)
-successfully.  Disable VMX off only for cpu with bit set.
+Yeah, this approach seems logical
 
+If the function is called
 
-From 01dbb58b50e3119da9c3d639a10eb5d0029ee944 Mon Sep 17 00:00:00 2001
-Message-Id: <01dbb58b50e3119da9c3d639a10eb5d0029ee944.1686677692.git.isaku.yamahata@intel.com>
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-Date: Tue, 22 Feb 2022 14:44:15 -0800
-Subject: [PATCH] KVM: TDX: Initialize the TDX module when loading the KVM
- intel kernel module
+  vfio_iommufd_get_dev_id(struct vfio_device *vdev, struct iommufd_ctx *ictx)
 
-TDX requires several initialization steps for KVM to create guest TDs.
-Detect CPU feature, enable VMX (TDX is based on VMX) on all online CPUs,
-detect the TDX module availability, initialize it and disable VMX.
+Then maybe 
+  ENOENT = device is owned but there is no Id
+  ENODEV = device is not owned
 
-To enable/disable VMX on all online CPUs, utilize
-vmx_hardware_enable/disable().  The method also initializes each CPU for
-TDX.  TDX requires calling a TDX initialization function per logical
-processor (LP) before the LP uses TDX.  When the CPU is becoming online,
-call the TDX LP initialization API.  If it fails to initialize TDX, refuse
-CPU online for simplicity instead of TDX avoiding the failed LP.
+EXDEV is good too, nice symmetry with ENODEV - it doesn't really
+matter since there is only one caller and there is no embedded errno
+propogation.
 
-There are several options on when to initialize the TDX module.  A.) kernel
-module loading time, B.) the first guest TD creation time.  A.) was chosen.
-With B.), a user may hit an error of the TDX initialization when trying to
-create the first guest TD.  The machine that fails to initialize the TDX
-module can't boot any guest TD further.  Such failure is undesirable and a
-surprise because the user expects that the machine can accommodate guest
-TD, but not.  So A.) is better than B.).
-
-Introduce a module parameter, kvm_intel.tdx, to explicitly enable TDX KVM
-support.  It's off by default to keep the same behavior for those who don't
-use TDX.  Implement hardware_setup method to detect TDX feature of CPU and
-initialize TDX module.
-
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- arch/x86/kvm/Makefile      |  1 +
- arch/x86/kvm/vmx/main.c    | 34 ++++++++++++++-
- arch/x86/kvm/vmx/tdx.c     | 84 ++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/x86_ops.h |  8 ++++
- 4 files changed, 125 insertions(+), 2 deletions(-)
- create mode 100644 arch/x86/kvm/vmx/tdx.c
-
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 0e894ae23cbc..4b01ab842ab7 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -25,6 +25,7 @@ kvm-$(CONFIG_KVM_SMM)	+= smm.o
- kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
- 			   vmx/hyperv.o vmx/nested.o vmx/posted_intr.o vmx/main.o
- kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
-+kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
- 
- kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
- 			   svm/sev.o svm/hyperv.o
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index bbeb32d40b8b..af037d1367e7 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -6,6 +6,36 @@
- #include "nested.h"
- #include "pmu.h"
- 
-+static bool enable_tdx __ro_after_init;
-+module_param_named(tdx, enable_tdx, bool, 0444);
-+
-+static int vt_hardware_enable(void)
-+{
-+	int ret;
-+
-+	ret = vmx_hardware_enable();
-+	if (ret || !enable_tdx)
-+		return ret;
-+
-+	ret = tdx_cpu_enable();
-+	if (ret)
-+		vmx_hardware_disable();
-+	return ret;
-+}
-+
-+static __init int vt_hardware_setup(void)
-+{
-+	int ret;
-+
-+	ret = vmx_hardware_setup();
-+	if (ret)
-+		return ret;
-+
-+	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
-+
-+	return 0;
-+}
-+
- #define VMX_REQUIRED_APICV_INHIBITS				\
- 	(BIT(APICV_INHIBIT_REASON_DISABLE)|			\
- 	 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
-@@ -22,7 +52,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 
- 	.hardware_unsetup = vmx_hardware_unsetup,
- 
--	.hardware_enable = vmx_hardware_enable,
-+	.hardware_enable = vt_hardware_enable,
- 	.hardware_disable = vmx_hardware_disable,
- 	.has_emulated_msr = vmx_has_emulated_msr,
- 
-@@ -157,7 +187,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- };
- 
- struct kvm_x86_init_ops vt_init_ops __initdata = {
--	.hardware_setup = vmx_hardware_setup,
-+	.hardware_setup = vt_hardware_setup,
- 	.handle_intel_pt_intr = NULL,
- 
- 	.runtime_ops = &vt_x86_ops,
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-new file mode 100644
-index 000000000000..8a378fb6f1d4
---- /dev/null
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -0,0 +1,84 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <linux/cpu.h>
-+
-+#include <asm/tdx.h>
-+
-+#include "capabilities.h"
-+#include "x86_ops.h"
-+#include "x86.h"
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+static int __init tdx_module_setup(void)
-+{
-+	int ret;
-+
-+	ret = tdx_enable();
-+	if (ret) {
-+		pr_info("Failed to initialize TDX module.\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+struct vmx_tdx_enabled {
-+	cpumask_var_t vmx_enabled;
-+	atomic_t err;
-+};
-+
-+static void __init vmx_tdx_on(void *_vmx_tdx)
-+{
-+	struct vmx_tdx_enabled *vmx_tdx = _vmx_tdx;
-+	int r;
-+
-+	r = vmx_hardware_enable();
-+	if (!r) {
-+		cpumask_set_cpu(smp_processor_id(), vmx_tdx->vmx_enabled);
-+		r = tdx_cpu_enable();
-+	}
-+	if (r)
-+		atomic_set(&vmx_tdx->err, r);
-+}
-+
-+static void __init vmx_off(void *_vmx_enabled)
-+{
-+	cpumask_var_t *vmx_enabled = (cpumask_var_t *)_vmx_enabled;
-+
-+	if (cpumask_test_cpu(smp_processor_id(), *vmx_enabled))
-+		vmx_hardware_disable();
-+}
-+
-+int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
-+{
-+	struct vmx_tdx_enabled vmx_tdx = {
-+		.err = ATOMIC_INIT(0),
-+	};
-+	int r = 0;
-+
-+	if (!enable_ept) {
-+		pr_warn("Cannot enable TDX with EPT disabled\n");
-+		return -EINVAL;
-+	}
-+
-+	if (!zalloc_cpumask_var(&vmx_tdx.vmx_enabled, GFP_KERNEL)) {
-+		r = -ENOMEM;
-+		goto out;
-+	}
-+
-+	/* tdx_enable() in tdx_module_setup() requires cpus lock. */
-+	cpus_read_lock();
-+	on_each_cpu(vmx_tdx_on, &vmx_tdx, true);	/* TDX requires vmxon. */
-+	r = atomic_read(&vmx_tdx.err);
-+	if (!r)
-+		r = tdx_module_setup();
-+	else
-+		r = -EIO;
-+	on_each_cpu(vmx_off, &vmx_tdx.vmx_enabled, true);
-+	cpus_read_unlock();
-+	free_cpumask_var(vmx_tdx.vmx_enabled);
-+
-+out:
-+	return r;
-+}
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 051b5c4b5c2f..a30683c6d822 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -20,6 +20,8 @@ bool kvm_is_vmx_supported(void);
- int __init vmx_init(void);
- void vmx_exit(void);
- 
-+__init int vmx_hardware_setup(void);
-+
- extern struct kvm_x86_ops vt_x86_ops __initdata;
- extern struct kvm_x86_init_ops vt_init_ops __initdata;
- 
-@@ -133,4 +135,10 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
- #endif
- void vmx_setup_mce(struct kvm_vcpu *vcpu);
- 
-+#ifdef CONFIG_INTEL_TDX_HOST
-+int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
-+#else
-+static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
-+#endif
-+
- #endif /* __KVM_X86_VMX_X86_OPS_H */
--- 
-2.25.1
-
-
-
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Jason
