@@ -2,76 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16E7072E365
-	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 14:55:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3556A72E366
+	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 14:55:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240495AbjFMMzQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jun 2023 08:55:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50400 "EHLO
+        id S241780AbjFMMzq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 08:55:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242497AbjFMMzK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jun 2023 08:55:10 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC22F10D9
-        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 05:55:08 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-652d1d3e040so4140319b3a.1
-        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 05:55:08 -0700 (PDT)
+        with ESMTP id S239139AbjFMMzk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jun 2023 08:55:40 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CC00173E;
+        Tue, 13 Jun 2023 05:55:38 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4f6170b1486so6682620e87.0;
+        Tue, 13 Jun 2023 05:55:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686660908; x=1689252908;
-        h=to:references:message-id:cc:date:in-reply-to:from:subject
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=N9+J5pkzNukUkC+uqb2tz8DIK3px0ww4xZnjqp8unR0=;
-        b=bKuxr4gjk2PMj61xfuW+ebHXU8+iCXVxu3jnqjg+5fgtRsnA2us+DfnrHaM2rka0Fj
-         AqpYG7fycKc80sFo4JRtHu+kRafFlBnTmFHR0R96zVr9wnQUKyFpMk2lFvmD7/36FJH6
-         CPMryp9EuBngD8qVgoxwVMLCmtRas9uT7yV+LfGliL0JZeFSHJumKgbWgqbcd26aGmVE
-         YVRyvV6u9K1uA6DXLLJsZ9FO9siuFNSXpRj9vJxOIqGZVD0+A+RllTpNrQjJaK38c7LA
-         soMcmByTGygWFzo+1JVOZSH7WR4m/7mXhmIix1SR8OFrEgeB7t+l/8aKXsw1lm1HfoCB
-         Lnag==
+        d=gmail.com; s=20221208; t=1686660936; x=1689252936;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7W4Ko7B93IyT3dfDQ20KvPSlqIiHOiBygYp9QycGPqs=;
+        b=nRlCBrjUCbQYb/IV7ca5ZWxF4mIazYwhIIOhnxiMieuweYM8m1KLxoDqTKPsenscqE
+         NXw8H6iao41gaI8Lg/5p4XKred2dJPaVOKj3hhIQDaUgeuoVKR7LWglPLX0FPaKDPth6
+         mDInWTkkApDulCDMZBlMho4gsnXecb+PDMC57fPausljNELnJsszsBzbtWuZaT6J/QUr
+         avx7QWXKEGae1rHK7rs06lok9x7Qgx7fnHHrRV+rBFIWGYhF1ul9P5qVbdJ/9G0wT4bm
+         tn8IhXeVqbTTACz8vC2iCmp/uqPWqtqJw+mgSY0pn4hSnoJN0zz2n/mXm/BZFzN2jfhY
+         0lNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686660908; x=1689252908;
-        h=to:references:message-id:cc:date:in-reply-to:from:subject
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N9+J5pkzNukUkC+uqb2tz8DIK3px0ww4xZnjqp8unR0=;
-        b=l1KwdQoXKBydOi0So1LyMRurR5OwYr+APWHIik2jbWgNZNgrnfUqmkO/FhgYIBIF3h
-         yVBkhs2iN7WRzuAnHmSRrdF6CoilbQrQEl5XZXKagwNuDxOHN4cncYW/zzWCGflID/2o
-         O+OkD0rpMUf9ps0V6/kMMbzsYwAjfKc8HAXwMnNxfPTImmDozcImzyrwfLKWtT7OMoc+
-         JqODflGy+BvXsKkym0QIGEkE5xiA3HP72VoiCQEOQfr1Dnka0RczOJeLTSskpEAmnwMw
-         pqILEzLtL4lTFi7gdypueQM8lhPVAeaRV2kUgyFEnv7/ID4gjUPPUqDqUt6Vaj+Wmu5J
-         SwvQ==
-X-Gm-Message-State: AC+VfDxHbX727k01VaExpc0JehPjW7EDU7YkB7BeKTIQIHbWMvY45wFd
-        VPfkd0PWUPGNVRTZgRx7SoY=
-X-Google-Smtp-Source: ACHHUZ7MfQ83oeDmCKmmF5IR2/dUBT3Uiq0Q33EsEyZFdNt5EmdBPOC7p+P3Sv0wyKFxK0zN35mfmA==
-X-Received: by 2002:a05:6a20:3d17:b0:10c:41a6:ac1f with SMTP id y23-20020a056a203d1700b0010c41a6ac1fmr13360873pzi.16.1686660907717;
-        Tue, 13 Jun 2023 05:55:07 -0700 (PDT)
-Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id v3-20020a170902d68300b001b243a5a5e1sm3553874ply.298.2023.06.13.05.55.06
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Jun 2023 05:55:07 -0700 (PDT)
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_2916A246-24B3-4374-86EF-1037BF8708A3";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
-Subject: Re: [kvm-unit-tests PATCH v6 00/32] EFI and ACPI support for arm64
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20230613-6b1cb3080babea45f2542c49@orel>
-Date:   Tue, 13 Jun 2023 05:54:53 -0700
-Cc:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
-        alexandru.elisei@arm.com, ricarkol@google.com, shahuang@redhat.com
-Message-Id: <D24DE2A5-2655-41C8-8320-69E1AD67823D@gmail.com>
-References: <20230530160924.82158-1-nikos.nikoleris@arm.com>
- <CC2B570B-9EE0-4686-ADF3-82D1ECDD5D8A@gmail.com>
- <20230612-6e1f6fac1759f06309be3342@orel>
- <5fb09d21-437d-f83e-120f-8908a9b354c1@arm.com>
- <EE9170FC-8229-4D93-AD98-35394494CE61@gmail.com>
- <de16e445-b119-d908-a4dc-c0d7cf942413@arm.com>
- <20230613-6b1cb3080babea45f2542c49@orel>
-To:     Andrew Jones <andrew.jones@linux.dev>
-X-Mailer: Apple Mail (2.3731.600.7)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        d=1e100.net; s=20221208; t=1686660936; x=1689252936;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7W4Ko7B93IyT3dfDQ20KvPSlqIiHOiBygYp9QycGPqs=;
+        b=VMVT2zqD9YU8A3zYlGHeXJDuYkGoGvMfBTwanGI91djqp7Kc5pVU+EBbKqhNVxs8b9
+         5TrcBwMt9q6Eqtv8U4zPsJATLX7s4c4apB10l3c4g5GuW8n/aGkWAdj3Zb/jv1Sp9H1H
+         tmMNB0WD1xoJdgYVhRPwg7zuWoHBLNl/FoLUypfWDaZZfijIIOWM1H/tLiUzUzrLpoC4
+         P52Ram6pCYG0F17sdLJeLDOq/cyzk/fwJ7JQD1eJkZLH1uCcaGWcwYdKw6X/J8lZqkVl
+         mGwYIAwQ48EwyQWxN/EhogiIovWc7PIDNegbqqzzoX6TZlbEE3DBUYz3/2ga2lQwpvnn
+         ElGA==
+X-Gm-Message-State: AC+VfDyZNooupQkZkzaoHCJ3+GxOa+Le+EFHuw51JlRCfMiNuifIVjTj
+        4BFX3LNevnj5gnZPAVUKtUk=
+X-Google-Smtp-Source: ACHHUZ5aEihzgwDHTfPgw2C4xeRI9zWQt88zi7pcD1IPMvrLDYIuZFevQCvhsGhyvFAtw3uIfC+Bjw==
+X-Received: by 2002:a19:e057:0:b0:4f4:d60a:e387 with SMTP id g23-20020a19e057000000b004f4d60ae387mr4045663lfj.1.1686660936507;
+        Tue, 13 Jun 2023 05:55:36 -0700 (PDT)
+Received: from ?IPV6:2a0b:6204:4302:5f00:4dab:3483:4506:9a0e? ([2a0b:6204:4302:5f00:4dab:3483:4506:9a0e])
+        by smtp.gmail.com with ESMTPSA id g12-20020a19ee0c000000b004eff6c7bc08sm1759382lfb.75.2023.06.13.05.55.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Jun 2023 05:55:36 -0700 (PDT)
+From:   "bibo, mao" <bibo.mao@gmail.com>
+X-Google-Original-From: "bibo, mao" <maobibo@loongson.cn>
+Message-ID: <a4b3a4cc-b424-d1cf-5583-16de24d58873@loongson.cn>
+Date:   Tue, 13 Jun 2023 20:55:32 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v13 07/30] LoongArch: KVM: Implement vcpu run interface
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Xi Ruoyao <xry111@xry111.site>, tangyouling@loongson.cn,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20230609090832.2131037-1-zhaotianrui@loongson.cn>
+ <20230609090832.2131037-8-zhaotianrui@loongson.cn>
+In-Reply-To: <20230609090832.2131037-8-zhaotianrui@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -80,64 +83,116 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---Apple-Mail=_2916A246-24B3-4374-86EF-1037BF8708A3
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
 
 
+Regards
+Bibo, Mao
 
-> On Jun 13, 2023, at 4:21 AM, Andrew Jones <andrew.jones@linux.dev> =
-wrote:
->=20
-> On Mon, Jun 12, 2023 at 10:53:56PM +0100, Nikos Nikoleris wrote:
->> On 12/06/2023 16:59, Nadav Amit wrote:>
->>> Thanks. I am still struggling to run the tests on my environment. =
-Why the
->>> heck frame-pointers are disabled on arm64? Perhaps I=E2=80=99ll send =
-my patch to
->>> enable them (and add one on exception handling).
->>>=20
->>=20
->> I am afraid I don't know why it's omitted. It seems that x86 and arm =
-keep
->> it:
->=20
-> The support was first added to x86 and then I ported it to arm and =
-gave
-> porting it to arm64 a small effort too, but it didn't work off the =
-bat.
-> I wrote it down on my TODO, but it eventually fell off the bottom=E2=80=A6=
-
-
-Thanks. Don=E2=80=99t worry. I=E2=80=99ll send my implementation.
-
-
-
---Apple-Mail=_2916A246-24B3-4374-86EF-1037BF8708A3
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEESJL3osl5Ymx/w9I1HaAqSabaD1oFAmSIZx0ACgkQHaAqSaba
-D1pJTA//eDphpaaagDgAqhCvKZmAzI6/Jg7kihKfKAiRy/p29ZfD1r4hHcE/X4XC
-qWvyvFVc3qkKUhUayGW7w3+XsJibZ7mbUzoWZFIu1IL+C5SpLJOvbaVObu05j3pV
-aZicJ1JLXoo2HM6mMvz4Y5hYRlHnyQes2qvOmqtQ8Z2vI2NWS0PJI9tsQW7R08pQ
-mgeyjjnOudh0MjMGIB+FlmFRnfM4wRaxAT/3WibqR36u7Lupaz8OHa81t0JjPNku
-+GxztEiMkJZDNB5O6H/QXfnOn2GiFwIVxpXKnP0lM+IowLKDDCxijcodVkdsm6ON
-Gvye3w8r2A2aSGb83XWZqy09FlWlMq0asUKLIIhk0pyUEvxeOnQpPnKyCqFT2jVY
-gNzeKi3ZfpxeKkWwYLqZworaGuBbkt4iKPWm8KVBZo0kQzefIU534a9GfZUzyHvk
-IKLWpzip7/rsXBWXOXcivcenizEYCuNJlc25DKtzOPbFvU3gJF6dafq7LcZb9yRq
-biQwQrXtCnFZNlSs0Uzb7BQM6hNJyDeJ8KwjCs8rnBXf7Al+zGGT5V/8CyR1Kvbw
-prfjIRvEd85aJOrqQYWmcX1WbfU8rTze+jImsDYN74U/Wix42j4jiFZCp8/uxKQx
-omMbG4ddTbY+gsL150AWfKQKAVCDO2T3ZwjdMbH4CjOXmUP/Jfg=
-=L0j+
------END PGP SIGNATURE-----
-
---Apple-Mail=_2916A246-24B3-4374-86EF-1037BF8708A3--
+在 2023/6/9 17:08, Tianrui Zhao 写道:
+> Implement vcpu run interface, handling mmio, iocsr reading fault
+> and deliver interrupt, lose fpu before vcpu enter guest.
+> 
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> ---
+>   arch/loongarch/kvm/vcpu.c | 83 +++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 83 insertions(+)
+> 
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index 24b5b00266a1..eba5c07b8be3 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -17,6 +17,41 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+>   	return 0;
+>   }
+>   
+> +/* Returns 1 if the guest TLB may be clobbered */
+> +static int _kvm_check_requests(struct kvm_vcpu *vcpu)
+> +{
+> +	int ret = 0;
+> +
+> +	if (!kvm_request_pending(vcpu))
+> +		return 0;
+> +
+> +	if (kvm_check_request(KVM_REQ_TLB_FLUSH, vcpu)) {
+> +		/* Drop vpid for this vCPU */
+> +		vcpu->arch.vpid = 0;
+> +		/* This will clobber guest TLB contents too */
+> +		ret = 1;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static void kvm_pre_enter_guest(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * handle vcpu timer, interrupts, check requests and
+> +	 * check vmid before vcpu enter guest
+> +	 */
+> +	kvm_acquire_timer(vcpu);
+> +	_kvm_deliver_intr(vcpu);
+> +	/* make sure the vcpu mode has been written */
+> +	smp_store_mb(vcpu->mode, IN_GUEST_MODE);
+> +	_kvm_check_requests(vcpu);
+> +	_kvm_check_vmid(vcpu);
+> +	vcpu->arch.host_eentry = csr_read64(LOONGARCH_CSR_EENTRY);
+> +	/* clear KVM_LARCH_CSR as csr will change when enter guest */
+> +	vcpu->arch.aux_inuse &= ~KVM_LARCH_CSR;
+> +}
+> +
+>   int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>   {
+>   	unsigned long timer_hz;
+> @@ -86,3 +121,51 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>   			context->last_vcpu = NULL;
+>   	}
+>   }
+> +
+> +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> +{
+> +	int r = -EINTR;
+> +	struct kvm_run *run = vcpu->run;
+> +
+> +	vcpu_load(vcpu);
+> +
+> +	kvm_sigset_activate(vcpu);
+> +
+> +	if (vcpu->mmio_needed) {
+> +		if (!vcpu->mmio_is_write)
+> +			_kvm_complete_mmio_read(vcpu, run);
+> +		vcpu->mmio_needed = 0;
+> +	}
+> +
+> +	if (run->exit_reason == KVM_EXIT_LOONGARCH_IOCSR) {
+> +		if (!run->iocsr_io.is_write)
+> +			_kvm_complete_iocsr_read(vcpu, run);
+> +	}
+> +
+> +	/* clear exit_reason */
+> +	run->exit_reason = KVM_EXIT_UNKNOWN;
+> +	if (run->immediate_exit)
+> +		goto out;
+> +
+> +	lose_fpu(1);
+> +
+> +	local_irq_disable();
+> +	guest_timing_enter_irqoff();
+> +
+> +	kvm_pre_enter_guest(vcpu);
+> +	trace_kvm_enter(vcpu);
+> +
+> +	guest_state_enter_irqoff();
+> +	r = kvm_loongarch_ops->enter_guest(run, vcpu);
+> +
+> +	/* guest_state_exit_irqoff() already done.  */
+> +	trace_kvm_out(vcpu);
+> +	guest_timing_exit_irqoff();
+> +	local_irq_enable();
+> +
+> +out:
+> +	kvm_sigset_deactivate(vcpu);
+> +
+> +	vcpu_put(vcpu);
+> +	return r;
+> +}
