@@ -2,136 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 42FEB72E9D9
+	by mail.lfdr.de (Postfix) with ESMTP id 8FCAA72E9DA
 	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 19:33:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235021AbjFMRb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jun 2023 13:31:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57628 "EHLO
+        id S233202AbjFMRdF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 13:33:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231946AbjFMRbv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jun 2023 13:31:51 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95BAE1FC4;
-        Tue, 13 Jun 2023 10:31:21 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-65131e85be4so6148572b3a.1;
-        Tue, 13 Jun 2023 10:31:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686677481; x=1689269481;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9gwggrrTCd3fmtnE+bDUolvMX6NQ3t3WZmbENaeJBoM=;
-        b=PISkHaBuS3mRUYJlO4nJJs7GW6ULLaJcmEcYK1UIEEcfaZPNHdb7TIS1uQAL9tSLPJ
-         GscNqJZNr+ILzf+T2SYDXkT216YFYs97ZituBxQxKE4B5sYouyWgEvUdDpuGMpoNBp0v
-         WBSwt8+sT7HEcKUYZH/ue4Ljlzc5PkDElKr0qyYWSRqc48HNdJINpbj2WlSvpVN+yHtV
-         f6t8D/SPU7JHpM7mJ/0XM7KPTstiKv3TwCXXAsIgrJZW69wkn7mPS+B7vGu3CpaJ/j3M
-         nKeHTApU5NehqHJTbdaHZidg+oFytWYhqJMAN8QaFWWp2Q76S9aLqLg6PVkCYL1JDo+l
-         QofQ==
+        with ESMTP id S238745AbjFMRc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jun 2023 13:32:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 618E319BF
+        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 10:31:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686677509;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UFob1aFAu0uRDZrX0tACTzFE1GhOsHEDLUDxSxQ/iS8=;
+        b=NEd08Y0tdgUaC5hY6VqWaovuJtlHXWnaxUcaydjKV2UHBaL/Tx5f1KQ5+BGzq7GIjrZh2q
+        CXZdeYv9FaRKa9z6wm9hWtzVAu7a8tDNqu/tgma/txhy2QSMj1iwcZIYgGzbvB4h45zsoS
+        tGT0Zr+fBIslkwQtGFbAJYE7XrA7l34=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-335-vPPpDri9NpiDxbcD1RXZ2A-1; Tue, 13 Jun 2023 13:31:48 -0400
+X-MC-Unique: vPPpDri9NpiDxbcD1RXZ2A-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-766655c2cc7so622455739f.3
+        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 10:31:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686677481; x=1689269481;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9gwggrrTCd3fmtnE+bDUolvMX6NQ3t3WZmbENaeJBoM=;
-        b=Zwfp/f7qCt7oIZr8uo7OC0Hx1fnpOPCGkh0sYrYdKJMC5WEpqOMARtOE6TMjgDvFwd
-         RgjDtLEFXz7R0r34gmSv1Mpgk5a/DcAecp0VcvUutGMH+luMSD1w0UvSE1uszabwIpdx
-         0ZhgrpTbsyVL1wjBaPI4bq7O3uXrdFc1CJe8USuNVvoVqmw9znq++LpoE5IPOSqCVP5l
-         LGAUAMrIldvSiT7PIethO0e1bLAdB/BZ5VfXK0j17FCvkweM3GsKQhPTGa0AyIaSzdTn
-         g1JGfLvAjZa3d8kw7cKDk1Vhb7SbCTgW9vQWMw/1IHaxR5eGJjw18u6YfYtGk/fk3Yfq
-         fZMw==
-X-Gm-Message-State: AC+VfDwjZxkgMQvErCYIxhqchaT5juS+groV0hcjnTRNilsxmD17aajQ
-        u/TYOq9etYcd5ssaS5gXYX4=
-X-Google-Smtp-Source: ACHHUZ4wIeo/npYX82XmWso98Ha4rFtX2QJThPCERDu1LAATOythu3zoC4U4Z9S8/aK8iNpxx06pkQ==
-X-Received: by 2002:a05:6a20:8e13:b0:10b:4539:fa0a with SMTP id y19-20020a056a208e1300b0010b4539fa0amr17104140pzj.1.1686677480710;
-        Tue, 13 Jun 2023 10:31:20 -0700 (PDT)
-Received: from localhost ([192.55.54.50])
-        by smtp.gmail.com with ESMTPSA id v12-20020aa7850c000000b00639fc7124c2sm1059516pfn.148.2023.06.13.10.31.19
+        d=1e100.net; s=20221208; t=1686677507; x=1689269507;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UFob1aFAu0uRDZrX0tACTzFE1GhOsHEDLUDxSxQ/iS8=;
+        b=FFPmfcyDBH9xlcm1SYYK/GpXUbKv0F1wmQKr1IWIAoy9ZUqIHKYkyxBGFLgHH07d51
+         7evgA7mgbHR/+Bv+c27Gqwzj4YFfudtfVdPF1fy67OBiuAbm8Q5uVl7vixSHbM956blf
+         PWpxJlsA2slOlzetP1003u81ldweBymOK9lbyJXODAdcyB/EZv8itXi9pAq748Ajqror
+         kCUY/gVr72MM+LwyCS/6tExmgpwq1UNO+SG0aMldyr6gEWtvgryqy2FpZB9RRwgAgUUy
+         /WhlYqAJom6w4B7RyNAmqOyxXYugtUiBN6b6guENrRZhZm+TlECw88Bu5oTkxed+6kxD
+         II+g==
+X-Gm-Message-State: AC+VfDwpCAcEOZJzsMW/0K9zeXPYQeVhKKFleRdtbc6HPxJEpgSRQgHv
+        R6n/Fumb+tNhpP/V0QglfkC9IgNcaexOHBTLOInO8sRC+2Sb9bmVEjr0jBY1OmR4A1uBnppPLQg
+        2+/KEGZOJiYsl
+X-Received: by 2002:a6b:6611:0:b0:774:ae01:fe1a with SMTP id a17-20020a6b6611000000b00774ae01fe1amr11606432ioc.7.1686677507009;
+        Tue, 13 Jun 2023 10:31:47 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6bJFfYsjTQdozyUeq9/qeGnMAlrvVCxaIfEt3FiroYG03nbc7MFTmdssUxFLgFVi603YCgtg==
+X-Received: by 2002:a6b:6611:0:b0:774:ae01:fe1a with SMTP id a17-20020a6b6611000000b00774ae01fe1amr11606418ioc.7.1686677506733;
+        Tue, 13 Jun 2023 10:31:46 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id z3-20020a5ec903000000b0077ac811b20dsm3980818iol.38.2023.06.13.10.31.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jun 2023 10:31:19 -0700 (PDT)
-Date:   Tue, 13 Jun 2023 10:31:18 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chen, Bo2" <chen.bo@intel.com>, "Shahar, Sagi" <sagis@google.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "Aktas, Erdem" <erdemaktas@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "dmatlack@google.com" <dmatlack@google.com>,
-        "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>
-Subject: Re: [PATCH v14 111/113] RFC: KVM: x86, TDX: Add check for setting
- CPUID
-Message-ID: <20230613173118.GO2244082@ls.amr.corp.intel.com>
-References: <cover.1685333727.git.isaku.yamahata@intel.com>
- <00f3770050fb0751273a48eb17804a7a1a697e75.1685333728.git.isaku.yamahata@intel.com>
- <05da9ce1eacab59e81801acca146b5f4949b98ac.camel@intel.com>
+        Tue, 13 Jun 2023 10:31:46 -0700 (PDT)
+Date:   Tue, 13 Jun 2023 11:31:45 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "clegoate@redhat.com" <clegoate@redhat.com>
+Subject: Re: [PATCH v12 07/24] vfio: Block device access via device fd until
+ device is opened
+Message-ID: <20230613113145.66b02d0f.alex.williamson@redhat.com>
+In-Reply-To: <ZIilFVb3sKnBgH2F@nvidia.com>
+References: <20230602121653.80017-1-yi.l.liu@intel.com>
+        <20230602121653.80017-8-yi.l.liu@intel.com>
+        <20230612155210.5fd3579f.alex.williamson@redhat.com>
+        <DS0PR11MB75293327BDE6D268996FFFCCC355A@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <20230613081647.740f5217.alex.williamson@redhat.com>
+        <ZIilFVb3sKnBgH2F@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <05da9ce1eacab59e81801acca146b5f4949b98ac.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 06, 2023 at 11:57:35PM +0000,
-"Huang, Kai" <kai.huang@intel.com> wrote:
+On Tue, 13 Jun 2023 14:19:17 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> On Sun, 2023-05-28 at 21:20 -0700, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> On Tue, Jun 13, 2023 at 08:16:47AM -0600, Alex Williamson wrote:
+> 
+> > > Not quite get why bit field is going to be incompatible with smp
+> > > lockless operations. Could you elaborate a bit? And should I define
+> > > the access_granted as u8 or "u8:1"?  
 > > 
-> > Add a hook to setting CPUID for additional consistency check of
-> > KVM_SET_CPUID2.
-> > 
-> > Because intel TDX or AMD SNP has restriction on the value of cpuid.  Some
-> > value can't be changed after boot.  Some can be only set at the VM
-> > creation time and can't be changed later.  Check if the new values are
-> > consistent with the old values.
+> > Perhaps FUD on my part, but load-acquire type operations have specific
+> > semantics and it's not clear to me that they interest with compiler
+> > generated bit operations.  Thanks,  
 > 
-> You might want to use some grammar tool to check against the changelog.
-> 
-> Also, personally I think it's better to briefly mention why we choose this
-> design but not another (e.g., why we just don't make KVM remember all CPUIDs in
-> TDH.MNG.INIT and simply ignores/rejects further KVM_SET_CPUID2).  It would be
-> helpful for the reviewer, or some git blamer in the future.
-> 
+> They won't compile if you target bit ops, you can't take the address
+> of a bitfield.
 
-> And why this patch is placed at the very bottom of this series? This logic
-> should belong to TD creation part which should be at a relative earlier position
-> in this series.
+Yup, that's what I was assuming but was too lazy to prove it.  Thanks,
 
-Because this is nice-to-have, not necessary for this patch series to work.  
+Alex
 
-
-> > @@ -32,6 +32,13 @@ struct kvm_tdx {
-> >  	atomic_t tdh_mem_track;
-> >  
-> >  	u64 tsc_offset;
-> > +
-> > +	/*
-> > +	 * For KVM_SET_CPUID to check consistency. Remember the one passed to
-> > +	 * TDH.MNG_INIT
-> > +	 */
-> > +	int cpuid_nent;
-> > +	struct kvm_cpuid_entry2 *cpuid;
-> 
-> Since these CPUIDs may only be part of the vcpu's CPUIDs, you may want a more
-> specific name, for instance, consistent_cpuid?
-> 
-> Also if you want this be common to AMD, then perhaps the comment should be
-> improved too to be more generic.
-
-Because I don't see apparent constraint on cpuid for SEV case in the spec, I
-doubt they want it.  Please correct me if I'm wrong.
-
-Given tdx_vcpu_check_cpuid() doesn't do much meaningful check, let's postpone
-this patch for now.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
