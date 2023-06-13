@@ -2,98 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52DD872DACF
-	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 09:29:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FE3172DC62
+	for <lists+kvm@lfdr.de>; Tue, 13 Jun 2023 10:26:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238983AbjFMH3N convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 13 Jun 2023 03:29:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60174 "EHLO
+        id S241151AbjFMI0G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jun 2023 04:26:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234256AbjFMH3L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jun 2023 03:29:11 -0400
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4D13AA;
-        Tue, 13 Jun 2023 00:29:10 -0700 (PDT)
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-bb2ffa1e235so5348185276.0;
-        Tue, 13 Jun 2023 00:29:10 -0700 (PDT)
+        with ESMTP id S238988AbjFMI0F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jun 2023 04:26:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00E40126
+        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 01:25:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686644725;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P1syNaBAKkffiLL0bv/EmGcINY+iq9kUOB1DQ8J5+wk=;
+        b=Mlnr2tBHCS9FCF+KIzjkXpuVGxCRUuJNv4sULCh5+5efmp3g6vKJDiu3BQ8p9/6GpkLgNu
+        cbof2Wyl/MGS3qp3rsyFy/5yv82LKzLwHmGMbLw4fdmWVHDHvPVEKA1+icUJ6sHp9zT0DC
+        LpjSaEJv752VEE6MjAQ7ZGuLVz0Y1UM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-665-WL1x4YEyOwO8Zd7TUQ1E8A-1; Tue, 13 Jun 2023 04:25:22 -0400
+X-MC-Unique: WL1x4YEyOwO8Zd7TUQ1E8A-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-30fb7b82e15so469916f8f.0
+        for <kvm@vger.kernel.org>; Tue, 13 Jun 2023 01:25:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686641350; x=1689233350;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gKEzJjzBKla4S0x8jxwIAxVSx314J/aF9PC4BBXNBUc=;
-        b=O/Qgik+keNnu5W/ripF9MuXw5uie4lrFN7GFG0ipslGi3ZQee/TgWENlvdMee5Gpqo
-         0+o31MhB6jqzNKVbgTiickkV71vfZbCYnr7kfGcuyUkfP9ZPGGZXxVKkKl6g4FR7GjN9
-         lkfoKHdeLiVE976H1HTNyVI+jLeAsREXo678dQWLSFslceozZqf8rcXbzQQQgkz/fBYz
-         yPojg2j9jHpPE8vkoTswAsvl9kQEpWMX6Z9R7Su60NwfLoJSuWIVCHGiNmYDCpDlOv/b
-         iLZj1ATjunJm8lGaGq2Qi3npr4/R/Zmau1WE+dUPJ44FHMMtZPpF1cysRy25xngbMtGn
-         RdGQ==
-X-Gm-Message-State: AC+VfDxdvE1X10rWnv8Uu+OqfpsF0hWuZuuThD1NcrzycNc/SbxN562x
-        iOUDikmDRR6YWpgq/pFjH9xd9KPAiDIt1Q==
-X-Google-Smtp-Source: ACHHUZ4yyzfk2dKTO7/ChlMLJuq/byIx5/VbZj9Su9mWsasd4QMjz/UO+qc8km3I9JTUtbNCjoFjyA==
-X-Received: by 2002:a25:420f:0:b0:bcd:7017:5893 with SMTP id p15-20020a25420f000000b00bcd70175893mr926167yba.24.1686641349766;
-        Tue, 13 Jun 2023 00:29:09 -0700 (PDT)
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com. [209.85.128.175])
-        by smtp.gmail.com with ESMTPSA id r123-20020a25c181000000b00babd2eef59dsm2983215ybf.27.2023.06.13.00.29.08
+        d=1e100.net; s=20221208; t=1686644721; x=1689236721;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P1syNaBAKkffiLL0bv/EmGcINY+iq9kUOB1DQ8J5+wk=;
+        b=AmkwDY19f5qarSXCEEsmT0GRI1NNg83BO+7ttuROfDi9zOGZsnuPxHTfcGqw88cECf
+         O5HGg2KOghNOPDwm4bwL8KHn4Bv20/1QBSE3+Bt2H5V9kRRrBST1HYHOuib36yVNPzXI
+         BRkPBoXGX+QpCOa1Jejavp2zBS9vLIuNgAL81KNdTCWqFb3SP5t/+iQSepBKBZRFbAVu
+         WIqEibleqtKe4vuAZc7VEk54pqiLpx5p7pdLvqb5+oQQdjjfmlTtGVGNAaJvWtMGMm7y
+         Z22VtVZ+qc9Gfm9gjY8rgZFuitqtvvLy1t1Op6E7mM67L4WoAX0ECkVH53POJGBsahVc
+         k1pg==
+X-Gm-Message-State: AC+VfDwTiIt1yGAb5oO1BMd7NdBWTNBPkxntR7R4d0E8UIQ7I5Wl/Nae
+        cPxQDQ5ZNCR0jk+7eiTrl7uYT4cpDLMccFfoM2DAkPiCE6Xa6v2xOa4tILMZ2RXzOg7ZKcSHeZk
+        Pxs6YtWs63dCf
+X-Received: by 2002:a5d:630b:0:b0:30f:c0a8:973c with SMTP id i11-20020a5d630b000000b0030fc0a8973cmr4182807wru.7.1686644721768;
+        Tue, 13 Jun 2023 01:25:21 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ54+a0ZNqCyRceTdBNOPN8n0EMFWs7KGngnKpklEwP2qo3zBges6I9cDMRiOnw/znCcScLd0Q==
+X-Received: by 2002:a5d:630b:0:b0:30f:c0a8:973c with SMTP id i11-20020a5d630b000000b0030fc0a8973cmr4182787wru.7.1686644721492;
+        Tue, 13 Jun 2023 01:25:21 -0700 (PDT)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id h14-20020a5d6e0e000000b003078354f774sm14594095wrz.36.2023.06.13.01.25.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jun 2023 00:29:08 -0700 (PDT)
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-56d378b75f0so17179997b3.1;
-        Tue, 13 Jun 2023 00:29:08 -0700 (PDT)
-X-Received: by 2002:a0d:d611:0:b0:56d:ddc:cdbb with SMTP id
- y17-20020a0dd611000000b0056d0ddccdbbmr1077781ywd.25.1686641348561; Tue, 13
- Jun 2023 00:29:08 -0700 (PDT)
+        Tue, 13 Jun 2023 01:25:21 -0700 (PDT)
+Message-ID: <02f40638-0230-ab06-6ccd-6bdbab814000@redhat.com>
+Date:   Tue, 13 Jun 2023 16:25:13 +0800
 MIME-Version: 1.0
-References: <20230612210423.18611-1-vishal.moola@gmail.com> <20230612210423.18611-26-vishal.moola@gmail.com>
-In-Reply-To: <20230612210423.18611-26-vishal.moola@gmail.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Tue, 13 Jun 2023 09:28:56 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdUk2OM+j_j8XSkMxRnNqmKy3qwUA8Mq-RA+p+ByfY-+4g@mail.gmail.com>
-Message-ID: <CAMuHMdUk2OM+j_j8XSkMxRnNqmKy3qwUA8Mq-RA+p+ByfY-+4g@mail.gmail.com>
-Subject: Re: [PATCH v4 25/34] m68k: Convert various functions to use ptdescs
-To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        Hugh Dickins <hughd@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v3 02/17] arm64: Prevent the use of
+ is_kernel_in_hyp_mode() in hypervisor code
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
+References: <20230609162200.2024064-1-maz@kernel.org>
+ <20230609162200.2024064-3-maz@kernel.org>
+From:   Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20230609162200.2024064-3-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 12, 2023 at 11:05 PM Vishal Moola (Oracle)
-<vishal.moola@gmail.com> wrote:
-> As part of the conversions to replace pgtable constructor/destructors with
-> ptdesc equivalents, convert various page table functions to use ptdescs.
->
-> Some of the functions use the *get*page*() helper functions. Convert
-> these to use pagetable_alloc() and ptdesc_address() instead to help
-> standardize page tables further.
->
-> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
 
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-Gr{oetje,eeting}s,
-
-                        Geert
+On 6/10/23 00:21, Marc Zyngier wrote:
+> Using is_kernel_in_hyp_mode() in hypervisor code is a pretty bad
+> mistake. This helper only checks for CurrentEL being EL2, which
+> is always true.
+> 
+> Make the compilation fail if using the helper in hypervisor context
+> Whilst we're at it, flag the helper as __always_inline, which it
+> really should be.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>   arch/arm64/include/asm/virt.h | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+> index 4eb601e7de50..21e94068804d 100644
+> --- a/arch/arm64/include/asm/virt.h
+> +++ b/arch/arm64/include/asm/virt.h
+> @@ -110,8 +110,10 @@ static inline bool is_hyp_mode_mismatched(void)
+>   	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
+>   }
+>   
+> -static inline bool is_kernel_in_hyp_mode(void)
+> +static __always_inline bool is_kernel_in_hyp_mode(void)
+>   {
+> +	BUILD_BUG_ON(__is_defined(__KVM_NVHE_HYPERVISOR__) ||
+> +		     __is_defined(__KVM_VHE_HYPERVISOR__));
+>   	return read_sysreg(CurrentEL) == CurrentEL_EL2;
+>   }
+>   
 
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Shaoqin
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
