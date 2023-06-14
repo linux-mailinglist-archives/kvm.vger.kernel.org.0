@@ -2,102 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D37573088E
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 21:42:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 045BC73089C
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 21:42:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231835AbjFNTlf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 15:41:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60642 "EHLO
+        id S231602AbjFNTmi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 15:42:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240402AbjFNTl1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 15:41:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBB4F26A1
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 12:40:22 -0700 (PDT)
+        with ESMTP id S235535AbjFNTmI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 15:42:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4977CD2
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 12:41:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686771609;
+        s=mimecast20190719; t=1686771684;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=N0PGlAWtqnSNmRFe+8NHyKS8xC+iNC6ewCGuOltYSZc=;
-        b=GUhc2iGJK6fx6XYx/maoXPJ9l0efh9hwGhnX3HHrJlf8fgASnlEP0rPaLrTi3AHnCn7ZqC
-        sD9cKQsrOQubCa9JS0lLkMD186U3fmx94lp/Vu71enM2Jvktg3APrWTBMtuM2MKoAxKsSs
-        aVWffD5js+VRJhH+b4ipYmSTgSUSeHk=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MI4l6W435/AyZ8e7TjE3Cy0y0UDEKZyjRiMPTqf+qxI=;
+        b=gTKGmp6nknQHGqW18za11zrL2zrbVvGl3qobgXAqnx2AOczM5m8yRcNN543Vr4mzd8USLD
+        XywhWPxtN9qO6Fsva8nDL3pooszvzzI8JD4Z604GfIZ/xK87yR70NMNtP+Q7eEJLMfiI/q
+        2oXM4zYl/l7DeM5SmNA4jYpVjlMlMKQ=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-635-GrHBNoM2NZW5FdLxWqG9rA-1; Wed, 14 Jun 2023 15:40:04 -0400
-X-MC-Unique: GrHBNoM2NZW5FdLxWqG9rA-1
+ us-mta-2-Zpj5qKdeOG2XZxlpaKGRGw-1; Wed, 14 Jun 2023 15:40:05 -0400
+X-MC-Unique: Zpj5qKdeOG2XZxlpaKGRGw-1
 Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AD9C3800193;
-        Wed, 14 Jun 2023 19:40:03 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 75E5685828F;
+        Wed, 14 Jun 2023 19:40:04 +0000 (UTC)
 Received: from omen.home.shazbot.org (unknown [10.22.33.254])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C4359492C1B;
-        Wed, 14 Jun 2023 19:40:02 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C7685492C1B;
+        Wed, 14 Jun 2023 19:40:03 +0000 (UTC)
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Alex Williamson <alex.williamson@redhat.com>, jgg@nvidia.com,
-        clg@redhat.com, eric.auger@redhat.com, diana.craciun@oss.nxp.com,
-        liulongfang@huawei.com, shameerali.kolothum.thodi@huawei.com,
-        yishaih@nvidia.com, kevin.tian@intel.com
-Subject: [PATCH v3 0/3] vfio: Cleanup Kconfigs
-Date:   Wed, 14 Jun 2023 13:39:45 -0600
-Message-Id: <20230614193948.477036-1-alex.williamson@redhat.com>
+        clg@redhat.com, eric.auger@redhat.com, liulongfang@huawei.com,
+        shameerali.kolothum.thodi@huawei.com, yishaih@nvidia.com,
+        kevin.tian@intel.com
+Subject: [PATCH v3 1/3] vfio/pci: Cleanup Kconfig
+Date:   Wed, 14 Jun 2023 13:39:46 -0600
+Message-Id: <20230614193948.477036-2-alex.williamson@redhat.com>
+In-Reply-To: <20230614193948.477036-1-alex.williamson@redhat.com>
+References: <20230614193948.477036-1-alex.williamson@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Create sub-menus for bus drivers and remove artificial dependencies
-between vfio-pci and vfio-platform and other variant drivers like
-vfio-amba, mlx5-vfio-pci, or hisi-acc-vfio-pci.
+It should be possible to select vfio-pci variant drivers without building
+vfio-pci itself, which implies each variant driver should select
+vfio-pci-core.
 
-This is an alternative proposal vs [1], which attempts to make the
-vfio-pci-core module individually selectable, even without built
-dependencies, in order to avoid the select per variant module.
+Fix the top level vfio Makefile to traverse pci based on vfio-pci-core
+rather than vfio-pci.
 
-The solution presented here is my preference, I don't see the select as
-overly burdensome or error prone, we have very good randconfig test
-coverage, and I prefer to not allow building module which have no
-in-kernel requirements.  Thanks,
+Mark MMAP and INTX options depending on vfio-pci-core to cleanup resulting
+config if core is not enabled.
 
-Alex
+Push all PCI related vfio options to a sub-menu and make descriptions
+consistent.
 
-v3: Move the depends line up to the menu level for fsl Kconfig as
-    discussed with Cedric in v2.  Add R-bs.
+Reviewed-by: Cédric Le Goater <clg@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ drivers/vfio/Makefile              | 2 +-
+ drivers/vfio/pci/Kconfig           | 8 ++++++--
+ drivers/vfio/pci/hisilicon/Kconfig | 4 ++--
+ drivers/vfio/pci/mlx5/Kconfig      | 2 +-
+ 4 files changed, 10 insertions(+), 6 deletions(-)
 
-v2: Move dependencies from config VFIO_PLATFORM to menu, make existing
-    platform reset drivers depend on VFIO_PLATFORM.  Add R-bs.
-
-[1]https://lore.kernel.org/all/0-v1-7eacf832787f+86-vfio_pci_kconfig_jgg@nvidia.com/
-
-
-Alex Williamson (3):
-  vfio/pci: Cleanup Kconfig
-  vfio/platform: Cleanup Kconfig
-  vfio/fsl: Create Kconfig sub-menu
-
- drivers/vfio/Makefile               |  4 ++--
- drivers/vfio/fsl-mc/Kconfig         |  6 +++++-
- drivers/vfio/pci/Kconfig            |  8 ++++++--
- drivers/vfio/pci/hisilicon/Kconfig  |  4 ++--
- drivers/vfio/pci/mlx5/Kconfig       |  2 +-
- drivers/vfio/platform/Kconfig       | 18 ++++++++++++++----
- drivers/vfio/platform/Makefile      |  9 +++------
- drivers/vfio/platform/reset/Kconfig |  2 ++
- 8 files changed, 35 insertions(+), 18 deletions(-)
-
+diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+index 70e7dcb302ef..151e816b2ff9 100644
+--- a/drivers/vfio/Makefile
++++ b/drivers/vfio/Makefile
+@@ -10,7 +10,7 @@ vfio-$(CONFIG_VFIO_VIRQFD) += virqfd.o
+ 
+ obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+ obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+-obj-$(CONFIG_VFIO_PCI) += pci/
++obj-$(CONFIG_VFIO_PCI_CORE) += pci/
+ obj-$(CONFIG_VFIO_PLATFORM) += platform/
+ obj-$(CONFIG_VFIO_MDEV) += mdev/
+ obj-$(CONFIG_VFIO_FSL_MC) += fsl-mc/
+diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+index f9d0c908e738..86bb7835cf3c 100644
+--- a/drivers/vfio/pci/Kconfig
++++ b/drivers/vfio/pci/Kconfig
+@@ -1,5 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+-if PCI && MMU
++menu "VFIO support for PCI devices"
++	depends on PCI && MMU
++
+ config VFIO_PCI_CORE
+ 	tristate
+ 	select VFIO_VIRQFD
+@@ -7,9 +9,11 @@ config VFIO_PCI_CORE
+ 
+ config VFIO_PCI_MMAP
+ 	def_bool y if !S390
++	depends on VFIO_PCI_CORE
+ 
+ config VFIO_PCI_INTX
+ 	def_bool y if !S390
++	depends on VFIO_PCI_CORE
+ 
+ config VFIO_PCI
+ 	tristate "Generic VFIO support for any PCI device"
+@@ -59,4 +63,4 @@ source "drivers/vfio/pci/mlx5/Kconfig"
+ 
+ source "drivers/vfio/pci/hisilicon/Kconfig"
+ 
+-endif
++endmenu
+diff --git a/drivers/vfio/pci/hisilicon/Kconfig b/drivers/vfio/pci/hisilicon/Kconfig
+index 5daa0f45d2f9..cbf1c32f6ebf 100644
+--- a/drivers/vfio/pci/hisilicon/Kconfig
++++ b/drivers/vfio/pci/hisilicon/Kconfig
+@@ -1,13 +1,13 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config HISI_ACC_VFIO_PCI
+-	tristate "VFIO PCI support for HiSilicon ACC devices"
++	tristate "VFIO support for HiSilicon ACC PCI devices"
+ 	depends on ARM64 || (COMPILE_TEST && 64BIT)
+-	depends on VFIO_PCI_CORE
+ 	depends on PCI_MSI
+ 	depends on CRYPTO_DEV_HISI_QM
+ 	depends on CRYPTO_DEV_HISI_HPRE
+ 	depends on CRYPTO_DEV_HISI_SEC2
+ 	depends on CRYPTO_DEV_HISI_ZIP
++	select VFIO_PCI_CORE
+ 	help
+ 	  This provides generic PCI support for HiSilicon ACC devices
+ 	  using the VFIO framework.
+diff --git a/drivers/vfio/pci/mlx5/Kconfig b/drivers/vfio/pci/mlx5/Kconfig
+index 29ba9c504a75..7088edc4fb28 100644
+--- a/drivers/vfio/pci/mlx5/Kconfig
++++ b/drivers/vfio/pci/mlx5/Kconfig
+@@ -2,7 +2,7 @@
+ config MLX5_VFIO_PCI
+ 	tristate "VFIO support for MLX5 PCI devices"
+ 	depends on MLX5_CORE
+-	depends on VFIO_PCI_CORE
++	select VFIO_PCI_CORE
+ 	help
+ 	  This provides migration support for MLX5 devices using the VFIO
+ 	  framework.
 -- 
 2.39.2
 
