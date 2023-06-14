@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B880730493
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 18:07:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EF387304B8
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 18:17:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230411AbjFNQHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 12:07:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58060 "EHLO
+        id S232600AbjFNQQd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 12:16:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230195AbjFNQHG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 12:07:06 -0400
+        with ESMTP id S232697AbjFNQQJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 12:16:09 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B312B5
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 09:07:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C0EE1FE5
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 09:16:09 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8E21363C4E
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 16:07:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8C7BC433C8;
-        Wed, 14 Jun 2023 16:07:00 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A94B260C09
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 16:16:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 096B2C433C0;
+        Wed, 14 Jun 2023 16:16:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686758821;
-        bh=/r6fdKCJUAuhajNoRQPQaUxEvrIU0vHzZIEJ1GzJpnE=;
+        s=k20201202; t=1686759368;
+        bh=Ks4bJ0TA9BrpfxeV3RYH48Yuda10fqlRYYmTIBuBuCo=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=qbK5EooCYLobN7jXxYBxiPx9/iHnGqXfD7liRUJcIZkCiw5Czt6Dvs1rhyIS5d1Fc
-         +MLZkaA9MgnB7fpUKtFfiHjpBi74vwnsCNnPj0Rodte4O9VtJOshjylallZx/8fRB1
-         IuNuq9ugLk8l/CfNHu/gKoejq8UvCbuJp4tG9vXLTtMGnO00BKBYFiXvIVxjIttLuS
-         1FZHEwvR2MzizQj80KYXE4CVyL3w4EEYJvfuQG7BnI4YxQOj0aK31cnzV4o2e23b2l
-         3NXbrNJNEVcKOWfPCm/1HyWpP9bqjrlAZBTUHgphsFaXp6bH+pRBFEATHu0hZ4hAJL
-         rvGqRpIG1g6cQ==
-Received: from [77.240.177.73] (helo=wait-a-minute.misterjones.org)
+        b=HXOPnP8S6xg5toWS4sF24QdreIb7t5QSXBu+BEueRUgQD0FePERQS92qJLcr5kBUU
+         Ytlq+PbcMosjSQpd6YugPVlkiVeCDHY+UeJEoizlGFjNSxMFSk81JWJcfg2yyHl5U3
+         9/WBJzVfSZquZ+EgdX+nU7yIEx5jyccWr97GEXQtcnZrgBMmplzJ47830pAkSLTtcN
+         KveEbbM0P9EFsP6EdAtbcEOYnoX3fR71kaIHxn/JhMSSSUfWtAJZNuHa1ufLvwaPdT
+         IvjnihOHgkiF8RGKA5NIeRn1pwx6yefJyS+Ib8/RCxlWo6TLZ6hmTZlrFfuCU+bWOX
+         mmhGjMNaEwgfA==
+Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1q9T1O-005NTK-E2;
-        Wed, 14 Jun 2023 17:06:58 +0100
-Date:   Wed, 14 Jun 2023 17:06:58 +0100
-Message-ID: <87bkhiqb8d.wl-maz@kernel.org>
+        id 1q9TAD-005NaV-M1;
+        Wed, 14 Jun 2023 17:16:05 +0100
+MIME-Version: 1.0
+Date:   Wed, 14 Jun 2023 17:16:05 +0100
 From:   Marc Zyngier <maz@kernel.org>
-To:     Shaoqin Huang <shahuang@redhat.com>
+To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
         Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v3 04/17] arm64: Add KVM_HVHE capability and has_hvhe() predicate
-In-Reply-To: <8f7d7285-b21d-23b0-793b-70ee008cb45b@redhat.com>
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: (subset) [PATCH v3 00/17] KVM: arm64: Allow using VHE in the nVHE
+ hypervisor
+In-Reply-To: <168675651876.3255755.11650251411681563144.b4-ty@linux.dev>
 References: <20230609162200.2024064-1-maz@kernel.org>
-        <20230609162200.2024064-5-maz@kernel.org>
-        <8f7d7285-b21d-23b0-793b-70ee008cb45b@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 77.240.177.73
-X-SA-Exim-Rcpt-To: shahuang@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com
+ <168675651876.3255755.11650251411681563144.b4-ty@linux.dev>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <7499530a98f6f9e9532f4cf72921a1ad@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 217.182.43.188
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, qperret@google.com, will@kernel.org, james.morse@arm.com, tabba@google.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -74,37 +75,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 14 Jun 2023 08:35:13 +0100,
-Shaoqin Huang <shahuang@redhat.com> wrote:
+On 2023-06-14 16:31, Oliver Upton wrote:
+> On Fri, 9 Jun 2023 17:21:43 +0100, Marc Zyngier wrote:
+>> KVM (on ARMv8.0) and pKVM (on all revisions of the architecture) use
+>> the split hypervisor model that makes the EL2 code more or less
+>> standalone. In the later case, we totally ignore the VHE mode and
+>> stick with the good old v8.0 EL2 setup.
+>> 
+>> This is all good, but means that the EL2 code is limited in what it
+>> can do with its own address space. This series proposes to remove this
+>> limitation and to allow VHE to be used even with the split hypervisor
+>> model. This has some potential isolation benefits[1], and eventually
+>> allow systems that do not support HCR_EL2.E2H==0 to run pKVM.
+>> 
+>> [...]
 > 
-> Hi Marc,
-> 
-> Should we have a document about the hVHE? Because it's a sw feature,
-> there is no spec about it. And later people may need to read the code
-> itself to understand what is hVHE.
+> I decided we should probably should have this in -next for a bit before
+> sending a pull request. We can shove any fixes on top as needed.
 
-I'm planning to eventually do that once the hVHE code actually does
-something useful. So far, it doesn't really do much.
+Awesome, thanks. There's already one such fix on your way!
 
-But what I really want is to *hide* this low level option, and have it
-driven by something like "kvm-arm.mode=hvhe,protected". It is just
-that writing a parser is hard at the point where this is evaluated (we
-don't have much of the kernel running).
+Cheers,
 
-> 
-> On 6/10/23 00:21, Marc Zyngier wrote:
-> > Expose a capability keying the hVHE feature as well as a new
-> > predicate testing it. Nothing is so far using it, and nothing
-> > is enabling it yet.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Besides that, the code itself LGTM.
-> 
-> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-
-Thanks,
-
-	M.
-
+         M.
 -- 
-Without deviation from the norm, progress is not possible.
+Jazz is not dead. It just smells funny...
