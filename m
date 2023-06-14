@@ -2,153 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35980730990
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 23:02:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5547E7309B6
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 23:20:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231726AbjFNVCM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 17:02:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38280 "EHLO
+        id S234541AbjFNVUj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 17:20:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230301AbjFNVCL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 17:02:11 -0400
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 417F0A6
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:02:10 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2b4146fbadeso4147191fa.0
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:02:10 -0700 (PDT)
+        with ESMTP id S233828AbjFNVUg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 17:20:36 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A4F3E6C
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:20:35 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-babb76a9831so1131009276.2
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:20:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1686776528; x=1689368528;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5X8hherlR2uhZ3CE5FD1YkO/sty7eWBacpdnuujDVLI=;
-        b=rB4r9OvSMEIo4AHbPFAUrCFvEDPKJWRka07yF1oz3yLBakZxy7Culdya6lzKrtM962
-         q5Nvwk2BU3Q6CBYwgy+3WiyizGuCKloOc67cvM35X8lWdJDFmoThrJyBcuRyybxdTVgP
-         48K8uRdEf3P5Psb2ysUXUOidCKD5sxjmGOO6+3AlXAemqD1b4nHKBOiqBjhGhbNSnqnk
-         75H6TwxS3wOxIHoKIQWj9QkP0xlwwOB+bFdfD3GciAJ/pagsU98FKt4RlXI2IilibrFF
-         VE2dPU/0sMv/JJbqLbj2eclwNTbYJal1lITVICgWO7EkYfCPSBbD//TNBvkLVAJLTEUQ
-         2XWA==
+        d=google.com; s=20221208; t=1686777634; x=1689369634;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=x6hmc6akWZOXS6z57inXO64YQNQW6poAh6GVOTwAKPI=;
+        b=wIvB/HT/XmzHwNVWmyp4gmc9ivMsqG6Vv+COxc694rcZRkSui7P0fdvEyRLm/RIo8c
+         7C6nStlgSUi8l94T+XiRi7phPIx5ApGS2Dxfld5jVKNyn/Z9mFWzz/8yfdF7uPsWHBs9
+         ZusULuK0gkIyHC73eD9oSibp9POPfmzMbBrXe3+yfDY9aAYMYBniUjH8PPMVbYFKOVAF
+         BzjUIVjJmzBJIagyUMDpv1vwgDxiFO2x9nzlYnnrWQ9N+yMM9YCTFx++JKDpP2rzfdJn
+         OWlV0iUsEDO9vzdxXcNsHrQ02mCED5KCVK2hoa3DaSDo2pxCP5VSUMfv5Y0mA12Q34d/
+         2L0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686776528; x=1689368528;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5X8hherlR2uhZ3CE5FD1YkO/sty7eWBacpdnuujDVLI=;
-        b=kbuno1LslTnDkmTdKdokerKQceN/dpAMrpC0vl3FFbnqg7GjTMVpggpIW8FPcBVPrV
-         y9XCj0xjfJ+v7VQ9puy4q9hHEZgkMs21zfAzZN5HKddAW9/dDmP+Zni0XfpH6yalQKuC
-         Ck3nPG6fv5WVK5o4Fhcnbsywcx/KRdate3/jHs+tOgByJFTJTxYXRqyZA2tvEC8Qkoz5
-         F3L9m+irt/j/+5JcSVAfgjxN5MrtZVWklqHg0gMn0Mi3xWP3uRDB+FH9X9cR4R+UnoHY
-         YM1oYinP9v4AcWrpRiZFIiuutOQcwPa/dXqTGaOhy3+zDQJ7/zmOf3aIZ6V19B8QIFFG
-         ULhg==
-X-Gm-Message-State: AC+VfDz68ALfZIbJNEzN+zUXCB6sFw715Fs6JmxrADybFrO3zBYR/ERW
-        IH1o1tvQdU17Er0zLnje0dPPY1V3CyqnuFOQANs=
-X-Google-Smtp-Source: ACHHUZ56deJfjbC9b+AtgyHw5i+C3pO8ozYMpTddZu7aKJ00E3x5c7HiyZqGpEwd8HEBCZjomrlGqQ==
-X-Received: by 2002:a2e:95d5:0:b0:2b1:bf5d:4115 with SMTP id y21-20020a2e95d5000000b002b1bf5d4115mr7249146ljh.13.1686776528315;
-        Wed, 14 Jun 2023 14:02:08 -0700 (PDT)
-Received: from ?IPV6:2003:f6:af14:3c00:9650:2efe:173b:4a64? (p200300f6af143c0096502efe173b4a64.dip0.t-ipconnect.de. [2003:f6:af14:3c00:9650:2efe:173b:4a64])
-        by smtp.gmail.com with ESMTPSA id m8-20020a056402050800b005149cb5ee2dsm8140527edv.82.2023.06.14.14.02.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jun 2023 14:02:07 -0700 (PDT)
-Message-ID: <4de05ab1-e4d3-6693-a3c2-3f80236110bf@grsecurity.net>
-Date:   Wed, 14 Jun 2023 23:02:06 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [kvm-unit-tests PATCH v2 06/16] x86/run_in_user: Change type of
- code label
-Content-Language: en-US, de-DE
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20230413184219.36404-1-minipli@grsecurity.net>
- <20230413184219.36404-7-minipli@grsecurity.net> <ZIe5IpqsWhy8Xyt5@google.com>
-From:   Mathias Krause <minipli@grsecurity.net>
-In-Reply-To: <ZIe5IpqsWhy8Xyt5@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1686777634; x=1689369634;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=x6hmc6akWZOXS6z57inXO64YQNQW6poAh6GVOTwAKPI=;
+        b=YKnl9lnzVqwZu7I1oWKC4qUqMaB2kYcPPQbkGzzePMypa5aExBGLKR+3F+e4h0BfaM
+         J92mqwK1zQEsudD4ArzCC01j50yiMsk2cPE4ak6iq3U8j724UcCOQ/wVIoJ5tDxrOUHq
+         1cNfO1NqJq5e+WeMvX1w4R9IkAlSmFZwLUVUCEqoshbgJHpM2vmLfucgdIJpkTkj3Bnm
+         uncg98Qb+8QMkfHEkea2Fq3j6oR8LqycagrTUVS1/y1w0+kuhP5PbS+gi3VxdOq3kSyV
+         lIw+EsPih7R+RLof4DnnmytEak8nCD/G3ud3+hGCVjhBtjGWOZAyLLWHDV+4tWV1JWP+
+         ZTSA==
+X-Gm-Message-State: AC+VfDzLM4O+JK29RHHk2vlVYBDvuKruzWeb/FKihIH4mWj4BfFR/GAi
+        drrv+H+F+p6wC5sDu4hs+mPORPJ+SxA=
+X-Google-Smtp-Source: ACHHUZ7/OAjVtrru1qxA+/Rr5tOMBJ37bkvlWQL8ZDLr371hkMHH9s1uHK7jXpwqUhzy6BE8Id0Xvpy0vvs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:e6c7:0:b0:bc6:8b95:5bd6 with SMTP id
+ d190-20020a25e6c7000000b00bc68b955bd6mr451694ybh.1.1686777634367; Wed, 14 Jun
+ 2023 14:20:34 -0700 (PDT)
+Date:   Wed, 14 Jun 2023 14:20:32 -0700
+In-Reply-To: <20230602161921.208564-10-amoorthy@google.com>
+Mime-Version: 1.0
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-10-amoorthy@google.com>
+Message-ID: <ZIovIBVLIM69E5Bo@google.com>
+Subject: Re: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without implementation
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        robert.hoo.linux@gmail.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+        isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13.06.23 02:32, Sean Christopherson wrote:
-> On Thu, Apr 13, 2023, Mathias Krause wrote:
->> Use an array type to refer to the code label 'ret_to_kernel'.
-> 
-> Why?  Taking the address of a label when setting what is effectively the target
-> of a branch seems more intuitive than pointing at an array (that's not an array).
+On Fri, Jun 02, 2023, Anish Moorthy wrote:
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 69a221f71914..abbc5dd72292 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2297,4 +2297,10 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+>   */
+>  inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
+>  				     uint64_t gpa, uint64_t len, uint64_t flags);
+> +
+> +static inline bool kvm_slot_nowait_on_fault(
+> +	const struct kvm_memory_slot *slot)
 
-Well, the flexible array notation is what my understanding of referring
-to a "label" defined in ASM is. I'm probably biased, as that's a pattern
-used a lot in the Linux kernel but trying to look at the individual
-semantics may make it clearer why I prefer 'extern char sym[]' over
-'extern char sym'.
+Just when I was starting to think that we had beat all of the Google3 out of you :-)
 
-The current code refers to the code sequence starting at 'ret_to_kernel'
-by creating an alias of it's first instruction byte. However, we're not
-interested in the first instruction byte at all. We want a symbolic
-handle of the begin of that sequence, which might be an unknown number
-of bytes. But that's also a detail that doesn't matter. We only what to
-know the start. By referring to it as 'extern char' implies that there
-is at least a single byte. (Let's ignore the hair splitting about just
-taking the address vs. actually dereferencing it (which we do not).) By
-looking at another code example, that byte may not actually be there!
-From x86/vmx_tests.c:
+And predicate helpers in KVM typically have "is" or "has" in the name, so that it's
+clear the helper queries, versus e.g. sets the flag or something. 
 
-  extern char vmx_mtf_pdpte_guest_begin;
-  extern char vmx_mtf_pdpte_guest_end;
+> +{
+> +	return slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
 
-  asm("vmx_mtf_pdpte_guest_begin:\n\t"
-      "mov %cr0, %rax\n\t"    /* save CR0 with PG=1                 */
-      "vmcall\n\t"            /* on return from this CR0.PG=0       */
-      "mov %rax, %cr0\n\t"    /* restore CR0.PG=1 to enter PAE mode */
-      "vmcall\n\t"
-      "retq\n\t"
-      "vmx_mtf_pdpte_guest_end:");
+KVM is anything but consistent, but if the helper is likely to be called without
+a known good memslot, it probably makes sense to have the helper check for NULL,
+e.g.
 
-The byte referred to via &vmx_mtf_pdpte_guest_end may not even be mapped
-due to -ftoplevel-reorder possibly putting that asm block at the very
-end of the compilation unit.
+static inline bool kvm_is_slot_nowait_on_fault(const struct kvm_memory_slot *slot)
+{
+	return slot && slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
+}
 
-By using 'extern char []' instead this nastiness is avoided by referring
-to an unknown sized byte sequence starting at that symbol (with zero
-being a totally valid length). We don't need to know how many bytes
-follow the label. All we want to know is its address. And that's what an
-array type provides easily.
+However, do we actually need to force vendor code to query nowait?  At a glance,
+the only external (relative to kvm_main.c) users of __gfn_to_pfn_memslot() are
+in flows that play nice with nowait or that don't support it at all.  So I *think*
+we can do this?
 
-But I can understand, that YMMV and you prefer it the other way around.
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index be06b09e9104..78024318286d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2403,6 +2403,11 @@ static bool memslot_is_readonly(const struct kvm_memory_slot *slot)
+        return slot->flags & KVM_MEM_READONLY;
+ }
+ 
++static bool memslot_is_nowait_on_fault(const struct kvm_memory_slot *slot)
++{
++       return slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
++}
++
+ static unsigned long __gfn_to_hva_many(const struct kvm_memory_slot *slot, gfn_t gfn,
+                                       gfn_t *nr_pages, bool write)
+ {
+@@ -2730,6 +2735,11 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+                writable = NULL;
+        }
+ 
++       if (async && memslot_is_nowait_on_fault(slot)) {
++               *async = false;
++               async = NULL;
++       }
++
+        return hva_to_pfn(addr, atomic, interruptible, async, write_fault,
+                          writable);
+ }
 
-> 
->> No functional change.
->>
->> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
->> ---
->>  lib/x86/usermode.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
->> index e22fb8f0132b..b976123ca753 100644
->> --- a/lib/x86/usermode.c
->> +++ b/lib/x86/usermode.c
->> @@ -35,12 +35,12 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
->>  		uint64_t arg1, uint64_t arg2, uint64_t arg3,
->>  		uint64_t arg4, bool *raised_vector)
->>  {
->> -	extern char ret_to_kernel;
->> +	extern char ret_to_kernel[];
->>  	uint64_t rax = 0;
->>  	static unsigned char user_stack[USERMODE_STACK_SIZE];
->>  
->>  	*raised_vector = 0;
->> -	set_idt_entry(RET_TO_KERNEL_IRQ, &ret_to_kernel, 3);
->> +	set_idt_entry(RET_TO_KERNEL_IRQ, ret_to_kernel, 3);
->>  	handle_exception(fault_vector,
->>  			restore_exec_to_jmpbuf_exception_handler);
->>  
->> -- 
->> 2.39.2
->>
+Ah, crud.  The above highlights something I missed in v3.  The memslot NOWAIT
+flag isn't tied to FOLL_NOWAIT, it's really truly a "fast-only" flag.  And even
+more confusingly, KVM does set FOLL_NOWAIT, but for the async #PF case, which will
+get even more confusing if/when KVM uses FOLL_NOWAIT internally.
+
+Drat.  I really like the NOWAIT name, but unfortunately it doesn't do what as the
+name says.
+
+I still don't love "fast-only" as that bleeds kernel internals to userspace.
+Anyone have ideas?  Maybe something about not installing new mappings?
