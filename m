@@ -2,82 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45B7973048B
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 18:05:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B880730493
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 18:07:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230146AbjFNQFh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 12:05:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57190 "EHLO
+        id S230411AbjFNQHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 12:07:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229807AbjFNQFe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 12:05:34 -0400
-Received: from out-37.mta0.migadu.com (out-37.mta0.migadu.com [IPv6:2001:41d0:1004:224b::25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 975FA1FCA
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 09:05:29 -0700 (PDT)
-Date:   Wed, 14 Jun 2023 16:05:16 +0000
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Joey Gouly <joey.gouly@arm.com>
+        with ESMTP id S230195AbjFNQHG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 12:07:06 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B312B5
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 09:07:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8E21363C4E
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 16:07:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8C7BC433C8;
+        Wed, 14 Jun 2023 16:07:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686758821;
+        bh=/r6fdKCJUAuhajNoRQPQaUxEvrIU0vHzZIEJ1GzJpnE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qbK5EooCYLobN7jXxYBxiPx9/iHnGqXfD7liRUJcIZkCiw5Czt6Dvs1rhyIS5d1Fc
+         +MLZkaA9MgnB7fpUKtFfiHjpBi74vwnsCNnPj0Rodte4O9VtJOshjylallZx/8fRB1
+         IuNuq9ugLk8l/CfNHu/gKoejq8UvCbuJp4tG9vXLTtMGnO00BKBYFiXvIVxjIttLuS
+         1FZHEwvR2MzizQj80KYXE4CVyL3w4EEYJvfuQG7BnI4YxQOj0aK31cnzV4o2e23b2l
+         3NXbrNJNEVcKOWfPCm/1HyWpP9bqjrlAZBTUHgphsFaXp6bH+pRBFEATHu0hZ4hAJL
+         rvGqRpIG1g6cQ==
+Received: from [77.240.177.73] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1q9T1O-005NTK-E2;
+        Wed, 14 Jun 2023 17:06:58 +0100
+Date:   Wed, 14 Jun 2023 17:06:58 +0100
+Message-ID: <87bkhiqb8d.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shaoqin Huang <shahuang@redhat.com>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Salil Mehta <salil.mehta@huawei.com>, nd@arm.com
-Subject: Re: [PATCH kvmtool 00/21] arm64: Handle PSCI calls in userspace
-Message-ID: <ZInlPE/J7W/FLX6P@linux.dev>
-References: <20230526221712.317287-1-oliver.upton@linux.dev>
- <20230614120503.GA3015626@e124191.cambridge.arm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230614120503.GA3015626@e124191.cambridge.arm.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v3 04/17] arm64: Add KVM_HVHE capability and has_hvhe() predicate
+In-Reply-To: <8f7d7285-b21d-23b0-793b-70ee008cb45b@redhat.com>
+References: <20230609162200.2024064-1-maz@kernel.org>
+        <20230609162200.2024064-5-maz@kernel.org>
+        <8f7d7285-b21d-23b0-793b-70ee008cb45b@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 77.240.177.73
+X-SA-Exim-Rcpt-To: shahuang@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Joey,
+On Wed, 14 Jun 2023 08:35:13 +0100,
+Shaoqin Huang <shahuang@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> Should we have a document about the hVHE? Because it's a sw feature,
+> there is no spec about it. And later people may need to read the code
+> itself to understand what is hVHE.
 
-Thanks for the review and taking the patches for a spin.
+I'm planning to eventually do that once the hVHE code actually does
+something useful. So far, it doesn't really do much.
 
-On Wed, Jun 14, 2023 at 01:05:03PM +0100, Joey Gouly wrote:
-> `kvm_cpu__configure_features` in kvmtool is failing because Linux returns an
-> error if SVE was already finalised (arch/arm64/kvm/reset.c):
-> 
-> ```
-> int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
-> {
->         switch (feature) {
->         case KVM_ARM_VCPU_SVE:
->                 if (!vcpu_has_sve(vcpu))
->                         return -EINVAL;
-> 
->                 if (kvm_arm_vcpu_sve_finalized(vcpu))
->                         return -EPERM; // <---- returns here
-> 
->                 return kvm_vcpu_finalize_sve(vcpu);
->         }
-> 
->         return -EINVAL;
-> }
-> ```
-> 
-> It's not immediately obvious to me why finalising SVE twice is an error.
-> Changing that to `return 0;` gets the test passing, but not sure if there
-> are other implications.
+But what I really want is to *hide* this low level option, and have it
+driven by something like "kvm-arm.mode=hvhe,protected". It is just
+that writing a parser is hard at the point where this is evaluated (we
+don't have much of the kernel running).
 
-This is utterly mindless on my part, apologies. The SVE feature
-shouldn't be finalised (again). I'll probably drop patch 8 altogether
-and replace its usage with a direct call to KVM_ARM_VCPU_INIT.
+> 
+> On 6/10/23 00:21, Marc Zyngier wrote:
+> > Expose a capability keying the hVHE feature as well as a new
+> > predicate testing it. Nothing is so far using it, and nothing
+> > is enabling it yet.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Besides that, the code itself LGTM.
+> 
+> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+
+Thanks,
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
