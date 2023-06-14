@@ -2,94 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DCC92730897
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 21:42:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D07747308EB
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 22:03:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235383AbjFNTmI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 15:42:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60616 "EHLO
+        id S235501AbjFNUDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 16:03:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230298AbjFNTle (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 15:41:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17F58268C
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 12:40:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686771609;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7OxB9F73sxxKzQb7MnYhti66iYjEzvVt+NUA6vB8wM8=;
-        b=J2bEoIv1DSSjbx5ewxoXlZYIW/L5S5TkPWAOuNOf6ZtRPFTXlXDB5klhZD8i3T3AcON8p7
-        SB8kjTU6j/6BZosAFNprymqx2lzWUkXrMvf5VX9IDtNsvsQ0NjnrNa59DZ24orxuyV18GW
-        GUz6M7Czyd+x5QkbBk0OisCghXR8j/o=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-265-F9Q2WxucPbSrKaHDodPjoA-1; Wed, 14 Jun 2023 15:40:06 -0400
-X-MC-Unique: F9Q2WxucPbSrKaHDodPjoA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8FA751C08DB5;
-        Wed, 14 Jun 2023 19:40:05 +0000 (UTC)
-Received: from omen.home.shazbot.org (unknown [10.22.33.254])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 21B99492C1B;
-        Wed, 14 Jun 2023 19:40:05 +0000 (UTC)
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>, jgg@nvidia.com,
-        clg@redhat.com, eric.auger@redhat.com, diana.craciun@oss.nxp.com
-Subject: [PATCH v3 3/3] vfio/fsl: Create Kconfig sub-menu
-Date:   Wed, 14 Jun 2023 13:39:48 -0600
-Message-Id: <20230614193948.477036-4-alex.williamson@redhat.com>
-In-Reply-To: <20230614193948.477036-1-alex.williamson@redhat.com>
-References: <20230614193948.477036-1-alex.williamson@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        with ESMTP id S233699AbjFNUDd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 16:03:33 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 501CDB5
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 13:03:32 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-56991d8e2b0so12612147b3.2
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 13:03:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686773011; x=1689365011;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xth/dKnZ4X28lQoTZbFQ4tulO57k+1JCaPSWj9iO4eA=;
+        b=a2rTpf7tk/AhTyaMcYRwTgveD/G8LLIuNF+Gea95Z3/RsC3wXxo0/bTqFAHMnfze4L
+         eH2vCFSAcUaRd7/8sO+PgzGelO8zrfjlb9IG8QqyC59Ph/lXTWsBYnR/oom4t7T3UNL7
+         kGC34V5rXEAZoVoUDymcTzLyTBV+bRMjMMrmqlIuq6rbluMMs5hvDWNYWma2QcTe3KzU
+         0k04HeWakaDnpABs8q3TNyI6rnjZKZmoeUL4MzEuwMzJEe0gNWpmMuJaZI9PlbxKuoeI
+         9ArdigBUyHR9upmYoGm3/n2arWjzhVC+SqOptnenPIXJkw1vyxDT8CuIJtqYmk6FpDrg
+         ly5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686773011; x=1689365011;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xth/dKnZ4X28lQoTZbFQ4tulO57k+1JCaPSWj9iO4eA=;
+        b=DMQIUeUfFCbSi32JXYiZYwtZubtlucOOpvcRVgizAneqmT2lCD1gyC7mzFdStYxfxT
+         Qd2wulIpP84ww2YJdENeGQd6k1ZIea2lULzrroCSlPQDbc8AUMZWfZpiC6kvG6dkIijS
+         +egjjJeizQRvQeanZaDMUE7C5xiOPmPCiHogRZ04c7WsM1b9Jt+O4pq7jXKej/akzald
+         Hz4MXQlSu4Cac83Jedpw1jSnUv2litBCUdG1FSvX8P734tQO+/x/ApHxgX8hsSyXtmks
+         4YFHRQsQw/B34s7SSK8cjtlQD4K2Gkk8SA4etoR42mq3fNS6HCj0oSM3xs4G5FCv2qB6
+         cCQw==
+X-Gm-Message-State: AC+VfDyVXwHO6kJdYlklEiBCO4hs7UHS40ZsijxjLOE0wX08k2AXABW9
+        RMmGKqoMyeAnCcKXr2yGvh4H/xPNH5E=
+X-Google-Smtp-Source: ACHHUZ5YC9fqFsbs2BK2YWnqhrDW9n8lci9HZwrS4su/Z+3YN/mtXio3BUOmvgDd38altuGk76kFhSg88x4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a5b:608:0:b0:ba8:54dc:9d0 with SMTP id
+ d8-20020a5b0608000000b00ba854dc09d0mr383540ybq.12.1686773011429; Wed, 14 Jun
+ 2023 13:03:31 -0700 (PDT)
+Date:   Wed, 14 Jun 2023 13:03:30 -0700
+In-Reply-To: <20230602161921.208564-9-amoorthy@google.com>
+Mime-Version: 1.0
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-9-amoorthy@google.com>
+Message-ID: <ZIodEnUmwIv+Iuqd@google.com>
+Subject: Re: [PATCH v4 08/16] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        robert.hoo.linux@gmail.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+        isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For consistency with pci and platform, push the vfio-fsl-mc option into a
-sub-menu.
+On Fri, Jun 02, 2023, Anish Moorthy wrote:
+> Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
+> kvm_handle_error_pfn().
+> 
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index c8961f45e3b1..cb71aae9aaec 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3291,6 +3291,10 @@ static void kvm_send_hwpoison_signal(struct kvm_memory_slot *slot, gfn_t gfn)
+>  
+>  static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  {
+> +	uint64_t rounded_gfn;
 
-Reviewed-by: Cédric Le Goater <clg@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/fsl-mc/Kconfig | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+gfn_t, and probably no need to specificy "rounded", let the code do the talking.
 
-diff --git a/drivers/vfio/fsl-mc/Kconfig b/drivers/vfio/fsl-mc/Kconfig
-index 597d338c5c8a..7d1d690348f0 100644
---- a/drivers/vfio/fsl-mc/Kconfig
-+++ b/drivers/vfio/fsl-mc/Kconfig
-@@ -1,6 +1,8 @@
-+menu "VFIO support for FSL_MC bus devices"
-+	depends on FSL_MC_BUS
-+
- config VFIO_FSL_MC
- 	tristate "VFIO support for QorIQ DPAA2 fsl-mc bus devices"
--	depends on FSL_MC_BUS
- 	select EVENTFD
- 	help
- 	  Driver to enable support for the VFIO QorIQ DPAA2 fsl-mc
-@@ -8,3 +10,5 @@ config VFIO_FSL_MC
- 	  fsl-mc bus devices using the VFIO framework.
- 
- 	  If you don't know what to do here, say N.
-+
-+endmenu
--- 
-2.39.2
+> +	uint64_t fault_size;
+> +	uint64_t fault_flags;
 
+With a few exceptions that we should kill off, KVM uses "u64", not "uint64_t".
+Though arguably the "size" should be gfn_t too.
+
+And these can all go on a single line, e.g.
+
+	u64 fault_size, fault_flags;
+
+Though since the kvm_run.memory_fault field and the param to the helper are "len",
+a simple "len" here is better IMO.
+
+And since this is not remotely performance sensitive, I wouldn't bother deferring
+the initialization, e.g.
+
+	gfn_t gfn = gfn_round_for_level(fault->gfn, fault->goal_level);
+	gfn_t len = KVM_HPAGE_SIZE(fault->goal_level);
+	u64 fault_flags;
+
+All that said, consuming fault->goal_level is unnecessary, and not be coincidence.
+The *only* time KVM should bail to userspace is if KVM failed to faultin a 4KiB
+page.  Providing a hugepage is done opportunistically, it's never a hard requirement.
+So throw away all of the above and see below.
+
+> +
+>  	if (is_sigpending_pfn(fault->pfn)) {
+>  		kvm_handle_signal_exit(vcpu);
+>  		return -EINTR;
+> @@ -3309,6 +3313,15 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+>  		return RET_PF_RETRY;
+>  	}
+>  
+> +	fault_size = KVM_HPAGE_SIZE(fault->goal_level);
+> +	rounded_gfn = round_down(fault->gfn * PAGE_SIZE, fault_size);
+
+We have a helper for this too, gfn_round_for_level().  Ooh, but this isn't storing
+a gfn, it's storing a gpa.  Naughty, naughty.
+	
+> +
+> +	fault_flags = 0;
+> +	if (fault->write)
+> +		fault_flags |= KVM_MEMORY_FAULT_FLAG_WRITE;
+> +	if (fault->exec)
+
+exec and write are mutually exclusive.  There's even documented precedent for
+this in page_fault_can_be_fast().
+
+So with a READ flag, this can be
+
+	if (fault->write)
+		fault_flags = KVM_MEMORY_FAULT_FLAG_WRITE;
+	else if (fault->exec)
+		fault_flags = KVM_MEMORY_FAULT_FLAG_EXEC;
+	else
+		fault_flags = KVM_MEMORY_FAULT_FLAG_READ;
+
+Or as Paolo would probably write it ;-)
+
+	fault_flags = (fault->write & 1) << KVM_MEMORY_FAULT_FLAG_WRITE_SHIFT |
+		      (fault->exec & 1) << KVM_MEMORY_FAULT_FLAG_EXEC_SHIFT |
+		      (!fault->write && !fault->exec) << KVM_MEMORY_FAULT_FLAG_READ_SHIFT;
+
+(that was a joke, don't actually do that)
+
+> +		fault_flags |= KVM_MEMORY_FAULT_FLAG_EXEC;
+> +	kvm_populate_efault_info(vcpu, rounded_gfn, fault_size, fault_flags);
+
+This is where passing a "gfn" variable as a "gpa" looks broken.
+
+>  	return -EFAULT;
+
+All in all, something like this?
+
+	u64 fault_flags;
+
+	<other error handling>
+
+	/* comment goes here */
+	WARN_ON_ONCE(fault->goal_level != PG_LEVEL_4K);
+
+	if (fault->write)
+		fault_flags = KVM_MEMORY_FAULT_FLAG_WRITE;
+	else if (fault->exec)
+		fault_flags = KVM_MEMORY_FAULT_FLAG_EXEC;
+	else
+		fault_flags = KVM_MEMORY_FAULT_FLAG_READ;
+
+	kvm_handle_blahblahblah_fault(vcpu, gfn_to_gpa(fault->gfn), PAGE_SIZE,
+				      fault_flags);
