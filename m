@@ -2,209 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD56D72FDD9
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 14:05:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3179B72FE14
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 14:12:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244386AbjFNMF0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 08:05:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43554 "EHLO
+        id S244517AbjFNMMp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 08:12:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244279AbjFNMFY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 08:05:24 -0400
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2060.outbound.protection.outlook.com [40.107.20.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 148E11FD8
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 05:05:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=by933ks/kR8PGy8GrFVpXM6VemjxjYISVJsO30hUz8w=;
- b=gAg/BGA+l95ZMF2xhfwbQrmxYoBJAEzETrn7+d26rbsKgskCeTMEM+Rh0nZH6le3+STZsrGIbhWv5CIV+NOm6Mg4LU0JChkJcUiVcBIZNvCzd8J08uq6TTcoSaXD+SS3+bjKo/ZUq9gC0X57khzl7ywnKxNMOzoNsCB81yIrAJ4=
-Received: from AM0PR10CA0039.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::19)
- by DU2PR08MB10302.eurprd08.prod.outlook.com (2603:10a6:10:46e::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.44; Wed, 14 Jun
- 2023 12:05:18 +0000
-Received: from AM7EUR03FT035.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:20b:150:cafe::46) by AM0PR10CA0039.outlook.office365.com
- (2603:10a6:20b:150::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.36 via Frontend
- Transport; Wed, 14 Jun 2023 12:05:18 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
- pr=C
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM7EUR03FT035.mail.protection.outlook.com (100.127.141.24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6500.25 via Frontend Transport; Wed, 14 Jun 2023 12:05:18 +0000
-Received: ("Tessian outbound 3570909035da:v136"); Wed, 14 Jun 2023 12:05:18 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: 7011087508e78935
-X-CR-MTA-TID: 64aa7808
-Received: from 356180b194ff.1
-        by 64aa7808-outbound-1.mta.getcheckrecipient.com id E4C8BFB1-D1EF-4EE8-8A5D-761D510F2289.1;
-        Wed, 14 Jun 2023 12:05:11 +0000
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 356180b194ff.1
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Wed, 14 Jun 2023 12:05:11 +0000
+        with ESMTP id S233839AbjFNMMV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 08:12:21 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2068.outbound.protection.outlook.com [40.107.244.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A36DB26BA;
+        Wed, 14 Jun 2023 05:12:05 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CfIDkqhSI2OLw/3Xao7ePs1uPuRh/z0kpFgX5xWLwzIVIbuzbY7fq2lwQQKQyjzoBTkdokanWDs3ijC/n211Zm0zWV/NypHLZqpahOE8YhBAFIrHEcRE9468/vIPcIfIuwVdRhmjULMVRlJAAwjLnxn3D1WyvYGmphRt42nB2X9UmAhq8RE1IjY1849OFTaBPZpl3T6Q27lnWFT+r5l+1bh7QjGz+zmFEjokhrWn4+U9Ud8B6rXuseNVJY0Y7eWlWy774eYgabAzUEIbV8yizGtrhOj67vKgJB0Q+iqAtyjk31ZNfqm5UJcGfjBwICYykqDKGCVDM6JWYHl+OV9I1A==
+ b=D/M11lfRDD0K48UI5v0Qbf5GgW3HFwLGNO4Mh+Ii9gXRZsk5NlWx5kc3n2kQTNVrD1VHlDtZZpF9TDbC2nEcul0zATNdDWoETE2hyKeRm9YRUU89jQtnXQaDj3FqGbQ1U+mtoyku/UqZsBBGE2yQOjKmHRzSaC4+lWNf4gzaxoAaQTTS7Fbx+X+jP9c+qC3YW8sfymTzofTh3D2mZjBhMCTFWhmpIwJkvjZ6ODYTiotwkP7JbzKL8SKqmajMvhnFYtxYlkwnJkUF+IjfhQygaLWuIr5pMa842E6tZDxcP5EBqXBzAe+qpEz68/bMdWhQzH+bIv7ZWAFdeIc6cuxckw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=by933ks/kR8PGy8GrFVpXM6VemjxjYISVJsO30hUz8w=;
- b=gHkr8TymoQqMBvBHgXaem0l4JDhbksyC6S8/vw7jPkEv82MWPEByt8Kjy4pQQmxUZAox3RUYw6MVvkxqENdAHEc4xqgSvulQywwRMl/6vF4UUSRORt4LlePcyow6rvaQx9uDs1fr8AaEw5O67Uk1UUhejcUW4LM7iiDY4/iOy9au5YY6TqMJ4kQfTvMFuvyz4iktdAtAxpbOdaoEOD/ciU4Y+mtv2TL5wOjQmUkUyXawSDTv1+GsWUNXV99NCRCm0XP7Z7TkodglWEh2YKbw2UzJzZBu7Ag6oQZQ+dykEmFG2kXY2pKi+MovdUt/ro4jJ0menywOPBshpPPEE4e2OQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 40.67.248.234) smtp.rcpttodomain=linux.dev smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
+ bh=n8BWqWvWDxVom9DUw8oV5oZ+fONisW171tP9Sz0HL9o=;
+ b=AfHVrPYX1WgTBN6lCmtdt3PKa+6aLZcaM7Gdz93c7lSHnNfc56yV4Z3KkWXzeuOwFg7PjNzN59paPW8og2HpsU6xo7fNi7LN7WMxUVkdQN7c0bq+ehj+II3OJIFROjTM2vKDLk+8Xo2zF/8Jm9btUxymIF0PYy6itKxathwR2fFYIz6Bcay7T7PUNOP8cx/oDM/zRJ0KUQ0MG24d7ukVr5fEz6ekRPEDMwunM31iSJjkm1RWtThyo5z/ebBwBlY9znRb9J/CBRnAIKtV43GxTZf+SfG8TmnLp5le7H7GTguo1NYN/ax2S/v18z+B9f3NSunDGiDQXlW8yT6gYsFmJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=by933ks/kR8PGy8GrFVpXM6VemjxjYISVJsO30hUz8w=;
- b=gAg/BGA+l95ZMF2xhfwbQrmxYoBJAEzETrn7+d26rbsKgskCeTMEM+Rh0nZH6le3+STZsrGIbhWv5CIV+NOm6Mg4LU0JChkJcUiVcBIZNvCzd8J08uq6TTcoSaXD+SS3+bjKo/ZUq9gC0X57khzl7ywnKxNMOzoNsCB81yIrAJ4=
-Received: from DB8PR06CA0037.eurprd06.prod.outlook.com (2603:10a6:10:120::11)
- by GV1PR08MB8500.eurprd08.prod.outlook.com (2603:10a6:150:84::5) with
+ bh=n8BWqWvWDxVom9DUw8oV5oZ+fONisW171tP9Sz0HL9o=;
+ b=IL/R051eIAyRKa1p9i9M5r1/Zm2Z7d/+KdKiy+qQeTIWq3/o6wCoambMHMgq70UjIVdw+mDvyx7GEyatxWAL9ghqIc/GjCk6fYaV731W4WBpTU0ClpkfcSW81J/N6VTvyHEc+5Ul7cIUrVKKyZAiYxWx4PEgoetvmufhNZf2V/wlJhN+TmTPh0X+aBaaUSgYY+gAJghPpgPKlY6CA1uDloX4Fd1hjw2sAmymE+NAFzk6+IjcjP7Td4bqonVDLbGUOuGxLK1xRyWcNAb4htqr58MNiW+5CSuzrULsyXHwF/Co1qykOd+eGiLSb/xVDwyYmdhmaXUwNHqHDwEy99jo5g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH8PR12MB6865.namprd12.prod.outlook.com (2603:10b6:510:1c8::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.46; Wed, 14 Jun
- 2023 12:05:06 +0000
-Received: from DBAEUR03FT022.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:10:120:cafe::6e) by DB8PR06CA0037.outlook.office365.com
- (2603:10a6:10:120::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.36 via Frontend
- Transport; Wed, 14 Jun 2023 12:05:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 40.67.248.234)
- smtp.mailfrom=arm.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 40.67.248.234 as permitted sender) receiver=protection.outlook.com;
- client-ip=40.67.248.234; helo=nebula.arm.com; pr=C
-Received: from nebula.arm.com (40.67.248.234) by
- DBAEUR03FT022.mail.protection.outlook.com (100.127.142.217) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6500.23 via Frontend Transport; Wed, 14 Jun 2023 12:05:05 +0000
-Received: from AZ-NEU-EX02.Emea.Arm.com (10.251.26.5) by AZ-NEU-EX03.Arm.com
- (10.251.24.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Wed, 14 Jun
- 2023 12:05:05 +0000
-Received: from AZ-NEU-EX03.Arm.com (10.251.24.31) by AZ-NEU-EX02.Emea.Arm.com
- (10.251.26.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Wed, 14 Jun
- 2023 12:05:04 +0000
-Received: from e124191.cambridge.arm.com (10.1.197.45) by mail.arm.com
- (10.251.24.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23 via Frontend
- Transport; Wed, 14 Jun 2023 12:05:04 +0000
-Date:   Wed, 14 Jun 2023 13:05:03 +0100
-From:   Joey Gouly <joey.gouly@arm.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-CC:     <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        "Salil Mehta" <salil.mehta@huawei.com>, <nd@arm.com>
-Subject: Re: [PATCH kvmtool 00/21] arm64: Handle PSCI calls in userspace
-Message-ID: <20230614120503.GA3015626@e124191.cambridge.arm.com>
-References: <20230526221712.317287-1-oliver.upton@linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.42; Wed, 14 Jun
+ 2023 12:12:00 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%7]) with mapi id 15.20.6477.037; Wed, 14 Jun 2023
+ 12:12:00 +0000
+Date:   Wed, 14 Jun 2023 09:11:57 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "clegoate@redhat.com" <clegoate@redhat.com>
+Subject: Re: [PATCH v7 6/9] vfio: Mark cdev usage in vfio_device
+Message-ID: <ZImujXKfS2NP3LqU@nvidia.com>
+References: <20230602121515.79374-1-yi.l.liu@intel.com>
+ <20230602121515.79374-7-yi.l.liu@intel.com>
+ <ZIitv1rz3wg48dOW@nvidia.com>
+ <DS0PR11MB752998A3AE0185BBF179F3BBC35AA@DS0PR11MB7529.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230526221712.317287-1-oliver.upton@linux.dev>
-X-EOPAttributedMessage: 1
-X-MS-TrafficTypeDiagnostic: DBAEUR03FT022:EE_|GV1PR08MB8500:EE_|AM7EUR03FT035:EE_|DU2PR08MB10302:EE_
-X-MS-Office365-Filtering-Correlation-Id: bfceaf33-078d-43ff-0dd9-08db6ccf9f38
-x-checkrecipientrouted: true
-NoDisclaimer: true
+In-Reply-To: <DS0PR11MB752998A3AE0185BBF179F3BBC35AA@DS0PR11MB7529.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BYAPR02CA0071.namprd02.prod.outlook.com
+ (2603:10b6:a03:54::48) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH8PR12MB6865:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2de37a29-e778-49b3-c9c0-08db6cd08e9a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original: iyVr4GvumxsvLOlatx1MHG39vjIn1rPp+o2hrETyNOh2jjpEEumJpTZXNVN4XUYrBgfWTuUHah62lm0pfm2PyLh7Jksbtw1lriRRBarvl1piW0nxi/Ya5tqhIpr8kCCp2kIDoMta0pGNK72MgYPWJ5S1Xh8+dGgGnRxji3ujs1DE1sF9GYEUrUNaKaFZU6RRHXvZOYRbTvtM4gOr3GlYFJJTEry3E37pbaL7LSkz4X7vViOVNz52Fh9G8ZLlOgXM5MsZ58R2Pl5kSTZ1VIaHcowFsEFfTdYMhW30bya6pG2KyYZy8ZDlOOmsnrZ7AJMgPVFPvDwxorT1sCIFfaTq7/TEOf21hEj+HNc4aPmmhOSUT5Mfb/5ona//fxtcmdq4oRPgZtZDHvBed33SHrEug9fFHjXCsiOSqA3iKGqahz2d7EO7kH54mSl1AT8z2sPJgY195SlLKT61qddKIK2DMu3uFxPBKAYdkAAWKGcjSRmfy0l7tpIfLRZ2NMueFcAUDZVjBuTp39ig2mdPvQ9MdJg6OyYCNZ7mlBa1zEIqcMeNe6p6i1/H44ZNH6xFvBQEGFJP9fdHSPScFiTjds4bZKytPdgaeI682pzonroJwQ0uRNrfgNxkiEgN8u7XfCJTrRDTHtn4Dt9ycS5pjxaUqv/ho75ILwoAVmohptAnwxuYe1qUqw3kpiQPtLbGFSCVHM7lOvyohEcw1UZfzUUG1VIMLTN5O3fBDEKJzBO50t+0W3ImNWh+/Qdt7m0R6mUTJ/GxFwjppTe8tKxwczwaqg==
-X-Forefront-Antispam-Report-Untrusted: CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(136003)(39860400002)(396003)(451199021)(36840700001)(40470700004)(46966006)(82740400003)(40460700003)(478600001)(7696005)(36860700001)(47076005)(83380400001)(26005)(186003)(336012)(426003)(1076003)(33656002)(86362001)(82310400005)(356005)(81166007)(40480700001)(55016003)(6916009)(4326008)(70586007)(70206006)(316002)(8936002)(44832011)(5660300002)(41300700001)(2906002)(54906003)(8676002)(36900700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR08MB8500
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM7EUR03FT035.eop-EUR03.prod.protection.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs: 228019bd-1e84-40cd-f283-08db6ccf978e
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ksN4lsyTaAvTvsMi1Rc/KTxM20j/7z9oUIe/kaKkCN3YTABOIq+Nf9B8vfVcdRy+tYVz2LWnuPgvi+uaJkiP+IVdb/DchxrNZ/37v0gpxm8ebSNyBB1Bq8EJMvmV7RV8zA39BATbez6UBEVHESSZ/KRFoz37CZWmjZloMoUgXoDasSN2yppYti486cPERv0m/55LSVlM2CEwqV07/U6ws79JXfnaxIKkTcDbVpZmoW1Im/elb2gqMIEY6ZC2jYpMQM37kqCmQ311Fzg/pdm9XFkEPhBUh4ZLJqwr7gE0LzP9iFvXk57BL0oK7YAq9HUMO0e0iUTchBhsgf0FsrQcxpNOt6S86p4AKUnNUXhOLSHFR/9/aHwSbCDRAsFRXpWEQWjLGxDDjSss79qT0E/eeSlZ+vAq2guJtZqzjfn1vpfKJlc02UVHDi4tQ5a2w8gd3MtGR/s3sF+J3Jm2bbgblz5sijJjAmhDvZnli9q/WTlrDfxOFuN+gdiy/SW55v16uF3/UtA7or6+6ZNMm2Xk8gWEj4jg5E8ay1at1PzBfp3qz2CT1PXZX3pAhSbzkcyluycMPnkM8W9++pcN2We1nCCzM5Rj0lYLNmDdrX1JlP0Xs8y0o4ishdHLeH8nqCk9929r+jbzT6rlMAOPFguh8J3kFQxNhgHx4vuDPreFwbXcQejrqz6zCOfpbHljp22pYM4UA+rZ2AukUoKlaGyEOimiOm2XFzQeyqd/69/DTc1BBEqhxR48ONKfSRk/lBK0
-X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(346002)(39860400002)(376002)(451199021)(46966006)(36840700001)(40470700004)(5660300002)(8936002)(6862004)(8676002)(2906002)(70206006)(70586007)(44832011)(54906003)(7696005)(4326008)(1076003)(26005)(186003)(316002)(41300700001)(36860700001)(82740400003)(336012)(426003)(83380400001)(47076005)(40460700003)(478600001)(33656002)(40480700001)(55016003)(86362001)(82310400005)(81166007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2023 12:05:18.7713
+X-Microsoft-Antispam-Message-Info: G7OaIIVkmu9UuleH/wzElBunkDFzJa4gO4nHeEu3K1bF2sNShO2GewhKGlFtonBPFJLLwNtIph5vFYtd1wqRFUHktExeOWATxUH7QhEdtc3R1bIea9JcNBHV0dlMZBJeUO6XxgR8yz0PxKYvSBIKh9ZZcaCm/wRcStZESsB7XTHQEK5ZnuIOkjYKZep8RhF7LmHqMt1XweUquIbkUWyB07g2BMslrnVUODukwXAJLxmhXFpIsmgL+lpXLmPqNwZ3WTkXBiOgLoHu6oxHdxJWSxb499it5wn19awsKacNGF6aGd0SocOlsxFdopwn9LNbjCd7Z5fZlS5XTT/s4Bx5fnnJHOO8ohEdDN0hFMbhcDexhFFxrR2OMOBz05ZTou3AX5pc72kIQiORlbfpjifI1N4yf9NhYCXS/s8d6t6Pp0DYwLnfNv3tlKHBjFXlExVwef3jdV6fk4+6w2reAnBl+eJmA79KuUVQefpsiWmCAw4Jkewoo4VOQcAzkmDQZPcddNRz7In09PMQoFFVrL+bCKpoNewG8++AOxDW4RoHsk2NMf5eJZBNdKlR9RUyxr7v
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(39860400002)(136003)(376002)(346002)(451199021)(8936002)(8676002)(5660300002)(7416002)(66556008)(6916009)(4326008)(66946007)(66476007)(316002)(54906003)(2906002)(41300700001)(6666004)(478600001)(6486002)(6512007)(36756003)(186003)(26005)(6506007)(2616005)(86362001)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PCS6sdrYlyK4YGGEihUNq03Um3UlkLJQdwb4JsRXTstBbB1tlcSM2t7IMnU4?=
+ =?us-ascii?Q?5dzrjWdXdLS7tI0C7V3kP1qkKXtrpm0pMYDDIPR0+jgCXCqrwHwZTKXPcRbr?=
+ =?us-ascii?Q?+4t/yAuY69Tw/caA+3zKQlnKX3tlnjhtZxHqtXop2nK1tO0yA6m78wuQAhmn?=
+ =?us-ascii?Q?2WezbZ2/iKL/EZBypolm9Kg1xxoxAQsdyTPTiTHe1FqhZO3R7CoKCVaMYQw7?=
+ =?us-ascii?Q?78aJ6MT1ip6SyiAxfxR1Wgq2uNr6aKFKjQc9mOY/Z4TPJIySr3S2hLIyAa0u?=
+ =?us-ascii?Q?HnsIbUY6QRN83YqyW3YpX8ge8paZPRN0fDQnL5dK6/oLg/5JdIWr01hahIye?=
+ =?us-ascii?Q?Dk+qjcBS7CHf4NdZMF4XUraZvrSrgb+SOBqqasn2zuWoEjgm7S3hqspAwxGk?=
+ =?us-ascii?Q?WPdcphf1VbReqYC2eSeVEDNvfNQprfVPaRgZFSCeffhg2F4M8/+olCXx2jVc?=
+ =?us-ascii?Q?aFb8c9piNiCLUELbMurNmZZuSDZqUf17p99xDMaCWvBowPwRhQnpQwDalTSh?=
+ =?us-ascii?Q?+mROmlKSOwGPYxNP9z6ndRIaLp1DZmXO9KK2Nsaen+W8t7tMYAnzkDJJxxOg?=
+ =?us-ascii?Q?lOfEmLHA4wLOWfSZl8zQvCll7VhrCozomgc7tAUvp/j7OWXHaDfAiYm7lAEK?=
+ =?us-ascii?Q?DUVCVjupoOqFaqGIgLIjnDWTcC3HzEAueS8A1ILfZN5Lr7GWEG1+HRj/x8Rs?=
+ =?us-ascii?Q?gyEQ5ZyqiRNGwBDBzhAKtZa4YlyD8gEuWPguPV+TiLxK4qWOgO63FEfd+mtT?=
+ =?us-ascii?Q?3Mf0HGHKrmJVNmjUJzKHd+16zBDeSRBjhw6K5VZ48KKzhjGAPYhpG8Rq//ap?=
+ =?us-ascii?Q?5z9lfMLTK1hsXpGUXJ8pJ0eg9pEDotq/FHaEa5/K4B5I8xk35VPJ+Ax/kqbM?=
+ =?us-ascii?Q?No0HvMrsBlHe0DMAKyqG4ScpM+RpdEKM2CyWlL1oeJA3BATK5si84fCuybZA?=
+ =?us-ascii?Q?NAjNW9iREAOjlHnCDoOLl+wn75mmnpvtuI0vjz1MO0vB+/kPXKbZMBzsqHcp?=
+ =?us-ascii?Q?JaK1lhbSegC/OB1UGEQDt4gPJaY9sflrP3ErXay78UICDQVtMb7QoGZ6wnwY?=
+ =?us-ascii?Q?ImZ0OI21lqMmg5LFsJWwO9P6vhlxZOb06YmoejRDx22+ykPDxbKDqJLE816W?=
+ =?us-ascii?Q?i8qFJcFzW8vvuMGVUhKbFMTvecV+REL93FeytPyTdCeRg3A4hHL1XmQVOu3e?=
+ =?us-ascii?Q?586/BdDbOz3YgiyYty+VEGdSRkrilF8tpDpwpARFbXP2IjvZFsrDIELJSJ89?=
+ =?us-ascii?Q?XjG3/MezdtoHT5EwyrqViThX8RoLaERprAEMyxvLF133wOAkgJsVSEpAKy3q?=
+ =?us-ascii?Q?CX5txaWhJdmtvZP9rO85rOvJRMUCAjsu31ROkYOkyWQ1uaUT6OIBjD7VHxpo?=
+ =?us-ascii?Q?NhThhseMVZ9WTXaOm07LRxs/chVg5OEjFzMvd6C6rOxzZdVUlu8by9vWwYqL?=
+ =?us-ascii?Q?oi8bfWbbho02Y2ufwzvYIiAROW5B3xnilrV3VBImcFriN4XULw13vkgAumcA?=
+ =?us-ascii?Q?plZTrfiw4avRwNDBrb0PA+xTPR2cxZnfmLw7qZLtKvvE37Afwetp+VeQA9Ad?=
+ =?us-ascii?Q?vDokQzzHF4dTjUhr6sPRwOPm8iLsu+0lVjXCNEKV?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2de37a29-e778-49b3-c9c0-08db6cd08e9a
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2023 12:12:00.6016
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bfceaf33-078d-43ff-0dd9-08db6ccf9f38
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource: AM7EUR03FT035.eop-EUR03.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR08MB10302
-X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,FORGED_SPF_HELO,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY
-        autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9gcJv2BByB1spf9jFSE8dM93kd/imF5nn577tiUepCfat822fS8CDxMLV0+seQFo
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6865
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
-
-On Fri, May 26, 2023 at 10:16:51PM +0000, Oliver Upton wrote:
-> The 6.4 kernel picks up support for a generalized SMCCC filter, allowing
-> userspace to select hypercall ranges that should be forwarded to
-> userspace. This is a shameless attempt of making future SMCCC interfaces
-> the responsibility of userspace :)
+On Wed, Jun 14, 2023 at 05:56:08AM +0000, Liu, Yi L wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Wednesday, June 14, 2023 1:56 AM
+> > 
+> > On Fri, Jun 02, 2023 at 05:15:12AM -0700, Yi Liu wrote:
+> > > This can be used to differentiate whether to report group_id or devid in
+> > > the revised VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl. At this moment, no
+> > > cdev path yet, so the vfio_device_cdev_opened() helper always returns false.
+> > >
+> > > Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> > > Tested-by: Terrence Xu <terrence.xu@intel.com>
+> > > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> > > ---
+> > >  include/linux/vfio.h | 5 +++++
+> > >  1 file changed, 5 insertions(+)
+> > >
+> > > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> > > index 2c137ea94a3e..2a45853773a6 100644
+> > > --- a/include/linux/vfio.h
+> > > +++ b/include/linux/vfio.h
+> > > @@ -139,6 +139,11 @@ int vfio_iommufd_emulated_attach_ioas(struct vfio_device
+> > *vdev, u32 *pt_id);
+> > >  	((int (*)(struct vfio_device *vdev, u32 *pt_id)) NULL)
+> > >  #endif
+> > >
+> > > +static inline bool vfio_device_cdev_opened(struct vfio_device *device)
+> > > +{
+> > > +	return false;
+> > > +}
+> > 
+> > This and the two hunks in the other two patches that use this function
+> > should be folded into the cdev series, probably just flattened to one
+> > patch
 > 
-> As a starting point, let's move PSCI up into userspace. KVM already
-> leans on userspace for handling calls that have a system-wide effect.
-> 
-> Tested on linux-next with a 64 vCPU VM. Additionally, I took a stab at
-> running kvm-unit-test's psci test, which passes.
+> Hmmm. I have a doubt about the rule. I think the reason to have this
+> sub-series is to avoid bumping the cdev series. So perhaps we can still
+> put this and the patch 9 in this series? Otherwise, most of the series
+> needs to be in the cdev series.
 
-I applied these patches to kvmtool and tested 6.4, however they don't work
-with an SVE enabled kernel/device.
+Well, then Alex should apply them at the same time..
 
-# ./lkvm run -c 2 -m 4 -k psci.flat                                                                                                                                                
-INFO: psci: PSCI version 1.0                                                                                                                                                         
-PASS: psci: invalid-function                                                                                                                                                         
-PASS: psci: affinity-info-on                                                                                                                                                         
-PASS: psci: affinity-info-off                                                                                                                                                        
-  Error: KVM_ARM_VCPU_FINALIZE: Operation not permitted                                                                                                                              
-  Fatal: Unable to configure requested vcpu features 
-
-`kvm_cpu__configure_features` in kvmtool is failing because Linux returns an
-error if SVE was already finalised (arch/arm64/kvm/reset.c):
-
-```
-int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
-{
-        switch (feature) {
-        case KVM_ARM_VCPU_SVE:
-                if (!vcpu_has_sve(vcpu))
-                        return -EINVAL;
-
-                if (kvm_arm_vcpu_sve_finalized(vcpu))
-                        return -EPERM; // <---- returns here
-
-                return kvm_vcpu_finalize_sve(vcpu);
-        }
-
-        return -EINVAL;
-}
-```
-
-It's not immediately obvious to me why finalising SVE twice is an error.
-Changing that to `return 0;` gets the test passing, but not sure if there
-are other implications.
-
-I also booted with `arm64.nosve` and the test passed.
-
-Thanks,
-Joey
+Jason
