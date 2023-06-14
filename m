@@ -2,194 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AFC772F680
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 09:37:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8385F72F76F
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 10:10:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243417AbjFNHhR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 03:37:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50220 "EHLO
+        id S234598AbjFNIKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 04:10:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243294AbjFNHhL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 03:37:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EDE2212F
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 00:35:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686728156;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=75lHM4GTlQyT6PH14rlaS9YkHZjtMeh42gty71BsVI4=;
-        b=iLpn668CiRgH1DNBlMuwiwDMLwZWgp+FGdbOH5mhRJKvfzrQfzM9FmyhVSNe+l6/NXk6lc
-        T0Yxua3mJDczxm2Hnz7TlS8QxI36O8pPqVdkKfoA23tWNbOfXnom5zeLm2TD6j7sqB4uhV
-        najNKwBKpKDcbXbB1gsyGGRLly7aqQg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-385-Ih1CsYnZPq2xY3avxux1Gg-1; Wed, 14 Jun 2023 03:35:22 -0400
-X-MC-Unique: Ih1CsYnZPq2xY3avxux1Gg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3f7ba550b12so13695855e9.0
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 00:35:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686728122; x=1689320122;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=75lHM4GTlQyT6PH14rlaS9YkHZjtMeh42gty71BsVI4=;
-        b=i0w0IIm4i7ecNZ0GrA3PxpDw9WA9enMdnWeUrzmNrAOWj6O2K5z/sS3QkokI4Pw3SK
-         BdyAEllUsZYjA33hn4SCpyl47CBNO0Y9KGcVNuAoNkBAPdrKhucGCY/Ed30CteAOZI9c
-         VzitIbVTYOTTKCnQ9HLrNKHtC6n1zy4ZoB3+iBC04wlG4U5c8tpX0+u/rKkn4jnspEWA
-         Pirb7AggoEHzfVSWWOoIuFv03bMQMUMUjcV+h3C5UkFqsuPxHa1fY7NLDQreh1lEjZA3
-         2JpfV+nPMwGm4XPaMr8xkFpeAuT5KUB9BIdVweztBEOiaOIREboYCvTesUK7MjhqcbIz
-         UZyw==
-X-Gm-Message-State: AC+VfDyyVSK/ElxEGf8vgQBZo8QA9B+uPMw2DQxvKDsPOuSrGlmN+6UP
-        K1dsVoiHhyxZul5r+LoqRAP0xIMj7U85/m/ngEdeD+PlemzEUyatCXqjLsFaq2cBotZVyvv+sY/
-        xlYxQfBGybbSs
-X-Received: by 2002:a05:600c:3501:b0:3f5:927:2b35 with SMTP id h1-20020a05600c350100b003f509272b35mr11947537wmq.1.1686728121724;
-        Wed, 14 Jun 2023 00:35:21 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4QVilCcTZ6ApVLLadrtzz0koSoKya8xZLjW06cd9QIPrbYz6pd0H2K++ymwwVqv0aTyXOXhA==
-X-Received: by 2002:a05:600c:3501:b0:3f5:927:2b35 with SMTP id h1-20020a05600c350100b003f509272b35mr11947517wmq.1.1686728121405;
-        Wed, 14 Jun 2023 00:35:21 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 10-20020a05600c22ca00b003f427687ba7sm16477969wmg.41.2023.06.14.00.35.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jun 2023 00:35:20 -0700 (PDT)
-Message-ID: <8f7d7285-b21d-23b0-793b-70ee008cb45b@redhat.com>
-Date:   Wed, 14 Jun 2023 15:35:13 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v3 04/17] arm64: Add KVM_HVHE capability and has_hvhe()
- predicate
+        with ESMTP id S243600AbjFNIJc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 04:09:32 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FBF526AA;
+        Wed, 14 Jun 2023 01:09:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686730161; x=1718266161;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=CCfcdMfnrRFbA50VDNIAY+0VkjRL4W1jgv8pyQphDhA=;
+  b=KmsGmTFbZD1L+ZshudheHlokF3O5+jpPoFLGs0pbkI9afHqbPCnhSEeD
+   7ZWqOURu0M7j78sCFbJmTOM7S08EJoNU6UW4EKN0degvo/b4yTWNaMXBv
+   HCoPPFCeznfTAhfSbp2xXH2h3JJyYIc5wE5ma+mOG1y/jnXaPdDdx5wa1
+   g6fQzS6jz1yEVdmH0SAzWx0vF7x9/YT953lfou59bMVnoiBakbueq8oKp
+   vXHI1mLXYB+pzksvBd2o2dM8dL+umsEVcP5ERp1caDU3/g1WlWtMrKosz
+   Fl5bow3QPlMIiWz01KN9Rqhtg8c6XbRpL6Z/C7YKlm/4b+EX9aVCdgOEU
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="422150029"
+X-IronPort-AV: E=Sophos;i="6.00,242,1681196400"; 
+   d="scan'208";a="422150029"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2023 01:07:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="886136948"
+X-IronPort-AV: E=Sophos;i="6.00,242,1681196400"; 
+   d="scan'208";a="886136948"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga005.jf.intel.com with ESMTP; 14 Jun 2023 01:07:32 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Wed, 14 Jun 2023 01:07:32 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Wed, 14 Jun 2023 01:07:32 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.47) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Wed, 14 Jun 2023 01:07:32 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nisW7UJPp4ugrwddRta8FVz0Pey4tKdlWRRceu3dTqVYoVrpM4v2IRqWLWU54FY/ThUHy9dSR4q4UuW02TrvJ7hwP2Bo5Ff4TQmnhg5McdegnWoF/pXeFVjmgw586NeaJDj5+IblC3V6avoZ5AxIKcPWXCRbNO0GYNQMi6WXV5YTPJvBjMMbtOsFyld4K8eWNImlKbko3CYqA6V/6o3cEY6y0bi4kBxfH6KLVa7e+9fL3WMJivs2LqI/UsQ+IaS/7OPFgMm0xllk3suuArKs8AL8gXnZ7z0Rl5umCYcUGxDb/wFG96aFuzot7zIwFTjKLQvisw5Jz3kGHo5w7g8v/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CCfcdMfnrRFbA50VDNIAY+0VkjRL4W1jgv8pyQphDhA=;
+ b=fCz5gS1KUdTSTUoj0WmU+YOn88Gp6Zwp6h400V/MA9mKOoVZnVKAen02EzoTLkgHJxhqZncrh5NyJA9SEA5Am0808xD2BO86mK0r1xdVNs1FrDIHCKCroEI8JX5/XDl4PobZjgbZ2sPce2Of/jKiv6jSJrQ/R00e4/nMJi8n1MemrA7AQz1E5Mg2KxPcG6xzdPcmURDCxqeOPjKuZb4gOKQCnyVpd4tEt447RvQCzcLwa3yJ1v5FKTXXNRrb7zzUv3LnQIFF8ZuTn8bkxCYHw45kVFy2P79WAT+Ni2ixdy+d18HIV7mOcsK3Mfqp2EQYul1zPUzlQ9853GXXKDmlSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by BN9PR11MB5243.namprd11.prod.outlook.com (2603:10b6:408:134::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.38; Wed, 14 Jun
+ 2023 08:07:30 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4f05:6b0b:dbc8:abbb]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4f05:6b0b:dbc8:abbb%7]) with mapi id 15.20.6477.037; Wed, 14 Jun 2023
+ 08:07:30 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: RE: [PATCH v3 00/10] Add Intel VT-d nested translation
+Thread-Topic: [PATCH v3 00/10] Add Intel VT-d nested translation
+Thread-Index: AQHZhBgNtWChyqGR00+u6nwW5Oa+KK9pLIFQgAiGGgCAGHH8MA==
+Date:   Wed, 14 Jun 2023 08:07:30 +0000
+Message-ID: <BN9PR11MB5276B15B4709F595B2A5A84A8C5AA@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230511145110.27707-1-yi.l.liu@intel.com>
+ <BN9PR11MB52765FA8255FB8F8A1A6F11B8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZHTyNgnjj/bOkIgi@nvidia.com>
+In-Reply-To: <ZHTyNgnjj/bOkIgi@nvidia.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
-References: <20230609162200.2024064-1-maz@kernel.org>
- <20230609162200.2024064-5-maz@kernel.org>
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230609162200.2024064-5-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|BN9PR11MB5243:EE_
+x-ms-office365-filtering-correlation-id: 06a8b3f4-c25d-4b46-d496-08db6cae66a2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: FYsEXwYG/v9k+855EkL6dhnVZTYWRj5RfchOEWBPxxaQU/dl618m2IsFxDvQn+Xgx+f/1K9vklTwNaudm30nwVfkbzMAwxwr/xzWE7AZ22W0dn3Ul+a7L8Ly9B9kFuS1h2kUxd40LM+H/jQW0+fkdOGPRRentX3EvMNeUtINWpTDFFwv0OnpGdTMLW5AMHXPD8PwlWHcx07ppu0/H7surPAugf6zMSvFkvNrK4lrHCX3+YyCQFKwOWpcfnkkmtFNgETXMDzxVMPY99rMIn7QWiR0he+tTsfFU3Zw/aPqwWTuUQ+Fxe2cmrKdzKsvcTNWVSDvaN25Zl5rWzpqyl+3cFzOnxq5bzX1GoB4o5uj2oLxoXjgcOO3f01GAf166lQPo84yyoTTBpYy/BTrw0VCnmgzz5cD4eA6fsX0bvG7FyoszKGR3BO+bE/pyFEmZx3u5oXXtEiWT8W88fVTfqXaHq2u1RJSNiANBUmdKgOXIPkOz/LyzwW377bXBetSeo1iY71KpJDCnEptt8E7Zgi/a473rVKjBaWDkA6hwM/7/VtdZg+GGrLtyXg/vqWjgEXqkXnjYEcSMAzDLJUubaqy+Q0xwL1ZH2tQ3Lex3UWqFRre0gZeV67Y3uj6XgWch56y
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(396003)(366004)(39860400002)(346002)(451199021)(186003)(38070700005)(38100700002)(2906002)(33656002)(4744005)(86362001)(7416002)(9686003)(6506007)(26005)(55016003)(82960400001)(122000001)(316002)(7696005)(4326008)(71200400001)(66556008)(66476007)(66446008)(64756008)(66946007)(76116006)(6916009)(478600001)(41300700001)(54906003)(5660300002)(52536014)(8676002)(8936002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?avNwTYFAoURwrFVNkoSmOJUKGOKVl+iGjv/x0I1qQuN0tj6WRAQ5t4bcG8CX?=
+ =?us-ascii?Q?YXGn7pN7lpIDBAcbKRcCZiu3dGKsG5pjWed5q0QntqYUyZNl4QrROnpwLh5C?=
+ =?us-ascii?Q?PC2i6V0CXvgk2aAqJFpIb+HNy/5vpbzch4Dmn34jC/K6t18/pR8ZOrHfMpSr?=
+ =?us-ascii?Q?phL7JRhbmCEYGwDkj+iGHPyfFQ99ENTL3RKIrol2F3N8CZsXy1eZgee7FZRb?=
+ =?us-ascii?Q?cPQS5KYMEBUUTAhxUvQqlJ1TpWwxsCzYgqNE2mBvtnze5/c6RO7dcXnIIIrz?=
+ =?us-ascii?Q?7kIjabSwwpAsPHgf/szVMoiayUwsP2frPBkUjn16z8TRRh697pFM8CSY4plH?=
+ =?us-ascii?Q?2xzRtZsN9oVi0Wof/TRlbPqFCPD9iNRq365O+/ExoU6Dg6iUMBFI8LEOyPXH?=
+ =?us-ascii?Q?313wjv9uogkVXdA93k8GWacRz1leHaSs5/1bDUubY6lSoMBJYyWd8vKTX3zH?=
+ =?us-ascii?Q?BXZ9edCG/vAvAnB13BB+qHLm8w1Ve2ge1+Q5cLMxNFiY1ye16qC9Nse9NzNu?=
+ =?us-ascii?Q?KbVs/dqFN4auBaZMhAPWiQEFWdFgpZk4t0luv9bprFPTB1D3KjsNoHbklSyD?=
+ =?us-ascii?Q?WUR1OmMd7/hgP4DJR7Z42YE13DSbcL9cDm5QTy1QZtebKtjlHWm2EOpjAuBJ?=
+ =?us-ascii?Q?DScgVwlT3yHzXQY8wL5b20lUcleB9/mr5xG5SwmjfiuPX12w/Fip/vbSnez7?=
+ =?us-ascii?Q?x2dN3lnnoU60rbEgC3tx9n3TH7tU6iVgvOjAWqmyGdZbop8IiSXsW+ZJ9KbQ?=
+ =?us-ascii?Q?i2rZTqKJYY4eLfHxO6/2ruLEhBipgGme+C8VWlQjyNblWyph9c35TZyIcSpu?=
+ =?us-ascii?Q?T2Rbg/OMTIZL4+NLGIHxxrLDU9fMxvAimEYwya+NST1BNN3Bpxqxx+SM/oHA?=
+ =?us-ascii?Q?rnUUgDWVjIXvKbhRB8/hzt/ZKSsAZDWgDhSGDptIjw+OKde0HDvIhgEFGJOm?=
+ =?us-ascii?Q?wNmwbJmVNSExx22i+vYd14b/p1sn0VgpulGDwOywkb2M6pKVxyTQo4xVbIcP?=
+ =?us-ascii?Q?xbkMNWsnorAp015hLxMn+RIZQS5lMpnuQYl3Ep8lQHgtITPOTsAcdWXZfV5O?=
+ =?us-ascii?Q?OVwlPgAq9GQRgGdQnqTxPsRQDj444PJTFCF2QJhef7F1qyo5OiZlUFvokcrL?=
+ =?us-ascii?Q?ty+uBFHbLt724LHnNfsN581mkwnxo7jyRyDrXMoPyIj6g/0C66VWNHbQW/AF?=
+ =?us-ascii?Q?fkDBa3ai2ERooIuq4KngHy5xwevfRqFAR5a1Ea5Uf4eNqxJXEZO5AcEMoRlA?=
+ =?us-ascii?Q?wkfSxEFi48xnEAUwQm0H5gpKyjwA4csOsCeNi1NThvyCAOkS3aFHtMDMgVv4?=
+ =?us-ascii?Q?KvFlFb7jFWyRoC4K0noyozhZY027iAZJYYwXkMhGe8grbvoSqNX7hiEs+CxX?=
+ =?us-ascii?Q?md+rMWwPJ/FJkZ7JZQUqvtBAoayJXoxnbk0Gm/xryIi5OLmI1a2PqQL1Ypth?=
+ =?us-ascii?Q?sSV+3bm6/l9Z3GIqZjvOx0LC2yrzmoAbz7JoQz6kS/meJUnmr4js3N7CXbhQ?=
+ =?us-ascii?Q?K/r9E0/B9O8GVracpjguj4nxZKoFDZCVfhHina7jBKLMV2wHTK3oLJvRYj/E?=
+ =?us-ascii?Q?Yddmse53uEtymaN8hmikFdhpKqJlqy1WqJJ8LECW?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 06a8b3f4-c25d-4b46-d496-08db6cae66a2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jun 2023 08:07:30.5052
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: GQcPoTkXST1Cw74TIvneGQ913tJEPM/d5T2WGNV7I38s3fDPhkwE2uBXcOvQC9ke6AHND5/a9U3yUA2+/brRqw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5243
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Tuesday, May 30, 2023 2:43 AM
+>=20
+> On Wed, May 24, 2023 at 08:59:43AM +0000, Tian, Kevin wrote:
+>=20
+> > At least this looks a reasonable tradeoff to some proprietary VMMs
+> > which never adds RO mappings in stage-2 today.
+>=20
+> What is the reason for the RO anyhow?
 
-Should we have a document about the hVHE? Because it's a sw feature, 
-there is no spec about it. And later people may need to read the code 
-itself to understand what is hVHE.
+vfio simply follows the permission in the CPU address space.
 
-On 6/10/23 00:21, Marc Zyngier wrote:
-> Expose a capability keying the hVHE feature as well as a new
-> predicate testing it. Nothing is so far using it, and nothing
-> is enabling it yet.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-Besides that, the code itself LGTM.
+vBIOS regions are marked as RO there hence also carried to vfio mappings.
 
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
->   arch/arm64/include/asm/cpufeature.h |  1 +
->   arch/arm64/include/asm/virt.h       |  8 ++++++++
->   arch/arm64/kernel/cpufeature.c      | 19 +++++++++++++++++++
->   arch/arm64/tools/cpucaps            |  1 +
->   4 files changed, 29 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index bc1009890180..3d4b547ae312 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -16,6 +16,7 @@
->   #define cpu_feature(x)		KERNEL_HWCAP_ ## x
->   
->   #define ARM64_SW_FEATURE_OVERRIDE_NOKASLR	0
-> +#define ARM64_SW_FEATURE_OVERRIDE_HVHE		4
->   
->   #ifndef __ASSEMBLY__
->   
-> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> index 21e94068804d..5227db7640c8 100644
-> --- a/arch/arm64/include/asm/virt.h
-> +++ b/arch/arm64/include/asm/virt.h
-> @@ -142,6 +142,14 @@ static __always_inline bool is_protected_kvm_enabled(void)
->   		return cpus_have_final_cap(ARM64_KVM_PROTECTED_MODE);
->   }
->   
-> +static __always_inline bool has_hvhe(void)
-> +{
-> +	if (is_vhe_hyp_code())
-> +		return false;
-> +
-> +	return cpus_have_final_cap(ARM64_KVM_HVHE);
-> +}
-> +
->   static inline bool is_hyp_nvhe(void)
->   {
->   	return is_hyp_mode_available() && !is_kernel_in_hyp_mode();
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 2d2b7bb5fa0c..c743b1a5ae31 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -1998,6 +1998,19 @@ static bool has_nested_virt_support(const struct arm64_cpu_capabilities *cap,
->   	return true;
->   }
->   
-> +static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
-> +			  int __unused)
-> +{
-> +	u64 val;
-> +
-> +	val = read_sysreg(id_aa64mmfr1_el1);
-> +	if (!cpuid_feature_extract_unsigned_field(val, ID_AA64MMFR1_EL1_VH_SHIFT))
-> +		return false;
-> +
-> +	val = arm64_sw_feature_override.val & arm64_sw_feature_override.mask;
-> +	return cpuid_feature_extract_unsigned_field(val, ARM64_SW_FEATURE_OVERRIDE_HVHE);
-> +}
-> +
->   #ifdef CONFIG_ARM64_PAN
->   static void cpu_enable_pan(const struct arm64_cpu_capabilities *__unused)
->   {
-> @@ -2643,6 +2656,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->   		.cpu_enable = cpu_enable_dit,
->   		ARM64_CPUID_FIELDS(ID_AA64PFR0_EL1, DIT, IMP)
->   	},
-> +	{
-> +		.desc = "VHE for hypervisor only",
-> +		.capability = ARM64_KVM_HVHE,
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.matches = hvhe_possible,
-> +	},
->   	{},
->   };
->   
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index 40ba95472594..3c23a55d7c2f 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -47,6 +47,7 @@ HAS_TLB_RANGE
->   HAS_VIRT_HOST_EXTN
->   HAS_WFXT
->   HW_DBM
-> +KVM_HVHE
->   KVM_PROTECTED_MODE
->   MISMATCHED_CACHE_TYPE
->   MTE
+>=20
+> Would it be so bad if it was DMA mapped as RW due to the errata?
+>=20
 
--- 
-Shaoqin
+think of a scenario where the vbios memory is shared by multiple qemu
+instances then RW allows a malicious VM to modify the shared content
+then potentially attacking other VMs.
 
+skipping the mapping is safest in this regard.
