@@ -2,67 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CB537309BF
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 23:23:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77F157309C1
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 23:23:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235925AbjFNVXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 17:23:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43874 "EHLO
+        id S235979AbjFNVXb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 17:23:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjFNVXQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 17:23:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5DF51FFA;
-        Wed, 14 Jun 2023 14:23:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3E2F5640C7;
-        Wed, 14 Jun 2023 21:23:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E219C433C8;
-        Wed, 14 Jun 2023 21:23:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686777794;
-        bh=sfZlQC0KRiU3VFMaS6H5djLiaDuaR3UyKKAHotXoEC4=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=JSy2cjQ3EfZqDH+GRmJ+mjVAAcseGIvPUq3lquiQxXqEjjGqwU+HemD7F3wiC1btN
-         oSofDjGtfqLFUZE6+eF26LaNmlZ0XJSVLI8h3M4XLmim/HM29Na3QWm9DVPo2aVCXI
-         K79BAGLxK+0MfFwKGWozB9O2gr9yZd3Cu5CIDwhRjdpR3tn5b309NHjtR2IQGAy5FI
-         ii48Ct/zrPJGlO6GMB0nxU3tTn8XzvIvT2D58R4sk2Mn4rxTjXdkRPrgiKhp+20BR7
-         UEwrTSQZ099UBshJbATcCyWw+lXzjKCSDECSlkjbQFiwFpFsJU9nBH5UIC1JXPi4An
-         txkWeQKuOaEyQ==
-Message-ID: <5729b45b-6a19-2aa8-8722-c50e6a1fceea@kernel.org>
-Date:   Wed, 14 Jun 2023 16:23:10 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v4 27/34] nios2: Convert __pte_free_tlb() to use ptdescs
-Content-Language: en-US
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        Hugh Dickins <hughd@google.com>
-References: <20230612210423.18611-1-vishal.moola@gmail.com>
- <20230612210423.18611-28-vishal.moola@gmail.com>
- <e52c7a74-da68-08d2-54e2-f95a8c5b52e7@kernel.org>
- <CAMuHMdXPASfLM8St_JZOW3Wke+ickJoo1oDr+orRbTERy=Zgwg@mail.gmail.com>
-From:   Dinh Nguyen <dinguyen@kernel.org>
-In-Reply-To: <CAMuHMdXPASfLM8St_JZOW3Wke+ickJoo1oDr+orRbTERy=Zgwg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        with ESMTP id S230514AbjFNVXa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 17:23:30 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77BD61FFA
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:23:29 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-56561689700so15920157b3.2
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:23:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686777808; x=1689369808;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EguF6lsG5lYio4UZZ1vADQabPc9eHzO82CmbKeM2Gps=;
+        b=1OB4P93nQ9hnwu1SKXSh9Rv08V9u9apR87yzMCxcD97fBtyXQJmA332SMyINsuwF5k
+         WDP3zbqRSh1YCG51O8vkwWH9UOylzOgoCLECbGuGxdNvsJ9P+t6xN5lXJVF2MDyWQ87d
+         g0kY3pdBzSUOSNlJopYI0Ol7QwH1IW9f/F1Rp9zDz5QHxviCsfLnNikWMf6G8MxzKnVN
+         Hkrgiju4CIHHe98opG11KR1x2fJVrXdKGQE9rYvKpUdRZpc6IXYrwgWM5oT55OGSLJ6k
+         /GCv5DjRwFS8JcP6fnZdTAWkndoEDNIel4yJiNwk7IwCqMj8H448JxLQqHA/Bc8wTCGB
+         WbOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686777808; x=1689369808;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EguF6lsG5lYio4UZZ1vADQabPc9eHzO82CmbKeM2Gps=;
+        b=SJRr/3J0nHAy63yzGTah4eK+bvzjLGadvjY9Lti9rFvvY1AQoSeMeWCZfyoXqq3IlV
+         VtmadlJOVc0pskcCOAQtb3ji6PvqAibkQDv/zZL/w9kbCvr7fyhV9fqvoA43QVynVxvD
+         RzwkcetLfIxPONDWG35Wut5OF0cLpMNPnqkhw6Fx0mS7LpKhc/kcsZ6Ru0z1C6GCxOg7
+         xg8ToX8vpU7rwRtxtyrb7fBdAuARCGxbkQFqBJGUMbVlnpQOtBA5L0AwQuvOr19DT3fr
+         ua+/KVg2I6q7AmUOqXugA6nZWgO+kU1QAQDqnytyLZ6N5NMsqWF1UWwwJ1kt+h+Y91jL
+         Y4HA==
+X-Gm-Message-State: AC+VfDypLBoC1PHMUfXTkn+KIlXfpUkjnmaJb/nNgj3JZGm4JuSVySXY
+        W+F6vpHBOnEkEBoIp64QYh9dKRcjHXk=
+X-Google-Smtp-Source: ACHHUZ4bOpC/uhJHVrKJmWqgRppZDc2NExGMN/kWxkPS3c90+dp9htpQTQSdFXtKL8nnsymOBcUnz5oiwGM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:320d:0:b0:bcc:285c:66de with SMTP id
+ y13-20020a25320d000000b00bcc285c66demr1522968yby.5.1686777808777; Wed, 14 Jun
+ 2023 14:23:28 -0700 (PDT)
+Date:   Wed, 14 Jun 2023 14:23:27 -0700
+In-Reply-To: <ZIovIBVLIM69E5Bo@google.com>
+Mime-Version: 1.0
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-10-amoorthy@google.com>
+ <ZIovIBVLIM69E5Bo@google.com>
+Message-ID: <ZIovz22R5dm05u6/@google.com>
+Subject: Re: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without implementation
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        robert.hoo.linux@gmail.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+        isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,47 +71,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 6/14/23 04:30, Geert Uytterhoeven wrote:
-> Hi Dinh,
+On Wed, Jun 14, 2023, Sean Christopherson wrote:
+> On Fri, Jun 02, 2023, Anish Moorthy wrote:
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 69a221f71914..abbc5dd72292 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -2297,4 +2297,10 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+> >   */
+> >  inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
+> >  				     uint64_t gpa, uint64_t len, uint64_t flags);
+> > +
+> > +static inline bool kvm_slot_nowait_on_fault(
+> > +	const struct kvm_memory_slot *slot)
 > 
-> On Wed, Jun 14, 2023 at 12:17 AM Dinh Nguyen <dinguyen@kernel.org> wrote:
->> On 6/12/23 16:04, Vishal Moola (Oracle) wrote:
->>> Part of the conversions to replace pgtable constructor/destructors with
->>> ptdesc equivalents.
->>>
->>> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
->>> ---
->>>    arch/nios2/include/asm/pgalloc.h | 8 ++++----
->>>    1 file changed, 4 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/arch/nios2/include/asm/pgalloc.h b/arch/nios2/include/asm/pgalloc.h
->>> index ecd1657bb2ce..ce6bb8e74271 100644
->>> --- a/arch/nios2/include/asm/pgalloc.h
->>> +++ b/arch/nios2/include/asm/pgalloc.h
->>> @@ -28,10 +28,10 @@ static inline void pmd_populate(struct mm_struct *mm, pmd_t *pmd,
->>>
->>>    extern pgd_t *pgd_alloc(struct mm_struct *mm);
->>>
->>> -#define __pte_free_tlb(tlb, pte, addr)                               \
->>> -     do {                                                    \
->>> -             pgtable_pte_page_dtor(pte);                     \
->>> -             tlb_remove_page((tlb), (pte));                  \
->>> +#define __pte_free_tlb(tlb, pte, addr)                                       \
->>> +     do {                                                            \
->>> +             pagetable_pte_dtor(page_ptdesc(pte));                   \
->>> +             tlb_remove_page_ptdesc((tlb), (page_ptdesc(pte)));      \
->>>        } while (0)
->>>
->>>    #endif /* _ASM_NIOS2_PGALLOC_H */
->>
->> Applied!
+> Just when I was starting to think that we had beat all of the Google3 out of you :-)
 > 
-> I don't think you can just apply this patch, as the new functions
-> were only introduced in [PATCH v4 05/34] of this series.
+> And predicate helpers in KVM typically have "is" or "has" in the name, so that it's
+> clear the helper queries, versus e.g. sets the flag or something. 
 > 
+> > +{
+> > +	return slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
+> 
+> KVM is anything but consistent, but if the helper is likely to be called without
+> a known good memslot, it probably makes sense to have the helper check for NULL,
+> e.g.
+> 
+> static inline bool kvm_is_slot_nowait_on_fault(const struct kvm_memory_slot *slot)
+> {
+> 	return slot && slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
+> }
+> 
+> However, do we actually need to force vendor code to query nowait?  At a glance,
+> the only external (relative to kvm_main.c) users of __gfn_to_pfn_memslot() are
+> in flows that play nice with nowait or that don't support it at all.  So I *think*
+> we can do this?
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index be06b09e9104..78024318286d 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2403,6 +2403,11 @@ static bool memslot_is_readonly(const struct kvm_memory_slot *slot)
+>         return slot->flags & KVM_MEM_READONLY;
+>  }
+>  
+> +static bool memslot_is_nowait_on_fault(const struct kvm_memory_slot *slot)
+> +{
+> +       return slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
+> +}
+> +
+>  static unsigned long __gfn_to_hva_many(const struct kvm_memory_slot *slot, gfn_t gfn,
+>                                        gfn_t *nr_pages, bool write)
+>  {
+> @@ -2730,6 +2735,11 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+>                 writable = NULL;
+>         }
+>  
+> +       if (async && memslot_is_nowait_on_fault(slot)) {
+> +               *async = false;
+> +               async = NULL;
+> +       }
 
-Ah, thanks for the pointer!
+Gah, got turned around and forgot to account for @atomic.  So this?
 
-Dinh
+	if (!atomic && memslot_is_nowait_on_fault(slot)) {
+		atomic = true;
+		if (async) {
+			*async = false;
+			async = NULL;
+		}
+	}
+	
+> +
+>         return hva_to_pfn(addr, atomic, interruptible, async, write_fault,
+>                           writable);
+>  }
+> 
+> Ah, crud.  The above highlights something I missed in v3.  The memslot NOWAIT
+> flag isn't tied to FOLL_NOWAIT, it's really truly a "fast-only" flag.  And even
+> more confusingly, KVM does set FOLL_NOWAIT, but for the async #PF case, which will
+> get even more confusing if/when KVM uses FOLL_NOWAIT internally.
+> 
+> Drat.  I really like the NOWAIT name, but unfortunately it doesn't do what as the
+> name says.
+> 
+> I still don't love "fast-only" as that bleeds kernel internals to userspace.
+> Anyone have ideas?  Maybe something about not installing new mappings?
