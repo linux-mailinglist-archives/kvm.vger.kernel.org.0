@@ -2,64 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F07A97307C5
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 21:08:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF08C7307DA
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 21:10:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234140AbjFNTIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 15:08:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41268 "EHLO
+        id S235123AbjFNTKw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 15:10:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232550AbjFNTIA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 15:08:00 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55F2B1BE9
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 12:07:59 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-65592a7cb54so6618999b3a.0
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 12:07:59 -0700 (PDT)
+        with ESMTP id S240837AbjFNTKj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 15:10:39 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DA50272B
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 12:10:26 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-66662bbb90eso541175b3a.2
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 12:10:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686769679; x=1689361679;
+        d=google.com; s=20221208; t=1686769826; x=1689361826;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R4oGXHbJy0nScfl9DUrXr2aiFTxNn0y6vjEBgrD4YHY=;
-        b=nOGHX1VJJGIvmuPEYJLThOxBUNYD8p50ORrVKKbBVCFp+RH5oBFXjH+xznFg3oqCa8
-         xb8VEcdYAWoX/WXiUXIJi8x/EunCDAJ5WJvYtu55mcNKj25XFU23lbP8VgCAZeApXtPY
-         X5/5uXytYr/SprRnkU2euA+CJ1Wy4Ai+PakcLnr9/dF9E7t+tvGez4qYVYdEiAoHs5PN
-         +nMR+cQYNfByy8QinHcoI10a0LyvV9twr6lJxXo0xCg/dxjXWHjYA1wUsnYUWW/0m3XC
-         H3ksHLjWjc1yYPyaRjVle585qu30bJ7GPuqZrK+KCB6nFeXu1gM17XUjgMiHyAUYS9WQ
-         Xv8A==
+        bh=dxQJOhg0ds4nvP7Z166Sd90CLLinvyoKIj6nvECzLfw=;
+        b=z0vg4Kmo6oKZVBeTkzK1ixF6OPifd5jGjG/sKFwzjh/BgZ6qNYI+QIOtc/ENviFNzB
+         dGvHzY5MnoRMUkgN2LUZbQiTQQICsq4svC6d8n/1Nag0h5s96J8gpLL40Rb8Yn7VXXti
+         Fhh5zxBoA64ykKdfzPKy2fZUpfa5584W4OM49pZt4ZDuxGf5RJLT3TfhDhr/fiS3VeSv
+         D4O/ZvmrKVONKv4exTu3ReQW2JI91Z+asaqMZlptjwd7dx2XaX39x/+n/Iv39MD7yOtD
+         v9kZfNDtdcc43gcDMThKgpipEq0PpuaFq5FMh57V5cpJvdOaDGh0isyod6zpffXDmk/v
+         jY2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686769679; x=1689361679;
+        d=1e100.net; s=20221208; t=1686769826; x=1689361826;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R4oGXHbJy0nScfl9DUrXr2aiFTxNn0y6vjEBgrD4YHY=;
-        b=OCzKjqV4oZlyVQSOtKnT/OUjYJvRz6KhQD+PgxX2c+hPqW0/zwvsgZLWs3lsEjIg3g
-         sBI9NuNKmDlKQ16CxcGJ26UmY0MdPmrrfHTDqCc0IqOyJTVr29qIhJK8HJ7YYpnowblR
-         UaOvt9YyHMSB8LL9/aGxTkli0XMeNpCJ3CYU5sDx7PFgSOK94WDI0tWFGbS38bMYxaP/
-         PVgMfH1mZSWb5X/LBCJfDBnFIs9DBHNGc8Ot+NDw2I/WxZPcW21/2GHPrVkYUjjwmJnG
-         8E3UXmUNSnVjV1Dp0V6yYWDJM88zXF8Z92tF5HqyCbsqtzCdZbNWvXlUMJkXuACpez1a
-         EK2A==
-X-Gm-Message-State: AC+VfDwAOqZDA/MnEj4GITSt0feHUlA1aYkXz7/lpLNHDL65F6Q3rrKb
-        b0uJ13VSvjg12GRTN7uy8OMQ0CsfZxE=
-X-Google-Smtp-Source: ACHHUZ51wQ/2Dxa+sgAhbPBB11TqxtOBn8DzwfspQDh9sz2PfijpF6oDOmxPzuT9ZPQOc58r5fog9k55rDE=
+        bh=dxQJOhg0ds4nvP7Z166Sd90CLLinvyoKIj6nvECzLfw=;
+        b=FKomsFS2pN9FLe1dSLeUHXApAIZAqBUyhJ5295SvJavv3Xs5zHe5uBOXVyBpvfqghF
+         Kmb+LRzkkfuhZqNUKcCGQ1i/VZssi5pFdRSFGsqnnt0wEj99lGyfTEE3zpPf2IbwcxSS
+         CfNLf7WyTkqV56Rn4zBfWxTsdWm2OPeOf4h+zFxNX+YoQIz7N0yqqceAoIutcqRG5yph
+         wncPdmrlcQDG/CegOQlifJcen4XRaujjhee1SUqv/aQOYgwTYNzzQvzWJEAGdWKTG64p
+         hkBs5MWzPcX50WCbKXMoPpVkBD4/UXxwHsxhyIDFYG8o+Ak0dI4ClrpUwTpg5ako5EDe
+         rO1Q==
+X-Gm-Message-State: AC+VfDzrIyD9IC3m0Et5aDnvd4z2KXX4vIcxPmmVAQzB4Cp7M37FHAEC
+        tlT5U9o3bAanrpGMIvS7lYbPxjNDW90=
+X-Google-Smtp-Source: ACHHUZ7C3cReboQ0Er1o7SpOku2nwnKw5DU0VxT9Y3qsSKHzED7PcdYspTE6bmt9GRrX8epAxXEm1tbsSjA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:8ca:b0:665:bd58:c93e with SMTP id
- s10-20020a056a0008ca00b00665bd58c93emr798632pfu.1.1686769678715; Wed, 14 Jun
- 2023 12:07:58 -0700 (PDT)
-Date:   Wed, 14 Jun 2023 12:07:57 -0700
-In-Reply-To: <abf509a2-ebfd-7b5f-4f7a-fdd4ef60c1de@amazon.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2d82:b0:665:b46a:b26f with SMTP id
+ fb2-20020a056a002d8200b00665b46ab26fmr759072pfb.0.1686769826143; Wed, 14 Jun
+ 2023 12:10:26 -0700 (PDT)
+Date:   Wed, 14 Jun 2023 12:10:24 -0700
+In-Reply-To: <20230602161921.208564-6-amoorthy@google.com>
 Mime-Version: 1.0
-References: <20230602005859.784190-1-seanjc@google.com> <168667299355.1927151.1998349801097712999.b4-ty@google.com>
- <abf509a2-ebfd-7b5f-4f7a-fdd4ef60c1de@amazon.com>
-Message-ID: <ZIoQDbte/uAiit9N@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Add "never" option to allow sticky
- disabling of nx_huge_pages
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-6-amoorthy@google.com>
+Message-ID: <ZIoQoIe+UF6qix5v@google.com>
+Subject: Re: [PATCH v4 05/16] KVM: Annotate -EFAULTs from kvm_vcpu_write_guest_page()
 From:   Sean Christopherson <seanjc@google.com>
-To:     Luiz Capitulino <luizcap@amazon.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Li RongQing <lirongqing@baidu.com>,
-        Yong He <zhuangel570@gmail.com>,
-        Robert Hoo <robert.hoo.linux@gmail.com>,
-        Kai Huang <kai.huang@intel.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        robert.hoo.linux@gmail.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+        isaku.yamahata@gmail.com
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -71,29 +70,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 14, 2023, Luiz Capitulino wrote:
+On Fri, Jun 02, 2023, Anish Moorthy wrote:
+> Implement KVM_CAP_MEMORY_FAULT_INFO for uaccess failures in
+> kvm_vcpu_write_guest_page()
 > 
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
 > 
-> On 2023-06-13 19:21, Sean Christopherson wrote:
-> 
-> > 
-> > 
-> > 
-> > On Thu, 01 Jun 2023 17:58:59 -0700, Sean Christopherson wrote:
-> > > Add a "never" option to the nx_huge_pages module param to allow userspace
-> > > to do a one-way hard disabling of the mitigation, and don't create the
-> > > per-VM recovery threads when the mitigation is hard disabled.  Letting
-> > > userspace pinky swear that userspace doesn't want to enable NX mitigation
-> > > (without reloading KVM) allows certain use cases to avoid the latency
-> > > problems associated with spawning a kthread for each VM.
-> > > 
-> > > [...]
-> > 
-> > Applied to kvm-x86 mmu.  I kept the default as "auto" for now, as that can go on
-> > top and I don't want to introduce that change this late in the cycle.  If no one
-> > beats me to the punch (hint, hint ;-) ), I'll post a patch to make "never" the
-> > default for unaffected hosts so that we can discuss/consider that change for 6.6.
-> 
-> Thanks Sean, I agree with the plan. I could give a try on the patch if you'd like.
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index d9c0fa7c907f..ea27a8178f1a 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3090,8 +3090,10 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
+>  
+>  /*
+>   * Copy 'len' bytes from 'data' into guest memory at '(gfn * PAGE_SIZE) + offset'
+> + * If 'vcpu' is non-null, then may fill its run struct for a
+> + * KVM_EXIT_MEMORY_FAULT on uaccess failure.
+>   */
+> -static int __kvm_write_guest_page(struct kvm *kvm,
+> +static int __kvm_write_guest_page(struct kvm *kvm, struct kvm_vcpu *vcpu,
+>  				  struct kvm_memory_slot *memslot, gfn_t gfn,
+>  			          const void *data, int offset, int len)
+>  {
+> @@ -3102,8 +3104,13 @@ static int __kvm_write_guest_page(struct kvm *kvm,
+>  	if (kvm_is_error_hva(addr))
+>  		return -EFAULT;
+>  	r = __copy_to_user((void __user *)addr + offset, data, len);
+> -	if (r)
+> +	if (r) {
+> +		if (vcpu)
 
-Yes please, thanks!
+As mentioned in a previous mail, put this in the (one) caller.  If more callers
+come along, which is highly unlikely, we can revisit that decision.  Right now,
+it just adds noise, both here and in the helper.
+
+> +			kvm_populate_efault_info(vcpu, gfn * PAGE_SIZE + offset,
+> +						 len,
+> +						 KVM_MEMORY_FAULT_FLAG_WRITE);
+
+For future reference, the 80 char limit is a soft limit, and with a lot of
+subjectivity, can be breached.  In this case, this
+
+			kvm_populate_efault_info(vcpu, gfn * PAGE_SIZE + offset,
+						 len, KVM_MEMORY_FAULT_FLAG_WRITE);
+
+is subjectively more readable than
+
+			kvm_populate_efault_info(vcpu, gfn * PAGE_SIZE + offset,
+						 len,
+						 KVM_MEMORY_FAULT_FLAG_WRITE);
+>  		return -EFAULT;
+> +	}
+>  	mark_page_dirty_in_slot(kvm, memslot, gfn);
+>  	return 0;
+>  }
+> @@ -3113,7 +3120,7 @@ int kvm_write_guest_page(struct kvm *kvm, gfn_t gfn,
+>  {
+>  	struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
+>  
+> -	return __kvm_write_guest_page(kvm, slot, gfn, data, offset, len);
+> +	return __kvm_write_guest_page(kvm, NULL, slot, gfn, data, offset, len);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_write_guest_page);
+>  
+> @@ -3121,8 +3128,8 @@ int kvm_vcpu_write_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn,
+>  			      const void *data, int offset, int len)
+>  {
+>  	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+> -
+
+Newline after variable declarations.  Double demerits for breaking what was
+originally correct :-)
+
+> -	return __kvm_write_guest_page(vcpu->kvm, slot, gfn, data, offset, len);
+> +	return __kvm_write_guest_page(vcpu->kvm, vcpu, slot, gfn, data,
+> +				      offset, len);
+
+With my various suggestions, something like
+
+	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+	int r;
+
+	r = __kvm_write_guest_page(vcpu->kvm, slot, gfn, data, offset, len);
+	if (r)
+		kvm_handle_guest_uaccess_fault(...);
+	return r;
+
+Side topic, "uaccess", and thus any "userfault" variants, is probably a bad name
+for the API, because that will fall apart when guest private memory comes along.  
