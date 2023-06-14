@@ -2,276 +2,308 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E25A072F43D
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 07:44:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B9FC72F439
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 07:42:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242916AbjFNFob (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 01:44:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55586 "EHLO
+        id S234385AbjFNFml (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 01:42:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233153AbjFNFo2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 01:44:28 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18D0219B3;
-        Tue, 13 Jun 2023 22:44:25 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id A75E05FD4E;
-        Wed, 14 Jun 2023 08:44:21 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1686721461;
-        bh=x+U9EAwPscPT+sus2+Qx6lEaN4S9X3UqnewbxDP6+7Y=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-        b=oyTEScIN+ET9/rsxEkirqGRR78glrkQa6iTwE2J5RIBn/thCiM3IApBy78a3Y5WDN
-         pRieXbtCoGj34+cAMsiq0iEVvfnkur9WBaXNMwPbz2IKVZE2wcINS/uOiVipUnPvyX
-         dXn+rdWWfKIO1kM6kJI1nyVJzqT3AqrdzYrX6nSY+Wan9w1GjAO5A6KJa+oM+RTOSo
-         eIMT1OLtWHNVz+iYIb7KKYhEiSUPz4clbYA5+fs8Ry4TsKICJdc4in/DCezO6Moh4S
-         t64hNrbrI4GY+xE39V+8l9dfc964wOc8BO2s2K7dV+ASDjhhvwabM+Toi3mzb7u2NC
-         tcL1o81yUfPig==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Wed, 14 Jun 2023 08:44:16 +0300 (MSK)
-Message-ID: <7e68f00b-7e50-cc6d-c0dc-ea54f7a2d992@sberdevices.ru>
-Date:   Wed, 14 Jun 2023 08:39:32 +0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v4 00/17] vsock: MSG_ZEROCOPY flag support
+        with ESMTP id S233153AbjFNFmj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 01:42:39 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56C0D19B2;
+        Tue, 13 Jun 2023 22:42:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686721358; x=1718257358;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Gzb+E6nJ6rM78+fRO3hQkBenuFx5iyPJm61rTN1saC4=;
+  b=DstZfjJRXFhbNJgu6SGJ4xdVK266eeyokYwDc/GKJPCJTv7/e3uE9fpK
+   oWE3B8zpoIdj3j8g164NXfGp8sia3Gnv87NKS/AgGxHwj76Xnxb73TDCY
+   Wy3CTEHUjoS5kuHBkw5T06w2rPcWiCTbCgXABSiscPxaBdj0R/e49+H1k
+   hSVfw4UpkG6IfQ3dtC1iguaAzfBUFNDMsZHIs8fv7MgF+XTwYPoRRMRoZ
+   SsaIvQwBIZc5KijOMCAL2xNnSDdv2jqIL59xLs/Jk5tjC9So6dxPgAcmR
+   BO0BKFM+hTSR2VzfjAKMkd4YKaiLppK5FYH23lUxAOU/mjOJQKEry5/rl
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="361899350"
+X-IronPort-AV: E=Sophos;i="6.00,241,1681196400"; 
+   d="scan'208";a="361899350"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2023 22:42:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="706077571"
+X-IronPort-AV: E=Sophos;i="6.00,241,1681196400"; 
+   d="scan'208";a="706077571"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga007.jf.intel.com with ESMTP; 13 Jun 2023 22:42:31 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 13 Jun 2023 22:42:31 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 13 Jun 2023 22:42:30 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Tue, 13 Jun 2023 22:42:30 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Tue, 13 Jun 2023 22:42:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T9M8d+unsEqyJrx6TWUtHULF3x2Q7Fe9/2qaRVVuUgKbaEhkvS9QVbolaCwGqgGkfjq0/X3EFvJmKsycSurCV23buEurNPLUnh11mi+Vt4lDBCF+3HD7sOFeBZthLLpXqm3pWzMEB8y0R+twSZRhAAjaevh7SoL7czaRvlARtAlckZsrtg8lhYHfqsgC1MRgRIydi4fqGyJFya/YkpBhOYD2c320LXbQgMrawFgdeeor9PS00y5Bu/fIoAQ53zgB8lkOAL2+XUUEeYCKhQgVlI5H12JK0lszKQ40FEFbNHYfrNn54QAXMRyBOxi83HiJpLLRMrLl4u/XfCgWFipGyA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=a81QFCokkuBiNYn8/JCdyNjUu4UZSpkKNUjpbiKLa3M=;
+ b=eGE+zsQUXr2/cHJbuj0jzh5pKSZk3teNscZsFjqiPGgvqXNDG5+GR4saPATZytyZDjQH7VJhRXm2MvEtYAeusfbldbIUPqSYQKwhVcxfYiezcRrYpCC9m41vC5x7+bNPBrfMcuX6GBmDIGPxiUWOU1GLSk7HhosmNzMJz3fGG6F5Zwo4rkU7HgIOGfh69CJUV3cHo/BkdQeodxhNTh8oyd31ko83Ib+YW6oIiT1Aa/SCveSPOVww5BC6nEWtUiWCZiOzAjtSYulYUP/VpgEaymBBOVkfFgMhx/1T+cd1FPwZ4tQVJ7GtFHujvzA7YAw2E0UHcfSI16NtA3T4CHjNmw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DM4PR11MB6405.namprd11.prod.outlook.com (2603:10b6:8:b5::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.37; Wed, 14 Jun
+ 2023 05:42:28 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4f05:6b0b:dbc8:abbb]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4f05:6b0b:dbc8:abbb%7]) with mapi id 15.20.6477.037; Wed, 14 Jun 2023
+ 05:42:27 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+CC:     "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "clegoate@redhat.com" <clegoate@redhat.com>
+Subject: RE: [PATCH v12 21/24] vfio: Determine noiommu device in
+ __vfio_register_dev()
+Thread-Topic: [PATCH v12 21/24] vfio: Determine noiommu device in
+ __vfio_register_dev()
+Thread-Index: AQHZlUw4/rlFbB33G0OF+kxLW4i2ha+H07wAgAB4fACAAI09gIAAA9uAgAAEUQCAAAOrgIAAAzGAgAAiIoCAAAWUgIAAK4AAgAB5BgCAACPuwA==
+Date:   Wed, 14 Jun 2023 05:42:27 +0000
+Message-ID: <BN9PR11MB52761B4E9C401A46FA5B4F2E8C5AA@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230602121653.80017-1-yi.l.liu@intel.com>
+        <20230602121653.80017-22-yi.l.liu@intel.com>
+        <20230612164228.65b500e0.alex.williamson@redhat.com>
+        <DS0PR11MB7529AE3701E154BF4C092E57C355A@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <20230613081913.279dea9e.alex.williamson@redhat.com>
+        <DS0PR11MB7529EB2903151B3399F636F5C355A@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <20230613084828.7af51055.alex.williamson@redhat.com>
+        <DS0PR11MB7529E84BCB100DE620FD2468C355A@DS0PR11MB7529.namprd11.prod.outlook.com>
+        <20230613091301.56986440.alex.williamson@redhat.com>
+        <20230613111511.425bdeae.alex.williamson@redhat.com>
+        <ZIiozfqet185iLIs@nvidia.com>
+ <20230613141050.29e7a22b.alex.williamson@redhat.com>
+ <DS0PR11MB7529F2D5EF95E9E1D63C9264C35AA@DS0PR11MB7529.namprd11.prod.outlook.com>
+In-Reply-To: <DS0PR11MB7529F2D5EF95E9E1D63C9264C35AA@DS0PR11MB7529.namprd11.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Bobby Eshleman <bobbyeshleman@gmail.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
- <ZIdT9Ei9C5wkHXNe@bullseye>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <ZIdT9Ei9C5wkHXNe@bullseye>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/06/14 01:08:00 #21497529
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|DM4PR11MB6405:EE_
+x-ms-office365-filtering-correlation-id: 35bf2950-7691-4067-42c3-08db6c9a233e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 8vXyhhVGV+4PusyVNG/zZpy7fr7AuNW70ghtwhk2tCz5d4XxP99zk3jWu4f/Gtr7qSOngqQCTGrEU8EyZYnxxoZfxkqkvnrQFars0sZbhxw+ePxKLK/okMgR6mojJ4oxD0t0x+9d7WMBzUiPGB4Zphqzs26KcvIaAPtOuhsgAgZiG3uBWWRHlWA2PVsGrV2ypt03bHw0wmUfWDWI5mEz1zSjn+ueIUvJ7Bf/YKWiihLTnwColg6QO2Gvp+7pDSfI11inSXnUt8xor3IfEmNmeCbP2pQkguQXSEALy0KztCYMmqZ/1DbsfbiKWCwY9pS6yAgwpS6YKqD6ru6qL+Z2dqUrwKyU4tnf8/tgKNKvhwxv9ppAy0DivwcF/TrScLZpBZ4GUi6UjIJ/UmbRkaJf29uT1SRd91uAGiUqemI+Upyi0gYTwB/DlCFP/fxpqYezxldFwUVt+2c5jd+X+JV9dZQ2tPdTwcRQ0BiweGCe0PRnZ2txWOz7f7ClX8jzw/gXFQVmJ6jfEDcYHZs/szBbDgOesTY5H0W8zZxOIbljRJbBL6GCGsN8WkKpAMT0TpPx3QmqfXj6upo5WSE5fqroZELqNwxw0agnMbNb791rArXQzFJu/VfutMYhjipP8GYE
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(396003)(376002)(39860400002)(366004)(136003)(451199021)(7696005)(8936002)(9686003)(26005)(8676002)(41300700001)(82960400001)(478600001)(38100700002)(71200400001)(66946007)(66476007)(86362001)(4326008)(76116006)(66556008)(64756008)(66446008)(316002)(122000001)(38070700005)(33656002)(110136005)(54906003)(6506007)(55016003)(5660300002)(83380400001)(52536014)(186003)(7416002)(2906002)(66899021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?BFlOUb1lvJnYcn63/tBv4bcDipETeFf798fojnL0kwHc0web1gRqOx2y11yD?=
+ =?us-ascii?Q?CGd1i7+U7/W3qRq229FLqrEuDsCbt0TsBBDTsbg/gYr9XW+N4chuTcQJ04iY?=
+ =?us-ascii?Q?vzt4flttKWTo3JvoG+DSOKtHdIVAwf5PJtKi5qhmAvIeTCB/iBb0ZaKon4eK?=
+ =?us-ascii?Q?8LeQWC+4/WIV/b5AmxpH2FcFO9McJJh1vD0QEI3MboL/Z/J7uux/6O9InXy3?=
+ =?us-ascii?Q?C7LDUXwir0dyiFhPJuH0lWAJukvu+QhpLHSwjgg4nsATXe1h5dfuIbQ/Pggn?=
+ =?us-ascii?Q?yyMPsiaI0CNsWlTNMfrkTBMvDyxUCNjpAt3mnwa71KvmJtHNCH4Faw2s+jWb?=
+ =?us-ascii?Q?+eZtjDh/UD2CcHPprZy6GMxtVQRynUaAn2AuL2Ds2MscNr1PYOGGHa1qnG7R?=
+ =?us-ascii?Q?kaOmvhlbZ4ceshJVs8GIyyptPOCRxe/bwh3vHiDThcfNnIbqa59qO7llS+bF?=
+ =?us-ascii?Q?Lh4INERfVISW0ji8ZR6KT10rLpVGciQDIzHj/RkOfOVbYNErqGQL341g0y9e?=
+ =?us-ascii?Q?eVsfiOTb9jWpgXXiNlnigaLfiJIFXPCPX2LebyvSsYY1azDrTyngNxEUEk2r?=
+ =?us-ascii?Q?/7HUpNXn/4bFozXuz7M3DwGkVqzROyUeRt0/tm+njsnG+gkZgYfgozYgzmGp?=
+ =?us-ascii?Q?/khnZyScVabqHxJunqND3YA+FcHeMX0HqACxMDjQa9WzTNkhmJou7cBjfOWe?=
+ =?us-ascii?Q?L7wlsBP0QMn4tWwvLis/taKRCLRoYbmuOniWivJFCnFtpalXq6lyQTwIKYMk?=
+ =?us-ascii?Q?vZX/biDtawWIR3BbSIEvr3XblDuwzhYwr5QPPBjwQiM3F2O2W4t1a8/Fw46F?=
+ =?us-ascii?Q?XxIDBElVkTcwQ7w/+rJ278vs7pCNUY+6lc1arXWl9AFc8SWfAp1rhvhi5vcn?=
+ =?us-ascii?Q?1rr8SOshEMUe4yuitWLitSqpldxV6cqzdlHTfhzImlsI3zOPXnWcjRgvTxcF?=
+ =?us-ascii?Q?2apo+e/OvHVrEvpC6JuaDpn9Y+8da0M6aDCY+/FTwguIXXyQhOqSKTEIrUfd?=
+ =?us-ascii?Q?tddYry48my4/07OAb+FhDMHF5vkt/ycW3B7iCh8sMuJNumk3F+WaFWa83dBc?=
+ =?us-ascii?Q?V5al85CTU1ylhlExiX5mLzWJ/uaoQgpNJztr5cXYg0qcmNaIjz3mdGA2c1SH?=
+ =?us-ascii?Q?BqYkNZTMsCRI873oSWsoxzllqNjk0MtXVLZX+cyOZpRZy1gOVmyAuR8y8RHt?=
+ =?us-ascii?Q?B0AwmZ5EIJdBaBbaHIOMPiYTb3F2OLjS9OIBYxXyZ+NYIFLGDvg0BqtjtTaN?=
+ =?us-ascii?Q?9WJFJVRMUfeCPjPQA9KNlCV62xUGKof6gqaahWM9hhg4jpwYdc7HULVi6Slu?=
+ =?us-ascii?Q?jc9cwsTLjbzsB7QVVAYfxW7SRAdLIh1e6vvQZ60sKpaTdJCK9s/ZO9q7ZgNz?=
+ =?us-ascii?Q?TQrP5qEjujfml0WDxZ9rmqlVb3HzN+KXEXK7KRwjnT3eviLmjldbsDlr8hRN?=
+ =?us-ascii?Q?8DE4aKydTJQ8HAA0YZ3SpqWkAScLDiQr08WQT609pLgjekdTb1NN45F6PsOt?=
+ =?us-ascii?Q?o84AdmxcuRuK6tCgnIISqjK1fDzb75ZO2MYHAZ46NOR3i77C4O5kYuqZHVkk?=
+ =?us-ascii?Q?watOdnrekVPNGMhr2Uzibi5AxAMX091ibzuoJ91q?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 35bf2950-7691-4067-42c3-08db6c9a233e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jun 2023 05:42:27.4860
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: arYwoKdoe5arvql4vshFpvRqmSZ9fCBYZFD0kvSHReLUouccy+wn4mdcs5psfWodHf5N1A6JOUeBt3tIpAhMrQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6405
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Bobby! Sorry for a little bit late reply.
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Wednesday, June 14, 2023 11:24 AM
+>=20
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Wednesday, June 14, 2023 4:11 AM
+> >
+> > On Tue, 13 Jun 2023 14:35:09 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >
+> > > On Tue, Jun 13, 2023 at 11:15:11AM -0600, Alex Williamson wrote:
+> > > > [Sorry for breaking threading, replying to my own message id with r=
+eply
+> > > >  content from Yi since the Cc list got broken]
+> > >
+> > > Yikes it is really busted, I think I fixed it?
+> > >
+> > > > If we renamed your function above to vfio_device_has_iommu_group(),
+> > > > couldn't we just wrap device_add like below instead to not have cde=
+v
+> > > > setup for a noiommu device, generate an error for a physical device
+> w/o
+> > > > IOMMU backing, and otherwise setup the cdev device?
+> > > >
+> > > > static inline int vfio_device_add(struct vfio_device *device, enum
+> vfio_group_type
+> > type)
+> > > > {
+> > > > #if IS_ENABLED(CONFIG_VFIO_GROUP)
+> > > > 	if (device->group->type =3D=3D VFIO_NO_IOMMU)
+> > > > 		return device_add(&device->device);
+> > >
+> > > vfio_device_is_noiommu() embeds the IS_ENABLED
+> >
+> > But patch 23/ makes the definition of struct vfio_group conditional on
+> > CONFIG_VFIO_GROUP, so while CONFIG_VFIO_NOIOMMU depends on
+> > CONFIG_VFIO_GROUP and the result could be determined, I think the
+> > compiler is still unhappy about the undefined reference.  We'd need a
+> > !CONFIG_VFIO_GROUP stub for the function.
+> >
+> > > > #else
+> > > > 	if (type =3D=3D VFIO_IOMMU && !vfio_device_has_iommu_group(device)=
+)
+> > > > 		return -EINVAL;
+> > > > #endif
+> > >
+> > > The require test is this from the group code:
+> > >
+> > >  	if (!device_iommu_capable(dev, IOMMU_CAP_CACHE_COHERENCY))
+> {
+> > >
+> > > We could lift it out of the group code and call it from vfio_main.c l=
+ike:
+> > >
+> > > if (type =3D=3D VFIO_IOMMU && !vfio_device_is_noiommu(vdev)
+> > && !device_iommu_capable(dev,
+> > >      IOMMU_CAP_CACHE_COHERENCY))
+> > >    FAIL
+> >
+> > Ack.  Thanks,
+>=20
+> So, what I got is:
+>=20
+> 1) Add bellow check in __vfio_register_dev() to fail the physical devices=
+ that
+>     don't have IOMMU protection.
+>=20
+> 	/*
+> 	  * noiommu device is a special type supported by the group interface.
+> 	  * Such type represents the physical devices  that are not iommu
+> backed.
+> 	  */
+> 	if (type =3D=3D VFIO_IOMMU && !vfio_device_is_noiommu(device)) &&
+> 	    !vfio_device_has_iommu_group(device))
+> 		return -EINVAL; //or maybe -EOPNOTSUPP?
+>=20
+> Nit: require a vfio_device_is_noiommu() stub which returns false for
+> the VFIO_GROUP unset case.
 
-On 12.06.2023 20:20, Bobby Eshleman wrote:
-> Hey Arseniy,
-> 
-> Thanks for this series, very good stuff!
-> 
-> On Sat, Jun 03, 2023 at 11:49:22PM +0300, Arseniy Krasnov wrote:
->> Hello,
->>
->>                            DESCRIPTION
->>
->> this is MSG_ZEROCOPY feature support for virtio/vsock. I tried to follow
->> current implementation for TCP as much as possible:
->>
->> 1) Sender must enable SO_ZEROCOPY flag to use this feature. Without this
->>    flag, data will be sent in "classic" copy manner and MSG_ZEROCOPY
->>    flag will be ignored (e.g. without completion).
->>
->> 2) Kernel uses completions from socket's error queue. Single completion
->>    for single tx syscall (or it can merge several completions to single
->>    one). I used already implemented logic for MSG_ZEROCOPY support:
->>    'msg_zerocopy_realloc()' etc.
->>
->> Difference with copy way is not significant. During packet allocation,
->> non-linear skb is created and filled with pinned user pages.
->> There are also some updates for vhost and guest parts of transport - in
->> both cases i've added handling of non-linear skb for virtio part. vhost
->> copies data from such skb to the guest's rx virtio buffers. In the guest,
->> virtio transport fills tx virtio queue with pages from skb.
->>
->> Head of this patchset is:
->> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d20dd0ea14072e8a90ff864b2c1603bd68920b4b
->>
->>
->> This version has several limits/problems:
->>
->> 1) As this feature totally depends on transport, there is no way (or it
->>    is difficult) to check whether transport is able to handle it or not
->>    during SO_ZEROCOPY setting. Seems I need to call AF_VSOCK specific
->>    setsockopt callback from setsockopt callback for SOL_SOCKET, but this
->>    leads to lock problem, because both AF_VSOCK and SOL_SOCKET callback
->>    are not considered to be called from each other. So in current version
->>    SO_ZEROCOPY is set successfully to any type (e.g. transport) of
->>    AF_VSOCK socket, but if transport does not support MSG_ZEROCOPY,
->>    tx routine will fail with EOPNOTSUPP.
->>
->>    ^^^
->>    This is still no resolved :(
->>
-> 
-> I think to get around this you could use set SOCK_CUSTOM_SOCKOPT in the
-> vsock create function, handle SO_ZEROCOPY in the vsock handler, but pass
-> the rest of the common options to sock_setsockopt().
+device_iommu_capable(dev, IOMMU_CAP_CACHE_COHERENCY) is valid
+only for cases with iommu groups. So that check already  covers the
+group verification indirectly.
 
-Ah yes, I really forget about this way, thanks!
+With that I think Jason's suggestion is to lift that test into main.c:
 
-> 
-> I think the next issue you would run into though is that users may call
-> setsockopt() before connect(), and so the transport will still be
-> unknown (except for dgrams, which are weird for reasons).
-> 
-> What do you think about EOPNOTSUPP being returned when the user selects
-> an incompatible transport with connect() instead of returning it later
-> in the tx path?
+int vfio_register_group_dev(struct vfio_device *device)
+{
+	/*
+	 * VFIO always sets IOMMU_CACHE because we offer no way for userspace to
+	 * restore cache coherency. It has to be checked here because it is only
+	 * valid for cases where we are using iommu groups.
+	 */
+	if (type =3D=3D VFIO_IOMMU && !vfio_device_is_noiommu(device) &&
+	    !device_iommu_capable(dev, IOMMU_CAP_CACHE_COHERENCY))
+		return ERR_PTR(-EINVAL);
 
-Yes, I think it is ok, in 'vsock_assign_transport()' which was called from
-'connect()' I will check that if zerocopy transmission is enabled, I will
-check that transport supports it (seqpacket mode works in the same way -
-if transports doesn't support it -> connect failed).
+	return __vfio_register_dev(device, VFIO_IOMMU);
+}
 
-So if 'setsockopt()' is called before 'connect()' (e.g. transport is unknown),
-I just set this option and thats all. Later in 'connect()' during transport
-assignment I'll check that selected transport supports this feature if needed.
+>=20
+> 2) Have below functions to add device
+>=20
+> #if IS_ENABLED(CONFIG_VFIO_DEVICE_CDEV)
+> static inline int vfio_device_add(struct vfio_device *device)
+> {
+> 	if (vfio_device_is_noiommu(device))
+> 		return device_add(&device->device);
+> 	vfio_init_device_cdev(device);
+> 	return cdev_device_add(&device->cdev, &device->device);
+> }
+>=20
+> static inline void vfio_device_del(struct vfio_device *device)
+> {
+> 	if (vfio_device_is_noiommu(device))
+> 		return device_del(&device->device);
+> 	cdev_device_del(&device->cdev, &device->device);
+> }
 
-If 'setsockopt()' is called after 'connect()' everything is simple - transport
-is already known.
-
-Thanks for this clue, I'll include it in v5!
-
-> 
->> 2) When MSG_ZEROCOPY is used, for each tx system call we need to enqueue
->>    one completion. In each completion there is flag which shows how tx
->>    was performed: zerocopy or copy. This leads that whole message must
->>    be send in zerocopy or copy way - we can't send part of message with
->>    copying and rest of message with zerocopy mode (or vice versa). Now,
->>    we need to account vsock credit logic, e.g. we can't send whole data
->>    once - only allowed number of bytes could sent at any moment. In case
->>    of copying way there is no problem as in worst case we can send single
->>    bytes, but zerocopy is more complex because smallest transmission
->>    unit is single page. So if there is not enough space at peer's side
->>    to send integer number of pages (at least one) - we will wait, thus
->>    stalling tx side. To overcome this problem i've added simple rule -
->>    zerocopy is possible only when there is enough space at another side
->>    for whole message (to check, that current 'msghdr' was already used
->>    in previous tx iterations i use 'iov_offset' field of it's iov iter).
->>
->>    ^^^
->>    Discussed as ok during v2. Link:
->>    https://lore.kernel.org/netdev/23guh3txkghxpgcrcjx7h62qsoj3xgjhfzgtbmqp2slrz3rxr4@zya2z7kwt75l/
->>
->> 3) loopback transport is not supported, because it requires to implement
->>    non-linear skb handling in dequeue logic (as we "send" fragged skb
->>    and "receive" it from the same queue). I'm going to implement it in
->>    next versions.
->>
->>    ^^^ fixed in v2
->>
->> 4) Current implementation sets max length of packet to 64KB. IIUC this
->>    is due to 'kmalloc()' allocated data buffers. I think, in case of
->>    MSG_ZEROCOPY this value could be increased, because 'kmalloc()' is
->>    not touched for data - user space pages are used as buffers. Also
->>    this limit trims every message which is > 64KB, thus such messages
->>    will be send in copy mode due to 'iov_offset' check in 2).
->>
->>    ^^^ fixed in v2
->>
->>                          PATCHSET STRUCTURE
->>
->> Patchset has the following structure:
->> 1) Handle non-linear skbuff on receive in virtio/vhost.
->> 2) Handle non-linear skbuff on send in virtio/vhost.
->> 3) Updates for AF_VSOCK.
->> 4) Enable MSG_ZEROCOPY support on transports.
->> 5) Tests/tools/docs updates.
->>
->>                             PERFORMANCE
->>
->> Performance: it is a little bit tricky to compare performance between
->> copy and zerocopy transmissions. In zerocopy way we need to wait when
->> user buffers will be released by kernel, so it is like synchronous
->> path (wait until device driver will process it), while in copy way we
->> can feed data to kernel as many as we want, don't care about device
->> driver. So I compared only time which we spend in the 'send()' syscall.
->> Then if this value will be combined with total number of transmitted
->> bytes, we can get Gbit/s parameter. Also to avoid tx stalls due to not
->> enough credit, receiver allocates same amount of space as sender needs.
->>
->> Sender:
->> ./vsock_perf --sender <CID> --buf-size <buf size> --bytes 256M [--zc]
->>
->> Receiver:
->> ./vsock_perf --vsk-size 256M
->>
->> I run tests on two setups: desktop with Core i7 - I use this PC for
->> development and in this case guest is nested guest, and host is normal
->> guest. Another hardware is some embedded board with Atom - here I don't
->> have nested virtualization - host runs on hw, and guest is normal guest.
->>
->> G2H transmission (values are Gbit/s):
->>
->>    Core i7 with nested guest.            Atom with normal guest.
->>
->> *-------------------------------*   *-------------------------------*
->> |          |         |          |   |          |         |          |
->> | buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
->> |          |         |          |   |          |         |          |
->> *-------------------------------*   *-------------------------------*
->> |   4KB    |    3    |    10    |   |   4KB    |   0.8   |   1.9    |
->> *-------------------------------*   *-------------------------------*
->> |   32KB   |   20    |    61    |   |   32KB   |   6.8   |   20.2   |
->> *-------------------------------*   *-------------------------------*
->> |   256KB  |   33    |   244    |   |   256KB  |   7.8   |   55     |
->> *-------------------------------*   *-------------------------------*
->> |    1M    |   30    |   373    |   |    1M    |   7     |   95     |
->> *-------------------------------*   *-------------------------------*
->> |    8M    |   22    |   475    |   |    8M    |   7     |   114    |
->> *-------------------------------*   *-------------------------------*
->>
->> H2G:
->>
->>    Core i7 with nested guest.            Atom with normal guest.
->>
->> *-------------------------------*   *-------------------------------*
->> |          |         |          |   |          |         |          |
->> | buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
->> |          |         |          |   |          |         |          |
->> *-------------------------------*   *-------------------------------*
->> |   4KB    |   20    |    10    |   |   4KB    |   4.37  |    3     |
->> *-------------------------------*   *-------------------------------*
->> |   32KB   |   37    |    75    |   |   32KB   |   11    |   18     |
->> *-------------------------------*   *-------------------------------*
->> |   256KB  |   44    |   299    |   |   256KB  |   11    |   62     |
->> *-------------------------------*   *-------------------------------*
->> |    1M    |   28    |   335    |   |    1M    |   9     |   77     |
->> *-------------------------------*   *-------------------------------*
->> |    8M    |   27    |   417    |   |    8M    |  9.35   |  115     |
->> *-------------------------------*   *-------------------------------*
->>
-> 
-> Nice!
-> 
-> 
-> [...]
-> 
-> Thanks,
-> Bobby
-
-Thanks, Arseniy
+Correct
