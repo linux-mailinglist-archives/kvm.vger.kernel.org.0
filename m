@@ -2,206 +2,365 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78289730617
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 19:31:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A50F73061A
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 19:35:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236795AbjFNRbB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 13:31:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50886 "EHLO
+        id S236821AbjFNRfX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 13:35:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjFNRa7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 13:30:59 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on20601.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e88::601])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA60F122;
-        Wed, 14 Jun 2023 10:30:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SZyqkaHrUAoDvF5VeelLuCm+YvNu9mXXwZO9i/SskxrskaWxdDyXLosb2zPFFMxAhWWnghVNagxzhxUt/iTf7iJFO+LXTEFg4FSIIBQmDPb0vI6WgJpu04MGV23HXEOf47BK2hP58WPQF0+jnW5S3hLyF0nX4fxqN3NdhHJ34vzg0ycLvAa0FPUCZR7I7LQrn7Lxd/EjEuXiQ6Y1aLctSq/yFc+ATNMUJ8zMpPrZuhBG2s4LYIKsS0DUXeHS6+V0loX3ux1Yyl5JgEJJugMtsYxPkeeA9vPOXTUbTyQtF+40jmV3vxhVyT1WLz1HPzZh8fyPsPF72zZtIeyMWdMUOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DeMADfgaUTcwOla0KPnXpa8mFr/d3az1NruE65+bhmc=;
- b=f8dcV8FhDz2EfRUq/BlfLPBuEYyD0rz3LiO3mN++UGaE5hiDB4KKPweK7jnJShsaqn/sncarxmC/UF1OEJ0IWhUemRtXH4JkqzvK4wgIHvtVk2ePg0S3H6oESI/jJttdVnwnx2arKUVKsiPj4Bhdv5ZHgyEtNEp8RmcJRlZSsLC26YIXVYwlRR2lWvvSBN1DXZ1Es8cm2Mq3XZ2uUkzj6Z8N+v8u7fXjqnXxUY02l3y5wcRnqPAOMi45vi8O8ZImzMuNaOQ7cny7XEeFfNTJ+c+8I9vpHLli61meKQI8Q+6HQJFAZZtDopchjT7TldHMxU1iAi3Ura/pgG6lCWWaxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DeMADfgaUTcwOla0KPnXpa8mFr/d3az1NruE65+bhmc=;
- b=me3wF8Moj8o2j9hX+Ht/WhUl6MS8U4krSCCkQtUVeH500DbXsFVEZP8Nrpo20NBb+T07JaAN+1hqAg/8eRWIrHDR+4XzGPoGEwoC/oCBeRn87608WvY/6Q4QByIB3ny5WYxRLs0xoBCrCZFmUIFX6aTTnDWYZH7esmBwV9QYT4LJqH4S6mF4bVbqNM42c5T0v95OGZhYj5p7aoNCgsrZszBsutWZQ3n0OZdICwh/I4hblNHIYb2ZhQdC6QUr4GEDEhRHrZs5E8IW3ZiFVpvRfDkzC8P21PghPVvEucuqhttI2/RUJsMXBcpR5TJYuQOnXqCovvdNWdhvoQmx70fe9A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BY5PR12MB4097.namprd12.prod.outlook.com (2603:10b6:a03:213::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.37; Wed, 14 Jun
- 2023 17:30:53 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%7]) with mapi id 15.20.6477.037; Wed, 14 Jun 2023
- 17:30:53 +0000
-Date:   Wed, 14 Jun 2023 14:30:50 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "clegoate@redhat.com" <clegoate@redhat.com>
-Subject: Re: [PATCH v12 21/24] vfio: Determine noiommu device in
- __vfio_register_dev()
-Message-ID: <ZIn5SihJ45URLlQ/@nvidia.com>
-References: <20230613091301.56986440.alex.williamson@redhat.com>
- <20230613111511.425bdeae.alex.williamson@redhat.com>
- <ZIiozfqet185iLIs@nvidia.com>
- <20230613141050.29e7a22b.alex.williamson@redhat.com>
- <DS0PR11MB7529F2D5EF95E9E1D63C9264C35AA@DS0PR11MB7529.namprd11.prod.outlook.com>
- <BN9PR11MB52761B4E9C401A46FA5B4F2E8C5AA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <DS0PR11MB7529E50A3F122449AAE5733FC35AA@DS0PR11MB7529.namprd11.prod.outlook.com>
- <BN9PR11MB5276FF400A7860DD23CF222B8C5AA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZImxMHrOHHwbpNmd@nvidia.com>
- <DS0PR11MB7529918D45D6402639F9ED68C35AA@DS0PR11MB7529.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS0PR11MB7529918D45D6402639F9ED68C35AA@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-ClientProxiedBy: SJ0PR03CA0276.namprd03.prod.outlook.com
- (2603:10b6:a03:39e::11) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BY5PR12MB4097:EE_
-X-MS-Office365-Filtering-Correlation-Id: d836360c-ad52-4e33-ca75-08db6cfd1a93
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pZ+QO2/JR1AGWj1feF3scfwEscA3QAwUJ33G3YRM98vDksKQk1WHfKD+/nEJOlr87h/u13UKCF3e2zMcGo/ORSNvGAVg47yTlkYLVeVqU66e6XNP9wdgYAm7wUEeOeQmasA/6uSMirkF6KZ4q5rOnc6QEyB0x7fIuD3IzNZlS95FwvYdhOZxyD0SSZw17Ia+8/IO1xv66xe41ssszPyeGZAPGX8+29EuGT0VNnghyvnwGnk/RmgqRtTTctCR9bVbIF3My+jKczUZYCjADNF8wsj0UFBwWmE6W5WTxtw9teNxzsOL1e9wtMQ4aRoR3bJgOrMVkQWafu5THqzxI6IizVt/lTFdLkgIf1cIEMQcx/dPhKWb6uyp9cmcLxbJukX6RKynuVIEOr89wbqmBrqWwcmPzRTmBSMw2KoBgDio2YkyhiYNyAVuqx+YcwksYgpS7hweTrk9AuVUz20yTW18w/dSpWk2JiENNGapru843qufdUrzAqRwfZyxk6PXweAy7vPSOpbrY3MX9mjoerds7xlSn7aEEh96MwzVKWK1rXLlT2kVOgg03MVLY0+tGYkC
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(346002)(136003)(376002)(396003)(39860400002)(451199021)(83380400001)(5660300002)(186003)(6506007)(66899021)(2906002)(2616005)(7416002)(41300700001)(6512007)(8936002)(26005)(8676002)(6486002)(316002)(54906003)(36756003)(478600001)(38100700002)(4326008)(66556008)(66476007)(86362001)(66946007)(6916009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?pX/sH4ko/EWTkHJSzDL9gehYCbaNubCHQd8Phh0m8zI6wEKzdlNIkGSNW7DB?=
- =?us-ascii?Q?QG9Vallx4fwsAcXUkTu9co6Bwe7iVZJrsHSlOH2jRVqfN4MCswjnWS+CHDHd?=
- =?us-ascii?Q?DFcHQoPIyxVWJ+gtU6995FtUPZnjTKVpLkTwRd/9MZEzVEVTLPkqBiP/c8/h?=
- =?us-ascii?Q?8rO8mRZhWeLWJ7yZZnATsx/vNX5M0PJdx93KlodgNEef38ea0iSYE+/rWWvb?=
- =?us-ascii?Q?+V1LUAaZs4iuQ/Xhlk9fm9eQqBr4D6Jgx6uw/KCnFuqoqaG0Bb0iom8tKAix?=
- =?us-ascii?Q?4exZs386Z6ojjfXE2+wNaL/lyOYEVicq+87HpkAJIqpMvl9kHIFrMc30gOFI?=
- =?us-ascii?Q?2eaIpEQjdhWoc9JIfnFJicZ3EiUqDTDybqhs1sRYgPVFBQJAj728Mor5D2Vi?=
- =?us-ascii?Q?EsHRfqUfb0PITWzwolIIbLiMgm0C0ZH7AuG3sWnS2XNstx9zQyL1VA8jDvty?=
- =?us-ascii?Q?u2p9Ol0wG++E7Nrdwv5fQDCIBDnZOmeJtFfYRSOaIuC0tergrOxiNAp9153t?=
- =?us-ascii?Q?cu6TEDjwlM6BQFvD06x405rKWPcI0KYs9WWHe/rv3+lgjYNFhKEwUOkVCnZk?=
- =?us-ascii?Q?Swn7Lt2MFiF31SlFECcdd0cVExZX3exMd8SAVYiHM2k8J2nlByMY3W0ZDqgR?=
- =?us-ascii?Q?yRmiuOoCc9x8UgCsUgc/nqo5GbvlD0ZIoIUPeNjt2gongGmFbRD8bqjBCvIz?=
- =?us-ascii?Q?hwNYEtC3ar/GErOkM6qzJSulSaYf6h6zwGlqkv30AAZuc63MdU5KnxZC2mjq?=
- =?us-ascii?Q?+W5uOxNO4PGXpfeq8ipFRXCj+vkLa262VMd0ahKLio/BzlCFwUPVPAN3w5I9?=
- =?us-ascii?Q?VBQpSLcHoTFRST+zuLTrCWA+AgNx1hd0aZWFOQV/gk3jNCG3j5xDHSQWhCD1?=
- =?us-ascii?Q?w91TaJ5y0XnxaUBdlOlRuwWY1R1XnTJpmW7MJiPtxYpPA3sGQwQDrOIY+NTR?=
- =?us-ascii?Q?ZFScRxoLMUz1WlYLn1jB7oH6ged4Hw7xp6tFtiNDU9bA+2pu8WVNHLJ15qoz?=
- =?us-ascii?Q?XhREr2A4L9SGLL23xcIGmjGdXFxsOdf6RtLkiGPxvE2fHbcaGO/E3Vt6SLfv?=
- =?us-ascii?Q?uwAe8QcjUPOtcppXH2dJBl6wWUK56Vqq3bZ5s+dxinCSn2opNagayM6z+v8B?=
- =?us-ascii?Q?UJIVSfqGrECTG/jjvnWZ+eszkMBJNF67M9YhF16BoD/mUcECP13hT2WAzPRD?=
- =?us-ascii?Q?LvUYi0hCxMc/EMx2yZtPeT/rnmdwPIsxCqJrntO+tDcv5XVZQvlXSZX1a5pB?=
- =?us-ascii?Q?C78sUxAE7sPa8yTjv8+Pn9hDaihzNh62BgnedahCV/UrHGwmq9UB6U/lR61d?=
- =?us-ascii?Q?16rW+BgpLULJWSyGYfoA5+lgFyS68c+CTe5XVyL5AlvSO6XZcmGRrIMKHG/l?=
- =?us-ascii?Q?Q41m1XPQ2nt2Pnq7+4TNf+LAOlPU5XZdx74sUr+zL9m9r5/Ot4wyGdvtC/s7?=
- =?us-ascii?Q?xftn51WXy18tJcK1KjxkXQJ+C64mDYxUSZ1QkesAZ7wweQsHGG+Or/sr3W+8?=
- =?us-ascii?Q?odh9xFJ5r+WtCJvCrP4Uoq2p9ga76ZDsXoW93ny7WGtdy7XsNih/LLQ6Li6A?=
- =?us-ascii?Q?hsBbYuVXf02sRQJApCk1I1SX0V7z3cJCABBsK1bc?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d836360c-ad52-4e33-ca75-08db6cfd1a93
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2023 17:30:53.4774
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AscMcF2B2erWNzGuyUFpo5tyJUlym9832XX2BpipnDsI6A+NGbwzYv9XoNm9rgMk
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4097
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229499AbjFNRfV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 13:35:21 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E730189
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 10:35:19 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-25dbcf8ad37so718643a91.0
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 10:35:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686764119; x=1689356119;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FINHWVuF9dPFXtAFp+YSQIwqxWqp3Z+QxlozugrxYpA=;
+        b=rrPILjJs9pdAauHMA0OgQJafLDH468H2vIlWGQdJnuFGjyQLoATb71ofxIKTzT/q0R
+         Uzkn8iA2MzM08yzOzp/QxN9H55AsYBjFSP3kE8TBk0p5PQBsUyalxjZZrCYHM/bNAUUU
+         bb62ZJ0ToeeIGKgaNO31tQJnTmgsDLdgNJyhRpjAT2F4wvZROS6RiwEttUUBOItwGtNt
+         Xa0PUJt0IXaurKfBtDxj+g7zBW4cnNelSypFGXOBwORe6X7FekgR1VsDLsA7HNSJhaAp
+         fSll4zmfaGYBGpQ8XqmHOuv3PuH11DaVMAcWQL4khwck3gYk0fdPVUFchD5gqr5SNDCF
+         GMxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686764119; x=1689356119;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FINHWVuF9dPFXtAFp+YSQIwqxWqp3Z+QxlozugrxYpA=;
+        b=KJoX6pX85ZvgfuROuRLMfYw87GonD98Fd92DqQImL5nKKqEuNSEKOJgToJq9F+0SxJ
+         EFzPFgwqGIf4cbKSKUEPHHwAL3Rq4McUWpr6REhzr/WOA8Xu7gwTnNzyl3sAu8Gt+Xwk
+         CXfhlTLI8Ly1a/Byy9wAXtReTJ/Fg3ttMI5w4yXGe5QaNFulG6VxmD8MAQfDvo15B34T
+         wMfRWeFNFiLxPgibCjVsgmAEnCmZ/AB58VxDJa2PRe6nqndXmEsyAICbm8ea9U6/sbz0
+         qjbyC5LTonT2ff2+OHg0c3o1O7g7c7eu4qv2ZlJUzC4lq2wu3LguBSPCuIVzIEoctd8P
+         iblw==
+X-Gm-Message-State: AC+VfDyKiIF7b/3dBKKC+kWsayDKZrc7nUgVH8+Cr/drQMJMMX9ADaV9
+        Ck3G98rCW+wlVnWDsY7B/qYmu2H2Gw0=
+X-Google-Smtp-Source: ACHHUZ5G9Xl6UoRXgEU6Nww4P4YArg3b+1LkloAzJJUxjU4WXFRQsFZeC273Urf/42A1BcgQK4zqtQCKVAY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:da03:b0:25d:cf9f:5a93 with SMTP id
+ e3-20020a17090ada0300b0025dcf9f5a93mr407104pjv.2.1686764118914; Wed, 14 Jun
+ 2023 10:35:18 -0700 (PDT)
+Date:   Wed, 14 Jun 2023 10:35:17 -0700
+In-Reply-To: <20230602161921.208564-4-amoorthy@google.com>
+Mime-Version: 1.0
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
+Message-ID: <ZIn6VQSebTRN1jtX@google.com>
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        robert.hoo.linux@gmail.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+        isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 14, 2023 at 01:12:50PM +0000, Liu, Yi L wrote:
-> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
-> index 41a09a2df690..c2e0128323a7 100644
-> --- a/drivers/vfio/group.c
-> +++ b/drivers/vfio/group.c
-> @@ -687,16 +687,6 @@ static struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
->  	if (!iommu_group)
->  		return ERR_PTR(-EINVAL);
->  
-> -	/*
-> -	 * VFIO always sets IOMMU_CACHE because we offer no way for userspace to
-> -	 * restore cache coherency. It has to be checked here because it is only
-> -	 * valid for cases where we are using iommu groups.
-> -	 */
-> -	if (!device_iommu_capable(dev, IOMMU_CAP_CACHE_COHERENCY)) {
-> -		iommu_group_put(iommu_group);
-> -		return ERR_PTR(-EINVAL);
-> -	}
-> -
->  	mutex_lock(&vfio.group_lock);
->  	group = vfio_group_find_from_iommu(iommu_group);
->  	if (group) {
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 51c80eb32af6..ffb4585b7f0e 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -292,6 +292,17 @@ static int __vfio_register_dev(struct vfio_device *device,
->  	if (ret)
->  		return ret;
->  
-> +	/*
-> +	 * VFIO always sets IOMMU_CACHE because we offer no way for userspace to
-> +	 * restore cache coherency. It has to be checked here because it is only
-> +	 * valid for cases where we are using iommu groups.
-> +	 */
-> +	if (type == VFIO_IOMMU && !vfio_device_is_noiommu(device) &&
-> +	    !device_iommu_capable(device->dev, IOMMU_CAP_CACHE_COHERENCY)) {
-> +		ret = -EINVAL;
-> +		goto err_out;
-> +	}
+On Fri, Jun 02, 2023, Anish Moorthy wrote:
+> +The 'gpa' and 'len' (in bytes) fields describe the range of guest
+> +physical memory to which access failed, i.e. [gpa, gpa + len). 'flags' is a
+> +bitfield indicating the nature of the access: valid masks are
 > +
->  	ret = vfio_device_add(device);
->  	if (ret)
->  		goto err_out;
+> +  - KVM_MEMORY_FAULT_FLAG_WRITE:     The failed access was a write.
+> +  - KVM_MEMORY_FAULT_FLAG_EXEC:      The failed access was an exec.
 
-Yes that looks right
+We should also define a READ flag, even though it's not strictly necessary.  That
+gives userspace another way to detect "bad" data (flags should never be zero), and
+it will allow us to use the same RWX bits that KVM_SET_MEMORY_ATTRIBUTES uses,
+e.g. R = BIT(0), W = BIT(1), X = BIT(2) (which just so happens to be the same
+RWX definitions EPT uses).
 
-> 
-> > I prefer the idea that vfio_device_is_noiommu() works in all the
-> > kconfig scenarios rather than adding #ifdefs.
-> 
-> But the vfio_group would be empty when CONFIG_VFIO_GROUP is unset.
-> From what I got now, when CONFIG_VFIO_GROUP is unset, the stub
-> function always returns false.
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 0e571e973bc2..69a221f71914 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2288,4 +2288,13 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+>  /* Max number of entries allowed for each kvm dirty ring */
+>  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+>  
+> +/*
+> + * Attempts to set the run struct's exit reason to KVM_EXIT_MEMORY_FAULT and
+> + * populate the memory_fault field with the given information.
+> + *
+> + * WARNs and does nothing if the exit reason is not KVM_EXIT_UNKNOWN, or if
+> + * 'vcpu' is not the current running vcpu.
+> + */
+> +inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
 
-It seems fine, you could also put the ifdef inside the stub
+Tagging a globally visible, non-static function as "inline" is odd, to say the
+least.
 
-Jason
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index fd80a560378c..09d4d85691e1 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4674,6 +4674,9 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>  
+>  		return r;
+>  	}
+> +	case KVM_CAP_MEMORY_FAULT_INFO: {
+
+No need for curly braces.  But that's moot because there's no need for this at
+all, just let it fall through to the default handling, which KVM already does for
+a number of other informational capabilities.
+
+> +		return -EINVAL;
+> +	}
+>  	default:
+>  		return kvm_vm_ioctl_enable_cap(kvm, cap);
+>  	}
+> @@ -6173,3 +6176,35 @@ int kvm_vm_create_worker_thread(struct kvm *kvm, kvm_vm_thread_fn_t thread_fn,
+>  
+>  	return init_context.err;
+>  }
+> +
+> +inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
+
+I strongly prefer to avoid "populate" and "efault".  Avoid "populate" because
+that verb will become stale the instance we do anything else in the helper.
+Avoid "efault" because it's imprecise, i.e. this isn't to be used for just any
+old -EFAULT scenario.  Something like kvm_handle_guest_uaccess_fault()? Definitely
+open to other names (especially less verbose names).
+
+> +				     uint64_t gpa, uint64_t len, uint64_t flags)
+> +{
+> +	if (WARN_ON_ONCE(!vcpu))
+> +		return;
+
+Drop this and instead invoke the helper if and only if vCPU is guaranteed to be
+valid, e.g. in a future patch, don't add a conditional call to __kvm_write_guest_page(),
+just handle the -EFAULT in kvm_vcpu_write_guest_page().  If the concern is that
+callers would need to manually check "r == -EFAULT", this helper could take in the
+error code, same as we do for kvm_handle_memory_failure(), e.g. do 
+
+	if (r != -EFAULT)
+		return;
+
+here.  This is also an argument for using a less prescriptive name for the helper.
+
+> +
+> +	preempt_disable();
+> +	/*
+> +	 * Ensure the this vCPU isn't modifying another vCPU's run struct, which
+> +	 * would open the door for races between concurrent calls to this
+> +	 * function.
+> +	 */
+> +	if (WARN_ON_ONCE(vcpu != __this_cpu_read(kvm_running_vcpu)))
+> +		goto out;
+
+Meh, this is overkill IMO.  The check in mark_page_dirty_in_slot() is an
+abomination that I wish didn't exist, not a pattern that should be copied.  If
+we do keep this sanity check, it can simply be
+
+	if (WARN_ON_ONCE(vcpu != kvm_get_running_vcpu()))
+		return;
+
+because as the comment for kvm_get_running_vcpu() explains, the returned vCPU
+pointer won't change even if this task gets migrated to a different pCPU.  If
+this code were doing something with vcpu->cpu then preemption would need to be
+disabled throughout, but that's not the case.
+
+> +	/*
+> +	 * Try not to overwrite an already-populated run struct.
+> +	 * This isn't a perfect solution, as there's no guarantee that the exit
+> +	 * reason is set before the run struct is populated, but it should prevent
+> +	 * at least some bugs.
+> +	 */
+> +	else if
+
+Kernel style is to not use if-elif-elif if any of the preceding checks are terminal,
+i.e. return or goto.  There's a good reason for that style/rule too, as it allows
+avoiding weirdness like this where there's a big block comment in the middle of
+an if-elif sequence.
+
+> (WARN_ON_ONCE(vcpu->run->exit_reason != KVM_EXIT_UNKNOWN))
+
+As I've stated multiple times, this can't WARN in "normal" builds because userspace
+can modify kvm_run fields at will.  I do want a WARN as it will allow fuzzers to
+find bugs for us, but it needs to be guarded with a Kconfig (or maybe a module
+param).  One idea would be to make the proposed CONFIG_KVM_PROVE_MMU[*] a generic
+Kconfig and use that.
+
+And this should not be a terminal condition, i.e. KVM should WARN but continue on.
+I am like 99% confident there are existing cases where KVM fills exit_reason
+without actually exiting, i.e. bailing will immediately "break" KVM.  On the other
+hand, clobbering what came before *might* break KVM, but it might work too.  More
+thoughts below.
+
+[*] https://lkml.kernel.org/r/20230511235917.639770-8-seanjc%40google.com
+
+> +		goto out;
+
+Folding in your other reply, as I wanted the full original context.
+
+> What I intended this check to guard against was the first problematic
+> case (A) I called out in the cover letter
+>
+> > The implementation strategy for KVM_CAP_MEMORY_FAULT_INFO has risks: for
+> > example, if there are any existing paths in KVM_RUN which cause a vCPU
+> > to (1) populate the kvm_run struct then (2) fail a vCPU guest memory
+> > access but ignore the failure and then (3) complete the exit to
+> > userspace set up in (1), then the contents of the kvm_run struct written
+> > in (1) will be corrupted.
+>
+> What I wrote was actually incorrect, as you may see: if in (1) the
+> exit reason != KVM_EXIT_UNKNOWN then the exit-reason-unset check will
+> prevent writing to the run struct. Now, if for some reason this flow
+> involved populating most of the run struct in (1) but only setting the
+> exit reason in (3) then we'd still have a problem: but it's not
+> feasible to anticipate everything after all :)
+>
+> I also mentioned a different error case (B)
+>
+> > Another example: if KVM_RUN fails a guest memory access for which the
+> > EFAULT is annotated but does not return the EFAULT to userspace, then
+> > later returns an *un*annotated EFAULT to userspace, then userspace will
+> > receive incorrect information.
+>
+> When the second EFAULT is un-annotated the presence/absence of the
+> exit-reason-unset check is irrelevant: userspace will observe an
+> annotated EFAULT in place of an un-annotated one either way.
+>
+> There's also a third interesting case (C) which I didn't mention: an
+> annotated EFAULT which is ignored/suppressed followed by one which is
+> propagated to userspace. Here the exit-reason-unset check will prevent
+> the second annotation from being written, so userspace sees an
+> annotation with bad contents, If we believe that case (A) is a weird
+> sequence of events that shouldn't be happening in the first place,
+> then case (C) seems more important to ensure correctn`ess in. But I
+> don't know anything about how often (A) happens in KVM, which is why I
+> want others' opinions.
+>
+> So, should we drop the exit-reason-unset check (and the accompanying
+> patch 4) and treat existing occurrences of case (A) as bugs, or should
+> we maintain the check at the cost of incorrect behavior in case (C)?
+> Or is there another option here entirely?
+>
+> Sean, I remember you calling out that some of the emulated mmio code
+> follows the pattern in (A), but it's been a while and my memory is
+> fuzzy. What's your opinion here?
+
+I got a bit (ok, way more than a bit) lost in all of the (A) (B) (C) madness.  I
+think this what you intended for each case?
+
+  (A) if there are any existing paths in KVM_RUN which cause a vCPU
+      to (1) populate the kvm_run struct then (2) fail a vCPU guest memory
+      access but ignore the failure and then (3) complete the exit to
+      userspace set up in (1), then the contents of the kvm_run struct written
+      in (1) will be corrupted.
+
+  (B) if KVM_RUN fails a guest memory access for which the EFAULT is annotated
+      but does not return the EFAULT to userspace, then later returns an *un*annotated
+      EFAULT to userspace, then userspace will receive incorrect information.
+
+  (C) an annotated EFAULT which is ignored/suppressed followed by one which is
+      propagated to userspace. Here the exit-reason-unset check will prevent the
+      second annotation from being written, so userspace sees an annotation with
+      bad contents, If we believe that case (A) is a weird sequence of events
+      that shouldn't be happening in the first place, then case (C) seems more
+      important to ensure correctness in. But I don't know anything about how often
+      (A) happens in KVM, which is why I want others' opinions.
+
+(A) does sadly happen.  I wouldn't call it a "pattern" though, it's an unfortunate
+side effect of deficiencies in KVM's uAPI.
+
+(B) is the trickiest to defend against in the kernel, but as I mentioned in earlier
+versions of this series, userspace needs to guard against a vCPU getting stuck in
+an infinite fault anyways, so I'm not _that_ concerned with figuring out a way to
+address this in the kernel.  KVM's documentation should strongly encourage userspace
+to take action if KVM repeatedly exits with the same info over and over, but beyond
+that I think anything else is nice to have, not mandatory.
+
+(C) should simply not be possible.  (A) is very much a "this shouldn't happen,
+but it does" case.  KVM provides no meaningful guarantees if (A) does happen, so
+yes, prioritizing correctness for (C) is far more important.
+
+That said, prioritizing (C) doesn't mean we can't also do our best to play nice
+with (A).  None of the existing exits use anywhere near the exit info union's 256
+bytes, i.e. there is tons of space to play with.  So rather than put memory_fault
+in with all the others, what if we split the union in two, and place memory_fault
+in the high half (doesn't have to literally be half, but you get the idea).  It'd
+kinda be similar to x86's contributory vs. benign faults; exits that can't be
+"nested" or "speculative" go in the low half, and things like memory_fault go in
+the high half.
+
+That way, if (A) does occur, the original information will be preserved when KVM
+fills memory_fault.  And my suggestion to WARN-and-continue limits the problematic
+scenarios to just fields in the second union, i.e. just memory_fault for now.
+At the very least, not clobbering would likely make it easier for us to debug when
+things go sideways.
+
+And rather than use kvm_run.exit_reason as the canary, we should carve out a
+kernel-only, i.e. non-ABI, field from the union.  That would allow setting the
+canary in common KVM code, which can't be done for kvm_run.exit_reason because
+some architectures, e.g. s390 (and x86 IIRC), consume the exit_reason early on
+in KVM_RUN.
+
+E.g. something like this (the #ifdefs are heinous, it might be better to let
+userspace see the exit_canary, but make it abundantly clear that it's not ABI).
+
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 143abb334f56..233702124e0a 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -511,16 +511,43 @@ struct kvm_run {
+ #define KVM_NOTIFY_CONTEXT_INVALID     (1 << 0)
+                        __u32 flags;
+                } notify;
++               /* Fix the size of the union. */
++               char padding[128];
++       };
++
++       /*
++        * This second KVM_EXIT_* union holds structures for exits that may be
++        * triggered after KVM has already initiated a different exit, and/or
++        * may be filled speculatively by KVM.  E.g. because of limitations in
++        * KVM's uAPI, a memory fault can be encountered after an MMIO exit is
++        * initiated and kvm_run.mmio is filled.  Isolating these structures
++        * from the primary KVM_EXIT_* union ensures that KVM won't clobber
++        * information for the original exit.
++        */
++       union {
+                /* KVM_EXIT_MEMORY_FAULT */
+                struct {
+                        __u64 flags;
+                        __u64 gpa;
+                        __u64 len;
+                } memory_fault;
+-               /* Fix the size of the union. */
+-               char padding[256];
++               /* Fix the size of this union too. */
++#ifndef __KERNEL__
++               char padding2[128];
++#else
++               char padding2[120];
++#endif
+        };
+ 
++#ifdef __KERNEL__
++       /*
++        * Non-ABI, kernel-only field that KVM uses to detect bugs related to
++        * filling exit_reason and the exit unions, e.g. to guard against
++        * clobbering a previous exit.
++        */
++       __u64 exit_canary;
++#endif
++
+        /* 2048 is the size of the char array used to bound/pad the size
+         * of the union that holds sync regs.
+         */
+
