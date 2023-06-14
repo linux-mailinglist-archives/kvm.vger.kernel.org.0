@@ -2,132 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BF4E7302FF
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 17:10:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D814730304
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 17:10:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343553AbjFNPK1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 11:10:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49334 "EHLO
+        id S1343585AbjFNPKc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 11:10:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343712AbjFNPKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 11:10:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2188268C
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 08:09:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686755342;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TuejhHkuMs2BYAezkmA+FR0lumlW7Hh8wezW2u/1WfA=;
-        b=dZOSOkNUWpHKO8nKHf8JXP5ZkC7jtRr3ZbpaCh84sTQasyMNrQUxfB3l9UttILIpK0QHxI
-        8xnXeWi82QW06t4SqfjnuBKpucrrrA51UhwxyCLP9ZOMEUHMywqMe33xb22my8MbRFxqRi
-        j9tLb2ZSyPPA/A7Dr7Tcq+7v16g2ZWE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-197-HZ5bSI7kM5C7tw6VoRHPWQ-1; Wed, 14 Jun 2023 11:08:59 -0400
-X-MC-Unique: HZ5bSI7kM5C7tw6VoRHPWQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3f7e8c24a92so5166365e9.0
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 08:08:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686755338; x=1689347338;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TuejhHkuMs2BYAezkmA+FR0lumlW7Hh8wezW2u/1WfA=;
-        b=VT99pOtLd2NbfcAifBcTaCio+L2RWyrN7xDVyKREft/yUPq4/cSTeyI6F4JDINUzxc
-         S9fauHTHaqszliPD7r/Gvcxr27JAHCwz6sd3O/D0VIwjQeATTXj9Iuk5mF4GvesCzirr
-         MGG4WEik1gVzZCJDfbzRYr/5k6xKqrWp1Rb+prMcxmWJ/ehfXMl2Nw10GCmwkFsdNM+0
-         xSXh0ypj32FkPOPPd9zsrTC+AF3APk2sI7BcphdHn+qK/3c4KOUP6Kmhf5TKtDiwMDgy
-         cXuSun7uicDXTxQi5oXHAmj/mwRI8vKPkol2ow6Xzd3QxC7wShvdbzk4fwSQngO5FiyW
-         IeUA==
-X-Gm-Message-State: AC+VfDy6BskBZoeoWqlaK0+N1ZT33nVWd+mDgADMRBMrRGwENuNY5M3A
-        LDJ/KH1ZOhO8a30sMsOU6feVkM3CydfVy47AjjkX2S/+nla9xBdC37SsBXLmKXrbWKPkizYmCqy
-        0+25BKEad6Cus
-X-Received: by 2002:a05:600c:224d:b0:3f8:1110:60c2 with SMTP id a13-20020a05600c224d00b003f8111060c2mr9388007wmm.33.1686755338164;
-        Wed, 14 Jun 2023 08:08:58 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7LqWE4g1m/b7l2zoM2EPzsm0Q2bvMJUIV8OqbGlfeguVVZ0y8q/N9qL3YHwPr6OhHbWkRfJA==
-X-Received: by 2002:a05:600c:224d:b0:3f8:1110:60c2 with SMTP id a13-20020a05600c224d00b003f8111060c2mr9387987wmm.33.1686755337860;
-        Wed, 14 Jun 2023 08:08:57 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id i10-20020a05600c354a00b003f4283f5c1bsm7897431wmq.2.2023.06.14.08.08.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jun 2023 08:08:57 -0700 (PDT)
-Message-ID: <56657425-d28f-9eb1-8ca2-3fa9bf568add@redhat.com>
-Date:   Wed, 14 Jun 2023 17:08:55 +0200
+        with ESMTP id S1343757AbjFNPKW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 11:10:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AD812101;
+        Wed, 14 Jun 2023 08:10:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F30DF63EA8;
+        Wed, 14 Jun 2023 15:10:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16FDFC433C9;
+        Wed, 14 Jun 2023 15:10:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686755416;
+        bh=eEAbU7oQr9nMdD1HLeHjNBK19Ki+7NwrWH3cOyfSAFw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=u1QQyNDBdtCEWKCdwkI61E6ULyFIgzYYylF24CXModGq8eNzM+Z8HRxJ8NnKbPEF5
+         UNrt/K6ZH5RXrryPuSNoWGiuCh9vnPW8YLLGFCdMmvIvsn7goY4XYWaNAnF4AlaV9N
+         mfMLdsrym6F2G1al1nf4xNlH9qHN5OFMys6dbDrcrpZ1VYnPTPQnPkmwVp166H2/JK
+         U32Jf//4jTFsBKhLdt7fUkuWV7s3JXIXH4B66LpDynvbrZHamU0t4g4xIlyNwqP+5M
+         W4uLOM28xHt+KNxT29B1NyZJ2yMGSa3xxMl7M4zbMQTq/+ShWbaHrgSWCQ911pmwU9
+         nPWmBNYhBTiFw==
+Date:   Wed, 14 Jun 2023 18:09:37 +0300
+From:   Mike Rapoport <rppt@kernel.org>
+To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        Hugh Dickins <hughd@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>
+Subject: Re: [PATCH v4 24/34] loongarch: Convert various functions to use
+ ptdescs
+Message-ID: <20230614150937.GW52412@kernel.org>
+References: <20230612210423.18611-1-vishal.moola@gmail.com>
+ <20230612210423.18611-25-vishal.moola@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v10 08/59] KVM: arm64: Add missing HCR_EL2 trap bits
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20230515173103.1017669-1-maz@kernel.org>
- <20230515173103.1017669-9-maz@kernel.org>
-From:   Eric Auger <eauger@redhat.com>
-In-Reply-To: <20230515173103.1017669-9-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230612210423.18611-25-vishal.moola@gmail.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On 5/15/23 19:30, Marc Zyngier wrote:
-> We're still missing a handfull of HCR_EL2 trap bits. Add them.
+On Mon, Jun 12, 2023 at 02:04:13PM -0700, Vishal Moola (Oracle) wrote:
+> As part of the conversions to replace pgtable constructor/destructors with
+> ptdesc equivalents, convert various page table functions to use ptdescs.
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Some of the functions use the *get*page*() helper functions. Convert
+> these to use pagetable_alloc() and ptdesc_address() instead to help
+> standardize page tables further.
+> 
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+
+Acked-by: Mike Rapoport (IBM) <rppt@kernel.org>
+
 > ---
->  arch/arm64/include/asm/kvm_arm.h | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  arch/loongarch/include/asm/pgalloc.h | 27 +++++++++++++++------------
+>  arch/loongarch/mm/pgtable.c          |  7 ++++---
+>  2 files changed, 19 insertions(+), 15 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 209a4fba5d2a..4b3e55abb30f 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -17,9 +17,19 @@
->  #define HCR_DCT		(UL(1) << 57)
->  #define HCR_ATA_SHIFT	56
->  #define HCR_ATA		(UL(1) << HCR_ATA_SHIFT)
-> +#define HCR_TTLBOS	(UL(1) << 55)
-> +#define HCR_TTLBIS	(UL(1) << 54)
-> +#define HCR_ENSCXT	(UL(1) << 53)
-> +#define HCR_TOCU	(UL(1) << 52)
->  #define HCR_AMVOFFEN	(UL(1) << 51)
-> +#define HCR_TICAB	(UL(1) << 50)
-> +#define HCR_TID4	(UL(1) << 49)
->  #define HCR_FIEN	(UL(1) << 47)
->  #define HCR_FWB		(UL(1) << 46)
-> +#define HCR_NV2		(UL(1) << 45)
-> +#define HCR_AT		(UL(1) << 44)
-> +#define HCR_NV1		(UL(1) << 43)
-> +#define HCR_NV		(UL(1) << 42)
->  #define HCR_API		(UL(1) << 41)
->  #define HCR_APK		(UL(1) << 40)
->  #define HCR_TEA		(UL(1) << 37)
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> diff --git a/arch/loongarch/include/asm/pgalloc.h b/arch/loongarch/include/asm/pgalloc.h
+> index af1d1e4a6965..70bb3bdd201e 100644
+> --- a/arch/loongarch/include/asm/pgalloc.h
+> +++ b/arch/loongarch/include/asm/pgalloc.h
+> @@ -45,9 +45,9 @@ extern void pagetable_init(void);
+>  extern pgd_t *pgd_alloc(struct mm_struct *mm);
+>  
+>  #define __pte_free_tlb(tlb, pte, address)			\
+> -do {							\
+> -	pgtable_pte_page_dtor(pte);			\
+> -	tlb_remove_page((tlb), pte);			\
+> +do {								\
+> +	pagetable_pte_dtor(page_ptdesc(pte));			\
+> +	tlb_remove_page_ptdesc((tlb), page_ptdesc(pte));	\
+>  } while (0)
+>  
+>  #ifndef __PAGETABLE_PMD_FOLDED
+> @@ -55,18 +55,18 @@ do {							\
+>  static inline pmd_t *pmd_alloc_one(struct mm_struct *mm, unsigned long address)
+>  {
+>  	pmd_t *pmd;
+> -	struct page *pg;
+> +	struct ptdesc *ptdesc;
+>  
+> -	pg = alloc_page(GFP_KERNEL_ACCOUNT);
+> -	if (!pg)
+> +	ptdesc = pagetable_alloc(GFP_KERNEL_ACCOUNT, 0);
+> +	if (!ptdesc)
+>  		return NULL;
+>  
+> -	if (!pgtable_pmd_page_ctor(pg)) {
+> -		__free_page(pg);
+> +	if (!pagetable_pmd_ctor(ptdesc)) {
+> +		pagetable_free(ptdesc);
+>  		return NULL;
+>  	}
+>  
+> -	pmd = (pmd_t *)page_address(pg);
+> +	pmd = ptdesc_address(ptdesc);
+>  	pmd_init(pmd);
+>  	return pmd;
+>  }
+> @@ -80,10 +80,13 @@ static inline pmd_t *pmd_alloc_one(struct mm_struct *mm, unsigned long address)
+>  static inline pud_t *pud_alloc_one(struct mm_struct *mm, unsigned long address)
+>  {
+>  	pud_t *pud;
+> +	struct ptdesc *ptdesc = pagetable_alloc(GFP_KERNEL, 0);
+>  
+> -	pud = (pud_t *) __get_free_page(GFP_KERNEL);
+> -	if (pud)
+> -		pud_init(pud);
+> +	if (!ptdesc)
+> +		return NULL;
+> +	pud = ptdesc_address(ptdesc);
+> +
+> +	pud_init(pud);
+>  	return pud;
+>  }
+>  
+> diff --git a/arch/loongarch/mm/pgtable.c b/arch/loongarch/mm/pgtable.c
+> index 36a6dc0148ae..cdba10ffc0df 100644
+> --- a/arch/loongarch/mm/pgtable.c
+> +++ b/arch/loongarch/mm/pgtable.c
+> @@ -11,10 +11,11 @@
+>  
+>  pgd_t *pgd_alloc(struct mm_struct *mm)
+>  {
+> -	pgd_t *ret, *init;
+> +	pgd_t *init, *ret = NULL;
+> +	struct ptdesc *ptdesc = pagetable_alloc(GFP_KERNEL, 0);
+>  
+> -	ret = (pgd_t *) __get_free_page(GFP_KERNEL);
+> -	if (ret) {
+> +	if (ptdesc) {
+> +		ret = (pgd_t *)ptdesc_address(ptdesc);
+>  		init = pgd_offset(&init_mm, 0UL);
+>  		pgd_init(ret);
+>  		memcpy(ret + USER_PTRS_PER_PGD, init + USER_PTRS_PER_PGD,
+> -- 
+> 2.40.1
+> 
+> 
 
-Eric
-
+-- 
+Sincerely yours,
+Mike.
