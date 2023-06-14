@@ -2,72 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1CE17309D1
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 23:28:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80C307309D9
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 23:31:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230247AbjFNV2E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 17:28:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44702 "EHLO
+        id S236089AbjFNVby (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 17:31:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjFNV2A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 17:28:00 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22EEB2688
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:27:52 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b3bb3dd181so25941995ad.3
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:27:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686778071; x=1689370071;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vi/7hmjTrTZ9KkULGSIwFNzyIkPs6ZSrGwYo1vsf4LY=;
-        b=TOv1Wi0OzaxGH6kqqwft5pXdVjMAM/MiDgT/EMigAP6UWlnGu7xMRdzjFEeJmPqlWL
-         RTMguNIvf07SQMEHLrmAq4s538RBa8g1hlLJBVpqAYDMU7MXO/cI0vJfKZcRp7+Lt3PP
-         rBCkWOYHX/q3klthqhVRiMb2noZUa6qOCtAC86kXBsVW/1JVqW2M55oQy089ISYIUowd
-         /0HnJnD9FuOU8/oC54Cf7PVSQQmfS1FsVszS9TBP9uGWz7cNYoT1Wjm5N9i2YrbzBWGB
-         wl3xERsZlBeaYSbULQx5juqMja79hOySYoERJKr6GgCd3cvL84OlDeYeUVp9stiYEMlN
-         Wrwg==
+        with ESMTP id S231363AbjFNVbx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 17:31:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18E102688
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:31:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686778269;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WKqEIHnlxf6mwzhgDSRr508DxiYghyosbbxoYepRPGM=;
+        b=Zg++gmSfqpMqy+M9n/sDebz8RrzHnLIvqmXYCd2zmRmWWUZD9nA/EORd0CvcvkvWvcrz7T
+        4DgoLLQDw0BvfxlYHSDS8SlMVyag5Hmy/IAAjl2Sojh3HEX165BsmrxuURfTUKSkzYDlYG
+        cwuyUcmzUeMu/cFU1S9SWxptfVL4Trc=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-138-VkRQiWQGM7acTe0Xi9bwTw-1; Wed, 14 Jun 2023 17:31:05 -0400
+X-MC-Unique: VkRQiWQGM7acTe0Xi9bwTw-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7775a282e25so767339439f.0
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:31:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686778071; x=1689370071;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vi/7hmjTrTZ9KkULGSIwFNzyIkPs6ZSrGwYo1vsf4LY=;
-        b=Hv3Ym8aOnZ9n7mYysDo1yoj3iUXg3AP3V3zsAG3XBcjAVsPWiq3N1txcJgfMmsCjvL
-         zZToSNmdadwWd0A3SS/Ww5DuDjRt0pRDW6th+DJkxPA1/BTyFH2Suxh8vC2OcJDB+pXO
-         RHb1F2pBHsA9V1u7cxLjbFF5fpBlh2hxkygPlBMBYEiQZny8oaPLLuuHG8qRKNWV/k+p
-         oCabCEeuTErEG+BG2HdYbgwerCiR0nBYGRQ1DIuwJg0h7jfqKLpPzgPNs3GVFOJ3SlPF
-         MGGJX2x0q81sleWNWez2GGoGrgovLi7kTVCI7l6x3NGUevNKNmX2vnyDnWA3hyc95+Uz
-         GEiA==
-X-Gm-Message-State: AC+VfDxnLjmZ+qcvwRVBZ7qxWXDlwBNvxnvnOTrOhZWEPGplBiOB15SM
-        6UCLkdUcCF2hhv3lxwPrHBQEgCi0594=
-X-Google-Smtp-Source: ACHHUZ5UF2epLMEIrkVLE9C35fy0CnP3TmO7JnKYJ6T3BpN/XCXz9TqLP32SSuRUgyULc0pTuDBD4I0wRGo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:f807:b0:1b5:bd8:5aaa with SMTP id
- ix7-20020a170902f80700b001b50bd85aaamr277193plb.1.1686778071544; Wed, 14 Jun
- 2023 14:27:51 -0700 (PDT)
-Date:   Wed, 14 Jun 2023 14:27:49 -0700
-In-Reply-To: <9ccc37a9-4f0b-f662-4d1a-467d18bbe48e@amd.com>
-Mime-Version: 1.0
-References: <20230411125718.2297768-6-aik@amd.com> <ZGv9Td4p1vtXC0Hy@google.com>
- <719a6b42-fd91-8eb4-f773-9ed98d2fdb07@amd.com> <ZGzfWQub4FQOrEtw@google.com>
- <fc82a8a7-af38-5037-1862-ba2315c4e5af@amd.com> <ZHDEkuaVjs/0kM6t@google.com>
- <64336829-60c5-afe1-81ad-91b4f354aef3@amd.com> <5e7c6b3d-2c69-59ca-1b9f-2459430e2643@amd.com>
- <ZIj5ms+DohcLyXHE@google.com> <9ccc37a9-4f0b-f662-4d1a-467d18bbe48e@amd.com>
-Message-ID: <ZIow1a0rVQ1FC4sH@google.com>
-Subject: Re: [PATCH kernel v5 5/6] KVM: SEV: Enable data breakpoints in SEV-ES
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Pankaj Gupta <pankaj.gupta@amd.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        Santosh Shukla <santosh.shukla@amd.com>,
-        Carlos Bilbao <carlos.bilbao@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1686778265; x=1689370265;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WKqEIHnlxf6mwzhgDSRr508DxiYghyosbbxoYepRPGM=;
+        b=KkdL5+hGphCk2ZlXPy6vdEgfRMgkC3CrvE5rOzhfanWqoNmaheXDC+xqurHYoHM+8m
+         kudt67YVjs+v641jz/0v3kplS2VwWQE4Gz+5KMjjvhTuLcIZ3nnhS705NWtI8UcGpwXQ
+         IpbyILl4L22d6jSS32OiePuspbS8IwjGvQKPDoSQIgun6tqcHZxBfxn/1shI/Rh6RAdM
+         +Od5qISd36nbDs18xhGD/duyuZn65q+6QVgpzj/S6hRR7YjIUtZy7VzVxJHJINsHZNfK
+         bUlvxwDE8yOBb7/Nn/FBx5hIaimb9OhJzGSy1QtfJpWY23SjxHAm5DzpR2NS8zYevfI9
+         XWog==
+X-Gm-Message-State: AC+VfDwVugVF8hEmqTo5s/BsJsx0Yr2DJvneePdMOF0fxwZpMhvT7GtU
+        rfxyyeW7CXFCJhs0Z6yYPnxRtT3s0PFcTJazIRwrg3NvkBOoCgU7HxTZMzW53jYSygM8o5yWKT7
+        UrwXzEm+qoIdt
+X-Received: by 2002:a5e:da0a:0:b0:776:f992:78cf with SMTP id x10-20020a5eda0a000000b00776f99278cfmr14423823ioj.12.1686778265059;
+        Wed, 14 Jun 2023 14:31:05 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7uiMpXdoX0C+7KK/CRCXj6bO8OX1uxwSsvmcuhnlcQTkcoN2CjjS23CivsgSBqyVM9D5u/Tw==
+X-Received: by 2002:a5e:da0a:0:b0:776:f992:78cf with SMTP id x10-20020a5eda0a000000b00776f99278cfmr14423804ioj.12.1686778264742;
+        Wed, 14 Jun 2023 14:31:04 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id m28-20020a02cddc000000b004210512e4b5sm3710351jap.174.2023.06.14.14.31.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jun 2023 14:31:04 -0700 (PDT)
+Date:   Wed, 14 Jun 2023 15:31:02 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Brett Creeley <brett.creeley@amd.com>
+Cc:     <kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <jgg@nvidia.com>,
+        <yishaih@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <kevin.tian@intel.com>, <shannon.nelson@amd.com>
+Subject: Re: [PATCH v10 vfio 2/7] vfio/pds: Initial support for pds_vfio
+ VFIO driver
+Message-ID: <20230614153102.54e82fe2.alex.williamson@redhat.com>
+In-Reply-To: <20230602220318.15323-3-brett.creeley@amd.com>
+References: <20230602220318.15323-1-brett.creeley@amd.com>
+        <20230602220318.15323-3-brett.creeley@amd.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,52 +82,257 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 14, 2023, Alexey Kardashevskiy wrote:
-> On 14/6/23 09:19, Sean Christopherson wrote:
-> > On Fri, Jun 02, 2023, Alexey Kardashevskiy wrote:
-> > > > > Side topic, isn't there an existing bug regarding SEV-ES NMI windows?
-> > > > > KVM can't actually single-step an SEV-ES guest, but tries to set
-> > > > > RFLAGS.TF anyways.
-> > > > =20
-> > > > Why is it a "bug" and what does the patch fix? Sound to me as it is
-> > > > pointless and the guest won't do single stepping and instead will run
-> > > > till it exits somehow, what do I miss?
-> > 
-> > The bug is benign in the end, but it's still a bug.  I'm not worried about =
-> 
-> 
-> (unrelated) Your response's encoding broke somehow and I wonder if this is
-> something I did or you did. Lore got it too:
-> 
-> https://lore.kernel.org/all/ZIj5ms+DohcLyXHE@google.com/
+On Fri, 2 Jun 2023 15:03:13 -0700
+Brett Creeley <brett.creeley@amd.com> wrote:
 
-Huh.  Guessing something I did, but I've no idea what caused it.
-
-> > fixing
-> > any behavior, but I dislike having dead, misleading code, especially for so=
-> > mething
-> > like this where both NMI virtualization and SEV-ES are already crazy comple=
-> > x and
-> > subtle.  I think it's safe to say that I've spent more time digging through=
-> >   SEV-ES
-> > and NMI virtualization than most KVM developers, and as evidenced by the nu=
-> > mber of
-> > things I got wrong below, I'm still struggling to keep track of the bigger =
-> > picture.
-> > Developers that are new to all of this need as much help as they can get.
-> > 
-> > > > > Blech, and suppressing EFER.SVME in efer_trap() is a bit gross,
-> > > > =20
-> > > > Why suppressed? svm_set_efer() sets it eventually anyway.
-> > 
-> > svm_set_efer() sets SVME in hardware, but KVM's view of the guest's value t=
-> > hat's
-> > stored in vcpu->arch.efer doesn't have SVME set.  E.g. from the guest's per=
-> > spective,
-> > EFER.SVME will have "Reserved Read As Zero" semantics.
+> This is the initial framework for the new pds_vfio device driver. This
+> does the very basics of registering the PDS PCI device and configuring
+> it as a VFIO PCI device.
 > 
-> It is not zero, why? From inside the guest, rdmsrl(MSR_EFER, efer) reads
-> 0x1d01 from that msr where 0x1000==(1<<_EFER_SVME),  _EFER_SVME==12.
+> With this change, the VF device can be bound to the pds_vfio driver on
+> the host and presented to the VM as the VF's device type.
+> 
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+> ---
+>  drivers/vfio/pci/Makefile       |  2 +
+>  drivers/vfio/pci/pds/Makefile   |  8 ++++
+>  drivers/vfio/pci/pds/pci_drv.c  | 69 +++++++++++++++++++++++++++++++
+>  drivers/vfio/pci/pds/vfio_dev.c | 72 +++++++++++++++++++++++++++++++++
+>  drivers/vfio/pci/pds/vfio_dev.h | 20 +++++++++
+>  5 files changed, 171 insertions(+)
+>  create mode 100644 drivers/vfio/pci/pds/Makefile
+>  create mode 100644 drivers/vfio/pci/pds/pci_drv.c
+>  create mode 100644 drivers/vfio/pci/pds/vfio_dev.c
+>  create mode 100644 drivers/vfio/pci/pds/vfio_dev.h
+> 
+> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+> index 24c524224da5..45167be462d8 100644
+> --- a/drivers/vfio/pci/Makefile
+> +++ b/drivers/vfio/pci/Makefile
+> @@ -11,3 +11,5 @@ obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
+>  obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
+>  
+>  obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
+> +
+> +obj-$(CONFIG_PDS_VFIO_PCI) += pds/
+> diff --git a/drivers/vfio/pci/pds/Makefile b/drivers/vfio/pci/pds/Makefile
+> new file mode 100644
+> index 000000000000..e1a55ae0f079
+> --- /dev/null
+> +++ b/drivers/vfio/pci/pds/Makefile
+> @@ -0,0 +1,8 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +# Copyright (c) 2023 Advanced Micro Devices, Inc.
+> +
+> +obj-$(CONFIG_PDS_VFIO_PCI) += pds_vfio.o
 
-Oh, lame.  So the guest gets to see the raw value in the VMSA.  So it really comes
-down to the GHCB not providing support for STGI/CLGI.
+Given the existing drivers:
+
+obj-$(CONFIG_MLX5_VFIO_PCI) += mlx5-vfio-pci.o
+obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisi-acc-vfio-pci.o
+
+Does it make sense to name this one pds-vfio-pci?
+
+> +
+> +pds_vfio-y := \
+> +	pci_drv.o	\
+> +	vfio_dev.o
+> diff --git a/drivers/vfio/pci/pds/pci_drv.c b/drivers/vfio/pci/pds/pci_drv.c
+> new file mode 100644
+> index 000000000000..0e84249069d4
+> --- /dev/null
+> +++ b/drivers/vfio/pci/pds/pci_drv.c
+> @@ -0,0 +1,69 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright(c) 2023 Advanced Micro Devices, Inc. */
+> +
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +#include <linux/module.h>
+> +#include <linux/pci.h>
+> +#include <linux/types.h>
+> +#include <linux/vfio.h>
+> +
+> +#include <linux/pds/pds_core_if.h>
+> +
+> +#include "vfio_dev.h"
+> +
+> +#define PDS_VFIO_DRV_DESCRIPTION	"AMD/Pensando VFIO Device Driver"
+> +#define PCI_VENDOR_ID_PENSANDO		0x1dd8
+
+Isn't this a duplicate from the above include:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/linux/pds/pds_core_if.h#n7
+
+I also find it defined in ionic.h, which means that it now satisfies
+pci_ids.h requirement that the identifier is shared between multiple
+drivers.  A trivial follow-up after this series might combine them
+there.
+
+> +
+> +static int pds_vfio_pci_probe(struct pci_dev *pdev,
+> +			      const struct pci_device_id *id)
+> +{
+> +	struct pds_vfio_pci_device *pds_vfio;
+> +	int err;
+> +
+> +	pds_vfio = vfio_alloc_device(pds_vfio_pci_device, vfio_coredev.vdev,
+> +				     &pdev->dev, pds_vfio_ops_info());
+> +	if (IS_ERR(pds_vfio))
+> +		return PTR_ERR(pds_vfio);
+> +
+> +	dev_set_drvdata(&pdev->dev, &pds_vfio->vfio_coredev);
+> +
+> +	err = vfio_pci_core_register_device(&pds_vfio->vfio_coredev);
+> +	if (err)
+> +		goto out_put_vdev;
+> +
+> +	return 0;
+> +
+> +out_put_vdev:
+> +	vfio_put_device(&pds_vfio->vfio_coredev.vdev);
+> +	return err;
+> +}
+> +
+> +static void pds_vfio_pci_remove(struct pci_dev *pdev)
+> +{
+> +	struct pds_vfio_pci_device *pds_vfio = pds_vfio_pci_drvdata(pdev);
+> +
+> +	vfio_pci_core_unregister_device(&pds_vfio->vfio_coredev);
+> +	vfio_put_device(&pds_vfio->vfio_coredev.vdev);
+> +}
+> +
+> +static const struct pci_device_id
+> +pds_vfio_pci_table[] = {
+> +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_PENSANDO, 0x1003) }, /* Ethernet VF */
+> +	{ 0, }
+> +};
+> +MODULE_DEVICE_TABLE(pci, pds_vfio_pci_table);
+> +
+> +static struct pci_driver pds_vfio_pci_driver = {
+> +	.name = KBUILD_MODNAME,
+> +	.id_table = pds_vfio_pci_table,
+> +	.probe = pds_vfio_pci_probe,
+> +	.remove = pds_vfio_pci_remove,
+> +	.driver_managed_dma = true,
+> +};
+> +
+> +module_pci_driver(pds_vfio_pci_driver);
+> +
+> +MODULE_DESCRIPTION(PDS_VFIO_DRV_DESCRIPTION);
+> +MODULE_AUTHOR("Advanced Micro Devices, Inc.");
+> +MODULE_LICENSE("GPL");
+> diff --git a/drivers/vfio/pci/pds/vfio_dev.c b/drivers/vfio/pci/pds/vfio_dev.c
+> new file mode 100644
+> index 000000000000..4038dac90a97
+> --- /dev/null
+> +++ b/drivers/vfio/pci/pds/vfio_dev.c
+> @@ -0,0 +1,72 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright(c) 2023 Advanced Micro Devices, Inc. */
+> +
+> +#include <linux/vfio.h>
+> +#include <linux/vfio_pci_core.h>
+> +
+> +#include "vfio_dev.h"
+> +
+> +struct pds_vfio_pci_device *pds_vfio_pci_drvdata(struct pci_dev *pdev)
+> +{
+> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(&pdev->dev);
+> +
+> +	return container_of(core_device, struct pds_vfio_pci_device,
+> +			    vfio_coredev);
+> +}
+> +
+> +static int pds_vfio_init_device(struct vfio_device *vdev)
+> +{
+> +	struct pds_vfio_pci_device *pds_vfio =
+> +		container_of(vdev, struct pds_vfio_pci_device,
+> +			     vfio_coredev.vdev);
+> +	struct pci_dev *pdev = to_pci_dev(vdev->dev);
+> +	int err;
+> +
+> +	err = vfio_pci_core_init_dev(vdev);
+> +	if (err)
+> +		return err;
+> +
+> +	pds_vfio->vf_id = pci_iov_vf_id(pdev);
+> +	pds_vfio->pci_id = PCI_DEVID(pdev->bus->number, pdev->devfn);
+
+We only ever end up using pci_id for a debug print here that could use
+a local variable and a slow path client registration that has access to
+pdev to do a lookup on demand.  Why do we bother caching it on the
+pds_vfio_pci_device?  Thanks,
+
+Alex
+
+> +
+> +	return 0;
+> +}
+> +
+> +static int pds_vfio_open_device(struct vfio_device *vdev)
+> +{
+> +	struct pds_vfio_pci_device *pds_vfio =
+> +		container_of(vdev, struct pds_vfio_pci_device,
+> +			     vfio_coredev.vdev);
+> +	int err;
+> +
+> +	err = vfio_pci_core_enable(&pds_vfio->vfio_coredev);
+> +	if (err)
+> +		return err;
+> +
+> +	vfio_pci_core_finish_enable(&pds_vfio->vfio_coredev);
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct vfio_device_ops pds_vfio_ops = {
+> +	.name = "pds-vfio",
+> +	.init = pds_vfio_init_device,
+> +	.release = vfio_pci_core_release_dev,
+> +	.open_device = pds_vfio_open_device,
+> +	.close_device = vfio_pci_core_close_device,
+> +	.ioctl = vfio_pci_core_ioctl,
+> +	.device_feature = vfio_pci_core_ioctl_feature,
+> +	.read = vfio_pci_core_read,
+> +	.write = vfio_pci_core_write,
+> +	.mmap = vfio_pci_core_mmap,
+> +	.request = vfio_pci_core_request,
+> +	.match = vfio_pci_core_match,
+> +	.bind_iommufd = vfio_iommufd_physical_bind,
+> +	.unbind_iommufd = vfio_iommufd_physical_unbind,
+> +	.attach_ioas = vfio_iommufd_physical_attach_ioas,
+> +};
+> +
+> +const struct vfio_device_ops *pds_vfio_ops_info(void)
+> +{
+> +	return &pds_vfio_ops;
+> +}
+> diff --git a/drivers/vfio/pci/pds/vfio_dev.h b/drivers/vfio/pci/pds/vfio_dev.h
+> new file mode 100644
+> index 000000000000..66cfcab5b5bf
+> --- /dev/null
+> +++ b/drivers/vfio/pci/pds/vfio_dev.h
+> @@ -0,0 +1,20 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright(c) 2023 Advanced Micro Devices, Inc. */
+> +
+> +#ifndef _VFIO_DEV_H_
+> +#define _VFIO_DEV_H_
+> +
+> +#include <linux/pci.h>
+> +#include <linux/vfio_pci_core.h>
+> +
+> +struct pds_vfio_pci_device {
+> +	struct vfio_pci_core_device vfio_coredev;
+> +
+> +	int vf_id;
+> +	int pci_id;
+> +};
+> +
+> +const struct vfio_device_ops *pds_vfio_ops_info(void);
+> +struct pds_vfio_pci_device *pds_vfio_pci_drvdata(struct pci_dev *pdev);
+> +
+> +#endif /* _VFIO_DEV_H_ */
+
