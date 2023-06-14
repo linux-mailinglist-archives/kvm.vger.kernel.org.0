@@ -2,158 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77F157309C1
-	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 23:23:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1CE17309D1
+	for <lists+kvm@lfdr.de>; Wed, 14 Jun 2023 23:28:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235979AbjFNVXb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jun 2023 17:23:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43994 "EHLO
+        id S230247AbjFNV2E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jun 2023 17:28:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230514AbjFNVXa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jun 2023 17:23:30 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77BD61FFA
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:23:29 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-56561689700so15920157b3.2
-        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:23:29 -0700 (PDT)
+        with ESMTP id S229453AbjFNV2A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jun 2023 17:28:00 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22EEB2688
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:27:52 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b3bb3dd181so25941995ad.3
+        for <kvm@vger.kernel.org>; Wed, 14 Jun 2023 14:27:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686777808; x=1689369808;
+        d=google.com; s=20221208; t=1686778071; x=1689370071;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EguF6lsG5lYio4UZZ1vADQabPc9eHzO82CmbKeM2Gps=;
-        b=1OB4P93nQ9hnwu1SKXSh9Rv08V9u9apR87yzMCxcD97fBtyXQJmA332SMyINsuwF5k
-         WDP3zbqRSh1YCG51O8vkwWH9UOylzOgoCLECbGuGxdNvsJ9P+t6xN5lXJVF2MDyWQ87d
-         g0kY3pdBzSUOSNlJopYI0Ol7QwH1IW9f/F1Rp9zDz5QHxviCsfLnNikWMf6G8MxzKnVN
-         Hkrgiju4CIHHe98opG11KR1x2fJVrXdKGQE9rYvKpUdRZpc6IXYrwgWM5oT55OGSLJ6k
-         /GCv5DjRwFS8JcP6fnZdTAWkndoEDNIel4yJiNwk7IwCqMj8H448JxLQqHA/Bc8wTCGB
-         WbOQ==
+        bh=Vi/7hmjTrTZ9KkULGSIwFNzyIkPs6ZSrGwYo1vsf4LY=;
+        b=TOv1Wi0OzaxGH6kqqwft5pXdVjMAM/MiDgT/EMigAP6UWlnGu7xMRdzjFEeJmPqlWL
+         RTMguNIvf07SQMEHLrmAq4s538RBa8g1hlLJBVpqAYDMU7MXO/cI0vJfKZcRp7+Lt3PP
+         rBCkWOYHX/q3klthqhVRiMb2noZUa6qOCtAC86kXBsVW/1JVqW2M55oQy089ISYIUowd
+         /0HnJnD9FuOU8/oC54Cf7PVSQQmfS1FsVszS9TBP9uGWz7cNYoT1Wjm5N9i2YrbzBWGB
+         wl3xERsZlBeaYSbULQx5juqMja79hOySYoERJKr6GgCd3cvL84OlDeYeUVp9stiYEMlN
+         Wrwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686777808; x=1689369808;
+        d=1e100.net; s=20221208; t=1686778071; x=1689370071;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EguF6lsG5lYio4UZZ1vADQabPc9eHzO82CmbKeM2Gps=;
-        b=SJRr/3J0nHAy63yzGTah4eK+bvzjLGadvjY9Lti9rFvvY1AQoSeMeWCZfyoXqq3IlV
-         VtmadlJOVc0pskcCOAQtb3ji6PvqAibkQDv/zZL/w9kbCvr7fyhV9fqvoA43QVynVxvD
-         RzwkcetLfIxPONDWG35Wut5OF0cLpMNPnqkhw6Fx0mS7LpKhc/kcsZ6Ru0z1C6GCxOg7
-         xg8ToX8vpU7rwRtxtyrb7fBdAuARCGxbkQFqBJGUMbVlnpQOtBA5L0AwQuvOr19DT3fr
-         ua+/KVg2I6q7AmUOqXugA6nZWgO+kU1QAQDqnytyLZ6N5NMsqWF1UWwwJ1kt+h+Y91jL
-         Y4HA==
-X-Gm-Message-State: AC+VfDypLBoC1PHMUfXTkn+KIlXfpUkjnmaJb/nNgj3JZGm4JuSVySXY
-        W+F6vpHBOnEkEBoIp64QYh9dKRcjHXk=
-X-Google-Smtp-Source: ACHHUZ4bOpC/uhJHVrKJmWqgRppZDc2NExGMN/kWxkPS3c90+dp9htpQTQSdFXtKL8nnsymOBcUnz5oiwGM=
+        bh=Vi/7hmjTrTZ9KkULGSIwFNzyIkPs6ZSrGwYo1vsf4LY=;
+        b=Hv3Ym8aOnZ9n7mYysDo1yoj3iUXg3AP3V3zsAG3XBcjAVsPWiq3N1txcJgfMmsCjvL
+         zZToSNmdadwWd0A3SS/Ww5DuDjRt0pRDW6th+DJkxPA1/BTyFH2Suxh8vC2OcJDB+pXO
+         RHb1F2pBHsA9V1u7cxLjbFF5fpBlh2hxkygPlBMBYEiQZny8oaPLLuuHG8qRKNWV/k+p
+         oCabCEeuTErEG+BG2HdYbgwerCiR0nBYGRQ1DIuwJg0h7jfqKLpPzgPNs3GVFOJ3SlPF
+         MGGJX2x0q81sleWNWez2GGoGrgovLi7kTVCI7l6x3NGUevNKNmX2vnyDnWA3hyc95+Uz
+         GEiA==
+X-Gm-Message-State: AC+VfDxnLjmZ+qcvwRVBZ7qxWXDlwBNvxnvnOTrOhZWEPGplBiOB15SM
+        6UCLkdUcCF2hhv3lxwPrHBQEgCi0594=
+X-Google-Smtp-Source: ACHHUZ5UF2epLMEIrkVLE9C35fy0CnP3TmO7JnKYJ6T3BpN/XCXz9TqLP32SSuRUgyULc0pTuDBD4I0wRGo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:320d:0:b0:bcc:285c:66de with SMTP id
- y13-20020a25320d000000b00bcc285c66demr1522968yby.5.1686777808777; Wed, 14 Jun
- 2023 14:23:28 -0700 (PDT)
-Date:   Wed, 14 Jun 2023 14:23:27 -0700
-In-Reply-To: <ZIovIBVLIM69E5Bo@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:f807:b0:1b5:bd8:5aaa with SMTP id
+ ix7-20020a170902f80700b001b50bd85aaamr277193plb.1.1686778071544; Wed, 14 Jun
+ 2023 14:27:51 -0700 (PDT)
+Date:   Wed, 14 Jun 2023 14:27:49 -0700
+In-Reply-To: <9ccc37a9-4f0b-f662-4d1a-467d18bbe48e@amd.com>
 Mime-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-10-amoorthy@google.com>
- <ZIovIBVLIM69E5Bo@google.com>
-Message-ID: <ZIovz22R5dm05u6/@google.com>
-Subject: Re: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without implementation
+References: <20230411125718.2297768-6-aik@amd.com> <ZGv9Td4p1vtXC0Hy@google.com>
+ <719a6b42-fd91-8eb4-f773-9ed98d2fdb07@amd.com> <ZGzfWQub4FQOrEtw@google.com>
+ <fc82a8a7-af38-5037-1862-ba2315c4e5af@amd.com> <ZHDEkuaVjs/0kM6t@google.com>
+ <64336829-60c5-afe1-81ad-91b4f354aef3@amd.com> <5e7c6b3d-2c69-59ca-1b9f-2459430e2643@amd.com>
+ <ZIj5ms+DohcLyXHE@google.com> <9ccc37a9-4f0b-f662-4d1a-467d18bbe48e@amd.com>
+Message-ID: <ZIow1a0rVQ1FC4sH@google.com>
+Subject: Re: [PATCH kernel v5 5/6] KVM: SEV: Enable data breakpoints in SEV-ES
 From:   Sean Christopherson <seanjc@google.com>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        robert.hoo.linux@gmail.com, jthoughton@google.com,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-        isaku.yamahata@gmail.com
+To:     Alexey Kardashevskiy <aik@amd.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Pankaj Gupta <pankaj.gupta@amd.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Santosh Shukla <santosh.shukla@amd.com>,
+        Carlos Bilbao <carlos.bilbao@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 14, 2023, Sean Christopherson wrote:
-> On Fri, Jun 02, 2023, Anish Moorthy wrote:
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 69a221f71914..abbc5dd72292 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -2297,4 +2297,10 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
-> >   */
-> >  inline void kvm_populate_efault_info(struct kvm_vcpu *vcpu,
-> >  				     uint64_t gpa, uint64_t len, uint64_t flags);
-> > +
-> > +static inline bool kvm_slot_nowait_on_fault(
-> > +	const struct kvm_memory_slot *slot)
+On Wed, Jun 14, 2023, Alexey Kardashevskiy wrote:
+> On 14/6/23 09:19, Sean Christopherson wrote:
+> > On Fri, Jun 02, 2023, Alexey Kardashevskiy wrote:
+> > > > > Side topic, isn't there an existing bug regarding SEV-ES NMI windows?
+> > > > > KVM can't actually single-step an SEV-ES guest, but tries to set
+> > > > > RFLAGS.TF anyways.
+> > > > =20
+> > > > Why is it a "bug" and what does the patch fix? Sound to me as it is
+> > > > pointless and the guest won't do single stepping and instead will run
+> > > > till it exits somehow, what do I miss?
+> > 
+> > The bug is benign in the end, but it's still a bug.  I'm not worried about =
 > 
-> Just when I was starting to think that we had beat all of the Google3 out of you :-)
 > 
-> And predicate helpers in KVM typically have "is" or "has" in the name, so that it's
-> clear the helper queries, versus e.g. sets the flag or something. 
+> (unrelated) Your response's encoding broke somehow and I wonder if this is
+> something I did or you did. Lore got it too:
 > 
-> > +{
-> > +	return slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
-> 
-> KVM is anything but consistent, but if the helper is likely to be called without
-> a known good memslot, it probably makes sense to have the helper check for NULL,
-> e.g.
-> 
-> static inline bool kvm_is_slot_nowait_on_fault(const struct kvm_memory_slot *slot)
-> {
-> 	return slot && slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
-> }
-> 
-> However, do we actually need to force vendor code to query nowait?  At a glance,
-> the only external (relative to kvm_main.c) users of __gfn_to_pfn_memslot() are
-> in flows that play nice with nowait or that don't support it at all.  So I *think*
-> we can do this?
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index be06b09e9104..78024318286d 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2403,6 +2403,11 @@ static bool memslot_is_readonly(const struct kvm_memory_slot *slot)
->         return slot->flags & KVM_MEM_READONLY;
->  }
->  
-> +static bool memslot_is_nowait_on_fault(const struct kvm_memory_slot *slot)
-> +{
-> +       return slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
-> +}
-> +
->  static unsigned long __gfn_to_hva_many(const struct kvm_memory_slot *slot, gfn_t gfn,
->                                        gfn_t *nr_pages, bool write)
->  {
-> @@ -2730,6 +2735,11 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
->                 writable = NULL;
->         }
->  
-> +       if (async && memslot_is_nowait_on_fault(slot)) {
-> +               *async = false;
-> +               async = NULL;
-> +       }
+> https://lore.kernel.org/all/ZIj5ms+DohcLyXHE@google.com/
 
-Gah, got turned around and forgot to account for @atomic.  So this?
+Huh.  Guessing something I did, but I've no idea what caused it.
 
-	if (!atomic && memslot_is_nowait_on_fault(slot)) {
-		atomic = true;
-		if (async) {
-			*async = false;
-			async = NULL;
-		}
-	}
-	
-> +
->         return hva_to_pfn(addr, atomic, interruptible, async, write_fault,
->                           writable);
->  }
+> > fixing
+> > any behavior, but I dislike having dead, misleading code, especially for so=
+> > mething
+> > like this where both NMI virtualization and SEV-ES are already crazy comple=
+> > x and
+> > subtle.  I think it's safe to say that I've spent more time digging through=
+> >   SEV-ES
+> > and NMI virtualization than most KVM developers, and as evidenced by the nu=
+> > mber of
+> > things I got wrong below, I'm still struggling to keep track of the bigger =
+> > picture.
+> > Developers that are new to all of this need as much help as they can get.
+> > 
+> > > > > Blech, and suppressing EFER.SVME in efer_trap() is a bit gross,
+> > > > =20
+> > > > Why suppressed? svm_set_efer() sets it eventually anyway.
+> > 
+> > svm_set_efer() sets SVME in hardware, but KVM's view of the guest's value t=
+> > hat's
+> > stored in vcpu->arch.efer doesn't have SVME set.  E.g. from the guest's per=
+> > spective,
+> > EFER.SVME will have "Reserved Read As Zero" semantics.
 > 
-> Ah, crud.  The above highlights something I missed in v3.  The memslot NOWAIT
-> flag isn't tied to FOLL_NOWAIT, it's really truly a "fast-only" flag.  And even
-> more confusingly, KVM does set FOLL_NOWAIT, but for the async #PF case, which will
-> get even more confusing if/when KVM uses FOLL_NOWAIT internally.
-> 
-> Drat.  I really like the NOWAIT name, but unfortunately it doesn't do what as the
-> name says.
-> 
-> I still don't love "fast-only" as that bleeds kernel internals to userspace.
-> Anyone have ideas?  Maybe something about not installing new mappings?
+> It is not zero, why? From inside the guest, rdmsrl(MSR_EFER, efer) reads
+> 0x1d01 from that msr where 0x1000==(1<<_EFER_SVME),  _EFER_SVME==12.
+
+Oh, lame.  So the guest gets to see the raw value in the VMSA.  So it really comes
+down to the GHCB not providing support for STGI/CLGI.
