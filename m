@@ -2,67 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 202B67320B9
-	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 22:13:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1559D73214B
+	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 23:05:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237002AbjFOUM5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jun 2023 16:12:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38656 "EHLO
+        id S231837AbjFOVFd convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 15 Jun 2023 17:05:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235649AbjFOUMm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jun 2023 16:12:42 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 651911FF7;
-        Thu, 15 Jun 2023 13:12:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686859961; x=1718395961;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=A3iAeINTOQxjlIUETFqioqPcdTpYY+dG6kh7WvobNeQ=;
-  b=E/gitTvcVFJ7pvGyNcibmFc2K6TWPLquy3ZzpPo8QFiXtEW+lAKtdDxi
-   PntRgYvHq8sD/cQoz1xrIAtXiYA2ECYASQ8V/KqDjTi+7fQBXOdmCZxiG
-   2autZgs6H5APGcsY9BGcfwkhw1iMyHFrURdo9dPRoUlqUXhbROFYNagPL
-   0tOTcuNvEtWROqm7ibL0Jar2IdTDvlhWC+9ObeWqhNDm9p6+7xoVC3atX
-   71GomlMBz6qP+dSOF4aRr5uisxflXKUGIsqY4GugiiPEYt0jCFjlU4xz1
-   9kMaYV6ayfeYxTn99REnXGr3DU6rbZN/nDaYRn5LqmBliLSeQV2d6F4db
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="387611486"
-X-IronPort-AV: E=Sophos;i="6.00,245,1681196400"; 
-   d="scan'208";a="387611486"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 13:12:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="712576666"
-X-IronPort-AV: E=Sophos;i="6.00,245,1681196400"; 
-   d="scan'208";a="712576666"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 13:12:40 -0700
-From:   isaku.yamahata@intel.com
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        linux-coco@lists.linux.dev,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Michael Roth <michael.roth@amd.com>
-Subject: [RFC PATCH 6/6] KVM: x86: Add is_vm_type_supported callback
-Date:   Thu, 15 Jun 2023 13:12:19 -0700
-Message-Id: <268aa027f991eb6afbfb338f88a33d409e81fd36.1686858861.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1686858861.git.isaku.yamahata@intel.com>
-References: <cover.1686858861.git.isaku.yamahata@intel.com>
+        with ESMTP id S229713AbjFOVFb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jun 2023 17:05:31 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69C66184;
+        Thu, 15 Jun 2023 14:05:29 -0700 (PDT)
+Received: from lhrpeml500002.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Qhvrj2l33z6GDGy;
+        Fri, 16 Jun 2023 05:03:01 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ lhrpeml500002.china.huawei.com (7.191.160.78) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Thu, 15 Jun 2023 22:05:26 +0100
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.023;
+ Thu, 15 Jun 2023 22:05:26 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Brett Creeley <brett.creeley@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>
+CC:     "shannon.nelson@amd.com" <shannon.nelson@amd.com>
+Subject: RE: [PATCH v10 vfio 3/7] vfio/pds: register with the pds_core PF
+Thread-Topic: [PATCH v10 vfio 3/7] vfio/pds: register with the pds_core PF
+Thread-Index: AQHZlZ4bRqh8n4WDQkKmbFuUylfIGq+MW5Zg
+Date:   Thu, 15 Jun 2023 21:05:26 +0000
+Message-ID: <67192b9598d041568ece62ea282367d0@huawei.com>
+References: <20230602220318.15323-1-brett.creeley@amd.com>
+ <20230602220318.15323-4-brett.creeley@amd.com>
+In-Reply-To: <20230602220318.15323-4-brett.creeley@amd.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.126.169.47]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,152 +59,270 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-For TDX, allow the backend can override the supported vm type.  Add
-KVM_X86_TDX_VM to reserve the bit.
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- arch/x86/include/asm/kvm-x86-ops.h |  1 +
- arch/x86/include/asm/kvm_host.h    |  1 +
- arch/x86/include/uapi/asm/kvm.h    |  1 +
- arch/x86/kvm/svm/svm.c             |  7 +++++++
- arch/x86/kvm/vmx/vmx.c             |  6 ++++++
- arch/x86/kvm/x86.c                 | 10 +++++++++-
- arch/x86/kvm/x86.h                 |  2 ++
- 7 files changed, 27 insertions(+), 1 deletion(-)
+> -----Original Message-----
+> From: Brett Creeley [mailto:brett.creeley@amd.com]
+> Sent: 02 June 2023 23:03
+> To: kvm@vger.kernel.org; netdev@vger.kernel.org;
+> alex.williamson@redhat.com; jgg@nvidia.com; yishaih@nvidia.com;
+> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> kevin.tian@intel.com
+> Cc: brett.creeley@amd.com; shannon.nelson@amd.com
+> Subject: [PATCH v10 vfio 3/7] vfio/pds: register with the pds_core PF
+> 
+> The pds_core driver will supply adminq services, so find the PF
+> and register with the DSC services.
+> 
+> Use the following commands to enable a VF:
+> echo 1 > /sys/bus/pci/drivers/pds_core/$PF_BDF/sriov_numvfs
+> 
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+> ---
+>  drivers/vfio/pci/pds/Makefile   |  1 +
+>  drivers/vfio/pci/pds/cmds.c     | 43
+> +++++++++++++++++++++++++++++++++
+>  drivers/vfio/pci/pds/cmds.h     | 10 ++++++++
+>  drivers/vfio/pci/pds/pci_drv.c  | 19 +++++++++++++++
+>  drivers/vfio/pci/pds/pci_drv.h  |  9 +++++++
+>  drivers/vfio/pci/pds/vfio_dev.c | 11 +++++++++
+>  drivers/vfio/pci/pds/vfio_dev.h |  6 +++++
+>  include/linux/pds/pds_common.h  |  2 ++
+>  8 files changed, 101 insertions(+)
+>  create mode 100644 drivers/vfio/pci/pds/cmds.c
+>  create mode 100644 drivers/vfio/pci/pds/cmds.h
+>  create mode 100644 drivers/vfio/pci/pds/pci_drv.h
+> 
+> diff --git a/drivers/vfio/pci/pds/Makefile b/drivers/vfio/pci/pds/Makefile
+> index e1a55ae0f079..87581111fa17 100644
+> --- a/drivers/vfio/pci/pds/Makefile
+> +++ b/drivers/vfio/pci/pds/Makefile
+> @@ -4,5 +4,6 @@
+>  obj-$(CONFIG_PDS_VFIO_PCI) += pds_vfio.o
+> 
+>  pds_vfio-y := \
+> +	cmds.o		\
+>  	pci_drv.o	\
+>  	vfio_dev.o
+> diff --git a/drivers/vfio/pci/pds/cmds.c b/drivers/vfio/pci/pds/cmds.c
+> new file mode 100644
+> index 000000000000..ae01f5df2f5c
+> --- /dev/null
+> +++ b/drivers/vfio/pci/pds/cmds.c
+> @@ -0,0 +1,43 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright(c) 2023 Advanced Micro Devices, Inc. */
+> +
+> +#include <linux/io.h>
+> +#include <linux/types.h>
+> +
+> +#include <linux/pds/pds_common.h>
+> +#include <linux/pds/pds_core_if.h>
+> +#include <linux/pds/pds_adminq.h>
+> +
+> +#include "vfio_dev.h"
+> +#include "cmds.h"
+> +
+> +int pds_vfio_register_client_cmd(struct pds_vfio_pci_device *pds_vfio)
+> +{
+> +	struct pci_dev *pdev = pds_vfio_to_pci_dev(pds_vfio);
+> +	char devname[PDS_DEVNAME_LEN];
+> +	int ci;
+> +
+> +	snprintf(devname, sizeof(devname), "%s.%d-%u", PDS_LM_DEV_NAME,
+> +		 pci_domain_nr(pdev->bus), pds_vfio->pci_id);
+> +
+> +	ci = pds_client_register(pci_physfn(pdev), devname);
+> +	if (ci <= 0)
+> +		return ci;
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 13bc212cd4bc..c0143906fe6d 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -20,6 +20,7 @@ KVM_X86_OP(hardware_disable)
- KVM_X86_OP(hardware_unsetup)
- KVM_X86_OP(has_emulated_msr)
- KVM_X86_OP(vcpu_after_set_cpuid)
-+KVM_X86_OP(is_vm_type_supported)
- KVM_X86_OP(vm_init)
- KVM_X86_OP_OPTIONAL(vm_destroy)
- KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 2763f9837a0b..ce83e24a538d 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1547,6 +1547,7 @@ struct kvm_x86_ops {
- 	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
- 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
- 
-+	bool (*is_vm_type_supported)(unsigned long vm_type);
- 	unsigned int vm_size;
- 	int (*vm_init)(struct kvm *kvm);
- 	void (*vm_destroy)(struct kvm *kvm);
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 6afbfbb32d56..53d382b3b423 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -561,5 +561,6 @@ struct kvm_pmu_event_filter {
- 
- #define KVM_X86_DEFAULT_VM	0
- #define KVM_X86_PROTECTED_VM	1
-+#define KVM_X86_TDX_VM		2
- 
- #endif /* _ASM_X86_KVM_H */
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index eb308c9994f9..e9ed8729f63b 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4756,6 +4756,12 @@ static void svm_vm_destroy(struct kvm *kvm)
- 	sev_vm_destroy(kvm);
- }
- 
-+static bool svm_is_vm_type_supported(unsigned long type)
-+{
-+	/* FIXME: Check if CPU is capable of SEV. */
-+	return __kvm_is_vm_type_supported(type);
-+}
-+
- static int svm_vm_init(struct kvm *kvm)
- {
- 	if (!pause_filter_count || !pause_filter_thresh)
-@@ -4784,6 +4790,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.vcpu_free = svm_vcpu_free,
- 	.vcpu_reset = svm_vcpu_reset,
- 
-+	.is_vm_type_supported = svm_is_vm_type_supported,
- 	.vm_size = sizeof(struct kvm_svm),
- 	.vm_init = svm_vm_init,
- 	.vm_destroy = svm_vm_destroy,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 44fb619803b8..b5394ba8cb9c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7469,6 +7469,11 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
- 	return err;
- }
- 
-+static bool vmx_is_vm_type_supported(unsigned long type)
-+{
-+	return __kvm_is_vm_type_supported(type);
-+}
-+
- #define L1TF_MSG_SMT "L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- #define L1TF_MSG_L1D "L1TF CPU bug present and virtualization mitigation disabled, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- 
-@@ -8138,6 +8143,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.hardware_disable = vmx_hardware_disable,
- 	.has_emulated_msr = vmx_has_emulated_msr,
- 
-+	.is_vm_type_supported = vmx_is_vm_type_supported,
- 	.vm_size = sizeof(struct kvm_vmx),
- 	.vm_init = vmx_vm_init,
- 	.vm_destroy = vmx_vm_destroy,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c9e1c9369be2..b5f865f39a00 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4418,12 +4418,18 @@ static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
--static bool kvm_is_vm_type_supported(unsigned long type)
-+bool __kvm_is_vm_type_supported(unsigned long type)
- {
- 	return type == KVM_X86_DEFAULT_VM ||
- 	       (type == KVM_X86_PROTECTED_VM &&
- 	        IS_ENABLED(CONFIG_KVM_PROTECTED_VM) && tdp_enabled);
- }
-+EXPORT_SYMBOL_GPL(__kvm_is_vm_type_supported);
-+
-+static bool kvm_is_vm_type_supported(unsigned long type)
-+{
-+	return static_call(kvm_x86_is_vm_type_supported)(type);
-+}
- 
- int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- {
-@@ -4618,6 +4624,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = BIT(KVM_X86_DEFAULT_VM);
- 		if (kvm_is_vm_type_supported(KVM_X86_PROTECTED_VM))
- 			r |= BIT(KVM_X86_PROTECTED_VM);
-+		if (kvm_is_vm_type_supported(KVM_X86_TDX_VM))
-+			r |= BIT(KVM_X86_TDX_VM);
- 		break;
- 	default:
- 		break;
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index c544602d07a3..7d5aa8f0571a 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -9,6 +9,8 @@
- #include "kvm_cache_regs.h"
- #include "kvm_emulate.h"
- 
-+bool __kvm_is_vm_type_supported(unsigned long type);
-+
- struct kvm_caps {
- 	/* control of guest tsc rate supported? */
- 	bool has_tsc_control;
--- 
-2.25.1
+So 0 is not a valid id I guess but we return 0 here. But below where
+pds_vfio_register_client_cmd() is called, 0 return is treated as success.
+
+Note: Also in drivers..../auxbus.c the comment says the function returns 0
+on success!.
+
+Please check.
+
+Thanks,
+Shameer
+> +
+> +	pds_vfio->client_id = ci;
+> +
+> +	return 0;
+> +}
+> +
+> +void pds_vfio_unregister_client_cmd(struct pds_vfio_pci_device *pds_vfio)
+> +{
+> +	struct pci_dev *pdev = pds_vfio_to_pci_dev(pds_vfio);
+> +	int err;
+> +
+> +	err = pds_client_unregister(pci_physfn(pdev), pds_vfio->client_id);
+> +	if (err)
+> +		dev_err(&pdev->dev, "unregister from DSC failed: %pe\n",
+> +			ERR_PTR(err));
+> +
+> +	pds_vfio->client_id = 0;
+> +}
+> diff --git a/drivers/vfio/pci/pds/cmds.h b/drivers/vfio/pci/pds/cmds.h
+> new file mode 100644
+> index 000000000000..4c592afccf89
+> --- /dev/null
+> +++ b/drivers/vfio/pci/pds/cmds.h
+> @@ -0,0 +1,10 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright(c) 2023 Advanced Micro Devices, Inc. */
+> +
+> +#ifndef _CMDS_H_
+> +#define _CMDS_H_
+> +
+> +int pds_vfio_register_client_cmd(struct pds_vfio_pci_device *pds_vfio);
+> +void pds_vfio_unregister_client_cmd(struct pds_vfio_pci_device *pds_vfio);
+> +
+> +#endif /* _CMDS_H_ */
+> diff --git a/drivers/vfio/pci/pds/pci_drv.c b/drivers/vfio/pci/pds/pci_drv.c
+> index 0e84249069d4..a49420aa9736 100644
+> --- a/drivers/vfio/pci/pds/pci_drv.c
+> +++ b/drivers/vfio/pci/pds/pci_drv.c
+> @@ -8,9 +8,13 @@
+>  #include <linux/types.h>
+>  #include <linux/vfio.h>
+> 
+> +#include <linux/pds/pds_common.h>
+>  #include <linux/pds/pds_core_if.h>
+> +#include <linux/pds/pds_adminq.h>
+> 
+>  #include "vfio_dev.h"
+> +#include "pci_drv.h"
+> +#include "cmds.h"
+> 
+>  #define PDS_VFIO_DRV_DESCRIPTION	"AMD/Pensando VFIO Device
+> Driver"
+>  #define PCI_VENDOR_ID_PENSANDO		0x1dd8
+> @@ -27,13 +31,27 @@ static int pds_vfio_pci_probe(struct pci_dev *pdev,
+>  		return PTR_ERR(pds_vfio);
+> 
+>  	dev_set_drvdata(&pdev->dev, &pds_vfio->vfio_coredev);
+> +	pds_vfio->pdsc = pdsc_get_pf_struct(pdev);
+> +	if (IS_ERR_OR_NULL(pds_vfio->pdsc)) {
+> +		err = PTR_ERR(pds_vfio->pdsc) ?: -ENODEV;
+> +		goto out_put_vdev;
+> +	}
+> 
+>  	err = vfio_pci_core_register_device(&pds_vfio->vfio_coredev);
+>  	if (err)
+>  		goto out_put_vdev;
+> 
+> +	err = pds_vfio_register_client_cmd(pds_vfio);
+> +	if (err) {
+> +		dev_err(&pdev->dev, "failed to register as client: %pe\n",
+> +			ERR_PTR(err));
+> +		goto out_unregister_coredev;
+> +	}
+> +
+>  	return 0;
+> 
+> +out_unregister_coredev:
+> +	vfio_pci_core_unregister_device(&pds_vfio->vfio_coredev);
+>  out_put_vdev:
+>  	vfio_put_device(&pds_vfio->vfio_coredev.vdev);
+>  	return err;
+> @@ -43,6 +61,7 @@ static void pds_vfio_pci_remove(struct pci_dev *pdev)
+>  {
+>  	struct pds_vfio_pci_device *pds_vfio = pds_vfio_pci_drvdata(pdev);
+> 
+> +	pds_vfio_unregister_client_cmd(pds_vfio);
+>  	vfio_pci_core_unregister_device(&pds_vfio->vfio_coredev);
+>  	vfio_put_device(&pds_vfio->vfio_coredev.vdev);
+>  }
+> diff --git a/drivers/vfio/pci/pds/pci_drv.h b/drivers/vfio/pci/pds/pci_drv.h
+> new file mode 100644
+> index 000000000000..e79bed12ed14
+> --- /dev/null
+> +++ b/drivers/vfio/pci/pds/pci_drv.h
+> @@ -0,0 +1,9 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright(c) 2023 Advanced Micro Devices, Inc. */
+> +
+> +#ifndef _PCI_DRV_H
+> +#define _PCI_DRV_H
+> +
+> +#include <linux/pci.h>
+> +
+> +#endif /* _PCI_DRV_H */
+> diff --git a/drivers/vfio/pci/pds/vfio_dev.c b/drivers/vfio/pci/pds/vfio_dev.c
+> index 4038dac90a97..39771265b78f 100644
+> --- a/drivers/vfio/pci/pds/vfio_dev.c
+> +++ b/drivers/vfio/pci/pds/vfio_dev.c
+> @@ -6,6 +6,11 @@
+> 
+>  #include "vfio_dev.h"
+> 
+> +struct pci_dev *pds_vfio_to_pci_dev(struct pds_vfio_pci_device *pds_vfio)
+> +{
+> +	return pds_vfio->vfio_coredev.pdev;
+> +}
+> +
+>  struct pds_vfio_pci_device *pds_vfio_pci_drvdata(struct pci_dev *pdev)
+>  {
+>  	struct vfio_pci_core_device *core_device =
+> dev_get_drvdata(&pdev->dev);
+> @@ -29,6 +34,12 @@ static int pds_vfio_init_device(struct vfio_device
+> *vdev)
+>  	pds_vfio->vf_id = pci_iov_vf_id(pdev);
+>  	pds_vfio->pci_id = PCI_DEVID(pdev->bus->number, pdev->devfn);
+> 
+> +	dev_dbg(&pdev->dev,
+> +		"%s: PF %#04x VF %#04x (%d) vf_id %d domain %d
+> pds_vfio %p\n",
+> +		__func__, pci_dev_id(pdev->physfn), pds_vfio->pci_id,
+> +		pds_vfio->pci_id, pds_vfio->vf_id, pci_domain_nr(pdev->bus),
+> +		pds_vfio);
+> +
+>  	return 0;
+>  }
+> 
+> diff --git a/drivers/vfio/pci/pds/vfio_dev.h b/drivers/vfio/pci/pds/vfio_dev.h
+> index 66cfcab5b5bf..92e8ff241ca8 100644
+> --- a/drivers/vfio/pci/pds/vfio_dev.h
+> +++ b/drivers/vfio/pci/pds/vfio_dev.h
+> @@ -7,14 +7,20 @@
+>  #include <linux/pci.h>
+>  #include <linux/vfio_pci_core.h>
+> 
+> +struct pdsc;
+> +
+>  struct pds_vfio_pci_device {
+>  	struct vfio_pci_core_device vfio_coredev;
+> +	struct pdsc *pdsc;
+> 
+>  	int vf_id;
+>  	int pci_id;
+> +	u16 client_id;
+>  };
+> 
+>  const struct vfio_device_ops *pds_vfio_ops_info(void);
+>  struct pds_vfio_pci_device *pds_vfio_pci_drvdata(struct pci_dev *pdev);
+> 
+> +struct pci_dev *pds_vfio_to_pci_dev(struct pds_vfio_pci_device *pds_vfio);
+> +
+>  #endif /* _VFIO_DEV_H_ */
+> diff --git a/include/linux/pds/pds_common.h
+> b/include/linux/pds/pds_common.h
+> index 060331486d50..721453bdf975 100644
+> --- a/include/linux/pds/pds_common.h
+> +++ b/include/linux/pds/pds_common.h
+> @@ -39,6 +39,8 @@ enum pds_core_vif_types {
+>  #define PDS_DEV_TYPE_RDMA_STR	"RDMA"
+>  #define PDS_DEV_TYPE_LM_STR	"LM"
+> 
+> +#define PDS_LM_DEV_NAME		PDS_CORE_DRV_NAME "."
+> PDS_DEV_TYPE_LM_STR
+> +
+>  #define PDS_CORE_IFNAMSIZ		16
+> 
+>  /**
+> --
+> 2.17.1
 
