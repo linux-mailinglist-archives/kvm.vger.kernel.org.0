@@ -2,398 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A66787310E5
-	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 09:36:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D8C8731145
+	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 09:49:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245109AbjFOHgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jun 2023 03:36:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49284 "EHLO
+        id S245297AbjFOHtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jun 2023 03:49:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245259AbjFOHfF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jun 2023 03:35:05 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B51830E0
-        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 00:34:36 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1b3b3f67ad6so43166075ad.3
-        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 00:34:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1686814475; x=1689406475;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a6Rq1yi2+qD0HFNpBzumkvByzhdG8I7NvHz0A/3B5uA=;
-        b=D01H5OrVIr8we3GFahjjLHOivkiaE0jKVyBdXjUGqt0vsAO+bn24SN+JpiLa0PUN1H
-         2Z6DX6it+lm1BaxQA9tDe7zTNNqfjuyjWywwmeFRsHlKPMa+nsCsHmRzD5QD9pysNvME
-         MZD3apcuHfjaQOsjcnTqFZwXpqvNYfneO33m755HSZ0yX1KEDAUuC95Z9pGTTLQddnsk
-         f50Dxqrk2DcJYPfmdNKO0VjvN6FEzFdOoDuPv6aq8wrMkbl9vVR8dNuuItzJA0gn/SJY
-         +yGqUkXWeDXotS0UNBjQNGetCAo2kzU6BiLjW4KR1jmG4Fr7wkMM/VjXt819XqNZKPjn
-         RBaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686814475; x=1689406475;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a6Rq1yi2+qD0HFNpBzumkvByzhdG8I7NvHz0A/3B5uA=;
-        b=DhCL6bZxoTWeE157KbIKxvWlVVR4HFNmMFVp1O5rL92wTfH6ulOUUIhi4+HCtNs/cn
-         nqfZgzHCUWT0dDd0hFaIjyuCcSa4nGZDf0V8JE8/TronExE9Xk7Ml9qFRWXiZv/dz4kh
-         bkHcOBsfNEP/j8/zDx/nAJjmZEWYC5dLoFXDe9tyNkEWXXRcOg71xDMBoD/hpQ1KRs5D
-         K7eo2o5Gj411J2qN5VaMXNo27ZycspME/jJ6agJ08//0r48U2TRPAMpnkHynJS1T/eWP
-         VFWb2BW6o8vEh5MEqNajsWoRCJETlJRHV5VtL+5mgfkU5oOUQfwdXHx0ITjnjEH0nAB0
-         +Mbg==
-X-Gm-Message-State: AC+VfDxB/29dwgJ9y8mmNqJ2MD/HwZUGlTmVnvR8Ox47Sa1Vm7yeI03Z
-        IpnUHpxJpfdk22ov88L/neBWSw==
-X-Google-Smtp-Source: ACHHUZ4l7irIUA/CXf68cBSaDH7QdRt29DwIkNVyjOIFDLs8AX8gkGfmdfm1sIJDRXEdvS6whAibZg==
-X-Received: by 2002:a17:902:da91:b0:1b5:1e24:8a76 with SMTP id j17-20020a170902da9100b001b51e248a76mr455504plx.65.1686814475589;
-        Thu, 15 Jun 2023 00:34:35 -0700 (PDT)
-Received: from anup-ubuntu-vm.localdomain ([106.51.83.242])
-        by smtp.gmail.com with ESMTPSA id ji1-20020a170903324100b001b016313b1dsm8049855plb.86.2023.06.15.00.34.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jun 2023 00:34:35 -0700 (PDT)
-From:   Anup Patel <apatel@ventanamicro.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>,
-        Atish Patra <atishp@rivosinc.com>
-Subject: [PATCH v3 10/10] RISC-V: KVM: Expose IMSIC registers as attributes of AIA irqchip
-Date:   Thu, 15 Jun 2023 13:03:53 +0530
-Message-Id: <20230615073353.85435-11-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230615073353.85435-1-apatel@ventanamicro.com>
-References: <20230615073353.85435-1-apatel@ventanamicro.com>
-MIME-Version: 1.0
+        with ESMTP id S245137AbjFOHs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jun 2023 03:48:58 -0400
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2049.outbound.protection.outlook.com [40.107.14.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E41002D79;
+        Thu, 15 Jun 2023 00:48:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g+1rQs5j0ZVpuFs9vhKENu7m6ESlKIlAlwVLgFiPOFmjWg0Vsgo84K0MjW75usnYOUclInREVl2TSklJuyzJreE/B+BMShkqIoB+yYRl2+Kabh5KVpi8dsKiphu9LZugFrJCY+q3z42tfoGsSrQLI7+VuGzt3vqLYnbDTHx6EAFHmDN+Xoa2Fa1Tqk7VsV9aCqMvKdYZBnbQrQb8M2iFk/QEaOPHgk79Aim9JHEJ6FlXLnNpkQXqH+QhVuIQoG/zNG3FZDA8CjEbFlDVTQbERfuOO1l2lmQpXmyIXOjdV8gyLL6VgFU21r++69rVPbbXBy89+rY954QlvjQB4W8hxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QDiZfHHu5UuW89C3SOpWMjNWGIsDXjq48VYLFVUKlr0=;
+ b=lnvLZvQx3LIh6L9nSc4nASBfTf/N9SpdNKKsAvCG9QA9QGDnwWOatMMLR6b3YL1Vm7SEjH7yDqBOIzxIB6BcLSlv9CdJ0tYfZ5ew/e1a5uqpdMCsCIWEPDL6jHoKm0LfGbStni7n0OKgGBfB71tow8mBIr4j7Bo8MdSfPsHGpN7ZxDnptTE0Uo4xLJcUTLE9eIXVO02USSvQ1nA4qLECr58Fb4L5NzEtb164eyay5eh212ddQg7lTTQ3t4zCZ6991p/zba1wKak7TCmB8gx0ZlVD1vpMXy53i0mpAu5t3Z/2NCraDGufe5HRP2/nUhVBMZA0JDkxtRe0MQABMRiEuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QDiZfHHu5UuW89C3SOpWMjNWGIsDXjq48VYLFVUKlr0=;
+ b=SBwDYtIbDmM0lXb4y+qXj+e6fvPWGrdXnZgR7K/8uTEMX3k2tAX0TaCt45rGKDhbEuCfLOZ5OOgxKD29+JoYE3qhJgGTaYvSxzk1nsLx4l3nqWTpl+MkdWrUfVjN76CuFVF7uQ8MEwO8id0e81wy+Uk9uFHeMc7JX6t/lIpzby9Ye8pfkTyyxuiSKQiuTJn/RikykWZ8QnBoBv1VlKXEzYPTo8cCdAgLtWy48qWupRGGiMGDmUrH6Lt1SEsxmYCouYFgIBLEMvDSgBv4N/Fiw4Ki/B4iPdUfavBZSNRPfUJHxgsb8Vzx0oMLFzDNBdubnl9ZwlIuGQhN/dNQ7afEOg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=suse.com;
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
+ by AM0PR04MB6916.eurprd04.prod.outlook.com (2603:10a6:208:185::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.37; Thu, 15 Jun
+ 2023 07:48:21 +0000
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::66a2:8913:a22a:be8d]) by PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::66a2:8913:a22a:be8d%4]) with mapi id 15.20.6500.025; Thu, 15 Jun 2023
+ 07:48:21 +0000
+Message-ID: <b516b042-bec8-63fa-2474-72301fec67c7@suse.com>
+Date:   Thu, 15 Jun 2023 10:48:17 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, dave.hansen@intel.com,
+        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
+        peterz@infradead.org, tglx@linutronix.de, seanjc@google.com,
+        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, ying.huang@intel.com,
+        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+References: <cover.1685887183.git.kai.huang@intel.com>
+ <4e108968c3294189ad150f62df1f146168036342.1685887183.git.kai.huang@intel.com>
+From:   Nikolay Borisov <nik.borisov@suse.com>
+Subject: Re: [PATCH v11 12/20] x86/virt/tdx: Allocate and set up PAMTs for
+ TDMRs
+In-Reply-To: <4e108968c3294189ad150f62df1f146168036342.1685887183.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-ClientProxiedBy: ZR0P278CA0151.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:41::12) To PA4PR04MB7790.eurprd04.prod.outlook.com
+ (2603:10a6:102:cc::8)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|AM0PR04MB6916:EE_
+X-MS-Office365-Filtering-Correlation-Id: ae2c5d3f-59cf-429c-6065-08db6d74e3b4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: HZ1929BrvtogSeRZi6/6+Vs/ECJU0gOIH8NbbB3ZOSxmEMU4UsvNilP6PcwwYRJdvBGjX/opiiDTyTMTbBM+1nksT/PYxNKAVrB2BSOmhFSsTDQZjI9ajfKdBPTcT+J1c3w34UoRyZ0j7MeZuzRr3O9RPds1Tc0QAcDr/qxKdZjQXKZDf7ypl3dY9OACoidyQiUP2FRypeG0wpVQ8aLS5R6BJFwHLxy9+j/ZwyGxho2r+FChJSNwLjj4I+SDmIRtUvgkXZLCwBrF8xJgMj4M0okZAYtUrGbIc6UzmvqLoeEZy0EgC5rZTjLO/xh68E+eL2YKJp+ZMHcBC5r0tKoFmr7jFckCyT6A4OT7XS8R4FE4jRMw2q+MTV9lEfZDLVbuFMIjC1qaSVzDw/56ZW9NAbUqI7xdpauS1HJ8PcjooN7Zg5ovuArTFrV0u2tERIr6fVjuHcHmoVqmxWMeyz77+BWaazDi0tNWAsoGkxYB4dEgPStZlSZ6dsKHcJ6y4Sx0KC0sGvfzjfop1ZsC12BKigBWC3gh1s8NKoRpzXX5b9uMUdNJBPIxSzwMMKD4VdxSUt181dg/qu8w3iil4oqqmpypVIvrCnf8FaPKSurck+F2QVqF1uwyxD/FlgYTpUXg0JoTCfPIfZwCjAKSffgv4pTIVa1X7965PNyoxpilpwE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(366004)(376002)(346002)(39860400002)(136003)(451199021)(36756003)(6506007)(6512007)(186003)(478600001)(6666004)(6486002)(2906002)(316002)(41300700001)(8936002)(86362001)(31696002)(31686004)(5660300002)(8676002)(7416002)(38100700002)(2616005)(66946007)(83380400001)(66476007)(66556008)(4326008)(17423001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eWxESjV1bDAxQnJFcFJOSjRPTkFPd2cwaW5QY0w0a1BkQXdvVi82STlJZ2ox?=
+ =?utf-8?B?emFNWlhEa0Q1bVFnTkVUWDVQallSMkw5NHZnd2dGOXorNDI4ZndxUVlVMmMv?=
+ =?utf-8?B?YlYyeU1sUlJ5WURONnBPTTBhS2s0Ynh5SXZmQmJIQWFCNFc1YzBJdlhVcW51?=
+ =?utf-8?B?OGh1enNOSnBJd3pWL1hHdXVvQTBEdnZKRllNK3M2YXh5RnpVd096UU4raHNl?=
+ =?utf-8?B?M2pvUjEvSXpGcFZEd2U0WEV5S2VnZU5NVE5IQWFJZFh3aHJGVzVUSTlFMmtl?=
+ =?utf-8?B?OHEzSTY5aUQ2ZHFXNzF4dUxBa0g4NlBIcWVoKzZxREVzM2hLMGpIai95LzBE?=
+ =?utf-8?B?YlhSaC9TNUdLTzJ5dEhzYzF2SU02QWRsbXZDWVdGRWFsbmxQK2FZaVE1Q1Ry?=
+ =?utf-8?B?TGNiT0V3aStOdEEwK0Q2NUhac2xkTktNd21wNHd2eDd2YWErbjJ1aXYrdy9o?=
+ =?utf-8?B?Y1hoUUNGbE9uMEFVN01XUzNLNXpsanFBQkpZc3NOdis3T05vb3BMNllvenBj?=
+ =?utf-8?B?eVFkTnFPdmZTOVI1NERkdnRTQzl1UkZrR3lwSnJkWXI5SmFSK2lmd1FwbVFJ?=
+ =?utf-8?B?aHpOV3BscnJPQlVsNE5JYkcrVEpDV05FbUVkMzFURmU3VWwwOFVQTkhqMGts?=
+ =?utf-8?B?ZEhsWXJjSTBWL0hlZ016aUkzNW5ZTVpVNW1FdWVjdnVadUI2SS81MXVtQkIx?=
+ =?utf-8?B?d2Ryd3lyQmtrNnB4MFZkZldXS3RNWjZBYmZSUWRveVk0K1BQV1NoMWlvYkUy?=
+ =?utf-8?B?cWpNS3l0OVhHbFc5STh6YTBQSWtCMk82dTF3QXhXL1RFKy9oVzRYUFZrZ1lD?=
+ =?utf-8?B?M2JDNGFIcFQyMEQyMVMwTVU5bU1OckloOHUxWktrTGQxd1QweW1HNzF4eHR1?=
+ =?utf-8?B?L0d2Z1B5bmp4ejdvWjN3a1R4REZHK1VZVmQ2azZsdVQxL251WE1KcDN5cUJV?=
+ =?utf-8?B?SjZvTDl5TzFsejRlT0lYL2hmS1lidlBQSXdmUUNsdVRMc1gxSzA1ZFBuUk9q?=
+ =?utf-8?B?a1ltRHB3TW1Qb0djd3NXUW1SeGowNElYNUcwbnkxNlhPSk9POWc5ZFd3UzB6?=
+ =?utf-8?B?bTYvU3JMbDI2bmlwSGtnK3hpai9CakRpT1NVREpabkJtVWNzVnFyVjVZUlpL?=
+ =?utf-8?B?Q3IvSEp2VU9jYmRBRjA5cUxGZEMwS1V2S3VKVlhrOE9VMlhqVGxEaThsT0xT?=
+ =?utf-8?B?d3JvSGVXdFE5cHl0ZTJibzcvMktZb2NUdVovL0preWhDbGJwbGRsdkk5eks4?=
+ =?utf-8?B?VlA4LzdxY1JMQlEvTjF4ZERuaFIzYkU0MXR4VFhRUmlXQlkzbnpmVytJK0Ri?=
+ =?utf-8?B?V09abTBsMmUvTHFmTkxFQ3JSM3MxbVo0ZFIrNndZZFFNbExIdFlBdzhVZFVh?=
+ =?utf-8?B?bSszdU04Wk9LMzlJSXZ4U1RmbGlSMWtLTGtOaTFMaFd1SUhxN0NzYmQzTThS?=
+ =?utf-8?B?T1NCM2ZTWUl1MW96aTZwMGZ3eVk0MDN5T0hHQWZNNTZKNXlkRzBBOFlRWWVx?=
+ =?utf-8?B?SHFOZ05Sb1N1VFFCUG5JMGVwNnAyclBuUy9ycnI0RmkwbFR6OHphS0hoTGNt?=
+ =?utf-8?B?Ri85NWxSWWhkdjBET0pOWGhJKzVMQkF6UXF6cDk1bkZSRzVNOHdod0FVOFNr?=
+ =?utf-8?B?TVFRdTQ4eHlxSW1ISzVqRDR1RStyUjZpQVV3ZG5CNzFGK2l1cGErdDhtaGps?=
+ =?utf-8?B?RHFnQ1k0dEVHVjgwRnRVN29Za0dZd0NsSkVPZVVSVzZhRGdLYkI3bTJmeDVV?=
+ =?utf-8?B?WjA0N1F4WTFCSjlyc3k5ZUtQaFpxaHMvVzRBNTFYbTJzdFdIVElHM2srZGpL?=
+ =?utf-8?B?YTc1WlBMenEwVU5QYklycjB1WFNhaDdReUtIMndqcDY2RGZiQlduMU9IQTBI?=
+ =?utf-8?B?T252b25id05uODREak9YTi9BL1pZV3ZERzJ0R2Zqbk05Z2RsdUkyOHpUWFdN?=
+ =?utf-8?B?NjVGc1R5bmdqLzNGSnB6OGJYSFMvR1gzRFA4RTVjNmhKRXlmZVBHY0lqeHVP?=
+ =?utf-8?B?bGlHSUtVMFltVjFZL3d3N2FSQW5ic29QaW1lQnpCckRKRXg4ZWY0Y1pRYlVK?=
+ =?utf-8?B?eXVGSW00QmdzejB4NHhCNmdNMG8ycXpVc29Tc0JnVThETFY2MDRPZzB4bEVk?=
+ =?utf-8?B?UEhhc0t5NlZKSU5FK2RNRkJNN01VTXZNOXU5RS9ncVc5M0RydVpjVnNQY3pa?=
+ =?utf-8?Q?pFX+176lgU8kLuFh+20Gj5BtjrKosGS66A25wcudhCSh?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae2c5d3f-59cf-429c-6065-08db6d74e3b4
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2023 07:48:20.8678
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eClDVououNUybRG+ikqCD1i5V4S/aGL8x6Ge7ywyRWTTLnfb6hw8wfq+R19fdNZagwLExHYWQ4AfB4BuePfmgw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB6916
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We expose IMSIC registers as KVM device attributes of the in-kernel
-AIA irqchip device. This will allow KVM user-space to save/restore
-IMISC state of each VCPU using KVM device ioctls().
 
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-Reviewed-by: Atish Patra <atishp@rivosinc.com>
----
- arch/riscv/include/asm/kvm_aia.h  |   3 +
- arch/riscv/include/uapi/asm/kvm.h |  17 +++
- arch/riscv/kvm/aia_device.c       |  29 ++++-
- arch/riscv/kvm/aia_imsic.c        | 170 ++++++++++++++++++++++++++++++
- 4 files changed, 217 insertions(+), 2 deletions(-)
 
-diff --git a/arch/riscv/include/asm/kvm_aia.h b/arch/riscv/include/asm/kvm_aia.h
-index a4f6ebf90e31..1f37b600ca47 100644
---- a/arch/riscv/include/asm/kvm_aia.h
-+++ b/arch/riscv/include/asm/kvm_aia.h
-@@ -97,6 +97,9 @@ int kvm_riscv_vcpu_aia_imsic_update(struct kvm_vcpu *vcpu);
- int kvm_riscv_vcpu_aia_imsic_rmw(struct kvm_vcpu *vcpu, unsigned long isel,
- 				 unsigned long *val, unsigned long new_val,
- 				 unsigned long wr_mask);
-+int kvm_riscv_aia_imsic_rw_attr(struct kvm *kvm, unsigned long type,
-+				bool write, unsigned long *val);
-+int kvm_riscv_aia_imsic_has_attr(struct kvm *kvm, unsigned long type);
- void kvm_riscv_vcpu_aia_imsic_reset(struct kvm_vcpu *vcpu);
- int kvm_riscv_vcpu_aia_imsic_inject(struct kvm_vcpu *vcpu,
- 				    u32 guest_index, u32 offset, u32 iid);
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-index 9ed822fc5589..61d7fecc4899 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -255,6 +255,23 @@ enum KVM_RISCV_SBI_EXT_ID {
-  */
- #define KVM_DEV_RISCV_AIA_GRP_APLIC		3
- 
-+/*
-+ * The lower 12-bits of the device attribute type contains the iselect
-+ * value of the IMSIC register (range 0x70-0xFF) whereas the higher order
-+ * bits contains the VCPU id.
-+ */
-+#define KVM_DEV_RISCV_AIA_GRP_IMSIC		4
-+#define KVM_DEV_RISCV_AIA_IMSIC_ISEL_BITS	12
-+#define KVM_DEV_RISCV_AIA_IMSIC_ISEL_MASK	\
-+		((1U << KVM_DEV_RISCV_AIA_IMSIC_ISEL_BITS) - 1)
-+#define KVM_DEV_RISCV_AIA_IMSIC_MKATTR(__vcpu, __isel)	\
-+		(((__vcpu) << KVM_DEV_RISCV_AIA_IMSIC_ISEL_BITS) | \
-+		 ((__isel) & KVM_DEV_RISCV_AIA_IMSIC_ISEL_MASK))
-+#define KVM_DEV_RISCV_AIA_IMSIC_GET_ISEL(__attr)	\
-+		((__attr) & KVM_DEV_RISCV_AIA_IMSIC_ISEL_MASK)
-+#define KVM_DEV_RISCV_AIA_IMSIC_GET_VCPU(__attr)	\
-+		((__attr) >> KVM_DEV_RISCV_AIA_IMSIC_ISEL_BITS)
-+
- /* One single KVM irqchip, ie. the AIA */
- #define KVM_NR_IRQCHIPS			1
- 
-diff --git a/arch/riscv/kvm/aia_device.c b/arch/riscv/kvm/aia_device.c
-index c649ad6e8e0a..84dae351b6d7 100644
---- a/arch/riscv/kvm/aia_device.c
-+++ b/arch/riscv/kvm/aia_device.c
-@@ -327,7 +327,7 @@ static int aia_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
- 	u32 nr;
- 	u64 addr;
- 	int nr_vcpus, r = -ENXIO;
--	unsigned long type = (unsigned long)attr->attr;
-+	unsigned long v, type = (unsigned long)attr->attr;
- 	void __user *uaddr = (void __user *)(long)attr->addr;
- 
- 	switch (attr->group) {
-@@ -374,6 +374,15 @@ static int aia_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
- 		r = kvm_riscv_aia_aplic_set_attr(dev->kvm, type, nr);
- 		mutex_unlock(&dev->kvm->lock);
- 
-+		break;
-+	case KVM_DEV_RISCV_AIA_GRP_IMSIC:
-+		if (copy_from_user(&v, uaddr, sizeof(v)))
-+			return -EFAULT;
-+
-+		mutex_lock(&dev->kvm->lock);
-+		r = kvm_riscv_aia_imsic_rw_attr(dev->kvm, type, true, &v);
-+		mutex_unlock(&dev->kvm->lock);
-+
- 		break;
- 	}
- 
-@@ -386,7 +395,7 @@ static int aia_get_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
- 	u64 addr;
- 	int nr_vcpus, r = -ENXIO;
- 	void __user *uaddr = (void __user *)(long)attr->addr;
--	unsigned long type = (unsigned long)attr->attr;
-+	unsigned long v, type = (unsigned long)attr->attr;
- 
- 	switch (attr->group) {
- 	case KVM_DEV_RISCV_AIA_GRP_CONFIG:
-@@ -435,6 +444,20 @@ static int aia_get_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
- 		if (copy_to_user(uaddr, &nr, sizeof(nr)))
- 			return -EFAULT;
- 
-+		break;
-+	case KVM_DEV_RISCV_AIA_GRP_IMSIC:
-+		if (copy_from_user(&v, uaddr, sizeof(v)))
-+			return -EFAULT;
-+
-+		mutex_lock(&dev->kvm->lock);
-+		r = kvm_riscv_aia_imsic_rw_attr(dev->kvm, type, false, &v);
-+		mutex_unlock(&dev->kvm->lock);
-+		if (r)
-+			return r;
-+
-+		if (copy_to_user(uaddr, &v, sizeof(v)))
-+			return -EFAULT;
-+
- 		break;
- 	}
- 
-@@ -473,6 +496,8 @@ static int aia_has_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
- 		break;
- 	case KVM_DEV_RISCV_AIA_GRP_APLIC:
- 		return kvm_riscv_aia_aplic_has_attr(dev->kvm, attr->attr);
-+	case KVM_DEV_RISCV_AIA_GRP_IMSIC:
-+		return kvm_riscv_aia_imsic_has_attr(dev->kvm, attr->attr);
- 	}
- 
- 	return -ENXIO;
-diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
-index 2dc09dcb8ab5..8f108cfa80e5 100644
---- a/arch/riscv/kvm/aia_imsic.c
-+++ b/arch/riscv/kvm/aia_imsic.c
-@@ -277,6 +277,33 @@ static u32 imsic_mrif_topei(struct imsic_mrif *mrif, u32 nr_eix, u32 nr_msis)
- 	return 0;
- }
- 
-+static int imsic_mrif_isel_check(u32 nr_eix, unsigned long isel)
-+{
-+	u32 num = 0;
-+
-+	switch (isel) {
-+	case IMSIC_EIDELIVERY:
-+	case IMSIC_EITHRESHOLD:
-+		break;
-+	case IMSIC_EIP0 ... IMSIC_EIP63:
-+		num = isel - IMSIC_EIP0;
-+		break;
-+	case IMSIC_EIE0 ... IMSIC_EIE63:
-+		num = isel - IMSIC_EIE0;
-+		break;
-+	default:
-+		return -ENOENT;
-+	};
-+#ifndef CONFIG_32BIT
-+	if (num & 0x1)
-+		return -EINVAL;
-+#endif
-+	if ((num / 2) >= nr_eix)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static int imsic_mrif_rmw(struct imsic_mrif *mrif, u32 nr_eix,
- 			  unsigned long isel, unsigned long *val,
- 			  unsigned long new_val, unsigned long wr_mask)
-@@ -407,6 +434,86 @@ static void imsic_vsfile_read(int vsfile_hgei, int vsfile_cpu, u32 nr_eix,
- 			 imsic_vsfile_local_read, &idata, 1);
- }
- 
-+struct imsic_vsfile_rw_data {
-+	int hgei;
-+	int isel;
-+	bool write;
-+	unsigned long val;
-+};
-+
-+static void imsic_vsfile_local_rw(void *data)
-+{
-+	struct imsic_vsfile_rw_data *idata = data;
-+	unsigned long new_hstatus, old_hstatus, old_vsiselect;
-+
-+	old_vsiselect = csr_read(CSR_VSISELECT);
-+	old_hstatus = csr_read(CSR_HSTATUS);
-+	new_hstatus = old_hstatus & ~HSTATUS_VGEIN;
-+	new_hstatus |= ((unsigned long)idata->hgei) << HSTATUS_VGEIN_SHIFT;
-+	csr_write(CSR_HSTATUS, new_hstatus);
-+
-+	switch (idata->isel) {
-+	case IMSIC_EIDELIVERY:
-+		if (idata->write)
-+			imsic_vs_csr_write(IMSIC_EIDELIVERY, idata->val);
-+		else
-+			idata->val = imsic_vs_csr_read(IMSIC_EIDELIVERY);
-+		break;
-+	case IMSIC_EITHRESHOLD:
-+		if (idata->write)
-+			imsic_vs_csr_write(IMSIC_EITHRESHOLD, idata->val);
-+		else
-+			idata->val = imsic_vs_csr_read(IMSIC_EITHRESHOLD);
-+		break;
-+	case IMSIC_EIP0 ... IMSIC_EIP63:
-+	case IMSIC_EIE0 ... IMSIC_EIE63:
-+#ifndef CONFIG_32BIT
-+		if (idata->isel & 0x1)
-+			break;
-+#endif
-+		if (idata->write)
-+			imsic_eix_write(idata->isel, idata->val);
-+		else
-+			idata->val = imsic_eix_read(idata->isel);
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	csr_write(CSR_HSTATUS, old_hstatus);
-+	csr_write(CSR_VSISELECT, old_vsiselect);
-+}
-+
-+static int imsic_vsfile_rw(int vsfile_hgei, int vsfile_cpu, u32 nr_eix,
-+			   unsigned long isel, bool write,
-+			   unsigned long *val)
-+{
-+	int rc;
-+	struct imsic_vsfile_rw_data rdata;
-+
-+	/* We can only access register if we have a IMSIC VS-file */
-+	if (vsfile_cpu < 0 || vsfile_hgei <= 0)
-+		return -EINVAL;
-+
-+	/* Check IMSIC register iselect */
-+	rc = imsic_mrif_isel_check(nr_eix, isel);
-+	if (rc)
-+		return rc;
-+
-+	/* We can only access register on local CPU */
-+	rdata.hgei = vsfile_hgei;
-+	rdata.isel = isel;
-+	rdata.write = write;
-+	rdata.val = (write) ? *val : 0;
-+	on_each_cpu_mask(cpumask_of(vsfile_cpu),
-+			 imsic_vsfile_local_rw, &rdata, 1);
-+
-+	if (!write)
-+		*val = rdata.val;
-+
-+	return 0;
-+}
-+
- static void imsic_vsfile_local_clear(int vsfile_hgei, u32 nr_eix)
- {
- 	u32 i;
-@@ -758,6 +865,69 @@ int kvm_riscv_vcpu_aia_imsic_rmw(struct kvm_vcpu *vcpu, unsigned long isel,
- 	return rc;
- }
- 
-+int kvm_riscv_aia_imsic_rw_attr(struct kvm *kvm, unsigned long type,
-+				bool write, unsigned long *val)
-+{
-+	u32 isel, vcpu_id;
-+	unsigned long flags;
-+	struct imsic *imsic;
-+	struct kvm_vcpu *vcpu;
-+	int rc, vsfile_hgei, vsfile_cpu;
-+
-+	if (!kvm_riscv_aia_initialized(kvm))
-+		return -ENODEV;
-+
-+	vcpu_id = KVM_DEV_RISCV_AIA_IMSIC_GET_VCPU(type);
-+	vcpu = kvm_get_vcpu_by_id(kvm, vcpu_id);
-+	if (!vcpu)
-+		return -ENODEV;
-+
-+	isel = KVM_DEV_RISCV_AIA_IMSIC_GET_ISEL(type);
-+	imsic = vcpu->arch.aia_context.imsic_state;
-+
-+	read_lock_irqsave(&imsic->vsfile_lock, flags);
-+
-+	rc = 0;
-+	vsfile_hgei = imsic->vsfile_hgei;
-+	vsfile_cpu = imsic->vsfile_cpu;
-+	if (vsfile_cpu < 0) {
-+		if (write) {
-+			rc = imsic_mrif_rmw(imsic->swfile, imsic->nr_eix,
-+					    isel, NULL, *val, -1UL);
-+			imsic_swfile_extirq_update(vcpu);
-+		} else
-+			rc = imsic_mrif_rmw(imsic->swfile, imsic->nr_eix,
-+					    isel, val, 0, 0);
-+	}
-+
-+	read_unlock_irqrestore(&imsic->vsfile_lock, flags);
-+
-+	if (!rc && vsfile_cpu >= 0)
-+		rc = imsic_vsfile_rw(vsfile_hgei, vsfile_cpu, imsic->nr_eix,
-+				     isel, write, val);
-+
-+	return rc;
-+}
-+
-+int kvm_riscv_aia_imsic_has_attr(struct kvm *kvm, unsigned long type)
-+{
-+	u32 isel, vcpu_id;
-+	struct imsic *imsic;
-+	struct kvm_vcpu *vcpu;
-+
-+	if (!kvm_riscv_aia_initialized(kvm))
-+		return -ENODEV;
-+
-+	vcpu_id = KVM_DEV_RISCV_AIA_IMSIC_GET_VCPU(type);
-+	vcpu = kvm_get_vcpu_by_id(kvm, vcpu_id);
-+	if (!vcpu)
-+		return -ENODEV;
-+
-+	isel = KVM_DEV_RISCV_AIA_IMSIC_GET_ISEL(type);
-+	imsic = vcpu->arch.aia_context.imsic_state;
-+	return imsic_mrif_isel_check(imsic->nr_eix, isel);
-+}
-+
- void kvm_riscv_vcpu_aia_imsic_reset(struct kvm_vcpu *vcpu)
- {
- 	struct imsic *imsic = vcpu->arch.aia_context.imsic_state;
--- 
-2.34.1
+On 4.06.23 г. 17:27 ч., Kai Huang wrote:
 
+<snip>
+
+>   /*
+>    * Construct a list of TDMRs on the preallocated space in @tdmr_list
+>    * to cover all TDX memory regions in @tmb_list based on the TDX module
+> @@ -487,10 +684,13 @@ static int construct_tdmrs(struct list_head *tmb_list,
+>   	if (ret)
+>   		return ret;
+>   
+> +	ret = tdmrs_set_up_pamt_all(tdmr_list, tmb_list,
+> +			sysinfo->pamt_entry_size);
+> +	if (ret)
+> +		return ret;
+>   	/*
+>   	 * TODO:
+>   	 *
+> -	 *  - Allocate and set up PAMTs for each TDMR.
+>   	 *  - Designate reserved areas for each TDMR.
+>   	 *
+>   	 * Return -EINVAL until constructing TDMRs is done
+> @@ -547,6 +747,11 @@ static int init_tdx_module(void)
+>   	 *  Return error before all steps are done.
+>   	 */
+>   	ret = -EINVAL;
+> +	if (ret)
+> +		tdmrs_free_pamt_all(&tdx_tdmr_list);
+> +	else
+> +		pr_info("%lu KBs allocated for PAMT.\n",
+> +				tdmrs_count_pamt_pages(&tdx_tdmr_list) * 4);
+
+Why not put the pr_info right after the 'if (ret)' check following 
+tdmrs_setup_pamt_all(). And make the tdmrs_free_pamt_all call 
+unconditional.
+
+It seems the main reason for having a bunch of conditionals in the exit 
+reason is that you share the put_online_mems(); in both the success and 
+failure cases. If you simply add :
+
+
+put_online_mems();
+return 0;
+
+// failure labels follow
+
+Then you can make do without the if (ret) checks and have straight line 
+code doing the error handling.
+
+>   out_free_tdmrs:
+>   	if (ret)
+>   		free_tdmr_list(&tdx_tdmr_list);
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+> index c20848e76469..e8110e1a9980 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.h
+> +++ b/arch/x86/virt/vmx/tdx/tdx.h
+> @@ -133,6 +133,7 @@ struct tdx_memblock {
+>   	struct list_head list;
+>   	unsigned long start_pfn;
+>   	unsigned long end_pfn;
+> +	int nid;
+>   };
+>   
+>   struct tdmr_info_list {
