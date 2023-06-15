@@ -2,158 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 210DD732091
-	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 22:02:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FC117320AF
+	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 22:12:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230126AbjFOUCu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jun 2023 16:02:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33516 "EHLO
+        id S234203AbjFOUMj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jun 2023 16:12:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbjFOUCs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jun 2023 16:02:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C451FEF
-        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 13:02:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686859321;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8IbbP+x6BA+CbR8PuWf9bFHgUN9aUhHhdqxdWI7RMB0=;
-        b=ciaUcNHBZMPex1yIX0SJiBJHY5Ct4f3QtgKbp39ny0+maif1STs9znDsttrrOI3uN0IQaX
-        aMKEOHilkve7P7RG6Xmr2IY6CZNy4ISz/7Lp+0jQOCddy+ali1/JJEkRUUNFjqPl/BP/ID
-        AKPxBSI/NYsR9laCHjIKtbWTvNXzePg=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-351-oRPqnIVSOwiDS_c57lEuzA-1; Thu, 15 Jun 2023 16:01:52 -0400
-X-MC-Unique: oRPqnIVSOwiDS_c57lEuzA-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-62fea7a5de9so158866d6.0
-        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 13:01:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686859311; x=1689451311;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8IbbP+x6BA+CbR8PuWf9bFHgUN9aUhHhdqxdWI7RMB0=;
-        b=TTc3vWYgepQmFrQZS8FMKVymUO6Se+qGAEoAPH9A+K6shbyMpkO16fO0wwfOP8BS1I
-         sNQYnmNCK1SZ8fRQpKLeTBJwB3isgFw4qeI+OQgW4aebDYzwUq4aQIIYwoqcLYiRs0mp
-         7ZzMYDKnxSVBMX78mDoN7Nllw+isJRuQODxNQLnbKNG4Sg9/f4JPjx71KwfCRBOpe5Hv
-         Rtjkl8l0kLd1aycQ73BRq/iX+dJIFsEs8kbcbkXMELKxyDyt1rpl7tpFkKu5DbEbqfUu
-         /uUwNKl66ZfPIKkTWDIJBek55op5EyWsqPJuVXrrhLV3CG2JSeYWdDNW0uxr9dVttTa1
-         S13Q==
-X-Gm-Message-State: AC+VfDxTGJJxK1hC4H7xajn5aTB4GYSoEfvDPqB34ZT142OUD1680jZK
-        pUzWPMQoaPSN5xLb0/ISvroFyCGwwzSkc1RV3ZFiDfpBunoEUcNzX7ypeXjFmwC6G+BMMdI0gxx
-        yPA1+f19jPZ4y
-X-Received: by 2002:ad4:5de8:0:b0:626:2305:6073 with SMTP id jn8-20020ad45de8000000b0062623056073mr13821qvb.4.1686859311724;
-        Thu, 15 Jun 2023 13:01:51 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4RMNRmKAg6OyzyvKUac88wdq6WG114AHscBN3XdznQNbojY/IbUhU0k7xX72rv1YrIiRdnew==
-X-Received: by 2002:ad4:5de8:0:b0:626:2305:6073 with SMTP id jn8-20020ad45de8000000b0062623056073mr13790qvb.4.1686859311408;
-        Thu, 15 Jun 2023 13:01:51 -0700 (PDT)
-Received: from x1n (cpe5c7695f3aee0-cm5c7695f3aede.cpe.net.cable.rogers.com. [99.254.144.39])
-        by smtp.gmail.com with ESMTPSA id hr6-20020a05621423c600b006263735a9adsm6122536qvb.112.2023.06.15.13.01.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jun 2023 13:01:50 -0700 (PDT)
-Date:   Thu, 15 Jun 2023 16:01:49 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        seanjc@google.com, mtosatti@redhat.com, maz@kernel.org,
-        will@kernel.org, c.dall@virtualopensystems.com, david@redhat.com,
-        aarcange@redhat.com, shahuang@redhat.com, hshuai@redhat.com,
-        zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v3] KVM: Avoid illegal stage2 mapping on invalid memory
- slot
-Message-ID: <ZItuLYyDt10U/ytb@x1n>
-References: <20230615054259.14911-1-gshan@redhat.com>
+        with ESMTP id S229969AbjFOUMh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jun 2023 16:12:37 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80C721BDB;
+        Thu, 15 Jun 2023 13:12:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686859956; x=1718395956;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cbAzvr+Ajvv1Z/vidWMYDMFl9TQ90crI2tO+uhbEtEc=;
+  b=AbZOIceo19Bj+S4sDcHKp1ogezbkkwtwiS7JgR/+Pjr47vFS25txS0q9
+   FbDJhvZiICV528LXsJeTOFyzgwLJk1YoNp85CKX99Sb2LXM0nFf+xciEV
+   /Petia14VEHSuN0BMHlU9hZu3qSI+hd+NPo0Kb8FrtkQKRWj/TKy25fel
+   A/01Kzt8OxdIFZ3FmSIFvvwh0W3lNSlewHb8whFAeJyXcFJ1hejKylGp5
+   3mMi86FY32rW8M2VkSYpJUdyWMTgCt6yyRI+spvRyERSLMWcT1z2cszUg
+   jTvlMmvMQmq8r5bHirLJ4sP4RAhuwY7Su8FEjgoMj1GdbHpiYneisxq2m
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="387611429"
+X-IronPort-AV: E=Sophos;i="6.00,245,1681196400"; 
+   d="scan'208";a="387611429"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 13:12:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="712576643"
+X-IronPort-AV: E=Sophos;i="6.00,245,1681196400"; 
+   d="scan'208";a="712576643"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 13:12:35 -0700
+From:   isaku.yamahata@intel.com
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        linux-coco@lists.linux.dev,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Michael Roth <michael.roth@amd.com>
+Subject: [RFC PATCH 0/6] KVM: guest memory: Misc enhacnement
+Date:   Thu, 15 Jun 2023 13:12:13 -0700
+Message-Id: <cover.1686858861.git.isaku.yamahata@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230615054259.14911-1-gshan@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 15, 2023 at 03:42:59PM +1000, Gavin Shan wrote:
-> We run into guest hang in edk2 firmware when KSM is kept as running on
-> the host. The edk2 firmware is waiting for status 0x80 from QEMU's pflash
-> device (TYPE_PFLASH_CFI01) during the operation of sector erasing or
-> buffered write. The status is returned by reading the memory region of
-> the pflash device and the read request should have been forwarded to QEMU
-> and emulated by it. Unfortunately, the read request is covered by an
-> illegal stage2 mapping when the guest hang issue occurs. The read request
-> is completed with QEMU bypassed and wrong status is fetched. The edk2
-> firmware runs into an infinite loop with the wrong status.
-> 
-> The illegal stage2 mapping is populated due to same page sharing by KSM
-> at (C) even the associated memory slot has been marked as invalid at (B)
-> when the memory slot is requested to be deleted. It's notable that the
-> active and inactive memory slots can't be swapped when we're in the middle
-> of kvm_mmu_notifier_change_pte() because kvm->mn_active_invalidate_count
-> is elevated, and kvm_swap_active_memslots() will busy loop until it reaches
-> to zero again. Besides, the swapping from the active to the inactive memory
-> slots is also avoided by holding &kvm->srcu in __kvm_handle_hva_range(),
-> corresponding to synchronize_srcu_expedited() in kvm_swap_active_memslots().
-> 
->   CPU-A                    CPU-B
->   -----                    -----
->                            ioctl(kvm_fd, KVM_SET_USER_MEMORY_REGION)
->                            kvm_vm_ioctl_set_memory_region
->                            kvm_set_memory_region
->                            __kvm_set_memory_region
->                            kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE)
->                              kvm_invalidate_memslot
->                                kvm_copy_memslot
->                                kvm_replace_memslot
->                                kvm_swap_active_memslots        (A)
->                                kvm_arch_flush_shadow_memslot   (B)
->   same page sharing by KSM
->   kvm_mmu_notifier_invalidate_range_start
->         :
->   kvm_mmu_notifier_change_pte
->     kvm_handle_hva_range
->     __kvm_handle_hva_range
->     kvm_set_spte_gfn            (C)
->         :
->   kvm_mmu_notifier_invalidate_range_end
-> 
-> Fix the issue by skipping the invalid memory slot at (C) to avoid the
-> illegal stage2 mapping so that the read request for the pflash's status
-> is forwarded to QEMU and emulated by it. In this way, the correct pflash's
-> status can be returned from QEMU to break the infinite loop in the edk2
-> firmware.
-> 
-> We tried a git-bisect and the first problematic commit is cd4c71835228 ("
-> KVM: arm64: Convert to the gfn-based MMU notifier callbacks"). With this,
-> clean_dcache_guest_page() is called after the memory slots are iterated
-> in kvm_mmu_notifier_change_pte(). clean_dcache_guest_page() is called
-> before the iteration on the memory slots before this commit. This change
-> literally enlarges the racy window between kvm_mmu_notifier_change_pte()
-> and memory slot removal so that we're able to reproduce the issue in a
-> practical test case. However, the issue exists since commit d5d8184d35c9
-> ("KVM: ARM: Memory virtualization setup").
-> 
-> Cc: stable@vger.kernel.org # v3.9+
-> Fixes: d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
-> Reported-by: Shuai Hu <hshuai@redhat.com>
-> Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
-> v3: Skip the invalid memory slots in change_pte() MMU notifier only,
->     suggested by Sean. Improved changelog to describe how the fixes
->     tag is given.
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-True.. FWIW:
+Hello. This is an RFC patch series based on KVM gmem [1] and [2] 
+for the common use of TDX and SEV-SNP.  I'd like to discuss three items.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+* Flags for kvm_gfn_range:
+Roth, By adding flags to kvm_gfn_range, kvm_arch_gmem_invalidate() won't be
+needed.  Maybe x86 gmem_invalidate callback is still needed, though.
 
+* Page fault error code or how to figure out the private page fault
+There is an issue to set kvm_page_fault.is_private. I came up with two new
+error codes.  Is this a way or any other way?
+
+* VM type: Now we have KVM_X86_PROTECTED_VM. How do we proceed?
+  - Keep KVM_X86_PROTECTED_VM for its use. Introduce KVM_X86_TDX_VM
+  - Use KVM_X86_PROTECTED_VM for TDX. (If necessary, introduce another type in
+    the future)
+  - any other way?
+
+[1] KVM gmem patches
+https://github.com/sean-jc/linux/tree/x86/kvm_gmem_solo
+
+[2] Add AMD Secure Nested Paging (SEV-SNP) Hypervisor Support
+https://lore.kernel.org/lkml/20230612042559.375660-1-michael.roth@amd.com/
+
+Isaku Yamahata (6):
+  KVM: selftests: Fix test_add_overlapping_private_memory_regions()
+  KVM: selftests: Fix guest_memfd()
+  KVM: x86/mmu: Pass round full 64-bit error code for the KVM page fault
+  KVM: x86: Introduce PFERR_GUEST_ENC_MASK to indicate fault is private
+  KVM: Add flags to struct kvm_gfn_range
+  KVM: x86: Add is_vm_type_supported callback
+
+ arch/x86/include/asm/kvm-x86-ops.h               |  1 +
+ arch/x86/include/asm/kvm_host.h                  |  5 +++++
+ arch/x86/include/uapi/asm/kvm.h                  |  1 +
+ arch/x86/kvm/mmu/mmu.c                           | 14 +++++++++-----
+ arch/x86/kvm/mmu/mmu_internal.h                  |  8 ++++----
+ arch/x86/kvm/mmu/mmutrace.h                      |  2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h                   |  4 ++--
+ arch/x86/kvm/svm/svm.c                           |  7 +++++++
+ arch/x86/kvm/vmx/vmx.c                           |  6 ++++++
+ arch/x86/kvm/x86.c                               | 10 +++++++++-
+ arch/x86/kvm/x86.h                               |  2 ++
+ include/linux/kvm_host.h                         | 11 ++++++++++-
+ tools/testing/selftests/kvm/guest_memfd_test.c   |  4 ++--
+ .../selftests/kvm/set_memory_region_test.c       | 16 ++++++++++++++--
+ virt/kvm/guest_mem.c                             | 10 +++++++---
+ virt/kvm/kvm_main.c                              |  4 +++-
+ 16 files changed, 83 insertions(+), 22 deletions(-)
+
+
+base-commit: be8abcec83c87d4e15ae04816b685fe260c4bcfd
 -- 
-Peter Xu
+2.25.1
 
