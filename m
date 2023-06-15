@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B53B7320B2
-	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 22:12:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 779C57320B4
+	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 22:12:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236191AbjFOUMr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jun 2023 16:12:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38622 "EHLO
+        id S236349AbjFOUMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jun 2023 16:12:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230174AbjFOUMj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jun 2023 16:12:39 -0400
+        with ESMTP id S234932AbjFOUMk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jun 2023 16:12:40 -0400
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C6E9E69;
-        Thu, 15 Jun 2023 13:12:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 184D312E;
+        Thu, 15 Jun 2023 13:12:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686859958; x=1718395958;
+  t=1686859959; x=1718395959;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SXFiwNIFA8ag0+D8oI15OIEKtW2U4baWFXxyYWhjlKM=;
-  b=Gn0bVqzuEIjd15icPYgK011Z0DfS5oKXzWBZ2tWlI5LhRh8tKFucOWSn
-   7ipLLymSp1FgcBVm5Hf7AgcaVfkk6P8VEXY05VNY11yK1rmdphaIiGGyA
-   tsvDh7nU/TYJTgoEgOtqqJMxjrtg2pvUCRMSOZj2ULrzB9nq5O7cFW4i+
-   oN7zePLO/bPhmzxqTc06rG5wUbYWLtAQsA7myOCbUecYcEj8saUvaMMhM
-   6tzU6FVU4FAIPRyC8rrTgBVys2PiNzfxKXEeiOuYVLYqfZCIr6j/0HCsS
-   9QwH5tEYnn6qtgpu3V7ws51nhGU5Cd8uL8zw9T8V+WahslC57Hvu+Bvwf
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="387611447"
+  bh=UZ90WRxUjX2K077yAxQuqlxmZw9YzTEYYyZ0/+kWEtg=;
+  b=IpEoEClPFW2hLIoU0bCK2sjekl6J9ikDHm2NqXsyz79SlOwxa3Yr7VQa
+   c+SbQal20hf685lRXCr352qxlqmn7Njcekv9yJUo8H8wQ9tZlCc4V6XO6
+   dT0y/yJFNTkR8qmY4LFqp/g9JhERcAa7Y7DsbhnmEzvpe3rLTDG+1HbQ5
+   pleZduFEG6TYrIKMYvzMMB6YyCDlBJb2/2LHYhNglo/sM7/DpA2zzE/lf
+   58iqY1rfw11fG5UwBF4HwS9ORiqYcco+vjrQfaTY7qOG2M1+0ZCR/xTc6
+   iAbCm/13yT0f4MIW1qMEe9HMkCGqO3seHMNi2lE4phpDgC6qBTY7wRNqB
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="387611456"
 X-IronPort-AV: E=Sophos;i="6.00,245,1681196400"; 
-   d="scan'208";a="387611447"
+   d="scan'208";a="387611456"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 13:12:37 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 13:12:38 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="712576651"
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="712576654"
 X-IronPort-AV: E=Sophos;i="6.00,245,1681196400"; 
-   d="scan'208";a="712576651"
+   d="scan'208";a="712576654"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 13:12:36 -0700
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 13:12:37 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -52,9 +52,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Ackerley Tng <ackerleytng@google.com>,
         Vishal Annapurve <vannapurve@google.com>,
         Michael Roth <michael.roth@amd.com>
-Subject: [RFC PATCH 2/6] KVM: selftests: Fix guest_memfd()
-Date:   Thu, 15 Jun 2023 13:12:15 -0700
-Message-Id: <9e3e99f78fcbd7db21368b5fe1d931feeb4db567.1686858861.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH 3/6] KVM: x86/mmu: Pass round full 64-bit error code for the KVM page fault
+Date:   Thu, 15 Jun 2023 13:12:16 -0700
+Message-Id: <2dea4b9819d1aac4b3194b00c5effaf6d01b449f.1686858861.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1686858861.git.isaku.yamahata@intel.com>
 References: <cover.1686858861.git.isaku.yamahata@intel.com>
@@ -72,32 +72,114 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Some test cases should succeed.  Check !ret instead of ret.
+Because the full 64-bit error code, or more info about the fault, for the
+KVM page fault will be needed for protected VM, TDX and SEV-SNP, update
+kvm_mmu_do_page_fault() to accept the 64-bit value so it can pass it to the
+callbacks.
 
-Fixes: 36eedd5b91e3 ("KVM: selftests: Add basic selftest for guest_memfd()")
+The upper 32 bits of error code are discarded at kvm_mmu_page_fault()
+by lower_32_bits().  Now it's passed down as full 64 bits.
+Because only FNAME(page_fault) depends on it, move lower_32_bits() into
+FNAME(page_fault).
+
+The accesses of fault->error_code are as follows
+- FNAME(page_fault): change to explicitly use lower_32_bits()
+- kvm_mmu_page_fault(): explicit mask with PFERR_RSVD_MASK,
+                        PFERR_NESTED_GUEST_PAGE
+- mmutrace: changed u32 -> u64
+- pgprintk(): change %x -> %llx
+
+No functional change is intended.  This is a preparation to pass on more
+info with page fault error code.
+
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- tools/testing/selftests/kvm/guest_memfd_test.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 5 ++---
+ arch/x86/kvm/mmu/mmu_internal.h | 4 ++--
+ arch/x86/kvm/mmu/mmutrace.h     | 2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h  | 4 ++--
+ 4 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index 3b6532b833b2..f3b99c1e5464 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -72,11 +72,11 @@ static void test_fallocate(int fd, size_t page_size, size_t total_size)
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index dc2b9a2f717c..b8ba7f11c3cb 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4510,7 +4510,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ static int nonpaging_page_fault(struct kvm_vcpu *vcpu,
+ 				struct kvm_page_fault *fault)
+ {
+-	pgprintk("%s: gva %lx error %x\n", __func__, fault->addr, fault->error_code);
++	pgprintk("%s: gva %llx error %llx\n", __func__, fault->addr, fault->error_code);
  
- 	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 			total_size, page_size);
--	TEST_ASSERT(ret, "fallocate(PUNCH_HOLE) at total_size should be fine (no-op)");
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) at total_size should be fine (no-op)");
+ 	/* This path builds a PAE pagetable, we can map 2mb pages at maximum. */
+ 	fault->max_level = PG_LEVEL_2M;
+@@ -5820,8 +5820,7 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+ 	}
  
- 	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 			total_size + page_size, page_size);
--	TEST_ASSERT(ret, "fallocate(PUNCH_HOLE) after total_size should be fine (no-op)");
-+	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) after total_size should be fine (no-op)");
+ 	if (r == RET_PF_INVALID) {
+-		r = kvm_mmu_do_page_fault(vcpu, cr2_or_gpa,
+-					  lower_32_bits(error_code), false,
++		r = kvm_mmu_do_page_fault(vcpu, cr2_or_gpa, error_code, false,
+ 					  &emulation_type);
+ 		if (KVM_BUG_ON(r == RET_PF_INVALID, vcpu->kvm))
+ 			return -EIO;
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index f1786698ae00..7f9ec1e5b136 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -191,7 +191,7 @@ static inline bool is_nx_huge_page_enabled(struct kvm *kvm)
+ struct kvm_page_fault {
+ 	/* arguments to kvm_mmu_do_page_fault.  */
+ 	const gpa_t addr;
+-	const u32 error_code;
++	const u64 error_code;
+ 	const bool prefetch;
  
- 	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 			page_size, page_size - 1);
+ 	/* Derived from error_code.  */
+@@ -283,7 +283,7 @@ enum {
+ };
+ 
+ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+-					u32 err, bool prefetch, int *emulation_type)
++					u64 err, bool prefetch, int *emulation_type)
+ {
+ 	struct kvm_page_fault fault = {
+ 		.addr = cr2_or_gpa,
+diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
+index 2d7555381955..2e77883c92f6 100644
+--- a/arch/x86/kvm/mmu/mmutrace.h
++++ b/arch/x86/kvm/mmu/mmutrace.h
+@@ -261,7 +261,7 @@ TRACE_EVENT(
+ 	TP_STRUCT__entry(
+ 		__field(int, vcpu_id)
+ 		__field(gpa_t, cr2_or_gpa)
+-		__field(u32, error_code)
++		__field(u64, error_code)
+ 		__field(u64 *, sptep)
+ 		__field(u64, old_spte)
+ 		__field(u64, new_spte)
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 0662e0278e70..ee4b881c5b39 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -758,7 +758,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	struct guest_walker walker;
+ 	int r;
+ 
+-	pgprintk("%s: addr %lx err %x\n", __func__, fault->addr, fault->error_code);
++	pgprintk("%s: addr %llx err %llx\n", __func__, fault->addr, fault->error_code);
+ 	WARN_ON_ONCE(fault->is_tdp);
+ 
+ 	/*
+@@ -767,7 +767,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	 * The bit needs to be cleared before walking guest page tables.
+ 	 */
+ 	r = FNAME(walk_addr)(&walker, vcpu, fault->addr,
+-			     fault->error_code & ~PFERR_RSVD_MASK);
++			     lower_32_bits(fault->error_code) & ~PFERR_RSVD_MASK);
+ 
+ 	/*
+ 	 * The page is not mapped by the guest.  Let the guest handle it.
 -- 
 2.25.1
 
