@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 929CE7320B5
-	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 22:12:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AE307320B7
+	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 22:12:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229661AbjFOUMw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jun 2023 16:12:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38640 "EHLO
+        id S236672AbjFOUMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jun 2023 16:12:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235146AbjFOUMk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jun 2023 16:12:40 -0400
+        with ESMTP id S235249AbjFOUMl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jun 2023 16:12:41 -0400
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5DBC1715;
-        Thu, 15 Jun 2023 13:12:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30DDE1BDB;
+        Thu, 15 Jun 2023 13:12:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686859959; x=1718395959;
+  t=1686859960; x=1718395960;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=pWaX7pZXuIDTaETtNDJUBd6sIkUSbiwO7+qg1weP6GA=;
-  b=b95OkILWRhFGUbZWn+PyzpXv0erUNB/JwSZsLpyVLepwyjcPdlJsVFbo
-   Qlwo5PiH04mJZ4DZGFjcdocY5kqwoV4QYp+tkhch/eY9idVRzlqn+3gvv
-   l7ILPQjFyZOmD0x4+xxbj/CySkwCKRKtIifSen+nnm+H5lwgZlK5OaRZi
-   NsUoe7icGwCI9Obzhric47nA8frxG+nJfyOr2jO20mSaeKVKynrXSWNL9
-   9qwJAwg1LXWJJptAyY8W2bOWVp/mjvFxc0NGBHTqdkZBokj3ACu8YixQL
-   Sl9n0peaj0TOKxUqtMVtL+gp/XFBKfuzA8bidM75joe5Oolx8ED8FAx1F
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="387611466"
+  bh=uidS/Azok9aj46kMl0B6yHBkyaymtg8HjXcA/9hKJoQ=;
+  b=GcT1IbQGxAJXplqUqzjNdA9aKhd4hoZW0M019HMc8aO4qWL86LQ6XD6/
+   VVSzuZ9OUgxtmxOEyxafwz0jZj8nFcaSKGl9IaJvOSzbeJC8TmTNIXdSL
+   B0FuAWUUw/gDdJ0s5B3ktvu8Gblza8DRJRb7N4QIrp5bwy0P8U2TLD8BG
+   7UuOK3BVDQJLD772cYSCDzZq0l0iUDbsrEEGVfX4Ee0ZmcMzLQkfYofY/
+   cFiQQM34FJugx9ramPMhNMOVPqB5po8PddcPhlcgJ0zT+tQ+lSJE5U+Eu
+   YZBoA3Cpp17spyLOeJXXXNQqoySS+vXoPs7fYMPlNlyRjov59NcOstJRU
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="387611473"
 X-IronPort-AV: E=Sophos;i="6.00,245,1681196400"; 
-   d="scan'208";a="387611466"
+   d="scan'208";a="387611473"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
   by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 13:12:39 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="712576657"
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="712576662"
 X-IronPort-AV: E=Sophos;i="6.00,245,1681196400"; 
-   d="scan'208";a="712576657"
+   d="scan'208";a="712576662"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 13:12:38 -0700
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 13:12:39 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -52,9 +52,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Ackerley Tng <ackerleytng@google.com>,
         Vishal Annapurve <vannapurve@google.com>,
         Michael Roth <michael.roth@amd.com>
-Subject: [RFC PATCH 4/6] KVM: x86: Introduce PFERR_GUEST_ENC_MASK to indicate fault is private
-Date:   Thu, 15 Jun 2023 13:12:17 -0700
-Message-Id: <02471a0e41717e40f415a96a2acbd80ba9d42e2e.1686858861.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH 5/6] KVM: Add flags to struct kvm_gfn_range
+Date:   Thu, 15 Jun 2023 13:12:18 -0700
+Message-Id: <e8d3ab4a56d69a09ba74ff1c439f904075d38c16.1686858861.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1686858861.git.isaku.yamahata@intel.com>
 References: <cover.1686858861.git.isaku.yamahata@intel.com>
@@ -72,96 +72,113 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-It is unfortunate and inflexible for kvm_mmu_do_page_fault() to call
-kvm_mem_is_private(), eventually looking up memory attributes.  Later
-__kvm_faultin_pfn() looks up memory attributes again.  There is a race
-condition that other threads can change memory attributes due to not
-gaining the mmu lock.  SNP-SEV and TDX define theri way to indicate that
-the page fault is private.
-
-Add two PFERR codes to designate that the page fault is private and that
-it requires looking up memory attributes.
+TDX and SEV-SNP need to know the reason for a callback by
+kvm_unmap_gfn_range().  mmu notifier, set memory attributes ioctl or KVM
+gmem callback.  The callback handler changes the behavior or does the
+additional housekeeping operation.  For mmu notifier, it's zapping shared
+PTE.  For set memory attributes, it's the conversion of memory attributes
+(private <=> shared).  For KVM gmem, it's punching a hole in the range, and
+releasing the file.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h | 4 ++++
- arch/x86/kvm/mmu/mmu.c          | 9 +++++++--
- arch/x86/kvm/mmu/mmu_internal.h | 4 ++--
- 3 files changed, 13 insertions(+), 4 deletions(-)
+ include/linux/kvm_host.h | 11 ++++++++++-
+ virt/kvm/guest_mem.c     | 10 +++++++---
+ virt/kvm/kvm_main.c      |  4 +++-
+ 3 files changed, 20 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 8ae131dc645d..2763f9837a0b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -255,7 +255,9 @@ enum x86_intercept_stage;
- #define PFERR_SGX_BIT 15
- #define PFERR_GUEST_FINAL_BIT 32
- #define PFERR_GUEST_PAGE_BIT 33
-+#define PFERR_GUEST_ENC_BIT 34
- #define PFERR_IMPLICIT_ACCESS_BIT 48
-+#define PFERR_HASATTR_BIT 63
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 1a47cedae8a1..c049c0aa44d6 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -256,12 +256,21 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
+ #endif
  
- #define PFERR_PRESENT_MASK	BIT(PFERR_PRESENT_BIT)
- #define PFERR_WRITE_MASK	BIT(PFERR_WRITE_BIT)
-@@ -266,7 +268,9 @@ enum x86_intercept_stage;
- #define PFERR_SGX_MASK		BIT(PFERR_SGX_BIT)
- #define PFERR_GUEST_FINAL_MASK	BIT_ULL(PFERR_GUEST_FINAL_BIT)
- #define PFERR_GUEST_PAGE_MASK	BIT_ULL(PFERR_GUEST_PAGE_BIT)
-+#define PFERR_GUEST_ENC_MASK	BIT_ULL(PFERR_GUEST_ENC_BIT)
- #define PFERR_IMPLICIT_ACCESS	BIT_ULL(PFERR_IMPLICIT_ACCESS_BIT)
-+#define PFERR_HASATTR_MASK	BIT_ULL(PFERR_HASATTR_BIT)
+ #ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
++
++#define KVM_GFN_RANGE_FLAGS_SET_MEM_ATTR		BIT(0)
++#define KVM_GFN_RANGE_FLAGS_GMEM_PUNCH_HOLE		BIT(1)
++#define KVM_GFN_RANGE_FLAGS_GMEM_RELEASE		BIT(2)
++
+ struct kvm_gfn_range {
+ 	struct kvm_memory_slot *slot;
+ 	gfn_t start;
+ 	gfn_t end;
+-	pte_t pte;
++	union {
++		pte_t pte;
++		u64 attrs;
++	};
+ 	bool may_block;
++	unsigned int flags;
+ };
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
+ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
+diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
+index cdf2d84683c8..30b8f66784d4 100644
+--- a/virt/kvm/guest_mem.c
++++ b/virt/kvm/guest_mem.c
+@@ -99,7 +99,8 @@ static struct folio *kvm_gmem_get_folio(struct file *file, pgoff_t index)
+ }
  
- #define PFERR_NESTED_GUEST_PAGE (PFERR_GUEST_PAGE_MASK |	\
- 				 PFERR_WRITE_MASK |		\
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b8ba7f11c3cb..e9c9780bab89 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4358,6 +4358,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ static void kvm_gmem_invalidate_begin(struct kvm *kvm, struct kvm_gmem *gmem,
+-				      pgoff_t start, pgoff_t end)
++				      pgoff_t start, pgoff_t end,
++				      unsigned int flags)
  {
- 	struct kvm_memory_slot *slot = fault->slot;
- 	bool async;
-+	bool is_private;
+ 	struct kvm_memory_slot *slot;
+ 	unsigned long index;
+@@ -118,6 +119,7 @@ static void kvm_gmem_invalidate_begin(struct kvm *kvm, struct kvm_gmem *gmem,
+ 			.slot = slot,
+ 			.pte = __pte(0),
+ 			.may_block = true,
++			.flags = flags,
+ 		};
  
- 	/*
- 	 * Retry the page fault if the gfn hit a memslot that is being deleted
-@@ -4386,8 +4387,12 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 			return RET_PF_EMULATE;
- 	}
+ 		kvm_mmu_invalidate_range_add(kvm, gfn_range.start, gfn_range.end);
+@@ -156,7 +158,8 @@ static long kvm_gmem_punch_hole(struct file *file, loff_t offset, loff_t len)
+ 	 */
+ 	filemap_invalidate_lock(file->f_mapping);
  
--	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn))
--		return kvm_do_memory_fault_exit(vcpu, fault);
-+	is_private = kvm_mem_is_private(vcpu->kvm, fault->gfn);
-+	if (fault->error_code & PFERR_HASATTR_MASK) {
-+		if (fault->is_private != is_private)
-+			return kvm_do_memory_fault_exit(vcpu, fault);
-+	} else
-+		fault->is_private = is_private;
+-	kvm_gmem_invalidate_begin(kvm, gmem, start, end);
++	kvm_gmem_invalidate_begin(kvm, gmem, start, end,
++				  KVM_GFN_RANGE_FLAGS_GMEM_PUNCH_HOLE);
  
- 	if (fault->is_private)
- 		return kvm_faultin_pfn_private(vcpu, fault);
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 7f9ec1e5b136..22f2cd60cabf 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -203,7 +203,7 @@ struct kvm_page_fault {
+ 	truncate_inode_pages_range(file->f_mapping, offset, offset + len - 1);
  
- 	/* Derived from mmu and global state.  */
- 	const bool is_tdp;
--	const bool is_private;
-+	bool is_private;
- 	const bool nx_huge_page_workaround_enabled;
+@@ -263,7 +266,8 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
+ 	 * Free the backing memory, and more importantly, zap all SPTEs that
+ 	 * pointed at this file.
+ 	 */
+-	kvm_gmem_invalidate_begin(kvm, gmem, 0, -1ul);
++	kvm_gmem_invalidate_begin(kvm, gmem, 0, -1ul,
++				  KVM_GFN_RANGE_FLAGS_GMEM_RELEASE);
+ 	truncate_inode_pages_final(file->f_mapping);
+ 	kvm_gmem_invalidate_end(kvm, gmem, 0, -1ul);
  
- 	/*
-@@ -301,7 +301,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		.max_level = KVM_MAX_HUGEPAGE_LEVEL,
- 		.req_level = PG_LEVEL_4K,
- 		.goal_level = PG_LEVEL_4K,
--		.is_private = kvm_mem_is_private(vcpu->kvm, cr2_or_gpa >> PAGE_SHIFT),
-+		.is_private = err & PFERR_GUEST_ENC_MASK,
- 	};
- 	int r;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 422d49634c56..9cdfa2fb675f 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -613,6 +613,7 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+ 			gfn_range.start = hva_to_gfn_memslot(hva_start, slot);
+ 			gfn_range.end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, slot);
+ 			gfn_range.slot = slot;
++			gfn_range.flags = 0;
  
+ 			if (!locked) {
+ 				locked = true;
+@@ -2391,8 +2392,9 @@ static void kvm_mem_attrs_changed(struct kvm *kvm, unsigned long attrs,
+ 	bool flush = false;
+ 	int i;
+ 
+-	gfn_range.pte = __pte(0);
++	gfn_range.attrs = attrs;
+ 	gfn_range.may_block = true;
++	gfn_range.flags = KVM_GFN_RANGE_FLAGS_SET_MEM_ATTR;
+ 
+ 	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
+ 		slots = __kvm_memslots(kvm, i);
 -- 
 2.25.1
 
