@@ -2,82 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52ECD7311B2
-	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 10:05:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39D717311CD
+	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 10:11:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233900AbjFOIFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jun 2023 04:05:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43346 "EHLO
+        id S238797AbjFOIL0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jun 2023 04:11:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230102AbjFOIFc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jun 2023 04:05:32 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C220135
-        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 01:05:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686816332; x=1718352332;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=L+he4Z+5cLuC40aQHUxZXyH5MUxV/r3z5GvtllcRDFQ=;
-  b=LYLYo/e4qeiNkU9SLBRlcXUt5Zumo/1HGo9lEh5e0AyQ2WuGWUxPPLfT
-   6FkB7SsfH3G8nQ6YKM4ZU/0+J5YQBxzq6wZK1QlhDWCwx5YsyMWKwS9KZ
-   ySw5sF9Hq1t5slKnzGKdU7eEARmpRCGdLfW69ktrh0ChpbAUgmHmiI1yf
-   TP6ltP+vX1mKZ5PJpKnuICPOZPgEtRJybyhZWT1zjExJFPX8J73l2idsl
-   UzruFRZOprt33PT1qjUl4BCqpEMWtSLvalRQfYu26qEfHO4wrd0c4zYsa
-   HiOcrfOv520XfmrUE1Czh/9SVq7NpCnKs+UShAMAU55PdbciVfDCjCAs1
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10741"; a="358839419"
-X-IronPort-AV: E=Sophos;i="6.00,244,1681196400"; 
-   d="scan'208";a="358839419"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 01:05:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10741"; a="1042550990"
-X-IronPort-AV: E=Sophos;i="6.00,244,1681196400"; 
-   d="scan'208";a="1042550990"
-Received: from ubuntu.bj.intel.com ([10.238.156.105])
-  by fmsmga005.fm.intel.com with ESMTP; 15 Jun 2023 01:05:29 -0700
-From:   Jun Miao <jun.miao@intel.com>
-To:     seanjc@google.com, pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, jun.miao@intel.com
-Subject: [PATCH] KVM: x86: Update the version number of SDM in comments
-Date:   Thu, 15 Jun 2023 16:06:24 +0800
-Message-Id: <20230615080624.725551-1-jun.miao@intel.com>
-X-Mailer: git-send-email 2.32.0
+        with ESMTP id S230304AbjFOILZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jun 2023 04:11:25 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84D581AA
+        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 01:11:23 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9827109c6e9so198323866b.3
+        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 01:11:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jms.id.au; s=google; t=1686816682; x=1689408682;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jc3bGs7n8LGJfGG9OcFyn2jHuE4ZH06NRDgfF5l5LjU=;
+        b=DeLazfIC3InLlnc+CbN7u3tKeBgHiyvNu9e/jNH3WftMrgPB8g8Nm8trECi2KONeGZ
+         uf3lWDYbRqTYPo0TVAcyEuFtq7s9eO4TbZ8HkZ0Zo2uvlysLQyGKYZ4tw2gr7KzCTIpj
+         SgMSEMZGFaHUpnALuimbilC8pr1x3qSHGxIzM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686816682; x=1689408682;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Jc3bGs7n8LGJfGG9OcFyn2jHuE4ZH06NRDgfF5l5LjU=;
+        b=Yi0VTdhkEhCE/UkJ7sUXAcXP0n1MZf1Udd8qEMy+5mUp3OwvgyHwivEYcFTPQKVdxK
+         HrR9n4F2EjGSc3d89HeE9fmKdpSev3XUCFXSrccOeBMzO2jyQKL+Qo2TJDIWPCKabKvQ
+         ClfZ5xFrn6vrerYfIMd9UfE4CLwblaMiuCvkEpI0V4ImyMybxOB7kWKg5llxvrDJXyOg
+         a8KC4IqGJ8bzJ9zCZUCiB3LpTjUP3joiwIvl1EpRZQZVOlbsGx6chEeUlYF6Pa3gUcTZ
+         4DzpysKvYwdCBtDKhmchmpWWMTopn82NGhgG1stc+DQviI6M/+HAvOmnEPUFiZQ19XVE
+         8kjw==
+X-Gm-Message-State: AC+VfDzWzAFPQbHhaObpazQrMBZy9n79h9XBEEdoZ/fDYok/5CSEN+8l
+        xxK8UZnsmeNL7o7jI/Rz5pgr9VrkMLJ0iBxC2AM=
+X-Google-Smtp-Source: ACHHUZ4bUFGFP77ZcF3kMaZOJhG6wTzBNRglO1RF+tVoIeHKdwBZFicWiHALQYaEk74qIyu3OSniSMlM/E6RZ+LZRhQ=
+X-Received: by 2002:a17:906:d553:b0:970:c9f:2db6 with SMTP id
+ cr19-20020a170906d55300b009700c9f2db6mr17756450ejc.63.1686816681651; Thu, 15
+ Jun 2023 01:11:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230608075826.86217-1-npiggin@gmail.com> <CACPK8XdpAxjvP+bFNFJzQQzBYvEwsE69QkbNWRumZtUW2wOrrA@mail.gmail.com>
+ <CTCW1ILCXTMA.24T7LU9PQBTDA@wheely>
+In-Reply-To: <CTCW1ILCXTMA.24T7LU9PQBTDA@wheely>
+From:   Joel Stanley <joel@jms.id.au>
+Date:   Thu, 15 Jun 2023 08:11:09 +0000
+Message-ID: <CACPK8XdOv4j5y6ADrxfvW_iDLLT0UT6Dwb_-J3mTA1Rq9s4xtQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests v4 00/12] powerpc: updates, P10, PNV support
+To:     Nicholas Piggin <npiggin@gmail.com>
+Cc:     kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, linuxppc-dev@lists.ozlabs.org,
+        qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A little optimized update version number of SDM and corresponding
-public date, making it more accurate to retrieve.
+On Thu, 15 Jun 2023 at 03:02, Nicholas Piggin <npiggin@gmail.com> wrote:
+>
+> On Wed Jun 14, 2023 at 11:09 AM AEST, Joel Stanley wrote:
+> > On Thu, 8 Jun 2023 at 07:58, Nicholas Piggin <npiggin@gmail.com> wrote:
+> > >
+> > > Posting again, a couple of patches were merged and accounted for review
+> > > comments from last time.
+> >
+> > I saw some failures in the spr tests running on a power9 powernv system:
+> >
+> > $ TESTNAME=sprs TIMEOUT=90s ACCEL= ./powerpc/run powerpc/sprs.elf -smp
+> > 1 |grep FAIL
+> > FAIL: WORT      ( 895):    0x00000000c0deba80 <==> 0x0000000000000000
+>
+> This is just TCG machine? I'm not sure why WORT fails, AFAIKS it's the
+> same on POWER8 and doesn't do anything just a simple register. I think
+> on real hardware WORT may not have any bits implemented on POWER9
+> though.
 
-Signed-off-by: Jun Miao <jun.miao@intel.com>
----
- arch/x86/kvm/lapic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yeah, just the TCG machine. Now that you point it out all of the
+failures I reported are for ACCEL=<blank>, so they are running in tcg
+mode.
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index d7639d126e6c..4c5493e08d2e 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2260,7 +2260,7 @@ static int apic_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
- 	/*
- 	 * APIC register must be aligned on 128-bits boundary.
- 	 * 32/64/128 bits registers must be accessed thru 32 bits.
--	 * Refer SDM 8.4.1
-+	 * Refer SDM 11.4.1 (March 2023).
- 	 */
- 	if (len != 4 || (offset & 0xf))
- 		return 0;
--- 
-2.32.0
+run_migration timeout -k 1s --foreground 90s
+/usr/bin/qemu-system-ppc64 -nodefaults -machine pseries,accel=tcg
+-bios powerpc/boot_rom.bin -display none -serial stdio -kernel
+powerpc/sprs.elf -smp 1 -append -w # -initrd /tmp/tmp.61XhbvCGcb
 
+
+>
+> > $ MIGRATION=yes TESTNAME=sprs-migration TIMEOUT=90s ACCEL=
+> > ./powerpc/run powerpc/sprs.elf -smp 1 -append '-w' | grep FAIL
+> > FAIL: SRR0      (  26):    0xcafefacec0debabc <==> 0x0000000000402244
+> > FAIL: SRR1      (  27):    0xc0000006409ebab6 <==> 0x8000000000001001
+> > FAIL: CTRL      ( 136):            0x00000000 <==>         0x00008001
+> > FAIL: WORT      ( 895):    0x00000000c0deba80 <==> 0x0000000000000000
+> > FAIL: PIR       (1023):            0x00000010 <==>         0x00000049
+> >
+> > Linux 6.2.0-20-generic
+> > QEMU emulator version 7.2.0 (Debian 1:7.2+dfsg-5ubuntu2)
+> >
+> > On a power8 powernv:
+> >
+> > MIGRATION=yes TESTNAME=sprs-migration TIMEOUT=90s ACCEL= ./powerpc/run
+> > powerpc/sprs.elf -smp 1 -append '-w' |grep FAIL
+> > FAIL: SRR0      (  26):    0xcafefacec0debabc <==> 0x0000000000402234
+> > FAIL: SRR1      (  27):    0xc0000006409ebab6 <==> 0x8000000000001000
+> > FAIL: CTRL      ( 136):            0x00000000 <==>         0x00008001
+> > FAIL: PIR       (1023):            0x00000060 <==>         0x00000030
+>
+> Hmm, seems we take some interrupt over migration test that is not
+> accounted for (could check the address in SRR0 to see where it is).
+> Either need to prevent that interrupt or avoid failing on SRR0/1 on
+> this test.
+>
+> Interesting about CTRL, I wonder if that not migrating correctly.
+> PIR looks like a migration issue as well, it can't be changed so
+> destination CPU has got a different PIR. I would be inclined to
+> leave those as failing to remind us to look into them.
+>
+> I'll take a look at the others though.
+>
+> Thanks,
+> Nick
