@@ -2,1482 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CAD5732153
-	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 23:07:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B8EC732162
+	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 23:12:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232139AbjFOVHu convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 15 Jun 2023 17:07:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57118 "EHLO
+        id S234795AbjFOVMM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jun 2023 17:12:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229896AbjFOVHt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jun 2023 17:07:49 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 864A1184;
-        Thu, 15 Jun 2023 14:07:45 -0700 (PDT)
-Received: from lhrpeml100001.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QhvxF1C3qz6J7St;
-        Fri, 16 Jun 2023 05:06:57 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml100001.china.huawei.com (7.191.160.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Thu, 15 Jun 2023 22:07:43 +0100
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.023;
- Thu, 15 Jun 2023 22:07:43 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Brett Creeley <brett.creeley@amd.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>
-CC:     "shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: RE: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
-Thread-Topic: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
-Thread-Index: AQHZlZ4fw+ycc9Ly8kiUgFWK9kvRUa+MZeFw
-Date:   Thu, 15 Jun 2023 21:07:43 +0000
-Message-ID: <e2ed042a061a4de3827f60e1bd695cfc@huawei.com>
-References: <20230602220318.15323-1-brett.creeley@amd.com>
- <20230602220318.15323-5-brett.creeley@amd.com>
-In-Reply-To: <20230602220318.15323-5-brett.creeley@amd.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.126.169.47]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        with ESMTP id S229563AbjFOVML (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jun 2023 17:12:11 -0400
+Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02AAEC3;
+        Thu, 15 Jun 2023 14:12:10 -0700 (PDT)
+Received: by mail-oo1-xc2b.google.com with SMTP id 006d021491bc7-55b3b3e2928so1860655eaf.2;
+        Thu, 15 Jun 2023 14:12:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686863529; x=1689455529;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cYFIoxmK6/11WcQGMEd3k+GSDGPqNwcIqNk05D0COTE=;
+        b=Ctj8OnhGP2r2mDaRqVkWYkbCXLxlBOU1XnLMs2rQnEZVFtLbX4y/91GeJfTZJq5ilZ
+         BEBJVQLtXSa74ZV6v9HQtOkzjDigIp47DOIRcrHwGUcKTsqQAhkMdn1UO87Sb7Gpm7ex
+         X45UZ0QhVvOtmv5xonVSE+x+ADmFWyurK8i6hsId3TXKamH0UIU6FCtus2oYmyYc/hXN
+         aKVQWGwGuIgL3W0ZwDOUERyeYftA7rlPAK83m58oUSPJYAdDpFEgGtRYfhALMGIZvZ2b
+         gofXVCoULo3vxmDnvGTZQX+wnBV6wdCwVEVCg+rvInQGzr6Uhq9I2bWmhZs/WkNDiQrK
+         W5gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686863529; x=1689455529;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cYFIoxmK6/11WcQGMEd3k+GSDGPqNwcIqNk05D0COTE=;
+        b=dNtcaH59WEHGWqVkytgnGRWeIUxTzLPyv4qPFosKJw+iCgSWdW9C6j+pd05uwqDPm4
+         Q5Vmdo0rZiCSp6G2f3Vet4ISTvXR+BRu/5zP7FL1xG6ycLlQkNxyrh9de1zN6e7wBD48
+         sX93BPbVFzPCj3Cz4iFeRnRuWJgyXiGXPT9tRNgRNfGVnLhqLLBvNTUo/EMNaIl6W/Qh
+         XZnf+x4JRCb7y0pLs0rccU7Aj/Om7ip2JT6XxJr8898YzZZOdYHFCs9lhK/dJBPlEwL1
+         AxRXOrN9h8NUKefUE1Lkuc9/BLUjV+Y0M6FRmlnkdg1ZaLf5E6BHZ6Mkc8VSHpjMdFQN
+         22Fw==
+X-Gm-Message-State: AC+VfDxa8UGHoIV8PqA7pHLEGrUmaSx0B3G9lLK23G+3x+AHhNeeRCgN
+        6ktk1RStX5rvuz2EAKfWnOWtMdI6zaDBSaeu+Aw=
+X-Google-Smtp-Source: ACHHUZ4RQOzLkRBT57QFtwfdt42rHQTpRvSKNUguWsVJUC9l4YMVkHjXvUxUEmpNf+dIqOqbJjieNSEhAcMqJy+p5M0=
+X-Received: by 2002:a05:6871:6ba6:b0:19f:ad5a:f518 with SMTP id
+ zh38-20020a0568716ba600b0019fad5af518mr274084oab.25.1686863529246; Thu, 15
+ Jun 2023 14:12:09 -0700 (PDT)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230613030151.216625-1-15330273260@189.cn> <20230613030151.216625-3-15330273260@189.cn>
+ <dbf0d89f-717a-1f78-aef2-f30506751d4d@loongson.cn>
+In-Reply-To: <dbf0d89f-717a-1f78-aef2-f30506751d4d@loongson.cn>
+From:   Alex Deucher <alexdeucher@gmail.com>
+Date:   Thu, 15 Jun 2023 17:11:58 -0400
+Message-ID: <CADnq5_N6vVtzH6tzguZdHnP_TdRoG1G-Cr94O+X03jvtk=vhag@mail.gmail.com>
+Subject: Re: [PATCH v7 2/8] PCI/VGA: Deal only with VGA class devices
+To:     Sui Jingfeng <suijingfeng@loongson.cn>
+Cc:     Sui Jingfeng <15330273260@189.cn>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        linux-fbdev@vger.kernel.org, kvm@vger.kernel.org,
+        nouveau@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        amd-gfx@lists.freedesktop.org, linux-pci@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jun 14, 2023 at 6:50=E2=80=AFAM Sui Jingfeng <suijingfeng@loongson.=
+cn> wrote:
+>
+> Hi,
+>
+> On 2023/6/13 11:01, Sui Jingfeng wrote:
+> > From: Sui Jingfeng <suijingfeng@loongson.cn>
+> >
+> > Deal only with the VGA devcie(pdev->class =3D=3D 0x0300), so replace th=
+e
+> > pci_get_subsys() function with pci_get_class(). Filter the non-PCI disp=
+lay
+> > device(pdev->class !=3D 0x0300) out. There no need to process the non-d=
+isplay
+> > PCI device.
+> >
+> > Cc: Bjorn Helgaas <bhelgaas@google.com>
+> > Signed-off-by: Sui Jingfeng <suijingfeng@loongson.cn>
+> > ---
+> >   drivers/pci/vgaarb.c | 22 ++++++++++++----------
+> >   1 file changed, 12 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/drivers/pci/vgaarb.c b/drivers/pci/vgaarb.c
+> > index c1bc6c983932..22a505e877dc 100644
+> > --- a/drivers/pci/vgaarb.c
+> > +++ b/drivers/pci/vgaarb.c
+> > @@ -754,10 +754,6 @@ static bool vga_arbiter_add_pci_device(struct pci_=
+dev *pdev)
+> >       struct pci_dev *bridge;
+> >       u16 cmd;
+> >
+> > -     /* Only deal with VGA class devices */
+> > -     if ((pdev->class >> 8) !=3D PCI_CLASS_DISPLAY_VGA)
+> > -             return false;
+> > -
+>
+> Hi, here is probably a bug fixing.
+>
+> For an example, nvidia render only GPU typically has 0x0380.
+>
+> at its PCI class number, but  render only GPU should not participate in
+> the arbitration.
+>
+> As it shouldn't snoop the legacy fixed VGA address.
+>
+> It(render only GPU) can not display anything.
+>
+>
+> But 0x0380 >> 8 =3D 0x03, the filter  failed.
+>
+>
+> >       /* Allocate structure */
+> >       vgadev =3D kzalloc(sizeof(struct vga_device), GFP_KERNEL);
+> >       if (vgadev =3D=3D NULL) {
+> > @@ -1500,7 +1496,9 @@ static int pci_notify(struct notifier_block *nb, =
+unsigned long action,
+> >       struct pci_dev *pdev =3D to_pci_dev(dev);
+> >       bool notify =3D false;
+> >
+> > -     vgaarb_dbg(dev, "%s\n", __func__);
+> > +     /* Only deal with VGA class devices */
+> > +     if (pdev->class !=3D PCI_CLASS_DISPLAY_VGA << 8)
+> > +             return 0;
+>
+> So here we only care 0x0300, my initial intent is to make an optimization=
+,
+>
+> nowadays sane display graphic card should all has 0x0300 as its PCI
+> class number, is this complete right?
+>
+> ```
+>
+> #define PCI_BASE_CLASS_DISPLAY        0x03
+> #define PCI_CLASS_DISPLAY_VGA        0x0300
+> #define PCI_CLASS_DISPLAY_XGA        0x0301
+> #define PCI_CLASS_DISPLAY_3D        0x0302
+> #define PCI_CLASS_DISPLAY_OTHER        0x0380
+>
+> ```
+>
+> Any ideas ?
 
+I'm not quite sure what you are asking about here.  For vga_arb, we
+only care about VGA class devices since those should be on the only
+ones that might have VGA routed to them.  However, as VGA gets
+deprecated, you'll have more non VGA PCI classes for devices which
+could be the pre-OS console device.
 
-> -----Original Message-----
-> From: Brett Creeley [mailto:brett.creeley@amd.com]
-> Sent: 02 June 2023 23:03
-> To: kvm@vger.kernel.org; netdev@vger.kernel.org;
-> alex.williamson@redhat.com; jgg@nvidia.com; yishaih@nvidia.com;
-> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> kevin.tian@intel.com
-> Cc: brett.creeley@amd.com; shannon.nelson@amd.com
-> Subject: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
-> 
-> Add live migration support via the VFIO subsystem. The migration
-> implementation aligns with the definition from uapi/vfio.h and uses
-> the pds_core PF's adminq for device configuration.
-> 
-> The ability to suspend, resume, and transfer VF device state data is
-> included along with the required admin queue command structures and
-> implementations.
-> 
-> PDS_LM_CMD_SUSPEND and PDS_LM_CMD_SUSPEND_STATUS are added to
-> support
-> the VF device suspend operation.
-> 
-> PDS_LM_CMD_RESUME is added to support the VF device resume operation.
-> 
-> PDS_LM_CMD_STATUS is added to determine the exact size of the VF
-> device state data.
-> 
-> PDS_LM_CMD_SAVE is added to get the VF device state data.
-> 
-> PDS_LM_CMD_RESTORE is added to restore the VF device with the
-> previously saved data from PDS_LM_CMD_SAVE.
-> 
-> PDS_LM_CMD_HOST_VF_STATUS is added to notify the device when
-> a migration is in/not-in progress from the host's perspective.
-> 
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> ---
->  drivers/vfio/pci/pds/Makefile   |   1 +
->  drivers/vfio/pci/pds/cmds.c     | 319 ++++++++++++++++++++++++
->  drivers/vfio/pci/pds/cmds.h     |   8 +-
->  drivers/vfio/pci/pds/lm.c       | 421
-> ++++++++++++++++++++++++++++++++
->  drivers/vfio/pci/pds/lm.h       |  41 ++++
->  drivers/vfio/pci/pds/pci_drv.c  |  13 +
->  drivers/vfio/pci/pds/vfio_dev.c | 120 ++++++++-
->  drivers/vfio/pci/pds/vfio_dev.h |  11 +
->  include/linux/pds/pds_adminq.h  | 217 ++++++++++++++++
->  9 files changed, 1149 insertions(+), 2 deletions(-)
->  create mode 100644 drivers/vfio/pci/pds/lm.c
->  create mode 100644 drivers/vfio/pci/pds/lm.h
-> 
-> diff --git a/drivers/vfio/pci/pds/Makefile b/drivers/vfio/pci/pds/Makefile
-> index 87581111fa17..dbaf613d3794 100644
-> --- a/drivers/vfio/pci/pds/Makefile
-> +++ b/drivers/vfio/pci/pds/Makefile
-> @@ -5,5 +5,6 @@ obj-$(CONFIG_PDS_VFIO_PCI) += pds_vfio.o
-> 
->  pds_vfio-y := \
->  	cmds.o		\
-> +	lm.o		\
->  	pci_drv.o	\
->  	vfio_dev.o
-> diff --git a/drivers/vfio/pci/pds/cmds.c b/drivers/vfio/pci/pds/cmds.c
-> index ae01f5df2f5c..256f458feb58 100644
-> --- a/drivers/vfio/pci/pds/cmds.c
-> +++ b/drivers/vfio/pci/pds/cmds.c
-> @@ -3,6 +3,7 @@
-> 
->  #include <linux/io.h>
->  #include <linux/types.h>
-> +#include <linux/delay.h>
-> 
->  #include <linux/pds/pds_common.h>
->  #include <linux/pds/pds_core_if.h>
-> @@ -11,6 +12,34 @@
->  #include "vfio_dev.h"
->  #include "cmds.h"
-> 
-> +#define SUSPEND_TIMEOUT_S		5
-> +#define SUSPEND_CHECK_INTERVAL_MS	1
-> +
-> +static int pds_vfio_client_adminq_cmd(struct pds_vfio_pci_device
-> *pds_vfio,
-> +				      union pds_core_adminq_cmd *req,
-> +				      size_t req_len,
-> +				      union pds_core_adminq_comp *resp,
-> +				      u64 flags)
+Alex
 
-Why u64? Do we expect more flags to follow? The core interface below
-only takes a bool(fast_poll) though.
-
-Thanks,
-Shameer
-
-> +{
-> +	union pds_core_adminq_cmd cmd = {};
-> +	size_t cp_len;
-> +	int err;
-> +
-> +	/* Wrap the client request */
-> +	cmd.client_request.opcode = PDS_AQ_CMD_CLIENT_CMD;
-> +	cmd.client_request.client_id = cpu_to_le16(pds_vfio->client_id);
-> +	cp_len = min_t(size_t, req_len, sizeof(cmd.client_request.client_cmd));
-> +	memcpy(cmd.client_request.client_cmd, req, cp_len);
-> +
-> +	err = pdsc_adminq_post(pds_vfio->pdsc, &cmd, resp,
-> +			       !!(flags & PDS_AQ_FLAG_FASTPOLL));
-> +	if (err && err != -EAGAIN)
-> +		dev_info(pds_vfio_to_dev(pds_vfio),
-> +			 "client admin cmd failed: %pe\n", ERR_PTR(err));
-> +
-> +	return err;
-> +}
-> +
->  int pds_vfio_register_client_cmd(struct pds_vfio_pci_device *pds_vfio)
->  {
->  	struct pci_dev *pdev = pds_vfio_to_pci_dev(pds_vfio);
-> @@ -41,3 +70,293 @@ void pds_vfio_unregister_client_cmd(struct
-> pds_vfio_pci_device *pds_vfio)
-> 
->  	pds_vfio->client_id = 0;
->  }
-> +
-> +static int
-> +pds_vfio_suspend_wait_device_cmd(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	union pds_core_adminq_cmd cmd = {
-> +		.lm_suspend_status = {
-> +			.opcode = PDS_LM_CMD_SUSPEND_STATUS,
-> +			.vf_id = cpu_to_le16(pds_vfio->vf_id),
-> +		},
-> +	};
-> +	struct device *dev = pds_vfio_to_dev(pds_vfio);
-> +	union pds_core_adminq_comp comp = {};
-> +	unsigned long time_limit;
-> +	unsigned long time_start;
-> +	unsigned long time_done;
-> +	int err;
-> +
-> +	time_start = jiffies;
-> +	time_limit = time_start + HZ * SUSPEND_TIMEOUT_S;
-> +	do {
-> +		err = pds_vfio_client_adminq_cmd(pds_vfio, &cmd, sizeof(cmd),
-> +						 &comp, PDS_AQ_FLAG_FASTPOLL);
-> +		if (err != -EAGAIN)
-> +			break;
-> +
-> +		msleep(SUSPEND_CHECK_INTERVAL_MS);
-> +	} while (time_before(jiffies, time_limit));
-> +
-> +	time_done = jiffies;
-> +	dev_dbg(dev, "%s: vf%u: Suspend comp received in %d msecs\n",
-> __func__,
-> +		pds_vfio->vf_id, jiffies_to_msecs(time_done - time_start));
-> +
-> +	/* Check the results */
-> +	if (time_after_eq(time_done, time_limit)) {
-> +		dev_err(dev, "%s: vf%u: Suspend comp timeout\n", __func__,
-> +			pds_vfio->vf_id);
-> +		err = -ETIMEDOUT;
-> +	}
-> +
-> +	return err;
-> +}
-> +
-> +int pds_vfio_suspend_device_cmd(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	union pds_core_adminq_cmd cmd = {
-> +		.lm_suspend = {
-> +			.opcode = PDS_LM_CMD_SUSPEND,
-> +			.vf_id = cpu_to_le16(pds_vfio->vf_id),
-> +		},
-> +	};
-> +	struct device *dev = pds_vfio_to_dev(pds_vfio);
-> +	union pds_core_adminq_comp comp = {};
-> +	int err;
-> +
-> +	dev_dbg(dev, "vf%u: Suspend device\n", pds_vfio->vf_id);
-> +
-> +	err = pds_vfio_client_adminq_cmd(pds_vfio, &cmd, sizeof(cmd),
-> &comp,
-> +					 PDS_AQ_FLAG_FASTPOLL);
-> +	if (err) {
-> +		dev_err(dev, "vf%u: Suspend failed: %pe\n", pds_vfio->vf_id,
-> +			ERR_PTR(err));
-> +		return err;
-> +	}
-> +
-> +	return pds_vfio_suspend_wait_device_cmd(pds_vfio);
-> +}
-> +
-> +int pds_vfio_resume_device_cmd(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	union pds_core_adminq_cmd cmd = {
-> +		.lm_resume = {
-> +			.opcode = PDS_LM_CMD_RESUME,
-> +			.vf_id = cpu_to_le16(pds_vfio->vf_id),
-> +		},
-> +	};
-> +	struct device *dev = pds_vfio_to_dev(pds_vfio);
-> +	union pds_core_adminq_comp comp = {};
-> +
-> +	dev_dbg(dev, "vf%u: Resume device\n", pds_vfio->vf_id);
-> +
-> +	return pds_vfio_client_adminq_cmd(pds_vfio, &cmd, sizeof(cmd),
-> &comp,
-> +					  0);
-> +}
-> +
-> +int pds_vfio_get_lm_status_cmd(struct pds_vfio_pci_device *pds_vfio, u64
-> *size)
-> +{
-> +	union pds_core_adminq_cmd cmd = {
-> +		.lm_status = {
-> +			.opcode = PDS_LM_CMD_STATUS,
-> +			.vf_id = cpu_to_le16(pds_vfio->vf_id),
-> +		},
-> +	};
-> +	struct device *dev = pds_vfio_to_dev(pds_vfio);
-> +	union pds_core_adminq_comp comp = {};
-> +	int err;
-> +
-> +	dev_dbg(dev, "vf%u: Get migration status\n", pds_vfio->vf_id);
-> +
-> +	err = pds_vfio_client_adminq_cmd(pds_vfio, &cmd, sizeof(cmd), &comp,
-> 0);
-> +	if (err)
-> +		return err;
-> +
-> +	*size = le64_to_cpu(comp.lm_status.size);
-> +	return 0;
-> +}
-> +
-> +static int pds_vfio_dma_map_lm_file(struct device *dev,
-> +				    enum dma_data_direction dir,
-> +				    struct pds_vfio_lm_file *lm_file)
-> +{
-> +	struct pds_lm_sg_elem *sgl, *sge;
-> +	struct scatterlist *sg;
-> +	dma_addr_t sgl_addr;
-> +	size_t sgl_size;
-> +	int err;
-> +	int i;
-> +
-> +	if (!lm_file)
-> +		return -EINVAL;
-> +
-> +	/* dma map file pages */
-> +	err = dma_map_sgtable(dev, &lm_file->sg_table, dir, 0);
-> +	if (err)
-> +		return err;
-> +
-> +	lm_file->num_sge = lm_file->sg_table.nents;
-> +
-> +	/* alloc sgl */
-> +	sgl_size = lm_file->num_sge * sizeof(struct pds_lm_sg_elem);
-> +	sgl = kzalloc(sgl_size, GFP_KERNEL);
-> +	if (!sgl) {
-> +		err = -ENOMEM;
-> +		goto out_unmap_sgtable;
-> +	}
-> +
-> +	/* fill sgl */
-> +	sge = sgl;
-> +	for_each_sgtable_dma_sg(&lm_file->sg_table, sg, i) {
-> +		sge->addr = cpu_to_le64(sg_dma_address(sg));
-> +		sge->len = cpu_to_le32(sg_dma_len(sg));
-> +		dev_dbg(dev, "addr = %llx, len = %u\n", sge->addr, sge->len);
-> +		sge++;
-> +	}
-> +
-> +	sgl_addr = dma_map_single(dev, sgl, sgl_size, DMA_TO_DEVICE);
-> +	if (dma_mapping_error(dev, sgl_addr)) {
-> +		err = -EIO;
-> +		goto out_free_sgl;
-> +	}
-> +
-> +	lm_file->sgl = sgl;
-> +	lm_file->sgl_addr = sgl_addr;
-> +
-> +	return 0;
-> +
-> +out_free_sgl:
-> +	kfree(sgl);
-> +out_unmap_sgtable:
-> +	lm_file->num_sge = 0;
-> +	dma_unmap_sgtable(dev, &lm_file->sg_table, dir, 0);
-> +	return err;
-> +}
-> +
-> +static void pds_vfio_dma_unmap_lm_file(struct device *dev,
-> +				       enum dma_data_direction dir,
-> +				       struct pds_vfio_lm_file *lm_file)
-> +{
-> +	if (!lm_file)
-> +		return;
-> +
-> +	/* free sgl */
-> +	if (lm_file->sgl) {
-> +		dma_unmap_single(dev, lm_file->sgl_addr,
-> +				 lm_file->num_sge * sizeof(*lm_file->sgl),
-> +				 DMA_TO_DEVICE);
-> +		kfree(lm_file->sgl);
-> +		lm_file->sgl = NULL;
-> +		lm_file->sgl_addr = DMA_MAPPING_ERROR;
-> +		lm_file->num_sge = 0;
-> +	}
-> +
-> +	/* dma unmap file pages */
-> +	dma_unmap_sgtable(dev, &lm_file->sg_table, dir, 0);
-> +}
-> +
-> +int pds_vfio_get_lm_state_cmd(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	union pds_core_adminq_cmd cmd = {
-> +		.lm_save = {
-> +			.opcode = PDS_LM_CMD_SAVE,
-> +			.vf_id = cpu_to_le16(pds_vfio->vf_id),
-> +		},
-> +	};
-> +	struct pci_dev *pdev = pds_vfio_to_pci_dev(pds_vfio);
-> +	struct device *pdsc_dev = &pci_physfn(pdev)->dev;
-> +	union pds_core_adminq_comp comp = {};
-> +	struct pds_vfio_lm_file *lm_file;
-> +	int err;
-> +
-> +	dev_dbg(&pdev->dev, "vf%u: Get migration state\n", pds_vfio->vf_id);
-> +
-> +	lm_file = pds_vfio->save_file;
-> +
-> +	err = pds_vfio_dma_map_lm_file(pdsc_dev, DMA_FROM_DEVICE,
-> lm_file);
-> +	if (err) {
-> +		dev_err(&pdev->dev, "failed to map save migration file: %pe\n",
-> +			ERR_PTR(err));
-> +		return err;
-> +	}
-> +
-> +	cmd.lm_save.sgl_addr = cpu_to_le64(lm_file->sgl_addr);
-> +	cmd.lm_save.num_sge = cpu_to_le32(lm_file->num_sge);
-> +
-> +	err = pds_vfio_client_adminq_cmd(pds_vfio, &cmd, sizeof(cmd), &comp,
-> 0);
-> +	if (err)
-> +		dev_err(&pdev->dev, "failed to get migration state: %pe\n",
-> +			ERR_PTR(err));
-> +
-> +	pds_vfio_dma_unmap_lm_file(pdsc_dev, DMA_FROM_DEVICE, lm_file);
-> +
-> +	return err;
-> +}
-> +
-> +int pds_vfio_set_lm_state_cmd(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	union pds_core_adminq_cmd cmd = {
-> +		.lm_restore = {
-> +			.opcode = PDS_LM_CMD_RESTORE,
-> +			.vf_id = cpu_to_le16(pds_vfio->vf_id),
-> +		},
-> +	};
-> +	struct pci_dev *pdev = pds_vfio_to_pci_dev(pds_vfio);
-> +	struct device *pdsc_dev = &pci_physfn(pdev)->dev;
-> +	union pds_core_adminq_comp comp = {};
-> +	struct pds_vfio_lm_file *lm_file;
-> +	int err;
-> +
-> +	dev_dbg(&pdev->dev, "vf%u: Set migration state\n", pds_vfio->vf_id);
-> +
-> +	lm_file = pds_vfio->restore_file;
-> +
-> +	err = pds_vfio_dma_map_lm_file(pdsc_dev, DMA_TO_DEVICE, lm_file);
-> +	if (err) {
-> +		dev_err(&pdev->dev,
-> +			"failed to map restore migration file: %pe\n",
-> +			ERR_PTR(err));
-> +		return err;
-> +	}
-> +
-> +	cmd.lm_restore.sgl_addr = cpu_to_le64(lm_file->sgl_addr);
-> +	cmd.lm_restore.num_sge = cpu_to_le32(lm_file->num_sge);
-> +
-> +	err = pds_vfio_client_adminq_cmd(pds_vfio, &cmd, sizeof(cmd), &comp,
-> 0);
-> +	if (err)
-> +		dev_err(&pdev->dev, "failed to set migration state: %pe\n",
-> +			ERR_PTR(err));
-> +
-> +	pds_vfio_dma_unmap_lm_file(pdsc_dev, DMA_TO_DEVICE, lm_file);
-> +
-> +	return err;
-> +}
-> +
-> +void pds_vfio_send_host_vf_lm_status_cmd(struct pds_vfio_pci_device
-> *pds_vfio,
-> +					 enum pds_lm_host_vf_status vf_status)
-> +{
-> +	union pds_core_adminq_cmd cmd = {
-> +		.lm_host_vf_status = {
-> +			.opcode = PDS_LM_CMD_HOST_VF_STATUS,
-> +			.vf_id = cpu_to_le16(pds_vfio->vf_id),
-> +			.status = vf_status,
-> +		},
-> +	};
-> +	struct device *dev = pds_vfio_to_dev(pds_vfio);
-> +	union pds_core_adminq_comp comp = {};
-> +	int err;
-> +
-> +	dev_dbg(dev, "vf%u: Set host VF LM status: %u", pds_vfio->vf_id,
-> +		vf_status);
-> +	if (vf_status != PDS_LM_STA_IN_PROGRESS &&
-> +	    vf_status != PDS_LM_STA_NONE) {
-> +		dev_warn(dev, "Invalid host VF migration status, %d\n",
-> +			 vf_status);
-> +		return;
-> +	}
-> +
-> +	err = pds_vfio_client_adminq_cmd(pds_vfio, &cmd, sizeof(cmd), &comp,
-> 0);
-> +	if (err)
-> +		dev_warn(dev, "failed to send host VF migration status: %pe\n",
-> +			 ERR_PTR(err));
-> +}
-> diff --git a/drivers/vfio/pci/pds/cmds.h b/drivers/vfio/pci/pds/cmds.h
-> index 4c592afccf89..3d8a5508c733 100644
-> --- a/drivers/vfio/pci/pds/cmds.h
-> +++ b/drivers/vfio/pci/pds/cmds.h
-> @@ -6,5 +6,11 @@
-> 
->  int pds_vfio_register_client_cmd(struct pds_vfio_pci_device *pds_vfio);
->  void pds_vfio_unregister_client_cmd(struct pds_vfio_pci_device *pds_vfio);
-> -
-> +int pds_vfio_suspend_device_cmd(struct pds_vfio_pci_device *pds_vfio);
-> +int pds_vfio_resume_device_cmd(struct pds_vfio_pci_device *pds_vfio);
-> +int pds_vfio_get_lm_status_cmd(struct pds_vfio_pci_device *pds_vfio, u64
-> *size);
-> +int pds_vfio_get_lm_state_cmd(struct pds_vfio_pci_device *pds_vfio);
-> +int pds_vfio_set_lm_state_cmd(struct pds_vfio_pci_device *pds_vfio);
-> +void pds_vfio_send_host_vf_lm_status_cmd(struct pds_vfio_pci_device
-> *pds_vfio,
-> +					 enum pds_lm_host_vf_status vf_status);
->  #endif /* _CMDS_H_ */
-> diff --git a/drivers/vfio/pci/pds/lm.c b/drivers/vfio/pci/pds/lm.c
-> new file mode 100644
-> index 000000000000..c507f39a2339
-> --- /dev/null
-> +++ b/drivers/vfio/pci/pds/lm.c
-> @@ -0,0 +1,421 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright(c) 2023 Advanced Micro Devices, Inc. */
-> +
-> +#include <linux/anon_inodes.h>
-> +#include <linux/file.h>
-> +#include <linux/fs.h>
-> +#include <linux/highmem.h>
-> +#include <linux/vfio.h>
-> +#include <linux/vfio_pci_core.h>
-> +
-> +#include "vfio_dev.h"
-> +#include "cmds.h"
-> +
-> +static struct pds_vfio_lm_file *
-> +pds_vfio_get_lm_file(const struct file_operations *fops, int flags, u64 size)
-> +{
-> +	struct pds_vfio_lm_file *lm_file = NULL;
-> +	unsigned long long npages;
-> +	struct page **pages;
-> +	void *page_mem;
-> +	const void *p;
-> +
-> +	if (!size)
-> +		return NULL;
-> +
-> +	/* Alloc file structure */
-> +	lm_file = kzalloc(sizeof(*lm_file), GFP_KERNEL);
-> +	if (!lm_file)
-> +		return NULL;
-> +
-> +	/* Create file */
-> +	lm_file->filep =
-> +		anon_inode_getfile("pds_vfio_lm", fops, lm_file, flags);
-> +	if (!lm_file->filep)
-> +		goto out_free_file;
-> +
-> +	stream_open(lm_file->filep->f_inode, lm_file->filep);
-> +	mutex_init(&lm_file->lock);
-> +
-> +	/* prevent file from being released before we are done with it */
-> +	get_file(lm_file->filep);
-> +
-> +	/* Allocate memory for file pages */
-> +	npages = DIV_ROUND_UP_ULL(size, PAGE_SIZE);
-> +	pages = kmalloc_array(npages, sizeof(*pages), GFP_KERNEL);
-> +	if (!pages)
-> +		goto out_put_file;
-> +
-> +	page_mem = kvzalloc(ALIGN(size, PAGE_SIZE), GFP_KERNEL);
-> +	if (!page_mem)
-> +		goto out_free_pages_array;
-> +
-> +	p = page_mem - offset_in_page(page_mem);
-> +	for (unsigned long long i = 0; i < npages; i++) {
-> +		if (is_vmalloc_addr(p))
-> +			pages[i] = vmalloc_to_page(p);
-> +		else
-> +			pages[i] = kmap_to_page((void *)p);
-> +		if (!pages[i])
-> +			goto out_free_page_mem;
-> +
-> +		p += PAGE_SIZE;
-> +	}
-> +
-> +	/* Create scatterlist of file pages to use for DMA mapping later */
-> +	if (sg_alloc_table_from_pages(&lm_file->sg_table, pages, npages, 0,
-> +				      size, GFP_KERNEL))
-> +		goto out_free_page_mem;
-> +
-> +	lm_file->size = size;
-> +	lm_file->pages = pages;
-> +	lm_file->npages = npages;
-> +	lm_file->page_mem = page_mem;
-> +	lm_file->alloc_size = npages * PAGE_SIZE;
-> +
-> +	return lm_file;
-> +
-> +out_free_page_mem:
-> +	kvfree(page_mem);
-> +out_free_pages_array:
-> +	kfree(pages);
-> +out_put_file:
-> +	fput(lm_file->filep);
-> +	mutex_destroy(&lm_file->lock);
-> +out_free_file:
-> +	kfree(lm_file);
-> +
-> +	return NULL;
-> +}
-> +
-> +static void pds_vfio_put_lm_file(struct pds_vfio_lm_file *lm_file)
-> +{
-> +	mutex_lock(&lm_file->lock);
-> +
-> +	lm_file->size = 0;
-> +	lm_file->alloc_size = 0;
-> +
-> +	/* Free scatter list of file pages */
-> +	sg_free_table(&lm_file->sg_table);
-> +
-> +	kvfree(lm_file->page_mem);
-> +	lm_file->page_mem = NULL;
-> +	kfree(lm_file->pages);
-> +	lm_file->pages = NULL;
-> +
-> +	mutex_unlock(&lm_file->lock);
-> +
-> +	/* allow file to be released since we are done with it */
-> +	fput(lm_file->filep);
-> +}
-> +
-> +void pds_vfio_put_save_file(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	if (!pds_vfio->save_file)
-> +		return;
-> +
-> +	pds_vfio_put_lm_file(pds_vfio->save_file);
-> +	pds_vfio->save_file = NULL;
-> +}
-> +
-> +void pds_vfio_put_restore_file(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	if (!pds_vfio->restore_file)
-> +		return;
-> +
-> +	pds_vfio_put_lm_file(pds_vfio->restore_file);
-> +	pds_vfio->restore_file = NULL;
-> +}
-> +
-> +static struct page *pds_vfio_get_file_page(struct pds_vfio_lm_file *lm_file,
-> +					   unsigned long offset)
-> +{
-> +	unsigned long cur_offset = 0;
-> +	struct scatterlist *sg;
-> +	unsigned int i;
-> +
-> +	/* All accesses are sequential */
-> +	if (offset < lm_file->last_offset || !lm_file->last_offset_sg) {
-> +		lm_file->last_offset = 0;
-> +		lm_file->last_offset_sg = lm_file->sg_table.sgl;
-> +		lm_file->sg_last_entry = 0;
-> +	}
-> +
-> +	cur_offset = lm_file->last_offset;
-> +
-> +	for_each_sg(lm_file->last_offset_sg, sg,
-> +		    lm_file->sg_table.orig_nents - lm_file->sg_last_entry, i) {
-> +		if (offset < sg->length + cur_offset) {
-> +			lm_file->last_offset_sg = sg;
-> +			lm_file->sg_last_entry += i;
-> +			lm_file->last_offset = cur_offset;
-> +			return nth_page(sg_page(sg),
-> +					(offset - cur_offset) / PAGE_SIZE);
-> +		}
-> +		cur_offset += sg->length;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +static int pds_vfio_release_file(struct inode *inode, struct file *filp)
-> +{
-> +	struct pds_vfio_lm_file *lm_file = filp->private_data;
-> +
-> +	mutex_lock(&lm_file->lock);
-> +	lm_file->filep->f_pos = 0;
-> +	lm_file->size = 0;
-> +	mutex_unlock(&lm_file->lock);
-> +	mutex_destroy(&lm_file->lock);
-> +	kfree(lm_file);
-> +
-> +	return 0;
-> +}
-> +
-> +static ssize_t pds_vfio_save_read(struct file *filp, char __user *buf,
-> +				  size_t len, loff_t *pos)
-> +{
-> +	struct pds_vfio_lm_file *lm_file = filp->private_data;
-> +	ssize_t done = 0;
-> +
-> +	if (pos)
-> +		return -ESPIPE;
-> +	pos = &filp->f_pos;
-> +
-> +	mutex_lock(&lm_file->lock);
-> +	if (*pos > lm_file->size) {
-> +		done = -EINVAL;
-> +		goto out_unlock;
-> +	}
-> +
-> +	len = min_t(size_t, lm_file->size - *pos, len);
-> +	while (len) {
-> +		size_t page_offset;
-> +		struct page *page;
-> +		size_t page_len;
-> +		u8 *from_buff;
-> +		int err;
-> +
-> +		page_offset = (*pos) % PAGE_SIZE;
-> +		page = pds_vfio_get_file_page(lm_file, *pos - page_offset);
-> +		if (!page) {
-> +			if (done == 0)
-> +				done = -EINVAL;
-> +			goto out_unlock;
-> +		}
-> +
-> +		page_len = min_t(size_t, len, PAGE_SIZE - page_offset);
-> +		from_buff = kmap_local_page(page);
-> +		err = copy_to_user(buf, from_buff + page_offset, page_len);
-> +		kunmap_local(from_buff);
-> +		if (err) {
-> +			done = -EFAULT;
-> +			goto out_unlock;
-> +		}
-> +		*pos += page_len;
-> +		len -= page_len;
-> +		done += page_len;
-> +		buf += page_len;
-> +	}
-> +
-> +out_unlock:
-> +	mutex_unlock(&lm_file->lock);
-> +	return done;
-> +}
-> +
-> +static const struct file_operations pds_vfio_save_fops = {
-> +	.owner = THIS_MODULE,
-> +	.read = pds_vfio_save_read,
-> +	.release = pds_vfio_release_file,
-> +	.llseek = no_llseek,
-> +};
-> +
-> +static int pds_vfio_get_save_file(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	struct device *dev = &pds_vfio->vfio_coredev.pdev->dev;
-> +	struct pds_vfio_lm_file *lm_file;
-> +	int err;
-> +	u64 size;
-> +
-> +	/* Get live migration state size in this state */
-> +	err = pds_vfio_get_lm_status_cmd(pds_vfio, &size);
-> +	if (err) {
-> +		dev_err(dev, "failed to get save status: %pe\n", ERR_PTR(err));
-> +		return err;
-> +	}
-> +
-> +	dev_dbg(dev, "save status, size = %lld\n", size);
-> +
-> +	if (!size) {
-> +		dev_err(dev, "invalid state size\n");
-> +		return -EIO;
-> +	}
-> +
-> +	lm_file = pds_vfio_get_lm_file(&pds_vfio_save_fops, O_RDONLY, size);
-> +	if (!lm_file) {
-> +		dev_err(dev, "failed to create save file\n");
-> +		return -ENOENT;
-> +	}
-> +
-> +	dev_dbg(dev, "size = %lld, alloc_size = %lld, npages = %lld\n",
-> +		lm_file->size, lm_file->alloc_size, lm_file->npages);
-> +
-> +	pds_vfio->save_file = lm_file;
-> +
-> +	return 0;
-> +}
-> +
-> +static ssize_t pds_vfio_restore_write(struct file *filp, const char __user
-> *buf,
-> +				      size_t len, loff_t *pos)
-> +{
-> +	struct pds_vfio_lm_file *lm_file = filp->private_data;
-> +	loff_t requested_length;
-> +	ssize_t done = 0;
-> +
-> +	if (pos)
-> +		return -ESPIPE;
-> +
-> +	pos = &filp->f_pos;
-> +
-> +	if (*pos < 0 ||
-> +	    check_add_overflow((loff_t)len, *pos, &requested_length))
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&lm_file->lock);
-> +
-> +	while (len) {
-> +		size_t page_offset;
-> +		struct page *page;
-> +		size_t page_len;
-> +		u8 *to_buff;
-> +		int err;
-> +
-> +		page_offset = (*pos) % PAGE_SIZE;
-> +		page = pds_vfio_get_file_page(lm_file, *pos - page_offset);
-> +		if (!page) {
-> +			if (done == 0)
-> +				done = -EINVAL;
-> +			goto out_unlock;
-> +		}
-> +
-> +		page_len = min_t(size_t, len, PAGE_SIZE - page_offset);
-> +		to_buff = kmap_local_page(page);
-> +		err = copy_from_user(to_buff + page_offset, buf, page_len);
-> +		kunmap_local(to_buff);
-> +		if (err) {
-> +			done = -EFAULT;
-> +			goto out_unlock;
-> +		}
-> +		*pos += page_len;
-> +		len -= page_len;
-> +		done += page_len;
-> +		buf += page_len;
-> +		lm_file->size += page_len;
-> +	}
-> +out_unlock:
-> +	mutex_unlock(&lm_file->lock);
-> +	return done;
-> +}
-> +
-> +static const struct file_operations pds_vfio_restore_fops = {
-> +	.owner = THIS_MODULE,
-> +	.write = pds_vfio_restore_write,
-> +	.release = pds_vfio_release_file,
-> +	.llseek = no_llseek,
-> +};
-> +
-> +static int pds_vfio_get_restore_file(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	struct device *dev = &pds_vfio->vfio_coredev.pdev->dev;
-> +	struct pds_vfio_lm_file *lm_file;
-> +	u64 size;
-> +
-> +	size = sizeof(union pds_lm_dev_state);
-> +	dev_dbg(dev, "restore status, size = %lld\n", size);
-> +
-> +	if (!size) {
-> +		dev_err(dev, "invalid state size");
-> +		return -EIO;
-> +	}
-> +
-> +	lm_file = pds_vfio_get_lm_file(&pds_vfio_restore_fops, O_WRONLY,
-> size);
-> +	if (!lm_file) {
-> +		dev_err(dev, "failed to create restore file");
-> +		return -ENOENT;
-> +	}
-> +	pds_vfio->restore_file = lm_file;
-> +
-> +	return 0;
-> +}
-> +
-> +struct file *
-> +pds_vfio_step_device_state_locked(struct pds_vfio_pci_device *pds_vfio,
-> +				  enum vfio_device_mig_state next)
-> +{
-> +	enum vfio_device_mig_state cur = pds_vfio->state;
-> +	int err;
-> +
-> +	if (cur == VFIO_DEVICE_STATE_STOP && next ==
-> VFIO_DEVICE_STATE_STOP_COPY) {
-> +		err = pds_vfio_get_save_file(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +
-> +		err = pds_vfio_get_lm_state_cmd(pds_vfio);
-> +		if (err) {
-> +			pds_vfio_put_save_file(pds_vfio);
-> +			return ERR_PTR(err);
-> +		}
-> +
-> +		return pds_vfio->save_file->filep;
-> +	}
-> +
-> +	if (cur == VFIO_DEVICE_STATE_STOP_COPY && next ==
-> VFIO_DEVICE_STATE_STOP) {
-> +		pds_vfio_put_save_file(pds_vfio);
-> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio,
-> PDS_LM_STA_NONE);
-> +		return NULL;
-> +	}
-> +
-> +	if (cur == VFIO_DEVICE_STATE_STOP && next ==
-> VFIO_DEVICE_STATE_RESUMING) {
-> +		err = pds_vfio_get_restore_file(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +
-> +		return pds_vfio->restore_file->filep;
-> +	}
-> +
-> +	if (cur == VFIO_DEVICE_STATE_RESUMING && next ==
-> VFIO_DEVICE_STATE_STOP) {
-> +		err = pds_vfio_set_lm_state_cmd(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +
-> +		pds_vfio_put_restore_file(pds_vfio);
-> +		return NULL;
-> +	}
-> +
-> +	if (cur == VFIO_DEVICE_STATE_RUNNING && next ==
-> VFIO_DEVICE_STATE_RUNNING_P2P) {
-> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio,
-> +						    PDS_LM_STA_IN_PROGRESS);
-> +		err = pds_vfio_suspend_device_cmd(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +
-> +		return NULL;
-> +	}
-> +
-> +	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && next ==
-> VFIO_DEVICE_STATE_RUNNING) {
-> +		err = pds_vfio_resume_device_cmd(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +
-> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio,
-> PDS_LM_STA_NONE);
-> +		return NULL;
-> +	}
-> +
-> +	if (cur == VFIO_DEVICE_STATE_STOP && next ==
-> VFIO_DEVICE_STATE_RUNNING_P2P)
-> +		return NULL;
-> +
-> +	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && next ==
-> VFIO_DEVICE_STATE_STOP)
-> +		return NULL;
-> +
-> +	return ERR_PTR(-EINVAL);
-> +}
-> diff --git a/drivers/vfio/pci/pds/lm.h b/drivers/vfio/pci/pds/lm.h
-> new file mode 100644
-> index 000000000000..13be893198b7
-> --- /dev/null
-> +++ b/drivers/vfio/pci/pds/lm.h
-> @@ -0,0 +1,41 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* Copyright(c) 2023 Advanced Micro Devices, Inc. */
-> +
-> +#ifndef _LM_H_
-> +#define _LM_H_
-> +
-> +#include <linux/fs.h>
-> +#include <linux/mutex.h>
-> +#include <linux/scatterlist.h>
-> +#include <linux/types.h>
-> +
-> +#include <linux/pds/pds_common.h>
-> +#include <linux/pds/pds_adminq.h>
-> +
-> +struct pds_vfio_lm_file {
-> +	struct file *filep;
-> +	struct mutex lock;	/* protect live migration data file */
-> +	u64 size;		/* Size with valid data */
-> +	u64 alloc_size;		/* Total allocated size. Always >= len */
-> +	void *page_mem;		/* memory allocated for pages */
-> +	struct page **pages;	/* Backing pages for file */
-> +	unsigned long long npages;
-> +	struct sg_table sg_table;	/* SG table for backing pages */
-> +	struct pds_lm_sg_elem *sgl;	/* DMA mapping */
-> +	dma_addr_t sgl_addr;
-> +	u16 num_sge;
-> +	struct scatterlist *last_offset_sg;	/* Iterator */
-> +	unsigned int sg_last_entry;
-> +	unsigned long last_offset;
-> +};
-> +
-> +struct pds_vfio_pci_device;
-> +
-> +struct file *
-> +pds_vfio_step_device_state_locked(struct pds_vfio_pci_device *pds_vfio,
-> +				  enum vfio_device_mig_state next);
-> +
-> +void pds_vfio_put_save_file(struct pds_vfio_pci_device *pds_vfio);
-> +void pds_vfio_put_restore_file(struct pds_vfio_pci_device *pds_vfio);
-> +
-> +#endif /* _LM_H_ */
-> diff --git a/drivers/vfio/pci/pds/pci_drv.c b/drivers/vfio/pci/pds/pci_drv.c
-> index a49420aa9736..ffd47fa8ede3 100644
-> --- a/drivers/vfio/pci/pds/pci_drv.c
-> +++ b/drivers/vfio/pci/pds/pci_drv.c
-> @@ -73,11 +73,24 @@ pds_vfio_pci_table[] = {
->  };
->  MODULE_DEVICE_TABLE(pci, pds_vfio_pci_table);
-> 
-> +static void pds_vfio_pci_aer_reset_done(struct pci_dev *pdev)
-> +{
-> +	struct pds_vfio_pci_device *pds_vfio = pds_vfio_pci_drvdata(pdev);
-> +
-> +	pds_vfio_reset(pds_vfio);
-> +}
-> +
-> +static const struct pci_error_handlers pds_vfio_pci_err_handlers = {
-> +	.reset_done = pds_vfio_pci_aer_reset_done,
-> +	.error_detected = vfio_pci_core_aer_err_detected,
-> +};
-> +
->  static struct pci_driver pds_vfio_pci_driver = {
->  	.name = KBUILD_MODNAME,
->  	.id_table = pds_vfio_pci_table,
->  	.probe = pds_vfio_pci_probe,
->  	.remove = pds_vfio_pci_remove,
-> +	.err_handler = &pds_vfio_pci_err_handlers,
->  	.driver_managed_dma = true,
->  };
-> 
-> diff --git a/drivers/vfio/pci/pds/vfio_dev.c b/drivers/vfio/pci/pds/vfio_dev.c
-> index 39771265b78f..2435d8255366 100644
-> --- a/drivers/vfio/pci/pds/vfio_dev.c
-> +++ b/drivers/vfio/pci/pds/vfio_dev.c
-> @@ -4,6 +4,7 @@
->  #include <linux/vfio.h>
->  #include <linux/vfio_pci_core.h>
-> 
-> +#include "lm.h"
->  #include "vfio_dev.h"
-> 
->  struct pci_dev *pds_vfio_to_pci_dev(struct pds_vfio_pci_device *pds_vfio)
-> @@ -11,6 +12,11 @@ struct pci_dev *pds_vfio_to_pci_dev(struct
-> pds_vfio_pci_device *pds_vfio)
->  	return pds_vfio->vfio_coredev.pdev;
->  }
-> 
-> +struct device *pds_vfio_to_dev(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	return &pds_vfio_to_pci_dev(pds_vfio)->dev;
-> +}
-> +
->  struct pds_vfio_pci_device *pds_vfio_pci_drvdata(struct pci_dev *pdev)
->  {
->  	struct vfio_pci_core_device *core_device =
-> dev_get_drvdata(&pdev->dev);
-> @@ -19,6 +25,98 @@ struct pds_vfio_pci_device
-> *pds_vfio_pci_drvdata(struct pci_dev *pdev)
->  			    vfio_coredev);
->  }
-> 
-> +static void pds_vfio_state_mutex_unlock(struct pds_vfio_pci_device
-> *pds_vfio)
-> +{
-> +again:
-> +	spin_lock(&pds_vfio->reset_lock);
-> +	if (pds_vfio->deferred_reset) {
-> +		pds_vfio->deferred_reset = false;
-> +		if (pds_vfio->state == VFIO_DEVICE_STATE_ERROR) {
-> +			pds_vfio->state = VFIO_DEVICE_STATE_RUNNING;
-> +			pds_vfio_put_restore_file(pds_vfio);
-> +			pds_vfio_put_save_file(pds_vfio);
-> +		}
-> +		spin_unlock(&pds_vfio->reset_lock);
-> +		goto again;
-> +	}
-> +	mutex_unlock(&pds_vfio->state_mutex);
-> +	spin_unlock(&pds_vfio->reset_lock);
-> +}
-> +
-> +void pds_vfio_reset(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	spin_lock(&pds_vfio->reset_lock);
-> +	pds_vfio->deferred_reset = true;
-> +	if (!mutex_trylock(&pds_vfio->state_mutex)) {
-> +		spin_unlock(&pds_vfio->reset_lock);
-> +		return;
-> +	}
-> +	spin_unlock(&pds_vfio->reset_lock);
-> +	pds_vfio_state_mutex_unlock(pds_vfio);
-> +}
-> +
-> +static struct file *
-> +pds_vfio_set_device_state(struct vfio_device *vdev,
-> +			  enum vfio_device_mig_state new_state)
-> +{
-> +	struct pds_vfio_pci_device *pds_vfio =
-> +		container_of(vdev, struct pds_vfio_pci_device,
-> +			     vfio_coredev.vdev);
-> +	struct file *res = NULL;
-> +
-> +	mutex_lock(&pds_vfio->state_mutex);
-> +	while (new_state != pds_vfio->state) {
-> +		enum vfio_device_mig_state next_state;
-> +
-> +		int err = vfio_mig_get_next_state(vdev, pds_vfio->state,
-> +						  new_state, &next_state);
-> +		if (err) {
-> +			res = ERR_PTR(err);
-> +			break;
-> +		}
-> +
-> +		res = pds_vfio_step_device_state_locked(pds_vfio, next_state);
-> +		if (IS_ERR(res))
-> +			break;
-> +
-> +		pds_vfio->state = next_state;
-> +
-> +		if (WARN_ON(res && new_state != pds_vfio->state)) {
-> +			res = ERR_PTR(-EINVAL);
-> +			break;
-> +		}
-> +	}
-> +	pds_vfio_state_mutex_unlock(pds_vfio);
-> +
-> +	return res;
-> +}
-> +
-> +static int pds_vfio_get_device_state(struct vfio_device *vdev,
-> +				     enum vfio_device_mig_state *current_state)
-> +{
-> +	struct pds_vfio_pci_device *pds_vfio =
-> +		container_of(vdev, struct pds_vfio_pci_device,
-> +			     vfio_coredev.vdev);
-> +
-> +	mutex_lock(&pds_vfio->state_mutex);
-> +	*current_state = pds_vfio->state;
-> +	pds_vfio_state_mutex_unlock(pds_vfio);
-> +	return 0;
-> +}
-> +
-> +static int pds_vfio_get_device_state_size(struct vfio_device *vdev,
-> +					  unsigned long *stop_copy_length)
-> +{
-> +	*stop_copy_length = PDS_LM_DEVICE_STATE_LENGTH;
-> +	return 0;
-> +}
-> +
-> +static const struct vfio_migration_ops pds_vfio_lm_ops = {
-> +	.migration_set_state = pds_vfio_set_device_state,
-> +	.migration_get_state = pds_vfio_get_device_state,
-> +	.migration_get_data_size = pds_vfio_get_device_state_size
-> +};
-> +
->  static int pds_vfio_init_device(struct vfio_device *vdev)
->  {
->  	struct pds_vfio_pci_device *pds_vfio =
-> @@ -34,6 +132,9 @@ static int pds_vfio_init_device(struct vfio_device
-> *vdev)
->  	pds_vfio->vf_id = pci_iov_vf_id(pdev);
->  	pds_vfio->pci_id = PCI_DEVID(pdev->bus->number, pdev->devfn);
-> 
-> +	vdev->migration_flags = VFIO_MIGRATION_STOP_COPY |
-> VFIO_MIGRATION_P2P;
-> +	vdev->mig_ops = &pds_vfio_lm_ops;
-> +
->  	dev_dbg(&pdev->dev,
->  		"%s: PF %#04x VF %#04x (%d) vf_id %d domain %d
-> pds_vfio %p\n",
->  		__func__, pci_dev_id(pdev->physfn), pds_vfio->pci_id,
-> @@ -54,17 +155,34 @@ static int pds_vfio_open_device(struct vfio_device
-> *vdev)
->  	if (err)
->  		return err;
-> 
-> +	mutex_init(&pds_vfio->state_mutex);
-> +	pds_vfio->state = VFIO_DEVICE_STATE_RUNNING;
-> +
->  	vfio_pci_core_finish_enable(&pds_vfio->vfio_coredev);
-> 
->  	return 0;
->  }
-> 
-> +static void pds_vfio_close_device(struct vfio_device *vdev)
-> +{
-> +	struct pds_vfio_pci_device *pds_vfio =
-> +		container_of(vdev, struct pds_vfio_pci_device,
-> +			     vfio_coredev.vdev);
-> +
-> +	mutex_lock(&pds_vfio->state_mutex);
-> +	pds_vfio_put_restore_file(pds_vfio);
-> +	pds_vfio_put_save_file(pds_vfio);
-> +	mutex_unlock(&pds_vfio->state_mutex);
-> +	mutex_destroy(&pds_vfio->state_mutex);
-> +	vfio_pci_core_close_device(vdev);
-> +}
-> +
->  static const struct vfio_device_ops pds_vfio_ops = {
->  	.name = "pds-vfio",
->  	.init = pds_vfio_init_device,
->  	.release = vfio_pci_core_release_dev,
->  	.open_device = pds_vfio_open_device,
-> -	.close_device = vfio_pci_core_close_device,
-> +	.close_device = pds_vfio_close_device,
->  	.ioctl = vfio_pci_core_ioctl,
->  	.device_feature = vfio_pci_core_ioctl_feature,
->  	.read = vfio_pci_core_read,
-> diff --git a/drivers/vfio/pci/pds/vfio_dev.h b/drivers/vfio/pci/pds/vfio_dev.h
-> index 92e8ff241ca8..df6208a7140b 100644
-> --- a/drivers/vfio/pci/pds/vfio_dev.h
-> +++ b/drivers/vfio/pci/pds/vfio_dev.h
-> @@ -7,12 +7,21 @@
->  #include <linux/pci.h>
->  #include <linux/vfio_pci_core.h>
-> 
-> +#include "lm.h"
-> +
->  struct pdsc;
-> 
->  struct pds_vfio_pci_device {
->  	struct vfio_pci_core_device vfio_coredev;
->  	struct pdsc *pdsc;
-> 
-> +	struct pds_vfio_lm_file *save_file;
-> +	struct pds_vfio_lm_file *restore_file;
-> +	struct mutex state_mutex; /* protect migration state */
-> +	enum vfio_device_mig_state state;
-> +	spinlock_t reset_lock; /* protect reset_done flow */
-> +	u8 deferred_reset;
-> +
->  	int vf_id;
->  	int pci_id;
->  	u16 client_id;
-> @@ -20,7 +29,9 @@ struct pds_vfio_pci_device {
-> 
->  const struct vfio_device_ops *pds_vfio_ops_info(void);
->  struct pds_vfio_pci_device *pds_vfio_pci_drvdata(struct pci_dev *pdev);
-> +void pds_vfio_reset(struct pds_vfio_pci_device *pds_vfio);
-> 
->  struct pci_dev *pds_vfio_to_pci_dev(struct pds_vfio_pci_device *pds_vfio);
-> +struct device *pds_vfio_to_dev(struct pds_vfio_pci_device *pds_vfio);
-> 
->  #endif /* _VFIO_DEV_H_ */
-> diff --git a/include/linux/pds/pds_adminq.h
-> b/include/linux/pds/pds_adminq.h
-> index 98a60ce87b92..db6de081f15f 100644
-> --- a/include/linux/pds/pds_adminq.h
-> +++ b/include/linux/pds/pds_adminq.h
-> @@ -584,6 +584,213 @@ struct pds_core_q_init_comp {
->  	u8     color;
->  };
-> 
-> +#define PDS_LM_DEVICE_STATE_LENGTH		65536
-> +#define PDS_LM_CHECK_DEVICE_STATE_LENGTH(X) \
-> +			PDS_CORE_SIZE_CHECK(union,
-> PDS_LM_DEVICE_STATE_LENGTH, X)
-> +
-> +/*
-> + * enum pds_lm_cmd_opcode - Live Migration Device commands
-> + */
-> +enum pds_lm_cmd_opcode {
-> +	PDS_LM_CMD_HOST_VF_STATUS  = 1,
-> +
-> +	/* Device state commands */
-> +	PDS_LM_CMD_STATUS          = 16,
-> +	PDS_LM_CMD_SUSPEND         = 18,
-> +	PDS_LM_CMD_SUSPEND_STATUS  = 19,
-> +	PDS_LM_CMD_RESUME          = 20,
-> +	PDS_LM_CMD_SAVE            = 21,
-> +	PDS_LM_CMD_RESTORE         = 22,
-> +};
-> +
-> +/**
-> + * struct pds_lm_cmd - generic command
-> + * @opcode:	Opcode
-> + * @rsvd:	Word boundary padding
-> + * @vf_id:	VF id
-> + * @rsvd2:	Structure padding to 60 Bytes
-> + */
-> +struct pds_lm_cmd {
-> +	u8     opcode;
-> +	u8     rsvd;
-> +	__le16 vf_id;
-> +	u8     rsvd2[56];
-> +};
-> +
-> +/**
-> + * struct pds_lm_comp - generic command completion
-> + * @status:	Status of the command (enum pds_core_status_code)
-> + * @rsvd:	Structure padding to 16 Bytes
-> + */
-> +struct pds_lm_comp {
-> +	u8 status;
-> +	u8 rsvd[15];
-> +};
-> +
-> +/**
-> + * struct pds_lm_status_cmd - STATUS command
-> + * @opcode:	Opcode
-> + * @rsvd:	Word boundary padding
-> + * @vf_id:	VF id
-> + */
-> +struct pds_lm_status_cmd {
-> +	u8     opcode;
-> +	u8     rsvd;
-> +	__le16 vf_id;
-> +};
-> +
-> +/**
-> + * struct pds_lm_status_comp - STATUS command completion
-> + * @status:		Status of the command (enum pds_core_status_code)
-> + * @rsvd:		Word boundary padding
-> + * @comp_index:		Index in the desc ring for which this is the
-> completion
-> + * @size:		Size of the device state
-> + * @rsvd2:		Word boundary padding
-> + * @color:		Color bit
-> + */
-> +struct pds_lm_status_comp {
-> +	u8     status;
-> +	u8     rsvd;
-> +	__le16 comp_index;
-> +	union {
-> +		__le64 size;
-> +		u8     rsvd2[11];
-> +	} __packed;
-> +	u8     color;
-> +};
-> +
-> +/**
-> + * struct pds_lm_suspend_cmd - SUSPEND command
-> + * @opcode:	Opcode PDS_LM_CMD_SUSPEND
-> + * @rsvd:	Word boundary padding
-> + * @vf_id:	VF id
-> + */
-> +struct pds_lm_suspend_cmd {
-> +	u8     opcode;
-> +	u8     rsvd;
-> +	__le16 vf_id;
-> +};
-> +
-> +/**
-> + * struct pds_lm_suspend_comp - SUSPEND command completion
-> + * @status:		Status of the command (enum pds_core_status_code)
-> + * @rsvd:		Word boundary padding
-> + * @comp_index:		Index in the desc ring for which this is the
-> completion
-> + * @state_size:		Size of the device state computed post suspend
-> + * @rsvd2:		Word boundary padding
-> + * @color:		Color bit
-> + */
-> +struct pds_lm_suspend_comp {
-> +	u8     status;
-> +	u8     rsvd;
-> +	__le16 comp_index;
-> +	union {
-> +		__le64 state_size;
-> +		u8     rsvd2[11];
-> +	} __packed;
-> +	u8     color;
-> +};
-> +
-> +/**
-> + * struct pds_lm_suspend_status_cmd - SUSPEND status command
-> + * @opcode:	Opcode PDS_AQ_CMD_LM_SUSPEND_STATUS
-> + * @rsvd:	Word boundary padding
-> + * @vf_id:	VF id
-> + */
-> +struct pds_lm_suspend_status_cmd {
-> +	u8 opcode;
-> +	u8 rsvd;
-> +	__le16 vf_id;
-> +};
-> +
-> +/**
-> + * struct pds_lm_resume_cmd - RESUME command
-> + * @opcode:	Opcode PDS_LM_CMD_RESUME
-> + * @rsvd:	Word boundary padding
-> + * @vf_id:	VF id
-> + */
-> +struct pds_lm_resume_cmd {
-> +	u8     opcode;
-> +	u8     rsvd;
-> +	__le16 vf_id;
-> +};
-> +
-> +/**
-> + * struct pds_lm_sg_elem - Transmit scatter-gather (SG) descriptor element
-> + * @addr:	DMA address of SG element data buffer
-> + * @len:	Length of SG element data buffer, in bytes
-> + * @rsvd:	Word boundary padding
-> + */
-> +struct pds_lm_sg_elem {
-> +	__le64 addr;
-> +	__le32 len;
-> +	__le16 rsvd[2];
-> +};
-> +
-> +/**
-> + * struct pds_lm_save_cmd - SAVE command
-> + * @opcode:	Opcode PDS_LM_CMD_SAVE
-> + * @rsvd:	Word boundary padding
-> + * @vf_id:	VF id
-> + * @rsvd2:	Word boundary padding
-> + * @sgl_addr:	IOVA address of the SGL to dma the device state
-> + * @num_sge:	Total number of SG elements
-> + */
-> +struct pds_lm_save_cmd {
-> +	u8     opcode;
-> +	u8     rsvd;
-> +	__le16 vf_id;
-> +	u8     rsvd2[4];
-> +	__le64 sgl_addr;
-> +	__le32 num_sge;
-> +} __packed;
-> +
-> +/**
-> + * struct pds_lm_restore_cmd - RESTORE command
-> + * @opcode:	Opcode PDS_LM_CMD_RESTORE
-> + * @rsvd:	Word boundary padding
-> + * @vf_id:	VF id
-> + * @rsvd2:	Word boundary padding
-> + * @sgl_addr:	IOVA address of the SGL to dma the device state
-> + * @num_sge:	Total number of SG elements
-> + */
-> +struct pds_lm_restore_cmd {
-> +	u8     opcode;
-> +	u8     rsvd;
-> +	__le16 vf_id;
-> +	u8     rsvd2[4];
-> +	__le64 sgl_addr;
-> +	__le32 num_sge;
-> +} __packed;
-> +
-> +/**
-> + * union pds_lm_dev_state - device state information
-> + * @words:	Device state words
-> + */
-> +union pds_lm_dev_state {
-> +	__le32 words[PDS_LM_DEVICE_STATE_LENGTH / sizeof(__le32)];
-> +};
-> +
-> +enum pds_lm_host_vf_status {
-> +	PDS_LM_STA_NONE = 0,
-> +	PDS_LM_STA_IN_PROGRESS,
-> +	PDS_LM_STA_MAX,
-> +};
-> +
-> +/**
-> + * struct pds_lm_host_vf_status_cmd - HOST_VF_STATUS command
-> + * @opcode:	Opcode PDS_LM_CMD_HOST_VF_STATUS
-> + * @rsvd:	Word boundary padding
-> + * @vf_id:	VF id
-> + * @status:	Current LM status of host VF driver (enum
-> pds_lm_host_status)
-> + */
-> +struct pds_lm_host_vf_status_cmd {
-> +	u8     opcode;
-> +	u8     rsvd;
-> +	__le16 vf_id;
-> +	u8     status;
-> +};
-> +
->  union pds_core_adminq_cmd {
->  	u8     opcode;
->  	u8     bytes[64];
-> @@ -600,6 +807,14 @@ union pds_core_adminq_cmd {
-> 
->  	struct pds_core_q_identify_cmd    q_ident;
->  	struct pds_core_q_init_cmd        q_init;
-> +
-> +	struct pds_lm_suspend_cmd		lm_suspend;
-> +	struct pds_lm_suspend_status_cmd	lm_suspend_status;
-> +	struct pds_lm_resume_cmd		lm_resume;
-> +	struct pds_lm_status_cmd		lm_status;
-> +	struct pds_lm_save_cmd			lm_save;
-> +	struct pds_lm_restore_cmd		lm_restore;
-> +	struct pds_lm_host_vf_status_cmd	lm_host_vf_status;
->  };
-> 
->  union pds_core_adminq_comp {
-> @@ -621,6 +836,8 @@ union pds_core_adminq_comp {
-> 
->  	struct pds_core_q_identify_comp   q_ident;
->  	struct pds_core_q_init_comp       q_init;
-> +
-> +	struct pds_lm_status_comp		lm_status;
->  };
-> 
->  #ifndef __CHECKER__
+>
+> >       /* For now we're only intereted in devices added and removed. I d=
+idn't
+> >        * test this thing here, so someone needs to double check for the
+> > @@ -1510,6 +1508,8 @@ static int pci_notify(struct notifier_block *nb, =
+unsigned long action,
+> >       else if (action =3D=3D BUS_NOTIFY_DEL_DEVICE)
+> >               notify =3D vga_arbiter_del_pci_device(pdev);
+> >
+> > +     vgaarb_dbg(dev, "%s: action =3D %lu\n", __func__, action);
+> > +
+> >       if (notify)
+> >               vga_arbiter_notify_clients();
+> >       return 0;
+> > @@ -1534,8 +1534,8 @@ static struct miscdevice vga_arb_device =3D {
+> >
+> >   static int __init vga_arb_device_init(void)
+> >   {
+> > +     struct pci_dev *pdev =3D NULL;
+> >       int rc;
+> > -     struct pci_dev *pdev;
+> >
+> >       rc =3D misc_register(&vga_arb_device);
+> >       if (rc < 0)
+> > @@ -1545,11 +1545,13 @@ static int __init vga_arb_device_init(void)
+> >
+> >       /* We add all PCI devices satisfying VGA class in the arbiter by
+> >        * default */
+> > -     pdev =3D NULL;
+> > -     while ((pdev =3D
+> > -             pci_get_subsys(PCI_ANY_ID, PCI_ANY_ID, PCI_ANY_ID,
+> > -                            PCI_ANY_ID, pdev)) !=3D NULL)
+> > +     while (1) {
+> > +             pdev =3D pci_get_class(PCI_CLASS_DISPLAY_VGA << 8, pdev);
+> > +             if (!pdev)
+> > +                     break;
+> > +
+> >               vga_arbiter_add_pci_device(pdev);
+> > +     }
+> >
+> >       pr_info("loaded\n");
+> >       return rc;
+>
 > --
-> 2.17.1
-
+> Jingfeng
+>
