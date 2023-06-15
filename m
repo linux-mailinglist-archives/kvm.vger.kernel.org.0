@@ -2,59 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F802731B75
-	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 16:37:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 389E9731B90
+	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 16:40:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344028AbjFOOg6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jun 2023 10:36:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55210 "EHLO
+        id S1345081AbjFOOkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jun 2023 10:40:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344268AbjFOOg4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jun 2023 10:36:56 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 500A9194
-        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 07:36:55 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-bc4c832c501so2044036276.0
-        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 07:36:55 -0700 (PDT)
+        with ESMTP id S1345075AbjFOOkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jun 2023 10:40:16 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4CFC1A2
+        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 07:40:14 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-53f06f7cc74so526828a12.1
+        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 07:40:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686839814; x=1689431814;
+        d=google.com; s=20221208; t=1686840014; x=1689432014;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X+7G//ecHjNVG/jfa9hG3bCxnnojYsnnlngJwYilFX0=;
-        b=6JCZdSWWBXcfcB1sYGiAmGvvmRR7N9BwMhNOn64TlZnfvyfm1eJtsD78+gu+EjJKIQ
-         cqsAGRHDxrxNdD8r9kjfRsKO+huWQAX+5hdN7VGbh/7JgHYZA7EOy71d4xDCZzxP1JKP
-         CZgEpo1agqlabTrH/uHxEQ9kTq+0BWPMnhYIHb0rKlUGwzlyLb/zJLXwmIUJmnK6aTee
-         JA5uk+U7B/RxOu8vpYnQZL6uMFMiB3agjF2/9n1hCGYgq9k3aV7KdnsMmqoi65F42KRr
-         ThK2dfO0L3uL4iN+nunLZyFvsY01SNSJtNj2B2e/917ZfRTFTokKlGAbHeTF7PZQdFXb
-         PkcA==
+        bh=bIrBNkZ9zKS9U5KeK7d+FaQMKemGy6nHExMMevpFFFU=;
+        b=Rp2/4KfTpi/ecFRTS49d42Q664LFIcaODsBJ8mojuIxoCiwP/gG1eyjRC6hOxE60O/
+         1aKKYOpSESIfe8WmOSkMMiBM+iSWB3a15qlxX34wypFNvlC4axW87m7MzWZKakvED9dn
+         lvtxAKI8GGht6q9NqiGo1yJn87y01XPJl1Gg0fjsb4XjMLhRbVuBrdWPdT9XxBlSf53Z
+         MY30Bz8TW+rmFWJaoFxtt/SWyoL+R20m+vlM59nOEbrLIbhpzo7Fx31h40qeNiE4sLcl
+         T6UtDjvMfqP6cWk52PaxYEKiGSJWKbMPWboALiSToUzDmaHx2KC21YkoXyXEYQGjeDg5
+         RAoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686839814; x=1689431814;
+        d=1e100.net; s=20221208; t=1686840014; x=1689432014;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X+7G//ecHjNVG/jfa9hG3bCxnnojYsnnlngJwYilFX0=;
-        b=hrp6NvhdwFSb+zqnkgtZc/PHJGaQNRiLcLVymbpR3ubS+0efedd8KHexMFd3TxaBJr
-         m6nir27KdQumepTbBFeONnKivx0VqoeFlWr0epTV53DuvEE6L7wfZf/krrgTEmINg8rW
-         b70Y0LXeA0JA3dW6RmLfrh7EGlnryI7ssOcg8pYorWOnexLDScUjwjGkPasT0gWhvzVf
-         B/shP0mqf16+mWOD4nTO+dzMjPsvdoWH6KofQqLtWBhhjl7j+bL8GFa/rIabT/AN9O31
-         WINheUj69KKf7DXyUwOZyGzEAcXx8F+CyL+fJhRkWEepbq5yv/D9AmONXEWLU3XjKAyr
-         AMZQ==
-X-Gm-Message-State: AC+VfDxc0sF/rKZQ+zr+rVeRrJOPGAZyhR5eFwMK3XQVPxetofAJWZ3s
-        jy27gkk+/X1RThLQX1x/nfZF8cg4vh0=
-X-Google-Smtp-Source: ACHHUZ7cVcvbTLgG2oGuHIlvWPaGf57oWLskFn184gpneooP01xurOPGVteuaZ8+XavJujWn4Oe63gNj58A=
+        bh=bIrBNkZ9zKS9U5KeK7d+FaQMKemGy6nHExMMevpFFFU=;
+        b=l+BcCOX6t84xt+Psqa1LGnyCZE7xLR0gXWNIldQIxcQeiAzXS9QMqGfSHkN3kd1Ckp
+         QTdTOwDkripREcBx6/iKipwtw5Czv3gEY8/OJDDKfaGl7kpxCJXNjEXnokul2ia8p9ta
+         LlkklluFj9UbmBwY7MTtF8cceg/l3EBNXJoH8InjrdD9iMITvJoWI1+YRyhpO91PiTzx
+         +wVMqAyl0ivWp/Re6x2Wlr6/P0a8p/Jp9LJGzm6hnIY8EDMzBluHQ/e9j7k8VKahhjpI
+         Kv3+X5oGXzR7IjLPggPy4drfBsERWH7bHX/FWYFI0Mj5v/MIjlRKimDtG6pinRvPT1M2
+         0OLw==
+X-Gm-Message-State: AC+VfDyIYixDuwarkyqDZSJ4WfZXlAOu+Sp8ItQb7qdCquzggkaheio/
+        MkmqyFPvRdg7wvrFsHd32fsSx266yWg=
+X-Google-Smtp-Source: ACHHUZ4ImrZRGKXrUehYcg6Mu58huGQo2fCvfr3+VnpcSsl+lnS/4G/v4KJtNEzrOEcBexGy313QNxHZVA4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ab85:0:b0:ba8:4ba3:5b54 with SMTP id
- v5-20020a25ab85000000b00ba84ba35b54mr651969ybi.11.1686839814563; Thu, 15 Jun
- 2023 07:36:54 -0700 (PDT)
-Date:   Thu, 15 Jun 2023 07:36:52 -0700
-In-Reply-To: <20230615091819.fzr67tevfxmcbnqo@linux.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a63:f30c:0:b0:53f:9e36:1d58 with SMTP id
+ l12-20020a63f30c000000b0053f9e361d58mr739967pgh.0.1686840014295; Thu, 15 Jun
+ 2023 07:40:14 -0700 (PDT)
+Date:   Thu, 15 Jun 2023 07:40:12 -0700
+In-Reply-To: <d4131051-8b71-fab3-59a8-2f15381c2d41@gmail.com>
 Mime-Version: 1.0
-References: <20230615080624.725551-1-jun.miao@intel.com> <20230615091819.fzr67tevfxmcbnqo@linux.intel.com>
-Message-ID: <ZIsiBCYB+18KG1XR@google.com>
-Subject: Re: [PATCH] KVM: x86: Update the version number of SDM in comments
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-9-amoorthy@google.com>
+ <d4131051-8b71-fab3-59a8-2f15381c2d41@gmail.com>
+Message-ID: <ZIsizBERLVMSIz+T@google.com>
+Subject: Re: [PATCH v4 08/16] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Jun Miao <jun.miao@intel.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org
+To:     Robert Hoo <robert.hoo.linux@gmail.com>
+Cc:     Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+        maz@kernel.org, jthoughton@google.com, bgardon@google.com,
+        dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com,
+        peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -66,45 +70,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 15, 2023, Yu Zhang wrote:
-> On Thu, Jun 15, 2023 at 04:06:24PM +0800, Jun Miao wrote:
-> > A little optimized update version number of SDM and corresponding
-> > public date, making it more accurate to retrieve.
+On Thu, Jun 15, 2023, Robert Hoo wrote:
+> On 6/3/2023 12:19 AM, Anish Moorthy wrote:
+> > Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
+> > kvm_handle_error_pfn().
 > > 
-> > Signed-off-by: Jun Miao <jun.miao@intel.com>
+> > Signed-off-by: Anish Moorthy <amoorthy@google.com>
 > > ---
-> >  arch/x86/kvm/lapic.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >   arch/x86/kvm/mmu/mmu.c | 13 +++++++++++++
+> >   1 file changed, 13 insertions(+)
 > > 
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index d7639d126e6c..4c5493e08d2e 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2260,7 +2260,7 @@ static int apic_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
-> >  	/*
-> >  	 * APIC register must be aligned on 128-bits boundary.
-> >  	 * 32/64/128 bits registers must be accessed thru 32 bits.
-> > -	 * Refer SDM 8.4.1
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index c8961f45e3b1..cb71aae9aaec 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -3291,6 +3291,10 @@ static void kvm_send_hwpoison_signal(struct kvm_memory_slot *slot, gfn_t gfn)
+> >   static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >   {
+> > +	uint64_t rounded_gfn;
+> > +	uint64_t fault_size;
+> > +	uint64_t fault_flags;
+> > +
+> >   	if (is_sigpending_pfn(fault->pfn)) {
+> >   		kvm_handle_signal_exit(vcpu);
+> >   		return -EINTR;
+> > @@ -3309,6 +3313,15 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+> >   		return RET_PF_RETRY;
+> >   	}
+> > +	fault_size = KVM_HPAGE_SIZE(fault->goal_level);
 > 
-> I would suggest just remove this line.
+> IIUC, here fault->goal_level is always PG_LEVEL_4K.
+> goal_level could be adjusted in later kvm_tdp_mmu_map() -->
+> kvm_mmu_hugepage_adjust(), if kvm_faultin_pfn() doesn't fail, that is to
+> say, code path doesn't go through here.
+> 
+> I wonder, if you would like put (kind of) kvm_mmu_hugepage_adjust() here as
+> well, reporting to user space the maximum map size it could do with, OR,
+> just report 4K size, let user space itself to detect/decide max possible
+> size (but now I've no idea how to).
 
-+1, and clean up the other part too?  The line about 32/64/128 bits registers is
-also flawed; there are no 128-bit registers, just 256-bit registers.  I see no
-reason to precisely call out the sizes.  And this would be a good opportunity to
-call out that KVM allows smaller reads, but not smaller writes.
-
-E.g. something like this?
-
-	/*
-	 * APIC registers must be aligned on 128-bit boundaries, and must be
-	 * written using 32-bit stores regardless of the register size.  Note,
-	 * KVM allows smaller 8-bit and 16-bit loads to be compatible with
-	 * guest software (some microarchitectures support such loads, even
-	 * though only 32-bit loads are architecturally guaranteed to work).
-	 */
-
-> And maybe, add "According to Intel SDM, " at the beginning of the comments.
-
-Nah, not necessary.  It's implied that KVM is implementing architecturally behavior
-unless otherwise stated.  And this isn't Intel specific code, e.g. the APM (hopefully)
-says the same thing.
+No, that's nonsensical because KVM uses the host mapping to compute the max
+mapping level.  If there's no valid mapping, then there's no defined level.  And
+as I said in my reply, KVM should never kick out to userspace if KVM can establish
+a 4KiB mapping, i.e. 4KiB is always the effective scope, and reporting anything
+else would just be wild speculation.
