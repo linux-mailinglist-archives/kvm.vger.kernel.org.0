@@ -2,86 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 910A07313B6
-	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 11:28:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52ECD7311B2
+	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 10:05:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238157AbjFOJ1p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jun 2023 05:27:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58712 "EHLO
+        id S233900AbjFOIFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jun 2023 04:05:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231239AbjFOJ13 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jun 2023 05:27:29 -0400
-X-Greylist: delayed 17601 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 15 Jun 2023 02:27:28 PDT
-Received: from mail.sitirkam.com (mail.aurorateknoglobal.com [103.126.10.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 636C11BD2;
-        Thu, 15 Jun 2023 02:27:28 -0700 (PDT)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-        by mail.sitirkam.com (Postfix) with ESMTP id 36E344E78AFC;
-        Thu, 15 Jun 2023 08:28:34 +0700 (WIB)
-Received: from mail.sitirkam.com ([127.0.0.1])
-        by localhost (mail.sitirkam.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id 9WyoA2-JOtU3; Thu, 15 Jun 2023 08:28:33 +0700 (WIB)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-        by mail.sitirkam.com (Postfix) with ESMTP id C162E4E78B0D;
-        Thu, 15 Jun 2023 08:28:27 +0700 (WIB)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.sitirkam.com C162E4E78B0D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sitirkam.com;
-        s=B8AB377C-ED3B-11EA-8736-9248CAEF674E; t=1686792507;
-        bh=q7vDHy+gLAr4GKZUDI+hjt8I93kvW09nNmGJORUTyfg=;
-        h=MIME-Version:To:From:Date:Message-Id;
-        b=qn8wuqMP1DGJeDnj2kKPlCe8bTU1f/KIjUs6h8C4HEV9iHCzieyB3VJ9U+4pf4Xtr
-         a5zun1OIx60/RGyiBkO+VIrPyO9g4GioawHNGGofVtbGntI6wybRSBZuKsJVd7GsU6
-         6shzGhwDl7KmE5y7akWSK18h9dxeJQify75DVYrJ58YYz8qmBa0Mq4I6/UEPU77BxQ
-         xoMxbn/oy72Qt6m/5lixrd8xi+KCtsrJr2FaZb+CBAoQpab1axHZZtHPATaWZQa/3a
-         MMNkpKZjhQ/+sk5iTf/X/Tp8cf6XzTJF9gM/E2wjQQshiXh5D6b2KluwUTAvHCXD/Z
-         DFJulKdjelIXg==
-X-Virus-Scanned: amavisd-new at mail.sitirkam.com
-Received: from mail.sitirkam.com ([127.0.0.1])
-        by localhost (mail.sitirkam.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id pvdGWmzojD5H; Thu, 15 Jun 2023 08:28:27 +0700 (WIB)
-Received: from [185.169.4.111] (unknown [185.169.4.111])
-        by mail.sitirkam.com (Postfix) with ESMTPSA id 046A24E78161;
-        Thu, 15 Jun 2023 08:28:20 +0700 (WIB)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S230102AbjFOIFc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jun 2023 04:05:32 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C220135
+        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 01:05:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686816332; x=1718352332;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=L+he4Z+5cLuC40aQHUxZXyH5MUxV/r3z5GvtllcRDFQ=;
+  b=LYLYo/e4qeiNkU9SLBRlcXUt5Zumo/1HGo9lEh5e0AyQ2WuGWUxPPLfT
+   6FkB7SsfH3G8nQ6YKM4ZU/0+J5YQBxzq6wZK1QlhDWCwx5YsyMWKwS9KZ
+   ySw5sF9Hq1t5slKnzGKdU7eEARmpRCGdLfW69ktrh0ChpbAUgmHmiI1yf
+   TP6ltP+vX1mKZ5PJpKnuICPOZPgEtRJybyhZWT1zjExJFPX8J73l2idsl
+   UzruFRZOprt33PT1qjUl4BCqpEMWtSLvalRQfYu26qEfHO4wrd0c4zYsa
+   HiOcrfOv520XfmrUE1Czh/9SVq7NpCnKs+UShAMAU55PdbciVfDCjCAs1
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10741"; a="358839419"
+X-IronPort-AV: E=Sophos;i="6.00,244,1681196400"; 
+   d="scan'208";a="358839419"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 01:05:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10741"; a="1042550990"
+X-IronPort-AV: E=Sophos;i="6.00,244,1681196400"; 
+   d="scan'208";a="1042550990"
+Received: from ubuntu.bj.intel.com ([10.238.156.105])
+  by fmsmga005.fm.intel.com with ESMTP; 15 Jun 2023 01:05:29 -0700
+From:   Jun Miao <jun.miao@intel.com>
+To:     seanjc@google.com, pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, jun.miao@intel.com
+Subject: [PATCH] KVM: x86: Update the version number of SDM in comments
+Date:   Thu, 15 Jun 2023 16:06:24 +0800
+Message-Id: <20230615080624.725551-1-jun.miao@intel.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Spende
-To:     Recipients <admin@sitirkam.com>
-From:   "Maria-Elisabeth Schaeffler" <admin@sitirkam.com>
-Date:   Wed, 14 Jun 2023 18:30:27 -0700
-Reply-To: schaefflermariaelisabeth1941@gmail.com
-Message-Id: <20230615012821.046A24E78161@mail.sitirkam.com>
-X-Spam-Status: Yes, score=5.9 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FORGED_REPLYTO,
-        FREEMAIL_REPLYTO_END_DIGIT,NIXSPAM_IXHASH,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5000]
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
-        *      digit
-        *      [schaefflermariaelisabeth1941[at]gmail.com]
-        * -0.0 SPF_HELO_PASS SPF: HELO matches SPF record
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        *  3.0 NIXSPAM_IXHASH http://www.nixspam.org/
-        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
-        *  2.1 FREEMAIL_FORGED_REPLYTO Freemail in Reply-To, but not From
-X-Spam-Level: *****
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Your email account has been selected for a donation of =E2=82=AC1,700,000. =
-Please contact me for more information.
+A little optimized update version number of SDM and corresponding
+public date, making it more accurate to retrieve.
 
-Mrs Maria Elisabeth Schaeffler
-CEO SCHAEFFLER.
+Signed-off-by: Jun Miao <jun.miao@intel.com>
+---
+ arch/x86/kvm/lapic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index d7639d126e6c..4c5493e08d2e 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2260,7 +2260,7 @@ static int apic_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
+ 	/*
+ 	 * APIC register must be aligned on 128-bits boundary.
+ 	 * 32/64/128 bits registers must be accessed thru 32 bits.
+-	 * Refer SDM 8.4.1
++	 * Refer SDM 11.4.1 (March 2023).
+ 	 */
+ 	if (len != 4 || (offset & 0xf))
+ 		return 0;
+-- 
+2.32.0
+
