@@ -2,67 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 389E9731B90
-	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 16:40:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01FCA731BB5
+	for <lists+kvm@lfdr.de>; Thu, 15 Jun 2023 16:47:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345081AbjFOOkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jun 2023 10:40:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57038 "EHLO
+        id S1345078AbjFOOrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jun 2023 10:47:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345075AbjFOOkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jun 2023 10:40:16 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4CFC1A2
-        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 07:40:14 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-53f06f7cc74so526828a12.1
-        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 07:40:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686840014; x=1689432014;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bIrBNkZ9zKS9U5KeK7d+FaQMKemGy6nHExMMevpFFFU=;
-        b=Rp2/4KfTpi/ecFRTS49d42Q664LFIcaODsBJ8mojuIxoCiwP/gG1eyjRC6hOxE60O/
-         1aKKYOpSESIfe8WmOSkMMiBM+iSWB3a15qlxX34wypFNvlC4axW87m7MzWZKakvED9dn
-         lvtxAKI8GGht6q9NqiGo1yJn87y01XPJl1Gg0fjsb4XjMLhRbVuBrdWPdT9XxBlSf53Z
-         MY30Bz8TW+rmFWJaoFxtt/SWyoL+R20m+vlM59nOEbrLIbhpzo7Fx31h40qeNiE4sLcl
-         T6UtDjvMfqP6cWk52PaxYEKiGSJWKbMPWboALiSToUzDmaHx2KC21YkoXyXEYQGjeDg5
-         RAoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686840014; x=1689432014;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bIrBNkZ9zKS9U5KeK7d+FaQMKemGy6nHExMMevpFFFU=;
-        b=l+BcCOX6t84xt+Psqa1LGnyCZE7xLR0gXWNIldQIxcQeiAzXS9QMqGfSHkN3kd1Ckp
-         QTdTOwDkripREcBx6/iKipwtw5Czv3gEY8/OJDDKfaGl7kpxCJXNjEXnokul2ia8p9ta
-         LlkklluFj9UbmBwY7MTtF8cceg/l3EBNXJoH8InjrdD9iMITvJoWI1+YRyhpO91PiTzx
-         +wVMqAyl0ivWp/Re6x2Wlr6/P0a8p/Jp9LJGzm6hnIY8EDMzBluHQ/e9j7k8VKahhjpI
-         Kv3+X5oGXzR7IjLPggPy4drfBsERWH7bHX/FWYFI0Mj5v/MIjlRKimDtG6pinRvPT1M2
-         0OLw==
-X-Gm-Message-State: AC+VfDyIYixDuwarkyqDZSJ4WfZXlAOu+Sp8ItQb7qdCquzggkaheio/
-        MkmqyFPvRdg7wvrFsHd32fsSx266yWg=
-X-Google-Smtp-Source: ACHHUZ4ImrZRGKXrUehYcg6Mu58huGQo2fCvfr3+VnpcSsl+lnS/4G/v4KJtNEzrOEcBexGy313QNxHZVA4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:f30c:0:b0:53f:9e36:1d58 with SMTP id
- l12-20020a63f30c000000b0053f9e361d58mr739967pgh.0.1686840014295; Thu, 15 Jun
- 2023 07:40:14 -0700 (PDT)
-Date:   Thu, 15 Jun 2023 07:40:12 -0700
-In-Reply-To: <d4131051-8b71-fab3-59a8-2f15381c2d41@gmail.com>
-Mime-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-9-amoorthy@google.com>
- <d4131051-8b71-fab3-59a8-2f15381c2d41@gmail.com>
-Message-ID: <ZIsizBERLVMSIz+T@google.com>
-Subject: Re: [PATCH v4 08/16] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Robert Hoo <robert.hoo.linux@gmail.com>
-Cc:     Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
-        maz@kernel.org, jthoughton@google.com, bgardon@google.com,
-        dmatlack@google.com, ricarkol@google.com, axelrasmussen@google.com,
-        peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        with ESMTP id S1345036AbjFOOrB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jun 2023 10:47:01 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0B345273D
+        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 07:46:55 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C50A1FB;
+        Thu, 15 Jun 2023 07:47:39 -0700 (PDT)
+Received: from [10.57.85.226] (unknown [10.57.85.226])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A06A13F663;
+        Thu, 15 Jun 2023 07:46:54 -0700 (PDT)
+Message-ID: <9a1a4e84-6567-fde2-945c-9ceb40e42c9f@arm.com>
+Date:   Thu, 15 Jun 2023 15:46:52 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [kvm-unit-tests PATCH 1/3] arch-run: Extend timeout when booting
+ with UEFI
+Content-Language: en-GB
+To:     Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+References: <20230607185905.32810-1-andrew.jones@linux.dev>
+ <20230607185905.32810-2-andrew.jones@linux.dev>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20230607185905.32810-2-andrew.jones@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,47 +45,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 15, 2023, Robert Hoo wrote:
-> On 6/3/2023 12:19 AM, Anish Moorthy wrote:
-> > Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
-> > kvm_handle_error_pfn().
-> > 
-> > Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> > ---
-> >   arch/x86/kvm/mmu/mmu.c | 13 +++++++++++++
-> >   1 file changed, 13 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index c8961f45e3b1..cb71aae9aaec 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -3291,6 +3291,10 @@ static void kvm_send_hwpoison_signal(struct kvm_memory_slot *slot, gfn_t gfn)
-> >   static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> >   {
-> > +	uint64_t rounded_gfn;
-> > +	uint64_t fault_size;
-> > +	uint64_t fault_flags;
-> > +
-> >   	if (is_sigpending_pfn(fault->pfn)) {
-> >   		kvm_handle_signal_exit(vcpu);
-> >   		return -EINTR;
-> > @@ -3309,6 +3313,15 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
-> >   		return RET_PF_RETRY;
-> >   	}
-> > +	fault_size = KVM_HPAGE_SIZE(fault->goal_level);
+On 07/06/2023 19:59, Andrew Jones wrote:
+> Booting UEFI can take a long time. Give the timeout some extra time
+> to compensate for it.
 > 
-> IIUC, here fault->goal_level is always PG_LEVEL_4K.
-> goal_level could be adjusted in later kvm_tdp_mmu_map() -->
-> kvm_mmu_hugepage_adjust(), if kvm_faultin_pfn() doesn't fail, that is to
-> say, code path doesn't go through here.
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> ---
+>   scripts/arch-run.bash | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
 > 
-> I wonder, if you would like put (kind of) kvm_mmu_hugepage_adjust() here as
-> well, reporting to user space the maximum map size it could do with, OR,
-> just report 4K size, let user space itself to detect/decide max possible
-> size (but now I've no idea how to).
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 51e4b97b27d1..72ce718b1170 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -94,7 +94,17 @@ run_qemu_status ()
+>   
+>   timeout_cmd ()
+>   {
+> +	local s
+> +
+>   	if [ "$TIMEOUT" ] && [ "$TIMEOUT" != "0" ]; then
+> +		if [ "$CONFIG_EFI" = 'y' ]; then
+> +			s=${TIMEOUT: -1}
+> +			if [ "$s" = 's' ]; then
+> +				TIMEOUT=${TIMEOUT:0:-1}
+> +				((TIMEOUT += 10)) # Add 10 seconds for booting UEFI
+> +				TIMEOUT="${TIMEOUT}s"
+> +			fi
+> +		fi
+>   		echo "timeout -k 1s --foreground $TIMEOUT"
+>   	fi
+>   }
 
-No, that's nonsensical because KVM uses the host mapping to compute the max
-mapping level.  If there's no valid mapping, then there's no defined level.  And
-as I said in my reply, KVM should never kick out to userspace if KVM can establish
-a 4KiB mapping, i.e. 4KiB is always the effective scope, and reporting anything
-else would just be wild speculation.
+This looks fine to me but at the same time, I wonder if it's worth the 
+complexity. In arm/unittests.cfg, timer is the only test where we 
+specify a timeout. If we were to bump it from 10s to 20s it would solve 
+the problem too but also the timeout would be extended for non EFI runs too.
+
+In any case:
+
+Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+
+Thanks,
+
+Nikos
