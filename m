@@ -2,91 +2,300 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F7FD7335F2
-	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 18:26:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 162D8733664
+	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 18:46:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230420AbjFPQ0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jun 2023 12:26:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51154 "EHLO
+        id S1345302AbjFPQqS convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 16 Jun 2023 12:46:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232001AbjFPQ0m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jun 2023 12:26:42 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF4451A3;
-        Fri, 16 Jun 2023 09:26:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686932800; x=1718468800;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=kJI27vN2p91Fu6uIkekhD7QZJBwp/dx6T6isHe7/eOM=;
-  b=XMSlJd5QBu6M8J+FeL2kkQjl5dCOLpD676ujDbSJSY4+MSSRzfacXEXz
-   1qvGhgNvQFCo1RtTO6NnnOKfTMThQMw2MEaZiNq6WPkdeV6U0+2T2Vw6m
-   XnWIODbmXNl42DWkIUHSCMSXgCKxby19cKi1jlJyU10Ur1LawQRYVT05g
-   SseA4X+sXRoum2qFBItc5tufvxYKgJqQvVdnMEZ6vQJRXkRaGSDJJEOfS
-   fXyWWNDAQjyw77szgmphwHZIQBv4EX06jUH5kqLsuG3mKx5i31OVsbJBd
-   jtXeWTWo2vnQhtbh0rVNHdXAFmU7WlBcns5a2HoXRAkl7giskeqgSKZEo
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="358126950"
-X-IronPort-AV: E=Sophos;i="6.00,247,1681196400"; 
-   d="scan'208";a="358126950"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2023 09:26:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10743"; a="887144847"
-X-IronPort-AV: E=Sophos;i="6.00,247,1681196400"; 
-   d="scan'208";a="887144847"
-Received: from fashta-mobl.amr.corp.intel.com (HELO [10.255.231.221]) ([10.255.231.221])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2023 09:26:39 -0700
-Message-ID: <6655bcdc-e658-3ba1-ed7a-3fe1eadef48a@intel.com>
-Date:   Fri, 16 Jun 2023 09:26:39 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v11 20/20] Documentation/x86: Add documentation for TDX
- host support
+        with ESMTP id S231138AbjFPQqR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 12:46:17 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83D852D4E
+        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 09:46:14 -0700 (PDT)
+Received: from lhrpeml500001.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QjQ336PCLz6GDcJ;
+        Sat, 17 Jun 2023 00:43:43 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ lhrpeml500001.china.huawei.com (7.191.163.213) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Fri, 16 Jun 2023 17:46:11 +0100
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.023;
+ Fri, 16 Jun 2023 17:46:11 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Joao Martins <joao.m.martins@oracle.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
+CC:     Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        "Lu Baolu" <baolu.lu@linux.intel.com>, Yi Liu <yi.l.liu@intel.com>,
+        Yi Y Sun <yi.y.sun@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH RFCv2 22/24] iommu/arm-smmu-v3: Add read_and_clear_dirty()
+ support
+Thread-Topic: [PATCH RFCv2 22/24] iommu/arm-smmu-v3: Add
+ read_and_clear_dirty() support
+Thread-Index: AQHZico8F+XQQUgz40mrFEyLOBzMNa+NzyIQ
+Date:   Fri, 16 Jun 2023 16:46:11 +0000
+Message-ID: <c4696aad77ef49e7b3c550c19b354223@huawei.com>
+References: <20230518204650.14541-1-joao.m.martins@oracle.com>
+ <20230518204650.14541-23-joao.m.martins@oracle.com>
+In-Reply-To: <20230518204650.14541-23-joao.m.martins@oracle.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-To:     Nikolay Borisov <nik.borisov@suse.com>,
-        Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, kirill.shutemov@linux.intel.com,
-        tony.luck@intel.com, peterz@infradead.org, tglx@linutronix.de,
-        seanjc@google.com, pbonzini@redhat.com, david@redhat.com,
-        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
-        ying.huang@intel.com, reinette.chatre@intel.com,
-        len.brown@intel.com, ak@linux.intel.com, isaku.yamahata@intel.com,
-        chao.gao@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
-References: <cover.1685887183.git.kai.huang@intel.com>
- <34853e0f8f38ec2fda66b0ba480d4df63b8aab43.1685887183.git.kai.huang@intel.com>
- <14c2a806-05e4-a9f8-e85f-70b2081cd22f@suse.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <14c2a806-05e4-a9f8-e85f-70b2081cd22f@suse.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.178]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/16/23 02:02, Nikolay Borisov wrote:
->>
->> +TDX reports a list of "Convertible Memory Region" (CMR) to tell the
+Hi Joao,
+
+> -----Original Message-----
+> From: Joao Martins [mailto:joao.m.martins@oracle.com]
+> Sent: 18 May 2023 21:47
+> To: iommu@lists.linux.dev
+> Cc: Jason Gunthorpe <jgg@nvidia.com>; Kevin Tian <kevin.tian@intel.com>;
+> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>; Lu
+> Baolu <baolu.lu@linux.intel.com>; Yi Liu <yi.l.liu@intel.com>; Yi Y Sun
+> <yi.y.sun@intel.com>; Eric Auger <eric.auger@redhat.com>; Nicolin Chen
+> <nicolinc@nvidia.com>; Joerg Roedel <joro@8bytes.org>; Jean-Philippe
+> Brucker <jean-philippe@linaro.org>; Suravee Suthikulpanit
+> <suravee.suthikulpanit@amd.com>; Will Deacon <will@kernel.org>; Robin
+> Murphy <robin.murphy@arm.com>; Alex Williamson
+> <alex.williamson@redhat.com>; kvm@vger.kernel.org; Joao Martins
+> <joao.m.martins@oracle.com>
+> Subject: [PATCH RFCv2 22/24] iommu/arm-smmu-v3: Add
+> read_and_clear_dirty() support
 > 
-> nit: It might be worth mentioning that those CMRs ultimately come from
-> the BIOS.  Because it's never mentioned here and in the "Physical Memory
-> Hotplug" it's directly mentioned that bios shouldn't support hot-removal
-> of memory. So the bios is a central component in a sense.
+> From: Keqian Zhu <zhukeqian1@huawei.com>
+> 
+> .read_and_clear_dirty() IOMMU domain op takes care of reading the dirty
+> bits (i.e. PTE has both DBM and AP[2] set) and marshalling into a bitmap of
+> a given page size.
+> 
+> While reading the dirty bits we also clear the PTE AP[2] bit to mark it as
+> writable-clean depending on read_and_clear_dirty() flags.
+> 
+> Structure it in a way that the IOPTE walker is generic, and so we pass a
+> function pointer over what to do on a per-PTE basis.
+> 
+> [Link below points to the original version that was based on]
+> 
+> Link:
+> https://lore.kernel.org/lkml/20210413085457.25400-11-zhukeqian1@huaw
+> ei.com/
+> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
+> Co-developed-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> [joaomart: Massage commit message]
+> Co-developed-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> ---
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  23 +++++
+>  drivers/iommu/io-pgtable-arm.c              | 104
+> ++++++++++++++++++++
+>  2 files changed, 127 insertions(+)
+> 
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> index e2b98a6a6b74..2cde14003469 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> @@ -2765,6 +2765,28 @@ static int arm_smmu_enable_nesting(struct
+> iommu_domain *domain)
+>  	return ret;
+>  }
+> 
+> +static int arm_smmu_read_and_clear_dirty(struct iommu_domain
+> *domain,
+> +					 unsigned long iova, size_t size,
+> +					 unsigned long flags,
+> +					 struct iommu_dirty_bitmap *dirty)
+> +{
+> +	struct arm_smmu_domain *smmu_domain =
+> to_smmu_domain(domain);
+> +	struct io_pgtable_ops *ops = smmu_domain->pgtbl_ops;
+> +	int ret;
+> +
+> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_S1)
+> +		return -EINVAL;
+> +
+> +	if (!ops || !ops->read_and_clear_dirty) {
+> +		pr_err_once("io-pgtable don't support dirty tracking\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	ret = ops->read_and_clear_dirty(ops, iova, size, flags, dirty);
+> +
+> +	return ret;
+> +}
+> +
+>  static int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args
+> *args)
+>  {
+>  	return iommu_fwspec_add_ids(dev, args->args, 1);
+> @@ -2893,6 +2915,7 @@ static struct iommu_ops arm_smmu_ops = {
+>  		.iova_to_phys		= arm_smmu_iova_to_phys,
+>  		.enable_nesting		= arm_smmu_enable_nesting,
+>  		.free			= arm_smmu_domain_free,
+> +		.read_and_clear_dirty	= arm_smmu_read_and_clear_dirty,
+>  	}
+>  };
+> 
+> diff --git a/drivers/iommu/io-pgtable-arm.c
+> b/drivers/iommu/io-pgtable-arm.c
+> index b2f470529459..de9e61f8452d 100644
+> --- a/drivers/iommu/io-pgtable-arm.c
+> +++ b/drivers/iommu/io-pgtable-arm.c
+> @@ -717,6 +717,109 @@ static phys_addr_t arm_lpae_iova_to_phys(struct
+> io_pgtable_ops *ops,
+>  	return iopte_to_paddr(pte, data) | iova;
+>  }
+> 
+> +struct arm_lpae_iopte_read_dirty {
+> +	unsigned long flags;
+> +	struct iommu_dirty_bitmap *dirty;
+> +};
+> +
+> +static int __arm_lpae_read_and_clear_dirty(unsigned long iova, size_t size,
+> +					   arm_lpae_iopte *ptep, void *opaque)
+> +{
+> +	struct arm_lpae_iopte_read_dirty *arg = opaque;
+> +	struct iommu_dirty_bitmap *dirty = arg->dirty;
+> +	arm_lpae_iopte pte;
+> +
+> +	pte = READ_ONCE(*ptep);
+> +	if (WARN_ON(!pte))
+> +		return -EINVAL;
+> +
+> +	if ((pte & ARM_LPAE_PTE_AP_WRITABLE) ==
+> ARM_LPAE_PTE_AP_WRITABLE)
+> +		return 0;
+> +
+> +	iommu_dirty_bitmap_record(dirty, iova, size);
+> +	if (!(arg->flags & IOMMU_DIRTY_NO_CLEAR))
+> +		set_bit(ARM_LPAE_PTE_AP_RDONLY_BIT, (unsigned long *)ptep);
+> +	return 0;
+> +}
+> +
+> +static int __arm_lpae_iopte_walk(struct arm_lpae_io_pgtable *data,
+> +				 unsigned long iova, size_t size,
+> +				 int lvl, arm_lpae_iopte *ptep,
+> +				 int (*fn)(unsigned long iova, size_t size,
+> +					   arm_lpae_iopte *pte, void *opaque),
+> +				 void *opaque)
+> +{
+> +	arm_lpae_iopte pte;
+> +	struct io_pgtable *iop = &data->iop;
+> +	size_t base, next_size;
+> +	int ret;
+> +
+> +	if (WARN_ON_ONCE(!fn))
+> +		return -EINVAL;
+> +
+> +	if (WARN_ON(lvl == ARM_LPAE_MAX_LEVELS))
+> +		return -EINVAL;
+> +
+> +	ptep += ARM_LPAE_LVL_IDX(iova, lvl, data);
+> +	pte = READ_ONCE(*ptep);
+> +	if (WARN_ON(!pte))
+> +		return -EINVAL;
+> +
+> +	if (size == ARM_LPAE_BLOCK_SIZE(lvl, data)) {
+> +		if (iopte_leaf(pte, lvl, iop->fmt))
+> +			return fn(iova, size, ptep, opaque);
+> +
+> +		/* Current level is table, traverse next level */
+> +		next_size = ARM_LPAE_BLOCK_SIZE(lvl + 1, data);
+> +		ptep = iopte_deref(pte, data);
+> +		for (base = 0; base < size; base += next_size) {
+> +			ret = __arm_lpae_iopte_walk(data, iova + base,
+> +						    next_size, lvl + 1, ptep,
+> +						    fn, opaque);
+> +			if (ret)
+> +				return ret;
+> +		}
+> +		return 0;
+> +	} else if (iopte_leaf(pte, lvl, iop->fmt)) {
+> +		return fn(iova, size, ptep, opaque);
+> +	}
+> +
+> +	/* Keep on walkin */
+> +	ptep = iopte_deref(pte, data);
+> +	return __arm_lpae_iopte_walk(data, iova, size, lvl + 1, ptep,
+> +				     fn, opaque);
+> +}
+> +
+> +static int arm_lpae_read_and_clear_dirty(struct io_pgtable_ops *ops,
+> +					 unsigned long iova, size_t size,
+> +					 unsigned long flags,
+> +					 struct iommu_dirty_bitmap *dirty)
+> +{
+> +	struct arm_lpae_io_pgtable *data = io_pgtable_ops_to_data(ops);
+> +	struct io_pgtable_cfg *cfg = &data->iop.cfg;
+> +	struct arm_lpae_iopte_read_dirty arg = {
+> +		.flags = flags, .dirty = dirty,
+> +	};
+> +	arm_lpae_iopte *ptep = data->pgd;
+> +	int lvl = data->start_level;
+> +	long iaext = (s64)iova >> cfg->ias;
+> +
+> +	if (WARN_ON(!size || (size & cfg->pgsize_bitmap) != size))
+> +		return -EINVAL;
 
-The BIOS is weird on TDX systems.  It's central, sure, but it's also
-untrusted.  The TDX module generally has a kind of "trust but verify"
-approach to the BIOS.
+I guess the size here is supposed to be one of the pgsize that iommu supports.
+But looking at the code, it looks like we are passing the iova mapped length and
+it fails here in my test setup. Could you please check and confirm.
 
-I guess the BIOS is the one poking at the memory controllers and getting
-the DIMMs fired up.  But I _do_ think it's OK to say that CMRs come from
-the TDX module.  The important thing is that they're trusted.
+Thanks,
+Shameer
+
+
+> +
+> +	if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_TTBR1)
+> +		iaext = ~iaext;
+> +	if (WARN_ON(iaext))
+> +		return -EINVAL;
+> +
+> +	if (data->iop.fmt != ARM_64_LPAE_S1 &&
+> +	    data->iop.fmt != ARM_32_LPAE_S1)
+> +		return -EINVAL;
+> +
+> +	return __arm_lpae_iopte_walk(data, iova, size, lvl, ptep,
+> +				     __arm_lpae_read_and_clear_dirty, &arg);
+> +}
+> +
+>  static void arm_lpae_restrict_pgsizes(struct io_pgtable_cfg *cfg)
+>  {
+>  	unsigned long granule, page_sizes;
+> @@ -795,6 +898,7 @@ arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
+>  		.map_pages	= arm_lpae_map_pages,
+>  		.unmap_pages	= arm_lpae_unmap_pages,
+>  		.iova_to_phys	= arm_lpae_iova_to_phys,
+> +		.read_and_clear_dirty = arm_lpae_read_and_clear_dirty,
+>  	};
+> 
+>  	return data;
+> --
+> 2.17.2
+
