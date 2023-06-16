@@ -2,166 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CE1F7336FD
-	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 19:01:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 020527337B9
+	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 19:57:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346112AbjFPRB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jun 2023 13:01:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42724 "EHLO
+        id S231681AbjFPR5C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jun 2023 13:57:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346475AbjFPRAk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jun 2023 13:00:40 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1EA53A9E
-        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 10:00:11 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QjQM61fMwz6J7fM;
-        Sat, 17 Jun 2023 00:57:38 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 16 Jun 2023 18:00:09 +0100
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.023;
- Fri, 16 Jun 2023 18:00:09 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Joao Martins <joao.m.martins@oracle.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
-CC:     Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Lu Baolu" <baolu.lu@linux.intel.com>, Yi Liu <yi.l.liu@intel.com>,
-        Yi Y Sun <yi.y.sun@intel.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH RFCv2 21/24] iommu/arm-smmu-v3: Enable HTTU for stage1
- with io-pgtable mapping
-Thread-Topic: [PATCH RFCv2 21/24] iommu/arm-smmu-v3: Enable HTTU for stage1
- with io-pgtable mapping
-Thread-Index: AQHZico50POrCq6Z9ESUTUA7KQEZ/a9mHK1Q///zYICAJ8MbUA==
-Date:   Fri, 16 Jun 2023 17:00:09 +0000
-Message-ID: <f4656595f62a46e48edecd259bce950e@huawei.com>
-References: <20230518204650.14541-1-joao.m.martins@oracle.com>
- <20230518204650.14541-22-joao.m.martins@oracle.com>
- <e16e35b399044e4f825a453e1b325e40@huawei.com>
- <e22772db-e432-c42f-181c-e7055aeed553@oracle.com>
-In-Reply-To: <e22772db-e432-c42f-181c-e7055aeed553@oracle.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.178]
+        with ESMTP id S1345227AbjFPR45 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 13:56:57 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A78630DF
+        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 10:56:45 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-56938733c13so11975147b3.1
+        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 10:56:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1686938204; x=1689530204;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XdEBYinZEP7oCUKRZF8/sBIDoz+bbiwUaZcYs+aSp6M=;
+        b=rMqYcB03De1k2qMDIISBklz3TWPvfwXa7utfxKeTZ0aGTkwW/DPx4TF8ro5tyLNHpl
+         V+sthQOwwx5+MNo5iWE1efXcd173dBXRy47gF2v0kTu25P420C/lLEanxBy8g1sJDlu1
+         vHj0DVP+wGcMPjWzq/mS+AcN2bOGOf8oI2IvbhHn1XS97MoJW1rsjSyLaXqriVu8VFOz
+         0y3RcHE7hB+5ZWG7qI0sJGYK0MA3+Wj9TDEpCosbU5CWFYecdgO1b8OioLkddFuyI5uB
+         ttIvb0PG52m/cZYb1fvanNfDceLKnd6MuAu4bGk2JmTc7sAYJlthLPB0SHfjbgZJHdxP
+         rX7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686938204; x=1689530204;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XdEBYinZEP7oCUKRZF8/sBIDoz+bbiwUaZcYs+aSp6M=;
+        b=AyjFPHYvX3LzohpRyCcyqqYx6NXwPkEssXsUVcGzsm1yhNXVBUVK6yL+0uuB7qko6t
+         CVi/FgqIsqM3OdHY8r6WVQm3FkxQs+qSkqJm4/mgBN82fpvqe8unhKIdEqY2urVUkqKH
+         wFMOONYxWLiGn4xABEwgwSVJY9ZFQ0MFfOU1gQKSL0GxCFE5Cx/F5SKUR8cA2dKWHg63
+         ZmI5oyTk/0Q8Ti5a13j1SGw+cRQ0OevPx63GNpWx2q8LrK66UqXwnzRuyrTJxTruGLHK
+         dshJ9L5GlkcOG/88KIde/wyQ++W5nz9uxkdtZdULAkKw1cPt0wnu3aFUi602IYmZzL/G
+         bwcQ==
+X-Gm-Message-State: AC+VfDxlwcCjkF8F/Db5Igs6Qn9j7eMBqOcMmZDVd/V2suinT86ZudLx
+        ot91x/M56iTW3aOIfcfbVX7GoraQ94I=
+X-Google-Smtp-Source: ACHHUZ6HEgPWTWewG0yDNBc6/rrRCA1VeI8vz5gQ01rnPZohM1EZNxFsMXtb1B5VwfYdcp8iXfRfn5N4ffI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ae07:0:b0:570:200:18e1 with SMTP id
+ m7-20020a81ae07000000b00570020018e1mr883903ywh.3.1686938204700; Fri, 16 Jun
+ 2023 10:56:44 -0700 (PDT)
+Date:   Fri, 16 Jun 2023 10:56:42 -0700
+In-Reply-To: <147246fc-79a2-3bb5-f51f-93dfc1cffcc0@intel.com>
+Mime-Version: 1.0
+References: <20230511040857.6094-1-weijiang.yang@intel.com>
+ <ZIufL7p/ZvxjXwK5@google.com> <147246fc-79a2-3bb5-f51f-93dfc1cffcc0@intel.com>
+Message-ID: <ZIyiWr4sR+MqwmAo@google.com>
+Subject: Re: [PATCH v3 00/21] Enable CET Virtualization
+From:   Sean Christopherson <seanjc@google.com>
+To:     Weijiang Yang <weijiang.yang@intel.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        rppt@kernel.org, binbin.wu@linux.intel.com,
+        rick.p.edgecombe@intel.com, john.allen@amd.com
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSm9hbyBNYXJ0aW5zIFtt
-YWlsdG86am9hby5tLm1hcnRpbnNAb3JhY2xlLmNvbV0NCj4gU2VudDogMjIgTWF5IDIwMjMgMTE6
-NDMNCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29sb3RodW0u
-dGhvZGlAaHVhd2VpLmNvbT47DQo+IGlvbW11QGxpc3RzLmxpbnV4LmRldg0KPiBDYzogSmFzb24g
-R3VudGhvcnBlIDxqZ2dAbnZpZGlhLmNvbT47IEtldmluIFRpYW4gPGtldmluLnRpYW5AaW50ZWwu
-Y29tPjsNCj4gTHUgQmFvbHUgPGJhb2x1Lmx1QGxpbnV4LmludGVsLmNvbT47IFlpIExpdSA8eWku
-bC5saXVAaW50ZWwuY29tPjsgWWkgWSBTdW4NCj4gPHlpLnkuc3VuQGludGVsLmNvbT47IEVyaWMg
-QXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT47IE5pY29saW4gQ2hlbg0KPiA8bmljb2xpbmNA
-bnZpZGlhLmNvbT47IEpvZXJnIFJvZWRlbCA8am9yb0A4Ynl0ZXMub3JnPjsgSmVhbi1QaGlsaXBw
-ZQ0KPiBCcnVja2VyIDxqZWFuLXBoaWxpcHBlQGxpbmFyby5vcmc+OyBTdXJhdmVlIFN1dGhpa3Vs
-cGFuaXQNCj4gPHN1cmF2ZWUuc3V0aGlrdWxwYW5pdEBhbWQuY29tPjsgV2lsbCBEZWFjb24gPHdp
-bGxAa2VybmVsLm9yZz47IFJvYmluDQo+IE11cnBoeSA8cm9iaW4ubXVycGh5QGFybS5jb20+OyBB
-bGV4IFdpbGxpYW1zb24NCj4gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPjsga3ZtQHZnZXIu
-a2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIFJGQ3YyIDIxLzI0XSBpb21tdS9hcm0t
-c21tdS12MzogRW5hYmxlIEhUVFUgZm9yDQo+IHN0YWdlMSB3aXRoIGlvLXBndGFibGUgbWFwcGlu
-Zw0KDQpbLi4uXQ0KDQo+ID4+IEBAIC0yMjI2LDYgKzIyMzMsOSBAQCBzdGF0aWMgaW50IGFybV9z
-bW11X2RvbWFpbl9maW5hbGlzZShzdHJ1Y3QNCj4gPj4gaW9tbXVfZG9tYWluICpkb21haW4sDQo+
-ID4+ICAJCS5pb21tdV9kZXYJPSBzbW11LT5kZXYsDQo+ID4+ICAJfTsNCj4gPj4NCj4gPj4gKwlp
-ZiAoc21tdS0+ZmVhdHVyZXMgJiBhcm1fc21tdV9kYm1fY2FwYWJsZShzbW11KSkNCj4gPj4gKwkJ
-cGd0YmxfY2ZnLnF1aXJrcyB8PSBJT19QR1RBQkxFX1FVSVJLX0FSTV9IRDsNCg0KQWxzbywgSSB0
-aGluayB3ZSBzaG91bGQgbGltaXQgc2V0dGluZyB0aGlzIHRvIHMxIG9ubHkgcGd0YmxfY2ZnLg0K
-DQpUaGFua3MsDQpTaGFtZWVyDQoNCj4gPj4gKw0KPiA+PiAgCXBndGJsX29wcyA9IGFsbG9jX2lv
-X3BndGFibGVfb3BzKGZtdCwgJnBndGJsX2NmZywgc21tdV9kb21haW4pOw0KPiA+PiAgCWlmICgh
-cGd0Ymxfb3BzKQ0KPiA+PiAgCQlyZXR1cm4gLUVOT01FTTsNCj4gPj4gZGlmZiAtLWdpdCBhL2Ry
-aXZlcnMvaW9tbXUvYXJtL2FybS1zbW11LXYzL2FybS1zbW11LXYzLmgNCj4gPj4gYi9kcml2ZXJz
-L2lvbW11L2FybS9hcm0tc21tdS12My9hcm0tc21tdS12My5oDQo+ID4+IGluZGV4IGQ4MmRkMTI1
-NDQ2Yy4uODNkNmYzYTI1NTRmIDEwMDY0NA0KPiA+PiAtLS0gYS9kcml2ZXJzL2lvbW11L2FybS9h
-cm0tc21tdS12My9hcm0tc21tdS12My5oDQo+ID4+ICsrKyBiL2RyaXZlcnMvaW9tbXUvYXJtL2Fy
-bS1zbW11LXYzL2FybS1zbW11LXYzLmgNCj4gPj4gQEAgLTI4OCw2ICsyODgsOSBAQA0KPiA+PiAg
-I2RlZmluZSBDVFhERVNDX0NEXzBfVENSX0lQUwkJR0VOTUFTS19VTEwoMzQsIDMyKQ0KPiA+PiAg
-I2RlZmluZSBDVFhERVNDX0NEXzBfVENSX1RCSTAJCSgxVUxMIDw8IDM4KQ0KPiA+Pg0KPiA+PiAr
-I2RlZmluZSBDVFhERVNDX0NEXzBfVENSX0hBICAgICAgICAgICAgKDFVTCA8PCA0MykNCj4gPj4g
-KyNkZWZpbmUgQ1RYREVTQ19DRF8wX1RDUl9IRCAgICAgICAgICAgICgxVUwgPDwgNDIpDQo+ID4+
-ICsNCj4gPj4gICNkZWZpbmUgQ1RYREVTQ19DRF8wX0FBNjQJCSgxVUwgPDwgNDEpDQo+ID4+ICAj
-ZGVmaW5lIENUWERFU0NfQ0RfMF9TCQkJKDFVTCA8PCA0NCkNCj4gPj4gICNkZWZpbmUgQ1RYREVT
-Q19DRF8wX1IJCQkoMVVMIDw8IDQ1KQ0KPiA+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9pb21tdS9p
-by1wZ3RhYmxlLWFybS5jDQo+ID4+IGIvZHJpdmVycy9pb21tdS9pby1wZ3RhYmxlLWFybS5jIGlu
-ZGV4IDcyZGNkZDQ2OGNmMy4uYjJmNDcwNTI5NDU5DQo+ID4+IDEwMDY0NA0KPiA+PiAtLS0gYS9k
-cml2ZXJzL2lvbW11L2lvLXBndGFibGUtYXJtLmMNCj4gPj4gKysrIGIvZHJpdmVycy9pb21tdS9p
-by1wZ3RhYmxlLWFybS5jDQo+ID4+IEBAIC03NSw2ICs3NSw3IEBADQo+ID4+DQo+ID4+ICAjZGVm
-aW5lIEFSTV9MUEFFX1BURV9OU1RBQkxFCQkoKChhcm1fbHBhZV9pb3B0ZSkxKSA8PCA2MykNCj4g
-Pj4gICNkZWZpbmUgQVJNX0xQQUVfUFRFX1hOCQkJKCgoYXJtX2xwYWVfaW9wdGUpMykgPDwgNTMp
-DQo+ID4+ICsjZGVmaW5lIEFSTV9MUEFFX1BURV9EQk0JCSgoKGFybV9scGFlX2lvcHRlKTEpIDw8
-IDUxKQ0KPiA+PiAgI2RlZmluZSBBUk1fTFBBRV9QVEVfQUYJCQkoKChhcm1fbHBhZV9pb3B0ZSkx
-KSA8PCAxMCkNCj4gPj4gICNkZWZpbmUgQVJNX0xQQUVfUFRFX1NIX05TCQkoKChhcm1fbHBhZV9p
-b3B0ZSkwKSA8PCA4KQ0KPiA+PiAgI2RlZmluZSBBUk1fTFBBRV9QVEVfU0hfT1MJCSgoKGFybV9s
-cGFlX2lvcHRlKTIpIDw8IDgpDQo+ID4+IEBAIC04NCw3ICs4NSw3IEBADQo+ID4+DQo+ID4+ICAj
-ZGVmaW5lIEFSTV9MUEFFX1BURV9BVFRSX0xPX01BU0sJKCgoYXJtX2xwYWVfaW9wdGUpMHgzZmYp
-IDw8DQo+IDIpDQo+ID4+ICAvKiBJZ25vcmUgdGhlIGNvbnRpZ3VvdXMgYml0IGZvciBibG9jayBz
-cGxpdHRpbmcgKi8NCj4gPj4gLSNkZWZpbmUgQVJNX0xQQUVfUFRFX0FUVFJfSElfTUFTSwkoKChh
-cm1fbHBhZV9pb3B0ZSk2KSA8PCA1MikNCj4gPj4gKyNkZWZpbmUgQVJNX0xQQUVfUFRFX0FUVFJf
-SElfTUFTSwkoKChhcm1fbHBhZV9pb3B0ZSkxMykgPDwNCj4gNTEpDQo+ID4+ICAjZGVmaW5lIEFS
-TV9MUEFFX1BURV9BVFRSX01BU0sNCj4gCShBUk1fTFBBRV9QVEVfQVRUUl9MT19NQVNLDQo+ID4+
-IHwJXA0KPiA+PiAgCQkJCQkgQVJNX0xQQUVfUFRFX0FUVFJfSElfTUFTSykNCj4gPj4gIC8qIFNv
-ZnR3YXJlIGJpdCBmb3Igc29sdmluZyBjb2hlcmVuY3kgcmFjZXMgKi8gQEAgLTkzLDYgKzk0LDkg
-QEANCj4gPj4gIC8qIFN0YWdlLTEgUFRFICovDQo+ID4+ICAjZGVmaW5lIEFSTV9MUEFFX1BURV9B
-UF9VTlBSSVYJCSgoKGFybV9scGFlX2lvcHRlKTEpIDw8IDYpDQo+ID4+ICAjZGVmaW5lIEFSTV9M
-UEFFX1BURV9BUF9SRE9OTFkJCSgoKGFybV9scGFlX2lvcHRlKTIpIDw8IDYpDQo+ID4+ICsjZGVm
-aW5lIEFSTV9MUEFFX1BURV9BUF9SRE9OTFlfQklUCTcNCj4gPj4gKyNkZWZpbmUgQVJNX0xQQUVf
-UFRFX0FQX1dSSVRBQkxFDQo+IAkoQVJNX0xQQUVfUFRFX0FQX1JET05MWSB8IFwNCj4gPj4gKwkJ
-CQkJIEFSTV9MUEFFX1BURV9EQk0pDQo+ID4+ICAjZGVmaW5lIEFSTV9MUEFFX1BURV9BVFRSSU5E
-WF9TSElGVAkyDQo+ID4+ICAjZGVmaW5lIEFSTV9MUEFFX1BURV9uRwkJCSgoKGFybV9scGFlX2lv
-cHRlKTEpIDw8IDExKQ0KPiA+Pg0KPiA+PiBAQCAtNDA3LDYgKzQxMSw4IEBAIHN0YXRpYyBhcm1f
-bHBhZV9pb3B0ZQ0KPiBhcm1fbHBhZV9wcm90X3RvX3B0ZShzdHJ1Y3QNCj4gPj4gYXJtX2xwYWVf
-aW9fcGd0YWJsZSAqZGF0YSwNCj4gPj4gIAkJcHRlID0gQVJNX0xQQUVfUFRFX25HOw0KPiA+PiAg
-CQlpZiAoIShwcm90ICYgSU9NTVVfV1JJVEUpICYmIChwcm90ICYgSU9NTVVfUkVBRCkpDQo+ID4+
-ICAJCQlwdGUgfD0gQVJNX0xQQUVfUFRFX0FQX1JET05MWTsNCj4gPj4gKwkJZWxzZSBpZiAoZGF0
-YS0+aW9wLmNmZy5xdWlya3MgJiBJT19QR1RBQkxFX1FVSVJLX0FSTV9IRCkNCj4gPj4gKwkJCXB0
-ZSB8PSBBUk1fTFBBRV9QVEVfQVBfV1JJVEFCTEU7DQo+ID4+ICAJCWlmICghKHByb3QgJiBJT01N
-VV9QUklWKSkNCj4gPj4gIAkJCXB0ZSB8PSBBUk1fTFBBRV9QVEVfQVBfVU5QUklWOw0KPiA+PiAg
-CX0gZWxzZSB7DQo+ID4+IEBAIC04MDQsNyArODEwLDggQEAgYXJtXzY0X2xwYWVfYWxsb2NfcGd0
-YWJsZV9zMShzdHJ1Y3QNCj4gPj4gaW9fcGd0YWJsZV9jZmcgKmNmZywgdm9pZCAqY29va2llKQ0K
-PiA+Pg0KPiA+PiAgCWlmIChjZmctPnF1aXJrcyAmIH4oSU9fUEdUQUJMRV9RVUlSS19BUk1fTlMg
-fA0KPiA+PiAgCQkJICAgIElPX1BHVEFCTEVfUVVJUktfQVJNX1RUQlIxIHwNCj4gPj4gLQkJCSAg
-ICBJT19QR1RBQkxFX1FVSVJLX0FSTV9PVVRFUl9XQldBKSkNCj4gPj4gKwkJCSAgICBJT19QR1RB
-QkxFX1FVSVJLX0FSTV9PVVRFUl9XQldBIHwNCj4gPj4gKwkJCSAgICBJT19QR1RBQkxFX1FVSVJL
-X0FSTV9IRCkpDQo+ID4+ICAJCXJldHVybiBOVUxMOw0KPiA+Pg0KPiA+PiAgCWRhdGEgPSBhcm1f
-bHBhZV9hbGxvY19wZ3RhYmxlKGNmZyk7IGRpZmYgLS1naXQNCj4gPj4gYS9pbmNsdWRlL2xpbnV4
-L2lvLXBndGFibGUuaCBiL2luY2x1ZGUvbGludXgvaW8tcGd0YWJsZS5oIGluZGV4DQo+ID4+IDI1
-MTQyYTBlMmZjMi4uOWE5OTZiYTc4NTZkIDEwMDY0NA0KPiA+PiAtLS0gYS9pbmNsdWRlL2xpbnV4
-L2lvLXBndGFibGUuaA0KPiA+PiArKysgYi9pbmNsdWRlL2xpbnV4L2lvLXBndGFibGUuaA0KPiA+
-PiBAQCAtODUsNiArODUsOCBAQCBzdHJ1Y3QgaW9fcGd0YWJsZV9jZmcgew0KPiA+PiAgCSAqDQo+
-ID4+ICAJICogSU9fUEdUQUJMRV9RVUlSS19BUk1fT1VURVJfV0JXQTogT3ZlcnJpZGUgdGhlDQo+
-IG91dGVyLWNhY2hlYWJpbGl0eQ0KPiA+PiAgCSAqCWF0dHJpYnV0ZXMgc2V0IGluIHRoZSBUQ1Ig
-Zm9yIGEgbm9uLWNvaGVyZW50IHBhZ2UtdGFibGUgd2Fsa2VyLg0KPiA+PiArCSAqDQo+ID4+ICsJ
-ICogSU9fUEdUQUJMRV9RVUlSS19BUk1fSEQ6IEVuYWJsZXMgZGlydHkgdHJhY2tpbmcuDQo+ID4+
-ICAJICovDQo+ID4+ICAJI2RlZmluZSBJT19QR1RBQkxFX1FVSVJLX0FSTV9OUwkJCUJJVCgwKQ0K
-PiA+PiAgCSNkZWZpbmUgSU9fUEdUQUJMRV9RVUlSS19OT19QRVJNUwkJQklUKDEpDQo+ID4+IEBA
-IC05Miw2ICs5NCw4IEBAIHN0cnVjdCBpb19wZ3RhYmxlX2NmZyB7DQo+ID4+ICAJI2RlZmluZSBJ
-T19QR1RBQkxFX1FVSVJLX0FSTV9NVEtfVFRCUl9FWFQJQklUKDQpDQo+ID4+ICAJI2RlZmluZSBJ
-T19QR1RBQkxFX1FVSVJLX0FSTV9UVEJSMQkJQklUKDUpDQo+ID4+ICAJI2RlZmluZSBJT19QR1RB
-QkxFX1FVSVJLX0FSTV9PVVRFUl9XQldBCQlCSVQoNikNCj4gPj4gKwkjZGVmaW5lIElPX1BHVEFC
-TEVfUVVJUktfQVJNX0hECQkJQklUKDcpDQo+ID4+ICsNCj4gPj4gIAl1bnNpZ25lZCBsb25nCQkJ
-cXVpcmtzOw0KPiA+PiAgCXVuc2lnbmVkIGxvbmcJCQlwZ3NpemVfYml0bWFwOw0KPiA+PiAgCXVu
-c2lnbmVkIGludAkJCWlhczsNCj4gPj4gLS0NCj4gPj4gMi4xNy4yDQo+ID4NCg==
+On Fri, Jun 16, 2023, Weijiang Yang wrote:
+>=20
+> On 6/16/2023 7:30 AM, Sean Christopherson wrote:
+> > On Thu, May 11, 2023, Yang Weijiang wrote:
+> > > The last patch is introduced to support supervisor SHSTK but the feat=
+ure is
+> > > not enabled on Intel platform for now, the main purpose of this patch=
+ is to
+> > > facilitate AMD folks to enable the feature.
+> > I am beyond confused by the SDM's wording of CET_SSS.
+> >=20
+> > First, it says that CET_SSS says the CPU isn't buggy (or maybe "less bu=
+ggy" is
+> > more appropriate phrasing).
+> >=20
+> >    Bit 18: CET_SSS. If 1, indicates that an operating system can enable=
+ supervisor
+> >    shadow stacks as long as it ensures that certain supervisor shadow-s=
+tack pushes
+> >    will not cause page faults (see Section 17.2.3 of the Intel=C2=AE 64=
+ and IA-32
+> >    Architectures Software Developer=E2=80=99s Manual, Volume 1).
+> >=20
+> > But then it says says VMMs shouldn't set the bit.
+> >=20
+> >    When emulating the CPUID instruction, a virtual-machine monitor shou=
+ld return
+> >    this bit as 0 if those pushes can cause VM exits.
+> >=20
+> > Based on the Xen code (which is sadly a far better source of informatio=
+n than the
+> > SDM), I *think* that what the SDM is trying to say is that VMMs should =
+not set
+> > CET_SS if VM-Exits can occur ***and*** the bit is not set in the host C=
+PU.  Because
+> > if the SDM really means "VMMs should never set the bit", then what on e=
+arth is the
+> > point of the bit.
+>=20
+> I need to double check for the vague description.
+>=20
+> From my understanding, on bare metal side, if the bit is 1, OS can enable
+> SSS if pushes won't cause page fault. But for VM case, it's not recommend=
+ed
+> (regardless of the bit state) to set the bit as vm-exits caused by guest =
+SSS
+> pushes cannot be fully excluded.
+>=20
+> In other word, the bit is mainly for bare metal guidance now.
+>=20
+> > > In summary, this new series enables CET user SHSTK/IBT and kernel IBT=
+, but
+> > > doesn't fully support CET supervisor SHSTK, the enabling work is left=
+ for
+> > > the future.
+> > Why?  If my interpretation of the SDM is correct, then all the pieces a=
+re there.
+
+...
+
+> And also based on above SDM description, I don't want to add the support
+> blindly now.
+
+*sigh*
+
+I got filled in on the details offlist.
+
+1) In the next version of this series, please rework it to reincorporate Su=
+pervisor
+   Shadow Stack support into the main series, i.e. pretend Intel's implemen=
+ation
+   isn't horribly flawed.  KVM can't guarantee that a VM-Exit won't occur, =
+i.e.
+   can't advertise CET_SS, but I want the baseline support to be implemente=
+d,
+   otherwise the series as a whole is a big confusing mess with unanswered =
+question
+   left, right, and center.  And more importantly, architecturally SSS exis=
+ts if
+   X86_FEATURE_SHSTK is enumerated, i.e. the guest should be allowed to uti=
+lize
+   SSS if it so chooses, with the obvious caveat that there's a non-zero ch=
+ance
+   the guest risks death by doing so.  Or if userspace can ensure no VM-Exi=
+t will
+   occur, which is difficult but feasible (ignoring #MC), e.g. by staticall=
+y
+   partitioning memory, prefaulting all memory in guest firmware, and not d=
+irty
+   logging SSS pages.  In such an extreme setup, userspace can enumerate CE=
+T_SSS
+   to the guest, and KVM should support that.
+=20
+2) Add the below patch to document exactly why KVM doesn't advertise CET_SS=
+S.
+   While Intel is apparently ok with treating KVM developers like mushrooms=
+, I
+   am not.
+
+---
+From: Sean Christopherson <seanjc@google.com>
+Date: Fri, 16 Jun 2023 10:04:37 -0700
+Subject: [PATCH] KVM: x86: Explicitly document that KVM must not advertise
+ CET_SSS
+
+Explicitly call out that KVM must NOT advertise CET_SSS to userspace,
+i.e. must not tell userspace and thus the guest that it is safe for the
+guest to enable Supervisor Shadow Stacks (SSS).
+
+Intel's implementation of SSS is fatally flawed for virtualized
+environments, as despite wording in the SDM that suggests otherwise,
+Intel CPUs' handling of shadow stack switches are NOT fully atomic.  Only
+the check-and-update of the supervisor shadow stack token's busy bit is
+atomic.  Per the SDM:
+
+  If the far CALL or event delivery pushes a stack frame after the token
+  is acquired and any of the pushes causes a fault or VM exit, the
+  processor will revert to the old shadow stack and the busy bit in the
+  new shadow stack's token remains set.
+
+Or more bluntly, any fault or VM-Exit that occurs when pushing to the
+shadow stack after the busy bit is set is fatal to the kernel, i.e. to
+the guest in KVM's case.  The (guest) kernel can protect itself against
+faults, e.g. by ensuring that the shadow stack always has a valid mapping,
+but a guest kernel obviously has no control over, or even knowledge of,
+VM-Exits due to host activity.
+
+To help software determine when it is safe to use SSS, Intel defined
+CPUID.0x7.1.EDX bit (CET_SSS) and updated Intel CPUs to enumerate CET_SS,
+i.e. bare metal Intel CPUs advertise to software that it is safe to enable
+SSS.
+
+  If CPUID.(EAX=3D07H,ECX=3D1H):EDX[bit 18] is enumerated as 1, it is
+  sufficient for an operating system to ensure that none of the pushes can
+  cause a page fault.
+
+But CET_SS also comes with an major caveat that is kinda sorta documented
+in the SDM:
+
+  When emulating the CPUID instruction, a virtual-machine monitor should
+  return this bit as 0 if those pushes can cause VM exits.
+
+In other words, CET_SSS (bit 18) does NOT enumerate that the underlying
+CPU prevents VM-Exits, only that the environment in which the software is
+running will not generate VM-Exits.  I.e. CET_SSS is a stopgap to stem the
+bleeding and allow kernels to enable SSS, not an indication that the
+underlying CPU is immune to the VM-Exit problem.
+
+And unfortunately, KVM itself effectively has zero chance of ensuring that
+a shadow stack switch can't trigger a VM-Exit, e.g. KVM zaps *all* SPTEs
+when any memslot is deleted, enabling dirty logging write-protects SPTEs,
+etc.  A sufficiently motivated userspace can, at least in theory, provide
+a safe environment for SSS, e.g. by statically partitioning and
+prefaulting (in guest firmware) all memory, disabling PML, never
+write-protecting guest shadow stacks, etc.  But such a setup is far, far
+beyond typical KVM deployments.
+
+Note, AMD CPUs have a similar erratum, but AMD CPUs *DO* perform the full
+shadow stack switch atomically so long as the stack is mapped WB and does
+not cross a page boundary, i.e. a "normal" KVM setup and a well-behaved
+guest play nice with SSS without additional shenanigans.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/cpuid.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 1e3ee96c879b..ecf4a68aaa08 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -658,7 +658,15 @@ void kvm_set_cpu_caps(void)
+ 	);
+=20
+ 	kvm_cpu_cap_init_kvm_defined(CPUID_7_1_EDX,
+-		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT) | F(PREFETCHITI)
++		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT) | F(PREFETCHITI) |
++
++		/*
++		 * Do NOT advertise CET_SSS, i.e. do not tell userspace and the
++		 * guest that it is safe to use Supervisor Shadow Stacks under
++		 * KVM when running on Intel CPUs.  KVM itself cannot guarantee
++		 * that a VM-Exit won't occur during a shadow stack update.
++		 */
++		0 /* F(CET_SSS) */
+ 	);
+=20
+ 	kvm_cpu_cap_mask(CPUID_D_1_EAX,
+
+base-commit: 9305c14847719870e9e08294034861360577ce08
+--=20
+
