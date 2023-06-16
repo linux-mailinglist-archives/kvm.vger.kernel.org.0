@@ -2,306 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C774B732605
-	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 05:52:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 238307326A8
+	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 07:34:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233454AbjFPDw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jun 2023 23:52:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47136 "EHLO
+        id S232704AbjFPFeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jun 2023 01:34:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbjFPDwz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jun 2023 23:52:55 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E4131271E;
-        Thu, 15 Jun 2023 20:52:52 -0700 (PDT)
-Received: from loongson.cn (unknown [10.40.46.158])
-        by gateway (Coremail) with SMTP id _____8BxL_CT3Itkm9IFAA--.12517S3;
-        Fri, 16 Jun 2023 11:52:51 +0800 (CST)
-Received: from [192.168.124.126] (unknown [10.40.46.158])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxVeSR3Itko9UcAA--.16617S3;
-        Fri, 16 Jun 2023 11:52:50 +0800 (CST)
-Subject: Re: [PATCH v13 29/30] LoongArch: KVM: Supplement kvm document about
- LoongArch-specific part
-To:     Huacai Chen <chenhuacai@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>, tangyouling@loongson.cn
-References: <20230609090832.2131037-1-zhaotianrui@loongson.cn>
- <20230609090832.2131037-30-zhaotianrui@loongson.cn>
- <CAAhV-H4rzRZQpfxFBANFJyUshsNHYqmZmLnZfHA+McPyQ3m4-w@mail.gmail.com>
- <749abd01-c717-3a4c-238e-cda1bb74f25c@loongson.cn>
- <CAAhV-H6KtyaJ8rCt+ZkvOD0seN-PjULSVw+f+zSBw6=hkvyAGg@mail.gmail.com>
-From:   zhaotianrui <zhaotianrui@loongson.cn>
-Message-ID: <d9942e20-3c40-934e-9685-f63b4bedd95e@loongson.cn>
-Date:   Fri, 16 Jun 2023 11:52:49 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        with ESMTP id S229756AbjFPFeH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 01:34:07 -0400
+X-Greylist: delayed 498 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 15 Jun 2023 22:34:05 PDT
+Received: from h7.fbrelay.privateemail.com (h7.fbrelay.privateemail.com [162.0.218.230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 524DF1BE8;
+        Thu, 15 Jun 2023 22:34:05 -0700 (PDT)
+Received: from MTA-15-3.privateemail.com (unknown [198.54.122.141])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by h7.fbrelay.privateemail.com (Postfix) with ESMTPSA id 94A726045A;
+        Fri, 16 Jun 2023 01:25:45 -0400 (EDT)
+Received: from mta-15.privateemail.com (localhost [127.0.0.1])
+        by mta-15.privateemail.com (Postfix) with ESMTP id 5606218000B1;
+        Fri, 16 Jun 2023 01:25:43 -0400 (EDT)
+Received: from [192.168.2.177] (bras-base-toroon4332w-grc-19-174-93-80-116.dsl.bell.ca [174.93.80.116])
+        by mta-15.privateemail.com (Postfix) with ESMTPA id B4143180018C;
+        Fri, 16 Jun 2023 01:25:40 -0400 (EDT)
+Date:   Fri, 16 Jun 2023 01:25:33 -0400
+From:   Hamza Mahfooz <someguy@effective-light.com>
+Subject: KVM page-fault on Kernel 6.3.8
+To:     kvm@vger.kernel.org
+Cc:     regressions@lists.linux.dev, linux-kernel@vger.kernel.org
+Message-Id: <L2ZBWR.TERFR10NPZ281@effective-light.com>
+X-Mailer: geary/43.0
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H6KtyaJ8rCt+ZkvOD0seN-PjULSVw+f+zSBw6=hkvyAGg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID: AQAAf8DxVeSR3Itko9UcAA--.16617S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3GryDAFy7JF45Aw4fAF15WrX_yoW3GF18pr
-        sxAayxKr4kXry7Jw12q347WrnIy3s7tr17WF1rJw1xC3Wqyrn7JrnFqFy8uFykCryUAF18
-        ZF1UtasxCry5ArXCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-        xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-        AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-        AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-        8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_GFv_Wrylx2IqxVAqx4xG67
-        AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-        rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
-        v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4SoGDU
-        UUU
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+X-Virus-Scanned: ClamAV using ClamSMTP
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+I am seeing the following page-fault on the latest stable kernel:
 
-在 2023/6/16 上午10:59, Huacai Chen 写道:
-> On Fri, Jun 16, 2023 at 10:39 AM zhaotianrui <zhaotianrui@loongson.cn> wrote:
->>
->> 在 2023/6/15 下午5:42, Huacai Chen 写道:
->>> Hi, Tianrui,
->>>
->>> On Fri, Jun 9, 2023 at 5:09 PM Tianrui Zhao <zhaotianrui@loongson.cn> wrote:
->>>> Supplement kvm document about LoongArch-specific part, such as add
->>>> api introduction for GET/SET_ONE_REG, GET/SET_FPU, GET/SET_MP_STATE,
->>>> etc.
->>>>
->>>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
->>>> ---
->>>>    Documentation/virt/kvm/api.rst | 71 +++++++++++++++++++++++++++++-----
->>>>    1 file changed, 62 insertions(+), 9 deletions(-)
->>>>
->>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->>>> index add067793b90..ad8e13eab48d 100644
->>>> --- a/Documentation/virt/kvm/api.rst
->>>> +++ b/Documentation/virt/kvm/api.rst
->>>> @@ -416,6 +416,12 @@ Reads the general purpose registers from the vcpu.
->>>>           __u64 pc;
->>>>      };
->>>>
->>>> +  /* LoongArch */
->>>> +  struct kvm_regs {
->>> Add a " /* out (KVM_GET_REGS) / in (KVM_SET_REGS) */" line as others here?
->> Thanks, I will add this comment here.
->>
->> Tianrui Zhao
->>
->>>> +        unsigned long gpr[32];
->>>> +        unsigned long pc;
->>>> +  };
->>>> +
->>>>
->>>>    4.12 KVM_SET_REGS
->>>>    -----------------
->>>> @@ -506,7 +512,7 @@ translation mode.
->>>>    ------------------
->>>>
->>>>    :Capability: basic
->>>> -:Architectures: x86, ppc, mips, riscv
->>>> +:Architectures: x86, ppc, mips, riscv, loongarch
->>>>    :Type: vcpu ioctl
->>>>    :Parameters: struct kvm_interrupt (in)
->>>>    :Returns: 0 on success, negative on failure.
->>>> @@ -592,6 +598,14 @@ b) KVM_INTERRUPT_UNSET
->>>>
->>>>    This is an asynchronous vcpu ioctl and can be invoked from any thread.
->>>>
->>>> +LOONGARCH:
->>>> +^^^^^^^^^^
->>>> +
->>>> +Queues an external interrupt to be injected into the virtual CPU. A negative
->>>> +interrupt number dequeues the interrupt.
->>>> +
->>>> +This is an asynchronous vcpu ioctl and can be invoked from any thread.
->>>> +
->>>>
->>>>    4.17 KVM_DEBUG_GUEST
->>>>    --------------------
->>>> @@ -737,7 +751,7 @@ signal mask.
->>>>    ----------------
->>>>
->>>>    :Capability: basic
->>>> -:Architectures: x86
->>>> +:Architectures: x86, loongarch
->>>>    :Type: vcpu ioctl
->>>>    :Parameters: struct kvm_fpu (out)
->>>>    :Returns: 0 on success, -1 on error
->>>> @@ -746,7 +760,7 @@ Reads the floating point state from the vcpu.
->>>>
->>>>    ::
->>>>
->>>> -  /* for KVM_GET_FPU and KVM_SET_FPU */
->>>> +  /* x86: for KVM_GET_FPU and KVM_SET_FPU */
->>>>      struct kvm_fpu {
->>>>           __u8  fpr[8][16];
->>>>           __u16 fcw;
->>>> @@ -761,12 +775,22 @@ Reads the floating point state from the vcpu.
->>>>           __u32 pad2;
->>>>      };
->>>>
->>>> +  /* LoongArch: for KVM_GET_FPU and KVM_SET_FPU */
->>>> +  struct kvm_fpu {
->>>> +        __u32 fcsr;
->>>> +        __u32 none;
->>> Maybe use pad1 as x86 is better.
->>>
->>> Huacai
->> Thanks, this 'none' variable is meaningless, and I will remove it. As
->> this have already been removed in the actually kvm_fpu structure.
-> Why remove? I think it is for alignment, just like pad1 for x86.
->
-> Huacai
+BUG: unable to handle page fault for address: ffffb4ff0cd20034
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 10002a067 P4D 10002a067 PUD 0
+Oops: 0000 [#1] PREEMPT SMP NOPTI
+CPU: 7 PID: 2675 Comm: CPU 7/KVM Not tainted 6.3.8-arch1-1 #1 
+a1d299e746aebdb27c523dd3bd94aba6f54915c7
+Hardware name: ASUS System Product Name/ProArt X670E-CREATOR WIFI, BIOS 
+1303 04/27/2023
+RIP: 0010:try_grab_folio+0x14f/0x370
+Code: 83 f8 04 75 6f 44 89 ee 4c 89 e7 e8 6b bc 0b 00 84 c0 74 60 4c 8b 
+63 08 41 f6 c4 01 0f 85 b0 01 00 00 0f 1f 44 00 00 49 89 dc <41> 8b 44 
+24 34 85 c0 0f 88 f8 00 00 00 41 8b 44 24 34 85 c0 74 58
+RSP: 0018:ffff9fa98504b948 EFLAGS: 00010086
+RAX: 0000000000000002 RBX: fffff4ff0cd21480 RCX: 0000000000000000
+RDX: 0000000000000003 RSI: 0000000000000001 RDI: fffff4ff0cd21480
+RBP: 0000000000000000 R08: ffff8b2edb510980 R09: 00007f5624253000
+R10: 80000003348008e7 R11: 00007f5624253000 R12: ffffb4ff0cd20000
+R13: 0000000000000001 R14: 0000000000000003 R15: 0000000000000001
+FS: 00007f548a7fc6c0(0000) GS:ffff8b35f83c0000(0000) 
+knlGS:0000000000000000
+CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffb4ff0cd20034 CR3: 0000000113e70000 CR4: 0000000000750ee0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ ? __die+0x23/0x70
+ ? page_fault_oops+0x171/0x4e0
+ ? exc_page_fault+0x172/0x180
+ ? asm_exc_page_fault+0x26/0x30
+ ? try_grab_folio+0x14f/0x370
+ internal_get_user_pages_fast+0x883/0x1150
+ __iov_iter_get_pages_alloc+0xdd/0x780
+ ? kmem_cache_alloc+0x16f/0x330
+ ? bio_associate_blkg_from_css+0xcd/0x340
+ iov_iter_get_pages+0x1d/0x40
+ bio_iov_iter_get_pages+0xa1/0x480
+ __blkdev_direct_IO_async+0xc5/0x1b0
+ blkdev_read_iter+0x127/0x1d0
+ aio_read+0x132/0x210
+ ? io_submit_one+0x46a/0x8b0
+ io_submit_one+0x46a/0x8b0
+ ? kvm_arch_vcpu_put+0x128/0x190 [kvm 
+711ceda1c40511ce22d1f99f4e9e574def76b25e]
+ ? kvm_arch_vcpu_ioctl_run+0x579/0x1770 [kvm 
+711ceda1c40511ce22d1f99f4e9e574def76b25e]
+ __x64_sys_io_submit+0xad/0x190
+ do_syscall_64+0x5d/0x90
+ ? __x64_sys_ioctl+0xac/0xd0
+ ? syscall_exit_to_user_mode+0x1b/0x40
+ ? do_syscall_64+0x6c/0x90
+ ? syscall_exit_to_user_mode+0x1b/0x40
+ ? do_syscall_64+0x6c/0x90
+ ? syscall_exit_to_user_mode+0x1b/0x40
+ ? do_syscall_64+0x6c/0x90
+ ? syscall_exit_to_user_mode+0x1b/0x40
+ ? do_syscall_64+0x6c/0x90
+ ? do_syscall_64+0x6c/0x90
+ entry_SYSCALL_64_after_hwframe+0x72/0xdc
+RIP: 0033:0x7f57ac0912ed
+Code: 5d c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 
+f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 
+f0 ff ff 73 01 c3 48 8b 0d 3b 7a 0d 00 f7 d8 64 89 01 48
+RSP: 002b:00007f5427ab97b8 EFLAGS: 00000246 ORIG_RAX: 00000000000000d1
+RAX: ffffffffffffffda RBX: 00007f548a7fc1d0 RCX: 00007f57ac0912ed
+RDX: 00007f5427ab9800 RSI: 0000000000000001 RDI: 00007f57a9d24000
+RBP: 00007f57a9d24000 R08: 0000000000000001 R09: 0000000000000001
+R10: 00007f54740044f0 R11: 0000000000000246 R12: 0000000000000001
+R13: 0000000000000004 R14: 00007f5427ab9800 R15: 000000000000000e
+ </TASK>
+Modules linked in: hid_playstation led_class_multicolor ff_memless tun 
+snd_seq_dummy snd_hrtimer snd_seq xt_CHECKSUM xt_MASQUERADE 
+xt_conntrack ipt_REJECT nf_reject_ipv4 xt_tcpudp nft_compat 
+nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 
+nf_tables libcrc32c nfnetlink bridge stp llc vfat fat 
+snd_hda_codec_realtek snd_hda_codec_generic mt7921e snd_hda_codec_hdmi 
+mt7921_common snd_usb_audio intel_rapl_msr mt76_connac_lib 
+snd_hda_intel intel_rapl_common snd_intel_dspcfg mt76 snd_usbmidi_lib 
+btusb snd_intel_sdw_acpi edac_mce_amd snd_rawmidi btrtl snd_hda_codec 
+btbcm snd_seq_device btintel snd_hda_core kvm_amd mc snd_hwdep 
+eeepc_wmi btmtk snd_pcm asus_wmi kvm mac80211 bluetooth ledtrig_audio 
+atlantic snd_timer i8042 sparse_keymap libarc4 ecdh_generic rapl 
+platform_profile serio intel_wmi_thunderbolt i2c_piix4 wmi_bmof pcspkr 
+k10temp thunderbolt snd igc ucsi_acpi macsec soundcore cfg80211 
+typec_ucsi mousedev joydev typec roles rfkill gpio_amdpt acpi_cpufreq 
+gpio_generic mac_hid dm_multipath
+ crypto_user fuse loop bpf_preload ip_tables x_tables ext4 
+crc32c_generic crc16 mbcache jbd2 dm_crypt cbc encrypted_keys trusted 
+asn1_encoder tee dm_mod hid_logitech_hidpp hid_logitech_dj usbhid 
+amdgpu crct10dif_pclmul crc32_pclmul crc32c_intel polyval_clmulni 
+polyval_generic i2c_algo_bit drm_ttm_helper gf128mul nvme 
+ghash_clmulni_intel ttm sha512_ssse3 drm_buddy aesni_intel gpu_sched 
+crypto_simd nvme_core drm_display_helper cryptd ccp xhci_pci cec 
+nvme_common xhci_pci_renesas video wmi vfio_pci vfio_pci_core irqbypass 
+vfio_iommu_type1 vfio iommufd
+CR2: ffffb4ff0cd20034
+---[ end trace 0000000000000000 ]---
+RIP: 0010:try_grab_folio+0x14f/0x370
+Code: 83 f8 04 75 6f 44 89 ee 4c 89 e7 e8 6b bc 0b 00 84 c0 74 60 4c 8b 
+63 08 41 f6 c4 01 0f 85 b0 01 00 00 0f 1f 44 00 00 49 89 dc <41> 8b 44 
+24 34 85 c0 0f 88 f8 00 00 00 41 8b 44 24 34 85 c0 74 58
+RSP: 0018:ffff9fa98504b948 EFLAGS: 00010086
+RAX: 0000000000000002 RBX: fffff4ff0cd21480 RCX: 0000000000000000
+RDX: 0000000000000003 RSI: 0000000000000001 RDI: fffff4ff0cd21480
+RBP: 0000000000000000 R08: ffff8b2edb510980 R09: 00007f5624253000
+R10: 80000003348008e7 R11: 00007f5624253000 R12: ffffb4ff0cd20000
+R13: 0000000000000001 R14: 0000000000000003 R15: 0000000000000001
+FS: 00007f548a7fc6c0(0000) GS:ffff8b35f83c0000(0000) 
+knlGS:0000000000000000
+CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffb4ff0cd20034 CR3: 0000000113e70000 CR4: 0000000000750ee0
+PKRU: 55555554
+note: CPU 7/KVM[2675] exited with irqs disabled
 
-This 'none' variable is not for alignment but a unused register named 
-vcsr in kvm_fpu, so I think it could be removed.
+It seems to appear randomly, so bisecting it would probably be
+difficult. Also, as far as I can tell it seems to be a recent
+regression (i.e. it was introduced in one of the 6.3.y releases).
 
-Tianrui Zhao
-
->> Tianrui Zhao
->>
->>>> +        __u64 fcc;
->>>> +        struct kvm_fpureg {
->>>> +                __u64 val64[4];
->>>> +        }fpr[32];
->>>> +  };
->>>> +
->>>>
->>>>    4.23 KVM_SET_FPU
->>>>    ----------------
->>>>
->>>>    :Capability: basic
->>>> -:Architectures: x86
->>>> +:Architectures: x86, loongarch
->>>>    :Type: vcpu ioctl
->>>>    :Parameters: struct kvm_fpu (in)
->>>>    :Returns: 0 on success, -1 on error
->>>> @@ -775,7 +799,7 @@ Writes the floating point state to the vcpu.
->>>>
->>>>    ::
->>>>
->>>> -  /* for KVM_GET_FPU and KVM_SET_FPU */
->>>> +  /* x86: for KVM_GET_FPU and KVM_SET_FPU */
->>>>      struct kvm_fpu {
->>>>           __u8  fpr[8][16];
->>>>           __u16 fcw;
->>>> @@ -790,6 +814,16 @@ Writes the floating point state to the vcpu.
->>>>           __u32 pad2;
->>>>      };
->>>>
->>>> +  /* LoongArch: for KVM_GET_FPU and KVM_SET_FPU */
->>>> +  struct kvm_fpu {
->>>> +        __u32 fcsr;
->>>> +        __u32 none;
->> I will also remove this 'none' variable.
->>
->> Tianrui Zhao
->>
->>>> +        __u64 fcc;
->>>> +        struct kvm_fpureg {
->>>> +                __u64 val64[4];
->>>> +        }fpr[32];
->>>> +  };
->>>> +
->>>>
->>>>    4.24 KVM_CREATE_IRQCHIP
->>>>    -----------------------
->>>> @@ -1387,7 +1421,7 @@ documentation when it pops into existence).
->>>>    -------------------
->>>>
->>>>    :Capability: KVM_CAP_ENABLE_CAP
->>>> -:Architectures: mips, ppc, s390, x86
->>>> +:Architectures: mips, ppc, s390, x86, loongarch
->>>>    :Type: vcpu ioctl
->>>>    :Parameters: struct kvm_enable_cap (in)
->>>>    :Returns: 0 on success; -1 on error
->>>> @@ -1442,7 +1476,7 @@ for vm-wide capabilities.
->>>>    ---------------------
->>>>
->>>>    :Capability: KVM_CAP_MP_STATE
->>>> -:Architectures: x86, s390, arm64, riscv
->>>> +:Architectures: x86, s390, arm64, riscv, loongarch
->>>>    :Type: vcpu ioctl
->>>>    :Parameters: struct kvm_mp_state (out)
->>>>    :Returns: 0 on success; -1 on error
->>>> @@ -1460,7 +1494,7 @@ Possible values are:
->>>>
->>>>       ==========================    ===============================================
->>>>       KVM_MP_STATE_RUNNABLE         the vcpu is currently running
->>>> -                                 [x86,arm64,riscv]
->>>> +                                 [x86,arm64,riscv,loongarch]
->>>>       KVM_MP_STATE_UNINITIALIZED    the vcpu is an application processor (AP)
->>>>                                     which has not yet received an INIT signal [x86]
->>>>       KVM_MP_STATE_INIT_RECEIVED    the vcpu has received an INIT signal, and is
->>>> @@ -1516,11 +1550,14 @@ For riscv:
->>>>    The only states that are valid are KVM_MP_STATE_STOPPED and
->>>>    KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
->>>>
->>>> +On LoongArch, only the KVM_MP_STATE_RUNNABLE state is used to reflect
->>>> +whether the vcpu is runnable.
->>>> +
->>>>    4.39 KVM_SET_MP_STATE
->>>>    ---------------------
->>>>
->>>>    :Capability: KVM_CAP_MP_STATE
->>>> -:Architectures: x86, s390, arm64, riscv
->>>> +:Architectures: x86, s390, arm64, riscv, loongarch
->>>>    :Type: vcpu ioctl
->>>>    :Parameters: struct kvm_mp_state (in)
->>>>    :Returns: 0 on success; -1 on error
->>>> @@ -1538,6 +1575,9 @@ For arm64/riscv:
->>>>    The only states that are valid are KVM_MP_STATE_STOPPED and
->>>>    KVM_MP_STATE_RUNNABLE which reflect if the vcpu should be paused or not.
->>>>
->>>> +On LoongArch, only the KVM_MP_STATE_RUNNABLE state is used to reflect
->>>> +whether the vcpu is runnable.
->>>> +
->>>>    4.40 KVM_SET_IDENTITY_MAP_ADDR
->>>>    ------------------------------
->>>>
->>>> @@ -2839,6 +2879,19 @@ Following are the RISC-V D-extension registers:
->>>>      0x8020 0000 0600 0020 fcsr      Floating point control and status register
->>>>    ======================= ========= =============================================
->>>>
->>>> +LoongArch registers are mapped using the lower 32 bits. The upper 16 bits of
->>>> +that is the register group type.
->>>> +
->>>> +LoongArch csr registers are used to control guest cpu or get status of guest
->>>> +cpu, and they have the following id bit patterns::
->>>> +
->>>> +  0x9030 0000 0001 00 <reg:5> <sel:3>   (64-bit)
->>>> +
->>>> +LoongArch KVM control registers are used to implement some new defined functions
->>>> +such as set vcpu counter or reset vcpu, and they have the following id bit patterns::
->>>> +
->>>> +  0x9030 0000 0002 <reg:16>
->>>> +
->>>>
->>>>    4.69 KVM_GET_ONE_REG
->>>>    --------------------
->>>> --
->>>> 2.39.1
->>>>
->>>>
 
