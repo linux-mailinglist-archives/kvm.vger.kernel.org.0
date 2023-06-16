@@ -2,440 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF2D9733518
-	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 17:45:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDE1973355E
+	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 18:03:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345668AbjFPPpT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jun 2023 11:45:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55202 "EHLO
+        id S1344997AbjFPQDA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jun 2023 12:03:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234741AbjFPPoz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jun 2023 11:44:55 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F08B030E0;
-        Fri, 16 Jun 2023 08:44:49 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.43])
-        by gateway (Coremail) with SMTP id _____8DxyOlwg4xk9QUGAA--.12749S3;
-        Fri, 16 Jun 2023 23:44:48 +0800 (CST)
-Received: from [10.20.42.43] (unknown [10.20.42.43])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8CxhuRsg4xkqmsdAA--.18023S3;
-        Fri, 16 Jun 2023 23:44:45 +0800 (CST)
-Message-ID: <1486f6e9-3123-3c3e-806a-47b9463cb61a@loongson.cn>
-Date:   Fri, 16 Jun 2023 23:44:44 +0800
+        with ESMTP id S1344428AbjFPQCu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 12:02:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91AEA269E
+        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 09:02:46 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2EF81623C6
+        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 16:02:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 85C20C433CA
+        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 16:02:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686931365;
+        bh=1tA5puP1Z0RV9u5S9jOpo2y8yn1V+zvYjVRjNWSzpUI=;
+        h=From:To:Subject:Date:From;
+        b=OnAenTyHTk9kWo9oG5hbsHvLiSOC/BRSd3qeYdmrOlmV2VUCxz78VKTTqBLTns9fz
+         7WR/41DIY+o26pPA7ZQnUGdqpfz+rHegpqj7uLIEHvMo1dVv/4QEP/nF/Dyirhy6QU
+         JVr762G32p+vQrrFK2qi2Pkg4HnX5aCi3YGFfyfhyJnm/cU8xENPl5+zb1KyJ/iPdd
+         9PoXSb8udnuaKRsDRVuqdXgAJJvmuaW5q8OONuWCJLP8oJnb4GP6HN2NSvAODIZU1K
+         p4NUzrVYHfMufawXWvzYFXG7aot8tnqbOv7wqgBFInaRjXaZWGXIdxP9+qAz5m00kd
+         HpyIuXqJrXOTw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 67744C53BD1; Fri, 16 Jun 2023 16:02:45 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 217562] New: kernel NULL pointer dereference on deletion of
+ guest physical memory slot
+Date:   Fri, 16 Jun 2023 16:02:45 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: arnaud.lefebvre@clever-cloud.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression attachments.created
+Message-ID: <bug-217562-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v7 2/8] PCI/VGA: Deal only with VGA class devices
-Content-Language: en-US
-To:     Alex Deucher <alexdeucher@gmail.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Daniel Vetter <daniel@ffwll.ch>
-Cc:     Thomas Zimmermann <tzimmermann@suse.de>,
-        Sui Jingfeng <15330273260@189.cn>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        linux-fbdev@vger.kernel.org, kvm@vger.kernel.org,
-        nouveau@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        amd-gfx@lists.freedesktop.org, linux-pci@vger.kernel.org
-References: <20230613030151.216625-1-15330273260@189.cn>
- <20230613030151.216625-3-15330273260@189.cn>
- <dbf0d89f-717a-1f78-aef2-f30506751d4d@loongson.cn>
- <CADnq5_N6vVtzH6tzguZdHnP_TdRoG1G-Cr94O+X03jvtk=vhag@mail.gmail.com>
- <3c1c86ab-96ea-aa1c-c9c5-9a4012644fd6@loongson.cn>
- <CADnq5_Px-HWfwetv8LZsCnCeV7SMt_uqtLwMVK7648ZQiP2RCQ@mail.gmail.com>
- <f08b6a76-6c90-b59b-ff43-c779ef759d09@loongson.cn>
- <CADnq5_PFoM2O8mCd6+VFfu9Nc-Hg_HTnwEMxrq0FGRpva1kKiA@mail.gmail.com>
-From:   Sui Jingfeng <suijingfeng@loongson.cn>
-Organization: Loongson
-In-Reply-To: <CADnq5_PFoM2O8mCd6+VFfu9Nc-Hg_HTnwEMxrq0FGRpva1kKiA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8CxhuRsg4xkqmsdAA--.18023S3
-X-CM-SenderInfo: xvxlyxpqjiv03j6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3Zr4kXFW7uF1fWr1kJF47Awc_yoWkZFyDpF
-        W5GFW5tF4DJr1UCr12qw1UXFyYv34rJFy5Xr15Jw1Y9ws0yr1UXryrtr4UC347Jrn5GF12
-        vr4UJry7uF15ZagCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-        xVWxJr0_GcWln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-        xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
-        6r1DMcIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
-        1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxG
-        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4U
-        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07joc_-UUU
-        UU=
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217562
 
-On 2023/6/16 22:34, Alex Deucher wrote:
-> On Fri, Jun 16, 2023 at 10:22 AM Sui Jingfeng <suijingfeng@loongson.cn> wrote:
->>
->> On 2023/6/16 21:41, Alex Deucher wrote:
->>> On Fri, Jun 16, 2023 at 3:11 AM Sui Jingfeng <suijingfeng@loongson.cn> wrote:
->>>> Hi,
->>>>
->>>> On 2023/6/16 05:11, Alex Deucher wrote:
->>>>> On Wed, Jun 14, 2023 at 6:50 AM Sui Jingfeng <suijingfeng@loongson.cn> wrote:
->>>>>> Hi,
->>>>>>
->>>>>> On 2023/6/13 11:01, Sui Jingfeng wrote:
->>>>>>> From: Sui Jingfeng <suijingfeng@loongson.cn>
->>>>>>>
->>>>>>> Deal only with the VGA devcie(pdev->class == 0x0300), so replace the
->>>>>>> pci_get_subsys() function with pci_get_class(). Filter the non-PCI display
->>>>>>> device(pdev->class != 0x0300) out. There no need to process the non-display
->>>>>>> PCI device.
->>>>>>>
->>>>>>> Cc: Bjorn Helgaas <bhelgaas@google.com>
->>>>>>> Signed-off-by: Sui Jingfeng <suijingfeng@loongson.cn>
->>>>>>> ---
->>>>>>>      drivers/pci/vgaarb.c | 22 ++++++++++++----------
->>>>>>>      1 file changed, 12 insertions(+), 10 deletions(-)
->>>>>>>
->>>>>>> diff --git a/drivers/pci/vgaarb.c b/drivers/pci/vgaarb.c
->>>>>>> index c1bc6c983932..22a505e877dc 100644
->>>>>>> --- a/drivers/pci/vgaarb.c
->>>>>>> +++ b/drivers/pci/vgaarb.c
->>>>>>> @@ -754,10 +754,6 @@ static bool vga_arbiter_add_pci_device(struct pci_dev *pdev)
->>>>>>>          struct pci_dev *bridge;
->>>>>>>          u16 cmd;
->>>>>>>
->>>>>>> -     /* Only deal with VGA class devices */
->>>>>>> -     if ((pdev->class >> 8) != PCI_CLASS_DISPLAY_VGA)
->>>>>>> -             return false;
->>>>>>> -
->>>>>> Hi, here is probably a bug fixing.
->>>>>>
->>>>>> For an example, nvidia render only GPU typically has 0x0380.
->>>>>>
->>>>>> as its PCI class number, but render only GPU should not participate in
->>>>>> the arbitration.
->>>>>>
->>>>>> As it shouldn't snoop the legacy fixed VGA address.
->>>>>>
->>>>>> It(render only GPU) can not display anything.
->>>>>>
->>>>>>
->>>>>> But 0x0380 >> 8 = 0x03, the filter  failed.
->>>>>>
->>>>>>
->>>>>>>          /* Allocate structure */
->>>>>>>          vgadev = kzalloc(sizeof(struct vga_device), GFP_KERNEL);
->>>>>>>          if (vgadev == NULL) {
->>>>>>> @@ -1500,7 +1496,9 @@ static int pci_notify(struct notifier_block *nb, unsigned long action,
->>>>>>>          struct pci_dev *pdev = to_pci_dev(dev);
->>>>>>>          bool notify = false;
->>>>>>>
->>>>>>> -     vgaarb_dbg(dev, "%s\n", __func__);
->>>>>>> +     /* Only deal with VGA class devices */
->>>>>>> +     if (pdev->class != PCI_CLASS_DISPLAY_VGA << 8)
->>>>>>> +             return 0;
->>>>>> So here we only care 0x0300, my initial intent is to make an optimization,
->>>>>>
->>>>>> nowadays sane display graphic card should all has 0x0300 as its PCI
->>>>>> class number, is this complete right?
->>>>>>
->>>>>> ```
->>>>>>
->>>>>> #define PCI_BASE_CLASS_DISPLAY        0x03
->>>>>> #define PCI_CLASS_DISPLAY_VGA        0x0300
->>>>>> #define PCI_CLASS_DISPLAY_XGA        0x0301
->>>>>> #define PCI_CLASS_DISPLAY_3D        0x0302
->>>>>> #define PCI_CLASS_DISPLAY_OTHER        0x0380
->>>>>>
->>>>>> ```
->>>>>>
->>>>>> Any ideas ?
->>>>> I'm not quite sure what you are asking about here.
->>>> To be honest, I'm worried about the PCI devices which has a
->>>>
->>>> PCI_CLASS_DISPLAY_XGA as its PCI class number.
->>>>
->>>> As those devices are very uncommon in the real world.
->>>>
->>>>
->>>> $ find . -name "*.c" -type f | xargs grep "PCI_CLASS_DISPLAY_XGA"
->>>>
->>>>
->>>> Grep the "PCI_CLASS_DISPLAY_XGA" in the linux kernel tree got ZERO,
->>>>
->>>> there no code reference this macro. So I think it seems safe to ignore
->>>> the XGA ?
->>>>
->>>>
->>>> PCI_CLASS_DISPLAY_3D and PCI_CLASS_DISPLAY_OTHER are used to annotate
->>>> the render-only GPU.
->>>>
->>>> And render-only GPU can't decode the fixed VGA address space, it is safe
->>>> to ignore them.
->>>>
->>>>
->>>>>     For vga_arb, we
->>>>> only care about VGA class devices since those should be on the only
->>>>> ones that might have VGA routed to them.
->>>>>     However, as VGA gets deprecated,
->>>> We need the vgaarb for a system with multiple video card.
->>>>
->>>> Not only because some Legacy VGA devices implemented
->>>>
->>>> on PCI will typically have the same "hard-decoded" addresses;
->>>>
->>>> But also these video card need to participate in the arbitration,
->>>>
->>>> determine the default boot device.
->>> But couldn't the boot device be determined via what whatever resources
->>> were used by the pre-OS console?
->> I don't know what you are refer to by saying  pre-OS console, UEFI
->> SHELL,  UEFI GOP  or something like that.
->>
-> Right.  Before the OS loads the platform firmware generally sets up
-> something for display.  That could be GOP or vesa or some other
-> platform specific protocol.
->
->> If you are referring to the framebuffer driver which light up the screen
->> before the Linux kernel is loaded .
->>
->>
->> Then, what you have said is true,  the boot device is determined by the
->> pre-OS console.
->>
->> But the problem is how does the Linux kernel(vgaarb) could know which
->> one is the default boot device
->>
->> on a multiple GPU machine.  Relaying on the firmware fb's address and
->> size is what the mechanism
->>
->> we already in using.
-> Right.  It shouldn't need to depend on vgaarb.
->
->>
->>>    I feel like that should be separate from vgaarb.
->> Emm, this really deserved another patch, please ?
->>
->>>    vgaarb should handle PCI VGA routing and some other
->>> mechanism should be used to determine what device provided the pre-OS
->>> console.
->> If the new mechanism need the firmware changed, then this probably break
->> the old machine.
->>
->> Also, this probably will get all arch involved. to get the new mechanism
->> supported.
->>
->> The testing pressure and review power needed is quite large.
->>
->> drm/amdgpu and drm/radeon already being used on X86, ARM64,  Mips and
->> more arch...
->>
->> The reviewing process will became quite difficult then.
->>
->> vgaarb is really what we already in use, and being used more than ten
->> years ...
-> Yes, it works for x86 (and a few other platforms) today because of the
-> VGA legacy, so we can look at VGA routing to determine this.  But even
-> today, we don't need VGA routing to determine what was the primary
-> display before starting the OS.  We could probably have a platform
-> independent way to handle this by looking at the bread crumbs leftover
-> from the pre-OS environment.  E.g., for pre-UEFI platforms, we can
-> look at VGA routing.  For UEFI platforms we can look at what GOP left
-> us.  For various non-UEFI ARM/PPC/MIPS/etc. platforms we can look at
-> whatever breadcrumbs those pre-OS environments left.  That way when
-> VGA goes away, we can have a clean break and you won't need vgaarb if
-> the platform has no VGA devices.
+            Bug ID: 217562
+           Summary: kernel NULL pointer dereference on deletion of guest
+                    physical memory slot
+           Product: Virtualization
+           Version: unspecified
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: arnaud.lefebvre@clever-cloud.com
+        Regression: No
 
-Yes, I'm complete agree the spirit you are convey here.
+Created attachment 304438
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D304438&action=3Dedit
+dmesg logs with decoded backtrace
 
-Patch 5[1] of this series is actually does what you have told me just now.
+Hello,
 
-I put this function in video/aperture intended.
+We've been having this BUG for the last 6 months on both Intel and AMD hosts
+without being able to reproduce it on demand. The issue also occurs randoml=
+y:
 
+[Mon Jun 12 10:50:08 UTC 2023] BUG: kernel NULL pointer dereference, addres=
+s:
+0000000000000008
+[Mon Jun 12 10:50:08 UTC 2023] #PF: supervisor write access in kernel mode
+[Mon Jun 12 10:50:08 UTC 2023] #PF: error_code(0x0002) - not-present page
+[Mon Jun 12 10:50:08 UTC 2023] PGD 0 P4D 0
+[Mon Jun 12 10:50:08 UTC 2023] Oops: 0002 [#1] SMP NOPTI
+[Mon Jun 12 10:50:08 UTC 2023] CPU: 88 PID: 856806 Comm: qemu Kdump: loaded=
+ Not
+tainted 5.15.115 #1
+[Mon Jun 12 10:50:08 UTC 2023] Hardware name: MCT         Capri=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20
+         /Capri           , BIOS V2010 04/19/2022
+[Mon Jun 12 10:50:08 UTC 2023] RIP: 0010:__handle_changed_spte+0x5f3/0x670
+[Mon Jun 12 10:50:08 UTC 2023] Code: b8 a8 00 00 00 e9 4d be 0f 00 4d 8d be=
+ 60
+6a 01 00 4c 89 44 24 08 4c 89 ff e8 69 30 43 01 4c 8b 44 24 08 49 8b 40 08 =
+49
+8b 10 <48> 89 42 08 48 89 10 48 b8 00 01 00 00 00 00 ad de 49 89 00 48 83
+[Mon Jun 12 10:50:09 UTC 2023] RSP: 0018:ffffc90029477840 EFLAGS: 00010246
+[Mon Jun 12 10:50:09 UTC 2023] RAX: 0000000000000000 RBX: ffff89581a1f6000 =
+RCX:
+0000000000000000
+[Mon Jun 12 10:50:09 UTC 2023] RDX: 0000000000000000 RSI: 0000000000000002 =
+RDI:
+ffffc9002d858a60
+[Mon Jun 12 10:50:09 UTC 2023] RBP: 0000000000002200 R08: ffff893450426450 =
+R09:
+0000000000000002
+[Mon Jun 12 10:50:09 UTC 2023] R10: 0000000000000001 R11: 0000000000000001 =
+R12:
+0000000000000001
+[Mon Jun 12 10:50:09 UTC 2023] R13: 00000000000005a0 R14: ffffc9002d842000 =
+R15:
+ffffc9002d858a60
+[Mon Jun 12 10:50:09 UTC 2023] FS:  00007fdb6c1ff6c0(0000)
+GS:ffff89804d800000(0000) knlGS:0000000000000000
+[Mon Jun 12 10:50:09 UTC 2023] CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033
+[Mon Jun 12 10:50:09 UTC 2023] CR2: 0000000000000008 CR3: 0000005380534005 =
+CR4:
+0000000000770ee0
+[Mon Jun 12 10:50:09 UTC 2023] PKRU: 55555554
+[Mon Jun 12 10:50:09 UTC 2023] Call Trace:
+[Mon Jun 12 10:50:09 UTC 2023]  <TASK>
+[Mon Jun 12 10:50:09 UTC 2023]  ? __die+0x50/0x8d
+[Mon Jun 12 10:50:09 UTC 2023]  ? page_fault_oops+0x184/0x2f0
+[Mon Jun 12 10:50:09 UTC 2023]  ? exc_page_fault+0x535/0x7d0
+[Mon Jun 12 10:50:09 UTC 2023]  ? asm_exc_page_fault+0x22/0x30
+[Mon Jun 12 10:50:09 UTC 2023]  ? __handle_changed_spte+0x5f3/0x670
+[Mon Jun 12 10:50:09 UTC 2023]  ? update_load_avg+0x73/0x560
+[Mon Jun 12 10:50:09 UTC 2023]  __handle_changed_spte+0x3ae/0x670
+[Mon Jun 12 10:50:09 UTC 2023]  __handle_changed_spte+0x3ae/0x670
+[Mon Jun 12 10:50:09 UTC 2023]  zap_gfn_range+0x21a/0x320
+[Mon Jun 12 10:50:09 UTC 2023]  kvm_tdp_mmu_zap_invalidated_roots+0x50/0xa0
+[Mon Jun 12 10:50:09 UTC 2023]  kvm_mmu_zap_all_fast+0x178/0x1b0
+[Mon Jun 12 10:50:09 UTC 2023]  kvm_page_track_flush_slot+0x4f/0x90
+[Mon Jun 12 10:50:09 UTC 2023]  kvm_set_memslot+0x32b/0x8e0
+[Mon Jun 12 10:50:09 UTC 2023]  kvm_delete_memslot+0x58/0x80
+[Mon Jun 12 10:50:09 UTC 2023]  __kvm_set_memory_region+0x3c4/0x4a0
+[Mon Jun 12 10:50:09 UTC 2023]  kvm_vm_ioctl+0x3d1/0xea0
+[Mon Jun 12 10:50:09 UTC 2023]  __x64_sys_ioctl+0x8b/0xc0
+[Mon Jun 12 10:50:09 UTC 2023]  do_syscall_64+0x3f/0x90
+[Mon Jun 12 10:50:09 UTC 2023]  entry_SYSCALL_64_after_hwframe+0x61/0xcb
+[Mon Jun 12 10:50:09 UTC 2023] RIP: 0033:0x7fdc71e3a5ef
+[Mon Jun 12 10:50:09 UTC 2023] Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60=
+ c7
+04 24 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 =
+00
+0f 05 <89> c2 3d 00 f0 ff ff 77 18 48 8b 44 24 18 64 48 2b 04 25 28 00 00
+[Mon Jun 12 10:50:09 UTC 2023] RSP: 002b:00007fdb6c1fc920 EFLAGS: 00000246
+ORIG_RAX: 0000000000000010
+[Mon Jun 12 10:50:09 UTC 2023] RAX: ffffffffffffffda RBX: 000000004020ae46 =
+RCX:
+00007fdc71e3a5ef
+[Mon Jun 12 10:50:09 UTC 2023] RDX: 00007fdb6c1fca40 RSI: 000000004020ae46 =
+RDI:
+000000000000000d
+[Mon Jun 12 10:50:09 UTC 2023] RBP: 00007fdc714fa000 R08: 0000000000000002 =
+R09:
+00007fdc6f7e8e10
+[Mon Jun 12 10:50:09 UTC 2023] R10: 00007fdc724966e8 R11: 0000000000000246 =
+R12:
+00007fdb6c1fca40
+[Mon Jun 12 10:50:09 UTC 2023] R13: 0000000001000000 R14: 00007fdb68400000 =
+R15:
+00000000fd000000
+[Mon Jun 12 10:50:09 UTC 2023]  </TASK>
+[Mon Jun 12 10:50:09 UTC 2023] CR2: 0000000000000008
+[Mon Jun 12 10:50:09 UTC 2023] ---[ end trace 353e5ae9ef11cd10 ]---
+[Mon Jun 12 10:50:09 UTC 2023] RIP: 0010:__handle_changed_spte+0x5f3/0x670
+[Mon Jun 12 10:50:09 UTC 2023] Code: b8 a8 00 00 00 e9 4d be 0f 00 4d 8d be=
+ 60
+6a 01 00 4c 89 44 24 08 4c 89 ff e8 69 30 43 01 4c 8b 44 24 08 49 8b 40 08 =
+49
+8b 10 <48> 89 42 08 48 89 10 48 b8 00 01 00 00 00 00 ad de 49 89 00 48 83
+[Mon Jun 12 10:50:09 UTC 2023] RSP: 0018:ffffc90029477840 EFLAGS: 00010246
+[Mon Jun 12 10:50:09 UTC 2023] RAX: 0000000000000000 RBX: ffff89581a1f6000 =
+RCX:
+0000000000000000
+[Mon Jun 12 10:50:09 UTC 2023] RDX: 0000000000000000 RSI: 0000000000000002 =
+RDI:
+ffffc9002d858a60
+[Mon Jun 12 10:50:09 UTC 2023] RBP: 0000000000002200 R08: ffff893450426450 =
+R09:
+0000000000000002
+[Mon Jun 12 10:50:09 UTC 2023] R10: 0000000000000001 R11: 0000000000000001 =
+R12:
+0000000000000001
+[Mon Jun 12 10:50:09 UTC 2023] R13: 00000000000005a0 R14: ffffc9002d842000 =
+R15:
+ffffc9002d858a60
+[Mon Jun 12 10:50:09 UTC 2023] FS:  00007fdb6c1ff6c0(0000)
+GS:ffff89804d800000(0000) knlGS:0000000000000000
+[Mon Jun 12 10:50:09 UTC 2023] CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033
+[Mon Jun 12 10:50:09 UTC 2023] CR2: 0000000000000008 CR3: 0000005380534005 =
+CR4:
+0000000000770ee0
+[Mon Jun 12 10:50:09 UTC 2023] PKRU: 55555554
 
-Its does not rely on "VGA routing".
+We've seen this issue with kernel 5.15.115, 5.15.79, some versions between =
+the
+two, and probably a 5.15.4x (not sure here). At the beginning, only a few
+"identical" hosts (same hardware model) had this issue but since then we've
+also had crashes on hosts running different hardware. Unfortunately, it
+sometimes takes a  few weeks to trigger (last occurrence before this one wa=
+s 2
+months ago) and we can't really think of a way to reproduce this.
 
-Its also does not required the display device is PCI vga device.
+As you can see in the dmesg.log.gz file, this bug then creates soft lockups=
+ for
+other processes, I guess because they wait for some kind of lock that never
+gets released. The host then becomes more and more unresponsive as time goes
+by.
 
-Platform display controller drivers(drm/ingenic, drm/imx, drm/rockchip etc)
+Let me know if I can provide any other details.
 
-can also call this function(aperture_contain_firmware_fb).
+--=20
+You may reply to this email to add a comment.
 
-It only require the platform has a firmware framebuffer driver 
-registered successfully.
-
-Both EFIFB are SIMPLEFB will be OK.
-
-
-Beside  this, on systems with a platform display controller device and a 
-PCI GPU device,
-
-the current implement may always set the PCI GPU device as the default 
-boot device.
-
-This is probably true for the arm64 platform.
-
-
-On the past, loongson LS2K1000 SoC  has a platform display controller,
-
-the SoC also has PCIE controller, So drm/radeon driver can be used on it.
-
-When discrete card is mounted on the system, the discrete gpu is always been
-
-selected as the default boot device in the past.
-
-Because radeon gpu is more faster, this behavior meet the user's 
-expectation by accident.
-
-Its funny and lucky.
-
-
-But the problem is sometime you want to use the integrated one,
-
-for example in the process of developing driver, or discrete GPU driver
-
-has a bug panic X server,  the user(or the device driver) don't has the 
-right to override.
-
-
-Also with the current implement, even you disable the device driver.
-
-vgaarb still make the decision for you,  which made the X server 
-confused and panic.
-
-
-Say on machine with loongson integrated display controller and a rx5700  
-machine.
-
-By passing the cmdline "modprobe.blacklist=amdgpu", then vgaarb will not 
-agree.
-
-He still mark the rx5700 as the default boot device. Then X server crash.
-
-Because xf86-video-amdgpu(still loaded) has no root in the kernel do the 
-service for it.
-
-
-I'm doing such a thing because I need developing the drivers for this
-
-integrated display controller, but I don't want unmounted the discrete 
-GPU every time.
-
-Because I also need to do the PRIME buffer sharing developing and test.
-
-
-For AMD APU, this is also the case.
-
-R5 200GE and 3000G processor has the integrated GPU,
-
-On a machine with R5 5600G + nvidia gtx1060, a user may want to compare
-
-which GPU is more powerful. But with the current implement, both the device
-
-driver and the end user don't have a choice.
-
-
-This is the reason why patch 6, 7 and 8[2] of this series is introduced.
-
-Device driver could do the force override if it isn't the default device.
-
-(by introducing another kernel cmd line)
-
-Because of device driver(.ko) get loaded latter than vgaarb.
-
-
-So feel free send a reviewed by ?
-
-
-[1] https://patchwork.freedesktop.org/patch/542253/?series=119250&rev=1
-
-[2] https://patchwork.freedesktop.org/patch/542255/?series=119250&rev=1
-
-> Alex
->
->>
->>> Alex
->>>
->>>> Nowadays, the 'VGA devices' here is stand for the Graphics card
->>>>
->>>> which is capable of display something on the screen.
->>>>
->>>> We still need vgaarb to select the default boot device.
->>>>
->>>>
->>>>> you'll have more non VGA PCI classes for devices which
->>>>> could be the pre-OS console device.
->>>> Ah, we still want  do this(by applying this patch) first,
->>>>
->>>> and then we will have the opportunity to see who will crying if
->>>> something is broken. Will know more then.
->>>>
->>>> But drop this patch or revise it with more consideration is also
->>>> acceptable.
->>>>
->>>>
->>>> I asking about suggestion and/or review.
->>>>
->>>>> Alex
->>>>>
->>>>>>>          /* For now we're only intereted in devices added and removed. I didn't
->>>>>>>           * test this thing here, so someone needs to double check for the
->>>>>>> @@ -1510,6 +1508,8 @@ static int pci_notify(struct notifier_block *nb, unsigned long action,
->>>>>>>          else if (action == BUS_NOTIFY_DEL_DEVICE)
->>>>>>>                  notify = vga_arbiter_del_pci_device(pdev);
->>>>>>>
->>>>>>> +     vgaarb_dbg(dev, "%s: action = %lu\n", __func__, action);
->>>>>>> +
->>>>>>>          if (notify)
->>>>>>>                  vga_arbiter_notify_clients();
->>>>>>>          return 0;
->>>>>>> @@ -1534,8 +1534,8 @@ static struct miscdevice vga_arb_device = {
->>>>>>>
->>>>>>>      static int __init vga_arb_device_init(void)
->>>>>>>      {
->>>>>>> +     struct pci_dev *pdev = NULL;
->>>>>>>          int rc;
->>>>>>> -     struct pci_dev *pdev;
->>>>>>>
->>>>>>>          rc = misc_register(&vga_arb_device);
->>>>>>>          if (rc < 0)
->>>>>>> @@ -1545,11 +1545,13 @@ static int __init vga_arb_device_init(void)
->>>>>>>
->>>>>>>          /* We add all PCI devices satisfying VGA class in the arbiter by
->>>>>>>           * default */
->>>>>>> -     pdev = NULL;
->>>>>>> -     while ((pdev =
->>>>>>> -             pci_get_subsys(PCI_ANY_ID, PCI_ANY_ID, PCI_ANY_ID,
->>>>>>> -                            PCI_ANY_ID, pdev)) != NULL)
->>>>>>> +     while (1) {
->>>>>>> +             pdev = pci_get_class(PCI_CLASS_DISPLAY_VGA << 8, pdev);
->>>>>>> +             if (!pdev)
->>>>>>> +                     break;
->>>>>>> +
->>>>>>>                  vga_arbiter_add_pci_device(pdev);
->>>>>>> +     }
->>>>>>>
->>>>>>>          pr_info("loaded\n");
->>>>>>>          return rc;
->>>>>> --
->>>>>> Jingfeng
->>>>>>
->>>> --
->>>> Jingfeng
->>>>
->> --
->> Jingfeng
->>
--- 
-Jingfeng
-
+You are receiving this mail because:
+You are watching the assignee of the bug.=
