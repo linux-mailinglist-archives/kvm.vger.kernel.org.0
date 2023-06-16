@@ -2,168 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 238307326A8
-	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 07:34:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A2D37327C3
+	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 08:38:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232704AbjFPFeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jun 2023 01:34:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36754 "EHLO
+        id S239295AbjFPGiv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jun 2023 02:38:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229756AbjFPFeH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jun 2023 01:34:07 -0400
-X-Greylist: delayed 498 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 15 Jun 2023 22:34:05 PDT
-Received: from h7.fbrelay.privateemail.com (h7.fbrelay.privateemail.com [162.0.218.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 524DF1BE8;
-        Thu, 15 Jun 2023 22:34:05 -0700 (PDT)
-Received: from MTA-15-3.privateemail.com (unknown [198.54.122.141])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by h7.fbrelay.privateemail.com (Postfix) with ESMTPSA id 94A726045A;
-        Fri, 16 Jun 2023 01:25:45 -0400 (EDT)
-Received: from mta-15.privateemail.com (localhost [127.0.0.1])
-        by mta-15.privateemail.com (Postfix) with ESMTP id 5606218000B1;
-        Fri, 16 Jun 2023 01:25:43 -0400 (EDT)
-Received: from [192.168.2.177] (bras-base-toroon4332w-grc-19-174-93-80-116.dsl.bell.ca [174.93.80.116])
-        by mta-15.privateemail.com (Postfix) with ESMTPA id B4143180018C;
-        Fri, 16 Jun 2023 01:25:40 -0400 (EDT)
-Date:   Fri, 16 Jun 2023 01:25:33 -0400
-From:   Hamza Mahfooz <someguy@effective-light.com>
-Subject: KVM page-fault on Kernel 6.3.8
-To:     kvm@vger.kernel.org
-Cc:     regressions@lists.linux.dev, linux-kernel@vger.kernel.org
-Message-Id: <L2ZBWR.TERFR10NPZ281@effective-light.com>
-X-Mailer: geary/43.0
+        with ESMTP id S234096AbjFPGit (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 02:38:49 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 435E12726
+        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 23:38:48 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-98276e2a4bbso50336366b.0
+        for <kvm@vger.kernel.org>; Thu, 15 Jun 2023 23:38:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1686897527; x=1689489527;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bOtOw8QIOdNvfFnrXAoGaMKBuGCxmASOEQnYVJ4K1Tg=;
+        b=Q1aZpVKmqN5xSNZ34/bMRPaX9cC4iRi8Edd7og4tH9D3Rpyyg6RyaXvZM387s948Ty
+         DWAGauOazenhir7pzSNzZmPXMKEcipjBrEIaXuEQ1On5ePTX2ZWts9g7csXALU3gziYY
+         XIGr4H7EYSdn/oCwtjmkaIE1dJl7rJ6c3zwdDd69Fi8uS3q0obfKLGDeCpDGxulyYPkg
+         n7e/2dsI3xEMUbfEkK4n1yuvt9B6ccQ4BWV+vEw6Vnimj2jOSrAwGfwbg3BB0T9VKHE8
+         ctiIiKf3cneRn1rALMtU41LU79AkwmZVDZmuElPTOHjzVhtonV4qKUrCgrq00i2cE0l6
+         Mupg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686897527; x=1689489527;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bOtOw8QIOdNvfFnrXAoGaMKBuGCxmASOEQnYVJ4K1Tg=;
+        b=DF/YOZL3X6EwHKtXcYyywqUBDzGF4A3FystRTS4xGAiicWFy1XJ+bo2wpeLHIP4Nvf
+         jae826V8hb9Ib03rCYcxADZ7yBrp+gru5lox68kVN2CXovLeCqNj/kgnwI34zQyg4tWY
+         9JAyYVqIL7cT5WFOexCLC9kMgXx/4BlF+rnB6vrDOIeXt5G+qQs/wuZW/8A9mYkQcjuM
+         WdL20dCwjajJ8IRayYjoQFtI8bSZvXdUTUOQ+wVC81q/by6E3bomfjvjySzJC4RLdWuR
+         C8YTPyk0mKWvyp1cpJZ8Kfj6l2BEs1PEoyCvSEPEwMoPbeJY0rcXuv2QQ00/Q9dONngr
+         ENAw==
+X-Gm-Message-State: AC+VfDzwoTrw9B45I/NAq212gkAvQ3jt3rXAMNzECnPcnBV6E+/Xd9Mj
+        ih5DcGTQdTdrSyfcXj1V+RVWlQ==
+X-Google-Smtp-Source: ACHHUZ6SjpC/GY4C4spOblKkMr7C1oUxp/LK10lsRBqsFPrzn+mn468bcHT9wsRKNJqMrJaLLRwYEQ==
+X-Received: by 2002:a17:907:360e:b0:96a:4ea0:a1e7 with SMTP id bk14-20020a170907360e00b0096a4ea0a1e7mr1121375ejc.50.1686897526443;
+        Thu, 15 Jun 2023 23:38:46 -0700 (PDT)
+Received: from ?IPV6:2003:f6:af16:3b00:baca:76bd:5313:ec6c? (p200300f6af163b00baca76bd5313ec6c.dip0.t-ipconnect.de. [2003:f6:af16:3b00:baca:76bd:5313:ec6c])
+        by smtp.gmail.com with ESMTPSA id r23-20020a1709064d1700b009658475919csm10251142eju.188.2023.06.15.23.38.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jun 2023 23:38:45 -0700 (PDT)
+Message-ID: <fb38904e-f503-8d72-3031-c8f60421631d@grsecurity.net>
+Date:   Fri, 16 Jun 2023 08:38:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-X-Virus-Scanned: ClamAV using ClamSMTP
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [kvm-unit-tests PATCH v2 06/16] x86/run_in_user: Change type of
+ code label
+Content-Language: en-US, de-DE
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20230413184219.36404-1-minipli@grsecurity.net>
+ <20230413184219.36404-7-minipli@grsecurity.net> <ZIe5IpqsWhy8Xyt5@google.com>
+ <4de05ab1-e4d3-6693-a3c2-3f80236110bf@grsecurity.net>
+ <ZIsr1acxWTbtiWKg@google.com>
+From:   Mathias Krause <minipli@grsecurity.net>
+In-Reply-To: <ZIsr1acxWTbtiWKg@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I am seeing the following page-fault on the latest stable kernel:
+On 15.06.23 17:18, Sean Christopherson wrote:
+> On Wed, Jun 14, 2023, Mathias Krause wrote:
+>> On 13.06.23 02:32, Sean Christopherson wrote:
+>>> On Thu, Apr 13, 2023, Mathias Krause wrote:
+>>>> Use an array type to refer to the code label 'ret_to_kernel'.
+>>>
+>>> Why?  Taking the address of a label when setting what is effectively the target
+>>> of a branch seems more intuitive than pointing at an array (that's not an array).
+>>
+>> Well, the flexible array notation is what my understanding of referring
+>> to a "label" defined in ASM is. I'm probably biased, as that's a pattern
+>> used a lot in the Linux kernel but trying to look at the individual
+>> semantics may make it clearer why I prefer 'extern char sym[]' over
+>> 'extern char sym'.
+>>
+>> The current code refers to the code sequence starting at 'ret_to_kernel'
+>> by creating an alias of it's first instruction byte. However, we're not
+>> interested in the first instruction byte at all. We want a symbolic
+>> handle of the begin of that sequence, which might be an unknown number
+>> of bytes. But that's also a detail that doesn't matter. We only what to
+>> know the start. By referring to it as 'extern char' implies that there
+>> is at least a single byte. (Let's ignore the hair splitting about just
+>> taking the address vs. actually dereferencing it (which we do not).) By
+>> looking at another code example, that byte may not actually be there!
+>> >From x86/vmx_tests.c:
+>>
+>>   extern char vmx_mtf_pdpte_guest_begin;
+>>   extern char vmx_mtf_pdpte_guest_end;
+>>
+>>   asm("vmx_mtf_pdpte_guest_begin:\n\t"
+>>       "mov %cr0, %rax\n\t"    /* save CR0 with PG=1                 */
+>>       "vmcall\n\t"            /* on return from this CR0.PG=0       */
+>>       "mov %rax, %cr0\n\t"    /* restore CR0.PG=1 to enter PAE mode */
+>>       "vmcall\n\t"
+>>       "retq\n\t"
+>>       "vmx_mtf_pdpte_guest_end:");
+>>
+>> The byte referred to via &vmx_mtf_pdpte_guest_end may not even be mapped
+>> due to -ftoplevel-reorder possibly putting that asm block at the very
+>> end of the compilation unit.
+>>
+>> By using 'extern char []' instead this nastiness is avoided by referring
+>> to an unknown sized byte sequence starting at that symbol (with zero
+>> being a totally valid length). We don't need to know how many bytes
+>> follow the label. All we want to know is its address. And that's what an
+>> array type provides easily.
+> 
+> I think my hangup is that arrays make me think of data, not code.
 
-BUG: unable to handle page fault for address: ffffb4ff0cd20034
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD 10002a067 P4D 10002a067 PUD 0
-Oops: 0000 [#1] PREEMPT SMP NOPTI
-CPU: 7 PID: 2675 Comm: CPU 7/KVM Not tainted 6.3.8-arch1-1 #1 
-a1d299e746aebdb27c523dd3bd94aba6f54915c7
-Hardware name: ASUS System Product Name/ProArt X670E-CREATOR WIFI, BIOS 
-1303 04/27/2023
-RIP: 0010:try_grab_folio+0x14f/0x370
-Code: 83 f8 04 75 6f 44 89 ee 4c 89 e7 e8 6b bc 0b 00 84 c0 74 60 4c 8b 
-63 08 41 f6 c4 01 0f 85 b0 01 00 00 0f 1f 44 00 00 49 89 dc <41> 8b 44 
-24 34 85 c0 0f 88 f8 00 00 00 41 8b 44 24 34 85 c0 74 58
-RSP: 0018:ffff9fa98504b948 EFLAGS: 00010086
-RAX: 0000000000000002 RBX: fffff4ff0cd21480 RCX: 0000000000000000
-RDX: 0000000000000003 RSI: 0000000000000001 RDI: fffff4ff0cd21480
-RBP: 0000000000000000 R08: ffff8b2edb510980 R09: 00007f5624253000
-R10: 80000003348008e7 R11: 00007f5624253000 R12: ffffb4ff0cd20000
-R13: 0000000000000001 R14: 0000000000000003 R15: 0000000000000001
-FS: 00007f548a7fc6c0(0000) GS:ffff8b35f83c0000(0000) 
-knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffb4ff0cd20034 CR3: 0000000113e70000 CR4: 0000000000750ee0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? __die+0x23/0x70
- ? page_fault_oops+0x171/0x4e0
- ? exc_page_fault+0x172/0x180
- ? asm_exc_page_fault+0x26/0x30
- ? try_grab_folio+0x14f/0x370
- internal_get_user_pages_fast+0x883/0x1150
- __iov_iter_get_pages_alloc+0xdd/0x780
- ? kmem_cache_alloc+0x16f/0x330
- ? bio_associate_blkg_from_css+0xcd/0x340
- iov_iter_get_pages+0x1d/0x40
- bio_iov_iter_get_pages+0xa1/0x480
- __blkdev_direct_IO_async+0xc5/0x1b0
- blkdev_read_iter+0x127/0x1d0
- aio_read+0x132/0x210
- ? io_submit_one+0x46a/0x8b0
- io_submit_one+0x46a/0x8b0
- ? kvm_arch_vcpu_put+0x128/0x190 [kvm 
-711ceda1c40511ce22d1f99f4e9e574def76b25e]
- ? kvm_arch_vcpu_ioctl_run+0x579/0x1770 [kvm 
-711ceda1c40511ce22d1f99f4e9e574def76b25e]
- __x64_sys_io_submit+0xad/0x190
- do_syscall_64+0x5d/0x90
- ? __x64_sys_ioctl+0xac/0xd0
- ? syscall_exit_to_user_mode+0x1b/0x40
- ? do_syscall_64+0x6c/0x90
- ? syscall_exit_to_user_mode+0x1b/0x40
- ? do_syscall_64+0x6c/0x90
- ? syscall_exit_to_user_mode+0x1b/0x40
- ? do_syscall_64+0x6c/0x90
- ? syscall_exit_to_user_mode+0x1b/0x40
- ? do_syscall_64+0x6c/0x90
- ? do_syscall_64+0x6c/0x90
- entry_SYSCALL_64_after_hwframe+0x72/0xdc
-RIP: 0033:0x7f57ac0912ed
-Code: 5d c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 
-f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 
-f0 ff ff 73 01 c3 48 8b 0d 3b 7a 0d 00 f7 d8 64 89 01 48
-RSP: 002b:00007f5427ab97b8 EFLAGS: 00000246 ORIG_RAX: 00000000000000d1
-RAX: ffffffffffffffda RBX: 00007f548a7fc1d0 RCX: 00007f57ac0912ed
-RDX: 00007f5427ab9800 RSI: 0000000000000001 RDI: 00007f57a9d24000
-RBP: 00007f57a9d24000 R08: 0000000000000001 R09: 0000000000000001
-R10: 00007f54740044f0 R11: 0000000000000246 R12: 0000000000000001
-R13: 0000000000000004 R14: 00007f5427ab9800 R15: 000000000000000e
- </TASK>
-Modules linked in: hid_playstation led_class_multicolor ff_memless tun 
-snd_seq_dummy snd_hrtimer snd_seq xt_CHECKSUM xt_MASQUERADE 
-xt_conntrack ipt_REJECT nf_reject_ipv4 xt_tcpudp nft_compat 
-nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 
-nf_tables libcrc32c nfnetlink bridge stp llc vfat fat 
-snd_hda_codec_realtek snd_hda_codec_generic mt7921e snd_hda_codec_hdmi 
-mt7921_common snd_usb_audio intel_rapl_msr mt76_connac_lib 
-snd_hda_intel intel_rapl_common snd_intel_dspcfg mt76 snd_usbmidi_lib 
-btusb snd_intel_sdw_acpi edac_mce_amd snd_rawmidi btrtl snd_hda_codec 
-btbcm snd_seq_device btintel snd_hda_core kvm_amd mc snd_hwdep 
-eeepc_wmi btmtk snd_pcm asus_wmi kvm mac80211 bluetooth ledtrig_audio 
-atlantic snd_timer i8042 sparse_keymap libarc4 ecdh_generic rapl 
-platform_profile serio intel_wmi_thunderbolt i2c_piix4 wmi_bmof pcspkr 
-k10temp thunderbolt snd igc ucsi_acpi macsec soundcore cfg80211 
-typec_ucsi mousedev joydev typec roles rfkill gpio_amdpt acpi_cpufreq 
-gpio_generic mac_hid dm_multipath
- crypto_user fuse loop bpf_preload ip_tables x_tables ext4 
-crc32c_generic crc16 mbcache jbd2 dm_crypt cbc encrypted_keys trusted 
-asn1_encoder tee dm_mod hid_logitech_hidpp hid_logitech_dj usbhid 
-amdgpu crct10dif_pclmul crc32_pclmul crc32c_intel polyval_clmulni 
-polyval_generic i2c_algo_bit drm_ttm_helper gf128mul nvme 
-ghash_clmulni_intel ttm sha512_ssse3 drm_buddy aesni_intel gpu_sched 
-crypto_simd nvme_core drm_display_helper cryptd ccp xhci_pci cec 
-nvme_common xhci_pci_renesas video wmi vfio_pci vfio_pci_core irqbypass 
-vfio_iommu_type1 vfio iommufd
-CR2: ffffb4ff0cd20034
----[ end trace 0000000000000000 ]---
-RIP: 0010:try_grab_folio+0x14f/0x370
-Code: 83 f8 04 75 6f 44 89 ee 4c 89 e7 e8 6b bc 0b 00 84 c0 74 60 4c 8b 
-63 08 41 f6 c4 01 0f 85 b0 01 00 00 0f 1f 44 00 00 49 89 dc <41> 8b 44 
-24 34 85 c0 0f 88 f8 00 00 00 41 8b 44 24 34 85 c0 74 58
-RSP: 0018:ffff9fa98504b948 EFLAGS: 00010086
-RAX: 0000000000000002 RBX: fffff4ff0cd21480 RCX: 0000000000000000
-RDX: 0000000000000003 RSI: 0000000000000001 RDI: fffff4ff0cd21480
-RBP: 0000000000000000 R08: ffff8b2edb510980 R09: 00007f5624253000
-R10: 80000003348008e7 R11: 00007f5624253000 R12: ffffb4ff0cd20000
-R13: 0000000000000001 R14: 0000000000000003 R15: 0000000000000001
-FS: 00007f548a7fc6c0(0000) GS:ffff8b35f83c0000(0000) 
-knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffb4ff0cd20034 CR3: 0000000113e70000 CR4: 0000000000750ee0
-PKRU: 55555554
-note: CPU 7/KVM[2675] exited with irqs disabled
+I can say the same for 'extern char' -- that's clearly data, not even
+r/o data, less so .text ;)
 
-It seems to appear randomly, so bisecting it would probably be
-difficult. Also, as far as I can tell it seems to be a recent
-regression (i.e. it was introduced in one of the 6.3.y releases).
+>                                                                    I wouldn't
+> object if this were new code, but I dislike changing existing code to something
+> that's arguably just as flawed.
 
+Fair enough.
 
+> What if we declare the label as a function?  That's not exactly correct either,
+> but IMO it's closer to the truth, and let's us document that the kernel trampoline
+> has a return value, i.e. preserves/outputs RAX.
+
+No, please don't. It's *not* a function, not at all. First thing that
+code block does is switching the stack, wich is already a bummer. But it
+also has no return instruction, making it fall-through to the middle of
+run_in_user() and execute code out of context. It's really just a label
+to mark the beginning of a code sequence we have to care about.
+
+Now, we do not want to ever call ret_to_kernel() from C, but declaring
+it as a function just feels way more worse than having a "wrong" extern
+char declaration.
+
+So, let's leave the code as-is. It's not broken, just imperfect.
+
+> 
+> diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
+> index c3ec0ad7..a46a369a 100644
+> --- a/lib/x86/usermode.c
+> +++ b/lib/x86/usermode.c
+> @@ -31,17 +31,18 @@ static void restore_exec_to_jmpbuf_exception_handler(struct ex_regs *regs)
+>  #endif
+>  }
+>  
+> +uint64_t ret_to_kernel(void);
+> +
+>  uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
+>                 uint64_t arg1, uint64_t arg2, uint64_t arg3,
+>                 uint64_t arg4, bool *raised_vector)
+>  {
+> -       extern char ret_to_kernel;
+>         volatile uint64_t rax = 0;
+>         static unsigned char user_stack[USERMODE_STACK_SIZE];
+>         handler old_ex;
+>  
+>         *raised_vector = 0;
+> -       set_idt_entry(RET_TO_KERNEL_IRQ, &ret_to_kernel, 3);
+> +       set_idt_entry(RET_TO_KERNEL_IRQ, ret_to_kernel, 3);
+>         old_ex = handle_exception(fault_vector,
+>                                   restore_exec_to_jmpbuf_exception_handler);
+>  
+> 
