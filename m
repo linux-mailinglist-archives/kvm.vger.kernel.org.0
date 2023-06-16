@@ -2,108 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1BEF732BBD
-	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 11:31:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A008E732BC8
+	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 11:31:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343914AbjFPJbH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jun 2023 05:31:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42302 "EHLO
+        id S1344253AbjFPJbU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jun 2023 05:31:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344734AbjFPJaL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jun 2023 05:30:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A0BB44A3
-        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 02:28:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686907681;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=klrOECQICZynP7hLL56x1E0j6YPlyVxqWgkAdUn8igo=;
-        b=JlrJO/l7/n1Y6fUlZgRMjx1eff1a5luQYF4DjZTuEkhQMgOyj/kPj+UAV6q/9uQKvjTi+g
-        NXBvD5tSKgaqgn4CHB6dulw201k/FG6KOoYdyDLEVMW+nvpNtIATf1AsN8bUtw4zpAx2NT
-        3jn/a0Hs5cq6GYQfZePg5fUhNVw+k94=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-124-LmxsdaiNNOmz1zLcds_ErA-1; Fri, 16 Jun 2023 05:27:58 -0400
-X-MC-Unique: LmxsdaiNNOmz1zLcds_ErA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2B24F85A5AA;
-        Fri, 16 Jun 2023 09:27:58 +0000 (UTC)
-Received: from t480s.fritz.box (unknown [10.39.194.44])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BF9411121314;
-        Fri, 16 Jun 2023 09:27:55 +0000 (UTC)
-From:   David Hildenbrand <david@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Michal Privoznik <mprivozn@redhat.com>,
-        =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org
-Subject: [PATCH v1 15/15] virtio-mem: Mark memslot alias memory regions unmergeable
-Date:   Fri, 16 Jun 2023 11:26:54 +0200
-Message-Id: <20230616092654.175518-16-david@redhat.com>
-In-Reply-To: <20230616092654.175518-1-david@redhat.com>
-References: <20230616092654.175518-1-david@redhat.com>
+        with ESMTP id S1343872AbjFPJat (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 05:30:49 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A11CC2959;
+        Fri, 16 Jun 2023 02:30:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686907844; x=1718443844;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=rcbWoJuquNvTPErXmQhigejML4bIMzlFqoFGfaEhre4=;
+  b=h8U1qHwuKxOV8usooSfHG3f5Cr8z8e01prvvylsNlIA10cnn2U5VsBzj
+   vcK7J8uV9buPnMac5OQmK7/Rx2q1YvkJo7vj+oOAQ5x8UX1pA1q9DzD1U
+   btQkCMGqXNaoatSOFdqzME5nIIxohBEY837tt/BdrD9yh7GOiEQdxbIMQ
+   8aPLiBuSERgGDLUeAqVal+pm4z2v8+FxmGVbM5MAR6XsuCDDY2HFv1u+O
+   5Ac6+c/PQgES8xTk7gbBYHbI1eKks7Sn0as1UewQdJIJ333NmbiMy/9BO
+   QUS2F0/qUWMiJoGrsx/Pew3T0MG5PQqesU7QBDkC/B5w1Ot9xE6/DkmNZ
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="387863415"
+X-IronPort-AV: E=Sophos;i="6.00,247,1681196400"; 
+   d="scan'208";a="387863415"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2023 02:30:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="742601899"
+X-IronPort-AV: E=Sophos;i="6.00,247,1681196400"; 
+   d="scan'208";a="742601899"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga008.jf.intel.com with ESMTP; 16 Jun 2023 02:30:43 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
+Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+        yi.l.liu@intel.com, yi.y.sun@linux.intel.com, peterx@redhat.com,
+        jasowang@redhat.com, shameerali.kolothum.thodi@huawei.com,
+        lulu@redhat.com, suravee.suthikulpanit@amd.com,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
+        clegoate@redhat.com
+Subject: [PATCH v8 00/10] Enhance vfio PCI hot reset for vfio cdev device
+Date:   Fri, 16 Jun 2023 02:30:32 -0700
+Message-Id: <20230616093042.65094-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's mark the memslot alias memory regions as unmergable, such that
-flatview and vhost won't merge adjacent memory region aliases and we can
-atomically map/unmap individual aliases without affecting adjacent
-alias memory regions.
+VFIO_DEVICE_PCI_HOT_RESET requires user to pass an array of group fds
+to prove that it owns all devices affected by resetting the calling
+device. While for cdev devices, user can use an iommufd-based ownership
+checking model and invoke VFIO_DEVICE_PCI_HOT_RESET with a zero-length
+fd array.
 
-This fixes issues with vhost and vfio (which do not support atomic memslot
-updates) and avoids the temporary removal of large memslots, which
-can be an expensive operation. For example, vfio might have to unpin +
-repin a lot of memory, which is undesired.
+This series extends VFIO_DEVICE_GET_PCI_HOT_RESET_INFO to check ownership
+and return the check result and the devid of affected devices to user. In
+the end, extends the VFIO_DEVICE_PCI_HOT_RESET to accept zero-length fd
+array for hot-reset with cdev devices.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/virtio/virtio-mem.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+The new hot reset method and updated _INFO ioctl are tested with the
+below qemu:
 
-diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-index 516370067a..cccd834466 100644
---- a/hw/virtio/virtio-mem.c
-+++ b/hw/virtio/virtio-mem.c
-@@ -955,6 +955,12 @@ static void virtio_mem_prepare_memslots(VirtIOMEM *vmem)
-         memory_region_init_alias(&vmem->memslots[idx], OBJECT(vmem), name,
-                                  &vmem->memdev->mr, memslot_offset,
-                                  memslot_size);
-+        /*
-+         * We want to be able to atomically and efficiently activate/deactivate
-+         * individual memslots without affecting adjacent memslots in memory
-+         * notifiers.
-+         */
-+        memory_region_set_unmergeable(&vmem->memslots[idx], true);
-     }
- }
- 
+https://github.com/yiliu1765/qemu/tree/iommufd_rfcv4.mig.reset.v4_var3
+(requires to test with the cdev kernel)
+
+Change log:
+
+v8:
+ - Add r-b from Jason to patch 03, 04, 05, 07, 09 of v7
+ - Add a patch to copy the per-device hot-reset structure to user during the
+   device loop instead of storing them in a buffer and copy all the contents
+   in one copy, this avoids an extra loop to count device and also avoids
+   allocating a temporay buffer for it. (Jason)
+ - Rename vfio_iommufd_device_hot_reset_devid() to be vfio_iommufd_get_dev_id()
+   and refine its return value for the case no valid ID can be returned. Hence
+   make it a general helper to get ID for a device. (Alex, Jason)
+ - Remove iommufd_ctx_has_group() CONIFG_IOMMUFD disabled stub as this API is
+   called in iommufd specific code which is compiled when CONFIG_IOMMU is
+   enabled. (Alex)
+ - Reaffirming Yanting's t-b (Tested NIC passthrough on Intel platform. mainly
+   regression tests)
+
+v7: https://lore.kernel.org/kvm/20230602121515.79374-1-yi.l.liu@intel.com/
+ - Drop noiommu support (patch 01 of v6 is dropped)
+ - Remove helpers to get devid and ictx for iommufd_access
+ - Document the dev_set representative requirement in the
+   VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for the cdev opened device (Alex)
+ - zero-length fd array approach is only for cdev opened device (Alex)
+
+v6: https://lore.kernel.org/kvm/20230522115751.326947-1-yi.l.liu@intel.com/
+ - Remove noiommu_access, reuse iommufd_access instead (Alex)
+ - vfio_iommufd_physical_ictx -> vfio_iommufd_device_ictx
+ - vfio_iommufd_physical_devid -> vfio_iommufd_device_hot_reset_devid
+ - Refine logic in patch 9 and 10 of v5, no uapi change. (Alex)
+ - Remove lockdep asset in vfio_pci_is_device_in_set (Cédric)
+ - Add t-b from Terrence (Tested GVT-g / GVT-d VFIO legacy mode / compat mode
+   / cdev mode, including negative tests. No regression be introduced.)
+
+v5: https://lore.kernel.org/kvm/20230513132136.15021-1-yi.l.liu@intel.com/
+ - Drop patch 01 of v4 (Alex)
+ - Create noiommu_access for noiommu devices (Jason)
+ - Reserve all negative iommufd IDs, hence VFIO can encode negative
+   values (Jason)
+ - Make vfio_iommufd_physical_devid() return -EINVAL if it's not called
+   with a physical device or a noiommu device.
+ - Add vfio_find_device_in_devset() in vfio_main.c (Alex)
+ - Add iommufd_ctx_has_group() to replace vfio_devset_iommufd_has_group().
+   Reason: vfio_devset_iommufd_has_group() only loops the devices within
+   the given devset to check the iommufd an iommu_group, but an iommu_group
+   can span into multiple devsets. So if failed to find the group in a
+   devset doesn't mean the group is not owned by the iommufd. So here either
+   needs to search all the devsets or add an iommufd API to check it. It
+   appears an iommufd API makes more sense.
+ - Adopt suggestions from Alex on patch 08 and 09 of v4, refine the hot-reset
+   uapi description and minor tweaks
+ - Use bitfields for bool members (Alex)
+
+v4: https://lore.kernel.org/kvm/20230426145419.450922-1-yi.l.liu@intel.com/
+ - Rename the patch series subject
+ - Patch 01 is moved from the cdev series
+ - Patch 02, 06 are new per review comments in v3
+ - Patch 03/04/05/07/08/09 are from v3 with updates
+
+v3: https://lore.kernel.org/kvm/20230401144429.88673-1-yi.l.liu@intel.com/
+ - Remove the new _INFO ioctl of v2, extend the existing _INFO ioctl to
+   report devid (Alex)
+ - Add r-b from Jason
+ - Add t-b from Terrence Xu and Yanting Jiang (mainly regression test)
+
+v2: https://lore.kernel.org/kvm/20230327093458.44939-1-yi.l.liu@intel.com/
+ - Split the patch 03 of v1 to be 03, 04 and 05 of v2 (Jaon)
+ - Add r-b from Kevin and Jason
+ - Add patch 10 to introduce a new _INFO ioctl for the usage of device
+   fd passing usage in cdev path (Jason, Alex)
+
+v1: https://lore.kernel.org/kvm/20230316124156.12064-1-yi.l.liu@intel.com/
+
+Regards,
+	Yi Liu
+
+Yi Liu (10):
+  vfio/pci: Update comment around group_fd get in
+    vfio_pci_ioctl_pci_hot_reset()
+  vfio/pci: Move the existing hot reset logic to be a helper
+  iommufd: Reserve all negative IDs in the iommufd xarray
+  iommufd: Add iommufd_ctx_has_group()
+  iommufd: Add helper to retrieve iommufd_ctx and devid
+  vfio: Mark cdev usage in vfio_device
+  vfio: Add helper to search vfio_device in a dev_set
+  vfio/pci: Extend VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for vfio device
+    cdev
+  vfio/pci: Copy hot-reset device info to userspace in the devices loop
+  vfio/pci: Allow passing zero-length fd array in
+    VFIO_DEVICE_PCI_HOT_RESET
+
+ drivers/iommu/iommufd/device.c   |  42 ++++++
+ drivers/iommu/iommufd/main.c     |   2 +-
+ drivers/vfio/iommufd.c           |  44 ++++++
+ drivers/vfio/pci/vfio_pci_core.c | 250 +++++++++++++++++++------------
+ drivers/vfio/vfio_main.c         |  15 ++
+ include/linux/iommufd.h          |   5 +
+ include/linux/vfio.h             |  22 +++
+ include/uapi/linux/vfio.h        |  71 ++++++++-
+ 8 files changed, 352 insertions(+), 99 deletions(-)
+
 -- 
-2.40.1
+2.34.1
 
