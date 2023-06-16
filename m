@@ -2,69 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2419A7337EA
-	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 20:11:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BECD67337ED
+	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 20:11:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232446AbjFPSLJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jun 2023 14:11:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47302 "EHLO
+        id S242470AbjFPSLx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jun 2023 14:11:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230327AbjFPSLH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jun 2023 14:11:07 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EED0626AF
-        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 11:11:03 -0700 (PDT)
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35GCiYhN024667;
-        Fri, 16 Jun 2023 18:10:33 GMT
+        with ESMTP id S230045AbjFPSLw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 14:11:52 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D28A83589
+        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 11:11:50 -0700 (PDT)
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35GCi5T8026547;
+        Fri, 16 Jun 2023 18:11:11 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
  subject : to : cc : references : from : in-reply-to : content-type :
  content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=sr7yE+VkPEyRrrrXyQzP/yo9AVKB5rHT9piW2BcUj6k=;
- b=nucUL2fAVRIX+kb/CiCEbvWfGGEEO10qZ8JuvrUUN+59Yp6zgxCc7IGk0ZlUkwFqBfQG
- t11ZvZ+YpBtkjtckkWwIywQWNWJDmKw8FCWMVuVer0w9+CuYstmOcLwvQz0y62sWFYML
- gVYp+9qP0qUgY6wEOI08+A5fopBEUnK0JO/nb5bLCdUcN4U66LiRKsHl8Ec6BZSK2puc
- deMJo5pxfxTpVZIKusMBrFbRFOhkDwZFBzNTx3wxODVJwY0sg+wKhLVJX7Icv6VmgHo0
- 0U1udUGuvlrLrNQZZAuoCYWBrJ3CCG/oQEWKZLtKxgR83Y4y3gArmJrQaPndI5UmNoB8 qA== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3r4hquvu5r-1
+ bh=pH3otvl11JNj1TuptcdzxizNGXqkDBF53XlCNt1H2S8=;
+ b=o+Q8cz09+y5Uut2i3o/r7ug8EgSUG+0iJ1lUnZ6zLpBmNqke6JruN0fnqsNFOZunCcBP
+ f+98GoB0PIr6zyJMlj7JkI4qAtv6bceT9EhhlrtqvFONq7R9TVmKF/hQSpNHKVcUg+n2
+ GXT2ZYbll2Zk2W82QGtjBrdp6hC3q99JmZ58em076b7tf3FhtrjGjzv6KXZlSYp+CxJW
+ aRjmEX9z1+f9e+p2q1xnzIHWGCNmBEjAwKKPR973MhMbSIyQaTW/A8kiI6UwMbDUBN/o
+ Nvq7wrIjO8WNj8S1ZqoU8ZQOL88CC7C+TdhQKozIcz4QSBOENjNztY+iweqQeB4pYong bA== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3r4fy3msxg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 16 Jun 2023 18:10:33 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 35GGGReM040492;
-        Fri, 16 Jun 2023 18:10:32 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2104.outbound.protection.outlook.com [104.47.58.104])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3r4fm88719-1
+        Fri, 16 Jun 2023 18:11:11 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 35GHv4Uk038876;
+        Fri, 16 Jun 2023 18:11:10 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2168.outbound.protection.outlook.com [104.47.58.168])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3r4fm895y1-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 16 Jun 2023 18:10:32 +0000
+        Fri, 16 Jun 2023 18:11:10 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CYjuO+NwtvjqivfDmhny5LoYmbwZGw+LvuZRReCvxvhPH5OTf7TKsAUY2QDk6mGMqkzWIW7/mIpyMWarAQ4t0l5U40U9U/BR8RWu6nBuTWDlNkPggSlWQPR8pzuqlyFPQcWQKQva7hVbTer51KinKm47gvjGcW4slXUNTmeP7ylyLrZDpj4uR/yWQtx/X6ozp0AP9kZ6SYGsdH+Jnr5CCALh7TpEdFNLSbyXfdrO8VOZKazITD6EYYx0dau15USDdb33YI43Va8MlsQZ3Zq4B69IikquOIsArXtoGFEbutuQjfCrkG1PNkJbF64NeCK4A3ewth1XyEbjHKnYf415BA==
+ b=M829ILrvO7VzWz0VftabmMX6KH7LhoX1PK6p1UKWLO9hVY/w/Hmmd/yU5Vvx7+3SNszYkdMQ8Na5poPVXxHCdDvQIkGKlOUY+hqGnCcff2OOUpQ9Yr7xF+5VnCyObLVegTLy5l6gM+8OWlM8a7XmxUUAJgkcUaZ5XEn5yaPZ9VduKnyosybc1PtI3GJcQlIvWgnwzfKUKmGtaJpMwE29NlcUr0diIrfxLHgG1l6dSCPNWzf7H6OpCtq9jxgT82GUehnxOX0hdrxGhPWfmfo3sa+e6AtGthIOK++ID66u+dZDndNB35BWq3v2iJ21F6nILTZsb6RWY9e2LcsHw5Vn8Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sr7yE+VkPEyRrrrXyQzP/yo9AVKB5rHT9piW2BcUj6k=;
- b=jisc8n2Fn7V/i3EWfi9paCR4Wqsb4K4a8bsl6p9D+H3vxn/DJb8x/ypWuUy2qpOsiz0rvew1YEDPsFBAHnjdCwid8PIUtwez9AVTwavXVISMx+OyerDMv7rWq9R59K1YPmufFr2fuYpRl6HJi0AqlborS5Mmy+Ah1vAYq3fdsow7m2jbLiR5int4ZsVX487l6Ans0vEeIFZFEKQcySo08AWLcb3CDg24cP8A21BVQUupzi7A9Tq39KzPgDdz1RljRNmKQd5SeHSjXS08leikqO+8D328UIIC6SrCw8PWGwMoqfOUUCv4GSIS4fFlKGL9XoUbUIATe5oTgfxfArAVNA==
+ bh=pH3otvl11JNj1TuptcdzxizNGXqkDBF53XlCNt1H2S8=;
+ b=Yu6sVSnYY+2K/q0ewgEJN35kxex7Q7d1CkNog0CLnRJkym0SzuY2qr5YcrqIn6PntwNP9ocSk6nyBg5FAE3QEhK88YqM/LbPE2IHzCyCuouIzNevXYQInJ9na9BdiP4zJVpu9DaZIfo9uxDoApJRTGY2uU/yYhEdWFfzxopRjb5RreD76AvBDQ3CxY241xmTCQsX52HvNGLbWcwliUrah/91ewouJL9ymAPZ/qdU43qEH63KmwMLf0kiyRzZSLmMsbDGm3TNwh/UMY7lG+xnAtGNYd0Z6lPP7IiUOWsCcB/ESM6CXyxpQfgNncgjyuGklR1Rw46dLOmTVHBtH9HQ1g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sr7yE+VkPEyRrrrXyQzP/yo9AVKB5rHT9piW2BcUj6k=;
- b=PuU04d0ySZr9DhcNsroRrqxrJbipgW/yv8Dvf/6tqzDnz+stTXlzWVvmiJ1A750YCw2xOMAQmcqC49EyHKTCfEV0nCpJFxr3NZis7YXrPVSQ/yresQA/TkEBL3SDco28v1sStJu25pzOYGPZePB00BoDrZs1od5/OAQbYRwvlok=
+ bh=pH3otvl11JNj1TuptcdzxizNGXqkDBF53XlCNt1H2S8=;
+ b=uCmfF+oyD5xcsVQq7k2PimRq4p9Kh0qD91ttyiwwPibT41EJgIFMFO1zZn9irjxMAHkuMZcBcImcCNGvLRib6C5y4JNmWEpWCpVeaQPNUj2z1Kv3Hii0deD3xut+O3cRqRP5wnSNGFEM+5F3SAOATshzy8rRWS5Kl0AEnFEvdQo=
 Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
- by CO1PR10MB4545.namprd10.prod.outlook.com (2603:10b6:303:9a::20) with
+ by IA0PR10MB7668.namprd10.prod.outlook.com (2603:10b6:208:492::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.25; Fri, 16 Jun
- 2023 18:10:29 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.36; Fri, 16 Jun
+ 2023 18:11:07 +0000
 Received: from BLAPR10MB4835.namprd10.prod.outlook.com
  ([fe80::f7ba:4a04:3f37:6d0f]) by BLAPR10MB4835.namprd10.prod.outlook.com
  ([fe80::f7ba:4a04:3f37:6d0f%4]) with mapi id 15.20.6500.029; Fri, 16 Jun 2023
- 18:10:29 +0000
-Message-ID: <154bf412-95d3-b069-89a4-35fc7ed11108@oracle.com>
-Date:   Fri, 16 Jun 2023 19:10:23 +0100
-Subject: Re: [PATCH RFCv2 22/24] iommu/arm-smmu-v3: Add read_and_clear_dirty()
- support
+ 18:11:07 +0000
+Message-ID: <8ebd3086-3664-4c95-c779-245fa5e64c78@oracle.com>
+Date:   Fri, 16 Jun 2023 19:11:00 +0100
+Subject: Re: [PATCH RFCv2 21/24] iommu/arm-smmu-v3: Enable HTTU for stage1
+ with io-pgtable mapping
 Content-Language: en-US
 To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 Cc:     Jason Gunthorpe <jgg@nvidia.com>,
@@ -82,108 +82,110 @@ Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 References: <20230518204650.14541-1-joao.m.martins@oracle.com>
- <20230518204650.14541-23-joao.m.martins@oracle.com>
- <c4696aad77ef49e7b3c550c19b354223@huawei.com>
+ <20230518204650.14541-22-joao.m.martins@oracle.com>
+ <e16e35b399044e4f825a453e1b325e40@huawei.com>
+ <e22772db-e432-c42f-181c-e7055aeed553@oracle.com>
+ <f4656595f62a46e48edecd259bce950e@huawei.com>
 From:   Joao Martins <joao.m.martins@oracle.com>
-In-Reply-To: <c4696aad77ef49e7b3c550c19b354223@huawei.com>
+In-Reply-To: <f4656595f62a46e48edecd259bce950e@huawei.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR01CA0141.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:168::46) To BLAPR10MB4835.namprd10.prod.outlook.com
+X-ClientProxiedBy: AM0PR01CA0125.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:168::30) To BLAPR10MB4835.namprd10.prod.outlook.com
  (2603:10b6:208:331::11)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BLAPR10MB4835:EE_|CO1PR10MB4545:EE_
-X-MS-Office365-Filtering-Correlation-Id: fb353521-7221-4ace-863a-08db6e94f7b2
+X-MS-TrafficTypeDiagnostic: BLAPR10MB4835:EE_|IA0PR10MB7668:EE_
+X-MS-Office365-Filtering-Correlation-Id: e21b5c18-df4a-4a0c-0be2-08db6e950e34
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: U2iBz2XqxTNpWdxTNzoXWrVFMWePTERaYR4mR6fRy8qIQ2zS4tUqnbBcuGRGYGm1PfvNR7O8IbHSVgxql9LRHs/a6eAnJncv9UGGrCeMBOpLr8kM0rASU35WodevtpC2nogCxcFowbaa+AN9jNNmR/xP8CWybTkiJQkDefOYwR6AhATWK65nugojx5V3vZwPLsfCzpYk8/IycZjlW+RKvMevLqVEP4pl9MtOpxNj/6svJ1w0KncSC3I2DY1bcH5xIWr6MUZxrHMMIRedgjkI1tOWKTEh+UBfTKXHtM7iCzaS7A3Z8qVjLm9v/ZD6M47VbDmieF1NWKAILC03a2JF+am7KEfnQJD9zH3tgDDM/7X1UZ/QieFyg0SeBx8znHTPlQdbf+wekvx9tQG3DoW/K7bXv30ZcWGbYhYmsC2ur4gNThINiPbuPYG0sjJq2o0iV3fOjKm1ckTkJFLycbPB5tDTfhDKIcqfty0cUkQms5ZfN+EjAzEn75lBAGqDEdORZUF2uwAMCv3eewTgsDdXjOOt+B4FEIzI5uLg/Z8bx1IWXW3DhUYI0fP8USS+JNMoVw56lHZ7NjVbS91MiTFUw6gApgDTn9tRCv7Pp7cmaBhVHinA2EUioCfm5jR1K9CK
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(396003)(346002)(376002)(366004)(39860400002)(451199021)(2616005)(186003)(2906002)(83380400001)(6666004)(66476007)(66556008)(6916009)(36756003)(66946007)(41300700001)(8676002)(8936002)(6486002)(316002)(966005)(31686004)(54906003)(86362001)(4326008)(478600001)(31696002)(26005)(6512007)(6506007)(53546011)(7416002)(38100700002)(5660300002)(14143004)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: IqQXpLklqIaVm3aiCTazJjssDnsUVUSJSjaYxg25h++WrSivGacAjlAylweIv4QLrPOfvgvPjKEldItLRDQ+0LuE30SPSp+4KZropmxzzhpnf+OAdqlLmNOg2fmxjr0E2fEws+4E3bg1mBicjfBmdzIhqLEPxdGuOWCk3F0HcO+P8QYNiCQMWfHpAE0kOCIxLHIB0qyNW25vcmnR2L0yUhZ3S0W+SworogvVeFJnDL/u1/hQeu99A93R5B12dGZ0X+SptFrqrE3Ypyw+HkumLcWW9OO7+F5bxoCRieWDB3EGKXUcWg3IGT8AyhO7W1VRd5lmYL5cs7sSbyl1SjU9Ee0gtlmSdZARU1bu3h5LHHWlGR9wPmCHLS9AnBFxmU3BqB+wiMp/nplJCOhZxCY/D0nSYFWzmVdy7Fa3GzvOLxn9sv8/EyoWRJdnxPyvTMMVBxGmsGjMDprsTF+jhpkNPfEd1csWjfptjPqfIBHhmVCRl2N48OiH8QStYgvPK2I9zLRCI6lKvR2VDAuqUqiZOR9i23XeOzd7lcj790xVW3Mee15lhQieN+6XyX6kID/bpS20HCC4vYZormUp9bjZI9ZNJQkc2K69tiCKWOx/MQTaV0m46r7LT/YJ/3c9U+ra
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(396003)(346002)(366004)(39860400002)(451199021)(186003)(6506007)(26005)(6512007)(31686004)(2616005)(53546011)(83380400001)(41300700001)(7416002)(6666004)(2906002)(36756003)(54906003)(8676002)(8936002)(6486002)(4326008)(478600001)(5660300002)(6916009)(316002)(86362001)(66476007)(66556008)(66946007)(31696002)(38100700002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MFcrNVM2SlJDN2xEQW1ZdWdJV2lIZ3drSEplQ3R4aFk3eW9zd3BMVWtmeWFm?=
- =?utf-8?B?T3FlTXllNEt0Qkg4enNQaytOTm01dTV5U2JrZlhYL2dEbGhIMVVPd3FRSFVY?=
- =?utf-8?B?cXo1WXA5SWNiQVFYcW1tZG84ZjZQbEtvOGNhcGN4ekZTYTNQM0p1ck5BQkpl?=
- =?utf-8?B?SzVuYVhselAyVlBhNTN3SjVTbzRaallGa0ltNUcyMFNHck9GVHdXRTRvcWdY?=
- =?utf-8?B?T3FVSUpBVE9NZnF1S08zZjF4Yzh0dTFCN0lUYmduei9hTEZ6NFREVHRoaXRo?=
- =?utf-8?B?RllzblJQQUF0M3pqdE1hakY5aWdZcmdTY1M1OTk4cWtEMW16TEcvMTNrUWpx?=
- =?utf-8?B?a3o0RGl6Q1MzMHhDVE5nVE55YjJyY1BGSUJYRnljSTQ3SkVKQmJocTRDWDNZ?=
- =?utf-8?B?TEVsVXROUG5OeXFBN3JrbjdISEpSbFFyUTZncWtkaXQxN3RvdDl2ellOcXU1?=
- =?utf-8?B?dlRyUUlMb3NuQk9vdlpYbkptVUtkK09RakVubDZtZlFhaXc4TTdGcWFRMVdF?=
- =?utf-8?B?SHM5OGFwMXF4aGdhZHRRVWNjdkFqbHo4STVqd05oUGlDZnFtVjhRaEVYWWsw?=
- =?utf-8?B?OFdOc21YdFVHSExRZHo0UnRzRm1vUUxaMm1maXFxek1hWWZuN2RISGhvYkFp?=
- =?utf-8?B?T0JCWldrMnFXZ3pRZitYNWNsTlg4YmxJTzJNcERISnBYZjVzbHhXYStFVE5U?=
- =?utf-8?B?TmRsNS82Y2RsbTBxalZnalhPUTJiWGVzaHFWQ3MxV3BSQURQbDZOaWxxdzBL?=
- =?utf-8?B?ajN1TGozT1grY0h6Q3dLSWptQndrbitncHl6TndBTFk3UUtScUdjVkRxM0ly?=
- =?utf-8?B?am5nTG9ia2dZVkFHTTFkc2V2SHlNMkFDbzUrOWpqc0pRc0JHVlhsemtrZGZ5?=
- =?utf-8?B?bmJEaGE4UjBZNm1LM3JwdGNoK1o2eGxNSjkwTitnYkhFcXBEQTdsY2QxYm5I?=
- =?utf-8?B?QVo4SS9OOEd6OVBNVHcwREVReDc1ZU9QVWFOS1lkeUV3QURxaWJxenVFcng2?=
- =?utf-8?B?YXo1d3JRalM2bnhpUXJpUHBvUk9QdWZ0dDR3SXl5VWRIeC9lbjBTTi9pcTBr?=
- =?utf-8?B?UTB2cDBhZjY1MXVkZm1JUTgrSTNvNUpoNk91ZTdZT0VUVTRaQ01VVVRkMmhu?=
- =?utf-8?B?UnhGUTVMNWV2cmhKeStKMjhpeGZwQklXTGJkS3dUVTI5eWxaNVVZdzlaa3Y4?=
- =?utf-8?B?TmIwWlNWOXN3T2JXdnFqN2hwTHlLVzVFN05KVm1OcStJUjlVUzdpdGlZbFVO?=
- =?utf-8?B?a3RQei9vVU1EMDJKVXk5Zk1JaXNqZ1MxeTkxN0tJSXJMY1R2TndOMUVnVXpP?=
- =?utf-8?B?ZXFlUnIvcE9yVUhLNDNZQ3MzdExKK3NoWnF6WjFia1l4S1BlVDhJaUxsaHpH?=
- =?utf-8?B?Rm1ZcjYvQnh2aDZQS3ZCdG1Bd2FQRllRVWs3OExxVHN3b240N09XK2RFQzBu?=
- =?utf-8?B?SHlzOFNwQ2d1WEM3TTBtTk5GQUdUbnFjMWNtRm5UaXczclgwMENscmpJbnpx?=
- =?utf-8?B?TXFVRmhmdnFsRzBHMzZkMitYNTBHN2thUHdwUGdPankwd0dkMGc0Q3pPMG5Y?=
- =?utf-8?B?V0s3SlUxYUl6Nkl5Rm1yaC9ZZXpUY05kcXY5enlkWUwzeC9MdUhNaXI1UXpP?=
- =?utf-8?B?dFRYUkdMVmxFM3pnOXdKMU4yL1A5VElIMFQzdGh3ZVFxTXcva216NEp6VXd4?=
- =?utf-8?B?eEMxQ2N3V21SeTNOSXBaLy92MUI1cXhKZWExUnlLKytmcjZCdG9FZldGd0sv?=
- =?utf-8?B?cHFybmVjSDJKNGZMSVdUSTJ5MTZRdGNQSnRNMWs1ME4wL0d5RWc5a2R2Rzg2?=
- =?utf-8?B?bGYrTlNVRjhKdFgzNEgxMGozc0hwNUg2OFNmSE5LN216UVc2SDRORDQybERU?=
- =?utf-8?B?b3Zvd0FGa0kwQVA3dTZ1ekZ4WXk2V09SSHczUThmUVZwc3Jwc0xsL0JINHZN?=
- =?utf-8?B?ZnNBbG95R2YvZFNnL2ZoOHUrZjRwRjIzMk9PdlB3aU95WmZaei92MXh6Ylpk?=
- =?utf-8?B?Y1VsUnVnV2UrOHdoNFowYkd1SldpYmRkSTZ6bnJyT2FKaklMWkJqcFYxT2J6?=
- =?utf-8?B?a1N0b3RpdTNUajdxem5SSWJVQm9QVUFqK09senE5b1BOVXRieGw2N3MvQlBv?=
- =?utf-8?B?dUxvbHpqYzU5UHM1RXJYWFZEOERoMUhOOVp5alB6WjFFbXFiQmhkWXFZL1hD?=
- =?utf-8?B?YUE9PQ==?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SGx1Qy92YlRZNXBXVjFwZ0F5d3BUOG5rQnk4OW44TWQ3bUh6R3djU0Vka2ZI?=
+ =?utf-8?B?N3VubW9zTHZqTUJVR0lpM3JEeEFlQ2dUMHUxWjFjSUF3bkNBdERmTE4vTFh0?=
+ =?utf-8?B?amtUZlNRWVJiRkljQm9CQlk0bkp4QjZ0RForMHJIc29rRmplOFVIZTZKWitQ?=
+ =?utf-8?B?alhiaUZEb0x1NFhPeVcwVnptbkpScC9sc0ptdXVIN1FlUTg2MVVydTdndW83?=
+ =?utf-8?B?T2tmQ0N4MjQzTWJkZUZlNHh4RUsxdmR2Tmp2RHZRQ3RadzdpNW5ZRUNXQUxH?=
+ =?utf-8?B?bEM0U2lGQk1GTUpMSXU0cnJodk5jQnFOYlEwNENlb1JqdFJQOXFLZlJDd0dw?=
+ =?utf-8?B?dGVLUmpqZmJTL0dsWjdGTzlSNE9oVFE1TWxKQWhiR1JwY3V3YTdOZk15WFY1?=
+ =?utf-8?B?cjgyU0M4T29HU1hjZUFEWnNCR1dxS3FsK1hyVnRueHRWemtpVHlURXVTV0FG?=
+ =?utf-8?B?SXNzWWp3T1M5NCtTUHlLN3pTSHY4ZEN2aFppMWlGUE5JbHg5a2QrdEZ1eVFX?=
+ =?utf-8?B?ZnA0WDRCcnhNcEdsS2xHemt4eTA2RTJpam5oMmRVcTlxQlY0RTJibjFjN3Fn?=
+ =?utf-8?B?QlZLWWx4SlRRdTlEelNIVG9qdFFRVG1zVEU4REdvdW1kcU1QWmpUT3ZPOTU5?=
+ =?utf-8?B?Z0hlaTJodkdaRjhyMVlLb20wMFlSQ0tKV3ZmaVNza0FqUWJ4SDh4YWxwVjBy?=
+ =?utf-8?B?dVhSZnBHVzVzZXpTTFIvRkhqOEIyMGxTT2NwclNqRFUyOVVkRTFOZHo1QTVp?=
+ =?utf-8?B?SU1LakV5c1FIUFRPejFyNUw1QjFrN3o0NEZKR1ZhaTdQeWpMbVk1cGdnVzI3?=
+ =?utf-8?B?WXplR2F1V2ZvT2J2WWM1QlE3OWtwVkd4UmJkUjQvRGliaWpSMnMyUG5JV0xH?=
+ =?utf-8?B?V09TUGtwdXVhR1RYanFXNVMxQ2lMMjRiMWh4Q0tNY2tXd2d0d1pvWG1QeU1p?=
+ =?utf-8?B?SDRwcWZncDZoZ0lBRWg0U09WS092QnU5WUxrOGtHWWRWcEsyR1VXVHQxTEFG?=
+ =?utf-8?B?QUU0VVN4MFFodEZybkJQQW9YVjFrOG1NUWdYbUxBa0lBMXhWS0cyeTJyNytq?=
+ =?utf-8?B?TkM3NWRuTEJlS3RnRzArZGVZaHRpTm44NlRXaWxwZC9OeFNtcFI0WGxhUzBQ?=
+ =?utf-8?B?RmcxTU5PQ24wQUZuNGlhUllEZmg4Ty9sMnZPdmVEYUxoY1ZmUHNoOXRnTmg0?=
+ =?utf-8?B?WFZoTTdjcVpaYUd2Q1p5cms3MDJMVVMvallXOXhZdnQ5eUpHdnhzNy8wRXI5?=
+ =?utf-8?B?M2tqbmc2YzdzUE9KRDZ6Wko5WERRemkyWUd0TlZjcjZCL0VDOGIvUlBqb2hh?=
+ =?utf-8?B?TW56YmVXK0RqdDNmS2FsM1VYaUFCTktyNElOS1BhNkpBb2did3k2UFlZL0Nh?=
+ =?utf-8?B?UDM2Zlk4a2tWSUxzbU9veHY3QTlvS0x2c2RPNEI0RlRqMWRiSDZSQ3lwWWFH?=
+ =?utf-8?B?eERQZFBBaUZHNndFMlJCdnA4L0RSMmFCTE8ydmNZN3VySHZiNVBMVHVvNWsw?=
+ =?utf-8?B?Q2tQQUV1K1VGZXN3UGRsQ2trR0J4R2hsVVZ3Y2xSczhsUjc4VDNaUEl2QVNQ?=
+ =?utf-8?B?d1JhK1VtUzBDT0ZZR0FRMVlML1BkRDFGWG9zSmJtZENMLy9xQ21nbjVtNEw4?=
+ =?utf-8?B?Rm5WRTBGc3JhZXV5Yk1GQlFhZTFmTCtPeVZOY2owMWNtRE10SC92UGx3MkdD?=
+ =?utf-8?B?b09NUXJOZUZaaGNtbU03aEgvcWhDWDMyU3RYY3UrSnZYaHVEMXNmdG8rRGVI?=
+ =?utf-8?B?Q3RjNERlM0J3c3R6NlllK2ZkdjFmZTllREplYitHY2szQXlhcFBPMVlLdlNa?=
+ =?utf-8?B?T3RpajhNendqc1JKTEJNWXk1ZzcyeC82cjhYVFhvWXB0M0pIZVVIaTNVUUJT?=
+ =?utf-8?B?K0lheWhhUWU1S1dRUURxa3ZJL3hlUkxCZElTSThQTldYMlV5ZXhNcDhtUG93?=
+ =?utf-8?B?Y2ZzU0JrMzJacGFnVE5GMm94M3cwVkozWmpodUp4YStkbE1HNDc2aEJQcith?=
+ =?utf-8?B?UTc2RjdDdWlpSVNFaG5pU2hDcmN3RjhpaWVRc1hjZ3pnS3BGRDZWVnhxMHJy?=
+ =?utf-8?B?bWFWNUt3TWZrU3l2NXFDU29MR2RwUWdUOGcwb1h0bmppd3JEeURqZDY1aXUr?=
+ =?utf-8?B?TkZaRDVHcVZRa3UxbExIQURTQ0tLR1JwZE1ZTW9LdVdpZFZDTHZ2QUEyNmth?=
+ =?utf-8?B?YVE9PQ==?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?ZGFJNWNPVFd6Y0FDVmlZdUlSRU1ncGlFZ0YyMmxsU2QrQTNCVUlwQ25vQWVp?=
- =?utf-8?B?SHpBUGpwR01uQy9QMFEwSCthdXI3UEZ5cnhxZEtBQTYyclhFaHZleU82ZG1w?=
- =?utf-8?B?TlEwUVhqMW4ydzRXYXlSTmxTSUJLQVBWeElaR0RYc2l2OEQ4WlZMS0NicW9F?=
- =?utf-8?B?U0Q5Ri9ndDBTU1diVUlwOGtCVThWck9RR2pkdGZUc3hJUGRRTUVoNnRTcTJl?=
- =?utf-8?B?emRMTFBOUkMxWDh0OUVjbE1jTmNLUFpMbVVtaE1Oc3kyTmFqN0k3ZFBKVDFX?=
- =?utf-8?B?M09WQmtwekFQWnowUHV4MXNlRXhadlJ2TVlPOTZBVk53VWxxYTQvZ0dZL2J5?=
- =?utf-8?B?SHNCZkpUTU9Qc2Rac3F4bTRsM3FvODE0Q1MxalVjV2pXSjdKZmRmOEpFcjRW?=
- =?utf-8?B?VzlPSWh4STh6L2lGaGMwaFdKWlJQTW90R28yZmdJNFFMVWlBbGhTM3JLRkFV?=
- =?utf-8?B?dEx2dXpsVU9ZQjFLUVp2Q3hRUy93NnNrcDZ0MEtSVDVEUHVRUzFoYXlBN1Jp?=
- =?utf-8?B?MDJMcVBpdUNxeUZCMU1jdUtBK0hIWE5YOVpKMTFCQ1ZqcjZTVGJSMjIyRU00?=
- =?utf-8?B?SFp4TzVPRDl3eTdsTUlWc2hTa1NKTTZ0bWhZQnkzT2Z2L29VWXV1SGRid1lL?=
- =?utf-8?B?ejhkRDBoOHBrQmczemg3S3ExQlZmOTVMNWNHSmNSTmlXTFppYmEyeTlZK01m?=
- =?utf-8?B?TlhwRGZlMnhUL0RobFR5blRnYmNLdnRTZHN0T3JFUkdKQlVGdC9LM0tXNWh3?=
- =?utf-8?B?dEU2S0JUWjJFK2RuZTBnWnZSci9kamJPdS9lUUhiZU1nTytrR1ZFWkoyWjQw?=
- =?utf-8?B?TmE2MDNtY3M5NFRxSC9iU2RtT2pHMm0vZXZaYVBMUVNqQ1Y5TitUejVwZktM?=
- =?utf-8?B?dVc1WUhhRENWc25HOVl6UDJPcUFpMjF6blRPZkZDaXhTQWZKcWlRSEM4WW1G?=
- =?utf-8?B?ME9BbC91b3dKa2ZNSWNvUzc5L0hVMkg4U1RpZEVSTFd6Skt2a0hOcFZ1VlEr?=
- =?utf-8?B?dm9sdFRLZzFMeVBCLzRXcGZyRU44bGd4WEFMRUhldE5uajdzM3dsSU45UWsv?=
- =?utf-8?B?UGFWVktxb29ZYjNneTB4NHFvTFZkQXZiZkJFMkN2QURCT2N3ZmN5alZJeXFP?=
- =?utf-8?B?VGNLZWV2WFR3UERrRlJyZUUyUm9aTk81akd6T01nWEJ0Q3FBaUFPSkJLeWNF?=
- =?utf-8?B?QS9jMjF3S1RtSVFUWjNRbmNBYnJWeGhVTkhJck96bkJxWjVVK1RnVVFKbzVa?=
- =?utf-8?B?Ums5MU9IeVFLYjBVZzdrbVoyeE41MjBJazlVeUdJcWVRU3l4OHc4QmRUWmY3?=
- =?utf-8?B?Q280OEtEMW92OHZ5VlVHbGZFdVpUWHloVGMwK0hIYXFlYXIxVTJ0SWNFNCtm?=
- =?utf-8?B?dDlEY2pLdk5Ed251WE52cHNnN1Bxck1scE8xdWRDQkQ4RGdrNUZzQndMa0tk?=
- =?utf-8?B?ai9ZZHNDeXJOSGxKU2NEb3NRdnoyWWVZcmxmZlB3PT0=?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?amRPaUwzZGE0TG1xbXVWK0NPY1ZKdjZpZDkzWllZZXVEWFVhUXMybkJxYm9C?=
+ =?utf-8?B?Wlg1MWRYcU01MDdLWEw3VTJOZGhjOTd5dWJ0ZFplVjFqTG9FcU1ZZWVMQUln?=
+ =?utf-8?B?QmZidTZzeGZSaGJKbFU2NTQ4V1FraVNEb3Z5SnNzcVgyNGN6M2NNcU8rTU1l?=
+ =?utf-8?B?ZVQySzZTVmNVQk1JejV1bnBNMEUzWVlMTi9OcFlVZ01WbzhEWWhLcnY5MDRU?=
+ =?utf-8?B?YkgzbnUyWWVob0pJaHpNazlUb1d5YnhNMzJZQ0hzMlN4VWdGMG56cDNoQlcr?=
+ =?utf-8?B?dEtDUnJVbXpMMm1jYXJQSnhjU0ltS2wyVmpnSGhmeVowMmduU01yQnF6Y214?=
+ =?utf-8?B?dGFPM3BZK0dkeVdtTDVBUVFNTWJzZ1lhZGhVYXo2RTFaWDBjOWxSa2xDYy9G?=
+ =?utf-8?B?bXplVHdmREtSNGxjOEdZMkdTMjZGRFFubzdBeEQzUHR5ckEyK3hhd3h4UnFn?=
+ =?utf-8?B?d0FnRS9KWkx2VW5nalNOaWRQb3VJbW9mKzNySTdlajhiOTh0TExSazBVbk5u?=
+ =?utf-8?B?KzNFcUozdGo5a2Uxbk1pc0RWS2JXOVRlckFCRldHb1p3bWxzakJZSmxoRjM3?=
+ =?utf-8?B?djc1UndWYkpWeTQwMWhPTWNTaGMzRkF2enI3NUtNMHpCZjh6ZEd3ZUJ6aVRN?=
+ =?utf-8?B?U01pQmlkRzFuWVlpOWNhR3g0aldva1M4NjRUYTNsR2c2WnBWdUhKcVZ1WVBy?=
+ =?utf-8?B?ZUcrRUZsNUs5aU1RcjkzTU1VelB1V3ZMeEczUWdrS2dqSCs3cERJZlVMaEhC?=
+ =?utf-8?B?c0tNWExuM0tkdXZqbGVrRkdwMktTdlBqSFVyMlZoZWhhSUpHY04zZ1pOeERp?=
+ =?utf-8?B?bjNHMW83c0N2OWtQa1RaQTV6eEZ0WUFDSjRPRktOcnNmZnpkNGVkUk9HVWY5?=
+ =?utf-8?B?MWlKc3BkaERKcFIwdEFFSUlQWU1kNGUyV2RMVGJrVFpOK3BTZUhDNWtoNkRI?=
+ =?utf-8?B?djUwME45c3RERGdMRE11NVJrSEFSYVo5ZjkvSm5BTjNWUm9OTlBId2Z2WTFT?=
+ =?utf-8?B?QzNwR3c4Q3VTTGdDV1B2RXdrUVRUVnJaRFJyblBLd2wrRVN5YzhyTThQTGt2?=
+ =?utf-8?B?dVVaelJkcUU4QTIwR2QyMlJseUZ3dkVSWmkwQzB3eGFjRWdYdUtVQUNQWWsw?=
+ =?utf-8?B?SGRNNzdoY3czanNZR1VCVWNCZ1lveUpzOE8xZHNycnBrUXNHK1UyMStaeXND?=
+ =?utf-8?B?azdwY2h4OWxmU2lkZkhRbU9UaXF2RkNQZ29RZGRCZWhRZnVPcHIyczVlZDJ0?=
+ =?utf-8?B?alAxZzQ4N3c0cTRYOUQ1QlZScytHTWdwVUFobnJrdWQrNk5STzRHSGJERExP?=
+ =?utf-8?B?VGlXcVNFZkw1MUU3bTUyRE8zWm5KS0gyUXo1L0poSkRRTHlKcjY3dG45ZVFS?=
+ =?utf-8?B?UGM0NkUrZm14Smt4UjJHKzR4N2hiaFZBWUp4akQxU01ueCswVitxeXZOWXE4?=
+ =?utf-8?B?c1RRYkcwR0diZWhwTDVtczZoeEtTWUtzTnpyTk5BPT0=?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb353521-7221-4ace-863a-08db6e94f7b2
+X-MS-Exchange-CrossTenant-Network-Message-Id: e21b5c18-df4a-4a0c-0be2-08db6e950e34
 X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2023 18:10:29.4944
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2023 18:11:07.3937
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GPQl93zMPKQolHtjeZo9wQzuxn/XjxSptjw52Gya1BEJPxY1a5TJOuH9OAPzyHAiqKhHQ9AAfJ8S8IwPpejxQTNPQERzbT01BRuitlrSCXo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4545
+X-MS-Exchange-CrossTenant-UserPrincipalName: lrGcc9AC5Px6x64q3L9hmb+45Xy0mm3eom2bN5pLQS4qwODQpV0meWKd9t/ripvI6eGc/35WTKW4DksjRsZpG2frpJnO287vRRRyxYrG/cs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR10MB7668
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-06-16_12,2023-06-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0
- suspectscore=0 mlxlogscore=999 mlxscore=0 phishscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
+ mlxscore=0 adultscore=0 spamscore=0 phishscore=0 bulkscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2305260000 definitions=main-2306160164
-X-Proofpoint-ORIG-GUID: g96QMsqK-9jPIxBz6lyZb0_1Y7wt02XN
-X-Proofpoint-GUID: g96QMsqK-9jPIxBz6lyZb0_1Y7wt02XN
+X-Proofpoint-GUID: ykTuKMmFEIuGH1ZYYgv7r4waJvVXLR85
+X-Proofpoint-ORIG-GUID: ykTuKMmFEIuGH1ZYYgv7r4waJvVXLR85
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -194,239 +196,144 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/06/2023 17:46, Shameerali Kolothum Thodi wrote:
-> Hi Joao,
+
+
+On 16/06/2023 18:00, Shameerali Kolothum Thodi wrote:
+> 
 > 
 >> -----Original Message-----
 >> From: Joao Martins [mailto:joao.m.martins@oracle.com]
->> Sent: 18 May 2023 21:47
->> To: iommu@lists.linux.dev
+>> Sent: 22 May 2023 11:43
+>> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+>> iommu@lists.linux.dev
 >> Cc: Jason Gunthorpe <jgg@nvidia.com>; Kevin Tian <kevin.tian@intel.com>;
->> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>; Lu
->> Baolu <baolu.lu@linux.intel.com>; Yi Liu <yi.l.liu@intel.com>; Yi Y Sun
+>> Lu Baolu <baolu.lu@linux.intel.com>; Yi Liu <yi.l.liu@intel.com>; Yi Y Sun
 >> <yi.y.sun@intel.com>; Eric Auger <eric.auger@redhat.com>; Nicolin Chen
 >> <nicolinc@nvidia.com>; Joerg Roedel <joro@8bytes.org>; Jean-Philippe
 >> Brucker <jean-philippe@linaro.org>; Suravee Suthikulpanit
 >> <suravee.suthikulpanit@amd.com>; Will Deacon <will@kernel.org>; Robin
 >> Murphy <robin.murphy@arm.com>; Alex Williamson
->> <alex.williamson@redhat.com>; kvm@vger.kernel.org; Joao Martins
->> <joao.m.martins@oracle.com>
->> Subject: [PATCH RFCv2 22/24] iommu/arm-smmu-v3: Add
->> read_and_clear_dirty() support
->>
->> From: Keqian Zhu <zhukeqian1@huawei.com>
->>
->> .read_and_clear_dirty() IOMMU domain op takes care of reading the dirty
->> bits (i.e. PTE has both DBM and AP[2] set) and marshalling into a bitmap of
->> a given page size.
->>
->> While reading the dirty bits we also clear the PTE AP[2] bit to mark it as
->> writable-clean depending on read_and_clear_dirty() flags.
->>
->> Structure it in a way that the IOPTE walker is generic, and so we pass a
->> function pointer over what to do on a per-PTE basis.
->>
->> [Link below points to the original version that was based on]
->>
->> Link:
->> https://lore.kernel.org/lkml/20210413085457.25400-11-zhukeqian1@huaw
->> ei.com/
->> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
->> Co-developed-by: Kunkun Jiang <jiangkunkun@huawei.com>
->> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
->> [joaomart: Massage commit message]
->> Co-developed-by: Joao Martins <joao.m.martins@oracle.com>
->> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
->> ---
->>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  23 +++++
->>  drivers/iommu/io-pgtable-arm.c              | 104
->> ++++++++++++++++++++
->>  2 files changed, 127 insertions(+)
->>
->> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> index e2b98a6a6b74..2cde14003469 100644
->> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> @@ -2765,6 +2765,28 @@ static int arm_smmu_enable_nesting(struct
->> iommu_domain *domain)
->>  	return ret;
->>  }
->>
->> +static int arm_smmu_read_and_clear_dirty(struct iommu_domain
->> *domain,
->> +					 unsigned long iova, size_t size,
->> +					 unsigned long flags,
->> +					 struct iommu_dirty_bitmap *dirty)
->> +{
->> +	struct arm_smmu_domain *smmu_domain =
->> to_smmu_domain(domain);
->> +	struct io_pgtable_ops *ops = smmu_domain->pgtbl_ops;
->> +	int ret;
->> +
->> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_S1)
->> +		return -EINVAL;
->> +
->> +	if (!ops || !ops->read_and_clear_dirty) {
->> +		pr_err_once("io-pgtable don't support dirty tracking\n");
->> +		return -ENODEV;
->> +	}
->> +
->> +	ret = ops->read_and_clear_dirty(ops, iova, size, flags, dirty);
->> +
->> +	return ret;
->> +}
->> +
->>  static int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args
->> *args)
->>  {
->>  	return iommu_fwspec_add_ids(dev, args->args, 1);
->> @@ -2893,6 +2915,7 @@ static struct iommu_ops arm_smmu_ops = {
->>  		.iova_to_phys		= arm_smmu_iova_to_phys,
->>  		.enable_nesting		= arm_smmu_enable_nesting,
->>  		.free			= arm_smmu_domain_free,
->> +		.read_and_clear_dirty	= arm_smmu_read_and_clear_dirty,
->>  	}
->>  };
->>
->> diff --git a/drivers/iommu/io-pgtable-arm.c
->> b/drivers/iommu/io-pgtable-arm.c
->> index b2f470529459..de9e61f8452d 100644
->> --- a/drivers/iommu/io-pgtable-arm.c
->> +++ b/drivers/iommu/io-pgtable-arm.c
->> @@ -717,6 +717,109 @@ static phys_addr_t arm_lpae_iova_to_phys(struct
->> io_pgtable_ops *ops,
->>  	return iopte_to_paddr(pte, data) | iova;
->>  }
->>
->> +struct arm_lpae_iopte_read_dirty {
->> +	unsigned long flags;
->> +	struct iommu_dirty_bitmap *dirty;
->> +};
->> +
->> +static int __arm_lpae_read_and_clear_dirty(unsigned long iova, size_t size,
->> +					   arm_lpae_iopte *ptep, void *opaque)
->> +{
->> +	struct arm_lpae_iopte_read_dirty *arg = opaque;
->> +	struct iommu_dirty_bitmap *dirty = arg->dirty;
->> +	arm_lpae_iopte pte;
->> +
->> +	pte = READ_ONCE(*ptep);
->> +	if (WARN_ON(!pte))
->> +		return -EINVAL;
->> +
->> +	if ((pte & ARM_LPAE_PTE_AP_WRITABLE) ==
->> ARM_LPAE_PTE_AP_WRITABLE)
->> +		return 0;
->> +
->> +	iommu_dirty_bitmap_record(dirty, iova, size);
->> +	if (!(arg->flags & IOMMU_DIRTY_NO_CLEAR))
->> +		set_bit(ARM_LPAE_PTE_AP_RDONLY_BIT, (unsigned long *)ptep);
->> +	return 0;
->> +}
->> +
->> +static int __arm_lpae_iopte_walk(struct arm_lpae_io_pgtable *data,
->> +				 unsigned long iova, size_t size,
->> +				 int lvl, arm_lpae_iopte *ptep,
->> +				 int (*fn)(unsigned long iova, size_t size,
->> +					   arm_lpae_iopte *pte, void *opaque),
->> +				 void *opaque)
->> +{
->> +	arm_lpae_iopte pte;
->> +	struct io_pgtable *iop = &data->iop;
->> +	size_t base, next_size;
->> +	int ret;
->> +
->> +	if (WARN_ON_ONCE(!fn))
->> +		return -EINVAL;
->> +
->> +	if (WARN_ON(lvl == ARM_LPAE_MAX_LEVELS))
->> +		return -EINVAL;
->> +
->> +	ptep += ARM_LPAE_LVL_IDX(iova, lvl, data);
->> +	pte = READ_ONCE(*ptep);
->> +	if (WARN_ON(!pte))
->> +		return -EINVAL;
->> +
->> +	if (size == ARM_LPAE_BLOCK_SIZE(lvl, data)) {
->> +		if (iopte_leaf(pte, lvl, iop->fmt))
->> +			return fn(iova, size, ptep, opaque);
->> +
->> +		/* Current level is table, traverse next level */
->> +		next_size = ARM_LPAE_BLOCK_SIZE(lvl + 1, data);
->> +		ptep = iopte_deref(pte, data);
->> +		for (base = 0; base < size; base += next_size) {
->> +			ret = __arm_lpae_iopte_walk(data, iova + base,
->> +						    next_size, lvl + 1, ptep,
->> +						    fn, opaque);
->> +			if (ret)
->> +				return ret;
->> +		}
->> +		return 0;
->> +	} else if (iopte_leaf(pte, lvl, iop->fmt)) {
->> +		return fn(iova, size, ptep, opaque);
->> +	}
->> +
->> +	/* Keep on walkin */
->> +	ptep = iopte_deref(pte, data);
->> +	return __arm_lpae_iopte_walk(data, iova, size, lvl + 1, ptep,
->> +				     fn, opaque);
->> +}
->> +
->> +static int arm_lpae_read_and_clear_dirty(struct io_pgtable_ops *ops,
->> +					 unsigned long iova, size_t size,
->> +					 unsigned long flags,
->> +					 struct iommu_dirty_bitmap *dirty)
->> +{
->> +	struct arm_lpae_io_pgtable *data = io_pgtable_ops_to_data(ops);
->> +	struct io_pgtable_cfg *cfg = &data->iop.cfg;
->> +	struct arm_lpae_iopte_read_dirty arg = {
->> +		.flags = flags, .dirty = dirty,
->> +	};
->> +	arm_lpae_iopte *ptep = data->pgd;
->> +	int lvl = data->start_level;
->> +	long iaext = (s64)iova >> cfg->ias;
->> +
->> +	if (WARN_ON(!size || (size & cfg->pgsize_bitmap) != size))
->> +		return -EINVAL;
+>> <alex.williamson@redhat.com>; kvm@vger.kernel.org
+>> Subject: Re: [PATCH RFCv2 21/24] iommu/arm-smmu-v3: Enable HTTU for
+>> stage1 with io-pgtable mapping
 > 
-> I guess the size here is supposed to be one of the pgsize that iommu supports.
-> But looking at the code, it looks like we are passing the iova mapped length and
-> it fails here in my test setup. Could you please check and confirm.
+> [...]
 > 
-I think this might be from the original patch, and it's meant to test that
-length is aligned to the page size, but I failed to removed it this snip. We
-should remove this.
+>>>> @@ -2226,6 +2233,9 @@ static int arm_smmu_domain_finalise(struct
+>>>> iommu_domain *domain,
+>>>>  		.iommu_dev	= smmu->dev,
+>>>>  	};
+>>>>
+>>>> +	if (smmu->features & arm_smmu_dbm_capable(smmu))
+>>>> +		pgtbl_cfg.quirks |= IO_PGTABLE_QUIRK_ARM_HD;
+> 
+> Also, I think we should limit setting this to s1 only pgtbl_cfg.
+> 
++1, makes sense.
 
 > Thanks,
 > Shameer
 > 
-> 
->> +
->> +	if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_TTBR1)
->> +		iaext = ~iaext;
->> +	if (WARN_ON(iaext))
->> +		return -EINVAL;
->> +
->> +	if (data->iop.fmt != ARM_64_LPAE_S1 &&
->> +	    data->iop.fmt != ARM_32_LPAE_S1)
->> +		return -EINVAL;
->> +
->> +	return __arm_lpae_iopte_walk(data, iova, size, lvl, ptep,
->> +				     __arm_lpae_read_and_clear_dirty, &arg);
->> +}
->> +
->>  static void arm_lpae_restrict_pgsizes(struct io_pgtable_cfg *cfg)
->>  {
->>  	unsigned long granule, page_sizes;
->> @@ -795,6 +898,7 @@ arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
->>  		.map_pages	= arm_lpae_map_pages,
->>  		.unmap_pages	= arm_lpae_unmap_pages,
->>  		.iova_to_phys	= arm_lpae_iova_to_phys,
->> +		.read_and_clear_dirty = arm_lpae_read_and_clear_dirty,
->>  	};
->>
->>  	return data;
->> --
->> 2.17.2
-> 
+>>>> +
+>>>>  	pgtbl_ops = alloc_io_pgtable_ops(fmt, &pgtbl_cfg, smmu_domain);
+>>>>  	if (!pgtbl_ops)
+>>>>  		return -ENOMEM;
+>>>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+>>>> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+>>>> index d82dd125446c..83d6f3a2554f 100644
+>>>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+>>>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+>>>> @@ -288,6 +288,9 @@
+>>>>  #define CTXDESC_CD_0_TCR_IPS		GENMASK_ULL(34, 32)
+>>>>  #define CTXDESC_CD_0_TCR_TBI0		(1ULL << 38)
+>>>>
+>>>> +#define CTXDESC_CD_0_TCR_HA            (1UL << 43)
+>>>> +#define CTXDESC_CD_0_TCR_HD            (1UL << 42)
+>>>> +
+>>>>  #define CTXDESC_CD_0_AA64		(1UL << 41)
+>>>>  #define CTXDESC_CD_0_S			(1UL << 44)
+>>>>  #define CTXDESC_CD_0_R			(1UL << 45)
+>>>> diff --git a/drivers/iommu/io-pgtable-arm.c
+>>>> b/drivers/iommu/io-pgtable-arm.c index 72dcdd468cf3..b2f470529459
+>>>> 100644
+>>>> --- a/drivers/iommu/io-pgtable-arm.c
+>>>> +++ b/drivers/iommu/io-pgtable-arm.c
+>>>> @@ -75,6 +75,7 @@
+>>>>
+>>>>  #define ARM_LPAE_PTE_NSTABLE		(((arm_lpae_iopte)1) << 63)
+>>>>  #define ARM_LPAE_PTE_XN			(((arm_lpae_iopte)3) << 53)
+>>>> +#define ARM_LPAE_PTE_DBM		(((arm_lpae_iopte)1) << 51)
+>>>>  #define ARM_LPAE_PTE_AF			(((arm_lpae_iopte)1) << 10)
+>>>>  #define ARM_LPAE_PTE_SH_NS		(((arm_lpae_iopte)0) << 8)
+>>>>  #define ARM_LPAE_PTE_SH_OS		(((arm_lpae_iopte)2) << 8)
+>>>> @@ -84,7 +85,7 @@
+>>>>
+>>>>  #define ARM_LPAE_PTE_ATTR_LO_MASK	(((arm_lpae_iopte)0x3ff) <<
+>> 2)
+>>>>  /* Ignore the contiguous bit for block splitting */
+>>>> -#define ARM_LPAE_PTE_ATTR_HI_MASK	(((arm_lpae_iopte)6) << 52)
+>>>> +#define ARM_LPAE_PTE_ATTR_HI_MASK	(((arm_lpae_iopte)13) <<
+>> 51)
+>>>>  #define ARM_LPAE_PTE_ATTR_MASK
+>> 	(ARM_LPAE_PTE_ATTR_LO_MASK
+>>>> |	\
+>>>>  					 ARM_LPAE_PTE_ATTR_HI_MASK)
+>>>>  /* Software bit for solving coherency races */ @@ -93,6 +94,9 @@
+>>>>  /* Stage-1 PTE */
+>>>>  #define ARM_LPAE_PTE_AP_UNPRIV		(((arm_lpae_iopte)1) << 6)
+>>>>  #define ARM_LPAE_PTE_AP_RDONLY		(((arm_lpae_iopte)2) << 6)
+>>>> +#define ARM_LPAE_PTE_AP_RDONLY_BIT	7
+>>>> +#define ARM_LPAE_PTE_AP_WRITABLE
+>> 	(ARM_LPAE_PTE_AP_RDONLY | \
+>>>> +					 ARM_LPAE_PTE_DBM)
+>>>>  #define ARM_LPAE_PTE_ATTRINDX_SHIFT	2
+>>>>  #define ARM_LPAE_PTE_nG			(((arm_lpae_iopte)1) << 11)
+>>>>
+>>>> @@ -407,6 +411,8 @@ static arm_lpae_iopte
+>> arm_lpae_prot_to_pte(struct
+>>>> arm_lpae_io_pgtable *data,
+>>>>  		pte = ARM_LPAE_PTE_nG;
+>>>>  		if (!(prot & IOMMU_WRITE) && (prot & IOMMU_READ))
+>>>>  			pte |= ARM_LPAE_PTE_AP_RDONLY;
+>>>> +		else if (data->iop.cfg.quirks & IO_PGTABLE_QUIRK_ARM_HD)
+>>>> +			pte |= ARM_LPAE_PTE_AP_WRITABLE;
+>>>>  		if (!(prot & IOMMU_PRIV))
+>>>>  			pte |= ARM_LPAE_PTE_AP_UNPRIV;
+>>>>  	} else {
+>>>> @@ -804,7 +810,8 @@ arm_64_lpae_alloc_pgtable_s1(struct
+>>>> io_pgtable_cfg *cfg, void *cookie)
+>>>>
+>>>>  	if (cfg->quirks & ~(IO_PGTABLE_QUIRK_ARM_NS |
+>>>>  			    IO_PGTABLE_QUIRK_ARM_TTBR1 |
+>>>> -			    IO_PGTABLE_QUIRK_ARM_OUTER_WBWA))
+>>>> +			    IO_PGTABLE_QUIRK_ARM_OUTER_WBWA |
+>>>> +			    IO_PGTABLE_QUIRK_ARM_HD))
+>>>>  		return NULL;
+>>>>
+>>>>  	data = arm_lpae_alloc_pgtable(cfg); diff --git
+>>>> a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h index
+>>>> 25142a0e2fc2..9a996ba7856d 100644
+>>>> --- a/include/linux/io-pgtable.h
+>>>> +++ b/include/linux/io-pgtable.h
+>>>> @@ -85,6 +85,8 @@ struct io_pgtable_cfg {
+>>>>  	 *
+>>>>  	 * IO_PGTABLE_QUIRK_ARM_OUTER_WBWA: Override the
+>> outer-cacheability
+>>>>  	 *	attributes set in the TCR for a non-coherent page-table walker.
+>>>> +	 *
+>>>> +	 * IO_PGTABLE_QUIRK_ARM_HD: Enables dirty tracking.
+>>>>  	 */
+>>>>  	#define IO_PGTABLE_QUIRK_ARM_NS			BIT(0)
+>>>>  	#define IO_PGTABLE_QUIRK_NO_PERMS		BIT(1)
+>>>> @@ -92,6 +94,8 @@ struct io_pgtable_cfg {
+>>>>  	#define IO_PGTABLE_QUIRK_ARM_MTK_TTBR_EXT	BIT(4)
+>>>>  	#define IO_PGTABLE_QUIRK_ARM_TTBR1		BIT(5)
+>>>>  	#define IO_PGTABLE_QUIRK_ARM_OUTER_WBWA		BIT(6)
+>>>> +	#define IO_PGTABLE_QUIRK_ARM_HD			BIT(7)
+>>>> +
+>>>>  	unsigned long			quirks;
+>>>>  	unsigned long			pgsize_bitmap;
+>>>>  	unsigned int			ias;
+>>>> --
+>>>> 2.17.2
+>>>
