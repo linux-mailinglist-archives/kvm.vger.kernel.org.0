@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 162D8733664
-	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 18:46:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CE1F7336FD
+	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 19:01:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345302AbjFPQqS convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 16 Jun 2023 12:46:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33884 "EHLO
+        id S1346112AbjFPRB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jun 2023 13:01:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231138AbjFPQqR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jun 2023 12:46:17 -0400
+        with ESMTP id S1346475AbjFPRAk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 13:00:40 -0400
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83D852D4E
-        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 09:46:14 -0700 (PDT)
-Received: from lhrpeml500001.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QjQ336PCLz6GDcJ;
-        Sat, 17 Jun 2023 00:43:43 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1EA53A9E
+        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 10:00:11 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QjQM61fMwz6J7fM;
+        Sat, 17 Jun 2023 00:57:38 +0800 (CST)
 Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml500001.china.huawei.com (7.191.163.213) with Microsoft SMTP Server
+ lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 16 Jun 2023 17:46:11 +0100
+ 15.1.2507.23; Fri, 16 Jun 2023 18:00:09 +0100
 Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
  lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.023;
- Fri, 16 Jun 2023 17:46:11 +0100
+ Fri, 16 Jun 2023 18:00:09 +0100
 From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 To:     Joao Martins <joao.m.martins@oracle.com>,
         "iommu@lists.linux.dev" <iommu@lists.linux.dev>
@@ -40,23 +40,25 @@ CC:     Jason Gunthorpe <jgg@nvidia.com>,
         Robin Murphy <robin.murphy@arm.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH RFCv2 22/24] iommu/arm-smmu-v3: Add read_and_clear_dirty()
- support
-Thread-Topic: [PATCH RFCv2 22/24] iommu/arm-smmu-v3: Add
- read_and_clear_dirty() support
-Thread-Index: AQHZico8F+XQQUgz40mrFEyLOBzMNa+NzyIQ
-Date:   Fri, 16 Jun 2023 16:46:11 +0000
-Message-ID: <c4696aad77ef49e7b3c550c19b354223@huawei.com>
+Subject: RE: [PATCH RFCv2 21/24] iommu/arm-smmu-v3: Enable HTTU for stage1
+ with io-pgtable mapping
+Thread-Topic: [PATCH RFCv2 21/24] iommu/arm-smmu-v3: Enable HTTU for stage1
+ with io-pgtable mapping
+Thread-Index: AQHZico50POrCq6Z9ESUTUA7KQEZ/a9mHK1Q///zYICAJ8MbUA==
+Date:   Fri, 16 Jun 2023 17:00:09 +0000
+Message-ID: <f4656595f62a46e48edecd259bce950e@huawei.com>
 References: <20230518204650.14541-1-joao.m.martins@oracle.com>
- <20230518204650.14541-23-joao.m.martins@oracle.com>
-In-Reply-To: <20230518204650.14541-23-joao.m.martins@oracle.com>
+ <20230518204650.14541-22-joao.m.martins@oracle.com>
+ <e16e35b399044e4f825a453e1b325e40@huawei.com>
+ <e22772db-e432-c42f-181c-e7055aeed553@oracle.com>
+In-Reply-To: <e22772db-e432-c42f-181c-e7055aeed553@oracle.com>
 Accept-Language: en-GB, en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.202.227.178]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 X-CFilter-Loop: Reflected
 X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
@@ -68,234 +70,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Joao,
-
-> -----Original Message-----
-> From: Joao Martins [mailto:joao.m.martins@oracle.com]
-> Sent: 18 May 2023 21:47
-> To: iommu@lists.linux.dev
-> Cc: Jason Gunthorpe <jgg@nvidia.com>; Kevin Tian <kevin.tian@intel.com>;
-> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>; Lu
-> Baolu <baolu.lu@linux.intel.com>; Yi Liu <yi.l.liu@intel.com>; Yi Y Sun
-> <yi.y.sun@intel.com>; Eric Auger <eric.auger@redhat.com>; Nicolin Chen
-> <nicolinc@nvidia.com>; Joerg Roedel <joro@8bytes.org>; Jean-Philippe
-> Brucker <jean-philippe@linaro.org>; Suravee Suthikulpanit
-> <suravee.suthikulpanit@amd.com>; Will Deacon <will@kernel.org>; Robin
-> Murphy <robin.murphy@arm.com>; Alex Williamson
-> <alex.williamson@redhat.com>; kvm@vger.kernel.org; Joao Martins
-> <joao.m.martins@oracle.com>
-> Subject: [PATCH RFCv2 22/24] iommu/arm-smmu-v3: Add
-> read_and_clear_dirty() support
-> 
-> From: Keqian Zhu <zhukeqian1@huawei.com>
-> 
-> .read_and_clear_dirty() IOMMU domain op takes care of reading the dirty
-> bits (i.e. PTE has both DBM and AP[2] set) and marshalling into a bitmap of
-> a given page size.
-> 
-> While reading the dirty bits we also clear the PTE AP[2] bit to mark it as
-> writable-clean depending on read_and_clear_dirty() flags.
-> 
-> Structure it in a way that the IOPTE walker is generic, and so we pass a
-> function pointer over what to do on a per-PTE basis.
-> 
-> [Link below points to the original version that was based on]
-> 
-> Link:
-> https://lore.kernel.org/lkml/20210413085457.25400-11-zhukeqian1@huaw
-> ei.com/
-> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
-> Co-developed-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> [joaomart: Massage commit message]
-> Co-developed-by: Joao Martins <joao.m.martins@oracle.com>
-> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
-> ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  23 +++++
->  drivers/iommu/io-pgtable-arm.c              | 104
-> ++++++++++++++++++++
->  2 files changed, 127 insertions(+)
-> 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index e2b98a6a6b74..2cde14003469 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -2765,6 +2765,28 @@ static int arm_smmu_enable_nesting(struct
-> iommu_domain *domain)
->  	return ret;
->  }
-> 
-> +static int arm_smmu_read_and_clear_dirty(struct iommu_domain
-> *domain,
-> +					 unsigned long iova, size_t size,
-> +					 unsigned long flags,
-> +					 struct iommu_dirty_bitmap *dirty)
-> +{
-> +	struct arm_smmu_domain *smmu_domain =
-> to_smmu_domain(domain);
-> +	struct io_pgtable_ops *ops = smmu_domain->pgtbl_ops;
-> +	int ret;
-> +
-> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_S1)
-> +		return -EINVAL;
-> +
-> +	if (!ops || !ops->read_and_clear_dirty) {
-> +		pr_err_once("io-pgtable don't support dirty tracking\n");
-> +		return -ENODEV;
-> +	}
-> +
-> +	ret = ops->read_and_clear_dirty(ops, iova, size, flags, dirty);
-> +
-> +	return ret;
-> +}
-> +
->  static int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args
-> *args)
->  {
->  	return iommu_fwspec_add_ids(dev, args->args, 1);
-> @@ -2893,6 +2915,7 @@ static struct iommu_ops arm_smmu_ops = {
->  		.iova_to_phys		= arm_smmu_iova_to_phys,
->  		.enable_nesting		= arm_smmu_enable_nesting,
->  		.free			= arm_smmu_domain_free,
-> +		.read_and_clear_dirty	= arm_smmu_read_and_clear_dirty,
->  	}
->  };
-> 
-> diff --git a/drivers/iommu/io-pgtable-arm.c
-> b/drivers/iommu/io-pgtable-arm.c
-> index b2f470529459..de9e61f8452d 100644
-> --- a/drivers/iommu/io-pgtable-arm.c
-> +++ b/drivers/iommu/io-pgtable-arm.c
-> @@ -717,6 +717,109 @@ static phys_addr_t arm_lpae_iova_to_phys(struct
-> io_pgtable_ops *ops,
->  	return iopte_to_paddr(pte, data) | iova;
->  }
-> 
-> +struct arm_lpae_iopte_read_dirty {
-> +	unsigned long flags;
-> +	struct iommu_dirty_bitmap *dirty;
-> +};
-> +
-> +static int __arm_lpae_read_and_clear_dirty(unsigned long iova, size_t size,
-> +					   arm_lpae_iopte *ptep, void *opaque)
-> +{
-> +	struct arm_lpae_iopte_read_dirty *arg = opaque;
-> +	struct iommu_dirty_bitmap *dirty = arg->dirty;
-> +	arm_lpae_iopte pte;
-> +
-> +	pte = READ_ONCE(*ptep);
-> +	if (WARN_ON(!pte))
-> +		return -EINVAL;
-> +
-> +	if ((pte & ARM_LPAE_PTE_AP_WRITABLE) ==
-> ARM_LPAE_PTE_AP_WRITABLE)
-> +		return 0;
-> +
-> +	iommu_dirty_bitmap_record(dirty, iova, size);
-> +	if (!(arg->flags & IOMMU_DIRTY_NO_CLEAR))
-> +		set_bit(ARM_LPAE_PTE_AP_RDONLY_BIT, (unsigned long *)ptep);
-> +	return 0;
-> +}
-> +
-> +static int __arm_lpae_iopte_walk(struct arm_lpae_io_pgtable *data,
-> +				 unsigned long iova, size_t size,
-> +				 int lvl, arm_lpae_iopte *ptep,
-> +				 int (*fn)(unsigned long iova, size_t size,
-> +					   arm_lpae_iopte *pte, void *opaque),
-> +				 void *opaque)
-> +{
-> +	arm_lpae_iopte pte;
-> +	struct io_pgtable *iop = &data->iop;
-> +	size_t base, next_size;
-> +	int ret;
-> +
-> +	if (WARN_ON_ONCE(!fn))
-> +		return -EINVAL;
-> +
-> +	if (WARN_ON(lvl == ARM_LPAE_MAX_LEVELS))
-> +		return -EINVAL;
-> +
-> +	ptep += ARM_LPAE_LVL_IDX(iova, lvl, data);
-> +	pte = READ_ONCE(*ptep);
-> +	if (WARN_ON(!pte))
-> +		return -EINVAL;
-> +
-> +	if (size == ARM_LPAE_BLOCK_SIZE(lvl, data)) {
-> +		if (iopte_leaf(pte, lvl, iop->fmt))
-> +			return fn(iova, size, ptep, opaque);
-> +
-> +		/* Current level is table, traverse next level */
-> +		next_size = ARM_LPAE_BLOCK_SIZE(lvl + 1, data);
-> +		ptep = iopte_deref(pte, data);
-> +		for (base = 0; base < size; base += next_size) {
-> +			ret = __arm_lpae_iopte_walk(data, iova + base,
-> +						    next_size, lvl + 1, ptep,
-> +						    fn, opaque);
-> +			if (ret)
-> +				return ret;
-> +		}
-> +		return 0;
-> +	} else if (iopte_leaf(pte, lvl, iop->fmt)) {
-> +		return fn(iova, size, ptep, opaque);
-> +	}
-> +
-> +	/* Keep on walkin */
-> +	ptep = iopte_deref(pte, data);
-> +	return __arm_lpae_iopte_walk(data, iova, size, lvl + 1, ptep,
-> +				     fn, opaque);
-> +}
-> +
-> +static int arm_lpae_read_and_clear_dirty(struct io_pgtable_ops *ops,
-> +					 unsigned long iova, size_t size,
-> +					 unsigned long flags,
-> +					 struct iommu_dirty_bitmap *dirty)
-> +{
-> +	struct arm_lpae_io_pgtable *data = io_pgtable_ops_to_data(ops);
-> +	struct io_pgtable_cfg *cfg = &data->iop.cfg;
-> +	struct arm_lpae_iopte_read_dirty arg = {
-> +		.flags = flags, .dirty = dirty,
-> +	};
-> +	arm_lpae_iopte *ptep = data->pgd;
-> +	int lvl = data->start_level;
-> +	long iaext = (s64)iova >> cfg->ias;
-> +
-> +	if (WARN_ON(!size || (size & cfg->pgsize_bitmap) != size))
-> +		return -EINVAL;
-
-I guess the size here is supposed to be one of the pgsize that iommu supports.
-But looking at the code, it looks like we are passing the iova mapped length and
-it fails here in my test setup. Could you please check and confirm.
-
-Thanks,
-Shameer
-
-
-> +
-> +	if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_TTBR1)
-> +		iaext = ~iaext;
-> +	if (WARN_ON(iaext))
-> +		return -EINVAL;
-> +
-> +	if (data->iop.fmt != ARM_64_LPAE_S1 &&
-> +	    data->iop.fmt != ARM_32_LPAE_S1)
-> +		return -EINVAL;
-> +
-> +	return __arm_lpae_iopte_walk(data, iova, size, lvl, ptep,
-> +				     __arm_lpae_read_and_clear_dirty, &arg);
-> +}
-> +
->  static void arm_lpae_restrict_pgsizes(struct io_pgtable_cfg *cfg)
->  {
->  	unsigned long granule, page_sizes;
-> @@ -795,6 +898,7 @@ arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
->  		.map_pages	= arm_lpae_map_pages,
->  		.unmap_pages	= arm_lpae_unmap_pages,
->  		.iova_to_phys	= arm_lpae_iova_to_phys,
-> +		.read_and_clear_dirty = arm_lpae_read_and_clear_dirty,
->  	};
-> 
->  	return data;
-> --
-> 2.17.2
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSm9hbyBNYXJ0aW5zIFtt
+YWlsdG86am9hby5tLm1hcnRpbnNAb3JhY2xlLmNvbV0NCj4gU2VudDogMjIgTWF5IDIwMjMgMTE6
+NDMNCj4gVG86IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29sb3RodW0u
+dGhvZGlAaHVhd2VpLmNvbT47DQo+IGlvbW11QGxpc3RzLmxpbnV4LmRldg0KPiBDYzogSmFzb24g
+R3VudGhvcnBlIDxqZ2dAbnZpZGlhLmNvbT47IEtldmluIFRpYW4gPGtldmluLnRpYW5AaW50ZWwu
+Y29tPjsNCj4gTHUgQmFvbHUgPGJhb2x1Lmx1QGxpbnV4LmludGVsLmNvbT47IFlpIExpdSA8eWku
+bC5saXVAaW50ZWwuY29tPjsgWWkgWSBTdW4NCj4gPHlpLnkuc3VuQGludGVsLmNvbT47IEVyaWMg
+QXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT47IE5pY29saW4gQ2hlbg0KPiA8bmljb2xpbmNA
+bnZpZGlhLmNvbT47IEpvZXJnIFJvZWRlbCA8am9yb0A4Ynl0ZXMub3JnPjsgSmVhbi1QaGlsaXBw
+ZQ0KPiBCcnVja2VyIDxqZWFuLXBoaWxpcHBlQGxpbmFyby5vcmc+OyBTdXJhdmVlIFN1dGhpa3Vs
+cGFuaXQNCj4gPHN1cmF2ZWUuc3V0aGlrdWxwYW5pdEBhbWQuY29tPjsgV2lsbCBEZWFjb24gPHdp
+bGxAa2VybmVsLm9yZz47IFJvYmluDQo+IE11cnBoeSA8cm9iaW4ubXVycGh5QGFybS5jb20+OyBB
+bGV4IFdpbGxpYW1zb24NCj4gPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPjsga3ZtQHZnZXIu
+a2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIFJGQ3YyIDIxLzI0XSBpb21tdS9hcm0t
+c21tdS12MzogRW5hYmxlIEhUVFUgZm9yDQo+IHN0YWdlMSB3aXRoIGlvLXBndGFibGUgbWFwcGlu
+Zw0KDQpbLi4uXQ0KDQo+ID4+IEBAIC0yMjI2LDYgKzIyMzMsOSBAQCBzdGF0aWMgaW50IGFybV9z
+bW11X2RvbWFpbl9maW5hbGlzZShzdHJ1Y3QNCj4gPj4gaW9tbXVfZG9tYWluICpkb21haW4sDQo+
+ID4+ICAJCS5pb21tdV9kZXYJPSBzbW11LT5kZXYsDQo+ID4+ICAJfTsNCj4gPj4NCj4gPj4gKwlp
+ZiAoc21tdS0+ZmVhdHVyZXMgJiBhcm1fc21tdV9kYm1fY2FwYWJsZShzbW11KSkNCj4gPj4gKwkJ
+cGd0YmxfY2ZnLnF1aXJrcyB8PSBJT19QR1RBQkxFX1FVSVJLX0FSTV9IRDsNCg0KQWxzbywgSSB0
+aGluayB3ZSBzaG91bGQgbGltaXQgc2V0dGluZyB0aGlzIHRvIHMxIG9ubHkgcGd0YmxfY2ZnLg0K
+DQpUaGFua3MsDQpTaGFtZWVyDQoNCj4gPj4gKw0KPiA+PiAgCXBndGJsX29wcyA9IGFsbG9jX2lv
+X3BndGFibGVfb3BzKGZtdCwgJnBndGJsX2NmZywgc21tdV9kb21haW4pOw0KPiA+PiAgCWlmICgh
+cGd0Ymxfb3BzKQ0KPiA+PiAgCQlyZXR1cm4gLUVOT01FTTsNCj4gPj4gZGlmZiAtLWdpdCBhL2Ry
+aXZlcnMvaW9tbXUvYXJtL2FybS1zbW11LXYzL2FybS1zbW11LXYzLmgNCj4gPj4gYi9kcml2ZXJz
+L2lvbW11L2FybS9hcm0tc21tdS12My9hcm0tc21tdS12My5oDQo+ID4+IGluZGV4IGQ4MmRkMTI1
+NDQ2Yy4uODNkNmYzYTI1NTRmIDEwMDY0NA0KPiA+PiAtLS0gYS9kcml2ZXJzL2lvbW11L2FybS9h
+cm0tc21tdS12My9hcm0tc21tdS12My5oDQo+ID4+ICsrKyBiL2RyaXZlcnMvaW9tbXUvYXJtL2Fy
+bS1zbW11LXYzL2FybS1zbW11LXYzLmgNCj4gPj4gQEAgLTI4OCw2ICsyODgsOSBAQA0KPiA+PiAg
+I2RlZmluZSBDVFhERVNDX0NEXzBfVENSX0lQUwkJR0VOTUFTS19VTEwoMzQsIDMyKQ0KPiA+PiAg
+I2RlZmluZSBDVFhERVNDX0NEXzBfVENSX1RCSTAJCSgxVUxMIDw8IDM4KQ0KPiA+Pg0KPiA+PiAr
+I2RlZmluZSBDVFhERVNDX0NEXzBfVENSX0hBICAgICAgICAgICAgKDFVTCA8PCA0MykNCj4gPj4g
+KyNkZWZpbmUgQ1RYREVTQ19DRF8wX1RDUl9IRCAgICAgICAgICAgICgxVUwgPDwgNDIpDQo+ID4+
+ICsNCj4gPj4gICNkZWZpbmUgQ1RYREVTQ19DRF8wX0FBNjQJCSgxVUwgPDwgNDEpDQo+ID4+ICAj
+ZGVmaW5lIENUWERFU0NfQ0RfMF9TCQkJKDFVTCA8PCA0NCkNCj4gPj4gICNkZWZpbmUgQ1RYREVT
+Q19DRF8wX1IJCQkoMVVMIDw8IDQ1KQ0KPiA+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9pb21tdS9p
+by1wZ3RhYmxlLWFybS5jDQo+ID4+IGIvZHJpdmVycy9pb21tdS9pby1wZ3RhYmxlLWFybS5jIGlu
+ZGV4IDcyZGNkZDQ2OGNmMy4uYjJmNDcwNTI5NDU5DQo+ID4+IDEwMDY0NA0KPiA+PiAtLS0gYS9k
+cml2ZXJzL2lvbW11L2lvLXBndGFibGUtYXJtLmMNCj4gPj4gKysrIGIvZHJpdmVycy9pb21tdS9p
+by1wZ3RhYmxlLWFybS5jDQo+ID4+IEBAIC03NSw2ICs3NSw3IEBADQo+ID4+DQo+ID4+ICAjZGVm
+aW5lIEFSTV9MUEFFX1BURV9OU1RBQkxFCQkoKChhcm1fbHBhZV9pb3B0ZSkxKSA8PCA2MykNCj4g
+Pj4gICNkZWZpbmUgQVJNX0xQQUVfUFRFX1hOCQkJKCgoYXJtX2xwYWVfaW9wdGUpMykgPDwgNTMp
+DQo+ID4+ICsjZGVmaW5lIEFSTV9MUEFFX1BURV9EQk0JCSgoKGFybV9scGFlX2lvcHRlKTEpIDw8
+IDUxKQ0KPiA+PiAgI2RlZmluZSBBUk1fTFBBRV9QVEVfQUYJCQkoKChhcm1fbHBhZV9pb3B0ZSkx
+KSA8PCAxMCkNCj4gPj4gICNkZWZpbmUgQVJNX0xQQUVfUFRFX1NIX05TCQkoKChhcm1fbHBhZV9p
+b3B0ZSkwKSA8PCA4KQ0KPiA+PiAgI2RlZmluZSBBUk1fTFBBRV9QVEVfU0hfT1MJCSgoKGFybV9s
+cGFlX2lvcHRlKTIpIDw8IDgpDQo+ID4+IEBAIC04NCw3ICs4NSw3IEBADQo+ID4+DQo+ID4+ICAj
+ZGVmaW5lIEFSTV9MUEFFX1BURV9BVFRSX0xPX01BU0sJKCgoYXJtX2xwYWVfaW9wdGUpMHgzZmYp
+IDw8DQo+IDIpDQo+ID4+ICAvKiBJZ25vcmUgdGhlIGNvbnRpZ3VvdXMgYml0IGZvciBibG9jayBz
+cGxpdHRpbmcgKi8NCj4gPj4gLSNkZWZpbmUgQVJNX0xQQUVfUFRFX0FUVFJfSElfTUFTSwkoKChh
+cm1fbHBhZV9pb3B0ZSk2KSA8PCA1MikNCj4gPj4gKyNkZWZpbmUgQVJNX0xQQUVfUFRFX0FUVFJf
+SElfTUFTSwkoKChhcm1fbHBhZV9pb3B0ZSkxMykgPDwNCj4gNTEpDQo+ID4+ICAjZGVmaW5lIEFS
+TV9MUEFFX1BURV9BVFRSX01BU0sNCj4gCShBUk1fTFBBRV9QVEVfQVRUUl9MT19NQVNLDQo+ID4+
+IHwJXA0KPiA+PiAgCQkJCQkgQVJNX0xQQUVfUFRFX0FUVFJfSElfTUFTSykNCj4gPj4gIC8qIFNv
+ZnR3YXJlIGJpdCBmb3Igc29sdmluZyBjb2hlcmVuY3kgcmFjZXMgKi8gQEAgLTkzLDYgKzk0LDkg
+QEANCj4gPj4gIC8qIFN0YWdlLTEgUFRFICovDQo+ID4+ICAjZGVmaW5lIEFSTV9MUEFFX1BURV9B
+UF9VTlBSSVYJCSgoKGFybV9scGFlX2lvcHRlKTEpIDw8IDYpDQo+ID4+ICAjZGVmaW5lIEFSTV9M
+UEFFX1BURV9BUF9SRE9OTFkJCSgoKGFybV9scGFlX2lvcHRlKTIpIDw8IDYpDQo+ID4+ICsjZGVm
+aW5lIEFSTV9MUEFFX1BURV9BUF9SRE9OTFlfQklUCTcNCj4gPj4gKyNkZWZpbmUgQVJNX0xQQUVf
+UFRFX0FQX1dSSVRBQkxFDQo+IAkoQVJNX0xQQUVfUFRFX0FQX1JET05MWSB8IFwNCj4gPj4gKwkJ
+CQkJIEFSTV9MUEFFX1BURV9EQk0pDQo+ID4+ICAjZGVmaW5lIEFSTV9MUEFFX1BURV9BVFRSSU5E
+WF9TSElGVAkyDQo+ID4+ICAjZGVmaW5lIEFSTV9MUEFFX1BURV9uRwkJCSgoKGFybV9scGFlX2lv
+cHRlKTEpIDw8IDExKQ0KPiA+Pg0KPiA+PiBAQCAtNDA3LDYgKzQxMSw4IEBAIHN0YXRpYyBhcm1f
+bHBhZV9pb3B0ZQ0KPiBhcm1fbHBhZV9wcm90X3RvX3B0ZShzdHJ1Y3QNCj4gPj4gYXJtX2xwYWVf
+aW9fcGd0YWJsZSAqZGF0YSwNCj4gPj4gIAkJcHRlID0gQVJNX0xQQUVfUFRFX25HOw0KPiA+PiAg
+CQlpZiAoIShwcm90ICYgSU9NTVVfV1JJVEUpICYmIChwcm90ICYgSU9NTVVfUkVBRCkpDQo+ID4+
+ICAJCQlwdGUgfD0gQVJNX0xQQUVfUFRFX0FQX1JET05MWTsNCj4gPj4gKwkJZWxzZSBpZiAoZGF0
+YS0+aW9wLmNmZy5xdWlya3MgJiBJT19QR1RBQkxFX1FVSVJLX0FSTV9IRCkNCj4gPj4gKwkJCXB0
+ZSB8PSBBUk1fTFBBRV9QVEVfQVBfV1JJVEFCTEU7DQo+ID4+ICAJCWlmICghKHByb3QgJiBJT01N
+VV9QUklWKSkNCj4gPj4gIAkJCXB0ZSB8PSBBUk1fTFBBRV9QVEVfQVBfVU5QUklWOw0KPiA+PiAg
+CX0gZWxzZSB7DQo+ID4+IEBAIC04MDQsNyArODEwLDggQEAgYXJtXzY0X2xwYWVfYWxsb2NfcGd0
+YWJsZV9zMShzdHJ1Y3QNCj4gPj4gaW9fcGd0YWJsZV9jZmcgKmNmZywgdm9pZCAqY29va2llKQ0K
+PiA+Pg0KPiA+PiAgCWlmIChjZmctPnF1aXJrcyAmIH4oSU9fUEdUQUJMRV9RVUlSS19BUk1fTlMg
+fA0KPiA+PiAgCQkJICAgIElPX1BHVEFCTEVfUVVJUktfQVJNX1RUQlIxIHwNCj4gPj4gLQkJCSAg
+ICBJT19QR1RBQkxFX1FVSVJLX0FSTV9PVVRFUl9XQldBKSkNCj4gPj4gKwkJCSAgICBJT19QR1RB
+QkxFX1FVSVJLX0FSTV9PVVRFUl9XQldBIHwNCj4gPj4gKwkJCSAgICBJT19QR1RBQkxFX1FVSVJL
+X0FSTV9IRCkpDQo+ID4+ICAJCXJldHVybiBOVUxMOw0KPiA+Pg0KPiA+PiAgCWRhdGEgPSBhcm1f
+bHBhZV9hbGxvY19wZ3RhYmxlKGNmZyk7IGRpZmYgLS1naXQNCj4gPj4gYS9pbmNsdWRlL2xpbnV4
+L2lvLXBndGFibGUuaCBiL2luY2x1ZGUvbGludXgvaW8tcGd0YWJsZS5oIGluZGV4DQo+ID4+IDI1
+MTQyYTBlMmZjMi4uOWE5OTZiYTc4NTZkIDEwMDY0NA0KPiA+PiAtLS0gYS9pbmNsdWRlL2xpbnV4
+L2lvLXBndGFibGUuaA0KPiA+PiArKysgYi9pbmNsdWRlL2xpbnV4L2lvLXBndGFibGUuaA0KPiA+
+PiBAQCAtODUsNiArODUsOCBAQCBzdHJ1Y3QgaW9fcGd0YWJsZV9jZmcgew0KPiA+PiAgCSAqDQo+
+ID4+ICAJICogSU9fUEdUQUJMRV9RVUlSS19BUk1fT1VURVJfV0JXQTogT3ZlcnJpZGUgdGhlDQo+
+IG91dGVyLWNhY2hlYWJpbGl0eQ0KPiA+PiAgCSAqCWF0dHJpYnV0ZXMgc2V0IGluIHRoZSBUQ1Ig
+Zm9yIGEgbm9uLWNvaGVyZW50IHBhZ2UtdGFibGUgd2Fsa2VyLg0KPiA+PiArCSAqDQo+ID4+ICsJ
+ICogSU9fUEdUQUJMRV9RVUlSS19BUk1fSEQ6IEVuYWJsZXMgZGlydHkgdHJhY2tpbmcuDQo+ID4+
+ICAJICovDQo+ID4+ICAJI2RlZmluZSBJT19QR1RBQkxFX1FVSVJLX0FSTV9OUwkJCUJJVCgwKQ0K
+PiA+PiAgCSNkZWZpbmUgSU9fUEdUQUJMRV9RVUlSS19OT19QRVJNUwkJQklUKDEpDQo+ID4+IEBA
+IC05Miw2ICs5NCw4IEBAIHN0cnVjdCBpb19wZ3RhYmxlX2NmZyB7DQo+ID4+ICAJI2RlZmluZSBJ
+T19QR1RBQkxFX1FVSVJLX0FSTV9NVEtfVFRCUl9FWFQJQklUKDQpDQo+ID4+ICAJI2RlZmluZSBJ
+T19QR1RBQkxFX1FVSVJLX0FSTV9UVEJSMQkJQklUKDUpDQo+ID4+ICAJI2RlZmluZSBJT19QR1RB
+QkxFX1FVSVJLX0FSTV9PVVRFUl9XQldBCQlCSVQoNikNCj4gPj4gKwkjZGVmaW5lIElPX1BHVEFC
+TEVfUVVJUktfQVJNX0hECQkJQklUKDcpDQo+ID4+ICsNCj4gPj4gIAl1bnNpZ25lZCBsb25nCQkJ
+cXVpcmtzOw0KPiA+PiAgCXVuc2lnbmVkIGxvbmcJCQlwZ3NpemVfYml0bWFwOw0KPiA+PiAgCXVu
+c2lnbmVkIGludAkJCWlhczsNCj4gPj4gLS0NCj4gPj4gMi4xNy4yDQo+ID4NCg==
