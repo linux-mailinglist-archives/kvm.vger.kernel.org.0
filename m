@@ -2,379 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A5D373297E
-	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 10:06:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85F64732987
+	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 10:10:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243101AbjFPIG3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jun 2023 04:06:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51250 "EHLO
+        id S243808AbjFPIJc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jun 2023 04:09:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242572AbjFPIG1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jun 2023 04:06:27 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D1961FD7;
-        Fri, 16 Jun 2023 01:06:25 -0700 (PDT)
+        with ESMTP id S242492AbjFPIJW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 04:09:22 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E9D2684;
+        Fri, 16 Jun 2023 01:09:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686902785; x=1718438785;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=CP9+6COdbCHr3IKIpWffUbLq8dRtkAikqouBCZciSM4=;
-  b=eNgeVFbk09P5iCM7x4wL9rcsRCxd6g4wHDH30YVKTva+dUqYkxlmCBEk
-   zkxBCDXEIXVSAoNZfnpOytt0rtOVS5n2g3HCpyX+INbyVu86QZT7bdvOw
-   SLKq7Dve7TTtTG/mQ7ZNjJ6+V+3fX+kKlzY2jdtejHQZIAFv+vDlfBPFu
-   PFIls1mWBPyHQLzi4pN7CnQ7qZhNYIrGsb9xE5HhUbMrvMhV+aMUxLveB
-   NgBXsMveM7Ww6BLWDHtyzP2LS3QsC1YVybZKYGz8A4HlhQoOHx4zDgcAU
-   JMIJrfopEUBIXkPHdmBO7q0kMZxiQmdkKaAdwxW0D4NazU/+gWsRiLAPW
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="425094827"
+  t=1686902961; x=1718438961;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=FIZHMugeg2xPHdpjXSgKrP/iomfabUS8UnyZHeA6vAc=;
+  b=ZdwSuFmLTFV5cEUXGj6RLwqtoAwmCmcDc/ejbM8Bq5PiVtwO/2A3EdHt
+   nXAihHm3hAql2RoUecuA0U+hU36efKFLSGHga5C4PxOnI+mxRKuu0zoFD
+   O6Zd4Qdl6+g+YwcqyO0AWLjAAn09Yh8t0NFn0r34Zx9cH6sIV3K8UQZHu
+   CikIXTup6w4e8jaWiBUg96RNInyNOkA5JGWRTR6c2ONJSK1U9Kov1WGex
+   aGHoUDGqa8shveQJH7jScqKg3kqUl0HcSaizBXSGc87JrD0k8PO6FcF+/
+   9Bn1LyTUTkK7c1rWDP7DtrrrnFB2QieyAEX8YHu4XNnuFuAYY1xEa+yfI
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="361682426"
 X-IronPort-AV: E=Sophos;i="6.00,247,1681196400"; 
-   d="scan'208";a="425094827"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2023 01:06:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="857291468"
+   d="scan'208";a="361682426"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2023 01:09:21 -0700
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="746106659"
 X-IronPort-AV: E=Sophos;i="6.00,247,1681196400"; 
-   d="scan'208";a="857291468"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga001.fm.intel.com with ESMTP; 16 Jun 2023 01:06:24 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 16 Jun 2023 01:06:23 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Fri, 16 Jun 2023 01:06:23 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.42) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Fri, 16 Jun 2023 01:06:22 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K/ECnypuiPNvlHsw+APJ6PYIQ0XfrqxxzSXB2H4/p36Qcll1ENa1HCQqM15aJ9LLM87Bqemvd7C38/JW4iR23cAnW9E0tdfectjdwJhIn7v1GGXGK+YjaJh8jVgWuzNTJzeRFnXbicFQsm6BnH87KRixnfFwg3KNIvQ/Q/IHi4gaAnOyo/4Xp2hFdJWag/fkCvog4/IaY0HYDqsIr2lCS82B8Zgw9mgLUHudGADtHoFVpTAwNJFvDDp8ZiBbOU/aJSXwU0Lxmr+9iqqrKP8MpPQsY0MNmsOufNj95IN62+r6Yzau7LHhDjvM2KQ9EprCn6lTkgPFTDy28swpHunxlg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QllZzOQIfE2zwfsTiIp8rDjQIdl9wFUp+KdhWo6NR/0=;
- b=EF5iZAcX8SVzOe50z0yMRNq75SabOaTbeZKNXkIrsRkjfhX/UpHt9qaIzBnhaOye1U9sMDxl3nRiRu+vRKAJlTqJNU/Jr9hj9J3z09dZ4+JwqY3GMGlfMPSBaGX5QbMMZmwG7Y/wjhQ4Wjw750nGHlK3EAW4Eg4aO8ubRQTf6/6Wr/3nF5kltDlgoSULypWXeMPXjIRLz1GQN1HXPB2wR4Z3MAeAdk2luPLxevK4K0oN6Q7qWTuv4qeLZls2TdoKdROZK/OI1PYPSE1ADql1UzogDuvHCRPi4aCBPGCjLWcOJvaaH23anwld5gFb6nWQ+ColtvP49qMuZyrXn14+jQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by SA0PR11MB4686.namprd11.prod.outlook.com (2603:10b6:806:97::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.29; Fri, 16 Jun
- 2023 08:06:21 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::4f05:6b0b:dbc8:abbb]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::4f05:6b0b:dbc8:abbb%7]) with mapi id 15.20.6500.026; Fri, 16 Jun 2023
- 08:06:21 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Brett Creeley <brett.creeley@amd.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>
-CC:     "shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: RE: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
-Thread-Topic: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
-Thread-Index: AQHZlZ4kU3Fwl99xbECsoSBHo1JwW6+NFosQ
-Date:   Fri, 16 Jun 2023 08:06:21 +0000
-Message-ID: <BN9PR11MB5276511543775B852AD1C5A88C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230602220318.15323-1-brett.creeley@amd.com>
- <20230602220318.15323-5-brett.creeley@amd.com>
-In-Reply-To: <20230602220318.15323-5-brett.creeley@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SA0PR11MB4686:EE_
-x-ms-office365-filtering-correlation-id: b4da5218-dec6-40bc-29d3-08db6e409241
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: kWJbu1B4Xe+huH68cR68dikIr/QVZCWwrWOb2ItvxL9MoFyRUIpRuEvHTNFStENOd6CYpxUG1HyGpSkwwCBdm7uA3n8mgz75CyTSSwGTdXO7OY5s2s4YE9zFIfxPaLn/2ukjS8kZgTdbt9SQf6eAzGnWAdIg6Lp7TMCt6ZQao1XZhggcqc2FzWVZaMIju2Qov82/ZloY6LbQS2mE6Q4hGghPwvELmFUj6TsKhzeBBXBAcqmTI1oKzDHv4gf+G7pZ/3lvL6VO0Rew2Q43YEvRLYw68IRotfbfO1MFJjPdXk7VyIRKADXaxrmBSK5tqYZ87xjUqRB1TavkzEhqa3YvDgZOt/6X0CEuUwZkFGDq9xguUSlUxxnmInDdbK4ubz2+uzSB8EI59pbvUWCIXOIZ/Ghqb8GyVFKtc+rmAgzcQzepeMVMaXD+X+DexQI9jaMeQM+rRpWp+Qs+4kQ4gYhdbQdwo0PRGnMaEx1TQBbx6eqNvpZyC4Vd+AR3qlFkvjrbzWVaHPHL0Sg6/snFvDhxToE0XSn8+UJUuxH13UAIOAGOQWm/dY00o3sZyRsZRN4V/mmd5f3pPl8MhND2qRapF2zmaQLgxl/NHhuSi1am8nwSu0pnS7jLdH+laA5N0XXF
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(346002)(136003)(366004)(396003)(39860400002)(451199021)(8676002)(122000001)(83380400001)(66476007)(55016003)(7696005)(64756008)(71200400001)(26005)(9686003)(76116006)(6506007)(110136005)(5660300002)(186003)(86362001)(478600001)(2906002)(52536014)(33656002)(4326008)(38070700005)(316002)(41300700001)(38100700002)(66446008)(82960400001)(66556008)(66946007)(8936002)(66899021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?HRXSaeBAyXND5QJsGB7CWqN84SIHZeIQHqVCixhqK1l1opml4jedph6H6xB/?=
- =?us-ascii?Q?nLc6aHy9ljqDU5em7p54Td4njM0HdN1DElKlvFNnRbvbolVqP+u41F/Zhhed?=
- =?us-ascii?Q?Nyl7IcwOhiMdwqV6sO6z3Yx9IJQbbs2iDu+Ia5XqhrJG8lbDv2XnaTq3R2oR?=
- =?us-ascii?Q?cFXyMy7eXSjzLUup23mtJVUpyH0tDxrCTHTyT7QGbQH/ufdgrmeECSkNhIzX?=
- =?us-ascii?Q?hAgvrz6xbVa669qLgTyOaKA1+0HMGqpQXc9SgpLtJSA0g3DDX/t6G6VJb3rd?=
- =?us-ascii?Q?RTTFyzTPFuhoePZQi1C9NKR4GEZxKoJQwGeY9Rm/OHOXgpaGux2glzqyMRjD?=
- =?us-ascii?Q?HCW1yXPJlF49XrHBKk82nmUozXAJB2+HiG6BfTpe1vPiqdqWEb8+8QLYdfVj?=
- =?us-ascii?Q?/TtxZWrM3Aclz6YvrcwxQOxaz08iRsm8gm/xtaC4Z1i5EjiCHqPYigBS+tzF?=
- =?us-ascii?Q?ABI+e6tgawmL4FUwTyAZWUz98UlJRFg7PR8OzbC+A/ZPZyUhMSs3uMk0DugF?=
- =?us-ascii?Q?yaLf52NZPJBNyfhN4WhTlGst5sLSaBXKRdaYkQuE2aqo1/fJ5aCe2btd9TuV?=
- =?us-ascii?Q?z3224wfYtzAvssmzEQNVWaL/kkna4cuEHGoFSXEzROUeydJVHz2yJdbACjfB?=
- =?us-ascii?Q?lmlI8opUxmCFKYC4qzOpzXJrrCTiXcKjeCdSPo2SFiGEG5hk3uY6VqcAezq8?=
- =?us-ascii?Q?dscqAD0ZgpgoD09zfSXOHiTpet3fmy1RlLdE4l1C6RWkW1rn1RED8YjG5qIi?=
- =?us-ascii?Q?Vyh26oVol3ujPCiKsozoFgMxCmxG6sdFZvqeXJBbKOlUNCVDjTeN/liOkiHp?=
- =?us-ascii?Q?Awo6VcG7Fnj973I7ZouRTyRPYI9ISOIr8RMhwjKcu3L2lxYzies4TxLHb6WA?=
- =?us-ascii?Q?tLTVlKKPZ/joepWfr8Ga/rhUqGTwyq+CQrr0PuKgKAv6Gkj6E+3YAp6NsnKp?=
- =?us-ascii?Q?h/kMQcdiv9dTgXR5SXoorMcB+l8oYTGJqJdyM3Xef47kAy4Hi3hpSRiugxQf?=
- =?us-ascii?Q?wV9Ivs+OB06fzZfeJM6vIAvhQN9n5KJ4EhR4zU760gv/6lkkYhT94xBh8deb?=
- =?us-ascii?Q?ZK7nzpC27TV1DdSAIX6ahDJU0VxIGsUnrrDKjwxi0xx7Tjh7134D4CCpn2Hm?=
- =?us-ascii?Q?kECX533iBsNGwihh8B3jFymU7DjUQ/EJTkXLolaH3cLAZQkz+uxoMmxtJsqb?=
- =?us-ascii?Q?n2I8d2+fDne9JvkLr5VGqO1A4vUhOIXgpIeX/n0eQV7dEsCaHixsLB6TuHnu?=
- =?us-ascii?Q?94Y/EKS1Zdk/ZJSomr0B+wNiAE4PG5SAoI2Ud1nFjVRsPQ22ZEuWhg0hHqLE?=
- =?us-ascii?Q?yiVPvLZ7k9+zqobzqFH61csF/e7y7sB5yE54EdHpRB652HNgv/0AHWLTRmE0?=
- =?us-ascii?Q?1vuqzzDjc+MPjupuyOgK63D2iAnBlxQQwa04ABdSKr968LAAGnoqXMuSZ5L4?=
- =?us-ascii?Q?myWNVMeUyNDEbxy50pHEKwfbd5QVgnXEQA85218S6GPPRaN5wNCTO2/vkrVM?=
- =?us-ascii?Q?s+Cn6vQaXuV7dsZ086afXNytza7Ub0jNIy1qvJbrb1fPrtsSePHp8D/Jr7Oa?=
- =?us-ascii?Q?CNMNPpKRS7nVtiFr9O+KAefZmaYKHlvByOMcaFbI?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="746106659"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orsmga001.jf.intel.com with ESMTP; 16 Jun 2023 01:09:18 -0700
+Date:   Fri, 16 Jun 2023 16:09:17 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, chao.gao@intel.com,
+        kai.huang@intel.com, robert.hoo.linux@gmail.com
+Subject: Re: [PATCH v3 09/11] KVM: x86/mmu: serialize vCPUs to zap gfn when
+ guest MTRRs are honored
+Message-ID: <20230616080917.fhekzs2fyhqtbitx@yy-desk-7060>
+References: <20230616023101.7019-1-yan.y.zhao@intel.com>
+ <20230616023945.7570-1-yan.y.zhao@intel.com>
+ <20230616074550.g2ikzbni2rjy7dfw@yy-desk-7060>
+ <ZIwROWti5d0sCFwT@yzhao56-desk.sh.intel.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b4da5218-dec6-40bc-29d3-08db6e409241
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2023 08:06:21.3272
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dvCcvbgsa4kERZTfzlJVeQ/318SPYWZFbA0RMUzPlpFz22waMXfUNsIhWrzsT+JYUmoBTRChh/BGdJzIxSbMoA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4686
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZIwROWti5d0sCFwT@yzhao56-desk.sh.intel.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Brett Creeley <brett.creeley@amd.com>
-> Sent: Saturday, June 3, 2023 6:03 AM
->=20
-> Add live migration support via the VFIO subsystem. The migration
-> implementation aligns with the definition from uapi/vfio.h and uses
-> the pds_core PF's adminq for device configuration.
->=20
-> The ability to suspend, resume, and transfer VF device state data is
-> included along with the required admin queue command structures and
-> implementations.
->=20
-> PDS_LM_CMD_SUSPEND and PDS_LM_CMD_SUSPEND_STATUS are added to
-> support
-> the VF device suspend operation.
->=20
-> PDS_LM_CMD_RESUME is added to support the VF device resume operation.
->=20
-> PDS_LM_CMD_STATUS is added to determine the exact size of the VF
-> device state data.
->=20
-> PDS_LM_CMD_SAVE is added to get the VF device state data.
->=20
-> PDS_LM_CMD_RESTORE is added to restore the VF device with the
-> previously saved data from PDS_LM_CMD_SAVE.
->=20
-> PDS_LM_CMD_HOST_VF_STATUS is added to notify the device when
-> a migration is in/not-in progress from the host's perspective.
+On Fri, Jun 16, 2023 at 03:37:29PM +0800, Yan Zhao wrote:
+> On Fri, Jun 16, 2023 at 03:45:50PM +0800, Yuan Yao wrote:
+> > > +/*
+> > > + * Add @range into kvm->arch.mtrr_zap_list and sort the list in
+> > > + * "length" ascending + "start" descending order, so that
+> > > + * ranges consuming more zap cycles can be dequeued later and their
+> > > + * chances of being found duplicated are increased.
+> > > + */
+> > > +static void kvm_add_mtrr_zap_list(struct kvm *kvm, struct mtrr_zap_range *range)
+> > > +{
+> > > +	struct list_head *head = &kvm->arch.mtrr_zap_list;
+> > > +	u64 len = range->end - range->start;
+> > > +	struct mtrr_zap_range *cur, *n;
+> > > +	bool added = false;
+> > > +
+> > > +	spin_lock(&kvm->arch.mtrr_zap_list_lock);
+> > > +
+> > > +	if (list_empty(head)) {
+> > > +		list_add(&range->node, head);
+> > > +		spin_unlock(&kvm->arch.mtrr_zap_list_lock);
+> > > +		return;
+> > > +	}
+> > > +
+> > > +	list_for_each_entry_safe(cur, n, head, node) {
+> > > +		u64 cur_len = cur->end - cur->start;
+> > > +
+> > > +		if (len < cur_len)
+> > > +			break;
+> > > +
+> > > +		if (len > cur_len)
+> > > +			continue;
+> > > +
+> > > +		if (range->start > cur->start)
+> > > +			break;
+> > > +
+> > > +		if (range->start < cur->start)
+> > > +			continue;
+> > > +
+> > > +		/* equal len & start, no need to add */
+> > > +		added = true;
+> >
+> > Possible/worth to ignore the range already covered
+> > by queued range ?
+>
+> I may not get you correctly, but
+> the "added" here means an queued range with exactly same start + len
+> found, so free and drop adding the new range here.
 
-Here is 'the device' referring to the PF or VF?
+I mean drop adding three B below if A already in the queue:
 
-and how would the device use this information?
+|------A--------|
+|----B----|
 
-> +
-> +static int pds_vfio_client_adminq_cmd(struct pds_vfio_pci_device *pds_vf=
-io,
-> +				      union pds_core_adminq_cmd *req,
-> +				      size_t req_len,
-> +				      union pds_core_adminq_comp *resp,
-> +				      u64 flags)
-> +{
-> +	union pds_core_adminq_cmd cmd =3D {};
-> +	size_t cp_len;
-> +	int err;
-> +
-> +	/* Wrap the client request */
-> +	cmd.client_request.opcode =3D PDS_AQ_CMD_CLIENT_CMD;
-> +	cmd.client_request.client_id =3D cpu_to_le16(pds_vfio->client_id);
-> +	cp_len =3D min_t(size_t, req_len,
-> sizeof(cmd.client_request.client_cmd));
+|------A--------|
+      |----B----|
 
-'req_len' is kind of redundant. Looks all the callers use sizeof(req).
+|------A--------|
+  |----B----|
 
-> +static int
-> +pds_vfio_suspend_wait_device_cmd(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	union pds_core_adminq_cmd cmd =3D {
-> +		.lm_suspend_status =3D {
-> +			.opcode =3D PDS_LM_CMD_SUSPEND_STATUS,
-> +			.vf_id =3D cpu_to_le16(pds_vfio->vf_id),
-> +		},
-> +	};
-> +	struct device *dev =3D pds_vfio_to_dev(pds_vfio);
-> +	union pds_core_adminq_comp comp =3D {};
-> +	unsigned long time_limit;
-> +	unsigned long time_start;
-> +	unsigned long time_done;
-> +	int err;
-> +
-> +	time_start =3D jiffies;
-> +	time_limit =3D time_start + HZ * SUSPEND_TIMEOUT_S;
-> +	do {
-> +		err =3D pds_vfio_client_adminq_cmd(pds_vfio, &cmd,
-> sizeof(cmd),
-> +						 &comp,
-> PDS_AQ_FLAG_FASTPOLL);
-> +		if (err !=3D -EAGAIN)
-> +			break;
-> +
-> +		msleep(SUSPEND_CHECK_INTERVAL_MS);
-> +	} while (time_before(jiffies, time_limit));
-
-pds_vfio_client_adminq_cmd() has the exactly same mechanism
-with 5s timeout and 1ms poll interval when FASTPOLL is set.
-
-probably you can introduce another flag to indicate retry on
--EAGAIN and then handle it fully in pds_vfio_client_adminq_cmd()?
-
-> +int pds_vfio_suspend_device_cmd(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	union pds_core_adminq_cmd cmd =3D {
-> +		.lm_suspend =3D {
-> +			.opcode =3D PDS_LM_CMD_SUSPEND,
-> +			.vf_id =3D cpu_to_le16(pds_vfio->vf_id),
-> +		},
-> +	};
-> +	struct device *dev =3D pds_vfio_to_dev(pds_vfio);
-> +	union pds_core_adminq_comp comp =3D {};
-> +	int err;
-> +
-> +	dev_dbg(dev, "vf%u: Suspend device\n", pds_vfio->vf_id);
-> +
-> +	err =3D pds_vfio_client_adminq_cmd(pds_vfio, &cmd, sizeof(cmd),
-> &comp,
-> +					 PDS_AQ_FLAG_FASTPOLL);
-> +	if (err) {
-> +		dev_err(dev, "vf%u: Suspend failed: %pe\n", pds_vfio->vf_id,
-> +			ERR_PTR(err));
-> +		return err;
-> +	}
-> +
-> +	return pds_vfio_suspend_wait_device_cmd(pds_vfio);
-> +}
-
-The logic in this function is very confusing.
-
-PDS_LM_CMD_SUSPEND has a completion record:
-
-+struct pds_lm_suspend_comp {
-+	u8     status;
-+	u8     rsvd;
-+	__le16 comp_index;
-+	union {
-+		__le64 state_size;
-+		u8     rsvd2[11];
-+	} __packed;
-+	u8     color;
-
-Presumably this function can look at the completion record to know whether
-the suspend request succeeds.
-
-Why do you require another wait_device step to query the suspend status?
-
-and I have another question. Is it correct to hard-code the 5s timeout in
-the kernel w/o any input from the VMM? Note the guest has been stopped
-at this point then very likely the 5s timeout will kill any reasonable SLA =
-which
-CSPs try to reach hard.
-
-Ideally the VMM has an estimation how long a VM can be paused based on
-SLA, to-be-migrated state size, available network bandwidth, etc. and that
-hint should be passed to the kernel so any state transition which may viola=
-te
-that expectation can fail quickly to break the migration process and put th=
-e
-VM back to the running state.
-
-Jason/Shameer, is there similar concern in mlx/hisilicon drivers?=20
-
-> +
-> +int pds_vfio_resume_device_cmd(struct pds_vfio_pci_device *pds_vfio)
-> +{
-> +	union pds_core_adminq_cmd cmd =3D {
-> +		.lm_resume =3D {
-> +			.opcode =3D PDS_LM_CMD_RESUME,
-> +			.vf_id =3D cpu_to_le16(pds_vfio->vf_id),
-> +		},
-> +	};
-> +	struct device *dev =3D pds_vfio_to_dev(pds_vfio);
-> +	union pds_core_adminq_comp comp =3D {};
-> +
-> +	dev_dbg(dev, "vf%u: Resume device\n", pds_vfio->vf_id);
-> +
-> +	return pds_vfio_client_adminq_cmd(pds_vfio, &cmd, sizeof(cmd),
-> &comp,
-> +					  0);
-
-'resume' is also in the blackout phase when the guest is not running.
-
-So presumably FAST_POLL should be set otherwise the max 256ms
-poll interval (PDSC_ADMINQ_MAX_POLL_INTERVAL) is really inefficient.
-
-> +
-> +	if (cur =3D=3D VFIO_DEVICE_STATE_RUNNING && next =3D=3D
-> VFIO_DEVICE_STATE_RUNNING_P2P) {
-> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio,
-> +
-> PDS_LM_STA_IN_PROGRESS);
-> +		err =3D pds_vfio_suspend_device_cmd(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +
-> +		return NULL;
-> +	}
-> +
-> +	if (cur =3D=3D VFIO_DEVICE_STATE_RUNNING_P2P && next =3D=3D
-> VFIO_DEVICE_STATE_RUNNING) {
-> +		err =3D pds_vfio_resume_device_cmd(pds_vfio);
-> +		if (err)
-> +			return ERR_PTR(err);
-> +
-> +		pds_vfio_send_host_vf_lm_status_cmd(pds_vfio,
-> PDS_LM_STA_NONE);
-> +		return NULL;
-> +	}
-> +
-> +	if (cur =3D=3D VFIO_DEVICE_STATE_STOP && next =3D=3D
-> VFIO_DEVICE_STATE_RUNNING_P2P)
-> +		return NULL;
-> +
-> +	if (cur =3D=3D VFIO_DEVICE_STATE_RUNNING_P2P && next =3D=3D
-> VFIO_DEVICE_STATE_STOP)
-> +		return NULL;
-
-I'm not sure whether P2P is actually supported here. By definition
-P2P means the device is stopped but still responds to p2p request
-from other devices. If you look at mlx example it uses different
-cmds between RUNNING->RUNNING_P2P and RUNNING_P2P->STOP.
-
-But in your case seems you simply move what is required in STOP
-into P2P. Probably you can just remove the support of P2P like
-hisilicon does.
-
-> +
-> +/**
-> + * struct pds_lm_comp - generic command completion
-> + * @status:	Status of the command (enum pds_core_status_code)
-> + * @rsvd:	Structure padding to 16 Bytes
-> + */
-> +struct pds_lm_comp {
-> +	u8 status;
-> +	u8 rsvd[15];
-> +};
-
-not used. Looks most comp structures are defined w/o an user
-except struct pds_lm_status_comp.
+>
+> >
+> > > +		kfree(range);
+> > > +		break;
+> > > +	}
+> > > +
+> > > +	if (!added)
+> > > +		list_add_tail(&range->node, &cur->node);
+> > > +
+> > > +	spin_unlock(&kvm->arch.mtrr_zap_list_lock);
+> > > +}
+> > > +
+> > > +static void kvm_zap_mtrr_zap_list(struct kvm *kvm)
+> > > +{
+> > > +	struct list_head *head = &kvm->arch.mtrr_zap_list;
+> > > +	struct mtrr_zap_range *cur = NULL;
+> > > +
+> > > +	spin_lock(&kvm->arch.mtrr_zap_list_lock);
+> > > +
+> > > +	while (!list_empty(head)) {
+> > > +		u64 start, end;
+> > > +
+> > > +		cur = list_first_entry(head, typeof(*cur), node);
+> > > +		start = cur->start;
+> > > +		end = cur->end;
+> > > +		list_del(&cur->node);
+> > > +		kfree(cur);
+> > > +		spin_unlock(&kvm->arch.mtrr_zap_list_lock);
+> > > +
+> > > +		kvm_zap_gfn_range(kvm, start, end);
+> > > +
+> > > +		spin_lock(&kvm->arch.mtrr_zap_list_lock);
+> > > +	}
+> > > +
+> > > +	spin_unlock(&kvm->arch.mtrr_zap_list_lock);
+> > > +}
+> > > +
+> > > +static void kvm_zap_or_wait_mtrr_zap_list(struct kvm *kvm)
+> > > +{
+> > > +	if (atomic_cmpxchg_acquire(&kvm->arch.mtrr_zapping, 0, 1) == 0) {
+> > > +		kvm_zap_mtrr_zap_list(kvm);
+> > > +		atomic_set_release(&kvm->arch.mtrr_zapping, 0);
+> > > +		return;
+> > > +	}
+> > > +
+> > > +	while (atomic_read(&kvm->arch.mtrr_zapping))
+> > > +		cpu_relax();
+> > > +}
+> > > +
+> > > +static void kvm_mtrr_zap_gfn_range(struct kvm_vcpu *vcpu,
+> > > +				   gfn_t gfn_start, gfn_t gfn_end)
+> > > +{
+> > > +	struct mtrr_zap_range *range;
+> > > +
+> > > +	range = kmalloc(sizeof(*range), GFP_KERNEL_ACCOUNT);
+> > > +	if (!range)
+> > > +		goto fail;
+> > > +
+> > > +	range->start = gfn_start;
+> > > +	range->end = gfn_end;
+> > > +
+> > > +	kvm_add_mtrr_zap_list(vcpu->kvm, range);
+> > > +
+> > > +	kvm_zap_or_wait_mtrr_zap_list(vcpu->kvm);
+> > > +	return;
+> > > +
+> > > +fail:
+> > > +	kvm_clear_mtrr_zap_list(vcpu->kvm);
+> > A very small chance race condition that incorrectly
+> > clear the queued ranges which have not been zapped by another thread ?
+> > Like below:
+> >
+> > Thread A                         |  Thread B
+> > kvm_add_mtrr_zap_list()          |
+> >                                  |  kvm_clear_mtrr_zap_list()
+> > kvm_zap_or_wait_mtrr_zap_list()  |
+> >
+> > Call kvm_clear_mtrr_zap_list() here looks unnecessary, other
+> > threads(B here) who put thing in the queue will take care them well.
+>
+> > > +   kvm_zap_gfn_range(vcpu->kvm, gfn_start, gfn_end);
+>
+> Yes, if gfn_start and gfn_end here are not 0 and ~0ULL, the
+> kvm_clear_mtrr_zap_list() is not necessary.
+> Though in reality, they are always 0-~0ULL, I agree dropping the
+> kvm_clear_mtrr_zap_list() here is better.
+>
+> Thanks!
