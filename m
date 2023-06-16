@@ -2,478 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 771E57329DB
-	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 10:31:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED1FA7329F8
+	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 10:36:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244925AbjFPIbf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jun 2023 04:31:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34704 "EHLO
+        id S245178AbjFPIgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jun 2023 04:36:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240382AbjFPIbd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jun 2023 04:31:33 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3CE613E;
-        Fri, 16 Jun 2023 01:31:31 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2B48F61055;
-        Fri, 16 Jun 2023 08:31:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 317D5C433C9;
-        Fri, 16 Jun 2023 08:31:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686904290;
-        bh=rTOlfpmBCp0oMrcMWpEhK5SPHAeTuxu5wMswJ4b9E70=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=qpLjshihZypKSGURcvnhtiQjt+wTqEidN+GrF6AIMbG3Ddu8gzlcs3C0+pZSb3kjs
-         Vjl65RCvawMSpjqvsRUy+pNp1J489y+VmeGwGNyeZ9sb2FVryCO0LDGo5DRPoS1XZF
-         4hFQf+wvnitxfpkeOBvAuqK7Q+zISh/4KkA922PMSZlXrILbrVE9ysI1lRrcdRkCCi
-         Pqlg+/Gk1cLe/IkoncELEQzRKumJFhNmwegZTRd9v8Kcnlx3Fsc1Ej6CzjpAK2q3GW
-         yc3jPAew7mIby3ZoRmf97KgSeuhAUExKxrCK/m8mIJ8eYllIGW6p8L1C05uybR12iB
-         TmsNXuEoIPNrg==
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-51878f8e541so492280a12.3;
-        Fri, 16 Jun 2023 01:31:30 -0700 (PDT)
-X-Gm-Message-State: AC+VfDydK16lolfUzTQpxHupcdCZuKDzjIT6WpYxvNv3xmvctpEwayey
-        onjOWe2xjs30H4jFleI0nH2v3myTi3OMrTqFsNI=
-X-Google-Smtp-Source: ACHHUZ7Q/ccIVBVq5F2jCaCd3wDfwJiFQhWmPdlbLzzgA08ypO1TckBlBcfjmVQjgDd7TjJOnZfYaVdBd9wZnpGZZCM=
-X-Received: by 2002:aa7:d3c1:0:b0:518:9195:b535 with SMTP id
- o1-20020aa7d3c1000000b005189195b535mr650263edr.42.1686904288292; Fri, 16 Jun
- 2023 01:31:28 -0700 (PDT)
+        with ESMTP id S244718AbjFPIg1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 04:36:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA95630FB
+        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 01:35:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686904531;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vPY8mg0jxuqun1aPaAtNaVksF8bWjZS2YCR1atB3dxE=;
+        b=Vp0azCoCUpNmRWgtrIFak2JOroAdMD1/sMVilx8VqWiHuIm2+k4gWh+LRFu+gKdtS1XDZL
+        trZqRgAZhivEmj0M5AhK+cTx+WpXU/C9hUXYw+rrNOSO8Lvz25Axvdf880dxqQPbU/JM9Q
+        icLL5tsyDN2Luc9EwfLiPEOlV5EPDfs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-531-mRDTCdEGPxeOYggwGY16og-1; Fri, 16 Jun 2023 04:35:30 -0400
+X-MC-Unique: mRDTCdEGPxeOYggwGY16og-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3110acc0042so80779f8f.1
+        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 01:35:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686904529; x=1689496529;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vPY8mg0jxuqun1aPaAtNaVksF8bWjZS2YCR1atB3dxE=;
+        b=eQ5q33rvDwBIUKKzEnCriA3kByGGrxwSPBlP2fhXXyY4YW86WKmTQzvOIoLr9Lvi2f
+         Ij/NfflI2BOWNCd7tpcSk9QzIlZYWKd6t5RF9HL3YCjoQsjysIyIz2gArCiIOUR82//t
+         mRzEEejpWFTPr1UXRs6TReuYCNXOOSFNfMfPfuI7+ibV+QjHTHA7rMdOP9f/6fPATEGD
+         0EVnMbrBNUtkiaTZEdufkaPwrcosbI4d/Cb7fMzAvPUdXdjtfGJKx4+71AMeClwg+YYn
+         Wk9yfOOF8rKfuY2sEAnVKdoG3owJ9QHHl+IHy+nZIXiNtC3wtl5x5LtmoprzNqWyOxMy
+         DL3A==
+X-Gm-Message-State: AC+VfDwmL5JyPLFenAT2Je9sUaKxzJGhFMF5X+Zj6g6CDeJtQjq8Oqhf
+        P6soaaL5MaYwPRWl0WmdUO+Gb3xc7vK/xPV02mK8YUaLyOUJ833/n5FtwG60xZk2/bv03U4sU2G
+        oKxqUA62MB5on
+X-Received: by 2002:a5d:4b08:0:b0:307:5561:5eec with SMTP id v8-20020a5d4b08000000b0030755615eecmr993228wrq.0.1686904529246;
+        Fri, 16 Jun 2023 01:35:29 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5kzV+/7/dVCXo13XaZMI6EFcFN2DW5D8H1UUaaDdWD7gjszkEhR6SrO+93PHjRuvl1lmH6dg==
+X-Received: by 2002:a5d:4b08:0:b0:307:5561:5eec with SMTP id v8-20020a5d4b08000000b0030755615eecmr993204wrq.0.1686904528906;
+        Fri, 16 Jun 2023 01:35:28 -0700 (PDT)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id h14-20020adff4ce000000b0030c40e2cf42sm22871904wrp.116.2023.06.16.01.35.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Jun 2023 01:35:27 -0700 (PDT)
+Message-ID: <ea6777df-7bb6-eeb9-645e-548bcbd6c2f6@redhat.com>
+Date:   Fri, 16 Jun 2023 16:35:18 +0800
 MIME-Version: 1.0
-References: <1596005919-29365-5-git-send-email-chenhc@lemote.com>
- <20230616071831.1452507-1-yuzhao@google.com> <20230616082322.GA7323@alpha.franken.de>
-In-Reply-To: <20230616082322.GA7323@alpha.franken.de>
-From:   Huacai Chen <chenhuacai@kernel.org>
-Date:   Fri, 16 Jun 2023 16:31:13 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H54aipF6jXAiGpcjzpDy06Q28hmx-p4msvxgASHU5Z+cw@mail.gmail.com>
-Message-ID: <CAAhV-H54aipF6jXAiGpcjzpDy06Q28hmx-p4msvxgASHU5Z+cw@mail.gmail.com>
-Subject: Re: [PATCH 5/5] MAINTAINERS: Update KVM/MIPS maintainers
-To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Cc:     Yu Zhao <yuzhao@google.com>, aleksandar.qemu.devel@gmail.com,
-        jiaxun.yang@flygoat.com, kvm@vger.kernel.org,
-        linux-mips@vger.kernel.org, pbonzini@redhat.com,
-        robh+dt@kernel.org, zhangfx@lemote.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v3] KVM: Avoid illegal stage2 mapping on invalid memory
+ slot
+Content-Language: en-US
+To:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, mtosatti@redhat.com,
+        maz@kernel.org, will@kernel.org, c.dall@virtualopensystems.com,
+        peterx@redhat.com, david@redhat.com, aarcange@redhat.com,
+        hshuai@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+References: <20230615054259.14911-1-gshan@redhat.com>
+From:   Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20230615054259.14911-1-gshan@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 16, 2023 at 4:23=E2=80=AFPM Thomas Bogendoerfer
-<tsbogend@alpha.franken.de> wrote:
->
-> On Fri, Jun 16, 2023 at 01:18:31AM -0600, Yu Zhao wrote:
-> > On Tue, Jul 28, 2020 at 23:58:20PM -0700, Huacai Chen wrote:
-> > > James Hogan has become inactive for a long time and leaves KVM for MI=
-PS
-> > > orphan. I'm working on KVM/Loongson and attempt to make it upstream b=
-oth
-> > > in kernel and QEMU, while Aleksandar Markovic is already a maintainer=
- of
-> > > QEMU/MIPS. We are both interested in QEMU/KVM/MIPS, and we have alrea=
-dy
-> > > made some contributions in kernel and QEMU. If possible, we want to t=
-ake
-> > > the KVM/MIPS maintainership.
-> > >
-> > > Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > > Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> > > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > > ---
-> > >  MAINTAINERS | 4 +++-
-> > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > index bddc79a..5f9c2fd 100644
-> > > --- a/MAINTAINERS
-> > > +++ b/MAINTAINERS
-> > > @@ -9441,9 +9441,11 @@ F:   arch/arm64/kvm/
-> > >  F: include/kvm/arm_*
-> > >
-> > >  KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)
-> > > +M: Huacai Chen <chenhc@lemote.com>
-> > > +M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> > >  L: linux-mips@vger.kernel.org
-> > >  L: kvm@vger.kernel.org
-> > > -S: Orphan
-> > > +S: Maintained
-> > >  F: arch/mips/include/asm/kvm*
-> > >  F: arch/mips/include/uapi/asm/kvm*
-> > >  F: arch/mips/kvm/
-> >
-> > Hi,
-> >
-> > Is kvm/mips still maintained? Thanks.
-> >
-> > I tried v6.4-rc6 and hit the following crash. It seems it has been brok=
-en since
-> >
-> >   commit 45c7e8af4a5e3f0bea4ac209eea34118dd57ac64
-> >   Author: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-> >   Date:   Mon Mar 1 16:29:57 2021 +0100
-> >
-> >       MIPS: Remove KVM_TE support
->
-> ok, I see what I missed when removing TE support, d'oh. Does the patch
-> below fix the issue for you ?
->
-> Thomas.
->
-> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm=
-_host.h
-> index 957121a495f0..04cedf9f8811 100644
-> --- a/arch/mips/include/asm/kvm_host.h
-> +++ b/arch/mips/include/asm/kvm_host.h
-> @@ -317,7 +317,7 @@ struct kvm_vcpu_arch {
->         unsigned int aux_inuse;
->
->         /* COP0 State */
-> -       struct mips_coproc *cop0;
-> +       struct mips_coproc cop0;
-Maybe keeping it as a pointer and allocate in kvm_arch_vcpu_create()
-is better? (smaller modification)
 
-Huacai
->
->         /* Resume PC after MMIO completion */
->         unsigned long io_pc;
-> @@ -698,7 +698,7 @@ static inline bool kvm_mips_guest_can_have_fpu(struct=
- kvm_vcpu_arch *vcpu)
->  static inline bool kvm_mips_guest_has_fpu(struct kvm_vcpu_arch *vcpu)
->  {
->         return kvm_mips_guest_can_have_fpu(vcpu) &&
-> -               kvm_read_c0_guest_config1(vcpu->cop0) & MIPS_CONF1_FP;
-> +               kvm_read_c0_guest_config1(&vcpu->cop0) & MIPS_CONF1_FP;
->  }
->
->  static inline bool kvm_mips_guest_can_have_msa(struct kvm_vcpu_arch *vcp=
-u)
-> @@ -710,7 +710,7 @@ static inline bool kvm_mips_guest_can_have_msa(struct=
- kvm_vcpu_arch *vcpu)
->  static inline bool kvm_mips_guest_has_msa(struct kvm_vcpu_arch *vcpu)
->  {
->         return kvm_mips_guest_can_have_msa(vcpu) &&
-> -               kvm_read_c0_guest_config3(vcpu->cop0) & MIPS_CONF3_MSA;
-> +               kvm_read_c0_guest_config3(&vcpu->cop0) & MIPS_CONF3_MSA;
->  }
->
->  struct kvm_mips_callbacks {
-> diff --git a/arch/mips/kvm/emulate.c b/arch/mips/kvm/emulate.c
-> index edaec93a1a1f..e64372b8f66a 100644
-> --- a/arch/mips/kvm/emulate.c
-> +++ b/arch/mips/kvm/emulate.c
-> @@ -312,7 +312,7 @@ int kvm_get_badinstrp(u32 *opc, struct kvm_vcpu *vcpu=
-, u32 *out)
->   */
->  int kvm_mips_count_disabled(struct kvm_vcpu *vcpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->
->         return  (vcpu->arch.count_ctl & KVM_REG_MIPS_COUNT_CTL_DC) ||
->                 (kvm_read_c0_guest_cause(cop0) & CAUSEF_DC);
-> @@ -384,7 +384,7 @@ static inline ktime_t kvm_mips_count_time(struct kvm_=
-vcpu *vcpu)
->   */
->  static u32 kvm_mips_read_count_running(struct kvm_vcpu *vcpu, ktime_t no=
-w)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         ktime_t expires, threshold;
->         u32 count, compare;
->         int running;
-> @@ -444,7 +444,7 @@ static u32 kvm_mips_read_count_running(struct kvm_vcp=
-u *vcpu, ktime_t now)
->   */
->  u32 kvm_mips_read_count(struct kvm_vcpu *vcpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->
->         /* If count disabled just read static copy of count */
->         if (kvm_mips_count_disabled(vcpu))
-> @@ -502,7 +502,7 @@ ktime_t kvm_mips_freeze_hrtimer(struct kvm_vcpu *vcpu=
-, u32 *count)
->  static void kvm_mips_resume_hrtimer(struct kvm_vcpu *vcpu,
->                                     ktime_t now, u32 count)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         u32 compare;
->         u64 delta;
->         ktime_t expire;
-> @@ -603,7 +603,7 @@ int kvm_mips_restore_hrtimer(struct kvm_vcpu *vcpu, k=
-time_t before,
->   */
->  void kvm_mips_write_count(struct kvm_vcpu *vcpu, u32 count)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         ktime_t now;
->
->         /* Calculate bias */
-> @@ -649,7 +649,7 @@ void kvm_mips_init_count(struct kvm_vcpu *vcpu, unsig=
-ned long count_hz)
->   */
->  int kvm_mips_set_count_hz(struct kvm_vcpu *vcpu, s64 count_hz)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         int dc;
->         ktime_t now;
->         u32 count;
-> @@ -696,7 +696,7 @@ int kvm_mips_set_count_hz(struct kvm_vcpu *vcpu, s64 =
-count_hz)
->   */
->  void kvm_mips_write_compare(struct kvm_vcpu *vcpu, u32 compare, bool ack=
-)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         int dc;
->         u32 old_compare =3D kvm_read_c0_guest_compare(cop0);
->         s32 delta =3D compare - old_compare;
-> @@ -779,7 +779,7 @@ void kvm_mips_write_compare(struct kvm_vcpu *vcpu, u3=
-2 compare, bool ack)
->   */
->  static ktime_t kvm_mips_count_disable(struct kvm_vcpu *vcpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         u32 count;
->         ktime_t now;
->
-> @@ -806,7 +806,7 @@ static ktime_t kvm_mips_count_disable(struct kvm_vcpu=
- *vcpu)
->   */
->  void kvm_mips_count_disable_cause(struct kvm_vcpu *vcpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->
->         kvm_set_c0_guest_cause(cop0, CAUSEF_DC);
->         if (!(vcpu->arch.count_ctl & KVM_REG_MIPS_COUNT_CTL_DC))
-> @@ -826,7 +826,7 @@ void kvm_mips_count_disable_cause(struct kvm_vcpu *vc=
-pu)
->   */
->  void kvm_mips_count_enable_cause(struct kvm_vcpu *vcpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         u32 count;
->
->         kvm_clear_c0_guest_cause(cop0, CAUSEF_DC);
-> @@ -852,7 +852,7 @@ void kvm_mips_count_enable_cause(struct kvm_vcpu *vcp=
-u)
->   */
->  int kvm_mips_set_count_ctl(struct kvm_vcpu *vcpu, s64 count_ctl)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         s64 changed =3D count_ctl ^ vcpu->arch.count_ctl;
->         s64 delta;
->         ktime_t expire, now;
-> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> index 884be4ef99dc..aa5583a7b05b 100644
-> --- a/arch/mips/kvm/mips.c
-> +++ b/arch/mips/kvm/mips.c
-> @@ -649,7 +649,7 @@ static int kvm_mips_copy_reg_indices(struct kvm_vcpu =
-*vcpu, u64 __user *indices)
->  static int kvm_mips_get_reg(struct kvm_vcpu *vcpu,
->                             const struct kvm_one_reg *reg)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         struct mips_fpu_struct *fpu =3D &vcpu->arch.fpu;
->         int ret;
->         s64 v;
-> @@ -761,7 +761,7 @@ static int kvm_mips_get_reg(struct kvm_vcpu *vcpu,
->  static int kvm_mips_set_reg(struct kvm_vcpu *vcpu,
->                             const struct kvm_one_reg *reg)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         struct mips_fpu_struct *fpu =3D &vcpu->arch.fpu;
->         s64 v;
->         s64 vs[2];
-> @@ -1086,7 +1086,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
-ong ext)
->  int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
->  {
->         return kvm_mips_pending_timer(vcpu) ||
-> -               kvm_read_c0_guest_cause(vcpu->arch.cop0) & C_TI;
-> +               kvm_read_c0_guest_cause(&vcpu->arch.cop0) & C_TI;
->  }
->
->  int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu)
-> @@ -1110,7 +1110,7 @@ int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu)
->         kvm_debug("\thi: 0x%08lx\n", vcpu->arch.hi);
->         kvm_debug("\tlo: 0x%08lx\n", vcpu->arch.lo);
->
-> -       cop0 =3D vcpu->arch.cop0;
-> +       cop0 =3D &vcpu->arch.cop0;
->         kvm_debug("\tStatus: 0x%08x, Cause: 0x%08x\n",
->                   kvm_read_c0_guest_status(cop0),
->                   kvm_read_c0_guest_cause(cop0));
-> @@ -1232,7 +1232,7 @@ static int __kvm_mips_handle_exit(struct kvm_vcpu *=
-vcpu)
->
->         case EXCCODE_TLBS:
->                 kvm_debug("TLB ST fault:  cause %#x, status %#x, PC: %p, =
-BadVaddr: %#lx\n",
-> -                         cause, kvm_read_c0_guest_status(vcpu->arch.cop0=
-), opc,
-> +                         cause, kvm_read_c0_guest_status(&vcpu->arch.cop=
-0), opc,
->                           badvaddr);
->
->                 ++vcpu->stat.tlbmiss_st_exits;
-> @@ -1304,7 +1304,7 @@ static int __kvm_mips_handle_exit(struct kvm_vcpu *=
-vcpu)
->                 kvm_get_badinstr(opc, vcpu, &inst);
->                 kvm_err("Exception Code: %d, not yet handled, @ PC: %p, i=
-nst: 0x%08x  BadVaddr: %#lx Status: %#x\n",
->                         exccode, opc, inst, badvaddr,
-> -                       kvm_read_c0_guest_status(vcpu->arch.cop0));
-> +                       kvm_read_c0_guest_status(&vcpu->arch.cop0));
->                 kvm_arch_vcpu_dump_regs(vcpu);
->                 run->exit_reason =3D KVM_EXIT_INTERNAL_ERROR;
->                 ret =3D RESUME_HOST;
-> @@ -1377,7 +1377,7 @@ int noinstr kvm_mips_handle_exit(struct kvm_vcpu *v=
-cpu)
->  /* Enable FPU for guest and restore context */
->  void kvm_own_fpu(struct kvm_vcpu *vcpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         unsigned int sr, cfg5;
->
->         preempt_disable();
-> @@ -1421,7 +1421,7 @@ void kvm_own_fpu(struct kvm_vcpu *vcpu)
->  /* Enable MSA for guest and restore context */
->  void kvm_own_msa(struct kvm_vcpu *vcpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         unsigned int sr, cfg5;
->
->         preempt_disable();
-> diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-> index 3d21cbfa7443..99d5a71e4300 100644
-> --- a/arch/mips/kvm/vz.c
-> +++ b/arch/mips/kvm/vz.c
-> @@ -422,7 +422,7 @@ static void _kvm_vz_restore_htimer(struct kvm_vcpu *v=
-cpu,
->   */
->  static void kvm_vz_restore_timer(struct kvm_vcpu *vcpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         u32 cause, compare;
->
->         compare =3D kvm_read_sw_gc0_compare(cop0);
-> @@ -517,7 +517,7 @@ static void _kvm_vz_save_htimer(struct kvm_vcpu *vcpu=
-,
->   */
->  static void kvm_vz_save_timer(struct kvm_vcpu *vcpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         u32 gctl0, compare, cause;
->
->         gctl0 =3D read_c0_guestctl0();
-> @@ -863,7 +863,7 @@ static unsigned long mips_process_maar(unsigned int o=
-p, unsigned long val)
->
->  static void kvm_write_maari(struct kvm_vcpu *vcpu, unsigned long val)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->
->         val &=3D MIPS_MAARI_INDEX;
->         if (val =3D=3D MIPS_MAARI_INDEX)
-> @@ -876,7 +876,7 @@ static enum emulation_result kvm_vz_gpsi_cop0(union m=
-ips_instruction inst,
->                                               u32 *opc, u32 cause,
->                                               struct kvm_vcpu *vcpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         enum emulation_result er =3D EMULATE_DONE;
->         u32 rt, rd, sel;
->         unsigned long curr_pc;
-> @@ -1911,7 +1911,7 @@ static int kvm_vz_get_one_reg(struct kvm_vcpu *vcpu=
-,
->                               const struct kvm_one_reg *reg,
->                               s64 *v)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         unsigned int idx;
->
->         switch (reg->id) {
-> @@ -2081,7 +2081,7 @@ static int kvm_vz_get_one_reg(struct kvm_vcpu *vcpu=
-,
->         case KVM_REG_MIPS_CP0_MAARI:
->                 if (!cpu_guest_has_maar || cpu_guest_has_dyn_maar)
->                         return -EINVAL;
-> -               *v =3D kvm_read_sw_gc0_maari(vcpu->arch.cop0);
-> +               *v =3D kvm_read_sw_gc0_maari(&vcpu->arch.cop0);
->                 break;
->  #ifdef CONFIG_64BIT
->         case KVM_REG_MIPS_CP0_XCONTEXT:
-> @@ -2135,7 +2135,7 @@ static int kvm_vz_set_one_reg(struct kvm_vcpu *vcpu=
-,
->                               const struct kvm_one_reg *reg,
->                               s64 v)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         unsigned int idx;
->         int ret =3D 0;
->         unsigned int cur, change;
-> @@ -2562,7 +2562,7 @@ static void kvm_vz_vcpu_load_tlb(struct kvm_vcpu *v=
-cpu, int cpu)
->
->  static int kvm_vz_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         bool migrated, all;
->
->         /*
-> @@ -2704,7 +2704,7 @@ static int kvm_vz_vcpu_load(struct kvm_vcpu *vcpu, =
-int cpu)
->
->  static int kvm_vz_vcpu_put(struct kvm_vcpu *vcpu, int cpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->
->         if (current->flags & PF_VCPU)
->                 kvm_vz_vcpu_save_wired(vcpu);
-> @@ -3076,7 +3076,7 @@ static void kvm_vz_vcpu_uninit(struct kvm_vcpu *vcp=
-u)
->
->  static int kvm_vz_vcpu_setup(struct kvm_vcpu *vcpu)
->  {
-> -       struct mips_coproc *cop0 =3D vcpu->arch.cop0;
-> +       struct mips_coproc *cop0 =3D &vcpu->arch.cop0;
->         unsigned long count_hz =3D 100*1000*1000; /* default to 100 MHz *=
-/
->
->         /*
->
-> --
-> Crap can work. Given enough thrust pigs will fly, but it's not necessaril=
-y a
-> good idea.                                                [ RFC1925, 2.3 =
-]
+
+On 6/15/23 13:42, Gavin Shan wrote:
+> We run into guest hang in edk2 firmware when KSM is kept as running on
+> the host. The edk2 firmware is waiting for status 0x80 from QEMU's pflash
+> device (TYPE_PFLASH_CFI01) during the operation of sector erasing or
+> buffered write. The status is returned by reading the memory region of
+> the pflash device and the read request should have been forwarded to QEMU
+> and emulated by it. Unfortunately, the read request is covered by an
+> illegal stage2 mapping when the guest hang issue occurs. The read request
+> is completed with QEMU bypassed and wrong status is fetched. The edk2
+> firmware runs into an infinite loop with the wrong status.
+> 
+> The illegal stage2 mapping is populated due to same page sharing by KSM
+> at (C) even the associated memory slot has been marked as invalid at (B)
+> when the memory slot is requested to be deleted. It's notable that the
+> active and inactive memory slots can't be swapped when we're in the middle
+> of kvm_mmu_notifier_change_pte() because kvm->mn_active_invalidate_count
+> is elevated, and kvm_swap_active_memslots() will busy loop until it reaches
+> to zero again. Besides, the swapping from the active to the inactive memory
+> slots is also avoided by holding &kvm->srcu in __kvm_handle_hva_range(),
+> corresponding to synchronize_srcu_expedited() in kvm_swap_active_memslots().
+> 
+>    CPU-A                    CPU-B
+>    -----                    -----
+>                             ioctl(kvm_fd, KVM_SET_USER_MEMORY_REGION)
+>                             kvm_vm_ioctl_set_memory_region
+>                             kvm_set_memory_region
+>                             __kvm_set_memory_region
+>                             kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE)
+>                               kvm_invalidate_memslot
+>                                 kvm_copy_memslot
+>                                 kvm_replace_memslot
+>                                 kvm_swap_active_memslots        (A)
+>                                 kvm_arch_flush_shadow_memslot   (B)
+>    same page sharing by KSM
+>    kvm_mmu_notifier_invalidate_range_start
+>          :
+>    kvm_mmu_notifier_change_pte
+>      kvm_handle_hva_range
+>      __kvm_handle_hva_range
+>      kvm_set_spte_gfn            (C)
+>          :
+>    kvm_mmu_notifier_invalidate_range_end
+> 
+> Fix the issue by skipping the invalid memory slot at (C) to avoid the
+> illegal stage2 mapping so that the read request for the pflash's status
+> is forwarded to QEMU and emulated by it. In this way, the correct pflash's
+> status can be returned from QEMU to break the infinite loop in the edk2
+> firmware.
+> 
+> We tried a git-bisect and the first problematic commit is cd4c71835228 ("
+> KVM: arm64: Convert to the gfn-based MMU notifier callbacks"). With this,
+> clean_dcache_guest_page() is called after the memory slots are iterated
+> in kvm_mmu_notifier_change_pte(). clean_dcache_guest_page() is called
+> before the iteration on the memory slots before this commit. This change
+> literally enlarges the racy window between kvm_mmu_notifier_change_pte()
+> and memory slot removal so that we're able to reproduce the issue in a
+> practical test case. However, the issue exists since commit d5d8184d35c9
+> ("KVM: ARM: Memory virtualization setup").
+> 
+> Cc: stable@vger.kernel.org # v3.9+
+> Fixes: d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
+> Reported-by: Shuai Hu <hshuai@redhat.com>
+> Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+> v3: Skip the invalid memory slots in change_pte() MMU notifier only,
+>      suggested by Sean. Improved changelog to describe how the fixes
+>      tag is given.
+> ---
+>   virt/kvm/kvm_main.c | 20 +++++++++++++++++++-
+>   1 file changed, 19 insertions(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 479802a892d4..65f94f592ff8 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -686,6 +686,24 @@ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn
+>   
+>   	return __kvm_handle_hva_range(kvm, &range);
+>   }
+> +
+> +static bool kvm_change_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+> +{
+> +	/*
+> +	 * Skipping invalid memslots is correct if and only change_pte() is
+> +	 * surrounded by invalidate_range_{start,end}(), which is currently
+> +	 * guaranteed by the primary MMU.  If that ever changes, KVM needs to
+> +	 * unmap the memslot instead of skipping the memslot to ensure that KVM
+> +	 * doesn't hold references to the old PFN.
+> +	 */
+> +	WARN_ON_ONCE(!READ_ONCE(kvm->mn_active_invalidate_count));
+> +
+> +	if (range->slot->flags & KVM_MEMSLOT_INVALID)
+> +		return false;
+> +
+> +	return kvm_set_spte_gfn(kvm, range);
+> +}
+> +
+>   static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+>   					struct mm_struct *mm,
+>   					unsigned long address,
+> @@ -707,7 +725,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+>   	if (!READ_ONCE(kvm->mmu_invalidate_in_progress))
+>   		return;
+>   
+> -	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
+> +	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_change_spte_gfn);
+>   }
+>   
+>   void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+
+-- 
+Shaoqin
+
