@@ -2,81 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED1FA7329F8
-	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 10:36:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 504D6732AA6
+	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 10:56:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245178AbjFPIgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jun 2023 04:36:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37048 "EHLO
+        id S244744AbjFPI42 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jun 2023 04:56:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244718AbjFPIg1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jun 2023 04:36:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA95630FB
-        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 01:35:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686904531;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vPY8mg0jxuqun1aPaAtNaVksF8bWjZS2YCR1atB3dxE=;
-        b=Vp0azCoCUpNmRWgtrIFak2JOroAdMD1/sMVilx8VqWiHuIm2+k4gWh+LRFu+gKdtS1XDZL
-        trZqRgAZhivEmj0M5AhK+cTx+WpXU/C9hUXYw+rrNOSO8Lvz25Axvdf880dxqQPbU/JM9Q
-        icLL5tsyDN2Luc9EwfLiPEOlV5EPDfs=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-531-mRDTCdEGPxeOYggwGY16og-1; Fri, 16 Jun 2023 04:35:30 -0400
-X-MC-Unique: mRDTCdEGPxeOYggwGY16og-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3110acc0042so80779f8f.1
-        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 01:35:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686904529; x=1689496529;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vPY8mg0jxuqun1aPaAtNaVksF8bWjZS2YCR1atB3dxE=;
-        b=eQ5q33rvDwBIUKKzEnCriA3kByGGrxwSPBlP2fhXXyY4YW86WKmTQzvOIoLr9Lvi2f
-         Ij/NfflI2BOWNCd7tpcSk9QzIlZYWKd6t5RF9HL3YCjoQsjysIyIz2gArCiIOUR82//t
-         mRzEEejpWFTPr1UXRs6TReuYCNXOOSFNfMfPfuI7+ibV+QjHTHA7rMdOP9f/6fPATEGD
-         0EVnMbrBNUtkiaTZEdufkaPwrcosbI4d/Cb7fMzAvPUdXdjtfGJKx4+71AMeClwg+YYn
-         Wk9yfOOF8rKfuY2sEAnVKdoG3owJ9QHHl+IHy+nZIXiNtC3wtl5x5LtmoprzNqWyOxMy
-         DL3A==
-X-Gm-Message-State: AC+VfDwmL5JyPLFenAT2Je9sUaKxzJGhFMF5X+Zj6g6CDeJtQjq8Oqhf
-        P6soaaL5MaYwPRWl0WmdUO+Gb3xc7vK/xPV02mK8YUaLyOUJ833/n5FtwG60xZk2/bv03U4sU2G
-        oKxqUA62MB5on
-X-Received: by 2002:a5d:4b08:0:b0:307:5561:5eec with SMTP id v8-20020a5d4b08000000b0030755615eecmr993228wrq.0.1686904529246;
-        Fri, 16 Jun 2023 01:35:29 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5kzV+/7/dVCXo13XaZMI6EFcFN2DW5D8H1UUaaDdWD7gjszkEhR6SrO+93PHjRuvl1lmH6dg==
-X-Received: by 2002:a5d:4b08:0:b0:307:5561:5eec with SMTP id v8-20020a5d4b08000000b0030755615eecmr993204wrq.0.1686904528906;
-        Fri, 16 Jun 2023 01:35:28 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id h14-20020adff4ce000000b0030c40e2cf42sm22871904wrp.116.2023.06.16.01.35.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Jun 2023 01:35:27 -0700 (PDT)
-Message-ID: <ea6777df-7bb6-eeb9-645e-548bcbd6c2f6@redhat.com>
-Date:   Fri, 16 Jun 2023 16:35:18 +0800
+        with ESMTP id S242847AbjFPI40 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 04:56:26 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67AE826A2;
+        Fri, 16 Jun 2023 01:56:24 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35G8p3jR007233;
+        Fri, 16 Jun 2023 08:56:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=9z3tMyvgoNrYBEOFFAQ+HLSRNHIqHXEfc6q8uZ5rIUE=;
+ b=mmYvBYx9bwnHsjwk/oHLhSlLhlq7WXZn5l8a5FOS6JGsOemNFB56lQoIOXH4rLJIrOPY
+ mU2UWXuOu8zxO/2Se9GXf4BOlSWA+bzgUg/PcidJE8fmCorKMTBJ5vBoZwwX4GBKFA4F
+ nnStSmh2DBnPi4NGi47khSl9+CkYB7ZasIm3oOyVhxpnFPcjDcf7GbO50LUbTL4SaFPN
+ jvd9XjiY3sAImuN5UZAxBkDCMCMsuy8h8TFGjHmsCkNhSOQKf3UZxJovDnExw8rZfMzC
+ xbu3CcaWNX40YTjoYzIftAcL/YoI5OnycZXpmegTe4080UVi+V7U4OZFGuyHlwu0VS18 Lw== 
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3r8mfu0dgt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 16 Jun 2023 08:56:23 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35G5jioS024210;
+        Fri, 16 Jun 2023 08:56:21 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3r4gedu4sc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 16 Jun 2023 08:56:21 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35G8uHFr20382460
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 16 Jun 2023 08:56:17 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CD37220043;
+        Fri, 16 Jun 2023 08:56:17 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7856320040;
+        Fri, 16 Jun 2023 08:56:17 +0000 (GMT)
+Received: from [9.179.5.100] (unknown [9.179.5.100])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 16 Jun 2023 08:56:17 +0000 (GMT)
+Message-ID: <08ed39eb-b1cf-7c15-83a4-dd59cc29732b@linux.ibm.com>
+Date:   Fri, 16 Jun 2023 10:56:17 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v3] KVM: Avoid illegal stage2 mapping on invalid memory
- slot
+ Thunderbird/102.11.1
+Subject: Re: [PATCH v5 1/7] s390/uv: Always export uv_info
+To:     Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>
+References: <20230615100533.3996107-1-seiden@linux.ibm.com>
+ <20230615100533.3996107-2-seiden@linux.ibm.com>
 Content-Language: en-US
-To:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, seanjc@google.com, mtosatti@redhat.com,
-        maz@kernel.org, will@kernel.org, c.dall@virtualopensystems.com,
-        peterx@redhat.com, david@redhat.com, aarcange@redhat.com,
-        hshuai@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-References: <20230615054259.14911-1-gshan@redhat.com>
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230615054259.14911-1-gshan@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20230615100533.3996107-2-seiden@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: rSK6T5LhdkXwFqRf0825EV8BGdNPrD2K
+X-Proofpoint-ORIG-GUID: rSK6T5LhdkXwFqRf0825EV8BGdNPrD2K
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-16_05,2023-06-15_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ adultscore=0 mlxlogscore=999 suspectscore=0 impostorscore=0 malwarescore=0
+ priorityscore=1501 mlxscore=0 bulkscore=0 lowpriorityscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2306160076
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,120 +88,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 6/15/23 12:05, Steffen Eiden wrote:
+> KVM needs the struct's values to be able to provide PV support.
+> 
+> The uvdevice is currently guest only and will need the struct's values
+> for call support checking and potential future expansions.
+> 
+> As uv.c is only compiled with CONFIG_PGSTE or
+> CONFIG_PROTECTED_VIRTUALIZATION_GUEST we don't need a second check in
+> the code. Users of uv_info will need to fence for these two config
+> options for the time being.
+> 
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> 
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-
-On 6/15/23 13:42, Gavin Shan wrote:
-> We run into guest hang in edk2 firmware when KSM is kept as running on
-> the host. The edk2 firmware is waiting for status 0x80 from QEMU's pflash
-> device (TYPE_PFLASH_CFI01) during the operation of sector erasing or
-> buffered write. The status is returned by reading the memory region of
-> the pflash device and the read request should have been forwarded to QEMU
-> and emulated by it. Unfortunately, the read request is covered by an
-> illegal stage2 mapping when the guest hang issue occurs. The read request
-> is completed with QEMU bypassed and wrong status is fetched. The edk2
-> firmware runs into an infinite loop with the wrong status.
-> 
-> The illegal stage2 mapping is populated due to same page sharing by KSM
-> at (C) even the associated memory slot has been marked as invalid at (B)
-> when the memory slot is requested to be deleted. It's notable that the
-> active and inactive memory slots can't be swapped when we're in the middle
-> of kvm_mmu_notifier_change_pte() because kvm->mn_active_invalidate_count
-> is elevated, and kvm_swap_active_memslots() will busy loop until it reaches
-> to zero again. Besides, the swapping from the active to the inactive memory
-> slots is also avoided by holding &kvm->srcu in __kvm_handle_hva_range(),
-> corresponding to synchronize_srcu_expedited() in kvm_swap_active_memslots().
-> 
->    CPU-A                    CPU-B
->    -----                    -----
->                             ioctl(kvm_fd, KVM_SET_USER_MEMORY_REGION)
->                             kvm_vm_ioctl_set_memory_region
->                             kvm_set_memory_region
->                             __kvm_set_memory_region
->                             kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE)
->                               kvm_invalidate_memslot
->                                 kvm_copy_memslot
->                                 kvm_replace_memslot
->                                 kvm_swap_active_memslots        (A)
->                                 kvm_arch_flush_shadow_memslot   (B)
->    same page sharing by KSM
->    kvm_mmu_notifier_invalidate_range_start
->          :
->    kvm_mmu_notifier_change_pte
->      kvm_handle_hva_range
->      __kvm_handle_hva_range
->      kvm_set_spte_gfn            (C)
->          :
->    kvm_mmu_notifier_invalidate_range_end
-> 
-> Fix the issue by skipping the invalid memory slot at (C) to avoid the
-> illegal stage2 mapping so that the read request for the pflash's status
-> is forwarded to QEMU and emulated by it. In this way, the correct pflash's
-> status can be returned from QEMU to break the infinite loop in the edk2
-> firmware.
-> 
-> We tried a git-bisect and the first problematic commit is cd4c71835228 ("
-> KVM: arm64: Convert to the gfn-based MMU notifier callbacks"). With this,
-> clean_dcache_guest_page() is called after the memory slots are iterated
-> in kvm_mmu_notifier_change_pte(). clean_dcache_guest_page() is called
-> before the iteration on the memory slots before this commit. This change
-> literally enlarges the racy window between kvm_mmu_notifier_change_pte()
-> and memory slot removal so that we're able to reproduce the issue in a
-> practical test case. However, the issue exists since commit d5d8184d35c9
-> ("KVM: ARM: Memory virtualization setup").
-> 
-> Cc: stable@vger.kernel.org # v3.9+
-> Fixes: d5d8184d35c9 ("KVM: ARM: Memory virtualization setup")
-> Reported-by: Shuai Hu <hshuai@redhat.com>
-> Reported-by: Zhenyu Zhang <zhenyzha@redhat.com>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
-> v3: Skip the invalid memory slots in change_pte() MMU notifier only,
->      suggested by Sean. Improved changelog to describe how the fixes
->      tag is given.
-> ---
->   virt/kvm/kvm_main.c | 20 +++++++++++++++++++-
->   1 file changed, 19 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 479802a892d4..65f94f592ff8 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -686,6 +686,24 @@ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn
->   
->   	return __kvm_handle_hva_range(kvm, &range);
->   }
-> +
-> +static bool kvm_change_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
-> +{
-> +	/*
-> +	 * Skipping invalid memslots is correct if and only change_pte() is
-> +	 * surrounded by invalidate_range_{start,end}(), which is currently
-> +	 * guaranteed by the primary MMU.  If that ever changes, KVM needs to
-> +	 * unmap the memslot instead of skipping the memslot to ensure that KVM
-> +	 * doesn't hold references to the old PFN.
-> +	 */
-> +	WARN_ON_ONCE(!READ_ONCE(kvm->mn_active_invalidate_count));
-> +
-> +	if (range->slot->flags & KVM_MEMSLOT_INVALID)
-> +		return false;
-> +
-> +	return kvm_set_spte_gfn(kvm, range);
-> +}
-> +
->   static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
->   					struct mm_struct *mm,
->   					unsigned long address,
-> @@ -707,7 +725,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
->   	if (!READ_ONCE(kvm->mmu_invalidate_in_progress))
->   		return;
->   
-> -	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
-> +	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_change_spte_gfn);
->   }
->   
->   void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
-
--- 
-Shaoqin
+In the long term we'll remove the config checks and always compile uv.o 
+in kernel/ and boot/ so we won't be running in these issues again.
 
