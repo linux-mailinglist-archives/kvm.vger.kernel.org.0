@@ -2,79 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EAE3F732964
-	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 10:03:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4468B7329A0
+	for <lists+kvm@lfdr.de>; Fri, 16 Jun 2023 10:16:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244285AbjFPIDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jun 2023 04:03:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48388 "EHLO
+        id S245211AbjFPIQF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jun 2023 04:16:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244149AbjFPIDF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jun 2023 04:03:05 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2EB92726;
-        Fri, 16 Jun 2023 01:03:03 -0700 (PDT)
+        with ESMTP id S245219AbjFPIPz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 04:15:55 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A31D30F7;
+        Fri, 16 Jun 2023 01:15:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686902584; x=1718438584;
+  t=1686903341; x=1718439341;
   h=date:from:to:cc:subject:message-id:reply-to:references:
    in-reply-to:mime-version;
-  bh=5x7yYFQKs3wnhavpnrFlCngeVgZCB6RXmcSNbgiXP84=;
-  b=C6QaYrD2Aol/gFKN9eXibAcv18Gdxr4a++xqtbFZxAgL1G1coROfB6Fq
-   gJakD3taNOrNKDnQBcLX2Nx+X/iE+gl2RiNgmhnVbkqNK+j3S1gt0ztJa
-   Jg9cdMA11AXcbeti5M8IeuWka/Sc35fS3HsC+jDLtU4pCp5FNT1UKJ0JI
-   3suEVd5TKC8g7fNkP1TPLmpc2aBfYE35jsyW8/ZxvmM1oIKaz7ClzNUe4
-   JM1SftvLhrLJc+MOvxY8Z+cZDQ+jOFev36zPGT1p8kFkrRY9BboAjKzdL
-   kXrHLn3NIWh+iceleaS5TBTMf+ZiBDrOcEMRPi2JoG1r0qrb2spUOHWm8
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="343896503"
+  bh=U+dONiqgiv9/LHtbUk1mVlqM1xgXwTivsuZ9bSsFoHc=;
+  b=Xw69qsrdghh7f8SujW/86vQJdtXeOdo/2VGkDMuHi9epU3LHYxB1Q+zi
+   o2bJ99I+F7XdtSo0Xa8GfiALJKz7V5s0QC/tR8vwOgH80XdpBk0sEqKcY
+   pkAwYSv4RFzAOqYAzf5bd6tywX3hMhbN2UVe7q4veP2My0TLn/YA3g0ew
+   GWCX+WUsUibrg4ExklaZ+VvjSJ+Ipz6fOJamqTHYRECM5NE3Pazctxg7K
+   xdDELM2LEqSyiVIw3rS3KSH/oea65bMsSHCySuyASJahFJE7+B3qlfb45
+   bQJ27bmdcGwtOr+JhuCKOdT/hrE9XS8mey/P4Wnx+liXQJb6pvo7NymLa
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="338773192"
 X-IronPort-AV: E=Sophos;i="6.00,247,1681196400"; 
-   d="scan'208";a="343896503"
+   d="scan'208";a="338773192"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2023 01:02:57 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2023 01:15:41 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="959536589"
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="959539619"
 X-IronPort-AV: E=Sophos;i="6.00,247,1681196400"; 
-   d="scan'208";a="959536589"
+   d="scan'208";a="959539619"
 Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga006.fm.intel.com with ESMTP; 16 Jun 2023 01:02:55 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+  by fmsmga006.fm.intel.com with ESMTP; 16 Jun 2023 01:15:40 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
  ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 16 Jun 2023 01:02:55 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ 15.1.2507.23; Fri, 16 Jun 2023 01:15:40 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 16 Jun 2023 01:02:54 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ 15.1.2507.23; Fri, 16 Jun 2023 01:15:39 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Fri, 16 Jun 2023 01:02:54 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.44) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ 15.1.2507.23 via Frontend Transport; Fri, 16 Jun 2023 01:15:39 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.106)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Fri, 16 Jun 2023 01:02:54 -0700
+ 15.1.2507.23; Fri, 16 Jun 2023 01:15:39 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TbEHODdKPzWrkiH3ZS2bY9dJsOwpCVD83+chjk2eJkFDuGD6Z9fVrNoBgtc9+kGch4Hu5YH4LIY/S15TxbaPGtptubdOYYLHUjZdS44AL8CjEaknITB1Ode9D+tUR0QvQeCvy3F2ylQWNw0oq38Sg2tuHrE65XBh/1W2TAIrKGrd8lTYuRwLjOGa1AFVpZET7/Gbvmm8xn9Lyc80vj7Sm2Yc/Q3zg6PGXrydocpvBYVr0HZVa4WlcwWdjHMrO+CEhRBLNdxFBmYEUhkz7pOV12djN6NGZ73PaiaUqMSzYNakw222fo304lTPFwdlw3nwPzo8GvpKJex3c4ahtTfnLA==
+ b=m/qw1Q4YJGlEKO2IcxHQVyx8+BGK1gsER80+mO3oN2/rjaDUYTtlGDkukQzsJ19pBxrKuvzCg3byUVk0cErT06Hax0QPFKTXJqraVZz1t8mmBRa/TPR0rXT4PEn4asgDhr4QaDH6OG4EN6Tc7rGzNFOHDg8iD4i5KHiJQ2kzd6MFxsm5xIbOcj/0oxTR2kgBWHOU7WZGpTORJ3mBDcSHcIUmMBnRmHHjRiY9mrGC59G2X2bww57OIf5vpOKbZKZu965w17wQFwmJTJ3xptmEbCORDUZwGEOXq8YAIDbqwbRqbmtUALhRpEQlXgD5ckZSuAsDDMG1fGts9/bGYGoadQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uSQt9h+Q4f6kmyKh4eqAm8SATKNv/W6EPEzGZiwxahU=;
- b=RXo2hWwjkXLPC9LRsqutCGQATwq9k3DMaUsWVoqugePAZRuXhY1NLWKK/6OStXJGgzVaOiYrVCDqsUjMMnaSOJGxig/9R62EJQywvPVb/0KGCC8d8Eo7dYP8sRpG4ouMxkuUNlXdq9SRcsbCE+zPeS8ZgqwNVeHPn8tg7vhdNiG4nZ0rh1dHC1lds7iSxfde3M2+dKb39AToXJHZHCmrUL+2HYiQWvgr6u7AupHL4k1cdBPRMjDWt/6psdTCEIz5ks10cEbQ010biRxWsPuBRevBKgLaskhdxSPS8sTIbjEWLz1k2uwCshQcqFAEvfzhywo7z/o7PSYZW934vYoBSg==
+ bh=xEpUqVIvTYX4nphLpoE9olnZYA4l1x8pU8IIm2Lx8bY=;
+ b=jLvaxkP2Dsm4Nau/vNIBpRi+hT36TJTQ9jbjp+Bibr89tIvwIYavaJtWTR5FL0MriKNwMjPpBQYhknM2U+bpI0Ns/HpijMcotBbtapLiTvb+YMZnZH9l9D/F1cxElzSp3cfqOuPB4hyJZXitQRPIBns1C+p7DUYIMLAbR7gjGhyslNc3DqXZbHARnYUaHNwwZ4tVjtOQvHAFTRL+zxR5XDwLmRsIDwSNlwAy2lgIaR1XREhFM+JxksAtJPbj2n/W1vSktWV6K26ozZldhuRfTyL9VurR3USCedPYVmiS+CzWCVXhlTaq/ZAqN9hQL5n5EutbNgm6WkQuEDvx3NynMQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- CO1PR11MB4881.namprd11.prod.outlook.com (2603:10b6:303:91::20) with Microsoft
+ DS7PR11MB6223.namprd11.prod.outlook.com (2603:10b6:8:98::19) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6477.37; Fri, 16 Jun 2023 08:02:46 +0000
+ 15.20.6500.27; Fri, 16 Jun 2023 08:15:37 +0000
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::9f93:c41e:2b80:1d6]) by DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::9f93:c41e:2b80:1d6%7]) with mapi id 15.20.6500.026; Fri, 16 Jun 2023
- 08:02:46 +0000
-Date:   Fri, 16 Jun 2023 15:37:29 +0800
+ 08:15:37 +0000
+Date:   Fri, 16 Jun 2023 15:50:19 +0800
 From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     Yuan Yao <yuan.yao@linux.intel.com>
 CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
@@ -82,69 +82,71 @@ CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <kai.huang@intel.com>, <robert.hoo.linux@gmail.com>
 Subject: Re: [PATCH v3 09/11] KVM: x86/mmu: serialize vCPUs to zap gfn when
  guest MTRRs are honored
-Message-ID: <ZIwROWti5d0sCFwT@yzhao56-desk.sh.intel.com>
+Message-ID: <ZIwUO/8W7dRYt2s8@yzhao56-desk.sh.intel.com>
 Reply-To: Yan Zhao <yan.y.zhao@intel.com>
 References: <20230616023101.7019-1-yan.y.zhao@intel.com>
  <20230616023945.7570-1-yan.y.zhao@intel.com>
  <20230616074550.g2ikzbni2rjy7dfw@yy-desk-7060>
+ <ZIwROWti5d0sCFwT@yzhao56-desk.sh.intel.com>
+ <20230616080917.fhekzs2fyhqtbitx@yy-desk-7060>
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20230616074550.g2ikzbni2rjy7dfw@yy-desk-7060>
-X-ClientProxiedBy: SI2PR01CA0040.apcprd01.prod.exchangelabs.com
- (2603:1096:4:193::14) To DS7PR11MB5966.namprd11.prod.outlook.com
+In-Reply-To: <20230616080917.fhekzs2fyhqtbitx@yy-desk-7060>
+X-ClientProxiedBy: SI2PR01CA0052.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:193::11) To DS7PR11MB5966.namprd11.prod.outlook.com
  (2603:10b6:8:71::6)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|CO1PR11MB4881:EE_
-X-MS-Office365-Filtering-Correlation-Id: bee7f926-bc03-4e34-ad0b-08db6e4011ae
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DS7PR11MB6223:EE_
+X-MS-Office365-Filtering-Correlation-Id: e81f7dd3-2afd-481c-1bfe-08db6e41dd0a
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vCfbBL462TvdGkvQ0xLcWZrBTrCdJWHS1aPriNdo9vCsLrcB3uz2p6/IT5IOczXCnCxCJo62/bUl2SA9jnM3ZNp3O++lUXtn6tLgfNKl9hgBHdRJQVbFrylTWPrwfB/+//UtnwaMxHDFrW7DP61ehynxm2bSlHB8WSv1e37qPH4MRHzelgRx0fRy5ba9ttmMltlbxvboG8FVa1opJzg7+odfbwudcDBz1IF5iUSf0VyQqafvmwk/8lvMOCZ5bKATZmlg4SVgrMcgnt0zbpazdfgpPHEe4DhiMiBBVgh0G3zn/7UMGiMtd4YjN3ndM0IrJkKQMbCLaqycgGryuRbZLn3WMGUL+0OmxLpAZMLoFGk37X6lygMFUs/8L/138TZeQzbAjL4/Nh9VGxK80cIvWKc+L235zQ+wJ3daz1975d1P+IhObRKe8PTnezn+H9rZv68QONYSyn7dE0XMsQ72x75Q/cWvKxsmyGKVDwhQ/bhaDE9tPcQj8qALghqiKGQpvQRm6crsPUZIIoMbjQ2k7hXSAk0VfoEe5Rh5D8iogyZmZYzlTOihOjRV+/APhJR3
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(366004)(376002)(346002)(39860400002)(136003)(451199021)(186003)(2906002)(3450700001)(38100700002)(86362001)(6512007)(26005)(83380400001)(6506007)(82960400001)(4326008)(316002)(6486002)(66476007)(66556008)(6666004)(6916009)(66946007)(478600001)(41300700001)(54906003)(8676002)(5660300002)(8936002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: fgFgY+eh7QwApVJky4eg9kuuLDE1SIqrHi/iam7EZ4WAbnv6jHWAzhD6daJIS+rpRePTFoTysprVRXuPaF65EHTbt+lMZ6prUFkHJHwftcby8jPC4IGIqZypTjhLBTjegeBy6z4L9MAYLsmCWCudon1Som0MXjD558029Vui52h1I6bt/c9FGjMytUvHMVpyYGE6uJO7/jyuTK4CavcyNki5M70hkN9XPjDpJxI1HblDQ/5XaynMQCoxrXD+3ey4MLEhHp2Lkjws7yySnUY1yZ2ocN/I5uW7PkWKgOunJ/RKmzSUYIdvLR5STUubSB1smd88n1T8GS7+MtRUJ4YYN83iePmKcWiQNRRUcM7w93xy5DENUT7GVVS94OTGrnGp7lh7RPRa/VIRsrcAU6MIzPMPCRXkQjFgakSqfkcIA3qYTlDfdORcYqor2tqunIx+lZwP+s7qKkfec9JoLEtnjTOp6Q+PQZtXC8IIRJ3IE97CsYo7Kki5q3UPuJSa2GSn7VpAi5UIx66f67aD8OntAO/X4Xnh2O0Q1hi7HzPLiOYsShNR8OmVq6t5QMMsySHI
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(376002)(346002)(396003)(39860400002)(366004)(451199021)(3450700001)(5660300002)(6666004)(54906003)(2906002)(41300700001)(8936002)(8676002)(316002)(4326008)(66556008)(6916009)(66946007)(66476007)(478600001)(6486002)(38100700002)(86362001)(186003)(82960400001)(83380400001)(6512007)(6506007)(26005);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5E6G7mJozrkNT1fJfohaexcUWCmKCI5NUrDBcU4y2Vd7EtI60jPR0D86k5bH?=
- =?us-ascii?Q?T7b+E5tMu9lsA8UUEt7dG1EoKxnNhVzc0z0dwCOdpl2kkQyxIfRSyli0u6kl?=
- =?us-ascii?Q?r+cZffndBAk6yHRBhc2TgzHyZ9Hw7mu2JhOGDm+k1mWmxQro6j44JvgmaH/N?=
- =?us-ascii?Q?s/f0aoMKyNFtuLMJRvHe6yMZjqq+2qFTJBk7/T3QpY/W2NXPVxIWug6GQ17l?=
- =?us-ascii?Q?DM9RuizBmU1pgY7Z/Yr373y3biUnqfoBWEPeDNkIb7bKYgpV/6B0/yqoF1EW?=
- =?us-ascii?Q?bYjIQ5dr/GzKqS/oZLQbk324qlsRUPBIl3Qkb6Aj6FcQ5H3bPpuqapsYYPks?=
- =?us-ascii?Q?fAILY5JdUWNRYY/aQADVlRctAWdxtLNGfX76uEpcxtBdqUCmNuftwLF1hvfj?=
- =?us-ascii?Q?y/zlwhJtLa3iq6pnzbp8K0TA3nBSpzA8jdFmBYcuPSj7Nyxmk9wij8OqGHYk?=
- =?us-ascii?Q?zqF1ownvtBRmr31a0YCBdRNHszHs+2eBY3288P65Ctt9pS+lLh/Au9+IyVym?=
- =?us-ascii?Q?YnLLpvvkrI3OFTt82UTE2FwXjB28nkX1CYnnI+nLjqWzzjFbHFDwhUCcgIUy?=
- =?us-ascii?Q?R0+HcxyoBGmmq7zHM6vDXrVVOLjSg8xs2ShE0nVxqij/D82CF9DHiAMvGJU9?=
- =?us-ascii?Q?4OyBJ4U8u7X1nnN1xF9fMXEfLIdJTffQrTAxcO4RnzWsxQj3T5pt4RCFKxRT?=
- =?us-ascii?Q?N9Qr7u5VG+mKsObgqt6fWyBzZo1vOwi32KpTqIt6GmKdJqSRUKQzpojjI7Ad?=
- =?us-ascii?Q?bzjo67bqOqR1gJvm4aSoNJY1m2raxDKqjbAgguGpxhGWmgc4q5u3iTxZZgzq?=
- =?us-ascii?Q?maZZXlmzzTciXKnPW37D8OLh1RFzCigtIiuApAwiNmvgUW0rWhXnnRb91uwb?=
- =?us-ascii?Q?czN7qi/cIpXTD9KlS+RwW3mwwpAJVDSN9LgElsyAYhPaTXWvUyxB4JSPT3SM?=
- =?us-ascii?Q?f6BuM/1e/VJffLNbkeheXRejlD4q0Pj6/RcI+mJ8dOufRRgM/LucnIH5nFCa?=
- =?us-ascii?Q?rkwP20+yHC8dWF0jdiIKKfwAutw4OY/daJNfXXUTHKHOk35+XsEm4ADYQkcr?=
- =?us-ascii?Q?ZFBKeISH1B03rtzz0m0cDvCeYSlRMuLGiEjNnO2zQiYExsDAVK6rXTO1vOWB?=
- =?us-ascii?Q?+53IpnkBdjrhPadOHtSKYyiPWzn9Fwr00HQc6/0/45d0FGtIPYiVmwv+bqz2?=
- =?us-ascii?Q?5s8JlfVqk1xelTov5XZdxYPMeajsVuJqrq6bLWomKC+VqDtEI0osmuy49qQX?=
- =?us-ascii?Q?khLji5TdTLNzYEkA7IP1wbrFLC8EPp5mJS60DRRn6DkBYYeULLYKGcuw+qCT?=
- =?us-ascii?Q?cNHHhmeDrB5bvTFQjqcgJ3rMBrI6v8Qwj/fFCC2Csu0e9bT4eSnIKDDI9eeA?=
- =?us-ascii?Q?2ja0tv11gxOao5ZEBLB5JPJBcChoFdPJ45I6CO0HBMlIXPOxCMUZs6YK5nuQ?=
- =?us-ascii?Q?ZGAUH9wTodmPI/xIcnp6OM4APwgojyQw7u/aqliBm2zaZLWKcf1NsyH/8rJR?=
- =?us-ascii?Q?Q6w2dAVg+JZOhcnlh05Gi6/R35bH4dMGHPc37Tg5NuxczUPeI6G9NIWE9nyW?=
- =?us-ascii?Q?whK//YQsLe31O8Z+l04VC4Q9CRV0Jh0p3LfZEW2w?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: bee7f926-bc03-4e34-ad0b-08db6e4011ae
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?WwPxe3pVlaaTY0Xin4oS+XyjLTdyq9NlB9sBFSWQJiHqNOLrf5WigBlYXfAS?=
+ =?us-ascii?Q?fHjU5sZ1Zf/b5pc+rTGjhdeCE1TmqLTABEaTDwSx0wtEsO6bqhsXRSx9RVOH?=
+ =?us-ascii?Q?Wx8MCgFqYiAz6nCMmhU3Wab2BTquho1t9OIcwFQm2WkvJoHc1BlWZJXdRGA4?=
+ =?us-ascii?Q?80zgtb3gHsZmG2OAxR6tl3xKiMVBgueFeGvVy2JhbqqGM3sUO9gd50p45j5v?=
+ =?us-ascii?Q?qQJwOuVkXGZdmMNZh+/k/4MzBjSRcoGMLgCRBec4+HnomeBx9qjcJk6k4fLB?=
+ =?us-ascii?Q?TO8L4VtSLPotylHFp5Cvq4TwNjQiKEHuKfgVJhwej3Zn3kPN/z+snrYsiRhF?=
+ =?us-ascii?Q?lVRMiIKs0MOcuG1v8EEQRpCY52+p4ZaMRwRZFARxr7f8/TWdpflsz1dZ7o33?=
+ =?us-ascii?Q?OJ3hITyhiabhvp7hLXO6ygqKepv/HyZiHpxRlLU9iK1EC8EsSe3kMpGG8qr0?=
+ =?us-ascii?Q?3MlAweR8t7cId16aKOpFhRrS4YV/dU3UmI7aeuk4hdnRXk91XRtcP1YBqMVg?=
+ =?us-ascii?Q?km1vcg+VRe5RoJ53KzlWojp9kJQ4u3gjnM9RdS1LF9aA61yuPVSYPPuxffMK?=
+ =?us-ascii?Q?G+mz7AfzwNk8QgqCtUXUxlBka45ntUWSHZrEkAR0qCFf5Q8TD4lxok/ra5V2?=
+ =?us-ascii?Q?XGXtMTg/gKEC/UQK1qqXCi9buK8Bh36Gy8ROv2W266Lr2mamKKwQHJ5FOCy+?=
+ =?us-ascii?Q?TQ1UbbweaItadod2vVxDzOTj5OApAMFe6KPMJWw80rqxy81USXxFesuWc7eM?=
+ =?us-ascii?Q?GOKV7Rl/cGTNcBE25gQe1dMhqptVFsy/5u2Oc2o8lAll5wIQFWWZ/RKzlUQ+?=
+ =?us-ascii?Q?YGOlKEReEM3VI2281NUA07iMMwhcRadBE+/w9ve2K5++ibxwkvVEXJaC09z4?=
+ =?us-ascii?Q?rUegInUqnIMmyNn+5gwyLltY9PcdVjy2XGuPZIfdSHlTnPwbdzWf4I34iWlB?=
+ =?us-ascii?Q?c5enltFvS27iiXXvW2dyIusqQgamGIFqlWMpoVxKeWNyVXP5mjrpHKCAUchl?=
+ =?us-ascii?Q?EyCIoLxtX+dOkFF50nReRPt6YWQdKp1XI33CvC03wmijsIyVQFnCndKWfA5g?=
+ =?us-ascii?Q?o6zsGMW+kPD1RJYZoDNrGxr5CAcjpgP7RAzkGVFHaiYZqGe/GXdf2XCfhmbh?=
+ =?us-ascii?Q?69y1QDMbBDubsfYhUXAOt0nUevvaAg+72ZUjPw14pxfZXDaVwPcgmJxLckvE?=
+ =?us-ascii?Q?BBvGy8zitGLqMWEWt7ViZHkZcNijUXWCzyh+cThH+h+hB8dnmJhjgxeSAXBe?=
+ =?us-ascii?Q?ybecdk9l+WoCMQNLlvpZaSeosrH++6blrCiULmiqSqvrs26LYj+4QJRtvOuV?=
+ =?us-ascii?Q?WKkbySsgNIUeEnC+gEwvXb1/iTV4MG/cch8oEnTTtUZeZnOxo96zRxt80FbH?=
+ =?us-ascii?Q?2NQtyydi4jzMZNRxG6F6bWOS9+dRzwHp/tp131JiF70dWPVPfgJHZjQRtGbZ?=
+ =?us-ascii?Q?m0or5WOzl2OeDwt7sL2BsXhusGhgGOJ24j7+mz5jcIRpoa7L5Yc2Q6KaKi7J?=
+ =?us-ascii?Q?TqS7eoYDj+iU/nGEgLYVFxRvQgQzgQm/dFKDisPeyrRtJtXol75pMdLJlJ2E?=
+ =?us-ascii?Q?ZKIe2plPtvaJ7abRG6FSzsW9MfE8B0d0PMzHp8CE?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e81f7dd3-2afd-481c-1bfe-08db6e41dd0a
 X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2023 08:02:46.5979
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2023 08:15:36.5600
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hNf6Gjtn4GNmeoK+Wh3tV95nXm3yH1NvCWGQR6rad3dHALONMtX9Czd9oreEEp6m8mil9UhYaESYBBQEBhKQSg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4881
+X-MS-Exchange-CrossTenant-UserPrincipalName: 26+STPTAwZXd1t5fkYzlhS+cmdQa3vrGECoPgOMzO2YzLnSSfSPwfCPFr6WPk0bAZ73z50saiLAVr56udKWRLA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6223
 X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -152,137 +154,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 16, 2023 at 03:45:50PM +0800, Yuan Yao wrote:
-> > +/*
-> > + * Add @range into kvm->arch.mtrr_zap_list and sort the list in
-> > + * "length" ascending + "start" descending order, so that
-> > + * ranges consuming more zap cycles can be dequeued later and their
-> > + * chances of being found duplicated are increased.
-> > + */
-> > +static void kvm_add_mtrr_zap_list(struct kvm *kvm, struct mtrr_zap_range *range)
-> > +{
-> > +	struct list_head *head = &kvm->arch.mtrr_zap_list;
-> > +	u64 len = range->end - range->start;
-> > +	struct mtrr_zap_range *cur, *n;
-> > +	bool added = false;
-> > +
-> > +	spin_lock(&kvm->arch.mtrr_zap_list_lock);
-> > +
-> > +	if (list_empty(head)) {
-> > +		list_add(&range->node, head);
-> > +		spin_unlock(&kvm->arch.mtrr_zap_list_lock);
-> > +		return;
-> > +	}
-> > +
-> > +	list_for_each_entry_safe(cur, n, head, node) {
-> > +		u64 cur_len = cur->end - cur->start;
-> > +
-> > +		if (len < cur_len)
-> > +			break;
-> > +
-> > +		if (len > cur_len)
-> > +			continue;
-> > +
-> > +		if (range->start > cur->start)
-> > +			break;
-> > +
-> > +		if (range->start < cur->start)
-> > +			continue;
-> > +
-> > +		/* equal len & start, no need to add */
-> > +		added = true;
+On Fri, Jun 16, 2023 at 04:09:17PM +0800, Yuan Yao wrote:
+> On Fri, Jun 16, 2023 at 03:37:29PM +0800, Yan Zhao wrote:
+> > On Fri, Jun 16, 2023 at 03:45:50PM +0800, Yuan Yao wrote:
+> > > > +/*
+> > > > + * Add @range into kvm->arch.mtrr_zap_list and sort the list in
+> > > > + * "length" ascending + "start" descending order, so that
+> > > > + * ranges consuming more zap cycles can be dequeued later and their
+> > > > + * chances of being found duplicated are increased.
+> > > > + */
+> > > > +static void kvm_add_mtrr_zap_list(struct kvm *kvm, struct mtrr_zap_range *range)
+> > > > +{
+> > > > +	struct list_head *head = &kvm->arch.mtrr_zap_list;
+> > > > +	u64 len = range->end - range->start;
+> > > > +	struct mtrr_zap_range *cur, *n;
+> > > > +	bool added = false;
+> > > > +
+> > > > +	spin_lock(&kvm->arch.mtrr_zap_list_lock);
+> > > > +
+> > > > +	if (list_empty(head)) {
+> > > > +		list_add(&range->node, head);
+> > > > +		spin_unlock(&kvm->arch.mtrr_zap_list_lock);
+> > > > +		return;
+> > > > +	}
+> > > > +
+> > > > +	list_for_each_entry_safe(cur, n, head, node) {
+> > > > +		u64 cur_len = cur->end - cur->start;
+> > > > +
+> > > > +		if (len < cur_len)
+> > > > +			break;
+> > > > +
+> > > > +		if (len > cur_len)
+> > > > +			continue;
+> > > > +
+> > > > +		if (range->start > cur->start)
+> > > > +			break;
+> > > > +
+> > > > +		if (range->start < cur->start)
+> > > > +			continue;
+> > > > +
+> > > > +		/* equal len & start, no need to add */
+> > > > +		added = true;
+> > >
+> > > Possible/worth to ignore the range already covered
+> > > by queued range ?
+> >
+> > I may not get you correctly, but
+> > the "added" here means an queued range with exactly same start + len
+> > found, so free and drop adding the new range here.
 > 
-> Possible/worth to ignore the range already covered
-> by queued range ?
-
-I may not get you correctly, but
-the "added" here means an queued range with exactly same start + len
-found, so free and drop adding the new range here.
-
+> I mean drop adding three B below if A already in the queue:
 > 
-> > +		kfree(range);
-> > +		break;
-> > +	}
-> > +
-> > +	if (!added)
-> > +		list_add_tail(&range->node, &cur->node);
-> > +
-> > +	spin_unlock(&kvm->arch.mtrr_zap_list_lock);
-> > +}
-> > +
-> > +static void kvm_zap_mtrr_zap_list(struct kvm *kvm)
-> > +{
-> > +	struct list_head *head = &kvm->arch.mtrr_zap_list;
-> > +	struct mtrr_zap_range *cur = NULL;
-> > +
-> > +	spin_lock(&kvm->arch.mtrr_zap_list_lock);
-> > +
-> > +	while (!list_empty(head)) {
-> > +		u64 start, end;
-> > +
-> > +		cur = list_first_entry(head, typeof(*cur), node);
-> > +		start = cur->start;
-> > +		end = cur->end;
-> > +		list_del(&cur->node);
-> > +		kfree(cur);
-> > +		spin_unlock(&kvm->arch.mtrr_zap_list_lock);
-> > +
-> > +		kvm_zap_gfn_range(kvm, start, end);
-> > +
-> > +		spin_lock(&kvm->arch.mtrr_zap_list_lock);
-> > +	}
-> > +
-> > +	spin_unlock(&kvm->arch.mtrr_zap_list_lock);
-> > +}
-> > +
-> > +static void kvm_zap_or_wait_mtrr_zap_list(struct kvm *kvm)
-> > +{
-> > +	if (atomic_cmpxchg_acquire(&kvm->arch.mtrr_zapping, 0, 1) == 0) {
-> > +		kvm_zap_mtrr_zap_list(kvm);
-> > +		atomic_set_release(&kvm->arch.mtrr_zapping, 0);
-> > +		return;
-> > +	}
-> > +
-> > +	while (atomic_read(&kvm->arch.mtrr_zapping))
-> > +		cpu_relax();
-> > +}
-> > +
-> > +static void kvm_mtrr_zap_gfn_range(struct kvm_vcpu *vcpu,
-> > +				   gfn_t gfn_start, gfn_t gfn_end)
-> > +{
-> > +	struct mtrr_zap_range *range;
-> > +
-> > +	range = kmalloc(sizeof(*range), GFP_KERNEL_ACCOUNT);
-> > +	if (!range)
-> > +		goto fail;
-> > +
-> > +	range->start = gfn_start;
-> > +	range->end = gfn_end;
-> > +
-> > +	kvm_add_mtrr_zap_list(vcpu->kvm, range);
-> > +
-> > +	kvm_zap_or_wait_mtrr_zap_list(vcpu->kvm);
-> > +	return;
-> > +
-> > +fail:
-> > +	kvm_clear_mtrr_zap_list(vcpu->kvm);
-> A very small chance race condition that incorrectly
-> clear the queued ranges which have not been zapped by another thread ?
-> Like below:
+> |------A--------|
+> |----B----|
 > 
-> Thread A                         |  Thread B
-> kvm_add_mtrr_zap_list()          |
->                                  |  kvm_clear_mtrr_zap_list()
-> kvm_zap_or_wait_mtrr_zap_list()  |
+> |------A--------|
+>       |----B----|
 > 
-> Call kvm_clear_mtrr_zap_list() here looks unnecessary, other
-> threads(B here) who put thing in the queue will take care them well.
-
-> > +   kvm_zap_gfn_range(vcpu->kvm, gfn_start, gfn_end); 
-
-Yes, if gfn_start and gfn_end here are not 0 and ~0ULL, the
-kvm_clear_mtrr_zap_list() is not necessary.
-Though in reality, they are always 0-~0ULL, I agree dropping the
-kvm_clear_mtrr_zap_list() here is better.
-
-Thanks!
+> |------A--------|
+>   |----B----|
+> 
+Oh, I implemented this way in my first version.
+But it will complicate the logic and increase time holding spinlock.
+And as usually in the zaps caused by MTRRs update and CR0.CD toggles,
+the queued ranges are duplicated in different vCPUs and non-overlapping
+in one vCPU, I turned to this simplier implemenation finally.
