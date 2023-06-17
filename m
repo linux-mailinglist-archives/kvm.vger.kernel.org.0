@@ -2,62 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CBB0733D77
-	for <lists+kvm@lfdr.de>; Sat, 17 Jun 2023 03:49:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C3B2733D78
+	for <lists+kvm@lfdr.de>; Sat, 17 Jun 2023 03:50:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230313AbjFQBt4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jun 2023 21:49:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44592 "EHLO
+        id S230482AbjFQBt7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jun 2023 21:49:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjFQBtz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jun 2023 21:49:55 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAFFD3A8B
-        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 18:49:54 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1b3d44e3d1cso11480495ad.0
-        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 18:49:54 -0700 (PDT)
+        with ESMTP id S229500AbjFQBt5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jun 2023 21:49:57 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E953A8B
+        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 18:49:56 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1b3d44e3d1cso11480585ad.0
+        for <kvm@vger.kernel.org>; Fri, 16 Jun 2023 18:49:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686966594; x=1689558594;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bBnVoG0dGS8HTBN+3H6jiV3bbfD0jHuG3w6ZkOnSA/c=;
-        b=m6wN6nNjJrKG1RjDZ0IS5eBwL1sYAM497YtCBU8l5cuoQ6gmIcX/HJAifPvY3FKSui
-         xvJIhG/22EJmaTta+LJdxYzJGA+d6gOqwYP61Yas87mTPS6K+cKUQxV5qaPTAQ2t8+cy
-         UX/m8kWykMhscVYPYJOOLrgyNtsf7Sqdth6xPXdOXf42IHaayoa8hjpcpKGAKIVx9yX1
-         NkOX3C/EAdYAUXx/rhWh+r3C+EmCsXUxZFrUfD1CmaDxQVECALchMBYYIHiSsWLoTWAK
-         1If6GyNvKLYBu+PESn1VtQNCNhY69yFjpUk199q0YwT8mKaWVe9l+yDRpGjwSoopqtus
-         pg0g==
+        d=gmail.com; s=20221208; t=1686966596; x=1689558596;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Oecw4cHm2e2h1exUu5iz9LoDoKel+rnByD4CKAVOjIY=;
+        b=Mrvp2JnZiceRh9mG0LiVPW0321usomG4RlXWmvuSG75MS9sl3wTBE5Vk9ug3cjyzpU
+         SV1w7HOX0Wt9l+GOUEkMJwYyJGN3XL+WYjhabirhKWLESE2p/LOXcFnooYtdtB04jKKT
+         Vc/Me3HxBi2zNq7tSrW9sPWo/FSQNdYi6HXvmdNSmI2UF50dyDURC3Y/endI9L6tW36J
+         prHnDUFKZm6w9ooIXneyXzl34vDxMnP5Ev7Wg3645q5RvVVNxHQVEgs2ziF+e/emNDsW
+         /8cJPfj6eZmBU8CyAWGDbSEIGn3rIxflU+zg0bf8+TkxqHRFUJ5ntAW86ZngcGQQn3TC
+         3Bwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686966594; x=1689558594;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bBnVoG0dGS8HTBN+3H6jiV3bbfD0jHuG3w6ZkOnSA/c=;
-        b=Y45O+gb37iQ2ynpFULq/ySFQSY67xJ49/V1qKyB8sOc0zS7L30rPk7QdyR2wJcgN+A
-         fAYD6upucosrnE1yQsb1xNpJAz6ai4uJqKoByGpQNjhkCF4Yq7uoCqOCQ8tY0VJQrTTg
-         bhTDBhuspoeqJYdhIHFCbGvLg7VN+PZDJqJxISsZF9cO4goO2klwkfB888I7XYVFYk1G
-         j8/+1YvrEz/yy24BbMcMJ6Qq68yYRLrRl93lLaHQQZsduVmzWS8iuj7OVLOaIhrBZbF4
-         qlQF9Ss6iQfbnuVno0H1OraGdzFkwn7e5Di5U928ZRKUykcdVvVCbzVFpZoTgNAfl7sX
-         Unyw==
-X-Gm-Message-State: AC+VfDwDJQFeDSd/KLss6GY5k0zVp4Q/ZRyl0nH1Pl7jV2rtlVCerfTr
-        CLldB6qPua8SgYsypDbZghrsVnErBLI=
-X-Google-Smtp-Source: ACHHUZ4cpPfFsO9W/eGdzgAztY0CAcJJ7yKSdodSvhnGM+FkRCdbajIl++ZLnxd673THR+rxqjLazg==
-X-Received: by 2002:a17:903:2341:b0:1ad:f138:b2f6 with SMTP id c1-20020a170903234100b001adf138b2f6mr4392591plh.16.1686966594076;
-        Fri, 16 Jun 2023 18:49:54 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1686966596; x=1689558596;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Oecw4cHm2e2h1exUu5iz9LoDoKel+rnByD4CKAVOjIY=;
+        b=PiyfdPflO8CeKIJwXAnf0OC/zCHDNNC5lLo8MI/wXlhp+Z/fShBfzR1DdVLXHmjYgH
+         m4Ym7PgwcYaPkHYFbTsdhqvraGiYY5iu4YmWOhbsT7ocSYkWxFgta+Yj97A6Q90pcsnU
+         /V+CxR8MzgyRKcVL1OOpptGfNVA35PhjISI5uMl8a7UMQDxVebLxhjh4NZvePcCe4iNO
+         oDQHvv/WfPatU39Pv0C/e8WbzMZLZfMyh8cdmfr73tYOOFdgd2fOrpJaKSQyAyWRZmFu
+         oA4k1jlewofbVvHZZ1ccrsWB2tseX6tznvDbUbZQGd53exLuFoTxzfxMGdHpToG+OK8I
+         j1xA==
+X-Gm-Message-State: AC+VfDyibGDPclIQ9dy7tWFTTG/fcRHUOdEzt4QdR7cVGsmbTYH550Rj
+        mF/ljmfIxtqxTbJtgHyCmG8=
+X-Google-Smtp-Source: ACHHUZ6X8GA1cQpq2woKJ6CnOZa9hGXLGvgUI5zPcjIdSU+YyL4dfK/rvK546JAqZeqN8MCF0I6FAg==
+X-Received: by 2002:a17:903:445:b0:1b3:f3ae:e1ed with SMTP id iw5-20020a170903044500b001b3f3aee1edmr3321551plb.37.1686966595824;
+        Fri, 16 Jun 2023 18:49:55 -0700 (PDT)
 Received: from sc9-mailhost1.vmware.com (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id 18-20020a17090a031200b0024dfb8271a4sm2114440pje.21.2023.06.16.18.49.52
+        by smtp.gmail.com with ESMTPSA id 18-20020a17090a031200b0024dfb8271a4sm2114440pje.21.2023.06.16.18.49.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jun 2023 18:49:53 -0700 (PDT)
+        Fri, 16 Jun 2023 18:49:55 -0700 (PDT)
 From:   Nadav Amit <nadav.amit@gmail.com>
 X-Google-Original-From: Nadav Amit
 To:     Andrew Jones <andrew.jones@linux.dev>
 Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, Nikos Nikoleris <nikos.nikoleris@arm.com>,
         Nadav Amit <namit@vmware.com>
-Subject: [kvm-unit-tests PATCH 0/6] arm64: improve debuggability
-Date:   Sat, 17 Jun 2023 01:49:24 +0000
-Message-Id: <20230617014930.2070-1-namit@vmware.com>
+Subject: [kvm-unit-tests PATCH 1/6] arm: keep efi debug information in a separate file
+Date:   Sat, 17 Jun 2023 01:49:25 +0000
+Message-Id: <20230617014930.2070-2-namit@vmware.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230617014930.2070-1-namit@vmware.com>
+References: <20230617014930.2070-1-namit@vmware.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -72,47 +75,38 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Nadav Amit <namit@vmware.com>
 
-My recent experience in debugging ARM64 tests on EFI was not as fun as I
-expected it to be.
+Debugging tests that run on EFI is hard because the debug information is
+not included in the EFI file. Dump it into a separeate .debug file to
+allow the use of gdb or pretty_print_stacks script.
 
-There were several reasons for that besides the questionable definition
-of "fun":
+Signed-off-by: Nadav Amit <namit@vmware.com>
+---
+ arm/Makefile.common | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-1. ARM64 is not compiled with frame pointers and there is no stack
-   unwinder when the stack is dumped.
-
-2. Building an EFI drops the debug information.
-
-3. The addresses that are printed on dump_stack() and the use of GDB
-   are hard because taking code relocation into account is non trivial.
-
-The patches help both ARM64 and EFI for this matter. The image address
-is printed when EFI is used to allow the use of GDB. Symbols are emitted
-into a separate debug file. The frame pointer is included and special
-entry is added upon an exception to allow backtracing across
-exceptions.
-
-Nadav Amit (6):
-  arm: keep efi debug information in a separate file
-  lib/stack: print base addresses on efi
-  arm64: enable frame pointer and support stack unwinding
-  arm64: stack: update trace stack on exception
-  efi: Print address of image
-  arm64: dump stack on bad exception
-
- arm/Makefile.arm        |  3 ---
- arm/Makefile.arm64      |  1 +
- arm/Makefile.common     |  8 ++++++-
- arm/cstart64.S          | 13 ++++++++++
- lib/arm64/asm-offsets.c |  3 ++-
- lib/arm64/asm/stack.h   |  3 +++
- lib/arm64/processor.c   |  1 +
- lib/arm64/stack.c       | 53 +++++++++++++++++++++++++++++++++++++++++
- lib/efi.c               |  3 +++
- lib/stack.c             | 31 ++++++++++++++++++++++--
- 10 files changed, 112 insertions(+), 7 deletions(-)
- create mode 100644 lib/arm64/stack.c
-
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index d60cf8c..f904702 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -69,7 +69,7 @@ FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libeabi)
+ ifeq ($(CONFIG_EFI),y)
+ %.so: EFI_LDFLAGS += -defsym=EFI_SUBSYSTEM=0xa --no-undefined
+ %.so: %.o $(FLATLIBS) $(SRCDIR)/arm/efi/elf_aarch64_efi.lds $(cstart.o)
+-	$(CC) $(CFLAGS) -c -o $(@:.so=.aux.o) $(SRCDIR)/lib/auxinfo.c \
++	$(CC) $(CFLAGS) -c -g -o $(@:.so=.aux.o) $(SRCDIR)/lib/auxinfo.c \
+ 		-DPROGNAME=\"$(@:.so=.efi)\" -DAUXFLAGS=$(AUXFLAGS)
+ 	$(LD) $(EFI_LDFLAGS) -o $@ -T $(SRCDIR)/arm/efi/elf_aarch64_efi.lds \
+ 		$(filter %.o, $^) $(FLATLIBS) $(@:.so=.aux.o) \
+@@ -78,6 +78,9 @@ ifeq ($(CONFIG_EFI),y)
+ 
+ %.efi: %.so
+ 	$(call arch_elf_check, $^)
++	$(OBJCOPY) --only-keep-debug $^ $@.debug
++	$(OBJCOPY) --strip-debug $^
++	$(OBJCOPY) --add-gnu-debuglink=$@.debug $^
+ 	$(OBJCOPY) \
+ 		-j .text -j .sdata -j .data -j .dynamic -j .dynsym \
+ 		-j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
 -- 
 2.34.1
 
