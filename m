@@ -2,104 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 89A19734484
-	for <lists+kvm@lfdr.de>; Sun, 18 Jun 2023 02:09:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 518047344A3
+	for <lists+kvm@lfdr.de>; Sun, 18 Jun 2023 04:11:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229668AbjFRAJc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 17 Jun 2023 20:09:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38290 "EHLO
+        id S229453AbjFRCL1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 17 Jun 2023 22:11:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233536AbjFRAJY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 17 Jun 2023 20:09:24 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 327F31724
-        for <kvm@vger.kernel.org>; Sat, 17 Jun 2023 17:09:23 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1afba64045aso19148975ad.0
-        for <kvm@vger.kernel.org>; Sat, 17 Jun 2023 17:09:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687046962; x=1689638962;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=1VCe6Te4dbtLGKgb4rOHMky/xQ+L+u4Ve7fRkEOuWfM=;
-        b=eM6eEMdeAdA3q12h/4zPiNDSyzDv6iURF6JeeAlS92vFN138+Ea57eUPBYKXB/1hSK
-         LO+sRsz7LswUmxtY2fR1MXtZ5ODEii85FISwNsl00srPgkpT+xOgRzsXGZenLTovEC4K
-         5bCdZnpVEh3xw/+QxJve/qwSzVD1fa3TqfhTUHfYi7y0bg4vv9JGAYAycx//ck2bTtEa
-         x0mjE8f8m8SfrfLilZa2KalRke5BniQVDR2ujyq/cZrSDYm/79+HVziX7w7RrRTnHlXw
-         fYE6FC2kIKP7Hw3VUVpp7d1JE/EkJAqrZYwsEiLJj6sx6zDZWhNU/Od3Bkmt9PNwwxke
-         +F7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687046962; x=1689638962;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1VCe6Te4dbtLGKgb4rOHMky/xQ+L+u4Ve7fRkEOuWfM=;
-        b=VgG/G+7ioHeHJqLBHzKEqtbDx/ixi4G7CGKK941KVnB4ywbHRPpiqEjhqId1tL2JW+
-         mz71BUE9AcgHUElho1rm63jEi5ZqY9Gn8jKSmkU24MKjou6DLkLpctUz+4FztVcbzx7i
-         cu3in/OjR2FAmuYj7J+IzkLjHQE7o+7xC0QhQmNbmCh0UwE7j2n06A3VNtJkC0mn9yRh
-         mz6djZ0dudPT3d35qi8OLAme/Ru8WYTG/QEvMgTJP8jK0QUd/FyqkQRjJDuuuILM4wZd
-         vCCsZYzJP1sJeKRWgcHpztdBmq+dW3LR/8wJEGJemAT3wOIFrGsoIWz509BAoa6+y3bx
-         diWA==
-X-Gm-Message-State: AC+VfDxzfaJJOmVeVQWA3eZjW4Bw1jwiRmN56X/YtoXyMAzN52uWWZMz
-        w2Qd+mgGiYCf0pMGjtmrRrzpnzp0mehO
-X-Google-Smtp-Source: ACHHUZ587n83fnu4WPNdcoRuCpjN8gdiXgApo0KsiKTF4x3Syc0S5oMmIS04y4PImd7mWuJ5Od9KbFTaOwBX
-X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
- job=sendgmr) by 2002:a17:902:e88b:b0:1a8:1f4:2d50 with SMTP id
- w11-20020a170902e88b00b001a801f42d50mr1222628plg.4.1687046962586; Sat, 17 Jun
- 2023 17:09:22 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Sun, 18 Jun 2023 00:08:56 +0000
-In-Reply-To: <20230618000856.1714902-1-mizhang@google.com>
-Mime-Version: 1.0
-References: <20230618000856.1714902-1-mizhang@google.com>
-X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
-Message-ID: <20230618000856.1714902-7-mizhang@google.com>
-Subject: [PATCH 6/6] KVM: Documentation: Add the missing tdp_mmu_page into kvm_mmu_page
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Mingwei Zhang <mizhang@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
+        with ESMTP id S229379AbjFRCL0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 17 Jun 2023 22:11:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A63ABA3;
+        Sat, 17 Jun 2023 19:11:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 59CE660B30;
+        Sun, 18 Jun 2023 02:11:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB3BEC433C8;
+        Sun, 18 Jun 2023 02:11:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687054284;
+        bh=hrbm6au2VGNBIFNhWA1SNgCyBekbxhSckbGJy7ygoK0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Ya9PdseP5WKgielreKKNKz2v6XO+JHq7gXQiUk3htMSv9iwKT4lgTCGTVZJ2MFbMk
+         dEZEgpKnQM4x0TBmGdJe+jx+EGsGwgB3l4mfVbrNn/YrQbPQYaAuLUZA+2MhJBIH/8
+         vrbQqI/fZTFqtX3/G3AVaODItl823e/eRfW3mkvspzpDfKmNZKjk9iMx8pI68fa7pU
+         Ap+PQ4GUvuIpfjLavr0SNfT/VcAWeUXm4M8HVzbYeOei0qDN8dylbTfwOhyEZh5weu
+         MCwXhYhOvoDeOFqhyUWhIWmU8HpPJ5FB1ZkIJ4lU0ypENEB9Abfezr0jUQAhx2Fvh/
+         NxhqZ4hXxjRRQ==
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-9768fd99c0cso665059866b.0;
+        Sat, 17 Jun 2023 19:11:24 -0700 (PDT)
+X-Gm-Message-State: AC+VfDyPKf/SvjVaVGIADPZ3AU/5cIC9MbU0wcHvD+Y5ro2d9aW0f9ro
+        BfbND2vuy6QBzeH8iTDkbMS01xGNgEC82MFgG5Q=
+X-Google-Smtp-Source: ACHHUZ5PRIJVD6PSGfwwUDJfcbff85dKyWLrYQFmq7HH0Jj0ecCvtJ3i2o1T4TZVJIDzKWrSRrubRTMKJKab6W2v1n0=
+X-Received: by 2002:a17:907:9624:b0:987:9852:603a with SMTP id
+ gb36-20020a170907962400b009879852603amr2734046ejc.26.1687054282890; Sat, 17
+ Jun 2023 19:11:22 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230617185335.2025859-1-yuzhao@google.com>
+In-Reply-To: <20230617185335.2025859-1-yuzhao@google.com>
+From:   Huacai Chen <chenhuacai@kernel.org>
+Date:   Sun, 18 Jun 2023 10:11:10 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5Z4eCumeykwcD8B-5K+ur5SWjufSv6oZw4Y9uSsE+wXg@mail.gmail.com>
+Message-ID: <CAAhV-H5Z4eCumeykwcD8B-5K+ur5SWjufSv6oZw4Y9uSsE+wXg@mail.gmail.com>
+Subject: Re: [PATCH] kvm/mips: update MAINTAINERS
+To:     Yu Zhao <yuzhao@google.com>
+Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add tdp_mmu_page into kvm_mmu_page description. tdp_mmu_page is a field to
-differentiate shadow pages from TDP MMU and non-TDP MMU. When TDP MMU is
-enabled, sp->tdp_mmu_page=1 indicates a shadow page for L1, while
-sp->tdp_mmu_page=0 indicates a shadow page for an L2. When TDP MMU is
-disabled, sp->tdp_mmu_page is always 0. So update the doc to reflect the
-information.
+Acked-by: Huacai Chen <chenhuacai@kernel.org>
 
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- Documentation/virt/kvm/x86/mmu.rst | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/Documentation/virt/kvm/x86/mmu.rst b/Documentation/virt/kvm/x86/mmu.rst
-index 0dbdb7fb8cc6..cbad49c37629 100644
---- a/Documentation/virt/kvm/x86/mmu.rst
-+++ b/Documentation/virt/kvm/x86/mmu.rst
-@@ -277,6 +277,10 @@ Shadow pages contain the following information:
-     since the last time the page table was actually used; if emulation
-     is triggered too frequently on this page, KVM will unmap the page
-     to avoid emulation in the future.
-+  tdp_mmu_page:
-+    Is 1 if the shadow page is a TDP MMU page. When TDP MMU is disabled,
-+    this field is always 0.
-+
- 
- Reverse map
- ===========
--- 
-2.41.0.162.gfafddb0af9-goog
-
+On Sun, Jun 18, 2023 at 2:53=E2=80=AFAM Yu Zhao <yuzhao@google.com> wrote:
+>
+> Aleksandar Markovic was last seen in Oct 2020 [1] and cannot be
+> reached for multiple days because of "Recipient inbox full".
+>
+> [1] https://lore.kernel.org/all/1602103041-32017-4-git-send-email-aleksan=
+dar.qemu.devel@gmail.com/
+>
+> Signed-off-by: Yu Zhao <yuzhao@google.com>
+> ---
+>  MAINTAINERS | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 6992b7cc7095..9de60ba04b6d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -11379,7 +11379,6 @@ F:      tools/testing/selftests/kvm/aarch64/
+>
+>  KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)
+>  M:     Huacai Chen <chenhuacai@kernel.org>
+> -M:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>  L:     linux-mips@vger.kernel.org
+>  L:     kvm@vger.kernel.org
+>  S:     Maintained
+> --
+> 2.41.0.162.gfafddb0af9-goog
+>
