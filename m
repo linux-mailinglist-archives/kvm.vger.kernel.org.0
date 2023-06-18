@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21EAF73447C
-	for <lists+kvm@lfdr.de>; Sun, 18 Jun 2023 02:09:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9BBA734481
+	for <lists+kvm@lfdr.de>; Sun, 18 Jun 2023 02:09:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233369AbjFRAJX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 17 Jun 2023 20:09:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38240 "EHLO
+        id S234603AbjFRAJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 17 Jun 2023 20:09:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232828AbjFRAJU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 17 Jun 2023 20:09:20 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 888CC170B
-        for <kvm@vger.kernel.org>; Sat, 17 Jun 2023 17:09:19 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-53f44c25595so1035623a12.2
-        for <kvm@vger.kernel.org>; Sat, 17 Jun 2023 17:09:19 -0700 (PDT)
+        with ESMTP id S233460AbjFRAJX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 17 Jun 2023 20:09:23 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E0F0170F
+        for <kvm@vger.kernel.org>; Sat, 17 Jun 2023 17:09:21 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-25efb82179dso41942a91.1
+        for <kvm@vger.kernel.org>; Sat, 17 Jun 2023 17:09:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687046959; x=1689638959;
+        d=google.com; s=20221208; t=1687046961; x=1689638961;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=SZRhH39sdwsf6mf7jmU2xtyZAtu6JfAYC83IgKKrw3g=;
-        b=yKkIRX0QpeQIZE1DidVGEAYWTGzy1a7kdjPPYLn8eK2kTitM+zJT9u6VA55WaqmtV6
-         pWHjiKIuMZWbo2Pnap/dtOis3oRHJicAz7uD3wD5V/AnkB+f30edVXETNO//NaRsMPv0
-         k/E+3VFdUlcad6EjHg+NVkBMrG8YirRZjg8CNYDb5HsmaTFw8gxIHruDw+7xEj5a/N9b
-         s5WHerxEKQKPsUwVjAKK/8YaGjoM7Q8orVuDn+mfc8+Hw4YWUMIAnvwn2u9CkSdrJgFI
-         sI+/eW+ixsQaT0cz+EHG9Hcon8LeQaDmkuRhNbgFglelLp5mNWJKezlzTzT9vI5/yjsC
-         68sQ==
+        bh=kxL2IQh8QsyzT6M8Esvdn0S5tsYGjEEcYbokMBIJOOA=;
+        b=gMXMhYIhG2lW0SrPMUMr/jEaUXXnHOTAKNZtToKxzpFzIj9Y9m+1qXmo4dWsPoPvLr
+         plVHnLbDVoL5nKbQ24qCLpgop2Mkxkv7z5E7x36gOXD9Dv/3IpNI29XczZ5e3dxJ9BP5
+         Cs3tNz3R/gYemrR4La3CUU0Zn/VzUphnGNOjltb587gpzFz4xxs5CatONKNqj/b+sqYP
+         wCO65H1ExzPgkkFj1vYdx6rCHjXIFdEOiqH5Bjg9KaAtsBFNSIVBwGspnXohbEd1i1Jp
+         wmu+yRapRmaZ33Czkeh7p9/dDzsqGZ1fhQBD2GtD2OUTNCuohWlQWzkhxhJft5S+PZFv
+         /L5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687046959; x=1689638959;
+        d=1e100.net; s=20221208; t=1687046961; x=1689638961;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=SZRhH39sdwsf6mf7jmU2xtyZAtu6JfAYC83IgKKrw3g=;
-        b=eTfuSYxm9PWaTh2i0zCDJnWKNPwr5pc6r+sH3txf0adCDCJi3sZzuztB7VohVfBqCT
-         a6azpMy8Z2w4juraILNd9FpimtoYA2Pry/qO7QCc9Cbl9TFsbcj2EdXikYAXl6S+TTNl
-         51dOH0soX/fRgXlqUhmZj5DmSVtu+SCT7sJsHO50iTfnq1Jd10XMdHorrBI/VW+bcfJk
-         EiUXYpGobbfr667KBwJcc6hgE4PT7oI6rcTUQZpuPmSCVuMFrM9YcTe9zgA5N/9sag6f
-         RuyOEm8KbOTX2LpvQ99BNcpWqj8DPAkeI9Ay0EpzsS73+BqS5+ij2wHp5DTG5tmlz17n
-         AO8g==
-X-Gm-Message-State: AC+VfDzkIE3tZSan6+sC01ud6DN3tYbE+KoRXyhlpo5wpP6bugbpNLev
-        NEIzfMcyDBhWmvYlgnK0zBRRtICwGDyE
-X-Google-Smtp-Source: ACHHUZ6s/0SDgBjDHb7lnw7v17wR8UYblxJ4u12S9rHeLlYYijB1xGLNmU6+VDed2EOc0mlXhPDl+/6YPoZi
+        bh=kxL2IQh8QsyzT6M8Esvdn0S5tsYGjEEcYbokMBIJOOA=;
+        b=knIH2DnQ28445LsTyCs04dQm8p+Ljtb3xz8EW/FGoLuAxrSAf0sIepTccAFOn3bTtS
+         EOTo4Aj/UHkOpDdnk0ILpwOTr1k9EnT3MrrMtBy2bxCdQqPwYKhgFN/CfMCjXFjkSuAN
+         QVQlfpoUSi9TVqX2tDnOyKHwDwv6tBTXVbRQVGSR038QodTl3Xw7UGG4sW+x3Le/SlQP
+         Vf4R1jcXEb9HJ3n83+62sAVSqXhfr6vprfrKDROyuTCrOQfRiRk11u2SagW1MW8vrxgq
+         aQyglYQaDos7+gqFdFINNeyeenYl8v1PE1P7wFE/SigQFMfBViVTLSyfS0YB3W9wuAMv
+         9D4w==
+X-Gm-Message-State: AC+VfDyzqG0Iq2i4ejstdLD26URGxBamHa+QHdrs+IET2ilsHYWxUcT8
+        TbbjNp0XjBRshTz93BvNhbFVWDI1Ue3T
+X-Google-Smtp-Source: ACHHUZ667rmHgnnVMFyiOS98UlXH2hDjVOn68VnJ+dNKWA2D/uGC0vcKPrekHRymKGd05CoJKmuP1cPxyqdg
 X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
- job=sendgmr) by 2002:a63:782:0:b0:517:ce37:756e with SMTP id
- 124-20020a630782000000b00517ce37756emr406250pgh.7.1687046959115; Sat, 17 Jun
- 2023 17:09:19 -0700 (PDT)
+ job=sendgmr) by 2002:a05:6a00:1a15:b0:654:8eb9:4607 with SMTP id
+ g21-20020a056a001a1500b006548eb94607mr1818385pfv.4.1687046960661; Sat, 17 Jun
+ 2023 17:09:20 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Sun, 18 Jun 2023 00:08:54 +0000
+Date:   Sun, 18 Jun 2023 00:08:55 +0000
 In-Reply-To: <20230618000856.1714902-1-mizhang@google.com>
 Mime-Version: 1.0
 References: <20230618000856.1714902-1-mizhang@google.com>
 X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
-Message-ID: <20230618000856.1714902-5-mizhang@google.com>
-Subject: [PATCH 4/6] KVM: Documentation: Add the missing tdp_mmu_root_count
- into kvm_mmu_page
+Message-ID: <20230618000856.1714902-6-mizhang@google.com>
+Subject: [PATCH 5/6] KVM: Documentation: Add the missing mmu_valid_gen into kvm_mmu_page
 From:   Mingwei Zhang <mizhang@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -74,32 +73,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add tdp_mmu_root_count into kvm_mmu_page description. tdp_mmu_root_count is
-an atomic counter used only in TDP MMU. Its usage and meaning is slightly
-different with root_counter in shadow MMU. Update the doc.
+Add mmu_valid_gen into kvm_mmu_page description. mmu_valid_gen is used in
+shadow MMU for fast zapping. Update the doc to reflect that.
 
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
- Documentation/virt/kvm/x86/mmu.rst | 6 ++++++
- 1 file changed, 6 insertions(+)
+ Documentation/virt/kvm/x86/mmu.rst | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/Documentation/virt/kvm/x86/mmu.rst b/Documentation/virt/kvm/x86/mmu.rst
-index 36bfe0fe02bb..3dce2426ad6d 100644
+index 3dce2426ad6d..0dbdb7fb8cc6 100644
 --- a/Documentation/virt/kvm/x86/mmu.rst
 +++ b/Documentation/virt/kvm/x86/mmu.rst
-@@ -230,6 +230,12 @@ Shadow pages contain the following information:
-     A counter keeping track of how many hardware registers (guest cr3 or
-     pdptrs) are now pointing at the page.  While this counter is nonzero, the
-     page cannot be destroyed.  See role.invalid.
-+  tdp_mmu_root_count:
-+    An atomic reference counter in TDP MMU that allows for parallel
-+    accesses.  Accessing the page requires lifting the counter value. The
-+    initial value is set as 2 indicating one reference from vCPU and one
-+    from TDP MMU itself. While this counter is nonzero, the page cannot be
-+    destroyed. Note this field is a union with root_count.
-   parent_ptes:
-     The reverse mapping for the pte/ptes pointing at this page's spt. If
-     parent_ptes bit 0 is zero, only one spte points at this page and
+@@ -208,6 +208,10 @@ Shadow pages contain the following information:
+     The page is not backed by a guest page table, but its first entry
+     points to one.  This is set if NPT uses 5-level page tables (host
+     CR4.LA57=1) and is shadowing L1's 4-level NPT (L1 CR4.LA57=1).
++  mmu_valid_gen:
++    Used by comparing against kvm->arch.mmu_valid_gen to check whether the
++    shadow page is obsolete thus a convenient variable for fast zapping.
++    Note that TDP MMU does not use mmu_valid_gen.
+   gfn:
+     Either the guest page table containing the translations shadowed by this
+     page, or the base page frame for linear translations.  See role.direct.
 -- 
 2.41.0.162.gfafddb0af9-goog
 
