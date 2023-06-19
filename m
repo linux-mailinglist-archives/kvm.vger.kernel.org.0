@@ -2,65 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A79A9734C68
-	for <lists+kvm@lfdr.de>; Mon, 19 Jun 2023 09:31:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28060734C7B
+	for <lists+kvm@lfdr.de>; Mon, 19 Jun 2023 09:42:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbjFSHbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jun 2023 03:31:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34800 "EHLO
+        id S229900AbjFSHmA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jun 2023 03:42:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbjFSHbD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jun 2023 03:31:03 -0400
-Received: from mail.quaich.pl (mail.quaich.pl [51.38.112.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 449C5121
-        for <kvm@vger.kernel.org>; Mon, 19 Jun 2023 00:31:00 -0700 (PDT)
-Received: by mail.quaich.pl (Postfix, from userid 1002)
-        id 0A8ABA25C4; Mon, 19 Jun 2023 07:30:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=quaich.pl; s=mail;
-        t=1687159858; bh=X52Iu/tAYBSbyYO11VQ829bhCy2aICQ8DuuS52v1cCE=;
-        h=Date:From:To:Subject:From;
-        b=pwnQIRLB5ip8HB6G/sVm10fnX5Cx0frApx4ovsT349AUJk7L1U3rnJhl/rwgXxGOJ
-         ZRQrJlWuQzAef/kuHcayZtv9439BP98BMe91k1fESqL9zagmtKpuU7D3rq9U/shXKM
-         93dW4Yex1Gmmf/xEL7JwoocwI+v1v/B38PaVsENSJg1wbIK+ZlYTd7NX44hF4Uyx14
-         boKxFrpIgeDqJRFXx0SnYlMAdOHbvnTBf5h3peK38JZ0iyafsQuv5jKck9YPhvXHci
-         g2tg2wG2OYzWuz2G1lQ87ElDz3dARMbmcUQ/Bu3GOhJacE7pa6E9R7mkJAbmaEDp8K
-         FE5cGgPGRy/KQ==
-Received: by quaich.pl for <kvm@vger.kernel.org>; Mon, 19 Jun 2023 07:30:50 GMT
-Message-ID: <20230619064520-0.1.8u.k3g3.0.928lcomqdx@quaich.pl>
-Date:   Mon, 19 Jun 2023 07:30:50 GMT
-From:   =?UTF-8?Q? "Tomasz_Wiewi=C3=B3r" ?= <tomasz.wiewior@quaich.pl>
-To:     <kvm@vger.kernel.org>
-Subject: =?UTF-8?Q?Domkni=C4=99cie_sprzeda=C5=BCy?=
-X-Mailer: mail.quaich.pl
+        with ESMTP id S229473AbjFSHl6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jun 2023 03:41:58 -0400
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D73C8FF
+        for <kvm@vger.kernel.org>; Mon, 19 Jun 2023 00:41:57 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3f8d258f203so23156255e9.1
+        for <kvm@vger.kernel.org>; Mon, 19 Jun 2023 00:41:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1687160516; x=1689752516;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mSDEO3S7v0gqsjqb34kIccXlrtVfeECb8OYUdCmpYAc=;
+        b=C+DZhtCqAjYyInswfiCXO6os7itVoRlQtPHPNTuHUsXeUrecgnnKFuAigEtuUjfY2Y
+         Us69L8zlaDifbvn2R6d4twJfx1qD2DuHdvimmlLM+rwfV13IGTIYSk32upQhOL9YUDlX
+         TQTVsi0uWfcVhQpKpe7O8vCiKJTXJwCyOv5UfaGONA1kU35uSm0ZKD7tXpRzco9WqWFp
+         3voegU1DphnvgQe5ZBKIqhlWeAQWmZFbX7wMEVnOGWkmwmuYKLM5sIRsrc/WblJrh/Hg
+         G1RqlDbOVyE6YVTrL/0K+mRyaiWY+wlWLN2cFMkhH+dTE7tfgMWlq/v2dVPHfoY0WJ1i
+         f4Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687160516; x=1689752516;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mSDEO3S7v0gqsjqb34kIccXlrtVfeECb8OYUdCmpYAc=;
+        b=iiqRkMI2i+s0NRZcft4dVGgkrdmyGlci5q1x+PNCIgfPke1in1zC0AWLwoyyfUJcxS
+         /ON8vGs8lvjPOeDWr4ha65w8iVeHT6mbnLRKSfkMZ2HYsmIk3k7Kd4jZu6LdXAkCf0IG
+         uy0BxBKeqEHoKvsJihyKVagJCm2z4ktRjB0FY6F5w3EIWKPZET58yKl8W5M59PO1dh7d
+         5TXAVVcjfBtOP3QJyK1n4hYHCZqhLaUcRbt3BglH/Hz5947TD9H+sRA6A5wx4adcO/Pf
+         qJBN9GCqIYw9wh9cWQbxgrJzGRpjItT27aZ6bj/ib6RBtXNNB9FWngA9Mp1MRRsOKjPe
+         7SJg==
+X-Gm-Message-State: AC+VfDzZXzRoG04rJ4dKJjSKbuhQ+qdnFJTfTOAeX5oL15xlPhRXPe69
+        BdX1wHPCYr4grU3nX3JatybXuQ==
+X-Google-Smtp-Source: ACHHUZ7OFFSztmt/Tn6nEm987OMGHO8qAv1Qs+aHhKfRshCWC598pSvmv3evhLzMOz/cnCav+Afhbw==
+X-Received: by 2002:a05:600c:203:b0:3f7:f24b:b2ed with SMTP id 3-20020a05600c020300b003f7f24bb2edmr6235870wmi.19.1687160516336;
+        Mon, 19 Jun 2023 00:41:56 -0700 (PDT)
+Received: from localhost.localdomain (194.red-95-127-33.staticip.rima-tde.net. [95.127.33.194])
+        by smtp.gmail.com with ESMTPSA id c25-20020a05600c0ad900b003f18b942338sm9853169wmr.3.2023.06.19.00.41.55
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 19 Jun 2023 00:41:55 -0700 (PDT)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Helge Deller <deller@gmx.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Jason Wang <jasowang@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH 0/4] exec: Header cleanups around memory.h/address-spaces.h
+Date:   Mon, 19 Jun 2023 09:41:49 +0200
+Message-Id: <20230619074153.44268-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dzie=C5=84 dobry,=20
+Trivial header cleanups extracted from bigger series.
+Sending separately since somehow unrelated to its goal.
 
-chcia=C5=82bym zaproponowa=C4=87 Pa=C5=84stwu program doradczo-szkoleniow=
-y.=20
+Philippe Mathieu-Daudé (4):
+  hw/net/i82596: Include missing 'exec/address-spaces.h' header
+  hw/dma/etraxfs: Include missing 'exec/memory.h' header
+  exec/address-spaces.h: Remove unuseful 'exec/memory.h' include
+  sysemu/kvm: Re-include "exec/memattrs.h" header
 
-Nasze dzia=C5=82ania s=C4=85 zorientowane na konkretne cele, dlatego w pi=
-erwszej kolejno=C5=9Bci przeprowadzamy z naszymi Klientami analiz=C4=99 p=
-otrzeb, a nast=C4=99pnie przyst=C4=99pujemy do stworzenia spersonalizowan=
-ego programu szkoleniowego.=20
+ include/exec/address-spaces.h | 2 --
+ include/sysemu/kvm.h          | 1 +
+ hw/dma/etraxfs_dma.c          | 1 +
+ hw/net/i82596.c               | 1 +
+ 4 files changed, 3 insertions(+), 2 deletions(-)
 
-Posiadamy do=C5=9Bwiadczenie we wsp=C3=B3=C5=82pracy z wiod=C4=85cymi fir=
-mami w konkretnych bran=C5=BCach. Zajmujemy si=C4=99 doradztwem, prowadzi=
-my coaching, szkolimy pracownik=C3=B3w wszystkich szczebli oraz specjalis=
-t=C3=B3w i kadr=C4=99 zarz=C4=85dzaj=C4=85c=C4=85.=20
+-- 
+2.38.1
 
-Czy mo=C5=BCemy porozmawia=C4=87 o naszej ofercie?=20
-
-
-Pozdrawiam
-Tomasz Wiewi=C3=B3r
