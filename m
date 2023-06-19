@@ -2,147 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34B94734817
-	for <lists+kvm@lfdr.de>; Sun, 18 Jun 2023 22:11:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3687C734A03
+	for <lists+kvm@lfdr.de>; Mon, 19 Jun 2023 04:17:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229456AbjFRULv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 18 Jun 2023 16:11:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44120 "EHLO
+        id S229739AbjFSCRd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 18 Jun 2023 22:17:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjFRULt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 18 Jun 2023 16:11:49 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3F25E47
-        for <kvm@vger.kernel.org>; Sun, 18 Jun 2023 13:11:48 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-3fddc620055so206291cf.1
-        for <kvm@vger.kernel.org>; Sun, 18 Jun 2023 13:11:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687119108; x=1689711108;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mpfISiVhGBFvYu3AQzytJ9eyp0qWbNPzT0F/TqGcEF0=;
-        b=BI4IVSXI0OmI7HSHsHlrapOhxlYQr88irtqXtejFQDdwi0ENBjBoT+XLb8GlVX5ye2
-         2RKZIVa3SgmrzIbhLz9gPTVxEaHp2aLuGzJABn2V8qcyj1r5n7W74CILO0agM4yRBdqp
-         1RaptWkZvNHDOFx+VjmcCLiDP8C+KTiX8SbGmrEKzvHmrSeItS1P0Xmdw5h0oqtFiDy4
-         AOhW0Kb490uZt+xyTNM54SZyWZrBQ/OOSALJEaw5URHLWQ5/4/9LTWbU9KUB5nzr8SkC
-         EiNHGrA/DNhBI3N/ps22/XwwMptyPwh1WFUc37QSRtqZWWbsx8o8/qqFNZmnqhSquaII
-         BNYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687119108; x=1689711108;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mpfISiVhGBFvYu3AQzytJ9eyp0qWbNPzT0F/TqGcEF0=;
-        b=Qwv73uKP0fgdLgb19tvGfy32Am2e2U7Px9Y4mZhhuE29YzTy6LwRcq96gRGfzi1juF
-         1wz+KwOm4Wfopuq5Lj5wQ46RCjhrDumtqigh6/18lc1qRmDftSsWVafZhtZ4nB1WRjqe
-         StpoEqQziILVRlrJIfwqPzB/HKUAbFmmnrfozx/MHq8y+F27309caxUHh1ZXEuZFgfqA
-         muTxGoKrwPJJ8TyxXj+sjmrmsOwlTZnmRv6OCTm95vly/Jl5Xmslfzfso4ng8ApWgTES
-         WxO80l4XtNGvm8DZJ0r/Cn7a4FJaWjC154hBhEZWPj2kayiWEak+vGCVd/TXBl0bwVPR
-         7N3Q==
-X-Gm-Message-State: AC+VfDzenAhMx7kBAEfhFpm3U8I+liDVG8tfwdVtL5aLrpfxZaAUEu1A
-        stKMCu6E++Uv58YXxDq3Gfi/dPqYaum9R93nJXamzA==
-X-Google-Smtp-Source: ACHHUZ7+FzP5AfTCxoLANN0O1kovXzprxLRO2NDRfP+79+jkGgGwKBzMX+UybO5p4uMqphT40cGSU06Ta5mNNZ2MZbY=
-X-Received: by 2002:a05:622a:85:b0:3f8:5b2:aeed with SMTP id
- o5-20020a05622a008500b003f805b2aeedmr773688qtw.21.1687119107794; Sun, 18 Jun
- 2023 13:11:47 -0700 (PDT)
+        with ESMTP id S229674AbjFSCRc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 18 Jun 2023 22:17:32 -0400
+Received: from 189.cn (ptr.189.cn [183.61.185.104])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D4966E4C;
+        Sun, 18 Jun 2023 19:17:29 -0700 (PDT)
+HMM_SOURCE_IP: 10.64.8.43:35506.1764402843
+HMM_ATTACHE_NUM: 0000
+HMM_SOURCE_TYPE: SMTP
+Received: from clientip-114.242.206.180 (unknown [10.64.8.43])
+        by 189.cn (HERMES) with SMTP id 2B4E01001CA;
+        Mon, 19 Jun 2023 10:17:25 +0800 (CST)
+Received: from  ([114.242.206.180])
+        by gateway-151646-dep-75648544bd-7vx9t with ESMTP id cbd68cba8c4f443bb65940078c2927dd for suijingfeng@loongson.cn;
+        Mon, 19 Jun 2023 10:17:28 CST
+X-Transaction-ID: cbd68cba8c4f443bb65940078c2927dd
+X-Real-From: 15330273260@189.cn
+X-Receive-IP: 114.242.206.180
+X-MEDUSA-Status: 0
+Sender: 15330273260@189.cn
+Message-ID: <827ede8b-b7b8-5aae-0816-244928b16897@189.cn>
+Date:   Mon, 19 Jun 2023 10:17:24 +0800
 MIME-Version: 1.0
-References: <20230526234435.662652-1-yuzhao@google.com> <20230609005935.42390-1-yuzhao@google.com>
- <873530okh0.wl-maz@kernel.org>
-In-Reply-To: <873530okh0.wl-maz@kernel.org>
-From:   Yu Zhao <yuzhao@google.com>
-Date:   Sun, 18 Jun 2023 14:11:11 -0600
-Message-ID: <CAOUHufaWbWZ-q-PUJnjXD_jDk1s34mcg4vHU8CtAtmeAT-deRA@mail.gmail.com>
-Subject: Re: kvm/arm64: Spark benchmark
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        Anup Patel <anup@brainfault.org>,
-        Ben Gardon <bgardon@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Gaosheng Cui <cuigaosheng1@huawei.com>,
-        Gavin Shan <gshan@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michael Larabel <michael@michaellarabel.com>,
-        Mike Rapoport <rppt@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
-        linux-trace-kernel@vger.kernel.org, x86@kernel.org,
-        linux-mm@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v7 2/8] PCI/VGA: Deal only with VGA class devices
+Content-Language: en-US
+To:     Sui Jingfeng <suijingfeng@loongson.cn>,
+        Alex Deucher <alexdeucher@gmail.com>
+Cc:     Thomas Zimmermann <tzimmermann@suse.de>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        linux-fbdev@vger.kernel.org, kvm@vger.kernel.org,
+        nouveau@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        amd-gfx@lists.freedesktop.org, linux-pci@vger.kernel.org
+References: <20230613030151.216625-1-15330273260@189.cn>
+ <20230613030151.216625-3-15330273260@189.cn>
+ <dbf0d89f-717a-1f78-aef2-f30506751d4d@loongson.cn>
+ <CADnq5_N6vVtzH6tzguZdHnP_TdRoG1G-Cr94O+X03jvtk=vhag@mail.gmail.com>
+ <3c1c86ab-96ea-aa1c-c9c5-9a4012644fd6@loongson.cn>
+ <CADnq5_Px-HWfwetv8LZsCnCeV7SMt_uqtLwMVK7648ZQiP2RCQ@mail.gmail.com>
+ <f08b6a76-6c90-b59b-ff43-c779ef759d09@loongson.cn>
+ <CADnq5_PFoM2O8mCd6+VFfu9Nc-Hg_HTnwEMxrq0FGRpva1kKiA@mail.gmail.com>
+ <c2cdc3ca-20de-0133-b198-1118fcea7902@loongson.cn>
+From:   Sui Jingfeng <15330273260@189.cn>
+In-Reply-To: <c2cdc3ca-20de-0133-b198-1118fcea7902@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
+        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,FROM_LOCAL_DIGITS,
+        FROM_LOCAL_HEX,NICE_REPLY_A,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 9, 2023 at 7:04=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 09 Jun 2023 01:59:35 +0100,
-> Yu Zhao <yuzhao@google.com> wrote:
-> >
-> > TLDR
-> > =3D=3D=3D=3D
-> > Apache Spark spent 12% less time sorting four billion random integers t=
-wenty times (in ~4 hours) after this patchset [1].
->
-> Why are the 3 architectures you have considered being evaluated with 3
-> different benchmarks?
+Hi,
 
-I was hoping people having special interests in different archs might
-try to reproduce the benchmarks that I didn't report (but did cover)
-and see what happens.
+On 2023/6/18 20:11, Sui Jingfeng wrote:
+> call back to use if successful
 
-> I am not suspecting you to have cherry-picked
-> the best results
 
-I'm generally very conservative when reporting *synthetic* results.
-For example, the same memcached benchmark used on powerpc yielded >50%
-improvement on aarch64, because the default Ubuntu Kconfig uses 64KB
-base page size for powerpc but 4KB for aarch64. (Before the series,
-the reclaim (swap) path takes kvm->mmu_lock for *write* on O(nr of all
-pages to consider); after the series, it becomes O(actual nr of pages
-to swap), which is <10% given how the benchmark was set up.)
+Call back to us if the drm device driver bound to the PCI GPU successfully
 
-          Ops/sec  Avg. Latency  p50 Latency  p99 Latency  p99.9 Latency
-------------------------------------------------------------------------
-Before  639511.40       0.09940      0.04700      0.27100       22.52700
-After   974184.60       0.06471      0.04700      0.15900        3.75900
-
-> but I'd really like to see a variety of benchmarks
-> that exercise this stuff differently.
-
-I'd be happy to try other synthetic workloads that people think that
-are relatively representative. Also, I've backported the series and
-started an A/B experiment involving ~1 million devices (real-world
-workloads). We should have the preliminary results by the time I post
-the next version.
