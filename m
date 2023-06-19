@@ -2,74 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F0B0734EB0
-	for <lists+kvm@lfdr.de>; Mon, 19 Jun 2023 10:54:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8206734EEF
+	for <lists+kvm@lfdr.de>; Mon, 19 Jun 2023 11:01:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230513AbjFSIyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jun 2023 04:54:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52444 "EHLO
+        id S230019AbjFSJA7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jun 2023 05:00:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230286AbjFSIxl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jun 2023 04:53:41 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F623AAA
-        for <kvm@vger.kernel.org>; Mon, 19 Jun 2023 01:52:36 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id 41be03b00d2f7-54fac3b7725so1112379a12.3
-        for <kvm@vger.kernel.org>; Mon, 19 Jun 2023 01:52:36 -0700 (PDT)
+        with ESMTP id S229530AbjFSJAz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jun 2023 05:00:55 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF2C39B;
+        Mon, 19 Jun 2023 02:00:54 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4f845ca2d92so718883e87.1;
+        Mon, 19 Jun 2023 02:00:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687164756; x=1689756756;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=o32zhHPH9dlxXlg+cTuJYce/UWbfkcquDipPvOEOnS0=;
-        b=rX4AYXOcRmpTowP6pa8hgvZgRZW/8ttJaztoyr9rPMgotBNE9djJAL8t8ahcEZ9rHD
-         qICpWZZ7GXIYKIPBjOT1OM8oVmAXNh/ObbesLWgk6n/ydZCGQ5A1vNnK+Cy8tdiBxXf0
-         SmxpPE3Bhaf2zXOXtJIl2CGHdZsd/pb5rOfu5IKDm8er8HfBTS1NiUlS9I4s0cTlvSBa
-         PktcAeV2KOx0g3jTigvthGtI4MxXuFFcXv7yMeg9ANe38m1yM9FyhtkU+hxV0+S8r4b6
-         Wn7574gsL8BDvPSFwNZLYLtcqWm2f36wU54mEf1PVomCGrNa1J9zxR8L24OFrOb5grPU
-         v6XA==
+        d=gmail.com; s=20221208; t=1687165253; x=1689757253;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V75CwKkoMS9GVL1WDBw8U7VzaszOLOs5Vwr/ePxHWAs=;
+        b=nFy1j8fEblfOtQ9ROMm9sQQfY+F7p8fn0NlZPyYFude7xSsfEKkk07PhsUrOuno7vS
+         CimR8dDTdd4cX/rc6knXJV6/J5+EGSCeGsO+bUuSj97EIxfmmRTpHN8CnudxNzPbtkaU
+         aL4NJg5AE1/qLvsncvPtRC/y8yozOkNDE43OhLKHr2erFXpLUGhi6ElAGvgKuEIJ9BNu
+         SlQM35IoIAIACJoHR6pkr0d5FwNSSDFkJVmBUQJNOqf25BeHD7BkLnxE9ubieBcrxp0i
+         5DzkGdqvgfmN+CtL3BuHrxYwGXpxArxtF7cxAVIJFoHXrFFLGeywBPtOofYXtGD+cC9h
+         RC3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687164756; x=1689756756;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o32zhHPH9dlxXlg+cTuJYce/UWbfkcquDipPvOEOnS0=;
-        b=BNAJFv3fN519l7iJT7mB35lDfby0idXuPx44MrN+D1yPfzzVMVI4uGRkqmWGqnwMtg
-         vOL04nZtT/5EWMIiQYZjJ25xpwFbvbIKicRmfmQmLkUsL4rQ68/y0ShchfvQ6DDDzD6g
-         li0ObxEkqT0xApigxtPRsVJZl9ceefeECotZf6Brkh/JVjTLluTAG5zseNKqwFTdbl1J
-         0YT4lkQyTD7KNcqqd7o3r/kg7prjF8h8EzD0P7vQDcIYTxgA8cKeTZfg94/GsdwMXxMg
-         Fe2E2VNKChCx0uNpiLaWog0qC6Y/dsUu3o+O+3FPcZ657bhWjnRBMfTBrzlInuoULLwW
-         K4kg==
-X-Gm-Message-State: AC+VfDxeABRh22ES4IDo7qm0J82XGgcocGr/a7viEGuzMlfmpuD4CI4F
-        POfDPmlMgy4CHf3pGDWQuhQ=
-X-Google-Smtp-Source: ACHHUZ457fDHQcHQZeJbaCaNYKn6K1hwnN2BhiUC7y/R6VnJXGQlOND+/7n93OHM9VShzMn04QLVFw==
-X-Received: by 2002:a17:902:ec86:b0:1b0:378e:279f with SMTP id x6-20020a170902ec8600b001b0378e279fmr5972089plg.19.1687164755880;
-        Mon, 19 Jun 2023 01:52:35 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id t11-20020a1709028c8b00b001ae0152d280sm19799901plo.193.2023.06.19.01.52.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Jun 2023 01:52:35 -0700 (PDT)
-Message-ID: <36d749a2-b349-e5f4-3683-a4d595bafec9@gmail.com>
-Date:   Mon, 19 Jun 2023 16:52:27 +0800
+        d=1e100.net; s=20221208; t=1687165253; x=1689757253;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V75CwKkoMS9GVL1WDBw8U7VzaszOLOs5Vwr/ePxHWAs=;
+        b=Jepuj3avUvaqRNY9tdkFmXeI/7MPmY23lM6PPXC0Tt6dCCB6RFkktOLIwYLOg8zBeL
+         NxoJ7lYjtM3mgRB3uTUUxuCeZwqqbkc1763eJzj09zlmfVldAoGxVY/VWG+Y7MKx4Vt0
+         Z/9g8zdvbCIZAOQ3uN2oggJg/zLjK0pPP5a4ky6gb0M5MIgIl+9V9koGyWkbp/2giES5
+         GhTZi8YfkyY6rATmoIomgGXSyqtAflYdGA8tGvV/WFWznYzhvZIfJdm9I/JR5qMsZoHZ
+         YGuPsbHtu7lbW7HGczgqtUb9oP9ktn8/bCxc9yhp9vK5GUZF36szz0qLvqycG49UAjY1
+         ZSNg==
+X-Gm-Message-State: AC+VfDz7KSoSQHctYeJvwS8KprmM/vXkp2JA0x5oyi6hGzyFTdV5aOdi
+        ITEm1w/4GcTsjzeDEJBFEHN0NIrQwOQ=
+X-Google-Smtp-Source: ACHHUZ5LWGe6gI5kmyP5XAeV564r+VmRjYajDuEmT6KFvFUB1O72TxULrEgF5jia4by+SK1cWBjsCQ==
+X-Received: by 2002:a05:6512:25a:b0:4f7:6a87:f16f with SMTP id b26-20020a056512025a00b004f76a87f16fmr3606802lfo.4.1687165252532;
+        Mon, 19 Jun 2023 02:00:52 -0700 (PDT)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id u25-20020a056512041900b004f24ee39661sm4164551lfk.137.2023.06.19.02.00.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jun 2023 02:00:52 -0700 (PDT)
+Date:   Mon, 19 Jun 2023 12:00:51 +0300
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH 0/6] KVM: Documentation: Update document description for
+ kvm_mmu_page and kvm_mmu_page_role
+Message-ID: <20230619120051.00001f0f.zhi.wang.linux@gmail.com>
+In-Reply-To: <20230618000856.1714902-1-mizhang@google.com>
+References: <20230618000856.1714902-1-mizhang@google.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.11.2
-Subject: Re: [PATCH v2 0/2] target/i386/kvm: fix two svm pmu virtualization
- bugs
-Content-Language: en-US
-To:     Dongli Zhang <dongli.zhang@oracle.com>, zhenyuw@linux.intel.com
-Cc:     pbonzini@redhat.com, mtosatti@redhat.com, joe.jin@oracle.com,
-        groug@kaod.org, lyan@digitalocean.com, qemu-devel@nongnu.org,
-        kvm list <kvm@vger.kernel.org>
-References: <20221202002256.39243-1-dongli.zhang@oracle.com>
- <895f5505-db8c-afa4-bfb1-26ecbe27690a@oracle.com>
- <eea7b6ba-c0bd-8a1e-b2a8-2f08c954628b@oracle.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <eea7b6ba-c0bd-8a1e-b2a8-2f08c954628b@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -78,119 +77,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I think we've been stuck here too long. Sorry Dongli.
+On Sun, 18 Jun 2023 00:08:50 +0000
+Mingwei Zhang <mizhang@google.com> wrote:
 
-+zhenyu, could you get someone to follow up on this, or I will start working on 
-that.
+> When reading the KVM MMU documentation for nested virtualization, I feel
+> that the description of kvm_mmu_page (and kvm_mmu_page_role) has been
+> lagging for around 1-2 years. The descriptions for several fields in struct
+> kvm_mmu_page and struct kvm_mmu_page_role are missing. So I think it might
+> be good to add them to make it consistent with the current code.
+>
 
-On 9/1/2023 9:19 am, Dongli Zhang wrote:
-> Ping?
+This is so nice. A trivial comment, maybe refining the tittle of PATCH 1-6 a
+bit: "Add the missing comment of xxxx into xxxx". It is a little bit confusing
+by just looking at the titles at the first glance, more like some members are
+missing, not the comments. :)
+
+> Note that there are still some fields not added in this series:
+>  - kvm_mmu_page.nx_huge_page_disallowed
+>  - kvm_mmu_page.possible_nx_huge_page_link
+>  - kvm_mmu_page.hash_link
+>  - kvm_mmu_page.link
 > 
-> About [PATCH v2 2/2], the bad thing is that the customer will not be able to
-> notice the issue, that is, the "Broken BIOS detected" in dmesg, immediately.
+> For the above, I thought the description might be just better to be
+> inlined or there is already good description inlined.
 > 
-> As a result, the customer VM many panic randomly anytime in the future (once
-> issue is encountered) if "/proc/sys/kernel/unknown_nmi_panic" is enabled.
+> Mingwei Zhang (6):
+>   KVM: Documentation: Add the missing guest_mode in kvm_mmu_page_role
+>   KVM: Documentation: Update the field name gfns in kvm_mmu_page
+>   KVM: Documentation: Add the missing ptep in kvm_mmu_page
+>   KVM: Documentation: Add the missing tdp_mmu_root_count into
+>     kvm_mmu_page
+>   KVM: Documentation: Add the missing mmu_valid_gen into kvm_mmu_page
+>   KVM: Documentation: Add the missing tdp_mmu_page into kvm_mmu_page
 > 
-> Thank you very much!
-> 
-> Dongli Zhang
-> 
-> On 12/19/22 06:45, Dongli Zhang wrote:
->> Can I get feedback for this patchset, especially the [PATCH v2 2/2]?
->>
->> About the [PATCH v2 2/2], currently the issue impacts the usage of PMUs on AMD
->> VM, especially the below case:
->>
->> 1. Enable panic on nmi.
->> 2. Use perf to monitor the performance of VM. Although without a test, I think
->> the nmi watchdog has the same effect.
->> 3. A sudden system reset, or a kernel panic (kdump/kexec).
->> 4. After reboot, there will be random unknown NMI.
->> 5. Unfortunately, the "panic on nmi" may panic the VM randomly at any time.
->>
->> Thank you very much!
->>
->> Dongli Zhang
->>
->> On 12/1/22 16:22, Dongli Zhang wrote:
->>> This patchset is to fix two svm pmu virtualization bugs, x86 only.
->>>
->>> version 1:
->>> https://lore.kernel.org/all/20221119122901.2469-1-dongli.zhang@oracle.com/
->>>
->>> 1. The 1st bug is that "-cpu,-pmu" cannot disable svm pmu virtualization.
->>>
->>> To use "-cpu EPYC" or "-cpu host,-pmu" cannot disable the pmu
->>> virtualization. There is still below at the VM linux side ...
->>>
->>> [    0.510611] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
->>>
->>> ... although we expect something like below.
->>>
->>> [    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
->>> [    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
->>>
->>> The 1st patch has introduced a new x86 only accel/kvm property
->>> "pmu-cap-disabled=true" to disable the pmu virtualization via
->>> KVM_PMU_CAP_DISABLE.
->>>
->>> I considered 'KVM_X86_SET_MSR_FILTER' initially before patchset v1.
->>> Since both KVM_X86_SET_MSR_FILTER and KVM_PMU_CAP_DISABLE are VM ioctl. I
->>> finally used the latter because it is easier to use.
->>>
->>>
->>> 2. The 2nd bug is that un-reclaimed perf events (after QEMU system_reset)
->>> at the KVM side may inject random unwanted/unknown NMIs to the VM.
->>>
->>> The svm pmu registers are not reset during QEMU system_reset.
->>>
->>> (1). The VM resets (e.g., via QEMU system_reset or VM kdump/kexec) while it
->>> is running "perf top". The pmu registers are not disabled gracefully.
->>>
->>> (2). Although the x86_cpu_reset() resets many registers to zero, the
->>> kvm_put_msrs() does not puts AMD pmu registers to KVM side. As a result,
->>> some pmu events are still enabled at the KVM side.
->>>
->>> (3). The KVM pmc_speculative_in_use() always returns true so that the events
->>> will not be reclaimed. The kvm_pmc->perf_event is still active.
->>>
->>> (4). After the reboot, the VM kernel reports below error:
->>>
->>> [    0.092011] Performance Events: Fam17h+ core perfctr, Broken BIOS detected, complain to your hardware vendor.
->>> [    0.092023] [Firmware Bug]: the BIOS has corrupted hw-PMU resources (MSR c0010200 is 530076)
->>>
->>> (5). In a worse case, the active kvm_pmc->perf_event is still able to
->>> inject unknown NMIs randomly to the VM kernel.
->>>
->>> [...] Uhhuh. NMI received for unknown reason 30 on CPU 0.
->>>
->>> The 2nd patch is to fix the issue by resetting AMD pmu registers as well as
->>> Intel registers.
->>>
->>>
->>> This patchset does not cover PerfMonV2, until the below patchset is merged
->>> into the KVM side.
->>>
->>> [PATCH v3 0/8] KVM: x86: Add AMD Guest PerfMonV2 PMU support
->>> https://lore.kernel.org/all/20221111102645.82001-1-likexu@tencent.com/
->>>
->>>
->>> Dongli Zhang (2):
->>>        target/i386/kvm: introduce 'pmu-cap-disabled' to set KVM_PMU_CAP_DISABLE
->>>        target/i386/kvm: get and put AMD pmu registers
->>>
->>>   accel/kvm/kvm-all.c      |   1 +
->>>   include/sysemu/kvm_int.h |   1 +
->>>   qemu-options.hx          |   7 +++
->>>   target/i386/cpu.h        |   5 ++
->>>   target/i386/kvm/kvm.c    | 129 +++++++++++++++++++++++++++++++++++++++++-
->>>   5 files changed, 141 insertions(+), 2 deletions(-)
->>>
->>> Thank you very much!
->>>
->>> Dongli Zhang
->>>
->>>
+>  Documentation/virt/kvm/x86/mmu.rst | 22 +++++++++++++++++++++-
+>  1 file changed, 21 insertions(+), 1 deletion(-)
 > 
 > 
+> base-commit: 265b97cbc22e0f67f79a71443b60dc1237ca5ee6
+
