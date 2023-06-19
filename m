@@ -2,87 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8923173517C
-	for <lists+kvm@lfdr.de>; Mon, 19 Jun 2023 12:06:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D669B7351B3
+	for <lists+kvm@lfdr.de>; Mon, 19 Jun 2023 12:13:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230149AbjFSKGp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jun 2023 06:06:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51516 "EHLO
+        id S231664AbjFSKNS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jun 2023 06:13:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230444AbjFSKGm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jun 2023 06:06:42 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B009CA;
-        Mon, 19 Jun 2023 03:06:41 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35J8HNMk029921;
-        Mon, 19 Jun 2023 08:34:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=5LShhLbhVao8SLBGioX3j+rejckaVYzT/Y8Ky68v3cY=;
- b=Xpe26JTTAMZpqNxILVxR3CWSNhs1KALwS2ZYe815zAFeZMTlt5dRpud/4OYAUgtVR29W
- c1nctw0knYLu1JUNVAeDgQS2l1KsWPpjwCirZDgxOFr//HwdFH6c2OCagJ1U4rvo+QM0
- dIcUljHlOYEwqUukrM+fK2+DrxmUCIFTYiJL7cFqG4BsJZt+cpvRD3pUQ2UK9WpKtuDg
- PZWxfOxmE/sWn8FhyGpUXDo8q0q7tE22VkjQOuXkH8HzVGUEotgId9Wv9uqnv/fNwUmI
- TG5tK53fjZHCRC9wYOb6jpk1HIXvndZh5OSd/QFz6BdtYO5m1UT3+8LUdijQ/wKhhrHH Zw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rakcagbcb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Jun 2023 08:34:07 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35J8Y6OQ000626;
-        Mon, 19 Jun 2023 08:34:06 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rakcagbbm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Jun 2023 08:34:06 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35J10fhx000966;
-        Mon, 19 Jun 2023 08:34:04 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3r94f5980n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Jun 2023 08:34:04 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35J8Y01B12059192
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 19 Jun 2023 08:34:00 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC3292005A;
-        Mon, 19 Jun 2023 08:34:00 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BE7682004B;
-        Mon, 19 Jun 2023 08:33:59 +0000 (GMT)
-Received: from linux6.. (unknown [9.114.12.104])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 19 Jun 2023 08:33:59 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        thuth@redhat.com, david@redhat.com, nsg@linux.ibm.com,
-        nrb@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v5 8/8] s390x: pv-diags: Add the test to unittests.conf
-Date:   Mon, 19 Jun 2023 08:33:29 +0000
-Message-Id: <20230619083329.22680-9-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230619083329.22680-1-frankja@linux.ibm.com>
-References: <20230619083329.22680-1-frankja@linux.ibm.com>
+        with ESMTP id S229818AbjFSKNR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jun 2023 06:13:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 017F8CA;
+        Mon, 19 Jun 2023 03:13:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8946660B46;
+        Mon, 19 Jun 2023 10:13:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF453C433D9;
+        Mon, 19 Jun 2023 10:13:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687169595;
+        bh=Ka23/u4MzqnLdyscdmovU7196lfxfiLmNtNvURhGOuQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=rlhpPkiwN/3ae/M3XHqVuSOiROzCUnNeVPcAWzOG7/ALQvJvGKS8zLskdmJGrXEJm
+         HhvtaAimfkZzaD5t/nd6RH2TWCR8S9dWPMs6Ne4xFjZRfaOT7iPwb3gr+Z09Jr7gx/
+         R0O8DwKiq/c9zt0CnaEmQ2GBQikq+y6BoW1xXOwBpf7Jh0qj9wSxz6xOuOccVU+/0v
+         po9ZkgpDF1mSRJvU4bnpeOm3zZYVfY8rkPE9ofspKjwBpt5g1CwGyXvjfhNmK7UM+E
+         qMAGX9EzT7V/jqviFcHpqS7VbC/t/DyZ8suSRcItYI/NBxJkKeT37+O6wNlY5eBWYW
+         XnZ61CuUSe7XQ==
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2b46d4e1b0aso22373921fa.2;
+        Mon, 19 Jun 2023 03:13:14 -0700 (PDT)
+X-Gm-Message-State: AC+VfDyf5n+yP6oWKbgWA81Cqq/4n9zwjK2oHbQ212Z6WpRLIo3mAgZp
+        9IkMjGWilIC1K9Ktr22KbOB3qtnzQWv6cOGSEyU=
+X-Google-Smtp-Source: ACHHUZ6+m0JNu1Zl8Q4e1b48iHqq2nss/OByLpaHRRLoZU7Uioft0V1XZWJA9+xFg0z8ZBQbmpZyFX+1z19e0MSz14E=
+X-Received: by 2002:a2e:80c9:0:b0:2b1:c039:e977 with SMTP id
+ r9-20020a2e80c9000000b002b1c039e977mr5144365ljg.16.1687169592851; Mon, 19 Jun
+ 2023 03:13:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: tdyxVFk79R-VaLsQ78FF6WdM4pT-ZXGX
-X-Proofpoint-ORIG-GUID: sCTZqxeMvjppmd_aPhnrwbJVUjqL48Tj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-19_05,2023-06-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 malwarescore=0 bulkscore=0 mlxscore=0 suspectscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=999 impostorscore=0
- adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306190077
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+References: <20230619083255.3841777-1-zhaotianrui@loongson.cn> <20230619083255.3841777-22-zhaotianrui@loongson.cn>
+In-Reply-To: <20230619083255.3841777-22-zhaotianrui@loongson.cn>
+From:   Huacai Chen <chenhuacai@kernel.org>
+Date:   Mon, 19 Jun 2023 18:13:00 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H6VcQUYu8Q7Cd2vbd=XQZmdTxUHV0bnuwr4vteLBpKEoQ@mail.gmail.com>
+Message-ID: <CAAhV-H6VcQUYu8Q7Cd2vbd=XQZmdTxUHV0bnuwr4vteLBpKEoQ@mail.gmail.com>
+Subject: Re: [PATCH v14 21/30] LoongArch: KVM: Implement handle iocsr exception
+To:     Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
+        Xi Ruoyao <xry111@xry111.site>, tangyouling@loongson.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -91,27 +70,172 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Better to have it run into a skip than to not run it at all.
+Hi, Tianrui,
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
----
- s390x/unittests.cfg | 5 +++++
- 1 file changed, 5 insertions(+)
+On Mon, Jun 19, 2023 at 4:33=E2=80=AFPM Tianrui Zhao <zhaotianrui@loongson.=
+cn> wrote:
+>
+> Implement kvm handle vcpu iocsr exception, setting the iocsr info into
+> vcpu_run and return to user space to handle it.
+>
+> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> ---
+>  arch/loongarch/include/asm/inst.h | 16 ++++++
+>  arch/loongarch/kvm/exit.c         | 92 +++++++++++++++++++++++++++++++
+>  2 files changed, 108 insertions(+)
+>
+> diff --git a/arch/loongarch/include/asm/inst.h b/arch/loongarch/include/a=
+sm/inst.h
+> index b09887ffcd15..db5857796432 100644
+> --- a/arch/loongarch/include/asm/inst.h
+> +++ b/arch/loongarch/include/asm/inst.h
+> @@ -56,6 +56,14 @@ enum reg2_op {
+>         revbd_op        =3D 0x0f,
+>         revh2w_op       =3D 0x10,
+>         revhd_op        =3D 0x11,
+> +       iocsrrdb_op     =3D 0x19200,
+> +       iocsrrdh_op     =3D 0x19201,
+> +       iocsrrdw_op     =3D 0x19202,
+> +       iocsrrdd_op     =3D 0x19203,
+> +       iocsrwrb_op     =3D 0x19204,
+> +       iocsrwrh_op     =3D 0x19205,
+> +       iocsrwrw_op     =3D 0x19206,
+> +       iocsrwrd_op     =3D 0x19207,
+>  };
+>
+>  enum reg2i5_op {
+> @@ -298,6 +306,13 @@ struct reg3sa2_format {
+>         unsigned int opcode : 15;
+>  };
+>
+> +struct reg2csr_format {
+> +       unsigned int rd : 5;
+> +       unsigned int rj : 5;
+> +       unsigned int csr : 14;
+> +       unsigned int opcode : 8;
+> +};
+Put it before reg3_format.
 
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 26bab34a..49b3cee4 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -229,3 +229,8 @@ extra_params = -m 2200
- file = pv-ipl.elf
- groups = pv-host
- extra_params = -m 2200
-+
-+[pv-diags]
-+file = pv-diags.elf
-+groups = pv-host
-+extra_params = -m 2200
--- 
-2.34.1
+> +
+>  union loongarch_instruction {
+>         unsigned int word;
+>         struct reg0i15_format   reg0i15_format;
+> @@ -313,6 +328,7 @@ union loongarch_instruction {
+>         struct reg2bstrd_format reg2bstrd_format;
+>         struct reg3_format      reg3_format;
+>         struct reg3sa2_format   reg3sa2_format;
+> +       struct reg2csr_format   reg2csr_format;
+The same, thanks.
 
+Huacai
+>  };
+>
+>  #define LOONGARCH_INSN_SIZE    sizeof(union loongarch_instruction)
+> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+> index 18635333fc9a..32edd915ebcb 100644
+> --- a/arch/loongarch/kvm/exit.c
+> +++ b/arch/loongarch/kvm/exit.c
+> @@ -96,3 +96,95 @@ static int _kvm_handle_csr(struct kvm_vcpu *vcpu, larc=
+h_inst inst)
+>
+>         return EMULATE_DONE;
+>  }
+> +
+> +int _kvm_emu_iocsr(larch_inst inst, struct kvm_run *run, struct kvm_vcpu=
+ *vcpu)
+> +{
+> +       u32 rd, rj, opcode;
+> +       u32 addr;
+> +       unsigned long val;
+> +       int ret;
+> +
+> +       /*
+> +        * Each IOCSR with different opcode
+> +        */
+> +       rd =3D inst.reg2_format.rd;
+> +       rj =3D inst.reg2_format.rj;
+> +       opcode =3D inst.reg2_format.opcode;
+> +       addr =3D vcpu->arch.gprs[rj];
+> +       ret =3D EMULATE_DO_IOCSR;
+> +       run->iocsr_io.phys_addr =3D addr;
+> +       run->iocsr_io.is_write =3D 0;
+> +
+> +       /* LoongArch is Little endian */
+> +       switch (opcode) {
+> +       case iocsrrdb_op:
+> +               run->iocsr_io.len =3D 1;
+> +               break;
+> +       case iocsrrdh_op:
+> +               run->iocsr_io.len =3D 2;
+> +               break;
+> +       case iocsrrdw_op:
+> +               run->iocsr_io.len =3D 4;
+> +               break;
+> +       case iocsrrdd_op:
+> +               run->iocsr_io.len =3D 8;
+> +               break;
+> +       case iocsrwrb_op:
+> +               run->iocsr_io.len =3D 1;
+> +               run->iocsr_io.is_write =3D 1;
+> +               break;
+> +       case iocsrwrh_op:
+> +               run->iocsr_io.len =3D 2;
+> +               run->iocsr_io.is_write =3D 1;
+> +               break;
+> +       case iocsrwrw_op:
+> +               run->iocsr_io.len =3D 4;
+> +               run->iocsr_io.is_write =3D 1;
+> +               break;
+> +       case iocsrwrd_op:
+> +               run->iocsr_io.len =3D 8;
+> +               run->iocsr_io.is_write =3D 1;
+> +               break;
+> +       default:
+> +               ret =3D EMULATE_FAIL;
+> +               break;
+> +       }
+> +
+> +       if (ret =3D=3D EMULATE_DO_IOCSR) {
+> +               if (run->iocsr_io.is_write) {
+> +                       val =3D vcpu->arch.gprs[rd];
+> +                       memcpy(run->iocsr_io.data, &val, run->iocsr_io.le=
+n);
+> +               }
+> +               vcpu->arch.io_gpr =3D rd;
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+> +int _kvm_complete_iocsr_read(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +{
+> +       unsigned long *gpr =3D &vcpu->arch.gprs[vcpu->arch.io_gpr];
+> +       enum emulation_result er =3D EMULATE_DONE;
+> +
+> +       switch (run->iocsr_io.len) {
+> +       case 8:
+> +               *gpr =3D *(s64 *)run->iocsr_io.data;
+> +               break;
+> +       case 4:
+> +               *gpr =3D *(int *)run->iocsr_io.data;
+> +               break;
+> +       case 2:
+> +               *gpr =3D *(short *)run->iocsr_io.data;
+> +               break;
+> +       case 1:
+> +               *gpr =3D *(char *) run->iocsr_io.data;
+> +               break;
+> +       default:
+> +               kvm_err("Bad IOCSR length: %d,addr is 0x%lx",
+> +                               run->iocsr_io.len, vcpu->arch.badv);
+> +               er =3D EMULATE_FAIL;
+> +               break;
+> +       }
+> +
+> +       return er;
+> +}
+> --
+> 2.39.1
+>
+>
