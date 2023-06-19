@@ -2,151 +2,264 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07430735727
-	for <lists+kvm@lfdr.de>; Mon, 19 Jun 2023 14:46:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0ED5735763
+	for <lists+kvm@lfdr.de>; Mon, 19 Jun 2023 14:53:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230422AbjFSMqx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jun 2023 08:46:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32768 "EHLO
+        id S229848AbjFSMxs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jun 2023 08:53:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229929AbjFSMqw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jun 2023 08:46:52 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2068.outbound.protection.outlook.com [40.107.223.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BB7D93;
-        Mon, 19 Jun 2023 05:46:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h2OV78lhkN9mApnh3t5I1Gprc0Hh9g6JcJzkhYXyKlLvT+9WHdmR1Um7sG0MQRUMAOo1f0wtcZZqAefksg0FwLS856C8PlbhEQbZi8+yRrgn6aG84sLvTjQ95DQjyL1ul2TykVnEFAmYy3HtSV9mfw/P9o2DW9IVVb6O7iTfpdkda35g0nv7xJ8FfvdktoGy1WZK1l5JGf6hlMXjPIEsLpPOB2EBDxmI6nUEpolZYdqjTIezrFrvYhtCqc+7wYCrU6QgvNHsmR+yLjvI5Rn4rGiOvK17r3fmXAoeEe6tEaI9XsIxuADyOexQ4TLNDQC7FY9r3q2Y/4D3WtuP7BBk9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Xpgnp6H0C5Lo7lG2Vx1wIkjgN1u/5iiOPeFj52yn0tw=;
- b=NWEhHoRKbDSh7GmN+bASzzZ4cwP15Gg+S/H0NYWj8dL7pqv6kaSIlMWY0iCmmTD+r8ogrb4zhhWRnjoX1bEHRb2VdJnsGr9ikDyjtqnM9syxfmVgjpwVXk2UP09fT+uYKHxdF4Q7Aq6CwYZmjSC9wXV/w7FqXGkJW0C+bMzZObuYU8Cfw5Y0xKcwXz95QALxuar4jbb/g6vMgak7u/3FcE5Va/PkfoSPN1AStN9cLawGYK1KczNO+rBZ6AlwViJDva+k+KmLvx+b/AcwzZNkek7md7dP5VGmJzueMYvStfYLhLeok68QEaDwoV7qpFByJYC6kwYWRm8LhVBzvjqhFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Xpgnp6H0C5Lo7lG2Vx1wIkjgN1u/5iiOPeFj52yn0tw=;
- b=lGlbOoIr9bv3WVhgMloL4d+wNDLc8yAUXUYwOoaDNI15UDYTJAsaHoyi7dTKBqPIv6yacK9jt2Ro6GskR9yyNXijCcRU6sot/C4T+2zmddsOkPHZvVDpDbUNLpbo6FRdzf5W7lr/BXkFtfRuFtrVlO7iwfn9k3HLAn4AGDAuPsxozfZ0YPL7x3PH6wIkueMciC4ORtzqUqsTjsV1Vtlct7n/XvcTtPUPpA3hNjOPqkQT2BpQMAaHBhRKClZqj66TXR12ZXu6J76qqTPoto5a/2SAJ2kBZqno0UU4Jgyrbw0+A1DL7X08quKMxXDneMIDCs1e0pBhlFMF/6ltBOlGDw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM6PR12MB4958.namprd12.prod.outlook.com (2603:10b6:5:20a::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.37; Mon, 19 Jun
- 2023 12:46:47 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%7]) with mapi id 15.20.6500.031; Mon, 19 Jun 2023
- 12:46:47 +0000
-Date:   Mon, 19 Jun 2023 09:46:46 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Brett Creeley <brett.creeley@amd.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: Re: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
-Message-ID: <ZJBONrx5LOgpTr1U@nvidia.com>
-References: <20230602220318.15323-1-brett.creeley@amd.com>
- <20230602220318.15323-5-brett.creeley@amd.com>
- <BN9PR11MB5276511543775B852AD1C5A88C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276511543775B852AD1C5A88C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: YT4PR01CA0178.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:110::22) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229811AbjFSMxj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jun 2023 08:53:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10D7D10DC
+        for <kvm@vger.kernel.org>; Mon, 19 Jun 2023 05:52:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687179128;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=usnwe/tASw/wAaW+kGK0ObxoIGkFy36hF/mR+fiZ/Zo=;
+        b=SxksAB0s2XTLSU1Nljbo75vVnlui9oQKCJdQhunbAPLKVYs93jVYri87EVCUgabUH5An0b
+        ncU+FCrQAPKsQhtMOSveQ3o/W3OEJN9viDVVOUsxHPLsKLMw1x+ESCrJJ7dNurfj/X3Bnu
+        bPrN7iLmQPaTncn56/wt7p0In8IYn+E=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-259-qZwBi8PvO6a0Z7_n65gybA-1; Mon, 19 Jun 2023 08:52:07 -0400
+X-MC-Unique: qZwBi8PvO6a0Z7_n65gybA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-3f9b19cb170so4527295e9.3
+        for <kvm@vger.kernel.org>; Mon, 19 Jun 2023 05:52:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687179126; x=1689771126;
+        h=content-transfer-encoding:in-reply-to:subject:organization:from
+         :references:cc:to:content-language:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=usnwe/tASw/wAaW+kGK0ObxoIGkFy36hF/mR+fiZ/Zo=;
+        b=T1h6Qj++p6LYFezA+/zZszWJQnEt7ftrQrcjAhb3//raeJuyeTQj3VkwhY+UwKJbCJ
+         P7+Q3J7fl50EdT7l/FRxCgXYaeiGPcoZ5/2MnheRgwz/qK2xFs/YDeFS84Mv+K6LsGOq
+         tUI4ck0hMvzEkHhHsgM2VhX2WqANpQF4NOLBJWB+wCvG3KRXZETOVf2osOlWoxlEUsCZ
+         6J4cBh+jvgbzky9O16tIaIFHJcUYEjoXrCDgi0sfJ3EIks7yp+neWL3fT7grqPQU5zbV
+         vIqQHqK7nN2CKQFoO9J/3TJzThOxYXcdbFUCQz2Xiq7sV5ZXFXStV4s2zQ+5tN42Mpy2
+         OrjA==
+X-Gm-Message-State: AC+VfDzYFz6n9CLp/Ra92JJhY3UqlIfCYXAojXWqJXw6tchMNiOqeNdv
+        H8CTP2ggSHu8j85OQcAETHPQ26ndG0L6gjPMBSwCubjdYQ3FrKend35VyQIaqBcjffpoplcd4mu
+        vWqonsVOs7s/i
+X-Received: by 2002:a05:600c:228b:b0:3f7:26f8:4cd0 with SMTP id 11-20020a05600c228b00b003f726f84cd0mr8032130wmf.16.1687179126340;
+        Mon, 19 Jun 2023 05:52:06 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6qNgZczslpun3cTWcOMwroQQgbukwP3O7vMg2jnLFSw7CbI/w20j92/l09YrAOdzgJjx6c9g==
+X-Received: by 2002:a05:600c:228b:b0:3f7:26f8:4cd0 with SMTP id 11-20020a05600c228b00b003f726f84cd0mr8032099wmf.16.1687179125851;
+        Mon, 19 Jun 2023 05:52:05 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c72f:7100:cede:6433:a77b:41e9? (p200300cbc72f7100cede6433a77b41e9.dip0.t-ipconnect.de. [2003:cb:c72f:7100:cede:6433:a77b:41e9])
+        by smtp.gmail.com with ESMTPSA id a2-20020a05600c224200b003f9b53959a4sm188667wmm.43.2023.06.19.05.52.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Jun 2023 05:52:05 -0700 (PDT)
+Message-ID: <759e3af5-6aec-7e50-c432-c5e0a0c3cf36@redhat.com>
+Date:   Mon, 19 Jun 2023 14:52:04 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM6PR12MB4958:EE_
-X-MS-Office365-Filtering-Correlation-Id: dd61aae7-93c6-4eba-8e19-08db70c33ea2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: V0Wgm2nwefjGUTRRdy5/djovFm33xHi4GTFk57kMjX8cTa12f8DNvPHUWgzr7Hd2xeyO/n6YJ43IUNK4rrJv219dYybmV8//JsewFU4oMj5qdySCzPYyF2Gf135dda7QuGxLcjfSRZx1vBXJVfXyyGxrJRO3HhqrD7m0GGWEL+tIx2Q9oAVGBilBuo+N0S1nKiHpWaEGQYKFy1hSmVuP0jSN++w8b/4d7Vew2eVayXl4RD6/xhA2wFu5XTcDjdbiGhMKKDxVG7fLGp8pWjL71UJ9w5GDJ6XmGnozRnSOTGM56R728zcXcU4bx0Say5OgrzQYdTDeCKOEvZAWnJvhAFbna5Sks0fNEpujc9o1td1A1qC02YoJhYPLp5MBq74TGe7VgguT9OX08IgwlPF4UacYmVtYi6dKNx3IBER5pQksbKNJKTJ+vFONoopMgiO+uezhkMsIf/4y9cy0Ighviwd8wMQDDDLzdOkdfUzWRbuKVW4B+TNEkd8QicxlN6QI2m9NX5U11AApcgYfI2ur++X78/h7w2CEPqADLZt2tpWz6K8qxp7hSOTO/MGeyrIY
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(136003)(39860400002)(366004)(376002)(451199021)(2906002)(66899021)(41300700001)(5660300002)(8676002)(8936002)(36756003)(83380400001)(86362001)(478600001)(26005)(6506007)(6512007)(186003)(54906003)(6486002)(66946007)(66476007)(66556008)(6916009)(4326008)(316002)(38100700002)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ouQdCaeg/vC4WpXO3Q7m7Q+lzk4cVAkJ7GPtnprdm/jgDayEIBJzVsMmYRmg?=
- =?us-ascii?Q?ewLK4+g6gK1Hq8tBSxYo7XD+aNeVVPIurmq4j2AbjQO6ZjUXtEuzBm9MH5pp?=
- =?us-ascii?Q?bUEsTKsSsCezJ4yvgCnlHVgncBF0dC86wu8igDawoUfuXj245hHS9gMeBTXY?=
- =?us-ascii?Q?a3XafiQOMcfNiDXIao3D1KMMRlbpPUXpEic4n/XUt6tzEoPxFs5h6j3Oc5Jr?=
- =?us-ascii?Q?WROfP0v15vw3npRbxquxxNFTFy+TlBlOBC58d6AeFPtGk/Ysf27b6RdQqe/G?=
- =?us-ascii?Q?61RakKxrMDCqV8t2ewHn6my17nDEoSmG5QUXSJEaZ8XHvF+kn0HDSWNNd2dF?=
- =?us-ascii?Q?oktTSpbFNGZZVtWwv6hd+voaZx8IJuJzx5QumfcYaV0g+DDJ26lJDJ0WlYyx?=
- =?us-ascii?Q?bQEyz6HimP/ecZ3mvq5YnXCEo5a/EmR44rdxQ7OmfR66+mxTtDku1l6WbQtn?=
- =?us-ascii?Q?fO+aZfUGTSmwitlHMpizTAZcXtwksF5fVR++lGKmhlrRDKZeGoXZ4Ik2EEsr?=
- =?us-ascii?Q?H+sKrE5wNUSUCfNwBNS9A95Wa63q6f/OPp8yvcAba88xw9g+RC94CBTO1SFd?=
- =?us-ascii?Q?VPo8sX2Mh5qFiKItBcJIqpuUlqfG6EJEiRghcZxsmLbTpBquviBPUiRWvp8p?=
- =?us-ascii?Q?Gz4iNAfRZDZjXGk/17ORo+5mgs7fXKau49m5NlGDu0Ny3T8QGPMWl8fjUzm6?=
- =?us-ascii?Q?r63cI+6tiLHAieWt8yDAWsgPKrIf0fnTbZzlJ30BQAMW06+j03F6+GKsvGNy?=
- =?us-ascii?Q?AKpdAACQ72ZP/96rL6bzi0dq/p+2GbqIIhmCPJNrA/Y1M71LP1YO37IwyeZr?=
- =?us-ascii?Q?E8+isVxJT7h1zGlgSgkp5OvzOgRkH1d7/0rH3lynZRa9i+675Of7GzUztoDd?=
- =?us-ascii?Q?LKh0LNKtonjT2wVrtj/Nzcodl+z0gUwFYtrhBrbOE4rL5azLZkUoRiOGjhv2?=
- =?us-ascii?Q?TYUlr2l3VUGu7/5jyR9iVYo/h37r8MK2ZMYO4LCUwHOOXEprpD+pNLtQn+s9?=
- =?us-ascii?Q?a8MJcr1gZ9f9Vo+DGgRIfvCAwkcZgd6NL7Dq5FLvlhqPxEwfy0kxejAg3FwD?=
- =?us-ascii?Q?vJ+jbPsq55LqBpHXArqrscplRvP9Wkahi0qcyH8BEROE0x7RTLs8h1/UmfBM?=
- =?us-ascii?Q?WbRNqgaNfYr0+yhR803c0ezI8z6Zv25wSvGZ2LkYo4PRSpW52wEZKzCI0nlX?=
- =?us-ascii?Q?0nkOdJaFnA+9jNLZbLsGQSbPaqaERKjEPA9iQpPJ0I/xpcdMHjj4kblLXDSL?=
- =?us-ascii?Q?9gjmFSvHLJ27FaaHEU7JZwSXGhzowTlMtahrZ9WK0hBentGSnwHK6JVVXQpK?=
- =?us-ascii?Q?8Aobz8dR5WqxapL+77QPJ/sW7ElQk7H7a308kkAYVfi7Bx8jYLsfmT48BZh4?=
- =?us-ascii?Q?4W9JMmURQRXj0NTj9eKTr8K1PjLjkEdUFUUnVzafyP5IEMRFsL3meYtQSTQY?=
- =?us-ascii?Q?6OzLIhvjn1F9TvII3ARh4h7W/z5uO6hjTpn8XpbRio0Be9OKEpdb18c4LcxM?=
- =?us-ascii?Q?A0mCaYy+szzYVBoia7CXUCI7MlIYxrVWpHc/R/BUfXdoX8uNt6QW7g/d+7i6?=
- =?us-ascii?Q?K7G67g+sm10ifimGZiQ0PxjCS0cWXRm2DY5693p6?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dd61aae7-93c6-4eba-8e19-08db70c33ea2
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2023 12:46:47.6066
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MdmIYU2/RWFpCHP4CxhXk2VG0fxP5v+FSOfosKVXBReDLcNx0NYi3Q8v/c8VLeMw
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4958
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, dave.hansen@intel.com,
+        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
+        peterz@infradead.org, tglx@linutronix.de, seanjc@google.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, ying.huang@intel.com,
+        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+References: <cover.1685887183.git.kai.huang@intel.com>
+ <ec640452a4385d61bec97f8b761ed1ff38898504.1685887183.git.kai.huang@intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH v11 05/20] x86/virt/tdx: Add SEAMCALL infrastructure
+In-Reply-To: <ec640452a4385d61bec97f8b761ed1ff38898504.1685887183.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 16, 2023 at 08:06:21AM +0000, Tian, Kevin wrote:
-
-> Ideally the VMM has an estimation how long a VM can be paused based on
-> SLA, to-be-migrated state size, available network bandwidth, etc. and that
-> hint should be passed to the kernel so any state transition which may violate
-> that expectation can fail quickly to break the migration process and put the
-> VM back to the running state.
+On 04.06.23 16:27, Kai Huang wrote:
+> TDX introduces a new CPU mode: Secure Arbitration Mode (SEAM).  This
+> mode runs only the TDX module itself or other code to load the TDX
+> module.
 > 
-> Jason/Shameer, is there similar concern in mlx/hisilicon drivers? 
-
-It is handled through the vfio_device_feature_mig_data_size mechanism..
-
-> > +	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && next ==
-> > VFIO_DEVICE_STATE_STOP)
-> > +		return NULL;
+> The host kernel communicates with SEAM software via a new SEAMCALL
+> instruction.  This is conceptually similar to a guest->host hypercall,
+> except it is made from the host to SEAM software instead.  The TDX
+> module establishes a new SEAMCALL ABI which allows the host to
+> initialize the module and to manage VMs.
 > 
-> I'm not sure whether P2P is actually supported here. By definition
-> P2P means the device is stopped but still responds to p2p request
-> from other devices. If you look at mlx example it uses different
-> cmds between RUNNING->RUNNING_P2P and RUNNING_P2P->STOP.
+> Add infrastructure to make SEAMCALLs.  The SEAMCALL ABI is very similar
+> to the TDCALL ABI and leverages much TDCALL infrastructure.
 > 
-> But in your case seems you simply move what is required in STOP
-> into P2P. Probably you can just remove the support of P2P like
-> hisilicon does.
+> SEAMCALL instruction causes #GP when TDX isn't BIOS enabled, and #UD
+> when CPU is not in VMX operation.  Currently, only KVM code mocks with
+> VMX enabling, and KVM is the only user of TDX.  This implementation
+> chooses to make KVM itself responsible for enabling VMX before using
+> TDX and let the rest of the kernel stay blissfully unaware of VMX.
+> 
+> The current TDX_MODULE_CALL macro handles neither #GP nor #UD.  The
+> kernel would hit Oops if SEAMCALL were mistakenly made w/o enabling VMX
+> first.  Architecturally, there is no CPU flag to check whether the CPU
+> is in VMX operation.  Also, if a BIOS were buggy, it could still report
+> valid TDX private KeyIDs when TDX actually couldn't be enabled.
+> 
+> Extend the TDX_MODULE_CALL macro to handle #UD and #GP to return error
+> codes.  Introduce two new TDX error codes for them respectively so the
+> caller can distinguish.
+> 
+> Also add a wrapper function of SEAMCALL to convert SEAMCALL error code
+> to the kernel error code, and print out SEAMCALL error code to help the
+> user to understand what went wrong.
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
 
-We want new devices to get their architecture right, they need to
-support P2P. Didn't we talk about this already and Brett was going to
-fix it?
+I agree with Dave that a buggy bios is not a good motivation for this 
+patch. The real strength of this infrastructure IMHO is central error 
+handling and expressive error messages. Maybe it makes some corner cases 
+(reboot -f) easier to handle. That would make a better justification 
+than buggy bios -- and should be spelled out in the patch description.
 
-Jason
+[...]
+
+
+> +/*
+> + * Wrapper of __seamcall() to convert SEAMCALL leaf function error code
+> + * to kernel error code.  @seamcall_ret and @out contain the SEAMCALL
+> + * leaf function return code and the additional output respectively if
+> + * not NULL.
+> + */
+> +static int __always_unused seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
+> +				    u64 *seamcall_ret,
+> +				    struct tdx_module_output *out)
+> +{
+> +	int cpu, ret = 0;
+> +	u64 sret;
+> +
+> +	/* Need a stable CPU id for printing error message */
+> +	cpu = get_cpu();
+> +
+> +	sret = __seamcall(fn, rcx, rdx, r8, r9, out);
+> +
+
+
+Why not
+
+cpu = get_cpu();
+sret = __seamcall(fn, rcx, rdx, r8, r9, out);
+put_cpu();
+
+
+> +	/* Save SEAMCALL return code if the caller wants it */
+> +	if (seamcall_ret)
+> +		*seamcall_ret = sret;
+> +
+> +	/* SEAMCALL was successful */
+> +	if (!sret)
+> +		goto out;
+
+Why not move that into the switch statement below to avoid th goto?
+If you do the put_cpu() early, you can avoid "ret" as well.
+
+switch (sret) {
+case 0:
+	/* SEAMCALL was successful */
+	return 0;
+case TDX_SEAMCALL_GP:
+	pr_err_once("[firmware bug]: TDX is not enabled by BIOS.\n");
+	return -ENODEV;
+...
+}
+
+[...]
+
+> +
+>   static int __init record_keyid_partitioning(u32 *tdx_keyid_start,
+>   					    u32 *nr_tdx_keyids)
+>   {
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+> new file mode 100644
+> index 000000000000..48ad1a1ba737
+> --- /dev/null
+> +++ b/arch/x86/virt/vmx/tdx/tdx.h
+> @@ -0,0 +1,10 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef _X86_VIRT_TDX_H
+> +#define _X86_VIRT_TDX_H
+> +
+> +#include <linux/types.h>
+> +
+> +struct tdx_module_output;
+> +u64 __seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
+> +	       struct tdx_module_output *out);
+> +#endif
+> diff --git a/arch/x86/virt/vmx/tdx/tdxcall.S b/arch/x86/virt/vmx/tdx/tdxcall.S
+> index 49a54356ae99..757b0c34be10 100644
+> --- a/arch/x86/virt/vmx/tdx/tdxcall.S
+> +++ b/arch/x86/virt/vmx/tdx/tdxcall.S
+> @@ -1,6 +1,7 @@
+>   /* SPDX-License-Identifier: GPL-2.0 */
+>   #include <asm/asm-offsets.h>
+>   #include <asm/tdx.h>
+> +#include <asm/asm.h>
+>   
+>   /*
+>    * TDCALL and SEAMCALL are supported in Binutils >= 2.36.
+> @@ -45,6 +46,7 @@
+>   	/* Leave input param 2 in RDX */
+>   
+>   	.if \host
+> +1:
+>   	seamcall
+>   	/*
+>   	 * SEAMCALL instruction is essentially a VMExit from VMX root
+> @@ -57,10 +59,23 @@
+>   	 * This value will never be used as actual SEAMCALL error code as
+>   	 * it is from the Reserved status code class.
+>   	 */
+> -	jnc .Lno_vmfailinvalid
+> +	jnc .Lseamcall_out
+>   	mov $TDX_SEAMCALL_VMFAILINVALID, %rax
+> -.Lno_vmfailinvalid:
+> +	jmp .Lseamcall_out
+> +2:
+> +	/*
+> +	 * SEAMCALL caused #GP or #UD.  By reaching here %eax contains
+> +	 * the trap number.  Convert the trap number to the TDX error
+> +	 * code by setting TDX_SW_ERROR to the high 32-bits of %rax.
+> +	 *
+> +	 * Note cannot OR TDX_SW_ERROR directly to %rax as OR instruction
+> +	 * only accepts 32-bit immediate at most.
+
+Not sure if that comment is really helpful here. It's a common pattern 
+for large immediates, no?
+
+> +	 */
+> +	mov $TDX_SW_ERROR, %r12
+> +	orq %r12, %rax
+>   
+> +	_ASM_EXTABLE_FAULT(1b, 2b)
+> +.Lseamcall_out:
+>   	.else
+>   	tdcall
+>   	.endif
+
+-- 
+Cheers,
+
+David / dhildenb
+
