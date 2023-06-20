@@ -2,111 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A89EE736BCE
-	for <lists+kvm@lfdr.de>; Tue, 20 Jun 2023 14:20:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 366E2736BEF
+	for <lists+kvm@lfdr.de>; Tue, 20 Jun 2023 14:31:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232778AbjFTMUn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jun 2023 08:20:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49206 "EHLO
+        id S232434AbjFTMbN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jun 2023 08:31:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232619AbjFTMUX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jun 2023 08:20:23 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C01F1713;
-        Tue, 20 Jun 2023 05:20:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687263620; x=1718799620;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=F+HeITyySyj3YXzLM/AtaRIIghZxjYADeQkaNZHPles=;
-  b=YL2MsLNTTCt7OTeTphOkjoSxlraLb2DoZ3tmSt0RKOcpGmo3tltK/T8N
-   yy8c8RQTDd2ihKYdolno+aZ32116+UrHYlP+wldoqcHkJSOKQYie/t2Z4
-   AhXzqpLtfbPgzTxss1AATrmg5OB/hYprScTfUnfHttbNHk4ye+b+PpU2m
-   ifxUXIB8koD5cW5qZlEyJFf2qiZLVe7dNjyT9tu/ecmagx0iM2UWupKJG
-   vmMCpTH3Dz7XvlMuwlI3GDkQDR/Kyz3Zp1k9P2aDlGBjDmr5FvPLAA6Tr
-   5JnpI6nTiE9C5RixFChXpNBiBL4W9IxUNy1bPsFqRmOMSdJOK5JehrwKa
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10746"; a="357332168"
-X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
-   d="scan'208";a="357332168"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 05:20:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10746"; a="858560189"
-X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
-   d="scan'208";a="858560189"
-Received: from dkravtso-mobl1.ccr.corp.intel.com (HELO box.shutemov.name) ([10.252.62.180])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 05:20:14 -0700
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id 30F8E10F89F; Tue, 20 Jun 2023 15:20:12 +0300 (+03)
-Date:   Tue, 20 Jun 2023 15:20:12 +0300
-From:   "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "david@redhat.com" <david@redhat.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-Subject: Re: [PATCH v11 05/20] x86/virt/tdx: Add SEAMCALL infrastructure
-Message-ID: <20230620122012.mnlgko443qrpfrzg@box.shutemov.name>
-References: <cover.1685887183.git.kai.huang@intel.com>
- <ec640452a4385d61bec97f8b761ed1ff38898504.1685887183.git.kai.huang@intel.com>
- <759e3af5-6aec-7e50-c432-c5e0a0c3cf36@redhat.com>
- <8e7d6b83347688bb013d7ebb660d0a74a1949d52.camel@intel.com>
-MIME-Version: 1.0
+        with ESMTP id S232416AbjFTMbL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jun 2023 08:31:11 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BF721B4;
+        Tue, 20 Jun 2023 05:31:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iC8MH1qoPL4f+wMv5FdthoTkr4QJHO7qnyMlI7GYjGZyValdIVAs0GkKLfi+O2adQOV26q3r3oHk+nDV9kpJJAjRkZWxSnMFRFZeL67ndqNguUYknLfhOciQaJ0emLGwgzu26kevEzum5Vx5ZDniODOnH8A7N8GU8CqQ6DNF/OatF1Qq5vLBQHVMoBZLtBwAjYG09798KOZwOi1h0EFhSNTye3p33gK5ImPtR1rfvy78KWa+JODGWO+bYBh8t2IF5QR/dxhOWekt3BaHRIdMMLr+oMCtTxsPgaF+pnPiy32PCh4Xuc764GsPkKXEmF5JdytKWV6ny5r78INc85od8A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zGNf4fCe7A9A/J3W3jFXL8G74K5RlSFBMnQAV4R3EC0=;
+ b=cLX2BzUMGy/MLeUOtOS1i6VJtImNtgT/XlPz6wkdHSnyqcCpbu8VlzaTOttlVBitTDzz3Fj3mKSYZm9l3Z2oT6AFMILKJ31vtigJeC/INlNq7B90aICqjfuGuu1Gfxwef+tX/r3RDCNZY4nq22Z1d11OUoyU9ufEFzREjmYZ13hSwp+pvHvR3aKNoE9GvwJdUGvb5d6Qq/xT6mx/8uEwn9Rv2m7jVkKtWRkfiMIkGehNoAw2NFEXcEKqYmS875K2eb8HUOXuwAtCWquhxoRYD6J3O0KyHYH4KtGua7A8TD6P6ZWeD8T0yILKB+evGTztLk8Dy31SGiwthwJrzTc6Lg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zGNf4fCe7A9A/J3W3jFXL8G74K5RlSFBMnQAV4R3EC0=;
+ b=Gq5J+wo2GGOyvQbzIgWFBGfIobIymB5ECql3zM+k0j762sstSjL//SCWkn+IQ612gqzPcbtU72aD157h7eFN/JOOTKuq8xWLjN0MndmnPjjCgzC6Hriw3OLNBcatQBmjaH+zAoWAa6uL3pO9NwbnBHxWmpyENhTORZTlr7qWAI7lCBtbTSfcWk1HYdH25Zg25QEGvLVuLW6EgkJt8ySD+ny565fhHugIhJKeEm7g/BtsQxkgyiqamv1Z8WGUjWvcT0QlXq07eUNfgbv2j4jz7g2jaO5nUbswWZtXTXJPURJ+WubiGxc1Hl9cAJ5+ZQsP05e4Z5zs3N01/PVHB3LlLw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by LV8PR12MB9154.namprd12.prod.outlook.com (2603:10b6:408:190::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.37; Tue, 20 Jun
+ 2023 12:31:07 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%7]) with mapi id 15.20.6500.031; Tue, 20 Jun 2023
+ 12:31:06 +0000
+Date:   Tue, 20 Jun 2023 09:31:04 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Brett Creeley <brett.creeley@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "shannon.nelson@amd.com" <shannon.nelson@amd.com>
+Subject: Re: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
+Message-ID: <ZJGcCF2hBGERGUBZ@nvidia.com>
+References: <20230602220318.15323-1-brett.creeley@amd.com>
+ <20230602220318.15323-5-brett.creeley@amd.com>
+ <BN9PR11MB5276511543775B852AD1C5A88C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJBONrx5LOgpTr1U@nvidia.com>
+ <BN9PR11MB5276DD9E2B791EE2C06046348C5CA@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8e7d6b83347688bb013d7ebb660d0a74a1949d52.camel@intel.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <BN9PR11MB5276DD9E2B791EE2C06046348C5CA@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BYAPR01CA0008.prod.exchangelabs.com (2603:10b6:a02:80::21)
+ To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|LV8PR12MB9154:EE_
+X-MS-Office365-Filtering-Correlation-Id: 499ea8a7-efb1-4d47-fcb4-08db718a3858
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 51GXKeQCZ285CRUE7JATPAoVSc6sl9aP3QuM1n8lYOot+0t4gNgYIWt4kqrp0syzh86O+FDloGOzK5sUO89U61jH7z3I+xN7Xr3CnLr0wlLi/8UGVR0hqRHDp41EF2rpyjlVFW5x8bI+5faIPjrJIU2qJStDr9v/NwD+nlqIGQgjUPwsKym+osK+OmkRocUI2pz3I1OhE1hK17nH17cpiSzBfelkmdytuWYryNZXblA2H91Jg2NybDrSsZeoHhHH61u2BRwzvGA6AlG6lfJzAX6Y8EdCTn8eCRMTqs4cH+Cqy1tx/XG3eWpfSo53xK8EPovcMBDqh6dec45BcB2BYYVy5HznsgiKrssv2IqKBibeZQ6SZIQ4+xRQWRm0iswT4CI2Cin/o/poSXWpKqbD4LCq8cjs2W1He5Zpi/o0cs4bWAd0ic+f0BnaQa4OEBjNt2F4C4Uhj5LfCl1ChmsMKysAlbF4a000VncdI2U2HKbljWytHTlz/LoL4NqGe9T6GDS4AMP8WCvhqixDntUrxZfQFIGqY9WlYckigA0MmJ0ggu39UkddtYMik3BKDdFW
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(366004)(39860400002)(136003)(376002)(451199021)(66946007)(8676002)(8936002)(66556008)(66476007)(26005)(186003)(6506007)(6512007)(36756003)(41300700001)(38100700002)(5660300002)(6916009)(4326008)(316002)(54906003)(66899021)(2616005)(6486002)(478600001)(2906002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Mk3Rl76koQS6S8DLJtkGlV32FRbMaAyzrpzrTapi7K5NTnDHdS//jd/JOJtb?=
+ =?us-ascii?Q?Y8lh3TZ2Q5WmLdR196tjThE4+bq7f/b+Eexu2aH/Ca5CQhikYl1ALzdullMx?=
+ =?us-ascii?Q?HDZEQ+QcdJF75w9L3dBZjz/6BQOaz5fnVbY/QFCZv3yBTkO1gCzmMFgkz2zC?=
+ =?us-ascii?Q?dWAZHMCvb+0Fh25pq6Shr9kd9+8bQqmFxpBHH91zPdjqn0M2dSNa3n8AYPsf?=
+ =?us-ascii?Q?pLsaIKthnvqih/JHIiVF0lDiq/FzpquNtFEqHbHvWSsWpbZKw4ZmB2ERVEH8?=
+ =?us-ascii?Q?MbWhUa5WqxmMYgClPktZLvz54shEoy+c9bbZUqleLHhgMEhO11uKN8/LbE0R?=
+ =?us-ascii?Q?GiQmtzb2hw9sjgxG2q94zJ5IyP0LEZkmgadSY82awIKSjXR2U9gkjrLQ/J6y?=
+ =?us-ascii?Q?epnU0IaZQ6G4rN13XQnK27VEe1Owf899Q7ehmZG2sinDNL7U+UqjS9pbfV7i?=
+ =?us-ascii?Q?kqlzx3gTWpkODbT/0yJMDsy5tgPQ/l22NZo3iB/YS+dHAk/lU5beeNMOyeLV?=
+ =?us-ascii?Q?6pVNn2mBXFvtUX184B+nxCIyc8RaBkWEwfRb/nDrz9i3Uo7my5Kszy0J1QCl?=
+ =?us-ascii?Q?VOgy/kJWeFtjce4QB8oTuXOamL/22rVDk+82jDRGCNzk4evF7IjxeDJVkcM1?=
+ =?us-ascii?Q?19tyE66p9IlL5uFlFOjfKAEmagLOo4ZTCPoe9blqydkHr6uHQmprNhCJ1Wu2?=
+ =?us-ascii?Q?yeEB8BMh4PoEhZB/JtulfjHc5thqL+Xqm5Tm+jVx754LtQTfXuGAH5596MBo?=
+ =?us-ascii?Q?Q6XuE6wKNpB1J53Z5EYuHVXki0RmtJE8Apbw2TLabRQHDf9ezWYpBgyj3j8I?=
+ =?us-ascii?Q?cUNtSsfKmEzXU19ltJezloUqXarxVkRaCGjzJLpSzOF+CRRUSEyjPGed//kK?=
+ =?us-ascii?Q?S54oWSSfh2BJxztkY6O3S4dPh1pBqZw3W4sjJo1kPzBa6U1/WTJjqvqMS65j?=
+ =?us-ascii?Q?CxZtjVDPKMyBWwqHG4CTnqc3NHOd8g3Zn8haEaT/aSviFK2+jLGezBtqaLvi?=
+ =?us-ascii?Q?c4bXCGJP4GWwgsMu1RvmDquTbBKmM6UGTOZQo8AASUaWJd+XwOlrJNI8F/3Z?=
+ =?us-ascii?Q?FDw+uyFzGxB20nyuRIHkEaFLxFaVAbPoJpEaj73vV1cq64NlGSvT3Fgf1xBp?=
+ =?us-ascii?Q?H3SvI/dco3pQxftl+vfGSbazNSAzZuIpj8cb5PHCxOWDiYl7Xl6y6QFRFwAW?=
+ =?us-ascii?Q?rDbrag7BOI1GGpVdcZ2JcsD87is3wtMypj4ZRsf23+uwnHktW5C2c3LMdxaw?=
+ =?us-ascii?Q?SmE6h8QIjaWcYRkZLNCg7H1J1Oc5meK+LquAIdC8yCEmYU4aBY2rpmZKvcJO?=
+ =?us-ascii?Q?ImJJCW2ensboYfLtOSkG/fixesbzte6DdXuDwS5icSgCN5Yhz5Sa5LMRrCvo?=
+ =?us-ascii?Q?f+DNGKw6K/hoFVv92f6wbruQe1kZqgdmStMGPjpEzjka9BDPJlDlN3B7YDlT?=
+ =?us-ascii?Q?m2oHv04YDzrHrlR6YP4qp8AriReOxJShmcolyRbbRj4N+Fu8Tadw45FLVaGN?=
+ =?us-ascii?Q?ux1XxXxj6pz74Ae2QuDTrC8bRq5CFDa1vbcHgyQGh3Fh1It3Zu+wp82qy/hx?=
+ =?us-ascii?Q?Sp01Fg/rSbtd/CztSDUHGkz2xEwX0BJGUwLV0oR+?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 499ea8a7-efb1-4d47-fcb4-08db718a3858
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2023 12:31:06.8954
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RCXcF3whzU7u2d9pS8Y32ZvlyStIq1rLBD5pvtViamMxQgw/aLh9vEkZAW5SNwrc
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9154
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 10:37:16AM +0000, Huang, Kai wrote:
-> > > +	/*
-> > > +	 * SEAMCALL caused #GP or #UD.  By reaching here %eax contains
-> > > +	 * the trap number.  Convert the trap number to the TDX error
-> > > +	 * code by setting TDX_SW_ERROR to the high 32-bits of %rax.
-> > > +	 *
-> > > +	 * Note cannot OR TDX_SW_ERROR directly to %rax as OR instruction
-> > > +	 * only accepts 32-bit immediate at most.
+On Tue, Jun 20, 2023 at 02:02:44AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Monday, June 19, 2023 8:47 PM
 > > 
-> > Not sure if that comment is really helpful here. It's a common pattern 
-> > for large immediates, no?
+> > On Fri, Jun 16, 2023 at 08:06:21AM +0000, Tian, Kevin wrote:
+> > 
+> > > Ideally the VMM has an estimation how long a VM can be paused based on
+> > > SLA, to-be-migrated state size, available network bandwidth, etc. and that
+> > > hint should be passed to the kernel so any state transition which may
+> > violate
+> > > that expectation can fail quickly to break the migration process and put the
+> > > VM back to the running state.
+> > >
+> > > Jason/Shameer, is there similar concern in mlx/hisilicon drivers?
+> > 
+> > It is handled through the vfio_device_feature_mig_data_size mechanism..
 > 
-> I am not sure.  I guess I am not expert of x86 assembly but only casual writer.
+> that is only for estimation of copied data.
 > 
-> Hi Dave, Kirill,
+> IMHO the stop time when the VM is paused includes both the time of
+> stopping the device and the time of migrating the VM state.
 > 
-> Are you OK to remove it?
+> For a software-emulated device the time of stopping the device is negligible.
+> 
+> But certainly for assigned device the worst-case hard-coded 5s timeout as
+> done in this patch will kill whatever reasonable 'VM dead time' SLA (usually
+> in milliseconds) which CSPs try to meet purely based on the size of copied
+> data.
 
-I would rather keep it. I wanted to ask why separate MOV is needed here,
-before I read the comment. Also size of $TDX_SW_ERROR is not visible here,
-so it contributes to possible confusion without the comment.
+There is not alot that can be done here, the stop time cannot be
+predicted in advance on these devices - the system relies on the
+device having a reasonable time window.
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+> Wouldn't a user-specified stop-device timeout be required to at least allow
+> breaking migration early according to the desired SLA?
+
+Not really, the device is going to still execute the stop regardless
+of the timeout, and when it does the VM will be broken.
+
+With a FW approach like this it is pretty stuck, we need the FW to
+remain in sync as the highest priority.
+
+> > We want new devices to get their architecture right, they need to
+> > support P2P. Didn't we talk about this already and Brett was going to
+> > fix it?
+> 
+> Looks it's not fixed since RUNNING_P2P->STOP is a nop in this patch.
+
+That could be OK, it needs a comment explaining why it is OK
+
+Jason
