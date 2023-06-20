@@ -2,459 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C98F736156
-	for <lists+kvm@lfdr.de>; Tue, 20 Jun 2023 04:01:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E58773615B
+	for <lists+kvm@lfdr.de>; Tue, 20 Jun 2023 04:02:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229875AbjFTCBt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jun 2023 22:01:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35438 "EHLO
+        id S229593AbjFTCCv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jun 2023 22:02:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjFTCBr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jun 2023 22:01:47 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 68CD7AF;
-        Mon, 19 Jun 2023 19:01:44 -0700 (PDT)
-Received: from loongson.cn (unknown [10.40.46.158])
-        by gateway (Coremail) with SMTP id _____8DxCeqGCJFkrAQHAA--.14486S3;
-        Tue, 20 Jun 2023 10:01:42 +0800 (CST)
-Received: from [192.168.124.126] (unknown [10.40.46.158])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxluSCCJFkdQshAA--.27156S3;
-        Tue, 20 Jun 2023 10:01:39 +0800 (CST)
-Subject: Re: [PATCH v14 27/30] LoongArch: KVM: Implement vcpu world switch
-To:     Huacai Chen <chenhuacai@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>, tangyouling@loongson.cn
-References: <20230619083255.3841777-1-zhaotianrui@loongson.cn>
- <20230619083255.3841777-28-zhaotianrui@loongson.cn>
- <CAAhV-H4XGGjz+bisxg+P+mtvC2UBFqsUwxePtE2sGAGF1ba50Q@mail.gmail.com>
-From:   zhaotianrui <zhaotianrui@loongson.cn>
-Message-ID: <8df17ccb-869c-b429-b1db-cc1c4e0d7a88@loongson.cn>
-Date:   Tue, 20 Jun 2023 10:01:38 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <CAAhV-H4XGGjz+bisxg+P+mtvC2UBFqsUwxePtE2sGAGF1ba50Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S229453AbjFTCCt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jun 2023 22:02:49 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47D20BD;
+        Mon, 19 Jun 2023 19:02:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687226568; x=1718762568;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Pd8Q0H1mfFHacsQCQJbQ5kUsOZJoJ2ydW/qVLYI5OqM=;
+  b=igS4wxOvkPuzUSYijjnWV7vjGdjV/paKB8kU/F2i0nnvfiBs0tDv5rhi
+   DUx6RxNyD4tcrHqNL8E5BJ4daKb8zqxcTd0oaIvW7Ha566yCumSS/au6L
+   G/fRHW/gWoTd7uYXh9b0TUcyQ4WkcEDBQHOk9lGZ7Klkrkr74/ksqXhJ2
+   3M9cN/3ARzqeEPMCJUlwuZsLQ1LAVQIbVbAl+vSQs/40ATT2LUuwP/osF
+   7/pDtyIOVOK38UzaGihI5TusPzd9wqZ7bX/1uNAW0lQh7p+BAtKRh3Qig
+   yPdWNk6N0useIN2qa/VdBXbUEVGuAl1XI9RD0picRfE/uW9Gxe47d9mIF
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10746"; a="423408112"
+X-IronPort-AV: E=Sophos;i="6.00,255,1681196400"; 
+   d="scan'208";a="423408112"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2023 19:02:47 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10746"; a="713872145"
+X-IronPort-AV: E=Sophos;i="6.00,255,1681196400"; 
+   d="scan'208";a="713872145"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga002.jf.intel.com with ESMTP; 19 Jun 2023 19:02:47 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Mon, 19 Jun 2023 19:02:46 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Mon, 19 Jun 2023 19:02:46 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Mon, 19 Jun 2023 19:02:46 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.103)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Mon, 19 Jun 2023 19:02:46 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l2I1nio5XnXA/bKT7CFOerXyDXcJ+HAQreWzNaMpIXKFb+GO68gN4kMlw3qIW0jmCi7Dwh4Qkr39/NhcxKOX4ygZ37uPvxSoabOd+Bj6JcIUPxZgjYe8/K0qyyrUL+Y1SWwxaVQBr9kM9St+Suugl8wfO2vBbDA2FWsCKTv1ZJDsQbY/Qi7phKADYuDC7wcWFV5PZE9diYanbwm1/7wyt/Yq4U6hVFT750EggELoSDHTN8VBGL00BcTHrRcXfhifMkmTs3wEIfAAK2zBIVzX0TPxCeWCihZltvRTqMiprf/lPZsHPXDsx7E9a0FuHOfb2C4UAA0reniAe4lYH27+jQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=C9hN9+vqzWs5jch9yg/jJ3issKY+7TVbU3N+icnjoB0=;
+ b=fEMH0fFkl6FBca/2HTPFASUouL2gkvin3lkEn7ucHyg0wuvc/3WsrNQBODe0gSkJhzuDPtINYG3tAcxCM1fRCjHu9xNDZvThoPBbSL/NMvFK8/bEjZ6V6lcsR0yZ+5f8ShikgCICj0Ck6lVMf+ENW19vT37tbCaMJmVkGlvH88dmn8GkJXf7P/Vlhj5I/K2kYW4T1qT8+iexRfKyTeV011jTZaiVlY9m3u1cYgKQIimycMf3hAZ8kM+FMz9W+ldY/KvIolae/XT+yuRqFi+bEgQvuGAOjIJ7D3kcqgJSEfJeEFiPkEttLgWC44388XR4+PT9OSgmgsCAs7GkLPgxCA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by CH3PR11MB7721.namprd11.prod.outlook.com (2603:10b6:610:12b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.35; Tue, 20 Jun
+ 2023 02:02:44 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4f05:6b0b:dbc8:abbb]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4f05:6b0b:dbc8:abbb%7]) with mapi id 15.20.6500.036; Tue, 20 Jun 2023
+ 02:02:44 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Brett Creeley <brett.creeley@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "shannon.nelson@amd.com" <shannon.nelson@amd.com>
+Subject: RE: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
+Thread-Topic: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
+Thread-Index: AQHZlZ4kU3Fwl99xbECsoSBHo1JwW6+NFosQgAUWbwCAANnr4A==
+Date:   Tue, 20 Jun 2023 02:02:44 +0000
+Message-ID: <BN9PR11MB5276DD9E2B791EE2C06046348C5CA@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230602220318.15323-1-brett.creeley@amd.com>
+ <20230602220318.15323-5-brett.creeley@amd.com>
+ <BN9PR11MB5276511543775B852AD1C5A88C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJBONrx5LOgpTr1U@nvidia.com>
+In-Reply-To: <ZJBONrx5LOgpTr1U@nvidia.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-CM-TRANSID: AQAAf8DxluSCCJFkdQshAA--.27156S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj9fXoW3Cw18ZFWUtr1xCrWktFy7Jwc_yoW8Jr4UCo
-        W5tF4Igas3Jay2gFWIk343Jay5Z34fCr1rA3yjyr4xWF1YqFsxKasrGa12qr43JF1DGry7
-        WasxW3WkCF4fX3Wrl-sFpf9Il3svdjkaLaAFLSUrUUUUeb8apTn2vfkv8UJUUUU8wcxFpf
-        9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
-        UjIYCTnIWjp_UUUO87kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
-        8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
-        Y2AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
-        v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVCY1x0267AK
-        xVW8JVW8Jr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-        xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
-        6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
-        1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxG
-        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW5JVW7JwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4U
-        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jz5lbUUU
-        UU=
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CH3PR11MB7721:EE_
+x-ms-office365-filtering-correlation-id: fe47ff54-6db4-4c39-9fcf-08db71326ff6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Yge7DEZqjfKpitMJq33Ss3//C8Xt4AKp3l8d3fLAY6X1h8Q4NKAbjkhOzt4+VmUWgOeVfVe5pNc8W1v3s6IaPlFJdu9aepEgwDkxVYdUxuqPQFRQhxLkFB006/W7pGGxKCTZYCAfDwAJ2xnpZe2mtEX5nPlpXgOoX28lnF2MrTTT6vfM8TW0Akfo7FujRRbBOgqLtbg8uCrh5STuzb+v73bJd7YVi7TEz6Cu7sOa5OluhI6P4omTgW/5en4nlfJlfAynyckeU7vSWtTpcxvm2J1hJtgIbG6fOaPreSLiCka+tn1RX6izHjliyxzYb2aiT/2aAzmtI1WOK4nVd2YYy6ZzwAimktA+xXYRXlRTZ6fnnChLQo9rirB66DZkCWYH+DwgzxwlRiv0XT7mIjyBv4LnxFOaQ7f43PiF6DsvXGrRYa42l4uz0C7wQhta1Y+vDrmxD3cFp7wqzkWHpDiMzj31j5t3IaTJDc2bZklTa9IpY7dxPTO7syySpeI1nz0IBnrfH1GUeGhbm2qDYAaKvgy4vSwaE0RQYmO1iY4W4EHdRy04VeeU889WvIKFg09NX0aV6/6bcxJIg1SjoWRiVA+cojcu/pA1DALNjbvZFAlnHftMNLFh+MJolEcpSLvc
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(39860400002)(396003)(376002)(366004)(136003)(451199021)(478600001)(52536014)(5660300002)(4326008)(6916009)(66946007)(76116006)(66556008)(64756008)(66446008)(66476007)(2906002)(54906003)(41300700001)(316002)(7696005)(71200400001)(8676002)(8936002)(6506007)(186003)(26005)(9686003)(83380400001)(66899021)(122000001)(55016003)(38100700002)(82960400001)(33656002)(86362001)(38070700005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ulflq38q/Feplq1gjQ1BU+5BTg2+6Kx4xxKOo7PXtQs0OL04g/+6/CqPI4Ss?=
+ =?us-ascii?Q?V1rklz1H6zraRZcmWK3gDpJ9eRQ4BLqb6dZCJnDJ5SmWQa8z45UJAfTlCVm+?=
+ =?us-ascii?Q?6YjbFW5U0nZatjGCrK8+kUKbVsvuimrzJYQjuSBBspp0Kz+DzT5bq3ScxG79?=
+ =?us-ascii?Q?5ZtAdg/SHgSIGXLGO23uP1L8S3ErHDyeG5Wf8RrvEihQTNr+OCczcE1LzmjI?=
+ =?us-ascii?Q?IKmZaVGyiiLaMjJLEt+dLq+wv9TfuOu+nPR40eScN5PF0mRnlyQEQ6SMY+jV?=
+ =?us-ascii?Q?LNVMjRaZNL/7a9VUSLatCUcEhR2uSHMNF3I88VtI87aEAiOdPluvc6Y7Ev32?=
+ =?us-ascii?Q?fo6IIRQ/hHGfPjSG3YCegLLnZPEbQkzQtrQ5hCfe9aezNDQyHoYLSHI0H51Z?=
+ =?us-ascii?Q?0+FXSVzIV6ZPnzvIQjqrPXZgUARYUT28QALMrs3DFDJE2JEWrzhUPUWbQH6q?=
+ =?us-ascii?Q?p3RqwIv0hGb6ooETABhOhzdGUQDl48VgUnRIYioiMM5RAkaigiU3zpehZGCy?=
+ =?us-ascii?Q?TUmNM3buJ0cEphnUpVym2lHASvCvo7P5kuSl3PbA8QgQ1e4/F6szpjlzWFxn?=
+ =?us-ascii?Q?9XWmCoHozI5bvVx2tty7er46MPZL/0t+o/lZgSzlfBU6CNEPQfnnKW5rLCIc?=
+ =?us-ascii?Q?l4tc89wC/qY1YbBtKKUs4mIn/BgtI1dfIpcAWz5Dn6Z3q5PMljK/ihyVg56p?=
+ =?us-ascii?Q?Fg2LsbCTX2E+ofbxbht6RA4QULfgndJKjcxohC0jLThK6RAE+TIu4Am7e9a1?=
+ =?us-ascii?Q?Gyqg7s2aCMLhCZewFjpscqlwT0QOJJcjZVs/2aukSFQQX1QAHS12Q+BnfG22?=
+ =?us-ascii?Q?4luPcvT/3PlMbz/fF6RuBUcs4HG90WaZVbHZ+f+V4Cn/+DKqWJvK0MPTRENl?=
+ =?us-ascii?Q?r7xdvL9I4XcWAUNzxA/kOzcufXtLsywVK3la+HeXDxJGs0IWGxQDXZRv85f6?=
+ =?us-ascii?Q?zgA11ucaHBKUpEY3AApME2Avt77FLaJJOg9ejdjAxrQdZd0j0IeUJevqGiwh?=
+ =?us-ascii?Q?pCUeWSn/0I5ycR4p3r/cZls0gChemMkPmwPmPzmUSiewrS5fSZorBOPb0i/W?=
+ =?us-ascii?Q?boJCi2OcgqW2pjQCo4/HjRLkCzEdL/xHwJ7lPfsEeesJYGH1BUAKjFB/vJHM?=
+ =?us-ascii?Q?Kd9NCOAsRQ++6WpIgB9BZ9j6izQ2dsYBO0zoJV76ZBHHH2fhghbLKjM47jHt?=
+ =?us-ascii?Q?xz/6R09fBy5xMb/yd+1Azo8h/i8tgP2c6AtY2+w0Xi/OKgfZgzSLXe8ihwLh?=
+ =?us-ascii?Q?ymtfBn5BDEylzBKo051U2bc1IXCsal075uaEx81KlKy5npL/1fuoNwTBNrUw?=
+ =?us-ascii?Q?aQlZePfp8kdge77u7Jd6ChNXedVAO0Z2F5Mu7j5+XPFVPZx4kjq0q6uMhsXi?=
+ =?us-ascii?Q?q1HKTFljY42mj5MD2glsUxDhZgz/co7yE7DLeqkhc2ueXZDCY3B3fjj44HJE?=
+ =?us-ascii?Q?gNBuGb7qijyLTRLY9VwtXS4tA2cqZx1wXFvYwaOcG7VnLxG8HKRpesIs1PNS?=
+ =?us-ascii?Q?cL6rSHic/ZVmttIh6hffIgGGOCyy/uu+lqFJb1n/ryZDXp0I751qZYEPTSFV?=
+ =?us-ascii?Q?iSWqa60n/tbadbv2ojPYSXFl9JHEFWVxZ4Z7i2wa?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe47ff54-6db4-4c39-9fcf-08db71326ff6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2023 02:02:44.3452
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: OP55CldnrbRB+IDaTTJEDMjfpB2wd5U/8vHyzizvgKWcp4NI3qmncqCFALxB/JiqJozrh6DlxBechfmQ4YwRKg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7721
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Monday, June 19, 2023 8:47 PM
+>=20
+> On Fri, Jun 16, 2023 at 08:06:21AM +0000, Tian, Kevin wrote:
+>=20
+> > Ideally the VMM has an estimation how long a VM can be paused based on
+> > SLA, to-be-migrated state size, available network bandwidth, etc. and t=
+hat
+> > hint should be passed to the kernel so any state transition which may
+> violate
+> > that expectation can fail quickly to break the migration process and pu=
+t the
+> > VM back to the running state.
+> >
+> > Jason/Shameer, is there similar concern in mlx/hisilicon drivers?
+>=20
+> It is handled through the vfio_device_feature_mig_data_size mechanism..
 
-在 2023/6/19 下午6:24, Huacai Chen 写道:
-> Hi, Tianrui,
->
-> On Mon, Jun 19, 2023 at 4:34 PM Tianrui Zhao <zhaotianrui@loongson.cn> wrote:
->> Implement LoongArch vcpu world switch, including vcpu enter guest and
->> vcpu exit from guest, both operations need to save or restore the host
->> and guest registers.
->>
->> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
->> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
->> ---
->>   arch/loongarch/kernel/asm-offsets.c |  32 +++
->>   arch/loongarch/kvm/switch.S         | 301 ++++++++++++++++++++++++++++
->>   2 files changed, 333 insertions(+)
->>   create mode 100644 arch/loongarch/kvm/switch.S
->>
->> diff --git a/arch/loongarch/kernel/asm-offsets.c b/arch/loongarch/kernel/asm-offsets.c
->> index 4bdb203fc66e..cb6c5a5afea9 100644
->> --- a/arch/loongarch/kernel/asm-offsets.c
->> +++ b/arch/loongarch/kernel/asm-offsets.c
->> @@ -9,6 +9,7 @@
->>   #include <linux/mm.h>
->>   #include <linux/kbuild.h>
->>   #include <linux/suspend.h>
->> +#include <linux/kvm_host.h>
->>   #include <asm/cpu-info.h>
->>   #include <asm/ptrace.h>
->>   #include <asm/processor.h>
->> @@ -272,3 +273,34 @@ void output_pbe_defines(void)
->>          BLANK();
->>   }
->>   #endif
->> +
->> +static void __used output_kvm_defines(void)
->> +{
->> +       COMMENT(" KVM/LOONGARCH Specific offsets. ");
->> +
->> +       OFFSET(VCPU_FCSR0, kvm_vcpu_arch, fpu.fcsr);
->> +       OFFSET(VCPU_FCC, kvm_vcpu_arch, fpu.fcc);
->> +       BLANK();
->> +
->> +       OFFSET(KVM_VCPU_ARCH, kvm_vcpu, arch);
->> +       OFFSET(KVM_VCPU_KVM, kvm_vcpu, kvm);
->> +       OFFSET(KVM_VCPU_RUN, kvm_vcpu, run);
->> +       BLANK();
->> +
->> +       OFFSET(KVM_ARCH_HSP, kvm_vcpu_arch, host_sp);
->> +       OFFSET(KVM_ARCH_HTP, kvm_vcpu_arch, host_tp);
->> +       OFFSET(KVM_ARCH_HANDLE_EXIT, kvm_vcpu_arch, handle_exit);
->> +       OFFSET(KVM_ARCH_HPGD, kvm_vcpu_arch, host_pgd);
->> +       OFFSET(KVM_ARCH_GEENTRY, kvm_vcpu_arch, guest_eentry);
->> +       OFFSET(KVM_ARCH_GPC, kvm_vcpu_arch, pc);
->> +       OFFSET(KVM_ARCH_GGPR, kvm_vcpu_arch, gprs);
->> +       OFFSET(KVM_ARCH_HESTAT, kvm_vcpu_arch, host_estat);
->> +       OFFSET(KVM_ARCH_HBADV, kvm_vcpu_arch, badv);
->> +       OFFSET(KVM_ARCH_HBADI, kvm_vcpu_arch, badi);
->> +       OFFSET(KVM_ARCH_HECFG, kvm_vcpu_arch, host_ecfg);
->> +       OFFSET(KVM_ARCH_HEENTRY, kvm_vcpu_arch, host_eentry);
->> +       OFFSET(KVM_ARCH_HPERCPU, kvm_vcpu_arch, host_percpu);
->> +
->> +       OFFSET(KVM_GPGD, kvm, arch.gpa_mm.pgd);
->> +       BLANK();
->> +}
->> diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
->> new file mode 100644
->> index 000000000000..f9f6e0707cd7
->> --- /dev/null
->> +++ b/arch/loongarch/kvm/switch.S
->> @@ -0,0 +1,301 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
->> + */
->> +
->> +#include <linux/linkage.h>
->> +#include <asm/stackframe.h>
->> +#include <asm/asm.h>
->> +#include <asm/asmmacro.h>
->> +#include <asm/regdef.h>
->> +#include <asm/loongarch.h>
->> +#include <asm/export.h>
->> +
->> +#define PT_GPR_OFFSET(x)       (PT_R0 + 8*x)
->> +       .text
->> +
->> +.macro kvm_save_host_gpr base
->> +       .irp n,1,2,3,22,23,24,25,26,27,28,29,30,31
->> +       st.d    $r\n, \base, PT_GPR_OFFSET(\n)
->> +       .endr
->> +.endm
->> +
->> +.macro kvm_restore_host_gpr base
->> +       .irp n,1,2,3,22,23,24,25,26,27,28,29,30,31
->> +       ld.d    $r\n, \base, PT_GPR_OFFSET(\n)
->> +       .endr
->> +.endm
->> +
->> +/*
->> + * prepare switch to guest, save host reg and restore guest reg.
->> + * a2: kvm_vcpu_arch, don't touch it until 'ertn'
->> + * t0, t1: temp register
->> + */
->> +.macro kvm_switch_to_guest
->> +       /* set host excfg.VS=0, all exceptions share one exception entry */
->> +       csrrd           t0, LOONGARCH_CSR_ECFG
->> +       bstrins.w       t0, zero, CSR_ECFG_VS_SHIFT_END, CSR_ECFG_VS_SHIFT
->> +       csrwr           t0, LOONGARCH_CSR_ECFG
->> +
->> +       /* Load up the new EENTRY */
->> +       ld.d    t0, a2, KVM_ARCH_GEENTRY
->> +       csrwr   t0, LOONGARCH_CSR_EENTRY
->> +
->> +       /* Set Guest ERA */
->> +       ld.d    t0, a2, KVM_ARCH_GPC
->> +       csrwr   t0, LOONGARCH_CSR_ERA
->> +
->> +       /* Save host PGDL */
->> +       csrrd   t0, LOONGARCH_CSR_PGDL
->> +       st.d    t0, a2, KVM_ARCH_HPGD
->> +
->> +       /* Switch to kvm */
->> +       ld.d    t1, a2, KVM_VCPU_KVM - KVM_VCPU_ARCH
->> +
->> +       /* Load guest PGDL */
->> +       lu12i.w t0, KVM_GPGD
->> +       srli.w  t0, t0, 12
->> +       ldx.d   t0, t1, t0
->> +       csrwr   t0, LOONGARCH_CSR_PGDL
->> +
->> +       /* Mix GID and RID */
->> +       csrrd           t1, LOONGARCH_CSR_GSTAT
->> +       bstrpick.w      t1, t1, CSR_GSTAT_GID_SHIFT_END, CSR_GSTAT_GID_SHIFT
->> +       csrrd           t0, LOONGARCH_CSR_GTLBC
->> +       bstrins.w       t0, t1, CSR_GTLBC_TGID_SHIFT_END, CSR_GTLBC_TGID_SHIFT
->> +       csrwr           t0, LOONGARCH_CSR_GTLBC
->> +
->> +       /*
->> +        * Switch to guest:
->> +        *  GSTAT.PGM = 1, ERRCTL.ISERR = 0, TLBRPRMD.ISTLBR = 0
->> +        *  ertn
->> +        */
->> +
->> +       /*
->> +        * Enable intr in root mode with future ertn so that host interrupt
->> +        * can be responsed during VM runs
->> +        * guest crmd comes from separate gcsr_CRMD register
->> +        */
->> +       ori     t0, zero, CSR_PRMD_PIE
->> +       csrxchg t0, t0,   LOONGARCH_CSR_PRMD
->> +
->> +       /* Set PVM bit to setup ertn to guest context */
->> +       ori     t0, zero, CSR_GSTAT_PVM
->> +       csrxchg t0, t0,   LOONGARCH_CSR_GSTAT
->> +
->> +       /* Load Guest gprs */
->> +       ld.d    ra,     a2,     (KVM_ARCH_GGPR + 8 * REG_RA)
->> +       ld.d    tp,     a2,     (KVM_ARCH_GGPR + 8 * REG_TP)
->> +       ld.d    sp,     a2,     (KVM_ARCH_GGPR + 8 * REG_SP)
->> +       ld.d    a0,     a2,     (KVM_ARCH_GGPR + 8 * REG_A0)
->> +       ld.d    a1,     a2,     (KVM_ARCH_GGPR + 8 * REG_A1)
->> +       ld.d    a3,     a2,     (KVM_ARCH_GGPR + 8 * REG_A3)
->> +       ld.d    a4,     a2,     (KVM_ARCH_GGPR + 8 * REG_A4)
->> +       ld.d    a5,     a2,     (KVM_ARCH_GGPR + 8 * REG_A5)
->> +       ld.d    a6,     a2,     (KVM_ARCH_GGPR + 8 * REG_A6)
->> +       ld.d    a7,     a2,     (KVM_ARCH_GGPR + 8 * REG_A7)
->> +       ld.d    t0,     a2,     (KVM_ARCH_GGPR + 8 * REG_T0)
->> +       ld.d    t1,     a2,     (KVM_ARCH_GGPR + 8 * REG_T1)
->> +       ld.d    t2,     a2,     (KVM_ARCH_GGPR + 8 * REG_T2)
->> +       ld.d    t3,     a2,     (KVM_ARCH_GGPR + 8 * REG_T3)
->> +       ld.d    t4,     a2,     (KVM_ARCH_GGPR + 8 * REG_T4)
->> +       ld.d    t5,     a2,     (KVM_ARCH_GGPR + 8 * REG_T5)
->> +       ld.d    t6,     a2,     (KVM_ARCH_GGPR + 8 * REG_T6)
->> +       ld.d    t7,     a2,     (KVM_ARCH_GGPR + 8 * REG_T7)
->> +       ld.d    t8,     a2,     (KVM_ARCH_GGPR + 8 * REG_T8)
->> +       ld.d    u0,     a2,     (KVM_ARCH_GGPR + 8 * REG_U0)
->> +       ld.d    fp,     a2,     (KVM_ARCH_GGPR + 8 * REG_FP)
->> +       ld.d    s0,     a2,     (KVM_ARCH_GGPR + 8 * REG_S0)
->> +       ld.d    s1,     a2,     (KVM_ARCH_GGPR + 8 * REG_S1)
->> +       ld.d    s2,     a2,     (KVM_ARCH_GGPR + 8 * REG_S2)
->> +       ld.d    s3,     a2,     (KVM_ARCH_GGPR + 8 * REG_S3)
->> +       ld.d    s4,     a2,     (KVM_ARCH_GGPR + 8 * REG_S4)
->> +       ld.d    s5,     a2,     (KVM_ARCH_GGPR + 8 * REG_S5)
->> +       ld.d    s6,     a2,     (KVM_ARCH_GGPR + 8 * REG_S6)
->> +       ld.d    s7,     a2,     (KVM_ARCH_GGPR + 8 * REG_S7)
->> +       ld.d    s8,     a2,     (KVM_ARCH_GGPR + 8 * REG_S8)
->> +       /* Load KVM_ARCH register */
->> +       ld.d    a2,     a2,     (KVM_ARCH_GGPR + 8 * REG_A2)
->> +
->> +       ertn
->> +.endm
->> +
->> +       /*
->> +        * exception entry for general exception from guest mode
->> +        *  - IRQ is disabled
->> +        *  - kernel privilege in root mode
->> +        *  - page mode keep unchanged from previous prmd in root mode
->> +        *  - Fixme: tlb exception cannot happen since registers relative with TLB
->> +        *  -        is still in guest mode, such as pgd table/vmid registers etc,
->> +        *  -        will fix with hw page walk enabled in future
->> +        * load kvm_vcpu from reserved CSR KVM_VCPU_KS, and save a2 to KVM_TEMP_KS
->> +        */
->> +       .section        .text
->> +       .cfi_sections   .debug_frame
->> +SYM_CODE_START(kvm_vector_entry)
->> +       csrwr   a2,   KVM_TEMP_KS
->> +       csrrd   a2,   KVM_VCPU_KS
->> +       addi.d  a2,   a2, KVM_VCPU_ARCH
->> +
->> +       /* After save gprs, free to use any gpr */
->> +       st.d    ra,     a2,     (KVM_ARCH_GGPR + 8 * REG_RA)
->> +       st.d    tp,     a2,     (KVM_ARCH_GGPR + 8 * REG_TP)
->> +       st.d    sp,     a2,     (KVM_ARCH_GGPR + 8 * REG_SP)
->> +       st.d    a0,     a2,     (KVM_ARCH_GGPR + 8 * REG_A0)
->> +       st.d    a1,     a2,     (KVM_ARCH_GGPR + 8 * REG_A1)
->> +       st.d    a3,     a2,     (KVM_ARCH_GGPR + 8 * REG_A3)
->> +       st.d    a4,     a2,     (KVM_ARCH_GGPR + 8 * REG_A4)
->> +       st.d    a5,     a2,     (KVM_ARCH_GGPR + 8 * REG_A5)
->> +       st.d    a6,     a2,     (KVM_ARCH_GGPR + 8 * REG_A6)
->> +       st.d    a7,     a2,     (KVM_ARCH_GGPR + 8 * REG_A7)
->> +       st.d    t0,     a2,     (KVM_ARCH_GGPR + 8 * REG_T0)
->> +       st.d    t1,     a2,     (KVM_ARCH_GGPR + 8 * REG_T1)
->> +       st.d    t2,     a2,     (KVM_ARCH_GGPR + 8 * REG_T2)
->> +       st.d    t3,     a2,     (KVM_ARCH_GGPR + 8 * REG_T3)
->> +       st.d    t4,     a2,     (KVM_ARCH_GGPR + 8 * REG_T4)
->> +       st.d    t5,     a2,     (KVM_ARCH_GGPR + 8 * REG_T5)
->> +       st.d    t6,     a2,     (KVM_ARCH_GGPR + 8 * REG_T6)
->> +       st.d    t7,     a2,     (KVM_ARCH_GGPR + 8 * REG_T7)
->> +       st.d    t8,     a2,     (KVM_ARCH_GGPR + 8 * REG_T8)
->> +       st.d    u0,     a2,     (KVM_ARCH_GGPR + 8 * REG_U0)
->> +       st.d    fp,     a2,     (KVM_ARCH_GGPR + 8 * REG_FP)
->> +       st.d    s0,     a2,     (KVM_ARCH_GGPR + 8 * REG_S0)
->> +       st.d    s1,     a2,     (KVM_ARCH_GGPR + 8 * REG_S1)
->> +       st.d    s2,     a2,     (KVM_ARCH_GGPR + 8 * REG_S2)
->> +       st.d    s3,     a2,     (KVM_ARCH_GGPR + 8 * REG_S3)
->> +       st.d    s4,     a2,     (KVM_ARCH_GGPR + 8 * REG_S4)
->> +       st.d    s5,     a2,     (KVM_ARCH_GGPR + 8 * REG_S5)
->> +       st.d    s6,     a2,     (KVM_ARCH_GGPR + 8 * REG_S6)
->> +       st.d    s7,     a2,     (KVM_ARCH_GGPR + 8 * REG_S7)
->> +       st.d    s8,     a2,     (KVM_ARCH_GGPR + 8 * REG_S8)
->> +       /* Save guest a2 */
->> +       csrrd   t0,     KVM_TEMP_KS
->> +       st.d    t0,     a2,     (KVM_ARCH_GGPR + 8 * REG_A2)
->> +
->> +       /* a2: kvm_vcpu_arch, a1 is free to use */
->> +       csrrd   s1,   KVM_VCPU_KS
->> +       ld.d    s0,   s1, KVM_VCPU_RUN
->> +
->> +       csrrd   t0,   LOONGARCH_CSR_ESTAT
->> +       st.d    t0,   a2, KVM_ARCH_HESTAT
->> +       csrrd   t0,   LOONGARCH_CSR_ERA
->> +       st.d    t0,   a2, KVM_ARCH_GPC
->> +       csrrd   t0,   LOONGARCH_CSR_BADV
->> +       st.d    t0,   a2, KVM_ARCH_HBADV
->> +       csrrd   t0,   LOONGARCH_CSR_BADI
->> +       st.d    t0,   a2, KVM_ARCH_HBADI
->> +
->> +       /* Restore host excfg.VS */
->> +       csrrd   t0, LOONGARCH_CSR_ECFG
->> +       ld.d    t1, a2, KVM_ARCH_HECFG
->> +       or      t0, t0, t1
->> +       csrwr   t0, LOONGARCH_CSR_ECFG
->> +
->> +       /* Restore host eentry */
->> +       ld.d    t0, a2, KVM_ARCH_HEENTRY
->> +       csrwr   t0, LOONGARCH_CSR_EENTRY
->> +
->> +       /* restore host pgd table */
->> +       ld.d    t0, a2, KVM_ARCH_HPGD
->> +       csrwr   t0, LOONGARCH_CSR_PGDL
->> +
->> +       /*
->> +        * Disable PGM bit to enter root mode by default with next ertn
->> +        */
->> +       ori     t0, zero, CSR_GSTAT_PVM
->> +       csrxchg zero, t0, LOONGARCH_CSR_GSTAT
->> +       /*
->> +        * Clear GTLBC.TGID field
->> +        *       0: for root  tlb update in future tlb instr
->> +        *  others: for guest tlb update like gpa to hpa in future tlb instr
->> +        */
->> +       csrrd   t0, LOONGARCH_CSR_GTLBC
->> +       bstrins.w       t0, zero, CSR_GTLBC_TGID_SHIFT_END, CSR_GTLBC_TGID_SHIFT
->> +       csrwr   t0, LOONGARCH_CSR_GTLBC
->> +       ld.d    tp, a2, KVM_ARCH_HTP
->> +       ld.d    sp, a2, KVM_ARCH_HSP
->> +       /* restore per cpu register */
->> +       ld.d    u0, a2, KVM_ARCH_HPERCPU
->> +       addi.d  sp, sp, -PT_SIZE
->> +
->> +       /* Prepare handle exception */
->> +       or      a0, s0, zero
->> +       or      a1, s1, zero
->> +       ld.d    t8, a2, KVM_ARCH_HANDLE_EXIT
->> +       jirl    ra, t8, 0
->> +
->> +       or      a2, s1, zero
->> +       addi.d  a2, a2, KVM_VCPU_ARCH
->> +
->> +       /* resume host when ret <= 0 */
->> +       bge     zero, a0, ret_to_host
->> +
->> +       /*
->> +         * return to guest
->> +         * save per cpu register again, maybe switched to another cpu
->> +         */
->> +       st.d    u0, a2, KVM_ARCH_HPERCPU
->> +
->> +       /* Save kvm_vcpu to kscratch */
->> +       csrwr   s1, KVM_VCPU_KS
->> +       kvm_switch_to_guest
->> +
->> +ret_to_host:
->> +       ld.d    a2, a2, KVM_ARCH_HSP
->> +       addi.d  a2, a2, -PT_SIZE
->> +       kvm_restore_host_gpr    a2
->> +       jr      ra
->> +SYM_CODE_END(kvm_vector_entry)
->> +kvm_vector_entry_end:
->> +
->> +/*
->> + * int kvm_enter_guest(struct kvm_run *run, struct kvm_vcpu *vcpu)
->> + *
->> + * @register_param:
->> + *  a0: kvm_run* run
->> + *  a1: kvm_vcpu* vcpu
->> + */
->> +SYM_FUNC_START(kvm_enter_guest)
->> +       /* allocate space in stack bottom */
->> +       addi.d  a2, sp, -PT_SIZE
->> +       /* save host gprs */
->> +       kvm_save_host_gpr a2
->> +
->> +       /* save host crmd,prmd csr to stack */
->> +       csrrd   a3, LOONGARCH_CSR_CRMD
->> +       st.d    a3, a2, PT_CRMD
->> +       csrrd   a3, LOONGARCH_CSR_PRMD
->> +       st.d    a3, a2, PT_PRMD
->> +
->> +       addi.d  a2, a1, KVM_VCPU_ARCH
->> +       st.d    sp, a2, KVM_ARCH_HSP
->> +       st.d    tp, a2, KVM_ARCH_HTP
->> +       /* Save per cpu register */
->> +       st.d    u0, a2, KVM_ARCH_HPERCPU
->> +
->> +       /* Save kvm_vcpu to kscratch */
->> +       csrwr   a1, KVM_VCPU_KS
->> +       kvm_switch_to_guest
->> +SYM_FUNC_END(kvm_enter_guest)
->> +kvm_enter_guest_end:
->> +
->> +       .section ".rodata"
->> +SYM_DATA(kvm_vector_size,
->> +               .quad kvm_vector_entry_end - kvm_vector_entry)
-> Don't use two lines to define it.
->
->> +SYM_DATA(kvm_enter_guest_size,
->> +               .quad kvm_enter_guest_end - kvm_enter_guest)
-> The same.
->
-> Huacai
-I will make the macro in one line.
+that is only for estimation of copied data.
 
-Thanks
-Tianrui Zhao
->> +
->> +
->> +SYM_FUNC_START(kvm_save_fpu)
->> +       fpu_save_csr    a0 t1
->> +       fpu_save_double a0 t1
->> +       fpu_save_cc     a0 t1 t2
->> +       jr              ra
->> +SYM_FUNC_END(kvm_save_fpu)
->> +
->> +SYM_FUNC_START(kvm_restore_fpu)
->> +       fpu_restore_double a0 t1
->> +       fpu_restore_csr    a0 t1
->> +       fpu_restore_cc     a0 t1 t2
->> +       jr                 ra
->> +SYM_FUNC_END(kvm_restore_fpu)
->> --
->> 2.39.1
->>
->>
+IMHO the stop time when the VM is paused includes both the time of
+stopping the device and the time of migrating the VM state.
 
+For a software-emulated device the time of stopping the device is negligibl=
+e.
+
+But certainly for assigned device the worst-case hard-coded 5s timeout as
+done in this patch will kill whatever reasonable 'VM dead time' SLA (usuall=
+y
+in milliseconds) which CSPs try to meet purely based on the size of copied
+data.
+
+Wouldn't a user-specified stop-device timeout be required to at least allow
+breaking migration early according to the desired SLA?
+
+>=20
+> > > +	if (cur =3D=3D VFIO_DEVICE_STATE_RUNNING_P2P && next =3D=3D
+> > > VFIO_DEVICE_STATE_STOP)
+> > > +		return NULL;
+> >
+> > I'm not sure whether P2P is actually supported here. By definition
+> > P2P means the device is stopped but still responds to p2p request
+> > from other devices. If you look at mlx example it uses different
+> > cmds between RUNNING->RUNNING_P2P and RUNNING_P2P->STOP.
+> >
+> > But in your case seems you simply move what is required in STOP
+> > into P2P. Probably you can just remove the support of P2P like
+> > hisilicon does.
+>=20
+> We want new devices to get their architecture right, they need to
+> support P2P. Didn't we talk about this already and Brett was going to
+> fix it?
+>=20
+
+Looks it's not fixed since RUNNING_P2P->STOP is a nop in this patch.
