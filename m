@@ -2,153 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D25F7366F7
-	for <lists+kvm@lfdr.de>; Tue, 20 Jun 2023 11:06:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 601417368D2
+	for <lists+kvm@lfdr.de>; Tue, 20 Jun 2023 12:06:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232114AbjFTJGs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jun 2023 05:06:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60766 "EHLO
+        id S232071AbjFTKGq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jun 2023 06:06:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232107AbjFTJGp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jun 2023 05:06:45 -0400
-Received: from out-21.mta0.migadu.com (out-21.mta0.migadu.com [91.218.175.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD29C10FF
-        for <kvm@vger.kernel.org>; Tue, 20 Jun 2023 02:06:43 -0700 (PDT)
-Date:   Tue, 20 Jun 2023 11:06:40 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1687252001;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/ZhslkC1rQ0aLtForUm8Fg+bP1zBb90Ucb1xGcqnuYk=;
-        b=nbjuc1pix0rXF0fhLAOajGau+7FlP/WVv7MncllKd+TWFOpp26KunhpbEsFUoh483/OOSm
-        y1ZhpvS2cLWFuUEtSf0JOJG/h9PcqrDjYinnO8qDc4JCK13BQWue7HEKfIyWmV2lrNu+Sm
-        x9vZTtEaIO9VAXlwe8ZwJtv4QYka0Sk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-s390@vger.kernel.org,
-        lvivier@redhat.com, thuth@redhat.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com, pbonzini@redhat.com,
-        nrb@linux.ibm.com, shan.gavin@gmail.com
-Subject: Re: [kvm-unit-tests PATCH v3] runtime: Allow to specify properties
- for accelerator
-Message-ID: <20230620-f496c5f56a78acc5529762a4@orel>
-References: <20230615062148.19883-1-gshan@redhat.com>
- <20230619-339675e424da033000049f83@orel>
- <766a1dc4-a5ad-725a-b25e-438bf1387a4f@redhat.com>
+        with ESMTP id S231575AbjFTKGS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jun 2023 06:06:18 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA257DB;
+        Tue, 20 Jun 2023 03:06:15 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b4725e9917so35299241fa.2;
+        Tue, 20 Jun 2023 03:06:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687255571; x=1689847571;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wtXc4PCbTDlAHZAVqhvtwaRICGJ6lazGNb1ljaV+Ftw=;
+        b=ldW/ylsuWZH3AXZueyYlRT0nh9Gl/MhIKISAju1Ir5dsyEDOYv8I/dKPmBee/odzkK
+         SDbVl0f1M1Z+H7UtPcorlVsRZ1YEUg+5forY69CwXp/YyhIvg9aUPWStKrGV2gmYsZNf
+         NowMzGu9Th8C8x1f9CVWdoHwEa07JlDa8276RyVLTkeEuOuDgoqnuPXbaJN0RQp9CxTN
+         scEmXUBZ0g6uTFZ/EWqPVXJUnHpeqXlZJ82NBJRiFQfJgWE85T8UqdlMfqHEootOMNc4
+         iiLGC6mmOBawCmItBjo8MjcoUJOAgAXU+CIrdSEtjUQzRSJ6ljr4Z5qpcnpXOjSwCxRp
+         vlGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687255571; x=1689847571;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wtXc4PCbTDlAHZAVqhvtwaRICGJ6lazGNb1ljaV+Ftw=;
+        b=l8megoFlgHrfD+dmkWmrP0X4XgeljU/oDZAACQUnD1hWQFVAwLhcMjSmKxWwYW0tat
+         RfWzpopmsThIXT7rPGviDkVcFqUxyJbKkcC19beWPrJa4A3czVanWXMFMopdMTJlRy2c
+         JcyZ5fOKU1rUCd7l110iXKcKLWsskjlBYwEYauzN4cY9Jo0ifuQDUkb2o6Qx2iTMnRQy
+         YVtsjr6Z00Skky5HJOSboVKSamTwimkQmtpiDxxxsvaa55685c7uYYySuYQmq5ji14tR
+         NpxrE5Zc4iRUxbOeL46R/gFcEIML9JCKUkpYlN7jWmcqy6+QOEcXFHLnCQ7S8njNxTML
+         8/ng==
+X-Gm-Message-State: AC+VfDzx3bD56ERWNFI6k3dnH1ORgUu/guA4qfk0a8PZimBSqE75E6L/
+        MIS14a3Itq7QjkwL7f3ze3NmCNsZWVTx2vSuAbc=
+X-Google-Smtp-Source: ACHHUZ7b29WcQEpJBxPgynKh2dxcEjQKO63R0QvBncBcn4CVZjBKqj6DvExU9PFON2qlRV1iXePc6q0qi5nDf7A9U3Q=
+X-Received: by 2002:a2e:9b06:0:b0:2b1:dc7a:ebf2 with SMTP id
+ u6-20020a2e9b06000000b002b1dc7aebf2mr7647520lji.17.1687255570896; Tue, 20 Jun
+ 2023 03:06:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <766a1dc4-a5ad-725a-b25e-438bf1387a4f@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+References: <cover.1686275310.git.haibo1.xu@intel.com> <8cd4ce50f5f4a639f4508085959aae222d4d4386.1686275310.git.haibo1.xu@intel.com>
+ <20230609-fba04b424a4d46574e04e587@orel>
+In-Reply-To: <20230609-fba04b424a4d46574e04e587@orel>
+From:   Haibo Xu <xiaobo55x@gmail.com>
+Date:   Tue, 20 Jun 2023 18:05:59 +0800
+Message-ID: <CAJve8okjRZEt6_6SB9EWm+6c7utpExzenfWo2T1N-J6G9w9czQ@mail.gmail.com>
+Subject: Re: [PATCH v3 10/10] KVM: riscv: selftests: Add get-reg-list test
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org,
+        oliver.upton@linux.dev, seanjc@google.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Shuah Khan <shuah@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ben Gardon <bgardon@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 02:13:22PM +1000, Gavin Shan wrote:
-> Hi Drew,
-> 
-> On 6/19/23 18:45, Andrew Jones wrote:
-> > On Thu, Jun 15, 2023 at 04:21:48PM +1000, Gavin Shan wrote:
-> > > There are extra properties for accelerators to enable the specific
-> > > features. For example, the dirty ring for KVM accelerator can be
-> > > enabled by "-accel kvm,dirty-ring-size=65536". Unfortuntely, the
-> > > extra properties for the accelerators aren't supported. It makes
-> > > it's impossible to test the combination of KVM and dirty ring
-> > > as the following error message indicates.
-> > > 
-> > >    # cd /home/gavin/sandbox/kvm-unit-tests/tests
-> > >    # QEMU=/home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
-> > >      ACCEL=kvm,dirty-ring-size=65536 ./its-migration
-> > >       :
-> > >    BUILD_HEAD=2fffb37e
-> > >    timeout -k 1s --foreground 90s /home/gavin/sandbox/qemu.main/build/qemu-system-aarch64 \
-> > >    -nodefaults -machine virt -accel kvm,dirty-ring-size=65536 -cpu cortex-a57             \
-> > >    -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd   \
-> > >    -device pci-testdev -display none -serial stdio -kernel _NO_FILE_4Uhere_ -smp 160      \
-> > >    -machine gic-version=3 -append its-pending-migration # -initrd /tmp/tmp.gfDLa1EtWk
-> > >    qemu-system-aarch64: kvm_init_vcpu: kvm_arch_init_vcpu failed (0): Invalid argument
-> > > 
-> > > Allow to specify extra properties for accelerators. With this, the
-> > > "its-migration" can be tested for the combination of KVM and dirty
-> > > ring.
-> > > 
-> > > Signed-off-by: Gavin Shan <gshan@redhat.com>
-> > > ---
-> > > v3: Split $ACCEL to $ACCEL and $ACCEL_PROPS in get_qemu_accelerator()
-> > >      and don't print them as output, suggested by Drew.
-> > > ---
-> > >   arm/run               | 12 ++++--------
-> > >   powerpc/run           |  5 ++---
-> > >   s390x/run             |  5 ++---
-> > >   scripts/arch-run.bash | 21 +++++++++++++--------
-> > >   x86/run               |  5 ++---
-> > >   5 files changed, 23 insertions(+), 25 deletions(-)
-> > > 
-> > > diff --git a/arm/run b/arm/run
-> > > index c6f25b8..d9ebe59 100755
-> > > --- a/arm/run
-> > > +++ b/arm/run
-> > > @@ -10,10 +10,8 @@ if [ -z "$KUT_STANDALONE" ]; then
-> > >   fi
-> > >   processor="$PROCESSOR"
-> > > -accel=$(get_qemu_accelerator) ||
-> > > -	exit $?
-> > > -
-> > > -if [ "$accel" = "kvm" ]; then
-> > > +get_qemu_accelerator || exit $?
-> > > +if [ "$ACCEL" = "kvm" ]; then
-> > >   	QEMU_ARCH=$HOST
-> > >   fi
-> > > @@ -23,11 +21,9 @@ qemu=$(search_qemu_binary) ||
-> > >   if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
-> > >      [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
-> > >      [ "$(basename $QEMU)" = "qemu-system-arm" ]; then
-> > > -	accel=tcg
-> > > +	ACCEL="tcg"
-> > >   fi
-> > 
-> > As I pointed out in the v2 review we can't just s/accel/ACCEL/ without
-> > other changes. Now ACCEL will also be set when the above condition
-> > is checked, making it useless. Please ensure the test case that commit
-> > c7d6c7f00e7c ("arm/run: Use TCG with qemu-system-arm on arm64 systems")
-> > fixed still works with your patch.
-> > 
-> 
-> Sorry that I missed your comments for v2. In order to make the test case
-> in c7d6c7f00e7c working, we just need to call set_qemu_accelerator() after
-> the chunk of code, like below. When $ACCEL is set to "tcg" by the conditional
-> code, it won't be changed in the following set_qemu_accelerator().
-> 
-> Could you Please confirm if it looks good to you so that I can integrate
-> the changes to v4 and post it.
-> 
-> arm/run
-> --------
-> 
-> processor="$PROCESSOR"
-> 
-> if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
->    [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
->    [ "$(basename $QEMU)" = "qemu-system-arm" ]; then
->         ACCEL="tcg"
-> fi
-> 
-> set_qemu_accelerator || exit $?
-> if [ "$ACCEL" = "kvm" ]; then
->         QEMU_ARCH=$HOST
-> fi
+On Fri, Jun 9, 2023 at 9:35=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
+m> wrote:
+>
+> On Fri, Jun 09, 2023 at 10:12:18AM +0800, Haibo Xu wrote:
+> > +static struct vcpu_reg_list aia_config =3D {
+> > +     .sublists =3D {
+> > +     BASE_SUBLIST,
+> > +     AIA_REGS_SUBLIST,
+> > +     {0},
+> > +     },
+> > +};
+> > +
+> > +static struct vcpu_reg_list fp_f_d_config =3D {
+> > +     .sublists =3D {
+> > +     BASE_SUBLIST,
+> > +     FP_F_REGS_SUBLIST,
+> > +     FP_D_REGS_SUBLIST,
+> > +     {0},
+> > +     },
+> > +};
+> > +
+> > +struct vcpu_reg_list *vcpu_configs[] =3D {
+> > +     &zicbo_config,
+> > +     &aia_config,
+> > +     &fp_f_d_config,
+> > +};
+> > +int vcpu_configs_n =3D ARRAY_SIZE(vcpu_configs);
+> > --
+> > 2.34.1
+> >
+>
+> I see we have a bit of a problem with the configs for riscv. Since we
+> don't disable anything we're not testing, then for any test that is
+> missing, for example, the f and d registers, we'll get output like
+> "There are 66 new registers. Consider adding them to the blessed reg
+> list with the following lines:" and then a dump of all the f and d
+> registers. The test doesn't fail, but it's messy and confusing. Ideally
+> we'd disable all registers of all sublists not in the config, probably
+> by starting by disabling everything and then only reenabling the ones
+> in the config.
+>
+> Anything that can't be disabled is either a KVM bug, i.e. we should
+> be able to disable it, because we can't expect every host to have it,
+> or it needs to be in the base register sublist (meaning every host
+> will always have it).
 >
 
-Looks fine, but please give it a test run.
+HI Andrew,
+
+I found several multi-letters ISA EXT(AIA/SSTC etc) were not allowed
+to be disabled.
+Is it a bug? shall we fix it=EF=BC=9F
 
 Thanks,
-drew
+Haibo
+
+static bool kvm_riscv_vcpu_isa_disable_allowed(unsigned long ext)
+ {
+     switch (ext) {
+     case KVM_RISCV_ISA_EXT_A:
+     case KVM_RISCV_ISA_EXT_C:
+     case KVM_RISCV_ISA_EXT_I:
+     case KVM_RISCV_ISA_EXT_M:
+     case KVM_RISCV_ISA_EXT_SSAIA:
+     case KVM_RISCV_ISA_EXT_SSTC:
+     case KVM_RISCV_ISA_EXT_SVINVAL:
+     case KVM_RISCV_ISA_EXT_ZIHINTPAUSE:
+     case KVM_RISCV_ISA_EXT_ZBB:
+         return false;
+     default:
+         break;
+     }
+
+     return true;
+ }
+
+> Thanks,
+> drew
