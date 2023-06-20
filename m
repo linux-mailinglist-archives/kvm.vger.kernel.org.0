@@ -2,115 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD7F8736ACD
-	for <lists+kvm@lfdr.de>; Tue, 20 Jun 2023 13:19:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4122A736B9C
+	for <lists+kvm@lfdr.de>; Tue, 20 Jun 2023 14:10:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232666AbjFTLT0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jun 2023 07:19:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51994 "EHLO
+        id S232115AbjFTMKN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jun 2023 08:10:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232656AbjFTLTY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jun 2023 07:19:24 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2046.outbound.protection.outlook.com [40.107.223.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB828173B;
-        Tue, 20 Jun 2023 04:19:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YbVeCgEo27qhGnEVxS9BY+D8R24pRcl6fg4X1T93P/pBbZv2wMiZFI3huqe2Qe+JOryn3d4F6565RGTNwXAz+UECo1QAoT0SRyuuAKbxXUOGOfuCv3dBfprBe2HtzApxtLKIcyzsboOeHa8+QBOYqViN4YeNIrzIsoWceFrFYr1YRleeL2m/KA9z+gcWXejZXW3Yc1fZvkhNwponmbfyD5e2pQyjMqhWNNLb1E6lNQVFQUPWgqanOHnwPBFhtcI4vE9tnR4KvOHZfVWultHGiDcl9FOmWi6SO2novTG92ZH/GZoc7gtmkssClxDAIpd0O891G6JYWP4+KKJ9c996+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xLekbJqg8vsPFgYGze+HqRvkFOmwXOtKLZ9MaaG0JOA=;
- b=QZwfK+4XVrTOgBEE8SuBCJUaYb+GJkVcoGDxA4s+IOVB3NydjgMEnqky4Yk1bpPeVxuuuh8gOrfg22RDu63y9Tnr+k8vL+DxeILBmLnDDOJo3WB4hwYgbz0PwDhTMn8T4YTw7OIsxs/+J+u+TgqOWy4oSC5RWQJqijiT9eNq6hBORNdiEbXTWZW/XPcjNujFEVF3lDjxBMUqL5DQ1BRSq1u3JSDoR2E8FkPsv/1kxrJRCEERdsaiGGta6u2VdFDPEg7MSpL0p4j38nv+0XA0Pj2VvFdNLPn1WR16kSnU9XoqwDlMFFTjjVZvAULuROqPeICT/h9gnqHZzNRFO/3Fhw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xLekbJqg8vsPFgYGze+HqRvkFOmwXOtKLZ9MaaG0JOA=;
- b=cMpmYuXrxidUaeWImkPN+T0DxNBhN/TGHV4mZazIPXuVMIAO2h/0FmpG7nfzV7Lj4AhD0Va67ARIkVmZCL/gyTsLm2tv2rQuL4Z0n3U9sVsmLznKXvES12DYXtm1K3OsKQ8xJ4IztRiksGq/zsWMRvjs/qfStk7u+MB4yl1G7bFiV5+DtqMTOgsR/pBN0WgEsRCJ/iPDDeTYa/vY8uKd8/poe74s9dLQP1gosFM1xtzGLTy9W/xKBeYCrfx8kXlMfMEchuDPCGUovPlOKmHfoaBdezsIOAWMuMVs3rHjyAXq9P0yFM9gkPlnFVBj5ylducoFQeCauT5/7MnhaVxk2g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB3176.namprd12.prod.outlook.com (2603:10b6:a03:134::26)
- by IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.37; Tue, 20 Jun
- 2023 11:19:10 +0000
-Received: from BYAPR12MB3176.namprd12.prod.outlook.com
- ([fe80::4854:668:e67e:b61d]) by BYAPR12MB3176.namprd12.prod.outlook.com
- ([fe80::4854:668:e67e:b61d%3]) with mapi id 15.20.6500.036; Tue, 20 Jun 2023
- 11:19:04 +0000
-From:   Alistair Popple <apopple@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
-Cc:     Robin Murphy <robin.murphy@arm.com>, will@kernel.org,
-        catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
-        nicolinc@nvidia.com, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>,
-        zhi.wang.linux@gmail.com, Sean Christopherson <seanjc@google.com>,
-        Alistair Popple <apopple@nvidia.com>
-Subject: [RFC PATCH 2/2] arm64: Notify on pte permission upgrades
-Date:   Tue, 20 Jun 2023 21:18:26 +1000
-Message-Id: <9b5ac4150137c0c91646ff94ee2080b5a98aa50a.1687259597.git-series.apopple@nvidia.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <cover.063f3dc2100ae7cbe3a6527689589646ea787216.1687259597.git-series.apopple@nvidia.com>
-References: <cover.063f3dc2100ae7cbe3a6527689589646ea787216.1687259597.git-series.apopple@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SY4P282CA0017.AUSP282.PROD.OUTLOOK.COM
- (2603:10c6:10:a0::27) To BYAPR12MB3176.namprd12.prod.outlook.com
- (2603:10b6:a03:134::26)
+        with ESMTP id S231723AbjFTMKM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jun 2023 08:10:12 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D62B7C6;
+        Tue, 20 Jun 2023 05:10:10 -0700 (PDT)
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 52D6D1EC0589;
+        Tue, 20 Jun 2023 14:10:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1687263009;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Ql+U7fdRXmA/T5FzVBClcEAj8T+8ofxD8UdRBhS4onc=;
+        b=WjEsimMgK0SDv+cwlHliRtOENHTrsh91vMlUj76a3SY0Rc6H+E1QML4j0hkmoDQidVH8Jo
+        iXeveYuyVhZCavOAbekzryJbODT1+1WzsAlpLWeLbvTXnmWdxcNWhwVhZgfkinI/0jEWz6
+        GPtY+3bfzVSiL0QsI9sT/GtaoNxGfp0=
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+        header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 18CQLNStf_-r; Tue, 20 Jun 2023 12:10:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+        t=1687263006; bh=Ql+U7fdRXmA/T5FzVBClcEAj8T+8ofxD8UdRBhS4onc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hfOUBxtBtBjPXF39oOF3ZUvN61XjQe3LmVhjKtWxJsHC/101LS7/ZwEAyCLXrtDos
+         6rV65BENcyyyWRLr06AnSLHuPXyYBP8k8Xku12SM1wyuoQ3Kt7xKdjkycFp66hKDeI
+         tFuA9sZRcDfWPUaFLFmL9M3d8fJU46JD2A9HhsxeXeaEyPL1MYk7jgUgshZnl0oZAw
+         OgRuwWp1I1HEPoirhwvgfY/c1X5by8s5P5gOw3pP8I8emQDdyYknlRJuLQgo31u10O
+         Jk+ojyM8mG0G6b2kJ5L0JpD5WSMAWgQ0sytpzO/R9X8XJt4S4PLWWkg6QpaXqhaO6+
+         X+XI3G+Wq8YDfZEGURuoru8FEWkLjNEwD6KAFabpurzjQPQbNuZOAMar3QqiqdycQ4
+         uDOihd2sUnMyBYqaLil+kQxq+50zc+tis817YK1HglsVOg/HvJeyupBjjO2cT+gHMM
+         dOR61duo+TRp5kxEpjcmIJQXulRbaURS/xFMoH7MoED/2Ky/h5xU7sUczEOG44CZFz
+         1bjOrgBSvWNgYLNzPwUoG+11pqfR/yFvht+38G03bd5wsnae6D/9ccuMfHQ64U5wZ4
+         tsmJXHXJbtLyApTEr6gMiQS/0RNFXcGdJzXW8hqDoM72Z/gUH4o1a2wvYS9PjVWPxB
+         DtXgq+0bY4yEUrlbXMaWY9ug=
+Received: from zn.tnic (p200300eA971dC592329C23ffFEa6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971d:c592:329c:23ff:fea6:a903])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+        (No client certificate requested)
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1E74440E01DE;
+        Tue, 20 Jun 2023 12:09:26 +0000 (UTC)
+Date:   Tue, 20 Jun 2023 14:09:20 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH RFC v9 05/51] x86/coco: move CONFIG_HAS_CC_PLATFORM check
+ down into coco/Makefile
+Message-ID: <20230620120920.GAZJGW8B6XHrsoLGCJ@fat_crate.local>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-6-michael.roth@amd.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3176:EE_|IA1PR12MB9031:EE_
-X-MS-Office365-Filtering-Correlation-Id: 80327d3d-1c4d-495c-fd24-08db718027e3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: u9ua1lrJFTLZCBPaZfDc7KptIpcnxm+RQkxGPZVkjHSWgtjUS13obZ3aWd86uXl1BZiir+GVYpYm0tBqSYngVoMd49qiae09PP/1vOPjVrywhdsHT4DMpTfGfTAJIB1eiWWtdP8mY7wfmGIy278D+XSykkcDBSerwVZO4klPZeQklYVx0B2yAy8hGjjqAifYjTXu2SbOo8YfGUh9Z61/ArnTpPE/BF19Ov1OknNwf+UpSn2hZXCgCU/GeCJ6FUWPJkaJra8KeQI0dh2haSGPu9Lh8r/4EbjQO9qYSHOd7vbu2DVkFArgVD6b52nJyx2ppzvRlbtb0s+RXUlOZGtELeGma2JzTkNJcheY2iirWR7QTTGoXCKhIfRjmTjtDT53tMHLoXUp8yr1hNHeFGuXJsKAlqPnkreqsLqdvTXbscz95+Cc4wYO2UdJBDr2rJQcl22veqlcm/uUUmlFdApQYIz1jdR/8iZ+cA1VYnpTNvpcFl1s3yCUlPYFlvHqo4Bw5PHe/zOjAgLY9y/UMbp+aj+eFTBTkdy18KseOpKNwzk=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB3176.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(39860400002)(396003)(366004)(346002)(451199021)(8676002)(8936002)(66946007)(186003)(66556008)(66476007)(5660300002)(54906003)(4326008)(26005)(6666004)(6486002)(316002)(478600001)(41300700001)(36756003)(6506007)(6512007)(38100700002)(107886003)(7416002)(86362001)(2906002)(83380400001)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4uVgNtCIVFsxiZqNjlazJHsr6p/IcEPuFWo9wBKO48CY4HDW1DZ5HeQ/NduN?=
- =?us-ascii?Q?BAaC/xoEOMDIlVpK8oQKEwIOgC/PUg5JrkgfAyvkSeBnYBnWHiZGS/S3gEGi?=
- =?us-ascii?Q?qzSct6FUOMtw5v3cvdHC7xRlvKz+DlTvnP8tO39gJpN9WejZvxBIFkQn4gAS?=
- =?us-ascii?Q?ePdsCF04bOIuOb9UGzl+nEf857//v1ZC63GyFaj9xU0pSoiynHdc6k2P1Izn?=
- =?us-ascii?Q?rvSn10dwPOIi+eeI+GBcIHrulupTAndELr+rMJMPCmdGPxqZdQJ7+sPmqQNC?=
- =?us-ascii?Q?hXdkZDj3OIO90NeuVbs6ZZXyPdjIA0lQPr3SmBiOSdHme2y1TxUB022aT44z?=
- =?us-ascii?Q?PGHqCXnrZbRrUE5gVr/0nvtc3pWe5TVGcygMIxuiEZxSPXdRI/rPyvqSbSjs?=
- =?us-ascii?Q?f9Q4NVR4jgSweT95aGn2tgxqsvc8s0c3oNdBe5mAA9Ht/isn+BwS9xmsrhZr?=
- =?us-ascii?Q?YNNX9uK8QbvZQ619G6InWbftz52KPtdIOCZDlCRsnXGV1R0BDoAJPKgxTn6Z?=
- =?us-ascii?Q?kLibWJzHj8wQkKjFXz0VVQv0nEcyk7c3YzkrVtvd5kri7ynrt2dSPxi4XTly?=
- =?us-ascii?Q?SgAQVvDacrtA/pR+1SlluRJDh4pmCzhql8aJrGW7fJmK1FVYlxvEZFGGHYSA?=
- =?us-ascii?Q?bOr7OekCAlzaQtIh8/bmd2qLdce80LnxfvLmxdeNlFZzk6nHntzCxdmvRACk?=
- =?us-ascii?Q?deFBlXOiGtv4buFIpVZYUNH6rKPMeUD/u0wWGkuGYvNKlMrd8oRR4D7e83eC?=
- =?us-ascii?Q?0EqrdlxbjPWF6pYiTx5+Zmn6BDcRY3LUxi4/5q3ZIiF77WU9ZgCMRF/naMbV?=
- =?us-ascii?Q?XukSesfpSBgqb6JLNLA6e4RMlGinv8ShwszAIfMtzG88wdnSItXJ0NZJLKRl?=
- =?us-ascii?Q?FiwRjhfUfb5TdauUV/f9i2Do6dyiBoOsuWis/ud0sbPCny8LkU3w3fMz2RLx?=
- =?us-ascii?Q?IRCsVKnrAtzWVFt66PBSIwTYYckuVPH6V0oP7ukqfLmKN8tUmFi86eaeGFXn?=
- =?us-ascii?Q?fwp6y1aB9+XP27em/oR05qyGzp4V1MfAZjCZXIjfod2S65i+Z0mv3KWp4TSU?=
- =?us-ascii?Q?93UIpb9hSSNB3wtOF0qFj43Q+CnI973fY0NT4B+gpE7zQ5a018lRgl1mLNXh?=
- =?us-ascii?Q?3A0wbjQGwikz/WP8H5GdLIxfSpZiWwH/4Ugh5ZF5UVe/R/jjLi8O0i2ttM6z?=
- =?us-ascii?Q?iVRiwfal0cXLpJVNUDXVXpnONL5S5OusYx3Tay1VAJfMKC4r+cXTCN1uTaRy?=
- =?us-ascii?Q?dMY4qyZ3CGQL+dt+CdKxNmD7MXfDxgWbHhcArmLpj0Cu1+OSKxdvPegK42oV?=
- =?us-ascii?Q?Ngd7jwHVa2qy7U8k6r5GT1V6xa/I0pgn0FBxyhS29YPmc4Csh3pUbPv0Of4O?=
- =?us-ascii?Q?l9L47i837l9QrAqYQ80rO0+ovHH64VLdtwGtUs8UElplGNrwUYveRhcK2LiY?=
- =?us-ascii?Q?HiCDBgBuCmyCTkJd9bUTe5ks/dM/lHM/olCM69bI0mu4OSaD+TaAJZrufEog?=
- =?us-ascii?Q?74v0Z/FTid0XZcrUuzPCLMS/bRWG0TeUx6ZlpNshSJVmmLge6LnM9KDYHRCV?=
- =?us-ascii?Q?gS9b9lXKzVBAqLDQz6QlKszhbV7EBRTOAWHaE6mT?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80327d3d-1c4d-495c-fd24-08db718027e3
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB3176.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2023 11:19:04.4010
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vKq9PjOINo6Hph8jJQPmCzucd6BvW+TTezX26F34mOk1xFb//EVE+0TcFYHTEhPC4x9cR9RV3WDeYvu+wn5K3g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB9031
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230612042559.375660-6-michael.roth@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -118,84 +92,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ARM64 requires TLB invalidates when upgrading pte permission from
-read-only to read-write. However mmu_notifiers assume upgrades do not
-need notifications and none are sent. This causes problems when a
-secondary TLB such as implemented by an ARM SMMU doesn't support
-broadcast TLB maintenance (BTM) and caches a read-only PTE.
+On Sun, Jun 11, 2023 at 11:25:13PM -0500, Michael Roth wrote:
+> Currently CONFIG_HAS_CC_PLATFORM is a prereq for building anything in
+					^^^^^^
 
-As no notification is sent and the SMMU does not snoop TLB invalidates
-it will continue to return read-only entries to a device even though
-the CPU page table contains a writable entry. This leads to a
-continually faulting device and no way of handling the fault.
+Use proper english words pls.
 
-The ARM SMMU driver already registers for mmu notifier events to keep
-any secondary TLB synchronised. Therefore sending a notifier on
-permission upgrade fixes the problem.
+> arch/x86/coco, but that is generally only applicable for guest support.
+> 
+> For SEV-SNP, helpers related purely to host support will also live in
+> arch/x86/coco. To allow for CoCo-related host support code in
+> arch/x86/coco, move that check down into the Makefile and check for it
+> specifically when needed.
 
-Rather than adding notifier calls to generic architecture independent
-code where it may cause performance regressions on architectures that
-don't require it add it to the architecture specific
-ptep_set_access_flags() where the CPU TLB is invalidated.
+I have no clue what that means. Example?
 
-Signed-off-by: Alistair Popple <apopple@nvidia.com>
----
- arch/arm64/mm/fault.c       |  7 ++++++-
- arch/arm64/mm/hugetlbpage.c |  9 +++++++++
- 2 files changed, 15 insertions(+), 1 deletion(-)
+The last time we talked about paths, we ended up agreeing on:
 
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index c601007..c28f257 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -25,6 +25,7 @@
- #include <linux/perf_event.h>
- #include <linux/preempt.h>
- #include <linux/hugetlb.h>
-+#include <linux/mmu_notifier.h>
- 
- #include <asm/acpi.h>
- #include <asm/bug.h>
-@@ -239,8 +240,12 @@ int ptep_set_access_flags(struct vm_area_struct *vma,
- 	} while (pteval != old_pteval);
- 
- 	/* Invalidate a stale read-only entry */
--	if (dirty)
-+	if (dirty) {
- 		flush_tlb_page(vma, address);
-+		mmu_notifier_invalidate_secondary_tlbs(vma->vm_mm,
-+					address & PAGE_MASK,
-+					(address & PAGE_MASK) + PAGE_SIZE);
-+	}
- 	return 1;
- }
- 
-diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
-index 21716c9..b689406 100644
---- a/arch/arm64/mm/hugetlbpage.c
-+++ b/arch/arm64/mm/hugetlbpage.c
-@@ -14,6 +14,7 @@
- #include <linux/pagemap.h>
- #include <linux/err.h>
- #include <linux/sysctl.h>
-+#include <linux/mmu_notifier.h>
- #include <asm/mman.h>
- #include <asm/tlb.h>
- #include <asm/tlbflush.h>
-@@ -480,6 +481,14 @@ int huge_ptep_set_access_flags(struct vm_area_struct *vma,
- 
- 	orig_pte = get_clear_contig_flush(mm, addr, ptep, pgsize, ncontig);
- 
-+	/*
-+	 * Make sure any cached read-only entries are removed from
-+	 * secondary TLBs.
-+	 */
-+	if (dirty)
-+		mmu_notifier_invalidate_secondary_tlbs(mm, addr,
-+						addr + (pgsize + ncontig));
-+
- 	/* Make sure we don't lose the dirty or young state */
- 	if (pte_dirty(orig_pte))
- 		pte = pte_mkdirty(pte);
+https://lore.kernel.org/all/Yg5nh1RknPRwIrb8@zn.tnic/
+
+So your "helpers related purely to host support" should go to
+
+arch/x86/virt/svm/sev*.c
+
+And just to keep it simple, that should be
+
+arch/x86/virt/svm/sev.c
+
+and if there's real need to split that, we can do that later.
+
+Thx.
+
 -- 
-git-series 0.9.1
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
