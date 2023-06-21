@@ -2,92 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36414738A59
-	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 18:01:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48E12738CD8
+	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 19:14:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233861AbjFUQBR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jun 2023 12:01:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33478 "EHLO
+        id S230453AbjFUROE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jun 2023 13:14:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233175AbjFUQBG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jun 2023 12:01:06 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A31D1718;
-        Wed, 21 Jun 2023 09:00:43 -0700 (PDT)
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 50DBA1EC0102;
-        Wed, 21 Jun 2023 18:00:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1687363232;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=Lkm1ovXF8w/3l1dQM0aqJCHQ40tS7jLprFLy/F9Ithw=;
-        b=Lv/JZdMzLJ1V/ja2qHoklv+xVmPUhC8fHl072kZMlMYUsq3+WHX3IUW39+KyB0t/lEw0qo
-        yqfLsMoXQiRo+HWEdgnUJ3Pl+2fgdjnYUCqaCSlI+WLK7F2BDjwp2JpGDREMwtSfbVfiUa
-        8E0ZABH+UD/wNOLXtZBnwgKVZtwnLGc=
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-        header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id c0Czf9ibAY93; Wed, 21 Jun 2023 16:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-        t=1687363227; bh=Lkm1ovXF8w/3l1dQM0aqJCHQ40tS7jLprFLy/F9Ithw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Dl+W+sUM4kesP9b6SzA+PpNwR05jkz42fZ+9E5uuznFcOUWKSEQ0dEqEq5BmRH0Mj
-         DJnzqmDQz4WQLjr5CbeV6gd9GDImmM0arCnGcOg6d6yLSo2KV3hzkYOeBVL/vuRnzV
-         j4sTA0/ymefYw+vms8mVJPf2jNH0zQL16wjEHaeVfAgKKPgadUd2w5GQXb2V1g6QRy
-         FOyY/4D0XXiM/UuG1KLYthVwx6ARpb/e/EKMzqFRKgsQw2zGPGGPLVkr/kgCqf79WN
-         1zvL2iZMvsIz3iceTKAD2jT8SUlgJ8tUBUwJsierdlrpkurUBS8LAy11xq9KwfxAKF
-         R5xQBVMcxygfMuPxx3r0s9FNB5vLMLlOY9uRBhxBU+Ie3dJZ0VoZBS/lq0qpBxF+l+
-         nY8UbSYcObQYoK/IxU6V4ELbJ5njZ+AHxdN9ao7qx9MtE+OSbu8+4PcWXmtte9+JvI
-         oyhXrFvpXDwoWnQpRttnENERDmZhWfz9XBVcEmKo4j/V8gNFWX2J93R0Yksojs0u9a
-         v4zHE95wsyF666l2fIGQqawT449BMG8eyaZagWA0V4Nanc/SkXz6BakXQHiyvwC/Az
-         b+2yK5E+sQ35wEtstMK47iRTNyP89w8xgn6ikSiEpk/YgbQeV5cugXbTQLkYGluFAO
-         x/Imc81hftUs+JTjh2qoQ0TE=
-Received: from zn.tnic (p200300ea971dc565329C23FFfeA6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971d:c565:329c:23ff:fea6:a903])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-        (No client certificate requested)
-        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1D60E40E019B;
-        Wed, 21 Jun 2023 15:59:46 +0000 (UTC)
-Date:   Wed, 21 Jun 2023 17:59:38 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Dave Hansen <dave.hansen@intel.com>,
-        Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v9 07/51] x86/sev: Add the host SEV-SNP
- initialization support
-Message-ID: <20230621155912.GKZJMeUHzKCFchhE5v@fat_crate.local>
-References: <20230612042559.375660-1-michael.roth@amd.com>
- <20230612042559.375660-8-michael.roth@amd.com>
- <12f95b38-427c-6810-373a-ba2062c43882@intel.com>
- <20230621091541.GEZJK/veTnfhOnX8ci@fat_crate.local>
- <23f400bc-9a62-be4a-6a24-0e2149d4491c@intel.com>
+        with ESMTP id S230500AbjFURNy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jun 2023 13:13:54 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2081.outbound.protection.outlook.com [40.107.237.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93A1819AD;
+        Wed, 21 Jun 2023 10:13:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W7Dl9TlAOFcclFVt7weQp0FAj3u8yV+Te66lGuNT91374GsKXhblrhfZWnh52DbBirINjqBJFB6SPp8XEHJbYUGM5+uBFdlygilBb1L/iUhihJ/UDDa8NNyHVMKQ00KyASu9wdpsIaLhZxmaUdXFoUJ0YaS8DFN1mV/OHSlVhuC9hjbfU2JoTSRvXrg/8TNMgOBxMgpth9GTPuc46m2jrTS7LB2bEsA28hvncLhPxCq0fEX+R0jeN9FR2W22KRE0ZUFvL1ttMj034XPZbC6DT97cHn1yaj3gt/LV/Mfe23nsGsGNIu272N+/x6gvE/hSU/8HFl1hEwRdQVV+twI8nw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UmafzQVzyRQAiBn1bxXTo6/xxqboTtgTBZeq4FQt3Uw=;
+ b=IULBlccwYjoBnYu5fzqceThoABb9jtYmZOJQ6MM78n2bIRmMmngi7EJyX39N8uOLLPrzhYED0wVmgYeCSaQY/mvnfUHjlD6M5hcRq7mVZJymkpvI1gy03kuvxqMGAEpiqsUUNsZaX6PhbxyT7QghGvfK4fpjOMQPyJtKZBMDiw+lFX4uT2YZcreu88fL/HFekZDYvgNVgCrShuZ4Mdjtx4WYi4+xFzKkNjD+/utm+tHQAQDx6JyLHTBMKcs5Km+5fJvyFKkicLEhP0x5P/2/h0oPOwXzA+L5om3+6pCjuXC/XqbLaA21lo/Z9dNgB2FU7+xIepXZqu2Kh9EicXwaPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UmafzQVzyRQAiBn1bxXTo6/xxqboTtgTBZeq4FQt3Uw=;
+ b=V+iLh2iHNItDK1UbV4NFb7NY/l6KlkGwr2/KhzWjZLHEoIQsWs+yOh0Zjt677h6A8e8eaZFSCv7eukSNOFCx7miGp8Y6PBdAhaKHep7xTilsHoZG5AXOFf9Kytc4xRT7SDWDa3SpYtsAZbM+EXVeVL7G1suweAmUqDXgIVSs41FFQNmERZxZsy6e/DuM88DdaM2nWbHbilRo5vd2r8oXw3ZCrl9mb6NVeBDMa4iKMKoXIUAJyQyIRvw3UMIx8rzHdSCqOXuO1a9yUwX3lDTZAvuE3yq7lI8T1MPvBpLM18SLCRjoby03GX3Gqh0oh3WSAFDQ/uRISmJQBD9hQH47zA==
+Received: from SN4PR0501CA0025.namprd05.prod.outlook.com
+ (2603:10b6:803:40::38) by CO6PR12MB5428.namprd12.prod.outlook.com
+ (2603:10b6:5:35c::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Wed, 21 Jun
+ 2023 17:13:49 +0000
+Received: from SA2PEPF000015CD.namprd03.prod.outlook.com
+ (2603:10b6:803:40:cafe::a0) by SN4PR0501CA0025.outlook.office365.com
+ (2603:10b6:803:40::38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21 via Frontend
+ Transport; Wed, 21 Jun 2023 17:13:49 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SA2PEPF000015CD.mail.protection.outlook.com (10.167.241.203) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6521.17 via Frontend Transport; Wed, 21 Jun 2023 17:13:49 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 21 Jun 2023
+ 10:13:27 -0700
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 21 Jun
+ 2023 10:13:27 -0700
+Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Wed, 21 Jun 2023 10:13:25 -0700
+Date:   Wed, 21 Jun 2023 10:13:24 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+CC:     Jason Gunthorpe <jgg@nvidia.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v2 00/11] iommufd: Add nesting infrastructure
+Message-ID: <ZJMvtMe5QHPM0OEJ@Asurada-Nvidia>
+References: <20230511143844.22693-1-yi.l.liu@intel.com>
+ <BN9PR11MB5276DAF0A11809CF8433EE338C7C9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZGdiS2m8jcd5OOt5@nvidia.com>
+ <BN9PR11MB5276A74B2DA86C79908A420B8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZH9AGWf1yRDu/86q@nvidia.com>
+ <BN9PR11MB52763C7B838B04D3200322FD8C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJBL8QLLBiwRsUSI@nvidia.com>
+ <BN9PR11MB527663567ECB8AD52D3170818C5CA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJGf3sgLKr9HLZuE@nvidia.com>
+ <BN9PR11MB5276B852A32F53BE8EAA1A7D8C5DA@BN9PR11MB5276.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <23f400bc-9a62-be4a-6a24-0e2149d4491c@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+In-Reply-To: <BN9PR11MB5276B852A32F53BE8EAA1A7D8C5DA@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015CD:EE_|CO6PR12MB5428:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54abb680-5565-4595-e8d7-08db727ae149
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: hyCRFDA5hJsbBo7OHwRhg+C0CszU3PRTN654U9ITrPOw0dUmX19wwN9czi6Dbk5p5DuMn+JZijCZ02yb9xRsVilWVBFpROf4WwGpNuUURa0EEoJTwkmUEY7xsV1RCxDOu3E26pwwQ8g0uXmtQngoQ88qsdaoG+Tj+mpS4+SYRVvOy/tcB3CZXNAvcP4wETzzzu5FtRnsB0Eh/c5r6RJNVnCR/ZHJwUDvdtfC2dwKAjcVO4phrsZ/guPAN6XUy8dofcrszILe65AJ0wBlqA47WmgHlWEELZEpgXfCJi6YED0ju9AgtFmrfcW6f4uKWsoilUIMRX8f8V4HmPyLn2KDOj4j1hhpnxI6pxwgMjwRH7pj65ytXofXQKE1ULzjAccqVjO0/R2gcaJ9lVjzat3zwZfRRWXlUSVcPeM8OxgY7HOrHRyCja5Me3MhoWdz59MATbSqkwDsD2vXicBu+R/C9eC0/KvsCHEtOEIGgH02Y9zx0E3FdXhUjx3jAA3OeUFVwZvHekPh7ZKS1d2O7v0jqFNo498ha4Kir5SIdU9uorzaEAlmnGc9w6PE7vbXQCiblL0FMXtebtjzGk4x8nb0ON2+nQElPIMIX1ND1eJnQiwd3QLfFIy4MAODKlSJwPBqogQWGQ08qLlXvjBvigf6Ga9QpSzB3LXal+D4EEn9UY0WuzKoQmLK1Mgnnu+Vm62a8S5MvPyeo2/LylAPblka5hGR+3LupOc6B+Iou0y8Zhw=
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(346002)(136003)(376002)(451199021)(40470700004)(46966006)(36840700001)(82310400005)(36860700001)(40460700003)(356005)(6916009)(70206006)(5660300002)(33716001)(8936002)(8676002)(7416002)(316002)(7636003)(4326008)(55016003)(40480700001)(41300700001)(82740400003)(70586007)(47076005)(26005)(2906002)(9686003)(426003)(478600001)(186003)(86362001)(54906003)(83380400001)(336012);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 17:13:49.2944
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54abb680-5565-4595-e8d7-08db727ae149
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: SA2PEPF000015CD.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5428
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -95,21 +133,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 21, 2023 at 07:31:34AM -0700, Dave Hansen wrote:
-> Yep, there's the hardware side and then there are fun nuggets like using
-> mem= and then doing a software-only hot-add later after boot.
+On Wed, Jun 21, 2023 at 06:02:21AM +0000, Tian, Kevin wrote:
 
-Ah, right, Mike, I think we need to check whether mem= has any effect on
-SNP.
+> > On Tue, Jun 20, 2023 at 01:43:42AM +0000, Tian, Kevin wrote:
+> > > I wonder whether we have argued passed each other.
+> > >
+> > > This series adds reserved regions to S2. I challenged the necessity as
+> > > S2 is not directly accessed by the device.
+> > >
+> > > Then you replied that doing so still made sense to support identity
+> > > S1.
+> >
+> > I think I said/ment if we attach the "s2" iommu domain as a direct
+> > attach for identity - eg at boot time, then the IOAS must gain the
+> > reserved regions. This is our normal protocol.
+> >
+> > But when we use the "s2" iommu domain as an actual nested S2 then we
+> > don't gain reserved regions.
+> 
+> Then we're aligned.
+> 
+> Yi/Nicolin, please update this series to not automatically add reserved
+> regions to S2 in the nesting configuration.
 
-> Also, if the hardware doesn't support any kind of hotplug, it would be
-> great to point to the place in the spec where it says that.
+I'm a bit late for the conversation here. Yet, how about the
+IOMMU_RESV_SW_MSI on ARM in the nesting configuration? We'd
+still call iommufd_group_setup_msi() on the S2 HWPT, despite
+attaching the device to a nested S1 HWPT right?
 
-I honestly don't know. But I can't recall ever hearing about hardware
-memory hotplug so something worth to check too.
+> It also implies that the user cannot rely on IOAS_IOVA_RANGES to
+> learn reserved regions for arranging addresses in S1.
+> 
+> Then we also need a new ioctl to report reserved regions per dev_id.
 
--- 
-Regards/Gruss,
-    Boris.
+So, in a nesting configuration, QEMU would poll a device's S2
+MSI region (i.e. IOMMU_RESV_SW_MSI) to prevent conflict?
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks
+Nic
