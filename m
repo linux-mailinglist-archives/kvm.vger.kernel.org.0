@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9970B739369
-	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 01:59:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8B5073936D
+	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 01:59:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230199AbjFUX4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jun 2023 19:56:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38376 "EHLO
+        id S230253AbjFUX4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jun 2023 19:56:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230252AbjFUX4R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229602AbjFUX4R (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 21 Jun 2023 19:56:17 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2056.outbound.protection.outlook.com [40.107.100.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31DFD19BF;
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2081.outbound.protection.outlook.com [40.107.212.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AE4D1BF9;
         Wed, 21 Jun 2023 16:56:01 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hk/TJ3InfuZo4HKmP9eFhOS4C8NUIwtG4z3L+jL2cgHBmycYwhnIcMhL1VA7snTNOdHOF6xglK9/lSqfQ8UIKZoV9L09j5l9AporMkPIdoMVCZKpAcgf4/2TB5Wo+dLlrg7mP5QDPFPLFWNl3aNr1nPkP05X82P3Fzx6NLoB2ZC7sZTChbw67zI2NqbjE4P3lnQKDaadR4uYMCTgFmgUEFcaDheG/za8IiYdeCpM8naUPiI5HvvfRJjZWTm2BToZ7kUJVUrH0BmFP0spHFNpjH383GSPCTN3Bdo0cAK5KrD14GHe0OdvdQ/YNUYiWsUDx0KKSn5JzN+cDtOD7c9O1A==
+ b=Z90loEt/J/SzYvoAOvlnQyOw6KwxisBGnmF8VzUCLmqGA/o95CleIau7pdU8LlOfixZ8qTFd2fZAf9Rh2ntt+4t+SdBZivgQG9nS6UiuRLiczoYs2jpdpxjo+HTjKMjoK4dI4f3Wg4hQWsg9jG0OwXuZDBWbD7OPXlGkv+kpboqBSYjg0MDhRLLm2ifi3TuAimvIUuaQowmjPQA9sbtdrswQ9p+j4rH4L7Gzcxw/QbvjeI/W9fnW0szjEKA7uxEyPTSz7AgveUUYbtuZjsHwFcQX7J/X+EIxaqNGFGE8MVrzwOSvw+omFtH8B00Sz/HJStaTWhwEmGH0ai4DPpxXEA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Yz2e1ho/bJYIFckNsG7A9GQvcwB0Nzbs6swFKcCVxkM=;
- b=Ewsq2SPp/5a462qP3iyIXt2hcZ34gc9N90v4PH//4pdPE534POqCvrQC0PcvPEwPKCYzxBw29j0VYp6zcR5vjbJY/M/os3BOcrR3Trct/umqXfT4OHYkQZrdNVj8OhiCvUrU4kTBT/F/paRnVneud8LoEN9Cpkxg5tvKjB90EXUHqJJNYC0LSBKJqMojhqj6UVfFc+tMbLeUtXkebjRIhCeFvOYs9UEvQztCaefMyjfrNoRsx8BCwjlXAFwKq2/TmfCjmhtjYbi0wxXLPSUoC8SUYUQTx48qswtpjtPbsVA3jkXcxk8S+H3tjpJoGVAsIg6iotHe1qFAou8LEGNVCw==
+ bh=opL4/QhswK9hoboF9zUynw6Y50TRvS1CdR+6bH2e+kE=;
+ b=WrwjPVJ3wbCL494Hz+9kk3x/4HMLiSaboXrwKKNVRgf3ddHMt8gcYlszmUVEdMNVDMRUhnW2eBKJjJ5fBC2h+PrV8rNx4x9KQjso/w2CXY6TItKXwwazd1BT1f01e7w1AhEekdLFqhD+L+GZ1cJHNZyjCrmDW5w9il1bClF7wshsRx3c0bfy4TS5rE8nWkp0u22oh7Ze71s5Ql5uA+cWEgIiyeoRB10DLLcbSRpovx/OlJzaUcKTvFEXLU1q6e5/wmk7Tp5kJROhxsdV6XBbzV3j/CP/7TuCsrPRcC0n6JQNZ+BbvSwRyDIt0IbhFwtjIJXnToqhErpXV8NbydSnZA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Yz2e1ho/bJYIFckNsG7A9GQvcwB0Nzbs6swFKcCVxkM=;
- b=f0sbbkep96LrVfmXMH7Fane5D2Nzt/5BLpPKPnrOpSECxnFnfw8hfQ3ZRrTfeGcx1Te+slXQnLfQ46JL83SCygpT4IJUEIxk+qmKP18vrooFVW1+ASvDlTpt1hqomSyyLh2+b4p1p9KRK9zG8fJo47DbjpHzys7xO7hyeeodX+U=
-Received: from CY5PR15CA0040.namprd15.prod.outlook.com (2603:10b6:930:1b::35)
- by CO6PR12MB5460.namprd12.prod.outlook.com (2603:10b6:5:357::11) with
+ bh=opL4/QhswK9hoboF9zUynw6Y50TRvS1CdR+6bH2e+kE=;
+ b=uErT5tbhrZdn0qu0+xH8yuhyW/ixtdKXI5AYl/AY+oNTUwK722LYVhXElWwbnWKkfGhieBLLbZUAjCe4rz1PUMjPZjll+zRuKJGOjZIUsTUboK2UUqeY5fe3QpIg8oGRqeWzQdhQyQtUuQ1lgguOrN4unEi/Lfx9XwqUYyZlMsE=
+Received: from CY5PR15CA0035.namprd15.prod.outlook.com (2603:10b6:930:1b::22)
+ by CY5PR12MB6227.namprd12.prod.outlook.com (2603:10b6:930:21::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Wed, 21 Jun
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 21 Jun
  2023 23:55:57 +0000
 Received: from CY4PEPF0000E9D4.namprd03.prod.outlook.com
- (2603:10b6:930:1b:cafe::5d) by CY5PR15CA0040.outlook.office365.com
- (2603:10b6:930:1b::35) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:930:1b:cafe::ff) by CY5PR15CA0035.outlook.office365.com
+ (2603:10b6:930:1b::22) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21 via Frontend
  Transport; Wed, 21 Jun 2023 23:55:57 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
@@ -52,7 +52,7 @@ Received: from SATLEXMB04.amd.com (165.204.84.17) by
 Received: from ruby-95f9host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Wed, 21 Jun
- 2023 18:55:55 -0500
+ 2023 18:55:56 -0500
 From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 To:     <linux-kernel@vger.kernel.org>, <iommu@lists.linux.dev>,
         <kvm@vger.kernel.org>
@@ -64,9 +64,9 @@ CC:     <joro@8bytes.org>, <robin.murphy@arm.com>, <yi.l.liu@intel.com>,
         <santosh.shukla@amd.com>, <vasant.hegde@amd.com>,
         <jay.chen@amd.com>, <joseph.chung@amd.com>,
         "Suravee Suthikulpanit" <suravee.suthikulpanit@amd.com>
-Subject: [RFC PATCH 14/21] iommu/amd: Initialize vIOMMU private address space regions
-Date:   Wed, 21 Jun 2023 18:55:01 -0500
-Message-ID: <20230621235508.113949-15-suravee.suthikulpanit@amd.com>
+Subject: [RFC PATCH 15/21] iommu/amd: Introduce vIOMMU vminit and vmdestroy ioctl
+Date:   Wed, 21 Jun 2023 18:55:02 -0500
+Message-ID: <20230621235508.113949-16-suravee.suthikulpanit@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230621235508.113949-1-suravee.suthikulpanit@amd.com>
 References: <20230621235508.113949-1-suravee.suthikulpanit@amd.com>
@@ -78,23 +78,23 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D4:EE_|CO6PR12MB5460:EE_
-X-MS-Office365-Filtering-Correlation-Id: ab321304-2be8-4053-eaa2-08db72b30e84
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D4:EE_|CY5PR12MB6227:EE_
+X-MS-Office365-Filtering-Correlation-Id: cbf2ec24-0f7d-40a0-fabb-08db72b30ed5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5TmKQVtWa0LJAlYgCx4H2bWbMsyM2AMIZQjuU1nQlbRLTrNXadeKTOp8A/DRrya7CLqtr7P5rT4Ax+Q/pqaItIgGK9t3jaSFTUb3h2894zsGFLFNQ9FdQRGSnhC7kSrtdMP4e/xzfxorlzMU/0cUxoxE7IxmjblbFaXQRm9wUNsD1zNCf8CIm26fHM9cHyta5JyAo6qWyAflcVb6fmkOQhA3pdJ2AVgqEHnReBccfJ0jFAJCVFxk0/5BwjtfUMGlDVZwW1yFTADw3BfVaWztl/MWXmeweb4ilGOZK5vrsx2wg5/t365+nb5hEAsXv86HaOsBG/Ws1O91eZb5/ReBcF5AKmFLT4sKkxZD7fXPTB+QpyyAEiTKt7bO2+Kt5Mv8rhWsgzQe+LRfjBhY9hgH6sMMgJJx278/tcbGBzYkJY8sDyc2Putj4kHtlCC0+lZ7J92GjwaXBO6m9hv5PmYLYvIsISn3cuAHZqdu+D5ZPQl3HxuKnXYdOk2TFNz/2g43dxcg7pn30CWp7ZyhtRiUOeRsEwzPERPusn5NR3MJIjA5vGsltyLvaVo566EreZCsol9uqZHXcx1JCNzxDpQTy5eVS9mU7/KHZLYipnI8agqBdek8Ky0iSoWQplNeKHqG5JV5MUSLWc4FsDcpQWUOSBW2siAlIaFH+oDEQIzZ0DTf2rh2KcifQeqIXHStbwUeew7GcIBQV5LuLW7aPp1t0M+YDg1mvpJVw2QrrFDGT824mKrv6ybmvfAdEoFRLikmawsF4iK54gY1NXwYRp6ryQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(39860400002)(396003)(376002)(346002)(451199021)(36840700001)(46966006)(40470700004)(82310400005)(36860700001)(16526019)(36756003)(356005)(81166007)(7416002)(70206006)(40460700003)(44832011)(5660300002)(41300700001)(8936002)(8676002)(4326008)(70586007)(40480700001)(316002)(86362001)(82740400003)(30864003)(1076003)(47076005)(426003)(2616005)(186003)(2906002)(26005)(336012)(54906003)(6666004)(7696005)(478600001)(110136005)(83380400001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: zNAboEXd2bsyD3s3CDBqGoVMAdHLGpltkD6QjkC+e2iFF94T9JP6e+5DMv3yGDpyQCBkJYICUS5tFJOkM1eweAPypdzkjVDi+dUh7vmfWxioCgTn9T3J6l/bRlB23Z3JYEe+DR5qEcfXGkp27z9xcCTETldyYO9ELm6quaPwTwpjD2aVm9Ael+4O3DvdTeMUXDdH2IVFn9z0e/pAnJsgMYntXRk9+HghKKwqdEZUSoMh6BSZQYjKjOZxaimCu/pqdz2L8sPbjAEnL4UgCBEmEYcUaP3McP9yiKr606BFhBLZTdHgZ+d0Co4zhjILKsNbWrdbSSLnhnMJEz9y8t4duLItBrRJ8wlMYX+MFsY29+13CHOq+g62WjocEqZB5kuszrh122psQjFDDQ5GFHHOkQ+7yBAYlyaGBPrHXgeGG8A4yybvxPNxCnSyp3NtcgSvWp83njGTR5aM0Va2npyQtfsgQ6Mtz0ANlM5d7Di4eymmhJd7CPb3BcmrCT3bQxXLJyUlHBVh15lHfFMx0/Jdpu0je9Y6VtNzNb+LSqcasxI++pZfUuMtlf1UzY100gxGbvwbPWig2NXu43jxkkQ0H5uWeC43bHaxhNkTHUtYrP2mMOeovPb9+qTjFvAl8T+mmSY3qZPLhpNlZoOL32+vFQ6bZsLpvto8ZlDLokKj62iPhhOBOSQxSGsyEP2Xsc5ibpBf9T0Nr2AckYbbOUv8kCaWxGLdQ0tPmQHZtxNBTAR/Th6LYNSL4uuW7PUJqXLdHfGfnmZ2A++coVLXr2qybw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(376002)(346002)(39860400002)(451199021)(40470700004)(46966006)(36840700001)(83380400001)(426003)(336012)(1076003)(186003)(16526019)(26005)(2616005)(110136005)(54906003)(70206006)(7696005)(478600001)(70586007)(36756003)(86362001)(316002)(82740400003)(4326008)(81166007)(356005)(47076005)(36860700001)(6666004)(5660300002)(44832011)(7416002)(8676002)(41300700001)(8936002)(40460700003)(2906002)(40480700001)(82310400005)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 23:55:57.0267
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 23:55:57.5580
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ab321304-2be8-4053-eaa2-08db72b30e84
+X-MS-Exchange-CrossTenant-Network-Message-Id: cbf2ec24-0f7d-40a0-fabb-08db72b30ed5
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000E9D4.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5460
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6227
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -106,435 +106,368 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Initialing vIOMMU private address space regions includes parsing
-PCI vendor-specific capability (VSC), and use information to
-setup vIOMMU private address space regions.
+These ioctl interfaces are called when QEMU initialize and destroy VMs.
 
 Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 ---
- drivers/iommu/amd/Makefile          |   2 +-
- drivers/iommu/amd/amd_iommu_types.h |  40 +++++
- drivers/iommu/amd/amd_viommu.h      |  57 +++++++
- drivers/iommu/amd/init.c            |   3 +
- drivers/iommu/amd/viommu.c          | 227 ++++++++++++++++++++++++++++
- 5 files changed, 328 insertions(+), 1 deletion(-)
- create mode 100644 drivers/iommu/amd/amd_viommu.h
- create mode 100644 drivers/iommu/amd/viommu.c
+ drivers/iommu/amd/amd_iommu.h |   2 +
+ drivers/iommu/amd/iommu.c     |   4 +-
+ drivers/iommu/amd/viommu.c    | 294 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 298 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/iommu/amd/Makefile b/drivers/iommu/amd/Makefile
-index 773d8aa00283..89c045716448 100644
---- a/drivers/iommu/amd/Makefile
-+++ b/drivers/iommu/amd/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0-only
--obj-$(CONFIG_AMD_IOMMU) += iommu.o init.o quirks.o io_pgtable.o io_pgtable_v2.o
-+obj-$(CONFIG_AMD_IOMMU) += iommu.o init.o quirks.o io_pgtable.o io_pgtable_v2.o viommu.o
- obj-$(CONFIG_AMD_IOMMU_DEBUGFS) += debugfs.o
- obj-$(CONFIG_AMD_IOMMU_V2) += iommu_v2.o
-diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/amd_iommu_types.h
-index 019a9182df87..5cb5a709b31b 100644
---- a/drivers/iommu/amd/amd_iommu_types.h
-+++ b/drivers/iommu/amd/amd_iommu_types.h
-@@ -34,6 +34,17 @@
- #define MMIO_RANGE_OFFSET	0x0c
- #define MMIO_MISC_OFFSET	0x10
+diff --git a/drivers/iommu/amd/amd_iommu.h b/drivers/iommu/amd/amd_iommu.h
+index a65d22384ab8..fccae07e8c9f 100644
+--- a/drivers/iommu/amd/amd_iommu.h
++++ b/drivers/iommu/amd/amd_iommu.h
+@@ -85,6 +85,8 @@ extern int amd_iommu_flush_tlb(struct iommu_domain *dom, u32 pasid);
+ extern int amd_iommu_domain_set_gcr3(struct iommu_domain *dom, u32 pasid,
+ 				     unsigned long cr3);
+ extern int amd_iommu_domain_clear_gcr3(struct iommu_domain *dom, u32 pasid);
++extern void amd_iommu_iotlb_sync(struct iommu_domain *domain,
++				 struct iommu_iotlb_gather *gather);
  
-+/* vIOMMU Capability offsets (from IOMMU Capability Header) */
-+#define MMIO_VSC_HDR_OFFSET		0x00
-+#define MMIO_VSC_INFO_OFFSET		0x00
-+#define MMIO_VSC_VF_BAR_LO_OFFSET	0x08
-+#define MMIO_VSC_VF_BAR_HI_OFFSET	0x0c
-+#define MMIO_VSC_VF_CNTL_BAR_LO_OFFSET	0x10
-+#define MMIO_VSC_VF_CNTL_BAR_HI_OFFSET	0x14
-+
-+#define IOMMU_VSC_INFO_REV(x)	((x >> 16) & 0xFF)
-+#define IOMMU_VSC_INFO_ID(x)	(x & 0xFFFF)
-+
- /* Masks, shifts and macros to parse the device range capability */
- #define MMIO_RANGE_LD_MASK	0xff000000
- #define MMIO_RANGE_FD_MASK	0x00ff0000
-@@ -61,12 +72,15 @@
- #define MMIO_PPR_LOG_OFFSET	0x0038
- #define MMIO_GA_LOG_BASE_OFFSET	0x00e0
- #define MMIO_GA_LOG_TAIL_OFFSET	0x00e8
-+#define MMIO_PPRB_LOG_OFFSET	0x00f0
-+#define MMIO_EVTB_LOG_OFFSET	0x00f8
- #define MMIO_MSI_ADDR_LO_OFFSET	0x015C
- #define MMIO_MSI_ADDR_HI_OFFSET	0x0160
- #define MMIO_MSI_DATA_OFFSET	0x0164
- #define MMIO_INTCAPXT_EVT_OFFSET	0x0170
- #define MMIO_INTCAPXT_PPR_OFFSET	0x0178
- #define MMIO_INTCAPXT_GALOG_OFFSET	0x0180
-+#define MMIO_VIOMMU_STATUS_OFFSET	0x0190
- #define MMIO_EXT_FEATURES2	0x01A0
- #define MMIO_CMD_HEAD_OFFSET	0x2000
- #define MMIO_CMD_TAIL_OFFSET	0x2008
-@@ -180,8 +194,16 @@
- #define CONTROL_GAM_EN		25
- #define CONTROL_GALOG_EN	28
- #define CONTROL_GAINT_EN	29
-+#define CONTROL_DUALPPRLOG_EN   30
-+#define CONTROL_DUALEVTLOG_EN   32
-+
-+#define CONTROL_PPR_AUTO_RSP_EN 39
-+#define CONTROL_BLKSTOPMRK_EN   41
-+#define CONTROL_PPR_AUTO_RSP_AON 48
- #define CONTROL_XT_EN		50
- #define CONTROL_INTCAPXT_EN	51
-+#define CONTROL_VCMD_EN         52
-+#define CONTROL_VIOMMU_EN       53
- #define CONTROL_SNPAVIC_EN	61
+ extern void amd_iommu_build_efr(u64 *efr, u64 *efr2);
  
- #define CTRL_INV_TO_MASK	(7 << CONTROL_INV_TIMEOUT)
-@@ -414,6 +436,13 @@
+diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
+index b5c62bc8249c..f22b2a5a8bfc 100644
+--- a/drivers/iommu/amd/iommu.c
++++ b/drivers/iommu/amd/iommu.c
+@@ -2447,8 +2447,8 @@ static void amd_iommu_flush_iotlb_all(struct iommu_domain *domain)
+ 	spin_unlock_irqrestore(&dom->lock, flags);
+ }
  
- #define DTE_GPT_LEVEL_SHIFT	54
- 
-+/* vIOMMU bit fields */
-+#define DTE_VIOMMU_EN_SHIFT		15
-+#define DTE_VIOMMU_GUESTID_SHIFT	16
-+#define DTE_VIOMMU_GUESTID_MASK		0xFFFF
-+#define DTE_VIOMMU_GDEVICEID_SHIFT	32
-+#define DTE_VIOMMU_GUESTID_MASK		0xFFFF
-+
- #define GCR3_VALID		0x01ULL
- 
- #define IOMMU_PAGE_MASK (((1ULL << 52) - 1) & ~0xfffULL)
-@@ -694,6 +723,17 @@ struct amd_iommu {
- 	 */
- 	u16 cap_ptr;
- 
-+	/* Vendor-Specific Capability (VSC) pointer. */
-+	u16 vsc_offset;
-+
-+	/* virtual addresses of vIOMMU VF/VF_CNTL BAR */
-+	u8 __iomem *vf_base;
-+	u8 __iomem *vfctrl_base;
-+
-+	struct protection_domain *viommu_pdom;
-+	void *guest_mmio;
-+	void *cmdbuf_dirty_mask;
-+
- 	/* pci domain of this IOMMU */
- 	struct amd_iommu_pci_seg *pci_seg;
- 
-diff --git a/drivers/iommu/amd/amd_viommu.h b/drivers/iommu/amd/amd_viommu.h
-new file mode 100644
-index 000000000000..c1dbc2e37eab
---- /dev/null
-+++ b/drivers/iommu/amd/amd_viommu.h
-@@ -0,0 +1,57 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2023 Advanced Micro Devices, Inc.
-+ * Author: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-+ */
-+
-+#ifndef AMD_VIOMMU_H
-+#define AMD_VIOMMU_H
-+
-+#define VIOMMU_MAX_GUESTID	(1 << 16)
-+
-+#define VIOMMU_VF_MMIO_ENTRY_SIZE		4096
-+#define VIOMMU_VFCTRL_MMIO_ENTRY_SIZE		64
-+
-+#define VIOMMU_VFCTRL_GUEST_DID_MAP_CONTROL0_OFFSET	0x00
-+#define VIOMMU_VFCTRL_GUEST_DID_MAP_CONTROL1_OFFSET	0x08
-+#define VIOMMU_VFCTRL_GUEST_MISC_CONTROL_OFFSET		0x10
-+
-+#define VIOMMU_VFCTRL_GUEST_CMD_CONTROL_OFFSET	0x20
-+#define VIOMMU_VFCTRL_GUEST_EVT_CONTROL_OFFSET	0x28
-+#define VIOMMU_VFCTRL_GUEST_PPR_CONTROL_OFFSET	0x30
-+
-+#define VIOMMU_VF_MMIO_BASE(iommu, guestId) \
-+	(iommu->vf_base + (guestId * VIOMMU_VF_MMIO_ENTRY_SIZE))
-+#define VIOMMU_VFCTRL_MMIO_BASE(iommu, guestId) \
-+	(iommu->vfctrl_base + (guestId * VIOMMU_VFCTRL_MMIO_ENTRY_SIZE))
-+
-+#define VIOMMU_GUEST_MMIO_BASE		0
-+#define VIOMMU_GUEST_MMIO_SIZE		(64 * VIOMMU_MAX_GUESTID)
-+
-+#define VIOMMU_CMDBUF_DIRTY_STATUS_BASE	0x400000ULL
-+#define VIOMMU_CMDBUF_DIRTY_STATUS_SIZE	0x2000
-+
-+#define VIOMMU_DEVID_MAPPING_BASE	0x1000000000ULL
-+#define VIOMMU_DEVID_MAPPING_ENTRY_SIZE	(1 << 20)
-+
-+#define VIOMMU_DOMID_MAPPING_BASE	0x2000000000ULL
-+#define VIOMMU_DOMID_MAPPING_ENTRY_SIZE	(1 << 19)
-+
-+#define VIOMMU_GUEST_CMDBUF_BASE	0x2800000000ULL
-+#define VIOMMU_GUEST_CMDBUF_SIZE	(1 << 19)
-+
-+#define VIOMMU_GUEST_PPR_LOG_BASE	0x3000000000ULL
-+#define VIOMMU_GUEST_PPR_LOG_SIZE	(1 << 19)
-+
-+#define VIOMMU_GUEST_PPR_B_LOG_BASE	0x3800000000ULL
-+#define VIOMMU_GUEST_PPR_B_LOG_SIZE	(1 << 19)
-+
-+#define VIOMMU_GUEST_EVT_LOG_BASE	0x4000000000ULL
-+#define VIOMMU_GUEST_EVT_LOG_SIZE	(1 << 19)
-+
-+#define VIOMMU_GUEST_EVT_B_LOG_BASE	0x4800000000ULL
-+#define VIOMMU_GUEST_EVT_B_LOG_SIZE	(1 << 19)
-+
-+extern int iommu_init_viommu(struct amd_iommu *iommu);
-+
-+#endif /* AMD_VIOMMU_H */
-diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-index 4dd9f09e16c4..48aa71fe76dc 100644
---- a/drivers/iommu/amd/init.c
-+++ b/drivers/iommu/amd/init.c
-@@ -34,6 +34,7 @@
- #include <linux/crash_dump.h>
- 
- #include "amd_iommu.h"
-+#include "amd_viommu.h"
- #include "../irq_remapping.h"
- 
- /*
-@@ -2068,6 +2069,8 @@ static int __init iommu_init_pci(struct amd_iommu *iommu)
- 	if (iommu_feature(iommu, FEATURE_PPR) && alloc_ppr_log(iommu))
- 		return -ENOMEM;
- 
-+	iommu_init_viommu(iommu);
-+
- 	if (iommu->cap & (1UL << IOMMU_CAP_NPCACHE)) {
- 		pr_info("Using strict mode due to virtualization\n");
- 		iommu_set_dma_strict();
+-static void amd_iommu_iotlb_sync(struct iommu_domain *domain,
+-				 struct iommu_iotlb_gather *gather)
++void amd_iommu_iotlb_sync(struct iommu_domain *domain,
++			  struct iommu_iotlb_gather *gather)
+ {
+ 	struct protection_domain *dom = to_pdomain(domain);
+ 	unsigned long flags;
 diff --git a/drivers/iommu/amd/viommu.c b/drivers/iommu/amd/viommu.c
-new file mode 100644
-index 000000000000..18036d03c747
---- /dev/null
+index 18036d03c747..2bafa5102ffa 100644
+--- a/drivers/iommu/amd/viommu.c
 +++ b/drivers/iommu/amd/viommu.c
-@@ -0,0 +1,227 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2023 Advanced Micro Devices, Inc.
-+ * Author: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-+ */
+@@ -12,6 +12,7 @@
+ 
+ #include <linux/fs.h>
+ #include <linux/cdev.h>
++#include <linux/hashtable.h>
+ #include <linux/ioctl.h>
+ #include <linux/iommufd.h>
+ #include <linux/mem_encrypt.h>
+@@ -28,8 +29,25 @@
+ #define SET_CTRL_BITS(reg, bit1, bit2, msk) \
+ 	((((reg) >> (bit1)) & (ULL(msk))) << (bit2))
+ 
++#define VIOMMU_MAX_GDEVID	0xFFFF
++#define VIOMMU_MAX_GDOMID	0xFFFF
 +
-+#define pr_fmt(fmt)     "AMD-Vi: " fmt
-+#define dev_fmt(fmt)    pr_fmt(fmt)
++#define VIOMMU_GID_HASH_BITS	16
++static DEFINE_HASHTABLE(viommu_gid_hash, VIOMMU_GID_HASH_BITS);
++static DEFINE_SPINLOCK(viommu_gid_hash_lock);
++static u32 viommu_next_gid;
++static bool next_viommu_gid_wrapped;
 +
-+#include <linux/iommu.h>
-+#include <linux/amd-iommu.h>
+ LIST_HEAD(viommu_devid_map);
+ 
++struct amd_iommu_vminfo {
++	u16 gid;
++	bool init;
++	struct hlist_node hnode;
++	u64 *devid_table;
++	u64 *domid_table;
++};
 +
-+#include <linux/fs.h>
-+#include <linux/cdev.h>
-+#include <linux/ioctl.h>
-+#include <linux/iommufd.h>
-+#include <linux/mem_encrypt.h>
-+#include <uapi/linux/amd_viommu.h>
-+
-+#include <asm/iommu.h>
-+#include <asm/set_memory.h>
-+
-+#include "amd_iommu.h"
-+#include "amd_iommu_types.h"
-+#include "amd_viommu.h"
-+
-+#define GET_CTRL_BITS(reg, bit, msk)	(((reg) >> (bit)) & (ULL(msk)))
-+#define SET_CTRL_BITS(reg, bit1, bit2, msk) \
-+	((((reg) >> (bit1)) & (ULL(msk))) << (bit2))
-+
-+LIST_HEAD(viommu_devid_map);
-+
-+struct amd_iommu *get_amd_iommu_from_devid(u16 devid)
-+{
-+	struct amd_iommu *iommu;
-+
-+	for_each_iommu(iommu)
-+		if (iommu->devid == devid)
-+			return iommu;
-+	return NULL;
-+}
-+
-+static void viommu_enable(struct amd_iommu *iommu)
-+{
-+	if (!amd_iommu_viommu)
-+		return;
-+	iommu_feature_enable(iommu, CONTROL_VCMD_EN);
-+	iommu_feature_enable(iommu, CONTROL_VIOMMU_EN);
-+}
-+
-+static int viommu_init_pci_vsc(struct amd_iommu *iommu)
-+{
-+	iommu->vsc_offset = pci_find_capability(iommu->dev, PCI_CAP_ID_VNDR);
-+	if (!iommu->vsc_offset)
-+		return -ENODEV;
-+
-+	DUMP_printk("device:%s, vsc offset:%04x\n",
-+		    pci_name(iommu->dev), iommu->vsc_offset);
-+	return 0;
-+}
-+
-+static int __init viommu_vf_vfcntl_init(struct amd_iommu *iommu)
-+{
-+	u32 lo, hi;
-+	u64 vf_phys, vf_cntl_phys;
-+
-+	/* Setting up VF and VF_CNTL MMIOs */
-+	pci_read_config_dword(iommu->dev, iommu->vsc_offset + MMIO_VSC_VF_BAR_LO_OFFSET, &lo);
-+	pci_read_config_dword(iommu->dev, iommu->vsc_offset + MMIO_VSC_VF_BAR_HI_OFFSET, &hi);
-+	vf_phys = hi;
-+	vf_phys = (vf_phys << 32) | lo;
-+	if (!(vf_phys & 1)) {
-+		pr_err(FW_BUG "vf_phys disabled\n");
-+		return -EINVAL;
-+	}
-+
-+	pci_read_config_dword(iommu->dev, iommu->vsc_offset + MMIO_VSC_VF_CNTL_BAR_LO_OFFSET, &lo);
-+	pci_read_config_dword(iommu->dev, iommu->vsc_offset + MMIO_VSC_VF_CNTL_BAR_HI_OFFSET, &hi);
-+	vf_cntl_phys = hi;
-+	vf_cntl_phys = (vf_cntl_phys << 32) | lo;
-+	if (!(vf_cntl_phys & 1)) {
-+		pr_err(FW_BUG "vf_cntl_phys disabled\n");
-+		return -EINVAL;
-+	}
-+
-+	if (!vf_phys || !vf_cntl_phys) {
-+		pr_err(FW_BUG "AMD-Vi: Unassigned VF resources.\n");
-+		return -ENOMEM;
-+	}
-+
-+	/* Mapping 256MB of VF and 4MB of VF_CNTL BARs */
-+	vf_phys &= ~1ULL;
-+	iommu->vf_base = iommu_map_mmio_space(vf_phys, 0x10000000);
-+	if (!iommu->vf_base) {
-+		pr_err("Can't reserve vf_base\n");
-+		return -ENOMEM;
-+	}
-+
-+	vf_cntl_phys &= ~1ULL;
-+	iommu->vfctrl_base = iommu_map_mmio_space(vf_cntl_phys, 0x400000);
-+
-+	if (!iommu->vfctrl_base) {
-+		pr_err("Can't reserve vfctrl_base\n");
-+		return -ENOMEM;
-+	}
-+
-+	pr_debug("%s: IOMMU device:%s, vf_base:%#llx, vfctrl_base:%#llx\n",
-+		 __func__, pci_name(iommu->dev), vf_phys, vf_cntl_phys);
-+	return 0;
-+}
-+
-+static void *alloc_private_region(struct amd_iommu *iommu,
-+				  u64 base, size_t size)
+ struct amd_iommu *get_amd_iommu_from_devid(u16 devid)
+ {
+ 	struct amd_iommu *iommu;
+@@ -138,6 +156,50 @@ static void *alloc_private_region(struct amd_iommu *iommu,
+ 	return NULL;
+ }
+ 
++static int alloc_private_vm_region(struct amd_iommu *iommu, u64 **entry,
++				   u64 base, size_t size, u16 guestId)
 +{
 +	int ret;
-+	void *region;
++	u64 addr = base + (guestId * size);
 +
-+	region  = (void *)__get_free_pages(GFP_KERNEL | __GFP_ZERO,
-+						get_order(size));
-+	if (!region)
-+		return NULL;
++	*entry = (void *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, get_order(size));
 +
-+	ret = set_memory_uc((unsigned long)region, size >> PAGE_SHIFT);
++	ret = set_memory_uc((unsigned long)*entry, size >> PAGE_SHIFT);
++	if (ret)
++		return ret;
++
++	pr_debug("%s: entry=%#llx(%#llx), addr=%#llx\n", __func__,
++		 (unsigned long  long)*entry, iommu_virt_to_phys(*entry), addr);
++
++	ret = amd_iommu_v1_map_pages(&iommu->viommu_pdom->iop.iop.ops, addr,
++				     iommu_virt_to_phys(*entry), PAGE_SIZE, (size / PAGE_SIZE),
++				     IOMMU_PROT_IR | IOMMU_PROT_IW, GFP_KERNEL, NULL);
++
++	return ret;
++}
++
++static void free_private_vm_region(struct amd_iommu *iommu, u64 **entry,
++					u64 base, size_t size, u16 guestId)
++{
++	size_t ret;
++	struct iommu_iotlb_gather gather;
++	u64 addr = base + (guestId * size);
++
++	pr_debug("entry=%#llx(%#llx), addr=%#llx\n",
++		 (unsigned long  long)*entry,
++		 iommu_virt_to_phys(*entry), addr);
++
++	if (!iommu || iommu->viommu_pdom)
++		return;
++	ret = amd_iommu_v1_unmap_pages(&iommu->viommu_pdom->iop.iop.ops,
++				       addr, PAGE_SIZE, (size / PAGE_SIZE), &gather);
++	if (ret)
++		amd_iommu_iotlb_sync(&iommu->viommu_pdom->domain, &gather);
++
++	free_pages((unsigned long)*entry, get_order(size));
++	*entry = NULL;
++}
++
+ static int viommu_private_space_init(struct amd_iommu *iommu)
+ {
+ 	u64 pte_root = 0;
+@@ -225,3 +287,235 @@ int __init iommu_init_viommu(struct amd_iommu *iommu)
+ 	amd_iommu_viommu = false;
+ 	return ret;
+ }
++
++static void viommu_uninit_one(struct amd_iommu *iommu, struct amd_iommu_vminfo *vminfo, u16 guestId)
++{
++	free_private_vm_region(iommu, &vminfo->devid_table,
++			       VIOMMU_DEVID_MAPPING_BASE,
++			       VIOMMU_DEVID_MAPPING_ENTRY_SIZE,
++			       guestId);
++	free_private_vm_region(iommu, &vminfo->domid_table,
++			       VIOMMU_DOMID_MAPPING_BASE,
++			       VIOMMU_DOMID_MAPPING_ENTRY_SIZE,
++			       guestId);
++}
++
++/*
++ * Clear the DevID via VFCTRL registers
++ * This function will be called during VM destroy via VFIO.
++ */
++static void clear_device_mapping(struct amd_iommu *iommu, u16 hDevId, u16 guestId,
++				 u16 queueId, u16 gDevId)
++{
++	u64 val, tmp1, tmp2;
++	u8 __iomem *vfctrl;
++
++	/*
++	 * Clear the DevID in VFCTRL registers
++	 */
++	tmp1 = gDevId;
++	tmp1 = ((tmp1 & 0xFFFFULL) << 46);
++	tmp2 = hDevId;
++	tmp2 = ((tmp2 & 0xFFFFULL) << 14);
++	val = tmp1 | tmp2 | 0x8000000000000001ULL;
++	vfctrl = VIOMMU_VFCTRL_MMIO_BASE(iommu, guestId);
++	writeq(val, vfctrl + VIOMMU_VFCTRL_GUEST_DID_MAP_CONTROL0_OFFSET);
++}
++
++/*
++ * Clear the DomID via VFCTRL registers
++ * This function will be called during VM destroy via VFIO.
++ */
++static void clear_domain_mapping(struct amd_iommu *iommu, u16 hDomId, u16 guestId, u16 gDomId)
++{
++	u64 val, tmp1, tmp2;
++	u8 __iomem *vfctrl = VIOMMU_VFCTRL_MMIO_BASE(iommu, guestId);
++
++	tmp1 = gDomId;
++	tmp1 = ((tmp1 & 0xFFFFULL) << 46);
++	tmp2 = hDomId;
++	tmp2 = ((tmp2 & 0xFFFFULL) << 14);
++	val = tmp1 | tmp2 | 0x8000000000000001UL;
++	writeq(val, vfctrl + VIOMMU_VFCTRL_GUEST_DID_MAP_CONTROL1_OFFSET);
++}
++
++static void viommu_clear_mapping(struct amd_iommu *iommu, u16 guestId)
++{
++	int i;
++
++	for (i = 0; i <= VIOMMU_MAX_GDEVID; i++)
++		clear_device_mapping(iommu, 0, guestId, 0, i);
++
++	for (i = 0; i <= VIOMMU_MAX_GDOMID; i++)
++		clear_domain_mapping(iommu, 0, guestId, i);
++}
++
++static void viommu_clear_dirty_status_mask(struct amd_iommu *iommu, unsigned int gid)
++{
++	u32 offset, index, bits;
++	u64 *group, val;
++
++	if (gid >= 256 * 256)
++		return;
++
++	group = (u64 *)(iommu->cmdbuf_dirty_mask +
++		(((gid & 0xFF) << 4) | (((gid >> 13) & 0x7) << 2)));
++	offset = (gid >> 8) & 0x1F;
++	index = offset >> 6;
++	bits = offset & 0x3F;
++
++	val = READ_ONCE(group[index]);
++	val &= ~(1ULL << bits);
++	WRITE_ONCE(group[index], val);
++}
++
++/*
++ * Allocate pages for the following regions:
++ * - Guest MMIO
++ * - DeviceID/DomainId Mapping Table
++ * - Cmd buffer
++ * - Event/PRR (A/B) logs
++ */
++static int viommu_init_one(struct amd_iommu *iommu, struct amd_iommu_vminfo *vminfo)
++{
++	int ret;
++
++	ret = alloc_private_vm_region(iommu, &vminfo->devid_table,
++				      VIOMMU_DEVID_MAPPING_BASE,
++				      VIOMMU_DEVID_MAPPING_ENTRY_SIZE,
++				      vminfo->gid);
 +	if (ret)
 +		goto err_out;
 +
-+	if (amd_iommu_v1_map_pages(&iommu->viommu_pdom->iop.iop.ops, base,
-+				   iommu_virt_to_phys(region), PAGE_SIZE, (size / PAGE_SIZE),
-+				   IOMMU_PROT_IR | IOMMU_PROT_IW, GFP_KERNEL, NULL))
++	ret = alloc_private_vm_region(iommu, &vminfo->domid_table,
++				      VIOMMU_DOMID_MAPPING_BASE,
++				      VIOMMU_DOMID_MAPPING_ENTRY_SIZE,
++				      vminfo->gid);
++	if (ret)
 +		goto err_out;
 +
-+	pr_debug("%s: base=%#llx, size=%#lx\n", __func__, base, size);
-+
-+	return region;
-+
-+err_out:
-+	free_pages((unsigned long)region, get_order(size));
-+	return NULL;
-+}
-+
-+static int viommu_private_space_init(struct amd_iommu *iommu)
-+{
-+	u64 pte_root = 0;
-+	struct iommu_domain *dom;
-+	struct protection_domain *pdom;
-+
-+	/*
-+	 * Setup page table root pointer, Guest MMIO and
-+	 * Cmdbuf Dirty Status regions.
-+	 */
-+	dom = amd_iommu_domain_alloc(IOMMU_DOMAIN_UNMANAGED);
-+	if (!dom)
-+		goto err_out;
-+
-+	pdom = to_pdomain(dom);
-+	iommu->viommu_pdom = pdom;
-+	set_dte_entry(iommu, iommu->devid, pdom, NULL, pdom->gcr3_tbl,
-+		      false, false);
-+
-+	iommu->guest_mmio = alloc_private_region(iommu,
-+						 VIOMMU_GUEST_MMIO_BASE,
-+						 VIOMMU_GUEST_MMIO_SIZE);
-+	if (!iommu->guest_mmio)
-+		goto err_out;
-+
-+	iommu->cmdbuf_dirty_mask = alloc_private_region(iommu,
-+							VIOMMU_CMDBUF_DIRTY_STATUS_BASE,
-+							VIOMMU_CMDBUF_DIRTY_STATUS_SIZE);
-+	if (!iommu->cmdbuf_dirty_mask)
-+		goto err_out;
-+
-+	pte_root = iommu_virt_to_phys(pdom->iop.root);
-+	pr_debug("%s: devid=%#x, pte_root=%#llx(%#llx), guest_mmio=%#llx(%#llx), cmdbuf_dirty_mask=%#llx(%#llx)\n",
-+		 __func__, iommu->devid, (unsigned long long)pdom->iop.root, pte_root,
-+		 (unsigned long long)iommu->guest_mmio, iommu_virt_to_phys(iommu->guest_mmio),
-+		 (unsigned long long)iommu->cmdbuf_dirty_mask,
-+		 iommu_virt_to_phys(iommu->cmdbuf_dirty_mask));
++	viommu_clear_mapping(iommu, vminfo->gid);
++	viommu_clear_dirty_status_mask(iommu, vminfo->gid);
 +
 +	return 0;
 +err_out:
-+	if (iommu->guest_mmio)
-+		free_pages((unsigned long)iommu->guest_mmio, get_order(VIOMMU_GUEST_MMIO_SIZE));
-+
-+	if (dom)
-+		amd_iommu_domain_free(dom);
++	viommu_uninit_one(iommu, vminfo, vminfo->gid);
 +	return -ENOMEM;
 +}
 +
-+/*
-+ * When IOMMU Virtualization is enabled, host software must:
-+ *	- allocate system memory for IOMMU private space
-+ *	- program IOMMU as an I/O device in Device Table
-+ *	- maintain the I/O page table for IOMMU private addressing to SPA translations.
-+ *	- specify the base address of the IOMMU Virtual Function MMIO and
-+ *	  IOMMU Virtual Function Control MMIO region.
-+ *	- enable Guest Virtual APIC enable (MMIO Offset 0x18[GAEn]).
-+ */
-+int __init iommu_init_viommu(struct amd_iommu *iommu)
++int viommu_gid_alloc(struct amd_iommu *iommu, struct amd_iommu_vminfo *vminfo)
 +{
-+	int ret = -EINVAL;
++	u32 gid;
++	struct amd_iommu_vminfo *tmp;
++	unsigned long flags;
 +
-+	if (!amd_iommu_viommu)
-+		return 0;
++	spin_lock_irqsave(&viommu_gid_hash_lock, flags);
++again:
++	gid = viommu_next_gid = (viommu_next_gid + 1) & 0xFFFF;
 +
-+	if (!iommu_feature(iommu, FEATURE_VIOMMU))
-+		goto err_out;
++	if (gid == 0) { /* id is 1-based, zero is not allowed */
++		next_viommu_gid_wrapped = 1;
++		goto again;
++	}
++	/* Is it still in use? Only possible if wrapped at least once */
++	if (next_viommu_gid_wrapped) {
++		hash_for_each_possible(viommu_gid_hash, tmp, hnode, gid) {
++			if (tmp->gid == gid)
++				goto again;
++		}
++	}
 +
-+	ret = viommu_init_pci_vsc(iommu);
++	pr_debug("%s: gid=%u\n", __func__, gid);
++	vminfo->gid = gid;
++	hash_add(viommu_gid_hash, &vminfo->hnode, vminfo->gid);
++	spin_unlock_irqrestore(&viommu_gid_hash_lock, flags);
++	return 0;
++}
++
++static void viommu_gid_free(struct amd_iommu *iommu,
++			    struct amd_iommu_vminfo *vminfo)
++{
++	unsigned long flags;
++
++	pr_debug("%s: gid=%u\n", __func__, vminfo->gid);
++	spin_lock_irqsave(&viommu_gid_hash_lock, flags);
++	hash_del(&vminfo->hnode);
++	spin_unlock_irqrestore(&viommu_gid_hash_lock, flags);
++}
++
++struct amd_iommu_vminfo *get_vminfo(struct amd_iommu *iommu, int gid)
++{
++	unsigned long flags;
++	struct amd_iommu_vminfo *tmp, *ptr = NULL;
++
++	spin_lock_irqsave(&viommu_gid_hash_lock, flags);
++	hash_for_each_possible(viommu_gid_hash, tmp, hnode, gid) {
++		if (tmp->gid == gid) {
++			ptr = tmp;
++			break;
++		}
++	}
++	if (!ptr)
++		pr_debug("%s : gid=%u not found\n", __func__, gid);
++	spin_unlock_irqrestore(&viommu_gid_hash_lock, flags);
++	return ptr;
++}
++
++int amd_viommu_iommu_init(struct amd_viommu_iommu_info *data)
++{
++	int ret;
++	struct amd_iommu_vminfo *vminfo;
++	unsigned int iommu_id = data->iommu_id;
++	struct amd_iommu *iommu = get_amd_iommu_from_devid(iommu_id);
++
++	if (!iommu)
++		return -ENODEV;
++
++	vminfo = kzalloc(sizeof(*vminfo), GFP_KERNEL);
++	if (!vminfo)
++		return -ENOMEM;
++
++	ret = viommu_gid_alloc(iommu, vminfo);
 +	if (ret)
 +		goto err_out;
 +
-+	ret = viommu_vf_vfcntl_init(iommu);
++	ret = viommu_init_one(iommu, vminfo);
 +	if (ret)
 +		goto err_out;
 +
-+	ret = viommu_private_space_init(iommu);
-+	if (ret)
-+		goto err_out;
-+
-+	viommu_enable(iommu);
++	vminfo->init = true;
++	data->gid = vminfo->gid;
++	pr_debug("%s: iommu_id=%#x, gid=%#x\n", __func__,
++		pci_dev_id(iommu->dev), vminfo->gid);
 +
 +	return ret;
 +
 +err_out:
-+	amd_iommu_viommu = false;
++	viommu_gid_free(iommu, vminfo);
++	kfree(vminfo);
 +	return ret;
 +}
++EXPORT_SYMBOL(amd_viommu_iommu_init);
++
++int amd_viommu_iommu_destroy(struct amd_viommu_iommu_info *data)
++{
++	unsigned int gid = data->gid;
++	struct amd_iommu_vminfo *vminfo;
++	unsigned int iommu_id = data->iommu_id;
++	struct amd_iommu *iommu = get_amd_iommu_from_devid(iommu_id);
++
++	if (!iommu)
++		return -ENODEV;
++
++	vminfo = get_vminfo(iommu, gid);
++	if (!vminfo)
++		return -EINVAL;
++
++	viommu_uninit_one(iommu, vminfo, gid);
++
++	if (vminfo->init)
++		vminfo->init = false;
++	return 0;
++
++}
++EXPORT_SYMBOL(amd_viommu_iommu_destroy);
 -- 
 2.34.1
 
