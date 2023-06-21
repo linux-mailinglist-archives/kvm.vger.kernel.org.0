@@ -2,156 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5BD27378C6
-	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 03:40:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B72FA7378C7
+	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 03:40:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229809AbjFUBkM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jun 2023 21:40:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34396 "EHLO
+        id S229820AbjFUBkU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jun 2023 21:40:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjFUBkJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jun 2023 21:40:09 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61961170F
-        for <kvm@vger.kernel.org>; Tue, 20 Jun 2023 18:40:08 -0700 (PDT)
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35KLYDDo025936;
-        Wed, 21 Jun 2023 01:39:01 GMT
+        with ESMTP id S229520AbjFUBkS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jun 2023 21:40:18 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29A8F1730
+        for <kvm@vger.kernel.org>; Tue, 20 Jun 2023 18:40:17 -0700 (PDT)
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35KLXrmb028606;
+        Wed, 21 Jun 2023 01:39:03 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references :
  content-transfer-encoding : content-type : mime-version;
- s=corp-2023-03-30; bh=iAdDFB8J0UJSnGaqk23VK+eckCBr9BJp9Ww9tZvUYTA=;
- b=am1OE5lX2lJ667ff68i7mKnsYu7Grx3RcuiRz6x9ncpRhSUxMB71Sc7JNCNcnKKw0eiF
- olc4cc4dvkBjpoJij9wftB+IZfTMQe3Nw3ALmPRPEUvOyWwinHCJLpyrGEIqRgmXsdSb
- kbRQVZo2UVlDIwuVJhlOfDI8arzG1MvI1gXjllxZdIWbIFG4NL21dGz6CY5qjMbvBJtg
- Aushh9kLSHuSiCG5iu9B4jYmbMVBt1mHH+3ujfXYAdFg3tlS1Mc0Pd9sJ5DE3fDZ8W6/
- eF1KwNjiZ6WxwQJ+0Gsd20p8WadDqO7JFZ3wt1SspLOYcdGDjo59CMJbUodE61+/oXUC vA== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3r93rbp7qg-1
+ s=corp-2023-03-30; bh=pTylnmkQiEkuLZcOffDTQp4QtlPZ5g9pa/a8moapo1w=;
+ b=nOq+rFG0Zt1z7D2M3/0EUtrOcKlAPuPdHNsYsRxBfN1V9smYSRl52VMo/HZkmN70C7wV
+ mVUUZFast2vASWmysIICpxGKZ0BkfyhhYuPSZFVf0RTqZ96yQgiMB6Sp5PvIIAyNUoVb
+ kzXtSI5PEHCrsj1+QnNMGKsNWBcXOjOVzm+vB26/UTzTZWWK2Fal99YqrXKnrW/l4Tp0
+ pYfXnQZ9nZ5OmfTmzYS0GEUcnVjMiNkhZjpcZPK/sz16zNTGbf+J93DzZsqwqK8lKX/b
+ qIJAg1IuxQppSux3AeBznhL1PHCA8XAT9AWVIpSCycH7AZGa4stV+TMiv3DoLXe1wikf Wg== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3r94etp721-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 21 Jun 2023 01:39:02 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 35L1cT66007913;
+        Wed, 21 Jun 2023 01:39:02 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2100.outbound.protection.outlook.com [104.47.55.100])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3r9w15r0p7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Wed, 21 Jun 2023 01:39:01 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 35L1KBiN005872;
-        Wed, 21 Jun 2023 01:38:59 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2103.outbound.protection.outlook.com [104.47.55.103])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3r93955fq8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 21 Jun 2023 01:38:59 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZcOc3m5AMWEYoT6ct1bJxabNu4gGQkOaY5Lr4u8wSF1TnUbBjuOFyEEjy2eMQN30YHpDmGgqOuqq+4XlHhUHKplXvXtZDtgWS5wLDjVY7hWTbpx3Gk2tQWm4nglZG+iC4IsEsdSZVEBSxkLa/S71CnDaLzfb6qbT/ODq+P7n1/drIkUKSS1RjWrRh2Q1I0Hv7MWsFX8CeydqWpE8MjQmpF9BYmJYxpZlz7hFKPg9ayZ9Pi1DHn6Lt39NiT+2h3WJMkzUNaaM81NS43YjXhAoyRDiDeE27BIRHYuZx6y9+bOo3bRzjVK53aNj1ALjCybSERomGroWx3Im9Usm5qc6Og==
+ b=L/3NcT1mFX7pVVQSHCwhQJGRVtyHT4SICQwKbXYCIM6JIy3iivYl2gIgBFhx4xAnOI+0SIkqkbKu34aCVESlBUQ9y8SaPfPJ5IvVlr9a4D/9/lc07/061hX6S0+DJm0IiEIvBICRMjy3jPwTZUZrHUVMNqcHncaJtySlRxY4eEXPfj1fOWmVaY5cbgSPeuvrGmQ4hVZ8AS4/0thPIWXbuZ+jxzA4XtZwhFAZfVAzYl5kxEX0+k5KbHXoVqY9Gez+dMkXgL03Eskpsv21qDozLn34AddKGWZrdlxgjB8JEViz+kD2fhBklD5E1TrDoBKT04Jt7rUhyWSo5bb4mZHlEQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iAdDFB8J0UJSnGaqk23VK+eckCBr9BJp9Ww9tZvUYTA=;
- b=DztO4u2VGU/ba6qKXQYghImD73sMCuB7QlkvY5RAVcYnASyAZUTlLrvdidRQJJS0Pv2F5gaVVJfXe4NoWywL4m/j4bck0/zRcq5OlaB7NTZbB1pBmKzwFZ2m//AunagIGmamRrNZAmy6AYLJ0GmWe4lL/2dGNRGwJhLE7VhRGfvw/jJdg4S53iAgmO+XWmjozZeEzgDZyPgJY6805K1MVWix/WE3ZynxY5d8Hzs3z5iTH5ZgWsAohw+DRrGBsgH3MfWHi2pAGR8jcAFUA74ECp60lQJYsO84UHCdnxX140Yk3FIl4YujQM5Iz3A84zFCqeeFCDUYKoJrEX3SEaNq3A==
+ bh=pTylnmkQiEkuLZcOffDTQp4QtlPZ5g9pa/a8moapo1w=;
+ b=JaVyUsuDDkLb1H1BK/TklPNZw8FGGDbb7d3FzIeC0t8jIbRkFsoUcNrQRZgZPAoNItm1O8YmZvxC0zof0e8rsGekiufl/1Dj4tyT/Rc/f7Nt+5NMiiGwMBFpbLrld8P1dE4unTjEXJi7KvxEZaAmBiypnqcxLL9uCvyFj3ovvT5PWNslm+C55gyl5GQPOfmNwITYmQFXpWB8v6pDTg0L5jpV3vd9GFntZdFjuwAAwupv5rqucH0qjGwl2aMzVByhtXHh5iVeD1ICBj3xx7hu7lZGc8a//TPrFT7HgilAbdyMdoUi04tBB4U1f678i20DxirZ45edy0cBw1zGl2Qv9w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iAdDFB8J0UJSnGaqk23VK+eckCBr9BJp9Ww9tZvUYTA=;
- b=fhs3lD3dILoQLRoig4q0rz1NBKPia9nmoH85wAgQb7gPHrF3nEVV+tSYv+pqnmbtY9baXQLMWwPjz/1zFAW6FK2PsEvOk/xJDlzRDmTExpiFGo1PxGFs8ympTVt5T4SlppRLPREojrIH0qQh/0+UjwVuzcu/tIE6B7aR25aVCfU=
+ bh=pTylnmkQiEkuLZcOffDTQp4QtlPZ5g9pa/a8moapo1w=;
+ b=RWEOf9MPsC1D8qeYV7DOwZRlSjFt1IQP+EOWjfkXyJRe0J44F4y1A26TGsk5uNtptZO29EJcZrXceH3GEcVD/jC9KAV1FaHTvBgrC9fgvAvQu5K2rs9RU7Z1xFpLFiyszKqXiJgvmft7Vj75GtXkaDcaa+vDFO2hDemL0AiBiBo=
 Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
  by IA1PR10MB6783.namprd10.prod.outlook.com (2603:10b6:208:429::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.37; Wed, 21 Jun
- 2023 01:38:57 +0000
+ 2023 01:38:59 +0000
 Received: from BYAPR10MB2663.namprd10.prod.outlook.com
  ([fe80::96aa:8e73:85a9:98b9]) by BYAPR10MB2663.namprd10.prod.outlook.com
  ([fe80::96aa:8e73:85a9:98b9%4]) with mapi id 15.20.6521.020; Wed, 21 Jun 2023
- 01:38:57 +0000
+ 01:38:59 +0000
 From:   Dongli Zhang <dongli.zhang@oracle.com>
 To:     qemu-devel@nongnu.org, kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, mtosatti@redhat.com, joe.jin@oracle.com,
         likexu@tencent.com, like.xu.linux@gmail.com,
         zhenyuw@linux.intel.com, groug@kaod.org, lyan@digitalocean.com
-Subject: [PATCH RESEND v2 1/2] target/i386/kvm: introduce 'pmu-cap-disabled' to set KVM_PMU_CAP_DISABLE
-Date:   Tue, 20 Jun 2023 18:38:20 -0700
-Message-Id: <20230621013821.6874-2-dongli.zhang@oracle.com>
+Subject: [PATCH RESEND v2 2/2] target/i386/kvm: get and put AMD pmu registers
+Date:   Tue, 20 Jun 2023 18:38:21 -0700
+Message-Id: <20230621013821.6874-3-dongli.zhang@oracle.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230621013821.6874-1-dongli.zhang@oracle.com>
 References: <20230621013821.6874-1-dongli.zhang@oracle.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SA1P222CA0030.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:22c::6) To BYAPR10MB2663.namprd10.prod.outlook.com
+X-ClientProxiedBy: SA1P222CA0007.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:22c::22) To BYAPR10MB2663.namprd10.prod.outlook.com
  (2603:10b6:a02:a9::20)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: BYAPR10MB2663:EE_|IA1PR10MB6783:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3e9a0d65-f17b-4d35-a7bb-08db71f847a5
+X-MS-Office365-Filtering-Correlation-Id: d3e34249-a2be-4968-1c03-08db71f848e5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: V89G9nB0c937q01oeiqr0K0N8i80lAjxGtQVs7Wc7De0eJdFQ8489rM6rcJD0pKdZcp+D3MHwkyx8EwSzM1T2Uw/wXtgXOXNJdWCejVcQEO+e5pyRDuHNHT94MTSGCtgzSMWUmFYiLgYnbsquffJf3sFrjbdiNxdt6DD9uCUOV36BMIs3pvJvlCceyuloSwtLJMn1oey1BjMtMHTyYE2H/xID84l7AwPVu/qjlNJ0nK06nSB94A75B2SMJMzogrIm+wz16Rez9Befb9ikUkj9CkQSp3oIbXBBoimKitYFZ63lX6uYUxOt98p4jCo6VQG5j+w2dKjntfiIuJncq5/XM3EVD7sv0xcLxUfoYAuJj4B5iv94akn7kKMjrPe4t+Hn8/DIOvO5VYAldAMDhtYhdHD/SNoIp1SPt+/gQo3TxpZR6ysHAOf3WXBixHG06xzCREzS+zAEImpYS2rmTxe13qFP/+ydYRXK3bBidFdEgjCjBPYuwV509syd0cY5qPZnW12ZPfpUhnqYbP47Xw+yGzVV/jAMophK2YOX37oZXh+f9HcLrY5tN4jmwT3TdEk
+X-Microsoft-Antispam-Message-Info: PSKrusnxzEZDVTNGuA5o+/pqA8vddfdmH4ReWCHBrGf5+bCzOBLdJJLVlJYhT1jYUKQWAe5T29Z12Qypj9jue5UqckfhnrV0A8syRKFY17ISbzNtkthr3gJXRs6mtPaBNJF+BHah0cOFQf0khZCPDS/2bPrD+OG8stTOw6jpG8PUAkPuuE6rMeDggQmdWttyCfeHo0Okttn+A89xSW0YKz/O9XHJvcE1pVyPtHU6azJK4L8+257HxkPlFsVcqMITk78YfIQGablUZYRAqysCTWpGnS4uCEKA7YTf1al7NyLmsaGhmh77LMRXCIZF3sH+zrJuroHBcDVnMhBOJQCUYV58GI/cyxgd83wltMGIlQt2RcgR5Vg/jxZWjo/KQfjse69T5/9ypX6csUHJjVojoQUNDD6nOWEOwM0V5DkiNQbUv/feUTWvcn21HThm1VaGmMPxvHENgFckqUOVq4Nov5k6B3qmEMtAn4JUI3w5TlrOgXe0gjpQSLugZBo0+ghr1PSB2E8GMPdsLJg3OJ9+lzwn5V7HaOdcmWxi7JMhOd/3T41udTBw4iDF3RiPXXVA
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(136003)(376002)(346002)(366004)(396003)(451199021)(2906002)(41300700001)(5660300002)(44832011)(8676002)(36756003)(8936002)(86362001)(478600001)(26005)(6506007)(1076003)(6512007)(186003)(6666004)(6486002)(66946007)(66476007)(66556008)(83380400001)(4326008)(316002)(38100700002)(2616005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?8VBn98GGCg5X/eOM5cspfcyUYkw+5Ei71Ry/BOXqBNP6dhGHseHG2MeFBoYN?=
- =?us-ascii?Q?qQ8aBbDstUcX/dlnAlbESyYdh1VGCATE49f9qU9THz9Z+0gC8f7m3KwE5Bhr?=
- =?us-ascii?Q?E8dz1qHziaTpYVqm19rYXwCmNQCYdfATa5JIPY+Y2u9Bo7rQkC6snDz2+taE?=
- =?us-ascii?Q?Yl+ls9IjmrJMRYRS+HV+kFMfvGLkhjd5SI3BecaoPknMKZL25OQhySXv2yUc?=
- =?us-ascii?Q?8H22bER+5d5dO4/Bu5GA2rJK6/k16XGxqfM9P+SOaXUgO/0i9idl59q+qc+E?=
- =?us-ascii?Q?R8W5HuaHL0LOdB5sIS9oz9HA8wZHuEXQARGGAxtP83m5ObnV/3/tTxBaGxPL?=
- =?us-ascii?Q?ar3jxjrWnyWh8HYir56qk1XXRcyS8Q8uoXwi9X+U7vse2pzFVC1fiJVLuP8P?=
- =?us-ascii?Q?Q8SU0FdtDDnvvNiZkw0HQqB8x0pM6UBOxRG1NIlxfe+HdCmezBOfhd9iPA/D?=
- =?us-ascii?Q?Yhep2RBqz7VJoJFhtJzBafPXdRrVXZB26L8OQOXDYJYhbvKm023ydQRsa/Dd?=
- =?us-ascii?Q?0UVQxVANh8+pjnJ+uSr2FmNhv3I/Fq+xyHb7+VXG9Om5VD20v4LUE7U9Y0V5?=
- =?us-ascii?Q?Lcgp/jrLlXVf0aSUX+eD33Ov+yLvqgkd3/39BI63ofE27chCzZPa2lZWhfD5?=
- =?us-ascii?Q?NZmHRAQmDr4WS9OPh5s0CMY1nGdvKQ2n3xHRFGQG90yKlGo5lmccVssc+1nR?=
- =?us-ascii?Q?p+xTP7l8OOW/3SooptQ9ZGnrbtfNKx4vy2nRifhfBctAQP/8Y8UU17gzSM5Y?=
- =?us-ascii?Q?dvpANnmaNrk8hbliSUn2j3DXf3zBccgbp08gAhfvGye1CYIfaGHnFF+F4Kkl?=
- =?us-ascii?Q?bO9lmvqtVV7C4M2/svsraOf9zsxbXPtEcw8e8rp5Si5ycrk614UgZF6St9UD?=
- =?us-ascii?Q?8kUZXVr+mLPcy1eNI7QAWwYji+DmqORMnBNbBbouNDazkNj9xtay22MQLpAl?=
- =?us-ascii?Q?E0fc3YIWTWxdlr7LzP7502QHTPgRCMycIZJXRSQxonBwUg4YaF9Y3Ep5uXhD?=
- =?us-ascii?Q?dcqjZBBmwx9ADhtu2p2jtXF20vVUdvc+iGuIZlG6CoQxyIkRJDtHDqTWjqns?=
- =?us-ascii?Q?3Ue5gM5+skWpEhFTFdvrJlDmIoTf/TvMKmb8MtICEGBiC8eiXt/V8j/YIVjr?=
- =?us-ascii?Q?KF7JtCHEHHtm+WrWP7TzvJqWGcO7ZaE1eB0xFZCj8X0uCtcC9Iiu1pbdw7Sf?=
- =?us-ascii?Q?x6MLpIkyjU8Yc673HDg33Orhu6oqCp4gWSGLMLME0UBZBSgn0Lyik1MgOK+f?=
- =?us-ascii?Q?4OhKqqcXR4PwY6YSinnbsg+StmMqVKiDdDdoUOK9UXAdTf9HyXC2ZwsWhhfE?=
- =?us-ascii?Q?cXEcV4wgGgQ+VSfWycYkoUMnPJL3FzvIQBD7B37Y7DE+nDu7C2Qknp7DvVnL?=
- =?us-ascii?Q?jO/M0f83eVQXcKa9X2ABeEL71MyjTRLdEsUBe24fH90iSrGWR3U9biHdcPTO?=
- =?us-ascii?Q?nCwcp9zs1Xs/+B52DWaIndNYOAaWrQV9G9PScYnH9YO5YTo7EQsNmEpux27J?=
- =?us-ascii?Q?2G3w062hmfL9p3NVOgKeQSESh/tfpqw9789NBuYrktZPQYb9UhP1d6wWXF5m?=
- =?us-ascii?Q?janNDodlvnSETxOEqY+i/3UxldYpmIztuPv8fuzB?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/z9SHYnOkQS17C/jkBF2yyr9qhWUFQad4ZgIQSVafvB4Bi0x0WL8vFBAfLqe?=
+ =?us-ascii?Q?MdzO0yQ+jcy2FsW/D7lfWAOcRteFaMBb5MjRzln8oxpOqXXWVHxYSHEwmbv5?=
+ =?us-ascii?Q?xgja224pMiARUKY2zj5Zqx2FCaGc7KBbIoLcRAbturtz9AnGw/NpZdpiPaqc?=
+ =?us-ascii?Q?UEvgkZgoNxo0WOrqXHP9z76X9zz8XK7iTrE7TpddIsgYnVtk00ev+nLfOH/k?=
+ =?us-ascii?Q?PbAbfB2U1CFuxa0/pqiv9sifBMyfaU82aSI6mQs+aO+KY28JYh6RoB4MpYQF?=
+ =?us-ascii?Q?pn+cPazBxxpBhcXKG7TYzyXgibyvjgIHrU/R3aSMzT3ClfAG+xPAjzuWTP1w?=
+ =?us-ascii?Q?+9EcVlqmE+lhBphwnYXwjJDdX98r/NLzkuW1kvsSm52sUYeF9rU7LKbFVhXF?=
+ =?us-ascii?Q?FfpqdiCqB/aI+8telnnglP0/1N6cUitM7n32990Go0HvlYTOZdzJ3Ko43eS/?=
+ =?us-ascii?Q?o1n4fOvp16hqrOmkH20oSYceF5MLw3TgilRGKclnDxU6db2rmXM5fImNGtl9?=
+ =?us-ascii?Q?zZ5gdNmvzBNbZhVAXzTizN/fP087emRi+I49cmGOO/Xws0foRZxY26SGJ6kF?=
+ =?us-ascii?Q?Ogk4uKCnRqRR75keGeAJ5guiRjdomeIIyA8/ru071VsOiJEUsNkHligkfVoQ?=
+ =?us-ascii?Q?TjcaCOpF+sqzjaD32TiIg+NqpPeEzvRKco62XirHGSeLct4r3dVqYbN9TTSp?=
+ =?us-ascii?Q?gSPs6fnnVi2hHY8Y55zwUUe7D02Hh4TGeZT3QuF58+j8TBxo5HxHMtSM06c1?=
+ =?us-ascii?Q?BSL6pUm0mzY24ayWa9l6g0QJYwaaQQH9lYOXTkxYyXCIHNo/3IqtTdVHTn2o?=
+ =?us-ascii?Q?CBj1yhLSJnNuxT69UJaDwe7QWCZYssgj7aW6LI00akkpfnN4l0CTQz/kacSe?=
+ =?us-ascii?Q?UrWPRdfAobuHz5lvvWWgUyhgSHgMdsxqJ7afAKiyh4taTe6TvNBrlPTWA9N8?=
+ =?us-ascii?Q?CeXjQAEbPWvYBOkDwaOH09dfJMuEDXSKoCUk4hskok9FNx9MjfpZ0OEN+9t1?=
+ =?us-ascii?Q?e1EJH2NprM3N5keV/RvD9ZuYdSN3bhgAs8v7aX2qroTOXtdivYVNo6E+BrBL?=
+ =?us-ascii?Q?F1ypCvjkWRH98BRKzhE3SkiuNJAq0FB95fUnzAoo+zx5dlhGQgMMUyDciR/D?=
+ =?us-ascii?Q?FmVplxSacpchkMPBcW9mJtg7BMTJgvVpAxn4TKjJ2VTicc9Xy7ZC4ycKUMCX?=
+ =?us-ascii?Q?DqxOaq6CXaQaF5/6t0PkjFbhu7EHQCWOSj5XlWZiP1SZL1jfud5R6esTukIS?=
+ =?us-ascii?Q?Th00qtxN3MF6pEcrXceAI+Danb3Amsd7VpY4SRgO7IWyIWSjXWPCZR5iUWCK?=
+ =?us-ascii?Q?JrByr9HPTiCaF4cwjVqAiHqeRk9A2HUw2l8oxce3iX/4O5XKvsKDa4KfVIJA?=
+ =?us-ascii?Q?aNerZk5NuKekSx7FZeVAtZZvj/9/uxktj9F1UgD0zyttDnejk8TAxUZ7wyxs?=
+ =?us-ascii?Q?+plqYlq77x/T/l3ZwBDIUmnUTyWdnDg2aEz6O7pRMhvmvDcGZa/PS5WmTKfQ?=
+ =?us-ascii?Q?JXToo3PHkcI7YidNHGVdChhGfTNaVVLlFueUZ6GSho9lLjQLB1AnfnVEIp4L?=
+ =?us-ascii?Q?Tm8nHlR4ReXEmXDzor+c7gkAfO+cNkHdKfWntdQW?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?T6paRdZQK7ECIqxP8A4Sec4XBY9TEk3ffz01ntf2lPEdiOAl4D64/02AUPQg?=
- =?us-ascii?Q?f+T77rbGTMs4RftO6UOwXFc0K4vSnK9Vb+JSxMbJIv99lKmWSE9STVAI/tOl?=
- =?us-ascii?Q?xndsHjJhpI6mjKWEpeFGBpQJow7zV6hStumRYdoSIUYqSbI48gK/oumJC1EY?=
- =?us-ascii?Q?AwgSQFxiLIXq8u8BSFAXkCcDfmGX91hwo5lzdEoiXWFVN4/SmipRE7+L892V?=
- =?us-ascii?Q?2V4JOeUxxDbXjEH7Uk6Ah71ZGkzGZQDdZpk0/Vuu9TCBpm7osrWYfQDaOo2g?=
- =?us-ascii?Q?uShNqO+/6kTwbFiizgHRfhBuNZEU9lmFNsCSV71UI3TgMoSzC20iuvA+hNDb?=
- =?us-ascii?Q?FAqQ6gkZhk+pUODUuepxNSZVXdLafEjkiKLuhZ5rCw55ZqoiaOTPKSaszUVa?=
- =?us-ascii?Q?ujcwQoBCE6DfE39WIL9Zd8owhGV89+2kM8yrUyHGYRBkDeKojNvAJRH7J0kN?=
- =?us-ascii?Q?yEg373+UZh8I1LT35Qo4/AOxzYkdikz3KQLcxODqBcz6XK5ZVlzQ4jktwQB3?=
- =?us-ascii?Q?NkMA3ia/Z8JC07UwJ8ne4Y6LvEgraWgYyuUufjXONp8EIz4I9QEoj8IhOb5R?=
- =?us-ascii?Q?53+pc9qkjeG1GocXvgNSS/0dGb8g13G5a6mA0j/HK6R/kLhZd/E8hFO+Hkx6?=
- =?us-ascii?Q?ifmamaVAsYkERxkx4QE2epH3pPCyYYohUXiwMRcULxp4FCYvkdQAWn29FUH4?=
- =?us-ascii?Q?8Fp6n/rWl+u7nJGoIHn2RII7sVpamh9o2DcTOIOsQdp3DTk23si1h86L8oqI?=
- =?us-ascii?Q?Z6f67FstxbJU/SoqhFFuvAjDLXiXs9NufyZczS7AsJ+jdTjtyfqCEVItE5n2?=
- =?us-ascii?Q?9EP62gwNVySDmwV+cwXpoyt2ou1HuxLKMX7INvnKyGjzZeH2OGXrCxZt8Z0u?=
- =?us-ascii?Q?St5E1/e6k/ibhQG5WlD0MiJxDrmxjrGKif4Wgf2gtt1DvRV2CqVn4AmOpKiq?=
- =?us-ascii?Q?4L6rCNhGZIA+lOeqcpd4ykvwKNCUZylcPoNOs1JE6FM=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?eiNv+kNzIWJ9s7ZOx4fiMVY3VUYEE74RpzJfq9Nakf+1kvd12NnAMIWNcUQV?=
+ =?us-ascii?Q?uvmuDlGrWI1Wj+cW0Anr7D9+cw+5K/K2HGDl+dtm3OSEPksdNSK6OQYyUE4q?=
+ =?us-ascii?Q?lNJbDktKRe4itmzi5ibgC3IlCoPhA94psR1KN4QnUBBTQ0SDOZ+W607F1XqJ?=
+ =?us-ascii?Q?tnTuZ8V56ROpPbncyo2fy6n6nFDLWtJ6jMs2Mn2Ge6zqRGRJoMTJgqixnC8/?=
+ =?us-ascii?Q?KFlomP81HGAV59TtmzV4L07J62k4KpkuYKIWLMNCbNWsWh55KFk73Qk6ELtC?=
+ =?us-ascii?Q?U1hAQumvzPW3V8MDojWsPVuhK6Sa2HqkUfacxdvdXpta6kVGKTiQ4nNlZTzN?=
+ =?us-ascii?Q?a/QI/EahveJDlKZyUWtrryrbtIAoNoheFxfBoRBtO8ofwtSZgAfS53wZO2wP?=
+ =?us-ascii?Q?e5xo5CxB2bGM/JFMQlarLeXR6gDb5iOfgjYm8tc/kRqXqqREts4kCySjC3na?=
+ =?us-ascii?Q?x8uEXkPr8XJe8EDMVj+ZZa1L/7Vdy+a42fjtkBjTXL77eAtAxvLjHyQ65hPl?=
+ =?us-ascii?Q?AnBUuI81iitdNvb2g27DU6BF7hCCOwNfrxNOGRIHTH92VLZbrNAwkk5bX6sB?=
+ =?us-ascii?Q?/ZiAsWTk9rvcs7ndEMRv8dtEpAR65St6C62GIweQfTcyikciDMjtcYbd+cRW?=
+ =?us-ascii?Q?ff0NI6DCCPp+NfOUq/TeU1g2eHC3n52++aPMj0GHakHot40tpLs+qaRAjKR6?=
+ =?us-ascii?Q?9HHZc4cwdKwcIz5buoTZZH0oUtdMzzr1Wu5/PbcUtnVH8nMKtvlupmUVwalo?=
+ =?us-ascii?Q?v8pR36ZRFQ1M85zdQgIpkYTlh7cIwIhQkQriK4VtrgXqkitVyh9m8tMi0JRm?=
+ =?us-ascii?Q?f/HpPCtKD0Xl1jAA7+Cm5x4hgS4ZKmE4eV7EtAQtjAaOI46R8ROlxwYCBzrT?=
+ =?us-ascii?Q?qY1Pi2Bg9AIYzQQItxLjiAQgpmpgtY+QFMkwaY1XRflVTsf94lNUJ6MZmYBj?=
+ =?us-ascii?Q?imIzRahMzSLPVp+aarg+TdMz1KNAFO6fiO7ANOaiMaI=3D?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e9a0d65-f17b-4d35-a7bb-08db71f847a5
+X-MS-Exchange-CrossTenant-Network-Message-Id: d3e34249-a2be-4968-1c03-08db71f848e5
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 01:38:57.2975
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 01:38:59.3444
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dkT1GhHszlUYSaJrHGSzUm00DYoHayJpQm7gRoDvfKBuBSqK5I34WOe+C9hC/Jh0I+j8NQi9VS5g//C4/bXuFQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: hhIemsxoCmIdfa8/Z6Jb0h9912wczMaYcQpRjsKIrGFPb3cEcHBHwl0FCgdyyrNj/A4iOFrC2a9xuTJWwPt6zg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB6783
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-06-21_01,2023-06-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
- spamscore=0 bulkscore=0 malwarescore=0 phishscore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306210012
-X-Proofpoint-ORIG-GUID: 5G8uJScsKhy3f6MUOVB7LYIvXVb_jGAD
-X-Proofpoint-GUID: 5G8uJScsKhy3f6MUOVB7LYIvXVb_jGAD
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 mlxscore=0
+ suspectscore=0 bulkscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2306210012
+X-Proofpoint-GUID: tqmmgjTDYHMuQssYfSr4I52-pO0U2HlK
+X-Proofpoint-ORIG-GUID: tqmmgjTDYHMuQssYfSr4I52-pO0U2HlK
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -162,170 +162,196 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The "perf stat" at the VM side still works even we set "-cpu host,-pmu" in
-the QEMU command line. That is, neither "-cpu host,-pmu" nor "-cpu EPYC"
-could disable the pmu virtualization in an AMD environment.
+The QEMU side calls kvm_get_msrs() to save the pmu registers from the KVM
+side to QEMU, and calls kvm_put_msrs() to store the pmu registers back to
+the KVM side.
 
-We still see below at VM kernel side ...
+However, only the Intel gp/fixed/global pmu registers are involved. There
+is not any implementation for AMD pmu registers. The
+'has_architectural_pmu_version' and 'num_architectural_pmu_gp_counters' are
+calculated at kvm_arch_init_vcpu() via cpuid(0xa). This does not work for
+AMD. Before AMD PerfMonV2, the number of gp registers is decided based on
+the CPU version.
 
-[    0.510611] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
+This patch is to add the support for AMD version=1 pmu, to get and put AMD
+pmu registers. Otherwise, there will be a bug:
 
-... although we expect something like below.
+1. The VM resets (e.g., via QEMU system_reset or VM kdump/kexec) while it
+is running "perf top". The pmu registers are not disabled gracefully.
 
-[    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
-[    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
+2. Although the x86_cpu_reset() resets many registers to zero, the
+kvm_put_msrs() does not puts AMD pmu registers to KVM side. As a result,
+some pmu events are still enabled at the KVM side.
 
-This is because the AMD pmu (v1) does not rely on cpuid to decide if the
-pmu virtualization is supported.
+3. The KVM pmc_speculative_in_use() always returns true so that the events
+will not be reclaimed. The kvm_pmc->perf_event is still active.
 
-We introduce a new property 'pmu-cap-disabled' for KVM accel to set
-KVM_PMU_CAP_DISABLE if KVM_CAP_PMU_CAPABILITY is supported. Only x86 host
-is supported because currently KVM uses KVM_CAP_PMU_CAPABILITY only for
-x86.
+4. After the reboot, the VM kernel reports below error:
+
+[    0.092011] Performance Events: Fam17h+ core perfctr, Broken BIOS detected, complain to your hardware vendor.
+[    0.092023] [Firmware Bug]: the BIOS has corrupted hw-PMU resources (MSR c0010200 is 530076)
+
+5. In a worse case, the active kvm_pmc->perf_event is still able to
+inject unknown NMIs randomly to the VM kernel.
+
+[...] Uhhuh. NMI received for unknown reason 30 on CPU 0.
+
+The patch is to fix the issue by resetting AMD pmu registers during the
+reset.
 
 Cc: Joe Jin <joe.jin@oracle.com>
 Cc: Like Xu <likexu@tencent.com>
 Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 ---
-Changed since v1:
-- In version 1 we did not introduce the new property. We ioctl
-  KVM_PMU_CAP_DISABLE only before the creation of the 1st vcpu. We had
-  introduced a helpfer function to do this job before creating the 1st
-  KVM vcpu in v1.
+ target/i386/cpu.h     |  5 +++
+ target/i386/kvm/kvm.c | 83 +++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 86 insertions(+), 2 deletions(-)
 
- accel/kvm/kvm-all.c      |  1 +
- include/sysemu/kvm_int.h |  1 +
- qemu-options.hx          |  7 ++++++
- target/i386/kvm/kvm.c    | 46 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 55 insertions(+)
-
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 7679f397ae..238098e991 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -3763,6 +3763,7 @@ static void kvm_accel_instance_init(Object *obj)
-     s->xen_version = 0;
-     s->xen_gnttab_max_frames = 64;
-     s->xen_evtchn_max_pirq = 256;
-+    s->pmu_cap_disabled = false;
- }
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index cd047e0410..b8ba72e87a 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -471,6 +471,11 @@ typedef enum X86Seg {
+ #define MSR_CORE_PERF_GLOBAL_CTRL       0x38f
+ #define MSR_CORE_PERF_GLOBAL_OVF_CTRL   0x390
  
- /**
-diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index 511b42bde5..cbbe08ec54 100644
---- a/include/sysemu/kvm_int.h
-+++ b/include/sysemu/kvm_int.h
-@@ -123,6 +123,7 @@ struct KVMState
-     uint32_t xen_caps;
-     uint16_t xen_gnttab_max_frames;
-     uint16_t xen_evtchn_max_pirq;
-+    bool pmu_cap_disabled;
- };
- 
- void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
-diff --git a/qemu-options.hx b/qemu-options.hx
-index b57489d7ca..1976c0ca3e 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -187,6 +187,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
-     "                tb-size=n (TCG translation block cache size)\n"
-     "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
-     "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
-+    "                pmu-cap-disabled=true|false (disable KVM_CAP_PMU_CAPABILITY, x86 only, default false)\n"
-     "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
- SRST
- ``-accel name[,prop=value[,...]]``
-@@ -254,6 +255,12 @@ SRST
-         open up for a specified of time (i.e. notify-window).
-         Default: notify-vmexit=run,notify-window=0.
- 
-+    ``pmu-cap-disabled=true|false``
-+        When the KVM accelerator is used, it controls whether to disable the
-+        KVM_CAP_PMU_CAPABILITY via KVM_PMU_CAP_DISABLE. When disabled, the
-+        PMU virtualization is disabled at the KVM module side. This is for
-+        x86 host only.
++#define MSR_K7_EVNTSEL0                 0xc0010000
++#define MSR_K7_PERFCTR0                 0xc0010004
++#define MSR_F15H_PERF_CTL0              0xc0010200
++#define MSR_F15H_PERF_CTR0              0xc0010201
 +
- ERST
- 
- DEF("smp", HAS_ARG, QEMU_OPTION_smp,
+ #define MSR_MC0_CTL                     0x400
+ #define MSR_MC0_STATUS                  0x401
+ #define MSR_MC0_ADDR                    0x402
 diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index de531842f6..bf4136fa1b 100644
+index bf4136fa1b..a0f7273dad 100644
 --- a/target/i386/kvm/kvm.c
 +++ b/target/i386/kvm/kvm.c
-@@ -129,6 +129,7 @@ static bool has_msr_ucode_rev;
- static bool has_msr_vmx_procbased_ctls2;
- static bool has_msr_perf_capabs;
- static bool has_msr_pkrs;
-+static bool has_pmu_cap;
- 
- static uint32_t has_architectural_pmu_version;
- static uint32_t num_architectural_pmu_gp_counters;
-@@ -2767,6 +2768,23 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+@@ -2084,6 +2084,32 @@ int kvm_arch_init_vcpu(CPUState *cs)
          }
      }
  
-+    has_pmu_cap = kvm_check_extension(s, KVM_CAP_PMU_CAPABILITY);
++    /*
++     * If KVM_CAP_PMU_CAPABILITY is not supported, there is no way to
++     * disable the AMD pmu virtualization.
++     *
++     * If KVM_CAP_PMU_CAPABILITY is supported, kvm_state->pmu_cap_disabled
++     * indicates the KVM side has already disabled the pmu virtualization.
++     */
++    if (IS_AMD_CPU(env) && !cs->kvm_state->pmu_cap_disabled) {
++        int64_t family;
 +
-+    if (s->pmu_cap_disabled) {
-+        if (has_pmu_cap) {
-+            ret = kvm_vm_enable_cap(s, KVM_CAP_PMU_CAPABILITY, 0,
-+                                    KVM_PMU_CAP_DISABLE);
-+            if (ret < 0) {
-+                s->pmu_cap_disabled = false;
-+                error_report("kvm: Failed to disable pmu cap: %s",
-+                             strerror(-ret));
++        family = (env->cpuid_version >> 8) & 0xf;
++        if (family == 0xf) {
++            family += (env->cpuid_version >> 20) & 0xff;
++        }
++
++        if (family >= 6) {
++            has_architectural_pmu_version = 1;
++
++            if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_PERFCORE) {
++                num_architectural_pmu_gp_counters = 6;
++            } else {
++                num_architectural_pmu_gp_counters = 4;
 +            }
-+        } else {
-+            s->pmu_cap_disabled = false;
-+            error_report("kvm: KVM_CAP_PMU_CAPABILITY is not supported");
 +        }
 +    }
 +
-     return 0;
- }
+     cpu_x86_cpuid(env, 0x80000000, 0, &limit, &unused, &unused, &unused);
  
-@@ -5951,6 +5969,28 @@ static void kvm_arch_set_xen_evtchn_max_pirq(Object *obj, Visitor *v,
-     s->xen_evtchn_max_pirq = value;
- }
+     for (i = 0x80000000; i <= limit; i++) {
+@@ -3438,7 +3464,7 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+             kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, env->poll_control_msr);
+         }
  
-+static void kvm_set_pmu_cap_disabled(Object *obj, Visitor *v,
-+                                     const char *name, void *opaque,
-+                                     Error **errp)
-+{
-+    KVMState *s = KVM_STATE(obj);
-+    bool pmu_cap_disabled;
-+    Error *error = NULL;
+-        if (has_architectural_pmu_version > 0) {
++        if (has_architectural_pmu_version > 0 && IS_INTEL_CPU(env)) {
+             if (has_architectural_pmu_version > 1) {
+                 /* Stop the counter.  */
+                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+@@ -3469,6 +3495,26 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+                                   env->msr_global_ctrl);
+             }
+         }
 +
-+    if (s->fd != -1) {
-+        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
-+        return;
++        if (has_architectural_pmu_version > 0 && IS_AMD_CPU(env)) {
++            uint32_t sel_base = MSR_K7_EVNTSEL0;
++            uint32_t ctr_base = MSR_K7_PERFCTR0;
++            uint32_t step = 1;
++
++            if (num_architectural_pmu_gp_counters == 6) {
++                sel_base = MSR_F15H_PERF_CTL0;
++                ctr_base = MSR_F15H_PERF_CTR0;
++                step = 2;
++            }
++
++            for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
++                kvm_msr_entry_add(cpu, ctr_base + i * step,
++                                  env->msr_gp_counters[i]);
++                kvm_msr_entry_add(cpu, sel_base + i * step,
++                                  env->msr_gp_evtsel[i]);
++            }
++        }
++
+         /*
+          * Hyper-V partition-wide MSRs: to avoid clearing them on cpu hot-add,
+          * only sync them to KVM on the first cpu
+@@ -3929,7 +3975,7 @@ static int kvm_get_msrs(X86CPU *cpu)
+     if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_POLL_CONTROL)) {
+         kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, 1);
+     }
+-    if (has_architectural_pmu_version > 0) {
++    if (has_architectural_pmu_version > 0 && IS_INTEL_CPU(env)) {
+         if (has_architectural_pmu_version > 1) {
+             kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+             kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
+@@ -3945,6 +3991,25 @@ static int kvm_get_msrs(X86CPU *cpu)
+         }
+     }
+ 
++    if (has_architectural_pmu_version > 0 && IS_AMD_CPU(env)) {
++        uint32_t sel_base = MSR_K7_EVNTSEL0;
++        uint32_t ctr_base = MSR_K7_PERFCTR0;
++        uint32_t step = 1;
++
++        if (num_architectural_pmu_gp_counters == 6) {
++            sel_base = MSR_F15H_PERF_CTL0;
++            ctr_base = MSR_F15H_PERF_CTR0;
++            step = 2;
++        }
++
++        for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
++            kvm_msr_entry_add(cpu, ctr_base + i * step,
++                              env->msr_gp_counters[i]);
++            kvm_msr_entry_add(cpu, sel_base + i * step,
++                              env->msr_gp_evtsel[i]);
++        }
 +    }
 +
-+    visit_type_bool(v, name, &pmu_cap_disabled, &error);
-+    if (error) {
-+        error_propagate(errp, error);
-+        return;
-+    }
-+
-+    s->pmu_cap_disabled = pmu_cap_disabled;
-+}
-+
- void kvm_arch_accel_class_init(ObjectClass *oc)
- {
-     object_class_property_add_enum(oc, "notify-vmexit", "NotifyVMexitOption",
-@@ -5990,6 +6030,12 @@ void kvm_arch_accel_class_init(ObjectClass *oc)
-                               NULL, NULL);
-     object_class_property_set_description(oc, "xen-evtchn-max-pirq",
-                                           "Maximum number of Xen PIRQs");
-+
-+    object_class_property_add(oc, "pmu-cap-disabled", "bool",
-+                              NULL, kvm_set_pmu_cap_disabled,
-+                              NULL, NULL);
-+    object_class_property_set_description(oc, "pmu-cap-disabled",
-+                                          "Disable KVM_CAP_PMU_CAPABILITY");
- }
- 
- void kvm_set_max_apic_id(uint32_t max_apic_id)
+     if (env->mcg_cap) {
+         kvm_msr_entry_add(cpu, MSR_MCG_STATUS, 0);
+         kvm_msr_entry_add(cpu, MSR_MCG_CTL, 0);
+@@ -4230,6 +4295,20 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL0 + MAX_GP_COUNTERS - 1:
+             env->msr_gp_evtsel[index - MSR_P6_EVNTSEL0] = msrs[i].data;
+             break;
++        case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL0 + 3:
++            env->msr_gp_evtsel[index - MSR_K7_EVNTSEL0] = msrs[i].data;
++            break;
++        case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR0 + 3:
++            env->msr_gp_counters[index - MSR_K7_PERFCTR0] = msrs[i].data;
++            break;
++        case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTL0 + 0xb:
++            index = index - MSR_F15H_PERF_CTL0;
++            if (index & 0x1) {
++                env->msr_gp_counters[index] = msrs[i].data;
++            } else {
++                env->msr_gp_evtsel[index] = msrs[i].data;
++            }
++            break;
+         case HV_X64_MSR_HYPERCALL:
+             env->msr_hv_hypercall = msrs[i].data;
+             break;
 -- 
 2.34.1
 
