@@ -2,88 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC55B7381B7
-	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 13:11:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 952807382BA
+	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 14:13:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231948AbjFUJnf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jun 2023 05:43:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45294 "EHLO
+        id S231742AbjFUMFJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jun 2023 08:05:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231750AbjFUJna (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jun 2023 05:43:30 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D9A129;
-        Wed, 21 Jun 2023 02:43:28 -0700 (PDT)
-Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D62E51EC0645;
-        Wed, 21 Jun 2023 11:43:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1687340605;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=yXKcV3auqZiH5ablDN0OpddtOVM62a/D928JjKMNXI0=;
-        b=fGGGFOcm/j1jBRRvN7zXyPW4PWbANeEwKO58akYk3HFwWVhSbZepdoK1UDfltiq3BVsgxV
-        afZo1xjFVpNXrOgPFEwzSrf+otLk2UgZpxcxQ/SMfzX2uiICQenOugsvfjtw+5jxoMDWDm
-        xejbSVf4LXHZHL2lKqvLKvAqigR5Qp0=
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-        header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id e4WsilyJ1x43; Wed, 21 Jun 2023 09:43:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-        t=1687340602; bh=yXKcV3auqZiH5ablDN0OpddtOVM62a/D928JjKMNXI0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fyQVwBnAueySdbG0xMg34yXlW/XbZoa2fdHIxCPpbUpUvZTzceVEGqhpKf26M8jvh
-         cQZrHrd4NDWJ1hZ9bhyVgh1pjqJKNLWEMiP5gA2Xv7wshI3Zdr7Ezl3oUQ1uk4hncH
-         ktCnJjrTimE6r2iOMN1pBLtXrLeF2ISV/Nw1dqvQxfSDmKyO1yF4mNSg9urBDIt19l
-         MOyDgIo8MpE4vooEPqEEgYB5Z2olkoquqbzGNxggefTMMtCyztPuHGCPg3nmVx4ozu
-         EPUIsYbiqJxia1qErD6CYuMaJsODWsvZ+ZOAudy/BD72pBpc6AID/bTPdb3fSif4he
-         YJqerDK6aM/oRya8NBWdn0pUP0ZzfKFVhaEGbiIc4fDLSmxsPt/LcKMFID505QCQeF
-         bjPZumWkHDakTZMlxA5hv+gLVXfkr8mXNg4pxO6pnDXgITMEpqFW+4/KcWboFFnXik
-         eYdNfzumlPl4OwXJ2X2A32oLbFraGQgho7WNG4HzPbuRoBvfnE4AFk+MN58iiXan/d
-         7YOKobJsShP6uAB/bu/hmdcuAF7hFSyLfx/3ll177T7PJLSzJNTbdqHS6oTgMKbf+/
-         /6fWRvqQT2vKqfHn6HtALNs+cMMAqD4RPO04QOQCVFEvh56EOxuwc3EewsfN5vk7wX
-         dCgtDPf8uUZqB0n1/xsXwixA=
-Received: from zn.tnic (p200300ea971Dc592329c23FffEA6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971d:c592:329c:23ff:fea6:a903])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-        (No client certificate requested)
-        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3EDD640E019B;
-        Wed, 21 Jun 2023 09:42:42 +0000 (UTC)
-Date:   Wed, 21 Jun 2023 11:42:36 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v9 07/51] x86/sev: Add the host SEV-SNP
- initialization support
-Message-ID: <20230621094236.GZZJLGDAicp1guNPvD@fat_crate.local>
-References: <20230612042559.375660-1-michael.roth@amd.com>
- <20230612042559.375660-8-michael.roth@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        with ESMTP id S231855AbjFUMEj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jun 2023 08:04:39 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2089.outbound.protection.outlook.com [40.107.94.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66B811730;
+        Wed, 21 Jun 2023 05:04:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=K2Dkpq254N/UI+tbVi0cOxgJFPb3d7poYQbZ0L1xWUBJmo+5aQos5eOX30RdueIg/dxArKVR7dVd7HW+TeZDHbHmJfVBo8m/VdcrWnfN8aYvYXeSJcu/KH8k1PDxjJmKiLeNwJW0IRchVCEl9VsRs9x7FkrsZa5oliOVCHQHyaq2fUw90hpMiksTWtGs6s1qV49C4K2tOlV+hscznEVwdecUlGj2pBbFP/otBbAUm+IY/apQT072IY17sQiKe2CmrgRRIy6KCREfBCBM1Ns6kWuNGEtlJMexW7jhpeSmW7sXI0aOo18i+mHrKIswOjXX0TZpGQv3THgvIwS6DnlZuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FiCAa3RCfuih27zNwHpXb39RnWJlKbNt8C1h91O8PjI=;
+ b=cKJ8cOG3VlZiL4gt35RY54ItCpmA4lW8XUM3Oc+kMQKVvAwdquY2qxwp8jpEa8J8HNxWm7L4GOOSQGOEBSuGsx6koBMRGXIMdLI+RN6GX68i2YGo/a9gxdxbvvJ1q5nMmcn9/CH+epoblD+w2VBrOG72nwy7sGNC638VlPdhTGdk4sLZTV8qu2eOqEpg/4fpIP/rrp1AkFkhPcivIOVO1LJy7pd5/SOsNGcKgBTAYXqEX4pZDtLrUKSK7Gmyv4ZTZRqqY6kJNvbH0L70+wCAy67SFnDucTYDWvjbJo1ARXD/rR3G5jAT1jFA4KORQLbOZ7x7ILhHVVh60N6VEZHDXQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FiCAa3RCfuih27zNwHpXb39RnWJlKbNt8C1h91O8PjI=;
+ b=qwjp07qq9r5hQUojhz1uaPwxLmclxpJLXx4VPKVxDXyAcXwGl6gT+gmxW2KdGIZBiiM55Hub21GiD8JWSdVJVXA1/CuxHBwC+tix/OgT/mx0DIp5cQkF5q2q5p0gxBBcUBJTgCFlzCYgJ2OPukorv7Nucds9tt7fCMxZKs0ELihTOGQhAphIrmLlhunIjOS7OdBwJGS1JrW9bdcBjW1ddockm7RGOIFPa7UNNyqwednD08S73hNAB2XPybuAKoNXg3OzjmE8CgbetOlTnzJVM2Ma7S91+CIyQdzaOxQ1cvE7iJ9f+KIEBdDDSMf5U/LwcHvLKK33V6O6i6iXUW08eg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CY8PR12MB7171.namprd12.prod.outlook.com (2603:10b6:930:5c::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 21 Jun
+ 2023 12:04:33 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%7]) with mapi id 15.20.6500.031; Wed, 21 Jun 2023
+ 12:04:33 +0000
+Date:   Wed, 21 Jun 2023 09:04:30 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v2 00/11] iommufd: Add nesting infrastructure
+Message-ID: <ZJLnTt/lCyTYBm7G@nvidia.com>
+References: <20230511143844.22693-1-yi.l.liu@intel.com>
+ <BN9PR11MB5276DAF0A11809CF8433EE338C7C9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZGdiS2m8jcd5OOt5@nvidia.com>
+ <BN9PR11MB5276A74B2DA86C79908A420B8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZH9AGWf1yRDu/86q@nvidia.com>
+ <BN9PR11MB52763C7B838B04D3200322FD8C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJBL8QLLBiwRsUSI@nvidia.com>
+ <BN9PR11MB527663567ECB8AD52D3170818C5CA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJGf3sgLKr9HLZuE@nvidia.com>
+ <BN9PR11MB5276B852A32F53BE8EAA1A7D8C5DA@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230612042559.375660-8-michael.roth@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+In-Reply-To: <BN9PR11MB5276B852A32F53BE8EAA1A7D8C5DA@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: SJ0PR03CA0374.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a1::19) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB7171:EE_
+X-MS-Office365-Filtering-Correlation-Id: 341c4359-4173-4b92-9bd3-08db724facca
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: eVVIVGt3aJMMpBzc7BNVEW+TA6APm7oDS1rsClhosNyWBR9AUPLnGKpUpBkYO8w8vlNN2obA8jpAG1vvGQGPW8lecLuFZjin5qMyglmJM3Q31PXgYNLF9AYuStbwwhybL5wAwBrQ3COEIJ+hCY93ngWrcboVAa7kLUfUhtr5MBTcm3WnMeZBcFZHMR/iqff4kUDx7sk0OavztGryTCjEsfN7S9WpRvqMhmZ/oh2sgPIPPsBv+Fbe5RngXBlJSR2nCnnQ1INdpf8qfbU4vp3YOp83vAdGKusZohnoVUNi6kPtiZ6LRoMbecwzQXT/0zIHk9pcERxs73LEtcGOgMNIvlQGy8UNdUI+SC5UG4MgTUcQ4e2plHLlfw8iR4Y9mGnEDcMR53ftxmZz/2LquKhrrmiUUuP27wNw5JZpW5V8uD0yjwddOZO0MJyy+Z37FbkBW/hv2FijMbsa32oaKuNDN6ok6+S2ovS2WKxtKdhMvTPBu4V7gKjHTmKJUNZzyyP9EnzuehaXVUY+bYGRhzcbRcO1kO2qSDN5jJ/dQRDRGcUaFa3TP7dQk248LtBIx9QM
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(366004)(346002)(39860400002)(376002)(451199021)(38100700002)(6506007)(6512007)(26005)(186003)(2616005)(6486002)(7416002)(5660300002)(8936002)(8676002)(41300700001)(2906002)(36756003)(478600001)(66556008)(66476007)(6916009)(66946007)(54906003)(316002)(86362001)(4326008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?83r2FdpPXtiFFEECkMmoU3ZCUhcbjGRx2wJUlnKeVT6tBamjXQPnz/kN3XBt?=
+ =?us-ascii?Q?TgJo8pdH1ksZ+SHrM6SsH6Fwo8WDUYgR9ToAYgYaBJVJ/JCHyRib7UALaMzt?=
+ =?us-ascii?Q?rssJG5wBbgv6rofZoKkai1ziqN/DHWR3tA/2aus0pVzuxSnNQd4aYqNkxCse?=
+ =?us-ascii?Q?8hcOUMm34uwV6qz9gEozOS9L/dsV+oNDKDUHxMs/D1AXs3viExz/jU92dv5F?=
+ =?us-ascii?Q?U4G1o+XzQShHelJayeXdRMU3hyufglvpTwhyjugJgmhSoK/dZrtxjoX/HDh6?=
+ =?us-ascii?Q?fNKZkyYaeJEyHDVDyEiW+t04vloRHyFXv/owCBD07oWmdDnK4P3oHpL7N8VD?=
+ =?us-ascii?Q?MuP36BSO/a3vM9SiOXr4CfCNZ/0j0qvRY0zcWgHJFjO7bEBYMBJbgDtMnG+A?=
+ =?us-ascii?Q?XlqW4wWMHfmbhfsWOBPmdimnOZ90ARaJ6muo979T2+7wpnG3xOjWmOpFhjWj?=
+ =?us-ascii?Q?0R8JCXAd2vzIvJ9PNn00e6ETaCzRUB/GtwuhvzLMzLePbXntYNFC9eFjctQq?=
+ =?us-ascii?Q?Ye6rk6P4SUT5zh1rDElUhGIiQiaSDJR43hvBj6UfcDjvxouKMvuNZQGESUpS?=
+ =?us-ascii?Q?tBzVFuWTxW7Zuz0RfPgjJ+Ky2ydX14K8Rf7+Af9W2kC8ycOvmskXuRZqq2Oa?=
+ =?us-ascii?Q?r0GnHEHo4VPZKiPdcCNY/Jcid9v+v8bbZ4dXEdYp6w5qe27SgFw+htFt1N4q?=
+ =?us-ascii?Q?MmQAhh6CTq3Z6QQjivMqI1GgetbVnLCtFWW8oJUgGSIq0DyRHkgekjCuEX2A?=
+ =?us-ascii?Q?Tu9Y+3DzeZTErJlpKyxX4ifs6f4kg1He1EO+hElcibDGYcXIla51ClCpkgja?=
+ =?us-ascii?Q?s547BoO+kK3mV5Tsw9LtbwNWi5BO7fdC4rGfkjHcod5t4Ceq1VKfNU2K6qYZ?=
+ =?us-ascii?Q?vEpD7nnacxYYSidwQcZSMG1XjilY2hgn7XmodEDL+FU3q0i6GKS31y2Ojod3?=
+ =?us-ascii?Q?8n6dtzHU9fJ4nM07S/kckTA9J9zQRJdNNk2x3+O2CcHyfT2sA2p6ji2Ug+t3?=
+ =?us-ascii?Q?i/ERcVvs9j7WFIMOkoiw3MUGwOPtVW0D8P19uBxW8maYrxV2V/eJLPnVo6Cc?=
+ =?us-ascii?Q?la3HTGXooVfRVw0RNWyil1yehoq6fWRYtt+8VkLCQTgT6CWOF8TguOG6F6q+?=
+ =?us-ascii?Q?rTELTi6cmQE55NxkpawHMwxyVj1VQzRMpTohzjo6XrcZpLUzcnaqtd0+d+65?=
+ =?us-ascii?Q?xUd2B6V+jL2CyjURlrxu+G/yLiA6dJLUP4VzXfe2H12Hmd6COWHB7vLkt0GB?=
+ =?us-ascii?Q?+bbaAaJZQqDShlNJVod1xX1E+albxXEAcmGUhacLcEGPZShR2sZh6ELhVnfb?=
+ =?us-ascii?Q?/vu4ztPWdC6ZAzkzaAuqHPPSLfYT1O2eOFqXI3vWVuHFCoSExRZkFWaarnRZ?=
+ =?us-ascii?Q?iuPEZpaReOR23HA1tRiYlf/SNuiCGDoHUAc4R1Y8apim2jMDmQ9VeBzxHyYW?=
+ =?us-ascii?Q?W1BLvjrLDuTgxfZbgmLNCSvNM7S+ry9/go+hfyn5KnX9UmsJoJ2GSarUsrjv?=
+ =?us-ascii?Q?Jl5X4vWVqpANcjRnw+x4DUhUZyfv/JznGXKu+ir0pvT49AqJEg+nhX7prLW4?=
+ =?us-ascii?Q?ZUV6oOoDk7RBC4nS5um0aigayimjEzAiuEPYDbaU?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 341c4359-4173-4b92-9bd3-08db724facca
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 12:04:33.1944
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6GBAZ+ctKD8q2ZhLhTnl/IECE8VBDfWHIZfIRezL4h47RaOz0apjUM0I2jRkVLQn
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7171
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,82 +142,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 11, 2023 at 11:25:15PM -0500, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+On Wed, Jun 21, 2023 at 06:02:21AM +0000, Tian, Kevin wrote:
+> > > My understanding of ARM SMMU is that from host p.o.v. the CD is the
+> > > S1 in the nested configuration. 'identity' is one configuration in the CD
+> > > then it's in the business of nesting.
+> > 
+> > I think it is the same. A CD doesn't come into the picture until the
+> > guest installs a CD pointing STE. Until that time the S2 is being used
+> > as identity.
+> > 
+> > It sounds like the same basic flow.
 > 
-> The memory integrity guarantees of SEV-SNP are enforced through a new
-> structure called the Reverse Map Table (RMP). The RMP is a single data
-> structure shared across the system that contains one entry for every 4K
-> page of DRAM that may be used by SEV-SNP VMs. APM2 section 15.36 details
+> After a CD table is installed in a STE I assume the SMMU still allows to
+> configure an individual CD entry as identity? e.g. while vSVA is enabled
+> on a device the guest can continue to keep CD#0 as identity when the
+> default domain of the device is set as 'passthrough'. In this case the
+> IOAS still needs to gain reserved regions even though S2 is not directly
+> attached from host p.o.v.
 
-Rather say 'APM v2, section "Secure Nested Paging (SEV-SNP)"' because
-the numbering is more likely to change than the name in the future. With
-the name, people can find it faster.
+In any nesting configuration the hypervisor cannot directly restrict
+what IOVA the guest will use. The VM could make a normal nest and try
+to use unusable IOVA. Identity is not really special.
 
-> a number of steps needed to detect/enable SEV-SNP and RMP table support
-> on the host:
-> 
->  - Detect SEV-SNP support based on CPUID bit
->  - Initialize the RMP table memory reported by the RMP base/end MSR
->    registers and configure IOMMU to be compatible with RMP access
->    restrictions
->  - Set the MtrrFixDramModEn bit in SYSCFG MSR
->  - Set the SecureNestedPagingEn and VMPLEn bits in the SYSCFG MSR
->  - Configure IOMMU
-> 
-> RMP table entry format is non-architectural and it can vary by
-> processor. It is defined by the PPR. Restrict SNP support to CPU
-> models/families which are compatible with the current RMP table entry
-> format to guard against any undefined behavior when running on other
-> system types. Future models/support will handle this through an
-> architectural mechanism to allow for broader compatibility.
+The VMM should construct the guest memory map so that an identity
+iommu_domain can meet the reserved requirements - it needs to do this
+anyhow for the initial boot part. It shouuld try to forward the
+reserved regions to the guest via ACPI/etc.
 
-I'm guessing this is all for live migration between SNP hosts. If so,
-then there will have to be a guest API to handle the differences.
+Being able to explicitly load reserved regions into an IOAS seems like
+a useful way to help construct this.
 
-> SNP host code depends on CONFIG_KVM_AMD_SEV config flag, which may be
-> enabled even when CONFIG_AMD_MEM_ENCRYPT isn't set, so update the
-> SNP-specific IOMMU helpers used here to rely on CONFIG_KVM_AMD_SEV
-> instead of CONFIG_AMD_MEM_ENCRYPT.
-
-Does that mean that even on CONFIG_AMD_MEM_ENCRYPT=n kernels, host SNP
-can function?
-
-Do we even want that?
-
-I'd expect that a host SNP kernel should have SME enabled too even
-though it is not absolutely necessary.
-
-> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Co-developed-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> [mdr: rework commit message to be clearer about what patch does, squash
->       in early_rmptable_check() handling from Tom]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/coco/Makefile                   |   1 +
->  arch/x86/coco/sev/Makefile               |   3 +
->  arch/x86/coco/sev/host.c                 | 212 +++++++++++++++++++++++
->  arch/x86/include/asm/disabled-features.h |   8 +-
->  arch/x86/include/asm/msr-index.h         |  11 +-
->  arch/x86/include/asm/sev.h               |   2 +
->  arch/x86/kernel/cpu/amd.c                |  19 ++
->  drivers/iommu/amd/init.c                 |   2 +-
->  include/linux/amd-iommu.h                |   2 +-
->  9 files changed, 256 insertions(+), 4 deletions(-)
->  create mode 100644 arch/x86/coco/sev/Makefile
->  create mode 100644 arch/x86/coco/sev/host.c
-
-Ignored review comments here:
-
-https://lore.kernel.org/r/Y9ubi0i4Z750gdMm@zn.tnic
-
-Ignoring this one for now too.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Jason
