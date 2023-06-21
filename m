@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6D5B739353
-	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 01:59:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 340F073935E
+	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 01:59:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230237AbjFUX4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jun 2023 19:56:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37920 "EHLO
+        id S230256AbjFUX4S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jun 2023 19:56:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230106AbjFUXz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230121AbjFUXz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 21 Jun 2023 19:55:59 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2073.outbound.protection.outlook.com [40.107.220.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C89A11BD3;
-        Wed, 21 Jun 2023 16:55:57 -0700 (PDT)
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2073.outbound.protection.outlook.com [40.107.102.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C7981BDC;
+        Wed, 21 Jun 2023 16:55:58 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=drvnfwpajwecAS44VNcbAkz6rFdmEShbMbEU0Xb85mO3+fhvfQY1YhUchGDOfjNdLcoUD7nyn6A9//tcC0xpKMnO+PS9JR5iD3QouahqS/pGfhkYEvp/AGGAtXfB94gnSoK+sonywnVBVe/fHeYKntQTHSd2P4g20po5FemIJoyW7B6BPC9QiEemkz4XIiNNbq8ULO4vXCoJSHYiW4LT77ziU8Z4E7xGCNK/fxlXKCP5pCpFP6+bmY/RDwT5JOI+G3fl6WXv6DQqDTEViy/f5oHs6vla1P6f/ZzgHeTmrw0MGw6LfBVyKrlmE65JqXl/fngaJjVm6hX+TBTFmOKbYg==
+ b=M5ZkctAjQUQLBUoEH7S3yVVXJD5+hLN1K29MpLbMvAUXJXWidtNtuZhKVTywk84aySrGou0B6OiAvv3MFdbZMPKnsxEDSa8iQQcCWf90+hy+jZCbRxr1HZZ/Eml4DvKxzHqD8deq+IwWJht9/BFbgiWja/0L9GUH5fiUCVJiPigguNQ/pUwulVKkC1sL/wwwP3tO9qL9dUnQSC3aVdXj+VU5/wGXnV9MCDvMXL39U4VHunMBquq9mh8U1bI7CmnFLtj2KyXsIcXc+m9WUlrDRfaefOAW5eVf2sTeXZvMPfR4c8wwWQ6dJa9k+cx8LgsJMIfE28RaxID9SRjC8oaKUw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0uTs75xJ8qf6SN4WoGmm5L5a0Tzd0cCIt37Rg7Rj3zs=;
- b=UTNDYyrC4tfGqa9ScIqcmneJGdd2I9lXjBZY382/zPYEEjiXfhpnD+Bpbr4gZQkLz0DHWLFe4znC8WYoigQ2x+d6gJNuj8erQbSorVZ01AW5PAkIF0Rm2d/Kj6jBMUxxS8peEYpFj325DeUAUA2NYXo0bn8ixed5xeNTeb3KglPKw1puFzpGkGssr6bHBGHLuIeWWxUxTPV9cks2TRkrlmMJt9UcgiW37rPF0pkSa+71PFACcrV24dtblHFtUSwT/6ojLOxVnkM5YiFGfRsjtpX4jsnsh7NCYR24rJ8hO9OIKinO/80xxukkQ9RvaLBBvyDxQIIr3PsGCiu0PyIQCw==
+ bh=Es4QkeoqKK9Q+iYRHWZ9ALKb26xop5VvYjHJNvJR12M=;
+ b=Oxei3InNcG/JkngoYzBQFiXBmpAJ/1IXcZGVq1CMdwRTewNLV1D5zTxM757Uu/8kvNSxzMVH1ndO1qFi1jMXZ0R4PCeeWksu551HcWbCLEhMaqjNkbWEBq0uE53/yd7XNlNnCVS+P6k+C/+8im5w8EfS/K9+vmirHfINzQc+EDgq8/SnKyMq9UR1lSW4UfHSHqHDe0hGZUNd11td/sSUhwSV4SfkWYC92pvdXygWgaBo6N4LFxiYfEAjVW0jYGP99bE62IEF8Ovo4f659xFlGDLbGW78tJMllXLzeZs5YwfXeOGezGg6vrN2PqgHo+GM2XqcNxDMorBaWRmVd1DxGQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0uTs75xJ8qf6SN4WoGmm5L5a0Tzd0cCIt37Rg7Rj3zs=;
- b=UTdeTcZvGQHwibhr9GHsfXsXa0Kp/n4WLKZSLNk+jou/yFmtVlkgtjmFHvShR9BBm8XjNqNEE6X1ckIe6mImBaIPmdS4BKFevBS8Bxse+uXMIKBywoIaavHeHwEGo3fKDX3npRO2kNR2RZvLxH+JGrynGzH6k9GStT4xhXDNkzY=
-Received: from CY5PR15CA0042.namprd15.prod.outlook.com (2603:10b6:930:1b::26)
- by SJ0PR12MB5485.namprd12.prod.outlook.com (2603:10b6:a03:305::13) with
+ bh=Es4QkeoqKK9Q+iYRHWZ9ALKb26xop5VvYjHJNvJR12M=;
+ b=w30vbHQd0V9vKom3mVkyoegeKyyxSWoJc7JpQKHdthOC2BRKVJ7r/DgGClQNQAVjCUkTGf8LhDHdfg8v9SdGaCSN4h2CgW7V05C0WhKchQGfLeFi+XAP/R197e6pXGsMx6ncghmiCbunrEoOm4/O8DpMc8xutvfuMdn2D5hBZdA=
+Received: from CY5PR15CA0045.namprd15.prod.outlook.com (2603:10b6:930:1b::23)
+ by SA0PR12MB4560.namprd12.prod.outlook.com (2603:10b6:806:97::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 21 Jun
- 2023 23:55:55 +0000
+ 2023 23:55:56 +0000
 Received: from CY4PEPF0000E9D4.namprd03.prod.outlook.com
- (2603:10b6:930:1b:cafe::c8) by CY5PR15CA0042.outlook.office365.com
- (2603:10b6:930:1b::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21 via Frontend
+ (2603:10b6:930:1b:cafe::5e) by CY5PR15CA0045.outlook.office365.com
+ (2603:10b6:930:1b::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23 via Frontend
  Transport; Wed, 21 Jun 2023 23:55:55 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
@@ -52,7 +52,7 @@ Received: from SATLEXMB04.amd.com (165.204.84.17) by
 Received: from ruby-95f9host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Wed, 21 Jun
- 2023 18:55:52 -0500
+ 2023 18:55:53 -0500
 From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 To:     <linux-kernel@vger.kernel.org>, <iommu@lists.linux.dev>,
         <kvm@vger.kernel.org>
@@ -64,9 +64,9 @@ CC:     <joro@8bytes.org>, <robin.murphy@arm.com>, <yi.l.liu@intel.com>,
         <santosh.shukla@amd.com>, <vasant.hegde@amd.com>,
         <jay.chen@amd.com>, <joseph.chung@amd.com>,
         "Suravee Suthikulpanit" <suravee.suthikulpanit@amd.com>
-Subject: [RFC PATCH 11/21] iommu/amd: Introduce Reset vMMIO Command
-Date:   Wed, 21 Jun 2023 18:54:58 -0500
-Message-ID: <20230621235508.113949-12-suravee.suthikulpanit@amd.com>
+Subject: [RFC PATCH 12/21] iommu/amd: Introduce AMD vIOMMU-specific UAPI
+Date:   Wed, 21 Jun 2023 18:54:59 -0500
+Message-ID: <20230621235508.113949-13-suravee.suthikulpanit@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230621235508.113949-1-suravee.suthikulpanit@amd.com>
 References: <20230621235508.113949-1-suravee.suthikulpanit@amd.com>
@@ -78,23 +78,23 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D4:EE_|SJ0PR12MB5485:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9087e2a9-a382-4fbe-7ff5-08db72b30d77
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D4:EE_|SA0PR12MB4560:EE_
+X-MS-Office365-Filtering-Correlation-Id: 65208709-462b-44ff-9034-08db72b30dc8
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YQtQyBvuxD49C4F+5hqCn4CWDuqFS6AnbNSPrSiqboIWpw8tjxTqpoOO1Vy8Rot+p6blqnaUQrTYMobO6Z0DR7UeQPCAdCNP9jmhoSxBWZ9ElSqamYGTym/6Xrw8coeULIqTyNMYzlxelxcWfwaejiHn1bbwNWVgBhn3qVRIW1Jgl0HInzDADGs3jPdSvb9FhF5nUb85GdbWF8WM27StfgjbCloe3drgpk9CyZYypE4B1D+/yP4xHnE49ONDqwH5P+SKZQUyaIauS7WDY2OAn7cEapfqJ8tpBmBYfGE6xbmEO2ZptQdGiX3Mo4ydjxpcr3pDkrii8U9gmsTtAbrM0QesWY33Zl3E+gKGe6ibc+PVJbYY3sieViVkpSyg+jvJc2T/YgIxB9y31TxATq3udvjhysCN+5KUFFVF4o2x3yDlRmeyTzgum3eFrW9q/Ymvn5Fjr09g26xDtU9vWf3GH4bvtH3VPs7UxoqYKaCfn+N3xgOHeZLEGrxxW7hlk/EheGJf2y5wCjjfye22dLMVkfbk2qZodQ6HurXNoQbOgFWyTYkt7BK8zD8tNjPvPoyzN3zxSIhWzqKa0C2tbQzazJK7JQs4/QhmwlmvuAuv0wqvP1EKZcLA+D9OuEHmhPOq4rY3tUA4V6Gy7FGXVxX3YccLgU7U35IfEGLoibYbsopCEZPEVjvjb5jGq+h4W0I8sbxxRCSOqPKejcFZxQvtw6z9ScoQzy6z+v5SeBTGbI0fkZFxzGl72Xa2c0yBHHYk7KRTVM4sLoDRXVAykojTJg==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(39860400002)(346002)(136003)(451199021)(46966006)(36840700001)(40470700004)(40480700001)(7696005)(110136005)(478600001)(26005)(54906003)(4326008)(36860700001)(186003)(1076003)(16526019)(82310400005)(70586007)(70206006)(41300700001)(356005)(5660300002)(7416002)(8936002)(8676002)(44832011)(82740400003)(81166007)(316002)(40460700003)(86362001)(47076005)(426003)(336012)(2616005)(36756003)(2906002)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: ky6UDFtn0ptih9xO7AaC5pH083ReWvflDIojiTAbYoWtzrFM5V45f/DwauxL2imB+Loy5Qdf3JWo3MqWgajdX65kSLpeP7k20cWfTZXxxQsjcproKInUTerGNZl/UQemiuPP0qI3t21AkV8ZP5JRqjeCnaOEi2HWV2Qq+2guaqYsGyYajTWXCI8eZd/yHIUtZeQ8cv35b6j8d3qtKP29/PD3KWWIZPRmKv6bJDKwpjxPKvRR1FXwAGPxlDam+E4cnOs35fcYoDQVyWSLA6/rAfbcZk9eZsMfMH9MYyWeEatiy5t/6i3rZu6o5GVP0NmqXOtqmOgCzP6Ij5CzkxQmKBouOuq2ekwyP2WQeNbUDzqflds3vFexyn95B1bBdXnWPmJ2/Gj5VQqnB6c8YazsFwJa5l2CnPiRl7g+LQ/SGfer73ZGBtaAvU/YosWUpPtUjhkm9qRMnOojVbGJ/cTe+pT3OlpGc+koN1pRIysH0d74xuxfBbftU8Z6THGn378TefzIiaOHxNQ0pZeINkhk35rh76NUOy/Ye5gBxZQzwkDlzic2WyJF7vZPbJpwRLgq6ohKadoJe3kJ+Zkws/KyXRdQAwdy/Cwm+yn5LtbKq/7TG0J8nsprwykyU0AgMwrnJrku3ELtHPvsp2Jg64yLLmfvdg/ryorQM8WWYmHPrQIE+6quats8juhJ9khk/3eoU7aBER9ERDK5MrZm9XiRl60hfGps9Rtn+dpnGPLMRDzqooCd6s2hpeC5jSwz7H3HdFNvQ0Y9kGPV6nhpcxA7MtZ8kSd41R6pnWlunYz90E+ivpi9Fc/WJbVOMixIr5Bu
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(396003)(346002)(136003)(451199021)(36840700001)(40470700004)(46966006)(54906003)(110136005)(478600001)(4326008)(26005)(16526019)(186003)(1076003)(70586007)(2906002)(82310400005)(7696005)(41300700001)(7416002)(8936002)(70206006)(8676002)(44832011)(5660300002)(316002)(82740400003)(356005)(81166007)(2616005)(86362001)(36756003)(40480700001)(47076005)(426003)(336012)(83380400001)(36860700001)(40460700003)(71600200004)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 23:55:55.2611
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 23:55:55.7923
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9087e2a9-a382-4fbe-7ff5-08db72b30d77
+X-MS-Exchange-CrossTenant-Network-Message-Id: 65208709-462b-44ff-9034-08db72b30dc8
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000E9D4.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5485
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4560
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -106,67 +106,166 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce new IOMMU commands for vIOMMU for resetting
-virtualized MMIO registers of a particular guest.
+To handle various operations necessary for setting up the vIOMMU hardware.
+These operations are specific to AMD hardware.
 
 Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 ---
- drivers/iommu/amd/amd_iommu_types.h |  1 +
- drivers/iommu/amd/iommu.c           | 22 ++++++++++++++++++++++
- 2 files changed, 23 insertions(+)
+ include/uapi/linux/amd_viommu.h | 145 ++++++++++++++++++++++++++++++++
+ 1 file changed, 145 insertions(+)
+ create mode 100644 include/uapi/linux/amd_viommu.h
 
-diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/amd_iommu_types.h
-index d832e0c36a21..aa16a7079b5c 100644
---- a/drivers/iommu/amd/amd_iommu_types.h
-+++ b/drivers/iommu/amd/amd_iommu_types.h
-@@ -200,6 +200,7 @@
- #define CMD_INV_IRT		0x05
- #define CMD_COMPLETE_PPR	0x07
- #define CMD_INV_ALL		0x08
-+#define CMD_RESET_VMMIO		0x0A
- 
- #define CMD_COMPL_WAIT_STORE_MASK	0x01
- #define CMD_COMPL_WAIT_INT_MASK		0x02
-diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-index efced59ba8a5..b5c62bc8249c 100644
---- a/drivers/iommu/amd/iommu.c
-+++ b/drivers/iommu/amd/iommu.c
-@@ -1133,6 +1133,18 @@ static void build_inv_irt(struct iommu_cmd *cmd, u16 devid)
- 	CMD_SET_TYPE(cmd, CMD_INV_IRT);
- }
- 
-+static void build_reset_vmmio(struct iommu_cmd *cmd, u16 guestId,
-+			      bool vcmd, bool all)
-+{
-+	memset(cmd, 0, sizeof(*cmd));
-+	cmd->data[0] = guestId;
-+	if (all)
-+		cmd->data[0] |= (1 << 28);
-+	if (vcmd)
-+		cmd->data[0] |= (1 << 31);
-+	CMD_SET_TYPE(cmd, CMD_RESET_VMMIO);
-+}
+diff --git a/include/uapi/linux/amd_viommu.h b/include/uapi/linux/amd_viommu.h
+new file mode 100644
+index 000000000000..f4a91ecd5dc2
+--- /dev/null
++++ b/include/uapi/linux/amd_viommu.h
+@@ -0,0 +1,145 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++/*
++ * AMD Hardwaer Accelerated Virtualized IOMMU (HW-vIOMMU)
++ *
++ * Copyright (c) 2023, Advanced Micro Devices, Inc.
++ *
++ */
++#ifndef _UAPI_AMD_VIOMMU_H_
++#define _UAPI_AMD_VIOMMU_H_
 +
- /*
-  * Writes the command to the IOMMUs command buffer and informs the
-  * hardware about the new command.
-@@ -1315,6 +1327,16 @@ void iommu_flush_all_caches(struct amd_iommu *iommu)
- 	}
- }
- 
-+void iommu_reset_vmmio(struct amd_iommu *iommu, u16 guestId)
-+{
-+	struct iommu_cmd cmd;
++#include <linux/types.h>
++#include <linux/ioctl.h>
 +
-+	build_reset_vmmio(&cmd, guestId, 1, 1);
++/**
++ * The ioctl interfaces in this file are specific for AMD HW-vIOMMU.
++ * They are an extension of extend the IOMMUFD ioctl interfaces.
++ * Please see include/uapi/linux/iommufd.h for more detail.
++ */
++#include <linux/iommufd.h>
 +
-+	iommu_queue_command(iommu, &cmd);
-+	iommu_completion_wait(iommu);
-+}
++enum iommufd_viommu_cmd {
++	IOMMUFD_VIOMMU_CMD_BASE = 0x60,
++	IOMMUFD_CMD_IOMMU_INIT = IOMMUFD_VIOMMU_CMD_BASE,
++	IOMMUFD_CMD_IOMMU_DESTROY,
++	IOMMUFD_CMD_DEVICE_ATTACH,
++	IOMMUFD_CMD_DEVICE_DETACH,
++	IOMMUFD_CMD_DOMAIN_ATTACH,
++	IOMMUFD_CMD_DOMAIN_DETACH,
++	IOMMUFD_CMD_MMIO_ACCESS,
++	IOMMUFD_CMD_CMDBUF_UPDATE,
++};
 +
- /*
-  * Command send function for flushing on-device TLB
-  */
++/**
++ * struct amd_viommu_iommu_info - ioctl(VIOMMU_IOMMU_[INIT|DESTROY])
++ * @size: sizeof(struct amd_viommu_iommu_info)
++ * @iommu_id: PCI device ID of the AMD IOMMU instance
++ * @gid: guest ID
++ *
++ * Initialize and destroy AMD HW-vIOMMU instances for the specified
++ * guest ID.
++ */
++struct amd_viommu_iommu_info {
++	__u32	size;
++	__u32	iommu_id;
++	__u32	gid;
++};
++#define VIOMMU_IOMMU_INIT	_IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOMMU_INIT)
++#define VIOMMU_IOMMU_DESTROY	_IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOMMU_DESTROY)
++
++/**
++ * struct amd_viommu_dev_info - ioctl(VIOMMU_DEVICE_[ATTACH|DETACH])
++ * @size: sizeof(struct amd_viommu_dev_info)
++ * @iommu_id: PCI device ID of the AMD IOMMU instance
++ * @gid: guest ID
++ * @hdev_id: host PCI device ID
++ * @gdev_id: guest PCI device ID
++ * @queue_id: guest PCI device queue ID
++ *
++ * Attach / Detach PCI device to a HW-vIOMMU instance, and program
++ * the IOMMU Device ID mapping table for the specified guest.
++ */
++struct amd_viommu_dev_info {
++	__u32	size;
++	__u32	iommu_id;
++	__u32	gid;
++	__u16	hdev_id;
++	__u16	gdev_id;
++	__u16	queue_id;
++};
++
++#define VIOMMU_DEVICE_ATTACH	_IO(IOMMUFD_TYPE, IOMMUFD_CMD_DEVICE_ATTACH)
++#define VIOMMU_DEVICE_DETACH	_IO(IOMMUFD_TYPE, IOMMUFD_CMD_DEVICE_DETACH)
++
++/**
++ * struct amd_viommu_dom_info - ioctl(VIOMMU_DOMAIN_[ATTACH|DETACH])
++ * @size: sizeof(struct amd_viommu_dom_info)
++ * @iommu_id: PCI device ID of the AMD IOMMU instance
++ * @gid: guest ID
++ * @hdev_id: host PCI device ID
++ * @gdev_id: guest PCI device ID
++ * @gdom_id: guest domain ID
++ *
++ * Attach / Detach domain of a PCI device to a HW-vIOMMU instance, and program
++ * the IOMMU Domain ID mapping table for the specified guest.
++ */
++struct amd_viommu_dom_info {
++	__u32	size;
++	__u32	iommu_id;
++	__u32	gid;
++	__u16	gdev_id;
++	__u16	gdom_id;
++};
++
++#define VIOMMU_DOMAIN_ATTACH	_IO(IOMMUFD_TYPE, IOMMUFD_CMD_DOMAIN_ATTACH)
++#define VIOMMU_DOMAIN_DETACH	_IO(IOMMUFD_TYPE, IOMMUFD_CMD_DOMAIN_DETACH)
++
++/**
++ * struct amd_viommu_mmio_data- ioctl(VIOMMU_MMIO_ACCESS)
++ * @size: sizeof(struct amd_viommu_mmio_data)
++ * @iommu_id: PCI device ID of the AMD IOMMU instance
++ * @gid: guest ID
++ * @offset: specify MMIO offset
++ * @value: specify MMIO write value or retrieving MMIO read value
++ * @mmio_size: specify MMIO size
++ * @is_write: specify MMIO read (0) / write (1)
++ *
++ * - Trap guest IOMMU MMIO write to program HW-vIOMMU for the specified
++ *   guest.
++ * - Trap guest IOMMU MMIO read to emulate return value for the specified
++ *   guest.
++ */
++struct amd_viommu_mmio_data {
++	__u32	size;
++	__u32	iommu_id;
++	__u32	gid;
++	__u32	offset;
++	__u64	value;
++	__u32	mmio_size;
++	__u8	is_write;
++};
++
++#define VIOMMU_MMIO_ACCESS	_IO(IOMMUFD_TYPE, IOMMUFD_CMD_MMIO_ACCESS)
++
++/**
++ * struct amd_viommu_cmdbuf_data - ioctl(VIOMMU_CMDBUF_UPDATE)
++ * @size: sizeof(struct amd_viommu_cmdbuf_data)
++ * @iommu_id: PCI device ID of the AMD IOMMU instance
++ * @gid: guest ID
++ * @gcmdbuf_size: guest command buffer size
++ * @hva: host virtual address for the guest command buffer
++ *
++ * Trap guest command buffer initialization to setup HW-vIOMMU command buffer
++ * for the specified guest.
++ */
++struct amd_viommu_cmdbuf_data {
++	__u32	size;
++	__u32	iommu_id;
++	__u32	gid;
++	__u32	cmdbuf_size;
++	__u64	hva;
++};
++
++#define VIOMMU_CMDBUF_UPDATE	_IO(IOMMUFD_TYPE, IOMMUFD_CMD_CMDBUF_UPDATE)
++
++#endif
 -- 
 2.34.1
 
