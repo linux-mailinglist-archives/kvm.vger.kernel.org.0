@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81AC8738713
-	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 16:34:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18671738715
+	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 16:34:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230400AbjFUOeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jun 2023 10:34:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45356 "EHLO
+        id S231148AbjFUOeE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jun 2023 10:34:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230038AbjFUOd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230172AbjFUOd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 21 Jun 2023 10:33:58 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71989170C
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C7C11C
         for <kvm@vger.kernel.org>; Wed, 21 Jun 2023 07:33:56 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 07B0621E07;
+        by smtp-out1.suse.de (Postfix) with ESMTP id 87F6221E0B;
         Wed, 21 Jun 2023 14:33:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1687358035; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fRvJwkdfvdP/6bmTGpHx3R+bAAEzjogT73pCJKfoseE=;
-        b=a3ePdYYnIpf9kBJmPBiN3Xg+bYZV4x6QM7zv/1lyw7fKlEYk0jbsTNtqmYs2xFWy5R5kLp
-        xWTBxdyg+nIYWD3s7ZADRfnSYxMjPo5Ze2Y45DRXtAn8e4Dhb6ZfyB1Lf/dH8XbTbu8Z7A
-        FAdQKm11wFP5mBPSOm7mVrdx9mUSasM=
+        bh=rF7i4IloRLCoVmUTLpQGt36jkO8fjLr5SVGvstyKfxM=;
+        b=HRTXCeu9o5/8Q8cB5nU9nUDOkwbgpvca8n4vGdqZWwYioPQEKHH8poUXFSUObu5pT4XWTf
+        z6u8rcMwfIPfOpF5CNy8t1hi/deNuq70qTmRckZ+xpXtBi5jQZf3oWtoIaL3B3oEHfW961
+        8D/DGHHgvFMEftK/i5/AeonOVeqU2bw=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1687358035;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fRvJwkdfvdP/6bmTGpHx3R+bAAEzjogT73pCJKfoseE=;
-        b=FV/JDyA2eGXyHWt48FtKK5zhrcwYwKJw2jLnvhapGILQyLZv4ZJhJYlves30OnWULqbPry
-        CmF15+gPDBq6vdBQ==
+        bh=rF7i4IloRLCoVmUTLpQGt36jkO8fjLr5SVGvstyKfxM=;
+        b=G71STGdLiyt6ufLGbJN70JwtcrppXzZgC5PNVnrbjM96pWkHgeNF24p4KYr8gwWyTL7utO
+        e1qGsejMV6pg07Bw==
 Received: from vasant-suse.fritz.box (unknown [10.163.24.134])
-        by relay2.suse.de (Postfix) with ESMTP id 9079C2C143;
-        Wed, 21 Jun 2023 14:33:54 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id 10A412C141;
+        Wed, 21 Jun 2023 14:33:55 +0000 (UTC)
 From:   Vasant Karasulli <vkarasulli@suse.de>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com
 Cc:     Thomas.Lendacky@amd.com, drjones@redhat.com, erdemaktas@google.com,
@@ -45,9 +45,9 @@ Cc:     Thomas.Lendacky@amd.com, drjones@redhat.com, erdemaktas@google.com,
         zxwang42@gmail.com, papaluri@amd.com,
         Vasant Karasulli <vkarasulli@suse.de>,
         Varad Gautam <varad.gautam@suse.com>
-Subject: [kvm-unit-tests PATCH v4 06/11] x86: AMD SEV-ES: Prepare for #VC processing
-Date:   Wed, 21 Jun 2023 16:33:20 +0200
-Message-Id: <20230621143325.25933-7-vkarasulli@suse.de>
+Subject: [kvm-unit-tests PATCH v4 07/11] lib/x86: Move xsave helpers to lib/
+Date:   Wed, 21 Jun 2023 16:33:21 +0200
+Message-Id: <20230621143325.25933-8-vkarasulli@suse.de>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230621143325.25933-1-vkarasulli@suse.de>
 References: <20230621143325.25933-1-vkarasulli@suse.de>
@@ -63,126 +63,162 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Lay the groundwork for processing #VC exceptions in the handler.
-This includes clearing the GHCB, decoding the insn that triggered
-this #VC, and continuing execution after the exception has been
-processed.
-
-Based on Linux 6d7d0603ca7c397a07efc88e314e38b4242a3a8d.
+Processing CPUID #VC for AMD SEV-ES requires copying xcr0 into GHCB.
+Move the xsave read/write helpers used by xsave testcase to lib/x86
+to share as common code.
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 Signed-off-by: Vasant Karasulli <vkarasulli@suse.de>
+Reviewed-by: Marc Orr <marcorr@google.com>
 ---
- lib/x86/amd_sev_vc.c | 87 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 87 insertions(+)
+ lib/x86/xsave.c     | 40 ++++++++++++++++++++++++++++++++++++++++
+ lib/x86/xsave.h     | 16 ++++++++++++++++
+ x86/Makefile.common |  1 +
+ x86/xsave.c         | 42 +-----------------------------------------
+ 4 files changed, 58 insertions(+), 41 deletions(-)
+ create mode 100644 lib/x86/xsave.c
+ create mode 100644 lib/x86/xsave.h
 
-diff --git a/lib/x86/amd_sev_vc.c b/lib/x86/amd_sev_vc.c
-index f622703..1eefaf0 100644
---- a/lib/x86/amd_sev_vc.c
-+++ b/lib/x86/amd_sev_vc.c
-@@ -1,15 +1,102 @@
- // SPDX-License-Identifier: GPL-2.0
-+/*
-+ * AMD SEV-ES #VC exception handling.
-+ * Adapted from Linux@6d7d0603ca:
-+ * - arch/x86/kernel/sev.c
-+ * - arch/x86/kernel/sev-shared.c
-+ */
+diff --git a/lib/x86/xsave.c b/lib/x86/xsave.c
+new file mode 100644
+index 0000000..5f05f88
+--- /dev/null
++++ b/lib/x86/xsave.c
+@@ -0,0 +1,40 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include "libcflat.h"
++#include "xsave.h"
++#include "processor.h"
++
++int xgetbv_checking(u32 index, u64 *result)
++{
++	u32 eax, edx;
++
++	asm volatile(ASM_TRY("1f")
++		".byte 0x0f,0x01,0xd0\n\t" /* xgetbv */
++		"1:"
++		: "=a" (eax), "=d" (edx)
++		: "c" (index));
++	*result = eax + ((u64)edx << 32);
++	return exception_vector();
++}
++
++int xsetbv_safe(u32 index, u64 value)
++{
++	u32 eax = value;
++	u32 edx = value >> 32;
++
++	asm volatile(ASM_TRY("1f")
++		".byte 0x0f,0x01,0xd1\n\t" /* xsetbv */
++		"1:"
++		: : "a" (eax), "d" (edx), "c" (index));
++	return exception_vector();
++}
++
++uint64_t get_supported_xcr0(void)
++{
++	struct cpuid r;
++
++	r = cpuid_indexed(0xd, 0);
++	printf("eax %x, ebx %x, ecx %x, edx %x\n",
++		r.a, r.b, r.c, r.d);
++	return r.a + ((u64)r.d << 32);
++}
+diff --git a/lib/x86/xsave.h b/lib/x86/xsave.h
+new file mode 100644
+index 0000000..12757c1
+--- /dev/null
++++ b/lib/x86/xsave.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _X86_XSAVE_H_
++#define _X86_XSAVE_H_
++
++#define XCR_XFEATURE_ENABLED_MASK       0x00000000
++#define XCR_XFEATURE_ILLEGAL_MASK       0x00000010
++
++#define XSTATE_FP       0x1
++#define XSTATE_SSE      0x2
++#define XSTATE_YMM      0x4
++
++int xgetbv_checking(u32 index, u64 *result);
++int xsetbv_safe(u32 index, u64 value);
++uint64_t get_supported_xcr0(void);
++
++#endif
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index ca45ae8..e755c7e 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -22,6 +22,7 @@ cflatobjs += lib/x86/acpi.o
+ cflatobjs += lib/x86/stack.o
+ cflatobjs += lib/x86/fault_test.o
+ cflatobjs += lib/x86/delay.o
++cflatobjs += lib/x86/xsave.o
+ cflatobjs += lib/x86/pmu.o
+ ifeq ($(CONFIG_EFI),y)
+ cflatobjs += lib/x86/amd_sev.o
+diff --git a/x86/xsave.c b/x86/xsave.c
+index 39a55d6..d44f9ff 100644
+--- a/x86/xsave.c
++++ b/x86/xsave.c
+@@ -1,6 +1,7 @@
+ #include "libcflat.h"
+ #include "desc.h"
+ #include "processor.h"
++#include "xsave.h"
 
- #include "amd_sev.h"
-+#include "svm.h"
+ #ifdef __x86_64__
+ #define uint64_t unsigned long
+@@ -8,47 +9,6 @@
+ #define uint64_t unsigned long long
+ #endif
 
- extern phys_addr_t ghcb_addr;
-
-+static void vc_ghcb_invalidate(struct ghcb *ghcb)
-+{
-+	ghcb->save.sw_exit_code = 0;
-+	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
-+}
-+
-+static bool vc_decoding_needed(unsigned long exit_code)
-+{
-+	/* Exceptions don't require to decode the instruction */
-+	return !(exit_code >= SVM_EXIT_EXCP_BASE &&
-+		 exit_code <= SVM_EXIT_LAST_EXCP);
-+}
-+
-+static enum es_result vc_decode_insn(struct es_em_ctxt *ctxt)
-+{
-+	unsigned char buffer[MAX_INSN_SIZE];
-+	int ret;
-+
-+	memcpy(buffer, (unsigned char *)ctxt->regs->rip, MAX_INSN_SIZE);
-+
-+	ret = insn_decode(&ctxt->insn, buffer, MAX_INSN_SIZE, INSN_MODE_64);
-+	if (ret < 0)
-+		return ES_DECODE_FAILED;
-+	else
-+		return ES_OK;
-+}
-+
-+static enum es_result vc_init_em_ctxt(struct es_em_ctxt *ctxt,
-+				      struct ex_regs *regs,
-+				      unsigned long exit_code)
-+{
-+	enum es_result ret = ES_OK;
-+
-+	memset(ctxt, 0, sizeof(*ctxt));
-+	ctxt->regs = regs;
-+
-+	if (vc_decoding_needed(exit_code))
-+		ret = vc_decode_insn(ctxt);
-+
-+	return ret;
-+}
-+
-+static void vc_finish_insn(struct es_em_ctxt *ctxt)
-+{
-+	ctxt->regs->rip += ctxt->insn.length;
-+}
-+
-+static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
-+					 struct ghcb *ghcb,
-+					 unsigned long exit_code)
-+{
-+	enum es_result result;
-+
-+	switch (exit_code) {
-+	default:
-+		/*
-+		 * Unexpected #VC exception
-+		 */
-+		result = ES_UNSUPPORTED;
-+	}
-+
-+	return result;
-+}
-+
- void handle_sev_es_vc(struct ex_regs *regs)
+-static int xgetbv_checking(u32 index, u64 *result)
+-{
+-    u32 eax, edx;
+-
+-    asm volatile(ASM_TRY("1f")
+-            ".byte 0x0f,0x01,0xd0\n\t" /* xgetbv */
+-            "1:"
+-            : "=a" (eax), "=d" (edx)
+-            : "c" (index));
+-    *result = eax + ((u64)edx << 32);
+-    return exception_vector();
+-}
+-
+-static int xsetbv_safe(u32 index, u64 value)
+-{
+-    u32 eax = value;
+-    u32 edx = value >> 32;
+-
+-    asm volatile(ASM_TRY("1f")
+-            ".byte 0x0f,0x01,0xd1\n\t" /* xsetbv */
+-            "1:"
+-            : : "a" (eax), "d" (edx), "c" (index));
+-    return exception_vector();
+-}
+-
+-static uint64_t get_supported_xcr0(void)
+-{
+-    struct cpuid r;
+-    r = cpuid_indexed(0xd, 0);
+-    printf("eax %x, ebx %x, ecx %x, edx %x\n",
+-            r.a, r.b, r.c, r.d);
+-    return r.a + ((u64)r.d << 32);
+-}
+-
+-#define XCR_XFEATURE_ENABLED_MASK       0x00000000
+-#define XCR_XFEATURE_ILLEGAL_MASK       0x00000010
+-
+-#define XSTATE_FP       0x1
+-#define XSTATE_SSE      0x2
+-#define XSTATE_YMM      0x4
+-
+ static void test_xsave(void)
  {
- 	struct ghcb *ghcb = (struct ghcb *) ghcb_addr;
-+	unsigned long exit_code = regs->error_code;
-+	struct es_em_ctxt ctxt;
-+	enum es_result result;
-
- 	if (!ghcb) {
- 		/* TODO: kill guest */
- 		return;
- 	}
-+
-+	vc_ghcb_invalidate(ghcb);
-+	result = vc_init_em_ctxt(&ctxt, regs, exit_code);
-+	if (result == ES_OK)
-+		result = vc_handle_exitcode(&ctxt, ghcb, exit_code);
-+	if (result == ES_OK) {
-+		vc_finish_insn(&ctxt);
-+	} else {
-+		printf("Unable to handle #VC exitcode, exit_code=%lx result=%x\n",
-+		       exit_code, result);
-+	}
-+
-+	return;
- }
+     unsigned long cr4;
 --
 2.34.1
 
