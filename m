@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2558473896B
-	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 17:35:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1C59738967
+	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 17:35:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233506AbjFUPfT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jun 2023 11:35:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42286 "EHLO
+        id S233469AbjFUPfR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jun 2023 11:35:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233527AbjFUPev (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jun 2023 11:34:51 -0400
+        with ESMTP id S233548AbjFUPey (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jun 2023 11:34:54 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 622321FEF;
-        Wed, 21 Jun 2023 08:34:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079011FFA;
+        Wed, 21 Jun 2023 08:34:29 -0700 (PDT)
 Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35LFPTsc009992;
-        Wed, 21 Jun 2023 15:34:28 GMT
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35LFPTse009992;
+        Wed, 21 Jun 2023 15:34:29 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=nNDYk+Xje2XH5AMwI9j9WBwWLQLNNYPDEP9vraj5IHU=;
- b=FmX3VDMOAl5aql7HwmI+8bDTMxLyNaQnbXqhhNw2/THeRvekGY7kHdCFETKx4q8IyRfm
- OtvTT4VERGGKDnjTrvu+6SAKiqR4oWd4vO3t0RqkfhIePYpnSyHv4akTqljMLgGZsgqn
- 71zEY6IY5ItJOBt6Ulux4jlcWApYv2Ih8iSlUlDk41+Ys2b7g1lSCfMsv15cm/a96FIq
- lnh0HUxXAh1tyHM1DQOzI2OBzqs/KsvNTwqVyM5xekEMR/3iPC9u/CyfNqxHHhd4HKlo
- L9RfkVClGuDXa3CiMY9KlWsmmxaUEO1/IZAu/wZwVpGyxncxnFNOb9zFThY4edShpVDN ww== 
+ : mime-version; s=pp1; bh=6Ow8M76yyb0ETXTWmKD7gTGVplFd/Xm3mz1VcbqGynw=;
+ b=XLao6dBWEg6XbUHCjzjaucunGQZB4l/kGfj+2nIyAZCYggcaKamZ70sIh0YgJ369dQ9T
+ XPpyjjz4Rjw4V+WMWGPxtISCl9B33zjsvtC1CiGc4HB/Vhii06eF2Ra6gkO8KZ43VHvu
+ fh2Mb2neUOIsrlnUY7I0DMtj7am8HvYoMY5Kh9OIksQpUiF3M9KBHhr59vaeYjwLTgZi
+ kHpHwgx2Gjtc+I3F+P44+iCYW7v3UmLcI4NE8mhO+L0KvmBQftNsBYY45FPL8fk4FbPH
+ qppDzAIDmf/de2eZKM39ocsLN3t4kZxCQ4bqXhXwu0X1ZbtnIuf4W2qQ6xUT5Bw31lLw eA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rc3u70apx-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rc3u70aq4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Jun 2023 15:34:27 +0000
+        Wed, 21 Jun 2023 15:34:28 +0000
 Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35LFQKrR012092;
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35LFPoSh010394;
         Wed, 21 Jun 2023 15:34:27 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rc3u70ajx-1
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rc3u70ak8-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 21 Jun 2023 15:34:26 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35L1mlLu028256;
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35L3IF3g011691;
         Wed, 21 Jun 2023 15:34:24 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3r94f5255u-1
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3r94f5aue3-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Jun 2023 15:34:23 +0000
+        Wed, 21 Jun 2023 15:34:24 +0000
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35LFYKAY14221984
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35LFYLsH44695824
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 21 Jun 2023 15:34:20 GMT
+        Wed, 21 Jun 2023 15:34:21 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7C32E20040;
+        by IMSVA (Postfix) with ESMTP id F163320040;
         Wed, 21 Jun 2023 15:34:20 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 15FB020043;
+        by IMSVA (Postfix) with ESMTP id 8D1E420049;
         Wed, 21 Jun 2023 15:34:20 +0000 (GMT)
 Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.ibm.com.com (unknown [9.171.33.34])
         by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -61,15 +61,15 @@ To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
         borntraeger@linux.ibm.com, linux-s390@vger.kernel.org,
         imbrenda@linux.ibm.com, nrb@linux.ibm.com, pmorel@linux.ibm.com
-Subject: [GIT PULL 10/11] s390/uv: replace scnprintf with sysfs_emit
-Date:   Wed, 21 Jun 2023 17:29:16 +0200
-Message-ID: <20230621153227.57250-11-frankja@linux.ibm.com>
+Subject: [GIT PULL 11/11] s390/uv: Update query for secret-UVCs
+Date:   Wed, 21 Jun 2023 17:29:17 +0200
+Message-ID: <20230621153227.57250-12-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230621153227.57250-1-frankja@linux.ibm.com>
 References: <20230621153227.57250-1-frankja@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ezuaGrIPUOEsVXgwe4pvP0uhBb2Wgl3l
-X-Proofpoint-ORIG-GUID: uNCRnVy9KKn24DFEaZexoNgDoX3e4mUq
+X-Proofpoint-GUID: oPTSMQhJlywPQ72mjM0M0kSgQ-HUlI5A
+X-Proofpoint-ORIG-GUID: x0VA4QBuq-ZcdKiwX0knXSNyGjGhb2-N
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
@@ -93,169 +93,145 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Steffen Eiden <seiden@linux.ibm.com>
 
-Replace scnprintf(page, PAGE_SIZE, ...) with the page size aware
-sysfs_emit(buf, ...) which adds some sanity checks.
+Update the query struct such that secret-UVC related
+information can be parsed.
+Add sysfs files for these new values.
+
+'supp_add_secret_req_ver' notes the supported versions for the
+Add Secret UVC. Bit 0 indicates that version 0x100 is supported,
+bit 1 indicates 0x200, and so on.
+
+'supp_add_secret_pcf' notes the supported plaintext flags for
+the Add Secret UVC.
+
+'supp_secret_types' notes the supported types of secrets.
+Bit 0 indicates secret type 1, bit 1 indicates type 2, and so on.
+
+'max_secrets' notes the maximum amount of secrets the secret store can
+store per pv guest.
 
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Link: https://lore.kernel.org/r/20230615100533.3996107-7-seiden@linux.ibm.com
+Link: https://lore.kernel.org/r/20230615100533.3996107-8-seiden@linux.ibm.com
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Message-Id: <20230615100533.3996107-7-seiden@linux.ibm.com>
+Message-Id: <20230615100533.3996107-8-seiden@linux.ibm.com>
 ---
- arch/s390/kernel/uv.c | 58 +++++++++++++++++++------------------------
- 1 file changed, 26 insertions(+), 32 deletions(-)
+ arch/s390/boot/uv.c        |  4 ++++
+ arch/s390/include/asm/uv.h | 13 +++++++++++--
+ arch/s390/kernel/uv.c      | 40 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 55 insertions(+), 2 deletions(-)
 
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index e320a382fa85..6a23a13d0dfc 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -468,13 +468,13 @@ EXPORT_SYMBOL_GPL(arch_make_page_accessible);
- 
- #if defined(CONFIG_PROTECTED_VIRTUALIZATION_GUEST) || IS_ENABLED(CONFIG_KVM)
- static ssize_t uv_query_facilities(struct kobject *kobj,
--				   struct kobj_attribute *attr, char *page)
-+				   struct kobj_attribute *attr, char *buf)
- {
--	return scnprintf(page, PAGE_SIZE, "%lx\n%lx\n%lx\n%lx\n",
--			uv_info.inst_calls_list[0],
--			uv_info.inst_calls_list[1],
--			uv_info.inst_calls_list[2],
--			uv_info.inst_calls_list[3]);
-+	return sysfs_emit(buf, "%lx\n%lx\n%lx\n%lx\n",
-+			  uv_info.inst_calls_list[0],
-+			  uv_info.inst_calls_list[1],
-+			  uv_info.inst_calls_list[2],
-+			  uv_info.inst_calls_list[3]);
- }
- 
- static struct kobj_attribute uv_query_facilities_attr =
-@@ -499,30 +499,27 @@ static struct kobj_attribute uv_query_supp_se_hdr_pcf_attr =
- 	__ATTR(supp_se_hdr_pcf, 0444, uv_query_supp_se_hdr_pcf, NULL);
- 
- static ssize_t uv_query_dump_cpu_len(struct kobject *kobj,
--				     struct kobj_attribute *attr, char *page)
-+				     struct kobj_attribute *attr, char *buf)
- {
--	return scnprintf(page, PAGE_SIZE, "%lx\n",
--			uv_info.guest_cpu_stor_len);
-+	return sysfs_emit(buf, "%lx\n", uv_info.guest_cpu_stor_len);
- }
- 
- static struct kobj_attribute uv_query_dump_cpu_len_attr =
- 	__ATTR(uv_query_dump_cpu_len, 0444, uv_query_dump_cpu_len, NULL);
- 
- static ssize_t uv_query_dump_storage_state_len(struct kobject *kobj,
--					       struct kobj_attribute *attr, char *page)
-+					       struct kobj_attribute *attr, char *buf)
- {
--	return scnprintf(page, PAGE_SIZE, "%lx\n",
--			uv_info.conf_dump_storage_state_len);
-+	return sysfs_emit(buf, "%lx\n", uv_info.conf_dump_storage_state_len);
- }
- 
- static struct kobj_attribute uv_query_dump_storage_state_len_attr =
- 	__ATTR(dump_storage_state_len, 0444, uv_query_dump_storage_state_len, NULL);
- 
- static ssize_t uv_query_dump_finalize_len(struct kobject *kobj,
--					  struct kobj_attribute *attr, char *page)
-+					  struct kobj_attribute *attr, char *buf)
- {
--	return scnprintf(page, PAGE_SIZE, "%lx\n",
--			uv_info.conf_dump_finalize_len);
-+	return sysfs_emit(buf, "%lx\n", uv_info.conf_dump_finalize_len);
- }
- 
- static struct kobj_attribute uv_query_dump_finalize_len_attr =
-@@ -538,48 +535,45 @@ static struct kobj_attribute uv_query_feature_indications_attr =
- 	__ATTR(feature_indications, 0444, uv_query_feature_indications, NULL);
- 
- static ssize_t uv_query_max_guest_cpus(struct kobject *kobj,
--				       struct kobj_attribute *attr, char *page)
-+				       struct kobj_attribute *attr, char *buf)
- {
--	return scnprintf(page, PAGE_SIZE, "%d\n",
--			uv_info.max_guest_cpu_id + 1);
-+	return sysfs_emit(buf, "%d\n", uv_info.max_guest_cpu_id + 1);
- }
- 
- static struct kobj_attribute uv_query_max_guest_cpus_attr =
- 	__ATTR(max_cpus, 0444, uv_query_max_guest_cpus, NULL);
- 
- static ssize_t uv_query_max_guest_vms(struct kobject *kobj,
--				      struct kobj_attribute *attr, char *page)
-+				      struct kobj_attribute *attr, char *buf)
- {
--	return scnprintf(page, PAGE_SIZE, "%d\n",
--			uv_info.max_num_sec_conf);
-+	return sysfs_emit(buf, "%d\n", uv_info.max_num_sec_conf);
- }
- 
- static struct kobj_attribute uv_query_max_guest_vms_attr =
- 	__ATTR(max_guests, 0444, uv_query_max_guest_vms, NULL);
- 
- static ssize_t uv_query_max_guest_addr(struct kobject *kobj,
--				       struct kobj_attribute *attr, char *page)
-+				       struct kobj_attribute *attr, char *buf)
- {
--	return scnprintf(page, PAGE_SIZE, "%lx\n",
--			uv_info.max_sec_stor_addr);
-+	return sysfs_emit(buf, "%lx\n", uv_info.max_sec_stor_addr);
- }
- 
- static struct kobj_attribute uv_query_max_guest_addr_attr =
- 	__ATTR(max_address, 0444, uv_query_max_guest_addr, NULL);
- 
- static ssize_t uv_query_supp_att_req_hdr_ver(struct kobject *kobj,
--					     struct kobj_attribute *attr, char *page)
-+					     struct kobj_attribute *attr, char *buf)
- {
--	return scnprintf(page, PAGE_SIZE, "%lx\n", uv_info.supp_att_req_hdr_ver);
-+	return sysfs_emit(buf, "%lx\n", uv_info.supp_att_req_hdr_ver);
- }
- 
- static struct kobj_attribute uv_query_supp_att_req_hdr_ver_attr =
- 	__ATTR(supp_att_req_hdr_ver, 0444, uv_query_supp_att_req_hdr_ver, NULL);
- 
- static ssize_t uv_query_supp_att_pflags(struct kobject *kobj,
--					struct kobj_attribute *attr, char *page)
-+					struct kobj_attribute *attr, char *buf)
- {
--	return scnprintf(page, PAGE_SIZE, "%lx\n", uv_info.supp_att_pflags);
-+	return sysfs_emit(buf, "%lx\n", uv_info.supp_att_pflags);
- }
- 
- static struct kobj_attribute uv_query_supp_att_pflags_attr =
-@@ -606,18 +600,18 @@ static struct attribute_group uv_query_attr_group = {
- };
- 
- static ssize_t uv_is_prot_virt_guest(struct kobject *kobj,
--				     struct kobj_attribute *attr, char *page)
-+				     struct kobj_attribute *attr, char *buf)
- {
- 	int val = 0;
+diff --git a/arch/s390/boot/uv.c b/arch/s390/boot/uv.c
+index 0a077c0a2056..1e66d2cbb096 100644
+--- a/arch/s390/boot/uv.c
++++ b/arch/s390/boot/uv.c
+@@ -47,6 +47,10 @@ void uv_query_info(void)
+ 		uv_info.conf_dump_finalize_len = uvcb.conf_dump_finalize_len;
+ 		uv_info.supp_att_req_hdr_ver = uvcb.supp_att_req_hdr_ver;
+ 		uv_info.supp_att_pflags = uvcb.supp_att_pflags;
++		uv_info.supp_add_secret_req_ver = uvcb.supp_add_secret_req_ver;
++		uv_info.supp_add_secret_pcf = uvcb.supp_add_secret_pcf;
++		uv_info.supp_secret_types = uvcb.supp_secret_types;
++		uv_info.max_secrets = uvcb.max_secrets;
+ 	}
  
  #ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
- 	val = prot_virt_guest;
- #endif
--	return scnprintf(page, PAGE_SIZE, "%d\n", val);
-+	return sysfs_emit(buf, "%d\n", val);
- }
+diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+index 3203ffbdde6b..d6bb2f4f78d1 100644
+--- a/arch/s390/include/asm/uv.h
++++ b/arch/s390/include/asm/uv.h
+@@ -123,7 +123,7 @@ struct uv_cb_qui {
+ 	u32 reserved70[3];			/* 0x0070 */
+ 	u32 max_num_sec_conf;			/* 0x007c */
+ 	u64 max_guest_stor_addr;		/* 0x0080 */
+-	u8  reserved88[158 - 136];		/* 0x0088 */
++	u8  reserved88[0x9e - 0x88];		/* 0x0088 */
+ 	u16 max_guest_cpu_id;			/* 0x009e */
+ 	u64 uv_feature_indications;		/* 0x00a0 */
+ 	u64 reserveda8;				/* 0x00a8 */
+@@ -135,7 +135,12 @@ struct uv_cb_qui {
+ 	u64 reservedd8;				/* 0x00d8 */
+ 	u64 supp_att_req_hdr_ver;		/* 0x00e0 */
+ 	u64 supp_att_pflags;			/* 0x00e8 */
+-	u8 reservedf0[256 - 240];		/* 0x00f0 */
++	u64 reservedf0;				/* 0x00f0 */
++	u64 supp_add_secret_req_ver;		/* 0x00f8 */
++	u64 supp_add_secret_pcf;		/* 0x0100 */
++	u64 supp_secret_types;			/* 0x0180 */
++	u16 max_secrets;			/* 0x0110 */
++	u8 reserved112[0x120 - 0x112];		/* 0x0112 */
+ } __packed __aligned(8);
  
- static ssize_t uv_is_prot_virt_host(struct kobject *kobj,
--				    struct kobj_attribute *attr, char *page)
+ /* Initialize Ultravisor */
+@@ -384,6 +389,10 @@ struct uv_info {
+ 	unsigned long conf_dump_finalize_len;
+ 	unsigned long supp_att_req_hdr_ver;
+ 	unsigned long supp_att_pflags;
++	unsigned long supp_add_secret_req_ver;
++	unsigned long supp_add_secret_pcf;
++	unsigned long supp_secret_types;
++	unsigned short max_secrets;
+ };
+ 
+ extern struct uv_info uv_info;
+diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+index 6a23a13d0dfc..273a0281a189 100644
+--- a/arch/s390/kernel/uv.c
++++ b/arch/s390/kernel/uv.c
+@@ -579,6 +579,42 @@ static ssize_t uv_query_supp_att_pflags(struct kobject *kobj,
+ static struct kobj_attribute uv_query_supp_att_pflags_attr =
+ 	__ATTR(supp_att_pflags, 0444, uv_query_supp_att_pflags, NULL);
+ 
++static ssize_t uv_query_supp_add_secret_req_ver(struct kobject *kobj,
++						struct kobj_attribute *attr, char *buf)
++{
++	return sysfs_emit(buf, "%lx\n", uv_info.supp_add_secret_req_ver);
++}
++
++static struct kobj_attribute uv_query_supp_add_secret_req_ver_attr =
++	__ATTR(supp_add_secret_req_ver, 0444, uv_query_supp_add_secret_req_ver, NULL);
++
++static ssize_t uv_query_supp_add_secret_pcf(struct kobject *kobj,
++					    struct kobj_attribute *attr, char *buf)
++{
++	return sysfs_emit(buf, "%lx\n", uv_info.supp_add_secret_pcf);
++}
++
++static struct kobj_attribute uv_query_supp_add_secret_pcf_attr =
++	__ATTR(supp_add_secret_pcf, 0444, uv_query_supp_add_secret_pcf, NULL);
++
++static ssize_t uv_query_supp_secret_types(struct kobject *kobj,
++					  struct kobj_attribute *attr, char *buf)
++{
++	return sysfs_emit(buf, "%lx\n", uv_info.supp_secret_types);
++}
++
++static struct kobj_attribute uv_query_supp_secret_types_attr =
++	__ATTR(supp_secret_types, 0444, uv_query_supp_secret_types, NULL);
++
++static ssize_t uv_query_max_secrets(struct kobject *kobj,
 +				    struct kobj_attribute *attr, char *buf)
- {
- 	int val = 0;
++{
++	return sysfs_emit(buf, "%d\n", uv_info.max_secrets);
++}
++
++static struct kobj_attribute uv_query_max_secrets_attr =
++	__ATTR(max_secrets, 0444, uv_query_max_secrets, NULL);
++
+ static struct attribute *uv_query_attrs[] = {
+ 	&uv_query_facilities_attr.attr,
+ 	&uv_query_feature_indications_attr.attr,
+@@ -592,6 +628,10 @@ static struct attribute *uv_query_attrs[] = {
+ 	&uv_query_dump_cpu_len_attr.attr,
+ 	&uv_query_supp_att_req_hdr_ver_attr.attr,
+ 	&uv_query_supp_att_pflags_attr.attr,
++	&uv_query_supp_add_secret_req_ver_attr.attr,
++	&uv_query_supp_add_secret_pcf_attr.attr,
++	&uv_query_supp_secret_types_attr.attr,
++	&uv_query_max_secrets_attr.attr,
+ 	NULL,
+ };
  
-@@ -625,7 +619,7 @@ static ssize_t uv_is_prot_virt_host(struct kobject *kobj,
- 	val = prot_virt_host;
- #endif
- 
--	return scnprintf(page, PAGE_SIZE, "%d\n", val);
-+	return sysfs_emit(buf, "%d\n", val);
- }
- 
- static struct kobj_attribute uv_prot_virt_guest =
 -- 
 2.41.0
 
