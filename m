@@ -2,79 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01F96738707
-	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 16:31:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F266773870C
+	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 16:33:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229755AbjFUObi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jun 2023 10:31:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44490 "EHLO
+        id S229768AbjFUOdw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jun 2023 10:33:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229513AbjFUObh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jun 2023 10:31:37 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6279612E;
-        Wed, 21 Jun 2023 07:31:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687357895; x=1718893895;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=O64wJ4h2FjMBRHsbamypZL1GWJNUE5Ay/zmz6Kb6Fbw=;
-  b=QhJVop2jENEPwjbKZntHyZiGNSZuKE3HfYuEE0+NAvFXXjcyocIRV88t
-   vZplUd9p33m6ayvnl9Lb1hBdc+VfbcbD92jJBsxXK6nKwId7LAzjXfgnc
-   ZdSdnmcy/KmnUWb7Mtc+HZvfvNBbnUlj/6uqmYhmy4/LUrByzEjmagPRo
-   MADNBAjNYtp5lQBdom4io7OSJVfsgLsX7TF4wY9pWCczkKP/wLmvgLvY3
-   T1H7T78oenkkDqvuwC9wljseueIpAdp8NOy1Ti1F2sAE6dAT62AAVWWfD
-   btQUaoxXudpNtliBp1xYMKcG+fpOAM5E/JHNAw/6jL0G+XEZ8Jy/NT40t
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="349921498"
-X-IronPort-AV: E=Sophos;i="6.00,260,1681196400"; 
-   d="scan'208";a="349921498"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 07:31:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="714507270"
-X-IronPort-AV: E=Sophos;i="6.00,260,1681196400"; 
-   d="scan'208";a="714507270"
-Received: from rmathew-mobl2.amr.corp.intel.com (HELO [10.212.134.235]) ([10.212.134.235])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 07:31:34 -0700
-Message-ID: <23f400bc-9a62-be4a-6a24-0e2149d4491c@intel.com>
-Date:   Wed, 21 Jun 2023 07:31:34 -0700
+        with ESMTP id S229513AbjFUOdt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jun 2023 10:33:49 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D356611C
+        for <kvm@vger.kernel.org>; Wed, 21 Jun 2023 07:33:44 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 87C2521DFB;
+        Wed, 21 Jun 2023 14:33:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1687358023; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=c8kwzDIIBDr3fel/kfXlCHjmh+lpX2M0y16Mob/akTo=;
+        b=V4Uue+WAQ8M6OrP1mZViz2etewCPVWY3kd483HPMWHKpZM0LeeVFWcauHgvYKdcGPhL8tb
+        mtmFlXYDhb4l4hUJy9At+o41Ozv7Madw+cXwkB7rUPzZCo+515lct0UwrTh/3/qW9yYkc1
+        xxPVi/EiHdkY4CWqdY4ntWppKL2tsfE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1687358023;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=c8kwzDIIBDr3fel/kfXlCHjmh+lpX2M0y16Mob/akTo=;
+        b=wLxLXXp/EMYhfOCNec200f7SN0z0XTMb5Mk1rPK0ZJnQ8H9vSA9chOtmTszcoltnlkt7Z3
+        euTP/HZIJsoZ9iCw==
+Received: from vasant-suse.fritz.box (unknown [10.163.24.134])
+        by relay2.suse.de (Postfix) with ESMTP id 15A4D2C141;
+        Wed, 21 Jun 2023 14:33:43 +0000 (UTC)
+From:   Vasant Karasulli <vkarasulli@suse.de>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     Thomas.Lendacky@amd.com, drjones@redhat.com, erdemaktas@google.com,
+        marcorr@google.com, rientjes@google.com, seanjc@google.com,
+        zxwang42@gmail.com, papaluri@amd.com,
+        Vasant Karasulli <vkarasulli@suse.de>
+Subject: [kvm-unit-tests PATCH v4 00/11] Add #VC exception handling for AMD SEV-ES
+Date:   Wed, 21 Jun 2023 16:33:14 +0200
+Message-Id: <20230621143325.25933-1-vkarasulli@suse.de>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH RFC v9 07/51] x86/sev: Add the host SEV-SNP initialization
- support
-Content-Language: en-US
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
-References: <20230612042559.375660-1-michael.roth@amd.com>
- <20230612042559.375660-8-michael.roth@amd.com>
- <12f95b38-427c-6810-373a-ba2062c43882@intel.com>
- <20230621091541.GEZJK/veTnfhOnX8ci@fat_crate.local>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230621091541.GEZJK/veTnfhOnX8ci@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        T_SCC_BODY_TEXT_LINE,T_SPF_TEMPERROR,URIBL_BLOCKED autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,25 +56,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/21/23 02:15, Borislav Petkov wrote:
-> On Mon, Jun 12, 2023 at 08:34:02AM -0700, Dave Hansen wrote:
->> On 6/11/23 21:25, Michael Roth wrote:
->>> +	/*
->>> +	 * Calculate the amount the memory that must be reserved by the BIOS to
->>> +	 * address the whole RAM, including the bookkeeping area. The RMP itself
->>> +	 * must also be covered.
->>> +	 */
->>> +	max_rmp_pfn = max_pfn;
->>> +	if (PHYS_PFN(rmp_end) > max_pfn)
->>> +		max_rmp_pfn = PHYS_PFN(rmp_end);
->> Could you say a little here about how this deals with memory hotplug?
-> Does SNP hw even support memory hotplug?
-> 
-> I think in order to support that, you'd need some special dance because
-> of the RMP table etc...
+For AMD SEV-ES, kvm-unit-tests currently rely on UEFI to set up a
+#VC exception handler. This leads to the following problems:
 
-Yep, there's the hardware side and then there are fun nuggets like using
-mem= and then doing a software-only hot-add later after boot.
+1) The test's page table needs to map the firmware and the shared
+   GHCB used by the firmware.
+2) The firmware needs to keep its #VC handler in the current IDT
+   so that kvm-unit-tests can copy the #VC entry into its own IDT.
+3) The firmware #VC handler might use state which is not available
+   anymore after ExitBootServices.
+4) After ExitBootServices, the firmware needs to get the GHCB address
+   from the GHCB MSR if it needs to use the kvm-unit-test GHCB. This
+   requires keeping an identity mapping, and the GHCB address must be
+   in the MSR at all times where a #VC could happen.
 
-Also, if the hardware doesn't support any kind of hotplug, it would be
-great to point to the place in the spec where it says that.
+Problems 1) and 2) were temporarily mitigated via commits b114aa57ab
+("x86 AMD SEV-ES: Set up GHCB page") and 706ede1833 ("x86 AMD SEV-ES:
+Copy UEFI #VC IDT entry") respectively.
+
+However, to make kvm-unit-tests reliable against 3) and 4), the tests
+must supply their own #VC handler [1][2].
+
+This series adds #VC exception processing from Linux into kvm-unit-tests,
+and makes it the default way of handling #VC exceptions.
+
+If --amdsev-efi-vc is passed during ./configure, the tests will continue
+using the UEFI #VC handler.
+
+[1] https://lore.kernel.org/all/Yf0GO8EydyQSdZvu@suse.de/
+[2] https://lore.kernel.org/all/YSA%2FsYhGgMU72tn+@google.com/
+
+v4:
+- Rebased the patches on top of the current state of the test suite
+- Rebased the insn decoder on linux kernel v6.4
+
+v3:
+- Reduce the diff between insn decoder code imported into kvm-unit-tests
+  and the original code in Linux; cleanup #VC handling.
+
+v2:
+- Drop #VC processing code for RDTSC/RDTSCP and WBINVD (seanjc). KVM does
+  not trap RDTSC/RDTSCP, and the tests do not produce a WBINVD exit to be
+  handled.
+- Clarify the rationale for tests needing their own #VC handler (marcorr).
+
+Vasant Karasulli (11):
+  x86: AMD SEV-ES: Setup #VC exception handler for AMD SEV-ES
+  x86: Move svm.h to lib/x86/
+  lib: Define unlikely()/likely() macros in libcflat.h
+  lib: x86: Import insn decoder from Linux
+  x86: AMD SEV-ES: Pull related GHCB definitions and helpers from Linux
+  x86: AMD SEV-ES: Prepare for #VC processing
+  lib/x86: Move xsave helpers to lib/
+  x86: AMD SEV-ES: Handle CPUID #VC
+  x86: AMD SEV-ES: Handle MSR #VC
+  x86: AMD SEV-ES: Handle IOIO #VC
+  x86: AMD SEV-ES: Handle string IO for IOIO #VC
+
+ .gitignore                         |    2 +
+ Makefile                           |    3 +
+ configure                          |   21 +
+ lib/libcflat.h                     |    3 +
+ lib/x86/amd_sev.c                  |   13 +-
+ lib/x86/amd_sev.h                  |   98 +++
+ lib/x86/amd_sev_vc.c               |  494 ++++++++++++
+ lib/x86/desc.c                     |   17 +
+ lib/x86/desc.h                     |    1 +
+ lib/x86/insn/README                |   23 +
+ lib/x86/insn/gen-insn-attr-x86.awk |  443 +++++++++++
+ lib/x86/insn/inat.c                |   86 ++
+ lib/x86/insn/inat.h                |  233 ++++++
+ lib/x86/insn/inat_types.h          |   18 +
+ lib/x86/insn/insn.c                |  749 +++++++++++++++++
+ lib/x86/insn/insn.h                |  279 +++++++
+ lib/x86/insn/insn_glue.h           |   32 +
+ lib/x86/insn/x86-opcode-map.txt    | 1191 ++++++++++++++++++++++++++++
+ lib/x86/msr.h                      |    1 +
+ lib/x86/processor.h                |   15 +
+ lib/x86/setup.c                    |    8 +
+ {x86 => lib/x86}/svm.h             |   40 +-
+ lib/x86/xsave.c                    |   40 +
+ lib/x86/xsave.h                    |   16 +
+ x86/Makefile.common                |   16 +-
+ x86/Makefile.x86_64                |    1 +
+ x86/kvmclock.c                     |    4 -
+ x86/svm.c                          |    2 +-
+ x86/svm_tests.c                    |    2 +-
+ x86/xsave.c                        |   42 +-
+ 30 files changed, 3835 insertions(+), 58 deletions(-)
+ create mode 100644 lib/x86/amd_sev_vc.c
+ create mode 100644 lib/x86/insn/README
+ create mode 100644 lib/x86/insn/gen-insn-attr-x86.awk
+ create mode 100644 lib/x86/insn/inat.c
+ create mode 100644 lib/x86/insn/inat.h
+ create mode 100644 lib/x86/insn/inat_types.h
+ create mode 100644 lib/x86/insn/insn.c
+ create mode 100644 lib/x86/insn/insn.h
+ create mode 100644 lib/x86/insn/insn_glue.h
+ create mode 100644 lib/x86/insn/x86-opcode-map.txt
+ rename {x86 => lib/x86}/svm.h (94%)
+ create mode 100644 lib/x86/xsave.c
+ create mode 100644 lib/x86/xsave.h
+
+--
+2.34.1
+
