@@ -2,236 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1C59738967
-	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 17:35:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36414738A59
+	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 18:01:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233469AbjFUPfR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jun 2023 11:35:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42336 "EHLO
+        id S233861AbjFUQBR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jun 2023 12:01:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233548AbjFUPey (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jun 2023 11:34:54 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079011FFA;
-        Wed, 21 Jun 2023 08:34:29 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35LFPTse009992;
-        Wed, 21 Jun 2023 15:34:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=6Ow8M76yyb0ETXTWmKD7gTGVplFd/Xm3mz1VcbqGynw=;
- b=XLao6dBWEg6XbUHCjzjaucunGQZB4l/kGfj+2nIyAZCYggcaKamZ70sIh0YgJ369dQ9T
- XPpyjjz4Rjw4V+WMWGPxtISCl9B33zjsvtC1CiGc4HB/Vhii06eF2Ra6gkO8KZ43VHvu
- fh2Mb2neUOIsrlnUY7I0DMtj7am8HvYoMY5Kh9OIksQpUiF3M9KBHhr59vaeYjwLTgZi
- kHpHwgx2Gjtc+I3F+P44+iCYW7v3UmLcI4NE8mhO+L0KvmBQftNsBYY45FPL8fk4FbPH
- qppDzAIDmf/de2eZKM39ocsLN3t4kZxCQ4bqXhXwu0X1ZbtnIuf4W2qQ6xUT5Bw31lLw eA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rc3u70aq4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Jun 2023 15:34:28 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35LFPoSh010394;
-        Wed, 21 Jun 2023 15:34:27 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rc3u70ak8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Jun 2023 15:34:26 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35L3IF3g011691;
-        Wed, 21 Jun 2023 15:34:24 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3r94f5aue3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Jun 2023 15:34:24 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35LFYLsH44695824
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 21 Jun 2023 15:34:21 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F163320040;
-        Wed, 21 Jun 2023 15:34:20 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8D1E420049;
-        Wed, 21 Jun 2023 15:34:20 +0000 (GMT)
-Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.ibm.com.com (unknown [9.171.33.34])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 21 Jun 2023 15:34:20 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        borntraeger@linux.ibm.com, linux-s390@vger.kernel.org,
-        imbrenda@linux.ibm.com, nrb@linux.ibm.com, pmorel@linux.ibm.com
-Subject: [GIT PULL 11/11] s390/uv: Update query for secret-UVCs
-Date:   Wed, 21 Jun 2023 17:29:17 +0200
-Message-ID: <20230621153227.57250-12-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230621153227.57250-1-frankja@linux.ibm.com>
-References: <20230621153227.57250-1-frankja@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: oPTSMQhJlywPQ72mjM0M0kSgQ-HUlI5A
-X-Proofpoint-ORIG-GUID: x0VA4QBuq-ZcdKiwX0knXSNyGjGhb2-N
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S233175AbjFUQBG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jun 2023 12:01:06 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A31D1718;
+        Wed, 21 Jun 2023 09:00:43 -0700 (PDT)
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 50DBA1EC0102;
+        Wed, 21 Jun 2023 18:00:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1687363232;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Lkm1ovXF8w/3l1dQM0aqJCHQ40tS7jLprFLy/F9Ithw=;
+        b=Lv/JZdMzLJ1V/ja2qHoklv+xVmPUhC8fHl072kZMlMYUsq3+WHX3IUW39+KyB0t/lEw0qo
+        yqfLsMoXQiRo+HWEdgnUJ3Pl+2fgdjnYUCqaCSlI+WLK7F2BDjwp2JpGDREMwtSfbVfiUa
+        8E0ZABH+UD/wNOLXtZBnwgKVZtwnLGc=
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+        header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id c0Czf9ibAY93; Wed, 21 Jun 2023 16:00:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+        t=1687363227; bh=Lkm1ovXF8w/3l1dQM0aqJCHQ40tS7jLprFLy/F9Ithw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Dl+W+sUM4kesP9b6SzA+PpNwR05jkz42fZ+9E5uuznFcOUWKSEQ0dEqEq5BmRH0Mj
+         DJnzqmDQz4WQLjr5CbeV6gd9GDImmM0arCnGcOg6d6yLSo2KV3hzkYOeBVL/vuRnzV
+         j4sTA0/ymefYw+vms8mVJPf2jNH0zQL16wjEHaeVfAgKKPgadUd2w5GQXb2V1g6QRy
+         FOyY/4D0XXiM/UuG1KLYthVwx6ARpb/e/EKMzqFRKgsQw2zGPGGPLVkr/kgCqf79WN
+         1zvL2iZMvsIz3iceTKAD2jT8SUlgJ8tUBUwJsierdlrpkurUBS8LAy11xq9KwfxAKF
+         R5xQBVMcxygfMuPxx3r0s9FNB5vLMLlOY9uRBhxBU+Ie3dJZ0VoZBS/lq0qpBxF+l+
+         nY8UbSYcObQYoK/IxU6V4ELbJ5njZ+AHxdN9ao7qx9MtE+OSbu8+4PcWXmtte9+JvI
+         oyhXrFvpXDwoWnQpRttnENERDmZhWfz9XBVcEmKo4j/V8gNFWX2J93R0Yksojs0u9a
+         v4zHE95wsyF666l2fIGQqawT449BMG8eyaZagWA0V4Nanc/SkXz6BakXQHiyvwC/Az
+         b+2yK5E+sQ35wEtstMK47iRTNyP89w8xgn6ikSiEpk/YgbQeV5cugXbTQLkYGluFAO
+         x/Imc81hftUs+JTjh2qoQ0TE=
+Received: from zn.tnic (p200300ea971dc565329C23FFfeA6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971d:c565:329c:23ff:fea6:a903])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+        (No client certificate requested)
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1D60E40E019B;
+        Wed, 21 Jun 2023 15:59:46 +0000 (UTC)
+Date:   Wed, 21 Jun 2023 17:59:38 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH RFC v9 07/51] x86/sev: Add the host SEV-SNP
+ initialization support
+Message-ID: <20230621155912.GKZJMeUHzKCFchhE5v@fat_crate.local>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-8-michael.roth@amd.com>
+ <12f95b38-427c-6810-373a-ba2062c43882@intel.com>
+ <20230621091541.GEZJK/veTnfhOnX8ci@fat_crate.local>
+ <23f400bc-9a62-be4a-6a24-0e2149d4491c@intel.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-21_08,2023-06-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- spamscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0 suspectscore=0
- clxscore=1015 adultscore=0 mlxscore=0 priorityscore=1501 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2306210131
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <23f400bc-9a62-be4a-6a24-0e2149d4491c@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Steffen Eiden <seiden@linux.ibm.com>
+On Wed, Jun 21, 2023 at 07:31:34AM -0700, Dave Hansen wrote:
+> Yep, there's the hardware side and then there are fun nuggets like using
+> mem= and then doing a software-only hot-add later after boot.
 
-Update the query struct such that secret-UVC related
-information can be parsed.
-Add sysfs files for these new values.
+Ah, right, Mike, I think we need to check whether mem= has any effect on
+SNP.
 
-'supp_add_secret_req_ver' notes the supported versions for the
-Add Secret UVC. Bit 0 indicates that version 0x100 is supported,
-bit 1 indicates 0x200, and so on.
+> Also, if the hardware doesn't support any kind of hotplug, it would be
+> great to point to the place in the spec where it says that.
 
-'supp_add_secret_pcf' notes the supported plaintext flags for
-the Add Secret UVC.
+I honestly don't know. But I can't recall ever hearing about hardware
+memory hotplug so something worth to check too.
 
-'supp_secret_types' notes the supported types of secrets.
-Bit 0 indicates secret type 1, bit 1 indicates type 2, and so on.
-
-'max_secrets' notes the maximum amount of secrets the secret store can
-store per pv guest.
-
-Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Link: https://lore.kernel.org/r/20230615100533.3996107-8-seiden@linux.ibm.com
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Message-Id: <20230615100533.3996107-8-seiden@linux.ibm.com>
----
- arch/s390/boot/uv.c        |  4 ++++
- arch/s390/include/asm/uv.h | 13 +++++++++++--
- arch/s390/kernel/uv.c      | 40 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 55 insertions(+), 2 deletions(-)
-
-diff --git a/arch/s390/boot/uv.c b/arch/s390/boot/uv.c
-index 0a077c0a2056..1e66d2cbb096 100644
---- a/arch/s390/boot/uv.c
-+++ b/arch/s390/boot/uv.c
-@@ -47,6 +47,10 @@ void uv_query_info(void)
- 		uv_info.conf_dump_finalize_len = uvcb.conf_dump_finalize_len;
- 		uv_info.supp_att_req_hdr_ver = uvcb.supp_att_req_hdr_ver;
- 		uv_info.supp_att_pflags = uvcb.supp_att_pflags;
-+		uv_info.supp_add_secret_req_ver = uvcb.supp_add_secret_req_ver;
-+		uv_info.supp_add_secret_pcf = uvcb.supp_add_secret_pcf;
-+		uv_info.supp_secret_types = uvcb.supp_secret_types;
-+		uv_info.max_secrets = uvcb.max_secrets;
- 	}
- 
- #ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
-diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-index 3203ffbdde6b..d6bb2f4f78d1 100644
---- a/arch/s390/include/asm/uv.h
-+++ b/arch/s390/include/asm/uv.h
-@@ -123,7 +123,7 @@ struct uv_cb_qui {
- 	u32 reserved70[3];			/* 0x0070 */
- 	u32 max_num_sec_conf;			/* 0x007c */
- 	u64 max_guest_stor_addr;		/* 0x0080 */
--	u8  reserved88[158 - 136];		/* 0x0088 */
-+	u8  reserved88[0x9e - 0x88];		/* 0x0088 */
- 	u16 max_guest_cpu_id;			/* 0x009e */
- 	u64 uv_feature_indications;		/* 0x00a0 */
- 	u64 reserveda8;				/* 0x00a8 */
-@@ -135,7 +135,12 @@ struct uv_cb_qui {
- 	u64 reservedd8;				/* 0x00d8 */
- 	u64 supp_att_req_hdr_ver;		/* 0x00e0 */
- 	u64 supp_att_pflags;			/* 0x00e8 */
--	u8 reservedf0[256 - 240];		/* 0x00f0 */
-+	u64 reservedf0;				/* 0x00f0 */
-+	u64 supp_add_secret_req_ver;		/* 0x00f8 */
-+	u64 supp_add_secret_pcf;		/* 0x0100 */
-+	u64 supp_secret_types;			/* 0x0180 */
-+	u16 max_secrets;			/* 0x0110 */
-+	u8 reserved112[0x120 - 0x112];		/* 0x0112 */
- } __packed __aligned(8);
- 
- /* Initialize Ultravisor */
-@@ -384,6 +389,10 @@ struct uv_info {
- 	unsigned long conf_dump_finalize_len;
- 	unsigned long supp_att_req_hdr_ver;
- 	unsigned long supp_att_pflags;
-+	unsigned long supp_add_secret_req_ver;
-+	unsigned long supp_add_secret_pcf;
-+	unsigned long supp_secret_types;
-+	unsigned short max_secrets;
- };
- 
- extern struct uv_info uv_info;
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index 6a23a13d0dfc..273a0281a189 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -579,6 +579,42 @@ static ssize_t uv_query_supp_att_pflags(struct kobject *kobj,
- static struct kobj_attribute uv_query_supp_att_pflags_attr =
- 	__ATTR(supp_att_pflags, 0444, uv_query_supp_att_pflags, NULL);
- 
-+static ssize_t uv_query_supp_add_secret_req_ver(struct kobject *kobj,
-+						struct kobj_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%lx\n", uv_info.supp_add_secret_req_ver);
-+}
-+
-+static struct kobj_attribute uv_query_supp_add_secret_req_ver_attr =
-+	__ATTR(supp_add_secret_req_ver, 0444, uv_query_supp_add_secret_req_ver, NULL);
-+
-+static ssize_t uv_query_supp_add_secret_pcf(struct kobject *kobj,
-+					    struct kobj_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%lx\n", uv_info.supp_add_secret_pcf);
-+}
-+
-+static struct kobj_attribute uv_query_supp_add_secret_pcf_attr =
-+	__ATTR(supp_add_secret_pcf, 0444, uv_query_supp_add_secret_pcf, NULL);
-+
-+static ssize_t uv_query_supp_secret_types(struct kobject *kobj,
-+					  struct kobj_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%lx\n", uv_info.supp_secret_types);
-+}
-+
-+static struct kobj_attribute uv_query_supp_secret_types_attr =
-+	__ATTR(supp_secret_types, 0444, uv_query_supp_secret_types, NULL);
-+
-+static ssize_t uv_query_max_secrets(struct kobject *kobj,
-+				    struct kobj_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%d\n", uv_info.max_secrets);
-+}
-+
-+static struct kobj_attribute uv_query_max_secrets_attr =
-+	__ATTR(max_secrets, 0444, uv_query_max_secrets, NULL);
-+
- static struct attribute *uv_query_attrs[] = {
- 	&uv_query_facilities_attr.attr,
- 	&uv_query_feature_indications_attr.attr,
-@@ -592,6 +628,10 @@ static struct attribute *uv_query_attrs[] = {
- 	&uv_query_dump_cpu_len_attr.attr,
- 	&uv_query_supp_att_req_hdr_ver_attr.attr,
- 	&uv_query_supp_att_pflags_attr.attr,
-+	&uv_query_supp_add_secret_req_ver_attr.attr,
-+	&uv_query_supp_add_secret_pcf_attr.attr,
-+	&uv_query_supp_secret_types_attr.attr,
-+	&uv_query_max_secrets_attr.attr,
- 	NULL,
- };
- 
 -- 
-2.41.0
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
