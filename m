@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C759738975
-	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 17:35:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BDCC73897F
+	for <lists+kvm@lfdr.de>; Wed, 21 Jun 2023 17:35:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233542AbjFUPfX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jun 2023 11:35:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41808 "EHLO
+        id S233519AbjFUPfg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jun 2023 11:35:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233473AbjFUPer (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jun 2023 11:34:47 -0400
+        with ESMTP id S233470AbjFUPeq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jun 2023 11:34:46 -0400
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AD0B1FE7;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C304C3;
         Wed, 21 Jun 2023 08:34:26 -0700 (PDT)
 Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35LEt1X2029548;
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35LEt2gZ029611;
         Wed, 21 Jun 2023 15:34:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=pObdPNeAcFJ9kzxuagSOlQxZ/Rl0hzL+z+fBmpAGHm0=;
- b=Ppp6mBhud+o2tO+qSIrfNYIepjL0/77XwG7AxY3HWAShy+X41G3VxJR40i7tU4gOxaAR
- LtfjdbDzVCayiIe2gnOifGWUu0SiOIaq3UJtAu3oT64d648ON24dxbtgnIInoLH9pKDz
- wknFYWw29JdYmdvVmcfbQKaKy0Whswi7vI9W/SuQ8uU/tI6tnS6ey+mrecceZhpQ+DWV
- oYNPRdZp4j7irJXR0eYvFbeTpT9OuTZV/IFPNJVu73hrk8vlmiuaxlCMT04KQnt75xzn
- 08FWDJK+/o7LuejNQcQ9DmfLAZJIa9RjwiDCELiq6cILKsXtmEWc5Y4rdIlrrw5qjZrP AQ== 
+ : mime-version; s=pp1; bh=XrbWxvHgCh2PwO2el0dwyvZWaz/Fzjy6JuyRdN7+yVc=;
+ b=BmhT7AvuV1jLMOp9IhcNn73CP9+gxDAsWm8lUGnPjg7vykyz4PliCDJduZgOgtrdMIzu
+ fM6PR+2aEJ5kYB0R68OjI7I3W4m1KFP0grnYIvHFjqjX9QW49sjd2B0t/iYQ9MOMGsaE
+ F2ZYPj4aikWn6+VMMIOH3p2fEyJH/iOE18ek579I1HDV8Ee2MoXixM3ll22NY7/Lk0cy
+ 7IYhd2QorNMnKeZIPpk0X0lWMXezewrXUgcX5ZKxNSQxMTA+XHnpuzG+aMZUofnjP3C6
+ IIetHSOHlCplB9IE1jWt7aH4e1nFhpDbgyJAgx4JwQYD0ufirp+79iGOOd3idEMWNIsB JQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rc3d0hepw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Jun 2023 15:34:25 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35LFV0XW010751;
-        Wed, 21 Jun 2023 15:34:24 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rc3d0henf-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rc3d0hepu-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 21 Jun 2023 15:34:24 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35LEleuK011893;
-        Wed, 21 Jun 2023 15:34:22 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3r943e2ucp-1
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35LEwD3N005667;
+        Wed, 21 Jun 2023 15:34:24 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rc3d0henk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Jun 2023 15:34:21 +0000
+        Wed, 21 Jun 2023 15:34:24 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35L5SGpp004427;
+        Wed, 21 Jun 2023 15:34:22 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3r943e25fr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Jun 2023 15:34:22 +0000
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35LFYIQH62062988
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35LFYJpX5833380
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 21 Jun 2023 15:34:18 GMT
+        Wed, 21 Jun 2023 15:34:19 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8A58820049;
-        Wed, 21 Jun 2023 15:34:18 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0CA2520049;
+        Wed, 21 Jun 2023 15:34:19 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2655520043;
+        by IMSVA (Postfix) with ESMTP id 9BD552004B;
         Wed, 21 Jun 2023 15:34:18 +0000 (GMT)
 Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.ibm.com.com (unknown [9.171.33.34])
         by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -61,15 +61,15 @@ To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
         borntraeger@linux.ibm.com, linux-s390@vger.kernel.org,
         imbrenda@linux.ibm.com, nrb@linux.ibm.com, pmorel@linux.ibm.com
-Subject: [GIT PULL 06/11] s390/uvdevice: Add info IOCTL
-Date:   Wed, 21 Jun 2023 17:29:12 +0200
-Message-ID: <20230621153227.57250-7-frankja@linux.ibm.com>
+Subject: [GIT PULL 07/11] s390/uvdevice: Add 'Add Secret' UVC
+Date:   Wed, 21 Jun 2023 17:29:13 +0200
+Message-ID: <20230621153227.57250-8-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230621153227.57250-1-frankja@linux.ibm.com>
 References: <20230621153227.57250-1-frankja@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QKb2g6OYkDFlIjnsSX5wAe6snf2hP_nk
-X-Proofpoint-ORIG-GUID: kqByetxUDtgfHiwBDqdiuXnOcjOx7XAZ
+X-Proofpoint-GUID: ltClDNdVIqZSIOo5EglPM4AQ4kkOeYBn
+X-Proofpoint-ORIG-GUID: Kt81yF4vHcM4t-B73wYqVE4mtvGRJl0d
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
@@ -93,212 +93,184 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Steffen Eiden <seiden@linux.ibm.com>
 
-Add an IOCTL that allows userspace to find out which IOCTLs the uvdevice
-supports without trial and error.
+Userspace can call the Add Secret Ultravisor Call using IOCTLs on the
+uvdevice. The Add Secret UV call sends an encrypted and
+cryptographically verified request to the Ultravisor. The request
+inserts a protected guest's secret into the Ultravisor for later use.
 
-Explicitly expose the IOCTL nr for the request types.
+The uvdevice is merely transporting the request from userspace to the
+Ultravisor. It's neither checking nor manipulating the request data.
 
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Link: https://lore.kernel.org/r/20230615100533.3996107-3-seiden@linux.ibm.com
+Link: https://lore.kernel.org/r/20230615100533.3996107-4-seiden@linux.ibm.com
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Message-Id: <20230615100533.3996107-3-seiden@linux.ibm.com>
+Message-Id: <20230615100533.3996107-4-seiden@linux.ibm.com>
 ---
- arch/s390/include/uapi/asm/uvdevice.h | 42 ++++++++++++++-
- drivers/s390/char/Kconfig             |  2 +-
- drivers/s390/char/uvdevice.c          | 77 ++++++++++++++++++++++++---
- 3 files changed, 112 insertions(+), 9 deletions(-)
+ arch/s390/include/asm/uv.h            | 14 ++++++
+ arch/s390/include/uapi/asm/uvdevice.h |  4 ++
+ drivers/s390/char/uvdevice.c          | 63 +++++++++++++++++++++++++++
+ 3 files changed, 81 insertions(+)
 
-diff --git a/arch/s390/include/uapi/asm/uvdevice.h b/arch/s390/include/uapi/asm/uvdevice.h
-index 10a5ac918e02..9d9b684836c2 100644
---- a/arch/s390/include/uapi/asm/uvdevice.h
-+++ b/arch/s390/include/uapi/asm/uvdevice.h
-@@ -32,6 +32,33 @@ struct uvio_attest {
- 	__u16 reserved136;				/* 0x0136 */
+diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+index 28a9ad57b6f1..1babc70ea5d4 100644
+--- a/arch/s390/include/asm/uv.h
++++ b/arch/s390/include/asm/uv.h
+@@ -58,6 +58,7 @@
+ #define UVC_CMD_SET_SHARED_ACCESS	0x1000
+ #define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
+ #define UVC_CMD_RETR_ATTEST		0x1020
++#define UVC_CMD_ADD_SECRET		0x1031
+ 
+ /* Bits in installed uv calls */
+ enum uv_cmds_inst {
+@@ -88,6 +89,7 @@ enum uv_cmds_inst {
+ 	BIT_UVC_CMD_DUMP_CPU = 26,
+ 	BIT_UVC_CMD_DUMP_COMPLETE = 27,
+ 	BIT_UVC_CMD_RETR_ATTEST = 28,
++	BIT_UVC_CMD_ADD_SECRET = 29,
  };
  
-+/**
-+ * uvio_uvdev_info - Information of supported functions
-+ * @supp_uvio_cmds - supported IOCTLs by this device
-+ * @supp_uv_cmds - supported UVCs corresponding to the IOCTL
-+ *
-+ * UVIO request to get information about supported request types by this
-+ * uvdevice and the Ultravisor.  Everything is output. Bits are in LSB0
-+ * ordering.  If the bit is set in both, @supp_uvio_cmds and @supp_uv_cmds, the
-+ * uvdevice and the Ultravisor support that call.
-+ *
-+ * Note that bit 0 (UVIO_IOCTL_UVDEV_INFO_NR) is always zero for `supp_uv_cmds`
-+ * as there is no corresponding UV-call.
+ enum uv_feat_ind {
+@@ -292,6 +294,18 @@ struct uv_cb_dump_complete {
+ 	u64 reserved30[5];
+ } __packed __aligned(8);
+ 
++/*
++ * A common UV call struct for pv guests that contains a single address
++ * Examples:
++ * Add Secret
 + */
-+struct uvio_uvdev_info {
-+	/*
-+	 * If bit `n` is set, this device supports the IOCTL with nr `n`.
-+	 */
-+	__u64 supp_uvio_cmds;
-+	/*
-+	 * If bit `n` is set, the Ultravisor(UV) supports the UV-call
-+	 * corresponding to the IOCTL with nr `n` in the calling contextx (host
-+	 * or guest).  The value is only valid if the corresponding bit in
-+	 * @supp_uvio_cmds is set as well.
-+	 */
-+	__u64 supp_uv_cmds;
-+};
++struct uv_cb_guest_addr {
++	struct uv_cb_header header;
++	u64 reserved08[3];
++	u64 addr;
++	u64 reserved28[4];
++} __packed __aligned(8);
 +
- /*
-  * The following max values define an upper length for the IOCTL in/out buffers.
-  * However, they do not represent the maximum the Ultravisor allows which is
-@@ -46,6 +73,19 @@ struct uvio_attest {
+ static inline int __uv_call(unsigned long r1, unsigned long r2)
+ {
+ 	int cc;
+diff --git a/arch/s390/include/uapi/asm/uvdevice.h b/arch/s390/include/uapi/asm/uvdevice.h
+index 9d9b684836c2..e77410226598 100644
+--- a/arch/s390/include/uapi/asm/uvdevice.h
++++ b/arch/s390/include/uapi/asm/uvdevice.h
+@@ -69,6 +69,7 @@ struct uvio_uvdev_info {
+ #define UVIO_ATT_ARCB_MAX_LEN		0x100000
+ #define UVIO_ATT_MEASUREMENT_MAX_LEN	0x8000
+ #define UVIO_ATT_ADDITIONAL_MAX_LEN	0x8000
++#define UVIO_ADD_SECRET_MAX_LEN		0x100000
+ 
  #define UVIO_DEVICE_NAME "uv"
  #define UVIO_TYPE_UVC 'u'
+@@ -76,6 +77,7 @@ struct uvio_uvdev_info {
+ enum UVIO_IOCTL_NR {
+ 	UVIO_IOCTL_UVDEV_INFO_NR = 0x00,
+ 	UVIO_IOCTL_ATT_NR,
++	UVIO_IOCTL_ADD_SECRET_NR,
+ 	/* must be the last entry */
+ 	UVIO_IOCTL_NUM_IOCTLS
+ };
+@@ -83,9 +85,11 @@ enum UVIO_IOCTL_NR {
+ #define UVIO_IOCTL(nr)		_IOWR(UVIO_TYPE_UVC, nr, struct uvio_ioctl_cb)
+ #define UVIO_IOCTL_UVDEV_INFO	UVIO_IOCTL(UVIO_IOCTL_UVDEV_INFO_NR)
+ #define UVIO_IOCTL_ATT		UVIO_IOCTL(UVIO_IOCTL_ATT_NR)
++#define UVIO_IOCTL_ADD_SECRET	UVIO_IOCTL(UVIO_IOCTL_ADD_SECRET_NR)
  
--#define UVIO_IOCTL_ATT _IOWR(UVIO_TYPE_UVC, 0x01, struct uvio_ioctl_cb)
-+enum UVIO_IOCTL_NR {
-+	UVIO_IOCTL_UVDEV_INFO_NR = 0x00,
-+	UVIO_IOCTL_ATT_NR,
-+	/* must be the last entry */
-+	UVIO_IOCTL_NUM_IOCTLS
-+};
-+
-+#define UVIO_IOCTL(nr)		_IOWR(UVIO_TYPE_UVC, nr, struct uvio_ioctl_cb)
-+#define UVIO_IOCTL_UVDEV_INFO	UVIO_IOCTL(UVIO_IOCTL_UVDEV_INFO_NR)
-+#define UVIO_IOCTL_ATT		UVIO_IOCTL(UVIO_IOCTL_ATT_NR)
-+
-+#define UVIO_SUPP_CALL(nr)	(1ULL << (nr))
-+#define UVIO_SUPP_UDEV_INFO	UVIO_SUPP_CALL(UVIO_IOCTL_UDEV_INFO_NR)
-+#define UVIO_SUPP_ATT		UVIO_SUPP_CALL(UVIO_IOCTL_ATT_NR)
+ #define UVIO_SUPP_CALL(nr)	(1ULL << (nr))
+ #define UVIO_SUPP_UDEV_INFO	UVIO_SUPP_CALL(UVIO_IOCTL_UDEV_INFO_NR)
+ #define UVIO_SUPP_ATT		UVIO_SUPP_CALL(UVIO_IOCTL_ATT_NR)
++#define UVIO_SUPP_ADD_SECRET	UVIO_SUPP_CALL(UVIO_IOCTL_ADD_SECRET_NR)
  
  #endif /* __S390_ASM_UVDEVICE_H */
-diff --git a/drivers/s390/char/Kconfig b/drivers/s390/char/Kconfig
-index 80c4e5101c97..8a03af5ee5b3 100644
---- a/drivers/s390/char/Kconfig
-+++ b/drivers/s390/char/Kconfig
-@@ -96,7 +96,7 @@ config SCLP_OFB
- config S390_UV_UAPI
- 	def_tristate m
- 	prompt "Ultravisor userspace API"
--	depends on S390
-+	depends on S390 && (KVM || PROTECTED_VIRTUALIZATION_GUEST)
- 	help
- 	  Selecting exposes parts of the UV interface to userspace
- 	  by providing a misc character device at /dev/uv.
 diff --git a/drivers/s390/char/uvdevice.c b/drivers/s390/char/uvdevice.c
-index 1d40457c7b10..7d7866be389b 100644
+index 7d7866be389b..7221e987703a 100644
 --- a/drivers/s390/char/uvdevice.c
 +++ b/drivers/s390/char/uvdevice.c
-@@ -32,6 +32,52 @@
- #include <asm/uvdevice.h>
- #include <asm/uv.h>
+@@ -37,6 +37,7 @@
+ static const u32 ioctl_nr_to_uvc_bit[] __initconst = {
+ 	[UVIO_IOCTL_UVDEV_INFO_NR] = BIT_UVIO_INTERNAL,
+ 	[UVIO_IOCTL_ATT_NR] = BIT_UVC_CMD_RETR_ATTEST,
++	[UVIO_IOCTL_ADD_SECRET_NR] = BIT_UVC_CMD_ADD_SECRET,
+ };
  
-+#define BIT_UVIO_INTERNAL U32_MAX
-+/* Mapping from IOCTL-nr to UVC-bit */
-+static const u32 ioctl_nr_to_uvc_bit[] __initconst = {
-+	[UVIO_IOCTL_UVDEV_INFO_NR] = BIT_UVIO_INTERNAL,
-+	[UVIO_IOCTL_ATT_NR] = BIT_UVC_CMD_RETR_ATTEST,
-+};
-+
-+static_assert(ARRAY_SIZE(ioctl_nr_to_uvc_bit) == UVIO_IOCTL_NUM_IOCTLS);
-+
-+static struct uvio_uvdev_info uvdev_info = {
-+	.supp_uvio_cmds = GENMASK_ULL(UVIO_IOCTL_NUM_IOCTLS - 1, 0),
-+};
-+
-+static void __init set_supp_uv_cmds(unsigned long *supp_uv_cmds)
-+{
-+	int i;
-+
-+	for (i = 0; i < UVIO_IOCTL_NUM_IOCTLS; i++) {
-+		if (ioctl_nr_to_uvc_bit[i] == BIT_UVIO_INTERNAL)
-+			continue;
-+		if (!test_bit_inv(ioctl_nr_to_uvc_bit[i], uv_info.inst_calls_list))
-+			continue;
-+		__set_bit(i, supp_uv_cmds);
-+	}
-+}
-+
-+/**
-+ * uvio_uvdev_info() - get information about the uvdevice
-+ *
-+ * @uv_ioctl: ioctl control block
-+ *
-+ * Lists all IOCTLs that are supported by this uvdevice
-+ */
-+static int uvio_uvdev_info(struct uvio_ioctl_cb *uv_ioctl)
-+{
-+	void __user *user_buf_arg = (void __user *)uv_ioctl->argument_addr;
-+
-+	if (uv_ioctl->argument_len < sizeof(uvdev_info))
-+		return -EINVAL;
-+	if (copy_to_user(user_buf_arg, &uvdev_info, sizeof(uvdev_info)))
-+		return -EFAULT;
-+
-+	uv_ioctl->uv_rc = UVC_RC_EXECUTED;
-+	return 0;
-+}
-+
- static int uvio_build_uvcb_attest(struct uv_cb_attest *uvcb_attest, u8 *arcb,
- 				  u8 *meas, u8 *add_data, struct uvio_attest *uvio_attest)
- {
-@@ -185,8 +231,19 @@ static int uvio_attestation(struct uvio_ioctl_cb *uv_ioctl)
+ static_assert(ARRAY_SIZE(ioctl_nr_to_uvc_bit) == UVIO_IOCTL_NUM_IOCTLS);
+@@ -231,6 +232,65 @@ static int uvio_attestation(struct uvio_ioctl_cb *uv_ioctl)
  	return ret;
  }
  
--static int uvio_copy_and_check_ioctl(struct uvio_ioctl_cb *ioctl, void __user *argp)
-+static int uvio_copy_and_check_ioctl(struct uvio_ioctl_cb *ioctl, void __user *argp,
-+				     unsigned long cmd)
++/** uvio_add_secret() - perform an Add Secret UVC
++ *
++ * @uv_ioctl: ioctl control block
++ *
++ * uvio_add_secret() performs the Add Secret Ultravisor Call.
++ *
++ * The given userspace argument address and size are verified to be
++ * valid but every other check is made by the Ultravisor
++ * (UV). Therefore UV errors won't result in a negative return
++ * value. The request is then copied to kernelspace, the UV-call is
++ * performed and the results are copied back to userspace.
++ *
++ * The argument has to point to an Add Secret Request Control Block
++ * which is an encrypted and cryptographically verified request that
++ * inserts a protected guest's secrets into the Ultravisor for later
++ * use.
++ *
++ * If the Add Secret UV facility is not present, UV will return
++ * invalid command rc. This won't be fenced in the driver and does not
++ * result in a negative return value.
++ *
++ * Context: might sleep
++ *
++ * Return: 0 on success or a negative error code on error.
++ */
++static int uvio_add_secret(struct uvio_ioctl_cb *uv_ioctl)
++{
++	void __user *user_buf_arg = (void __user *)uv_ioctl->argument_addr;
++	struct uv_cb_guest_addr uvcb = {
++		.header.len = sizeof(uvcb),
++		.header.cmd = UVC_CMD_ADD_SECRET,
++	};
++	void *asrcb = NULL;
++	int ret;
++
++	if (uv_ioctl->argument_len > UVIO_ADD_SECRET_MAX_LEN)
++		return -EINVAL;
++	if (uv_ioctl->argument_len == 0)
++		return -EINVAL;
++
++	asrcb = kvzalloc(uv_ioctl->argument_len, GFP_KERNEL);
++	if (!asrcb)
++		return -ENOMEM;
++
++	ret = -EFAULT;
++	if (copy_from_user(asrcb, user_buf_arg, uv_ioctl->argument_len))
++		goto out;
++
++	ret = 0;
++	uvcb.addr = (u64)asrcb;
++	uv_call_sched(0, (u64)&uvcb);
++	uv_ioctl->uv_rc = uvcb.header.rc;
++	uv_ioctl->uv_rrc = uvcb.header.rrc;
++
++out:
++	kvfree(asrcb);
++	return ret;
++}
++
+ static int uvio_copy_and_check_ioctl(struct uvio_ioctl_cb *ioctl, void __user *argp,
+ 				     unsigned long cmd)
  {
-+	u8 nr = _IOC_NR(cmd);
-+
-+	if (_IOC_DIR(cmd) != (_IOC_READ | _IOC_WRITE))
-+		return -ENOIOCTLCMD;
-+	if (_IOC_TYPE(cmd) != UVIO_TYPE_UVC)
-+		return -ENOIOCTLCMD;
-+	if (nr >= UVIO_IOCTL_NUM_IOCTLS)
-+		return -ENOIOCTLCMD;
-+	if (_IOC_SIZE(cmd) != sizeof(*ioctl))
-+		return -ENOIOCTLCMD;
- 	if (copy_from_user(ioctl, argp, sizeof(*ioctl)))
- 		return -EFAULT;
- 	if (ioctl->flags != 0)
-@@ -194,7 +251,7 @@ static int uvio_copy_and_check_ioctl(struct uvio_ioctl_cb *ioctl, void __user *a
- 	if (memchr_inv(ioctl->reserved14, 0, sizeof(ioctl->reserved14)))
- 		return -EINVAL;
- 
--	return 0;
-+	return nr;
- }
- 
- /*
-@@ -205,12 +262,17 @@ static long uvio_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
- 	void __user *argp = (void __user *)arg;
- 	struct uvio_ioctl_cb uv_ioctl = { };
- 	long ret;
-+	int nr;
- 
--	switch (cmd) {
--	case UVIO_IOCTL_ATT:
--		ret = uvio_copy_and_check_ioctl(&uv_ioctl, argp);
--		if (ret)
--			return ret;
-+	nr = uvio_copy_and_check_ioctl(&uv_ioctl, argp, cmd);
-+	if (nr < 0)
-+		return nr;
-+
-+	switch (nr) {
-+	case UVIO_IOCTL_UVDEV_INFO_NR:
-+		ret = uvio_uvdev_info(&uv_ioctl);
-+		break;
-+	case UVIO_IOCTL_ATT_NR:
+@@ -275,6 +335,9 @@ static long uvio_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+ 	case UVIO_IOCTL_ATT_NR:
  		ret = uvio_attestation(&uv_ioctl);
  		break;
++	case UVIO_IOCTL_ADD_SECRET_NR:
++		ret = uvio_add_secret(&uv_ioctl);
++		break;
  	default:
-@@ -245,6 +307,7 @@ static void __exit uvio_dev_exit(void)
- 
- static int __init uvio_dev_init(void)
- {
-+	set_supp_uv_cmds((unsigned long *)&uvdev_info.supp_uv_cmds);
- 	return misc_register(&uvio_dev_miscdev);
- }
- 
+ 		ret = -ENOIOCTLCMD;
+ 		break;
 -- 
 2.41.0
 
