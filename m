@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C3E373936E
-	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 01:59:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BFA3739355
+	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 01:59:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230017AbjFUX4L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jun 2023 19:56:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37852 "EHLO
+        id S230220AbjFUX4H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jun 2023 19:56:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229961AbjFUXzy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jun 2023 19:55:54 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2054.outbound.protection.outlook.com [40.107.220.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43E4F1710;
-        Wed, 21 Jun 2023 16:55:53 -0700 (PDT)
+        with ESMTP id S230089AbjFUXz6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jun 2023 19:55:58 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2088.outbound.protection.outlook.com [40.107.223.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AB6919BD;
+        Wed, 21 Jun 2023 16:55:55 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZOJN4TC/0/d+E25u2CDXMKiSWOPVOw5oL3VjsLH1Lu7BpulJtOMOJXSWrxSQqTE/E75LMBHMf/RJF+k7G+S2JIGbzrvp8VSY7RZM/9MxPm+ErRbGhWQzsN2K4x+PELfaMqyUKkF0AoSakszwEj/YEm0PQNwGcnrWRTfbj6jhw/JWiB7kwefD4PqcIiiaK+gLePZUQgorrS/4nQUowSrtC7SvOh/QY8LbVgRl3rgHXCGJ2cmrQNiVuKw3pgTpObnn7UhNnQ3zHf/5Qwj5DSS6muA6UMfp0L/+lD1s79pMLFiv/KtQWvSmX/RXcg3Xg2nUUBfvn44bQD5g16/Pllir/A==
+ b=M3LVJ2yqU1aXUTHCcQgrOjNRLJ+zZbPG9P34N7WiO9vyRUyuj6vQuQDArKW9iQhKh5nuQevPcRxhMissYHpbZMKR6QyWTgyRs3MZ21G9XGRAR8hDGINW65/hs/CWYAn4p0V2i8n5EZlT+PQLj80VJW68gf33VJ5kGCkl2aKPSS/V22uFMcu64SbnF1n9bi0P3uS4zzJ7PCGa0M8pqzXpXMu8RZ7Y+8X66l1BhK9BeDb0UY9zbE3Eem9oshmgW1O+mrWQ9oe2hfl7EUKcZoq9+4/ojtW1VsuJ9V2dBD86Xj5tmrkDmScn7FEf8qBKa+qYRPnwhWf9Jw1KnYBdbMxQKg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rLb5xtN5TaWay0gJVTKsVlxdX6r0nThc1E7uO+JsurY=;
- b=Uhhnllxe8q5oAzBIfMkDoOfuuROrut8KhYWEahZFR6uLKfUyGmLOm7YweTVgcfM3ZtE1yFcQq+eDa15R8uTTRQKiGBaLTcdNAgSJP5unsUuK03X8ougNaNKfA4OfAcgiqeJRw1vYFWdlHrwdmaOlY66Hggw1pRvAmlRw7iMHBsSSCL0eoCR5bUtXqCl/wumbzBXj/lIhFT243ZfIY2btvQBSX3L+mDpfGGELcHl4ql4r/R81DkZ0JyaV2/n7HBLRhFBr+bdEm29TobYLChdd6P4UJ/3GvscR6C2jth0zQUM+85YTnuIQlVhgMOzLYOt2ASe3aXF2PuNJSHlWbuQIGQ==
+ bh=h9c1V23bWJTyTuJZVhIWQIcbksX0hPKqLTQpOJXmFuI=;
+ b=YSGBmx7CEeJslVo02evsO3raheiPB1d5XcpEotG9B+n8BB4boQfQQmiTijrIU29l676zFfGe3YccdmX96Jj8M9BBJxp+erhlNoDzwqkDo5m0HzJCqW/A/UQk1X6GtOstIVuC10PqN0q7LaC6oovpG6HUXwcixfBF7550oyICYwiL/y77cyvrjwFI5n+GZkx4yg4+Hy1q7XC2D5AWM4SfdXfZFang0T6nadS4lM7/MLDvRRR3GeW4MqdI69PcUg841RXTVokIlNn2u075dSPtCnvl/xEohQUFe1sO4tRovRzX9Szn7uYSJ6q5J1s+eux/1kY+Ig6y7Nxi3lwECABjHw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rLb5xtN5TaWay0gJVTKsVlxdX6r0nThc1E7uO+JsurY=;
- b=xBIDnbTRWPnsUnmg66556YLdXdfiwCs2UOmi/Ju3/oubKfs4zAVreaGBbrKrRv6ZgFixSJ0so2fpB0Qh/+aE5gNsOs6f3rckDOu69ZKjwNUlLmYFUwV1RQTPl4Xb6Kt0tqfKAPGaUlRa7XxWL8ZRmjsYJrs39S8W2FR6fLiEcJw=
-Received: from CY5PR15CA0053.namprd15.prod.outlook.com (2603:10b6:930:1b::30)
- by BL1PR12MB5302.namprd12.prod.outlook.com (2603:10b6:208:31d::13) with
+ bh=h9c1V23bWJTyTuJZVhIWQIcbksX0hPKqLTQpOJXmFuI=;
+ b=Y8bE+0nLzbMB67Jep2o2nFTxii+5WFEcGW+q9fhpFq2DKp/NLzmOWv4OFRNVUNg7QNs9vfba3QUUoDXbQCxN4nUg4ztGY+ku6JFyux5Bh3kRckeZMyOSh8CHxtPKcgioN5Z7XPieOmV1dirATzxnVP2wgR/jvKGL1tSh4fxfOy0=
+Received: from CY5PR15CA0033.namprd15.prod.outlook.com (2603:10b6:930:1b::24)
+ by BY5PR12MB4163.namprd12.prod.outlook.com (2603:10b6:a03:202::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Wed, 21 Jun
- 2023 23:55:51 +0000
+ 2023 23:55:52 +0000
 Received: from CY4PEPF0000E9D4.namprd03.prod.outlook.com
- (2603:10b6:930:1b:cafe::df) by CY5PR15CA0053.outlook.office365.com
- (2603:10b6:930:1b::30) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:930:1b:cafe::5f) by CY5PR15CA0033.outlook.office365.com
+ (2603:10b6:930:1b::24) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23 via Frontend
- Transport; Wed, 21 Jun 2023 23:55:50 +0000
+ Transport; Wed, 21 Jun 2023 23:55:52 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,11 +48,11 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CY4PEPF0000E9D4.mail.protection.outlook.com (10.167.241.147) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6521.21 via Frontend Transport; Wed, 21 Jun 2023 23:55:50 +0000
+ 15.20.6521.21 via Frontend Transport; Wed, 21 Jun 2023 23:55:52 +0000
 Received: from ruby-95f9host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Wed, 21 Jun
- 2023 18:55:49 -0500
+ 2023 18:55:50 -0500
 From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 To:     <linux-kernel@vger.kernel.org>, <iommu@lists.linux.dev>,
         <kvm@vger.kernel.org>
@@ -64,9 +64,9 @@ CC:     <joro@8bytes.org>, <robin.murphy@arm.com>, <yi.l.liu@intel.com>,
         <santosh.shukla@amd.com>, <vasant.hegde@amd.com>,
         <jay.chen@amd.com>, <joseph.chung@amd.com>,
         "Suravee Suthikulpanit" <suravee.suthikulpanit@amd.com>
-Subject: [RFC PATCH 08/21] iommu/amd: Allow nested IOMMU page tables
-Date:   Wed, 21 Jun 2023 18:54:55 -0500
-Message-ID: <20230621235508.113949-9-suravee.suthikulpanit@amd.com>
+Subject: [RFC PATCH 09/21] iommu/amd: Add support for hw_info for iommu capability query
+Date:   Wed, 21 Jun 2023 18:54:56 -0500
+Message-ID: <20230621235508.113949-10-suravee.suthikulpanit@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230621235508.113949-1-suravee.suthikulpanit@amd.com>
 References: <20230621235508.113949-1-suravee.suthikulpanit@amd.com>
@@ -78,23 +78,23 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D4:EE_|BL1PR12MB5302:EE_
-X-MS-Office365-Filtering-Correlation-Id: f84711e7-3783-4837-3b31-08db72b30acb
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D4:EE_|BY5PR12MB4163:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9555c499-7111-4111-4358-08db72b30bd6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KJT4n4Ec4KvH2bEojB86+baQFYdyYGnSWIxaOLQ9kK1k063657lOs8l3mtaUFPhVn+4IUASeaZribS9hrEvgzxmVsVdDnISSBg9QYfc6AwK7dqar34VBAKSA8n7HEaiQEr+w5MIHX4zvjye3pJWFcmqllkSG7Z/YlKayKyjd7OXpsxDQavDV7JqM9IVrkVrUGCFxaCSYdLUa+mRzb82VxMSQpBMlUc1n/8Ve90hVYjoRxK0bo32vJxoIvcHVPnhYKhmW/h2OIRgkI747b1CewDp25vFITzFISDdmwfqKoitKEGqQvYGMamxulSOcBMe9RDqVNpoO+7UMdCX/ZIgSSd4Aub5VIlGNDqAC9+0kRQ3vfCGN4tpVaZO91Xi11DvDLdppeqtkzFHuaNMysWKHm+Nhid74Dzm67ZxR1sle59H3xzQVhZ6mYnjquploOvJ0isO7w5ncvVoAK7g04sAArPyb1aNOIlvp77X6PdjZ1UgRNNvfw9oPMLmmFLPi09F+KrZFzFkEwPhJB2a38e1wLbpH2UnmSeWJE25O6apemxOsbApmC2kQ5eOT2SF4Vr22dh4lIBH5fg9d/CxLNrt+9Ox4wC80VOxZ8+0twU/euJjRuoFFT3eZ9whlcCNr997Z831dxBTLrXx/6e+u3HsMRZQUB5SS0PezCKLbjeSeETB3Vs7SuDQPd++XXvxUsPfbA2hKk05+NS8QVCo6QgQB7lG3O6aQHu6CauuxkvLEletcQEjL+lvHbjpUsxmLDLXzGkwF12aF8Mr/pqQp0PVLuQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(396003)(376002)(346002)(451199021)(46966006)(40470700004)(36840700001)(40460700003)(7696005)(6666004)(478600001)(83380400001)(16526019)(186003)(47076005)(426003)(26005)(336012)(2616005)(82310400005)(86362001)(82740400003)(36756003)(356005)(1076003)(81166007)(40480700001)(36860700001)(70586007)(70206006)(4326008)(41300700001)(316002)(7416002)(44832011)(8936002)(8676002)(5660300002)(110136005)(54906003)(2906002)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: SXdP8JRmtUCCodN7DF4QalKVNOFfxQ+icg6IrcJPCynEHNz4BBYDrEkJGO5GQj/768kgIrb5pdbJt+olgH0SPhhdHv13+K0gKBM7r5p5PK31Uqyl1STutqV08QcLxGwZZGqIPOM4huBqLMMPQZHVglHQjNN6TEPxv/Z9pfZYrLbE8pbUKhtAwCqBoAC34Yroa/h0kO03SYzyxU8AGwqnO/H30w13wx2QOXQnzCxk3Qep5hFRULKWh8PSmBetZlTj6a8UPs+yOfI7JrxgbQEeFRwVBfnLGv0uNgY+hti5dfUhv0E0p1/ZKeD+1v7ar3LctHqMHFVy7XW3azNGd6uh4aHrHCtQAaVXAWoNxsqPYk7xxM8lUPNeMYS7EzXeH+EhMF8u0PwinThm2oUlrUtdCQcu8tIGOLMHeZNxmTf3nCJk06wQJYScZX5mmepXRepvkeP0pgqxTAkpDiv/A4OTZ9eNQXfYVcG/rlHHp7YmlBqMqMKnHmKK9z6/9aQq5iLVyGsnUcLYcrsdTOHHRQkHzfDn1LyRdkUmNjqyRfpfXYe1upa6lpGGYzLflLoyu+Lp1PN5iC+AUh6nsLmfoJwoKdYPAP4xkf9wplbFeOEHGb4PCasEbDv+DuK4VnRD788HJ49PB6P9sw85nFxZ2mUNOvobxq/vXKaFzWblfpeIrEF5s5nlb48TKsk0+m+xsz4z4qW4LqMYGuAFkcVpRphN5IR/M7OHOjwrnnpqezqE+4yBHoHj9OQ2MiQTRKR2DD6W7Y4F6pEaTRDuFA8ByKoulg==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(136003)(376002)(346002)(451199021)(40470700004)(46966006)(36840700001)(36860700001)(36756003)(82310400005)(40460700003)(81166007)(356005)(70206006)(5660300002)(44832011)(7416002)(41300700001)(8936002)(86362001)(4326008)(8676002)(316002)(40480700001)(82740400003)(70586007)(47076005)(426003)(26005)(1076003)(2616005)(16526019)(186003)(2906002)(7696005)(336012)(478600001)(110136005)(54906003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 23:55:50.7766
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 23:55:52.5267
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f84711e7-3783-4837-3b31-08db72b30acb
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9555c499-7111-4111-4358-08db72b30bd6
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000E9D4.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5302
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4163
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -106,50 +106,127 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The GCR3 table contains guest CR3 registers, and it is used to
-setup guest page tables. Current logic only allow guest CR3 table
-setup only when the host table is not setup (i.e. PAGE_MODE_NONE).
-Therefore, only 1-level page translation is allowed
-(e.g. host only vs. guest only).
+AMD IOMMU Extended Feature(2) Register (EFR/EFR2) specifies features
+supported by each IOMMU hardware instance. The IOMMU driver checks each
+feature-specific bits before enabling each feature at run time.
 
-Remove this restriction to allow nested page table setup.
+For hardware-assisted vIOMMU, the hypervisor determines which IOMMU
+features to supported in the guest, and communicates this information
+to user-space (e.g. QEMU) via iommufd IOMMU_DEVICE_GET_HW_INFO ioctl.
 
 Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 ---
- drivers/iommu/amd/iommu.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ drivers/iommu/amd/amd_iommu.h       |  2 ++
+ drivers/iommu/amd/amd_iommu_types.h |  3 +++
+ drivers/iommu/amd/iommu.c           | 37 +++++++++++++++++++++++++++++
+ include/uapi/linux/iommufd.h        | 11 +++++++++
+ 4 files changed, 53 insertions(+)
 
+diff --git a/drivers/iommu/amd/amd_iommu.h b/drivers/iommu/amd/amd_iommu.h
+index d36a39796c2f..c9dfa4734801 100644
+--- a/drivers/iommu/amd/amd_iommu.h
++++ b/drivers/iommu/amd/amd_iommu.h
+@@ -84,6 +84,8 @@ extern int amd_iommu_domain_set_gcr3(struct iommu_domain *dom, u32 pasid,
+ 				     unsigned long cr3);
+ extern int amd_iommu_domain_clear_gcr3(struct iommu_domain *dom, u32 pasid);
+ 
++extern void amd_iommu_build_efr(u64 *efr, u64 *efr2);
++
+ #ifdef CONFIG_IRQ_REMAP
+ extern int amd_iommu_create_irq_domain(struct amd_iommu *iommu);
+ #else
+diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/amd_iommu_types.h
+index 09df25779fe9..8830f511bee4 100644
+--- a/drivers/iommu/amd/amd_iommu_types.h
++++ b/drivers/iommu/amd/amd_iommu_types.h
+@@ -98,12 +98,15 @@
+ #define FEATURE_EPHSUP		(1ULL<<50)
+ #define FEATURE_SNP		(1ULL<<63)
+ 
++#define FEATURE_GATS_5LEVEL	1ULL
+ #define FEATURE_GATS_SHIFT	12
+ #define FEATURE_GATS_MASK	(0x03ULL << FEATURE_GATS_SHIFT)
+ 
++#define FEATURE_GLX_3LEVEL	0ULL
+ #define FEATURE_GLX_SHIFT	14
+ #define FEATURE_GLX_MASK	(0x03ULL << FEATURE_GLX_SHIFT)
+ 
++#define FEATURE_PASMAX_16	0xFULL
+ #define FEATURE_PASMAX_SHIFT	32
+ #define FEATURE_PASMAX_MASK	(0x1FULL << FEATURE_PASMAX_SHIFT)
+ 
 diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-index 333c8a4831be..c23f99ebdffc 100644
+index c23f99ebdffc..4a42af85664e 100644
 --- a/drivers/iommu/amd/iommu.c
 +++ b/drivers/iommu/amd/iommu.c
-@@ -2531,12 +2531,12 @@ int amd_iommu_domain_enable_v2(struct iommu_domain *dom, int pasids, bool giov)
- 	spin_lock_irqsave(&pdom->lock, flags);
+@@ -2435,8 +2435,45 @@ static bool amd_iommu_enforce_cache_coherency(struct iommu_domain *domain)
+ 	return true;
+ }
  
- 	/*
--	 * Save us all sanity checks whether devices already in the
--	 * domain support IOMMUv2. Just force that the domain has no
--	 * devices attached when it is switched into IOMMUv2 mode.
-+	 * With nested page table, we can enable * v2 (i.e GCR3)
-+	 * on a existing domain. Therefore, only check if domain
-+	 * already enable v2.
- 	 */
- 	ret = -EBUSY;
--	if (pdom->dev_cnt > 0 || pdom->flags & PD_IOMMUV2_MASK)
-+	if (pdom->flags & PD_IOMMUV2_MASK)
- 		goto out;
++void amd_iommu_build_efr(u64 *efr, u64 *efr2)
++{
++	if (efr) {
++		*efr = (FEATURE_GT | FEATURE_GIOSUP);
++
++		/* 5-level v2 page table support */
++		*efr |= ((FEATURE_GATS_5LEVEL << FEATURE_GATS_SHIFT) &
++			 FEATURE_GATS_MASK);
++
++		/* 3-level GCR3 table support */
++		*efr |= ((FEATURE_GLX_3LEVEL << FEATURE_GLX_SHIFT) &
++			 FEATURE_GLX_MASK);
++
++		/* 16-bit PASMAX support */
++		*efr |= ((FEATURE_PASMAX_16 << FEATURE_PASMAX_SHIFT) &
++			 FEATURE_PASMAX_MASK);
++	}
++
++	if (efr2)
++		*efr2 = 0;
++}
++
++static void *amd_iommu_hw_info(struct device *dev, u32 *length)
++{
++	struct iommu_hw_info_amd *hwinfo;
++
++	hwinfo = kzalloc(sizeof(*hwinfo), GFP_KERNEL);
++	if (!hwinfo)
++		return ERR_PTR(-ENOMEM);
++
++	*length = sizeof(*hwinfo);
++
++	amd_iommu_build_efr(&hwinfo->efr, &hwinfo->efr2);
++	return hwinfo;
++}
++
+ const struct iommu_ops amd_iommu_ops = {
+ 	.capable		= amd_iommu_capable,
++	.hw_info		= amd_iommu_hw_info,
+ 	.domain_alloc		= amd_iommu_domain_alloc,
+ 	.probe_device		= amd_iommu_probe_device,
+ 	.release_device		= amd_iommu_release_device,
+diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+index ec870e2d32fd..f8ea9faf6770 100644
+--- a/include/uapi/linux/iommufd.h
++++ b/include/uapi/linux/iommufd.h
+@@ -508,6 +508,17 @@ struct iommu_hw_info_smmuv3 {
+ 	__u32 idr[6];
+ };
  
- 	if (!pdom->gcr3_tbl)
-@@ -2688,9 +2688,6 @@ static int __set_gcr3(struct protection_domain *domain, u32 pasid,
- {
- 	u64 *pte;
- 
--	if (domain->iop.mode != PAGE_MODE_NONE)
--		return -EINVAL;
--
- 	pte = __get_gcr3_pte(domain->gcr3_tbl, domain->glx, pasid, true);
- 	if (pte == NULL)
- 		return -ENOMEM;
++/**
++ * struct iommu_hw_info_amd - AMD IOMMU device info
++ *
++ * @efr : Value of AMD IOMMU Extended Feature Register (EFR)
++ * @efr2: Value of AMD IOMMU Extended Feature 2 Register (EFR2)
++ */
++struct iommu_hw_info_amd {
++	__u64 efr;
++	__u64 efr2;
++};
++
+ /**
+  * enum iommu_hw_info_type - IOMMU Hardware Info Types
+  * @IOMMU_HW_INFO_TYPE_INTEL_VTD: Intel VT-d iommu info type
 -- 
 2.34.1
 
