@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E21273A5A4
-	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 18:09:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC1E073A5BC
+	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 18:11:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230280AbjFVQJx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jun 2023 12:09:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49854 "EHLO
+        id S230395AbjFVQKt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jun 2023 12:10:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230339AbjFVQJp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jun 2023 12:09:45 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38D011BF2
-        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 09:09:32 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-311394406d0so4930683f8f.2
-        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 09:09:32 -0700 (PDT)
+        with ESMTP id S229687AbjFVQJs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jun 2023 12:09:48 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73771210A
+        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 09:09:42 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-31129591288so5614886f8f.1
+        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 09:09:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687450170; x=1690042170;
+        d=linaro.org; s=google; t=1687450181; x=1690042181;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UX7A/4NpufAJKKWp2HGkO2gs63RM9WYyIFTo3iDzXaM=;
-        b=DdtbSfGB9fIFn73hC/ZN2gzhWDEsS0lqTX8dZb/if6XVyDDbwZBazG7bXEfDnHcBjo
-         cR4ajzbr27l+07b6XnE3TAUOrrAaPlT5xkF/l909nBh4qbPQ3Le8z4WnnFM4pKME0MKi
-         NbK3/ZqKbBUkNEXH8RgWgsGDDqMpx3luPpSpi46OqkCh5VXZM0ZX6MHWsmyWZfMOlGLK
-         UOr3ih8YC2upaRjqD7yvc8ALouWGlaOZAhU+QIMbyyOMXRFGVh8hLC4KGkyCuxUS6QeS
-         3FzJNs97K48LpXVOdGHAYg8xBBpXfCsgZVqYjpH6rIQumcZxeMkew5aWBuVSu56hmwO5
-         pLgQ==
+        bh=CEVQVFEhZHNy/cnG3lPruZJhEG3g4jextiQzVLX54RM=;
+        b=SWMbMjJlyBtm5Bcs5Hgx8xsm/R/SyPlbc+86z/Pib+CFxsxMZCIvBFiDzrAKjzAP6e
+         5U4spQdTKBGt4dKZJLewiirbAkuHrcXUQBf+sb8f3diBcS9vwPRS4YeFDv/GbfCuCOaj
+         agnq4eSheHgWta4fDymCjlvdWpqGbg31kVD4c/85wg4mGAlNfKktoS6aP5iDcXxBzQ2k
+         8zugatryBG0h8USQ+05WldDKrbWNpvrPR0xBIawvKUMmo9OoZgGhMxauyxxVnvkftVy2
+         z0by5PUyeeeVG2B6codhhf2qKQL47MbeaJkQ/rTbEWGzrkZAUfxlMILC4Vo14gYZm80G
+         uPWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687450170; x=1690042170;
+        d=1e100.net; s=20221208; t=1687450181; x=1690042181;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UX7A/4NpufAJKKWp2HGkO2gs63RM9WYyIFTo3iDzXaM=;
-        b=NeRNGAMgXKKWzxKFLbKv0cRx35jP3a3N95BkAfItS15jUPIvL5wpmgXjYZ/a1Tl60N
-         sgt7NcXzdGh4KooY714Kj4gKswAB0fbCsKt7khYTTBP+Kz8qjZAG1Jbh1TTIIiD4iYzl
-         z1Ht733mS8tSpZbZCvEGnKAqs3df3/B34sKk1Ao+If0ac+ZdKu5KNN5yY6tgnC3V6S8z
-         +pGYTdwNqmIJPS9OPchONOhtKmtNAQFLU8eqpzfpHSifzrQXEzUOOVZbUVCu8mepfPwh
-         O7D3a/HpIyy+WJj1tHwsEYH+CuOtnlH53HeMnqiznvry45N2yIe0X0DbCGxG7sc/cwny
-         YIjQ==
-X-Gm-Message-State: AC+VfDwcIDYVnz3w/Ny9bJ2mh/14MTtQiF8GYcw/rqc3sCGFZjzXFud+
-        m0IE2VPLZ6sjPBzdHaWUKWlk8g==
-X-Google-Smtp-Source: ACHHUZ6397oLn+9xHpt22BhUSP9QEJUubmRRJRV5VKiXD/mQbPJbeDrcgDPjDy71BF2ku+M1ZHsSsw==
-X-Received: by 2002:adf:f78a:0:b0:311:1cbd:800a with SMTP id q10-20020adff78a000000b003111cbd800amr13110914wrp.12.1687450170751;
-        Thu, 22 Jun 2023 09:09:30 -0700 (PDT)
+        bh=CEVQVFEhZHNy/cnG3lPruZJhEG3g4jextiQzVLX54RM=;
+        b=fuyX76C27pyH38YWdp+svVuRRX4+6EO/Eh+lTw9CCNRrsdC22AcHNHx0r24RXpON95
+         xpRi4qHCXjfpQPGb1MTx/EnOsEW2mIzU1vooMgQzklE2ZrBkxpG75mVy3xYSr2dA0KC/
+         McGkR2AaVpeEX02QPZ+cT91L+zY0Pf/gLR8424kgFFUSrX+QDlmvSqFErDI6RYMAvzK5
+         hF9uS5skYLcAb/YYK92WF9ESZHl/XWud0mRDbgLbmciGlOuyIGbbh+tgdkQ8xrZr4KTf
+         VmJT8pykb5VAZMzUKnlnRNKJtaogkIw8bkg7pVQV6Bw6cZV7SxV/6IIe4KeHmctZ5PDL
+         VS+Q==
+X-Gm-Message-State: AC+VfDxaK2+GoJZ7QriOhcqtJ4VQ6PWmDzkXZ2rS4ze6xWaPWMQeNwQZ
+        +2SX4bK+nkVd5b40qF77H89z4A==
+X-Google-Smtp-Source: ACHHUZ4nT6po+2alF3S0sJQrN6xHw6556XG/dKFnd67cfUhsDGgYRSSQBeakH0E0LLBXoBk4pMHnVg==
+X-Received: by 2002:a5d:414e:0:b0:30f:c6cd:e6c7 with SMTP id c14-20020a5d414e000000b0030fc6cde6c7mr12969411wrq.18.1687450180837;
+        Thu, 22 Jun 2023 09:09:40 -0700 (PDT)
 Received: from localhost.localdomain (230.red-88-28-3.dynamicip.rima-tde.net. [88.28.3.230])
-        by smtp.gmail.com with ESMTPSA id w8-20020adfcd08000000b00301a351a8d6sm7484316wrm.84.2023.06.22.09.09.26
+        by smtp.gmail.com with ESMTPSA id q6-20020adff506000000b00307c8d6b4a0sm7365203wro.26.2023.06.22.09.09.36
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 22 Jun 2023 09:09:30 -0700 (PDT)
+        Thu, 22 Jun 2023 09:09:40 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Reinoud Zandijk <reinoud@netbsd.org>, qemu-arm@nongnu.org,
@@ -67,9 +67,9 @@ Cc:     Reinoud Zandijk <reinoud@netbsd.org>, qemu-arm@nongnu.org,
         xen-devel@lists.xenproject.org,
         Eduardo Habkost <eduardo@habkost.net>,
         Cameron Esfahani <dirty@apple.com>
-Subject: [PATCH v2 06/16] accel: Rename 'hax_vcpu' as 'accel' in CPUState
-Date:   Thu, 22 Jun 2023 18:08:13 +0200
-Message-Id: <20230622160823.71851-7-philmd@linaro.org>
+Subject: [PATCH v2 07/16] accel: Rename HAX 'struct hax_vcpu_state' -> AccelCPUState
+Date:   Thu, 22 Jun 2023 18:08:14 +0200
+Message-Id: <20230622160823.71851-8-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230622160823.71851-1-philmd@linaro.org>
 References: <20230622160823.71851-1-philmd@linaro.org>
@@ -86,91 +86,161 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All accelerators will share a single opaque context
-in CPUState. Start by renaming 'hax_vcpu' as 'accel'.
+We want all accelerators to share the same opaque pointer in
+CPUState. Start with the HAX context, renaming its forward
+declarated structure 'hax_vcpu_state' as 'AccelCPUState'.
+Directly use the typedef.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- include/hw/core/cpu.h           |  2 +-
- target/i386/hax/hax-accel-ops.c |  2 +-
- target/i386/hax/hax-all.c       | 18 +++++++++---------
- target/i386/nvmm/nvmm-all.c     |  6 +++---
- target/i386/whpx/whpx-all.c     |  6 +++---
- 5 files changed, 17 insertions(+), 17 deletions(-)
+ include/hw/core/cpu.h         |  5 ++---
+ target/i386/hax/hax-i386.h    | 11 ++++++-----
+ target/i386/hax/hax-all.c     | 16 ++++++++--------
+ target/i386/hax/hax-posix.c   |  4 ++--
+ target/i386/hax/hax-windows.c |  4 ++--
+ target/i386/nvmm/nvmm-all.c   |  2 +-
+ target/i386/whpx/whpx-all.c   |  2 +-
+ 7 files changed, 22 insertions(+), 22 deletions(-)
 
 diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 4871ad85f0..84b5a866e7 100644
+index 84b5a866e7..7a0eb5ef32 100644
 --- a/include/hw/core/cpu.h
 +++ b/include/hw/core/cpu.h
-@@ -441,7 +441,7 @@ struct CPUState {
+@@ -240,7 +240,6 @@ typedef struct SavedIOTLB {
+ struct KVMState;
+ struct kvm_run;
+ 
+-struct hax_vcpu_state;
+ struct hvf_vcpu_state;
+ 
+ /* work queue */
+@@ -308,6 +307,7 @@ struct qemu_work_item;
+  * @next_cpu: Next CPU sharing TB cache.
+  * @opaque: User data.
+  * @mem_io_pc: Host Program Counter at which the memory was accessed.
++ * @accel: Pointer to accelerator specific state.
+  * @kvm_fd: vCPU file descriptor for KVM.
+  * @work_mutex: Lock to prevent multiple access to @work_list.
+  * @work_list: List of pending asynchronous work.
+@@ -422,6 +422,7 @@ struct CPUState {
+     uint32_t can_do_io;
+     int32_t exception_index;
+ 
++    struct AccelvCPUState *accel;
+     /* shared by kvm, hax and hvf */
+     bool vcpu_dirty;
+ 
+@@ -441,8 +442,6 @@ struct CPUState {
      /* Used for user-only emulation of prctl(PR_SET_UNALIGN). */
      bool prctl_unalign_sigbus;
  
--    struct hax_vcpu_state *hax_vcpu;
-+    struct hax_vcpu_state *accel;
- 
+-    struct hax_vcpu_state *accel;
+-
      struct hvf_vcpu_state *hvf;
  
-diff --git a/target/i386/hax/hax-accel-ops.c b/target/i386/hax/hax-accel-ops.c
-index 0157a628a3..a8512efcd5 100644
---- a/target/i386/hax/hax-accel-ops.c
-+++ b/target/i386/hax/hax-accel-ops.c
-@@ -71,7 +71,7 @@ static void hax_start_vcpu_thread(CPUState *cpu)
-              cpu->cpu_index);
-     qemu_thread_create(cpu->thread, thread_name, hax_cpu_thread_fn,
-                        cpu, QEMU_THREAD_JOINABLE);
--    assert(cpu->hax_vcpu);
-+    assert(cpu->accel);
- #ifdef _WIN32
-     cpu->hThread = qemu_thread_get_handle(cpu->thread);
+     /* track IOMMUs whose translations we've cached in the TCG TLB */
+diff --git a/target/i386/hax/hax-i386.h b/target/i386/hax/hax-i386.h
+index 409ebdb4af..341688a254 100644
+--- a/target/i386/hax/hax-i386.h
++++ b/target/i386/hax/hax-i386.h
+@@ -25,12 +25,13 @@ typedef HANDLE hax_fd;
  #endif
+ 
+ extern struct hax_state hax_global;
+-struct hax_vcpu_state {
++
++typedef struct AccelCPUState {
+     hax_fd fd;
+     int vcpu_id;
+     struct hax_tunnel *tunnel;
+     unsigned char *iobuf;
+-};
++} hax_vcpu_state;
+ 
+ struct hax_state {
+     hax_fd fd; /* the global hax device interface */
+@@ -46,7 +47,7 @@ struct hax_vm {
+     hax_fd fd;
+     int id;
+     int numvcpus;
+-    struct hax_vcpu_state **vcpus;
++    hax_vcpu_state **vcpus;
+ };
+ 
+ /* Functions exported to host specific mode */
+@@ -57,7 +58,7 @@ int valid_hax_tunnel_size(uint16_t size);
+ int hax_mod_version(struct hax_state *hax, struct hax_module_version *version);
+ int hax_inject_interrupt(CPUArchState *env, int vector);
+ struct hax_vm *hax_vm_create(struct hax_state *hax, int max_cpus);
+-int hax_vcpu_run(struct hax_vcpu_state *vcpu);
++int hax_vcpu_run(hax_vcpu_state *vcpu);
+ int hax_vcpu_create(int id);
+ void hax_kick_vcpu_thread(CPUState *cpu);
+ 
+@@ -76,7 +77,7 @@ int hax_host_create_vm(struct hax_state *hax, int *vm_id);
+ hax_fd hax_host_open_vm(struct hax_state *hax, int vm_id);
+ int hax_host_create_vcpu(hax_fd vm_fd, int vcpuid);
+ hax_fd hax_host_open_vcpu(int vmid, int vcpuid);
+-int hax_host_setup_vcpu_channel(struct hax_vcpu_state *vcpu);
++int hax_host_setup_vcpu_channel(hax_vcpu_state *vcpu);
+ hax_fd hax_mod_open(void);
+ void hax_memory_init(void);
+ 
 diff --git a/target/i386/hax/hax-all.c b/target/i386/hax/hax-all.c
-index 38a4323a3c..3865ff9419 100644
+index 3865ff9419..a55b18f353 100644
 --- a/target/i386/hax/hax-all.c
 +++ b/target/i386/hax/hax-all.c
 @@ -62,7 +62,7 @@ int valid_hax_tunnel_size(uint16_t size)
  
  hax_fd hax_vcpu_get_fd(CPUArchState *env)
  {
--    struct hax_vcpu_state *vcpu = env_cpu(env)->hax_vcpu;
-+    struct hax_vcpu_state *vcpu = env_cpu(env)->accel;
+-    struct hax_vcpu_state *vcpu = env_cpu(env)->accel;
++    hax_vcpu_state *vcpu = env_cpu(env)->accel;
      if (!vcpu) {
          return HAX_INVALID_FD;
      }
+@@ -136,7 +136,7 @@ static int hax_version_support(struct hax_state *hax)
+ 
+ int hax_vcpu_create(int id)
+ {
+-    struct hax_vcpu_state *vcpu = NULL;
++    hax_vcpu_state *vcpu = NULL;
+     int ret;
+ 
+     if (!hax_global.vm) {
+@@ -149,7 +149,7 @@ int hax_vcpu_create(int id)
+         return 0;
+     }
+ 
+-    vcpu = g_new0(struct hax_vcpu_state, 1);
++    vcpu = g_new0(hax_vcpu_state, 1);
+ 
+     ret = hax_host_create_vcpu(hax_global.vm->fd, id);
+     if (ret) {
 @@ -188,7 +188,7 @@ int hax_vcpu_create(int id)
  
  int hax_vcpu_destroy(CPUState *cpu)
  {
--    struct hax_vcpu_state *vcpu = cpu->hax_vcpu;
-+    struct hax_vcpu_state *vcpu = cpu->accel;
+-    struct hax_vcpu_state *vcpu = cpu->accel;
++    hax_vcpu_state *vcpu = cpu->accel;
  
      if (!hax_global.vm) {
          fprintf(stderr, "vcpu %x destroy failed, vm is null\n", vcpu->vcpu_id);
-@@ -209,7 +209,7 @@ int hax_vcpu_destroy(CPUState *cpu)
-     CloseHandle(cpu->hThread);
- #endif
-     g_free(vcpu);
--    cpu->hax_vcpu = NULL;
-+    cpu->accel = NULL;
-     return 0;
- }
- 
-@@ -223,7 +223,7 @@ int hax_init_vcpu(CPUState *cpu)
-         exit(-1);
+@@ -263,7 +263,7 @@ struct hax_vm *hax_vm_create(struct hax_state *hax, int max_cpus)
      }
  
--    cpu->hax_vcpu = hax_global.vm->vcpus[cpu->cpu_index];
-+    cpu->accel = hax_global.vm->vcpus[cpu->cpu_index];
-     cpu->vcpu_dirty = true;
-     qemu_register_reset(hax_reset_vcpu_state, cpu->env_ptr);
- 
+     vm->numvcpus = max_cpus;
+-    vm->vcpus = g_new0(struct hax_vcpu_state *, vm->numvcpus);
++    vm->vcpus = g_new0(hax_vcpu_state *, vm->numvcpus);
+     for (i = 0; i < vm->numvcpus; i++) {
+         vm->vcpus[i] = NULL;
+     }
 @@ -415,7 +415,7 @@ static int hax_handle_io(CPUArchState *env, uint32_t df, uint16_t port,
  static int hax_vcpu_interrupt(CPUArchState *env)
  {
      CPUState *cpu = env_cpu(env);
--    struct hax_vcpu_state *vcpu = cpu->hax_vcpu;
-+    struct hax_vcpu_state *vcpu = cpu->accel;
+-    struct hax_vcpu_state *vcpu = cpu->accel;
++    hax_vcpu_state *vcpu = cpu->accel;
      struct hax_tunnel *ht = vcpu->tunnel;
  
      /*
@@ -178,8 +248,8 @@ index 38a4323a3c..3865ff9419 100644
  
  void hax_raise_event(CPUState *cpu)
  {
--    struct hax_vcpu_state *vcpu = cpu->hax_vcpu;
-+    struct hax_vcpu_state *vcpu = cpu->accel;
+-    struct hax_vcpu_state *vcpu = cpu->accel;
++    hax_vcpu_state *vcpu = cpu->accel;
  
      if (!vcpu) {
          return;
@@ -187,83 +257,80 @@ index 38a4323a3c..3865ff9419 100644
      int ret = 0;
      CPUState *cpu = env_cpu(env);
      X86CPU *x86_cpu = X86_CPU(cpu);
--    struct hax_vcpu_state *vcpu = cpu->hax_vcpu;
-+    struct hax_vcpu_state *vcpu = cpu->accel;
+-    struct hax_vcpu_state *vcpu = cpu->accel;
++    hax_vcpu_state *vcpu = cpu->accel;
      struct hax_tunnel *ht = vcpu->tunnel;
  
      if (!hax_enabled()) {
-@@ -1114,8 +1114,8 @@ void hax_reset_vcpu_state(void *opaque)
- {
-     CPUState *cpu;
-     for (cpu = first_cpu; cpu != NULL; cpu = CPU_NEXT(cpu)) {
--        cpu->hax_vcpu->tunnel->user_event_pending = 0;
--        cpu->hax_vcpu->tunnel->ready_for_interrupt_injection = 0;
-+        cpu->accel->tunnel->user_event_pending = 0;
-+        cpu->accel->tunnel->ready_for_interrupt_injection = 0;
-     }
+diff --git a/target/i386/hax/hax-posix.c b/target/i386/hax/hax-posix.c
+index ac1a51096e..8ee247845b 100644
+--- a/target/i386/hax/hax-posix.c
++++ b/target/i386/hax/hax-posix.c
+@@ -205,7 +205,7 @@ hax_fd hax_host_open_vcpu(int vmid, int vcpuid)
+     return fd;
  }
  
+-int hax_host_setup_vcpu_channel(struct hax_vcpu_state *vcpu)
++int hax_host_setup_vcpu_channel(hax_vcpu_state *vcpu)
+ {
+     int ret;
+     struct hax_tunnel_info info;
+@@ -227,7 +227,7 @@ int hax_host_setup_vcpu_channel(struct hax_vcpu_state *vcpu)
+     return 0;
+ }
+ 
+-int hax_vcpu_run(struct hax_vcpu_state *vcpu)
++int hax_vcpu_run(hax_vcpu_state *vcpu)
+ {
+     return ioctl(vcpu->fd, HAX_VCPU_IOCTL_RUN, NULL);
+ }
+diff --git a/target/i386/hax/hax-windows.c b/target/i386/hax/hax-windows.c
+index 59afa213a6..08ec93a256 100644
+--- a/target/i386/hax/hax-windows.c
++++ b/target/i386/hax/hax-windows.c
+@@ -301,7 +301,7 @@ hax_fd hax_host_open_vcpu(int vmid, int vcpuid)
+     return hDeviceVCPU;
+ }
+ 
+-int hax_host_setup_vcpu_channel(struct hax_vcpu_state *vcpu)
++int hax_host_setup_vcpu_channel(hax_vcpu_state *vcpu)
+ {
+     hax_fd hDeviceVCPU = vcpu->fd;
+     int ret;
+@@ -327,7 +327,7 @@ int hax_host_setup_vcpu_channel(struct hax_vcpu_state *vcpu)
+     return 0;
+ }
+ 
+-int hax_vcpu_run(struct hax_vcpu_state *vcpu)
++int hax_vcpu_run(hax_vcpu_state *vcpu)
+ {
+     int ret;
+     HANDLE hDeviceVCPU = vcpu->fd;
 diff --git a/target/i386/nvmm/nvmm-all.c b/target/i386/nvmm/nvmm-all.c
-index b75738ee9c..cf4f0af24b 100644
+index cf4f0af24b..50b96ced45 100644
 --- a/target/i386/nvmm/nvmm-all.c
 +++ b/target/i386/nvmm/nvmm-all.c
-@@ -52,7 +52,7 @@ static struct qemu_machine qemu_mach;
- static struct qemu_vcpu *
- get_qemu_vcpu(CPUState *cpu)
- {
--    return (struct qemu_vcpu *)cpu->hax_vcpu;
-+    return (struct qemu_vcpu *)cpu->accel;
- }
- 
- static struct nvmm_machine *
 @@ -995,7 +995,7 @@ nvmm_init_vcpu(CPUState *cpu)
      }
  
      cpu->vcpu_dirty = true;
--    cpu->hax_vcpu = (struct hax_vcpu_state *)qcpu;
-+    cpu->accel = (struct hax_vcpu_state *)qcpu;
+-    cpu->accel = (struct hax_vcpu_state *)qcpu;
++    cpu->accel = (struct AccelCPUState *)qcpu;
  
      return 0;
  }
-@@ -1030,7 +1030,7 @@ nvmm_destroy_vcpu(CPUState *cpu)
-     struct qemu_vcpu *qcpu = get_qemu_vcpu(cpu);
- 
-     nvmm_vcpu_destroy(mach, &qcpu->vcpu);
--    g_free(cpu->hax_vcpu);
-+    g_free(cpu->accel);
- }
- 
- /* -------------------------------------------------------------------------- */
 diff --git a/target/i386/whpx/whpx-all.c b/target/i386/whpx/whpx-all.c
-index 52af81683c..d1ad6f156a 100644
+index d1ad6f156a..340053e6dd 100644
 --- a/target/i386/whpx/whpx-all.c
 +++ b/target/i386/whpx/whpx-all.c
-@@ -262,7 +262,7 @@ static bool whpx_has_xsave(void)
- 
- static struct whpx_vcpu *get_whpx_vcpu(CPUState *cpu)
- {
--    return (struct whpx_vcpu *)cpu->hax_vcpu;
-+    return (struct whpx_vcpu *)cpu->accel;
- }
- 
- static WHV_X64_SEGMENT_REGISTER whpx_seg_q2h(const SegmentCache *qs, int v86,
 @@ -2258,7 +2258,7 @@ int whpx_init_vcpu(CPUState *cpu)
  
      vcpu->interruptable = true;
      cpu->vcpu_dirty = true;
--    cpu->hax_vcpu = (struct hax_vcpu_state *)vcpu;
-+    cpu->accel = (struct hax_vcpu_state *)vcpu;
+-    cpu->accel = (struct hax_vcpu_state *)vcpu;
++    cpu->accel = (struct AccelCPUState *)vcpu;
      max_vcpu_index = max(max_vcpu_index, cpu->cpu_index);
      qemu_add_vm_change_state_handler(whpx_cpu_update_state, cpu->env_ptr);
- 
-@@ -2300,7 +2300,7 @@ void whpx_destroy_vcpu(CPUState *cpu)
- 
-     whp_dispatch.WHvDeleteVirtualProcessor(whpx->partition, cpu->cpu_index);
-     whp_dispatch.WHvEmulatorDestroyEmulator(vcpu->emulator);
--    g_free(cpu->hax_vcpu);
-+    g_free(cpu->accel);
-     return;
- }
  
 -- 
 2.38.1
