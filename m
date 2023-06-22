@@ -2,59 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7679D73AB53
-	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 23:14:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDBB973ABA7
+	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 23:32:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230395AbjFVVOr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jun 2023 17:14:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60706 "EHLO
+        id S231267AbjFVVc5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jun 2023 17:32:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230260AbjFVVOp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jun 2023 17:14:45 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C9FC19AB
-        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 14:14:44 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-56cf9a86277so88516637b3.3
-        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 14:14:44 -0700 (PDT)
+        with ESMTP id S230010AbjFVVc4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jun 2023 17:32:56 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ED6E1BFA
+        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 14:32:55 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-260cb94f585so749408a91.0
+        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 14:32:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687468483; x=1690060483;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jqUulwFndrSd4Z5q05A624q3pqI8UuERYAHN9/eTEII=;
-        b=33zr6TGeQavSRT1WuiIzJ4fhf2pI+8pC3cpXhuJwcjWI2WIk+9czdmtc+rXTkB3s7j
-         Qh2E87+dLZdpUYrVx4IlGmxLFaVAwFLM1ZyHLlM8BSjgjZ+5L5AqLDxYs0JesCtpajtf
-         cLISB/c4THSZ0KKSz89KArwWQuzUrCXXt8DJYum/5vueZYQaKywnu2K3kew0loFm88TA
-         lUwWfV+U2ydyZbWfy/jhfaMZEZMnvrx7IuSrk+x7FtrpL7ORx0tw0VniSZJO1T2hEK0T
-         GJF5a8/N2e+FYcNksKCXy1CILhSZLZo9zh+mdbSXwstnFi3s05NpdMnEWkm4Ix3tOkBB
-         SWSQ==
+        d=google.com; s=20221208; t=1687469574; x=1690061574;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=McrWPEMdcY8Ijo4mXTjWSWYCRblXWzlaJqW9ZS43WxU=;
+        b=2qEuhBwk+Gyb8ChECzhA/azJHwfTPgAVY6tHxt5F1W+qkNOe/U/psq7KIDxNXJ41SD
+         OS+AloMu2DO72wgYGScX4hPoptWUn8Pi8B7/dvhEMYhzfyJY53HRHCo6JNnXH8umfNIW
+         2Er3vtqKWy/95Dy1tsG7z3pMeG278VNA4GcpT5roGprYLXeGpmtki9sJgWGj+wLlx7r5
+         B/i+MohRq8+obwAfE7Ne0GQwVw9A92PJDNVI2XC+FTq3ATZ21wpO/iPYPpBNOB6p2Do6
+         7wZA0R7lTp4R1S8csy5Hc9Wy7BInlOu+XUddBBX33x/+TJ2q2EZZO3p6l39FMy/aPN0Z
+         kWBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687468483; x=1690060483;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jqUulwFndrSd4Z5q05A624q3pqI8UuERYAHN9/eTEII=;
-        b=cDCwleMBPDZImBzAcefApcwO9lt/RkQKDdDbyJxWnxX9DcKvGid8iGcbwe4KsOVzZZ
-         vXrkRMnkekhnhomAAkpbYh9MNU5kqQYXKzhxKbFTCr2kKHSUU6LyD1NXdjVv34/hyN2V
-         Ju0RWmXjHEgkwlnPjxegy3iNT1PVU8RVSJb81ROBVFnG0z6jRrgQ+R4Io+RLfblrTP4R
-         mhUuB+rwTetW1Qpm2S4El/ywThtD4qHkICI5C94d1VkyulUg31MjmJjqMSXfcq+s8oTm
-         PuRhTmSmIhZPAxL6SyxBcplvJlEHsCs7IlVmzUrKwsyApe/v4fYHVa9s+f6h0DFM2VDx
-         gMMQ==
-X-Gm-Message-State: AC+VfDzyJ62EXfRPJ1zDlNufcYDa2PmfVJfoXrd0El2Q3ucu2/GLqker
-        JQpufs1NrhQHBxJjZwz3CgT6dA1EfpE=
-X-Google-Smtp-Source: ACHHUZ4/GDc/ab+X+y3D/CYeCzXwd1oDZnX/VCGgCf2my+uzyj9kiMr//KAYWuuDCQz3CPYg8DsPAd/957U=
+        d=1e100.net; s=20221208; t=1687469575; x=1690061575;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=McrWPEMdcY8Ijo4mXTjWSWYCRblXWzlaJqW9ZS43WxU=;
+        b=HqLehU4pqSilafw8jlqd3GVMdR1r5YWxLVNI2eGj5dPFikHQYnw4HtVIwvOw1GpVhE
+         LfRxEASVkdF4HwD6rtU7KNDKq6/d5m8dhS8Wtu2rVniiLlXkpLZ3VIDaGgwI2vX5B6Ej
+         m+yqeXRc+5gp88b9KG63NYbodAn9IkKkQ7tEc4V1AQNBCGDKHwYFyk8zvH5bnRMYsLD6
+         9yiDAPFydbawkshSiJvTm9rMM2Z/CNvE3cJ2NxdCOlDpIn3oKP2lUmVz2JDwWargeNB2
+         EOchv9rT60s4bT7Ad1tcc3nom3tFoRp2CHRNDixfTI7NiPf66UvUmz5W5d6wGppVX3ml
+         VbJA==
+X-Gm-Message-State: AC+VfDxt/MVhRrt5PkYjCchb4UwnedUvix4XWZwHRhH9fhxNpV0W76MJ
+        0Or/KAxPMstbV27cFHvMPQ0jvJ1xX1g=
+X-Google-Smtp-Source: ACHHUZ6Wam0yuN4axfKLcIxsgHLl7cpPes08rLhF/Y32UXt5K7JEn6xRcyrUnXfHr+YEaf/SvnuGrio/h7w=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ef0e:0:b0:56f:e7d7:911e with SMTP id
- o14-20020a81ef0e000000b0056fe7d7911emr7333001ywm.4.1687468483726; Thu, 22 Jun
- 2023 14:14:43 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 22 Jun 2023 14:14:40 -0700
+ (user=seanjc job=sendgmr) by 2002:a17:90a:ca8a:b0:25e:d506:593e with SMTP id
+ y10-20020a17090aca8a00b0025ed506593emr2256361pjt.2.1687469574636; Thu, 22 Jun
+ 2023 14:32:54 -0700 (PDT)
+Date:   Thu, 22 Jun 2023 14:32:53 -0700
+In-Reply-To: <20230622081953.jc4tw6cwczl7bc6j@linux.intel.com>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
-Message-ID: <20230622211440.2595272-1-seanjc@google.com>
-Subject: [kvm-unit-tests GIT PULL] x86: Fixes, cleanups and new testscases
+References: <20230613203037.1968489-1-seanjc@google.com> <20230613203037.1968489-2-seanjc@google.com>
+ <20230622081953.jc4tw6cwczl7bc6j@linux.intel.com>
+Message-ID: <ZJS+BdDFg+qd1SyA@google.com>
+Subject: Re: [PATCH 1/3] KVM: x86: Disallow KVM_SET_SREGS{2} if incoming CR0
+ is invalid
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+5feef0b9ee9c8e9e5689@syzkaller.appspotmail.com,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
@@ -65,131 +70,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Please pull a variety of (mostly) x86 changes.  There's one non-x86 change to
-fix a bug in processing "check" entries in unittests.cfg files.  The majority
-of the x86 changes revolve around nSVM, PMU, and emulator tests.
+On Thu, Jun 22, 2023, Yu Zhang wrote:
+> On Tue, Jun 13, 2023 at 01:30:35PM -0700, Sean Christopherson wrote:
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 0ecf4be2c6af..355b0e8c9b00 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -3037,6 +3037,15 @@ static void enter_rmode(struct kvm_vcpu *vcpu)
+> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> >  	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vcpu->kvm);
+> >  
+> > +	/*
+> > +	 * KVM should never use VM86 to virtualize Real Mode when L2 is active,
+> > +	 * as using VM86 is unnecessary if unrestricted guest is enabled, and
+> > +	 * if unrestricted guest is disabled, VM-Enter (from L1) with CR0.PG=0
+> > +	 * should VM-Fail and KVM should reject userspace attempts to stuff
+> 
+> VM Enry shall fail(with CR0.PG=0), because SECONDARY_EXEC_UNRESTRICTED_GUEST
+> will be cleared in L1's secondary_ctls_high MSR, and hence in its VMCS12?
 
-The following changes since commit 02d8befe99f8205d4caea402d8b0800354255681:
+Yep.
 
-  pretty_print_stacks: modify relative path calculation (2023-04-20 10:26:06 +0200)
+> 
+> When will an unrestricted L1 run L2 as a restricted one? Shadow on EPT(L0
+> uses EPT for L1 and L1 uses shadow for L2)?
 
-are available in the Git repository at:
-
-  https://github.com/kvm-x86/kvm-unit-tests.git tags/kvm-x86-2023.06.22
-
-for you to fetch changes up to e3a9b2f5490e854dfcccdde4bcc712fe928b02b4:
-
-  x86/emulator64: Test non-canonical memory access exceptions (2023-06-12 11:06:19 -0700)
-
-----------------------------------------------------------------
-x86 fixes, cleanups, and new testcases, and a few generic changes
-
- - Fix a bug in runtime.bash that caused it to mishandle "check" strings with
-   multiple entries, e.g. a test that depends on multiple module params
- - Make the PMU tests depend on vPMU support being enabled in KVM
- - Fix PMU's forced emulation test on CPUs with full-width writes
- - Add a PMU testcase for measuring TSX transactional cycles
- - Nested SVM testcase for virtual NMIs
- - Fix linker warnings about an executable stack
- - Move a pile of code to ASM_TRY() and "safe" helpers
- - Set up the guest stack in the LBRV tests so that the tests don't fail if the
-   compiler decides to generate function calls in guest code
- - Ignore the "mispredict" flag in nSVM's LBRV tests to fix false failures
- - Clean up usage of helpers that disable interrupts, e.g. stop inserting
-   unnecessary nops
- - Add helpers to dedup code for programming the APIC timer
-
-----------------------------------------------------------------
-Like Xu (2):
-      x86/pmu: Add Intel Guest Transactional (commited) cycles testcase
-      x86/pmu: Wrap the written counter value with gp_counter_width
-
-Mathias Krause (15):
-      x86: Drop types.h
-      x86: Use symbolic names in exception_mnemonic()
-      x86: Add vendor specific exception vectors
-      x86/cet: Use symbolic name for #CP
-      x86/access: Use 'bool' type as defined via libcflat.h
-      x86/run_in_user: Preserve exception handler
-      x86/run_in_user: Relax register constraints of inline asm
-      x86/run_in_user: Reload SS after successful return
-      x86/fault_test: Preserve exception handler
-      x86/emulator64: Relax register constraints for usr_gs_mov()
-      x86/emulator64: Switch test_sreg() to ASM_TRY()
-      x86/emulator64: Add non-null selector test
-      x86/emulator64: Switch test_jmp_noncanonical() to ASM_TRY()
-      x86/emulator64: Switch test_mmx_movq_mf() to ASM_TRY()
-      x86/emulator64: Test non-canonical memory access exceptions
-
-Maxim Levitsky (8):
-      x86: replace irq_{enable|disable}() with sti()/cli()
-      x86: introduce sti_nop() and sti_nop_cli()
-      x86: add few helper functions for apic local timer
-      x86: nSVM: Remove nop after stgi/clgi
-      x86: nSVM: make svm_intr_intercept_mix_if/gif test a bit more robust
-      x86: nSVM: use apic_start_timer/apic_stop_timer instead of open coding it
-      x86: nSVM: Add nested shutdown interception test
-      x86: nSVM: Remove defunct get_npt_pte() declaration
-
-Santosh Shukla (1):
-      x86: nSVM: Add support for VNMI test
-
-Sean Christopherson (15):
-      nSVM: Add helper to report fatal errors in guest
-      x86: Link with "-z noexecstack" to suppress irrelevant linker warnings
-      x86: Add macros to wrap ASM_TRY() for single instructions
-      x86: Convert inputs-only "safe" instruction helpers to asm_safe()
-      x86: Add macros to wrap ASM_TRY() for single instructions with output(s)
-      x86: Move invpcid_safe() to processor.h and convert to asm_safe()
-      x86: Move XSETBV and XGETBV "safe" helpers to processor.h
-      x86: nSVM: Set up a guest stack in LBRV tests
-      lib: Expose a subset of VMX's assertion macros
-      x86: Add defines for the various LBR record bit definitions
-      x86: nSVM: Ignore mispredict bit in LBR records
-      x86: nSVM: Replace check_dbgctl() with TEST_EXPECT_EQ() in LBRV test
-      x86: nSVM: Print out RIP and LBRs from VMCB if LBRV guest test fails
-      runtime: Convert "check" from string to array so that iterating works
-      x86/pmu: Make PMU testcases dependent on vPMU being enabled in KVM
-
- lib/util.h                |  31 ++++
- lib/x86/apic.c            |  38 ++++
- lib/x86/apic.h            |   6 +
- lib/x86/desc.c            |  43 +++--
- lib/x86/desc.h            |  48 ++++++
- lib/x86/fault_test.c      |   4 +-
- lib/x86/msr.h             |  11 ++
- lib/x86/processor.h       | 137 +++++++++------
- lib/x86/smp.c             |   2 +-
- lib/x86/usermode.c        |  38 ++--
- scripts/runtime.bash      |   1 +
- x86/Makefile.common       |   2 +-
- x86/access.c              |  11 +-
- x86/apic.c                |   6 +-
- x86/asyncpf.c             |   6 +-
- x86/cet.c                 |   2 +-
- x86/cmpxchg8b.c           |   1 -
- x86/emulator.c            |   1 -
- x86/emulator64.c          | 105 +++++++-----
- x86/eventinj.c            |  22 +--
- x86/hyperv_connections.c  |   2 +-
- x86/hyperv_stimer.c       |   4 +-
- x86/hyperv_synic.c        |   6 +-
- x86/intel-iommu.c         |   2 +-
- x86/ioapic.c              |  15 +-
- x86/memory.c              |  60 ++-----
- x86/pcid.c                |   8 -
- x86/pmu.c                 |  52 +++++-
- x86/pmu_pebs.c            |   1 -
- x86/svm.c                 |  17 +-
- x86/svm.h                 |  11 +-
- x86/svm_tests.c           | 429 +++++++++++++++++++++++-----------------------
- x86/taskswitch2.c         |   4 +-
- x86/tscdeadline_latency.c |   4 +-
- x86/types.h               |  21 ---
- x86/unittests.cfg         |   7 +-
- x86/vmexit.c              |  18 +-
- x86/vmx.h                 |  32 +---
- x86/vmx_tests.c           |  48 ++----
- x86/xsave.c               |  31 +---
- 40 files changed, 709 insertions(+), 578 deletions(-)
- delete mode 100644 x86/types.h
+Ya, the L1 VMM/hypervisor disabling EPT is the most likely scenario, i.e. the only
+thing I would expect to encounter outside of testing.  Other than testing, e.g. to
+ensure compatibility with Nehalem CPUs (the only Intel CPUs with EPT but not URG),
+I don't know of any reason to disable URG but not EPT.
