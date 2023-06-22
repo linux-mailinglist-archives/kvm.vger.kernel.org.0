@@ -2,179 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7304173A224
-	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 15:47:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E02C873A2B6
+	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 16:13:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230448AbjFVNqc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jun 2023 09:46:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46960 "EHLO
+        id S231414AbjFVONF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jun 2023 10:13:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230343AbjFVNqb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jun 2023 09:46:31 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 287281721;
-        Thu, 22 Jun 2023 06:46:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mZfGhtR3rwqvwPoyJpIfP7tBcZN5hoAHSjO/Q5r676W1XFfdZacN7bcV9pwOhOj4r7/P/CHsRz3OIJgaHxNnf0RwPko+iiNf63sTEqrlNbNBENCnZni8x0wGoYD1rBW6olO29E1eUFnGbKYB+RLI+IFUME2+5qwyC7dae0OZ4u7CcgqXnH5f42X9iSuBzxEjGuZ/MU3CE+heRU1bKiYqbQ7buWaKDtv25kIqIj2UtXQwiAE7aFrR6Zy9eTQvwnWv3BtXSGpkOQ64NcYPFQcYhAr2QKcl/oCWbDcjNJJEntTcrAfvFrYEvscB5xKuOtqfYlg+4g1FJqF6LBG9Kanyhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yw5dB/WzbQq/mx6KegG3p7E0nCv7b0h3gCuxeTabGdU=;
- b=HcDv9GdIpbqmgrHPidDfoBIHdOlrA1mXSpTrZWzMxDQW2gYSBJ06y9rf24lYIoTwJqAfFPhEYXAJndcOuiC7Z+h3U3w0LVMi+5VkVjwylUHd3ZpC5jrDzbbc4l2TOtNKs3h5ged83vRWXJi3AaArIoepI2Aca5UVbEM3svKaZvIaKpjUd9zhvsFbrmLjD40V2Zt9nz9uQLJarzZ1TlGG/d1tOiBwcoDFHkAzCOSNLk8IILnLD9PGpbUP/FSYi7bAuAbAfwfYr7Xz98bIfo9WYolL461yXcA1B0mhZoctX2ViYQwIVZQZzF12KcrzuWdE+uTmfLSa6znF3ZuzL8sHvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yw5dB/WzbQq/mx6KegG3p7E0nCv7b0h3gCuxeTabGdU=;
- b=RE5SoEPkDJDsRHzzUGk2mUxRpujqZkS+/bacs6oS/HiUvWzn7vA8eZM5ukwUbLGJJDGqVtZlhAiYrTcF1PU30Ai8OsYM4QSUuJB2UO2nFjnBZvp5bZwHLLmsau7zJEBe23k1yAQ3HMMN1z/GPuZ+rHs650jprrrZiw+XA6FocshO0vI99ofkEuYeRrVAYBvRvGajiDOnWECGvctgiyitdWDhOy0siXkNZBEKErM+0WP035DvMoZniQQ7eVp0k0b495ByVZkc3vDt5+0NtQD9ahFSesze5TJVlCY76U+jMSZ7MLliR5o3psCBcepdwUEqQgfJ/GUJVxYC4TzeK0aNuQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BL3PR12MB6450.namprd12.prod.outlook.com (2603:10b6:208:3b9::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Thu, 22 Jun
- 2023 13:46:28 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%7]) with mapi id 15.20.6521.024; Thu, 22 Jun 2023
- 13:46:28 +0000
-Date:   Thu, 22 Jun 2023 10:46:25 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Cc:     linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, joro@8bytes.org, robin.murphy@arm.com,
-        yi.l.liu@intel.com, alex.williamson@redhat.com,
-        nicolinc@nvidia.com, baolu.lu@linux.intel.com,
-        eric.auger@redhat.com, pandoh@google.com, kumaranand@google.com,
-        jon.grimm@amd.com, santosh.shukla@amd.com, vasant.hegde@amd.com,
-        jay.chen@amd.com, joseph.chung@amd.com
-Subject: Re: [RFC PATCH 00/21] iommu/amd: Introduce support for HW
- accelerated vIOMMU w/ nested page table
-Message-ID: <ZJRQseaYkTJGHNsk@nvidia.com>
-References: <20230621235508.113949-1-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230621235508.113949-1-suravee.suthikulpanit@amd.com>
-X-ClientProxiedBy: YT4P288CA0013.CANP288.PROD.OUTLOOK.COM
- (2603:10b6:b01:d4::18) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S231377AbjFVOND (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jun 2023 10:13:03 -0400
+Received: from mail-ua1-x933.google.com (mail-ua1-x933.google.com [IPv6:2607:f8b0:4864:20::933])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00EEE10F6
+        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 07:13:01 -0700 (PDT)
+Received: by mail-ua1-x933.google.com with SMTP id a1e0cc1a2514c-791b8525b59so1189919241.1
+        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 07:13:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687443181; x=1690035181;
+        h=to:subject:message-id:date:from:sender:mime-version:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=znGg349Xo9TtHurkn031UR2KOdzyHK5vxKXGkG+tGZ0=;
+        b=kRWQfEeMXIg4iGoBcuXEPHaISfj5KEHhtIJDhV2uZkF4eHcvpXekCut5EEXlplg2fM
+         lfTgF3whFKJmR5uJBq5g9Y/o3i/I7o+lIGjZUsj9bnxVHIsfIvwaJ6dFcu1csQVhknBF
+         GtGc2AMe0XjdaUhrEAWELhWh3JeDVAxNC/ihFXm0boLk8XumAVfJdFgfqrv1N8H/lolH
+         QZI36BMS2GE6mpEu9jckabKwvr9vlNSr3+2BQa0gcLw/lfTSEWxyKiCw3sruYmTkRYpv
+         sYue3JICfMhVWcr/Kn9FTFaAkZFPrPMEgnjIYOzb1JhJ7QP6fzGUfaetLp1DZwHTUMoL
+         5ddA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687443181; x=1690035181;
+        h=to:subject:message-id:date:from:sender:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=znGg349Xo9TtHurkn031UR2KOdzyHK5vxKXGkG+tGZ0=;
+        b=H2y0PKW/TjQcqohUjGku7r5JnGUQGPykKElhsc7jkCAW+HBMtNCa7iqKKMGGyIahNp
+         9ImFrF4BwiV2bbvWFkXtm693WBMGzIr9XoSdJYc1oicjqp82EfUr7RujiFIhOqe4FOD8
+         V2OfphEjJ/mtuQrqzu+n567wyEV6BJC9jyP8xncqKFlszahXTqWvx1K5JVtqW6lSQVlI
+         QMSF+kT6X7EYGLjV+PevbZvjl/S/a6qEi/EzQKUIOi7Bb04zCpO4Vm+hQENfelUkx0Hb
+         s9f9kV/IbnqNJK3vi6RyS3k9LFk3KuBGYtfqvL2t1YHlAwNcdlHfRENGNTFTNI5jDedZ
+         b0Dw==
+X-Gm-Message-State: AC+VfDzL6zO3WROWl6urBh9WMxKyMI3aZ1IyVCcdgZlpDe14Bo4/yr43
+        6z3rWBM7a5ImxUox6YGjxrS/dba2/r7AjMgfgUw=
+X-Google-Smtp-Source: ACHHUZ5BHoKOTeiPAPe6J2DZlGR5OAGHzRNIWDjYkffqxFVXSl9qdjW6dvleIuJBjYueZmbww+Lw9N90yJido6b7bJ4=
+X-Received: by 2002:a67:ea8f:0:b0:440:cd2b:4787 with SMTP id
+ f15-20020a67ea8f000000b00440cd2b4787mr4526216vso.35.1687443180684; Thu, 22
+ Jun 2023 07:13:00 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL3PR12MB6450:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4fc184bf-acb1-4e6e-43e2-08db732713f9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ODDlvRaPUm0y7ZfslN/eRjjHgt8cmOHIutpwYt8FLYrCYuMsjEJqiE/ljg7NAsMOnGaSCP7FkpLBt2mvFnErf9p/77rz2ZGNQiV244Alks5DEkoMoxZL7Goo6pFu4t8MoQuKU2lgZ69DdU07ueBTXBj84bci5wH3MttKRfiy3S7wVpbij5VllRX2I7b4ki3B+gfTznJ/72ekh3SaKIStXVRU2/WSM9RIJ32lNMXR2g3EfrTtsKth5SWspiCllQS1dmfhegHdXZGvr56RRXPyfXTn+QUUYHtYdY5iJkvxUjxujUZAOpUlN/+M0zSy8kHVYkRH1k6I8fqsQMkncYq7r/vHL/YMKNPe1rNVQ6e7odrDzGjijUz3CCXvCaj9rPiVXvwWOhUA3NAcD2n3Sy0fBcTyh0cUcVsrPgts09H4pk7ELE2V0DFcZZjQCigA8B9M5enPn1ZR3u5V43ZFmx9isODWHbMX9EpRNkKe3ZuH9ouoz+9vKbpEcsLBb4CUML1N9dK8NByM3lebnHeK5H4Xrx9d0N6v77guKGVLn2uCc17VyHbPmTTlamZezOnP5hHf
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(39860400002)(366004)(136003)(346002)(451199021)(6486002)(478600001)(6666004)(6512007)(26005)(2906002)(66946007)(186003)(8676002)(66476007)(316002)(6916009)(4326008)(8936002)(5660300002)(66556008)(7416002)(41300700001)(38100700002)(6506007)(86362001)(36756003)(83380400001)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SHPcMxsKZRnAi3LRfvmIi1lGBkgLijW98bSFZk/Bd40oBhshWVhcLBXW92CN?=
- =?us-ascii?Q?4sd1Vv2mep+rfhB7OSYGKLX7w4C8IJdIIV4077bKpU+mHMb+D1qBo81TAuxn?=
- =?us-ascii?Q?XuEfHe6jQYEQ2oriuLAwoW4tyOUz8B7fRSEssF3AW5Z53eWp2xi0PiFnCuSA?=
- =?us-ascii?Q?2s6S9w0ysJhOg5lCB8LBeUypcMo3oF1YkcM3+oWOwJn/TzYWId27pADvP/YH?=
- =?us-ascii?Q?LPpNDjd6+Z9VYir9XEcTTyBvrIgT5Ao3btXfzGpp6khHAWx9FX/RLfNuO+7t?=
- =?us-ascii?Q?NMKM1v2E6MhA0iE/7m6FxygCXii/7gfcZYGuhfwXANNdysUA60gbu4IC4Kic?=
- =?us-ascii?Q?lxZjM7z0XxiYRWYH2AyHcjrPCfIob/ja6s5Wpnm1g8U8i0OVm+bWiBTCV6i/?=
- =?us-ascii?Q?eTtF4tTnKQKJGqFNaUPfQPKE0lZBgKA/PcLZy7skh5fWwwXs9Kan1tloUjmZ?=
- =?us-ascii?Q?clKjsGw9r3jT7uKJf9rtlH8iFu3x+J4gPMl5rPpe/O1VnneNvYs5tv3A9KsC?=
- =?us-ascii?Q?00mwjpZjR+Jw0dbJPA5377D4XLFlp3gaxXJiO1Q8vMtBiMq58kqT8tg7UWzC?=
- =?us-ascii?Q?B0VzlFujbQj0nXzLAsc/LpxX9Y5ji88uJFdv2+v7Oy4f09FiI0uqddDO7gUe?=
- =?us-ascii?Q?y3Afpzn+Vi9MjZ6fx4LruVd+tHlbOj/h7VhfVUtXgRYp4rOSCROu/fd6305d?=
- =?us-ascii?Q?doSnwcpA1XCQqAe/DSwdA3cRPzFxOdzKXFTvqOAgBV8J898JruuU2UhRhYOl?=
- =?us-ascii?Q?ecK6kBZH8JKRY4WvpHOWrEBBs/uzZJWp/N9J/kJq1Jesq//wdPOz5SdN8cvD?=
- =?us-ascii?Q?Fz5ZElXSsAGMQXDTjux1MqjqHDRrQjF86W21heHse6yz9WkojckJV9xFg9QN?=
- =?us-ascii?Q?S6b97JdxK11C1Dm4tq4BrwsXgH8wfl0YEvY6tF9kiJ4tvsDaAkpsJQgRgpDG?=
- =?us-ascii?Q?7mw7eM1lBL5rgAhPGEg4OZXXlG420RnMoczyRqHp6iFkos3U4qonUq4kLBbX?=
- =?us-ascii?Q?a1LB3FMM1hp3DPTtqPA5szu637s1dibuxrFHkB7oSQF57xc0JfPXuRBFKCnt?=
- =?us-ascii?Q?dkPmE2omVJjljLsSJshRTIglEdNk93tdRfxZiKVEDXK9mm61wXZ5G/nusg/Z?=
- =?us-ascii?Q?TSO7dJpycmCrVrnSg3TzQlreLL48QZ4SRZcnBdYN4l85h918e95s3GdYzezG?=
- =?us-ascii?Q?XmwqyPwgPCWVMDgzXMw/KOTr/nAjAxePfSIze+zL4yDUqcJ6bWILNTw6rEGG?=
- =?us-ascii?Q?pJODGhOFJzQmpjKhFEIUnDp+1tPsbJTl0RWjvdztVXE2FClkah9CngWem86H?=
- =?us-ascii?Q?oMo3+kd5c8nYKZ6bHXTCIRglSeqHKh6mLSgT7X4HswaP4uUr5Oh9KiVecGrD?=
- =?us-ascii?Q?o06NE6NwUpGcUP/wIgQra6iV7D7gUCHPoCRwl9EzOapY5dQ7XFx+DkgiX5wV?=
- =?us-ascii?Q?aBUODXcOu0Cg5z49xHmcQEUrj8JxwvmLNS5WE/KjAtGS1CCOpYlwMdY3dSv5?=
- =?us-ascii?Q?QjzIUV/dstoks1CVgR/Yp32tKF6BTG5E78xBP2f7zo1YIzCwHbaMfxSbcD6Y?=
- =?us-ascii?Q?D53kUVLqsSZ99xxg9MzAIqdg/5R5/Fn2TY65ILVH?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4fc184bf-acb1-4e6e-43e2-08db732713f9
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2023 13:46:28.4062
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LIWiboctYfS3E3Zte1fcWAZXCVg1xVDmnCXMyoMR7ZbSmATzR9moNuAtXyOseh/+
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6450
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Sender: moonleepark07@gmail.com
+Received: by 2002:a59:b3a2:0:b0:3da:4546:c65c with HTTP; Thu, 22 Jun 2023
+ 07:13:00 -0700 (PDT)
+From:   Aisha Algaddafi <algaddafiaisha247@gmail.com>
+Date:   Thu, 22 Jun 2023 15:13:00 +0100
+X-Google-Sender-Auth: EKgiq0zkKZIsispvQcO06XnOqv8
+Message-ID: <CAMgr=-pX4qt9Zt-nGD+o6YsRd9UZXUTO8ZV=WB2nDc8v2FuX6g@mail.gmail.com>
+Subject: GREETINGS MY BELOVED ONE.
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: Yes, score=5.7 required=5.0 tests=BAYES_60,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORM_FRAUD_5,
+        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,LOTS_OF_MONEY,
+        MONEY_FORM_SHORT,MONEY_FRAUD_5,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,SUBJ_ALL_CAPS,T_FILL_THIS_FORM_SHORT,T_SCC_BODY_TEXT_LINE,
+        UNDISC_MONEY,URG_BIZ autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: *  1.5 BAYES_60 BODY: Bayes spam probability is 60 to 80%
+        *      [score: 0.6329]
+        * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2607:f8b0:4864:20:0:0:0:933 listed in]
+        [list.dnswl.org]
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [moonleepark07[at]gmail.com]
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.5 SUBJ_ALL_CAPS Subject is all capitals
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
+        *       in digit
+        *      [moonleepark07[at]gmail.com]
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        *  0.0 LOTS_OF_MONEY Huge... sums of money
+        *  0.6 URG_BIZ Contains urgent matter
+        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
+        *  0.0 T_FILL_THIS_FORM_SHORT Fill in a short form with personal
+        *      information
+        *  0.0 MONEY_FORM_SHORT Lots of money if you fill out a short form
+        *  3.1 UNDISC_MONEY Undisclosed recipients + money/fraud signs
+        *  0.0 MONEY_FRAUD_5 Lots of money and many fraud phrases
+        *  0.0 FORM_FRAUD_5 Fill a form and many fraud phrases
+X-Spam-Level: *****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 21, 2023 at 06:54:47PM -0500, Suravee Suthikulpanit wrote:
+Please Permits me to use this medium to open a mutual conversations  with you
+seeking for your acceptance towards investing in your country under your
+management as my partner,
 
-> Since the IOMMU hardware virtualizes the guest command buffer, this allows
-> IOMMU operations to be accelerated such as invalidation of guest pages
-> (i.e. stage1) when the command is issued by the guest kernel without
-> intervention from the hypervisor.
+My name is Aisha  Gaddaf and currently living in Omani, i am a Widow and
+single Mother with three Children, the only biological Daughter of late
+Libyan President (Late Colonel Muammar Gaddafi) and presently i am under
+political asylum protection by the Omani Government.
 
-This is similar to what we are doing on ARM as well.
- 
-> This series is implemented on top of the IOMMUFD framework. It leverages
-> the exisiting APIs and ioctls for providing guest iommu information
-> (i.e. struct iommu_hw_info_amd), and allowing guest to provide guest page
-> table information (i.e. struct iommu_hwpt_amd_v2) for setting up user
-> domain.
-> 
-> Please see the [4],[5], and [6] for more detail on the AMD HW-vIOMMU.
-> 
-> NOTES
-> -----
-> This series is organized into two parts:
->   * Part1: Preparing IOMMU driver for HW-vIOMMU support (Patch 1-8).
-> 
->   * Part2: Introducing HW-vIOMMU support (Patch 9-21).
-> 
->   * Patch 12 and 21 extends the existing IOMMUFD ioctls to support
->     additional opterations, which can be categorized into:
->     - Ioctls to init/destroy AMD HW-vIOMMU instance
->     - Ioctls to attach/detach guest devices to the AMD HW-vIOMMU instance.
->     - Ioctls to attach/detach guest domains to the AMD HW-vIOMMU instance.
->     - Ioctls to trap certain AMD HW-vIOMMU MMIO register accesses.
->     - Ioctls to trap AMD HW-vIOMMU command buffer initialization.
+I have funds worth " [ $7.500.000.00 US Dollars ] which I want to entrust
+to you for investment projects in your country.
+If you are willing to handle this project on my behalf, kindly
+reply urgent to enable me provide you more details to start the transfer
+process, I shall appreciate your urgent response through my private email
+address below:
 
-No one else seems to need this kind of stuff, why is AMD different?
+algaddafiaisha247@gmail.com
 
-Emulation and mediation to create the vIOMMU is supposed to be in the
-VMM side, not in the kernel. I don't want to see different models by
-vendor.
-
-Even stuff like setting up the gcr3 should not be it's own ioctls,
-that is now how we are modeling things at all.
-
-I think you need to take smaller steps in line with the other
-drivers so we can all progress through this step by step together.
-
-To start focus only on user space page tables and kernel mediated
-invalidation and fit into the same model as everyone else. This is
-approx the same patches and uAPI you see for ARM and Intel. AFAICT
-AMD's HW is very similar to ARM's, so you should be aligning to the
-ARM design.
-
-Then maybe we can argue if a kernel vIOMMU emulation/mediation is
-appropriate or not, but this series is just too much as is.
-
-I also want to see the AMD driver align with the new APIs for
-PASID/etc before we start shovling more stuff into it. This is going
-to be part of the iommufd contract as well, I'm very unhappy to see
-drivers pick and choosing what part of the contract they implement.
-
-Regards,
-Jason
+Thanks
+Yours Truly
+Aisha Gaddafi
