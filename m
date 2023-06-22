@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0C8273AD03
-	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 01:17:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 300D473AD29
+	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 01:25:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231571AbjFVXQ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jun 2023 19:16:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44048 "EHLO
+        id S231889AbjFVXZT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jun 2023 19:25:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229564AbjFVXQ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jun 2023 19:16:57 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0251739;
-        Thu, 22 Jun 2023 16:16:52 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1b55bc0c907so43790605ad.0;
-        Thu, 22 Jun 2023 16:16:52 -0700 (PDT)
+        with ESMTP id S230308AbjFVXZR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jun 2023 19:25:17 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF5541739;
+        Thu, 22 Jun 2023 16:25:15 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-553a1f13d9fso104057a12.1;
+        Thu, 22 Jun 2023 16:25:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687475811; x=1690067811;
+        d=gmail.com; s=20221208; t=1687476315; x=1690068315;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Pz0qQ59gTITsK6v/Fx5sanYdNWIwSFtFYWBZghPoW8=;
-        b=nlqpR03CsJHzvGZ7Q4hevMWi5IXecV9nOK/EDGgBfjvtHV8KdO5wzkvCidUXkffIQJ
-         wm5ZTAcJghbW1UPsY5zr39sWlWoep4EEraok8cW1kAJ/LgRIWzlVMupSL24bRouFLc/F
-         c250AkU8a9mzl8wkFsm6kOKvwOc3Yoe1+8hKQbG+TFEODKciS2ZBEeIU0peanf8JMyLQ
-         B5/OESGqxPRemZhpI0mPyVkKwnc7vxyFYcWpVtqFY9UEH9cnWAgYUGvsIzREU+WGl6Ss
-         B9DVzRPoDDXtHhGUBrvE3p0e3VQa4K+FwJD5+AcbB5A3lYL2nij5hzLI2hcFkd89oEIe
-         Npxw==
+        bh=4D8Wxa6Yt64GiHr2W4uB9oohHtFtapWP542Q1YdMlNU=;
+        b=KrVfUthrwBRNP2v6L7FrWE2Na6b2zZHxO0Y6MYyNHH82dT2WgpSReylCf3Qrm/1/kS
+         iCecqCG2Mewtg4wEiOgNdj6CtHa8VacSQp2vHzWj/mJ8kyxx11fA99eclT8a8BZBkQGI
+         K/3RT4q02wpDjSNk+RAHY1X1TMIlbmDyuP9Xk3IFybe9hxIFU2lH2N4hfKhbuOuD6fJL
+         KbXbFglPsdl1T1EgdADx8CBg7n4vjraJ1UZ5gDVwTrHQ8Ju6eu/JgXbAcjdmhZLRdwa2
+         JRDxiVU05A6uhE6Duulcjg/Eg4yu1a9EDYaXqC7NowxLLDHv17V/UNRsagtfHnXv9OTp
+         AlDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687475811; x=1690067811;
+        d=1e100.net; s=20221208; t=1687476315; x=1690068315;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3Pz0qQ59gTITsK6v/Fx5sanYdNWIwSFtFYWBZghPoW8=;
-        b=OL1Qhy7fwu2MG51YHZhoJPK7+nRG4QZCK5ShMqyrGRDwFoHk5oyRV9SycCx+d5oveN
-         EqWrPsOsBB76giBsyd8pxstQjUKlpHk/n6kjkk9gMHaN5mSntRIPSHiRbhPpfxc2staP
-         lsebNYc6hZriKT/bJPSyGlLBO8fZrvUYyYmlONdFYjU0fORLFOjr2bcUFQUQhdcH05Bo
-         T5wOIlpuRPsqDJB7E4SzvhkvpNGctz1+IZJcEeNRaDFChGLNAuTOxFeaqZsOfsyzdNRC
-         B9bbNr0cUvvFibrhOKI0egafDFEHXpxFIjicoWw51dq/pxvMvINA+Hk7lq5K2PRolVjb
-         tLWA==
-X-Gm-Message-State: AC+VfDz3YXmEiRxKVVa+rcYjcuwFTVEjigNKUAgeDRAB24xS8vg0NENF
-        JQZWaeN6/dQ0YmlSsQnrzvY=
-X-Google-Smtp-Source: ACHHUZ7gwUu/Yv+IF2sICMk+380WUL8bpEkES3EUSlSaVOZ+LF4TsT37NR68BOzHVFqxPuQzFJtU2g==
-X-Received: by 2002:a17:902:c40c:b0:1b5:3aed:b078 with SMTP id k12-20020a170902c40c00b001b53aedb078mr25374634plk.53.1687475811013;
-        Thu, 22 Jun 2023 16:16:51 -0700 (PDT)
+        bh=4D8Wxa6Yt64GiHr2W4uB9oohHtFtapWP542Q1YdMlNU=;
+        b=NXsXWHTijvD52hkNaz4MMbtGn8XMbcHRBkkeMp9onHo/CZlRE+Mgdehx8zKrCZb1SZ
+         NJRW5jwH/AU9Kb8gvGmYqEjmKzpZAyEFGgur4Q9p1Fz2jwYLjY8gck09xTr3OiafN6Pt
+         OaqirXIhgpsV0/TKVv0tHZBbaajE1RvwzWsDgSi9aOZgBdxqIOOCvOt2RZDVkfxrYiZX
+         Wt/A7ckyOQet+IdkBKigqrJgpjtnuPzqgbazMSabVKNRQpPEN3nqn9gne9SvFVVmn9Fl
+         HoUH4ceZ64r62D1hcMD5Hnqf2GBzcOyHs/B+AGP7uZpzh0A8cDzGLKgX/XNSI+U/TXVi
+         jHyg==
+X-Gm-Message-State: AC+VfDxcIHnE9XzKz982RyWXQHPfik860Z8uuT3Oc97dWDGFjpXmLljP
+        kE6g8PXGlDditeuxVTvXXZ4=
+X-Google-Smtp-Source: ACHHUZ7HmToXZ2F2Rc522CpPi3lqWvEnNPqZ1c8BVln9i9NNPM5ipKj9k6peealW73Un4J5n37xUbA==
+X-Received: by 2002:a05:6a20:442a:b0:110:6146:1056 with SMTP id ce42-20020a056a20442a00b0011061461056mr28639410pzb.2.1687476315023;
+        Thu, 22 Jun 2023 16:25:15 -0700 (PDT)
 Received: from localhost (ec2-54-67-115-33.us-west-1.compute.amazonaws.com. [54.67.115.33])
-        by smtp.gmail.com with ESMTPSA id p2-20020a170902eac200b001aae64e9b36sm5882168pld.114.2023.06.22.16.16.50
+        by smtp.gmail.com with ESMTPSA id h19-20020a62b413000000b006687b41c4dasm4970707pfn.110.2023.06.22.16.25.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 16:16:50 -0700 (PDT)
-Date:   Thu, 22 Jun 2023 23:16:49 +0000
+        Thu, 22 Jun 2023 16:25:14 -0700 (PDT)
+Date:   Thu, 22 Jun 2023 23:25:13 +0000
 From:   Bobby Eshleman <bobbyeshleman@gmail.com>
 To:     Arseniy Krasnov <oxffffaa@gmail.com>
 Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
@@ -71,16 +71,17 @@ Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
         Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        bpf@vger.kernel.org, Jiang Wang <jiang.wang@bytedance.com>
-Subject: Re: [PATCH RFC net-next v4 8/8] tests: add vsock dgram tests
-Message-ID: <ZJTWYRGd95xl+yRE@bullseye>
+        bpf@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v4 1/8] vsock/dgram: generalize recvmsg and
+ drop transport->dgram_dequeue
+Message-ID: <ZJTYWaAnMpcjeG3L@bullseye>
 References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
- <20230413-b4-vsock-dgram-v4-8-0cebbb2ae899@bytedance.com>
- <484c7b6f-5ce5-ce43-2dfd-0ae3063f1e47@gmail.com>
+ <20230413-b4-vsock-dgram-v4-1-0cebbb2ae899@bytedance.com>
+ <3eb6216b-a3d2-e1ef-270c-8a0032a4a8a5@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <484c7b6f-5ce5-ce43-2dfd-0ae3063f1e47@gmail.com>
+In-Reply-To: <3eb6216b-a3d2-e1ef-270c-8a0032a4a8a5@gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -91,762 +92,388 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 11, 2023 at 11:54:57PM +0300, Arseniy Krasnov wrote:
-> Hello Bobby!
+On Sun, Jun 11, 2023 at 11:43:15PM +0300, Arseniy Krasnov wrote:
+> Hello Bobby! Thanks for this patchset! Small comment below:
 > 
-> Sorry, may be I become a little bit annoying:), but I tried to run vsock_test with
-> this v4 version, and again get the same crash:
+> On 10.06.2023 03:58, Bobby Eshleman wrote:
+> > This commit drops the transport->dgram_dequeue callback and makes
+> > vsock_dgram_recvmsg() generic. It also adds additional transport
+> > callbacks for use by the generic vsock_dgram_recvmsg(), such as for
+> > parsing skbs for CID/port which vary in format per transport.
+> > 
+> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> > ---
+> >  drivers/vhost/vsock.c                   |  4 +-
+> >  include/linux/virtio_vsock.h            |  3 ++
+> >  include/net/af_vsock.h                  | 13 ++++++-
+> >  net/vmw_vsock/af_vsock.c                | 51 ++++++++++++++++++++++++-
+> >  net/vmw_vsock/hyperv_transport.c        | 17 +++++++--
+> >  net/vmw_vsock/virtio_transport.c        |  4 +-
+> >  net/vmw_vsock/virtio_transport_common.c | 18 +++++++++
+> >  net/vmw_vsock/vmci_transport.c          | 68 +++++++++++++--------------------
+> >  net/vmw_vsock/vsock_loopback.c          |  4 +-
+> >  9 files changed, 132 insertions(+), 50 deletions(-)
+> > 
+> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > index 6578db78f0ae..c8201c070b4b 100644
+> > --- a/drivers/vhost/vsock.c
+> > +++ b/drivers/vhost/vsock.c
+> > @@ -410,9 +410,11 @@ static struct virtio_transport vhost_transport = {
+> >  		.cancel_pkt               = vhost_transport_cancel_pkt,
+> >  
+> >  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+> > -		.dgram_dequeue            = virtio_transport_dgram_dequeue,
+> >  		.dgram_bind               = virtio_transport_dgram_bind,
+> >  		.dgram_allow              = virtio_transport_dgram_allow,
+> > +		.dgram_get_cid		  = virtio_transport_dgram_get_cid,
+> > +		.dgram_get_port		  = virtio_transport_dgram_get_port,
+> > +		.dgram_get_length	  = virtio_transport_dgram_get_length,
+> >  
+> >  		.stream_enqueue           = virtio_transport_stream_enqueue,
+> >  		.stream_dequeue           = virtio_transport_stream_dequeue,
+> > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> > index c58453699ee9..23521a318cf0 100644
+> > --- a/include/linux/virtio_vsock.h
+> > +++ b/include/linux/virtio_vsock.h
+> > @@ -219,6 +219,9 @@ bool virtio_transport_stream_allow(u32 cid, u32 port);
+> >  int virtio_transport_dgram_bind(struct vsock_sock *vsk,
+> >  				struct sockaddr_vm *addr);
+> >  bool virtio_transport_dgram_allow(u32 cid, u32 port);
+> > +int virtio_transport_dgram_get_cid(struct sk_buff *skb, unsigned int *cid);
+> > +int virtio_transport_dgram_get_port(struct sk_buff *skb, unsigned int *port);
+> > +int virtio_transport_dgram_get_length(struct sk_buff *skb, size_t *len);
+> >  
+> >  int virtio_transport_connect(struct vsock_sock *vsk);
+> >  
+> > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> > index 0e7504a42925..7bedb9ee7e3e 100644
+> > --- a/include/net/af_vsock.h
+> > +++ b/include/net/af_vsock.h
+> > @@ -120,11 +120,20 @@ struct vsock_transport {
+> >  
+> >  	/* DGRAM. */
+> >  	int (*dgram_bind)(struct vsock_sock *, struct sockaddr_vm *);
+> > -	int (*dgram_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
+> > -			     size_t len, int flags);
+> >  	int (*dgram_enqueue)(struct vsock_sock *, struct sockaddr_vm *,
+> >  			     struct msghdr *, size_t len);
+> >  	bool (*dgram_allow)(u32 cid, u32 port);
+> > +	int (*dgram_get_cid)(struct sk_buff *skb, unsigned int *cid);
+> > +	int (*dgram_get_port)(struct sk_buff *skb, unsigned int *port);
+> > +	int (*dgram_get_length)(struct sk_buff *skb, size_t *length);
+> > +
+> > +	/* The number of bytes into the buffer at which the payload starts, as
+> > +	 * first seen by the receiving socket layer. For example, if the
+> > +	 * transport presets the skb pointers using skb_pull(sizeof(header))
+> > +	 * than this would be zero, otherwise it would be the size of the
+> > +	 * header.
+> > +	 */
+> > +	const size_t dgram_payload_offset;
+> >  
+> >  	/* STREAM. */
+> >  	/* TODO: stream_bind() */
+> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > index efb8a0937a13..ffb4dd8b6ea7 100644
+> > --- a/net/vmw_vsock/af_vsock.c
+> > +++ b/net/vmw_vsock/af_vsock.c
+> > @@ -1271,11 +1271,15 @@ static int vsock_dgram_connect(struct socket *sock,
+> >  int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+> >  			size_t len, int flags)
+> >  {
+> > +	const struct vsock_transport *transport;
+> >  #ifdef CONFIG_BPF_SYSCALL
+> >  	const struct proto *prot;
+> >  #endif
+> >  	struct vsock_sock *vsk;
+> > +	struct sk_buff *skb;
+> > +	size_t payload_len;
+> >  	struct sock *sk;
+> > +	int err;
+> >  
+> >  	sk = sock->sk;
+> >  	vsk = vsock_sk(sk);
+> > @@ -1286,7 +1290,52 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+> >  		return prot->recvmsg(sk, msg, len, flags, NULL);
+> >  #endif
+> >  
+> > -	return vsk->transport->dgram_dequeue(vsk, msg, len, flags);
+> > +	if (flags & MSG_OOB || flags & MSG_ERRQUEUE)
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	transport = vsk->transport;
+> > +
+> > +	/* Retrieve the head sk_buff from the socket's receive queue. */
+> > +	err = 0;
+> > +	skb = skb_recv_datagram(sk_vsock(vsk), flags, &err);
+> > +	if (!skb)
+> > +		return err;
+> > +
+> > +	err = transport->dgram_get_length(skb, &payload_len);
+> > +	if (err)
+> > +		goto out;
+> > +
+> > +	if (payload_len > len) {
+> > +		payload_len = len;
+> > +		msg->msg_flags |= MSG_TRUNC;
+> > +	}
+> > +
+> > +	/* Place the datagram payload in the user's iovec. */
+> > +	err = skb_copy_datagram_msg(skb, transport->dgram_payload_offset, msg, payload_len);
+> > +	if (err)
+> > +		goto out;
+> > +
+> > +	if (msg->msg_name) {
+> > +		/* Provide the address of the sender. */
+> > +		DECLARE_SOCKADDR(struct sockaddr_vm *, vm_addr, msg->msg_name);
+> > +		unsigned int cid, port;
+> > +
+> > +		err = transport->dgram_get_cid(skb, &cid);
+> > +		if (err)
+> > +			goto out;
+> > +
+> > +		err = transport->dgram_get_port(skb, &port);
+> > +		if (err)
+> > +			goto out;
+> 
+> Maybe we can merge 'dgram_get_cid' and 'dgram_get_port' to a single callback? Because I see that this is
+> the only place where both are used (correct me if i'm wrong) and logically both operates with addresses:
+> CID and port. E.g. something like that: dgram_get_cid_n_port().
 
-Haha not annoying at all. I appreciate the testing!
+I like this idea.
 
 > 
-> # cat client.sh 
-> ./vsock_test  --mode=client --control-host=192.168.1.1 --control-port=12345 --peer-cid=2
-> # ./client.sh 
-> Control socket connected to 192.168.1.1:12345.
-> 0 - SOCK_STREAM connection reset...[   20.065237] BUG: kernel NULL pointer dereference, addre0
-> [   20.065895] #PF: supervisor read access in kernel mode
-> [   20.065895] #PF: error_code(0x0000) - not-present page
-> [   20.065895] PGD 0 P4D 0 
-> [   20.065895] Oops: 0000 [#1] PREEMPT SMP PTI
-> [   20.065895] CPU: 0 PID: 111 Comm: vsock_test Not tainted 6.4.0-rc3-gefcccba07069 #385
-> [   20.065895] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd44
-> [   20.065895] RIP: 0010:static_key_count+0x0/0x20
-> [   20.065895] Code: 04 4c 8b 46 08 49 29 c0 4c 01 c8 4c 89 47 08 89 0e 89 56 04 48 89 46 08 f
-> [   20.065895] RSP: 0018:ffffbbb000223dc0 EFLAGS: 00010202
-> [   20.065895] RAX: ffffffff85709880 RBX: ffffffffc0079140 RCX: 0000000000000000
-> [   20.065895] RDX: ffff9f73c2175700 RSI: 0000000000000000 RDI: 0000000000000000
-> [   20.065895] RBP: ffff9f73c2385900 R08: ffffbbb000223d30 R09: ffff9f73ff896000
-> [   20.065895] R10: 0000000000001000 R11: 0000000000000000 R12: ffffbbb000223e80
-> [   20.065895] R13: 0000000000000000 R14: 0000000000000002 R15: ffff9f73c1cfaa80
-> [   20.065895] FS:  00007f1ad82f55c0(0000) GS:ffff9f73fe400000(0000) knlGS:0000000000000000
-> [   20.065895] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   20.065895] CR2: 0000000000000000 CR3: 000000003f954000 CR4: 00000000000006f0
-> [   20.065895] Call Trace:
-> [   20.065895]  <TASK>
-> [   20.065895]  once_deferred+0xd/0x30
-> [   20.065895]  vsock_assign_transport+0x9a/0x1b0 [vsock]
-> [   20.065895]  vsock_connect+0xb4/0x3a0 [vsock]
-> [   20.065895]  ? var_wake_function+0x60/0x60
-> [   20.065895]  __sys_connect+0x9e/0xd0
-> [   20.065895]  ? _raw_spin_unlock_irq+0xe/0x30
-> [   20.065895]  ? do_setitimer+0x128/0x1f0
-> [   20.065895]  ? alarm_setitimer+0x4c/0x90
-> [   20.065895]  ? fpregs_assert_state_consistent+0x1d/0x50
-> [   20.065895]  ? exit_to_user_mode_prepare+0x36/0x130
-> [   20.065895]  __x64_sys_connect+0x11/0x20
-> [   20.065895]  do_syscall_64+0x3b/0xc0
-> [   20.065895]  entry_SYSCALL_64_after_hwframe+0x4b/0xb5
-> [   20.065895] RIP: 0033:0x7f1ad822dd13
-> [   20.065895] Code: 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 64 8
-> [   20.065895] RSP: 002b:00007ffc513e3c98 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-> [   20.065895] RAX: ffffffffffffffda RBX: 000055aed298e020 RCX: 00007f1ad822dd13
-> [   20.065895] RDX: 0000000000000010 RSI: 00007ffc513e3cb0 RDI: 0000000000000004
-> [   20.065895] RBP: 0000000000000004 R08: 000055aed32b2018 R09: 0000000000000000
-> [   20.065895] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> [   20.065895] R13: 000055aed298acb1 R14: 00007ffc513e3cb0 R15: 00007ffc513e3d40
-> [   20.065895]  </TASK>
-> [   20.065895] Modules linked in: vsock_loopback vhost_vsock vmw_vsock_virtio_transport vmw_vb
-
-^ I'm guessing this is the difference between our setups. I have been
-going all built-in, let me see if I can reproduce w/ modules...
-
-> [   20.065895] CR2: 0000000000000000
-> [   20.154060] ---[ end trace 0000000000000000 ]---
-> [   20.155519] RIP: 0010:static_key_count+0x0/0x20
-> [   20.156932] Code: 04 4c 8b 46 08 49 29 c0 4c 01 c8 4c 89 47 08 89 0e 89 56 04 48 89 46 08 f
-> [   20.161367] RSP: 0018:ffffbbb000223dc0 EFLAGS: 00010202
-> [   20.162613] RAX: ffffffff85709880 RBX: ffffffffc0079140 RCX: 0000000000000000
-> [   20.164262] RDX: ffff9f73c2175700 RSI: 0000000000000000 RDI: 0000000000000000
-> [   20.165934] RBP: ffff9f73c2385900 R08: ffffbbb000223d30 R09: ffff9f73ff896000
-> [   20.167684] R10: 0000000000001000 R11: 0000000000000000 R12: ffffbbb000223e80
-> [   20.169427] R13: 0000000000000000 R14: 0000000000000002 R15: ffff9f73c1cfaa80
-> [   20.171109] FS:  00007f1ad82f55c0(0000) GS:ffff9f73fe400000(0000) knlGS:0000000000000000
-> [   20.173000] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   20.174381] CR2: 0000000000000000 CR3: 000000003f954000 CR4: 00000000000006f0
+> Moreover, I'm not sure, but is it good "tradeoff" here: remove transport specific callback for dgram receive
+> where we already have 'msghdr' with both data buffer and buffer for 'sockaddr_vm' and instead of it add new
+> several fields (callbacks) to transports like dgram_get_cid(), dgram_get_port()? I agree, that in each transport
+> specific callback we will have same copying logic by calling 'skb_copy_datagram_msg()' and filling address
+> by using 'vsock_addr_init()', but in this case we don't need to update transports too much. For example HyperV
+> still unchanged as it does not support SOCK_DGRAM. For VMCI You just need to add 'vsock_addr_init()' logic
+> to it's dgram dequeue callback.
 > 
-> So, what HEAD do You use? May be You have some specific config (I use x86-64 defconfig + vsock/vhost
-> related things) ?
+> What do You think?
 > 
-
-For this series I used net-next:
-	28cfea989d6f55c3d10608eba2a2bae609c5bf3e
-
 > Thanks, Arseniy
 > 
 
-As always, thanks for the bug finding! I'll report back when I
-reproduce or with questions if I can't.
+I tend to agree with your point here that adding this many callbacks is
+not the big win in complexity reduction that we're hoping for.
+
+I also agree with Stefano's assessment that having two near identical
+implementations is not good either.
+
+Hopefully having one simpler callback will bring the best of both
+worlds?
 
 Best,
 Bobby
 
-> 
-> On 10.06.2023 03:58, Bobby Eshleman wrote:
-> > From: Jiang Wang <jiang.wang@bytedance.com>
-> > 
-> > This patch adds tests for vsock datagram.
-> > 
-> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> > Signed-off-by: Jiang Wang <jiang.wang@bytedance.com>
-> > ---
-> >  tools/testing/vsock/util.c       | 141 ++++++++++++-
-> >  tools/testing/vsock/util.h       |   6 +
-> >  tools/testing/vsock/vsock_test.c | 432 +++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 578 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-> > index 01b636d3039a..811e70d7cf1e 100644
-> > --- a/tools/testing/vsock/util.c
-> > +++ b/tools/testing/vsock/util.c
-> > @@ -99,7 +99,8 @@ static int vsock_connect(unsigned int cid, unsigned int port, int type)
-> >  	int ret;
-> >  	int fd;
+> > +
+> > +		vsock_addr_init(vm_addr, cid, port);
+> > +		msg->msg_namelen = sizeof(*vm_addr);
+> > +	}
+> > +	err = payload_len;
+> > +
+> > +out:
+> > +	skb_free_datagram(&vsk->sk, skb);
+> > +	return err;
+> >  }
+> >  EXPORT_SYMBOL_GPL(vsock_dgram_recvmsg);
 > >  
-> > -	control_expectln("LISTENING");
-> > +	if (type != SOCK_DGRAM)
-> > +		control_expectln("LISTENING");
-> >  
-> >  	fd = socket(AF_VSOCK, type, 0);
-> >  
-> > @@ -130,6 +131,11 @@ int vsock_seqpacket_connect(unsigned int cid, unsigned int port)
-> >  	return vsock_connect(cid, port, SOCK_SEQPACKET);
+> > diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+> > index 7cb1a9d2cdb4..ff6e87e25fa0 100644
+> > --- a/net/vmw_vsock/hyperv_transport.c
+> > +++ b/net/vmw_vsock/hyperv_transport.c
+> > @@ -556,8 +556,17 @@ static int hvs_dgram_bind(struct vsock_sock *vsk, struct sockaddr_vm *addr)
+> >  	return -EOPNOTSUPP;
 > >  }
 > >  
-> > +int vsock_dgram_connect(unsigned int cid, unsigned int port)
+> > -static int hvs_dgram_dequeue(struct vsock_sock *vsk, struct msghdr *msg,
+> > -			     size_t len, int flags)
+> > +static int hvs_dgram_get_cid(struct sk_buff *skb, unsigned int *cid)
 > > +{
-> > +	return vsock_connect(cid, port, SOCK_DGRAM);
+> > +	return -EOPNOTSUPP;
 > > +}
 > > +
-> >  /* Listen on <cid, port> and return the first incoming connection.  The remote
-> >   * address is stored to clientaddrp.  clientaddrp may be NULL.
-> >   */
-> > @@ -211,6 +217,34 @@ int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
-> >  	return vsock_accept(cid, port, clientaddrp, SOCK_SEQPACKET);
+> > +static int hvs_dgram_get_port(struct sk_buff *skb, unsigned int *port)
+> > +{
+> > +	return -EOPNOTSUPP;
+> > +}
+> > +
+> > +static int hvs_dgram_get_length(struct sk_buff *skb, size_t *len)
+> >  {
+> >  	return -EOPNOTSUPP;
+> >  }
+> > @@ -833,7 +842,9 @@ static struct vsock_transport hvs_transport = {
+> >  	.shutdown                 = hvs_shutdown,
+> >  
+> >  	.dgram_bind               = hvs_dgram_bind,
+> > -	.dgram_dequeue            = hvs_dgram_dequeue,
+> > +	.dgram_get_cid		  = hvs_dgram_get_cid,
+> > +	.dgram_get_port		  = hvs_dgram_get_port,
+> > +	.dgram_get_length	  = hvs_dgram_get_length,
+> >  	.dgram_enqueue            = hvs_dgram_enqueue,
+> >  	.dgram_allow              = hvs_dgram_allow,
+> >  
+> > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> > index e95df847176b..5763cdf13804 100644
+> > --- a/net/vmw_vsock/virtio_transport.c
+> > +++ b/net/vmw_vsock/virtio_transport.c
+> > @@ -429,9 +429,11 @@ static struct virtio_transport virtio_transport = {
+> >  		.cancel_pkt               = virtio_transport_cancel_pkt,
+> >  
+> >  		.dgram_bind               = virtio_transport_dgram_bind,
+> > -		.dgram_dequeue            = virtio_transport_dgram_dequeue,
+> >  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+> >  		.dgram_allow              = virtio_transport_dgram_allow,
+> > +		.dgram_get_cid		  = virtio_transport_dgram_get_cid,
+> > +		.dgram_get_port		  = virtio_transport_dgram_get_port,
+> > +		.dgram_get_length	  = virtio_transport_dgram_get_length,
+> >  
+> >  		.stream_dequeue           = virtio_transport_stream_dequeue,
+> >  		.stream_enqueue           = virtio_transport_stream_enqueue,
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index b769fc258931..e6903c719964 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -797,6 +797,24 @@ int virtio_transport_dgram_bind(struct vsock_sock *vsk,
+> >  }
+> >  EXPORT_SYMBOL_GPL(virtio_transport_dgram_bind);
+> >  
+> > +int virtio_transport_dgram_get_cid(struct sk_buff *skb, unsigned int *cid)
+> > +{
+> > +	return -EOPNOTSUPP;
+> > +}
+> > +EXPORT_SYMBOL_GPL(virtio_transport_dgram_get_cid);
+> > +
+> > +int virtio_transport_dgram_get_port(struct sk_buff *skb, unsigned int *port)
+> > +{
+> > +	return -EOPNOTSUPP;
+> > +}
+> > +EXPORT_SYMBOL_GPL(virtio_transport_dgram_get_port);
+> > +
+> > +int virtio_transport_dgram_get_length(struct sk_buff *skb, size_t *len)
+> > +{
+> > +	return -EOPNOTSUPP;
+> > +}
+> > +EXPORT_SYMBOL_GPL(virtio_transport_dgram_get_length);
+> > +
+> >  bool virtio_transport_dgram_allow(u32 cid, u32 port)
+> >  {
+> >  	return false;
+> > diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+> > index b370070194fa..bbc63826bf48 100644
+> > --- a/net/vmw_vsock/vmci_transport.c
+> > +++ b/net/vmw_vsock/vmci_transport.c
+> > @@ -1731,57 +1731,40 @@ static int vmci_transport_dgram_enqueue(
+> >  	return err - sizeof(*dg);
 > >  }
 > >  
-> > +int vsock_dgram_bind(unsigned int cid, unsigned int port)
-> > +{
-> > +	union {
-> > +		struct sockaddr sa;
-> > +		struct sockaddr_vm svm;
-> > +	} addr = {
-> > +		.svm = {
-> > +			.svm_family = AF_VSOCK,
-> > +			.svm_port = port,
-> > +			.svm_cid = cid,
-> > +		},
-> > +	};
-> > +	int fd;
-> > +
-> > +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
-> > +	if (fd < 0) {
-> > +		perror("socket");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
-> > +		perror("bind");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	return fd;
+> > -static int vmci_transport_dgram_dequeue(struct vsock_sock *vsk,
+> > -					struct msghdr *msg, size_t len,
+> > -					int flags)
+> > +static int vmci_transport_dgram_get_cid(struct sk_buff *skb, unsigned int *cid)
+> >  {
+> > -	int err;
+> >  	struct vmci_datagram *dg;
+> > -	size_t payload_len;
+> > -	struct sk_buff *skb;
+> >  
+> > -	if (flags & MSG_OOB || flags & MSG_ERRQUEUE)
+> > -		return -EOPNOTSUPP;
+> > +	dg = (struct vmci_datagram *)skb->data;
+> > +	if (!dg)
+> > +		return -EINVAL;
+> >  
+> > -	/* Retrieve the head sk_buff from the socket's receive queue. */
+> > -	err = 0;
+> > -	skb = skb_recv_datagram(&vsk->sk, flags, &err);
+> > -	if (!skb)
+> > -		return err;
+> > +	*cid = dg->src.context;
+> > +	return 0;
 > > +}
 > > +
-> >  /* Transmit one byte and check the return value.
-> >   *
-> >   * expected_ret:
-> > @@ -260,6 +294,57 @@ void send_byte(int fd, int expected_ret, int flags)
-> >  	}
+> > +static int vmci_transport_dgram_get_port(struct sk_buff *skb, unsigned int *port)
+> > +{
+> > +	struct vmci_datagram *dg;
+> >  
+> >  	dg = (struct vmci_datagram *)skb->data;
+> >  	if (!dg)
+> > -		/* err is 0, meaning we read zero bytes. */
+> > -		goto out;
+> > -
+> > -	payload_len = dg->payload_size;
+> > -	/* Ensure the sk_buff matches the payload size claimed in the packet. */
+> > -	if (payload_len != skb->len - sizeof(*dg)) {
+> > -		err = -EINVAL;
+> > -		goto out;
+> > -	}
+> > +		return -EINVAL;
+> >  
+> > -	if (payload_len > len) {
+> > -		payload_len = len;
+> > -		msg->msg_flags |= MSG_TRUNC;
+> > -	}
+> > +	*port = dg->src.resource;
+> > +	return 0;
+> > +}
+> >  
+> > -	/* Place the datagram payload in the user's iovec. */
+> > -	err = skb_copy_datagram_msg(skb, sizeof(*dg), msg, payload_len);
+> > -	if (err)
+> > -		goto out;
+> > +static int vmci_transport_dgram_get_length(struct sk_buff *skb, size_t *len)
+> > +{
+> > +	struct vmci_datagram *dg;
+> >  
+> > -	if (msg->msg_name) {
+> > -		/* Provide the address of the sender. */
+> > -		DECLARE_SOCKADDR(struct sockaddr_vm *, vm_addr, msg->msg_name);
+> > -		vsock_addr_init(vm_addr, dg->src.context, dg->src.resource);
+> > -		msg->msg_namelen = sizeof(*vm_addr);
+> > -	}
+> > -	err = payload_len;
+> > +	dg = (struct vmci_datagram *)skb->data;
+> > +	if (!dg)
+> > +		return -EINVAL;
+> >  
+> > -out:
+> > -	skb_free_datagram(&vsk->sk, skb);
+> > -	return err;
+> > +	*len = dg->payload_size;
+> > +	return 0;
 > >  }
 > >  
-> > +/* Transmit one byte and check the return value.
-> > + *
-> > + * expected_ret:
-> > + *  <0 Negative errno (for testing errors)
-> > + *   0 End-of-file
-> > + *   1 Success
-> > + */
-> > +void sendto_byte(int fd, const struct sockaddr *dest_addr, int len, int expected_ret,
-> > +		 int flags)
-> > +{
-> > +	const uint8_t byte = 'A';
-> > +	ssize_t nwritten;
-> > +
-> > +	timeout_begin(TIMEOUT);
-> > +	do {
-> > +		nwritten = sendto(fd, &byte, sizeof(byte), flags, dest_addr,
-> > +				  len);
-> > +		timeout_check("write");
-> > +	} while (nwritten < 0 && errno == EINTR);
-> > +	timeout_end();
-> > +
-> > +	if (expected_ret < 0) {
-> > +		if (nwritten != -1) {
-> > +			fprintf(stderr, "bogus sendto(2) return value %zd\n",
-> > +				nwritten);
-> > +			exit(EXIT_FAILURE);
-> > +		}
-> > +		if (errno != -expected_ret) {
-> > +			perror("write");
-> > +			exit(EXIT_FAILURE);
-> > +		}
-> > +		return;
-> > +	}
-> > +
-> > +	if (nwritten < 0) {
-> > +		perror("write");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +	if (nwritten == 0) {
-> > +		if (expected_ret == 0)
-> > +			return;
-> > +
-> > +		fprintf(stderr, "unexpected EOF while sending byte\n");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +	if (nwritten != sizeof(byte)) {
-> > +		fprintf(stderr, "bogus sendto(2) return value %zd\n", nwritten);
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +}
-> > +
-> >  /* Receive one byte and check the return value.
-> >   *
-> >   * expected_ret:
-> > @@ -313,6 +398,60 @@ void recv_byte(int fd, int expected_ret, int flags)
-> >  	}
-> >  }
+> >  static bool vmci_transport_dgram_allow(u32 cid, u32 port)
+> > @@ -2040,9 +2023,12 @@ static struct vsock_transport vmci_transport = {
+> >  	.release = vmci_transport_release,
+> >  	.connect = vmci_transport_connect,
+> >  	.dgram_bind = vmci_transport_dgram_bind,
+> > -	.dgram_dequeue = vmci_transport_dgram_dequeue,
+> >  	.dgram_enqueue = vmci_transport_dgram_enqueue,
+> >  	.dgram_allow = vmci_transport_dgram_allow,
+> > +	.dgram_get_cid = vmci_transport_dgram_get_cid,
+> > +	.dgram_get_port = vmci_transport_dgram_get_port,
+> > +	.dgram_get_length = vmci_transport_dgram_get_length,
+> > +	.dgram_payload_offset = sizeof(struct vmci_datagram),
+> >  	.stream_dequeue = vmci_transport_stream_dequeue,
+> >  	.stream_enqueue = vmci_transport_stream_enqueue,
+> >  	.stream_has_data = vmci_transport_stream_has_data,
+> > diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+> > index 5c6360df1f31..2f3cabc79ee5 100644
+> > --- a/net/vmw_vsock/vsock_loopback.c
+> > +++ b/net/vmw_vsock/vsock_loopback.c
+> > @@ -62,9 +62,11 @@ static struct virtio_transport loopback_transport = {
+> >  		.cancel_pkt               = vsock_loopback_cancel_pkt,
 > >  
-> > +/* Receive one byte and check the return value.
-> > + *
-> > + * expected_ret:
-> > + *  <0 Negative errno (for testing errors)
-> > + *   0 End-of-file
-> > + *   1 Success
-> > + */
-> > +void recvfrom_byte(int fd, struct sockaddr *src_addr, socklen_t *addrlen,
-> > +		   int expected_ret, int flags)
-> > +{
-> > +	uint8_t byte;
-> > +	ssize_t nread;
-> > +
-> > +	timeout_begin(TIMEOUT);
-> > +	do {
-> > +		nread = recvfrom(fd, &byte, sizeof(byte), flags, src_addr, addrlen);
-> > +		timeout_check("read");
-> > +	} while (nread < 0 && errno == EINTR);
-> > +	timeout_end();
-> > +
-> > +	if (expected_ret < 0) {
-> > +		if (nread != -1) {
-> > +			fprintf(stderr, "bogus recvfrom(2) return value %zd\n",
-> > +				nread);
-> > +			exit(EXIT_FAILURE);
-> > +		}
-> > +		if (errno != -expected_ret) {
-> > +			perror("read");
-> > +			exit(EXIT_FAILURE);
-> > +		}
-> > +		return;
-> > +	}
-> > +
-> > +	if (nread < 0) {
-> > +		perror("read");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +	if (nread == 0) {
-> > +		if (expected_ret == 0)
-> > +			return;
-> > +
-> > +		fprintf(stderr, "unexpected EOF while receiving byte\n");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +	if (nread != sizeof(byte)) {
-> > +		fprintf(stderr, "bogus recvfrom(2) return value %zd\n", nread);
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +	if (byte != 'A') {
-> > +		fprintf(stderr, "unexpected byte read %c\n", byte);
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +}
-> > +
-> >  /* Run test cases.  The program terminates if a failure occurs. */
-> >  void run_tests(const struct test_case *test_cases,
-> >  	       const struct test_opts *opts)
-> > diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
-> > index fb99208a95ea..a69e128d120c 100644
-> > --- a/tools/testing/vsock/util.h
-> > +++ b/tools/testing/vsock/util.h
-> > @@ -37,13 +37,19 @@ void init_signals(void);
-> >  unsigned int parse_cid(const char *str);
-> >  int vsock_stream_connect(unsigned int cid, unsigned int port);
-> >  int vsock_seqpacket_connect(unsigned int cid, unsigned int port);
-> > +int vsock_dgram_connect(unsigned int cid, unsigned int port);
-> >  int vsock_stream_accept(unsigned int cid, unsigned int port,
-> >  			struct sockaddr_vm *clientaddrp);
-> >  int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
-> >  			   struct sockaddr_vm *clientaddrp);
-> > +int vsock_dgram_bind(unsigned int cid, unsigned int port);
-> >  void vsock_wait_remote_close(int fd);
-> >  void send_byte(int fd, int expected_ret, int flags);
-> > +void sendto_byte(int fd, const struct sockaddr *dest_addr, int len, int expected_ret,
-> > +		 int flags);
-> >  void recv_byte(int fd, int expected_ret, int flags);
-> > +void recvfrom_byte(int fd, struct sockaddr *src_addr, socklen_t *addrlen,
-> > +		   int expected_ret, int flags);
-> >  void run_tests(const struct test_case *test_cases,
-> >  	       const struct test_opts *opts);
-> >  void list_tests(const struct test_case *test_cases);
-> > diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-> > index ac1bd3ac1533..ded82d39ee5d 100644
-> > --- a/tools/testing/vsock/vsock_test.c
-> > +++ b/tools/testing/vsock/vsock_test.c
-> > @@ -1053,6 +1053,413 @@ static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
-> >  	close(fd);
-> >  }
+> >  		.dgram_bind               = virtio_transport_dgram_bind,
+> > -		.dgram_dequeue            = virtio_transport_dgram_dequeue,
+> >  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+> >  		.dgram_allow              = virtio_transport_dgram_allow,
+> > +		.dgram_get_cid		  = virtio_transport_dgram_get_cid,
+> > +		.dgram_get_port		  = virtio_transport_dgram_get_port,
+> > +		.dgram_get_length	  = virtio_transport_dgram_get_length,
 > >  
-> > +static void test_dgram_sendto_client(const struct test_opts *opts)
-> > +{
-> > +	union {
-> > +		struct sockaddr sa;
-> > +		struct sockaddr_vm svm;
-> > +	} addr = {
-> > +		.svm = {
-> > +			.svm_family = AF_VSOCK,
-> > +			.svm_port = 1234,
-> > +			.svm_cid = opts->peer_cid,
-> > +		},
-> > +	};
-> > +	int fd;
-> > +
-> > +	/* Wait for the server to be ready */
-> > +	control_expectln("BIND");
-> > +
-> > +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
-> > +	if (fd < 0) {
-> > +		perror("socket");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	sendto_byte(fd, &addr.sa, sizeof(addr.svm), 1, 0);
-> > +
-> > +	/* Notify the server that the client has finished */
-> > +	control_writeln("DONE");
-> > +
-> > +	close(fd);
-> > +}
-> > +
-> > +static void test_dgram_sendto_server(const struct test_opts *opts)
-> > +{
-> > +	union {
-> > +		struct sockaddr sa;
-> > +		struct sockaddr_vm svm;
-> > +	} addr = {
-> > +		.svm = {
-> > +			.svm_family = AF_VSOCK,
-> > +			.svm_port = 1234,
-> > +			.svm_cid = VMADDR_CID_ANY,
-> > +		},
-> > +	};
-> > +	int len = sizeof(addr.sa);
-> > +	int fd;
-> > +
-> > +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
-> > +	if (fd < 0) {
-> > +		perror("socket");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
-> > +		perror("bind");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	/* Notify the client that the server is ready */
-> > +	control_writeln("BIND");
-> > +
-> > +	recvfrom_byte(fd, &addr.sa, &len, 1, 0);
-> > +
-> > +	/* Wait for the client to finish */
-> > +	control_expectln("DONE");
-> > +
-> > +	close(fd);
-> > +}
-> > +
-> > +static void test_dgram_connect_client(const struct test_opts *opts)
-> > +{
-> > +	union {
-> > +		struct sockaddr sa;
-> > +		struct sockaddr_vm svm;
-> > +	} addr = {
-> > +		.svm = {
-> > +			.svm_family = AF_VSOCK,
-> > +			.svm_port = 1234,
-> > +			.svm_cid = opts->peer_cid,
-> > +		},
-> > +	};
-> > +	int ret;
-> > +	int fd;
-> > +
-> > +	/* Wait for the server to be ready */
-> > +	control_expectln("BIND");
-> > +
-> > +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
-> > +	if (fd < 0) {
-> > +		perror("bind");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	ret = connect(fd, &addr.sa, sizeof(addr.svm));
-> > +	if (ret < 0) {
-> > +		perror("connect");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	send_byte(fd, 1, 0);
-> > +
-> > +	/* Notify the server that the client has finished */
-> > +	control_writeln("DONE");
-> > +
-> > +	close(fd);
-> > +}
-> > +
-> > +static void test_dgram_connect_server(const struct test_opts *opts)
-> > +{
-> > +	test_dgram_sendto_server(opts);
-> > +}
-> > +
-> > +static void test_dgram_multiconn_sendto_client(const struct test_opts *opts)
-> > +{
-> > +	union {
-> > +		struct sockaddr sa;
-> > +		struct sockaddr_vm svm;
-> > +	} addr = {
-> > +		.svm = {
-> > +			.svm_family = AF_VSOCK,
-> > +			.svm_port = 1234,
-> > +			.svm_cid = opts->peer_cid,
-> > +		},
-> > +	};
-> > +	int fds[MULTICONN_NFDS];
-> > +	int i;
-> > +
-> > +	/* Wait for the server to be ready */
-> > +	control_expectln("BIND");
-> > +
-> > +	for (i = 0; i < MULTICONN_NFDS; i++) {
-> > +		fds[i] = socket(AF_VSOCK, SOCK_DGRAM, 0);
-> > +		if (fds[i] < 0) {
-> > +			perror("socket");
-> > +			exit(EXIT_FAILURE);
-> > +		}
-> > +	}
-> > +
-> > +	for (i = 0; i < MULTICONN_NFDS; i++)
-> > +		sendto_byte(fds[i], &addr.sa, sizeof(addr.svm), 1, 0);
-> > +
-> > +	/* Notify the server that the client has finished */
-> > +	control_writeln("DONE");
-> > +
-> > +	for (i = 0; i < MULTICONN_NFDS; i++)
-> > +		close(fds[i]);
-> > +}
-> > +
-> > +static void test_dgram_multiconn_sendto_server(const struct test_opts *opts)
-> > +{
-> > +	union {
-> > +		struct sockaddr sa;
-> > +		struct sockaddr_vm svm;
-> > +	} addr = {
-> > +		.svm = {
-> > +			.svm_family = AF_VSOCK,
-> > +			.svm_port = 1234,
-> > +			.svm_cid = VMADDR_CID_ANY,
-> > +		},
-> > +	};
-> > +	int len = sizeof(addr.sa);
-> > +	int fd;
-> > +	int i;
-> > +
-> > +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
-> > +	if (fd < 0) {
-> > +		perror("socket");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
-> > +		perror("bind");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	/* Notify the client that the server is ready */
-> > +	control_writeln("BIND");
-> > +
-> > +	for (i = 0; i < MULTICONN_NFDS; i++)
-> > +		recvfrom_byte(fd, &addr.sa, &len, 1, 0);
-> > +
-> > +	/* Wait for the client to finish */
-> > +	control_expectln("DONE");
-> > +
-> > +	close(fd);
-> > +}
-> > +
-> > +static void test_dgram_multiconn_send_client(const struct test_opts *opts)
-> > +{
-> > +	int fds[MULTICONN_NFDS];
-> > +	int i;
-> > +
-> > +	/* Wait for the server to be ready */
-> > +	control_expectln("BIND");
-> > +
-> > +	for (i = 0; i < MULTICONN_NFDS; i++) {
-> > +		fds[i] = vsock_dgram_connect(opts->peer_cid, 1234);
-> > +		if (fds[i] < 0) {
-> > +			perror("socket");
-> > +			exit(EXIT_FAILURE);
-> > +		}
-> > +	}
-> > +
-> > +	for (i = 0; i < MULTICONN_NFDS; i++)
-> > +		send_byte(fds[i], 1, 0);
-> > +
-> > +	/* Notify the server that the client has finished */
-> > +	control_writeln("DONE");
-> > +
-> > +	for (i = 0; i < MULTICONN_NFDS; i++)
-> > +		close(fds[i]);
-> > +}
-> > +
-> > +static void test_dgram_multiconn_send_server(const struct test_opts *opts)
-> > +{
-> > +	union {
-> > +		struct sockaddr sa;
-> > +		struct sockaddr_vm svm;
-> > +	} addr = {
-> > +		.svm = {
-> > +			.svm_family = AF_VSOCK,
-> > +			.svm_port = 1234,
-> > +			.svm_cid = VMADDR_CID_ANY,
-> > +		},
-> > +	};
-> > +	int fd;
-> > +	int i;
-> > +
-> > +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
-> > +	if (fd < 0) {
-> > +		perror("socket");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
-> > +		perror("bind");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	/* Notify the client that the server is ready */
-> > +	control_writeln("BIND");
-> > +
-> > +	for (i = 0; i < MULTICONN_NFDS; i++)
-> > +		recv_byte(fd, 1, 0);
-> > +
-> > +	/* Wait for the client to finish */
-> > +	control_expectln("DONE");
-> > +
-> > +	close(fd);
-> > +}
-> > +
-> > +static void test_dgram_msg_bounds_client(const struct test_opts *opts)
-> > +{
-> > +	unsigned long recv_buf_size;
-> > +	int page_size;
-> > +	int msg_cnt;
-> > +	int fd;
-> > +
-> > +	fd = vsock_dgram_connect(opts->peer_cid, 1234);
-> > +	if (fd < 0) {
-> > +		perror("connect");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	/* Let the server know the client is ready */
-> > +	control_writeln("CLNTREADY");
-> > +
-> > +	msg_cnt = control_readulong();
-> > +	recv_buf_size = control_readulong();
-> > +
-> > +	/* Wait, until receiver sets buffer size. */
-> > +	control_expectln("SRVREADY");
-> > +
-> > +	page_size = getpagesize();
-> > +
-> > +	for (int i = 0; i < msg_cnt; i++) {
-> > +		unsigned long curr_hash;
-> > +		ssize_t send_size;
-> > +		size_t buf_size;
-> > +		void *buf;
-> > +
-> > +		/* Use "small" buffers and "big" buffers. */
-> > +		if (i & 1)
-> > +			buf_size = page_size +
-> > +					(rand() % (MAX_MSG_SIZE - page_size));
-> > +		else
-> > +			buf_size = 1 + (rand() % page_size);
-> > +
-> > +		buf_size = min(buf_size, recv_buf_size);
-> > +
-> > +		buf = malloc(buf_size);
-> > +
-> > +		if (!buf) {
-> > +			perror("malloc");
-> > +			exit(EXIT_FAILURE);
-> > +		}
-> > +
-> > +		memset(buf, rand() & 0xff, buf_size);
-> > +		/* Set at least one MSG_EOR + some random. */
-> > +
-> > +		send_size = send(fd, buf, buf_size, 0);
-> > +
-> > +		if (send_size < 0) {
-> > +			perror("send");
-> > +			exit(EXIT_FAILURE);
-> > +		}
-> > +
-> > +		if (send_size != buf_size) {
-> > +			fprintf(stderr, "Invalid send size\n");
-> > +			exit(EXIT_FAILURE);
-> > +		}
-> > +
-> > +		/* In theory the implementation isn't required to transmit
-> > +		 * these packets in order, so we use this SYNC control message
-> > +		 * so that server and client coordinate sending and receiving
-> > +		 * one packet at a time. The client sends a packet and waits
-> > +		 * until it has been received before sending another.
-> > +		 */
-> > +		control_writeln("PKTSENT");
-> > +		control_expectln("PKTRECV");
-> > +
-> > +		/* Send the server a hash of the packet */
-> > +		curr_hash = hash_djb2(buf, buf_size);
-> > +		control_writeulong(curr_hash);
-> > +		free(buf);
-> > +	}
-> > +
-> > +	control_writeln("SENDDONE");
-> > +	close(fd);
-> > +}
-> > +
-> > +static void test_dgram_msg_bounds_server(const struct test_opts *opts)
-> > +{
-> > +	const unsigned long msg_cnt = 16;
-> > +	unsigned long sock_buf_size;
-> > +	struct msghdr msg = {0};
-> > +	struct iovec iov = {0};
-> > +	char buf[MAX_MSG_SIZE];
-> > +	socklen_t len;
-> > +	int fd;
-> > +	int i;
-> > +
-> > +	fd = vsock_dgram_bind(VMADDR_CID_ANY, 1234);
-> > +
-> > +	if (fd < 0) {
-> > +		perror("bind");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	/* Set receive buffer to maximum */
-> > +	sock_buf_size = -1;
-> > +	if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF,
-> > +		       &sock_buf_size, sizeof(sock_buf_size))) {
-> > +		perror("setsockopt(SO_RECVBUF)");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	/* Retrieve the receive buffer size */
-> > +	len = sizeof(sock_buf_size);
-> > +	if (getsockopt(fd, SOL_SOCKET, SO_RCVBUF,
-> > +		       &sock_buf_size, &len)) {
-> > +		perror("getsockopt(SO_RECVBUF)");
-> > +		exit(EXIT_FAILURE);
-> > +	}
-> > +
-> > +	/* Client ready to receive parameters */
-> > +	control_expectln("CLNTREADY");
-> > +
-> > +	control_writeulong(msg_cnt);
-> > +	control_writeulong(sock_buf_size);
-> > +
-> > +	/* Ready to receive data. */
-> > +	control_writeln("SRVREADY");
-> > +
-> > +	iov.iov_base = buf;
-> > +	iov.iov_len = sizeof(buf);
-> > +	msg.msg_iov = &iov;
-> > +	msg.msg_iovlen = 1;
-> > +
-> > +	for (i = 0; i < msg_cnt; i++) {
-> > +		unsigned long remote_hash;
-> > +		unsigned long curr_hash;
-> > +		ssize_t recv_size;
-> > +
-> > +		control_expectln("PKTSENT");
-> > +		recv_size = recvmsg(fd, &msg, 0);
-> > +		control_writeln("PKTRECV");
-> > +
-> > +		if (!recv_size)
-> > +			break;
-> > +
-> > +		if (recv_size < 0) {
-> > +			perror("recvmsg");
-> > +			exit(EXIT_FAILURE);
-> > +		}
-> > +
-> > +		curr_hash = hash_djb2(msg.msg_iov[0].iov_base, recv_size);
-> > +		remote_hash = control_readulong();
-> > +
-> > +		if (curr_hash != remote_hash) {
-> > +			fprintf(stderr, "Message bounds broken\n");
-> > +			exit(EXIT_FAILURE);
-> > +		}
-> > +	}
-> > +
-> > +	close(fd);
-> > +}
-> > +
-> >  static struct test_case test_cases[] = {
-> >  	{
-> >  		.name = "SOCK_STREAM connection reset",
-> > @@ -1128,6 +1535,31 @@ static struct test_case test_cases[] = {
-> >  		.run_client = test_stream_virtio_skb_merge_client,
-> >  		.run_server = test_stream_virtio_skb_merge_server,
-> >  	},
-> > +	{
-> > +		.name = "SOCK_DGRAM client sendto",
-> > +		.run_client = test_dgram_sendto_client,
-> > +		.run_server = test_dgram_sendto_server,
-> > +	},
-> > +	{
-> > +		.name = "SOCK_DGRAM client connect",
-> > +		.run_client = test_dgram_connect_client,
-> > +		.run_server = test_dgram_connect_server,
-> > +	},
-> > +	{
-> > +		.name = "SOCK_DGRAM multiple connections using sendto",
-> > +		.run_client = test_dgram_multiconn_sendto_client,
-> > +		.run_server = test_dgram_multiconn_sendto_server,
-> > +	},
-> > +	{
-> > +		.name = "SOCK_DGRAM multiple connections using send",
-> > +		.run_client = test_dgram_multiconn_send_client,
-> > +		.run_server = test_dgram_multiconn_send_server,
-> > +	},
-> > +	{
-> > +		.name = "SOCK_DGRAM msg bounds",
-> > +		.run_client = test_dgram_msg_bounds_client,
-> > +		.run_server = test_dgram_msg_bounds_server,
-> > +	},
-> >  	{},
-> >  };
-> >  
+> >  		.stream_dequeue           = virtio_transport_stream_dequeue,
+> >  		.stream_enqueue           = virtio_transport_stream_enqueue,
 > > 
