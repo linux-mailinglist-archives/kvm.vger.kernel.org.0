@@ -2,131 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4576B73ACE5
-	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 01:06:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA3CC73AD08
+	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 01:17:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231429AbjFVXGX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jun 2023 19:06:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38444 "EHLO
+        id S229564AbjFVXRY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jun 2023 19:17:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230314AbjFVXGV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jun 2023 19:06:21 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1DBD2128;
-        Thu, 22 Jun 2023 16:06:11 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id 46e09a7af769-6b5915d0816so94715a34.1;
-        Thu, 22 Jun 2023 16:06:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687475171; x=1690067171;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ouszZxBWK4Y/7BnPKGCua1rglERmrS5y1sP9g0y1NxU=;
-        b=aTB1pvy0DXHIer0JV5RF4ky0pZJjqqTMNLnoz3OJFDzXR2M1WhUq1IKpMh911OPGMb
-         GMIL5ZdCS66V+dz0MCNHe4rkphypdFwdgBQCmUh4+dakL9F8ZzsSktXpbYbB5/PQEfNx
-         LvyxoJc2bw34I8JQ8y3cbCwykwlJhcf5QjI2Rtp3ntF6yVvu2+mAGffWnayVss1LIXTC
-         Tb2vpZD7lnViDjTmWqiEw8mVm1czpGyLzU3KIxLsI2txruv50G1S/vLnHIqvYVAEHrzA
-         y4NtmYcKzNJV6ek3hEP52Nph+NwmjCZ3jaCgPE58l9O7MvMPzTPFFMP05eXoxWQeMyTR
-         GbnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687475171; x=1690067171;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ouszZxBWK4Y/7BnPKGCua1rglERmrS5y1sP9g0y1NxU=;
-        b=FokVQ9Uf2+NiSpLsC2zV4o2XRRoRkHtMSpl3RRLZcu6Ig35ud17bV5fcsoP039Wc0f
-         5304GaWW2emDWL55ypFIo7rzG70thnNs/85hAVpxgj5xo0CaoFKO1trWTLeFpZi+sLRj
-         tljApsf1DIMvLzx7sWWRzr/gz5GctICf/rl1XOCGe5Lm0tFHtGkH7rWGNmduZ/NVfnQ/
-         U8JYcCL2YlfUcjdL/fTEKpGkUJVz2pDBgaPiD2djIHMFrDX+sygk1ljFpK5BPF9Y+WR/
-         u/ZlAazBEOjSD1ZO2kjgRXW7wiwIbQpSgX4CK3IjLh871v1pG2d6jDhQnweqAnzoUH9Z
-         Zpgg==
-X-Gm-Message-State: AC+VfDzacCbw9FTP+6lYAVO8KrmoTpkoC9f45Cc0cVdZ/Odv5TLizrlk
-        OPjThx1ro7z119Y/Al0WeUw=
-X-Google-Smtp-Source: ACHHUZ5BE2JaRf9U/RJpZMsASVAr/InFv9I3p6UcUaGtwKesvlbWrLfzH9LHqG+tmTWYjJCn3wl8NA==
-X-Received: by 2002:a05:6359:b95:b0:12b:d23d:f5bf with SMTP id gf21-20020a0563590b9500b0012bd23df5bfmr15658173rwb.0.1687475171058;
-        Thu, 22 Jun 2023 16:06:11 -0700 (PDT)
-Received: from localhost (ec2-54-67-115-33.us-west-1.compute.amazonaws.com. [54.67.115.33])
-        by smtp.gmail.com with ESMTPSA id d18-20020a63f252000000b0054febe8a5f6sm5348113pgk.82.2023.06.22.16.06.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 16:06:10 -0700 (PDT)
-Date:   Thu, 22 Jun 2023 23:06:09 +0000
-From:   Bobby Eshleman <bobbyeshleman@gmail.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        linux-hyperv@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        virtualization@lists.linux-foundation.org,
-        Eric Dumazet <edumazet@google.com>,
-        Dan Carpenter <dan.carpenter@linaro.org>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Bryan Tan <bryantan@vmware.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        Vishnu Dasa <vdasa@vmware.com>,
-        Jiang Wang <jiang.wang@bytedance.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH RFC net-next v4 5/8] virtio/vsock: add
- VIRTIO_VSOCK_F_DGRAM feature bit
-Message-ID: <ZJTT4QTwD824pBsh@bullseye>
-References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
- <20230413-b4-vsock-dgram-v4-5-0cebbb2ae899@bytedance.com>
- <med476cdkdhkylddqa5wbhjpgyw2yiqfthvup2kics3zbb5vpb@ovzg57adewfw>
+        with ESMTP id S231592AbjFVXRU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jun 2023 19:17:20 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C3F813E;
+        Thu, 22 Jun 2023 16:17:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687475831; x=1719011831;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wII/YgahFD6pOu/PD+x55CaQ2xydlhbyXI2dGgWNIAI=;
+  b=IvDwR9GMGrYuefhI8O1kABtJZcJcQmBTnwsBzsyiF540/9RAdIBA4hfk
+   0qPaSss9fEUn+nD1eAIh/yUQa79buaSBp2HPWvnzzyCC3LqqlY9MtBMp4
+   Grh6QE3fPfnDB6WfXT/BYCFQhnTDvYkFyp9yz2zvypS5p7HKaaFYOipn4
+   MahQTeFtWMF5qUbdZqT44ptBpsfCa/tp40BECehc3Xn+P0mvb6osHfTDQ
+   ks28iaJkdXJeVi2aDUmkLnh8XuvXEEz2VPqarYvbNcwJqDJ3IL/xXCsKg
+   94u48f1OkjKx2rny8ryJhsP//Vcfj203GgJq9d7OIkqcn59CCeuw2p0lD
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="358129710"
+X-IronPort-AV: E=Sophos;i="6.01,150,1684825200"; 
+   d="scan'208";a="358129710"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 16:17:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="718285970"
+X-IronPort-AV: E=Sophos;i="6.01,150,1684825200"; 
+   d="scan'208";a="718285970"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 16:17:10 -0700
+From:   isaku.yamahata@intel.com
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        linux-coco@lists.linux.dev,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Michael Roth <michael.roth@amd.com>
+Subject: [RFC PATCH v2 0/6] KVM: guest memory: Misc enhacnement
+Date:   Thu, 22 Jun 2023 16:16:24 -0700
+Message-Id: <cover.1687474039.git.isaku.yamahata@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <med476cdkdhkylddqa5wbhjpgyw2yiqfthvup2kics3zbb5vpb@ovzg57adewfw>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 22, 2023 at 05:29:08PM +0200, Stefano Garzarella wrote:
-> On Sat, Jun 10, 2023 at 12:58:32AM +0000, Bobby Eshleman wrote:
-> > This commit adds a feature bit for virtio vsock to support datagrams.
-> > 
-> > Signed-off-by: Jiang Wang <jiang.wang@bytedance.com>
-> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> > ---
-> > include/uapi/linux/virtio_vsock.h | 1 +
-> > 1 file changed, 1 insertion(+)
-> 
-> LGTM, but I'll give the R-b when we merge the virtio-spec.
-> 
-> Stefano
-> 
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Roger that.
+Hello. I've updated the patch series following Michael suggestion.
+Here are the discussion points.
 
-> > 
-> > diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
-> > index 64738838bee5..9c25f267bbc0 100644
-> > --- a/include/uapi/linux/virtio_vsock.h
-> > +++ b/include/uapi/linux/virtio_vsock.h
-> > @@ -40,6 +40,7 @@
-> > 
-> > /* The feature bitmap for virtio vsock */
-> > #define VIRTIO_VSOCK_F_SEQPACKET	1	/* SOCK_SEQPACKET supported */
-> > +#define VIRTIO_VSOCK_F_DGRAM		3	/* SOCK_DGRAM supported */
-> > 
-> > struct virtio_vsock_config {
-> > 	__le64 guest_cid;
-> > 
-> > -- 
-> > 2.30.2
-> > 
-> 
-> _______________________________________________
-> Virtualization mailing list
-> Virtualization@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+- 4/6 KVM: x86: Introduce fault type to indicate kvm page fault is private
+  The moot point is where to put the logic to determine the fault is private.
+  - The caller site of kvm_mmu_do_page_fault() (or kvm_mmu_page_fault()).
+    The v1 patch approach.
+    - npf_interception()
+    - handle_ept_violation(), handle_ept_misconfig() and TDX counter part.
+  - Open code in kvm_get_fault_type()
+  
+- 5/6 KVM: Add flags to struct kvm_gfn_range
+  I think this patch doesn't interfere the SNP case because it passes more
+  info to the callback.
+
+- 6/6 KVM: x86: Add is_vm_type_supported callback
+  Let's introduce KVM_X86_TDX_VM for TDX.  And revise KVM_X86_PROTECTED_VM.
+  I won't address the name in this patch series.
+
+Thanks,
+
+
+Hello. This is an RFC patch series based on KVM gmem [1] and [2] 
+for the common use of TDX and SEV-SNP.  I'd like to discuss three items.
+
+* Flags for kvm_gfn_range:
+Roth, By adding flags to kvm_gfn_range, kvm_arch_gmem_invalidate() won't be
+needed.  Maybe x86 gmem_invalidate callback is still needed, though.
+
+* Page fault error code or how to figure out the private page fault
+There is an issue to set kvm_page_fault.is_private. I came up with two new
+error codes.  Is this a way or any other way?
+
+* VM type: Now we have KVM_X86_PROTECTED_VM. How do we proceed?
+  - Keep KVM_X86_PROTECTED_VM for its use. Introduce KVM_X86_TDX_VM
+  - Use KVM_X86_PROTECTED_VM for TDX. (If necessary, introduce another type in
+    the future)
+  - any other way?
+
+[1] KVM gmem patches
+https://github.com/sean-jc/linux/tree/x86/kvm_gmem_solo
+
+[2] Add AMD Secure Nested Paging (SEV-SNP) Hypervisor Support
+https://lore.kernel.org/lkml/20230612042559.375660-1-michael.roth@amd.com/
+
+Isaku Yamahata (6):
+  KVM: selftests: Fix test_add_overlapping_private_memory_regions()
+  KVM: selftests: Fix guest_memfd()
+  KVM: x86/mmu: Pass round full 64-bit error code for the KVM page fault
+  KVM: x86: Introduce fault type to indicate kvm page fault is private
+  KVM: Add flags to struct kvm_gfn_range
+  KVM: x86: Add is_vm_type_supported callback
+
+ arch/x86/include/asm/kvm-x86-ops.h            |  1 +
+ arch/x86/include/asm/kvm_host.h               |  7 ++++
+ arch/x86/include/uapi/asm/kvm.h               |  1 +
+ arch/x86/kvm/mmu/mmu.c                        | 31 +++++++++++-----
+ arch/x86/kvm/mmu/mmu_internal.h               | 37 +++++++++++++++++--
+ arch/x86/kvm/mmu/mmutrace.h                   |  2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h                |  4 +-
+ arch/x86/kvm/svm/svm.c                        |  7 ++++
+ arch/x86/kvm/vmx/vmx.c                        |  6 +++
+ arch/x86/kvm/x86.c                            | 10 ++++-
+ arch/x86/kvm/x86.h                            |  2 +
+ include/linux/kvm_host.h                      | 10 ++++-
+ .../testing/selftests/kvm/guest_memfd_test.c  |  4 +-
+ .../selftests/kvm/set_memory_region_test.c    | 16 +++++++-
+ virt/kvm/guest_mem.c                          |  9 +++--
+ virt/kvm/kvm_main.c                           |  4 +-
+ 16 files changed, 125 insertions(+), 26 deletions(-)
+
+
+base-commit: be8abcec83c87d4e15ae04816b685fe260c4bcfd
+-- 
+2.25.1
+
