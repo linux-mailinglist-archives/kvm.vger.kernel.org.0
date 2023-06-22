@@ -2,84 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A3CA73A7B5
-	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 19:51:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F22973A7BA
+	for <lists+kvm@lfdr.de>; Thu, 22 Jun 2023 19:52:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231411AbjFVRvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jun 2023 13:51:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42824 "EHLO
+        id S231424AbjFVRwE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jun 2023 13:52:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231418AbjFVRvT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jun 2023 13:51:19 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B191E1FE6
-        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 10:51:17 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4f76a0a19d4so10386693e87.2
-        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 10:51:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687456276; x=1690048276;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9RxDEfypLP474dWXJLDSfwdHncLLmi9Gthq1bxnH6Sg=;
-        b=RiVWMtP0j99xIRYUNXDURWNefogBeHrukb98HKl2KpQPFeqzG8I5jV1I8RYGUIxgwH
-         sBTf6FPI0LAFSEQpvawCbcgioqZrrkhjCenDgar1wInj2SzuwqjwDBLhQxIR2y/WHDOD
-         uDQ5+I4pvWVB6lwB5UW3bgC25Cd4/1Dr4pX5ff+Xtzu5kIWnQxozPwnZBupIPOtpEfbi
-         AxCY/kmKMitTxzq+qp51TgVcvHwWugs+tFjPpja+shXEeqz4rfRWJr73IzbwST2ryOSo
-         yu3gSElU9n8FQ6tnrRY0Gl+RD1sXGK1RjAue2K0BBFP2LCwPwBr1gimeAqkmcjsllPjQ
-         725w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687456276; x=1690048276;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9RxDEfypLP474dWXJLDSfwdHncLLmi9Gthq1bxnH6Sg=;
-        b=dHGLMolWpsTq3JrAkU2oAkIqIt8Yu2IvoBPCypUMul3/JZK1wyYZ5bac8B35RG/KDp
-         +cu2GhRtgawArk9q984dh3I+Y3VMbe4c/h6u/4UYPVSAp2IawxedjVzqH/8mXrTqW96I
-         Nz/ypjTP75ovsp0WkYmYWKU/p3e8PiJjANXWUz3TfT73bgVVO4hXXtGE3zZ4i0dJzFUm
-         xC9w7+KYuFWriiKg0msr859UIqDCZ+1xyL7ZOcFH9bsd9fKzmcnLJuBny7WfJFG7Zml6
-         QvHAJK/KDhIeqYCyHPDQiLqaY3rQKbuhE/gIgv3l+9s/mhKN8nC/NhRcMa7QfSTSkLkn
-         KA2Q==
-X-Gm-Message-State: AC+VfDw+U6yne/t9stff9ckiMPGqfQ1Zb+MWVd3avwDKoEtPFMfcxm2D
-        HHprnhsX1Lgl9/EQMUA5JM4gcQ==
-X-Google-Smtp-Source: ACHHUZ4jTKt0S9wGV9j57uZV2AskBM6ykJg1BX+PUA6Y8ggImBM58aMPiFh3pdEHVJWhW5Jzj4GL0w==
-X-Received: by 2002:ac2:5bca:0:b0:4f8:67e7:8a1c with SMTP id u10-20020ac25bca000000b004f867e78a1cmr2333897lfn.45.1687456275753;
-        Thu, 22 Jun 2023 10:51:15 -0700 (PDT)
-Received: from [192.168.157.227] ([91.223.100.47])
-        by smtp.gmail.com with ESMTPSA id i14-20020ac2522e000000b004f24db9248dsm1195907lfl.141.2023.06.22.10.51.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Jun 2023 10:51:15 -0700 (PDT)
-Message-ID: <58c48176-c9b2-0184-a93f-3168f66b7d72@linaro.org>
-Date:   Thu, 22 Jun 2023 19:51:09 +0200
+        with ESMTP id S231415AbjFVRwA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jun 2023 13:52:00 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A4591988
+        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 10:51:42 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0735E618D1
+        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 17:51:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6EE3BC433CA
+        for <kvm@vger.kernel.org>; Thu, 22 Jun 2023 17:51:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687456301;
+        bh=wBa/cVYSsMexYufK/vz8DU9upfhEblf5HovA5DtarWA=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=iNIxgHJeViJxU6HD5Yh9d/tAxrzfAMzzoQ9du/zDPXsZRtMlQbYcWcLDabHgjMSrK
+         hxj4AFSvACn83UQZh3zizYO/kXCTBZ5L/Tlqk7Rf/Q4ScA5xT3dXvlHeBBMZNC+QmL
+         Hx6P1kAx6Wi8Ctx+EYO7aa7hYRXxJmrNfpAnh/HUvQp3ujoHEpuD1TWet/C4nVBOWN
+         F0av8sEl7QkQogQ3bvNNyJDsLsbxU6QPfwN2iAdcHFQYKanAGiJ0sWF2V4d+wXfHxZ
+         5QxENWGLQ8vWRM9vVSc90G97mKbkztj9uXeEM+qwO8sMfHyxgxpvPyhvCwPuAdnij9
+         ZUbFAfqbJuhyQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 5A1F3C53BC6; Thu, 22 Jun 2023 17:51:41 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 217562] kernel NULL pointer dereference on deletion of guest
+ physical memory slot
+Date:   Thu, 22 Jun 2023 17:51:41 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: arnaud.lefebvre@clever-cloud.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-217562-28872-nbfYtxtk57@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217562-28872@https.bugzilla.kernel.org/>
+References: <bug-217562-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2 15/16] accel: Rename 'cpu_state' -> 'cpu'
-Content-Language: en-US
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     Reinoud Zandijk <reinoud@netbsd.org>, qemu-arm@nongnu.org,
-        kvm@vger.kernel.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Roman Bolshakov <rbolshakov@ddn.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Durrant <paul@xen.org>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Alexander Graf <agraf@csgraf.de>,
-        xen-devel@lists.xenproject.org,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Cameron Esfahani <dirty@apple.com>
-References: <20230622160823.71851-1-philmd@linaro.org>
- <20230622160823.71851-16-philmd@linaro.org>
-From:   Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20230622160823.71851-16-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -88,16 +72,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/22/23 18:08, Philippe Mathieu-Daudé wrote:
-> Most of the codebase uses 'CPUState *cpu' or 'CPUState *cs'.
-> While 'cpu_state' is kind of explicit, it makes the code
-> harder to review. Simply rename as 'cpu' like the rest.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217562
 
-I would have chosen 'cs', since 'cpu' is often used for ArchCPU.  But ok.
+--- Comment #2 from Arnaud Lefebvre (arnaud.lefebvre@clever-cloud.com) ---
+Thanks a lot for that very detailed reply!
 
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
+> TL;DR: I'm 99% certain you're hitting a race that results in KVM doing a
+> list_del()
+> before a list_add().  I am planning on sending a patch for v5.15 to disab=
+le
+> the
+> TDP MMU by default, which will "fix" this bug, but I have an extra long
+> weekend
+> and won't get to that before next Thursday or so.
 
+> In the meantime, you can effect the same fix by disabling the TDP MMU via
+> module
+> param, i.e. add kvm.tdp_mmu=3Dfalse to your kernel/KVM command line.
 
-r~
+Alright, thanks for the tip. We'll probably just upgrade to the 6.1 LTS, th=
+is
+was planned but we weren't sure if the bug were there too.
+
+> If you're feeling particularly masochistic, I bet you could reproduce this
+> more
+> easily by introducing a delay between setting the SPTE and linking the pa=
+ge,
+> e.g.
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 6c2bb60ccd88..1fb10d4156aa 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1071,6 +1071,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gp=
+a,
+> u32 error_code,
+>                                                      !shadow_accessed_mas=
+k);
+>=20=20
+>                         if (tdp_mmu_set_spte_atomic_no_dirty_log(vcpu->kv=
+m,
+>                         &iter, new_spte)) {
+> +                               udelay(100);
+>                                 tdp_mmu_link_page(vcpu->kvm, sp,
+>                                                   huge_page_disallowed &&
+>                                                   req_level >=3D iter.lev=
+el);
+
+We might try that if we can find some time in the upcoming weeks, just to be
+sure that we can actually reproduce the bug and put this behind us.
+
+Regarding this bug report, how do we proceed from now on? Should we close i=
+t?
+Keep it open for a few weeks until we can confirm that we don't have this i=
+ssue
+in 6.1 anymore? Let you handle it once you disable TDP MMU by default on the
+v5.15 LTS?
+
+Thanks for your advice.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
