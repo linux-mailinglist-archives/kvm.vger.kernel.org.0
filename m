@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29B3973ACC9
-	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 00:59:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E524673ACD0
+	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 01:00:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231214AbjFVW70 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jun 2023 18:59:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35234 "EHLO
+        id S231308AbjFVXA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jun 2023 19:00:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229564AbjFVW7Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jun 2023 18:59:25 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 488031BE3;
-        Thu, 22 Jun 2023 15:59:24 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id 46e09a7af769-6b6da72d5e2so89927a34.1;
-        Thu, 22 Jun 2023 15:59:24 -0700 (PDT)
+        with ESMTP id S230235AbjFVXA1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jun 2023 19:00:27 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 479E31BE7;
+        Thu, 22 Jun 2023 16:00:26 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-543ae6ce8d1so77428a12.2;
+        Thu, 22 Jun 2023 16:00:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687474763; x=1690066763;
+        d=gmail.com; s=20221208; t=1687474826; x=1690066826;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wWPY8k9L840OD62Ue8PL7iZKL+dQfszwnxeEIHODVBc=;
-        b=Q7bzN6LbCulUU0WhmtUFRMdr/KvNmTdC4ACMgPyX8gLelGdIi1s+bvxXqxaD1V8TOZ
-         ab7xY74HKayq/Fg5dL+bKssUf79P5oAfRuccfkVkuR/W9V9fPXlqMfqMdBUpRov3Zjh2
-         32VnT+tGBCnq37L0EzYYom69surB55s7nMprbUPv4FB3fhNiVYBk95iPhV3kuzDnJftB
-         +QUPH1mpVD+e8Y91wKSGiLYmtK1nPQ8XRkLMpDsc/7j8YVTa3qnVz8rJN2tAkBC4K3ws
-         5H7zz58/Ws5YBjN7bbPIDSX61jxPfrJyWQRlLos8QHxDifYOha73gMZOOXBUZ7YoM9cm
-         KJxQ==
+        bh=/gUgtCMqYn0BEVYUGz1fELi84ouQU1vkS6xfwxCrOBU=;
+        b=rzotDp/kE7nSqn5vzRqJehlC0VBklhAosprw6i8pu1ENpnT2BjyN9lsqYCFDQXVq+E
+         BZ++5ZJ+xjIRn4lKuCRq3TmbM+0W3xGwWUnT3Z1AGaH+1nSR+R7XGyOjMx+WE0UG9pab
+         pI3J09PUejvgoVgq6J3ha1L2TRTMuHE3+Xp4l+MaZiIyIn/ElBLjUoFoOmestcbKfzoI
+         tODcr4Hku/TCfwFJZAMydiPoPPwKo7JR2eiunyMI+3C8AMMeioNqLgZiAKCXSLquYt6Q
+         yp37SSgAQASSYmdV8JGsRX6bBEDmQUGyhE6VUgadJ9diRm1SX4owfw62CVkiRLM8bL1+
+         eRFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687474763; x=1690066763;
+        d=1e100.net; s=20221208; t=1687474826; x=1690066826;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wWPY8k9L840OD62Ue8PL7iZKL+dQfszwnxeEIHODVBc=;
-        b=DvrjJ7IQ1cGYGIYKIzdM9b0xBu5CRpELwqWGGq5bg1mmD0Ry4nk5px+7rmzQELcriq
-         Ht/WoYhZRJuFLAfSrpxVrHTD9Tj24lcobUxUXeNlyA5OxLOq+2nUpi7SW7Mzjc/HS+Gt
-         q1ZVFJzKpKdYpLaKZ0jgXSd+oGArVXoY9wnJC2BNhDql5fxs0YA3uD/KXeiNL0tLTn24
-         yDZ2jko3iMFszzTMWrFV5kzvlbG19G4Dbn3oz+OUf3mRGdhwiPdQyiE72M9s0i7cBFA8
-         +YPZEGjJoQEez+8oCu0jT8XrdYRJqIKQshQ94K5WPmEBvn/Nw/BzOTc2fbQbzW+wiV13
-         G3eA==
-X-Gm-Message-State: AC+VfDwdV5SPhTiyX2PpUHaCikEhBXS9SSSYwdO2B66cK20hpZmbDpUc
-        V0Rqa0WS+OUNdiofW9ua9p0=
-X-Google-Smtp-Source: ACHHUZ5HZ5+9OoRofgTAwYouOOwETNaZfLN7OvRc/XYLG8ZwPagH5q3m/sPPoXBvzLM22SVLraJMgQ==
-X-Received: by 2002:a05:6358:7059:b0:132:d3c1:6d20 with SMTP id 25-20020a056358705900b00132d3c16d20mr2272951rwp.6.1687474763163;
-        Thu, 22 Jun 2023 15:59:23 -0700 (PDT)
+        bh=/gUgtCMqYn0BEVYUGz1fELi84ouQU1vkS6xfwxCrOBU=;
+        b=Y5Hpw0rDxC02flG0heZapAmulF1r4S15SDslOU5HUSbarR+MRrclqw78XUuwbNeZC3
+         2p/BTFrCsBfxVnWvtVwatkjMeOCnfa5A5xq9Y/2t7H2nCjFGjzP9H3AJXP5pxJEmR9sm
+         Ud2cUtCkKcIpKM8v6h9pHWGEOflnjkUAK0OR8I5zBINQWCrHuxQmKylFoTXrqvgiY3Y2
+         yi291Xo6+jNOHqTaYAoAxS8s8MsxpPwL06iKDrBN1XXe8flBD66Y70KpX42NvDy/UXrx
+         tE+9Vmh1a4nu5H98tYd3wWuGFxBsdKpRcopz/R8M8S9R52+kz3BkRIMaLWcuIODDwawI
+         2n7Q==
+X-Gm-Message-State: AC+VfDx1bRZM1RftS9OC+fmjlbrX1/EqO1CpS7oTiiOPmXPQdasxYC+b
+        ccd3peQSKkHiHQAhx85FOVY=
+X-Google-Smtp-Source: ACHHUZ7wvdcEdVOXN1Tpg0tF0aDch62ga/MzP3cuYpsRpGok/9Tk1Nx9L24zjf8weRaYN9LZw96XIg==
+X-Received: by 2002:a05:6a20:4402:b0:125:11da:f951 with SMTP id ce2-20020a056a20440200b0012511daf951mr3850477pzb.45.1687474825574;
+        Thu, 22 Jun 2023 16:00:25 -0700 (PDT)
 Received: from localhost (ec2-54-67-115-33.us-west-1.compute.amazonaws.com. [54.67.115.33])
-        by smtp.gmail.com with ESMTPSA id h8-20020a63df48000000b00548fb73874asm5347229pgj.37.2023.06.22.15.59.22
+        by smtp.gmail.com with ESMTPSA id s34-20020a635262000000b0053f2037d639sm5236111pgl.81.2023.06.22.16.00.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 15:59:22 -0700 (PDT)
-Date:   Thu, 22 Jun 2023 22:59:22 +0000
+        Thu, 22 Jun 2023 16:00:25 -0700 (PDT)
+Date:   Thu, 22 Jun 2023 23:00:24 +0000
 From:   Bobby Eshleman <bobbyeshleman@gmail.com>
 To:     Simon Horman <simon.horman@corigine.com>
 Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
@@ -72,15 +72,15 @@ Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
         bpf@vger.kernel.org
-Subject: Re: [PATCH RFC net-next v4 7/8] vsock: Add lockless sendmsg() support
-Message-ID: <ZJTSSqXL+IXoRK3x@bullseye>
+Subject: Re: [PATCH RFC net-next v4 4/8] vsock: make vsock bind reusable
+Message-ID: <ZJTSiFsUA96MoYx9@bullseye>
 References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
- <20230413-b4-vsock-dgram-v4-7-0cebbb2ae899@bytedance.com>
- <ZIbq/CeWowEq+nvg@corigine.com>
+ <20230413-b4-vsock-dgram-v4-4-0cebbb2ae899@bytedance.com>
+ <ZIbqRXYMbYsdq874@corigine.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZIbq/CeWowEq+nvg@corigine.com>
+In-Reply-To: <ZIbqRXYMbYsdq874@corigine.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -91,82 +91,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 12, 2023 at 11:53:00AM +0200, Simon Horman wrote:
-> On Sat, Jun 10, 2023 at 12:58:34AM +0000, Bobby Eshleman wrote:
-> > Because the dgram sendmsg() path for AF_VSOCK acquires the socket lock
-> > it does not scale when many senders share a socket.
+On Mon, Jun 12, 2023 at 11:49:57AM +0200, Simon Horman wrote:
+> On Sat, Jun 10, 2023 at 12:58:31AM +0000, Bobby Eshleman wrote:
+> > This commit makes the bind table management functions in vsock usable
+> > for different bind tables. For use by datagrams in a future patch.
 > > 
-> > Prior to this patch the socket lock is used to protect both reads and
-> > writes to the local_addr, remote_addr, transport, and buffer size
-> > variables of a vsock socket. What follows are the new protection schemes
-> > for these fields that ensure a race-free and usually lock-free
-> > multi-sender sendmsg() path for vsock dgrams.
+> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> > ---
+> >  net/vmw_vsock/af_vsock.c | 33 ++++++++++++++++++++++++++-------
+> >  1 file changed, 26 insertions(+), 7 deletions(-)
 > > 
-> > - local_addr
-> > local_addr changes as a result of binding a socket. The write path
-> > for local_addr is bind() and various vsock_auto_bind() call sites.
-> > After a socket has been bound via vsock_auto_bind() or bind(), subsequent
-> > calls to bind()/vsock_auto_bind() do not write to local_addr again. bind()
-> > rejects the user request and vsock_auto_bind() early exits.
-> > Therefore, the local addr can not change while a parallel thread is
-> > in sendmsg() and lock-free reads of local addr in sendmsg() are safe.
-> > Change: only acquire lock for auto-binding as-needed in sendmsg().
-> > 
-> > - buffer size variables
-> > Not used by dgram, so they do not need protection. No change.
-> > 
-> > - remote_addr and transport
-> > Because a remote_addr update may result in a changed transport, but we
-> > would like to be able to read these two fields lock-free but coherently
-> > in the vsock send path, this patch packages these two fields into a new
-> > struct vsock_remote_info that is referenced by an RCU-protected pointer.
-> > 
-> > Writes are synchronized as usual by the socket lock. Reads only take
-> > place in RCU read-side critical sections. When remote_addr or transport
-> > is updated, a new remote info is allocated. Old readers still see the
-> > old coherent remote_addr/transport pair, and new readers will refer to
-> > the new coherent. The coherency between remote_addr and transport
-> > previously provided by the socket lock alone is now also preserved by
-> > RCU, except with the highly-scalable lock-free read-side.
-> > 
-> > Helpers are introduced for accessing and updating the new pointer.
-> > 
-> > The new structure is contains an rcu_head so that kfree_rcu() can be
-> > used. This removes the need of writers to use synchronize_rcu() after
-> > freeing old structures which is simply more efficient and reduces code
-> > churn where remote_addr/transport are already being updated inside RCU
-> > read-side sections.
-> > 
-> > Only virtio has been tested, but updates were necessary to the VMCI and
-> > hyperv code. Unfortunately the author does not have access to
-> > VMCI/hyperv systems so those changes are untested.
-> > 
-> > Perf Tests (results from patch v2)
-> > vCPUS: 16
-> > Threads: 16
-> > Payload: 4KB
-> > Test Runs: 5
-> > Type: SOCK_DGRAM
-> > 
-> > Before: 245.2 MB/s
-> > After: 509.2 MB/s (+107%)
-> > 
-> > Notably, on the same test system, vsock dgram even outperforms
-> > multi-threaded UDP over virtio-net with vhost and MQ support enabled.
-> > 
-> > Throughput metrics for single-threaded SOCK_DGRAM and
-> > single/multi-threaded SOCK_STREAM showed no statistically signficant
+> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > index ef86765f3765..7a3ca4270446 100644
+> > --- a/net/vmw_vsock/af_vsock.c
+> > +++ b/net/vmw_vsock/af_vsock.c
+> > @@ -230,11 +230,12 @@ static void __vsock_remove_connected(struct vsock_sock *vsk)
+> >  	sock_put(&vsk->sk);
+> >  }
+> >  
+> > -static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
+> > +struct sock *vsock_find_bound_socket_common(struct sockaddr_vm *addr,
+> > +					    struct list_head *bind_table)
 > 
 > Hi Bobby,
 > 
-> a minor nit from checkpatch --codespell: signficant -> significant
-> 
+> This function seems to only be used in this file.
+> Should it be static?
 
-Thanks! I'll fix that and add that argument to my pre-commit hook.
+Oh good call, yep.
 
-> > throughput changes (lowest p-value reaching 0.27), with the range of the
-> > mean difference ranging between -5% to +1%.
-> > 
-> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> 
-> ...
+Thanks!
+Bobby
