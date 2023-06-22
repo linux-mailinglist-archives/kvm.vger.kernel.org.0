@@ -2,223 +2,851 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82F8673AD14
-	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 01:17:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0C8273AD03
+	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 01:17:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231791AbjFVXRy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jun 2023 19:17:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44820 "EHLO
+        id S231571AbjFVXQ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jun 2023 19:16:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231700AbjFVXRu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jun 2023 19:17:50 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CBBD26B0;
-        Thu, 22 Jun 2023 16:17:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687475854; x=1719011854;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=BD6pXTs5JxVG1xLxlJ9ylWBhK590xLSHJkxsDTrYBeo=;
-  b=ZBjCB8nhfDeF4EJvPg9bdCYQR9UOPyTY2IjR97f0p03UlKcIj2BrhHT/
-   0Lm2x9sHgDqEmR4/sFG2HAwRFg6aKWEA5uMGDaRo4Hh7/n6z7P2hM8gfi
-   otBzFP8PjtyiQS/n6ewH9SSXi834a/bsEUtbWkJorIOMbfTldgvXJyaoP
-   QXpg8w8QToxaMl9S5gUPyxFBkeoKIfGEvqvuLAmk/ugaJ1ZoEx37bCkQF
-   7RLYiNz2HQ0wQrNDoVWh9iZ99auCTjBAxI21S3zwQOK+RH6Ex3TfGvdFy
-   Q72/XLDf0lNxW3xzIsl1C83IABjyRHkFWIhvJJym73i+fuUMsfE1J0Lbs
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="358129749"
-X-IronPort-AV: E=Sophos;i="6.01,150,1684825200"; 
-   d="scan'208";a="358129749"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 16:17:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="718285989"
-X-IronPort-AV: E=Sophos;i="6.01,150,1684825200"; 
-   d="scan'208";a="718285989"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 16:17:13 -0700
-From:   isaku.yamahata@intel.com
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        linux-coco@lists.linux.dev,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Michael Roth <michael.roth@amd.com>
-Subject: [RFC PATCH v2 6/6] KVM: x86: Add is_vm_type_supported callback
-Date:   Thu, 22 Jun 2023 16:16:30 -0700
-Message-Id: <af9d610e4cba313aa09f1516dbb9bccc72049355.1687474039.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1687474039.git.isaku.yamahata@intel.com>
-References: <cover.1687474039.git.isaku.yamahata@intel.com>
+        with ESMTP id S229564AbjFVXQ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jun 2023 19:16:57 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0251739;
+        Thu, 22 Jun 2023 16:16:52 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1b55bc0c907so43790605ad.0;
+        Thu, 22 Jun 2023 16:16:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687475811; x=1690067811;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Pz0qQ59gTITsK6v/Fx5sanYdNWIwSFtFYWBZghPoW8=;
+        b=nlqpR03CsJHzvGZ7Q4hevMWi5IXecV9nOK/EDGgBfjvtHV8KdO5wzkvCidUXkffIQJ
+         wm5ZTAcJghbW1UPsY5zr39sWlWoep4EEraok8cW1kAJ/LgRIWzlVMupSL24bRouFLc/F
+         c250AkU8a9mzl8wkFsm6kOKvwOc3Yoe1+8hKQbG+TFEODKciS2ZBEeIU0peanf8JMyLQ
+         B5/OESGqxPRemZhpI0mPyVkKwnc7vxyFYcWpVtqFY9UEH9cnWAgYUGvsIzREU+WGl6Ss
+         B9DVzRPoDDXtHhGUBrvE3p0e3VQa4K+FwJD5+AcbB5A3lYL2nij5hzLI2hcFkd89oEIe
+         Npxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687475811; x=1690067811;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Pz0qQ59gTITsK6v/Fx5sanYdNWIwSFtFYWBZghPoW8=;
+        b=OL1Qhy7fwu2MG51YHZhoJPK7+nRG4QZCK5ShMqyrGRDwFoHk5oyRV9SycCx+d5oveN
+         EqWrPsOsBB76giBsyd8pxstQjUKlpHk/n6kjkk9gMHaN5mSntRIPSHiRbhPpfxc2staP
+         lsebNYc6hZriKT/bJPSyGlLBO8fZrvUYyYmlONdFYjU0fORLFOjr2bcUFQUQhdcH05Bo
+         T5wOIlpuRPsqDJB7E4SzvhkvpNGctz1+IZJcEeNRaDFChGLNAuTOxFeaqZsOfsyzdNRC
+         B9bbNr0cUvvFibrhOKI0egafDFEHXpxFIjicoWw51dq/pxvMvINA+Hk7lq5K2PRolVjb
+         tLWA==
+X-Gm-Message-State: AC+VfDz3YXmEiRxKVVa+rcYjcuwFTVEjigNKUAgeDRAB24xS8vg0NENF
+        JQZWaeN6/dQ0YmlSsQnrzvY=
+X-Google-Smtp-Source: ACHHUZ7gwUu/Yv+IF2sICMk+380WUL8bpEkES3EUSlSaVOZ+LF4TsT37NR68BOzHVFqxPuQzFJtU2g==
+X-Received: by 2002:a17:902:c40c:b0:1b5:3aed:b078 with SMTP id k12-20020a170902c40c00b001b53aedb078mr25374634plk.53.1687475811013;
+        Thu, 22 Jun 2023 16:16:51 -0700 (PDT)
+Received: from localhost (ec2-54-67-115-33.us-west-1.compute.amazonaws.com. [54.67.115.33])
+        by smtp.gmail.com with ESMTPSA id p2-20020a170902eac200b001aae64e9b36sm5882168pld.114.2023.06.22.16.16.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 16:16:50 -0700 (PDT)
+Date:   Thu, 22 Jun 2023 23:16:49 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Arseniy Krasnov <oxffffaa@gmail.com>
+Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        bpf@vger.kernel.org, Jiang Wang <jiang.wang@bytedance.com>
+Subject: Re: [PATCH RFC net-next v4 8/8] tests: add vsock dgram tests
+Message-ID: <ZJTWYRGd95xl+yRE@bullseye>
+References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
+ <20230413-b4-vsock-dgram-v4-8-0cebbb2ae899@bytedance.com>
+ <484c7b6f-5ce5-ce43-2dfd-0ae3063f1e47@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <484c7b6f-5ce5-ce43-2dfd-0ae3063f1e47@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Sun, Jun 11, 2023 at 11:54:57PM +0300, Arseniy Krasnov wrote:
+> Hello Bobby!
+> 
+> Sorry, may be I become a little bit annoying:), but I tried to run vsock_test with
+> this v4 version, and again get the same crash:
 
-For TDX, allow the backend can override the supported vm type.  Add
-KVM_X86_TDX_VM to reserve the bit.
+Haha not annoying at all. I appreciate the testing!
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
-Changes v1 -> v2
-- no change
----
- arch/x86/include/asm/kvm-x86-ops.h |  1 +
- arch/x86/include/asm/kvm_host.h    |  1 +
- arch/x86/include/uapi/asm/kvm.h    |  1 +
- arch/x86/kvm/svm/svm.c             |  7 +++++++
- arch/x86/kvm/vmx/vmx.c             |  6 ++++++
- arch/x86/kvm/x86.c                 | 10 +++++++++-
- arch/x86/kvm/x86.h                 |  2 ++
- 7 files changed, 27 insertions(+), 1 deletion(-)
+> 
+> # cat client.sh 
+> ./vsock_test  --mode=client --control-host=192.168.1.1 --control-port=12345 --peer-cid=2
+> # ./client.sh 
+> Control socket connected to 192.168.1.1:12345.
+> 0 - SOCK_STREAM connection reset...[   20.065237] BUG: kernel NULL pointer dereference, addre0
+> [   20.065895] #PF: supervisor read access in kernel mode
+> [   20.065895] #PF: error_code(0x0000) - not-present page
+> [   20.065895] PGD 0 P4D 0 
+> [   20.065895] Oops: 0000 [#1] PREEMPT SMP PTI
+> [   20.065895] CPU: 0 PID: 111 Comm: vsock_test Not tainted 6.4.0-rc3-gefcccba07069 #385
+> [   20.065895] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd44
+> [   20.065895] RIP: 0010:static_key_count+0x0/0x20
+> [   20.065895] Code: 04 4c 8b 46 08 49 29 c0 4c 01 c8 4c 89 47 08 89 0e 89 56 04 48 89 46 08 f
+> [   20.065895] RSP: 0018:ffffbbb000223dc0 EFLAGS: 00010202
+> [   20.065895] RAX: ffffffff85709880 RBX: ffffffffc0079140 RCX: 0000000000000000
+> [   20.065895] RDX: ffff9f73c2175700 RSI: 0000000000000000 RDI: 0000000000000000
+> [   20.065895] RBP: ffff9f73c2385900 R08: ffffbbb000223d30 R09: ffff9f73ff896000
+> [   20.065895] R10: 0000000000001000 R11: 0000000000000000 R12: ffffbbb000223e80
+> [   20.065895] R13: 0000000000000000 R14: 0000000000000002 R15: ffff9f73c1cfaa80
+> [   20.065895] FS:  00007f1ad82f55c0(0000) GS:ffff9f73fe400000(0000) knlGS:0000000000000000
+> [   20.065895] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   20.065895] CR2: 0000000000000000 CR3: 000000003f954000 CR4: 00000000000006f0
+> [   20.065895] Call Trace:
+> [   20.065895]  <TASK>
+> [   20.065895]  once_deferred+0xd/0x30
+> [   20.065895]  vsock_assign_transport+0x9a/0x1b0 [vsock]
+> [   20.065895]  vsock_connect+0xb4/0x3a0 [vsock]
+> [   20.065895]  ? var_wake_function+0x60/0x60
+> [   20.065895]  __sys_connect+0x9e/0xd0
+> [   20.065895]  ? _raw_spin_unlock_irq+0xe/0x30
+> [   20.065895]  ? do_setitimer+0x128/0x1f0
+> [   20.065895]  ? alarm_setitimer+0x4c/0x90
+> [   20.065895]  ? fpregs_assert_state_consistent+0x1d/0x50
+> [   20.065895]  ? exit_to_user_mode_prepare+0x36/0x130
+> [   20.065895]  __x64_sys_connect+0x11/0x20
+> [   20.065895]  do_syscall_64+0x3b/0xc0
+> [   20.065895]  entry_SYSCALL_64_after_hwframe+0x4b/0xb5
+> [   20.065895] RIP: 0033:0x7f1ad822dd13
+> [   20.065895] Code: 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 64 8
+> [   20.065895] RSP: 002b:00007ffc513e3c98 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+> [   20.065895] RAX: ffffffffffffffda RBX: 000055aed298e020 RCX: 00007f1ad822dd13
+> [   20.065895] RDX: 0000000000000010 RSI: 00007ffc513e3cb0 RDI: 0000000000000004
+> [   20.065895] RBP: 0000000000000004 R08: 000055aed32b2018 R09: 0000000000000000
+> [   20.065895] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> [   20.065895] R13: 000055aed298acb1 R14: 00007ffc513e3cb0 R15: 00007ffc513e3d40
+> [   20.065895]  </TASK>
+> [   20.065895] Modules linked in: vsock_loopback vhost_vsock vmw_vsock_virtio_transport vmw_vb
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 13bc212cd4bc..c0143906fe6d 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -20,6 +20,7 @@ KVM_X86_OP(hardware_disable)
- KVM_X86_OP(hardware_unsetup)
- KVM_X86_OP(has_emulated_msr)
- KVM_X86_OP(vcpu_after_set_cpuid)
-+KVM_X86_OP(is_vm_type_supported)
- KVM_X86_OP(vm_init)
- KVM_X86_OP_OPTIONAL(vm_destroy)
- KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5afeefc7a516..6adcc6be6466 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1549,6 +1549,7 @@ struct kvm_x86_ops {
- 	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
- 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
- 
-+	bool (*is_vm_type_supported)(unsigned long vm_type);
- 	unsigned int vm_size;
- 	int (*vm_init)(struct kvm *kvm);
- 	void (*vm_destroy)(struct kvm *kvm);
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 6afbfbb32d56..53d382b3b423 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -561,5 +561,6 @@ struct kvm_pmu_event_filter {
- 
- #define KVM_X86_DEFAULT_VM	0
- #define KVM_X86_PROTECTED_VM	1
-+#define KVM_X86_TDX_VM		2
- 
- #endif /* _ASM_X86_KVM_H */
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index eb308c9994f9..e9ed8729f63b 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4756,6 +4756,12 @@ static void svm_vm_destroy(struct kvm *kvm)
- 	sev_vm_destroy(kvm);
- }
- 
-+static bool svm_is_vm_type_supported(unsigned long type)
-+{
-+	/* FIXME: Check if CPU is capable of SEV. */
-+	return __kvm_is_vm_type_supported(type);
-+}
-+
- static int svm_vm_init(struct kvm *kvm)
- {
- 	if (!pause_filter_count || !pause_filter_thresh)
-@@ -4784,6 +4790,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.vcpu_free = svm_vcpu_free,
- 	.vcpu_reset = svm_vcpu_reset,
- 
-+	.is_vm_type_supported = svm_is_vm_type_supported,
- 	.vm_size = sizeof(struct kvm_svm),
- 	.vm_init = svm_vm_init,
- 	.vm_destroy = svm_vm_destroy,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 44fb619803b8..b5394ba8cb9c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7469,6 +7469,11 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
- 	return err;
- }
- 
-+static bool vmx_is_vm_type_supported(unsigned long type)
-+{
-+	return __kvm_is_vm_type_supported(type);
-+}
-+
- #define L1TF_MSG_SMT "L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- #define L1TF_MSG_L1D "L1TF CPU bug present and virtualization mitigation disabled, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- 
-@@ -8138,6 +8143,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.hardware_disable = vmx_hardware_disable,
- 	.has_emulated_msr = vmx_has_emulated_msr,
- 
-+	.is_vm_type_supported = vmx_is_vm_type_supported,
- 	.vm_size = sizeof(struct kvm_vmx),
- 	.vm_init = vmx_vm_init,
- 	.vm_destroy = vmx_vm_destroy,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c9e1c9369be2..b5f865f39a00 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4418,12 +4418,18 @@ static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
--static bool kvm_is_vm_type_supported(unsigned long type)
-+bool __kvm_is_vm_type_supported(unsigned long type)
- {
- 	return type == KVM_X86_DEFAULT_VM ||
- 	       (type == KVM_X86_PROTECTED_VM &&
- 	        IS_ENABLED(CONFIG_KVM_PROTECTED_VM) && tdp_enabled);
- }
-+EXPORT_SYMBOL_GPL(__kvm_is_vm_type_supported);
-+
-+static bool kvm_is_vm_type_supported(unsigned long type)
-+{
-+	return static_call(kvm_x86_is_vm_type_supported)(type);
-+}
- 
- int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- {
-@@ -4618,6 +4624,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = BIT(KVM_X86_DEFAULT_VM);
- 		if (kvm_is_vm_type_supported(KVM_X86_PROTECTED_VM))
- 			r |= BIT(KVM_X86_PROTECTED_VM);
-+		if (kvm_is_vm_type_supported(KVM_X86_TDX_VM))
-+			r |= BIT(KVM_X86_TDX_VM);
- 		break;
- 	default:
- 		break;
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index c544602d07a3..7d5aa8f0571a 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -9,6 +9,8 @@
- #include "kvm_cache_regs.h"
- #include "kvm_emulate.h"
- 
-+bool __kvm_is_vm_type_supported(unsigned long type);
-+
- struct kvm_caps {
- 	/* control of guest tsc rate supported? */
- 	bool has_tsc_control;
--- 
-2.25.1
+^ I'm guessing this is the difference between our setups. I have been
+going all built-in, let me see if I can reproduce w/ modules...
 
+> [   20.065895] CR2: 0000000000000000
+> [   20.154060] ---[ end trace 0000000000000000 ]---
+> [   20.155519] RIP: 0010:static_key_count+0x0/0x20
+> [   20.156932] Code: 04 4c 8b 46 08 49 29 c0 4c 01 c8 4c 89 47 08 89 0e 89 56 04 48 89 46 08 f
+> [   20.161367] RSP: 0018:ffffbbb000223dc0 EFLAGS: 00010202
+> [   20.162613] RAX: ffffffff85709880 RBX: ffffffffc0079140 RCX: 0000000000000000
+> [   20.164262] RDX: ffff9f73c2175700 RSI: 0000000000000000 RDI: 0000000000000000
+> [   20.165934] RBP: ffff9f73c2385900 R08: ffffbbb000223d30 R09: ffff9f73ff896000
+> [   20.167684] R10: 0000000000001000 R11: 0000000000000000 R12: ffffbbb000223e80
+> [   20.169427] R13: 0000000000000000 R14: 0000000000000002 R15: ffff9f73c1cfaa80
+> [   20.171109] FS:  00007f1ad82f55c0(0000) GS:ffff9f73fe400000(0000) knlGS:0000000000000000
+> [   20.173000] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   20.174381] CR2: 0000000000000000 CR3: 000000003f954000 CR4: 00000000000006f0
+> 
+> So, what HEAD do You use? May be You have some specific config (I use x86-64 defconfig + vsock/vhost
+> related things) ?
+> 
+
+For this series I used net-next:
+	28cfea989d6f55c3d10608eba2a2bae609c5bf3e
+
+> Thanks, Arseniy
+> 
+
+As always, thanks for the bug finding! I'll report back when I
+reproduce or with questions if I can't.
+
+Best,
+Bobby
+
+> 
+> On 10.06.2023 03:58, Bobby Eshleman wrote:
+> > From: Jiang Wang <jiang.wang@bytedance.com>
+> > 
+> > This patch adds tests for vsock datagram.
+> > 
+> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> > Signed-off-by: Jiang Wang <jiang.wang@bytedance.com>
+> > ---
+> >  tools/testing/vsock/util.c       | 141 ++++++++++++-
+> >  tools/testing/vsock/util.h       |   6 +
+> >  tools/testing/vsock/vsock_test.c | 432 +++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 578 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+> > index 01b636d3039a..811e70d7cf1e 100644
+> > --- a/tools/testing/vsock/util.c
+> > +++ b/tools/testing/vsock/util.c
+> > @@ -99,7 +99,8 @@ static int vsock_connect(unsigned int cid, unsigned int port, int type)
+> >  	int ret;
+> >  	int fd;
+> >  
+> > -	control_expectln("LISTENING");
+> > +	if (type != SOCK_DGRAM)
+> > +		control_expectln("LISTENING");
+> >  
+> >  	fd = socket(AF_VSOCK, type, 0);
+> >  
+> > @@ -130,6 +131,11 @@ int vsock_seqpacket_connect(unsigned int cid, unsigned int port)
+> >  	return vsock_connect(cid, port, SOCK_SEQPACKET);
+> >  }
+> >  
+> > +int vsock_dgram_connect(unsigned int cid, unsigned int port)
+> > +{
+> > +	return vsock_connect(cid, port, SOCK_DGRAM);
+> > +}
+> > +
+> >  /* Listen on <cid, port> and return the first incoming connection.  The remote
+> >   * address is stored to clientaddrp.  clientaddrp may be NULL.
+> >   */
+> > @@ -211,6 +217,34 @@ int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
+> >  	return vsock_accept(cid, port, clientaddrp, SOCK_SEQPACKET);
+> >  }
+> >  
+> > +int vsock_dgram_bind(unsigned int cid, unsigned int port)
+> > +{
+> > +	union {
+> > +		struct sockaddr sa;
+> > +		struct sockaddr_vm svm;
+> > +	} addr = {
+> > +		.svm = {
+> > +			.svm_family = AF_VSOCK,
+> > +			.svm_port = port,
+> > +			.svm_cid = cid,
+> > +		},
+> > +	};
+> > +	int fd;
+> > +
+> > +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
+> > +	if (fd < 0) {
+> > +		perror("socket");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
+> > +		perror("bind");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	return fd;
+> > +}
+> > +
+> >  /* Transmit one byte and check the return value.
+> >   *
+> >   * expected_ret:
+> > @@ -260,6 +294,57 @@ void send_byte(int fd, int expected_ret, int flags)
+> >  	}
+> >  }
+> >  
+> > +/* Transmit one byte and check the return value.
+> > + *
+> > + * expected_ret:
+> > + *  <0 Negative errno (for testing errors)
+> > + *   0 End-of-file
+> > + *   1 Success
+> > + */
+> > +void sendto_byte(int fd, const struct sockaddr *dest_addr, int len, int expected_ret,
+> > +		 int flags)
+> > +{
+> > +	const uint8_t byte = 'A';
+> > +	ssize_t nwritten;
+> > +
+> > +	timeout_begin(TIMEOUT);
+> > +	do {
+> > +		nwritten = sendto(fd, &byte, sizeof(byte), flags, dest_addr,
+> > +				  len);
+> > +		timeout_check("write");
+> > +	} while (nwritten < 0 && errno == EINTR);
+> > +	timeout_end();
+> > +
+> > +	if (expected_ret < 0) {
+> > +		if (nwritten != -1) {
+> > +			fprintf(stderr, "bogus sendto(2) return value %zd\n",
+> > +				nwritten);
+> > +			exit(EXIT_FAILURE);
+> > +		}
+> > +		if (errno != -expected_ret) {
+> > +			perror("write");
+> > +			exit(EXIT_FAILURE);
+> > +		}
+> > +		return;
+> > +	}
+> > +
+> > +	if (nwritten < 0) {
+> > +		perror("write");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +	if (nwritten == 0) {
+> > +		if (expected_ret == 0)
+> > +			return;
+> > +
+> > +		fprintf(stderr, "unexpected EOF while sending byte\n");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +	if (nwritten != sizeof(byte)) {
+> > +		fprintf(stderr, "bogus sendto(2) return value %zd\n", nwritten);
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +}
+> > +
+> >  /* Receive one byte and check the return value.
+> >   *
+> >   * expected_ret:
+> > @@ -313,6 +398,60 @@ void recv_byte(int fd, int expected_ret, int flags)
+> >  	}
+> >  }
+> >  
+> > +/* Receive one byte and check the return value.
+> > + *
+> > + * expected_ret:
+> > + *  <0 Negative errno (for testing errors)
+> > + *   0 End-of-file
+> > + *   1 Success
+> > + */
+> > +void recvfrom_byte(int fd, struct sockaddr *src_addr, socklen_t *addrlen,
+> > +		   int expected_ret, int flags)
+> > +{
+> > +	uint8_t byte;
+> > +	ssize_t nread;
+> > +
+> > +	timeout_begin(TIMEOUT);
+> > +	do {
+> > +		nread = recvfrom(fd, &byte, sizeof(byte), flags, src_addr, addrlen);
+> > +		timeout_check("read");
+> > +	} while (nread < 0 && errno == EINTR);
+> > +	timeout_end();
+> > +
+> > +	if (expected_ret < 0) {
+> > +		if (nread != -1) {
+> > +			fprintf(stderr, "bogus recvfrom(2) return value %zd\n",
+> > +				nread);
+> > +			exit(EXIT_FAILURE);
+> > +		}
+> > +		if (errno != -expected_ret) {
+> > +			perror("read");
+> > +			exit(EXIT_FAILURE);
+> > +		}
+> > +		return;
+> > +	}
+> > +
+> > +	if (nread < 0) {
+> > +		perror("read");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +	if (nread == 0) {
+> > +		if (expected_ret == 0)
+> > +			return;
+> > +
+> > +		fprintf(stderr, "unexpected EOF while receiving byte\n");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +	if (nread != sizeof(byte)) {
+> > +		fprintf(stderr, "bogus recvfrom(2) return value %zd\n", nread);
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +	if (byte != 'A') {
+> > +		fprintf(stderr, "unexpected byte read %c\n", byte);
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +}
+> > +
+> >  /* Run test cases.  The program terminates if a failure occurs. */
+> >  void run_tests(const struct test_case *test_cases,
+> >  	       const struct test_opts *opts)
+> > diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+> > index fb99208a95ea..a69e128d120c 100644
+> > --- a/tools/testing/vsock/util.h
+> > +++ b/tools/testing/vsock/util.h
+> > @@ -37,13 +37,19 @@ void init_signals(void);
+> >  unsigned int parse_cid(const char *str);
+> >  int vsock_stream_connect(unsigned int cid, unsigned int port);
+> >  int vsock_seqpacket_connect(unsigned int cid, unsigned int port);
+> > +int vsock_dgram_connect(unsigned int cid, unsigned int port);
+> >  int vsock_stream_accept(unsigned int cid, unsigned int port,
+> >  			struct sockaddr_vm *clientaddrp);
+> >  int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
+> >  			   struct sockaddr_vm *clientaddrp);
+> > +int vsock_dgram_bind(unsigned int cid, unsigned int port);
+> >  void vsock_wait_remote_close(int fd);
+> >  void send_byte(int fd, int expected_ret, int flags);
+> > +void sendto_byte(int fd, const struct sockaddr *dest_addr, int len, int expected_ret,
+> > +		 int flags);
+> >  void recv_byte(int fd, int expected_ret, int flags);
+> > +void recvfrom_byte(int fd, struct sockaddr *src_addr, socklen_t *addrlen,
+> > +		   int expected_ret, int flags);
+> >  void run_tests(const struct test_case *test_cases,
+> >  	       const struct test_opts *opts);
+> >  void list_tests(const struct test_case *test_cases);
+> > diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+> > index ac1bd3ac1533..ded82d39ee5d 100644
+> > --- a/tools/testing/vsock/vsock_test.c
+> > +++ b/tools/testing/vsock/vsock_test.c
+> > @@ -1053,6 +1053,413 @@ static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
+> >  	close(fd);
+> >  }
+> >  
+> > +static void test_dgram_sendto_client(const struct test_opts *opts)
+> > +{
+> > +	union {
+> > +		struct sockaddr sa;
+> > +		struct sockaddr_vm svm;
+> > +	} addr = {
+> > +		.svm = {
+> > +			.svm_family = AF_VSOCK,
+> > +			.svm_port = 1234,
+> > +			.svm_cid = opts->peer_cid,
+> > +		},
+> > +	};
+> > +	int fd;
+> > +
+> > +	/* Wait for the server to be ready */
+> > +	control_expectln("BIND");
+> > +
+> > +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
+> > +	if (fd < 0) {
+> > +		perror("socket");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	sendto_byte(fd, &addr.sa, sizeof(addr.svm), 1, 0);
+> > +
+> > +	/* Notify the server that the client has finished */
+> > +	control_writeln("DONE");
+> > +
+> > +	close(fd);
+> > +}
+> > +
+> > +static void test_dgram_sendto_server(const struct test_opts *opts)
+> > +{
+> > +	union {
+> > +		struct sockaddr sa;
+> > +		struct sockaddr_vm svm;
+> > +	} addr = {
+> > +		.svm = {
+> > +			.svm_family = AF_VSOCK,
+> > +			.svm_port = 1234,
+> > +			.svm_cid = VMADDR_CID_ANY,
+> > +		},
+> > +	};
+> > +	int len = sizeof(addr.sa);
+> > +	int fd;
+> > +
+> > +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
+> > +	if (fd < 0) {
+> > +		perror("socket");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
+> > +		perror("bind");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	/* Notify the client that the server is ready */
+> > +	control_writeln("BIND");
+> > +
+> > +	recvfrom_byte(fd, &addr.sa, &len, 1, 0);
+> > +
+> > +	/* Wait for the client to finish */
+> > +	control_expectln("DONE");
+> > +
+> > +	close(fd);
+> > +}
+> > +
+> > +static void test_dgram_connect_client(const struct test_opts *opts)
+> > +{
+> > +	union {
+> > +		struct sockaddr sa;
+> > +		struct sockaddr_vm svm;
+> > +	} addr = {
+> > +		.svm = {
+> > +			.svm_family = AF_VSOCK,
+> > +			.svm_port = 1234,
+> > +			.svm_cid = opts->peer_cid,
+> > +		},
+> > +	};
+> > +	int ret;
+> > +	int fd;
+> > +
+> > +	/* Wait for the server to be ready */
+> > +	control_expectln("BIND");
+> > +
+> > +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
+> > +	if (fd < 0) {
+> > +		perror("bind");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	ret = connect(fd, &addr.sa, sizeof(addr.svm));
+> > +	if (ret < 0) {
+> > +		perror("connect");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	send_byte(fd, 1, 0);
+> > +
+> > +	/* Notify the server that the client has finished */
+> > +	control_writeln("DONE");
+> > +
+> > +	close(fd);
+> > +}
+> > +
+> > +static void test_dgram_connect_server(const struct test_opts *opts)
+> > +{
+> > +	test_dgram_sendto_server(opts);
+> > +}
+> > +
+> > +static void test_dgram_multiconn_sendto_client(const struct test_opts *opts)
+> > +{
+> > +	union {
+> > +		struct sockaddr sa;
+> > +		struct sockaddr_vm svm;
+> > +	} addr = {
+> > +		.svm = {
+> > +			.svm_family = AF_VSOCK,
+> > +			.svm_port = 1234,
+> > +			.svm_cid = opts->peer_cid,
+> > +		},
+> > +	};
+> > +	int fds[MULTICONN_NFDS];
+> > +	int i;
+> > +
+> > +	/* Wait for the server to be ready */
+> > +	control_expectln("BIND");
+> > +
+> > +	for (i = 0; i < MULTICONN_NFDS; i++) {
+> > +		fds[i] = socket(AF_VSOCK, SOCK_DGRAM, 0);
+> > +		if (fds[i] < 0) {
+> > +			perror("socket");
+> > +			exit(EXIT_FAILURE);
+> > +		}
+> > +	}
+> > +
+> > +	for (i = 0; i < MULTICONN_NFDS; i++)
+> > +		sendto_byte(fds[i], &addr.sa, sizeof(addr.svm), 1, 0);
+> > +
+> > +	/* Notify the server that the client has finished */
+> > +	control_writeln("DONE");
+> > +
+> > +	for (i = 0; i < MULTICONN_NFDS; i++)
+> > +		close(fds[i]);
+> > +}
+> > +
+> > +static void test_dgram_multiconn_sendto_server(const struct test_opts *opts)
+> > +{
+> > +	union {
+> > +		struct sockaddr sa;
+> > +		struct sockaddr_vm svm;
+> > +	} addr = {
+> > +		.svm = {
+> > +			.svm_family = AF_VSOCK,
+> > +			.svm_port = 1234,
+> > +			.svm_cid = VMADDR_CID_ANY,
+> > +		},
+> > +	};
+> > +	int len = sizeof(addr.sa);
+> > +	int fd;
+> > +	int i;
+> > +
+> > +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
+> > +	if (fd < 0) {
+> > +		perror("socket");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
+> > +		perror("bind");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	/* Notify the client that the server is ready */
+> > +	control_writeln("BIND");
+> > +
+> > +	for (i = 0; i < MULTICONN_NFDS; i++)
+> > +		recvfrom_byte(fd, &addr.sa, &len, 1, 0);
+> > +
+> > +	/* Wait for the client to finish */
+> > +	control_expectln("DONE");
+> > +
+> > +	close(fd);
+> > +}
+> > +
+> > +static void test_dgram_multiconn_send_client(const struct test_opts *opts)
+> > +{
+> > +	int fds[MULTICONN_NFDS];
+> > +	int i;
+> > +
+> > +	/* Wait for the server to be ready */
+> > +	control_expectln("BIND");
+> > +
+> > +	for (i = 0; i < MULTICONN_NFDS; i++) {
+> > +		fds[i] = vsock_dgram_connect(opts->peer_cid, 1234);
+> > +		if (fds[i] < 0) {
+> > +			perror("socket");
+> > +			exit(EXIT_FAILURE);
+> > +		}
+> > +	}
+> > +
+> > +	for (i = 0; i < MULTICONN_NFDS; i++)
+> > +		send_byte(fds[i], 1, 0);
+> > +
+> > +	/* Notify the server that the client has finished */
+> > +	control_writeln("DONE");
+> > +
+> > +	for (i = 0; i < MULTICONN_NFDS; i++)
+> > +		close(fds[i]);
+> > +}
+> > +
+> > +static void test_dgram_multiconn_send_server(const struct test_opts *opts)
+> > +{
+> > +	union {
+> > +		struct sockaddr sa;
+> > +		struct sockaddr_vm svm;
+> > +	} addr = {
+> > +		.svm = {
+> > +			.svm_family = AF_VSOCK,
+> > +			.svm_port = 1234,
+> > +			.svm_cid = VMADDR_CID_ANY,
+> > +		},
+> > +	};
+> > +	int fd;
+> > +	int i;
+> > +
+> > +	fd = socket(AF_VSOCK, SOCK_DGRAM, 0);
+> > +	if (fd < 0) {
+> > +		perror("socket");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
+> > +		perror("bind");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	/* Notify the client that the server is ready */
+> > +	control_writeln("BIND");
+> > +
+> > +	for (i = 0; i < MULTICONN_NFDS; i++)
+> > +		recv_byte(fd, 1, 0);
+> > +
+> > +	/* Wait for the client to finish */
+> > +	control_expectln("DONE");
+> > +
+> > +	close(fd);
+> > +}
+> > +
+> > +static void test_dgram_msg_bounds_client(const struct test_opts *opts)
+> > +{
+> > +	unsigned long recv_buf_size;
+> > +	int page_size;
+> > +	int msg_cnt;
+> > +	int fd;
+> > +
+> > +	fd = vsock_dgram_connect(opts->peer_cid, 1234);
+> > +	if (fd < 0) {
+> > +		perror("connect");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	/* Let the server know the client is ready */
+> > +	control_writeln("CLNTREADY");
+> > +
+> > +	msg_cnt = control_readulong();
+> > +	recv_buf_size = control_readulong();
+> > +
+> > +	/* Wait, until receiver sets buffer size. */
+> > +	control_expectln("SRVREADY");
+> > +
+> > +	page_size = getpagesize();
+> > +
+> > +	for (int i = 0; i < msg_cnt; i++) {
+> > +		unsigned long curr_hash;
+> > +		ssize_t send_size;
+> > +		size_t buf_size;
+> > +		void *buf;
+> > +
+> > +		/* Use "small" buffers and "big" buffers. */
+> > +		if (i & 1)
+> > +			buf_size = page_size +
+> > +					(rand() % (MAX_MSG_SIZE - page_size));
+> > +		else
+> > +			buf_size = 1 + (rand() % page_size);
+> > +
+> > +		buf_size = min(buf_size, recv_buf_size);
+> > +
+> > +		buf = malloc(buf_size);
+> > +
+> > +		if (!buf) {
+> > +			perror("malloc");
+> > +			exit(EXIT_FAILURE);
+> > +		}
+> > +
+> > +		memset(buf, rand() & 0xff, buf_size);
+> > +		/* Set at least one MSG_EOR + some random. */
+> > +
+> > +		send_size = send(fd, buf, buf_size, 0);
+> > +
+> > +		if (send_size < 0) {
+> > +			perror("send");
+> > +			exit(EXIT_FAILURE);
+> > +		}
+> > +
+> > +		if (send_size != buf_size) {
+> > +			fprintf(stderr, "Invalid send size\n");
+> > +			exit(EXIT_FAILURE);
+> > +		}
+> > +
+> > +		/* In theory the implementation isn't required to transmit
+> > +		 * these packets in order, so we use this SYNC control message
+> > +		 * so that server and client coordinate sending and receiving
+> > +		 * one packet at a time. The client sends a packet and waits
+> > +		 * until it has been received before sending another.
+> > +		 */
+> > +		control_writeln("PKTSENT");
+> > +		control_expectln("PKTRECV");
+> > +
+> > +		/* Send the server a hash of the packet */
+> > +		curr_hash = hash_djb2(buf, buf_size);
+> > +		control_writeulong(curr_hash);
+> > +		free(buf);
+> > +	}
+> > +
+> > +	control_writeln("SENDDONE");
+> > +	close(fd);
+> > +}
+> > +
+> > +static void test_dgram_msg_bounds_server(const struct test_opts *opts)
+> > +{
+> > +	const unsigned long msg_cnt = 16;
+> > +	unsigned long sock_buf_size;
+> > +	struct msghdr msg = {0};
+> > +	struct iovec iov = {0};
+> > +	char buf[MAX_MSG_SIZE];
+> > +	socklen_t len;
+> > +	int fd;
+> > +	int i;
+> > +
+> > +	fd = vsock_dgram_bind(VMADDR_CID_ANY, 1234);
+> > +
+> > +	if (fd < 0) {
+> > +		perror("bind");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	/* Set receive buffer to maximum */
+> > +	sock_buf_size = -1;
+> > +	if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF,
+> > +		       &sock_buf_size, sizeof(sock_buf_size))) {
+> > +		perror("setsockopt(SO_RECVBUF)");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	/* Retrieve the receive buffer size */
+> > +	len = sizeof(sock_buf_size);
+> > +	if (getsockopt(fd, SOL_SOCKET, SO_RCVBUF,
+> > +		       &sock_buf_size, &len)) {
+> > +		perror("getsockopt(SO_RECVBUF)");
+> > +		exit(EXIT_FAILURE);
+> > +	}
+> > +
+> > +	/* Client ready to receive parameters */
+> > +	control_expectln("CLNTREADY");
+> > +
+> > +	control_writeulong(msg_cnt);
+> > +	control_writeulong(sock_buf_size);
+> > +
+> > +	/* Ready to receive data. */
+> > +	control_writeln("SRVREADY");
+> > +
+> > +	iov.iov_base = buf;
+> > +	iov.iov_len = sizeof(buf);
+> > +	msg.msg_iov = &iov;
+> > +	msg.msg_iovlen = 1;
+> > +
+> > +	for (i = 0; i < msg_cnt; i++) {
+> > +		unsigned long remote_hash;
+> > +		unsigned long curr_hash;
+> > +		ssize_t recv_size;
+> > +
+> > +		control_expectln("PKTSENT");
+> > +		recv_size = recvmsg(fd, &msg, 0);
+> > +		control_writeln("PKTRECV");
+> > +
+> > +		if (!recv_size)
+> > +			break;
+> > +
+> > +		if (recv_size < 0) {
+> > +			perror("recvmsg");
+> > +			exit(EXIT_FAILURE);
+> > +		}
+> > +
+> > +		curr_hash = hash_djb2(msg.msg_iov[0].iov_base, recv_size);
+> > +		remote_hash = control_readulong();
+> > +
+> > +		if (curr_hash != remote_hash) {
+> > +			fprintf(stderr, "Message bounds broken\n");
+> > +			exit(EXIT_FAILURE);
+> > +		}
+> > +	}
+> > +
+> > +	close(fd);
+> > +}
+> > +
+> >  static struct test_case test_cases[] = {
+> >  	{
+> >  		.name = "SOCK_STREAM connection reset",
+> > @@ -1128,6 +1535,31 @@ static struct test_case test_cases[] = {
+> >  		.run_client = test_stream_virtio_skb_merge_client,
+> >  		.run_server = test_stream_virtio_skb_merge_server,
+> >  	},
+> > +	{
+> > +		.name = "SOCK_DGRAM client sendto",
+> > +		.run_client = test_dgram_sendto_client,
+> > +		.run_server = test_dgram_sendto_server,
+> > +	},
+> > +	{
+> > +		.name = "SOCK_DGRAM client connect",
+> > +		.run_client = test_dgram_connect_client,
+> > +		.run_server = test_dgram_connect_server,
+> > +	},
+> > +	{
+> > +		.name = "SOCK_DGRAM multiple connections using sendto",
+> > +		.run_client = test_dgram_multiconn_sendto_client,
+> > +		.run_server = test_dgram_multiconn_sendto_server,
+> > +	},
+> > +	{
+> > +		.name = "SOCK_DGRAM multiple connections using send",
+> > +		.run_client = test_dgram_multiconn_send_client,
+> > +		.run_server = test_dgram_multiconn_send_server,
+> > +	},
+> > +	{
+> > +		.name = "SOCK_DGRAM msg bounds",
+> > +		.run_client = test_dgram_msg_bounds_client,
+> > +		.run_server = test_dgram_msg_bounds_server,
+> > +	},
+> >  	{},
+> >  };
+> >  
+> > 
