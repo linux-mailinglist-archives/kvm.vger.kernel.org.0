@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B9EE73AD12
-	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 01:17:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82F8673AD14
+	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 01:17:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231696AbjFVXRm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jun 2023 19:17:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44730 "EHLO
+        id S231791AbjFVXRy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jun 2023 19:17:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231592AbjFVXRk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jun 2023 19:17:40 -0400
+        with ESMTP id S231700AbjFVXRu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jun 2023 19:17:50 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24C11992;
-        Thu, 22 Jun 2023 16:17:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CBBD26B0;
+        Thu, 22 Jun 2023 16:17:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687475846; x=1719011846;
+  t=1687475854; x=1719011854;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=zBMD9h2KBgIYaddcweRh+FeZhoyrRw3SBUE0qo0cW8k=;
-  b=SEjhHTfvXLCgluYg021G2iTKdA5LDkSOKdkhXU1v+CHdm2IVFUerXhJE
-   h3iwWXs7bTbW5+PM2JbrDEgffMPJMht7OJ2DpeJhOixZzEg7AnpNti1BP
-   ID4KuG49DywQxBD2Ze95SOAo65HONypM1B2cN8J60THygaKxMCLOr+rNF
-   GcNX21PzL7JneeZufKAP1O1afH5Zuvwy46GYpTMLvTqj8HZXWRBykPWjX
-   bazv26LGkceO79h0IYKF35vLBJHY8GD9tvydgt/AZ8EGmb848SZ/JFl/s
-   EhBXemdGWZWs2Hu+gfM70616ikeYhMLkxtDZB1Nxifelvr3SiTS94JEj+
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="358129743"
+  bh=BD6pXTs5JxVG1xLxlJ9ylWBhK590xLSHJkxsDTrYBeo=;
+  b=ZBjCB8nhfDeF4EJvPg9bdCYQR9UOPyTY2IjR97f0p03UlKcIj2BrhHT/
+   0Lm2x9sHgDqEmR4/sFG2HAwRFg6aKWEA5uMGDaRo4Hh7/n6z7P2hM8gfi
+   otBzFP8PjtyiQS/n6ewH9SSXi834a/bsEUtbWkJorIOMbfTldgvXJyaoP
+   QXpg8w8QToxaMl9S5gUPyxFBkeoKIfGEvqvuLAmk/ugaJ1ZoEx37bCkQF
+   7RLYiNz2HQ0wQrNDoVWh9iZ99auCTjBAxI21S3zwQOK+RH6Ex3TfGvdFy
+   Q72/XLDf0lNxW3xzIsl1C83IABjyRHkFWIhvJJym73i+fuUMsfE1J0Lbs
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="358129749"
 X-IronPort-AV: E=Sophos;i="6.01,150,1684825200"; 
-   d="scan'208";a="358129743"
+   d="scan'208";a="358129749"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 16:17:13 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 16:17:14 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="718285986"
+X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="718285989"
 X-IronPort-AV: E=Sophos;i="6.01,150,1684825200"; 
-   d="scan'208";a="718285986"
+   d="scan'208";a="718285989"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 16:17:13 -0700
 From:   isaku.yamahata@intel.com
@@ -52,9 +52,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Ackerley Tng <ackerleytng@google.com>,
         Vishal Annapurve <vannapurve@google.com>,
         Michael Roth <michael.roth@amd.com>
-Subject: [RFC PATCH v2 5/6] KVM: Add flags to struct kvm_gfn_range
-Date:   Thu, 22 Jun 2023 16:16:29 -0700
-Message-Id: <689da77417c2f4055f02a71aab51ff603bc195af.1687474039.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v2 6/6] KVM: x86: Add is_vm_type_supported callback
+Date:   Thu, 22 Jun 2023 16:16:30 -0700
+Message-Id: <af9d610e4cba313aa09f1516dbb9bccc72049355.1687474039.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1687474039.git.isaku.yamahata@intel.com>
 References: <cover.1687474039.git.isaku.yamahata@intel.com>
@@ -72,125 +72,153 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Add flags to strut kvm_gfn_range to indicate who triggered the callback
-and new memory attributes.
-
-TDX needs to know the reason for a callback by kvm_unmap_gfn_range().  mmu
-notifier, set memory attributes ioctl or KVM gmem callback.  With TDX,
-zapping a private page from the encrypted page table and adding the page
-back to the same private GPA results in zeroing the page, and the guest has
-to accept the page again.  On the change of memory attribute from private
-to shared, zapping the GPA range irrespective to private-or-shared and
-expecting the fault doesn't work for TDX.  Instead, zap shared pages only
-and keep the private pages.  Concretely
-- If it's from mmu notifier, zap shared pages.
-- If it's from KVM gmem, zap private pages.
-- If setting memory attributes to private, zap shared pages.
-- If setting memory attributes to shared, zap private pages.
+For TDX, allow the backend can override the supported vm type.  Add
+KVM_X86_TDX_VM to reserve the bit.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-
 ---
-Changes v1 -> v2:
-- consolidate KVM_GFN_RANGE_FLAGS_GMEM_{PUNCH_HOLE, RELEASE} into
-  KVM_GFN_RANGE_FLAGS_GMEM.
-- Update the commit message to describe TDX more.  Drop SEV_SNP.
+Changes v1 -> v2
+- no change
 ---
- include/linux/kvm_host.h | 10 +++++++++-
- virt/kvm/guest_mem.c     |  9 ++++++---
- virt/kvm/kvm_main.c      |  4 +++-
- 3 files changed, 18 insertions(+), 5 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  1 +
+ arch/x86/include/uapi/asm/kvm.h    |  1 +
+ arch/x86/kvm/svm/svm.c             |  7 +++++++
+ arch/x86/kvm/vmx/vmx.c             |  6 ++++++
+ arch/x86/kvm/x86.c                 | 10 +++++++++-
+ arch/x86/kvm/x86.h                 |  2 ++
+ 7 files changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 1a47cedae8a1..1fe0516fcddf 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -256,12 +256,20 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
- #endif
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 13bc212cd4bc..c0143906fe6d 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -20,6 +20,7 @@ KVM_X86_OP(hardware_disable)
+ KVM_X86_OP(hardware_unsetup)
+ KVM_X86_OP(has_emulated_msr)
+ KVM_X86_OP(vcpu_after_set_cpuid)
++KVM_X86_OP(is_vm_type_supported)
+ KVM_X86_OP(vm_init)
+ KVM_X86_OP_OPTIONAL(vm_destroy)
+ KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 5afeefc7a516..6adcc6be6466 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1549,6 +1549,7 @@ struct kvm_x86_ops {
+ 	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
+ 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
  
- #ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
-+
-+#define KVM_GFN_RANGE_FLAGS_SET_MEM_ATTR	BIT(0)
-+#define KVM_GFN_RANGE_FLAGS_GMEM		BIT(1)
-+
- struct kvm_gfn_range {
- 	struct kvm_memory_slot *slot;
- 	gfn_t start;
- 	gfn_t end;
--	pte_t pte;
-+	union {
-+		pte_t pte;
-+		u64 attrs;
-+	};
- 	bool may_block;
-+	unsigned int flags;
- };
- bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
- bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
-diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
-index cdf2d84683c8..387226136960 100644
---- a/virt/kvm/guest_mem.c
-+++ b/virt/kvm/guest_mem.c
-@@ -99,7 +99,8 @@ static struct folio *kvm_gmem_get_folio(struct file *file, pgoff_t index)
++	bool (*is_vm_type_supported)(unsigned long vm_type);
+ 	unsigned int vm_size;
+ 	int (*vm_init)(struct kvm *kvm);
+ 	void (*vm_destroy)(struct kvm *kvm);
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 6afbfbb32d56..53d382b3b423 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -561,5 +561,6 @@ struct kvm_pmu_event_filter {
+ 
+ #define KVM_X86_DEFAULT_VM	0
+ #define KVM_X86_PROTECTED_VM	1
++#define KVM_X86_TDX_VM		2
+ 
+ #endif /* _ASM_X86_KVM_H */
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index eb308c9994f9..e9ed8729f63b 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4756,6 +4756,12 @@ static void svm_vm_destroy(struct kvm *kvm)
+ 	sev_vm_destroy(kvm);
  }
  
- static void kvm_gmem_invalidate_begin(struct kvm *kvm, struct kvm_gmem *gmem,
--				      pgoff_t start, pgoff_t end)
-+				      pgoff_t start, pgoff_t end,
-+				      unsigned int flags)
++static bool svm_is_vm_type_supported(unsigned long type)
++{
++	/* FIXME: Check if CPU is capable of SEV. */
++	return __kvm_is_vm_type_supported(type);
++}
++
+ static int svm_vm_init(struct kvm *kvm)
  {
- 	struct kvm_memory_slot *slot;
- 	unsigned long index;
-@@ -118,6 +119,7 @@ static void kvm_gmem_invalidate_begin(struct kvm *kvm, struct kvm_gmem *gmem,
- 			.slot = slot,
- 			.pte = __pte(0),
- 			.may_block = true,
-+			.flags = flags,
- 		};
+ 	if (!pause_filter_count || !pause_filter_thresh)
+@@ -4784,6 +4790,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.vcpu_free = svm_vcpu_free,
+ 	.vcpu_reset = svm_vcpu_reset,
  
- 		kvm_mmu_invalidate_range_add(kvm, gfn_range.start, gfn_range.end);
-@@ -156,7 +158,8 @@ static long kvm_gmem_punch_hole(struct file *file, loff_t offset, loff_t len)
- 	 */
- 	filemap_invalidate_lock(file->f_mapping);
++	.is_vm_type_supported = svm_is_vm_type_supported,
+ 	.vm_size = sizeof(struct kvm_svm),
+ 	.vm_init = svm_vm_init,
+ 	.vm_destroy = svm_vm_destroy,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 44fb619803b8..b5394ba8cb9c 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7469,6 +7469,11 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
+ 	return err;
+ }
  
--	kvm_gmem_invalidate_begin(kvm, gmem, start, end);
-+	kvm_gmem_invalidate_begin(kvm, gmem, start, end,
-+				  KVM_GFN_RANGE_FLAGS_GMEM);
++static bool vmx_is_vm_type_supported(unsigned long type)
++{
++	return __kvm_is_vm_type_supported(type);
++}
++
+ #define L1TF_MSG_SMT "L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
+ #define L1TF_MSG_L1D "L1TF CPU bug present and virtualization mitigation disabled, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
  
- 	truncate_inode_pages_range(file->f_mapping, offset, offset + len - 1);
+@@ -8138,6 +8143,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.hardware_disable = vmx_hardware_disable,
+ 	.has_emulated_msr = vmx_has_emulated_msr,
  
-@@ -263,7 +266,7 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
- 	 * Free the backing memory, and more importantly, zap all SPTEs that
- 	 * pointed at this file.
- 	 */
--	kvm_gmem_invalidate_begin(kvm, gmem, 0, -1ul);
-+	kvm_gmem_invalidate_begin(kvm, gmem, 0, -1ul, KVM_GFN_RANGE_FLAGS_GMEM);
- 	truncate_inode_pages_final(file->f_mapping);
- 	kvm_gmem_invalidate_end(kvm, gmem, 0, -1ul);
++	.is_vm_type_supported = vmx_is_vm_type_supported,
+ 	.vm_size = sizeof(struct kvm_vmx),
+ 	.vm_init = vmx_vm_init,
+ 	.vm_destroy = vmx_vm_destroy,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c9e1c9369be2..b5f865f39a00 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4418,12 +4418,18 @@ static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
  
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 422d49634c56..9cdfa2fb675f 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -613,6 +613,7 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- 			gfn_range.start = hva_to_gfn_memslot(hva_start, slot);
- 			gfn_range.end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, slot);
- 			gfn_range.slot = slot;
-+			gfn_range.flags = 0;
+-static bool kvm_is_vm_type_supported(unsigned long type)
++bool __kvm_is_vm_type_supported(unsigned long type)
+ {
+ 	return type == KVM_X86_DEFAULT_VM ||
+ 	       (type == KVM_X86_PROTECTED_VM &&
+ 	        IS_ENABLED(CONFIG_KVM_PROTECTED_VM) && tdp_enabled);
+ }
++EXPORT_SYMBOL_GPL(__kvm_is_vm_type_supported);
++
++static bool kvm_is_vm_type_supported(unsigned long type)
++{
++	return static_call(kvm_x86_is_vm_type_supported)(type);
++}
  
- 			if (!locked) {
- 				locked = true;
-@@ -2391,8 +2392,9 @@ static void kvm_mem_attrs_changed(struct kvm *kvm, unsigned long attrs,
- 	bool flush = false;
- 	int i;
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+@@ -4618,6 +4624,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = BIT(KVM_X86_DEFAULT_VM);
+ 		if (kvm_is_vm_type_supported(KVM_X86_PROTECTED_VM))
+ 			r |= BIT(KVM_X86_PROTECTED_VM);
++		if (kvm_is_vm_type_supported(KVM_X86_TDX_VM))
++			r |= BIT(KVM_X86_TDX_VM);
+ 		break;
+ 	default:
+ 		break;
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index c544602d07a3..7d5aa8f0571a 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -9,6 +9,8 @@
+ #include "kvm_cache_regs.h"
+ #include "kvm_emulate.h"
  
--	gfn_range.pte = __pte(0);
-+	gfn_range.attrs = attrs;
- 	gfn_range.may_block = true;
-+	gfn_range.flags = KVM_GFN_RANGE_FLAGS_SET_MEM_ATTR;
- 
- 	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
- 		slots = __kvm_memslots(kvm, i);
++bool __kvm_is_vm_type_supported(unsigned long type);
++
+ struct kvm_caps {
+ 	/* control of guest tsc rate supported? */
+ 	bool has_tsc_control;
 -- 
 2.25.1
 
