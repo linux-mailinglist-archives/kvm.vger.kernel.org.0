@@ -2,88 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B25873BF39
-	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 22:08:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C365173BF4C
+	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 22:15:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231169AbjFWUIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Jun 2023 16:08:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41734 "EHLO
+        id S231922AbjFWUPv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Jun 2023 16:15:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231177AbjFWUIy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Jun 2023 16:08:54 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 589F5271F
-        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 13:08:53 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D668B61B07
-        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 20:08:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 45C18C433CC
-        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 20:08:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687550932;
-        bh=CEZYZlgGc+70Gcmcw3iurb8+ImYt81sWNJMxVJQ77EM=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=PICAG2L9NJibUy+1YLOzHwBy6xwoYR/35iuX6ucFHkXwXv/fu7gqCKcbpPaGeRVxA
-         Ugp45MEjC/imxC9AZK/e+4JgsoZ6hQ+snAOuDh9cDYJ2pKbEIir1+x8ukIyuazT14K
-         CfmYapab76BMhKqLLdG9svOs7igW79cGENeONQi7QTjkb6KIgJcX3y8f7pcoTCZx1I
-         G4VbE0MbygC4A6+Qi3ya0stBNrhuVhbig4aUF6uJ50SSiqSjzUy1ZWDdji70Vgb4Dj
-         qV6eUS/CI2nQ6yzZ8EL00L1ZC7PON3GKiO5VMBmaS5cfCdVgBluYq83pgPscnRph0P
-         PcHv6nfj/1LSA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 2F22EC53BD0; Fri, 23 Jun 2023 20:08:52 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 217574] kvm_intel loads only after suspend
-Date:   Fri, 23 Jun 2023 20:08:51 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217574-28872-VH9xAa5Vaj@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217574-28872@https.bugzilla.kernel.org/>
-References: <bug-217574-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231887AbjFWUPj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Jun 2023 16:15:39 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E142976
+        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 13:15:22 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b5465a79edso5946075ad.3
+        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 13:15:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1687551322; x=1690143322;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=70ZfEI8a2M09RBYYQwke8NZZ3VNklBFCLgKlCnF88SM=;
+        b=rL4H+NA02UlMXD1hW1Ab2Il2DwfUxUySGqZjfluyuilula6C4+hh1idRsQBC2VyXLG
+         ZqLeT4rsFvCJXf30bPDw8DIL2mll1UA5Qkzd/Zs2fOB3map/hyraD34YJfAxgAnzjECy
+         A9lxGseEk7jdnI+PjAIdWXTVvYyLJim7zAeA0ExxG09/+x6MzCz2bd2qWNGkCRoJ6Stw
+         13aBRpBMHQMz2fjOASin93UwwuBR9lUBhYGr87g24sV5/kedXlh4Fg/yecdEURjVFTjq
+         eCQpzB0KSY0uUOqY1EkdlfqBLdlDC786FZyMHiFOWNfoD7jMHSNjYHnah/yMqT0TzGfA
+         Es5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687551322; x=1690143322;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=70ZfEI8a2M09RBYYQwke8NZZ3VNklBFCLgKlCnF88SM=;
+        b=AxfF2x5fjSePHm9SOrIIkdVF8oxpQfnX+yyeMsgYykOQdRMJD8TzLsqVScxwvLsnp+
+         z5nMQPLzf4AsOu5uQew6b00Sz3iU2eYeFjsew3ZIKZKdSRaZ1alKg/l+PJs/EAS0lyvZ
+         kZTXtEZizCkxFfb1R/F94V2oqmcF5tZ5uqIt2UgGQ7KvizXc7JE/05suBb/7MdF3WgOR
+         LICX0kSJZMFGfBrTxs7SPOrSQhyVk17/hEPQz/0oi4i/DWMjvYac97c9UaFIyvzR0ReV
+         Ov87UtPE2rat4/GQnVifoCvqrukfPCiMqVJhN8UKhyJVriT1ZMuQiO4eS83MS5u3gORI
+         nzwg==
+X-Gm-Message-State: AC+VfDwJM7N7z5hNaIMkUBwuOuTvL9mc3rPnGtMXZORcGS8wYpJqi9aX
+        y2e3jn3ixpsgTnkP+wsA61foT/kjwkU=
+X-Google-Smtp-Source: ACHHUZ6IVfy4CB7jZj+9RHdPho3mt4NHvkwGRcJXGSQRfyQAO/+wXZZtHfvg27XlZc8Y5VNaR+f518bFkgY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:b288:b0:1b3:edae:882b with SMTP id
+ u8-20020a170902b28800b001b3edae882bmr18939plr.12.1687551322098; Fri, 23 Jun
+ 2023 13:15:22 -0700 (PDT)
+Date:   Fri, 23 Jun 2023 13:15:20 -0700
+In-Reply-To: <20230616113353.45202-3-xiong.y.zhang@intel.com>
+Mime-Version: 1.0
+References: <20230616113353.45202-1-xiong.y.zhang@intel.com> <20230616113353.45202-3-xiong.y.zhang@intel.com>
+Message-ID: <ZJX9WHFPdEVjRtC+@google.com>
+Subject: Re: [PATCH 2/4] KVM: VMX/pmu: Save host debugctlmsr just before vm entry
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xiong Zhang <xiong.y.zhang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, peterz@infradead.org, like.xu.linux@gmail.com,
+        kan.liang@linux.intel.com, zhenyuw@linux.intel.com,
+        zhiyuan.lv@intel.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217574
+On Fri, Jun 16, 2023, Xiong Zhang wrote:
+> Perf defines four types of perf event: per cpu pinned event, per process
+> pinned event, per cpu event, per process event, their prioirity are from
+> high to low. vLBR event is per process pinned event. So durng vm exit
+> handler, if vLBR event preempts perf low priority LBR event, perf will
+> disable LBR and let guest control LBR, or if vLBR event is preempted by
+> perf high priority LBR event, perf will enable LBR. In a word LBR status
+> may be changed during vm exit handler.
+> 
+> MSR_IA32_DEBUGCTLMSR[0] controls LBR enabling, kvm saves its value into
+> vmx->host_debugctlmsr in vcpu_load(), and kvm restores its value from
+> vmx->host_debugctlmsr after vm exit immediately. Since
+> MSR_IA32_DEBUGCTLMSR[0] could be changed during vm exit handler, the
+> saved value vmx->host_debugctlmsr could be wrong. So this commit saves
+> MSR_IA32_DEBUGCTLMSR into vmx->host_debugctlmsr just before vm entry to
+> reflect the real hardware value.
+> 
+> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 44fb619803b8..5ca61a26d0d7 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1459,13 +1459,9 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
+>   */
+>  static void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  {
+> -	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> -
+>  	vmx_vcpu_load_vmcs(vcpu, cpu, NULL);
+>  
+>  	vmx_vcpu_pi_load(vcpu, cpu);
+> -
+> -	vmx->host_debugctlmsr = get_debugctlmsr();
+>  }
+>  
+>  static void vmx_vcpu_put(struct kvm_vcpu *vcpu)
+> @@ -7273,6 +7269,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>  	atomic_switch_perf_msrs(vmx);
+>  	if (intel_pmu_lbr_is_enabled(vcpu))
+>  		vmx_passthrough_lbr_msrs(vcpu);
+> +	vmx->host_debugctlmsr = get_debugctlmsr();
 
---- Comment #4 from Sean Christopherson (seanjc@google.com) ---
-Can you check all MSRs in the range 0x480-0x491, i.e. all the known VMX MSR=
-s,
-and just report back any divergences between CPUs?  The values for MSRs that
-are consistent across all CPUs aren't interesting at this time.  What we
-*suspect* is going on is that one or more CPUs has different MSRs in one or
-more of the VMX MSRs.  Before we can debug further, we need to first confirm
-that that is indeed why KVM is refusing to load.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Reading DEBUG_CTL on every VM-Entry is either unnecessary or insufficient.  If
+the DEBUG_CTL value is being changed synchronously, then just fix whatever KVM
+path leads to a change in the host avlue.  If DEBUG_CTL is being changed
+asynchronously, then I'm guessing the change is coming from NMI context, which
+means that KVM is buggy no matter how close we put this to VM-Enter.
