@@ -2,63 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75A0E73C050
-	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 22:39:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E570B73C185
+	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 22:54:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232367AbjFWUi6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Jun 2023 16:38:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55800 "EHLO
+        id S232489AbjFWUyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Jun 2023 16:54:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232350AbjFWUix (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Jun 2023 16:38:53 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BF942130
-        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 13:38:21 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c1039cbba72so248157276.0
-        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 13:38:21 -0700 (PDT)
+        with ESMTP id S230171AbjFWUxj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Jun 2023 16:53:39 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF5D9294E
+        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 13:52:00 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-66870d541b7so494032b3a.2
+        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 13:52:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687552694; x=1690144694;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QwNPgwiBQZGJeDnguHE5i5QhIkh5nKMqMyEPaR/bIi0=;
-        b=S+gS2IQYLrYxQ/9+oRMG1ahOtYGEn4Hx1tnys8TxBtT5IefCIFC0J1mYt2T2h0EOd8
-         Yhvyu9Epl+xfAOfKqWuXEOKQfKH1y790+4wYskDZ0Awt0AST/Kwvi3m4NVlsMeOsaAl2
-         HFduxVFkrks7NWvWafWc2IB48aAaJNaQzPaiMSpC5gNB8Kb15lJD5rnFWS9F1IACFvFO
-         TxhphQw8dS+VtPpXo/I2jouDnp01zylDHZfitq/+NpO+r/WfSv2akxEwxVEcjIgfYlxh
-         PDXMXqHGRSuegFHhwoHEF1o0CUiq7bc78FJzS3bXOQvJMNzZ2EewecUcbGxLjn1tiIlQ
-         DxkA==
+        d=google.com; s=20221208; t=1687553520; x=1690145520;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uspspMky8TikfcgO17xdnQdY4tVzQxlzD9UOFv5URqQ=;
+        b=YiXMks3MPNFsB1OT+0qqYJ2rxlkMClQoWTKh3D6Hj/XNrDus7X4XwKxKHtpDZW3x4y
+         TGJf0Y8Nq66k/FYNBQfJsnjeU37M2PcXSZwVtSuwJeDoQFBXwzEelHIHopnh/p/LFsdj
+         MgloQtCba5KbDah8HuDUyyok5SopLpg3ubLkKILx1AEFrHutuJNaW0Bcg1CT/K7CMaBR
+         D+0Enn2INIjbmX9KxXfr1d1B1LrOUGrBC6zaoWWqWjdOVZpPtbMjj9qBMYKs/8i0hANy
+         C5Gknim/JFnVx13T/lo8FG5/hmU8AxGyVyJD31S8bBw8LzBapR2bAKxjcOLlKakiJFb2
+         cYIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687552694; x=1690144694;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QwNPgwiBQZGJeDnguHE5i5QhIkh5nKMqMyEPaR/bIi0=;
-        b=DpHqU+0vL6WmAhXFXojkdMR7QUlUK8I+cpF1j+qnwTddOpFaEZ0+3kbyreooF0shmg
-         /9OPi0eRO2yeQkcoPfbFE9HjJ0LK9GSXrO4MfbEL629Lf/hsZKYkfdNomh09XqPyxNIU
-         GTuK6IianxIGnZFM8iUXAmCCKk8363FxJhBuiIB+CsFiaEZhuNeZrM1Vajg5TPcAveAu
-         Gd8p77mvnBh7SO0Z9rlqqIZYbVDdYwvsHNtnH2JrLfhK7WLso74gldrImOvJr/1T2NHd
-         lVKO5hySJDtUtQeMBJvXvQwNKhOlnaISfzoVxl0pjUnNJ+CxZCdCWxwoKpQqp1vAUmDb
-         dHKQ==
-X-Gm-Message-State: AC+VfDwtnAzsVZqPDq448Gg44eh9iw5o0aZgj7yoND9o89Ou/w+hBTmZ
-        MqyY4vg3Go8nsZMNe8xb/n+QuLOwFRw=
-X-Google-Smtp-Source: ACHHUZ6bgde2JCXrNsJtz06MCTZDowjFJv1N0BDCPuMZvZmiiAsrXclVeOU/48XYNaZZon8hj8RtdhjkyGk=
+        d=1e100.net; s=20221208; t=1687553520; x=1690145520;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uspspMky8TikfcgO17xdnQdY4tVzQxlzD9UOFv5URqQ=;
+        b=PgxWhS1tg2nDKBmvkPqOcSCroLAvKt3CnhinQaw2jll6W8VEsMSd7Uee3iEXMK3jcI
+         HxnO5plDO/5xM7i5HSx9ezsZ4ujL0WGLnpa9Sw2ccQenvNaolTcfTlVe8DrBh22RNdSs
+         5X+zyqadF1eWjH6svEC+M5En2beaHoahuY6jPuWTy/SyPoFy8PtrtJ6aydMYaFrTQHBT
+         iLwKH6gflxQ2f1T+o7iisCzWmCTWtJwHqxd7bGi4ll4yMNRMxKHwRp36qxdHF4kRQ+Mq
+         hYZku1YKPcWTgqalspB0sEjRmvVcphowNc+weuygOlYCyDKHIcljfEo4a7ul2DiLXnJa
+         0oJA==
+X-Gm-Message-State: AC+VfDzPTKf+P4mYQiFxMlR/Ea7027LY4/dVwAfIHgdA1f5TxCzVG9t8
+        sS2WhEgvhgDz3lJIg/Gnxb5Q+ANwz6E=
+X-Google-Smtp-Source: ACHHUZ5tDD9Xnl2ftoPkz9hATloNCrnffXyV8YLuv9q99SkzEIZoBQw7GrDngn3qIdQ4xx8AcJqHEmFzyjw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:2691:0:b0:ba8:1646:c15d with SMTP id
- m139-20020a252691000000b00ba81646c15dmr9694281ybm.1.1687552694461; Fri, 23
- Jun 2023 13:38:14 -0700 (PDT)
-Date:   Fri, 23 Jun 2023 13:38:12 -0700
-In-Reply-To: <20230616113353.45202-4-xiong.y.zhang@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:3a0c:b0:668:69fa:f795 with SMTP id
+ fj12-20020a056a003a0c00b0066869faf795mr4918321pfb.2.1687553520213; Fri, 23
+ Jun 2023 13:52:00 -0700 (PDT)
+Date:   Fri, 23 Jun 2023 13:51:58 -0700
+In-Reply-To: <c438b5b1-b34d-3e77-d374-37053f4c14fa@intel.com>
 Mime-Version: 1.0
-References: <20230616113353.45202-1-xiong.y.zhang@intel.com> <20230616113353.45202-4-xiong.y.zhang@intel.com>
-Message-ID: <ZJYCtDN+ITmrgCUs@google.com>
-Subject: Re: [PATCH 3/4] KVM: VMX/pmu: Enable inactive vLBR event in guest LBR
- MSR emulation
+References: <20230511040857.6094-1-weijiang.yang@intel.com>
+ <ZIufL7p/ZvxjXwK5@google.com> <147246fc-79a2-3bb5-f51f-93dfc1cffcc0@intel.com>
+ <ZIyiWr4sR+MqwmAo@google.com> <c438b5b1-b34d-3e77-d374-37053f4c14fa@intel.com>
+Message-ID: <ZJYF7haMNRCbtLIh@google.com>
+Subject: Re: [PATCH v3 00/21] Enable CET Virtualization
 From:   Sean Christopherson <seanjc@google.com>
-To:     Xiong Zhang <xiong.y.zhang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, peterz@infradead.org, like.xu.linux@gmail.com,
-        kan.liang@linux.intel.com, zhenyuw@linux.intel.com,
-        zhiyuan.lv@intel.com
-Content-Type: text/plain; charset="us-ascii"
+To:     Weijiang Yang <weijiang.yang@intel.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        rppt@kernel.org, binbin.wu@linux.intel.com,
+        rick.p.edgecombe@intel.com, john.allen@amd.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
@@ -69,73 +73,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 16, 2023, Xiong Zhang wrote:
-> vLBR event could be inactive in two case:
-> a. host per cpu pinned LBR event occupy LBR when vLBR event is created
-> b. vLBR event is preempted by host per cpu pinned LBR event during vm
-> exit handler.
-> When vLBR event is inactive, guest couldn't access LBR msr, and it is
-> forced into error state and is excluded from schedule by perf scheduler.
-> So vLBR event couldn't be active through perf scheduler even if host per
-> cpu pinned LBR event has released LBR, kvm could enable vLBR event
-> proactively, then vLBR event may be active and LBR msr could be passthrough
-> into guest.
-> 
-> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
-> ---
->  arch/x86/kvm/vmx/pmu_intel.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 741efe2c497b..5a3ab8c8711b 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -314,7 +314,16 @@ static bool intel_pmu_handle_lbr_msrs_access(struct kvm_vcpu *vcpu,
->  	if (!intel_pmu_is_valid_lbr_msr(vcpu, index))
->  		return false;
->  
-> -	if (!lbr_desc->event && intel_pmu_create_guest_lbr_event(vcpu) < 0)
-> +	/* vLBR event may be inactive, but physical LBR may be free now.
+On Mon, Jun 19, 2023, Weijiang Yang wrote:
+>=20
+> On 6/17/2023 1:56 AM, Sean Christopherson wrote:
+> > On Fri, Jun 16, 2023, Weijiang Yang wrote:
+> > > On 6/16/2023 7:30 AM, Sean Christopherson wrote:
+> > > > On Thu, May 11, 2023, Yang Weijiang wrote:
+> > > > > The last patch is introduced to support supervisor SHSTK but the =
+feature is
+> > > > > not enabled on Intel platform for now, the main purpose of this p=
+atch is to
+> > > > > facilitate AMD folks to enable the feature.
+> > > > I am beyond confused by the SDM's wording of CET_SSS.
+> > > >=20
+> > > > First, it says that CET_SSS says the CPU isn't buggy (or maybe "les=
+s buggy" is
+> > > > more appropriate phrasing).
+> > > >=20
+> > > >     Bit 18: CET_SSS. If 1, indicates that an operating system can e=
+nable supervisor
+> > > >     shadow stacks as long as it ensures that certain supervisor sha=
+dow-stack pushes
+> > > >     will not cause page faults (see Section 17.2.3 of the Intel=C2=
+=AE 64 and IA-32
+> > > >     Architectures Software Developer=E2=80=99s Manual, Volume 1).
+> > > >=20
+> > > > But then it says says VMMs shouldn't set the bit.
+> > > >=20
+> > > >     When emulating the CPUID instruction, a virtual-machine monitor=
+ should return
+> > > >     this bit as 0 if those pushes can cause VM exits.
+> > > >=20
+> > > > Based on the Xen code (which is sadly a far better source of inform=
+ation than the
+> > > > SDM), I *think* that what the SDM is trying to say is that VMMs sho=
+uld not set
+> > > > CET_SS if VM-Exits can occur ***and*** the bit is not set in the ho=
+st CPU.  Because
+> > > > if the SDM really means "VMMs should never set the bit", then what =
+on earth is the
+> > > > point of the bit.
+> > > I need to double check for the vague description.
+> > >=20
+> > >  From my understanding, on bare metal side, if the bit is 1, OS can e=
+nable
+> > > SSS if pushes won't cause page fault. But for VM case, it's not recom=
+mended
+> > > (regardless of the bit state) to set the bit as vm-exits caused by gu=
+est SSS
+> > > pushes cannot be fully excluded.
+> > >=20
+> > > In other word, the bit is mainly for bare metal guidance now.
+> > >=20
+> > > > > In summary, this new series enables CET user SHSTK/IBT and kernel=
+ IBT, but
+> > > > > doesn't fully support CET supervisor SHSTK, the enabling work is =
+left for
+> > > > > the future.
+> > > > Why?  If my interpretation of the SDM is correct, then all the piec=
+es are there.
+> > ...
+> >=20
+> > > And also based on above SDM description, I don't want to add the supp=
+ort
+> > > blindly now.
+> > *sigh*
+> >=20
+> > I got filled in on the details offlist.
+> >=20
+> > 1) In the next version of this series, please rework it to reincorporat=
+e Supervisor
+> >     Shadow Stack support into the main series, i.e. pretend Intel's imp=
+lemenation
+> >     isn't horribly flawed.
+>=20
+> Let me make it clear, you want me to do two things:
+>=20
+> 1)Add Supervisor Shadow Stack=C2=A0 state support(i.e., XSS.bit12(CET_S))=
+ into
+> kernel so that host can support guest Supervisor Shadow Stack MSRs in g/h=
+ FPU
+> context switch.
 
-	/*
-	 * This is the preferred block comment style.
-	 */
+If that's necessary for correct functionality, yes.
 
-> +	 * but vLBR event is pinned event, once it is inactive state, perf
-> +	 * will force it to error state in merge_sched_in() and exclude it from
-> +	 * perf schedule, so even if LBR is free now, vLBR event couldn't be active
-> +	 * through perf scheduler and vLBR event could be active through
-> +	 * perf_event_enable().
-> +	 */
+> 2) Add Supervisor Shadow stack support into KVM part so that guest OS is
+> able to use SSS with risk.
 
-Trimming that down, is this what you mean?
-
-	/*
-	 * Attempt to re-enable the vLBR event if it was disabled due to
-	 * contention with host LBR usage, i.e. was put into an error state.
-	 * Perf doesn't notify KVM if the host stops using LBRs, i.e. KVM needs
-	 * to manually re-enable the event.
-	 */
-
-Which begs the question, why can't there be a notification of some form that the
-LBRs are once again available?
-
-Assuming that's too difficult for whatever reason, why wait until the guest tries
-to read LBRs?  E.g. why not be more aggressive and try to re-enable vLBRs on every
-VM-Exit.
-
-And if we do wait until the guest touches relevant MSRs, shouldn't writes to
-DEBUG_CTL that set DEBUGCTLMSR_LBR also try to re-enable the event?
-
-Lastly, what guarantees that the MSRs hold guest data?  I assume perf purges the
-MSRs at some point, but it would be helpful to call that out in the changelog.
-
-> +	if (lbr_desc->event && (lbr_desc->event->state == PERF_EVENT_STATE_ERROR))
-> +		perf_event_enable(lbr_desc->event);
-> +	else if (!lbr_desc->event && intel_pmu_create_guest_lbr_event(vcpu) < 0)
->  		goto dummy;
->  
->  	/*
-> -- 
-> 2.25.1
-> 
+Yes.  Architecturally, if KVM advertises X86_FEATURE_SHSTK, then KVM needs =
+to
+provide both User and Supervisor support.  CET_SSS doesn't change the archi=
+tecture,
+it's little more than a hint.  And even if the guest follows SDM's recommen=
+dation
+to not enable shadow stacks, a clever kernel can still utilize SSS assets, =
+e.g. use
+the MSRs as scratch registers.
