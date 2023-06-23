@@ -2,179 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6667273C4BA
-	for <lists+kvm@lfdr.de>; Sat, 24 Jun 2023 01:21:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2117473C4F7
+	for <lists+kvm@lfdr.de>; Sat, 24 Jun 2023 01:53:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231843AbjFWXVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Jun 2023 19:21:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49366 "EHLO
+        id S231634AbjFWXxx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Jun 2023 19:53:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231210AbjFWXVQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Jun 2023 19:21:16 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B2422683
-        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 16:21:15 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-543c2537dacso668931a12.2
-        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 16:21:15 -0700 (PDT)
+        with ESMTP id S232266AbjFWXxs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Jun 2023 19:53:48 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D22A92710
+        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 16:53:41 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-666e3dad70aso825780b3a.0
+        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 16:53:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687562475; x=1690154475;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DUD5RYjo6Sx5P4lA1ER1U7bhRxM4zQjuiTOF9zGf3yE=;
-        b=QLiQ9fXbHiCe0qK57ildEM5KTuDKuavekOKc0qZAvV5TZ+Xns1ge/pltTmsuxkoXus
-         CfICaQaAOpMVJXBHhmmavEyPvBGphytxBo51EJ6dvPNto6RPjIBDKGvw0h50knpKPW+8
-         QCPdd2487OYHgEeNateURDQvlJYucy7BAt4B9d8YkURczWIKEWGBrEQUH4jEseSH23nG
-         qF6foUDt1tj/HRJcX3k97/Gq5jtf5goraEMESh8ywCs56xoT8tAt9BksEjfXi9yAAnYF
-         T5dTzZg8hLF3MikoSItK9TxF0D2Izn12udp7tSquqEBY5CrIZ9orHwfTBmvugM0f8AT8
-         mjbg==
+        d=google.com; s=20221208; t=1687564421; x=1690156421;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GZ8//a8k4/ppq4ZcuNZo7A71GBV4B2OsjfDuokwVTXo=;
+        b=c59RSbCEPyj90/KW+D5tTFxn2TL2cCfZzqUIIO431a4lQcfvn5qFbiF49tPT18UBmb
+         PDW7tk4967hU4Er+q1dXV0VaWLMoVQnqoEx1IQO40kw4MtE8oec3Tmt5kmImoHYLU7Cb
+         04Jc6gaDVCeyU3idKtZYtKXNxbXtToPtgm3pMvLmQzJ8iBWoK18s0O9cbpNZ/2pbaXFH
+         XKIxaHjkXpv943nX85eBLV2MG69zG58RA235+DrPnQf2ezqeEFPNKeX8y7ewa090jyMY
+         aezw1gUrVAMYS4EnSy49lJOtClzvF1aveP4IBxfA1QRVvUk+4fif17u8zUGFSjsgdtB2
+         BPqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687562475; x=1690154475;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DUD5RYjo6Sx5P4lA1ER1U7bhRxM4zQjuiTOF9zGf3yE=;
-        b=ko89WphhYjxo7vqZaTWEWMBKpYxefxUu/aFXNMTrxNnxvVw1pIuUXMfKH/uogD9DKZ
-         ut/zHX1ZOECSg6fgRg23lX+6AOcLWJVqFls5huV3uCnBejsz5m4LG/mwr9PH79mKEaTu
-         tYHtdAN3purH4Tjc4ugE6nKRFAzJMz+DCEeFOdL8f5qAApVsk2WSjm9B66+dx8vteT+R
-         BsDM7vzDwyvdzEa9Kxz5uj08zxeYSpl4Zrw1syRBeOOrDMe1i30Aj1jsPK4y9JsItcQR
-         p1Hbht7eH1jijeYFidtQK2oXHgXrt0E7a7rsz9TY5lcRbiXaJfmA1Zvu63hTotkiV/Je
-         mc4w==
-X-Gm-Message-State: AC+VfDzcJaBHq6Y4+j4r09KnnI25nGpk9aLNQiriSHN5kG7hm2yOnTKw
-        KGMSf90JHLY7LdicIX4L8daMUg1TEMM=
-X-Google-Smtp-Source: ACHHUZ76wCt3kLoU/pcmU3i2bY4ZdXcM+NFgKY37hXTE8tgyzFAFCtUFnXoZgC71g3fXutZxhceNY6B3278=
+        d=1e100.net; s=20221208; t=1687564421; x=1690156421;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GZ8//a8k4/ppq4ZcuNZo7A71GBV4B2OsjfDuokwVTXo=;
+        b=SV30R7ez4bTD6jyTnM5dBVBOwm7HSzLl8s/XdgzSTOmGy6H+q0QSR2r6ZDSPcZ1RGR
+         qf/IUn9MrMgg2OzJI72PriugT3Gtic+CtnTAXeJMwsOPP0vpMd3eh/cciK02lAeNKo3e
+         OJaDzAVHk+XWP0tLN3p7gYQM8esfHQmnsWEKMulMzJJDxbY+5MDINznubZsWDEpGxeCu
+         F1N3WeL5Vg4Xg2me45gZ3rU4M+OySDqllPEP9YVVl7PYC+ABQHhyNseN6d2o880RlW7a
+         4jfy9JhB57+wDqoWBtbvjWR5jZ7KVqIc3nlu2jEpvCdiiaAC+WUPnqd4ycGLymHY0X5p
+         05DA==
+X-Gm-Message-State: AC+VfDydEFmcM+2+vBZlxJztTlKjWMZOy0pGFVrnX/VQPxIRWB0nazdJ
+        mMg0Nam/nNgX5rTGf56t2oTe+Hz7ujQ=
+X-Google-Smtp-Source: ACHHUZ6vCcOm23GPYV5TypZFd7kfdJrzsMwKTZimKPcF/b8IZraa0vcbNSbC6Lk2YWT0GE65RMm7dxGpTKg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:4382:0:b0:551:eb6:1ea6 with SMTP id
- q124-20020a634382000000b005510eb61ea6mr2614071pga.10.1687562475077; Fri, 23
- Jun 2023 16:21:15 -0700 (PDT)
-Date:   Fri, 23 Jun 2023 16:21:13 -0700
-In-Reply-To: <f2708ad5-494c-c91e-cf5a-09f6e2d81e15@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:234a:b0:668:9181:8e20 with SMTP id
+ j10-20020a056a00234a00b0066891818e20mr3352690pfj.1.1687564421125; Fri, 23 Jun
+ 2023 16:53:41 -0700 (PDT)
+Date:   Fri, 23 Jun 2023 16:53:39 -0700
+In-Reply-To: <20230511040857.6094-14-weijiang.yang@intel.com>
 Mime-Version: 1.0
-References: <20230511040857.6094-1-weijiang.yang@intel.com>
- <20230511040857.6094-8-weijiang.yang@intel.com> <ZG77wu4PyBn1z587@chao-email>
- <23169e5f-9793-9486-fd5f-287e3317b837@intel.com> <ZHXnP5bEvxPrDg3m@chao-email>
- <6e1e9de9-8def-46c3-a238-c1b4ef52e331@intel.com> <ZIuitcH7P1JpkzFH@google.com>
- <f2708ad5-494c-c91e-cf5a-09f6e2d81e15@intel.com>
-Message-ID: <ZJYo6aDtt0DQ5Tjv@google.com>
-Subject: Re: [PATCH v3 07/21] KVM:x86: Refresh CPUID on write to guest MSR_IA32_XSS
+References: <20230511040857.6094-1-weijiang.yang@intel.com> <20230511040857.6094-14-weijiang.yang@intel.com>
+Message-ID: <ZJYwg3Lnq3nJZgQf@google.com>
+Subject: Re: [PATCH v3 13/21] KVM:VMX: Emulate reads and writes to CET MSRs
 From:   Sean Christopherson <seanjc@google.com>
-To:     Weijiang Yang <weijiang.yang@intel.com>
-Cc:     Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        peterz@infradead.org, rppt@kernel.org, binbin.wu@linux.intel.com,
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        rppt@kernel.org, binbin.wu@linux.intel.com,
         rick.p.edgecombe@intel.com, john.allen@amd.com,
-        Zhang Yi Z <yi.z.zhang@linux.intel.com>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 16, 2023, Weijiang Yang wrote:
->=20
-> On 6/16/2023 7:45 AM, Sean Christopherson wrote:
-> > On Wed, May 31, 2023, Weijiang Yang wrote:
-> > > On 5/30/2023 8:08 PM, Chao Gao wrote:
-> > > > > > > --- a/arch/x86/kvm/x86.c
-> > > > > > > +++ b/arch/x86/kvm/x86.c
-> > > > > > > @@ -3776,8 +3776,10 @@ int kvm_set_msr_common(struct kvm_vcpu=
- *vcpu, struct msr_data *msr_info)
-> > > > > > > 		 */
-> > > > > > > 		if (data & ~kvm_caps.supported_xss)
-> > > > > > Shouldn't we check against the supported value of _this_ guest?=
- similar to
-> > > > > > guest_supported_xcr0.
-> > > > > I don't think it requires an extra variable to serve per guest pu=
-rpose.
-> > > > >=20
-> > > > > For guest XSS settings, now we don't add extra constraints like X=
-CR0, thus
-> > > > QEMU can impose constraints by configuring guest CPUID.0xd.1 to ind=
-icate
-> > > > certain supervisor state components cannot be managed by XSAVES, ev=
-en
-> > > > though KVM supports them. IOW, guests may differ in the supported v=
-alues
-> > > > for the IA32_XSS MSR.
-> > > OK, will change this part to align with xcr0 settings. Thanks!
-> > Please write KVM-Unit-Tests to verify KVM correctly handles the various=
- MSRs related
-> > to CET, e.g. a test_cet_msrs() subtest in msr.c would do nicely.  Hmm, =
-though testing
-> > the combinations of CPUID bits will require multiple x86/unittests.cfg =
-entries.
-> > Might be time to split up msr.c into a library and then multiple tests.
->=20
-> Since there's already a CET specific unit test app, do you mind adding al=
-l
-> CET related stuffs to the app to make it inclusive? e.g.,=EF=BF=BDvalidat=
-e constraints
-> between CET CPUIDs vs. CET/XSS MSRs?
+On Thu, May 11, 2023, Yang Weijiang wrote:
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index c872a5aafa50..0ccaa467d7d3 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2093,6 +2093,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		else
+>  			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
+>  		break;
+> +	case MSR_IA32_U_CET:
+> +	case MSR_IA32_PL3_SSP:
+> +		if (!kvm_cet_is_msr_accessible(vcpu, msr_info))
+> +			return 1;
+> +		kvm_get_xsave_msr(msr_info);
+> +		break;
 
-Hmm, that will get a bit kludgy since the MSR testcases will want to toggle=
- IBT
-and SHSTK on and off.
+Please put as much MSR handling in x86.c as possible.  We quite obviously know
+that AMD support is coming along, there's no reason to duplicate all of this code.
+And unless I'm missing something, John's series misses several #GP checks, e.g.
+for MSR_IA32_S_CET reserved bits, which means that providing a common implementation
+would actually fix bugs.
 
-Actually, I take back my suggestion to add a KUT test.  Except for a few sp=
-ecial
-cases, e.g. 32-bit support, selftests is a better framework for testing MSR=
-s than
-KUT, as it's relatively easy to create a custom vCPU model in selftests, wh=
-ereas
-in KUT it requires handcoding an entry in unittests.cfg, and having corresp=
-onding
-code in the test itself.
+For MSRs that require vendor input and/or handling, please follow what was
+recently done for MSR_IA32_CR_PAT, where the common bits are handled in common
+code, and vendor code does its updates.
 
-The biggest gap in selftests was the lack of decent reporting in guest code=
-, but
-Aaron is working on closing that gap[*].
+The divergent alignment between AMD and Intel could get annoying, but I'm sure
+we can figure out a solution. 
 
-I'm thinking something like this as a framework. =20
+>  	case MSR_IA32_DEBUGCTLMSR:
+>  		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+>  		break;
+> @@ -2405,6 +2411,18 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		else
+>  			vmx->pt_desc.guest.addr_a[index / 2] = data;
+>  		break;
+> +	case MSR_IA32_U_CET:
+> +	case MSR_IA32_PL3_SSP:
+> +		if (!kvm_cet_is_msr_accessible(vcpu, msr_info))
+> +			return 1;
+> +		if (is_noncanonical_address(data, vcpu))
+> +			return 1;
+> +		if (msr_index == MSR_IA32_U_CET && (data & GENMASK(9, 6)))
+> +			return 1;
+> +		if (msr_index == MSR_IA32_PL3_SSP && (data & GENMASK(2, 0)))
 
-	struct msr_data {
-		const uint32_t idx;
-		const char *name;
-		const struct kvm_x86_cpu_feature feature1;
-		const struct kvm_x86_cpu_feature feature2;
-		const uint32_t nr_values;
-		const uint64_t *values;
-	};
+Please #define reserved bits, ideally using the inverse of the valid masks.  And
+for SSP, it might be better to do IS_ALIGNED(data, 8) (or 4, pending my question
+about the SDM's wording).
 
-	#define TEST_MSR2(msr, f1, f2) { .idx =3D msr, .name =3D #msr, .feature1 =
-=3D f1, .feature2 =3D f2, .nr_values =3D ARRAY_SIZE(msr_VALUES), .values =
-=3D msr_VALUES }
-	#define TEST_MSR(msr, f) TEST_MSR2(msr, f, <a dummy value?>)
-	#define TEST_MSR0(msr) TEST_MSR(msr, <a dummy value?>)
+Side topic, what on earth does the SDM mean by this?!?
 
-With CET usage looking like
+  The linear address written must be aligned to 8 bytes and bits 2:0 must be 0
+  (hardware requires bits 1:0 to be 0).
 
-	static const uint64_t MSR_IA32_S_CET_VALUES[] =3D {
-		<super interesting values>
-	};
+I know Intel retroactively changed the alignment requirements, but the above
+is nonsensical.  If ucode prevents writing bits 2:0, who cares what hardware
+requires?
 
-	TEST_MSR2(MSR_IA32_S_CET, X86_FEATURE_IBT, X86_FEATURE_SHSTK);
+> +			return 1;
+> +		kvm_set_xsave_msr(msr_info);
+> +		break;
+>  	case MSR_IA32_PERF_CAPABILITIES:
+>  		if (data && !vcpu_to_pmu(vcpu)->version)
+>  			return 1;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b6eec9143129..2e3a39c9297c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -13630,6 +13630,26 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
+>  
+> +bool kvm_cet_is_msr_accessible(struct kvm_vcpu *vcpu, struct msr_data *msr)
+> +{
+> +	if (!kvm_cet_user_supported())
 
-Then the test could iterate over each entry and test the various combinatio=
-ns of
-features being enabled (if supported by KVM).  And it could also test ioctl=
-s(),
-which are all but impossible to test in KUT, e.g. verify that supported MSR=
-s are
-reported in KVM_GET_MSR_INDEX_LIST, verify that userspace can read/write MS=
-Rs
-regardless of guest CPUID, etc.  Ooh, and we can even test MSR filtering.
+This feels wrong.  KVM should differentiate between SHSTK and IBT in the host.
+E.g. if running in a VM with SHSTK but not IBT, or vice versa, KVM should allow
+writes to non-existent MSRs.  I.e. this looks wrong:
 
-I don't know that we'd want to cram all of those things in a single test, b=
-ut we
-can worry about that later as it shouldn't be difficult to put the framewor=
-k and
-MSR definitions in common code.
+	/*
+	 * If SHSTK and IBT are available in KVM, clear CET user bit in
+	 * kvm_caps.supported_xss so that kvm_cet_user_supported() returns
+	 * false when called.
+	 */
+	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
+	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
+		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_USER;
 
-[*] https://lore.kernel.org/all/20230607224520.4164598-1-aaronlewis@google.=
-com
+and by extension, all dependent code is also wrong.  IIRC, there's a virtualization
+hole, but I don't see any reason why KVM has to make the hole even bigger.
+
+> +		return false;
+> +
+> +	if (msr->host_initiated)
+> +		return true;
+> +
+> +	if (!guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) &&
+> +	    !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
+> +		return false;
+> +
+> +	if (msr->index == MSR_IA32_PL3_SSP &&
+> +	    !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
+
+I probably asked this long ago, but if I did I since forgot.  Is it really just
+PL3_SSP that depends on SHSTK?  I would expect all shadow stack MSRs to depend
+on SHSTK.
+
+> @@ -546,5 +557,25 @@ int kvm_sev_es_mmio_read(struct kvm_vcpu *vcpu, gpa_t src, unsigned int bytes,
+>  int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
+>  			 unsigned int port, void *data,  unsigned int count,
+>  			 int in);
+> +bool kvm_cet_is_msr_accessible(struct kvm_vcpu *vcpu, struct msr_data *msr);
+> +
+> +/*
+> + * We've already loaded guest MSRs in __msr_io() after check the MSR index.
+
+Please avoid pronouns
+
+> + * In case vcpu has been preempted, we need to disable preemption, check
+
+vCPU.  And this doesn't make any sense.  The "vCPU" being preempted doesn't matter,
+it's KVM, i.e. the task that's accessing vCPU state that cares about preemption.
+I *think* what you're trying to say is that preemption needs to be disabled to
+ensure that the guest values are resident.
+
+> + * and reload the guest fpu states before read/write xsaves-managed MSRs.
+> + */
+> +static inline void kvm_get_xsave_msr(struct msr_data *msr_info)
+> +{
+> +	fpregs_lock_and_load();
+
+KVM already has helpers that do exactly this, and they have far better names for
+KVM: kvm_fpu_get() and kvm_fpu_put().  Can you convert kvm_fpu_get() to
+fpregs_lock_and_load() and use those isntead?  And if the extra consistency checks
+in fpregs_lock_and_load() fire, we definitely want to know, as it means we probably
+have bugs in KVM.
