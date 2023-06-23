@@ -2,87 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DAAC73B3CD
-	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 11:40:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29BA973B55F
+	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 12:34:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231591AbjFWJk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Jun 2023 05:40:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59064 "EHLO
+        id S232208AbjFWKe0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Jun 2023 06:34:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229686AbjFWJk1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Jun 2023 05:40:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C418EDC
-        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 02:39:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687513188;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=gRyPsYNMsmn7yEoiSn1NbaSs0ga5/o0J6ddDdrg5+Vc=;
-        b=FMJdetEIBmDWn+La2p2oi5fLZlhLGWHHQxTCcLbG6icpwP+iLz5ta2Ys8ik0r1dfZwfem6
-        Gyy1gA6gwnywXyS+dQIUo+Sv1x1DJhsGg69L7p5cYx6hEbdovR8qbgySFyKGSEZP4q9FFb
-        QGVm+L0NEIiQfRxgL8YcTRPbW8b0fU4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-17-F37DcmT1Md-rmuefAejvuA-1; Fri, 23 Jun 2023 05:39:46 -0400
-X-MC-Unique: F37DcmT1Md-rmuefAejvuA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9D671380451B;
-        Fri, 23 Jun 2023 09:39:45 +0000 (UTC)
-Received: from thuth.com (unknown [10.39.192.208])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 291F3492B01;
-        Fri, 23 Jun 2023 09:39:43 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        =?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH] s390x: Align __bss_end to a halfword boundary
-Date:   Fri, 23 Jun 2023 11:39:41 +0200
-Message-Id: <20230623093941.448147-1-thuth@redhat.com>
+        with ESMTP id S231769AbjFWKeZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Jun 2023 06:34:25 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 062B3E6D;
+        Fri, 23 Jun 2023 03:34:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687516465; x=1719052465;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Ug0tb+KIthtcBNlWZulbUMsIP+un6qpERH8Wcsp0QfQ=;
+  b=RMwaB1jYY1ppCly5Sx/9YiZAKiOLjNc0nwLw4vp/jJ+Ue3ugpXRPbI4I
+   keWwNrVx60loOl4TWulSV88lfMOyT2iYDz9lhNbOQjdan4jiKSI5XtF+j
+   VD92M4aJxVNBRLRFWo4hEJ/tOhTxOe02Ee39o4P3edGdfOllTqpJjLHZQ
+   NRz4sWwOo4NjHRF9NR9j7gw9KRDICFOs8xQ3DZM3K38TsTGd5C2lvnFu2
+   pkPnDrVKGZU2ICydfrBPznUfRUqgkKQE5HPyUEC8RoMEK7KppXljyPKY7
+   EJkjo6tAdWOLj5spxND8BqXuvAoTrUCMfAccYTlJZ8x4fICzGveop4Aoy
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="447112225"
+X-IronPort-AV: E=Sophos;i="6.01,151,1684825200"; 
+   d="scan'208";a="447112225"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2023 03:34:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="715275624"
+X-IronPort-AV: E=Sophos;i="6.01,151,1684825200"; 
+   d="scan'208";a="715275624"
+Received: from haibo-optiplex-7090.sh.intel.com ([10.239.159.132])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2023 03:34:17 -0700
+From:   Haibo Xu <haibo1.xu@intel.com>
+Cc:     xiaobo55x@gmail.com, haibo1.xu@intel.com, ajones@ventanamicro.com,
+        maz@kernel.org, oliver.upton@linux.dev, seanjc@google.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Shuah Khan <shuah@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: [PATCH v4 00/12] RISCV: Add KVM_GET_REG_LIST API
+Date:   Fri, 23 Jun 2023 18:40:02 +0800
+Message-Id: <cover.1687515463.git.haibo1.xu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We are using the "larl" instruction to load the address of __bss_end,
-and this instruction can only deal with even addresses, so we have
-to make sure that this symbol is aligned accordingly. Otherwise this
-will cause a failure with the new binutils 2.40 and Clang:
+KVM_GET_REG_LIST will dump all register IDs that are available to
+KVM_GET/SET_ONE_REG and It's very useful to identify some platform
+regression issue during VM migration.
 
- /usr/bin/ld: s390x/cstart64.o(.init+0x6a): misaligned symbol `__bss_end'
-              (0x2c0d1) for relocation R_390_PC32DBL
+Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
+of the code as common test framework that can be shared by riscv.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Patch 8 move reject_set check logic to a function so as to check for
+different errno for different registers.
+Patch 9 change to do the get/set operation only on present-blessed list.
+Patch 10 enabled the KVM_GET_REG_LIST API in riscv.
+patch 11-12 added the corresponding kselftest for checking possible
+register regressions.
+
+The get-reg-list kvm selftest was ported from aarch64 and tested with
+Linux 6.4-rc6 on a Qemu riscv64 virt machine.
+
 ---
- s390x/flat.lds.S | 1 +
- 1 file changed, 1 insertion(+)
+Changed since v3:
+  * Rebase to Linux 6.4-rc6
+  * Address Andrew's suggestions and comments:
+  *   Move reject_set check logic to a function 
+  *   Only do get/set tests on present blessed list 
+  *   Only enable ISA extension for the specified config
+  *   For disable-not-allowed registers, move them to the filter-reg-list 
 
-diff --git a/s390x/flat.lds.S b/s390x/flat.lds.S
-index 0cb7e383..5e91ecac 100644
---- a/s390x/flat.lds.S
-+++ b/s390x/flat.lds.S
-@@ -37,6 +37,7 @@ SECTIONS
- 	. = ALIGN(16);
- 	__bss_start = .;
- 	.bss : { *(.bss) }
-+	. = ALIGN(2);
- 	__bss_end = .;
- 	. = ALIGN(4K);
- 	edata = .;
+Andrew Jones (7):
+  KVM: arm64: selftests: Replace str_with_index with strdup_printf
+  KVM: arm64: selftests: Drop SVE cap check in print_reg
+  KVM: arm64: selftests: Remove print_reg's dependency on vcpu_config
+  KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
+  KVM: arm64: selftests: Delete core_reg_fixup
+  KVM: arm64: selftests: Split get-reg-list test code
+  KVM: arm64: selftests: Finish generalizing get-reg-list
+
+Haibo Xu (5):
+  KVM: arm64: selftests: Move reject_set check logic to a function
+  KVM: selftests: Only do get/set tests on present blessed list
+  KVM: riscv: Add KVM_GET_REG_LIST API support
+  KVM: riscv: selftests: Add finalize_vcpu check in run_test
+  KVM: riscv: selftests: Add get-reg-list test
+
+ Documentation/virt/kvm/api.rst                |   2 +-
+ arch/riscv/kvm/vcpu.c                         | 375 +++++++++
+ tools/testing/selftests/kvm/Makefile          |  11 +-
+ .../selftests/kvm/aarch64/get-reg-list.c      | 538 ++-----------
+ tools/testing/selftests/kvm/get-reg-list.c    | 439 ++++++++++
+ .../selftests/kvm/include/kvm_util_base.h     |  16 +
+ .../selftests/kvm/include/riscv/processor.h   |   3 +
+ .../testing/selftests/kvm/include/test_util.h |   2 +
+ tools/testing/selftests/kvm/lib/test_util.c   |  15 +
+ .../selftests/kvm/riscv/get-reg-list.c        | 752 ++++++++++++++++++
+ 10 files changed, 1658 insertions(+), 495 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/get-reg-list.c
+ create mode 100644 tools/testing/selftests/kvm/riscv/get-reg-list.c
+
 -- 
-2.39.3
+2.34.1
 
