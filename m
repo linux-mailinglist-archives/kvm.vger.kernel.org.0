@@ -2,290 +2,455 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3422173BEF6
-	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 21:37:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BA6E73C03E
+	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 22:38:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231779AbjFWThv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Jun 2023 15:37:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35058 "EHLO
+        id S229617AbjFWUiH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Jun 2023 16:38:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231267AbjFWTht (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Jun 2023 15:37:49 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 593251FC6
-        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 12:37:44 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-56942667393so13170917b3.2
-        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 12:37:44 -0700 (PDT)
+        with ESMTP id S231975AbjFWUh6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Jun 2023 16:37:58 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 839622D6B;
+        Fri, 23 Jun 2023 13:37:28 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-668723729c5so716129b3a.3;
+        Fri, 23 Jun 2023 13:37:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687549063; x=1690141063;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xi03PcQlzLUPg60JS878wSJG0NHmPGcINWnga6lnDGk=;
-        b=F5XENiq53fCdxmPXSDw3oZXVQxMfKAsVXMbijdo/ZA9TCR0ose5RAsilA4Q+6qJ8U7
-         7BG583RXlFo3BvS7H7DUUSoG2pLDtzc1MW61wWgDt0d5UzT5kI4FeDcSLtAdJeZycz1x
-         MyvFd9x7x+g/BMDIkcXiN7513doMU9oeMAAK32vJuEdBdY6wiBcNIn7u0qCs+lbAjC7W
-         ZLdA1UJcxqCyycHu0AiKHi+v7aB4n+x1sPnR2cFdrk3FCuUqui0vtqXrEE/YvRXuzV97
-         zpZPIhs7SFFhoHsNZkE6BAIH6IXNnM0ClLjC8B+rziZuFgZbfj5/U58FytQqAjLa/cUS
-         rPTw==
+        d=gmail.com; s=20221208; t=1687552647; x=1690144647;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=idFnPl31OGuMhU4Uuh/6VPd8tYp9K05WUCilImVkZuc=;
+        b=pcS1h0rzgKtA6xovCPoCgiyKI2HmCmxHH1MhQzGtgAvaeKxDX38agYOtf0Xvei9Kjs
+         7NByRRy1DgVl70mMQEoybKa6v463xo0C0Gg1KSlpG90BTVE1GfWyaONRZq9DeUKxQitG
+         OGDBl9QO5V8tmIrhKVaLNth60e94Sj85sjkPZ1daCJgEN2boK7HxCiYiSw6FJq4d3P1Y
+         2iUeiDWGN8PkmL2hzpwxjjeQIPPCD0zc7EuFueqg7mqso+F3hiCjwtDApdGp6EroPRW/
+         n80CagTBNbRLMh/20a7BTg3JEfjJHHRMU08uqw46UJ9xsNkxci79NJtWD1HyIYWNHydV
+         I0lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687549063; x=1690141063;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xi03PcQlzLUPg60JS878wSJG0NHmPGcINWnga6lnDGk=;
-        b=D2pALlaxA/hlDLz618dj2FOUvESTngEOcfiLN83jRFmWXcitzzjPwpvn2E/zAzL9P4
-         UB4ylyEOlKMYJfnJFGzssOOWINgJ2NxJXZ5cRTfGpLCWW1NgIjADFCca1AwSYYR2IqiV
-         3lv6CgFAn3Sx5ZpOXkD/4ng4MtWZeBWtR3TZIRzHSYK+ETivbphqHE8QBjhtEzi0X3zZ
-         5ysnWoJV0XcomsujApZP+pf2mn9FFBJ/cQb/5VQlwK4H2uHC5M439TZ7qDYMt+6E8yVH
-         i9QO6PYTsorKWYHCaGbEHmX3hVjY0TMdKMXBkjVJFoltSuwBWpQlRpgyLuDBcC7q8NK6
-         RXKw==
-X-Gm-Message-State: AC+VfDxCgAKV7Wo35FzhkQ64t4ARCasEGcCK7l4z/tOJa5UAs1qrY+DQ
-        lDyZuZX/fk+wumLoqYKFFywFyZWURbs=
-X-Google-Smtp-Source: ACHHUZ5iHF1LvGk4T4mkRO1dk7b3zvSByLk2x6aU/q82+4HM5UnIBJsMJHMgNj5jkfNWRAhtpSQnpYPMhAo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4041:0:b0:576:750d:5fdf with SMTP id
- m1-20020a814041000000b00576750d5fdfmr1347898ywn.4.1687549063590; Fri, 23 Jun
- 2023 12:37:43 -0700 (PDT)
-Date:   Fri, 23 Jun 2023 12:37:42 -0700
-In-Reply-To: <20230620190443.GU2244082@ls.amr.corp.intel.com>
-Mime-Version: 1.0
-References: <cover.1686858861.git.isaku.yamahata@intel.com>
- <e8d3ab4a56d69a09ba74ff1c439f904075d38c16.1686858861.git.isaku.yamahata@intel.com>
- <20230620162835.xsmaao63brira7as@amd.com> <20230620190443.GU2244082@ls.amr.corp.intel.com>
-Message-ID: <ZJX0hk+KpQP0KUyB@google.com>
-Subject: Re: [RFC PATCH 5/6] KVM: Add flags to struct kvm_gfn_range
-From:   Sean Christopherson <seanjc@google.com>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Michael Roth <michael.roth@amd.com>, isaku.yamahata@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        linux-coco@lists.linux.dev,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Vishal Annapurve <vannapurve@google.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1687552647; x=1690144647;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=idFnPl31OGuMhU4Uuh/6VPd8tYp9K05WUCilImVkZuc=;
+        b=WujSeDbgwlr21g4oqrxPG00hESSSq6vYJZVbnroA7EqvH4shxPPcTqkDI/oDoYTYX7
+         E+oQol7rksjPSk0OPYCR5uHExd1/Mlk2Wbga9zOaGRRQJlQw5hQi20rV4/XLoiMMDOCo
+         pQj3FEupFjxCczQ7g16DJraBQvgPO2ka175mYWJFaUiHy5sBmwijADA5/HikVCBCVRzX
+         WTAEBgPiXqQSVr9jtmj4Cp0UST1zM5IV6al9PdwrOltqHFAbMwfl6esr84dRPBncqkqo
+         6Q2h4F2YIIb8HIgvnUvNt4XxgmFN4+z/dK5oEl07GqoSw5BfdQIdmTy45TIwbHJeWVLo
+         sGAQ==
+X-Gm-Message-State: AC+VfDwlasZw/VDqB2eSy3V0taVXpsmWXiDX8fp/R8cGN4SQOnRNZcYh
+        RiYy5PaH9vD5oq73K1RYYC0=
+X-Google-Smtp-Source: ACHHUZ5SGifeSzoN56YB44OBLwYk9Qd0ScclF4T/BhSnwaL5a2XGxOImV1Ghh1e34gb+1vEHUv2dEA==
+X-Received: by 2002:a05:6a00:1303:b0:668:9bf9:fa75 with SMTP id j3-20020a056a00130300b006689bf9fa75mr12192084pfu.34.1687552647311;
+        Fri, 23 Jun 2023 13:37:27 -0700 (PDT)
+Received: from localhost (ec2-54-67-115-33.us-west-1.compute.amazonaws.com. [54.67.115.33])
+        by smtp.gmail.com with ESMTPSA id u10-20020aa7838a000000b00662c4ca18ebsm2109525pfm.128.2023.06.23.13.37.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jun 2023 13:37:26 -0700 (PDT)
+Date:   Fri, 23 Jun 2023 02:50:01 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        linux-hyperv@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Simon Horman <simon.horman@corigine.com>,
+        virtualization@lists.linux-foundation.org,
+        Eric Dumazet <edumazet@google.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        Vishnu Dasa <vdasa@vmware.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH RFC net-next v4 3/8] vsock: support multi-transport
+ datagrams
+Message-ID: <ZJUIWcgg13F7DNBm@bullseye>
+References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
+ <20230413-b4-vsock-dgram-v4-3-0cebbb2ae899@bytedance.com>
+ <tngyeva5by3aldrhlixajjin2hqmcl6uruvuoed7hyrndlesfd@bbv7aphqye2q>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tngyeva5by3aldrhlixajjin2hqmcl6uruvuoed7hyrndlesfd@bbv7aphqye2q>
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 20, 2023, Isaku Yamahata wrote:
-> On Tue, Jun 20, 2023 at 11:28:35AM -0500,
-> Michael Roth <michael.roth@amd.com> wrote:
+On Thu, Jun 22, 2023 at 05:19:08PM +0200, Stefano Garzarella wrote:
+> On Sat, Jun 10, 2023 at 12:58:30AM +0000, Bobby Eshleman wrote:
+> > This patch adds support for multi-transport datagrams.
+> > 
+> > This includes:
+> > - Per-packet lookup of transports when using sendto(sockaddr_vm)
+> > - Selecting H2G or G2H transport using VMADDR_FLAG_TO_HOST and CID in
+> >  sockaddr_vm
+> > 
+> > To preserve backwards compatibility with VMCI, some important changes
+> > were made. The "transport_dgram" / VSOCK_TRANSPORT_F_DGRAM is changed to
+> > be used for dgrams iff there is not yet a g2h or h2g transport that has
 > 
-> > On Thu, Jun 15, 2023 at 01:12:18PM -0700, isaku.yamahata@intel.com wrote:
-> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > 
-> > > TDX and SEV-SNP need to know the reason for a callback by
-> > > kvm_unmap_gfn_range().  mmu notifier, set memory attributes ioctl or KVM
-> > > gmem callback.  The callback handler changes the behavior or does the
-> > > additional housekeeping operation.  For mmu notifier, it's zapping shared
-> > > PTE.  For set memory attributes, it's the conversion of memory attributes
-> > > (private <=> shared).  For KVM gmem, it's punching a hole in the range, and
-> > > releasing the file.
-> > 
-> > I think it's still an open topic that we need to hear more from Sean about:
-> > 
-> >   https://lore.kernel.org/lkml/20230522235838.ov3722lcusotzlvo@amd.com/
-> > 
-> > but I *think* we were leaning toward decoupling the act of invalidating
-> > GFNs, vs. the act of invalidating/free'ing gmem pages.
-
-Yes.  Ignore any comments I made about not introducing new hooks, I messed up and
-forgot the full context.
-
-> > One concrete example of where this seperation makes sense if with
-> > hole-punching. SNP has unique platform-specific stuff it has to do before
-> > free'ing that gmem page back to the host. If we try to plumb this through
-> > kvm_unmap_gfn_range() via a special flag then it's a little awkward
-> > because:
-> > 
-> > a) Presumably that hole-punch would have occurred after a preceeding
-> >    KVM_SET_MEMORY_ATTRIBUTES was issued to switch the page to shared
-> >    state in the xarray. So all it should really need to do is handle
-> >    that platform-specific behavior, like updating RMP table in case of
-> >    SNP. But none of the other details like GFN ranges are relevant in
-> >    that case, RMP updates here only need the PFN, so we end up walking
-> >    memslots to do GFN->PFN translations, when it would actually be much
-> >    more efficient to do these translations by translating the
-> >    hole-punched FD offset range to the corresponding folio()'s backing
-> >    those ranges
-> > 
-> > b) It places an unecessary dependency on having an active memslot to do
-> >    those translations. This ends up not being an issue with current
-> >    version of gmem patchset because the release() happens *before*
-> >    gmem_unbind(), so there is a memslot associated with the ranges at
-> >    gmem_release() time, but in the initial version of gmem it was the
-> >    reverse, so if things ever changed again in this regard we'd once
-> >    again have to completely rework how to issue these platform-specific
-> >    invalidation callbacks.
-> > 
-> > I really *really* like having a separate, simple invalidation mechanism
-> > in place that just converts FD offsets to PFNs and then passes those on
-> > to platform-defined handlers to clean up pages before free'ing them back
-> > to the system. It's versatile in that it can be called pretty much
-> > anywhere regardless of where we are in KVM lifecycle, it's robust in
-> > that it doesn't rely on unecessary outside dependencies, and it avoids
-> > added uneeded complexity to paths like kvm_unmap_gfn_range().
-> > 
-> > That's the approach taken with SNP hypervisor v9 series, with the
-> > gmem hook being introduced here:
-> > 
-> >   https://lore.kernel.org/kvm/20230612042559.375660-1-michael.roth@amd.com/T/#m3ad8245235a27ed0f41c359c191dcda6c77af043
-> > 
-> > and the SEV-SNP implementation of that hook being here:
-> > 
-> >   https://lore.kernel.org/kvm/20230612042559.375660-1-michael.roth@amd.com/T/#m6ac04b44722dbc07839011816e94fadf5ad6794e
-> > 
-> > Would a similar approach work for TDX? At least WRT cleaning up pages
-> > before returning them back to the host? If we could isolate that
-> > requirement/handling from all the other aspects of invalidations it
-> > really seems like it would cause us less headaches down the road.
+> s/iff/if
 > 
-> In short, TDX KVM doesn't need an extra callback for invalidating/freeing gmem
-> pages. kvm_unmap_gfn_range() callback works.  Instead TDX needs attributes
-> (private-or-shared) for it.
-
-Just because TDX doesn't strictly need a separate callback doesn't mean it
-wouldn't be useful and beneficial.  SNP doesn't "need" a separate callback either,
-i.e. we could make kvm_unmap_gfn_range() work, but it would be ugly and inflexible.
-
-E.g. as Mike pointed out in the other thread, reclaiming physical memory when
-SPTEs are zapped is suboptimal if the memory is not actually discarded.
-
-  : There's also cases like userspaces that opt to not discard memory after
-  : conversions because they highly favor performance over memory usage. In
-  : those cases it would make sense to defer marking the pages as shared in
-  : the RMP until the FALLOC_FL_PUNCH_HOLE, rather than triggering it via
-  : KVM MMU invalidation path after a conversion.
-
-And to some extent, I would even argue that TDX does "need" the separate hook,
-because doing PAGE.WBINVD while holding mmu_lock for write is going to be slooow.
-Even if the PAGE.WBINVD isn't redundant, i.e. the memory is never converted back
-to private, deferring the cache flush until the backing store is freed is a win
-for guest performance during conversions.
-
-> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > > index 1a47cedae8a1..c049c0aa44d6 100644
-> > > --- a/include/linux/kvm_host.h
-> > > +++ b/include/linux/kvm_host.h
-> > > @@ -256,12 +256,21 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
-> > >  #endif
-> > >  
-> > >  #ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
-> > > +
-> > > +#define KVM_GFN_RANGE_FLAGS_SET_MEM_ATTR		BIT(0)
+> > been registered that can transmit the packet. If there is a g2h/h2g
+> > transport for that remote address, then that transport will be used and
+> > not "transport_dgram". This essentially makes "transport_dgram" a
+> > fallback transport for when h2g/g2h has not yet gone online, which
+> > appears to be the exact use case for VMCI.
 > > 
-> > Can you go into more detail on why special handling is needed for
-> > SET_MEM_ATTR?
-> 
-> When in TDX, the VMM zaps a private page from the encrypted page table and the
-> VMM adds the page back to the same GPA, it results in zeroing page and guest
-> needs to accept the page again.  When converting a page from shared to private,
-> KVM needs to zap only shared pages.  So the callback needs to know this zap
-> is for converting shared-to-private or private-to-shared.
-
-That doesn't answer Mike's question.  You answered why KVM needs to know whether
-to zap shared vs. private, but not why SET_MEM_ATTR is a special case.
-
-> > > +#define KVM_GFN_RANGE_FLAGS_GMEM_PUNCH_HOLE		BIT(1)
-> > > +#define KVM_GFN_RANGE_FLAGS_GMEM_RELEASE		BIT(2)
+> > This design makes sense, because there is no reason that the
+> > transport_{g2h,h2g} cannot also service datagrams, which makes the role
+> > of transport_dgram difficult to understand outside of the VMCI context.
 > > 
-> > Would the need to distinguish between PUNCH_HOLE/RELEASE go away in the
-> > TDX case if you take the above approach? For SNP, the answer is yes. If
-> > that's also the case for TDX I think that would be another argument in
-> > favor of decoupling these from existing KVM MMU invalidation path.
+> > The logic around "transport_dgram" had to be retained to prevent
+> > breaking VMCI:
+> > 
+> > 1) VMCI datagrams appear to function outside of the h2g/g2h
+> >   paradigm. When the vmci transport becomes online, it registers itself
+> >   with the DGRAM feature, but not H2G/G2H. Only later when the
+> >   transport has more information about its environment does it register
+> >   H2G or G2H. In the case that a datagram socket becomes active
+> >   after DGRAM registration but before G2H/H2G registration, the
+> >   "transport_dgram" transport needs to be used.
 > 
-> TDX doesn't need gmem_invalidate callback.  TDx doesn't need the difference
-> betwee punch hole and release. So in short TDX needs
-> KVM_GFN_RANGE_FLAGS_SET_MEM_ATTR and KVM_GFN_RANGE_FLAGS_GMEM.
+> IIRC we did this, because at that time only VMCI supported DGRAM. Now that
+> there are more transports, maybe DGRAM can follow the h2g/g2h paradigm.
+> 
 
-TDX needs to now what flavor of mappings, i.e. EPT vs. S-EPT, are in scope, TDX
-doesn't need to know who/what initiated a zap.  And for that, a simple private vs.
-shared flag would suffice.
+Totally makes sense. I'll add the detail above that the prior design was
+a result of chronology.
 
-However, looking at kvm_mem_attrs_changed() again, I think invoking kvm_unmap_gfn_range()
-from generic KVM code is a mistake and shortsighted.  Zapping in response to
-*any* attribute change is very private/shared centric.  E.g. if/when we extend
-attributes to provide per-page RWX protections, zapping existing SPTEs in response
-to granting *more* permissions may not be necessary or even desirable.
+> > 
+> > 2) VMCI seems to require special message be sent by the transport when a
+> >   datagram socket calls bind(). Under the h2g/g2h model, the transport
+> >   is selected using the remote_addr which is set by connect(). At
+> >   bind time there is no remote_addr because often no connect() has been
+> >   called yet: the transport is null. Therefore, with a null transport
+> >   there doesn't seem to be any good way for a datagram socket a tell the
+> >   VMCI transport that it has just had bind() called upon it.
+> 
+> @Vishnu, @Bryan do you think we can avoid this in some way?
+> 
+> > 
+> > Only transports with a special datagram fallback use-case such as VMCI
+> > need to register VSOCK_TRANSPORT_F_DGRAM.
+> 
+> Maybe we should rename it in VSOCK_TRANSPORT_F_DGRAM_FALLBACK or
+> something like that.
+> 
+> In any case, we definitely need to update the comment in
+> include/net/af_vsock.h on top of VSOCK_TRANSPORT_F_DGRAM mentioning
+> this.
+> 
 
-And for SNP, isn't zapping unnecessary?  KVM needs to update the RMP, but there's
-no need to zap NPT entries.  Or do RMP lookups need to be blocked while the RMP
-is being updated?
+Agreed. I'll rename to VSOCK_TRANSPORT_F_DGRAM_FALLBACK, unless we find
+there is a better way altogether.
 
-Regardless of what SNP needs to do on attribute changes, rather than using
-kvm_unmap_gfn_range(), I think kvm_mem_attrs_changed() should look something like:
+> > 
+> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> > ---
+> > drivers/vhost/vsock.c                   |  1 -
+> > include/linux/virtio_vsock.h            |  2 -
+> > net/vmw_vsock/af_vsock.c                | 78 +++++++++++++++++++++++++--------
+> > net/vmw_vsock/hyperv_transport.c        |  6 ---
+> > net/vmw_vsock/virtio_transport.c        |  1 -
+> > net/vmw_vsock/virtio_transport_common.c |  7 ---
+> > net/vmw_vsock/vsock_loopback.c          |  1 -
+> > 7 files changed, 60 insertions(+), 36 deletions(-)
+> > 
+> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > index c8201c070b4b..8f0082da5e70 100644
+> > --- a/drivers/vhost/vsock.c
+> > +++ b/drivers/vhost/vsock.c
+> > @@ -410,7 +410,6 @@ static struct virtio_transport vhost_transport = {
+> > 		.cancel_pkt               = vhost_transport_cancel_pkt,
+> > 
+> > 		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+> > -		.dgram_bind               = virtio_transport_dgram_bind,
+> > 		.dgram_allow              = virtio_transport_dgram_allow,
+> > 		.dgram_get_cid		  = virtio_transport_dgram_get_cid,
+> > 		.dgram_get_port		  = virtio_transport_dgram_get_port,
+> > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> > index 23521a318cf0..73afa09f4585 100644
+> > --- a/include/linux/virtio_vsock.h
+> > +++ b/include/linux/virtio_vsock.h
+> > @@ -216,8 +216,6 @@ void virtio_transport_notify_buffer_size(struct vsock_sock *vsk, u64 *val);
+> > u64 virtio_transport_stream_rcvhiwat(struct vsock_sock *vsk);
+> > bool virtio_transport_stream_is_active(struct vsock_sock *vsk);
+> > bool virtio_transport_stream_allow(u32 cid, u32 port);
+> > -int virtio_transport_dgram_bind(struct vsock_sock *vsk,
+> > -				struct sockaddr_vm *addr);
+> > bool virtio_transport_dgram_allow(u32 cid, u32 port);
+> > int virtio_transport_dgram_get_cid(struct sk_buff *skb, unsigned int *cid);
+> > int virtio_transport_dgram_get_port(struct sk_buff *skb, unsigned int *port);
+> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > index 74358f0b47fa..ef86765f3765 100644
+> > --- a/net/vmw_vsock/af_vsock.c
+> > +++ b/net/vmw_vsock/af_vsock.c
+> > @@ -438,6 +438,18 @@ vsock_connectible_lookup_transport(unsigned int cid, __u8 flags)
+> > 	return transport;
+> > }
+> > 
+> > +static const struct vsock_transport *
+> > +vsock_dgram_lookup_transport(unsigned int cid, __u8 flags)
+> > +{
+> > +	const struct vsock_transport *transport;
+> > +
+> > +	transport = vsock_connectible_lookup_transport(cid, flags);
+> > +	if (transport)
+> > +		return transport;
+> > +
+> > +	return transport_dgram;
+> > +}
+> > +
+> > /* Assign a transport to a socket and call the .init transport callback.
+> >  *
+> >  * Note: for connection oriented socket this must be called when vsk->remote_addr
+> > @@ -474,7 +486,8 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+> > 
+> > 	switch (sk->sk_type) {
+> > 	case SOCK_DGRAM:
+> > -		new_transport = transport_dgram;
+> > +		new_transport = vsock_dgram_lookup_transport(remote_cid,
+> > +							     remote_flags);
+> > 		break;
+> > 	case SOCK_STREAM:
+> > 	case SOCK_SEQPACKET:
+> > @@ -691,6 +704,9 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+> > static int __vsock_bind_dgram(struct vsock_sock *vsk,
+> > 			      struct sockaddr_vm *addr)
+> > {
+> > +	if (!vsk->transport || !vsk->transport->dgram_bind)
+> > +		return -EINVAL;
+> > +
+> > 	return vsk->transport->dgram_bind(vsk, addr);
+> > }
+> > 
+> > @@ -1172,19 +1188,24 @@ static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+> > 
+> > 	lock_sock(sk);
+> > 
+> > -	transport = vsk->transport;
+> > -
+> > -	err = vsock_auto_bind(vsk);
+> > -	if (err)
+> > -		goto out;
+> > -
+> > -
+> > 	/* If the provided message contains an address, use that.  Otherwise
+> > 	 * fall back on the socket's remote handle (if it has been connected).
+> > 	 */
+> > 	if (msg->msg_name &&
+> > 	    vsock_addr_cast(msg->msg_name, msg->msg_namelen,
+> > 			    &remote_addr) == 0) {
+> > +		transport = vsock_dgram_lookup_transport(remote_addr->svm_cid,
+> > +							 remote_addr->svm_flags);
+> > +		if (!transport) {
+> > +			err = -EINVAL;
+> > +			goto out;
+> > +		}
+> > +
+> > +		if (!try_module_get(transport->module)) {
+> > +			err = -ENODEV;
+> > +			goto out;
+> > +		}
+> > +
+> > 		/* Ensure this address is of the right type and is a valid
+> > 		 * destination.
+> > 		 */
+> > @@ -1193,11 +1214,27 @@ static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+> > 			remote_addr->svm_cid = transport->get_local_cid();
+> > 
+> 
+> From here ...
+> 
+> > 		if (!vsock_addr_bound(remote_addr)) {
+> > +			module_put(transport->module);
+> > +			err = -EINVAL;
+> > +			goto out;
+> > +		}
+> > +
+> > +		if (!transport->dgram_allow(remote_addr->svm_cid,
+> > +					    remote_addr->svm_port)) {
+> > +			module_put(transport->module);
+> > 			err = -EINVAL;
+> > 			goto out;
+> > 		}
+> > +
+> > +		err = transport->dgram_enqueue(vsk, remote_addr, msg, len);
+> 
+> ... to here, looks like duplicate code, can we get it out of the if block?
+> 
 
+Yes, I think using something like this:
 
-	struct kvm_gfn_range gfn_range;
-	struct kvm_memory_slot *slot;
-	struct kvm_memslots *slots;
-	struct kvm_memslot_iter iter;
-	bool flush = false;
-	int i;
+[...]
+	bool module_got = false;
 
-	gfn_range.may_block = true;
-	gfn_range.attrs = attrs;
-
-	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
-		slots = __kvm_memslots(kvm, i);
-
-		kvm_for_each_memslot_in_gfn_range(&iter, slots, start, end) {
-			slot = iter.slot;
-			gfn_range.start = max(start, slot->base_gfn);
-			gfn_range.end = min(end, slot->base_gfn + slot->npages);
-			if (gfn_range.start >= gfn_range.end)
-				continue;
-			gfn_range.slot = slot;
-
-			flush |= kvm_arch_set_memory_attributes(kvm, &gfn_range);
+[...]
+		if (!try_module_get(transport->module)) {
+			err = -ENODEV;
+			goto out;
 		}
-	}
+		module_got = true;
 
-	if (flush)
-		kvm_flush_remote_tlbs(kvm);
+[...]
 
-At that point, a single "is_private" or "is_shared" flag is awkward and arguably
-wrong, because the changing attributes affect both.  The fact that TDX only needs
-to zap one or the other is an implementation detail, not a fundamental truth of
-the update itself.
+out:
+	if (likely(transport && !err && module_got))
+		module_put(transport->module)
 
-We could just have kvm_arch_set_memory_attributes() take individual params instead
-of taking a kvm_gfn_range pointer, but that's a missed opportunitiy IMO as this
-really is just another variation of gfn-based notification to arch MMU code.
+> > +		module_put(transport->module);
+> > 	} else if (sock->state == SS_CONNECTED) {
+> > 		remote_addr = &vsk->remote_addr;
+> > +		transport = vsk->transport;
+> > +
+> > +		err = vsock_auto_bind(vsk);
+> > +		if (err)
+> > +			goto out;
+> > 
+> > 		if (remote_addr->svm_cid == VMADDR_CID_ANY)
+> > 			remote_addr->svm_cid = transport->get_local_cid();
+> > @@ -1205,23 +1242,23 @@ static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+> > 		/* XXX Should connect() or this function ensure remote_addr is
+> > 		 * bound?
+> > 		 */
+> > -		if (!vsock_addr_bound(&vsk->remote_addr)) {
+> > +		if (!vsock_addr_bound(remote_addr)) {
+> > 			err = -EINVAL;
+> > 			goto out;
+> > 		}
+> > -	} else {
+> > -		err = -EINVAL;
+> > -		goto out;
+> > -	}
+> > 
+> > -	if (!transport->dgram_allow(remote_addr->svm_cid,
+> > -				    remote_addr->svm_port)) {
+> > +		if (!transport->dgram_allow(remote_addr->svm_cid,
+> > +					    remote_addr->svm_port)) {
+> > +			err = -EINVAL;
+> > +			goto out;
+> > +		}
+> > +
+> > +		err = transport->dgram_enqueue(vsk, remote_addr, msg, len);
+> > +	} else {
+> > 		err = -EINVAL;
+> > 		goto out;
+> > 	}
+> > 
+> > -	err = transport->dgram_enqueue(vsk, remote_addr, msg, len);
+> > -
+> > out:
+> > 	release_sock(sk);
+> > 	return err;
+> > @@ -1255,13 +1292,18 @@ static int vsock_dgram_connect(struct socket *sock,
+> > 	if (err)
+> > 		goto out;
+> > 
+> > +	memcpy(&vsk->remote_addr, remote_addr, sizeof(vsk->remote_addr));
+> > +
+> > +	err = vsock_assign_transport(vsk, NULL);
+> > +	if (err)
+> > +		goto out;
+> > +
+> > 	if (!vsk->transport->dgram_allow(remote_addr->svm_cid,
+> > 					 remote_addr->svm_port)) {
+> > 		err = -EINVAL;
+> > 		goto out;
+> > 	}
+> > 
+> > -	memcpy(&vsk->remote_addr, remote_addr, sizeof(vsk->remote_addr));
+> > 	sock->state = SS_CONNECTED;
+> > 
+> > 	/* sock map disallows redirection of non-TCP sockets with sk_state !=
+> > diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+> > index ff6e87e25fa0..c00bc5da769a 100644
+> > --- a/net/vmw_vsock/hyperv_transport.c
+> > +++ b/net/vmw_vsock/hyperv_transport.c
+> > @@ -551,11 +551,6 @@ static void hvs_destruct(struct vsock_sock *vsk)
+> > 	kfree(hvs);
+> > }
+> > 
+> > -static int hvs_dgram_bind(struct vsock_sock *vsk, struct sockaddr_vm *addr)
+> > -{
+> > -	return -EOPNOTSUPP;
+> > -}
+> > -
+> > static int hvs_dgram_get_cid(struct sk_buff *skb, unsigned int *cid)
+> > {
+> > 	return -EOPNOTSUPP;
+> > @@ -841,7 +836,6 @@ static struct vsock_transport hvs_transport = {
+> > 	.connect                  = hvs_connect,
+> > 	.shutdown                 = hvs_shutdown,
+> > 
+> > -	.dgram_bind               = hvs_dgram_bind,
+> > 	.dgram_get_cid		  = hvs_dgram_get_cid,
+> > 	.dgram_get_port		  = hvs_dgram_get_port,
+> > 	.dgram_get_length	  = hvs_dgram_get_length,
+> > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> > index 5763cdf13804..1b7843a7779a 100644
+> > --- a/net/vmw_vsock/virtio_transport.c
+> > +++ b/net/vmw_vsock/virtio_transport.c
+> > @@ -428,7 +428,6 @@ static struct virtio_transport virtio_transport = {
+> > 		.shutdown                 = virtio_transport_shutdown,
+> > 		.cancel_pkt               = virtio_transport_cancel_pkt,
+> > 
+> > -		.dgram_bind               = virtio_transport_dgram_bind,
+> > 		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+> > 		.dgram_allow              = virtio_transport_dgram_allow,
+> > 		.dgram_get_cid		  = virtio_transport_dgram_get_cid,
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index e6903c719964..d5a3c8efe84b 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -790,13 +790,6 @@ bool virtio_transport_stream_allow(u32 cid, u32 port)
+> > }
+> > EXPORT_SYMBOL_GPL(virtio_transport_stream_allow);
+> > 
+> > -int virtio_transport_dgram_bind(struct vsock_sock *vsk,
+> > -				struct sockaddr_vm *addr)
+> > -{
+> > -	return -EOPNOTSUPP;
+> > -}
+> > -EXPORT_SYMBOL_GPL(virtio_transport_dgram_bind);
+> > -
+> > int virtio_transport_dgram_get_cid(struct sk_buff *skb, unsigned int *cid)
+> > {
+> > 	return -EOPNOTSUPP;
+> > diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+> > index 2f3cabc79ee5..e9de45a26fbd 100644
+> > --- a/net/vmw_vsock/vsock_loopback.c
+> > +++ b/net/vmw_vsock/vsock_loopback.c
+> > @@ -61,7 +61,6 @@ static struct virtio_transport loopback_transport = {
+> > 		.shutdown                 = virtio_transport_shutdown,
+> > 		.cancel_pkt               = vsock_loopback_cancel_pkt,
+> > 
+> > -		.dgram_bind               = virtio_transport_dgram_bind,
+> > 		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+> > 		.dgram_allow              = virtio_transport_dgram_allow,
+> > 		.dgram_get_cid		  = virtio_transport_dgram_get_cid,
+> > 
+> > -- 
+> > 2.30.2
+> > 
+> 
+> The rest LGTM!
+> 
+> Stefano
 
-Going with my union suggestion from the MGLRU thread[*], I think we should aim
-for making kvm_gfn_range look like this:
-
-struct kvm_gfn_range {
-	struct kvm_memory_slot *slot;
-	gfn_t start;
-	gfn_t end;
-	union {
-		struct test_clear_young_metadata *metadata;
-		unsigned long attributes;
-		pte_t pte;
-		unsigned long callback_arg; /* needs a better name */
-	};
-	bool only_private;
-	bool only_shared;
-	bool may_block;
-};
-
-That way kvm_arch_set_memory_attributes() can communicate that it affects both
-shared and private mappings, i.e. can leave it to TDX to precisely zap only the
-necessary tree.  It's a bit unfortunate that the existing mmu_notifier usage
-would need to explicitly say "only_shared", but that's literally one line of code
-in __kvm_handle_hva_range(), and on the plus side would clearly document that
-hva-based notifications are shared-only.
-
-[*] https://lore.kernel.org/all/ZItNoeWriZgLUaon@google.com
+Thanks,
+Bobby
