@@ -2,92 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2350473B282
-	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 10:16:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0DAAC73B3CD
+	for <lists+kvm@lfdr.de>; Fri, 23 Jun 2023 11:40:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231631AbjFWIQ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Jun 2023 04:16:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54398 "EHLO
+        id S231591AbjFWJk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Jun 2023 05:40:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230203AbjFWIQO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Jun 2023 04:16:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D26D269E
-        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 01:15:30 -0700 (PDT)
+        with ESMTP id S229686AbjFWJk1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Jun 2023 05:40:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C418EDC
+        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 02:39:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687508129;
+        s=mimecast20190719; t=1687513188;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vvP94iL0b14tTM53kZ2sYxqnmPo54a4UlF6JdzA9tVs=;
-        b=ZBDjyIkaE/PFGh7HJb0czEmKU0tgCZDqhis18PtqOl0Gg7ske+txGakFvDKTW2nDzoXJX/
-        Lo9Gk4nVBLCycZvkCwJKjB8MvniuvBt40EazpvB0Qnz9se2ODtLNjiUbQzkGwyauMP3NR/
-        k4XsAHOBAXE6Hb2Qjy4Rr4H81PTa11c=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-484-M-wRi40ANoiLAsjkExCH6A-1; Fri, 23 Jun 2023 04:15:28 -0400
-X-MC-Unique: M-wRi40ANoiLAsjkExCH6A-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-95847b4b4e7so27251666b.3
-        for <kvm@vger.kernel.org>; Fri, 23 Jun 2023 01:15:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687508127; x=1690100127;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vvP94iL0b14tTM53kZ2sYxqnmPo54a4UlF6JdzA9tVs=;
-        b=eLf8PrhoDd8y/SB8EI1s8mgxWlVUi0h4A2YHOlXGDG2SNSxvM+z9eeFNbI36RRYCHt
-         bj/1WL1+8d/AJPBfceM1+OafjvRFWoce7Q3lEAYhPm2U/8LxcsqfRXqwmz4ssSsppj0z
-         SdBTay4jKYKU2WTAz2JvKYhQePBlg3VY16QjlhCpFONTiVwiwz2PL7LiZRXujciSlDQu
-         qWZBN6Vye2A4MFtafpPnRvcN7XbZEpybHI7jcChA3HBiaawCn5b0KrrQLFRp31KBwcRe
-         gLJcDgXVsRJMJLLxz9WD+yoeHj5IDHDHvls6fLaOn/NHMhqLDPw+4fzm/a3xfLveidW0
-         hrJg==
-X-Gm-Message-State: AC+VfDwJ9hVtXwQaouOCxl0647TBf8P+R+626mn7U8aRgMKq2sZImVVO
-        Q6/BYktyZDC2dXMAh4nAEdnpMGnPiBXNmW2exMtLK4FrhjqLrxEoOVGfsr2MG6xKUMl1r1gaqFi
-        dRRooQ6YyyVnQ
-X-Received: by 2002:a17:907:969f:b0:947:335f:5a0d with SMTP id hd31-20020a170907969f00b00947335f5a0dmr18564025ejc.62.1687508127032;
-        Fri, 23 Jun 2023 01:15:27 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7sG50KKcb8/4d0k9Sa5DNa+zxv2rKJ2E9yej3gVqMAjHzgkvZGHjdevsBGJ9oYHGKr3rl2Pw==
-X-Received: by 2002:a17:907:969f:b0:947:335f:5a0d with SMTP id hd31-20020a170907969f00b00947335f5a0dmr18563999ejc.62.1687508126768;
-        Fri, 23 Jun 2023 01:15:26 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id o11-20020a17090608cb00b00985ed2f1584sm5635492eje.187.2023.06.23.01.15.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 01:15:26 -0700 (PDT)
-Date:   Fri, 23 Jun 2023 10:15:23 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Bryan Tan <bryantan@vmware.com>,
-        Vishnu Dasa <vdasa@vmware.com>,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        Dan Carpenter <dan.carpenter@linaro.org>,
-        Simon Horman <simon.horman@corigine.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        bpf@vger.kernel.org
-Subject: Re: [PATCH RFC net-next v4 4/8] vsock: make vsock bind reusable
-Message-ID: <oq5c2c4snksklko6tmq44g73d6ihrbnqjyugsvfbhtdsnlrioi@hklfspvyjmad>
-References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
- <20230413-b4-vsock-dgram-v4-4-0cebbb2ae899@bytedance.com>
- <p2tgn3wczd3t3dodyicczetr2nqnqpwcadz6ql5hpvg2cd2dxa@phheksxhxfna>
- <ZJTTx0XJ2LeITNh0@bullseye>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=gRyPsYNMsmn7yEoiSn1NbaSs0ga5/o0J6ddDdrg5+Vc=;
+        b=FMJdetEIBmDWn+La2p2oi5fLZlhLGWHHQxTCcLbG6icpwP+iLz5ta2Ys8ik0r1dfZwfem6
+        Gyy1gA6gwnywXyS+dQIUo+Sv1x1DJhsGg69L7p5cYx6hEbdovR8qbgySFyKGSEZP4q9FFb
+        QGVm+L0NEIiQfRxgL8YcTRPbW8b0fU4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-17-F37DcmT1Md-rmuefAejvuA-1; Fri, 23 Jun 2023 05:39:46 -0400
+X-MC-Unique: F37DcmT1Md-rmuefAejvuA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9D671380451B;
+        Fri, 23 Jun 2023 09:39:45 +0000 (UTC)
+Received: from thuth.com (unknown [10.39.192.208])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 291F3492B01;
+        Fri, 23 Jun 2023 09:39:43 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        =?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH] s390x: Align __bss_end to a halfword boundary
+Date:   Fri, 23 Jun 2023 11:39:41 +0200
+Message-Id: <20230623093941.448147-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <ZJTTx0XJ2LeITNh0@bullseye>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -98,74 +58,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 22, 2023 at 11:05:43PM +0000, Bobby Eshleman wrote:
->On Thu, Jun 22, 2023 at 05:25:55PM +0200, Stefano Garzarella wrote:
->> On Sat, Jun 10, 2023 at 12:58:31AM +0000, Bobby Eshleman wrote:
->> > This commit makes the bind table management functions in vsock usable
->> > for different bind tables. For use by datagrams in a future patch.
->> >
->> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->> > ---
->> > net/vmw_vsock/af_vsock.c | 33 ++++++++++++++++++++++++++-------
->> > 1 file changed, 26 insertions(+), 7 deletions(-)
->> >
->> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> > index ef86765f3765..7a3ca4270446 100644
->> > --- a/net/vmw_vsock/af_vsock.c
->> > +++ b/net/vmw_vsock/af_vsock.c
->> > @@ -230,11 +230,12 @@ static void __vsock_remove_connected(struct vsock_sock *vsk)
->> > 	sock_put(&vsk->sk);
->> > }
->> >
->> > -static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
->> > +struct sock *vsock_find_bound_socket_common(struct sockaddr_vm *addr,
->> > +					    struct list_head *bind_table)
->> > {
->> > 	struct vsock_sock *vsk;
->> >
->> > -	list_for_each_entry(vsk, vsock_bound_sockets(addr), bound_table) {
->> > +	list_for_each_entry(vsk, bind_table, bound_table) {
->> > 		if (vsock_addr_equals_addr(addr, &vsk->local_addr))
->> > 			return sk_vsock(vsk);
->> >
->> > @@ -247,6 +248,11 @@ static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
->> > 	return NULL;
->> > }
->> >
->> > +static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
->> > +{
->> > +	return vsock_find_bound_socket_common(addr, vsock_bound_sockets(addr));
->> > +}
->> > +
->> > static struct sock *__vsock_find_connected_socket(struct sockaddr_vm *src,
->> > 						  struct sockaddr_vm *dst)
->> > {
->> > @@ -646,12 +652,17 @@ static void vsock_pending_work(struct work_struct *work)
->> >
->> > /**** SOCKET OPERATIONS ****/
->> >
->> > -static int __vsock_bind_connectible(struct vsock_sock *vsk,
->> > -				    struct sockaddr_vm *addr)
->> > +static int vsock_bind_common(struct vsock_sock *vsk,
->> > +			     struct sockaddr_vm *addr,
->> > +			     struct list_head *bind_table,
->> > +			     size_t table_size)
->> > {
->> > 	static u32 port;
->> > 	struct sockaddr_vm new_addr;
->> >
->> > +	if (table_size < VSOCK_HASH_SIZE)
->> > +		return -1;
->>
->> Why we need this check now?
->>
->
->If the table_size is not at least VSOCK_HASH_SIZE then the
->VSOCK_HASH(addr) used later could overflow the table.
->
->Maybe this really deserves a WARN() and a comment?
+We are using the "larl" instruction to load the address of __bss_end,
+and this instruction can only deal with even addresses, so we have
+to make sure that this symbol is aligned accordingly. Otherwise this
+will cause a failure with the new binutils 2.40 and Clang:
 
-Yes, please WARN_ONCE() should be enough.
+ /usr/bin/ld: s390x/cstart64.o(.init+0x6a): misaligned symbol `__bss_end'
+              (0x2c0d1) for relocation R_390_PC32DBL
 
-Stefano
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ s390x/flat.lds.S | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/s390x/flat.lds.S b/s390x/flat.lds.S
+index 0cb7e383..5e91ecac 100644
+--- a/s390x/flat.lds.S
++++ b/s390x/flat.lds.S
+@@ -37,6 +37,7 @@ SECTIONS
+ 	. = ALIGN(16);
+ 	__bss_start = .;
+ 	.bss : { *(.bss) }
++	. = ALIGN(2);
+ 	__bss_end = .;
+ 	. = ALIGN(4K);
+ 	edata = .;
+-- 
+2.39.3
 
