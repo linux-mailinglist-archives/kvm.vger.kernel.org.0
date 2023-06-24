@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B34D73CC17
-	for <lists+kvm@lfdr.de>; Sat, 24 Jun 2023 19:41:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7649673CC1A
+	for <lists+kvm@lfdr.de>; Sat, 24 Jun 2023 19:41:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233144AbjFXRlh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 24 Jun 2023 13:41:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38714 "EHLO
+        id S233188AbjFXRlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 24 Jun 2023 13:41:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjFXRlf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 24 Jun 2023 13:41:35 -0400
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 833EE1BCA
-        for <kvm@vger.kernel.org>; Sat, 24 Jun 2023 10:41:34 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-313e2fdd186so746314f8f.2
-        for <kvm@vger.kernel.org>; Sat, 24 Jun 2023 10:41:34 -0700 (PDT)
+        with ESMTP id S233160AbjFXRln (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 24 Jun 2023 13:41:43 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E69FE1BDB
+        for <kvm@vger.kernel.org>; Sat, 24 Jun 2023 10:41:41 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-3f9bdb01ec0so22167955e9.2
+        for <kvm@vger.kernel.org>; Sat, 24 Jun 2023 10:41:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687628493; x=1690220493;
+        d=linaro.org; s=google; t=1687628500; x=1690220500;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+JIxHWMClVl6mvpALDoBK231PZeNGUQgT3foMweSwl8=;
-        b=d9EPiTdMBS6ezt21TafvsYW1DcHw6rx3bSyGYk02qijZjSVC1xbJv7hrNc8Bln/+KY
-         da9/C7KLlpChs5ekpkEMTLt+8/tTn69sMDTvOr77GosenaKuMVoIqanEcBIaB+x8/IYa
-         sMX5xiZvQgUwCoIYnw0wLy0I8qTh5UNWS2TKXn7vV66wpwVU6Arg9AwvuzGbtx5f2Fr1
-         NS187HJhnsPP5z7lKj2H5zJ9WFDNB74ee+CLe5qo2TrqCpMy25BW2hi6t3sBgrl2wrMY
-         3O1uqpNOR6dT7+pTrezI8H96sgMZeN+qygKbA8KQdg//j8BnqU62WE8Pxxa1LGwOWpQ1
-         C2DA==
+        bh=xHLdIwIywOmneOj5eUp5g6ra2t5DF15QteoMLknkUnc=;
+        b=omrduxic9rR9gPq+8XiHL87viBJ6wPrEMLfMgl5GRT1MGJsF+TtB4IIzUjBDeXNjSP
+         tp/8tj21VJeGWzF0OuqgjS2WgxvAd7ieEEmjLY+I4RrDNy354ZcTaHifbrUEQBN4g/u9
+         4e/DFqq/MH/KbKaaB92Ppsx49dKlUxgAkumlNe5v3R+Jm/CqIieAk+esoDLYqoEBfLF/
+         1f88uKZFICtvcllNPS/mi7pVo0xerJ43s2nY2Z3sJDSCnEe0Pht9v3orZiuam5tqDacn
+         UUqcswJ4Q6QF4/9o+nZDEmVIc9HxLeYNLEDed2aM4/V1htoQbmJH9XmE/hgtRRhOhIST
+         3Imw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687628493; x=1690220493;
+        d=1e100.net; s=20221208; t=1687628500; x=1690220500;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+JIxHWMClVl6mvpALDoBK231PZeNGUQgT3foMweSwl8=;
-        b=UCV35UScNLbYMVZroL/YyEI27cYpeSk4g/aW1zhPQMi/sGXDdvplqLqwBXV0uNA9xc
-         txbOXvIx1jvtdHVCDWK0zlW4YdtNEzl3Yjm2YAxtLezddJ+PeDfWbzVW14Xj14TYM/D7
-         7uCOzDkfyHx0CCpeTlQjdi4G/cD2axHWTpFVYK2YBEABDIRVUSF4spC81tqogTztNcSD
-         M+Wgftvc3dgms0ybPzXBicX9XtXgqCFVN9hjlSlrt8Hkb0TK+NzNOr9BCUznlnPmt9A5
-         mtv+13XgWJqw/gbAAV0qjluzOmmMjGL7nPAOXbUHJvz59qkQPDT1t6dG4mgF5DbL9uR5
-         WBKw==
-X-Gm-Message-State: AC+VfDxogPYK6rvwngrOPigEqA5g3a26zmy1qPltGb2z7rlnxliOQEyN
-        /guEvJsfkebiVlMW8OAdbVtOldB5PXDKc4VKZ+8=
-X-Google-Smtp-Source: ACHHUZ4gIjgAKb4rVFXLZjiJdVzXvPynrHKyrgCEdSr0allCKh8ZZswCbWqoo+JLTWwg5/zBqsSxag==
-X-Received: by 2002:a5d:5344:0:b0:313:df09:ad04 with SMTP id t4-20020a5d5344000000b00313df09ad04mr2110290wrv.57.1687628493050;
-        Sat, 24 Jun 2023 10:41:33 -0700 (PDT)
+        bh=xHLdIwIywOmneOj5eUp5g6ra2t5DF15QteoMLknkUnc=;
+        b=dAGh4ajC+pDlkhah953SyXaUKFlkCfXmJQHu9M7cP/vY/kfiwneoxUzWP7dJDgCWO+
+         8+v5HZ+bzmOuIA8Boid44CMdCFviG30w8bMvV8uIWwvDfVz8Y4bVjph0knZOddBw4233
+         GS+U3J4nZ/BW/B2no95rMPVCxFn1Y0QjQFkahRLTbgRfDICXzbkTMN3wo4gqsXL/2rX+
+         paDO9YhQAr+iqR43g/p+s+KTvDLEjowkGNPZ0bOeAFQwtuktyYH70W6ZYIOOrp6L+0vn
+         55WWTFTyqgXtgFc5HiM1PDxESbiABnAi+ImWpsQgnWTbchXdgAjnk3u/12FtVXV4E9AF
+         eKaw==
+X-Gm-Message-State: AC+VfDyksc/vEePRd3w4GyeTIKhGWwHsI5A63HoA7T5SYx8kyK87oQ5Q
+        3QpXgZ7waqqG1YgQvlaE5WSshw==
+X-Google-Smtp-Source: ACHHUZ4U4xeWdaU30+Yq1mmhN/DHgskzeAXZldA07vw+iV02dwa7q8YwoovgGfKWWwqQiGNx3nFeTA==
+X-Received: by 2002:a1c:f70d:0:b0:3f7:3685:1e10 with SMTP id v13-20020a1cf70d000000b003f736851e10mr19084030wmh.40.1687628500315;
+        Sat, 24 Jun 2023 10:41:40 -0700 (PDT)
 Received: from m1x-phil.lan ([176.187.217.150])
-        by smtp.gmail.com with ESMTPSA id z7-20020a5d6407000000b0030fcf3d75c4sm2609804wru.45.2023.06.24.10.41.30
+        by smtp.gmail.com with ESMTPSA id t16-20020a7bc3d0000000b003f17848673fsm2720557wmj.27.2023.06.24.10.41.37
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 24 Jun 2023 10:41:32 -0700 (PDT)
+        Sat, 24 Jun 2023 10:41:39 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     kvm@vger.kernel.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
@@ -67,9 +67,9 @@ Cc:     kvm@vger.kernel.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Eduardo Habkost <eduardo@habkost.net>,
         Cameron Esfahani <dirty@apple.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v3 01/16] MAINTAINERS: Update Roman Bolshakov email address
-Date:   Sat, 24 Jun 2023 19:41:06 +0200
-Message-Id: <20230624174121.11508-2-philmd@linaro.org>
+Subject: [PATCH v3 02/16] accel: Document generic accelerator headers
+Date:   Sat, 24 Jun 2023 19:41:07 +0200
+Message-Id: <20230624174121.11508-3-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230624174121.11508-1-philmd@linaro.org>
 References: <20230624174121.11508-1-philmd@linaro.org>
@@ -86,54 +86,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-r.bolshakov@yadro.com is bouncing: Update Roman's email address
-using one found somewhere on the Internet; this way he can Ack-by.
-
-(Reorder Taylor's line to keep the section sorted alphabetically).
+These headers are meant to be include by any file to check
+the availability of accelerators, thus are not accelerator
+specific.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- MAINTAINERS | 4 ++--
- .mailmap    | 3 ++-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ include/sysemu/hax.h  | 2 ++
+ include/sysemu/kvm.h  | 2 ++
+ include/sysemu/nvmm.h | 2 ++
+ include/sysemu/tcg.h  | 2 ++
+ include/sysemu/whpx.h | 2 ++
+ include/sysemu/xen.h  | 2 ++
+ 6 files changed, 12 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7f323cd2eb..1da135b0c8 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -497,14 +497,14 @@ F: target/arm/hvf/
+diff --git a/include/sysemu/hax.h b/include/sysemu/hax.h
+index bf8f99a824..80fc716f80 100644
+--- a/include/sysemu/hax.h
++++ b/include/sysemu/hax.h
+@@ -19,6 +19,8 @@
+  *
+  */
  
- X86 HVF CPUs
- M: Cameron Esfahani <dirty@apple.com>
--M: Roman Bolshakov <r.bolshakov@yadro.com>
-+M: Roman Bolshakov <rbolshakov@ddn.com>
- W: https://wiki.qemu.org/Features/HVF
- S: Maintained
- F: target/i386/hvf/
++/* header to be included in non-HAX-specific code */
++
+ #ifndef QEMU_HAX_H
+ #define QEMU_HAX_H
  
- HVF
- M: Cameron Esfahani <dirty@apple.com>
--M: Roman Bolshakov <r.bolshakov@yadro.com>
-+M: Roman Bolshakov <rbolshakov@ddn.com>
- W: https://wiki.qemu.org/Features/HVF
- S: Maintained
- F: accel/hvf/
-diff --git a/.mailmap b/.mailmap
-index b57da4827e..64ef9f4de6 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -76,9 +76,10 @@ Paul Burton <paulburton@kernel.org> <pburton@wavecomp.com>
- Philippe Mathieu-Daudé <philmd@linaro.org> <f4bug@amsat.org>
- Philippe Mathieu-Daudé <philmd@linaro.org> <philmd@redhat.com>
- Philippe Mathieu-Daudé <philmd@linaro.org> <philmd@fungible.com>
-+Roman Bolshakov <rbolshakov@ddn.com> <r.bolshakov@yadro.com>
- Stefan Brankovic <stefan.brankovic@syrmia.com> <stefan.brankovic@rt-rk.com.com>
--Yongbok Kim <yongbok.kim@mips.com> <yongbok.kim@imgtec.com>
- Taylor Simpson <ltaylorsimpson@gmail.com> <tsimpson@quicinc.com>
-+Yongbok Kim <yongbok.kim@mips.com> <yongbok.kim@imgtec.com>
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 88f5ccfbce..7902acdfd9 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -11,6 +11,8 @@
+  *
+  */
  
- # Also list preferred name forms where people have changed their
- # git author config, or had utf8/latin1 encoding issues.
++/* header to be included in non-KVM-specific code */
++
+ #ifndef QEMU_KVM_H
+ #define QEMU_KVM_H
+ 
+diff --git a/include/sysemu/nvmm.h b/include/sysemu/nvmm.h
+index 833670fccb..be7bc9a62d 100644
+--- a/include/sysemu/nvmm.h
++++ b/include/sysemu/nvmm.h
+@@ -7,6 +7,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+ 
++/* header to be included in non-NVMM-specific code */
++
+ #ifndef QEMU_NVMM_H
+ #define QEMU_NVMM_H
+ 
+diff --git a/include/sysemu/tcg.h b/include/sysemu/tcg.h
+index 53352450ff..5e2ca9aab3 100644
+--- a/include/sysemu/tcg.h
++++ b/include/sysemu/tcg.h
+@@ -5,6 +5,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+ 
++/* header to be included in non-TCG-specific code */
++
+ #ifndef SYSEMU_TCG_H
+ #define SYSEMU_TCG_H
+ 
+diff --git a/include/sysemu/whpx.h b/include/sysemu/whpx.h
+index 2889fa2278..781ca5b2b6 100644
+--- a/include/sysemu/whpx.h
++++ b/include/sysemu/whpx.h
+@@ -10,6 +10,8 @@
+  *
+  */
+ 
++/* header to be included in non-WHPX-specific code */
++
+ #ifndef QEMU_WHPX_H
+ #define QEMU_WHPX_H
+ 
+diff --git a/include/sysemu/xen.h b/include/sysemu/xen.h
+index 0ca25697e4..bc13ad5692 100644
+--- a/include/sysemu/xen.h
++++ b/include/sysemu/xen.h
+@@ -5,6 +5,8 @@
+  * See the COPYING file in the top-level directory.
+  */
+ 
++/* header to be included in non-Xen-specific code */
++
+ #ifndef SYSEMU_XEN_H
+ #define SYSEMU_XEN_H
+ 
 -- 
 2.38.1
 
