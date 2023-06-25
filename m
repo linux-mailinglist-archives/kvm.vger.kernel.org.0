@@ -2,158 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D316673CF05
-	for <lists+kvm@lfdr.de>; Sun, 25 Jun 2023 09:44:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E10D573CF1D
+	for <lists+kvm@lfdr.de>; Sun, 25 Jun 2023 09:58:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231669AbjFYHoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 25 Jun 2023 03:44:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48934 "EHLO
+        id S231789AbjFYH6p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 25 Jun 2023 03:58:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230254AbjFYHod (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 25 Jun 2023 03:44:33 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AE9EE41;
-        Sun, 25 Jun 2023 00:44:32 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-66c729f5618so866002b3a.1;
-        Sun, 25 Jun 2023 00:44:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687679072; x=1690271072;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=neXY6jFf5rj9eQqLL93VzLNnPS2lbHcmyz9yh8r+rt8=;
-        b=bnjx7r5qxdwXBqbQZwiVNQBpMixVG+rERy/3rkFI/f/FYxvZUFcDkTZpBhxbp3t4cw
-         ZzLBLhJ01nxGWp/P6ELflDd9xcUxtPo5ordUHsqYVM7ocwxOopMLJ3XId4dRYJelyGrb
-         XlJX20GcTgjtSLbMxcrTk2RR6jesbt+6lHdqLyVdPPuYBeMZMhpuZuDPsE9FfHKC/R2N
-         WYIa1RqOKocxrBg/Gjfu57bwIRZ7w6I6X8B9wV4d5MgQgp5HPUeaKiTP2/rYp+JcEMhF
-         6oKR8t65qyJGuCjueND6Lt/ZLJoICJcJ9XiZkyCGfJvH7oJ0CO7ELWWTa7TOi5n+HlR2
-         ZMyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687679072; x=1690271072;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=neXY6jFf5rj9eQqLL93VzLNnPS2lbHcmyz9yh8r+rt8=;
-        b=SqxVd0Uo4AUS8/5PjN2pBaN2bSD0LRefdY2BdxC3wnkSmsIsWtJ0glwMJPDX+bqgNO
-         V35CPxFTsop+qq/lhhdmPZi+Yg6ieovcghojc4vGiJtLzQBXyS16awCGYvVvBk2qy60B
-         IoYfW7TFYInGb+rArOmZrxur1uhStFTDyoPs9VHGxTxcubY0fX4gz5EWZs5dx+jy7cut
-         cYMjbscqT7jeLLDOoTKmg5VMdje+lZLlkP7cPq7MGvPy15nlp2T8q54nZRBE4zVoNsRy
-         en2GJWBDhb9bc23ImiLBdtrZx7AO05PAU4nqSdSOk5c4mgVxFRGugCxddVZ9wG/BKz7b
-         z9bA==
-X-Gm-Message-State: AC+VfDyPADnufnTD/+7+BDAelnqXjy2SKSkmV5i3Gw8psDt+/A7UAxtA
-        rO7/7vX2hmyqlxCVGB3fhcY=
-X-Google-Smtp-Source: ACHHUZ5CtLgdbmzpBs7x4v3vyTriQY7cmHDMyauQBQHe2dlAdEy6raDKswrsJGO4fXRCcEKR7cmtCg==
-X-Received: by 2002:a05:6a00:2309:b0:668:7744:10ea with SMTP id h9-20020a056a00230900b00668774410eamr24033021pfh.18.1687679071861;
-        Sun, 25 Jun 2023 00:44:31 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id c19-20020aa78813000000b00671aa6b4962sm684118pfo.114.2023.06.25.00.44.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 25 Jun 2023 00:44:31 -0700 (PDT)
-Message-ID: <a5398e4b-bb9f-9913-c436-7528479be2ee@gmail.com>
-Date:   Sun, 25 Jun 2023 15:44:23 +0800
+        with ESMTP id S230154AbjFYH6o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 25 Jun 2023 03:58:44 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C99D8DF;
+        Sun, 25 Jun 2023 00:58:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687679922; x=1719215922;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=eTIwvrfKylgiLU30c+QKGL2VdYd5OeJbT6ROhsR0yJI=;
+  b=RLJOYEPHBNSGXq/vuLXtIXn+f3uXPPJyF+6LxlauyJTb8Yia8322ZfpE
+   tYhAkiXNdS+2b3HxB7pRJhVwZ2K7BCa8veecAiqXzxE70ysmN9JiA6w1z
+   LJg7EENodukZ+1Bys0OrYl7VTSFFjZlx/RpyqA+1tB+MwzJBjBa1KOCEh
+   fElGG0lGLlcBdGDjacTyhC2z0oHCQkOgliOqsD/tBEEXxWeCX788aFFrY
+   iJRXcBc19x3iwlVHNFPsjlHe66YGHPpnyAMpk6R+uY/L32+Ff/zJ0Ay8H
+   rXX8LKgY6RDIWYwPD37TN+KOJ/XQnA4K1W9soTBiD919YR4gMl+RDUTqh
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10751"; a="447419942"
+X-IronPort-AV: E=Sophos;i="6.01,156,1684825200"; 
+   d="scan'208";a="447419942"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2023 00:58:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10751"; a="693123135"
+X-IronPort-AV: E=Sophos;i="6.01,156,1684825200"; 
+   d="scan'208";a="693123135"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 25 Jun 2023 00:58:34 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qDKdm-0009sJ-0Z;
+        Sun, 25 Jun 2023 07:58:34 +0000
+Date:   Sun, 25 Jun 2023 15:57:56 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     oe-kbuild-all@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        Hugh Dickins <hughd@google.com>,
+        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Mike Rapoport <rppt@kernel.org>
+Subject: Re: [PATCH v5 24/33] m68k: Convert various functions to use ptdescs
+Message-ID: <202306251513.WVzxgGxu-lkp@intel.com>
+References: <20230622205745.79707-25-vishal.moola@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v4 06/13] KVM: x86/mmu: Bypass __handle_changed_spte()
- when clearing TDP MMU dirty bits
-To:     Sean Christopherson <seanjc@google.com>,
-        Vipin Sharma <vipinsh@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230321220021.2119033-1-seanjc@google.com>
- <20230321220021.2119033-7-seanjc@google.com>
-Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20230321220021.2119033-7-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230622205745.79707-25-vishal.moola@gmail.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/3/2023 6:00 am, Sean Christopherson wrote:
-> From: Vipin Sharma <vipinsh@google.com>
-> 
-> Drop everything except marking the PFN dirty and the relevant tracepoint
-> parts of __handle_changed_spte() when clearing the dirty status of gfns in
-> the TDP MMU.  Clearing only the Dirty (or Writable) bit doesn't affect
-> the SPTEs shadow-present status, whether or not the SPTE is a leaf, or
-> change the SPTE's PFN.  I.e. other than marking the PFN dirty, none of the
-> functional updates handled by __handle_changed_spte() are relevant.
-> 
-> Losing __handle_changed_spte()'s sanity checks does mean that a bug could
-> theoretical go unnoticed, but that scenario is extremely unlikely, e.g.
-> would effectively require a misconfigured or a locking bug elsewhere.
-> 
-> Opportunistically remove a comment blurb from __handle_changed_spte()
-> about all modifications to TDP MMU SPTEs needing to invoke said function,
-> that "rule" hasn't been true since fast page fault support was added for
-> the TDP MMU (and perhaps even before).
-> 
-> Tested on a VM (160 vCPUs, 160 GB memory) and found that performance of
-> clear dirty log stage improved by ~40% in dirty_log_perf_test (with the
-> full optimization applied).
-> 
-> Before optimization:
-> --------------------
-> Iteration 1 clear dirty log time: 3.638543593s
-> Iteration 2 clear dirty log time: 3.145032742s
-> Iteration 3 clear dirty log time: 3.142340358s
-> Clear dirty log over 3 iterations took 9.925916693s. (Avg 3.308638897s/iteration)
-> 
-> After optimization:
-> -------------------
-> Iteration 1 clear dirty log time: 2.318988110s
-> Iteration 2 clear dirty log time: 1.794470164s
-> Iteration 3 clear dirty log time: 1.791668628s
-> Clear dirty log over 3 iterations took 5.905126902s. (Avg 1.968375634s/iteration)
-> 
-> Link: https://lore.kernel.org/all/Y9hXmz%2FnDOr1hQal@google.com
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> Reviewed-by: David Matlack <dmatlack@google.com>
-> [sean: split the switch to atomic-AND to a separate patch]
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/mmu/tdp_mmu.c | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 950c5d23ecee..467931c43968 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -517,7 +517,6 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
->    *	    threads that might be modifying SPTEs.
->    *
->    * Handle bookkeeping that might result from the modification of a SPTE.
-> - * This function must be called for all TDP SPTE modifications.
->    */
->   static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->   				  u64 old_spte, u64 new_spte, int level,
-> @@ -1689,8 +1688,10 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
->   							iter.old_spte, dbit,
->   							iter.level);
->   
-> -		__handle_changed_spte(kvm, iter.as_id, iter.gfn, iter.old_spte,
-> -				      iter.old_spte & ~dbit, iter.level, false);
-> +		trace_kvm_tdp_mmu_spte_changed(iter.as_id, iter.gfn, iter.level,
+Hi Vishal,
 
-Here the first parameter "kvm" is no longer used in this context.
+kernel test robot noticed the following build errors:
 
-Please help confirm that for clear_dirty_pt_masked(), should the "struct kvm 
-*kvm" parameter
-be cleared from the list of incoming parameters ?
+[auto build test ERROR on next-20230622]
+[cannot apply to akpm-mm/mm-everything powerpc/next powerpc/fixes s390/features geert-m68k/for-next geert-m68k/for-linus linus/master v6.4-rc7 v6.4-rc6 v6.4-rc5 v6.4-rc7]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> +					       iter.old_spte,
-> +					       iter.old_spte & ~dbit);
-> +		kvm_set_pfn_dirty(spte_to_pfn(iter.old_spte));
->   	}
->   
->   	rcu_read_unlock();
+url:    https://github.com/intel-lab-lkp/linux/commits/Vishal-Moola-Oracle/mm-Add-PAGE_TYPE_OP-folio-functions/20230623-050011
+base:   next-20230622
+patch link:    https://lore.kernel.org/r/20230622205745.79707-25-vishal.moola%40gmail.com
+patch subject: [PATCH v5 24/33] m68k: Convert various functions to use ptdescs
+config: m68k-randconfig-s051-20230625 (https://download.01.org/0day-ci/archive/20230625/202306251513.WVzxgGxu-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230625/202306251513.WVzxgGxu-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306251513.WVzxgGxu-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+   In file included from arch/m68k/include/asm/pgalloc.h:12,
+                    from kernel/fork.c:103:
+   arch/m68k/include/asm/mcf_pgalloc.h: In function 'pgd_alloc':
+>> arch/m68k/include/asm/mcf_pgalloc.h:82:60: error: 'GFP_NOWARN' undeclared (first use in this function); did you mean 'GFP_NOWAIT'?
+      82 |         struct ptdesc *ptdesc = pagetable_alloc((GFP_DMA | GFP_NOWARN) &
+         |                                                            ^~~~~~~~~~
+         |                                                            GFP_NOWAIT
+   arch/m68k/include/asm/mcf_pgalloc.h:82:60: note: each undeclared identifier is reported only once for each function it appears in
+   arch/m68k/include/asm/mcf_pgalloc.h: At top level:
+>> arch/m68k/include/asm/mcf_pgalloc.h:23:16: warning: 'ptdesc_address' is static but used in inline function 'pte_alloc_one_kernel' which is not static
+      23 |         return ptdesc_address(ptdesc);
+         |                ^~~~~~~~~~~~~~
+>> arch/m68k/include/asm/mcf_pgalloc.h:17:33: warning: 'pagetable_alloc' is static but used in inline function 'pte_alloc_one_kernel' which is not static
+      17 |         struct ptdesc *ptdesc = pagetable_alloc((GFP_DMA | __GFP_ZERO) &
+         |                                 ^~~~~~~~~~~~~~~
+>> arch/m68k/include/asm/mcf_pgalloc.h:10:24: warning: 'virt_to_ptdesc' is static but used in inline function 'pte_free_kernel' which is not static
+      10 |         pagetable_free(virt_to_ptdesc(pte));
+         |                        ^~~~~~~~~~~~~~
+>> arch/m68k/include/asm/mcf_pgalloc.h:10:9: warning: 'pagetable_free' is static but used in inline function 'pte_free_kernel' which is not static
+      10 |         pagetable_free(virt_to_ptdesc(pte));
+         |         ^~~~~~~~~~~~~~
+--
+   In file included from arch/m68k/mm/mcfmmu.c:21:
+   arch/m68k/include/asm/mcf_pgalloc.h: In function 'pgd_alloc':
+>> arch/m68k/include/asm/mcf_pgalloc.h:82:60: error: 'GFP_NOWARN' undeclared (first use in this function); did you mean 'GFP_NOWAIT'?
+      82 |         struct ptdesc *ptdesc = pagetable_alloc((GFP_DMA | GFP_NOWARN) &
+         |                                                            ^~~~~~~~~~
+         |                                                            GFP_NOWAIT
+   arch/m68k/include/asm/mcf_pgalloc.h:82:60: note: each undeclared identifier is reported only once for each function it appears in
+   arch/m68k/mm/mcfmmu.c: At top level:
+   arch/m68k/mm/mcfmmu.c:36:13: warning: no previous prototype for 'paging_init' [-Wmissing-prototypes]
+      36 | void __init paging_init(void)
+         |             ^~~~~~~~~~~
+   arch/m68k/mm/mcfmmu.c: In function 'paging_init':
+   arch/m68k/mm/mcfmmu.c:41:37: warning: variable 'bootmem_end' set but not used [-Wunused-but-set-variable]
+      41 |         unsigned long next_pgtable, bootmem_end;
+         |                                     ^~~~~~~~~~~
+   arch/m68k/include/asm/mcf_pgalloc.h: At top level:
+>> arch/m68k/include/asm/mcf_pgalloc.h:23:16: warning: 'ptdesc_address' is static but used in inline function 'pte_alloc_one_kernel' which is not static
+      23 |         return ptdesc_address(ptdesc);
+         |                ^~~~~~~~~~~~~~
+>> arch/m68k/include/asm/mcf_pgalloc.h:17:33: warning: 'pagetable_alloc' is static but used in inline function 'pte_alloc_one_kernel' which is not static
+      17 |         struct ptdesc *ptdesc = pagetable_alloc((GFP_DMA | __GFP_ZERO) &
+         |                                 ^~~~~~~~~~~~~~~
+>> arch/m68k/include/asm/mcf_pgalloc.h:10:24: warning: 'virt_to_ptdesc' is static but used in inline function 'pte_free_kernel' which is not static
+      10 |         pagetable_free(virt_to_ptdesc(pte));
+         |                        ^~~~~~~~~~~~~~
+>> arch/m68k/include/asm/mcf_pgalloc.h:10:9: warning: 'pagetable_free' is static but used in inline function 'pte_free_kernel' which is not static
+      10 |         pagetable_free(virt_to_ptdesc(pte));
+         |         ^~~~~~~~~~~~~~
+
+
+vim +82 arch/m68k/include/asm/mcf_pgalloc.h
+
+     7	
+     8	extern inline void pte_free_kernel(struct mm_struct *mm, pte_t *pte)
+     9	{
+  > 10		pagetable_free(virt_to_ptdesc(pte));
+    11	}
+    12	
+    13	extern const char bad_pmd_string[];
+    14	
+    15	extern inline pte_t *pte_alloc_one_kernel(struct mm_struct *mm)
+    16	{
+  > 17		struct ptdesc *ptdesc = pagetable_alloc((GFP_DMA | __GFP_ZERO) &
+    18				~__GFP_HIGHMEM, 0);
+    19	
+    20		if (!ptdesc)
+    21			return NULL;
+    22	
+  > 23		return ptdesc_address(ptdesc);
+    24	}
+    25	
+    26	extern inline pmd_t *pmd_alloc_kernel(pgd_t *pgd, unsigned long address)
+    27	{
+    28		return (pmd_t *) pgd;
+    29	}
+    30	
+    31	#define pmd_populate(mm, pmd, pte) (pmd_val(*pmd) = (unsigned long)(pte))
+    32	
+    33	#define pmd_populate_kernel pmd_populate
+    34	
+    35	static inline void __pte_free_tlb(struct mmu_gather *tlb, pgtable_t pgtable,
+    36					  unsigned long address)
+    37	{
+    38		struct ptdesc *ptdesc = virt_to_ptdesc(pgtable);
+    39	
+    40		pagetable_pte_dtor(ptdesc);
+    41		pagetable_free(ptdesc);
+    42	}
+    43	
+    44	static inline pgtable_t pte_alloc_one(struct mm_struct *mm)
+    45	{
+    46		struct ptdesc *ptdesc = pagetable_alloc(GFP_DMA | __GFP_ZERO, 0);
+    47		pte_t *pte;
+    48	
+    49		if (!ptdesc)
+    50			return NULL;
+    51		if (!pagetable_pte_ctor(ptdesc)) {
+    52			pagetable_free(ptdesc);
+    53			return NULL;
+    54		}
+    55	
+    56		pte = ptdesc_address(ptdesc);
+    57		return pte;
+    58	}
+    59	
+    60	static inline void pte_free(struct mm_struct *mm, pgtable_t pgtable)
+    61	{
+    62		struct ptdesc *ptdesc = virt_to_ptdesc(pgtable);
+    63	
+    64		pagetable_pte_dtor(ptdesc);
+    65		pagetable_free(ptdesc);
+    66	}
+    67	
+    68	/*
+    69	 * In our implementation, each pgd entry contains 1 pmd that is never allocated
+    70	 * or freed.  pgd_present is always 1, so this should never be called. -NL
+    71	 */
+    72	#define pmd_free(mm, pmd) BUG()
+    73	
+    74	static inline void pgd_free(struct mm_struct *mm, pgd_t *pgd)
+    75	{
+    76		pagetable_free(virt_to_ptdesc(pgd));
+    77	}
+    78	
+    79	static inline pgd_t *pgd_alloc(struct mm_struct *mm)
+    80	{
+    81		pgd_t *new_pgd;
+  > 82		struct ptdesc *ptdesc = pagetable_alloc((GFP_DMA | GFP_NOWARN) &
+    83				~__GFP_HIGHMEM, 0);
+    84	
+    85		if (!ptdesc)
+    86			return NULL;
+    87		new_pgd = ptdesc_address(ptdesc);
+    88	
+    89		memcpy(new_pgd, swapper_pg_dir, PTRS_PER_PGD * sizeof(pgd_t));
+    90		memset(new_pgd, 0, PAGE_OFFSET >> PGDIR_SHIFT);
+    91		return new_pgd;
+    92	}
+    93	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
