@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1860A73D529
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 01:07:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E27673D52A
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 01:07:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229724AbjFYXHy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 25 Jun 2023 19:07:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59660 "EHLO
+        id S229728AbjFYXHz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 25 Jun 2023 19:07:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjFYXHw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 25 Jun 2023 19:07:52 -0400
-Received: from mail-oa1-x2e.google.com (mail-oa1-x2e.google.com [IPv6:2001:4860:4864:20::2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56EA111A
-        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 16:07:51 -0700 (PDT)
-Received: by mail-oa1-x2e.google.com with SMTP id 586e51a60fabf-1a998a2e7a6so2861151fac.1
-        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 16:07:51 -0700 (PDT)
+        with ESMTP id S229698AbjFYXHx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 25 Jun 2023 19:07:53 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0721BE
+        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 16:07:52 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-557790487feso1911344a12.0
+        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 16:07:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687734470; x=1690326470;
+        d=gmail.com; s=20221208; t=1687734472; x=1690326472;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h7oWc9wSs7s043FQcLimHSRTeXEF/XHk5/+kEWBjS/c=;
-        b=pqvibM9Ffgkw4ZAQyk1xHojANTwVtiIS5hRfZMFg52S8Cg0wwSe9XF0waWvOzUZ3uH
-         +A4MGphX3vZX6zIK150E+uNRBcxpaZhVJezkqQBi3N4ac9p3LUlbYV2B2Fxp+uvrp0lP
-         BvKQh2YbpRUqVtN69W7HbsMqNvuuqffL3MWT0WeLNoKGbI7dgy00IjtQ1bHmggIPSKYU
-         y6eEVr9b6qMWTKR2DBwoikf2tmbvBdxK/PVhIfyvfQJ0zJogEnZ6LvOto3tFlel6qsk3
-         qRChWV7fbWA4uSBP7anYY924zkvKjQwNgjor+ykR3ndO6FBWl/LrW8PIuu3HnvDB9vSy
-         5tJQ==
+        bh=21SpjF+xBmEu7QPQNtztE4cG4YYUJTEjHrp9rj09zZA=;
+        b=mYKRtXtslrTwwqDTD/ejgHiqY78Bg3f0Ow86sGs6aIrEeLpYfPezvuDIh78Jlg8dbb
+         dpGgzXCTTictLDtnIsHyiSWMfFM+/RoLRRIvrYNCulZ6FJnVbg+tsHpuaxPkMjbsjVcx
+         ob74xAx+pweCRjtsPaF/4dQlHbjlZCIDJP+rUSeVBy1V+zM7maAED2cQtj2ToZnitM6x
+         qr8ToXU/jiSmQGv6eyCbzXzlkfPbb0wqNg2PTjVKm+SEq8DPJ7lQ5ns++UOonYtp4eA1
+         vd9dOx2U6CPxTc5K6QcasCO2Ote5f30zpJ1Nl0OW5jv+rfJnoOIjgQC6tL6NSW1mnhxz
+         5vLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687734470; x=1690326470;
+        d=1e100.net; s=20221208; t=1687734472; x=1690326472;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=h7oWc9wSs7s043FQcLimHSRTeXEF/XHk5/+kEWBjS/c=;
-        b=ZwzMggjeIWRKJ5WmoPANC0dVK6Y3fazmCdlsC291jjQ3XrDcYQSH4SFok7ZHI8wbnP
-         wJM/NcWaIwSYHgcFO8EPLLD0tF8Eg2TZqhJ4b3BuESlfeieFuRollani2px0eyhJONJI
-         jOjpbSVCci+lIPW9hbjRdnLaKkw6EX2D8CZCjpW1khPeUJZx1ah1ABMM6q36hrIS7dGd
-         PpTVPX/r05JBbPi0nb9YjQHAlpmEfSoruufKTwE2T+U47N0LlxqH+KX5o2mD4qFxLqrx
-         3KD53NILil56QL6+gDJlVjJQj8/3gw/dRJf/DTyfrALYU1nQpZ+hXDF+4WM+X6mpfF/h
-         r0Wg==
-X-Gm-Message-State: AC+VfDzSCOXxWVf7oEjUaoeBaqMWul5NbLfp9zt36k5maDQrKaPIThOe
-        pywYMU4mb9qaBr7MyhhXXo4=
-X-Google-Smtp-Source: ACHHUZ5dqO0X8bwSvx9fSgWCyvTPMYV1XorM/j0fmfwzYYbEorfh1Fp3o54fEXtpwtHf66B12UfBkg==
-X-Received: by 2002:a05:6808:285:b0:3a1:b638:9c2c with SMTP id z5-20020a056808028500b003a1b6389c2cmr7607809oic.55.1687734470386;
-        Sun, 25 Jun 2023 16:07:50 -0700 (PDT)
+        bh=21SpjF+xBmEu7QPQNtztE4cG4YYUJTEjHrp9rj09zZA=;
+        b=bJeNhH+UIoHJm56hT3kXGjgYt2NJkjb+oToDwvDA+A0abP320GXmhHJLLZRb5Fp0PK
+         1cbnCbYTCc0nyBuuLngzwcCQcSSgGABIm5VlMm9Vr0bXv94RKubw/EgA5v2b5UTZw5DE
+         OdG0iE3CFsIvQf7qlHf9FUn81IblxFPkxgqlDQJ0iMQ0LdOllAQwMWBGjHmuaqWpHowJ
+         Myv7+icsCOzMxHtUBG7qBPfsVQSEkrvYhG8xtnu+sNsxH66b4BHH2mhRGX4vKo75PERL
+         OTcl6isp1RWF6jVF00MUTfvw2pchrEPy4dvfJG3V1hob40QyiPtG61axJFmhWHrkGgm8
+         PHsw==
+X-Gm-Message-State: AC+VfDwsivXNf19n4ooHmzcW0DvieN9+VW8zjrOHMrWvRR5FZSgAR9Eh
+        I9H1xHs8NKUfcEodrTJYPr8=
+X-Google-Smtp-Source: ACHHUZ4g4Mp3PlNC3YacyCrfQUvV+O+hcyfuZIxxGIcHCdWEgNp471z0bfFiNEcrbg19bvWen6IgdA==
+X-Received: by 2002:a05:6a20:3d81:b0:107:35ed:28a7 with SMTP id s1-20020a056a203d8100b0010735ed28a7mr36176837pzi.8.1687734471696;
+        Sun, 25 Jun 2023 16:07:51 -0700 (PDT)
 Received: from sc9-mailhost1.vmware.com (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id x20-20020aa79194000000b006668f004420sm2716397pfa.148.2023.06.25.16.07.49
+        by smtp.gmail.com with ESMTPSA id x20-20020aa79194000000b006668f004420sm2716397pfa.148.2023.06.25.16.07.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jun 2023 16:07:49 -0700 (PDT)
+        Sun, 25 Jun 2023 16:07:51 -0700 (PDT)
 From:   Nadav Amit <nadav.amit@gmail.com>
 X-Google-Original-From: Nadav Amit
 To:     Andrew Jones <andrew.jones@linux.dev>
@@ -56,9 +56,9 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         Nikos Nikoleris <nikos.nikoleris@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Nadav Amit <namit@vmware.com>
-Subject: [kvm-unit-tests PATCH v2 2/6] lib/stack: print base addresses on efi
-Date:   Sun, 25 Jun 2023 23:07:12 +0000
-Message-Id: <20230625230716.2922-3-namit@vmware.com>
+Subject: [kvm-unit-tests PATCH v2 3/6] arm64: enable frame pointer and support stack unwinding
+Date:   Sun, 25 Jun 2023 23:07:13 +0000
+Message-Id: <20230625230716.2922-4-namit@vmware.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230625230716.2922-1-namit@vmware.com>
 References: <20230625230716.2922-1-namit@vmware.com>
@@ -76,96 +76,127 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Nadav Amit <namit@vmware.com>
 
-Making sense from dumped stacks when running EFI tests is very hard due
-to the relocation. Fix it by adjusting the address back to the original
-address.
-
-Introduce CONFIG_RELOC, which would be set on arm64 and on EFI configs.
+Enable frame pointers for arm64 and perform stack unwinding based on
+arm64 convention.
 
 Signed-off-by: Nadav Amit <namit@vmware.com>
 
 ---
-
-v1->v2: Introduce CONFIG_RELOC to support ARM64 [Andrew]
+v1->v2:
+* Adding SPDX [checkpatch]
+* Moving some unused declarations to next patch [Andrew]
+* Adding recursion prevention
 ---
- configure   |  3 +++
- lib/stack.c | 31 +++++++++++++++++++++++++++++--
- 2 files changed, 32 insertions(+), 2 deletions(-)
+ arm/Makefile.arm      |  3 ---
+ arm/Makefile.arm64    |  1 +
+ arm/Makefile.common   |  3 +++
+ lib/arm64/asm/stack.h |  3 +++
+ lib/arm64/stack.c     | 44 +++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 51 insertions(+), 3 deletions(-)
+ create mode 100644 lib/arm64/stack.c
 
-diff --git a/configure b/configure
-index b665f7d..8a3c8fe 100755
---- a/configure
-+++ b/configure
-@@ -416,6 +416,9 @@ EOF
- if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-     echo "TARGET=$target" >> config.mak
- fi
-+if [ "$efi" = "y" ] || [ "$arch" = "arm64" ]; then
-+    echo "CONFIG_RELOC=y" >> config.mak
-+fi
+diff --git a/arm/Makefile.arm b/arm/Makefile.arm
+index 2ce00f5..7fd39f3 100644
+--- a/arm/Makefile.arm
++++ b/arm/Makefile.arm
+@@ -11,9 +11,6 @@ ifeq ($(CONFIG_EFI),y)
+ $(error Cannot build arm32 tests as EFI apps)
+ endif
  
- cat <<EOF > lib/config.h
- #ifndef _CONFIG_H_
-diff --git a/lib/stack.c b/lib/stack.c
-index bdb23fd..dd6bfa8 100644
---- a/lib/stack.c
-+++ b/lib/stack.c
-@@ -6,13 +6,38 @@
-  */
+-# stack.o relies on frame pointers.
+-KEEP_FRAME_POINTER := y
+-
+ CFLAGS += $(machine)
+ CFLAGS += -mcpu=$(PROCESSOR)
+ CFLAGS += -mno-unaligned-access
+diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+index eada7f9..60385e2 100644
+--- a/arm/Makefile.arm64
++++ b/arm/Makefile.arm64
+@@ -21,6 +21,7 @@ define arch_elf_check =
+ endef
  
- #include <libcflat.h>
+ cstart.o = $(TEST_DIR)/cstart64.o
++cflatobjs += lib/arm64/stack.o
+ cflatobjs += lib/arm64/processor.o
+ cflatobjs += lib/arm64/spinlock.o
+ cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index 9b45a8f..bc86e44 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -22,6 +22,9 @@ $(TEST_DIR)/sieve.elf: AUXFLAGS = 0x1
+ ##################################################################
+ AUXFLAGS ?= 0x0
+ 
++# stack.o relies on frame pointers.
++KEEP_FRAME_POINTER := y
++
+ CFLAGS += -std=gnu99
+ CFLAGS += -ffreestanding
+ CFLAGS += -O2
+diff --git a/lib/arm64/asm/stack.h b/lib/arm64/asm/stack.h
+index d000624..be486cf 100644
+--- a/lib/arm64/asm/stack.h
++++ b/lib/arm64/asm/stack.h
+@@ -5,4 +5,7 @@
+ #error Do not directly include <asm/stack.h>. Just use <stack.h>.
+ #endif
+ 
++#define HAVE_ARCH_BACKTRACE_FRAME
++#define HAVE_ARCH_BACKTRACE
++
+ #endif
+diff --git a/lib/arm64/stack.c b/lib/arm64/stack.c
+new file mode 100644
+index 0000000..a2024e8
+--- /dev/null
++++ b/lib/arm64/stack.c
+@@ -0,0 +1,44 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Backtrace support.
++ */
++#include <libcflat.h>
 +#include <stdbool.h>
- #include <stack.h>
- 
- #define MAX_DEPTH 20
- 
-+#ifdef CONFIG_RELOC
-+extern char _text, _etext;
++#include <stack.h>
 +
-+static bool base_address(const void *rebased_addr, unsigned long *addr)
++int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
 +{
-+	unsigned long ra = (unsigned long)rebased_addr;
-+	unsigned long start = (unsigned long)&_text;
-+	unsigned long end = (unsigned long)&_etext;
++	const void *fp = frame;
++	static bool walking;
++	void *lr;
++	int depth;
 +
-+	if (ra < start || ra >= end)
-+		return false;
++	if (walking) {
++		printf("RECURSIVE STACK WALK!!!\n");
++		return 0;
++	}
++	walking = true;
 +
-+	*addr = ra - start;
-+	return true;
++	/*
++	 * ARM64 stack grows down. fp points to the previous fp on the stack,
++	 * and lr is just above it
++	 */
++	for (depth = 0; fp && depth < max_depth; ++depth) {
++
++		asm volatile ("ldp %0, %1, [%2]"
++				  : "=r" (fp), "=r" (lr)
++				  : "r" (fp)
++				  : );
++
++		return_addrs[depth] = lr;
++	}
++
++	walking = false;
++	return depth;
 +}
-+#else
-+static bool base_address(const void *rebased_addr, unsigned long *addr)
++
++int backtrace(const void **return_addrs, int max_depth)
 +{
-+	*addr = (unsigned long)rebased_addr;
-+	return true;
++	return backtrace_frame(__builtin_frame_address(0),
++			       return_addrs, max_depth);
 +}
-+#endif
-+
- static void print_stack(const void **return_addrs, int depth,
- 			bool top_is_return_address)
- {
-+	unsigned long addr;
- 	int i = 0;
- 
- 	printf("\tSTACK:");
-@@ -20,12 +45,14 @@ static void print_stack(const void **return_addrs, int depth,
- 	/* @addr indicates a non-return address, as expected by the stack
- 	 * pretty printer script. */
- 	if (depth > 0 && !top_is_return_address) {
--		printf(" @%lx", (unsigned long) return_addrs[0]);
-+		if (base_address(return_addrs[0], &addr))
-+			printf(" @%lx", addr);
- 		i++;
- 	}
- 
- 	for (; i < depth; i++) {
--		printf(" %lx", (unsigned long) return_addrs[i]);
-+		if (base_address(return_addrs[i], &addr))
-+			printf(" %lx", addr);
- 	}
- 	printf("\n");
- }
 -- 
 2.34.1
 
