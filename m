@@ -2,102 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CE7A73D367
-	for <lists+kvm@lfdr.de>; Sun, 25 Jun 2023 21:45:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 292B273D527
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 01:07:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229742AbjFYTpG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 25 Jun 2023 15:45:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50490 "EHLO
+        id S229639AbjFYXHv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 25 Jun 2023 19:07:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbjFYTpF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 25 Jun 2023 15:45:05 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 884DB13E
-        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 12:45:04 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-341d62e78d3so13652575ab.3
-        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 12:45:04 -0700 (PDT)
+        with ESMTP id S229489AbjFYXHt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 25 Jun 2023 19:07:49 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B67F1BE
+        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 16:07:48 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id 41be03b00d2f7-544c0d768b9so2328513a12.0
+        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 16:07:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687722304; x=1690314304;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UD778V9DnbQQOIeZ16R9VPoinqYi52FwCCQW+55Zlfg=;
-        b=nH/1GU6tAoZJ5TOiQyuLU9ktyEVt+6AGm7NmokBvorjStJrPO56/iNX19gld4nzsn6
-         ZW62uYzB78gfffCvqXhO1huDp0UXF0Xq9ddibruZ1XGiQLG5oXVq5udjcdqh9OZOb/RG
-         ZOWtOAMtf8cpWsoAoPPaRBUazUynWWEhReq4R9mNkVnJEKisAMchvHdsZ6nOdMM1rKgX
-         cax65oJNsw1wDuZw0F/So6bbli7d4TseT9SPnjWr13bl9Mys8QTiuAEaiSn7uEaKst7x
-         OA1mJAmQ9K6Rh1dkWd4zd03vphGJgrqe7WEGkUHUOjGomTIqpiXJO+r4Fm4JIF9VOnxV
-         L0nQ==
+        d=gmail.com; s=20221208; t=1687734468; x=1690326468;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vfmqHhQfkj9wC5y9/5OT1WX/hmOglQnl+4M6B/wqw8Q=;
+        b=S776eYOJGIf7CwEDDfYfATHy9A1TlgYbn8wbW+TPiSHW0EcypEhxakbQberham4ku1
+         l0i+S/qpkhCwbf1GbimM/m7DN50hfk8OOn5ex4FeHtg+c/Hk9M2Eb/ivqSzy/InniVH9
+         bXdoO/0xBD58ho+gZUU6mSTZTO07tANHjRf5d/Pk2AS0MHUP9NrD9lFVuJJK10JHfuTP
+         gNVB2/YG4HTwZcXvdGRQwYcmr9g6NrJb1nkSPKZK5SvB97Y5RFh/7tEuIKiRGHYPblbO
+         4u5Jw2+HN99/sbv26YQo3ZUt8TBUX76MZf8JYUBgQBGF5kKXN5OKNglP4wEbl2s18Hj/
+         JZAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687722304; x=1690314304;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UD778V9DnbQQOIeZ16R9VPoinqYi52FwCCQW+55Zlfg=;
-        b=ZHyw5LPRkTJrk15fXGIRzFAfKQFchh1gT/E8cllxsdNiyAh2izkFOgcJo6cVaxCipq
-         defNektkvzpWv2gFzcyRhxNmfqIgi55BoR8SnbVZ20vmhRi5mcJmtRHOjhY9E6b9NaI0
-         vtZqyljsbPdQPE+yrvC0v4ZoOoWcCImJgf1yHeZR1XL5BESxklRW+RURQk7Ca1HppRmd
-         ZsV7DjaPIu0NX9X/mr3HhGu+gGarMYx3lGvjKiBBtBo3iXcGbjAtAwFI3JmS8x0Ai2cR
-         aJgksxJeDIty7IO9kt62I4C/1d4pEbApG63G2WsHWlziH4jLLtA2rggJnlnC/aWmymxx
-         v7wA==
-X-Gm-Message-State: AC+VfDxSXsVrPoKMXZN6ysOYjdK9qdUi2cGXhqgj3+YR8znPkSVtbgIv
-        Ey1ewwLvL70mNq8LDU220ro=
-X-Google-Smtp-Source: ACHHUZ7OVVWILzkNimUL7YZMLzzTvPEiDpBLJaMNeR74K2LfQUZbPkANTfFyrSM4IL9OYnt8ITIYDA==
-X-Received: by 2002:a92:d910:0:b0:343:92a1:9cf4 with SMTP id s16-20020a92d910000000b0034392a19cf4mr20250462iln.19.1687722303599;
-        Sun, 25 Jun 2023 12:45:03 -0700 (PDT)
-Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id v26-20020aa7809a000000b0062cf75a9e6bsm2540730pff.131.2023.06.25.12.45.02
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 25 Jun 2023 12:45:03 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
-Subject: Re: [kvm-unit-tests PATCH 1/2] arm64: set sctlr_el1.SPAN
+        d=1e100.net; s=20221208; t=1687734468; x=1690326468;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vfmqHhQfkj9wC5y9/5OT1WX/hmOglQnl+4M6B/wqw8Q=;
+        b=YqLHEDnLmxkHlYZDLwqVpwpu9wbPuUhqSm+cxjAaA800d5bwzVn5G4e/8nK3S/Ua8K
+         wnub3bcARtQeRIYoH3vgTH/iMuoIbxk58Pg0EvhpTUnR0uRPU7iG4jWrSDlw9FWlby94
+         IwiZ/PrH6SbZim5nPCRZT3aTIWTIl6K7SI/Ul9sz3QB/MdlrESFFL16P4pv1Vznt1s2k
+         585fXGUq4obEBjYXd/2Ftmxvg5b/LVjeS9RG1LokMAXB+X/A+sx3Y5rftWJcT2ch4XDq
+         //ZU1KO07a28MNVQfhWEUBlHkicjAhsNOKr7fKm/9juuXApIxp9WQXVjdApR5AY1+OQC
+         MgBA==
+X-Gm-Message-State: AC+VfDxBXOzifDP9Noz0hJIJCRRsNW7d8iP3UpvUn9Av1d1K1/O12Mm7
+        xOycr1izVsbcHYfl3h3ZVxYeW/ZHeMQ=
+X-Google-Smtp-Source: ACHHUZ7Mm+1kxGkAESQaQXiARzivg+Gp3MSHekPBONhiuqLGDZQkz6zhBpxUCwrRX8SkdMrmUlknig==
+X-Received: by 2002:a05:6a20:8427:b0:10a:e9ff:808d with SMTP id c39-20020a056a20842700b0010ae9ff808dmr37725342pzd.0.1687734467528;
+        Sun, 25 Jun 2023 16:07:47 -0700 (PDT)
+Received: from sc9-mailhost1.vmware.com (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
+        by smtp.gmail.com with ESMTPSA id x20-20020aa79194000000b006668f004420sm2716397pfa.148.2023.06.25.16.07.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jun 2023 16:07:46 -0700 (PDT)
 From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20230617013138.1823-2-namit@vmware.com>
-Date:   Sun, 25 Jun 2023 12:44:51 -0700
-Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <14C64FF1-A7D1-48F5-AD9C-09E8492FB5AC@gmail.com>
-References: <20230617013138.1823-1-namit@vmware.com>
- <20230617013138.1823-2-namit@vmware.com>
+X-Google-Original-From: Nadav Amit
 To:     Andrew Jones <andrew.jones@linux.dev>
-X-Mailer: Apple Mail (2.3731.600.7)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Nadav Amit <namit@vmware.com>
+Subject: [kvm-unit-tests PATCH v2 0/6] arm64: improve debuggability
+Date:   Sun, 25 Jun 2023 23:07:10 +0000
+Message-Id: <20230625230716.2922-1-namit@vmware.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Nadav Amit <namit@vmware.com>
 
+My recent experience in debugging ARM64 tests on EFI was not as fun as I
+expected it to be.
 
-> On Jun 16, 2023, at 6:31 PM, Nadav Amit <nadav.amit@gmail.com> wrote:
->=20
-> From: Nadav Amit <namit@vmware.com>
->=20
-> Do not assume PAN is not supported or that sctlr_el1.SPAN is already =
-set.
->=20
-> Without setting sctlr_el1.SPAN, tests crash when they access the =
-memory
-> after an exception.
+There were several reasons for that besides the questionable definition
+of "fun":
 
-Andrew,
+1. ARM64 is not compiled with frame pointers and there is no stack
+   unwinder when the stack is dumped.
 
-You=E2=80=99ve been kind enough to review the other patch-set and =
-perhaps this
-one fell through the cracks. Can you please have a look at this one
-specifically and on:
+2. Building an EFI drops the debug information.
 
-https://lore.kernel.org/all/20230615003832.161134-1-namit@vmware.com/
+3. The addresses that are printed on dump_stack() and the use of GDB
+   are hard because taking code relocation into account is non trivial.
 
-These issues cause problem on other environments.
+The patches help both ARM64 and EFI for this matter. The image address
+is printed when EFI is used to allow the use of GDB. Symbols are emitted
+into a separate debug file. The frame pointer is included and special
+entry is added upon an exception to allow backtracing across
+exceptions.
 
-Thanks,
-Nadav
+v1->v2:
+* Andrew comments [see in individual patches]
+* Few cleanups
+
+Nadav Amit (6):
+  efi: keep efi debug information in a separate file
+  lib/stack: print base addresses on efi
+  arm64: enable frame pointer and support stack unwinding
+  arm64: stack: update trace stack on exception
+  efi: print address of image
+  arm64: dump stack on bad exception
+
+ arm/Makefile.arm        |  3 --
+ arm/Makefile.arm64      |  1 +
+ arm/Makefile.common     |  8 +++++-
+ arm/cstart64.S          | 13 +++++++++
+ configure               |  3 ++
+ lib/arm64/asm-offsets.c |  6 +++-
+ lib/arm64/asm/stack.h   |  3 ++
+ lib/arm64/processor.c   |  1 +
+ lib/arm64/stack.c       | 62 +++++++++++++++++++++++++++++++++++++++++
+ lib/efi.c               |  4 +++
+ lib/stack.c             | 31 +++++++++++++++++++--
+ x86/Makefile.common     |  5 +++-
+ 12 files changed, 132 insertions(+), 8 deletions(-)
+ create mode 100644 lib/arm64/stack.c
+
+-- 
+2.34.1
 
