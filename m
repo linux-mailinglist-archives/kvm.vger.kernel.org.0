@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CB3273D69B
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 05:50:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDEB573D69C
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 05:50:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229572AbjFZDud (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 25 Jun 2023 23:50:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59966 "EHLO
+        id S229649AbjFZDuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 25 Jun 2023 23:50:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbjFZDub (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 25 Jun 2023 23:50:31 -0400
+        with ESMTP id S229599AbjFZDup (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 25 Jun 2023 23:50:45 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25D82189
-        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 20:50:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D078E1AB
+        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 20:50:43 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AA4DD60C79
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 03:50:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1111CC433CB
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 03:50:30 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6D23660C79
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 03:50:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CE675C433D9
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 03:50:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687751430;
-        bh=xwmNti7w0UAqVHQeXHRIrqXGcJ4ZS6r+htz86m1Sy+A=;
+        s=k20201202; t=1687751442;
+        bh=AcSYdZnTpnMUr4FJlU+9Odc8cN749L9O4ZhD0spA0Bw=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=uk7tSzS6aY3ZX1jbKTBfC7GguZ0hq7JFqizJ+A5DEuOY+jRUiy91ZpiX+1N4HHvYX
-         MAPwWh1ioIWnA/F+K9kRehE+UWL7kw7HRFYYXwRDQ0iYtcvZhFfHu86m688V+MHuD8
-         vfaB8bQ9C51Hei5FVTfRzV/Lu3q1zH3LNCvRAEDgrd3I9DmP1DoGDZOw/1WABiW79u
-         ft+PBXns1wtH1DjAhKwTLYGZpwwbjLMC6vkz1YyO7Y1oxU4K+Er9n9f21DNaNi6mKo
-         3V5Pep6JfXs7ksJkb6Ls2/JjiRnxcpeHaqmLiDzabNdxayKvGhYc/878zKboRpkK6P
-         lm5YoQVbG/O6w==
+        b=M1xKX4r0+GpzVHHDjopvex9N5/ghLdGf47IbJ1pA+IxvcBwlHYSwSUzVXmi12OIVs
+         OMK+2GOC2dSxIcfofe1ehgElb1cpJfBJWvdE32GK+zZrOCWwKAtyTvwCVZLReX8xNd
+         UneZqLQ+mMOx33Tfu4/KpRoPD4YsKkslk1GT2fHmxW54/BrsF4Echz8rgzFw/LYGbX
+         WPsEUH5ORU/ybWmWpRWP6lKdr8e2rbhfnQOZ+yt/qBVkRryGkNfAkt2ElpMsrOkLy/
+         FVMVUx6R5BvSE8K7c5UkSC2BXf7WvpkY9/Z3QYi4TVZfw18nnEbxpD2hRYwg6D9nkZ
+         Tcy/RkGLn82dg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id EB3F5C53BD3; Mon, 26 Jun 2023 03:50:29 +0000 (UTC)
+        id BF724C53BD4; Mon, 26 Jun 2023 03:50:42 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     kvm@vger.kernel.org
 Subject: [Bug 217558] In KVM guest with VF of X710 NIC passthrough, the mac
  address of VF is inconsistent with it in host
-Date:   Mon, 26 Jun 2023 03:50:29 +0000
+Date:   Mon, 26 Jun 2023 03:50:42 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -53,8 +53,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217558-28872-7yzOKLooBM@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cf_kernel_version
+Message-ID: <bug-217558-28872-wYNrAQrB5S@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-217558-28872@https.bugzilla.kernel.org/>
 References: <bug-217558-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -74,21 +74,11 @@ X-Mailing-List: kvm@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D217558
 
---- Comment #8 from Chen, Fan (farrah.chen@intel.com) ---
-Hi Patryk
+Chen, Fan (farrah.chen@intel.com) changed:
 
-We reproduced this issue with the latest kernel commit
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
-a92b7d26 kernel version: 6.4.0_rc7
-
-When you reproduce, did you create multiple VFs and passthrough all of them=
- to
-KVM guest? I found that if we only passthrough one VF to guest, the mac is =
-the
-same as it in host, but when passthrough 2 or more VFs, sometimes only the
-first VF use the same mac as it in host, other VFs' mac are random; sometim=
-es
-all the VFs' mac are random.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+     Kernel Version|6.4.0-rc2                   |6.4.0-rc7
 
 --=20
 You may reply to this email to add a comment.
