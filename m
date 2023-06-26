@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E61773D7FB
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 08:50:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5521273D7FF
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 08:50:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229582AbjFZGuY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 02:50:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48834 "EHLO
+        id S229613AbjFZGum (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 02:50:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbjFZGuW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 02:50:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 574541B7
-        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 23:49:48 -0700 (PDT)
+        with ESMTP id S229604AbjFZGuj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 02:50:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70C56E54
+        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 23:49:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687762187;
+        s=mimecast20190719; t=1687762189;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WX90kZNBwe7dwYkh6anqQDpSify7IhqnpPmXu2ebVnc=;
-        b=EXO2ugRB8e2sjs+Pl/hxy9yeur5KxNx223x7MeIcVp1zg6G8BZuVlhOuH/lJY0H8iK7gcm
-        hZ6+ODEGLhJcf9mW7G6SoxhP03+uJeoCCpdng0iSLIql1Pya37qhmhO1vV4+d+sh9Vq4bM
-        Ok5ABaHN8nWiwMY7BJEiuRDET5jwhwg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=NMHucQZ4M31K7QXIgHBtRlKVAlpmIjZVnWfneYhxS0Q=;
+        b=ZWseVts0Cg4wEHpuAbkToBoVB8rMliPH6l1HtdfGnfLipltTPhMyZ30UirBpWFL/0NBQXL
+        e+RlyQZyRNRaDkKrJqfoCsuGxcdoodaiokQNyjzj9XHoO7UtnnU4vSrop4PsU24sStBz5L
+        pA3RiG4d8n5eDZ6XwIjI8kOhSdtLGxY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-329-k4yhj1csPmSg0UdimX50_Q-1; Mon, 26 Jun 2023 02:49:44 -0400
-X-MC-Unique: k4yhj1csPmSg0UdimX50_Q-1
+ us-mta-182-ByhBcNp3OFuVvfR_Cy2dMg-1; Mon, 26 Jun 2023 02:49:44 -0400
+X-MC-Unique: ByhBcNp3OFuVvfR_Cy2dMg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7FF7A3C0F671;
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A1D2B90ED33;
         Mon, 26 Jun 2023 06:49:43 +0000 (UTC)
 Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 76ADF200BA8D;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9452C200B677;
         Mon, 26 Jun 2023 06:49:43 +0000 (UTC)
 From:   Shaoqin Huang <shahuang@redhat.com>
 To:     qemu-devel@nongnu.org, qemu-arm@nongnu.org
@@ -44,9 +44,9 @@ Cc:     oliver.upton@linux.dev, salil.mehta@huawei.com,
         Shaoqin Huang <shahuang@redhat.com>,
         Peter Maydell <peter.maydell@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH v1 4/5] arm/kvm: add skeleton implementation for userspace SMCCC call handling
-Date:   Mon, 26 Jun 2023 02:49:08 -0400
-Message-Id: <20230626064910.1787255-5-shahuang@redhat.com>
+Subject: [PATCH v1 5/5] arm/kvm: add support for userspace psci calls handling
+Date:   Mon, 26 Jun 2023 02:49:09 -0400
+Message-Id: <20230626064910.1787255-6-shahuang@redhat.com>
 In-Reply-To: <20230626064910.1787255-1-shahuang@redhat.com>
 References: <20230626064910.1787255-1-shahuang@redhat.com>
 MIME-Version: 1.0
@@ -62,187 +62,205 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The SMCCC call filtering provide the ability to forward the SMCCC call
-to userspace, so we provide a new option `user-smccc` to enable handling
-SMCCC call in userspace, the default value is off.
+Use the SMCCC filter to start sending psci calls to userspace, qemu will
+need to handle the psci calls. In qemu, reuse the psci handler which
+used for tcg, while use it, we need to take care the reset vcpu process
+which will reset the vcpu register and grab all vcpu locks when reset
+gicv3.
 
-And add the skeleton implementation for userspace SMCCC call
-initialization and handling.
+So when reset vcpu, we need to mark it as dirty to force the vcpu to
+sync its register to kvm, and when reset gicv3, we need to pause all
+vcpus to grab the all vcpu locks, thus when handling the psci CPU_ON
+call, the vcpu can be successfuly boot up.
 
 Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 ---
- docs/system/arm/virt.rst |  4 +++
- hw/arm/virt.c            | 21 ++++++++++++++++
- include/hw/arm/virt.h    |  1 +
- target/arm/kvm.c         | 54 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 80 insertions(+)
+ hw/intc/arm_gicv3_kvm.c | 10 +++++
+ target/arm/kvm.c        | 94 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 103 insertions(+), 1 deletion(-)
 
-diff --git a/docs/system/arm/virt.rst b/docs/system/arm/virt.rst
-index 1cab33f02e..ff43d52f04 100644
---- a/docs/system/arm/virt.rst
-+++ b/docs/system/arm/virt.rst
-@@ -155,6 +155,10 @@ dtb-randomness
-   DTB to be non-deterministic. It would be the responsibility of
-   the firmware to come up with a seed and pass it on if it wants to.
- 
-+user-smccc
-+  Set ``on``/``off`` to enable/disable handling smccc call in userspace
-+  instead of kernel.
-+
- dtb-kaslr-seed
-   A deprecated synonym for dtb-randomness.
- 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 9b9f7d9c68..767720321c 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -42,6 +42,7 @@
- #include "hw/vfio/vfio-amd-xgbe.h"
- #include "hw/display/ramfb.h"
- #include "net/net.h"
-+#include "qom/object.h"
- #include "sysemu/device_tree.h"
- #include "sysemu/numa.h"
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index 72ad916d3d..e42898c1d6 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -24,6 +24,7 @@
+ #include "hw/intc/arm_gicv3_common.h"
+ #include "qemu/error-report.h"
+ #include "qemu/module.h"
++#include "sysemu/cpus.h"
+ #include "sysemu/kvm.h"
  #include "sysemu/runstate.h"
-@@ -2511,6 +2512,19 @@ static void virt_set_oem_table_id(Object *obj, const char *value,
-     strncpy(vms->oem_table_id, value, 8);
+ #include "kvm_arm.h"
+@@ -695,10 +696,19 @@ static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+         return;
+     }
+ 
++    /*
++     * When handling psci call in userspace like cpu hotplug, this shall be called
++     * when other vcpus might be running. Host kernel KVM to handle device
++     * access of IOCTLs KVM_{GET|SET}_DEVICE_ATTR might fail due to inability to
++     * grab vcpu locks for all the vcpus. Hence, we need to pause all vcpus to
++     * facilitate locking within host.
++     */
++    pause_all_vcpus();
+     /* Initialize to actual HW supported configuration */
+     kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+                       KVM_VGIC_ATTR(ICC_CTLR_EL1, c->gicr_typer),
+                       &c->icc_ctlr_el1[GICV3_NS], false, &error_abort);
++    resume_all_vcpus();
+ 
+     c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
  }
- 
-+static bool virt_get_user_smccc(Object *obj, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+
-+    return vms->user_smccc;
-+}
-+
-+static void virt_set_user_smccc(Object *obj, bool value, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+
-+    vms->user_smccc = value;
-+}
- 
- bool virt_is_acpi_enabled(VirtMachineState *vms)
- {
-@@ -3155,6 +3169,13 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-                                           "in ACPI table header."
-                                           "The string may be up to 8 bytes in size");
- 
-+    object_class_property_add_bool(oc, "user-smccc",
-+                                   virt_get_user_smccc,
-+                                   virt_set_user_smccc);
-+    object_class_property_set_description(oc, "user-smccc",
-+                                          "Set on/off to enable/disable "
-+                                          "handling smccc call in userspace");
-+
- }
- 
- static void virt_instance_init(Object *obj)
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index e1ddbea96b..4f1bc12680 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -160,6 +160,7 @@ struct VirtMachineState {
-     bool ras;
-     bool mte;
-     bool dtb_randomness;
-+    bool user_smccc;
-     OnOffAuto acpi;
-     VirtGICType gic_version;
-     VirtIOMMUType iommu;
 diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 84da49332c..579c6edd49 100644
+index 579c6edd49..d2857a8499 100644
 --- a/target/arm/kvm.c
 +++ b/target/arm/kvm.c
-@@ -9,6 +9,8 @@
-  */
+@@ -10,6 +10,7 @@
  
  #include "qemu/osdep.h"
-+#include <asm-arm64/kvm.h>
-+#include <linux/arm-smccc.h>
+ #include <asm-arm64/kvm.h>
++#include <linux/psci.h>
+ #include <linux/arm-smccc.h>
  #include <sys/ioctl.h>
  
- #include <linux/kvm.h>
-@@ -247,6 +249,20 @@ int kvm_arm_get_max_vm_ipa_size(MachineState *ms, bool *fixed_ipa)
-     return ret > 0 ? ret : 40;
- }
+@@ -251,7 +252,29 @@ int kvm_arm_get_max_vm_ipa_size(MachineState *ms, bool *fixed_ipa)
  
-+static int kvm_arm_init_smccc_filter(KVMState *s)
-+{
-+    int ret = 0;
-+
-+    if (kvm_vm_check_attr(s, KVM_ARM_VM_SMCCC_CTRL, KVM_ARM_VM_SMCCC_FILTER)) {
-+        error_report("ARM SMCCC filter not supported");
-+        ret = -EINVAL;
-+        goto out;
-+    }
-+
-+out:
-+    return ret;
-+}
-+
- int kvm_arch_init(MachineState *ms, KVMState *s)
+ static int kvm_arm_init_smccc_filter(KVMState *s)
  {
++    unsigned int i;
      int ret = 0;
-@@ -282,6 +298,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
++    struct kvm_smccc_filter filter_ranges[] = {
++        {
++            .base           = KVM_PSCI_FN_BASE,
++            .nr_functions   = 4,
++            .action         = KVM_SMCCC_FILTER_DENY,
++        },
++        {
++            .base           = PSCI_0_2_FN_BASE,
++            .nr_functions   = 0x20,
++            .action         = KVM_SMCCC_FILTER_FWD_TO_USER,
++        },
++        {
++            .base           = PSCI_0_2_FN64_BASE,
++            .nr_functions   = 0x20,
++            .action         = KVM_SMCCC_FILTER_FWD_TO_USER,
++        },
++    };
++    struct kvm_device_attr attr = {
++        .group = KVM_ARM_VM_SMCCC_CTRL,
++        .attr = KVM_ARM_VM_SMCCC_FILTER,
++    };
  
-     kvm_arm_init_debug(s);
+     if (kvm_vm_check_attr(s, KVM_ARM_VM_SMCCC_CTRL, KVM_ARM_VM_SMCCC_FILTER)) {
+         error_report("ARM SMCCC filter not supported");
+@@ -259,6 +282,16 @@ static int kvm_arm_init_smccc_filter(KVMState *s)
+         goto out;
+     }
  
-+    if (ret == 0 && object_property_get_bool(OBJECT(ms), "user-smccc", NULL)) {
-+        ret = kvm_arm_init_smccc_filter(s);
++    for (i = 0; i < ARRAY_SIZE(filter_ranges); i++) {
++        attr.addr = (uint64_t)&filter_ranges[i];
++
++        ret = kvm_vm_ioctl(s, KVM_SET_DEVICE_ATTR, &attr);
++        if (ret < 0) {
++            error_report("KVM_SET_DEVICE_ATTR failed when SMCCC init");
++            goto out;
++        }
 +    }
 +
+ out:
      return ret;
  }
+@@ -654,6 +687,14 @@ void kvm_arm_reset_vcpu(ARMCPU *cpu)
+      * for the same reason we do so in kvm_arch_get_registers().
+      */
+     write_list_to_cpustate(cpu);
++
++    /*
++     * When enabled userspace psci call handling, qemu will reset the vcpu if
++     * it's PSCI CPU_ON call. Since this will reset the vcpu register and
++     * power_state, we should sync these state to kvm, so manually set the
++     * vcpu_dirty to force the qemu to put register to kvm.
++     */
++    CPU(cpu)->vcpu_dirty = true;
+ }
  
-@@ -912,6 +932,37 @@ static int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
+ /*
+@@ -932,6 +973,51 @@ static int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
      return -1;
  }
  
-+static void kvm_arm_smccc_return_result(CPUState *cs, struct arm_smccc_res *res)
++static int kvm_arm_handle_psci(CPUState *cs, struct kvm_run *run)
 +{
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    CPUARMState *env = &cpu->env;
++    if (run->hypercall.flags & KVM_HYPERCALL_EXIT_SMC) {
++        cs->exception_index = EXCP_SMC;
++    } else {
++        cs->exception_index = EXCP_HVC;
++    }
 +
-+    env->xregs[0] = res->a0;
-+    env->xregs[1] = res->a1;
-+    env->xregs[2] = res->a2;
-+    env->xregs[3] = res->a3;
++    qemu_mutex_lock_iothread();
++    arm_cpu_do_interrupt(cs);
++    qemu_mutex_unlock_iothread();
++
++    /*
++     * We need to exit the run loop to have the chance to execute the
++     * qemu_wait_io_event() which will execute the psci function which queued in
++     * the cpu work queue.
++     */
++    return EXCP_INTERRUPT;
 +}
 +
-+static int kvm_arm_handle_hypercall(CPUState *cs, struct kvm_run *run)
++static int kvm_arm_handle_std_call(CPUState *cs, struct kvm_run *run,
++                                   struct arm_smccc_res *res,
++                                   bool *sync_reg)
 +{
 +    uint32_t fn = run->hypercall.nr;
-+    struct arm_smccc_res res = {
-+        .a0     = SMCCC_RET_NOT_SUPPORTED,
-+    };
 +    int ret = 0;
 +
-+    kvm_cpu_synchronize_state(cs);
-+
-+    switch (ARM_SMCCC_OWNER_NUM(fn)) {
++    switch (ARM_SMCCC_FUNC_NUM(fn)) {
++    /* PSCI */
++    case 0x00 ... 0x1F:
++        /*
++         * We will reuse the psci handler, but the handler directly get psci
++         * call parameter from register, and write the return value to register.
++         * So we no need to sync the value in arm_smccc_res.
++         */
++        *sync_reg = false;
++        ret = kvm_arm_handle_psci(cs, run);
++        break;
 +    default:
 +        break;
 +    }
 +
-+    kvm_arm_smccc_return_result(cs, &res);
-+
 +    return ret;
 +}
 +
- int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+ static void kvm_arm_smccc_return_result(CPUState *cs, struct arm_smccc_res *res)
  {
+     ARMCPU *cpu = ARM_CPU(cs);
+@@ -949,16 +1035,22 @@ static int kvm_arm_handle_hypercall(CPUState *cs, struct kvm_run *run)
+     struct arm_smccc_res res = {
+         .a0     = SMCCC_RET_NOT_SUPPORTED,
+     };
++    bool sync_reg = true;
      int ret = 0;
-@@ -927,6 +978,9 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-         ret = kvm_arm_handle_dabt_nisv(cs, run->arm_nisv.esr_iss,
-                                        run->arm_nisv.fault_ipa);
-         break;
-+    case KVM_EXIT_HYPERCALL:
-+        ret = kvm_arm_handle_hypercall(cs, run);
+ 
+     kvm_cpu_synchronize_state(cs);
+ 
+     switch (ARM_SMCCC_OWNER_NUM(fn)) {
++    case ARM_SMCCC_OWNER_STANDARD:
++        ret = kvm_arm_handle_std_call(cs, run, &res, &sync_reg);
 +        break;
      default:
-         qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
-                       __func__, run->exit_reason);
+         break;
+     }
+ 
+-    kvm_arm_smccc_return_result(cs, &res);
++    if (sync_reg) {
++        kvm_arm_smccc_return_result(cs, &res);
++    }
+ 
+     return ret;
+ }
 -- 
 2.39.1
 
