@@ -2,463 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4FA373ECC8
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 23:22:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A049D73ECF8
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 23:37:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230167AbjFZVWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 17:22:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58216 "EHLO
+        id S230002AbjFZVhp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 17:37:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229788AbjFZVWE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 17:22:04 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0868FAF;
-        Mon, 26 Jun 2023 14:22:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687814522; x=1719350522;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=kSNEKzDDq36AWtCjWIhdDQaQVOs181rw0EbBIWHHrRQ=;
-  b=MChyjRGHYDlowdXyfEN3vU50MXnN7ZTGmbHexZ2fXdI+/TqGtK+Ur0ec
-   48UxMhNMHEVkBwZ+sh/zQ1LVILlPuv4wdWb944nFAj+eWDJ7TArIUuNXb
-   Jodm/XfT7MN7FQRqTbQndt8xBpYLpn1WZTIYBDJdhWISUKZ/cPVioSI15
-   73ic3U/CaiLoWAsAHb6wFVmhfHuvXcmIf9hMYyyM9q16VyaIogNqlgxTm
-   YiWEVmMZLiOKjBiUK/IKw++E5dcqm9qzlfwAaWSVfqTv4lt0MpHLpHiaK
-   zy1FGjdCRJ+PhYadBEHdkF8lDTXP8TzLQFhCsRxc89sgsv0eoh48YznL3
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="391801060"
-X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
-   d="scan'208";a="391801060"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 14:22:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="781597706"
-X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
-   d="scan'208";a="781597706"
-Received: from bbogsx-mobl.amr.corp.intel.com (HELO [10.212.255.77]) ([10.212.255.77])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 14:21:59 -0700
-Message-ID: <fcaf00b3-3da3-af72-65e0-ddacb870f96f@linux.intel.com>
-Date:   Mon, 26 Jun 2023 14:21:58 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.11.0
-Subject: Re: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, x86@kernel.org, dave.hansen@intel.com,
-        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
-        peterz@infradead.org, tglx@linutronix.de, bp@alien8.de,
-        mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
-        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, ashok.raj@intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, ying.huang@intel.com, chao.gao@intel.com,
-        nik.borisov@suse.com, bagasdotme@gmail.com, sagis@google.com,
-        imammedo@redhat.com
-References: <cover.1687784645.git.kai.huang@intel.com>
- <104d324cd68b12e14722ee5d85a660cccccd8892.1687784645.git.kai.huang@intel.com>
-From:   Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-In-Reply-To: <104d324cd68b12e14722ee5d85a660cccccd8892.1687784645.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229516AbjFZVho (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 17:37:44 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48E7AC2
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 14:37:43 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-57325434999so52302317b3.1
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 14:37:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1687815462; x=1690407462;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2hJTnGKaVBQkg0yz+eVOgG/0uK7zEDVVCQ+nLV5omt0=;
+        b=pztYkiPL+Pja+QCn3bFgtqogw6fqAMuWeFWbIIMS5Rj9GDe2aa/AXa6mU5VjTQuFNT
+         kGltwz4rKfXYPBP0V/suvXthJtqL23UOZ9I1kC2ChQ2UqCleP5jw6y4Zro6zDTTiKKiJ
+         baH1iafxFDqTYS3Pg3RFmhHq/zni5MwsfmOFJaABmwgj0cG2Odcapj4vEa3Ec5/hCI3k
+         IsjwRNGKD6lQsQ9yQzKrrpCUVjkcaeqjI4hPVx2/Pt/K5BHDt8YOq/N9PbyhCUnzpiOB
+         mrtwGyU06SekKaDzW4z+lXgjDl9On2xsIE2YrMuPyoask0r7Tbqw+HeDqGgkVksZJ//l
+         oUtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687815462; x=1690407462;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2hJTnGKaVBQkg0yz+eVOgG/0uK7zEDVVCQ+nLV5omt0=;
+        b=VKoxVfuelM9TsOrVSYF7bRkCxr+0dpiOwVCVddMAExukDmZSsEvEXYpIulWnzh6GwB
+         ODfnw3H3ytYEPKKGz9yKmISv61FY+USD16dyuIe4xgp0VOzOigcK2z4PsAzA6IWuUy1w
+         xURxqYZ1oviORYTpo+5wO3P4iWCHudRBd7wzioVW0A+71KQwSluiUr71nVjUhT+W7vNg
+         dC0VPx7Z3BMet/tVrCyNqV3qpxvf6rNi+uwLyJ5+WSvZZoJFceHOuGgEzN05aQnN70u6
+         CZ2WJqMIyCsAGV1uZKZ8ewMZiIOXJiFGTCOt5XNAokw+dsXP742tJpColDQ8pKuuqci5
+         Ypfg==
+X-Gm-Message-State: AC+VfDyZuU2eEQpHK1xSfXhVEdmg89JGdPzQ+9QldmwvowG/9U8ieLGG
+        Ax4c0GT1z7vmZ3z1LolTvHbjQEGZRdM=
+X-Google-Smtp-Source: ACHHUZ7NdZzNENhExS/VeuzxqO4azWnvTcARnkz17r9kguRpghEbyDaKgFneVMrHPrA+YunJHzIn4G7UK78=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:b710:0:b0:565:9f59:664f with SMTP id
+ v16-20020a81b710000000b005659f59664fmr12998654ywh.6.1687815462579; Mon, 26
+ Jun 2023 14:37:42 -0700 (PDT)
+Date:   Mon, 26 Jun 2023 14:37:40 -0700
+In-Reply-To: <a5398e4b-bb9f-9913-c436-7528479be2ee@gmail.com>
+Mime-Version: 1.0
+References: <20230321220021.2119033-1-seanjc@google.com> <20230321220021.2119033-7-seanjc@google.com>
+ <a5398e4b-bb9f-9913-c436-7528479be2ee@gmail.com>
+Message-ID: <ZJoFJMaY97CwloH/@google.com>
+Subject: Re: [PATCH v4 06/13] KVM: x86/mmu: Bypass __handle_changed_spte()
+ when clearing TDP MMU dirty bits
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Jun 25, 2023, Like Xu wrote:
+> On 22/3/2023 6:00 am, Sean Christopherson wrote:
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index 950c5d23ecee..467931c43968 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -517,7 +517,6 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
+> >    *	    threads that might be modifying SPTEs.
+> >    *
+> >    * Handle bookkeeping that might result from the modification of a SPTE.
+> > - * This function must be called for all TDP SPTE modifications.
+> >    */
+> >   static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+> >   				  u64 old_spte, u64 new_spte, int level,
+> > @@ -1689,8 +1688,10 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+> >   							iter.old_spte, dbit,
+> >   							iter.level);
+> > -		__handle_changed_spte(kvm, iter.as_id, iter.gfn, iter.old_spte,
+> > -				      iter.old_spte & ~dbit, iter.level, false);
+> > +		trace_kvm_tdp_mmu_spte_changed(iter.as_id, iter.gfn, iter.level,
+> 
+> Here the first parameter "kvm" is no longer used in this context.
+> 
+> Please help confirm that for clear_dirty_pt_masked(), should the "struct kvm
+> *kvm" parameter be cleared from the list of incoming parameters ?
+
+Hmm, there's only one caller, so keeping @kvm around "just in case" probably
+doesn't make sense, e.g. adding it back so that we could do KVM_BUG_ON() in the
+future wouldn't require much churn.
+
+That said, I'm tempted to move the lockdep so that it's more obvious why it's safe
+for clear_dirty_pt_masked() to use the non-atomic (for non-volatile SPTEs)
+tdp_mmu_clear_spte_bits() helper.  for_each_tdp_mmu_root() does its own lockdep,
+so the only "loss" in lockdep coverage is if the list is completely empty.
+
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 512163d52194..0b4f03bef70e 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1600,6 +1600,8 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+                                                   shadow_dirty_mask;
+        struct tdp_iter iter;
+ 
++       lockdep_assert_held_write(&kvm->mmu_lock);
++
+        rcu_read_lock();
+ 
+        tdp_root_for_each_leaf_pte(iter, root, gfn + __ffs(mask),
+@@ -1646,7 +1648,6 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+ {
+        struct kvm_mmu_page *root;
+ 
+-       lockdep_assert_held_write(&kvm->mmu_lock);
+        for_each_tdp_mmu_root(kvm, root, slot->as_id)
+                clear_dirty_pt_masked(kvm, root, gfn, mask, wrprot);
+ }
 
 
-On 6/26/23 7:12 AM, Kai Huang wrote:
-> To enable TDX the kernel needs to initialize TDX from two perspectives:
-> 1) Do a set of SEAMCALLs to initialize the TDX module to make it ready
-> to create and run TDX guests; 2) Do the per-cpu initialization SEAMCALL
-> on one logical cpu before the kernel wants to make any other SEAMCALLs
-> on that cpu (including those involved during module initialization and
-> running TDX guests).
-> 
-> The TDX module can be initialized only once in its lifetime.  Instead
-> of always initializing it at boot time, this implementation chooses an
-> "on demand" approach to initialize TDX until there is a real need (e.g
-> when requested by KVM).  This approach has below pros:
-> 
-> 1) It avoids consuming the memory that must be allocated by kernel and
-> given to the TDX module as metadata (~1/256th of the TDX-usable memory),
-> and also saves the CPU cycles of initializing the TDX module (and the
-> metadata) when TDX is not used at all.
-> 
-> 2) The TDX module design allows it to be updated while the system is
-> running.  The update procedure shares quite a few steps with this "on
-> demand" initialization mechanism.  The hope is that much of "on demand"
-> mechanism can be shared with a future "update" mechanism.  A boot-time
-> TDX module implementation would not be able to share much code with the
-> update mechanism.
-> 
-> 3) Making SEAMCALL requires VMX to be enabled.  Currently, only the KVM
-> code mucks with VMX enabling.  If the TDX module were to be initialized
-> separately from KVM (like at boot), the boot code would need to be
-> taught how to muck with VMX enabling and KVM would need to be taught how
-> to cope with that.  Making KVM itself responsible for TDX initialization
-> lets the rest of the kernel stay blissfully unaware of VMX.
-> 
-> Similar to module initialization, also make the per-cpu initialization
-> "on demand" as it also depends on VMX being enabled.
-> 
-> Add two functions, tdx_enable() and tdx_cpu_enable(), to enable the TDX
-> module and enable TDX on local cpu respectively.  For now tdx_enable()
-> is a placeholder.  The TODO list will be pared down as functionality is
-> added.
-> 
-> Export both tdx_cpu_enable() and tdx_enable() for KVM use.
-> 
-> In tdx_enable() use a state machine protected by mutex to make sure the
-> initialization will only be done once, as tdx_enable() can be called
-> multiple times (i.e. KVM module can be reloaded) and may be called
-> concurrently by other kernel components in the future.
-> 
-> The per-cpu initialization on each cpu can only be done once during the
-> module's life time.  Use a per-cpu variable to track its status to make
-> sure it is only done once in tdx_cpu_enable().
-> 
-> Also, a SEAMCALL to do TDX module global initialization must be done
-> once on any logical cpu before any per-cpu initialization SEAMCALL.  Do
-> it inside tdx_cpu_enable() too (if hasn't been done).
-> 
-> tdx_enable() can potentially invoke SEAMCALLs on any online cpus.  The
-> per-cpu initialization must be done before those SEAMCALLs are invoked
-> on some cpu.  To keep things simple, in tdx_cpu_enable(), always do the
-> per-cpu initialization regardless of whether the TDX module has been
-> initialized or not.  And in tdx_enable(), don't call tdx_cpu_enable()
-> but assume the caller has disabled CPU hotplug, done VMXON and
-> tdx_cpu_enable() on all online cpus before calling tdx_enable().
-> 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
-> 
-> v11 -> v12:
->  - Simplified TDX module global init and lp init status tracking (David).
->  - Added comment around try_init_module_global() for using
->    raw_spin_lock() (Dave).
->  - Added one sentence to changelog to explain why to expose tdx_enable()
->    and tdx_cpu_enable() (Dave).
->  - Simplifed comments around tdx_enable() and tdx_cpu_enable() to use
->    lockdep_assert_*() instead. (Dave)
->  - Removed redundent "TDX" in error message (Dave).
-> 
-> v10 -> v11:
->  - Return -NODEV instead of -EINVAL when CONFIG_INTEL_TDX_HOST is off.
->  - Return the actual error code for tdx_enable() instead of -EINVAL.
->  - Added Isaku's Reviewed-by.
-> 
-> v9 -> v10:
->  - Merged the patch to handle per-cpu initialization to this patch to
->    tell the story better.
->  - Changed how to handle the per-cpu initialization to only provide a
->    tdx_cpu_enable() function to let the user of TDX to do it when the
->    user wants to run TDX code on a certain cpu.
->  - Changed tdx_enable() to not call cpus_read_lock() explicitly, but
->    call lockdep_assert_cpus_held() to assume the caller has done that.
->  - Improved comments around tdx_enable() and tdx_cpu_enable().
->  - Improved changelog to tell the story better accordingly.
-> 
-> v8 -> v9:
->  - Removed detailed TODO list in the changelog (Dave).
->  - Added back steps to do module global initialization and per-cpu
->    initialization in the TODO list comment.
->  - Moved the 'enum tdx_module_status_t' from tdx.c to local tdx.h
-> 
-> v7 -> v8:
->  - Refined changelog (Dave).
->  - Removed "all BIOS-enabled cpus" related code (Peter/Thomas/Dave).
->  - Add a "TODO list" comment in init_tdx_module() to list all steps of
->    initializing the TDX Module to tell the story (Dave).
->  - Made tdx_enable() unverisally return -EINVAL, and removed nonsense
->    comments (Dave).
->  - Simplified __tdx_enable() to only handle success or failure.
->  - TDX_MODULE_SHUTDOWN -> TDX_MODULE_ERROR
->  - Removed TDX_MODULE_NONE (not loaded) as it is not necessary.
->  - Improved comments (Dave).
->  - Pointed out 'tdx_module_status' is software thing (Dave).
-> 
-> v6 -> v7:
->  - No change.
-> 
-> v5 -> v6:
->  - Added code to set status to TDX_MODULE_NONE if TDX module is not
->    loaded (Chao)
->  - Added Chao's Reviewed-by.
->  - Improved comments around cpus_read_lock().
-> 
-> - v3->v5 (no feedback on v4):
->  - Removed the check that SEAMRR and TDX KeyID have been detected on
->    all present cpus.
->  - Removed tdx_detect().
->  - Added num_online_cpus() to MADT-enabled CPUs check within the CPU
->    hotplug lock and return early with error message.
->  - Improved dmesg printing for TDX module detection and initialization.
-> 
-> 
-> ---
->  arch/x86/include/asm/tdx.h  |   4 +
->  arch/x86/virt/vmx/tdx/tdx.c | 162 ++++++++++++++++++++++++++++++++++++
->  arch/x86/virt/vmx/tdx/tdx.h |  13 +++
->  3 files changed, 179 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index 4dfe2e794411..d8226a50c58c 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -97,8 +97,12 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
->  
->  #ifdef CONFIG_INTEL_TDX_HOST
->  bool platform_tdx_enabled(void);
-> +int tdx_cpu_enable(void);
-> +int tdx_enable(void);
->  #else	/* !CONFIG_INTEL_TDX_HOST */
->  static inline bool platform_tdx_enabled(void) { return false; }
-> +static inline int tdx_cpu_enable(void) { return -ENODEV; }
-> +static inline int tdx_enable(void)  { return -ENODEV; }
->  #endif	/* CONFIG_INTEL_TDX_HOST */
->  
->  #endif /* !__ASSEMBLY__ */
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 141d12376c4d..29ca18f66d61 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -13,6 +13,10 @@
->  #include <linux/errno.h>
->  #include <linux/printk.h>
->  #include <linux/smp.h>
-> +#include <linux/cpu.h>
-> +#include <linux/spinlock.h>
-> +#include <linux/percpu-defs.h>
-> +#include <linux/mutex.h>
->  #include <asm/msr-index.h>
->  #include <asm/msr.h>
->  #include <asm/archrandom.h>
-> @@ -23,6 +27,13 @@ static u32 tdx_global_keyid __ro_after_init;
->  static u32 tdx_guest_keyid_start __ro_after_init;
->  static u32 tdx_nr_guest_keyids __ro_after_init;
->  
-> +static bool tdx_global_initialized;
-> +static DEFINE_RAW_SPINLOCK(tdx_global_init_lock);
-
-Why use raw_spin_lock()?
-
-> +static DEFINE_PER_CPU(bool, tdx_lp_initialized);
-> +
-> +static enum tdx_module_status_t tdx_module_status;
-> +static DEFINE_MUTEX(tdx_module_lock);
-
-I think you can add a single line comment about what states above
-variables tracks. But it is entirely up to you.
-
-> +
->  /*
->   * Wrapper of __seamcall() to convert SEAMCALL leaf function error code
->   * to kernel error code.  @seamcall_ret and @out contain the SEAMCALL
-> @@ -74,6 +85,157 @@ static int __always_unused seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
->  	}
->  }
->  
-> +/*
-> + * Do the module global initialization if not done yet.
-> + * It's always called with interrupts and preemption disabled.
-> + */
-> +static int try_init_module_global(void)
-> +{
-> +	unsigned long flags;
-> +	int ret;
-> +
-> +	/*
-> +	 * The TDX module global initialization only needs to be done
-> +	 * once on any cpu.
-> +	 */
-> +	raw_spin_lock_irqsave(&tdx_global_init_lock, flags);
-> +
-> +	if (tdx_global_initialized) {
-> +		ret = 0;
-> +		goto out;
-> +	}
-> +
-> +	/* All '0's are just unused parameters. */
-
-I have noticed that you add the above comment whenever you call seamcall() with
-0 as parameters. Is this a ask from the maintainer? If not, I think you can skip
-it. Just explaining the parameters in seamcall function definition is good
-enough.
-
-> +	ret = seamcall(TDH_SYS_INIT, 0, 0, 0, 0, NULL, NULL);
-> +	if (!ret)
-> +		tdx_global_initialized = true;
-> +out:
-> +	raw_spin_unlock_irqrestore(&tdx_global_init_lock, flags);
-> +
-> +	return ret;
-> +}
-> +
-> +/**
-> + * tdx_cpu_enable - Enable TDX on local cpu
-> + *
-> + * Do one-time TDX module per-cpu initialization SEAMCALL (and TDX module
-> + * global initialization SEAMCALL if not done) on local cpu to make this
-> + * cpu be ready to run any other SEAMCALLs.
-> + *
-> + * Call this function with preemption disabled.
-> + *
-> + * Return 0 on success, otherwise errors.
-> + */
-> +int tdx_cpu_enable(void)
-> +{
-> +	int ret;
-> +
-> +	if (!platform_tdx_enabled())
-> +		return -ENODEV;
-> +
-> +	lockdep_assert_preemption_disabled();
-> +
-> +	/* Already done */
-> +	if (__this_cpu_read(tdx_lp_initialized))
-> +		return 0;
-> +
-> +	/*
-> +	 * The TDX module global initialization is the very first step
-> +	 * to enable TDX.  Need to do it first (if hasn't been done)
-> +	 * before the per-cpu initialization.
-> +	 */
-> +	ret = try_init_module_global();
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* All '0's are just unused parameters */
-> +	ret = seamcall(TDH_SYS_LP_INIT, 0, 0, 0, 0, NULL, NULL);
-> +	if (ret)
-> +		return ret;
-> +
-> +	__this_cpu_write(tdx_lp_initialized, true);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(tdx_cpu_enable);
-> +
-> +static int init_tdx_module(void)
-> +{
-> +	/*
-> +	 * TODO:
-> +	 *
-> +	 *  - Get TDX module information and TDX-capable memory regions.
-> +	 *  - Build the list of TDX-usable memory regions.
-> +	 *  - Construct a list of "TD Memory Regions" (TDMRs) to cover
-> +	 *    all TDX-usable memory regions.
-> +	 *  - Configure the TDMRs and the global KeyID to the TDX module.
-> +	 *  - Configure the global KeyID on all packages.
-> +	 *  - Initialize all TDMRs.
-> +	 *
-> +	 *  Return error before all steps are done.
-> +	 */
-> +	return -EINVAL;
-> +}
-> +
-> +static int __tdx_enable(void)
-> +{
-> +	int ret;
-> +
-> +	ret = init_tdx_module();
-> +	if (ret) {
-> +		pr_err("module initialization failed (%d)\n", ret);
-> +		tdx_module_status = TDX_MODULE_ERROR;
-> +		return ret;
-> +	}
-> +
-> +	pr_info("module initialized.\n");
-> +	tdx_module_status = TDX_MODULE_INITIALIZED;
-> +
-> +	return 0;
-> +}
-> +
-> +/**
-> + * tdx_enable - Enable TDX module to make it ready to run TDX guests
-> + *
-> + * This function assumes the caller has: 1) held read lock of CPU hotplug
-> + * lock to prevent any new cpu from becoming online; 2) done both VMXON
-> + * and tdx_cpu_enable() on all online cpus.
-> + *
-> + * This function can be called in parallel by multiple callers.
-> + *
-> + * Return 0 if TDX is enabled successfully, otherwise error.
-> + */
-> +int tdx_enable(void)
-> +{
-> +	int ret;
-> +
-> +	if (!platform_tdx_enabled())
-> +		return -ENODEV;
-> +
-> +	lockdep_assert_cpus_held();
-> +
-> +	mutex_lock(&tdx_module_lock);
-> +
-> +	switch (tdx_module_status) {
-> +	case TDX_MODULE_UNKNOWN:
-> +		ret = __tdx_enable();
-> +		break;
-> +	case TDX_MODULE_INITIALIZED:
-> +		/* Already initialized, great, tell the caller. */
-> +		ret = 0;
-> +		break;
-> +	default:
-> +		/* Failed to initialize in the previous attempts */
-> +		ret = -EINVAL;
-> +		break;
-> +	}
-> +
-> +	mutex_unlock(&tdx_module_lock);
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(tdx_enable);
-> +
->  static int __init record_keyid_partitioning(u32 *tdx_keyid_start,
->  					    u32 *nr_tdx_keyids)
->  {
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-> index 55dbb1b8c971..9fb46033c852 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.h
-> +++ b/arch/x86/virt/vmx/tdx/tdx.h
-> @@ -16,11 +16,24 @@
->   */
->  #define TDX_RND_NO_ENTROPY	0x8000020300000000ULL
->  
-> +/*
-> + * TDX module SEAMCALL leaf functions
-> + */
-> +#define TDH_SYS_INIT		33
-> +#define TDH_SYS_LP_INIT		35
-> +
->  /*
->   * Do not put any hardware-defined TDX structure representations below
->   * this comment!
->   */
->  
-> +/* Kernel defined TDX module status during module initialization. */
-> +enum tdx_module_status_t {
-> +	TDX_MODULE_UNKNOWN,
-> +	TDX_MODULE_INITIALIZED,
-> +	TDX_MODULE_ERROR
-> +};
-> +
->  struct tdx_module_output;
->  u64 __seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
->  	       struct tdx_module_output *out);
-
--- 
-Sathyanarayanan Kuppuswamy
-Linux Kernel Developer
