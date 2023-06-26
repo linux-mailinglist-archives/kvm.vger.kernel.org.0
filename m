@@ -2,76 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2375073E434
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 18:08:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 076DA73E43E
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 18:09:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231669AbjFZQH5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 12:07:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43094 "EHLO
+        id S231722AbjFZQJn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 12:09:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231660AbjFZQHn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 12:07:43 -0400
+        with ESMTP id S231721AbjFZQJh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 12:09:37 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1F631B1
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 09:06:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BC910F6
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 09:08:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687795613;
+        s=mimecast20190719; t=1687795727;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RJPNo+/LgG0KXsCyIerMFPAI/JqqDRK/rvfGQLVSbrI=;
-        b=goQ7bT2lZVq1FtgxGDisSKw8WLZHUrceKYiRpW1BXn9ReYsf5qy5LBvetZh9mZ5MGRvvyu
-        MBhPzQQIeolDgaV8aO5kKAvoj6yqJ6mLuZ2C8q9pEafD2kHICuabAmVVwnrDh3z7lxs7p3
-        NcykmBTNuHbLVYLBtT182P8SHmHTvaQ=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=wVw/Wv9H1+jgHlFyXB8K46FNsZdoHq7Qo4C7jHkkuH8=;
+        b=Uq8bXJlN3GE4NZs1yzqFs78sDoboE5uODq3+WLMvNtXTr84noXM5Zgcde7/v4HQ/bTMbiY
+        E7lU1/b6Hoj7rFg7zBLq92acUdXpcMSUlBY6Cvi9bH/Zb2XDSVUhmMIVT++sVHgKvdCd2T
+        6ntrWUXgQk7LskN5jgVYJFWYVwNmy4E=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-398-pEhkPEJVMbGVdMd9AOC9Ww-1; Mon, 26 Jun 2023 12:06:46 -0400
-X-MC-Unique: pEhkPEJVMbGVdMd9AOC9Ww-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7836080abf0so48583639f.2
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 09:06:33 -0700 (PDT)
+ us-mta-654-0EoqNQ1_PGGIPDfUapP0fQ-1; Mon, 26 Jun 2023 12:08:46 -0400
+X-MC-Unique: 0EoqNQ1_PGGIPDfUapP0fQ-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-635d9e482f1so18567766d6.1
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 09:08:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687795592; x=1690387592;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RJPNo+/LgG0KXsCyIerMFPAI/JqqDRK/rvfGQLVSbrI=;
-        b=bqY5lpw+JjZZHwiW7ok7VGW+6rhUaQTnUOJhEgwvs+0A4YnuAXgh4PW27EXYJQsLzR
-         QvBLG4Zzguue9hFWx6rRyOsvP8mqWCmlVJfbOLbzmvcweQyY2M7yjXAwRD+VyCbY42rs
-         kYqTHdKUlyjH/UQwyWhmPqhj9e0UZKWOhtEo8HjkAcOD5SFRir+tBETVB28te4aLf2Eq
-         Gw5SkbBPm/9XkaFpT7oG2K04p7id/helERlkjNaVOWjRvpo0mP3m52kxhcgTADvLvner
-         CVIKnpoIfuFdHXXrWvKLESbPfFNvob/NhxZ3V0MeCsOxsNeqWO+dwYT16l1wMI8W5eUo
-         WdEw==
-X-Gm-Message-State: AC+VfDwCrNt89er3ccrc8BuEC+SsyZlJlVn9uWFR6jNQZqPg5siNCFak
-        /P+GzotYpzL0vMjfjTcR2kSsaVsw+7Uf87hitboHF8Wcr7ZIerWfbBIiU67kvlBclxNYNcqPlO8
-        5VZ5j5XH8vSMX
-X-Received: by 2002:a6b:f417:0:b0:777:b4af:32a3 with SMTP id i23-20020a6bf417000000b00777b4af32a3mr24592666iog.14.1687795592670;
-        Mon, 26 Jun 2023 09:06:32 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ53FUa3LHmQBZC6LWteROXsScIosACWPyU08IRlkyg3/dKKqdkS4z/oGdbp+hN7l0kO2tLOkw==
-X-Received: by 2002:a6b:f417:0:b0:777:b4af:32a3 with SMTP id i23-20020a6bf417000000b00777b4af32a3mr24592636iog.14.1687795592402;
-        Mon, 26 Jun 2023 09:06:32 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id h21-20020a02b615000000b004231ee0fed4sm1831402jam.78.2023.06.26.09.06.30
+        d=1e100.net; s=20221208; t=1687795722; x=1690387722;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wVw/Wv9H1+jgHlFyXB8K46FNsZdoHq7Qo4C7jHkkuH8=;
+        b=UC7KY8S7VaE6VliMk/Ehof380BgSkeu9ypgcxPAUAeICUyWAuL044+Yhf50iUyDQbr
+         ult336d5raikmzzpqXrT/mTEl1hC4XD7VpzU9InTTqNuWK3wcV1pq6xSVORdMGf5326q
+         vwqUiUUfxpS4dBQbDqjG+37HSEnHArBsyvQi6MafHPJJ2B0D6EWV2gXnYkloCClyxMxY
+         CZ0h6Ic4Oxu+PhxPKJk9pBsc0x2vc3nqMe4LKQIX8I7NynblN+3pKeVlM1oJRTXUXV++
+         3GJqaMrK8pr3yz1urCX4L+imX+Zo2ueaL9liCdXZp7UfmMGASxah8VQhSW0zG914uA27
+         VcQA==
+X-Gm-Message-State: AC+VfDzBMsvmLLdv10at8neE98eGrxt8k/tbNfZwX/Mai0drgJKzU1a+
+        FkcrUd/iOyOQONsHLfhHaJ7lu14hT2cReGyT7bdnYVdDXcsFwisG3pejp4S9mwi5kg6NbWs1bLE
+        tle4rUSabPzbV
+X-Received: by 2002:a05:6214:27c9:b0:62d:f515:9320 with SMTP id ge9-20020a05621427c900b0062df5159320mr36074262qvb.28.1687795722195;
+        Mon, 26 Jun 2023 09:08:42 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5raYOLH44gjALQWDUf6IbJggeYwYWXvVHtOWcRvbl3wuo2Ee6zIMMrWONEOeu5ohWrGHlbZg==
+X-Received: by 2002:a05:6214:27c9:b0:62d:f515:9320 with SMTP id ge9-20020a05621427c900b0062df5159320mr36074244qvb.28.1687795721957;
+        Mon, 26 Jun 2023 09:08:41 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
+        by smtp.gmail.com with ESMTPSA id l13-20020ad44d0d000000b0063227969cf7sm3308298qvl.96.2023.06.26.09.08.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 09:06:31 -0700 (PDT)
-Date:   Mon, 26 Jun 2023 10:06:29 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     ankita@nvidia.com, aniketa@nvidia.com, cjia@nvidia.com,
-        kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
-        acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
-        danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/1] vfio/nvgpu: Add vfio pci variant module for
- grace hopper
-Message-ID: <20230626100629.3c318922.alex.williamson@redhat.com>
-In-Reply-To: <ZJWdbbNESp1+6GVN@nvidia.com>
-References: <20230622030720.19652-1-ankita@nvidia.com>
-        <ZJWdbbNESp1+6GVN@nvidia.com>
-Organization: Red Hat
+        Mon, 26 Jun 2023 09:08:41 -0700 (PDT)
+Date:   Mon, 26 Jun 2023 18:08:36 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v4 07/17] vsock: read from socket's error queue
+Message-ID: <sq5jlfhhlj347uapazqnotc5rakzdvj33ruzqwxdjsfx275m5r@dxujwphcffkl>
+References: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
+ <20230603204939.1598818-8-AVKrasnov@sberdevices.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230603204939.1598818-8-AVKrasnov@sberdevices.ru>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -83,46 +87,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 23 Jun 2023 10:26:05 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Sat, Jun 03, 2023 at 11:49:29PM +0300, Arseniy Krasnov wrote:
+>This adds handling of MSG_ERRQUEUE input flag in receive call. This flag
+>is used to read socket's error queue instead of data queue. Possible
+>scenario of error queue usage is receiving completions for transmission
+>with MSG_ZEROCOPY flag.
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> include/linux/socket.h   | 1 +
+> net/vmw_vsock/af_vsock.c | 5 +++++
+> 2 files changed, 6 insertions(+)
+>
+>diff --git a/include/linux/socket.h b/include/linux/socket.h
+>index bd1cc3238851..d79efd026880 100644
+>--- a/include/linux/socket.h
+>+++ b/include/linux/socket.h
+>@@ -382,6 +382,7 @@ struct ucred {
+> #define SOL_MPTCP	284
+> #define SOL_MCTP	285
+> #define SOL_SMC		286
+>+#define SOL_VSOCK	287
 
-> On Wed, Jun 21, 2023 at 08:07:20PM -0700, ankita@nvidia.com wrote:
-> > +			if (caps.size) {
-> > +				info.flags |= VFIO_REGION_INFO_FLAG_CAPS;
-> > +				if (info.argsz < sizeof(info) + caps.size) {
-> > +					info.argsz = sizeof(info) + caps.size;
-> > +					info.cap_offset = 0;  
-> 
-> Shouldn't this be an error if we can't fit the caps into the response?
-> Silently discarding the caps seems wrong..
+Maybe this change should go in another patch where we describe that
+we need to support setsockopt()
 
-It's required for backwards compatibility.  If a userspace doesn't
-support the info ioctl capabilities chain, it gets the basic
-information successfully, while an enlightened userspace makes use of
-the flags to know that a capability chain is available but unreported
-due to an insufficient buffer size, with the required size being
-provided in the return structure.
- 
-> > +static ssize_t nvgpu_vfio_pci_read(struct vfio_device *core_vdev,
-> > +		char __user *buf, size_t count, loff_t *ppos)
-> > +{
-> > +	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
-> > +
-> > +	/*
-> > +	 * Only the device memory present on the hardware is mapped, which may
-> > +	 * not be power-of-2 aligned. A read to the BAR2 region implies an
-> > +	 * access outside the available device memory on the hardware.
-> > +	 */
-> > +	if (index == VFIO_PCI_BAR2_REGION_INDEX)
-> > +		return -EINVAL;  
-> 
-> What does the qemu do in this case? Crash the VM?
-
-Yes, I don't think return -errno matches what we discussed for
-returning -1 on read and dropping writes outside of the device memory.
-Also see comments in my review that read/write should handle the
-coherent memory area as well, the device should work with x-no-mmap=on.
-Thanks,
-
-Alex
+>
+> /* IPX options */
+> #define IPX_TYPE	1
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 45fd20c4ed50..07803d9fbf6d 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -110,6 +110,7 @@
+> #include <linux/workqueue.h>
+> #include <net/sock.h>
+> #include <net/af_vsock.h>
+>+#include <linux/errqueue.h>
+>
+> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
+> static void vsock_sk_destruct(struct sock *sk);
+>@@ -2135,6 +2136,10 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+> 	int err;
+>
+> 	sk = sock->sk;
+>+
+>+	if (unlikely(flags & MSG_ERRQUEUE))
+>+		return sock_recv_errqueue(sk, msg, len, SOL_VSOCK, 0);
+>+
+> 	vsk = vsock_sk(sk);
+> 	err = 0;
+>
+>-- 
+>2.25.1
+>
 
