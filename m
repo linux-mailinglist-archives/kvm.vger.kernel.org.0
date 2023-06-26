@@ -2,155 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A201573E338
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 17:25:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67CDA73E36E
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 17:34:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229670AbjFZPZM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 11:25:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44916 "EHLO
+        id S229835AbjFZPed (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 11:34:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230443AbjFZPZF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 11:25:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48185C7
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 08:24:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687793058;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=pNcIf8DGlU4ngflbaStrLY/OgH3ZgZfAt2j/tScjlPs=;
-        b=B8jcWkxIoLJZCfZbWwRlDzONXq/HhUyujXuvj1F2aJ31L8iiy1v5KiqokWzSSP7breviKO
-        JVqS1R9A2CFfGWDElQtE5RA4uyDzHABpGT9/iajCLBFf1FSKR7m0G/ANkmFZJmoPF9gvPV
-        ITID4h7tGpt0Q4iiUguvlrlG7up3C04=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-86-V87wrEXmNrWu3ELPJaQ1-Q-1; Mon, 26 Jun 2023 11:24:17 -0400
-X-MC-Unique: V87wrEXmNrWu3ELPJaQ1-Q-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-765986c0568so212687185a.1
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 08:24:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687793052; x=1690385052;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pNcIf8DGlU4ngflbaStrLY/OgH3ZgZfAt2j/tScjlPs=;
-        b=Mm/tpKmvV21npUabd3qcxe91AKvhBexEJKXLvBKztc2QDthftpKECUELg3/392lYw4
-         jdBjEj+N5o8MJXfTYJ/9QMT7S+6UKT02EHHkp87/cvvH+a0n4jBesErkOghsrB5bDFQy
-         NScuirJ5Knjlydt2+TvEkNW0TX1gC9+up/TEL+NbkQ9dFkvDWiNBhUbZwhqP3FcwUzHZ
-         pUrIICqxXsIbLJPMMFDcHVfozu3DcuYKNlaNGZozgbOJITpSv3mKOp2NpPR2bXgHghAF
-         ejolyaAl4VIljpJIf/CajPMRCpCMkGcChCVCon7/ISvQ/y9xaj7e+liw/8GzEzdzL0aV
-         2zfg==
-X-Gm-Message-State: AC+VfDw++gmJFq0G+pOv9YM6A4Z5Ev7ogM/fZAFCDFlccomhy/XDhERS
-        xmiGNp1Ls9wo1U7CU3JHFXQXThQcMCpeL/fftpGPUC268jkaSt8S5NGZN/OCU+9Bp52vrTVUgsn
-        csrqHiifsGu6l
-X-Received: by 2002:a05:620a:880f:b0:75b:23a1:363d with SMTP id qj15-20020a05620a880f00b0075b23a1363dmr20468178qkn.78.1687793052464;
-        Mon, 26 Jun 2023 08:24:12 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ67krRALDwbYzxNGPfYizrvdl7LS+HU+avZAWHRkye9gBvomn4n/ypyeI8Y0aTbS2T5cmmDUw==
-X-Received: by 2002:a05:620a:880f:b0:75b:23a1:363d with SMTP id qj15-20020a05620a880f00b0075b23a1363dmr20468165qkn.78.1687793052227;
-        Mon, 26 Jun 2023 08:24:12 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id y24-20020a37e318000000b007579ea33cdesm2785460qki.62.2023.06.26.08.24.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 08:24:11 -0700 (PDT)
-Date:   Mon, 26 Jun 2023 17:24:07 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v4 02/17] vhost/vsock: read data from non-linear skb
-Message-ID: <vpcrdclcic7oiuat4oapnkj54dolld6hh2wixe3fozlthyt2ni@omyjyem3uj3t>
-References: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
- <20230603204939.1598818-3-AVKrasnov@sberdevices.ru>
+        with ESMTP id S231158AbjFZPea (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 11:34:30 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 001391700;
+        Mon, 26 Jun 2023 08:34:25 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35QFCXkk007336;
+        Mon, 26 Jun 2023 15:34:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=V+Y2cq7WfTk5J2Cr2qDvHL53AGxEkQEk2hsvIhE6LrA=;
+ b=iotVi9/vmNIhnsFl0WuawdTF+mP5ixDGZYAGuIgzgd/98YXGR6IpqAi0/9iwCVsF6TcQ
+ tn1SYrYe8LM6UhgW3wurC4zkRk5pnsprz4l0IEWITZ6sV+zVokPmfaZB+TwhpjMlcb3u
+ G8aMrddYmiHTZpYVLrnZBf+panUobC6ijnbxOJwbuFz9VJFtCNGUc52rJIU5/rimMW0k
+ Msxs+ZjfbT1JgE/zPnOZ76dyXEA0o5or6TD3MSUEQXqoDe5QYKQGB408IrmjkqNfeq4i
+ ZRliUZakmCSY0ZnkLTcHJaHbPluu97H4tfV3Svyzx42EMjd1xBxbOs/ZQwb/aABcsPMX 9g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rfd420nur-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 26 Jun 2023 15:34:25 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35QFER1j013459;
+        Mon, 26 Jun 2023 15:34:24 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rfd420nsu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 26 Jun 2023 15:34:24 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35Q6g7ZX030161;
+        Mon, 26 Jun 2023 15:34:22 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3rdr4518vx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 26 Jun 2023 15:34:22 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35QFYIE245154586
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 26 Jun 2023 15:34:18 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C8C3120049;
+        Mon, 26 Jun 2023 15:34:18 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 91A1A20040;
+        Mon, 26 Jun 2023 15:34:18 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 26 Jun 2023 15:34:18 +0000 (GMT)
+Date:   Mon, 26 Jun 2023 17:34:17 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        Nico =?UTF-8?B?QsO2aHI=?= <nrb@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] s390x: Align __bss_end to a halfword
+ boundary
+Message-ID: <20230626173417.6b6b70cd@p-imbrenda>
+In-Reply-To: <20230623093941.448147-1-thuth@redhat.com>
+References: <20230623093941.448147-1-thuth@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230603204939.1598818-3-AVKrasnov@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: bzMAVwUB_fzMoREDDJNC8RqcVONxtp4-
+X-Proofpoint-GUID: ifvth31eWlVmbBs-dPIGXRSmvOCVN7c_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-26_13,2023-06-26_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 priorityscore=1501 bulkscore=0 impostorscore=0 adultscore=0
+ malwarescore=0 mlxscore=0 clxscore=1015 spamscore=0 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2306260141
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jun 03, 2023 at 11:49:24PM +0300, Arseniy Krasnov wrote:
->This adds copying to guest's virtio buffers from non-linear skbs. Such
->skbs are created by protocol layer when MSG_ZEROCOPY flags is used. It
->changes call of 'copy_to_iter()' to 'skb_copy_datagram_iter()'. Second
->function can read data from non-linear skb.
->
->See commit to 'net/vmw_vsock/virtio_transport_common.c' with the same
->name for more details.
+On Fri, 23 Jun 2023 11:39:41 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-I think it's okay if we report the same details here.
+> We are using the "larl" instruction to load the address of __bss_end,
+> and this instruction can only deal with even addresses, so we have
+> to make sure that this symbol is aligned accordingly. Otherwise this
+> will cause a failure with the new binutils 2.40 and Clang:
+> 
+>  /usr/bin/ld: s390x/cstart64.o(.init+0x6a): misaligned symbol `__bss_end'
+>               (0x2c0d1) for relocation R_390_PC32DBL
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> drivers/vhost/vsock.c | 12 +++++++-----
-> 1 file changed, 7 insertions(+), 5 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index 6578db78f0ae..b254aa4b756a 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -156,7 +156,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		}
->
-> 		iov_iter_init(&iov_iter, ITER_DEST, &vq->iov[out], in, iov_len);
->-		payload_len = skb->len;
->+		payload_len = skb->len - VIRTIO_VSOCK_SKB_CB(skb)->frag_off;
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Also here a variable should make the code more readable.
-
-Stefano
-
-> 		hdr = virtio_vsock_hdr(skb);
->
-> 		/* If the packet is greater than the space available in the
->@@ -197,8 +197,10 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 			break;
-> 		}
->
->-		nbytes = copy_to_iter(skb->data, payload_len, &iov_iter);
->-		if (nbytes != payload_len) {
->+		if (skb_copy_datagram_iter(skb,
->+					   VIRTIO_VSOCK_SKB_CB(skb)->frag_off,
->+					   &iov_iter,
->+					   payload_len)) {
-> 			kfree_skb(skb);
-> 			vq_err(vq, "Faulted on copying pkt buf\n");
-> 			break;
->@@ -212,13 +214,13 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		vhost_add_used(vq, head, sizeof(*hdr) + payload_len);
-> 		added = true;
->
->-		skb_pull(skb, payload_len);
->+		VIRTIO_VSOCK_SKB_CB(skb)->frag_off += payload_len;
-> 		total_len += payload_len;
->
-> 		/* If we didn't send all the payload we can requeue the packet
-> 		 * to send it with the next available buffer.
-> 		 */
->-		if (skb->len > 0) {
->+		if (VIRTIO_VSOCK_SKB_CB(skb)->frag_off < skb->len) {
-> 			hdr->flags |= cpu_to_le32(flags_to_restore);
->
-> 			/* We are queueing the same skb to handle
->-- 
->2.25.1
->
+> ---
+>  s390x/flat.lds.S | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/s390x/flat.lds.S b/s390x/flat.lds.S
+> index 0cb7e383..5e91ecac 100644
+> --- a/s390x/flat.lds.S
+> +++ b/s390x/flat.lds.S
+> @@ -37,6 +37,7 @@ SECTIONS
+>  	. = ALIGN(16);
+>  	__bss_start = .;
+>  	.bss : { *(.bss) }
+> +	. = ALIGN(2);
+>  	__bss_end = .;
+>  	. = ALIGN(4K);
+>  	edata = .;
 
