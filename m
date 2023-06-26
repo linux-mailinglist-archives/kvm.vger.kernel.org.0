@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B36B73E386
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 17:37:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B596373E3BE
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 17:44:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231264AbjFZPhp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 11:37:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53284 "EHLO
+        id S230409AbjFZPoR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 11:44:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231255AbjFZPho (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 11:37:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D40F8F3
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 08:37:00 -0700 (PDT)
+        with ESMTP id S229756AbjFZPoQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 11:44:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB869AB
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 08:43:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687793820;
+        s=mimecast20190719; t=1687794210;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=71PcUdXHzfbmeSLaqcZwK2r6pjSreCaY9XzRHkKEiCA=;
-        b=B2KNL6lhS8pmKbnvPCLrOV2RiYy6hTkQBzLIia94FDd/aPoelqS8j1nsEW3akfY/G+LbvC
-        pbTTg91o4tK5GiKv1ikL/qQn8/hSMvpxduSNu2zGAcQLbnJw5cb29jgSISuzb3AjrcyYAX
-        7voOfE87vm5pCnE5VFaUi3oH5Sz8C8g=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=EHL9J0eB4Sdz9Nc78m+y6P53irdo4gKn3Uc9907MynE=;
+        b=E6vZE2Ay603xU0EqKUnRdTjBAS/tBz1h9Q46xuSpZOI0ii/k4fkYdt1LG5SImJ5zaSbaoT
+        2tQI6ETAIwlLslNcvlJ3HMuQrVtBytSOGb5OBDr4OexHPRDw+AMlAU60hOiWWgKsuktqlM
+        4Ru9/WC8GnzaZfRjKTGBWmNK8pfqk6A=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-240-4i0A1DdcPHurf8POkcUmCg-1; Mon, 26 Jun 2023 11:36:58 -0400
-X-MC-Unique: 4i0A1DdcPHurf8POkcUmCg-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-62f9986d687so35137656d6.1
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 08:36:58 -0700 (PDT)
+ us-mta-471-PVd6loF7P7yL2TZtn_zGwg-1; Mon, 26 Jun 2023 11:43:28 -0400
+X-MC-Unique: PVd6loF7P7yL2TZtn_zGwg-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-763c36d4748so331368885a.0
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 08:43:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687793817; x=1690385817;
+        d=1e100.net; s=20221208; t=1687794200; x=1690386200;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=71PcUdXHzfbmeSLaqcZwK2r6pjSreCaY9XzRHkKEiCA=;
-        b=dbD7ARjNEC7LfLkn+O67VIt+9jim2P2oAHRID4OUMWjo6M73GorChjsiXLVP6ZoVfr
-         uyxw3LugaOTjalYllaU7qsTWyZ7ckmFdzvVlBfZd84oVPOn+Ga2ytEQt6tHSmDshDNS2
-         EyX5PI8fekmwDcb1vd9EnKqCqiBp2PDqec+nJEgY/MWF+WuA/hIj9RwaIc5i7VYWDzJ/
-         OwdOLufpKH5/S4sA367e2SVNwZcsAk4jCzNkEZpEOOfmBv7EQk5FhtLNXFAtlZDguamg
-         VxQhmSKMgsoqFsM9HdGAR2j3ENSdER/4cvxAcNJ1NsJ+QIpOp1nW/Agufg429ns//QB7
-         XMVQ==
-X-Gm-Message-State: AC+VfDyfuWaZHsNYj/Z5iA6Z9/gGys+ZzQ1rC//mJtE9dQTvjQAbh2Jo
-        4bWIpBYBLZHPJogQ3l8bsKybqDssDkbcYPTuqK1Q1TZIjLrGUNnkT8AvdC6MBx8fc3c2cTnIIVV
-        qmbPHl2vOeDuaBBAZw/yk
-X-Received: by 2002:a05:6214:2346:b0:62f:f13e:bd73 with SMTP id hu6-20020a056214234600b0062ff13ebd73mr39396835qvb.20.1687793817544;
-        Mon, 26 Jun 2023 08:36:57 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ40I5NnfBD7e9UXdCL5E/tGBEB8QeoD2KkkaZxvewAgMci79nu2OXGaIhbm0FmSDkshqOeiBQ==
-X-Received: by 2002:a05:6214:2346:b0:62f:f13e:bd73 with SMTP id hu6-20020a056214234600b0062ff13ebd73mr39396823qvb.20.1687793817297;
-        Mon, 26 Jun 2023 08:36:57 -0700 (PDT)
+        bh=EHL9J0eB4Sdz9Nc78m+y6P53irdo4gKn3Uc9907MynE=;
+        b=ZuDJh4olEZYlTGLzZYLt0m8snbPCd4j17of/9/jjnE9tyhuQ47+SxlYzo6ksl663pi
+         kLCTM+X7g6/BArPD664dYJI2xGT5mGJkn7HYHaibIokl4JSoGLSxxGOlKvyPk8Mey02U
+         CHrb8LeNqlV8xbzLZFKgK2d8A48b8Xx8GPT189UggyiFFgOB1B38SFUs04i40qzXwu7j
+         f84JlVNQ8oKoEJLvA0fX2Y4XtiwoasVJVDGpdFgpfA3fTiAXQEexf1ZdGluMtoC4kpBK
+         21p+EqBywWf6ddeT+SjKT+s7W90rAF+XtvXoWggaIJ/WM3dz/qjsOq7xxg0KoXRpIV56
+         foIw==
+X-Gm-Message-State: AC+VfDx8LjX5XQYd40mU0RKgkjZQZY3ceDxt1oytjqyaapTLazJX/hT3
+        ujQLikxNYpJmuCLmE1VLqOvQqnUHQAyj+Wg4xiu1x0dAc5xIhTZ8j6GZ6HahZBVfDN1mbraYT34
+        pG6nMCcn8gbNxw8k6ni6J
+X-Received: by 2002:a05:620a:24cf:b0:765:a828:7d02 with SMTP id m15-20020a05620a24cf00b00765a8287d02mr4274654qkn.24.1687794199779;
+        Mon, 26 Jun 2023 08:43:19 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7wo4oIIXt+M60hxTpJtMEqYtBvIw+eoptPK+6HuXbpu6oq7q8v2GIbBoAcgQwaiCeGYHwlTw==
+X-Received: by 2002:a05:620a:24cf:b0:765:a828:7d02 with SMTP id m15-20020a05620a24cf00b00765a8287d02mr4274641qkn.24.1687794199542;
+        Mon, 26 Jun 2023 08:43:19 -0700 (PDT)
 Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id dd12-20020ad4580c000000b00632191a70aesm3299770qvb.88.2023.06.26.08.36.54
+        by smtp.gmail.com with ESMTPSA id w10-20020a05620a148a00b00761fae866c7sm2807410qkj.76.2023.06.26.08.43.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 08:36:56 -0700 (PDT)
-Date:   Mon, 26 Jun 2023 17:36:52 +0200
+        Mon, 26 Jun 2023 08:43:19 -0700 (PDT)
+Date:   Mon, 26 Jun 2023 17:43:14 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -68,129 +68,103 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v4 03/17] vsock/virtio: support to send non-linear skb
-Message-ID: <3lg4apldxdrpbkgfa2o4wxe4qyayj2h7b2lfcw3q5a7u3hnofi@z2ifmmzt4xpc>
+Subject: Re: [RFC PATCH v4 04/17] vsock/virtio: non-linear skb handling for
+ tap
+Message-ID: <gp4xniaudmgaeij677g4eylbizhjtk6e7l5modpxb2dwqygnse@5ceugoevrtht>
 References: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
- <20230603204939.1598818-4-AVKrasnov@sberdevices.ru>
+ <20230603204939.1598818-5-AVKrasnov@sberdevices.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20230603204939.1598818-4-AVKrasnov@sberdevices.ru>
+In-Reply-To: <20230603204939.1598818-5-AVKrasnov@sberdevices.ru>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jun 03, 2023 at 11:49:25PM +0300, Arseniy Krasnov wrote:
->For non-linear skb use its pages from fragment array as buffers in
->virtio tx queue. These pages are already pinned by 'get_user_pages()'
->during such skb creation.
+On Sat, Jun 03, 2023 at 11:49:26PM +0300, Arseniy Krasnov wrote:
+>For tap device new skb is created and data from the current skb is
+>copied to it. This adds copying data from non-linear skb to new
+>the skb.
 >
 >Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 >---
-> net/vmw_vsock/virtio_transport.c | 37 ++++++++++++++++++++++++++------
-> 1 file changed, 31 insertions(+), 6 deletions(-)
+> net/vmw_vsock/virtio_transport_common.c | 31 ++++++++++++++++++++++---
+> 1 file changed, 28 insertions(+), 3 deletions(-)
 >
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index e95df847176b..6053d8341091 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -100,7 +100,9 @@ virtio_transport_send_pkt_work(struct work_struct *work)
-> 	vq = vsock->vqs[VSOCK_VQ_TX];
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 5819a9cd4515..0de562c1dc4b 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -106,6 +106,27 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
+> 	return NULL;
+> }
 >
-> 	for (;;) {
->-		struct scatterlist hdr, buf, *sgs[2];
->+		/* +1 is for packet header. */
->+		struct scatterlist *sgs[MAX_SKB_FRAGS + 1];
->+		struct scatterlist bufs[MAX_SKB_FRAGS + 1];
-> 		int ret, in_sg = 0, out_sg = 0;
-> 		struct sk_buff *skb;
-> 		bool reply;
->@@ -111,12 +113,35 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+>+static void virtio_transport_copy_nonlinear_skb(struct sk_buff *skb,
+
+`const struct sk_buff *skb` should be better also to understand that
+the function copy data from *skb to *dst.
+
+>+						void *dst,
+>+						size_t len)
+>+{
+>+	struct iov_iter iov_iter = { 0 };
+>+	struct kvec kvec;
+>+	size_t to_copy;
+>+
+>+	kvec.iov_base = dst;
+>+	kvec.iov_len = len;
+>+
+>+	iov_iter.iter_type = ITER_KVEC;
+>+	iov_iter.kvec = &kvec;
+>+	iov_iter.nr_segs = 1;
+>+
+>+	to_copy = min_t(size_t, len, skb->len);
+>+
+>+	skb_copy_datagram_iter(skb, VIRTIO_VSOCK_SKB_CB(skb)->frag_off,
+>+			       &iov_iter, to_copy);
+>+}
+>+
+> /* Packet capture */
+> static struct sk_buff *virtio_transport_build_skb(void *opaque)
+> {
+>@@ -114,7 +135,6 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+> 	struct af_vsockmon_hdr *hdr;
+> 	struct sk_buff *skb;
+> 	size_t payload_len;
+>-	void *payload_buf;
 >
-> 		virtio_transport_deliver_tap_pkt(skb);
-> 		reply = virtio_vsock_skb_reply(skb);
->+		sg_init_one(&bufs[0], virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)));
->+		sgs[out_sg++] = &bufs[0];
-
-Can we use out_sg also to index bufs (here and in the rest of the code)?
-
-E.g.
-
-		sg_init_one(&bufs[out_sg], ...)
-		sgs[out_sg] = &bufs[out_sg];
-		++out_sg;
-
-		...
-			if (skb->len > 0) {
-				sg_init_one(&bufs[out_sg], skb->data, skb->len);
-				sgs[out_sg] = &bufs[out_sg];
-				++out_sg;
-			}
-
-		etc...
-
+> 	/* A packet could be split to fit the RX buffer, so we can retrieve
+> 	 * the payload length from the header and the buffer pointer taking
+>@@ -122,7 +142,6 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+> 	 */
+> 	pkt_hdr = virtio_vsock_hdr(pkt);
+> 	payload_len = pkt->len;
+>-	payload_buf = pkt->data;
+>
+> 	skb = alloc_skb(sizeof(*hdr) + sizeof(*pkt_hdr) + payload_len,
+> 			GFP_ATOMIC);
+>@@ -165,7 +184,13 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+> 	skb_put_data(skb, pkt_hdr, sizeof(*pkt_hdr));
+>
+> 	if (payload_len) {
+>-		skb_put_data(skb, payload_buf, payload_len);
+>+		if (skb_is_nonlinear(pkt)) {
+>+			void *data = skb_put(skb, payload_len);
 >+
-
-For readability, I would move the smaller branch above:
-
-		if (!skb_is_nonlinear(skb)) {
-			// small block
-			...
-		} else {
-			// big block
-			...
-		}
-
->+		if (skb_is_nonlinear(skb)) {
->+			struct skb_shared_info *si;
->+			int i;
->+
->+			si = skb_shinfo(skb);
->+
->+			for (i = 0; i < si->nr_frags; i++) {
->+				skb_frag_t *skb_frag = &si->frags[i];
->+				void *va = page_to_virt(skb_frag->bv_page);
->+
->+				/* We will use 'page_to_virt()' for userspace page here,
->+				 * because virtio layer will call 'virt_to_phys()' later
->+				 * to fill buffer descriptor. We don't touch memory at
->+				 * "virtual" address of this page.
->+				 */
->+				sg_init_one(&bufs[i + 1],
->+					    va + skb_frag->bv_offset,
->+					    skb_frag->bv_len);
->+				sgs[out_sg++] = &bufs[i + 1];
->+			}
+>+			virtio_transport_copy_nonlinear_skb(pkt, data, 
+>payload_len);
 >+		} else {
->+			if (skb->len > 0) {
-
-Should we do the same check (skb->len > 0) for nonlinear skb as well?
-Or do the nonlinear ones necessarily have len > 0?
-
->+				sg_init_one(&bufs[1], skb->data, skb->len);
->+				sgs[out_sg++] = &bufs[1];
->+			}
+>+			skb_put_data(skb, pkt->data, payload_len);
+>+		}
+> 	}
 >
-    ^
-Blank line that we can remove.
-
-Stefano
-
->-		sg_init_one(&hdr, virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)));
->-		sgs[out_sg++] = &hdr;
->-		if (skb->len > 0) {
->-			sg_init_one(&buf, skb->data, skb->len);
->-			sgs[out_sg++] = &buf;
-> 		}
->
-> 		ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
+> 	return skb;
 >-- 
 >2.25.1
 >
