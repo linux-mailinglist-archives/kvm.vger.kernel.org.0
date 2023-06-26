@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EFBC73D77D
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 08:03:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E759C73D7AB
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 08:15:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229586AbjFZGD5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 02:03:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35370 "EHLO
+        id S229653AbjFZGPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 02:15:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229454AbjFZGD4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 02:03:56 -0400
-Received: from out-13.mta1.migadu.com (out-13.mta1.migadu.com [95.215.58.13])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45B42E43
-        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 23:03:55 -0700 (PDT)
-Date:   Mon, 26 Jun 2023 08:03:52 +0200
+        with ESMTP id S229639AbjFZGPl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 02:15:41 -0400
+Received: from out-7.mta0.migadu.com (out-7.mta0.migadu.com [IPv6:2001:41d0:1004:224b::7])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C991EE
+        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 23:15:36 -0700 (PDT)
+Date:   Mon, 26 Jun 2023 08:15:32 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1687759433;
+        t=1687760133;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=8yAaHpgjJ540eL7EbnjdHAnG61C7smgo4IQybrL2Pn8=;
-        b=E+VhC5qztSMMn0PRXFNskOEGEd2rTd0rVFxz5JgWOU2SxYz7JWfAEsCSjt3ImLKaC2wtRx
-        XroLvTWhW5q9DYshYgWB0KTr82LC1SmQJueQvQvxodAIFUYlEfh3RRKOZ5P9jgA69cHiYS
-        NKxaE76rZbmRfrkfOAe0KIeGuGE4WcU=
+        bh=fNF07VoGo26+xilKqlR9Lg2Z/PCRyjJsqNC3ggaqlDE=;
+        b=B0LqQENq/ffVQH4/QI+7xzw0SQlH/bxiYYusDkLFDS9Zt7F1rkLB4oCsA/IM/uA0YizPdt
+        wHJM6UUUXttNsIp5lPgYhFIirWyKorxMgbVjmDldrNXghZ8eaHN7ojeHt3+nauASYxVajw
+        6fnb8E3UbW8sGTj1A2LrNgqUvSnBefQ=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Andrew Jones <andrew.jones@linux.dev>
 To:     Nadav Amit <nadav.amit@gmail.com>
@@ -31,15 +31,15 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         Nikos Nikoleris <nikos.nikoleris@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Nadav Amit <namit@vmware.com>
-Subject: Re: [kvm-unit-tests PATCH v2 2/6] lib/stack: print base addresses on
- efi
-Message-ID: <20230626-96c5e2101071fcb6f3ddc550@orel>
+Subject: Re: [kvm-unit-tests PATCH v2 1/6] efi: keep efi debug information in
+ a separate file
+Message-ID: <20230626-9f6f98244a9ea949a48db91d@orel>
 References: <20230625230716.2922-1-namit@vmware.com>
- <20230625230716.2922-3-namit@vmware.com>
+ <20230625230716.2922-2-namit@vmware.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230625230716.2922-3-namit@vmware.com>
+In-Reply-To: <20230625230716.2922-2-namit@vmware.com>
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
@@ -50,82 +50,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 25, 2023 at 11:07:12PM +0000, Nadav Amit wrote:
+On Sun, Jun 25, 2023 at 11:07:11PM +0000, Nadav Amit wrote:
 > From: Nadav Amit <namit@vmware.com>
 > 
-> Making sense from dumped stacks when running EFI tests is very hard due
-> to the relocation. Fix it by adjusting the address back to the original
-> address.
-> 
-> Introduce CONFIG_RELOC, which would be set on arm64 and on EFI configs.
+> Debugging tests that run on EFI is hard because the debug information is
+> not included in the EFI file. Dump it into a separeate .debug file to
+> allow the use of gdb or pretty_print_stacks script.
+
+We're still missing the run_tests.sh change needed for
+pretty_print_stacks, but I can post that myself.
+
+Thanks,
+drew
+
 > 
 > Signed-off-by: Nadav Amit <namit@vmware.com>
 > 
 > ---
 > 
-> v1->v2: Introduce CONFIG_RELOC to support ARM64 [Andrew]
+> v1->v2:
+> * Making clean should remove .debug [Andrew]
+> * x86 EFI support [Andrew]
 > ---
->  configure   |  3 +++
->  lib/stack.c | 31 +++++++++++++++++++++++++++++--
->  2 files changed, 32 insertions(+), 2 deletions(-)
+>  arm/Makefile.common | 5 ++++-
+>  x86/Makefile.common | 5 ++++-
+>  2 files changed, 8 insertions(+), 2 deletions(-)
 > 
-> diff --git a/configure b/configure
-> index b665f7d..8a3c8fe 100755
-> --- a/configure
-> +++ b/configure
-> @@ -416,6 +416,9 @@ EOF
->  if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
->      echo "TARGET=$target" >> config.mak
->  fi
-> +if [ "$efi" = "y" ] || [ "$arch" = "arm64" ]; then
-> +    echo "CONFIG_RELOC=y" >> config.mak
-
-This won't work, because, unlike CONFIG_EFI, nothing is defining
-CONFIG_RELOC in the build. We need CONFIG_RELOC in lib/config.h
-or to append -DCONFIG_RELOC to CFLAGS in a makefile when some
-config.mak variable is set. I think my preference would be
-something like
-
-diff --git a/Makefile b/Makefile
-index 307bc291844a..ae79059e7e6f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -40,7 +40,7 @@ OBJDIRS += $(LIBFDT_objdir)
-
- # EFI App
- ifeq ($(CONFIG_EFI),y)
--EFI_CFLAGS := -DCONFIG_EFI
-+EFI_CFLAGS := -DCONFIG_EFI -DCONFIG_RELOC
- # The following CFLAGS and LDFLAGS come from:
- #   - GNU-EFI/Makefile.defaults
- #   - GNU-EFI/apps/Makefile
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index 60385e2d2b2b..960880f1c09f 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -12,6 +12,7 @@ CFLAGS += -mstrict-align
-
- mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
- CFLAGS += $(mno_outline_atomics)
-+CFLAGS += -DCONFIG_RELOC
-
- define arch_elf_check =
-        $(if $(shell ! $(READELF) -rW $(1) >&/dev/null && echo "nok"),
-diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
-index 8ce00340b6be..c2e976e41f20 100644
---- a/powerpc/Makefile.common
-+++ b/powerpc/Makefile.common
-@@ -24,6 +24,7 @@ CFLAGS += -ffreestanding
- CFLAGS += -O2 -msoft-float -mno-altivec $(mabi_no_altivec)
- CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib
- CFLAGS += -Wa,-mregnames
-+CFLAGS += -DCONFIG_RELOC
-
- # We want to keep intermediate files
- .PRECIOUS: %.o
-
-
-(I also threw in ppc64 since it also relocates.)
-
-Thanks,
-drew
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index d60cf8c..9b45a8f 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -78,6 +78,9 @@ ifeq ($(CONFIG_EFI),y)
+>  
+>  %.efi: %.so
+>  	$(call arch_elf_check, $^)
+> +	$(OBJCOPY) --only-keep-debug $^ $@.debug
+> +	$(OBJCOPY) --strip-debug $^
+> +	$(OBJCOPY) --add-gnu-debuglink=$@.debug $^
+>  	$(OBJCOPY) \
+>  		-j .text -j .sdata -j .data -j .dynamic -j .dynsym \
+>  		-j .rel -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
+> @@ -103,7 +106,7 @@ $(libeabi): $(eabiobjs)
+>  	$(AR) rcs $@ $^
+>  
+>  arm_clean: asm_offsets_clean
+> -	$(RM) $(TEST_DIR)/*.{o,flat,elf,so,efi} $(libeabi) $(eabiobjs) \
+> +	$(RM) $(TEST_DIR)/*.{o,flat,elf,so,efi,debug} $(libeabi) $(eabiobjs) \
+>  	      $(TEST_DIR)/.*.d $(TEST_DIR)/efi/.*.d lib/arm/.*.d
+>  
+>  generated-files = $(asm-offsets)
+> diff --git a/x86/Makefile.common b/x86/Makefile.common
+> index 9f2bc93..c42c3e4 100644
+> --- a/x86/Makefile.common
+> +++ b/x86/Makefile.common
+> @@ -54,6 +54,9 @@ ifeq ($(CONFIG_EFI),y)
+>  	@chmod a-x $@
+>  
+>  %.efi: %.so
+> +	$(OBJCOPY) --only-keep-debug $^ $@.debug
+> +	$(OBJCOPY) --strip-debug $^
+> +	$(OBJCOPY) --add-gnu-debuglink=$@.debug $^
+>  	$(OBJCOPY) \
+>  		-j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel \
+>  		-j .rela -j .reloc -S --target=$(FORMAT) $< $@
+> @@ -124,4 +127,4 @@ arch_clean:
+>  	$(RM) $(TEST_DIR)/*.o $(TEST_DIR)/*.flat $(TEST_DIR)/*.elf \
+>  	$(TEST_DIR)/.*.d lib/x86/.*.d \
+>  	$(TEST_DIR)/efi/*.o $(TEST_DIR)/efi/.*.d \
+> -	$(TEST_DIR)/*.so $(TEST_DIR)/*.efi
+> +	$(TEST_DIR)/*.so $(TEST_DIR)/*.efi $(TEST_DIR)/*.debug
+> -- 
+> 2.34.1
+> 
