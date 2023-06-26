@@ -2,216 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AC8773E0BE
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 15:35:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E1D473E0CA
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 15:37:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230152AbjFZNfc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 09:35:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42002 "EHLO
+        id S229788AbjFZNhF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 09:37:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230013AbjFZNf2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 09:35:28 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C02441B7;
-        Mon, 26 Jun 2023 06:35:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687786523; x=1719322523;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=4DH85UHNS/l/RAF9dlScf8SC7+IDSTRC/TPMt6oTZtY=;
-  b=bWOyElsbCCIdXvqk1IayTC7eISKWQW6B3PVB2n2aVE0wB5ENzewKAt/7
-   fnMbhozbJHn9nNJ/FLt4eLT3D5X2/tE4S1Yn4k1eCABc+mNBjohtkxlZY
-   rXO3NDNnCdO9g70RsTmYkQ/hWl8H5lXudpibxHbqR50Wdlw9HPBBVt7x7
-   qmhv/ufrGzp5NU90usADXW9wYApBQsoOLysns6N20Iwxgl/2UWfX21h6i
-   d7J76QBnEzDy2AQAuPcNIGuHfuTG2ZXyWneIUm1DDj2xZ61WYb3xL0zpi
-   8pvnNPwzBWBiUI5jRFZD2Eqx3aZSaAmmI2/kKBzkW7DiMFGY2VSl81qYx
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="391577895"
-X-IronPort-AV: E=Sophos;i="6.01,159,1684825200"; 
-   d="scan'208";a="391577895"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 06:35:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="806048842"
-X-IronPort-AV: E=Sophos;i="6.01,159,1684825200"; 
-   d="scan'208";a="806048842"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by FMSMGA003.fm.intel.com with ESMTP; 26 Jun 2023 06:35:20 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 26 Jun 2023 06:35:19 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 26 Jun 2023 06:35:19 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 26 Jun 2023 06:35:19 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.170)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Mon, 26 Jun 2023 06:35:18 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ihvj4y6gy9cO2/zoWpGvWg5TvSECTRlNiP8BrJjxTH78mF/hSMVeplblrpt2kby3RNJbp2FqNemEO1jG9p9WodeFP+JVg/Gn40pobrJCu3bNGKFgVmYcPwy4nUf8zyi9WR1W26FeVUmpA6sbyO3VWh1mn2YpgfmQeSf63RlRfm3U5Gx7Ftq3nAdwFlp5Bju3gh2Gq4Z1lWySrYuJOeJTFy99jLw9UcSlAraf/E7mpxMHdG17DN5r7O+V9fIo7FRwfzniZLTDJYUXDDjjj4/0HnVnxf2QoKl9CYsbrI9w9W/OKaE8CuGe5vyCIzunKmONKF0hKLz/l94VvZ0LHs22PA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nhdiud/tZp8owJJQ5G8JSNnC4OoBUBDbrilrT0oQUFY=;
- b=mEVTmNcvzImy8xlP2Jc+7cVCKJ21DWUiKKN6Qece7GBXA2kg47VTw4u2P5vcrSvVfW4Pq/v/5kHPqrW7ukqXSrx6XIze9DQerlT5I/0JcG8xXrLV5fCTBBGFZ4VvdanYNYPYxeKaGAzu8i73LaThNvcW0u2MjhJ/nEOpiGYPI4IHMf1AMjp9UqFNCj3gbeHSnsnIo0bUrzxqub/gx04BWuP4eAeyppsE+hfII/3GSHe7hqbQTvDslVEQBxcK58A5UuHk+2uG90YmjkqQDg1YSBXvQY5Ck1GoSIlmnIxixD05VdAIWZyOq4ejrjRGeErDcmG7SZcTy1EhM77P8GMNow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by SA2PR11MB4811.namprd11.prod.outlook.com (2603:10b6:806:11d::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Mon, 26 Jun
- 2023 13:35:16 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::e7db:878:dfab:826d]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::e7db:878:dfab:826d%3]) with mapi id 15.20.6521.023; Mon, 26 Jun 2023
- 13:35:16 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Hao, Xudong" <xudong.hao@intel.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "Xu, Terrence" <terrence.xu@intel.com>,
-        "Jiang, Yanting" <yanting.jiang@intel.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "clegoate@redhat.com" <clegoate@redhat.com>
-Subject: RE: [PATCH v12 18/24] vfio: Add VFIO_DEVICE_BIND_IOMMUFD
-Thread-Topic: [PATCH v12 18/24] vfio: Add VFIO_DEVICE_BIND_IOMMUFD
-Thread-Index: AQHZlUw0PINbjPidUkeXtdGCTAzTl6+YsS6AgAQ157CAAEl6gIAACkuw
-Date:   Mon, 26 Jun 2023 13:35:16 +0000
-Message-ID: <DS0PR11MB75291F4581566C7B78DC110CC326A@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230602121653.80017-1-yi.l.liu@intel.com>
- <20230602121653.80017-19-yi.l.liu@intel.com> <ZJXFEbmY7BOW6QIe@nvidia.com>
- <DS0PR11MB752904E31251E05619A442B9C326A@DS0PR11MB7529.namprd11.prod.outlook.com>
- <ZJmK6ensADJS/kms@nvidia.com>
-In-Reply-To: <ZJmK6ensADJS/kms@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|SA2PR11MB4811:EE_
-x-ms-office365-filtering-correlation-id: f8d20670-7112-41ae-d185-08db764a2d99
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 4cTlNoMXOdcuB4omhQ4SYWWjFbi8DBERw+UI5173o+fJ6gOX4UAFEvzIJJnUCmEftJOnjGLbZksI1oO8n+p+kIl6OcqJi9pt5pt9KIkYU5y/47AQnmbz6KEd35V42AW6o/C3dM6477C6WRB5KXVCwxig+UuGB8x1z84/30pJeDV4TovSk3MRysbzVC2jSXeEwaCopf4MqOa6/c+Gi1LI4RE8sGihq/Zlc3QIxuiMLTZVoQidJ/qP28oUp4AGt0VntFwMyiqi7OP549BpBE/HD1M6L6Kr4mrtRm79qOmoNkO8OLx7VJ44FfXNTcUZ1RpdLvdXLlF93CJVrFSJ/wbFOs2IJD4Ob8m8X1yeyv3LridICJLdB1tH9MKr0xSNaZTT4z0Coij1NUFJ+60tJv3T/hWO5zJ4bi2ucCTMuYzf2KQdMkcVN729N7Z+IYlitFSXyOVWcKSI2Y0IP+UH8f4SQ1Kmh5Of1ZORFCZw/rZTGF0GJ61HmEzjoR7TW/2j6OqkK8+41fGAexvJSvjniIeQoCb6hCxmcehw2mxQ8NRDUGR4P+NS/IpbONl5brkbj6q3PI9R0d4sQdvW7hEZUsBI+wfqz3uWVOlHL2LJZzlyR5Q=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(396003)(376002)(136003)(366004)(39860400002)(451199021)(478600001)(54906003)(7696005)(71200400001)(83380400001)(26005)(186003)(9686003)(6506007)(66446008)(2906002)(5660300002)(7416002)(52536014)(33656002)(38100700002)(122000001)(4326008)(66946007)(55016003)(82960400001)(76116006)(316002)(86362001)(8936002)(8676002)(41300700001)(6916009)(38070700005)(66556008)(64756008)(66476007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?XF7jJ5/FqS4q2OkcQBohv4pxcXonat6tEo88d/sXFKJa4f4HeY3oQvJdREb6?=
- =?us-ascii?Q?Fa+gFrrnKN+NgzlPa9rixuUkaYvuVWWoi5qoBJd1v8qZFAn4CApp7V2S6Pcp?=
- =?us-ascii?Q?+sgeHVloehMp3dS2lrx/5+6hDYWWOThkvejcHt4ONTXetfBMGXlag0Rfc0vP?=
- =?us-ascii?Q?zdn+AlY8/+CR87cOt9DyB55tZAt0JR8U43i4wKgGpjfLDOHoi7BmfdcbFnEW?=
- =?us-ascii?Q?n8ezeIZ6OGhl4/CcKquBn787nQ9s6etnQQOb0Ozv0GgS5EM7MgLm92x00GsX?=
- =?us-ascii?Q?aFiGzH7DNzmBMaQaXq5s5s8WoxAxJaWN/lYEnBRmZoUti/uvPpUsriUjQhJF?=
- =?us-ascii?Q?Zkg4AbwROOcjIL0mFOQeUXqh4yUscknF856p/adC7E+2dvs0aHmJzMaDXDhZ?=
- =?us-ascii?Q?9s3IWiK2aG1S2xFCjTcz9NJfjH/kNG/LXtIJPESqFclxAox7i8efiDIJ0Xbj?=
- =?us-ascii?Q?hlH0JGZbnAXzycv+zwQzuNv7phmUEaz1i+yWxsxWcfThlLjKh3JBGVB8Wyjo?=
- =?us-ascii?Q?bBYbs6gFwYkaDuWbLnHNAOl0DyMcWL3IHpudWdoAavEnanIY34W22lxa6GSS?=
- =?us-ascii?Q?qwpDdjTcG5p9JnZzIfKMVlovthhPjXe8HAI4oeS0DJG7g9n4ms0Gb7oNkmNu?=
- =?us-ascii?Q?EZ20q8nwSU/Go90aaWF5GULERt80nHC3YZBWMmZcLhjRROzxVay4Mz4eQulS?=
- =?us-ascii?Q?RnAVCO4MgGcgJVD/pm+jwfLIT24F86jJRPPYuqmPBQAfe0b8I3G0xLA3vEjO?=
- =?us-ascii?Q?LYbK/UoYu/nQ+WIUMjFLETpHn7bXPOL6VQIPzu8THJUfhH97Qo29B5dJo07c?=
- =?us-ascii?Q?PYRY/3nzmZCH5bvt4t98ZmQ6aw2wTGILI4mIpPGbmz2JzZcG59+ykvTAZtKq?=
- =?us-ascii?Q?e0hdLz5OBX9w5aOyeuI5JGDDbWc9JiRkYhaW+oPNkJtG6SR7uSsI+AO+Wj5G?=
- =?us-ascii?Q?0pfeXzJUMFrUtHBJoYV5J8WsX7+mG3a4Pz8ZmAxq+Uk5a/OPjstIeWX/9+In?=
- =?us-ascii?Q?3dif0WROLEruwvq7HLgl46iFiQg9YoRNs3xG4UpsnAEqNqiGxZM2Oc4veudv?=
- =?us-ascii?Q?e7IXpNfM6BNk2rfNK7746W6w8sGoOe7Gn0KxBXnEYEtmPpudXv2y+z2warNs?=
- =?us-ascii?Q?jggqaKJCL2tMPFR/8jt5PMrMhMY32EuUMAEKNGQQrzh5QeVDe+aKowU6GZ1x?=
- =?us-ascii?Q?7TUIgyehbilSA3bwNSkWd3N7iGVU2PeLp11doJek4P6c4NA3CGamCx/bPqEr?=
- =?us-ascii?Q?oYdE2Biv36VvtRE++hLxz8pcYq5QC2y544o+Lpz9dCdRjq8BwQf+XMQXR5Dt?=
- =?us-ascii?Q?rwumEvh3dWFciFD5uiTptPCnN/PZMAuZ4bO1lE41BjhA//PgHu+JyAricc4k?=
- =?us-ascii?Q?qZUWSZFke7mJ6a28p1OTXzAXU3sN4Qt4SD8RSrrUeX5AFOVHsnnWyrbTWRls?=
- =?us-ascii?Q?bPVl4fQKKL+UB9f70dZnu21Y4KrLDOZ0BOqYlwgHhwiwkQdXLD8qKFcK1HD9?=
- =?us-ascii?Q?iLWZZHipd9IqclAAwF9h6B+sl8ZRI/5OQ0N5w1KN9VZtaGsOyj0V5oTK2zW6?=
- =?us-ascii?Q?K44l8svJszKO9ZTcyAz8IxA4CTaGjocDq1qxfkTG?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229578AbjFZNhE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 09:37:04 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07532B1
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 06:37:02 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35QDavec024219;
+        Mon, 26 Jun 2023 13:36:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=O5kLnr0eD5Q/QY6/vgqV22a9kXV4PJ8qXBRz5fXzKUY=;
+ b=JIgTSxHp+8QWEXajFJ/DGd9Cvtomk/009hzCrducFW8sLwRNC75J9cWQuHqe48aLcVBU
+ qv3L/Hg/88Ll5kacqje4tHjKejcraDfdGTf5F4iGeYn9F69qYScVNPIZvh36H/yYJcuj
+ HOquU1bwhXvp1I9YRh/todVzwUcqxl+G9UVQQJBKn+l4cWrJk5B/Tm0mPggnWiWUBeJL
+ IMJO2j1sspzUdloDixys7XxGmYTfN8BuwzoaxmEMMHYlesdyvL7lSxjt6wb0PvNmHgr6
+ bRp7dWrjQJDd+QPLNbNymw5J+2REqbr3fpkfmkexRooKTt9fOf904SiHmgJOoMvKkYSS rw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rfbgagcbw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 26 Jun 2023 13:36:57 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35QDUkVK014598;
+        Mon, 26 Jun 2023 13:36:56 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rfbgagcb4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 26 Jun 2023 13:36:56 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35Q3kbq9032532;
+        Mon, 26 Jun 2023 13:36:54 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3rdqre16wg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 26 Jun 2023 13:36:54 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35QDaodi18874982
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 26 Jun 2023 13:36:51 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DD59620043;
+        Mon, 26 Jun 2023 13:36:50 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C9AE220040;
+        Mon, 26 Jun 2023 13:36:50 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Mon, 26 Jun 2023 13:36:50 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+        id 7305EE06FD; Mon, 26 Jun 2023 15:36:50 +0200 (CEST)
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>, kvm@vger.kernel.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Alexander Egorenkov <egorenar@linux.ibm.com>
+Subject: [PATCH] vfio/mdev: Move the compat_class initialization to module init
+Date:   Mon, 26 Jun 2023 15:36:42 +0200
+Message-Id: <20230626133642.2939168-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8d20670-7112-41ae-d185-08db764a2d99
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2023 13:35:16.7504
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: V1l2p7bcP7qpM3kgqUuWTDbvZPTPjN/SSoo6Qc0H5ZN4+7von36gpcYgmVst37hvwFoonOjzyWu7O5LQZ1Ha3g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4811
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 6nXtBz3a_xJgsfu78APZPqxk8qpl-tk_
+X-Proofpoint-ORIG-GUID: 8PCpXL0rSzemi5nQSv7_h_hTW_996C3a
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-26_09,2023-06-26_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ priorityscore=1501 impostorscore=0 mlxscore=0 phishscore=0 clxscore=1011
+ mlxlogscore=923 malwarescore=0 lowpriorityscore=0 spamscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2306260113
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Monday, June 26, 2023 8:56 PM
->=20
-> On Mon, Jun 26, 2023 at 08:34:26AM +0000, Liu, Yi L wrote:
-> > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Saturday, June 24, 2023 12:15 AM
-> >
-> > > >  }
-> > > >
-> > > > +static void vfio_device_get_kvm_safe(struct vfio_device_file *df)
-> > > > +{
-> > > > +	spin_lock(&df->kvm_ref_lock);
-> > > > +	if (df->kvm)
-> > > > +		_vfio_device_get_kvm_safe(df->device, df->kvm);
-> > > > +	spin_unlock(&df->kvm_ref_lock);
-> > > > +}
-> > >
-> > > I'm surprised symbol_get() can be called from a spinlock, but it sure
-> > > looks like it can..
-> > >
-> > > Also moving the if kvm is null test into _vfio_device_get_kvm_safe()
-> > > will save a few lines.
-> > >
-> > > Also shouldn't be called _vfio_device...
-> >
-> > Ah, any suggestion on the naming? How about vfio_device_get_kvm_safe_lo=
-cked()?
->=20
-> I thought you were using _df_ now for these functions?
->=20
+The pointer to mdev_bus_compat_class is statically defined at the top
+of mdev_core, and was originally (commit 7b96953bc640 ("vfio: Mediated
+device Core driver") serialized by the parent_list_lock. The blamed
+commit removed this mutex, leaving the pointer initialization
+unserialized. As a result, the creation of multiple MDEVs in parallel
+(such as during boot) can encounter errors during the creation of the
+sysfs entries, such as:
 
-I see. Your point is passing df to _vfio_device_get_kvm_safe(() and
-test the df->kvm within it.  Hence rename it to be _df_. I think group
-path should be ok with this change as well. Let me make it.
+  [    8.337509] sysfs: cannot create duplicate filename '/class/mdev_bus'
+  [    8.337514] vfio_ccw 0.0.01d8: MDEV: Registered
+  [    8.337516] CPU: 13 PID: 946 Comm: driverctl Not tainted 6.4.0-rc7 #20
+  [    8.337522] Hardware name: IBM 3906 M05 780 (LPAR)
+  [    8.337525] Call Trace:
+  [    8.337528]  [<0000000162b0145a>] dump_stack_lvl+0x62/0x80
+  [    8.337540]  [<00000001622aeb30>] sysfs_warn_dup+0x78/0x88
+  [    8.337549]  [<00000001622aeca6>] sysfs_create_dir_ns+0xe6/0xf8
+  [    8.337552]  [<0000000162b04504>] kobject_add_internal+0xf4/0x340
+  [    8.337557]  [<0000000162b04d48>] kobject_add+0x78/0xd0
+  [    8.337561]  [<0000000162b04e0a>] kobject_create_and_add+0x6a/0xb8
+  [    8.337565]  [<00000001627a110e>] class_compat_register+0x5e/0x90
+  [    8.337572]  [<000003ff7fd815da>] mdev_register_parent+0x102/0x130 [mdev]
+  [    8.337581]  [<000003ff7fdc7f2c>] vfio_ccw_sch_probe+0xe4/0x178 [vfio_ccw]
+  [    8.337588]  [<0000000162a7833c>] css_probe+0x44/0x80
+  [    8.337599]  [<000000016279f4da>] really_probe+0xd2/0x460
+  [    8.337603]  [<000000016279fa08>] driver_probe_device+0x40/0xf0
+  [    8.337606]  [<000000016279fb78>] __device_attach_driver+0xc0/0x140
+  [    8.337610]  [<000000016279cbe0>] bus_for_each_drv+0x90/0xd8
+  [    8.337618]  [<00000001627a00b0>] __device_attach+0x110/0x190
+  [    8.337621]  [<000000016279c7c8>] bus_rescan_devices_helper+0x60/0xb0
+  [    8.337626]  [<000000016279cd48>] drivers_probe_store+0x48/0x80
+  [    8.337632]  [<00000001622ac9b0>] kernfs_fop_write_iter+0x138/0x1f0
+  [    8.337635]  [<00000001621e5e14>] vfs_write+0x1ac/0x2f8
+  [    8.337645]  [<00000001621e61d8>] ksys_write+0x70/0x100
+  [    8.337650]  [<0000000162b2bdc4>] __do_syscall+0x1d4/0x200
+  [    8.337656]  [<0000000162b3c828>] system_call+0x70/0x98
+  [    8.337664] kobject: kobject_add_internal failed for mdev_bus with -EEXIST, don't try to register things with the same name in the same directory.
+  [    8.337668] kobject: kobject_create_and_add: kobject_add error: -17
+  [    8.337674] vfio_ccw: probe of 0.0.01d9 failed with error -12
+  [    8.342941] vfio_ccw_mdev aeb9ca91-10c6-42bc-a168-320023570aea: Adding to iommu group 2
 
-Regards,
-Yi Liu
+Move the initialization of the mdev_bus_compat_class pointer to the
+init path, to match the cleanup in module exit. This way the code
+in mdev_register_parent() can simply link the new parent to it,
+rather than determining whether initialization is required first.
+
+Fixes: 89345d5177aa ("vfio/mdev: embedd struct mdev_parent in the parent data structure")
+Reported-by: Alexander Egorenkov <egorenar@linux.ibm.com>
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
+---
+ drivers/vfio/mdev/mdev_core.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+index 58f91b3bd670..ed4737de4528 100644
+--- a/drivers/vfio/mdev/mdev_core.c
++++ b/drivers/vfio/mdev/mdev_core.c
+@@ -72,12 +72,6 @@ int mdev_register_parent(struct mdev_parent *parent, struct device *dev,
+ 	parent->nr_types = nr_types;
+ 	atomic_set(&parent->available_instances, mdev_driver->max_instances);
+ 
+-	if (!mdev_bus_compat_class) {
+-		mdev_bus_compat_class = class_compat_register("mdev_bus");
+-		if (!mdev_bus_compat_class)
+-			return -ENOMEM;
+-	}
+-
+ 	ret = parent_create_sysfs_files(parent);
+ 	if (ret)
+ 		return ret;
+@@ -251,13 +245,24 @@ int mdev_device_remove(struct mdev_device *mdev)
+ 
+ static int __init mdev_init(void)
+ {
+-	return bus_register(&mdev_bus_type);
++	int ret;
++
++	ret = bus_register(&mdev_bus_type);
++	if (ret)
++		return ret;
++
++	mdev_bus_compat_class = class_compat_register("mdev_bus");
++	if (!mdev_bus_compat_class) {
++		bus_unregister(&mdev_bus_type);
++		return -ENOMEM;
++	}
++
++	return 0;
+ }
+ 
+ static void __exit mdev_exit(void)
+ {
+-	if (mdev_bus_compat_class)
+-		class_compat_unregister(mdev_bus_compat_class);
++	class_compat_unregister(mdev_bus_compat_class);
+ 	bus_unregister(&mdev_bus_type);
+ }
+ 
+-- 
+2.39.2
+
