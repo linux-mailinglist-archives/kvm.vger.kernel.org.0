@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 173D473E1BD
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 16:15:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB6B073E1C0
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 16:15:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231315AbjFZOPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 10:15:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35222 "EHLO
+        id S231210AbjFZOPc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 10:15:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231372AbjFZOOz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 10:14:55 -0400
+        with ESMTP id S230274AbjFZOPI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 10:15:08 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25DF210C6;
-        Mon, 26 Jun 2023 07:14:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7AE41993;
+        Mon, 26 Jun 2023 07:14:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687788867; x=1719324867;
+  t=1687788879; x=1719324879;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Ixw5+FCRyQHe1x1K29AuSwyiCMpy80rpmMrG2obNERo=;
-  b=XRrLSCijnxsq4FI22RHIIAcZMIu+eYh26ZQO8Z4yAnfsq3T5HLRh6ylR
-   W6I0BUrjPo0zo3S0Gczkb45OWkNtQM9VgfJhNopyg5kQTrfW5Pk/HeerL
-   BHahJAWf7oC4SO/FJpBAzStzCP8MTFnmNMrKkR3+PQV4u5/8tffOyWlpS
-   ZNNaGIFoOMcVJxSQstmvzt2+ddr/6uvKbImUzZ/nF9wYc0xJSEj/4d1Zv
-   Ltk5f8hSf34b6S+MQ8yawnYhdKlihUrDBm7OTUu5jWT7qw3niv3ocRTlz
-   Q9PUIebiHbOXz8EYK4Vnj1+Xfs5u9UriakryLChJAVBjDFRJIR0EvhJ4H
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="346033732"
+  bh=tr7/JhLkJTmM0KxdS6UE+PrfI2lhwEOuCowE3zg/i+k=;
+  b=F6Ec4f4ASH6R8Ulv89jH3B3gxHOBCFbJr0jieWyn2gamWlxzTWDAo+CC
+   oKe6OGukWUN45q7kf3CnlFSqUvgbPh6nwANzo4S3ShfRCFE3ZPxKQbWqw
+   uO/9n9BO4KpYmJmLssSaWEqOw9Kj34mDkCBAaMNYVa5x2kwJH8d4W8b6q
+   gqOTmgRjagEp+88sxE17d55xar/gOFaYtVP1HU2XgWVNMKadyAyJhgYzc
+   ieg85MKLn5cox/76bZlSgtn8dut7fD5yDKpVuZT/JwteQCMdV3of8gMrz
+   wx1JGJcFKsUzBlgbldv1hlNZNWKu5APyNxCZhbKMZyeiUp29A+jb5KxD9
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="346033768"
 X-IronPort-AV: E=Sophos;i="6.01,159,1684825200"; 
-   d="scan'208";a="346033732"
+   d="scan'208";a="346033768"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 07:14:26 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 07:14:33 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="890292329"
+X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="890292340"
 X-IronPort-AV: E=Sophos;i="6.01,159,1684825200"; 
-   d="scan'208";a="890292329"
+   d="scan'208";a="890292340"
 Received: from smithau-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.213.179.223])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 07:14:20 -0700
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 07:14:26 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, x86@kernel.org, dave.hansen@intel.com,
@@ -51,9 +51,9 @@ Cc:     linux-mm@kvack.org, x86@kernel.org, dave.hansen@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
         bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com,
         kai.huang@intel.com
-Subject: [PATCH v12 08/22] x86/virt/tdx: Get information about TDX module and TDX-capable memory
-Date:   Tue, 27 Jun 2023 02:12:38 +1200
-Message-Id: <a33f372df345f6232b55e26d498ea67d4adc18f0.1687784645.git.kai.huang@intel.com>
+Subject: [PATCH v12 09/22] x86/virt/tdx: Use all system memory when initializing TDX module as TDX memory
+Date:   Tue, 27 Jun 2023 02:12:39 +1200
+Message-Id: <999b47f30fbe2535c37a5e8d602c6c27ac6212dd.1687784645.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <cover.1687784645.git.kai.huang@intel.com>
 References: <cover.1687784645.git.kai.huang@intel.com>
@@ -69,293 +69,351 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Start to transit out the "multi-steps" to initialize the TDX module.
+As a step of initializing the TDX module, the kernel needs to tell the
+TDX module which memory regions can be used by the TDX module as TDX
+guest memory.
 
-TDX provides increased levels of memory confidentiality and integrity.
-This requires special hardware support for features like memory
-encryption and storage of memory integrity checksums.  Not all memory
-satisfies these requirements.
+TDX reports a list of "Convertible Memory Region" (CMR) to tell the
+kernel which memory is TDX compatible.  The kernel needs to build a list
+of memory regions (out of CMRs) as "TDX-usable" memory and pass them to
+the TDX module.  Once this is done, those "TDX-usable" memory regions
+are fixed during module's lifetime.
 
-As a result, TDX introduced the concept of a "Convertible Memory Region"
-(CMR).  During boot, the firmware builds a list of all of the memory
-ranges which can provide the TDX security guarantees.
+To keep things simple, assume that all TDX-protected memory will come
+from the page allocator.  Make sure all pages in the page allocator
+*are* TDX-usable memory.
 
-CMRs tell the kernel which memory is TDX compatible.  The kernel takes
-CMRs (plus a little more metadata) and constructs "TD Memory Regions"
-(TDMRs).  TDMRs let the kernel grant TDX protections to some or all of
-the CMR areas.
+As TDX-usable memory is a fixed configuration, take a snapshot of the
+memory configuration from memblocks at the time of module initialization
+(memblocks are modified on memory hotplug).  This snapshot is used to
+enable TDX support for *this* memory configuration only.  Use a memory
+hotplug notifier to ensure that no other RAM can be added outside of
+this configuration.
 
-The TDX module also reports necessary information to let the kernel
-build TDMRs and run TDX guests in structure 'tdsysinfo_struct'.  The
-list of CMRs, along with the TDX module information, is available to
-the kernel by querying the TDX module.
+This approach requires all memblock memory regions at the time of module
+initialization to be TDX convertible memory to work, otherwise module
+initialization will fail in a later SEAMCALL when passing those regions
+to the module.  This approach works when all boot-time "system RAM" is
+TDX convertible memory, and no non-TDX-convertible memory is hot-added
+to the core-mm before module initialization.
 
-As a preparation to construct TDMRs, get the TDX module information and
-the list of CMRs.  Print out CMRs to help user to decode which memory
-regions are TDX convertible.
-
-The 'tdsysinfo_struct' is fairly large (1024 bytes) and contains a lot
-of info about the TDX module.  Fully define the entire structure, but
-only use the fields necessary to build the TDMRs and pr_info() some
-basics about the module.  The rest of the fields will get used by KVM.
+For instance, on the first generation of TDX machines, both CXL memory
+and NVDIMM are not TDX convertible memory.  Using kmem driver to hot-add
+any CXL memory or NVDIMM to the core-mm before module initialization
+will result in failure to initialize the module.  The SEAMCALL error
+code will be available in the dmesg to help user to understand the
+failure.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
+Reviewed-by: "Huang, Ying" <ying.huang@intel.com>
 Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
+Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
 
 v11 -> v12:
- - Changed to use dynamic allocation for TDSYSINFO_STRUCT and CMR array
-   (Kirill).
- - Keep SEAMCALL leaf macro definitions in order (Kirill)
- - Removed is_cmr_empty() but open code directly (David)
- - 'atribute' -> 'attribute' (David)
+ - Added tags from Dave/Kirill.
 
 v10 -> v11:
- - No change.
-
-v9 -> v10:
- - Added back "start to transit out..." as now per-cpu init has been
-   moved out from tdx_enable().
-
-v8 -> v9:
- - Removed "start to trransit out ..." part in changelog since this patch
-   is no longer the first step anymore.
- - Changed to declare 'tdsysinfo' and 'cmr_array' as local static, and
-   changed changelog accordingly (Dave).
- - Improved changelog to explain why to declare  'tdsysinfo_struct' in
-   full but only use a few members of them (Dave).
-
-v7 -> v8: (Dave)
- - Improved changelog to tell this is the first patch to transit out the
-   "multi-steps" init_tdx_module().
- - Removed all CMR check/trim code but to depend on later SEAMCALL.
- - Variable 'vertical alignment' in print TDX module information.
- - Added DECLARE_PADDED_STRUCT() for padded structure.
- - Made tdx_sysinfo and tdx_cmr_array[] to be function local variable
-   (and rename them accordingly), and added -Wframe-larger-than=4096 flag
-   to silence the build warning.
-
-v6 -> v7:
- - Simplified the check of CMRs due to the fact that TDX actually
-   verifies CMRs (that are passed by the BIOS) before enabling TDX.
- - Changed the function name from check_cmrs() -> trim_empty_cmrs().
- - Added CMR page aligned check so that later patch can just get the PFN
-   using ">> PAGE_SHIFT".
-
-v5 -> v6:
- - Added to also print TDX module's attribute (Isaku).
- - Removed all arguments in tdx_gete_sysinfo() to use static variables
-   of 'tdx_sysinfo' and 'tdx_cmr_array' directly as they are all used
-   directly in other functions in later patches.
  - Added Isaku's Reviewed-by.
 
-- v3 -> v5 (no feedback on v4):
- - Renamed sanitize_cmrs() to check_cmrs().
- - Removed unnecessary sanity check against tdx_sysinfo and tdx_cmr_array
-   actual size returned by TDH.SYS.INFO.
- - Changed -EFAULT to -EINVAL in couple places.
- - Added comments around tdx_sysinfo and tdx_cmr_array saying they are
-   used by TDH.SYS.INFO ABI.
- - Changed to pass 'tdx_sysinfo' and 'tdx_cmr_array' as function
-   arguments in tdx_get_sysinfo().
- - Changed to only print BIOS-CMR when check_cmrs() fails.
+v9 -> v10:
+ - Moved empty @tdx_memlist check out of is_tdx_memory() to make the
+   logic better.
+ - Added Ying's Reviewed-by.
+
+v8 -> v9:
+ - Replace "The initial support ..." with timeless sentence in both
+   changelog and comments(Dave).
+ - Fix run-on sentence in changelog, and senstence to explain why to
+   stash off memblock (Dave).
+ - Tried to improve why to choose this approach and how it work in
+   changelog based on Dave's suggestion.
+ - Many other comments enhancement (Dave).
+
+v7 -> v8:
+ - Trimed down changelog (Dave).
+ - Changed to use PHYS_PFN() and PFN_PHYS() throughout this series
+   (Ying).
+ - Moved memory hotplug handling from add_arch_memory() to
+   memory_notifier (Dan/David).
+ - Removed 'nid' from 'struct tdx_memblock' to later patch (Dave).
+ - {build|free}_tdx_memory() -> {build|}free_tdx_memlist() (Dave).
+ - Removed pfn_covered_by_cmr() check as no code to trim CMRs now.
+ - Improve the comment around first 1MB (Dave).
+ - Added a comment around reserve_real_mode() to point out TDX code
+   relies on first 1MB being reserved (Ying).
+ - Added comment to explain why the new online memory range cannot
+   cross multiple TDX memory blocks (Dave).
+ - Improved other comments (Dave).
 
 
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 79 ++++++++++++++++++++++++++++++++++++-
- arch/x86/virt/vmx/tdx/tdx.h | 60 ++++++++++++++++++++++++++++
- 2 files changed, 137 insertions(+), 2 deletions(-)
+ arch/x86/Kconfig            |   1 +
+ arch/x86/kernel/setup.c     |   2 +
+ arch/x86/virt/vmx/tdx/tdx.c | 161 +++++++++++++++++++++++++++++++++++-
+ arch/x86/virt/vmx/tdx/tdx.h |   6 ++
+ 4 files changed, 169 insertions(+), 1 deletion(-)
 
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index f0f3f1a2c8e0..2226d8a4c749 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1958,6 +1958,7 @@ config INTEL_TDX_HOST
+ 	depends on X86_64
+ 	depends on KVM_INTEL
+ 	depends on X86_X2APIC
++	select ARCH_KEEP_MEMBLOCK
+ 	help
+ 	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
+ 	  host and certain physical attacks.  This option enables necessary TDX
+diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
+index 16babff771bd..fd94f8186b9c 100644
+--- a/arch/x86/kernel/setup.c
++++ b/arch/x86/kernel/setup.c
+@@ -1159,6 +1159,8 @@ void __init setup_arch(char **cmdline_p)
+ 	 *
+ 	 * Moreover, on machines with SandyBridge graphics or in setups that use
+ 	 * crashkernel the entire 1M is reserved anyway.
++	 *
++	 * Note the host kernel TDX also requires the first 1MB being reserved.
+ 	 */
+ 	x86_platform.realmode_reserve();
+ 
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 29ca18f66d61..a2129cbe056e 100644
+index a2129cbe056e..127036f06752 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -20,6 +20,7 @@
+@@ -17,6 +17,13 @@
+ #include <linux/spinlock.h>
+ #include <linux/percpu-defs.h>
+ #include <linux/mutex.h>
++#include <linux/list.h>
++#include <linux/slab.h>
++#include <linux/memblock.h>
++#include <linux/memory.h>
++#include <linux/minmax.h>
++#include <linux/sizes.h>
++#include <linux/pfn.h>
  #include <asm/msr-index.h>
  #include <asm/msr.h>
  #include <asm/archrandom.h>
-+#include <asm/page.h>
- #include <asm/tdx.h>
- #include "tdx.h"
+@@ -35,6 +42,9 @@ static DEFINE_PER_CPU(bool, tdx_lp_initialized);
+ static enum tdx_module_status_t tdx_module_status;
+ static DEFINE_MUTEX(tdx_module_lock);
  
-@@ -159,12 +160,79 @@ int tdx_cpu_enable(void)
++/* All TDX-usable memory regions.  Protected by mem_hotplug_lock. */
++static LIST_HEAD(tdx_memlist);
++
+ /*
+  * Wrapper of __seamcall() to convert SEAMCALL leaf function error code
+  * to kernel error code.  @seamcall_ret and @out contain the SEAMCALL
+@@ -204,6 +214,79 @@ static int tdx_get_sysinfo(struct tdsysinfo_struct *sysinfo,
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(tdx_cpu_enable);
  
-+static void print_cmrs(struct cmr_info *cmr_array, int nr_cmrs)
++/*
++ * Add a memory region as a TDX memory block.  The caller must make sure
++ * all memory regions are added in address ascending order and don't
++ * overlap.
++ */
++static int add_tdx_memblock(struct list_head *tmb_list, unsigned long start_pfn,
++			    unsigned long end_pfn)
 +{
-+	int i;
++	struct tdx_memblock *tmb;
 +
-+	for (i = 0; i < nr_cmrs; i++) {
-+		struct cmr_info *cmr = &cmr_array[i];
++	tmb = kmalloc(sizeof(*tmb), GFP_KERNEL);
++	if (!tmb)
++		return -ENOMEM;
 +
-+		/*
-+		 * The array of CMRs reported via TDH.SYS.INFO can
-+		 * contain tail empty CMRs.  Don't print them.
-+		 */
-+		if (!cmr->size)
-+			break;
++	INIT_LIST_HEAD(&tmb->list);
++	tmb->start_pfn = start_pfn;
++	tmb->end_pfn = end_pfn;
 +
-+		pr_info("CMR: [0x%llx, 0x%llx)\n", cmr->base,
-+				cmr->base + cmr->size);
++	/* @tmb_list is protected by mem_hotplug_lock */
++	list_add_tail(&tmb->list, tmb_list);
++	return 0;
++}
++
++static void free_tdx_memlist(struct list_head *tmb_list)
++{
++	/* @tmb_list is protected by mem_hotplug_lock */
++	while (!list_empty(tmb_list)) {
++		struct tdx_memblock *tmb = list_first_entry(tmb_list,
++				struct tdx_memblock, list);
++
++		list_del(&tmb->list);
++		kfree(tmb);
 +	}
 +}
 +
-+static int tdx_get_sysinfo(struct tdsysinfo_struct *sysinfo,
-+			   struct cmr_info *cmr_array)
++/*
++ * Ensure that all memblock memory regions are convertible to TDX
++ * memory.  Once this has been established, stash the memblock
++ * ranges off in a secondary structure because memblock is modified
++ * in memory hotplug while TDX memory regions are fixed.
++ */
++static int build_tdx_memlist(struct list_head *tmb_list)
 +{
-+	struct tdx_module_output out;
-+	u64 sysinfo_pa, cmr_array_pa;
-+	int ret;
++	unsigned long start_pfn, end_pfn;
++	int i, ret;
 +
-+	sysinfo_pa = __pa(sysinfo);
-+	cmr_array_pa = __pa(cmr_array);
-+	ret = seamcall(TDH_SYS_INFO, sysinfo_pa, TDSYSINFO_STRUCT_SIZE,
-+			cmr_array_pa, MAX_CMRS, NULL, &out);
-+	if (ret)
-+		return ret;
++	for_each_mem_pfn_range(i, MAX_NUMNODES, &start_pfn, &end_pfn, NULL) {
++		/*
++		 * The first 1MB is not reported as TDX convertible memory.
++		 * Although the first 1MB is always reserved and won't end up
++		 * to the page allocator, it is still in memblock's memory
++		 * regions.  Skip them manually to exclude them as TDX memory.
++		 */
++		start_pfn = max(start_pfn, PHYS_PFN(SZ_1M));
++		if (start_pfn >= end_pfn)
++			continue;
 +
-+	pr_info("TDX module: attributes 0x%x, vendor_id 0x%x, major_version %u, minor_version %u, build_date %u, build_num %u",
-+		sysinfo->attributes,	sysinfo->vendor_id,
-+		sysinfo->major_version, sysinfo->minor_version,
-+		sysinfo->build_date,	sysinfo->build_num);
-+
-+	/* R9 contains the actual entries written to the CMR array. */
-+	print_cmrs(cmr_array, out.r9);
++		/*
++		 * Add the memory regions as TDX memory.  The regions in
++		 * memblock has already guaranteed they are in address
++		 * ascending order and don't overlap.
++		 */
++		ret = add_tdx_memblock(tmb_list, start_pfn, end_pfn);
++		if (ret)
++			goto err;
++	}
 +
 +	return 0;
++err:
++	free_tdx_memlist(tmb_list);
++	return ret;
 +}
 +
  static int init_tdx_module(void)
  {
-+	struct tdsysinfo_struct *sysinfo;
-+	struct cmr_info *cmr_array;
-+	int ret;
-+
+ 	struct tdsysinfo_struct *sysinfo;
+@@ -230,10 +313,25 @@ static int init_tdx_module(void)
+ 	if (ret)
+ 		goto out;
+ 
 +	/*
-+	 * Get the TDSYSINFO_STRUCT and CMRs from the TDX module.
++	 * To keep things simple, assume that all TDX-protected memory
++	 * will come from the page allocator.  Make sure all pages in the
++	 * page allocator are TDX-usable memory.
 +	 *
-+	 * The buffers of the TDSYSINFO_STRUCT and the CMR array passed
-+	 * to the TDX module must be 1024-bytes and 512-bytes aligned
-+	 * respectively.  Allocate one page to accommodate them both and
-+	 * also meet those alignment requirements.
++	 * Build the list of "TDX-usable" memory regions which cover all
++	 * pages in the page allocator to guarantee that.  Do it while
++	 * holding mem_hotplug_lock read-lock as the memory hotplug code
++	 * path reads the @tdx_memlist to reject any new memory.
 +	 */
-+	sysinfo = (struct tdsysinfo_struct *)__get_free_page(GFP_KERNEL);
-+	if (!sysinfo)
-+		return -ENOMEM;
-+	cmr_array = (struct cmr_info *)((unsigned long)sysinfo + PAGE_SIZE / 2);
++	get_online_mems();
 +
-+	BUILD_BUG_ON(PAGE_SIZE / 2 < TDSYSINFO_STRUCT_SIZE);
-+	BUILD_BUG_ON(PAGE_SIZE / 2 < sizeof(struct cmr_info) * MAX_CMRS);
-+
-+	ret = tdx_get_sysinfo(sysinfo, cmr_array);
++	ret = build_tdx_memlist(&tdx_memlist);
 +	if (ret)
-+		goto out;
++		goto out_put_tdxmem;
 +
  	/*
  	 * TODO:
  	 *
--	 *  - Get TDX module information and TDX-capable memory regions.
- 	 *  - Build the list of TDX-usable memory regions.
+-	 *  - Build the list of TDX-usable memory regions.
  	 *  - Construct a list of "TD Memory Regions" (TDMRs) to cover
  	 *    all TDX-usable memory regions.
-@@ -174,7 +242,14 @@ static int init_tdx_module(void)
- 	 *
+ 	 *  - Configure the TDMRs and the global KeyID to the TDX module.
+@@ -243,6 +341,12 @@ static int init_tdx_module(void)
  	 *  Return error before all steps are done.
  	 */
--	return -EINVAL;
-+	ret = -EINVAL;
-+out:
+ 	ret = -EINVAL;
++out_put_tdxmem:
 +	/*
-+	 * For now both @sysinfo and @cmr_array are only used during
-+	 * module initialization, so always free them.
++	 * @tdx_memlist is written here and read at memory hotplug time.
++	 * Lock out memory hotplug code while building it.
 +	 */
-+	free_page((unsigned long)sysinfo);
-+	return ret;
++	put_online_mems();
+ out:
+ 	/*
+ 	 * For now both @sysinfo and @cmr_array are only used during
+@@ -339,6 +443,54 @@ static int __init record_keyid_partitioning(u32 *tdx_keyid_start,
+ 	return 0;
  }
  
- static int __tdx_enable(void)
++static bool is_tdx_memory(unsigned long start_pfn, unsigned long end_pfn)
++{
++	struct tdx_memblock *tmb;
++
++	/*
++	 * This check assumes that the start_pfn<->end_pfn range does not
++	 * cross multiple @tdx_memlist entries.  A single memory online
++	 * event across multiple memblocks (from which @tdx_memlist
++	 * entries are derived at the time of module initialization) is
++	 * not possible.  This is because memory offline/online is done
++	 * on granularity of 'struct memory_block', and the hotpluggable
++	 * memory region (one memblock) must be multiple of memory_block.
++	 */
++	list_for_each_entry(tmb, &tdx_memlist, list) {
++		if (start_pfn >= tmb->start_pfn && end_pfn <= tmb->end_pfn)
++			return true;
++	}
++	return false;
++}
++
++static int tdx_memory_notifier(struct notifier_block *nb, unsigned long action,
++			       void *v)
++{
++	struct memory_notify *mn = v;
++
++	if (action != MEM_GOING_ONLINE)
++		return NOTIFY_OK;
++
++	/*
++	 * Empty list means TDX isn't enabled.  Allow any memory
++	 * to go online.
++	 */
++	if (list_empty(&tdx_memlist))
++		return NOTIFY_OK;
++
++	/*
++	 * The TDX memory configuration is static and can not be
++	 * changed.  Reject onlining any memory which is outside of
++	 * the static configuration whether it supports TDX or not.
++	 */
++	return is_tdx_memory(mn->start_pfn, mn->start_pfn + mn->nr_pages) ?
++		NOTIFY_OK : NOTIFY_BAD;
++}
++
++static struct notifier_block tdx_memory_nb = {
++	.notifier_call = tdx_memory_notifier,
++};
++
+ static int __init tdx_init(void)
+ {
+ 	u32 tdx_keyid_start, nr_tdx_keyids;
+@@ -362,6 +514,13 @@ static int __init tdx_init(void)
+ 		return -ENODEV;
+ 	}
+ 
++	err = register_memory_notifier(&tdx_memory_nb);
++	if (err) {
++		pr_info("initialization failed: register_memory_notifier() failed (%d)\n",
++				err);
++		return -ENODEV;
++	}
++
+ 	/*
+ 	 * Just use the first TDX KeyID as the 'global KeyID' and
+ 	 * leave the rest for TDX guests.
 diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 9fb46033c852..8ab2d40971ea 100644
+index 8ab2d40971ea..37ee7c5dce1c 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.h
 +++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -3,6 +3,8 @@
- #define _X86_VIRT_TDX_H
+@@ -94,6 +94,12 @@ enum tdx_module_status_t {
+ 	TDX_MODULE_ERROR
+ };
  
- #include <linux/types.h>
-+#include <linux/stddef.h>
-+#include <linux/compiler_attributes.h>
- 
- /*
-  * This file contains both macros and data structures defined by the TDX
-@@ -19,9 +21,67 @@
- /*
-  * TDX module SEAMCALL leaf functions
-  */
-+#define TDH_SYS_INFO		32
- #define TDH_SYS_INIT		33
- #define TDH_SYS_LP_INIT		35
- 
-+struct cmr_info {
-+	u64	base;
-+	u64	size;
-+} __packed;
++struct tdx_memblock {
++	struct list_head list;
++	unsigned long start_pfn;
++	unsigned long end_pfn;
++};
 +
-+#define MAX_CMRS	32
-+
-+struct cpuid_config {
-+	u32	leaf;
-+	u32	sub_leaf;
-+	u32	eax;
-+	u32	ebx;
-+	u32	ecx;
-+	u32	edx;
-+} __packed;
-+
-+#define TDSYSINFO_STRUCT_SIZE		1024
-+
-+/*
-+ * The size of this structure itself is flexible.  The actual structure
-+ * passed to TDH.SYS.INFO must be padded to 1024 bytes and be 1204-bytes
-+ * aligned.
-+ */
-+struct tdsysinfo_struct {
-+	/* TDX-SEAM Module Info */
-+	u32	attributes;
-+	u32	vendor_id;
-+	u32	build_date;
-+	u16	build_num;
-+	u16	minor_version;
-+	u16	major_version;
-+	u8	reserved0[14];
-+	/* Memory Info */
-+	u16	max_tdmrs;
-+	u16	max_reserved_per_tdmr;
-+	u16	pamt_entry_size;
-+	u8	reserved1[10];
-+	/* Control Struct Info */
-+	u16	tdcs_base_size;
-+	u8	reserved2[2];
-+	u16	tdvps_base_size;
-+	u8	tdvps_xfam_dependent_size;
-+	u8	reserved3[9];
-+	/* TD Capabilities */
-+	u64	attributes_fixed0;
-+	u64	attributes_fixed1;
-+	u64	xfam_fixed0;
-+	u64	xfam_fixed1;
-+	u8	reserved4[32];
-+	u32	num_cpuid_config;
-+	/*
-+	 * The actual number of CPUID_CONFIG depends on above
-+	 * 'num_cpuid_config'.
-+	 */
-+	DECLARE_FLEX_ARRAY(struct cpuid_config, cpuid_configs);
-+} __packed;
-+
- /*
-  * Do not put any hardware-defined TDX structure representations below
-  * this comment!
+ struct tdx_module_output;
+ u64 __seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
+ 	       struct tdx_module_output *out);
 -- 
 2.40.1
 
