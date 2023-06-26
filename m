@@ -2,129 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A049D73ECF8
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 23:37:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC3C673ED04
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 23:44:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230002AbjFZVhp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 17:37:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35354 "EHLO
+        id S230087AbjFZVoz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 17:44:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbjFZVho (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 17:37:44 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48E7AC2
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 14:37:43 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-57325434999so52302317b3.1
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 14:37:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687815462; x=1690407462;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2hJTnGKaVBQkg0yz+eVOgG/0uK7zEDVVCQ+nLV5omt0=;
-        b=pztYkiPL+Pja+QCn3bFgtqogw6fqAMuWeFWbIIMS5Rj9GDe2aa/AXa6mU5VjTQuFNT
-         kGltwz4rKfXYPBP0V/suvXthJtqL23UOZ9I1kC2ChQ2UqCleP5jw6y4Zro6zDTTiKKiJ
-         baH1iafxFDqTYS3Pg3RFmhHq/zni5MwsfmOFJaABmwgj0cG2Odcapj4vEa3Ec5/hCI3k
-         IsjwRNGKD6lQsQ9yQzKrrpCUVjkcaeqjI4hPVx2/Pt/K5BHDt8YOq/N9PbyhCUnzpiOB
-         mrtwGyU06SekKaDzW4z+lXgjDl9On2xsIE2YrMuPyoask0r7Tbqw+HeDqGgkVksZJ//l
-         oUtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687815462; x=1690407462;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2hJTnGKaVBQkg0yz+eVOgG/0uK7zEDVVCQ+nLV5omt0=;
-        b=VKoxVfuelM9TsOrVSYF7bRkCxr+0dpiOwVCVddMAExukDmZSsEvEXYpIulWnzh6GwB
-         ODfnw3H3ytYEPKKGz9yKmISv61FY+USD16dyuIe4xgp0VOzOigcK2z4PsAzA6IWuUy1w
-         xURxqYZ1oviORYTpo+5wO3P4iWCHudRBd7wzioVW0A+71KQwSluiUr71nVjUhT+W7vNg
-         dC0VPx7Z3BMet/tVrCyNqV3qpxvf6rNi+uwLyJ5+WSvZZoJFceHOuGgEzN05aQnN70u6
-         CZ2WJqMIyCsAGV1uZKZ8ewMZiIOXJiFGTCOt5XNAokw+dsXP742tJpColDQ8pKuuqci5
-         Ypfg==
-X-Gm-Message-State: AC+VfDyZuU2eEQpHK1xSfXhVEdmg89JGdPzQ+9QldmwvowG/9U8ieLGG
-        Ax4c0GT1z7vmZ3z1LolTvHbjQEGZRdM=
-X-Google-Smtp-Source: ACHHUZ7NdZzNENhExS/VeuzxqO4azWnvTcARnkz17r9kguRpghEbyDaKgFneVMrHPrA+YunJHzIn4G7UK78=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:b710:0:b0:565:9f59:664f with SMTP id
- v16-20020a81b710000000b005659f59664fmr12998654ywh.6.1687815462579; Mon, 26
- Jun 2023 14:37:42 -0700 (PDT)
-Date:   Mon, 26 Jun 2023 14:37:40 -0700
-In-Reply-To: <a5398e4b-bb9f-9913-c436-7528479be2ee@gmail.com>
-Mime-Version: 1.0
-References: <20230321220021.2119033-1-seanjc@google.com> <20230321220021.2119033-7-seanjc@google.com>
- <a5398e4b-bb9f-9913-c436-7528479be2ee@gmail.com>
-Message-ID: <ZJoFJMaY97CwloH/@google.com>
-Subject: Re: [PATCH v4 06/13] KVM: x86/mmu: Bypass __handle_changed_spte()
- when clearing TDP MMU dirty bits
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Vipin Sharma <vipinsh@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
+        with ESMTP id S229459AbjFZVoy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 17:44:54 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26FAEE6F;
+        Mon, 26 Jun 2023 14:44:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+        bh=EdgK0IHrzHwFNhFM3Sp8S6TGye1AJP5vyX4MGNNLE8c=; b=vnYPiZvsf3gk3whl4Re7bpeeIs
+        jpvevsVauYb3VlJxp9V4mE/NVKN57XH9jjzcYBkndLmQxeFzogqHcP3BZlN2BJsHekICQdg78vmfE
+        wqUSbheArEfSqVUUpR6M+FfegOjI/jIantl2IpIFec1f20/luP4UNAOEVFNNdMOGJULNt7HrdfHJh
+        sQdZz7hRnwaVkLdzSdFwajRBKerXhGiKCEIcKGV5Y1DOFiB3i7opU3GVc/HPC1mvhwqYusJLJNuTl
+        ebhnq3XIO+Gz3+eCL3P0f2xnYo31RYVQpN1okrb7l4a9cWiRt9zGn30AkrvcstTvkL9xpBGdayinu
+        jqyeB4pw==;
+Received: from [2601:1c2:980:9ec0::2764]
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qDu0y-00B5Z2-0f;
+        Mon, 26 Jun 2023 21:44:52 +0000
+Message-ID: <a816c65d-1db2-9043-9e4c-bb0d3f318044@infradead.org>
+Date:   Mon, 26 Jun 2023 14:44:51 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v2 3/6] KVM: Documentation: Add the missing description
+ for ptep in kvm_mmu_page
+Content-Language: en-US
+To:     Mingwei Zhang <mizhang@google.com>,
+        Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Cc:     kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Kai Huang <kai.huang@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>, Xu Yilun <yilun.xu@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>
+References: <20230626182016.4127366-1-mizhang@google.com>
+ <20230626182016.4127366-4-mizhang@google.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20230626182016.4127366-4-mizhang@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 25, 2023, Like Xu wrote:
-> On 22/3/2023 6:00 am, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index 950c5d23ecee..467931c43968 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -517,7 +517,6 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
-> >    *	    threads that might be modifying SPTEs.
-> >    *
-> >    * Handle bookkeeping that might result from the modification of a SPTE.
-> > - * This function must be called for all TDP SPTE modifications.
-> >    */
-> >   static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> >   				  u64 old_spte, u64 new_spte, int level,
-> > @@ -1689,8 +1688,10 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
-> >   							iter.old_spte, dbit,
-> >   							iter.level);
-> > -		__handle_changed_spte(kvm, iter.as_id, iter.gfn, iter.old_spte,
-> > -				      iter.old_spte & ~dbit, iter.level, false);
-> > +		trace_kvm_tdp_mmu_spte_changed(iter.as_id, iter.gfn, iter.level,
+
+
+On 6/26/23 11:20, Mingwei Zhang wrote:
+> Add the missing description for ptep in kvm_mmu_page description. ptep is
+> used when TDP MMU is enabled and it shares the storage with parent_ptes.
+> Update the doc to help readers to get up-to-date info.
 > 
-> Here the first parameter "kvm" is no longer used in this context.
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  Documentation/virt/kvm/x86/mmu.rst | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> Please help confirm that for clear_dirty_pt_masked(), should the "struct kvm
-> *kvm" parameter be cleared from the list of incoming parameters ?
+> diff --git a/Documentation/virt/kvm/x86/mmu.rst b/Documentation/virt/kvm/x86/mmu.rst
+> index 4c9044b4dc6c..5cd6cd5e8926 100644
+> --- a/Documentation/virt/kvm/x86/mmu.rst
+> +++ b/Documentation/virt/kvm/x86/mmu.rst
+> @@ -237,6 +237,11 @@ Shadow pages contain the following information:
+>      parent_ptes points at this single spte, otherwise, there exists multiple
+>      sptes pointing at this page and (parent_ptes & ~0x1) points at a data
+>      structure with a list of parent sptes.
+> +  ptep:
+> +    The reverse mapping for the pte pointing at this page's spt. This field is
+> +    used in replace of parent_ptes when TDP MMU is used. In TDP MMU, each
 
-Hmm, there's only one caller, so keeping @kvm around "just in case" probably
-doesn't make sense, e.g. adding it back so that we could do KVM_BUG_ON() in the
-future wouldn't require much churn.
+            in replacement of
 
-That said, I'm tempted to move the lockdep so that it's more obvious why it's safe
-for clear_dirty_pt_masked() to use the non-atomic (for non-volatile SPTEs)
-tdp_mmu_clear_spte_bits() helper.  for_each_tdp_mmu_root() does its own lockdep,
-so the only "loss" in lockdep coverage is if the list is completely empty.
+> +    non-root shadow page will have one parent, while each root shadow page has
+> +    no parent. Note that this field is a union with parent_ptes.
+>    unsync:
+>      If true, then the translations in this page may not match the guest's
+>      translation.  This is equivalent to the state of the tlb when a pte is
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 512163d52194..0b4f03bef70e 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1600,6 +1600,8 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
-                                                   shadow_dirty_mask;
-        struct tdp_iter iter;
- 
-+       lockdep_assert_held_write(&kvm->mmu_lock);
-+
-        rcu_read_lock();
- 
-        tdp_root_for_each_leaf_pte(iter, root, gfn + __ffs(mask),
-@@ -1646,7 +1648,6 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- {
-        struct kvm_mmu_page *root;
- 
--       lockdep_assert_held_write(&kvm->mmu_lock);
-        for_each_tdp_mmu_root(kvm, root, slot->as_id)
-                clear_dirty_pt_masked(kvm, root, gfn, mask, wrprot);
- }
-
-
+-- 
+~Randy
