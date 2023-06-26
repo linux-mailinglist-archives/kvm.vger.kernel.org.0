@@ -2,68 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF3C773E6B7
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 19:41:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D41A73E703
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 19:55:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230154AbjFZRk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 13:40:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40972 "EHLO
+        id S230429AbjFZRzn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 13:55:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229910AbjFZRkk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 13:40:40 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0CE335B7
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 10:39:24 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1b8161f564dso12335ad.1
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 10:39:24 -0700 (PDT)
+        with ESMTP id S230432AbjFZRzK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 13:55:10 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D29D183
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 10:55:08 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-666ed230c81so3215451b3a.0
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 10:55:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687801126; x=1690393126;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CnOW0xT5vQ5Av3Y9zgLv4Rm4Hfmf/1VJmsqhaRUinD4=;
-        b=TUU5FDQJ3oYqPE3qDHrBI6fwe4I571fEYBA0VqrYAi7cDeMjY0wKJfR/qH2TqovmSL
-         iluh0WAWNzpjTuCPT8B2agKYqsBsyj1ZwkrQxsmQl4GlCoQplmsa+3qosl+ZYC9RXnaH
-         /TAWG9q8l24d58A9xjxFpcWMfZpsdu/vyNrR76MTJQiJKHPPzA7G6EmJIozjjXCUhGX4
-         HgO2d0f1g1UzZjq6jYSlXutQdZJcTv/v/ssxwcfPfI2B1Rmt5hnku7VpFof8YVOfVKUW
-         fuaDPRVMPJWEsOIcLs7unSsJzzWuE+LGB5k+keJ+AzelKn9D2wC/sdAoTTKlGToGDgW9
-         j09Q==
+        d=google.com; s=20221208; t=1687802108; x=1690394108;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=aQQSDBr5oatmPC3jRYA52hLZn7olUfljW9YDHvW1zAM=;
+        b=V2GYqB5ZQKGlBdGq4Ggv2HY9SnXrvS+6OQvar/tPaSl8v1rTUd9eo+OUWlhFfPVPG5
+         TGS0qUSoBeb2t39d9BAjPi8XnBSRP905tos6b6nJlFup7RpRn1ogqPkikP9uDkMTqx6Z
+         4UCmTXYnSIYE3MclrgU36J1AyaPBuorg6mUGcJgYEiu2CttmuUFFs+9egk0mex0tW4xS
+         7gchAvfYnRtXV1lveCg00na72TrbNbbNlg8rx/EQOxQ9NXoMlkYkU0Ut6ghgwdp/467d
+         3Z0kW9QXnIksBQJsBfIkOh05l8Bv+FocfBmGOXHsbVoS2CXWJx1GW31R52ED6wT86jDB
+         pJyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687801126; x=1690393126;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CnOW0xT5vQ5Av3Y9zgLv4Rm4Hfmf/1VJmsqhaRUinD4=;
-        b=VG1dEWI4Qb39vOamrqXd/Ccxj6ayk3b/ONL2MxnTpuYKnV0anHyAiK7HzeZunM63Bw
-         n5vExziKQ8JcxjoO3+fkDFux+L7cpYRL9iRrpGCshvhTS2IHhI7OlwQ+MB5kOKQgGkND
-         R+HpT2u5vZggHsIw5UhKpPh/QUvo1kmPvfXGb4nSkQFfnJ1f/w2/Opuh0sovLF/7CUsY
-         kVaZucWKPkOL9BOc1eFRFvu6SPQtFFn8Z7AXIT/ZzcSH/snLKvJQ+O0r/xhi2F7HmVs0
-         VhStFCIV4+m8pt0epRUNK0xibla9EOzA2VzOptB6hqEyROcSUTphxXXvoWjoGA6JWkqz
-         1G5Q==
-X-Gm-Message-State: AC+VfDzZcWUsIgVXrKt3AZHCjPvJ0LawDaOvlT9VN8TIUV7VT0oMiwdT
-        V1RdNsMeYkJLoDMx2u9sr6fOKAQ6PqeZfnzDRuFMlw==
-X-Google-Smtp-Source: ACHHUZ4MH0OZy3lD6UGeyuNNbWYbl4Jr2Ip0p+nhEVV6ESU3PL17fzY9SkLenEMqFlPeT1C9o8cn8wB3BwK8DHU561w=
-X-Received: by 2002:a17:902:ecc7:b0:1ae:4008:5404 with SMTP id
- a7-20020a170902ecc700b001ae40085404mr2096040plh.0.1687801125581; Mon, 26 Jun
- 2023 10:38:45 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687802108; x=1690394108;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aQQSDBr5oatmPC3jRYA52hLZn7olUfljW9YDHvW1zAM=;
+        b=MY9/P5YTZa1fISKh1o5RnyLeFg/D79re7B/mz2z8LhoNwY8xJ+mpgaZozlfzGJ5MxZ
+         4N12w7U0pdGlq4phuxnEEYBYbfP4LD+TLCSbiXvtWLXBNOwk7w12pYiwlDghO2olvDn8
+         bc0oxKzin83tMVWzEI/C4zUPBqi/I9LNnQ8WcFU85W05nLv3bDbfcXECd7r+uGVjbycu
+         UN4vOjB4cdlSXMrJBGVDoiOeJl1sgLWm/l74zrKVOWug74bNlX4GJqnEBLSwvP1Ty9dh
+         npAIYRrsVXneiAL1vBm68g6CW6IOeENutgdhO/QtynHnK2sSfPDT9iPu9v1WRc8yuqO4
+         RwOg==
+X-Gm-Message-State: AC+VfDyuyNEyTGYrL/QOBaRuDG3IWVuwvLNpDnh3c/shdoLP+dSSfYGV
+        /t9XT35v+y9x2oE9JdLvfYRxXYYBumVnR66lDJH21A==
+X-Google-Smtp-Source: ACHHUZ56YKQ0psWle33+Ep3NAFri1ZgeDSD/fhC7v/Y4sIg81RSp2vNIPzt8E+8LzDLkd08G0/E0OQ==
+X-Received: by 2002:a05:6a20:7da4:b0:11f:3f4b:9687 with SMTP id v36-20020a056a207da400b0011f3f4b9687mr33878996pzj.56.1687802107970;
+        Mon, 26 Jun 2023 10:55:07 -0700 (PDT)
+Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
+        by smtp.gmail.com with ESMTPSA id w16-20020a634750000000b00530621e5ee4sm4459318pgk.9.2023.06.26.10.55.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jun 2023 10:55:07 -0700 (PDT)
+Date:   Mon, 26 Jun 2023 17:55:03 +0000
+From:   Mingwei Zhang <mizhang@google.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dmatlack@google.com" <dmatlack@google.com>,
+        "bgardon@google.com" <bgardon@google.com>
+Subject: Re: [PATCH 4/6] KVM: Documentation: Add the missing
+ tdp_mmu_root_count into kvm_mmu_page
+Message-ID: <ZJnQ9w5deFHhElu9@google.com>
+References: <20230618000856.1714902-1-mizhang@google.com>
+ <20230618000856.1714902-5-mizhang@google.com>
+ <1af0f4de320fd5ba96d63b7f0bdbbb061a7466f2.camel@intel.com>
 MIME-Version: 1.0
-References: <20230605004334.1930091-1-mizhang@google.com> <CALMp9eSQgcKd=SN4q2QRYbveKoayKzuYEQPM0Xu+FgQ_Mja8-g@mail.gmail.com>
- <CAL715WJowYL=W40SWmtPoz1F9WVBFDG7TQwbsV2Bwf9-cS77=Q@mail.gmail.com>
- <ZH4ofuj0qvKNO9Bz@google.com> <CAL715WKtsC=93Nqr7QJZxspWzF04_CLqN3FUxUaqTHWFRUrwBA@mail.gmail.com>
- <ZH+8GafaNLYPvTJI@google.com> <CAL715WJ1rHS9ORR2ttyAw+idqbaLnOhLveUhW8f4tB9o+ZsuiQ@mail.gmail.com>
- <ZH/PKMmWWgJQdcJQ@google.com> <CAL715W+KSgNMk+kTt3=B-CgxTkToH6xmvHWvVmm3V+hir-jE=g@mail.gmail.com>
-In-Reply-To: <CAL715W+KSgNMk+kTt3=B-CgxTkToH6xmvHWvVmm3V+hir-jE=g@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 26 Jun 2023 10:38:34 -0700
-Message-ID: <CALMp9eRvUky-jcrkJ75N5-kvWWxVMNaf95XpyGTa_k49n48g9A@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Remove KVM MMU write lock when accessing indirect_shadow_pages
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1af0f4de320fd5ba96d63b7f0bdbbb061a7466f2.camel@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,38 +82,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 15, 2023 at 4:58=E2=80=AFPM Mingwei Zhang <mizhang@google.com> =
-wrote:
+On Thu, Jun 22, 2023, Huang, Kai wrote:
+> On Sun, 2023-06-18 at 00:08 +0000, Mingwei Zhang wrote:
+> > Add tdp_mmu_root_count into kvm_mmu_page description. tdp_mmu_root_count is
+> > an atomic counter used only in TDP MMU. Its usage and meaning is slightly
+> > different with root_counter in shadow MMU. Update the doc.
+> > 
+> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> > ---
+> >  Documentation/virt/kvm/x86/mmu.rst | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> > 
+> > diff --git a/Documentation/virt/kvm/x86/mmu.rst b/Documentation/virt/kvm/x86/mmu.rst
+> > index 36bfe0fe02bb..3dce2426ad6d 100644
+> > --- a/Documentation/virt/kvm/x86/mmu.rst
+> > +++ b/Documentation/virt/kvm/x86/mmu.rst
+> > @@ -230,6 +230,12 @@ Shadow pages contain the following information:
+> >      A counter keeping track of how many hardware registers (guest cr3 or
+> >      pdptrs) are now pointing at the page.  While this counter is nonzero, the
+> >      page cannot be destroyed.  See role.invalid.
+> > +  tdp_mmu_root_count:
+> > +    An atomic reference counter in TDP MMU that allows for parallel
+> 					     ^
+> Please explicitly say "TDP MMU root page" ?
 >
-> On Tue, Jun 6, 2023 at 5:28=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > On Tue, Jun 06, 2023, Mingwei Zhang wrote:
-> > > > > Hmm. I agree with both points above, but below, the change seems =
-too
-> > > > > heavyweight. smp_wb() is a mfence(), i.e., serializing all
-> > > > > loads/stores before the instruction. Doing that for every shadow =
-page
-> > > > > creation and destruction seems a lot.
-> > > >
-> > > > No, the smp_*b() variants are just compiler barriers on x86.
-> > >
-> > > hmm, it is a "lock addl" now for smp_mb(). Check this: 450cbdd0125c
-> > > ("locking/x86: Use LOCK ADD for smp_mb() instead of MFENCE")
-> > >
-> > > So this means smp_mb() is not a free lunch and we need to be a little
-> > > bit careful.
-> >
-> > Oh, those sneaky macros.  x86 #defines __smp_mb(), not the outer helper=
-.  I'll
-> > take a closer look before posting to see if there's a way to avoid the =
-runtime
-> > barrier.
->
-> Checked again, I think using smp_wmb() and smp_rmb() should be fine as
-> those are just compiler barriers. We don't need a full barrier here.
+> > +    accesses.  Accessing the page requires lifting the counter value. The
+> > +    initial value is set as 2 indicating one reference from vCPU and one
+> 			    ^
+> 			    to ?
+> 
+> > +    from TDP MMU itself. 
+> > 
+> 
+> 
+> > While this counter is nonzero, the page cannot be
+> > +    destroyed. 
+> > 
+> 
+> I guess this sentence is implied by "reference counter" mentioned in the first
+> sentence.
+> 
 
-That seems adequate.
+Will make the changes in next version.
 
-> Thanks.
-> -Mingwei
+-Mingwei
