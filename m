@@ -2,165 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F103C73D88A
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 09:31:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A97B73D8CF
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 09:50:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229844AbjFZHbh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 03:31:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33206 "EHLO
+        id S229506AbjFZHuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 03:50:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229454AbjFZHbf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 03:31:35 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05CF5E0;
-        Mon, 26 Jun 2023 00:31:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687764695; x=1719300695;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ruY20NAQ08oiR1PebyTz+Ma7La4SJPgiZxvT2aHjzFQ=;
-  b=LeHws0mZ5/4f4YI9TOoK4nwsPqA3ULspIOvyC4e0IMKPp2d5nr5Ah6Kz
-   iIvFVGaKbztZiGsdVfL7db0cweudDlGUsK8r+GYEdY6p4q8kxO/Pa3asm
-   z6OdYuOMhBdp/oXosoPyDZJbGLA9t9yeGNaVa4LQfNDkR5OyoCR4B5vGx
-   P293WN3cdCDMqQbWwo4plUWdVfpshbITop04fyduIyRJ1dUMhqcEvobsf
-   M1Atrq5iWt9I80VG9Bk8rxdfstIMaAFQ866m1DZEj8PDG+Wr3roFI9B4P
-   w989zVTLY5IakdtXk4bfD822o03Io1yVlmhzeIWXhaCt7K7XxYaBQgNiH
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10752"; a="427193406"
-X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
-   d="scan'208";a="427193406"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 00:31:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10752"; a="745694975"
-X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
-   d="scan'208";a="745694975"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga008.jf.intel.com with ESMTP; 26 Jun 2023 00:31:34 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 26 Jun 2023 00:31:34 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 26 Jun 2023 00:31:34 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Mon, 26 Jun 2023 00:31:33 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ToqC73nc3jPweECAtoDoZqGiFCR0NGRQk4DwPT/vQLxUMxHGU4Xk3H9cqSmsy/qbSUhMHJWtQ/vl4XxFiPOG03J1y08NQ/UHNwkmpPqUnJrnJ3HSPmQdNHuTHdKfON4k4euaPaLTGCgv66QKdGdVRfVuvAGW+/Lkrdja5Wrh7i5PCak+8sd+j9lJc6oC1GOwQziDjEwoZxj5K+pZHF04MGKo0SO4pGTteYIaVk1SKLXBPvz3PDBgw4lGRTqqiD8qXrsOBu1nS0OdlJs7aP9Aga2IIlp3VvsnbV+HC5E/r4+Lo8Fp9eHCnVNi8kSH40PI8GtroQn+0BSfYBak++W2vA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ruY20NAQ08oiR1PebyTz+Ma7La4SJPgiZxvT2aHjzFQ=;
- b=j5dcT2/HUAlwEuMDRMbCCTJdO+XVmKthHxTvWc4+aCdfzlKOwX7uFfI3HjYH5yu0I03EMmXABL3X6tdUdi6uALCAzNBGyRDTv1U06WTYhoCerUMOqthHGK8FKj2fYQtRR3FRDp9f/IJNNdZrbV0O1t063dHx8wNTRi0jg0KrclV4x6jtecGFxc1WnWrx7etOR7STbMe+QOtNn0wydOq5NZedc7NmwzjFa6y1iB34wyPAKM2PEgDOYXtUPI5a3gdjznyY3f0avR6IXMwTWtdi+UV5ezr8MWjVlp7RX6n48Z/R5aDw660TbHgPa/RBuAXSbFPlrxIFlS2bUm+107EzpQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by PH0PR11MB7563.namprd11.prod.outlook.com (2603:10b6:510:286::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Mon, 26 Jun
- 2023 07:31:32 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::4f05:6b0b:dbc8:abbb]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::4f05:6b0b:dbc8:abbb%7]) with mapi id 15.20.6521.026; Mon, 26 Jun 2023
- 07:31:31 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Brett Creeley <brett.creeley@amd.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: RE: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
-Thread-Topic: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
-Thread-Index: AQHZlZ4kU3Fwl99xbECsoSBHo1JwW6+NFosQgAUWbwCAANnr4IAAtAcAgAEnoKCAAHp3AIAHb+Ew
-Date:   Mon, 26 Jun 2023 07:31:31 +0000
-Message-ID: <BN9PR11MB52762ECFCA869B97BDD2AA9D8C26A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230602220318.15323-1-brett.creeley@amd.com>
- <20230602220318.15323-5-brett.creeley@amd.com>
- <BN9PR11MB5276511543775B852AD1C5A88C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZJBONrx5LOgpTr1U@nvidia.com>
- <BN9PR11MB5276DD9E2B791EE2C06046348C5CA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZJGcCF2hBGERGUBZ@nvidia.com>
- <BN9PR11MB52763F3D4F18DAB867D146458C5DA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZJL6wHiXHc1eBj/R@nvidia.com>
-In-Reply-To: <ZJL6wHiXHc1eBj/R@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH0PR11MB7563:EE_
-x-ms-office365-filtering-correlation-id: 77554316-389f-4452-320d-08db76175cca
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 2pDrDCh5P+2cX1+td7Nbqfnq1sdMX3caxhCHKPp8pIOgx0X84dLaUIz8gNzxCVL3jyfKYWR8vO2IsJXOeKVYxpS8mnUtJNizY8oW37acjWY7cfXCfludi5ZjFseMk5F3wZ3N0t2QuZgI2nUjLFCS4dEHpvM7oVjR+W5RkVhdl9vKTfWTUPALLss2/0fIODaextE5oRopnPdgDm6cOtWCmEFjt4yZYE1ZJYhO1Hl9kCD12Du4vU+LV+zmHTg0E6xu3ClSrSoBShiGIba8lffKcB+AvQPEWDHMF/JPgDzWoYQurBvOPy8835bhg8QfEl27SylvNAevmOAceNsaVLk9fyHxKgYAlb5Su1ajGARi8q3xfx9v8c1UBrpuUH1bh3Nh7brg26fGYS6YJPchmdMYPRqLeOtpLcZ4vqXq3995bbYxGde9gDM6JBr9uzyAQVYEd47rvGEJLlSSYEjB0o4kj5UYt/jiUYF3BU9RJpv/kfQk9ZMD+AJrNNB6nzKEohY86NXmYxyQUUfpdsn1/P/O7a7DwOFbZTG27wKFKRuB786K6oh9VOZEDlo49h7+2eN18bokqpIpklmYeZZhi5u9c63C3hegWPRBCVnnfOPq1i23DFJ0BTeu9o/x17cHGTGh
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(376002)(346002)(39860400002)(396003)(366004)(451199021)(33656002)(52536014)(38100700002)(122000001)(55016003)(26005)(6506007)(83380400001)(9686003)(82960400001)(186003)(8936002)(2906002)(8676002)(5660300002)(41300700001)(71200400001)(478600001)(66476007)(38070700005)(6916009)(66446008)(76116006)(66556008)(4326008)(7696005)(64756008)(66946007)(86362001)(316002)(54906003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MElkaUFlZndoUTErZ1dmTng3T0hSMTRUbWt1RCtlaU4weHZFaDd2ZG12RjBq?=
- =?utf-8?B?VkM4ZmxpaERUVFByalZxcEdaYVpleE9XOXhEUDdNWmkxNEhtNVF1amt3SDJ5?=
- =?utf-8?B?K21CMzUvZVUrSmpuTEZiUHdXaHRKdnFPYStQZXl5eWh2ZFN2WlczdThEaWxm?=
- =?utf-8?B?YzJvaDJxUU1wVlF5alk2emVtZmxoQW53Q2JpT0E3bXhXRDJkTnByZk12ZjV6?=
- =?utf-8?B?aU54ZDlHM1hCN3AzUWNRMjhISjUyS1VLaUF4cTFvellDYkdveUQyejUyYUJR?=
- =?utf-8?B?dWhGZlVUSVY2ak43MlU3L1pkWVhwQ3M2ZW1ScktIUDUvYVVqckJqNklHRTJu?=
- =?utf-8?B?WEhqTUtiN2hQMXhIcTQzVS81WVZBdEhYOUw0VmUvQlZTMHcwMGl3OVNOUkxD?=
- =?utf-8?B?d0FLR2dvdnFVTFh4NFdibXZhaUo2MGtjSE9GVDZZQUxNcW1Bc0dieUM0a2J3?=
- =?utf-8?B?ZGsrQmtDd21tTHVJY0s4VlBFWDJwSER0eHMrd3oycnR1RUlZUGVZMVdLbCtV?=
- =?utf-8?B?RzdFOFFBeVAzdmdNYmhLamdlbTV2YVJ1ZjY1QWhVZUQrZ1N1aXRTSVFCNUx1?=
- =?utf-8?B?NnptbS9rM1dma1FlQ0d2V2RJR21RN2J4em9XOUFneXdXTk03U1MxRndBZ2dK?=
- =?utf-8?B?WkFUVFdoUDF4TTA1OVdILy9Sak5lL0w2OXI4TVh6QW1yY0M0Q1RFNVlpQS9N?=
- =?utf-8?B?MEVnKzFtTWt5cHZQVzc1RGdWSEIrMURqY1k3eDFQcVFZNm1xVTNJMkZGOW9Z?=
- =?utf-8?B?aUJkVnlmOXgrekNQU0VBSDZUSlNJeWpvYVdPZDd3cE1YQTh5OE1UbDFSQjlS?=
- =?utf-8?B?Q1pCRUMvSlRadkRncy9MbXdUVDBsZERiYTdpN2MwZEFIM1FrdGNnMXJEVUN6?=
- =?utf-8?B?N0V4aTJmNmVlbmhPb2luOFdkdXhYN1BGOENDbi9QclIxQVE2MzUvVTB1ODNx?=
- =?utf-8?B?dEJPT1dPWnRJb21MUDN2MnA5OVhsbE5wWCs1cW41bm11dHdFQVVmWUFGV0JN?=
- =?utf-8?B?dWtvSG5SdjcvczAzTnZCeWxUSVhaMlh6R0JPRWg4YmVzTVlmR0ZyUm5wQ1Za?=
- =?utf-8?B?MjFpRXM3NGhBNXB6TDVKYmtUaXZrQ1l2ekE4eTJWaHpQOUFQc1AzZXpyYTJZ?=
- =?utf-8?B?WUVBKzQyOGlRM3U3K0FVZHVQMzhYMXo1UWdxRTFpRVlnM3c5Mm5maFZtb0pp?=
- =?utf-8?B?cmo5WEZvTjEwTldQLzBQRXFnbGEwam5uNmVQRUgrUFRpWC9sTW1vV2xSRzB2?=
- =?utf-8?B?U0RqSWRlSDJNbUlicldrYWhFeFlIUy9VQkIvdmgrZ2UzRU1KQmxMREV5ekJV?=
- =?utf-8?B?SnRvajlYWmhOUVBwUFJNbG5YWFo3SzY4cDlKaGxpWDI1Z0lOSG5JcE5oU0Qx?=
- =?utf-8?B?bXpEUXFmdnU3YjhsbXVRR2Q5MmZ1VXFiRDlXQUVhWkJDUndEWHdGdVB3eHFN?=
- =?utf-8?B?ZWxUNHBtN2JkNnNTWEpQWmNqWFNhdExGcmFucm9wSSs1Q0phU0FkUG9IT0Ra?=
- =?utf-8?B?SzVSY0FhNXRnOG8rKzBoc3hNeGxNM3BlWGFCVkJIOEZ5cWF5SHprNEF0TkYy?=
- =?utf-8?B?UEk0TTgwWFlMclQzVmdQeExFL0dPNDJMeTQ1ck9zTEFzOGNUazN1NXFTQkZH?=
- =?utf-8?B?NTB0QVljMHNTME5ZNlpLSzdxSzdJZHlUcHZIeUI0TmU0aWFSWnZkWEczWlR0?=
- =?utf-8?B?MjRiWFZ0TExUS2N3YnNZazY5SU9jeWJyU1pTSEZ4SGZSZnlYY2ZVblU3aVY5?=
- =?utf-8?B?ZGFnc213QjNXSWtHU2cxMVF6YWpXOWFvRC9ielRCRm5QRCtVclRwUWgwUUVl?=
- =?utf-8?B?TEpzV0g5eTBydjhVazdkdHpOUk5JOWI3SVczeVZBeStYL0N4cTh5NUYzRDdS?=
- =?utf-8?B?d0YvZ2M0MFR3VlNiUlJySTB5TzdDUGdzelpvOERqeGxRTVJQWDdsT3UxQUpV?=
- =?utf-8?B?VzVtRDZsOUNXa2lTVDBEMEg0MHgwUXpaU1ZFcXdudHdRbVl2SlZjdmFsKzVK?=
- =?utf-8?B?S2twMzU5UUludCtCOUN1RTM0M2djazI4Q0prVUZoKy82c2pMVy9BdzBleHpD?=
- =?utf-8?B?bkRLUXI2UUowVjRQaDVkS2poZ0lyMHZZMThQdnhweC9YeHRPY1VyRjJKZFUr?=
- =?utf-8?Q?52gBmFumzSStgHD9mpvOU02D/?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S229998AbjFZHt7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 03:49:59 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 438A2128;
+        Mon, 26 Jun 2023 00:49:56 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C108D60B5A;
+        Mon, 26 Jun 2023 07:49:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3708EC433C0;
+        Mon, 26 Jun 2023 07:49:52 +0000 (UTC)
+From:   Huacai Chen <chenhuacai@loongson.cn>
+To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>
+Cc:     linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Huacai Chen <chenhuacai@loongson.cn>, stable@vger.kernel.org
+Subject: [PATCH] MIPS: KVM: Fix NULL pointer dereference
+Date:   Mon, 26 Jun 2023 15:49:19 +0800
+Message-Id: <20230626074919.1871944-1-chenhuacai@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 77554316-389f-4452-320d-08db76175cca
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2023 07:31:31.6043
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ORvmD1s5AjSZfPXEipa9/laVXZgtaLp78AgNYs8YY+ilSdzeAQUQhpek37VGRjz3qVbCX6Gu9xNFDywG4kppEQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7563
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
+        HEADER_FROM_DIFFERENT_DOMAINS,LOTS_OF_MONEY,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -168,39 +45,389 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBKYXNvbiBHdW50aG9ycGUgPGpnZ0BudmlkaWEuY29tPg0KPiBTZW50OiBXZWRuZXNk
-YXksIEp1bmUgMjEsIDIwMjMgOToyNyBQTQ0KPiANCj4gT24gV2VkLCBKdW4gMjEsIDIwMjMgYXQg
-MDY6NDk6MTJBTSArMDAwMCwgVGlhbiwgS2V2aW4gd3JvdGU6DQo+IA0KPiA+IFdoYXQgaXMgdGhl
-IGNyaXRlcmlhIGZvciAncmVhc29uYWJsZSc/IEhvdyBkb2VzIENTUHMganVkZ2UgdGhhdCBzdWNo
-DQo+ID4gZGV2aWNlIGNhbiBndWFyYW50ZWUgYSAqcmVsaWFibGUqIHJlYXNvbmFibGUgd2luZG93
-IHNvIGxpdmUgbWlncmF0aW9uDQo+ID4gY2FuIGJlIGVuYWJsZWQgaW4gdGhlIHByb2R1Y3Rpb24g
-ZW52aXJvbm1lbnQ/DQo+IA0KPiBUaGUgQ1NQIG5lZWRzIHRvIHdvcmsgd2l0aCB0aGUgZGV2aWNl
-IHZlbmRvciB0byB1bmRlcnN0YW5kIGhvdyBpdCBmaXRzDQo+IGludG8gdGhlaXIgc3lzdGVtLCBJ
-IGRvbid0IHNlZSBob3cgd2UgY2FuIGV4dGVybmFsaXplIHRoaXMga2luZCBvZg0KPiBkZXRhaWwg
-aW4gYSBnZW5lcmFsIHdheS4NCj4gDQo+ID4gSSdtIGFmcmFpZCB0aGF0IHdlIGFyZSBoaWRpbmcg
-YSBub24tZGV0ZXJtaW5pc3RpYyBmYWN0b3IgaW4gY3VycmVudCBwcm90b2NvbC4NCj4gDQo+IFll
-cw0KPiANCj4gPiBCdXQgc3RpbGwgSSBkb24ndCB0aGluayBpdCdzIGEgZ29vZCBzaXR1YXRpb24g
-d2hlcmUgdGhlIHVzZXIgaGFzIFpFUk8NCj4gPiBrbm93bGVkZ2UgYWJvdXQgdGhlIG5vbi1uZWds
-aWdpYmxlIHRpbWUgaW4gdGhlIHN0b3BwaW5nIHBhdGguLi4NCj4gDQo+IEluIGFueSBzYW5lIGRl
-dmljZSBkZXNpZ24gdGhpcyB3aWxsIGJlIGEgc21hbGwgcGVyaW9kIG9mIHRpbWUuIFRoZXNlDQo+
-IHRpbWVvdXRzIHNob3VsZCBiZSB0byBwcm90ZWN0IGFnYWluc3QgYSBkZXZpY2UgdGhhdCBoYXMg
-Z29uZSB3aWxkLg0KPiANCg0KQW55IGV4YW1wbGUgaG93ICdzbWFsbCcgaXQgd2lsbCBiZSAoZS5n
-LiA8MW1zKT8NCg0KU2hvdWxkIHdlIGRlZmluZSBhICpyZWFzb25hYmxlKiB0aHJlc2hvbGQgaW4g
-VkZJTyBjb21tdW5pdHkgd2hpY2gNCmFueSBuZXcgdmFyaWFudCBkcml2ZXIgc2hvdWxkIHByb3Zp
-ZGUgaW5mb3JtYXRpb24gdG8ganVkZ2UgYWdhaW5zdD8NCg0KSWYgdGhlIHdvcnN0LWNhc2Ugc3Rv
-cCB0aW1lIChhc3N1bWluZyB0aGUgZGV2aWNlIGRvZXNuJ3QgZ28gd2lsZCkgbWF5DQpleGNlZWQg
-dGhlIHRocmVzaG9sZCB0aGVuIGl0J3MgdGltZSB0byBjb25zaWRlciB3aGV0aGVyIGEgbmV3IGlu
-dGVyZmFjZQ0KaXMgcmVxdWlyZWQgdG8gY29tbXVuaWNhdGUgc3VjaCBjb25zdHJhaW50IHRvIHVz
-ZXJzcGFjZS4NCg0KVGhlIHJlYXNvbiB3aHkgSSBrZWVwIGRpc2N1c3NpbmcgaXQgaXMgdGhhdCBJ
-TUhPIGFjaGlldmluZyBuZWdsaWdpYmxlDQpzdG9wIHRpbWUgaXMgYSB2ZXJ5IGNoYWxsZW5naW5n
-IHRhc2sgZm9yIG1hbnkgYWNjZWxlcmF0b3JzLiBlLmcuIElEWEQNCmNhbiBiZSBzdG9wcGVkIG9u
-bHkgYWZ0ZXIgY29tcGxldGluZyBhbGwgdGhlIHBlbmRpbmcgcmVxdWVzdHMuIFdoaWxlDQppdCBh
-bGxvd3Mgc29mdHdhcmUgdG8gY29uZmlndXJlIHRoZSBtYXggcGVuZGluZyB3b3JrIHNpemUgKGFu
-ZCBhDQpyZWFzb25hYmxlIHNldHRpbmcgY291bGQgbWVldCBib3RoIG1pZ3JhdGlvbiBTTEEgYW5k
-IHBlcmZvcm1hbmNlDQpTTEEpIHRoZSB3b3JzdC1jYXNlIGRyYWluaW5nIGxhdGVuY3kgY291bGQg
-YmUgaW4gMTAncyBtaWxsaXNlY29uZHMgd2hpY2gNCmNhbm5vdCBiZSBpZ25vcmVkIGJ5IHRoZSBW
-TU0uDQoNCk9yIGRvIHlvdSB0aGluayBpdCdzIHN0aWxsIGJldHRlciBsZWZ0IHRvIENTUCB3b3Jr
-aW5nIHdpdGggdGhlIGRldmljZSB2ZW5kb3INCmV2ZW4gaW4gdGhpcyBjYXNlLCBnaXZlbiB0aGUg
-d29yc3QtY2FzZSBsYXRlbmN5IGNvdWxkIGJlIGFmZmVjdGVkIGJ5DQptYW55IGZhY3RvcnMgaGVu
-Y2Ugbm90IHNvbWV0aGluZyB3aGljaCBhIGtlcm5lbCBkcml2ZXIgY2FuIGFjY3VyYXRlbHkNCmVz
-dGltYXRlPw0KDQpUaGFua3MNCktldmluDQoNCg==
+After commit 45c7e8af4a5e3f0bea4ac209 ("MIPS: Remove KVM_TE support") we
+get a NULL pointer dereference when creating a KVM guest:
+
+[  146.243409] Starting KVM with MIPS VZ extensions
+[  149.849151] CPU 3 Unable to handle kernel paging request at virtual address 0000000000000300, epc == ffffffffc06356ec, ra == ffffffffc063568c
+[  149.849177] Oops[#1]:
+[  149.849182] CPU: 3 PID: 2265 Comm: qemu-system-mip Not tainted 6.4.0-rc3+ #1671
+[  149.849188] Hardware name: THTF CX TL630 Series/THTF-LS3A4000-7A1000-ML4A, BIOS KL4.1F.TF.D.166.201225.R 12/25/2020
+[  149.849192] $ 0   : 0000000000000000 000000007400cce0 0000000000400004 ffffffff8119c740
+[  149.849209] $ 4   : 000000007400cce1 000000007400cce1 0000000000000000 0000000000000000
+[  149.849221] $ 8   : 000000240058bb36 ffffffff81421ac0 0000000000000000 0000000000400dc0
+[  149.849233] $12   : 9800000102a07cc8 ffffffff80e40e38 0000000000000001 0000000000400dc0
+[  149.849245] $16   : 0000000000000000 9800000106cd0000 9800000106cd0000 9800000100cce000
+[  149.849257] $20   : ffffffffc0632b28 ffffffffc05b31b0 9800000100ccca00 0000000000400000
+[  149.849269] $24   : 9800000106cd09ce ffffffff802f69d0
+[  149.849281] $28   : 9800000102a04000 9800000102a07cd0 98000001106a8000 ffffffffc063568c
+[  149.849293] Hi    : 00000335b2111e66
+[  149.849295] Lo    : 6668d90061ae0ae9
+[  149.849298] epc   : ffffffffc06356ec kvm_vz_vcpu_setup+0xc4/0x328 [kvm]
+[  149.849324] ra    : ffffffffc063568c kvm_vz_vcpu_setup+0x64/0x328 [kvm]
+[  149.849336] Status: 7400cce3 KX SX UX KERNEL EXL IE
+[  149.849351] Cause : 1000000c (ExcCode 03)
+[  149.849354] BadVA : 0000000000000300
+[  149.849357] PrId  : 0014c004 (ICT Loongson-3)
+[  149.849360] Modules linked in: kvm nfnetlink_queue nfnetlink_log nfnetlink fuse sha256_generic libsha256 cfg80211 rfkill binfmt_misc vfat fat snd_hda_codec_hdmi input_leds led_class snd_hda_intel snd_intel_dspcfg snd_hda_codec snd_hda_core snd_pcm snd_timer snd serio_raw xhci_pci radeon drm_suballoc_helper drm_display_helper xhci_hcd ip_tables x_tables
+[  149.849432] Process qemu-system-mip (pid: 2265, threadinfo=00000000ae2982d2, task=0000000038e09ad4, tls=000000ffeba16030)
+[  149.849439] Stack : 9800000000000003 9800000100ccca00 9800000100ccc000 ffffffffc062cef4
+[  149.849453]         9800000102a07d18 c89b63a7ab338e00 0000000000000000 ffffffff811a0000
+[  149.849465]         0000000000000000 9800000106cd0000 ffffffff80e59938 98000001106a8920
+[  149.849476]         ffffffff80e57f30 ffffffffc062854c ffffffff811a0000 9800000102bf4240
+[  149.849488]         ffffffffc05b0000 ffffffff80e3a798 000000ff78000000 000000ff78000010
+[  149.849500]         0000000000000255 98000001021f7de0 98000001023f0078 ffffffff81434000
+[  149.849511]         0000000000000000 0000000000000000 9800000102ae0000 980000025e92ae28
+[  149.849523]         0000000000000000 c89b63a7ab338e00 0000000000000001 ffffffff8119dce0
+[  149.849535]         000000ff78000010 ffffffff804f3d3c 9800000102a07eb0 0000000000000255
+[  149.849546]         0000000000000000 ffffffff8049460c 000000ff78000010 0000000000000255
+[  149.849558]         ...
+[  149.849565] Call Trace:
+[  149.849567] [<ffffffffc06356ec>] kvm_vz_vcpu_setup+0xc4/0x328 [kvm]
+[  149.849586] [<ffffffffc062cef4>] kvm_arch_vcpu_create+0x184/0x228 [kvm]
+[  149.849605] [<ffffffffc062854c>] kvm_vm_ioctl+0x64c/0xf28 [kvm]
+[  149.849623] [<ffffffff805209c0>] sys_ioctl+0xc8/0x118
+[  149.849631] [<ffffffff80219eb0>] syscall_common+0x34/0x58
+
+The root cause is the deletion of kvm_mips_commpage_init() leaves vcpu->
+arch.cop0 NULL. So fix it by make cop0 from a pointer to an embed object.
+
+Fixes: 45c7e8af4a5e3f0bea4ac209 ("MIPS: Remove KVM_TE support")
+Cc: stable@vger.kernel.org
+Suggested-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+---
+ arch/mips/include/asm/kvm_host.h |  6 +++---
+ arch/mips/kvm/emulate.c          | 22 +++++++++++-----------
+ arch/mips/kvm/mips.c             | 16 ++++++++--------
+ arch/mips/kvm/trace.h            |  8 ++++----
+ arch/mips/kvm/vz.c               | 20 ++++++++++----------
+ 5 files changed, 36 insertions(+), 36 deletions(-)
+
+diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+index 957121a495f0..04cedf9f8811 100644
+--- a/arch/mips/include/asm/kvm_host.h
++++ b/arch/mips/include/asm/kvm_host.h
+@@ -317,7 +317,7 @@ struct kvm_vcpu_arch {
+ 	unsigned int aux_inuse;
+ 
+ 	/* COP0 State */
+-	struct mips_coproc *cop0;
++	struct mips_coproc cop0;
+ 
+ 	/* Resume PC after MMIO completion */
+ 	unsigned long io_pc;
+@@ -698,7 +698,7 @@ static inline bool kvm_mips_guest_can_have_fpu(struct kvm_vcpu_arch *vcpu)
+ static inline bool kvm_mips_guest_has_fpu(struct kvm_vcpu_arch *vcpu)
+ {
+ 	return kvm_mips_guest_can_have_fpu(vcpu) &&
+-		kvm_read_c0_guest_config1(vcpu->cop0) & MIPS_CONF1_FP;
++		kvm_read_c0_guest_config1(&vcpu->cop0) & MIPS_CONF1_FP;
+ }
+ 
+ static inline bool kvm_mips_guest_can_have_msa(struct kvm_vcpu_arch *vcpu)
+@@ -710,7 +710,7 @@ static inline bool kvm_mips_guest_can_have_msa(struct kvm_vcpu_arch *vcpu)
+ static inline bool kvm_mips_guest_has_msa(struct kvm_vcpu_arch *vcpu)
+ {
+ 	return kvm_mips_guest_can_have_msa(vcpu) &&
+-		kvm_read_c0_guest_config3(vcpu->cop0) & MIPS_CONF3_MSA;
++		kvm_read_c0_guest_config3(&vcpu->cop0) & MIPS_CONF3_MSA;
+ }
+ 
+ struct kvm_mips_callbacks {
+diff --git a/arch/mips/kvm/emulate.c b/arch/mips/kvm/emulate.c
+index edaec93a1a1f..e64372b8f66a 100644
+--- a/arch/mips/kvm/emulate.c
++++ b/arch/mips/kvm/emulate.c
+@@ -312,7 +312,7 @@ int kvm_get_badinstrp(u32 *opc, struct kvm_vcpu *vcpu, u32 *out)
+  */
+ int kvm_mips_count_disabled(struct kvm_vcpu *vcpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 
+ 	return	(vcpu->arch.count_ctl & KVM_REG_MIPS_COUNT_CTL_DC) ||
+ 		(kvm_read_c0_guest_cause(cop0) & CAUSEF_DC);
+@@ -384,7 +384,7 @@ static inline ktime_t kvm_mips_count_time(struct kvm_vcpu *vcpu)
+  */
+ static u32 kvm_mips_read_count_running(struct kvm_vcpu *vcpu, ktime_t now)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	ktime_t expires, threshold;
+ 	u32 count, compare;
+ 	int running;
+@@ -444,7 +444,7 @@ static u32 kvm_mips_read_count_running(struct kvm_vcpu *vcpu, ktime_t now)
+  */
+ u32 kvm_mips_read_count(struct kvm_vcpu *vcpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 
+ 	/* If count disabled just read static copy of count */
+ 	if (kvm_mips_count_disabled(vcpu))
+@@ -502,7 +502,7 @@ ktime_t kvm_mips_freeze_hrtimer(struct kvm_vcpu *vcpu, u32 *count)
+ static void kvm_mips_resume_hrtimer(struct kvm_vcpu *vcpu,
+ 				    ktime_t now, u32 count)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	u32 compare;
+ 	u64 delta;
+ 	ktime_t expire;
+@@ -603,7 +603,7 @@ int kvm_mips_restore_hrtimer(struct kvm_vcpu *vcpu, ktime_t before,
+  */
+ void kvm_mips_write_count(struct kvm_vcpu *vcpu, u32 count)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	ktime_t now;
+ 
+ 	/* Calculate bias */
+@@ -649,7 +649,7 @@ void kvm_mips_init_count(struct kvm_vcpu *vcpu, unsigned long count_hz)
+  */
+ int kvm_mips_set_count_hz(struct kvm_vcpu *vcpu, s64 count_hz)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	int dc;
+ 	ktime_t now;
+ 	u32 count;
+@@ -696,7 +696,7 @@ int kvm_mips_set_count_hz(struct kvm_vcpu *vcpu, s64 count_hz)
+  */
+ void kvm_mips_write_compare(struct kvm_vcpu *vcpu, u32 compare, bool ack)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	int dc;
+ 	u32 old_compare = kvm_read_c0_guest_compare(cop0);
+ 	s32 delta = compare - old_compare;
+@@ -779,7 +779,7 @@ void kvm_mips_write_compare(struct kvm_vcpu *vcpu, u32 compare, bool ack)
+  */
+ static ktime_t kvm_mips_count_disable(struct kvm_vcpu *vcpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	u32 count;
+ 	ktime_t now;
+ 
+@@ -806,7 +806,7 @@ static ktime_t kvm_mips_count_disable(struct kvm_vcpu *vcpu)
+  */
+ void kvm_mips_count_disable_cause(struct kvm_vcpu *vcpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 
+ 	kvm_set_c0_guest_cause(cop0, CAUSEF_DC);
+ 	if (!(vcpu->arch.count_ctl & KVM_REG_MIPS_COUNT_CTL_DC))
+@@ -826,7 +826,7 @@ void kvm_mips_count_disable_cause(struct kvm_vcpu *vcpu)
+  */
+ void kvm_mips_count_enable_cause(struct kvm_vcpu *vcpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	u32 count;
+ 
+ 	kvm_clear_c0_guest_cause(cop0, CAUSEF_DC);
+@@ -852,7 +852,7 @@ void kvm_mips_count_enable_cause(struct kvm_vcpu *vcpu)
+  */
+ int kvm_mips_set_count_ctl(struct kvm_vcpu *vcpu, s64 count_ctl)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	s64 changed = count_ctl ^ vcpu->arch.count_ctl;
+ 	s64 delta;
+ 	ktime_t expire, now;
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 884be4ef99dc..aa5583a7b05b 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -649,7 +649,7 @@ static int kvm_mips_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices)
+ static int kvm_mips_get_reg(struct kvm_vcpu *vcpu,
+ 			    const struct kvm_one_reg *reg)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	struct mips_fpu_struct *fpu = &vcpu->arch.fpu;
+ 	int ret;
+ 	s64 v;
+@@ -761,7 +761,7 @@ static int kvm_mips_get_reg(struct kvm_vcpu *vcpu,
+ static int kvm_mips_set_reg(struct kvm_vcpu *vcpu,
+ 			    const struct kvm_one_reg *reg)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	struct mips_fpu_struct *fpu = &vcpu->arch.fpu;
+ 	s64 v;
+ 	s64 vs[2];
+@@ -1086,7 +1086,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_mips_pending_timer(vcpu) ||
+-		kvm_read_c0_guest_cause(vcpu->arch.cop0) & C_TI;
++		kvm_read_c0_guest_cause(&vcpu->arch.cop0) & C_TI;
+ }
+ 
+ int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu)
+@@ -1110,7 +1110,7 @@ int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu)
+ 	kvm_debug("\thi: 0x%08lx\n", vcpu->arch.hi);
+ 	kvm_debug("\tlo: 0x%08lx\n", vcpu->arch.lo);
+ 
+-	cop0 = vcpu->arch.cop0;
++	cop0 = &vcpu->arch.cop0;
+ 	kvm_debug("\tStatus: 0x%08x, Cause: 0x%08x\n",
+ 		  kvm_read_c0_guest_status(cop0),
+ 		  kvm_read_c0_guest_cause(cop0));
+@@ -1232,7 +1232,7 @@ static int __kvm_mips_handle_exit(struct kvm_vcpu *vcpu)
+ 
+ 	case EXCCODE_TLBS:
+ 		kvm_debug("TLB ST fault:  cause %#x, status %#x, PC: %p, BadVaddr: %#lx\n",
+-			  cause, kvm_read_c0_guest_status(vcpu->arch.cop0), opc,
++			  cause, kvm_read_c0_guest_status(&vcpu->arch.cop0), opc,
+ 			  badvaddr);
+ 
+ 		++vcpu->stat.tlbmiss_st_exits;
+@@ -1304,7 +1304,7 @@ static int __kvm_mips_handle_exit(struct kvm_vcpu *vcpu)
+ 		kvm_get_badinstr(opc, vcpu, &inst);
+ 		kvm_err("Exception Code: %d, not yet handled, @ PC: %p, inst: 0x%08x  BadVaddr: %#lx Status: %#x\n",
+ 			exccode, opc, inst, badvaddr,
+-			kvm_read_c0_guest_status(vcpu->arch.cop0));
++			kvm_read_c0_guest_status(&vcpu->arch.cop0));
+ 		kvm_arch_vcpu_dump_regs(vcpu);
+ 		run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+ 		ret = RESUME_HOST;
+@@ -1377,7 +1377,7 @@ int noinstr kvm_mips_handle_exit(struct kvm_vcpu *vcpu)
+ /* Enable FPU for guest and restore context */
+ void kvm_own_fpu(struct kvm_vcpu *vcpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	unsigned int sr, cfg5;
+ 
+ 	preempt_disable();
+@@ -1421,7 +1421,7 @@ void kvm_own_fpu(struct kvm_vcpu *vcpu)
+ /* Enable MSA for guest and restore context */
+ void kvm_own_msa(struct kvm_vcpu *vcpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	unsigned int sr, cfg5;
+ 
+ 	preempt_disable();
+diff --git a/arch/mips/kvm/trace.h b/arch/mips/kvm/trace.h
+index a8c7fd7bf6d2..136c3535a1cb 100644
+--- a/arch/mips/kvm/trace.h
++++ b/arch/mips/kvm/trace.h
+@@ -322,11 +322,11 @@ TRACE_EVENT_FN(kvm_guest_mode_change,
+ 	    ),
+ 
+ 	    TP_fast_assign(
+-			__entry->epc = kvm_read_c0_guest_epc(vcpu->arch.cop0);
++			__entry->epc = kvm_read_c0_guest_epc(&vcpu->arch.cop0);
+ 			__entry->pc = vcpu->arch.pc;
+-			__entry->badvaddr = kvm_read_c0_guest_badvaddr(vcpu->arch.cop0);
+-			__entry->status = kvm_read_c0_guest_status(vcpu->arch.cop0);
+-			__entry->cause = kvm_read_c0_guest_cause(vcpu->arch.cop0);
++			__entry->badvaddr = kvm_read_c0_guest_badvaddr(&vcpu->arch.cop0);
++			__entry->status = kvm_read_c0_guest_status(&vcpu->arch.cop0);
++			__entry->cause = kvm_read_c0_guest_cause(&vcpu->arch.cop0);
+ 	    ),
+ 
+ 	    TP_printk("EPC: 0x%08lx PC: 0x%08lx Status: 0x%08x Cause: 0x%08x BadVAddr: 0x%08lx",
+diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
+index 3d21cbfa7443..99d5a71e4300 100644
+--- a/arch/mips/kvm/vz.c
++++ b/arch/mips/kvm/vz.c
+@@ -422,7 +422,7 @@ static void _kvm_vz_restore_htimer(struct kvm_vcpu *vcpu,
+  */
+ static void kvm_vz_restore_timer(struct kvm_vcpu *vcpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	u32 cause, compare;
+ 
+ 	compare = kvm_read_sw_gc0_compare(cop0);
+@@ -517,7 +517,7 @@ static void _kvm_vz_save_htimer(struct kvm_vcpu *vcpu,
+  */
+ static void kvm_vz_save_timer(struct kvm_vcpu *vcpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	u32 gctl0, compare, cause;
+ 
+ 	gctl0 = read_c0_guestctl0();
+@@ -863,7 +863,7 @@ static unsigned long mips_process_maar(unsigned int op, unsigned long val)
+ 
+ static void kvm_write_maari(struct kvm_vcpu *vcpu, unsigned long val)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 
+ 	val &= MIPS_MAARI_INDEX;
+ 	if (val == MIPS_MAARI_INDEX)
+@@ -876,7 +876,7 @@ static enum emulation_result kvm_vz_gpsi_cop0(union mips_instruction inst,
+ 					      u32 *opc, u32 cause,
+ 					      struct kvm_vcpu *vcpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	enum emulation_result er = EMULATE_DONE;
+ 	u32 rt, rd, sel;
+ 	unsigned long curr_pc;
+@@ -1911,7 +1911,7 @@ static int kvm_vz_get_one_reg(struct kvm_vcpu *vcpu,
+ 			      const struct kvm_one_reg *reg,
+ 			      s64 *v)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	unsigned int idx;
+ 
+ 	switch (reg->id) {
+@@ -2081,7 +2081,7 @@ static int kvm_vz_get_one_reg(struct kvm_vcpu *vcpu,
+ 	case KVM_REG_MIPS_CP0_MAARI:
+ 		if (!cpu_guest_has_maar || cpu_guest_has_dyn_maar)
+ 			return -EINVAL;
+-		*v = kvm_read_sw_gc0_maari(vcpu->arch.cop0);
++		*v = kvm_read_sw_gc0_maari(&vcpu->arch.cop0);
+ 		break;
+ #ifdef CONFIG_64BIT
+ 	case KVM_REG_MIPS_CP0_XCONTEXT:
+@@ -2135,7 +2135,7 @@ static int kvm_vz_set_one_reg(struct kvm_vcpu *vcpu,
+ 			      const struct kvm_one_reg *reg,
+ 			      s64 v)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	unsigned int idx;
+ 	int ret = 0;
+ 	unsigned int cur, change;
+@@ -2562,7 +2562,7 @@ static void kvm_vz_vcpu_load_tlb(struct kvm_vcpu *vcpu, int cpu)
+ 
+ static int kvm_vz_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	bool migrated, all;
+ 
+ 	/*
+@@ -2704,7 +2704,7 @@ static int kvm_vz_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ static int kvm_vz_vcpu_put(struct kvm_vcpu *vcpu, int cpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 
+ 	if (current->flags & PF_VCPU)
+ 		kvm_vz_vcpu_save_wired(vcpu);
+@@ -3076,7 +3076,7 @@ static void kvm_vz_vcpu_uninit(struct kvm_vcpu *vcpu)
+ 
+ static int kvm_vz_vcpu_setup(struct kvm_vcpu *vcpu)
+ {
+-	struct mips_coproc *cop0 = vcpu->arch.cop0;
++	struct mips_coproc *cop0 = &vcpu->arch.cop0;
+ 	unsigned long count_hz = 100*1000*1000; /* default to 100 MHz */
+ 
+ 	/*
+-- 
+2.39.3
+
