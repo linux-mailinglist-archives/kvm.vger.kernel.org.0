@@ -2,64 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13A8573E691
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 19:35:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF3C773E6B7
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 19:41:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231783AbjFZRe6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 13:34:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35326 "EHLO
+        id S230154AbjFZRk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 13:40:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231377AbjFZReR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 13:34:17 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B2EC2
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 10:34:16 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-56ff7b4feefso33700027b3.0
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 10:34:16 -0700 (PDT)
+        with ESMTP id S229910AbjFZRkk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 13:40:40 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0CE335B7
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 10:39:24 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1b8161f564dso12335ad.1
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 10:39:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687800856; x=1690392856;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C69XInp0wICRbOpkfYjSxGQ6Ixd6KtkmGO4PCkEo8n0=;
-        b=bwoKhPSbWox2m1zh2KruqyMiMuvq6Q4cogbm3zpRuUe7yh83xGm9HfYq+M9tnxjI1G
-         Sj3u4wWteXweU19vK1QtxC5Go2JKQbIX/eALES++0Vd75jX2qwCQE4oXY0jV7ffxL9We
-         avHP8m1ug+9RhJvQV//YAHqbVPbrp7ZY92O/B6LeDNZNg9O/dQqOH54USSGsDFQalf/t
-         s/hnza1o7viPad+132CsvMyeU1dor4gXFod54UuMMFGjgpefDdzJjlX8DgatdWjhBkS6
-         LzBw5FQWOW2mQ/kZdNUCfpU25k2kGqKkTcHvxt6V7jHPs1aKBA5zPd9SITQWEDdltsd/
-         jQmg==
+        d=google.com; s=20221208; t=1687801126; x=1690393126;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CnOW0xT5vQ5Av3Y9zgLv4Rm4Hfmf/1VJmsqhaRUinD4=;
+        b=TUU5FDQJ3oYqPE3qDHrBI6fwe4I571fEYBA0VqrYAi7cDeMjY0wKJfR/qH2TqovmSL
+         iluh0WAWNzpjTuCPT8B2agKYqsBsyj1ZwkrQxsmQl4GlCoQplmsa+3qosl+ZYC9RXnaH
+         /TAWG9q8l24d58A9xjxFpcWMfZpsdu/vyNrR76MTJQiJKHPPzA7G6EmJIozjjXCUhGX4
+         HgO2d0f1g1UzZjq6jYSlXutQdZJcTv/v/ssxwcfPfI2B1Rmt5hnku7VpFof8YVOfVKUW
+         fuaDPRVMPJWEsOIcLs7unSsJzzWuE+LGB5k+keJ+AzelKn9D2wC/sdAoTTKlGToGDgW9
+         j09Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687800856; x=1690392856;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C69XInp0wICRbOpkfYjSxGQ6Ixd6KtkmGO4PCkEo8n0=;
-        b=gfmmIKntk9+BrE5OH2TC7F/1egoPwTwJDjftor0iS1OCdTjROxPASbFC40ml1Pj5eI
-         arwV4oG+u/SrsYzzSx1aM2RVtyDPgAfFK5na5MoQ8KGew1Y4TS0rM1qR5sl7rl272+DT
-         alFn3dJ7PMvm60/nAJQD7scb+tNBIvXnXnIef7z2iqX/zVcWbW8hMSadG4rosCbRo0jv
-         42bCyIifGCexdMOd5KA+wfE54QfSejwFQzZgNao0rUCdfQ4jjvlyDNJhHmfUriS2oGeD
-         SJ0FWfsYX/nA6JwBiL4+MpKQUhX1xyJQq66XWaEY5Dnu+l3AMAsgf5qEnb440vzIwjbg
-         WFog==
-X-Gm-Message-State: AC+VfDzo9VO0Lh8XEDppf1X516eYGJifujYF0es5atOF8zkGmCRt1Rh6
-        Hrh4AUWxg1jtSXYpADzueVPTFlUHjZo=
-X-Google-Smtp-Source: ACHHUZ51V3Kiv8m1FOZGGhbPviSCx+GJDADabe6eJiyXexMK/hPGkFMHHaUtx/OzOsnuvWoQm7JT/+CBAj4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:e24a:0:b0:56d:2abf:f0c with SMTP id
- z10-20020a81e24a000000b0056d2abf0f0cmr12812727ywl.10.1687800855885; Mon, 26
- Jun 2023 10:34:15 -0700 (PDT)
-Date:   Mon, 26 Jun 2023 10:34:14 -0700
-In-Reply-To: <CAAAPnDEb0dwdWsF6K9s1r=gZSQHXwo5Y8U9FWGzX52_KSFk_hw@mail.gmail.com>
-Mime-Version: 1.0
-References: <20230623123522.4185651-2-aaronlewis@google.com>
- <ZJW9uBPssAtHY4h+@google.com> <CAAAPnDEb0dwdWsF6K9s1r=gZSQHXwo5Y8U9FWGzX52_KSFk_hw@mail.gmail.com>
-Message-ID: <ZJnMFq+BQF46NGut@google.com>
-Subject: Re: [PATCH] KVM: x86/pmu: SRCU protect the PMU event filter in the
- fast path
-From:   Sean Christopherson <seanjc@google.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        d=1e100.net; s=20221208; t=1687801126; x=1690393126;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CnOW0xT5vQ5Av3Y9zgLv4Rm4Hfmf/1VJmsqhaRUinD4=;
+        b=VG1dEWI4Qb39vOamrqXd/Ccxj6ayk3b/ONL2MxnTpuYKnV0anHyAiK7HzeZunM63Bw
+         n5vExziKQ8JcxjoO3+fkDFux+L7cpYRL9iRrpGCshvhTS2IHhI7OlwQ+MB5kOKQgGkND
+         R+HpT2u5vZggHsIw5UhKpPh/QUvo1kmPvfXGb4nSkQFfnJ1f/w2/Opuh0sovLF/7CUsY
+         kVaZucWKPkOL9BOc1eFRFvu6SPQtFFn8Z7AXIT/ZzcSH/snLKvJQ+O0r/xhi2F7HmVs0
+         VhStFCIV4+m8pt0epRUNK0xibla9EOzA2VzOptB6hqEyROcSUTphxXXvoWjoGA6JWkqz
+         1G5Q==
+X-Gm-Message-State: AC+VfDzZcWUsIgVXrKt3AZHCjPvJ0LawDaOvlT9VN8TIUV7VT0oMiwdT
+        V1RdNsMeYkJLoDMx2u9sr6fOKAQ6PqeZfnzDRuFMlw==
+X-Google-Smtp-Source: ACHHUZ4MH0OZy3lD6UGeyuNNbWYbl4Jr2Ip0p+nhEVV6ESU3PL17fzY9SkLenEMqFlPeT1C9o8cn8wB3BwK8DHU561w=
+X-Received: by 2002:a17:902:ecc7:b0:1ae:4008:5404 with SMTP id
+ a7-20020a170902ecc700b001ae40085404mr2096040plh.0.1687801125581; Mon, 26 Jun
+ 2023 10:38:45 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230605004334.1930091-1-mizhang@google.com> <CALMp9eSQgcKd=SN4q2QRYbveKoayKzuYEQPM0Xu+FgQ_Mja8-g@mail.gmail.com>
+ <CAL715WJowYL=W40SWmtPoz1F9WVBFDG7TQwbsV2Bwf9-cS77=Q@mail.gmail.com>
+ <ZH4ofuj0qvKNO9Bz@google.com> <CAL715WKtsC=93Nqr7QJZxspWzF04_CLqN3FUxUaqTHWFRUrwBA@mail.gmail.com>
+ <ZH+8GafaNLYPvTJI@google.com> <CAL715WJ1rHS9ORR2ttyAw+idqbaLnOhLveUhW8f4tB9o+ZsuiQ@mail.gmail.com>
+ <ZH/PKMmWWgJQdcJQ@google.com> <CAL715W+KSgNMk+kTt3=B-CgxTkToH6xmvHWvVmm3V+hir-jE=g@mail.gmail.com>
+In-Reply-To: <CAL715W+KSgNMk+kTt3=B-CgxTkToH6xmvHWvVmm3V+hir-jE=g@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 26 Jun 2023 10:38:34 -0700
+Message-ID: <CALMp9eRvUky-jcrkJ75N5-kvWWxVMNaf95XpyGTa_k49n48g9A@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Remove KVM MMU write lock when accessing indirect_shadow_pages
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,84 +75,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 26, 2023, Aaron Lewis wrote:
-> As a separate issue, shouldn't we restrict the MSR filter from being
-> able to intercept MSRs handled by the fast path?  I see that we do
-> that for the APIC MSRs, but if MSR_IA32_TSC_DEADLINE is handled by the
-> fast path, I don't see a way for userspace to override that behavior.
-> So maybe it shouldn't?  E.g.
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 439312e04384..dd0a314da0a3 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1787,7 +1787,7 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32
-> index, u32 type)
->         u32 i;
-> 
->         /* x2APIC MSRs do not support filtering. */
-> -       if (index >= 0x800 && index <= 0x8ff)
-> +       if (index >= 0x800 && index <= 0x8ff || index == MSR_IA32_TSC_DEADLINE)
->                 return true;
-> 
->         idx = srcu_read_lock(&kvm->srcu);
+On Thu, Jun 15, 2023 at 4:58=E2=80=AFPM Mingwei Zhang <mizhang@google.com> =
+wrote:
+>
+> On Tue, Jun 6, 2023 at 5:28=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >
+> > On Tue, Jun 06, 2023, Mingwei Zhang wrote:
+> > > > > Hmm. I agree with both points above, but below, the change seems =
+too
+> > > > > heavyweight. smp_wb() is a mfence(), i.e., serializing all
+> > > > > loads/stores before the instruction. Doing that for every shadow =
+page
+> > > > > creation and destruction seems a lot.
+> > > >
+> > > > No, the smp_*b() variants are just compiler barriers on x86.
+> > >
+> > > hmm, it is a "lock addl" now for smp_mb(). Check this: 450cbdd0125c
+> > > ("locking/x86: Use LOCK ADD for smp_mb() instead of MFENCE")
+> > >
+> > > So this means smp_mb() is not a free lunch and we need to be a little
+> > > bit careful.
+> >
+> > Oh, those sneaky macros.  x86 #defines __smp_mb(), not the outer helper=
+.  I'll
+> > take a closer look before posting to see if there's a way to avoid the =
+runtime
+> > barrier.
+>
+> Checked again, I think using smp_wmb() and smp_rmb() should be fine as
+> those are just compiler barriers. We don't need a full barrier here.
 
-Yeah, I saw that flaw too :-/  I'm not entirely sure what to do about MSRs that
-can be handled in the fastpath.
+That seems adequate.
 
-On one hand, intercepting those MSRs probably doesn't make much sense.  On the
-other hand, the MSR filter needs to be uABI, i.e. we can't make the statement
-"MSRs handled in KVM's fastpath can't be filtered", because either every new
-fastpath MSRs will potentially break userspace, or KVM will be severely limited
-with respect to what can be handled in the fastpath.
-
-From an ABI perspective, the easiest thing is to fix the bug and enforce any
-filter that affects MSR_IA32_TSC_DEADLINE.  If we ignore performance, the fix is
-trivial.  E.g.
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5f220c04624e..3ef903bb78ce 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2174,6 +2174,9 @@ fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu)
- 
-        kvm_vcpu_srcu_read_lock(vcpu);
- 
-+       if (!kvm_msr_allowed(vcpu, msr, KVM_MSR_FILTER_WRITE))
-+               goto out;
-+
-        switch (msr) {
-        case APIC_BASE_MSR + (APIC_ICR >> 4):
-                data = kvm_read_edx_eax(vcpu);
-@@ -2196,6 +2199,7 @@ fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu)
-        if (ret != EXIT_FASTPATH_NONE)
-                trace_kvm_msr_write(msr, data);
- 
-+out:
-        kvm_vcpu_srcu_read_unlock(vcpu);
- 
-        return ret;
-
-But I don't love the idea of searching through the filters for an MSR that is
-pretty much guaranteed to be allowed.  Since x2APIC MSRs can't be filtered, we
-could add a per-vCPU flag to track if writes to TSC_DEADLINE are allowed, i.e.
-if TSC_DEADLINE can be handled in the fastpath.
-
-However, at some point Intel and/or AMD will (hopefully) add support for full
-virtualization of TSC_DEADLINE, and then TSC_DEADLINE will be in the same boat as
-the x2APIC MSRs, i.e. allowing userspace to filter TSC_DEADLINE when it's fully
-virtualized would be nonsensical.  And depending on how hardware behaves, i.e. how
-a virtual TSC_DEADLINE interacts with the MSR bitmaps, *enforcing* userspace's
-filtering might require a small amount of additional complexity.
-
-And any MSR that is performance sensitive enough to be handled in the fastpath is
-probably worth virtualizing in hardware, i.e. we'll end up revisiting this topic
-every time we add an MSR to the fastpath :-(
-
-I'm struggling to come up with an idea that won't create an ABI nightmare, won't
-be subject to the whims of AMD and Intel, and won't saddle KVM with complexity to
-support behavior that in all likelihood no one wants.
-
-I'm leaning toward enforcing the filter for TSC_DEADLINE, and crossing my fingers
-that neither AMD nor Intel implements TSC_DEADLINE virtualization in such a way
-that it changes the behavior of WRMSR interception.
+> Thanks.
+> -Mingwei
