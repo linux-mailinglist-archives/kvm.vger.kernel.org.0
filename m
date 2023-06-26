@@ -2,349 +2,438 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4A6373E191
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 16:07:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60D4973E1AD
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 16:13:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230152AbjFZOHx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 10:07:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59104 "EHLO
+        id S231158AbjFZONu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 10:13:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230002AbjFZOHw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 10:07:52 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49CB1E7E;
-        Mon, 26 Jun 2023 07:07:50 -0700 (PDT)
+        with ESMTP id S231153AbjFZONr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 10:13:47 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EBE810E7;
+        Mon, 26 Jun 2023 07:13:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687788470; x=1719324470;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=bP6cXtU0J0gQ2sp2xYfnQhQerZcIa+R7rAym3aw1bkw=;
-  b=UhYjAqIrooBKrTMs5blEXXkQk3sBZ58m8Ks2yrzuUlXqOYSrwMORuxU5
-   nUWP9i6BouLlGjCGWylxzw9717mBVmSMsgkAM4yeTBZCNHjkewC+5grO+
-   C1D7/cVmQf4LhNZiTHS6yadusoNoKmyqpi4BTicXethp12WfuiGES+/q9
-   oRN73cJZfgAEhoWE4NOPxQn2TR6D3+epR3pZ7rwN6qhgEZcjmektdVDcQ
-   9NWJWa+gMpOgDhPISM8Rulc4291+XqIzDIEB5lCEbPft/sSr/kTcLii8z
-   joScOmKjwwk9bor0JtQDoGP2lR53GJlavNK3Qzr28xIlNsxhGNBAPN4u4
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="424947076"
+  t=1687788814; x=1719324814;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=psCgDDLbjhZ2K4kae5gzxul1wXH5G7UqNqB5dydQ/uU=;
+  b=JsMzLo9HGNVFcLAVftN1vi/cvY09R7+GOQlTo5jsfb56ZWJcikkfAeVn
+   LPCpFcQiFkR/R8QTTBq/UaJTX2iWwSHH9XoLCiCXmaqv4mi6E79plPzhd
+   WyFMicA9ik7Wy5yxPRCbOARFZ+s6uyL4FhMkMvtMqWykDEcuDKqacg9X7
+   kLUyyqC3m9Z972AiXpDDL7kEI0jLgz6Os0x3hJBRO1ukTGoegrOjgVYfd
+   vMbHTSCXYDRaMFCuPR9cn78CKcPvCfVw52O4aagBz19u0ncrDQ7ZAnu5q
+   RaLKdaXCX/3cRXZDWtdg2nHQX1Toqn1UAUo46+5Gsczalmmbt75mpVA0c
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="346033458"
 X-IronPort-AV: E=Sophos;i="6.01,159,1684825200"; 
-   d="scan'208";a="424947076"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 07:06:04 -0700
+   d="scan'208";a="346033458"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 07:13:31 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="745804310"
+X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="890292201"
 X-IronPort-AV: E=Sophos;i="6.01,159,1684825200"; 
-   d="scan'208";a="745804310"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga008.jf.intel.com with ESMTP; 26 Jun 2023 07:06:03 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 26 Jun 2023 07:06:03 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 26 Jun 2023 07:06:03 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.175)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Mon, 26 Jun 2023 07:06:01 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NK67Evi1BcoaBDPfgcFoHMusn2oge1ZA/+IXKaQQIZs3JbZvim/b/iwPXDRH+sGoIVwez7Wj/1Mus9lJb9pJ7YxxLOf3ZPxFDELY5i39BC85XKOKxLcZXw/9PikHE6NFU5wq/y1gmPT5LNP2STq2I6/46Li04x9ga4koYdlOQe9Ydt97boW4DVQhq/QjWa8LgOQNjq1sCIIE4JBGbof8zCkBnh+Vvq400oSGIdp61kuHT8yKdW3kaJ65zkJ0HGEc/VNBeBIwPsLcP5enW3tNqWz142FPqW7rb7OvQSim3nhwu7ppWjYVotmT1FGAR7Dd6jQkYmBHfpqkekCyHov77A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xYBqDFwcqwUTldbVMF/JEDhDZkd4s/vNpmWjVuwq4YI=;
- b=DzOIA1EZSs2OfCVdSX5JUx7hAEAsm3N0Icpwe3wFsEIHm/CNno48gbQOGRAKLvMGzxoBGkjLehlDIuLk7YHq0IjjdJIheqCl2ksKivCba5gkELkQfq866h4jCfiL7Cncqu8ifpBAW179pO0RSCN38u+CuUWGOPUQqrWSiW2d3HAXQ3jxOWWRH+fuUeQXK/vzO5SAQ/rRs8+2begmx6U/pGGdv2U/lHUx5bn7Eb6bWppoE+c1xT/3DkbW27oa3Phf7ziW3rFBmm3cw76V2sH7FWPEr/yY2aCw8pw0CrZSUFR654429+H9LfnIFwmBJ6Ft+5Qyd7l4xRwwpw7fQgJ/2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by DS0PR11MB7925.namprd11.prod.outlook.com (2603:10b6:8:f8::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Mon, 26 Jun
- 2023 14:05:56 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::4707:8818:a403:f7a9]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::4707:8818:a403:f7a9%6]) with mapi id 15.20.6521.023; Mon, 26 Jun 2023
- 14:05:56 +0000
-Message-ID: <9b12207f-7aec-7d46-9b7a-99355bc9d38d@intel.com>
-Date:   Mon, 26 Jun 2023 22:05:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v3 13/21] KVM:VMX: Emulate reads and writes to CET MSRs
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-CC:     <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <peterz@infradead.org>,
-        <rppt@kernel.org>, <binbin.wu@linux.intel.com>,
-        <rick.p.edgecombe@intel.com>, <john.allen@amd.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20230511040857.6094-1-weijiang.yang@intel.com>
- <20230511040857.6094-14-weijiang.yang@intel.com>
- <ZJYwg3Lnq3nJZgQf@google.com>
-From:   "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <ZJYwg3Lnq3nJZgQf@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2P153CA0013.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:140::12) To PH0PR11MB4965.namprd11.prod.outlook.com
- (2603:10b6:510:34::7)
+   d="scan'208";a="890292201"
+Received: from smithau-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.213.179.223])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 07:13:23 -0700
+From:   Kai Huang <kai.huang@intel.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, x86@kernel.org, dave.hansen@intel.com,
+        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
+        peterz@infradead.org, tglx@linutronix.de, bp@alien8.de,
+        mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
+        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, ashok.raj@intel.com,
+        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, ying.huang@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
+        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com,
+        kai.huang@intel.com
+Subject: [PATCH v12 00/22] TDX host kernel support
+Date:   Tue, 27 Jun 2023 02:12:30 +1200
+Message-Id: <cover.1687784645.git.kai.huang@intel.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|DS0PR11MB7925:EE_
-X-MS-Office365-Filtering-Correlation-Id: 56a78ec1-b2c9-462d-95a1-08db764e75f9
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MugaQrwui7rnpWXWZ+EmWl4GMbDSEI2pUU1hBBZ/UMA6IhaQ0HSceiDUHvL0yeUYN2CK8iS8bGKv+S4XD9pAWGBK0B5uxTW512gSQkWretS+MK0rKyFIXF3bwY0J1Uzwan5Xz1zuo0BojR3dX+V1s2sO5YSgKEkw+DlsvVytAUaWyrrYMkvoHYKjr8zaNhJ4Tl6lrHPDwKIJRbYEn6R6rFwAlKsBkIAjuJbNFgy2NKTKp04NNcLbmSwJCraJ5HC/bO6uBky3ivY6LsKVeN5Ug8hklZzDOVdJxHL6SfLbn/efJMYeEpd6t0a6U4aBpAy8dnpRpdIEEiaYmWHsb6nNksWCwPTw3SPjF2NMctG3hM314aSjWJz8MFX0HS6aNPUbJxn6t67uAwEGxwxCp57in/YUcLzS/2QBjRsApwu/ZcIz88ibC+7vZ6xODuzPMcIvXPLliKEsTk8KnJw54pP1OfNKLzCIb/vKww7pA9Gn+beOT643NJqWrQ0KSoF6yRKqyBCvLrReuHlCdlcvL1ekIr7tZ4PHPNaMD3jUaeBvLTiC/pa+Ex0+I5lKqWa/tvsVpDiHW08hwDF2JOzdnfx8Scwz1AwVF1YOrVS6C+PAvuutvzGDuq42qUP0Y4176zxfmwgoRZIRNrYl5Mmi43cwyg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(136003)(39860400002)(376002)(366004)(346002)(451199021)(31686004)(5660300002)(4326008)(66946007)(66556008)(6916009)(66476007)(478600001)(36756003)(316002)(66899021)(8676002)(8936002)(2906002)(31696002)(86362001)(41300700001)(6486002)(53546011)(6512007)(6506007)(26005)(186003)(82960400001)(38100700002)(2616005)(6666004)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WFFUM2loYVJlU09qSE04WDZaOUV6N0tkeUQxNHV5VGNPWTcxUVFqOWxhYUVB?=
- =?utf-8?B?alVzUGdNRUpjczA5NjJTRFdDQmZEdDRJVXJSTjJCMVFNV3N5RHhGNVUyNExB?=
- =?utf-8?B?bHZ2TFBKRkhGTE5acVlWZU8xVnZGa1BxMFBNNFJmUE9Kb2ZTNm41enhUVGtB?=
- =?utf-8?B?UjhqTFVQUnhpSnNmcFp1RXpRVFNXQTA2dHJBcTVWR0pFTnFvSmJtQ2FaelBP?=
- =?utf-8?B?bjV2M29kYy9vT2JSM3N3Tmp5M0ZCVmduaU5rVFJhTmVsTlk0dzh1VWtEb3Bk?=
- =?utf-8?B?TDUzSitQN3BmM21oclNWUkozL3RYRjBOdnJyMWdQMW95dG1sZitERE1UWnJI?=
- =?utf-8?B?RmFlbGc0Sy9Qckp5WWlzMTBzajBDQlRaTGZweUtKdGp3c2NBaUlvS0xVN2hG?=
- =?utf-8?B?VDFneEJpeUptaXQvbU55dUF5anQrdUlvQVpNN1ZuWDNORzhPQmFhL2NrSnZS?=
- =?utf-8?B?RDRtbGk3N2VUVG13cWR4enk1ZzdUcldIQUZkNm5hMEJMeWFuUG5WRU1nSDBm?=
- =?utf-8?B?M0JVVWpTQ3dhWWFVekZIN1JYdGkyUW03NFRLNFhHY1B1QkZ2WEE4NlBWWlFV?=
- =?utf-8?B?ZUM2YkFHSzlzYzhKZ0Rzd3A5RnJzWTZZSFhVck1NVnJVV01qRHhraG96b1pr?=
- =?utf-8?B?K1R6U1pOY3NkdU1wN3V4SmljS2xJVVIzNDF5OEhmdUxBTmEzaXczbFNrc0c5?=
- =?utf-8?B?aWNaOXhHWWtYV0Y1bXk0UnBRVjVwTUdURzB3NWQ1SXBpSGFnUTAxL3E1Qjhj?=
- =?utf-8?B?ME1lb1FMeGJ5c1d3b3VQOFJJT2dxZWhlTy95T0IyeThNUms1b1JPZDFqY0Ji?=
- =?utf-8?B?dmtLQi9Ucm1XZjh3VHNDOWdtY0g5QVN1RVFJdmVpTXROWlBkVnR0dDB5TWxs?=
- =?utf-8?B?VzFTcU1EVXRYOE5UM1puUnFwTlJwc2FzdXZVcll5RTNSdDNvbVBRYXU1dkpH?=
- =?utf-8?B?cEVPWmxxZW5zQ2tnMm4zRHFjakw1TWNheG92R2k2RkdqVW1jTWhsdnY5a3Jv?=
- =?utf-8?B?bmZJVnY1SkZ6MFEvVDEzZE8xT0JUeTRwSVRGRG9GZWxvUHBUVXFWNDUyV0RD?=
- =?utf-8?B?S2dBSk5aQkFjOUlEeHJZQXFJNGJTYXF6bVhFcEdUeUx1MVVkWHFJdkJrQm0w?=
- =?utf-8?B?Kzg3NjdFMXFPWmZkM1lCaXBmRFAyNnQyVlFHUFBsVXNhS3dpNnFnanMxVmsx?=
- =?utf-8?B?S2Y0ZEIycnlCNmU5cVlYTnhwdmtJcVp3MU8zRmp2NHg1MUpHWlV1Z1ltMXhD?=
- =?utf-8?B?MlJGM1J5NUtiR3ExUEhMNE1jVnE0a2phVlhFeCtiNHdVVE5WU2hBb0ZwUE1H?=
- =?utf-8?B?YjZzSUpselpMN3FtVlFROThCVWhPc2FhQ1VKN0pvc2dxY0hoS2NZKzdMTGNy?=
- =?utf-8?B?N1pncjEvR2Q4ZWNWUHVPYkFVaFhZRzZsaG1EUWFiUDFEei9NQkJaNGtPME84?=
- =?utf-8?B?YTMwdkhSMDkxRVZHcUh2WFNielhGZGwwWVJlRFhPNnQyb2JIS1R4aWcwNmty?=
- =?utf-8?B?RTc1QmlUV01EQTRJMlJwRG82SW9iOXZqREM0bFZKV0Q0OEpvdWNFRjFOelRp?=
- =?utf-8?B?ZTdNTk1LMGpPZERreG9FbnZXRkNTbUg0c29Kc3p2WFBxK3gvWWIwNEo4aEcw?=
- =?utf-8?B?ZTU1VWg3SHhWZXdLK1RoRlNBVTQ1RXVMa0V4VVlyTHJaUFlFZThWQ3FHVi9i?=
- =?utf-8?B?TFl6N0Z3M0NZLzJHbHdGWnB6L0VoSHJuZG9LU05YQjBOWkpOT2I1YzR4ODAy?=
- =?utf-8?B?ZzVOaG5VMlVxSm5rU1RWQ2FwNlNVTUNIWjNYQ2NTaXppVXl5bG5ZUUJ0U3lV?=
- =?utf-8?B?eDN4K0NPWkFCbDBaZGJZc3NhTVRPUlJCbUpjZnFxS0JvcEl1QkVwbEtqMkVy?=
- =?utf-8?B?NFhveDNaak1ueFJTbUw1b21jMHNROWU2UFN0RTdRSjdtNUY3ZHkxekdIZGRR?=
- =?utf-8?B?MXEwOE1OT0I3QXMxOVB1TWo0MnFPeXcyVGE5Vm42c0dZRmhnN21YVWJKcHIy?=
- =?utf-8?B?WmJiSHBSK0pRZ1llZ2lTT0FkcTZhNm12Qno1MHdEQlRtYllzMG9GQjVmNm83?=
- =?utf-8?B?ZTBRUi9mSkJVMUVHVEpSQkhVYTI4V1RtTFpoQk5YaG9kS3pRbDhwWFVjVWpZ?=
- =?utf-8?B?OXQ0alQrMVNXQWVDaGlWbk1aS281eDQ0bWN3aXhEZVExTzBQSk1XeUlRWWNF?=
- =?utf-8?B?amc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 56a78ec1-b2c9-462d-95a1-08db764e75f9
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2023 14:05:56.5021
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0lxENx5rpSQuATKIhjM1lCS4x/Ch55gsNbzPvjb3e4hXjwSR4iPmwF2jEyX2JDGqDC+T14MSOc6S3qPtrsZDmw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7925
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Intel Trusted Domain Extensions (TDX) protects guest VMs from malicious
+host and certain physical attacks.  TDX specs are available in [1].
 
-On 6/24/2023 7:53 AM, Sean Christopherson wrote:
-> On Thu, May 11, 2023, Yang Weijiang wrote:
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index c872a5aafa50..0ccaa467d7d3 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -2093,6 +2093,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>   		else
->>   			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
->>   		break;
->> +	case MSR_IA32_U_CET:
->> +	case MSR_IA32_PL3_SSP:
->> +		if (!kvm_cet_is_msr_accessible(vcpu, msr_info))
->> +			return 1;
->> +		kvm_get_xsave_msr(msr_info);
->> +		break;
-> Please put as much MSR handling in x86.c as possible.  We quite obviously know
-> that AMD support is coming along, there's no reason to duplicate all of this code.
-> And unless I'm missing something, John's series misses several #GP checks, e.g.
-> for MSR_IA32_S_CET reserved bits, which means that providing a common implementation
-> would actually fix bugs.
+This series is the initial support to enable TDX with minimal code to
+allow KVM to create and run TDX guests.  KVM support for TDX is being
+developed separately[2].  A new "userspace inaccessible memfd" approach
+to support TDX private memory is also being developed[3].  The KVM will
+only support the new "userspace inaccessible memfd" as TDX guest memory.
 
-OK, will move the common part to x86.c
+Also, a few first generations of TDX hardware have an erratum[4], and
+require additional handing.
 
->
-> For MSRs that require vendor input and/or handling, please follow what was
-> recently done for MSR_IA32_CR_PAT, where the common bits are handled in common
-> code, and vendor code does its updates.
->
-> The divergent alignment between AMD and Intel could get annoying, but I'm sure
-> we can figure out a solution.
-Got it, will refer to the PAT handling.
->
->>   	case MSR_IA32_DEBUGCTLMSR:
->>   		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
->>   		break;
->> @@ -2405,6 +2411,18 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>   		else
->>   			vmx->pt_desc.guest.addr_a[index / 2] = data;
->>   		break;
->> +	case MSR_IA32_U_CET:
->> +	case MSR_IA32_PL3_SSP:
->> +		if (!kvm_cet_is_msr_accessible(vcpu, msr_info))
->> +			return 1;
->> +		if (is_noncanonical_address(data, vcpu))
->> +			return 1;
->> +		if (msr_index == MSR_IA32_U_CET && (data & GENMASK(9, 6)))
->> +			return 1;
->> +		if (msr_index == MSR_IA32_PL3_SSP && (data & GENMASK(2, 0)))
-> Please #define reserved bits, ideally using the inverse of the valid masks.  And
-> for SSP, it might be better to do IS_ALIGNED(data, 8) (or 4, pending my question
-> about the SDM's wording).
+This series doesn't aim to support all functionalities, and doesn't aim
+to resolve all things perfectly.  All other optimizations will be posted
+as follow-up once this initial TDX support is upstreamed.
 
-OK.
+(For memory hotplug, sorry for broadcasting widely but I cc'ed the
+linux-mm@kvack.org following Kirill's suggestion so MM experts can also
+help to provide comments.)
 
->
-> Side topic, what on earth does the SDM mean by this?!?
->
->    The linear address written must be aligned to 8 bytes and bits 2:0 must be 0
->    (hardware requires bits 1:0 to be 0).
->
-> I know Intel retroactively changed the alignment requirements, but the above
-> is nonsensical.  If ucode prevents writing bits 2:0, who cares what hardware
-> requires?
+Hi Dave/Kirill/Tony/David and all,
 
-So do I ;-/
+Thanks for your review on the previous versions.  Appreciate your review
+on this version and any tag if patches look good to you.  Thanks!
 
->
->> +			return 1;
->> +		kvm_set_xsave_msr(msr_info);
->> +		break;
->>   	case MSR_IA32_PERF_CAPABILITIES:
->>   		if (data && !vcpu_to_pmu(vcpu)->version)
->>   			return 1;
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index b6eec9143129..2e3a39c9297c 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -13630,6 +13630,26 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
->>   }
->>   EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
->>   
->> +bool kvm_cet_is_msr_accessible(struct kvm_vcpu *vcpu, struct msr_data *msr)
->> +{
->> +	if (!kvm_cet_user_supported())
-> This feels wrong.  KVM should differentiate between SHSTK and IBT in the host.
-> E.g. if running in a VM with SHSTK but not IBT, or vice versa, KVM should allow
-> writes to non-existent MSRs.
+----- Changelog history: ------
 
-I don't follow you, in this case, which part KVM is on behalf of? guest 
-or user space?
+- v11 -> v12:
+ - Addressed comments in v11 from Dave/Kirill/David and others.
+ - Collected review tags from Dave/Kirill/David and others.
+ - Splitted the SEAMCALL infrastructure patch into 2 patches for better
+   reveiw.
+ - One more patch to change to keep TDMRs when module initialization is
+   successful for better review.
 
-> I.e. this looks wrong:
->
-> 	/*
-> 	 * If SHSTK and IBT are available in KVM, clear CET user bit in
-> 	 * kvm_caps.supported_xss so that kvm_cet_user_supported() returns
-> 	 * false when called.
-> 	 */
-> 	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
-> 	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
-> 		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_USER;
+ v11: https://lore.kernel.org/lkml/cover.1685887183.git.kai.huang@intel.com/T/
 
-The comment is wrong, it should be "are not available in KVM". My intent 
-is,  if both features are not
+- v10 -> v11:
 
-available in KVM, then clear the precondition bit so that all dependent 
-checks will fail quickly.
+ - Addressed comments in v10
+ - Added patches to handle TDX "partial write machine check" erratum.
+ - Added a new patch to handle running out of entropy in common code.
+ - Fixed a bug in kexec() support.
 
->
-> and by extension, all dependent code is also wrong.  IIRC, there's a virtualization
-> hole, but I don't see any reason why KVM has to make the hole even bigger.
+ v10: https://lore.kernel.org/kvm/cover.1678111292.git.kai.huang@intel.com/
 
-Do you mean the issue that both SHSTK and IBT share one control MSR? 
-i.e., U_CET/S_CET?
+- v9 -> v10:
 
->
->> +		return false;
->> +
->> +	if (msr->host_initiated)
->> +		return true;
->> +
->> +	if (!guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) &&
->> +	    !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
->> +		return false;
->> +
->> +	if (msr->index == MSR_IA32_PL3_SSP &&
->> +	    !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
-> I probably asked this long ago, but if I did I since forgot.  Is it really just
-> PL3_SSP that depends on SHSTK?  I would expect all shadow stack MSRs to depend
-> on SHSTK.
+ - Changed the per-cpu initalization handling
+   - Gave up "ensuring all online cpus are TDX-runnable when TDX module
+     is initialized", but just provide two basic functions, tdx_enable()
+     and tdx_cpu_enable(), to let the user of TDX to make sure the
+     tdx_cpu_enable() has been done successfully when the user wants to
+     use particular cpu for TDX.
+   - Thus, moved per-cpu initialization out of tdx_enable().  Now
+     tdx_enable() just assumes VMXON and tdx_cpu_enable() has been done
+     on all online cpus before calling it.
+   - Merged the tdx_enable() skeleton patch and per-cpu initialization
+     patch together to tell better story.
+   - Moved "SEAMCALL infrastructure" patch before the tdx_enable() patch.
 
-All PL{0,1,2,3}_SSP plus INT_SSP_TAB msr depend on SHSTK. In patch 21, I 
-added more
+ v9: https://lore.kernel.org/lkml/cover.1676286526.git.kai.huang@intel.com/
 
-MSRs in this helper.
+- v8 -> v9:
 
->> @@ -546,5 +557,25 @@ int kvm_sev_es_mmio_read(struct kvm_vcpu *vcpu, gpa_t src, unsigned int bytes,
->>   int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
->>   			 unsigned int port, void *data,  unsigned int count,
->>   			 int in);
->> +bool kvm_cet_is_msr_accessible(struct kvm_vcpu *vcpu, struct msr_data *msr);
->> +
->> +/*
->> + * We've already loaded guest MSRs in __msr_io() after check the MSR index.
-> Please avoid pronouns
+ - Added patches to handle TDH.SYS.INIT and TDH.SYS.LP.INIT back.
+ - Other changes please refer to changelog histroy in individual patches.
 
-OK.
+ v8: https://lore.kernel.org/lkml/cover.1670566861.git.kai.huang@intel.com/
 
->> + * In case vcpu has been preempted, we need to disable preemption, check
-> vCPU.  And this doesn't make any sense.  The "vCPU" being preempted doesn't matter,
-> it's KVM, i.e. the task that's accessing vCPU state that cares about preemption.
-> I *think* what you're trying to say is that preemption needs to be disabled to
-> ensure that the guest values are resident.
+- v7 -> v8:
 
-Sorry the comment is broken, I meant to say between kvm_load_guest_fpu() 
-and the
+ - 200+ LOC removed (from 1800+ -> 1600+).
+ - Removed patches to do TDH.SYS.INIT and TDH.SYS.LP.INIT
+   (Dave/Peter/Thomas).
+ - Removed patch to shut down TDX module (Sean).
+ - For memory hotplug, changed to reject non-TDX memory from
+   arch_add_memory() to memory_notifier (Dan/David).
+ - Simplified the "skeletion patch" as a result of removing
+   TDH.SYS.LP.INIT patch.
+ - Refined changelog/comments for most of the patches (to tell better
+   story, remove silly comments, etc) (Dave).
+ - Added new 'struct tdmr_info_list' struct, and changed all TDMR related
+   patches to use it (Dave).
+ - Effectively merged patch "Reserve TDX module global KeyID" and
+   "Configure TDX module with TDMRs and global KeyID", and removed the
+   static variable 'tdx_global_keyid', following Dave's suggestion on
+   making tdx_sysinfo local variable.
+ - For detailed changes please see individual patch changelog history.
 
-place to use this helper, the vCPU could have been preempted, so need to 
-reload fpu with
+ v7: https://lore.kernel.org/lkml/529a22d05e21b9218dc3f29c17ac5a176334cac1.camel@intel.com/T/
 
-fpregs_lock_and_load() and disable preemption now before access MSR.
+- v6 -> v7:
+  - Added memory hotplug support.
+  - Changed how to choose the list of "TDX-usable" memory regions from at
+    kernel boot time to TDX module initialization time.
+  - Addressed comments received in previous versions. (Andi/Dave).
+  - Improved the commit message and the comments of kexec() support patch,
+    and the patch handles returnning PAMTs back to the kernel when TDX
+    module initialization fails. Please also see "kexec()" section below.
+  - Changed the documentation patch accordingly.
+  - For all others please see individual patch changelog history.
+
+ v6: https://lore.kernel.org/lkml/529a22d05e21b9218dc3f29c17ac5a176334cac1.camel@intel.com/T/
+
+- v5 -> v6:
+
+  - Removed ACPI CPU/memory hotplug patches. (Intel internal discussion)
+  - Removed patch to disable driver-managed memory hotplug (Intel
+    internal discussion).
+  - Added one patch to introduce enum type for TDX supported page size
+    level to replace the hard-coded values in TDX guest code (Dave).
+  - Added one patch to make TDX depends on X2APIC being enabled (Dave).
+  - Added one patch to build all boot-time present memory regions as TDX
+    memory during kernel boot.
+  - Added Reviewed-by from others to some patches.
+  - For all others please see individual patch changelog history.
+
+ v5: https://lore.kernel.org/lkml/529a22d05e21b9218dc3f29c17ac5a176334cac1.camel@intel.com/T/
+
+- v4 -> v5:
+
+  This is essentially a resent of v4.  Sorry I forgot to consult
+  get_maintainer.pl when sending out v4, so I forgot to add linux-acpi
+  and linux-mm mailing list and the relevant people for 4 new patches.
+
+  There are also very minor code and commit message update from v4:
+
+  - Rebased to latest tip/x86/tdx.
+  - Fixed a checkpatch issue that I missed in v4.
+  - Removed an obsoleted comment that I missed in patch 6.
+  - Very minor update to the commit message of patch 12.
+
+  For other changes to individual patches since v3, please refer to the
+  changelog histroy of individual patches (I just used v3 -> v5 since
+  there's basically no code change to v4).
+
+ v4: https://lore.kernel.org/lkml/98c84c31d8f062a0b50a69ef4d3188bc259f2af2.1654025431.git.kai.huang@intel.com/T/
+
+- v3 -> v4 (addressed Dave's comments, and other comments from others):
+
+ - Simplified SEAMRR and TDX keyID detection.
+ - Added patches to handle ACPI CPU hotplug.
+ - Added patches to handle ACPI memory hotplug and driver managed memory
+   hotplug.
+ - Removed tdx_detect() but only use single tdx_init().
+ - Removed detecting TDX module via P-SEAMLDR.
+ - Changed from using e820 to using memblock to convert system RAM to TDX
+   memory.
+ - Excluded legacy PMEM from TDX memory.
+ - Removed the boot-time command line to disable TDX patch.
+ - Addressed comments for other individual patches (please see individual
+   patches).
+ - Improved the documentation patch based on the new implementation.
+
+ v3: https://lore.kernel.org/lkml/529a22d05e21b9218dc3f29c17ac5a176334cac1.camel@intel.com/T/
+
+- V2 -> v3:
+
+ - Addressed comments from Isaku.
+  - Fixed memory leak and unnecessary function argument in the patch to
+    configure the key for the global keyid (patch 17).
+  - Enhanced a little bit to the patch to get TDX module and CMR
+    information (patch 09).
+  - Fixed an unintended change in the patch to allocate PAMT (patch 13).
+ - Addressed comments from Kevin:
+  - Slightly improvement on commit message to patch 03.
+ - Removed WARN_ON_ONCE() in the check of cpus_booted_once_mask in
+   seamrr_enabled() (patch 04).
+ - Changed documentation patch to add TDX host kernel support materials
+   to Documentation/x86/tdx.rst together with TDX guest staff, instead
+   of a standalone file (patch 21)
+ - Very minor improvement in commit messages.
+
+ v2: https://lore.kernel.org/lkml/529a22d05e21b9218dc3f29c17ac5a176334cac1.camel@intel.com/T/
+
+- RFC (v1) -> v2:
+  - Rebased to Kirill's latest TDX guest code.
+  - Fixed two issues that are related to finding all RAM memory regions
+    based on e820.
+  - Minor improvement on comments and commit messages.
+
+ v1: https://lore.kernel.org/lkml/529a22d05e21b9218dc3f29c17ac5a176334cac1.camel@intel.com/T/
+
+== Background ==
+
+TDX introduces a new CPU mode called Secure Arbitration Mode (SEAM)
+and a new isolated range pointed by the SEAM Ranger Register (SEAMRR).
+A CPU-attested software module called 'the TDX module' runs in the new
+isolated region as a trusted hypervisor to create/run protected VMs.
+
+TDX also leverages Intel Multi-Key Total Memory Encryption (MKTME) to
+provide crypto-protection to the VMs.  TDX reserves part of MKTME KeyIDs
+as TDX private KeyIDs, which are only accessible within the SEAM mode.
+
+TDX is different from AMD SEV/SEV-ES/SEV-SNP, which uses a dedicated
+secure processor to provide crypto-protection.  The firmware runs on the
+secure processor acts a similar role as the TDX module.
+
+The host kernel communicates with SEAM software via a new SEAMCALL
+instruction.  This is conceptually similar to a guest->host hypercall,
+except it is made from the host to SEAM software instead.
+
+Before being able to manage TD guests, the TDX module must be loaded
+and properly initialized.  This series assumes the TDX module is loaded
+by BIOS before the kernel boots.
+
+How to initialize the TDX module is described at TDX module 1.0
+specification, chapter "13.Intel TDX Module Lifecycle: Enumeration,
+Initialization and Shutdown".
+
+== Design Considerations ==
+
+1. Initialize the TDX module at runtime
+
+There are basically two ways the TDX module could be initialized: either
+in early boot, or at runtime before the first TDX guest is run.  This
+series implements the runtime initialization.
+
+Also, TDX requires a per-cpu initialization SEAMCALL to be done before
+making any SEAMCALL on that cpu.
+
+This series adds two functions: tdx_cpu_enable() and tdx_enable() to do
+per-cpu initialization and module initialization respectively.
+
+2. CPU hotplug
+
+DX doesn't support physical (ACPI) CPU hotplug.  A non-buggy BIOS should
+never support hotpluggable CPU devicee and/or deliver ACPI CPU hotplug
+event to the kernel.  This series doesn't handle physical (ACPI) CPU
+hotplug at all but depends on the BIOS to behave correctly.
+
+Also, tdx_cpu_enable() will simply return error for any hot-added cpu if
+something insane happened.
+
+Note TDX works with CPU logical online/offline, thus this series still
+allows to do logical CPU online/offline.
+
+3. Kernel policy on TDX memory
+
+The TDX module reports a list of "Convertible Memory Region" (CMR) to
+indicate which memory regions are TDX-capable.  The TDX architecture
+allows the VMM to designate specific convertible memory regions as usable
+for TDX private memory.
+
+The initial support of TDX guests will only allocate TDX private memory
+from the global page allocator.  This series chooses to designate _all_
+system RAM in the core-mm at the time of initializing TDX module as TDX
+memory to guarantee all pages in the page allocator are TDX pages.
+
+4. Memory Hotplug
+
+After the kernel passes all "TDX-usable" memory regions to the TDX
+module, the set of "TDX-usable" memory regions are fixed during module's
+runtime.  No more "TDX-usable" memory can be added to the TDX module
+after that.
+
+To achieve above "to guarantee all pages in the page allocator are TDX
+pages", this series simply choose to reject any non-TDX-usable memory in
+memory hotplug.
+
+5. Physical Memory Hotplug
+
+Note TDX assumes convertible memory is always physically present during
+machine's runtime.  A non-buggy BIOS should never support hot-removal of
+any convertible memory.  This implementation doesn't handle ACPI memory
+removal but depends on the BIOS to behave correctly.
+
+Also, if something insane really happened, 4) makes sure either TDX
+cannot be enabled or hot-added memory will be rejected after TDX gets
+enabled.
+
+6. Kexec()
+
+Similar to AMD's SME, in kexec() kernel needs to flush dirty cachelines
+of TDX private memory otherwise they may silently corrupt the new kernel.
+
+7. TDX erratum
+
+The first few generations of TDX hardware have an erratum.  A partial
+write to a TDX private memory cacheline will silently "poison" the
+line.  Subsequent reads will consume the poison and generate a machine
+check.
+
+The fast warm reset reboot doesn't reset TDX private memory.  With this
+erratum, all TDX private pages needs to be converted back to normal
+before a fast warm reset reboot or booting to the new kernel in kexec().
+Otherwise, the new kernel may get unexpected machine check.
+
+In normal condition, triggering the erratum in Linux requires some kind
+of kernel bug involving relatively exotic memory writes to TDX private
+memory and will manifest via spurious-looking machine checks when
+reading the affected memory.  Machine check handler is improved to deal
+with such machine check.
 
 
->> + * and reload the guest fpu states before read/write xsaves-managed MSRs.
->> + */
->> +static inline void kvm_get_xsave_msr(struct msr_data *msr_info)
->> +{
->> +	fpregs_lock_and_load();
-> KVM already has helpers that do exactly this, and they have far better names for
-> KVM: kvm_fpu_get() and kvm_fpu_put().  Can you convert kvm_fpu_get() to
-> fpregs_lock_and_load() and use those isntead? And if the extra consistency checks
-> in fpregs_lock_and_load() fire, we definitely want to know, as it means we probably
-> have bugs in KVM.
+[1]: TDX specs
+https://software.intel.com/content/www/us/en/develop/articles/intel-trust-domain-extensions.html
 
-Do you want me to do some experiments to make sure the WARN()  in 
-fpregs_lock_and load() would be
+[2]: KVM TDX basic feature support
+https://lore.kernel.org/kvm/cover.1685333727.git.isaku.yamahata@intel.com/T/#t
 
-triggered or not?
+[3]: KVM: mm: fd-based approach for supporting KVM
+https://lore.kernel.org/kvm/20221202061347.1070246-1-chao.p.peng@linux.intel.com/
 
-If no WARN() trigger, then replace 
-fpregs_lock_and_load()/fpregs_unlock() with kvm_fpu_get()/
+[4]: TDX erratum
+https://cdrdv2.intel.com/v1/dl/getContent/772415?explicitVersion=true
 
-kvm_fpu_put()?
+
+
+
+Kai Huang (22):
+  x86/tdx: Define TDX supported page sizes as macros
+  x86/virt/tdx: Detect TDX during kernel boot
+  x86/virt/tdx: Make INTEL_TDX_HOST depend on X86_X2APIC
+  x86/cpu: Detect TDX partial write machine check erratum
+  x86/virt/tdx: Add SEAMCALL infrastructure
+  x86/virt/tdx: Handle SEAMCALL running out of entropy error
+  x86/virt/tdx: Add skeleton to enable TDX on demand
+  x86/virt/tdx: Get information about TDX module and TDX-capable memory
+  x86/virt/tdx: Use all system memory when initializing TDX module as
+    TDX memory
+  x86/virt/tdx: Add placeholder to construct TDMRs to cover all TDX
+    memory regions
+  x86/virt/tdx: Fill out TDMRs to cover all TDX memory regions
+  x86/virt/tdx: Allocate and set up PAMTs for TDMRs
+  x86/virt/tdx: Designate reserved areas for all TDMRs
+  x86/virt/tdx: Configure TDX module with the TDMRs and global KeyID
+  x86/virt/tdx: Configure global KeyID on all packages
+  x86/virt/tdx: Initialize all TDMRs
+  x86/kexec: Flush cache of TDX private memory
+  x86/virt/tdx: Keep TDMRs when module initialization is successful
+  x86/kexec(): Reset TDX private memory on platforms with TDX erratum
+  x86/virt/tdx: Allow SEAMCALL to handle #UD and #GP
+  x86/mce: Improve error log of kernel space TDX #MC due to erratum
+  Documentation/x86: Add documentation for TDX host support
+
+ Documentation/arch/x86/tdx.rst     |  189 +++-
+ arch/x86/Kconfig                   |   15 +
+ arch/x86/Makefile                  |    2 +
+ arch/x86/coco/tdx/tdx.c            |    6 +-
+ arch/x86/include/asm/cpufeatures.h |    1 +
+ arch/x86/include/asm/msr-index.h   |    3 +
+ arch/x86/include/asm/tdx.h         |   26 +
+ arch/x86/kernel/cpu/intel.c        |   17 +
+ arch/x86/kernel/cpu/mce/core.c     |   33 +
+ arch/x86/kernel/machine_kexec_64.c |    9 +
+ arch/x86/kernel/process.c          |    7 +-
+ arch/x86/kernel/reboot.c           |   15 +
+ arch/x86/kernel/setup.c            |    2 +
+ arch/x86/virt/Makefile             |    2 +
+ arch/x86/virt/vmx/Makefile         |    2 +
+ arch/x86/virt/vmx/tdx/Makefile     |    2 +
+ arch/x86/virt/vmx/tdx/seamcall.S   |   52 +
+ arch/x86/virt/vmx/tdx/tdx.c        | 1542 ++++++++++++++++++++++++++++
+ arch/x86/virt/vmx/tdx/tdx.h        |  151 +++
+ arch/x86/virt/vmx/tdx/tdxcall.S    |   19 +-
+ 20 files changed, 2078 insertions(+), 17 deletions(-)
+ create mode 100644 arch/x86/virt/Makefile
+ create mode 100644 arch/x86/virt/vmx/Makefile
+ create mode 100644 arch/x86/virt/vmx/tdx/Makefile
+ create mode 100644 arch/x86/virt/vmx/tdx/seamcall.S
+ create mode 100644 arch/x86/virt/vmx/tdx/tdx.c
+ create mode 100644 arch/x86/virt/vmx/tdx/tdx.h
+
+
+base-commit: 94142c9d1bdf1c18027a42758ceb6bdd59a92012
+-- 
+2.40.1
 
