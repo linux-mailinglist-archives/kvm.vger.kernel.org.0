@@ -2,142 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 634DB73E4E5
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 18:24:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4EFF73E4E8
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 18:25:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231439AbjFZQYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 12:24:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52862 "EHLO
+        id S230029AbjFZQZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 12:25:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229689AbjFZQYE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 12:24:04 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2080.outbound.protection.outlook.com [40.107.220.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88C642135;
-        Mon, 26 Jun 2023 09:23:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WfPso+YU91VDXkorR0hNeosx0U7UHoqhDHAycwjCQZ8sayxGJAw4cU0714Ci7vcHhBTuWhV4B6fF5cDBlvrcMuwmvIQLFiI+b8LkzHun7hGOVvDpJhENTtuxXuXKVJ/kZkk3ThefeOU6rcrzS2UtLM4BvNo5c1ObNM10TtLEbMW69mJsf8N2qx95zZvttSV6imH2FGGENhr+iLYxj7S0l9YrMbUel/z871FfOXBsfXJsBa2MDpiQz8S92ZDmhSzvF7HDhVfeTfez5gLevo+V3hf4eStqoYpbFdLULv3MNcLQGFL/v+TaIPcGMVjc3t/wssv5w2M9n03y7fy/PMkwtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=j30aBMAcZxJzYSgJm+44A+2jO2EztXvfs0/DogpcmGA=;
- b=T73EgjhUbseD/6MkbFIi6jtJOW0oD4IgvxKaqZ+zcZz3p6fb1Z0e6eOHX8RC84RBeA4sSEoafckunBfczSWebxiO359NOwrccS3ERz8vg9DskISAiIHhEKuq8GOfynUkIkCOx7LlyOYITbWsLPafJbyXb4K3h0qF/0+w10F7QQo0DfH/YNO+lVpoMJpFq1cxQjguFkl83SP1yBoKu7UzVkkmTgMvEqB5uZ8/S0p7Mp3C1NWJglyeW7Iiz1+ZOC8G7xR+n8GECDrCbWLWXZ+72gjfMDqTYaow3G6iqvaMsSsDKoSbv/15oWuOHOtwcmIajwDPSqLdaYNFX4IUw3IEgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j30aBMAcZxJzYSgJm+44A+2jO2EztXvfs0/DogpcmGA=;
- b=pr1MyVnMj1sQb+Tj3HCVsnJdJ9Wkd5tz8hjqA6D+99c2JoBFBj8U4qb8IAswbo/DFJPbwekGy9Zk+uyf8yVX80IT1MRyQ56nx0iiiJZFSjdqtjg9W29a1pYr6FZlTNmq5IDLY4hNjLzPLxf2ZQz0HBOW3wJtdPTYg5KIKjCsLN/rPu/W3LR9KUhwcniRrOjQZ5svhgY+xGQnHDsAYGxdaC7DIv2IPWVtPHQKvIntBGQcL+BvnBxQsJ2kOO9mCPYcKYtWn0n55QUqht2f4P5XVp8pNDIijZiGMqTm51muFcmhaZoA6drnO0rIw0hYfEu4yqfQmDoxNuJuYAOO4vc0/Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA1PR12MB6749.namprd12.prod.outlook.com (2603:10b6:806:255::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Mon, 26 Jun
- 2023 16:23:09 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%7]) with mapi id 15.20.6521.024; Mon, 26 Jun 2023
- 16:23:09 +0000
-Date:   Mon, 26 Jun 2023 13:23:07 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     ankita@nvidia.com, aniketa@nvidia.com, cjia@nvidia.com,
-        kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
-        acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
-        danw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/1] vfio/nvgpu: Add vfio pci variant module for grace
- hopper
-Message-ID: <ZJm7a1BpeLmQQ5Mj@nvidia.com>
-References: <20230622030720.19652-1-ankita@nvidia.com>
- <ZJWdbbNESp1+6GVN@nvidia.com>
- <20230626100629.3c318922.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230626100629.3c318922.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL1P221CA0012.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:208:2c5::6) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S232106AbjFZQZF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 12:25:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FE1C2941
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 09:23:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687796625;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=goJ82gfmaMLDwx1lebPuhQrFW0gpPX2fa0/sdreNvaA=;
+        b=SD6KzRytsr6wD2vg5KQ8IbjclesQwG9+zkJGZh10fkBpdzD4JaoMas7GxNSZhiv+vVNGys
+        HUl+PNfI4oLA06PL3opD+gKjOgLRd8g+cOW/WHxB2OeM9hb/Fd7xiaA9CUNTTK7Z4n1izb
+        MZzCrJTenxPwabQUf9lX5F7iiJNP1OQ=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-308-P06w9hkFNVeMbnCg669waQ-1; Mon, 26 Jun 2023 12:23:38 -0400
+X-MC-Unique: P06w9hkFNVeMbnCg669waQ-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4009a8498f7so16684631cf.1
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 09:23:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687796617; x=1690388617;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=goJ82gfmaMLDwx1lebPuhQrFW0gpPX2fa0/sdreNvaA=;
+        b=J7dFC9IHwKsPmASskMTnzzFUjgy8KdUpg9uqJGTyvlSkSKVWzPeNAityna5uw883Eb
+         +vR1N69Xd7iUdA8HRmvCNEv7OsVcYdt/Dm5H/mLHd0tS0L8rkFFpiuct5Prt3UWBs08J
+         wVUhBoTW8kbcNTRAVj2RIApEhtYFYfbPaMiv9fPhEH+YmDXIHlN9QUqfdpkSbNgUtw2i
+         WQ5VCuJAhMjTePRZ5mJwkcKT/rj/hAzCRcgYuDT+4EatxoMofW1HnfFzRFn6ASfgsXdK
+         7f7OayCRkt6CQLQaZomBjwr5wTgq7lHrNyVoO4c+cu7ENg5ulr7+tho4WOrnJVa4DAGJ
+         Y4yA==
+X-Gm-Message-State: AC+VfDyg1iod9MeFYuiQ6IXqQhNQVJX8VUD9fbJrmgwDka697faBZsfO
+        wHp+ZlrlGhewBhh5AqtrxZJJW5hSggOrlg4PgxGTZ/26VdnLB8ZAwTq2XfPgE5yySy4KCSRjnOE
+        Es4+bvy/z7WlH
+X-Received: by 2002:a05:622a:5cc:b0:3ff:28a6:b507 with SMTP id d12-20020a05622a05cc00b003ff28a6b507mr27045074qtb.62.1687796617354;
+        Mon, 26 Jun 2023 09:23:37 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4Fcw3HZ9CsPSMizS0+mFl35ikBhcBByAiRtmV5dvu+j35EXovmFwfSrDE8p+YUssGNZi+Ntg==
+X-Received: by 2002:a05:622a:5cc:b0:3ff:28a6:b507 with SMTP id d12-20020a05622a05cc00b003ff28a6b507mr27045049qtb.62.1687796617099;
+        Mon, 26 Jun 2023 09:23:37 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
+        by smtp.gmail.com with ESMTPSA id cm23-20020a05622a251700b003e4ee0f5234sm3211789qtb.87.2023.06.26.09.23.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jun 2023 09:23:36 -0700 (PDT)
+Date:   Mon, 26 Jun 2023 18:23:32 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v1 1/4] virtio/vsock: rework MSG_PEEK for SOCK_STREAM
+Message-ID: <fumoatu4z5pvqntnqa6hnuripfa4zrtb5m2rsfkfsdn23pn5y5@f7yy23tjxwwa>
+References: <20230618062451.79980-1-AVKrasnov@sberdevices.ru>
+ <20230618062451.79980-2-AVKrasnov@sberdevices.ru>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB6749:EE_
-X-MS-Office365-Filtering-Correlation-Id: c60d3d96-6572-49c8-9de9-08db7661a11c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 23jXYxiN3it1/RUbzOS6+DwC42UDjqY01tcxpABMUVadPLxjRmiie1og+wXs+nIdALBuYE2qkWuDVFfjts1znmgHU2ZddMHDrqeBNvPpIzMqgPJ6bCwB41/AsUyvbjVcwOONt835cvha2FwQfBw4eHEAi387wx3utPzRAoqoRdrFwJNo6io9xAJlMDktSQyC7nLeG0FPAWGd/0lhFBqK+wO5KtEPPKK7nxHjzToVy9tjJdtZQmFz4CAHY6Z5go3aZEpc4u5qtuEFMotHWArz2Z92bpkTL/nnKJ+rygTRRJl1n6sRv7nKSRoqCU6sV5Q/xFKwgbH/C5ZIB68UM6g1/vi2ENdiZb16iY8UTTDge+iENDxuCXjYAYRA2/1kq/0patmYxHIz0URvqsW1s9fUJ9LvYeRbW7uzPR7YM+4q/uwH4HTqR168vULW6BgyPlS0jgwqimpMx12CERxUk9CDnnmo3JEdRAKEzJ0ef8MfJGJwEddcP/nSlx8UtshXo+/p4JupmVVeLFT84mlftxzo/Rb677MDb5SXhuFfV5AoQGFV0P9eWsdnQc/Tvz7LZRsp
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(376002)(136003)(346002)(366004)(451199021)(86362001)(38100700002)(36756003)(41300700001)(6486002)(66476007)(4326008)(316002)(66946007)(66556008)(2616005)(8676002)(6512007)(6506007)(186003)(8936002)(6916009)(26005)(2906002)(4744005)(478600001)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?vrHCWhM+9ZxIplgL2we/T6vnvSPwNxjRXbgcbhAtrqQEBj3KqfiWhy9VfHpW?=
- =?us-ascii?Q?zsjO6k+4jGovT6P244D8cZH+32Or3C6+8QqbTxwwexoRTfycHfj4nKgcatlp?=
- =?us-ascii?Q?XIhkVCjhKvyVz6LrSveBdwEVV6gxdTJaEsttFqey5cx3Y1BbLwcOE3JphbfO?=
- =?us-ascii?Q?hCaiBHyHjjtXhkOeqEOrQ2VaEdXViOjWn5aoiKeibLy2efgecpgDKd7MSPYd?=
- =?us-ascii?Q?8ro/+pyeJFC1AFxiuDCyZXclXKkU9cM8jN1ab6f6L2n0bETSoh9HmlhhrLi2?=
- =?us-ascii?Q?OxkL8fHEPZPcSguFTOBVh6hqRaC8maJGQ0xGFzNI4rgDS9i2cB2gUM0sGdV5?=
- =?us-ascii?Q?LJ3Gmj9+M3mNBr2smQm6BTCBm7r8+Jy3SAOHN/Gcb2QJhkrPBzl7tdmAdsgL?=
- =?us-ascii?Q?Qd76GpcZXPDZ3AyuZYREecndWtjCavuefB2QeCAP9b7+kikk/lQFcwsU3I0u?=
- =?us-ascii?Q?TbQDkCdr6Pq6uo9PwseGZj6OlTIPfd/13kgt8t2/2dtBrWtRcsAKAbezHitP?=
- =?us-ascii?Q?emFC5HJDhmfl5jkkP0RqojeF1wtq1fjvjpQ8szWKqx7rYFBJhE/Ku9O/1yyc?=
- =?us-ascii?Q?UKYfU8/jwbddo1QAN769+AmYJ1mKWP951K9DuhS6OkXd4xKfpGed1NH2/HjO?=
- =?us-ascii?Q?bKItTAe15AisT0sKe1P2O6NMqiaRGNgjk077Vf6o4RC8DegeyyyX3PEV5NrB?=
- =?us-ascii?Q?lm6+HwvlHD4hWRJKcdkyFpp0T1sXBjPy04kkAVw0/C8DDspPZCvCY5DVHQQG?=
- =?us-ascii?Q?yLlfGiFvtdOGSi3Sw6E5oXF9L64WF9lsu9mUpUr2eybe8rbCpkA3TEZ8Uann?=
- =?us-ascii?Q?YNBeBAXf82Q0kUPI59nHHoH4O9Z1e621v8y9PeA0VEw1wH749jnzOm7MZg+g?=
- =?us-ascii?Q?TZn70AIc/a6TEhLamLSbz/1hvAU3Cmz1bYhP4lrXgODWxNP0xcYrowg7/lk3?=
- =?us-ascii?Q?6Dydlza+EHGpkHv88U4RPyhRtzORu52yuDJO+ghLsshn75me8h4uT7yaic8X?=
- =?us-ascii?Q?ULvf5UJQkMfUxTgQGFDee/UztJq332fMmG6VHzyaXcq38T4+RgrRoI0Shxs6?=
- =?us-ascii?Q?b6J52o3jTvGH1bSXf4xoSecqX+a+tELBZOsQMBLPzb0z1cAQvC2TB06pRBHj?=
- =?us-ascii?Q?EFpuuE2sNNgs2aWyMtUGyZg/Uoin0Tktv0YW55kxiIcB7UtTfpdFUWGmiotZ?=
- =?us-ascii?Q?Qn8h6MEnnXgT+xLUhBAeE66h9gvlEnzhIIDp6ZpmLo4O0buyL+fE5cDe4xZO?=
- =?us-ascii?Q?LiB7OPuQvvbXgDh4xk6q1iHefyTJ7GwbRmHM2EFvSiVJEWYuhF1e7jd2cHH3?=
- =?us-ascii?Q?5GWYLJa4s1wyKtIPiVXkZMbGLogcMHXIj2hVNUbyEvrGjvIkPDhqH4mBNSaz?=
- =?us-ascii?Q?rWQyFQ0p1jOPcG9H4QWgiWW2ecwDZZ9FZDdiAjYLVga/aR/6DB8rpkGERL32?=
- =?us-ascii?Q?8iNbA/YAqEJau+f0u5zctm4Ls0Y+83eqY/F/hvI6t3capz4zo9yUrkNyRRA4?=
- =?us-ascii?Q?7Z5A+FIr6xFpLJLPZc56knkt7eTEtD3Eb9sjyw2+6xD8Q1jL4xazhsHvzxM2?=
- =?us-ascii?Q?owIDYgcr/dbOibGTiUjiUade0jxh+UGXwPV3RolD?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c60d3d96-6572-49c8-9de9-08db7661a11c
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2023 16:23:09.1590
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: T7iPeZ9bh+fXdEKXIOvxHNbFv8p4qgSX2E2r1cF+TuVQbHs8Nk4lEsS7cUypeBnO
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6749
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230618062451.79980-2-AVKrasnov@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 26, 2023 at 10:06:29AM -0600, Alex Williamson wrote:
-> On Fri, 23 Jun 2023 10:26:05 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Wed, Jun 21, 2023 at 08:07:20PM -0700, ankita@nvidia.com wrote:
-> > > +			if (caps.size) {
-> > > +				info.flags |= VFIO_REGION_INFO_FLAG_CAPS;
-> > > +				if (info.argsz < sizeof(info) + caps.size) {
-> > > +					info.argsz = sizeof(info) + caps.size;
-> > > +					info.cap_offset = 0;  
-> > 
-> > Shouldn't this be an error if we can't fit the caps into the response?
-> > Silently discarding the caps seems wrong..
-> 
-> It's required for backwards compatibility.  If a userspace doesn't
-> support the info ioctl capabilities chain, it gets the basic
-> information successfully, while an enlightened userspace makes use of
-> the flags to know that a capability chain is available but unreported
-> due to an insufficient buffer size, with the required size being
-> provided in the return structure.
+On Sun, Jun 18, 2023 at 09:24:48AM +0300, Arseniy Krasnov wrote:
+>This reworks current implementation of MSG_PEEK logic:
+>1) Replaces 'skb_queue_walk_safe()' with 'skb_queue_walk()'. There is
+>   no need in the first one, as there are no removes of skb in loop.
+>2) Removes nested while loop - MSG_PEEK logic could be implemented
+>   without it: just iterate over skbs without removing it and copy
+>   data from each until destination buffer is not full.
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> net/vmw_vsock/virtio_transport_common.c | 41 ++++++++++++-------------
+> 1 file changed, 19 insertions(+), 22 deletions(-)
 
-Hum, maybe this part should be pushed into the cap helpers..
+Great clean up!
 
-Jason
+LGTM, but @Bobby can you also take a look?
+
+Thanks,
+Stefano
+
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index b769fc258931..2ee40574c339 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -348,37 +348,34 @@ virtio_transport_stream_do_peek(struct vsock_sock *vsk,
+> 				size_t len)
+> {
+> 	struct virtio_vsock_sock *vvs = vsk->trans;
+>-	size_t bytes, total = 0, off;
+>-	struct sk_buff *skb, *tmp;
+>-	int err = -EFAULT;
+>+	struct sk_buff *skb;
+>+	size_t total = 0;
+>+	int err;
+>
+> 	spin_lock_bh(&vvs->rx_lock);
+>
+>-	skb_queue_walk_safe(&vvs->rx_queue, skb,  tmp) {
+>-		off = 0;
+>+	skb_queue_walk(&vvs->rx_queue, skb) {
+>+		size_t bytes;
+>
+>-		if (total == len)
+>-			break;
+>+		bytes = len - total;
+>+		if (bytes > skb->len)
+>+			bytes = skb->len;
+>
+>-		while (total < len && off < skb->len) {
+>-			bytes = len - total;
+>-			if (bytes > skb->len - off)
+>-				bytes = skb->len - off;
+>+		spin_unlock_bh(&vvs->rx_lock);
+>
+>-			/* sk_lock is held by caller so no one else can dequeue.
+>-			 * Unlock rx_lock since memcpy_to_msg() may sleep.
+>-			 */
+>-			spin_unlock_bh(&vvs->rx_lock);
+>+		/* sk_lock is held by caller so no one else can dequeue.
+>+		 * Unlock rx_lock since memcpy_to_msg() may sleep.
+>+		 */
+>+		err = memcpy_to_msg(msg, skb->data, bytes);
+>+		if (err)
+>+			goto out;
+>
+>-			err = memcpy_to_msg(msg, skb->data + off, bytes);
+>-			if (err)
+>-				goto out;
+>+		total += bytes;
+>
+>-			spin_lock_bh(&vvs->rx_lock);
+>+		spin_lock_bh(&vvs->rx_lock);
+>
+>-			total += bytes;
+>-			off += bytes;
+>-		}
+>+		if (total == len)
+>+			break;
+> 	}
+>
+> 	spin_unlock_bh(&vvs->rx_lock);
+>-- 
+>2.25.1
+>
+
