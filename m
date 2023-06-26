@@ -2,265 +2,279 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5521273D7FF
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 08:50:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F22673D837
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 09:07:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229613AbjFZGum (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 02:50:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48844 "EHLO
+        id S229725AbjFZHHO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 03:07:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbjFZGuj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 02:50:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70C56E54
-        for <kvm@vger.kernel.org>; Sun, 25 Jun 2023 23:49:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687762189;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NMHucQZ4M31K7QXIgHBtRlKVAlpmIjZVnWfneYhxS0Q=;
-        b=ZWseVts0Cg4wEHpuAbkToBoVB8rMliPH6l1HtdfGnfLipltTPhMyZ30UirBpWFL/0NBQXL
-        e+RlyQZyRNRaDkKrJqfoCsuGxcdoodaiokQNyjzj9XHoO7UtnnU4vSrop4PsU24sStBz5L
-        pA3RiG4d8n5eDZ6XwIjI8kOhSdtLGxY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-182-ByhBcNp3OFuVvfR_Cy2dMg-1; Mon, 26 Jun 2023 02:49:44 -0400
-X-MC-Unique: ByhBcNp3OFuVvfR_Cy2dMg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A1D2B90ED33;
-        Mon, 26 Jun 2023 06:49:43 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9452C200B677;
-        Mon, 26 Jun 2023 06:49:43 +0000 (UTC)
-From:   Shaoqin Huang <shahuang@redhat.com>
-To:     qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc:     oliver.upton@linux.dev, salil.mehta@huawei.com,
-        james.morse@arm.com, gshan@redhat.com,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH v1 5/5] arm/kvm: add support for userspace psci calls handling
-Date:   Mon, 26 Jun 2023 02:49:09 -0400
-Message-Id: <20230626064910.1787255-6-shahuang@redhat.com>
-In-Reply-To: <20230626064910.1787255-1-shahuang@redhat.com>
-References: <20230626064910.1787255-1-shahuang@redhat.com>
+        with ESMTP id S229572AbjFZHHM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 03:07:12 -0400
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B01E12A
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 00:06:55 -0700 (PDT)
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3459772e100so7482615ab.3
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 00:06:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687763214; x=1690355214;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fXcwNiHEj4amqBCnv7s3j5wJPuDkZ0zT42+TEnL8kLE=;
+        b=et9rrXQbLo8kPIFn+sAgHeqgIQAVMIecVpF1XCTG47U94QaOd65+CV2sB682gjdwgP
+         2H7tDhXH4eN6HTofoYerEOA/bcWSHkTN8ZZjNR5nq+o0EkaApCJuv06dI9Zvh3APTzMR
+         zn51w7Y5hR0DoTaKlCsL6MHiQzS1izIxllDFI90C/JG9ykzGI+PL/Kap0qbIviwYPwbN
+         jj/cs7oCjdD+J1sK3Oyxj/FZ0Rwt2n59NX8XwYhlYlLwEhldkm/EwcIjE9jblXtUOg5t
+         wRmW7c6YZVDlJYAPp33k7L/twejDi2fWxSGQ5xFO/XiwUezFa+e+Z3puxkBnTB8c3F10
+         PMYg==
+X-Gm-Message-State: AC+VfDxQzIsj9i+AM6EL/XewbPQhWl4AM4zBG7SE69LkSbxdqXF8xlI9
+        /4aU4jcfP5/0gevKDA6fh+v2lhLWSTQXGaOYKCZjAUMYAwaz
+X-Google-Smtp-Source: ACHHUZ6Yb+d93L6BiWKrEkD2MqEQiAME4CB12iRJdkPZes0TMwtBbRazsp0iQ/aZx49z/FODF7KaaUAZ8S6Usx+R49Z5B+ienrit
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a92:cf48:0:b0:345:9269:341f with SMTP id
+ c8-20020a92cf48000000b003459269341fmr1521551ilr.4.1687763214612; Mon, 26 Jun
+ 2023 00:06:54 -0700 (PDT)
+Date:   Mon, 26 Jun 2023 00:06:54 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000df3e3b05ff02fe20@google.com>
+Subject: [syzbot] [net?] [virt?] [kvm?] KASAN: slab-use-after-free Read in __vhost_vq_attach_worker
+From:   syzbot <syzbot+8540db210d403f1aa214@syzkaller.appspotmail.com>
+To:     jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, michael.christie@oracle.com,
+        mst@redhat.com, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the SMCCC filter to start sending psci calls to userspace, qemu will
-need to handle the psci calls. In qemu, reuse the psci handler which
-used for tcg, while use it, we need to take care the reset vcpu process
-which will reset the vcpu register and grab all vcpu locks when reset
-gicv3.
+Hello,
 
-So when reset vcpu, we need to mark it as dirty to force the vcpu to
-sync its register to kvm, and when reset gicv3, we need to pause all
-vcpus to grab the all vcpu locks, thus when handling the psci CPU_ON
-call, the vcpu can be successfuly boot up.
+syzbot found the following issue on:
 
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+HEAD commit:    8d2be868b42c Add linux-next specific files for 20230623
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=12872950a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d8ac8dd33677e8e0
+dashboard link: https://syzkaller.appspot.com/bug?extid=8540db210d403f1aa214
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15c1b70f280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=122ee4cb280000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/2a004483aca3/disk-8d2be868.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/5688cb13b277/vmlinux-8d2be868.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/76de0b63bc53/bzImage-8d2be868.xz
+
+The issue was bisected to:
+
+commit 21a18f4a51896fde11002165f0e7340f4131d6a0
+Author: Mike Christie <michael.christie@oracle.com>
+Date:   Tue Jun 13 01:32:46 2023 +0000
+
+    vhost: allow userspace to create workers
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=130850bf280000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=108850bf280000
+console output: https://syzkaller.appspot.com/x/log.txt?x=170850bf280000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8540db210d403f1aa214@syzkaller.appspotmail.com
+Fixes: 21a18f4a5189 ("vhost: allow userspace to create workers")
+
+==================================================================
+BUG: KASAN: slab-use-after-free in __mutex_lock_common kernel/locking/mutex.c:582 [inline]
+BUG: KASAN: slab-use-after-free in __mutex_lock+0x1029/0x1350 kernel/locking/mutex.c:747
+Read of size 8 at addr ffff8880703fff68 by task syz-executor204/5105
+
+CPU: 0 PID: 5105 Comm: syz-executor204 Not tainted 6.4.0-rc7-next-20230623-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:364
+ print_report mm/kasan/report.c:475 [inline]
+ kasan_report+0x11d/0x130 mm/kasan/report.c:588
+ __mutex_lock_common kernel/locking/mutex.c:582 [inline]
+ __mutex_lock+0x1029/0x1350 kernel/locking/mutex.c:747
+ __vhost_vq_attach_worker+0xe7/0x390 drivers/vhost/vhost.c:678
+ vhost_dev_set_owner+0x670/0xa60 drivers/vhost/vhost.c:892
+ vhost_net_set_owner drivers/vhost/net.c:1687 [inline]
+ vhost_net_ioctl+0x668/0x16a0 drivers/vhost/net.c:1737
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x19d/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7fe7a9715629
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 21 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fe7a96ba208 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000000000b RCX: 00007fe7a9715629
+RDX: 0000000000000000 RSI: 000000000000af01 RDI: 0000000000000003
+RBP: 00007fe7a979e240 R08: 00007fe7a979e248 R09: 00007fe7a979e248
+R10: 00007fe7a979e248 R11: 0000000000000246 R12: 00007fe7a979e24c
+R13: 00007ffcfa04d48f R14: 00007fe7a96ba300 R15: 0000000000022000
+ </TASK>
+
+Allocated by task 5105:
+ kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ ____kasan_kmalloc mm/kasan/common.c:374 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:333 [inline]
+ __kasan_kmalloc+0xa2/0xb0 mm/kasan/common.c:383
+ kmalloc include/linux/slab.h:579 [inline]
+ kzalloc include/linux/slab.h:700 [inline]
+ vhost_worker_create+0x9c/0x320 drivers/vhost/vhost.c:627
+ vhost_dev_set_owner+0x5b9/0xa60 drivers/vhost/vhost.c:885
+ vhost_net_set_owner drivers/vhost/net.c:1687 [inline]
+ vhost_net_ioctl+0x668/0x16a0 drivers/vhost/net.c:1737
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x19d/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Freed by task 5108:
+ kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ kasan_save_free_info+0x2b/0x40 mm/kasan/generic.c:521
+ ____kasan_slab_free mm/kasan/common.c:236 [inline]
+ ____kasan_slab_free+0x160/0x1c0 mm/kasan/common.c:200
+ kasan_slab_free include/linux/kasan.h:164 [inline]
+ slab_free_hook mm/slub.c:1792 [inline]
+ slab_free_freelist_hook+0x8b/0x1c0 mm/slub.c:1818
+ slab_free mm/slub.c:3801 [inline]
+ __kmem_cache_free+0xb8/0x2d0 mm/slub.c:3814
+ vhost_worker_destroy drivers/vhost/vhost.c:600 [inline]
+ vhost_workers_free drivers/vhost/vhost.c:615 [inline]
+ vhost_dev_cleanup+0x66b/0x850 drivers/vhost/vhost.c:991
+ vhost_dev_reset_owner+0x25/0x160 drivers/vhost/vhost.c:923
+ vhost_net_reset_owner drivers/vhost/net.c:1621 [inline]
+ vhost_net_ioctl+0x807/0x16a0 drivers/vhost/net.c:1735
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x19d/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+The buggy address belongs to the object at ffff8880703fff00
+ which belongs to the cache kmalloc-cg-192 of size 192
+The buggy address is located 104 bytes inside of
+ freed 192-byte region [ffff8880703fff00, ffff8880703fffc0)
+
+The buggy address belongs to the physical page:
+page:ffffea0001c0ffc0 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x703ff
+flags: 0xfff00000000200(slab|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000000200 ffff88801284ddc0 dead000000000122 0000000000000000
+raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x16cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_RETRY_MAYFAIL|__GFP_NORETRY), pid 5034, tgid 5034 (syz-executor204), ts 72916757418, free_ts 72797036103
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook+0x2db/0x350 mm/page_alloc.c:1570
+ prep_new_page mm/page_alloc.c:1577 [inline]
+ get_page_from_freelist+0xfd9/0x2c40 mm/page_alloc.c:3257
+ __alloc_pages+0x1cb/0x4a0 mm/page_alloc.c:4513
+ alloc_pages+0x1aa/0x270 mm/mempolicy.c:2279
+ alloc_slab_page mm/slub.c:1862 [inline]
+ allocate_slab+0x25f/0x390 mm/slub.c:2009
+ new_slab mm/slub.c:2062 [inline]
+ ___slab_alloc+0xbc3/0x15d0 mm/slub.c:3215
+ __slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3314
+ __slab_alloc_node mm/slub.c:3367 [inline]
+ slab_alloc_node mm/slub.c:3460 [inline]
+ __kmem_cache_alloc_node+0x143/0x350 mm/slub.c:3509
+ __do_kmalloc_node mm/slab_common.c:984 [inline]
+ __kmalloc_node+0x51/0x1a0 mm/slab_common.c:992
+ kmalloc_node include/linux/slab.h:599 [inline]
+ kvmalloc_node+0xa2/0x1a0 mm/util.c:604
+ kvmalloc include/linux/slab.h:717 [inline]
+ kvzalloc include/linux/slab.h:725 [inline]
+ netif_alloc_rx_queues net/core/dev.c:9847 [inline]
+ alloc_netdev_mqs+0xbde/0x1270 net/core/dev.c:10660
+ ieee80211_if_add+0x1b7/0x19d0 net/mac80211/iface.c:2099
+ ieee80211_register_hw+0x37e5/0x40e0 net/mac80211/main.c:1407
+ mac80211_hwsim_new_radio+0x26e6/0x4c70 drivers/net/wireless/virtual/mac80211_hwsim.c:5303
+ hwsim_new_radio_nl+0xacf/0x1210 drivers/net/wireless/virtual/mac80211_hwsim.c:5983
+ genl_family_rcv_msg_doit.isra.0+0x1e6/0x2d0 net/netlink/genetlink.c:970
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1161 [inline]
+ free_unref_page_prepare+0x62e/0xcb0 mm/page_alloc.c:2384
+ free_unref_page+0x33/0x370 mm/page_alloc.c:2479
+ __unfreeze_partials+0x1fe/0x220 mm/slub.c:2647
+ qlink_free mm/kasan/quarantine.c:166 [inline]
+ qlist_free_all+0x6a/0x170 mm/kasan/quarantine.c:185
+ kasan_quarantine_reduce+0x195/0x220 mm/kasan/quarantine.c:292
+ __kasan_slab_alloc+0x63/0x90 mm/kasan/common.c:305
+ kasan_slab_alloc include/linux/kasan.h:188 [inline]
+ slab_post_alloc_hook mm/slab.h:750 [inline]
+ slab_alloc_node mm/slub.c:3470 [inline]
+ __kmem_cache_alloc_node+0x1ce/0x350 mm/slub.c:3509
+ __do_kmalloc_node mm/slab_common.c:984 [inline]
+ __kmalloc_node+0x51/0x1a0 mm/slab_common.c:992
+ kmalloc_node include/linux/slab.h:599 [inline]
+ kvmalloc_node+0xa2/0x1a0 mm/util.c:604
+ kvmalloc include/linux/slab.h:717 [inline]
+ seq_buf_alloc fs/seq_file.c:38 [inline]
+ seq_read_iter+0x7fb/0x12d0 fs/seq_file.c:210
+ kernfs_fop_read_iter+0x4ce/0x690 fs/kernfs/file.c:279
+ call_read_iter include/linux/fs.h:1865 [inline]
+ new_sync_read fs/read_write.c:389 [inline]
+ vfs_read+0x4a8/0x8d0 fs/read_write.c:470
+ ksys_read+0x122/0x250 fs/read_write.c:613
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Memory state around the buggy address:
+ ffff8880703ffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff8880703ffe80: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
+>ffff8880703fff00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                                          ^
+ ffff8880703fff80: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+ ffff888070400000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
 ---
- hw/intc/arm_gicv3_kvm.c | 10 +++++
- target/arm/kvm.c        | 94 ++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 103 insertions(+), 1 deletion(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 72ad916d3d..e42898c1d6 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -24,6 +24,7 @@
- #include "hw/intc/arm_gicv3_common.h"
- #include "qemu/error-report.h"
- #include "qemu/module.h"
-+#include "sysemu/cpus.h"
- #include "sysemu/kvm.h"
- #include "sysemu/runstate.h"
- #include "kvm_arm.h"
-@@ -695,10 +696,19 @@ static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-         return;
-     }
- 
-+    /*
-+     * When handling psci call in userspace like cpu hotplug, this shall be called
-+     * when other vcpus might be running. Host kernel KVM to handle device
-+     * access of IOCTLs KVM_{GET|SET}_DEVICE_ATTR might fail due to inability to
-+     * grab vcpu locks for all the vcpus. Hence, we need to pause all vcpus to
-+     * facilitate locking within host.
-+     */
-+    pause_all_vcpus();
-     /* Initialize to actual HW supported configuration */
-     kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
-                       KVM_VGIC_ATTR(ICC_CTLR_EL1, c->gicr_typer),
-                       &c->icc_ctlr_el1[GICV3_NS], false, &error_abort);
-+    resume_all_vcpus();
- 
-     c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
- }
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 579c6edd49..d2857a8499 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -10,6 +10,7 @@
- 
- #include "qemu/osdep.h"
- #include <asm-arm64/kvm.h>
-+#include <linux/psci.h>
- #include <linux/arm-smccc.h>
- #include <sys/ioctl.h>
- 
-@@ -251,7 +252,29 @@ int kvm_arm_get_max_vm_ipa_size(MachineState *ms, bool *fixed_ipa)
- 
- static int kvm_arm_init_smccc_filter(KVMState *s)
- {
-+    unsigned int i;
-     int ret = 0;
-+    struct kvm_smccc_filter filter_ranges[] = {
-+        {
-+            .base           = KVM_PSCI_FN_BASE,
-+            .nr_functions   = 4,
-+            .action         = KVM_SMCCC_FILTER_DENY,
-+        },
-+        {
-+            .base           = PSCI_0_2_FN_BASE,
-+            .nr_functions   = 0x20,
-+            .action         = KVM_SMCCC_FILTER_FWD_TO_USER,
-+        },
-+        {
-+            .base           = PSCI_0_2_FN64_BASE,
-+            .nr_functions   = 0x20,
-+            .action         = KVM_SMCCC_FILTER_FWD_TO_USER,
-+        },
-+    };
-+    struct kvm_device_attr attr = {
-+        .group = KVM_ARM_VM_SMCCC_CTRL,
-+        .attr = KVM_ARM_VM_SMCCC_FILTER,
-+    };
- 
-     if (kvm_vm_check_attr(s, KVM_ARM_VM_SMCCC_CTRL, KVM_ARM_VM_SMCCC_FILTER)) {
-         error_report("ARM SMCCC filter not supported");
-@@ -259,6 +282,16 @@ static int kvm_arm_init_smccc_filter(KVMState *s)
-         goto out;
-     }
- 
-+    for (i = 0; i < ARRAY_SIZE(filter_ranges); i++) {
-+        attr.addr = (uint64_t)&filter_ranges[i];
-+
-+        ret = kvm_vm_ioctl(s, KVM_SET_DEVICE_ATTR, &attr);
-+        if (ret < 0) {
-+            error_report("KVM_SET_DEVICE_ATTR failed when SMCCC init");
-+            goto out;
-+        }
-+    }
-+
- out:
-     return ret;
- }
-@@ -654,6 +687,14 @@ void kvm_arm_reset_vcpu(ARMCPU *cpu)
-      * for the same reason we do so in kvm_arch_get_registers().
-      */
-     write_list_to_cpustate(cpu);
-+
-+    /*
-+     * When enabled userspace psci call handling, qemu will reset the vcpu if
-+     * it's PSCI CPU_ON call. Since this will reset the vcpu register and
-+     * power_state, we should sync these state to kvm, so manually set the
-+     * vcpu_dirty to force the qemu to put register to kvm.
-+     */
-+    CPU(cpu)->vcpu_dirty = true;
- }
- 
- /*
-@@ -932,6 +973,51 @@ static int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
-     return -1;
- }
- 
-+static int kvm_arm_handle_psci(CPUState *cs, struct kvm_run *run)
-+{
-+    if (run->hypercall.flags & KVM_HYPERCALL_EXIT_SMC) {
-+        cs->exception_index = EXCP_SMC;
-+    } else {
-+        cs->exception_index = EXCP_HVC;
-+    }
-+
-+    qemu_mutex_lock_iothread();
-+    arm_cpu_do_interrupt(cs);
-+    qemu_mutex_unlock_iothread();
-+
-+    /*
-+     * We need to exit the run loop to have the chance to execute the
-+     * qemu_wait_io_event() which will execute the psci function which queued in
-+     * the cpu work queue.
-+     */
-+    return EXCP_INTERRUPT;
-+}
-+
-+static int kvm_arm_handle_std_call(CPUState *cs, struct kvm_run *run,
-+                                   struct arm_smccc_res *res,
-+                                   bool *sync_reg)
-+{
-+    uint32_t fn = run->hypercall.nr;
-+    int ret = 0;
-+
-+    switch (ARM_SMCCC_FUNC_NUM(fn)) {
-+    /* PSCI */
-+    case 0x00 ... 0x1F:
-+        /*
-+         * We will reuse the psci handler, but the handler directly get psci
-+         * call parameter from register, and write the return value to register.
-+         * So we no need to sync the value in arm_smccc_res.
-+         */
-+        *sync_reg = false;
-+        ret = kvm_arm_handle_psci(cs, run);
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    return ret;
-+}
-+
- static void kvm_arm_smccc_return_result(CPUState *cs, struct arm_smccc_res *res)
- {
-     ARMCPU *cpu = ARM_CPU(cs);
-@@ -949,16 +1035,22 @@ static int kvm_arm_handle_hypercall(CPUState *cs, struct kvm_run *run)
-     struct arm_smccc_res res = {
-         .a0     = SMCCC_RET_NOT_SUPPORTED,
-     };
-+    bool sync_reg = true;
-     int ret = 0;
- 
-     kvm_cpu_synchronize_state(cs);
- 
-     switch (ARM_SMCCC_OWNER_NUM(fn)) {
-+    case ARM_SMCCC_OWNER_STANDARD:
-+        ret = kvm_arm_handle_std_call(cs, run, &res, &sync_reg);
-+        break;
-     default:
-         break;
-     }
- 
--    kvm_arm_smccc_return_result(cs, &res);
-+    if (sync_reg) {
-+        kvm_arm_smccc_return_result(cs, &res);
-+    }
- 
-     return ret;
- }
--- 
-2.39.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
