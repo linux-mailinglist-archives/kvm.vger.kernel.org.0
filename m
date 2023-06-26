@@ -2,175 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4EFF73E4E8
-	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 18:25:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 581EE73E508
+	for <lists+kvm@lfdr.de>; Mon, 26 Jun 2023 18:29:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230029AbjFZQZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 12:25:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52490 "EHLO
+        id S230104AbjFZQ3n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 12:29:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232106AbjFZQZF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 12:25:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FE1C2941
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 09:23:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687796625;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=goJ82gfmaMLDwx1lebPuhQrFW0gpPX2fa0/sdreNvaA=;
-        b=SD6KzRytsr6wD2vg5KQ8IbjclesQwG9+zkJGZh10fkBpdzD4JaoMas7GxNSZhiv+vVNGys
-        HUl+PNfI4oLA06PL3opD+gKjOgLRd8g+cOW/WHxB2OeM9hb/Fd7xiaA9CUNTTK7Z4n1izb
-        MZzCrJTenxPwabQUf9lX5F7iiJNP1OQ=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-308-P06w9hkFNVeMbnCg669waQ-1; Mon, 26 Jun 2023 12:23:38 -0400
-X-MC-Unique: P06w9hkFNVeMbnCg669waQ-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4009a8498f7so16684631cf.1
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 09:23:37 -0700 (PDT)
+        with ESMTP id S229989AbjFZQ3Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 12:29:25 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A19BE10F
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 09:28:26 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-53fa2d0c2ebso1421264a12.1
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 09:28:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1687796906; x=1690388906;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LcHOcPJNQNsmb8p5lWxRB01eVrgr+kLMT1qIAAPh7K0=;
+        b=0C+CyWG0GM0drwvZ0vSkvRMtOSGBuPAKMRT9q9dRUNLgsTmg4HKMwjYpYcDTv57Tls
+         zSJGXTxI6enbEMjyacQKdeUQcj8wenqCDj2auDP4WOwTdqv2mkFXXqtCw4dMrc+GL4UZ
+         jMIwhWZ4zIFfAKfoAP3ki2pyE1yo3gcNAKNksNqGCMY5cPjA26nOLRCRSKzJhhet5mWN
+         Lj+T5CX9IyCLMiU4f1sJFb9xKm6JQ+02iH15WBZYqIissVx0r560CxYKbPw7/cXX53LO
+         9dXRlcIb47Yj3OJ4myuWHzraEWB281b77yaf5mLKXXkCsUj10GzQiqE/oeSurlo+Yjsv
+         Or9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687796617; x=1690388617;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=goJ82gfmaMLDwx1lebPuhQrFW0gpPX2fa0/sdreNvaA=;
-        b=J7dFC9IHwKsPmASskMTnzzFUjgy8KdUpg9uqJGTyvlSkSKVWzPeNAityna5uw883Eb
-         +vR1N69Xd7iUdA8HRmvCNEv7OsVcYdt/Dm5H/mLHd0tS0L8rkFFpiuct5Prt3UWBs08J
-         wVUhBoTW8kbcNTRAVj2RIApEhtYFYfbPaMiv9fPhEH+YmDXIHlN9QUqfdpkSbNgUtw2i
-         WQ5VCuJAhMjTePRZ5mJwkcKT/rj/hAzCRcgYuDT+4EatxoMofW1HnfFzRFn6ASfgsXdK
-         7f7OayCRkt6CQLQaZomBjwr5wTgq7lHrNyVoO4c+cu7ENg5ulr7+tho4WOrnJVa4DAGJ
-         Y4yA==
-X-Gm-Message-State: AC+VfDyg1iod9MeFYuiQ6IXqQhNQVJX8VUD9fbJrmgwDka697faBZsfO
-        wHp+ZlrlGhewBhh5AqtrxZJJW5hSggOrlg4PgxGTZ/26VdnLB8ZAwTq2XfPgE5yySy4KCSRjnOE
-        Es4+bvy/z7WlH
-X-Received: by 2002:a05:622a:5cc:b0:3ff:28a6:b507 with SMTP id d12-20020a05622a05cc00b003ff28a6b507mr27045074qtb.62.1687796617354;
-        Mon, 26 Jun 2023 09:23:37 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4Fcw3HZ9CsPSMizS0+mFl35ikBhcBByAiRtmV5dvu+j35EXovmFwfSrDE8p+YUssGNZi+Ntg==
-X-Received: by 2002:a05:622a:5cc:b0:3ff:28a6:b507 with SMTP id d12-20020a05622a05cc00b003ff28a6b507mr27045049qtb.62.1687796617099;
-        Mon, 26 Jun 2023 09:23:37 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id cm23-20020a05622a251700b003e4ee0f5234sm3211789qtb.87.2023.06.26.09.23.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 09:23:36 -0700 (PDT)
-Date:   Mon, 26 Jun 2023 18:23:32 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v1 1/4] virtio/vsock: rework MSG_PEEK for SOCK_STREAM
-Message-ID: <fumoatu4z5pvqntnqa6hnuripfa4zrtb5m2rsfkfsdn23pn5y5@f7yy23tjxwwa>
-References: <20230618062451.79980-1-AVKrasnov@sberdevices.ru>
- <20230618062451.79980-2-AVKrasnov@sberdevices.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230618062451.79980-2-AVKrasnov@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20221208; t=1687796906; x=1690388906;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LcHOcPJNQNsmb8p5lWxRB01eVrgr+kLMT1qIAAPh7K0=;
+        b=gw3INYNQiNOIKNH/HjiYjxQgRQ8UNlQ0lPYOrde6d0xUC7GRMAQY2cFfgGEbv0PoFO
+         ftByoXptFfGsvj0DCTG/bGb3tfl+Ar/uM66IpxGh9FCdM0/rchFazwAOUABvsY5YbPNB
+         7CmX84wTj3PQZUd0O/ZPncZ8RjG76eykfgsg6vDx9Y8OKwd4pin5wbk9nidQ302oMYhC
+         2fbjSkCtEK2HaoSG/6nCdVO4t4DchVEUD4yCx8tS6vFWsfQpgNgqW6rXeweAAOaXcXCQ
+         bXjOKxA1IxqEY0525Isxe3kGCT5IUaG4/OzcdZS3oNYeJEewsAukOSIh7KanPx/M4ff1
+         BllA==
+X-Gm-Message-State: AC+VfDw/iEZ1R1dep4+N9qH9+40bd4v3Z5mWLP9DeW71NJEWzjPNSInC
+        U8jKStPw8eGaoilyUg5W0MqzVPDaHJw=
+X-Google-Smtp-Source: ACHHUZ7Wk6snFRWIjCiJHNIBQLZ/Mb6v/fisOviOSg2CIlQCenmsh0/FaAZPBkXB3y1IHQ/hHD+ZHUSwhWE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:d244:0:b0:540:ca81:4a1d with SMTP id
+ t4-20020a63d244000000b00540ca814a1dmr3818129pgi.11.1687796906100; Mon, 26 Jun
+ 2023 09:28:26 -0700 (PDT)
+Date:   Mon, 26 Jun 2023 09:28:24 -0700
+In-Reply-To: <52ea8386-8652-dd91-23de-9d35781cb131@amd.com>
+Mime-Version: 1.0
+References: <20230524155339.415820-1-john.allen@amd.com> <20230524155339.415820-7-john.allen@amd.com>
+ <161174d013dff42ddfd2950fe33a8054f45c223e.camel@intel.com>
+ <ZINGaJnNJ54+klsD@johallen-workstation.lan> <9ef2faeaa38e667bd4daa8ee338d4cade452c76c.camel@intel.com>
+ <ZJYaNSzup+yuYxNy@google.com> <52ea8386-8652-dd91-23de-9d35781cb131@amd.com>
+Message-ID: <ZJm64a7IKuSDS9bz@google.com>
+Subject: Re: [RFC PATCH v2 6/6] KVM: SVM: Add CET features to supported_xss
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Rick P Edgecombe <rick.p.edgecombe@intel.com>,
+        "john.allen@amd.com" <john.allen@amd.com>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 18, 2023 at 09:24:48AM +0300, Arseniy Krasnov wrote:
->This reworks current implementation of MSG_PEEK logic:
->1) Replaces 'skb_queue_walk_safe()' with 'skb_queue_walk()'. There is
->   no need in the first one, as there are no removes of skb in loop.
->2) Removes nested while loop - MSG_PEEK logic could be implemented
->   without it: just iterate over skbs without removing it and copy
->   data from each until destination buffer is not full.
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> net/vmw_vsock/virtio_transport_common.c | 41 ++++++++++++-------------
-> 1 file changed, 19 insertions(+), 22 deletions(-)
+On Mon, Jun 26, 2023, Tom Lendacky wrote:
+> On 6/23/23 17:18, Sean Christopherson wrote:
+> > On Fri, Jun 09, 2023, Rick P Edgecombe wrote:
+> > > Also, since the host might have CR4.CET set for its own reasons, if the host
+> > > handled an exit with the the guests MSR_IA32_S_CET set it could suddenly be
+> > > subjected to CET enforcement that it doesn't expect. Waiting to restore it
+> > > until returning to the guest is too late.
+> > > 
+> > > At least that's the reasoning on the VMX side as I understand it
+> > 
+> > The APM doesn't come right out and say it, but I assume/hope that S_CET is saved
+> > on VMRUN and loaded on #VMEXIT, i.e. is the same as VMX for all intents and
+> > purposes.
+> > 
+> > The host save state definitely has a field for S_CET, and VMRUN documents that the
+> > guest values are loaded, I just can't find anything in the APM that explicitly states
+> > how host S_CET and friends are handled.  E.g. in theory, they could have been
+> > shoved into VMSAVE+VMLOAD, though I very much doubt that's the case.
+> 
+> Yes, the host value is saved/restored on VMRUN/#VMEXIT. Anything that is in
+> the VMCB Save Area (the non-SEV-ES save area) is fully virtualized (unless
+> noted otherwise) and doesn't require special processing to save/restore the
+> host values.
 
-Great clean up!
+Would it makes sense to add a column in "Table B-2. VMCB Layout, State Save Area"
+to specify whether a field is handled by VMRUN+#VMEXIT vs. VMLOAD+VMSAVE?  I can't
+find anywhere in the APM where it explicitly states that VMRUN+#VMEXIT context
+switches everything in the Save Area except the fields listed in "15.5.2 VMSAVE
+and VMLOAD Instructions".
 
-LGTM, but @Bobby can you also take a look?
+"15.5 VMRUN Instruction" kinda sorta covers that behavior, but the information is
+either incomplete or stale, e.g. for host state it says "at least the following"
 
-Thanks,
-Stefano
+  Saving Host State. To ensure that the host can resume operation after #VMEXIT,
+  VMRUN saves at least the following host state information:
 
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index b769fc258931..2ee40574c339 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -348,37 +348,34 @@ virtio_transport_stream_do_peek(struct vsock_sock *vsk,
-> 				size_t len)
-> {
-> 	struct virtio_vsock_sock *vvs = vsk->trans;
->-	size_t bytes, total = 0, off;
->-	struct sk_buff *skb, *tmp;
->-	int err = -EFAULT;
->+	struct sk_buff *skb;
->+	size_t total = 0;
->+	int err;
->
-> 	spin_lock_bh(&vvs->rx_lock);
->
->-	skb_queue_walk_safe(&vvs->rx_queue, skb,  tmp) {
->-		off = 0;
->+	skb_queue_walk(&vvs->rx_queue, skb) {
->+		size_t bytes;
->
->-		if (total == len)
->-			break;
->+		bytes = len - total;
->+		if (bytes > skb->len)
->+			bytes = skb->len;
->
->-		while (total < len && off < skb->len) {
->-			bytes = len - total;
->-			if (bytes > skb->len - off)
->-				bytes = skb->len - off;
->+		spin_unlock_bh(&vvs->rx_lock);
->
->-			/* sk_lock is held by caller so no one else can dequeue.
->-			 * Unlock rx_lock since memcpy_to_msg() may sleep.
->-			 */
->-			spin_unlock_bh(&vvs->rx_lock);
->+		/* sk_lock is held by caller so no one else can dequeue.
->+		 * Unlock rx_lock since memcpy_to_msg() may sleep.
->+		 */
->+		err = memcpy_to_msg(msg, skb->data, bytes);
->+		if (err)
->+			goto out;
->
->-			err = memcpy_to_msg(msg, skb->data + off, bytes);
->-			if (err)
->-				goto out;
->+		total += bytes;
->
->-			spin_lock_bh(&vvs->rx_lock);
->+		spin_lock_bh(&vvs->rx_lock);
->
->-			total += bytes;
->-			off += bytes;
->-		}
->+		if (total == len)
->+			break;
-> 	}
->
-> 	spin_unlock_bh(&vvs->rx_lock);
->-- 
->2.25.1
->
+but for guest state it says "the following"
 
+  Loading Guest State. After saving host state, VMRUN loads the following guest
+  state from the VMCB:
+
+and then both provide incomplete lists of state.  A pedantic reading of the guest
+case suggests that there's a large pile of state that *isn't* loaded, and the host
+case isn't all that helpful because it's way too handwavy.
