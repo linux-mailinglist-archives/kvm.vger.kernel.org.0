@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D543273EFBE
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 02:33:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2680773EFBF
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 02:33:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229638AbjF0AdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jun 2023 20:33:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47978 "EHLO
+        id S229844AbjF0AdY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jun 2023 20:33:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229699AbjF0AdU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jun 2023 20:33:20 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ACDD1716
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 17:33:19 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-53f06f7cc74so2132540a12.1
-        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 17:33:19 -0700 (PDT)
+        with ESMTP id S229808AbjF0AdX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jun 2023 20:33:23 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 749D4173A
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 17:33:21 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1b561edde47so30086495ad.1
+        for <kvm@vger.kernel.org>; Mon, 26 Jun 2023 17:33:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687825999; x=1690417999;
+        d=google.com; s=20221208; t=1687826001; x=1690418001;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=M479X8BzT9EyUvB0vw68D3v0mDUftpC8reH4txRhECo=;
-        b=0O/XWPOLVoN2w0+hzLQL+azS/KKmtaprESqtEKXNCzBwucOBeaSz7X+lvxgloL/1jq
-         ourz/nDRhpUg413NFvJY+Y7+hmJQdpEa6vcKD+f74sXGin+FQy1qNXy6AyGulm7iP+J2
-         3TPQg7GioLLuhC9RgIkjYSYCFerWY0cyNiG8lGcLu2lSZ7gF/1zlh/FI9SXSGrWo8Xxd
-         jG97Tg2y2hHEfmUlVL965hFTiFZP4iZi233sQMNVWF0nKQcOc6lL2Jg7ABF5zopazzG2
-         iKjWRhkCn3vpC1UrH6fZEeAq+5lm8CJNCsZxybVvZOay0Ho9Jh3dXfXYsdgCFOFwpX6M
-         Pvsg==
+        bh=/XyuVQXzD8M/qARM8CRFFM69l6guVTcvJ3+RsznqEQs=;
+        b=NQfmlfMl0pakrOTFF8c/zOirQ0mP6KeB0PAHKzwYnxrdUBdk/IHCsvmMqZWn2xppvA
+         aFcccIGnUcT1ubDa/C9E6kOhkacLTmZurTbvVjgDYpTqo4w4Bjbo3q46uDB9cYc6sfWn
+         QoiCB4A2ecSgmk4KHci2Hj1bq+/aFsWJVdmw0qDG7PqoU011vgpR+kbZyZHfHAkZt2Lz
+         rBvXEZoEcMh6YH8D4rfvce7ZooSQqDufUYPnsP8cWiZDzJJoHIk7Ot71l7D/umMYhvPD
+         e8ahyk8RPBT6gCoZngiSdLhs8KcyvGdMPnle0CJ7b4xN6P9c3iW54bopCkUpr4lA1nMK
+         54eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687825999; x=1690417999;
+        d=1e100.net; s=20221208; t=1687826001; x=1690418001;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=M479X8BzT9EyUvB0vw68D3v0mDUftpC8reH4txRhECo=;
-        b=GRO365XM7p9+mU4ofS0BcihvVAHf3hWShNXUO3a3xGW+9/slXW5NjhETrIrFJiWj1M
-         cpRUChfzPUzLmq0JMGemB88L+ipbWvzy+fmt91v8C5c+iCMOpcCAuO7+SuiV24XkPuV3
-         0iem38BFgICIWaFbSEWAoyOPgGUOTSddPpivhOeqglUDJO0KCsR4LXz2NAPi/LhpxcLG
-         mPsGL2p3hgJustS1XbJrJASO/Qyz0DDft1j0wsOedEV1rhEDDTrPEYexcAMYYfnBPkuj
-         X0r/b/BH6oyp1MEvEDKapS4oIRqg3DmK4qDE37N1dOufcJKlBAfKIc2bdbl8tinrBf+O
-         0QPw==
-X-Gm-Message-State: AC+VfDxLEqPXE21rmzM23likxBogN8GPtQHgJ8mjTplVXrkee7vXYwq4
-        57xv439SABBxeFBjwe3XmEw8RfLwrVE=
-X-Google-Smtp-Source: ACHHUZ47i9u3jKY14hSfci3XHhcjldznPlh6ukEG9NZLO9YA/S51X3yh/on1/0gUINqCaX8SWkaklVmBlaM=
+        bh=/XyuVQXzD8M/qARM8CRFFM69l6guVTcvJ3+RsznqEQs=;
+        b=jQJNR2XtcrX0nTvbmjRrphbH4mXVMfT+0bLQjiEqVSGo8Np+6wH0YNNWw4w533PiT+
+         QI5vqhuuvTLRhMMcEx7dQuhFclzHEThFaAfJ2laWn6uFOyir3bNLtTl4aLkprM9JEDZZ
+         h1AeOjUH0bH1DGwDVg3tHaodnJhi1vdqB53UC00hw7OZU84GTy9H9LH7NmybVcIt61OI
+         flkKsOu5eCzbTNOvKpB8oJjmtyP9l8foNlzd1UZl9VzNwdNDRBxBsa/j33hiDismt9YC
+         O43rsoMQhSu6FBCrv8CNR7ZlpwVT9wxlf12mnSABH0nXmbIvJ8BR2vPIcki/3IKUqs7y
+         NlIA==
+X-Gm-Message-State: AC+VfDwwCCRp9Rg94RDvS2vvoePb4DBaDdOpCSHsbx2Dbg4JNFe/UbqO
+        efV+JLC6fjpABE+IUE1O0g6bSMdaVHA=
+X-Google-Smtp-Source: ACHHUZ6/wZU8cwxAZPHPPLlezNtM7pQpIrJ/Y0rQXLCsUbzL6IquyJcAJXwmKiFWLrYGwXBGGXkJwB3Ut9c=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:f902:0:b0:53f:9a37:c199 with SMTP id
- h2-20020a63f902000000b0053f9a37c199mr3422081pgi.1.1687825998948; Mon, 26 Jun
- 2023 17:33:18 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:b496:b0:1ae:531f:366a with SMTP id
+ y22-20020a170902b49600b001ae531f366amr1218856plr.5.1687826000967; Mon, 26 Jun
+ 2023 17:33:20 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon, 26 Jun 2023 17:33:03 -0700
+Date:   Mon, 26 Jun 2023 17:33:04 -0700
 In-Reply-To: <20230627003306.2841058-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230627003306.2841058-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
-Message-ID: <20230627003306.2841058-5-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86: Selftests changes for 6.5
+Message-ID: <20230627003306.2841058-6-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: SVM changes for 6.5
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org
@@ -68,9 +68,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM selftests changes for 6.5.  The most notable change is adding dependency
-generation, and it's also the one I'm least confident about because my Makefile
-knowledge is abysmal.  Please give that one an extra pass or two.
+KVM SVM changes for 6.5.  Misc fixes and cleanups, nothing super notable.
 
 The following changes since commit b9846a698c9aff4eb2214a06ac83638ad098f33f:
 
@@ -78,56 +76,38 @@ The following changes since commit b9846a698c9aff4eb2214a06ac83638ad098f33f:
 
 are available in the Git repository at:
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-selftests-6.5
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-svm-6.5
 
-for you to fetch changes up to 5ed19528db8ddcf0113d721f67a381be3e30c65a:
+for you to fetch changes up to 106ed2cad9f7bd803bd31a18fe7a9219b077bf95:
 
-  KVM: selftests: Add new CFLAGS to generate dependency files (2023-06-13 14:26:22 -0700)
-
-----------------------------------------------------------------
-KVM selftests changes for 6.5:
-
- - Add a test for splitting and reconstituting hugepages during and after
-   dirty logging
-
- - Add support for CPU pinning in demand paging test
-
- - Generate dependency files so that partial rebuilds work as expected
-
- - Misc cleanups and fixes
+  KVM: SVM: WARN, but continue, if misc_cg_set_capacity() fails (2023-06-13 09:20:26 -0700)
 
 ----------------------------------------------------------------
-Ben Gardon (2):
-      KVM: selftests: Move dirty logging functions to memstress.(c|h)
-      KVM: selftests: Add dirty logging page splitting test
+KVM SVM changes for 6.5:
 
-Colin Ian King (1):
-      KVM: selftests: Fix spelling mistake "miliseconds" -> "milliseconds"
+ - Drop manual TR/TSS load after VM-Exit now that KVM uses VMLOAD for host state
 
-Paolo Bonzini (1):
-      KVM: selftests: touch all pages of args on each memstress iteration
+ - Fix a not-yet-problematic missing call to trace_kvm_exit() for VM-Exits that
+   are handled in the fastpath
 
-Peter Xu (3):
-      KVM: selftests: Setup vcpu_alias only for minor mode test
-      KVM: selftests: Allow dumping per-vcpu info for uffd threads
-      KVM: selftests: Allow specify physical cpu list in demand paging test
+ - Print more descriptive information about the status of SEV and SEV-ES during
+   module load
 
-Sean Christopherson (1):
-      KVM: selftests: Refactor stable TSC check to use TEST_REQUIRE()
+ - Assert that misc_cg_set_capacity() doesn't fail to avoid should-be-impossible
+   memory leaks
 
-Yu Zhang (1):
-      KVM: selftests: Add new CFLAGS to generate dependency files
+----------------------------------------------------------------
+Alexander Mikhalitsyn (1):
+      KVM: SVM: enhance info printk's in SEV init
 
- tools/testing/selftests/kvm/Makefile               |  18 +-
- tools/testing/selftests/kvm/demand_paging_test.c   |  32 ++-
- tools/testing/selftests/kvm/dirty_log_perf_test.c  |  96 +-------
- .../testing/selftests/kvm/include/kvm_util_base.h  |   1 +
- tools/testing/selftests/kvm/include/memstress.h    |   8 +
- tools/testing/selftests/kvm/lib/kvm_util.c         |  17 ++
- tools/testing/selftests/kvm/lib/memstress.c        |  75 ++++++
- tools/testing/selftests/kvm/lib/userfaultfd_util.c |   4 +-
- .../kvm/x86_64/dirty_log_page_splitting_test.c     | 259 +++++++++++++++++++++
- .../selftests/kvm/x86_64/nx_huge_pages_test.c      |   2 +-
- .../kvm/x86_64/vmx_nested_tsc_scaling_test.c       |  22 +-
- 11 files changed, 416 insertions(+), 118 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
+Mingwei Zhang (1):
+      KVM: SVM: Remove TSS reloading code after VMEXIT
+
+Sean Christopherson (2):
+      KVM: SVM: Invoke trace_kvm_exit() for fastpath VM-Exits
+      KVM: SVM: WARN, but continue, if misc_cg_set_capacity() fails
+
+ arch/x86/kvm/svm/sev.c | 19 +++++++++++--------
+ arch/x86/kvm/svm/svm.c | 28 ++--------------------------
+ arch/x86/kvm/svm/svm.h |  1 -
+ 3 files changed, 13 insertions(+), 35 deletions(-)
