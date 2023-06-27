@@ -2,150 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F85E73FCC2
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 15:23:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF87A73FD57
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 16:06:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230003AbjF0NXf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 09:23:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33312 "EHLO
+        id S231345AbjF0OGR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 10:06:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230226AbjF0NXP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 09:23:15 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37D49199C
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 06:23:14 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35RDH1Fc018220;
-        Tue, 27 Jun 2023 13:23:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=n56pSaHnS3rxAWzGj3JlgeuPAA4H4eEhNnnq8faHt8s=;
- b=J9fygOgF3m4M6iFmpeyUW02lS6h60Rnz3FlACUMYUaOaJDl6A9fMkUqrXyaT4E/NRYOD
- CDcwr+Hplfd+N/00l6xFTZt7N0+0GzSzHyMLlGxCVtg1CvmwmWD8fSbjojFjhPrtgBPo
- Yg4q4sBc3OFgWyfkROfuCRqgLLMZK8B9ygbx60PvgyQBI5fOiOK+ysjX7T25Xdk/qIQ8
- MmSmy7EpW5oboFDVobwFSA8Sr0loLEOpvToi3Ggkbrl0xxozluRm3dADNvTtUN7pfovS
- MOYdoHi4e2MplTO6LhOZjD8Xqc8C+RDT3B+2XrhZRdfi5zoHCokC1OxfWRCrx67oTz+z Sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rg0h205u0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Jun 2023 13:23:02 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35RDKcJH028710;
-        Tue, 27 Jun 2023 13:23:02 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rg0h205sj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Jun 2023 13:23:02 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35R4QTBC029933;
-        Tue, 27 Jun 2023 13:23:00 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3rdr451e96-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Jun 2023 13:22:57 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35RDMqLm14549716
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 27 Jun 2023 13:22:52 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0F52A20043;
-        Tue, 27 Jun 2023 13:22:52 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5D7D320040;
-        Tue, 27 Jun 2023 13:22:51 +0000 (GMT)
-Received: from [9.152.222.242] (unknown [9.152.222.242])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Tue, 27 Jun 2023 13:22:51 +0000 (GMT)
-Message-ID: <9d4e8f39-ba07-dc19-58a0-076ac9b186e0@linux.ibm.com>
-Date:   Tue, 27 Jun 2023 15:22:50 +0200
+        with ESMTP id S229608AbjF0OGO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 10:06:14 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4779211B;
+        Tue, 27 Jun 2023 07:06:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7C7BF611AA;
+        Tue, 27 Jun 2023 14:06:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB6ECC433C0;
+        Tue, 27 Jun 2023 14:06:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687874772;
+        bh=gdCzgZa5ZO1KjKZiWh8H9VlbmneP5crniKuqd9ftXpA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=JqLTHeB9AMvnOWFw5aeGpHjDGpwjIdN0SoZoj1GjiIQt4WcSML2TQuki3WZ84FCuv
+         GoPtFRULJguonwIqOZ5TQL7kl8EvNrSAaqUouy64vBc/lYwBV2tZJv/JN3lpwe/71s
+         8azeJiy+YP0VG4ukxI4RcIS4/8aEWPxVu2UknWjEQ8GGzIafxMvFMPh5vgyJAOGkcs
+         PB6YakR+Nu+a8mTMKdGOL6APGVKbgMXtG6FGIewhGtoMQsj+PLoqQNDamTdreGlWNE
+         HPQiGtpWKFSp6G49Yz9LM9wcn5REaOF1LtQJtD2nj5q3YGCeG8dsD3fvygj5Iak4H0
+         mJ/b+/zCgBttA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qE9Kc-008oTQ-Ju;
+        Tue, 27 Jun 2023 15:06:10 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org
+Subject: [PATCH] KVM: arm64: timers: Use CNTHCTL_EL2 when setting non-CNTKCTL_EL1 bits
+Date:   Tue, 27 Jun 2023 15:05:57 +0100
+Message-Id: <20230627140557.544885-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v20 16/21] tests/avocado: s390x cpu topology entitlement
- tests
-Content-Language: en-US
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-References: <20230425161456.21031-1-pmorel@linux.ibm.com>
- <20230425161456.21031-17-pmorel@linux.ibm.com>
- <c268bd5b3246bdd0b7736eeeaba200a10546c470.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <c268bd5b3246bdd0b7736eeeaba200a10546c470.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: YHfSa4bOUAhv07ktXgWS5AJmmnoCtpt-
-X-Proofpoint-GUID: biZTVjvZGuFJ-8PZnExDkhSuiYzS2x5U
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-27_08,2023-06-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- clxscore=1015 priorityscore=1501 suspectscore=0 bulkscore=0 malwarescore=0
- mlxlogscore=999 adultscore=0 lowpriorityscore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306270121
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+It recently appeared that, whien running VHE, there is a notable
+difference between using CNTKCTL_EL1 and CNTHCTL_EL2, despite what
+the architecture documents:
 
-On 5/22/23 21:47, Nina Schoetterl-Glausch wrote:
-> On Tue, 2023-04-25 at 18:14 +0200, Pierre Morel wrote:
->> This test takes care to check the changes on different entitlements
->> when the guest requests a polarization change.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   tests/avocado/s390_topology.py | 56 ++++++++++++++++++++++++++++++++++
->>   1 file changed, 56 insertions(+)
->>
->> diff --git a/tests/avocado/s390_topology.py b/tests/avocado/s390_topology.py
->> index 30d3c0d0cb..64e1cc9209 100644
->> --- a/tests/avocado/s390_topology.py
->> +++ b/tests/avocado/s390_topology.py
->> @@ -244,3 +244,59 @@ def test_polarisation(self):
->>                   '/bin/cat /sys/devices/system/cpu/dispatching', '0')
->>   
->>           self.check_topology(0, 0, 0, 0, 'medium', False)
->> +
->> +    def test_entitlement(self):
->> +        """
->> +        This test verifies that QEMU modifies the polarization
->> +        after a guest request.
->> +
->> +        :avocado: tags=arch:s390x
->> +        :avocado: tags=machine:s390-ccw-virtio
->> +        """
->> +        self.kernel_init()
->> +        self.vm.add_args('-smp',
->> +                         '1,drawers=2,books=2,sockets=3,cores=2,maxcpus=24')
->> +        self.vm.add_args('-device', 'z14-s390x-cpu,core-id=1')
->> +        self.vm.add_args('-device', 'z14-s390x-cpu,core-id=2')
->> +        self.vm.add_args('-device', 'z14-s390x-cpu,core-id=3')
-> Why the -device statements? Won't they result in the same as specifying -smp 4,...?
-> Same for patch 17.
+- When accessed from EL2, bits [19:18] and [16:10] same bits have
+  the same assignment as CNTHCTL_EL2
+- When accessed from EL1, bits [19:18] and [16:10] are RES0
 
+It is all OK, until you factor in NV, where the EL2 guest runs at EL1.
+In this configuration, CNTKCTL_EL11 doesn't trap, nor ends up in
+the VNCR page. This means that any write from the guest affecting
+CNTHCTL_EL2 using CNTKCTL_EL1 ends up losing some state. Not good.
 
-A left over.
+The fix it obvious: don't use CNTKCTL_EL1 if you want to change bits
+that are not part of the EL1 definition of CNTKCTL_EL1, and use
+CNTHCTL_EL2 instead. This doesn't change anything for a bare-metal OS,
+and fixes it when running under NV. The NV hypervisor will itself
+have to work harder to merge the two accessors.
 
-You are right it is the same.
+Note that there is a pending update to the architecture to address
+this issue by making the affected bits UNKNOWN when CNTKCTL_EL1 is
+user from EL2 with VHE enabled.
 
-thanks,
+Fixes: c605ee245097 ("KVM: arm64: timers: Allow physical offset without CNTPOFF_EL2")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org # v6.4
+---
+ arch/arm64/kvm/arch_timer.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Pierre
-
-
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 0696732fa38c..6dcdae4d38cb 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -827,8 +827,8 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
+ 	assign_clear_set_bit(tpt, CNTHCTL_EL1PCEN << 10, set, clr);
+ 	assign_clear_set_bit(tpc, CNTHCTL_EL1PCTEN << 10, set, clr);
+ 
+-	/* This only happens on VHE, so use the CNTKCTL_EL1 accessor */
+-	sysreg_clear_set(cntkctl_el1, clr, set);
++	/* This only happens on VHE, so use the CNTHCTL_EL2 accessor. */
++	sysreg_clear_set(cnthctl_el2, clr, set);
+ }
+ 
+ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+@@ -1563,7 +1563,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ void kvm_timer_init_vhe(void)
+ {
+ 	if (cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF))
+-		sysreg_clear_set(cntkctl_el1, 0, CNTHCTL_ECV);
++		sysreg_clear_set(cnthctl_el2, 0, CNTHCTL_ECV);
+ }
+ 
+ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+-- 
+2.34.1
 
