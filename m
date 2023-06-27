@@ -2,115 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5799C74069A
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 00:45:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0829F7406C0
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 01:07:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229995AbjF0WpQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 18:45:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60562 "EHLO
+        id S230214AbjF0XHB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 19:07:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjF0WpP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 18:45:15 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98A00269F
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 15:45:13 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b80c19b3e2so12616285ad.1
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 15:45:13 -0700 (PDT)
+        with ESMTP id S229789AbjF0XHA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 19:07:00 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49BE22944
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 16:06:58 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-262dc0bab18so1763527a91.2
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 16:06:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687905913; x=1690497913;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qQl7WxhCDcJMe6QTdlAGh4IXmTTWyixOnnvB+eyw+fQ=;
-        b=mcnfKrfFS5X5dXTkSHwka9NxwdbPhR2fwJhoetdaaPdDRv3X3x7UxugYngfRtoXZ0m
-         wa5d2ei3qq/U3rsE5CUP2ZrTgpmFwPEGmiBJRZ9v/j2yhE9OHXXZi3rZinXe4RkSE75U
-         XMV+UxEpRvXjN/XAxStB2ZmmFkhDcPUcq5bVVt5Au+3WcRpyRT8jrGU6pz6+VvDqrzCY
-         X8mRPUPIn82qA9B/2zZ2twReqldHIOw8zL/QbNUPmwb4aLZwfl2MOI9TBCovCOkTW56X
-         ZAZduiLdbuOpLQSdu71hge6YLTPeMvM4+rSz+kxtf1PzXMLIDlMo+E3d/TG9sM6UHzZS
-         R6aA==
+        d=google.com; s=20221208; t=1687907218; x=1690499218;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gL62EeYqdZ3PPyujO7ySVUUWGUsaK4x/yrcgDor1fzE=;
+        b=XA0i6NJO6zVaWEAdvQ0RGr3lYDbLStCwBxZEmIzXRY3TZ8UXLILRMKpUywo4CQfxEN
+         tWebC5EoS9ylt9sr/cyovWOVr3fgf+HOHFC+NZWJIubjBTbISTmse52BgFHIMzUP/yD7
+         kX1PA6VsckP4xAR1CAobEFeZ5AyAum44ZFdABMVatmHUjnRDPLF4AMjUSa8Jr2Q4ydLq
+         ENG95eEdMBtLVW3SFdZ1dAFGYHZICz9cp50HeOioOyT6q5S1z2sBhiC/9wEoG8FsABa2
+         0YwfGdJBtoomJI+qKMURt0Toszw9RNb4wew49BQyelaX28EXL2BrSyNQB0pG6StV2c3J
+         dqsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687905913; x=1690497913;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qQl7WxhCDcJMe6QTdlAGh4IXmTTWyixOnnvB+eyw+fQ=;
-        b=d9vB7EY0oHytbkBJt5SYfTuH/ss5ih7Fc7w9Xp7ZsVoxIhEbLv740YN4g18Fm476Se
-         2Hovrk1rtUUyAwVDxDD6T2mZAQbtAHuBpop2KGUrW0XKodcWV+U58wmE7/YvzPtNZ6l6
-         GFvYu2UEu24CxScGt98Bm+mtbwNpjq/sm9BNuXIJ8g9RCxhcpXK68ImV20d6SfTW1jTV
-         Zp13ahturU4NKSOWLIPqn2PSnNXPGMBGuEc3VzJ/Ch4JSKrc7DVvq1bsKsmjhFjC11Km
-         yjjjStF8GIUIw/zCdcPytt75xnD/Z5UFGjgem/AgdVDtYb87u1/zGmEz2ZdW7Z6WK1WT
-         Iy1Q==
-X-Gm-Message-State: AC+VfDwuZuE/dfHWH8pZCjBBVmaqXaFNPitMo0nEy5NJoZhXIpi0oaze
-        yQNq57v8Cm8QF0jEwmekdGu0yNBU0YQ=
-X-Google-Smtp-Source: ACHHUZ5xQRT54Q3fsm5S2VBg5oxUqBZFQOwEvhmR3gix9ccCGfGpmR1ksoUMpjO5/Z/UmQ1y636i7aos+wk=
+        d=1e100.net; s=20221208; t=1687907218; x=1690499218;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gL62EeYqdZ3PPyujO7ySVUUWGUsaK4x/yrcgDor1fzE=;
+        b=EgeNgJMr4JMaWuiNPFY2GSz31Ez57tWOvg51A4+EnPQ+1jHvaow00oZfovHp9k+sHe
+         0I5yUmFHRmC9eQqy0mbb8T1BVuKVVGrgBrvobcsPzpp4co3wfOIXcyrv+DySjL9tRUp7
+         kCWKQ9n55xC7r331pPUuFvCXzg0F2Z6uUxjF93Z0h6cf4E4L57IzjlNXb7JC2UDCg1wE
+         QA6ijZ5JNLhSlzg2GHzhN0AGz9ez1QKO754hQKWzxRu7TsM3C1NTl3dy5XUE2UKWyYqM
+         ROstXkP8GdqDvTFP/eeBLarIlcEJ63LsvsIfvFI4Muf356TuuLCG3FnEziZ++zpw+Lzk
+         mHbA==
+X-Gm-Message-State: AC+VfDxQP8agRFg9VOWe9CavUU5RGd4iZ88UFbaCCiAm2UxCQk5lRBpn
+        mtw144OvHpTBo8x6r/s5Dz4ZGhK7j8XYBxRL7tBYXx4w+hwtbAXd/JML5N9AUHT9WwUUlVTRqZe
+        iseYkElIPdUJmkGjubADHWV81RhaZPW8DMbD8QUFJ+IgnMDEsQo1/SUnV5w==
+X-Google-Smtp-Source: ACHHUZ666Fn22KRYLGf7nDT1NpIRjQNKOeRfl8ZbwKBChIE/imADWetbcLmqcEvBBkb/Gqs7ZqR06jmRGBg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:64d:b0:1b5:32f2:5a7 with SMTP id
- kh13-20020a170903064d00b001b532f205a7mr703788plb.13.1687905913091; Tue, 27
- Jun 2023 15:45:13 -0700 (PDT)
-Date:   Tue, 27 Jun 2023 15:45:11 -0700
-In-Reply-To: <ZJspu3uS2mirF+4k@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:9418:b0:262:e955:3d87 with SMTP id
+ r24-20020a17090a941800b00262e9553d87mr1221003pjo.9.1687907217644; Tue, 27 Jun
+ 2023 16:06:57 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 27 Jun 2023 16:06:54 -0700
 Mime-Version: 1.0
-References: <20230601142309.6307-1-guang.zeng@intel.com> <20230601142309.6307-4-guang.zeng@intel.com>
- <ZJspu3uS2mirF+4k@google.com>
-Message-ID: <ZJtmdxrr2cC+gpVO@google.com>
-Subject: Re: [PATCH v1 3/6] KVM: VMX: Add new ops in kvm_x86_ops for LASS
- violation check
+X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
+Message-ID: <20230627230654.2934968-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Agenda - 2023.06.28 - CANCELED
 From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+To:     kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 27, 2023, Sean Christopherson wrote:
-> > +	/*
-> > +	 * An access is a supervisor-mode access if CPL < 3 or if it implicitly
-> > +	 * accesses a system data structure. For implicit accesses to system
-> > +	 * data structure, the processor acts as if RFLAGS.AC is clear.
-> > +	 */
-> > +	if (access & PFERR_IMPLICIT_ACCESS) {
-> 
-> Please don't use PFERR_IMPLICIT_ACCESS, just extend the new flags.  This is
-> obviously not coming from a page fault.  PFERR_IMPLICIT_ACCESS really shouldn't
-> exist, but at least there was reasonable justification for adding it (changing
-> all of the paths that lead to permission_fault() would have require a massive
-> overhaul).
-> 
-> ***HOWEVER***
-> 
-> I think the entire approach of hooking __linearize() may be a mistake, and LASS
-> should instead be implemented in a wrapper of ->gva_to_gpa().  The two calls to
-> __linearize() that are escaped with SKIPLASS are escaped *because* they don't
-> actually access memory (branch targets and INVLPG), and so if LASS is enforced
-> only when ->gva_to_gpa() is invoked, all of these new flags go away because the
-> cases that ignore LASS are naturally handled.
-> 
-> That should also make it unnecessary to add one-off checks since e.g. kvm_handle_invpcid()
-> will hit kvm_read_guest_virt() and thus ->gva_to_gpa(), i.e. we won't end up playing
-> an ongoing game of whack-a-mole.
+No topic this week, and I need to reclaim some time this week as I will be OOO
+all of next week.
 
-Drat, that won't work, at least not without quite a few more changes.
+For future topics, a few things on my radar that I am hoping to discuss in the
+not-too-distant future, but that need additional work before they're worth
+discussing:
 
-  1. kvm_{read,write,fetch}_guest_virt() are effectively defined to work with a
-    fully resolve linear address, i.e. callers assume failure means #PF
+ - Coordinating guest_mem() development.  I need to post patches, plan is to do
+   that the week after I get back.
 
-  2. Similar to (1), segment information isn't available, i.e. KVM wouldn't know
-     when to inject #SS instead of #GP
+ - Overhauling KVM's gfn_to_pfn() APIs.  Need a status update from David S., e.g.
+   I don't even know if this being actively worked.
 
-And IIUC, LASS violations are higher priority than instruction specific alignment
-checks, e.g. on CMPXCHG16B.  
+   https://lore.kernel.org/all/ZGvUsf7lMkrNDHuE@google.com
 
-And looking at LAM, that untagging needs to be done before the canonical checks,
-which means that we'll need at least X86EMUL_F_INVLPG.
+ - KVM + UFFD scalability.  We're not yet at the point where we need a synchronous
+   discussion, but I suspect we'll want a live discussion before merging.
 
-So my idea of shoving this into a ->gva_to_gpa() wrapper won't work well.  Bummer.
+   https://lore.kernel.org/all/20230602161921.208564-1-amoorthy@google.com
+
+ - Hiding KVM internals from the kernel at large, e.g. moving kvm_host.h into
+   arch/<arch>/kvm and virt/kvm/, and exporting "internal" KVM symbols if and
+   only if there are vendor modules.  Needs an RFC from us (Google GCE people).
+
+Future Schedule:
+June 28th - Canceled
+July 5th  - Canceled (Sean OOO)
+July 12th - Available!
+July 19th - Available!
