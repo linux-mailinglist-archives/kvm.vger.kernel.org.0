@@ -2,145 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 03F9073FBDD
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 14:19:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F24B73FC1C
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 14:43:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230012AbjF0MTH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 08:19:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39374 "EHLO
+        id S229732AbjF0MnQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 08:43:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbjF0MTG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 08:19:06 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8EBB1999;
-        Tue, 27 Jun 2023 05:19:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687868344; x=1719404344;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=S/Oh83wIoz8iTjgXyFj7FBvLQ6z/1uq7Rt97/C+Sd54=;
-  b=UhlkP5V77gYWSjHPKHlfFoxLhqjpTxGu3c4H7WKrpD1jaJ2Rj7OThxmC
-   kogpxGeUMrU9ozH7RrmikkPX3U9hEoh/JCiiaIpj0JznH50AXczy0z8+i
-   7BKfL7RrdNv5LRF0T2muSqFT6KjWZRHv4LFvwywmrNCCGpXgo73Nb1upx
-   fxU2ENeRQELt92z3QBkOLsmRkm9LVvKmSjKYmluvGw/KKyYDu6l25JqhC
-   eXuQi2E3dPoONTlCMzzcox850guSlqS+ON4MNuXxPtfuP/sMSWov6VITI
-   FplneC5xXvV7ojDOpXK3nKzUMx1Jq0WCmcZ488aWiMtN7G61x8MGW8WCL
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="364105346"
-X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="scan'208";a="364105346"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 05:19:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="963174691"
-X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="scan'208";a="963174691"
-Received: from rbhaumik-mobl2.ger.corp.intel.com (HELO box.shutemov.name) ([10.251.217.121])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 05:18:56 -0700
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id 453D0103738; Tue, 27 Jun 2023 15:18:53 +0300 (+03)
-Date:   Tue, 27 Jun 2023 15:18:53 +0300
-From:   "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "nik.borisov@suse.com" <nik.borisov@suse.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-Subject: Re: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Message-ID: <20230627121853.ek5zr7sfiezfkfyj@box.shutemov.name>
-References: <cover.1687784645.git.kai.huang@intel.com>
- <104d324cd68b12e14722ee5d85a660cccccd8892.1687784645.git.kai.huang@intel.com>
- <20230627095012.ln47s62pqzdrnb7x@box.shutemov.name>
- <d6a0fb32ebcdeb6c38ebe8e2b03f034f42360c0f.camel@intel.com>
+        with ESMTP id S229468AbjF0MnO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 08:43:14 -0400
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87931269E
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 05:43:13 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-986d8332f50so567170866b.0
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 05:43:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1687869792; x=1690461792;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oiGMShFqsK5vy0r+ZoVprgd+7ONOa51b6TZq+l7w8nA=;
+        b=N9jYqZxdR661UImV0f2eqz9etcpnHRQWFJOWqbKzx+pPrr0rGpTyRrmz5XuUcm1Jel
+         baeVg/QwQJBCIEde+fmbP7LG4Izl1AuD0EKT+rEyp5sfJSH192El68xs7rbT6+K4WH9y
+         IfQhrB0iGU5wf9XPYsYmDFUbqjvN0yAjtDAbR5RKLJJX7UPC2owKWr4ScVk8mulj3v1M
+         rUlnRkKpW+k6Vp3tBKcP/u8zcAy+nchDJTbp1UFf/jwRX/gpGEnEqqlo9lImfk5IYIgt
+         /E/zRUzGds4zgAE/1m6/1FiPOwoCYKzmruujyCiOPEFDktm5hG65u6lqnFuN24x3EXwg
+         3F0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687869792; x=1690461792;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oiGMShFqsK5vy0r+ZoVprgd+7ONOa51b6TZq+l7w8nA=;
+        b=TTZngoVcScsxa81o2UhPL42y8o6GZshMZfCH+APgesbp0yBAQXZAM3jEOqwCFB+rjH
+         h3Jy3edczaGy0Q/lfwteT4dbsjVxl0mGSa6Uk8ja48rQig7ScS71yOvK2BN1DhfsyTU7
+         6DuefJPCSyv/1P6TSHEdKatxobLCNNay0tc/DUarfuNeihTyTZlYlUHyk9PreTNWWUv8
+         Et/Gp37VyFbgrSEwJE+5dZTjoRgkam6El/33pGoCKP5jHJOOO1HRkyLuGC/3vMamao7t
+         hp2h52dmKq5VhdUyl46ybWyQYq0UJU0/cuTJm8aKfuy5Nf+j6geheKBJPEdZvzvkUvrQ
+         IA6g==
+X-Gm-Message-State: AC+VfDxEESBjfLzLsas3xfCcy9MV+yPkbJd0oaxj/eTXFwo7thaoe0UI
+        3Shucm9lCRfl0IchZUVBYCyWqQ==
+X-Google-Smtp-Source: ACHHUZ6zoAvKTmIUPl7vS48VUGVb/8NUBU9FbZNA+3XvIM6YbbuEMppTKmcZbeQKq+uiXwT/1/ecVw==
+X-Received: by 2002:a17:907:c0a:b0:96f:d345:d0f7 with SMTP id ga10-20020a1709070c0a00b0096fd345d0f7mr28092609ejc.62.1687869792013;
+        Tue, 27 Jun 2023 05:43:12 -0700 (PDT)
+Received: from [192.168.69.115] ([176.187.199.204])
+        by smtp.gmail.com with ESMTPSA id kg1-20020a17090776e100b0098e2eaec395sm3430672ejc.130.2023.06.27.05.43.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Jun 2023 05:43:11 -0700 (PDT)
+Message-ID: <9d54d187-dd61-9d48-01bc-d0d6a44d119e@linaro.org>
+Date:   Tue, 27 Jun 2023 14:43:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d6a0fb32ebcdeb6c38ebe8e2b03f034f42360c0f.camel@intel.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH v3 15/16] accel: Rename 'cpu_state' -> 'cs'
+Content-Language: en-US
+To:     qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Roman Bolshakov <rbolshakov@ddn.com>, qemu-arm@nongnu.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Alexander Graf <agraf@csgraf.de>,
+        xen-devel@lists.xenproject.org,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Paul Durrant <paul@xen.org>,
+        Reinoud Zandijk <reinoud@netbsd.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Cameron Esfahani <dirty@apple.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20230624174121.11508-1-philmd@linaro.org>
+ <20230624174121.11508-16-philmd@linaro.org>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <20230624174121.11508-16-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 27, 2023 at 10:34:04AM +0000, Huang, Kai wrote:
-> On Tue, 2023-06-27 at 12:50 +0300, kirill.shutemov@linux.intel.com wrote:
-> > On Tue, Jun 27, 2023 at 02:12:37AM +1200, Kai Huang wrote:
-> > > +	/*
-> > > +	 * The TDX module global initialization only needs to be done
-> > > +	 * once on any cpu.
-> > > +	 */
-> > > +	raw_spin_lock_irqsave(&tdx_global_init_lock, flags);
-> > 
-> > I don't understand how the comment justifies using raw spin lock.
-> > 
+On 24/6/23 19:41, Philippe Mathieu-Daudé wrote:
+> Most of the codebase uses 'CPUState *cpu' or 'CPUState *cs'.
+> While 'cpu_state' is kind of explicit, it makes the code
+> harder to review. Simply rename as 'cs'.
 > 
-> This comment is for using lock in general.  The reason to use raw_ version is
-> because this function gets called in IRQ context, and for PREEMPT_RT kernel the
-> normal spinlock is converted to sleeping lock.
+> Acked-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>   target/i386/hvf/x86hvf.h |  18 +-
+>   target/i386/hvf/x86hvf.c | 372 +++++++++++++++++++--------------------
+>   2 files changed, 195 insertions(+), 195 deletions(-)
 
-Sorry, but this still doesn't explain anything.
+Per IRC chat:
+Tested-by: Peter Maydell <peter.maydell@linaro.org>
 
-Why converting to sleeping lock here is wrong? There are plenty
-spin_lock_irqsave() users all over the kernel that are fine to be
-converted to sleeping lock on RT kernel. Why this use-case is special
-enough to justify raw_?
-
-From the documentation:
-
-	raw_spinlock_t is a strict spinning lock implementation in all
-	kernels, including PREEMPT_RT kernels. Use raw_spinlock_t only in
-	real critical core code, low-level interrupt handling and places
-	where disabling preemption or interrupts is required, for example,
-	to safely access hardware state. raw_spinlock_t can sometimes also
-	be used when the critical section is tiny, thus avoiding RT-mutex
-	overhead.
-
-How does it apply here?
-
-> Dave suggested to comment on the function rather than comment on the
-> raw_spin_lock directly, e.g.,  no other kernel code does that:
-> 
-> https://lore.kernel.org/linux-mm/d2b3bc5e-1371-0c50-8ecb-64fc70917d42@intel.com/
-> 
-> So I commented the function in this version:
-> 
-> +/*
-> + * Do the module global initialization if not done yet.
-> + * It's always called with interrupts and preemption disabled.
-> + */
-
-If interrupts are always disabled why do you need _irqsave()?
-
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
