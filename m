@@ -2,89 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 737DD7401E4
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 19:08:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBB117401F1
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 19:15:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230429AbjF0RIo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 13:08:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42662 "EHLO
+        id S229437AbjF0RPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 13:15:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229927AbjF0RIn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 13:08:43 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEC93198D
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 10:08:41 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-56fffdea2d0so51770157b3.1
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 10:08:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687885721; x=1690477721;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zmTYBHiq1aAEhFeB5lbw1u0SmbjoMvuQpM4GCZ6yf38=;
-        b=IVA1fW9z3fvV2citHCS4ShP8SJ355AticUoDo8b4hCd7KVDGS3NOP0gYlyt4iz5YTS
-         HAki00VvRLmzk1A388nL1Pqw2E6th3LdFtMjILyxEZmr6mdFs80Vlq4cbYPVMVjSULq9
-         OguibegXP3fdCKzrispjaCvcaiHsItetv3OaZKsfWM4B3krqFqOCDKXyaU5FtaHoUa54
-         lhfjc5h563F0SoDc6Y9XXlljkNAANgnzNQQElnZrKXuCxNX5naT2+Y041W0YBSdPOBmS
-         EIOddBn7CiOslBCcl+66cqhgqclSDddd2PKx6mBJdkjOGd/lQ6yVYUwgjexWDhQ5WfHU
-         Wr6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687885721; x=1690477721;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zmTYBHiq1aAEhFeB5lbw1u0SmbjoMvuQpM4GCZ6yf38=;
-        b=DuWVyb282y/6fPAapbM9BYLqDnGSnACqiivY/TKZqPQk5+g0v+ipYrnENdHgyValKm
-         TypMH2WlPT6xEZjqFfKb5jdqfoDAfOdWmJSWtwS3F8z6Fim16ZQxmo+MMC4ApDyfsBIw
-         OwywFs+FMpIiEZOXgWnin8EbHFZi8Ng//iq7jT7i4wob8GxpebgpE2trtCxS3/7anjj7
-         SYMVhEHTJcozJSidyyQXBh0m5lWl0nVfM18JQIkkWhegRNHyHvZmPv4r5CTiK1nzgonj
-         rDx+AqRTTx4ULn+OqB98ISpPr7Y6eVUEQPTt8n/25aCyNQPeblSQS9K+/e/HRl4IpKIE
-         hpQA==
-X-Gm-Message-State: AC+VfDxUqaJvTNpNpkirHm2FrMcTmyIGSIpNmr25FU78wfi4zpoR5YW2
-        QmRbxNrCH1X2GDpBdTRWP7MyBH/W6MY=
-X-Google-Smtp-Source: ACHHUZ4x/kmMRFuVDQPoWm9oePlEoaxawv+Tl+xLy1w6ikaFM/ufb1HKrZ3JhOLWb11Z/yZ7OXbmMpfiMmA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4046:0:b0:55d:d5b1:c2bd with SMTP id
- m6-20020a814046000000b0055dd5b1c2bdmr10445571ywn.8.1687885720828; Tue, 27 Jun
- 2023 10:08:40 -0700 (PDT)
-Date:   Tue, 27 Jun 2023 10:08:39 -0700
-In-Reply-To: <20230601142309.6307-1-guang.zeng@intel.com>
-Mime-Version: 1.0
-References: <20230601142309.6307-1-guang.zeng@intel.com>
-Message-ID: <ZJsXl6emfV2yr4rs@google.com>
-Subject: Re: [PATCH v1 0/6] LASS KVM virtualization support
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229995AbjF0RPL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 13:15:11 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 147AB1FF0;
+        Tue, 27 Jun 2023 10:15:07 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 96CA7611DD;
+        Tue, 27 Jun 2023 17:15:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6C4DC433C0;
+        Tue, 27 Jun 2023 17:15:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687886105;
+        bh=t9t1/a06KinouPCACcUuUpceqv6hMh2a6Tw4XIcjN4c=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=WsQ45bPsRfyitg7EavXXk3MVtRFks+vihvVXxuENZTdS+E8wbhnMxkwCFii6JmAA3
+         IhCahkSjnnSQcMCU8sZSmNFccI5E67IqphG+pkebqKJNbDU+CBJ2Lte8sIK9KMLUvA
+         tXJ6BLFwGsxZBj2F6q7twe8DnjPvo9LO4YG374IQBHpyEKwx9Oq31iT5L7m0vDodhA
+         CS+wCu6sT/5eA9m53Gg9phGk+yvrO6pfL+sGdJcmr6qpEUVrhaj4vXQX6aYcTn2OW9
+         6tWG1yLTtvlv2rgjWOQXlII0l2g8Pk9t7n2pr783ZtbPnUmXYHeCa+8wKqSpAuvs8+
+         /VWyWTKx7wK5Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qECHP-008sHp-7W;
+        Tue, 27 Jun 2023 18:15:03 +0100
+Date:   Tue, 27 Jun 2023 18:14:58 +0100
+Message-ID: <86cz1gygh9.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: timers: Use CNTHCTL_EL2 when setting non-CNTKCTL_EL1 bits
+In-Reply-To: <ZJsQAFlsx0GssfL2@linux.dev>
+References: <20230627140557.544885-1-maz@kernel.org>
+        <ZJsQAFlsx0GssfL2@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 01, 2023, Zeng Guang wrote:
-> This patch series provide a LASS KVM solution.
-
-... and depends on kernel enabling that can be found at
-
-https://lore.kernel.org/all/20230609183632.48706-1-alexander.shishkin@linux.intel.com
-
-> We tested the basic function of LASS virtualization including LASS
-> enumeration and enabling in non-root and nested environment. As KVM
-> unittest framework is not compatible to LASS rule, we use kernel module
-> and application test to emulate LASS violation instead. With KVM forced
-> emulation mechanism, we also verified the LASS functionality on some
-> emulation path with instruction fetch and data access to have same
-> behavior as hardware.
+On Tue, 27 Jun 2023 17:36:16 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> [1] Intel ISE https://cdrdv2.intel.com/v1/dl/getContent/671368
-> Chapter Linear Address Space Separation (LASS)
+> On Tue, Jun 27, 2023 at 03:05:57PM +0100, Marc Zyngier wrote:
+> > It recently appeared that, whien running VHE, there is a notable
+> > difference between using CNTKCTL_EL1 and CNTHCTL_EL2, despite what
+> > the architecture documents:
+> > 
+> > - When accessed from EL2, bits [19:18] and [16:10] same bits have
+> >   the same assignment as CNTHCTL_EL2
+> > - When accessed from EL1, bits [19:18] and [16:10] are RES0
+> > 
+> > It is all OK, until you factor in NV, where the EL2 guest runs at EL1.
+> > In this configuration, CNTKCTL_EL11 doesn't trap, nor ends up in
+> > the VNCR page. This means that any write from the guest affecting
+> > CNTHCTL_EL2 using CNTKCTL_EL1 ends up losing some state. Not good.
+> > 
+> > The fix it obvious: don't use CNTKCTL_EL1 if you want to change bits
+> > that are not part of the EL1 definition of CNTKCTL_EL1, and use
+> > CNTHCTL_EL2 instead. This doesn't change anything for a bare-metal OS,
+> > and fixes it when running under NV. The NV hypervisor will itself
+> > have to work harder to merge the two accessors.
+> > 
+> > Note that there is a pending update to the architecture to address
+> > this issue by making the affected bits UNKNOWN when CNTKCTL_EL1 is
+> > user from EL2 with VHE enabled.
+> > 
+> > Fixes: c605ee245097 ("KVM: arm64: timers: Allow physical offset without CNTPOFF_EL2")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: stable@vger.kernel.org # v6.4
+> 
+> Looks good. I'll probably open a fixes branch around -rc1 and pick this
+> patch up then.
+
+Awesome, thanks.
+
+(/me goes back to encoding FGT handling by hand... :-/)
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
