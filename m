@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5020173F60F
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 09:50:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 159AB73F61E
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 09:51:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231536AbjF0HuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 03:50:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42324 "EHLO
+        id S230373AbjF0Hvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 03:51:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231561AbjF0Htz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 03:49:55 -0400
+        with ESMTP id S229710AbjF0Hvs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 03:51:48 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F34710E4
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 00:49:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34E9226B7
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 00:50:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687852148;
+        s=mimecast20190719; t=1687852257;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QskuoK2+u8nib14YsmgjwegctAeH9ldt3GHDxrpov3o=;
-        b=QkWIMW5lUcjUXGGipQwToZZylucxHoBf0kBNJpUlAlqiNx2YmQcejg0puoP0BiICz7qCRP
-        IZs4Fled02xf/XKUQBhHTs1e0nY+BoTJ69Jlk2IIi2ZlsliiDtUSbzC4VI/u5Vai3EzA+o
-        bW6g8eM1CxilvWOUyA1zkqfxOa46CUo=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=8vz3rfN1JqJlfXhLD/L5Jo/WsFsNJWGpEaFmWZTzVCg=;
+        b=B7QX1cxyNzE6LaOnLRR9hkQUOOkXNtujfYQUcrgfRdPbyaG3NSyLdZJ5SSd0t5t5tDBUXG
+        m6a6+8JkOSZym8oMygvqhfQt8KlFCxa/45lAz/i/UXqonIK8A4kpiG2SnKGD/7qpaZKLU3
+        jLajZJdTHIFA6Tlq87AIVoE0g7VDLys=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-375-DYBB5-evPCOT0VObYESoCQ-1; Tue, 27 Jun 2023 03:49:06 -0400
-X-MC-Unique: DYBB5-evPCOT0VObYESoCQ-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9835bf83157so270828366b.2
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 00:49:06 -0700 (PDT)
+ us-mta-607-TvWa3xfSNeWsyvcG3pE9kw-1; Tue, 27 Jun 2023 03:50:56 -0400
+X-MC-Unique: TvWa3xfSNeWsyvcG3pE9kw-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-50ddef368e4so2496291a12.0
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 00:50:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687852144; x=1690444144;
+        d=1e100.net; s=20221208; t=1687852255; x=1690444255;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QskuoK2+u8nib14YsmgjwegctAeH9ldt3GHDxrpov3o=;
-        b=ejyTSwZ4165G2KTo3tLgqGzPxoF3+tDjQU+lSmtt1yvGk0a+6VKhGWjt8zCe9wcoR1
-         eCCQT1O3mmmHysdtoDZp0S5k4lKa4wUL0JkvODQCU0eXSgCp9efxrBpxaI7oCCRVkzqT
-         kQ6AFIE0+7KsRAGAzBA5l0ydFPwitv+WzyCGZIefRlR7tAz0FJsgLi0kuNyLJf8mZTfl
-         zgHVnR+wKoF401kteuIUDqg+P3KiY0gK0COS5SZTIAcMFkLy00SaiELPZA0RaRY8YeAI
-         ENaJ9MQp0qJstJH5ihj1U0F0ZKYFXiZBE+ITy/bmH4SWGh9kjyxgsidRMYiviDcro3D1
-         0BzA==
-X-Gm-Message-State: AC+VfDwjCM4eZ8zAiedqVbShYoxBxnyC28zPUgJDHunIgLXdfLShvJOK
-        we0kCcod39a6eOFWzTMIjGp+P2pTYZXnUyMBehtHhpSubHTH9q7xCLZk3gQf14gqbZxL9Zsk+Th
-        qNDMpjyaflDcaumxFd3J+
-X-Received: by 2002:a17:907:5c2:b0:974:55a2:cb0b with SMTP id wg2-20020a17090705c200b0097455a2cb0bmr27377793ejb.55.1687852144702;
-        Tue, 27 Jun 2023 00:49:04 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5lPeO/qla5LYI8so4+wb692OOE9l0zoDT61iV17QvGS0n+RA4RN7JnC6UwGFHGHsZN1sj4ZQ==
-X-Received: by 2002:a17:907:5c2:b0:974:55a2:cb0b with SMTP id wg2-20020a17090705c200b0097455a2cb0bmr27377778ejb.55.1687852144363;
-        Tue, 27 Jun 2023 00:49:04 -0700 (PDT)
+        bh=8vz3rfN1JqJlfXhLD/L5Jo/WsFsNJWGpEaFmWZTzVCg=;
+        b=S2V/mQsS97NmOJ4bleKryD/g0Osyfuzy49ZHBhcIr/L6+IsMbOl6mGJlHYPnZTXopd
+         j6TihQe2l4zdSBjC7LdLgYUhi6p5h3N5LiPgbfjxiPaZD3vyoVqf17dKYNHB3M44k9v+
+         hhpxC4lUSbm/wUZw8E06vAyz3kNyEnRttFrhnJuB1wsnzn9xcxMgwACzVhN9Y4PDJrEF
+         QWrLthGaVXdILzyNeNtwBQ79aTC5eBkd3wvgIQ7/ZMPUimQwUvh15qkVorb4UegIzoTX
+         1iTXEQWH/FTqI1NsEbyFwk56aduEM2r4M5cLT63DX7Rj5r84x6lfBPhKQ719iDHvaLJ4
+         VUAw==
+X-Gm-Message-State: AC+VfDysuBXvLENy0AB9IvZcQX/wSR0PAAAA4UBLVyAq192oJHomQv/S
+        PrOMQbeLo39qydFmlzK7LCu5m6UbJ+DRuRzK/69yh1PxZSjAiMIfI6UkRUuj/sv4QpUADBvgJ5k
+        wwcLAEFdax2mH
+X-Received: by 2002:aa7:c689:0:b0:51d:a9be:ab79 with SMTP id n9-20020aa7c689000000b0051da9beab79mr733771edq.2.1687852254828;
+        Tue, 27 Jun 2023 00:50:54 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4r5Nuhu/LFQfyvCpDwQm07eO8S4FqGAtq9D1kRhDQP4rhQkvndwRPaTOhkr212xoReVU2WzA==
+X-Received: by 2002:aa7:c689:0:b0:51d:a9be:ab79 with SMTP id n9-20020aa7c689000000b0051da9beab79mr733749edq.2.1687852254390;
+        Tue, 27 Jun 2023 00:50:54 -0700 (PDT)
 Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id n5-20020a170906088500b0098963eb0c3dsm4208125eje.26.2023.06.27.00.49.03
+        by smtp.gmail.com with ESMTPSA id v14-20020aa7d80e000000b0051a59d81c4dsm3606442edq.3.2023.06.27.00.50.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 00:49:03 -0700 (PDT)
-Date:   Tue, 27 Jun 2023 09:49:01 +0200
+        Tue, 27 Jun 2023 00:50:53 -0700 (PDT)
+Date:   Tue, 27 Jun 2023 09:50:50 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -69,151 +69,396 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v4 03/17] vsock/virtio: support to send non-linear skb
-Message-ID: <6g6rfqbfkmfn5or56v25xny6lyhixj6plmrnyg77hirz7dzzhn@jskeqmnbthhk>
+Subject: Re: [RFC PATCH v4 05/17] vsock/virtio: MSG_ZEROCOPY flag support
+Message-ID: <m5q3fqqvur4pcvkcxx36ivoqu77tsrjd4xna6zszmzq34dbqq5@6wfrhllk6tsq>
 References: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
- <20230603204939.1598818-4-AVKrasnov@sberdevices.ru>
- <3lg4apldxdrpbkgfa2o4wxe4qyayj2h7b2lfcw3q5a7u3hnofi@z2ifmmzt4xpc>
- <0a89e51b-0f7f-b64b-c827-7c943d6f08a6@sberdevices.ru>
+ <20230603204939.1598818-6-AVKrasnov@sberdevices.ru>
+ <rbyt6uomvimurmgchxpuyoqjehdleqzzohzzdnajgadrwkbwsf@qwlcvzqhqxqw>
+ <b25f0c4d-828c-ffe8-2780-2c954ed8770a@sberdevices.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <0a89e51b-0f7f-b64b-c827-7c943d6f08a6@sberdevices.ru>
+In-Reply-To: <b25f0c4d-828c-ffe8-2780-2c954ed8770a@sberdevices.ru>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 27, 2023 at 07:39:41AM +0300, Arseniy Krasnov wrote:
+On Tue, Jun 27, 2023 at 07:41:51AM +0300, Arseniy Krasnov wrote:
 >
 >
->On 26.06.2023 18:36, Stefano Garzarella wrote:
->> On Sat, Jun 03, 2023 at 11:49:25PM +0300, Arseniy Krasnov wrote:
->>> For non-linear skb use its pages from fragment array as buffers in
->>> virtio tx queue. These pages are already pinned by 'get_user_pages()'
->>> during such skb creation.
+>On 26.06.2023 19:03, Stefano Garzarella wrote:
+>> On Sat, Jun 03, 2023 at 11:49:27PM +0300, Arseniy Krasnov wrote:
+>>> This adds handling of MSG_ZEROCOPY flag on transmission path: if this
+>>> flag is set and zerocopy transmission is possible, then non-linear skb
+>>> will be created and filled with the pages of user's buffer. Pages of
+>>> user's buffer are locked in memory by 'get_user_pages()'.
 >>>
 >>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 >>> ---
->>> net/vmw_vsock/virtio_transport.c | 37 ++++++++++++++++++++++++++------
->>> 1 file changed, 31 insertions(+), 6 deletions(-)
+>>> net/vmw_vsock/virtio_transport_common.c | 270 ++++++++++++++++++------
+>>> 1 file changed, 208 insertions(+), 62 deletions(-)
 >>>
->>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->>> index e95df847176b..6053d8341091 100644
->>> --- a/net/vmw_vsock/virtio_transport.c
->>> +++ b/net/vmw_vsock/virtio_transport.c
->>> @@ -100,7 +100,9 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->>>     vq = vsock->vqs[VSOCK_VQ_TX];
+>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> index 0de562c1dc4b..f1ec38c72db7 100644
+>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> @@ -37,27 +37,100 @@ virtio_transport_get_ops(struct vsock_sock *vsk)
+>>>     return container_of(t, struct virtio_transport, transport);
+>>> }
 >>>
->>>     for (;;) {
->>> -        struct scatterlist hdr, buf, *sgs[2];
->>> +        /* +1 is for packet header. */
->>> +        struct scatterlist *sgs[MAX_SKB_FRAGS + 1];
->>> +        struct scatterlist bufs[MAX_SKB_FRAGS + 1];
->>>         int ret, in_sg = 0, out_sg = 0;
->>>         struct sk_buff *skb;
->>>         bool reply;
->>> @@ -111,12 +113,35 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+>>> -/* Returns a new packet on success, otherwise returns NULL.
+>>> - *
+>>> - * If NULL is returned, errp is set to a negative errno.
+>>> - */
+>>> -static struct sk_buff *
+>>> -virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
+>>> -               size_t len,
+>>> -               u32 src_cid,
+>>> -               u32 src_port,
+>>> -               u32 dst_cid,
+>>> -               u32 dst_port)
+>>> -{
+>>> -    const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM + len;
+>>> -    struct virtio_vsock_hdr *hdr;
+>>> -    struct sk_buff *skb;
+>>> +static bool virtio_transport_can_zcopy(struct virtio_vsock_pkt_info *info,
+>>> +                       size_t max_to_send)
+>>> +{
+>>> +    struct iov_iter *iov_iter;
+>>> +
+>>> +    if (!info->msg)
+>>> +        return false;
+>>> +
+>>> +    iov_iter = &info->msg->msg_iter;
+>>> +
+>>> +    /* Data is simple buffer. */
+>>> +    if (iter_is_ubuf(iov_iter))
+>>> +        return true;
+>>> +
+>>> +    if (!iter_is_iovec(iov_iter))
+>>> +        return false;
+>>> +
+>>> +    if (iov_iter->iov_offset)
+>>> +        return false;
+>>> +
+>>> +    /* We can't send whole iov. */
+>>> +    if (iov_iter->count > max_to_send)
+>>> +        return false;
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
+>>> +                       struct sk_buff *skb,
+>>> +                       struct msghdr *msg,
+>>> +                       bool zerocopy)
+>>> +{
+>>> +    struct ubuf_info *uarg;
+>>> +
+>>> +    if (msg->msg_ubuf) {
+>>> +        uarg = msg->msg_ubuf;
+>>> +        net_zcopy_get(uarg);
+>>> +    } else {
+>>> +        struct iov_iter *iter = &msg->msg_iter;
+>>> +        struct ubuf_info_msgzc *uarg_zc;
+>>> +        int len;
+>>> +
+>>> +        /* Only ITER_IOVEC or ITER_UBUF are allowed and
+>>> +         * checked before.
+>>> +         */
+>>> +        if (iter_is_iovec(iter))
+>>> +            len = iov_length(iter->__iov, iter->nr_segs);
+>>> +        else
+>>> +            len = iter->count;
+>>> +
+>>> +        uarg = msg_zerocopy_realloc(sk_vsock(vsk),
+>>> +                        len,
+>>> +                        NULL);
+>>> +
+>>> +        if (!uarg)
+>>> +            return -1;
+>>> +
+>>> +        uarg_zc = uarg_to_msgzc(uarg);
+>>> +        uarg_zc->zerocopy = zerocopy ? 1 : 0;
+>>> +    }
+>>> +
+>>> +    skb_zcopy_init(skb, uarg);
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>> +static int virtio_transport_fill_linear_skb(struct sk_buff *skb,
+>>> +                        struct vsock_sock *vsk,
+>>
+>> `vsk` seems unused
+>>
+>>> +                        struct virtio_vsock_pkt_info *info,
+>>> +                        size_t len)
+>>> +{
+>>>     void *payload;
+>>>     int err;
 >>>
->>>         virtio_transport_deliver_tap_pkt(skb);
->>>         reply = virtio_vsock_skb_reply(skb);
->>> +        sg_init_one(&bufs[0], virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)));
->>> +        sgs[out_sg++] = &bufs[0];
+>>> -    skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
+>>> -    if (!skb)
+>>> -        return NULL;
+>>> +    payload = skb_put(skb, len);
+>>> +    err = memcpy_from_msg(payload, info->msg, len);
+>>> +    if (err)
+>>> +        return -1;
+>>> +
+>>> +    if (msg_data_left(info->msg))
+>>> +        return 0;
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>> +static void virtio_transport_init_hdr(struct sk_buff *skb,
+>>> +                      struct virtio_vsock_pkt_info *info,
+>>> +                      u32 src_cid,
+>>> +                      u32 src_port,
+>>> +                      u32 dst_cid,
+>>> +                      u32 dst_port,
+>>> +                      size_t len)
+>>> +{
+>>> +    struct virtio_vsock_hdr *hdr;
+>>>
+>>>     hdr = virtio_vsock_hdr(skb);
+>>>     hdr->type    = cpu_to_le16(info->type);
+>>> @@ -68,42 +141,6 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
+>>>     hdr->dst_port    = cpu_to_le32(dst_port);
+>>>     hdr->flags    = cpu_to_le32(info->flags);
+>>>     hdr->len    = cpu_to_le32(len);
+>>> -
+>>> -    if (info->msg && len > 0) {
+>>> -        payload = skb_put(skb, len);
+>>> -        err = memcpy_from_msg(payload, info->msg, len);
+>>> -        if (err)
+>>> -            goto out;
+>>> -
+>>> -        if (msg_data_left(info->msg) == 0 &&
+>>> -            info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
+>>> -            hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
+>>> -
+>>> -            if (info->msg->msg_flags & MSG_EOR)
+>>> -                hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
+>>> -        }
+>>> -    }
+>>> -
+>>> -    if (info->reply)
+>>> -        virtio_vsock_skb_set_reply(skb);
+>>> -
+>>> -    trace_virtio_transport_alloc_pkt(src_cid, src_port,
+>>> -                     dst_cid, dst_port,
+>>> -                     len,
+>>> -                     info->type,
+>>> -                     info->op,
+>>> -                     info->flags);
+>>> -
+>>> -    if (info->vsk && !skb_set_owner_sk_safe(skb, sk_vsock(info->vsk))) {
+>>> -        WARN_ONCE(1, "failed to allocate skb on vsock socket with sk_refcnt == 0\n");
+>>> -        goto out;
+>>> -    }
+>>> -
+>>> -    return skb;
+>>> -
+>>> -out:
+>>> -    kfree_skb(skb);
+>>> -    return NULL;
+>>> }
+>>>
+>>> static void virtio_transport_copy_nonlinear_skb(struct sk_buff *skb,
+>>> @@ -214,6 +251,85 @@ static u16 virtio_transport_get_type(struct sock *sk)
+>>>         return VIRTIO_VSOCK_TYPE_SEQPACKET;
+>>> }
+>>>
+>>> +/* Returns a new packet on success, otherwise returns NULL.
+>>> + *
+>>> + * If NULL is returned, errp is set to a negative errno.
 >>
->> Can we use out_sg also to index bufs (here and in the rest of the code)?
+>> I had noticed this in Bobby's patches, I think it's an old comment we
+>> left around.
 >>
->> E.g.
+>>> + */
+>>> +static struct sk_buff *virtio_transport_alloc_skb(struct vsock_sock *vsk,
+>>> +                          struct virtio_vsock_pkt_info *info,
+>>> +                          size_t payload_len,
+>>> +                          bool zcopy,
+>>> +                          u32 dst_cid,
+>>> +                          u32 dst_port,
+>>> +                          u32 src_cid,
+>>> +                          u32 src_port)
+>>> +{
+>>> +    struct sk_buff *skb;
+>>> +    size_t skb_len;
+>>> +
+>>> +    skb_len = VIRTIO_VSOCK_SKB_HEADROOM;
+>>> +
+>>> +    if (!zcopy)
+>>> +        skb_len += payload_len;
+>>> +
+>>> +    skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
+>>> +    if (!skb)
+>>> +        return NULL;
+>>> +
+>>> +    virtio_transport_init_hdr(skb, info, src_cid, src_port,
+>>> +                  dst_cid, dst_port,
+>>> +                  payload_len);
+>>> +
+>>> +    /* Set owner here, because '__zerocopy_sg_from_iter()' uses
+>>> +     * owner of skb without check to update 'sk_wmem_alloc'.
+>>> +     */
+>>> +    if (vsk)
+>>> +        skb_set_owner_w(skb, sk_vsock(vsk));
 >>
->>         sg_init_one(&bufs[out_sg], ...)
->>         sgs[out_sg] = &bufs[out_sg];
->>         ++out_sg;
+>> why we are moving from skb_set_owner_sk_safe() to skb_set_owner_w()?
 >>
->>         ...
->>             if (skb->len > 0) {
->>                 sg_init_one(&bufs[out_sg], skb->data, skb->len);
->>                 sgs[out_sg] = &bufs[out_sg];
->>                 ++out_sg;
->>             }
->>
->>         etc...
+>> We should mention this in the commit description.
 >>
 >>> +
->>
->> For readability, I would move the smaller branch above:
->>
->>         if (!skb_is_nonlinear(skb)) {
->>             // small block
->>             ...
->>         } else {
->>             // big block
->>             ...
->>         }
->>
->>> +        if (skb_is_nonlinear(skb)) {
->>> +            struct skb_shared_info *si;
->>> +            int i;
+>>> +    if (info->msg && payload_len > 0) {
+>>> +        int err;
 >>> +
->>> +            si = skb_shinfo(skb);
->>> +
->>> +            for (i = 0; i < si->nr_frags; i++) {
->>> +                skb_frag_t *skb_frag = &si->frags[i];
->>> +                void *va = page_to_virt(skb_frag->bv_page);
->>> +
->>> +                /* We will use 'page_to_virt()' for userspace page here,
->>> +                 * because virtio layer will call 'virt_to_phys()' later
->>> +                 * to fill buffer descriptor. We don't touch memory at
->>> +                 * "virtual" address of this page.
->>> +                 */
->>> +                sg_init_one(&bufs[i + 1],
->>> +                        va + skb_frag->bv_offset,
->>> +                        skb_frag->bv_len);
->>> +                sgs[out_sg++] = &bufs[i + 1];
->>> +            }
+>>> +        if (zcopy) {
+>>> +            err = __zerocopy_sg_from_iter(info->msg, NULL, skb,
+>>> +                              &info->msg->msg_iter,
+>>> +                              payload_len);
 >>> +        } else {
->>> +            if (skb->len > 0) {
+>>> +            err = virtio_transport_fill_linear_skb(skb, vsk, info, payload_len);
+>>> +        }
+>>> +
+>>> +        if (err)
+>>> +            goto out;
+>>> +
+>>> +        VIRTIO_VSOCK_SKB_CB(skb)->frag_off = 0;
+>>> +
+>>> +        if (info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
+>>> +            struct virtio_vsock_hdr *hdr;
+>>> +
+>>> +            hdr = virtio_vsock_hdr(skb);
 >>
->> Should we do the same check (skb->len > 0) for nonlinear skb as well?
->> Or do the nonlinear ones necessarily have len > 0?
+>> Just `struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);` should be
+>> fine.
+>>
+>>> +
+>>> +            hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
+>>> +
+>>> +            if (info->msg->msg_flags & MSG_EOR)
+>>> +                hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
+>>> +        }
+>>> +    }
+>>> +
+>>> +    if (info->reply)
+>>> +        virtio_vsock_skb_set_reply(skb);
+>>> +
+>>> +    trace_virtio_transport_alloc_pkt(src_cid, src_port,
+>>> +                     dst_cid, dst_port,
+>>> +                     payload_len,
+>>> +                     info->type,
+>>> +                     info->op,
+>>> +                     info->flags);
+>>> +
+>>> +    return skb;
+>>> +out:
+>>> +    kfree_skb(skb);
+>>> +    return NULL;
+>>> +}
+>>> +
+>>> /* This function can only be used on connecting/connected sockets,
+>>>  * since a socket assigned to a transport is required.
+>>>  *
+>>> @@ -226,6 +342,8 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>>     const struct virtio_transport *t_ops;
+>>>     struct virtio_vsock_sock *vvs;
+>>>     u32 pkt_len = info->pkt_len;
+>>> +    bool can_zcopy = false;
+>>> +    u32 max_skb_cap;
+>>>     u32 rest_len;
+>>>     int ret;
+>>>
+>>> @@ -254,22 +372,49 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>>     if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
+>>>         return pkt_len;
+>>>
+>>> +    /* If zerocopy is not enabled by 'setsockopt()', we behave as
+>>> +     * there is no MSG_ZEROCOPY flag set.
+>>> +     */
+>>> +    if (!sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY))
+>>> +        info->flags &= ~MSG_ZEROCOPY;
+>>> +
+>>> +    if (info->flags & MSG_ZEROCOPY)
+>>> +        can_zcopy = virtio_transport_can_zcopy(info, pkt_len);
+>>> +
+>>> +    if (can_zcopy)
+>>> +        max_skb_cap = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
+>>> +                    (MAX_SKB_FRAGS * PAGE_SIZE));
+>>> +    else
+>>> +        max_skb_cap = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
+>>> +
+>>
+>> We use `len` very often, what about `max_skb_len`?
+>>
+>>>     rest_len = pkt_len;
+>>>
+>>>     do {
+>>>         struct sk_buff *skb;
+>>>         size_t skb_len;
+>>>
+>>> -        skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE, rest_len);
+>>> +        skb_len = min(max_skb_cap, rest_len);
+>>>
+>>> -        skb = virtio_transport_alloc_skb(info, skb_len,
+>>> -                         src_cid, src_port,
+>>> -                         dst_cid, dst_port);
+>>> +        skb = virtio_transport_alloc_skb(vsk, info, skb_len, can_zcopy,
+>>> +                         dst_cid, dst_port,
+>>> +                         src_cid, src_port);
+>>>         if (!skb) {
+>>>             ret = -ENOMEM;
+>>>             break;
+>>>         }
+>>>
+>>> +        /* This is last skb to send this portion of data. */
+>>> +        if (skb_len == rest_len &&
+>>> +            info->flags & MSG_ZEROCOPY &&
+>>> +            info->op == VIRTIO_VSOCK_OP_RW) {
+>>> +            if (virtio_transport_init_zcopy_skb(vsk, skb,
+>>> +                                info->msg,
+>>> +                                can_zcopy)) {
+>>> +                ret = -ENOMEM;
+>>> +                break;
+>>> +            }
+>>> +        }
+>>> +
+>>>         virtio_transport_inc_tx_pkt(vvs, skb);
+>>>
+>>>         ret = t_ops->send_pkt(skb);
+>>> @@ -884,6 +1029,7 @@ virtio_transport_stream_enqueue(struct vsock_sock *vsk,
+>>>         .msg = msg,
+>>>         .pkt_len = len,
+>>>         .vsk = vsk,
+>>> +        .flags = msg->msg_flags,
+>>
+>> These flags then get copied into the virtio_vsock_hdr, which I don't
+>> think is a good idea.
+>>
+>> Why not using directly info->msg->msg_flags?
 >
->Yes, non-linear skb always has 'data_len' > 0, e.g. such skbs always have some
->data in it.
+>Ops, yes, it's a bug, You're right, this is really wrong as there are two different
+>sets of flags - MSG_XXX passed to syscall and flags in the header of packet.
 
-Okay, makes sense ;-)
+Yep.
+
+What about the moving from skb_set_owner_sk_safe() to skb_set_owner_w()?
+Was it voluntary? If so, can you explain why?
+
 
 Thanks,
 Stefano
-
->
->Thanks, Arseniy
->
->>
->>> +                sg_init_one(&bufs[1], skb->data, skb->len);
->>> +                sgs[out_sg++] = &bufs[1];
->>> +            }
->>>
->>    ^
->> Blank line that we can remove.
->>
->> Stefano
->>
->>> -        sg_init_one(&hdr, virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)));
->>> -        sgs[out_sg++] = &hdr;
->>> -        if (skb->len > 0) {
->>> -            sg_init_one(&buf, skb->data, skb->len);
->>> -            sgs[out_sg++] = &buf;
->>>         }
->>>
->>>         ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
->>> -- 
->>> 2.25.1
->>>
->>
->
 
