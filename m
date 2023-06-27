@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D6DE73FB65
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 13:52:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62E5C73FB66
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 13:52:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231522AbjF0Lv5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 07:51:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55074 "EHLO
+        id S231213AbjF0LwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 07:52:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231130AbjF0Lvy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 07:51:54 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16D23120
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 04:51:53 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-51d9124e1baso3780056a12.2
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 04:51:53 -0700 (PDT)
+        with ESMTP id S230238AbjF0LwE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 07:52:04 -0400
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADE45E71
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 04:51:58 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-991b7a4d2e8so272814866b.1
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 04:51:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687866711; x=1690458711;
+        d=linaro.org; s=google; t=1687866717; x=1690458717;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TGZXRn778tTjabpObTTq7zFLfhDFVmkSDdvtG4Gr8rE=;
-        b=ivXPP7EELHfP6sJ0l5qbHx5mCV8QlbwHGwSr7NB/wOhD6ru2flkDn3IF6/KjnLc1Sc
-         RuPyAvov01ZLYBdsoZomj1ewZoI+FtwOEl+ccTsSDdOldyqu+FZwmlFqzaqtzYFbfs8P
-         ce1DotNHn0nwCBkYyHAAx/Bd9+mhjvIj0Pyhk+o56mBDh/nXkkbTS71Ee83uhnydL9yI
-         P77qRKp256o1b5l9IuNXT9ndDCwwreprJlClr4Q5c4N+b1Th9tj8Xpj+sbA3a1w9/BJR
-         GOcbV8TtL+sewaMNfqzFZ2+sjHp2XuNJOG9liHKOZSwFlzeMYHcKGHdDLNplrav8YT5U
-         JkmQ==
+        bh=VO9Kit1sdoJ392FVmc33R5cx+Y6OihE9F+t/ncxHt8c=;
+        b=YT5YuAOOsTqqfatWHVtR5bkFlY0OTtUHvz/0s46L5ULvuQ9jKzUP8DdeP4Gvihrma4
+         p3ihWqPzfDEhIHOOPHC+rsh5mMYQeIQ3JnTnrFzesbzAqWnLmlojrINFWAaITg2IsoRa
+         fFIVnpjnh0gaHLZeA0mtf9bEsjWc7j+R1jKgwpen8bJanw32gRd8dXnt/1Jln2WieGxc
+         SfADtn16kwQiMn1ONmCxcXlGIEhWJ91N3aoLX3XCIWTMHMS7sJOPVwM7N15G+1CRoRf0
+         cb1rzlPPnpb0DCmjSUxVMvNUof956VdbGliqmdPEL8p2bsAS8PUXfgobj2cWf3KG5MOu
+         rvAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687866711; x=1690458711;
+        d=1e100.net; s=20221208; t=1687866717; x=1690458717;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TGZXRn778tTjabpObTTq7zFLfhDFVmkSDdvtG4Gr8rE=;
-        b=SDtwEMkz5S8BY93ngEyhWLORUq8aHekH27iS2/g5DLkDeg+8/8pmmshijU0ePJNprX
-         HmvIYGhsi+Yw6UBGAeftYT/CcThSwkQ5P1QeJLmCkha5bs384t/z5v2t6EnQ75JD/CF4
-         P/vrECW/Xh/D0WD1cRgqDWRORv3NSI+fYMBG1zOHDBDIBFWk6bThbVVu+O07wLRQwEBk
-         MBdBUI731LChm26Q5FqBdakhVWIMoakKiN8DdWiZ7EuU1SeuFHclk5IcNb9zB6yFJ6Pf
-         H40HqU0D+ze7doTQb5VGGhIf1uXt7rTOl3rFRDe9VyilzwQ/UWz4hYT7AZjWqz8L8YB0
-         cUIQ==
-X-Gm-Message-State: AC+VfDyiGaqf6C7tQu+o9GosvU9DvxFokH2kpYCjuWN0Hkmkx62U2qCg
-        Twmvq184Bhbz9AxFrVEqGQ60fQ==
-X-Google-Smtp-Source: ACHHUZ6KmfyVDXHoF0LSGwDDJ1p2i/7O7JP2KiimBL6Oz48s5RB2ncVVHEPFcgvvbfKEdG3eNwqUoQ==
-X-Received: by 2002:aa7:d5d6:0:b0:51d:961c:8ad4 with SMTP id d22-20020aa7d5d6000000b0051d961c8ad4mr4856426eds.28.1687866711477;
-        Tue, 27 Jun 2023 04:51:51 -0700 (PDT)
+        bh=VO9Kit1sdoJ392FVmc33R5cx+Y6OihE9F+t/ncxHt8c=;
+        b=QRdszwrP9tTeVRc754Pvp/RTzhDUU7AIYKj19GgDBNb9nNMRlqND0u47nprDbmNwwW
+         zeSwQsaH0XZeCGqLE0ukSylPy1GPoZ8VQtOGJ3Q8ri2KTJJ2WXd1DkffJrxYL1tC1xo4
+         EZV83BsAxCOaNFjgwGyYLxAy5eyXwxTWWJzXD954b9Pbx8/uVGd89IMDWzMcHulre+zB
+         UuiZhLhQPEnRaeMXQrtZThIXiqLMPQxHEawii5ZRdO7nBbzoMbPYTUlp9cN9Bd2Ot34n
+         1iiAtovxr4E0zbfy7k7LoHTQx4Qy8fA+wpwduVardVqsPJ/SkTLg84ewQu/fD5Pj0xRI
+         Yfpw==
+X-Gm-Message-State: AC+VfDy4FqwaQp1WJErWQzHpGtsD40A/vGzyX5RKDDxJbexbk57C4KOh
+        9PWeAgv9h678yMGvi8tdFxabfQ==
+X-Google-Smtp-Source: ACHHUZ5LgZQOdPi8vbeWTXXgBKtBWYxquWJPWcOG+nXOG6pwEQj7QCL4ybEz91QzLvRj1pWiyaIm9A==
+X-Received: by 2002:a17:907:9450:b0:989:3670:3696 with SMTP id dl16-20020a170907945000b0098936703696mr17867636ejc.58.1687866717193;
+        Tue, 27 Jun 2023 04:51:57 -0700 (PDT)
 Received: from m1x-phil.lan ([176.187.199.204])
-        by smtp.gmail.com with ESMTPSA id v20-20020aa7dbd4000000b00514a5f7a145sm3701418edt.37.2023.06.27.04.51.49
+        by smtp.gmail.com with ESMTPSA id a2-20020a1709065f8200b009827b97c89csm4455614eju.102.2023.06.27.04.51.55
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 27 Jun 2023 04:51:51 -0700 (PDT)
+        Tue, 27 Jun 2023 04:51:56 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     David Gibson <david@gibson.dropbear.id.au>,
@@ -58,9 +58,9 @@ Cc:     David Gibson <david@gibson.dropbear.id.au>,
         Greg Kurz <groug@kaod.org>, kvm@vger.kernel.org,
         Nicholas Piggin <npiggin@gmail.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH v3 4/6] target/ppc: Define TYPE_HOST_POWERPC_CPU in cpu-qom.h
-Date:   Tue, 27 Jun 2023 13:51:22 +0200
-Message-Id: <20230627115124.19632-5-philmd@linaro.org>
+Subject: [PATCH v3 5/6] target/ppc: Restrict 'kvm_ppc.h' to sysemu in cpu_init.c
+Date:   Tue, 27 Jun 2023 13:51:23 +0200
+Message-Id: <20230627115124.19632-6-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230627115124.19632-1-philmd@linaro.org>
 References: <20230627115124.19632-1-philmd@linaro.org>
@@ -77,42 +77,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TYPE_HOST_POWERPC_CPU is used in various places of cpu_init.c,
-in order to restrict "kvm_ppc.h" to sysemu, move this QOM-related
-definition to cpu-qom.h.
+User emulation shouldn't need any of the KVM prototypes
+declared in "kvm_ppc.h".
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/ppc/cpu-qom.h | 2 ++
- target/ppc/kvm_ppc.h | 2 --
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ target/ppc/cpu_init.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index c2bff349cc..4e4061068e 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -36,6 +36,8 @@ OBJECT_DECLARE_CPU_TYPE(PowerPCCPU, PowerPCCPUClass, POWERPC_CPU)
- #define CPU_RESOLVING_TYPE TYPE_POWERPC_CPU
- #define cpu_list ppc_cpu_list
+diff --git a/target/ppc/cpu_init.c b/target/ppc/cpu_init.c
+index aeff71d063..f2afb539eb 100644
+--- a/target/ppc/cpu_init.c
++++ b/target/ppc/cpu_init.c
+@@ -21,7 +21,6 @@
+ #include "qemu/osdep.h"
+ #include "disas/dis-asm.h"
+ #include "gdbstub/helpers.h"
+-#include "kvm_ppc.h"
+ #include "sysemu/cpus.h"
+ #include "sysemu/hw_accel.h"
+ #include "sysemu/tcg.h"
+@@ -49,6 +48,7 @@
+ #ifndef CONFIG_USER_ONLY
+ #include "hw/boards.h"
+ #include "hw/intc/intc.h"
++#include "kvm_ppc.h"
+ #endif
  
-+#define TYPE_HOST_POWERPC_CPU POWERPC_CPU_TYPE_NAME("host")
-+
- ObjectClass *ppc_cpu_class_by_name(const char *name);
- 
- typedef struct CPUArchState CPUPPCState;
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 49954a300b..901e188c9a 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -13,8 +13,6 @@
- #include "exec/hwaddr.h"
- #include "cpu.h"
- 
--#define TYPE_HOST_POWERPC_CPU POWERPC_CPU_TYPE_NAME("host")
--
- #ifdef CONFIG_KVM
- 
- uint32_t kvmppc_get_tbfreq(void);
+ /* #define PPC_DEBUG_SPR */
 -- 
 2.38.1
 
