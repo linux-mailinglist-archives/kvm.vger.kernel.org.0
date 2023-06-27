@@ -2,130 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10F3273FBA8
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 14:04:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03F9073FBDD
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 14:19:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231778AbjF0MEZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 08:04:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33148 "EHLO
+        id S230012AbjF0MTH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 08:19:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229748AbjF0MEX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 08:04:23 -0400
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D842B10EC;
-        Tue, 27 Jun 2023 05:04:19 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 9EC795FD71;
-        Tue, 27 Jun 2023 15:04:16 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1687867456;
-        bh=N+yr4uUtudu6mibyumvLqyo/EuSagL5a4hQI4FKGs9M=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-        b=WqOl7HPJIkLi8Rw+yzXRCdsLyZGIZsnXdFAtGq/6NNVl69IhYX/kS+yNCH3KCIgQU
-         9zrk856UEbqQ5sQ5wlanmnvuUDqCXdO7RSifPbXjwA0jfxxdYAVM8YO03NXMLTLNI4
-         tzn7Dph4Kvs4TOXtIUfyI8UZeshz/A7WrD+HfYBioZiPv3FQs9ioYXqEuzQvUsib22
-         EutXfXCYSYvcMnmBimRjuxnigbocHApZ+eAJQHTyWEhKiB9ubFK+ZvarFM4R42K6J+
-         gLwB28NZVdeflb+3JCy4mklpEGImVwEujcxKGmnY5QevTgEXbMkMqGqvLMUKjKdOix
-         rziDJ6njzO8tA==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Tue, 27 Jun 2023 15:03:56 +0300 (MSK)
-Message-ID: <bb1c0271-bd0d-7a2d-01a8-b7777af67017@sberdevices.ru>
-Date:   Tue, 27 Jun 2023 14:58:57 +0300
+        with ESMTP id S229468AbjF0MTG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 08:19:06 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8EBB1999;
+        Tue, 27 Jun 2023 05:19:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687868344; x=1719404344;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=S/Oh83wIoz8iTjgXyFj7FBvLQ6z/1uq7Rt97/C+Sd54=;
+  b=UhlkP5V77gYWSjHPKHlfFoxLhqjpTxGu3c4H7WKrpD1jaJ2Rj7OThxmC
+   kogpxGeUMrU9ozH7RrmikkPX3U9hEoh/JCiiaIpj0JznH50AXczy0z8+i
+   7BKfL7RrdNv5LRF0T2muSqFT6KjWZRHv4LFvwywmrNCCGpXgo73Nb1upx
+   fxU2ENeRQELt92z3QBkOLsmRkm9LVvKmSjKYmluvGw/KKyYDu6l25JqhC
+   eXuQi2E3dPoONTlCMzzcox850guSlqS+ON4MNuXxPtfuP/sMSWov6VITI
+   FplneC5xXvV7ojDOpXK3nKzUMx1Jq0WCmcZ488aWiMtN7G61x8MGW8WCL
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="364105346"
+X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
+   d="scan'208";a="364105346"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 05:19:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="963174691"
+X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
+   d="scan'208";a="963174691"
+Received: from rbhaumik-mobl2.ger.corp.intel.com (HELO box.shutemov.name) ([10.251.217.121])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 05:18:56 -0700
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id 453D0103738; Tue, 27 Jun 2023 15:18:53 +0300 (+03)
+Date:   Tue, 27 Jun 2023 15:18:53 +0300
+From:   "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "nik.borisov@suse.com" <nik.borisov@suse.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
+ demand
+Message-ID: <20230627121853.ek5zr7sfiezfkfyj@box.shutemov.name>
+References: <cover.1687784645.git.kai.huang@intel.com>
+ <104d324cd68b12e14722ee5d85a660cccccd8892.1687784645.git.kai.huang@intel.com>
+ <20230627095012.ln47s62pqzdrnb7x@box.shutemov.name>
+ <d6a0fb32ebcdeb6c38ebe8e2b03f034f42360c0f.camel@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v1 0/4] virtio/vsock: some updates for MSG_PEEK flag
-Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230618062451.79980-1-AVKrasnov@sberdevices.ru>
- <tmcj34lrgk7rxlnp4qvkpljwovowlz3wnosqboxssv6f6enr6u@qnf422n6lu6j>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <tmcj34lrgk7rxlnp4qvkpljwovowlz3wnosqboxssv6f6enr6u@qnf422n6lu6j>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/06/27 09:07:00 #21586757
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d6a0fb32ebcdeb6c38ebe8e2b03f034f42360c0f.camel@intel.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 26.06.2023 19:30, Stefano Garzarella wrote:
-> On Sun, Jun 18, 2023 at 09:24:47AM +0300, Arseniy Krasnov wrote:
->> Hello,
->>
->> This patchset does several things around MSG_PEEK flag support. In
->> general words it reworks MSG_PEEK test and adds support for this flag
->> in SOCK_SEQPACKET logic. Here is per-patch description:
->>
->> 1) This is cosmetic change for SOCK_STREAM implementation of MSG_PEEK:
->>   1) I think there is no need of "safe" mode walk here as there is no
->>      "unlink" of skbs inside loop (it is MSG_PEEK mode - we don't change
->>      queue).
->>   2) Nested while loop is removed: in case of MSG_PEEK we just walk
->>      over skbs and copy data from each one. I guess this nested loop
->>      even didn't behave as loop - it always executed just for single
->>      iteration.
->>
->> 2) This adds MSG_PEEK support for SOCK_SEQPACKET. It could be implemented
->>   be reworking MSG_PEEK callback for SOCK_STREAM to support SOCK_SEQPACKET
->>   also, but I think it will be more simple and clear from potential
->>   bugs to implemented it as separate function thus not mixing logics
->>   for both types of socket. So I've added it as dedicated function.
->>
->> 3) This is reworked MSG_PEEK test for SOCK_STREAM. Previous version just
->>   sent single byte, then tried to read it with MSG_PEEK flag, then read
->>   it in normal way. New version is more complex: now sender uses buffer
->>   instead of single byte and this buffer is initialized with random
->>   values. Receiver tests several things:
->>   1) Read empty socket with MSG_PEEK flag.
->>   2) Read part of buffer with MSG_PEEK flag.
->>   3) Read whole buffer with MSG_PEEK flag, then checks that it is same
->>      as buffer from 2) (limited by size of buffer from 2) of course).
->>   4) Read whole buffer without any flags, then checks that is is same
->>      as buffer from 3).
->>
->> 4) This is MSG_PEEK test for SOCK_SEQPACKET. It works in the same way
->>   as for SOCK_STREAM, except it also checks combination of MSG_TRUNC
->>   and MSG_PEEK.
->>
->> Head is:
->> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d20dd0ea14072e8a90ff864b2c1603bd68920b4b
+On Tue, Jun 27, 2023 at 10:34:04AM +0000, Huang, Kai wrote:
+> On Tue, 2023-06-27 at 12:50 +0300, kirill.shutemov@linux.intel.com wrote:
+> > On Tue, Jun 27, 2023 at 02:12:37AM +1200, Kai Huang wrote:
+> > > +	/*
+> > > +	 * The TDX module global initialization only needs to be done
+> > > +	 * once on any cpu.
+> > > +	 */
+> > > +	raw_spin_lock_irqsave(&tdx_global_init_lock, flags);
+> > 
+> > I don't understand how the comment justifies using raw spin lock.
+> > 
 > 
-> Nice cleanup, LGTM, but I'd like a comment from Bobby.
+> This comment is for using lock in general.  The reason to use raw_ version is
+> because this function gets called in IRQ context, and for PREEMPT_RT kernel the
+> normal spinlock is converted to sleeping lock.
 
-Got it, thanks!
+Sorry, but this still doesn't explain anything.
 
-Thanks, Arseniy
+Why converting to sleeping lock here is wrong? There are plenty
+spin_lock_irqsave() users all over the kernel that are fine to be
+converted to sleeping lock on RT kernel. Why this use-case is special
+enough to justify raw_?
 
+From the documentation:
+
+	raw_spinlock_t is a strict spinning lock implementation in all
+	kernels, including PREEMPT_RT kernels. Use raw_spinlock_t only in
+	real critical core code, low-level interrupt handling and places
+	where disabling preemption or interrupts is required, for example,
+	to safely access hardware state. raw_spinlock_t can sometimes also
+	be used when the critical section is tiny, thus avoiding RT-mutex
+	overhead.
+
+How does it apply here?
+
+> Dave suggested to comment on the function rather than comment on the
+> raw_spin_lock directly, e.g.,  no other kernel code does that:
 > 
-> Thanks,
-> Stefano
+> https://lore.kernel.org/linux-mm/d2b3bc5e-1371-0c50-8ecb-64fc70917d42@intel.com/
 > 
+> So I commented the function in this version:
+> 
+> +/*
+> + * Do the module global initialization if not done yet.
+> + * It's always called with interrupts and preemption disabled.
+> + */
+
+If interrupts are always disabled why do you need _irqsave()?
+
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
