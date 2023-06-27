@@ -2,85 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 46D4073FF5F
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 17:14:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A51B573FF9D
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 17:27:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231781AbjF0POG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 11:14:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38714 "EHLO
+        id S232095AbjF0P1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 11:27:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230003AbjF0POF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 11:14:05 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E95E26B3
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 08:14:04 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9891c73e0fbso837972066b.1
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 08:14:04 -0700 (PDT)
+        with ESMTP id S229482AbjF0P1K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 11:27:10 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4050A2963
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 08:27:09 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c118efd0c3cso3742985276.0
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 08:27:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687878842; x=1690470842;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1hLkHKgBAbZUuk0W8oE9AqIRXF820+oX61/uVYQAwns=;
-        b=RHSJC9x8UfCPz2FSbqOh2Ao54TcsCXhLbDK36yeB1DEJ4hj8Sl//hI37GaNYUgS+fs
-         y4GXgRTnzQOM1uZVi38YmTqIyNo79pOMoci/EMI21MPW3l/lqt4OWFxhD0crUv1+Jlb9
-         HAOtsR6oW56BaUJI4kAcsAxbPwP1gziEWSlXXCLlw13fsJZ46+EXCC7yWYT+y9jAT4m2
-         e37yJcRCJEf80dlpoCKw2ihRR+G97nQEWmYOKSl3kIWFhrwA65/8u/9cIRWyQlcvD9VH
-         FtltpgqEHEOcfVtyLsREChlxiSDkV4CjXzltjoOAxfty5o4YqGw18zEI/gJw6anC6zz4
-         g8oA==
+        d=google.com; s=20221208; t=1687879628; x=1690471628;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6NLijTf2/sAC4laqIOL04JiF4+eWg1Jct/Be4UNkg/8=;
+        b=h7dLn/JHC61OpxZkFCi0H/sZEf1OZKmomvPgBMpGOtp16lAe+cimobKk7EWvEWW/6H
+         wgE+9uoDHs81ikq5WeMQrbgHJpf5d1dMt/wSBjhmqhwt5q9L4IF6Xy3ABlbuhflKV7HD
+         TVbYVV/AXse5BC874QxxAuX/40RP0YGWwKpK17JvXSVs7BENTQ4FnOeMtJGW/aAR8XXZ
+         7HYbxobmgCjQ5TkMlh+wU9k5fjk7+nRT15EhHD9u8Je8YvpfghDghf4ijIuSjlQto0aq
+         3KIPyM6rMrCdW73nbjcJFJvaNMhCKL2wevpOX4SibfGlA0H63y6avDw1V8Y72zogOCCQ
+         Wgjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687878842; x=1690470842;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1hLkHKgBAbZUuk0W8oE9AqIRXF820+oX61/uVYQAwns=;
-        b=RKm3YfLLDgiau0w9UpKjN9qwKZQ0s0PN/QOKqta6eNhL2y36bNBdjyNwGawLjoQaqC
-         CrJPzHzh0mMEOMOcITEdL0OerMOtZAd88mS9jm45HBOER+kKmuoluJwzedlTIR7AV/0T
-         UkmJPSYRY+UXfR+cjEi7v38AKPVF4VqgMM1DimXxPqtdc1DMMcIy2r1JglShkz1k1VlT
-         b3nUHm8cMm5R0FeiASuVXYLrQoV5+8axfe3VVGeYQqYESVPSpvcJ2EJixJmfUB0dzvk1
-         XjrW+7VQRjS18Y6Hn5knXBtnyOL+28N442M4JOwxrlSUtTAEbgz28z6XPGNOn/KodwWH
-         vB9w==
-X-Gm-Message-State: AC+VfDzeEQX+Udo3xx3KgcchucVYVeuuGwRNZ/qivJ7Qa5oWBLVfak+K
-        8+iECToYPpegKldxezD2zMr5GwOxpF45AORG5bg=
-X-Google-Smtp-Source: ACHHUZ4N32hEou6vtUW/NAB1itCDeEMec+9QDxvX9fKtvB6/ovOV17I4ogYzFcIiFUizKhcJXoAQ3g==
-X-Received: by 2002:a17:907:3f87:b0:977:d660:c5aa with SMTP id hr7-20020a1709073f8700b00977d660c5aamr30961510ejc.31.1687878842634;
-        Tue, 27 Jun 2023 08:14:02 -0700 (PDT)
-Received: from [192.168.69.115] ([176.187.199.204])
-        by smtp.gmail.com with ESMTPSA id ss26-20020a170907039a00b0098e422d6758sm3262608ejb.219.2023.06.27.08.14.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jun 2023 08:14:02 -0700 (PDT)
-Message-ID: <dcf96b9e-16c5-b1d5-14a5-276fc0556bee@linaro.org>
-Date:   Tue, 27 Jun 2023 17:13:58 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v3 00/16] accel: Share CPUState accel context
- (HAX/NVMM/WHPX/HVF)
-Content-Language: en-US
-To:     qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Roman Bolshakov <rbolshakov@ddn.com>, qemu-arm@nongnu.org,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Alexander Graf <agraf@csgraf.de>,
-        xen-devel@lists.xenproject.org,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Paul Durrant <paul@xen.org>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Cameron Esfahani <dirty@apple.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230624174121.11508-1-philmd@linaro.org>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20230624174121.11508-1-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        d=1e100.net; s=20221208; t=1687879628; x=1690471628;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6NLijTf2/sAC4laqIOL04JiF4+eWg1Jct/Be4UNkg/8=;
+        b=HzC5aDrDSpOxR2b1Z5NhmrVKcTs8aIWX+P6mbXaCcil5cjfF1kkwxYNhVoxrs64IsY
+         MLaTedrbzBi1BCS96EIH1qDf9SGwqo52HgqcBc1vH+NHki4WXSr6AXKGAh3dXYkG5g+R
+         /GzozJEC2ubT90HtGx/T8XRsw5wieH2DB7xVe5BV3BXRb71qLs/w8/HE/GK0XQkvDjkv
+         iMSu2XoqLvy85e7+J4e5LRMWZxP5umSPLZMf83KQH0EU64ScVNbUcYWaS1fRFKyQWi15
+         hMXH3tMe3ajPE1EL222y2QLmnlVBBI1N1qS+yh4jig6bf1AglPqaGBUzqKpYlITW3lb8
+         XCgA==
+X-Gm-Message-State: AC+VfDy3w+765SnNxAPbIRaQwshEZmnA+MK1QbhOD95TprBcSxnkA4M/
+        xcbq/vJ3edNxBKXPmiso2eHVVXqM23s=
+X-Google-Smtp-Source: ACHHUZ6i9hxC0rpjX5e7D79bFHnK4/ftIrY9mY8lDIyIZWpW2pWwCE/PWfmXYEC2brZukFVKZmR1nCyrUnw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:6945:0:b0:c1f:6862:d907 with SMTP id
+ e66-20020a256945000000b00c1f6862d907mr4104679ybc.10.1687879628566; Tue, 27
+ Jun 2023 08:27:08 -0700 (PDT)
+Date:   Tue, 27 Jun 2023 08:27:06 -0700
+In-Reply-To: <20230626182016.4127366-4-mizhang@google.com>
+Mime-Version: 1.0
+References: <20230626182016.4127366-1-mizhang@google.com> <20230626182016.4127366-4-mizhang@google.com>
+Message-ID: <ZJr/yoWzV7gHMuaG@google.com>
+Subject: Re: [PATCH v2 3/6] KVM: Documentation: Add the missing description
+ for ptep in kvm_mmu_page
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kai Huang <kai.huang@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>, Xu Yilun <yilun.xu@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,48 +72,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/6/23 19:41, Philippe Mathieu-Daudé wrote:
-> This series is part of the single binary effort.
+On Mon, Jun 26, 2023, Mingwei Zhang wrote:
+> Add the missing description for ptep in kvm_mmu_page description. ptep is
+> used when TDP MMU is enabled and it shares the storage with parent_ptes.
+> Update the doc to help readers to get up-to-date info.
 > 
-> All accelerator will share their per-vCPU context in
-> an opaque 'accel' pointer within the CPUState.
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  Documentation/virt/kvm/x86/mmu.rst | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> First handle HAX/NVMM/WHPX/HVF. KVM and TCG will follow
-> as two different (bigger) follow-up series.
-> 
-> Except HVF/intel, all has been (cross-)build tested.
-> 
-> I plan to send the PR myself.
-> 
-> Since v2:
-> - Addressed rth's review comments
-> - Added rth's R-b tag
-> 
-> Since v1:
-> - Addressed rth's review comments
-> - Added rth's R-b tag
-> - Converted HVF intel (untested)
-> - Rebased
-> 
-> Philippe Mathieu-Daudé (16):
->    MAINTAINERS: Update Roman Bolshakov email address
->    accel: Document generic accelerator headers
->    accel: Remove unused hThread variable on TCG/WHPX
->    accel: Fix a leak on Windows HAX
->    accel: Destroy HAX vCPU threads once done
->    accel: Rename 'hax_vcpu' as 'accel' in CPUState
->    accel: Rename HAX 'struct hax_vcpu_state' -> AccelCPUState
->    accel: Move HAX hThread to accelerator context
->    accel: Remove NVMM unreachable error path
->    accel: Rename NVMM 'struct qemu_vcpu' -> AccelCPUState
->    accel: Inline NVMM get_qemu_vcpu()
->    accel: Remove WHPX unreachable error path
->    accel: Rename WHPX 'struct whpx_vcpu' -> AccelCPUState
->    accel: Inline WHPX get_whpx_vcpu()
->    accel: Rename 'cpu_state' -> 'cs'
->    accel: Rename HVF 'struct hvf_vcpu_state' -> AccelCPUState
+> diff --git a/Documentation/virt/kvm/x86/mmu.rst b/Documentation/virt/kvm/x86/mmu.rst
+> index 4c9044b4dc6c..5cd6cd5e8926 100644
+> --- a/Documentation/virt/kvm/x86/mmu.rst
+> +++ b/Documentation/virt/kvm/x86/mmu.rst
+> @@ -237,6 +237,11 @@ Shadow pages contain the following information:
+>      parent_ptes points at this single spte, otherwise, there exists multiple
+>      sptes pointing at this page and (parent_ptes & ~0x1) points at a data
+>      structure with a list of parent sptes.
+> +  ptep:
+> +    The reverse mapping for the pte pointing at this page's spt. This field is
 
-Except the MAINTAINERS patch, all the rest is reviewed, so I plan
-to send a PR tomorrow (dropping the first patch, nobody complained
-about Roman email bouncing for months so we can keep ignoring the
-automated emails).
+I don't think describing "reverse mapping" is necessary, and it's arguably even
+misleading.  A "reverse mapping" typically provides a way to find mappings given
+a (guest) physical address.  The TDP MMU doesn't bother with reverse mappings
+because there is exactly one possible mapping for any given gfn.  The "ptep" exists
+specifically to expedite zapping a single TDP MMU shadow page, i.e. allows zapping
+without having to traverse the paging tree.
+
+The ptep field is just a pointer at the SPTE, no more no less.  Something like
+this?
+
+  ptep:
+    The kernel virtual address of the SPTE that points at this shadow page.
+    Used exclusively by the TDP MMU, this field is a union with parent_ptes.
+
+> +    used in replace of parent_ptes when TDP MMU is used. In TDP MMU, each
+> +    non-root shadow page will have one parent, while each root shadow page has
+> +    no parent. Note that this field is a union with parent_ptes.
+>    unsync:
+>      If true, then the translations in this page may not match the guest's
+>      translation.  This is equivalent to the state of the tlb when a pte is
+> -- 
+> 2.41.0.162.gfafddb0af9-goog
+> 
