@@ -2,82 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5519E740270
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 19:43:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 160AC7402A8
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 19:52:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231749AbjF0RnZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 13:43:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59090 "EHLO
+        id S231833AbjF0RwR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 13:52:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231819AbjF0RnU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 13:43:20 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 743332D7E
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 10:43:16 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-573cacf4804so65600967b3.1
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 10:43:16 -0700 (PDT)
+        with ESMTP id S230019AbjF0RwM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 13:52:12 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1ECA116;
+        Tue, 27 Jun 2023 10:52:11 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id 46e09a7af769-6b73b839025so2711579a34.1;
+        Tue, 27 Jun 2023 10:52:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687887795; x=1690479795;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZFffcNfXphZcVXVYjmzKuM76MS8vddm5iG6/4tmKFXI=;
-        b=Q3Yu058kYoSapd4q3xZuhDkkGUkCKLg0p3i6hK5SEkQXADqshsADvKmA25IH2kaAE0
-         nBMlKCSzk7E7zudiLoecRRkJdAy0dBwOusKZi0jlkYjtfvWoBncVI2qg4hVCJ1TG4ZuR
-         UpiL/r2dy74KFDDNpAg7WJjAhxPEPHHN8f2OjoOF+G/OcMWGsmq2AGTIs2kMKSuKlPxL
-         8ifeA3DtLNR52XAQVbj13XWQTd/jqDjPI3n8U2zUGRHYEXV2c5xzZY1ONV9mh3ZvFiPD
-         +KdZ9R9LCM2x1HcbnnqnR/QFqnF//MwWFcAgU7ESqvKSHjhZDjQcDIdJS7AMbbvl5rP5
-         zx0A==
+        d=gmail.com; s=20221208; t=1687888331; x=1690480331;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ya0gjT04wvrkPEwxsIo0SrjOZFrw43ACMJ5aI2sBKGs=;
+        b=jU0XSQm/UgQNqhqQcjqaxOHJKL3Tu8GM/GwEobHZGDkP+x8DVdgSjRkU85h/Lj/+te
+         oZwK4Q1yO37Pzbn1i7oZRsd+yfivOXZX9DLv/iX+OOzSZ/17s4ytR4cUrCKbaq8ScVjb
+         y4NBy98BQyt8WGI73+o5s1aq7cUaSdPW95ULfQ6FlPkdUprfA5PQkMvKjJsZAGVBcKqi
+         qlieckJVpQyRqbWlQMoi71Q4k95ldkAZz69rpAi1h8kLQ3wxt3idqYMSWF1Mqn3mJooy
+         Rs2GGbK0m2G7LUgnIAcus/1X+0dgeX1Usy3dZ/2MF2ihQvsHs5fE8nG3/WrSESAbmo+3
+         LPFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687887795; x=1690479795;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZFffcNfXphZcVXVYjmzKuM76MS8vddm5iG6/4tmKFXI=;
-        b=anGv8XuZOT4EPNQV2bSjWIWDGOoXQ+yor3COT+wwelcz9Ubj/Rg0PexTcrwuqKtdCc
-         i2BoZFbTTCVLnS9GtM2fhtRN/HBUKw9YxdYfq1dqoIxJlfeIzaf8mhWB9w1AaPPmugxg
-         UECWAV5Vv3h1Y2mdqCz1dck++9YN7HwjkIRgPek5hNGXNEVoCbkRveuHiEGPqSvR/a+c
-         QJySO29ebqyEW0jAytpNtLlha8xZPdBeqyCVXUWxg+m9edS9G7gE73GvVScQ4AMQk/WZ
-         t5T9uQlGiTeOIzJIrqX2gwtdLyp7uIIXUcO+STD0nJisBetduwg0gD/NF8+WC++DmxjB
-         uCcA==
-X-Gm-Message-State: AC+VfDxEmX4PUde1aBRF0GkWcfcfiSdAyrEgt+LvgCn836F/8idirTmt
-        qRDZX0EnHnOO7egEFrSJ/G8S98kVwjE=
-X-Google-Smtp-Source: ACHHUZ5Fke4uyoHtfR/7W1QuD+62saqrRJuufxphcpx9wbot76yINyy6sEDSMQTibZ/wPMD3j8pMlBViZ1g=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:aba9:0:b0:bc4:8939:e1f5 with SMTP id
- v38-20020a25aba9000000b00bc48939e1f5mr15087649ybi.4.1687887795734; Tue, 27
- Jun 2023 10:43:15 -0700 (PDT)
-Date:   Tue, 27 Jun 2023 10:43:14 -0700
-In-Reply-To: <20230601142309.6307-3-guang.zeng@intel.com>
-Mime-Version: 1.0
-References: <20230601142309.6307-1-guang.zeng@intel.com> <20230601142309.6307-3-guang.zeng@intel.com>
-Message-ID: <ZJsfsjwug9PcQFLA@google.com>
-Subject: Re: [PATCH v1 2/6] KVM: x86: Virtualize CR4.LASS
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1687888331; x=1690480331;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ya0gjT04wvrkPEwxsIo0SrjOZFrw43ACMJ5aI2sBKGs=;
+        b=BClq6JrQuM47FlWCzs6sAdrEGWCtgUm+VlHM9T3OnEKRPjE2kmh2hE5KnJcZHweXXr
+         tq4H2UYY2HVKco3Vqop+fYFwxJ86/yuvr6Q54JZnXogQl2DnWkrTWwBvDxhUcJyReYR2
+         pehqYrbFeNBtO7ucehjplZomGvmgBzD3lUmvTgn8Yx3wZ9pXHhJw/AKsncT/RX/oK+Yi
+         VY+2IeZJDh6KupaVgt8GRZsOrndYipxMOMI8J0dFCQ+CZzn7RRNoh0wB3SDezlfvWjOL
+         MDUn+IPWHN/jTvQ3jmSxQkQelP4aEf4RM9ev9BdmTLpfyw0YrHmkEcNOkv5v4eiPNnGN
+         4sOg==
+X-Gm-Message-State: AC+VfDwXerydJMSOvU1bRnm6IqTO1JFH1qEalun7GQmUpBnV4BnOacDH
+        GRMGhxs9+UgL0ev+ucmr8TetFg3Qm940wtZbXyk=
+X-Google-Smtp-Source: ACHHUZ60PXVLGXFjCZbPL4+H89P+QaultgII2fPTXJpRhifF/y6voZRlslPkfFetToA56imkT1WhjHNqMU1RYiBUm6M=
+X-Received: by 2002:a05:6359:d23:b0:133:a55:7e26 with SMTP id
+ gp35-20020a0563590d2300b001330a557e26mr5444430rwb.7.1687888330839; Tue, 27
+ Jun 2023 10:52:10 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230627031431.29653-1-vishal.moola@gmail.com>
+ <20230627031431.29653-4-vishal.moola@gmail.com> <ZJsJT9dLtxaKlxVb@x1n>
+In-Reply-To: <ZJsJT9dLtxaKlxVb@x1n>
+From:   Vishal Moola <vishal.moola@gmail.com>
+Date:   Tue, 27 Jun 2023 10:51:59 -0700
+Message-ID: <CAOzc2pw2U2XvMcaEdy18UYe=5=PeCBn_qLR_3ns8_nWvgSSDQw@mail.gmail.com>
+Subject: Re: [PATCH v6 03/33] pgtable: Create struct ptdesc
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        Hugh Dickins <hughd@google.com>,
+        Mike Rapoport <rppt@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 01, 2023, Zeng Guang wrote:
-> Virtualize CR4.LASS[bit 27] under KVM control instead of being guest-owned
-> as CR4.LASS generally set once for each vCPU at boot time and won't be
-> toggled at runtime. Besides, only if VM has LASS capability enumerated with
-> CPUID.(EAX=07H.ECX=1):EAX.LASS[bit 6], KVM allows guest software to be able
-> to set CR4.LASS.
+On Tue, Jun 27, 2023 at 9:07=E2=80=AFAM Peter Xu <peterx@redhat.com> wrote:
 >
-> Updating cr4_fixed1 to set CR4.LASS bit in the emulated IA32_VMX_CR4_FIXED1
-> MSR for guests and allow guests to enable LASS in nested VMX operaion as well.
+> On Mon, Jun 26, 2023 at 08:14:01PM -0700, Vishal Moola (Oracle) wrote:
+> > Currently, page table information is stored within struct page. As part
+> > of simplifying struct page, create struct ptdesc for page table
+> > information.
+> >
+> > Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> > Acked-by: Mike Rapoport (IBM) <rppt@kernel.org>
+> > ---
+> >  include/linux/pgtable.h | 68 +++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 68 insertions(+)
+> >
+> > diff --git a/include/linux/pgtable.h b/include/linux/pgtable.h
+> > index 5063b482e34f..d46cb709ce08 100644
+> > --- a/include/linux/pgtable.h
+> > +++ b/include/linux/pgtable.h
+> > @@ -987,6 +987,74 @@ static inline void ptep_modify_prot_commit(struct =
+vm_area_struct *vma,
+> >  #endif /* __HAVE_ARCH_PTEP_MODIFY_PROT_TRANSACTION */
+> >  #endif /* CONFIG_MMU */
+> >
+> > +
+> > +/**
+> > + * struct ptdesc -    Memory descriptor for page tables.
+> > + * @__page_flags:     Same as page flags. Unused for page tables.
+> > + * @pt_rcu_head:      For freeing page table pages.
+> > + * @pt_list:          List of used page tables. Used for s390 and x86.
+> > + * @_pt_pad_1:        Padding that aliases with page's compound head.
+> > + * @pmd_huge_pte:     Protected by ptdesc->ptl, used for THPs.
+> > + * @_pt_s390_gaddr:   Aliases with page's mapping. Used for s390 gmap =
+only.
+>
+> Should some arch-specific bits (and a few others) always under some
+> #ifdefs, so it shouldn't appear on other archs?
 
-s/operaion/operation.
+Right now this struct completely overlays struct page, so the padding as
+well as any arch-specific fields have to stay. Whenever we get ptdescs
+independent of struct page we can cleanup any unnecessary fields, as
+well as omit unnecessary fields from unrelated architectures.
