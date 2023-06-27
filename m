@@ -2,56 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C72473F6D4
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 10:20:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D69A73F6ED
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 10:22:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231547AbjF0IUH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 04:20:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58148 "EHLO
+        id S231791AbjF0IWY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 04:22:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230054AbjF0IUE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 04:20:04 -0400
-Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 108EDE5;
-        Tue, 27 Jun 2023 01:20:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-        t=1687853998; bh=FNm89gkdhid/F9i0RK3rbfD/L/HwpUHHCTG+95nssus=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=xoWamd7VJHJpaAmhRrr9sJ9Ih38xFEyD6qLt6k/qDNKZOVjq1NqVRIKh07ClO53M9
-         kaBZux4vXrf3vFscj2Oa33lclnuqe6k4TRkqNXF1WgHj2roXq5gPmfQx1bCO381a/Y
-         bE+/Tg3JgyUQoRqUGPibLrrFr5mDYAGoy26Tzibw=
-Received: from [100.100.34.13] (unknown [220.248.53.61])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 017D96011B;
-        Tue, 27 Jun 2023 16:19:57 +0800 (CST)
-Message-ID: <18bc1f6b-5299-2628-82b7-55f3848e856a@xen0n.name>
-Date:   Tue, 27 Jun 2023 16:19:56 +0800
+        with ESMTP id S231749AbjF0IWI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 04:22:08 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D49D1FC3;
+        Tue, 27 Jun 2023 01:22:03 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35R8BHPC011257;
+        Tue, 27 Jun 2023 08:22:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=KQICVt43VMdWCZaYBJ3FihIkO4Ais8LuVFB6x5RA/Fk=;
+ b=eLTcPevp4OYHKpzJTMA3hQLrFxT5ublyEHRSWi/SMgLb9EEb6B0kLvcD2RdgUcpYpieM
+ j54J5DniYdoQ3PJkPNlK20OyayQgKmrp4fbp5h4gOxHQ5O2hsSyDfEqYGbkBENG2hl7T
+ tXNIygEDPfqXP8H9pEd+LgVdZG08v9Sl9gNatSWZ2h67diug1kly4bOlrAXyiUJaZu+3
+ 4ogT20PjqqoROQrywP9bV2CdlGryahXPZGlhIA+MnlO9fdBU8FG7Ze8xsD3lnVmRzyHW
+ D0sL3l3LtSZJKNgk3xSldZIhbJ1QD+UKpDqKCbYDur0RnnRnwlkjk21Oiss3lmZkea8J Tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rfuuxgfgf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Jun 2023 08:22:02 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35R8EbMI022523;
+        Tue, 27 Jun 2023 08:22:01 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rfuuxgffw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Jun 2023 08:22:01 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35R4mKvR010013;
+        Tue, 27 Jun 2023 08:22:00 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3rdr459b8s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Jun 2023 08:21:59 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35R8Lu3w37356166
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 27 Jun 2023 08:21:56 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 21D5E2004B;
+        Tue, 27 Jun 2023 08:21:56 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D171220040;
+        Tue, 27 Jun 2023 08:21:55 +0000 (GMT)
+Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com (unknown [9.152.222.242])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 27 Jun 2023 08:21:55 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        imbrenda@linux.ibm.com, david@redhat.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v10 0/2] S390x: CPU Topology Information
+Date:   Tue, 27 Jun 2023 10:21:53 +0200
+Message-Id: <20230627082155.6375-1-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v15 05/30] LoongArch: KVM: Add vcpu related header files
-To:     Tianrui Zhao <zhaotianrui@loongson.cn>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>, tangyouling@loongson.cn
-References: <20230626084752.1138621-1-zhaotianrui@loongson.cn>
- <20230626084752.1138621-6-zhaotianrui@loongson.cn>
-Content-Language: en-US
-From:   WANG Xuerui <kernel@xen0n.name>
-In-Reply-To: <20230626084752.1138621-6-zhaotianrui@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: TcRzulZ2Wa6ifUMWdQ4r89plYmIqoujN
+X-Proofpoint-GUID: hvxyjROb1hmLc7d4N-a1W3CIrksPBIiy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-27_04,2023-06-26_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ phishscore=0 malwarescore=0 mlxscore=0 mlxlogscore=810 spamscore=0
+ priorityscore=1501 impostorscore=0 clxscore=1015 lowpriorityscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2306270076
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -59,121 +88,128 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/6/26 16:47, Tianrui Zhao wrote:
-> Add LoongArch vcpu related header files, including vcpu csr
-> information, irq number defines, and some vcpu interfaces.
-> 
-> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
-> ---
->   arch/loongarch/include/asm/insn-def.h  |  55 ++++++
->   arch/loongarch/include/asm/kvm_csr.h   | 231 +++++++++++++++++++++++++
->   arch/loongarch/include/asm/kvm_vcpu.h  |  97 +++++++++++
->   arch/loongarch/include/asm/loongarch.h |  20 ++-
->   arch/loongarch/kvm/trace.h             | 168 ++++++++++++++++++
->   5 files changed, 566 insertions(+), 5 deletions(-)
->   create mode 100644 arch/loongarch/include/asm/insn-def.h
->   create mode 100644 arch/loongarch/include/asm/kvm_csr.h
->   create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
->   create mode 100644 arch/loongarch/kvm/trace.h
-> 
-> diff --git a/arch/loongarch/include/asm/insn-def.h b/arch/loongarch/include/asm/insn-def.h
-> new file mode 100644
-> index 000000000000..e285ee108fb0
-> --- /dev/null
-> +++ b/arch/loongarch/include/asm/insn-def.h
-> @@ -0,0 +1,55 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +
-> +#ifndef __ASM_INSN_DEF_H
-> +#define __ASM_INSN_DEF_H
-> +
-> +#include <linux/stringify.h>
-> +#include <asm/gpr-num.h>
-> +#include <asm/asm.h>
-> +
-> +#define INSN_STR(x)		__stringify(x)
-> +#define CSR_RD_SHIFT		0
-> +#define CSR_RJ_SHIFT		5
-> +#define CSR_SIMM14_SHIFT	10
-> +#define CSR_OPCODE_SHIFT	24
-> +
-> +#define DEFINE_INSN_CSR							\
-> +	__DEFINE_ASM_GPR_NUMS						\
-> +"	.macro insn_csr, opcode, rj, rd, simm14\n"			\
-> +"	.4byte	((\\opcode << " INSN_STR(CSR_OPCODE_SHIFT) ") |"	\
-> +"		 (.L__gpr_num_\\rj << " INSN_STR(CSR_RJ_SHIFT) ") |"	\
-> +"		 (.L__gpr_num_\\rd << " INSN_STR(CSR_RD_SHIFT) ") |"	\
-> +"		 (\\simm14 << " INSN_STR(CSR_SIMM14_SHIFT) "))\n"	\
-> +"	.endm\n"
-> +
-> +#define UNDEFINE_INSN_CSR						\
-> +"	.purgem insn_csr\n"
-> +
-> +#define __INSN_CSR(opcode, rj, rd, simm14)				\
-> +	DEFINE_INSN_CSR							\
-> +	"insn_csr " opcode ", " rj ", " rd ", " simm14 "\n"		\
-> +	UNDEFINE_INSN_CSR
-> +
-> +
-> +#define INSN_CSR(opcode, rj, rd, simm14)				\
-> +	__INSN_CSR(LARCH_##opcode, LARCH_##rj, LARCH_##rd,		\
-> +		   LARCH_##simm14)
-> +
-> +#define __ASM_STR(x)		#x
-> +#define LARCH_OPCODE(v)		__ASM_STR(v)
-> +#define LARCH_SIMM14(v)		__ASM_STR(v)
-> +#define __LARCH_REG(v)		__ASM_STR(v)
-> +#define LARCH___RD(v)		__LARCH_REG(v)
-> +#define LARCH___RJ(v)		__LARCH_REG(v)
-> +#define LARCH_OPCODE_GCSR	LARCH_OPCODE(5)
-> +
-> +#define GCSR_read(csr, rd)						\
-> +	INSN_CSR(OPCODE_GCSR, __RJ(zero), __RD(rd), SIMM14(csr))
-> +
-> +#define GCSR_write(csr, rd)						\
-> +	INSN_CSR(OPCODE_GCSR, __RJ($r1), __RD(rd), SIMM14(csr))
-> +
-> +#define GCSR_xchg(csr, rj, rd)						\
-> +	INSN_CSR(OPCODE_GCSR, __RJ(rj), __RD(rd), SIMM14(csr))
-> +
-> +#endif /* __ASM_INSN_DEF_H */
+Hi,
 
-I still find this unnecessarily complex. First of all this is 
-reinventing infra that's already available as the "parse_r" helper 
-(check out include/asm/tlb.h in v6.4), but the only usage of the helper 
-has just been removed, so it's probably a signal saying this practice 
-may not last for long -- people are no longer in a situation like back 
-in the MIPS era when toolchain support are not guaranteed (or even 
-allowed upstream).
+new version of the kvm-unit-test s390x CPU topology series.
 
-Secondly, while support for older compilers is nice-to-have, but users 
-of upstream kernels also already effectively depend on very recent 
-toolchains (if not bleeding-edge). So we can just probe for support and 
-just use proper mnemonics and automatically get support soon, because we 
-can expect most of them to pick up upstream changes very quickly. That's 
-to say, if we have something like:
+0. what is new in this new spin
+-------------------------------
 
-# arch/loongarch/Kconfig
-config LOONGARCH
-     # ...
-     select HAVE_KVM if AS_HAS_LVZ_EXTENSION
+- the configuration tested in unittests.cfg is compatible with current
+  QEMU. A later patch will be needed to use full topology when QEMU
+  patches are mainline.
+- one of the tested configuration using 248 processors will failed
+  until SCLP bug is corrected
+- use of -cpu max instead of z14
 
-config AS_HAS_LVZ_EXTENSION
-     def_bool $(as-instr,gcsrrd \$t0$(comma)\$t1$(comma)123)
+1. what is done
+---------------
 
-Then support is guaranteed for all KVM code and this cruft can go away, 
-and then the feature will likely be available in a few months.
+- First part is checking PTF errors, for KVM and LPAR
 
-FYI, support for LSX and LASX instructions are already posted by your 
-fellow toolchain folks [1], so it's 100% doable for them to add support 
-despite the manuals not being available yet. Just coordinate with them a 
-bit...
+- Second part is checking PTF polarization change and STSI
+  with the cpu topology including drawers and books.
+  This tests are run for KVM only.
 
-[1]: https://sourceware.org/pipermail/binutils/2023-June/127990.html
+To run these tests under KVM successfully you need Linux 6.0
+or newer.
+
+Note that Fedora-35 already has the CPU Topology backport for Linux.
+
+To start the test in KVM just do:
+
+# ./run_tests.sh topology
+for the topology ptf tests or for the topology stsi tests
+# ./run_tests.sh topology-2
+
+or something like:
+
+# ./s390x-run s390x/topology.elf \
+	-cpu max,ctop=on \
+	-smp 5,sockets=4,cores=4,maxcpus=16 \
+	-append '-sockets 4 -cores 4'
+
+Of course the declaration of the number of drawers, books, socket and
+core must be coherent between -smp and -append arguments.
+
+Regards,
+Pierre
+
+Pierre Morel (2):
+  s390x: topology: Check the Perform Topology Function
+  s390x: topology: Checking Configuration Topology Information
+
+ lib/s390x/sclp.c    |   6 +
+ lib/s390x/sclp.h    |   4 +-
+ lib/s390x/stsi.h    |  36 ++++
+ s390x/Makefile      |   1 +
+ s390x/topology.c    | 516 ++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg |   7 +
+ 6 files changed, 569 insertions(+), 1 deletion(-)
+ create mode 100644 s390x/topology.c
 
 -- 
-WANG "xen0n" Xuerui
+2.31.1
 
-Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
+new in v10:
+
+- unitests now compatible with current QEMU
+  (Janosch)
+
+- use of -cpu max instead of z14
+  (Janosch, Thomas)
+
+- colapse prefix_push and report_info
+  (Nico)
+
+new in v9:
+
+- use report_fail instead of report(0,...
+  (Nico)
+
+- add 2 more configurations in unittests.cfg
+  (Nico)
+
+new in v8:
+
+- define PTF_INVALID_FUNCTION
+  (Claudio)
+
+- test every single bits for specification in the ptf instruction
+  (Claudio)
+
+- test vertical polarization twice
+  (Claudio)
+
+- add an assert(read_info)
+  (Nico)
+
+- changed skips
+  (Nico)
+
+
+new in v7:
+
+- better checks using device attributes on commandline
+  (Pierre)
+- use builtin to get the number of CPU in the TLE mask
+  (Thomas)
+- use Elvis (not dead)
+  (Thomas)
+- reset before tests
+  (Nina)
+- splitting test_ptf in small functions
+  (Thomas)
+- check every ptf function code for program check
+  (Nina)
+- Test made on LPAR
+  (Janosch)
+- use a single page for SYSIB
+  (Thomas)
+- abort on wrong parameter
+  (Thomas)
+- implement SYSIB check with a recursive funtion
+  (Nina)
+- diverse little changes (naming, clearer checks
+  (Nina, Thomas)
 
