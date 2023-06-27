@@ -2,144 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE164740011
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 17:50:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 708EA740029
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 17:57:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231878AbjF0PuJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 11:50:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56980 "EHLO
+        id S231992AbjF0P5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 11:57:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231761AbjF0PuG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 11:50:06 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1F3D2D4F
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 08:50:04 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-bf179fcc200so6082433276.0
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 08:50:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687881004; x=1690473004;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f5n5wbc65BkLjffQxci9ddtPIGz5YKpcfVhEyMlRoQY=;
-        b=VhMOUNxSGhmfeN6tDKv9taNLgMcr5boht1EBjABUS4HraFOok8xpcso7YrzEuAs2yD
-         +fXKHztOwJwongchscymI1+wRS4M3XnZg0imwW+LEL1Hv5vvZCq8a/kpbVE1NEVPIbck
-         NtWyVbZchEPzOXDvF5DoXEYD4gk8bg457Fd2/ZxwwwmhwaRjmW/QLlWLhp98MkO1F19g
-         /w9WdiEarwnv76xb0+YaLD7LCHKppXsN2A51pOz0/OtHAq1Zh51CBnotWzXtZuchE1X5
-         t22fV9gTuCA0jsyRpGHAumZ4XgtJwNa9sROwT27nws9Ck11caUxgch3giXyO0GTvhZsR
-         svWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687881004; x=1690473004;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f5n5wbc65BkLjffQxci9ddtPIGz5YKpcfVhEyMlRoQY=;
-        b=Qn7yWjHURegum+QUacLbXtSZaxjKWskvt3ujeMZO43Os/v0a7jBljshTlWu+Ee9Pm+
-         gxYgJHMcury/qUItSdhIVkx9GRj4eFY9WTpsmtiTjCG+Xk6BmcSYiaGubVvdkIe+2/j/
-         2E4TLokJneEmFuIVbG99ZoUAFksH49wI14S1owpXZ607Px/oXglaKNUCY2dF4STEntUK
-         dGA7BBTnFQ0r17Sa42UCi2fo8TtF6C9URSjieKTVC5XavaE6n+PBpcsvyv7lO8PCFdl3
-         jlZvjHmUrbXqxLawBWt2NANA4zgNAUTGvTinm/OuisgqY1RLsNzkGqmtRzZliDglP3MC
-         nHdg==
-X-Gm-Message-State: AC+VfDzNoEwcN0FUkKp1CwYqXE0fh9BD/k+S8Z7KxFZhOwtTAh30A3BE
-        it+uTdtNRVIctgNepKcvhlOS2DA6Ma4=
-X-Google-Smtp-Source: ACHHUZ7mMBkSNvozupflxXt5JB6dTU3vVzV21t3j/a/eGE+57DLAKMNVKHP6O6XwIf+08yU+3AhPzi1YxHc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:c514:0:b0:ba8:b828:c8ff with SMTP id
- v20-20020a25c514000000b00ba8b828c8ffmr7185326ybe.10.1687881003834; Tue, 27
- Jun 2023 08:50:03 -0700 (PDT)
-Date:   Tue, 27 Jun 2023 08:50:02 -0700
-In-Reply-To: <20230626182016.4127366-5-mizhang@google.com>
-Mime-Version: 1.0
-References: <20230626182016.4127366-1-mizhang@google.com> <20230626182016.4127366-5-mizhang@google.com>
-Message-ID: <ZJsFKjbaCKk+fFkv@google.com>
-Subject: Re: [PATCH v2 4/6] KVM: Documentation: Add the missing description
- for tdp_mmu_root_count into kvm_mmu_page
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kai Huang <kai.huang@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>, Xu Yilun <yilun.xu@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S231936AbjF0P5b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 11:57:31 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C532D64;
+        Tue, 27 Jun 2023 08:57:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=grdde8Xiu7qmn+xeWQjS6jhM9eMOIEx2FTKQKHA0qcE=; b=O4LgnaJa+96/pjOun/grMWRgf0
+        LntDzHo/Nz16KvqxiEr1HwXvA//H8Xwaltp+tupPUb4EjOFyVKwNxLm4bicLOTqp/7aKDRUtZ+Ti+
+        YkZNFYgufWM7VfJ37zBwafjppANl7Ov4YfJ/3SNrxho42WxRJ90YRkLRkEz9110OQT69JgyQix3bE
+        1UUN6JmWKzg8Bc5AERWCg8k1In+54bOFEIjoHmAhuJ48uTlyrsgS9ASEoWWfFX2oCx8vHeEKiHBK2
+        0ATl5M0lbW4dygkvrSWQNrInCol2nuI3Fn1fE8BBqWu2s6F5FIZzUwvO8Dgsb04PN8JGsMx2K7RYi
+        V5QQ1b6Q==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qEB4A-002rlX-EZ; Tue, 27 Jun 2023 15:57:18 +0000
+Date:   Tue, 27 Jun 2023 16:57:18 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Hugh Dickins <hughd@google.com>
+Cc:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
+        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Jonas Bonn <jonas@southpole.se>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>
+Subject: Re: [PATCH v6 00/33] Split ptdesc from struct page
+Message-ID: <ZJsG3oMF+FaH0iMw@casper.infradead.org>
+References: <20230627031431.29653-1-vishal.moola@gmail.com>
+ <e8992eee-4140-427e-bacb-9449f346318@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e8992eee-4140-427e-bacb-9449f346318@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 26, 2023, Mingwei Zhang wrote:
-> Add the description of tdp_mmu_root_count into kvm_mmu_page description.
-> tdp_mmu_root_count is an atomic counter used only in TDP MMU. Its usage and
-> meaning is slightly different with root_counter in shadow MMU. Update the
-> doc.
+On Mon, Jun 26, 2023 at 09:44:08PM -0700, Hugh Dickins wrote:
+> On Mon, 26 Jun 2023, Vishal Moola (Oracle) wrote:
 > 
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  Documentation/virt/kvm/x86/mmu.rst | 5 +++++
->  1 file changed, 5 insertions(+)
+> > The MM subsystem is trying to shrink struct page. This patchset
+> > introduces a memory descriptor for page table tracking - struct ptdesc.
+> ...
+> >  39 files changed, 686 insertions(+), 455 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/x86/mmu.rst b/Documentation/virt/kvm/x86/mmu.rst
-> index 5cd6cd5e8926..97d695207e11 100644
-> --- a/Documentation/virt/kvm/x86/mmu.rst
-> +++ b/Documentation/virt/kvm/x86/mmu.rst
-> @@ -231,6 +231,11 @@ Shadow pages contain the following information:
->      A counter keeping track of how many hardware registers (guest cr3 or
->      pdptrs) are now pointing at the page.  While this counter is nonzero, the
->      page cannot be destroyed.  See role.invalid.
-> +  tdp_mmu_root_count:
-> +    An atomic reference counter in TDP MMU root page that allows for parallel
-> +    accesses.
-
-I find the "parallel accesses" simultaneously redundant and confusing.  The fact
-that's it's an atomic implies that there are concurrent accesses.  And need for
-an atomic is really just a minor note, i.e. shouldn't be the focus of the
-documentation.
-
-On a related topic, the description for "root_count" is stale now that KVM keeps
-references to roots.
-
-What if we take this opportunity to unify the documentation?
-
-  root_count / tdp_mmu_rount_count:
-
-     A reference counter for root shadow pages.  vCPUs elevate the refcount when
-     getting a shadow page that will be used as a root, i.e. will be loaded into
-     hardware directly (CR3, PDPTRs, nCR3 EPTP).  Root pages cannnot be freed
-     while their refcount is non-zero.  The TDP MMU uses an atomic refcount as
-     vCPUs can acquire references while holding mmu_lock for read.  See
-     role.invalid and Root Pages.
-
-And then add a section specifically for root pages?  I think trying to cram
-everything important about root pages into the description for their refcount
-will be difficult and kludgy.  E.g. this doc should also provide an explanation of
-previous roots.
-
-Root Pages
-==========
-
-Key talking points:
-
-  - Definition of a root page
-  - Lifecycle of roots for both the shadow MMU and TDP MMU
-  - Previous root tracking, and why only KVM doesn'y track previous roots when
-    using PAE paging
-  - The importance of preserving roots that are currently not referenced by any
-    vCPU, i.e. why TDP MMU roots are initialized with a refcount of '2'
-  - Why shadow MMU roots don't gift a reference to the MMU itself, i.e. why they
-    naturally survive their refcount going to zero
-
-
->   Accessing the page requires lifting the counter value. The
-> +    initial value is set to 2 indicating one reference from vCPU and one
-> +    from TDP MMU itself. Note this field is a union with root_count.
->    parent_ptes:
->      The reverse mapping for the pte/ptes pointing at this page's spt. If
->      parent_ptes bit 0 is zero, only one spte points at this page and
-> -- 
-> 2.41.0.162.gfafddb0af9-goog
+> I don't see the point of this patchset: to me it is just obfuscation of
+> the present-day tight relationship between page table and struct page.
 > 
+> Matthew already explained:
+> 
+> > The intent is to get ptdescs to be dynamically allocated at some point
+> > in the ~2-3 years out future when we have finished the folio project ...
+> 
+> So in a kindly mood, I'd say that this patchset is ahead of its time.
+> But I can certainly adapt to it, if everyone else sees some point to it.
+
+If you think this patchset is ahead of its time, we can certainly put
+it on hold.  We're certainly prepared to redo it to be merged after your
+current patch series.
+
+I think you can see the advantage of the destination, so I don't think
+you're against that.  Are you opposed to the sequencing of the work to
+get us there?  I'd be happy to discuss another way to do it.
+
+For example, we could dynamically allocate ptdescs right now.  We'd get
+the benefit of having an arbitrary amount of space in the ptdesc,
+although not the benefit of a smaller memmap until everything else is
+also dynamically allocated.
