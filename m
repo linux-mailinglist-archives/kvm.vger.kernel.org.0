@@ -2,145 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 46FCC7404F0
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 22:26:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A695874056A
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 23:02:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231319AbjF0U0B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 16:26:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45352 "EHLO
+        id S230002AbjF0VCR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 17:02:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231343AbjF0UZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 16:25:58 -0400
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2CD8270C
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 13:25:56 -0700 (PDT)
-Received: by mail-oo1-xc31.google.com with SMTP id 006d021491bc7-560c617c820so3569059eaf.3
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 13:25:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687897556; x=1690489556;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LZAV5n644nbF2fspex915RKKOQRg7bETsj2bpveqEMY=;
-        b=xNz2k+2fBy79SBSN7O3Nv7cLANq5HCaENIBFu+yQEGe96a1YOHtJEoPaKnyife8HRe
-         5dU95/2GVD5K+lpOCTP593eJsZJwf/2wZp9yo1OQfO/oNZwywWrdmA09H1o2gjeFBMGa
-         2z17oC13XR4C8ajUueC5PeNsuXdi61YrDmFXBoVZVdvnVAtqQrU5JobTasqjeN7xrIeJ
-         MpmBPZJhwD6ptkxugjRgmTxswvpeogN6O0bHDNZg4lSF5UmKAFt+JTRw6jFkbjRuUe/7
-         Do+RKbNuWG1nZ+QFgPFa8R4odd5nhFz3t0Eq/rbGXPI4aHvGzMWePtxiLYZ9tzwtN2+N
-         73Ng==
+        with ESMTP id S229777AbjF0VCQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 17:02:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C0D92106
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 14:01:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687899689;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uDraqVlYkekFBNJ0Y0EsgDVmCNSx543RHR3agkDg5bA=;
+        b=E1teJ03B87ZU790LtKTlycifKPAx0tlJm1CqJlYC/4bOOIfmk/YC0nfxrOt17Aup67G2Iv
+        7QXWCNcA9r2Uft9Lty4gJ2B8YEiyFalfzE4lQ3TRLAjjENps4TgOLEMiwhFm8A7YZUyq/8
+        PpUR80BftsoPf2xAjiY5W+kjnsR9u6M=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-504-B4qUFsISMHC-UzD6A1-xbg-1; Tue, 27 Jun 2023 17:01:27 -0400
+X-MC-Unique: B4qUFsISMHC-UzD6A1-xbg-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-77e41268d40so308048039f.3
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 14:01:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687897556; x=1690489556;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LZAV5n644nbF2fspex915RKKOQRg7bETsj2bpveqEMY=;
-        b=CVRMyyPkChOZ33ULn5tXDHlRdJk9bwiOw68naGyiTFdZlA/z839QUh83gGwDHfeDh9
-         5qbyWk21T0SDP4TYwtI97ErQpbg36wTgduQIxHprNjYXAno8cmoI7mSqHCOwIh2b6piY
-         vDowC6KFAIh9lNCAgcfojs5ARRC1f1cFY3CCf7svMUUhG6HmSjEWAmkv/afocflrTBEA
-         FeyB1cr7x2rDb8kRvBsZzFLHnldsNLgA/AHxOmawUr9EWEgawETGv36ekA4NXhVCLlGC
-         HVOGp9N/7DNTVSfRmvJz5dyw4kDc/iDB2HLV7RVZ0jGHdmb2hWGV63Xu/eYzSzASsksT
-         y6FA==
-X-Gm-Message-State: AC+VfDzvDIyITj7EoZWP//s9lVyMn/PTeKdIBpPWCDG7Rmxgo7xsO0rk
-        yrSNXqcfDey8mNSW4olTUfy5Rw==
-X-Google-Smtp-Source: ACHHUZ4XO8G5i/7kBsDqN0SkVyZDmn1Y3+y5XriSrT6/YkoTOhARrZtNyfUTkKT2V2obJFMfnoberA==
-X-Received: by 2002:a05:6808:1a8d:b0:39e:ff3d:af9d with SMTP id bm13-20020a0568081a8d00b0039eff3daf9dmr24552508oib.46.1687897555783;
-        Tue, 27 Jun 2023 13:25:55 -0700 (PDT)
-Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id p79-20020a0de652000000b00573a2a0808esm2002459ywe.77.2023.06.27.13.25.52
+        d=1e100.net; s=20221208; t=1687899686; x=1690491686;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uDraqVlYkekFBNJ0Y0EsgDVmCNSx543RHR3agkDg5bA=;
+        b=dQmk0FhO31inTIygIDRh1+0VeoGnEzgG8olQ4DwTwGKdum7X5p3cqIzpxr76NVjAj9
+         UV7jTXQr97FJfSe1Jc0e2G1ZgFvdKZHPmkhRhLyDHZkeEMVgMSNwUnnLN69GVCcMy2S0
+         C7dqc+/OpQfxl3CmA+kShN1hYMpLE3CGvqc+gkUe0s7/iAp5jdKoMwLN0OT2uE40G2vq
+         Xni+1Ot5KznpBzfALr3gVAjMajhjNnhwoynJ7w7ndC+Mr7E8+UVhVpTIV2KsL+vf9Suf
+         k0qSd4auI0n7817OxotypdETmM5sCifQkF5vO1vRtXgUedWLZvWttML289fLRxoFkUL/
+         /ExQ==
+X-Gm-Message-State: AC+VfDzwW2u9lx66hgS23VrXfFPqmuYXLGfgdntVCaHfOiQVBqWZH2Xk
+        41n0VGWkHLeI7aIulXiCgQSeqrKNeLpF3qtnGdIT7yfOb5NiKE+GHeP1748Agq5o2lmHYOUb/nY
+        hrJtVHZU4g6Nc
+X-Received: by 2002:a05:6602:2483:b0:783:40ef:c9f6 with SMTP id g3-20020a056602248300b0078340efc9f6mr9061143ioe.19.1687899686651;
+        Tue, 27 Jun 2023 14:01:26 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7bHylSCU/1eTTD2k4nZYYlm4UvEIXMbFlAEmAlLuLOaoK/IPO/W8W7K51R4M6iKPO2Jj9z8Q==
+X-Received: by 2002:a05:6602:2483:b0:783:40ef:c9f6 with SMTP id g3-20020a056602248300b0078340efc9f6mr9061123ioe.19.1687899686401;
+        Tue, 27 Jun 2023 14:01:26 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id k7-20020a6bef07000000b007835a305f61sm1695895ioh.36.2023.06.27.14.01.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 13:25:55 -0700 (PDT)
-Date:   Tue, 27 Jun 2023 13:25:52 -0700 (PDT)
-From:   Hugh Dickins <hughd@google.com>
-X-X-Sender: hugh@ripple.attlocal.net
-To:     Matthew Wilcox <willy@infradead.org>
-cc:     Hugh Dickins <hughd@google.com>,
-        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Jonas Bonn <jonas@southpole.se>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Richard Weinberger <richard@nod.at>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>
-Subject: Re: [PATCH v6 00/33] Split ptdesc from struct page
-In-Reply-To: <ZJsG3oMF+FaH0iMw@casper.infradead.org>
-Message-ID: <8f1f3dd-50a-3726-87f2-b66d35804ba7@google.com>
-References: <20230627031431.29653-1-vishal.moola@gmail.com> <e8992eee-4140-427e-bacb-9449f346318@google.com> <ZJsG3oMF+FaH0iMw@casper.infradead.org>
+        Tue, 27 Jun 2023 14:01:25 -0700 (PDT)
+Date:   Tue, 27 Jun 2023 15:01:24 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>, kvm@vger.kernel.org,
+        Alexander Egorenkov <egorenar@linux.ibm.com>
+Subject: Re: [PATCH] vfio/mdev: Move the compat_class initialization to
+ module init
+Message-ID: <20230627150124.07745516.alex.williamson@redhat.com>
+In-Reply-To: <20230626133642.2939168-1-farman@linux.ibm.com>
+References: <20230626133642.2939168-1-farman@linux.ibm.com>
+Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 27 Jun 2023, Matthew Wilcox wrote:
-> On Mon, Jun 26, 2023 at 09:44:08PM -0700, Hugh Dickins wrote:
-> > On Mon, 26 Jun 2023, Vishal Moola (Oracle) wrote:
-> > 
-> > > The MM subsystem is trying to shrink struct page. This patchset
-> > > introduces a memory descriptor for page table tracking - struct ptdesc.
-> > ...
-> > >  39 files changed, 686 insertions(+), 455 deletions(-)
-> > 
-> > I don't see the point of this patchset: to me it is just obfuscation of
-> > the present-day tight relationship between page table and struct page.
-> > 
-> > Matthew already explained:
-> > 
-> > > The intent is to get ptdescs to be dynamically allocated at some point
-> > > in the ~2-3 years out future when we have finished the folio project ...
-> > 
-> > So in a kindly mood, I'd say that this patchset is ahead of its time.
-> > But I can certainly adapt to it, if everyone else sees some point to it.
+On Mon, 26 Jun 2023 15:36:42 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
+
+> The pointer to mdev_bus_compat_class is statically defined at the top
+> of mdev_core, and was originally (commit 7b96953bc640 ("vfio: Mediated
+> device Core driver") serialized by the parent_list_lock. The blamed
+> commit removed this mutex, leaving the pointer initialization
+> unserialized. As a result, the creation of multiple MDEVs in parallel
+> (such as during boot) can encounter errors during the creation of the
+> sysfs entries, such as:
 > 
-> If you think this patchset is ahead of its time, we can certainly put
-> it on hold.  We're certainly prepared to redo it to be merged after your
-> current patch series.
-
-Thank you, but I can adapt.  That was not my point:
-I'm claiming this patchset is ~2-3 years ahead of its time.
-
+>   [    8.337509] sysfs: cannot create duplicate filename '/class/mdev_bus'
+>   [    8.337514] vfio_ccw 0.0.01d8: MDEV: Registered
+>   [    8.337516] CPU: 13 PID: 946 Comm: driverctl Not tainted 6.4.0-rc7 #20
+>   [    8.337522] Hardware name: IBM 3906 M05 780 (LPAR)
+>   [    8.337525] Call Trace:
+>   [    8.337528]  [<0000000162b0145a>] dump_stack_lvl+0x62/0x80
+>   [    8.337540]  [<00000001622aeb30>] sysfs_warn_dup+0x78/0x88
+>   [    8.337549]  [<00000001622aeca6>] sysfs_create_dir_ns+0xe6/0xf8
+>   [    8.337552]  [<0000000162b04504>] kobject_add_internal+0xf4/0x340
+>   [    8.337557]  [<0000000162b04d48>] kobject_add+0x78/0xd0
+>   [    8.337561]  [<0000000162b04e0a>] kobject_create_and_add+0x6a/0xb8
+>   [    8.337565]  [<00000001627a110e>] class_compat_register+0x5e/0x90
+>   [    8.337572]  [<000003ff7fd815da>] mdev_register_parent+0x102/0x130 [mdev]
+>   [    8.337581]  [<000003ff7fdc7f2c>] vfio_ccw_sch_probe+0xe4/0x178 [vfio_ccw]
+>   [    8.337588]  [<0000000162a7833c>] css_probe+0x44/0x80
+>   [    8.337599]  [<000000016279f4da>] really_probe+0xd2/0x460
+>   [    8.337603]  [<000000016279fa08>] driver_probe_device+0x40/0xf0
+>   [    8.337606]  [<000000016279fb78>] __device_attach_driver+0xc0/0x140
+>   [    8.337610]  [<000000016279cbe0>] bus_for_each_drv+0x90/0xd8
+>   [    8.337618]  [<00000001627a00b0>] __device_attach+0x110/0x190
+>   [    8.337621]  [<000000016279c7c8>] bus_rescan_devices_helper+0x60/0xb0
+>   [    8.337626]  [<000000016279cd48>] drivers_probe_store+0x48/0x80
+>   [    8.337632]  [<00000001622ac9b0>] kernfs_fop_write_iter+0x138/0x1f0
+>   [    8.337635]  [<00000001621e5e14>] vfs_write+0x1ac/0x2f8
+>   [    8.337645]  [<00000001621e61d8>] ksys_write+0x70/0x100
+>   [    8.337650]  [<0000000162b2bdc4>] __do_syscall+0x1d4/0x200
+>   [    8.337656]  [<0000000162b3c828>] system_call+0x70/0x98
+>   [    8.337664] kobject: kobject_add_internal failed for mdev_bus with -EEXIST, don't try to register things with the same name in the same directory.
+>   [    8.337668] kobject: kobject_create_and_add: kobject_add error: -17
+>   [    8.337674] vfio_ccw: probe of 0.0.01d9 failed with error -12
+>   [    8.342941] vfio_ccw_mdev aeb9ca91-10c6-42bc-a168-320023570aea: Adding to iommu group 2
 > 
-> I think you can see the advantage of the destination, so I don't think
-> you're against that.
-
-Maybe - I have some scepticism, but I'll be happy for that to be dissolved.
-
-> Are you opposed to the sequencing of the work to
-> get us there?  I'd be happy to discuss another way to do it.
-
-Yes, I'm opposed to churn for no benefit.
-
+> Move the initialization of the mdev_bus_compat_class pointer to the
+> init path, to match the cleanup in module exit. This way the code
+> in mdev_register_parent() can simply link the new parent to it,
+> rather than determining whether initialization is required first.
 > 
-> For example, we could dynamically allocate ptdescs right now.  We'd get
-> the benefit of having an arbitrary amount of space in the ptdesc,
-> although not the benefit of a smaller memmap until everything else is
-> also dynamically allocated.
+> Fixes: 89345d5177aa ("vfio/mdev: embedd struct mdev_parent in the parent data structure")
+> Reported-by: Alexander Egorenkov <egorenar@linux.ibm.com>
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>  drivers/vfio/mdev/mdev_core.c | 23 ++++++++++++++---------
+>  1 file changed, 14 insertions(+), 9 deletions(-)
 
-That sounded much better, at first: churn serving good purpose.  But now
-I suspect you're offering to dynamically allocate a ptdesc, in addition
-to the struct page of the page table(s) itself, which will be wasted:
-more memory consumption to no advantage.  If that's so, no thanks.
+Applied to vfio next branch for v6.5.  Thanks!
 
-Hugh
+Alex
+
+
+> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> index 58f91b3bd670..ed4737de4528 100644
+> --- a/drivers/vfio/mdev/mdev_core.c
+> +++ b/drivers/vfio/mdev/mdev_core.c
+> @@ -72,12 +72,6 @@ int mdev_register_parent(struct mdev_parent *parent, struct device *dev,
+>  	parent->nr_types = nr_types;
+>  	atomic_set(&parent->available_instances, mdev_driver->max_instances);
+>  
+> -	if (!mdev_bus_compat_class) {
+> -		mdev_bus_compat_class = class_compat_register("mdev_bus");
+> -		if (!mdev_bus_compat_class)
+> -			return -ENOMEM;
+> -	}
+> -
+>  	ret = parent_create_sysfs_files(parent);
+>  	if (ret)
+>  		return ret;
+> @@ -251,13 +245,24 @@ int mdev_device_remove(struct mdev_device *mdev)
+>  
+>  static int __init mdev_init(void)
+>  {
+> -	return bus_register(&mdev_bus_type);
+> +	int ret;
+> +
+> +	ret = bus_register(&mdev_bus_type);
+> +	if (ret)
+> +		return ret;
+> +
+> +	mdev_bus_compat_class = class_compat_register("mdev_bus");
+> +	if (!mdev_bus_compat_class) {
+> +		bus_unregister(&mdev_bus_type);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	return 0;
+>  }
+>  
+>  static void __exit mdev_exit(void)
+>  {
+> -	if (mdev_bus_compat_class)
+> -		class_compat_unregister(mdev_bus_compat_class);
+> +	class_compat_unregister(mdev_bus_compat_class);
+>  	bus_unregister(&mdev_bus_type);
+>  }
+>  
+
