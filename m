@@ -2,104 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 95E6D73F51F
-	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 09:15:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1D9173F606
+	for <lists+kvm@lfdr.de>; Tue, 27 Jun 2023 09:49:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbjF0HPT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 03:15:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52912 "EHLO
+        id S231487AbjF0HtJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 03:49:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229681AbjF0HPS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 03:15:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 059021BEB
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 00:14:35 -0700 (PDT)
+        with ESMTP id S231488AbjF0HtF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 03:49:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A27410D5
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 00:48:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687850075;
+        s=mimecast20190719; t=1687852096;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=N1scKhPxxz/YxysE64BuheSdyQmgV4XhiinPf6icWX8=;
-        b=gLHtxCt7YxT7fD4RUMsMt5nkuqomgRGHLVnhkE5mtTO9G6qqlrV6MupV/chx6JnAHldSvj
-        wk86egqixoIqEzSgzOQ0uzhhe50WyoLlDU0uUS0mQ8IJsOJB9b5honExYv+XEhLrorqKcT
-        tv5LsStXpK5QhintwqeKkiF2P9peTmQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=whaOhWVIaKHzUbZWclTPzFtnTVD/3jITld51dEdWQ0A=;
+        b=hdfeDB27ORrcqC/2KNRCbtpBNcNbMCRddYeM9qrM8z/qJDK2kHoVqbPTfxsjbfxS5+FANn
+        Mzt9iO3oJTxcSC/WGC80AKKtYXBDmkqSpVuWblPeu02rnA53f5w5JHyDC3u80ixXXdFNhn
+        voEAJwrCWnbj6RQsX14IS6m2e3iESw8=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-316-V6sMN7b8On2D0SRWrFfI6w-1; Tue, 27 Jun 2023 03:14:33 -0400
-X-MC-Unique: V6sMN7b8On2D0SRWrFfI6w-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3fa979d0c32so8080475e9.2
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 00:14:33 -0700 (PDT)
+ us-mta-141-p7jilyCFM9iTlALm35SbMQ-1; Tue, 27 Jun 2023 03:48:11 -0400
+X-MC-Unique: p7jilyCFM9iTlALm35SbMQ-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-988907e1b15so378176166b.3
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 00:48:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687850072; x=1690442072;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N1scKhPxxz/YxysE64BuheSdyQmgV4XhiinPf6icWX8=;
-        b=Q5y2cAYdY3LYZXgK+2xuUeJ2LwJN7W4C+9L3N1TT9aGhaXTNy/GVOwxEOMcM07AT1O
-         Dbavi5WR1cBJ4nRsocDuHyZsTV/aeHz2pNw+0YgtmEhLE1LS494K6RBxiKA4MKULsGyg
-         hYMwpsC3TiCF6k+2K1pelRo7ayI4HY8pAQclpjE/nWpXlVnyTipma7ERknINtUGQaqif
-         f7rf/WzyoPIE+FsO1h255EnCpw99ZiyPZHT9gn/D6TBXzbNHCEpty8xFQd/RoRZMyzFM
-         bQKBaoqFVnio2/osXzQ7NbdV9V5MEKr1CYz12EXSnpuBocIIHwd/6lgw/96OytF0nuGq
-         3tyg==
-X-Gm-Message-State: AC+VfDy74ue0DC1bZmM7WtAkRFk1FDcZkSrNEIfZWnXmx1uVWnPFoNxf
-        7ac84apXBO0bgaChNnl1XcKI6NQSL6F5vqGadDXuZoCloDrmXE81Cg8wnFB1yCJDJLNjvJpkGxD
-        YnnqBLZ4RSV3g
-X-Received: by 2002:a05:600c:3655:b0:3fa:9d0f:f1e1 with SMTP id y21-20020a05600c365500b003fa9d0ff1e1mr2936793wmq.35.1687850072227;
-        Tue, 27 Jun 2023 00:14:32 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6HIpOGvancvhac5jw2GR0kOhKc72MxDndtCuN9HZ1pSF+uaoBl/D52ddajPiSHV9uK1Eb9sw==
-X-Received: by 2002:a05:600c:3655:b0:3fa:9d0f:f1e1 with SMTP id y21-20020a05600c365500b003fa9d0ff1e1mr2936755wmq.35.1687850071891;
-        Tue, 27 Jun 2023 00:14:31 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c737:4900:68b3:e93b:e07a:558b? (p200300cbc737490068b3e93be07a558b.dip0.t-ipconnect.de. [2003:cb:c737:4900:68b3:e93b:e07a:558b])
-        by smtp.gmail.com with ESMTPSA id 21-20020a05600c22d500b003f96d10eafbsm9778433wmg.12.2023.06.27.00.14.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jun 2023 00:14:31 -0700 (PDT)
-Message-ID: <ac1c162c-07d8-6084-44ca-a2c1a4183df2@redhat.com>
-Date:   Tue, 27 Jun 2023 09:14:29 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v6 00/33] Split ptdesc from struct page
-Content-Language: en-US
-To:     Hugh Dickins <hughd@google.com>,
-        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Jonas Bonn <jonas@southpole.se>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
+        d=1e100.net; s=20221208; t=1687852090; x=1690444090;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=whaOhWVIaKHzUbZWclTPzFtnTVD/3jITld51dEdWQ0A=;
+        b=leoclyVCxLle6WHjOU/Nob5dYRDevFaiP02lcniPkUwSDqYfqnEHjyRLlwjpHUNW0x
+         H/2MQQsoZS4IPPE0TXlqKVlUd97YeD7uCzDLcuioXBL9byM2RNmgMtvJJL8KytqAMCMo
+         oogH1pLSVP0MwjEgFf5a7UITcwrsWrUfVrAPpmihblFD1P1Ugz5a+C6UQGINGS+0d9Rd
+         EghN+hnuZ5O3yP63BPFqtOCQsheit/cipU2W6TnSPtr1tkfFOFGCLo2FAetbFZ5RUJpD
+         /xjHkH5HKrHc2pSVObaboB6NPtfq1zBURc/r9QOtRHdncUce0RCwfIv2KO5xfeXFKp2W
+         NXvQ==
+X-Gm-Message-State: AC+VfDx4N6plcxByhSBj5szQ8BQF7VggjoqWWpolJWo9TdI56tkIJPSn
+        ZiLOlRZXXdLH+VfIW8sCNpLNp5/MKDFIDCJi3SVLHaYAEQZh1kFUJgj7cBMa8+cSH49+1huzFeU
+        7AT96H5/Sjxj2
+X-Received: by 2002:a17:906:da84:b0:988:f307:aea7 with SMTP id xh4-20020a170906da8400b00988f307aea7mr21595736ejb.7.1687852090427;
+        Tue, 27 Jun 2023 00:48:10 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5ob/ReyhK7BIZNcKDNmnYWuzv3zeM/wIdMcpgjlvuvypLCy8x/HUywv68r17c73ooOglaGQw==
+X-Received: by 2002:a17:906:da84:b0:988:f307:aea7 with SMTP id xh4-20020a170906da8400b00988f307aea7mr21595713ejb.7.1687852090093;
+        Tue, 27 Jun 2023 00:48:10 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
+        by smtp.gmail.com with ESMTPSA id s16-20020a170906355000b00991ba677d92sm2190941eja.84.2023.06.27.00.48.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jun 2023 00:48:09 -0700 (PDT)
+Date:   Tue, 27 Jun 2023 09:48:06 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Richard Weinberger <richard@nod.at>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>
-References: <20230627031431.29653-1-vishal.moola@gmail.com>
- <e8992eee-4140-427e-bacb-9449f346318@google.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <e8992eee-4140-427e-bacb-9449f346318@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v1 2/4] virtio/vsock: support MSG_PEEK for
+ SOCK_SEQPACKET
+Message-ID: <4pcexfrdtuisz53c4sb4pse4cyjw7zsuwtqsnnul23njo4ab5l@4jvdk6buxmj3>
+References: <20230618062451.79980-1-AVKrasnov@sberdevices.ru>
+ <20230618062451.79980-3-AVKrasnov@sberdevices.ru>
+ <yiy3kssoiyzs6ehnlo7g2xsb26zee5vih3jpgyc7i3dvfcyfpv@xvokxez3lzpo>
+ <9553a82f-ce31-e2e0-ff62-8abd2a6b639b@sberdevices.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9553a82f-ce31-e2e0-ff62-8abd2a6b639b@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -107,38 +92,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27.06.23 06:44, Hugh Dickins wrote:
-> On Mon, 26 Jun 2023, Vishal Moola (Oracle) wrote:
-> 
->> The MM subsystem is trying to shrink struct page. This patchset
->> introduces a memory descriptor for page table tracking - struct ptdesc.
-> ...
->>   39 files changed, 686 insertions(+), 455 deletions(-)
-> 
-> I don't see the point of this patchset: to me it is just obfuscation of
-> the present-day tight relationship between page table and struct page.
-> 
-> Matthew already explained:
-> 
->> The intent is to get ptdescs to be dynamically allocated at some point
->> in the ~2-3 years out future when we have finished the folio project ...
-> 
-> So in a kindly mood, I'd say that this patchset is ahead of its time.
-> But I can certainly adapt to it, if everyone else sees some point to it.
+On Tue, Jun 27, 2023 at 07:34:29AM +0300, Arseniy Krasnov wrote:
+>
+>
+>On 26.06.2023 19:28, Stefano Garzarella wrote:
+>> On Sun, Jun 18, 2023 at 09:24:49AM +0300, Arseniy Krasnov wrote:
+>>> This adds support of MSG_PEEK flag for SOCK_SEQPACKET type of socket.
+>>> Difference with SOCK_STREAM is that this callback returns either length
+>>> of the message or error.
+>>>
+>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>>> ---
+>>> net/vmw_vsock/virtio_transport_common.c | 63 +++++++++++++++++++++++--
+>>> 1 file changed, 60 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> index 2ee40574c339..352d042b130b 100644
+>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> @@ -460,6 +460,63 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>>     return err;
+>>> }
+>>>
+>>> +static ssize_t
+>>> +virtio_transport_seqpacket_do_peek(struct vsock_sock *vsk,
+>>> +                   struct msghdr *msg)
+>>> +{
+>>> +    struct virtio_vsock_sock *vvs = vsk->trans;
+>>> +    struct sk_buff *skb;
+>>> +    size_t total, len;
+>>> +
+>>> +    spin_lock_bh(&vvs->rx_lock);
+>>> +
+>>> +    if (!vvs->msg_count) {
+>>> +        spin_unlock_bh(&vvs->rx_lock);
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    total = 0;
+>>> +    len = msg_data_left(msg);
+>>> +
+>>> +    skb_queue_walk(&vvs->rx_queue, skb) {
+>>> +        struct virtio_vsock_hdr *hdr;
+>>> +
+>>> +        if (total < len) {
+>>> +            size_t bytes;
+>>> +            int err;
+>>> +
+>>> +            bytes = len - total;
+>>> +            if (bytes > skb->len)
+>>> +                bytes = skb->len;
+>>> +
+>>> +            spin_unlock_bh(&vvs->rx_lock);
+>>> +
+>>> +            /* sk_lock is held by caller so no one else can dequeue.
+>>> +             * Unlock rx_lock since memcpy_to_msg() may sleep.
+>>> +             */
+>>> +            err = memcpy_to_msg(msg, skb->data, bytes);
+>>> +            if (err)
+>>> +                return err;
+>>> +
+>>> +            spin_lock_bh(&vvs->rx_lock);
+>>> +        }
+>>> +
+>>> +        total += skb->len;
+>>> +        hdr = virtio_vsock_hdr(skb);
+>>> +
+>>> +        if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOM) {
+>>> +            if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOR)
+>>> +                msg->msg_flags |= MSG_EOR;
+>>> +
+>>> +            break;
+>>> +        }
+>>> +    }
+>>> +
+>>> +    spin_unlock_bh(&vvs->rx_lock);
+>>> +
+>>> +    return total;
+>>
+>> Should we return the minimum between total and len?
+>
+>I guess no, because seqpacket dequeue callback always returns length of message,
+>then, in af_vsock.c we return either number of bytes read or length of message
+>depending on MSG_TRUNC flags.
 
-I share your thoughts, that code churn which will help eventually in the 
-far, far future (not wanting to sound too pessimistic, but it's not 
-going to be there tomorrow ;) ).
+Right! We should always return the total lenght of the packet.
 
-However, if it's just the same as the other conversions we already did 
-(e.g., struct slab), then I guess there is no reason to stop now -- the 
-obfuscation already happened.
+Thanks,
+Stefano
 
-... or is there a difference regarding this conversion and the previous 
-ones?
-
--- 
-Cheers,
-
-David / dhildenb
+>
+>Thanks, Arseniy
+>
+>>
+>> Thanks,
+>> Stefano
+>>
+>>> +}
+>>> +
+>>> static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+>>>                          struct msghdr *msg,
+>>>                          int flags)
+>>> @@ -554,9 +611,9 @@ virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+>>>                    int flags)
+>>> {
+>>>     if (flags & MSG_PEEK)
+>>> -        return -EOPNOTSUPP;
+>>> -
+>>> -    return virtio_transport_seqpacket_do_dequeue(vsk, msg, flags);
+>>> +        return virtio_transport_seqpacket_do_peek(vsk, msg);
+>>> +    else
+>>> +        return virtio_transport_seqpacket_do_dequeue(vsk, msg, flags);
+>>> }
+>>> EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_dequeue);
+>>>
+>>> -- 
+>>> 2.25.1
+>>>
+>>
+>
 
