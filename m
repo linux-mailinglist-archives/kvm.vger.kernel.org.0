@@ -2,190 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71313741935
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 22:03:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7A437419CF
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 22:41:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231925AbjF1UDL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 16:03:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59586 "EHLO
+        id S231916AbjF1UlQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 16:41:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231897AbjF1UC5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 16:02:57 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 996AD1BEA
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 13:02:55 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-55ac8f85360so57389a12.0
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 13:02:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687982575; x=1690574575;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aF+eaqoyjG8K7JrTXAx7p+ekpq66+KyCCJ2W8xApmu4=;
-        b=yiXMZe1WRiCBewd8cQIpLAFHrBNvdVKQGotoGoxyUI+Nt8m67zl9/LQsJJTjIY4dTr
-         UVCUCQagQXdkhQQCP2zgCKYg73b+Q9jTHV+/C9rrSL5Ds1bXsWZ5vP5WK7LtMrPNBl83
-         XA6uYZItHwh/nTj5wL4klFmcXVsz0ZOkw8N9xrnS0ey/9J85y8+wmME4Al6uHDg42AWq
-         yyqm9wMuiW0FejgZ0IBHG18KhoC4gzy1mWpIY/OOtVt1MKpipmJruIk3/eoSgFd1PQXl
-         e9WFa9Ue90gV7m+cWv3dfOPUuyoGXpQ82UA7TjuD0LzX/lZtRvxXQxyboNIZDS4cOL62
-         98ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687982575; x=1690574575;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aF+eaqoyjG8K7JrTXAx7p+ekpq66+KyCCJ2W8xApmu4=;
-        b=hPRUhBQl2AsTyZBev9/QdR01frYA+B6Re40GLlkR0hKhhOxY0iX33ool06G1qSmdid
-         XzhKvWCNZEl6ZI/Tlkp/C2K8HY9kJstMneb0pGlnXcpsn7ZUUuuyG911o4aSMekqBnq3
-         BbqS8tENg33SPQrJPRqfeGap2VD7naX+qlQ+dnzAebSIDk0mI9ka0bIGw/1AuMWqBFJf
-         lXyLPk4L2pFjyjGXD+QYWRlMTO1g+ly8sg5hMrGlsKhon2o6R6j1TNwsjPz2bTb2lQXx
-         +D+XEEvoCa27iJ5RqBLIoouPk+jJdB6MluO06Ohu10WeB9uqYdVkp88fEnlog3z8E/iC
-         eMww==
-X-Gm-Message-State: AC+VfDz4guzHQ/ReArrlOZ9pZNrpfTZZRLuhvCBKWDW6xIeCVHeYBQ9E
-        Dpd7RfoZFGntnqNLMW/TLhzqOZGyMeA=
-X-Google-Smtp-Source: ACHHUZ5bO34e6p8FZc9bz44vcDbWILB0WTqbsNIRWGQhflnvBOZc6PKwqE2im4IFVlHM6ZRuwHrSr8ltKMg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:fa45:0:b0:52c:8878:65dd with SMTP id
- g5-20020a63fa45000000b0052c887865ddmr3637339pgk.0.1687982575114; Wed, 28 Jun
- 2023 13:02:55 -0700 (PDT)
-Date:   Wed, 28 Jun 2023 13:02:53 -0700
-In-Reply-To: <20230530134248.23998-3-cloudliang@tencent.com>
-Mime-Version: 1.0
-References: <20230530134248.23998-1-cloudliang@tencent.com> <20230530134248.23998-3-cloudliang@tencent.com>
-Message-ID: <ZJyR7XzVeOu8IN9n@google.com>
-Subject: Re: [PATCH v2 2/8] KVM: selftests: Add pmu.h for PMU events and
- common masks
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jinrong Liang <ljr.kernel@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
-        David Matlack <dmatlack@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231767AbjF1UlB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 16:41:01 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AD501FF7;
+        Wed, 28 Jun 2023 13:39:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Q74U9h5cJqAF7kQMrqejEwYKPbZZwynJrbUyaN3UMdk=; b=U7ven3j1n/AGEZHnBs70CiAm3c
+        IFp7vZgZH+yI7tHPmRDhAxOv2CZ4gCjKF9xF4GFFql17CQMcuZsdavKL+gcE2vidJElANCkN/8Nlp
+        2Wi1Mxv7uQu7+LMDHIpCxsmPRFaciMupyA2OtLGyMmPZK3R+wiSQCLj3z19/8StnPgL1++XOAQOS8
+        Zm4KNBKwkc32cbwqyYjVZpp4wAMQtDJfxRPhUH2DlnwKFk6ZmIYyfJj7mDbnGRbWIgDUIo8M72um9
+        gTIhGZf2TIGG6gfoSjXoe3/DZawyJWKyubvPt63WJDlpJBmXc+ZlzlbsSKsW657uHq2vLD9F7d0vU
+        ffz4ertQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qEbvl-004CII-F8; Wed, 28 Jun 2023 20:38:25 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 317E33002C5;
+        Wed, 28 Jun 2023 22:38:23 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 18B8C214D80C3; Wed, 28 Jun 2023 22:38:23 +0200 (CEST)
+Date:   Wed, 28 Jun 2023 22:38:23 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-mm@kvack.org, x86@kernel.org, dave.hansen@intel.com,
+        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
+        tglx@linutronix.de, bp@alien8.de, mingo@redhat.com, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, david@redhat.com,
+        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
+        ashok.raj@intel.com, reinette.chatre@intel.com,
+        len.brown@intel.com, ak@linux.intel.com, isaku.yamahata@intel.com,
+        ying.huang@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
+        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
+Subject: Re: [PATCH v12 20/22] x86/virt/tdx: Allow SEAMCALL to handle #UD and
+ #GP
+Message-ID: <20230628203823.GR38236@hirez.programming.kicks-ass.net>
+References: <cover.1687784645.git.kai.huang@intel.com>
+ <c124550719716f1f7759c2bdea70f4722d8e0167.1687784645.git.kai.huang@intel.com>
+ <20230628152900.GI2438817@hirez.programming.kicks-ass.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230628152900.GI2438817@hirez.programming.kicks-ass.net>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 30, 2023, Jinrong Liang wrote:
-> From: Jinrong Liang <cloudliang@tencent.com>
+On Wed, Jun 28, 2023 at 05:29:01PM +0200, Peter Zijlstra wrote:
+> On Tue, Jun 27, 2023 at 02:12:50AM +1200, Kai Huang wrote:
+> > diff --git a/arch/x86/virt/vmx/tdx/tdxcall.S b/arch/x86/virt/vmx/tdx/tdxcall.S
+> > index 49a54356ae99..757b0c34be10 100644
+> > --- a/arch/x86/virt/vmx/tdx/tdxcall.S
+> > +++ b/arch/x86/virt/vmx/tdx/tdxcall.S
+> > @@ -1,6 +1,7 @@
+> >  /* SPDX-License-Identifier: GPL-2.0 */
+> >  #include <asm/asm-offsets.h>
+> >  #include <asm/tdx.h>
+> > +#include <asm/asm.h>
+> >  
+> >  /*
+> >   * TDCALL and SEAMCALL are supported in Binutils >= 2.36.
+> > @@ -45,6 +46,7 @@
+> >  	/* Leave input param 2 in RDX */
+> >  
+> >  	.if \host
+> > +1:
+> >  	seamcall
 > 
-> To introduce a new pmu.h header file under
-> tools/testing/selftests/kvm/include/x86_64 directory to better
-> organize the PMU performance event constants and common masks.
-> It will enhance the maintainability and readability of the KVM
-> selftests code.
-> 
-> In the new pmu.h header, to define the PMU performance events and
-> masks that are relevant for x86_64, allowing developers to easily
-> reference them and minimize potential errors in code that handles
-> these values.
+> So what registers are actually clobbered by SEAMCALL ? There's a
+> distinct lack of it in SDM Vol.2 instruction list :-(
 
-Same feedback as the previous changelog.
+With the exception of the abomination that is TDH.VP.ENTER all SEAMCALLs
+seem to be limited to the set presented here (c,d,8,9,10,11) and all
+other registers should be available.
 
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> ---
->  .../selftests/kvm/include/x86_64/pmu.h        | 56 +++++++++++++++++++
->  1 file changed, 56 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/include/x86_64/pmu.h
-> 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/pmu.h b/tools/testing/selftests/kvm/include/x86_64/pmu.h
-> new file mode 100644
-> index 000000000000..0e0111b11024
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/x86_64/pmu.h
-> @@ -0,0 +1,56 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * tools/testing/selftests/kvm/include/x86_64/pmu.h
-> + *
-> + * Copyright (C) 2023, Tencent, Inc.
-> + */
-> +#ifndef _PMU_H_
-> +#define _PMU_H_
+Can we please make that a hard requirement, SEAMCALL must not use
+registers outside this? We can hardly program to random future
+extentions; we need hard ABI guarantees here.
 
-SELFTEST_KVM_PMU_H for consistency, and to minimize the risk of a collision.
+That also means we should be able to use si,di for the cmovc below.
 
-> +#include "processor.h"
-> +
-> +#define GP_CTR_NUM_OFS_BIT 8
-> +#define EVT_LEN_OFS_BIT 24
+Kirill, back when we did __tdx_hypercall() we got bp removed as a valid
+register, the 1.0 spec still lists that, and it is also listed in
+TDH.VP.ENTER, I'm assuming it will be removed there too?
 
-Please spell out the words, I genuinely have no idea what these refer to, and
-readers shouldn't have to consult the SDM just to understand a name.
+bp must not be used -- it violates the pre-existing calling convention.
 
-> +#define INTEL_PMC_IDX_FIXED 32
-> +
-> +#define PMU_CAP_FW_WRITES BIT_ULL(13)
-> +#define EVENTSEL_OS BIT_ULL(17)
-> +#define EVENTSEL_ANY BIT_ULL(21)
-> +#define EVENTSEL_EN BIT_ULL(22)
-> +#define RDPMC_FIXED_BASE BIT_ULL(30)
-> +
-> +#define PMU_VERSION_MASK GENMASK_ULL(7, 0)
-> +#define EVENTS_MASK GENMASK_ULL(7, 0)
-> +#define EVT_LEN_MASK GENMASK_ULL(31, EVT_LEN_OFS_BIT)
-> +#define GP_CTR_NUM_MASK GENMASK_ULL(15, GP_CTR_NUM_OFS_BIT)
-> +#define FIXED_CTR_NUM_MASK GENMASK_ULL(4, 0)
-> +
-> +#define X86_INTEL_PMU_VERSION		kvm_cpu_property(X86_PROPERTY_PMU_VERSION)
-> +#define X86_INTEL_MAX_GP_CTR_NUM	kvm_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS)
-> +#define X86_INTEL_MAX_FIXED_CTR_NUM	kvm_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS)
-> +#define X86_INTEL_FIXED_CTRS_BITMASK	kvm_cpu_property(X86_PROPERTY_PMU_FIXED_CTRS_BITMASK)
-
-Please don't add macros like this.  It gives the false impression that all these
-values are constant at compile time, which is very much not the case.  I really,
-really dislike code that hides important details, like the fact that this is
-querying KVM.
-
-Yeah, the line lengths will be longer, but 80 chars is a soft limit, and we can
-always get creative, e.g.
-
-	uint8_t max_pmu_version = kvm_cpu_property(X86_PROPERTY_PMU_VERSION);
-	struct kvm_vm *vm;
-	struct kvm_vcpu *vcpu;
-	uint8_t version;
-
-	TEST_REQUIRE(kvm_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS) > 2);
-
-> +/* Definitions for Architectural Performance Events */
-> +#define ARCH_EVENT(select, umask) (((select) & 0xff) | ((umask) & 0xff) << 8)
-> +
-> +/* Intel Pre-defined Architectural Performance Events */
-> +static const uint64_t arch_events[] = {
-> +	[0] = ARCH_EVENT(0x3c, 0x0),
-> +	[1] = ARCH_EVENT(0xc0, 0x0),
-> +	[2] = ARCH_EVENT(0x3c, 0x1),
-> +	[3] = ARCH_EVENT(0x2e, 0x4f),
-> +	[4] = ARCH_EVENT(0x2e, 0x41),
-> +	[5] = ARCH_EVENT(0xc4, 0x0),
-> +	[6] = ARCH_EVENT(0xc5, 0x0),
-> +	[7] = ARCH_EVENT(0xa4, 0x1),
-
-Please do something like I proposed for KVM, i.e. avoid magic numbers inasmuch
-as possible.
-
-https://lore.kernel.org/all/20230607010206.1425277-2-seanjc@google.com
-
-> +};
-> +
-> +/* Association of Fixed Counters with Architectural Performance Events */
-> +static int fixed_events[] = {1, 0, 7};
-> +
-> +static inline uint64_t evt_code_for_fixed_ctr(uint8_t idx)
-
-s/evt/event.  Having consistent naming is more important than saving two characters.
-
-> +{
-> +	return arch_events[fixed_events[idx]];
-> +}
-> +
-> +#endif /* _PMU_H_ */
-> -- 
-> 2.31.1
-> 
