@@ -2,216 +2,307 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF1E9740A17
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 09:57:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB05A740A20
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 09:58:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232128AbjF1H5p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 03:57:45 -0400
-Received: from outbound-ip7a.ess.barracuda.com ([209.222.82.174]:58966 "EHLO
-        outbound-ip7a.ess.barracuda.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231419AbjF1HzN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Jun 2023 03:55:13 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2108.outbound.protection.outlook.com [104.47.58.108]) by mx-outbound-ea15-94.us-east-2a.ess.aws.cudaops.com (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Wed, 28 Jun 2023 07:55:10 +0000
+        id S232396AbjF1H62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 03:58:28 -0400
+Received: from mail-co1nam11on2125.outbound.protection.outlook.com ([40.107.220.125]:49612
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231593AbjF1H4F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 03:56:05 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eoMdz46ehLEsEusQRqidDoSR6Wy2gXJiu1/+e76Vwuor8pJ0/QRjkASvMhbg3OZIWWpHOzQn+aRFGAq3lgYqut3Pp4USIG5PzLQyglr+iRqYHI+NJjLokB3gdlxOF81zjLgGqDb41h8P8sa+sPDfUtjCmgjkwoMD+zu/3Izfhgb+G0H3+VcztNUgPtuJoGTDbBQ7rTZ+BDa0csRxd/qmmWRfeggr3U69shHBo1oFJValvFkK2+YiqFzSmUkkZy+HIK3n+3le97qUsPadTqbM8PnoEu8xxkGfk1TpbSOoFa6JqMtbk0g7nloazi1D6Cr6CfNFVFj5bJ7DdxXV7u+moQ==
+ b=fIHh0fmnkD/kTTs4gFl8CITc7ubsSsJDRbWf39KyAFQgU8wpMrKlTiPruGI2k8J4sv6ble//hhOsZLYKbzhLP1eiqome64LVf3VtCE/gkW7xvRZc+s6yKvOJaT4kZ7wl94qO7xQxQdcUNazvcLa+Uqn1ohDxRjkOmnoR19VWgS/ZbzgQREEXWGYHBrDC/lLUm7egholm2DNuWnLGFL5DrrUW3V1XDuM+OdysmEwDrTCDavUpkO/UVVWV/3sX/BECXyQHcQpQewQZFIerQZi4jW9ESQ+VxqE0iKnuLrZubUAWK+ChP2a9DmNgwPA6fA/u0PbygRu8GOl7HjBaPLe6lQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Wpkr5HQR/3UKw9Mrv3wM4ePxX7APx1l1v6UxLpgpJBo=;
- b=oRcYaXBBK8SPIP/G1TIP43F5GBilWa5WXeRpWzrT8KQMo5oF0qTlN9V5aacUzgrIWmqj89q1wWOEeWQN44Z4KDtY2Dakztnr+sg6z08Bot8J2Wkxuclah+JarMHTXhTPl3hFCgtOIvYieoAnAbPJKLQq7ce8WOalFmZCW60BqYpA3J5JJitONAUZA+yJ57zlXsMLlWD9rbS1qIcSnYUkXsNm2XwVUesmXVkufUAMkwFmVdyg+0GvDrwAiKxLv0PfTjlAZSG0QLANnJnKSGn7ld611SFpW/QeP0ckrR8C+37GBxe5Sk1Y7tnmP8oXp0YrtRcrbLkTkDqgQ4VOLv+5lA==
+ bh=xWORmrHUDzGBSJeACCmrj+uLoiYqlpO7QwVKdhVOV5E=;
+ b=SFCFlbIdwPSn6u/1IxVjO3s2ZipUhvcXsSfCWGo6VPVr1AU7K8spFaGrXOOzowpWYLMbT+ZjvGlgJgZeHmH3qD2MigaLrxTS7/Y2Rdsk2MghmzghPkQUrIH0hQuzCheQdmn6Kx82h28YtTUUH05VljKn3w2V9IvmOzkwS6GrxTODCUzyngAr3Jqjk18IcIpVQZ+i55MlnO3MDwJ4VXAVQN0A4PFRl8cHGYuUnqyPwXooa1/0Z+iuD176ROWQmM01N6wfHC32z+iA2MBVDBGhiEKRx3bRYfa3xeYz8NwjgDSMJQ70PkEkHIHZpL3BuSocEYUHN9AoixTPwimBE2wYBg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=ddn.com; dmarc=pass action=none header.from=ddn.com; dkim=pass
- header.d=ddn.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ddn.com; s=selector2;
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Wpkr5HQR/3UKw9Mrv3wM4ePxX7APx1l1v6UxLpgpJBo=;
- b=nvZ6CV3CRdv0FzgoJT09vXaDS3nfSuJPaGWhp7htdz9ZadeTRn8OxVeHHmww8DjVGNmPgU7VTXAMkchZ7cWa4Pfin6K4nENtdPyVvCJ8vKvSsGQcuhiMnPc+tZTQpS0wc/bCcBsr5o3tMY1vqnHDefi7MHX9jkuR63pHKJHO8/Y=
-Received: from LV8PR19MB8249.namprd19.prod.outlook.com (2603:10b6:408:191::12)
- by CO6PR19MB5353.namprd19.prod.outlook.com (2603:10b6:303:144::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Wed, 28 Jun
- 2023 06:19:52 +0000
-Received: from LV8PR19MB8249.namprd19.prod.outlook.com
- ([fe80::a05d:58f5:99dc:75ef]) by LV8PR19MB8249.namprd19.prod.outlook.com
- ([fe80::a05d:58f5:99dc:75ef%4]) with mapi id 15.20.6500.045; Wed, 28 Jun 2023
- 06:19:52 +0000
-From:   Roman Bolshakov <rbolshakov@ddn.com>
-To:     =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Alexander Graf <agraf@csgraf.de>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Paul Durrant <paul@xen.org>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Cameron Esfahani <dirty@apple.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 01/16] MAINTAINERS: Update Roman Bolshakov email
- address
-Thread-Topic: [PATCH v3 01/16] MAINTAINERS: Update Roman Bolshakov email
- address
-Thread-Index: AQHZpsMheyi/SuGliUuOPtsU0HotzK+fw5cA
-Date:   Wed, 28 Jun 2023 06:19:51 +0000
-Message-ID: <c2fda5c9-56c6-8d8d-c3de-287c4f31b97c@ddn.com>
-References: <20230624174121.11508-1-philmd@linaro.org>
- <20230624174121.11508-2-philmd@linaro.org>
-In-Reply-To: <20230624174121.11508-2-philmd@linaro.org>
-Accept-Language: ru-RU, en-US
-Content-Language: ru-RU
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=ddn.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV8PR19MB8249:EE_|CO6PR19MB5353:EE_
-x-ms-office365-filtering-correlation-id: 363550ed-5cd1-490f-6c65-08db779faedc
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: OxR44FwCmEgoxDRsdH/NgqalO+BB/vao4G62Fuc8gDS+M1pdiBlIgJaZe6XrzWdOyUx2P8SEDI/0drTc4Z+BZ6TtAykS9QIYwREXNa8KbTvVnM2QODgO+jok80rlopvblukfy5LTQgvXYlfTC/8sEK4IqQwB1X287Y5XAJAQUSqVZ41mlEZFdKSaWi3VZ2LMjjlJhSRjs/fjNGTMuEIG+upmUOypl1fSEtmZE547FQJlE3mG+ywzc0Qpv0dwEsDD/rsyDQLSjppRlBVLWwRbV3yIoeIyfj4WM0gE8Wmkwk+rc0oqroHJf0D8MuctvCFjTW3ZazdcvTYV80TO8EngcLqT7eZ+Ex5QJ4LMJ15d+QlgKV8D348lQ+0k5Bv+PYecwhaZ7IFGuUeKMlqYBV8FuoSpJye8PKWyfboyBaORCY0n944eYflmnvX1fqP01MQh0rAJ6jii2yv9E7QCD1tyoBKuE35Ay6dMJLsltWYUY6Qd9Ms1PQzHgqjq7bQfCPHIHQWUz9rMi3SFw5f9XHeB21zgewuRLDsTQe5KepBbUX+OTFzydR/V3aUPmPSyy6LIooi+nTfJM7HSc3pnmQvoSLaKSVOJDDFv2qyWYTxPC30cqmP9AIerWF2B2MnqSFrOh4MsyqD3+6bMN1GVFogoZg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR19MB8249.namprd19.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(136003)(39850400004)(346002)(376002)(451199021)(6512007)(66446008)(31686004)(38070700005)(26005)(66556008)(66476007)(122000001)(5660300002)(7416002)(66574015)(86362001)(8936002)(41300700001)(4326008)(316002)(8676002)(66946007)(76116006)(64756008)(31696002)(38100700002)(110136005)(966005)(36756003)(6506007)(6486002)(186003)(2906002)(15650500001)(71200400001)(83380400001)(54906003)(2616005)(478600001)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RVNRcitVREYwbzBneEdlelhUT2JocXM5MG9nSWI1c0d6RnZ3SmR1c3ROSDEx?=
- =?utf-8?B?aFVIbTk4M0h6QTlXSCtOZVk5ZlZ4RTRrbDIzUkRpUXlZQ0F1L2R0RXZPaUNN?=
- =?utf-8?B?TXBjSlp3WFRUcmR5QmQ2OGJkZ1Q3akZxWVBuN0t4MnlQc0RrNXlLUm5vL2o5?=
- =?utf-8?B?Z3dJS3NjVGF6NVdxWVBtaGhxMjlaME4ydjlLTEtxZjMwMjU1SkpaWEVGNlhX?=
- =?utf-8?B?TG1WUmFab1N2K3NNUVBldVNTdWRTZDllU2c5Z2JWVGdzV1Q3eUNsWWY3cTZG?=
- =?utf-8?B?YWxwZ0xOUEgwYnJyVGxoWFBNOXZXZGJQaE5UNm93Zk9MYk5XZ2Q3dUFLZ2M1?=
- =?utf-8?B?V0R6bEx6bXE0TVhhWTR5N05IMVBlc25uSlpDVWZKb2pyOHdkT1NCOEdBanhw?=
- =?utf-8?B?WkhhTExCMktoRGVrRlVCMHNVYnRySFc2SWpteFl2MEZLVEVENzc4SjJGU2Fl?=
- =?utf-8?B?ODBHNlZtSlNGS1RVRDNJdjZrL05JUUlJTkdPNmJ4ZjF1OTVoSm1WbCtuaUYx?=
- =?utf-8?B?QndRRmFKUVUvVmRLREV6WFJ4T2xuQ2R2djM0bWNPL0JHL2ZZMjgwbGx3T3dH?=
- =?utf-8?B?NHJLbFNUUGpBV1psSEZLUm1OWjY0TnQzWTMwM1lMZWp1YStNUzc4QU9wci9y?=
- =?utf-8?B?Tlc2TW40QzNja01RWGduY0ovQmJwWndDdXNpdlBKdTZ0RnhYYm8rQzZBZU1u?=
- =?utf-8?B?M3VhamxOSWhtQnpLaVZVelAxbzNHeE9laTRHWlMrM2hRZGxiRGZCUFlCb1pJ?=
- =?utf-8?B?clVMa3NFSjF1c1ZZbE44NVJyL2sycDk0dnQ3QytMc3VkTHZybzRsTjNBa2Q3?=
- =?utf-8?B?Uk9WS05DeTFPdVpxTGZPbmNBS25KWVNML1FVSlpmZVFFMFg1YktkMHc4cG9X?=
- =?utf-8?B?d1NFMXlxNDUvY0Nyck90WnBmditLTmxUS1kxazdBQUNYNW9JVEhOS3o5R0s2?=
- =?utf-8?B?ZHNvSXJUWXdCWGVHYmdoODd2ZFlxMTR0TjdSdGI1eW9QQWE2eUszWHB6a09S?=
- =?utf-8?B?MDhId1ZBNzN6VWVNOFZVTXVKYUk0YVBRb0VqelFIL29NNDJrL0cwL1BHeTNw?=
- =?utf-8?B?NVNTUlJEWXZ1cUphdjRudEpudFI0R3l5MVI1RkdZTWJBZU9NQ042VG5MWGlh?=
- =?utf-8?B?SDJiaTdJRU1ObkZkQlQxSUVKOUl5alJxMjh1MGswMDRCTFZ3dVRmekJjZ0ND?=
- =?utf-8?B?Y1cwcUNXL1hkVEFxUzExdmwyV0d3bktRY0FDWVczVFdIdTFUUzNuZTBjV1dL?=
- =?utf-8?B?cGI1MGdtTUhwajN3Z3hiem81L0tJaFlkYVVtTlpkSGlXS1l5TVozUVFwTkxB?=
- =?utf-8?B?RTZJSW9McndqZXV2NHNjaFJWNk9zdTZyRi80YUphbW9Ja1hCMXN4R3VCTTlw?=
- =?utf-8?B?N3NyVHNiZ3FidGE4dERMbXNwS3JBN1hBdWozUHBZWSthaG85cWVUUTkvVXBW?=
- =?utf-8?B?QSszTDhGclFPR2NGd2dVZnk4L0MyQXpNRGRSNE5TTG92WTJjM3JlN0dPaDJH?=
- =?utf-8?B?VXlNeVVFc1NjcURpVmVLT2kwOUtONnlXcGpjUUZGSmM4dUhWYXlKdmZzb1Nq?=
- =?utf-8?B?QVpKSEV3eFFIWmtWd1BzMnEyZnBQZVdFQmpBdHNMdXVCRFpVVXVSdmtsVlZL?=
- =?utf-8?B?VkV2MTJYYmtKeGpTWEp5N29GT25od2lnckFnOE1Ic1cyRTJWb2EvaEpBQzdD?=
- =?utf-8?B?SzdMSFlWOG9rVjBaYnRrK1BuNVpvang1OERINVB0MXV2WTdXK000RDY1Zzdk?=
- =?utf-8?B?VE1jWmNvQzdCR214SHBrWU1wMFVpNUM0Y0tJNGpSUUNiWXpZaTlqeHV2aWhN?=
- =?utf-8?B?SmI0T3RXeE5zczdLM1FyY1lOSFRJUXBCVGZiS1RPTE9EVTZlUVo2M1daeEVT?=
- =?utf-8?B?OTVOWDZTamF2V0kzK05mVWRGQzkyejREbHkwR1VGb0NXaXhzZzNFU095TW5X?=
- =?utf-8?B?VjNJZ0hVSE5LeDhZZDRvRm51cUhBQ1F6eVFsc3E2bHB4bFYwRVhHNjhZOFB4?=
- =?utf-8?B?MkNmZTlRMzZ3WC9uTy9wTTdYOVdJWllYNFkxdi8zVFNSc3VyM2JQVkp2Q0R4?=
- =?utf-8?B?MlBFemZzOUIyL3hRN1E3ajVBWHNsZEYxdHdNeU5XU0NhMjNGMlJMR3JHSUJK?=
- =?utf-8?Q?ovVI=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D14D5FFAF0F0C64EBAD1047B4DD3516A@namprd19.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ bh=xWORmrHUDzGBSJeACCmrj+uLoiYqlpO7QwVKdhVOV5E=;
+ b=vop5gv2qCCP6yyUAfWNoxx9IcdigzWvc0srnFOZHOJj1u1kkTdafBPXLYd6JnI4NWaJDb+XozpVVe1BBYYE+N9dQH1t7xZwFEk7tHtfdmhqkoE+WMir2Wdtw01BR4gIIUvHT+/ychsk9hF1L/CurbdZBn2xZpNJn+49rwu/xgq8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
+ BY3PR01MB6708.prod.exchangelabs.com (2603:10b6:a03:363::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6521.26; Wed, 28 Jun 2023 06:46:06 +0000
+Received: from DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::88ed:9a2b:46b7:1eb0]) by DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::88ed:9a2b:46b7:1eb0%6]) with mapi id 15.20.6521.023; Wed, 28 Jun 2023
+ 06:46:06 +0000
+Message-ID: <f19bb506-3e21-2bd6-7463-9aea8ab912f5@os.amperecomputing.com>
+Date:   Wed, 28 Jun 2023 12:15:55 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v10 00/59] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Eric Auger <eauger@redhat.com>
+References: <20230515173103.1017669-1-maz@kernel.org>
+From:   Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <20230515173103.1017669-1-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR05CA0072.namprd05.prod.outlook.com
+ (2603:10b6:610:38::49) To DM8PR01MB6824.prod.exchangelabs.com
+ (2603:10b6:8:23::24)
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?dEpOWkR4ZGxtdVpoVTlXNjUxQzE5Q1dycUpyQ3pPWHNjc01NRllIa25LZ2Fq?=
- =?utf-8?B?K3kyMk1zazR2di8vVE84enZuTXl5cVBtOTROeDM0aUUrZGRqcnNyVzFzWmVP?=
- =?utf-8?B?eE9mS3czMmJzVU55ZGkzYVZNYTlIWXFzRkVKRXIvZHFwSzBDVGN4SjlxWGpV?=
- =?utf-8?B?K2lKU1Bmc3ZBdjg0ZDhXVWFmMDBDTkQ5ZDJmdWZhbnZrTUVtblNaWFVxNG1q?=
- =?utf-8?B?VzF2bmg0V3U5SURUOFd4cUJpSXVRZFQ2d3RwV2RZR2daYXdrWk50Ty8rU2Nm?=
- =?utf-8?B?UHY3SnNDRHJ5aHFrdElqTC84bTYvLzR6TWpvV01yL21VRUtLRThhZXRsaUV4?=
- =?utf-8?B?clBuTmJLdndQT1lPL29ISFhXamxiN2pDbWY4aEd4QWpTS2tTQWJybnZGbG94?=
- =?utf-8?B?aENBVTdQbXJlQXBJdmRWME8wcHpxRnZtT1ZFU0NNVWZJMHgvZTJzS2lxdlZ1?=
- =?utf-8?B?ZkJwNTJZMm84NnZXakdEcm5PSFNReVkxMHJxQlVLTnl1T0h6cVdENFd1dEdM?=
- =?utf-8?B?THJNR3A0M2ZtME1qeXhncG1HU3VOV054NHlGZW5BdEp2b0xsTTg3SmVoREZx?=
- =?utf-8?B?WmdYOWJPTGRTVVZJWEMreWdSMnBWQkoxODdHay90YURaV0d4ZjdPQnZnWlRj?=
- =?utf-8?B?YXhOZnNXUUg5cjRPWU9pSmtvVGVYYzFNazBIRDlUL1p6a2xBMGNvdGFoY2Ni?=
- =?utf-8?B?ZWxMRHc1NDdwWnRqcEJXb3BDeGxxbC9WWFI0SCtIVSt5SFBNUStmZXJMNXNP?=
- =?utf-8?B?SU5wSHRCc29IYlU0NTEvMmZyRmxrR21LTWtUQjJtTFVPeXl4R1FuWG1HZUxh?=
- =?utf-8?B?SGthcEp4WlBjZXlOV1FHYUlWam9hZk1NYjh4bEVhM3NadmxTWnNWM2VxYnNi?=
- =?utf-8?B?OVJ2NVVhdG8xVGRVMU9kU0UxQ1V6VGw4bWZVUmNtSkJvWHRiRzRlb2RSN1NN?=
- =?utf-8?B?bmQzOUdja3k1RlhDcCthNE4yOENPbEhQazJyZDBtSGNDMm50bENmdnlGMVdM?=
- =?utf-8?B?MW82VC9USHJuMzZXYnJwaHdxdmlQL25OemxuNnY1OXpwM2JWQnlOT1dkdGlQ?=
- =?utf-8?B?b2Z2eGZGcFltWDh0TEFXYlVQVVpwMkhNSnFBcEJCZ1JNVlkvUll0THVoRUF5?=
- =?utf-8?B?eGxBRWt1eTdIbEJwZGZsbURsdGdrUW5TdHBhZEE1L0VEOGZmcFZZZHFpblRo?=
- =?utf-8?B?UnE5eFQ2ZnZGb2t6TDMwZXBZWFRhLzZBbUpqVTVsQUJVYWNyaGF5dnlMNVRY?=
- =?utf-8?B?c05vMnRVYkdTZmlmck55UEdsRE9ReXNkUzloL1ppdXF5SVIvV1MrNC95NWpo?=
- =?utf-8?B?Qy9md3Y0OWQ3dWlsNjA2TGxRT09YVnI5N2kwSU5Xbno4Z3ZjUjB6aWx1SytT?=
- =?utf-8?B?TDREVUNiR1I4RXZQTHF3QnhWZkZWWmJuNEd2Skl3WEIxR2NibjQ4a0tJS0Jl?=
- =?utf-8?B?cnJHRnpXdHUzMXFJN3BJd1FQaXcrWGcrZ25HZnlod0dzOUlibFF0TCtoOG1X?=
- =?utf-8?B?cFgrV0lRMlpCNlpGREN4cW5EaStHNzFwWXROeFRaT1BuYUFTRlRzMEpQYkl4?=
- =?utf-8?B?Tjg5WjVHVmNodmpDVnd6aVJybmxWMFFwSGZZeTFvQlcxdXg0S1V4bGZ2TlRu?=
- =?utf-8?Q?fnNWRgVBGcTsqP3Et6w94esh1XXYp2IEiBfVG1eylizk=3D?=
-X-OriginatorOrg: ddn.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|BY3PR01MB6708:EE_
+X-MS-Office365-Filtering-Correlation-Id: c0b4b847-83a2-4e0e-6af0-08db77a35841
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: EmBUl+1jD8X/31gXYCzjnPGzAepZOmqffouXVSW0NF/mZFskiEDTk27vZwLu/yFR+CP5aBtXdJwsDM76sre0czu/RYhVNZksKCfcOeiJ5eMUeRHjPyh3rfg+vBdxXSxbFPIUfz5gsZefZMpY4fBUnrzmF8Tugvve//AzVZ8VnAm22fghP98ZaQZXhZ+pj2StzmHD/0JTAywY4aPpD7BW2iiv4OptnYpfNljhj1SGcsRiuY5Oxk730P85+QSUDvS3UeIlpJp6jr3pmjm42CZULytRWTFmRpHB0YphAIppCnOCstxJzsCXU6gaVMlRHCTzq+GwPYUja1jfhmMhmfY/1GM1VTPdCBrdq7AV77AU7ou0z3F1LeL2fKrBhVs8+cjROimiGoyVM9CilQ1T5LH/GEbARKSZqoFPGt/blczNsNcQHArV+pODq7Up91vrDSVL8Vyo3YswNA230f3PQ19qFhdUv4CnvR2ggwnOJecxta6dIcvMfb37tTOykTPjGH5vzg5AZLdCMxEmhCg7XqIaYZRVdmgZecz3NaomSD9pGwwX6sqaXPlQVAewzNrQwoNvT6flQmGKucqpFwBKk5QzY6EkfsLKCRXqYqBaobYAhoAI8oMp4omejRYPIfnZy9L9gW35Eu4h6DEpGresXN0H4A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(39850400004)(396003)(346002)(136003)(451199021)(31686004)(66899021)(53546011)(7416002)(5660300002)(86362001)(8936002)(8676002)(66556008)(41300700001)(66476007)(38100700002)(316002)(4326008)(31696002)(66946007)(966005)(2906002)(26005)(186003)(478600001)(6506007)(2616005)(6512007)(6486002)(83380400001)(54906003)(6666004)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ajNJRWVQeWllVFpDM2IxTkUyNWZXTGxFTjNreHNVSkZXdTBCb1d5VkVud2Ja?=
+ =?utf-8?B?eXNNaEZJWVFLK3ozSjVUdW5OMmlvTUgzbVlxWjd0Y3lyTnd0bmNyN3hmQlhH?=
+ =?utf-8?B?TGRlekM0a20yZDJaYnZSZEZUTThBSjdrbWFHd3hwdVAyK2xnS1lrNGRGVXgy?=
+ =?utf-8?B?cWNuZEJZN0luS2Fhb1pmNkVZSG9CYUFCSTd4cVN6TEgwaG9zYzFaWFV3TnQ0?=
+ =?utf-8?B?NXNWTGRQY1QvMExvYm9MYld6VFFReW5Ga3RpbUFoVURrMXhJNWZlTmZFUTls?=
+ =?utf-8?B?ZVk3b3RwMis2U1VNaHRmSFF1aVprcGNvN2p0M2xYUDdMSFpJemptU3p3MTNp?=
+ =?utf-8?B?TUZCNmZFWldzVjB1YUZNY05DdDZLN05JUWs4OFNYV1lvOGwzVnZsQzdEaEIx?=
+ =?utf-8?B?ei95Y2phZFRuQkREdWs0NlVpQVg5NG9tMmdpOXNKeW1yYTJtQ1JxSVRCcmJY?=
+ =?utf-8?B?R2IxL09sSnhtaXlRVVB5cndwVkhXOTVEK3NWMFl6a3NtZXA3bWdjTHdrTzdF?=
+ =?utf-8?B?VWpBSDVPN2MzRUVzN0tLTWNRMXN2dDRwWExaRXhTQTZ4WXZ0OGR5aU53MzdK?=
+ =?utf-8?B?cFFoYlp3WFYraEZMSStnYzlyQ0tvdFNWaFVwbVpjMFM3emVGc0cxNS9wZHRJ?=
+ =?utf-8?B?MUtBM3pXeDFFQUIxMjhuWm1iTDFOaUVxNVUyUll0dmc0c3RHdTFoUEZKMFdP?=
+ =?utf-8?B?TExVMklRdmlYK3QraEVrVllNN0FnOW5TdVdrWjNRMXhYcGhJMGMrUGRHU2ly?=
+ =?utf-8?B?SnZrb2FoUmFCQzY5RDNpYVlMWE01aFBoTUVlOHpJUHpIMEdLMjBNSWVvYUM3?=
+ =?utf-8?B?Qk8vaEpiUFp6eTVvRHFyM2VaT01TcDV5WkFOU3ErSzE3Mm9ZZndRcHZCLzcy?=
+ =?utf-8?B?OUxnU2Y5dDRxcm9XdXdybk1rYytkdmV1V3cwWnA3WE93ZzQ2dXFMRS9NNEpt?=
+ =?utf-8?B?RHlsTkIzMWRWWmhlb3lVL1MwdGRNRkx1ZWJkNG0xSlNCelVMbzRjNlRwK21y?=
+ =?utf-8?B?ci9FSmZtYjVRWXVabzR0bzljaW5WTE1hZzUzQjhRZEtRNWdDTHdmNnBybit4?=
+ =?utf-8?B?U1BFT3ZNZThQRzkzYzY3Z2QyWnZlNGQzYytYWVpoWEtqREV5L0lGM2JKRlhC?=
+ =?utf-8?B?a0hSY0ZrT3BVditMZStMcFQwcUZNQjRhbmtUUUhDRENsRXlGUitZT0plYTlL?=
+ =?utf-8?B?bDJKSC9oQXZJVlFvSHY2elFCd2RjOXJYRjFreTJLd3JpSGpjcDZZK0p2MEM4?=
+ =?utf-8?B?ekQ3NXlQWm1nZ1hXaEpjRFBWK3I2MXp5dXRhQ1VtbnR2NmFZSFZYRkt3VzVT?=
+ =?utf-8?B?TWoxdWE2VENjMy9qeVkxc2xFL2d1N0hGVG9RalNhanE0NnVVK0dNR0c0RUlh?=
+ =?utf-8?B?Vk4zZ09EYUUxQTNybUtuZUFhZHRHdHZZU0VaRGZyKzUycFBtN3d3c3VlcHd3?=
+ =?utf-8?B?bDU1MVhsZThkU1IyZUx4ZjJtNzFBL2JUSXFKbjRvTkU3RlFBQUN6cklOZWo1?=
+ =?utf-8?B?ZlNJeThFZ2VQL2RXUFNrZFNaTW9ERytxZEtXT0R2N2FrTncrdlkvTzd1Y1ov?=
+ =?utf-8?B?Njc1eXN0RzBuMlNYVENnRi9qK2NvZWNzUnZtanloNERoc1ZmaXhSUWc2N3F4?=
+ =?utf-8?B?eHVLcDlKdzlUdmFFQ0g2OXBuZW9hNCtvQXJYVUovUWs0eUdoeUxHRTRFZTB1?=
+ =?utf-8?B?UkJZMFdEc1FsVW9LNUxUajJKS1FKQlhsUHBBZzNLeUVrdi9QbWdIelZxVWhZ?=
+ =?utf-8?B?dzByL1pHcW03UnNnNHZVaXFYM2FuVys1aCtBSkxBRjU0TEE4cWxWTWpFVlB5?=
+ =?utf-8?B?TDRybDJvOTlicENWd2tFL05DcHJmREljRmFwaC9KaHFMbEVwSUI3bzE2Q3Ir?=
+ =?utf-8?B?Um9Nc2thTGI3R3h5QzJWai82Q3JPRU5aaHRaZngxOCtNSUJHT1gvdE5BRmlW?=
+ =?utf-8?B?bksrUzZTeTBVN3dML2g1UnN0anFpSjFnRzBOcStPditJaDRWK0ZGd2xZZ3Vr?=
+ =?utf-8?B?cWl3Tk9ob0RMK1BDbHp6eUp4aW4zbjFuYWpxSFZnSXZBWm9HVSsrTGc4QjA1?=
+ =?utf-8?B?T1AzUDg0QUhackxqK3hOTEZtQ21RajNDL2trck9iSkJrK1A3NWZmU0hBdDZ1?=
+ =?utf-8?B?Zmhxby9nNkpBMlBYL3dHeWpFSmJibW1iTGRaYlRXMWxuL0ZTTzREUGE1RG91?=
+ =?utf-8?Q?LWZxXF/CgPJX5hlO/0nbGM8GH36l/QEpI88LWoTXfWzO?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0b4b847-83a2-4e0e-6af0-08db77a35841
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR19MB8249.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 363550ed-5cd1-490f-6c65-08db779faedc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2023 06:19:51.9759
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2023 06:46:05.5757
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 753b6e26-6fd3-43e6-8248-3f1735d59bb4
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: txC4pu41dSOMYjTTPu/qICBOQjD5uW9hn4P8EKJ3TvNtIWtgc9OV71094kj45jtcMXrwVzECiMpc4uWp4bfQ5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR19MB5353
-X-BESS-ID: 1687938910-103934-7346-2021-1
-X-BESS-VER: 2019.3_20230620.2124
-X-BESS-Apparent-Source-IP: 104.47.58.108
-X-BESS-Parts: H4sIAAAAAAACA4uuVkqtKFGyUioBkjpK+cVKVkYGRoZAVgZQ0MAwJckyKSXJNC
-        nZzMzCwsIsJdHIwCIx2cg4KSUxzcJYqTYWADYob8lBAAAA
-X-BESS-Outbound-Spam-Score: 0.50
-X-BESS-Outbound-Spam-Report: Code version 3.2, rules version 3.2.2.249134 [from 
-        cloudscan14-0.us-east-2a.ess.aws.cudaops.com]
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------
-        0.00 BSF_BESS_OUTBOUND      META: BESS Outbound 
-        0.50 BSF_RULE7568M          META: Custom Rule 7568M 
-X-BESS-Outbound-Spam-Status: SCORE=0.50 using account:ESS124931 scores of KILL_LEVEL=7.0 tests=BSF_BESS_OUTBOUND, BSF_RULE7568M
-X-BESS-BRTS-Status: 1
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6DWp3ogmkJSFzDe95hEjkghDRS/g882ozp7q/AUyqeYH64IR3sZ1J5cQEnN3B6e3+T0u5FN95gLmAwWjyV0fgvHHWdiR0yJfi5+3oNQQXvwxinRofETqbxrlm+1JOBzp
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR01MB6708
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-MjQuMDYuMjAyMyAyMDo0MSwgUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kg0L/QuNGI0LXRgjoNCj4g
-ci5ib2xzaGFrb3ZAeWFkcm8uY29tIGlzIGJvdW5jaW5nOiBVcGRhdGUgUm9tYW4ncyBlbWFpbCBh
-ZGRyZXNzDQo+IHVzaW5nIG9uZSBmb3VuZCBzb21ld2hlcmUgb24gdGhlIEludGVybmV0OyB0aGlz
-IHdheSBoZSBjYW4gQWNrLWJ5Lg0KPg0KPiAoUmVvcmRlciBUYXlsb3IncyBsaW5lIHRvIGtlZXAg
-dGhlIHNlY3Rpb24gc29ydGVkIGFscGhhYmV0aWNhbGx5KS4NCj4NCj4gU2lnbmVkLW9mZi1ieTog
-UGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPHBoaWxtZEBsaW5hcm8ub3JnPg0KPiAtLS0NCj4gICBN
-QUlOVEFJTkVSUyB8IDQgKystLQ0KPiAgIC5tYWlsbWFwICAgIHwgMyArKy0NCj4gICAyIGZpbGVz
-IGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4NCj4gZGlmZiAtLWdp
-dCBhL01BSU5UQUlORVJTIGIvTUFJTlRBSU5FUlMNCj4gaW5kZXggN2YzMjNjZDJlYi4uMWRhMTM1
-YjBjOCAxMDA2NDQNCj4gLS0tIGEvTUFJTlRBSU5FUlMNCj4gKysrIGIvTUFJTlRBSU5FUlMNCj4g
-QEAgLTQ5NywxNCArNDk3LDE0IEBAIEY6IHRhcmdldC9hcm0vaHZmLw0KPiAgIA0KPiAgIFg4NiBI
-VkYgQ1BVcw0KPiAgIE06IENhbWVyb24gRXNmYWhhbmkgPGRpcnR5QGFwcGxlLmNvbT4NCj4gLU06
-IFJvbWFuIEJvbHNoYWtvdiA8ci5ib2xzaGFrb3ZAeWFkcm8uY29tPg0KPiArTTogUm9tYW4gQm9s
-c2hha292IDxyYm9sc2hha292QGRkbi5jb20+DQo+ICAgVzogaHR0cHM6Ly93aWtpLnFlbXUub3Jn
-L0ZlYXR1cmVzL0hWRg0KPiAgIFM6IE1haW50YWluZWQNCj4gICBGOiB0YXJnZXQvaTM4Ni9odmYv
-DQo+ICAgDQo+ICAgSFZGDQo+ICAgTTogQ2FtZXJvbiBFc2ZhaGFuaSA8ZGlydHlAYXBwbGUuY29t
-Pg0KPiAtTTogUm9tYW4gQm9sc2hha292IDxyLmJvbHNoYWtvdkB5YWRyby5jb20+DQo+ICtNOiBS
-b21hbiBCb2xzaGFrb3YgPHJib2xzaGFrb3ZAZGRuLmNvbT4NCj4gICBXOiBodHRwczovL3dpa2ku
-cWVtdS5vcmcvRmVhdHVyZXMvSFZGDQo+ICAgUzogTWFpbnRhaW5lZA0KPiAgIEY6IGFjY2VsL2h2
-Zi8NCj4gZGlmZiAtLWdpdCBhLy5tYWlsbWFwIGIvLm1haWxtYXANCj4gaW5kZXggYjU3ZGE0ODI3
-ZS4uNjRlZjlmNGRlNiAxMDA2NDQNCj4gLS0tIGEvLm1haWxtYXANCj4gKysrIGIvLm1haWxtYXAN
-Cj4gQEAgLTc2LDkgKzc2LDEwIEBAIFBhdWwgQnVydG9uIDxwYXVsYnVydG9uQGtlcm5lbC5vcmc+
-IDxwYnVydG9uQHdhdmVjb21wLmNvbT4NCj4gICBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSA8cGhp
-bG1kQGxpbmFyby5vcmc+IDxmNGJ1Z0BhbXNhdC5vcmc+DQo+ICAgUGhpbGlwcGUgTWF0aGlldS1E
-YXVkw6kgPHBoaWxtZEBsaW5hcm8ub3JnPiA8cGhpbG1kQHJlZGhhdC5jb20+DQo+ICAgUGhpbGlw
-cGUgTWF0aGlldS1EYXVkw6kgPHBoaWxtZEBsaW5hcm8ub3JnPiA8cGhpbG1kQGZ1bmdpYmxlLmNv
-bT4NCj4gK1JvbWFuIEJvbHNoYWtvdiA8cmJvbHNoYWtvdkBkZG4uY29tPiA8ci5ib2xzaGFrb3ZA
-eWFkcm8uY29tPg0KPiAgIFN0ZWZhbiBCcmFua292aWMgPHN0ZWZhbi5icmFua292aWNAc3lybWlh
-LmNvbT4gPHN0ZWZhbi5icmFua292aWNAcnQtcmsuY29tLmNvbT4NCj4gLVlvbmdib2sgS2ltIDx5
-b25nYm9rLmtpbUBtaXBzLmNvbT4gPHlvbmdib2sua2ltQGltZ3RlYy5jb20+DQo+ICAgVGF5bG9y
-IFNpbXBzb24gPGx0YXlsb3JzaW1wc29uQGdtYWlsLmNvbT4gPHRzaW1wc29uQHF1aWNpbmMuY29t
-Pg0KPiArWW9uZ2JvayBLaW0gPHlvbmdib2sua2ltQG1pcHMuY29tPiA8eW9uZ2Jvay5raW1AaW1n
-dGVjLmNvbT4NCj4gICANCj4gICAjIEFsc28gbGlzdCBwcmVmZXJyZWQgbmFtZSBmb3JtcyB3aGVy
-ZSBwZW9wbGUgaGF2ZSBjaGFuZ2VkIHRoZWlyDQo+ICAgIyBnaXQgYXV0aG9yIGNvbmZpZywgb3Ig
-aGFkIHV0ZjgvbGF0aW4xIGVuY29kaW5nIGlzc3Vlcy4NCg0KSGkgUGhpbGlwcGUsDQoNClJldmll
-d2VkLWJ5OiBSb21hbiBCb2xzaGFrb3YgPHJib2xzaGFrb3ZAZGRuLmNvbT4NCg0KVGhhbmtzIGZv
-ciB1cGRhdGluZyB0aGUgZW1haWwuDQoNCg==
+
+Hi Marc,
+
+
+On 15-05-2023 11:00 pm, Marc Zyngier wrote:
+> This is the 4th drop of NV support on arm64 for this year.
+> 
+> For the previous episodes, see [1].
+> 
+> What's changed:
+> 
+> - New framework to track system register traps that are reinjected in
+>    guest EL2. It is expected to replace the discrete handling we have
+>    enjoyed so far, which didn't scale at all. This has already fixed a
+>    number of bugs that were hidden (a bunch of traps were never
+>    forwarded...). Still a work in progress, but this is going in the
+>    right direction.
+> 
+> - Allow the L1 hypervisor to have a S2 that has an input larger than
+>    the L0 IPA space. This fixes a number of subtle issues, depending on
+>    how the initial guest was created.
+> 
+> - Consequently, the patch series has gone longer again. Boo. But
+>    hopefully some of it is easier to review...
+> 
+
+I am facing issue in booting NestedVM with V9 as well with 10 patchset.
+
+I have tried V9/V10 on Ampere platform using kvmtool and I could boot
+Guest-Hypervisor and then NestedVM without any issue.
+However when I try to boot using QEMU(not using EDK2/EFI), 
+Guest-Hypervisor is booted with Fedora 37 using virtio disk. From 
+Guest-Hypervisor console(or ssh shell), If I try to boot NestedVM, boot 
+hangs very early stage of the boot.
+
+I did some debug using ftrace and it seems the Guest-Hypervisor is
+getting very high rate of arch-timer interrupts,
+due to that all CPU time is going on in serving the Guest-Hypervisor
+and it is never going back to NestedVM.
+
+I am using QEMU vanilla version v7.2.0 with top-up patches for NV [1]
+
+[1] 
+https://lore.kernel.org/all/20230227163718.62003-1-miguel.luis@oracle.com/
+
+> [1] https://lore.kernel.org/r/20230405154008.3552854-1-maz@kernel.org
+> 
+> Andre Przywara (1):
+>    KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
+> 
+> Christoffer Dall (5):
+>    KVM: arm64: nv: Trap EL1 VM register accesses in virtual EL2
+>    KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+>    KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+>    KVM: arm64: nv: vgic: Emulate the HW bit in software
+>    KVM: arm64: nv: Sync nested timer state with FEAT_NV2
+> 
+> Jintack Lim (7):
+>    KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
+>    KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+>    KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,FPEN} settings
+>    KVM: arm64: nv: Respect virtual HCR_EL2.{NV,TSC) settings
+>    KVM: arm64: nv: Configure HCR_EL2 for nested virtualization
+>    KVM: arm64: nv: Trap and emulate TLBI instructions from virtual EL2
+>    KVM: arm64: nv: Nested GICv3 Support
+> 
+> Marc Zyngier (46):
+>    KVM: arm64: Move VTCR_EL2 into struct s2_mmu
+>    arm64: Add missing Set/Way CMO encodings
+>    arm64: Add missing VA CMO encodings
+>    arm64: Add missing ERXMISCx_EL1 encodings
+>    arm64: Add missing DC ZVA/GVA/GZVA encodings
+>    arm64: Add TLBI operation encodings
+>    arm64: Add AT operation encodings
+>    KVM: arm64: Add missing HCR_EL2 trap bits
+>    KVM: arm64: nv: Add trap forwarding infrastructure
+>    KVM: arm64: nv: Add trap forwarding for HCR_EL2
+>    KVM: arm64: nv: Expose FEAT_EVT to nested guests
+>    KVM: arm64: nv: Add trap forwarding for MDCR_EL2
+>    KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
+>    KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
+>    KVM: arm64: nv: Handle virtual EL2 registers in
+>      vcpu_read/write_sys_reg()
+>    KVM: arm64: nv: Handle SPSR_EL2 specially
+>    KVM: arm64: nv: Handle HCR_EL2.E2H specially
+>    KVM: arm64: nv: Save/Restore vEL2 sysregs
+>    KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+>    KVM: arm64: nv: Handle shadow stage 2 page faults
+>    KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
+>    KVM: arm64: nv: Set a handler for the system instruction traps
+>    KVM: arm64: nv: Trap and emulate AT instructions from virtual EL2
+>    KVM: arm64: nv: Fold guest's HCR_EL2 configuration into the host's
+>    KVM: arm64: nv: Hide RAS from nested guests
+>    KVM: arm64: nv: Add handling of EL2-specific timer registers
+>    KVM: arm64: nv: Load timer before the GIC
+>    KVM: arm64: nv: Don't load the GICv4 context on entering a nested
+>      guest
+>    KVM: arm64: nv: Implement maintenance interrupt forwarding
+>    KVM: arm64: nv: Deal with broken VGIC on maintenance interrupt
+>      delivery
+>    KVM: arm64: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
+>    KVM: arm64: nv: Add handling of FEAT_TTL TLB invalidation
+>    KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
+>      information
+>    KVM: arm64: nv: Tag shadow S2 entries with nested level
+>    KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
+>    KVM: arm64: nv: Map VNCR-capable registers to a separate page
+>    KVM: arm64: nv: Move nested vgic state into the sysreg file
+>    KVM: arm64: Add FEAT_NV2 cpu feature
+>    KVM: arm64: nv: Fold GICv3 host trapping requirements into guest setup
+>    KVM: arm64: nv: Publish emulated timer interrupt state in the
+>      in-memory state
+>    KVM: arm64: nv: Allocate VNCR page when required
+>    KVM: arm64: nv: Enable ARMv8.4-NV support
+>    KVM: arm64: nv: Fast-track 'InHost' exception returns
+>    KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
+>    KVM: arm64: nv: Use FEAT_ECV to trap access to EL0 timers
+>    KVM: arm64: nv: Accelerate EL0 timer read accesses when FEAT_ECV is on
+> 
+>   .../virt/kvm/devices/arm-vgic-v3.rst          |  12 +-
+>   arch/arm64/include/asm/esr.h                  |   1 +
+>   arch/arm64/include/asm/kvm_arm.h              |  14 +
+>   arch/arm64/include/asm/kvm_asm.h              |   4 +
+>   arch/arm64/include/asm/kvm_emulate.h          |  93 +-
+>   arch/arm64/include/asm/kvm_host.h             | 181 +++-
+>   arch/arm64/include/asm/kvm_hyp.h              |   2 +
+>   arch/arm64/include/asm/kvm_mmu.h              |  20 +-
+>   arch/arm64/include/asm/kvm_nested.h           | 133 +++
+>   arch/arm64/include/asm/stage2_pgtable.h       |   4 +-
+>   arch/arm64/include/asm/sysreg.h               | 196 ++++
+>   arch/arm64/include/asm/vncr_mapping.h         |  74 ++
+>   arch/arm64/include/uapi/asm/kvm.h             |   1 +
+>   arch/arm64/kernel/cpufeature.c                |  11 +
+>   arch/arm64/kvm/Makefile                       |   4 +-
+>   arch/arm64/kvm/arch_timer.c                   |  98 +-
+>   arch/arm64/kvm/arm.c                          |  33 +-
+>   arch/arm64/kvm/at.c                           | 219 ++++
+>   arch/arm64/kvm/emulate-nested.c               | 934 ++++++++++++++++-
+>   arch/arm64/kvm/handle_exit.c                  |  29 +-
+>   arch/arm64/kvm/hyp/include/hyp/switch.h       |   8 +-
+>   arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |   5 +-
+>   arch/arm64/kvm/hyp/nvhe/mem_protect.c         |   8 +-
+>   arch/arm64/kvm/hyp/nvhe/pkvm.c                |   4 +-
+>   arch/arm64/kvm/hyp/nvhe/switch.c              |   2 +-
+>   arch/arm64/kvm/hyp/nvhe/sysreg-sr.c           |   2 +-
+>   arch/arm64/kvm/hyp/pgtable.c                  |   2 +-
+>   arch/arm64/kvm/hyp/vgic-v3-sr.c               |   6 +-
+>   arch/arm64/kvm/hyp/vhe/switch.c               | 206 +++-
+>   arch/arm64/kvm/hyp/vhe/sysreg-sr.c            | 124 ++-
+>   arch/arm64/kvm/hyp/vhe/tlb.c                  |  83 ++
+>   arch/arm64/kvm/mmu.c                          | 255 ++++-
+>   arch/arm64/kvm/nested.c                       | 799 ++++++++++++++-
+>   arch/arm64/kvm/pkvm.c                         |   2 +-
+>   arch/arm64/kvm/reset.c                        |   7 +
+>   arch/arm64/kvm/sys_regs.c                     | 958 +++++++++++++++++-
+>   arch/arm64/kvm/trace_arm.h                    |  19 +
+>   arch/arm64/kvm/vgic/vgic-init.c               |  33 +
+>   arch/arm64/kvm/vgic/vgic-kvm-device.c         |  32 +-
+>   arch/arm64/kvm/vgic/vgic-v3-nested.c          | 248 +++++
+>   arch/arm64/kvm/vgic/vgic-v3.c                 |  43 +-
+>   arch/arm64/kvm/vgic/vgic.c                    |  29 +
+>   arch/arm64/kvm/vgic/vgic.h                    |  10 +
+>   arch/arm64/tools/cpucaps                      |   1 +
+>   include/clocksource/arm_arch_timer.h          |   4 +
+>   include/kvm/arm_arch_timer.h                  |   1 +
+>   include/kvm/arm_vgic.h                        |  17 +
+>   include/uapi/linux/kvm.h                      |   1 +
+>   tools/arch/arm/include/uapi/asm/kvm.h         |   1 +
+>   49 files changed, 4790 insertions(+), 183 deletions(-)
+>   create mode 100644 arch/arm64/include/asm/vncr_mapping.h
+>   create mode 100644 arch/arm64/kvm/at.c
+>   create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
+> 
+
+Thanks,
+Ganapat
