@@ -2,76 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BED8740B96
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 10:33:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E45FD740C1A
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 10:59:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234668AbjF1IdK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 04:33:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41902 "EHLO
+        id S235856AbjF1I7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 04:59:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235338AbjF1Ia7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 04:30:59 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41F102D76;
-        Wed, 28 Jun 2023 01:22:58 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1b82616c4ecso8744535ad.2;
-        Wed, 28 Jun 2023 01:22:58 -0700 (PDT)
+        with ESMTP id S236304AbjF1IqD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 04:46:03 -0400
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17AD23C32;
+        Wed, 28 Jun 2023 01:38:03 -0700 (PDT)
+Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-76595a7b111so276581885a.2;
+        Wed, 28 Jun 2023 01:38:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687940578; x=1690532578;
+        d=gmail.com; s=20221208; t=1687941482; x=1690533482;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=yh3r9ozI6iCZ3HLG4svWMn5mT2ARhBSKX4nEiZrlmq4=;
-        b=b/imsmQDaFn27HHBrhikiwr7xAiNtwoMA70h3v4uflr87pwW8ysF/93zj6T51i22PK
-         wxToSlMqXi5Nby3R14gIfsd2qLfpW0YaW7xNtTmICbzhFMK/nVFiEvE/v4t3uabA33y3
-         ZFq9JP8nHNGvGiFTxQX20BHvbxTlctItCOItErwyIpD8pzs0Wt/c/BxQxIp6LvePDIDA
-         c9m9wdllcSGMjaK050Pz2TCBohFhLF5mHebGIvHGcwJgRJz8LSEZlGvsmVl0wObtMkfG
-         10qKVnGCGqg6ngLX7RoVhnNYhCmCY52N4m3VMyRCnf+WvL2BHU9frpAg/n+owoBfV/at
-         VfsQ==
+        bh=rF6Bz7DMTuAZ4V51W8Y1crpt4EI0YJzN0Fe2wfUOMT8=;
+        b=oGPFLURTsHeOhOROYv+AiC7F+iMbvg3TYANxlCnBPFXvTmwlsuOM6GBbWTtmfl5j7U
+         XyH4AVUG0jcFYREUgBC2wABHm0uCyNogHWl3oX9fO8Ws2FNywcTJF9Llt1VgqEWf3GeV
+         C0K7Sfwd9HruI1eP4dyjHMQQaEoTLVcxl/Lh/S+CB+HSYOZmASpyMcSYoAVW9e4KoTo1
+         PJdeuQmTAoC4KA9DwwPQ0ZSmKB7TmFM4Ch+0ZzmHKLNL9DZxgKNvKXhDlv896+rsiS7e
+         s1DcglwjLWEN9nHUVV4HFUP95iMoRp22dkqxUOTY8yw8V4U/hWtg3SlG2TSuv+JXfnIC
+         PAJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687940578; x=1690532578;
+        d=1e100.net; s=20221208; t=1687941482; x=1690533482;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yh3r9ozI6iCZ3HLG4svWMn5mT2ARhBSKX4nEiZrlmq4=;
-        b=BGkXHyJimDK3NUxb2catyFQOt1RsZO1gjjrT2FAVWoWfzdF7FtuL7lh+Xhe4+tyaXS
-         ezYqQ6fIy1Q2ECPhtNYAxPpesJ3Gm5+GjuB5612fAUROIIGAQgwxrXGcxGDuz4v6WCXw
-         saUN5lWiwqJ1ChaOdeHorWh33jjIucCi7+tH4+bvB1+72tl3qmHexSqIoQRXsPNNU54l
-         /PUTGrMt8nVI/kKkpp+Sk1FiUpynl7QvzjtkbTdvkJDBy78fTgaiY5Xf27SThhH5xkzD
-         L9E9MwILvnikcm4RL02EnghoWvu98MoHcwS7xhykRKPg7UXIQ4VH6PXXIpWymikwJ3C5
-         tMWA==
-X-Gm-Message-State: AC+VfDxHQPWj//1dPc9j6JzNjXp8bTgDYtn+iUY25eQ7OdHgy74aESk2
-        bAob1ZwsdUwfKkR32b5LUEo088b8d5GJ7NCWtU4=
-X-Google-Smtp-Source: ACHHUZ56jGXuIEKfoHtNcofr3E73Z8afz/z8VDWxvvkxrGv1P/UUs0rOcCOidY9AJeSVk0YK++CuUw==
-X-Received: by 2002:a17:903:11c6:b0:1b3:d4ae:7e21 with SMTP id q6-20020a17090311c600b001b3d4ae7e21mr8607753plh.63.1687930673578;
-        Tue, 27 Jun 2023 22:37:53 -0700 (PDT)
+        bh=rF6Bz7DMTuAZ4V51W8Y1crpt4EI0YJzN0Fe2wfUOMT8=;
+        b=Yvn3Ob7WZeLcFRnvMaJVRzyIPvq7/ctdguvDWHe+k2Cgu/qHIqUw87HXIKOegxZTe3
+         W32MEIVwt5uk6Q/gX8KgeJ0sZObeXNIM+LSg/X/fd24n2/JYh9G1Qq0c76Qniaef0EpR
+         pQ5tnaa4wB3V/vZy673venyKXkvPkiOS0I7fn6li8f/SrfOpLUXwoL4a1+AG9mGpq8aY
+         poNdKFVxZeGa0SxhGOs5/QT3y1bfrKOW0xyRTuYqeS7+dYbTk5cbuMaii7WJYDNE/MIQ
+         F/26ijhfy6kZ7Oxj8awIM0d02682A5Ab+zhlotAzB5jjh5CALDxHi8BoFArZgvZulA1F
+         S0Pw==
+X-Gm-Message-State: AC+VfDyskTjhJl+E/EueeBvLfIptzeRU0xsgQUHSKdKxEiw96JXlL9+0
+        9Va1vG6VM9dAsESAuvJJ9K/asR5psqRqmMQSFVo=
+X-Google-Smtp-Source: ACHHUZ5eZtzChDLLbyPNhwtIrvlbjAOerwQ9f/NDGCNZrLqXv0jLyNqDQjysli3WHVeuoQQt2uQ9EQ==
+X-Received: by 2002:a05:6a20:28a0:b0:125:7a4e:ade6 with SMTP id q32-20020a056a2028a000b001257a4eade6mr13098147pzf.17.1687931455253;
+        Tue, 27 Jun 2023 22:50:55 -0700 (PDT)
 Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id u10-20020a17090282ca00b001b8062c1db3sm4310127plz.82.2023.06.27.22.37.50
+        by smtp.gmail.com with ESMTPSA id s6-20020a170902b18600b001ae44e2f425sm6820599plr.223.2023.06.27.22.50.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jun 2023 22:37:52 -0700 (PDT)
-Message-ID: <613d0cfa-e118-1e7e-b313-6c775a2daa14@gmail.com>
-Date:   Wed, 28 Jun 2023 13:37:44 +0800
+        Tue, 27 Jun 2023 22:50:55 -0700 (PDT)
+Message-ID: <2db5fe53-c316-2017-c0dc-74190d6ad9ba@gmail.com>
+Date:   Wed, 28 Jun 2023 13:50:46 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH 2/4] KVM: VMX/pmu: Save host debugctlmsr just before vm
- entry
+Subject: Re: [PATCH 3/4] KVM: VMX/pmu: Enable inactive vLBR event in guest LBR
+ MSR emulation
 Content-Language: en-US
-To:     "Zhang, Xiong Y" <xiong.y.zhang@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "kan.liang@linux.intel.com" <kan.liang@linux.intel.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>
+To:     Xiong Zhang <xiong.y.zhang@intel.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+        kan.liang@linux.intel.com, zhenyuw@linux.intel.com,
+        zhiyuan.lv@intel.com, kvm list <kvm@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
 References: <20230616113353.45202-1-xiong.y.zhang@intel.com>
- <20230616113353.45202-3-xiong.y.zhang@intel.com>
- <ZJX9WHFPdEVjRtC+@google.com>
- <MW4PR11MB5824480492ED55C63769FF11BB21A@MW4PR11MB5824.namprd11.prod.outlook.com>
+ <20230616113353.45202-4-xiong.y.zhang@intel.com>
 From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <MW4PR11MB5824480492ED55C63769FF11BB21A@MW4PR11MB5824.namprd11.prod.outlook.com>
+In-Reply-To: <20230616113353.45202-4-xiong.y.zhang@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -84,78 +78,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/6/2023 12:03 pm, Zhang, Xiong Y wrote:
->> On Fri, Jun 16, 2023, Xiong Zhang wrote:
->>> Perf defines four types of perf event: per cpu pinned event, per
->>> process pinned event, per cpu event, per process event, their
->>> prioirity are from high to low. vLBR event is per process pinned
->>> event. So durng vm exit handler, if vLBR event preempts perf low
->>> priority LBR event, perf will disable LBR and let guest control LBR,
->>> or if vLBR event is preempted by perf high priority LBR event, perf
->>> will enable LBR. In a word LBR status may be changed during vm exit handler.
->>>
->>> MSR_IA32_DEBUGCTLMSR[0] controls LBR enabling, kvm saves its value
->>> into
->>> vmx->host_debugctlmsr in vcpu_load(), and kvm restores its value from
->>> vmx->host_debugctlmsr after vm exit immediately. Since
->>> MSR_IA32_DEBUGCTLMSR[0] could be changed during vm exit handler, the
->>> saved value vmx->host_debugctlmsr could be wrong. So this commit saves
->>> MSR_IA32_DEBUGCTLMSR into vmx->host_debugctlmsr just before vm entry
->>> to reflect the real hardware value.
->>>
->>> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
->>> ---
->>>   arch/x86/kvm/vmx/vmx.c | 5 +----
->>>   1 file changed, 1 insertion(+), 4 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c index
->>> 44fb619803b8..5ca61a26d0d7 100644
->>> --- a/arch/x86/kvm/vmx/vmx.c
->>> +++ b/arch/x86/kvm/vmx/vmx.c
->>> @@ -1459,13 +1459,9 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu,
->> int cpu,
->>>    */
->>>   static void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)  {
->>> -	struct vcpu_vmx *vmx = to_vmx(vcpu);
->>> -
->>>   	vmx_vcpu_load_vmcs(vcpu, cpu, NULL);
->>>
->>>   	vmx_vcpu_pi_load(vcpu, cpu);
->>> -
->>> -	vmx->host_debugctlmsr = get_debugctlmsr();
->>>   }
->>>
->>>   static void vmx_vcpu_put(struct kvm_vcpu *vcpu) @@ -7273,6 +7269,7 @@
->>> static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>>   	atomic_switch_perf_msrs(vmx);
->>>   	if (intel_pmu_lbr_is_enabled(vcpu))
->>>   		vmx_passthrough_lbr_msrs(vcpu);
->>> +	vmx->host_debugctlmsr = get_debugctlmsr();
->>
->> Reading DEBUG_CTL on every VM-Entry is either unnecessary or insufficient.  If
->> the DEBUG_CTL value is being changed synchronously, then just fix whatever
->> KVM path leads to a change in the host avlue.  If DEBUG_CTL is being changed
->> asynchronously, then I'm guessing the change is coming from NMI context,
->> which means that KVM is buggy no matter how close we put this to VM-Enter.
-> When a perf event reschedule is needed on a physical cpu, perf scheduler send an IPI to the target cpu, LBR will be enabled or disabled in the IPI handler according to active event attribute.
-> If vLBR event is active, LBR is disabled in IPI handler.
-> If Host LBR event is active, LBR is enabled in the IPI handler, this could happen when host LBR event preempt vLBR event during vm exit handler.
-> DEBUG_CTL[0]'s changing is asynchronous in the perf IPI handler,  host irq is disabled near VM-Enter, so IPI couldn't happen, then host DEBUG_CTL[0] couldn't change before kvm enable host irq.
-> Perf event counter overflow (PMI) is a NMI, but this NMI handler doesn't change LBR status, the kvm saved host_debugctlmsr is correct still after PMI handler.
+On 16/6/2023 7:33 pm, Xiong Zhang wrote:
+> vLBR event could be inactive in two case:
+> a. host per cpu pinned LBR event occupy LBR when vLBR event is created
+> b. vLBR event is preempted by host per cpu pinned LBR event during vm
+> exit handler.
+> When vLBR event is inactive, guest couldn't access LBR msr, and it is
+> forced into error state and is excluded from schedule by perf scheduler.
+> So vLBR event couldn't be active through perf scheduler even if host per
+> cpu pinned LBR event has released LBR, kvm could enable vLBR event
+> proactively, then vLBR event may be active and LBR msr could be passthrough
+> into guest.
 > 
-> thanks
+> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+> ---
+>   arch/x86/kvm/vmx/pmu_intel.c | 11 ++++++++++-
+>   1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 741efe2c497b..5a3ab8c8711b 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -314,7 +314,16 @@ static bool intel_pmu_handle_lbr_msrs_access(struct kvm_vcpu *vcpu,
+>   	if (!intel_pmu_is_valid_lbr_msr(vcpu, index))
+>   		return false;
+>   
+> -	if (!lbr_desc->event && intel_pmu_create_guest_lbr_event(vcpu) < 0)
+> +	/* vLBR event may be inactive, but physical LBR may be free now.
+> +	 * but vLBR event is pinned event, once it is inactive state, perf
+> +	 * will force it to error state in merge_sched_in() and exclude it from
+> +	 * perf schedule, so even if LBR is free now, vLBR event couldn't be active
+> +	 * through perf scheduler and vLBR event could be active through
+> +	 * perf_event_enable().
+> +	 */
+> +	if (lbr_desc->event && (lbr_desc->event->state == PERF_EVENT_STATE_ERROR))
+> +		perf_event_enable(lbr_desc->event);
 
-This is not true. One example is Freezing LBRs on PMI (bit 11) in the host NMI ctx.
+After allowing LBR host/guest coexistence, calls perf_event_enable() for events
+here do not always succeed, thus this is not a good call point.
 
-For "Legacy Freeze_LBR_on_PMI" feature on a host, "the LBR is frozen on the
-overflowed condition of the buffer area, the processor clears the LBR bit
-(bit 0) in IA32_DEBUGCTL."
+As expected here, any erroneous perf_event is released and reprogrammed in the
+kvm_pmu_handle_event(), and the perf status for enabled features are checked
+near the atomic_switch_perf_msrs().
 
-Not to mention that the commit message makes no mention of the effect of
-this change on other features on DEBUG_CTL.
-
-I couldn't agree with Sean more here. I think the first is to make sure that 
-debugctl's
-functionality is not broken in both root mode and non-root mode, followed closely
-by what policy should be set and notified to any user if host/kvm are not in a
-position to support either side.
+> +	else if (!lbr_desc->event && intel_pmu_create_guest_lbr_event(vcpu) < 0)
+>   		goto dummy;
+>   
+>   	/*
