@@ -2,69 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 132FE740A5B
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 10:02:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E2FC740AB1
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 10:09:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231502AbjF1ICt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 04:02:49 -0400
-Received: from mail-oa1-f69.google.com ([209.85.160.69]:58470 "EHLO
-        mail-oa1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231363AbjF1IAp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 04:00:45 -0400
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-1b019e26019so4211398fac.0
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 01:00:45 -0700 (PDT)
+        id S233593AbjF1IJg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 04:09:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:29077 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232316AbjF1IEu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Jun 2023 04:04:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687939440;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ofwo3P8uKOaWvV1X+hYEb8hA8CV2BceFbJ10PxbVumI=;
+        b=WAtCvFZtzjwk/ERT0HcXYckMliozUFX2x0dKeO70lNcsTwo0YbgglsLAeW3iRiXlUiZHKI
+        XOKwtlq1TBlQndIvWWN3la6XcjbYQe/97Z/u8C+Lis5nC4aILU+cqUABc+sYiv8VWN5LUE
+        CSyqSteiP+uZdJYaJ0r9R9HkLCG0nec=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-85-Vvq5zTXEOZu3EHyu-QmIZQ-1; Wed, 28 Jun 2023 04:03:53 -0400
+X-MC-Unique: Vvq5zTXEOZu3EHyu-QmIZQ-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4f9569b09a3so459991e87.0
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 01:03:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687939245; x=1690531245;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0tU/DkiC2cdHNVfkcshEwEdx4UQyiRnmp0Dt8PMj1Z0=;
-        b=lNwZ+jWXIWxEeu/SKeHgN19UBS4aACumMo2X7XrJ9V7b+2AVTU/QS883TqnqRk+BSY
-         miXM6BNfQmFtPpld/yfWsZUoVnyqAzj2ygSOE0dlqCWT2swMhmaLEkdPWhPKems3NDdc
-         I9vQti88wiW0pyMjcE3gmwLMGb1QnWRDkXSd/ONW5Q54PPMl3MQ0O2+t7CtebFiXBkqv
-         5RxDSVIwoGh1knKaIVVR2UbglsEFpfwO0666mgEJ/6OhNab/KwEXy2OlYThGMZZ5onIe
-         DCfI3uaNh2/3CuW8Rr3v09GWsD55NvbEf/5TEScf3ufmaef/p8b9Gcvs8ITr1Pkl74BK
-         3oJA==
-X-Gm-Message-State: AC+VfDxNEUwUatItLQLrPBrt2rekcG7aDuphOeWAj/sUU7tdoKE4FbFo
-        eWl/ioDT0DQKSoP0qq2YH7kOSDXRvnANHNbCrt2xEj+2F3HJ
-X-Google-Smtp-Source: ACHHUZ5cpgvp7soPDJcmISMLPVZMvANV7NjaIOHQgKsTt00uSF8IsG6HtFS3C0HtXvaPSoJCdX+57RlSlPTzVYakrGII8TH/G1sV
+        d=1e100.net; s=20221208; t=1687939432; x=1690531432;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ofwo3P8uKOaWvV1X+hYEb8hA8CV2BceFbJ10PxbVumI=;
+        b=ljzRSCdLX9omMoQHS6DZcbK58SeIvlk7/WVmYZQDf4Z1HXPopQuMqTM/LqqaE6teKY
+         RjIACOpRcKyriE3DQAOsmQEdhWHxxRY/g+2F04aDtk8ANBJZ5iYzE0b8KlxPURMtZdIc
+         O8jgxloYOCbbgtx0XpMZvZQOrQSYokoHL+cRjGtLRsfAQPvPuqoiH6mMOIhGgnHN0LaB
+         InsOLN/F2pUfUEftGCv04/S/Djko/7R2IVAW6WhyEmwKJRtUvV7K2NPGrc7EtRsEv3Ww
+         puE6N/M+9b235BG6O7+QeAnQzDHQ27f0/P3iyJH1VFaPVZuUN1fHyYZSSlEyyBqmDzGo
+         ctQw==
+X-Gm-Message-State: AC+VfDx5vzt7pi+/uV4t4VyUdOaTuAnRFguQ//hXnCarJnPXhuQjJ231
+        c9p5WOj7RUMxK9AY/w/xqlveYSyLqe5L0PukjgwjHg33BLA+RdRpmzankOgMc2cfg+MjUsmQfUc
+        01OG1YFkRGejuqkAdeXOheVCajfEl
+X-Received: by 2002:a05:6512:2828:b0:4f8:75d5:e14f with SMTP id cf40-20020a056512282800b004f875d5e14fmr206450lfb.28.1687939432274;
+        Wed, 28 Jun 2023 01:03:52 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5+VHNhq6OsMLyItLK9e1q5NqGMrmykMJR0HIs4eAUBTfGZ9IUjxcd7L2s5r2cSDn4Ra3WnvvHrOmw346uihVA=
+X-Received: by 2002:a05:6512:2828:b0:4f8:75d5:e14f with SMTP id
+ cf40-20020a056512282800b004f875d5e14fmr206443lfb.28.1687939431925; Wed, 28
+ Jun 2023 01:03:51 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6870:7a0b:b0:1b0:2d25:f5ab with SMTP id
- hf11-20020a0568707a0b00b001b02d25f5abmr3842449oab.0.1687939245302; Wed, 28
- Jun 2023 01:00:45 -0700 (PDT)
-Date:   Wed, 28 Jun 2023 01:00:45 -0700
-In-Reply-To: <000000000000a2c79f05ed84c7f9@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001e68bd05ff2bfbbf@google.com>
-Subject: Re: [syzbot] [kernel?] kernel BUG in workingset_activation (2)
-From:   syzbot <syzbot+644848628d5e12d5438c@syzkaller.appspotmail.com>
-To:     akpm@linux-foundation.org, gregkh@linuxfoundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, lrh2000@pku.edu.cn, seanjc@google.com,
-        stern@rowland.harvard.edu, syzkaller-bugs@googlegroups.com
+References: <20230628065919.54042-1-lulu@redhat.com> <20230628065919.54042-2-lulu@redhat.com>
+In-Reply-To: <20230628065919.54042-2-lulu@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Wed, 28 Jun 2023 16:03:40 +0800
+Message-ID: <CACGkMEvTyxvEkdMbYqZG3T4ZGm2G36hYqPidbTNzLB=bUgSr0A@mail.gmail.com>
+Subject: Re: [RFC 1/4] vduse: Add the struct to save the vq reconnect info
+To:     Cindy Lu <lulu@redhat.com>
+Cc:     mst@redhat.com, maxime.coquelin@redhat.com,
+        xieyongji@bytedance.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+On Wed, Jun 28, 2023 at 2:59=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+>
+> From: Your Name <you@example.com>
 
-commit 0143d148d1e882fb1538dc9974c94d63961719b9
-Author: Ruihan Li <lrh2000@pku.edu.cn>
-Date:   Mon May 15 13:09:55 2023 +0000
+It looks to me your git is not properly configured.
 
-    usb: usbfs: Enforce page requirements for mmap
+>
+> this struct is to save the reconnect info struct, in this
+> struct saved the page info that alloc to save the
+> reconnect info
+>
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  drivers/vdpa/vdpa_user/vduse_dev.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/=
+vduse_dev.c
+> index 26b7e29cb900..f845dc46b1db 100644
+> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+> @@ -72,6 +72,12 @@ struct vduse_umem {
+>         struct page **pages;
+>         struct mm_struct *mm;
+>  };
+> +struct vdpa_reconnect_info {
+> +       u32 index;
+> +       phys_addr_t addr;
+> +       unsigned long vaddr;
+> +       phys_addr_t size;
+> +};
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10a65abd280000
-start commit:   59d0d52c30d4 AMerge tag 'netfs-fixes-20221115' of git://gi..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=11d3fa0b3feb5055
-dashboard link: https://syzkaller.appspot.com/bug?extid=644848628d5e12d5438c
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14fdf3f1880000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17b54702880000
+Please add comments to explain each field. And I think this should be
+a part of uAPI?
 
-If the result looks correct, please mark the issue as fixed by replying with:
+Thanks
 
-#syz fix: usb: usbfs: Enforce page requirements for mmap
+>
+>  struct vduse_dev {
+>         struct vduse_vdpa *vdev;
+> @@ -106,6 +112,7 @@ struct vduse_dev {
+>         u32 vq_align;
+>         struct vduse_umem *umem;
+>         struct mutex mem_lock;
+> +       struct vdpa_reconnect_info reconnect_info[64];
+>  };
+>
+>  struct vduse_dev_msg {
+> --
+> 2.34.3
+>
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
