@@ -2,58 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07B9B7417A2
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 19:57:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 299FB7417F8
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 20:24:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232154AbjF1R5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 13:57:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46964 "EHLO
+        id S231967AbjF1SYO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 14:24:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232180AbjF1R4M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 13:56:12 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C16CD2689
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 10:56:11 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-57059f90cc5so854507b3.0
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 10:56:11 -0700 (PDT)
+        with ESMTP id S231693AbjF1SYG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 14:24:06 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39CB21BE6
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 11:24:05 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-57059e6f9c7so3143507b3.0
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 11:24:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687974971; x=1690566971;
+        d=google.com; s=20221208; t=1687976644; x=1690568644;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oft31F5mAAnY3y8JHizHeZojVgGUNJAYwhDFnTgpg8o=;
-        b=yzU2JoIQ6C81Hm062cJ2Hc3EmkrShnx3KDof7OpjrvrceMW2p/JIqkFL3bPzaIzfQi
-         V0Dc3dj9921O8AA28Eb8uR90sAND7PQjSUi3zuhfCUzdQxBhnZVZsYvTlt3X7kuQYZp2
-         KjoOs6xj0SFu1apHoMQ0Luhg6NI5lnYXDv0N0Mko9n7j5Y4SbNUrBHzkXz29K2cpjBMT
-         6cWrkLt8pVICK6OZ+FHUiEg5csnak4W+YtNqidraNd5gfTgRYXcfZLtfLwAwEiMQcEjR
-         MS6a30GfaRHxg0cP3WbpBtjznhW8uoJXj5dkOCiweAp9Kwj2cDsBt61bjdnFUtxW6njJ
-         otXQ==
+        bh=waAceiGJaJIZM1rTpOnkG9zmisMavGazW+tCIuQxkVs=;
+        b=uztf5Fp5P1E97NMF0TnBlrtUrLMVUIP+ugYLlYTLoMigD6DZmxK1UVGc4x0qOAilGZ
+         3NQuryCqq+mJLuHVnFuYq5gFv9zOc4zLevxO6JGgddH4qfYggUedW1saX8zlX/mAnAEZ
+         SCb3+ZTeHSismRmZh66YwkIxzDUiJlMcqjKXMOv81gn0cA+pjTowGfXTAF/h0QGT3L9m
+         FZP1kps4tKKxQkML9vtiFdJBw2zClRgrkUO01L/tPSPUW/m2olCw2HkrhuNy4Xh3WB9C
+         XOQaQOKWtjn2BhMtioSImBFAAHFGF1RzbFU6oNXLA/hk3x/m52kNiphchoACPfNn058o
+         WKlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687974971; x=1690566971;
+        d=1e100.net; s=20221208; t=1687976644; x=1690568644;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oft31F5mAAnY3y8JHizHeZojVgGUNJAYwhDFnTgpg8o=;
-        b=iNs7rD5zrx6mxl8H7Q/tc5Ko1r946A6uK1LZ+MC3jNT38sQOKlZr5s6I0Kqx2PDPaA
-         YfnFJ4zr0iARjhgvv9EVwkmevVLtnfWfW7ZoertFnuHJaeI+5BnlK1x1CYR2mmqpjuZY
-         7rEm9ldvG97qY4zOZU1IreY1dBOCOibT8IAokAOBfqemgr40lNfuBaI8rwplkvrql+6F
-         hM+1XswZaDswWXquMGW66Wo2PaAFQTBp/LnQWAojEK/8J5pgDpCYezdrxOZ34xePNEeL
-         Y6Gzcu6zfpXQmclVUhemkrO+8SKuKxRiaMTpJSGsC3FVj+S8jg/EjJM23DFizfArbzml
-         Q7ZQ==
-X-Gm-Message-State: AC+VfDxWsurVERky2PtVg99NQBqM6EQfQwn+sr475aYjgEB77Hlo580d
-        sHkuuqk3IKicbEF/9jPoFhEAIEv0jfk=
-X-Google-Smtp-Source: ACHHUZ5/HawWcuOHI8uZBuEAt0m4vKfLDhoPBp3MHo3Wacm6ZrRpEToDO+6/6KfJozZIuzIqSu5wFGU5F90=
+        bh=waAceiGJaJIZM1rTpOnkG9zmisMavGazW+tCIuQxkVs=;
+        b=kbPbtJvHn8a/MgV7OXajbfkzeW2oQZ57+w0QEVUm/B8AzLY/aBMtfbtkessNgDXhw3
+         XDDM575Oo6T0Dy7Kt1D+hm1CYNPkwZ/e6hKrwSCPEx8eq2pKgkcIk1OlK45SCFlzwA/H
+         qih/YZ9WWSRrQJnJpu4XJgBjyaztuA7Hip0BakqU1S09lIOLUD4Gm6uphD2t1y8FvvGw
+         9K+PEACD4zM25qvUxLxH3naAbfPjHVPyyYU0FJCQSGCi8hIwa328ARXzSMQgqpCUp2t9
+         Eta5nT1ngqB4nvtY0zC0+UzvrnDjaKqXbpfV0LicTmMcDlDhpMLNpu3IJkF0oO74GLr+
+         ChmQ==
+X-Gm-Message-State: ABy/qLbseFQehYLBAz+Zw9pjxOsgfEf2iLRaezSW3HbrcHY8lA1Nd27x
+        vxCPdm4f9zR7UG48A+Jt5U6KQTiAIiM=
+X-Google-Smtp-Source: APBJJlFJ6sGH4qbNrqxIT5rwqmY40tMuEfge6iB7SEY8W4FiNZZhLRUeObmDZffAE9DcMoPnJfeiEPM9npE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ae5d:0:b0:573:ab97:578 with SMTP id
- g29-20020a81ae5d000000b00573ab970578mr8329623ywk.2.1687974971110; Wed, 28 Jun
- 2023 10:56:11 -0700 (PDT)
-Date:   Wed, 28 Jun 2023 10:56:09 -0700
-In-Reply-To: <20230608024504.58189-1-npiggin@gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a81:ad48:0:b0:56c:f903:8678 with SMTP id
+ l8-20020a81ad48000000b0056cf9038678mr30187ywk.2.1687976644502; Wed, 28 Jun
+ 2023 11:24:04 -0700 (PDT)
+Date:   Wed, 28 Jun 2023 11:24:02 -0700
+In-Reply-To: <20230408040020.868929-3-npiggin@gmail.com>
 Mime-Version: 1.0
-References: <20230608024504.58189-1-npiggin@gmail.com>
-Message-ID: <ZJx0OVEphb/OqQ+t@google.com>
-Subject: Re: [PATCH] KVM: PPC: Update MAINTAINERS
+References: <20230408040020.868929-1-npiggin@gmail.com> <20230408040020.868929-3-npiggin@gmail.com>
+Message-ID: <ZJx6wqgS4TOi/D4j@google.com>
+Subject: Re: [PATCH v2 2/4] KVM: selftests: Add aligned guest physical page allocator
 From:   Sean Christopherson <seanjc@google.com>
 To:     Nicholas Piggin <npiggin@gmail.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -65,44 +67,164 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 08, 2023, Nicholas Piggin wrote:
-> Michael is merging KVM PPC patches via the powerpc tree and KVM topic
-> branches. He doesn't necessarily have time to be across all of KVM so
-> is reluctant to call himself maintainer, but for the mechanics of how
-> patches flow upstream, it is maintained and does make sense to have
-> some contact people in MAINTAINERS.
-> 
-> So add Michael Ellerman as KVM PPC maintainer and myself as reviewer.
-> Split out the subarchs that don't get so much attention.
+On Sat, Apr 08, 2023, Nicholas Piggin wrote:
+> powerpc will require this to allocate MMU tables in guest memory that
+> are aligned and larger than the base page size.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
-
-Thanks for documenting the reality of things, much appreciated!
-
-Acked-by: Sean Christopherson <seanjc@google.com>
-
->  MAINTAINERS | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  .../selftests/kvm/include/kvm_util_base.h     |  2 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 44 ++++++++++++-------
+>  2 files changed, 29 insertions(+), 17 deletions(-)
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0dab9737ec16..44417acd2936 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -11379,7 +11379,13 @@ F:	arch/mips/include/uapi/asm/kvm*
->  F:	arch/mips/kvm/
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index 16425da16861..8a27bd4111ff 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -679,6 +679,8 @@ const char *exit_reason_str(unsigned int exit_reason);
 >  
->  KERNEL VIRTUAL MACHINE FOR POWERPC (KVM/powerpc)
-> +M:	Michael Ellerman <mpe@ellerman.id.au>
-> +R:	Nicholas Piggin <npiggin@gmail.com>
->  L:	linuxppc-dev@lists.ozlabs.org
-> +L:	kvm@vger.kernel.org
-> +S:	Maintained (Book3S 64-bit HV)
-> +S:	Odd fixes (Book3S 64-bit PR)
-> +S:	Orphan (Book3E and 32-bit)
+>  vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+>  			     uint32_t memslot);
+> +vm_paddr_t vm_phy_pages_alloc_align(struct kvm_vm *vm, size_t num, size_t align,
+> +			      vm_paddr_t paddr_min, uint32_t memslot);
+>  vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+>  			      vm_paddr_t paddr_min, uint32_t memslot);
+>  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 8ec20ac33de0..4f15bbbb8f5e 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1898,6 +1898,7 @@ const char *exit_reason_str(unsigned int exit_reason)
+>   * Input Args:
+>   *   vm - Virtual Machine
+>   *   num - number of pages
+> + *   align - pages alignment
+>   *   paddr_min - Physical address minimum
+>   *   memslot - Memory region to allocate page from
+>   *
+> @@ -1911,7 +1912,7 @@ const char *exit_reason_str(unsigned int exit_reason)
+>   * and their base address is returned. A TEST_ASSERT failure occurs if
+>   * not enough pages are available at or above paddr_min.
+>   */
+> -vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+> +vm_paddr_t vm_phy_pages_alloc_align(struct kvm_vm *vm, size_t num, size_t align,
 
-Do you think there's any chance of dropping support for everything except Book3S
-64-bit HV at some point soonish?  There haven't been many generic KVM changes that
-touch PPC, but in my experience when such series do come along, the many flavors
-and layers of PPC incur quite a bit of development and testing cost, and have a
-high chance of being broken compared to other architectures.
+I'd prefer to use double underscores, even though they are imperfect, because
+appending a single specifier always seems to result in the name becoming stale
+sooner or later, e.g. when another param with a default is added.
+
+And IIUC, PPC requires the page tables to be naturally aligned, so rather than
+expose the inner helper and copy+paste the rather odd KVM_GUEST_PAGE_TABLE_MIN_PADDR
+and vm->memslots[MEM_REGION_PT] stuff, what if we instead have vm_alloc_page_table()
+deal with the alignment?  And provide a PPC-specific wrapper so that other
+architectures don't need to manually specify '1' page?
+
+E.g.
+
+---
+ .../selftests/kvm/include/kvm_util_base.h      | 18 +++++++++++++++---
+ tools/testing/selftests/kvm/lib/kvm_util.c     | 14 ++++++++------
+ .../selftests/kvm/lib/powerpc/processor.c      |  8 ++------
+ 3 files changed, 25 insertions(+), 15 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index f14a059f58fb..e52405c9fa8b 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -700,11 +700,23 @@ const char *exit_reason_str(unsigned int exit_reason);
+ 
+ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+ 			     uint32_t memslot);
+-vm_paddr_t vm_phy_pages_alloc_align(struct kvm_vm *vm, size_t num, size_t align,
+-			      vm_paddr_t paddr_min, uint32_t memslot);
+ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+ 			      vm_paddr_t paddr_min, uint32_t memslot);
+-vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
++
++vm_paddr_t __vm_alloc_page_table(struct kvm_vm *vm, size_t nr_pages);
++
++/*
++ * PowerPC conditionally needs to allocate multiple pages for each page table,
++ * all other architectures consume exactly one page per table.
++ */
++#if defined(__powerpc64__
++#define vm_alloc_page_table __vm_alloc_page_table
++#else
++static inline vm_alloc_page_table(struct kvm_vm *vm)
++{
++	return __vm_alloc_page_table(vm, 1)
++}
++#endif
+ 
+ /*
+  * ____vm_create() does KVM_CREATE_VM and little else.  __vm_create() also
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 70f792ba444c..ffd18afe9725 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -1946,8 +1946,9 @@ const char *exit_reason_str(unsigned int exit_reason)
+  * and their base address is returned. A TEST_ASSERT failure occurs if
+  * not enough pages are available at or above paddr_min.
+  */
+-vm_paddr_t vm_phy_pages_alloc_align(struct kvm_vm *vm, size_t num, size_t align,
+-			      vm_paddr_t paddr_min, uint32_t memslot)
++static vm_paddr_t __vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
++				       size_t align, vm_paddr_t paddr_min,
++				       uint32_t memslot)
+ {
+ 	struct userspace_mem_region *region;
+ 	sparsebit_idx_t pg, base;
+@@ -1992,7 +1993,7 @@ vm_paddr_t vm_phy_pages_alloc_align(struct kvm_vm *vm, size_t num, size_t align,
+ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+ 			      vm_paddr_t paddr_min, uint32_t memslot)
+ {
+-	return vm_phy_pages_alloc_align(vm, num, 1, paddr_min, memslot);
++	return __vm_phy_pages_alloc(vm, num, 1, paddr_min, memslot);
+ }
+ 
+ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+@@ -2001,10 +2002,11 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+ 	return vm_phy_pages_alloc(vm, 1, paddr_min, memslot);
+ }
+ 
+-vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
++vm_paddr_t __vm_alloc_page_table(struct kvm_vm *vm)
+ {
+-	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+-				 vm->memslots[MEM_REGION_PT]);
++	return __vm_phy_pages_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
++				    nr_pages, nr_pages,
++				    vm->memslots[MEM_REGION_PT]);
+ }
+ 
+ /*
+diff --git a/tools/testing/selftests/kvm/lib/powerpc/processor.c b/tools/testing/selftests/kvm/lib/powerpc/processor.c
+index 7052ce9b5029..57d64d281467 100644
+--- a/tools/testing/selftests/kvm/lib/powerpc/processor.c
++++ b/tools/testing/selftests/kvm/lib/powerpc/processor.c
+@@ -44,9 +44,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+ 	pgd_pages = (1UL << (RADIX_PGD_INDEX_SIZE + 3)) >> vm->page_shift;
+ 	if (!pgd_pages)
+ 		pgd_pages = 1;
+-	pgtb = vm_phy_pages_alloc_align(vm, pgd_pages, pgd_pages,
+-					KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+-					vm->memslots[MEM_REGION_PT]);
++	pt = vm_alloc_page_table(vm, pgd_pages);
+ 	vm->pgd = pgtb;
+ 
+ 	/* Set the base page directory in the proc table */
+@@ -168,9 +166,7 @@ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t gva, uint64_t gpa)
+ 		pt_pages = (1ULL << (nls + 3)) >> vm->page_shift;
+ 		if (!pt_pages)
+ 			pt_pages = 1;
+-		pt = vm_phy_pages_alloc_align(vm, pt_pages, pt_pages,
+-					KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+-					vm->memslots[MEM_REGION_PT]);
++		pt = vm_alloc_page_table(vm, pt_pages);
+ 		pde = PDE_VALID | nls | pt;
+ 		*pdep = cpu_to_be64(pde);
+ 	}
+
+base-commit: 15a281f5c83f34d4d1808e5f790403b0770c5e78
+-- 
+
