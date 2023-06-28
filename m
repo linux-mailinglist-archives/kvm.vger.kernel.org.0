@@ -2,140 +2,288 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C4EB740C19
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 10:59:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AD5F740AE7
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 10:13:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235802AbjF1I6x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 04:58:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44534 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236419AbjF1IrD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 04:47:03 -0400
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A1E035A1;
-        Wed, 28 Jun 2023 01:39:22 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-76547539718so399726985a.2;
-        Wed, 28 Jun 2023 01:39:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687941561; x=1690533561;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ScB+ZZist0LJhvo4aFrlQCLs/vxCp+MpbUQwDLajxRw=;
-        b=Sc7YXP1JbPv0mFwQfYm4HOjIkcuGaoYrspov0HZUKETfxRnhgij7IHOEJ7ZTntjbWw
-         sSr9sTImr/TpA+q824k92W5AviwhWW8+j6ZLZ2DdTB/kcZ5VlKK3w/lWGDAFuq+zDZBt
-         C87XQTvC6OzXmgDF80R7ztwPknaCOhv0crl+e5w0IloO+acNL8v1raxkWtGKJOtayxau
-         tT/ZIJ2jSWi7bN8sG2Luq+RvhwVUVU1bnhM5q9DE3VZws8e0EaCULqaA+iq4mVkGsC5K
-         n/jjMqN0ZQh3kU7lxsCS2iFjKoh2UksEWxiukfgjl81oPJI5di7GVpuT2heRq3V536kD
-         Vj0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687941561; x=1690533561;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ScB+ZZist0LJhvo4aFrlQCLs/vxCp+MpbUQwDLajxRw=;
-        b=gqtT5jGaLiCse2zAZ/o+SGYBmQ3A6Y9ImKo3s3qEwoeeP0TvqHrnVCNzE6n9ZZYCJ1
-         KMYouJbk19lYjTo+vlEp9QBWbuGICqBRrVUsNCZ8DeV7SjGGmieGoWRAAvW5WuIqFx24
-         n9hM3QSC8AVS6/0UmzBT4uK77wItoG+AyyQ2nwQ0M5rrpTv8dzVdKleSVR/mWtS5cIk3
-         C8bMLdUmTWecIiVUcHv3mo/W7nWJmffvrLCzwiUazFczZhiLdo74WG0wvnArGLO1Yn3f
-         xUEP2lV3hKKA8kQaj4xUwbD1Xf+h3N12gfTFeAkWNGot9oxPhovAV0T8odoUhCmyP5p0
-         XoGg==
-X-Gm-Message-State: AC+VfDzNC834a2codn/1HnVU2cyVJjX5gTkHWM0cIJr5mJqbbGyYea1j
-        i3TefXMGChwmJuYgQruWfoF7Iaz/9JJ/iIUr/eU=
-X-Google-Smtp-Source: ACHHUZ4lVPX+j5H7tZJ6oXHoKfmzWDLYFEUeYz33ThHTbUCa2xbvIJmb2a0J/CVmsCUQZSEw4UUV6Q==
-X-Received: by 2002:a17:902:e746:b0:1b7:f3a4:a6dc with SMTP id p6-20020a170902e74600b001b7f3a4a6dcmr11012625plf.21.1687926325524;
-        Tue, 27 Jun 2023 21:25:25 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id iw19-20020a170903045300b001b0603829a0sm862107plb.199.2023.06.27.21.25.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jun 2023 21:25:24 -0700 (PDT)
-Message-ID: <ca71fc1f-280e-19ff-ce0f-8befa29f45cd@gmail.com>
-Date:   Wed, 28 Jun 2023 12:25:16 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH 1/4] perf/x86/intel: Get shared reg constraints first for
- vLBR
-Content-Language: en-US
-To:     Xiong Zhang <xiong.y.zhang@intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, peterz@infradead.org,
-        kan.liang@linux.intel.com, zhenyuw@linux.intel.com,
-        zhiyuan.lv@intel.com, kvm list <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20230616113353.45202-1-xiong.y.zhang@intel.com>
- <20230616113353.45202-2-xiong.y.zhang@intel.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20230616113353.45202-2-xiong.y.zhang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-        lindbergh.monkeyblade.net
+        id S234112AbjF1INA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 04:13:00 -0400
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:47263 "EHLO
+        out2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231509AbjF1IKt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Jun 2023 04:10:49 -0400
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.nyi.internal (Postfix) with ESMTP id 56E6F5C0078;
+        Wed, 28 Jun 2023 00:55:46 -0400 (EDT)
+Received: from imap50 ([10.202.2.100])
+  by compute1.internal (MEProxy); Wed, 28 Jun 2023 00:55:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+        cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1687928146; x=1688014546; bh=Dr
+        kfQZA4ZAS1gh0epx3coneRI+oyfY6k0HGVYNs6GJY=; b=Kf9Lwrmr0v8lFU0t92
+        H5QXsii6fPb6Qlu/s5Jp0uC5J4ZhnylbNjKaJBO3MkadNpr25csmXaFVYUwd/Jdx
+        rwaqd26MHUdVq51eQh6lkvQtKqtKJuKr5UXy9s43VL6Gu9tNw1jO6dxaE6wQQPX1
+        L9K7wFv/1UFG9M7SlR7oQCiOD1a8c+Y7O7tzlOOgL51a5jHt17A3DDkJPzg6sBNJ
+        2+PxT0VFfMKulsD6oETx4cHcynBFgT0CQWdti+UpSHGch0KEavZ6L3sQDzdqnQVc
+        ZZEZTlIJkzWsnjFOn6J5cXOq9aV4+Z4SInTTZkM9AO1aPTO+Mes+7tBSanpKAl8Q
+        aq2Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; t=1687928146; x=1688014546; bh=DrkfQZA4ZAS1g
+        h0epx3coneRI+oyfY6k0HGVYNs6GJY=; b=P35eUrXrQAqM/4cW9cePk3hDAlY6c
+        5Jq5RiqyDYbpcUZbJHToh47Pm3G0GiXb1J+qhQp7Lvchuya9rYJLi2+TB/it+TPj
+        6pyomZcT2POh04hrzdnYxHT2d2MHoOMum4qEh/OaOvg5fSj8Cl5poE4V5SmEfP4a
+        MZ4qXPZwHvGEwtdyJ/binLznlrQi7XVSlExKYHioNAMhe/IKTlaglTSjNe8+BiVr
+        LowVo3Wke/5MUitu382SkGvbbxl7s71QV+t7CvBt/D4ynkc2O6gx6Gi8H+CK4NSN
+        k5s/SjC1ODiPgq6ZBYLllsFTyYTsApkB631uP+qrZ9xc3D6bXfALXsvhQ==
+X-ME-Sender: <xms:UL2bZLCUVtFhsnbPWsg-DNYDpJGIzmvHx9MfdyX_h8VfFwSDrNA8Sg>
+    <xme:UL2bZBiLqeUDbJljf0PRLNUpdSRCPKmUFxjqeWj9AcGj9OIHxjU09b5u3XiVSyFC1
+    B3kSp9KHH_AewFJ4g>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrtddugdeklecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdfuthgv
+    fhgrnhcuqfdktfgvrghrfdcuoehsohhrvggrrhesfhgrshhtmhgrihhlrdgtohhmqeenuc
+    ggtffrrghtthgvrhhnpeehjeelgeekkeelfeeugeekffduveffvdfghfefteejtefgfeek
+    hfekkedttdefudenucffohhmrghinhepshhouhhrtggvfigrrhgvrdhorhhgpdhinhhfrh
+    gruggvrggurdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghi
+    lhhfrhhomhepshhorhgvrghrsehfrghsthhmrghilhdrtghomh
+X-ME-Proxy: <xmx:UL2bZGkhqB3QP820CC7YUMjw4XhGi1hZpsDGe7-GBqI28yiOPzUVWg>
+    <xmx:UL2bZNz7Sc6saWs8J0QtG6-xiksAUBd1a7rRty71JHS7q2G5U2HwAA>
+    <xmx:UL2bZASp24C38Hp_mdkx7_BBAGn-Of_6Yp6QzaCYn024u4Q2LpqRxA>
+    <xmx:Ur2bZJDVYEvgRTpNJKkIiG774eQYP1AnCYcE2ORkKjdUFzt8jhp_bQ>
+Feedback-ID: i84414492:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id C72F21700089; Wed, 28 Jun 2023 00:55:44 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-499-gf27bbf33e2-fm-20230619.001-gf27bbf33
+Mime-Version: 1.0
+Message-Id: <b911c5e1-458a-456a-abe4-a8964580a85b@app.fastmail.com>
+In-Reply-To: <mhng-97928779-5d76-4390-a84c-398fdc6a0a4f@palmer-ri-x1c9>
+References: <mhng-97928779-5d76-4390-a84c-398fdc6a0a4f@palmer-ri-x1c9>
+Date:   Wed, 28 Jun 2023 00:53:38 -0400
+From:   "Stefan O'Rear" <sorear@fastmail.com>
+To:     "Palmer Dabbelt" <palmer@dabbelt.com>
+Cc:     "Andy Chiu" <andy.chiu@sifive.com>,
+        linux-riscv@lists.infradead.org, anup@brainfault.org,
+        "Atish Patra" <atishp@atishpatra.org>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        "Vineet Gupta" <vineetg@rivosinc.com>, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, "Jonathan Corbet" <corbet@lwn.net>,
+        "Paul Walmsley" <paul.walmsley@sifive.com>,
+        "Albert Ou" <aou@eecs.berkeley.edu>,
+        "Heiko Stuebner" <heiko.stuebner@vrull.eu>,
+        "Evan Green" <evan@rivosinc.com>,
+        "Conor Dooley" <conor.dooley@microchip.com>,
+        "Andrew Jones" <ajones@ventanamicro.com>,
+        "Celeste Liu" <coelacanthus@outlook.com>,
+        "Andrew Bresticker" <abrestic@rivosinc.com>
+Subject: Re: [PATCH -next v21 03/27] riscv: hwprobe: Add support for probing V in
+ RISCV_HWPROBE_KEY_IMA_EXT_0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/6/2023 7:33 pm, Xiong Zhang wrote:
-> When host has per cpu pinned LBR event and guest use LBR also, host
-> couldn't get correct LBR data, as the physical LBR is preempted by
-> guest.
-> 
-> The rule for multi events sharing LBR is defined in
-> __intel_shared_reg_get_constraints(), but guest vLBR event skips this
-> function, so even if host has per cpu pinned LBR event, guest vLBR event
-> could get constraints successfully and make vlbr_exclude_host returns true,
-> finally host couldn't enable LBR in intel_pmu_lbr_enable_all().
+On Tue, Jun 27, 2023, at 9:56 PM, Palmer Dabbelt wrote:
+> On Tue, 27 Jun 2023 17:30:33 PDT (-0700), sorear@fastmail.com wrote:
+>> On Mon, Jun 5, 2023, at 7:07 AM, Andy Chiu wrote:
+>>> Probing kernel support for Vector extension is available now. This only
+>>> add detection for V only. Extenions like Zvfh, Zk are not in this scope.
+>>>
+>>> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+>>> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+>>> Reviewed-by: Evan Green <evan@rivosinc.com>
+>>> Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
+>>> ---
+>>> Changelog v20:
+>>>  - Fix a typo in document, and remove duplicated probes (Heiko)
+>>>  - probe V extension in RISCV_HWPROBE_KEY_IMA_EXT_0 key only (Palmer,
+>>>    Evan)
+>>> ---
+>>>  Documentation/riscv/hwprobe.rst       | 3 +++
+>>>  arch/riscv/include/uapi/asm/hwprobe.h | 1 +
+>>>  arch/riscv/kernel/sys_riscv.c         | 4 ++++
+>>>  3 files changed, 8 insertions(+)
+>>>
+>>> diff --git a/Documentation/riscv/hwprobe.rst b/Documentation/riscv/hwprobe.rst
+>>> index 9f0dd62dcb5d..7431d9d01c73 100644
+>>> --- a/Documentation/riscv/hwprobe.rst
+>>> +++ b/Documentation/riscv/hwprobe.rst
+>>> @@ -64,6 +64,9 @@ The following keys are defined:
+>>>    * :c:macro:`RISCV_HWPROBE_IMA_C`: The C extension is supported, as defined
+>>>      by version 2.2 of the RISC-V ISA manual.
+>>>
+>>> +  * :c:macro:`RISCV_HWPROBE_IMA_V`: The V extension is supported, as defined by
+>>> +    version 1.0 of the RISC-V Vector extension manual.
+>>> +
+>>>  * :c:macro:`RISCV_HWPROBE_KEY_CPUPERF_0`: A bitmask that contains performance
+>>>    information about the selected set of processors.
+>>>
+>>> diff --git a/arch/riscv/include/uapi/asm/hwprobe.h
+>>> b/arch/riscv/include/uapi/asm/hwprobe.h
+>>> index 8d745a4ad8a2..7c6fdcf7ced5 100644
+>>> --- a/arch/riscv/include/uapi/asm/hwprobe.h
+>>> +++ b/arch/riscv/include/uapi/asm/hwprobe.h
+>>> @@ -25,6 +25,7 @@ struct riscv_hwprobe {
+>>>  #define RISCV_HWPROBE_KEY_IMA_EXT_0	4
+>>>  #define		RISCV_HWPROBE_IMA_FD		(1 << 0)
+>>>  #define		RISCV_HWPROBE_IMA_C		(1 << 1)
+>>> +#define		RISCV_HWPROBE_IMA_V		(1 << 2)
+>>>  #define RISCV_HWPROBE_KEY_CPUPERF_0	5
+>>>  #define		RISCV_HWPROBE_MISALIGNED_UNKNOWN	(0 << 0)
+>>>  #define		RISCV_HWPROBE_MISALIGNED_EMULATED	(1 << 0)
+>>> diff --git a/arch/riscv/kernel/sys_riscv.c
+>>> b/arch/riscv/kernel/sys_riscv.c
+>>> index 5db29683ebee..88357a848797 100644
+>>> --- a/arch/riscv/kernel/sys_riscv.c
+>>> +++ b/arch/riscv/kernel/sys_riscv.c
+>>> @@ -10,6 +10,7 @@
+>>>  #include <asm/cpufeature.h>
+>>>  #include <asm/hwprobe.h>
+>>>  #include <asm/sbi.h>
+>>> +#include <asm/vector.h>
+>>>  #include <asm/switch_to.h>
+>>>  #include <asm/uaccess.h>
+>>>  #include <asm/unistd.h>
+>>> @@ -171,6 +172,9 @@ static void hwprobe_one_pair(struct riscv_hwprobe
+>>> *pair,
+>>>  		if (riscv_isa_extension_available(NULL, c))
+>>>  			pair->value |= RISCV_HWPROBE_IMA_C;
+>>>
+>>> +		if (has_vector())
+>>> +			pair->value |= RISCV_HWPROBE_IMA_V;
+>>> +
+>>>  		break;
+>>
+>> I am concerned by the exception this is making.  I believe the intention of
+>> riscv_hwprobe is to replace AT_HWCAP as the single point of truth for userspace
+>> to make instruction use decisions.  Since this does not check riscv_v_vstate_ctrl_user_allowed,
+>> application code which wants to know if V instructions are usable must use
+>> AT_HWCAP instead, unlike all other extensions for which the relevant data is
+>> available within the hwprobe return.
+>
+> I guess we were vague in the docs about what "supported" means, but IIRC 
+> the goal was for riscv_hwprobe() to indicate what's supported by both 
+> the HW and the kernel.  In other words, hwprobe should indicate what's 
 
-Although it goes against the "per cpu pinned LBR event" priority expectation,
-the order is intentionally specified. For two reasons:
+Should this be "the HW, the firmware, and the kernel" in the cases where it
+matters, or are you considering the firmware part of the kernel's view of
+the hardware?
 
-- vlbr uses the fake event mechanism in its implementation, a presence similar to
-   BTS event, thus the question here is whether we can get the per cpu pinned BTS
-   event to work as expected;
+> possible to enable -- even if there's some additional steps necessary to 
+> enable it.
+>
+> We can at least make this a little more explicit with something like
+>
+>     diff --git a/Documentation/riscv/hwprobe.rst 
+> b/Documentation/riscv/hwprobe.rst
+>     index 19165ebd82ba..7f82a5385bc3 100644
+>     --- a/Documentation/riscv/hwprobe.rst
+>     +++ b/Documentation/riscv/hwprobe.rst
+>     @@ -27,6 +27,13 @@ AND of the values for the specified CPUs. 
+> Usermode can supply NULL for cpus and
+>      0 for cpu_count as a shortcut for all online CPUs. There are 
+> currently no flags,
+>      this value must be zero for future compatibility.
+>     
+>     +Calls to `sys_riscv_hwprobe()` indicate the features supported by 
+> both the
+>     +kernel and the hardware that the system is running on.  For 
+> example, if the
+>     +hardware supports the V extension and the kernel has V support 
+> enabled then
+>     +`RISCV_HWPROBE_KEY_IMA_EXT_0`/`RISCV_HWPROBE_IMA_V` will be set 
+> even if the V
+>     +extension is disabled via a userspace-controlled tunable such as
+>     +`PR_RISCV_V_SET_CONTROL`.
+>     +
+>      On success 0 is returned, on failure a negative error code is 
+> returned.
+>     
+>      The following keys are defined:
+>     @@ -65,7 +72,10 @@ The following keys are defined:
+>          by version 2.2 of the RISC-V ISA manual.
+>     
+>        * :c:macro:`RISCV_HWPROBE_IMA_V`: The V extension is supported, 
+> as defined by
+>     -    version 1.0 of the RISC-V Vector extension manual.
+>     +    version 1.0 of the RISC-V Vector extension manual.  For strict 
+> uABI
+>     +    compatibility some systems may disable V by default even when 
+> the hardware
+>     +    supports in, in which case users must call 
+> `prctl(PR_RISCV_V_SET_CONTROL,
+>     +    ...` to explicitly allow V to be used.
+>     
+>        * :c:macro:`RISCV_HWPROBE_EXT_ZBA`: The Zba address generation 
+> extension is
+>             supported, as defined in version 1.0 of the 
+> Bit-Manipulation ISA
+>
+> IMO that's the better way to go that to require that userspace tries to enable
+> V via the prctl() first, but we haven't released this yet so in theory we could
+> still change it.
 
-- this change should not be applied first before KVM has done a good job
-   of making guest lbr and other lbr events coexist correctly;
+It's certainly a more precise definition but I'm arguing it's not a useful one.
 
-In treating vlbr event as an ordinary perf_event behind a guest counter that
-is expected to comply equally with the scheduling rules of host perf, the first
-thing we need to address is how a guest counter should continue to function
-during the time when the backend event is preempted by a higher priority one.
+The description of the prctl() in Documentation/riscv/vector.rst is fairly clear
+that it is intended only for use by init systems, and not by libraries.
 
-> 
-> This commit move intel_vlbr_constraints() behind
-> intel_shared_regs_constraints(), guest vLBR event will use LBR also and it
-> should get LBR resource through intel_shared_regs_constraints().
-> 
-> Fixes: 097e4311cda9 ("perf/x86: Add constraint to create guest LBR event without hw counter")
-> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
-> ---
->   arch/x86/events/intel/core.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-> index 6fd3cd97a6ac..2e27a69e9725 100644
-> --- a/arch/x86/events/intel/core.c
-> +++ b/arch/x86/events/intel/core.c
-> @@ -3347,15 +3347,15 @@ __intel_get_event_constraints(struct cpu_hw_events *cpuc, int idx,
->   {
->   	struct event_constraint *c;
->   
-> -	c = intel_vlbr_constraints(event);
-> +	c = intel_bts_constraints(event);
->   	if (c)
->   		return c;
->   
-> -	c = intel_bts_constraints(event);
-> +	c = intel_shared_regs_constraints(cpuc, event);
->   	if (c)
->   		return c;
->   
-> -	c = intel_shared_regs_constraints(cpuc, event);
-> +	c = intel_vlbr_constraints(event);
->   	if (c)
->   		return c;
->   
+Would you agree that "V is supported by the hardware and kernel, and could have
+been enabled by the init system but wasn't" is not actionable information for
+most applications and libraries?
+
+https://sourceware.org/pipermail/libc-alpha/2023-April/147062.html proposes to
+use hwprobe to "do things like dynamically choose a memcpy implementation".
+Would you agree that hwprobe as currently defined in for-next is not suitable
+for the purpose described in that message, since it describes features that could
+be enabled, not features that are enabled?
+
+> We'd have a similar discussion for some of the counters that need to feed
+> through the perf interface, though those are still in flight...
+
+The documented intent of the vector prctl is to enable or disable vector use as
+a policy for a tree of processes.  If I understand them correctly the perf
+counter user access patches require _individual processes_ to enable perf
+counters for their own use, which makes it a very different story from the
+perspective of the hwprobe API consumers.
+
+-s
+
+>> Assuming this is intentional, what is the path forward for future extensions
+>> that cannot be used from userspace without additional conditions being met?
+>> For instance, if we add support in the future for the Zve* extensions, the V
+>> bit would not be set in HWCAP for them, which would require library code to
+>> use the prctl interface unless we define the hwcap bits to imply userspace
+>> usability.
+>
+> In this case a system that supports some of the Zve extensions but not 
+> the full V extension would not be probably from userspace, as V would 
+> not be set anywhere.  The way to support that would be to add new bits 
+> into hwprobe to indicate those extensions, it just wasn't clear that 
+> anyone was interested in building Linux-flavored systems that supported 
+> only some a strict subset of V.
+>
+> Happy to see patches if you know of some hardware in the pipeline, though ;)
+>
+>>
+>> -s
+>>
+>>>  	case RISCV_HWPROBE_KEY_CPUPERF_0:
+>>> --
+>>> 2.17.1
+>>>
+>>>
+>>> _______________________________________________
+>>> linux-riscv mailing list
+>>> linux-riscv@lists.infradead.org
+>>> http://lists.infradead.org/mailman/listinfo/linux-riscv
+>
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
