@@ -2,206 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DAB21741B3E
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 23:56:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F589741B4E
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 23:59:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232292AbjF1V4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 17:56:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38738 "EHLO
+        id S231835AbjF1V7F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 17:59:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231758AbjF1Vzz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 17:55:55 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 105162D78
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 14:55:33 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c118efd0c36so45213276.0
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 14:55:33 -0700 (PDT)
+        with ESMTP id S231398AbjF1V7D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 17:59:03 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04F77210B
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 14:59:02 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-262c488c1d3so10312a91.3
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 14:59:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687989332; x=1690581332;
+        d=google.com; s=20221208; t=1687989541; x=1690581541;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=u1lKcqn9ySILuHAuk8KKZF1RwSNsgXAEhY3643E2F/0=;
-        b=BRo0KRb5NEu7qjfuG+yJrx9L3lM9o2xl8qUFEVLG5EUlUs/qioeXBSoR5z6LDsE9ZY
-         gPZeFxMbvifz00kbpJFWCMCfrf0Q2RJeMmsar6q3K0K3QpreHsH1twT4OjsNeoa/V6nb
-         fdG6vrSspxz8fm6cCBqkCku4lf8VOMgCbv92Y/5ASoAwzLCQqBmFBMhWAa051ABRI1Dj
-         PeA6D9aKqlwVebLuTluwqPwHVv9Zv6YZ1CiieJ+93pViWelJi2ZW7YGRgzc+l0o12+iC
-         AmAPZP1GopOS9vB10hpjCpvo1ILZwLdWjf8G1dczq05oasD5dK449wgeNvZRdK8aioVK
-         KbuQ==
+        bh=ibnfIbYLuJprbyc7sn5N3Pf0TgkraQ9Zv5pFLImKpVg=;
+        b=Ge6+GmIzvDZU7Zw141Rx/LRC7h8S4S5RBarecs/PvpTQhQ+pdIj1ek6PydxAGs4wrF
+         t2iVRrxbJeLRxCv5mN6fJU4t8uqOR87OO9YpWLyftShqUPn1OHvyHYfWhENz336KFZK+
+         ex6254kwUAza1RlM9ZxY4VUmZjOktvGfcPN9SFnW29aABIBBWxlDrcV4D+eRzFUu9jTG
+         pb2AHu2xbpBh28I56EFcG+v3AeGVEYahO29wIfow2sCSCpcMKR+lzI4jclPJdO40qk3S
+         PjamQtKwbZlti7ku32Du9kxnZLrrQ6rpe6ApbCKiPBkicKaFDxLl6HdnTyR7aqPila4O
+         cwpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687989332; x=1690581332;
+        d=1e100.net; s=20221208; t=1687989541; x=1690581541;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u1lKcqn9ySILuHAuk8KKZF1RwSNsgXAEhY3643E2F/0=;
-        b=Y2SnDkcyio2tVv8XlUBe/MWIz1V3D1vWaPB7pMjZR29C/wx+ws1p/Gx++SkXPVFUmI
-         hr6oUtiRg3TN5RsBeNtyTIJkXgOCsoME7FWvm70ptGGizHz6YVQbea3oLJ+SY9J9VpE7
-         3UzjHAhHdUJoH8FM+VAe0dCsgpNU25bvHPx4YbjXBpZ24r0kl9U/4+N/B7cTs4IO49ky
-         gTCuMZaxlwIKCxNC8ljRF/PYqf+W+Vum0br9dnSNPic/tqL4SIh3hzGyegf9qATkNVR/
-         AKFZuQgnDjK0LVjke4Ka3xS4aoHK5FM4jpBII6NagC4eWV7rCCM0BjUzq+w2tCW5n5Ez
-         rnlQ==
-X-Gm-Message-State: ABy/qLYJnNP+yAYZ0ksr7Kzmu/6dJ2R22AnkXI/9NkPlxRX4zT0fRG0G
-        beSpgg7sdoaTN0r+nscOoJpqnfSG/xo=
-X-Google-Smtp-Source: APBJJlFKvBpXnkX0H2yHtqHBM7Cd2bMIR38Te1JNjKYkfLsUjcuLMNcqnz4YWiw5D6/1sYDxAYEnbv+3kcA=
+        bh=ibnfIbYLuJprbyc7sn5N3Pf0TgkraQ9Zv5pFLImKpVg=;
+        b=i5IC++hXS7yqR7VbFF+orWpAupC8u/2brEMJWz4fVEaxK/umDi6MydmSkLzzi0OMw6
+         VEdjNBT8geeijxU5W3Owj6hQPMosN9dsT+V7fe+c9FV8MRK5BPs6s8VA50uT+ZCcdaZw
+         7IHKCBxsXIFU1sQLy33125mEkImGP5asxsLaavk9KHNu2d+TKjaV363bt895WstexB01
+         cAhgzhR0YIje0lHXzYnMa2mD6W29kocHN8XwHtxOuPGgGxBFgl5HeMLHxLHlVhhK1NOZ
+         v9ySd5PmZOrgJYmie5ZYEsbwFe2brbtVYWXUQmkKC+y5uo55zVwJrl/tcjMQTxJjmUEh
+         0tiA==
+X-Gm-Message-State: AC+VfDzPjgVbyZmp5FY/REQDUMTv5DVGZqd6trkRpWq3ls2nXzRNAfJB
+        bqCMd84ZFLp+p7J4n5CgIyy2dAL6SpA=
+X-Google-Smtp-Source: ACHHUZ4rvDnUAz5eHaI/CZWx4/4PhYzzJqS4OnxZCidRNr69vjsJoOjv5M+IT/B0vTJKM2dRyV7PAIysIKQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1105:b0:c17:b9e7:4c2c with SMTP id
- o5-20020a056902110500b00c17b9e74c2cmr40499ybu.6.1687989332365; Wed, 28 Jun
- 2023 14:55:32 -0700 (PDT)
-Date:   Wed, 28 Jun 2023 14:55:30 -0700
-In-Reply-To: <20230608113420.14695-3-cloudliang@tencent.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:8049:b0:263:39c1:d0b2 with SMTP id
+ e9-20020a17090a804900b0026339c1d0b2mr661352pjw.5.1687989541371; Wed, 28 Jun
+ 2023 14:59:01 -0700 (PDT)
+Date:   Wed, 28 Jun 2023 14:59:00 -0700
+In-Reply-To: <20230616023524.7203-1-yan.y.zhao@intel.com>
 Mime-Version: 1.0
-References: <20230608113420.14695-1-cloudliang@tencent.com> <20230608113420.14695-3-cloudliang@tencent.com>
-Message-ID: <ZJysUp5Ndnecok4S@google.com>
-Subject: Re: [PATCH 2/2] KVM: selftests: Add PEBS test for MSR_IA32_PERF_CAPABILITIES
+References: <20230616023101.7019-1-yan.y.zhao@intel.com> <20230616023524.7203-1-yan.y.zhao@intel.com>
+Message-ID: <ZJytJB+mwdU6v/XJ@google.com>
+Subject: Re: [PATCH v3 03/11] KVM: x86/mmu: Use KVM honors guest MTRRs helper
+ when CR0.CD toggles
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jinrong Liang <ljr.kernel@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Jinrong Liang <cloudliang@tencent.com>,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
+        robert.hoo.linux@gmail.com
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 08, 2023, Jinrong Liang wrote:
-> From: Jinrong Liang <cloudliang@tencent.com>
+On Fri, Jun 16, 2023, Yan Zhao wrote:
+> Call helper to check if guest MTRRs are honored by KVM MMU before zapping,
+
+Nit, state the effect, not what the code literally does.  The important part is
+that the end result is that KVM will zap if and only if guest MTRRs are being
+honored, e.g.
+
+  Zap SPTEs when CR0.CD is toggled if and only if KVM's MMU is honoring
+  guest MTRRs, which is the only time that KVM incorporates the guest's
+  CR0.CD into the final memtype.
+
+> as values of guest CR0.CD will only affect memory types of KVM TDP when
+> guest MTRRs are honored.
 > 
-> This commit adds a PEBS test that verifies all possible combinations
-> of PEBS-related bits in MSR_IA32_PERF_CAPABILITIES. This comprehensive
-> test ensures the accuracy of the PEBS feature.
-> 
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+> Suggested-by: Chao Gao <chao.gao@intel.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 > ---
->  .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  | 71 +++++++++++++++++++
->  1 file changed, 71 insertions(+)
+>  arch/x86/kvm/x86.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-> index 02903084598f..c1b1ba44bc26 100644
-> --- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-> @@ -21,6 +21,12 @@
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9e7186864542..6693daeb5686 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -942,7 +942,7 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
+>  		kvm_mmu_reset_context(vcpu);
 >  
->  #define MAX_LINEAR_ADDR_MASK		GENMASK_ULL(15, 8)
->  #define ADDR_OFS_BIT			8
-> +#define PMU_CAP_LBR_FMT		0x3f
-> +#define PMU_CAP_SMM_FREEZE		BIT_ULL(12)
-> +#define PMU_CAP_FW_WRITES		BIT_ULL(13)
-> +#define PMU_CAP_PERF_METRICS_AVAILABLE	BIT_ULL(PERF_CAP_METRICS_IDX)
-> +#define PMU_CAP_PEBS_OUTPUT_PT_AVAIL	BIT_ULL(PERF_CAP_PT_IDX)
-> +#define PMU_CAP_PEBS_ALL		(PERF_CAP_PEBS_MASK | PMU_CAP_PEBS_OUTPUT_PT_AVAIL)
->  
->  union perf_capabilities {
->  	struct {
-> @@ -331,6 +337,70 @@ static void test_ds_area_noncanonical_address(union perf_capabilities host_cap)
->  	kvm_vm_free(vm);
+>  	if (((cr0 ^ old_cr0) & X86_CR0_CD) &&
+> -	    kvm_arch_has_noncoherent_dma(vcpu->kvm) &&
+> +	    kvm_mmu_honors_guest_mtrrs(vcpu->kvm) &&
+>  	    !kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_CD_NW_CLEARED))
+>  		kvm_zap_gfn_range(vcpu->kvm, 0, ~0ULL);
 >  }
->  
-> +static void test_pebs_bit_combinations(union perf_capabilities host_cap)
-> +{
-> +	int ret;
-
-Reverse xmas tree.
-
-> +	uint64_t pebs_val, val;
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm = vm_create_with_one_vcpu(&vcpu, NULL);
-
-It's kinda silly, but I think it makes sense to wait until after all of the
-TEST_REQUIRE()s to create the VM+vCPU.
-
-> +
-> +	TEST_REQUIRE(kvm_cpu_property(X86_PROPERTY_PMU_VERSION) > 1);
-> +	TEST_REQUIRE(host_cap.capabilities & PERF_CAP_PEBS_FORMAT);
-> +	TEST_REQUIRE(vcpu_get_msr(vcpu, MSR_IA32_MISC_ENABLE) &
-> +		     MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL);
-> +
-> +	/*
-> +	 * Test if PEBS_REC_FMT is set and the value is the same as host,
-> +	 * the other PEBS bits are allowed to be set only if they are the
-> +	 * same as host.
-> +	 */
-> +	pebs_val = host_cap.capabilities & PMU_CAP_PEBS_ALL;
-> +
-> +	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, pebs_val);
-> +	ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES),
-> +		  (u64)pebs_val);
-
-This cast shouldn't be necessary.  And if you're going to split lines...
-
-	ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES),
-		  host_cap.capabilities & PMU_CAP_PEBS_ALL);
-
-Though isn't that flawed?  E.g. will fail if MSR_IA32_PERF_CAPABILITIES has
-non-PEBS bits set.  I think what you want is something like:
-
-	guest_perf_caps = vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES);
-
-	ASSERT_EQ(guest_perf_caps & PMU_CAP_PEBS_ALL,
-		  host_cap.capabilities & PMU_CAP_PEBS_ALL);
-
-> +
-> +	/* Test all PEBS bit combinations. */
-> +	for (val = 0x0; val <= (~0ul & PMU_CAP_PEBS_ALL); val++) {
-> +		/* Skips values that are not related to PEBS. */
-> +		if (val & (PMU_CAP_LBR_FMT | PMU_CAP_SMM_FREEZE |
-> +		    PMU_CAP_FW_WRITES | PMU_CAP_PERF_METRICS_AVAILABLE))
-
-Align things by their scope, i.e.
-
-		if (val & (PMU_CAP_LBR_FMT | PMU_CAP_SMM_FREEZE
-			   PMU_CAP_FW_WRITES | PMU_CAP_PERF_METRICS_AVAILABLE))
-
-But even better would be to look for !PEBS, not some other values where it's not
-clear they exhaustively cover all !PEBS value.  E.g. can't this be?
-
-		if (val & ~PMU_CAP_PEBS_ALL)
-			continue;
-
-> +			continue;
-> +
-> +		/*
-> +		 * Test that value of PEBS is rejected when the KVM doesn't
-
-Just "KVM", not "the KVM".
-
-> +		 * supports Intel PT.
-> +		 */
-> +		if ((val & PMU_CAP_PEBS_OUTPUT_PT_AVAIL) &&
-> +		    (!(host_cap.capabilities & PMU_CAP_PEBS_OUTPUT_PT_AVAIL))) {
-> +			ret = _vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, val);
-> +			TEST_ASSERT(!ret, "Bad PEBS auxiliary bits = 0x%lx didn't fail", val);
-> +
-> +			continue;
-> +		}
-> +
-> +		/*
-> +		 * Test that value of PEBS is rejected when carrying
-
-I don't quite follow what you mean by "carrying".  Do you mean a non-zero value?
-
-> +		 * PEBS_REC_FMT if the value of PEBS is not equal to host.
-> +		 */
-> +		if ((val & PERF_CAP_PEBS_FORMAT) && val != pebs_val) {
-> +			ret = _vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, val);
-> +			TEST_ASSERT(!ret, "Bad PEBS auxiliary bits = 0x%lx didn't fail", val);
-> +
-> +			continue;
-> +		}
-> +
-> +		/*
-> +		 * Test that PEBS bits can be written simultaneously or
-> +		 * independently if PEBS_REC_FMT is not carried.
-> +		 */
-> +		vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, val);
-> +		ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES), val);
-> +	}
-> +
-> +	kvm_vm_free(vm);
-> +}
+> -- 
+> 2.17.1
+> 
