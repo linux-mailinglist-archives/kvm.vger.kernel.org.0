@@ -2,41 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EC8A741372
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 16:11:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 271557413A9
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 16:20:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230219AbjF1OLF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 10:11:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52802 "EHLO
+        id S231917AbjF1OTL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 10:19:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230060AbjF1OLD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 10:11:03 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10122FB;
-        Wed, 28 Jun 2023 07:11:01 -0700 (PDT)
+        with ESMTP id S231921AbjF1OSl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 10:18:41 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2E13294C;
+        Wed, 28 Jun 2023 07:18:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=t1UE1YcEx/3OUicSr8z/BxwdM98H5NewX/wXJaCdFrk=; b=KN9eHtrUeD8K5uBlduYTWdmVU0
-        BnoJhC4+EfIzFNgShMK+lgnKmk5ySokNqM4QQV2xRysgEDs2tfLnZVA2I9EeWgUH1cQ9eUSnOUvwJ
-        lsuJ5n4bDOA0ktg7bN+lJKhMKJyTKHCWZut/VURu+Th7hIvRZut9CPXuLJv4CAZboTJzIq5ub3OBG
-        +J1vzhZalUaW+f4qY5EhbZawLqYzk8ruZJSxspunCw53CuW+bIkPAitD4kpY6NHBbpJ5zZYMZKc5h
-        kgudLe2y3bI36Qsw9nHv53G3UldK+aajeE4zDbsslFbv//oqf7Gf6eZZPd/UoDqgx3ddnIYprUMy/
-        6JSD5CtQ==;
+        bh=WHS7onuXT/a8g00MBKmGlEUlFARjR8xadQuu4dkQLVQ=; b=X+y2nRAABO9CYH/S/cO67Aav2A
+        Z9L+Ubju0tpzunzzVqTASlwVFl2aTpcezURvoi6K1zqxzXlORCVbKPcOFBEhv9L4ZYLJro7xkYivF
+        6d34SozdoP5rfGxg8mE+JUHIxdTX5sqn7kph4kKa5HxocTJhzGBlmPk9eSiCQOYYBDDUC4+w1V9dR
+        IVPfMa4YNObNIqCMYmkY02S2cxQZD5bLT4clORhk0hXbtyUCwNWiCWcbIg5nYhOAlmiwaCr5jRHmT
+        d+w5aRRSGxubahjTpvm6XSZM1ycZjIS4QHYBMQ749hKyUD3MdYa/3ntH5ZAyQjRhaaPFrYAwXAgHi
+        s/XXZv7w==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qEVs5-005fcL-0g;
-        Wed, 28 Jun 2023 14:10:13 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qEVzU-003qti-RT; Wed, 28 Jun 2023 14:17:52 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 690B5300023;
-        Wed, 28 Jun 2023 16:10:11 +0200 (CEST)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id F1923300095;
+        Wed, 28 Jun 2023 16:17:51 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 521712458D611; Wed, 28 Jun 2023 16:10:11 +0200 (CEST)
-Date:   Wed, 28 Jun 2023 16:10:11 +0200
+        id D8FF52458D611; Wed, 28 Jun 2023 16:17:51 +0200 (CEST)
+Date:   Wed, 28 Jun 2023 16:17:51 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     Kai Huang <kai.huang@intel.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -50,15 +49,15 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         ying.huang@intel.com, chao.gao@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
         bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
-Subject: Re: [PATCH v12 08/22] x86/virt/tdx: Get information about TDX module
- and TDX-capable memory
-Message-ID: <20230628141011.GG2438817@hirez.programming.kicks-ass.net>
+Subject: Re: [PATCH v12 09/22] x86/virt/tdx: Use all system memory when
+ initializing TDX module as TDX memory
+Message-ID: <20230628141751.GH2438817@hirez.programming.kicks-ass.net>
 References: <cover.1687784645.git.kai.huang@intel.com>
- <a33f372df345f6232b55e26d498ea67d4adc18f0.1687784645.git.kai.huang@intel.com>
+ <999b47f30fbe2535c37a5e8d602c6c27ac6212dd.1687784645.git.kai.huang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a33f372df345f6232b55e26d498ea67d4adc18f0.1687784645.git.kai.huang@intel.com>
+In-Reply-To: <999b47f30fbe2535c37a5e8d602c6c27ac6212dd.1687784645.git.kai.huang@intel.com>
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
@@ -69,42 +68,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 27, 2023 at 02:12:38AM +1200, Kai Huang wrote:
-> +static int tdx_get_sysinfo(struct tdsysinfo_struct *sysinfo,
-> +			   struct cmr_info *cmr_array)
+On Tue, Jun 27, 2023 at 02:12:39AM +1200, Kai Huang wrote:
+
+> +static int tdx_memory_notifier(struct notifier_block *nb, unsigned long action,
+> +			       void *v)
 > +{
-> +	struct tdx_module_output out;
-> +	u64 sysinfo_pa, cmr_array_pa;
-> +	int ret;
+> +	struct memory_notify *mn = v;
 > +
-> +	sysinfo_pa = __pa(sysinfo);
-> +	cmr_array_pa = __pa(cmr_array);
-> +	ret = seamcall(TDH_SYS_INFO, sysinfo_pa, TDSYSINFO_STRUCT_SIZE,
-> +			cmr_array_pa, MAX_CMRS, NULL, &out);
-> +	if (ret)
-> +		return ret;
+> +	if (action != MEM_GOING_ONLINE)
+> +		return NOTIFY_OK;
+
+So offlining TDX memory is ok?
+
 > +
-> +	pr_info("TDX module: attributes 0x%x, vendor_id 0x%x, major_version %u, minor_version %u, build_date %u, build_num %u",
-> +		sysinfo->attributes,	sysinfo->vendor_id,
-> +		sysinfo->major_version, sysinfo->minor_version,
-> +		sysinfo->build_date,	sysinfo->build_num);
+> +	/*
+> +	 * Empty list means TDX isn't enabled.  Allow any memory
+> +	 * to go online.
+> +	 */
+> +	if (list_empty(&tdx_memlist))
+> +		return NOTIFY_OK;
 > +
-> +	/* R9 contains the actual entries written to the CMR array. */
+> +	/*
+> +	 * The TDX memory configuration is static and can not be
+> +	 * changed.  Reject onlining any memory which is outside of
+> +	 * the static configuration whether it supports TDX or not.
+> +	 */
+> +	return is_tdx_memory(mn->start_pfn, mn->start_pfn + mn->nr_pages) ?
+> +		NOTIFY_OK : NOTIFY_BAD;
 
-So I'm vexed by this comment; it's either not enough or too much.
+	if (is_tdx_memory(...))
+		return NOTIFY_OK;
 
-I mean, as given you assume we all know about the magic parameters to
-TDH_SYS_INFO but then somehow need an explanation for how %r9 is changed
-from the array size to the number of used entries.
+	return NOTIFY_BAD;
 
-Either describe the whole thing or none of it.
-
-Me, I would prefer all of it, because I've no idea where to begin
-looking for any of this, SDM doesn't seem to be the place. That doesn't
-even list TDCALL/SEAMCALL in Volume 2 :-( Let alone describe the magic
-values.
-
-> +	print_cmrs(cmr_array, out.r9);
-> +
-> +	return 0;
 > +}
