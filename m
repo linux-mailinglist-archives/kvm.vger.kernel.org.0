@@ -2,52 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DAA6E740714
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 02:14:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A304740716
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 02:14:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230171AbjF1AOa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 20:14:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55488 "EHLO
+        id S230205AbjF1AOd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 20:14:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230031AbjF1AO3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 20:14:29 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A02D2E8
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 17:14:28 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1b82616c4ecso7476085ad.2
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 17:14:28 -0700 (PDT)
+        with ESMTP id S230172AbjF1AOa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 20:14:30 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1881E8
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 17:14:29 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1b7dd061e9aso23592205ad.2
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 17:14:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687911268; x=1690503268;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ZjcXPxOnEy7+SOVIdg9yFzDIlL6q00qvIVRkRmdKtM=;
-        b=DKB7JOxPefuZO7KixVJFWWixhZBrTUmoOWjWM6HbkNPtDJ7RbVMWVl6G+QYa8/0Nez
-         VHQVCnrnSTflid3YqbihoTRbjdG7G0cJHmZOgIfoEorGz8Op/66NSyMDNTTtlUDzw4JU
-         aMKiH+2Vw0Tgx2tMg9ITPTCQP69+dvxX1tatkgiK5oR8pL+yrznMTNWbHvORRCs5Sp++
-         XEh0e9zrdznltdWvWNkc3wOlpsb0AuPPu0LN+zg7fj/OzOWE+EIsND1JVrKHMQZ4ZY2p
-         TAZCmwRU4oT6/4tm6fmZGWH4Cni0vHZG5naAUjbEM4lu6mgCdpx3HiPS7zENgM9B0V5k
-         GdHg==
+        d=gmail.com; s=20221208; t=1687911269; x=1690503269;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=54YEzEQBCutR+gefBVnLuCnoFZSPr1AQvRKrvXs8DRM=;
+        b=rssPJ9pe0NTvz6xb8tjHKDIANdYWah6ocqGDWrYFtdHXhtR690CLpGIwP4JxsRyT6R
+         ei1iFw3MDnCoowyq7LzVPyYZEvx4ovKQpT/IJ49IWoAwqdC1hnLqjPUBwGEuPSmcoeXH
+         GXdPo47a43QoXcdQ0DRPerhCmr0mu+6fpT1Ky+z7naeXZf6NYd2sJfah/GGGqm4Qjb+x
+         oRDt3Dm3BoEXk8bMc+LK/XqRlCLSpvCUVHUR65GrBJbFZOwIczJQKJmD3UOh0K3PuGOi
+         GqQ9fvA80M/XWHjpFPy7PFGs6pAJCb1EZdQjdAdRs/i3ZZ+6tJoiNj3eRzOsDYp+SBis
+         2opw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687911268; x=1690503268;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4ZjcXPxOnEy7+SOVIdg9yFzDIlL6q00qvIVRkRmdKtM=;
-        b=g8HGq6hGIeLIQ4Xm9pjkDHWtfzZvu+LzBuaGTnCk6tZEwwfTPZf3dYmGN8akqAXnxH
-         S2O+z58JMA0+AAqas3B2y8/N0mbg+Aoo/HIIdoFws947nj1HM1EFcn4tN0b0iPe2maHD
-         rBsFMYWHW8axZotve9dNRnnhLEZhzatt2pdR+msxXEbx4Uf3X5G/YIVvyCkE3XckQbR+
-         sx3+1lvX5zOJ05U1/y0sC69MNTW87IoF9HiIKDKS0m04J3Z2++n4iShkDeCQn83OkL3L
-         pFpC5coWc7Ac9Usf7iHEJzBzsc3W1y3Enp+akyhf7Suwt8LqX20KmcVGjLllFeRTBXX3
-         8LUw==
-X-Gm-Message-State: AC+VfDz0Hn8rZkUrED3oTCVCJ7pG23Ot8T5ZWRn3A8CPcqEHpzrA8i7q
-        zqVRLtrlM7jtQTXV7Ct0JHU=
-X-Google-Smtp-Source: ACHHUZ4ajl/K9Afuy4wmkbZFJTlHaXfzvMo7K6CnfYtIi4x1dX/K2YDRLAr1sl1b7VUp9WmPnjfpFA==
-X-Received: by 2002:a17:902:ea06:b0:1b8:50d:9dd9 with SMTP id s6-20020a170902ea0600b001b8050d9dd9mr7276070plg.51.1687911267850;
-        Tue, 27 Jun 2023 17:14:27 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687911269; x=1690503269;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=54YEzEQBCutR+gefBVnLuCnoFZSPr1AQvRKrvXs8DRM=;
+        b=OWSNKga2pjas5kpg5uAerSH28IrpGi7JUW2wSk07nFSLNcLoZI68QczcQDsqS0rxt+
+         Bax6HW7Gnc8LiR0qLmM/gC2KIkWuWI0xripOnb42OqMH6+aakxkvw2d7SrP+FLiRB9FY
+         rZ4uwZ0Iwcpr6lF99ewtA9YhLkZ2/rDzDVdezEaWrNDMrRD70ojC+uegZKLK0u1ZbAj6
+         3jtX6l3lIk1SzLZT8Uma+CRqmNC6iVlQwReb1+IGK8zD0AVUrO6EW56rEypuQD3nLCvo
+         88BwNWxYOfRyw0c107eh/RK73KO9f1YuI1NMze/1joKyHCi5wi4G7lPbUukHgvR9+31S
+         RrMA==
+X-Gm-Message-State: AC+VfDzjMtC9GjlBk8XaTbmkBr6LPha0jJ6s+C3viQvjLZlU1GBiB3x8
+        ZNDcI6RDtkLnzz4PPNqKR7A=
+X-Google-Smtp-Source: ACHHUZ50pa0YiATIK/COunvYOh3th4Bjpa5itlHWiS7QVeAqx+bEb4TeM16vZWNOaPfnRdlXozFEbw==
+X-Received: by 2002:a17:902:f7c4:b0:1b3:d4aa:461 with SMTP id h4-20020a170902f7c400b001b3d4aa0461mr7901602plw.44.1687911269190;
+        Tue, 27 Jun 2023 17:14:29 -0700 (PDT)
 Received: from sc9-mailhost2.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id jd4-20020a170903260400b001b1920cffdasm343796plb.204.2023.06.27.17.14.26
+        by smtp.gmail.com with ESMTPSA id jd4-20020a170903260400b001b1920cffdasm343796plb.204.2023.06.27.17.14.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 17:14:27 -0700 (PDT)
+        Tue, 27 Jun 2023 17:14:28 -0700 (PDT)
 From:   Nadav Amit <nadav.amit@gmail.com>
 X-Google-Original-From: Nadav Amit
 To:     Andrew Jones <andrew.jones@linux.dev>
@@ -55,10 +56,12 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         Nikos Nikoleris <nikos.nikoleris@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Huth <thuth@redhat.com>, Nadav Amit <namit@vmware.com>
-Subject: [PATCH] .debug ignore - to squash with efi:keep efi
-Date:   Wed, 28 Jun 2023 00:13:48 +0000
-Message-Id: <20230628001356.2706-1-namit@vmware.com>
+Subject: [kvm-unit-tests PATCH v3 0/6] arm64: improve debuggability
+Date:   Wed, 28 Jun 2023 00:13:49 +0000
+Message-Id: <20230628001356.2706-2-namit@vmware.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230628001356.2706-1-namit@vmware.com>
+References: <20230628001356.2706-1-namit@vmware.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -73,22 +76,61 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Nadav Amit <namit@vmware.com>
 
----
- .gitignore | 1 +
- 1 file changed, 1 insertion(+)
+My recent experience in debugging ARM64 tests on EFI was not as fun as I
+expected it to be.
 
-diff --git a/.gitignore b/.gitignore
-index 29f352c..2168e01 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -7,6 +7,7 @@ tags
- *.flat
- *.efi
- *.elf
-+*.debug
- *.patch
- .pc
- patches
+There were several reasons for that besides the questionable definition
+of "fun":
+
+1. ARM64 is not compiled with frame pointers and there is no stack
+   unwinder when the stack is dumped.
+
+2. Building an EFI drops the debug information.
+
+3. The addresses that are printed on dump_stack() and the use of GDB
+   are hard because taking code relocation into account is non trivial.
+
+The patches help both ARM64 and EFI for this matter. The image address
+is printed when EFI is used to allow the use of GDB. Symbols are emitted
+into a separate debug file. The frame pointer is included and special
+entry is added upon an exception to allow backtracing across
+exceptions.
+
+[ PowerPC: Please ack patches 1,2 ]
+[ x86: Please ack patches 1,2,5 ]
+
+v2->v3:
+* Consider PowerPC for reloc and related fixes [Andrew]
+
+v1->v2:
+* Andrew comments [see in individual patches]
+* Few cleanups
+
+Nadav Amit (6):
+  efi: keep efi debug information in a separate file
+  lib/stack: print base addresses on relocation setups
+  arm64: enable frame pointer and support stack unwinding
+  arm64: stack: update trace stack on exception
+  efi: print address of image
+  arm64: dump stack on bad exception
+
+ .gitignore              |  1 +
+ Makefile                |  2 +-
+ arm/Makefile.arm        |  3 --
+ arm/Makefile.arm64      |  2 ++
+ arm/Makefile.common     |  8 +++++-
+ arm/cstart64.S          | 13 +++++++++
+ lib/arm64/asm-offsets.c |  6 +++-
+ lib/arm64/asm/stack.h   |  3 ++
+ lib/arm64/processor.c   |  1 +
+ lib/arm64/stack.c       | 62 +++++++++++++++++++++++++++++++++++++++++
+ lib/efi.c               |  4 +++
+ lib/stack.c             | 31 +++++++++++++++++++--
+ powerpc/Makefile.common |  1 +
+ x86/Makefile.common     |  5 +++-
+ 14 files changed, 133 insertions(+), 9 deletions(-)
+ create mode 100644 lib/arm64/stack.c
+
 -- 
 2.34.1
 
