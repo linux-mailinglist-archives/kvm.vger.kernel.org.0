@@ -2,109 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C986A7411FE
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 15:11:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8253F74121D
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 15:19:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231324AbjF1NKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 09:10:41 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20630 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230458AbjF1NKi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Jun 2023 09:10:38 -0400
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35SCxjGr005743;
-        Wed, 28 Jun 2023 13:10:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=dqrHOtS23igrd6a15KgAzVG3EY30E0zNBaHr7o1S/Jo=;
- b=EH4bNd3Rf5uOpHXqTeH2FcfpSUajSvP/WZi2up0e5k0ffDgqhKkfSq7kKkjeIJ6sikAs
- okkfT6Y9JhTCsoTyJlcDR9/OHGKKIFbBL0MJuW90UuS6c8/ZLgTKb2izpaNR58ZtAbal
- LywpY4szPQ0GbmdBUpfwXvCTp8uE7+SSloTnte3DGec0uUsUMKrq0bHI3ffZ/eu0tJ27
- YcJCOnegNn6zzD3zpKjTRNRPFMLgZi/HcS4blVAIJRrJj5vG9PyxggTgrSWLaGEZlwro
- O1AJXAEG4mii7+zn8E92KkIfySGVPGEklss1tvObe1ZFWr/kb6yR6tDmqeopl5voDrTb 2g== 
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rgn5w8u8d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Jun 2023 13:10:37 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35SBktk6031198;
-        Wed, 28 Jun 2023 13:10:35 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3rdr451y53-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Jun 2023 13:10:35 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35SDAToP59375886
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Jun 2023 13:10:29 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C7ADE20043;
-        Wed, 28 Jun 2023 13:10:29 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8843A20040;
-        Wed, 28 Jun 2023 13:10:29 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 28 Jun 2023 13:10:29 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        frankja@linux.ibm.com, mhartmay@linux.ibm.com, nsg@linux.ibm.com,
-        borntraeger@de.ibm.com
-Subject: [PATCH v1 1/1] KVM: s390: pv: simplify shutdown and fix race
-Date:   Wed, 28 Jun 2023 15:10:29 +0200
-Message-ID: <20230628131029.35145-1-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.41.0
+        id S231750AbjF1NSQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 09:18:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45564 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229686AbjF1NSO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 09:18:14 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6628FC;
+        Wed, 28 Jun 2023 06:18:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=SZjY9T5wYLk/ZPXpC2xwCOO8vFvsYxxnBs2G2p7Kd4c=; b=GOc0CrE7TOe5knDtMw3STu/s9q
+        Zw6M9D5kaE32oHAbeNWaRr+nFWPxDtMQolrRL3ZcJ6mqoDqMnAvWSqNWFw+rkhrcr9WpAuHBlEMmn
+        F0UJr5rHq9k0fwJaOQRnerQoS5u+MRymdKE52oWTefth8eALR/zHVqFrWyTq/om90HIyv+1TkCLLH
+        keCSdVwZSdcfypkBibwUAMMXY6hUUxXM1cnkjzeU1tkgljgoQ3LZjd44Ttw72AvUmgVMib+Uqknnm
+        WBGrVzsNOq5AkFIpYVWh1QbnNOJ3qTpRP6UW9GSk6PCvqpUAiRzMXnu8VP/pHxb4a5t0R7zaPkBt7
+        9FsQs/jw==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qEV2s-005eQa-2y;
+        Wed, 28 Jun 2023 13:17:19 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 257C0300023;
+        Wed, 28 Jun 2023 15:17:18 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 0B3BC27F62BA6; Wed, 28 Jun 2023 15:17:18 +0200 (CEST)
+Date:   Wed, 28 Jun 2023 15:17:17 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-mm@kvack.org, x86@kernel.org, dave.hansen@intel.com,
+        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
+        tglx@linutronix.de, bp@alien8.de, mingo@redhat.com, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, david@redhat.com,
+        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
+        ashok.raj@intel.com, reinette.chatre@intel.com,
+        len.brown@intel.com, ak@linux.intel.com, isaku.yamahata@intel.com,
+        ying.huang@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
+        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
+Subject: Re: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
+ demand
+Message-ID: <20230628131717.GE2438817@hirez.programming.kicks-ass.net>
+References: <cover.1687784645.git.kai.huang@intel.com>
+ <104d324cd68b12e14722ee5d85a660cccccd8892.1687784645.git.kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: AD9XzmSmvwHs_EMjcbfnD80M6S02vQSl
-X-Proofpoint-GUID: AD9XzmSmvwHs_EMjcbfnD80M6S02vQSl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-28_08,2023-06-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- mlxlogscore=851 malwarescore=0 spamscore=0 impostorscore=0
- lowpriorityscore=0 suspectscore=0 clxscore=1015 adultscore=0 bulkscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306280116
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <104d324cd68b12e14722ee5d85a660cccccd8892.1687784645.git.kai.huang@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Simplify the shutdown of non-protected VMs. There is no need to do
-complex manipulations of the counter if it was zero.
+On Tue, Jun 27, 2023 at 02:12:37AM +1200, Kai Huang wrote:
+> +EXPORT_SYMBOL_GPL(tdx_cpu_enable);
 
-This also fixes a very rare race which caused pages to be torn down
-from the address space with a non-zero counter even on older machines
-that don't support the UVC instruction, causing a crash.
-
-Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-Fixes: fb491d5500a7 ("KVM: s390: pv: asynchronous destroy for reboot")
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- arch/s390/kvm/pv.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-index 3ce5f4351156..899f3b8ac011 100644
---- a/arch/s390/kvm/pv.c
-+++ b/arch/s390/kvm/pv.c
-@@ -411,8 +411,12 @@ int kvm_s390_pv_deinit_cleanup_all(struct kvm *kvm, u16 *rc, u16 *rrc)
- 	u16 _rc, _rrc;
- 	int cc = 0;
- 
--	/* Make sure the counter does not reach 0 before calling s390_uv_destroy_range */
--	atomic_inc(&kvm->mm->context.protected_count);
-+	/*
-+	 * Nothing to do if the counter was already 0. Otherwise make sure
-+	 * the counter does not reach 0 before calling s390_uv_destroy_range.
-+	 */
-+	if (!atomic_inc_not_zero(&kvm->mm->context.protected_count))
-+		return 0;
- 
- 	*rc = 1;
- 	/* If the current VM is protected, destroy it */
--- 
-2.41.0
-
+I can't find a single caller of this.. why is this exported?
