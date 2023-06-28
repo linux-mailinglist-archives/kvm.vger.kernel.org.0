@@ -2,98 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F24E6740720
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 02:19:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCD05740723
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 02:19:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229877AbjF1ATL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 20:19:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57506 "EHLO
+        id S230004AbjF1ATS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 20:19:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjF1ATK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 20:19:10 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B1B426AF;
-        Tue, 27 Jun 2023 17:19:09 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id 98e67ed59e1d1-262d9e75438so2838748a91.2;
-        Tue, 27 Jun 2023 17:19:09 -0700 (PDT)
+        with ESMTP id S229934AbjF1ATN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 20:19:13 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A077926B1
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 17:19:12 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-bfae0f532e4so6627025276.2
+        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 17:19:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687911549; x=1690503549;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LRW+WfLeR5s36t4pmpW2ZzxI34nEruKTcCkQKc8zt1Q=;
-        b=lXZCyJeD4x/gEW6A/gLJ9H8o8uBtBEpQLgGWLAuapamP8apREigOJbO980T40piv3j
-         WCpnhd4zm3WHUySGDTZmZQbs4XwQWoG3Ze6TXItSpBeAZ4nOMp9mMoj2r61WE9xiEhCY
-         Yzp2DggX6Uk1j8W7foRtc7JTrQFxh7/EVv1sLjpAJJtEJz9Rm1ccVAqKvzXaaARLDrOW
-         mXFLwWLKQ2EkuGYeyb5N0lmHoMxg6ZguIFT7m/PLtvfuKqbxOEhVYWEGul9CAGrqswyB
-         whrDRsXYJUz8Yka8EPN9pSotmXOZpWThpPGlrrBbIy46M2JJ0L/9cgX5RWWe7+uchlb8
-         GfrA==
+        d=google.com; s=20221208; t=1687911552; x=1690503552;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JxI6sBdKFLWo5Ay5v2GBSHIoKPiwpGbdFIVlVPe/v4M=;
+        b=o7IzfuzhBh4HIx1i1BzhePb11oSoCkZdF5cXU1rZUb1WQ93wB5m8uCCACBFIHP34Nr
+         knyUQJ06dz8rz3+5HG6XTAtPLzdJLqONWk0jZ+gsWGHvqb0ZhqqnpemzA1Z0KfJSUIrA
+         ksnTQsJumX9JbFmfFR+VCu5jr7NfLGkMWfYqUKo7CcbIHbKsCghJ/eD4z2oauLow/LF5
+         kYA3mpHM1XCXMTVouhCUKDJMZ3Guf3f3D5dbWaoaa/kAXGeARWW1TNQwxcz6lChPMCkI
+         9xR1pFECo23PbVvl4RHotEqeXhMwD8qzZwU8o7lIxgjdfdZeC9jNYvmsRlFSNt1/1BW9
+         SDuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687911549; x=1690503549;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LRW+WfLeR5s36t4pmpW2ZzxI34nEruKTcCkQKc8zt1Q=;
-        b=eagH8ACtRWPPh++6I1K0k3csINr6vVWgLgMJY1Oda3qn4nFoUoTjJ5HQaPi6OLgxIE
-         0XHnTppoQE0+arfyS2sNF2RMy1YHG2yrUxWsxXY7OIitL63cwrsD9xLAldHefR7eRZ7N
-         EvyrubpD+fJRNHW4LhrSf3EWPRFYvzB6UZhmUszqAYyIX/bBx0mp9gEgUCtjJ17MR+PK
-         Eh8yC3Az1a1zbnqVCkvbb0oC2XInqetXbNZaGC1tyH3fLuD2Fz36/GBwnTUBoW9Yr91L
-         Pqta8O+vZCFo5d6UIQubfiH8FHgEyynYqnWher+Ma2BHwYRuA2JqgNIhrw10vwnxepe5
-         T2RA==
-X-Gm-Message-State: AC+VfDw1s0QHXRnLADF3DPSXEvCxcLTdDr6eic6CgOorZuNXLi6yaew0
-        jUHYh6nFCa0oc0GcLsmaNU13seRV7QKXtA==
-X-Google-Smtp-Source: ACHHUZ543SbHsjKdnX0Px9SlC2128aPramo/lQSbMVvPHEubWaQs0pY8hUL1Js96oetOeWXp3foqAQ==
-X-Received: by 2002:a17:90a:346:b0:262:ad7b:235b with SMTP id 6-20020a17090a034600b00262ad7b235bmr12898198pjf.34.1687911548511;
-        Tue, 27 Jun 2023 17:19:08 -0700 (PDT)
-Received: from localhost ([192.55.54.50])
-        by smtp.gmail.com with ESMTPSA id lx13-20020a17090b4b0d00b00262def4ad92sm5062690pjb.41.2023.06.27.17.19.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 17:19:07 -0700 (PDT)
-Date:   Tue, 27 Jun 2023 17:19:06 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "nik.borisov@suse.com" <nik.borisov@suse.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        isaku.yamahata@gmail.com
-Subject: Re: [PATCH v12 05/22] x86/virt/tdx: Add SEAMCALL infrastructure
-Message-ID: <20230628001906.GA3629671@ls.amr.corp.intel.com>
-References: <cover.1687784645.git.kai.huang@intel.com>
- <b2a875fd855145728744617ac4425a06d8b46c90.1687784645.git.kai.huang@intel.com>
- <20230627094856.6udzuhzhygc4nzit@box.shutemov.name>
- <102e45dd81589625ed064a742508597e0d118375.camel@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <102e45dd81589625ed064a742508597e0d118375.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        d=1e100.net; s=20221208; t=1687911552; x=1690503552;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JxI6sBdKFLWo5Ay5v2GBSHIoKPiwpGbdFIVlVPe/v4M=;
+        b=I+gEEjgkNGY+0+/IBHFP8jlgigQdZ5d26eR9r+l7cu9RT6WR6AZiG/pCsDJ66xbcsd
+         hlEuppsGXZzKmMOme/7bIJKzOujQsngX/pSLgv/qpPODVVenmEuMKKlPTG3uYRXgk+1r
+         9bchvVsKYWzmL0xJWASU3XhYd/D/sAtDbVj6R1/Su9dzR8hVvBKc3XpnnDPKONg+ZdEz
+         P50wWHniUyxB7YDN8g1rTN4qISLSyaVgpIdJz853njtjT9xSdY7kYSR5FT+MmhiKREJm
+         b733sgSsvI3eFEacArt0XQecrQpDjG3GyA6veg2MbclQ55HiElKLuG40rVKx88ToMUy3
+         TCog==
+X-Gm-Message-State: AC+VfDzbyUEq+d49ejfWJwwNBb39WroM7eDC3d6fzCyEn8SutsLgdz1s
+        TII8JhhQD3ZAJxUIswFw54a5TILU7S8=
+X-Google-Smtp-Source: ACHHUZ7dTSjYNqSQljkBCaYubh27DakmyAQK55bDz+5RD15ftXpG6YHCof66yu7RUAC6POkSnUOpLyFBemc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:248d:0:b0:c1a:b0e2:e933 with SMTP id
+ k135-20020a25248d000000b00c1ab0e2e933mr3579839ybk.1.1687911551936; Tue, 27
+ Jun 2023 17:19:11 -0700 (PDT)
+Date:   Tue, 27 Jun 2023 17:19:10 -0700
+In-Reply-To: <20230606091842.13123-6-binbin.wu@linux.intel.com>
+Mime-Version: 1.0
+References: <20230606091842.13123-1-binbin.wu@linux.intel.com> <20230606091842.13123-6-binbin.wu@linux.intel.com>
+Message-ID: <ZJt8fjfNQYIV9wVk@google.com>
+Subject: Re: [PATCH v9 5/6] KVM: x86: Untag address when LAM applicable
+From:   Sean Christopherson <seanjc@google.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
+        David.Laight@aculab.com, robert.hu@linux.intel.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -101,68 +67,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 27, 2023 at 10:28:20AM +0000,
-"Huang, Kai" <kai.huang@intel.com> wrote:
+On Tue, Jun 06, 2023, Binbin Wu wrote:
+> Untag address for 64-bit memory/MMIO operand in instruction emulations
+> and VMExit handlers when LAM is applicable.
+> 
+> For instruction emulation, untag address in __linearize() before
+> canonical check. LAM doesn't apply to addresses used for instruction
+> fetches or to those that specify the targets of jump and call instructions,
+> use X86EMUL_F_SKIPLAM to skip LAM untag.
+> 
+> For VMExit handlers related to 64-bit linear address:
+> - Cases need to untag address
+>   Operand(s) of VMX instructions and INVPCID.
+>   Operand(s) of SGX ENCLS.
+> - Cases LAM doesn't apply to
+>   Operand of INVLPG.
+>   Linear address in INVPCID descriptor (no change needed).
+>   Linear address in INVVPID descriptor (it has been confirmed, although it is
+>   not called out in LAM spec, no change needed).
+>   BASEADDR specified in SESC of ECREATE (no change needed).
+> 
+> Note:
+> LAM doesn't apply to the writes to control registers or MSRs.
+> LAM masking applies before paging, so the faulting linear address in CR2
+> doesn't contain the metadata.
+> The guest linear address saved in VMCS doesn't contain metadata.
+> 
+> Co-developed-by: Robert Hoo <robert.hu@linux.intel.com>
+> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+> Reviewed-by: Chao Gao <chao.gao@intel.com>
+> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
+> ---
+>  arch/x86/kvm/emulate.c     | 16 +++++++++++++---
+>  arch/x86/kvm/kvm_emulate.h |  2 ++
+>  arch/x86/kvm/vmx/nested.c  |  2 ++
+>  arch/x86/kvm/vmx/sgx.c     |  1 +
+>  arch/x86/kvm/x86.c         |  7 +++++++
+>  5 files changed, 25 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index e89afc39e56f..c135adb26f1e 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -701,6 +701,7 @@ static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
+>  	*max_size = 0;
+>  	switch (mode) {
+>  	case X86EMUL_MODE_PROT64:
+> +		ctxt->ops->untag_addr(ctxt, &la, flags);
+>  		*linear = la;
 
-> On Tue, 2023-06-27 at 12:48 +0300, kirill.shutemov@linux.intel.com wrote:
-> > On Tue, Jun 27, 2023 at 02:12:35AM +1200, Kai Huang wrote:
-> > > +/*
-> > > + * Wrapper of __seamcall() to convert SEAMCALL leaf function error code
-> > > + * to kernel error code.  @seamcall_ret and @out contain the SEAMCALL
-> > > + * leaf function return code and the additional output respectively if
-> > > + * not NULL.
-> > > + */
-> > > +static int __always_unused seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
-> > > +				    u64 *seamcall_ret,
-> > > +				    struct tdx_module_output *out)
-> > > +{
-> > > +	u64 sret;
-> > > +	int cpu;
-> > > +
-> > > +	/* Need a stable CPU id for printing error message */
-> > > +	cpu = get_cpu();
-> > > +	sret = __seamcall(fn, rcx, rdx, r8, r9, out);
-> > > +	put_cpu();
-> > > +
-> > > +	/* Save SEAMCALL return code if the caller wants it */
-> > > +	if (seamcall_ret)
-> > > +		*seamcall_ret = sret;
-> > > +
-> > > +	switch (sret) {
-> > > +	case 0:
-> > > +		/* SEAMCALL was successful */
-> > > +		return 0;
-> > > +	case TDX_SEAMCALL_VMFAILINVALID:
-> > > +		pr_err_once("module is not loaded.\n");
-> > > +		return -ENODEV;
-> > > +	default:
-> > > +		pr_err_once("SEAMCALL failed: CPU %d: leaf %llu, error 0x%llx.\n",
-> > > +				cpu, fn, sret);
-> > > +		if (out)
-> > > +			pr_err_once("additional output: rcx 0x%llx, rdx 0x%llx, r8 0x%llx, r9 0x%llx, r10 0x%llx, r11 0x%llx.\n",
-> > > +					out->rcx, out->rdx, out->r8,
-> > > +					out->r9, out->r10, out->r11);
-> > 
-> > This look excessively noisy.
-> > 
-> > Don't we have SEAMCALL leafs that can fail in normal situation? Like
-> > TDX_OPERAND_BUSY error code that indicate that operation likely will
-> > succeed on retry.
-> 
-> For TDX module initialization TDX_OPERAND_BUSY cannot happen.  KVM may have
-> legal cases that BUSY can happen, e.g., KVM's TDP MMU supports handling faults
-> concurrently on different cpus, but that is still under discussion.  Also KVM
-> tends to use __seamcall() directly:
-> 
-> https://lore.kernel.org/lkml/3c2c142e14a04a833b47f77faecaa91899b472cd.1678643052.git.isaku.yamahata@intel.com/
-> 
-> I guess KVM doesn't want to print message in all cases as you said, but for
-> module initialization is fine.  Those error messages are useful in case
-> something goes wrong, and printing them in seamcall() helps to reduce the code
-> to print in all callers.
+Ha!  Returning the untagged address does help:
 
-That's right.  KVM wants to do its own error handling and error messaging.  Its
-requirement is different from TDX module initialization. I didn't see much
-benefit to unify the function.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+		*linear = ctx->ops->get_untagged_address(ctxt, la, flags);
+
+>  		va_bits = ctxt_virt_addr_bits(ctxt);
+>  		if (!__is_canonical_address(la, va_bits))
+> @@ -771,8 +772,12 @@ static inline int assign_eip(struct x86_emulate_ctxt *ctxt, ulong dst)
+>  
+>  	if (ctxt->op_bytes != sizeof(unsigned long))
+>  		addr.ea = dst & ((1UL << (ctxt->op_bytes << 3)) - 1);
+> +	/*
+> +	 * LAM doesn't apply to addresses that specify the targets of jump and
+> +	 * call instructions.
+> +	 */
+>  	rc = __linearize(ctxt, addr, &max_size, 1, ctxt->mode, &linear,
+> -			 X86EMUL_F_FETCH);
+> +			 X86EMUL_F_FETCH | X86EMUL_F_SKIPLAM);
+
+No need for anything LAM specific here, just skip all FETCH access (unlike LASS
+which skips checks only for branch targets).
+
+> -	rc = linearize(ctxt, ctxt->src.addr.mem, 1, false, &linear);
+> +	/* LAM doesn't apply to invlpg */
+
+Comment unneeded if X86EMUL_F_INVLPG is added.
