@@ -2,232 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC67A7407DB
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 03:56:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A60527408AA
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 04:47:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231194AbjF1B4f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jun 2023 21:56:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54850 "EHLO
+        id S230507AbjF1Crg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jun 2023 22:47:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231186AbjF1B4e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jun 2023 21:56:34 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E2762111
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 18:56:32 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1b7fb1a82c4so20507225ad.1
-        for <kvm@vger.kernel.org>; Tue, 27 Jun 2023 18:56:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20221208.gappssmtp.com; s=20221208; t=1687917391; x=1690509391;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4Cd/G7/Im6qRuywIaizS4WiK3piIElyerw+hFayCjhc=;
-        b=blWTk18r6RBs8QioLBPExCIBzB3ccRZ623Cad7klNG93TJsUgKUMzWCgAl2tV0Ng63
-         w2eRGA6EDird05tCuBu516E3WnLGGMymdfeXum6GLnQAC2Fez66HBXYV3tcfyEZQHWxm
-         mxgTXZMBc8s0hrlxaCa23e0bVQ1Yfa8EbxPWJ0FinE1OFdVXz/LPTHNLQDp3jqQD2jM5
-         57u/iU9mkHCa4aRFHN8i6R0sFDgOPrWJB4vFF4lIut7sCROkoakGtSN2oHM+msZcjL0b
-         oWXFEF1JODW89N1t75p3TcWrffMtYvI25YDA9ZgaXD+Phhw9Aj5q+fwR3zfwMHTCzpvE
-         jTwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687917391; x=1690509391;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4Cd/G7/Im6qRuywIaizS4WiK3piIElyerw+hFayCjhc=;
-        b=IDDprJ2wCrSOywS9+P5NbU1bQts/yZ2a6c90ITcOHYsflgHtgnJqq5wL/M3jZQIj3Q
-         NsW6m54TyBdi3vdkk8YB5N/kEYMs1/emEG4OhXKwgwJD8MH2aU/f9aAVMNjc2RoEkxfm
-         W8tDDr1OlR4BVxPuY39ba3jvXmXtejOS+misXcGynnhsJW4J3CNIsH508Aa3EoHH5Eym
-         b86MHTtxqRYvbLJOTuKywtvJfesJX8n44hezx9JvAGM35LXA5fLDc7FMhXnvu0Ik6SV5
-         XjPdIhsQj5B7RXvVrRDxhKWic7LpFOOX5gR5IxGOl4dY2tnVZUXc0IDZX+lSOuQqGIWS
-         CwbQ==
-X-Gm-Message-State: AC+VfDzbwXOVTQ3NQP/V7xV1UdwJkU4R7KiKKVdEIoZ5dWzEAoGW7oLy
-        O4jkrTqwiV/yzjHQer7eXs3NWg==
-X-Google-Smtp-Source: ACHHUZ58GyJha99BlISGLKvix5VrOdfHBzZg+foa3A15tt5s3k1KZNrsi+SA4yIHW/r87Fw+saC7jw==
-X-Received: by 2002:a17:902:bd07:b0:1b7:e646:4cc4 with SMTP id p7-20020a170902bd0700b001b7e6464cc4mr7446569pls.28.1687917391102;
-        Tue, 27 Jun 2023 18:56:31 -0700 (PDT)
-Received: from localhost ([135.180.227.0])
-        by smtp.gmail.com with ESMTPSA id j18-20020a170902da9200b001b03a1a3151sm6552494plx.70.2023.06.27.18.56.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 18:56:30 -0700 (PDT)
-Date:   Tue, 27 Jun 2023 18:56:30 -0700 (PDT)
-X-Google-Original-Date: Tue, 27 Jun 2023 18:56:27 PDT (-0700)
-Subject:     Re: [PATCH -next v21 03/27] riscv: hwprobe: Add support for probing V in RISCV_HWPROBE_KEY_IMA_EXT_0
-In-Reply-To: <8af3e53a-ead7-4568-a0f1-2829f5d174e6@app.fastmail.com>
-CC:     andy.chiu@sifive.com, linux-riscv@lists.infradead.org,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        Vineet Gupta <vineetg@rivosinc.com>, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, corbet@lwn.net,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        aou@eecs.berkeley.edu, heiko.stuebner@vrull.eu,
-        Evan Green <evan@rivosinc.com>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        ajones@ventanamicro.com, coelacanthus@outlook.com,
-        abrestic@rivosinc.com
-From:   Palmer Dabbelt <palmer@dabbelt.com>
-To:     sorear@fastmail.com
-Message-ID: <mhng-97928779-5d76-4390-a84c-398fdc6a0a4f@palmer-ri-x1c9>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S231378AbjF1CrS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jun 2023 22:47:18 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFB7F2D7E;
+        Tue, 27 Jun 2023 19:47:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687920429; x=1719456429;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=CysqMp8fxbpSEpwP60ZuinsTcIDEWVjPwHMT6Z9z8Mw=;
+  b=dUVGn4/t1X9QNORMW9vai43hcrnrimjsVznWfyJ56kOVA37iaFFNWI8a
+   tcScOtQO+eN+9NhLo/iwPZMBmjE+IsIbYUfhV4tky7PWfno9rgAU+UgHU
+   tYQwy684/S4CWJM4lIIEEVMxidmWdoKFszpF4xuJPP18pkAE6UzJb+LA+
+   unH046Egk8TrtTev3WEo6jNDNKviHtjwaQxIKLycOCDgLwsuc/iE9Jb8w
+   wYPkZ/JzVQErdI4np5b3xhMhl8rwhlL3f1vu++07JJNv45GDLmSxRXzj3
+   Q+ANmAkpNYf7PHyBvvG+6RQeFldDhio5H5iL8KZ0AR+v0UzTSwHKHMDVW
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10754"; a="427739457"
+X-IronPort-AV: E=Sophos;i="6.01,164,1684825200"; 
+   d="scan'208";a="427739457"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 19:47:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10754"; a="694116188"
+X-IronPort-AV: E=Sophos;i="6.01,164,1684825200"; 
+   d="scan'208";a="694116188"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga006.jf.intel.com with ESMTP; 27 Jun 2023 19:47:07 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 27 Jun 2023 19:47:07 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 27 Jun 2023 19:47:06 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 27 Jun 2023 19:47:06 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 27 Jun 2023 19:47:06 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KPgcxZ9WsqKvF4um+UCIc23iLvii60OcR9i9zLQHo4GdV/3AyrYV9a/YXKN0LWEu7mqERbvKXCSUZGzRpzEylOtafUcdAKiSaec3afreSnhdfpekQtQWNXxHxRw93x1UWO94xuqcqyHB6bCkKCE57L9pmY6WQPKQVmuz/qkRVpNtLZa8/4ly7fSr7Z/KuQ2nB5A+XPpaDapo1YYJLoX4KaL5PkaVlxZvRq6RYbVUyF7MWEbfjNpvI6P/wBi7aTeUs4Cod6MbDC+u75gF0UOwBAIHlP/Sa4nDvED9sAS+3xj2RxMbFarHDSvPhSAq/xpEyA8PB4VKFgHHe4+MkWD9KA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CysqMp8fxbpSEpwP60ZuinsTcIDEWVjPwHMT6Z9z8Mw=;
+ b=XQrzURmeWIdGUoT+12msjB9Bz6RWEVVQtAR7nNyDcc7ctezNMUykgZ8F+A3sp8/2HCKkRukVPKoYwUMsP2X0UJI5mNKTejjnotOvNj+O34coU6zxrgKi8bTs+4Eh0chNGWl3zfDx48B5WxbWs0Gh5l84k98tNL7LiFy4ybxp73p+/k3PXe4ZoSCgQQzrcZeYKE0tVIMFdqn3b8tdtWyHvdwD0r/4MxkxdxA0x+nB98Vg0yUMsQnP4BWtkkcWvCNkrJIcszSRty+I2h6QJMAwVrZtTfnK6sXRGfEvnhyvTOmI68CD0tkhhCMJSD85PFWiUwqMXkM8LbeESAdI6MYITw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by LV3PR11MB8580.namprd11.prod.outlook.com (2603:10b6:408:1ae::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Wed, 28 Jun
+ 2023 02:47:03 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4f05:6b0b:dbc8:abbb]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4f05:6b0b:dbc8:abbb%7]) with mapi id 15.20.6521.026; Wed, 28 Jun 2023
+ 02:47:02 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: RE: [PATCH v2 00/11] iommufd: Add nesting infrastructure
+Thread-Topic: [PATCH v2 00/11] iommufd: Add nesting infrastructure
+Thread-Index: AQHZhBZTNX7dDuLMFEel2CdlG13MGq9hZYMwgAAiQoCAB0Y6EIAVLTqAgA7xydCABWBTgIAA1LOwgADAhgCAARBZAIAAzEsAgAcosiCAALdQAIAAz7YQgACqJwCAALFKoA==
+Date:   Wed, 28 Jun 2023 02:47:02 +0000
+Message-ID: <BN9PR11MB5276BA9BBAFB8BCC8B339AFA8C24A@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <ZH9AGWf1yRDu/86q@nvidia.com>
+ <BN9PR11MB52763C7B838B04D3200322FD8C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJBL8QLLBiwRsUSI@nvidia.com>
+ <BN9PR11MB527663567ECB8AD52D3170818C5CA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJGf3sgLKr9HLZuE@nvidia.com>
+ <BN9PR11MB5276B852A32F53BE8EAA1A7D8C5DA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJMvtMe5QHPM0OEJ@Asurada-Nvidia>
+ <BN9PR11MB5276D6040E41595B929843168C26A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJnK2schtjrrwJ1L@Asurada-Nvidia>
+ <BN9PR11MB5276AA174BBE2C4A91C5E5338C27A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJsH1NtUJIDfUthO@nvidia.com>
+In-Reply-To: <ZJsH1NtUJIDfUthO@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|LV3PR11MB8580:EE_
+x-ms-office365-filtering-correlation-id: 58264a60-c3a7-49d3-9d05-08db7781f37c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 9CeCLGGx6ci23zK4PMM8QHsUxPclsFVvJvawxzHCM9juKtDURKwrz7hMr9SDV5CPi8PAStYoFObVk5byJR/EGouUAVS1ZFcjSqn8Plu0fDQiiH070QNsrPk9fbkTksfYhzEBWji1AsLLebw+4ZAJ3zVeS65xGArt3IU24B5Unj5OK6cFZZdfDIfC3xqpmpA5fK0mviprjq7hbTF7aBLNSKDKpqxgd1YnMGElN0xES4y6vv6MhxNyaj33uPwEP1M75Jff0XxOESBkiXkgMPxsF0JZ2/vd8r06SwUOUKlqt7YXaqG+npoyjYXMbhzQXlom3b7xjXMoaUD9yIxRT8gElkK+EV0cuua070o43JNXGqSam6GXQ59VCLYgpb6MTlAMq4+H6nNObJoKPy/4d6xHA8xAEr/gWw6X2VHBHHFh8s+QkO78DT2TRkcehUXY5BcOusdngWNtTBTtecJi6ZrM73E5ui5S5K2n0JUspH6rEJ+9tAg4dTtN1QrobqcIrBy3+zYE1z57SLLMGw+PerUWGro8uzawICF/5krw5Os6Xw+SfNXGHcWG9GppophXwcrTqTesG5q29eNKWg+RVD6IREMBl9dlWdQ1InHk3aP5TM1OLWiIbH7VAyuJKXARlP5I
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(396003)(136003)(39860400002)(346002)(376002)(451199021)(66446008)(38070700005)(26005)(66556008)(66476007)(33656002)(122000001)(6916009)(5660300002)(52536014)(7416002)(86362001)(8936002)(41300700001)(4326008)(316002)(8676002)(82960400001)(66946007)(76116006)(55016003)(64756008)(38100700002)(6506007)(9686003)(186003)(2906002)(71200400001)(54906003)(7696005)(478600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ccDwBOUDaLKhub9BzuRLS9aruxfzkhVsygtSELqBhD7KuV7kb5tEJWtjPla/?=
+ =?us-ascii?Q?luRb2uJ/gYiT0ms5on9P4BqqZ9xKwWzmhPiavwbQL9UsfwbpfOtA9p7ADant?=
+ =?us-ascii?Q?0Eh6ej/EkokTDEg1BpHOHI0I5rQTQuiIO4pR8k3uBJ4mT+baScTPvjFReiu+?=
+ =?us-ascii?Q?5Y5uF6Eg9ktnfbsaHQbVSb/rpG/YMZwLf1lc8kN8Hpo6w6gYpnpPK4ZzIdgo?=
+ =?us-ascii?Q?9cpzszEE2DZuIN9Y+gmPNP7+yeR68xMZFxYBz3KMGdMnJEoXEh2DFOiGEaxf?=
+ =?us-ascii?Q?NnKKB8UtP2onPQuC6qbQ/HjF/WbEnvWl45BRMhy6tZiH3ZjUE8M+4KfVrB3p?=
+ =?us-ascii?Q?Zi5zu1GWX+Ki3CAhK08OlvdhxHpwvDPdv3sWFnh+RbC5LWNYgxHeGKLAJhjz?=
+ =?us-ascii?Q?E38Yr7Vld4rL+QCRnELg3njxUHkb7t1H4omYNJOcqQ9TIcoPEcvPb4Icc/MZ?=
+ =?us-ascii?Q?A9OKZdhDpsvaRt/vOa0KRoP8plxmb5iq2Rc8CEAlWAaybBGvCwUTwtOGAqlZ?=
+ =?us-ascii?Q?BKqJPe3sQapw/vzLt8thY8NisuOtPZtK2tfng/2lf/6HjUI7ImmRWDKN3BT4?=
+ =?us-ascii?Q?VLbsmamChiTSqPf6fTiujQGat5lcR52JsjiPcgbLOCWwokeLTkUvymzvkOy1?=
+ =?us-ascii?Q?sGXPJKKNiFGOiDtrg0+EwuG9oVOtecE3fcYp5RjphTG3h8SFfjRTBfV3oy0n?=
+ =?us-ascii?Q?5hzz9tANjiMICwGypIP+mH7SJiVsxJftLndMf/WvLireKlYZIRl2hC2B3iDR?=
+ =?us-ascii?Q?rHsfluWKNujPRwQHPZpZ3wzoZsN/6kXf2560GzxZw4vN27BE0PZxlKH6V7gg?=
+ =?us-ascii?Q?1m9x5lw8MWVcINiiBHJ3W3yJTYLgW3lee1S4dE80/frXeRGu9iQfilge/lDT?=
+ =?us-ascii?Q?4zzUxRFN9jqYu9hv1qoab8wDZuhEYO6/1PQn9HNnd1obVf+0qlWKCri6f4M3?=
+ =?us-ascii?Q?JHwu8RjB8Y+SlLc9KlUQnAbJWdQftvDEWm1HBn4uSSBl/Q92L2IGJhHgKU4v?=
+ =?us-ascii?Q?227hVlNw0vtoUdIKttDS+rUwjhgkqZihj85OMn5fWfIVXBVjI6ZvcTK7ZHRM?=
+ =?us-ascii?Q?dZzAsvGIAZnIKhUUHhtCsoOEBOqNyw4rIMJO2cffL+J+QuYwF3cg5Dw7eWgg?=
+ =?us-ascii?Q?R3kJecfGrboUEqRKRKT6/OMyJBh1agznCkoJeXEXA9feiVpSCOcwAHjsqOgf?=
+ =?us-ascii?Q?tybR7kAoO1ZrpqGF6GY4BLvyu/dp/JkvKPgEJZ73OtJw6ASPD5OcJek4R4i8?=
+ =?us-ascii?Q?Ea4cD9xLzaqaahVr/PsOnIlSDithB7RqQrQXZ746iJD8fQYo3CMIINNE3Dcu?=
+ =?us-ascii?Q?GJvqtzIEgutcQicY4VdKZ8hljht8NbPD7zGktJMFJZHryzVbgO1JqCnbLNOm?=
+ =?us-ascii?Q?HMKtQszMOMpglKD46nYxipkC0TDss8sLxlFC4a646LX2inWJkPtG30BPsud9?=
+ =?us-ascii?Q?/op8T9K2oMiFyFex2X2RYT0ceUKBcC8ix1AudWl2ggHD2bqtBPS+oaF7BEEb?=
+ =?us-ascii?Q?mIEbFrmQ5ql+QX4h6tys/xIYqZK0OuOSMIUq5/VXDFbZtYvBp2uh+gXIBUda?=
+ =?us-ascii?Q?B4YEopjFunjpILnp56UeKs/NR2qFmiBRTcUXQdY9?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 58264a60-c3a7-49d3-9d05-08db7781f37c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2023 02:47:02.2127
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1Qe6KYpRWpWb8hPWErS5Qfgyjn5lIRb9WpvYQ4W/roOjmtNC0gYHzDwjceXIYREsaow9MM4wLAOuI3S5XcDxjQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8580
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 27 Jun 2023 17:30:33 PDT (-0700), sorear@fastmail.com wrote:
-> On Mon, Jun 5, 2023, at 7:07 AM, Andy Chiu wrote:
->> Probing kernel support for Vector extension is available now. This only
->> add detection for V only. Extenions like Zvfh, Zk are not in this scope.
->>
->> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
->> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
->> Reviewed-by: Evan Green <evan@rivosinc.com>
->> Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
->> ---
->> Changelog v20:
->>  - Fix a typo in document, and remove duplicated probes (Heiko)
->>  - probe V extension in RISCV_HWPROBE_KEY_IMA_EXT_0 key only (Palmer,
->>    Evan)
->> ---
->>  Documentation/riscv/hwprobe.rst       | 3 +++
->>  arch/riscv/include/uapi/asm/hwprobe.h | 1 +
->>  arch/riscv/kernel/sys_riscv.c         | 4 ++++
->>  3 files changed, 8 insertions(+)
->>
->> diff --git a/Documentation/riscv/hwprobe.rst b/Documentation/riscv/hwprobe.rst
->> index 9f0dd62dcb5d..7431d9d01c73 100644
->> --- a/Documentation/riscv/hwprobe.rst
->> +++ b/Documentation/riscv/hwprobe.rst
->> @@ -64,6 +64,9 @@ The following keys are defined:
->>    * :c:macro:`RISCV_HWPROBE_IMA_C`: The C extension is supported, as defined
->>      by version 2.2 of the RISC-V ISA manual.
->>
->> +  * :c:macro:`RISCV_HWPROBE_IMA_V`: The V extension is supported, as defined by
->> +    version 1.0 of the RISC-V Vector extension manual.
->> +
->>  * :c:macro:`RISCV_HWPROBE_KEY_CPUPERF_0`: A bitmask that contains performance
->>    information about the selected set of processors.
->>
->> diff --git a/arch/riscv/include/uapi/asm/hwprobe.h
->> b/arch/riscv/include/uapi/asm/hwprobe.h
->> index 8d745a4ad8a2..7c6fdcf7ced5 100644
->> --- a/arch/riscv/include/uapi/asm/hwprobe.h
->> +++ b/arch/riscv/include/uapi/asm/hwprobe.h
->> @@ -25,6 +25,7 @@ struct riscv_hwprobe {
->>  #define RISCV_HWPROBE_KEY_IMA_EXT_0	4
->>  #define		RISCV_HWPROBE_IMA_FD		(1 << 0)
->>  #define		RISCV_HWPROBE_IMA_C		(1 << 1)
->> +#define		RISCV_HWPROBE_IMA_V		(1 << 2)
->>  #define RISCV_HWPROBE_KEY_CPUPERF_0	5
->>  #define		RISCV_HWPROBE_MISALIGNED_UNKNOWN	(0 << 0)
->>  #define		RISCV_HWPROBE_MISALIGNED_EMULATED	(1 << 0)
->> diff --git a/arch/riscv/kernel/sys_riscv.c
->> b/arch/riscv/kernel/sys_riscv.c
->> index 5db29683ebee..88357a848797 100644
->> --- a/arch/riscv/kernel/sys_riscv.c
->> +++ b/arch/riscv/kernel/sys_riscv.c
->> @@ -10,6 +10,7 @@
->>  #include <asm/cpufeature.h>
->>  #include <asm/hwprobe.h>
->>  #include <asm/sbi.h>
->> +#include <asm/vector.h>
->>  #include <asm/switch_to.h>
->>  #include <asm/uaccess.h>
->>  #include <asm/unistd.h>
->> @@ -171,6 +172,9 @@ static void hwprobe_one_pair(struct riscv_hwprobe
->> *pair,
->>  		if (riscv_isa_extension_available(NULL, c))
->>  			pair->value |= RISCV_HWPROBE_IMA_C;
->>
->> +		if (has_vector())
->> +			pair->value |= RISCV_HWPROBE_IMA_V;
->> +
->>  		break;
->
-> I am concerned by the exception this is making.  I believe the intention of
-> riscv_hwprobe is to replace AT_HWCAP as the single point of truth for userspace
-> to make instruction use decisions.  Since this does not check riscv_v_vstate_ctrl_user_allowed,
-> application code which wants to know if V instructions are usable must use
-> AT_HWCAP instead, unlike all other extensions for which the relevant data is
-> available within the hwprobe return.
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Wednesday, June 28, 2023 12:01 AM
+>=20
+> On Tue, Jun 27, 2023 at 06:02:13AM +0000, Tian, Kevin wrote:
+> > > From: Nicolin Chen <nicolinc@nvidia.com>
+> > > Sent: Tuesday, June 27, 2023 1:29 AM
+> > >
+> > > > I'm not sure whether the MSI region needs a special MSI type or
+> > > > just a general RESV_DIRECT type for 1:1 mapping, though.
+> > >
+> > > I don't quite get this part. Isn't MSI having IOMMU_RESV_MSI
+> > > and IOMMU_RESV_SW_MSI? Or does it juset mean we should report
+> > > the iommu_resv_type along with reserved regions in new ioctl?
+> > >
+> >
+> > Currently those are iommu internal types. When defining the new
+> > ioctl we need think about what are necessary presenting to the user.
+> >
+> > Probably just a list of reserved regions plus a flag to mark which
+> > one is SW_MSI? Except SW_MSI all other reserved region types
+> > just need the user to reserve them w/o knowing more detail.
+>=20
+> I think I prefer the idea we just import the reserved regions from a
+> devid and do not expose any of this detail to userspace.
+>=20
+> Kernel can make only the SW_MSI a mandatory cut out when the S2 is
+> attached.
+>=20
 
-I guess we were vague in the docs about what "supported" means, but IIRC 
-the goal was for riscv_hwprobe() to indicate what's supported by both 
-the HW and the kernel.  In other words, hwprobe should indicate what's 
-possible to enable -- even if there's some additional steps necessary to 
-enable it.
+I'm confused.
 
-We can at least make this a little more explicit with something like
+The VMM needs to know reserved regions per dev_id and report them
+to the guest.
 
-    diff --git a/Documentation/riscv/hwprobe.rst b/Documentation/riscv/hwprobe.rst
-    index 19165ebd82ba..7f82a5385bc3 100644
-    --- a/Documentation/riscv/hwprobe.rst
-    +++ b/Documentation/riscv/hwprobe.rst
-    @@ -27,6 +27,13 @@ AND of the values for the specified CPUs. Usermode can supply NULL for cpus and
-     0 for cpu_count as a shortcut for all online CPUs. There are currently no flags,
-     this value must be zero for future compatibility.
-     
-    +Calls to `sys_riscv_hwprobe()` indicate the features supported by both the
-    +kernel and the hardware that the system is running on.  For example, if the
-    +hardware supports the V extension and the kernel has V support enabled then
-    +`RISCV_HWPROBE_KEY_IMA_EXT_0`/`RISCV_HWPROBE_IMA_V` will be set even if the V
-    +extension is disabled via a userspace-controlled tunable such as
-    +`PR_RISCV_V_SET_CONTROL`.
-    +
-     On success 0 is returned, on failure a negative error code is returned.
-     
-     The following keys are defined:
-    @@ -65,7 +72,10 @@ The following keys are defined:
-         by version 2.2 of the RISC-V ISA manual.
-     
-       * :c:macro:`RISCV_HWPROBE_IMA_V`: The V extension is supported, as defined by
-    -    version 1.0 of the RISC-V Vector extension manual.
-    +    version 1.0 of the RISC-V Vector extension manual.  For strict uABI
-    +    compatibility some systems may disable V by default even when the hardware
-    +    supports in, in which case users must call `prctl(PR_RISCV_V_SET_CONTROL,
-    +    ...` to explicitly allow V to be used.
-     
-       * :c:macro:`RISCV_HWPROBE_EXT_ZBA`: The Zba address generation extension is
-            supported, as defined in version 1.0 of the Bit-Manipulation ISA
+And we have aligned on that reserved regions (except SW_MSI) should
+not be automatically added to S2 in nesting case. Then the VMM cannot
+rely on IOAS_IOVA_RANGES to identify the reserved regions.
 
-IMO that's the better way to go that to require that userspace tries to enable
-V via the prctl() first, but we haven't released this yet so in theory we could
-still change it.
+So there needs a new interface for the user to discover reserved regions
+per dev_id, within which the SW_MSI region should be marked out so
+identity mapping can be installed properly for it in S1.
 
-We'd have a similar discussion for some of the counters that need to feed
-through the perf interface, though those are still in flight...
-
-> Assuming this is intentional, what is the path forward for future extensions
-> that cannot be used from userspace without additional conditions being met?
-> For instance, if we add support in the future for the Zve* extensions, the V
-> bit would not be set in HWCAP for them, which would require library code to
-> use the prctl interface unless we define the hwcap bits to imply userspace
-> usability.
-
-In this case a system that supports some of the Zve extensions but not 
-the full V extension would not be probably from userspace, as V would 
-not be set anywhere.  The way to support that would be to add new bits 
-into hwprobe to indicate those extensions, it just wasn't clear that 
-anyone was interested in building Linux-flavored systems that supported 
-only some a strict subset of V.
-
-Happy to see patches if you know of some hardware in the pipeline, though ;)
-
->
-> -s
->
->>  	case RISCV_HWPROBE_KEY_CPUPERF_0:
->> --
->> 2.17.1
->>
->>
->> _______________________________________________
->> linux-riscv mailing list
->> linux-riscv@lists.infradead.org
->> http://lists.infradead.org/mailman/listinfo/linux-riscv
+Did I misunderstand your point in previous discussion?
