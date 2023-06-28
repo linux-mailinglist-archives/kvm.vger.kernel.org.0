@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD61B741AE1
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 23:29:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38089741AE4
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 23:30:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231882AbjF1V3G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 17:29:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33320 "EHLO
+        id S232023AbjF1Van (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 17:30:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231628AbjF1V3E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 17:29:04 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D321BEA
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 14:29:02 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-57325434999so2341277b3.1
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 14:29:02 -0700 (PDT)
+        with ESMTP id S230413AbjF1Val (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 17:30:41 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 476CE1FDC
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 14:30:40 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-be47a3b3a01so155300276.2
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 14:30:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687987742; x=1690579742;
+        d=google.com; s=20221208; t=1687987839; x=1690579839;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S4+NG0E282pExx69hOpqlYJL4D++Sscbft5Jezcu1U4=;
-        b=LmTiMTLjtNU8B+N2wm1qv1Xh+WY5DCUp3/vCPG22i+LFvSuz4Z8BwGRQgKrdosqrED
-         8KVLYu5kYeA9sXbrtaC5xRgq12Vn0+jvo2NS9FLX2LoVDN7s6lIqJncjVsTOxKDbSs/t
-         qmWHZuANGKIhnEeC5aO9RIfyOD2dsd+EBfvThphHldcD8OElNd8OFdMTrLG6DGcxVUMr
-         /eTTF8mTqrNEzid+Gjd117s+xAtn9r5f2QzMeSYYZe7yxL0+jjhc9mlb5l1VEz4t38du
-         C+w0gdJaiY+6ADDV+ee0nUnzlJPd4yq+N++z02+jMjaYwzgoHHeZQeGQqoPH+LPTsanU
-         0eOQ==
+        bh=VcnjYg/WB2vQn+tBGvK3Q2gluatWaUqvXxEopMzKdso=;
+        b=nBCEFq9b2TG3gseb06QDgnUtN/CScBK+uLIbOaLLRsI3KJk84omXwh3k8Fj4OMTxi7
+         TWGDjSmRl95Za+Hc1FBI/a1ypwBtn4txANo14deOfMtjacON+9hju13X74roaEUQd5WY
+         fKQyjYRf1wHfKWXBhRWvTg1azXTGz2C+RoDWlQEksAORrVyZNlkbDXLH9k/y9tp73P3i
+         ZJAUAyMhFFbWYUTpGgLaOhoRTDUKP9+ebdp00PodHiXW1qlx0Bz17w58BRy538VJcFbM
+         B8v4CiztnM28Vj536xtLaLbwutOFZrYY6jDpo4b5N+VeJw17SSvHoaD5q/0HknmbBDRQ
+         3o8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687987742; x=1690579742;
+        d=1e100.net; s=20221208; t=1687987839; x=1690579839;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S4+NG0E282pExx69hOpqlYJL4D++Sscbft5Jezcu1U4=;
-        b=MHUIGhOQlb8Ml/71DGq2crnZxDzd9mJ7tMPtHnjhBvAolh5ILITSL6PoUc/La/Ujna
-         QnRdWP72LcdfJLV9iFj4tJOuFJYc8GOuFBHA5wCo4EOm1SCV9pjJo8TyOdBHaTRLhuxN
-         8xIdv1skXUtUvqqlynWrivOdwlTAs/u6n59j7ttKOkpBzo9PAXKM3Ffg359EKNHeujaD
-         gswePKEfPQjhiyo1/22oJswpev+8yi4b7EodYQTxCFlenx2iPnETjAa2zcz+AMXcr0Bg
-         F/seenarqzSSMiSa9L4k5WDDyFX8gMbt+d7p0Dh83T5xTAk9v89qYAEM4dQdwJOGL3x7
-         XVjA==
-X-Gm-Message-State: AC+VfDz+MEuXf8GKxQI9PVHRo6erDdvBJIS+Od/y8UHa9dy8Me6b0Th3
-        /ohw05FVfPSEDq/z35j/ayNgBNwrbYQ=
-X-Google-Smtp-Source: ACHHUZ4n8a2QLF6VBqJGBRku7htondlRkoTsoqSbam1pQTzOu9LsAReH81erivYUgmkTY3xJRw3s1hR6jZA=
+        bh=VcnjYg/WB2vQn+tBGvK3Q2gluatWaUqvXxEopMzKdso=;
+        b=AxxhQHPFF2WG5nezI9c9202JQRy4rddwUg2oELDTmITiJh2OF2Ubbts5GGTV2QDgiy
+         Mg6gPwLwjf7rQkgSruYWh7alanR+KiRc8lb8zKVAFR2dcuUw981C4AXD8PLpjdjGr7YM
+         9Lsh79FsdfCDt7gx7aE4P306JvcEx2HhfAqkleLEg3ARNprQ7ZSFIzX5451uD1I4mMQq
+         1zhX92rpIB22HufM/m5EdbQsONkFMhm9eOuPCiQePIT3YeGNw9Y2cVHQ6mu4Nn0lLBxA
+         QHXo2R7yIFkmqm77nCvzyJTBQOnoINgfYbhJf3K+KXlhrQp3nlBigAVuYQa3rBu+k2B7
+         ysCA==
+X-Gm-Message-State: AC+VfDxTiJTetSlT5oglWUEQv5qRCjUg2pEX4Uu9BN/KmO4YwAr1ReTO
+        9MSfD7HC7KrOGN4Y0KVCr1kauWaa46c=
+X-Google-Smtp-Source: ACHHUZ5XelWl+F2ma1SfdrNipVHrp8infBaeoZzX2b9ZqRCrkICVXeVBv8pkxbJ+G47QSPPaNsQPsAdxz0Y=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:708:b0:576:a5a8:f686 with SMTP id
- bs8-20020a05690c070800b00576a5a8f686mr4556851ywb.9.1687987741909; Wed, 28 Jun
- 2023 14:29:01 -0700 (PDT)
-Date:   Wed, 28 Jun 2023 14:29:00 -0700
-In-Reply-To: <20230607123700.40229-4-cloudliang@tencent.com>
+ (user=seanjc job=sendgmr) by 2002:a25:ab6b:0:b0:c1b:4347:b3db with SMTP id
+ u98-20020a25ab6b000000b00c1b4347b3dbmr3335327ybi.6.1687987839556; Wed, 28 Jun
+ 2023 14:30:39 -0700 (PDT)
+Date:   Wed, 28 Jun 2023 14:30:37 -0700
+In-Reply-To: <20230607123700.40229-5-cloudliang@tencent.com>
 Mime-Version: 1.0
-References: <20230607123700.40229-1-cloudliang@tencent.com> <20230607123700.40229-4-cloudliang@tencent.com>
-Message-ID: <ZJymHAKx9XNAFYPk@google.com>
-Subject: Re: [PATCH v3 3/4] KVM: selftests: Check if event filter meets
- expectations on fixed counters
+References: <20230607123700.40229-1-cloudliang@tencent.com> <20230607123700.40229-5-cloudliang@tencent.com>
+Message-ID: <ZJymfTf+fRFnDsyW@google.com>
+Subject: Re: [PATCH v3 4/4] KVM: selftests: Test gp event filters don't affect
+ fixed event filters
 From:   Sean Christopherson <seanjc@google.com>
 To:     Jinrong Liang <ljr.kernel@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -69,7 +69,7 @@ Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -77,30 +77,22 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Jun 07, 2023, Jinrong Liang wrote:
-> +	/*
-> +	 * Check the fixed performance counter can count normally works when
-> +	 * KVM userspace doesn't set any pmu filter.
-> +	 */
-> +	TEST_ASSERT(run_vcpu_to_sync(vcpu),
-> +		    "Fixed counter does not exist or does not work as expected.");
-
-No punctuation, and print the unexpected return value so that debug isn't too
-painful.
-
+>  static void __test_fixed_counter_bitmap(struct kvm_vcpu *vcpu, uint8_t idx,
+>  					uint8_t nr_fixed_counters)
+>  {
+> @@ -881,6 +894,25 @@ static void __test_fixed_counter_bitmap(struct kvm_vcpu *vcpu, uint8_t idx,
+>  						       bitmap);
+>  		TEST_ASSERT(!!count == !(bitmap & BIT(idx)),
+>  			    "Fixed event filter does not work as expected.");
 > +
-> +	for (i = 0; i < BIT(nr_fixed_counters); i++) {
-> +		bitmap = BIT(i);
-> +		count = test_with_fixed_counter_filter(vcpu, KVM_PMU_EVENT_ALLOW,
-> +						       bitmap);
-> +		TEST_ASSERT(!!count == !!(bitmap & BIT(idx)),
-> +			    "Fixed event filter does not work as expected.");
+> +		/*
+> +		 * Check that setting both events[] and fixed_counter_bitmap
+> +		 * does not affect the consistency of the fixed ctrs' behaviour.
 
-No punctuation please.
+Spell out "counters".  And this isn't about "consistency", the fixed_counter_bitmap
+should straight up win, i.e.
 
-> +
-> +		count = test_with_fixed_counter_filter(vcpu, KVM_PMU_EVENT_DENY,
-> +						       bitmap);
-> +		TEST_ASSERT(!!count == !(bitmap & BIT(idx)),
-> +			    "Fixed event filter does not work as expected.");
-> +	}
-> +}
+		/*
+		 * Check that fixed_counter_bitmap has higher priority than
+		 * events[] when both are set.
+		 */
