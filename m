@@ -2,125 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EBC6740E72
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 12:14:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84E8D740E84
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 12:20:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229436AbjF1KN7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 06:13:59 -0400
-Received: from mail.loongson.cn ([114.242.206.163]:60946 "EHLO
-        mail.loongson.cn" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230447AbjF1KLi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 06:11:38 -0400
-Received: from loongson.cn (unknown [10.20.42.170])
-        by gateway (Coremail) with SMTP id _____8Axy8ZYB5xkWXADAA--.5475S3;
-        Wed, 28 Jun 2023 18:11:36 +0800 (CST)
-Received: from [10.20.42.170] (unknown [10.20.42.170])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8CxF8xXB5xkuyUOAA--.13135S3;
-        Wed, 28 Jun 2023 18:11:35 +0800 (CST)
-Message-ID: <30261345-45de-8511-e285-fe16ee408ba1@loongson.cn>
-Date:   Wed, 28 Jun 2023 18:11:35 +0800
+        id S230121AbjF1KUe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 06:20:34 -0400
+Received: from foss.arm.com ([217.140.110.172]:53190 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231417AbjF1KSQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 06:18:16 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D2067113E;
+        Wed, 28 Jun 2023 03:18:59 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4F5463F663;
+        Wed, 28 Jun 2023 03:18:14 -0700 (PDT)
+Date:   Wed, 28 Jun 2023 11:18:11 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Eric Auger <eric.auger@redhat.com>
+Cc:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, andrew.jones@linux.dev, maz@kernel.org,
+        will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
+        reijiw@google.com, mark.rutland@arm.com
+Subject: Re: [kvm-unit-tests PATCH v3 0/6] arm: pmu: Fix random failures of
+ pmu-chain-promotion
+Message-ID: <ZJwI45VTkf6TppBm@monolith.localdoman>
+References: <20230619200401.1963751-1-eric.auger@redhat.com>
+ <0aa48994-96b3-b5a1-e72b-961e6e892142@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v15 27/30] LoongArch: KVM: Implement vcpu world switch
-Content-Language: en-US
-To:     WANG Xuerui <kernel@xen0n.name>,
-        zhaotianrui <zhaotianrui@loongson.cn>,
-        Jinyang He <hejinyang@loongson.cn>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Xi Ruoyao <xry111@xry111.site>, tangyouling@loongson.cn
-References: <20230626084752.1138621-1-zhaotianrui@loongson.cn>
- <20230626084752.1138621-28-zhaotianrui@loongson.cn>
- <f648a182-7c26-5bbc-6ae5-584af26e9db1@loongson.cn>
- <7017277c-3721-b417-5215-491efae7c8a9@loongson.cn>
- <cfc87f85-3a09-8a9e-4258-4fb1fd8013ab@xen0n.name>
-From:   bibo mao <maobibo@loongson.cn>
-In-Reply-To: <cfc87f85-3a09-8a9e-4258-4fb1fd8013ab@xen0n.name>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8CxF8xXB5xkuyUOAA--.13135S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxGry3CF4kKrWfXw15XrWUtrc_yoW5WFy5pF
-        18AFW3GrZ8Jrs5Gw1UK3WUZF9ayF18ta15Xr1Fqa45A348Kwn2gF10gr1q9F1fJw4rJryj
-        9r4jqws7ZF13AFXCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-        xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-        AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-        AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-        8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_GFv_Wrylx2IqxVAqx4xG67
-        AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-        rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
-        v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUU
-        UU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0aa48994-96b3-b5a1-e72b-961e6e892142@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
-
-在 2023/6/28 17:51, WANG Xuerui 写道:
-> Hi,
+On Wed, Jun 28, 2023 at 09:44:44AM +0200, Eric Auger wrote:
+> Hi Alexandru, Drew,
 > 
-> On 2023/6/28 16:34, zhaotianrui wrote:
->>
->> 在 2023/6/28 上午11:42, Jinyang He 写道:
->>> On 2023-06-26 16:47, Tianrui Zhao wrote:
->>>
->>>> [snip]
->>>
->>>> +    ldx.d   t0, t1, t0
->>>> +    csrwr    t0, LOONGARCH_CSR_PGDL
->>>> +
->>>> +    /* Mix GID and RID */
->>>> +    csrrd        t1, LOONGARCH_CSR_GSTAT
->>>> +    bstrpick.w    t1, t1, CSR_GSTAT_GID_SHIFT_END, CSR_GSTAT_GID_SHIFT
->>>> +    csrrd        t0, LOONGARCH_CSR_GTLBC
->>>> +    bstrins.w    t0, t1, CSR_GTLBC_TGID_SHIFT_END, CSR_GTLBC_TGID_SHIFT
->>>> +    csrwr        t0, LOONGARCH_CSR_GTLBC
->>>> +
->>>> +    /*
->>>> +     * Switch to guest:
->>>> +     *  GSTAT.PGM = 1, ERRCTL.ISERR = 0, TLBRPRMD.ISTLBR = 0
->>>> +     *  ertn
->>>> +     */
->>>> +
->>>> +    /*
->>>> +     * Enable intr in root mode with future ertn so that host interrupt
->>>> +     * can be responsed during VM runs
->>>> +     * guest crmd comes from separate gcsr_CRMD register
->>>> +     */
->>>> +    ori    t0, zero, CSR_PRMD_PIE
->>> li.w t0, CSR_PRMD_PIE
->> Thanks for your advice, and I think it need not to replace it with "li.w" there, as it has the same meaning with "ori" instruction, and "ori" instruction is simple and clear enough. The same as the following "move" instructions. What do you think of it.
-> 
-> Just my 2c: I'd agree that pseudo-instructions should be used wherever possible and helping readability.
-"lu12i.w+srli.w" can be replaced by "li.w t0, KVM_GPGD" 
-we accept the suggestion two instructions should be replaced with pseudo-instruction.
+> On 6/19/23 22:03, Eric Auger wrote:
+> > On some HW (ThunderXv2), some random failures of
+> > pmu-chain-promotion test can be observed.
+> >
+> > pmu-chain-promotion is composed of several subtests
+> > which run 2 mem_access loops. The initial value of
+> > the counter is set so that no overflow is expected on
+> > the first loop run and overflow is expected on the second.
+> > However it is observed that sometimes we get an overflow
+> > on the first run. It looks related to some variability of
+> > the mem_acess count. This variability is observed on all
+> > HW I have access to, with different span though. On
+> > ThunderX2 HW it looks the margin that is currently taken
+> > is too small and we regularly hit failure.
+> >
+> > although the first goal of this series is to increase
+> > the count/margin used in those tests, it also attempts
+> > to improve the pmu-chain-promotion logs, add some barriers
+> > in the mem-access loop, clarify the chain counter
+> > enable/disable sequence.
+> >
+> > A new 'pmu-mem-access-reliability' is also introduced to
+> > detect issues with MEM_ACCESS event variability and make
+> > the debug easier.
+> >
+> > Obviously one can wonder if this variability is something normal
+> > and does not hide any other bug. I hope this series will raise
+> > additional discussions about this.
+> >
+> > https://github.com/eauger/kut/tree/pmu-chain-promotion-fixes-v3
+> >
+> > History:
+> >
+> > v2 -> v3:
+> > - took into account Alexandru's comments. See individual log
+> >   files
+> Gentle ping. Does this version match all your expectations?
 
-For the instruction "ori    t0, zero, CSR_PRMD_PIE"
-what is advantage of this pseudo-instruction
-    li.w t0, CSR_PRMD_PIE
+The series are on my radar, I'll have a look this Friday.
 
-is "ori t0, zero, CSR_PRMD_PIE" hard to understand? It is basic arithmetic instr and easy to understand also. To be frank I do not see the advantage of using li.w, also there is no document that pseudo-instruction should be used with high priority.
+Thanks,
+Alex
 
-Regards
-Bibo Mao
 > 
-> FYI there were similar usages way before, but all were cleaned up with my previous commit 57ce5d3eefac ("LoongArch: Use the "move" pseudo-instruction where applicable").
+> Thanks
 > 
-> Such usages apparently came from an era when the LoongArch toolchains didn't support any pseudo-instruction, and are less intuitive especially for someone not familiar with LoongArch assembly. Given that familiarity with LoongArch won't be widespread (unlike with e.g. RISC-V that are adopted more widely), we should optimize for readability when writing code; it's also a best practice in general because code is read way more often than written, and people care about semantics not unnecessary details like "how are moves like this or that materialized".
+> Eric
+> >
+> > v1 -> v2:
+> > - Take into account Alexandru's & Mark's comments. Added some
+> >   R-b's and T-b's.
+> >
+> >
+> > Eric Auger (6):
+> >   arm: pmu: pmu-chain-promotion: Improve debug messages
+> >   arm: pmu: pmu-chain-promotion: Introduce defines for count and margin
+> >     values
+> >   arm: pmu: Add extra DSB barriers in the mem_access loop
+> >   arm: pmu: Fix chain counter enable/disable sequences
+> >   arm: pmu: Add pmu-mem-access-reliability test
+> >   arm: pmu-chain-promotion: Increase the count and margin values
+> >
+> >  arm/pmu.c         | 208 ++++++++++++++++++++++++++++++++--------------
+> >  arm/unittests.cfg |   6 ++
+> >  2 files changed, 153 insertions(+), 61 deletions(-)
+> >
 > 
-
