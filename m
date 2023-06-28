@@ -2,77 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8724741BA5
-	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 00:08:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB7B9741BCF
+	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 00:43:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231835AbjF1WIq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 18:08:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42220 "EHLO
+        id S231631AbjF1Wnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 18:43:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229972AbjF1WIo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 18:08:44 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BF12210B
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 15:08:43 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-53f06f7cc74so10042a12.1
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 15:08:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687990123; x=1690582123;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dWsQ+Zk7IjWGrlut4U5SpkgMPsmLAFUMniA+6zN69Ac=;
-        b=uTE1vo4MY53qGUepRvI/eb4jxvbxYUEOkPTTvvoD4kGkMDRhRLsKzlGL+vQLMjhKRi
-         rdeWPPHm+L2E8twFBAHl+ZoEMemoTY5PNpYWB+f1xGrPZGZ2la2YZiTaJab5HHqd1wGu
-         e8TDq18vFJWMtrUvtcJUxqp4yTMOBToJdy/ugfjzlaSzjWeyDaxn9ot07hn/Pbz02y9X
-         nLv8szoIVmDzsQGyNi1/NfgnmXBsbr3QltbMozbVHuKXTSLvqZ+0gEau2/8RUWMqkcYj
-         zbwadNSttgKKZPrqDNVQfevrq9jnrko7CL5qNbCNLrVhTgwrR3NdAPk4RY/cPRIrFlwf
-         sAjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687990123; x=1690582123;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dWsQ+Zk7IjWGrlut4U5SpkgMPsmLAFUMniA+6zN69Ac=;
-        b=Em7iBYz9X9rm51CjDVbLmhK6VgrjVUckp1cPJDm3jw0BLfjH5cGBjFlKK2Y8YUEh1k
-         7eycZJCYsWGwL72xMaMu5R3/k9jwNct9Fr3hwZnkAgGseMPF0APa8lQX9uLtr7cOUNXS
-         uXDsO3MqorrPywr+LETAqpo8oghIr0HyNUh8GqFJvrFeZl/WJPjvnTfXRYfXAlNOivEj
-         3+HL/4DKO61Gxt1P40ghK0N2NrbupZs6P80pKhPe669H22R3AuJ2vyFKx5K47sSULxw2
-         ypMaWn5VYeZ5HTU2C2gTq2bBEZ6+UGTtHAz4d6ThmfAqTce6jfVGxBijjliSvAhDawmJ
-         EhHw==
-X-Gm-Message-State: AC+VfDytCoNvhauG2x/W/JoMpcWB5nQP9InM6N92anxIK0O/SdeTlPj5
-        V6U9iybEM/yIxmJhY535EDGYPiF3i4k=
-X-Google-Smtp-Source: ACHHUZ7HOmJsurSrMF65FGkboY/aMr53gf5wL8po/HLlsjcs/5jxbF2RqSFGM05DvnggoK1dwXSa0P2+iKM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:cd09:0:b0:553:8437:3db3 with SMTP id
- i9-20020a63cd09000000b0055384373db3mr490412pgg.3.1687990122897; Wed, 28 Jun
- 2023 15:08:42 -0700 (PDT)
-Date:   Wed, 28 Jun 2023 15:08:41 -0700
-In-Reply-To: <20230616023614.7261-1-yan.y.zhao@intel.com>
-Mime-Version: 1.0
-References: <20230616023101.7019-1-yan.y.zhao@intel.com> <20230616023614.7261-1-yan.y.zhao@intel.com>
-Message-ID: <ZJyvaVVyxPmhvYph@google.com>
-Subject: Re: [PATCH v3 04/11] KVM: x86/mmu: Use KVM honors guest MTRRs helper
- when update mtrr
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
-        robert.hoo.linux@gmail.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231422AbjF1WnW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 18:43:22 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDE841715;
+        Wed, 28 Jun 2023 15:43:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687992200; x=1719528200;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=x+1cfc/xmoFxBnLLgTcKrep1dUoeoXKUxnolji14RNc=;
+  b=demIm3U0Dy3KSwiOehDB1LWzsy0oKoA6oT37rK1wTuFRYalpd3HJGnip
+   UtYR1Zqr+QlIsDirgbARaPBFU1acRu3Iqw5aD5cmH1/W7G/h3jnzyN9vG
+   K6vVbwrKbzIae+O7dA4zWTiv516eaHCeqQcWxHEjZT3C374iSOZCzQlN7
+   SGfoOpaYNaOnZfkRdZlWb6qD0kYlYu8yPOAtZ0y4HjHWvUlTQzmo62hgx
+   TudevnR1DlXD3WrOguya8EfZ9VPLOUBJWdpsdQ+Rg66ofsN5YbdBwSHqU
+   chEfgWS4sJ1424bYreUruKQTbYC+fZ1xyu/MxTi80FeAwVlu6+RDRZf6B
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="392699110"
+X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
+   d="scan'208";a="392699110"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 15:43:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="830299976"
+X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
+   d="scan'208";a="830299976"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 15:43:19 -0700
+From:   isaku.yamahata@intel.com
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        linux-coco@lists.linux.dev,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>
+Subject: [RFC PATCH v3 00/11] KVM: guest memory: Misc enhacnement
+Date:   Wed, 28 Jun 2023 15:42:59 -0700
+Message-Id: <cover.1687991811.git.isaku.yamahata@intel.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 16, 2023, Yan Zhao wrote:
-> Call helper to check if guest MTRRs are honored by KVM MMU before
-> calculation and zapping.
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Same comment here about stating the effect, not the literal code change.
+Hello. I've updated the patch series based on the feedback. Here are the
+discussion points.
 
-> Guest MTRRs only affect TDP memtypes when TDP honors guest MTRRs, there's
-> no meaning to do the calculation and zapping otherwise.
+- 06/11 KVM: x86: Introduce PFERR_GUEST_ENC_MASK to indicate fault is private
+  Michael has his own opinion on how to indicate private fault.
+
+- 09/11 KVM: Add new members to struct kvm_gfn_range to operate on
+
+- 10/11 KVM: x86: Add gmem hook for initializing private memory
+  SNP needs the callback. TDX won't use this one.
+
+- 11/11 KVM: x86: Add gmem hook for invalidating private memory
+  SNP needs the callback. TDX doesn't use this one at the moment, but would
+  use it.
+  
+- VM type:
+  I didn't rename KVM_X86_PROTECTED_VM to KVM_X86_SW_PROTECTED_VM  in this patch
+  series.  It's easy to rename it if desired.
+
+Thanks,
+
+This is an RFC patch series based on KVM gmem [1] and [2] for the common use of
+TDX and SEV-SNP.
+
+[1] KVM gmem patches
+https://github.com/sean-jc/linux/tree/x86/kvm_gmem_solo
+
+[2] Add AMD Secure Nested Paging (SEV-SNP) Hypervisor Support
+https://lore.kernel.org/lkml/20230612042559.375660-1-michael.roth@amd.com/
+
+---
+v3:
+- Imported common patches from Michael Roth which can be useful for both SNP
+  and TDX.  And reorder patches.
+- Update struct kvm_gfn_range to drop flag, and add add only_private, and
+  only_shared
+- Update kvm_arch_set_memory_attributes() and added a x86 vendor callback for
+  it.
+
+v2:
+https://lore.kernel.org/all/cover.1687474039.git.isaku.yamahata@intel.com/
+
+v1:
+https://lore.kernel.org/all/cover.1686858861.git.isaku.yamahata@intel.com/
+
+Brijesh Singh (1):
+  KVM: x86: Export the kvm_zap_gfn_range() for the SNP use
+
+Isaku Yamahata (8):
+  KVM: selftests: Fix test_add_overlapping_private_memory_regions()
+  KVM: selftests: Fix guest_memfd()
+  KVM: selftests: x86: typo in private_mem_conversions_test.c
+  KVM: x86: Add is_vm_type_supported callback
+  KVM: x86/mmu: Pass around full 64-bit error code for the KVM page
+    fault
+  KVM: x86: Introduce PFERR_GUEST_ENC_MASK to indicate fault is private
+  KVM: Fix set_mem_attr ioctl when error case
+  KVM: Add new members to struct kvm_gfn_range to operate on
+
+Michael Roth (2):
+  KVM: x86: Add gmem hook for initializing private memory
+  KVM: x86: Add gmem hook for invalidating private memory
+
+ arch/x86/include/asm/kvm-x86-ops.h            |  4 ++
+ arch/x86/include/asm/kvm_host.h               | 12 +++++
+ arch/x86/include/uapi/asm/kvm.h               |  1 +
+ arch/x86/kvm/mmu.h                            |  2 -
+ arch/x86/kvm/mmu/mmu.c                        | 51 ++++++++++++++-----
+ arch/x86/kvm/mmu/mmu_internal.h               | 20 ++++++--
+ arch/x86/kvm/mmu/mmutrace.h                   |  2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h                |  2 +-
+ arch/x86/kvm/svm/svm.c                        |  7 +++
+ arch/x86/kvm/vmx/vmx.c                        |  6 +++
+ arch/x86/kvm/x86.c                            | 16 +++++-
+ arch/x86/kvm/x86.h                            |  2 +
+ include/linux/kvm_host.h                      | 16 ++++--
+ .../testing/selftests/kvm/guest_memfd_test.c  |  4 +-
+ .../selftests/kvm/set_memory_region_test.c    | 16 +++++-
+ .../kvm/x86_64/private_mem_conversions_test.c |  2 +-
+ virt/kvm/guest_mem.c                          | 50 +++++++++++++++++-
+ virt/kvm/kvm_main.c                           | 24 +++++----
+ 18 files changed, 192 insertions(+), 45 deletions(-)
+
+
+base-commit: be8abcec83c87d4e15ae04816b685fe260c4bcfd
+-- 
+2.25.1
+
