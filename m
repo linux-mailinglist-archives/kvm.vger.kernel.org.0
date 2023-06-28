@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4BF8741903
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 21:46:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71313741935
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 22:03:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230480AbjF1TqX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 15:46:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58508 "EHLO
+        id S231925AbjF1UDL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 16:03:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229647AbjF1TqW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 15:46:22 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C312C1BE8
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 12:46:20 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-53450fa3a18so48266a12.0
-        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 12:46:20 -0700 (PDT)
+        with ESMTP id S231897AbjF1UC5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 16:02:57 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 996AD1BEA
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 13:02:55 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-55ac8f85360so57389a12.0
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 13:02:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687981580; x=1690573580;
+        d=google.com; s=20221208; t=1687982575; x=1690574575;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=I7mcp5/4P8AP0xkXt/thddGLST36j3uQroOasjJw2kQ=;
-        b=3X3J2Y9E1VfBP9Ua7QLQHnf5tWOiCY196KrTDDRGoQT5j5w75S+ef9lJaxQf1I+Dr6
-         2ng0STjRGjZzYm7EtW7P3AqdvF4BpiTunzeqVHiCrNu8SLnudKTIoKMLwKyJ+dHLPtZx
-         Uy1kq7ORYYrbeGQK/jo2+9FBGCEtb3qnJypIwWIFe5dx+s8TQoFaJ9YZI1UhCqWeNfUG
-         wJ7PZQbwTrRcOtewooOJgYCoEZ9a9ay3tNFjuIrVPzJTK7o6U4C4oXVv4avxQuEpejEU
-         +mrUIUhzaO+zX+OZ8TzVl3OK/CB6e1shtdVkwtZV8PtCKhlGXpsxLKpVzlQEyBGrOjtP
-         Cd9Q==
+        bh=aF+eaqoyjG8K7JrTXAx7p+ekpq66+KyCCJ2W8xApmu4=;
+        b=yiXMZe1WRiCBewd8cQIpLAFHrBNvdVKQGotoGoxyUI+Nt8m67zl9/LQsJJTjIY4dTr
+         UVCUCQagQXdkhQQCP2zgCKYg73b+Q9jTHV+/C9rrSL5Ds1bXsWZ5vP5WK7LtMrPNBl83
+         XA6uYZItHwh/nTj5wL4klFmcXVsz0ZOkw8N9xrnS0ey/9J85y8+wmME4Al6uHDg42AWq
+         yyqm9wMuiW0FejgZ0IBHG18KhoC4gzy1mWpIY/OOtVt1MKpipmJruIk3/eoSgFd1PQXl
+         e9WFa9Ue90gV7m+cWv3dfOPUuyoGXpQ82UA7TjuD0LzX/lZtRvxXQxyboNIZDS4cOL62
+         98ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687981580; x=1690573580;
+        d=1e100.net; s=20221208; t=1687982575; x=1690574575;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I7mcp5/4P8AP0xkXt/thddGLST36j3uQroOasjJw2kQ=;
-        b=B+vB3Dzv3RHnKwztdgE1hyqEztX0aC485GYu1scpXwrICOWVCtv1qf+mbNXP7GMHXp
-         JAwhqPriS9Gco1icFHcrrxITwOrL/MUi+U0xViOLR1eVSX/7skbALIwrvzcd93V7ISp6
-         QSuj+C+A5ogiv8Lu3J9C00mmMxsWs2LEH9VwgBDheBmI81brTiw28vvDl6z/HSDnOnvv
-         vMPJ9rtSUZDgZM+HL7tykORmAedvXRkcjHK6e8/hTod3FgWhLS9lsRGKhh2xZH+6SIJU
-         krtQirS3wjLr3wOBYaS4y/bDgdHClAqZ0I6ZBgpkXyud76se7NwCQ4jU2sg3otqAu14n
-         SZ9Q==
-X-Gm-Message-State: AC+VfDxC6x2jnXOtNQ3NCn/CF5r9ESZcbj08UAuzuB/27fXHodQMSCt4
-        tas2rF94Dg8amWphf3W/b7vXY20xnQU=
-X-Google-Smtp-Source: ACHHUZ63GagN7SvQAnsZIi3Pep1VIp9fjbRzI2L7PvnlNPi9oisw5tsVURUi8r1TgGB2Av+65c6uN1xbQbk=
+        bh=aF+eaqoyjG8K7JrTXAx7p+ekpq66+KyCCJ2W8xApmu4=;
+        b=hPRUhBQl2AsTyZBev9/QdR01frYA+B6Re40GLlkR0hKhhOxY0iX33ool06G1qSmdid
+         XzhKvWCNZEl6ZI/Tlkp/C2K8HY9kJstMneb0pGlnXcpsn7ZUUuuyG911o4aSMekqBnq3
+         BbqS8tENg33SPQrJPRqfeGap2VD7naX+qlQ+dnzAebSIDk0mI9ka0bIGw/1AuMWqBFJf
+         lXyLPk4L2pFjyjGXD+QYWRlMTO1g+ly8sg5hMrGlsKhon2o6R6j1TNwsjPz2bTb2lQXx
+         +D+XEEvoCa27iJ5RqBLIoouPk+jJdB6MluO06Ohu10WeB9uqYdVkp88fEnlog3z8E/iC
+         eMww==
+X-Gm-Message-State: AC+VfDz4guzHQ/ReArrlOZ9pZNrpfTZZRLuhvCBKWDW6xIeCVHeYBQ9E
+        Dpd7RfoZFGntnqNLMW/TLhzqOZGyMeA=
+X-Google-Smtp-Source: ACHHUZ5bO34e6p8FZc9bz44vcDbWILB0WTqbsNIRWGQhflnvBOZc6PKwqE2im4IFVlHM6ZRuwHrSr8ltKMg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:f50e:0:b0:54f:d3ef:539a with SMTP id
- w14-20020a63f50e000000b0054fd3ef539amr3666158pgh.4.1687981580106; Wed, 28 Jun
- 2023 12:46:20 -0700 (PDT)
-Date:   Wed, 28 Jun 2023 12:46:18 -0700
-In-Reply-To: <20230530134248.23998-2-cloudliang@tencent.com>
+ (user=seanjc job=sendgmr) by 2002:a63:fa45:0:b0:52c:8878:65dd with SMTP id
+ g5-20020a63fa45000000b0052c887865ddmr3637339pgk.0.1687982575114; Wed, 28 Jun
+ 2023 13:02:55 -0700 (PDT)
+Date:   Wed, 28 Jun 2023 13:02:53 -0700
+In-Reply-To: <20230530134248.23998-3-cloudliang@tencent.com>
 Mime-Version: 1.0
-References: <20230530134248.23998-1-cloudliang@tencent.com> <20230530134248.23998-2-cloudliang@tencent.com>
-Message-ID: <ZJyOCpueM0viGDfX@google.com>
-Subject: Re: [PATCH v2 1/8] KVM: selftests: KVM: selftests: Add macros for
- fixed counters in processor.h
+References: <20230530134248.23998-1-cloudliang@tencent.com> <20230530134248.23998-3-cloudliang@tencent.com>
+Message-ID: <ZJyR7XzVeOu8IN9n@google.com>
+Subject: Re: [PATCH v2 2/8] KVM: selftests: Add pmu.h for PMU events and
+ common masks
 From:   Sean Christopherson <seanjc@google.com>
 To:     Jinrong Liang <ljr.kernel@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
@@ -72,59 +72,120 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Heh, duplicate "KVM: selftests:" in the shortlog.
-
 On Tue, May 30, 2023, Jinrong Liang wrote:
 > From: Jinrong Liang <cloudliang@tencent.com>
 > 
-> Add macro in processor.h, providing a efficient way to obtain
+> To introduce a new pmu.h header file under
+> tools/testing/selftests/kvm/include/x86_64 directory to better
+> organize the PMU performance event constants and common masks.
+> It will enhance the maintainability and readability of the KVM
+> selftests code.
+> 
+> In the new pmu.h header, to define the PMU performance events and
+> masks that are relevant for x86_64, allowing developers to easily
+> reference them and minimize potential errors in code that handles
+> these values.
 
-Try not to describe what the patch literally does in terms of code, the purpose
-of the shortlog+changelog is to complement the diff, e.g. it's super obvious from
-the diff that this patch adds macros in processor.h.
-
-> the number of fixed counters and fixed counters bit mask. The
-
-Wrap closer to 75 chars, 60 is too aggressive.
-
-> addition of these macro will simplify the handling of fixed
-> performance counters, while keeping the code maintainable and
-> clean.
-
-Instead of making assertions, justify the patch by stating the effects on code.
-Statements like "will simplify the handling" and "keeping the code maintainable
-and clean" are subjective.  In cases like these, it's extremely unlikely anyone
-will disagree, but getting into the habit of providing concrete justification
-even for simple cases makes it easier to write changelogs for more complex changes.
-
-E.g.
-
-  Add x86 properties for the number of PMU fixed counters and the bitmask
-  that allows for "discontiguous" fixed counters so that tests don't have
-  to manually retrieve the correct CPUID leaf+register, and so that the
-  resulting code is self-documenting.
+Same feedback as the previous changelog.
 
 > Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
 > ---
->  tools/testing/selftests/kvm/include/x86_64/processor.h | 2 ++
->  1 file changed, 2 insertions(+)
+>  .../selftests/kvm/include/x86_64/pmu.h        | 56 +++++++++++++++++++
+>  1 file changed, 56 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/include/x86_64/pmu.h
 > 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index aa434c8f19c5..94751bddf1d9 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -240,6 +240,8 @@ struct kvm_x86_cpu_property {
->  #define X86_PROPERTY_PMU_VERSION		KVM_X86_CPU_PROPERTY(0xa, 0, EAX, 0, 7)
->  #define X86_PROPERTY_PMU_NR_GP_COUNTERS		KVM_X86_CPU_PROPERTY(0xa, 0, EAX, 8, 15)
->  #define X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH	KVM_X86_CPU_PROPERTY(0xa, 0, EAX, 24, 31)
-> +#define X86_PROPERTY_PMU_FIXED_CTRS_BITMASK	KVM_X86_CPU_PROPERTY(0xa, 0, ECX, 0, 31)
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/pmu.h b/tools/testing/selftests/kvm/include/x86_64/pmu.h
+> new file mode 100644
+> index 000000000000..0e0111b11024
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/x86_64/pmu.h
+> @@ -0,0 +1,56 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * tools/testing/selftests/kvm/include/x86_64/pmu.h
+> + *
+> + * Copyright (C) 2023, Tencent, Inc.
+> + */
+> +#ifndef _PMU_H_
+> +#define _PMU_H_
 
-Please spell out COUNTERS so that all the properties are consistent.
+SELFTEST_KVM_PMU_H for consistency, and to minimize the risk of a collision.
 
-> +#define X86_PROPERTY_PMU_NR_FIXED_COUNTERS	KVM_X86_CPU_PROPERTY(0xa, 0, EDX, 0, 4)
->  
->  #define X86_PROPERTY_SUPPORTED_XCR0_LO		KVM_X86_CPU_PROPERTY(0xd,  0, EAX,  0, 31)
->  #define X86_PROPERTY_XSTATE_MAX_SIZE_XCR0	KVM_X86_CPU_PROPERTY(0xd,  0, EBX,  0, 31)
+> +#include "processor.h"
+> +
+> +#define GP_CTR_NUM_OFS_BIT 8
+> +#define EVT_LEN_OFS_BIT 24
+
+Please spell out the words, I genuinely have no idea what these refer to, and
+readers shouldn't have to consult the SDM just to understand a name.
+
+> +#define INTEL_PMC_IDX_FIXED 32
+> +
+> +#define PMU_CAP_FW_WRITES BIT_ULL(13)
+> +#define EVENTSEL_OS BIT_ULL(17)
+> +#define EVENTSEL_ANY BIT_ULL(21)
+> +#define EVENTSEL_EN BIT_ULL(22)
+> +#define RDPMC_FIXED_BASE BIT_ULL(30)
+> +
+> +#define PMU_VERSION_MASK GENMASK_ULL(7, 0)
+> +#define EVENTS_MASK GENMASK_ULL(7, 0)
+> +#define EVT_LEN_MASK GENMASK_ULL(31, EVT_LEN_OFS_BIT)
+> +#define GP_CTR_NUM_MASK GENMASK_ULL(15, GP_CTR_NUM_OFS_BIT)
+> +#define FIXED_CTR_NUM_MASK GENMASK_ULL(4, 0)
+> +
+> +#define X86_INTEL_PMU_VERSION		kvm_cpu_property(X86_PROPERTY_PMU_VERSION)
+> +#define X86_INTEL_MAX_GP_CTR_NUM	kvm_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS)
+> +#define X86_INTEL_MAX_FIXED_CTR_NUM	kvm_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS)
+> +#define X86_INTEL_FIXED_CTRS_BITMASK	kvm_cpu_property(X86_PROPERTY_PMU_FIXED_CTRS_BITMASK)
+
+Please don't add macros like this.  It gives the false impression that all these
+values are constant at compile time, which is very much not the case.  I really,
+really dislike code that hides important details, like the fact that this is
+querying KVM.
+
+Yeah, the line lengths will be longer, but 80 chars is a soft limit, and we can
+always get creative, e.g.
+
+	uint8_t max_pmu_version = kvm_cpu_property(X86_PROPERTY_PMU_VERSION);
+	struct kvm_vm *vm;
+	struct kvm_vcpu *vcpu;
+	uint8_t version;
+
+	TEST_REQUIRE(kvm_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS) > 2);
+
+> +/* Definitions for Architectural Performance Events */
+> +#define ARCH_EVENT(select, umask) (((select) & 0xff) | ((umask) & 0xff) << 8)
+> +
+> +/* Intel Pre-defined Architectural Performance Events */
+> +static const uint64_t arch_events[] = {
+> +	[0] = ARCH_EVENT(0x3c, 0x0),
+> +	[1] = ARCH_EVENT(0xc0, 0x0),
+> +	[2] = ARCH_EVENT(0x3c, 0x1),
+> +	[3] = ARCH_EVENT(0x2e, 0x4f),
+> +	[4] = ARCH_EVENT(0x2e, 0x41),
+> +	[5] = ARCH_EVENT(0xc4, 0x0),
+> +	[6] = ARCH_EVENT(0xc5, 0x0),
+> +	[7] = ARCH_EVENT(0xa4, 0x1),
+
+Please do something like I proposed for KVM, i.e. avoid magic numbers inasmuch
+as possible.
+
+https://lore.kernel.org/all/20230607010206.1425277-2-seanjc@google.com
+
+> +};
+> +
+> +/* Association of Fixed Counters with Architectural Performance Events */
+> +static int fixed_events[] = {1, 0, 7};
+> +
+> +static inline uint64_t evt_code_for_fixed_ctr(uint8_t idx)
+
+s/evt/event.  Having consistent naming is more important than saving two characters.
+
+> +{
+> +	return arch_events[fixed_events[idx]];
+> +}
+> +
+> +#endif /* _PMU_H_ */
 > -- 
 > 2.31.1
 > 
