@@ -2,146 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9EE87414F9
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 17:30:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 915EA74156E
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 17:41:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232144AbjF1PaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 11:30:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60416 "EHLO
+        id S232480AbjF1PiD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 11:38:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232098AbjF1PaA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 11:30:00 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFEAA268F;
-        Wed, 28 Jun 2023 08:29:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=yx7U6Q1zu/jZUmaTgwSAgFdK87Ilf4lSewGXSOlnpeM=; b=j/HFTVj/s4oubzmOZQkbXs2rGy
-        m89lVq7Gr97cfnYWa6xARbldnNMVFMkRq8W1AjOORgsbE+JDe1bw/SVj909aNMoaQgR33VCyocwnB
-        jMyRPT/RNe6DUCMNQAbSh+QXX1aa+EunTFd0+s08kp6YUsHL37mxE+tFruQTX09nNF/z4QHlhYdw/
-        Q5Ev1yPX6SCK8BzGSUJsl0YZ9yclM8o4/U1hfdZUH6Q02BMUKP1h+1S3pQ/wYL/2iY2EjTmEFlAP+
-        boThf77OadEYRu9XDFgab10EyNjLhgCEc6jrk8JIR2EiwsURk08sQ48aUNIfNGmiKUfXlxu01rmoL
-        unCslgyg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qEX6M-005iuP-1l;
-        Wed, 28 Jun 2023 15:29:02 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 16CA73002D6;
-        Wed, 28 Jun 2023 17:29:01 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id F340423B2EE90; Wed, 28 Jun 2023 17:29:00 +0200 (CEST)
-Date:   Wed, 28 Jun 2023 17:29:00 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-mm@kvack.org, x86@kernel.org, dave.hansen@intel.com,
-        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
-        tglx@linutronix.de, bp@alien8.de, mingo@redhat.com, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, david@redhat.com,
-        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
-        ashok.raj@intel.com, reinette.chatre@intel.com,
-        len.brown@intel.com, ak@linux.intel.com, isaku.yamahata@intel.com,
-        ying.huang@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
-        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
-Subject: Re: [PATCH v12 20/22] x86/virt/tdx: Allow SEAMCALL to handle #UD and
- #GP
-Message-ID: <20230628152900.GI2438817@hirez.programming.kicks-ass.net>
-References: <cover.1687784645.git.kai.huang@intel.com>
- <c124550719716f1f7759c2bdea70f4722d8e0167.1687784645.git.kai.huang@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c124550719716f1f7759c2bdea70f4722d8e0167.1687784645.git.kai.huang@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232465AbjF1Pht (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 11:37:49 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A022110
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 08:37:47 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-666edb1f24aso5072086b3a.2
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 08:37:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1687966667; x=1690558667;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vPkmOZsStIRwjbDOEXaXo6r7N3JQ7QJXcRY6iLzA/Qk=;
+        b=DKVopbz40gCodRwuFrblNmczBiV7uP7jTfggZxesVD6svK5lhtuPvapRqniQHtYu2q
+         AwHR4RJglp1crZbofE7aQv9RikrC1F/s60aShTh2BqnI6pYDISsNbnAY+NlMIHxoF7eZ
+         kxg2BW3pIFYNj3Z/18g/v/CGKeT86MVEyk8EqOQL9t0C09C8Zscjbmlp10OEPGcM4RpY
+         3c8jr5w2jN0Dhl1SPbsi6CYQ9Ehvp1civaYDH45BDHQ6cSk/Ae9C4UK/KrmlcL9WLFLZ
+         E+AcFAFAYNHXA/NM3/RBU5qgVbB6HcwUjib3XgKZbiH+0F8/2pGcQVLJm/qSaAxKLmjG
+         jtKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687966667; x=1690558667;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vPkmOZsStIRwjbDOEXaXo6r7N3JQ7QJXcRY6iLzA/Qk=;
+        b=gUoKA/eGJLxuRXiqkRn52SKmVvfjDKqpnAgx9g6NWP5FL1u3O0JKQBXHFtDkb2kHZ5
+         BaqI6cTKDLcLc43Nv3SeS3N6LM68XrlBg2Oxj2EObJ3Qrqxj0xmJnnw28lwNZuJh7/pL
+         JrO9TQ+LMYpoXWkNlyrfBQ4pLYSsJR9OYcQvlCgWF5QD+vdrmJZmzC0m/bhZiGjrtxxR
+         rFa4yyJeoHMpbPbUCCNkW7c4TjKT34/DKsuX1G6tfrt9pNc+1LVeIXncrvcrAtOympqO
+         CGmkBLuoyqWMrRebpuLg73bulDiwGiY2yQfNpDdEfj7+49oZvZEZfAQpJQ7TyPRy2XfE
+         DY/w==
+X-Gm-Message-State: AC+VfDw2YjJTlPk3gsHCUiD+Q3lc1Uw83u85UYUq51JIpYaGHTe42+6Y
+        9CHfuhDX0KHzA4AHNxDCgXErEO5xAuc=
+X-Google-Smtp-Source: ACHHUZ6Ql/94Qt3z7G/UNZhUNRJWw4KsKpHHwJNc0t4Ibppx6UPzGeVWvleYA0AJjIVkNFaSNhQlLjEp8e8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2d94:b0:668:843e:d413 with SMTP id
+ fb20-20020a056a002d9400b00668843ed413mr7794157pfb.2.1687966666879; Wed, 28
+ Jun 2023 08:37:46 -0700 (PDT)
+Date:   Wed, 28 Jun 2023 08:37:45 -0700
+In-Reply-To: <20230628071217.71126-1-ishiir@g.ecc.u-tokyo.ac.jp>
+Mime-Version: 1.0
+References: <20230628071217.71126-1-ishiir@g.ecc.u-tokyo.ac.jp>
+Message-ID: <ZJxTTZzZnfbyMVIH@google.com>
+Subject: Re: [PATCH] KVM: nVMX: Prevent vmlaunch with EPTP pointing outside
+ assigned memory area
+From:   Sean Christopherson <seanjc@google.com>
+To:     Reima Ishii <ishiir@g.ecc.u-tokyo.ac.jp>
+Cc:     ishiir@g.ecc.u-tokyo.ac.jp, shina@ecc.u-tokyo.ac.jp,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 27, 2023 at 02:12:50AM +1200, Kai Huang wrote:
-> diff --git a/arch/x86/virt/vmx/tdx/tdxcall.S b/arch/x86/virt/vmx/tdx/tdxcall.S
-> index 49a54356ae99..757b0c34be10 100644
-> --- a/arch/x86/virt/vmx/tdx/tdxcall.S
-> +++ b/arch/x86/virt/vmx/tdx/tdxcall.S
-> @@ -1,6 +1,7 @@
->  /* SPDX-License-Identifier: GPL-2.0 */
->  #include <asm/asm-offsets.h>
->  #include <asm/tdx.h>
-> +#include <asm/asm.h>
+On Wed, Jun 28, 2023, Reima Ishii wrote:
+> In nested virtualization, if L1 sets an EPTP in VMCS12 that points
+> beyond the assigned memory area and initiates a vmlaunch to L2, the
+> existing KVM code handles the vmlaunch, and passes the VMCS
+> consistency check. However, due to EPTP pointing outside accessible
+> memory from the vCPU in mmu_check_root(), it attempts to trigger a
+> triple fault.
+> 
+> As a result, the nested_vmx_triple_fault() and nested_vmx_vmexit() are
+> called before the actual vmlaunch to L2 occurs. Despite the vmlaunch
+> not actually being executed in L2, KVM attempts a vmexit to L1,
+> resulting in a warning in nested_vmx_vmexit() due to the
+> nested_run_pending flag.
+> 
+> This commit resolves the issue by modifying the nested_vmx_check_eptp()
+> to return false when EPTP points outside the assigned memory area.
+> This effectively prevents a vmlaunch with such an EPTP, thus avoiding
+> the unnecessary warning.
+> 
+> Signed-off-by: Reima Ishii <ishiir@g.ecc.u-tokyo.ac.jp>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index e35cf0bd0df9..721f98a5dc24 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2727,6 +2727,10 @@ static bool nested_vmx_check_eptp(struct kvm_vcpu *vcpu, u64 new_eptp)
+>  			return false;
+>  	}
 >  
->  /*
->   * TDCALL and SEAMCALL are supported in Binutils >= 2.36.
-> @@ -45,6 +46,7 @@
->  	/* Leave input param 2 in RDX */
->  
->  	.if \host
-> +1:
->  	seamcall
+> +	/* Check if EPTP points to an assigned memory area */
+> +	if (!kvm_vcpu_is_visible_gfn(vcpu, new_eptp >> PAGE_SHIFT))
+> +		return false;
 
-So what registers are actually clobbered by SEAMCALL ? There's a
-distinct lack of it in SDM Vol.2 instruction list :-(
+This is wrong, an EPTP that has a legal GPA but points at non-existent memory
+does not trigger VM-Fail.  But the existing behavior isn't correct either
+(obviously), because even though a bad EPT will *probably* lead to shutdown,
+(a) it's not guaranteed and (b) the CPU won't read the underlying memory until
+after VM-Enter succeeds.  E.g. if L1 runs L2 with a VMX preemption timer value
+of '0', then architecturally the preemption timer VM-Exit is guaranteed to occur
+before the CPU executes any instruction, i.e. before the CPU needs to translate
+a GPA to a HPA (so long as there are no injected events with higher priority than
+the preemption timer).
 
->  	/*
->  	 * SEAMCALL instruction is essentially a VMExit from VMX root
-> @@ -57,10 +59,23 @@
->  	 * This value will never be used as actual SEAMCALL error code as
->  	 * it is from the Reserved status code class.
->  	 */
-> -	jnc .Lno_vmfailinvalid
-> +	jnc .Lseamcall_out
->  	mov $TDX_SEAMCALL_VMFAILINVALID, %rax
-> -.Lno_vmfailinvalid:
-> +	jmp .Lseamcall_out
-> +2:
-> +	/*
-> +	 * SEAMCALL caused #GP or #UD.  By reaching here %eax contains
-> +	 * the trap number.  Convert the trap number to the TDX error
-> +	 * code by setting TDX_SW_ERROR to the high 32-bits of %rax.
-> +	 *
-> +	 * Note cannot OR TDX_SW_ERROR directly to %rax as OR instruction
-> +	 * only accepts 32-bit immediate at most.
-> +	 */
-> +	mov $TDX_SW_ERROR, %r12
-> +	orq %r12, %rax
->  
-> +	_ASM_EXTABLE_FAULT(1b, 2b)
-> +.Lseamcall_out:
+Furthermore, KVM applies this logic *only* to the root (and PDPTRs).  E.g. if
+a lower level page table points at a KVM-internal memslot, KVM will happily read
+the backing memory and use it as the guest PTE value.
 
-This is all pretty atrocious code flow... would it at all be possible to
-write it like:
+The behavior is quite ancient, and unsurprisingly the changelog provides no real
+justification for the behavior.
 
-SYM_FUNC_START(...)
+  commit 8986ecc0ef58c96eec48d8502c048f3ab67fd8e2
+  Author: Marcelo Tosatti <mtosatti@redhat.com>
+  Date:   Tue May 12 18:55:45 2009 -0300
 
-.if \host
-1:	seamcall
-	cmovc	%spare, %rax
-2:
-.else
-	tdcall
-.endif
+    KVM: x86: check for cr3 validity in mmu_alloc_roots
+    
+    Verify the cr3 address stored in vcpu->arch.cr3 points to an existant
+    memslot. If not, inject a triple fault.
 
-	.....
-	RET
+I'm struggling to think of anything that will break (in KVM) if we simply drop the
+check, e.g. L1 can already read and write to KVM-internal memslots, so it's not
+like the data is sensitive.  The guest is going to have weird behavior, especially
+for the APIC access page memslot, but that's more architecturally correct than
+injecting a triple fault, e.g. KVM would effectively act like there's a "hidden"
+MMIO device at the address.
 
+So I think we should try this:
 
-3:
-	mov $TDX_SW_ERROR, %r12
-	orq %r12, %rax
-	jmp 2b
+---
+ arch/x86/kvm/mmu/mmu.c   | 19 -------------------
+ include/linux/kvm_host.h |  1 -
+ virt/kvm/kvm_main.c      | 13 ++-----------
+ 3 files changed, 2 insertions(+), 31 deletions(-)
 
-	_ASM_EXTABLE_FAULT(1b, 3b)
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 60397a1beda3..e305737edf84 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3671,19 +3671,6 @@ void kvm_mmu_free_guest_mode_roots(struct kvm *kvm, struct kvm_mmu *mmu)
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_free_guest_mode_roots);
+ 
+-
+-static int mmu_check_root(struct kvm_vcpu *vcpu, gfn_t root_gfn)
+-{
+-	int ret = 0;
+-
+-	if (!kvm_vcpu_is_visible_gfn(vcpu, root_gfn)) {
+-		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+-		ret = 1;
+-	}
+-
+-	return ret;
+-}
+-
+ static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, int quadrant,
+ 			    u8 level)
+ {
+@@ -3821,9 +3808,6 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 	root_pgd = kvm_mmu_get_guest_pgd(vcpu, mmu);
+ 	root_gfn = root_pgd >> PAGE_SHIFT;
+ 
+-	if (mmu_check_root(vcpu, root_gfn))
+-		return 1;
+-
+ 	/*
+ 	 * On SVM, reading PDPTRs might access guest memory, which might fault
+ 	 * and thus might sleep.  Grab the PDPTRs before acquiring mmu_lock.
+@@ -3833,9 +3817,6 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 			pdptrs[i] = mmu->get_pdptr(vcpu, i);
+ 			if (!(pdptrs[i] & PT_PRESENT_MASK))
+ 				continue;
+-
+-			if (mmu_check_root(vcpu, pdptrs[i] >> PAGE_SHIFT))
+-				return 1;
+ 		}
+ 	}
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index d90331f16db1..4645c205a4d1 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1234,7 +1234,6 @@ int kvm_gfn_to_hva_cache_init(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
+ int kvm_clear_guest(struct kvm *kvm, gpa_t gpa, unsigned long len);
+ struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn);
+ bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn);
+-bool kvm_vcpu_is_visible_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
+ unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn);
+ void mark_page_dirty_in_slot(struct kvm *kvm, const struct kvm_memory_slot *memslot, gfn_t gfn);
+ void mark_page_dirty(struct kvm *kvm, gfn_t gfn);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 66c1447d3c7f..61ab6e367397 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1720,9 +1720,8 @@ static void kvm_invalidate_memslot(struct kvm *kvm,
+ 
+ 	/*
+ 	 * From this point no new shadow pages pointing to a deleted, or moved,
+-	 * memslot will be created.  Validation of sp->gfn happens in:
+-	 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
+-	 *	- kvm_is_visible_gfn (mmu_check_root)
++	 * memslot will be created.  Arch MMUs must zap all relevant mappings,
++	 * and must not follow the address of an INVALID memslots.
+ 	 */
+ 	kvm_arch_flush_shadow_memslot(kvm, old);
+ 	kvm_arch_guest_memory_reclaimed(kvm);
+@@ -2345,14 +2344,6 @@ bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
+ }
+ EXPORT_SYMBOL_GPL(kvm_is_visible_gfn);
+ 
+-bool kvm_vcpu_is_visible_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
+-{
+-	struct kvm_memory_slot *memslot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+-
+-	return kvm_is_visible_memslot(memslot);
+-}
+-EXPORT_SYMBOL_GPL(kvm_vcpu_is_visible_gfn);
+-
+ unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn)
+ {
+ 	struct vm_area_struct *vma;
 
-SYM_FUNC_END()
+base-commit: 88bb466c9dec4f70d682cf38c685324e7b1b3d60
+-- 
 
-That is, having all that inline in the hotpath is quite horrific.
