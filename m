@@ -2,288 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AD5F740AE7
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 10:13:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 717D1740B59
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 10:26:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234112AbjF1INA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 04:13:00 -0400
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:47263 "EHLO
-        out2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231509AbjF1IKt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Jun 2023 04:10:49 -0400
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.nyi.internal (Postfix) with ESMTP id 56E6F5C0078;
-        Wed, 28 Jun 2023 00:55:46 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute1.internal (MEProxy); Wed, 28 Jun 2023 00:55:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-        cc:cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1687928146; x=1688014546; bh=Dr
-        kfQZA4ZAS1gh0epx3coneRI+oyfY6k0HGVYNs6GJY=; b=Kf9Lwrmr0v8lFU0t92
-        H5QXsii6fPb6Qlu/s5Jp0uC5J4ZhnylbNjKaJBO3MkadNpr25csmXaFVYUwd/Jdx
-        rwaqd26MHUdVq51eQh6lkvQtKqtKJuKr5UXy9s43VL6Gu9tNw1jO6dxaE6wQQPX1
-        L9K7wFv/1UFG9M7SlR7oQCiOD1a8c+Y7O7tzlOOgL51a5jHt17A3DDkJPzg6sBNJ
-        2+PxT0VFfMKulsD6oETx4cHcynBFgT0CQWdti+UpSHGch0KEavZ6L3sQDzdqnQVc
-        ZZEZTlIJkzWsnjFOn6J5cXOq9aV4+Z4SInTTZkM9AO1aPTO+Mes+7tBSanpKAl8Q
-        aq2Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1687928146; x=1688014546; bh=DrkfQZA4ZAS1g
-        h0epx3coneRI+oyfY6k0HGVYNs6GJY=; b=P35eUrXrQAqM/4cW9cePk3hDAlY6c
-        5Jq5RiqyDYbpcUZbJHToh47Pm3G0GiXb1J+qhQp7Lvchuya9rYJLi2+TB/it+TPj
-        6pyomZcT2POh04hrzdnYxHT2d2MHoOMum4qEh/OaOvg5fSj8Cl5poE4V5SmEfP4a
-        MZ4qXPZwHvGEwtdyJ/binLznlrQi7XVSlExKYHioNAMhe/IKTlaglTSjNe8+BiVr
-        LowVo3Wke/5MUitu382SkGvbbxl7s71QV+t7CvBt/D4ynkc2O6gx6Gi8H+CK4NSN
-        k5s/SjC1ODiPgq6ZBYLllsFTyYTsApkB631uP+qrZ9xc3D6bXfALXsvhQ==
-X-ME-Sender: <xms:UL2bZLCUVtFhsnbPWsg-DNYDpJGIzmvHx9MfdyX_h8VfFwSDrNA8Sg>
-    <xme:UL2bZBiLqeUDbJljf0PRLNUpdSRCPKmUFxjqeWj9AcGj9OIHxjU09b5u3XiVSyFC1
-    B3kSp9KHH_AewFJ4g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrtddugdeklecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdfuthgv
-    fhgrnhcuqfdktfgvrghrfdcuoehsohhrvggrrhesfhgrshhtmhgrihhlrdgtohhmqeenuc
-    ggtffrrghtthgvrhhnpeehjeelgeekkeelfeeugeekffduveffvdfghfefteejtefgfeek
-    hfekkedttdefudenucffohhmrghinhepshhouhhrtggvfigrrhgvrdhorhhgpdhinhhfrh
-    gruggvrggurdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghi
-    lhhfrhhomhepshhorhgvrghrsehfrghsthhmrghilhdrtghomh
-X-ME-Proxy: <xmx:UL2bZGkhqB3QP820CC7YUMjw4XhGi1hZpsDGe7-GBqI28yiOPzUVWg>
-    <xmx:UL2bZNz7Sc6saWs8J0QtG6-xiksAUBd1a7rRty71JHS7q2G5U2HwAA>
-    <xmx:UL2bZASp24C38Hp_mdkx7_BBAGn-Of_6Yp6QzaCYn024u4Q2LpqRxA>
-    <xmx:Ur2bZJDVYEvgRTpNJKkIiG774eQYP1AnCYcE2ORkKjdUFzt8jhp_bQ>
-Feedback-ID: i84414492:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id C72F21700089; Wed, 28 Jun 2023 00:55:44 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-499-gf27bbf33e2-fm-20230619.001-gf27bbf33
-Mime-Version: 1.0
-Message-Id: <b911c5e1-458a-456a-abe4-a8964580a85b@app.fastmail.com>
-In-Reply-To: <mhng-97928779-5d76-4390-a84c-398fdc6a0a4f@palmer-ri-x1c9>
-References: <mhng-97928779-5d76-4390-a84c-398fdc6a0a4f@palmer-ri-x1c9>
-Date:   Wed, 28 Jun 2023 00:53:38 -0400
-From:   "Stefan O'Rear" <sorear@fastmail.com>
-To:     "Palmer Dabbelt" <palmer@dabbelt.com>
-Cc:     "Andy Chiu" <andy.chiu@sifive.com>,
-        linux-riscv@lists.infradead.org, anup@brainfault.org,
-        "Atish Patra" <atishp@atishpatra.org>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        "Vineet Gupta" <vineetg@rivosinc.com>, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, "Jonathan Corbet" <corbet@lwn.net>,
-        "Paul Walmsley" <paul.walmsley@sifive.com>,
-        "Albert Ou" <aou@eecs.berkeley.edu>,
-        "Heiko Stuebner" <heiko.stuebner@vrull.eu>,
-        "Evan Green" <evan@rivosinc.com>,
-        "Conor Dooley" <conor.dooley@microchip.com>,
-        "Andrew Jones" <ajones@ventanamicro.com>,
-        "Celeste Liu" <coelacanthus@outlook.com>,
-        "Andrew Bresticker" <abrestic@rivosinc.com>
-Subject: Re: [PATCH -next v21 03/27] riscv: hwprobe: Add support for probing V in
- RISCV_HWPROBE_KEY_IMA_EXT_0
-Content-Type: text/plain
+        id S234686AbjF1I0U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 04:26:20 -0400
+Received: from mga17.intel.com ([192.55.52.151]:64637 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233256AbjF1IXF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 04:23:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687940585; x=1719476585;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Pn0urhmg5uhEUgRwx90xHAfJv9M1P7KA+1U3g8ePS30=;
+  b=Dab4tOiPu2DToE564RUDSspaIVs0XwfwszWhEpNH9IQsW5xo340Fy3i6
+   7FF+3eHUe46PWNsebMHe0LyUqKpkHjky1wlkqvjB2HD5Qspv4ZoVVf2bI
+   SMnLC+qy9RJpdOc+RGyG3P77d3ByEoWY4Iya7wIBjUHVRXwtRFm5yWgbD
+   gQpTYjSlfsEcLnEKnk/NUt0xX1m1sy/Iz79Samp7dBrKUo6ouqmyiWfpJ
+   PMpKIw0d43Qta0yMksebJwTwldD698JXSBMKjSvELD6eZFz5R6CTwLqkH
+   qSWKvJF5QkvLdNIC8uMFPB6DLOL7gYFyg8EmsdHMrU4KhUMGCGXNX8nt5
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10754"; a="342092496"
+X-IronPort-AV: E=Sophos;i="6.01,164,1684825200"; 
+   d="scan'208";a="342092496"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 22:13:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10754"; a="666956324"
+X-IronPort-AV: E=Sophos;i="6.01,164,1684825200"; 
+   d="scan'208";a="666956324"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.9.27]) ([10.238.9.27])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 22:13:12 -0700
+Message-ID: <b911d367-d000-1237-62fe-230c52e2842c@linux.intel.com>
+Date:   Wed, 28 Jun 2023 13:13:09 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v1 1/6] KVM: x86: Consolidate flags for __linearize()
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Zeng Guang <guang.zeng@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+References: <20230601142309.6307-1-guang.zeng@intel.com>
+ <20230601142309.6307-2-guang.zeng@intel.com> <ZJsfIQqPQgRILn7o@google.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ZJsfIQqPQgRILn7o@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 27, 2023, at 9:56 PM, Palmer Dabbelt wrote:
-> On Tue, 27 Jun 2023 17:30:33 PDT (-0700), sorear@fastmail.com wrote:
->> On Mon, Jun 5, 2023, at 7:07 AM, Andy Chiu wrote:
->>> Probing kernel support for Vector extension is available now. This only
->>> add detection for V only. Extenions like Zvfh, Zk are not in this scope.
->>>
->>> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
->>> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
->>> Reviewed-by: Evan Green <evan@rivosinc.com>
->>> Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
->>> ---
->>> Changelog v20:
->>>  - Fix a typo in document, and remove duplicated probes (Heiko)
->>>  - probe V extension in RISCV_HWPROBE_KEY_IMA_EXT_0 key only (Palmer,
->>>    Evan)
->>> ---
->>>  Documentation/riscv/hwprobe.rst       | 3 +++
->>>  arch/riscv/include/uapi/asm/hwprobe.h | 1 +
->>>  arch/riscv/kernel/sys_riscv.c         | 4 ++++
->>>  3 files changed, 8 insertions(+)
->>>
->>> diff --git a/Documentation/riscv/hwprobe.rst b/Documentation/riscv/hwprobe.rst
->>> index 9f0dd62dcb5d..7431d9d01c73 100644
->>> --- a/Documentation/riscv/hwprobe.rst
->>> +++ b/Documentation/riscv/hwprobe.rst
->>> @@ -64,6 +64,9 @@ The following keys are defined:
->>>    * :c:macro:`RISCV_HWPROBE_IMA_C`: The C extension is supported, as defined
->>>      by version 2.2 of the RISC-V ISA manual.
->>>
->>> +  * :c:macro:`RISCV_HWPROBE_IMA_V`: The V extension is supported, as defined by
->>> +    version 1.0 of the RISC-V Vector extension manual.
->>> +
->>>  * :c:macro:`RISCV_HWPROBE_KEY_CPUPERF_0`: A bitmask that contains performance
->>>    information about the selected set of processors.
->>>
->>> diff --git a/arch/riscv/include/uapi/asm/hwprobe.h
->>> b/arch/riscv/include/uapi/asm/hwprobe.h
->>> index 8d745a4ad8a2..7c6fdcf7ced5 100644
->>> --- a/arch/riscv/include/uapi/asm/hwprobe.h
->>> +++ b/arch/riscv/include/uapi/asm/hwprobe.h
->>> @@ -25,6 +25,7 @@ struct riscv_hwprobe {
->>>  #define RISCV_HWPROBE_KEY_IMA_EXT_0	4
->>>  #define		RISCV_HWPROBE_IMA_FD		(1 << 0)
->>>  #define		RISCV_HWPROBE_IMA_C		(1 << 1)
->>> +#define		RISCV_HWPROBE_IMA_V		(1 << 2)
->>>  #define RISCV_HWPROBE_KEY_CPUPERF_0	5
->>>  #define		RISCV_HWPROBE_MISALIGNED_UNKNOWN	(0 << 0)
->>>  #define		RISCV_HWPROBE_MISALIGNED_EMULATED	(1 << 0)
->>> diff --git a/arch/riscv/kernel/sys_riscv.c
->>> b/arch/riscv/kernel/sys_riscv.c
->>> index 5db29683ebee..88357a848797 100644
->>> --- a/arch/riscv/kernel/sys_riscv.c
->>> +++ b/arch/riscv/kernel/sys_riscv.c
->>> @@ -10,6 +10,7 @@
->>>  #include <asm/cpufeature.h>
->>>  #include <asm/hwprobe.h>
->>>  #include <asm/sbi.h>
->>> +#include <asm/vector.h>
->>>  #include <asm/switch_to.h>
->>>  #include <asm/uaccess.h>
->>>  #include <asm/unistd.h>
->>> @@ -171,6 +172,9 @@ static void hwprobe_one_pair(struct riscv_hwprobe
->>> *pair,
->>>  		if (riscv_isa_extension_available(NULL, c))
->>>  			pair->value |= RISCV_HWPROBE_IMA_C;
->>>
->>> +		if (has_vector())
->>> +			pair->value |= RISCV_HWPROBE_IMA_V;
->>> +
->>>  		break;
+
+
+On 6/28/2023 1:40 AM, Sean Christopherson wrote:
+> On Thu, Jun 01, 2023, Zeng Guang wrote:
+>> From: Binbin Wu <binbin.wu@linux.intel.com>
 >>
->> I am concerned by the exception this is making.  I believe the intention of
->> riscv_hwprobe is to replace AT_HWCAP as the single point of truth for userspace
->> to make instruction use decisions.  Since this does not check riscv_v_vstate_ctrl_user_allowed,
->> application code which wants to know if V instructions are usable must use
->> AT_HWCAP instead, unlike all other extensions for which the relevant data is
->> available within the hwprobe return.
+>> Define a 32-bit parameter and consolidate the two bools into it.
+> Please write changelogs so that they make sense without the context of the shortlog.
+> In isolation, the above provides zero context.  And there's no need to provide a
+> play-by-play description of the change, e.g. this can be:
 >
-> I guess we were vague in the docs about what "supported" means, but IIRC 
-> the goal was for riscv_hwprobe() to indicate what's supported by both 
-> the HW and the kernel.  In other words, hwprobe should indicate what's 
-
-Should this be "the HW, the firmware, and the kernel" in the cases where it
-matters, or are you considering the firmware part of the kernel's view of
-the hardware?
-
-> possible to enable -- even if there's some additional steps necessary to 
-> enable it.
+>    Consolidate __linearize()'s @write and @fetch into a set of flags so that
+>    additional flags can be added without needing more/new boolean parameters,
+>    e.g. to precisely identify the access type for LASS.
 >
-> We can at least make this a little more explicit with something like
+>> __linearize() has two bool parameters write and fetch. And new flag
+>> will be needed to support new feature (e.g. LAM needs a flag to skip
+> s/LAM/LASS
 >
->     diff --git a/Documentation/riscv/hwprobe.rst 
-> b/Documentation/riscv/hwprobe.rst
->     index 19165ebd82ba..7f82a5385bc3 100644
->     --- a/Documentation/riscv/hwprobe.rst
->     +++ b/Documentation/riscv/hwprobe.rst
->     @@ -27,6 +27,13 @@ AND of the values for the specified CPUs. 
-> Usermode can supply NULL for cpus and
->      0 for cpu_count as a shortcut for all online CPUs. There are 
-> currently no flags,
->      this value must be zero for future compatibility.
->     
->     +Calls to `sys_riscv_hwprobe()` indicate the features supported by 
-> both the
->     +kernel and the hardware that the system is running on.  For 
-> example, if the
->     +hardware supports the V extension and the kernel has V support 
-> enabled then
->     +`RISCV_HWPROBE_KEY_IMA_EXT_0`/`RISCV_HWPROBE_IMA_V` will be set 
-> even if the V
->     +extension is disabled via a userspace-controlled tunable such as
->     +`PR_RISCV_V_SET_CONTROL`.
->     +
->      On success 0 is returned, on failure a negative error code is 
-> returned.
->     
->      The following keys are defined:
->     @@ -65,7 +72,10 @@ The following keys are defined:
->          by version 2.2 of the RISC-V ISA manual.
->     
->        * :c:macro:`RISCV_HWPROBE_IMA_V`: The V extension is supported, 
-> as defined by
->     -    version 1.0 of the RISC-V Vector extension manual.
->     +    version 1.0 of the RISC-V Vector extension manual.  For strict 
-> uABI
->     +    compatibility some systems may disable V by default even when 
-> the hardware
->     +    supports in, in which case users must call 
-> `prctl(PR_RISCV_V_SET_CONTROL,
->     +    ...` to explicitly allow V to be used.
->     
->        * :c:macro:`RISCV_HWPROBE_EXT_ZBA`: The Zba address generation 
-> extension is
->             supported, as defined in version 1.0 of the 
-> Bit-Manipulation ISA
+>> address untag under some conditions).
+> Looks like this was copy+pasted LAM.  AIUI, there is no untagging in LASS.  Please,
+> please take the time to proofread what you're posting.  To you it's a minor typo,
+> to others, incorrect statements like this can create a lot of confusion.
 >
-> IMO that's the better way to go that to require that userspace tries to enable
-> V via the prctl() first, but we haven't released this yet so in theory we could
-> still change it.
-
-It's certainly a more precise definition but I'm arguing it's not a useful one.
-
-The description of the prctl() in Documentation/riscv/vector.rst is fairly clear
-that it is intended only for use by init systems, and not by libraries.
-
-Would you agree that "V is supported by the hardware and kernel, and could have
-been enabled by the init system but wasn't" is not actionable information for
-most applications and libraries?
-
-https://sourceware.org/pipermail/libc-alpha/2023-April/147062.html proposes to
-use hwprobe to "do things like dynamically choose a memcpy implementation".
-Would you agree that hwprobe as currently defined in for-next is not suitable
-for the purpose described in that message, since it describes features that could
-be enabled, not features that are enabled?
-
-> We'd have a similar discussion for some of the counters that need to feed
-> through the perf interface, though those are still in flight...
-
-The documented intent of the vector prctl is to enable or disable vector use as
-a policy for a tree of processes.  If I understand them correctly the perf
-counter user access patches require _individual processes_ to enable perf
-counters for their own use, which makes it a very different story from the
-perspective of the hwprobe API consumers.
-
--s
-
->> Assuming this is intentional, what is the path forward for future extensions
->> that cannot be used from userspace without additional conditions being met?
->> For instance, if we add support in the future for the Zve* extensions, the V
->> bit would not be set in HWCAP for them, which would require library code to
->> use the prctl interface unless we define the hwcap bits to imply userspace
->> usability.
->
-> In this case a system that supports some of the Zve extensions but not 
-> the full V extension would not be probably from userspace, as V would 
-> not be set anywhere.  The way to support that would be to add new bits 
-> into hwprobe to indicate those extensions, it just wasn't clear that 
-> anyone was interested in building Linux-flavored systems that supported 
-> only some a strict subset of V.
->
-> Happy to see patches if you know of some hardware in the pipeline, though ;)
->
+>> No functional change intended.
 >>
->> -s
+>> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+>> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+>> ---
+>>   arch/x86/kvm/emulate.c     | 19 +++++++++++++------
+>>   arch/x86/kvm/kvm_emulate.h |  4 ++++
+>>   2 files changed, 17 insertions(+), 6 deletions(-)
 >>
->>>  	case RISCV_HWPROBE_KEY_CPUPERF_0:
->>> --
->>> 2.17.1
->>>
->>>
->>> _______________________________________________
->>> linux-riscv mailing list
->>> linux-riscv@lists.infradead.org
->>> http://lists.infradead.org/mailman/listinfo/linux-riscv
+>> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+>> index 936a397a08cd..9508836e8a35 100644
+>> --- a/arch/x86/kvm/emulate.c
+>> +++ b/arch/x86/kvm/emulate.c
+>> @@ -687,8 +687,8 @@ static unsigned insn_alignment(struct x86_emulate_ctxt *ctxt, unsigned size)
+>>   static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
+>>   				       struct segmented_address addr,
+>>   				       unsigned *max_size, unsigned size,
+>> -				       bool write, bool fetch,
+>> -				       enum x86emul_mode mode, ulong *linear)
+>> +				       u32 flags, enum x86emul_mode mode,
+> "unsigned int", not "u32".  They're obviously the same effective thing, but using
+> "unsigned int" captures that the number of bits doesn't truly matter, e.g. isn't
+> reflected in hardware or anything.  This could just as easily be a u16, but there's
+> obviously no reason to squeeze this into a u16.
+OK. Thanks.
+
+Except for the "u32" / "usigned int" thing, I have updated the patch in 
+KVM LAM enabling patch series v9:
+https://lore.kernel.org/kvm/20230606091842.13123-2-binbin.wu@linux.intel.com/
+It has dropped the unnecessary local variables you mentioned below and 
+improved the changelog a bit to be more informative.
+
+Do you have any comment on this version?
+
+
 >
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
+>> +				       ulong *linear)
+>>   {
+>>   	struct desc_struct desc;
+>>   	bool usable;
+>> @@ -696,6 +696,8 @@ static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
+>>   	u32 lim;
+>>   	u16 sel;
+>>   	u8  va_bits;
+>> +	bool fetch = !!(flags & X86EMUL_F_FETCH);
+>> +	bool write = !!(flags & X86EMUL_F_WRITE);
+>>   
+>>   	la = seg_base(ctxt, addr.seg) + addr.ea;
+>>   	*max_size = 0;
+>> @@ -757,7 +759,11 @@ static int linearize(struct x86_emulate_ctxt *ctxt,
+>>   		     ulong *linear)
+>>   {
+>>   	unsigned max_size;
+>> -	return __linearize(ctxt, addr, &max_size, size, write, false,
+>> +	u32 flags = 0;
+>> +
+>> +	if (write)
+>> +		flags |= X86EMUL_F_WRITE;
+>> +	return __linearize(ctxt, addr, &max_size, size, flags,
+>>   			   ctxt->mode, linear);
+> I'm tempted to have this be:
+>
+> 	return __linearize(ctxt, addr, &max_size, size,
+> 			   write ? X86EMUL_F_WRITE : 0, ctxt->mode, linear);
+>
+> Mostly so that it's obvious "flags" is constant.  The alterntive would e
+>
+> 	const unsigned int flags = write ? X86EMUL_F_WRITE : 0;
+>
+> But my preference is probably to omit "flags" entirely.
+>
+>>   }
+>>   
+>> @@ -768,10 +774,11 @@ static inline int assign_eip(struct x86_emulate_ctxt *ctxt, ulong dst)
+>>   	unsigned max_size;
+>>   	struct segmented_address addr = { .seg = VCPU_SREG_CS,
+>>   					   .ea = dst };
+>> +	u32 flags = X86EMUL_F_FETCH;
+>>   
+>>   	if (ctxt->op_bytes != sizeof(unsigned long))
+>>   		addr.ea = dst & ((1UL << (ctxt->op_bytes << 3)) - 1);
+>> -	rc = __linearize(ctxt, addr, &max_size, 1, false, true, ctxt->mode, &linear);
+>> +	rc = __linearize(ctxt, addr, &max_size, 1, flags, ctxt->mode, &linear);
+> Meh, just pass X86EMUL_F_FETCH directly, i.e. drop the local "flags".
+>
+>>   	if (rc == X86EMUL_CONTINUE)
+>>   		ctxt->_eip = addr.ea;
+>>   	return rc;
+>> @@ -896,6 +903,7 @@ static int __do_insn_fetch_bytes(struct x86_emulate_ctxt *ctxt, int op_size)
+>>   	int cur_size = ctxt->fetch.end - ctxt->fetch.data;
+>>   	struct segmented_address addr = { .seg = VCPU_SREG_CS,
+>>   					   .ea = ctxt->eip + cur_size };
+>> +	u32 flags = X86EMUL_F_FETCH;
+>>   
+>>   	/*
+>>   	 * We do not know exactly how many bytes will be needed, and
+>> @@ -907,8 +915,7 @@ static int __do_insn_fetch_bytes(struct x86_emulate_ctxt *ctxt, int op_size)
+>>   	 * boundary check itself.  Instead, we use max_size to check
+>>   	 * against op_size.
+>>   	 */
+>> -	rc = __linearize(ctxt, addr, &max_size, 0, false, true, ctxt->mode,
+>> -			 &linear);
+>> +	rc = __linearize(ctxt, addr, &max_size, 0, flags, ctxt->mode, &linear);
+> And here.
+>
+>>   	if (unlikely(rc != X86EMUL_CONTINUE))
+>>   		return rc;
+>>   
+>> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+>> index ab65f3a47dfd..5b9ec610b2cb 100644
+>> --- a/arch/x86/kvm/kvm_emulate.h
+>> +++ b/arch/x86/kvm/kvm_emulate.h
+>> @@ -88,6 +88,10 @@ struct x86_instruction_info {
+>>   #define X86EMUL_IO_NEEDED       5 /* IO is needed to complete emulation */
+>>   #define X86EMUL_INTERCEPTED     6 /* Intercepted by nested VMCB/VMCS */
+>>   
+>> +/* x86-specific emulation flags */
+>> +#define X86EMUL_F_FETCH			BIT(0)
+>> +#define X86EMUL_F_WRITE			BIT(1)
+>> +
+>>   struct x86_emulate_ops {
+>>   	void (*vm_bugged)(struct x86_emulate_ctxt *ctxt);
+>>   	/*
+>> -- 
+>> 2.27.0
+>>
+
