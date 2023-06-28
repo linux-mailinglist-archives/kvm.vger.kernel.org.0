@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB7B9741BCF
-	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 00:43:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 029B6741BD7
+	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 00:44:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231631AbjF1Wnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 18:43:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46998 "EHLO
+        id S231654AbjF1Wnt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 18:43:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231422AbjF1WnW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231441AbjF1WnW (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 28 Jun 2023 18:43:22 -0400
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDE841715;
-        Wed, 28 Jun 2023 15:43:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 273491FDC;
+        Wed, 28 Jun 2023 15:43:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687992200; x=1719528200;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=x+1cfc/xmoFxBnLLgTcKrep1dUoeoXKUxnolji14RNc=;
-  b=demIm3U0Dy3KSwiOehDB1LWzsy0oKoA6oT37rK1wTuFRYalpd3HJGnip
-   UtYR1Zqr+QlIsDirgbARaPBFU1acRu3Iqw5aD5cmH1/W7G/h3jnzyN9vG
-   K6vVbwrKbzIae+O7dA4zWTiv516eaHCeqQcWxHEjZT3C374iSOZCzQlN7
-   SGfoOpaYNaOnZfkRdZlWb6qD0kYlYu8yPOAtZ0y4HjHWvUlTQzmo62hgx
-   TudevnR1DlXD3WrOguya8EfZ9VPLOUBJWdpsdQ+Rg66ofsN5YbdBwSHqU
-   chEfgWS4sJ1424bYreUruKQTbYC+fZ1xyu/MxTi80FeAwVlu6+RDRZf6B
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="392699110"
+  t=1687992202; x=1719528202;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=1Sq/+JnMtm+xsGNEP3FqZg9J60yyeR0JKdJ3AsGMaUY=;
+  b=iWpH/MEHn+fwxEBu/2m43EkK7wksKJAzUuiCWtT0YcyWsVGKg331EEgR
+   A3/m5Vy8TbCRZj8fVvRCYf4dbo3tuxpqCrADifbBu0p4i5zXjxfZrvVQU
+   VWzB0u8+5xCy+gEA65/nazuynGFCw6/lRaKofvot2sWITIR3UX52VdwnH
+   VMJlUsdrf4d9f/bfU0BHLPtrzK/n9iDd+xEVLWzAkxxsSbS2aCEFKQKeD
+   JHEHbnTRySWp3nET8/VpEVh/e5igs2+bwzbRxtxvMR50WyZc/xarj1/Au
+   Xu1bR8fxrD6TTLrubRhbMkpJdDpY6u2l54HIedmM9ZyTsi06i8TJj+/ZE
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="392699120"
 X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="392699110"
+   d="scan'208";a="392699120"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
   by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 15:43:20 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="830299976"
+X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="830299980"
 X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="830299976"
+   d="scan'208";a="830299980"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 15:43:19 -0700
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 15:43:20 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -53,10 +53,12 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Vishal Annapurve <vannapurve@google.com>,
         Michael Roth <michael.roth@amd.com>,
         Yuan Yao <yuan.yao@linux.intel.com>
-Subject: [RFC PATCH v3 00/11] KVM: guest memory: Misc enhacnement
-Date:   Wed, 28 Jun 2023 15:42:59 -0700
-Message-Id: <cover.1687991811.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v3 01/11] KVM: selftests: Fix test_add_overlapping_private_memory_regions()
+Date:   Wed, 28 Jun 2023 15:43:00 -0700
+Message-Id: <4557c452b8ed5a44a22b566db00045991b92fbc6.1687991811.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1687991811.git.isaku.yamahata@intel.com>
+References: <cover.1687991811.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -72,91 +74,58 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Hello. I've updated the patch series based on the feedback. Here are the
-discussion points.
+The last test in test_add_overlapping_private_memory_regions() doesn't use
+overlapping regions resulting in the failure.  When the region is overlaps
+with the existing ones, the error code is EEXIST instead of EINVAL.  Pass
+the overlapping region, and check if the errno is EEXIST.
 
-- 06/11 KVM: x86: Introduce PFERR_GUEST_ENC_MASK to indicate fault is private
-  Michael has his own opinion on how to indicate private fault.
-
-- 09/11 KVM: Add new members to struct kvm_gfn_range to operate on
-
-- 10/11 KVM: x86: Add gmem hook for initializing private memory
-  SNP needs the callback. TDX won't use this one.
-
-- 11/11 KVM: x86: Add gmem hook for invalidating private memory
-  SNP needs the callback. TDX doesn't use this one at the moment, but would
-  use it.
-  
-- VM type:
-  I didn't rename KVM_X86_PROTECTED_VM to KVM_X86_SW_PROTECTED_VM  in this patch
-  series.  It's easy to rename it if desired.
-
-Thanks,
-
-This is an RFC patch series based on KVM gmem [1] and [2] for the common use of
-TDX and SEV-SNP.
-
-[1] KVM gmem patches
-https://github.com/sean-jc/linux/tree/x86/kvm_gmem_solo
-
-[2] Add AMD Secure Nested Paging (SEV-SNP) Hypervisor Support
-https://lore.kernel.org/lkml/20230612042559.375660-1-michael.roth@amd.com/
+Fixes: bdb645960cb5 ("KVM: selftests: Expand set_memory_region_test to validate guest_memfd()")
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
 ---
-v3:
-- Imported common patches from Michael Roth which can be useful for both SNP
-  and TDX.  And reorder patches.
-- Update struct kvm_gfn_range to drop flag, and add add only_private, and
-  only_shared
-- Update kvm_arch_set_memory_attributes() and added a x86 vendor callback for
-  it.
+Changes v2 -> v3:
+- no change
 
-v2:
-https://lore.kernel.org/all/cover.1687474039.git.isaku.yamahata@intel.com/
+Changes v1 -> v2:
+- no change
+---
+ .../selftests/kvm/set_memory_region_test.c       | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-v1:
-https://lore.kernel.org/all/cover.1686858861.git.isaku.yamahata@intel.com/
-
-Brijesh Singh (1):
-  KVM: x86: Export the kvm_zap_gfn_range() for the SNP use
-
-Isaku Yamahata (8):
-  KVM: selftests: Fix test_add_overlapping_private_memory_regions()
-  KVM: selftests: Fix guest_memfd()
-  KVM: selftests: x86: typo in private_mem_conversions_test.c
-  KVM: x86: Add is_vm_type_supported callback
-  KVM: x86/mmu: Pass around full 64-bit error code for the KVM page
-    fault
-  KVM: x86: Introduce PFERR_GUEST_ENC_MASK to indicate fault is private
-  KVM: Fix set_mem_attr ioctl when error case
-  KVM: Add new members to struct kvm_gfn_range to operate on
-
-Michael Roth (2):
-  KVM: x86: Add gmem hook for initializing private memory
-  KVM: x86: Add gmem hook for invalidating private memory
-
- arch/x86/include/asm/kvm-x86-ops.h            |  4 ++
- arch/x86/include/asm/kvm_host.h               | 12 +++++
- arch/x86/include/uapi/asm/kvm.h               |  1 +
- arch/x86/kvm/mmu.h                            |  2 -
- arch/x86/kvm/mmu/mmu.c                        | 51 ++++++++++++++-----
- arch/x86/kvm/mmu/mmu_internal.h               | 20 ++++++--
- arch/x86/kvm/mmu/mmutrace.h                   |  2 +-
- arch/x86/kvm/mmu/paging_tmpl.h                |  2 +-
- arch/x86/kvm/svm/svm.c                        |  7 +++
- arch/x86/kvm/vmx/vmx.c                        |  6 +++
- arch/x86/kvm/x86.c                            | 16 +++++-
- arch/x86/kvm/x86.h                            |  2 +
- include/linux/kvm_host.h                      | 16 ++++--
- .../testing/selftests/kvm/guest_memfd_test.c  |  4 +-
- .../selftests/kvm/set_memory_region_test.c    | 16 +++++-
- .../kvm/x86_64/private_mem_conversions_test.c |  2 +-
- virt/kvm/guest_mem.c                          | 50 +++++++++++++++++-
- virt/kvm/kvm_main.c                           | 24 +++++----
- 18 files changed, 192 insertions(+), 45 deletions(-)
-
-
-base-commit: be8abcec83c87d4e15ae04816b685fe260c4bcfd
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index f46841843300..ea7da324c4d6 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -432,6 +432,7 @@ static void test_add_overlapping_private_memory_regions(void)
+ {
+ 	struct kvm_vm *vm;
+ 	int memfd;
++	int r;
+ 
+ 	pr_info("Testing ADD of overlapping KVM_MEM_PRIVATE memory regions\n");
+ 
+@@ -453,8 +454,19 @@ static void test_add_overlapping_private_memory_regions(void)
+ 	vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
+ 				   MEM_REGION_GPA, 0, NULL, -1, 0);
+ 
+-	test_invalid_guest_memfd(vm, memfd, MEM_REGION_SIZE,
+-				 "Overlapping guest_memfd() bindings should fail");
++	r = __vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
++					 MEM_REGION_GPA * 2 - MEM_REGION_SIZE,
++					 MEM_REGION_SIZE * 2,
++					 0, memfd, 0);
++	TEST_ASSERT(r == -1 && errno == EEXIST, "%s",
++		    "Overlapping guest_memfd() bindings should fail");
++
++	r = __vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
++					 MEM_REGION_GPA * 2 + MEM_REGION_SIZE,
++					 MEM_REGION_SIZE * 2,
++					 0, memfd, 0);
++	TEST_ASSERT(r == -1 && errno == EEXIST, "%s",
++		    "Overlapping guest_memfd() bindings should fail");
+ 
+ 	close(memfd);
+ 	kvm_vm_free(vm);
 -- 
 2.25.1
 
