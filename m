@@ -2,195 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1FEC740ED2
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 12:31:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3427D740F0A
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 12:42:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231643AbjF1Kba (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 06:31:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57566 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232083AbjF1K30 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 06:29:26 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11ADF1B0;
-        Wed, 28 Jun 2023 03:29:23 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4fb863edcb6so2691472e87.0;
-        Wed, 28 Jun 2023 03:29:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687948161; x=1690540161;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/9+dB0uPjR6dzec0l9qeLYrn0RkeAmaPi6wiBE0Rz0s=;
-        b=b2Rs2cSK28LUBmSPPPXn1tL6IRsmSP2tJgPSfQSx4O5vycvWrA8kXiiRZLuf47VqNQ
-         3T5FosiCwHUqAqiWFHaG1ckoLAJZE8HaG1zHw5D8T0V+TrINR2QnL3/PH2dd8VbGR0O/
-         A/bGKjFPDpYY/4XE571aMQ29SutOrFhUowFPKjCXEV8NJSbkp1tNbP4Vhgu8hW7zlCY9
-         LIkALG9i847X5HSNaM32b94V+lrtjI9t6xRUthyF3e8TsPSeoRv5f8s0GX/aMf89bYrC
-         cp+awk1KsU8+n8daJmyM+z1eW9ItpBDv93fq6bcTCW6DP4TZAhyDJkSjmYdWiR6uPH2q
-         dKdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687948161; x=1690540161;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/9+dB0uPjR6dzec0l9qeLYrn0RkeAmaPi6wiBE0Rz0s=;
-        b=bSNcs6fmCJ56Ik1LT/Xszm1qJL6PqFSsld1YuSqKheBGSaqoq0en/++bNCffWVT2bI
-         VYv1N856lubnc4mcXpPNiE2W1kPPoHwtjPrshY6E+MO3BYGN1bFC3+/nPm9hmb9tUNJw
-         +JxEUGxVM/fCzZMbSAqxUdMCt7ixtzl77s4wPUZDFykmpCvnfWMQ7BpP3jY30+pBLghq
-         pEdJfE84jYWWQRCZ6hCbefmdCYXycN+c0mhj9PyvO2QhDz4KfSS5bB9I9I0ojLE9Szpb
-         4DF8Fe7LciaSoXxv7MDFDg8KIUEi4TBVIf9z8qoMnXUy0BPYVO7IRITWFRZrkof9bDzk
-         eXsw==
-X-Gm-Message-State: AC+VfDxbXpkvfwybdRmqFjE1cE4CZlLaPJsAVFK5Opz5LgkbtexhwSvM
-        YegCqexpo3vXrVgN+q9JQxjyKdQGdaw1RfLdBVw=
-X-Google-Smtp-Source: ACHHUZ4h09V3wI1azpJqOp/sAeZVBD2vtw10dniqbPA1C8M7x23FpqEn0BF2WO5Dy4bGcYG4R5lh8sQuVPSUE5aJ9aE=
-X-Received: by 2002:a2e:9183:0:b0:2b4:6e21:637e with SMTP id
- f3-20020a2e9183000000b002b46e21637emr17706195ljg.16.1687948161020; Wed, 28
- Jun 2023 03:29:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1687515463.git.haibo1.xu@intel.com> <fa6b80b578553e561ccacaeb24091e0716975593.1687515463.git.haibo1.xu@intel.com>
- <20230627-feb5bf584a3fd16d2c0ffe66@orel>
-In-Reply-To: <20230627-feb5bf584a3fd16d2c0ffe66@orel>
-From:   Haibo Xu <xiaobo55x@gmail.com>
-Date:   Wed, 28 Jun 2023 18:29:09 +0800
-Message-ID: <CAJve8o=CN4TJz5R9+zne_mA9L_doNTwg+w39OgU5HKXPzb4hmg@mail.gmail.com>
-Subject: Re: [PATCH v4 11/12] KVM: riscv: selftests: Add finalize_vcpu check
- in run_test
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org,
-        oliver.upton@linux.dev, seanjc@google.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+        id S231681AbjF1Kmk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 06:42:40 -0400
+Received: from xry111.site ([89.208.246.23]:44116 "EHLO xry111.site"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231956AbjF1Kka (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 06:40:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
+        s=default; t=1687948824;
+        bh=j1QlM126j6MA+r/+OaAKCCpzmed3Q7diNaQnwFqIZ8U=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=he8v0OYnFOPwL55tjufGR98tmw8tQQXPIdHEIUgxkSsv3f7JngrXzV1aU+i1bsw2J
+         iFw/W/hTQzIIJQwMxFXpuNk9D22uydpV2stSa1vQUA2L+oMLFWkCKDo25UoMgrjiLz
+         hh5nGrEcl5FwV7L/20/wRImVTklBVOpe9UIkxR9g=
+Received: from [192.168.124.11] (unknown [113.140.11.3])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
+        (Client did not present a certificate)
+        (Authenticated sender: xry111@xry111.site)
+        by xry111.site (Postfix) with ESMTPSA id D86A165C20;
+        Wed, 28 Jun 2023 06:40:21 -0400 (EDT)
+Message-ID: <74a06e8e7d0bab88892321dbdb891762487b6f6b.camel@xry111.site>
+Subject: Re: [PATCH v15 27/30] LoongArch: KVM: Implement vcpu world switch
+From:   Xi Ruoyao <xry111@xry111.site>
+To:     WANG Xuerui <kernel@xen0n.name>, bibo mao <maobibo@loongson.cn>,
+        zhaotianrui <zhaotianrui@loongson.cn>,
+        Jinyang He <hejinyang@loongson.cn>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, tangyouling@loongson.cn
+Date:   Wed, 28 Jun 2023 18:40:20 +0800
+In-Reply-To: <baf5c93f-59ae-57eb-49e0-a0231dab325d@xen0n.name>
+References: <20230626084752.1138621-1-zhaotianrui@loongson.cn>
+         <20230626084752.1138621-28-zhaotianrui@loongson.cn>
+         <f648a182-7c26-5bbc-6ae5-584af26e9db1@loongson.cn>
+         <7017277c-3721-b417-5215-491efae7c8a9@loongson.cn>
+         <cfc87f85-3a09-8a9e-4258-4fb1fd8013ab@xen0n.name>
+         <30261345-45de-8511-e285-fe16ee408ba1@loongson.cn>
+         <baf5c93f-59ae-57eb-49e0-a0231dab325d@xen0n.name>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-        lindbergh.monkeyblade.net
+User-Agent: Evolution 3.48.3 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks a lot!
+On Wed, 2023-06-28 at 18:22 +0800, WANG Xuerui wrote:
+> > is "ori t0, zero, CSR_PRMD_PIE" hard to understand? It is basic
+> > arithmetic instr and easy to understand also. To be frank I do not
+> > see the advantage of using li.w, also there is no document that
+> > pseudo-instruction should be used with high priority.
 
-On Tue, Jun 27, 2023 at 5:16=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
-om> wrote:
->
-> On Fri, Jun 23, 2023 at 06:40:13PM +0800, Haibo Xu wrote:
-> > Disable all vcpu extensions which were enabled by default
-> > if they were available in the risc-v host, and only enable
-> > the desired one for a vcpu_config.
-> >
-> > Suggested-by: Andrew Jones <ajones@ventanamicro.com>
-> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> > ---
-> >  tools/testing/selftests/kvm/get-reg-list.c | 42 +++++++++++++++++++++-
-> >  1 file changed, 41 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing=
-/selftests/kvm/get-reg-list.c
-> > index 3beb6b62de0a..612dabc61137 100644
-> > --- a/tools/testing/selftests/kvm/get-reg-list.c
-> > +++ b/tools/testing/selftests/kvm/get-reg-list.c
-> > @@ -138,11 +138,50 @@ static struct kvm_vcpu *vcpu_config_get_vcpu(stru=
-ct vcpu_reg_list *c, struct kvm
-> >       prepare_vcpu_init(c, &init);
-> >       vcpu =3D __vm_vcpu_add(vm, 0);
-> >       aarch64_vcpu_setup(vcpu, &init);
-> > -     finalize_vcpu(vcpu, c);
-> >
-> >       return vcpu;
-> >  }
-> >  #else
-> > +static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> > +{
-> > +     int ret;
-> > +     unsigned long value;
-> > +
-> > +     ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> > +     if (ret) {
-> > +             printf("Failed to get ext %d", ext);
-> > +             return false;
-> > +     }
-> > +
-> > +     return !!value;
-> > +}
-> > +
-> > +static void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list =
-*c)
-> > +{
-> > +     struct vcpu_reg_sublist *s;
-> > +
-> > +     /*
-> > +      * Disable all extensions which were enabled by default
-> > +      * if they were available in the risc-v host.
-> > +      */
-> > +     for (int i =3D 0; i < KVM_RISCV_ISA_EXT_MAX; i++) {
-> > +             __vcpu_set_reg(vcpu, RISCV_ISA_EXT_REG(i), 0);
-> > +     }
->
-> nit: can drop the {}
->
-> > +
-> > +     for_each_sublist(c, s) {
-> > +             if (!s->feature)
-> > +                     continue;
-> > +
-> > +             /* Try to enable the desired extension */
-> > +             __vcpu_set_reg(vcpu, RISCV_ISA_EXT_REG(s->feature), 1);
-> > +
-> > +             /* Double check whether the desired extension was enabled=
- */
-> > +             __TEST_REQUIRE(vcpu_has_ext(vcpu, s->feature),
-> > +                            "%s: %s not available, skipping tests\n",
-> > +                            config_name(c), s->name);
-> > +     }
-> > +}
-> > +
-> >  static struct kvm_vcpu *vcpu_config_get_vcpu(struct vcpu_reg_list *c, =
-struct kvm_vm *vm)
-> >  {
-> >       return __vm_vcpu_add(vm, 0);
-> > @@ -178,6 +217,7 @@ static void run_test(struct vcpu_reg_list *c)
-> >
-> >       vm =3D vm_create_barebones();
-> >       vcpu =3D vcpu_config_get_vcpu(c, vm);
-> > +     finalize_vcpu(vcpu, c);
->
-> Now that both arm and riscv call finalize_vcpu() we could do the weak
-> function trick for it and move the arch-specific implementations to
-> their own arch-specific files.
->
-> >
-> >       reg_list =3D vcpu_get_reg_list(vcpu);
-> >
-> > --
-> > 2.34.1
-> >
->
-> Otherwise,
->
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
->
-> Thanks,
-> drew
+> It depends on the reader. Sure the semantics are the same, but with "ori=
+=20
+> xx, zero, xx" someone's always going to wonder "why do 'x =3D 0 |=20
+> something' when you can simply li.w", because even if it's easy to=20
+> understand it's still an extra level of indirection.
+>=20
+> And I've given the historical and general software engineering=20
+> perspective too; it's not something set in stone, but I'd expect general=
+=20
+> software development best practices and minimizing any *possible* reader=
+=20
+> confusion to be acceptable.
+
+The pseudo *should* be the high priority in general.  If we don't
+consider the pseudos high priority, people will start to load immediates
+with "their own way", like writing "addi.w $t0, $zero, 42" or even "xori
+$t0, $zero, 42" for "42".  These may puzzle the uarch, causing a
+performance worse than "ori $t0, $zero, 42".  So the only rationale
+things are either:
+
+1. Telling people always use pseudos if possible.
+
+or
+
+2. Telling people "remember to use ori for loading small immediates, not
+other instructions".
+
+1 is obviously easier.
+
+--=20
+Xi Ruoyao <xry111@xry111.site>
+School of Aerospace Science and Technology, Xidian University
