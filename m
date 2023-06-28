@@ -2,153 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26A33741AAF
-	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 23:23:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEBD9741AC8
+	for <lists+kvm@lfdr.de>; Wed, 28 Jun 2023 23:25:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231799AbjF1VWh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 17:22:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58124 "EHLO
+        id S231693AbjF1VYQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 17:24:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232258AbjF1VWH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 17:22:07 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A16735A3;
-        Wed, 28 Jun 2023 14:17:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=SHmTybyGcoc5/JHuzcVL5NX4Cs2gDAkCaV9bDoHI6B0=; b=rL7tFVolsDXSDWlE9Rcxp2bWmN
-        Q9/yYXbuz8LgkmajLixE4pyVs8jNt0e1htRkRgqpAojAOnS2IOcggOUqw7n4Njl7Fsvsy1wXYY71M
-        6QN4rTTRRQfiWfLfN4AgVeNqDhL+cq3CIfR3KSmolf0VLZuS2C/wSY3e4G5TnkMziNOhqb1HFJjNy
-        v3qIw7bK00JYJ7nic7cGo0ApMaYScx2DWyHXF+5w3wLSGpyxnahYAgdApeZERqxR1XZYoCZZICuVF
-        4FTp11QpjOsXVK3HYE3/zq0Zx7zV/3s0TnkCRbD6kn0mE8gqnVB+o8WEI9UzwY0l7e2YqpWy2t8y2
-        jv+xC5HA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qEcWo-004E0P-8M; Wed, 28 Jun 2023 21:16:42 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id C765F3002C5;
-        Wed, 28 Jun 2023 23:16:41 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id AA92C2481AF37; Wed, 28 Jun 2023 23:16:41 +0200 (CEST)
-Date:   Wed, 28 Jun 2023 23:16:41 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-mm@kvack.org, x86@kernel.org, dave.hansen@intel.com,
-        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
-        tglx@linutronix.de, bp@alien8.de, mingo@redhat.com, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, david@redhat.com,
-        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
-        ashok.raj@intel.com, reinette.chatre@intel.com,
-        len.brown@intel.com, ak@linux.intel.com, isaku.yamahata@intel.com,
-        ying.huang@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
-        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
-Subject: Re: [PATCH v12 20/22] x86/virt/tdx: Allow SEAMCALL to handle #UD and
- #GP
-Message-ID: <20230628211641.GT38236@hirez.programming.kicks-ass.net>
-References: <cover.1687784645.git.kai.huang@intel.com>
- <c124550719716f1f7759c2bdea70f4722d8e0167.1687784645.git.kai.huang@intel.com>
- <20230628152900.GI2438817@hirez.programming.kicks-ass.net>
- <20230628203823.GR38236@hirez.programming.kicks-ass.net>
- <20230628211132.GS38236@hirez.programming.kicks-ass.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230628211132.GS38236@hirez.programming.kicks-ass.net>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232064AbjF1VXU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 17:23:20 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9096C44A3
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 14:19:27 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-2630c837b85so43328a91.2
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 14:19:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1687987167; x=1690579167;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=K5o+u/LcqTyeF7/tUgJ+GtCurg1xt5x0j01M6c1nAM4=;
+        b=BCMWJuhTCYqZq6awzCXGu8UvyS2OPUrlieTFwEo1aixq5Xm4ugYyzQEZiCU0iQjT//
+         6uyBs7WKvusL/hPaakVVZBI1lGlxqLFW7rmrIpxWPkKdW8qlcymcdjYLR9fhMpAkqnoU
+         hteN8adl4qjM+9L6EUO+99LkcnIqnhIQCR8L3l7fzf9U7HOyaxrmLxMgYoZSg5SnHIAo
+         aenSx++qrBS33ZdMXjDaqUqEq70zxlh8/GRc1UmnWy+bQHoA0/B+jEZYNdNp/N/SfEoU
+         ZaWTs/3jaNhAoEBXGpj7n437t82993zaOrSHY0JPeAFO1T70ng4IstUq0B22D6mGt0RM
+         51Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687987167; x=1690579167;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=K5o+u/LcqTyeF7/tUgJ+GtCurg1xt5x0j01M6c1nAM4=;
+        b=k7/l0pyjUEXMGY49JlaizIWq6D0sJnjxfrG39jZ81IkEOno1xVLTR4XfGdM6M+IeXP
+         JSxK2ohug3takQvrJz8GIqeowyUCFeBwpPm/uKUi7UvuGLPminpJ9+GEpxHgaCHSs95J
+         btuPJSm7sZBxpmUDzox7dmUvPoSIQRlzNf8BDWmlPjq7GfLy7sqZ6guHRjYQzD9jZvqz
+         UM0mER5XDLJLy7RdAkNkYHlelQUU+pPnUGtyvF8YorbOpGoeT+KE7oJhNc2Vx2NdpCSO
+         Alv8W+1RiQApLACSGrXQjuLmLOCjozdD4kERJMC0ZnjdTSZPh+8HosBI6UmCjr3wX8ny
+         Q/3w==
+X-Gm-Message-State: AC+VfDzow02W9oOVElz+Qp6jMFnGuEo+Yh8Ajga6k+uSb1+lDZvX3OOx
+        t/v/SLbba6oddCwySmeU1wDLFG/SJwQ=
+X-Google-Smtp-Source: APBJJlFWTrCAksdjDLaWtoLnz03DHBL3ow8XZSb9snqil8RyAkcgS/ASGh4N/YLbWfA+kzmLN3QQ66SKxQI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:7645:b0:263:4dca:ae63 with SMTP id
+ s5-20020a17090a764500b002634dcaae63mr68584pjl.6.1687987167013; Wed, 28 Jun
+ 2023 14:19:27 -0700 (PDT)
+Date:   Wed, 28 Jun 2023 14:19:25 -0700
+In-Reply-To: <20230607123700.40229-2-cloudliang@tencent.com>
+Mime-Version: 1.0
+References: <20230607123700.40229-1-cloudliang@tencent.com> <20230607123700.40229-2-cloudliang@tencent.com>
+Message-ID: <ZJyj3QDu9eAtJ+eq@google.com>
+Subject: Re: [PATCH v3 1/4] KVM: selftests: Introduce __kvm_pmu_event_filter
+ to improved event filter settings
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jinrong Liang <ljr.kernel@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Jinrong Liang <cloudliang@tencent.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 11:11:32PM +0200, Peter Zijlstra wrote:
-> --- a/arch/x86/virt/vmx/tdx/tdxcall.S
-> +++ b/arch/x86/virt/vmx/tdx/tdxcall.S
-> @@ -17,37 +17,44 @@
->   *            TDX module and hypercalls to the VMM.
->   * SEAMCALL - used by TDX hosts to make requests to the
->   *            TDX module.
-> + *
-> + *-------------------------------------------------------------------------
-> + * TDCALL/SEAMCALL ABI:
-> + *-------------------------------------------------------------------------
-> + * Input Registers:
-> + *
-> + * RAX                 - TDCALL Leaf number.
-> + * RCX,RDX,R8-R9       - TDCALL Leaf specific input registers.
-> + *
-> + * Output Registers:
-> + *
-> + * RAX                 - TDCALL instruction error code.
-> + * RCX,RDX,R8-R11      - TDCALL Leaf specific output registers.
-> + *
-> + *-------------------------------------------------------------------------
-> + *
-> + * __tdx_module_call() function ABI:
-> + *
-> + * @fn   (RDI)         - TDCALL Leaf ID,    moved to RAX
-> + * @regs (RSI)         - struct tdx_regs pointer
-> + *
-> + * Return status of TDCALL via RAX.
->   */
-> +.macro TDX_MODULE_CALL host:req ret:req
-> +	FRAME_BEGIN
->  
-> +	mov	%rdi, %rax
-> +	mov	$TDX_SEAMCALL_VMFAILINVALID, %rdi
->  
-> +	mov	TDX_MODULE_rcx(%rsi), %rcx
-> +	mov	TDX_MODULE_rdx(%rsi), %rdx
-> +	mov	TDX_MODULE_r8(%rsi),  %r8
-> +	mov	TDX_MODULE_r9(%rsi),  %r9
-> +//	mov	TDX_MODULE_r10(%rsi), %r10
-> +//	mov	TDX_MODULE_r11(%rsi), %r11
->  
-> +.if \host
-> +1:	seamcall
->  	/*
->  	 * SEAMCALL instruction is essentially a VMExit from VMX root
->  	 * mode to SEAM VMX root mode.  VMfailInvalid (CF=1) indicates
-	...
->  	 * This value will never be used as actual SEAMCALL error code as
->  	 * it is from the Reserved status code class.
->  	 */
-> +	cmovc	%rdi, %rax
->  2:
-> +.else
->  	tdcall
-> +.endif
->  
-> +.if \ret
-> +	movq %rcx, TDX_MODULE_rcx(%rsi)
-> +	movq %rdx, TDX_MODULE_rdx(%rsi)
-> +	movq %r8,  TDX_MODULE_r8(%rsi)
-> +	movq %r9,  TDX_MODULE_r9(%rsi)
-> +	movq %r10, TDX_MODULE_r10(%rsi)
-> +	movq %r11, TDX_MODULE_r11(%rsi)
-> +.endif
-> +
-> +	FRAME_END
-> +	RET
-> +
-> +.if \host
-> +3:
-> +	mov	$TDX_SW_ERROR, %rdi
-> +	or	%rdi, %rax
-> +	jmp 2b
->  
-> +	_ASM_EXTABLE_FAULT(1b, 3b)
-> +.endif
->  .endm
+On Wed, Jun 07, 2023, Jinrong Liang wrote:
+> -static struct kvm_pmu_event_filter *remove_event(struct kvm_pmu_event_filter *f,
+> +static struct kvm_pmu_event_filter *remove_event(struct __kvm_pmu_event_filter *__f,
+>  						 uint64_t event)
 
-Isn't that much simpler?
+Can you tack on a patch to drop the return?  None of the callers consume it, and
+it incorrectly implies that the incoming filter isn't modified.
+
+>  {
+>  	bool found = false;
+>  	int i;
+> +	struct kvm_pmu_event_filter *f = (void *)__f;
+
+Nit, reverse xmas tree is preferred:
+
+	struct kvm_pmu_event_filter *f = (void *)__f;
+	bool found = false;
+	int i;
+
+Hoever, I don't think this one needs to cast, the cast is only necessary when
+invoking a KVM ioctl(), e.g. I believe this should work:
+
+static void remove_event(struct __kvm_pmu_event_filter *f, uint64_t event)
+{
+	bool found = false;
+	int i;
+
+	for (i = 0; i < f->nevents; i++) {
+		if (found)
+			f->events[i - 1] = f->events[i];
+		else
+			found = f->events[i] == event;
+	}
+	if (found)
+		f->nevents--;
+}
+> @@ -569,19 +554,16 @@ static void run_masked_events_test(struct kvm_vcpu *vcpu,
+>  				   const uint64_t masked_events[],
+>  				   const int nmasked_events)
+>  {
+> -	struct kvm_pmu_event_filter *f;
+> +	struct __kvm_pmu_event_filter f = {
+> +	    .nevents = nmasked_events,
+> +	    .action = KVM_PMU_EVENT_ALLOW,
+> +	    .flags = KVM_PMU_EVENT_FLAG_MASKED_EVENTS,
+
+Tabs, not spaces please.
+
+> +static int set_pmu_single_event_filter(struct kvm_vcpu *vcpu, uint64_t event,
+> +				       uint32_t flags, uint32_t action)
+> +{
+> +	struct __kvm_pmu_event_filter f = {
+> +	    .nevents = 1,
+> +	    .flags = flags,
+> +	    .action = action,
+> +	    .events = {
+> +		event,
+
+Tabs.
