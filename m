@@ -2,107 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 151CD741CEC
-	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 02:32:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9409E741D0A
+	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 02:35:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230329AbjF2AcP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jun 2023 20:32:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57726 "EHLO
+        id S230519AbjF2Aey (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jun 2023 20:34:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbjF2AcO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jun 2023 20:32:14 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 884161BFE;
-        Wed, 28 Jun 2023 17:32:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687998733; x=1719534733;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=sqRArJ9svcYk8Srvkb99FaaP4ltBUPw0xtk0ZlIVfjk=;
-  b=QV/GX4LHVL7oonoqRN5/fZJrvDXcnSlIE1vr3SJpN+wVcqi7tV2+a/26
-   9ib7h0OXwHGOrou380D4jA2cg1s2crAqxq3AwkK+hMO0PVEjcceHEyok0
-   +RJv/OmMyOElyAXAI83327/iWEqo6xclkOOX0yA5G13vVZdzo9jTIY/W1
-   4nBae17Q12w5FWDZUsALojGPAIowo6SseuQpY1jNFlQn4V0aqweEyHnxp
-   yvPH62lrYVihlCQYeT16cBkXKrtxmPFG9BS4Rl+kD//8DNT8s0msJ8zAm
-   CQL8SsEKbXuGyC3apiryjixqjSbe2KeYje7MLSgDGDDRPIjkNFqQfCW4c
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="365455150"
-X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="365455150"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 17:32:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="891226114"
-X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="891226114"
-Received: from adamha2x-mobl.amr.corp.intel.com (HELO [10.209.108.95]) ([10.209.108.95])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 17:32:12 -0700
-Message-ID: <dc30a8c6-c313-9d85-c41e-07171dfdf056@intel.com>
-Date:   Wed, 28 Jun 2023 17:32:13 -0700
+        with ESMTP id S231330AbjF2Aew (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jun 2023 20:34:52 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D47352102;
+        Wed, 28 Jun 2023 17:34:49 -0700 (PDT)
+Received: from loongson.cn (unknown [10.20.42.170])
+        by gateway (Coremail) with SMTP id _____8Bx1cSn0Zxk36UDAA--.6074S3;
+        Thu, 29 Jun 2023 08:34:47 +0800 (CST)
+Received: from [10.20.42.170] (unknown [10.20.42.170])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxrM6m0ZxkUaIPAA--.57412S3;
+        Thu, 29 Jun 2023 08:34:46 +0800 (CST)
+Message-ID: <76fdc1e5-9f4b-1e5a-dbad-5214708b01f4@loongson.cn>
+Date:   Thu, 29 Jun 2023 08:34:46 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v12 19/22] x86/kexec(): Reset TDX private memory on
- platforms with TDX erratum
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v15 27/30] LoongArch: KVM: Implement vcpu world switch
 Content-Language: en-US
-To:     Nikolay Borisov <nik.borisov@suse.com>,
-        Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, x86@kernel.org,
-        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
-        peterz@infradead.org, tglx@linutronix.de, bp@alien8.de,
-        mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
-        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, ashok.raj@intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, ying.huang@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com
-References: <cover.1687784645.git.kai.huang@intel.com>
- <28aece770321e307d58df77eddee2d3fa851d15a.1687784645.git.kai.huang@intel.com>
- <1662a5ef-c333-d6d6-7605-060f4bcca6fd@suse.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <1662a5ef-c333-d6d6-7605-060f4bcca6fd@suse.com>
+To:     WANG Xuerui <kernel@xen0n.name>,
+        zhaotianrui <zhaotianrui@loongson.cn>,
+        Jinyang He <hejinyang@loongson.cn>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Xi Ruoyao <xry111@xry111.site>, tangyouling@loongson.cn
+References: <20230626084752.1138621-1-zhaotianrui@loongson.cn>
+ <20230626084752.1138621-28-zhaotianrui@loongson.cn>
+ <f648a182-7c26-5bbc-6ae5-584af26e9db1@loongson.cn>
+ <7017277c-3721-b417-5215-491efae7c8a9@loongson.cn>
+ <cfc87f85-3a09-8a9e-4258-4fb1fd8013ab@xen0n.name>
+ <30261345-45de-8511-e285-fe16ee408ba1@loongson.cn>
+ <baf5c93f-59ae-57eb-49e0-a0231dab325d@xen0n.name>
+From:   bibo mao <maobibo@loongson.cn>
+In-Reply-To: <baf5c93f-59ae-57eb-49e0-a0231dab325d@xen0n.name>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-CM-TRANSID: AQAAf8BxrM6m0ZxkUaIPAA--.57412S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxArWrJw13tF4fJr1xtrWUGFX_yoW5uw17pr
+        1xAay3GrW5Jr1kGw1UKw4UZFySyF1xJa15Xr18XasxJ3s8Kwn2gF1jgrn09Fn3Jr48JryU
+        Xr4jq3ZruF13ArXCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+        0xBIdaVrnRJUUUPYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+        Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+        kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
+        twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+        k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l
+        4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxV
+        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
+        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+        42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5o7tUUUUU=
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/28/23 02:20, Nikolay Borisov wrote:
+
+
+在 2023/6/28 18:22, WANG Xuerui 写道:
+> On 2023/6/28 18:11, bibo mao wrote:
 >>
->>   +    /*
->> +     * Starting from this point the system may have TDX private
->> +     * memory.  Make it globally visible so tdx_reset_memory() only
->> +     * reads TDMRs/PAMTs when they are stable.
->> +     *
->> +     * Note using atomic_inc_return() to provide the explicit memory
->> +     * ordering isn't mandatory here as the WBINVD above already
->> +     * does that.  Compiler barrier isn't needed here either.
->> +     */
+>>
+>> 在 2023/6/28 17:51, WANG Xuerui 写道:
+>>> Hi,
+>>>
+>>> On 2023/6/28 16:34, zhaotianrui wrote:
+>>>>
+>>>> 在 2023/6/28 上午11:42, Jinyang He 写道:
+>>>>> On 2023-06-26 16:47, Tianrui Zhao wrote:
+>>>>>
+>>>>>> [snip]
+>>>>>
+>>>>>> +    ldx.d   t0, t1, t0
+>>>>>> +    csrwr    t0, LOONGARCH_CSR_PGDL
+>>>>>> +
+>>>>>> +    /* Mix GID and RID */
+>>>>>> +    csrrd        t1, LOONGARCH_CSR_GSTAT
+>>>>>> +    bstrpick.w    t1, t1, CSR_GSTAT_GID_SHIFT_END, CSR_GSTAT_GID_SHIFT
+>>>>>> +    csrrd        t0, LOONGARCH_CSR_GTLBC
+>>>>>> +    bstrins.w    t0, t1, CSR_GTLBC_TGID_SHIFT_END, CSR_GTLBC_TGID_SHIFT
+>>>>>> +    csrwr        t0, LOONGARCH_CSR_GTLBC
+>>>>>> +
+>>>>>> +    /*
+>>>>>> +     * Switch to guest:
+>>>>>> +     *  GSTAT.PGM = 1, ERRCTL.ISERR = 0, TLBRPRMD.ISTLBR = 0
+>>>>>> +     *  ertn
+>>>>>> +     */
+>>>>>> +
+>>>>>> +    /*
+>>>>>> +     * Enable intr in root mode with future ertn so that host interrupt
+>>>>>> +     * can be responsed during VM runs
+>>>>>> +     * guest crmd comes from separate gcsr_CRMD register
+>>>>>> +     */
+>>>>>> +    ori    t0, zero, CSR_PRMD_PIE
+>>>>> li.w t0, CSR_PRMD_PIE
+>>>> Thanks for your advice, and I think it need not to replace it with "li.w" there, as it has the same meaning with "ori" instruction, and "ori" instruction is simple and clear enough. The same as the following "move" instructions. What do you think of it.
+>>>
+>>> Just my 2c: I'd agree that pseudo-instructions should be used wherever possible and helping readability.
+>> "lu12i.w+srli.w" can be replaced by "li.w t0, KVM_GPGD"
+>> we accept the suggestion two instructions should be replaced with pseudo-instruction.
+>>
+>> For the instruction "ori    t0, zero, CSR_PRMD_PIE"
+>> what is advantage of this pseudo-instruction
+>>      li.w t0, CSR_PRMD_PIE
+>>
+>> is "ori t0, zero, CSR_PRMD_PIE" hard to understand? It is basic arithmetic instr and easy to understand also. To be frank I do not see the advantage of using li.w, also there is no document that pseudo-instruction should be used with high priority.
 > 
-> If it's not needed, then why use it? Simply do atomic_inc() and instead
-> rephrase the comment to state what are the ordering guarantees and how
-> they are achieved (i.e by using wbinvd above).
+> It depends on the reader. Sure the semantics are the same, but with "ori xx, zero, xx" someone's always going to wonder "why do 'x = 0 | something' when you can simply li.w", because even if it's easy to understand it's still an extra level of indirection.
+pseudo-instruction li.w/li.d is understandable, is there alias li.h/li.b instructions also or li is enough on LoongArch64 system?
 
-Even better, explain why the barrier needs to be there and *IGNORE* the
-WBVIND.
+ori $rd, $rj, imm12 can be used, however ori $rd, zero, imm12 should not be used by the description.
 
-If the WBINVD gets moved -- or if the gods ever bless us with a halfway
-reasonable way to flush the caches that's not full serializing -- this
-code is screwed.
+I guess compiler guys want to remove using zero register in assemble language, so there is pseudo instruction here. is there similar pseudo instr for "xor $rd, ZERO, $rj" and "sub $rd, ZERO, $rj" to remove zero register also?  I do not get the  documentation and consensus information for pseudo instruction usage.
 
-There is _zero_ reason to try and "optimize" this junk by trying to get
-rid of a memory barrier at the risk of screwing it over later.
+Regards
+Bibo Mao
 
-I use "optimize" in quotes because that's a highly charitable way of
-describing this activity.
-
+> 
+> And I've given the historical and general software engineering perspective too; it's not something set in stone, but I'd expect general software development best practices and minimizing any *possible* reader confusion to be acceptable.
+> 
 
