@@ -2,119 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D486742ACF
-	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 18:48:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4CEB742AD4
+	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 18:50:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231766AbjF2Qsv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jun 2023 12:48:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47592 "EHLO
+        id S231902AbjF2Quk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jun 2023 12:50:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230119AbjF2Qsq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jun 2023 12:48:46 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A125E30DD;
-        Thu, 29 Jun 2023 09:48:44 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-666eba6f3d6so594505b3a.3;
-        Thu, 29 Jun 2023 09:48:44 -0700 (PDT)
+        with ESMTP id S230314AbjF2Qui (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jun 2023 12:50:38 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CFD430FA
+        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 09:50:37 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-56fffdea2d0so7015027b3.1
+        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 09:50:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688057324; x=1690649324;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bSki35S0PvYwPqAK7/2pZgtomNRuxO2llKu0zknsBnk=;
-        b=IK+Pu7ifwtQliKRnlj7Nn0eRKL7I9Mv61uWrAaYBBeZPmZxyj2Ylq0fHe/hNc8Qta7
-         +g2uEiGK268PijWCOTVsvTKUvA+M0aMyMQtFji356Rjm5+dteYzfddK/RcCqnMSv3qYi
-         9haTTQEfVNYrmH60/crg+3qwUN8NNDdTVEaaHTWO0m7ImgyJrRknPymq2UaxzCDvNUEG
-         x+FBxXw+/1F6EREqw8ZdTahpzV7WnthvKOk7jCx/VuudswbAWudta+SN2dFunv0W8BdE
-         57Lxf1Ho/3Is0Cprcb+XoAIZ0DUjrKlPe3vPv7oqfJ4jZX8/lywCQ4W+zjg7NMuL2CNz
-         IsQw==
+        d=google.com; s=20221208; t=1688057436; x=1690649436;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=P7X1f1JkCDNqEyBhjNE0NVCYk7dv7XgPQ/wMLYU+XyQ=;
+        b=a6lSBajW3W02rYZGgR3/o0i9lxzRFVovXoe3Q3JaBs8FdTwqUBneab7VBjiCfUhcLA
+         0ufpIbSR4EeP/geTQzfXNnnIbTwqIf0t30LMWe6PpIWGthQ/XTooya1lmeGiSvs6YA5S
+         mswOiz4kIhsywRvIn1fanIuT6NZHga1wspana2xVtBxT5giHdB7sN6MIVZl44cmlJnNO
+         1CGKzS+KzlyEF3Q2aNAESdMDCcdGN0e8CIBhnwCbVpSChU+zztHsa7BZhyNcGQZmHaPF
+         L9/xLJSMfJm4abmW4kcT3CxN4cTptlZaENvbIcJ9kj1ojgO1prkD1YbHNJi4caKPO1dv
+         6E7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688057324; x=1690649324;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bSki35S0PvYwPqAK7/2pZgtomNRuxO2llKu0zknsBnk=;
-        b=WtDGBLt44+Ltpl9eXEn5u8iN0qiMXNkRGD0wfp+W2pY43NGxib87nIqZya6I8y9N7s
-         Mrrxh5l8HKEdWlhaHw8HHDz3AEE75ZhFYZCoYabWqmNgK2NGsJlo9JfQ0ZnKDTwSSxGP
-         fCNo4DGtIc8QrPKslCxn5cPVksu4hP+m4sLDoTwJA1yToex5htHgQxOPXHS1GHQCNbHa
-         2znaEdC6OE4oGhuX7+EljS5KAbMEPRC4gyBkpkCeO6wJCtOvuA2D0wFbq79J5C3pLA8q
-         oJAphfGyS4E1dyvAKqrp34zoYZZGIo935IQEPE6FGXYeVELkYVlkTQYzJFNxULJEH2Lu
-         2B0A==
-X-Gm-Message-State: ABy/qLZeQD+/N5QYy3/EIWpZrg2OvI3X6HMtzsFaRB0bxIocMMzKjQs5
-        sdCY+ITHvGrAOXf1u740kYA=
-X-Google-Smtp-Source: APBJJlFLalmrW00cv9nDfJaWZuxENtV9pNZdmFCIw6hOxO1KZHGUQnax8YXliaHN1g7SEU5Mf0q1ng==
-X-Received: by 2002:a05:6a00:b92:b0:680:fa5f:4ed6 with SMTP id g18-20020a056a000b9200b00680fa5f4ed6mr545799pfj.27.1688057323982;
-        Thu, 29 Jun 2023 09:48:43 -0700 (PDT)
-Received: from localhost.localdomain ([114.84.30.247])
-        by smtp.gmail.com with ESMTPSA id k6-20020aa78206000000b0064aea45b040sm8557339pfi.168.2023.06.29.09.48.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 09:48:42 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/tsc: Update guest tsc_offset again before vcpu first runs
-Date:   Fri, 30 Jun 2023 00:48:38 +0800
-Message-Id: <20230629164838.66847-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.32.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1688057436; x=1690649436;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P7X1f1JkCDNqEyBhjNE0NVCYk7dv7XgPQ/wMLYU+XyQ=;
+        b=UKgmtWsZiyY6z+Vp37/s2XT8frIZd96+wgY9tHe6vvM2r89MZ2NU2/9dni1AqKLie5
+         rJkceH8yodpw45YV69okPn23JlE+ktG7Tk35QBiA5H/M2sH6kkhxS8fdC0qvu5hThHTy
+         p532vW+Se0Fq3lyx6kX8n0V1nKxqmuO5g1JqF60ehwKrMoDSOqi2wHMp3499aUOw8Fnj
+         QXTy3No2Ok1c5MiE25rFKP78PEuH0b2j3YdCo7hfxHXw5n/SIq5VT8JwryTqGnFfmXbE
+         Gp5yTXlSN/nchDRBh7wneQPXNn1V8TdGjGIQX5fy22+sbaVa9uJfusNS0zY7ot+Oozk2
+         LHFQ==
+X-Gm-Message-State: AC+VfDwFsaBKFL2eV4pdYQbl/2XLJnN36srfhyefbOS4DFI8IHVGvyIw
+        wOXn/yLmUQn0US34ozs9oJBjF1RWqag=
+X-Google-Smtp-Source: ACHHUZ4lX+OOByfNcIUyoAakFmq15S+MSm5QkF+XEVSIc/gfVC4dKYToyRXyN+5uRHV6F/tF6oW/LjK/pqc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:b647:0:b0:56d:3c2b:2471 with SMTP id
+ h7-20020a81b647000000b0056d3c2b2471mr15652904ywk.3.1688057436218; Thu, 29 Jun
+ 2023 09:50:36 -0700 (PDT)
+Date:   Thu, 29 Jun 2023 09:50:34 -0700
+In-Reply-To: <Y/ZFJfspU6L2RmQS@google.com>
+Mime-Version: 1.0
+References: <20230217231022.816138-1-seanjc@google.com> <20230217231022.816138-9-seanjc@google.com>
+ <20230221152349.ulcjtbnvziair7ff@linux.intel.com> <20230221153306.qubx7tfmasnvodeu@linux.intel.com>
+ <Y/VYN3n/lHePiDxM@google.com> <20230222064931.ppz6berhfr4edewf@linux.intel.com>
+ <Y/ZFJfspU6L2RmQS@google.com>
+Message-ID: <ZJ22Wts4WKKD19bN@google.com>
+Subject: Re: [PATCH 08/12] KVM: nSVM: Use KVM-governed feature framework to
+ track "vVM{SAVE,LOAD} enabled"
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Wed, Feb 22, 2023, Sean Christopherson wrote:
+> +Maxim
+> 
+> On Wed, Feb 22, 2023, Yu Zhang wrote:
+> I'll opportunistically massage the comment to make it more explicit about why
+> VMLOAD needs to be intercepted.
+>  
+> That said, clearing the bits for this seems wrong.  That would corrupt the MSRs
+> for 64-bit Intel guests.  The "target" of the fix was 32-bit L2s, i.e. I doubt
+> anything would notice.
+> 
+>     This patch fixes nested migration of 32 bit nested guests, that was
+>     broken because incorrect cached values of SYSENTER msrs were stored in
+>     the migration stream if L1 changed these msrs with
+>     vmload prior to L2 entry.
 
-When a new vcpu is created and subsequently restored by vcpu snapshot,
-apply kvm_vcpu_write_tsc_offset() before vcpu runs for the first time.
+Aha!  Finally figured out what this code is doing.  KVM intercepts VMLOAD so that
+KVM can correctly model the VMLOAD behavior of dropping bits 63:32, i.e. to clear
+svm->sysenter_eip_hi and svm->sysenter_esp_hi.
 
-Before a vcpu runs for the first time, the user space (VMM) sets the guest
-tsc as it wants, which may triggers the time synchronization mechanism with
-other vcpus (if any). In a scenario where a vcpu snapshot is used to
-restore, like the bugzilla report [*], the newly target guest tsc (e.g.
-at the time of vcpu restoration) is synchronized with its the most
-primitive guest timestamp initialized at the time of vcpu creation.
+So the code is correct.  I'll add this comment:
 
-Furthermore, the VMM can actually update the target guest tsc multiple
-times before the vcpu actually gets running, which requires the tsc_offset
-to be updated every time it is set. In this scenario, it can be considered
-as unstable tsc (even this vcpu has not yet even started ticking to follow
-the intended logic of KVM timer emulation).
-
-It is only necessary to delay this step until kvm_arch_vcpu_load() to
-catch up with guest expectation with the help of kvm_vcpu_has_run(),
-and the change is expected to not break any of the cumbersome existing
-virt timer features.
-
-Reported-by: Yong He <alexyonghe@tencent.com>
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217423 [*] 
-Tested-by: Jinrong Liang <cloudliang@tencent.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/x86.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 439312e04384..616940fc3791 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4818,7 +4818,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		if (tsc_delta < 0)
- 			mark_tsc_unstable("KVM discovered backwards TSC");
- 
--		if (kvm_check_tsc_unstable()) {
-+		if (kvm_check_tsc_unstable() || !kvm_vcpu_has_run(vcpu)) {
- 			u64 offset = kvm_compute_l1_tsc_offset(vcpu,
- 						vcpu->arch.last_guest_tsc);
- 			kvm_vcpu_write_tsc_offset(vcpu, offset);
-
-base-commit: 88bb466c9dec4f70d682cf38c685324e7b1b3d60
--- 
-2.32.0
-
+	/*
+	 * Intercept VMLOAD if the vCPU mode is Intel in order to emulate that
+	 * VMLOAD drops bits 63:32 of SYSENTER (ignoring the fact that exposing
+	 * SVM on Intel is bonkers and extremely unlikely to work).
+	 */
