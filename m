@@ -2,70 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 040BE742947
-	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 17:16:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85C5F7429BC
+	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 17:34:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232554AbjF2PQy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jun 2023 11:16:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47788 "EHLO
+        id S232424AbjF2PeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jun 2023 11:34:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232521AbjF2PQr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jun 2023 11:16:47 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B6D430E6
-        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 08:16:45 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c0d62f4487cso652198276.0
-        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 08:16:45 -0700 (PDT)
+        with ESMTP id S229575AbjF2PeA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jun 2023 11:34:00 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E57A10EC
+        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 08:33:59 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-561eb6c66f6so6512167b3.0
+        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 08:33:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688051805; x=1690643805;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7TGC0VGQH5Yr0gxepslsru//MnVacowxczeMG+0ih5U=;
-        b=uIFm08lWh354I3Yb9tpSwcd/lD37ejiz/aCL5wO1kFc5Ja7IMAEB1ZSZGhggEMCr+t
-         XPlBhlePXtWobpv6scIZE66hOihfqD98wraX24uBzW6weu93/0bGUFdNcHOg/9Hr+kB7
-         tJIO8EPiuQ25OtnSTaoJRFsQ6K7zxFJcROu18Vkqmd7NCCkHYpV25twRhFFuKh321+oc
-         e6oAvwWKRR2wyrvtxH5+AVlLxrBMrNkdSdU1SfcSaGPNN9rbOo9oAsEhxC734AqnKxBc
-         JT7oUS5wf4a4xrsxvVjIHWcyYCNMVoP5UbsfA2yOC4M5ti1xsgf2SHYvJzKDcMCMpih7
-         /Fvg==
+        d=google.com; s=20221208; t=1688052838; x=1690644838;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3kyk0rokFAbkrgtc01xjyd4YqyaphcRK63ModOvOwcg=;
+        b=5X+7dWLqWA+c5c/xZHCNYho35yEbDsgnfFTOb677nP9Eqd3EiyuJWdUXUIndMJZd6g
+         1ACBc9Qax2zAZUORZHVKSFoMLEBZc5IErMyHXbmqQ7dlZbY9iGhOCkWWh2a0qTTWdEN4
+         dCdbQ7mI8sYEds1L1nKER5UzFeOAsM2mm998PYc08qZZjva8xvFQ3Pq+wTgrEnYENB0x
+         /+4atDdsU9iIIYUlOEc60GU0kWzVD8c6YdF1S7SE5IGScPMez0aBihHPX0BaEnpL0esK
+         Qy+awD0S4Nh8jOeRtmVJDmTAGbj+GEP6+XfXgdd54Zb34y8abGXuvai3oxm5MAocPkFP
+         vJfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688051805; x=1690643805;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7TGC0VGQH5Yr0gxepslsru//MnVacowxczeMG+0ih5U=;
-        b=dgTwlfX732Op3IKkbnvFu8HOEQ+CIyQNqr+QaxVvHzyZKfCtHArTtZuAtP5CR0cAK5
-         kgbvBbrfWVLj4ep0X6zzL+du5SRDRn6QZ3+rKy0x79e13LRtORNtjepir2wm6Qhp+pdx
-         aGeNvk+0HdCKXIWIWKqiSjidNMxY1GcarUthotYPLUU8BzAQXcM8HAWli1y63P7K4zca
-         vgSlZYbl4GOMwzhv8/7xtsUsQgZbriw25TAdxBOU1zxRpwbDqb395nfRl+vXOys9vAA5
-         /HboLveryC08UhoY/NAw1MOJi1UE2DtjskhdpY7Ey1fV2zZXPadl98mV1nQ8h83YrEzI
-         +7wA==
-X-Gm-Message-State: ABy/qLbK3ysY+rRv7ukCaXF5nhA6eOmUkYl1qhOlWm9PcJofjr2mD1/p
-        FdlZ3lo3acY1zG04wnMwSb5wBnNB8nM=
-X-Google-Smtp-Source: APBJJlHMhTJvRuoOzizvVvyutfaZ8MDqcMNL35+km2IIyOk3qRIiEWBi4YHhm17Hsnxd/WY8WeoexSN0f6Q=
+        d=1e100.net; s=20221208; t=1688052838; x=1690644838;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3kyk0rokFAbkrgtc01xjyd4YqyaphcRK63ModOvOwcg=;
+        b=P0KUsx78vroMSYKtLWZt792kHoGVJEPjXmGaNBbk6bRig/1Xp31eg4eECS75KaT6bh
+         GptOzWlgNcW2WTycqv4wH3cCBcStRJ+/6jutJBATvP+CXlIqXTB9WBgTChRwAtnkPKDo
+         +rUPsfhBHoGwOP0uo4CYb/zQ1kqYJ9txGmgX4+vy2bt/X5qTEhj+y0VCjHQd/Q6ospH2
+         8sTR9Trb6Uidosg/NnD73rozbSWd4tJ2m6G84dvXDLnfdmx88qfFsecspPaQ+5gy2i+8
+         gbXTOpntzfBM6bvKbl7NcjHUy5Fqm+SqrIMSsV1EHYxffAfuyEaxLq6wRgqNhYcTQ4Ke
+         joGw==
+X-Gm-Message-State: AC+VfDztxeGPbS7TU6FbL6H80XpxdYE+xllhhTGaOMo4M1GjipzeUWqm
+        aXa71TH4/47ErKr/eXC7NYyn/9SXYO0=
+X-Google-Smtp-Source: ACHHUZ5T23XUwgoQYNVKR3GhWx0nZKBunI4K2GoWz7QSBczf+rRDc1r13BPCUxWnXlsXJ96ewp+xOHgkx/8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:3610:0:b0:c15:cbd1:60d6 with SMTP id
- d16-20020a253610000000b00c15cbd160d6mr1647yba.5.1688051804809; Thu, 29 Jun
- 2023 08:16:44 -0700 (PDT)
-Date:   Thu, 29 Jun 2023 08:16:43 -0700
-In-Reply-To: <bf5ef935-b676-4f2a-7df3-271eff24e6bb@linux.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a81:4046:0:b0:55d:d5b1:c2bd with SMTP id
+ m6-20020a814046000000b0055dd5b1c2bdmr10931805ywn.8.1688052838293; Thu, 29 Jun
+ 2023 08:33:58 -0700 (PDT)
+Date:   Thu, 29 Jun 2023 08:33:56 -0700
+In-Reply-To: <5a9e57e3-0361-77f8-834f-edb8600483e1@linux.intel.com>
 Mime-Version: 1.0
 References: <20230606091842.13123-1-binbin.wu@linux.intel.com>
  <20230606091842.13123-5-binbin.wu@linux.intel.com> <ZJt7vud/2FJtcGjV@google.com>
- <bf5ef935-b676-4f2a-7df3-271eff24e6bb@linux.intel.com>
-Message-ID: <ZJ2gW1gD9noko8H6@google.com>
+ <bf5ef935-b676-4f2a-7df3-271eff24e6bb@linux.intel.com> <ZJ0rcVpSjbZInnIq@chao-email>
+ <5a9e57e3-0361-77f8-834f-edb8600483e1@linux.intel.com>
+Message-ID: <ZJ2kZL6mJB+bDQxi@google.com>
 Subject: Re: [PATCH v9 4/6] KVM: x86: Introduce untag_addr() in kvm_x86_ops
 From:   Sean Christopherson <seanjc@google.com>
 To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
-        David.Laight@aculab.com, robert.hu@linux.intel.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Cc:     Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        kai.huang@intel.com, David.Laight@aculab.com,
+        robert.hu@linux.intel.com
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -73,73 +72,66 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Jun 29, 2023, Binbin Wu wrote:
-> On 6/28/2023 8:15 AM, Sean Christopherson wrote:
-> > On Tue, Jun 06, 2023, Binbin Wu wrote:
-> > Use the perfectly good helper added earlier in the series:
-> >=20
-> > 		cr3_lam =3D kvm_get_active_lam_bits();
-> Good suggestion. Thanks.
->=20
-> >=20
-> > That has the added bonus of avoiding a VMREAD of CR3 when LAM is disabl=
-ed in CR4.
-> Why? I don't get the point.
+> On 6/29/2023 2:57 PM, Chao Gao wrote:
+> > On Thu, Jun 29, 2023 at 02:12:27PM +0800, Binbin Wu wrote:
+> > > > > +	/*
+> > > > > +	 * Check LAM_U48 in cr3_ctrl_bits to avoid guest_cpuid_has().
+> > > > > +	 * If not set, vCPU doesn't supports LAM.
+> > > > > +	 */
+> > > > > +	if (!(vcpu->arch.cr3_ctrl_bits & X86_CR3_LAM_U48) ||
+> > > > This is unnecessary, KVM should never allow the LAM bits in CR3 to be set if LAM
+> > > > isn't supported.
+> > A corner case is:
+> > 
+> > If EPT is enabled, CR3 writes are not trapped. then guests can set the
+> > LAM bits in CR3 if hardware supports LAM regardless whether or not guest
+> > enumerates LAM.
 
-Sorry, typo on my end.  When LAM is disabled in guest CPUID, not CR4.
+Argh, that's a really obnoxious virtualization hole.
 
-> > > +void vmx_untag_addr(struct kvm_vcpu *vcpu, gva_t *gva, u32 flags)
-> > Rather than modify the pointer, return the untagged address.  That's mo=
-re flexible
-> > as it allows using the result in if-statements and whatnot.  That might=
- not ever
-> > come into play, but there's no good reason to use an in/out param in a =
-void
-> > function.
-> In earlier version, it did return the untagged address.
-> In this version, I changed it as an in/out param to make the interface
-> conditional and avoid to add a dummy one in SVM.
-> Is it can be a reason?
+> I recalled the main reason why I added the check.
+> It's used to avoid the following checking on CR3 & CR4, which may cause an
+> additional VMREAD.
 
-Hmm, no.  You can achieve the same by doing:
+FWIW, that will (and should) be handled by kvm_get_active_lam_bits().  Hmm, though
+since CR4.LAM_SUP is a separate thing, that should probably be
+kvm_get_active_cr3_lam_bits().
 
-	struct kvm_vcpu *vcpu =3D emul_to_vcpu(ctxt);
+> Also, about the virtualization hole, if guest can enable LAM bits in CR3 in
+> non-root mode without cause any problem, that means the hardware supports
+> LAM, should KVM continue to untag the address following CR3 setting?
 
-	if (!kvm_x86_ops.get_untagged_addr)
-		return addr;
+Hrm, no, KVM should honor the architecture.  The virtualization hole is bad enough
+as it is, I don't want to KVM to actively make it worse.
 
-	return static_call(kvm_x86_get_untagged_addr)(vcpu, addr, flags);
+> Because skip untag the address probably will cause guest failure, and of
+> cause, this is the guest itself to blame.
 
-> > gva_t vmx_get_untagged_addr(struct kvm_vcpu *vcpu, gva_t gva,
-> > 			    unsigned int flags)
-> > {
-> > 	unsigned long cr3_bits, cr4_bits;
-> > 	int lam_bit;
-> >=20
-> > 	if (flags & (X86EMUL_F_FETCH | X86EMUL_F_BRANCH_INVLPG | X86EMUL_F_IMP=
-LICIT))
-> Thanks for the suggestion. Overall, it looks good to me.
->=20
-> Suppose "X86EMUL_F_BRANCH_INVLPG "=C2=A0 should be two flags for branch a=
-nd
-> invlpg, right=EF=BC=9F
+Yeah, guest's fault.  The fact that it the guest won't get all the #GPs it should
+is unfortunate, but intercepting all writes to CR3 just to close the hole is sadly
+a really bad tradeoff.
 
-Yeah, typo again.  Should just be X86EMUL_F_INVLPG, because unlike LASS, LA=
-M
-ignores all FETCH types.
+> But untag the address seems do no harm?
 
-> And for LAM, X86EMUL_F_IMPLICIT will not be used because in the implicit
-> access to memory management registers or descriptors,
-> the linear base addresses still need to be canonical and no hooks will be
-> added to untag the addresses in these pathes.
-> So I probably will remove the check for X86EMUL_F_IMPLICIT here.
+In an of itself, not really.  But I don't want to set the precedent in KVM that
+user LAM is supported regardless of guest CPUID.
 
-No, please keep it, e.g. so that changes in the emulator don't lead to brea=
-kage,
-and to document that they are exempt.
+Another problem with the virtualization hole is that the guest will be able
+to induce VM-Fail when KVM is running on L1, because L0 will likely enforce the
+CR3 checks on VM-Enter but not intercept MOV CR3.  I.e. the guest can get an
+illegal value into vmcs.GUEST_CR3.  We could add code to explicitly detect that
+case to help triage such failures, but I don't know that it's worth the code, e.g.
 
-If you want, you could do WARN_ON_ONCE() for the IMPLICIT case, but I don't=
- know
-that that's worthwhile, e.g. nothing will go wrong if KVM tries to untag an
-implicit access, and deliberately avoiding the call make make it annoying t=
-o
-consolidate code in the future.
+	if (exit_reason.failed_vmentry) {
+		if (boot_cpu_has(X86_FEATURE_LAM) &&
+		    !guest_can_use(X86_FEATURE_LAM) &&
+		    (kvm_read_cr3(vcpu) & (X86_CR3_LAM_U48 | X86_CR3_LAM_U57)))
+		    	pr_warn_ratelimited("Guest abused LAM virtualization hole\n");
+		else
+			dump_vmcs(vcpu);
+		vcpu->run->exit_reason = KVM_EXIT_FAIL_ENTRY;
+		vcpu->run->fail_entry.hardware_entry_failure_reason
+			= exit_reason.full;
+		vcpu->run->fail_entry.cpu = vcpu->arch.last_vmentry_cpu;
+		return 0;
+	}
