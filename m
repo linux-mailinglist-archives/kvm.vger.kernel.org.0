@@ -2,122 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C285C742EAB
-	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 22:43:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D198E742EDE
+	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 22:50:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230284AbjF2Umz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jun 2023 16:42:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44108 "EHLO
+        id S231878AbjF2Uuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jun 2023 16:50:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229720AbjF2Umx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jun 2023 16:42:53 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1852130F6
-        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 13:42:48 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-53f44c2566dso577939a12.2
-        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 13:42:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688071367; x=1690663367;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BQRaWvbWayXrUaV/AdYM8A6PgwM50YALn2m11rBg8qU=;
-        b=ZvuBCPvFjFFfa8d+zeaX46c2x0RijXWR6UrLD+BhybYRnBeiOyYlxDbqGIWXCZioD7
-         ZoWlSM3s10b16QVHRvcNSQ2ADgzCmL70OUrYzCYR4OOQf1RKZijla/OQ9FBA9/lkvON6
-         fphvlcXOJMhvX9CGodVsEzRcGS5MuxWZdhjdqH62iLroGXy5WRhF0Qe5LFdjlgkYAOsl
-         GXWbKs/cG6e3gqM7iMUXW45g4SBZKhdPOo9QQ1emhpLiPch1aJIJo/fee0+KFFC7NKMo
-         jKPIt5+Oa2r4lcoc5b+2hLIHg+GDaYRzlZBqQ8fquyFgs6FakYi2EhfTvXVKkV+dqZoV
-         y2UQ==
+        with ESMTP id S229676AbjF2Uuo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jun 2023 16:50:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BC5730EC
+        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 13:49:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1688071794;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=p3Vp3rwhn+p+DOqGjp5roAc+L4HiC1iWcg0rxheHFZg=;
+        b=URGTnri4IhxkEDDhyVpFP9h1MjMIKwnjPqlmjI6O1lARObr2gp7GbXAKdjenFSRKLMCFes
+        NYO/IpAdPPBI+WCklvMozgJtDGxGXB6q0c2tpyhuwNOmFm5FMtSQmwb8YVlWpwcmHrTsjL
+        chHy2ACZnvYivJiu3t78YS/IhQ/smAE=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-632-A1NFQlmDNkSxqUP8-0Y0vQ-1; Thu, 29 Jun 2023 16:49:52 -0400
+X-MC-Unique: A1NFQlmDNkSxqUP8-0Y0vQ-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-76c5c78bc24so48227839f.2
+        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 13:49:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688071367; x=1690663367;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BQRaWvbWayXrUaV/AdYM8A6PgwM50YALn2m11rBg8qU=;
-        b=MEYz42tWwXZGEdPje9zqA9aoHjZ+QLBdTSSnqAuOyBjF6sYo4qwlsbX7iXoomTp497
-         S5QWcfYaGbhAqpu79mIVsHZVZbgm5/rKKME6BK3ZMl/MKAgd3xfJVRv9Lm21S5op4owt
-         iDs7KIO/DEFhKO8y/XIrtQz7WifX8f44AigE2JOeLRRrKIWYHoZzWi/jtUBaNSHCDRJo
-         VDVRQ8UtzBdifHMLKxGHFPlRORdb64mqmF1pxaLN+0U6WW4dkpE1EqLa9TNqbV6u065P
-         RIYKZno75m75Nc8TazTqDFdgbR9H7zfCCV4PaHF07YWvjfze8dL/UdpY01PKuSiyL6OH
-         1P6w==
-X-Gm-Message-State: ABy/qLaYery03BunXENegygmfct5KPtmP7O3D4cm/kA6GxAmTitE9E2s
-        TnhVmCAsYciYeRbwD1drNkDmqSpAZao=
-X-Google-Smtp-Source: APBJJlHgevTQgY2MJg54ip7lP9/UCiNLV/mV8dCTaL4KyHYq1c01ivdPXnryEBWLTlP3BFj3MZA2IesL2GU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:67cd:0:b0:55b:583d:3fd9 with SMTP id
- b13-20020a6567cd000000b0055b583d3fd9mr6024pgs.6.1688071367584; Thu, 29 Jun
- 2023 13:42:47 -0700 (PDT)
-Date:   Thu, 29 Jun 2023 13:42:46 -0700
-In-Reply-To: <ZJzWZEsRWOUrF7TG@yzhao56-desk.sh.intel.com>
-Mime-Version: 1.0
-References: <20230616023101.7019-1-yan.y.zhao@intel.com> <20230616023858.7503-1-yan.y.zhao@intel.com>
- <ZJy6xcIsOknHPQ9w@google.com> <ZJzWZEsRWOUrF7TG@yzhao56-desk.sh.intel.com>
-Message-ID: <ZJ3sxm6CngYC7pno@google.com>
-Subject: Re: [PATCH v3 08/11] KVM: x86: move vmx code to get EPT memtype when
- CR0.CD=1 to x86 common code
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
-        robert.hoo.linux@gmail.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1688071792; x=1690663792;
+        h=content-transfer-encoding:mime-version:organization:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p3Vp3rwhn+p+DOqGjp5roAc+L4HiC1iWcg0rxheHFZg=;
+        b=TE032cdZp+wlBZsvs7jo5gbll8/1XlbqRR7qTGnE7o7Djjj93xTOVdS4bKWvvKGf7+
+         4SKmN0EOxezbJ/nyK4EhV+3StyGJBaBNU+j0wtCuQyIackR1lMXYbsaDL6CjXJ8LE/JE
+         0IQVkJs07rysrYBj45RlzHIcFjjCC7NF60val/KqcLO0t3ybM4D31b17QE5o9/Ulu+gL
+         IrfKbKkLm03eEu4hjU/UcTe5UL9G6mziWABd64rmir8WvY8pBcvMUcbtdSgdV6TQo9Lx
+         h/PQUo4qKfVg3KDUsJ0bsZfNnct6mOh1jK8Yzb3kHbTFCC3Heu+qgFSoCemhTQahlkNj
+         1Oxg==
+X-Gm-Message-State: AC+VfDwUrcAQcHHcgjsH7xsr0CxJ7zH7rLUi+HhJUftPU0l2FQHqErMx
+        HxO+0vZBHDnN50/Pke/Dk0sxzdy+YLVFy2gf3vGq+c5RCI6ZCL2ImkAdPn79YMlUbwjixjmIqcZ
+        QHEt57g4kzmrz
+X-Received: by 2002:a6b:e308:0:b0:786:2878:9593 with SMTP id u8-20020a6be308000000b0078628789593mr819533ioc.0.1688071791749;
+        Thu, 29 Jun 2023 13:49:51 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6xKHDlA0smrFl44a/e+yacmCPzvKHISZ+A7ODOaf0op5jZ2Yb52khHqsOAdLbSJHShkEpzeA==
+X-Received: by 2002:a6b:e308:0:b0:786:2878:9593 with SMTP id u8-20020a6be308000000b0078628789593mr819520ioc.0.1688071791492;
+        Thu, 29 Jun 2023 13:49:51 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id p13-20020a02c80d000000b004249d9e81besm4041609jao.131.2023.06.29.13.49.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jun 2023 13:49:51 -0700 (PDT)
+Date:   Thu, 29 Jun 2023 14:49:49 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [GIT PULL] VFIO updates for v6.5-rc1
+Message-ID: <20230629144949.07e6cd78.alex.williamson@redhat.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 29, 2023, Yan Zhao wrote:
-> On Wed, Jun 28, 2023 at 03:57:09PM -0700, Sean Christopherson wrote:
-> > On Fri, Jun 16, 2023, Yan Zhao wrote:
-> > > Move code in vmx.c to get cache disabled memtype when non-coherent DMA
-> > > present to x86 common code.
-> > > 
-> > > This is the preparation patch for later implementation of fine-grained gfn
-> > > zap for CR0.CD toggles when guest MTRRs are honored.
-> > > 
-> > > No functional change intended.
-> > > 
-> > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > > ---
-> > >  arch/x86/kvm/mtrr.c    | 19 +++++++++++++++++++
-> > >  arch/x86/kvm/vmx/vmx.c | 10 +++++-----
-> > >  arch/x86/kvm/x86.h     |  1 +
-> > >  3 files changed, 25 insertions(+), 5 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/mtrr.c b/arch/x86/kvm/mtrr.c
-> > > index 3ce58734ad22..b35dd0bc9cad 100644
-> > > --- a/arch/x86/kvm/mtrr.c
-> > > +++ b/arch/x86/kvm/mtrr.c
-> > > @@ -721,3 +721,22 @@ bool kvm_mtrr_check_gfn_range_consistency(struct kvm_vcpu *vcpu, gfn_t gfn,
-> > >  
-> > >  	return type == mtrr_default_type(mtrr_state);
-> > >  }
-> > > +
-> > > +void kvm_mtrr_get_cd_memory_type(struct kvm_vcpu *vcpu, u8 *type, bool *ipat)
-> > 
-> > Hmm, I'm not convinced that this logic is subtle enough to warrant a common
-> I added this patch because the memtype to use under CR0.CD=1 is determined by
-> vmx specific code (i.e. vmx.c), while mtrr.c is a common code for x86.
-> 
-> I don't know if it's good to assume what vmx.c will return as in below open code. 
-> (e.g. if someone added IPAT bit for CR0.CD=1 under the quirk, and forgot
-> to update the code here, we actually need to zap everything rather than
-> zap only non-WB ranges).
-> 
-> That's why I want to introduce a helper and let vmx.c call into it.
-> (sorry, I didn't write a good commit message to explain the real intent).
+Hi Linus,
 
-No need to apologize, I fully understood the intent.  I'm just not convinced that
-the risk of us screwing up this particular case is worth the extra layers of crud
-that are necessary to let VMX and MTRRs share the core logic.
+The following changes since commit 44c026a73be8038f03dbdeef028b642880cf1511:
 
-Absent emulating CR0.CD=1 with UC, setting IPAT is complete nonsense when KVM is
-honoring the guest memtype.
+  Linux 6.4-rc3 (2023-05-21 14:05:48 -0700)
 
-I 100% agree that splitting the logic is less than ideal, but providing a common
-helper feels forced and IMO yields significantly less readable code.  And exporting
-kvm_mtrr_get_cd_memory_type() only adds to the confusion because calling it on
-SVM, which can't fully ignore gPAT, is also nonsensical.
+are available in the Git repository at:
+
+  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.5-rc1
+
+for you to fetch changes up to ff598081e5b9d0bdd6874bfe340811bbb75b35e4:
+
+  vfio/mdev: Move the compat_class initialization to module init (2023-06-27 12:05:26 -0600)
+
+----------------------------------------------------------------
+VFIO updates for v6.5-rc1
+
+ - Adjust log levels for common messages. (Oleksandr Natalenko,
+   Alex Williamson)
+
+ - Support for dynamic MSI-X allocation. (Reinette Chatre)
+
+ - Enable and report PCIe AtomicOp Completer capabilities.
+   (Alex Williamson)
+
+ - Cleanup Kconfigs for vfio bus drivers. (Alex Williamson)
+
+ - Add support for CDX bus based devices. (Nipun Gupta)
+
+ - Fix race with concurrent mdev initialization. (Eric Farman)
+
+----------------------------------------------------------------
+Alex Williamson (5):
+      vfio/pci: Also demote hiding standard cap messages
+      vfio/pci-core: Add capability for AtomicOp completer support
+      vfio/pci: Cleanup Kconfig
+      vfio/platform: Cleanup Kconfig
+      vfio/fsl: Create Kconfig sub-menu
+
+Eric Farman (1):
+      vfio/mdev: Move the compat_class initialization to module init
+
+Nipun Gupta (1):
+      vfio/cdx: add support for CDX bus
+
+Oleksandr Natalenko (1):
+      vfio/pci: demote hiding ecap messages to debug level
+
+Reinette Chatre (11):
+      vfio/pci: Consolidate irq cleanup on MSI/MSI-X disable
+      vfio/pci: Remove negative check on unsigned vector
+      vfio/pci: Prepare for dynamic interrupt context storage
+      vfio/pci: Move to single error path
+      vfio/pci: Use xarray for interrupt context storage
+      vfio/pci: Remove interrupt context counter
+      vfio/pci: Update stale comment
+      vfio/pci: Use bitfield for struct vfio_pci_core_device flags
+      vfio/pci: Probe and store ability to support dynamic MSI-X
+      vfio/pci: Support dynamic MSI-X
+      vfio/pci: Clear VFIO_IRQ_INFO_NORESIZE for MSI-X
+
+ MAINTAINERS                         |   7 +
+ drivers/vfio/Kconfig                |   1 +
+ drivers/vfio/Makefile               |   5 +-
+ drivers/vfio/cdx/Kconfig            |  17 ++
+ drivers/vfio/cdx/Makefile           |   8 +
+ drivers/vfio/cdx/main.c             | 234 +++++++++++++++++++++++++++
+ drivers/vfio/cdx/private.h          |  28 ++++
+ drivers/vfio/fsl-mc/Kconfig         |   6 +-
+ drivers/vfio/mdev/mdev_core.c       |  23 +--
+ drivers/vfio/pci/Kconfig            |   8 +-
+ drivers/vfio/pci/hisilicon/Kconfig  |   4 +-
+ drivers/vfio/pci/mlx5/Kconfig       |   2 +-
+ drivers/vfio/pci/vfio_pci_config.c  |   8 +-
+ drivers/vfio/pci/vfio_pci_core.c    |  46 +++++-
+ drivers/vfio/pci/vfio_pci_intrs.c   | 305 ++++++++++++++++++++++++------------
+ drivers/vfio/platform/Kconfig       |  18 ++-
+ drivers/vfio/platform/Makefile      |   9 +-
+ drivers/vfio/platform/reset/Kconfig |   2 +
+ include/linux/cdx/cdx_bus.h         |   1 -
+ include/linux/mod_devicetable.h     |   6 +
+ include/linux/vfio_pci_core.h       |  26 +--
+ include/uapi/linux/vfio.h           |  18 +++
+ scripts/mod/devicetable-offsets.c   |   1 +
+ scripts/mod/file2alias.c            |  17 +-
+ 24 files changed, 654 insertions(+), 146 deletions(-)
+ create mode 100644 drivers/vfio/cdx/Kconfig
+ create mode 100644 drivers/vfio/cdx/Makefile
+ create mode 100644 drivers/vfio/cdx/main.c
+ create mode 100644 drivers/vfio/cdx/private.h
+
