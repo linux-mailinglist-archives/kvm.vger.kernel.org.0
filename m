@@ -2,121 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B29DB7429F4
-	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 17:54:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34F527429FA
+	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 17:55:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232316AbjF2Pyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jun 2023 11:54:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59376 "EHLO
+        id S231668AbjF2PzZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jun 2023 11:55:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230487AbjF2Pyl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jun 2023 11:54:41 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D23BF10FB;
-        Thu, 29 Jun 2023 08:54:39 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6CC226153C;
-        Thu, 29 Jun 2023 15:54:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28680C433C8;
-        Thu, 29 Jun 2023 15:54:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688054078;
-        bh=L6FQS4d7vn+9QEms0SfAm1VLkLjV+bIazDI0tjMBu5g=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=k8QvCfS9YYp1B+ART94SdyS5GCq+kzg+y0GcPPcxH+Mz9b1I4fFjWlHyii0LCx/Zb
-         6oqHcWtiuE3GTIm5ZtGtpI5GJoj+Uki8akhd/tLN8XIvFLJ4vCNRMSzWFjh3vcU96P
-         F6nnnWDIE4ZC6jcq+iQOB7KR1kmI5HAuZgfRETPIGLrJefP/K7dQk2FX6jv6Do9o62
-         6dFS9sWsPtWknyZX4osw36zBl8rdJv7ce0BtqwOjDubXmJlfxwaLWPMCaZA0PiKewB
-         /QBRqLcnYPOwgUGemUscA0GTUkIR0SFl9qk65pBR8RcIQJ0ANd+rxatzb7VXpj8G2x
-         dcnTEBewzlWmg==
-Date:   Thu, 29 Jun 2023 10:54:36 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Sui Jingfeng <suijingfeng@loongson.cn>
-Cc:     Sui Jingfeng <15330273260@189.cn>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        linux-fbdev@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Karol Herbst <kherbst@redhat.com>,
-        nouveau@lists.freedesktop.org,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        dri-devel@lists.freedesktop.org, YiPeng Chai <YiPeng.Chai@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Likun Gao <Likun.Gao@amd.com>,
-        David Airlie <airlied@gmail.com>,
-        Ville Syrjala <ville.syrjala@linux.intel.com>,
-        Yi Liu <yi.l.liu@intel.com>, kvm@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
-        Ben Skeggs <bskeggs@redhat.com>, linux-pci@vger.kernel.org,
-        Kevin Tian <kevin.tian@intel.com>,
-        Lijo Lazar <lijo.lazar@amd.com>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Bokun Zhang <Bokun.Zhang@amd.com>,
-        intel-gfx@lists.freedesktop.org,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Pan Xinhui <Xinhui.Pan@amd.com>, linux-kernel@vger.kernel.org,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian Konig <christian.koenig@amd.com>,
-        Hawking Zhang <Hawking.Zhang@amd.com>
-Subject: Re: [PATCH v7 6/8] PCI/VGA: Introduce is_boot_device function
- callback to vga_client_register
-Message-ID: <20230629155436.GA397963@bhelgaas>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0dd961ae-78a7-0b67-af51-008ecbcdbbef@loongson.cn>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231718AbjF2PzW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jun 2023 11:55:22 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 280A63598
+        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 08:55:21 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-bacfa4ef059so617465276.2
+        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 08:55:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688054120; x=1690646120;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cgri8fUOqQI+I7MUyONsDj9koQfNy64c7FUPlFRFGyA=;
+        b=gReoJunxGhk+O7ZA1Bq4JL8qGLF5oyGv7NH3Q/vC+NhFoZ79MnNV4ZvN/QsdWodcXL
+         L1r015WDcOV5fiPOG/fuhXOOyTjcqM/Ufd3gHwQBHEiEQSswPDQ5snkwH3f9t3n3Y81R
+         tIc8VIE1JDHu+fmTntY3En+zbKdtdCGbXkvPLoYpHR8VoiN99uCzybXHnKtdfDq/pz+e
+         NCy/0NY7ux2VYzjzaBC1jIEVnLs55kONXlRt9LmISrzGHy5UYmqYWpwjyPzFCovADx6D
+         w5ZoLsMaJ0rb4RsgJic8ofviuq79K2ljmKKnlK7nvNiiQ7hvpTUkSb9Ks5bnKByNwTbU
+         8uiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688054120; x=1690646120;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cgri8fUOqQI+I7MUyONsDj9koQfNy64c7FUPlFRFGyA=;
+        b=XMN29PnubgD6UOLIUDMhahaB5d6gPGz2GunxNny4+dJ3/8J+4TZubYiKWud22B1EcW
+         0EfWfDBDmyBc/xwkCCPUNEReoLTuggtZ1i/wpMcEdnowi11tbZW5v97lTGf1d9jGrG6b
+         9Y2TP0XWkp2bBNat6db95Bzm5TSWuagA884xJxjpkMMOaK3er8RpO2QFk6i4pHAN1yyn
+         W5MVAC2JPSrKAwNRF2iJYpvHOvonIfJERF/KVVRn0c8OPnsyejkV4cSTsYA7sP3ky88c
+         KiZ6DQT/AIMF0KhSTPnRhkvetd7xqDu10+iVnSd8H+ppFH0pqTrn32yEVuDF3JDLGbRt
+         1zgg==
+X-Gm-Message-State: ABy/qLYyW9fkXDoxhbo2+4YNGZZdn4WYR6u1rGg51NB30tURiXvnzRju
+        dJ/EqogNn3QXIrvhsy99FFRen0ZxMFU=
+X-Google-Smtp-Source: APBJJlH71Yciw3xeqsl46JypVoDE/SEH7Y6DeYWgAp+jNkiLzoDpetuR+INoL7nBo38XdL/qpt5TVOqaReM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ab68:0:b0:bed:d03a:fc5f with SMTP id
+ u95-20020a25ab68000000b00bedd03afc5fmr2047ybi.11.1688054120441; Thu, 29 Jun
+ 2023 08:55:20 -0700 (PDT)
+Date:   Thu, 29 Jun 2023 08:55:18 -0700
+In-Reply-To: <20230629142633.86034-1-likexu@tencent.com>
+Mime-Version: 1.0
+References: <20230629142633.86034-1-likexu@tencent.com>
+Message-ID: <ZJ2pZh4GeBytq7R2@google.com>
+Subject: Re: [PATCH] KVM: selftests: Fix the meta info of test cases in the
+ header comments
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     David Woodhouse <dwmw@amazon.co.uk>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 22, 2023 at 01:08:15PM +0800, Sui Jingfeng wrote:
-> Hi,
-> 
-> 
-> A nouveau developer(Lyude) from redhat send me a R-B,
-> 
-> Thanks for the developers of nouveau project.
-> 
-> 
-> Please allow me add a link[1] here.
-> 
-> 
-> [1] https://lore.kernel.org/all/0afadc69f99a36bc9d03ecf54ff25859dbc10e28.camel@redhat.com/
+On Thu, Jun 29, 2023, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
+>=20
+> Fix test case names (including descriptions) in comments for
+> tsc_scaling_sync and xen_shinfo_test. No functional changes intended.
+>=20
+> Fixes: e467b0de82b2 ("KVM: x86: Test case for TSC scaling and offset sync=
+")
+> Fixes: 8d4e7e80838f ("KVM: x86: declare Xen HVM shared info capability an=
+d add test case")
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c | 4 ++--
+>  tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c  | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c b/tool=
+s/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
+> index 5b669818e39a..cdb214660e0a 100644
+> --- a/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
+> +++ b/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
+> @@ -1,10 +1,10 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
+>  /*
+> - * svm_vmcall_test
+> + * tsc_scaling_sync
+>   *
+>   * Copyright =EF=BF=BD 2021 Amazon.com, Inc. or its affiliates.
+>   *
+> - * Xen shared_info / pvclock testing
+> + * Test case for TSC scaling and offset sync
 
-1) Thanks for this.  If you post another version of this series,
-   please pick up Lyude's Reviewed-by and include it in the relevant
-   patches (as long as you haven't made significant changes to the
-   code Lyude reviewed).  Whoever applies this should automatically
-   pick up Reviewed-by/Ack/etc that are replies to the version being
-   applied, but they won't go through previous revisions to find them.
+I vote to delete the metadata (but leave the Copyright).  IMO it adds zero =
+value,
+and has a non-zero chance of becoming stale in the future.
 
-2) Please mention the commit to which the series applies.  I tried to
-   apply this on v6.4-rc1, but it doesn't apply cleanly.
-
-3) Thanks for including cover letters in your postings.  Please
-   include a little changelog in the cover letter so we know what
-   changed between v6 and v7, etc.
-
-4) Right now we're in the middle of the v6.5 merge window, so new
-   content, e.g., this series, is too late for v6.5.  Most
-   maintainers, including me, wait to merge new content until the
-   merge window closes and a new -rc1 is tagged.  This merge window
-   should close on July 9, and people will start merging content for
-   v6.6, typically based on v6.5-rc1.
-
-Bjorn
+>   */
+> =20
+>  #include "test_util.h"
+> diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools=
+/testing/selftests/kvm/x86_64/xen_shinfo_test.c
+> index 05898ad9f4d9..60daee9f3514 100644
+> --- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
+> @@ -1,6 +1,6 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
+>  /*
+> - * svm_vmcall_test
+> + * xen_shinfo_test
+>   *
+>   * Copyright =EF=BF=BD 2021 Amazon.com, Inc. or its affiliates.
+>   *
+>=20
+> base-commit: 88bb466c9dec4f70d682cf38c685324e7b1b3d60
+> --=20
+> 2.32.0
+>=20
