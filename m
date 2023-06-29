@@ -2,118 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D2D974204D
-	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 08:24:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D69574209E
+	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 08:46:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231861AbjF2GYu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jun 2023 02:24:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39594 "EHLO
+        id S231972AbjF2GqP convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 29 Jun 2023 02:46:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231543AbjF2GYs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jun 2023 02:24:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9AE32D54;
-        Wed, 28 Jun 2023 23:24:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4F287614C9;
-        Thu, 29 Jun 2023 06:24:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6523C433C8;
-        Thu, 29 Jun 2023 06:24:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688019886;
-        bh=iOOjD3A+S8SeXAoZrFqMF28gFRwFGFeW1oMEvRjrMaA=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=TmnLvFIkk2zxqAL6gSfDhRSGvxPyVFX1fmGu2VALfl8cjLa845fOoMbV0T1cGyn2k
-         7DVfYdpRCEQ+9QUpY0ii8gJL2F+dPPV1oUTG9X2Ktxuu33I3F0TTKWKGBjYPhZpQ2J
-         4f51fLD8TAjr1SnbNQhIiB5OmMwkKH+2lr7Whao+1vvaQdiJ7ZnHyY75HB3QkXRSPJ
-         wKq0eoMUu9IAOW2BbeY3pK06/vSVJY6FETNUQj3RHwfGOoH+1kaLvHm0cHnOQVxf46
-         1A0jIk75cimDrl6qL4OX7lEgidjTk1IBSJTVOedEKC3PezqNpaiEeaW19TqcGBOnVe
-         O+47jyhschJDA==
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-51d884a22e7so350692a12.3;
-        Wed, 28 Jun 2023 23:24:46 -0700 (PDT)
-X-Gm-Message-State: AC+VfDyd+zduiFW7kPhk66Ilbdie4Fbi3x11GjozRySGOjnkDx2uyJ/E
-        9PkeHtc/VqtucxE7qvxS7YDTGy1wZ2KmuEcPSXs=
-X-Google-Smtp-Source: ACHHUZ40VDkZdsHx4o3RM3KAXJpZxn6DsufG+PQoL4Y5YjvJzzruyD4+H/YNHJSSjYs6VHUkkJyUanUQ5J/RNjpxRmI=
-X-Received: by 2002:a05:6402:5157:b0:51d:a724:48d6 with SMTP id
- n23-20020a056402515700b0051da72448d6mr5056544edd.37.1688019884938; Wed, 28
- Jun 2023 23:24:44 -0700 (PDT)
+        with ESMTP id S232271AbjF2GpO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jun 2023 02:45:14 -0400
+X-Greylist: delayed 387 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 28 Jun 2023 23:43:49 PDT
+Received: from smtpout1.mo529.mail-out.ovh.net (smtpout1.mo529.mail-out.ovh.net [178.32.125.2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D78D72D56
+        for <kvm@vger.kernel.org>; Wed, 28 Jun 2023 23:43:49 -0700 (PDT)
+Received: from mxplan5.mail.ovh.net (unknown [10.109.143.141])
+        by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 7734720B29;
+        Thu, 29 Jun 2023 06:36:13 +0000 (UTC)
+Received: from kaod.org (37.59.142.97) by DAG6EX1.mxp5.local (172.16.2.51)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 29 Jun
+ 2023 08:36:12 +0200
+Authentication-Results: garm.ovh; auth=pass (GARM-97G002bc5539fe-ec9e-4790-8209-e60a71a887e4,
+                    3572DC45CCAD587926D7956B888079DA14C9F13E) smtp.auth=groug@kaod.org
+X-OVh-ClientIp: 78.197.208.248
+Date:   Thu, 29 Jun 2023 08:36:11 +0200
+From:   Greg Kurz <groug@kaod.org>
+To:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>
+CC:     <qemu-devel@nongnu.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        "=?UTF-8?B?Q8OpZHJpYw==?= Le Goater" <clg@kaod.org>,
+        <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        <kvm@vger.kernel.org>, Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v3 4/6] target/ppc: Define TYPE_HOST_POWERPC_CPU in
+ cpu-qom.h
+Message-ID: <20230629083611.3ba82988@bahia>
+In-Reply-To: <20230627115124.19632-5-philmd@linaro.org>
+References: <20230627115124.19632-1-philmd@linaro.org>
+        <20230627115124.19632-5-philmd@linaro.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <CABgObfYLnhW0qrPvFnMW_B9xZzLF6Ysn2uL4w9B815fUNVKK5A@mail.gmail.com>
- <20230629000729.1223067-1-yuzhao@google.com>
-In-Reply-To: <20230629000729.1223067-1-yuzhao@google.com>
-From:   Huacai Chen <chenhuacai@kernel.org>
-Date:   Thu, 29 Jun 2023 14:24:32 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H73BgeU=Vw+X+R+1pTrbZb_y9WLy66iu9=d3SXXeD0SBw@mail.gmail.com>
-Message-ID: <CAAhV-H73BgeU=Vw+X+R+1pTrbZb_y9WLy66iu9=d3SXXeD0SBw@mail.gmail.com>
-Subject: Re: [PATCH] MIPS: KVM: Fix NULL pointer dereference
-To:     Yu Zhao <yuzhao@google.com>
-Cc:     pbonzini@redhat.com, chenhuacai@loongson.cn,
-        jiaxun.yang@flygoat.com, kvm@vger.kernel.org,
-        linux-mips@vger.kernel.org, stable@vger.kernel.org,
-        tsbogend@alpha.franken.de
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8BIT
+X-Originating-IP: [37.59.142.97]
+X-ClientProxiedBy: DAG7EX2.mxp5.local (172.16.2.62) To DAG6EX1.mxp5.local
+ (172.16.2.51)
+X-Ovh-Tracer-GUID: e29b3c8e-1a4e-4c65-a97d-5e7d78dff95b
+X-Ovh-Tracer-Id: 2764365747181230383
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedviedrtdefgdduuddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfofggtgfgihesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepueeuieejtdelleeutdfhteejffeiteffueevffeffeetvdeifeeujefgudegteeunecukfhppeduvdejrddtrddtrddupdefjedrheelrddugedvrdeljedpjeekrdduleejrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepuddvjedrtddrtddruddpmhgrihhlfhhrohhmpeeoghhrohhugheskhgrohgurdhorhhgqedpnhgspghrtghpthhtohepuddprhgtphhtthhopehphhhilhhmugeslhhinhgrrhhordhorhhgpdhqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgpdgurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghupdgurghnihgvlhhhsgegudefsehgmhgrihhlrdgtohhmpdhqvghmuhdqphhptgesnhhonhhgnhhurdhorhhgpdhpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdhkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhnphhighhgihhnsehgmhgrihhlrdgtohhmpdgtlh
+ hgsehkrghougdrohhrghdpoffvtefjohhsthepmhhohedvledpmhhouggvpehsmhhtphhouhht
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Zhao,
+On Tue, 27 Jun 2023 13:51:22 +0200
+Philippe Mathieu-Daudé <philmd@linaro.org> wrote:
 
-On Thu, Jun 29, 2023 at 8:07=E2=80=AFAM Yu Zhao <yuzhao@google.com> wrote:
->
-> On Mon, Jun 26, 2023 at 6:33 AM Paolo Bonzini <pbonzini@redhat.com> wrote=
-:
-> >
-> > On Mon, Jun 26, 2023 at 9:59 AM Huacai Chen <chenhuacai@loongson.cn> wr=
-ote:
-> > >
-> > > After commit 45c7e8af4a5e3f0bea4ac209 ("MIPS: Remove KVM_TE support")=
- we
-> > > get a NULL pointer dereference when creating a KVM guest:
-> >
-> > To be honest, a bug that needed 2 years to be reproduced is probably a
-> > sign that KVM/MIPS has no users. Any objections to removing it
-> > altogether?
->
-> ACK:
-> 1. It's still broken after this patch [1]. The most well-tested MIPS
->    distros, i.e., Debian/OpenWrt, have CONFIG_KVM=3Dn. (The latter doesn'=
-t
->    even provide the QEMU package on MIPS.)
-> 2. Burden on QEMU dev. There is no guarantee that QEMU would work with
->    KVM even if we could fix the kernel -- it actually does not until
->    v8.0 [1], which is by luck:
->
->    commit a844873512400fae6bed9e87694dc96ff2f15f39
->    Author: Paolo Bonzini <pbonzini@redhat.com>
->    Date:   Sun Dec 18 01:06:45 2022 +0100
->
->        mips: Remove support for trap and emulate KVM
->
->        This support was limited to the Malta board, drop it.
->        I do not have a machine that can run VZ KVM, so I am assuming
->        that it works for -M malta as well.
->
->    (The latest Debian stable only ships v7.2.)
->
-> [1] https://lore.kernel.org/r/ZI0R76Fx25Q2EThZ@google.com/
-My testbed is Loongson-3A4000 host + Loongson-3A4000 guest + Qemu8.0,
-both TCG and KVM works.
+> TYPE_HOST_POWERPC_CPU is used in various places of cpu_init.c,
+> in order to restrict "kvm_ppc.h" to sysemu, move this QOM-related
+> definition to cpu-qom.h.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
 
-Some thoughts:
-1, I think your host is malta, but you cannot use a malta host to boot
-a Loongson guest, at least their kernels use different page sizes.
-2, commit a844873512400fae6bed9e87694dc96f remove the TE KVM, so if
-you are trying VZ KVM (but it seems you are using TE KVM), it can
-break nothing.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Huacai
+>  target/ppc/cpu-qom.h | 2 ++
+>  target/ppc/kvm_ppc.h | 2 --
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> index c2bff349cc..4e4061068e 100644
+> --- a/target/ppc/cpu-qom.h
+> +++ b/target/ppc/cpu-qom.h
+> @@ -36,6 +36,8 @@ OBJECT_DECLARE_CPU_TYPE(PowerPCCPU, PowerPCCPUClass, POWERPC_CPU)
+>  #define CPU_RESOLVING_TYPE TYPE_POWERPC_CPU
+>  #define cpu_list ppc_cpu_list
+>  
+> +#define TYPE_HOST_POWERPC_CPU POWERPC_CPU_TYPE_NAME("host")
+> +
+>  ObjectClass *ppc_cpu_class_by_name(const char *name);
+>  
+>  typedef struct CPUArchState CPUPPCState;
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 49954a300b..901e188c9a 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -13,8 +13,6 @@
+>  #include "exec/hwaddr.h"
+>  #include "cpu.h"
+>  
+> -#define TYPE_HOST_POWERPC_CPU POWERPC_CPU_TYPE_NAME("host")
+> -
+>  #ifdef CONFIG_KVM
+>  
+>  uint32_t kvmppc_get_tbfreq(void);
+
+
+
+-- 
+Greg
