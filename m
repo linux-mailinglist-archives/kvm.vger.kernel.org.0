@@ -2,161 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27A24742AA1
-	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 18:26:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D486742ACF
+	for <lists+kvm@lfdr.de>; Thu, 29 Jun 2023 18:48:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232048AbjF2Q0f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jun 2023 12:26:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43324 "EHLO
+        id S231766AbjF2Qsv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jun 2023 12:48:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231208AbjF2Q0d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jun 2023 12:26:33 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D236C187
-        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 09:26:32 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c361777c7f7so1370139276.0
-        for <kvm@vger.kernel.org>; Thu, 29 Jun 2023 09:26:32 -0700 (PDT)
+        with ESMTP id S230119AbjF2Qsq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jun 2023 12:48:46 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A125E30DD;
+        Thu, 29 Jun 2023 09:48:44 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-666eba6f3d6so594505b3a.3;
+        Thu, 29 Jun 2023 09:48:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688055992; x=1690647992;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xMCpFTi4MEZLbHfM6PilnIIZPnyzbN27S0/lWwHLYHI=;
-        b=GMBD/LpzELPsRbxZKKzblbYWJ+sxqCFJh8sqXPWlxGp8U0A+UAgRmx8mtN4RFIKJLS
-         tWShDw0jJHclaaBavEJWjBB6dGPUFZoVr5twyAtBHN6qebVtacCXdYDnd93pZVkyKoZw
-         0+WJ/aWT6RPc8Os5dCvJyiYl0a4On2PNUBwQYaQq5U78afKLGz6jg3nVF/2Qhr5TQX0q
-         EK4td6N0JI9F5orF6SckKRYtzUbWYAUY5E5soJH6YcA1rYDGWhTJIbgdvG8mpTgqleWV
-         cCtNrROuiOoldk/CP0QNltmh6FMzC+iqKVsmsBNTqPYeMGPgjNuoHfAlcELNKCgayqlJ
-         pn6A==
+        d=gmail.com; s=20221208; t=1688057324; x=1690649324;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bSki35S0PvYwPqAK7/2pZgtomNRuxO2llKu0zknsBnk=;
+        b=IK+Pu7ifwtQliKRnlj7Nn0eRKL7I9Mv61uWrAaYBBeZPmZxyj2Ylq0fHe/hNc8Qta7
+         +g2uEiGK268PijWCOTVsvTKUvA+M0aMyMQtFji356Rjm5+dteYzfddK/RcCqnMSv3qYi
+         9haTTQEfVNYrmH60/crg+3qwUN8NNDdTVEaaHTWO0m7ImgyJrRknPymq2UaxzCDvNUEG
+         x+FBxXw+/1F6EREqw8ZdTahpzV7WnthvKOk7jCx/VuudswbAWudta+SN2dFunv0W8BdE
+         57Lxf1Ho/3Is0Cprcb+XoAIZ0DUjrKlPe3vPv7oqfJ4jZX8/lywCQ4W+zjg7NMuL2CNz
+         IsQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688055992; x=1690647992;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xMCpFTi4MEZLbHfM6PilnIIZPnyzbN27S0/lWwHLYHI=;
-        b=MFgs2Zf2snjrqz7TbhGqLR7QZFEbH9G7cczQD49xXIevtPXvAvZTxeGmHA5uXn0uBq
-         i6Xs+NdAayy0L9Xh1t1rYqG9LcT1V9OFeHrubzkopzLHdeX/ozdZyupVoXO3JsP2+Cao
-         WKodfPvPugfDelQo7XPOYBV3jTx8kUjwxNAtjCYcsjpo2EpuunDXSq2NaVTcEeNflAur
-         tYA6MoGkjDE/jUgE+d11j7BjpIsJxXLMPJtq/c5+9dPBtpsfZPyyl58Wb8kTz2ELNZ5o
-         5NRwVaDMJLvntuODngU9c2dhjsDvA0cTtPsXm4tuIYtAXi6x58VYxFKTwPHs9dF+YzsZ
-         AMfg==
-X-Gm-Message-State: ABy/qLYgsASj25G/4QxzZIQBdMUQH8JEjv8Q1mKifEyrawEl7sMbAgUL
-        dwPbQKK0gJJ3bEtXeaQNLs4I6epBaQQ=
-X-Google-Smtp-Source: APBJJlH5xRb4gXx8WB/VIhDJtQKmlpyV6We+v5eXJyNoDqtd/JFAFS3IGZnTMhoFhIMqhyEzV4FkH8V/jS8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1105:b0:bc3:cdb7:4ec8 with SMTP id
- o5-20020a056902110500b00bc3cdb74ec8mr66497ybu.6.1688055992045; Thu, 29 Jun
- 2023 09:26:32 -0700 (PDT)
-Date:   Thu, 29 Jun 2023 09:26:30 -0700
-In-Reply-To: <9d9e9156-b9d9-86b4-9d20-77305e1e4d63@linux.intel.com>
-Mime-Version: 1.0
-References: <20230217231022.816138-1-seanjc@google.com> <20230217231022.816138-2-seanjc@google.com>
- <9d9e9156-b9d9-86b4-9d20-77305e1e4d63@linux.intel.com>
-Message-ID: <ZJ2wtg5KJyhD3cUe@google.com>
-Subject: Re: [PATCH 01/12] KVM: x86: Add a framework for enabling KVM-governed
- x86 features
-From:   Sean Christopherson <seanjc@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1688057324; x=1690649324;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bSki35S0PvYwPqAK7/2pZgtomNRuxO2llKu0zknsBnk=;
+        b=WtDGBLt44+Ltpl9eXEn5u8iN0qiMXNkRGD0wfp+W2pY43NGxib87nIqZya6I8y9N7s
+         Mrrxh5l8HKEdWlhaHw8HHDz3AEE75ZhFYZCoYabWqmNgK2NGsJlo9JfQ0ZnKDTwSSxGP
+         fCNo4DGtIc8QrPKslCxn5cPVksu4hP+m4sLDoTwJA1yToex5htHgQxOPXHS1GHQCNbHa
+         2znaEdC6OE4oGhuX7+EljS5KAbMEPRC4gyBkpkCeO6wJCtOvuA2D0wFbq79J5C3pLA8q
+         oJAphfGyS4E1dyvAKqrp34zoYZZGIo935IQEPE6FGXYeVELkYVlkTQYzJFNxULJEH2Lu
+         2B0A==
+X-Gm-Message-State: ABy/qLZeQD+/N5QYy3/EIWpZrg2OvI3X6HMtzsFaRB0bxIocMMzKjQs5
+        sdCY+ITHvGrAOXf1u740kYA=
+X-Google-Smtp-Source: APBJJlFLalmrW00cv9nDfJaWZuxENtV9pNZdmFCIw6hOxO1KZHGUQnax8YXliaHN1g7SEU5Mf0q1ng==
+X-Received: by 2002:a05:6a00:b92:b0:680:fa5f:4ed6 with SMTP id g18-20020a056a000b9200b00680fa5f4ed6mr545799pfj.27.1688057323982;
+        Thu, 29 Jun 2023 09:48:43 -0700 (PDT)
+Received: from localhost.localdomain ([114.84.30.247])
+        by smtp.gmail.com with ESMTPSA id k6-20020aa78206000000b0064aea45b040sm8557339pfi.168.2023.06.29.09.48.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jun 2023 09:48:42 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86/tsc: Update guest tsc_offset again before vcpu first runs
+Date:   Fri, 30 Jun 2023 00:48:38 +0800
+Message-Id: <20230629164838.66847-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.32.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 29, 2023, Binbin Wu wrote:
->=20
->=20
-> On 2/18/2023 7:10 AM, Sean Christopherson wrote:
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
-_host.h
-> > index 792a6037047a..cd660de02f7b 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -835,6 +835,17 @@ struct kvm_vcpu_arch {
-> >   	struct kvm_cpuid_entry2 *cpuid_entries;
-> >   	struct kvm_hypervisor_cpuid kvm_cpuid;
-> > +	/*
-> > +	 * Track whether or not the guest is allowed to use features that are
-> > +	 * governed by KVM, where "governed" means KVM needs to manage state
-> > +	 * and/or explicitly enable the feature in hardware.  Typically, but
-> > +	 * not always, governed features can be used by the guest if and only
-> > +	 * if both KVM and userspace want to expose the feature to the guest.
-> > +	 */
-> > +	struct {
-> > +		u32 enabled;
-> Although there are some guidances/preconditions of using the framework,
-> is it possible that u32 will be ran out quickly after people starts to us=
-e
-> the framework?
+From: Like Xu <likexu@tencent.com>
 
-It's definitely possible.  And there's no reason to limit this to a u32, I =
-really
-have no idea why I did that.=20
+When a new vcpu is created and subsequently restored by vcpu snapshot,
+apply kvm_vcpu_write_tsc_offset() before vcpu runs for the first time.
 
-Ah, it's because "struct kvm_vcpu_arch" is defined in arch/x86/include/asm/=
-kvm_host.h,
-and I didn't want to expose governed_features.h in arch/x86/include/asm.  H=
-rm,
-that's really annoying.
+Before a vcpu runs for the first time, the user space (VMM) sets the guest
+tsc as it wants, which may triggers the time synchronization mechanism with
+other vcpus (if any). In a scenario where a vcpu snapshot is used to
+restore, like the bugzilla report [*], the newly target guest tsc (e.g.
+at the time of vcpu restoration) is synchronized with its the most
+primitive guest timestamp initialized at the time of vcpu creation.
 
-Aha!  A better workaround for that conudrum would be to define an explicit =
-"max"
-and use that, with a FIXME to call out that this really should use
-KVM_NR_GOVERNED_FEATURES directly.  I have aspirations of moving kvm_host.h=
- to
-arch/<arch>/kvm, at which point this can be cleaned up by declaring "enum
-kvm_governed_features" in kvm_host.h (though it'll likely be named somethin=
-g
-like kvm_arch.h at that point).
+Furthermore, the VMM can actually update the target guest tsc multiple
+times before the vcpu actually gets running, which requires the tsc_offset
+to be updated every time it is set. In this scenario, it can be considered
+as unstable tsc (even this vcpu has not yet even started ticking to follow
+the intended logic of KVM timer emulation).
 
-	/*
-	 * FIXME: Drop this macro and use KVM_NR_GOVERNED_FEATURES directly
-	 * when "struct kvm_vcpu_arch" is no longer defined in an
-	 * arch/x86/include/asm header.  The max is mostly arbitrary, i.e.
-	 * can be increased as necessary.
-	 */
-#define KVM_MAX_NR_GOVERNED_FEATURES BITS_PER_LONG
+It is only necessary to delay this step until kvm_arch_vcpu_load() to
+catch up with guest expectation with the help of kvm_vcpu_has_run(),
+and the change is expected to not break any of the cumbersome existing
+virt timer features.
 
-	/*
-	 * Track whether or not the guest is allowed to use features that are
-	 * governed by KVM, where "governed" means KVM needs to manage state
-	 * and/or explicitly enable the feature in hardware.  Typically, but
-	 * not always, governed features can be used by the guest if and only
-	 * if both KVM and userspace want to expose the feature to the guest.
-	 */
-	struct {
-		DECLARE_BITMAP(enabled, KVM_MAX_NR_GOVERNED_FEATURES);
-	} governed_features;
+Reported-by: Yong He <alexyonghe@tencent.com>
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217423 [*] 
+Tested-by: Jinrong Liang <cloudliang@tencent.com>
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 439312e04384..616940fc3791 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4818,7 +4818,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 		if (tsc_delta < 0)
+ 			mark_tsc_unstable("KVM discovered backwards TSC");
+ 
+-		if (kvm_check_tsc_unstable()) {
++		if (kvm_check_tsc_unstable() || !kvm_vcpu_has_run(vcpu)) {
+ 			u64 offset = kvm_compute_l1_tsc_offset(vcpu,
+ 						vcpu->arch.last_guest_tsc);
+ 			kvm_vcpu_write_tsc_offset(vcpu, offset);
 
-> Of course, I noticed there is build=EF=BF=BD bug check on the length, it =
-should be
-> OK to increase the length when needed.
+base-commit: 88bb466c9dec4f70d682cf38c685324e7b1b3d60
+-- 
+2.32.0
 
-> > +static __always_inline int kvm_governed_feature_index(unsigned int x86=
-_feature)
-> > +{
-> > +	switch (x86_feature) {
-> > +#define KVM_GOVERNED_FEATURE(x) case x: return KVM_GOVERNED_##x;
-> > +#include "governed_features.h"
-> > +	default:
-> > +		return -1;
-> > +	}
-> > +}
-> > +
-> > +static __always_inline int kvm_is_governed_feature(unsigned int x86_fe=
-ature)
-> Is it better to use bool instead of int?
-
-Yes, this definitely should return a bool.
-
-Thanks!
