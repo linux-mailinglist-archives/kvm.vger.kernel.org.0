@@ -2,80 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C225743878
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 11:40:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E5C97438A3
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 11:48:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232709AbjF3Jk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 05:40:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42194 "EHLO
+        id S232814AbjF3Jsj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 05:48:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232579AbjF3JkY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 05:40:24 -0400
-Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ACA6129
-        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 02:40:22 -0700 (PDT)
-Received: by mail-oo1-xc34.google.com with SMTP id 006d021491bc7-56352146799so1090248eaf.3
-        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 02:40:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1688118021; x=1690710021;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NYp1hcFtgX7WNbxKorlpjCFpKcBSALVGo1SsXkYlX08=;
-        b=PP3dstgwgOGIeuNCyTzr3Hz1iSL0j7Q2vHISTqPdnXmNRQhfgBvoGvcW9S46IP1HQ4
-         tG8hVvHcysjr1KfaOGIVSBKaGrD/wCQ2CP/o41hH0poXctNxa1u63XacqIcxKNCNktnt
-         g4Em5JAq4PuDaIoBA03YV3JOC1B9bDjw6gBrrOg3QnkbXtXPdoHwzbBz6ZkIZuyN4xsJ
-         9ToTj/twP10HseHFh6Ydz/iqF21qPgv1xF0RPCrzjsWMacBxAs4T17xa9E+mXEwntiMD
-         BujfyGfmtSCcfLAmz5oUTGBGH5JNbDUQxzFcQ8hx6dzYOnzMwZcqK7snMHSBNCCog0+f
-         2SMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688118021; x=1690710021;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NYp1hcFtgX7WNbxKorlpjCFpKcBSALVGo1SsXkYlX08=;
-        b=UvDocdohU/e6XBgYyczNmu9LA/w11ZA6ZhwI+5A4YkzihcS4CAnTUxepN+m/tgdM3f
-         AYcnVHFuu71ysLqUiXVsIU6Sn9QDnvHck2S0UauDbhx9fOWNop+H13mPWy5pB1prPOqE
-         PDfMf7cINlaP8SC6Dv8HAgI7hyGaa06xxtfYUvWQ/JrlRsQWRDtujy3GbSmqkhSh4whN
-         hTounE8QPtZstxyymL4uALX9DvWFK9l1MasBXru+P4Cdds14BAmnNLYIbKaQX63J7RDn
-         tdEfkTB/b0I28YpGbg2LykFTdqzzQnY2hF6128cJqQNCwMeXOJ1lE0cyeNkZBzpzlI5j
-         ZxMQ==
-X-Gm-Message-State: AC+VfDw1nWYYJOF668OgzubxUI8wwANJbMQD6P2hcKxm9CuJOMSfiAM4
-        eAQ3uwbCsLr/zO6ktDwcwEvD3g==
-X-Google-Smtp-Source: ACHHUZ5gKAQw6Y5xGv2QyvJJt0bAbxvMyp6HdVUKtLpCf21TFhgqo8lC9xYyunX93m/nN4LZC09L6w==
-X-Received: by 2002:a05:6808:23c6:b0:3a1:e3d9:17ed with SMTP id bq6-20020a05680823c600b003a1e3d917edmr2476349oib.51.1688118021703;
-        Fri, 30 Jun 2023 02:40:21 -0700 (PDT)
-Received: from [192.168.68.107] (201-69-66-110.dial-up.telesp.net.br. [201.69.66.110])
-        by smtp.gmail.com with ESMTPSA id z14-20020a056808048e00b003a3645e9ebbsm2437501oid.40.2023.06.30.02.40.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Jun 2023 02:40:21 -0700 (PDT)
-Message-ID: <14a9a851-f9d1-e73f-ff80-1f6b0e272447@ventanamicro.com>
-Date:   Fri, 30 Jun 2023 06:40:15 -0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v4 4/6] target/riscv: Create an KVM AIA irqchip
+        with ESMTP id S231961AbjF3Jsf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 05:48:35 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 155C6E57;
+        Fri, 30 Jun 2023 02:48:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688118514; x=1719654514;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=KFIw+YnxxoYtk9fIgDr9AXU44DB6IXeN/jWq0uWgTFI=;
+  b=m1qyKkz24/NUZFfxnKV5JgrKZi/xRkXFJwD6u04e2Qt7fjoCAlsTErQ+
+   e+RFtzNgnoZRcXvMYXnOZEUutf7O/8B1ieclDMlQWR4Jg1nCfWgRXL6A8
+   LPUmh+9U2iZvZw7bYL5glOnaJ/4VA3xuFKUWrEc1ALxJW3gSsySWRYIz2
+   enaG7ppVGAt8x/JjHNuNWfW+1bG/30DsCmIIuBAZT3k3i2JzZWPEicbxq
+   W/ZOqLHRo+o0rNV4jdXHib/Rp1nxqmM0TIwRjP4ot8SDas7GNNTOvbmVy
+   a79IFB1wQvA1FPT0nOenmqzWWZ66oDLoPhdmphSnoCn5pAa65RfFcO/B2
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="448735483"
+X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
+   d="scan'208";a="448735483"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 02:48:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="964325780"
+X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
+   d="scan'208";a="964325780"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga006.fm.intel.com with ESMTP; 30 Jun 2023 02:48:31 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 30 Jun 2023 02:48:31 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Fri, 30 Jun 2023 02:48:31 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Fri, 30 Jun 2023 02:48:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KIniB35hLrRvJGC2UZQQxjYxP5Ge1raK+4yV65WJTFa2COvw6d3dFa+K1kN8Mrdt1lxwP9Ks0MW8DCLQEnE1h8oez7IrXCbBW5g9NOmRaTTeBGiBkEGKvYzg4xsNwX+WVDH/gMxUZRvW6dCSBYoxv8OrgMkXhCP+jFZC3RBJ3XP/h+d79tOTIYiLGHLX7Gh27fojcEAEpA9MQ+FiZa33IJiA8w4/2q6gAV9APvRafbNHwOwMLRGXQBg6GYOhoTQ0xJMCm/JOzZyHhSN19m4BBlJnbN8m5w4LIc4xegkcSgH9PF8J3dM9erMDwDNXweCMtwPpO1pigC4zoAtgqTvGKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KFIw+YnxxoYtk9fIgDr9AXU44DB6IXeN/jWq0uWgTFI=;
+ b=hW8KtxhFLGFyHTBwaJQ1jEpIkRhKXXg7uxKI0uTR03Z6lx6dsjeGIJNsnm0jv5piJkwf5Gbmp2bF5C+SmzQGnw5FvNvNEH5BgQkgZ6rx8iIvbHgiw+ogYW0Wmh6CJ8UmZPZHAB1HUNMGhBKeEAJmCqBK2RFzBuxQcPl80xcpX0R9jn9Cn3HillXnIa73ikPcTJylMHQtQxpVOaJrQmeDnjpXYJndaeOnvgUkfFgHtGXfIMRbswv6BdiEfkcP3pAy8XyPOPMmmBwpqLzYBn2g9/DACRpSgjrAMZb5YofG0+YDaJwdqxTxrY/lmzzyEiPBKpeBxEdJ1bomsIQiOYQeWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by PH0PR11MB5029.namprd11.prod.outlook.com (2603:10b6:510:30::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.15; Fri, 30 Jun
+ 2023 09:48:23 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::19b7:466f:32ac:b764]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::19b7:466f:32ac:b764%3]) with mapi id 15.20.6521.026; Fri, 30 Jun 2023
+ 09:48:23 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "peterz@infradead.org" <peterz@infradead.org>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "nik.borisov@suse.com" <nik.borisov@suse.com>,
+        "hpa@zytor.com" <hpa@zytor.com>, "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
+ demand
+Thread-Topic: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
+ demand
+Thread-Index: AQHZqDWtW8hO2PRC3kCMr0lha9GzWK+gMa2AgAC3Y4CAAjAEgIAABoCA
+Date:   Fri, 30 Jun 2023 09:48:23 +0000
+Message-ID: <0a51e92e4be15e0c59cd41491f246fed5a1e3615.camel@intel.com>
+References: <cover.1687784645.git.kai.huang@intel.com>
+         <104d324cd68b12e14722ee5d85a660cccccd8892.1687784645.git.kai.huang@intel.com>
+         <20230628130419.GC2438817@hirez.programming.kicks-ass.net>
+         <20322f0432e418eaacfe397aa9363f94ada0b902.camel@intel.com>
+         <20230630092503.GC2533791@hirez.programming.kicks-ass.net>
+In-Reply-To: <20230630092503.GC2533791@hirez.programming.kicks-ass.net>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Yong-Xuan Wang <yongxuan.wang@sifive.com>, qemu-devel@nongnu.org,
-        qemu-riscv@nongnu.org
-Cc:     rkanwal@rivosinc.com, anup@brainfault.org, atishp@atishpatra.org,
-        vincent.chen@sifive.com, greentime.hu@sifive.com,
-        frank.chang@sifive.com, jim.shu@sifive.com,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Weiwei Li <liweiwei@iscas.ac.cn>,
-        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20230621145500.25624-1-yongxuan.wang@sifive.com>
- <20230621145500.25624-5-yongxuan.wang@sifive.com>
-From:   Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-In-Reply-To: <20230621145500.25624-5-yongxuan.wang@sifive.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.48.3 (3.48.3-1.fc38) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|PH0PR11MB5029:EE_
+x-ms-office365-filtering-correlation-id: 953164ce-d3c7-4a44-b046-08db794f24e3
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: gad2w8Mx1OidipWOLanqjwuTRStqKemLhVqBsQwHyiR5kPj/mdRoZZNaO9Q0tYdaNb6p40mWzMSOl13URP7eczHnAknSUVWXLO+rh0VAz4h6nuBHQBonQa7DrjxWIQsCv4HT1yWOtV+lBcq1gcCEiDF9Jyxo1e1VMFj+RWmd5JQe6MlNIiakCp9Zct7xEPHMwYhI9JasC29lN+TQrYL4VPPEj2fblZkvH4ZnTRLZps1GF7/q/BHeZ4fIdBoNtNgQOfmH2jJJJMcYM6L6YBCXQ8qlXloQmgD9fxZRqYR7mRNvzvc7CecGys4mVH7ms1tX0orWKTPrfV6R8odOUsmnUZpu21yNW0btttWne/gw1vPFhXJWpWyD8wMT5UJ040HveBNGof33c8PU8ttoZsMj5c/PBSnuQMiHhhN7i3HZeOeZqm6ca+MuoEWXQdA9Zs3uyQew/n+0zrb6ityYpOzkXEWZJDWUTKm1r6wDu/98XZifCF5Ky8sxjTWUYVELnZnaziyB+o4yI/ObdrFkNeDvK0EbT3GOaQSz6ictIoHzzNx3NdGmWCmh4mEpj1gdLAwqG0hoJe9dSGDkSLAJguI66gxKoAmMHNbEjGFg49uEvKNFAKqXPBpZl17ts0Cr9Ael
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(366004)(39860400002)(346002)(396003)(451199021)(5660300002)(54906003)(478600001)(8936002)(41300700001)(8676002)(316002)(6486002)(26005)(186003)(6512007)(6506007)(7416002)(66446008)(66476007)(66556008)(66946007)(64756008)(6916009)(91956017)(76116006)(4326008)(71200400001)(86362001)(83380400001)(2616005)(2906002)(82960400001)(122000001)(38100700002)(36756003)(38070700005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?eVE3OWFLQjFudEhWTEdqMU5CZVZidVFEazY5Zmw2cTFBcFM0azhwL0pZNCtB?=
+ =?utf-8?B?d1ZhejAwMUE0eVVOcmNxNE5VVVdPNzR1RXhBMzdLQ0FaeStOZWR1S2dJUmNj?=
+ =?utf-8?B?VHY3aUxPeFZYdGJHNzBRSlZFQ3gzd2FpSW0wL0VldU54WGFRWkEvSmFYc0xI?=
+ =?utf-8?B?d1JORTBCUnVFakJmdldXWHhSRncxbkdaeUZUQ1NBMUE0UURIRlZxc09VNUR5?=
+ =?utf-8?B?bm4wTXcrNkJ4T1kwRUthLzFoOXNOdUhjbTRIcUhRRlBlTnRjQW5zckowd0h1?=
+ =?utf-8?B?VzBKVUFFam9ldHZtRTFWZmRITHpaWWM2NlhYZ0FQN083S3hKYXlrWGxWME9o?=
+ =?utf-8?B?T1FQMmZONUttWjRXVko0UjJXOUhHNjQ1RW52Z0N0dFA0WU9lZHl2N2JJSW5O?=
+ =?utf-8?B?UFhpOExBdXJVcjFFbXBwd3FQeFh3U0VXSVlobWlaZUtTYzNnbWNzMEh6SzRs?=
+ =?utf-8?B?clNFMVhUR1JxU0F2Q0p4NXhCQmxhdmxLQU1MVmFTYzQ4bkVVYUJoMUw4bi82?=
+ =?utf-8?B?YllnbmVtVTFaSTQ5MUNzVUQwUFhKdE5kNmVPOFVoOE5OT3cvRmlmZGRENk9l?=
+ =?utf-8?B?MTZBZDlDR0k0cjk5VDZKWXFmbFpsNVpleUsxZ1VOYVB3YzJ1QVNocEM1MmRj?=
+ =?utf-8?B?aVZQL05JS25Bbk1XVTBLRmtzYmQzbWRRZFA2bkE2OGpacWhRN3J3TkMxcWpp?=
+ =?utf-8?B?K1pvZGJsZXdKVXJDdjIwcXYzLzhWUmw1dDk0WG4wY01xNDUrK05kVmV2TW9a?=
+ =?utf-8?B?RWVhZzlPUWFOQm95eG44V2UyVEhlcVVvdFRwa3pIQVBhRTRyLzhBUCtpK29P?=
+ =?utf-8?B?dy80UHFaZnJVMjlDTFpkUTBhbVpRbDkwMytyd1dwNGFKak81UlNoWWtGcVgv?=
+ =?utf-8?B?dWhOaWFSOW9jV0lnWVlpVG80VytpYmR3ckdyVVBYL3IvUmp1dm1UcHFWMzVE?=
+ =?utf-8?B?aVpUQkE4ZDAycjNsc3pzUWFEcGtKS3Q3R3JOb2hUU1hXM21nY2xveDd1V2tu?=
+ =?utf-8?B?TUJQQmxUM2dlcndLSVYxeGp3Z1NuRTErV0VEM2VsUUU4emhGN3g3ejBvTytw?=
+ =?utf-8?B?WGphYWl1Y1lMdnd2T3FKZE9vUitjTDg4bE85dVplZUhMaFRuVURVQnhybk9M?=
+ =?utf-8?B?OHdKQ3V2THR4KzVKKzc1S3VRdEdPWWN3SVA3dHZpdWcxUXhKZEdCNmJld1RK?=
+ =?utf-8?B?dVdZUU02Wk94M2Q3WVhoMjNKUmllM3FkTjRLNTI5NVBVY2wzQnJKd2ZoMmx6?=
+ =?utf-8?B?Lzd5Wm9BMVJZU3pEUW1iWnlGRm56clM1c1NDRHBZazUyMHZmbXd3dHdvK3lx?=
+ =?utf-8?B?MHdsUStlMHYzOU1DaS9VOC9qQjNTK2RObllXcy9tbEsvT3QzaTkrd2xEVzdF?=
+ =?utf-8?B?QUVHaFNXanBMWWdEcUxqeXBLZG81MDgrYXdEVERJOSttK3h3SU9id3VGWFZJ?=
+ =?utf-8?B?RUdnUHJMeGwyR2VtbHdhdGpOekJ1L0lkc2plV2t0Nk4yZUtRMnJseGlVV1NR?=
+ =?utf-8?B?QUVYZ0VscnBRRWtzZXczbmpOZVpIREIxVURCVDlQaVNMOHQyRUpvSFN3b3My?=
+ =?utf-8?B?RGFqa3d0OTBmbTBadUZHeVBncDU3dHh4di9CYllkTkZ2UWpkZHovV3ZyU2ZL?=
+ =?utf-8?B?aXJhK0JlWVAzNkFTV285aUhHSGVRWk0zNTRwRG8yeU5nTTYyWEJ2bWkvdDNE?=
+ =?utf-8?B?bHk1VG9QWmVPN2FsanZzSWlhQmYrWmo2Q0pNN1lGZXJpUUt0ZlVWVjJGUFlW?=
+ =?utf-8?B?SnVqN1hYYzEwM3FEcU9qQVB2cmwwbGlzTFZDcC9USEpwQ3ZKd2R3UVJ2ZnF0?=
+ =?utf-8?B?czZFRWhxUWp3NEl6Q1FkMXdmQnYzRFlQck8vbysxOHptdGxFRmhHK0hBZmRC?=
+ =?utf-8?B?WjE3cWdZdmovM1hYTUNBOHVqaTl4RVgzdFROWlNsV20ramNjbzFocytuL0I5?=
+ =?utf-8?B?YTRKUHlYU2VwcXJ0eWVDa0p6OE50WmZOVkZOU0hUeDlNZmk3NWR3K2tZQWFm?=
+ =?utf-8?B?SUNvZ3p6bGcvMzluMmVUcWNvN1J0R1U4cHRNTW5BUVR5dkxtT0QxTVhMOHBt?=
+ =?utf-8?B?M0FuTmtidWJadEVoRnkxVkF0TktTbVdDc3ZmYmtFZEJMQ3ExQzNEOEM3RmE2?=
+ =?utf-8?Q?CHHIW4xy6FdiuKuUQsqEwpepv?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <617572B92D127C45AC77AD411E9B5919@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 953164ce-d3c7-4a44-b046-08db794f24e3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2023 09:48:23.0793
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: FIBGhpozQI4hZXRCSFSodY35NZFKPmthtVU6TDC2S8XWC2h8T33v/DRM0ErMWHg7f5wgo+cBGQRQ9P4xJLWa8g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5029
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,219 +190,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 6/21/23 11:54, Yong-Xuan Wang wrote:
-> implement a function to create an KVM AIA chip
-> 
-> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-> Reviewed-by: Jim Shu <jim.shu@sifive.com>
-> ---
-
-Reviewed-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-
->   target/riscv/kvm.c       | 163 +++++++++++++++++++++++++++++++++++++++
->   target/riscv/kvm_riscv.h |   6 ++
->   2 files changed, 169 insertions(+)
-> 
-> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-> index eb469e8ca5..3dd8467031 100644
-> --- a/target/riscv/kvm.c
-> +++ b/target/riscv/kvm.c
-> @@ -34,6 +34,7 @@
->   #include "exec/address-spaces.h"
->   #include "hw/boards.h"
->   #include "hw/irq.h"
-> +#include "hw/intc/riscv_imsic.h"
->   #include "qemu/log.h"
->   #include "hw/loader.h"
->   #include "kvm_riscv.h"
-> @@ -41,6 +42,7 @@
->   #include "chardev/char-fe.h"
->   #include "migration/migration.h"
->   #include "sysemu/runstate.h"
-> +#include "hw/riscv/numa.h"
->   
->   static uint64_t kvm_riscv_reg_id(CPURISCVState *env, uint64_t type,
->                                    uint64_t idx)
-> @@ -548,3 +550,164 @@ bool kvm_arch_cpu_check_are_resettable(void)
->   void kvm_arch_accel_class_init(ObjectClass *oc)
->   {
->   }
-> +
-> +char *kvm_aia_mode_str(uint64_t aia_mode)
-> +{
-> +    const char *val;
-> +
-> +    switch (aia_mode) {
-> +    case KVM_DEV_RISCV_AIA_MODE_EMUL:
-> +        val = "emul";
-> +        break;
-> +    case KVM_DEV_RISCV_AIA_MODE_HWACCEL:
-> +        val = "hwaccel";
-> +        break;
-> +    case KVM_DEV_RISCV_AIA_MODE_AUTO:
-> +    default:
-> +        val = "auto";
-> +        break;
-> +    };
-> +
-> +    return g_strdup(val);
-> +}
-> +
-> +void kvm_riscv_aia_create(MachineState *machine,
-> +                          uint64_t aia_mode, uint64_t group_shift,
-> +                          uint64_t aia_irq_num, uint64_t aia_msi_num,
-> +                          uint64_t aplic_base, uint64_t imsic_base,
-> +                          uint64_t guest_num)
-> +{
-> +    int ret, i;
-> +    int aia_fd = -1;
-> +    uint64_t default_aia_mode;
-> +    uint64_t socket_count = riscv_socket_count(machine);
-> +    uint64_t max_hart_per_socket = 0;
-> +    uint64_t socket, base_hart, hart_count, socket_imsic_base, imsic_addr;
-> +    uint64_t socket_bits, hart_bits, guest_bits;
-> +
-> +    aia_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_RISCV_AIA, false);
-> +
-> +    if (aia_fd < 0) {
-> +        error_report("Unable to create in-kernel irqchip");
-> +        exit(1);
-> +    }
-> +
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_MODE,
-> +                            &default_aia_mode, false, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to get current KVM AIA mode");
-> +        exit(1);
-> +    }
-> +    qemu_log("KVM AIA: default mode is %s\n",
-> +             kvm_aia_mode_str(default_aia_mode));
-> +
-> +    if (default_aia_mode != aia_mode) {
-> +        ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                                KVM_DEV_RISCV_AIA_CONFIG_MODE,
-> +                                &aia_mode, true, NULL);
-> +        if (ret < 0)
-> +            warn_report("KVM AIA: fail to set KVM AIA mode");
-> +        else
-> +            qemu_log("KVM AIA: set current mode to %s\n",
-> +                     kvm_aia_mode_str(aia_mode));
-> +    }
-> +
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_SRCS,
-> +                            &aia_irq_num, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set number of input irq lines");
-> +        exit(1);
-> +    }
-> +
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_IDS,
-> +                            &aia_msi_num, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set number of msi");
-> +        exit(1);
-> +    }
-> +
-> +    socket_bits = find_last_bit(&socket_count, BITS_PER_LONG) + 1;
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_GROUP_BITS,
-> +                            &socket_bits, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set group_bits");
-> +        exit(1);
-> +    }
-> +
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_GROUP_SHIFT,
-> +                            &group_shift, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set group_shift");
-> +        exit(1);
-> +    }
-> +
-> +    guest_bits = guest_num == 0 ? 0 :
-> +                 find_last_bit(&guest_num, BITS_PER_LONG) + 1;
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_GUEST_BITS,
-> +                            &guest_bits, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set guest_bits");
-> +        exit(1);
-> +    }
-> +
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_ADDR,
-> +                            KVM_DEV_RISCV_AIA_ADDR_APLIC,
-> +                            &aplic_base, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set the base address of APLIC");
-> +        exit(1);
-> +    }
-> +
-> +    for (socket = 0; socket < socket_count; socket++) {
-> +        socket_imsic_base = imsic_base + socket * (1U << group_shift);
-> +        hart_count = riscv_socket_hart_count(machine, socket);
-> +        base_hart = riscv_socket_first_hartid(machine, socket);
-> +
-> +        if (max_hart_per_socket < hart_count) {
-> +            max_hart_per_socket = hart_count;
-> +        }
-> +
-> +        for (i = 0; i < hart_count; i++) {
-> +            imsic_addr = socket_imsic_base + i * IMSIC_HART_SIZE(guest_bits);
-> +            ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_ADDR,
-> +                                    KVM_DEV_RISCV_AIA_ADDR_IMSIC(i + base_hart),
-> +                                    &imsic_addr, true, NULL);
-> +            if (ret < 0) {
-> +                error_report("KVM AIA: fail to set the address of IMSICs");
-> +                exit(1);
-> +            }
-> +        }
-> +    }
-> +
-> +    hart_bits = find_last_bit(&max_hart_per_socket, BITS_PER_LONG) + 1;
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_HART_BITS,
-> +                            &hart_bits, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set hart_bits");
-> +        exit(1);
-> +    }
-> +
-> +    if (kvm_has_gsi_routing()) {
-> +        for (uint64_t idx = 0; idx < aia_irq_num + 1; ++idx) {
-> +            /* KVM AIA only has one APLIC instance */
-> +            kvm_irqchip_add_irq_route(kvm_state, idx, 0, idx);
-> +        }
-> +        kvm_gsi_routing_allowed = true;
-> +        kvm_irqchip_commit_routes(kvm_state);
-> +    }
-> +
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CTRL,
-> +                            KVM_DEV_RISCV_AIA_CTRL_INIT,
-> +                            NULL, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: initialized fail");
-> +        exit(1);
-> +    }
-> +}
-> diff --git a/target/riscv/kvm_riscv.h b/target/riscv/kvm_riscv.h
-> index ed281bdce0..a61f552d1d 100644
-> --- a/target/riscv/kvm_riscv.h
-> +++ b/target/riscv/kvm_riscv.h
-> @@ -21,5 +21,11 @@
->   
->   void kvm_riscv_reset_vcpu(RISCVCPU *cpu);
->   void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level);
-> +char *kvm_aia_mode_str(uint64_t aia_mode);
-> +void kvm_riscv_aia_create(MachineState *machine,
-> +                          uint64_t aia_mode, uint64_t group_shift,
-> +                          uint64_t aia_irq_num, uint64_t aia_msi_num,
-> +                          uint64_t aplic_base, uint64_t imsic_base,
-> +                          uint64_t guest_num);
->   
->   #endif
+T24gRnJpLCAyMDIzLTA2LTMwIGF0IDExOjI1ICswMjAwLCBQZXRlciBaaWpsc3RyYSB3cm90ZToN
+Cj4gT24gVGh1LCBKdW4gMjksIDIwMjMgYXQgMTI6MDA6NDRBTSArMDAwMCwgSHVhbmcsIEthaSB3
+cm90ZToNCj4gDQo+ID4gVGhlIHNwZWMgc2F5cyBpdCBkb2Vzbid0IGhhdmUgYSBsYXRlbmN5IHJl
+cXVpcmVtZW50LCBzbyB0aGVvcmV0aWNhbGx5IGl0IGNvdWxkDQo+ID4gYmUgbG9uZy4gIFNFQU1D
+QUxMIGlzIGEgVk1FWElUIHNvIGl0IHdvdWxkIGF0IGxlYXN0IGNvc3QgdGhvdXNhbmRzIG9mIGN5
+Y2xlcy4NCj4gDQo+IDotKA0KPiANCj4gPiBJZiByYXdfc3BpbmxvY2sgaXNuJ3QgZGVzaXJlZCwg
+SSB0aGluayBJIGNhbiBpbnRyb2R1Y2UgYW5vdGhlciBmdW5jdGlvbiB0byBkbw0KPiA+IHRoaXMg
+YW5kIGxldCB0aGUgY2FsbGVyIHRvIGNhbGwgaXQgYmVmb3JlIGNhbGxpbmcgdGR4X2NwdV9lbmFi
+bGUoKS4gIEUuZy4sIHdlDQo+ID4gY2FuIGhhdmUgYmVsb3cgZnVuY3Rpb25zOg0KPiA+IA0KPiA+
+IDEpIHRkeF9nbG9iYWxfaW5pdCgpCS0+IFRESF9TWVNfSU5JVA0KPiA+IDIpIHRkeF9jcHVfaW5p
+dCgpCS0+IFRESF9TWVNfTFBfSU5JVA0KPiA+IDMpIHRkeF9lbmFibGUoKQkJLT4gYWN0dWFsIG1v
+ZHVsZSBpbml0aWFsaXphdGlvbg0KPiA+IA0KPiA+IEhvdyBkb2VzIHRoaXMgc291bmQ/DQo+IA0K
+PiBBaCwgd2FpdCwgSSBoYWRuJ3QgaGFkIGVub3VnaCB3YWtlLXVwIGp1aWNlLCBpdCdzIHRkeF9n
+bG9iYWxfaW5pdCgpIHRoYXQNCj4gZGlkIHRoZSByYXdfc3BpbmxvY2tfdCwgYnV0IHRoYXQgaXNu
+J3QgdGhlIElQSSB0aGluZy4NCj4gDQo+IFRoZW4gcGVyaGFwcyBqdXN0IHVzZSBhIG11dGV4IHRv
+IHNlcmlhbGl6ZSB0aGluZ3M/DQo+IA0KDQpJbiB0aGUgY3VycmVudCBjb2RlIHllcyBUREhfU1lT
+X0lOSVQgaXMgcHJvdGVjdGVkIGJ5IHJhd19zcGlubG9ja190LCBiZWNhdXNlIGl0DQppcyBkb25l
+IGluIHRkeF9jcHVfZW5hYmxlKCkuICBJIHRob3VnaHQgdGhpcyBtYWtlcyB0aGUgY2FsbGVyIChL
+Vk0pJ3MgbGlmZQ0KZWFzaWVyIGFzIGl0IGRvZXNuJ3QgaGF2ZSB0byBjYWxsIGFuIGFkZGl0aW9u
+YWwgdGR4X2dsb2JhbF9pbml0KCkuDQoNCklmIHdlIHB1dCBUREhfU1lTX0lOSVQgdG8gYW4gYWRk
+aXRpb25hbCB0ZHhfZ2xvYmFsX2luaXQoKSwgdGhlbiB3ZSBhcmUNCmVzc2VudGlhbGx5IGFza2lu
+ZyB0aGUgY2FsbGVyIHRvIGd1YXJhbnRlZSBpdCBtdXN0IGJlIGNhbGxlZCBiZWZvcmUgY2FsbGlu
+ZyBhbnkNCnRkeF9jcHVfZW5hYmxlKCkgKG9yIHRkeF9jcHVfaW5pdCgpIGZvciBiZXR0ZXIgbmFt
+aW5nKS4gIEJ1dCBpbiB0aGlzIGNhc2Ugd2UNCmRvbid0IG5lZWQgdGhlIHJhd19zcGlubG9jayBh
+bnltb3JlIGJlY2F1c2UgaXQncyBjYWxsZXIncyByZXNwb25zaWJpbGl0eSBub3cuDQoNClRoZXkg
+Ym90aCBhcmUgbm90IHByb3RlY3RlZCBieSB0aGUgVERYIG1vZHVsZSBpbml0aWFsaXphdGlvbiBt
+dXRleCwgb25seQ0KdGR4X2VuYWJsZSgpIGlzLiAgVGhlIGNhbGxlciAoS1ZNKSBpcyBzdXBwb3Nl
+ZCB0byBjYWxsIHRkeF9jcHVfZW5hYmxlKCkgZm9yIGFsbA0Kb25saW5lIGNwdXMgdmlhIElQSSBm
+dW5jdGlvbiBjYWxsIGJlZm9yZSBjYWxsaW5nIHRkeF9lbmFibGUoKS4NCg0KU28gaWYgdXNpbmcg
+cmF3X3NwaW5sb2NrX3QgYXJvdW5kIFRESF9TWVNfSU5JVCBpcyBhIGNvbmNlcm4sIHRoZW4gd2Ug
+Y2FuIGdvIHdpdGgNCnRoZSBkZWRpY2F0ZWQgdGR4X2dsb2JhbF9pbml0KCkgZnVuY3Rpb24gb3B0
+aW9uLg0KDQpIb3BlIEkndmUgZXhwbGFpbmVkIHRoaXMgY2xlYXJseS4NCg0KDQoNCg0KDQo=
