@@ -2,91 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 60DA5743E9E
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 17:21:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DF4A743E5E
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 17:15:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231633AbjF3PVw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 11:21:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38430 "EHLO
+        id S232372AbjF3PPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 11:15:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232836AbjF3PVi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 11:21:38 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60ABC1FCB;
-        Fri, 30 Jun 2023 08:21:16 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35UFL6c4022072;
-        Fri, 30 Jun 2023 15:21:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=mroG2bNPFP4a3LKuOqs8lVWBWyw9ttA+6E6TiOkXUJk=;
- b=lL8W+Iwh+ZnF+WaWZC2I8tpdPb//AKWDV6cIdyIw5jogcNKGZSVrdjSlk1OUZRWxmsmg
- /MwCeWNfMBOQq3Lo/CGkKJ7/nvm2i64ruzQwXSJFqWsPldNbwqEZ2c0h/w2mzP8gRPhz
- PhxLAq6UaSrpt83JgknWrMVO0TGkKqzHQOnpt3P8cK3zWTa+nPOehM0ghPmYLQ0uv6zi
- QuBKCOt6ganFjkzaKnqc1oHA6hZal66U1voHtmNYeKuX3JuJwN58ySYNrkZuEXrsoSgn
- ucUIPcsnqdyKfGq8++eyo1qgxKldffBLJKGu6Z1pFIjLiCBYIHyadFDlpeznz7q4PiWv fA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rj1m7804v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Jun 2023 15:21:15 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35UFLFVs022531;
-        Fri, 30 Jun 2023 15:21:15 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rj1m78046-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Jun 2023 15:21:15 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35UAodqT003997;
-        Fri, 30 Jun 2023 15:21:13 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3rdr4547dy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Jun 2023 15:21:12 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35UFL9Hs3343092
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 30 Jun 2023 15:21:09 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 67CA72004D;
-        Fri, 30 Jun 2023 15:21:09 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1DC8520040;
-        Fri, 30 Jun 2023 15:21:09 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 30 Jun 2023 15:21:09 +0000 (GMT)
-Date:   Fri, 30 Jun 2023 17:12:26 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, nsg@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [kvm-unit-tests RFC 1/3] lib: s390x: sclp: Add carriage return
- to line feed
-Message-ID: <20230630171226.3e77e0eb@p-imbrenda>
-In-Reply-To: <20230630145449.2312-2-frankja@linux.ibm.com>
-References: <20230630145449.2312-1-frankja@linux.ibm.com>
-        <20230630145449.2312-2-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        with ESMTP id S232538AbjF3POx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 11:14:53 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A4762728;
+        Fri, 30 Jun 2023 08:14:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=W6sjO6kMUAzQUdib394q0FOg+FPBU//DVwrbnuX1BOI=; b=DRkzwZdnOgjRI8VZ00V7KPTI+Z
+        t7+XBmemrUnsGULbnPANM4lpiDmXojlLYDkxt2fvFP3mZmdO8s4skmtu//QjxY+6F8eBEd/6VW7P2
+        HF+pwfelAvfbwg56kv1FegIcEAvpYp/hudtWSpnSRrrEq8rnLclZW7RNf5vHwFLhNP3SsYsiEjwYT
+        XXIDBNgeyJi2vLb5iHYLjRctT/ZUbdwSlsMyr6oSX35RzSfr/Rn6j9+y8NW0YOD8x7np7KlwFYkpI
+        Fk/myStHYRF3ob8qImCsfS542js3IGtMiAl3A2/McroOYmtCnv8wG9Il9Zg7c2R/Dg+Dd44BHtAhw
+        o09lJbrw==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qFFpQ-005nkP-7n; Fri, 30 Jun 2023 15:14:32 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B8B71300164;
+        Fri, 30 Jun 2023 17:14:30 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 9C63F24810094; Fri, 30 Jun 2023 17:14:30 +0200 (CEST)
+Date:   Fri, 30 Jun 2023 17:14:30 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "nik.borisov@suse.com" <nik.borisov@suse.com>,
+        "hpa@zytor.com" <hpa@zytor.com>, "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH v12 20/22] x86/virt/tdx: Allow SEAMCALL to handle #UD and
+ #GP
+Message-ID: <20230630151430.GC2534364@hirez.programming.kicks-ass.net>
+References: <cover.1687784645.git.kai.huang@intel.com>
+ <c124550719716f1f7759c2bdea70f4722d8e0167.1687784645.git.kai.huang@intel.com>
+ <20230628152900.GI2438817@hirez.programming.kicks-ass.net>
+ <20230628203823.GR38236@hirez.programming.kicks-ass.net>
+ <42e13ccf7f27a68c0dd64640eed378c38ef40967.camel@intel.com>
+ <20230630100659.GF2533791@hirez.programming.kicks-ass.net>
+ <20230630102141.GA2534364@hirez.programming.kicks-ass.net>
+ <20230630120650.GB2534364@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4IpcbtqqaW5tpxbAM6yF88xlYsoRbl8C
-X-Proofpoint-ORIG-GUID: vCCqO_j3h23g82c7AsXgnM4Jspn0zlDB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-30_05,2023-06-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- impostorscore=0 mlxscore=0 phishscore=0 malwarescore=0 lowpriorityscore=0
- priorityscore=1501 clxscore=1015 spamscore=0 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2306300127
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230630120650.GB2534364@hirez.programming.kicks-ass.net>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,57 +90,205 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 30 Jun 2023 14:54:47 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> Without the \r the output of the ASCII console takes a lot of
-> additional effort to read in comparison to the line mode console.
+On Fri, Jun 30, 2023 at 02:06:50PM +0200, Peter Zijlstra wrote:
+> /*
+>  * Used for input/output registers values of the TDCALL and SEAMCALL
+>  * instructions when requesting services from the TDX module.
+>  *
+>  * This is a software only structure and not part of the TDX module/VMM ABI.
+>  */
+> struct tdx_module_args {
+> 	/* callee-clobbered */
+> 	u64 rdx;
+> 	u64 rcx;
+> 	u64 r8;
+> 	u64 r9;
+> 	/* extra callee-clobbered */
+> 	u64 r10;
+> 	u64 r11;
+> 	/* callee-saved + rdi/rsi */
+> 	u64 rdi;
+> 	u64 rsi;
+> 	u64 rbx;
+> 	u64 r12;
+> 	u64 r13;
+> 	u64 r14;
+> 	u64 r15;
+> };
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  lib/s390x/sclp-console.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
 > 
-> diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
-> index 19c74e46..384080b0 100644
-> --- a/lib/s390x/sclp-console.c
-> +++ b/lib/s390x/sclp-console.c
-> @@ -97,14 +97,27 @@ static void sclp_print_ascii(const char *str)
->  {
->  	int len = strlen(str);
->  	WriteEventData *sccb = (void *)_sccb;
-> +	char *str_dest = (char *)&sccb->msg;
-> +	int i = 0;
->  
->  	sclp_mark_busy();
->  	memset(sccb, 0, sizeof(*sccb));
-> +
-> +	for (; i < len; i++) {
-> +		*str_dest = str[i];
-> +		str_dest++;
-> +		/* Add a \r to the \n */
-> +		if (str[i] == '\n') {
-> +			*str_dest = '\r';
-> +			str_dest++;
-> +		}
-> +	}
-> +
-> +	len = (uintptr_t)str_dest - (uintptr_t)&sccb->msg;
+> 
+> /*
+>  * TDX_MODULE_CALL - common helper macro for both
+>  *                   TDCALL and SEAMCALL instructions.
+>  *
+>  * TDCALL   - used by TDX guests to make requests to the
+>  *            TDX module and hypercalls to the VMM.
+>  *
+>  * SEAMCALL - used by TDX hosts to make requests to the
+>  *            TDX module.
+>  *
+>  *-------------------------------------------------------------------------
+>  * TDCALL/SEAMCALL ABI:
+>  *-------------------------------------------------------------------------
+>  * Input Registers:
+>  *
+>  * RAX                 - Leaf number.
+>  * RCX,RDX,R8-R11      - Leaf specific input registers.
+>  * RDI,RSI,RBX,R11-R15 - VP.VMCALL VP.ENTER
+>  *
+>  * Output Registers:
+>  *
+>  * RAX                 - instruction error code.
+>  * RCX,RDX,R8-R11      - Leaf specific output registers.
+>  * RDI,RSI,RBX,R12-R15 - VP.VMCALL VP.ENTER
+>  *
+>  *-------------------------------------------------------------------------
+>  *
+>  * So while the common core (RAX,RCX,RDX,R8-R11) fits nicely in the
+>  * callee-clobbered registers and even leaves RDI,RSI free to act as a base
+>  * pointer some rare leafs (VP.VMCALL, VP.ENTER) make a giant mess of things.
+>  *
+>  * For simplicity, assume that anything that needs the callee-saved regs also
+>  * tramples on RDI,RSI. This isn't strictly true, see for example EXPORT.MEM.
+>  */
+> .macro TDX_MODULE_CALL host:req ret:req saved:0
+> 	FRAME_BEGIN
+> 
+> 	movq	%rdi, %rax
+> 
+> 	movq	TDX_MODULE_rcx(%rsi), %rcx
+> 	movq	TDX_MODULE_rdx(%rsi), %rdx
+> 	movq	TDX_MODULE_r8(%rsi),  %r8
+> 	movq	TDX_MODULE_r9(%rsi),  %r9
+> 	movq	TDX_MODULE_r10(%rsi), %r10
+> 	movq	TDX_MODULE_r11(%rsi), %r11
+> 
+> .if \saved
+> 	pushq	rbx
+> 	pushq	r12
+> 	pushq	r13
+> 	pushq	r14
+> 	pushq	r15
+> 
+> 	movq	TDX_MODULE_rbx(%rsi), %rbx
+> 	movq	TDX_MODULE_r12(%rsi), %r12
+> 	movq	TDX_MODULE_r13(%rsi), %r13
+> 	movq	TDX_MODULE_r14(%rsi), %r14
+> 	movq	TDX_MODULE_r15(%rsi), %r15
+> 
+> 	/* VP.VMCALL and VP.ENTER */
+> .if \ret
+> 	pushq	%rsi
+> .endif
+> 	movq	TDX_MODULE_rdi(%rsi), %rdi
+> 	movq	TDX_MODULE_rsi(%rsi), %rsi
+> .endif
+> 
+> .Lcall:
+> .if \host
+> 	seamcall
+> 	/*
+> 	 * SEAMCALL instruction is essentially a VMExit from VMX root
+> 	 * mode to SEAM VMX root mode.  VMfailInvalid (CF=1) indicates
+> 	 * that the targeted SEAM firmware is not loaded or disabled,
+> 	 * or P-SEAMLDR is busy with another SEAMCALL. RAX is not
+> 	 * changed in this case.
+> 	 */
+> 	jc	.Lseamfail
+> 
+> .if \saved && \ret
+> 	/*
+> 	 * VP.ENTER clears RSI on output, use it to restore state.
+> 	 */
+> 	popq	%rsi
+> 	xor	%edi,%edi
+> 	movq	%rdi, TDX_MODULE_rdi(%rsi)
+> 	movq	%rdi, TDX_MODULE_rsi(%rsi)
+> .endif
+> .else
+> 	tdcall
+> 
+> 	/*
+> 	 * RAX!=0 indicates a failure, assume no return values.
+> 	 */
+> 	testq	%rax, %rax
+> 	jne	.Lerror
+> 
+> .if \saved && \ret
+> 	/*
+> 	 * Since RAX==0, it can be used as a scratch register to restore state.
+> 	 *
+> 	 * [ assumes \saved implies \ret ]
 
-some strings will therefore potentially overflow the SCCB
+This comment is wrong. As should be obvious from the condition above.
 
-sclp_print() refuses to print more than 2kB, with this patch that limit
-could potentially be crossed
-
-can you please briefly explain in a comment why that is ok? (or maybe
-that is not ok? then fix it somehow :) )
-
->  	sccb->h.length = offsetof(WriteEventData, msg) + len;
->  	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
->  	sccb->ebh.length = sizeof(EventBufferHeader) + len;
->  	sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
-> -	memcpy(&sccb->msg, str, len);
->  
->  	sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
->  }
-
+> 	 */
+> 	popq	%rax
+> 	movq	%rdi, TDX_MODULE_rdi(%rax)
+> 	movq	%rsi, TDX_MODULE_rsi(%rax)
+> 	movq	%rax, %rsi
+> 	xor	%eax, %eax;
+> .endif
+> .endif // \host
+> 
+> .if \ret
+> 	/* RSI is restored */
+> 	movq	%rcx, TDX_MODULE_rcx(%rsi)
+> 	movq	%rdx, TDX_MODULE_rdx(%rsi)
+> 	movq	%r8,  TDX_MODULE_r8(%rsi)
+> 	movq	%r9,  TDX_MODULE_r9(%rsi)
+> 	movq	%r10, TDX_MODULE_r10(%rsi)
+> 	movq	%r11, TDX_MODULE_r11(%rsi)
+> .if \saved
+> 	movq	%rbx, TDX_MODULE_rbx(%rsi)
+> 	movq	%r12, TDX_MODULE_r12(%rsi)
+> 	movq	%r13, TDX_MODULE_r13(%rsi)
+> 	movq	%r14, TDX_MODULE_r14(%rsi)
+> 	movq	%r15, TDX_MODULE_r15(%rsi)
+> .endif
+> .endif // \ret
+> 
+> .Lout:
+> .if \saved
+> 	popq	%r15
+> 	popq	%r14
+> 	popq	%r13
+> 	popq	%r12
+> 	popq	%rbx
+> .endif
+> 	FRAME_END
+> 	RET
+> 
+> 	/*
+> 	 * Error and exception handling at .Lcall. Ignore \ret on failure.
+> 	 */
+> .Lerror:
+> .if \saved && \ret
+> 	popq	%rsi
+> .endif
+> 	jmp	.Lout
+> 
+> .if \host
+> .Lseamfail:
+> 	/*
+> 	 * Set RAX to TDX_SEAMCALL_VMFAILINVALID for VMfailInvalid.
+> 	 * This value will never be used as actual SEAMCALL error code as
+> 	 * it is from the Reserved status code class.
+> 	 */
+> 	movq	$TDX_SEAMCALL_VMFAILINVALID, %rax
+> 	jmp	.Lerror
+> 
+> .Lfault:
+> 	/*
+> 	 * SEAMCALL caused #GP or #UD. Per _ASM_EXTABLE_FAULT() RAX
+> 	 * contains the trap number, convert to a TDX error code by
+> 	 * setting the high word to TDX_SW_ERROR.
+> 	 */
+> 	mov	$TDX_SW_ERROR, %rdi
+> 	or	%rdi, %rax
+> 	jmp	.Lerror
+> 
+> 	_ASM_EXTABLE_FAULT(.Lcall, .Lfault)
+> .endif
+> .endm
