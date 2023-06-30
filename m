@@ -2,248 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2ADE1743297
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 04:14:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C2697432DC
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 04:47:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232099AbjF3COX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jun 2023 22:14:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54096 "EHLO
+        id S231874AbjF3Cr5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jun 2023 22:47:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230013AbjF3COU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jun 2023 22:14:20 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C104730EF;
-        Thu, 29 Jun 2023 19:14:17 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.43])
-        by gateway (Coremail) with SMTP id _____8BxlfB4Op5kzh0EAA--.6712S3;
-        Fri, 30 Jun 2023 10:14:16 +0800 (CST)
-Received: from [10.20.42.43] (unknown [10.20.42.43])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxxsxzOp5kA3oSAA--.41851S3;
-        Fri, 30 Jun 2023 10:14:11 +0800 (CST)
-Message-ID: <2c81fbe3-308a-4c5e-0150-32006253b3ea@loongson.cn>
-Date:   Fri, 30 Jun 2023 10:14:11 +0800
+        with ESMTP id S230013AbjF3Crz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jun 2023 22:47:55 -0400
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 316F230D1;
+        Thu, 29 Jun 2023 19:47:54 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id ffacd0b85a97d-311099fac92so1649499f8f.0;
+        Thu, 29 Jun 2023 19:47:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688093272; x=1690685272;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PN5yxbuJ2nnYnl/4YBa8slTNyYfmpUDhYSEL5xstQsU=;
+        b=IUaTt8TcLWNzXn8Ey8PCwkSOyValaLJHNsJBzfJ8c8VFkXDXWZ07DZAYAyY8ZpyG+D
+         ViyKdbolLZuN3acuoZPui7va0jpo92CmUUIR/E7PR4LuPuZ/dAWAmpRWYosYBlh7+UXN
+         SbsW85y6oTB4jNWi3r6NOH6/5NH8WmCp+PHbpfVjulKWtWdG30+EdGEfcyAzSfV0zRVP
+         BTcIyC28klTeW45HEmkwSpo9CSqIcb1O9J4m64qHMGD47BrK1KM43qXMEAlbWKWW/g/d
+         dLFlS0reoxJD2v1Q0NAKPAhoCVlf93BZoE/wJRWSISQssl9GtJnZi4AwMUJS8dA7GITJ
+         i1dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688093272; x=1690685272;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PN5yxbuJ2nnYnl/4YBa8slTNyYfmpUDhYSEL5xstQsU=;
+        b=VQw18THOx28CsTP5o/yyu2WuJzMh6j1EWXH60pOUu6SQ2BAwkRFMMVjbrL7BA2V/Kx
+         PmfOGDt309dI1tE0ivl6Rieivvp/qgJ1PA1pBAeFLVL+JwWhs2ME6gxDMuIqc+HdmKY4
+         gMyY26bX19oZEZVUKrMCyi9ORREnRtmSFKSKtwa3OnxI57TGKGF5pYDpXT6UuwgJVVtL
+         3vzZWzYlyU03gfGLUm3EnUohNmOZrWj0RK0eLLE2PR3oZwT1AEpAAMgDT7IFTe3N+gwM
+         U2R/aqXz3rZtERQ/gpGG8EESABtLFlNaKKu2Ytto+asq+MZ7fTTMGsSMpsCaoP8GOwk+
+         OZHw==
+X-Gm-Message-State: ABy/qLa3kZ5xV4GJTz1Ou8Cu6J4FXhGWODDZ+M6zq4AsILw6oSCTi2zn
+        hT9/nufL/tbu2htBuF23Ua4I+ODGqRR0U0OyPp8=
+X-Google-Smtp-Source: APBJJlG2XSLJk7WgprfL+OPvH4/Ws0gRTftzgVG3a1nA2jukp+WyKKCCC6yZ9QwKgrCuixwdMY5UR+sy3rDqqsFm9rU=
+X-Received: by 2002:a5d:514d:0:b0:313:e20c:b8e0 with SMTP id
+ u13-20020a5d514d000000b00313e20cb8e0mr921811wrt.23.1688093272424; Thu, 29 Jun
+ 2023 19:47:52 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v7 6/8] PCI/VGA: Introduce is_boot_device function
- callback to vga_client_register
-To:     "Limonciello, Mario" <Mario.Limonciello@amd.com>,
-        "15330273260@189.cn" <15330273260@189.cn>,
-        Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Bjorn Helgaas <bhelgaas@google.com>,
-        "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Karol Herbst <kherbst@redhat.com>,
-        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "Chai, Thomas" <YiPeng.Chai@amd.com>,
-        "Gao, Likun" <Likun.Gao@amd.com>, David Airlie <airlied@gmail.com>,
-        Ville Syrjala <ville.syrjala@linux.intel.com>,
-        Yi Liu <yi.l.liu@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Lazar, Lijo" <Lijo.Lazar@amd.com>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        "Zhang, Bokun" <Bokun.Zhang@amd.com>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        "Deucher, Alexander" <Alexander.Deucher@amd.com>,
-        "Koenig, Christian" <Christian.Koenig@amd.com>,
-        "Zhang, Hawking" <Hawking.Zhang@amd.com>
-References: <20230629155436.GA397963@bhelgaas>
- <bcfdc77d-a94d-bca1-56e3-5e14e91f6fd9@189.cn>
- <MN0PR12MB6101CDB6FF9DC8F8EDEF5F45E225A@MN0PR12MB6101.namprd12.prod.outlook.com>
-Content-Language: en-US
-From:   suijingfeng <suijingfeng@loongson.cn>
-In-Reply-To: <MN0PR12MB6101CDB6FF9DC8F8EDEF5F45E225A@MN0PR12MB6101.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: AQAAf8BxxsxzOp5kA3oSAA--.41851S3
-X-CM-SenderInfo: xvxlyxpqjiv03j6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3JryDGFWfuryxZw1xGryrZrc_yoW7ZF4xpr
-        WY9FsIkrs7Xr1rAF1kKa4UAF1jq3y8J343Wrn8t3W8ur909F1SqrZaqr4a9Fy5Ar1akF4Y
-        vw4agrn2k395Z3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUd529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUPqb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
-        wI0_Gr1j6F4UJwAaw2AFwI0_Jw0_GFyle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
-        xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
-        Jw0_WrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
-        xGrwCYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26rWY6Fy7MxAIw28IcxkI7VAK
-        I48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1q6r43MI8I3I0E5I8CrV
-        AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWrXVW8Jr1l
-        IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxV
-        AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j
-        6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07bUzu
-        AUUUUU=
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230607123700.40229-1-cloudliang@tencent.com>
+ <20230607123700.40229-2-cloudliang@tencent.com> <ZJyj3QDu9eAtJ+eq@google.com>
+In-Reply-To: <ZJyj3QDu9eAtJ+eq@google.com>
+From:   Jinrong Liang <ljr.kernel@gmail.com>
+Date:   Fri, 30 Jun 2023 10:47:40 +0800
+Message-ID: <CAFg_LQVtcBaO-=dvrqe7OjMqift__x-F6FeJ8EEUh+Ei-tgyhg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/4] KVM: selftests: Introduce __kvm_pmu_event_filter
+ to improved event filter settings
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Jinrong Liang <cloudliang@tencent.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On 2023/6/30 01:44, Limonciello, Mario wrote:
-> [Public]
+Sean Christopherson <seanjc@google.com> =E4=BA=8E2023=E5=B9=B46=E6=9C=8829=
+=E6=97=A5=E5=91=A8=E5=9B=9B 05:19=E5=86=99=E9=81=93=EF=BC=9A
 >
->> -----Original Message-----
->> From: 15330273260@189.cn <15330273260@189.cn>
->> Sent: Thursday, June 29, 2023 12:00 PM
->> To: Bjorn Helgaas <helgaas@kernel.org>; Sui Jingfeng
->> <suijingfeng@loongson.cn>
->> Cc: Bjorn Helgaas <bhelgaas@google.com>; linux-fbdev@vger.kernel.org;
->> Cornelia Huck <cohuck@redhat.com>; Karol Herbst <kherbst@redhat.com>;
->> nouveau@lists.freedesktop.org; Joonas Lahtinen
->> <joonas.lahtinen@linux.intel.com>; dri-devel@lists.freedesktop.org; Chai,
->> Thomas <YiPeng.Chai@amd.com>; Limonciello, Mario
->> <Mario.Limonciello@amd.com>; Gao, Likun <Likun.Gao@amd.com>; David
->> Airlie <airlied@gmail.com>; Ville Syrjala <ville.syrjala@linux.intel.com>; Yi Liu
->> <yi.l.liu@intel.com>; kvm@vger.kernel.org; amd-gfx@lists.freedesktop.org;
->> Jason Gunthorpe <jgg@ziepe.ca>; Ben Skeggs <bskeggs@redhat.com>; linux-
->> pci@vger.kernel.org; Kevin Tian <kevin.tian@intel.com>; Lazar, Lijo
->> <Lijo.Lazar@amd.com>; Thomas Zimmermann <tzimmermann@suse.de>;
->> Zhang, Bokun <Bokun.Zhang@amd.com>; intel-gfx@lists.freedesktop.org;
->> Maarten Lankhorst <maarten.lankhorst@linux.intel.com>; Jani Nikula
->> <jani.nikula@linux.intel.com>; Alex Williamson
->> <alex.williamson@redhat.com>; Abhishek Sahu <abhsahu@nvidia.com>;
->> Maxime Ripard <mripard@kernel.org>; Rodrigo Vivi <rodrigo.vivi@intel.com>;
->> Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>; Yishai Hadas
->> <yishaih@nvidia.com>; Pan, Xinhui <Xinhui.Pan@amd.com>; linux-
->> kernel@vger.kernel.org; Daniel Vetter <daniel@ffwll.ch>; Deucher, Alexander
->> <Alexander.Deucher@amd.com>; Koenig, Christian
->> <Christian.Koenig@amd.com>; Zhang, Hawking <Hawking.Zhang@amd.com>
->> Subject: Re: [PATCH v7 6/8] PCI/VGA: Introduce is_boot_device function
->> callback to vga_client_register
->>
->> Hi,
->>
->> On 2023/6/29 23:54, Bjorn Helgaas wrote:
->>> On Thu, Jun 22, 2023 at 01:08:15PM +0800, Sui Jingfeng wrote:
->>>> Hi,
->>>>
->>>>
->>>> A nouveau developer(Lyude) from redhat send me a R-B,
->>>>
->>>> Thanks for the developers of nouveau project.
->>>>
->>>>
->>>> Please allow me add a link[1] here.
->>>>
->>>>
->>>> [1]
->> https://lore.kernel.org/all/0afadc69f99a36bc9d03ecf54ff25859dbc10e28.ca
->> mel@redhat.com/
->>> 1) Thanks for this.  If you post another version of this series,
->>>      please pick up Lyude's Reviewed-by and include it in the relevant
->>>      patches (as long as you haven't made significant changes to the
->>>      code Lyude reviewed).
->> Yes, no significant changes. Just fix typo.
->>
->> I also would like to add support for other DRM drivers.
->>
->> But I think this deserve another patch.
->>
->>>    Whoever applies this should automatically
->>>      pick up Reviewed-by/Ack/etc that are replies to the version being
->>>      applied, but they won't go through previous revisions to find them.
->>>
->>> 2) Please mention the commit to which the series applies.  I tried to
->>>      apply this on v6.4-rc1, but it doesn't apply cleanly.
->> Since I'm a graphic driver developer, I'm using drm-tip.
->>
->> I just have already pulled, it still apply cleanly on drm-tip.
->>
->>> 3) Thanks for including cover letters in your postings.  Please
->>>      include a little changelog in the cover letter so we know what
->>>      changed between v6 and v7, etc.
->> No change between v6 and v7,
->>
->> it seems that it is because the mailbox don't allow me to sending too
->> many mails a day.
->>
->> so some of the patch is failed to delivery because out of quota.
->>
->>
->>> 4) Right now we're in the middle of the v6.5 merge window, so new
->>>      content, e.g., this series, is too late for v6.5.  Most
->>>      maintainers, including me, wait to merge new content until the
->>>      merge window closes and a new -rc1 is tagged.  This merge window
->>>      should close on July 9, and people will start merging content for
->>>      v6.6, typically based on v6.5-rc1.
->> I'm wondering
->>
->> Would you will merge all of the patches in this series (e.g. including
->> the patch for drm/amdgpu(7/8) and drm/radeon(8/8)) ?
->>
->> Or just part of them?
->>
->> Emm, I don't know because my patch seems across different subsystem of
->> Linux kernel.
->>
->> There is also a developer for AMDGPU (Mario) give me a R-B for the
->> patch-0002 of this series.
->>
->> So, at least, PATCH-0001, PATCH-0002, PATCH-0003, PATCH-0004, PATCH-
->> 0006
->> are already OK(got reviewed by).
->>
->> Those 5 patch are already qualified to be merged, I think.
-> I think what you can do is pick up all the tags in your next version.  Once the
-> whole series has tags we can discuss how it merges.
+> On Wed, Jun 07, 2023, Jinrong Liang wrote:
+> > -static struct kvm_pmu_event_filter *remove_event(struct kvm_pmu_event_=
+filter *f,
+> > +static struct kvm_pmu_event_filter *remove_event(struct __kvm_pmu_even=
+t_filter *__f,
+> >                                                uint64_t event)
+>
+> Can you tack on a patch to drop the return?  None of the callers consume =
+it, and
+> it incorrectly implies that the incoming filter isn't modified.
 
-Thanks a lot, Mario.
-
-
-Is it possible to merge the PCI/VGA part as fast as possible, especially the
-
-PATCH-0006 PCI/VGA: Introduce is_boot_device function callback to vga_client_register
-
-As this patch is fundamental, it introduce no functional change, as long as the drm
-
-driver side don't introduce a callback.
-
-I'm not hurry, but drm driver-side's patch have a dependency on this patch,
-
-I think it is better the PCI/VGA-side's patch got merge first.
-
-At least for get the first four cleanup(0001 ~ 0004) patch merged first,
-
-so that I don't have to send so much on the next version on one series.
-
-Being exposed so far, there no obvious objection.
-
-It saying that other people also want it got merged.
-
-Bjorn, is this OK ?
+Thank you very much for your suggestion! I'm more than happy to follow
+your advice and modify the code accordingly.
 
 >
->> I means that if you could merge those 5 patch first, then there no need
->> to send another version again.
->>
->> I will refine the rest patch with more details and description.
->>
->> I'm fear of making too much noise.
->>
->>> Bjorn
+> >  {
+> >       bool found =3D false;
+> >       int i;
+> > +     struct kvm_pmu_event_filter *f =3D (void *)__f;
+>
+> Nit, reverse xmas tree is preferred:
+>
+>         struct kvm_pmu_event_filter *f =3D (void *)__f;
+>         bool found =3D false;
+>         int i;
+>
+> Hoever, I don't think this one needs to cast, the cast is only necessary =
+when
+> invoking a KVM ioctl(), e.g. I believe this should work:
+>
+> static void remove_event(struct __kvm_pmu_event_filter *f, uint64_t event=
+)
+> {
+>         bool found =3D false;
+>         int i;
+>
+>         for (i =3D 0; i < f->nevents; i++) {
+>                 if (found)
+>                         f->events[i - 1] =3D f->events[i];
+>                 else
+>                         found =3D f->events[i] =3D=3D event;
+>         }
+>         if (found)
+>                 f->nevents--;
+> }
+> > @@ -569,19 +554,16 @@ static void run_masked_events_test(struct kvm_vcp=
+u *vcpu,
+> >                                  const uint64_t masked_events[],
+> >                                  const int nmasked_events)
+> >  {
+> > -     struct kvm_pmu_event_filter *f;
+> > +     struct __kvm_pmu_event_filter f =3D {
+> > +         .nevents =3D nmasked_events,
+> > +         .action =3D KVM_PMU_EVENT_ALLOW,
+> > +         .flags =3D KVM_PMU_EVENT_FLAG_MASKED_EVENTS,
+>
+> Tabs, not spaces please.
+>
+> > +static int set_pmu_single_event_filter(struct kvm_vcpu *vcpu, uint64_t=
+ event,
+> > +                                    uint32_t flags, uint32_t action)
+> > +{
+> > +     struct __kvm_pmu_event_filter f =3D {
+> > +         .nevents =3D 1,
+> > +         .flags =3D flags,
+> > +         .action =3D action,
+> > +         .events =3D {
+> > +             event,
+>
+> Tabs.
 
+I will include these change in the new patch version and ensure that
+any related code is adjusted accordingly.
+
+Once again, I truly appreciate your guidance!
