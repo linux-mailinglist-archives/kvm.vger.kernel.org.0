@@ -2,240 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 386E77437D0
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 10:59:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E6FB7437DB
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 11:03:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232693AbjF3I7Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 04:59:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53012 "EHLO
+        id S232434AbjF3JD1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 05:03:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230057AbjF3I7X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 04:59:23 -0400
-Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 394122118;
-        Fri, 30 Jun 2023 01:59:22 -0700 (PDT)
-Received: by mail-ej1-x641.google.com with SMTP id a640c23a62f3a-991fe70f21bso188179966b.3;
-        Fri, 30 Jun 2023 01:59:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688115560; x=1690707560;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5XyG9hWncrHnC6M9gFUR394kLaY92tagFHZ9PMVjGOw=;
-        b=GYibKrN0wEDbK/0c8BH9qnz99L8rnbH7azC9dHW1F03iQ/ZAkiOULDAlgDVoiAT3o9
-         TDkk5DdokomN1jTxujVFwb4KgMP6pJq3F1B6v7TwEAzxmSBxVmYk0qvxUB5+WUP4UnBN
-         BJR5XL+MpDficKPropC5unNZwytJAPb3l+UGx37q51jJx2wgvun2nxHm/2WPrUzw9HN/
-         BolrZK7DUS3eZU3G8pHPeSuxWZZxe/iv0xg920KPsKwZtVgPsSTJtuj0gZDkSvmLp6xm
-         HbGM1nLcmd+RnYPiHKnYa1mzBnqry3e+gtrgcBWdaR6vT3GoyWLeP462eoiG0egAp5KN
-         N7hQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688115560; x=1690707560;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5XyG9hWncrHnC6M9gFUR394kLaY92tagFHZ9PMVjGOw=;
-        b=JDwiqAqszL2fmhvWR6MaI6bRjlNzUvgPw9MfFPpNoTKb7Yi9xlCmeeM96nVgWwNnRF
-         Vaetyl7gmsYykJm08wqRCTt6zkCGk/czqUayttllvviQHmt0cH/i3uYwrRS8iIC1N3HZ
-         ESbTmdRWF5OFYE3Q8WQ7U+s03koVLH+yPX05CmNtU1LyuELS8xIjtb0c4gY40UbV/F74
-         Dl8ISScTwxABxWhswitBEWBtk5fbL3THBW7fu/hMmVBu1akuyQSDRdolaNKn0UjVFUdl
-         l0+OA24hza2HXXHuE6xck6P7niuEgggD170qJ7zTyTrNsfRLEm+JIw9yP9aDamtCL2lI
-         7y5A==
-X-Gm-Message-State: ABy/qLZY5aiONULg8uIbamW+1CmiG+d3UhIU6TVckAjK97vkd1eWTQ92
-        jBtZBB8aMFgyItFzkUYo26Nxt5TVcSWnOd3hBi0=
-X-Google-Smtp-Source: APBJJlEp4+UUDkOh9/yDHTg+SwOatqJkJzuotF+phusYUk/Vj2XurBYpoIEerHYEX5FwBBJoQCw0JJOjLoJc/zU9Npc=
-X-Received: by 2002:a17:906:340a:b0:970:1b2d:45cc with SMTP id
- c10-20020a170906340a00b009701b2d45ccmr1217441ejb.57.1688115560344; Fri, 30
- Jun 2023 01:59:20 -0700 (PDT)
+        with ESMTP id S231874AbjF3JDV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 05:03:21 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB11C2118;
+        Fri, 30 Jun 2023 02:03:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688115800; x=1719651800;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=G4tgA5Quxms81FQitPgPzP60ScKph30Y7igWUr2N9eg=;
+  b=QLMjkTlOT92fEDbPTZ5LVOlPKtEhLNQ1evgZM/D5mJE3HR6TRoUFiu4N
+   QzepQ16Dur//5lovbi79xx6bs4tDCiqWj34g4v6ppB1E8M9h+sgyMG454
+   PLl8x+9hei+pw45+rWJaQOYOu4ss0MCBgrGFnvaOBe/Ej/pjFV1CvzzVi
+   wn3du7m8RPYp9m7IRJDh1r7bM7IDMyvhd/h5sVGgfYz+0yGd5FB02w8Kr
+   QSP9uobdkKqn+XNeECWAfIB/Z0+ts5nWTi/n6/ro52CV7W+2YSfBewo5c
+   JaVb9zHgJ7EqjOiNlWsqz6J9c88gykKup6/ffwU4y08PjrgzctEcfLC5G
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="342690207"
+X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
+   d="scan'208";a="342690207"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 02:03:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="694958090"
+X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
+   d="scan'208";a="694958090"
+Received: from valeriik-mobl.ger.corp.intel.com (HELO box.shutemov.name) ([10.252.49.47])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 02:03:12 -0700
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id DC7D3109754; Fri, 30 Jun 2023 12:03:09 +0300 (+03)
+Date:   Fri, 30 Jun 2023 12:03:09 +0300
+From:   kirill.shutemov@linux.intel.com
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+        dave.hansen@intel.com, tony.luck@intel.com, tglx@linutronix.de,
+        bp@alien8.de, mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
+        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, ashok.raj@intel.com,
+        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, ying.huang@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
+        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
+Subject: Re: [PATCH v12 20/22] x86/virt/tdx: Allow SEAMCALL to handle #UD and
+ #GP
+Message-ID: <20230630090309.6mnsvfhcptekmzfu@box.shutemov.name>
+References: <cover.1687784645.git.kai.huang@intel.com>
+ <c124550719716f1f7759c2bdea70f4722d8e0167.1687784645.git.kai.huang@intel.com>
+ <20230628152900.GI2438817@hirez.programming.kicks-ass.net>
+ <20230628203823.GR38236@hirez.programming.kicks-ass.net>
+ <20230628211132.GS38236@hirez.programming.kicks-ass.net>
+ <20230628211641.GT38236@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-References: <20230608113420.14695-1-cloudliang@tencent.com>
- <20230608113420.14695-3-cloudliang@tencent.com> <ZJysUp5Ndnecok4S@google.com>
-In-Reply-To: <ZJysUp5Ndnecok4S@google.com>
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-Date:   Fri, 30 Jun 2023 16:59:08 +0800
-Message-ID: <CAFg_LQWdtWMn0HyKpBZH+fQfeBdEAq1fxDnekcw04pXFMqOJ3Q@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: selftests: Add PEBS test for MSR_IA32_PERF_CAPABILITIES
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Jinrong Liang <cloudliang@tencent.com>,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230628211641.GT38236@hirez.programming.kicks-ass.net>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> =E4=BA=8E2023=E5=B9=B46=E6=9C=8829=
-=E6=97=A5=E5=91=A8=E5=9B=9B 05:55=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Thu, Jun 08, 2023, Jinrong Liang wrote:
-> > From: Jinrong Liang <cloudliang@tencent.com>
-> >
-> > This commit adds a PEBS test that verifies all possible combinations
-> > of PEBS-related bits in MSR_IA32_PERF_CAPABILITIES. This comprehensive
-> > test ensures the accuracy of the PEBS feature.
-> >
-> > Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> > ---
-> >  .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  | 71 +++++++++++++++++++
-> >  1 file changed, 71 insertions(+)
-> >
-> > diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/t=
-ools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-> > index 02903084598f..c1b1ba44bc26 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-> > @@ -21,6 +21,12 @@
-> >
-> >  #define MAX_LINEAR_ADDR_MASK         GENMASK_ULL(15, 8)
-> >  #define ADDR_OFS_BIT                 8
-> > +#define PMU_CAP_LBR_FMT              0x3f
-> > +#define PMU_CAP_SMM_FREEZE           BIT_ULL(12)
-> > +#define PMU_CAP_FW_WRITES            BIT_ULL(13)
-> > +#define PMU_CAP_PERF_METRICS_AVAILABLE       BIT_ULL(PERF_CAP_METRICS_=
-IDX)
-> > +#define PMU_CAP_PEBS_OUTPUT_PT_AVAIL BIT_ULL(PERF_CAP_PT_IDX)
-> > +#define PMU_CAP_PEBS_ALL             (PERF_CAP_PEBS_MASK | PMU_CAP_PEB=
-S_OUTPUT_PT_AVAIL)
-> >
-> >  union perf_capabilities {
-> >       struct {
-> > @@ -331,6 +337,70 @@ static void test_ds_area_noncanonical_address(unio=
-n perf_capabilities host_cap)
-> >       kvm_vm_free(vm);
-> >  }
-> >
-> > +static void test_pebs_bit_combinations(union perf_capabilities host_ca=
-p)
-> > +{
-> > +     int ret;
->
-> Reverse xmas tree.
->
-> > +     uint64_t pebs_val, val;
-> > +     struct kvm_vcpu *vcpu;
-> > +     struct kvm_vm *vm =3D vm_create_with_one_vcpu(&vcpu, NULL);
->
-> It's kinda silly, but I think it makes sense to wait until after all of t=
-he
-> TEST_REQUIRE()s to create the VM+vCPU.
->
+On Wed, Jun 28, 2023 at 11:16:41PM +0200, Peter Zijlstra wrote:
+> On Wed, Jun 28, 2023 at 11:11:32PM +0200, Peter Zijlstra wrote:
+> > --- a/arch/x86/virt/vmx/tdx/tdxcall.S
+> > +++ b/arch/x86/virt/vmx/tdx/tdxcall.S
+> > @@ -17,37 +17,44 @@
+> >   *            TDX module and hypercalls to the VMM.
+> >   * SEAMCALL - used by TDX hosts to make requests to the
+> >   *            TDX module.
+> > + *
+> > + *-------------------------------------------------------------------------
+> > + * TDCALL/SEAMCALL ABI:
+> > + *-------------------------------------------------------------------------
+> > + * Input Registers:
+> > + *
+> > + * RAX                 - TDCALL Leaf number.
+> > + * RCX,RDX,R8-R9       - TDCALL Leaf specific input registers.
+> > + *
+> > + * Output Registers:
+> > + *
+> > + * RAX                 - TDCALL instruction error code.
+> > + * RCX,RDX,R8-R11      - TDCALL Leaf specific output registers.
+> > + *
+> > + *-------------------------------------------------------------------------
+> > + *
+> > + * __tdx_module_call() function ABI:
+> > + *
+> > + * @fn   (RDI)         - TDCALL Leaf ID,    moved to RAX
+> > + * @regs (RSI)         - struct tdx_regs pointer
+> > + *
+> > + * Return status of TDCALL via RAX.
+> >   */
+> > +.macro TDX_MODULE_CALL host:req ret:req
+> > +	FRAME_BEGIN
+> >  
+> > +	mov	%rdi, %rax
+> > +	mov	$TDX_SEAMCALL_VMFAILINVALID, %rdi
+> >  
+> > +	mov	TDX_MODULE_rcx(%rsi), %rcx
+> > +	mov	TDX_MODULE_rdx(%rsi), %rdx
+> > +	mov	TDX_MODULE_r8(%rsi),  %r8
+> > +	mov	TDX_MODULE_r9(%rsi),  %r9
+> > +//	mov	TDX_MODULE_r10(%rsi), %r10
+> > +//	mov	TDX_MODULE_r11(%rsi), %r11
+> >  
+> > +.if \host
+> > +1:	seamcall
+> >  	/*
+> >  	 * SEAMCALL instruction is essentially a VMExit from VMX root
+> >  	 * mode to SEAM VMX root mode.  VMfailInvalid (CF=1) indicates
+> 	...
+> >  	 * This value will never be used as actual SEAMCALL error code as
+> >  	 * it is from the Reserved status code class.
+> >  	 */
+> > +	cmovc	%rdi, %rax
+> >  2:
+> > +.else
+> >  	tdcall
+> > +.endif
+> >  
+> > +.if \ret
+> > +	movq %rcx, TDX_MODULE_rcx(%rsi)
+> > +	movq %rdx, TDX_MODULE_rdx(%rsi)
+> > +	movq %r8,  TDX_MODULE_r8(%rsi)
+> > +	movq %r9,  TDX_MODULE_r9(%rsi)
+> > +	movq %r10, TDX_MODULE_r10(%rsi)
+> > +	movq %r11, TDX_MODULE_r11(%rsi)
+> > +.endif
 > > +
-> > +     TEST_REQUIRE(kvm_cpu_property(X86_PROPERTY_PMU_VERSION) > 1);
-> > +     TEST_REQUIRE(host_cap.capabilities & PERF_CAP_PEBS_FORMAT);
-> > +     TEST_REQUIRE(vcpu_get_msr(vcpu, MSR_IA32_MISC_ENABLE) &
-> > +                  MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL);
+> > +	FRAME_END
+> > +	RET
 > > +
-> > +     /*
-> > +      * Test if PEBS_REC_FMT is set and the value is the same as host,
-> > +      * the other PEBS bits are allowed to be set only if they are the
-> > +      * same as host.
-> > +      */
-> > +     pebs_val =3D host_cap.capabilities & PMU_CAP_PEBS_ALL;
-> > +
-> > +     vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, pebs_val);
-> > +     ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES),
-> > +               (u64)pebs_val);
->
-> This cast shouldn't be necessary.  And if you're going to split lines...
->
->         ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES),
->                   host_cap.capabilities & PMU_CAP_PEBS_ALL);
->
-> Though isn't that flawed?  E.g. will fail if MSR_IA32_PERF_CAPABILITIES h=
-as
-> non-PEBS bits set.  I think what you want is something like:
->
->         guest_perf_caps =3D vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES=
-);
->
->         ASSERT_EQ(guest_perf_caps & PMU_CAP_PEBS_ALL,
->                   host_cap.capabilities & PMU_CAP_PEBS_ALL);
->
-> > +
-> > +     /* Test all PEBS bit combinations. */
-> > +     for (val =3D 0x0; val <=3D (~0ul & PMU_CAP_PEBS_ALL); val++) {
-> > +             /* Skips values that are not related to PEBS. */
-> > +             if (val & (PMU_CAP_LBR_FMT | PMU_CAP_SMM_FREEZE |
-> > +                 PMU_CAP_FW_WRITES | PMU_CAP_PERF_METRICS_AVAILABLE))
->
-> Align things by their scope, i.e.
->
->                 if (val & (PMU_CAP_LBR_FMT | PMU_CAP_SMM_FREEZE
->                            PMU_CAP_FW_WRITES | PMU_CAP_PERF_METRICS_AVAIL=
-ABLE))
->
-> But even better would be to look for !PEBS, not some other values where i=
-t's not
-> clear they exhaustively cover all !PEBS value.  E.g. can't this be?
->
->                 if (val & ~PMU_CAP_PEBS_ALL)
->                         continue;
->
-> > +                     continue;
-> > +
-> > +             /*
-> > +              * Test that value of PEBS is rejected when the KVM doesn=
-'t
->
-> Just "KVM", not "the KVM".
->
-> > +              * supports Intel PT.
-> > +              */
-> > +             if ((val & PMU_CAP_PEBS_OUTPUT_PT_AVAIL) &&
-> > +                 (!(host_cap.capabilities & PMU_CAP_PEBS_OUTPUT_PT_AVA=
-IL))) {
-> > +                     ret =3D _vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABIL=
-ITIES, val);
-> > +                     TEST_ASSERT(!ret, "Bad PEBS auxiliary bits =3D 0x=
-%lx didn't fail", val);
-> > +
-> > +                     continue;
-> > +             }
-> > +
-> > +             /*
-> > +              * Test that value of PEBS is rejected when carrying
->
-> I don't quite follow what you mean by "carrying".  Do you mean a non-zero=
- value?
+> > +.if \host
+> > +3:
+> > +	mov	$TDX_SW_ERROR, %rdi
+> > +	or	%rdi, %rax
+> > +	jmp 2b
+> >  
+> > +	_ASM_EXTABLE_FAULT(1b, 3b)
+> > +.endif
+> >  .endm
+> 
+> Isn't that much simpler?
 
-I apologize for the confusion. Yes, by "carrying" I meant a non-zero
-value. I will revise the comment to clarify the meaning and make it
-more precise.
+I'm okay either way.
 
->
-> > +              * PEBS_REC_FMT if the value of PEBS is not equal to host=
-.
-> > +              */
-> > +             if ((val & PERF_CAP_PEBS_FORMAT) && val !=3D pebs_val) {
-> > +                     ret =3D _vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABIL=
-ITIES, val);
-> > +                     TEST_ASSERT(!ret, "Bad PEBS auxiliary bits =3D 0x=
-%lx didn't fail", val);
-> > +
-> > +                     continue;
-> > +             }
-> > +
-> > +             /*
-> > +              * Test that PEBS bits can be written simultaneously or
-> > +              * independently if PEBS_REC_FMT is not carried.
-> > +              */
-> > +             vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, val);
-> > +             ASSERT_EQ(vcpu_get_msr(vcpu, MSR_IA32_PERF_CAPABILITIES),=
- val);
-> > +     }
-> > +
-> > +     kvm_vm_free(vm);
-> > +}
+Obviously, arch/x86/coco/tdx/tdcall.S has to be patched to use the new
+TDX_MODULE_CALL macro.
 
-Thank you for all your valuable feedback and suggestions. Your
-guidance has been extremely helpful in improving the quality of the
-code.
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
