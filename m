@@ -2,264 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B0B67440FD
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 19:16:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1846B7440FB
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 19:16:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232988AbjF3RQo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 13:16:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36792 "EHLO
+        id S232971AbjF3RQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 13:16:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229738AbjF3RQf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232881AbjF3RQf (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 30 Jun 2023 13:16:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F384A183
-        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 10:15:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688145343;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZdTDhbZr4eQQTRSk7eayCEYmdszTgdjX7jCu+h7WTEM=;
-        b=Wy1vyJP4+954epO8l+8YvUi29W7UGfg8pj28sXGnm8090VwUO2k/6Rhg2LwQ8f7/JN8Qvk
-        RC0f+/GDvu+ZajI/LEeDMezxrWRBlP3U4kfsCiYPBQ0XuQ1qCoU75937qreoWROOKAMHUR
-        oyvarsP/jaw7EQ013c3HrT0VNz4z8wY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-70-fizKD8Q4OdK_Nnct5d7eDw-1; Fri, 30 Jun 2023 13:15:41 -0400
-X-MC-Unique: fizKD8Q4OdK_Nnct5d7eDw-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-30e6153f0eeso1091851f8f.0
-        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 10:15:41 -0700 (PDT)
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 769FC3A90
+        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 10:16:34 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-4007b5bafceso12671cf.1
+        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 10:16:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688145393; x=1690737393;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KZYjbsbti+rVflhaD8niD3Jax2FmXNNOo5d9fcG6uCU=;
+        b=a8rX5Jg4cK6o2EwrKI9ZMYQ7nGXlRnt1EjGarsxRoCGSTfKW8GbuPuQV+FLsgSexsW
+         ncS83gvPK9qbbFpFqcgFcyW7kUz/wXl5tdIpJvYhXTnpW6MrMGL1OptIn8jvYDALkeBY
+         Pu6MLXnYIeTLGlBF/b/iZ9D9+VCzpYRI0sfpWuxwDiFfmx+cnpD+zLXeL+2gvCNwF8hy
+         KEPbVpMdBlkHzEHXWs2jLwt0j+OQnl0Wx48yzFMytvxBh8Zi4LSCk6mg6sptCHk4JjRl
+         G1VLJS6IbIxTK66w3ojnO0M2TKTa6XQNBicWbtDlrB6pGZOQAlsmQ5xFrJKkhCvxm9G/
+         YClQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688145340; x=1690737340;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZdTDhbZr4eQQTRSk7eayCEYmdszTgdjX7jCu+h7WTEM=;
-        b=lpk0BseiwJRqEDljJbB+BqkBEn040dRciDHtxsGqJS6eX0n4MTRx/d3RrPAcjGZLo/
-         dE/ye6rCCFLEI6h840j218T1d7EqeJDirIXHW0c2jganzs0qE6DdSW7bunoce1i4k2PS
-         SQuZvVS+kw3g9cDg3Uri+y0biEiQu+rBB+rlzgDYyVjSxuUN6B4qjkgAGDcT2Hbbalur
-         VdSzFUNZGW0X0b0iMVY9cCxJlrQrB9/46ktclPRKw+6UxCqPZ+A2mtSfb9+c/XKjByDY
-         dT0eg8hZvuVNN5V6EFNe3+ebG5HXmUyke++WzPZr3skXwIuAVwEsCdvaeM2IAf8A2V5x
-         HOoQ==
-X-Gm-Message-State: ABy/qLYZOcst846HhHQd429CeuuMQMWHiLHRR3sRkmpVc+dgOPKTbKtf
-        Rg13MChdJCTStFa6tF9bufJlr1Js4kmJfKPbhls7nz8ncLYwqK5Gfz2ttCnQAa9CorczkpS9Tcg
-        3wRYITMct4Zfk
-X-Received: by 2002:a5d:63ca:0:b0:314:2594:7b9f with SMTP id c10-20020a5d63ca000000b0031425947b9fmr1537716wrw.11.1688145340110;
-        Fri, 30 Jun 2023 10:15:40 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGYQtNnqxzBlUMaJpB4SLIl9agMNRhMzLKZKgZfHAAAO79NYFKr3eANPETkJIKzZ3Y9SRHyrA==
-X-Received: by 2002:a5d:63ca:0:b0:314:2594:7b9f with SMTP id c10-20020a5d63ca000000b0031425947b9fmr1537691wrw.11.1688145339672;
-        Fri, 30 Jun 2023 10:15:39 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id h11-20020a1ccc0b000000b003fa8158135esm20167744wmb.11.2023.06.30.10.15.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Jun 2023 10:15:38 -0700 (PDT)
-Message-ID: <829d87f7-2103-ef6f-5d3b-18aa8f8cb850@redhat.com>
-Date:   Fri, 30 Jun 2023 19:15:37 +0200
+        d=1e100.net; s=20221208; t=1688145393; x=1690737393;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KZYjbsbti+rVflhaD8niD3Jax2FmXNNOo5d9fcG6uCU=;
+        b=iTV//XiqlZEntIUfpyWH2UZBBvz/wH/SMkl1PqjBUW9i+TciKvgDEvhxX5vN4Ktjiv
+         4wyGisf6ahOIsbHM/2H3UmcsG1PCHchvrel7GPQDFpUcaV2IBHgW6KWgsyzTT3uJG7QP
+         KzAPzFEFazlgbsWw0atpubWbrY54uH7aqNTtp8hjrOiVI/Pi8u6AOdCIRFkg3so569uk
+         GntcikEbl7/AD5XD10f+yh7cAKxCfeRcabutdGRu/kRATDeNIjeOiDsn/PlqojFAUzIB
+         oZzbnTIPeJCoAWq/gUEnFPfEM7uN3egj1Z8ZAHsi3V8KEPTGANmiELq2fEPBpPyNPL58
+         RwrQ==
+X-Gm-Message-State: AC+VfDzqYIzHLOEIVYV6YFnAOcDCYI2ulc630sQ+UtBFdPc7yPSRaIbM
+        kh4O/W+AQJi/j9n0QoxqLszG9rdLrUGxkUWwjjjU7Q==
+X-Google-Smtp-Source: ACHHUZ4Y+04AAzcFvQV2MAlgSLAksud+hKLE4aoReVbH5ER/J/WJhxJzyZwtr8CAuSJ1t1UAYZ/yhAD18d0hZJL1YeA=
+X-Received: by 2002:ac8:5882:0:b0:3ef:4319:c6c5 with SMTP id
+ t2-20020ac85882000000b003ef4319c6c5mr669071qta.19.1688145393483; Fri, 30 Jun
+ 2023 10:16:33 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 5/6] arm: pmu: Add
- pmu-mem-access-reliability test
-Content-Language: en-US
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, andrew.jones@linux.dev, maz@kernel.org,
-        will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
-        reijiw@google.com, mark.rutland@arm.com
-References: <20230619200401.1963751-1-eric.auger@redhat.com>
- <20230619200401.1963751-6-eric.auger@redhat.com>
- <ZJ7_UrrBdgn6FB7-@monolith.localdoman>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <ZJ7_UrrBdgn6FB7-@monolith.localdoman>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20230504120042.785651-1-rkagan@amazon.de> <ZH6DJ8aFq/LM6Bk9@google.com>
+ <CALMp9eS3F08cwUJbKjTRAEL0KyZ=MC==YSH+DW-qsFkNfMpqEQ@mail.gmail.com>
+ <ZJ4dmrQSduY8aWap@google.com> <ZJ65CiW0eEL2mGg8@u40bc5e070a0153.ant.amazon.com>
+ <ZJ7mjdZ8h/RSilFX@google.com> <ZJ7y9DuedQyBb9eU@u40bc5e070a0153.ant.amazon.com>
+ <ZJ74gELkj4DgAk4S@google.com> <CAL715WL9T8Ucnj_1AygwMgDjOJrttNZHRP9o-KUNfpx1aYZnog@mail.gmail.com>
+In-Reply-To: <CAL715WL9T8Ucnj_1AygwMgDjOJrttNZHRP9o-KUNfpx1aYZnog@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 30 Jun 2023 10:16:22 -0700
+Message-ID: <CALMp9eSQ9uRBVdLDkfCdPbprZ45LpdZY5-5O9i41oJYs-dK7+Q@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Roman Kagan <rkagan@amazon.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Hankland <ehankland@google.com>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Like Xu <likexu@tencent.com>, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alexandru,
+On Fri, Jun 30, 2023 at 10:08=E2=80=AFAM Mingwei Zhang <mizhang@google.com>=
+ wrote:
+>
+> On Fri, Jun 30, 2023 at 8:45=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Fri, Jun 30, 2023, Roman Kagan wrote:
+> > > On Fri, Jun 30, 2023 at 07:28:29AM -0700, Sean Christopherson wrote:
+> > > > On Fri, Jun 30, 2023, Roman Kagan wrote:
+> > > > > On Thu, Jun 29, 2023 at 05:11:06PM -0700, Sean Christopherson wro=
+te:
+> > > > > > @@ -74,6 +74,14 @@ static inline u64 pmc_read_counter(struct kv=
+m_pmc *pmc)
+> > > > > >         return counter & pmc_bitmask(pmc);
+> > > > > >  }
+> > > > > >
+> > > > > > +static inline void pmc_write_counter(struct kvm_pmc *pmc, u64 =
+val)
+> > > > > > +{
+> > > > > > +       if (pmc->perf_event && !pmc->is_paused)
+> > > > > > +               perf_event_set_count(pmc->perf_event, val);
+> > > > > > +
+> > > > > > +       pmc->counter =3D val;
+> > > > >
+> > > > > Doesn't this still have the original problem of storing wider val=
+ue than
+> > > > > allowed?
+> > > >
+> > > > Yes, this was just to fix the counter offset weirdness.  My plan is=
+ to apply your
+> > > > patch on top.  Sorry for not making that clear.
+> > >
+> > > Ah, got it, thanks!
+> > >
+> > > Also I'm now chasing a problem that we occasionally see
+> > >
+> > > [3939579.462832] Uhhuh. NMI received for unknown reason 30 on CPU 43.
+> > > [3939579.462836] Do you have a strange power saving mode enabled?
+> > > [3939579.462836] Dazed and confused, but trying to continue
+> > >
+> > > in the guests when perf is used.  These messages disappear when
+> > > 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions") is
+> > > reverted.  I haven't yet figured out where exactly the culprit is.
+> >
+> > Can you reverting de0f619564f4 ("KVM: x86/pmu: Defer counter emulated o=
+verflow
+> > via pmc->prev_counter")?  I suspect the problem is the prev_counter mes=
+s.
+>
+> For sure it is prev_counter issue, I have done some instrumentation as fo=
+llows:
+>
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 48a0528080ab..946663a42326 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -322,8 +322,11 @@ static void reprogram_counter(struct kvm_pmc *pmc)
+>         if (!pmc_event_is_allowed(pmc))
+>                 goto reprogram_complete;
+>
+> -       if (pmc->counter < pmc->prev_counter)
+> +       if (pmc->counter < pmc->prev_counter) {
+> +               pr_info("pmc->counter: %llx\tpmc->prev_counter: %llx\n",
+> +                       pmc->counter, pmc->prev_counter);
+>                 __kvm_perf_overflow(pmc, false);
+> +       }
+>
+>         if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
+>                 printk_once("kvm pmu: pin control bit is ignored\n");
+>
+> I find some interesting changes on prev_counter:
+>
+> [  +7.295348] pmc->counter: 12 pmc->prev_counter: fffffffffb3d
+> [  +0.622991] pmc->counter: 3 pmc->prev_counter: fffffffffb1a
+> [  +6.943282] pmc->counter: 1 pmc->prev_counter: fffffffff746
+> [  +4.483523] pmc->counter: 0 pmc->prev_counter: ffffffffffff
+> [ +12.817772] pmc->counter: 0 pmc->prev_counter: ffffffffffff
+> [ +21.721233] pmc->counter: 0 pmc->prev_counter: ffffffffffff
+>
+> The first 3 logs will generate this:
+>
+> [ +11.811925] Uhhuh. NMI received for unknown reason 20 on CPU 2.
+> [  +0.000003] Dazed and confused, but trying to continue
+>
+> While the last 3 logs won't. This is quite reasonable as looking into
+> de0f619564f4 ("KVM: x86/pmu: Defer counter emulated overflow via
+> pmc->prev_counter"), counter and prev_counter should only have 1 diff
+> in value.
 
-On 6/30/23 18:14, Alexandru Elisei wrote:
-> Hi,
->
-> On Mon, Jun 19, 2023 at 10:04:00PM +0200, Eric Auger wrote:
->> Add a new basic test that runs MEM_ACCESS loop over
->> 100 iterations and make sure the number of measured
->> MEM_ACCESS never overflows the margin. Some other
->> pmu tests rely on this pattern and if the MEM_ACCESS
->> measurement is not reliable, it is better to report
->> it beforehand and not confuse the user any further.
->>
->> Without the subsequent patch, this typically fails on
->> ThunderXv2 with the following logs:
->>
->> INFO: pmu: pmu-mem-access-reliability: 32-bit overflows:
->> overflow=1 min=21 max=41 COUNT=20 MARGIN=15
->> FAIL: pmu: pmu-mem-access-reliability: 32-bit overflows:
->> mem_access count is reliable
-> Looks good:
->
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
->
-> Also ran the test on my rockpro64, with qemu and kvmtool. With kvmtool,
-> when running on the little cores, min=max=250, but when running on the big
-> cores, there was some deviation from that, I would say about 5 events,
-> varying from run to run. I assume this is because the little cores are in
-> order, and the big cores are out of order. Maybe the reason why you are
-> seeing such a big difference between min and max on the ThunderX 2, the
-> core might be speculating more aggressively.
+prev_counter isn't actually sync'ed at this point, is it? This comes
+back to that "setting a running counter" nonsense. We want to add 1 to
+the current counter, but we don't actually know what the current
+counter is.
 
-thank you for your time. At least this new test outputting the min/max
-will give interesting indications of what can be expected from the mem
-access count precision on a given HW.
->
-> Anyway:
->
-> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+My interpretation of the above is that, in the first three cases, PMU
+hardware has already detected an overflow. In the last three cases,
+software counting has detected an overflow.
 
-Thanks!
+If the last three occur while executing the guest's PMI handler (i.e.
+NMIs are blocked), then this could corroborate my conjecture about
+IA32_DEBUGCTL.Freeze_PerfMon_On_PMI.
 
-Eric
->
-> Thanks,
-> Alex
->
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v2 -> v3:
->> - rename variables as suggested by Alexandru, rework the
->>   traces accordingly. Use all_set.
->>
->> v1 -> v2:
->> - use mem-access instead of memaccess as suggested by Mark
->> - simplify the logic and add comments in the test loop
->> ---
->>  arm/pmu.c         | 59 +++++++++++++++++++++++++++++++++++++++++++++++
->>  arm/unittests.cfg |  6 +++++
->>  2 files changed, 65 insertions(+)
->>
->> diff --git a/arm/pmu.c b/arm/pmu.c
->> index 0995a249..491d2958 100644
->> --- a/arm/pmu.c
->> +++ b/arm/pmu.c
->> @@ -56,6 +56,11 @@
->>  #define EXT_COMMON_EVENTS_HIGH	0x403F
->>  
->>  #define ALL_SET_32		0x00000000FFFFFFFFULL
->> +#define ALL_SET_64		0xFFFFFFFFFFFFFFFFULL
->> +
->> +#define ALL_SET(__overflow_at_64bits)				\
->> +	(__overflow_at_64bits ? ALL_SET_64 : ALL_SET_32)
->> +
->>  #define ALL_CLEAR		0x0000000000000000ULL
->>  #define PRE_OVERFLOW_32		0x00000000FFFFFFF0ULL
->>  #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
->> @@ -67,6 +72,10 @@
->>   * for some observed variability we take into account a given @MARGIN
->>   */
->>  #define PRE_OVERFLOW2_32		(ALL_SET_32 - COUNT - MARGIN)
->> +#define PRE_OVERFLOW2_64		(ALL_SET_64 - COUNT - MARGIN)
->> +
->> +#define PRE_OVERFLOW2(__overflow_at_64bits)				\
->> +	(__overflow_at_64bits ? PRE_OVERFLOW2_64 : PRE_OVERFLOW2_32)
->>  
->>  #define PRE_OVERFLOW(__overflow_at_64bits)				\
->>  	(__overflow_at_64bits ? PRE_OVERFLOW_64 : PRE_OVERFLOW_32)
->> @@ -744,6 +753,53 @@ static void test_chained_sw_incr(bool unused)
->>  		    read_regn_el0(pmevcntr, 0), \
->>  		    read_sysreg(pmovsclr_el0))
->>  
->> +/*
->> + * This test checks that a mem access loop featuring COUNT accesses
->> + * does not overflow with an init value of PRE_OVERFLOW2. It also
->> + * records the min/max access count to see how much the counting
->> + * is (un)reliable
->> + */
->> +static void test_mem_access_reliability(bool overflow_at_64bits)
->> +{
->> +	uint32_t events[] = {MEM_ACCESS};
->> +	void *addr = malloc(PAGE_SIZE);
->> +	uint64_t cntr_val, num_events, max = 0, min = pmevcntr_mask();
->> +	uint64_t pre_overflow2 = PRE_OVERFLOW2(overflow_at_64bits);
->> +	uint64_t all_set = ALL_SET(overflow_at_64bits);
->> +	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
->> +	bool overflow = false;
->> +
->> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
->> +	    !check_overflow_prerequisites(overflow_at_64bits))
->> +		return;
->> +
->> +	pmu_reset();
->> +	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->> +	for (int i = 0; i < 100; i++) {
->> +		pmu_reset();
->> +		write_regn_el0(pmevcntr, 0, pre_overflow2);
->> +		write_sysreg_s(0x1, PMCNTENSET_EL0);
->> +		isb();
->> +		mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->> +		cntr_val = read_regn_el0(pmevcntr, 0);
->> +		if (cntr_val >= pre_overflow2) {
->> +			num_events = cntr_val - pre_overflow2;
->> +		} else {
->> +			/* unexpected counter overflow */
->> +			num_events = cntr_val + all_set - pre_overflow2;
->> +			overflow = true;
->> +			report_info("iter=%d num_events=%ld min=%ld max=%ld overflow!!!",
->> +				    i, num_events, min, max);
->> +		}
->> +		/* record extreme value */
->> +		max = MAX(num_events, max);
->> +		min = MIN(num_events, min);
->> +	}
->> +	report_info("overflow=%d min=%ld max=%ld expected=%d acceptable margin=%d",
->> +		    overflow, min, max, COUNT, MARGIN);
->> +	report(!overflow, "mem_access count is reliable");
->> +}
->> +
->>  static void test_chain_promotion(bool unused)
->>  {
->>  	uint32_t events[] = {MEM_ACCESS, CHAIN};
->> @@ -1201,6 +1257,9 @@ int main(int argc, char *argv[])
->>  	} else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
->>  		run_event_test(argv[1], test_basic_event_count, false);
->>  		run_event_test(argv[1], test_basic_event_count, true);
->> +	} else if (strcmp(argv[1], "pmu-mem-access-reliability") == 0) {
->> +		run_event_test(argv[1], test_mem_access_reliability, false);
->> +		run_event_test(argv[1], test_mem_access_reliability, true);
->>  	} else if (strcmp(argv[1], "pmu-mem-access") == 0) {
->>  		run_event_test(argv[1], test_mem_access, false);
->>  		run_event_test(argv[1], test_mem_access, true);
->> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> index 5e67b558..fe601cbb 100644
->> --- a/arm/unittests.cfg
->> +++ b/arm/unittests.cfg
->> @@ -90,6 +90,12 @@ groups = pmu
->>  arch = arm64
->>  extra_params = -append 'pmu-mem-access'
->>  
->> +[pmu-mem-access-reliability]
->> +file = pmu.flat
->> +groups = pmu
->> +arch = arm64
->> +extra_params = -append 'pmu-mem-access-reliability'
->> +
->>  [pmu-sw-incr]
->>  file = pmu.flat
->>  groups = pmu
->> -- 
->> 2.38.1
->>
-
+> So, the reasonable suspect should be the stale prev_counter. There
+> might be several potential reasons behind this. Jim's theory is the
+> highly reasonable one as I did another experiment and found that KVM
+> may leave pmu->global_status as '0' when injecting an NMI.
