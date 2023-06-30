@@ -2,215 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D2767444DB
-	for <lists+kvm@lfdr.de>; Sat,  1 Jul 2023 00:30:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D21A7444FA
+	for <lists+kvm@lfdr.de>; Sat,  1 Jul 2023 00:56:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233076AbjF3WaQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 18:30:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55420 "EHLO
+        id S231324AbjF3W4T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 18:56:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233070AbjF3WaK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 18:30:10 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F4373C38;
-        Fri, 30 Jun 2023 15:29:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688164198; x=1719700198;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=kmxjEdY/oS9OgHs4b5rew7Czs0b9e7jAaSHy4XBU38o=;
-  b=UAs25VDhQWJ0Hf4V6Xy4yWiJA9WGd8sCzoKC5FMuvX0QDH84x9O3ZIKC
-   uHbljP4OyvNLR3gd8MV19Z9IWA6fCPNmxDsKcJnBXqHaBWr4dRdRCyPg7
-   e1rw7+cjFqXGpZYPfJDCDNH+n+tRDQQMp8mXpVZBtGo24HHCJGUXZn7OD
-   GRIAAYW1NMGOR37EBoE6wfszMmUPPaxFG1ZoocX1PJU3mSSfeexH0bhz2
-   66UN8gjT8TqwrF/Qg8OtMGqromdfpOkNjNjXgLdXMj3eYhYpVXF8Wo+4X
-   vwIg9vI6lAUJhwm62itHpMpGQ7lAk+/50mECW4P/ALtrD1ypq0XiPujVg
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="428552774"
-X-IronPort-AV: E=Sophos;i="6.01,172,1684825200"; 
-   d="scan'208";a="428552774"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 15:29:57 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="747558521"
-X-IronPort-AV: E=Sophos;i="6.01,172,1684825200"; 
-   d="scan'208";a="747558521"
-Received: from amuruge1-mobl.amr.corp.intel.com (HELO [10.252.133.96]) ([10.252.133.96])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 15:29:55 -0700
-Message-ID: <522b0954-749e-33be-59a7-4ce28e8c4d5c@intel.com>
-Date:   Fri, 30 Jun 2023 15:29:54 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH RFC v9 09/51] x86/sev: Add RMP entry lookup helpers
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
-References: <20230612042559.375660-1-michael.roth@amd.com>
- <20230612042559.375660-10-michael.roth@amd.com>
- <59d5ca67-6a31-1929-8d2f-0e3314626893@intel.com>
- <20230630215709.owobzb5cr2wtkqhd@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230630215709.owobzb5cr2wtkqhd@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229484AbjF3W4R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 18:56:17 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8D6F2D69
+        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 15:56:16 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-260cb94f585so2090629a91.0
+        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 15:56:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688165776; x=1690757776;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y+QnFBcSRBuOpb7/7NCuCNZ3hM36J3/pYWSX0Cwatlw=;
+        b=S0waF408wufglvxMeJmrbw1kI/mjgD/oT5sEf/q15auZfk2dybtZV4SIAd53uc2cTx
+         jO6Ed7ldXcWOFosmsIjCZ+0C0Ic76XRyuMC8wmnPjcTfNl2AEHXdVFslCM8N+43wP/Qy
+         tVMAwGwYSnuK2V6QPEmgJZqhzDTucNSH8z5LbwRRikUjoiQQ/pZJx0Do/7xrXqBxALPa
+         TAovJI94lsrzduMH/H8lnybCqIsA1bmP+XsEFssM7dMqWGJkN+xHMFv8ptCa1dJ8JuUr
+         SakB0OMT6IwT+4QRca8Krzdf34Z5IDdUi3ZddEIrkd/LSd90ptqRefG5bYGWsm7mCSbf
+         /+zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688165776; x=1690757776;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y+QnFBcSRBuOpb7/7NCuCNZ3hM36J3/pYWSX0Cwatlw=;
+        b=gk1UVRpJlCvTN1KTd/Zo5gUXGRdISRcFYdgcmDA37JgsIR/oN7FhusspkL8Ehh4UKB
+         4Xo8j9US2UyFyWY4yWTdLnM7jFkvS3SrOtgvWxrT/DkgXqnAhYpKeNHwUVbdydHpsWPA
+         gTHsOAXQGJoGHxaAc6nnNQ2ku2R1PRXiVkYI1QQRCHcPXbQZsThlSXckb2xP0vd2jX7i
+         B3UWjbWVu2fnco7qIcpvEeFWvYE9GpkvCmaJv1+RZ1ZJ0XlvJEgPF2uMoAWC0WQgTMS2
+         6f661eyJnTZSdYHjKjrWZeK79t/bnWURacZcaXsV6PRbratSguvMyHr1vM46rHghyp2g
+         18EQ==
+X-Gm-Message-State: AC+VfDynaQy+BUi2x75S05RTwOuBxNk/UczrICjxh7d2yjlHXSFxhdP9
+        WFSmMxaBqDaPH1jug5lIP1OyBBS0x0M=
+X-Google-Smtp-Source: ACHHUZ7iPNwIykcY15LNzA+wFLMyr203vVFrF8aE2GhoGO8tUKRF6R2KJm2aQ5+nXurVT5iyhkPHkiH6wak=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:164f:b0:263:1117:32da with SMTP id
+ il15-20020a17090b164f00b00263111732damr4394158pjb.2.1688165776199; Fri, 30
+ Jun 2023 15:56:16 -0700 (PDT)
+Date:   Fri, 30 Jun 2023 15:56:14 -0700
+In-Reply-To: <ZJ6rBwy9p5bbdWrs@chao-email>
+Mime-Version: 1.0
+References: <20230630072612.1106705-1-aiqi.i7@bytedance.com> <ZJ6rBwy9p5bbdWrs@chao-email>
+Message-ID: <ZJ9djqQZWSEjJlfb@google.com>
+Subject: Re: [PATCH] kvm/x86: clear hlt for intel cpu when resetting vcpu
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     Qi Ai <aiqi.i7@bytedance.com>, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com, kvm@vger.kernel.org,
+        fengzhimin@bytedance.com, cenjiahui@bytedance.com,
+        fangying.tommy@bytedance.com, dengqiao.joey@bytedance.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/30/23 14:57, Michael Roth wrote:
-> On Mon, Jun 12, 2023 at 09:08:58AM -0700, Dave Hansen wrote:
->> On 6/11/23 21:25, Michael Roth wrote:
->>> +/*
->>> + * The RMP entry format is not architectural. The format is defined in PPR
->>> + * Family 19h Model 01h, Rev B1 processor.
->>> + */
->>> +struct rmpentry {
->>> +	union {
->>> +		struct {
->>> +			u64	assigned	: 1,
->>> +				pagesize	: 1,
->>> +				immutable	: 1,
->>> +				rsvd1		: 9,
->>> +				gpa		: 39,
->>> +				asid		: 10,
->>> +				vmsa		: 1,
->>> +				validated	: 1,
->>> +				rsvd2		: 1;
->>> +		} info;
->>> +		u64 low;
->>> +	};
->>> +	u64 high;
->>> +} __packed;
->>
->> What's 'high' used for?  The PPR says it's reserved.  Why not call it
->> reserved?
->>
->> It _looks_ like it's only used for a debugging pr_info().  It makes the
->> struct look kinda goofy.  I'd much rather limit the goofiness to the
->> "dumping" code, like:
->>
->>      u64 *__e = (void *)e;
->>      ....
->>      pr_info("RMPEntry paddr 0x%llx: [high=0x%016llx low=0x%016llx]\n",
->>                                pfn << PAGE_SHIFT, __e[0], __e[1]);
->>
->> BTW, why does it do any good to dump all these reserved fields?
->>
+mn Fri, Jun 30, 2023, Chao Gao wrote:
+> On Fri, Jun 30, 2023 at 03:26:12PM +0800, Qi Ai wrote:
+> >+				!is_protmode(vcpu))
+> >+			kvm_x86_ops.clear_hlt(vcpu);
 > 
-> The reserved bits sometimes contain information that can be useful to
-> pass along to folks on the firmware side, so would definitely be helpful
-> to provide the full raw contents of the RMP entry.
-
-Ahh, OK.  Could you include a comment to that effect, please?
-
-> So maybe something like this better captures the intended usage:
+> Use static_call_cond(kvm_x86_clear_hlt)(vcpu) instead.
 > 
->     struct rmpentry {
->         union {
->             struct {
->                 u64 assigned        : 1,
->                     pagesize        : 1,
->                     immutable       : 1,
->                     rsvd1           : 9,
->                     gpa             : 39,
->                     asid            : 10,
->                     vmsa            : 1,
->                     validated       : 1,
->                     rsvd2           : 1;
->                 u64 rsvd3;
->             } info;
->             u64 data[2];
->         };
->     } __packed;
-> 
-> But dropping the union and casting to u64[] locally in the debug/dumping
-> routine should work fine as well.
+> It looks incorrect that we add this side-effect heuristically here. I
 
-Yeah, I'd suggest doing the nasty casting in the debug function.  That
-makes it much more clear what the hardware is doing with the entries.
-The hardware doesn't treat the struct as 2*u64's at all.
+Yeah, adding heuristics to KVM_SET_REGS isn't happening.  KVM's existing hack
+for "Older userspace" in __set_sregs_common() is bad enough:
 
-...
->>> +	ret = rmptable_entry(paddr, entry);
->>> +	if (ret)
->>> +		return ret;
->>> +
->>> +	/* Read a large RMP entry to get the correct page level used in RMP entry. */
->>> +	ret = rmptable_entry(paddr & PMD_MASK, &large_entry);
->>> +	if (ret)
->>> +		return ret;
->>> +
->>> +	*level = RMP_TO_X86_PG_LEVEL(rmpentry_pagesize(&large_entry));
->>> +
->>> +	return 0;
->>> +}
->>
->> This is a bit weird.  Should it say something like this?
->>
->> To do an 4k RMP lookup the hardware looks at two places in the RMP:
-> 
-> I'd word this as:
-> 
->   "To query all the relevant bit of an 4k RMP entry, the kernel must access
->    2 entries in the RMP table:"
-> 
-> Because it's possible hardware only looks at the 2M entry for
-> hardware-based lookups, depending on where the access is coming from, or
-> how the memory at the PFN range is mapped.
-> 
-> But otherwise it seems like an accurate description.
+	/* Older userspace won't unhalt the vcpu on reset. */
+	if (kvm_vcpu_is_bsp(vcpu) && kvm_rip_read(vcpu) == 0xfff0 &&
+	    sregs->cs.selector == 0xf000 && sregs->cs.base == 0xffff0000 &&
+	    !is_protmode(vcpu))
+		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
 
-The wording you suggest is a bit imprecise.  For a 2M-aligned 4k page,
-there is only *one* location, *one* entry.
+> am wondering if we can link vcpu->arch.mp_state to VMCS activity state,
 
-Also, we're not doing a lookup for an RMP entry.  We're doing it for a
-_pfn_ that results in an RMP entry.
+Hrm, maybe.
 
-How about this:
+> i.e., when mp_state is set to RUNNABLE in KVM_SET_MP_STATE ioctl, KVM
+> sets VMCS activity state to active.
 
-/*
- * Find the authoritative RMP entry for a PFN.  This can be either a 4k
- * RMP entry or a special large RMP entry that is authoritative for a
- * whole 2M area.
- */
-...
->>> +#ifdef CONFIG_KVM_AMD_SEV
->>> +int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level);
->>> +#else
->>> +static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return 0; }
->>> +#endif
->>
->> Above, -ENXIO was returned when SEV-SNP was not supported.  Here, 0 is
->> returned when it is compiled out.  That inconsistent.
->>
->> Is snp_lookup_rmpentry() acceptable when SEV-SNP is in play?  I'd like
->> to see consistency between when it is compiled out and when it is
->> compiled in but unsupported on the CPU.
-> 
-> I really don't think anything in the kernel should be calling
-> snp_lookup_rmpentry(), so I think it makes sense to adoption the -ENXIO
-> convention here and in any other stubs where that applies.
+Not in the ioctl(), there needs to be a proper set of APIs, e.g. so that the
+existing hack works, and so that KVM actually reports out to userspace that a
+vCPU is HALTED if userspace gained control of the vCPU, e.g. after an IRQ exit,
+while the vCPU was HALTED.  I.e. mp_state versus vmcs.ACTIVITY_STATE needs to be
+bidirectional, not one-way.  E.g. if a vCPU is live migrated, I'm pretty sure
+vmcs.ACTIVITY_STATE is lost, which is wrong.
 
-Sounds good to me.  Just please make them consistent.
+The downside is that if KVM propagates vmcs.ACTIVITY_STATE to mp_state for the
+halted case, then KVM will enter kvm_vcpu_halt() instead of entering the guest
+in halted state, which is undesirable.   Hmm, that can be handled by treating
+the vCPU as running, e.g. 
+
+static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
+{
+	return (vcpu->arch.mp_state == KVM_MP_STATE_RUNNABLE ||
+		(vcpu->arch.mp_state == KVM_MP_STATE_HALTED &&
+		 kvm_hlt_in_guest(vcpu->kvm))) &&
+	       !vcpu->arch.apf.halted);
+}
+
+but that would have cascading effect to a whole pile of things.  I don't *think*
+they'd be used with kvm_hlt_in_guest(), but we've had weirder stuff.
+
+I'm half tempted to solve this particular issue by stuffing vmcs.ACTIVITY_STATE on
+shutdown, similar to what SVM does on shutdown interception.  KVM doesn't come
+anywhere near faithfully emulating shutdown, so it's unlikely to break anything.
+And then the mp_state vs. hlt_in_guest coulbe tackled separately.  Ugh, but that
+wouldn't cover a synthesized KVM_REQ_TRIPLE_FAULT.
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 44fb619803b8..ee4bb37067d1 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5312,6 +5312,8 @@ static __always_inline int handle_external_interrupt(struct kvm_vcpu *vcpu)
+ 
+ static int handle_triple_fault(struct kvm_vcpu *vcpu)
+ {
++       vmcs_write32(GUEST_ACTIVITY_STATE, GUEST_ACTIVITY_ACTIVE);
++
+        vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
+        vcpu->mmio_needed = 0;
+        return 0;
+
+
+I don't suppose QEMU can to blast INIT at all vCPUs for this case?
