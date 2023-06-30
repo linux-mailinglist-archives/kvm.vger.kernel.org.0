@@ -2,87 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 381EF743B95
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 14:08:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7572743BE1
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 14:30:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233014AbjF3MIw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 08:08:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50414 "EHLO
+        id S232365AbjF3MaD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 08:30:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232904AbjF3MIe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 08:08:34 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD4D14C31;
-        Fri, 30 Jun 2023 05:07:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=aQIbBeHHxL8b1EjNDcJ4bA1/I8pw3VBqIBojsRFOLbw=; b=KC/TbbzT8bzIA0JpUlRQYGkWSu
-        X36S4/OI2xzOEihSBR6z3wSl1KCcHUBx4VX7XNxsLT9r0RDfusT+qDwypgxa2N2qTmYDJZbwKmPHo
-        afaRLdxGeSE1dFf81lP+9jSfsYVKnLeTp9Xlz58gos5YrnsB+H3ln/H4v+d2+LynRreSEDtIViXqF
-        EVweNvkVBisoB9UnnDIQu1Gl/yksQNfy3ois/kPe3S6Zu323pM5taGFZ4WpIJh+LiT5Xt5TNsGaIZ
-        wjUCmtD54dZSTarHds4fj4AMRwlh28BlrQovnx+z1An9E1XKvSSpvsAXfl9OZahC0gHLlGhH6sXlE
-        wGpkDy/w==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qFCto-007yu1-06;
-        Fri, 30 Jun 2023 12:06:53 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 41827300338;
-        Fri, 30 Jun 2023 14:06:50 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 28EC024806A2C; Fri, 30 Jun 2023 14:06:50 +0200 (CEST)
-Date:   Fri, 30 Jun 2023 14:06:50 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "nik.borisov@suse.com" <nik.borisov@suse.com>,
-        "hpa@zytor.com" <hpa@zytor.com>, "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH v12 20/22] x86/virt/tdx: Allow SEAMCALL to handle #UD and
- #GP
-Message-ID: <20230630120650.GB2534364@hirez.programming.kicks-ass.net>
-References: <cover.1687784645.git.kai.huang@intel.com>
- <c124550719716f1f7759c2bdea70f4722d8e0167.1687784645.git.kai.huang@intel.com>
- <20230628152900.GI2438817@hirez.programming.kicks-ass.net>
- <20230628203823.GR38236@hirez.programming.kicks-ass.net>
- <42e13ccf7f27a68c0dd64640eed378c38ef40967.camel@intel.com>
- <20230630100659.GF2533791@hirez.programming.kicks-ass.net>
- <20230630102141.GA2534364@hirez.programming.kicks-ass.net>
+        with ESMTP id S229578AbjF3MaB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 08:30:01 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 188941FFD;
+        Fri, 30 Jun 2023 05:30:01 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35UCH6h8007255;
+        Fri, 30 Jun 2023 12:30:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references :
+ subject : from : cc : to : message-id : date; s=pp1;
+ bh=uDWtMKlD2xe6wFahLSDNmJmGOuV5OV2j+L2uW8Is1o4=;
+ b=ZldScI3CJce0fRbfAcHoKF6gXJK8JJKj/K9B9Opj/hNfxV3Xjl/Mu/k+K68iknhxZx6h
+ SXtLtT7++UL8p7hl6zg4mBitg4CPAWNTSzc5FoN4VIpg4rJGb2OdUJM6/v0Fh5wCsBzR
+ oOa7Wg2x6kifoDU30K4DRtVW9nYEjQIhKK3q1IFfKiEXxqjeC/dDfOhs0/4sHv9nbnBm
+ 8TN0aoRtBBz1r/d0GIYVqRoqgB/CnlMnqFf31cY31BRk1lSh/D4X3xzzVKigogcxbEll
+ jlVGOvUYNIhnWD6uHBsZShgQI0TK915DSv8Ic/A2MoEYA1wnU6fLqoHIJVCenm1sXLvd ow== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rhxwtgahp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Jun 2023 12:30:00 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35UCIQeH011484;
+        Fri, 30 Jun 2023 12:30:00 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rhxwtgaga-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Jun 2023 12:29:59 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35U2AHMB019719;
+        Fri, 30 Jun 2023 12:29:56 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3rdqre4594-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Jun 2023 12:29:55 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35UCTqed23397062
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 30 Jun 2023 12:29:52 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2F0EA2004E;
+        Fri, 30 Jun 2023 12:29:52 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A8182004D;
+        Fri, 30 Jun 2023 12:29:52 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.51.244])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 30 Jun 2023 12:29:51 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230630102141.GA2534364@hirez.programming.kicks-ass.net>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230627082155.6375-1-pmorel@linux.ibm.com>
+References: <20230627082155.6375-1-pmorel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v10 0/2] S390x: CPU Topology Information
+From:   Nico Boehr <nrb@linux.ibm.com>
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
+Message-ID: <168812819166.15775.3844560015451726762@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Fri, 30 Jun 2023 14:29:51 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: oVXDLg4OerJawxdZaMFs-dnuWJQG9CBF
+X-Proofpoint-ORIG-GUID: VDmmexvbBou0CVXDhojxJ_YlF4L0QJmS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-30_05,2023-06-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ malwarescore=0 adultscore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0
+ suspectscore=0 phishscore=0 spamscore=0 mlxlogscore=999 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2306300103
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,243 +91,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 30, 2023 at 12:21:41PM +0200, Peter Zijlstra wrote:
-> On Fri, Jun 30, 2023 at 12:07:00PM +0200, Peter Zijlstra wrote:
-> > On Thu, Jun 29, 2023 at 10:33:38AM +0000, Huang, Kai wrote:
-> 
-> > > Looking at the later versions of TDX spec (with TD live migration, etc), it
-> > > seems they are already using R12-R13 as SEAMCALL output:
-> > > 
-> > > https://cdrdv2.intel.com/v1/dl/getContent/733579
-> > 
-> > Urgh.. I think I read an older versio because I got bleeding eyes from
-> > all this colour coded crap.
-> > 
-> > All this red is unreadable :-( Have they been told about the glories of
-> > TeX and diff ?
-> > 
-> > > E.g., 6.3.15. NEW: TDH.IMPORT.MEM Leaf
-> > > 
-> > > It uses R12 and R13 as input.
-> > 
-> > 12 and 14. They skipped 13 for some mysterious raisin.
-> 
-> Things like TDH.SERVTD.BIND do use R13.
-> 
-> > But also, 10,11 are frequently used as input with this new stuff, which
-> > already suggests the setup from your patches is not tenable.
-> 
-> 
-> TDG.SERVTD.RD *why* can't they pass that TD_UUID as a pointer? Using *4*
-> registers like that is quite insane.
-> 
-> TDG.VP.ENTER :-(((( that has b,15,si,di as additional output.
-> 
-> That means there's not a single register left unused. Can we still get
-> this changed, please?!?
+Quoting Pierre Morel (2023-06-27 10:21:53)
+> Hi,
+>=20
+> new version of the kvm-unit-test s390x CPU topology series.
 
-Can't :/, VP.ENTER mirrors VP.VMCALL, so we need to deal with both.
-
-So I think the below deals with everything and unifies __tdx_hypercall()
-and __tdx_module_call(), since both sides needs to deal with exactly the
-same trainwreck.
-
-
-/*
- * Used for input/output registers values of the TDCALL and SEAMCALL
- * instructions when requesting services from the TDX module.
- *
- * This is a software only structure and not part of the TDX module/VMM ABI.
- */
-struct tdx_module_args {
-	/* callee-clobbered */
-	u64 rdx;
-	u64 rcx;
-	u64 r8;
-	u64 r9;
-	/* extra callee-clobbered */
-	u64 r10;
-	u64 r11;
-	/* callee-saved + rdi/rsi */
-	u64 rdi;
-	u64 rsi;
-	u64 rbx;
-	u64 r12;
-	u64 r13;
-	u64 r14;
-	u64 r15;
-};
-
-
-
-/*
- * TDX_MODULE_CALL - common helper macro for both
- *                   TDCALL and SEAMCALL instructions.
- *
- * TDCALL   - used by TDX guests to make requests to the
- *            TDX module and hypercalls to the VMM.
- *
- * SEAMCALL - used by TDX hosts to make requests to the
- *            TDX module.
- *
- *-------------------------------------------------------------------------
- * TDCALL/SEAMCALL ABI:
- *-------------------------------------------------------------------------
- * Input Registers:
- *
- * RAX                 - Leaf number.
- * RCX,RDX,R8-R11      - Leaf specific input registers.
- * RDI,RSI,RBX,R11-R15 - VP.VMCALL VP.ENTER
- *
- * Output Registers:
- *
- * RAX                 - instruction error code.
- * RCX,RDX,R8-R11      - Leaf specific output registers.
- * RDI,RSI,RBX,R12-R15 - VP.VMCALL VP.ENTER
- *
- *-------------------------------------------------------------------------
- *
- * So while the common core (RAX,RCX,RDX,R8-R11) fits nicely in the
- * callee-clobbered registers and even leaves RDI,RSI free to act as a base
- * pointer some rare leafs (VP.VMCALL, VP.ENTER) make a giant mess of things.
- *
- * For simplicity, assume that anything that needs the callee-saved regs also
- * tramples on RDI,RSI. This isn't strictly true, see for example EXPORT.MEM.
- */
-.macro TDX_MODULE_CALL host:req ret:req saved:0
-	FRAME_BEGIN
-
-	movq	%rdi, %rax
-
-	movq	TDX_MODULE_rcx(%rsi), %rcx
-	movq	TDX_MODULE_rdx(%rsi), %rdx
-	movq	TDX_MODULE_r8(%rsi),  %r8
-	movq	TDX_MODULE_r9(%rsi),  %r9
-	movq	TDX_MODULE_r10(%rsi), %r10
-	movq	TDX_MODULE_r11(%rsi), %r11
-
-.if \saved
-	pushq	rbx
-	pushq	r12
-	pushq	r13
-	pushq	r14
-	pushq	r15
-
-	movq	TDX_MODULE_rbx(%rsi), %rbx
-	movq	TDX_MODULE_r12(%rsi), %r12
-	movq	TDX_MODULE_r13(%rsi), %r13
-	movq	TDX_MODULE_r14(%rsi), %r14
-	movq	TDX_MODULE_r15(%rsi), %r15
-
-	/* VP.VMCALL and VP.ENTER */
-.if \ret
-	pushq	%rsi
-.endif
-	movq	TDX_MODULE_rdi(%rsi), %rdi
-	movq	TDX_MODULE_rsi(%rsi), %rsi
-.endif
-
-.Lcall:
-.if \host
-	seamcall
-	/*
-	 * SEAMCALL instruction is essentially a VMExit from VMX root
-	 * mode to SEAM VMX root mode.  VMfailInvalid (CF=1) indicates
-	 * that the targeted SEAM firmware is not loaded or disabled,
-	 * or P-SEAMLDR is busy with another SEAMCALL. RAX is not
-	 * changed in this case.
-	 */
-	jc	.Lseamfail
-
-.if \saved && \ret
-	/*
-	 * VP.ENTER clears RSI on output, use it to restore state.
-	 */
-	popq	%rsi
-	xor	%edi,%edi
-	movq	%rdi, TDX_MODULE_rdi(%rsi)
-	movq	%rdi, TDX_MODULE_rsi(%rsi)
-.endif
-.else
-	tdcall
-
-	/*
-	 * RAX!=0 indicates a failure, assume no return values.
-	 */
-	testq	%rax, %rax
-	jne	.Lerror
-
-.if \saved && \ret
-	/*
-	 * Since RAX==0, it can be used as a scratch register to restore state.
-	 *
-	 * [ assumes \saved implies \ret ]
-	 */
-	popq	%rax
-	movq	%rdi, TDX_MODULE_rdi(%rax)
-	movq	%rsi, TDX_MODULE_rsi(%rax)
-	movq	%rax, %rsi
-	xor	%eax, %eax;
-.endif
-.endif // \host
-
-.if \ret
-	/* RSI is restored */
-	movq	%rcx, TDX_MODULE_rcx(%rsi)
-	movq	%rdx, TDX_MODULE_rdx(%rsi)
-	movq	%r8,  TDX_MODULE_r8(%rsi)
-	movq	%r9,  TDX_MODULE_r9(%rsi)
-	movq	%r10, TDX_MODULE_r10(%rsi)
-	movq	%r11, TDX_MODULE_r11(%rsi)
-.if \saved
-	movq	%rbx, TDX_MODULE_rbx(%rsi)
-	movq	%r12, TDX_MODULE_r12(%rsi)
-	movq	%r13, TDX_MODULE_r13(%rsi)
-	movq	%r14, TDX_MODULE_r14(%rsi)
-	movq	%r15, TDX_MODULE_r15(%rsi)
-.endif
-.endif // \ret
-
-.Lout:
-.if \saved
-	popq	%r15
-	popq	%r14
-	popq	%r13
-	popq	%r12
-	popq	%rbx
-.endif
-	FRAME_END
-	RET
-
-	/*
-	 * Error and exception handling at .Lcall. Ignore \ret on failure.
-	 */
-.Lerror:
-.if \saved && \ret
-	popq	%rsi
-.endif
-	jmp	.Lout
-
-.if \host
-.Lseamfail:
-	/*
-	 * Set RAX to TDX_SEAMCALL_VMFAILINVALID for VMfailInvalid.
-	 * This value will never be used as actual SEAMCALL error code as
-	 * it is from the Reserved status code class.
-	 */
-	movq	$TDX_SEAMCALL_VMFAILINVALID, %rax
-	jmp	.Lerror
-
-.Lfault:
-	/*
-	 * SEAMCALL caused #GP or #UD. Per _ASM_EXTABLE_FAULT() RAX
-	 * contains the trap number, convert to a TDX error code by
-	 * setting the high word to TDX_SW_ERROR.
-	 */
-	mov	$TDX_SW_ERROR, %rdi
-	or	%rdi, %rax
-	jmp	.Lerror
-
-	_ASM_EXTABLE_FAULT(.Lcall, .Lfault)
-.endif
-.endm
+This is now on our internal CI, so we can at least see that it doesn't brea=
+k anything when the topology is not yet there :)
