@@ -2,75 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F3EB74336E
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 06:17:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66ADB7433AB
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 06:43:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbjF3EQ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 00:16:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49460 "EHLO
+        id S231431AbjF3EnM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 00:43:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232262AbjF3EQw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 00:16:52 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27EE42102;
-        Thu, 29 Jun 2023 21:16:51 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id ACB546169F;
-        Fri, 30 Jun 2023 04:16:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 22103C433C9;
-        Fri, 30 Jun 2023 04:16:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688098610;
-        bh=bpYbLvucEyJ32hINQQAQ1CbkrNPXOnYsO/mnvxbBwgU=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=pRrInoFre+XhTKOgxiBi03JEdDp+Tnh12rKVLC6Csk3NyAwIN6So9WbxEt1V4WFp2
-         66EehYbIgUXUN6wjXXYhPp9lHgquFRrSh0+QBtkMpYlGe6bxdif3AAAZYSSdFvbO0y
-         UG9HFJjmm7QVTt6mmIz7OtpQnAtFWVLwV+zuu0ACdJc0D1kw9+NZkrOQz9t3AXowKW
-         c0wIQdl1zsTbhflUln8DKzX1gNEXdbc4SzPKKkztBrz1Lba6zHM2eOHGzNuvhcRjhC
-         QqSOX/q1clXzoX7mBEl5n25p6/UcBd1TwcmbG6fZKXXbjPntKLQ7Ftb9SQaAg2fpnL
-         G9SeqYFn6X4WA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0F2CFC6445A;
-        Fri, 30 Jun 2023 04:16:50 +0000 (UTC)
-Subject: Re: [GIT PULL] Please pull IOMMUFD subsystem changes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <ZJw95Knh/UEL6vQh@nvidia.com>
-References: <ZJw95Knh/UEL6vQh@nvidia.com>
-X-PR-Tracked-List-Id: <iommu.lists.linux.dev>
-X-PR-Tracked-Message-Id: <ZJw95Knh/UEL6vQh@nvidia.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git tags/for-linus-iommufd
-X-PR-Tracked-Commit-Id: dbe245cdf5189e88d680379ed13901356628b650
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 31929ae00890d921618b0b449722dcdf4a4416cc
-Message-Id: <168809861005.23778.16859013806626555298.pr-tracker-bot@kernel.org>
-Date:   Fri, 30 Jun 2023 04:16:50 +0000
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        iommu@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S230141AbjF3EnL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 00:43:11 -0400
+Received: from 189.cn (ptr.189.cn [183.61.185.104])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 33987210E;
+        Thu, 29 Jun 2023 21:43:08 -0700 (PDT)
+HMM_SOURCE_IP: 10.64.8.41:36042.36167694
+HMM_ATTACHE_NUM: 0000
+HMM_SOURCE_TYPE: SMTP
+Received: from clientip-114.242.206.180 (unknown [10.64.8.41])
+        by 189.cn (HERMES) with SMTP id C76A010013F;
+        Fri, 30 Jun 2023 12:43:02 +0800 (CST)
+Received: from  ([114.242.206.180])
+        by gateway-151646-dep-6d8594f54d-zsdp9 with ESMTP id 5b3173dd4b264e9cbf3fad1bf2583dd6 for mario.limonciello@amd.com;
+        Fri, 30 Jun 2023 12:43:06 CST
+X-Transaction-ID: 5b3173dd4b264e9cbf3fad1bf2583dd6
+X-Real-From: 15330273260@189.cn
+X-Receive-IP: 114.242.206.180
+X-MEDUSA-Status: 0
+Sender: 15330273260@189.cn
+Message-ID: <b7528e1d-7f71-016c-f0ef-a044586b7765@189.cn>
+Date:   Fri, 30 Jun 2023 12:42:59 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v7 6/8] PCI/VGA: Introduce is_boot_device function
+ callback to vga_client_register
+To:     "Limonciello, Mario" <Mario.Limonciello@amd.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Sui Jingfeng <suijingfeng@loongson.cn>
+Cc:     Bjorn Helgaas <bhelgaas@google.com>,
+        "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Karol Herbst <kherbst@redhat.com>,
+        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "Chai, Thomas" <YiPeng.Chai@amd.com>,
+        "Gao, Likun" <Likun.Gao@amd.com>, David Airlie <airlied@gmail.com>,
+        Ville Syrjala <ville.syrjala@linux.intel.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        "Lazar, Lijo" <Lijo.Lazar@amd.com>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        "Zhang, Bokun" <Bokun.Zhang@amd.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        "Deucher, Alexander" <Alexander.Deucher@amd.com>,
+        "Koenig, Christian" <Christian.Koenig@amd.com>,
+        "Zhang, Hawking" <Hawking.Zhang@amd.com>
+References: <20230629155436.GA397963@bhelgaas>
+ <bcfdc77d-a94d-bca1-56e3-5e14e91f6fd9@189.cn>
+ <MN0PR12MB6101CDB6FF9DC8F8EDEF5F45E225A@MN0PR12MB6101.namprd12.prod.outlook.com>
+Content-Language: en-US
+From:   Sui Jingfeng <15330273260@189.cn>
+In-Reply-To: <MN0PR12MB6101CDB6FF9DC8F8EDEF5F45E225A@MN0PR12MB6101.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
+        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FROM,FROM_LOCAL_DIGITS,
+        FROM_LOCAL_HEX,NICE_REPLY_A,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Wed, 28 Jun 2023 11:04:20 -0300:
+Hi,
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git tags/for-linus-iommufd
+On 2023/6/30 01:44, Limonciello, Mario wrote:
+> I think what you can do is pick up all the tags in your next version.  Once the
+> whole series has tags we can discuss how it merges.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/31929ae00890d921618b0b449722dcdf4a4416cc
+Yes, you are right.
 
-Thank you!
+I will prepare the next version.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+But I think, I should only gather the reverent part together.
+
+I means that I probably should divide the 8 patches in V7 into 4 + 4.
+
+The first four patch form a group, and the last four patch form another 
+group.
+
+
+Certainly, I will pick up the precious tags I got in the next version.
+
+Thanks you!
+
