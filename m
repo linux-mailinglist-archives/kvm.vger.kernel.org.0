@@ -2,135 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC046744176
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 19:42:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DEAD7441BA
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 20:04:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232769AbjF3RmB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 13:42:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52792 "EHLO
+        id S232367AbjF3SEQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 14:04:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232119AbjF3RmA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 13:42:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9EFD1BDF;
-        Fri, 30 Jun 2023 10:41:59 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 40A68617CA;
-        Fri, 30 Jun 2023 17:41:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45920C433C0;
-        Fri, 30 Jun 2023 17:41:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688146918;
-        bh=oBuH5pzv1m4U165eHXlxwEABZcjqI8yl/lnDYOcl6ZI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=A7CbpXg3brFiPOI2ytxu8IpWxHI3M+/swPov9cHayuiqO9cMATSG6c4ez6MFGNO0z
-         Ru8EowGY/rqrRQIZwEhDZTnk+iduM52sCwhkWlTTCl8+a5J9Km01kl5HI3fQzFq2Lq
-         wOjgPd6RxDUg7m4ocetVdyjL+MealrAsXh9h9PMnDDoFqivVT/qQoq3c/TGjtjiqN/
-         eHYBXPGgPFhstAo0o8ix5t3xiMpkLqrACIll6PSfK9pdsSXGZRuCxFRzU8s+FYzCAc
-         zL43+fczW0etE3m5c1GVglsbsvMe5lL55YAga1mOHJkaKrmOGii/a/rGs1ilq7P74h
-         ZnlgoVz7lUrlg==
-Date:   Fri, 30 Jun 2023 12:41:56 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     suijingfeng <suijingfeng@loongson.cn>
-Cc:     "Limonciello, Mario" <Mario.Limonciello@amd.com>,
-        "15330273260@189.cn" <15330273260@189.cn>,
-        "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "Chai, Thomas" <YiPeng.Chai@amd.com>,
-        "Gao, Likun" <Likun.Gao@amd.com>, David Airlie <airlied@gmail.com>,
-        Ville Syrjala <ville.syrjala@linux.intel.com>,
-        Yi Liu <yi.l.liu@intel.com>, Karol Herbst <kherbst@redhat.com>,
-        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "Lazar, Lijo" <Lijo.Lazar@amd.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        "Zhang, Bokun" <Bokun.Zhang@amd.com>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        "Deucher, Alexander" <Alexander.Deucher@amd.com>,
-        "Koenig, Christian" <Christian.Koenig@amd.com>,
-        "Zhang, Hawking" <Hawking.Zhang@amd.com>
-Subject: Re: [PATCH v7 6/8] PCI/VGA: Introduce is_boot_device function
- callback to vga_client_register
-Message-ID: <20230630174156.GA487980@bhelgaas>
+        with ESMTP id S229991AbjF3SEO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 14:04:14 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F69610F8
+        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 11:04:13 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b698dd515dso33687641fa.3
+        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 11:04:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688148251; x=1690740251;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=uYdGoo2IprrfPMUF4ijD753EkS4/HIm2RYWkY/Jxr5s=;
+        b=sQJDPDPhU2yH6TxF/IrqYPa+x/nB9NHhP5ZlgmLDc0NrTPtN6RfViTuwDGygdN4Vlg
+         TMfS90ClO96XXxSWl0mIbkPIKDzEtoegAUh8cODszQPcpeYbW+WaX37dwoRIWuPcJR+t
+         d80fxgxuomyGG9jujER1E9SG+C9m2C8GsCCOXJwgniprVhvs+JK0QPdw3myFBU7cE8U0
+         AgPvlmBHNinIuKuBLbPKUyaU7k0KAOAdEGmxk6NAygQBjlC1mO0Gmgf1QuxZnmBp11qE
+         NGkF8UORud38UcyO+Gp1nPTt5imwNgT/6eaEKYgiNdNqUo4Y8r9ahk1uowm+W8OS9rUH
+         vmYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688148251; x=1690740251;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uYdGoo2IprrfPMUF4ijD753EkS4/HIm2RYWkY/Jxr5s=;
+        b=O7oiMPv24Br5gFpLr/OjIIZlxRfQ0RHAF/Aeennot/IC3dhHb1xgxdNmQwJCowURKQ
+         olxfUAn658UwbaCN/6RBGQYpJef8R95d9bdjizq7/hKbPWoJvykbj7pPFxTQaXlA/YKn
+         FHqXS2owtAw/Um5/fNHPFxVXIyT5QneYyy55lLkZz/K06d9/KHEx4/2gPP92Jn4dFTTY
+         5SBfYfVsgrLKGXpn8aab2taKSNgddPIb7TXwUx1Il7EjbBfMN5SUGmvIJCvjelfrLF7o
+         zhoVbBdrwiVjUl7M4LElC6eA3YM8OW8q/4kXD3YHbYm3/S9FGhUnyWmAWK6xRSn9MPm8
+         WO0A==
+X-Gm-Message-State: ABy/qLY3aP6e+8p6vCtvjSW3Wssli2vDbo4QvEYI7KzLzS1rXK8YLcZ6
+        k2I2+MxMbG+QlYf3hzzFhAGg6jI+p1BsP2Zvp6PSFA==
+X-Google-Smtp-Source: APBJJlEtwaUdbybFWqQjeuK+sGhxwAg1iNgt4IfVkag0T/duKX4X+vo+xgVFLbleKQ4zuteEzNZdIE7/+bycQNdjoZw=
+X-Received: by 2002:a2e:980c:0:b0:2b4:8168:2050 with SMTP id
+ a12-20020a2e980c000000b002b481682050mr2486687ljj.29.1688148251192; Fri, 30
+ Jun 2023 11:04:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2c81fbe3-308a-4c5e-0150-32006253b3ea@loongson.cn>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230504120042.785651-1-rkagan@amazon.de> <ZH6DJ8aFq/LM6Bk9@google.com>
+ <CALMp9eS3F08cwUJbKjTRAEL0KyZ=MC==YSH+DW-qsFkNfMpqEQ@mail.gmail.com>
+ <ZJ4dmrQSduY8aWap@google.com> <ZJ65CiW0eEL2mGg8@u40bc5e070a0153.ant.amazon.com>
+ <ZJ7mjdZ8h/RSilFX@google.com> <ZJ7y9DuedQyBb9eU@u40bc5e070a0153.ant.amazon.com>
+ <ZJ74gELkj4DgAk4S@google.com> <CAL715WL9T8Ucnj_1AygwMgDjOJrttNZHRP9o-KUNfpx1aYZnog@mail.gmail.com>
+ <CALMp9eSQ9uRBVdLDkfCdPbprZ45LpdZY5-5O9i41oJYs-dK7+Q@mail.gmail.com> <CAL715WJDjox6AOU=gzN_E-VPL8aXMuD+SkN3k18T=imoS_dKaw@mail.gmail.com>
+In-Reply-To: <CAL715WJDjox6AOU=gzN_E-VPL8aXMuD+SkN3k18T=imoS_dKaw@mail.gmail.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Fri, 30 Jun 2023 11:03:34 -0700
+Message-ID: <CAL715WJfOXOovUJSBtC0SfXVTuXEXwRF3sQBUzGaPDXe99dRoQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Roman Kagan <rkagan@amazon.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Hankland <ehankland@google.com>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Like Xu <likexu@tencent.com>, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 30, 2023 at 10:14:11AM +0800, suijingfeng wrote:
-> On 2023/6/30 01:44, Limonciello, Mario wrote:
-> > > On 2023/6/29 23:54, Bjorn Helgaas wrote:
-> > > > On Thu, Jun 22, 2023 at 01:08:15PM +0800, Sui Jingfeng wrote:
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 48a0528080ab..8d28158e58f2 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -322,7 +322,7 @@ static void reprogram_counter(struct kvm_pmc *pmc)
+>         if (!pmc_event_is_allowed(pmc))
+>                 goto reprogram_complete;
+>
+> -       if (pmc->counter < pmc->prev_counter)
+> +       if (pmc->counter == 0)
+>                 __kvm_perf_overflow(pmc, false);
+>
+>         if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
+>
+> Since this is software emulation, we (KVM) should only handle overflow
+> by plusing one?
 
-> > > > 4) Right now we're in the middle of the v6.5 merge window, so new
-> > > >      content, e.g., this series, is too late for v6.5.  Most
-> > > >      maintainers, including me, wait to merge new content until the
-> > > >      merge window closes and a new -rc1 is tagged.  This merge window
-> > > >      should close on July 9, and people will start merging content for
-> > > >      v6.6, typically based on v6.5-rc1.
-> > > 
-> > > Would you will merge all of the patches in this series (e.g. including
-> > > the patch for drm/amdgpu(7/8) and drm/radeon(8/8)) ?
-> > > 
-> > > Or just part of them?
-
-The bulk of this series is drivers/pci changes, so typically I would
-merge all the patches after getting Acked-by tags from the other
-subsystems (DRM and VFIO).
-
-> Is it possible to merge the PCI/VGA part as fast as possible,
-> especially the PATCH-0006 PCI/VGA: Introduce is_boot_device function
-> callback to vga_client_register
-
-We're in the middle of the v6.5 merge window, so it's too late to add
-things to v6.5-rc1.  The most likely path for new material like this
-would be to queue it for v6.6, which means I would merge it after
-v6.5-rc1 is tagged (that tag will probably happen on July 9).
-
-It would then be in -next until the v6.6 merge window opens (likely in
-September), when it would be merged into Linus' tree.
-
-If the series fixes a regression or other major defect, it's
-*possible* to merge things earlier, so they appear in v6.5.  But this
-series doesn't seem to fall in that category, so I think v6.6 is a
-more realistic target.
-
-Merging for v6.6 would include both the PCI parts and the DRM parts at
-the same time, so hopefully that addresses your dependency concerns.
-
-I suggest that you wait until v6.5-rc1, rebase your patches so they
-apply cleanly on that tag, collect all the Reviewed-by and Acked-by
-tags, include them in your commit logs, and then repost them.
-
-Bjorn
+Sign. Please ignore this as it is not only hacky but also not working.
