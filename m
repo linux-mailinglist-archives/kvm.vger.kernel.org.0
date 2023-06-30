@@ -2,93 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C347E743E71
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 17:16:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32AEF743E83
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 17:18:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232646AbjF3PQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 11:16:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35198 "EHLO
+        id S232682AbjF3PSv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 11:18:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232509AbjF3PQG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 11:16:06 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6A7F468F
-        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 08:15:26 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-565ba5667d5so18305607b3.0
-        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 08:15:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688138126; x=1690730126;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z7oJzLLPGW/Cx9f/CDqtoSXPOSWREn06ZdPTZhJC3Go=;
-        b=AfsXkZXlZJPvva1bmvipN9xiFdW0LWN5Ibj64QQvTBdzXdIrAXkFx0kUhmllcfNyjr
-         pAlOJ7sJPNzfIfdXxHCn+R1qQiqSw5cQGKtoSE6I6+1q8qU/HMbjfixp7a/mjyvMyoSN
-         b02kSEaYdL50YI1V7wz8SUtGgKFRBMVHxhqhbre0ua4nYdt2U9kAYDTJdJqzJlwBBfYb
-         Wkx8i9WsPC9wi3bibCZvTbX2brPCZKCZVckU/uqISG3uTscgkQcXTeIN9YeVJyoaCl7A
-         zKj67sA93xoBdrCn5C5jXdJufo2VXCIJY2kHP7iLx/xm7YwAjcj3Z6QR/wXS39Pna9ie
-         b2fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688138126; x=1690730126;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z7oJzLLPGW/Cx9f/CDqtoSXPOSWREn06ZdPTZhJC3Go=;
-        b=g6nih9lEtPY1pxxHuDB5LxhxT0mSTjSDpEj/K9InMcIHDMO8bNxcTP3w/t5XJkwoJs
-         LIO4EGv2OC5zMvRfZk27XZBYoPUPrgE0nQuEuvrNkR/CHr24xeIv2EC4WXnZC0M5Qkvk
-         Ihdxk7bqWQcn5QazJyMR7LGlbmG4EZHtgIvCyzzEM74OxKsti+TXEIfhWpxHrHGR9086
-         dDYJxcd7/UP5P6plLDZ876+T3GHW6q75x8P/MIVB7rXT//fM+J0HnOPYyTjc6N9C35Mo
-         C4TJbJ+N09qKe+bpWNy8XmCOh5VRBZt1JjKJTUO9PmAWmRdworKb+rcPxDwi5YjRzdQH
-         RkOQ==
-X-Gm-Message-State: ABy/qLb+87P/mY1xe+XEZYYyHNKWfr2HT0/eNxq0kHZUXNpRV1Paf8Bs
-        NFP/JZdWS8XNxu6N5bJ+X6gRMf57Iug=
-X-Google-Smtp-Source: APBJJlHTHksxFR2/TcaLyjYYDz1o/aFwnGkFGVCI/XRMxF6grQX75vNH1cRAuBQ+JkPyf3jb4+BDxo/E2y0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ac0b:0:b0:c3f:b53e:b2c2 with SMTP id
- w11-20020a25ac0b000000b00c3fb53eb2c2mr22548ybi.0.1688138125852; Fri, 30 Jun
- 2023 08:15:25 -0700 (PDT)
-Date:   Fri, 30 Jun 2023 08:15:24 -0700
-In-Reply-To: <CO1PR11MB5107FBC68DBA6877E390A633912AA@CO1PR11MB5107.namprd11.prod.outlook.com>
-Mime-Version: 1.0
-References: <20230511040857.6094-11-weijiang.yang@intel.com>
- <ZH73kDx6VCaBFiyh@chao-email> <21568052-eb0f-a8d6-5225-3b422e9470e9@intel.com>
- <ZIulniryqlj0hLnt@google.com> <dfdf6d93-a68c-bb07-e59e-8d888dd6ebb6@intel.com>
- <ZIywqx6xTAMFyDPT@google.com> <0a98683f-3e60-1f1b-55df-f2a781929fdf@intel.com>
- <ZJ6uKZToMPfwoXW6@chao-email> <8dec8b09-2568-a664-e51d-e6ff9f49e7de@intel.com>
- <CO1PR11MB5107FBC68DBA6877E390A633912AA@CO1PR11MB5107.namprd11.prod.outlook.com>
-Message-ID: <ZJ7xjE0qMjpYIiB/@google.com>
-Subject: Re: [PATCH v3 10/21] KVM:x86: Add #CP support in guest exception classification
-From:   Sean Christopherson <seanjc@google.com>
-To:     Gil Neiger <gil.neiger@intel.com>
-Cc:     Weijiang Yang <weijiang.yang@intel.com>,
-        Chao Gao <chao.gao@intel.com>,
+        with ESMTP id S232402AbjF3PSc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 11:18:32 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2541A469B;
+        Fri, 30 Jun 2023 08:17:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688138267; x=1719674267;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=vNkj93/5Q0qPJqdsxO49mwhsALqQK4kXJEFlJaSNhnE=;
+  b=S18uEx3lk1G0nR2kIoaSVGv25QB6PwuweY4F3PAx1bb55zJxQcD85+Kz
+   VSNQkwDWkccXwVBeKG4qIFeFpNh6xe10oINPOzluuMZVDzabwCL9bGDcu
+   oW+LhTYKpVwuXXyad4klg1NeonOZbEQHjY2dnNtgB69G0UkDGFSkS8wEy
+   qDWYH19KN4fT2+4dh99cbl/b11C9oVXYGwOLa8/xCXMJ8eJzZ10QwSa7n
+   gG5vSh8zrlQSZyyeg9+/2XHTJPaVkUkcEypIUFrTaKdW0pPI0mFSlE2Vv
+   REUExvMMqNov/O3WSqSfZ/VGXBrd4gO6aCo07c2w0xBX/RLRN46XdaOhX
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="448793795"
+X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
+   d="scan'208";a="448793795"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 08:16:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="747455463"
+X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
+   d="scan'208";a="747455463"
+Received: from amuruge1-mobl.amr.corp.intel.com (HELO [10.252.133.96]) ([10.252.133.96])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 08:16:51 -0700
+Message-ID: <1121357f-93ad-9016-36be-8bc34c256b16@intel.com>
+Date:   Fri, 30 Jun 2023 08:16:50 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v12 20/22] x86/virt/tdx: Allow SEAMCALL to handle #UD and
+ #GP
+Content-Language: en-US
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "rppt@kernel.org" <rppt@kernel.org>,
-        "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-        Rick P Edgecombe <rick.p.edgecombe@intel.com>,
-        "john.allen@amd.com" <john.allen@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "nik.borisov@suse.com" <nik.borisov@suse.com>,
+        "hpa@zytor.com" <hpa@zytor.com>, "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>
+References: <cover.1687784645.git.kai.huang@intel.com>
+ <c124550719716f1f7759c2bdea70f4722d8e0167.1687784645.git.kai.huang@intel.com>
+ <20230628152900.GI2438817@hirez.programming.kicks-ass.net>
+ <20230628203823.GR38236@hirez.programming.kicks-ass.net>
+ <42e13ccf7f27a68c0dd64640eed378c38ef40967.camel@intel.com>
+ <20230630100659.GF2533791@hirez.programming.kicks-ass.net>
+ <88de636ed40786f40c153b392070357f8b3d6948.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <88de636ed40786f40c153b392070357f8b3d6948.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 30, 2023, Gil Neiger wrote:
-> Intel will not produce any CPU with CET that does not enumerate IA32_VMX_BASIC[56] as 1.
+On 6/30/23 03:18, Huang, Kai wrote:
+>> Please, because 12,14 are callee-saved, which means we need to go add
+>> push/pop to preserve them 🙁
+> Yes.
 > 
-> One can check that bit before injecting a #CP with error code, but it should
-> not be necessary if CET is enumerated.
+> However those new SEAMCALLs are for TDX guest live migration support,  which is
+> at a year(s)-later thing from upstreaming's point of view.  My thinking is we
+> can defer supporting those new SEAMCALls until that phase.  Yes we need to do
+> some assembly change at that time, but also looks fine to me.
 > 
-> Of course, if the KVM may run as a guest of another VMM/hypervisor, it may be
-> that the virtual CPU in which KVM operates may enumerate CET but clear the
-> bit in IA32_VMX_BASIC.
+> How does this sound?
 
-Yeah, I think KVM should be paranoid and expose CET to the guest if and only if
-IA32_VMX_BASIC[56] is 1.  That'll also help validate nested support, e.g. will
-make it more obvious if userspace+KVM provides a  "bad" model to L1.
+It would sound better if the TDX module folks would take that year to
+fix the module and make it nicer for Linux. :)
