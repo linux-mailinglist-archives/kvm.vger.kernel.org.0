@@ -2,44 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98989743DC2
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 16:43:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA0C2743DF6
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 16:55:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232701AbjF3Ony (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 10:43:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45330 "EHLO
+        id S232793AbjF3Oze (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 10:55:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232739AbjF3Onh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 10:43:37 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7BAF6423E
-        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 07:43:26 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 92DB2D75;
-        Fri, 30 Jun 2023 07:44:09 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 030CB3F73F;
-        Fri, 30 Jun 2023 07:43:23 -0700 (PDT)
-Date:   Fri, 30 Jun 2023 15:43:21 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     eric.auger.pro@gmail.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, andrew.jones@linux.dev, maz@kernel.org,
-        will@kernel.org, oliver.upton@linux.dev, ricarkol@google.com,
-        reijiw@google.com, mark.rutland@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 5/6] arm: pmu: Add
- pmu-mem-access-reliability test
-Message-ID: <ZJ7qCdSkHSIj-I2N@monolith.localdoman>
-References: <20230531201438.3881600-1-eric.auger@redhat.com>
- <20230531201438.3881600-6-eric.auger@redhat.com>
- <ZIxM8-z0WdhbVq64@monolith.localdoman>
- <5be4612e-5364-fe22-c09c-d4c8215942ff@redhat.com>
+        with ESMTP id S230013AbjF3Ozc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 10:55:32 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 855B0171E;
+        Fri, 30 Jun 2023 07:55:30 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35UElJen028125;
+        Fri, 30 Jun 2023 14:55:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=lDpFoRK1/JvWkbdjwEGp2GZljhqvTVU77TncYGJvVao=;
+ b=ryupaRnBGG6ypMqmm22XhFu7U47aeAYGPqreVwbA1MjO3+P+X1UgURO2NezaYEbhIVyt
+ 9lap7loSSepEKw5KCuA1HxWvWUhcu0AYdE7Y1W8KM3pYd5066y3vfLPq6CQeO8HoBtOT
+ e7MXEjMOcvcxW5SrF4F/IfsYjO25U1iOmL3AuSuoQp0bS+UR2OF/6OjftDK0+FLS5Ys6
+ WaLBZJdJZH71nopKbm3Ny4AebNZR6XbfModFBGRQBEphbpiHcTt1GaKGPDtObyUuO0U8
+ 7ReX0WOLQBpCp2QW6l7bR3AJbBe6GQU7nAQBxudm5KLV4bkcwkdDeybuDgNtm6f6ZaPZ xQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rj143r5gf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Jun 2023 14:55:29 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35UEmbsm030740;
+        Fri, 30 Jun 2023 14:55:29 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rj143r5ft-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Jun 2023 14:55:29 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35UDJqAK025762;
+        Fri, 30 Jun 2023 14:55:27 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3rdr4533tk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Jun 2023 14:55:27 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35UEtOKB28443166
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 30 Jun 2023 14:55:24 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1048020049;
+        Fri, 30 Jun 2023 14:55:24 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 147EB20043;
+        Fri, 30 Jun 2023 14:55:23 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 30 Jun 2023 14:55:22 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        thuth@redhat.com, david@redhat.com, nsg@linux.ibm.com,
+        nrb@linux.ibm.com
+Subject: [kvm-unit-tests RFC 0/3] s390x: Improve console handling
+Date:   Fri, 30 Jun 2023 14:54:46 +0000
+Message-Id: <20230630145449.2312-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5be4612e-5364-fe22-c09c-d4c8215942ff@redhat.com>
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: fpboecg2XEmWPG74YZKxcOpbsIq4SpqX
+X-Proofpoint-GUID: eZ-QzgrX7-7Cfak5Ph6ejJBnuyxGsM76
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-30_05,2023-06-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
+ mlxlogscore=609 priorityscore=1501 mlxscore=0 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 spamscore=0 suspectscore=0 adultscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2306300123
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -47,52 +88,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+Console IO is and has been in a state of "works for me". I don't think
+that will change soon since there's no need for a proper console
+driver when all we want is the ability to print or read a line at a
+time.
 
-On Mon, Jun 19, 2023 at 10:00:11PM +0200, Eric Auger wrote:
-> Hi,
-> 
-> On 6/16/23 13:52, Alexandru Elisei wrote:
-> > Hi,
-> >
-> > The test looks much more readable now, some comments below.
-> >
-> > On Wed, May 31, 2023 at 10:14:37PM +0200, Eric Auger wrote:
-> >> [..]
-> >> +static void test_mem_access_reliability(bool overflow_at_64bits)
-> >> +{
-> >> +	uint32_t events[] = {MEM_ACCESS};
-> >> +	void *addr = malloc(PAGE_SIZE);
-> >> +	uint64_t count, delta, max = 0, min = pmevcntr_mask();
-> >> +	uint64_t pre_overflow2 = PRE_OVERFLOW2(overflow_at_64bits);
-> >> +	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
-> >> +	bool overflow = false;
-> >> +
-> >> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-> >> +	    !check_overflow_prerequisites(overflow_at_64bits))
-> >> +		return;
-> >> +
-> >> +	pmu_reset();
-> >> +	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
-> >> +	for (int i = 0; i < 100; i++) {
-> >> +		pmu_reset();
-> >> +		write_regn_el0(pmevcntr, 0, pre_overflow2);
-> >> +		write_sysreg_s(0x1, PMCNTENSET_EL0);
-> >> +		isb();
-> >> +		mem_access_loop(addr, COUNT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >> +		count = read_regn_el0(pmevcntr, 0);
-> >> +		if (count >= pre_overflow2) {
-> >> +			/* not counter overflow, as expected */
-> >> +			delta = count - pre_overflow2;
-> > Personally, I find the names confusing. Since the test tries to see how
-> > much the counting is unreliable, I would have have expected delta to be
-> > difference between the expected number of events incremented (i.e., COUNT)
-> > and the actual number of events recorded in the counter. I would rename
-> > count to cntr_val and delta to num_events, but that might be just personal
-> > bias and I leave it up to you if think this might be useful.
-> I followed your suggestion
+However since input is only supported on the ASCII console I was
+forced to use it on the HMC. The HMC generally does not add a \r on a
+\n so each line doesn't start at column 0. It's time to finally fix
+that.
 
-Sorry for that, I guess I didn't think things through :(
+Also, since there are environments that only provide the line-mode
+console it's time to add line-mode input to properly support them.
 
-Thanks,
-Alex
+Janosch Frank (3):
+  lib: s390x: sclp: Add carriage return to line feed
+  lib: s390x: sclp: Clear ASCII screen on setup
+  lib: s390x: sclp: Add line mode input handling
+
+ lib/s390x/sclp-console.c | 191 +++++++++++++++++++++++++++++++++++----
+ lib/s390x/sclp.h         |  26 +++++-
+ s390x/run                |   2 +-
+ 3 files changed, 197 insertions(+), 22 deletions(-)
+
+-- 
+2.34.1
+
