@@ -2,98 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E77D743F06
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 17:37:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D754743F23
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 17:45:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232680AbjF3PhL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 11:37:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51322 "EHLO
+        id S232892AbjF3PpK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 11:45:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230054AbjF3PhJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 11:37:09 -0400
+        with ESMTP id S232740AbjF3PpI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 11:45:08 -0400
 Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2B39F0
-        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 08:37:08 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-573a92296c7so19286657b3.1
-        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 08:37:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 062EC35B0
+        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 08:45:07 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5706641dda9so18927787b3.3
+        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 08:45:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688139428; x=1690731428;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2bdagaR5N1qIFZFzXqIi1uWqn/bfAiw0c0oO57kq+nk=;
-        b=uXJ9O6qfWdldgDsjuntnftMM7qQJfvFQeahSqQ1ggMIEOuduwnzqedr89fbQSwyX3y
-         69liEDrUS89Mna80gPnZj9SSWOxAXWQ+AXL+3EpJDL5bi1yWAGYi0dJxql4YZx7q+rHo
-         kPwDS7Zc1fuMZ6eJ8gzVvmdfHx/U5edBjcuSC2K/3aCu1tMTMFP7CuLH9LfXT/gZd4wM
-         cVNuNiAjZoK8uEWnnjwV6qvCsxJOiY06W+8AytXoa8q1N7XdnkvDLNlzj38wkClMWZnM
-         zo5+GIMafrtJOQCoHaSghQo76lX4ae7GXByj8elgsIvYBEp7ljkzDcRkbdW0cTfXc+qr
-         EeCQ==
+        d=google.com; s=20221208; t=1688139906; x=1690731906;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PGsWok1x7dplsdKnJrrmcBge8O50nAaWvf5Ok5mjPd4=;
+        b=eGWMOFM3GXS9tFnRExmbojyXBqlwq1sFNIcYYNt/arDuFYsW3XSFXkF8D7ji6W9HFO
+         1t3zqgJECHeAewxekDfmjmiVJhjLuv9owT68r2sk+2anDX2FECxtAgkji45GUi35HryQ
+         nILNZhxmPSGqpyMJw0/iGNlrEz4ODnzq5GXM50PzGwrgRZzC+KepSXcT4SAwym9y4qZl
+         KHJxFeJS1IJT5FbMPZ1SwsdKgWGMLvYGxOt1AvuRTkQys+iVOHUejAi5cn3k1MnbnVWH
+         RmKTPVBNf3EjgUD0yDXkRWnRtwRxM0ZgtC8du3g7YOe+EZkHyNXqogZjC+E7XsLHS5qx
+         o7ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688139428; x=1690731428;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2bdagaR5N1qIFZFzXqIi1uWqn/bfAiw0c0oO57kq+nk=;
-        b=Lcy25AEHqblxY39nVm0LcbKrBtAf1mmgP8jdLxTWxGPSdS71tsK4HSBFWrvO+LvFx0
-         Txkdp93irbv8sVEAX/L1a7kMnJA2qWUaa6Pg6BUwf0/o3gt1drvJfy91y3MzAudPUK+9
-         Oqc8ExIriZDUGzvq0GiWed+NjmvEOm3YFqx7MozHOrjcNjS9C7u1CqFPt9T2oO0QiePE
-         m3wbngXCt6D7lo1IsTd9zXkD6bTmn0yOZkJyaSDVo03ZMTOCRj/WfG2LbcpkeiVg+P9S
-         HKpOKD8NcqEYM5lfmeOAc0iWARFbhg6akaENVav3ljfe3Fq1kOnFyPJpuUgtAasE3Lzi
-         UvVw==
-X-Gm-Message-State: ABy/qLbSMbQb4lk9JVjdEDhLF2ZAKv9Zwbfvx8D6BTl0klOHRkgnXmNV
-        xLcuKdBIxhr/hBAgPXcBwiurTOIluwk=
-X-Google-Smtp-Source: APBJJlH/uQWpr30lhFP7FUBhm2MxHCzEed19skQiSf4QGVih73ZchxcUBLHXypB7iNCVn2LK3aQlcjxDBd4=
+        d=1e100.net; s=20221208; t=1688139906; x=1690731906;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PGsWok1x7dplsdKnJrrmcBge8O50nAaWvf5Ok5mjPd4=;
+        b=E84mvQnz52evagIQEAxjVDhGRwjrEFSBVAycTLLw4KGKqI3c99fjx8dLj2ro2VakOC
+         x1TLTiEZXEBpOFOWUu1ljGkOPJAsOqJNH7VDIEkHlIRCZcNKt1uXhgm/6vqxsPYZ4Jnq
+         bQZ+i/B2xsRb4ZhUrsjKjHSzrWSHKc9OC3Uogr6xcO7Q5V3MfJD1sNiagju33fKZluW1
+         vtQ64Aaw9cDZaCA2gz8GpyHgKMym786h0FfheD8Pbdv1lMA6qXRO4tW95vdPjeN2jwNG
+         +xqpVNzAgJYRHoh/WxjU+MMdep7mtKDOJrpk3KDc1J1tNZDMfkZgIrL8g6MqgeL/sViM
+         m/rg==
+X-Gm-Message-State: ABy/qLb0OhkfNk/lNaFF+DYJMfAaiLukSOFJGsTsGu6t9pKtQUb+OWRg
+        5+f+T8ZqD5sCUQvv2RzwMkcmqv52u5o=
+X-Google-Smtp-Source: APBJJlHy/+n3gP4uEnSiKJhOURvGBDU9Rhgp1safCbT03R172hS2cwVS+sadpG2Abl+BU20MlcvIRg6EdYs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:8d52:0:b0:56d:2abf:f0c with SMTP id
- w18-20020a818d52000000b0056d2abf0f0cmr25114ywj.10.1688139428278; Fri, 30 Jun
- 2023 08:37:08 -0700 (PDT)
-Date:   Fri, 30 Jun 2023 08:37:06 -0700
-In-Reply-To: <20230630050157.kurgzdcpjngs6w4k@yy-desk-7060>
+ (user=seanjc job=sendgmr) by 2002:a81:760a:0:b0:56c:fce1:7d8d with SMTP id
+ r10-20020a81760a000000b0056cfce17d8dmr23323ywc.6.1688139906026; Fri, 30 Jun
+ 2023 08:45:06 -0700 (PDT)
+Date:   Fri, 30 Jun 2023 08:45:04 -0700
+In-Reply-To: <ZJ7y9DuedQyBb9eU@u40bc5e070a0153.ant.amazon.com>
 Mime-Version: 1.0
-References: <20230628071217.71126-1-ishiir@g.ecc.u-tokyo.ac.jp>
- <ZJxTTZzZnfbyMVIH@google.com> <ZJ0w5pKk/41Zv26i@yzhao56-desk.sh.intel.com>
- <ZJ3FyLUYrlr6+HLw@google.com> <ZJ3p5wBwyQZ+aQOV@google.com> <20230630050157.kurgzdcpjngs6w4k@yy-desk-7060>
-Message-ID: <ZJ72omPGZcdjjWbo@google.com>
-Subject: Re: [PATCH] KVM: nVMX: Prevent vmlaunch with EPTP pointing outside
- assigned memory area
+References: <20230504120042.785651-1-rkagan@amazon.de> <ZH6DJ8aFq/LM6Bk9@google.com>
+ <CALMp9eS3F08cwUJbKjTRAEL0KyZ=MC==YSH+DW-qsFkNfMpqEQ@mail.gmail.com>
+ <ZJ4dmrQSduY8aWap@google.com> <ZJ65CiW0eEL2mGg8@u40bc5e070a0153.ant.amazon.com>
+ <ZJ7mjdZ8h/RSilFX@google.com> <ZJ7y9DuedQyBb9eU@u40bc5e070a0153.ant.amazon.com>
+Message-ID: <ZJ74gELkj4DgAk4S@google.com>
+Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yuan Yao <yuan.yao@linux.intel.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>,
-        Reima Ishii <ishiir@g.ecc.u-tokyo.ac.jp>,
-        shina@ecc.u-tokyo.ac.jp, Paolo Bonzini <pbonzini@redhat.com>,
+To:     Roman Kagan <rkagan@amazon.de>, Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Hankland <ehankland@google.com>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Like Xu <likexu@tencent.com>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yuan.yao@intel.com
+        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Mingwei Zhang <mizhang@google.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 30, 2023, Yuan Yao wrote:
-> On Thu, Jun 29, 2023 at 01:30:31PM -0700, Sean Christopherson wrote:
-> > @@ -3834,8 +3822,8 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
-> >  			if (!(pdptrs[i] & PT_PRESENT_MASK))
-> >  				continue;
-> >
-> > -			if (mmu_check_root(vcpu, pdptrs[i] >> PAGE_SHIFT))
-> > -				return 1;
-> > +			if (kvm_vcpu_is_visible_gfn(vcpu, pdptrs[i] >> PAGE_SHIFT))
-> > +				pdptrs[i] = 0;
+On Fri, Jun 30, 2023, Roman Kagan wrote:
+> On Fri, Jun 30, 2023 at 07:28:29AM -0700, Sean Christopherson wrote:
+> > On Fri, Jun 30, 2023, Roman Kagan wrote:
+> > > On Thu, Jun 29, 2023 at 05:11:06PM -0700, Sean Christopherson wrote:
+> > > > @@ -74,6 +74,14 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
+> > > >         return counter & pmc_bitmask(pmc);
+> > > >  }
+> > > >
+> > > > +static inline void pmc_write_counter(struct kvm_pmc *pmc, u64 val)
+> > > > +{
+> > > > +       if (pmc->perf_event && !pmc->is_paused)
+> > > > +               perf_event_set_count(pmc->perf_event, val);
+> > > > +
+> > > > +       pmc->counter = val;
+> > >
+> > > Doesn't this still have the original problem of storing wider value than
+> > > allowed?
+> > 
+> > Yes, this was just to fix the counter offset weirdness.  My plan is to apply your
+> > patch on top.  Sorry for not making that clear.
 > 
-> Hi Sean,
+> Ah, got it, thanks!
 > 
-> Should this be "!kvm_vcpu_is_visible_gfn(vcpu, pdptrs[i] >> PAGE_SHIFT)" and
+> Also I'm now chasing a problem that we occasionally see
+> 
+> [3939579.462832] Uhhuh. NMI received for unknown reason 30 on CPU 43.
+> [3939579.462836] Do you have a strange power saving mode enabled?
+> [3939579.462836] Dazed and confused, but trying to continue
+> 
+> in the guests when perf is used.  These messages disappear when
+> 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions") is
+> reverted.  I haven't yet figured out where exactly the culprit is.
 
-Yep, typo that inverted the check.  Thanks for saving me some debug time!
-
-> turn the pae_root[i] to dummy root yet ?
-
-No, zeroing the PDPTR is sufficient.  Unlike CR3, which is always "present", PDPTRs
-have a present bit and so KVM can communicate to hardware that the entry isn't
-valid simply by clearing the PDPTPR.
+Can you reverting de0f619564f4 ("KVM: x86/pmu: Defer counter emulated overflow
+via pmc->prev_counter")?  I suspect the problem is the prev_counter mess.
