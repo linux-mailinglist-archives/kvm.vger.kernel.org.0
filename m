@@ -2,187 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1846B7440FB
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 19:16:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61824744116
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 19:21:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232971AbjF3RQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 13:16:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36958 "EHLO
+        id S232642AbjF3RVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 13:21:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232881AbjF3RQf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 13:16:35 -0400
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 769FC3A90
-        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 10:16:34 -0700 (PDT)
-Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-4007b5bafceso12671cf.1
-        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 10:16:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688145393; x=1690737393;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KZYjbsbti+rVflhaD8niD3Jax2FmXNNOo5d9fcG6uCU=;
-        b=a8rX5Jg4cK6o2EwrKI9ZMYQ7nGXlRnt1EjGarsxRoCGSTfKW8GbuPuQV+FLsgSexsW
-         ncS83gvPK9qbbFpFqcgFcyW7kUz/wXl5tdIpJvYhXTnpW6MrMGL1OptIn8jvYDALkeBY
-         Pu6MLXnYIeTLGlBF/b/iZ9D9+VCzpYRI0sfpWuxwDiFfmx+cnpD+zLXeL+2gvCNwF8hy
-         KEPbVpMdBlkHzEHXWs2jLwt0j+OQnl0Wx48yzFMytvxBh8Zi4LSCk6mg6sptCHk4JjRl
-         G1VLJS6IbIxTK66w3ojnO0M2TKTa6XQNBicWbtDlrB6pGZOQAlsmQ5xFrJKkhCvxm9G/
-         YClQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688145393; x=1690737393;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KZYjbsbti+rVflhaD8niD3Jax2FmXNNOo5d9fcG6uCU=;
-        b=iTV//XiqlZEntIUfpyWH2UZBBvz/wH/SMkl1PqjBUW9i+TciKvgDEvhxX5vN4Ktjiv
-         4wyGisf6ahOIsbHM/2H3UmcsG1PCHchvrel7GPQDFpUcaV2IBHgW6KWgsyzTT3uJG7QP
-         KzAPzFEFazlgbsWw0atpubWbrY54uH7aqNTtp8hjrOiVI/Pi8u6AOdCIRFkg3so569uk
-         GntcikEbl7/AD5XD10f+yh7cAKxCfeRcabutdGRu/kRATDeNIjeOiDsn/PlqojFAUzIB
-         oZzbnTIPeJCoAWq/gUEnFPfEM7uN3egj1Z8ZAHsi3V8KEPTGANmiELq2fEPBpPyNPL58
-         RwrQ==
-X-Gm-Message-State: AC+VfDzqYIzHLOEIVYV6YFnAOcDCYI2ulc630sQ+UtBFdPc7yPSRaIbM
-        kh4O/W+AQJi/j9n0QoxqLszG9rdLrUGxkUWwjjjU7Q==
-X-Google-Smtp-Source: ACHHUZ4Y+04AAzcFvQV2MAlgSLAksud+hKLE4aoReVbH5ER/J/WJhxJzyZwtr8CAuSJ1t1UAYZ/yhAD18d0hZJL1YeA=
-X-Received: by 2002:ac8:5882:0:b0:3ef:4319:c6c5 with SMTP id
- t2-20020ac85882000000b003ef4319c6c5mr669071qta.19.1688145393483; Fri, 30 Jun
- 2023 10:16:33 -0700 (PDT)
+        with ESMTP id S232568AbjF3RVq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 13:21:46 -0400
+Received: from out-1.mta1.migadu.com (out-1.mta1.migadu.com [IPv6:2001:41d0:203:375::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA3BD1996
+        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 10:21:43 -0700 (PDT)
+Date:   Fri, 30 Jun 2023 17:21:37 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1688145701;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=A0mPPdxkOT9iMRRMTKH6KrkJnOAUidY1ftIlS1g9iTY=;
+        b=SlwHZyv/ZqndEvudSAcLtIsPQxxs+m0GBXLCrP9yRlVBLHUjGzSkzBVXBfINUt0LSY7V2p
+        Yh9SVcqPP8nLiZ27BlX0nYGByyJC9Z/Hb0oYEoSr5PbM558LgPBfeRU2WmsQCFa4oTu+Oh
+        PTXex1FpSDiPHi6uDwv8sjfj67r+wws=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Like Xu <like.xu.linux@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86/tsc: Update guest tsc_offset again before vcpu
+ first runs
+Message-ID: <ZJ8PIbHfhc0oYB8/@linux.dev>
+References: <20230629164838.66847-1-likexu@tencent.com>
+ <ZJ29KhiVLyAq/7Sh@google.com>
 MIME-Version: 1.0
-References: <20230504120042.785651-1-rkagan@amazon.de> <ZH6DJ8aFq/LM6Bk9@google.com>
- <CALMp9eS3F08cwUJbKjTRAEL0KyZ=MC==YSH+DW-qsFkNfMpqEQ@mail.gmail.com>
- <ZJ4dmrQSduY8aWap@google.com> <ZJ65CiW0eEL2mGg8@u40bc5e070a0153.ant.amazon.com>
- <ZJ7mjdZ8h/RSilFX@google.com> <ZJ7y9DuedQyBb9eU@u40bc5e070a0153.ant.amazon.com>
- <ZJ74gELkj4DgAk4S@google.com> <CAL715WL9T8Ucnj_1AygwMgDjOJrttNZHRP9o-KUNfpx1aYZnog@mail.gmail.com>
-In-Reply-To: <CAL715WL9T8Ucnj_1AygwMgDjOJrttNZHRP9o-KUNfpx1aYZnog@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 30 Jun 2023 10:16:22 -0700
-Message-ID: <CALMp9eSQ9uRBVdLDkfCdPbprZ45LpdZY5-5O9i41oJYs-dK7+Q@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Roman Kagan <rkagan@amazon.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Hankland <ehankland@google.com>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Like Xu <likexu@tencent.com>, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZJ29KhiVLyAq/7Sh@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 30, 2023 at 10:08=E2=80=AFAM Mingwei Zhang <mizhang@google.com>=
- wrote:
->
-> On Fri, Jun 30, 2023 at 8:45=E2=80=AFAM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Fri, Jun 30, 2023, Roman Kagan wrote:
-> > > On Fri, Jun 30, 2023 at 07:28:29AM -0700, Sean Christopherson wrote:
-> > > > On Fri, Jun 30, 2023, Roman Kagan wrote:
-> > > > > On Thu, Jun 29, 2023 at 05:11:06PM -0700, Sean Christopherson wro=
-te:
-> > > > > > @@ -74,6 +74,14 @@ static inline u64 pmc_read_counter(struct kv=
-m_pmc *pmc)
-> > > > > >         return counter & pmc_bitmask(pmc);
-> > > > > >  }
-> > > > > >
-> > > > > > +static inline void pmc_write_counter(struct kvm_pmc *pmc, u64 =
-val)
-> > > > > > +{
-> > > > > > +       if (pmc->perf_event && !pmc->is_paused)
-> > > > > > +               perf_event_set_count(pmc->perf_event, val);
-> > > > > > +
-> > > > > > +       pmc->counter =3D val;
-> > > > >
-> > > > > Doesn't this still have the original problem of storing wider val=
-ue than
-> > > > > allowed?
-> > > >
-> > > > Yes, this was just to fix the counter offset weirdness.  My plan is=
- to apply your
-> > > > patch on top.  Sorry for not making that clear.
-> > >
-> > > Ah, got it, thanks!
-> > >
-> > > Also I'm now chasing a problem that we occasionally see
-> > >
-> > > [3939579.462832] Uhhuh. NMI received for unknown reason 30 on CPU 43.
-> > > [3939579.462836] Do you have a strange power saving mode enabled?
-> > > [3939579.462836] Dazed and confused, but trying to continue
-> > >
-> > > in the guests when perf is used.  These messages disappear when
-> > > 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions") is
-> > > reverted.  I haven't yet figured out where exactly the culprit is.
-> >
-> > Can you reverting de0f619564f4 ("KVM: x86/pmu: Defer counter emulated o=
-verflow
-> > via pmc->prev_counter")?  I suspect the problem is the prev_counter mes=
-s.
->
-> For sure it is prev_counter issue, I have done some instrumentation as fo=
-llows:
->
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index 48a0528080ab..946663a42326 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -322,8 +322,11 @@ static void reprogram_counter(struct kvm_pmc *pmc)
->         if (!pmc_event_is_allowed(pmc))
->                 goto reprogram_complete;
->
-> -       if (pmc->counter < pmc->prev_counter)
-> +       if (pmc->counter < pmc->prev_counter) {
-> +               pr_info("pmc->counter: %llx\tpmc->prev_counter: %llx\n",
-> +                       pmc->counter, pmc->prev_counter);
->                 __kvm_perf_overflow(pmc, false);
-> +       }
->
->         if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
->                 printk_once("kvm pmu: pin control bit is ignored\n");
->
-> I find some interesting changes on prev_counter:
->
-> [  +7.295348] pmc->counter: 12 pmc->prev_counter: fffffffffb3d
-> [  +0.622991] pmc->counter: 3 pmc->prev_counter: fffffffffb1a
-> [  +6.943282] pmc->counter: 1 pmc->prev_counter: fffffffff746
-> [  +4.483523] pmc->counter: 0 pmc->prev_counter: ffffffffffff
-> [ +12.817772] pmc->counter: 0 pmc->prev_counter: ffffffffffff
-> [ +21.721233] pmc->counter: 0 pmc->prev_counter: ffffffffffff
->
-> The first 3 logs will generate this:
->
-> [ +11.811925] Uhhuh. NMI received for unknown reason 20 on CPU 2.
-> [  +0.000003] Dazed and confused, but trying to continue
->
-> While the last 3 logs won't. This is quite reasonable as looking into
-> de0f619564f4 ("KVM: x86/pmu: Defer counter emulated overflow via
-> pmc->prev_counter"), counter and prev_counter should only have 1 diff
-> in value.
+On Thu, Jun 29, 2023 at 10:19:38AM -0700, Sean Christopherson wrote:
+> +Oliver
 
-prev_counter isn't actually sync'ed at this point, is it? This comes
-back to that "setting a running counter" nonsense. We want to add 1 to
-the current counter, but we don't actually know what the current
-counter is.
+It has been a while since I've looked at any x86 code, so forgive any
+ignorance :)
 
-My interpretation of the above is that, in the first three cases, PMU
-hardware has already detected an overflow. In the last three cases,
-software counting has detected an overflow.
+> On Fri, Jun 30, 2023, Like Xu wrote:
+> > From: Like Xu <likexu@tencent.com>
+> > 
+> > When a new vcpu is created and subsequently restored by vcpu snapshot,
+> > apply kvm_vcpu_write_tsc_offset() before vcpu runs for the first time.
+> > 
+> > Before a vcpu runs for the first time, the user space (VMM) sets the guest
+> > tsc as it wants, which may triggers the time synchronization mechanism with
+> > other vcpus (if any). In a scenario where a vcpu snapshot is used to
+> > restore, like the bugzilla report [*], the newly target guest tsc (e.g.
+> > at the time of vcpu restoration) is synchronized with its the most
+> > primitive guest timestamp initialized at the time of vcpu creation.
+> > 
+> > Furthermore, the VMM can actually update the target guest tsc multiple
+> > times before the vcpu actually gets running, which requires the tsc_offset
+> > to be updated every time it is set. In this scenario, it can be considered
+> > as unstable tsc (even this vcpu has not yet even started ticking to follow
+> > the intended logic of KVM timer emulation).
+> > 
+> > It is only necessary to delay this step until kvm_arch_vcpu_load() to
+> > catch up with guest expectation with the help of kvm_vcpu_has_run(),
+> > and the change is expected to not break any of the cumbersome existing
+> > virt timer features.
 
-If the last three occur while executing the guest's PMI handler (i.e.
-NMIs are blocked), then this could corroborate my conjecture about
-IA32_DEBUGCTL.Freeze_PerfMon_On_PMI.
+The bug description is a bit difficult to grok, IMO. My understanding is
+something like the following:
 
-> So, the reasonable suspect should be the stale prev_counter. There
-> might be several potential reasons behind this. Jim's theory is the
-> highly reasonable one as I did another experiment and found that KVM
-> may leave pmu->global_status as '0' when injecting an NMI.
+ 1) Create VM_0 and save state within 1 second of creation
+
+ 2) Create VM_1 and restore state from VM_0
+
+ 3) Guest TSCs synchronize with the TSC value resulting from the vCPU
+ creation in VM_1 instead of the expected value in the snapshot.
+
+Generalizing -- restoring a vCPU that was saved within a second of its
+creation leads to KVM ignoring the user-written TSC value.
+
+Or am I entirely lost?
+
+> > Reported-by: Yong He <alexyonghe@tencent.com>
+> > Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217423 [*] 
+> > Tested-by: Jinrong Liang <cloudliang@tencent.com>
+> > Signed-off-by: Like Xu <likexu@tencent.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 439312e04384..616940fc3791 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -4818,7 +4818,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> >  		if (tsc_delta < 0)
+> >  			mark_tsc_unstable("KVM discovered backwards TSC");
+> >  
+> > -		if (kvm_check_tsc_unstable()) {
+> > +		if (kvm_check_tsc_unstable() || !kvm_vcpu_has_run(vcpu)) {
+> >  			u64 offset = kvm_compute_l1_tsc_offset(vcpu,
+> >  						vcpu->arch.last_guest_tsc);
+> >  			kvm_vcpu_write_tsc_offset(vcpu, offset);
+> 
+> Doing this on every vCPU load feels all kinds of wrong, e.g. it will override the
+> value set by userspace via KVM_VCPU_TSC_OFFSET.  One could argue the KVM is "helping"
+> userspace by providing a more up-to-date offset for the guest, but "helping"
+> userspace by silently overriding userspace rarely ends well.
+> 
+> Can't we instead just fix the heuristic that tries to detect synchronization?
+> 
+> ---
+>  arch/x86/kvm/x86.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c30364152fe6..43d40f058a41 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2721,14 +2721,14 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
+>  			 * kvm_clock stable after CPU hotplug
+>  			 */
+>  			synchronizing = true;
+> -		} else {
+> +		} else if (kvm_vcpu_has_run(vcpu)) {
+>  			u64 tsc_exp = kvm->arch.last_tsc_write +
+>  						nsec_to_cycles(vcpu, elapsed);
+>  			u64 tsc_hz = vcpu->arch.virtual_tsc_khz * 1000LL;
+>  			/*
+>  			 * Special case: TSC write with a small delta (1 second)
+> -			 * of virtual cycle time against real time is
+> -			 * interpreted as an attempt to synchronize the CPU.
+> +			 * of virtual cycle time against real time on a running
+> +			 * vCPU is interpreted as an attempt to synchronize.
+>  			 */
+>  			synchronizing = data < tsc_exp + tsc_hz &&
+>  					data + tsc_hz > tsc_exp;
+
+This would break existing save/restore patterns for the TSC. QEMU relies
+on KVM synchronizing the TSCs when restoring a VM, since it cannot
+snapshot the TSC values of all the vCPUs in a single instant. It instead
+tries to save the TSCs at roughly the same time [*], which KVM detects
+on the target and gets everything back in sync. Can't wait to see when
+this heuristic actually breaks :)
+
+It's gonna be a hack no matter how we go about fixing this, but the root
+of the problem is that KVM-initiated TSC changes are synchronizing with
+userpsace-initiated TSC changes. Why not force a new TSC sync generation
+(i.e. set @synchronizing to false) for the first user-initiated write to
+the TSC MSR?
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 808c292ad3f4..8bb27ad0af53 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1321,6 +1321,7 @@ struct kvm_arch {
+ 	u64 cur_tsc_offset;
+ 	u64 cur_tsc_generation;
+ 	int nr_vcpus_matched_tsc;
++	bool user_changed_tsc;
+ 
+ 	u32 default_tsc_khz;
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7713420abab0..1fe24bbc28f4 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2668,7 +2668,7 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
+ 	kvm_track_tsc_matching(vcpu);
+ }
+ 
+-static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
++static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data, bool user_initiated)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 	u64 offset, ns, elapsed;
+@@ -2689,20 +2689,29 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
+ 			 * kvm_clock stable after CPU hotplug
+ 			 */
+ 			synchronizing = true;
+-		} else {
++		} else if (kvm->arch.user_changed_tsc) {
+ 			u64 tsc_exp = kvm->arch.last_tsc_write +
+ 						nsec_to_cycles(vcpu, elapsed);
+ 			u64 tsc_hz = vcpu->arch.virtual_tsc_khz * 1000LL;
+ 			/*
+-			 * Special case: TSC write with a small delta (1 second)
+-			 * of virtual cycle time against real time is
+-			 * interpreted as an attempt to synchronize the CPU.
++			 * Here lies UAPI baggage: user-initiated TSC write with
++			 * a small delta (1 second) of virtual cycle time
++			 * against real time is interpreted as an attempt to
++			 * synchronize the CPU.
++			 *
++			 * Don't synchronize user changes to the TSC with the
++			 * KVM-initiated change in kvm_arch_vcpu_postcreate()
++			 * by conditioning this mess on userspace having
++			 * written the TSC at least once already.
+ 			 */
+ 			synchronizing = data < tsc_exp + tsc_hz &&
+ 					data + tsc_hz > tsc_exp;
+ 		}
+ 	}
+ 
++	if (user_initiated)
++		kvm->arch.user_changed_tsc = true;
++
+ 	/*
+ 	 * For a reliable TSC, we can match TSC offsets, and for an unstable
+ 	 * TSC, we add elapsed time in this computation.  We could let the
+@@ -3695,7 +3704,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	case MSR_IA32_TSC:
+ 		if (msr_info->host_initiated) {
+-			kvm_synchronize_tsc(vcpu, data);
++			kvm_synchronize_tsc(vcpu, data, true);
+ 		} else {
+ 			u64 adj = kvm_compute_l1_tsc_offset(vcpu, data) - vcpu->arch.l1_tsc_offset;
+ 			adjust_tsc_offset_guest(vcpu, adj);
+@@ -11832,7 +11841,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+ 	if (mutex_lock_killable(&vcpu->mutex))
+ 		return;
+ 	vcpu_load(vcpu);
+-	kvm_synchronize_tsc(vcpu, 0);
++	kvm_synchronize_tsc(vcpu, 0, false);
+ 	vcpu_put(vcpu);
+ 
+ 	/* poll control enabled by default */
