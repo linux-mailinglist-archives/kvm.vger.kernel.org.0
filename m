@@ -2,84 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D9C1E744239
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 20:30:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F57374423D
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 20:32:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232834AbjF3Saw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 14:30:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40346 "EHLO
+        id S232284AbjF3Scf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 14:32:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231455AbjF3Sat (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 14:30:49 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11D6211F;
-        Fri, 30 Jun 2023 11:30:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=CbMDicFOeY5VdckkPN/BPu5OIcTYRlOakMO4pzeR/1s=; b=h03AT+EgdHGL4gmfUn6nIQf9kH
-        tELcfcbxNx0EqJWT5XOxA9ZzAKMuqZW6XgnUq950oj8vWss02KuLnaDjVw94Ajimy1any1YceyFR1
-        U1yb8klAe0V3ySXfH3TneSOe2xHvZDO/MApSEtk0qHKoA9TjdcIfay9yn2KtAPkRJAIm7prGPyPfz
-        52C0MdaendV3o4ok05d0OwwXQ6cDBvfh1OT3pM2yxtyZlSEde4fF3LlR1J8lHXLMVWWXSOxietDx/
-        fwFzj/EWWyW4GJPVLKcip3eE27+oqwqlRGnHY6FISc/OFtMPzNAvPT9TPckRpBCQ1fhQopG1hfYPm
-        +RlqUpoQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qFIsx-005uVm-5a; Fri, 30 Jun 2023 18:30:23 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 0500B3002E1;
-        Fri, 30 Jun 2023 20:30:21 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id DD53824824672; Fri, 30 Jun 2023 20:30:20 +0200 (CEST)
-Date:   Fri, 30 Jun 2023 20:30:20 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
+        with ESMTP id S230001AbjF3Sce (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 14:32:34 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD90D3C2F;
+        Fri, 30 Jun 2023 11:32:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688149953; x=1719685953;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=AUog1oylk7F8erWTwuZvVpqNmif9eOSht3QwuL4uOG8=;
+  b=KK1RfvbhbAh74z3tzwv+CJBtmzNehYTlcpbn4/sGM0VtVNRl7RPKG2Oe
+   usWsvVk8XNFb5zzrzCLFzIkE7A/x9Jk4zD4b+OEtSTev2OOVXFb8YS/CH
+   4E2ITrdBQ9xhMLR5r8JcxGHWe6NGhr4w4jK+UZfTV6Qz7EvRdEqQPQBxz
+   KmetxV6fNdhar/tZAFv+/89lKiuhK4Jh8lyzPrDSJDfvtZX98H3/mQAjb
+   IDEEsE3vIVMfmHoQcgBuFY9+t1WLMfBptJ6dXrWaiM6iozkgNoOoqFMNG
+   7SnVsrI2jLFYXyw2ro6JbtZAWj8pLkjT2IE0yx02mCMKm8k3sLpTzHeF7
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="365949330"
+X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
+   d="scan'208";a="365949330"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 11:32:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="717896031"
+X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
+   d="scan'208";a="717896031"
+Received: from lpascal-mobl.amr.corp.intel.com (HELO localhost) ([10.252.49.62])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 11:32:23 -0700
+From:   Jani Nikula <jani.nikula@linux.intel.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>,
+        suijingfeng <suijingfeng@loongson.cn>
+Cc:     "Limonciello, Mario" <Mario.Limonciello@amd.com>,
+        "15330273260@189.cn" <15330273260@189.cn>,
+        "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
+        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "Chai, Thomas" <YiPeng.Chai@amd.com>,
+        "Gao, Likun" <Likun.Gao@amd.com>, David Airlie <airlied@gmail.com>,
+        Ville Syrjala <ville.syrjala@linux.intel.com>,
+        Yi Liu <yi.l.liu@intel.com>, Karol Herbst <kherbst@redhat.com>,
+        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        "Lazar, Lijo" <Lijo.Lazar@amd.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        "Zhang, Bokun" <Bokun.Zhang@amd.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "nik.borisov@suse.com" <nik.borisov@suse.com>,
-        "hpa@zytor.com" <hpa@zytor.com>, "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Message-ID: <20230630183020.GA4253@hirez.programming.kicks-ass.net>
-References: <cover.1687784645.git.kai.huang@intel.com>
- <104d324cd68b12e14722ee5d85a660cccccd8892.1687784645.git.kai.huang@intel.com>
- <20230628131717.GE2438817@hirez.programming.kicks-ass.net>
- <0c9639db604a0670eeae5343d456e43d06b35d39.camel@intel.com>
- <20230630092615.GD2533791@hirez.programming.kicks-ass.net>
- <2659d6eef84f008635ba300f4712501ac88cef2c.camel@intel.com>
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        "Deucher, Alexander" <Alexander.Deucher@amd.com>,
+        "Koenig, Christian" <Christian.Koenig@amd.com>,
+        "Zhang, Hawking" <Hawking.Zhang@amd.com>
+Subject: Re: [PATCH v7 6/8] PCI/VGA: Introduce is_boot_device function
+ callback to vga_client_register
+In-Reply-To: <20230630174156.GA487980@bhelgaas>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20230630174156.GA487980@bhelgaas>
+Date:   Fri, 30 Jun 2023 21:32:20 +0300
+Message-ID: <87v8f4243v.fsf@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2659d6eef84f008635ba300f4712501ac88cef2c.camel@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -88,43 +95,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 30, 2023 at 09:55:32AM +0000, Huang, Kai wrote:
-> On Fri, 2023-06-30 at 11:26 +0200, Peter Zijlstra wrote:
-> > On Thu, Jun 29, 2023 at 12:10:00AM +0000, Huang, Kai wrote:
-> > > On Wed, 2023-06-28 at 15:17 +0200, Peter Zijlstra wrote:
-> > > > On Tue, Jun 27, 2023 at 02:12:37AM +1200, Kai Huang wrote:
-> > > > > +EXPORT_SYMBOL_GPL(tdx_cpu_enable);
-> > > > 
-> > > > I can't find a single caller of this.. why is this exported?
-> > > 
-> > > It's for KVM TDX patch to use, which isn't in this series.
-> > > 
-> > > I'll remove the export.  KVM TDX series can export it.
-> > 
-> > Fair enough; where will the KVM TDX series call this? Earlier there was
-> > talk about doing it at kvm module load time -- but I objected (and still
-> > do object) to that.
-> > 
-> > What's the current plan?
-> > 
-> 
-> The direction is still doing it during module load (not my series anyway).  But
-> this can be a separate discussion with KVM maintainers involved.
+On Fri, 30 Jun 2023, Bjorn Helgaas <helgaas@kernel.org> wrote:
+> On Fri, Jun 30, 2023 at 10:14:11AM +0800, suijingfeng wrote:
+>> On 2023/6/30 01:44, Limonciello, Mario wrote:
+>> > > On 2023/6/29 23:54, Bjorn Helgaas wrote:
+>> > > > On Thu, Jun 22, 2023 at 01:08:15PM +0800, Sui Jingfeng wrote:
+>
+>> > > > 4) Right now we're in the middle of the v6.5 merge window, so new
+>> > > >      content, e.g., this series, is too late for v6.5.  Most
+>> > > >      maintainers, including me, wait to merge new content until the
+>> > > >      merge window closes and a new -rc1 is tagged.  This merge window
+>> > > >      should close on July 9, and people will start merging content for
+>> > > >      v6.6, typically based on v6.5-rc1.
+>> > > 
+>> > > Would you will merge all of the patches in this series (e.g. including
+>> > > the patch for drm/amdgpu(7/8) and drm/radeon(8/8)) ?
+>> > > 
+>> > > Or just part of them?
+>
+> The bulk of this series is drivers/pci changes, so typically I would
+> merge all the patches after getting Acked-by tags from the other
+> subsystems (DRM and VFIO).
 
-They all on Cc afaict.
+For the (negligible) i915 parts,
 
-> I understand you have concern that you don't want to have the memory & cpu time
-> wasted on enabling TDX by default.  For that we can have a kernel command line
-> to disable TDX once for all (we can even make it default).
+Acked-by: Jani Nikula <jani.nikula@intel.com>
 
-That's insane, I don't want to totally disable it. I want it done at
-guard creation. Do the whole TDX setup the moment you actually create a
-TDX guast.
+>> Is it possible to merge the PCI/VGA part as fast as possible,
+>> especially the PATCH-0006 PCI/VGA: Introduce is_boot_device function
+>> callback to vga_client_register
+>
+> We're in the middle of the v6.5 merge window, so it's too late to add
+> things to v6.5-rc1.  The most likely path for new material like this
+> would be to queue it for v6.6, which means I would merge it after
+> v6.5-rc1 is tagged (that tag will probably happen on July 9).
 
-Totally killing TDX is stupid, just about as stupid as doing it on
-module load (which equates to always doing it).
+Perhaps the part that causes confusion here is that the drm-misc-next
+and drm-intel-next branches, for example, are always open for new
+patches; it's just that there's a cutoff at around rc5/rc6 after which
+they start targeting the next+1 release. We basically hide the merge
+window from a lot of drm developers.
 
-> Also, KVM will have a module parameter 'enable_tdx'.  I am hoping this could
-> reduce your concern too.
+> It would then be in -next until the v6.6 merge window opens (likely in
+> September), when it would be merged into Linus' tree.
+>
+> If the series fixes a regression or other major defect, it's
+> *possible* to merge things earlier, so they appear in v6.5.  But this
+> series doesn't seem to fall in that category, so I think v6.6 is a
+> more realistic target.
+>
+> Merging for v6.6 would include both the PCI parts and the DRM parts at
+> the same time, so hopefully that addresses your dependency concerns.
 
-I don't get this obsession with doing at module load time :/
+I guess the main question is whether Sui Jingfeng has follow-up work
+planned in drm that depends on these being merged. This would set that
+back by a full release. (But it happens.)
+
+BR,
+Jani.
+
+
+
+>
+> I suggest that you wait until v6.5-rc1, rebase your patches so they
+> apply cleanly on that tag, collect all the Reviewed-by and Acked-by
+> tags, include them in your commit logs, and then repost them.
+>
+> Bjorn
+
+-- 
+Jani Nikula, Intel Open Source Graphics Center
