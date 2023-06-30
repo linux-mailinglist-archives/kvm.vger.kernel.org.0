@@ -2,92 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BAE5743825
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 11:20:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCDEB74383C
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 11:23:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232292AbjF3JUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 05:20:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58756 "EHLO
+        id S232521AbjF3JX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 05:23:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232844AbjF3JTg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 05:19:36 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE0154230
-        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 02:19:05 -0700 (PDT)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35U9COXI006124;
-        Fri, 30 Jun 2023 09:18:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=T51o20zKH3o9FTHVr9GkMoRJbLWlrByQLyhf1bOW8zc=;
- b=DEM56XCQ+F/2k2Lj4aiCTXAxqkRJy+7TDHa+AAufUs3xj69IkZbeAEIhJKKBQBOvyVJG
- vS19c1nrbPvircARQBX/pczGh7+IiLKr0obN5V0LxpvaqY4bcJWIHaBCf0bun1HLAkm/
- sJsAgijJNM7F2tDZ8YeNo3CpvLRFfPM8p/dxqejvcmLwKUTWKxOaZF8s85SKSwQ6WxQb
- dK362wUxP8FB0lJENSByKXGrwId7keXt/4CEcj+HBZFNXeU/dTnWFFH+n+OzG1uqdCpk
- jHOhrBzY/frvNyEna6GYXtbVR6pjC0M9P5tJi3XeZ7CYGy854RXYrK9a7+HldBBDKqaV 8A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rhv76g80k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Jun 2023 09:18:33 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35U9CSrF006204;
-        Fri, 30 Jun 2023 09:18:32 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rhv76g7xd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Jun 2023 09:18:32 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35U3GEN5027359;
-        Fri, 30 Jun 2023 09:18:28 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3rdr4542r2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Jun 2023 09:18:28 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35U9IN1I21758494
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 30 Jun 2023 09:18:23 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 11E6E20043;
-        Fri, 30 Jun 2023 09:18:23 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C00B220040;
-        Fri, 30 Jun 2023 09:18:21 +0000 (GMT)
-Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.38.86])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 30 Jun 2023 09:18:21 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
-        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
-Subject: [PATCH v21 20/20] tests/avocado: s390x cpu topology bad move
-Date:   Fri, 30 Jun 2023 11:17:52 +0200
-Message-Id: <20230630091752.67190-21-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230630091752.67190-1-pmorel@linux.ibm.com>
-References: <20230630091752.67190-1-pmorel@linux.ibm.com>
+        with ESMTP id S229890AbjF3JXS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 05:23:18 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 296A419C;
+        Fri, 30 Jun 2023 02:23:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=iTX8DaTvNk5W0MCthv55SgD+0pWkPm2TRQnZZ/JQ/qY=; b=XmROkBf3JCdjF81mNoAr+LIl+f
+        Vw8rNxXyhVFIA0bcfCCqDkKp3Al+MOXDa0mh1xa9kPkY5ab+csf2UZDMVn5QeNXvnolMSu7KXZamX
+        liALNMxlMn2C5LbM5kDAFUWhYIBVmAef4LIoP1kjEkKtDU2knGS7fXjBFuUqkKkncUp4hZzHaJSz9
+        jhw4r3B8HYmhS3zz7YVk0EBMRfidp7WyeP9dAzb36mYOOsr0Lxbf6/FsQgwJai7oPDdjonVeM7Hv7
+        YYyJhy0l1q7TWDUSN2nX/2Xt/NOP8giii0QyfQDX6v4keJsJdG9b6/BcmIYd2X+JGtxww/4uDsPOi
+        sxo96+iQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qFAKn-007wJ4-0D;
+        Fri, 30 Jun 2023 09:22:33 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 51BE7300118;
+        Fri, 30 Jun 2023 11:22:32 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 31692245D3645; Fri, 30 Jun 2023 11:22:32 +0200 (CEST)
+Date:   Fri, 30 Jun 2023 11:22:32 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "nik.borisov@suse.com" <nik.borisov@suse.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "bp@alien8.de" <bp@alien8.de>, "Brown, Len" <len.brown@intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+Subject: Re: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
+ demand
+Message-ID: <20230630092232.GB2533791@hirez.programming.kicks-ass.net>
+References: <cover.1687784645.git.kai.huang@intel.com>
+ <104d324cd68b12e14722ee5d85a660cccccd8892.1687784645.git.kai.huang@intel.com>
+ <20230627095012.ln47s62pqzdrnb7x@box.shutemov.name>
+ <d6a0fb32ebcdeb6c38ebe8e2b03f034f42360c0f.camel@intel.com>
+ <20230627121853.ek5zr7sfiezfkfyj@box.shutemov.name>
+ <9361abfa9bf22c2a1a4b25e5495bcccc5b8dcd43.camel@intel.com>
+ <7b61715ad35d7b9916f55df72378e02e62c5cc4e.camel@intel.com>
+ <20230628133541.GF2438817@hirez.programming.kicks-ass.net>
+ <03def8b40a7db14f31d2ad67fb1a201e8ae8bce0.camel@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 9eb96QBsfZ6v80jTpPFryxOyYQbZXz4L
-X-Proofpoint-ORIG-GUID: obkRZp39P4l8fwt7bi8582Y_AZFom2gC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-30_05,2023-06-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- bulkscore=0 priorityscore=1501 mlxlogscore=999 impostorscore=0
- malwarescore=0 adultscore=0 clxscore=1015 suspectscore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306300076
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <03def8b40a7db14f31d2ad67fb1a201e8ae8bce0.camel@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -95,47 +93,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This test verifies that QEMU refuses to move a CPU to an
-unexistant location.
+On Thu, Jun 29, 2023 at 12:15:13AM +0000, Huang, Kai wrote:
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- tests/avocado/s390_topology.py | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+> > 	Can be called locally or through an IPI function call.
+> > 
+> 
+> Thanks.  As in another reply, if using spinlock is OK, then I think we can say
+> it will be called either locally or through an IPI function call.  Otherwise, we
+> do via a new separate function tdx_global_init() and no lock is needed in that
+> function.  The caller should call it properly.
 
-diff --git a/tests/avocado/s390_topology.py b/tests/avocado/s390_topology.py
-index 99d9508cef..ea39168b53 100644
---- a/tests/avocado/s390_topology.py
-+++ b/tests/avocado/s390_topology.py
-@@ -388,3 +388,28 @@ def test_dedicated_error(self):
-         res = self.vm.qmp('set-cpu-topology',
-                           {'core-id': 0, 'entitlement': 'medium', 'dedicated': False})
-         self.assertEqual(res['return'], {})
-+
-+    def test_move_error(self):
-+        """
-+        This test verifies that QEMU refuses to move a CPU to an
-+        unexistant location
-+
-+        :avocado: tags=arch:s390x
-+        :avocado: tags=machine:s390-ccw-virtio
-+        """
-+        self.kernel_init()
-+        self.vm.launch()
-+        self.wait_until_booted()
-+
-+        self.system_init()
-+
-+        res = self.vm.qmp('set-cpu-topology', {'core-id': 0, 'drawer-id': 1})
-+        self.assertEqual(res['error']['class'], 'GenericError')
-+
-+        res = self.vm.qmp('set-cpu-topology', {'core-id': 0, 'book-id': 1})
-+        self.assertEqual(res['error']['class'], 'GenericError')
-+
-+        res = self.vm.qmp('set-cpu-topology', {'core-id': 0, 'socket-id': 1})
-+        self.assertEqual(res['error']['class'], 'GenericError')
-+
-+        self.check_topology(0, 0, 0, 0, 'medium', False)
--- 
-2.31.1
+IPI must use raw_spinlock_t. I'm ok with using raw_spinlock_t if there's
+actual need for that, but the code as presented didn't -- in comments or
+otherwise -- make it clear why it was as it was.
 
+TDX not specifying time constraints on the various TD/SEAM-CALLs is
+ofcourse sad, but alas.
