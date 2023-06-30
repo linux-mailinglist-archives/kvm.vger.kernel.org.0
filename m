@@ -2,140 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E035743EB6
-	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 17:26:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47A4D743EEF
+	for <lists+kvm@lfdr.de>; Fri, 30 Jun 2023 17:32:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232935AbjF3P0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 11:26:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43226 "EHLO
+        id S233058AbjF3Pcv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jun 2023 11:32:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232835AbjF3P02 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 11:26:28 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52AED4220;
-        Fri, 30 Jun 2023 08:26:08 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35UFGp5n028558;
-        Fri, 30 Jun 2023 15:26:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=pn22A98pXYlQtC3wO0cEzklFNcVIWdSYRPNq41LuUvs=;
- b=IN94GtdpX/EnX49kPcHcBMbGmVxIwqca5AlXqzHCo1PFMqCQX4fm2sOCrgSe3Qte9WWy
- TrdFcgSq+ak/I0x7EGeaSf3z+dTkYCmdNnxUFT/IF8J0XJ54yS9QDrpqvK/JUmeIS5za
- yI6qO5bqpvmFPbZKihCq0BZ6vsRJJLDq0Tsntdopm5sVQ1Kwk+WWygCLyf3xqXELTsso
- sE+tuSAz98Z0SMfs6IBkRtw13qNMg/Ci4YPMH3mpqHZvRPnwNj4tQOfIeP7RFJpJ28K6
- cCnhVAP/CkHY74v50kXI3NH5eMKCGt0etVsl8w0kE1fjTAnHm7TmRP9A4HweYsORKycY 7g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rj1j8871h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Jun 2023 15:26:07 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35UFHv8w032606;
-        Fri, 30 Jun 2023 15:26:07 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rj1j88700-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Jun 2023 15:26:07 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35U405M1011788;
-        Fri, 30 Jun 2023 15:26:03 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3rdr45b4d6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Jun 2023 15:26:03 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35UFQ0Mx8782360
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 30 Jun 2023 15:26:00 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 195D42004B;
-        Fri, 30 Jun 2023 15:26:00 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C1AAE20040;
-        Fri, 30 Jun 2023 15:25:59 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 30 Jun 2023 15:25:59 +0000 (GMT)
-Date:   Fri, 30 Jun 2023 17:25:58 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, nsg@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [kvm-unit-tests RFC 2/3] lib: s390x: sclp: Clear ASCII screen
- on setup
-Message-ID: <20230630172558.3edfa9ec@p-imbrenda>
-In-Reply-To: <20230630145449.2312-3-frankja@linux.ibm.com>
-References: <20230630145449.2312-1-frankja@linux.ibm.com>
-        <20230630145449.2312-3-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qZqqA0qN2cMEHnIyWr3afLsFvFMCUvyU
-X-Proofpoint-ORIG-GUID: bAMdnxINwWSErEaZaJgXaMP14vofY7Fy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-30_05,2023-06-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
- suspectscore=0 bulkscore=0 spamscore=0 priorityscore=1501 mlxlogscore=999
- clxscore=1015 phishscore=0 malwarescore=0 lowpriorityscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2306300127
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232172AbjF3Pca (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jun 2023 11:32:30 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C02A349C8
+        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 08:31:13 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-bb2a7308f21so1861131276.2
+        for <kvm@vger.kernel.org>; Fri, 30 Jun 2023 08:31:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688139073; x=1690731073;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bsmw8jfciOwOf213T4vvvPY507/uByM+euYpoT+ptPg=;
+        b=6D0cPh+YeGLV8h/5nl0BrWU1nUHMKAygp6XFTnbzbVbzPdSQq4/ECryMaHR5gvfsav
+         NXTGslGrBOjg7lgnNb5aHwxGAoINBxGmiGeDZsrxbRnoQqwY/NM2FdzBlytI2TixQg7U
+         TLQeIAv+Ntmzte95EoKJuz8ijPtLyHdpgh0L+8Bledrd6WBR8pi8zcueQHPBZxl1xtMi
+         A7l4wp+0ksdBdPxWnM8hap5e+ZNHevlDyIAjwAz+tm2010ZiKkbfRWf+EMRdsEuRwiH7
+         uiAXX9mP9Y/vMUfcuUlhEtcfG9N+V9kaPtL6CcOvugUCgx0MsqshYTEJXD79h9ROcSKb
+         r7Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688139073; x=1690731073;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bsmw8jfciOwOf213T4vvvPY507/uByM+euYpoT+ptPg=;
+        b=P88esALMWkhow7CcIByNo/udqBVraUfxLT3oKrN48qz71dNJnvvl4oyymReq050Iyl
+         5zWq0AnCJFP4A4A7mStFyCNRq0Y2QQwgELU3gvgK5bBUoZiXepxDerQoOP5+SND/qWOz
+         ZYcGJw506GzRQl/h+qX7BvJKrugA0M3dI74Q64EUmp0SO/1PiLL3UgJMlvfMI7vzq5yb
+         IxDI2w6u7pP72YHOjk6Y4eGuABRKjm+r7h4G+05lvspUwyMEOwX4Xi05Vx3W3mS58rMK
+         utfza9VxmnnCQooqpNG/WHDDElLhNuBe5/uinkmJvJI22XqzG0IOul+T8QI3Re5rZhP+
+         I+CQ==
+X-Gm-Message-State: ABy/qLasjRoOdgx1JqnmjpSmnFx+7+CHx2ov+2ELbE1gTIcLHRaAnAqK
+        nUGyrdXtEID7YqJUkqof9+er6Fz8B4k=
+X-Google-Smtp-Source: APBJJlH96WkeOuqF0lr9jikNmEIJLpGKCJfNaoB1ON4ZeustBd39YLNr9WURKYvxNyFg73yTWuDFTIt48Hc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:e090:0:b0:c42:2b05:17aa with SMTP id
+ x138-20020a25e090000000b00c422b0517aamr8586ybg.6.1688139073025; Fri, 30 Jun
+ 2023 08:31:13 -0700 (PDT)
+Date:   Fri, 30 Jun 2023 08:31:11 -0700
+In-Reply-To: <ZJ6L4oWE9refbXnX@chao-email>
+Mime-Version: 1.0
+References: <20230217231022.816138-1-seanjc@google.com> <20230217231022.816138-2-seanjc@google.com>
+ <ZJ6L4oWE9refbXnX@chao-email>
+Message-ID: <ZJ71P+i4aRg3S5TL@google.com>
+Subject: Re: [PATCH 01/12] KVM: x86: Add a framework for enabling KVM-governed
+ x86 features
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 30 Jun 2023 14:54:48 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> In contrast to the line-mode console the ASCII console will retain
-
-what's the problem with that?
-
-> previously written text on a reboot. So let's clear the console on
-> setup so only our text will be displayed. To not clear the whole
-> screen when running under QEMU we switch the run command to the line
-> mode console.
+On Fri, Jun 30, 2023, Chao Gao wrote:
+> On Fri, Feb 17, 2023 at 03:10:11PM -0800, Sean Christopherson wrote:
+> >+static __always_inline void kvm_governed_feature_set(struct kvm_vcpu *vcpu,
+> >+						     unsigned int x86_feature)
+> >+{
+> >+	BUILD_BUG_ON(KVM_NR_GOVERNED_FEATURES >
+> >+		     sizeof(vcpu->arch.governed_features.enabled) * BITS_PER_BYTE);
+> >+
+> >+	vcpu->arch.governed_features.enabled |= kvm_governed_feature_bit(x86_feature);
+> >+}
+> >+
+> >+static __always_inline void kvm_governed_feature_check_and_set(struct kvm_vcpu *vcpu,
+> >+							       unsigned int x86_feature)
+> >+{
+> >+	if (guest_cpuid_has(vcpu, x86_feature))
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  lib/s390x/sclp-console.c | 2 ++
->  s390x/run                | 2 +-
->  2 files changed, 3 insertions(+), 1 deletion(-)
+> Most callers in this series are conditional on either boot_cpu_has() or some
+> local variables. Can we convert them to kvm_cpu_cap_has() and incorporate them
+> within this function? i.e.,
 > 
-> diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
-> index 384080b0..534d3443 100644
-> --- a/lib/s390x/sclp-console.c
-> +++ b/lib/s390x/sclp-console.c
-> @@ -233,6 +233,8 @@ void sclp_console_setup(void)
->  {
->  	/* We send ASCII and line mode. */
->  	sclp_write_event_mask(0, SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_MASK_MSG);
-> +	/* Hard terminal reset to clear screen */
-> +	sclp_print_ascii("\ec");
->  }
->  
->  void sclp_print(const char *str)
-> diff --git a/s390x/run b/s390x/run
-> index f1111dbd..68f8e733 100755
-> --- a/s390x/run
-> +++ b/s390x/run
-> @@ -28,7 +28,7 @@ fi
->  M='-machine s390-ccw-virtio'
->  M+=",accel=$ACCEL"
->  command="$qemu -nodefaults -nographic $M"
-> -command+=" -chardev stdio,id=con0 -device sclpconsole,chardev=con0"
-> +command+=" -chardev stdio,id=con0 -device sclplmconsole,chardev=con0"
->  command+=" -kernel"
->  command="$(panic_cmd) $(migration_cmd) $(timeout_cmd) $command"
->  
+> 	if (kvm_cpu_cap_has(x86_feature) && guest_cpuid_has(vcpu, x86_feature))
 
+Hmm, I was going to say "no", as most callers don't check kvm_cpu_cap_has() verbatim,
+but it doesn't have to be that way.   The majority of SVM features factor in module
+params, but KVM should set the kvm_cpu capability if and only if a feature is supported
+in hardware *and* enabled by its module param.
+
+And arguably that's kinda sorta a bug fix, because this
+
+	if (lbrv)
+		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_LBRV);
+
+technically should be 
+
+	if (lbrv && nested)
+		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_LBRV);	
+
+Heh, and it's kinda sorta a bug fix for XSAVES on VMX, because this
+
+	if (cpu_has_vmx_xsaves() && boot_cpu_has(X86_FEATURE_XSAVE) &&
+	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
+		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_XSAVES);
+
+should technically be
+
+	if (kvm_cpu_cap_has(X86_FEATURE_XSAVES) &&
+	    boot_cpu_has(X86_FEATURE_XSAVE) &&
+	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
+		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_XSAVES);
+
+> The benefits of doing so are
+> 1. callers needn't repeat
+> 
+> 	if (kvm_cpu_cap_has(x86_feature))
+> 		kvm_governed_feature_check_and_set(x86_feature)
+> 
+> 2. this fits the idea better that guests can use a governed feature only if host
+>    supports it _and_ QEMU exposes it to the guest.
+
+Agreed, especially since we'll still have kvm_governed_feature_set() for the
+extra special cases.
+
+Thanks for the input!
