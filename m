@@ -2,64 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DD4374482E
-	for <lists+kvm@lfdr.de>; Sat,  1 Jul 2023 11:17:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4096744834
+	for <lists+kvm@lfdr.de>; Sat,  1 Jul 2023 11:25:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229538AbjGAJRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Jul 2023 05:17:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46612 "EHLO
+        id S229688AbjGAJZC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Jul 2023 05:25:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbjGAJRq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 1 Jul 2023 05:17:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F540B4
-        for <kvm@vger.kernel.org>; Sat,  1 Jul 2023 02:16:58 -0700 (PDT)
+        with ESMTP id S229507AbjGAJZA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 1 Jul 2023 05:25:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6778AB7
+        for <kvm@vger.kernel.org>; Sat,  1 Jul 2023 02:24:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688203017;
+        s=mimecast20190719; t=1688203452;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5P8+oZe2nmTOWnWCkmaHcGjW4ddEKWX+zP9ge5Dhnp4=;
-        b=JS9WJ7Wc8yk8XUq1XkgsibRT5lcGa6sxBeVWCKZTUOzuCO6TLDMKdAdQKxYav7zl38gTdt
-        HuD1zFMTFp6fv3zwdlaxwb3bQ1bIV72PKWrjsnJ7L2EQCn7BT2i8bPHZbxSZJ7swhI5ETZ
-        2naRY1end8XM2XL6lAZueHsfyRj6vFg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Eam9D8S2vBmtyoziYyOMxULmlaRFIIksD/jzBqUMocE=;
+        b=G+I5V4KxLI2SJVRcw/EHwJQR1FwvLq+UCvuetsWFLxKhCDolIglZyrHKxuGdIMZnUfc3zS
+        /S3bQdrBP9v+1zU/jZBiI7Kz5b9uGzCH/9AVGE5G3yIvec1bPtolykzjZbnQRWoyoKqjSo
+        77FTDf44kN5kD4gcR5B0aNH+blbvSaw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-647-yTBK-5QIOzupQA01SmFdWQ-1; Sat, 01 Jul 2023 05:16:56 -0400
-X-MC-Unique: yTBK-5QIOzupQA01SmFdWQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-31400956ce8so1401623f8f.3
-        for <kvm@vger.kernel.org>; Sat, 01 Jul 2023 02:16:56 -0700 (PDT)
+ us-mta-190-llrwCCdtPTCNGfDCaBVPyQ-1; Sat, 01 Jul 2023 05:24:11 -0400
+X-MC-Unique: llrwCCdtPTCNGfDCaBVPyQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3fb40d90456so11827275e9.0
+        for <kvm@vger.kernel.org>; Sat, 01 Jul 2023 02:24:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688203015; x=1690795015;
+        d=1e100.net; s=20221208; t=1688203450; x=1690795450;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5P8+oZe2nmTOWnWCkmaHcGjW4ddEKWX+zP9ge5Dhnp4=;
-        b=gJ3aBbk5vpbWO9uwOB8WbdCrmWTjLdeY0z56z5e82lOeTWBctsqRjNVd9EbLy2B/Gt
-         OqM0bpUUyD3Y2g8O+UIKwvtvObDHdfXOCvp2jMpjza+Tl+sAd3fMOkiSFHrfazGMSDLu
-         HjZhq8U339TVYmcPqjPRgz1oLG4HlIRjmCIomrukZk6AqdHxteWfEUmBH4KHnR1xvA3T
-         0pFoACP/iDJzPP7Jz1PRshC3o8vZMMzZ7dhkpA+PGfy+j6jo7BHk9X0jLw/HxVGVPacx
-         syiFQpg4U5H2n/ewVCEdbN898q5mJtatMczwWUmninC8l4NSltldu4cya7dvtdWZw4GE
-         Op3w==
-X-Gm-Message-State: ABy/qLbXiEgfR3TKBpj3eqmcY74+xP7Cj7OwfdUxRGsqK8Q12rX1sX05
-        X5XXvh+5nn7kpGWELxDAFXKh3cIQUEhY3NuGifjC/yMai+HAzsjSauU8y86vayv/CwQwB9XEI2D
-        riJmL8yvWR33XbZ4l8L5/tLZXCCFv
-X-Received: by 2002:a5d:6852:0:b0:314:415:cbf5 with SMTP id o18-20020a5d6852000000b003140415cbf5mr3287988wrw.51.1688203015241;
-        Sat, 01 Jul 2023 02:16:55 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFP3EMRENIi4DQ20/IEBTU2KVd2ubnsbHO86eBAPDozHrZF1MK7rYVDNEdoWWEJqptXlwjlPPkCIWy6yF4bzDg=
-X-Received: by 2002:a5d:6852:0:b0:314:415:cbf5 with SMTP id
- o18-20020a5d6852000000b003140415cbf5mr3287980wrw.51.1688203014977; Sat, 01
- Jul 2023 02:16:54 -0700 (PDT)
+        bh=Eam9D8S2vBmtyoziYyOMxULmlaRFIIksD/jzBqUMocE=;
+        b=gljrC+T6WSCHo9UyFvEldPzKwwwmdxqe1a3c08HgIwk3YNkOzF63+G1MxeQT/BM4Rt
+         mg6d+qkhPTB3gbwbne0piqpL+UGZQxPYyDiL79hWqSp1fA76CXhekxJ70R2POlvebGee
+         N/ydHZbxoLrMV0iz5WQ/xinwwc+CTYffYD/lOLpv2+Sd0SIX3nBwrkzzZLtYmXML/wPW
+         LVtli2JIpPrIv+GyvMTQkXK+jPFeNoV/OD6zDKISQG98Hqbaa+DZdNhsfJyh4W+Mow/c
+         WLALOZKoD2LVM/J5LUfAchNJmgec4ktQeufY4ZlZpKrz2Wf0qSoIh5Pr9jwIvsNzdOkT
+         5Sug==
+X-Gm-Message-State: ABy/qLaRUFWYiHR/UsiUhndtGMLtwTtqSsEapUaD297csRNTXqSN8m+i
+        YOUZNkadqDqgCUbsOwUAz79IhjKt2xYHTwvZMvcmbLkCs1DaziXsJh5LH/DUAoU2YCDTrfXi/Kj
+        IjGORHMN0pXlVbaTI5eIzO26TzZPm
+X-Received: by 2002:adf:db51:0:b0:314:98f:2495 with SMTP id f17-20020adfdb51000000b00314098f2495mr4469383wrj.12.1688203450351;
+        Sat, 01 Jul 2023 02:24:10 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGIdkfDOc47sFDmHvOGwO7sKRLp+s5TlQ1vRnFa8KPeI4WqTZSk8JFSJCDQoRIXQtilqW6JCSYyLbGTn5trX7o=
+X-Received: by 2002:adf:db51:0:b0:314:98f:2495 with SMTP id
+ f17-20020adfdb51000000b00314098f2495mr4469373wrj.12.1688203450037; Sat, 01
+ Jul 2023 02:24:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230628065919.54042-1-lulu@redhat.com> <20230628065919.54042-4-lulu@redhat.com>
- <CACGkMEs2V2gqGOv1jd-ZrT-9HHnSU6dhC=1zUojHRDGCeG2E7w@mail.gmail.com>
-In-Reply-To: <CACGkMEs2V2gqGOv1jd-ZrT-9HHnSU6dhC=1zUojHRDGCeG2E7w@mail.gmail.com>
+References: <20230628065919.54042-1-lulu@redhat.com> <20230628065919.54042-3-lulu@redhat.com>
+ <CACGkMEuzrFP96qcFL0M=nGiQ9t57-EzOhZmB3No-8T8pMAWTxw@mail.gmail.com>
+In-Reply-To: <CACGkMEuzrFP96qcFL0M=nGiQ9t57-EzOhZmB3No-8T8pMAWTxw@mail.gmail.com>
 From:   Cindy Lu <lulu@redhat.com>
-Date:   Sat, 1 Jul 2023 17:16:14 +0800
-Message-ID: <CACLfguXFWEs6QLf5Ba65Y_a-i9bQTc-SLvdGfYMAJ+u6BYaLPg@mail.gmail.com>
-Subject: Re: [RFC 3/4] vduse: Add the function for get/free the mapp pages
+Date:   Sat, 1 Jul 2023 17:23:29 +0800
+Message-ID: <CACLfguXHpCVuU-X9XZBOsuusELVBQsTa0L5LiJ59BSuiNx=ARg@mail.gmail.com>
+Subject: Re: [RFC 2/4] vduse: Add file operation for mmap
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     mst@redhat.com, maxime.coquelin@redhat.com,
         xieyongji@bytedance.com, kvm@vger.kernel.org,
@@ -77,96 +77,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 4:11=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
+On Wed, Jun 28, 2023 at 4:08=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
 ote:
 >
 > On Wed, Jun 28, 2023 at 2:59=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
 > >
 > > From: Your Name <you@example.com>
 > >
-> > Add the function for get/free pages, ad this info
-> > will saved in dev->reconnect_info
+> > Add the operation for mmap, The user space APP will
+> > use this function to map the pages to userspace
 >
-> I think this should be squashed to patch 2 otherwise it fixes a bug
-> that is introduced in patch 2?
+> Please be specific in the log. E.g why and what the main goal for this mm=
+ap.
 >
-sure will do
 > >
 > > Signed-off-by: Cindy Lu <lulu@redhat.com>
 > > ---
-> >  drivers/vdpa/vdpa_user/vduse_dev.c | 35 ++++++++++++++++++++++++++++++
-> >  1 file changed, 35 insertions(+)
+> >  drivers/vdpa/vdpa_user/vduse_dev.c | 49 ++++++++++++++++++++++++++++++
+> >  1 file changed, 49 insertions(+)
 > >
 > > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_use=
 r/vduse_dev.c
-> > index 1b833bf0ae37..3df1256eccb4 100644
+> > index f845dc46b1db..1b833bf0ae37 100644
 > > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
 > > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> > @@ -1313,6 +1313,35 @@ static struct vduse_dev *vduse_dev_get_from_mino=
+> > @@ -1313,6 +1313,54 @@ static struct vduse_dev *vduse_dev_get_from_mino=
 r(int minor)
 > >         return dev;
 > >  }
 > >
-> > +int vduse_get_vq_reconnnect(struct vduse_dev *dev, u16 idx)
+> > +
+> > +static vm_fault_t vduse_vm_fault(struct vm_fault *vmf)
 > > +{
-> > +       struct vdpa_reconnect_info *area;
-> > +       void *addr =3D (void *)get_zeroed_page(GFP_KERNEL);
+> > +       struct vduse_dev *dev =3D vmf->vma->vm_file->private_data;
+> > +       struct vm_area_struct *vma =3D vmf->vma;
+> > +       u16 index =3D vma->vm_pgoff;
 > > +
-> > +       area =3D &dev->reconnect_info[idx];
+> > +       struct vdpa_reconnect_info *info;
+> > +       info =3D &dev->reconnect_info[index];
 > > +
-> > +       area->addr =3D virt_to_phys(addr);
-> > +       area->vaddr =3D (unsigned long)addr;
-> > +       area->size =3D PAGE_SIZE;
-> > +       area->index =3D idx;
-> > +
-> > +       return 0;
+> > +       vma->vm_page_prot =3D pgprot_noncached(vma->vm_page_prot);
+> > +       if (remap_pfn_range(vma, vmf->address & PAGE_MASK, PFN_DOWN(inf=
+o->addr),
+> > +                           PAGE_SIZE, vma->vm_page_prot))
+>
+> I'm not sure if this can work e.g do we want to use separate pages for
+> each virtqueue (I think the answer is yes).
+>
+yes, this map the separate pages per vq, beads on my test this works
+> > +               return VM_FAULT_SIGBUS;
+> > +       return VM_FAULT_NOPAGE;
 > > +}
 > > +
-> > +int vduse_free_vq_reconnnect(struct vduse_dev *dev, u16 idx)
+> > +static const struct vm_operations_struct vduse_vm_ops =3D {
+> > +       .fault =3D vduse_vm_fault,
+> > +};
+> > +
+> > +static int vduse_mmap(struct file *file, struct vm_area_struct *vma)
 > > +{
-> > +       struct vdpa_reconnect_info *area;
+> > +       struct vduse_dev *dev =3D file->private_data;
+> > +       struct vdpa_reconnect_info *info;
+> > +       unsigned long index =3D vma->vm_pgoff;
 > > +
-> > +       area =3D &dev->reconnect_info[idx];
-> > +       if ((area->size =3D=3D PAGE_SIZE) && (area->addr !=3D NULL)) {
-> > +               free_page(area->vaddr);
-> > +               area->size =3D 0;
-> > +               area->addr =3D 0;
-> > +               area->vaddr =3D 0;
+> > +       if (vma->vm_end - vma->vm_start !=3D PAGE_SIZE)
+> > +               return -EINVAL;
+> > +       if ((vma->vm_flags & VM_SHARED) =3D=3D 0)
+> > +               return -EINVAL;
+> > +
+> > +       if (index > 65535)
+> > +               return -EINVAL;
+> > +
+> > +       info =3D &dev->reconnect_info[index];
+> > +       if (info->addr & (PAGE_SIZE - 1))
+> > +               return -EINVAL;
+> > +       if (vma->vm_end - vma->vm_start !=3D info->size) {
+> > +               return -ENOTSUPP;
 > > +       }
-> > +
-> > +       return 0;
-> > +}
-> >
-> >  static vm_fault_t vduse_vm_fault(struct vm_fault *vmf)
-> >  {
-> > @@ -1446,6 +1475,10 @@ static int vduse_destroy_dev(char *name)
-> >                 mutex_unlock(&dev->lock);
-> >                 return -EBUSY;
-> >         }
-> > +       for (int i =3D 0; i < dev->vq_num; i++) {
-> > +
-> > +               vduse_free_vq_reconnnect(dev, i);
-> > +       }
-> >         dev->connected =3D true;
-> >         mutex_unlock(&dev->lock);
-> >
-> > @@ -1583,6 +1616,8 @@ static int vduse_create_dev(struct vduse_dev_conf=
-ig *config,
-> >                 INIT_WORK(&dev->vqs[i].kick, vduse_vq_kick_work);
-> >                 spin_lock_init(&dev->vqs[i].kick_lock);
-> >                 spin_lock_init(&dev->vqs[i].irq_lock);
-> > +
-> > +               vduse_get_vq_reconnnect(dev, i);
 >
-> Can we delay the allocated until fault?
+> How can userspace know the correct size (info->size) here?
 >
-sure will do
+I had hard code the size in userpace , I will add the new ioctl of get
+the map size
+Thanks
+cindy
+> > +
+> > +       vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDU=
+MP);
+>
+> Why do you need VM_IO, VM_PFNMAP and VM_DONTDUMP here?
+>
 > Thanks
 >
-> >         }
+> > +       vma->vm_ops =3D &vduse_vm_ops;
+> > +
+> > +       return 0;
+> > +}
+> > +
+> >  static int vduse_dev_open(struct inode *inode, struct file *file)
+> >  {
+> >         int ret;
+> > @@ -1345,6 +1393,7 @@ static const struct file_operations vduse_dev_fop=
+s =3D {
+> >         .unlocked_ioctl =3D vduse_dev_ioctl,
+> >         .compat_ioctl   =3D compat_ptr_ioctl,
+> >         .llseek         =3D noop_llseek,
+> > +       .mmap           =3D vduse_mmap,
+> >  };
 > >
-> >         ret =3D idr_alloc(&vduse_idr, dev, 1, VDUSE_DEV_MAX, GFP_KERNEL=
-);
+> >  static struct vduse_dev *vduse_dev_create(void)
 > > --
 > > 2.34.3
 > >
