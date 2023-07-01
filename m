@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 065FF744745
+	by mail.lfdr.de (Postfix) with ESMTP id 9FC29744746
 	for <lists+kvm@lfdr.de>; Sat,  1 Jul 2023 08:51:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230459AbjGAGk3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Jul 2023 02:40:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40134 "EHLO
+        id S229612AbjGAGjh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Jul 2023 02:39:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230059AbjGAGjj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 1 Jul 2023 02:39:39 -0400
+        with ESMTP id S229890AbjGAGjW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 1 Jul 2023 02:39:22 -0400
 Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8190D4232;
-        Fri, 30 Jun 2023 23:39:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E03F44237;
+        Fri, 30 Jun 2023 23:39:13 -0700 (PDT)
 Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id A0E3612000C;
-        Sat,  1 Jul 2023 09:28:43 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A0E3612000C
+        by mx1.sberdevices.ru (Postfix) with ESMTP id C676812000E;
+        Sat,  1 Jul 2023 09:28:44 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru C676812000E
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1688192923;
-        bh=2BWXHhctpAkbTJhGKfSJxyOEOoSV2p85OEMm5gTeQ6k=;
+        s=mail; t=1688192924;
+        bh=UprXoHq7Bqi5L60D4m4n3ECZ9Zuve/BBPpn+ZPhJids=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=Td0B7dNnXU2D9+IJBugEC1PQ5fUymlSr2OUd8FYFXT2E92rwaCQWnBqjPRN//cmKh
-         TX78gLil0vrt2GyeuEKBMbF0YGLfXQxdJlPFDqWF0B0HqEqlaw0JrUIuHh2cCzzrZz
-         LnG+al4rJIaBPhCNtAmvbOKXw76L+truHziLvxVz9T/KRxNm9+U62Csk/yKLuwPRQ0
-         WSUcuYUfqN3eQBTDS2HOfM/4UeLmey7Br867OgrEiZd1NCHD/VRp0E10w+l5JSk13t
-         vRvKvBNtV5aONJdpFqI0rZGW56ZPVSdLuGPmN+2ZGA0D67W7Ux8UEw7C6WvYFAKx6x
-         j3gl7GaGBw1sA==
+        b=l1fIFjg0bsJNU8nXttK7I4WaCQhvF7u05F5ojLkYPS9hlepzoGV+7p9G4WEr2Gd1f
+         UWoGSnj3vJs85PBvdYEJ3POiPFc71m+MxKRMWLhk1ESiOJTGmLDs/uTxJKvyP0WJb1
+         iodDilyoFW8/gnEGRFy6ssfduFkiTan+wWA5gQnIjJIYdewHeCvQovw8q6L+unj/B0
+         Iev6nWrOOK4GbVY8zCt4LQTplv8PBdvnOtl6j5MLR40/qgjnD6yZmUPqZbyvsDnZ+v
+         n/rW/YZnQ+DdGhqhKPCzvHgaUoeFT1b0tOrUWcrVhDRYlJmHYGfP50Yf7dl6NdrzD1
+         a1zdi0o4E4P8w==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
         by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Sat,  1 Jul 2023 09:28:42 +0300 (MSK)
+        Sat,  1 Jul 2023 09:28:43 +0300 (MSK)
 Received: from localhost.localdomain (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Sat, 1 Jul 2023 09:28:20 +0300
+ 15.2.1118.30; Sat, 1 Jul 2023 09:28:21 +0300
 From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 To:     Stefan Hajnoczi <stefanha@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
@@ -52,9 +52,9 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@sberdevices.ru>,
         Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Subject: [RFC PATCH v5 06/17] vsock: fix EPOLLERR set on non-empty error queue
-Date:   Sat, 1 Jul 2023 09:22:59 +0300
-Message-ID: <20230701062310.3397129-7-AVKrasnov@sberdevices.ru>
+Subject: [RFC PATCH v5 07/17] vsock: read from socket's error queue
+Date:   Sat, 1 Jul 2023 09:23:00 +0300
+Message-ID: <20230701062310.3397129-8-AVKrasnov@sberdevices.ru>
 X-Mailer: git-send-email 2.35.0
 In-Reply-To: <20230701062310.3397129-1-AVKrasnov@sberdevices.ru>
 References: <20230701062310.3397129-1-AVKrasnov@sberdevices.ru>
@@ -90,35 +90,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If socket's error queue is not empty, EPOLLERR must be set. Otherwise,
-reader of error queue won't detect data in it using EPOLLERR bit.
-Currently for AF_VSOCK this is reproducible only with MSG_ZEROCOPY, as
-this feature is the only user of an error queue of the socket.
+This adds handling of MSG_ERRQUEUE input flag in receive call. This flag
+is used to read socket's error queue instead of data queue. Possible
+scenario of error queue usage is receiving completions for transmission
+with MSG_ZEROCOPY flag. This patch also adds 'SOL_VSOCK' define.
 
-Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
 Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 ---
  Changelog:
  v4 -> v5:
-  * Change commit message as Fix patch. Also add details that this
-    problem could be reproduced only with MSG_ZEROCOPY transmission
-    mode.
+  * Update commit message by adding sentence that 'SOL_VSOCK' is also
+    added.
 
- net/vmw_vsock/af_vsock.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/socket.h   | 1 +
+ net/vmw_vsock/af_vsock.c | 5 +++++
+ 2 files changed, 6 insertions(+)
 
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index bd1cc3238851..d79efd026880 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -382,6 +382,7 @@ struct ucred {
+ #define SOL_MPTCP	284
+ #define SOL_MCTP	285
+ #define SOL_SMC		286
++#define SOL_VSOCK	287
+ 
+ /* IPX options */
+ #define IPX_TYPE	1
 diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index efb8a0937a13..45fd20c4ed50 100644
+index 45fd20c4ed50..07803d9fbf6d 100644
 --- a/net/vmw_vsock/af_vsock.c
 +++ b/net/vmw_vsock/af_vsock.c
-@@ -1030,7 +1030,7 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
- 	poll_wait(file, sk_sleep(sk), wait);
- 	mask = 0;
+@@ -110,6 +110,7 @@
+ #include <linux/workqueue.h>
+ #include <net/sock.h>
+ #include <net/af_vsock.h>
++#include <linux/errqueue.h>
  
--	if (sk->sk_err)
-+	if (sk->sk_err || !skb_queue_empty_lockless(&sk->sk_error_queue))
- 		/* Signify that there has been an error on this socket. */
- 		mask |= EPOLLERR;
+ static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
+ static void vsock_sk_destruct(struct sock *sk);
+@@ -2135,6 +2136,10 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ 	int err;
+ 
+ 	sk = sock->sk;
++
++	if (unlikely(flags & MSG_ERRQUEUE))
++		return sock_recv_errqueue(sk, msg, len, SOL_VSOCK, 0);
++
+ 	vsk = vsock_sk(sk);
+ 	err = 0;
  
 -- 
 2.25.1
