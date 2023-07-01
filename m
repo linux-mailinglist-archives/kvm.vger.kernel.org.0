@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B50374473A
-	for <lists+kvm@lfdr.de>; Sat,  1 Jul 2023 08:51:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B25B74472A
+	for <lists+kvm@lfdr.de>; Sat,  1 Jul 2023 08:51:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230439AbjGAGk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Jul 2023 02:40:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40002 "EHLO
+        id S231428AbjGAGmg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Jul 2023 02:42:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbjGAGjj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 1 Jul 2023 02:39:39 -0400
+        with ESMTP id S230282AbjGAGli (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 1 Jul 2023 02:41:38 -0400
 Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 707504230;
-        Fri, 30 Jun 2023 23:39:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45D1A49D3;
+        Fri, 30 Jun 2023 23:39:55 -0700 (PDT)
 Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id B6EB8120015;
-        Sat,  1 Jul 2023 09:28:50 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru B6EB8120015
+        by mx1.sberdevices.ru (Postfix) with ESMTP id E5C77120016;
+        Sat,  1 Jul 2023 09:28:51 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru E5C77120016
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1688192930;
-        bh=/zPSdfUGbdjD3WsNJ+2VRQman2eX/Wi/L4491xiMsn8=;
+        s=mail; t=1688192931;
+        bh=/JpJG9jMN3yK/D5/IqeMHJNNEU4HVxLFDCFOJJsYMMQ=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=XeiUz6z8OFifNh3zimAno63/Bw/k8RpV0A9NPKs+Sytm+fqRWusR47ky9AdkOaMUL
-         k/ujvy7fAYTN1CdbZ/o0fETmkCXszW2sJdhDZS515C6Wjz9IEAHGwCA05mItWtjubZ
-         RSZ09D3j6KZaOlrhxygDQgQBFdux+Fz4pGHDrHRFCAiZRIpQBBS/3VEStHba5qT8/1
-         ewC3dai3Vk3NdAaIFZGRLPqH4H781OID3Dm9cyC+/T/KdM43TCsbglOKxcdeqimsNO
-         ay7xhHNdydb0Oo7Xn6U2H5x/7+n8kJsq0HPb8Bml3J+jluK8OcpObdJnRfesRu/WoQ
-         Sg+iDRiqSGDAA==
+        b=pBVbca5isHLQIE/+QNwxi7WmfWNANfDLUUZMcl8M7DM10EWZSlT28kTUp99xtsIA+
+         aFZgB2FKCZ0UweRLRfjijAz62syihhdOt1vvc91iMRkqY33+Q2FhVOxFpYt/wpHdCm
+         /tmZzIJfet6kEFMj00Gwv+OoElj1HWZ4/T1YqM+TQ7Goc60R6O2p/XnxjdF9jblYpp
+         pJx1AoniReeDq7y9lnxIf5QnEVfZK/F9sEBf6BNN9lBGaJnk/OQ7LxG+0A8kri83DF
+         7i51m50GRXr8KXnGEhLnkEi7vC8eUaAPDoqm0kBxGWBoXClzfTzBO0dtaFWmwYudFR
+         VZ7+KlIoAOc0Q==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
         by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Sat,  1 Jul 2023 09:28:49 +0300 (MSK)
+        Sat,  1 Jul 2023 09:28:50 +0300 (MSK)
 Received: from localhost.localdomain (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -52,9 +52,9 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@sberdevices.ru>,
         Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Subject: [RFC PATCH v5 11/17] vsock/virtio: support MSG_ZEROCOPY for transport
-Date:   Sat, 1 Jul 2023 09:23:04 +0300
-Message-ID: <20230701062310.3397129-12-AVKrasnov@sberdevices.ru>
+Subject: [RFC PATCH v5 12/17] vsock/loopback: support MSG_ZEROCOPY for transport
+Date:   Sat, 1 Jul 2023 09:23:05 +0300
+Message-ID: <20230701062310.3397129-13-AVKrasnov@sberdevices.ru>
 X-Mailer: git-send-email 2.35.0
 In-Reply-To: <20230701062310.3397129-1-AVKrasnov@sberdevices.ru>
 References: <20230701062310.3397129-1-AVKrasnov@sberdevices.ru>
@@ -90,38 +90,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add 'msgzerocopy_allow()' callback for virtio transport.
+Add 'msgzerocopy_allow()' callback for loopback transport.
 
 Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 ---
  Changelog:
  v4 -> v5:
   * Move 'msgzerocopy_allow' right after seqpacket callbacks.
+  * Don't use prototype for 'vsock_loopback_msgzerocopy_allow()'.
 
- net/vmw_vsock/virtio_transport.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ net/vmw_vsock/vsock_loopback.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index 6cbb45bb12d2..8d3e9f441fa1 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -441,6 +441,11 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
- 	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+index 5c6360df1f31..048640167411 100644
+--- a/net/vmw_vsock/vsock_loopback.c
++++ b/net/vmw_vsock/vsock_loopback.c
+@@ -47,6 +47,10 @@ static int vsock_loopback_cancel_pkt(struct vsock_sock *vsk)
  }
  
-+static bool virtio_transport_msgzerocopy_allow(void)
+ static bool vsock_loopback_seqpacket_allow(u32 remote_cid);
++static bool vsock_loopback_msgzerocopy_allow(void)
 +{
 +	return true;
 +}
-+
- static bool virtio_transport_seqpacket_allow(u32 remote_cid);
  
- static struct virtio_transport virtio_transport = {
-@@ -474,6 +479,8 @@ static struct virtio_transport virtio_transport = {
- 		.seqpacket_allow          = virtio_transport_seqpacket_allow,
+ static struct virtio_transport loopback_transport = {
+ 	.transport = {
+@@ -79,6 +83,8 @@ static struct virtio_transport loopback_transport = {
+ 		.seqpacket_allow          = vsock_loopback_seqpacket_allow,
  		.seqpacket_has_data       = virtio_transport_seqpacket_has_data,
  
-+		.msgzerocopy_allow        = virtio_transport_msgzerocopy_allow,
++		.msgzerocopy_allow        = vsock_loopback_msgzerocopy_allow,
 +
  		.notify_poll_in           = virtio_transport_notify_poll_in,
  		.notify_poll_out          = virtio_transport_notify_poll_out,
