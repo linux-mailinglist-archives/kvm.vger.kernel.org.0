@@ -2,193 +2,464 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D40E7445F5
-	for <lists+kvm@lfdr.de>; Sat,  1 Jul 2023 03:59:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00BF9744742
+	for <lists+kvm@lfdr.de>; Sat,  1 Jul 2023 08:51:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229802AbjGAB7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jun 2023 21:59:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37438 "EHLO
+        id S231161AbjGAGkk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Jul 2023 02:40:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjGAB7H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jun 2023 21:59:07 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36E0B420E;
-        Fri, 30 Jun 2023 18:59:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688176747; x=1719712747;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=kadwobPbntv7bqEGAJAWmbPreUMwjC7qneUEnCmNsyQ=;
-  b=T3nD8HY4QTExSuTwe5OsLIDPWkL8Td5VXrHwfEa3QDHxCBprsamnhX2S
-   ptfLfXHyujJDyCI/QpVe/hWuDJXG3mqWOwPGOmT0ONp7ezx+5G+4FYFGO
-   D+ybZUtkRNm1DMB5+YXwFQPPlKCd5Q5K1/W4jN2FrEvsQ/+NQm3Kwav8/
-   OZ3Lw5tKpXpIgb9qDO6mMsB9FlzvYofvV52HnKukTBlOqLSdW9wtwMrTw
-   w2QWrkTgTfjBngk/L2vuig7kKDt55jRU0sm0V9ZrGxaw0Z2r8zSAoD0aH
-   LH/25faDJhmmC6lS0xF4hkV4NOxnfnXXVUh/urt1jj+6PhIDQ3CjH87lK
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="342119785"
-X-IronPort-AV: E=Sophos;i="6.01,172,1684825200"; 
-   d="scan'208";a="342119785"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 18:59:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="964587391"
-X-IronPort-AV: E=Sophos;i="6.01,172,1684825200"; 
-   d="scan'208";a="964587391"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga006.fm.intel.com with ESMTP; 30 Jun 2023 18:59:06 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 30 Jun 2023 18:59:06 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Fri, 30 Jun 2023 18:59:06 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+        with ESMTP id S229547AbjGAGjr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 1 Jul 2023 02:39:47 -0400
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 819694236;
+        Fri, 30 Jun 2023 23:39:33 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id A98C3120003;
+        Sat,  1 Jul 2023 09:28:35 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A98C3120003
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1688192915;
+        bh=4a6C3WsLtas1laB85b1u+TVuIfgcGoIgezLQKn3GUOw=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+        b=FNqzLmH82DRcM7iQKQ21ytl/GDIfC/82R/gz3NtXipx5USnD0pT/IMqa6gTsZoxoN
+         dT8f6RIkCy2MCHm6fIBhBoBey7XINCSTm2fWE2Z8Y1cooxd3hnQTqGGGMfhZGsLpAV
+         wT2V3NRzcdwpZPXrxZoYdEWU60dF7S7gqHLvgnxUTo/uuQz6hW3EygDnMB5jlIosuk
+         UouZmL7XZlSWJNyrUOZctnJdfOtVVa+PdO4fEi9ootZZ+saNswq0r8z+Mw2ZOAGVG/
+         +N29zMK16PhE/30fYBx/ktabIGurVY/n/fl10N8UvFKLhdpwo3uHrTXX2pkpvUjC3z
+         nP0sYeZDTcH/Q==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.sberdevices.ru (Postfix) with ESMTPS;
+        Sat,  1 Jul 2023 09:28:34 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Fri, 30 Jun 2023 18:59:04 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LPeBEK6OrYF/aB2oSPRyWV2XIbuGiS163qKfXhJIh6WruCV5HG1fU9GbXDOsw5NbN7cpr5VRZwPcTlvYVLQFSZs03TgCXmjYmlviHFrU+Mz975xUM9a1x4o0vhKsSYhVN7U131mlg9uA5Ml+q5VY3kKGUzf2WqqEJjfb7BE+eZAIQaXcMOuyZqm0LkwK/GfG0Xjj90cBTdPjiR6H25tuNJXTgFMlYokfo3+YP63mcevS4YJUlk5EpMwnxm2JurT843qBPGFKl1p6s7YipNyiGyi2rUFE6gDWBQZvJwNHJIy6xFSP/MAnlvUYXDDCRpyTgm0prCU7zO8uXdMVImezOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=doLYAUw5JsT6W3d806pztx4iLn/V2KIYBiYFvtqp11Q=;
- b=VP5jyh26ImYUEO6sHuhWyaSy/6EUM5zBxDoCplb63rVMp8J6b9TJTpJy9KgaKruWk7ft5Nk1ojpU02nV0t+wFBuF4cYNAhtVCoAqzG/nkx+xGE3EGk7UkCxo0/ME60QCxFiKY+welz4I2155RSH/4Ui1E0l8xw9YK7VB2OEOikLReiz5tKqbM77t+ThPQIO9ueEdKrlHTK4as6O+GTmDW3uV4T0TI+Ynwa98ssFWRHTCpptwnMDfyEaKbVlf+ujOwqaLYJIvzuYYb4VpmqiKPUrX2h5oRBSIcyS6qwvUBIUo8AeaO0twbCu34e9szx9FJnAoGC1/2CAiXBOVhzaQOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by BL1PR11MB5955.namprd11.prod.outlook.com (2603:10b6:208:386::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Sat, 1 Jul
- 2023 01:59:02 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::4707:8818:a403:f7a9]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::4707:8818:a403:f7a9%6]) with mapi id 15.20.6544.024; Sat, 1 Jul 2023
- 01:59:02 +0000
-Message-ID: <8ae1bf2e-48d1-4c9b-4dc3-398c8e199247@intel.com>
-Date:   Sat, 1 Jul 2023 09:58:51 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v3 10/21] KVM:x86: Add #CP support in guest exception
- classification
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Gil Neiger <gil.neiger@intel.com>
-CC:     Chao Gao <chao.gao@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "rppt@kernel.org" <rppt@kernel.org>,
-        "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-        Rick P Edgecombe <rick.p.edgecombe@intel.com>,
-        "john.allen@amd.com" <john.allen@amd.com>
-References: <20230511040857.6094-11-weijiang.yang@intel.com>
- <ZH73kDx6VCaBFiyh@chao-email>
- <21568052-eb0f-a8d6-5225-3b422e9470e9@intel.com>
- <ZIulniryqlj0hLnt@google.com>
- <dfdf6d93-a68c-bb07-e59e-8d888dd6ebb6@intel.com>
- <ZIywqx6xTAMFyDPT@google.com>
- <0a98683f-3e60-1f1b-55df-f2a781929fdf@intel.com>
- <ZJ6uKZToMPfwoXW6@chao-email>
- <8dec8b09-2568-a664-e51d-e6ff9f49e7de@intel.com>
- <CO1PR11MB5107FBC68DBA6877E390A633912AA@CO1PR11MB5107.namprd11.prod.outlook.com>
- <ZJ7xjE0qMjpYIiB/@google.com>
-From:   "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <ZJ7xjE0qMjpYIiB/@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG3P274CA0001.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:be::13)
- To PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+ 15.2.1118.30; Sat, 1 Jul 2023 09:28:15 +0300
+From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
+        <avkrasnov@sberdevices.ru>,
+        Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Subject: [RFC PATCH v5 00/17] vsock: MSG_ZEROCOPY flag support
+Date:   Sat, 1 Jul 2023 09:22:53 +0300
+Message-ID: <20230701062310.3397129-1-AVKrasnov@sberdevices.ru>
+X-Mailer: git-send-email 2.35.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|BL1PR11MB5955:EE_
-X-MS-Office365-Filtering-Correlation-Id: a0a64db4-bf7b-48ff-b95f-08db79d6bdd0
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GIEMfCCRfySLWTtqAUllj9HPr+VDFn6sZIhKj05OXOzZw9eXnLV/dr8vCdDEOY6CUHeiWuwlai310YzCjTUu695Anrw35UWTVy0PTujh2nk9FxR3T7En2gE/FiPVdwcPyxG7u7IdD4Ouf2CgGAwRjmPgDYoxpXO+h+Gb7sr2bGYf9ey0VM4532ogQZYqekzrOF4vt8+a32R4DTUTmn2yRuh/EkMzPSVHXwmuA9yJLMj0tLz7yD5avu73lN7/ZR9jwrgEDR4tKuHgv92vYJrwZPvN7Y5z6jQrkgY/OVaSbrTjr7rmOd1pOucErDrKEdjB7+S9vKk1n76xMrmH/Q/sY9P2KRXLXDG4+Pi5vMD1mjDeZg68EEBoNOW+KzP8fdUFNgIUHBthcAOW510zH+zY3ey7BBbzfNr0UutYpI4Ff8XLZNH5lx3JkLrsJGzQ7CbCAwLvblWg4dAZMVgnptxcIzPNpjEqYC39snre7pfUO8X0LW9Vi1ftez+ahDHQvrt9WujmJoRPQeTJRVd5cV6A0Sc0fs7iQyT+x5rPVuQW7xhdN6zD9C4Jae+l2vdZKqt9JCsKZOCxFrcvfip5KcPIlStRhPRODQ7/uqFggaD4uSBS8WvQ4xaFItUFnS0HDhNGaguUJUo02ZpdeDyGLysUpg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(346002)(39860400002)(366004)(396003)(136003)(451199021)(53546011)(6666004)(4744005)(6486002)(54906003)(110136005)(83380400001)(6506007)(2906002)(6512007)(2616005)(26005)(186003)(478600001)(5660300002)(36756003)(316002)(4326008)(31696002)(6636002)(82960400001)(66946007)(38100700002)(8936002)(41300700001)(66556008)(86362001)(66476007)(8676002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RjA1dG9EZGVURzRubVl4TzZaNzRsU3FCclowQVRydDRkWVV1cXhCUkFqUlcw?=
- =?utf-8?B?ZHNIWmdod1paRnpVWVNWUnJEOVRoQjVmQ3IyRXZ3bnMvVzUzcEhOTVFkU3R3?=
- =?utf-8?B?NGRFdUtOVDgzeTY3UHRnNy9jV2FvUHhQVmUwdnlJenhlR2FmS1JhY3V6aklu?=
- =?utf-8?B?bnpXbVhpb29uU0hETlVZMVdFdk03VHNsbWFDNDAydHU3U1JqbCtWN1dkWVNy?=
- =?utf-8?B?NURZYjhYV3R5dHRSeE41eHE2OVA4bFV4aDFQRlc1U1VjUi9UY2Z2cGpWZ2F0?=
- =?utf-8?B?eC9xUXRxc2M1anQ5ZE5BdEFuNCsvdGw4VW1LclpwcmVHQUt3VFVRUytTYVcy?=
- =?utf-8?B?MEZEZXBOZWFsVGZGeExoTlg1d2MxM3FSaUhSeWpTTkxablROOE1XR3ExbGtH?=
- =?utf-8?B?NndNQWNSTWhmSWREZm11V1V0ekF6YkRMUVFWK2ZaSHZ6MkpzMlRGc1NGZllF?=
- =?utf-8?B?M0trdm9IV0h3clB2ZHBZaFBiMFRLRGRzZFUybUQ5RXQ4SUM2dzhJUHdDV1hZ?=
- =?utf-8?B?S1ovbzgwWWxXelg0MWNPU2F1VFI1WWpCd21VdGVHckJvZ0FkR1NSMk9XOW5T?=
- =?utf-8?B?cmZKZnRzYmVjYTBvSXdBVGdVcmRhTVF5TnVRWXpVeDZWZzNaYnc4c3h3a3Ew?=
- =?utf-8?B?VDhxYUJOQWZxdVVQSGxIdmhCMG9Tb3ZIdUZQM25RTVhPNHYvR2tWNjhTcUJK?=
- =?utf-8?B?TUhxOE5KYTV4cncybzV5MW9zN3E5WEE5em9nd2RLMjJiV0FIenlKbXZsNXVu?=
- =?utf-8?B?NVB2VHpNSkQ1ejljQkl1U2hheEVCTldIQXNQaElXVVBpSnN3NDRKWld0TEZZ?=
- =?utf-8?B?T3pJTkk1dGZkeEU2UzFsWkw1eHhtdVliYzlqamNCRGVyOURodnB0Zm5OVExW?=
- =?utf-8?B?UFJOclFLczhSdVlzRktXNTJuZVhVK1ZkU2dOYkRKK09HbXZHVFpYY04wN05u?=
- =?utf-8?B?cE1FTURtdURiN2dZYVBxNVBXbEJyUU84Q1MzdVN0RE50UGJtazJLaTdORFZX?=
- =?utf-8?B?cnRNM3d4US9GV1hiS0x6bndITUNjRVc5bEZNS3NyY3FKWUZxM2ZZMUZXemZM?=
- =?utf-8?B?dDVnRndMaTQrUSt0T3VKNy9ialc3ZkZUSWl0SnpFMUtUbFVSUlBSQUVuVEdM?=
- =?utf-8?B?emc5Sm5iUnVwVFc3NkxFVGdFcGlVaU42bVFMTEdhNW1kNmgzRXgxYlk2VmJX?=
- =?utf-8?B?UzdjVkFWYitsMU96c1dNM0FOL2dmM2k3cE5LdzRYc2luRGxiU1VyYmtGN3Fk?=
- =?utf-8?B?bEJMRVFBNkI2dnB6NUw0YkZBNXZKSGNIMFF6aTA4MkJRVnN2VXFHQ3pRVStq?=
- =?utf-8?B?ZGhlT1dHMkEyWUh2TVVTNVVEbG8wQ2Yva1lsTlMyam9meXMvT3hYMGdCcjFZ?=
- =?utf-8?B?aUhVOUkyKzFiR2haSlpnZzcxZ2JrZHlwYTRkZUgyQ0phM3hCb3ZOeTJLeXdp?=
- =?utf-8?B?WGJRS3NkUHk2dDAzUGVQOWQ3VitNamQ0VDI2N1J5cHJlT1l1OURUd1ZaRGdP?=
- =?utf-8?B?L0RyelhQQXpVVHkra3I5alJGalNCczcxVWNWK0I0cmpwQ3ZBbzhHcUQ0L1pH?=
- =?utf-8?B?UGovdUdBNVN0aGhqNzN1VXp1RmJuZkZrb3lRQlRsM1lnMWtvUVFKaC8zOGJ0?=
- =?utf-8?B?b0tZcThXZ094enpSd3ppb0orazgyWHpzR3J2T1NyZi9tb2tUTGxTVzRvN3py?=
- =?utf-8?B?RmE3ZDkxeHd2ZFpxVFhnclcxSWk0VjJIclNOMEFnY0FKWTZEMXNLUlhyNzdU?=
- =?utf-8?B?dTlGMGNQckpVbS9ZZGozcGFleEdBUlFsUHY3QnhoUXBnNnRzTDI4ZENqdWZa?=
- =?utf-8?B?a2NhUVlyTjlFT281UDdOZUJUa00rYUNETXgvY1FGYmN6Q3BzSEhMWUk4WWpJ?=
- =?utf-8?B?akUvS3p1dTR6S2VTdXJDQ0hLODhaamUrSTQyVUdNMmhQdGNiZzEwOTNEV1FU?=
- =?utf-8?B?aDFaN3hkL1ZDS1hScjFBbFFTSFJYZWk3d0VGUzkrU1huUUp6VHNaenVIOU9D?=
- =?utf-8?B?YW5iL1htREZXYzYvWkdZQjh4T3B2TjlaUFJzMkhFelRhVTJHL0ZqRk50RUM2?=
- =?utf-8?B?cEtONFFHOElxL3Y0encvVXJlVDNMRDZocEllRVJ3aGU4MFhIYWViQkJ3NXlM?=
- =?utf-8?B?cWZ0RkhzYmJzbFY4aXIxTEd3UWNvVTJCTWliRVhGRWFnS2hZZkx6RFMxRStD?=
- =?utf-8?B?cHc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a0a64db4-bf7b-48ff-b95f-08db79d6bdd0
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2023 01:59:02.0739
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lEhJd/SuhNZvP/E8rPMnQPuQ+41wKTqe8VZpmGH1dR5GzK3WqH55zL1P/6ROb2+hzvbScd6PKpzkzhtS9SsVuw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5955
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 178380 [Jun 30 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 517 517 b0056c19d8e10afbb16cb7aad7258dedb0179a79, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, git.kernel.org:7.1.1;sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;lore.kernel.org:7.1.1;100.64.160.123:7.1.2, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/07/01 05:11:00
+X-KSMG-LinksScanning: Clean, bases: 2023/07/01 05:11:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/01 00:58:00 #21597365
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
 
-On 6/30/2023 11:15 PM, Sean Christopherson wrote:
-> On Fri, Jun 30, 2023, Gil Neiger wrote:
->> Intel will not produce any CPU with CET that does not enumerate IA32_VMX_BASIC[56] as 1.
->>
->> One can check that bit before injecting a #CP with error code, but it should
->> not be necessary if CET is enumerated.
->>
->> Of course, if the KVM may run as a guest of another VMM/hypervisor, it may be
->> that the virtual CPU in which KVM operates may enumerate CET but clear the
->> bit in IA32_VMX_BASIC.
-> Yeah, I think KVM should be paranoid and expose CET to the guest if and only if
-> IA32_VMX_BASIC[56] is 1.  That'll also help validate nested support, e.g. will
-> make it more obvious if userspace+KVM provides a  "bad" model to L1.
+                           DESCRIPTION
 
-OK, will do it, thanks you two!
+this is MSG_ZEROCOPY feature support for virtio/vsock. I tried to follow
+current implementation for TCP as much as possible:
+
+1) Sender must enable SO_ZEROCOPY flag to use this feature. Without this
+   flag, data will be sent in "classic" copy manner and MSG_ZEROCOPY
+   flag will be ignored (e.g. without completion).
+
+2) Kernel uses completions from socket's error queue. Single completion
+   for single tx syscall (or it can merge several completions to single
+   one). I used already implemented logic for MSG_ZEROCOPY support:
+   'msg_zerocopy_realloc()' etc.
+
+Difference with copy way is not significant. During packet allocation,
+non-linear skb is created and filled with pinned user pages.
+There are also some updates for vhost and guest parts of transport - in
+both cases i've added handling of non-linear skb for virtio part. vhost
+copies data from such skb to the guest's rx virtio buffers. In the guest,
+virtio transport fills tx virtio queue with pages from skb.
+
+Head of this patchset is:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d20dd0ea14072e8a90ff864b2c1603bd68920b4b
+
+
+This version has several limits/problems (all resolved at v5):
+
+1) As this feature totally depends on transport, there is no way (or it
+   is difficult) to check whether transport is able to handle it or not
+   during SO_ZEROCOPY setting. Seems I need to call AF_VSOCK specific
+   setsockopt callback from setsockopt callback for SOL_SOCKET, but this
+   leads to lock problem, because both AF_VSOCK and SOL_SOCKET callback
+   are not considered to be called from each other. So in current version
+   SO_ZEROCOPY is set successfully to any type (e.g. transport) of
+   AF_VSOCK socket, but if transport does not support MSG_ZEROCOPY,
+   tx routine will fail with EOPNOTSUPP.
+
+   ^^^ fixed in v5. Thanks to Bobby Eshleman.
+
+2) When MSG_ZEROCOPY is used, for each tx system call we need to enqueue
+   one completion. In each completion there is flag which shows how tx
+   was performed: zerocopy or copy. This leads that whole message must
+   be send in zerocopy or copy way - we can't send part of message with
+   copying and rest of message with zerocopy mode (or vice versa). Now,
+   we need to account vsock credit logic, e.g. we can't send whole data
+   once - only allowed number of bytes could sent at any moment. In case
+   of copying way there is no problem as in worst case we can send single
+   bytes, but zerocopy is more complex because smallest transmission
+   unit is single page. So if there is not enough space at peer's side
+   to send integer number of pages (at least one) - we will wait, thus
+   stalling tx side. To overcome this problem i've added simple rule -
+   zerocopy is possible only when there is enough space at another side
+   for whole message (to check, that current 'msghdr' was already used
+   in previous tx iterations i use 'iov_offset' field of it's iov iter).
+
+   ^^^
+   Discussed as ok during v2. Link:
+   https://lore.kernel.org/netdev/23guh3txkghxpgcrcjx7h62qsoj3xgjhfzgtbmqp2slrz3rxr4@zya2z7kwt75l/
+
+3) loopback transport is not supported, because it requires to implement
+   non-linear skb handling in dequeue logic (as we "send" fragged skb
+   and "receive" it from the same queue). I'm going to implement it in
+   next versions.
+
+   ^^^ fixed in v2
+
+4) Current implementation sets max length of packet to 64KB. IIUC this
+   is due to 'kmalloc()' allocated data buffers. I think, in case of
+   MSG_ZEROCOPY this value could be increased, because 'kmalloc()' is
+   not touched for data - user space pages are used as buffers. Also
+   this limit trims every message which is > 64KB, thus such messages
+   will be send in copy mode due to 'iov_offset' check in 2).
+
+   ^^^ fixed in v2
+
+                         PATCHSET STRUCTURE
+
+Patchset has the following structure:
+1) Handle non-linear skbuff on receive in virtio/vhost.
+2) Handle non-linear skbuff on send in virtio/vhost.
+3) Updates for AF_VSOCK.
+4) Enable MSG_ZEROCOPY support on transports.
+5) Tests/tools/docs updates.
+
+                            PERFORMANCE
+
+Performance: it is a little bit tricky to compare performance between
+copy and zerocopy transmissions. In zerocopy way we need to wait when
+user buffers will be released by kernel, so it is like synchronous
+path (wait until device driver will process it), while in copy way we
+can feed data to kernel as many as we want, don't care about device
+driver. So I compared only time which we spend in the 'send()' syscall.
+Then if this value will be combined with total number of transmitted
+bytes, we can get Gbit/s parameter. Also to avoid tx stalls due to not
+enough credit, receiver allocates same amount of space as sender needs.
+
+Sender:
+./vsock_perf --sender <CID> --buf-size <buf size> --bytes 256M [--zc]
+
+Receiver:
+./vsock_perf --vsk-size 256M
+
+I run tests on two setups: desktop with Core i7 - I use this PC for
+development and in this case guest is nested guest, and host is normal
+guest. Another hardware is some embedded board with Atom - here I don't
+have nested virtualization - host runs on hw, and guest is normal guest.
+
+G2H transmission (values are Gbit/s):
+
+   Core i7 with nested guest.            Atom with normal guest.
+
+*-------------------------------*   *-------------------------------*
+|          |         |          |   |          |         |          |
+| buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
+|          |         |          |   |          |         |          |
+*-------------------------------*   *-------------------------------*
+|   4KB    |    3    |    10    |   |   4KB    |   0.8   |   1.9    |
+*-------------------------------*   *-------------------------------*
+|   32KB   |   20    |    61    |   |   32KB   |   6.8   |   20.2   |
+*-------------------------------*   *-------------------------------*
+|   256KB  |   33    |   244    |   |   256KB  |   7.8   |   55     |
+*-------------------------------*   *-------------------------------*
+|    1M    |   30    |   373    |   |    1M    |   7     |   95     |
+*-------------------------------*   *-------------------------------*
+|    8M    |   22    |   475    |   |    8M    |   7     |   114    |
+*-------------------------------*   *-------------------------------*
+
+H2G:
+
+   Core i7 with nested guest.            Atom with normal guest.
+
+*-------------------------------*   *-------------------------------*
+|          |         |          |   |          |         |          |
+| buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
+|          |         |          |   |          |         |          |
+*-------------------------------*   *-------------------------------*
+|   4KB    |   20    |    10    |   |   4KB    |   4.37  |    3     |
+*-------------------------------*   *-------------------------------*
+|   32KB   |   37    |    75    |   |   32KB   |   11    |   18     |
+*-------------------------------*   *-------------------------------*
+|   256KB  |   44    |   299    |   |   256KB  |   11    |   62     |
+*-------------------------------*   *-------------------------------*
+|    1M    |   28    |   335    |   |    1M    |   9     |   77     |
+*-------------------------------*   *-------------------------------*
+|    8M    |   27    |   417    |   |    8M    |  9.35   |  115     |
+*-------------------------------*   *-------------------------------*
+
+ * Let's look to the first line of both tables - where copy is better
+   than zerocopy. I analyzed this case more deeply and found that
+   bottleneck is function 'vhost_work_queue()'. With 4K buffer size,
+   caller spends too much time in it with zerocopy mode (comparing to
+   copy mode). This happens only with 4K buffer size. This function just
+   calls 'wake_up_process()' and its internal logic does not depends on
+   skb, so i think potential reason (may be) is interval between two
+   calls of this function (e.g. how often it is called). Note, that
+   'vhost_work_queue()' differs from the same function at guest's side of
+   transport: 'virtio_transport_send_pkt()' uses 'queue_work()' which
+   i think is more optimized for worker purposes, than direct call to
+   'wake_up_process()'. But again - this is just my assumption.
+
+Loopback:
+
+   Core i7 with nested guest.            Atom with normal guest.
+
+*-------------------------------*   *-------------------------------*
+|          |         |          |   |          |         |          |
+| buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
+|          |         |          |   |          |         |          |
+*-------------------------------*   *-------------------------------*
+|   4KB    |    8    |     7    |   |   4KB    |   1.8   |   1.3    |
+*-------------------------------*   *-------------------------------*
+|   32KB   |   38    |    44    |   |   32KB   |   10    |   10     |
+*-------------------------------*   *-------------------------------*
+|   256KB  |   55    |   168    |   |   256KB  |   15    |   36     |
+*-------------------------------*   *-------------------------------*
+|    1M    |   53    |   250    |   |    1M    |   12    |   45     |
+*-------------------------------*   *-------------------------------*
+|    8M    |   40    |   344    |   |    8M    |   11    |   74     |
+*-------------------------------*   *-------------------------------*
+
+I analyzed performace difference more deeply for the following setup:
+server: ./vsock_perf --vsk-size 16M
+client: ./vsock_perf --sender 2 --bytes 16M --buf-size 16K/4K [--zc]
+
+In other words I send 16M of data from guest to host in copy/zerocopy
+modes and with two different sizes of buffer - 4K and 64K. Let's see
+to tx path for both modes - it consists of two steps:
+
+copy:
+1) Allocate skb of buffer's length.
+2) Copy data to skb from buffer.
+
+zerocopy:
+1) Allocate skb with header space only.
+2) Pin pages of the buffer and insert them to skb.
+
+I measured average number of ns (returned by 'ktime_get()') for each
+step above:
+1) Skb allocation (for both copy and zerocopy modes).
+2) For copy mode in 'memcpy_to_msg()' - copying.
+3) For zerocopy mode in '__zerocopy_sg_from_iter()' - pinning.
+
+Here are results for copy mode:
+*-------------------------------------*
+| buf | skb alloc | 'memcpy_to_msg()' |
+*-------------------------------------*
+|     |           |                   |
+| 64K |  5000ns   |      25000ns      |
+|     |           |                   |
+*-------------------------------------*
+|     |           |                   |
+| 4K  |  800ns    |      2200ns       |
+|     |           |                   |
+*-------------------------------------*
+
+Here are results for zerocopy mode:
+*-----------------------------------------------*
+| buf | skb alloc | '__zerocopy_sg_from_iter()' |
+*-----------------------------------------------*
+|     |           |                             |
+| 64K |  250ns    |          3500ns             |
+|     |           |                             |
+*-----------------------------------------------*
+|     |           |                             |
+| 4K  |  250ns    |          3000ns             |
+|     |           |                             |
+*-----------------------------------------------*
+
+I guess that reason of zerocopy performance is low overhead for page
+pinning: there is big difference between 4K and 64K in case of copying
+(25000 vs 2200), but in pinning case - just 3000 vs 3500.
+
+So, zerocopy is faster than classic copy mode, but of course it requires
+specific architecture of application due to user pages pinning, buffer
+size and alignment.
+
+                             NOTES
+
+If host fails to send data with "Cannot allocate memory", check value
+/proc/sys/net/core/optmem_max - it is accounted during completion skb
+allocation. Try to update it to for example 1M and try send again:
+"echo 1048576 > /proc/sys/net/core/optmem_max" (as root).
+
+                            TESTING
+
+This patchset includes set of tests for MSG_ZEROCOPY feature. I tried to
+cover new code as much as possible so there are different cases for
+MSG_ZEROCOPY transmissions: with disabled SO_ZEROCOPY and several io
+vector types (different sizes, alignments, with unmapped pages). I also
+run tests with loopback transport and run vsockmon. In v3 i've added
+io_uring test as separated application.
+
+           LET'S SPLIT PATCHSET TO MAKE REVIEW EASIER
+
+In v3 Stefano Garzarella <sgarzare@redhat.com> asked to split this patchset
+for several parts, because it looks too big for review. I think in this
+version (v4) we can do it in the following way:
+
+[0001 - 0005] - this is preparation for virtio/vhost part.
+[0006 - 0009] - this is preparation for AF_VSOCK part.
+[0010 - 0014] - these patches allows to trigger logic from the previous
+                two parts. In addition 0014 is patch for Documentation.
+[0015 - rest] - updates for tests, utils. This part doesn't touch kernel
+                code and looks not critical.
+
+Thanks, Arseniy
+
+Link to v1:
+https://lore.kernel.org/netdev/0e7c6fc4-b4a6-a27b-36e9-359597bba2b5@sberdevices.ru/
+Link to v2:
+https://lore.kernel.org/netdev/20230423192643.1537470-1-AVKrasnov@sberdevices.ru/
+Link to v3:
+https://lore.kernel.org/netdev/20230522073950.3574171-1-AVKrasnov@sberdevices.ru/
+Link to v4:
+https://lore.kernel.org/netdev/20230603204939.1598818-1-AVKrasnov@sberdevices.ru/
+
+Changelog:
+v1 -> v2:
+ - Replace 'get_user_pages()' with 'pin_user_pages()'.
+ - Loopback transport support.
+
+v2 -> v3
+ - Use 'get_user_pages()' instead of 'pin_user_pages()'. I think this
+   is right approach, because i'm using '__zerocopy_sg_from_iter()'
+   function. It is already implemented and used by io_uring zerocopy
+   tx logic to 'pin' pages of user's buffer.
+
+ - Use 'skb_copy_datagram_iter()' to copy data from both linear and
+   non-linear skb to user's iov iter. It already has support for copying
+   data from paged part of skb (by calling 'kmap()'). In v2 i used my
+   own "from scratch" implemented function. With this and previous thing
+   I significantly reduced LOC number in kernel part.
+
+ - Add io_uring test for AF_VSOCK. It is implemented as separated util,
+   because it depends on liburing (i think there is no need to link
+   'vsock_test' with liburing, because io_uring functionality depends
+   on environment - both in kernel and userspace).
+
+ - Values from PERFORMANCE section are updated for all transports, but
+   I didn't found any significant difference with v2.
+
+ - More details in commit messages.
+
+v3 -> v4:
+ - Requirement for buffers to have page aligned base and size is removed,
+   because virtio can handle such buffers.
+
+ - Crash with SOCK_SEQPACKET is fixed. This is done by setting owner of
+   new 'skb' before passing it to '__zerocopy_sg_from_iter()'. Last one
+   dereferences owner of the passed skb without any checks (it was NULL).
+
+ - Type of "owning" of the newly created skb is also changed: in v3 and
+   before it was 'skb_set_owner_sk_safe()'. I replace it with this one:
+   'skb_set_owner_w()'. This is because '__zerocopy_sg_from_iter()'
+   increments 'sk_wmem_alloc' of socket which owns skb, thus we need a
+   proper destructor which decrements it back - it is 'sock_wfree()'.
+   This destructor is set by 'skb_set_owner_w()'. Otherwise we get leak
+   of resource - such socket will be never deallocated.
+
+ - Use ITER_KVEC instead of ITER_IOVEC when skb is copied to another one
+   for passing to TAP device. Reason of this update is that ITER_IOVEC
+   considered as userspace memory, while we have only kernel memory here.
+
+v4 -> v5:
+ - Problem 1) with dependency of SO_ZEROCOPY from the current transport
+   is fixed.
+
+ - See per patch changelog (after ---).
+
+Arseniy Krasnov (17):
+  vsock/virtio: read data from non-linear skb
+  vhost/vsock: read data from non-linear skb
+  vsock/virtio: support to send non-linear skb
+  vsock/virtio: non-linear skb handling for tap
+  vsock/virtio: MSG_ZEROCOPY flag support
+  vsock: fix EPOLLERR set on non-empty error queue
+  vsock: read from socket's error queue
+  vsock: check for MSG_ZEROCOPY support on send
+  vsock: enable SOCK_SUPPORT_ZC bit
+  vhost/vsock: support MSG_ZEROCOPY for transport
+  vsock/virtio: support MSG_ZEROCOPY for transport
+  vsock/loopback: support MSG_ZEROCOPY for transport
+  vsock: enable setting SO_ZEROCOPY
+  docs: net: description of MSG_ZEROCOPY for AF_VSOCK
+  test/vsock: MSG_ZEROCOPY flag tests
+  test/vsock: MSG_ZEROCOPY support for vsock_perf
+  test/vsock: io_uring rx/tx tests
+
+ Documentation/networking/msg_zerocopy.rst |  12 +-
+ drivers/vhost/vsock.c                     |  21 +-
+ include/linux/socket.h                    |   1 +
+ include/linux/virtio_vsock.h              |   1 +
+ include/net/af_vsock.h                    |   7 +
+ net/vmw_vsock/af_vsock.c                  |  61 +++-
+ net/vmw_vsock/virtio_transport.c          |  47 +++-
+ net/vmw_vsock/virtio_transport_common.c   | 313 ++++++++++++++++-----
+ net/vmw_vsock/vsock_loopback.c            |   6 +
+ tools/testing/vsock/Makefile              |   9 +-
+ tools/testing/vsock/util.c                | 218 +++++++++++++++
+ tools/testing/vsock/util.h                |  18 ++
+ tools/testing/vsock/vsock_perf.c          | 139 +++++++++-
+ tools/testing/vsock/vsock_test.c          |  16 ++
+ tools/testing/vsock/vsock_test_zerocopy.c | 312 +++++++++++++++++++++
+ tools/testing/vsock/vsock_test_zerocopy.h |  15 +
+ tools/testing/vsock/vsock_uring_test.c    | 321 ++++++++++++++++++++++
+ 17 files changed, 1423 insertions(+), 94 deletions(-)
+ create mode 100644 tools/testing/vsock/vsock_test_zerocopy.c
+ create mode 100644 tools/testing/vsock/vsock_test_zerocopy.h
+ create mode 100644 tools/testing/vsock/vsock_uring_test.c
+
+-- 
+2.25.1
 
