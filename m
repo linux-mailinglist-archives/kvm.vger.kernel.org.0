@@ -2,133 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F3ED7453FF
-	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 04:53:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 410F2745511
+	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 07:52:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbjGCCxa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Jul 2023 22:53:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54942 "EHLO
+        id S229820AbjGCFwm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jul 2023 01:52:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjGCCx3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Jul 2023 22:53:29 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9235218F;
-        Sun,  2 Jul 2023 19:53:28 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b6c3921c8bso61859691fa.3;
-        Sun, 02 Jul 2023 19:53:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688352807; x=1690944807;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fhyBGVQ1gaH5Dq33+rfxBQOlHqFL4drvkmIj6aJ3EDI=;
-        b=O1hWsfHy6op+iJK7RchZka3HezdQVlH4vq5oZ4Ax4HtYBJHdp7SiTUlOd/0MeGRlXW
-         qD/ZIYJ7S7K1mp3qOnr6kToxa76JlnRwNUBFg8F1baXgmRqJNnWHdQllc+zNQ/KDquxA
-         7ErHevq/QuYL5AcR4Ql1h5QzNaJ9QIQcafCqt4dGXfaEkOM3HL++icZX1GE7OHuqT4Je
-         cvxgKsI/a5C0cZWpASXrd1T8JMo5yoIoj74Zs2ka04Rmp+6QnFbys2scKj3azEQXgQ2p
-         1SDy5h+KL7Ty3XPYq179EooH/TEpDroawrvKxJ2iJS0i2N+UJhV225NmXPpDfy0Ly7ur
-         MwBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688352807; x=1690944807;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fhyBGVQ1gaH5Dq33+rfxBQOlHqFL4drvkmIj6aJ3EDI=;
-        b=IM3Gs7DaIM4xwZMU9A1O9itQhG30KTZobBn0AR+a+u8sllFva9Ed/rN8dlYq5UUUJe
-         mqwOfWPDos11UnFLWa7Nn5mfXckUMRh1QV3XTswGu63bNyalMTzxX1KHo3aPSsw3oOua
-         XIL3+R/C4WpqzAv8C4DOZv8v1+3zsrZJYx+R0G/gCseFgOwU/h9Cn9TSYaBZ7He9BAq+
-         zJ9rk4ksxSPbBgduEwbWjMrSeWsAQjp7BHt/Qg5UkEi0A3XzkwMrOloiGasgMQQY8IJY
-         8FxwnxaMAT3b14LIzC15p/cokJysVJkS/jm+Fc1v8mYZx9jdZcclue8109N0gVAI9zhk
-         5TDw==
-X-Gm-Message-State: ABy/qLYEjZYszfkDLSeNnhovWb8bYYM7Qay0+YwH315a4nouOHDmol2N
-        qs4FV/4EWddpejUYov3plOZl1DZKhVzaDHnTKhg=
-X-Google-Smtp-Source: APBJJlFfL2px5Y6Cyr17rNDrNo5fJ8sdzYko47a6W75rx7foKvBUjbZJAB2cC/NyOavCuc3SoyWVNmryeUVMgdKDyso=
-X-Received: by 2002:a2e:9205:0:b0:2b6:e128:e7a3 with SMTP id
- k5-20020a2e9205000000b002b6e128e7a3mr2116081ljg.33.1688352806560; Sun, 02 Jul
- 2023 19:53:26 -0700 (PDT)
+        with ESMTP id S229657AbjGCFwm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jul 2023 01:52:42 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B4B4B2
+        for <kvm@vger.kernel.org>; Sun,  2 Jul 2023 22:52:40 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4QvZnz0lsnz4wqZ;
+        Mon,  3 Jul 2023 15:52:39 +1000 (AEST)
+From:   Michael Ellerman <patch-notifications@ellerman.id.au>
+To:     linuxppc-dev@lists.ozlabs.org, Nicholas Piggin <npiggin@gmail.com>
+Cc:     kvm@vger.kernel.org
+In-Reply-To: <20230608024504.58189-1-npiggin@gmail.com>
+References: <20230608024504.58189-1-npiggin@gmail.com>
+Subject: Re: [PATCH] KVM: PPC: Update MAINTAINERS
+Message-Id: <168836201882.50010.3420393910023246463.b4-ty@ellerman.id.au>
+Date:   Mon, 03 Jul 2023 15:26:58 +1000
 MIME-Version: 1.0
-References: <cover.1688010022.git.haibo1.xu@intel.com> <20230701-e1bff47a0ed38ec3ab6ca252@orel>
-In-Reply-To: <20230701-e1bff47a0ed38ec3ab6ca252@orel>
-From:   Haibo Xu <xiaobo55x@gmail.com>
-Date:   Mon, 3 Jul 2023 10:53:15 +0800
-Message-ID: <CAJve8on_SRbPmQ4U16imMUjrqs_abLsW64xJotBxRSv65WJa-w@mail.gmail.com>
-Subject: Re: [PATCH v5 00/13] RISCV: Add KVM_GET_REG_LIST API
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org,
-        oliver.upton@linux.dev, seanjc@google.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jul 1, 2023 at 10:53=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
-om> wrote:
->
-> On Sat, Jul 01, 2023 at 09:42:48PM +0800, Haibo Xu wrote:
-> > KVM_GET_REG_LIST will dump all register IDs that are available to
-> > KVM_GET/SET_ONE_REG and It's very useful to identify some platform
-> > regression issue during VM migration.
-> >
-> > Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
-> > of the code as common test framework that can be shared by riscv.
-> >
-> > Patch 8 move reject_set check logic to a function so as to check for
-> > different errno for different registers.
-> > Patch 9 move finalize_vcpu back to run_test so that riscv can implement
-> > its specific operation.
-> > Patch 10 change to do the get/set operation only on present-blessed lis=
-t.
-> > Patch 11 add the skip_set facilities so that riscv can skip set operati=
-on
-> > on some registers.
-> > Patch 12 enabled the KVM_GET_REG_LIST API in riscv.
-> > patch 13 added the corresponding kselftest for checking possible
-> > register regressions.
-> >
-> > The get-reg-list kvm selftest was ported from aarch64 and tested with
-> > Linux v6.4 on a Qemu riscv64 virt machine.
->
-> Hi Haibo,
->
-> This series needs a rebase on top of these recent patches
->
->  commit ee053e03b08e ("KVM: selftests: get-reg-list: support ID register =
-features")
->  commit 5f0419a0083b ("KVM: selftests: get-reg-list: add Permission Indir=
-ection registers")
->
-> The conflicts will be in my patches, which do the splitting of the test.
-> I'll do the rebase and push it to a branch for you to pick up.
->
+On Thu, 08 Jun 2023 12:45:04 +1000, Nicholas Piggin wrote:
+> Michael is merging KVM PPC patches via the powerpc tree and KVM topic
+> branches. He doesn't necessarily have time to be across all of KVM so
+> is reluctant to call himself maintainer, but for the mechanics of how
+> patches flow upstream, it is maintained and does make sense to have
+> some contact people in MAINTAINERS.
+> 
+> So add Michael Ellerman as KVM PPC maintainer and myself as reviewer.
+> Split out the subarchs that don't get so much attention.
+> 
+> [...]
 
-Thanks for the heads up. I will include your changes in v6.
+Applied to powerpc/next.
 
-> Thanks,
-> drew
+[1/1] KVM: PPC: Update MAINTAINERS
+      https://git.kernel.org/powerpc/c/7cc99ed87e4aeb3738e6ea7dc4d3ae28ad943601
+
+cheers
