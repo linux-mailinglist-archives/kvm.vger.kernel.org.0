@@ -2,54 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E16574536C
-	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 02:57:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 756B574536F
+	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 03:03:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229868AbjGCA5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Jul 2023 20:57:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38510 "EHLO
+        id S229605AbjGCBDs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 Jul 2023 21:03:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjGCA5T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Jul 2023 20:57:19 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49F8DB0;
-        Sun,  2 Jul 2023 17:57:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1688345836;
-        bh=apqVPv3XQygSSOnIf/x9KRbD32JjzKgKRrGCU9iYzNE=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=t2vnoItum7LuYXL3O6aWvkKEJOilTAR7tfLlQGFPUmNTJPs0pw0uX10QnBbCVyBWX
-         P5c+8Lt3jxIyM2YxG7TxWIImzdTPIAby4sTvwMIgOZrC0pUNu+4iOjlcKFD8hOQdj1
-         M0aGShfv6w5NYqjc5N+yGlvyYRU1ctjYZD+oFB87ApUBYvm9YK86yXuOLyXW5uj7mv
-         KeOQ6ptPFD2qU1FjI27v1k2deWCinA6czGxflfhAtbWgVbMakqZYgR8nkSGd3ShG+J
-         FdSOvYRrhkI3moBm6VptcP4ddXVML5b7e6ds8+26obF3DvpElMtZOcmU+zRxAuj4Ud
-         0rQcpO/E/JiAA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4QvSF63ZKLz4wb1;
-        Mon,  3 Jul 2023 10:57:14 +1000 (AEST)
-Date:   Mon, 3 Jul 2023 10:57:13 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Olof Johansson <olof@lixom.net>, Arnd Bergmann <arnd@arndb.de>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        ARM <linux-arm-kernel@lists.infradead.org>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        KVM <kvm@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the kvm-x86 tree with the arm-soc
- tree
-Message-ID: <20230703105713.5839c48d@canb.auug.org.au>
-In-Reply-To: <20230623122037.16eb8bec@canb.auug.org.au>
-References: <20230623122037.16eb8bec@canb.auug.org.au>
+        with ESMTP id S229437AbjGCBDq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Jul 2023 21:03:46 -0400
+Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8CA3120
+        for <kvm@vger.kernel.org>; Sun,  2 Jul 2023 18:03:45 -0700 (PDT)
+Received: by mail-vs1-xe30.google.com with SMTP id ada2fe7eead31-440afc96271so1344731137.3
+        for <kvm@vger.kernel.org>; Sun, 02 Jul 2023 18:03:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688346225; x=1690938225;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kr/csRpj7yRPd+a7XEQy9luDGdTRfuaDwcgbO882Uj8=;
+        b=kOhKlHs+rIVwGNY5dryVgpjloNzsE74uqLEH50SI1+QjWy0EzNZs/z6Szie+6igmog
+         OaWB5piKPLNyMtmpSVGY77Zf4cT5S8rssJAO2ivGBWZEmvkp//5aMZp6TzXYsNN3m3Za
+         iTedvqhwrm0xaf6V6ERCqoGESvdmTcJIiSrdzVL33uYJhHgLKRjzN6WxGVRxUXy2KijT
+         jOI5xDUOIhsiW72ztAr0f/vqtinUztpsGSrK6iFL6dibO6Vq9RRDR+UBz27o5d5Vs0p+
+         hNe7ebF4NCxiRCHpgpzkZtRMX++j37B5sd5D3vN/2mA9JoUctktxc/cIA/hfGT7HL239
+         ETUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688346225; x=1690938225;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kr/csRpj7yRPd+a7XEQy9luDGdTRfuaDwcgbO882Uj8=;
+        b=Rd0lCLC37Xn+KpuZ44HunV74tb9tmTRgbsLfMaZjsQmYAxbwRE4ieZ9l7DPxSZjccY
+         Pve0zKXfVcBNyIkMRqfdmDAP9PLVP+IqatfhxfoEIjRbmpOIEZ/QLTSUH7XevbDK9RaS
+         4S2J1Q08+W56XTY0X4I/xDHs4tn3npeef5+MfkbYLuZlj0uaXNab657pzvjvArXJTs0r
+         f+43gzqsT+V+QaG8YSqJNgm686LAXSnVQAEqqKF+DEfB/AlXVPD9Ql5qS2/+jG3deDMM
+         Ib4utP83Mo1F97alNRKf+vNPiB2NzMiv1YzkE2TGQXNM0ZjToC4HAAVvGP3Inay/50kA
+         KEBA==
+X-Gm-Message-State: ABy/qLbJ1uqwj4pAmG7UYPeHKxwsv1/GtTUGUqhogaqIJ0OM+c4lJQqG
+        NVzE1+vnCGjLHDmzkmiKbwERh0RX4d4kw7jL2gI=
+X-Google-Smtp-Source: APBJJlEiA/DJ04JzAYoPetRZd51MbkR1pL12E+h/WqOyzTBsiq/7TvFwrnAP3Qm1BvA19qUXYTGTSNpZoG5Upuv9KcQ=
+X-Received: by 2002:a67:f981:0:b0:443:672c:2d8 with SMTP id
+ b1-20020a67f981000000b00443672c02d8mr4324597vsq.22.1688346224763; Sun, 02 Jul
+ 2023 18:03:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/c=JIyJ/lMrHd9876_yAmd+A";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,
+References: <20230620081611.88158-1-philmd@linaro.org>
+In-Reply-To: <20230620081611.88158-1-philmd@linaro.org>
+From:   Alistair Francis <alistair23@gmail.com>
+Date:   Mon, 3 Jul 2023 11:03:18 +1000
+Message-ID: <CAKmqyKObAOYmgT54azCgrYt-aHD8V37c1h6KoNBjshASEdvVwA@mail.gmail.com>
+Subject: Re: [PATCH] target/riscv: Remove unuseful KVM stubs
+To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
+Cc:     qemu-devel@nongnu.org,
+        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Bin Meng <bin.meng@windriver.com>, qemu-riscv@nongnu.org,
+        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, kvm@vger.kernel.org,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Weiwei Li <liweiwei@iscas.ac.cn>,
+        Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -57,73 +74,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/c=JIyJ/lMrHd9876_yAmd+A
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jun 20, 2023 at 6:17=E2=80=AFPM Philippe Mathieu-Daud=C3=A9
+<philmd@linaro.org> wrote:
+>
+> Since we always check whether KVM is enabled before calling
+> kvm_riscv_reset_vcpu() and kvm_riscv_set_irq(), their call
+> is elided by the compiler when KVM is not available.
+> Therefore the stubs are not even linked. Remove them.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
 
-Hi all,
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-On Fri, 23 Jun 2023 12:20:37 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
->=20
-> Today's linux-next merge of the kvm-x86 tree got a conflict in:
->=20
->   Documentation/process/maintainer-handbooks.rst
->=20
-> between commit:
->=20
->   425d827ef91e ("Documentation/process: add soc maintainer handbook")
->=20
-> from the arm-soc tree and commit:
->=20
->   63e2f55cabed ("Documentation/process: Add a maintainer handbook for KVM=
- x86")
->=20
-> from the kvm-x86 tree.
->=20
-> I fixed it up (and sorted the entries - see below) and can carry the
-> fix as necessary. This is now fixed as far as linux-next is concerned,
-> but any non trivial conflicts should be mentioned to your upstream
-> maintainer when your tree is submitted for merging.  You may also want
-> to consider cooperating with the maintainer of the conflicting tree to
-> minimise any particularly complex conflicts.
->=20
->=20
-> diff --cc Documentation/process/maintainer-handbooks.rst
-> index fe24cb665fb7,d12cbbe2b7df..000000000000
-> --- a/Documentation/process/maintainer-handbooks.rst
-> +++ b/Documentation/process/maintainer-handbooks.rst
-> @@@ -15,6 -15,6 +15,7 @@@ Contents
->      :numbered:
->      :maxdepth: 2
->  =20
->  -   maintainer-tip
->  -   maintainer-netdev
-> +    maintainer-kvm-x86
->  +   maintainer-netdev
->  +   maintainer-soc
->  +   maintainer-tip
+Alistair
 
-This is now a conflict between the kvm tree and the arm-soc tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/c=JIyJ/lMrHd9876_yAmd+A
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmSiHOkACgkQAVBC80lX
-0GxJ2Af/UgmY1xH3huGwNAXHDSDaCOm9lMM+10q4QkiL5kgbNa+RIfspW8y5VkOz
-LE0FmXuam/uxpC2aWYtcOLRi38kGefivsV0GF/YsF2hPXuqYoQec3aljn88lxa0Q
-Kn3JJuuWEwphcx62pfqZ5uRl3m0GLDSKEokt5FYO/0Hac52yOkenjDF3xmShZALI
-DHLvpJlynb0n4z/Mhd+hD0PTB7jOUOvgco/Hyp0FySVmn3hFSCTyibGW3nM96J6Q
-R4dT7cHn3igU1s3K9kR6NRaJIuSYIU0Q3qNT7OIJYAxdGA4AW6jaNh8I8BQ53NpA
-IIf7NStKp8vWdQdIEP6Ex9hgcGrstg==
-=Z+KA
------END PGP SIGNATURE-----
-
---Sig_/c=JIyJ/lMrHd9876_yAmd+A--
+> ---
+>  target/riscv/kvm-stub.c  | 30 ------------------------------
+>  target/riscv/kvm.c       |  4 +---
+>  target/riscv/meson.build |  2 +-
+>  3 files changed, 2 insertions(+), 34 deletions(-)
+>  delete mode 100644 target/riscv/kvm-stub.c
+>
+> diff --git a/target/riscv/kvm-stub.c b/target/riscv/kvm-stub.c
+> deleted file mode 100644
+> index 4e8fc31a21..0000000000
+> --- a/target/riscv/kvm-stub.c
+> +++ /dev/null
+> @@ -1,30 +0,0 @@
+> -/*
+> - * QEMU KVM RISC-V specific function stubs
+> - *
+> - * Copyright (c) 2020 Huawei Technologies Co., Ltd
+> - *
+> - * This program is free software; you can redistribute it and/or modify =
+it
+> - * under the terms and conditions of the GNU General Public License,
+> - * version 2 or later, as published by the Free Software Foundation.
+> - *
+> - * This program is distributed in the hope it will be useful, but WITHOU=
+T
+> - * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> - * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
+> - * more details.
+> - *
+> - * You should have received a copy of the GNU General Public License alo=
+ng with
+> - * this program.  If not, see <http://www.gnu.org/licenses/>.
+> - */
+> -#include "qemu/osdep.h"
+> -#include "cpu.h"
+> -#include "kvm_riscv.h"
+> -
+> -void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
+> -{
+> -    abort();
+> -}
+> -
+> -void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level)
+> -{
+> -    abort();
+> -}
+> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
+> index 0f932a5b96..52884bbe15 100644
+> --- a/target/riscv/kvm.c
+> +++ b/target/riscv/kvm.c
+> @@ -503,9 +503,7 @@ void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
+>  {
+>      CPURISCVState *env =3D &cpu->env;
+>
+> -    if (!kvm_enabled()) {
+> -        return;
+> -    }
+> +    assert(kvm_enabled());
+>      env->pc =3D cpu->env.kernel_addr;
+>      env->gpr[10] =3D kvm_arch_vcpu_id(CPU(cpu)); /* a0 */
+>      env->gpr[11] =3D cpu->env.fdt_addr;          /* a1 */
+> diff --git a/target/riscv/meson.build b/target/riscv/meson.build
+> index e1ff6d9b95..37fc2cf487 100644
+> --- a/target/riscv/meson.build
+> +++ b/target/riscv/meson.build
+> @@ -22,7 +22,7 @@ riscv_ss.add(files(
+>    'crypto_helper.c',
+>    'zce_helper.c'
+>  ))
+> -riscv_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c'), if_false: file=
+s('kvm-stub.c'))
+> +riscv_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c'))
+>
+>  riscv_softmmu_ss =3D ss.source_set()
+>  riscv_softmmu_ss.add(files(
+> --
+> 2.38.1
+>
+>
