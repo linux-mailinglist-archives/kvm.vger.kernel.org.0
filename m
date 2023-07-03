@@ -2,132 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 335DC744FCF
-	for <lists+kvm@lfdr.de>; Sun,  2 Jul 2023 20:29:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07BC474535D
+	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 02:51:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230095AbjGBS3B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Jul 2023 14:29:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52702 "EHLO
+        id S229759AbjGCAvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 Jul 2023 20:51:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229754AbjGBS26 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Jul 2023 14:28:58 -0400
-Received: from out-54.mta0.migadu.com (out-54.mta0.migadu.com [91.218.175.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69DDB1A5
-        for <kvm@vger.kernel.org>; Sun,  2 Jul 2023 11:28:38 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1688322516;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JD+BSfEOubeM4NaunZhKuggns+1jx3KG/ygiczCTpQY=;
-        b=hsPJDuYj9iRgllcgTdnKnVeIWHI4dbFO6cetTcGBRitOohcizdBhNOgpXttZSEDOrRYB5m
-        YFJNaZLsmoLXvdcfKsN/KjXlvPsWffQ20eToqWq6ZBWru43mzpRqHFZmlFwwfPaOHCHF4R
-        FpaJ05EzBAAFuai3Fohx7nkMzTFuZlM=
-From:   Sui Jingfeng <sui.jingfeng@linux.dev>
-To:     Alex Deucher <alexander.deucher@amd.com>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Maxime Ripard <mripard@kernel.org>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Lyude Paul <lyude@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Mario Limonciello <mario.limonciello@amd.com>
-Cc:     dri-devel@lists.freedesktop.org, amd-gfx@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        nouveau@lists.freedesktop.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        Sui Jingfeng <suijingfeng@loongson.cn>,
-        Jocelyn Falempe <jfalempe@redhat.com>
-Subject: [PATCH v2 6/6] drm/ast: Register as a vga client to vgaarb by calling vga_client_register()
-Date:   Mon,  3 Jul 2023 02:27:44 +0800
-Message-Id: <20230702182744.755467-7-sui.jingfeng@linux.dev>
-In-Reply-To: <20230702182744.755467-1-sui.jingfeng@linux.dev>
-References: <20230702182744.755467-1-sui.jingfeng@linux.dev>
+        with ESMTP id S229481AbjGCAvI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Jul 2023 20:51:08 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18A4CE46;
+        Sun,  2 Jul 2023 17:51:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1688345458;
+        bh=W8UTleaI39zhvyKft+IyBAJyhvE7V+oU3D+72yrg5F0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qRrmb5NTY1ow3Ilu1mvFxM+Ue+zCMPXR+MI08Yse4OnproP0NQCyVhSqWpivJWqTL
+         NkXNm/328oNJflh/OaEd1vd13yU7zxeDQweqIn2t4mAiYfAzH1Kwe3H/fp2uY7A4cr
+         2EdQSUAf110QvU+Q/HokXb70uA2b/Zm06uj1ZprLn9RywR1umW/UUGWpzLHAVjXOWS
+         s6rDDdc8tTg5TJGtMKmpWvvWTtBhX2V4MCTL08DgWGU6F+QUAwhjWfW+gmi3oqkefq
+         FNSgUCWAR6yWAyOWY7KjavnozXYb+Rv756bYxbtwWtwEJFhV5AIK43GCV8MrRVGQu/
+         Zfxcl7CmtY4lw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4QvS5s7593z4wZs;
+        Mon,  3 Jul 2023 10:50:57 +1000 (AEST)
+Date:   Mon, 3 Jul 2023 10:50:55 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Christoffer Dall <cdall@cs.columbia.edu>,
+        Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+        Kristina Martsenko <kristina.martsenko@arm.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        KVM <kvm@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the kvm-arm tree with the arm64
+ tree
+Message-ID: <20230703105055.6f44441a@canb.auug.org.au>
+In-Reply-To: <20230615122201.75e36abd@canb.auug.org.au>
+References: <20230615122201.75e36abd@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/VrmBmzMnHW6Zb=BRqFTbtVd";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sui Jingfeng <suijingfeng@loongson.cn>
+--Sig_/VrmBmzMnHW6Zb=BRqFTbtVd
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Becasuse the VGA Display Controller in the ASpeed BMC chip is also a PCIe
-device, the Software Programming guide of AST2400 say that it is Fully
-IBM VGA compliant, thus, it should also particiate in the arbitration.
+Hi all,
 
-Cc: Thomas Zimmermann <tzimmermann@suse.de>
-Cc: Jocelyn Falempe <jfalempe@redhat.com>
-Cc: David Airlie <airlied@gmail.com>
-Cc: Daniel Vetter <daniel@ffwll.ch>
-Signed-off-by: Sui Jingfeng <suijingfeng@loongson.cn>
----
- drivers/gpu/drm/ast/ast_drv.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+On Thu, 15 Jun 2023 12:22:01 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>=20
+> Today's linux-next merge of the kvm-arm tree got a conflict in:
+>=20
+>   arch/arm64/kernel/cpufeature.c
+>=20
+> between commits:
+>=20
+>   b7564127ffcb ("arm64: mops: detect and enable FEAT_MOPS")
+>   2b760046a2d3 ("arm64: cpufeature: add TCR2 cpucap")
+>   e43454c44232 ("arm64: cpufeature: add Permission Indirection Extension =
+cpucap")
+>=20
+> from the arm64 tree and commits:
+>=20
+>   c876c3f182a5 ("KVM: arm64: Relax trapping of CTR_EL0 when FEAT_EVT is a=
+vailable")
+>   e2d6c906f0ac ("arm64: Add KVM_HVHE capability and has_hvhe() predicate")
+>=20
+> from the kvm-arm tree.
+>=20
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+>=20
+> diff --cc arch/arm64/kernel/cpufeature.c
+> index 6ea7f23b1287,f6e3598760f1..000000000000
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@@ -2662,27 -2656,23 +2677,44 @@@ static const struct arm64_cpu_capabilit
+>   		.cpu_enable =3D cpu_enable_dit,
+>   		ARM64_CPUID_FIELDS(ID_AA64PFR0_EL1, DIT, IMP)
+>   	},
+>  +	{
+>  +		.desc =3D "Memory Copy and Memory Set instructions",
+>  +		.capability =3D ARM64_HAS_MOPS,
+>  +		.type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
+>  +		.matches =3D has_cpuid_feature,
+>  +		.cpu_enable =3D cpu_enable_mops,
+>  +		ARM64_CPUID_FIELDS(ID_AA64ISAR2_EL1, MOPS, IMP)
+>  +	},
+>  +	{
+>  +		.capability =3D ARM64_HAS_TCR2,
+>  +		.type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
+>  +		.matches =3D has_cpuid_feature,
+>  +		ARM64_CPUID_FIELDS(ID_AA64MMFR3_EL1, TCRX, IMP)
+>  +	},
+>  +	{
+>  +		.desc =3D "Stage-1 Permission Indirection Extension (S1PIE)",
+>  +		.capability =3D ARM64_HAS_S1PIE,
+>  +		.type =3D ARM64_CPUCAP_BOOT_CPU_FEATURE,
+>  +		.matches =3D has_cpuid_feature,
+>  +		ARM64_CPUID_FIELDS(ID_AA64MMFR3_EL1, S1PIE, IMP)
+>  +	},
+> + 	{
+> + 		.desc =3D "Enhanced Virtualization Traps",
+> + 		.capability =3D ARM64_HAS_EVT,
+> + 		.type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
+> + 		.sys_reg =3D SYS_ID_AA64MMFR2_EL1,
+> + 		.sign =3D FTR_UNSIGNED,
+> + 		.field_pos =3D ID_AA64MMFR2_EL1_EVT_SHIFT,
+> + 		.field_width =3D 4,
+> + 		.min_field_value =3D ID_AA64MMFR2_EL1_EVT_IMP,
+> + 		.matches =3D has_cpuid_feature,
+> + 	},
+> + 	{
+> + 		.desc =3D "VHE for hypervisor only",
+> + 		.capability =3D ARM64_KVM_HVHE,
+> + 		.type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
+> + 		.matches =3D hvhe_possible,
+> + 	},
+>   	{},
+>   };
+>  =20
 
-diff --git a/drivers/gpu/drm/ast/ast_drv.c b/drivers/gpu/drm/ast/ast_drv.c
-index e1224ef4ad83..5ce681142679 100644
---- a/drivers/gpu/drm/ast/ast_drv.c
-+++ b/drivers/gpu/drm/ast/ast_drv.c
-@@ -28,6 +28,7 @@
- 
- #include <linux/module.h>
- #include <linux/pci.h>
-+#include <linux/vgaarb.h>
- 
- #include <drm/drm_aperture.h>
- #include <drm/drm_atomic_helper.h>
-@@ -89,6 +90,32 @@ static const struct pci_device_id ast_pciidlist[] = {
- 
- MODULE_DEVICE_TABLE(pci, ast_pciidlist);
- 
-+static bool ast_is_boot_device(struct pci_dev *pdev)
-+{
-+	struct drm_device *drm = pci_get_drvdata(pdev);
-+	struct ast_device *ast = to_ast_device(drm);
-+
-+	return drm_aperture_contain_firmware_fb(ast->vram_base, ast->vram_size);
-+}
-+
-+static unsigned int ast_vga_set_decode(struct pci_dev *pdev, bool state)
-+{
-+	struct drm_device *drm = pci_get_drvdata(pdev);
-+	struct ast_device *ast = to_ast_device(drm);
-+
-+	if (state) {
-+		/* Enable standard VGA decode and Enable normal VGA decode */
-+		ast_set_index_reg(ast, AST_IO_CRTC_PORT, 0xa1, 0x04);
-+
-+		return VGA_RSRC_LEGACY_IO | VGA_RSRC_LEGACY_MEM |
-+		       VGA_RSRC_NORMAL_IO | VGA_RSRC_NORMAL_MEM;
-+	}
-+
-+	ast_set_index_reg(ast, AST_IO_CRTC_PORT, 0xa1, 0x07);
-+
-+	return VGA_RSRC_NORMAL_IO | VGA_RSRC_NORMAL_MEM;
-+}
-+
- static int ast_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- {
- 	struct ast_device *ast;
-@@ -112,6 +139,8 @@ static int ast_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (ret)
- 		return ret;
- 
-+	vga_client_register(pdev, ast_vga_set_decode, ast_is_boot_device);
-+
- 	drm_fbdev_generic_setup(dev, 32);
- 
- 	return 0;
--- 
-2.25.1
+This is now a conflict between the kvm tree and Linus' tree.
 
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/VrmBmzMnHW6Zb=BRqFTbtVd
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmSiG3AACgkQAVBC80lX
+0GwutwgAnkiwE+j+ht7leaNtMyHvErYDOgyp1MB9I+TwOyB5RpqljcDbrWhNOTXa
+XHuVPX2BKJB20Mxkuz48uDqG104FAPJ8Govy1p5n+cqna3esTPAGpzE/nPFueT+g
+EDfi/zlL215GzC5/ke+/KCGzBauHsw8F0ejDnry7bE4dm3Y0mXCjyDUztX90E4sn
+/B+xQpxkZ+rkxoqAy8stb1Z3SiFfkJSz9Y8eUbAgNAgfATV29jsIVeRQZFOkgGah
+8B8QtaFL/6+wNbLnKk1lvby5Qzc2B3pMl442EFWBpTtLMckbdn6RcpYoRY2NcDWt
+ZBCIUVgBiKvO5M5oBBomTs+VhOZzfQ==
+=/6o9
+-----END PGP SIGNATURE-----
+
+--Sig_/VrmBmzMnHW6Zb=BRqFTbtVd--
