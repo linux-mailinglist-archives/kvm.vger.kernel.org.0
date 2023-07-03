@@ -2,73 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19679745CED
-	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 15:13:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A4CD745D46
+	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 15:28:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231367AbjGCNN6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jul 2023 09:13:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43372 "EHLO
+        id S231418AbjGCN2t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jul 2023 09:28:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229454AbjGCNN4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jul 2023 09:13:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AB1AE5A
-        for <kvm@vger.kernel.org>; Mon,  3 Jul 2023 06:13:16 -0700 (PDT)
+        with ESMTP id S229830AbjGCN2s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jul 2023 09:28:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29728E3
+        for <kvm@vger.kernel.org>; Mon,  3 Jul 2023 06:28:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688389996;
+        s=mimecast20190719; t=1688390883;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SxEeda1lP8vYHztO09buc7PNU+fvlt7zSS2H1ID2IBc=;
-        b=UR8KcfgtNuoiw6GbkibBFCfbdHtP6BgN8FomZrwW/8W29fh3NSz4aRTWzj3JbdgaZrcUqy
-        cnSt0buEql48ifPTFT+QA/ntEzNijrhYW4ruVcZOWXMZx4Dq4md5hF9jfgba6nFdPTrSqZ
-        Dk2Lh9clVTsF5JYItXJ3cnHmLN3i8+M=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=ycsPEf+hk8Q2JnOBMERVIv1v1bxnQ/4XY8nDOt3hLFE=;
+        b=cSMhxyW41m4t5Q4N9WErBHPb/CLNqMsrOyV3IiJsxyv6rtxbgM+7UtTTzjCq7ECF/a7WAa
+        AzUuuRBa52Ay8BYgmQlC7NFaFEOBhDE4GBeUSRiwAKN28grmlEe9mcroaHvONRZb6KYG2/
+        6o+EzrBomK60Rhkmd0sNL7ihmtVHuR4=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-48-88vg7HDPO32uYAMxwGcWWw-1; Mon, 03 Jul 2023 09:13:15 -0400
-X-MC-Unique: 88vg7HDPO32uYAMxwGcWWw-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-635e6c83cf0so46247336d6.3
-        for <kvm@vger.kernel.org>; Mon, 03 Jul 2023 06:13:14 -0700 (PDT)
+ us-mta-515-GkKvZ6LYNCyf4pS_1ohCFg-1; Mon, 03 Jul 2023 09:28:02 -0400
+X-MC-Unique: GkKvZ6LYNCyf4pS_1ohCFg-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-40343567c4eso18047061cf.0
+        for <kvm@vger.kernel.org>; Mon, 03 Jul 2023 06:28:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688389994; x=1690981994;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1688390882; x=1690982882;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SxEeda1lP8vYHztO09buc7PNU+fvlt7zSS2H1ID2IBc=;
-        b=IXPBgJu/+phDF3b4xQhHNi/AYIM5cqcQ1cmSgh2CIHO1HyMIN3z2oxlFa+EaH8CtbQ
-         elQOBARQwL3Ca+wdXdQjitsKbEgOPs7gbJvlbd0aHcF8A/oA9aF0qF+ZxBfH9iTe3eJg
-         HTKyCPyfuKwiA4/TeqrACtO0FPh4lUB5agVIj1sPB/OPLyPIGfRBic3i/bH+qhZjT9l2
-         fVjyyh40rFjVNBp0RkCeiyodNjSkwvxoszBipLfpZzo14KJTw0MLnKKWqFiLXL+Ctn0O
-         wvznuUN+PUNr75l/Haw1BPOwnzUPxBtjqj2H7eq6VSMr66uOWlpMVMKtjOPo7vtwZ47Y
-         7uSA==
-X-Gm-Message-State: ABy/qLZQJsEXPS5czWU0BE+BbPgc5I2Tw9Eko1Qg91/MjXazDqyKnh74
-        G+ypgNokjhmKQ6nX0GYe6LT1v7T8TcYozUnKBYvhim9GvFlkYZShygePAmeGQZ+qi/dSYJdQXuM
-        O5eJEoXwdnedcTQDNYgu5
-X-Received: by 2002:a05:6214:494:b0:636:39ed:4dd1 with SMTP id pt20-20020a056214049400b0063639ed4dd1mr15625137qvb.29.1688389994532;
-        Mon, 03 Jul 2023 06:13:14 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlH70MSF5RsvM0aA7RGTUjQAfELnLWyU96GzzmqtXEz/JuVIKVH+1sOOL6whIcUNk07KLiGrBQ==
-X-Received: by 2002:a05:6214:494:b0:636:39ed:4dd1 with SMTP id pt20-20020a056214049400b0063639ed4dd1mr15625118qvb.29.1688389994211;
-        Mon, 03 Jul 2023 06:13:14 -0700 (PDT)
+        bh=ycsPEf+hk8Q2JnOBMERVIv1v1bxnQ/4XY8nDOt3hLFE=;
+        b=YDtl7rpmr7czos75m+5sL5zX01ZYELX4NKP1Wr1CYEBe3wOrFHSRwNYObJ9TSd4idK
+         SAtmOF/Tw4lAWP7DA9ET2H4d9vvm6H2hXteVHmkXATTnOkOFd30L66n8HGH+oQiLF7sj
+         NCbET0+ZChtMJ2fZSlH7TIAaf7B6As3dl6y093vkfueNgf0d3qlckKoz1XOO+vf+21py
+         Qrw+stiish2xJh4mxe0K4+ovFH+x9pi8FZiBX0krDmolmtL+Dw2BLue3vd4/6VhFYpyV
+         ESUelWvVd3AtOV25QfuzLcpsvOGAqOl4gv3ek5bLPdWYN2OWqVVEmW2UF6Z82Gon/Ms8
+         gocQ==
+X-Gm-Message-State: AC+VfDxEDcRPYkr739r3osfRfOg0rux8BjPGfNlBRO3p8lVKRglZPkLp
+        L2aITpNXwBYX5mQ1FBmogtBXPHG9bgE1HKumbIVw+VAau8rmK5e2L+JUFk9N+uxPz+/LrXdhp3G
+        8gzYkrIRWAoIg
+X-Received: by 2002:a05:622a:1392:b0:400:9a53:75cf with SMTP id o18-20020a05622a139200b004009a5375cfmr18644556qtk.30.1688390881804;
+        Mon, 03 Jul 2023 06:28:01 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5pGep0ZvHdyMHlfEcnPcwLb3nLyZyg6SGhfYHWcOPFIl3YZF8OBAcIezkPj1r9OSXjvN/daw==
+X-Received: by 2002:a05:622a:1392:b0:400:9a53:75cf with SMTP id o18-20020a05622a139200b004009a5375cfmr18644535qtk.30.1688390881548;
+        Mon, 03 Jul 2023 06:28:01 -0700 (PDT)
 Received: from [192.168.0.5] (ip-109-43-176-127.web.vodafone.de. [109.43.176.127])
-        by smtp.gmail.com with ESMTPSA id j14-20020a056214032e00b00635eee57eb0sm5626982qvu.34.2023.07.03.06.13.11
+        by smtp.gmail.com with ESMTPSA id n7-20020ac81e07000000b004033992e2dbsm4891888qtl.45.2023.07.03.06.28.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jul 2023 06:13:12 -0700 (PDT)
-Message-ID: <1d624930-fbd1-a760-772d-6175bfad84c1@redhat.com>
-Date:   Mon, 3 Jul 2023 15:13:09 +0200
+        Mon, 03 Jul 2023 06:28:01 -0700 (PDT)
+Message-ID: <f2d4d019-4a77-7ba9-d564-6e39b194a5d8@redhat.com>
+Date:   Mon, 3 Jul 2023 15:27:59 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [kvm-unit-tests v4 03/12] powerpc: Abstract H_CEDE calls into a
- sleep functions
 Content-Language: en-US
 To:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
 Cc:     linuxppc-dev@lists.ozlabs.org, Laurent Vivier <lvivier@redhat.com>
 References: <20230608075826.86217-1-npiggin@gmail.com>
- <20230608075826.86217-4-npiggin@gmail.com>
 From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230608075826.86217-4-npiggin@gmail.com>
+Subject: Re: [kvm-unit-tests v4 00/12] powerpc: updates, P10, PNV support
+In-Reply-To: <20230608075826.86217-1-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -83,233 +81,19 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 08/06/2023 09.58, Nicholas Piggin wrote:
-> This consolidates several implementations, and it no longer leaves
-> MSR[EE] enabled after the decrementer interrupt is handled, but
-> rather disables it on return.
-> 
-> The handler no longer allows a continuous ticking, but rather dec
-> has to be re-armed and EE re-enabled (e.g., via H_CEDE hcall) each
-> time.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->   lib/powerpc/asm/handlers.h  |  2 +-
->   lib/powerpc/asm/ppc_asm.h   |  1 +
->   lib/powerpc/asm/processor.h |  7 ++++++
->   lib/powerpc/handlers.c      | 10 ++++-----
->   lib/powerpc/processor.c     | 43 +++++++++++++++++++++++++++++++++++++
->   powerpc/sprs.c              |  6 +-----
->   powerpc/tm.c                | 20 +----------------
->   7 files changed, 58 insertions(+), 31 deletions(-)
-> 
-> diff --git a/lib/powerpc/asm/handlers.h b/lib/powerpc/asm/handlers.h
-> index 64ba727a..e4a0cd45 100644
-> --- a/lib/powerpc/asm/handlers.h
-> +++ b/lib/powerpc/asm/handlers.h
-> @@ -3,6 +3,6 @@
->   
->   #include <asm/ptrace.h>
->   
-> -void dec_except_handler(struct pt_regs *regs, void *data);
-> +void dec_handler_oneshot(struct pt_regs *regs, void *data);
->   
->   #endif /* _ASMPOWERPC_HANDLERS_H_ */
-> diff --git a/lib/powerpc/asm/ppc_asm.h b/lib/powerpc/asm/ppc_asm.h
-> index 1b85f6bb..6299ff53 100644
-> --- a/lib/powerpc/asm/ppc_asm.h
-> +++ b/lib/powerpc/asm/ppc_asm.h
-> @@ -36,6 +36,7 @@
->   #endif /* __BYTE_ORDER__ */
->   
->   /* Machine State Register definitions: */
-> +#define MSR_EE_BIT	15			/* External Interrupts Enable */
->   #define MSR_SF_BIT	63			/* 64-bit mode */
->   
->   #endif /* _ASMPOWERPC_PPC_ASM_H */
-> diff --git a/lib/powerpc/asm/processor.h b/lib/powerpc/asm/processor.h
-> index ac001e18..ebfeff2b 100644
-> --- a/lib/powerpc/asm/processor.h
-> +++ b/lib/powerpc/asm/processor.h
-> @@ -20,6 +20,8 @@ static inline uint64_t get_tb(void)
->   
->   extern void delay(uint64_t cycles);
->   extern void udelay(uint64_t us);
-> +extern void sleep_tb(uint64_t cycles);
-> +extern void usleep(uint64_t us);
->   
->   static inline void mdelay(uint64_t ms)
->   {
-> @@ -27,4 +29,9 @@ static inline void mdelay(uint64_t ms)
->   		udelay(1000);
->   }
->   
-> +static inline void msleep(uint64_t ms)
-> +{
-> +	usleep(ms * 1000);
-> +}
-> +
->   #endif /* _ASMPOWERPC_PROCESSOR_H_ */
-> diff --git a/lib/powerpc/handlers.c b/lib/powerpc/handlers.c
-> index c8721e0a..296f14ff 100644
-> --- a/lib/powerpc/handlers.c
-> +++ b/lib/powerpc/handlers.c
-> @@ -9,15 +9,13 @@
->   #include <libcflat.h>
->   #include <asm/handlers.h>
->   #include <asm/ptrace.h>
-> +#include <asm/ppc_asm.h>
->   
->   /*
->    * Generic handler for decrementer exceptions (0x900)
-> - * Just reset the decrementer back to the value specified when registering the
-> - * handler
-> + * Return with MSR[EE] disabled.
->    */
-> -void dec_except_handler(struct pt_regs *regs __unused, void *data)
-> +void dec_handler_oneshot(struct pt_regs *regs, void *data)
->   {
-> -	uint64_t dec = *((uint64_t *) data);
-> -
-> -	asm volatile ("mtdec %0" : : "r" (dec));
-> +	regs->msr &= ~(1UL << MSR_EE_BIT);
->   }
-> diff --git a/lib/powerpc/processor.c b/lib/powerpc/processor.c
-> index 0550e4fc..aaf45b68 100644
-> --- a/lib/powerpc/processor.c
-> +++ b/lib/powerpc/processor.c
-> @@ -10,6 +10,8 @@
->   #include <asm/ptrace.h>
->   #include <asm/setup.h>
->   #include <asm/barrier.h>
-> +#include <asm/hcall.h>
-> +#include <asm/handlers.h>
->   
->   static struct {
->   	void (*func)(struct pt_regs *, void *data);
-> @@ -58,3 +60,44 @@ void udelay(uint64_t us)
->   {
->   	delay((us * tb_hz) / 1000000);
->   }
-> +
-> +void sleep_tb(uint64_t cycles)
-> +{
-> +	uint64_t start, end, now;
-> +
-> +	start = now = get_tb();
-> +	end = start + cycles;
-> +
-> +	while (end > now) {
-> +		uint64_t left = end - now;
-> +
-> +		/* TODO: Could support large decrementer */
-> +		if (left > 0x7fffffff)
-> +			left = 0x7fffffff;
-> +
-> +		/* DEC won't fire until H_CEDE is called because EE=0 */
-> +		asm volatile ("mtdec %0" : : "r" (left));
-> +		handle_exception(0x900, &dec_handler_oneshot, NULL);
-> +		/*
-> +		 * H_CEDE is called with MSR[EE] clear and enables it as part
-> +		 * of the hcall, returning with EE enabled. The dec interrupt
-> +		 * is then taken immediately and the handler disables EE.
-> +		 *
-> +		 * If H_CEDE returned for any other interrupt than dec
-> +		 * expiring, that is considered an unhandled interrupt and
-> +		 * the test case would be stopped.
-> +		 */
-> +		if (hcall(H_CEDE) != H_SUCCESS) {
-> +			printf("H_CEDE failed\n");
-> +			abort();
-> +		}
-> +		handle_exception(0x900, NULL, NULL);
-> +
-> +		now = get_tb();
-> +	}
-> +}
-> +
-> +void usleep(uint64_t us)
-> +{
-> +	sleep_tb((us * tb_hz) / 1000000);
-> +}
-> diff --git a/powerpc/sprs.c b/powerpc/sprs.c
-> index 5cc1cd16..ba4ddee4 100644
-> --- a/powerpc/sprs.c
-> +++ b/powerpc/sprs.c
-> @@ -254,7 +254,6 @@ int main(int argc, char **argv)
->   		0x1234567890ABCDEFULL, 0xFEDCBA0987654321ULL,
->   		-1ULL,
->   	};
-> -	static uint64_t decr = 0x7FFFFFFF; /* Max value */
->   
->   	for (i = 1; i < argc; i++) {
->   		if (!strcmp(argv[i], "-w")) {
-> @@ -288,10 +287,7 @@ int main(int argc, char **argv)
->   	if (pause) {
->   		migrate_once();
->   	} else {
-> -		puts("Sleeping...\n");
-> -		handle_exception(0x900, &dec_except_handler, &decr);
-> -		asm volatile ("mtdec %0" : : "r" (0x3FFFFFFF));
-> -		hcall(H_CEDE);
-> +		msleep(2000);
->   	}
->   
->   	get_sprs(after);
-> diff --git a/powerpc/tm.c b/powerpc/tm.c
-> index 65cacdf5..7fa91636 100644
-> --- a/powerpc/tm.c
-> +++ b/powerpc/tm.c
-> @@ -48,17 +48,6 @@ static int count_cpus_with_tm(void)
->   	return available;
->   }
->   
-> -static int h_cede(void)
-> -{
-> -	register uint64_t r3 asm("r3") = H_CEDE;
-> -
-> -	asm volatile ("sc 1" : "+r"(r3) :
-> -			     : "r0", "r4", "r5", "r6", "r7", "r8", "r9",
-> -			       "r10", "r11", "r12", "xer", "ctr", "cc");
-> -
-> -	return r3;
-> -}
-> -
->   /*
->    * Enable transactional memory
->    * Returns:	FALSE - Failure
-> @@ -95,14 +84,10 @@ static bool enable_tm(void)
->   static void test_h_cede_tm(int argc, char **argv)
->   {
->   	int i;
-> -	static uint64_t decr = 0x3FFFFF; /* ~10ms */
->   
->   	if (argc > 2)
->   		report_abort("Unsupported argument: '%s'", argv[2]);
->   
-> -	handle_exception(0x900, &dec_except_handler, &decr);
-> -	asm volatile ("mtdec %0" : : "r" (decr));
-> -
->   	if (!start_all_cpus(halt, 0))
->   		report_abort("Failed to start secondary cpus");
->   
-> @@ -120,10 +105,7 @@ static void test_h_cede_tm(int argc, char **argv)
->   		      "bf 2,1b" : : : "cr0");
->   
->   	for (i = 0; i < 500; i++) {
-> -		uint64_t rval = h_cede();
-> -
-> -		if (rval != H_SUCCESS)
-> -			break;
-> +		msleep(10);
->   		mdelay(5);
+> Posting again, a couple of patches were merged and accounted for review
+> comments from last time.
 
-msleep() directly followed by an mdelay() looks weird now. Do we still need 
-the mdelay()? Or could we maybe at least get a comment here why there are 
-now two different delaying calls here?
+Sorry for not being very responsive ... it's been a busy month.
+
+Anyway, I've now merged the first 5 patches and the VPA test since they look 
+fine to me.
+
+As Joel already wrote, there is an issue with the sprs patch, I also get an 
+error with the PIR register on the P8 box that I have access to as soon as I 
+apply the "Specify SPRs with data rather than code" patch. It would be good 
+to get that problem resolved before merging the remaining patches...
 
   Thomas
 
-
->   	}
->   
 
