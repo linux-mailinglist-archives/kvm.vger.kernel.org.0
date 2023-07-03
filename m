@@ -2,143 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8D86745D85
-	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 15:34:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4901745E3F
+	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 16:12:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231479AbjGCNeA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jul 2023 09:34:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56364 "EHLO
+        id S230028AbjGCOMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jul 2023 10:12:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229585AbjGCNd7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jul 2023 09:33:59 -0400
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21B1CE3;
-        Mon,  3 Jul 2023 06:33:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1688391234; x=1719927234;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=MZnqhy/csMNXbugFtNWNDpN2XhhdE1oePTXoQDzZgeU=;
-  b=j8+tx2eMFLT0PgwFTtZQw0kVMx7+H3or39OowaVAvarHLB94Ff9it+IS
-   duh+gLFsqCyy7aOa1ZVQHI6hreQPGkwd6Zrj323xnraG3MfdOEr/cX9C4
-   v4t3EFDFN/0tqyJGreFuxthm2ekcMxamrxM+w+yaoQsqVXxyCnYnABsdg
-   c=;
-X-IronPort-AV: E=Sophos;i="6.01,178,1684800000"; 
-   d="scan'208";a="657678907"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-94edd59b.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 13:33:49 +0000
-Received: from EX19D010EUA004.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2c-m6i4x-94edd59b.us-west-2.amazon.com (Postfix) with ESMTPS id 226AA40D4B;
-        Mon,  3 Jul 2023 13:33:47 +0000 (UTC)
-Received: from EX19D033EUC004.ant.amazon.com (10.252.61.133) by
- EX19D010EUA004.ant.amazon.com (10.252.50.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 3 Jul 2023 13:33:40 +0000
-Received: from u40bc5e070a0153.ant.amazon.com (10.1.212.14) by
- EX19D033EUC004.ant.amazon.com (10.252.61.133) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 3 Jul 2023 13:33:35 +0000
-Date:   Mon, 3 Jul 2023 15:33:29 +0200
-From:   Roman Kagan <rkagan@amazon.de>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Hankland <ehankland@google.com>, <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Like Xu <likexu@tencent.com>, <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        "Borislav Petkov" <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
-Message-ID: <ZKLOKc1RbfLyQz7H@u40bc5e070a0153.ant.amazon.com>
-Mail-Followup-To: Roman Kagan <rkagan@amazon.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Hankland <ehankland@google.com>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Like Xu <likexu@tencent.com>, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Ingo Molnar <mingo@redhat.com>, Mingwei Zhang <mizhang@google.com>
-References: <20230504120042.785651-1-rkagan@amazon.de>
- <ZH6DJ8aFq/LM6Bk9@google.com>
- <CALMp9eS3F08cwUJbKjTRAEL0KyZ=MC==YSH+DW-qsFkNfMpqEQ@mail.gmail.com>
- <ZJ4dmrQSduY8aWap@google.com>
- <ZJ65CiW0eEL2mGg8@u40bc5e070a0153.ant.amazon.com>
- <ZJ7mjdZ8h/RSilFX@google.com>
- <ZJ7y9DuedQyBb9eU@u40bc5e070a0153.ant.amazon.com>
- <ZJ74gELkj4DgAk4S@google.com>
+        with ESMTP id S231268AbjGCOM1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jul 2023 10:12:27 -0400
+Received: from elvis.franken.de (elvis.franken.de [193.175.24.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A9475E5C;
+        Mon,  3 Jul 2023 07:12:25 -0700 (PDT)
+Received: from uucp by elvis.franken.de with local-rmail (Exim 3.36 #1)
+        id 1qGKHs-0008Fl-00; Mon, 03 Jul 2023 16:12:20 +0200
+Received: by alpha.franken.de (Postfix, from userid 1000)
+        id 6937BC02FD; Mon,  3 Jul 2023 16:08:53 +0200 (CEST)
+Date:   Mon, 3 Jul 2023 16:08:53 +0200
+From:   Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+To:     Huacai Chen <chenhuacai@loongson.cn>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@gmail.com>, kvm@vger.kernel.org,
+        linux-mips@vger.kernel.org, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        stable@vger.kernel.org, Yu Zhao <yuzhao@google.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Subject: Re: [PATCH V2] MIPS: KVM: Fix NULL pointer dereference
+Message-ID: <20230703140853.GA16247@alpha.franken.de>
+References: <20230628110817.3167337-1-chenhuacai@loongson.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <ZJ74gELkj4DgAk4S@google.com>
-X-Originating-IP: [10.1.212.14]
-X-ClientProxiedBy: EX19D031UWA004.ant.amazon.com (10.13.139.19) To
- EX19D033EUC004.ant.amazon.com (10.252.61.133)
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,
-        T_SPF_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230628110817.3167337-1-chenhuacai@loongson.cn>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,LOTS_OF_MONEY,
+        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 30, 2023 at 08:45:04AM -0700, Sean Christopherson wrote:
-> On Fri, Jun 30, 2023, Roman Kagan wrote:
-> > On Fri, Jun 30, 2023 at 07:28:29AM -0700, Sean Christopherson wrote:
-> > > On Fri, Jun 30, 2023, Roman Kagan wrote:
-> > > > On Thu, Jun 29, 2023 at 05:11:06PM -0700, Sean Christopherson wrote:
-> > > > > @@ -74,6 +74,14 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
-> > > > >         return counter & pmc_bitmask(pmc);
-> > > > >  }
-> > > > >
-> > > > > +static inline void pmc_write_counter(struct kvm_pmc *pmc, u64 val)
-> > > > > +{
-> > > > > +       if (pmc->perf_event && !pmc->is_paused)
-> > > > > +               perf_event_set_count(pmc->perf_event, val);
-> > > > > +
-> > > > > +       pmc->counter = val;
-> > > >
-> > > > Doesn't this still have the original problem of storing wider value than
-> > > > allowed?
-> > >
-> > > Yes, this was just to fix the counter offset weirdness.  My plan is to apply your
-> > > patch on top.  Sorry for not making that clear.
-> >
-> > Ah, got it, thanks!
-> >
-> > Also I'm now chasing a problem that we occasionally see
-> >
-> > [3939579.462832] Uhhuh. NMI received for unknown reason 30 on CPU 43.
-> > [3939579.462836] Do you have a strange power saving mode enabled?
-> > [3939579.462836] Dazed and confused, but trying to continue
-> >
-> > in the guests when perf is used.  These messages disappear when
-> > 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions") is
-> > reverted.  I haven't yet figured out where exactly the culprit is.
+On Wed, Jun 28, 2023 at 07:08:17PM +0800, Huacai Chen wrote:
+> After commit 45c7e8af4a5e3f0bea4ac209 ("MIPS: Remove KVM_TE support") we
+> get a NULL pointer dereference when creating a KVM guest:
 > 
-> Can you reverting de0f619564f4 ("KVM: x86/pmu: Defer counter emulated overflow
-> via pmc->prev_counter")?  I suspect the problem is the prev_counter mess.
+> [  146.243409] Starting KVM with MIPS VZ extensions
+> [  149.849151] CPU 3 Unable to handle kernel paging request at virtual address 0000000000000300, epc == ffffffffc06356ec, ra == ffffffffc063568c
+> [  149.849177] Oops[#1]:
+> [  149.849182] CPU: 3 PID: 2265 Comm: qemu-system-mip Not tainted 6.4.0-rc3+ #1671
+> [  149.849188] Hardware name: THTF CX TL630 Series/THTF-LS3A4000-7A1000-ML4A, BIOS KL4.1F.TF.D.166.201225.R 12/25/2020
+> [  149.849192] $ 0   : 0000000000000000 000000007400cce0 0000000000400004 ffffffff8119c740
+> [  149.849209] $ 4   : 000000007400cce1 000000007400cce1 0000000000000000 0000000000000000
+> [  149.849221] $ 8   : 000000240058bb36 ffffffff81421ac0 0000000000000000 0000000000400dc0
+> [  149.849233] $12   : 9800000102a07cc8 ffffffff80e40e38 0000000000000001 0000000000400dc0
+> [  149.849245] $16   : 0000000000000000 9800000106cd0000 9800000106cd0000 9800000100cce000
+> [  149.849257] $20   : ffffffffc0632b28 ffffffffc05b31b0 9800000100ccca00 0000000000400000
+> [  149.849269] $24   : 9800000106cd09ce ffffffff802f69d0
+> [  149.849281] $28   : 9800000102a04000 9800000102a07cd0 98000001106a8000 ffffffffc063568c
+> [  149.849293] Hi    : 00000335b2111e66
+> [  149.849295] Lo    : 6668d90061ae0ae9
+> [  149.849298] epc   : ffffffffc06356ec kvm_vz_vcpu_setup+0xc4/0x328 [kvm]
+> [  149.849324] ra    : ffffffffc063568c kvm_vz_vcpu_setup+0x64/0x328 [kvm]
+> [  149.849336] Status: 7400cce3 KX SX UX KERNEL EXL IE
+> [  149.849351] Cause : 1000000c (ExcCode 03)
+> [  149.849354] BadVA : 0000000000000300
+> [  149.849357] PrId  : 0014c004 (ICT Loongson-3)
+> [  149.849360] Modules linked in: kvm nfnetlink_queue nfnetlink_log nfnetlink fuse sha256_generic libsha256 cfg80211 rfkill binfmt_misc vfat fat snd_hda_codec_hdmi input_leds led_class snd_hda_intel snd_intel_dspcfg snd_hda_codec snd_hda_core snd_pcm snd_timer snd serio_raw xhci_pci radeon drm_suballoc_helper drm_display_helper xhci_hcd ip_tables x_tables
+> [  149.849432] Process qemu-system-mip (pid: 2265, threadinfo=00000000ae2982d2, task=0000000038e09ad4, tls=000000ffeba16030)
+> [  149.849439] Stack : 9800000000000003 9800000100ccca00 9800000100ccc000 ffffffffc062cef4
+> [  149.849453]         9800000102a07d18 c89b63a7ab338e00 0000000000000000 ffffffff811a0000
+> [  149.849465]         0000000000000000 9800000106cd0000 ffffffff80e59938 98000001106a8920
+> [  149.849476]         ffffffff80e57f30 ffffffffc062854c ffffffff811a0000 9800000102bf4240
+> [  149.849488]         ffffffffc05b0000 ffffffff80e3a798 000000ff78000000 000000ff78000010
+> [  149.849500]         0000000000000255 98000001021f7de0 98000001023f0078 ffffffff81434000
+> [  149.849511]         0000000000000000 0000000000000000 9800000102ae0000 980000025e92ae28
+> [  149.849523]         0000000000000000 c89b63a7ab338e00 0000000000000001 ffffffff8119dce0
+> [  149.849535]         000000ff78000010 ffffffff804f3d3c 9800000102a07eb0 0000000000000255
+> [  149.849546]         0000000000000000 ffffffff8049460c 000000ff78000010 0000000000000255
+> [  149.849558]         ...
+> [  149.849565] Call Trace:
+> [  149.849567] [<ffffffffc06356ec>] kvm_vz_vcpu_setup+0xc4/0x328 [kvm]
+> [  149.849586] [<ffffffffc062cef4>] kvm_arch_vcpu_create+0x184/0x228 [kvm]
+> [  149.849605] [<ffffffffc062854c>] kvm_vm_ioctl+0x64c/0xf28 [kvm]
+> [  149.849623] [<ffffffff805209c0>] sys_ioctl+0xc8/0x118
+> [  149.849631] [<ffffffff80219eb0>] syscall_common+0x34/0x58
+> 
+> The root cause is the deletion of kvm_mips_commpage_init() leaves vcpu
+> ->arch.cop0 NULL. So fix it by making cop0 from a pointer to an embedded
+> object.
+> 
+> Fixes: 45c7e8af4a5e3f0bea4ac209 ("MIPS: Remove KVM_TE support")
+> Cc: stable@vger.kernel.org
+> Reported-by: Yu Zhao <yuzhao@google.com>
+> Suggested-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+> ---
+> V2: Update commit message and add Reported-by/Reviewed-by.
+> 
+>  arch/mips/include/asm/kvm_host.h |  6 +++---
+>  arch/mips/kvm/emulate.c          | 22 +++++++++++-----------
+>  arch/mips/kvm/mips.c             | 16 ++++++++--------
+>  arch/mips/kvm/trace.h            |  8 ++++----
+>  arch/mips/kvm/vz.c               | 20 ++++++++++----------
+>  5 files changed, 36 insertions(+), 36 deletions(-)
 
-We observe the problem on a branch that predates this commit
+applied to mips-next.
 
-Thanks,
-Roman.
+Thomas.
 
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+-- 
+Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
+good idea.                                                [ RFC1925, 2.3 ]
