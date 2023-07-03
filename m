@@ -2,112 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F74D745787
-	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 10:43:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 531317458A6
+	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 11:45:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229958AbjGCInl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jul 2023 04:43:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41070 "EHLO
+        id S231161AbjGCJpw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jul 2023 05:45:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbjGCInk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jul 2023 04:43:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 725BDE41
-        for <kvm@vger.kernel.org>; Mon,  3 Jul 2023 01:42:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688373771;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=w9j01qwPpErBDT2GubuAl+sX/3Bkrf1KFu3e6uDsu3A=;
-        b=KxIF7VW6TvchpAlGnjb+ipIfinWo2H/x3YnajHqCLaT3Is/y1z/QT1d7si/HLXHnOsEOFW
-        TsllfmE+GY9gpPfCjQmGo3DNpNhNwGhDcPn5jhrezYkfDegYLmijfRoHFPpTaHap+kuPvZ
-        DcRi94WuVibN015yG9bK8FjRutAOErg=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-119-tvUBWtgwNSWXrBqZivbETA-1; Mon, 03 Jul 2023 04:42:48 -0400
-X-MC-Unique: tvUBWtgwNSWXrBqZivbETA-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-635dd236b63so26628866d6.0
-        for <kvm@vger.kernel.org>; Mon, 03 Jul 2023 01:42:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688373768; x=1690965768;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w9j01qwPpErBDT2GubuAl+sX/3Bkrf1KFu3e6uDsu3A=;
-        b=Z7DXDChZOEctYNA7b4naJo55oxnenvncO9dt8XL7QPvcw4HcOWUhtUeAkV60zdoA7M
-         eOyVW49+SWCDaQ7FC9zdOklqJzFzJbGv5o1wfHqxkOJGn/qHCciotL6J222UGLZcVkk8
-         K424RnXwPQp+hH2jwKi2Xol7D8A+aiHawMI6OOHe2IzwEVn3cYdc83hpE52KSSnGRiCx
-         9Gx4d3V8l/OuCY4jak8PFEdOSOAdkglOhQM7BEPEyBhANw22VI9q0Q+chaqcaUOJxJLE
-         bMJ6lBchSc9IJd/LOVmxmOBEtdf1Z1cZnnHMCTnbxG1CfG+hpNYx/mMaPi+OhEbCETj7
-         hk1w==
-X-Gm-Message-State: ABy/qLbiipHhFgDKX8gcjT1LoHcQkY//n0wZ9mYl/0JXKDswwj3TgT04
-        n3JUqqQ8ETUCiUN/Ys957NMSpucAvSRK3ufNPY8RqqwrYu0rF1wkJG+WKLPCnNDMzKTubJ3tjox
-        WLsZciUtCNGaH
-X-Received: by 2002:a05:6214:2a4a:b0:635:f562:fa1e with SMTP id jf10-20020a0562142a4a00b00635f562fa1emr12570339qvb.30.1688373767940;
-        Mon, 03 Jul 2023 01:42:47 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEg+PvXt3zRvvQF/8LbgMFfXOr/yVak/1Iy7Zlv9ZOHPU6mms7XYBSch3qq3Gqbn+BlsVFLWA==
-X-Received: by 2002:a05:6214:2a4a:b0:635:f562:fa1e with SMTP id jf10-20020a0562142a4a00b00635f562fa1emr12570332qvb.30.1688373767735;
-        Mon, 03 Jul 2023 01:42:47 -0700 (PDT)
-Received: from [192.168.0.5] (ip-109-43-178-242.web.vodafone.de. [109.43.178.242])
-        by smtp.gmail.com with ESMTPSA id q5-20020ad45ca5000000b00623950fbe48sm11249923qvh.41.2023.07.03.01.42.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jul 2023 01:42:47 -0700 (PDT)
-Message-ID: <a162644d-f548-7c34-e501-d8080d1d0bef@redhat.com>
-Date:   Mon, 3 Jul 2023 10:42:43 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [kvm-unit-tests PATCH v10 1/2] s390x: topology: Check the Perform
- Topology Function
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, kvm@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, nsg@linux.ibm.com
-References: <20230627082155.6375-1-pmorel@linux.ibm.com>
- <20230627082155.6375-2-pmorel@linux.ibm.com>
- <168802854091.40048.12063023827984391132@t14-nrb>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <168802854091.40048.12063023827984391132@t14-nrb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        with ESMTP id S230253AbjGCJpn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jul 2023 05:45:43 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 321EAE4F
+        for <kvm@vger.kernel.org>; Mon,  3 Jul 2023 02:45:31 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 91D7760EA8
+        for <kvm@vger.kernel.org>; Mon,  3 Jul 2023 09:45:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02412C433C8;
+        Mon,  3 Jul 2023 09:45:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1688377530;
+        bh=07vPEXuHNAjSyb/jCUmI2nBGwG00D9SJ31afLJUgB10=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ekNgQGsW5LceWciZOTwVmsTRBUks/1hJheWaZlaPwggWKp2ncHo5CsiPqrLwfwo41
+         3u3HRKntVO0KGjU5mxvQJKRfxhObIT3+rf0N/BU0cOmaQw5hpAW9DT9I+nTs2yzqJ7
+         C29MnDWjoZ2KcJIML8pfp9Wv1SpCsKgSZHA759ql+QEcHonijAcIelfoKFkU0tJhSs
+         VUfTas7Std/Yjmq9UQ3mtkdARrqA2yaZ2bWm5PTNP46H4Mq8ZUhTmiNqdUAfVPrvjS
+         f8FiFLKZeajO1xXnuRyJ39XkbQNKT1WnBQYcq0GMU36E5gFoN71OrfVYXvxItod5Qw
+         j85J53OspIPgQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qGG7a-00A7cd-S8;
+        Mon, 03 Jul 2023 10:45:27 +0100
+Date:   Mon, 03 Jul 2023 10:45:26 +0100
+Message-ID: <867crhxr9l.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>,
+        Kristina Martsenko <kristina.martsenko@arm.com>
+Cc:     isaku.yamahata@intel.com, seanjc@google.com, pbonzini@redhat.com,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>
+Subject: Re: KVM CPU hotplug notifier triggers BUG_ON on arm64
+In-Reply-To: <ZKBlhJwl9YD5FHvs@linux.dev>
+References: <aeab7562-2d39-e78e-93b1-4711f8cc3fa5@arm.com>
+        <ZKBlhJwl9YD5FHvs@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kristina.martsenko@arm.com, isaku.yamahata@intel.com, seanjc@google.com, pbonzini@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/06/2023 10.49, Nico Boehr wrote:
-> Quoting Pierre Morel (2023-06-27 10:21:54)
-> [...]
->> diff --git a/s390x/topology.c b/s390x/topology.c
->> new file mode 100644
->> index 0000000..7e1bbf9
->> --- /dev/null
->> +++ b/s390x/topology.c
->> @@ -0,0 +1,190 @@
-> [...]
->> +static void check_privilege(int fc)
->> +{
->> +       unsigned long rc;
->> +       char buf[20];
->> +
->> +       snprintf(buf, sizeof(buf), "Privileged fc %d", fc);
->> +       report_prefix_push(buf);
+On Sat, 01 Jul 2023 18:42:28 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> We have report_prefix_pushf (note the f at the end!) for this.
+> Hi Kristina,
 > 
-> I can fix that up when picking in case there's no new version, though.
+> Thanks for the bug report.
+> 
+> On Sat, Jul 01, 2023 at 01:50:52PM +0100, Kristina Martsenko wrote:
+> > Hi,
+> > 
+> > When I try to online a CPU on arm64 while a KVM guest is running, I hit a
+> > BUG_ON(preemptible()) (as well as a WARN_ON). See below for the full log.
+> > 
+> > This is on kvmarm/next, but seems to have been broken since 6.3. Bisecting it
+> > points at commit:
+> > 
+> >   0bf50497f03b ("KVM: Drop kvm_count_lock and instead protect kvm_usage_count with kvm_lock")
+> 
+> Makes sense. We were using a spinlock before, which implictly disables
+> preemption.
+> 
+> Well, one way to hack around the problem would be to just cram
+> preempt_{disable,enable}() into kvm_arch_hardware_disable(), but that's
+> kinda gross in the context of cpuhp which isn't migratable in the first
+> place. Let me have a look...
 
-With that fixed:
+An alternative would be to replace the preemptible() checks with a one
+that looks at the migration state, but I'm not sure that's much better
+(it certainly looks more costly).
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+There is also the fact that most of our per-CPU accessors are already
+using preemption disabling, and this code has a bunch of them. So I'm
+not sure there is a lot to be gained from not disabling preemption
+upfront.
 
+Anyway, as I was able to reproduce the issue under NV, I tested the
+hack below. If anything, I expect it to be a reasonable fix for
+6.3/6.4, and until we come up with a better approach.
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index aaeae1145359..a28c4ffe4932 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1894,8 +1894,17 @@ static void _kvm_arch_hardware_enable(void *discard)
+ 
+ int kvm_arch_hardware_enable(void)
+ {
+-	int was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
++	int was_enabled;
+ 
++	/*
++	 * Most calls to this function are made with migration
++	 * disabled, but not with preemption disabled. The former is
++	 * enough to ensure correctness, but most of the helpers
++	 * expect the later and will throw a tantrum otherwise.
++	 */
++	preempt_disable();
++
++	was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
+ 	_kvm_arch_hardware_enable(NULL);
+ 
+ 	if (!was_enabled) {
+@@ -1903,6 +1912,8 @@ int kvm_arch_hardware_enable(void)
+ 		kvm_timer_cpu_up();
+ 	}
+ 
++	preempt_enable();
++
+ 	return 0;
+ }
+ 
+
+
+
+-- 
+Without deviation from the norm, progress is not possible.
