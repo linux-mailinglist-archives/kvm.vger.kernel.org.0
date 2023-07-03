@@ -2,43 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B55C745F63
-	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 17:03:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55B12745FC9
+	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 17:26:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231623AbjGCPD5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jul 2023 11:03:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45694 "EHLO
+        id S230300AbjGCP0I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jul 2023 11:26:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229853AbjGCPD4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jul 2023 11:03:56 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A7E1E66;
-        Mon,  3 Jul 2023 08:03:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=lqm8TMHAWxnUZDzATcGlvFdy39sG8ALavmX6CjixFQY=; b=O6AB5gQlNheuz9I5RbADZ+PUPJ
-        ATvZw+X674CVJh9wuJPOYigu7eaM8Z083C4NEiKq1Si5rnvRlevUcbPxP0jcx8JZcSe1t4p6+DvMO
-        WP11P0qeKkF6uNZKtoSNgnSvQfE66aXLVi91zjVih0lPLxuhl91jUUkbAiE2gxaiwX1JFUDXzVYZF
-        wquoHmeV34TDMueUkhk2tqBMdnszXSsJLoH+CICY/Cy3xgP1XMWNOhj1I6vQYH28aJjo2Y9uVhUYl
-        TkX7Xor/1XGCOJbhgsh1hykay1S5tOdWtpzIQ0G5qIewfazGh5bzHRwSmHP1YSA+pwfVLgsEKonIo
-        OFyknsQQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qGL5Q-00A6hA-0p;
-        Mon, 03 Jul 2023 15:03:33 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 8433E300095;
-        Mon,  3 Jul 2023 17:03:30 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 6A2732029B0A3; Mon,  3 Jul 2023 17:03:30 +0200 (CEST)
-Date:   Mon, 3 Jul 2023 17:03:30 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Dave Hansen <dave.hansen@intel.com>
+        with ESMTP id S229930AbjGCP0G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jul 2023 11:26:06 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F368E66;
+        Mon,  3 Jul 2023 08:26:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688397963; x=1719933963;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=kj6e5XFo1qU/JWRexT6QL5AcQhLeMKD04nwS981R7Mk=;
+  b=bHlyziwdI3jDBrhqVAB+bZeZThMdrecTUzVklE9qmdFWrnIifXNUwKNo
+   K0Ei7w2n95GykkpIirh8B7vQsjq1ow8OFTdpHbD5QlwJ6VXbait9TK3/M
+   MRnKlI4XaqoQxIV56PXk7kk318Y32lqsAxq7FZtu4nS6ByE5+IVY9VvZb
+   7kr8Ik1bj6uZXLHby43LqGe6tYA8Ej3XzLPHcRwYmlGaNn39El5WjIAT9
+   Iai3E1KmfXHDqfFTs1wgy/T73p4x0ePvZ2KdbvoB/VO8nkpRLR89bJsoM
+   PhIUAZrCeG5zh26Mbgi6Wjx46OOuE0089r6uLi/JGDfBm+4UNfTgB9YI5
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="428950439"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="428950439"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 08:26:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="668786413"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="668786413"
+Received: from lbates-mobl.amr.corp.intel.com (HELO [10.212.242.115]) ([10.212.242.115])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 08:26:01 -0700
+Message-ID: <8c080959-e1a5-6768-934d-33eca8e04086@intel.com>
+Date:   Mon, 3 Jul 2023 08:26:00 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
+ demand
+Content-Language: en-US
+To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Sean Christopherson <seanjc@google.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
         Kai Huang <kai.huang@intel.com>,
@@ -67,9 +75,6 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Ying Huang <ying.huang@intel.com>,
         Dan J Williams <dan.j.williams@intel.com>,
         "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Message-ID: <20230703150330.GA83892@hirez.programming.kicks-ass.net>
 References: <104d324cd68b12e14722ee5d85a660cccccd8892.1687784645.git.kai.huang@intel.com>
  <20230628131717.GE2438817@hirez.programming.kicks-ass.net>
  <0c9639db604a0670eeae5343d456e43d06b35d39.camel@intel.com>
@@ -80,68 +85,81 @@ References: <104d324cd68b12e14722ee5d85a660cccccd8892.1687784645.git.kai.huang@i
  <ZJ9IKALhz1Q6ogu1@google.com>
  <20230703104942.GG4253@hirez.programming.kicks-ass.net>
  <eb83e722-0379-1451-9c9c-9b9de33cb4cb@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eb83e722-0379-1451-9c9c-9b9de33cb4cb@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+ <20230703150330.GA83892@hirez.programming.kicks-ass.net>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <20230703150330.GA83892@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 03, 2023 at 07:40:55AM -0700, Dave Hansen wrote:
-> On 7/3/23 03:49, Peter Zijlstra wrote:
-> >> There are also latency and noisy neighbor concerns, e.g. we *really* don't want
-> >> to end up in a situation where creating a TDX guest for a customer can observe
-> >> arbitrary latency *and* potentially be disruptive to VMs already running on the
-> >> host.
-> > Well, that's a quality of implementation issue with the whole TDX
-> > crapola. Sounds like we want to impose latency constraints on the
-> > various TDX calls. Allowing it to consume arbitrary amounts of CPU time
-> > is unacceptable in any case.
+On 7/3/23 08:03, Peter Zijlstra wrote:
+> On Mon, Jul 03, 2023 at 07:40:55AM -0700, Dave Hansen wrote:
+>> On 7/3/23 03:49, Peter Zijlstra wrote:
+>>>> There are also latency and noisy neighbor concerns, e.g. we *really* don't want
+>>>> to end up in a situation where creating a TDX guest for a customer can observe
+>>>> arbitrary latency *and* potentially be disruptive to VMs already running on the
+>>>> host.
+>>> Well, that's a quality of implementation issue with the whole TDX
+>>> crapola. Sounds like we want to impose latency constraints on the
+>>> various TDX calls. Allowing it to consume arbitrary amounts of CPU time
+>>> is unacceptable in any case.
+>>
+>> For what it's worth, everybody knew that calling into the TDX module was
+>> going to be a black hole and that consuming large amounts of CPU at
+>> random times would drive people bat guano crazy.
+>>
+>> The TDX Module ABI spec does have "Leaf Function Latency" warnings for
+>> some of the module calls.  But, it's basically a binary thing.  A call
+>> is either normal or "longer than most".
+>>
+>> The majority of the "longer than most" cases are for initialization.
+>> The _most_ obscene runtime ones are chunked up and can return partial
+>> progress to limit latency spikes.  But I don't think folks tried as hard
+>> on the initialization calls since they're only called once which
+>> actually seems pretty reasonable to me.
+>>
+>> Maybe we need three classes of "Leaf Function Latency":
+>> 1. Sane
+>> 2. "Longer than most"
+>> 3. Better turn the NMI watchdog off before calling this. :)
+>>
+>> Would that help?
 > 
-> For what it's worth, everybody knew that calling into the TDX module was
-> going to be a black hole and that consuming large amounts of CPU at
-> random times would drive people bat guano crazy.
+> I'm thikning we want something along the lines of the Xen preemptible
+> hypercalls, except less crazy. Where the caller does:
 > 
-> The TDX Module ABI spec does have "Leaf Function Latency" warnings for
-> some of the module calls.  But, it's basically a binary thing.  A call
-> is either normal or "longer than most".
+> 	for (;;) {
+> 		ret = tdcall(fn, args);
+> 		if (ret == -EAGAIN) {
+> 			cond_resched();
+> 			continue;
+> 		}
+> 		break;
+> 	}
 > 
-> The majority of the "longer than most" cases are for initialization.
-> The _most_ obscene runtime ones are chunked up and can return partial
-> progress to limit latency spikes.  But I don't think folks tried as hard
-> on the initialization calls since they're only called once which
-> actually seems pretty reasonable to me.
-> 
-> Maybe we need three classes of "Leaf Function Latency":
-> 1. Sane
-> 2. "Longer than most"
-> 3. Better turn the NMI watchdog off before calling this. :)
-> 
-> Would that help?
+> And then the TDX black box provides a guarantee that any one tdcall (or
+> seamcall or whatever) never takes more than X ns (possibly even
+> configurable) and we get to raise a bug report if we can prove it
+> actually takes longer.
 
-I'm thikning we want something along the lines of the Xen preemptible
-hypercalls, except less crazy. Where the caller does:
+It's _supposed_ to be doing something kinda like that.  For instance, in
+the places that need locking, the TDX module essentially does:
 
-	for (;;) {
-		ret = tdcall(fn, args);
-		if (ret == -EAGAIN) {
-			cond_resched();
-			continue;
-		}
-		break;
-	}
+	if (!trylock(&lock))
+		return -EBUSY;
 
-And then the TDX black box provides a guarantee that any one tdcall (or
-seamcall or whatever) never takes more than X ns (possibly even
-configurable) and we get to raise a bug report if we can prove it
-actually takes longer.
+which is a heck of a lot better than spinning in the TDX module.  Those
+module locks are also almost always for things that *also* have some
+kind of concurrency control in Linux too.
 
-Handing the CPU off to random code for random period of time is just not
-a good idea, ever.
+*But*, there are also the really nasty calls that *do* take forever.  It
+would be great to have a list of them or, heck, even *enumeration* of
+which ones can take forever so we don't need to maintain a table.
