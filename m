@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DE5E746269
-	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 20:32:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 200C174626A
+	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 20:32:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231183AbjGCScN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jul 2023 14:32:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49182 "EHLO
+        id S230417AbjGCScU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jul 2023 14:32:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231167AbjGCScL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jul 2023 14:32:11 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEF14E67
-        for <kvm@vger.kernel.org>; Mon,  3 Jul 2023 11:32:08 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-3fba8e2aa52so57229265e9.1
-        for <kvm@vger.kernel.org>; Mon, 03 Jul 2023 11:32:08 -0700 (PDT)
+        with ESMTP id S231199AbjGCScS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jul 2023 14:32:18 -0400
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C36EE6A
+        for <kvm@vger.kernel.org>; Mon,  3 Jul 2023 11:32:15 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-314319c0d3eso2261111f8f.0
+        for <kvm@vger.kernel.org>; Mon, 03 Jul 2023 11:32:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1688409127; x=1691001127;
+        d=linaro.org; s=google; t=1688409133; x=1691001133;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MmplW2ex2rHzihVJ44uJ4xkpwEybdiXLv3F1bYg0V9o=;
-        b=crGvpkCQQsqDzLIoUgcMsHdYqvWJOnGoIuQ/6q/mfvoIOHSvNImdJpaPo0q1U3jT2V
-         mHkp9rOwRKSD+mdTIH7KH4BysB9MboC9TrJ3sbDDCs5rGZBiJHxrrDH0dY64YNJAOqoq
-         tBXke0PJ5p30cVXtQeZZgY77oGV0GyibjGMvkj0PvyoB8DSLW7TwIqYh8G5qYWpn5IRD
-         UL37SB8mV0rE4SA1d0peFobkwPBhrVCRQBSqVLPuaPzHAFuS7W9S9KvUQwtPmBB+qnFa
-         ncO1oEu+0lkVzugu+6t+YcDF1GLWAFEmg3L/YyXbX9QVgBCnOh/DLQmOrumB6yodiLVi
-         L7Ew==
+        bh=KNXX9yjMUQcBLaEX0n22oT0yHELrjRtAMDfsIdBaNkY=;
+        b=KIK5m6ETMi3E+DS0NOoaPhJTIaeZWsAbFYOV6Zl7AOmoiTcn8qvuL0HF+pnuVFScFG
+         dagK5jUXqbUkBh/CoHtVTNrK5Zw8YVfRszT6X3I7J2y+JgZ7ak1OIwTX5AxRLKfZJse1
+         EWs66tgk92rQ1CnP1vltH6gmx+vFVYlZuNXlRl5sTfE4nzmSeOJWqW/OhoiCeX1XP91e
+         BCsyxZ1YR/EQynYeZ2xomyJXpZH9A1VE4rtdD3TNFlPkZpEPJBc5M9kJQfg5mAU8DMah
+         0KQKxqwC1+GiTfkqYbXnA/CHoUHbKyS75aZMGaU1oIVMOthqNpFIYYkf5PAr+iOHlBKF
+         Wjcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688409127; x=1691001127;
+        d=1e100.net; s=20221208; t=1688409133; x=1691001133;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MmplW2ex2rHzihVJ44uJ4xkpwEybdiXLv3F1bYg0V9o=;
-        b=ehxr3qvELTe5xH8ueTqx6wwVBQBuKK0JBXJ9SMpuyG5pnWJkNCpPRAk522aR3SOjXt
-         uRquAOzVdsJO00Mdbh3QKiLK82I9EVn7LqCDs6zHf3ko3nLdMlHp0Z/V7NzNT9xkTeZ+
-         tE8PwGBkZPdwyLWgt329CFJX1s4pF5I1zvc75BhYKFvGPqa8bXedSIsISEtAb3E2DSpV
-         69/y6sso8Sbmc0SmcoWjClJSZimdNG3AMFrlW3IHYKsEX0XSn2vhqBNz+WajJ4bL/9QT
-         WB7+713DXfML1p2mDhBakvD6i+0DbW2V7nXb5wi5n8lP2UHVGsRFfFRYdYrvqNDI6sjx
-         EFUA==
-X-Gm-Message-State: AC+VfDw8FzCWzbnlSSy3mL4U31lTHEFpbLp/xWvsZ6MVlODft8gG48IM
-        OLEHCFcThGawbHGl1yhIxkAgEg==
-X-Google-Smtp-Source: ACHHUZ5P9NPaUY2M9plko56MMlY+LD4D0vX+GUYll+SWPHJdo6WhISnJstsVpBPOD24/pxFJoXi75Q==
-X-Received: by 2002:a1c:790b:0:b0:3fb:b280:f551 with SMTP id l11-20020a1c790b000000b003fbb280f551mr9744606wme.41.1688409127036;
-        Mon, 03 Jul 2023 11:32:07 -0700 (PDT)
+        bh=KNXX9yjMUQcBLaEX0n22oT0yHELrjRtAMDfsIdBaNkY=;
+        b=Fs6OdWpS4ZZ9AK+imadMsgTmF5kFT89TVoosSEFlGY1/g9epmS2KYrB29pRCAHrhaO
+         jAGMt5bPNcCtmVx3BAxLVjgkBrxgRnrfprSxvwb+KdvfilZFRWHb8nar6UXn95l1XIlj
+         xg9xqgjwZaPMB0D4zeadqheLEXROPyWdfmGo5PkDWGVhXHgDz+J47HvpqbIe+JXkNTtF
+         VQx5Fc1f0G0zw/YMwmoe5UJ0DwaDeGxZSb+hU82kpKpcUJT4W8O6SVhRJLGAJBtXza5E
+         bHmdSqApgNjKgXwJJQmvy4FtpJp9UcdhP3k61J5RBNOMUlvRBn0MJIgFaW2VO+UQkvBh
+         RQhg==
+X-Gm-Message-State: ABy/qLYaH0nrBfdJKqwhe3BYj0VX+eXnp2JTvyTInre/DVEWTETu/ta8
+        X8ROYDcOG1xq2hqBnKt4goZHvw==
+X-Google-Smtp-Source: APBJJlHatMbhgx8arqDUSOAALOI8iktiuHwcIb3VHA/qra9oYQt49PQ0pLFIYvPi0+AxjH5Xon74jA==
+X-Received: by 2002:a05:6000:924:b0:314:2c17:d921 with SMTP id cx4-20020a056000092400b003142c17d921mr6336643wrb.38.1688409133603;
+        Mon, 03 Jul 2023 11:32:13 -0700 (PDT)
 Received: from localhost.localdomain ([176.176.178.91])
-        by smtp.gmail.com with ESMTPSA id m21-20020a7bcb95000000b003faabd8fcb8sm21627386wmi.46.2023.07.03.11.32.05
+        by smtp.gmail.com with ESMTPSA id w10-20020adfec4a000000b00314172ba213sm11770980wrn.108.2023.07.03.11.32.11
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 03 Jul 2023 11:32:06 -0700 (PDT)
+        Mon, 03 Jul 2023 11:32:13 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
@@ -64,9 +64,9 @@ Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         Weiwei Li <liweiwei@iscas.ac.cn>,
         Liu Zhiwei <zhiwei_liu@linux.alibaba.com>
-Subject: [PATCH v2 03/16] target/riscv: Restrict sysemu specific header to user emulation
-Date:   Mon,  3 Jul 2023 20:31:32 +0200
-Message-Id: <20230703183145.24779-4-philmd@linaro.org>
+Subject: [PATCH v2 04/16] target/riscv: Restrict 'rv128' machine to TCG accelerator
+Date:   Mon,  3 Jul 2023 20:31:33 +0200
+Message-Id: <20230703183145.24779-5-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230703183145.24779-1-philmd@linaro.org>
 References: <20230703183145.24779-1-philmd@linaro.org>
@@ -83,72 +83,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+We only build for 32/64-bit hosts, so TCG is required for
+128-bit targets.
+
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
 Acked-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/cpu.c        | 8 +++++---
- target/riscv/cpu_helper.c | 2 ++
- target/riscv/csr.c        | 2 ++
- 3 files changed, 9 insertions(+), 3 deletions(-)
+ target/riscv/cpu.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index fd647534cf..174003348f 100644
+index 174003348f..78ab61c274 100644
 --- a/target/riscv/cpu.c
 +++ b/target/riscv/cpu.c
-@@ -23,9 +23,13 @@
- #include "qemu/log.h"
- #include "cpu.h"
- #include "cpu_vendorid.h"
-+#ifndef CONFIG_USER_ONLY
- #include "pmu.h"
--#include "internals.h"
- #include "time_helper.h"
-+#include "sysemu/kvm.h"
-+#include "kvm_riscv.h"
-+#endif
-+#include "internals.h"
- #include "exec/exec-all.h"
- #include "qapi/error.h"
- #include "qapi/visitor.h"
-@@ -33,8 +37,6 @@
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
- #include "fpu/softfloat-helpers.h"
--#include "sysemu/kvm.h"
--#include "kvm_riscv.h"
- #include "tcg/tcg.h"
+@@ -498,6 +498,7 @@ static void rv64_veyron_v1_cpu_init(Object *obj)
+ #endif
+ }
  
- /* RISC-V CPU definitions */
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 9f611d89bb..e8b7f70be3 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -28,7 +28,9 @@
- #include "tcg/tcg-op.h"
- #include "trace.h"
- #include "semihosting/common-semi.h"
-+#ifndef CONFIG_USER_ONLY
- #include "sysemu/cpu-timers.h"
++#ifdef CONFIG_TCG
+ static void rv128_base_cpu_init(Object *obj)
+ {
+     if (qemu_tcg_mttcg_enabled()) {
+@@ -516,7 +517,10 @@ static void rv128_base_cpu_init(Object *obj)
+     set_satp_mode_max_supported(RISCV_CPU(obj), VM_1_10_SV57);
+ #endif
+ }
+-#else
 +#endif
- #include "cpu_bits.h"
- #include "debug.h"
- #include "tcg/oversized-guest.h"
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index ea7585329e..e5737dcf58 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -21,8 +21,10 @@
- #include "qemu/log.h"
- #include "qemu/timer.h"
- #include "cpu.h"
-+#ifndef CONFIG_USER_ONLY
- #include "pmu.h"
- #include "time_helper.h"
-+#endif
- #include "qemu/main-loop.h"
- #include "exec/exec-all.h"
- #include "exec/tb-flush.h"
++
++#else /* !TARGET_RISCV64 */
++
+ static void rv32_base_cpu_init(Object *obj)
+ {
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+@@ -598,7 +602,7 @@ static void rv32_imafcu_nommu_cpu_init(Object *obj)
+     cpu->cfg.ext_icsr = true;
+     cpu->cfg.pmp = true;
+ }
+-#endif
++#endif /* !TARGET_RISCV64 */
+ 
+ #if defined(CONFIG_KVM)
+ static void riscv_host_cpu_init(Object *obj)
+@@ -2033,8 +2037,10 @@ static const TypeInfo riscv_cpu_type_infos[] = {
+     DEFINE_CPU(TYPE_RISCV_CPU_SHAKTI_C,         rv64_sifive_u_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_THEAD_C906,       rv64_thead_c906_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_VEYRON_V1,        rv64_veyron_v1_cpu_init),
++#ifdef CONFIG_TCG
+     DEFINE_DYNAMIC_CPU(TYPE_RISCV_CPU_BASE128,  rv128_base_cpu_init),
+-#endif
++#endif /* CONFIG_TCG */
++#endif /* TARGET_RISCV64 */
+ };
+ 
+ DEFINE_TYPES(riscv_cpu_type_infos)
 -- 
 2.38.1
 
