@@ -2,117 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4901745E3F
-	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 16:12:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4416D745E75
+	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 16:23:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230028AbjGCOMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jul 2023 10:12:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44178 "EHLO
+        id S230464AbjGCOXr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jul 2023 10:23:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231268AbjGCOM1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jul 2023 10:12:27 -0400
-Received: from elvis.franken.de (elvis.franken.de [193.175.24.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A9475E5C;
-        Mon,  3 Jul 2023 07:12:25 -0700 (PDT)
-Received: from uucp by elvis.franken.de with local-rmail (Exim 3.36 #1)
-        id 1qGKHs-0008Fl-00; Mon, 03 Jul 2023 16:12:20 +0200
-Received: by alpha.franken.de (Postfix, from userid 1000)
-        id 6937BC02FD; Mon,  3 Jul 2023 16:08:53 +0200 (CEST)
-Date:   Mon, 3 Jul 2023 16:08:53 +0200
-From:   Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-To:     Huacai Chen <chenhuacai@loongson.cn>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@gmail.com>, kvm@vger.kernel.org,
-        linux-mips@vger.kernel.org, Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        stable@vger.kernel.org, Yu Zhao <yuzhao@google.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
-Subject: Re: [PATCH V2] MIPS: KVM: Fix NULL pointer dereference
-Message-ID: <20230703140853.GA16247@alpha.franken.de>
-References: <20230628110817.3167337-1-chenhuacai@loongson.cn>
+        with ESMTP id S231319AbjGCOXe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jul 2023 10:23:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA764E52
+        for <kvm@vger.kernel.org>; Mon,  3 Jul 2023 07:22:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1688394166;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=tXq7CSCBg4+cZGxQq09ZDU/5siBg7EUbmcmgq0dXQ3g=;
+        b=aYAQg2Cx97s0fDvb2AvY/T3HeUEaZFrFPjJNRgk2TUwegm8ijHD9iCn0U9R/HQfQVap3lu
+        AOqQ8OBuIttqxEspoU2jzG0e1N2OP0DT6XbPnR9q9mJTCU6Yv8MejwULLNSlqAu/T9CzoK
+        GF0LeCEOrrrDrlr5yZLWwoWaipi5LDk=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-134-g9FqHmkaM_WYKSeHKKyPcQ-1; Mon, 03 Jul 2023 10:22:42 -0400
+X-MC-Unique: g9FqHmkaM_WYKSeHKKyPcQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 628983813F2C;
+        Mon,  3 Jul 2023 14:22:42 +0000 (UTC)
+Received: from eperezma.remote.csb (unknown [10.39.192.105])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A2D581400C35;
+        Mon,  3 Jul 2023 14:22:19 +0000 (UTC)
+From:   =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To:     mst@redhat.com
+Cc:     Jason Wang <jasowang@redhat.com>,
+        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Shannon Nelson <shannon.nelson@amd.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Subject: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not support it
+Date:   Mon,  3 Jul 2023 16:22:18 +0200
+Message-Id: <20230703142218.362549-1-eperezma@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230628110817.3167337-1-chenhuacai@loongson.cn>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,LOTS_OF_MONEY,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 07:08:17PM +0800, Huacai Chen wrote:
-> After commit 45c7e8af4a5e3f0bea4ac209 ("MIPS: Remove KVM_TE support") we
-> get a NULL pointer dereference when creating a KVM guest:
-> 
-> [  146.243409] Starting KVM with MIPS VZ extensions
-> [  149.849151] CPU 3 Unable to handle kernel paging request at virtual address 0000000000000300, epc == ffffffffc06356ec, ra == ffffffffc063568c
-> [  149.849177] Oops[#1]:
-> [  149.849182] CPU: 3 PID: 2265 Comm: qemu-system-mip Not tainted 6.4.0-rc3+ #1671
-> [  149.849188] Hardware name: THTF CX TL630 Series/THTF-LS3A4000-7A1000-ML4A, BIOS KL4.1F.TF.D.166.201225.R 12/25/2020
-> [  149.849192] $ 0   : 0000000000000000 000000007400cce0 0000000000400004 ffffffff8119c740
-> [  149.849209] $ 4   : 000000007400cce1 000000007400cce1 0000000000000000 0000000000000000
-> [  149.849221] $ 8   : 000000240058bb36 ffffffff81421ac0 0000000000000000 0000000000400dc0
-> [  149.849233] $12   : 9800000102a07cc8 ffffffff80e40e38 0000000000000001 0000000000400dc0
-> [  149.849245] $16   : 0000000000000000 9800000106cd0000 9800000106cd0000 9800000100cce000
-> [  149.849257] $20   : ffffffffc0632b28 ffffffffc05b31b0 9800000100ccca00 0000000000400000
-> [  149.849269] $24   : 9800000106cd09ce ffffffff802f69d0
-> [  149.849281] $28   : 9800000102a04000 9800000102a07cd0 98000001106a8000 ffffffffc063568c
-> [  149.849293] Hi    : 00000335b2111e66
-> [  149.849295] Lo    : 6668d90061ae0ae9
-> [  149.849298] epc   : ffffffffc06356ec kvm_vz_vcpu_setup+0xc4/0x328 [kvm]
-> [  149.849324] ra    : ffffffffc063568c kvm_vz_vcpu_setup+0x64/0x328 [kvm]
-> [  149.849336] Status: 7400cce3 KX SX UX KERNEL EXL IE
-> [  149.849351] Cause : 1000000c (ExcCode 03)
-> [  149.849354] BadVA : 0000000000000300
-> [  149.849357] PrId  : 0014c004 (ICT Loongson-3)
-> [  149.849360] Modules linked in: kvm nfnetlink_queue nfnetlink_log nfnetlink fuse sha256_generic libsha256 cfg80211 rfkill binfmt_misc vfat fat snd_hda_codec_hdmi input_leds led_class snd_hda_intel snd_intel_dspcfg snd_hda_codec snd_hda_core snd_pcm snd_timer snd serio_raw xhci_pci radeon drm_suballoc_helper drm_display_helper xhci_hcd ip_tables x_tables
-> [  149.849432] Process qemu-system-mip (pid: 2265, threadinfo=00000000ae2982d2, task=0000000038e09ad4, tls=000000ffeba16030)
-> [  149.849439] Stack : 9800000000000003 9800000100ccca00 9800000100ccc000 ffffffffc062cef4
-> [  149.849453]         9800000102a07d18 c89b63a7ab338e00 0000000000000000 ffffffff811a0000
-> [  149.849465]         0000000000000000 9800000106cd0000 ffffffff80e59938 98000001106a8920
-> [  149.849476]         ffffffff80e57f30 ffffffffc062854c ffffffff811a0000 9800000102bf4240
-> [  149.849488]         ffffffffc05b0000 ffffffff80e3a798 000000ff78000000 000000ff78000010
-> [  149.849500]         0000000000000255 98000001021f7de0 98000001023f0078 ffffffff81434000
-> [  149.849511]         0000000000000000 0000000000000000 9800000102ae0000 980000025e92ae28
-> [  149.849523]         0000000000000000 c89b63a7ab338e00 0000000000000001 ffffffff8119dce0
-> [  149.849535]         000000ff78000010 ffffffff804f3d3c 9800000102a07eb0 0000000000000255
-> [  149.849546]         0000000000000000 ffffffff8049460c 000000ff78000010 0000000000000255
-> [  149.849558]         ...
-> [  149.849565] Call Trace:
-> [  149.849567] [<ffffffffc06356ec>] kvm_vz_vcpu_setup+0xc4/0x328 [kvm]
-> [  149.849586] [<ffffffffc062cef4>] kvm_arch_vcpu_create+0x184/0x228 [kvm]
-> [  149.849605] [<ffffffffc062854c>] kvm_vm_ioctl+0x64c/0xf28 [kvm]
-> [  149.849623] [<ffffffff805209c0>] sys_ioctl+0xc8/0x118
-> [  149.849631] [<ffffffff80219eb0>] syscall_common+0x34/0x58
-> 
-> The root cause is the deletion of kvm_mips_commpage_init() leaves vcpu
-> ->arch.cop0 NULL. So fix it by making cop0 from a pointer to an embedded
-> object.
-> 
-> Fixes: 45c7e8af4a5e3f0bea4ac209 ("MIPS: Remove KVM_TE support")
-> Cc: stable@vger.kernel.org
-> Reported-by: Yu Zhao <yuzhao@google.com>
-> Suggested-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
-> ---
-> V2: Update commit message and add Reported-by/Reviewed-by.
-> 
->  arch/mips/include/asm/kvm_host.h |  6 +++---
->  arch/mips/kvm/emulate.c          | 22 +++++++++++-----------
->  arch/mips/kvm/mips.c             | 16 ++++++++--------
->  arch/mips/kvm/trace.h            |  8 ++++----
->  arch/mips/kvm/vz.c               | 20 ++++++++++----------
->  5 files changed, 36 insertions(+), 36 deletions(-)
+With the current code it is accepted as long as userland send it.
 
-applied to mips-next.
+Although userland should not set a feature flag that has not been
+offered to it with VHOST_GET_BACKEND_FEATURES, the current code will not
+complain for it.
 
-Thomas.
+Since there is no specific reason for any parent to reject that backend
+feature bit when it has been proposed, let's control it at vdpa frontend
+level. Future patches may move this control to the parent driver.
 
+Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
+Signed-off-by: Eugenio PÃ©rez <eperezma@redhat.com>
+
+---
+Sent with Fixes: tag pointing to git.kernel.org/pub/scm/linux/kernel/git/mst
+commit. Please let me know if I should send a v3 of [1] instead.
+
+[1] https://lore.kernel.org/lkml/20230609121244-mutt-send-email-mst@kernel.org/T/
+---
+ drivers/vhost/vdpa.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index e1abf29fed5b..a7e554352351 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+ {
+ 	struct vhost_vdpa *v = filep->private_data;
+ 	struct vhost_dev *d = &v->vdev;
++	const struct vdpa_config_ops *ops = v->vdpa->config;
+ 	void __user *argp = (void __user *)arg;
+ 	u64 __user *featurep = argp;
+-	u64 features;
++	u64 features, parent_features = 0;
+ 	long r = 0;
+ 
+ 	if (cmd == VHOST_SET_BACKEND_FEATURES) {
+ 		if (copy_from_user(&features, featurep, sizeof(features)))
+ 			return -EFAULT;
++		if (ops->get_backend_features)
++			parent_features = ops->get_backend_features(v->vdpa);
+ 		if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
+ 				 BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
+ 				 BIT_ULL(VHOST_BACKEND_F_RESUME) |
+-				 BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK)))
++				 parent_features))
+ 			return -EOPNOTSUPP;
+ 		if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
+ 		     !vhost_vdpa_can_suspend(v))
 -- 
-Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
-good idea.                                                [ RFC1925, 2.3 ]
+2.39.3
+
