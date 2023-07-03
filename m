@@ -2,64 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10AF87460C5
-	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 18:36:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2E727460D5
+	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 18:38:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230034AbjGCQf6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jul 2023 12:35:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54948 "EHLO
+        id S230144AbjGCQiT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jul 2023 12:38:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjGCQf5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jul 2023 12:35:57 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E61BFD
-        for <kvm@vger.kernel.org>; Mon,  3 Jul 2023 09:35:56 -0700 (PDT)
+        with ESMTP id S229505AbjGCQiS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jul 2023 12:38:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9936AE52
+        for <kvm@vger.kernel.org>; Mon,  3 Jul 2023 09:38:17 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 136CE60FC5
-        for <kvm@vger.kernel.org>; Mon,  3 Jul 2023 16:35:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78523C433C7;
-        Mon,  3 Jul 2023 16:35:55 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 33C5560FD6
+        for <kvm@vger.kernel.org>; Mon,  3 Jul 2023 16:38:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E235C433C7;
+        Mon,  3 Jul 2023 16:38:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688402155;
-        bh=N6vR/isJS7QDUT4Iu2eb1E931YafySKJREGUVnDreiM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=p5rDwHcfqw0tUgUUaFctvRj3+Oc5tUab8U+pxrOWeWXV603vijyNqMPRmQY1NJZpk
-         gqRFTpus2hXFu8/3WI6AH5iqqI/yVXw7ol3VQ01QIDiMh5KHWlRjLF+Ospxa5gwmey
-         w2bHtDdXyyg1YprUfnXOl49VJsAVYIcmbCEYvtRXUKAUEeZXW26Ty6EzfKf1pVm8PY
-         MeK3b1vIGMYUn11rkzvj2pqD4vv2tWmINhZVWmfFrWp2s1iCtUuWj/xjBrEBtkhJLI
-         fiTuO/KloLZiGn4i5781HZ8gQ7ChQHwN6jCIJp93UckXxcBut/bdpSDIVOQU7HI6xj
-         SMUDSzYZ+QTxQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        s=k20201202; t=1688402296;
+        bh=yU0XB29qN64qtUjijennPhY7fPZFsNvNq/Cdci8Ufv0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=fiKpo29mQ59sNbw2HoiHnU9ZYerPcx7garu//JDm/0Ek75HY/IZqcTAVf0SUgqHlp
+         b7lc9F7QkigT0bVn/OAgTyLSkMNGJhL9fVmIMBRc+o/ZGLTfIVaiBO1CBStXfrOhXh
+         SOp/n3b2/kT/CVA0+/HnICfWtD7OPNhtJWBiWXDLh7WlS9a9qHFKLugC7CfFPuwBX+
+         tdO+tBaZgaoSx09mdNHLTr1OtCnapSWeZRSTRYkf7V0IgMbwB6IjYcc2ixWNnfQM64
+         3nSiUUg4nrk3NVRhqKMm/oeIJVKT4UhkmsyZMbp0ZEAZm/KFFK3BN/JbJcDCuVjp2P
+         knuYma56DW/kw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qGMWm-00ADGW-SY;
-        Mon, 03 Jul 2023 17:35:53 +0100
+        id 1qGMZ4-00ADIt-DN;
+        Mon, 03 Jul 2023 17:38:14 +0100
+Date:   Mon, 03 Jul 2023 17:38:14 +0100
+Message-ID: <864jmlx85l.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>, isaku.yamahata@intel.com,
-        seanjc@google.com, pbonzini@redhat.com,
-        Kristina Martsenko <kristina.martsenko@arm.com>,
-        stable@vger.kernek.org
-Subject: [PATCH] KVM: arm64: Disable preemption in kvm_arch_hardware_enable()
-Date:   Mon,  3 Jul 2023 17:35:48 +0100
-Message-Id: <20230703163548.1498943-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Kristina Martsenko <kristina.martsenko@arm.com>,
+        isaku.yamahata@intel.com, seanjc@google.com, pbonzini@redhat.com,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>
+Subject: Re: KVM CPU hotplug notifier triggers BUG_ON on arm64
+In-Reply-To: <ZKLxFveKKvoQs5RV@thinky-boi>
+References: <aeab7562-2d39-e78e-93b1-4711f8cc3fa5@arm.com>
+        <ZKBlhJwl9YD5FHvs@linux.dev>
+        <867crhxr9l.wl-maz@kernel.org>
+        <ZKLxFveKKvoQs5RV@thinky-boi>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, isaku.yamahata@intel.com, seanjc@google.com, pbonzini@redhat.com, kristina.martsenko@arm.com, stable@vger.kernek.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kristina.martsenko@arm.com, isaku.yamahata@intel.com, seanjc@google.com, pbonzini@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -68,62 +72,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since 0bf50497f03b ("KVM: Drop kvm_count_lock and instead protect
-kvm_usage_count with kvm_lock"), hotplugging back a CPU whilst
-a guest is running results in a number of ugly splats as most
-of this code expects to run with preemption disabled, which isn't
-the case anymore.
+On Mon, 03 Jul 2023 17:02:30 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hey Marc,
+> 
+> On Mon, Jul 03, 2023 at 10:45:26AM +0100, Marc Zyngier wrote:
+> > On Sat, 01 Jul 2023 18:42:28 +0100, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > Well, one way to hack around the problem would be to just cram
+> > > preempt_{disable,enable}() into kvm_arch_hardware_disable(), but that's
+> > > kinda gross in the context of cpuhp which isn't migratable in the first
+> > > place. Let me have a look...
+> 
+> Heh, I should've mentioned I'm on holiday until Thursday.
 
-While the context is preemptable, it isn't migratable, which should
-be enough. But we have plenty of preemptible() checks all over
-the place, and our per-CPU accessors also disable preemption.
+No problem, happy to keep an eye on stuff in the meantime.
 
-Since this affects released versions, let's do the easy fix first,
-disabling preemption in kvm_arch_hardware_enable(). We can always
-revisit this with a more invasive fix in the future.
+> 
+> > An alternative would be to replace the preemptible() checks with a one
+> > that looks at the migration state, but I'm not sure that's much better
+> > (it certainly looks more costly).
+> > 
+> > There is also the fact that most of our per-CPU accessors are already
+> > using preemption disabling, and this code has a bunch of them. So I'm
+> > not sure there is a lot to be gained from not disabling preemption
+> > upfront.
+> > 
+> > Anyway, as I was able to reproduce the issue under NV, I tested the
+> > hack below. If anything, I expect it to be a reasonable fix for
+> > 6.3/6.4, and until we come up with a better approach.
+> 
+> Yeah, I'm fine with a hack like this. Do you want to send this out as a
+> patch?
 
-Fixes: 0bf50497f03b ("KVM: Drop kvm_count_lock and instead protect kvm_usage_count with kvm_lock")
-Reported-by: Kristina Martsenko <kristina.martsenko@arm.com>
-Tested-by: Kristina Martsenko <kristina.martsenko@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/aeab7562-2d39-e78e-93b1-4711f8cc3fa5@arm.com
-Cc: stable@vger.kernek.org # v6.3, v6.4
----
- arch/arm64/kvm/arm.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+Now sent as 20230703163548.1498943-1-maz@kernel.org.
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index aaeae1145359..a28c4ffe4932 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1894,8 +1894,17 @@ static void _kvm_arch_hardware_enable(void *discard)
- 
- int kvm_arch_hardware_enable(void)
- {
--	int was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
-+	int was_enabled;
- 
-+	/*
-+	 * Most calls to this function are made with migration
-+	 * disabled, but not with preemption disabled. The former is
-+	 * enough to ensure correctness, but most of the helpers
-+	 * expect the later and will throw a tantrum otherwise.
-+	 */
-+	preempt_disable();
-+
-+	was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
- 	_kvm_arch_hardware_enable(NULL);
- 
- 	if (!was_enabled) {
-@@ -1903,6 +1912,8 @@ int kvm_arch_hardware_enable(void)
- 		kvm_timer_cpu_up();
- 	}
- 
-+	preempt_enable();
-+
- 	return 0;
- }
- 
+Enjoy your time off!
+
+	M.
+
 -- 
-2.34.1
-
+Without deviation from the norm, progress is not possible.
