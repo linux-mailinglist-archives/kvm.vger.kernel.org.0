@@ -2,49 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29E3F7461A3
-	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 19:56:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DC26746257
+	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 20:26:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230246AbjGCR4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jul 2023 13:56:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58064 "EHLO
+        id S230303AbjGCS0s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jul 2023 14:26:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbjGCR4I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jul 2023 13:56:08 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E1BC2;
-        Mon,  3 Jul 2023 10:56:07 -0700 (PDT)
+        with ESMTP id S229830AbjGCS0q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jul 2023 14:26:46 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04947D7;
+        Mon,  3 Jul 2023 11:26:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688406967; x=1719942967;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tXCkUV57n+k42/6WNxCUqFu0N3OYKzthRacRkqM/8M4=;
-  b=flQsM+SuVo3aJmhviTcDIZdCaLDjc8pbYcfCFHDCJl8fqyFMXat6xe0j
-   8Y2cbhVxlzo7n6QTJZS6CmuBosFnEAJ8xNZMOPQkmURK3ID5jKhsQpoZs
-   MCwGd3T6bYO/JPsgGjuF2DFl9pnFsrlknKq79A8KryG+yRXP3FQI7fJ+R
-   uR4zwIh4RfH63ZHpTyIbxGBxAk9WQGIG1OIdTe1NtSG2TcYtG3U8NYbjs
-   OeU5PZdHatu1xPIbAdT0ZaLgXMlr8YukihQzAta/4VAe8eLwA1Wu0JxMG
-   jwYV92z3BQgQeDkHWaG4bFyTJt2MlblAd+9yW+WnTv0R1eAiS+DBrowzZ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="342528980"
+  t=1688408806; x=1719944806;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=loPr+dzJ18Fhw1+ezR3lKISk94Z2wAYPGf8y4ACIrKE=;
+  b=kWtc2nsl+9L+/nOEZXpTFwYRvliVyo3wZ46DdDLeLmwlVNvZbZBwFIpt
+   +dr3BbEDZYiH4VUfhMCuou6XCCqQL1si5//5u9M/4gbu65ijc6QMtPp7d
+   OCSpRvZNbnZrtB0oBDMDOk2io65OFHeR38TcbdC/+e4IuQsgk17H8V+wH
+   7Gq7/AXflJHC/q0n1aZDCu2TLo709g1yXRNFKo8TSsFWn0TLQ/4/zInRD
+   JbZCyyfgLQn8QAKhQfXc6ad3ERN37FdeEjEIXtVb1AUco9DrPRv3kQWGY
+   pEkRHfAy6/ILF81TuK9D9azvplAWM186+LBNbEdyfPu7G5GrLlT5ed85B
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="428985376"
 X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="342528980"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 10:56:06 -0700
+   d="scan'208";a="428985376"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 11:26:45 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="788597117"
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="712635074"
 X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="788597117"
-Received: from foliveix-mobl5.amr.corp.intel.com (HELO box.shutemov.name) ([10.251.218.218])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 10:55:59 -0700
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id B504410955C; Mon,  3 Jul 2023 20:55:56 +0300 (+03)
-Date:   Mon, 3 Jul 2023 20:55:56 +0300
-From:   "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
+   d="scan'208";a="712635074"
+Received: from lbates-mobl.amr.corp.intel.com (HELO [10.212.242.115]) ([10.212.242.115])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 11:26:44 -0700
+Message-ID: <f29fb57f-f59f-9101-74b6-e48e738963c5@intel.com>
+Date:   Mon, 3 Jul 2023 11:26:43 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
+ demand
+Content-Language: en-US
+To:     "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
         Kai Huang <kai.huang@intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
@@ -71,9 +75,6 @@ Cc:     Dave Hansen <dave.hansen@intel.com>,
         Ying Huang <ying.huang@intel.com>,
         Dan J Williams <dan.j.williams@intel.com>,
         "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Message-ID: <20230703175556.nn5xozz7dzxjocqm@box.shutemov.name>
 References: <20230628131717.GE2438817@hirez.programming.kicks-ass.net>
  <0c9639db604a0670eeae5343d456e43d06b35d39.camel@intel.com>
  <20230630092615.GD2533791@hirez.programming.kicks-ass.net>
@@ -84,76 +85,55 @@ References: <20230628131717.GE2438817@hirez.programming.kicks-ass.net>
  <20230703104942.GG4253@hirez.programming.kicks-ass.net>
  <eb83e722-0379-1451-9c9c-9b9de33cb4cb@intel.com>
  <20230703150330.GA83892@hirez.programming.kicks-ass.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230703150330.GA83892@hirez.programming.kicks-ass.net>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+ <20230703175556.nn5xozz7dzxjocqm@box.shutemov.name>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <20230703175556.nn5xozz7dzxjocqm@box.shutemov.name>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 03, 2023 at 05:03:30PM +0200, Peter Zijlstra wrote:
-> On Mon, Jul 03, 2023 at 07:40:55AM -0700, Dave Hansen wrote:
-> > On 7/3/23 03:49, Peter Zijlstra wrote:
-> > >> There are also latency and noisy neighbor concerns, e.g. we *really* don't want
-> > >> to end up in a situation where creating a TDX guest for a customer can observe
-> > >> arbitrary latency *and* potentially be disruptive to VMs already running on the
-> > >> host.
-> > > Well, that's a quality of implementation issue with the whole TDX
-> > > crapola. Sounds like we want to impose latency constraints on the
-> > > various TDX calls. Allowing it to consume arbitrary amounts of CPU time
-> > > is unacceptable in any case.
-> > 
-> > For what it's worth, everybody knew that calling into the TDX module was
-> > going to be a black hole and that consuming large amounts of CPU at
-> > random times would drive people bat guano crazy.
-> > 
-> > The TDX Module ABI spec does have "Leaf Function Latency" warnings for
-> > some of the module calls.  But, it's basically a binary thing.  A call
-> > is either normal or "longer than most".
-> > 
-> > The majority of the "longer than most" cases are for initialization.
-> > The _most_ obscene runtime ones are chunked up and can return partial
-> > progress to limit latency spikes.  But I don't think folks tried as hard
-> > on the initialization calls since they're only called once which
-> > actually seems pretty reasonable to me.
-> > 
-> > Maybe we need three classes of "Leaf Function Latency":
-> > 1. Sane
-> > 2. "Longer than most"
-> > 3. Better turn the NMI watchdog off before calling this. :)
-> > 
-> > Would that help?
+On 7/3/23 10:55, kirill.shutemov@linux.intel.com wrote:
+>> I'm thikning we want something along the lines of the Xen preemptible
+>> hypercalls, except less crazy. Where the caller does:
+>>
+>> 	for (;;) {
+>> 		ret = tdcall(fn, args);
+>> 		if (ret == -EAGAIN) {
+>> 			cond_resched();
+>> 			continue;
+>> 		}
+>> 		break;
+>> 	}
+>>
+>> And then the TDX black box provides a guarantee that any one tdcall (or
+>> seamcall or whatever) never takes more than X ns (possibly even
+>> configurable) and we get to raise a bug report if we can prove it
+>> actually takes longer.
+> TDG.VP.VMCALL TDCALL can take arbitrary amount of time as it handles over
+> control to the host/VMM.
 > 
-> I'm thikning we want something along the lines of the Xen preemptible
-> hypercalls, except less crazy. Where the caller does:
-> 
-> 	for (;;) {
-> 		ret = tdcall(fn, args);
-> 		if (ret == -EAGAIN) {
-> 			cond_resched();
-> 			continue;
-> 		}
-> 		break;
-> 	}
-> 
-> And then the TDX black box provides a guarantee that any one tdcall (or
-> seamcall or whatever) never takes more than X ns (possibly even
-> configurable) and we get to raise a bug report if we can prove it
-> actually takes longer.
+> But I'm not quite follow how it is different from the host stopping
+> scheduling vCPU on a random instruction. It can happen at any point and
+> TDCALL is not special from this PoV.
 
-TDG.VP.VMCALL TDCALL can take arbitrary amount of time as it handles over
-control to the host/VMM.
+Well, for one, if the host stops the vCPU on a random instruction the
+host has to restore all the vCPU state.  *ALL* of it.  That means that
+after the host hands control back, the guest is perfectly ready to take
+all the interrupts that are pending.
 
-But I'm not quite follow how it is different from the host stopping
-scheduling vCPU on a random instruction. It can happen at any point and
-TDCALL is not special from this PoV.
+These TDCALLs are *VERY* different.  The guest gets control back and has
+some amount of its state zapped, RBP being the most annoying current
+example of state that is lost.  So the guest resumes control here and
+must handle all of its interrupts with some of its state (and thus
+ability to cleanly handle the interrupt) gone.
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+The instructions after state is lost are very much special.  Just look
+at the syscall gap.
