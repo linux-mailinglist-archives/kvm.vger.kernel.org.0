@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 756B574536F
-	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 03:03:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E21C74537F
+	for <lists+kvm@lfdr.de>; Mon,  3 Jul 2023 03:22:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229605AbjGCBDs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Jul 2023 21:03:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39210 "EHLO
+        id S229821AbjGCBWz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 Jul 2023 21:22:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjGCBDq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Jul 2023 21:03:46 -0400
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8CA3120
-        for <kvm@vger.kernel.org>; Sun,  2 Jul 2023 18:03:45 -0700 (PDT)
-Received: by mail-vs1-xe30.google.com with SMTP id ada2fe7eead31-440afc96271so1344731137.3
-        for <kvm@vger.kernel.org>; Sun, 02 Jul 2023 18:03:45 -0700 (PDT)
+        with ESMTP id S229437AbjGCBWy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Jul 2023 21:22:54 -0400
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 642E812D
+        for <kvm@vger.kernel.org>; Sun,  2 Jul 2023 18:22:52 -0700 (PDT)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5702415be17so41098257b3.2
+        for <kvm@vger.kernel.org>; Sun, 02 Jul 2023 18:22:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688346225; x=1690938225;
+        d=gmail.com; s=20221208; t=1688347371; x=1690939371;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kr/csRpj7yRPd+a7XEQy9luDGdTRfuaDwcgbO882Uj8=;
-        b=kOhKlHs+rIVwGNY5dryVgpjloNzsE74uqLEH50SI1+QjWy0EzNZs/z6Szie+6igmog
-         OaWB5piKPLNyMtmpSVGY77Zf4cT5S8rssJAO2ivGBWZEmvkp//5aMZp6TzXYsNN3m3Za
-         iTedvqhwrm0xaf6V6ERCqoGESvdmTcJIiSrdzVL33uYJhHgLKRjzN6WxGVRxUXy2KijT
-         jOI5xDUOIhsiW72ztAr0f/vqtinUztpsGSrK6iFL6dibO6Vq9RRDR+UBz27o5d5Vs0p+
-         hNe7ebF4NCxiRCHpgpzkZtRMX++j37B5sd5D3vN/2mA9JoUctktxc/cIA/hfGT7HL239
-         ETUg==
+        bh=gRF740pvkTjPn4YyUomuPjqPm+NWFaBR5Nuuxw9suaE=;
+        b=sZzttCQ2aFMeuk7Qzxvb8/ctk3BL0j6coXsUhhhCjG4NhHIREn+/97VJ+hl7OSxG3F
+         Aa1MUdSfU1WWWKn8kYjOU8fVooQopsh0+VRCQjlG1orSFCZxUuesUzPYZyulQUjCJqZr
+         l92XA22clFVvGECLdQG8Ie9qfgl1I3UX0Y9T1uVc5RxR6vbVW5HRUmpRhwt6K6IoMnJR
+         Gm3bzOnS2FfrFoeH/5ygtHkXEqKRAm+paQCB9TofUjsOQYza9/ncXTIct/+m691bChfE
+         g55Zv9q5NXBF+C21VdaqT+PLTawrGvR//8whU1yY4KI1VHhFCBpRJyda8y0wmcEcu8EC
+         myLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688346225; x=1690938225;
+        d=1e100.net; s=20221208; t=1688347371; x=1690939371;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kr/csRpj7yRPd+a7XEQy9luDGdTRfuaDwcgbO882Uj8=;
-        b=Rd0lCLC37Xn+KpuZ44HunV74tb9tmTRgbsLfMaZjsQmYAxbwRE4ieZ9l7DPxSZjccY
-         Pve0zKXfVcBNyIkMRqfdmDAP9PLVP+IqatfhxfoEIjRbmpOIEZ/QLTSUH7XevbDK9RaS
-         4S2J1Q08+W56XTY0X4I/xDHs4tn3npeef5+MfkbYLuZlj0uaXNab657pzvjvArXJTs0r
-         f+43gzqsT+V+QaG8YSqJNgm686LAXSnVQAEqqKF+DEfB/AlXVPD9Ql5qS2/+jG3deDMM
-         Ib4utP83Mo1F97alNRKf+vNPiB2NzMiv1YzkE2TGQXNM0ZjToC4HAAVvGP3Inay/50kA
-         KEBA==
-X-Gm-Message-State: ABy/qLbJ1uqwj4pAmG7UYPeHKxwsv1/GtTUGUqhogaqIJ0OM+c4lJQqG
-        NVzE1+vnCGjLHDmzkmiKbwERh0RX4d4kw7jL2gI=
-X-Google-Smtp-Source: APBJJlEiA/DJ04JzAYoPetRZd51MbkR1pL12E+h/WqOyzTBsiq/7TvFwrnAP3Qm1BvA19qUXYTGTSNpZoG5Upuv9KcQ=
-X-Received: by 2002:a67:f981:0:b0:443:672c:2d8 with SMTP id
- b1-20020a67f981000000b00443672c02d8mr4324597vsq.22.1688346224763; Sun, 02 Jul
- 2023 18:03:44 -0700 (PDT)
+        bh=gRF740pvkTjPn4YyUomuPjqPm+NWFaBR5Nuuxw9suaE=;
+        b=hk/lBWsCmHFAyWM+UGl/S07QMGYO5luUEyxFGDjzJxVp3yuHlXWXUU8TkRK/2p57Se
+         TWjIQNAWCs9vvg1oIV/ZXSXB1lhb8gwQoyabo6SrzPAnnk7qVhSTvrHnIYNb6Enz3Rpl
+         9FZs0UVG2enc1dM0WqEUgyQwSaWsU4Uyqgc+ehfv05EKBIdBQpZNuIJPVgfC1KlpSVnA
+         9UCEkin9FvCAyxX7qNEre1J+GLyzxiS832sSFgd1XdAF872uqUk61dTJ7WY6nkI/Y/BC
+         377EY441PjHp8yJ8syY4YfQcRonPO0hHFzMmUjyHJlI8UzJkAI5a9y+K6gJj3ditRjt9
+         EhkA==
+X-Gm-Message-State: ABy/qLbwUeX8vGIluKRgaBFv4Ns3sSwRcGUMhN7uRhIjLS9zgbLxoIze
+        ApoXM13r8cLiIB6WSkL/FkXFHDn3PK5Xp1tkxoo=
+X-Google-Smtp-Source: APBJJlEYfvoyq7nlwsb2Qd+EnEtO+x8RmnoUJdsf3KLdVU8hbVL3wJDxvBrE6UtcPOKcqPjcE1hYTT0Q8ZhcfgSdgdo=
+X-Received: by 2002:a25:4d07:0:b0:be5:fa6b:1fcd with SMTP id
+ a7-20020a254d07000000b00be5fa6b1fcdmr6540014ybb.30.1688347371509; Sun, 02 Jul
+ 2023 18:22:51 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230620081611.88158-1-philmd@linaro.org>
 In-Reply-To: <20230620081611.88158-1-philmd@linaro.org>
 From:   Alistair Francis <alistair23@gmail.com>
-Date:   Mon, 3 Jul 2023 11:03:18 +1000
-Message-ID: <CAKmqyKObAOYmgT54azCgrYt-aHD8V37c1h6KoNBjshASEdvVwA@mail.gmail.com>
+Date:   Mon, 3 Jul 2023 11:22:25 +1000
+Message-ID: <CAKmqyKNXLxE=AN-nOt6eMYFMdY1hFQqg3wFh364-pQ26xTeTaA@mail.gmail.com>
 Subject: Re: [PATCH] target/riscv: Remove unuseful KVM stubs
 To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
 Cc:     qemu-devel@nongnu.org,
@@ -84,7 +84,8 @@ On Tue, Jun 20, 2023 at 6:17=E2=80=AFPM Philippe Mathieu-Daud=C3=A9
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Do you mind rebasing this on
+https://github.com/alistair23/qemu/tree/riscv-to-apply.next?
 
 Alistair
 
