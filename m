@@ -2,136 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A8797470B7
-	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 14:22:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98E4274714E
+	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 14:28:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231443AbjGDMWO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jul 2023 08:22:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38830 "EHLO
+        id S231207AbjGDM2Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jul 2023 08:28:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbjGDMWN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jul 2023 08:22:13 -0400
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2107.outbound.protection.outlook.com [40.107.215.107])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAAE6E70;
-        Tue,  4 Jul 2023 05:22:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MSXfMkrZRMTtF1Yny0Aq9Fu2hGjnuAJDMGbbuFwG4pC2/Ih8PPZR5+NbjcAqn74Ruy16cMnh5CZ8ErsRJs6NTpiXizk3x1uyTEB8wgqNT3dqFaRLmOhHz2P8tCDFEn3T4EaMiMYQq96ZFXsOu9S6T9DWbFzKQWK7mX3fvmk10IVbeX41ebBmnJtxDR0RysR6XB1kC/fT+swu3wGFP+qJVikb+zZ4fBHXjGAeJtUypoh/jxeUU6ybmJLaLkXb7feEfD51yqDmdyU5SCoOdmTY78R5+9gAj4oK2/qmoRW4MRXJ0fkwWO9x1et/XPjP2XThbnKWQs5hxXVF3jVYoO6BtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mITg8/+XJVzuWzBr5eHjyB3cikXNrlR/IKL0rqjV2Xc=;
- b=QlD2hzDc0gVFaxxY22xo3sjHsNT2f3xGtFhQWzlP2PmNtGvG5UfyxfdeZ5YxrRRXyyKTZVp0Tz/Ql4mAluVTpAW9LnSQlJOaLFCCY0GqXqmZbdrue9Q4hKGs5rJjFeSHtUjRtqZV/7ErTtn0+//8b2iNizFSLU8YaPDn7AVbGLyck/4iz2opvqXNQhlAVwqm5PQJ+wBVWEaLNRt3Ak2s6krrbITIPuncyRpTuREHNi/Pu2/GOGQzfP9jCwQY8ucsMfg50f66gpfCj4GAQNzYW+vWb7ZirW3T7XtUYJS0FkZJcDHCDPlxRd9E6r0h6SGYJHN6D1fAsglmmpvEMi18dg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mITg8/+XJVzuWzBr5eHjyB3cikXNrlR/IKL0rqjV2Xc=;
- b=eG1Wwy5UqLADef48aRXAe99jR/r+0czqK0TSWcCXyhOib56rcEuSSMoTqKWgTCuu7LP3y2Ja3zXspt9znATYfgxMbUc++Nd297j2yiPIy+yn+c4v8XbCp0zmeovSTSEiSscMgLC+0AZ/1jpOk4ElUDeWN9GjdvWuG2Du9JLGFWw4FRPZSHx+Ifd0ZqeT0f20b3Ir1u/WpLUc/i6llWsCZM/9pKWZNYYeYiqmwwEToNaaQaIVQiwdTIKBPkzrlmWHfoNMCzlfk987YPwc+W1HdwRtk7/R4rHsZLilBLnj0sidwO8yah7cWo0Is/Nt6e18Psq/Xhjz7BHAp4kDONKMZA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from SG2PR06MB5288.apcprd06.prod.outlook.com (2603:1096:4:1dc::9) by
- TYZPR06MB6464.apcprd06.prod.outlook.com (2603:1096:400:459::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6544.19; Tue, 4 Jul 2023 12:22:06 +0000
-Received: from SG2PR06MB5288.apcprd06.prod.outlook.com
- ([fe80::c2b:41ab:3b14:f920]) by SG2PR06MB5288.apcprd06.prod.outlook.com
- ([fe80::c2b:41ab:3b14:f920%6]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
- 12:22:06 +0000
-From:   Minjie Du <duminjie@vivo.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Minjie Du <duminjie@vivo.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE (KVM)),
-        linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
-        linux-kernel@vger.kernel.org (open list)
-Cc:     opensource.kernel@vivo.com
-Subject: [PATCH v1] tools: remove duplicate assignment
-Date:   Tue,  4 Jul 2023 20:21:47 +0800
-Message-Id: <20230704122148.11573-1-duminjie@vivo.com>
-X-Mailer: git-send-email 2.39.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TYAPR01CA0096.jpnprd01.prod.outlook.com
- (2603:1096:404:2c::36) To SG2PR06MB5288.apcprd06.prod.outlook.com
- (2603:1096:4:1dc::9)
+        with ESMTP id S231726AbjGDM15 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jul 2023 08:27:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D475B10F9
+        for <kvm@vger.kernel.org>; Tue,  4 Jul 2023 05:27:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1688473630;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=f1DVV9YwOzEbvqEsOsygUElF9BNPHfcGIhILStRd8EE=;
+        b=gKYJffEW/30zgR0IdzIC65z1qO5Nlw/bHudklzBFCzIC9mhmqgliK8gLaU6XntuF9ADOu7
+        VVGFSATsRafBDp6qaXGraV8KwmNxrYSgwiDDYUc0MJLoVm6Y13cfEDrGxkrEjP9lml7bgW
+        x4eSG6DB8Kwi0VVdQ+apwq6VYgnNAS0=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-367-MvHdh9bEONSzBvpO5NauQg-1; Tue, 04 Jul 2023 08:27:09 -0400
+X-MC-Unique: MvHdh9bEONSzBvpO5NauQg-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-765ab532883so670193385a.0
+        for <kvm@vger.kernel.org>; Tue, 04 Jul 2023 05:27:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688473629; x=1691065629;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=f1DVV9YwOzEbvqEsOsygUElF9BNPHfcGIhILStRd8EE=;
+        b=Vak98GLQImQ0D7heGkGpnoVgjEKj8xewazW/lfXMXvVkTgXe4alT9ZbNz3oiLnRxxR
+         4k9/hoFiOMcxmyuajEsH7vgsw+AnRg2DCaDfJ2shGKu8QpX912b7S5ICyS7Q6fq/rOhO
+         al+v5lcb/0AjM5JFq+vKmhLrmr/+MEmqzvNijMcyfh/K/ljknIKaTV+vfDv5m4PxlQGM
+         m2vyOT3JCoCJnckCj/xdO4uQimZPvXUMwioFBLvVjM/biqcUVjPDUpRpJUSOlCFtYxWR
+         tnDPeMAWDfvq06H0qpQSBA33OYCcjhns1jANytl7KenlDAOEWGXEIOx3HCwh+p9flWV6
+         9qCg==
+X-Gm-Message-State: AC+VfDy/401EzMT33y8BJR6gqeOyrahvXOCrJ/nIXSdVvqxUX+u0Jjke
+        ARjk9+gDNAkZx4DlDfpc3eVlI6oIEzqLVpqBLrdsOv+YkhmL5BEqsHQzpqJmJa8XfSi7Pi/AMB7
+        skIRJnNYohfwK
+X-Received: by 2002:a05:620a:4589:b0:765:67fe:5325 with SMTP id bp9-20020a05620a458900b0076567fe5325mr11399700qkb.44.1688473629333;
+        Tue, 04 Jul 2023 05:27:09 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7zjflw9gGwLPQ+6p7/iOq2otzVQcU0pI8fD11P7JCfoU8kTxxOyduW3xPfK9rVb7NpMdhNEQ==
+X-Received: by 2002:a05:620a:4589:b0:765:67fe:5325 with SMTP id bp9-20020a05620a458900b0076567fe5325mr11399686qkb.44.1688473629093;
+        Tue, 04 Jul 2023 05:27:09 -0700 (PDT)
+Received: from [192.168.0.5] (ip-109-43-179-126.web.vodafone.de. [109.43.179.126])
+        by smtp.gmail.com with ESMTPSA id dy1-20020a05620a60c100b007676ee76195sm1924994qkb.20.2023.07.04.05.27.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Jul 2023 05:27:07 -0700 (PDT)
+Message-ID: <dd5c5445-e563-8461-a81b-1c637e69362d@redhat.com>
+Date:   Tue, 4 Jul 2023 14:27:03 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SG2PR06MB5288:EE_|TYZPR06MB6464:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0da624ef-9927-4c91-3fb0-08db7c8947b7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gJnZU27WxPMh9uCUX0EAQBIYV2CCaROius3IxzO/RJ4dbKZZNAzs6MVeb2uGh2vSg71bTqLpwtTdQ010ZUlMwJClnwtzKcRIen4OEviPCpQYJRqld8VxDbMoqvWDDa8ts29UuoBxI4dvLj7LFmZJzFB2r2uZ5jdNKY+kaGIgbh92Ah5i8X1dBeeu+zH86zsi6nDthtEcq9YWr5k2lVsMPs7P+SkmrfoPCgIWhi9en2uXvf/zPiUmIRwabMyVmMzNj2FRd2A4A6qFUXbZF5vkKuJllNQsXuGVV37wOnrzd4PzQVO2UNyaRd/txpYHyeWlK7+KfI//A91L6yrjILX7AwZwm3/c6rnM+gmmdTeUPtABu2weVHtANL811qHN+qCib+wLEKDksFMndCYWdCb3w3xSnWE8ZTmz4vyUPMUGKmmkDSE6W+Zl5u1gMaqs4wfDlkUrlNUJY3t355ykwQSVzZ+2hRUT3TttWUxBQcrYsdE2vwEdnAvzu0HOdPkjoAQPXcbhTW+H0n2CPals7WRBtV5bn47w7QMiR890mvY/S4IfSEJ84VFXMBxnKCrrx7cnLPkS+fioXWKStuV+2cxWE+ZG/Ca3uqt4+n+s6/1VFMh26jnkKo+qmiXHTcF93ukR
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB5288.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39850400004)(366004)(396003)(376002)(136003)(451199021)(66946007)(66556008)(66476007)(4326008)(36756003)(478600001)(316002)(8936002)(8676002)(5660300002)(2906002)(4744005)(41300700001)(110136005)(86362001)(52116002)(6486002)(6512007)(1076003)(186003)(26005)(38100700002)(6506007)(6666004)(38350700002)(83380400001)(2616005)(107886003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?r2I5mYG9Iiz4lFAJMRw5rSFXsGy38laHAav++ZEt0HdwGN1wlfYVkJwQqYdg?=
- =?us-ascii?Q?NoyIJ48Jhkw29g3tXWGskugnry5OO52OM4ZV07OoM5ZKBnhFOAlGbWzQlUkI?=
- =?us-ascii?Q?60IlMtbNe+GYggeEGJMCjEIpMmUQ+gLqlXO/fG/O3KIRbfFafi1mIVVLm0q4?=
- =?us-ascii?Q?8NIPxrsu0w/Ni/RQWzP1G0GFu2lVGq49BSYO450UcaYdHdyOPA/1uRIRg/8S?=
- =?us-ascii?Q?rwMYiObvB3KxNChyQPQY9Hxx585WVRzk/U2nRM7FGavRSDh4Cr5wupYIxj/4?=
- =?us-ascii?Q?Mrd3fwHY7VX0p1QSPLXTJa8zbveGBZ+4qXmwUDmsRGZlXApK88p6Ne8F/SXo?=
- =?us-ascii?Q?VMMKqOXczSjpAmrEn+Bt2373epRNPJHYAKxRmB38hU4nzwwHrosfQNs/cdD7?=
- =?us-ascii?Q?W94iJOg/HTm0xhmWbVmpLD9EbM3tnBCkBRWkFbp9qOHkabsv8YUzJ7X0tC0s?=
- =?us-ascii?Q?YPyscgxRxYyGjPK03Tv8xmbL+TLMvEMnki5UsUK/sFVHEjFhQttbR6yybXUy?=
- =?us-ascii?Q?aBsm76tc7vMJOd1xp8yNZTRxXQJx9P9H2raPA17Uzxludqh2TuX4d/ney3MD?=
- =?us-ascii?Q?kcr5WWxZ2RTAeLbctxrxzQKqvxXnTmp3uzFSgfTnfbXlh2Idj70Pr7nVBCaF?=
- =?us-ascii?Q?fBBrRTJ/WO529MPyM9886Kdx9T+P3umxFBNln+eV23/Hsgzba71pz9hrPp6W?=
- =?us-ascii?Q?LynA+dvJ+bwaj+0rquS3g/iQgY/Rn0xToqTHu9VQNm+PVWrgy9wN634NvFqB?=
- =?us-ascii?Q?4fb3rDonyti+uuOuIwLMguPxqOiE5eVk2nEM9bVnUEsPrTZmFlqPYqeaVzhv?=
- =?us-ascii?Q?rRnIUFiILBDjOzpWkl7l6bk7sje79+jnh+DC48KOi2fya1eGMFqUgQHWTxEP?=
- =?us-ascii?Q?pvZgKI6ck87Zg0NK7YVO/TStiRMJGSna7gxEQHrPF42QMg9qpWvX1vUm3vQJ?=
- =?us-ascii?Q?OGdbwCMuhZ6QJF6gTKqXE0YFi86ktQmH6xzxkSs14mFUi06+3lJTHAw+hS4L?=
- =?us-ascii?Q?75oamiIYsFHRaGexOaNuBN+jqbiNqY9AFyUneT1lKDhJ5rLh3TQKlKYBJ96F?=
- =?us-ascii?Q?1i+8ezm1Hs52CPVvy8yMXiAPOEUnm/Zebv7ZgnVQylujylVg/O7X0WiAtNjq?=
- =?us-ascii?Q?bX0S38eHstuxPblMQjLIMYp3z/z43zSHd+mfJVpmxyiDi0Lb236OWcriB2YX?=
- =?us-ascii?Q?6OxLXrDLf8yRTLEBLyLKevnZk/DUAaTjxNRIoiDGJiiuN0nm3RfnARiYeuAe?=
- =?us-ascii?Q?eS6Oa11amkluOWnCa9EUCj1MDT+WuET+C9cuurZnlfyTvgqNvZ0n6r8hhTg4?=
- =?us-ascii?Q?wTKlVKPBnr1RjH37dlwR4qqpltLFiRMaOUTKzxLVUvjsFaVyujoJp5nXDN60?=
- =?us-ascii?Q?tqQNe3yA41aW+Ze+jdH1GhPGiUiubttIDw8YMc4oM0mONN6wirxOwM47mV9b?=
- =?us-ascii?Q?5AkYtrJ2e32kI+uYHR4CG7AG6O4lCYmm0Gtd+U+h3mRzLnFpS70xujNx1hcZ?=
- =?us-ascii?Q?FNWFJKou88BcxUAZGDkcrGQUBwr2pQbjDOeqKP+uUEBJedNPNzW0JP+Myqq/?=
- =?us-ascii?Q?HHmJnyQ112yKNHHsDOV/VvYGRaFUtw7JTxaRpFso?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0da624ef-9927-4c91-3fb0-08db7c8947b7
-X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB5288.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 12:22:06.0626
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qxuIB1D7tOhqmSl0uliE882AkiNRMIiKtSl+TC8X8O8kCorv1ML2knfRIWGsJlax1QMTnaQsRu2tmPAVh9UxyA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB6464
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v21 03/20] target/s390x/cpu topology: handle STSI(15) and
+ build the SYSIB
+Content-Language: en-US
+From:   Thomas Huth <thuth@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
+        frankja@linux.ibm.com, Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+References: <20230630091752.67190-1-pmorel@linux.ibm.com>
+ <20230630091752.67190-4-pmorel@linux.ibm.com>
+ <aef8accb-3576-2b10-a946-191a6be3e3e0@redhat.com>
+In-Reply-To: <aef8accb-3576-2b10-a946-191a6be3e3e0@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix: make 'nodep' remove duplicate assignment
+On 04/07/2023 13.40, Thomas Huth wrote:
+...
+> Also, what about protected virtualization? Do you have to use 
+> s390_cpu_pv_mem_write() in case PV is enabled?
 
-Signed-off-by: Minjie Du <duminjie@vivo.com>
----
- tools/testing/selftests/kvm/lib/sparsebit.c | 1 -
- 1 file changed, 1 deletion(-)
+Never mind, I keep forgetting that CPU topology can't be used together with 
+PV (I just noticed after reading patch 07/20).
+Not sure ... but maybe a comment here in the code would help?
 
-diff --git a/tools/testing/selftests/kvm/lib/sparsebit.c b/tools/testing/selftests/kvm/lib/sparsebit.c
-index 50e0cf41a..88cb6b84e 100644
---- a/tools/testing/selftests/kvm/lib/sparsebit.c
-+++ b/tools/testing/selftests/kvm/lib/sparsebit.c
-@@ -634,7 +634,6 @@ static void node_reduce(struct sparsebit *s, struct node *nodep)
- 				tmp = node_prev(s, nodep);
- 
- 			node_rm(s, nodep);
--			nodep = NULL;
- 
- 			nodep = tmp;
- 			reduction_performed = true;
--- 
-2.39.0
+  Thomas
 
