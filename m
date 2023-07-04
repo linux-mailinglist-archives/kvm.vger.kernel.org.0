@@ -2,169 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7687274728C
-	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 15:19:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABA3C747459
+	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 16:46:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231345AbjGDNTA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jul 2023 09:19:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38734 "EHLO
+        id S231228AbjGDOqY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jul 2023 10:46:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231550AbjGDNSm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jul 2023 09:18:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 885901733
-        for <kvm@vger.kernel.org>; Tue,  4 Jul 2023 06:17:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688476497;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HgU56Jb9oAALfA5DNLs9cSNt9PhE+0rEJU0KndMkfmw=;
-        b=XTpq4y6nAWpvUBe2yNLOE7dYaCcE00kVmEGPXuUL88DNrzGEMkTB06Dv5JKC4QJFjLygXA
-        ySk59tRw0kDIfjhmkZtF7TALuBUrbiUQwgve8g6/donicaI1WmzFvfwWS7dP9zLitTwou+
-        hmFeCBl7SFte7wHkj6pXSX7Xi50Rp6k=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-53-RB9MJ8MGMDChI99fvIRKFw-1; Tue, 04 Jul 2023 09:14:56 -0400
-X-MC-Unique: RB9MJ8MGMDChI99fvIRKFw-1
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-40328438392so57842291cf.3
-        for <kvm@vger.kernel.org>; Tue, 04 Jul 2023 06:14:56 -0700 (PDT)
+        with ESMTP id S229610AbjGDOqX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jul 2023 10:46:23 -0400
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B698E49
+        for <kvm@vger.kernel.org>; Tue,  4 Jul 2023 07:46:22 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-98e39784a85so1026678066b.1
+        for <kvm@vger.kernel.org>; Tue, 04 Jul 2023 07:46:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1688481980; x=1691073980;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V1Ae3RuOxJhgI3BLugmtWq6zSsW+2ghmr3c9wVK5GFg=;
+        b=pRSqaZGrtTWOvZr/isOwp6GM3vtrB6NZyPfVOZdLhRLvqlonBE1oN+OIsG7xN650tx
+         msc5MaXPYAJlq+1A56sfyAxW4l7pUOmgJXmtr8OgoS0kWq8aokOG8y3K8dPh6IvZu9r0
+         RRZSl5GPtoaZEaCrhkId8OaVBvphmdz4o/p6Bd+vqNCG/4Xab9kKKfv5ZA5wpJJL3TL9
+         XwBelheP8ZhL6odLZBAh6eOziNGoK4VYjPhQmGUM4wevDAeoq1KzG6H8nPmPUolQITZu
+         E/FNEdy2N9/A8u8S7ZpK2FfCQBYXD8KbWzTpHuxI02iubIbXNLQUj5uqDH1FBbltTF7x
+         u7NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688476496; x=1691068496;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HgU56Jb9oAALfA5DNLs9cSNt9PhE+0rEJU0KndMkfmw=;
-        b=V4mx+xoU6NpvVKMgTH8vEgILJdpf8gZXY8Rccwxf+fNRwuGSiN4nem2vQLJuBNNkgs
-         frakaoBHMUgpg7ScxN7y3sgnW2oIVW2x1If0VwjVxClum9IYRNZmcfQmMIEODuTFIBzk
-         98Yi5UgHDVdUhCc7EN8xYizB8TDUiPl6EOL1wXdNXeDPTGbLexkuuEIK1+TKWMOxDvfX
-         dXklnRLQYx/9BN1/3/ktRPevpoZ7GnLLgyzWcKAu+FWifitlKh1ZQQjHiSLtA0A6yd4R
-         PQplCTkWB2ewEe0KzVYQI8MaSm+b5ms0DomibyzUEHy6yhLcBi/ttOXrg+dxdnwoPCM9
-         Uubg==
-X-Gm-Message-State: AC+VfDyCiAyQfwkzCuwRsxgDAdN1gmDAVSSfNJtXFyu2o3GunvhiB4Mr
-        MWf5K5r8MUB8wJUIJM4w/z5vafdGG27nejAtqLd4o8aqGs+b1fwsMhO8V4PE/hoVWtYQyEE2CN2
-        j8jPw88AkOoHT
-X-Received: by 2002:a05:622a:54b:b0:403:2066:fd4a with SMTP id m11-20020a05622a054b00b004032066fd4amr16238497qtx.33.1688476496082;
-        Tue, 04 Jul 2023 06:14:56 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ60Hhv6E/D+lFNFeHht/lNY2cZw1ZCZ2ynIsM8esIAOxcMhjUvu2r7D4Ht4xPL8BLFjYp2gEA==
-X-Received: by 2002:a05:622a:54b:b0:403:2066:fd4a with SMTP id m11-20020a05622a054b00b004032066fd4amr16238468qtx.33.1688476495803;
-        Tue, 04 Jul 2023 06:14:55 -0700 (PDT)
-Received: from [192.168.0.5] (ip-109-43-179-126.web.vodafone.de. [109.43.179.126])
-        by smtp.gmail.com with ESMTPSA id f14-20020ac859ce000000b003f9c6a311e1sm11131824qtf.47.2023.07.04.06.14.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jul 2023 06:14:55 -0700 (PDT)
-Message-ID: <3ea3a276-a06a-b1b3-bc88-662c94d240e0@redhat.com>
-Date:   Tue, 4 Jul 2023 15:14:50 +0200
+        d=1e100.net; s=20221208; t=1688481980; x=1691073980;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V1Ae3RuOxJhgI3BLugmtWq6zSsW+2ghmr3c9wVK5GFg=;
+        b=BT3kmc0lmeXAmDrbPtvt2LtAIbWWW+Mu/HZRLDs5jkw6c25gKNIAyVEsssYfpbnvwq
+         zJi5vjApViH6pq3NN43m1sCia0Ndnmn34GpAs16T1K6AIWGM1va0+cXYrdlt89ck73YL
+         0xdC+zYS2I0uAkeVzFazBD1kHUk+p1z3m8BrCjGc0YOFxdbz3tMdf3IBA7mh9PZC5GJk
+         b1rhrvQ7iLS0Blh7Wpte/DpAb+74Ss4PB0Y1a0JS9VCZigD9IvdKLkRqL3Ut1PDDzKbW
+         HDE+TC3noyXS+sE7L/+h/7SDPsQDFa4xwbEZYE8m/PwV7HldM6r4A0/ORgqdg/B/BcA2
+         koaA==
+X-Gm-Message-State: AC+VfDyO8a0Km5ZsIjI0c47MmxincnaysCPMXZSbKodHjXFKJqHz7FCY
+        mnh5rnqWNfOhwEEgrej0Lpkmkg==
+X-Google-Smtp-Source: APBJJlHjRSFZSI7aVge0lLdM56gpzgi/7b+9c350rXY0yAmVOGJ/CQlVtcVO4S9Z4q5yAY7mfB4oww==
+X-Received: by 2002:a17:907:3fa3:b0:988:d841:7f90 with SMTP id hr35-20020a1709073fa300b00988d8417f90mr15606804ejc.27.1688481980507;
+        Tue, 04 Jul 2023 07:46:20 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id a12-20020a1709064a4c00b009932337747esm4805726ejv.86.2023.07.04.07.46.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jul 2023 07:46:19 -0700 (PDT)
+Date:   Tue, 4 Jul 2023 16:46:18 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Cc:     qemu-devel@nongnu.org, qemu-riscv@nongnu.org, rkanwal@rivosinc.com,
+        anup@brainfault.org, dbarboza@ventanamicro.com,
+        atishp@atishpatra.org, vincent.chen@sifive.com,
+        greentime.hu@sifive.com, frank.chang@sifive.com,
+        jim.shu@sifive.com, Palmer Dabbelt <palmer@dabbelt.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Bin Meng <bin.meng@windriver.com>,
+        Weiwei Li <liweiwei@iscas.ac.cn>,
+        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 3/6] target/riscv: check the in-kernel irqchip support
+Message-ID: <20230704-27481846a2cab7364d040a19@orel>
+References: <20230621145500.25624-1-yongxuan.wang@sifive.com>
+ <20230621145500.25624-4-yongxuan.wang@sifive.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v21 14/20] tests/avocado: s390x cpu topology core
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230630091752.67190-1-pmorel@linux.ibm.com>
- <20230630091752.67190-15-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230630091752.67190-15-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621145500.25624-4-yongxuan.wang@sifive.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/06/2023 11.17, Pierre Morel wrote:
-> Introduction of the s390x cpu topology core functions and
-> basic tests.
+On Wed, Jun 21, 2023 at 02:54:53PM +0000, Yong-Xuan Wang wrote:
+> We check the in-kernel irqchip support when using KVM acceleration.
 > 
-> We test the corelation between the command line and
-> the QMP results in query-cpus-fast for various CPU topology.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+> Reviewed-by: Jim Shu <jim.shu@sifive.com>
+> Reviewed-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
 > ---
->   MAINTAINERS                    |   1 +
->   tests/avocado/s390_topology.py | 196 +++++++++++++++++++++++++++++++++
->   2 files changed, 197 insertions(+)
->   create mode 100644 tests/avocado/s390_topology.py
+>  target/riscv/kvm.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 76f236564c..12d0d7bd91 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1705,6 +1705,7 @@ F: hw/s390x/cpu-topology.c
->   F: target/s390x/kvm/stsi-topology.c
->   F: docs/devel/s390-cpu-topology.rst
->   F: docs/system/s390x/cpu-topology.rst
-> +F: tests/avocado/s390_topology.py
->   
->   X86 Machines
->   ------------
-> diff --git a/tests/avocado/s390_topology.py b/tests/avocado/s390_topology.py
-> new file mode 100644
-> index 0000000000..1758ec1f13
-> --- /dev/null
-> +++ b/tests/avocado/s390_topology.py
-> @@ -0,0 +1,196 @@
-> +# Functional test that boots a Linux kernel and checks the console
-> +#
-> +# Copyright IBM Corp. 2023
-> +#
-> +# Author:
-> +#  Pierre Morel <pmorel@linux.ibm.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or
-> +# later.  See the COPYING file in the top-level directory.
+> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
+> index 0f932a5b96..eb469e8ca5 100644
+> --- a/target/riscv/kvm.c
+> +++ b/target/riscv/kvm.c
+> @@ -433,7 +433,18 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>  
+>  int kvm_arch_irqchip_create(KVMState *s)
+>  {
+> -    return 0;
+> +    if (kvm_kernel_irqchip_split()) {
+> +        error_report("-machine kernel_irqchip=split is not supported "
+> +                     "on RISC-V.");
+
+It's best to not split error messages across lines. We can go to 90 chars
+before checkpatch considers it an error, and I'd still consider it worse
+to split an error message than to ignore checkpatch and exceed 90 chars.
+
+> +        exit(1);
+> +    }
 > +
-> +import os
-> +import shutil
-> +import time
-> +
-> +from avocado_qemu import QemuSystemTest
-> +from avocado_qemu import exec_command
-> +from avocado_qemu import exec_command_and_wait_for_pattern
-> +from avocado_qemu import interrupt_interactive_console_until_pattern
-> +from avocado_qemu import wait_for_console_pattern
-> +from avocado.utils import process
-> +from avocado.utils import archive
-> +
-> +
-> +class S390CPUTopology(QemuSystemTest):
-> +    """
-> +    S390x CPU topology consist of 4 topology layers, from bottom to top,
-> +    the cores, sockets, books and drawers and 2 modifiers attributes,
-> +    the entitlement and the dedication.
-> +    See: docs/system/s390x/cpu-topology.rst.
-> +
-> +    S390x CPU topology is setup in different ways:
-> +    - implicitely from the '-smp' argument by completing each topology
+> +    /*
+> +     * If we can create the VAIA using the newer device control API, we
+> +     * let the device do this when it initializes itself, otherwise we
+> +     * fall back to the old API
 
-implicitly
+This comment appears lifted from arm, but the "fall back to the old API"
+doesn't apply to riscv since riscv doesn't support KVM_CREATE_IRQCHIP.
 
-> +      level one after the other begining with drawer 0, book 0 and socket 0.
+> +     */
+> +    return kvm_check_extension(s, KVM_CAP_DEVICE_CTRL);
+>  }
+>  
+>  int kvm_arch_process_async_events(CPUState *cs)
+> -- 
+> 2.17.1
+> 
+>
 
-beginning
-
-> +    - explicitely from the '-device' argument on the QEMU command line
-
-explicitly
-
-> +    - explicitely by hotplug of a new CPU using QMP or HMP
-
-explicitly
-
-  Thomas
-
+Thanks,
+drew
