@@ -2,175 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1028746EE2
-	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 12:39:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6134747007
+	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 13:35:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231545AbjGDKjh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jul 2023 06:39:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52484 "EHLO
+        id S231288AbjGDLfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jul 2023 07:35:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231830AbjGDKjc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jul 2023 06:39:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1493E186
-        for <kvm@vger.kernel.org>; Tue,  4 Jul 2023 03:38:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688467124;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QRorza6OJCiLsVesM2IH/LA8g4F1XVqMOWMx+3P1rz4=;
-        b=WK6+siXTpMKYmAWxQnR86ytA49jxDOu82BBjafOwSP9jIlBDgFrpKEVv7FKPqiak5p9Fak
-        fqDrmJPyBk3lm0WEf4frmkab6e6x8+UKDHtu4El8yM9f+vKku2f7eXqOmIPppSrZ15FuQu
-        lG3xdFWvZvNkhPLOKaGazIarsmNA9l0=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-612-eYn1NZhvNNuWGlsuvcs_fw-1; Tue, 04 Jul 2023 06:38:41 -0400
-X-MC-Unique: eYn1NZhvNNuWGlsuvcs_fw-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4fb89482c48so4794938e87.3
-        for <kvm@vger.kernel.org>; Tue, 04 Jul 2023 03:38:40 -0700 (PDT)
+        with ESMTP id S231319AbjGDLfe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jul 2023 07:35:34 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6C5C172B
+        for <kvm@vger.kernel.org>; Tue,  4 Jul 2023 04:34:51 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1b82616c4ecso24858935ad.2
+        for <kvm@vger.kernel.org>; Tue, 04 Jul 2023 04:34:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1688470491; x=1691062491;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vX+IcUnnGo66OiUlAe+T2bgBkHMF6tovqCGWaacWWp0=;
+        b=hqJthy8eneNLNhStDpLQMPNcFLc///PvceiQrj0YabAbFkvHdp9IGpmj2EZ104d2aR
+         I/F/ftRlZSZ7U7FmfIy8GBr0mmg1XHgOrtutzpOWrXeYDTeD+jIhINas1Vs4ui3EOVqO
+         Ns5u2cXasFz3H83Uivp4Nww4FPPu9vomstZ0I5xwJaTAlKNxiY8/sLzZsb5SYvITMivL
+         j0AV4rZWgj4ZI0/9sT/rQ2DnzfHZSPZHnts+xrUETBYEunYJplbbNSaL8RI6tFfGfxUO
+         axd+5gnOw2NIgnhfNC3fRsx7t6r6ojMChHRTtX606TpebglnapScXT/Q7J2q+UOh6PeZ
+         BGhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688467119; x=1691059119;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QRorza6OJCiLsVesM2IH/LA8g4F1XVqMOWMx+3P1rz4=;
-        b=lKF8+y36z9f+xby9qBK6tfNB05ZvpWDBraFVAwRoPi/5aKHB7QiORRq7JXoCAxa0UO
-         +W0duA0aOZCBiPotkHFvG62vON8VBESlxO334YAqzHMkme7UbCeXkvGh64ApWFIZGAH5
-         0yykKLOnjnq8kiJHL3JOuibVhiXT5tPot1OZgHdCGPHU6fyo+xdjy1suf9l5egtRcMPk
-         ZsWbxIHhzsybG4dk5kvZaC8nqoU05Bx5H4++F2d96sCy6XEX5Q7AnQf6QW4BImRosvkB
-         /p7Mn70EL/nveaXZoYfbmTU0VKcvY4WzjehxNTDcqQVRQdzEFxlAHVHraf+MesPk27tK
-         6Myg==
-X-Gm-Message-State: ABy/qLb/oY5l/LyYBbE2hM+NHVisnV8tOidRJAc6WIiTw93+qetOCue1
-        lV/c1HKqQrCYHAYOWSJrti1b3zf5kmY55Px49xgXSxnJw6V2JwRlD+MQVf6/Pf3KnQEz/FqH28W
-        KJ4Dk9iGW5XJI
-X-Received: by 2002:a05:6512:39d3:b0:4f7:405f:72e7 with SMTP id k19-20020a05651239d300b004f7405f72e7mr10638816lfu.50.1688467119713;
-        Tue, 04 Jul 2023 03:38:39 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHGDGMjGihqxX02HuxnbdBtGBjZZQqY3m1CG+EemG0uaYcjxxZV8C9XGiMcmo2QCieoBmTukg==
-X-Received: by 2002:a05:6512:39d3:b0:4f7:405f:72e7 with SMTP id k19-20020a05651239d300b004f7405f72e7mr10638796lfu.50.1688467119354;
-        Tue, 04 Jul 2023 03:38:39 -0700 (PDT)
-Received: from redhat.com ([2.52.13.33])
-        by smtp.gmail.com with ESMTPSA id z7-20020a05600c220700b003fa999cefc0sm23940722wml.36.2023.07.04.03.38.37
+        d=1e100.net; s=20221208; t=1688470491; x=1691062491;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vX+IcUnnGo66OiUlAe+T2bgBkHMF6tovqCGWaacWWp0=;
+        b=cuIT6sR8ETuE5izU813OT9DoLy2xOapzdEtj4zxI3TwtqE6aTG7rdZaDgPTC89Pjsd
+         tl59UQsW41NZcahdVYXSIfczbML6ilYBmxodI2w6JmQRwDAJBEBPej/8UZ55uDe6RdWf
+         vRbpbk60HnJfIy33I1FHHV2ThPU/PbjJNFONp1yJ2q9c2KT5E00sA4Ck2q0Rx0UGPtZS
+         avM0zXipNc7JJY+0LN/dhFkZAb4wKqDUPA0QPGz0yeGAyatlBZKUJCL2zvfffoNd6YGN
+         xEQ1ujZtPlwrxf0exmqXXOHz274s0RB52yzstA9py4pDraaHE3bk6Y3v3X3Z5emrNthT
+         WvmA==
+X-Gm-Message-State: ABy/qLas/jtNyxMk7wgMMBeg97+dHr7Lik6THNdCrQQX2+a5Qdc/Cwh5
+        DnBbBZj+bVk0ERD9n1vBmIpyeQ==
+X-Google-Smtp-Source: APBJJlHo4AkgsIvc07sjsIQzFsqO2qiwuO87rpQGYieS6MfkOi1EoSqenVLkcGJJ7u0FLSHyj/Gn7g==
+X-Received: by 2002:a17:902:f68c:b0:1b7:eebc:884 with SMTP id l12-20020a170902f68c00b001b7eebc0884mr12205180plg.64.1688470491045;
+        Tue, 04 Jul 2023 04:34:51 -0700 (PDT)
+Received: from n157-102-137.byted.org ([240e:b1:e401:3::41])
+        by smtp.gmail.com with ESMTPSA id 12-20020a170902c10c00b001b694140d96sm8039917pli.170.2023.07.04.04.34.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jul 2023 03:38:38 -0700 (PDT)
-Date:   Tue, 4 Jul 2023 06:38:35 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Shannon Nelson <shannon.nelson@amd.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does
- not support it
-Message-ID: <20230704063646-mutt-send-email-mst@kernel.org>
-References: <20230703142218.362549-1-eperezma@redhat.com>
- <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
+        Tue, 04 Jul 2023 04:34:50 -0700 (PDT)
+From:   Qi Ai <aiqi.i7@bytedance.com>
+To:     seanjc@google.com
+Cc:     aiqi.i7@bytedance.com, bp@alien8.de, cenjiahui@bytedance.com,
+        chao.gao@intel.com, dave.hansen@linux.intel.com,
+        dengqiao.joey@bytedance.com, fangying.tommy@bytedance.com,
+        fengzhimin@bytedance.com, hpa@zytor.com, kvm@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, tglx@linutronix.de
+Subject: Re: [PATCH] kvm/x86: clear hlt for intel cpu when resetting vcpu 
+Date:   Tue,  4 Jul 2023 19:34:05 +0800
+Message-Id: <20230704113405.3335046-1-aiqi.i7@bytedance.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <ZJ9djqQZWSEjJlfb@google.com>
+References: <ZJ9djqQZWSEjJlfb@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin wrote:
-> On Mon, Jul 3, 2023 at 4:52 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+On Sat, Jul 1, 2023 at 6:56 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> mn Fri, Jun 30, 2023, Chao Gao wrote:
+> > On Fri, Jun 30, 2023 at 03:26:12PM +0800, Qi Ai wrote:
+> > >+                            !is_protmode(vcpu))
+> > >+                    kvm_x86_ops.clear_hlt(vcpu);
 > >
-> > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio Pérez wrote:
-> > > With the current code it is accepted as long as userland send it.
-> > >
-> > > Although userland should not set a feature flag that has not been
-> > > offered to it with VHOST_GET_BACKEND_FEATURES, the current code will not
-> > > complain for it.
-> > >
-> > > Since there is no specific reason for any parent to reject that backend
-> > > feature bit when it has been proposed, let's control it at vdpa frontend
-> > > level. Future patches may move this control to the parent driver.
-> > >
-> > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
-> > > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> > Use static_call_cond(kvm_x86_clear_hlt)(vcpu) instead.
 > >
-> > Please do send v3. And again, I don't want to send "after driver ok" hack
-> > upstream at all, I merged it in next just to give it some testing.
-> > We want RING_ACCESS_AFTER_KICK or some such.
-> >
-> 
-> Current devices do not support that semantic.
+> > It looks incorrect that we add this side-effect heuristically here. I
+>
+> Yeah, adding heuristics to KVM_SET_REGS isn't happening.  KVM's existing hack
+> for "Older userspace" in __set_sregs_common() is bad enough:
+>
+>         /* Older userspace won't unhalt the vcpu on reset. */
+>         if (kvm_vcpu_is_bsp(vcpu) && kvm_rip_read(vcpu) == 0xfff0 &&
+>             sregs->cs.selector == 0xf000 && sregs->cs.base == 0xffff0000 &&
+>             !is_protmode(vcpu))
+>                 vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>
+> > am wondering if we can link vcpu->arch.mp_state to VMCS activity state,
+>
+> Hrm, maybe.
+>
+> > i.e., when mp_state is set to RUNNABLE in KVM_SET_MP_STATE ioctl, KVM
+> > sets VMCS activity state to active.
+>
+> Not in the ioctl(), there needs to be a proper set of APIs, e.g. so that the
+> existing hack works, and so that KVM actually reports out to userspace that a
+> vCPU is HALTED if userspace gained control of the vCPU, e.g. after an IRQ exit,
+> while the vCPU was HALTED.  I.e. mp_state versus vmcs.ACTIVITY_STATE needs to be
+> bidirectional, not one-way.  E.g. if a vCPU is live migrated, I'm pretty sure
+> vmcs.ACTIVITY_STATE is lost, which is wrong.
+>
+> The downside is that if KVM propagates vmcs.ACTIVITY_STATE to mp_state for the
+> halted case, then KVM will enter kvm_vcpu_halt() instead of entering the guest
+> in halted state, which is undesirable.   Hmm, that can be handled by treating
+> the vCPU as running, e.g.
+>
+> static inline bool kvm_vcpu_running(struct kvm_vcpu *vcpu)
+> {
+>         return (vcpu->arch.mp_state == KVM_MP_STATE_RUNNABLE ||
+>                 (vcpu->arch.mp_state == KVM_MP_STATE_HALTED &&
+>                  kvm_hlt_in_guest(vcpu->kvm))) &&
+>                !vcpu->arch.apf.halted);
+> }
+>
+> but that would have cascading effect to a whole pile of things.  I don't *think*
+> they'd be used with kvm_hlt_in_guest(), but we've had weirder stuff.
+>
+> I'm half tempted to solve this particular issue by stuffing vmcs.ACTIVITY_STATE on
+> shutdown, similar to what SVM does on shutdown interception.  KVM doesn't come
+> anywhere near faithfully emulating shutdown, so it's unlikely to break anything.
+> And then the mp_state vs. hlt_in_guest coulbe tackled separately.  Ugh, but that
+> wouldn't cover a synthesized KVM_REQ_TRIPLE_FAULT.
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 44fb619803b8..ee4bb37067d1 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5312,6 +5312,8 @@ static __always_inline int handle_external_interrupt(struct kvm_vcpu *vcpu)
+>
+>  static int handle_triple_fault(struct kvm_vcpu *vcpu)
+>  {
+> +       vmcs_write32(GUEST_ACTIVITY_STATE, GUEST_ACTIVITY_ACTIVE);
+> +
+>         vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
+>         vcpu->mmio_needed = 0;
+>         return 0;
+>
+>
+> I don't suppose QEMU can to blast INIT at all vCPUs for this case?
 
-Which devices specifically access the ring after DRIVER_OK but before
-a kick?
+Reproduce this problem need to use the cpu_pm=on in QEMU, so execute halt in vm doesn't
+cause a vm exit, so mp_state will never be HLT. I am confused why mp_state is considered in this case.
 
-> My plan was to convert
-> it in vp_vdpa if needed, and reuse the current vdpa ops. Sorry if I
-> was not explicit enough.
-> 
-> The only solution I can see to that is to trap & emulate in the vdpa
-> (parent?) driver, as talked in virtio-comment. But that complicates
-> the architecture:
-> * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> * Store vq enable state separately, at
-> vdpa->config->set_vq_ready(true), but not transmit that enable to hw
-> * Store the doorbell state separately, but do not configure it to the
-> device directly.
-> 
-> But how to recover if the device cannot configure them at kick time,
-> for example?
-> 
-> Maybe we can just fail if the parent driver does not support enabling
-> the vq after DRIVER_OK? That way no new feature flag is needed.
-> 
-> Thanks!
-> 
-> >
-> > > ---
-> > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/linux/kernel/git/mst
-> > > commit. Please let me know if I should send a v3 of [1] instead.
-> > >
-> > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send-email-mst@kernel.org/T/
-> > > ---
-> > >  drivers/vhost/vdpa.c | 7 +++++--
-> > >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > index e1abf29fed5b..a7e554352351 100644
-> > > --- a/drivers/vhost/vdpa.c
-> > > +++ b/drivers/vhost/vdpa.c
-> > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
-> > >  {
-> > >       struct vhost_vdpa *v = filep->private_data;
-> > >       struct vhost_dev *d = &v->vdev;
-> > > +     const struct vdpa_config_ops *ops = v->vdpa->config;
-> > >       void __user *argp = (void __user *)arg;
-> > >       u64 __user *featurep = argp;
-> > > -     u64 features;
-> > > +     u64 features, parent_features = 0;
-> > >       long r = 0;
-> > >
-> > >       if (cmd == VHOST_SET_BACKEND_FEATURES) {
-> > >               if (copy_from_user(&features, featurep, sizeof(features)))
-> > >                       return -EFAULT;
-> > > +             if (ops->get_backend_features)
-> > > +                     parent_features = ops->get_backend_features(v->vdpa);
-> > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
-> > >                                BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
-> > >                                BIT_ULL(VHOST_BACKEND_F_RESUME) |
-> > > -                              BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK)))
-> > > +                              parent_features))
-> > >                       return -EOPNOTSUPP;
-> > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
-> > >                    !vhost_vdpa_can_suspend(v))
-> > > --
-> > > 2.39.3
-> >
-
+And the bsp's vmcs.ACTIVITY_STATE need to reset to ACTIVITY to solve this problem.
+We need a proper set of APIs as you say. In this case, do we only provide a reset ioctl,
+or do we need to report vmcs.ACTIVITY_STATE to the userspace?
