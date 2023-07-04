@@ -2,327 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55417747509
-	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 17:12:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D5B874758F
+	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 17:46:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231650AbjGDPMo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jul 2023 11:12:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36702 "EHLO
+        id S231228AbjGDPqK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jul 2023 11:46:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231594AbjGDPMn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jul 2023 11:12:43 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76BDEE6
-        for <kvm@vger.kernel.org>; Tue,  4 Jul 2023 08:12:41 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-51d89664272so6710709a12.1
-        for <kvm@vger.kernel.org>; Tue, 04 Jul 2023 08:12:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1688483560; x=1691075560;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UmwEhHGCiPaByJisLi3VmUJ7Uu9s7XovyhRxpM0ByVo=;
-        b=S6xyKfnLmgSL390ag4/Mb5Pi2POMaMiUvAQJKyXPglWbayXbrZd0XXtwnAPq/ilWFE
-         QGNaETVwgm/jP4XR6Sjamsu0dtchAKrsZiUVurN1uc1LsjKMQ4QhqaJrWeR0m7y2lCFk
-         JqNP5QA6jaqdWcCYmf6Lg/1rGFnGgYGTFZJ4VD4u97Z8HAa2bzHemsA2sxXGZ6iW71jA
-         t/kV+SUUMDd8ZALULU6nHk41KmwzHbM/QM0hN2dpIYG9IXSFwK61hLeLUmMfX8uyKWuq
-         mOfNUVW/szx0Qr2Bf6yfzSrqiksX3HG/jSpRK0AzI5t3pXwN5UNDN64sHuZ+aGLzTYNq
-         rr8g==
+        with ESMTP id S230232AbjGDPqI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jul 2023 11:46:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7F5E75
+        for <kvm@vger.kernel.org>; Tue,  4 Jul 2023 08:45:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1688485518;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/PUI+CtLNs4l2I0+iAQpXHNnM5sim5Or6js9Z3l/FyQ=;
+        b=BwlKMqEujySN5qmw+K5Ji2A/Mzspe0yZk0QIdbBhKkUYclIY449s27xavVxf/f22rOYcs2
+        Aj8GJ/vr5+Oy8b4+tT70dnirtcdptqtsAS9iZI9o4xCQVEDDFjmA7neUMmIZ5HY4VJ1Nkb
+        YwLyJczOgVm4IRoFmJOGvhnVIF6zUMc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-264-OMIEuFaiPtuOd8Oc_dojEg-1; Tue, 04 Jul 2023 11:45:17 -0400
+X-MC-Unique: OMIEuFaiPtuOd8Oc_dojEg-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-31286355338so3315666f8f.0
+        for <kvm@vger.kernel.org>; Tue, 04 Jul 2023 08:45:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688483560; x=1691075560;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UmwEhHGCiPaByJisLi3VmUJ7Uu9s7XovyhRxpM0ByVo=;
-        b=RD42MiQq/Xetxh+lKphYkqx6CMZID64EkBbPzix2BNkqsQwXbTDZNBzPbFFNlOQMZS
-         gON5gMYnprIo+hfPua6TDLINKfmTs26FKMAwsjuU3HErpiulYdNT+uN/CZM8hLPcj7m3
-         iFUfDTkBq94XHMpGQbBN6iACG6RlkTycySQyupzuS91IGbrXwF1z0TE0Kbrv7boh0O1I
-         d6LCAicQ5gAU56FEulJu4b6LagTYeTxw9jML1AMhs/ke8w8mes1tG79hrtOzxDSCAi2U
-         kSom4XBQI+oIKIxAyQrVMJlk4/JZU0JvfaOWi/4jplvJZLF4YRQlmwQZx2pz6v8eOsY/
-         bQXA==
-X-Gm-Message-State: AC+VfDwNIFEpVSc1slPJSnOaKWSrXbc+9oJK3YgpAUcu14E/Uk52Xwa3
-        w2ePe4TZhvmOEs0xclnRFTzafQ==
-X-Google-Smtp-Source: APBJJlEFsaTF0C9YEC6MH3s75YSrBseUxS4LBAy0tC0lcDgNKEGdMAsHr1mltmZVIS/RuN6vnv9Yuw==
-X-Received: by 2002:a17:906:f196:b0:992:7295:61c9 with SMTP id gs22-20020a170906f19600b00992729561c9mr9981772ejb.69.1688483559913;
-        Tue, 04 Jul 2023 08:12:39 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id i16-20020a1709061cd000b00992e14af9b9sm6189928ejh.134.2023.07.04.08.12.38
+        d=1e100.net; s=20221208; t=1688485516; x=1691077516;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/PUI+CtLNs4l2I0+iAQpXHNnM5sim5Or6js9Z3l/FyQ=;
+        b=eoOZrKjcMQ6KtoAtSv7PeYewVvYr32AhGtWdLc/3jBeJKUkvZWobSPQPnC99UW1Og0
+         PMYWER3UgVJsUCAjqeZbISARGnTzfZLC1hKNAwk+NFYA2jMHoFFrK2dv1Fv9ohcf6S28
+         jogegZFo4LGKbJLGc8lVoJZJMZTNnzGXGXgCd91c1TWUsnZG6g/DNgOvdMyv3nb5Ty2Q
+         +LWiMdaxZ1Cjf4LfBhcOekWyZm7c40SvKTtCNPIJX16/ZaIoQRk91PPPchaMoab95fkL
+         edSNj/5eHjkCjpB07hTEBBvNbTe28mlaJD2OV2XcIMSxvINXxD5Dbkbj9XV8X+K62TyQ
+         3FDA==
+X-Gm-Message-State: ABy/qLZeI4oEkt7UsppKbYrfmP5uutNtVaBQ8WtL3JwX3nN+qNDcktF6
+        7q1U/AuT8LoEj91i7kaHJkoxA7u2jTzulz8ONhbgKdK6oJj1NIZRiCw1dL6X6icl79Hndq2kA8M
+        Ah0S+i4L6xdIl
+X-Received: by 2002:a5d:674d:0:b0:314:13d8:8ae7 with SMTP id l13-20020a5d674d000000b0031413d88ae7mr11780928wrw.26.1688485516323;
+        Tue, 04 Jul 2023 08:45:16 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGHQsomKCUqerVJHD/653LO914nQ9p0VRaFIwyfELGloTwcXrjzg/w2GewNcsvZX5Lc+3kg9A==
+X-Received: by 2002:a5d:674d:0:b0:314:13d8:8ae7 with SMTP id l13-20020a5d674d000000b0031413d88ae7mr11780912wrw.26.1688485515962;
+        Tue, 04 Jul 2023 08:45:15 -0700 (PDT)
+Received: from redhat.com ([2.52.13.33])
+        by smtp.gmail.com with ESMTPSA id 24-20020a05600c021800b003fbe43238c6sm914770wmi.9.2023.07.04.08.45.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jul 2023 08:12:39 -0700 (PDT)
-Date:   Tue, 4 Jul 2023 17:12:37 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Cc:     qemu-devel@nongnu.org, qemu-riscv@nongnu.org, rkanwal@rivosinc.com,
-        anup@brainfault.org, dbarboza@ventanamicro.com,
-        atishp@atishpatra.org, vincent.chen@sifive.com,
-        greentime.hu@sifive.com, frank.chang@sifive.com,
-        jim.shu@sifive.com, Palmer Dabbelt <palmer@dabbelt.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Weiwei Li <liweiwei@iscas.ac.cn>,
-        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 4/6] target/riscv: Create an KVM AIA irqchip
-Message-ID: <20230704-e98d67cadfcb3fc3fdf3d958@orel>
-References: <20230621145500.25624-1-yongxuan.wang@sifive.com>
- <20230621145500.25624-5-yongxuan.wang@sifive.com>
+        Tue, 04 Jul 2023 08:45:15 -0700 (PDT)
+Date:   Tue, 4 Jul 2023 11:45:12 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Eugenio Perez Martin <eperezma@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Shannon Nelson <shannon.nelson@amd.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does
+ not support it
+Message-ID: <20230704114159-mutt-send-email-mst@kernel.org>
+References: <20230703142218.362549-1-eperezma@redhat.com>
+ <20230703105022-mutt-send-email-mst@kernel.org>
+ <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
+ <20230704063646-mutt-send-email-mst@kernel.org>
+ <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230621145500.25624-5-yongxuan.wang@sifive.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 21, 2023 at 02:54:54PM +0000, Yong-Xuan Wang wrote:
-> implement a function to create an KVM AIA chip
-
-This is a bit too terse. We should at least summarize the KVM API this
-uses.
-
+On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wrote:
+> On Tue, Jul 4, 2023 at 12:38 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin wrote:
+> > > On Mon, Jul 3, 2023 at 4:52 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio Pérez wrote:
+> > > > > With the current code it is accepted as long as userland send it.
+> > > > >
+> > > > > Although userland should not set a feature flag that has not been
+> > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the current code will not
+> > > > > complain for it.
+> > > > >
+> > > > > Since there is no specific reason for any parent to reject that backend
+> > > > > feature bit when it has been proposed, let's control it at vdpa frontend
+> > > > > level. Future patches may move this control to the parent driver.
+> > > > >
+> > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
+> > > > > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> > > >
+> > > > Please do send v3. And again, I don't want to send "after driver ok" hack
+> > > > upstream at all, I merged it in next just to give it some testing.
+> > > > We want RING_ACCESS_AFTER_KICK or some such.
+> > > >
+> > >
+> > > Current devices do not support that semantic.
+> >
+> > Which devices specifically access the ring after DRIVER_OK but before
+> > a kick?
+> >
 > 
-> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-> Reviewed-by: Jim Shu <jim.shu@sifive.com>
-> ---
->  target/riscv/kvm.c       | 163 +++++++++++++++++++++++++++++++++++++++
->  target/riscv/kvm_riscv.h |   6 ++
->  2 files changed, 169 insertions(+)
+> Previous versions of the QEMU LM series did a spurious kick to start
+> traffic at the LM destination [1]. When it was proposed, that spurious
+> kick was removed from the series because to check for descriptors
+> after driver_ok, even without a kick, was considered work of the
+> parent driver.
 > 
-> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-> index eb469e8ca5..3dd8467031 100644
-> --- a/target/riscv/kvm.c
-> +++ b/target/riscv/kvm.c
-> @@ -34,6 +34,7 @@
->  #include "exec/address-spaces.h"
->  #include "hw/boards.h"
->  #include "hw/irq.h"
-> +#include "hw/intc/riscv_imsic.h"
->  #include "qemu/log.h"
->  #include "hw/loader.h"
->  #include "kvm_riscv.h"
-> @@ -41,6 +42,7 @@
->  #include "chardev/char-fe.h"
->  #include "migration/migration.h"
->  #include "sysemu/runstate.h"
-> +#include "hw/riscv/numa.h"
->  
->  static uint64_t kvm_riscv_reg_id(CPURISCVState *env, uint64_t type,
->                                   uint64_t idx)
-> @@ -548,3 +550,164 @@ bool kvm_arch_cpu_check_are_resettable(void)
->  void kvm_arch_accel_class_init(ObjectClass *oc)
->  {
->  }
-> +
-> +char *kvm_aia_mode_str(uint64_t aia_mode)
-> +{
-> +    const char *val;
-> +
-> +    switch (aia_mode) {
-> +    case KVM_DEV_RISCV_AIA_MODE_EMUL:
-> +        val = "emul";
-> +        break;
-> +    case KVM_DEV_RISCV_AIA_MODE_HWACCEL:
-> +        val = "hwaccel";
-> +        break;
-> +    case KVM_DEV_RISCV_AIA_MODE_AUTO:
-> +    default:
-> +        val = "auto";
-> +        break;
-> +    };
-> +
-> +    return g_strdup(val);
-
-There's no need to duplicate statically allocated strings unless they need
-to be manipulated. These strings do not, so this should just be
-
- const char *kvm_aia_mode_str(uint64_t aia_mode)
- {
-    switch (aia_mode) {
-    case KVM_DEV_RISCV_AIA_MODE_EMUL:
-        return "emul";
-    ...
-
-or even just an array
-
- const char *kvm_aia_mode_str[] = { "emul", "hwaccel", "auto" };
-
-> +}
-> +
-> +void kvm_riscv_aia_create(MachineState *machine,
-> +                          uint64_t aia_mode, uint64_t group_shift,
-> +                          uint64_t aia_irq_num, uint64_t aia_msi_num,
-> +                          uint64_t aplic_base, uint64_t imsic_base,
-> +                          uint64_t guest_num)
-> +{
-> +    int ret, i;
-> +    int aia_fd = -1;
-> +    uint64_t default_aia_mode;
-> +    uint64_t socket_count = riscv_socket_count(machine);
-> +    uint64_t max_hart_per_socket = 0;
-> +    uint64_t socket, base_hart, hart_count, socket_imsic_base, imsic_addr;
-> +    uint64_t socket_bits, hart_bits, guest_bits;
-> +
-> +    aia_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_RISCV_AIA, false);
-> +
-> +    if (aia_fd < 0) {
-> +        error_report("Unable to create in-kernel irqchip");
-> +        exit(1);
-> +    }
-> +
-
-For all the "fail to..." error messages below I would change them to
-"failed to..."
-
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_MODE,
-> +                            &default_aia_mode, false, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to get current KVM AIA mode");
-> +        exit(1);
-> +    }
-> +    qemu_log("KVM AIA: default mode is %s\n",
-> +             kvm_aia_mode_str(default_aia_mode));
-> +
-> +    if (default_aia_mode != aia_mode) {
-> +        ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                                KVM_DEV_RISCV_AIA_CONFIG_MODE,
-> +                                &aia_mode, true, NULL);
-> +        if (ret < 0)
-> +            warn_report("KVM AIA: fail to set KVM AIA mode");
-> +        else
-> +            qemu_log("KVM AIA: set current mode to %s\n",
-> +                     kvm_aia_mode_str(aia_mode));
-> +    }
-> +
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_SRCS,
-> +                            &aia_irq_num, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set number of input irq lines");
-> +        exit(1);
-> +    }
-> +
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_IDS,
-> +                            &aia_msi_num, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set number of msi");
-> +        exit(1);
-> +    }
-> +
-> +    socket_bits = find_last_bit(&socket_count, BITS_PER_LONG) + 1;
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_GROUP_BITS,
-> +                            &socket_bits, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set group_bits");
-> +        exit(1);
-> +    }
-> +
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_GROUP_SHIFT,
-> +                            &group_shift, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set group_shift");
-> +        exit(1);
-> +    }
-> +
-> +    guest_bits = guest_num == 0 ? 0 :
-> +                 find_last_bit(&guest_num, BITS_PER_LONG) + 1;
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_GUEST_BITS,
-> +                            &guest_bits, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set guest_bits");
-> +        exit(1);
-> +    }
-> +
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_ADDR,
-> +                            KVM_DEV_RISCV_AIA_ADDR_APLIC,
-> +                            &aplic_base, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set the base address of APLIC");
-> +        exit(1);
-> +    }
-> +
-> +    for (socket = 0; socket < socket_count; socket++) {
-> +        socket_imsic_base = imsic_base + socket * (1U << group_shift);
-> +        hart_count = riscv_socket_hart_count(machine, socket);
-> +        base_hart = riscv_socket_first_hartid(machine, socket);
-> +
-> +        if (max_hart_per_socket < hart_count) {
-> +            max_hart_per_socket = hart_count;
-> +        }
-> +
-> +        for (i = 0; i < hart_count; i++) {
-> +            imsic_addr = socket_imsic_base + i * IMSIC_HART_SIZE(guest_bits);
-> +            ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_ADDR,
-> +                                    KVM_DEV_RISCV_AIA_ADDR_IMSIC(i + base_hart),
-> +                                    &imsic_addr, true, NULL);
-> +            if (ret < 0) {
-> +                error_report("KVM AIA: fail to set the address of IMSICs");
-
- ("KVM AIA: failed to set the IMSIC address for hart index %d", i)
-
-> +                exit(1);
-> +            }
-> +        }
-> +    }
-> +
-> +    hart_bits = find_last_bit(&max_hart_per_socket, BITS_PER_LONG) + 1;
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CONFIG,
-> +                            KVM_DEV_RISCV_AIA_CONFIG_HART_BITS,
-> +                            &hart_bits, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: fail to set hart_bits");
-> +        exit(1);
-> +    }
-> +
-> +    if (kvm_has_gsi_routing()) {
-> +        for (uint64_t idx = 0; idx < aia_irq_num + 1; ++idx) {
-> +            /* KVM AIA only has one APLIC instance */
-> +            kvm_irqchip_add_irq_route(kvm_state, idx, 0, idx);
-> +        }
-> +        kvm_gsi_routing_allowed = true;
-> +        kvm_irqchip_commit_routes(kvm_state);
-> +    }
-> +
-> +    ret = kvm_device_access(aia_fd, KVM_DEV_RISCV_AIA_GRP_CTRL,
-> +                            KVM_DEV_RISCV_AIA_CTRL_INIT,
-> +                            NULL, true, NULL);
-> +    if (ret < 0) {
-> +        error_report("KVM AIA: initialized fail");
-
-"KVM AIA: failed to initialize"
-
-> +        exit(1);
-> +    }
-> +}
-> diff --git a/target/riscv/kvm_riscv.h b/target/riscv/kvm_riscv.h
-> index ed281bdce0..a61f552d1d 100644
-> --- a/target/riscv/kvm_riscv.h
-> +++ b/target/riscv/kvm_riscv.h
-> @@ -21,5 +21,11 @@
->  
->  void kvm_riscv_reset_vcpu(RISCVCPU *cpu);
->  void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level);
-> +char *kvm_aia_mode_str(uint64_t aia_mode);
-> +void kvm_riscv_aia_create(MachineState *machine,
-> +                          uint64_t aia_mode, uint64_t group_shift,
-> +                          uint64_t aia_irq_num, uint64_t aia_msi_num,
-> +                          uint64_t aplic_base, uint64_t imsic_base,
-> +                          uint64_t guest_num);
->  
->  #endif
-> -- 
-> 2.17.1
+> I'm ok to go back to this spurious kick, but I'm not sure if the hw
+> will read the ring before the kick actually. I can ask.
 > 
->
+> Thanks!
+> 
+> [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/msg02775.html
 
-Thanks,
-drew
+Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, no?
+
+
+
+> > > My plan was to convert
+> > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorry if I
+> > > was not explicit enough.
+> > >
+> > > The only solution I can see to that is to trap & emulate in the vdpa
+> > > (parent?) driver, as talked in virtio-comment. But that complicates
+> > > the architecture:
+> > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
+> > > * Store vq enable state separately, at
+> > > vdpa->config->set_vq_ready(true), but not transmit that enable to hw
+> > > * Store the doorbell state separately, but do not configure it to the
+> > > device directly.
+> > >
+> > > But how to recover if the device cannot configure them at kick time,
+> > > for example?
+> > >
+> > > Maybe we can just fail if the parent driver does not support enabling
+> > > the vq after DRIVER_OK? That way no new feature flag is needed.
+> > >
+> > > Thanks!
+> > >
+> > > >
+> > > > > ---
+> > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/linux/kernel/git/mst
+> > > > > commit. Please let me know if I should send a v3 of [1] instead.
+> > > > >
+> > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send-email-mst@kernel.org/T/
+> > > > > ---
+> > > > >  drivers/vhost/vdpa.c | 7 +++++--
+> > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > > > index e1abf29fed5b..a7e554352351 100644
+> > > > > --- a/drivers/vhost/vdpa.c
+> > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+> > > > >  {
+> > > > >       struct vhost_vdpa *v = filep->private_data;
+> > > > >       struct vhost_dev *d = &v->vdev;
+> > > > > +     const struct vdpa_config_ops *ops = v->vdpa->config;
+> > > > >       void __user *argp = (void __user *)arg;
+> > > > >       u64 __user *featurep = argp;
+> > > > > -     u64 features;
+> > > > > +     u64 features, parent_features = 0;
+> > > > >       long r = 0;
+> > > > >
+> > > > >       if (cmd == VHOST_SET_BACKEND_FEATURES) {
+> > > > >               if (copy_from_user(&features, featurep, sizeof(features)))
+> > > > >                       return -EFAULT;
+> > > > > +             if (ops->get_backend_features)
+> > > > > +                     parent_features = ops->get_backend_features(v->vdpa);
+> > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
+> > > > >                                BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
+> > > > >                                BIT_ULL(VHOST_BACKEND_F_RESUME) |
+> > > > > -                              BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK)))
+> > > > > +                              parent_features))
+> > > > >                       return -EOPNOTSUPP;
+> > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
+> > > > >                    !vhost_vdpa_can_suspend(v))
+> > > > > --
+> > > > > 2.39.3
+> > > >
+> >
+
