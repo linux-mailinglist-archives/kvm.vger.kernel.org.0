@@ -2,112 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E65237470AA
-	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 14:17:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A8797470B7
+	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 14:22:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230219AbjGDMRM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jul 2023 08:17:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36236 "EHLO
+        id S231443AbjGDMWO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jul 2023 08:22:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbjGDMRK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jul 2023 08:17:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC188E70
-        for <kvm@vger.kernel.org>; Tue,  4 Jul 2023 05:16:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688472982;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YIXfzZjsdVt8vvfchF5Qn1Sl+Sb+f/LHZzCge3DWDPE=;
-        b=Lo67/PcaOexquWfs0Z3M5QzgFSD5FwCeHqhQWwH+kApHH/Xrd451Uckb/5Dr6/A5rPyEgS
-        Y/ZIiKGBxc0gkTvYpWLpevccyRgDQc7jG1bXwbYgIkVMRiYad0V8vG4AN3zVTo8mwSQt4b
-        g85X+yCOV1i0vU09ccMyISysI3rKsL0=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-526-YOHFo_ShNFqk1X6pX-K9Ng-1; Tue, 04 Jul 2023 08:16:21 -0400
-X-MC-Unique: YOHFo_ShNFqk1X6pX-K9Ng-1
-Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-39cb2a0b57aso4770380b6e.1
-        for <kvm@vger.kernel.org>; Tue, 04 Jul 2023 05:16:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688472980; x=1691064980;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YIXfzZjsdVt8vvfchF5Qn1Sl+Sb+f/LHZzCge3DWDPE=;
-        b=hwC4d55lEgwl6QsOf2QO0zMYw49Y/DL4KAfs5pkKSah/ZFEXX2aYCK5NixRWNoNXY8
-         Y50LSy6nlOZCk6A+57M68hUMVvF5dqFSwP7qtkVCpE1zcGWLa1rkVArfl6/X/nXLzUaO
-         sVwrn399UIepPb7o89Vzkug7FN1NAP7EEt/2AlDMpzQk4YqDSBAQsI2EGXGACOYIw0Up
-         qvAqymDZvP3U6DVAsLFjfuz0dvT+/6XxEIKbWBmzWklLep9EvzaL9DnFQ7PqAWrqjYHI
-         T0p3jVyI+lYeW5GFbWqxPZi2qeI7UiwyAl6BOxQa2rMWQADCr3fMbSvsbAJ3YPd0mTof
-         W/Tg==
-X-Gm-Message-State: AC+VfDz9pjJ7eIwIulVuOf4atqzHsHlMf7xn4Tfv6oFZTgX9rKkDi7OD
-        OVDJs+Cb/O9bdB4X2i3rZah4jfMteDhvbAO34Ze7IRe/AB2F/qNTCnafJ9JchCIg0X8+2pXWLoA
-        UmPmVcR6DNFoY
-X-Received: by 2002:a05:6808:2a83:b0:3a3:6576:f31b with SMTP id fc3-20020a0568082a8300b003a36576f31bmr9794646oib.36.1688472980381;
-        Tue, 04 Jul 2023 05:16:20 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ62AHFVi349eOottfwQKI1ADJu/ofloNDCL3+OXJkcHbdoOoYm5j7T6tdVHgGJsNtprjihKwQ==
-X-Received: by 2002:a05:6808:2a83:b0:3a3:6576:f31b with SMTP id fc3-20020a0568082a8300b003a36576f31bmr9794623oib.36.1688472980098;
-        Tue, 04 Jul 2023 05:16:20 -0700 (PDT)
-Received: from [192.168.0.5] (ip-109-43-179-126.web.vodafone.de. [109.43.179.126])
-        by smtp.gmail.com with ESMTPSA id g10-20020ad4510a000000b0063623c266easm6309903qvp.3.2023.07.04.05.16.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jul 2023 05:16:19 -0700 (PDT)
-Message-ID: <ab53c709-964b-452e-9cb2-c4c8d67d318f@redhat.com>
-Date:   Tue, 4 Jul 2023 14:16:13 +0200
+        with ESMTP id S229610AbjGDMWN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jul 2023 08:22:13 -0400
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2107.outbound.protection.outlook.com [40.107.215.107])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAAE6E70;
+        Tue,  4 Jul 2023 05:22:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MSXfMkrZRMTtF1Yny0Aq9Fu2hGjnuAJDMGbbuFwG4pC2/Ih8PPZR5+NbjcAqn74Ruy16cMnh5CZ8ErsRJs6NTpiXizk3x1uyTEB8wgqNT3dqFaRLmOhHz2P8tCDFEn3T4EaMiMYQq96ZFXsOu9S6T9DWbFzKQWK7mX3fvmk10IVbeX41ebBmnJtxDR0RysR6XB1kC/fT+swu3wGFP+qJVikb+zZ4fBHXjGAeJtUypoh/jxeUU6ybmJLaLkXb7feEfD51yqDmdyU5SCoOdmTY78R5+9gAj4oK2/qmoRW4MRXJ0fkwWO9x1et/XPjP2XThbnKWQs5hxXVF3jVYoO6BtA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mITg8/+XJVzuWzBr5eHjyB3cikXNrlR/IKL0rqjV2Xc=;
+ b=QlD2hzDc0gVFaxxY22xo3sjHsNT2f3xGtFhQWzlP2PmNtGvG5UfyxfdeZ5YxrRRXyyKTZVp0Tz/Ql4mAluVTpAW9LnSQlJOaLFCCY0GqXqmZbdrue9Q4hKGs5rJjFeSHtUjRtqZV/7ErTtn0+//8b2iNizFSLU8YaPDn7AVbGLyck/4iz2opvqXNQhlAVwqm5PQJ+wBVWEaLNRt3Ak2s6krrbITIPuncyRpTuREHNi/Pu2/GOGQzfP9jCwQY8ucsMfg50f66gpfCj4GAQNzYW+vWb7ZirW3T7XtUYJS0FkZJcDHCDPlxRd9E6r0h6SGYJHN6D1fAsglmmpvEMi18dg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mITg8/+XJVzuWzBr5eHjyB3cikXNrlR/IKL0rqjV2Xc=;
+ b=eG1Wwy5UqLADef48aRXAe99jR/r+0czqK0TSWcCXyhOib56rcEuSSMoTqKWgTCuu7LP3y2Ja3zXspt9znATYfgxMbUc++Nd297j2yiPIy+yn+c4v8XbCp0zmeovSTSEiSscMgLC+0AZ/1jpOk4ElUDeWN9GjdvWuG2Du9JLGFWw4FRPZSHx+Ifd0ZqeT0f20b3Ir1u/WpLUc/i6llWsCZM/9pKWZNYYeYiqmwwEToNaaQaIVQiwdTIKBPkzrlmWHfoNMCzlfk987YPwc+W1HdwRtk7/R4rHsZLilBLnj0sidwO8yah7cWo0Is/Nt6e18Psq/Xhjz7BHAp4kDONKMZA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SG2PR06MB5288.apcprd06.prod.outlook.com (2603:1096:4:1dc::9) by
+ TYZPR06MB6464.apcprd06.prod.outlook.com (2603:1096:400:459::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6544.19; Tue, 4 Jul 2023 12:22:06 +0000
+Received: from SG2PR06MB5288.apcprd06.prod.outlook.com
+ ([fe80::c2b:41ab:3b14:f920]) by SG2PR06MB5288.apcprd06.prod.outlook.com
+ ([fe80::c2b:41ab:3b14:f920%6]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
+ 12:22:06 +0000
+From:   Minjie Du <duminjie@vivo.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Minjie Du <duminjie@vivo.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE (KVM)),
+        linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
+        linux-kernel@vger.kernel.org (open list)
+Cc:     opensource.kernel@vivo.com
+Subject: [PATCH v1] tools: remove duplicate assignment
+Date:   Tue,  4 Jul 2023 20:21:47 +0800
+Message-Id: <20230704122148.11573-1-duminjie@vivo.com>
+X-Mailer: git-send-email 2.39.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYAPR01CA0096.jpnprd01.prod.outlook.com
+ (2603:1096:404:2c::36) To SG2PR06MB5288.apcprd06.prod.outlook.com
+ (2603:1096:4:1dc::9)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v21 06/20] s390x/cpu topology: interception of PTF
- instruction
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230630091752.67190-1-pmorel@linux.ibm.com>
- <20230630091752.67190-7-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230630091752.67190-7-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SG2PR06MB5288:EE_|TYZPR06MB6464:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0da624ef-9927-4c91-3fb0-08db7c8947b7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gJnZU27WxPMh9uCUX0EAQBIYV2CCaROius3IxzO/RJ4dbKZZNAzs6MVeb2uGh2vSg71bTqLpwtTdQ010ZUlMwJClnwtzKcRIen4OEviPCpQYJRqld8VxDbMoqvWDDa8ts29UuoBxI4dvLj7LFmZJzFB2r2uZ5jdNKY+kaGIgbh92Ah5i8X1dBeeu+zH86zsi6nDthtEcq9YWr5k2lVsMPs7P+SkmrfoPCgIWhi9en2uXvf/zPiUmIRwabMyVmMzNj2FRd2A4A6qFUXbZF5vkKuJllNQsXuGVV37wOnrzd4PzQVO2UNyaRd/txpYHyeWlK7+KfI//A91L6yrjILX7AwZwm3/c6rnM+gmmdTeUPtABu2weVHtANL811qHN+qCib+wLEKDksFMndCYWdCb3w3xSnWE8ZTmz4vyUPMUGKmmkDSE6W+Zl5u1gMaqs4wfDlkUrlNUJY3t355ykwQSVzZ+2hRUT3TttWUxBQcrYsdE2vwEdnAvzu0HOdPkjoAQPXcbhTW+H0n2CPals7WRBtV5bn47w7QMiR890mvY/S4IfSEJ84VFXMBxnKCrrx7cnLPkS+fioXWKStuV+2cxWE+ZG/Ca3uqt4+n+s6/1VFMh26jnkKo+qmiXHTcF93ukR
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB5288.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39850400004)(366004)(396003)(376002)(136003)(451199021)(66946007)(66556008)(66476007)(4326008)(36756003)(478600001)(316002)(8936002)(8676002)(5660300002)(2906002)(4744005)(41300700001)(110136005)(86362001)(52116002)(6486002)(6512007)(1076003)(186003)(26005)(38100700002)(6506007)(6666004)(38350700002)(83380400001)(2616005)(107886003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?r2I5mYG9Iiz4lFAJMRw5rSFXsGy38laHAav++ZEt0HdwGN1wlfYVkJwQqYdg?=
+ =?us-ascii?Q?NoyIJ48Jhkw29g3tXWGskugnry5OO52OM4ZV07OoM5ZKBnhFOAlGbWzQlUkI?=
+ =?us-ascii?Q?60IlMtbNe+GYggeEGJMCjEIpMmUQ+gLqlXO/fG/O3KIRbfFafi1mIVVLm0q4?=
+ =?us-ascii?Q?8NIPxrsu0w/Ni/RQWzP1G0GFu2lVGq49BSYO450UcaYdHdyOPA/1uRIRg/8S?=
+ =?us-ascii?Q?rwMYiObvB3KxNChyQPQY9Hxx585WVRzk/U2nRM7FGavRSDh4Cr5wupYIxj/4?=
+ =?us-ascii?Q?Mrd3fwHY7VX0p1QSPLXTJa8zbveGBZ+4qXmwUDmsRGZlXApK88p6Ne8F/SXo?=
+ =?us-ascii?Q?VMMKqOXczSjpAmrEn+Bt2373epRNPJHYAKxRmB38hU4nzwwHrosfQNs/cdD7?=
+ =?us-ascii?Q?W94iJOg/HTm0xhmWbVmpLD9EbM3tnBCkBRWkFbp9qOHkabsv8YUzJ7X0tC0s?=
+ =?us-ascii?Q?YPyscgxRxYyGjPK03Tv8xmbL+TLMvEMnki5UsUK/sFVHEjFhQttbR6yybXUy?=
+ =?us-ascii?Q?aBsm76tc7vMJOd1xp8yNZTRxXQJx9P9H2raPA17Uzxludqh2TuX4d/ney3MD?=
+ =?us-ascii?Q?kcr5WWxZ2RTAeLbctxrxzQKqvxXnTmp3uzFSgfTnfbXlh2Idj70Pr7nVBCaF?=
+ =?us-ascii?Q?fBBrRTJ/WO529MPyM9886Kdx9T+P3umxFBNln+eV23/Hsgzba71pz9hrPp6W?=
+ =?us-ascii?Q?LynA+dvJ+bwaj+0rquS3g/iQgY/Rn0xToqTHu9VQNm+PVWrgy9wN634NvFqB?=
+ =?us-ascii?Q?4fb3rDonyti+uuOuIwLMguPxqOiE5eVk2nEM9bVnUEsPrTZmFlqPYqeaVzhv?=
+ =?us-ascii?Q?rRnIUFiILBDjOzpWkl7l6bk7sje79+jnh+DC48KOi2fya1eGMFqUgQHWTxEP?=
+ =?us-ascii?Q?pvZgKI6ck87Zg0NK7YVO/TStiRMJGSna7gxEQHrPF42QMg9qpWvX1vUm3vQJ?=
+ =?us-ascii?Q?OGdbwCMuhZ6QJF6gTKqXE0YFi86ktQmH6xzxkSs14mFUi06+3lJTHAw+hS4L?=
+ =?us-ascii?Q?75oamiIYsFHRaGexOaNuBN+jqbiNqY9AFyUneT1lKDhJ5rLh3TQKlKYBJ96F?=
+ =?us-ascii?Q?1i+8ezm1Hs52CPVvy8yMXiAPOEUnm/Zebv7ZgnVQylujylVg/O7X0WiAtNjq?=
+ =?us-ascii?Q?bX0S38eHstuxPblMQjLIMYp3z/z43zSHd+mfJVpmxyiDi0Lb236OWcriB2YX?=
+ =?us-ascii?Q?6OxLXrDLf8yRTLEBLyLKevnZk/DUAaTjxNRIoiDGJiiuN0nm3RfnARiYeuAe?=
+ =?us-ascii?Q?eS6Oa11amkluOWnCa9EUCj1MDT+WuET+C9cuurZnlfyTvgqNvZ0n6r8hhTg4?=
+ =?us-ascii?Q?wTKlVKPBnr1RjH37dlwR4qqpltLFiRMaOUTKzxLVUvjsFaVyujoJp5nXDN60?=
+ =?us-ascii?Q?tqQNe3yA41aW+Ze+jdH1GhPGiUiubttIDw8YMc4oM0mONN6wirxOwM47mV9b?=
+ =?us-ascii?Q?5AkYtrJ2e32kI+uYHR4CG7AG6O4lCYmm0Gtd+U+h3mRzLnFpS70xujNx1hcZ?=
+ =?us-ascii?Q?FNWFJKou88BcxUAZGDkcrGQUBwr2pQbjDOeqKP+uUEBJedNPNzW0JP+Myqq/?=
+ =?us-ascii?Q?HHmJnyQ112yKNHHsDOV/VvYGRaFUtw7JTxaRpFso?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0da624ef-9927-4c91-3fb0-08db7c8947b7
+X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB5288.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 12:22:06.0626
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qxuIB1D7tOhqmSl0uliE882AkiNRMIiKtSl+TC8X8O8kCorv1ML2knfRIWGsJlax1QMTnaQsRu2tmPAVh9UxyA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB6464
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/06/2023 11.17, Pierre Morel wrote:
-> When the host supports the CPU topology facility, the PTF
-> instruction with function code 2 is interpreted by the SIE,
-> provided that the userland hypervisor activates the interpretation
-> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
-> 
-> The PTF instructions with function code 0 and 1 are intercepted
-> and must be emulated by the userland hypervisor.
-> 
-> During RESET all CPU of the configuration are placed in
-> horizontal polarity.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Reviewed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> ---
->   include/hw/s390x/s390-virtio-ccw.h |  6 ++++
->   hw/s390x/cpu-topology.c            | 54 ++++++++++++++++++++++++++++++
->   target/s390x/kvm/kvm.c             | 11 ++++++
->   3 files changed, 71 insertions(+)
+Fix: make 'nodep' remove duplicate assignment
 
+Signed-off-by: Minjie Du <duminjie@vivo.com>
+---
+ tools/testing/selftests/kvm/lib/sparsebit.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+diff --git a/tools/testing/selftests/kvm/lib/sparsebit.c b/tools/testing/selftests/kvm/lib/sparsebit.c
+index 50e0cf41a..88cb6b84e 100644
+--- a/tools/testing/selftests/kvm/lib/sparsebit.c
++++ b/tools/testing/selftests/kvm/lib/sparsebit.c
+@@ -634,7 +634,6 @@ static void node_reduce(struct sparsebit *s, struct node *nodep)
+ 				tmp = node_prev(s, nodep);
+ 
+ 			node_rm(s, nodep);
+-			nodep = NULL;
+ 
+ 			nodep = tmp;
+ 			reduction_performed = true;
+-- 
+2.39.0
 
