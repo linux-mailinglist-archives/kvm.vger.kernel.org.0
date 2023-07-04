@@ -2,74 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BF16746674
-	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 02:16:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C1F27466CB
+	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 03:10:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231605AbjGDAQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jul 2023 20:16:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32890 "EHLO
+        id S231213AbjGDBKV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jul 2023 21:10:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231590AbjGDAQt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jul 2023 20:16:49 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 237EDE1;
-        Mon,  3 Jul 2023 17:16:49 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AD6E36108E;
-        Tue,  4 Jul 2023 00:16:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 22CAFC433C9;
-        Tue,  4 Jul 2023 00:16:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688429808;
-        bh=Q9t82D0XHv4OWmTe/RwOQDGGsULJk3SPsKOLkKVGSwg=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=EF+rI0UZy991UFGmXXD7R9ymiubcJMAewschJbFdPWiPI3ov3WtJPNxLizrUdgite
-         tpPN5emhEurTtPLGqJIG+hv/nt1LcyGKVEjfG4rplJnm3FdeksHIipUf9xcZLlkV9n
-         R0uP+NdIP3MqlhuUjsy9xi72AE+SrNMj0U2d4yQbNF2LvY5xOsO9Qg20excRz7zNBh
-         Ajab1KxH80uiL+LkGPEIEnuXKPf4sW9Jud7Z86X+VYLWAZcW9vrXLUrh85h+IucgsR
-         H6IbCpOxTARtvmN4mbo9K2D48sr6AxR7ytbLnrClFdMoxZpgSsG8FlQyQfX4m3AJ2J
-         d5SbvVYS0QIvA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 11D2BC39563;
-        Tue,  4 Jul 2023 00:16:48 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM changes for Linux 6.5
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20230703114435.645750-1-pbonzini@redhat.com>
-References: <20230703114435.645750-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20230703114435.645750-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 255006adb3da71bb75c334453786df781b415f54
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e8069f5a8e3bdb5fdeeff895780529388592ee7a
-Message-Id: <168842980806.28751.3192519412776943013.pr-tracker-bot@kernel.org>
-Date:   Tue, 04 Jul 2023 00:16:48 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229793AbjGDBKT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jul 2023 21:10:19 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD578E5C;
+        Mon,  3 Jul 2023 18:10:09 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2b6ef64342aso13308061fa.3;
+        Mon, 03 Jul 2023 18:10:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688433008; x=1691025008;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NanNEKu00OV4dGi7G0zvqpvZhV9czNdIron8MRqRfZI=;
+        b=eLCXFaLroQ5MoaLRSPbNjWaACX61zx1cLYCRkq3boGYpFlVmf8gtDCfzTAw2qdS3Ub
+         ozu8Ff4DqPjlyqIbk/MtR7tq1BYGzsWtkTT7gFrBQ/S+rBGY+a5FqO86Mh7S7Lodvd6/
+         d1t56l5wcCUN7lU4sIr+FBq3VcR4xcxN7uYojfMdTGTlyJ69Zii2bollYU8snTcP4v5v
+         4cgFMeQ5R1c+5ogbAsMLV0DvNXruXSAscfFxZWXXWHfnDBfbMFoC8hs8bE5gg71RY0Pw
+         Bx2+ahtaEvxVOLWc9DPAFQW5JJo+ZC/2wKRECxa8Pk7mRMnXLM7Rwa5WD3Nx+dT3Uyxw
+         geSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688433008; x=1691025008;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NanNEKu00OV4dGi7G0zvqpvZhV9czNdIron8MRqRfZI=;
+        b=hhtKT2DqFJtW42PPDacCQ/m6aUYftBXJ6w7E331bZF73Je6TtYKrGa7H8EZagcr9s9
+         0OjI4sWhTpIq2epuLXLe/+KmlTHda/2h0omGsCy5LTV5QIMza/OPbQ1S39lpBLuxy7D4
+         9W4G0JD3GcVibNasJW1YdAqfGmAegH7jmEmSCZ7MQah41XxoJyZBLiKsEl6zyN44f8tI
+         4zzkKakD+UgVw0y897JqsfAevRXi41SF6ZSn8gmZ0j6R9uPM8+iOxW0UccRh6iQAk3z1
+         oqHzKzrDxojUXpc+pGcEiI3yuErkrrv5d0G5rL6lKKRYCsJ7sgjrA9Ee1L5k2icWcqFa
+         3VHQ==
+X-Gm-Message-State: ABy/qLbepFZA5OIVnneNbvnr2BA1bpyTRXw+A1xMIwGMIVInI5l/TyV1
+        09Qx6mzdxh7F4O+QjmYhYqzwQ2tammlssfpVfnE=
+X-Google-Smtp-Source: APBJJlGiNQwrknvCAy76rNcAE/MkDTPW2U3FZfJqSOgzlNETgHG1hunCNunvnDb4FfPWDhNrPhJSZ0ADPdMbvQoO9hw=
+X-Received: by 2002:a2e:918e:0:b0:2b6:e96c:5414 with SMTP id
+ f14-20020a2e918e000000b002b6e96c5414mr2899927ljg.52.1688433007852; Mon, 03
+ Jul 2023 18:10:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1688010022.git.haibo1.xu@intel.com> <f44c3aa46971d524319c6340f9ce1b00c0182fd2.1688010022.git.haibo1.xu@intel.com>
+ <20230702-49c5545eb1ae2d0cf11c7b95@orel>
+In-Reply-To: <20230702-49c5545eb1ae2d0cf11c7b95@orel>
+From:   Haibo Xu <xiaobo55x@gmail.com>
+Date:   Tue, 4 Jul 2023 09:09:56 +0800
+Message-ID: <CAJve8om-r67p7WojymsfP0T3MdZWchhujCZMzGyQ8de2AbykBQ@mail.gmail.com>
+Subject: Re: [PATCH v5 10/13] KVM: selftests: Only do get/set tests on present
+ blessed list
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org,
+        oliver.upton@linux.dev, seanjc@google.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Shuah Khan <shuah@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Mon,  3 Jul 2023 07:44:35 -0400:
+On Mon, Jul 3, 2023 at 4:18=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
+m> wrote:
+>
+> On Sat, Jul 01, 2023 at 09:42:58PM +0800, Haibo Xu wrote:
+> > Only do the get/set tests on present and blessed registers
+> > since we don't know the capabilities of any new ones.
+> >
+> > Suggested-by: Andrew Jones <ajones@ventanamicro.com>
+> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> > ---
+> >  tools/testing/selftests/kvm/get-reg-list.c | 29 ++++++++++++++--------
+> >  1 file changed, 18 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing=
+/selftests/kvm/get-reg-list.c
+> > index c61090806007..74fb6f6fdd09 100644
+> > --- a/tools/testing/selftests/kvm/get-reg-list.c
+> > +++ b/tools/testing/selftests/kvm/get-reg-list.c
+> > @@ -49,6 +49,10 @@ extern int vcpu_configs_n;
+> >       for_each_reg_filtered(i)                                         =
+       \
+> >               if (!find_reg(blessed_reg, blessed_n, reg_list->reg[i]))
+> >
+> > +#define for_each_present_blessed_reg(i)                      \
+> > +     for ((i) =3D 0; (i) < blessed_n; ++(i))           \
+> > +             if (find_reg(reg_list->reg, reg_list->n, blessed_reg[i]))
+>
+> I just realized this is backwards. We need 'i' to index reg_list->reg in
+> the body of the loop. That means we need to write this as
+>
+> #define for_each_present_blessed_reg(i)                                  =
+       \
+>         for_each_reg(i)                                                  =
+       \
+>                 if (find_reg(blessed_reg, blessed_n, reg_list->reg[i]))
+>
+> (Which, in hindsight, makes sense since we're replacing a for_each_reg()
+> loop.)
+>
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+Sure, I will update it in v6.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e8069f5a8e3bdb5fdeeff895780529388592ee7a
+Thanks!
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> Thanks,
+> drew
