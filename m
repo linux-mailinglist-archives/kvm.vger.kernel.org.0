@@ -2,226 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 011FA746E01
-	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 11:53:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0819746E11
+	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 11:58:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231148AbjGDJxI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jul 2023 05:53:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35790 "EHLO
+        id S231328AbjGDJ6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jul 2023 05:58:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229739AbjGDJxH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jul 2023 05:53:07 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D95EAC4
-        for <kvm@vger.kernel.org>; Tue,  4 Jul 2023 02:53:05 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3fbc0609cd6so53206775e9.1
-        for <kvm@vger.kernel.org>; Tue, 04 Jul 2023 02:53:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1688464384; x=1691056384;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DLfPNulXKo+qJFwX/tED285Px/SBZZY1/yvfCrf8v/I=;
-        b=ZcacpQ0sFIQOplWw6A06PlVQzDW7/5wn88vf8yWJhvhr6DzZFVVAN4WLd/Znjs3buU
-         7KMjZQhLN8tLn3iMvvNd/KlXZLju+cadbp20PifZzuGxjZ0Ak5xfhToIlMyQjGXI4lrI
-         uZA7xV7ELptBXeZHQoWAt0QoiSUc+QM0QW/bvT2sh4X+q/qAn/Q22c814mZxtiVhLqGW
-         l7UoU/BbinzBz+WCeKCakQBWOH15zb7gd8AT2iJp+8Q1MZVAg5jWcJVDzw7zqeJ2uod/
-         5/yvf2TgOY3vZUILzTBdYpFImETzkOtV+6JECBnC2lt+W1ghEe/oRVlv//0QvBI3PXRy
-         D4Zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688464384; x=1691056384;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DLfPNulXKo+qJFwX/tED285Px/SBZZY1/yvfCrf8v/I=;
-        b=bUZ/ONh9KyNBMGmUizgyRRM6wclxSLw4suhqEyR7In2A3DKkFrVYqNIFpVTrBVajob
-         QfzioJqqEZo7JeyfoBJWIfL0ebDKW8hxZrn3fVCGHF3T7c7LAdO3u6Tv9UVxQWhcMO9H
-         rCLE3SlsaRzupmtjQgf4DfW8IsQLgaxlkLxNS6AXT1ISq4IUSzFMlzdflT2sxyY3t//g
-         kf4HYyYjaYfPjUTxxgZTav4g3m0yEIMmis2WctkWDQfaXlpRm6dxp9MBU1DVewWnrI9J
-         hSR1RonDcBbt9E2HXEPjf9Ql3KfNJ0N5FMCpsys2bERDFqk7Uog403yx7o521Em//pHQ
-         6w1w==
-X-Gm-Message-State: AC+VfDy55MUSFyTXXieDokEmXEKVjZQNWr6pm+6nuuiK4XAryqH+zi59
-        VZvo9J1XbTE0kqdD4x3szCEUag==
-X-Google-Smtp-Source: ACHHUZ7+mN4NtBSyJM8s/2UeUz91Q5GZJLAEyevkpWQR9OXa9AvxSYeUSnOReA4GkYpAZrCdbJfgQA==
-X-Received: by 2002:a1c:7203:0:b0:3fa:934c:8360 with SMTP id n3-20020a1c7203000000b003fa934c8360mr9908102wmc.8.1688464384401;
-        Tue, 04 Jul 2023 02:53:04 -0700 (PDT)
-Received: from myrica ([2.219.138.198])
-        by smtp.gmail.com with ESMTPSA id b2-20020a05600010c200b00314427091a2sm571086wrx.98.2023.07.04.02.53.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jul 2023 02:53:04 -0700 (PDT)
-Date:   Tue, 4 Jul 2023 10:53:04 +0100
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        Suzuki.Poulose@arm.com, andre.przywara@arm.com, maz@kernel.org,
-        oliver.upton@linux.dev, jean-philippe.brucker@arm.com,
-        apatel@ventanamicro.com, kvm@vger.kernel.org
-Subject: Re: [PATCH RESEND kvmtool 4/4] Add --loglevel argument for the run
- command
-Message-ID: <20230704095304.GE3214657@myrica>
-References: <20230630133134.65284-1-alexandru.elisei@arm.com>
- <20230630133134.65284-5-alexandru.elisei@arm.com>
+        with ESMTP id S231139AbjGDJ6U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jul 2023 05:58:20 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A040E5
+        for <kvm@vger.kernel.org>; Tue,  4 Jul 2023 02:58:18 -0700 (PDT)
+Received: from lhrpeml500003.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QwJ8v27qlz6J7Tr;
+        Tue,  4 Jul 2023 17:56:31 +0800 (CST)
+Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
+ lhrpeml500003.china.huawei.com (7.191.162.67) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 4 Jul 2023 10:58:16 +0100
+Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
+ lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.027;
+ Tue, 4 Jul 2023 10:58:16 +0100
+From:   Salil Mehta <salil.mehta@huawei.com>
+To:     Shaoqin Huang <shahuang@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+CC:     "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "gshan@redhat.com" <gshan@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Salil Mehta <salil.mehta@opnsrc.net>
+Subject: RE: [PATCH v1 0/5] target/arm: Handle psci calls in userspace
+Thread-Topic: [PATCH v1 0/5] target/arm: Handle psci calls in userspace
+Thread-Index: AQHZp/pp444fl0T5A0KjPRKELV/ZGK+dFe3AgADJLYCAC4aZ8A==
+Date:   Tue, 4 Jul 2023 09:58:15 +0000
+Message-ID: <539e6a25b89a45839de37fe92b27d0d3@huawei.com>
+References: <20230626064910.1787255-1-shahuang@redhat.com>
+ <9df973ede74e4757b510f26cd5786036@huawei.com>
+ <fb5e8d4d-2388-3ab0-aaac-a1dd91e74b08@redhat.com>
+In-Reply-To: <fb5e8d4d-2388-3ab0-aaac-a1dd91e74b08@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.48.147.121]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230630133134.65284-5-alexandru.elisei@arm.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 30, 2023 at 02:31:34PM +0100, Alexandru Elisei wrote:
-> Add --loglevel command line argument, with the possible values of 'error',
-> 'warning', 'info' or 'debug' to control what messages kvmtool displays. The
-> argument functions similarly to the Linux kernel parameter, when lower
-> verbosity levels hide all message with a higher verbosity (for example,
-> 'warning' hides info and debug messages, allows warning and error
-> messsages).
-> 
-> The default level is 'info', to match the current behaviour. --debug has
-> been kept as a legacy option, which might be removed in the future.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-
-> ---
->  builtin-run.c      | 32 ++++++++++++++++++++++++++++----
->  include/kvm/util.h |  9 +++++++--
->  util/util.c        |  9 +++++++++
->  3 files changed, 44 insertions(+), 6 deletions(-)
-> 
-> diff --git a/builtin-run.c b/builtin-run.c
-> index 79d031777c26..2e4378819f00 100644
-> --- a/builtin-run.c
-> +++ b/builtin-run.c
-> @@ -58,8 +58,7 @@
->  __thread struct kvm_cpu *current_kvm_cpu;
->  
->  static int  kvm_run_wrapper;
-> -
-> -bool do_debug_print = false;
-> +int loglevel = LOGLEVEL_INFO;
->  
->  static const char * const run_usage[] = {
->  	"lkvm run [<options>] [<kernel image>]",
-> @@ -146,6 +145,27 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
->  	return 0;
->  }
->  
-> +static int loglevel_parser(const struct option *opt, const char *arg, int unset)
-> +{
-> +	if (strcmp(opt->long_name, "debug") == 0) {
-> +		loglevel = LOGLEVEL_DEBUG;
-> +		return 0;
-> +	}
-> +
-> +	if (strcmp(arg, "debug") == 0)
-> +		loglevel = LOGLEVEL_DEBUG;
-> +	else if (strcmp(arg, "info") == 0)
-> +		loglevel = LOGLEVEL_INFO;
-> +	else if (strcmp(arg, "warning") == 0)
-> +		loglevel = LOGLEVEL_WARNING;
-> +	else if (strcmp(arg, "error") == 0)
-> +		loglevel = LOGLEVEL_ERROR;
-> +	else
-> +		die("Unknown loglevel: %s", arg);
-> +
-> +	return 0;
-> +}
-> +
->  #ifndef OPT_ARCH_RUN
->  #define OPT_ARCH_RUN(...)
->  #endif
-> @@ -215,6 +235,8 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
->  		     VIRTIO_TRANS_OPT_HELP_SHORT,		        \
->  		     "Type of virtio transport",			\
->  		     virtio_transport_parser, NULL),			\
-> +	OPT_CALLBACK('\0', "loglevel", NULL, "[error|warning|info|debug]",\
-> +			"Set the verbosity level", loglevel_parser, NULL),\
->  									\
->  	OPT_GROUP("Kernel options:"),					\
->  	OPT_STRING('k', "kernel", &(cfg)->kernel_filename, "kernel",	\
-> @@ -241,8 +263,10 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
->  		     vfio_device_parser, kvm),				\
->  									\
->  	OPT_GROUP("Debug options:"),					\
-> -	OPT_BOOLEAN('\0', "debug", &do_debug_print,			\
-> -			"Enable debug messages"),			\
-> +	OPT_CALLBACK_NOOPT('\0', "debug", kvm, NULL,			\
-> +			"Enable debug messages (deprecated, use "	\
-> +			"--loglevel=debug instead)",			\
-> +			loglevel_parser, NULL),				\
->  	OPT_BOOLEAN('\0', "debug-single-step", &(cfg)->single_step,	\
->  			"Enable single stepping"),			\
->  	OPT_BOOLEAN('\0', "debug-ioport", &(cfg)->ioport_debug,		\
-> diff --git a/include/kvm/util.h b/include/kvm/util.h
-> index 6920ce2630ad..e9d63c184752 100644
-> --- a/include/kvm/util.h
-> +++ b/include/kvm/util.h
-> @@ -32,7 +32,10 @@
->  #endif
->  #endif
->  
-> -extern bool do_debug_print;
-> +#define LOGLEVEL_ERROR		0
-> +#define LOGLEVEL_WARNING	1
-> +#define LOGLEVEL_INFO		2
-> +#define LOGLEVEL_DEBUG		3
->  
->  #define PROT_RW (PROT_READ|PROT_WRITE)
->  #define MAP_ANON_NORESERVE (MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE)
-> @@ -45,9 +48,11 @@ extern void pr_info(const char *err, ...) __attribute__((format (printf, 1, 2)))
->  extern void __pr_debug(const char *err, ...) __attribute__((format (printf, 1, 2)));
->  extern void set_die_routine(void (*routine)(const char *err, va_list params) NORETURN);
->  
-> +extern int loglevel;
-> +
->  #define pr_debug(fmt, ...)						\
->  	do {								\
-> -		if (do_debug_print)					\
-> +		if (loglevel >= LOGLEVEL_DEBUG)				\
->  			__pr_debug("(%s) %s:%d: " fmt, __FILE__,	\
->  				__func__, __LINE__, ##__VA_ARGS__);	\
->  	} while (0)
-> diff --git a/util/util.c b/util/util.c
-> index e3b36f67f899..962e8d4edb21 100644
-> --- a/util/util.c
-> +++ b/util/util.c
-> @@ -56,6 +56,9 @@ void pr_err(const char *err, ...)
->  {
->  	va_list params;
->  
-> +	if (loglevel < LOGLEVEL_ERROR)
-> +		return;
-> +
->  	va_start(params, err);
->  	error_builtin(err, params);
->  	va_end(params);
-> @@ -65,6 +68,9 @@ void pr_warning(const char *warn, ...)
->  {
->  	va_list params;
->  
-> +	if (loglevel < LOGLEVEL_WARNING)
-> +		return;
-> +
->  	va_start(params, warn);
->  	warn_builtin(warn, params);
->  	va_end(params);
-> @@ -74,6 +80,9 @@ void pr_info(const char *info, ...)
->  {
->  	va_list params;
->  
-> +	if (loglevel < LOGLEVEL_INFO)
-> +		return;
-> +
->  	va_start(params, info);
->  	info_builtin(info, params);
->  	va_end(params);
-> -- 
-> 2.41.0
-> 
+SGkgU2hhb3FpbiwNCkp1c3Qgc2F3IHRoaXMuIEFwb2xvZ2llcy4gSSBtaXNzZWQgdG8gcmVwbHkg
+dGhpcyBlYXJsaWVyIGFzIEkgd2FzIGJpdA0KZGlzY29ubmVjdGVkIGZvciBsYXN0IGZldyBkYXlz
+Lg0KDQoNCj4gRnJvbTogU2hhb3FpbiBIdWFuZyA8c2hhaHVhbmdAcmVkaGF0LmNvbT4NCj4gU2Vu
+dDogVHVlc2RheSwgSnVuZSAyNywgMjAyMyAzOjM1IEFNDQoNCj4gSGkgU2FsaWwsDQo+IA0KPiBP
+biA2LzI2LzIzIDIxOjQyLCBTYWxpbCBNZWh0YSB3cm90ZToNCj4gPj4gRnJvbTogU2hhb3FpbiBI
+dWFuZyA8c2hhaHVhbmdAcmVkaGF0LmNvbT4NCj4gPj4gU2VudDogTW9uZGF5LCBKdW5lIDI2LCAy
+MDIzIDc6NDkgQU0NCj4gPj4gVG86IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgcWVtdS1hcm1Abm9u
+Z251Lm9yZw0KPiA+PiBDYzogb2xpdmVyLnVwdG9uQGxpbnV4LmRldjsgU2FsaWwgTWVodGEgPHNh
+bGlsLm1laHRhQGh1YXdlaS5jb20+Ow0KPiA+PiBqYW1lcy5tb3JzZUBhcm0uY29tOyBnc2hhbkBy
+ZWRoYXQuY29tOyBTaGFvcWluIEh1YW5nIDxzaGFodWFuZ0ByZWRoYXQuY29tPjsNCj4gPj4gQ29y
+bmVsaWEgSHVjayA8Y29odWNrQHJlZGhhdC5jb20+OyBrdm1Admdlci5rZXJuZWwub3JnOyBNaWNo
+YWVsIFMuIFRzaXJraW4NCj4gPj4gPG1zdEByZWRoYXQuY29tPjsgUGFvbG8gQm9uemluaSA8cGJv
+bnppbmlAcmVkaGF0LmNvbT47IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9y
+Zz4NCj4gPj4gU3ViamVjdDogW1BBVENIIHYxIDAvNV0gdGFyZ2V0L2FybTogSGFuZGxlIHBzY2kg
+Y2FsbHMgaW4gdXNlcnNwYWNlDQo+ID4+DQo+ID4+IFRoZSB1c2Vyc3BhY2UgU01DQ0MgY2FsbCBm
+aWx0ZXJpbmdbMV0gcHJvdmlkZXMgdGhlIGFiaWxpdHkgdG8gZm9yd2FyZCB0aGUgU01DQ0MNCj4g
+Pj4gY2FsbHMgdG8gdGhlIHVzZXJzcGFjZS4gVGhlIHZDUFUgaG90cGx1Z1syXSB3b3VsZCBiZSB0
+aGUgZmlyc3QgbGVnaXRpbWF0ZSB1c2UNCj4gPj4gY2FzZSB0byBoYW5kbGUgdGhlIHBzY2kgY2Fs
+bHMgaW4gdXNlcnNwYWNlLCB0aHVzIHRoZSB2Q1BVIGhvdHBsdWcgY2FuIGRlbnkgdGhlDQo+ID4+
+IFBTQ0lfT04gY2FsbCBpZiB0aGUgdkNQVSBpcyBub3QgcHJlc2VudCBub3cuDQo+ID4+DQo+ID4+
+IFRoaXMgc2VyaWVzIHRyeSB0byBlbmFibGUgdGhlIHVzZXJzcGFjZSBTTUNDQyBjYWxsIGZpbHRl
+cmluZywgdGh1cyBjYW4gaGFuZGxlDQo+ID4+IHRoZSBTTUNDQyBjYWxsIGluIHVzZXJzcGFjZS4g
+VGhlIGZpcnN0IGVuYWJsZWQgU01DQ0MgY2FsbCBpcyBwc2NpIGNhbGwsIGJ5IHVzaW5nDQo+ID4+
+IHRoZSBuZXcgYWRkZWQgb3B0aW9uICd1c2VyLXNtY2NjJywgd2UgY2FuIGVuYWJsZSBoYW5kbGUg
+cHNjaSBjYWxscyBpbiB1c2Vyc3BhY2UuDQo+ID4+DQo+ID4+IHFlbXUtc3lzdGVtLWFhcmNoNjQg
+LW1hY2hpbmUgdmlydCx1c2VyLXNtY2NjPW9uDQo+ID4+DQo+ID4+IFRoaXMgc2VyaWVzIHJldXNl
+IHRoZSBxZW11IGltcGxlbWVudGF0aW9uIG9mIHRoZSBwc2NpIGhhbmRsaW5nLCB0aHVzIHRoZQ0K
+PiA+PiBoYW5kbGluZyBwcm9jZXNzIGlzIHZlcnkgc2ltcGxlLiBCdXQgd2hlbiBoYW5kbGluZyBw
+c2NpIGluIHVzZXJzcGFjZSB3aGVuIHVzaW5nDQo+ID4+IGt2bSwgdGhlIHJlc2V0IHZjcHUgcHJv
+Y2VzcyBuZWVkIHRvIGJlIHRha2luZyBjYXJlLCB0aGUgZGV0YWlsIGlzIGluY2x1ZGVkIGluDQo+
+ID4+IHRoZSBwYXRjaDA1Lg0KPiA+DQo+ID4gVGhpcyBjaGFuZ2UgaXMgaW50ZW5kZWQgZm9yIFZD
+UFUgSG90cGx1ZyBhbmQgYXJlIGR1cGxpY2F0aW5nIHRoZSBjb2RlDQo+ID4gd2UgYXJlIHdvcmtp
+bmcgb24uIFVubGVzcyB0aGlzIGNoYW5nZSBpcyBhbHNvIGludGVuZGVkIGZvciBhbnkgb3RoZXIN
+Cj4gPiBmZWF0dXJlIEkgd291bGQgcmVxdWVzdCB5b3UgdG8gZGVmZXIgdGhpcy4NCj4gDQo+IFRo
+YW5rcyBmb3Igc2hhcmluZyBtZSB0aGUgaW5mb3JtYXRpb24uIEknbSBub3QgaW50ZW5kZWQgZm9y
+IG1lcmdpbmcgdGhpcw0KPiBzZXJpZXMsIGJ1dCBkaXNjdXNzIHNvbWV0aGluZyBhYm91dCB0aGUg
+VkNQVSBIb3RwbHVnLCBzaW5jZSBJJ20gYWxzbw0KPiBmb2xsb3dpbmcgdGhlIHdvcmsgb2YgdkNQ
+VSBIb3RwbHVnLg0KDQpTdXJlLiBJIGFtIG5vdCBhZ2FpbnN0IHRoaXMgd29yayBpbiBhbnkgd2F5
+IGJ1dCB0aGVyZSB3YXMgYml0IG9mIGFuIG92ZXJsYXAgYW5kIHdhcw0KdHJ5aW5nIHRvIGF2b2lk
+IHRoYXQuIA0KDQo+IA0KPiBKdXN0IGN1cmlvdXMsIHdoYXQgaXMgeW91ciBwbGFuIHRvIHVwZGF0
+ZSBhIG5ldyB2ZXJzaW9uIG9mIFZDUFUgSG90cGx1Zw0KPiB3aGljaCBpcyBiYXNlZCBvbiB0aGUg
+dXNlcnNwYWNlIFNNQ0NDIGZpbHRlcmluZz8NCg0KV2UgaGF2ZSBhbHJlYWR5IGluY29ycG9yYXRl
+ZCB0aGlzLiBXZSBoYXZlIG5vdCB0ZXN0ZWQgaXQgcHJvcGVybHkgdGhvdWdoIGFuZA0KdGhlcmUg
+YXJlIHNvbWUgaXNzdWVzIHJlbGF0ZWQgdG8gdGhlIG1pZ3JhdGlvbiB3ZSBhcmUgZml4aW5nLg0K
+DQpJIGRpZCBtZW50aW9uIGFib3V0IHRoaXMgaW4gdGhlIEtWTUZvcnVtMjAyMyBwcmVzZW50YXRp
+b24gYXMgd2VsbC4NCg0KTGF0ZXN0IFFlbXUgUHJvdG90eXBlIChQcmUgUkZDIFYyKSAoTm90IGlu
+IHRoZSBmaW5hbCBzaGFwZSBvZiB0aGUgcGF0Y2hlcykNCmh0dHBzOi8vZ2l0aHViLmNvbS9zYWxp
+bC1tZWh0YS9xZW11LmdpdMKgIMKgdmlydC1jcHVocC1hcm12OC9yZmMtdjEtcG9ydDExMDUyMDIz
+LmRldi0xDQoNCg0Kc2hvdWxkIHdvcmsgYWdhaW5zdCBiZWxvdyBrZXJuZWwgY2hhbmdlcyBhcyBj
+b25maXJtZWQgYnkgSmFtZXMsDQoNCkxhdGVzdCBLZXJuZWwgUHJvdG90eXBlIChQcmUgUkZDIFYy
+ID0gUkZDIFYxICsgRml4ZXMpwqANCmh0dHBzOi8vZ2l0LmdpdGxhYi5hcm0uY29tL2xpbnV4LWFy
+bS9saW51eC1qbS5naXTCoCAgdmlydHVhbF9jcHVfaG90cGx1Zy9yZmMvdjIgIA0KDQoNCldlIGhh
+dmUgbm90IGFkZGVkIHRoZSBzdXBwb3J0IG9mIHVzZXItY29uZmlndXJhYmlsaXR5IHdoaWNoIHlv
+dXIgcGF0Y2gtc2V0IGRvZXMuDQoNCg0KTWFueSB0aGFua3MNClNhbGlsLg0KDQoNCg0KDQoNCg0K
+DQoNCg0KDQoNCg==
