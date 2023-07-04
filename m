@@ -2,312 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64299746B62
-	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 10:02:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A55D746B9A
+	for <lists+kvm@lfdr.de>; Tue,  4 Jul 2023 10:12:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231293AbjGDICJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jul 2023 04:02:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38830 "EHLO
+        id S230299AbjGDIMU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jul 2023 04:12:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231162AbjGDICD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jul 2023 04:02:03 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E357E72;
-        Tue,  4 Jul 2023 01:01:59 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id ca18e2360f4ac-7835971026fso212251739f.3;
-        Tue, 04 Jul 2023 01:01:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688457718; x=1691049718;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9obIGbe7Ltql5gFIiLDCERHCQB9lI1Zs9zejDT+BupE=;
-        b=dTpBNyNAP6SDI0lcP82DoFS00ikvWz+HUdPKGnsP+a5CaKLpX7erU7uzNMFb7Y0CYT
-         nZ+Dx22+2B5c1WoTERkC2wZE+Vb3JMxw2hu+T2EINe7TOVvM3bV9kdImuoxixDWNpg3l
-         CX7Fhi7M9MCuR+FsGTCB8L6uB/PD/3WofXkSuIBXKo/+vynyoFwVckf7JqOvr9MkSF30
-         vF6rxb2qnhDz+e2CBoLXmmHwcWtKtZ/NdB4btWHTXfOb5+dMZSTdLtK2uEZqok5DdvLv
-         sgGZqbTHNmMOCp3dekTTDlws2tucY5pUr/QXuNVf5ZSQcdu0fcuPSOS49omeMUQH856H
-         ZCKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688457718; x=1691049718;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9obIGbe7Ltql5gFIiLDCERHCQB9lI1Zs9zejDT+BupE=;
-        b=bq7dZ90QYrVdTvOcAaqkMW9KOWNJBpVo80GGmRO5CECPI6hURg6QsSrTG2vwzjAZRz
-         bNbi2QbN2ROkPCi/BOczHnnwz4H07dBrFVLHi0IGtqbtv3nASPbclwagJQNy/eNgehWU
-         Nbhc3J8mv4osVsVGMMMrXzUJdHrODcvxTpLUzflxkYKSmH9VHl20DO7K9ln/Eql3Uc5L
-         jAEAYA28U8pMwxJxTzzm+bkdDGNSGIheX0qOXKhPsoV07n+4HSCiJuOYyVcXdleXuHdT
-         PMWFBH+pbLkku2rzWTzIaTSzXWFx8bIlcTQ7LUS4VV+L2s904x0mWy360OlIaSsVoJB4
-         4/mA==
-X-Gm-Message-State: AC+VfDzyafzQbmH14jZ2dNpfBV3wA2WNFXcRv+EeTm2l2Rtisi29ZSP/
-        ALL4ncj8Mg9Sdg8DThaAVsc=
-X-Google-Smtp-Source: ACHHUZ7eIbyAJYukAn7A9hDlg51URN/4evK8On7PTBXfKbEP6vgrX/DQVHvt4XpijnLmO4rr3cj+rg==
-X-Received: by 2002:a5e:a911:0:b0:77e:3d2f:d1f4 with SMTP id c17-20020a5ea911000000b0077e3d2fd1f4mr12439925iod.15.1688457718361;
-        Tue, 04 Jul 2023 01:01:58 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id y17-20020a63e251000000b005501b24b1c9sm15649485pgj.62.2023.07.04.01.01.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jul 2023 01:01:56 -0700 (PDT)
-Message-ID: <3fe014ed-b845-bada-8598-351a6ec61523@gmail.com>
-Date:   Tue, 4 Jul 2023 16:01:48 +0800
+        with ESMTP id S229534AbjGDIMR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jul 2023 04:12:17 -0400
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on072d.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe0c::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D8AFCA
+        for <kvm@vger.kernel.org>; Tue,  4 Jul 2023 01:12:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oOWkaiglxCly8I61+vboHCQirDXgu0KpqiqykEwLbx2CH1GV7j5PGDNjXNJYm+joQOXi4SK61qkZhQhzyiWwkkT1+7WMtRC4v8yOeN6+ba3XgMCnB5UzHfpK98NfO1b3GiWdtd6L66zLyOX1o2NJuIP79pGTjnDmsN3GnMObsVS2dYdL220pdsDXTQaHNDUjy6isCqQSu6BYqFJkM6ZusIGkl/vkc4hjk8FAAjE+ySFQiLaFabvFx96lQFJEsLHSIprye7HvCY5WAI8nxB0kry4O0PDS9aBejnU0aEq9upRD9R6gX1Vhc31wkNRx2+5JX5GCN+1ZEx6MPI26muHNfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KJsX5B/lsifYbqw3otpO6ISTUWtezOr1jK4I1mGJHtc=;
+ b=c21dP8plIhVqbDX/GPnkAf8UmiPYSvCGq6xnymDUlT8CrbGbjoHGvsNA6UT+jb4lfJL/mXhBDJQjiPQFZQcwCljNpOei31EPfy2RAJYkwVUJSh/A3zvzOBNRBcunYoGwQGF8jEKcVx9ObgQQ0fovV6qGgzt2qyKHEm7mJb9MktxcuxD9afz125CORqYom37VbnuX5mZMfdXekEuZ8VtaTJkGtOKjlr1WuujIagn/KU5JBySCFbD4ntzr3p5rTT4v50Y48CsqtTwYV8FBcGO6qe6OX2Xix8+B8TymzzJN2dx2jWRmV1zRkqOOZ5VffUq7SiLv994IAYrGEPvl1d7u/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=knorr-bremse.com; dmarc=pass action=none
+ header.from=knorr-bremse.com; dkim=pass header.d=knorr-bremse.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=knorr-bremse.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KJsX5B/lsifYbqw3otpO6ISTUWtezOr1jK4I1mGJHtc=;
+ b=DnPWVbjXHJ1hMX9/+66ZfBQvp9tj5v/argauNYGJ/CJ61nxMEbsGqR/MrlziP7vK7++MYaAG2CHQQHjmK7fiuSRDV76J5akGDVe9E07brI+A+qozyT0SOZDs0O/dY9BEiewfqrntBIrCxy+HNdbQYP+7QZ3GWu0bP1iafPi3a+M=
+Received: from AM8PR04MB7396.eurprd04.prod.outlook.com (2603:10a6:20b:1da::6)
+ by AS8PR04MB8417.eurprd04.prod.outlook.com (2603:10a6:20b:3f9::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Tue, 4 Jul
+ 2023 08:12:12 +0000
+Received: from AM8PR04MB7396.eurprd04.prod.outlook.com
+ ([fe80::9072:398b:adea:17df]) by AM8PR04MB7396.eurprd04.prod.outlook.com
+ ([fe80::9072:398b:adea:17df%7]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
+ 08:12:12 +0000
+From:   =?iso-8859-2?Q?S=E1nta=2C_M=E1rton_=28ext=29?= 
+        <Marton.Santa@knorr-bremse.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: KVM with PREEMPT_RT
+Thread-Topic: KVM with PREEMPT_RT
+Thread-Index: AdmuTw9kT/M41sYgTvm67GKv0NpdGA==
+Date:   Tue, 4 Jul 2023 08:12:12 +0000
+Message-ID: <AM8PR04MB7396D7A5DF8D712B49317E59B02EA@AM8PR04MB7396.eurprd04.prod.outlook.com>
+Accept-Language: hu-HU, en-US
+Content-Language: hu-HU
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=knorr-bremse.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM8PR04MB7396:EE_|AS8PR04MB8417:EE_
+x-ms-office365-filtering-correlation-id: 95dac51d-df2c-4ef5-b797-08db7c665eff
+x-kbdisclaimer-set: True
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: xN6WA0Hx2xz4ToVHo/sClGOOcK7FMCSxg32cWpRaJn4nHFTK4w93C05HbGiIjYIwi9iJLgnvADkQGwCFXbjP39HSyxQ4PErXqDKfCaPvf9MbKflWqH9yZ5fmQm1d5RAaHQw6Hbbocu2FQ2oYU7X0mQF/GB7lav0iWwUin/MlVD6d18T4drujeTY1qk07FqkH3b4EqewqXXHLKT1AoWgVQVfGnSikIua2LTnWOIsdYTVY1gFsvAttZeb+K7VH1MgJE+UwX7LWhyNM/tRma9GGhfNAl1QCf4sqcrRXcVkDIbSNRjm8E76qoqhkruUylWoJi5/fmTmxt294deTz7Uhx1BpODj5LhCkBuYeWOO8pyThMr7HWXignMZbvBj/ngN2TDpPg0+8Q3nwmtmafZfpfOL7PFK6UByUqLMUx47HqBdxYfnU9f/BPGz3bIszY7A9edDKhhqUBpuHCDq2NZAz0qAKn6IDiDcGuAouBnq7AXk27N3wm9jWDU09uZ1qZY36oeN6F3Mq+gDNq5PFa2eq3/tAz60JPFgPFYu8cDiEKudqSglpBgdCZDIqacfjs1Z9fmz9Az8VV5eGTuvZVZ4BOojN8qyLuzi15ulON/lkghyI=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7396.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(39860400002)(376002)(346002)(136003)(451199021)(316002)(41300700001)(7696005)(26005)(83380400001)(66574015)(186003)(9686003)(6506007)(478600001)(71200400001)(122000001)(38100700002)(66446008)(66556008)(64756008)(66946007)(76116006)(66476007)(6916009)(55016003)(52536014)(7116003)(5660300002)(38070700005)(86362001)(33656002)(2906002)(8676002)(8936002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-2?Q?qxhuRGCS4NztqbCddjte+w0dKUx/+1nQGNvG288IAMLrZcaKDJD2RuMgNZ?=
+ =?iso-8859-2?Q?DBTLeZ5vUr4RMZ1/You3bxgnVM8rPDHHHQxhGYnZjRuMtubICIQLNYsHZW?=
+ =?iso-8859-2?Q?4f18UUBw12NQyz7PfcKmggkkdbr9fimBuh2bfu0/MlFlyh+rjx0NHv0T74?=
+ =?iso-8859-2?Q?4B7MmDX0By1mI8HhRjd9kQrlNyrRF9V0X1ahdcnnCI3umZ6J/uJ+Kdtalu?=
+ =?iso-8859-2?Q?bzfOK1qVtds7grkgC0sdFh47ARUPVcpErW4mzT044QbZQSfEKd3Qan0Byw?=
+ =?iso-8859-2?Q?3DU2T4TPfaomTHby+3MZd2Bvjt9WkskocjswBLuodfDHMCvVoXABoxJnyX?=
+ =?iso-8859-2?Q?YVrEpD6O8wxs3giODmEPbRZ66o3PWcGRTaWKJJNfbyd77kniqvJtJDxgNR?=
+ =?iso-8859-2?Q?QiguWm2KVcOebmtgaL8Tnm2mIfZHuGDdhC2zHADs7csPfein1e0VQnbW72?=
+ =?iso-8859-2?Q?T2YkvVUEJotG0wwMOh3VnxT2MpG2ySupB4KTRQRWL3BnLTzeXABbzoTIUl?=
+ =?iso-8859-2?Q?8dnC9K2dZDxHizKdk7O/APnpqqhkwPVNAFl+H23p9zMgIM1u3zLfNspcp7?=
+ =?iso-8859-2?Q?C8T5NAbvbPXJlKi8qLY4wlfrGrMQXsTqzaxXFFrK16Tjx/tYIFNRv4rnTU?=
+ =?iso-8859-2?Q?D8SwVTjv5bIBCzHAV4j52SP87QhZ3BIeUdfNX90aDJqdjBGhNFCT4UzHDm?=
+ =?iso-8859-2?Q?CaHoVBc9VIMJJzFaViAMMR0e0UQNteQBB+Ag05G3etOcsa1h4Sz6oHmV/g?=
+ =?iso-8859-2?Q?mOaxKba3bSM69b21eQYRHvszKW+wGX4OF0NdhT/N/q5y4pCsapNleydhMq?=
+ =?iso-8859-2?Q?rFflsWwMH8oXl7siUva7yDOu+SRlY/7xtPX1qiSmGM6z1+C2o6alAFkOt8?=
+ =?iso-8859-2?Q?w/pLn/28OAJmpZ0FMqSqDyxskyZOejhvf0hg8rhAvdyMChfQAgk+IHflLd?=
+ =?iso-8859-2?Q?NXOLxoOLXm3YsS036/NWrHgae07EJ+kig/GOwOOai/Gd34UBbI35glqCG5?=
+ =?iso-8859-2?Q?UYajfRcTcYa45XUx6tfrElFYgm/3fAXojRPsoqIwajUCsGs5pF3nWBtCFO?=
+ =?iso-8859-2?Q?8iwZc17clGH2XIwYxblyoy0xxAOhGpBU28z/qY3JAOWoJDpmOqSg6sYaXr?=
+ =?iso-8859-2?Q?5LRoSiq9GVK7W4s+fUU2oQoXTRYxUSXPssJir+BWZsoMMS62Fr65WvORSH?=
+ =?iso-8859-2?Q?lYUYFflH+d9huLZSHjfLqq6ncqoDqNbffm34sLtPHAKL48KaESf/Y22t3y?=
+ =?iso-8859-2?Q?RMreBHH7HsDgex0RebQKnV/PRP/0XJs/IH9aofKrdXVA3Kf3/7C4tG9JQ6?=
+ =?iso-8859-2?Q?shx8Qc5B4YNoAyjpF7cCUePGYL94grrAtOP7TXPGvCAsM3512xf9tzS8JX?=
+ =?iso-8859-2?Q?15WJ3vbdYCrfo0JHXQRKNkKHPJHCHjJtK76efhWfTti8G0+3iK6S6Q91EB?=
+ =?iso-8859-2?Q?0ULckwWk8xGp9IpYVmVxVbpllpJI+G2l2Jc/dOt/oEg74trlsrMuzk1cJ/?=
+ =?iso-8859-2?Q?a/xDua7ddm1phSnbz6IKgY2+Ry9ARxdUHETP6Ps/Y2q2kXdxuxTIhrdcf8?=
+ =?iso-8859-2?Q?8KDnRZQnyI9ha86quQQHdUlnK9mAl0BSGAniCuoETSSC5Vja3tihHA4qvY?=
+ =?iso-8859-2?Q?sDnZT3O/vYBTQf/MMk7Uj/cNr00tv+EU+9VVjkJZ73pABjSHBWDp5GWw?=
+ =?iso-8859-2?Q?=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH] KVM: x86/tsc: Update guest tsc_offset again before vcpu
- first runs
-Content-Language: en-US
-To:     Oliver Upton <oliver.upton@linux.dev>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230629164838.66847-1-likexu@tencent.com>
- <ZJ29KhiVLyAq/7Sh@google.com> <ZJ8PIbHfhc0oYB8/@linux.dev>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <ZJ8PIbHfhc0oYB8/@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-OriginatorOrg: knorr-bremse.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7396.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 95dac51d-df2c-4ef5-b797-08db7c665eff
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jul 2023 08:12:12.5114
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 66f6821e-0a30-4a06-8b8b-901bbfd2bc60
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 88UVMpDflU+QDp/+3AhmPAzf4SkNW3AqJJxlBsaK/RwcvivNAcQLcvYF671XVM7DlLuY3OcSRWjAQgXPkSnvvSnwxKE2DoUpl6H6m1u9AfA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8417
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/7/2023 1:21 am, Oliver Upton wrote:
-> On Thu, Jun 29, 2023 at 10:19:38AM -0700, Sean Christopherson wrote:
->> +Oliver
-> 
-> It has been a while since I've looked at any x86 code, so forgive any
-> ignorance :)
+Dear All,
 
-The x86 world still needs you, :D
+With my colleague, we use aarch64 architecture and we managed to build AGL =
+needlefish with KVM features enabled. When we wanted to apply also the PREE=
+MPT_RT patch to the kernel to have a real-time system with virtualization c=
+apabilities, the "Fully Preemptible Kernel (Real-Time)" option did not appe=
+ar in the kernel configuration, only after the KVM support was disabled. We=
+ found that it worked like that after a certain kernel version (https://lor=
+e.kernel.org/linux-rt-users/20200824154605.v66t2rsxobt3r5jg@linutronix.de/)=
+, but we also found forum posts that KVM and PREEMPT_RT can coexist (https:=
+//lore.kernel.org/lkml/20211129145706.rvfywpvt6sapiwy2@linutronix.de/T/) in=
+ newer kernel versions. Does it work now? What does that mean? Can we build=
+ a real-time KVM host OS? What is the process we should follow to build suc=
+h an image? We use AGL needlefish with kernel version 5.10.41.
 
-> 
->> On Fri, Jun 30, 2023, Like Xu wrote:
->>> From: Like Xu <likexu@tencent.com>
->>>
->>> When a new vcpu is created and subsequently restored by vcpu snapshot,
->>> apply kvm_vcpu_write_tsc_offset() before vcpu runs for the first time.
->>>
->>> Before a vcpu runs for the first time, the user space (VMM) sets the guest
->>> tsc as it wants, which may triggers the time synchronization mechanism with
->>> other vcpus (if any). In a scenario where a vcpu snapshot is used to
->>> restore, like the bugzilla report [*], the newly target guest tsc (e.g.
->>> at the time of vcpu restoration) is synchronized with its the most
->>> primitive guest timestamp initialized at the time of vcpu creation.
->>>
->>> Furthermore, the VMM can actually update the target guest tsc multiple
->>> times before the vcpu actually gets running, which requires the tsc_offset
->>> to be updated every time it is set. In this scenario, it can be considered
->>> as unstable tsc (even this vcpu has not yet even started ticking to follow
->>> the intended logic of KVM timer emulation).
->>>
->>> It is only necessary to delay this step until kvm_arch_vcpu_load() to
->>> catch up with guest expectation with the help of kvm_vcpu_has_run(),
->>> and the change is expected to not break any of the cumbersome existing
->>> virt timer features.
+Thank you very much in advance for your early reply!
 
-Emm for Sean's comment, we may have something like:
+Best regards,
 
-"This change is not expected to break any of the cumbersome existing virt
-timer features."
+M=E1rton S=E1nta
 
-> 
-> The bug description is a bit difficult to grok, IMO. My understanding is
-> something like the following:
-> 
->   1) Create VM_0 and save state within 1 second of creation
-> 
->   2) Create VM_1 and restore state from VM_0
-> 
->   3) Guest TSCs synchronize with the TSC value resulting from the vCPU
->   creation in VM_1 instead of the expected value in the snapshot.
-> 
-> Generalizing -- restoring a vCPU that was saved within a second of its
-> creation leads to KVM ignoring the user-written TSC value.
-> 
-> Or am I entirely lost?
 
-A user space saves the tsc of one vcpu and uses the same tsc value to
-restore another vcpu, at which point the synchronizing brought by KVM
-is not expected here. Part of log looks like this:
-
-[save] kvm: kvm_get_msr_common, data = 0x175ef88a # MSR_IA32_TSC
-[restore] kvm: kvm_synchronize_tsc, data = 0x175ef88a
-
-[save] kvm: kvm_get_msr_common, data = 0x171a7688 # MSR_IA32_TSC
-[restore] kvm: kvm_synchronize_tsc, data = 0x171a7688
-
-> 
->>> Reported-by: Yong He <alexyonghe@tencent.com>
->>> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217423 [*]
->>> Tested-by: Jinrong Liang <cloudliang@tencent.com>
->>> Signed-off-by: Like Xu <likexu@tencent.com>
->>> ---
->>>   arch/x86/kvm/x86.c | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>> index 439312e04384..616940fc3791 100644
->>> --- a/arch/x86/kvm/x86.c
->>> +++ b/arch/x86/kvm/x86.c
->>> @@ -4818,7 +4818,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->>>   		if (tsc_delta < 0)
->>>   			mark_tsc_unstable("KVM discovered backwards TSC");
->>>   
->>> -		if (kvm_check_tsc_unstable()) {
->>> +		if (kvm_check_tsc_unstable() || !kvm_vcpu_has_run(vcpu)) {
->>>   			u64 offset = kvm_compute_l1_tsc_offset(vcpu,
->>>   						vcpu->arch.last_guest_tsc);
->>>   			kvm_vcpu_write_tsc_offset(vcpu, offset);
->>
->> Doing this on every vCPU load feels all kinds of wrong, e.g. it will override the
->> value set by userspace via KVM_VCPU_TSC_OFFSET.  One could argue the KVM is "helping"
->> userspace by providing a more up-to-date offset for the guest, but "helping"
->> userspace by silently overriding userspace rarely ends well.
->>
->> Can't we instead just fix the heuristic that tries to detect synchronization?
->>
->> ---
->>   arch/x86/kvm/x86.c | 6 +++---
->>   1 file changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index c30364152fe6..43d40f058a41 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -2721,14 +2721,14 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
->>   			 * kvm_clock stable after CPU hotplug
->>   			 */
->>   			synchronizing = true;
->> -		} else {
->> +		} else if (kvm_vcpu_has_run(vcpu)) {
->>   			u64 tsc_exp = kvm->arch.last_tsc_write +
->>   						nsec_to_cycles(vcpu, elapsed);
->>   			u64 tsc_hz = vcpu->arch.virtual_tsc_khz * 1000LL;
->>   			/*
->>   			 * Special case: TSC write with a small delta (1 second)
->> -			 * of virtual cycle time against real time is
->> -			 * interpreted as an attempt to synchronize the CPU.
->> +			 * of virtual cycle time against real time on a running
->> +			 * vCPU is interpreted as an attempt to synchronize.
->>   			 */
->>   			synchronizing = data < tsc_exp + tsc_hz &&
->>   					data + tsc_hz > tsc_exp;
-
-The above proposal also breaks the KUT:hyperv_clock test.
-
-> 
-> This would break existing save/restore patterns for the TSC. QEMU relies
-> on KVM synchronizing the TSCs when restoring a VM, since it cannot
-> snapshot the TSC values of all the vCPUs in a single instant. It instead
-> tries to save the TSCs at roughly the same time [*], which KVM detects
-> on the target and gets everything back in sync. Can't wait to see when
-> this heuristic actually breaks :)
-> 
-> It's gonna be a hack no matter how we go about fixing this, but the root
-> of the problem is that KVM-initiated TSC changes are synchronizing with
-> userpsace-initiated TSC changes. Why not force a new TSC sync generation
-> (i.e. set @synchronizing to false) for the first user-initiated write to
-> the TSC MSR?
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 808c292ad3f4..8bb27ad0af53 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1321,6 +1321,7 @@ struct kvm_arch {
->   	u64 cur_tsc_offset;
->   	u64 cur_tsc_generation;
->   	int nr_vcpus_matched_tsc;
-> +	bool user_changed_tsc;
->   
->   	u32 default_tsc_khz;
->   
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 7713420abab0..1fe24bbc28f4 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2668,7 +2668,7 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
->   	kvm_track_tsc_matching(vcpu);
->   }
->   
-> -static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
-> +static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data, bool user_initiated)
->   {
->   	struct kvm *kvm = vcpu->kvm;
->   	u64 offset, ns, elapsed;
-> @@ -2689,20 +2689,29 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
->   			 * kvm_clock stable after CPU hotplug
->   			 */
->   			synchronizing = true;
-> -		} else {
-> +		} else if (kvm->arch.user_changed_tsc) {
->   			u64 tsc_exp = kvm->arch.last_tsc_write +
->   						nsec_to_cycles(vcpu, elapsed);
->   			u64 tsc_hz = vcpu->arch.virtual_tsc_khz * 1000LL;
->   			/*
-> -			 * Special case: TSC write with a small delta (1 second)
-> -			 * of virtual cycle time against real time is
-> -			 * interpreted as an attempt to synchronize the CPU.
-> +			 * Here lies UAPI baggage: user-initiated TSC write with
-> +			 * a small delta (1 second) of virtual cycle time
-> +			 * against real time is interpreted as an attempt to
-> +			 * synchronize the CPU.
-> +			 *
-> +			 * Don't synchronize user changes to the TSC with the
-> +			 * KVM-initiated change in kvm_arch_vcpu_postcreate()
-> +			 * by conditioning this mess on userspace having
-> +			 * written the TSC at least once already.
->   			 */
->   			synchronizing = data < tsc_exp + tsc_hz &&
->   					data + tsc_hz > tsc_exp;
->   		}
->   	}
->   
-> +	if (user_initiated)
-> +		kvm->arch.user_changed_tsc = true;
-> +
->   	/*
->   	 * For a reliable TSC, we can match TSC offsets, and for an unstable
->   	 * TSC, we add elapsed time in this computation.  We could let the
-> @@ -3695,7 +3704,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   		break;
->   	case MSR_IA32_TSC:
->   		if (msr_info->host_initiated) {
-> -			kvm_synchronize_tsc(vcpu, data);
-> +			kvm_synchronize_tsc(vcpu, data, true);
->   		} else {
->   			u64 adj = kvm_compute_l1_tsc_offset(vcpu, data) - vcpu->arch.l1_tsc_offset;
->   			adjust_tsc_offset_guest(vcpu, adj);
-> @@ -11832,7 +11841,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->   	if (mutex_lock_killable(&vcpu->mutex))
->   		return;
->   	vcpu_load(vcpu);
-> -	kvm_synchronize_tsc(vcpu, 0);
-> +	kvm_synchronize_tsc(vcpu, 0, false);
->   	vcpu_put(vcpu);
->   
->   	/* poll control enabled by default */
-
-This looks a lot like my first fix attempt, then came a new version:
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 439312e04384..715f0b078a4e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2721,7 +2721,7 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 
-data)
-  			 * kvm_clock stable after CPU hotplug
-  			 */
-  			synchronizing = true;
--		} else {
-+		} else if (kvm->arch.nr_vcpus_matched_tsc) {
-  			u64 tsc_exp = kvm->arch.last_tsc_write +
-  						nsec_to_cycles(vcpu, elapsed);
-  			u64 tsc_hz = vcpu->arch.virtual_tsc_khz * 1000LL;
-
-Oliver and Sean, any better move ?
+This transmission is intended solely for the addressee and contains confide=
+ntial information.
+If you are not the intended recipient, please immediately inform the sender=
+ and delete the message and any attachments from your system.
+Furthermore, please do not copy the message or disclose the contents to any=
+one unless agreed otherwise. To the extent permitted by law we shall in no =
+way be liable for any damages, whatever their nature, arising out of transm=
+ission failures, viruses, external influence, delays and the like.
