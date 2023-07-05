@@ -2,151 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE752748014
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 10:49:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9363174802C
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 10:54:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231802AbjGEItv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 04:49:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33714 "EHLO
+        id S232023AbjGEIyY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 04:54:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231140AbjGEItu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 04:49:50 -0400
+        with ESMTP id S232268AbjGEIyT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 04:54:19 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 277D51AA
-        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 01:49:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2D389D
+        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 01:53:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688546944;
+        s=mimecast20190719; t=1688547218;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mejduW6pzyJ5/oq78SQym8Bp3DsXmuWwE5r2XAdQDl8=;
-        b=NZjAFhMvsdFBWKumJcappgBXRwYADEPY8ObGuzcADWy4jVtyE///VqB2x9H9Ed4eI4fglH
-        3Xw6YW3qHTTNLUShFmnwM7lUDgMRoGx9MBYxVNd4gA+c67V8FNIZKaw6oLItm9S5B9fbQo
-        4x4Li9YCFZzV+xebTupbnva/ti3bJlM=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-274-plHcPoEfPyicWq02xxyA4Q-1; Wed, 05 Jul 2023 04:48:59 -0400
-X-MC-Unique: plHcPoEfPyicWq02xxyA4Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5E74B3C100A1;
-        Wed,  5 Jul 2023 08:48:58 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 194B41121315;
-        Wed,  5 Jul 2023 08:48:57 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oupton@google.com>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>
-Subject: Re: [PATCH v4 1/4] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
-In-Reply-To: <ZKRC80hb4hXwW8WK@thinky-boi>
-Organization: Red Hat GmbH
-References: <20230607194554.87359-1-jingzhangos@google.com>
- <20230607194554.87359-2-jingzhangos@google.com>
- <ZJm+Kj0C5YySp055@linux.dev> <874jmjiumh.fsf@redhat.com>
- <ZKRC80hb4hXwW8WK@thinky-boi>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Wed, 05 Jul 2023 10:48:57 +0200
-Message-ID: <87o7kq3fra.fsf@redhat.com>
+        bh=JEyFUuSpxw2m67++RhGuJGOEC/oiC8glFPbfTSquf1M=;
+        b=X0rVXPHr7caTPQZtEf5eRThA3aZZEINtCvUcL4J/VQaWE0mKwYdSMGRvsYB0/59M+laLPb
+        RCBECFyYCMjry67lSqDMt9pTDHdKHm7hMqVl+WJjfKu81ZEEfRKk4aYBudBsli+zMRFBil
+        8hYWk7D1CldkQHIGsTp3lQ1gbz6maCc=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-14-2WqQdaXsNka7PyPI70BBwQ-1; Wed, 05 Jul 2023 04:53:37 -0400
+X-MC-Unique: 2WqQdaXsNka7PyPI70BBwQ-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7659b44990eso549254885a.1
+        for <kvm@vger.kernel.org>; Wed, 05 Jul 2023 01:53:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688547217; x=1691139217;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JEyFUuSpxw2m67++RhGuJGOEC/oiC8glFPbfTSquf1M=;
+        b=QzRxsArgBqk1NJncp0Jn0Zv3cW9x215n94BAvQ0UvlYSDp1owsyaPOAxrFzdLekpm4
+         GCxf6UIpTFx6/Z72/HsxaDKHJPYQ7lth7UkC78DYibwI18AC9jO22YxvD9ZlZJBeRubR
+         8tVa82OJt2fDUWeLUa9qcAGEt7kGvHhqdX8rUTcEPh8oTpr5Wpa+8bqayOCeYF3qU7gy
+         Voc/SFLaXtyR/MrB9f7R5QiVLaW88l4xC0JMTGH8jupmWCWsOBdZXzvY0Uim3DuDyRoP
+         LKDdXVbF5D59U0Mpa6pdAqcC1b5MEqqXUnET3dRzTu9uZqTaL95M4ZLlHS70Ko8udmNu
+         rjKQ==
+X-Gm-Message-State: ABy/qLbH+7I6FmeYhyoXBmbuWRalCHvgWXeK7/aOFP6PbpcR4AvnBQ+d
+        jB9meWk3dGdLUD1jzyH6fJOewxmYz4uiIYrYvhPIcUEU+sjNeZAfBzg/6Xi+e78l+in3u3VL/93
+        +EmIuZXqPsGefCFDjaLAG
+X-Received: by 2002:a37:ef11:0:b0:767:35a:5f19 with SMTP id j17-20020a37ef11000000b00767035a5f19mr14196397qkk.14.1688547217371;
+        Wed, 05 Jul 2023 01:53:37 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5l+Up1PuHm9a+E1pNEtgMCCz4on7wAJIpTXcsQBkkWCgz0dkqS4GCRKF9kVD3pOGTuatoxSA==
+X-Received: by 2002:a37:ef11:0:b0:767:35a:5f19 with SMTP id j17-20020a37ef11000000b00767035a5f19mr14196389qkk.14.1688547217126;
+        Wed, 05 Jul 2023 01:53:37 -0700 (PDT)
+Received: from [10.33.192.205] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id x9-20020a05620a01e900b00765f8e5ac7csm10127935qkn.48.2023.07.05.01.53.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Jul 2023 01:53:36 -0700 (PDT)
+Message-ID: <eb088f47-6b16-d8fc-cddc-b3a8f0e53ffe@redhat.com>
+Date:   Wed, 5 Jul 2023 10:53:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
+        clg@kaod.org
+References: <20230630091752.67190-1-pmorel@linux.ibm.com>
+ <20230630091752.67190-16-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v21 15/20] tests/avocado: s390x cpu topology polarisation
+In-Reply-To: <20230630091752.67190-16-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 04 2023, Oliver Upton <oliver.upton@linux.dev> wrote:
+On 30/06/2023 11.17, Pierre Morel wrote:
+> Polarization is changed on a request from the guest.
+> Let's verify the polarization is accordingly set by QEMU.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   tests/avocado/s390_topology.py | 46 ++++++++++++++++++++++++++++++++++
+>   1 file changed, 46 insertions(+)
+> 
+> diff --git a/tests/avocado/s390_topology.py b/tests/avocado/s390_topology.py
+> index 1758ec1f13..2cf731cb1d 100644
+> --- a/tests/avocado/s390_topology.py
+> +++ b/tests/avocado/s390_topology.py
+> @@ -40,6 +40,7 @@ class S390CPUTopology(QemuSystemTest):
+>       The polarization is changed on a request from the guest.
+>       """
+>       timeout = 90
+> +    event_timeout = 1
 
-> Hi Cornelia,
->
-> On Tue, Jul 04, 2023 at 05:06:30PM +0200, Cornelia Huck wrote:
->> On Mon, Jun 26 2023, Oliver Upton <oliver.upton@linux.dev> wrote:
->> 
->> > On Wed, Jun 07, 2023 at 07:45:51PM +0000, Jing Zhang wrote:
->> >> +	brps = FIELD_GET(ID_AA64DFR0_EL1_BRPs_MASK, val);
->> >> +	ctx_cmps = FIELD_GET(ID_AA64DFR0_EL1_CTX_CMPs_MASK, val);
->> >> +	if (ctx_cmps > brps)
->> >> +		return -EINVAL;
->> >> +
->> >
->> > I'm not fully convinced on the need to do this sort of cross-field
->> > validation... I think it is probably more trouble than it is worth. If
->> > userspace writes something illogical to the register, oh well. All we
->> > should care about is that the advertised feature set is a subset of
->> > what's supported by the host.
->> >
->> > The series doesn't even do complete sanity checking, and instead works
->> > on a few cherry-picked examples. AA64PFR0.EL{0-3} would also require
->> > special handling depending on how pedantic you're feeling. AArch32
->> > support at a higher exception level implies AArch32 support at all lower
->> > exception levels.
->> >
->> > But that isn't a suggestion to implement it, more of a suggestion to
->> > just avoid the problem as a whole.
->> 
->> Generally speaking, how much effort do we want to invest to prevent
->> userspace from doing dumb things? "Make sure we advertise a subset of
->> features of what the host supports" and "disallow writing values that
->> are not allowed by the architecture in the first place" seem reasonable,
->> but if userspace wants to create weird frankencpus[1], should it be
->> allowed to break the guest and get to keep the pieces?
->
-> What I'm specifically objecting to is having KVM do sanity checks across
-> multiple fields. That requires explicit, per-field plumbing that will
-> eventually become a tangled mess that Marc and I will have to maintain.
-> The context-aware breakpoints is one example, as is ensuring SVE is
-> exposed iff FP is too. In all likelihood we'll either get some part of
-> this wrong, or miss a required check altogether.
+When running tests in CI and the machines are very loaded, the tests can be 
+stalled easily by multiple seconds. So using a timeout of 1 seconds sounds 
+way too low for me. Please use at least 5 seconds, or maybe even 10.
 
-Nod, this sounds like more trouble than it's worth in the end.
+>       KERNEL_COMMON_COMMAND_LINE = ('printk.time=0 '
+>                                     'root=/dev/ram '
+> @@ -99,6 +100,15 @@ def kernel_init(self):
+>                            '-initrd', initrd_path,
+>                            '-append', kernel_command_line)
+>   
+> +    def system_init(self):
+> +        self.log.info("System init")
+> +        exec_command(self, 'mount proc -t proc /proc')
+> +        time.sleep(0.2)
+> +        exec_command(self, 'mount sys -t sysfs /sys')
+> +        time.sleep(0.2)
 
->
-> Modulo a few exceptions to this case, I think per-field validation is
-> going to cover almost everything we're worried about, and we get that
-> largely for free from arm64_check_features().
->
->> I'd be more in favour to rely on userspace to configure something that
->> is actually usable; it needs to sanitize any user-provided configuration
->> anyway.
->
-> Just want to make sure I understand your sentiment here, you'd be in
-> favor of the more robust sanitization?
+Hard coded sleeps are ugly... they are prone to race conditions (e.g. on 
+loaded test systems), and they artificially slow down the test duration.
 
-In userspace. E.g. QEMU can go ahead and try to implement the
-user-exposed knobs in a way that the really broken configurations are
-not even possible. I'd also expect userspace to have a more complete
-view of what it is trying to instantiate (especially if code is shared
-between instantiating a vcpu for use with KVM and a fully emulated
-vcpu -- we probably don't want to go all crazy in the latter case,
-either.)
+What about doing all three commands in one statement instead:
 
->
->> [1] I think userspace will end up creating frankencpus in any case, but
->> at least it should be the kind that doesn't look out of place in the
->> subway if you dress it in proper clothing.
->
-> I mean, KVM already advertises a frankencpu in the first place, so we're
-> off to a good start :)
+     exec_command_and_wait_for_pattern(self,
+            """mount proc -t proc /proc ;
+               mount sys -t sysfs /sys ;
+               /bin/cat /sys/devices/system/cpu/dispatching""",
+            '0')
 
-Indeed :)
+?
+
+> +        exec_command_and_wait_for_pattern(self,
+> +                '/bin/cat /sys/devices/system/cpu/dispatching', '0')
+> +
+>       def test_single(self):
+>           """
+>           This test checks the simplest topology with a single CPU.
+> @@ -194,3 +204,39 @@ def test_hotplug_full(self):
+>           self.check_topology(3, 1, 1, 1, 'high', False)
+>           self.check_topology(4, 1, 1, 1, 'medium', False)
+>           self.check_topology(5, 2, 1, 1, 'high', True)
+> +
+> +
+> +    def guest_set_dispatching(self, dispatching):
+> +        exec_command(self,
+> +                f'echo {dispatching} > /sys/devices/system/cpu/dispatching')
+> +        self.vm.event_wait('CPU_POLARIZATION_CHANGE', self.event_timeout)
+> +        exec_command_and_wait_for_pattern(self,
+> +                '/bin/cat /sys/devices/system/cpu/dispatching', dispatching)
+> +
+> +
+> +    def test_polarisation(self):
+> +        """
+> +        This test verifies that QEMU modifies the entitlement change after
+> +        several guest polarization change requests.
+> +
+> +        :avocado: tags=arch:s390x
+> +        :avocado: tags=machine:s390-ccw-virtio
+> +        """
+> +        self.kernel_init()
+> +        self.vm.launch()
+> +        self.wait_until_booted()
+> +
+> +        self.system_init()
+> +        res = self.vm.qmp('query-cpu-polarization')
+> +        self.assertEqual(res['return']['polarization'], 'horizontal')
+> +        self.check_topology(0, 0, 0, 0, 'medium', False)
+> +
+> +        self.guest_set_dispatching('1');
+> +        res = self.vm.qmp('query-cpu-polarization')
+> +        self.assertEqual(res['return']['polarization'], 'vertical')
+> +        self.check_topology(0, 0, 0, 0, 'medium', False)
+> +
+> +        self.guest_set_dispatching('0');
+> +        res = self.vm.qmp('query-cpu-polarization')
+> +        self.assertEqual(res['return']['polarization'], 'horizontal')
+> +        self.check_topology(0, 0, 0, 0, 'medium', False)
 
