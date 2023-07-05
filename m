@@ -2,145 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ECC2748407
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 14:18:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42A4474840B
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 14:19:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231407AbjGEMS1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 08:18:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38932 "EHLO
+        id S231417AbjGEMTk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 08:19:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229901AbjGEMS0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 08:18:26 -0400
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00CC9D8
-        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 05:18:24 -0700 (PDT)
-X-GND-Sasl: alex@ghiti.fr
-X-GND-Sasl: alex@ghiti.fr
-X-GND-Sasl: alex@ghiti.fr
-X-GND-Sasl: alex@ghiti.fr
-X-GND-Sasl: alex@ghiti.fr
-X-GND-Sasl: alex@ghiti.fr
-X-GND-Sasl: alex@ghiti.fr
-X-GND-Sasl: alex@ghiti.fr
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B47EFC000A;
-        Wed,  5 Jul 2023 12:18:22 +0000 (UTC)
-Message-ID: <994ae720-b3a1-1e67-ca9c-ca00e6525488@ghiti.fr>
-Date:   Wed, 5 Jul 2023 14:18:22 +0200
+        with ESMTP id S229901AbjGEMTj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 08:19:39 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5918199;
+        Wed,  5 Jul 2023 05:19:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ZBre0g3T1mcgEtkinxsB/uoAXz8ZMrPHkJlWIM1M77A=; b=TG2cXPGtjDPuRohKGQ7FFcgcnz
+        yy7Wboha5BtCIh5QyCVQVSLA+npV9WYK+6ISz4sxLcCPm3FjxHL5pQSL2MwjC+M7qfgfxjjZ3Wlj4
+        vAw8klij1kOJeqGb2eEsYx44AWGsS0u2vT5NiC09ZDaBcqpLiY0qxuvyZbFpp++oD92+J1yYxheCv
+        G61n8lItcz3FLWozuuUSizvFPklOcxjS33w2Zwqp21PfKYBVMMySyh7MuwS5Ec3bGyRZ0Ux+PPuxi
+        lAGXZKEmskubUXdJhdll17bgxfQLhSqAwx70+OrQU30mpcoBFgJ4RnkKY0xE6S7HznL8yluwQ2ghw
+        iz6ft95g==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qH1Te-00A3o9-Mw; Wed, 05 Jul 2023 12:19:22 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 4352A300023;
+        Wed,  5 Jul 2023 14:19:21 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 2CAC62022DED3; Wed,  5 Jul 2023 14:19:21 +0200 (CEST)
+Date:   Wed, 5 Jul 2023 14:19:21 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "nik.borisov@suse.com" <nik.borisov@suse.com>,
+        "hpa@zytor.com" <hpa@zytor.com>, "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH v12 20/22] x86/virt/tdx: Allow SEAMCALL to handle #UD and
+ #GP
+Message-ID: <20230705121921.GZ4253@hirez.programming.kicks-ass.net>
+References: <c124550719716f1f7759c2bdea70f4722d8e0167.1687784645.git.kai.huang@intel.com>
+ <20230628152900.GI2438817@hirez.programming.kicks-ass.net>
+ <20230628203823.GR38236@hirez.programming.kicks-ass.net>
+ <42e13ccf7f27a68c0dd64640eed378c38ef40967.camel@intel.com>
+ <20230630100659.GF2533791@hirez.programming.kicks-ass.net>
+ <20230630102141.GA2534364@hirez.programming.kicks-ass.net>
+ <20230630120650.GB2534364@hirez.programming.kicks-ass.net>
+ <fdd81fbd2424d8da04f98d156668cad5e73c740b.camel@intel.com>
+ <20230705102137.GX4253@hirez.programming.kicks-ass.net>
+ <ab3dea02892920cd6640a31a9c846afd6c6a9d54.camel@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] RISC-V: KVM: provide UAPI for host SATP mode
-Content-Language: en-US
-To:     Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, Conor Dooley <conor.dooley@microchip.com>
-Cc:     anup@brainfault.org, atishp@atishpatra.org, ajones@ventanamicro.com
-References: <20230705091535.237765-1-dbarboza@ventanamicro.com>
-From:   Alexandre Ghiti <alex@ghiti.fr>
-In-Reply-To: <20230705091535.237765-1-dbarboza@ventanamicro.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ab3dea02892920cd6640a31a9c846afd6c6a9d54.camel@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jul 05, 2023 at 11:34:53AM +0000, Huang, Kai wrote:
 
-On 05/07/2023 11:15, Daniel Henrique Barboza wrote:
-> KVM userspaces need to be aware of the host SATP to allow them to
-> advertise it back to the guest OS.
->
-> Since this information is used to build the guest FDT we can't wait for
+> Yeah I think from long-term's view, since SEAMCALLs to support live migration
+> pretty much uses all RCX/RDX/R8-R15 as input/output, it seems reasonable to
+> unify all of them, although I guess there might be some special handling to
+> VP.VMCALL and/or VP.ENTER, e.g., below:
+> 
+>         /* TDVMCALL leaf return code is in R10 */                              
+>         movq %r10, %rax
+> 
+> So long-termly, I don't have objection to that.  But my thinking is for the
+> first version of TDX host support, we don't have to support all SEAMCALLs but
+> only those involved in basic TDX support. 
 
+Since those calls are out now, we should look at them now, there is no
+point in delaying the pain. That then gives us two options:
 
-The thing is the "mmu-type" property in the FDT is never used: the 
-kernel will probe the hardware and choose the largest available mode, or 
-use "no4lvl"/"no5lvl" from the command line to restrict this mode. And 
-FYI the current mode is exposed through cpuinfo. @Conor Can we deprecate 
-this node or something similar?
+ - we accept them and their wonky calling convention and our code should
+   be ready for it.
 
-Just a remark, not sure that helps :)
+ - we reject them and send the TDX team a message to please try again
+   but with a saner calling convention.
 
+Sticking our head in the sand and pretending like they don't exist isn't
+really a viable option at this point.
 
-> the SATP reg to be readable. We just need to read the SATP mode, thus
-> we can use the existing 'satp_mode' global that represents the SATP reg
-> with MODE set and both ASID and PPN cleared. E.g. for a 32 bit host
-> running with sv32 satp_mode is 0x80000000, for a 64 bit host running
-> sv57 satp_mode is 0xa000000000000000, and so on.
->
-> Add a new userspace virtual config register 'satp_mode' to allow
-> userspace to read the current SATP mode the host is using with
-> GET_ONE_REG API before spinning the vcpu.
->
-> 'satp_mode' can't be changed via KVM, so SET_ONE_REG is allowed as long
-> as userspace writes the existing 'satp_mode'.
->
-> Signed-off-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-> ---
->   arch/riscv/include/asm/csr.h      | 2 ++
->   arch/riscv/include/uapi/asm/kvm.h | 1 +
->   arch/riscv/kvm/vcpu.c             | 7 +++++++
->   3 files changed, 10 insertions(+)
->
-> diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
-> index b6acb7ed115f..be6e5c305e5b 100644
-> --- a/arch/riscv/include/asm/csr.h
-> +++ b/arch/riscv/include/asm/csr.h
-> @@ -46,6 +46,7 @@
->   #ifndef CONFIG_64BIT
->   #define SATP_PPN	_AC(0x003FFFFF, UL)
->   #define SATP_MODE_32	_AC(0x80000000, UL)
-> +#define SATP_MODE_SHIFT	31
->   #define SATP_ASID_BITS	9
->   #define SATP_ASID_SHIFT	22
->   #define SATP_ASID_MASK	_AC(0x1FF, UL)
-> @@ -54,6 +55,7 @@
->   #define SATP_MODE_39	_AC(0x8000000000000000, UL)
->   #define SATP_MODE_48	_AC(0x9000000000000000, UL)
->   #define SATP_MODE_57	_AC(0xa000000000000000, UL)
-> +#define SATP_MODE_SHIFT	60
->   #define SATP_ASID_BITS	16
->   #define SATP_ASID_SHIFT	44
->   #define SATP_ASID_MASK	_AC(0xFFFF, UL)
-> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-> index f92790c9481a..0493c078e64e 100644
-> --- a/arch/riscv/include/uapi/asm/kvm.h
-> +++ b/arch/riscv/include/uapi/asm/kvm.h
-> @@ -54,6 +54,7 @@ struct kvm_riscv_config {
->   	unsigned long marchid;
->   	unsigned long mimpid;
->   	unsigned long zicboz_block_size;
-> +	unsigned long satp_mode;
->   };
->   
->   /* CORE registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 8bd9f2a8a0b9..b31acf923802 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -313,6 +313,9 @@ static int kvm_riscv_vcpu_get_reg_config(struct kvm_vcpu *vcpu,
->   	case KVM_REG_RISCV_CONFIG_REG(mimpid):
->   		reg_val = vcpu->arch.mimpid;
->   		break;
-> +	case KVM_REG_RISCV_CONFIG_REG(satp_mode):
-> +		reg_val = satp_mode >> SATP_MODE_SHIFT;
-> +		break;
->   	default:
->   		return -EINVAL;
->   	}
-> @@ -395,6 +398,10 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
->   		else
->   			return -EBUSY;
->   		break;
-> +	case KVM_REG_RISCV_CONFIG_REG(satp_mode):
-> +		if (reg_val != (satp_mode >> SATP_MODE_SHIFT))
-> +			return -EINVAL;
-> +		break;
->   	default:
->   		return -EINVAL;
->   	}
+> Also, the new SEAMCALLs to handle live migration all seem to have below
+> statement:
+> 
+> 	AVX, AVX2	May be reset to the architectural INIT state
+> 	and
+> 	AVX512
+> 	state
+> 
+> Which means those SEAMCALLs need to preserve AVX* states too?
+
+Yes, we need to ensure the userspace 'FPU' state is saved before
+we call them. But I _think_ that KVM already does much of that.
+
+> And reading the spec, the VP.VMCALL and VP.ENTER also can use XMM0 - XMM15 as
+> input/output.  Linux VP.VMCALL seems doesn't support using XMM0 - XMM15 as
+> input/output, but KVM can run other guest OSes too so I think KVM VP.ENTER needs
+> to handle XMM0-XMM15 as input/output too.
+
+Why would KVM accept VMCALLs it doesn't know about? Just trash the
+guest and call it a day.
+
+> That being said, I think although we can provide a common asm macro to cover
+> VP.ENTER, I suspect KVM still needs to do additional assembly around the macro
+> too.  So I am not sure whether we should try to cover VP.ENTER.
+
+Not sure about asm, we have interfaces to save the XMM/AVX regs.
+kernel_fpu_begin() comes to mind, but I know there's more of that,
+including some for KVM specifically.
+
+> > I don't think they should be special, they're really just yet another
+> > leaf call. Yes, they have a shit calling convention, and yes VP.ENTER is
+> > terminally broken for unconditionally clobbering BP :-(
+> > 
+> > That really *must* be fixed.
+> 
+> Sure I don't have objection to this, and for VP.ENTER please see above.
+> 
+> But I'd like to say that, generally speaking, from virtualization's point of
+> view, guest has its own BP and conceptually the hypervisor needs to restore
+> guest's BP before jumping to the guest.  E.g., for normal VMX guest, KVM always
+> restores guest's BP before VMENTER (arch/x86/kvm/vmx/vmenter.S):
+> 
+> SYM_FUNC_START(__vmx_vcpu_run)
+>         push %_ASM_BP
+>         mov  %_ASM_SP, %_ASM_BP
+> 	
+> 	...
+> 	mov VCPU_RBP(%_ASM_AX), %_ASM_BP
+> 	...
+> 	vmenter/vmresume
+> 	...
+> SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
+> 	.....
+> 	mov %_ASM_BP, VCPU_RBP(%_ASM_AX)
+> 	...
+> 	pop %_ASM_BP
+>         RET
+
+That's disgusting :/ So what happens if we get an NMI after VMENTER and
+before POP? Then it sees a garbage BP value.
+
+Why is all this stuff such utter crap?
+
