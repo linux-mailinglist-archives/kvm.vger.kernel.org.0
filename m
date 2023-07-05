@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E70A87487D1
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 17:23:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEB6B748809
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 17:27:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232728AbjGEPXu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 11:23:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50764 "EHLO
+        id S233210AbjGEP1u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 11:27:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232731AbjGEPXs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 11:23:48 -0400
+        with ESMTP id S232425AbjGEP1p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 11:27:45 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9542E170B
-        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 08:23:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AE2719AB
+        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 08:27:38 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2C05B615F0
-        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 15:23:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8FCF5C433D9
-        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 15:23:46 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4556A615F2
+        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 15:27:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id ABD91C433CC
+        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 15:27:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688570626;
-        bh=EU0KAhxjqn+Ob0RyjLQpfA+2QBsokNpsCGuAxaQ+hak=;
+        s=k20201202; t=1688570857;
+        bh=4MuFxGvSTsOdfrWrgL+EE6BlSs/I8K+sTUbxq3UDGs4=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=SH9orV7bW28tWZcYHl8EjTnG3ryuEdiSTPFVNd3ROEw/wfuZhXL8xnitXn0AMlhS7
-         Z/Qab+KyGv4f/hbVU3VDgojpxhH7hAzp3dPNGRxanEY3NmaXLnGAMkKSMUb1FA4kId
-         2FPUHwhqa835Uk9EX4UOhCjkIjwFX394hfNqwCtufR7YKOl4m8a41ua9VHrufXS1BM
-         P4EAI9b6qvfynsS0n0A1C7DKZBVCNSjCMzcHN5EhZo+AMcvIhgJAHJqKMiASmB8AhC
-         GIeWIjXS0EbqS6m9ecZ4+lCYTGSLNdxkxmPLgrcbFzfJC3LbLrfrb7AmUYo4CA8+U0
-         Y27n2nSazJN6A==
+        b=RFlDN+WOyXp1I4xca6wo2qR/0KYcecZPb5QhqnIE0Epu4Q3HnPvflQwRh1Wew7Osh
+         TtswPxeKyqnnuaOKJBQ/gBae6BzGyeXxNw/zhb2rZclqN6pNc4tV3Zyvv0if2VhO2b
+         e9cdSanHfjdkow5L5MgxTk8h0ibB/wnU/meaGwTYn8bKENTmRgiqBjwNYIEsSkVrOE
+         D5/wojXla/zEa8D+chMtOhphrx0A0Eg3hhrakIjtwIW4fII5emwdhh6VAZW4y5UUX+
+         bm0Xi81l9Uxy8e8dOPPrpycOdNznTsBqd8x7qZn4uI8p2MUxtUi50iB//V0Zjrw3RW
+         JydySSZJHYlZg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 7F858C53BD4; Wed,  5 Jul 2023 15:23:46 +0000 (UTC)
+        id 9B5C7C53BD0; Wed,  5 Jul 2023 15:27:37 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     kvm@vger.kernel.org
 Subject: [Bug 217307] windows guest entering boot loop when nested
  virtualization enabled and hyperv installed
-Date:   Wed, 05 Jul 2023 15:23:46 +0000
+Date:   Wed, 05 Jul 2023 15:27:37 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -47,14 +47,14 @@ X-Bugzilla-Component: kvm
 X-Bugzilla-Version: unspecified
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: 780553323@qq.com
+X-Bugzilla-Who: webczat@outlook.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217307-28872-mEBH2fssCu@https.bugzilla.kernel.org/>
+Message-ID: <bug-217307-28872-KZcSwzuIhy@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-217307-28872@https.bugzilla.kernel.org/>
 References: <bug-217307-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -74,15 +74,18 @@ X-Mailing-List: kvm@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D217307
 
---- Comment #16 from Prob1d (780553323@qq.com) ---
-i7 9700 actually. Before switch to host mode, the config below also works f=
-or
-me.
-<cpu mode=3D'custom' match=3D'exact' check=3D'partial'>
- <model fallback=3D'allow'>Skylake-Client-noTSX-IBRS</model>
- <feature policy=3D'require' name=3D'hypervisor'/>
- <feature policy=3D'require' name=3D'vmx'/>
-</cpu>
+--- Comment #17 from Micha=C5=82 Zegan (webczat@outlook.com) ---
+well, no matter what problems you had before with nested virtualization,
+according to some forum posts I was reading lately it seems that my problem=
+ is
+something that exclusively affects 12th gen and above. and no toggling of
+features help, except features which would just disable nested virtualizati=
+on.
+sep, vme, vmx features when disabled make vm boot without hypervisor. Any o=
+ther
+combination results in boot loop, and i was even crazy enough to both disab=
+le
+and enable them one by one. nothing comes close to working.
 
 --=20
 You may reply to this email to add a comment.
