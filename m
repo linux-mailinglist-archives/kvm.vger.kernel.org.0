@@ -2,162 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 818D974828E
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 12:53:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA5777482CF
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 13:19:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232123AbjGEKxj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 06:53:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60540 "EHLO
+        id S231450AbjGELTx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 07:19:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231682AbjGEKxi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 06:53:38 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2DCBCE;
-        Wed,  5 Jul 2023 03:53:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688554417; x=1720090417;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=IBLKigB688l4z6znm/BvrWmSXP37deMHsQcHbbqjCj4=;
-  b=fqEEnzvajrUI/25RGHs4GC+xvSCiN/DIaqNP9oxCLnXWyDD0U1HKc5Q6
-   aqgxJsDZCrYF2OpmRe2T8kmy0NDuLWqWol8V8UnThK8BtOJT9P/m4A5eG
-   vvQF1z3sfOqeroqxFqfqGpBgTy59k3SmOtiUmvQ8845QhB98X7kIAlq7X
-   bn5zzem3JajPe4cg49sD/tNfyRYG9cWM7AJEM9xmsAyJF/wtLr7pOzoeQ
-   glnvsqxK2Ev8oDiUAvHFSmuzPiRIf4Yj4YH7ettv2g+2JubQi/6vWg5oT
-   EAXcJszx1/rsIYNVEx/1F18fgVpTRG+Ny5eVAprvL6sVNF6NKW4+7YoHC
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="394063290"
-X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="394063290"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 03:53:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="809217086"
-X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="809217086"
-Received: from jialinji-mobl4.ccr.corp.intel.com (HELO localhost) ([10.255.30.200])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 03:53:33 -0700
-Date:   Wed, 5 Jul 2023 18:53:43 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     David Stevens <stevensd@chromium.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Peter Xu <peterx@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v7 2/8] KVM: Introduce __kvm_follow_pfn function
-Message-ID: <20230705105343.iounmlflfued7lco@linux.intel.com>
-References: <20230704075054.3344915-1-stevensd@google.com>
- <20230704075054.3344915-3-stevensd@google.com>
- <20230705031002.xrxk42hli6oavtlt@linux.intel.com>
- <CAD=HUj6-VbznOOtn5WJee7Of_nh33ygg7_ph2G=hgnvNk_Cbsw@mail.gmail.com>
+        with ESMTP id S229697AbjGELTw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 07:19:52 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97775F2;
+        Wed,  5 Jul 2023 04:19:51 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 365BGmXq000681;
+        Wed, 5 Jul 2023 11:19:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=5iB3XX+PHP4NFnfsxzUoEdBSwjJaaEbKXMTVMTtUMLI=;
+ b=KA3NMkrtUWuZOCgH/FUu6uTyQxPKGRd51ROh5mtVJtDXbTIGaBA5j+krq2QFx0l9133U
+ uhq8ZqcTlvRsfo88gVTTE0bFJcgpXSxvSwOlFF1bLCtr1CIDMSG2vKOVkCnxE+r60Arl
+ YO+l3Ky/x4jWjaQBTPaOhnlz8E/6YdGTsqCiC8Zr/XA45+m84fTBBxYf2ORLZDxaSPjz
+ 9QNlGdPKY3iHVXha1hCqN4K4UH0Upy8ogzIngjk5xt8lrI6vvp1gNqnFsBg2N7nSH7yz
+ zRYhfREfTBJsa63TeOFHvIenxOgAxbb2vKhP5TXe38+RuGn7ooWjXRuO2g+KwLgdq7I0 AA== 
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rn7gq01xj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 05 Jul 2023 11:19:51 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3652dpG5015007;
+        Wed, 5 Jul 2023 11:19:48 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3rjbs4svdr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 05 Jul 2023 11:19:48 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 365BJhUu42140344
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 5 Jul 2023 11:19:43 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EFC042004E;
+        Wed,  5 Jul 2023 11:19:42 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 519C520043;
+        Wed,  5 Jul 2023 11:19:42 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.171.77.114])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed,  5 Jul 2023 11:19:42 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        frankja@linux.ibm.com, mhartmay@linux.ibm.com, nsg@linux.ibm.com,
+        borntraeger@de.ibm.com, nrb@linux.ibm.com
+Subject: [PATCH v2 0/2] KVM: s390: pv: fix two small bugs
+Date:   Wed,  5 Jul 2023 13:19:35 +0200
+Message-ID: <20230705111937.33472-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAD=HUj6-VbznOOtn5WJee7Of_nh33ygg7_ph2G=hgnvNk_Cbsw@mail.gmail.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: tgFn-rpdOXbJGb7pMLFc7rl0cfh2OLl6
+X-Proofpoint-GUID: tgFn-rpdOXbJGb7pMLFc7rl0cfh2OLl6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-05_02,2023-07-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 adultscore=0 spamscore=0
+ mlxlogscore=624 mlxscore=0 suspectscore=0 bulkscore=0 clxscore=1015
+ phishscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2305260000 definitions=main-2307050097
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 05, 2023 at 06:22:59PM +0900, David Stevens wrote:
-> On Wed, Jul 5, 2023 at 12:10 PM Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> >
-> > > @@ -2514,35 +2512,26 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
-> > >   * The slow path to get the pfn of the specified host virtual address,
-> > >   * 1 indicates success, -errno is returned if error is detected.
-> > >   */
-> > > -static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
-> > > -                        bool interruptible, bool *writable, kvm_pfn_t *pfn)
-> > > +static int hva_to_pfn_slow(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn)
-> > >  {
-> > > -     unsigned int flags = FOLL_HWPOISON;
-> > > +     unsigned int flags = FOLL_HWPOISON | FOLL_GET | foll->flags;
-> > >       struct page *page;
-> > >       int npages;
-> > >
-> > >       might_sleep();
-> > >
-> > > -     if (writable)
-> > > -             *writable = write_fault;
-> > > -
-> > > -     if (write_fault)
-> > > -             flags |= FOLL_WRITE;
-> > > -     if (async)
-> > > -             flags |= FOLL_NOWAIT;
-> > > -     if (interruptible)
-> > > -             flags |= FOLL_INTERRUPTIBLE;
-> > > -
-> > > -     npages = get_user_pages_unlocked(addr, 1, &page, flags);
-> > > +     npages = get_user_pages_unlocked(foll->hva, 1, &page, flags);
-> > >       if (npages != 1)
-> > >               return npages;
-> > >
-> > > +     foll->writable = (foll->flags & FOLL_WRITE) && foll->allow_write_mapping;
-> > > +
-> > >       /* map read fault as writable if possible */
-> > > -     if (unlikely(!write_fault) && writable) {
-> > > +     if (unlikely(!foll->writable) && foll->allow_write_mapping) {
-> >
-> > I guess !foll->writable should be !(foll->flags & FOLL_WRITE) here.
-> 
-> The two statements are logically equivalent, although I guess using
-> !(foll->flags & FOLL_WRITE) may be a little clearer, if a little more
-> verbose.
+This series fixes 2 small bugs introduced with asynchronous teardown.
 
-Well, as the comment says, we wanna try to map the read fault as writable
-whenever possible. And __gfn_to_pfn_memslot() will only set the FOLL_WRITE
-for write faults. So I guess using !foll->writable will not allow this.
-Did I miss anything?
+The first patch (unmodified since v1, but did not get any reviews)
+fixes a potential race that can cause crashes during shutdown on
+machines that don't support protected virtualization.
 
-> > > +kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
-> > > +                            bool atomic, bool interruptible, bool *async,
-> > > +                            bool write_fault, bool *writable, hva_t *hva)
-> > > +{
-> > > +     kvm_pfn_t pfn;
-> > > +     struct kvm_follow_pfn foll = {
-> > > +             .slot = slot,
-> > > +             .gfn = gfn,
-> > > +             .flags = 0,
-> > > +             .atomic = atomic,
-> > > +             .allow_write_mapping = !!writable,
-> > > +     };
-> > > +
-> > > +     if (write_fault)
-> > > +             foll.flags |= FOLL_WRITE;
-> > > +     if (async)
-> > > +             foll.flags |= FOLL_NOWAIT;
-> > > +     if (interruptible)
-> > > +             foll.flags |= FOLL_INTERRUPTIBLE;
-> > > +
-> > > +     pfn = __kvm_follow_pfn(&foll);
-> > > +     if (pfn == KVM_PFN_ERR_NEEDS_IO) {
-> >
-> > Could we just use KVM_PFN_ERR_FAULT and foll.flags here? I.e.,
-> >         if (pfn == KVM_PFN_ERR_FAULT && (foll.flags & FOLL_NOWAIT))?
-> > Setting pfn to KVM_PFN_ERR_NEEDS_IO just to indicate an async fault
-> > seems unnecessary.
-> 
-> There are the cases where the fault does not fall within a vma or when
-> the target vma's flags don't support the fault's access permissions.
-> In those cases, continuing to try to resolve the fault won't cause
-> problems per-se, but it's wasteful and a bit confusing. Having
-> hva_to_pfn detect whether or not it may be possible to resolve the
-> fault asynchronously and return KVM_PFN_ERR_NEEDS_IO if so seems like
-> a good idea. It also matches what the existing code does.
+The second patch adds a missing initialization when replacing the ASCE
+for a protected guest. This could potentially cause issues and crashes
+if lowcore is affected.
 
-Got it. Sounds reasonable. And thanks! :)
 
-B.R.
-Yu
+v1->v2:
+
+* added the second patch
+
+Claudio Imbrenda (2):
+  KVM: s390: pv: simplify shutdown and fix race
+  KVM: s390: pv: fix index value of replaced ASCE
+
+ arch/s390/kvm/pv.c  | 8 ++++++--
+ arch/s390/mm/gmap.c | 1 +
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+-- 
+2.41.0
+
