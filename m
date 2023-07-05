@@ -2,178 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 96D61748BD5
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 20:28:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCBCF748C0A
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 20:37:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232559AbjGES2d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 14:28:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56136 "EHLO
+        id S232699AbjGEShw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 14:37:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231811AbjGES2c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 14:28:32 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 766A8113
-        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 11:28:30 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-401f4408955so40301cf.1
-        for <kvm@vger.kernel.org>; Wed, 05 Jul 2023 11:28:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688581709; x=1691173709;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e8dndtCGBviDKso48620x/RRDlxyTnfI7vX9Z8Kirm4=;
-        b=qHerNChH5eP9A1oGMa/u9oWkmuCgznM2HVxsH+LjQhf818ADYLHImqByT6aQXQhInT
-         lsPnmURbNPO6fppcnuOnamesFjBJKNU2VjGsp7/zxpl38hCRF7pbMARmx/fH4RtrBMXV
-         lQCBcftHQe7vy8FS1hGBIKM2SVaXZc1yMDHJKL+p6iFTBjybLHnCmhC3ptpPAjUBADqF
-         3xClQ5mQkWbYUptl2dibTwnozlhBXkK1U0l3tZ6Z5T6JHE7q8ixwHU+MB8RFml50gCT1
-         uyWFL1uZ2eGNwS7NmGPjVfeFoLHTmgcENG6AZUnGhL3wV09Qm91ASD61v7QtiUdM7Tit
-         M5jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688581709; x=1691173709;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e8dndtCGBviDKso48620x/RRDlxyTnfI7vX9Z8Kirm4=;
-        b=ludJHt4BUnp629n71eTi2LvgN3Vr+sMYWGHy43YRaZ8xI10Dr7B0mLGL/uKTGP4Mwh
-         AqU8zMlGjL6JmgGTZe/EV7BA91DlOpdg+Ut3rwTVDPCHlPfQhkI84NXT8GYZy6BvEQU0
-         mgvuSC0PJgR3BnH3n0ARGSUIlrtionUMC2eGSWDgv/+OObjH+dNalzse4LzdAd8KznM/
-         DTzL5TBE0w17cs3rL3GWCg5uvZgz7esWv8Im5O3I1DdhBvgAfjxfkFIzhTf7KuhyF9Js
-         VY6jDYDJPFgUq+jGEspREfi1u0A2lxz8tTH1ZIRNWdXXFwUoxgzmL2hgdaVKQ/OXPp/Z
-         Q5wg==
-X-Gm-Message-State: ABy/qLZ/FJSLSrwMe0NjS7Dlh0UXo8PMOdyoGk0D/eTLK6yguHFxKzmx
-        HMuN+zaMc8tqAkeM/YMFpEf+Anz+NOWT/GzZSDOH0g==
-X-Google-Smtp-Source: APBJJlGb5UHuGR9v4dIzL9FTRyvRdUi3B9fkgynBbnAtVZ2X8ICkvXAlrTkWscrnk/Iu+8sDpm99vm1xuq8baNEkTO8=
-X-Received: by 2002:ac8:580b:0:b0:3ed:86f6:6eab with SMTP id
- g11-20020ac8580b000000b003ed86f66eabmr26383qtg.14.1688581709489; Wed, 05 Jul
- 2023 11:28:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230621175002.2832640-1-rananta@google.com> <20230621175002.2832640-8-rananta@google.com>
- <1fe280a7-0f10-e124-00aa-b137df722c33@redhat.com>
-In-Reply-To: <1fe280a7-0f10-e124-00aa-b137df722c33@redhat.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Wed, 5 Jul 2023 11:28:18 -0700
-Message-ID: <CAJHc60xQtjvVsWRE=w-pAioNJW6uh-qKuZz2wp6bkT=X4oCm5A@mail.gmail.com>
-Subject: Re: [RESEND PATCH v5 07/11] KVM: arm64: Define kvm_tlb_flush_vmid_range()
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S232445AbjGEShu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 14:37:50 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 497D8171E;
+        Wed,  5 Jul 2023 11:37:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LCkOvuZDv0V2cLfFPDPNVRAusgtdH0uW21sg93U4or5IHTNEoApeZnfbMaI1BWa4EBhd4xP0HMxAGsaCZA0YVKzlCZZHjaLIp7InHR1PweIXX4mUS07KQvXRnH6FNMwCDQx6POLdC5stCZVy6pvg0GLPWWXbdM/xS313CNtBJNKjMZDn6skfN2SHHxLbJ6Ppdef+zN62kF9wP6ptpSvwP/YNAn4aZiV2xT3moY7htHwiucecsaz7uDc1gFbdM+u/dPBqrY8cfCSKCh+VT8+uu2Z2Dqg4/AMu4T2vecUxA+gTo2exB2A6Q/ZvpVB343cDqa6GuZiuIsOhwo59InmZxA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r06oppFVdAW/1NyUnv/5OYhT+0VvRrG5SGx/NF5O6SM=;
+ b=bRNBHK0CaUMpfYU1GeEmoIDEr6pkRUyYalsMizuunfgr05nySi8l/nGDypHx0VB4zGfwKKo8Bd/X7d23XOBHrJYkTpaD+LFcCjRkLqwTR49GyUdpHjXxIPy9rk7D5vJ42yLEvkCxc+rLJtu+ID88k0TvKvlSx5YpU/0mIbhQG4xBMgLjW+/K7J+EvZ7oXns8VvDNidovxb0sLOw//Y9vVwINmJk3KU3RqOsI0+d1O1DxrwBVjZU2x4iout96f4i1vY7QPuwP98Ud11JZSKjQpSGEUkYx/U9YRkQ1ggoyfmsX7HrViRtHFj4ZylQwWOkD9N12pMsMg7Z++7sbluoDIw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r06oppFVdAW/1NyUnv/5OYhT+0VvRrG5SGx/NF5O6SM=;
+ b=QHuVhXDHm6MuboxDxbRnCITnp1K4CgDVL3V5PYW2BEEusFq9ZRygSwFZlUJr8HfmB9tzvZF+PH/el0QVeEgzcSdPzQCcjNnNf6EFDMDHzmZ5lhCLjPTwg4LEBuKmcYk/ju9fB0HxmYnWDUZCcvBEpDrErEffWtgNJR6+mMP/CCybfjnkjrXdyuRihnkxUksd2KjBc6Mdg1puOTR7WC7HghcEe3VfTvattyIZe2SUcx/xbjSL6qpWWM9K3hcIu0NJuMLHXHR3o01d4qJ2TknCjd3iPS8cfSa1Asx4XO6vVD4z0YdTo4sJA+jt+QgB+qG5EUyd64j2v3tjTLgIv3/+Wg==
+Received: from BY5PR12MB3763.namprd12.prod.outlook.com (2603:10b6:a03:1a8::24)
+ by BN9PR12MB5259.namprd12.prod.outlook.com (2603:10b6:408:100::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Wed, 5 Jul
+ 2023 18:37:42 +0000
+Received: from BY5PR12MB3763.namprd12.prod.outlook.com
+ ([fe80::8634:5f0e:cf09:a084]) by BY5PR12MB3763.namprd12.prod.outlook.com
+ ([fe80::8634:5f0e:cf09:a084%7]) with mapi id 15.20.6565.016; Wed, 5 Jul 2023
+ 18:37:42 +0000
+From:   Ankit Agrawal <ankita@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     Jason Gunthorpe <jgg@nvidia.com>,
+        Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+        Vikram Sethi <vsethi@nvidia.com>,
+        Andy Currid <ACurrid@nvidia.com>,
+        Alistair Popple <apopple@nvidia.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Dan Williams <danw@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v4 1/1] vfio/nvgpu: Add vfio pci variant module for grace
+ hopper
+Thread-Topic: [PATCH v4 1/1] vfio/nvgpu: Add vfio pci variant module for grace
+ hopper
+Thread-Index: AQHZpLaxSTuRkhXihUusFX/7jkP6ra+dRWYAgA3LksA=
+Date:   Wed, 5 Jul 2023 18:37:42 +0000
+Message-ID: <BY5PR12MB3763A67B9AEFC48BAAFA9C5AB02FA@BY5PR12MB3763.namprd12.prod.outlook.com>
+References: <20230622030720.19652-1-ankita@nvidia.com>
+ <20230626100106.2e3ddb14.alex.williamson@redhat.com>
+In-Reply-To: <20230626100106.2e3ddb14.alex.williamson@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY5PR12MB3763:EE_|BN9PR12MB5259:EE_
+x-ms-office365-filtering-correlation-id: fe8ccf89-aad7-41b5-85a9-08db7d86eb1c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 2/8sikv8oC8w2fXaWWWQ+W0vUord45XWoBDWElLSB1ZuGnQbK5jiawxZ8OBuh7NMmYEqIlR3xR9vte1AP7SkX4gcA7D7A0CPnIemZnsWRz6yB9aDaPfEOXDlaPwn9p1k6lTQRuVXz3cyBMbTPtI0/+GLpNrKikQ3Z8QEgUENhpDRs+qzWAgzJNmpMsYI1qKuwufOUVboA6Ph9NDqqTmklaoooRT/piBXZkvrkfid1KmE4AKxYeJ4mg+5wQohliexFIw4FfwCXOPwPYrKR6a61jyt1mYdleOhDhNsW2/RibXQwWc+2iijQ+COhBd3fXnkDSNy7aTaYHkyson30V+pE7ZsbkvLRb6ZsZt521WDxTX1gLsktBExsrRMmruFAV5PF9yETEVKKYijNGMWSNjKShKgf5W231Z5KfCfcYaJM3V/xFE7Cp/bY0i+aUiyTM05/3iBMr2b29b6IDkWWTpZbdRZKH88th5oMObkXmAGpzpmFQy5YjxkLtcdHOlF91jSNGSbCRILVv8JOGudRrmAFkcytJ52XdncPcdqZceMSoOmnd9ltsCIxkvbbmasULZiXJ4IVDcGbCrVYCcXZFS+m93fCZfgcwHioEZ7p0W4tWTRLrau8Fh6nEi/fp+1N7PA
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB3763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(346002)(136003)(39860400002)(376002)(451199021)(41300700001)(4744005)(478600001)(9686003)(38070700005)(54906003)(86362001)(38100700002)(7696005)(122000001)(71200400001)(4326008)(316002)(66946007)(33656002)(66556008)(66446008)(64756008)(66476007)(6916009)(76116006)(55016003)(8936002)(8676002)(2906002)(5660300002)(52536014)(186003)(6506007)(26005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?gEbLvzpWFz5h4T1dJXTa8AHQThjgrtpSPCjzUCg4DHO+XEY77i4KB+cvkn4k?=
+ =?us-ascii?Q?6+50JRTb+azcxygum5Ao8rZg1yFiXOvWm0lagMsCdK9xWyM9z+I9hokB7i9a?=
+ =?us-ascii?Q?N86+t5G3tZLOMbvqvXCL6EYmxgfcVJBPN2UzwdE23QrN3F/B7Sm6w3QmF8Rw?=
+ =?us-ascii?Q?Lj4CugP7VrorVLXd4QsT0oXRhu27yIS8ykfpy3/VVdsLmdA6aZbuXjQ4EEXa?=
+ =?us-ascii?Q?3+7WfUhY3RfZB3GLcr1dnWdrG8WThVoxU3xm9zAKsM5w4+2PHncugspUpZld?=
+ =?us-ascii?Q?dWV19FsBEHIIYl0Nxu55kBQhrv7xlAnqWoc+Qd/tsfI/60mPWToqjKm2ONa4?=
+ =?us-ascii?Q?qbqQglOU/Z/PuXTsbV63nWTS9OFulY0cqS1VAIxxtd0DTHw7mWymw0QJzdqZ?=
+ =?us-ascii?Q?9NNWUAGbLvq71Ckk26u8PvtwUetbfSGRryL2FvxFbReqieFuYpylUX5/Ane/?=
+ =?us-ascii?Q?aXdbVupg6UDLCih5iV9iORjWdopvrgyf7afcagWo9Cbhhurhr3Q3UC/uIx2z?=
+ =?us-ascii?Q?cxcaE4unHc7PLgB2Ra/8xH9f09b4SXqYD2/IFS6XG3fwJViFmwMT2CViKJYV?=
+ =?us-ascii?Q?MTz5JMoOALQbEvzxLUbV5quzgsIoqkWIPMw/p5RKrtgOssB5Lo0jV2i956bl?=
+ =?us-ascii?Q?PjFTJtB8GYSmY2NXkJvkdlKHl9skwlMoO/3Ec5rOFCUefHg5Vk8Uy8EiA5d4?=
+ =?us-ascii?Q?oFxPhADeEGIgiAD2z1rjrQL3JEVRGcZJulh1ndlJqlBniveGjPGTbP6ggGcl?=
+ =?us-ascii?Q?geKTk7xb/YAiUHqqwyNQK9VsAYwN9un5+sAt7nGi16YYCB0u7DlNAqPtO163?=
+ =?us-ascii?Q?RwaNN8Cs08mMi1yd9YQOb02T11oHy3PIAYEXviVuQENzdC00coqlcGALUvGh?=
+ =?us-ascii?Q?KOppAH/omqjw6R20p1+1rx/Jct7WRmLtTCwuWfnyOjPRGIsRMbHWXEjtw1PS?=
+ =?us-ascii?Q?1LcFhz1aWFC7i2bs3KZj0TWUDSEKdQL+nZJIad4HpTnELk0p+9Ia9wkczvZ3?=
+ =?us-ascii?Q?EX9czlvuY3QwMkpPQJCisNCpHHhcj3jtCZRRSitZSNUBsD8dcan0wzDy6ncD?=
+ =?us-ascii?Q?18Ywnu5umN4QUkCxA8FpwNI4lv1qhsy3I6nQQ0XkrG4i7Lpfjuw/IHjLL/uC?=
+ =?us-ascii?Q?2QdBZvF7AnZgcCz2IdlA7KBiMRNrdMoFTPxxbYyOUxIDELkntW0ZFrnQjDsj?=
+ =?us-ascii?Q?Gwt2cQQESbB3yHXtCMZ+iXD1iFr8WdRO6T55sjCbPy7bFMORHC5u6teASu2m?=
+ =?us-ascii?Q?TjotVOfNiwU7fYPg3x1d4ePSjqhF6MOP2hkDZCWcWz9atJq5iTHEbJPeQZXj?=
+ =?us-ascii?Q?UPyGY1/ZoPTXwVlB50e9R2db4xO7gzq5jNbK+TNkHvxUJF5lERNZEY2sfD8f?=
+ =?us-ascii?Q?b9ml2QTg1Wc++QnOb5X1/TYzD0j/7cM41321w2QW+KzCZCkfWO7/5mgu7d7s?=
+ =?us-ascii?Q?hh1DD9HXqyalM5Fpr99keVGLXnC6kAgq9Ke4Zh/ymLDo/4we5vVvMAglWjA4?=
+ =?us-ascii?Q?/OJteQQDtgljB+G7ZeKlEQEVuxRotlkKBTtlpriWPURgV3M33dlyHYqQmS0R?=
+ =?us-ascii?Q?BpDss+6yp5Eg7NEVHRxO7u78TIXTalmhg0sGteVH?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB3763.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe8ccf89-aad7-41b5-85a9-08db7d86eb1c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jul 2023 18:37:42.6238
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8/HMTcy7dnwHXUVWOle9GEoFkLsk3cDbWVl6f1LQ9X6vo2oq2Yk4Gj+IZ4da3R1hLZcOk6ZwyaZE+xk1Fv3M/g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5259
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 4, 2023 at 5:31=E2=80=AFPM Gavin Shan <gshan@redhat.com> wrote:
->
->
-> On 6/22/23 03:49, Raghavendra Rao Ananta wrote:
-> > Implement the helper kvm_tlb_flush_vmid_range() that acts
-> > as a wrapper for range-based TLB invalidations. For the
-> > given VMID, use the range-based TLBI instructions to do
-> > the job or fallback to invalidating all the TLB entries.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >   arch/arm64/include/asm/kvm_pgtable.h | 10 ++++++++++
-> >   arch/arm64/kvm/hyp/pgtable.c         | 20 ++++++++++++++++++++
-> >   2 files changed, 30 insertions(+)
-> >
->
-> It may be reasonable to fold this to PATCH[08/11] since kvm_tlb_flush_vmi=
-d_range() is
-> only called by ARM64's kvm_arch_flush_remote_tlbs_range(), which is added=
- by PATCH[08/11].
-> In either way, the changes look good to me:
->
-Ah, the patches 10 and 11 also call kvm_tlb_flush_vmid_range(), so
-probably it's better to keep the definition isolated?
+> I had also asked in the previous review whether "nvgpu" is already overus=
+ed.  I
+> see a python tool named nvgpu, an OpenXLA tool, various nvgpu things rela=
+ted
+> to Tegra, an nvgpu dialect for MLIR, etc.  There are over 5,000 hits on g=
+oogle for
+> "nvgpu", only a few of which reference development of this module.  Is th=
+ere a
+> more unique name we can use?  Thanks,
 
-Regards,
-Raghavendra
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
->
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/=
-asm/kvm_pgtable.h
-> > index 4cd6762bda805..1b12295a83595 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -682,4 +682,14 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(=
-kvm_pte_t pte);
-> >    *     kvm_pgtable_prot format.
-> >    */
-> >   enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
-> > +
-> > +/**
-> > + * kvm_tlb_flush_vmid_range() - Invalidate/flush a range of TLB entrie=
-s
-> > + *
-> > + * @mmu:     Stage-2 KVM MMU struct
-> > + * @addr:    The base Intermediate physical address from which to inva=
-lidate
-> > + * @size:    Size of the range from the base to invalidate
-> > + */
-> > +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-> > +                             phys_addr_t addr, size_t size);
-> >   #endif      /* __ARM64_KVM_PGTABLE_H__ */
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
-c
-> > index 3d61bd3e591d2..df8ac14d9d3d4 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -631,6 +631,26 @@ static bool stage2_has_fwb(struct kvm_pgtable *pgt=
-)
-> >       return !(pgt->flags & KVM_PGTABLE_S2_NOFWB);
-> >   }
-> >
-> > +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-> > +                             phys_addr_t addr, size_t size)
-> > +{
-> > +     unsigned long pages, inval_pages;
-> > +
-> > +     if (!system_supports_tlb_range()) {
-> > +             kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> > +             return;
-> > +     }
-> > +
-> > +     pages =3D size >> PAGE_SHIFT;
-> > +     while (pages > 0) {
-> > +             inval_pages =3D min(pages, MAX_TLBI_RANGE_PAGES);
-> > +             kvm_call_hyp(__kvm_tlb_flush_vmid_range, mmu, addr, inval=
-_pages);
-> > +
-> > +             addr +=3D inval_pages << PAGE_SHIFT;
-> > +             pages -=3D inval_pages;
-> > +     }
-> > +}
-> > +
-> >   #define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fw=
-b(pgt))
-> >
-> >   static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgt=
-able_prot prot,
->
-> Thanks,
-> Gavin
->
+Sorry, had missed this comment. Are you suggesting changing the module name
+or just reduce the number of times we use the nvgpu keyword in all the func=
+tions
+of the module? I don't see any in-tree or vfio-pci module with a similar *n=
+vgpu*
+name, and the clash appears to be with items outside of the kernel tree. Gi=
+ven
+that, should we still change the module name as nvgpu-vfio-pci sounds a rel=
+evant
+name here? Thanks.
