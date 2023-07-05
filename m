@@ -2,141 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B5931747EBF
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 09:58:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 036CD747F0D
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 10:08:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232202AbjGEH6x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 03:58:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33942 "EHLO
+        id S231571AbjGEIH7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 04:07:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229776AbjGEH6v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 03:58:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD92B133
-        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 00:58:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688543893;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DHyUUWj6BrRpeBXtGyi+Vo8u/2b6hcAsHGdukza2YEg=;
-        b=T/x/BfM8L7QipS11DQx5B6sgg6UOoI1PqYY/Jk5b3OBW9vjBciaoaLrPZftaEpigzj8GPG
-        Nrk6aENcQtlSTR5UwxuaD6gsDbetQ794oehGJE03op4sdTUOOGMLAFL/nvnLZVe5IqoMcz
-        xsNuIPySMDDlekDtZ2oq65mvQL9t6uM=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-449-J17wmQpQNT2Kp_7pi3ZGuw-1; Wed, 05 Jul 2023 03:58:09 -0400
-X-MC-Unique: J17wmQpQNT2Kp_7pi3ZGuw-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4031d923632so47739991cf.2
-        for <kvm@vger.kernel.org>; Wed, 05 Jul 2023 00:58:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688543889; x=1691135889;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DHyUUWj6BrRpeBXtGyi+Vo8u/2b6hcAsHGdukza2YEg=;
-        b=SxYKv4ILXwIMTw2udJLoFloMjOvDfd70HpKKeSSyIAyfHiWtq0wB3RUeMvRCkOeqJE
-         34DDCzc8Mi7SdtPrvgQo3UvUCgomhi+qb3dIXDV1tarXqCR50l31eJSkyeSgkGYLcx2+
-         SKcGjQMzxI5jw+N4IqXoFDHzXIZu5jbqjIue6WbdxRGOMCeScgyH5FM/GWRWBP/sld1L
-         DqkkoUVwSnad+B/2fOaxrReoR52QxrYOyxlgbkuFIYXhu2oAHO2UE6V8SXnwLudX7ldN
-         Nuvnb2aIcHmCt/XG8Ghl0ubWvHEN3Z71+szKQD29vijuz6ZY63Mab+j5oZnDPP/tSfts
-         9akQ==
-X-Gm-Message-State: AC+VfDzIOF/MV803M8h/nbdWJlVgWKN5RIhPazloaQvLPbiMZh5mTzbX
-        gvrczxFpO+piE00N71iOkM+Bqbt7nyv3DQ5YZF/laDEIgF56r6PuE+G1MYDiCmyg1NOcYXDXqvA
-        tPu+IjQIdUug3
-X-Received: by 2002:ac8:7e95:0:b0:400:a9db:f0cb with SMTP id w21-20020ac87e95000000b00400a9dbf0cbmr17119495qtj.12.1688543889322;
-        Wed, 05 Jul 2023 00:58:09 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4VuOMVWA8XBvaJxR0q5M6RwQbAsHqqk0YDI9u2J8ujXYh0h4xbzBgwyDXuEmGGcn2BnoZROQ==
-X-Received: by 2002:ac8:7e95:0:b0:400:a9db:f0cb with SMTP id w21-20020ac87e95000000b00400a9dbf0cbmr17119485qtj.12.1688543889007;
-        Wed, 05 Jul 2023 00:58:09 -0700 (PDT)
-Received: from [10.33.192.205] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id j11-20020ac85f8b000000b003fdec95e9c8sm7613863qta.83.2023.07.05.00.58.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Jul 2023 00:58:08 -0700 (PDT)
-Message-ID: <3d4d0349-45c1-28c7-1da1-3c66f03025a0@redhat.com>
-Date:   Wed, 5 Jul 2023 09:58:05 +0200
+        with ESMTP id S231992AbjGEIH4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 04:07:56 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 598AB123;
+        Wed,  5 Jul 2023 01:07:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688544475; x=1720080475;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Cn1WBv4JrMsrgoasE/lasO/n0SnRwlADo/SoWnSzf8M=;
+  b=H6nAxTJNgv7Mug2MwINb9R7fJ+dUEjWUth49iW5C0tbqncwQrpLMWCqc
+   kpa0T6eDc+GGGurircEYjoCQGIOQITwifUSsb+ExHcgIWscSsF+7Bzw/G
+   S+y1/mFEHNvQ7pYv63Zm/5AQeXeh8QuCh0TsmJ7V8B6tHb2GNpKk3srbw
+   eLy+al/5TYiavWE+8KQgRcTSw5DcnizUmpz7JuNyaEcqV/QZIDa+LiGFz
+   0lRCmO2ZGwn4IrcCfvKx3A5z0tJEuPWKUkeWy6hYZY3MPSNTmAOKIsJPE
+   C7MdVRw03s1BiIw69w/nSmHgeOxuJjOQ6tuQEOGMUOeGA7EpaJ1S7dG9J
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="343610815"
+X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
+   d="scan'208";a="343610815"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 01:07:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="669323671"
+X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
+   d="scan'208";a="669323671"
+Received: from jialinji-mobl4.ccr.corp.intel.com (HELO localhost) ([10.255.30.200])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 01:07:50 -0700
+Date:   Wed, 5 Jul 2023 16:07:56 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Peter Xu <peterx@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v7 4/8] KVM: x86/mmu: Migrate to __kvm_follow_pfn
+Message-ID: <20230705080756.xv7fm3jxewipunvn@linux.intel.com>
+References: <20230704075054.3344915-1-stevensd@google.com>
+ <20230704075054.3344915-5-stevensd@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v21 12/20] qapi/s390x/cpu topology: query-cpu-polarization
- qmp command
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230630091752.67190-1-pmorel@linux.ibm.com>
- <20230630091752.67190-13-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230630091752.67190-13-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230704075054.3344915-5-stevensd@google.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/06/2023 11.17, Pierre Morel wrote:
-> The query-cpu-polarization qmp command returns the current
-> CPU polarization of the machine.
+On Tue, Jul 04, 2023 at 04:50:49PM +0900, David Stevens wrote:
+> From: David Stevens <stevensd@chromium.org>
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Migrate from __gfn_to_pfn_memslot to __kvm_follow_pfn.
+> 
+> Signed-off-by: David Stevens <stevensd@chromium.org>
 > ---
->   qapi/machine-target.json | 29 +++++++++++++++++++++++++++++
->   hw/s390x/cpu-topology.c  |  8 ++++++++
->   2 files changed, 37 insertions(+)
+>  arch/x86/kvm/mmu/mmu.c | 35 +++++++++++++++++++++++++----------
+>  1 file changed, 25 insertions(+), 10 deletions(-)
 > 
-> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> index 1362e43983..1e4b8976aa 100644
-> --- a/qapi/machine-target.json
-> +++ b/qapi/machine-target.json
-> @@ -445,3 +445,32 @@
->     'features': [ 'unstable' ],
->     'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
->   }
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index ec169f5c7dce..e44ab512c3a1 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4296,7 +4296,12 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  {
+>  	struct kvm_memory_slot *slot = fault->slot;
+> -	bool async;
+> +	struct kvm_follow_pfn foll = {
+> +		.slot = slot,
+> +		.gfn = fault->gfn,
+> +		.flags = FOLL_GET | (fault->write ? FOLL_WRITE : 0),
+> +		.allow_write_mapping = true,
+> +	};
+>  
+>  	/*
+>  	 * Retry the page fault if the gfn hit a memslot that is being deleted
+> @@ -4325,12 +4330,14 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  			return RET_PF_EMULATE;
+>  	}
+>  
+> -	async = false;
+> -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
+> -					  fault->write, &fault->map_writable,
+> -					  &fault->hva);
+> -	if (!async)
+> -		return RET_PF_CONTINUE; /* *pfn has correct page already */
+> +	foll.flags |= FOLL_NOWAIT;
+> +	fault->pfn = __kvm_follow_pfn(&foll);
 > +
-> +##
-> +# @CpuPolarizationInfo:
-> +#
-> +# The result of a cpu polarization
-> +#
-> +# @polarization: the CPU polarization
-> +#
-> +# Since: 8.1
-> +##
-> +{ 'struct': 'CpuPolarizationInfo',
-> +  'data': { 'polarization': 'CpuS390Polarization' },
-> +  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
-> +}
+> +	if (!is_error_noslot_pfn(fault->pfn))
+> +		goto success;
 > +
-> +##
-> +# @query-cpu-polarization:
-> +#
-> +# Features:
-> +# @unstable: This command may still be modified.
-> +#
-> +# Returns: the machine polarization
-> +#
-> +# Since: 8.1
-> +##
-> +{ 'command': 'query-cpu-polarization', 'returns': 'CpuPolarizationInfo',
+> +	if (fault->pfn != KVM_PFN_ERR_NEEDS_IO)
+> +		return RET_PF_CONTINUE;
 
-Since this is very specific to s390x, I wonder whether we want to have a 
-"s390x" in the command name? 'query-s390x-cpu-polarization'? ... or is this 
-getting too long already?
+IIUC, FOLL_NOWAIT is set only when we wanna an async fault. So
+KVM_PFN_ERR_NEEDS_IO may not be necessary? 
 
-Anyway,
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
+B.R.
+Yu
