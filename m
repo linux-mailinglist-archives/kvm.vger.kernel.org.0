@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB988748C3B
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 20:54:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DCCA748CA0
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 21:00:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232684AbjGESyi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 14:54:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37736 "EHLO
+        id S233274AbjGETAj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 15:00:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229700AbjGESyg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 14:54:36 -0400
+        with ESMTP id S232938AbjGETAg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 15:00:36 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A49170B;
-        Wed,  5 Jul 2023 11:54:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 767611998;
+        Wed,  5 Jul 2023 12:00:20 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 246DC616D2;
-        Wed,  5 Jul 2023 18:54:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22E68C433C7;
-        Wed,  5 Jul 2023 18:54:21 +0000 (UTC)
-Date:   Wed, 5 Jul 2023 14:54:11 -0400
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1449D616D1;
+        Wed,  5 Jul 2023 19:00:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD2C4C433C8;
+        Wed,  5 Jul 2023 19:00:14 +0000 (UTC)
+Date:   Wed, 5 Jul 2023 15:00:13 -0400
 From:   Steven Rostedt <rostedt@goodmis.org>
 To:     Valentin Schneider <vschneid@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
@@ -67,12 +67,12 @@ Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
         Daniel Bristot de Oliveira <bristot@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH 02/14] tracing/filters: Enable filtering a cpumask
- field by another cpumask
-Message-ID: <20230705145411.33e1e173@gandalf.local.home>
-In-Reply-To: <20230705181256.3539027-3-vschneid@redhat.com>
+Subject: Re: [RFC PATCH 03/14] tracing/filters: Enable filtering a scalar
+ field by a cpumask
+Message-ID: <20230705150013.5ba7ddb8@gandalf.local.home>
+In-Reply-To: <20230705181256.3539027-4-vschneid@redhat.com>
 References: <20230705181256.3539027-1-vschneid@redhat.com>
-        <20230705181256.3539027-3-vschneid@redhat.com>
+        <20230705181256.3539027-4-vschneid@redhat.com>
 X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -86,21 +86,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  5 Jul 2023 19:12:44 +0100
+On Wed,  5 Jul 2023 19:12:45 +0100
 Valentin Schneider <vschneid@redhat.com> wrote:
 
-> +		/* Copy the cpulist between { and } */
-> +		tmp = kmalloc(i - maskstart + 1, GFP_KERNEL);
-> +		strncpy(tmp, str + maskstart, i - maskstart);
-> +		tmp[i - maskstart] = '\0';
-> +
+> +/* Optimisation of do_filter_cpumask() for scalar values */
+> +static inline int
+> +do_filter_cpumask_scalar(int op, unsigned int cpu, const struct cpumask *mask)
+> +{
+> +	switch (op) {
+> +	case OP_EQ:
+> +		return cpumask_equal(mask, cpumask_of(cpu));
+> +	case OP_NE:
+> +		return !cpumask_equal(mask, cpumask_of(cpu));
 
-You can replace the above with:
+The above two can be optimized much more if the cpu is a scalar. If mask is
+anything but a single CPU, then EQ will always be false, and NE will always
+be true. If the mask contains a single CPU, then we should convert the mask
+into the scalar CPU and just do:
 
-	tmp = kmalloc((i - maskstart) + 1, GFP_KERNEL);
-	strscpy(tmp, str + maskstart, (i - maskstart) + 1);
-
-As strscpy() adds the nul terminating character, not to mention that
-strncpy() is deprecated (see Documentation/process/deprecated.rst).
+	case OP_EQ:
+		return mask_cpu == cpu;
+	case op_NE:
+		return maks_cpu != cpu;
 
 -- Steve
+
+> +	case OP_BAND:
+> +		return cpumask_test_cpu(cpu, mask);
+> +	default:
+> +		return 0;
+> +	}
+> +}
