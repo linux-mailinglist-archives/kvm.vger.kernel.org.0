@@ -2,256 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4799E748BD7
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 20:28:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96D61748BD5
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 20:28:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232992AbjGES2v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 14:28:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55970 "EHLO
+        id S232559AbjGES2d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 14:28:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbjGES2t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 14:28:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DF4610B
-        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 11:27:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688581678;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DMZds0wi1UTsS0FUwNFQbHz46c8LCZrpEle71cju5wE=;
-        b=QNMu+lGQ7a9DgunzcF0lYJhYElnb0DZKe1xHXKELX1XQUB6ZIi2yDiFDvZZ7w+NZcZnAI9
-        BQNMDDGoQzso8VSCyUBcKIXcp5soUxprFstffnG0938iNldM1uHow226usFapmQzdw9/8X
-        mrVuK2QfC1xdvD2UqoSib27ECpROiKQ=
-Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
- [209.85.219.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-651-485GZCwBPyyQbjng8kTkCA-1; Wed, 05 Jul 2023 14:27:57 -0400
-X-MC-Unique: 485GZCwBPyyQbjng8kTkCA-1
-Received: by mail-yb1-f199.google.com with SMTP id 3f1490d57ef6-c56c5e61ae4so3049272276.0
-        for <kvm@vger.kernel.org>; Wed, 05 Jul 2023 11:27:57 -0700 (PDT)
+        with ESMTP id S231811AbjGES2c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 14:28:32 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 766A8113
+        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 11:28:30 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-401f4408955so40301cf.1
+        for <kvm@vger.kernel.org>; Wed, 05 Jul 2023 11:28:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688581709; x=1691173709;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e8dndtCGBviDKso48620x/RRDlxyTnfI7vX9Z8Kirm4=;
+        b=qHerNChH5eP9A1oGMa/u9oWkmuCgznM2HVxsH+LjQhf818ADYLHImqByT6aQXQhInT
+         lsPnmURbNPO6fppcnuOnamesFjBJKNU2VjGsp7/zxpl38hCRF7pbMARmx/fH4RtrBMXV
+         lQCBcftHQe7vy8FS1hGBIKM2SVaXZc1yMDHJKL+p6iFTBjybLHnCmhC3ptpPAjUBADqF
+         3xClQ5mQkWbYUptl2dibTwnozlhBXkK1U0l3tZ6Z5T6JHE7q8ixwHU+MB8RFml50gCT1
+         uyWFL1uZ2eGNwS7NmGPjVfeFoLHTmgcENG6AZUnGhL3wV09Qm91ASD61v7QtiUdM7Tit
+         M5jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688581676; x=1691173676;
+        d=1e100.net; s=20221208; t=1688581709; x=1691173709;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DMZds0wi1UTsS0FUwNFQbHz46c8LCZrpEle71cju5wE=;
-        b=kJj5hzvy6LxXOg0HeevwM0d8aIhTSr1idj+xn8a6LeK2H22TVP4oVbdFWP4Z/S3gHO
-         Lc0L4BfhgFFvpItjz/m48A0yfA09SwJBnr8lrYA5+QRV7UM7PEflyVZQwggjvaibJQd9
-         oA553FA7ouC7hyLPLZgpmtG0diiIHVZL0j4aZzDJverLU3tbSCXPS1OSnsrH8H+dpZ2Q
-         YxjFv5zxLNWNMF6gtMHGLemy0MYIPHKCXBrfZhJ2Qz4203+ed/mFsHmAqXprwlwSukDJ
-         ntk8QbLPQPiDujai51grDUGaMrkNWhRcX5pg7dCa90SPcE5QKrDwkSzL8j+rJW9UBUE9
-         FSmw==
-X-Gm-Message-State: ABy/qLbKP+K/n8nNVgRZPN71KcdaYEyKwTwUM8QY3kdNv6omU+QMBLy3
-        16xnlQtUvA0khHvQTomnO9tQu1XazX5BN6h/yOfh4Nf2VDcDMdpLaL9jHSj8WEpJPCo8f1IpXlw
-        K2ltg28Dcq7lG5CWYjtrTTQUym4xE2IHAeUp2
-X-Received: by 2002:a25:f309:0:b0:c4c:af97:d649 with SMTP id c9-20020a25f309000000b00c4caf97d649mr10261785ybs.38.1688581676301;
-        Wed, 05 Jul 2023 11:27:56 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGVD0/f72lvQQ/uCerfOmsg61RewbBZB6TMSt3T6GjJFk/CPDsxV8+Lpqdj2HFwruFhkb4i+8Y9uJXcQSftE0E=
-X-Received: by 2002:a25:f309:0:b0:c4c:af97:d649 with SMTP id
- c9-20020a25f309000000b00c4caf97d649mr10261773ybs.38.1688581676010; Wed, 05
- Jul 2023 11:27:56 -0700 (PDT)
+        bh=e8dndtCGBviDKso48620x/RRDlxyTnfI7vX9Z8Kirm4=;
+        b=ludJHt4BUnp629n71eTi2LvgN3Vr+sMYWGHy43YRaZ8xI10Dr7B0mLGL/uKTGP4Mwh
+         AqU8zMlGjL6JmgGTZe/EV7BA91DlOpdg+Ut3rwTVDPCHlPfQhkI84NXT8GYZy6BvEQU0
+         mgvuSC0PJgR3BnH3n0ARGSUIlrtionUMC2eGSWDgv/+OObjH+dNalzse4LzdAd8KznM/
+         DTzL5TBE0w17cs3rL3GWCg5uvZgz7esWv8Im5O3I1DdhBvgAfjxfkFIzhTf7KuhyF9Js
+         VY6jDYDJPFgUq+jGEspREfi1u0A2lxz8tTH1ZIRNWdXXFwUoxgzmL2hgdaVKQ/OXPp/Z
+         Q5wg==
+X-Gm-Message-State: ABy/qLZ/FJSLSrwMe0NjS7Dlh0UXo8PMOdyoGk0D/eTLK6yguHFxKzmx
+        HMuN+zaMc8tqAkeM/YMFpEf+Anz+NOWT/GzZSDOH0g==
+X-Google-Smtp-Source: APBJJlGb5UHuGR9v4dIzL9FTRyvRdUi3B9fkgynBbnAtVZ2X8ICkvXAlrTkWscrnk/Iu+8sDpm99vm1xuq8baNEkTO8=
+X-Received: by 2002:ac8:580b:0:b0:3ed:86f6:6eab with SMTP id
+ g11-20020ac8580b000000b003ed86f66eabmr26383qtg.14.1688581709489; Wed, 05 Jul
+ 2023 11:28:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
- <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
-In-Reply-To: <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Wed, 5 Jul 2023 20:27:19 +0200
-Message-ID: <CAJaqyWd0QC6x9WHBT0x9beZyC8ZrF2y=d9HvmT0+05RtGc8_og@mail.gmail.com>
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
- support it
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Shannon Nelson <shannon.nelson@amd.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+References: <20230621175002.2832640-1-rananta@google.com> <20230621175002.2832640-8-rananta@google.com>
+ <1fe280a7-0f10-e124-00aa-b137df722c33@redhat.com>
+In-Reply-To: <1fe280a7-0f10-e124-00aa-b137df722c33@redhat.com>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Wed, 5 Jul 2023 11:28:18 -0700
+Message-ID: <CAJHc60xQtjvVsWRE=w-pAioNJW6uh-qKuZz2wp6bkT=X4oCm5A@mail.gmail.com>
+Subject: Re: [RESEND PATCH v5 07/11] KVM: arm64: Define kvm_tlb_flush_vmid_range()
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 5, 2023 at 9:50=E2=80=AFAM Jason Wang <jasowang@redhat.com> wro=
-te:
+On Tue, Jul 4, 2023 at 5:31=E2=80=AFPM Gavin Shan <gshan@redhat.com> wrote:
 >
-> On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <mst@redhat.co=
-m> wrote:
+>
+> On 6/22/23 03:49, Raghavendra Rao Ananta wrote:
+> > Implement the helper kvm_tlb_flush_vmid_range() that acts
+> > as a wrapper for range-based TLB invalidations. For the
+> > given VMID, use the range-based TLBI instructions to do
+> > the job or fallback to invalidating all the TLB entries.
 > >
-> > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wrote:
-> > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirkin <mst@redha=
-t.com> wrote:
-> > > >
-> > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin wrot=
-e:
-> > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsirkin <mst@re=
-dhat.com> wrote:
-> > > > > >
-> > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=C3=A9rez wr=
-ote:
-> > > > > > > With the current code it is accepted as long as userland send=
- it.
-> > > > > > >
-> > > > > > > Although userland should not set a feature flag that has not =
-been
-> > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the current co=
-de will not
-> > > > > > > complain for it.
-> > > > > > >
-> > > > > > > Since there is no specific reason for any parent to reject th=
-at backend
-> > > > > > > feature bit when it has been proposed, let's control it at vd=
-pa frontend
-> > > > > > > level. Future patches may move this control to the parent dri=
-ver.
-> > > > > > >
-> > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFT=
-ER_DRIVER_OK backend feature")
-> > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > > > > >
-> > > > > > Please do send v3. And again, I don't want to send "after drive=
-r ok" hack
-> > > > > > upstream at all, I merged it in next just to give it some testi=
-ng.
-> > > > > > We want RING_ACCESS_AFTER_KICK or some such.
-> > > > > >
-> > > > >
-> > > > > Current devices do not support that semantic.
-> > > >
-> > > > Which devices specifically access the ring after DRIVER_OK but befo=
-re
-> > > > a kick?
-> > > >
-> > >
-> > > Previous versions of the QEMU LM series did a spurious kick to start
-> > > traffic at the LM destination [1]. When it was proposed, that spuriou=
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >   arch/arm64/include/asm/kvm_pgtable.h | 10 ++++++++++
+> >   arch/arm64/kvm/hyp/pgtable.c         | 20 ++++++++++++++++++++
+> >   2 files changed, 30 insertions(+)
+> >
+>
+> It may be reasonable to fold this to PATCH[08/11] since kvm_tlb_flush_vmi=
+d_range() is
+> only called by ARM64's kvm_arch_flush_remote_tlbs_range(), which is added=
+ by PATCH[08/11].
+> In either way, the changes look good to me:
+>
+Ah, the patches 10 and 11 also call kvm_tlb_flush_vmid_range(), so
+probably it's better to keep the definition isolated?
+
+Regards,
+Raghavendra
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/=
+asm/kvm_pgtable.h
+> > index 4cd6762bda805..1b12295a83595 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -682,4 +682,14 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(=
+kvm_pte_t pte);
+> >    *     kvm_pgtable_prot format.
+> >    */
+> >   enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
+> > +
+> > +/**
+> > + * kvm_tlb_flush_vmid_range() - Invalidate/flush a range of TLB entrie=
 s
-> > > kick was removed from the series because to check for descriptors
-> > > after driver_ok, even without a kick, was considered work of the
-> > > parent driver.
-> > >
-> > > I'm ok to go back to this spurious kick, but I'm not sure if the hw
-> > > will read the ring before the kick actually. I can ask.
-> > >
-> > > Thanks!
-> > >
-> > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/msg02775=
-.html
+> > + *
+> > + * @mmu:     Stage-2 KVM MMU struct
+> > + * @addr:    The base Intermediate physical address from which to inva=
+lidate
+> > + * @size:    Size of the range from the base to invalidate
+> > + */
+> > +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> > +                             phys_addr_t addr, size_t size);
+> >   #endif      /* __ARM64_KVM_PGTABLE_H__ */
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
+c
+> > index 3d61bd3e591d2..df8ac14d9d3d4 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -631,6 +631,26 @@ static bool stage2_has_fwb(struct kvm_pgtable *pgt=
+)
+> >       return !(pgt->flags & KVM_PGTABLE_S2_NOFWB);
+> >   }
 > >
-> > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, no?
->
-> My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
-> sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
->
-> But this reminds me one thing, as the thread is going too long, I
-> wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET is
-> supported?
->
-
-The problem with that is that the device needs to support all
-RING_RESET, like to be able to change vq address etc after DRIVER_OK.
-Not all HW support it.
-
-We just need the subset of having the dataplane freezed until all CVQ
-commands have been consumed. I'm sure current vDPA code already
-supports it in some devices, like MLX and PSD.
-
-Thanks!
-
-> Thanks
->
+> > +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> > +                             phys_addr_t addr, size_t size)
+> > +{
+> > +     unsigned long pages, inval_pages;
+> > +
+> > +     if (!system_supports_tlb_range()) {
+> > +             kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> > +             return;
+> > +     }
+> > +
+> > +     pages =3D size >> PAGE_SHIFT;
+> > +     while (pages > 0) {
+> > +             inval_pages =3D min(pages, MAX_TLBI_RANGE_PAGES);
+> > +             kvm_call_hyp(__kvm_tlb_flush_vmid_range, mmu, addr, inval=
+_pages);
+> > +
+> > +             addr +=3D inval_pages << PAGE_SHIFT;
+> > +             pages -=3D inval_pages;
+> > +     }
+> > +}
+> > +
+> >   #define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fw=
+b(pgt))
 > >
-> >
-> >
-> > > > > My plan was to convert
-> > > > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorry if=
- I
-> > > > > was not explicit enough.
-> > > > >
-> > > > > The only solution I can see to that is to trap & emulate in the v=
-dpa
-> > > > > (parent?) driver, as talked in virtio-comment. But that complicat=
-es
-> > > > > the architecture:
-> > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> > > > > * Store vq enable state separately, at
-> > > > > vdpa->config->set_vq_ready(true), but not transmit that enable to=
- hw
-> > > > > * Store the doorbell state separately, but do not configure it to=
- the
-> > > > > device directly.
-> > > > >
-> > > > > But how to recover if the device cannot configure them at kick ti=
-me,
-> > > > > for example?
-> > > > >
-> > > > > Maybe we can just fail if the parent driver does not support enab=
-ling
-> > > > > the vq after DRIVER_OK? That way no new feature flag is needed.
-> > > > >
-> > > > > Thanks!
-> > > > >
-> > > > > >
-> > > > > > > ---
-> > > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/linux=
-/kernel/git/mst
-> > > > > > > commit. Please let me know if I should send a v3 of [1] inste=
-ad.
-> > > > > > >
-> > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send-ema=
-il-mst@kernel.org/T/
-> > > > > > > ---
-> > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
-> > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > > > > > index e1abf29fed5b..a7e554352351 100644
-> > > > > > > --- a/drivers/vhost/vdpa.c
-> > > > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl(s=
-truct file *filep,
-> > > > > > >  {
-> > > > > > >       struct vhost_vdpa *v =3D filep->private_data;
-> > > > > > >       struct vhost_dev *d =3D &v->vdev;
-> > > > > > > +     const struct vdpa_config_ops *ops =3D v->vdpa->config;
-> > > > > > >       void __user *argp =3D (void __user *)arg;
-> > > > > > >       u64 __user *featurep =3D argp;
-> > > > > > > -     u64 features;
-> > > > > > > +     u64 features, parent_features =3D 0;
-> > > > > > >       long r =3D 0;
-> > > > > > >
-> > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
-> > > > > > >               if (copy_from_user(&features, featurep, sizeof(=
-features)))
-> > > > > > >                       return -EFAULT;
-> > > > > > > +             if (ops->get_backend_features)
-> > > > > > > +                     parent_features =3D ops->get_backend_fe=
-atures(v->vdpa);
-> > > > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
-> > > > > > >                                BIT_ULL(VHOST_BACKEND_F_SUSPEN=
-D) |
-> > > > > > >                                BIT_ULL(VHOST_BACKEND_F_RESUME=
-) |
-> > > > > > > -                              BIT_ULL(VHOST_BACKEND_F_ENABLE=
-_AFTER_DRIVER_OK)))
-> > > > > > > +                              parent_features))
-> > > > > > >                       return -EOPNOTSUPP;
-> > > > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND=
-)) &&
-> > > > > > >                    !vhost_vdpa_can_suspend(v))
-> > > > > > > --
-> > > > > > > 2.39.3
-> > > > > >
-> > > >
-> >
+> >   static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgt=
+able_prot prot,
 >
-
+> Thanks,
+> Gavin
+>
