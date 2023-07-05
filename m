@@ -2,250 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CD7B748F1E
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 22:43:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54846748F73
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 22:56:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233562AbjGEUn2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 16:43:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46214 "EHLO
+        id S230157AbjGEU44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 16:56:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232039AbjGEUn1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 16:43:27 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C363A19B;
-        Wed,  5 Jul 2023 13:43:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=2uvD9mYwUyQ82PXrNwiJR0+WRJM0PQCF8y2F5N/cONE=; b=djk8cOqXqggfU6Ml1I4iR48Y7x
-        K1cf8UXkaxjEDlwcadptEwEIaddtNIkZ0QgDE05z3bHQsFK/T5BZk/A8EptDgFhNmtZxPrwNXlvJV
-        XqR9O+Eu8jaR3tznarXclGqLXhttQm8PKIkMB2RlU+j6j7xs3SRhCNvr1dqBVjy/o/qjV7pqiuzx2
-        dq1/AwZbWVkovVvjc8c9ypAE/fOd7iZIGqbxgefCqqqOg7/4r8r9OHqD5LuscwVdfRwKLVQhf60Zi
-        Es6WF26h4jXaLqFM+2HbZbyO0rrMU+w7jsQZkzWgNUV3/3f7udrqYKcc3yQc5ERx5e65xwVlGsfrz
-        w+G8Gp6w==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qH9Jr-00CFZa-24;
-        Wed, 05 Jul 2023 20:41:50 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 32F36300023;
-        Wed,  5 Jul 2023 22:41:43 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 0F151200E5E98; Wed,  5 Jul 2023 22:41:43 +0200 (CEST)
-Date:   Wed, 5 Jul 2023 22:41:42 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Valentin Schneider <vschneid@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH 08/14] BROKEN: context_tracking: Make
- context_tracking_key __ro_after_init
-Message-ID: <20230705204142.GB2813335@hirez.programming.kicks-ass.net>
-References: <20230705181256.3539027-1-vschneid@redhat.com>
- <20230705181256.3539027-9-vschneid@redhat.com>
+        with ESMTP id S229532AbjGEU4y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 16:56:54 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED6CF11D;
+        Wed,  5 Jul 2023 13:56:53 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1b8b4749013so5803615ad.2;
+        Wed, 05 Jul 2023 13:56:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688590613; x=1691182613;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ovzEbDAGJ3+ZjzcYiibK38OFMjmG360mQnBH1xSJlPk=;
+        b=MqB/Cx7O1eM1d9pgvNMoEsucDpppcyx1oBo1eJOHnUH/YPkxddkx5hl0nZHaNFEI5c
+         G6ps1xaj4ET6AI9UAOkC08vDCnuoU/mCYSlutjyo55YiTgIId4xDh6OOhzRZF357P7Mw
+         9NoA7XRB6pVwOyxXzAScmJ0ktaQWLpntLhjDUD0rFzU9CGxVsuznMwjuIrq7/3X6x+2G
+         o455gZcnGVOoykXm6kNg2Efj5rRIc52hj1oRr9OmtjbV6PgJoooFgHb/pzvaw9JKho2B
+         Gf/hNeKmeJz6Zhz7ilOCVjkgwFPgeWPC8olAqtXzFYskQORQKSMO0l3RWQGHl6O9WPRW
+         e9qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688590613; x=1691182613;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ovzEbDAGJ3+ZjzcYiibK38OFMjmG360mQnBH1xSJlPk=;
+        b=T7fA2pVPkv++rp1UzxkEjP2DYKbjep8iGv5oX3xD8snNWBhHrAsQcVSLG0neYl/KXt
+         W/SiCWGLVEgAINhPjh31Fmxvx+lKA9ZkkFNZsx820Kw/LwUDbypLGFC1+ZOy+Icygni2
+         xMiahR9x3xHIJuqiPGGn/CppPuT2MXfPnuMf7n310hbKjS89SULPrvIQ69OqSBvRXl6I
+         B5kivNRTw/h1BV0MINOnqmdDcojIjxuQsfBWA6jNcb4Q3bUggTsr0w4H2v4rl98oCGIG
+         iQQBQUwwVYhGhs6VROxZDAfWaEZbV7mwX6e/zRKWDXrt9/1aU4+MQfW2ah4WBZZl9jIS
+         FL3w==
+X-Gm-Message-State: ABy/qLakjcFpBcfJHaEeFtiUy/bmmkWMBi3xRxq7a1Pr3btgF325tQgS
+        1jhw69oCojJbSQLMWAcHmrU=
+X-Google-Smtp-Source: APBJJlEeMt/Iu5iAHsjfGQ7mflNzscvdOd5j6NwpGC/RfdnC/J4hNkVbWBefWE+XhpRumWZ5+EOT3Q==
+X-Received: by 2002:a17:902:d486:b0:1b2:fa8:d9c9 with SMTP id c6-20020a170902d48600b001b20fa8d9c9mr59542plg.49.1688590613062;
+        Wed, 05 Jul 2023 13:56:53 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id x18-20020a170902ec9200b001b022f2aa12sm14405060plg.239.2023.07.05.13.56.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jul 2023 13:56:52 -0700 (PDT)
+Date:   Wed, 5 Jul 2023 13:56:50 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "peterz@infradead.org" <peterz@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "nik.borisov@suse.com" <nik.borisov@suse.com>,
+        "hpa@zytor.com" <hpa@zytor.com>, "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>, isaku.yamahata@gmail.com
+Subject: Re: [PATCH v12 20/22] x86/virt/tdx: Allow SEAMCALL to handle #UD and
+ #GP
+Message-ID: <20230705205650.GJ3436214@ls.amr.corp.intel.com>
+References: <20230628203823.GR38236@hirez.programming.kicks-ass.net>
+ <42e13ccf7f27a68c0dd64640eed378c38ef40967.camel@intel.com>
+ <20230630100659.GF2533791@hirez.programming.kicks-ass.net>
+ <20230630102141.GA2534364@hirez.programming.kicks-ass.net>
+ <20230630120650.GB2534364@hirez.programming.kicks-ass.net>
+ <fdd81fbd2424d8da04f98d156668cad5e73c740b.camel@intel.com>
+ <20230705102137.GX4253@hirez.programming.kicks-ass.net>
+ <ab3dea02892920cd6640a31a9c846afd6c6a9d54.camel@intel.com>
+ <20230705121921.GZ4253@hirez.programming.kicks-ass.net>
+ <3bef89e1bc5935625483cc5bf339c13f643c2c29.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230705181256.3539027-9-vschneid@redhat.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <3bef89e1bc5935625483cc5bf339c13f643c2c29.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 05, 2023 at 07:12:50PM +0100, Valentin Schneider wrote:
+On Wed, Jul 05, 2023 at 12:53:58PM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-> BROKEN: the struct static_key lives in a read-only mapping after
-> mark_rodata_ro(), which falls apart when the KVM module is loaded after
-> init and a write to the struct happens due to e.g. guest_state_exit_irqoff()
-> relying on the static key:
+> On Wed, 2023-07-05 at 14:19 +0200, Peter Zijlstra wrote:
+> > On Wed, Jul 05, 2023 at 11:34:53AM +0000, Huang, Kai wrote:
+> > 
+> > > Yeah I think from long-term's view, since SEAMCALLs to support live migration
+> > > pretty much uses all RCX/RDX/R8-R15 as input/output, it seems reasonable to
+> > > unify all of them, although I guess there might be some special handling to
+> > > VP.VMCALL and/or VP.ENTER, e.g., below:
+> > > 
+> > >         /* TDVMCALL leaf return code is in R10 */                              
+> > >         movq %r10, %rax
+> > > 
+> > > So long-termly, I don't have objection to that.  But my thinking is for the
+> > > first version of TDX host support, we don't have to support all SEAMCALLs but
+> > > only those involved in basic TDX support. 
+> > 
+> > Since those calls are out now, we should look at them now, there is no
+> > point in delaying the pain. That then gives us two options:
+> > 
+> >  - we accept them and their wonky calling convention and our code should
+> >    be ready for it.
+> > 
+> >  - we reject them and send the TDX team a message to please try again
+> >    but with a saner calling convention.
+> > 
+> > Sticking our head in the sand and pretending like they don't exist isn't
+> > really a viable option at this point.
+> 
+> OK.  I'll work on this.
+> 
+> But I think even we want to unify __tdx_module_call() and __tdx_hypercall(), the
+> first step should be making __tdx_module_call() look like __tdx_hypercall()?  I
+> mean from organizing patchset's point of view, we cannot just do in one big
+> patch but need to split into small patches with each doing one thing.
+> 
+> By thinking is perhaps we can organize this way:
+> 
+>  1) Patch(es) to make TDX_MODULE_CALL macro / __tdx_module_call() look like
+> __tdx_hypercall().
+>  2) Add SEAMCALL support based on TDX_MODULE_CALL, e.g., implement __seamcall().
+>  3) Unify __tdx_module_call()/__seamcall() with __tdx_hypercall().
+> 
+> Does this look good?
+> 
+> Btw, I've already part 1) based on your code, and sent the patches to Kirill for
+> review.  Should I sent them out first?
+> 
+> > 
+> > > Also, the new SEAMCALLs to handle live migration all seem to have below
+> > > statement:
+> > > 
+> > > 	AVX, AVX2	May be reset to the architectural INIT state
+> > > 	and
+> > > 	AVX512
+> > > 	state
+> > > 
+> > > Which means those SEAMCALLs need to preserve AVX* states too?
+> > 
+> > Yes, we need to ensure the userspace 'FPU' state is saved before
+> > we call them. But I _think_ that KVM already does much of that.
+> 
+> Let me look into this.
 
-Right.. so whoever added the whole ro_after_init jump_label support did
-a very poor job of it.
+KVM VCPU_RUN ioctl saves/restores FPU state by kvm_load_guest_fpu() and
+kvm_put_guest_fpu() which calls fpu_swap_kvm_fpstate().
+Other KVM ioctls doesn't modify FPU.  Because some SEAMCALLs related for live
+migration don't preserve FPU state, we need explicit save/restore of FPU state.
 
-That said; I think it is fixable. Since the key cannot be changed, we
-don't actually need to track the entries list and can thus avoid the key
-update.
-
-Something like the completely untested below...
-
----
-Subject: jump_label: Seal __ro_after_init keys
-
-When a static_key is marked ro_after_init, its state will never change
-(after init), therefore jump_label_update() will never need to iterate
-the entries, and thus module load won't actually need to track this --
-avoiding the static_key::next write.
-
-Therefore, mark these keys such that jump_label_add_module() might
-recognise them and avoid the modification.
-
-Use the special state: 'static_key_linked(key) && !static_key_mod(key)'
-to denote such keys.
-
-*UNTESTED*
-
-NOT-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
- include/asm-generic/sections.h |  5 +++++
- include/linux/jump_label.h     |  1 +
- init/main.c                    |  1 +
- kernel/jump_label.c            | 44 ++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 51 insertions(+)
-
-diff --git a/include/asm-generic/sections.h b/include/asm-generic/sections.h
-index db13bb620f52..c768de6f19a9 100644
---- a/include/asm-generic/sections.h
-+++ b/include/asm-generic/sections.h
-@@ -180,6 +180,11 @@ static inline bool is_kernel_rodata(unsigned long addr)
- 	       addr < (unsigned long)__end_rodata;
- }
- 
-+static inline bool is_kernel_ro_after_init(unsigned long addr)
-+{
-+	return addr >= (unsigned long)__start_ro_after_init &&
-+	       addr < (unsigned long)__end_ro_after_init;
-+}
- /**
-  * is_kernel_inittext - checks if the pointer address is located in the
-  *                      .init.text section
-diff --git a/include/linux/jump_label.h b/include/linux/jump_label.h
-index f0a949b7c973..88ef9e776af8 100644
---- a/include/linux/jump_label.h
-+++ b/include/linux/jump_label.h
-@@ -216,6 +216,7 @@ extern struct jump_entry __start___jump_table[];
- extern struct jump_entry __stop___jump_table[];
- 
- extern void jump_label_init(void);
-+extern void jump_label_ro(void);
- extern void jump_label_lock(void);
- extern void jump_label_unlock(void);
- extern void arch_jump_label_transform(struct jump_entry *entry,
-diff --git a/init/main.c b/init/main.c
-index ad920fac325c..cb5304ca18f4 100644
---- a/init/main.c
-+++ b/init/main.c
-@@ -1403,6 +1403,7 @@ static void mark_readonly(void)
- 		 * insecure pages which are W+X.
- 		 */
- 		rcu_barrier();
-+		jump_label_ro();
- 		mark_rodata_ro();
- 		rodata_test();
- 	} else
-diff --git a/kernel/jump_label.c b/kernel/jump_label.c
-index d9c822bbffb8..40fb72d79d7a 100644
---- a/kernel/jump_label.c
-+++ b/kernel/jump_label.c
-@@ -530,6 +530,46 @@ void __init jump_label_init(void)
- 	cpus_read_unlock();
- }
- 
-+static inline bool static_key_sealed(struct static_key *key)
-+{
-+	return (key->type & JUMP_TYPE_LINKED) && !(key->type & ~JUMP_TYPE_MASK);
-+}
-+
-+static inline void static_key_seal(struct static_key *key)
-+{
-+	unsigned long type = key->type & JUMP_TYPE_TRUE;
-+	key->type = JUMP_TYPE_LINKED | type;
-+}
-+
-+void jump_label_ro(void)
-+{
-+	struct jump_entry *iter_start = __start___jump_table;
-+	struct jump_entry *iter_stop = __stop___jump_table;
-+	struct static_key *key = NULL;
-+	struct jump_entry *iter;
-+
-+	if (WARN_ON_ONCE(!static_key_initialized))
-+		return;
-+
-+	cpus_read_lock();
-+	jump_label_lock();
-+
-+	for (iter = iter_start; iter < iter_stop; iter++) {
-+		struct static_key *iterk = jump_entry_key(iter);
-+
-+		if (!is_kernel_ro_after_init(iterk))
-+			continue;
-+
-+		if (static_key_sealed(iterk))
-+			continue;
-+
-+		static_key_seal(iterk);
-+	}
-+
-+	jump_label_unlock();
-+	cpus_read_unlock();
-+}
-+
- #ifdef CONFIG_MODULES
- 
- enum jump_label_type jump_label_init_type(struct jump_entry *entry)
-@@ -650,6 +690,9 @@ static int jump_label_add_module(struct module *mod)
- 			static_key_set_entries(key, iter);
- 			continue;
- 		}
-+		if (static_key_sealed(key))
-+			goto do_poke;
-+
- 		jlm = kzalloc(sizeof(struct static_key_mod), GFP_KERNEL);
- 		if (!jlm)
- 			return -ENOMEM;
-@@ -675,6 +718,7 @@ static int jump_label_add_module(struct module *mod)
- 		static_key_set_linked(key);
- 
- 		/* Only update if we've changed from our initial state */
-+do_poke:
- 		if (jump_label_type(iter) != jump_label_init_type(iter))
- 			__jump_label_update(key, iter, iter_stop, true);
- 	}
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
