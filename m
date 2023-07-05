@@ -2,155 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D169748096
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 11:15:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 426D97480BB
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 11:23:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232279AbjGEJPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 05:15:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43508 "EHLO
+        id S231250AbjGEJXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 05:23:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231533AbjGEJPm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 05:15:42 -0400
-Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ED7E1713
-        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 02:15:41 -0700 (PDT)
-Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-1b09276ed49so6057116fac.1
-        for <kvm@vger.kernel.org>; Wed, 05 Jul 2023 02:15:41 -0700 (PDT)
+        with ESMTP id S230434AbjGEJXN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 05:23:13 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E7E6E5
+        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 02:23:12 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b6ff1ada5dso6827921fa.2
+        for <kvm@vger.kernel.org>; Wed, 05 Jul 2023 02:23:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1688548540; x=1691140540;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WbwVyC6fOUxdMPZng6GXOKeTpMZw4Uea4VKPOQCS1kA=;
-        b=hoBRqNpxZLjhjng/wvEo1GY+oC9pDRblaGFYgrepCrMMWzyZEGZN8/tY+kS6kAVONe
-         1DUEQ8wF0HXMnWSPBqD7AiBrkw3J9p3CF8d1/6XD3m0rDYSR3xc6kiewP4do5ugZe8Ij
-         fBUpzBDkLHPjRzgfNtyiLxy/wKq+/zQyKRCLbI/DFJBYMXdbjgz1/Fmh3KdOiVnStgsa
-         TmE7L7+JL1M10IboIONEXvwqneMdrlou00fIvieX9YZ/81oF//GQW5OiNavYdyTmVc5J
-         v6GVFKzmiNKnCQZm0pUecLZv1tvrEJSrmU1o84k036yZ2Eckv9TEKgF3EpfgM6R48qFu
-         zUQw==
+        d=chromium.org; s=google; t=1688548990; x=1691140990;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hevL1MlnabH6U4eIyVNZqX1Q6T1jS/bGfgvHOxnvxFk=;
+        b=UjRgjsVBiY8D2AXveR2isxaEiF6+iOKVwJC0ezqlGCKd5u2QVdG+ntqDaxNfYIhHYh
+         7tH2XGdL93OCAOdZMYBp4jJVQHAKzpFSXh4XiPwkMuh2gMxkUrjGMC/CYge/PDTC6reF
+         FsTwGWH8uIYJu0RFz24ORez/tyH0bQ20ps1Vc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688548540; x=1691140540;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WbwVyC6fOUxdMPZng6GXOKeTpMZw4Uea4VKPOQCS1kA=;
-        b=KksrU7M89sDaPJnrCkENXDu6pCnPXJ47DOjquOe99f2lC6PthSCEysEt7LVMz9sJQr
-         6NUX2zkPH84XvYqZN0HyZK5aAeUvBS75vP6FtMn4ProLobbqEFRyvirjCyySvQ/jjSMg
-         fytbooxYWpybtiYW/JDMqH/Ff1hA5mS6PEhvtK0Ana1kILUvMjemzZn1hjZiRI03sqkc
-         ltINPRvlxjteZixWFRpmVW1VyHvOY3n5e9Um1g/srZjtLEWjPo1zCwAQljFKw+4GKnVp
-         8kEb9NsxNF9QhcVzCWHEZczZt3OM22yTUezPJvxcBTjdyNg1Yyd5LOWFaUyhEDCpkGaw
-         1YUg==
-X-Gm-Message-State: ABy/qLYzjFJ3USM33I9UjhTODztvzQ5BprwJgSRmcqgWfyOUSC1BtqqD
-        N+CpqN8iXjIjEa/9iMrp0tw5eQ==
-X-Google-Smtp-Source: ACHHUZ6P6BGgfJQ/l26Ogon7fmyXPy5Gtkf+9NSeBNJqUqQElHKeOCgNEcWp4DJV889yGyelvkfq3w==
-X-Received: by 2002:a05:6870:c192:b0:1b0:37cf:5af9 with SMTP id h18-20020a056870c19200b001b037cf5af9mr19169800oad.2.1688548540392;
-        Wed, 05 Jul 2023 02:15:40 -0700 (PDT)
-Received: from grind.. (201-69-66-110.dial-up.telesp.net.br. [201.69.66.110])
-        by smtp.gmail.com with ESMTPSA id s3-20020a4aa383000000b0055e489a7fdasm2637414ool.0.2023.07.05.02.15.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jul 2023 02:15:39 -0700 (PDT)
-From:   Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-To:     kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org
-Cc:     anup@brainfault.org, atishp@atishpatra.org,
-        ajones@ventanamicro.com,
-        Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-Subject: [PATCH] RISC-V: KVM: provide UAPI for host SATP mode
-Date:   Wed,  5 Jul 2023 06:15:35 -0300
-Message-ID: <20230705091535.237765-1-dbarboza@ventanamicro.com>
-X-Mailer: git-send-email 2.41.0
+        d=1e100.net; s=20221208; t=1688548990; x=1691140990;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hevL1MlnabH6U4eIyVNZqX1Q6T1jS/bGfgvHOxnvxFk=;
+        b=keYVOqHDdqi1x8tRMBTPjNfEFG+qTVbPemYscQol5QMX6uLrnaKIwp/lhQp2UBjKY/
+         yuYOvyhSOWozL59AqnQWQ9JYtgIHoamuHfZABqa3KDHi/T2nYabS1V+K8UKbUubzUOKX
+         CDiHYz7nG1RcvBRbMRjpBPDv44r0f0mHXuRCTaXHmWJb1qv3tII+xKwT1oNF/V/fFw5L
+         QiCABQF4PVtDTaXitTnjKx8ZeGzh5jRmN7TqA+zTw/WIEegq7eheOD9iWylD0TVVxZRT
+         IKfg+Lxtrh+wjjhWjAooO1ri5Aejn5BVBK84AdPY/J+G4zdTxyn5e3aMri2Jllw4A7oY
+         0eeQ==
+X-Gm-Message-State: ABy/qLZ+tWE6oxXmqCAS/2VcmxW9NiTM/ZX9nACySEo9qwBn5a3ibvOY
+        9fT29zduFheUK4QbJKpVMVYMq4RQ1wCJ/7iCOQ1iRw==
+X-Google-Smtp-Source: APBJJlHALNKpgop8uXo+YA22FSE0sRA/ZaoE9VV+TBwKPxNA104VYZCTQrddq5ETUv0WC+BnXxDNFCP/AZDkp5bMkgw=
+X-Received: by 2002:a05:651c:8e:b0:2b6:e283:32cb with SMTP id
+ 14-20020a05651c008e00b002b6e28332cbmr6846475ljq.23.1688548990474; Wed, 05 Jul
+ 2023 02:23:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-3-stevensd@google.com>
+ <20230705031002.xrxk42hli6oavtlt@linux.intel.com>
+In-Reply-To: <20230705031002.xrxk42hli6oavtlt@linux.intel.com>
+From:   David Stevens <stevensd@chromium.org>
+Date:   Wed, 5 Jul 2023 18:22:59 +0900
+Message-ID: <CAD=HUj6-VbznOOtn5WJee7Of_nh33ygg7_ph2G=hgnvNk_Cbsw@mail.gmail.com>
+Subject: Re: [PATCH v7 2/8] KVM: Introduce __kvm_follow_pfn function
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Peter Xu <peterx@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM userspaces need to be aware of the host SATP to allow them to
-advertise it back to the guest OS.
+On Wed, Jul 5, 2023 at 12:10=E2=80=AFPM Yu Zhang <yu.c.zhang@linux.intel.co=
+m> wrote:
+>
+> > @@ -2514,35 +2512,26 @@ static bool hva_to_pfn_fast(unsigned long addr,=
+ bool write_fault,
+> >   * The slow path to get the pfn of the specified host virtual address,
+> >   * 1 indicates success, -errno is returned if error is detected.
+> >   */
+> > -static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write=
+_fault,
+> > -                        bool interruptible, bool *writable, kvm_pfn_t =
+*pfn)
+> > +static int hva_to_pfn_slow(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn=
+)
+> >  {
+> > -     unsigned int flags =3D FOLL_HWPOISON;
+> > +     unsigned int flags =3D FOLL_HWPOISON | FOLL_GET | foll->flags;
+> >       struct page *page;
+> >       int npages;
+> >
+> >       might_sleep();
+> >
+> > -     if (writable)
+> > -             *writable =3D write_fault;
+> > -
+> > -     if (write_fault)
+> > -             flags |=3D FOLL_WRITE;
+> > -     if (async)
+> > -             flags |=3D FOLL_NOWAIT;
+> > -     if (interruptible)
+> > -             flags |=3D FOLL_INTERRUPTIBLE;
+> > -
+> > -     npages =3D get_user_pages_unlocked(addr, 1, &page, flags);
+> > +     npages =3D get_user_pages_unlocked(foll->hva, 1, &page, flags);
+> >       if (npages !=3D 1)
+> >               return npages;
+> >
+> > +     foll->writable =3D (foll->flags & FOLL_WRITE) && foll->allow_writ=
+e_mapping;
+> > +
+> >       /* map read fault as writable if possible */
+> > -     if (unlikely(!write_fault) && writable) {
+> > +     if (unlikely(!foll->writable) && foll->allow_write_mapping) {
+>
+> I guess !foll->writable should be !(foll->flags & FOLL_WRITE) here.
 
-Since this information is used to build the guest FDT we can't wait for
-the SATP reg to be readable. We just need to read the SATP mode, thus
-we can use the existing 'satp_mode' global that represents the SATP reg
-with MODE set and both ASID and PPN cleared. E.g. for a 32 bit host
-running with sv32 satp_mode is 0x80000000, for a 64 bit host running
-sv57 satp_mode is 0xa000000000000000, and so on.
+The two statements are logically equivalent, although I guess using
+!(foll->flags & FOLL_WRITE) may be a little clearer, if a little more
+verbose.
 
-Add a new userspace virtual config register 'satp_mode' to allow
-userspace to read the current SATP mode the host is using with
-GET_ONE_REG API before spinning the vcpu.
+> >               struct page *wpage;
+> >
+> > -             if (get_user_page_fast_only(addr, FOLL_WRITE, &wpage)) {
+> > -                     *writable =3D true;
+> > +             if (get_user_page_fast_only(foll->hva, FOLL_WRITE, &wpage=
+)) {
+> > +                     foll->writable =3D true;
+> >                       put_page(page);
+> >                       page =3D wpage;
+> >               }
+> > @@ -2572,23 +2561,23 @@ static int kvm_try_get_pfn(kvm_pfn_t pfn)
+> >       return get_page_unless_zero(page);
+> >  }
+> >
+> ...
+>
+> > +kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn=
+_t gfn,
+> > +                            bool atomic, bool interruptible, bool *asy=
+nc,
+> > +                            bool write_fault, bool *writable, hva_t *h=
+va)
+> > +{
+> > +     kvm_pfn_t pfn;
+> > +     struct kvm_follow_pfn foll =3D {
+> > +             .slot =3D slot,
+> > +             .gfn =3D gfn,
+> > +             .flags =3D 0,
+> > +             .atomic =3D atomic,
+> > +             .allow_write_mapping =3D !!writable,
+> > +     };
+> > +
+> > +     if (write_fault)
+> > +             foll.flags |=3D FOLL_WRITE;
+> > +     if (async)
+> > +             foll.flags |=3D FOLL_NOWAIT;
+> > +     if (interruptible)
+> > +             foll.flags |=3D FOLL_INTERRUPTIBLE;
+> > +
+> > +     pfn =3D __kvm_follow_pfn(&foll);
+> > +     if (pfn =3D=3D KVM_PFN_ERR_NEEDS_IO) {
+>
+> Could we just use KVM_PFN_ERR_FAULT and foll.flags here? I.e.,
+>         if (pfn =3D=3D KVM_PFN_ERR_FAULT && (foll.flags & FOLL_NOWAIT))?
+> Setting pfn to KVM_PFN_ERR_NEEDS_IO just to indicate an async fault
+> seems unnecessary.
 
-'satp_mode' can't be changed via KVM, so SET_ONE_REG is allowed as long
-as userspace writes the existing 'satp_mode'.
+There are the cases where the fault does not fall within a vma or when
+the target vma's flags don't support the fault's access permissions.
+In those cases, continuing to try to resolve the fault won't cause
+problems per-se, but it's wasteful and a bit confusing. Having
+hva_to_pfn detect whether or not it may be possible to resolve the
+fault asynchronously and return KVM_PFN_ERR_NEEDS_IO if so seems like
+a good idea. It also matches what the existing code does.
 
-Signed-off-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
----
- arch/riscv/include/asm/csr.h      | 2 ++
- arch/riscv/include/uapi/asm/kvm.h | 1 +
- arch/riscv/kvm/vcpu.c             | 7 +++++++
- 3 files changed, 10 insertions(+)
-
-diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
-index b6acb7ed115f..be6e5c305e5b 100644
---- a/arch/riscv/include/asm/csr.h
-+++ b/arch/riscv/include/asm/csr.h
-@@ -46,6 +46,7 @@
- #ifndef CONFIG_64BIT
- #define SATP_PPN	_AC(0x003FFFFF, UL)
- #define SATP_MODE_32	_AC(0x80000000, UL)
-+#define SATP_MODE_SHIFT	31
- #define SATP_ASID_BITS	9
- #define SATP_ASID_SHIFT	22
- #define SATP_ASID_MASK	_AC(0x1FF, UL)
-@@ -54,6 +55,7 @@
- #define SATP_MODE_39	_AC(0x8000000000000000, UL)
- #define SATP_MODE_48	_AC(0x9000000000000000, UL)
- #define SATP_MODE_57	_AC(0xa000000000000000, UL)
-+#define SATP_MODE_SHIFT	60
- #define SATP_ASID_BITS	16
- #define SATP_ASID_SHIFT	44
- #define SATP_ASID_MASK	_AC(0xFFFF, UL)
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-index f92790c9481a..0493c078e64e 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -54,6 +54,7 @@ struct kvm_riscv_config {
- 	unsigned long marchid;
- 	unsigned long mimpid;
- 	unsigned long zicboz_block_size;
-+	unsigned long satp_mode;
- };
- 
- /* CORE registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 8bd9f2a8a0b9..b31acf923802 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -313,6 +313,9 @@ static int kvm_riscv_vcpu_get_reg_config(struct kvm_vcpu *vcpu,
- 	case KVM_REG_RISCV_CONFIG_REG(mimpid):
- 		reg_val = vcpu->arch.mimpid;
- 		break;
-+	case KVM_REG_RISCV_CONFIG_REG(satp_mode):
-+		reg_val = satp_mode >> SATP_MODE_SHIFT;
-+		break;
- 	default:
- 		return -EINVAL;
- 	}
-@@ -395,6 +398,10 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
- 		else
- 			return -EBUSY;
- 		break;
-+	case KVM_REG_RISCV_CONFIG_REG(satp_mode):
-+		if (reg_val != (satp_mode >> SATP_MODE_SHIFT))
-+			return -EINVAL;
-+		break;
- 	default:
- 		return -EINVAL;
- 	}
--- 
-2.41.0
-
+-David
