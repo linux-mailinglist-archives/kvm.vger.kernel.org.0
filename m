@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DCCA748CA0
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 21:00:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 622FE748CDB
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 21:04:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233274AbjGETAj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 15:00:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39702 "EHLO
+        id S233677AbjGETEb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 15:04:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232938AbjGETAg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 15:00:36 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 767611998;
-        Wed,  5 Jul 2023 12:00:20 -0700 (PDT)
+        with ESMTP id S233572AbjGETDt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 15:03:49 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 007AB1BF9;
+        Wed,  5 Jul 2023 12:03:35 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1449D616D1;
-        Wed,  5 Jul 2023 19:00:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD2C4C433C8;
-        Wed,  5 Jul 2023 19:00:14 +0000 (UTC)
-Date:   Wed, 5 Jul 2023 15:00:13 -0400
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 54AFC616EF;
+        Wed,  5 Jul 2023 19:03:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E719DC433C9;
+        Wed,  5 Jul 2023 19:03:29 +0000 (UTC)
+Date:   Wed, 5 Jul 2023 15:03:28 -0400
 From:   Steven Rostedt <rostedt@goodmis.org>
 To:     Valentin Schneider <vschneid@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
@@ -67,18 +67,17 @@ Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
         Daniel Bristot de Oliveira <bristot@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH 03/14] tracing/filters: Enable filtering a scalar
- field by a cpumask
-Message-ID: <20230705150013.5ba7ddb8@gandalf.local.home>
-In-Reply-To: <20230705181256.3539027-4-vschneid@redhat.com>
+Subject: Re: [RFC PATCH 00/14] context_tracking,x86: Defer some IPIs until a
+ user->kernel transition
+Message-ID: <20230705150328.16791f25@gandalf.local.home>
+In-Reply-To: <20230705181256.3539027-1-vschneid@redhat.com>
 References: <20230705181256.3539027-1-vschneid@redhat.com>
-        <20230705181256.3539027-4-vschneid@redhat.com>
 X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,34 +85,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  5 Jul 2023 19:12:45 +0100
+On Wed,  5 Jul 2023 19:12:42 +0100
 Valentin Schneider <vschneid@redhat.com> wrote:
 
-> +/* Optimisation of do_filter_cpumask() for scalar values */
-> +static inline int
-> +do_filter_cpumask_scalar(int op, unsigned int cpu, const struct cpumask *mask)
-> +{
-> +	switch (op) {
-> +	case OP_EQ:
-> +		return cpumask_equal(mask, cpumask_of(cpu));
-> +	case OP_NE:
-> +		return !cpumask_equal(mask, cpumask_of(cpu));
+> o Patches 1-5 have been submitted previously and are included for the sake of
+>   testing
 
-The above two can be optimized much more if the cpu is a scalar. If mask is
-anything but a single CPU, then EQ will always be false, and NE will always
-be true. If the mask contains a single CPU, then we should convert the mask
-into the scalar CPU and just do:
+I should have commented on the previous set, but I did my review on this set ;-)
 
-	case OP_EQ:
-		return mask_cpu == cpu;
-	case op_NE:
-		return maks_cpu != cpu;
+Anyway, I'm all for the patches. Care to send a new version covering my input?
+
+Thanks,
 
 -- Steve
-
-> +	case OP_BAND:
-> +		return cpumask_test_cpu(cpu, mask);
-> +	default:
-> +		return 0;
-> +	}
-> +}
