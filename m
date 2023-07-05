@@ -2,85 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DBA1747FF4
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 10:43:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E76E747FF6
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 10:43:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231658AbjGEInK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 04:43:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58440 "EHLO
+        id S231879AbjGEInQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 04:43:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232070AbjGEImo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 04:42:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93A5ACA
-        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 01:41:54 -0700 (PDT)
+        with ESMTP id S232283AbjGEInA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 04:43:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CD291719
+        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 01:42:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688546513;
+        s=mimecast20190719; t=1688546531;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=wdNrP8dfk3Kph9Hz/PClECdrtpW1/BqpQGymcbZPeJ8=;
-        b=W6iHMrXE6SvxArQx6gS6Yx1ikNqtH4+3xVZGassn+8syAofGxRyi5z7kN1hrxxNFEPkx4j
-        Iqz1oEKftmBSIdeR454bIwrfeDptXpf9WdY+EtlkdPPSV9Bk4iLCZQmj/3UBZuOTPxyXWl
-        Di0GgsMw+hIT4kgp1HMbGrUlPBdT1eo=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=zOQW6ytwkNKpldl4Gwcyl0hiPfFRDq2NpyrhoTMoIf4=;
+        b=FoY5G3W9kTObHvdMs3r5St+TC6PX/qiJM/jTWpHFaVQF8ps5GE8uOiFUej6Nm6j2S1YWXD
+        +pm/AgW1wb/ELWSVntztwRgeq0hEAv/cBKQlTzW64etOyJAieMdkhKXPlRO9H7u63nZD/j
+        fBqO0gFCdtKw/a62r6v3dzcDqDu3aQs=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-561-X9qUQebwNbG-sxRP-1Mn-w-1; Wed, 05 Jul 2023 04:41:49 -0400
-X-MC-Unique: X9qUQebwNbG-sxRP-1Mn-w-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-765de3a3404so764055585a.2
-        for <kvm@vger.kernel.org>; Wed, 05 Jul 2023 01:41:49 -0700 (PDT)
+ us-mta-622-Gu0-P5ooPaeGXvaiUM1NEw-1; Wed, 05 Jul 2023 04:42:08 -0400
+X-MC-Unique: Gu0-P5ooPaeGXvaiUM1NEw-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-4edc7406cbaso6438878e87.2
+        for <kvm@vger.kernel.org>; Wed, 05 Jul 2023 01:42:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688546509; x=1691138509;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1688546527; x=1691138527;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wdNrP8dfk3Kph9Hz/PClECdrtpW1/BqpQGymcbZPeJ8=;
-        b=ENXUfm2Bq3UgyWPnhHDg8+VZcH5cs9Q11DcQRncRwOpjJdGjc4KaVHCqs3xQqP31M6
-         Y3j4RS5SJyTdDCk+YCBHxT+2vmqpDfhPoWk35jJDyi3BentlhhQgmB/Mv6NNzP4/xQBr
-         J9Yd7HEtB7R6Vxd9vFTiANyvd+bhU+IJ2M+WxVxPybfCC9uJ//tZQS9XJr/367s9hCsX
-         3TKxmdqwZdZNOixy3coHDsxqOCv5+nJaq+65iC9rHR4+WG2iTMmvCplMp2++R+hQBmU5
-         7ct3PKesvbrLAvhJg7K2rCB1rcGfrsE1QNYrhWxrHPL9Z8dWkKKcmWDTyf2wwHdBJUzU
-         bvgw==
-X-Gm-Message-State: AC+VfDwQ+DNCbD9DpcswTHN0ciwgwNZrFVqDJEUuKIVvl5l3EBTAbh/J
-        Gtc7CM+ksAUomS028HPS3wzTOvLn8i2D/s9seCCvcv2uf27Zm3MH6Ra9TGGYAON1nbLtvQa+Toi
-        KeWcd5vYdwmoG
-X-Received: by 2002:ae9:df81:0:b0:767:2bbc:fcc7 with SMTP id t123-20020ae9df81000000b007672bbcfcc7mr14631356qkf.14.1688546508916;
-        Wed, 05 Jul 2023 01:41:48 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ71CaVCRrRR6rAohpxhb22V8YOaZAWx/3GRQchHhTTXWU9kQNAREmhAA45MAu/KGLSqmAabOA==
-X-Received: by 2002:ae9:df81:0:b0:767:2bbc:fcc7 with SMTP id t123-20020ae9df81000000b007672bbcfcc7mr14631339qkf.14.1688546508543;
-        Wed, 05 Jul 2023 01:41:48 -0700 (PDT)
-Received: from [10.33.192.205] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id t2-20020a05620a034200b007674f5c3fcdsm5334544qkm.23.2023.07.05.01.41.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Jul 2023 01:41:47 -0700 (PDT)
-Message-ID: <a4fe8fe8-c71e-931b-b86b-94c8673c3236@redhat.com>
-Date:   Wed, 5 Jul 2023 10:41:44 +0200
+        bh=zOQW6ytwkNKpldl4Gwcyl0hiPfFRDq2NpyrhoTMoIf4=;
+        b=kMBUbpI+AjBGWcGMGCU3CiexejiLyFYnYrwbxm3vkxOoNEFUJdGRv+RiIR/VmVKHKR
+         SIQXBrhpy4oRKjfLFeHX3OJnza9avtiUKExqr2Kfxae+WqjJPHaZuNJtZY1/vAze812B
+         T6z0cgZ9ut5aVSoq+szv3WZ9hPzc84LzLEpUn78AocWbnZQfp4aMXUPcftSNxlxhdB7H
+         PQmOBX+AsX2mDk68rtm2avq8agh6YhLKS9wZOiEJGDGq0QXVMYld/ZaFr1eQ5CdogK/t
+         f0t/x4EdVqydRsTVSUMbdUX8BTuVlhkeopJ2i2M7q4kkqobrKtl+Ut6PkBIrUvHWamRC
+         T+ZQ==
+X-Gm-Message-State: ABy/qLYeB+OsEA/f17rRkfm4Q2pc6JGH0cdNjgai43/3/C5e5hwDaKJo
+        h1LUwAGxCwM0EFZlR/hFfPT3FY97y9WO4zcRxDyAd64rRToQoywqS6HCbUILJuxObgAuBsZtEVR
+        qrXOJ58Gt6Btm
+X-Received: by 2002:a05:6512:3b9c:b0:4f8:5960:49a9 with SMTP id g28-20020a0565123b9c00b004f8596049a9mr14003101lfv.23.1688546527015;
+        Wed, 05 Jul 2023 01:42:07 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlG/H5pfmSsFn72wPJaF6gCY5W2vcZpPs+es/4FECw46OZpiDrini6ap0HCP3FDgbIRy+g5z/A==
+X-Received: by 2002:a05:6512:3b9c:b0:4f8:5960:49a9 with SMTP id g28-20020a0565123b9c00b004f8596049a9mr14003085lfv.23.1688546526663;
+        Wed, 05 Jul 2023 01:42:06 -0700 (PDT)
+Received: from redhat.com ([2.52.13.33])
+        by smtp.gmail.com with ESMTPSA id p23-20020a1c7417000000b003fbb5506e54sm1460129wmc.29.2023.07.05.01.42.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jul 2023 01:42:06 -0700 (PDT)
+Date:   Wed, 5 Jul 2023 04:42:02 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Eugenio Perez Martin <eperezma@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Shannon Nelson <shannon.nelson@amd.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does
+ not support it
+Message-ID: <20230705044151-mutt-send-email-mst@kernel.org>
+References: <20230703142218.362549-1-eperezma@redhat.com>
+ <20230703105022-mutt-send-email-mst@kernel.org>
+ <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
+ <20230704063646-mutt-send-email-mst@kernel.org>
+ <CACGkMEvT4Y+-wfhyi324Y5hhAtn+ZF7cP9d=omdH-ZgdJ-4SOQ@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230630091752.67190-1-pmorel@linux.ibm.com>
- <20230630091752.67190-14-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v21 13/20] docs/s390x/cpu topology: document s390x cpu
- topology
-In-Reply-To: <20230630091752.67190-14-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEvT4Y+-wfhyi324Y5hhAtn+ZF7cP9d=omdH-ZgdJ-4SOQ@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,400 +86,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/06/2023 11.17, Pierre Morel wrote:
-> Add some basic examples for the definition of cpu topology
-> in s390x.
+On Wed, Jul 05, 2023 at 03:55:23PM +0800, Jason Wang wrote:
+> On Tue, Jul 4, 2023 at 6:38 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin wrote:
+> > > On Mon, Jul 3, 2023 at 4:52 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio Pérez wrote:
+> > > > > With the current code it is accepted as long as userland send it.
+> > > > >
+> > > > > Although userland should not set a feature flag that has not been
+> > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the current code will not
+> > > > > complain for it.
+> > > > >
+> > > > > Since there is no specific reason for any parent to reject that backend
+> > > > > feature bit when it has been proposed, let's control it at vdpa frontend
+> > > > > level. Future patches may move this control to the parent driver.
+> > > > >
+> > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
+> > > > > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> > > >
+> > > > Please do send v3. And again, I don't want to send "after driver ok" hack
+> > > > upstream at all, I merged it in next just to give it some testing.
+> > > > We want RING_ACCESS_AFTER_KICK or some such.
+> > > >
+> > >
+> > > Current devices do not support that semantic.
+> >
+> > Which devices specifically access the ring after DRIVER_OK but before
+> > a kick?
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   MAINTAINERS                        |   2 +
->   docs/devel/index-internals.rst     |   1 +
->   docs/devel/s390-cpu-topology.rst   | 170 ++++++++++++++++++++
->   docs/system/s390x/cpu-topology.rst | 240 +++++++++++++++++++++++++++++
->   docs/system/target-s390x.rst       |   1 +
->   5 files changed, 414 insertions(+)
->   create mode 100644 docs/devel/s390-cpu-topology.rst
->   create mode 100644 docs/system/s390x/cpu-topology.rst
+> Vhost-net is one example at last. It polls a socket as well, so it
+> starts to access the ring immediately after DRIVER_OK.
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b8d3e8815c..76f236564c 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1703,6 +1703,8 @@ S: Supported
->   F: include/hw/s390x/cpu-topology.h
->   F: hw/s390x/cpu-topology.c
->   F: target/s390x/kvm/stsi-topology.c
-> +F: docs/devel/s390-cpu-topology.rst
-> +F: docs/system/s390x/cpu-topology.rst
->   
->   X86 Machines
->   ------------
-> diff --git a/docs/devel/index-internals.rst b/docs/devel/index-internals.rst
-> index e1a93df263..6f81df92bc 100644
-> --- a/docs/devel/index-internals.rst
-> +++ b/docs/devel/index-internals.rst
-> @@ -14,6 +14,7 @@ Details about QEMU's various subsystems including how to add features to them.
->      migration
->      multi-process
->      reset
-> +   s390-cpu-topology
->      s390-dasd-ipl
->      tracing
->      vfio-migration
-> diff --git a/docs/devel/s390-cpu-topology.rst b/docs/devel/s390-cpu-topology.rst
-> new file mode 100644
-> index 0000000000..cd36476011
-> --- /dev/null
-> +++ b/docs/devel/s390-cpu-topology.rst
-> @@ -0,0 +1,170 @@
-> +QAPI interface for S390 CPU topology
-> +====================================
-> +
-> +Let's start QEMU with the following command defining 4 CPUs,
+> Thanks
 
-Maybe better something like this:
 
-The following sections will explain the S390 CPU topology with the help of 
-exemplary output. For this, let's assume that QEMU has been started with the 
-following command, defining 4 CPUs.
+For sure but that is not vdpa.
 
-?
-
-> +CPU[0] defined by the -smp argument will have default values:
-> +
-> +.. code-block:: bash
-> +
-> + qemu-system-s390x \
-> +    -enable-kvm \
-> +    -cpu z14,ctop=on \
-> +    -smp 1,drawers=3,books=3,sockets=2,cores=2,maxcpus=36 \
-> +    \
-> +    -device z14-s390x-cpu,core-id=19,entitlement=high \
-> +    -device z14-s390x-cpu,core-id=11,entitlement=low \
-> +    -device z14-s390x-cpu,core-id=112,entitlement=high \
-> +   ...
-> +
-> +and see the result when using the QAPI interface.
-...
-> +QAPI command: set-cpu-topology
-> +------------------------------
-> +
-> +The command set-cpu-topology allows to modify the topology tree
-> +or the topology modifiers of a vCPU in the configuration.
-> +
-> +.. code-block:: QMP
-> +
-> +    { "execute": "set-cpu-topology",
-> +      "arguments": {
-> +         "core-id": 11,
-> +         "socket-id": 0,
-> +         "book-id": 0,
-> +         "drawer-id": 0,
-> +         "entitlement": "low",
-> +         "dedicated": false
-> +      }
-> +    }
-> +    {"return": {}}
-> +
-> +The core-id parameter is the only non optional parameter and every
-> +unspecified parameter keeps its previous value.
-> +
-> +QAPI event CPU_POLARIZATION_CHANGE
-> +----------------------------------
-> +
-> +When a guest is requests a modification of the polarization,
-
-Scratch the word "is".
-
-> +QEMU sends a CPU_POLARIZATION_CHANGE event.
-...
-> diff --git a/docs/system/s390x/cpu-topology.rst b/docs/system/s390x/cpu-topology.rst
-> new file mode 100644
-> index 0000000000..0535a5d883
-> --- /dev/null
-> +++ b/docs/system/s390x/cpu-topology.rst
-> @@ -0,0 +1,240 @@
-> +CPU topology on s390x
-> +=====================
-> +
-> +Since QEMU 8.1, CPU topology on s390x provides up to 3 levels of
-> +topology containers: drawers, books, sockets, defining a tree shaped
-> +hierarchy.
-
-"drawers, books and sockets. They define a tree-shaped hierarchy."
-
-?
-
-> +The socket container contains one or more CPU entries.
-
-"The socket container has one or more CPU entries." ?
-
-> +Each of these CPU entries consists of a bitmap and three CPU attributes:
-> +
-> +- CPU type
-> +- entitlement
-> +- dedication
-> +
-> +Each bit set in the bitmap correspond to the core-id of a vCPU with
-> +matching the three attribute.
-> +
-> +This documentation provide general information on S390 CPU topology,
-> +how to enable it and on the new CPU attributes.
-> +For information on how to modify the S390 CPU topology and on how to
-> +monitor the polarization change see ``Developer Information``.
-
-It would be nicer to have a proper link here instead. See commit 
-d6359e150dbdf84f67add786473fd277a9a442bb for example how to do this in our 
-.rst files.
-
-> +Prerequisites
-> +-------------
-> +
-> +To use the CPU topology, you need to run with KVM on a s390x host that
-> +uses the Linux kernel v6.0 or newer (which provide the so-called
-> +``KVM_CAP_S390_CPU_TOPOLOGY`` capability that allows QEMU to signal the
-> +CPU topology facility via the so-called STFLE bit 11 to the VM).
-> +
-> +Enabling CPU topology
-> +---------------------
-> +
-> +Currently, CPU topology is only enabled in the host model by default.
-> +
-> +Enabling CPU topology in a CPU model is done by setting the CPU flag
-> +``ctop`` to ``on`` like in:
-> +
-> +.. code-block:: bash
-> +
-> +   -cpu gen16b,ctop=on
-> +
-> +Having the topology disabled by default allows migration between
-> +old and new QEMU without adding new flags.
-> +
-> +Default topology usage
-> +----------------------
-> +
-> +The CPU topology can be specified on the QEMU command line
-> +with the ``-smp`` or the ``-device`` QEMU command arguments.
-> +
-> +Note also that since 7.2 threads are no longer supported in the topology
-> +and the ``-smp`` command line argument accepts only ``threads=1``.
-> +
-> +If none of the containers attributes (drawers, books, sockets) are
-> +specified for the ``-smp`` flag, the number of these containers
-> +is ``1`` .
-
-"Thus the following two options will result in the same topology, for 
-example:" ?
-
-> +.. code-block:: bash
-> +
-> +    -smp cpus=5,drawer=1,books=1,sockets=8,cores=4,maxcpus=32
-> +
-> +or
-> +
-> +.. code-block:: bash
-> +
-> +    -smp cpus=5,sockets=8,cores=4,maxcpus=32
-> +
-> +When a CPU is defined by the ``-smp`` command argument, its position
-> +inside the topology is calculated by adding the CPUs to the topology
-> +based on the core-id starting with core-0 at position 0 of socket-0,
-> +book-0, drawer-0 and filling all CPUs of socket-0 before to fill socket-1
-> +of book-0 and so on up to the last socket of the last book of the last
-> +drawer.
-> +
-> +When a CPU is defined by the ``-device`` command argument, the
-> +tree topology attributes must be all defined or all not defined.
-> +
-> +.. code-block:: bash
-> +
-> +    -device gen16b-s390x-cpu,drawer-id=1,book-id=1,socket-id=2,core-id=1
-> +
-> +or
-> +
-> +.. code-block:: bash
-> +
-> +    -device gen16b-s390x-cpu,core-id=1,dedicated=true
-> +
-> +If none of the tree attributes (drawer, book, sockets), are specified
-> +for the ``-device`` argument, as for all CPUs defined with the ``-smp``
-> +command argument the topology tree attributes will be set by simply
-> +adding the CPUs to the topology based on the core-id starting with
-> +core-0 at position 0 of socket-0, book-0, drawer-0.
-> +
-> +QEMU will not try to solve collisions and will report an error if the
-> +CPU topology, explicitly or implicitly defined on a ``-device``
-> +argument collides with the definition of a CPU implicitely defined
-
-s/implicitely/implicitly/
-
-> +on the ``-smp`` argument.
-> +
-> +When the topology modifier attributes are not defined for the
-> +``-device`` command argument they takes following default values:
-> +
-> +- dedicated: ``false``
-> +- entitlement: ``medium``
-> +
-> +
-> +Hot plug
-> +++++++++
-> +
-> +New CPUs can be plugged using the device_add hmp command as in:
-> +
-> +.. code-block:: bash
-> +
-> +  (qemu) device_add gen16b-s390x-cpu,core-id=9
-> +
-> +The same placement of the CPU is derived from the core-id as described above.
-> +
-> +The topology can of course be fully defined:
-> +
-> +.. code-block:: bash
-> +
-> +    (qemu) device_add gen16b-s390x-cpu,drawer-id=1,book-id=1,socket-id=2,core-id=1
-> +
-> +
-> +Examples
-> +++++++++
-> +
-> +In the following machine we define 8 sockets with 4 cores each.
-> +
-> +.. code-block:: bash
-> +
-> +  $ qemu-system-s390x -m 2G \
-> +    -cpu gen16b,ctop=on \
-> +    -smp cpus=5,sockets=8,cores=4,maxcpus=32 \
-> +    -device host-s390x-cpu,core-id=14 \
-> +
-> +A new CPUs can be plugged using the device_add hmp command as before:
-> +
-> +.. code-block:: bash
-> +
-> +  (qemu) device_add gen16b-s390x-cpu,core-id=9
-> +
-> +The core-id defines the placement of the core in the topology by
-> +starting with core 0 in socket 0 up to maxcpus.
-> +
-> +In the example above:
-> +
-> +* There are 5 CPUs provided to the guest with the ``-smp`` command line
-> +  They will take the core-ids 0,1,2,3,4
-> +  As we have 4 cores in a socket, we have 4 CPUs provided
-> +  to the guest in socket 0, with core-ids 0,1,2,3.
-> +  The last cpu, with core-id 4, will be on socket 1.
-> +
-> +* the core with ID 14 provided by the ``-device`` command line will
-> +  be placed in socket 3, with core-id 14
-> +
-> +* the core with ID 9 provided by the ``device_add`` qmp command will
-> +  be placed in socket 2, with core-id 9
-> +
-> +
-> +Polarization, entitlement and dedication
-> +----------------------------------------
-> +
-> +Polarization
-> +++++++++++++
-> +
-> +The polarization is an indication given by the ``guest`` to the host
-
-Why quoting guest, but not host? I'd remove the quotes from guest here.
-
-> +that it is able to make use of CPU provisioning information.
-> +The guest indicates the polarization by using the PTF instruction.
-> +
-> +Polarization is define two models of CPU provisioning: horizontal
-
-"Polarization defines ..." ? ... or "Polarization is defined by ..." ?
-
-> +and vertical.
-> +
-> +The horizontal polarization is the default model on boot and after
-> +subsystem reset in which the guest considers all vCPUs being having
-
-scratch "being" ?
-
-> +an equal provisioning of CPUs by the host.
-> +
-> +In the vertical polarization model the guest can make use of the
-> +vCPU entitlement information provided by the host to optimize
-> +kernel thread scheduling.
-> +
-> +A subsystem reset puts all vCPU of the configuration into the
-> +horizontal polarization.
-> +
-> +Entitlement
-> ++++++++++++
-> +
-> +The vertical polarization specifies that the guest's vCPU can get
-> +different real CPU provisions:
-> +
-> +- a vCPU with vertical high entitlement specifies that this
-> +  vCPU gets 100% of the real CPU provisioning.
-> +
-> +- a vCPU with vertical medium entitlement specifies that this
-> +  vCPU shares the real CPU with other vCPUs.
-> +
-> +- a vCPU with vertical low entitlement specifies that this
-> +  vCPU only gets real CPU provisioning when no other vCPUs needs it.
-> +
-> +In the case a vCPU with vertical high entitlement does not use
-> +the real CPU, the unused "slack" can be dispatched to other vCPU
-> +with medium or low entitlement.
-> +
-> +The upper level specifies a vCPU as ``dedicated`` when the vCPU is
-
-Using `` quotes will print "dedicated" in monotyped font ... is that what 
-you wanted here? AFAIK we're mainly doing that for things that can be typed 
-in the terminal, e.g. command line options. So should this use normal quotes 
-instead?
-
-> +fully dedicated to a single real CPU.
-> +
-> +The dedicated bit is an indication of affinity of a vCPU for a real CPU
-> +while the entitlement indicates the sharing or exclusivity of use.
-> +
-> +Defining the topology on command line
-> +-------------------------------------
-> +
-> +The topology can entirely be defined using -device cpu statements,
-> +with the exception of CPU 0 which must be defined with the -smp
-> +argument.
-> +
-> +For example, here we set the position of the cores 1,2,3 to
-> +drawer 1, book 1, socket 2 and cores 0,9 and 14 to drawer 0,
-> +book 0, socket 0 without defining entitlement or dedication.
-> +The core 4, will be set on its default position on socket 1
-> +(since we have 4 core per socket) and we define it as dedicated and
-> +with vertical high entitlement.
-> +
-> +.. code-block:: bash
-> +
-> +  $ qemu-system-s390x -m 2G \
-> +    -cpu gen16b,ctop=on \
-> +    -smp cpus=1,sockets=8,cores=4,maxcpus=32 \
-> +    \
-> +    -device gen16b-s390x-cpu,drawer-id=1,book-id=1,socket-id=2,core-id=1 \
-> +    -device gen16b-s390x-cpu,drawer-id=1,book-id=1,socket-id=2,core-id=2 \
-> +    -device gen16b-s390x-cpu,drawer-id=1,book-id=1,socket-id=2,core-id=3 \
-> +    \
-> +    -device gen16b-s390x-cpu,drawer-id=0,book-id=0,socket-id=0,core-id=9 \
-> +    -device gen16b-s390x-cpu,drawer-id=0,book-id=0,socket-id=0,core-id=14 \
-> +    \
-> +    -device gen16b-s390x-cpu,core-id=4,dedicated=on,entitlement=high
-> +
-> +The entitlement defined for the CPU 4, will only be used after the guest
-> +successfully enables vertical polarization by using the PTF instruction.
-> diff --git a/docs/system/target-s390x.rst b/docs/system/target-s390x.rst
-> index f6f11433c7..94c981e732 100644
-> --- a/docs/system/target-s390x.rst
-> +++ b/docs/system/target-s390x.rst
-> @@ -34,3 +34,4 @@ Architectural features
->   .. toctree::
->      s390x/bootdevices
->      s390x/protvirt
-> +   s390x/cpu-topology
-
-  Thomas
+> >
+> > > My plan was to convert
+> > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorry if I
+> > > was not explicit enough.
+> > >
+> > > The only solution I can see to that is to trap & emulate in the vdpa
+> > > (parent?) driver, as talked in virtio-comment. But that complicates
+> > > the architecture:
+> > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
+> > > * Store vq enable state separately, at
+> > > vdpa->config->set_vq_ready(true), but not transmit that enable to hw
+> > > * Store the doorbell state separately, but do not configure it to the
+> > > device directly.
+> > >
+> > > But how to recover if the device cannot configure them at kick time,
+> > > for example?
+> > >
+> > > Maybe we can just fail if the parent driver does not support enabling
+> > > the vq after DRIVER_OK? That way no new feature flag is needed.
+> > >
+> > > Thanks!
+> > >
+> > > >
+> > > > > ---
+> > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/linux/kernel/git/mst
+> > > > > commit. Please let me know if I should send a v3 of [1] instead.
+> > > > >
+> > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send-email-mst@kernel.org/T/
+> > > > > ---
+> > > > >  drivers/vhost/vdpa.c | 7 +++++--
+> > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > > > index e1abf29fed5b..a7e554352351 100644
+> > > > > --- a/drivers/vhost/vdpa.c
+> > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+> > > > >  {
+> > > > >       struct vhost_vdpa *v = filep->private_data;
+> > > > >       struct vhost_dev *d = &v->vdev;
+> > > > > +     const struct vdpa_config_ops *ops = v->vdpa->config;
+> > > > >       void __user *argp = (void __user *)arg;
+> > > > >       u64 __user *featurep = argp;
+> > > > > -     u64 features;
+> > > > > +     u64 features, parent_features = 0;
+> > > > >       long r = 0;
+> > > > >
+> > > > >       if (cmd == VHOST_SET_BACKEND_FEATURES) {
+> > > > >               if (copy_from_user(&features, featurep, sizeof(features)))
+> > > > >                       return -EFAULT;
+> > > > > +             if (ops->get_backend_features)
+> > > > > +                     parent_features = ops->get_backend_features(v->vdpa);
+> > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
+> > > > >                                BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
+> > > > >                                BIT_ULL(VHOST_BACKEND_F_RESUME) |
+> > > > > -                              BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK)))
+> > > > > +                              parent_features))
+> > > > >                       return -EOPNOTSUPP;
+> > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
+> > > > >                    !vhost_vdpa_can_suspend(v))
+> > > > > --
+> > > > > 2.39.3
+> > > >
+> >
 
