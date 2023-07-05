@@ -2,152 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90A167481E1
-	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 12:18:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 766CF748200
+	for <lists+kvm@lfdr.de>; Wed,  5 Jul 2023 12:22:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231888AbjGEKR6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 06:17:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43492 "EHLO
+        id S231653AbjGEKWH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 06:22:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231877AbjGEKR4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 06:17:56 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EDD4E3;
-        Wed,  5 Jul 2023 03:17:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688552275; x=1720088275;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=oLxACQJJ5+O8I5OycraL/46XHwuWjbLPz8/XoWWOHjg=;
-  b=Mnn+HoPz0qna1i0f7IRCiprB16wNIfrQ9e5Z4ahaBsAYwDdtolu1ZHld
-   wL8pm4hFu/OZd7y5XzYyRONPQ+ZkPrLQ+mJ8TNDsmoTccZOk3EumnY5lM
-   Z7Q2SUa6FVHK9rzy8qwbV/1KhzFCTrLaGFwIR/HxjI+A1u/I6X+A2ehJN
-   OjgaKbRGgVcWux9BPz1Lc8R8bTlrIxeUD03E1z4EybMRJaXWgL7kgdwV8
-   VxUG/Ii6gIfiMFoQKF8Qt8eCtXdjss77/RJyYgwmHDRzy0sRrnvHaWhqW
-   zP3eGdaF6E5EeEHJB6MvaEXr+P8jSWiWsicWh98eWG9zQDhhdWy8iNVh0
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="365873180"
-X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="365873180"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 03:17:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="965775138"
-X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="965775138"
-Received: from jialinji-mobl4.ccr.corp.intel.com (HELO localhost) ([10.255.30.200])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 03:17:51 -0700
-Date:   Wed, 5 Jul 2023 18:18:00 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     David Stevens <stevensd@chromium.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Peter Xu <peterx@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to
- __kvm_follow_pfn
-Message-ID: <20230705101800.ut4c6topn6ylwczs@linux.intel.com>
-References: <20230704075054.3344915-1-stevensd@google.com>
- <20230704075054.3344915-6-stevensd@google.com>
+        with ESMTP id S229776AbjGEKWF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 06:22:05 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F705122;
+        Wed,  5 Jul 2023 03:22:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=4Ry2jwT0YbMwWbjx+3d3lF7amM0BUUKmYAyIeJr5PH0=; b=TkLfIfSOKiy03+vFG2OK6XsHNN
+        Iq/mWTSZwNCg6/mZQN71Of8QJbi5+cWYhWfQs7Bg4NO1fX6WIuakygNQYhMZCOyeZBV/fVZJcp4+m
+        JaHFPtOq0506oqa9eJxIq3H1ZQlw/Xgm/Sy6TUK5IRLCoKiLI4pzqvQ93rUo5XLnJbVhPlg7hbmrd
+        +GdtrTHYNPvLalFg8XnTjE3HI89O7Lhkz+M3iW5BX3ZQIYNQfBnDHchympbxWrlXeIEFDnNibnAdw
+        YLit9T+us3bY6+IX/Kpgx/R/E2ggxQ1gpsSUQ/Se+5PiF54l+IifukRhkO7I8VfhslIyaLjqT3SIt
+        oxlzWqyA==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qGzdj-009yvy-Tr; Wed, 05 Jul 2023 10:21:39 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 02A2F30005E;
+        Wed,  5 Jul 2023 12:21:38 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id DD7032028F056; Wed,  5 Jul 2023 12:21:37 +0200 (CEST)
+Date:   Wed, 5 Jul 2023 12:21:37 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "nik.borisov@suse.com" <nik.borisov@suse.com>,
+        "hpa@zytor.com" <hpa@zytor.com>, "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH v12 20/22] x86/virt/tdx: Allow SEAMCALL to handle #UD and
+ #GP
+Message-ID: <20230705102137.GX4253@hirez.programming.kicks-ass.net>
+References: <cover.1687784645.git.kai.huang@intel.com>
+ <c124550719716f1f7759c2bdea70f4722d8e0167.1687784645.git.kai.huang@intel.com>
+ <20230628152900.GI2438817@hirez.programming.kicks-ass.net>
+ <20230628203823.GR38236@hirez.programming.kicks-ass.net>
+ <42e13ccf7f27a68c0dd64640eed378c38ef40967.camel@intel.com>
+ <20230630100659.GF2533791@hirez.programming.kicks-ass.net>
+ <20230630102141.GA2534364@hirez.programming.kicks-ass.net>
+ <20230630120650.GB2534364@hirez.programming.kicks-ass.net>
+ <fdd81fbd2424d8da04f98d156668cad5e73c740b.camel@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230704075054.3344915-6-stevensd@google.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <fdd81fbd2424d8da04f98d156668cad5e73c740b.camel@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 04, 2023 at 04:50:50PM +0900, David Stevens wrote:
-> From: David Stevens <stevensd@chromium.org>
+On Mon, Jul 03, 2023 at 12:15:13PM +0000, Huang, Kai wrote:
 > 
-> Stop passing FOLL_GET to __kvm_follow_pfn. This allows the host to map
-> memory into the guest that is backed by un-refcounted struct pages - for
-> example, higher order non-compound pages allocated by the amdgpu driver
-> via ttm_pool_alloc_page.
-
-I guess you mean the tail pages of the higher order non-compound pages?
-And as to the head page, it is said to be set to one coincidentally[*],
-and shall not be considered as refcounted.  IIUC, refcount of this head
-page will be increased and decreased soon in hva_to_pfn_remapped(), so
-this may not be a problem(?). But treating this head page differently,
-as a refcounted one(e.g., to set the A/D flags), is weired. 
-
-Or maybe I missed some context, e.g., can the head page be allocted to
-guest at all? 
-
-
+> > 
+> > So I think the below deals with everything and unifies __tdx_hypercall()
+> > and __tdx_module_call(), since both sides needs to deal with exactly the
+> > same trainwreck.
 > 
-> The bulk of this change is tracking the is_refcounted_page flag so that
-> non-refcounted pages don't trigger page_count() == 0 warnings. This is
-> done by storing the flag in an unused bit in the sptes.
-
-Also, maybe we should mention this only works on x86-64. 
-
+> Hi Peter,
 > 
-> Signed-off-by: David Stevens <stevensd@chromium.org>
-> ---
->  arch/x86/kvm/mmu/mmu.c          | 44 +++++++++++++++++++++------------
->  arch/x86/kvm/mmu/mmu_internal.h |  1 +
->  arch/x86/kvm/mmu/paging_tmpl.h  |  9 ++++---
->  arch/x86/kvm/mmu/spte.c         |  4 ++-
->  arch/x86/kvm/mmu/spte.h         | 12 ++++++++-
->  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++++-------
->  6 files changed, 62 insertions(+), 30 deletions(-)
+> Just want to make sure I understand you correctly:
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e44ab512c3a1..b1607e314497 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
+> You want to make __tdx_module_call() look like __tdx_hypercall(), but not to
+> unify them into one assembly (at least for now), right?
 
-...
+Well, given the horrendous trainwreck this is all turning into, I
+through it prudent to have it all in a single place. The moment you go
+play games with callee-saved registers you're really close to what
+hypercall does so then they might as well be the same.
 
-> @@ -2937,6 +2943,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
->  	bool host_writable = !fault || fault->map_writable;
->  	bool prefetch = !fault || fault->prefetch;
->  	bool write_fault = fault && fault->write;
-> +	bool is_refcounted = !fault || fault->is_refcounted_page;
+> I am confused you mentioned VP.VMCALL below, which is handled by
+> __tdx_hypercall().
 
-Just wonder, what if a non-refcounted page is prefetched?  Or is it possible in
-practice?
+But why? It really isn't *that* special if you consider the other calls
+that are using callee-saved regs, yes it has the rdi/rsi extra, but meh,
+it really just is tdcall-0.
 
-...
->  
-> @@ -883,7 +884,7 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
->   */
->  static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
->  {
-> -	bool host_writable;
-> +	bool host_writable, is_refcounted;
->  	gpa_t first_pte_gpa;
->  	u64 *sptep, spte;
->  	struct kvm_memory_slot *slot;
-> @@ -940,10 +941,12 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
->  	sptep = &sp->spt[i];
->  	spte = *sptep;
->  	host_writable = spte & shadow_host_writable_mask;
-> +	// TODO: is this correct?
-> +	is_refcounted = spte & SPTE_MMU_PAGE_REFCOUNTED;
->  	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
->  	make_spte(vcpu, sp, slot, pte_access, gfn,
->  		  spte_to_pfn(spte), spte, true, false,
-> -		  host_writable, &spte);
-> +		  host_writable, is_refcounted, &spte);
 
-Could we restrict that a non-refcounted page shall not be used as shadow page?
+> >  *-------------------------------------------------------------------------
+> >  * TDCALL/SEAMCALL ABI:
+> >  *-------------------------------------------------------------------------
+> >  * Input Registers:
+> >  *
+> >  * RAX                 - Leaf number.
+> >  * RCX,RDX,R8-R11      - Leaf specific input registers.
+> >  * RDI,RSI,RBX,R11-R15 - VP.VMCALL VP.ENTER
+> >  *
+> >  * Output Registers:
+> >  *
+> >  * RAX                 - instruction error code.
+> >  * RCX,RDX,R8-R11      - Leaf specific output registers.
+> >  * RDI,RSI,RBX,R12-R15 - VP.VMCALL VP.ENTER
+> 
+> As mentioned above, VP.VMCALL is handled by __tdx_hypercall().  Also, VP.ENTER
+> will be handled by KVM's own assembly.  They both are not handled in this
+> TDX_MODULE_CALL assembly.
 
-[*] https://lore.kernel.org/all/8caf3008-dcf3-985a-631e-e019b277c6f0@amd.com/
+I don't think they should be special, they're really just yet another
+leaf call. Yes, they have a shit calling convention, and yes VP.ENTER is
+terminally broken for unconditionally clobbering BP :-(
 
-B.R.
-Yu
+That really *must* be fixed.
+
+> > .Lcall:
+> > .if \host
+> > 	seamcall
+> > 	/*
+> > 	 * SEAMCALL instruction is essentially a VMExit from VMX root
+> > 	 * mode to SEAM VMX root mode.  VMfailInvalid (CF=1) indicates
+> > 	 * that the targeted SEAM firmware is not loaded or disabled,
+> > 	 * or P-SEAMLDR is busy with another SEAMCALL. RAX is not
+> > 	 * changed in this case.
+> > 	 */
+> > 	jc	.Lseamfail
+> > 
+> > .if \saved && \ret
+> > 	/*
+> > 	 * VP.ENTER clears RSI on output, use it to restore state.
+> > 	 */
+> > 	popq	%rsi
+> > 	xor	%edi,%edi
+> > 	movq	%rdi, TDX_MODULE_rdi(%rsi)
+> > 	movq	%rdi, TDX_MODULE_rsi(%rsi)
+> > .endif
+> > .else
+> > 	tdcall
+> > 
+> > 	/*
+> > 	 * RAX!=0 indicates a failure, assume no return values.
+> > 	 */
+> > 	testq	%rax, %rax
+> > 	jne	.Lerror
+> 
+> For some SEAMCALL/TDCALL the output registers may contain additional error
+> information.  We need to jump to a location where whether returning those
+> additional regs to 'struct tdx_module_args' depends on \ret.
+
+I suppose we can move this into the below conditional :-( The [DS]I
+register stuff requires a scratch reg to recover, AX being zero provides
+that.
+
+> > .if \saved && \ret
+> > 	/*
+> > 	 * Since RAX==0, it can be used as a scratch register to restore state.
+> > 	 *
+> > 	 * [ assumes \saved implies \ret ]
+> > 	 */
+> > 	popq	%rax
+> > 	movq	%rdi, TDX_MODULE_rdi(%rax)
+> > 	movq	%rsi, TDX_MODULE_rsi(%rax)
+> > 	movq	%rax, %rsi
+> > 	xor	%eax, %eax;
+> > .endif
+> > .endif // \host
+
+So the reason I want this, is that I feel very strongly that if you
+cannot write a single coherent wrapper for all this, its calling
+convention is fundamentally *too* complex / broken.
+
+
