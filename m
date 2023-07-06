@@ -2,189 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63F5674A252
-	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 18:39:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D34ED74A270
+	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 18:48:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231623AbjGFQjZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jul 2023 12:39:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39850 "EHLO
+        id S232004AbjGFQsn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jul 2023 12:48:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231675AbjGFQjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jul 2023 12:39:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AAB71BD4;
-        Thu,  6 Jul 2023 09:39:18 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 817B660F4F;
-        Thu,  6 Jul 2023 16:39:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD5B4C433C8;
-        Thu,  6 Jul 2023 16:39:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688661556;
-        bh=h0OgFh+n1mPvFs2BQeBGKqCup9+gz5oIEYrZdP/kZ1I=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=R0xErIoJDEDCPvtj6yutBpmBjH5+sNN2DTcaezc0n9WR9TmEy1Nr2SEjJS8AccSd3
-         25C6dIotYWq8C5oJ9XdKjIpstBZeJWrrI9E27qO7jpwLOi76bYLKoIyXlH2wfstEMQ
-         tPDpcvtxi4PytZqu0bwUna2NlsoyPW4LBUJOY/NsN0hai4AjwHDjPZzylD8bgAPtdb
-         Cwl4u1kw+cVOCyrTxYlUiTtFJt//p8FjGirDXyUgy4nS8jwMLqoMNQN/rB22Oc6zG4
-         gH6et2pDl9nnxtn2MeaAt2F24E81hxy8q8zy8E74z/IjrpOLVV0NQ5YhU+0Jter5Dd
-         vcGyaW6m9hrYA==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-        id 6BCE5CE3BFC; Thu,  6 Jul 2023 09:39:16 -0700 (PDT)
-Date:   Thu, 6 Jul 2023 09:39:16 -0700
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Frederic Weisbecker <frederic@kernel.org>
-Cc:     Valentin Schneider <vschneid@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org,
-        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH 11/14] context-tracking: Introduce work deferral
- infrastructure
-Message-ID: <4c2cb573-168f-4806-b1d9-164e8276e66a@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20230705181256.3539027-1-vschneid@redhat.com>
- <20230705181256.3539027-12-vschneid@redhat.com>
- <ZKXtfWZiM66dK5xC@localhost.localdomain>
- <xhsmhttuhuvix.mognet@vschneid.remote.csb>
- <ZKaoHrm0Fejb7kAl@lothringen>
+        with ESMTP id S231281AbjGFQsm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jul 2023 12:48:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32FCE1BD6
+        for <kvm@vger.kernel.org>; Thu,  6 Jul 2023 09:47:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1688662078;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=CIjV3nrO4jNdql8yp29S+96UpDACpGjeOguVgyJZq6o=;
+        b=MkHVBl9FvFzP4jqiFqmsT1Woa1f9Cp3W+3H6uFBHwRCxU/SNHwLOOFYs4EDDM+cxNTLiZu
+        Bxyqka5KCIeslMtG1Y/vRC7nrp7g9Jk9L8IR6p9mQER1NnMhjygp9p8FMz35uirZ+Lx1Ej
+        IFpK//HIg32SaPo+678iKcx+Y/PmHDY=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-325-MWuj_MPsNLW3XfOxVYNzVQ-1; Thu, 06 Jul 2023 12:47:55 -0400
+X-MC-Unique: MWuj_MPsNLW3XfOxVYNzVQ-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-518676b6d09so619826a12.1
+        for <kvm@vger.kernel.org>; Thu, 06 Jul 2023 09:47:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688662074; x=1691254074;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CIjV3nrO4jNdql8yp29S+96UpDACpGjeOguVgyJZq6o=;
+        b=IJIR7Rp2ZlkYT7VnFuhUgu5uw/GFedN+14tiUY55h6jbVU2NBun8wRrS8+91YRmx86
+         nlmFcaMtWIpExsOJuBmI7qVbS2TtWMIpXPfn50UsjKJNEiFk+tm2Z07RoCNbqpzxhq7n
+         HYGyb8xkP0MZ0UvBdDxkJDjz+3aFN/nhvos4w/hj2fUkpfk2LtmPsS5t1VitP+a0ZHMZ
+         JM62rBud6zA+1bUchPvUtZbpevzsK2U0T5n+2IOQCiTXLCcUHeRMOO1cy/qfQfDCtvE5
+         j+WPHLryv1dVpe9FYAczf/o/vvkVMOGdmhGT0pkBORLALVLF3F9Fi1nQzw4/Zy3Fu1pX
+         /oqg==
+X-Gm-Message-State: ABy/qLZjtP1+s/3lui+xdyzC4H0hIzAoEWeoD1005ducOXXmGbTlPfAJ
+        lDYTaEjkaPXF44CHWDAG1r4KI3RVqfy7WmbbGjrwob2tFKJIeqH/S0bjCHlTdZryQ0/hLWQpNl5
+        2BJND6GWHbBV4
+X-Received: by 2002:a50:ec99:0:b0:51d:f74c:1d44 with SMTP id e25-20020a50ec99000000b0051df74c1d44mr2453339edr.31.1688662074130;
+        Thu, 06 Jul 2023 09:47:54 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFsgBZKktKUKDnMD4AGXhJM/rSYMTYzoTBTMz/PUfXFIbgHcwyix502QSKdumliEmlDeazbpg==
+X-Received: by 2002:a50:ec99:0:b0:51d:f74c:1d44 with SMTP id e25-20020a50ec99000000b0051df74c1d44mr2453315edr.31.1688662073762;
+        Thu, 06 Jul 2023 09:47:53 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-163.retail.telecomitalia.it. [79.46.200.163])
+        by smtp.gmail.com with ESMTPSA id i22-20020aa7c716000000b0051df13f1d8fsm973950edq.71.2023.07.06.09.47.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jul 2023 09:47:53 -0700 (PDT)
+Date:   Thu, 6 Jul 2023 18:47:50 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v5 01/17] vsock/virtio: read data from non-linear skb
+Message-ID: <xz2elkpzzgn6zfm2e7lpognwgwm3leexyjm65qn54xwxlvbxmb@l5mhnorcbuez>
+References: <20230701063947.3422088-1-AVKrasnov@sberdevices.ru>
+ <20230701063947.3422088-2-AVKrasnov@sberdevices.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <ZKaoHrm0Fejb7kAl@lothringen>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20230701063947.3422088-2-AVKrasnov@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 06, 2023 at 01:40:14PM +0200, Frederic Weisbecker wrote:
-> On Thu, Jul 06, 2023 at 12:30:46PM +0100, Valentin Schneider wrote:
-> > >> +		ret = atomic_try_cmpxchg(&ct->work, &old_work, old_work | work);
-> > >> +
-> > >> +	preempt_enable();
-> > >> +	return ret;
-> > >> +}
-> > > [...]
-> > >> @@ -100,14 +158,19 @@ static noinstr void ct_kernel_exit_state(int offset)
-> > >>   */
-> > >>  static noinstr void ct_kernel_enter_state(int offset)
-> > >>  {
-> > >> +	struct context_tracking *ct = this_cpu_ptr(&context_tracking);
-> > >>      int seq;
-> > >> +	unsigned int work;
-> > >>
-> > >> +	work = ct_work_fetch(ct);
-> > >
-> > > So this adds another fully ordered operation on user <-> kernel transition.
-> > > How many such IPIs can we expect?
-> > >
-> > 
-> > Despite having spent quite a lot of time on that question, I think I still
-> > only have a hunch.
-> > 
-> > Poking around RHEL systems, I'd say 99% of the problematic IPIs are
-> > instruction patching and TLB flushes.
-> > 
-> > Staring at the code, there's quite a lot of smp_calls for which it's hard
-> > to say whether the target CPUs can actually be isolated or not (e.g. the
-> > CPU comes from a cpumask shoved in a struct that was built using data from
-> > another struct of uncertain origins), but then again some of them don't
-> > need to hook into context_tracking.
-> > 
-> > Long story short: I /think/ we can consider that number to be fairly small,
-> > but there could be more lurking in the shadows.
-> 
-> I guess it will still be time to reconsider the design if we ever reach such size.
-> 
-> > > If this is just about a dozen, can we stuff them in the state like in the
-> > > following? We can potentially add more of them especially on 64 bits we could
-> > > afford 30 different works, this is just shrinking the RCU extended quiescent
-> > > state counter space. Worst case that can happen is that RCU misses 65535
-> > > idle/user <-> kernel transitions and delays a grace period...
-> > >
-> > 
-> > I'm trying to grok how this impacts RCU, IIUC most of RCU mostly cares about the
-> > even/odd-ness of the thing, and rcu_gp_fqs() cares about the actual value
-> > but only to check if it has changed over time (rcu_dynticks_in_eqs_since()
-> > only does a !=).
-> > 
-> > I'm rephrasing here to make sure I get it - is it then that the worst case
-> > here is 2^(dynticks_counter_size) transitions happen between saving the
-> > dynticks snapshot and checking it again, so RCU waits some more?
-> 
-> That's my understanding as well but I have to defer on Paul to make sure I'm
-> not overlooking something.
+On Sat, Jul 01, 2023 at 09:39:31AM +0300, Arseniy Krasnov wrote:
+>This is preparation patch for non-linear skbuff handling. It replaces
+>direct calls of 'memcpy_to_msg()' with 'skb_copy_datagram_iter()'. Main
+>advantage of the second one is that is can handle paged part of the skb
 
-That does look plausible to me.
+s/is that is/is that it/
 
-And yes, RCU really cares about whether its part of this counter has
-been a multiple of two during a given interval of time, because this
-indicates that the CPU has no pre-existing RCU readers still active.
-One way that this can happen is for that value to be a multiple of two
-at some point in time.  The other way that this can happen is for the
-value to have changed.  No matter what the start and end values, if they
-are different, the counter must necessarily have at least passed through
-multiple of two in the meantime, again guaranteeing that any RCU readers
-that around when the count was first fetched have now finished.
+>by using 'kmap()' on each page, but if there are no pages in the skb,
+>it behaves like simple copying to iov iterator. This patch also adds
+>new field to the control block of skb - this value shows current offset
+>in the skb to read next portion of data (it doesn't matter linear it or
+>not). Idea is that 'skb_copy_datagram_iter()' handles both types of
+>skb internally - it just needs an offset from which to copy data from
+>the given skb. This offset is incremented on each read from skb. This
+>approach allows to avoid special handling of non-linear skbs:
+>1) We can't call 'skb_pull()' on it, because it updates 'data' pointer.
+>2) We need to update 'data_len' also on each read from this skb.
 
-But we should take the machine's opinions much more seriously than we
-take any of our own opinions.  Why not adjust RCU_DYNTICKS_IDX so as
-to crank RCU's portion of this counter down to (say) two or three bits
-and let rcutorture have at it on TREE04 or TREE07, both of which have
-nohz_full CPUs?
+I would mention that this change is in preparation of zero-copy support.
 
-Maybe also adjust mkinitrd.sh to make the user/kernel transitions more
-frequent?
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> Changelog:
+> v4 -> v5:
+>  * Use local variable for 'frag_off' in stream dequeue calback.
+>  * R-b from Bobby Eshleman removed due to patch update.
+>
+> include/linux/virtio_vsock.h            |  1 +
+> net/vmw_vsock/virtio_transport_common.c | 30 ++++++++++++++++++-------
+> 2 files changed, 23 insertions(+), 8 deletions(-)
+>
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index c58453699ee9..17dbb7176e37 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -12,6 +12,7 @@
+> struct virtio_vsock_skb_cb {
+> 	bool reply;
+> 	bool tap_delivered;
+>+	u32 frag_off;
+> };
+>
+> #define VIRTIO_VSOCK_SKB_CB(skb) ((struct virtio_vsock_skb_cb *)((skb)->cb))
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index b769fc258931..e5683af23e60 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -355,7 +355,7 @@ virtio_transport_stream_do_peek(struct vsock_sock *vsk,
+> 	spin_lock_bh(&vvs->rx_lock);
+>
+> 	skb_queue_walk_safe(&vvs->rx_queue, skb,  tmp) {
+>-		off = 0;
+>+		off = VIRTIO_VSOCK_SKB_CB(skb)->frag_off;
+>
+> 		if (total == len)
+> 			break;
+>@@ -370,7 +370,10 @@ virtio_transport_stream_do_peek(struct vsock_sock *vsk,
+> 			 */
+> 			spin_unlock_bh(&vvs->rx_lock);
+>
+>-			err = memcpy_to_msg(msg, skb->data + off, bytes);
+>+			err = skb_copy_datagram_iter(skb, off,
+>+						     &msg->msg_iter,
+>+						     bytes);
+>+
+> 			if (err)
+> 				goto out;
+>
+>@@ -411,27 +414,35 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> 	}
+>
+> 	while (total < len && !skb_queue_empty(&vvs->rx_queue)) {
+>+		u32 skb_rest_len;
+>+
+> 		skb = skb_peek(&vvs->rx_queue);
+>
+> 		bytes = len - total;
+>-		if (bytes > skb->len)
+>-			bytes = skb->len;
+>+		skb_rest_len = skb->len - VIRTIO_VSOCK_SKB_CB(skb)->frag_off;
+>+
+>+		if (bytes > skb_rest_len)
+>+			bytes = skb_rest_len;
 
-Please note that I do -not- recommend production use of a three-bit
-(let alone a two-bit) RCU portion because this has a high probability
-of excessively extending grace periods.  But it might be good to keep
-a tiny counter as a debug option so that we regularly rcutorture it.
+What about just:
+		bytes = min_t(size_t, len - total,
+			      skb->len - VIRTIO_VSOCK_SKB_CB(skb)->frag_off);
 
-							Thanx, Paul
+The rest LGTM!
+
+Stefano
+
+>
+> 		/* sk_lock is held by caller so no one else can dequeue.
+> 		 * Unlock rx_lock since memcpy_to_msg() may sleep.
+> 		 */
+> 		spin_unlock_bh(&vvs->rx_lock);
+>
+>-		err = memcpy_to_msg(msg, skb->data, bytes);
+>+		err = skb_copy_datagram_iter(skb,
+>+					     VIRTIO_VSOCK_SKB_CB(skb)->frag_off,
+>+					     &msg->msg_iter, bytes);
+>+
+> 		if (err)
+> 			goto out;
+>
+> 		spin_lock_bh(&vvs->rx_lock);
+>
+> 		total += bytes;
+>-		skb_pull(skb, bytes);
+>
+>-		if (skb->len == 0) {
+>+		VIRTIO_VSOCK_SKB_CB(skb)->frag_off += bytes;
+>+
+>+		if (skb->len == VIRTIO_VSOCK_SKB_CB(skb)->frag_off) {
+> 			u32 pkt_len = le32_to_cpu(virtio_vsock_hdr(skb)->len);
+>
+> 			virtio_transport_dec_rx_pkt(vvs, pkt_len);
+>@@ -503,7 +514,10 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+> 				 */
+> 				spin_unlock_bh(&vvs->rx_lock);
+>
+>-				err = memcpy_to_msg(msg, skb->data, bytes_to_copy);
+>+				err = skb_copy_datagram_iter(skb, 0,
+>+							     &msg->msg_iter,
+>+							     bytes_to_copy);
+>+
+> 				if (err) {
+> 					/* Copy of message failed. Rest of
+> 					 * fragments will be freed without copy.
+>-- 
+>2.25.1
+>
+
