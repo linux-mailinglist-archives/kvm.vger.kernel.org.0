@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4EE374A2A9
-	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 18:56:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B3B5274A2AC
+	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 18:57:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232322AbjGFQ4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jul 2023 12:56:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48750 "EHLO
+        id S232308AbjGFQ5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jul 2023 12:57:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232404AbjGFQ4e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jul 2023 12:56:34 -0400
+        with ESMTP id S229694AbjGFQ5R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jul 2023 12:57:17 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A281FC3
-        for <kvm@vger.kernel.org>; Thu,  6 Jul 2023 09:55:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E621FEE
+        for <kvm@vger.kernel.org>; Thu,  6 Jul 2023 09:56:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688662548;
+        s=mimecast20190719; t=1688662566;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Y7EFslApvIMhSEz1WUIyVbtwIYD8kB8bBcKW8IzvGEk=;
-        b=IyMu8CsaEBttKaaH1CTPXRpPmhR4AiFztvBvNBk15TWXX6wlt7L8D6nd7FYYtBlDN0aL/L
-        r1o1FWvRENQhtbKGMJAoIruAojS8QxnZM8GQSkyPoyMF9YjJVbWVTO0z4b03Rb84FVzJq7
-        n4Mpp+v2mGskFDchFTiPURYJ4X2VrPA=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=DQmeZW7JJEADmCiQp/d8Tl0o1s0eDsc5Jt7E9LRdL4I=;
+        b=jBT8ea68MTbatSIaWvO1KoJ8qiUiR0jMOKZplEORzMGFzjwsVXdMigjo4x0hnT9YDcYJh6
+        nduRD6z6IZNeLW+3ikfx0yflJ8XsaAALCYTvVwYF86kcZasbObb+DP9lDXl83uBHbjqugx
+        iJjxiY9TnHVD93pCttXhVjYfvJKJ7us=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-551-Z98jKmaGO2iapBKnO0pBag-1; Thu, 06 Jul 2023 12:55:47 -0400
-X-MC-Unique: Z98jKmaGO2iapBKnO0pBag-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-992e6840901so113359966b.0
-        for <kvm@vger.kernel.org>; Thu, 06 Jul 2023 09:55:46 -0700 (PDT)
+ us-mta-93-ctPVf_cdMe6sggy4r4d8wg-1; Thu, 06 Jul 2023 12:56:05 -0400
+X-MC-Unique: ctPVf_cdMe6sggy4r4d8wg-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-51836731bfbso636151a12.3
+        for <kvm@vger.kernel.org>; Thu, 06 Jul 2023 09:56:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688662546; x=1691254546;
+        d=1e100.net; s=20221208; t=1688662564; x=1691254564;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Y7EFslApvIMhSEz1WUIyVbtwIYD8kB8bBcKW8IzvGEk=;
-        b=aduR25T4cdQKChsVhwY817N+yXS7iZk3zqV8BLf7xC1yf6yongQCodzZZfwM9AAlvO
-         2g+cOrQYLqJSITZSYttrUwhCro1134/xNMf6zM/S7AGjxL063YI21mXUUWGzPSdrHK93
-         8ZtHNT0sq+AfuBGjo+tQGWLS2voA/tBFZ9d/y/LsgIapCgYXbslX+Wh+WYwH64bLAKSv
-         WMLuOVRNsQ766OhW0KYxk6OnIsU5OGTQnqkib/4aNC2cTbJjvRNZXk0obf/d2r+t0xF7
-         JlIGA2Syv9xUO14GTKW3LhDaEmhvZeLP4kpSPt1I8jIj18PViZ/qAgnjsjx67G4HjM5i
-         YGOw==
-X-Gm-Message-State: ABy/qLa0p+qgk+o58qpe5baCc9hluZ6c0m3prUXN1zJe3bFzcXv0VACw
-        b9JSxxAF//8RkcvhtLUnIi8ynnwoDTGetvlO152RSZW3M6ijvziZT+7MMkArreoN07FpZ186zml
-        AlfgK8DxZvRZv
-X-Received: by 2002:a17:906:2d6:b0:993:b238:314 with SMTP id 22-20020a17090602d600b00993b2380314mr2600083ejk.38.1688662546152;
-        Thu, 06 Jul 2023 09:55:46 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFGg/FURu/KpBWldonp5cKBo2TqmSR+9W2fAH24sb2tpeMexZDCIz1vdjUXF4DUou9tWLwsog==
-X-Received: by 2002:a17:906:2d6:b0:993:b238:314 with SMTP id 22-20020a17090602d600b00993b2380314mr2600069ejk.38.1688662545830;
-        Thu, 06 Jul 2023 09:55:45 -0700 (PDT)
+        bh=DQmeZW7JJEADmCiQp/d8Tl0o1s0eDsc5Jt7E9LRdL4I=;
+        b=JWqi81l2BNmY/3URruUQWeCrnZVvr3goBvjQ8o8p7ajDmo6qaxo4XJ7O9cnY2hZHrC
+         SzSvs3kY3LacGEHpVZBeom6Oh0t7M5WyPs6X5RKi7Y2u+g12U/FKBAZ1M1dODSvUMqO7
+         FwdW34EmgTcsYG4m1/QcWqdiJjSsIdC/kCNJzLj4jcQfEpp/XW/diRtQCcr642WBQcoN
+         UXRNqrKnbfhgmiN9j48pul+aWFFaDa4yLmHy4D6bkNtolzNa+zX455p2oa4uvQxYSMPz
+         QvHWXLrjY3UivWs8bZ++NXBOQhTDWEd3vTfqstQBVfclN3H2WbK+eCifxIXsLU7Sl60y
+         QwSg==
+X-Gm-Message-State: ABy/qLaFq96pfDahYidicqp38yXeoUCBkR5aOjbP+CgtPDlDSIYbsAiW
+        g1ycX0qEJu7IYQ0uiH8jUYZxy6ZYylThm376dUTiOTg3IdalGA41XMruwLAjdY0KIobbOnx+0E0
+        QcRa9wWI5egFk
+X-Received: by 2002:a05:6402:120b:b0:51b:ec86:b49a with SMTP id c11-20020a056402120b00b0051bec86b49amr2154476edw.7.1688662564106;
+        Thu, 06 Jul 2023 09:56:04 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFxoQPW4oanBsoLFqkOwrRRnKfPaR1KLUxeJaSGG1BqBJPWu7lxGmtL/ElaHswkY3m0t4dqDw==
+X-Received: by 2002:a05:6402:120b:b0:51b:ec86:b49a with SMTP id c11-20020a056402120b00b0051bec86b49amr2154459edw.7.1688662563919;
+        Thu, 06 Jul 2023 09:56:03 -0700 (PDT)
 Received: from sgarzare-redhat (host-79-46-200-163.retail.telecomitalia.it. [79.46.200.163])
-        by smtp.gmail.com with ESMTPSA id h20-20020a170906719400b0099290e2c163sm1041264ejk.204.2023.07.06.09.55.44
+        by smtp.gmail.com with ESMTPSA id w26-20020a056402129a00b0051a1ef536c9sm961703edv.64.2023.07.06.09.56.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jul 2023 09:55:45 -0700 (PDT)
-Date:   Thu, 6 Jul 2023 18:55:43 +0200
+        Thu, 06 Jul 2023 09:56:03 -0700 (PDT)
+Date:   Thu, 6 Jul 2023 18:56:01 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -68,15 +68,15 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v5 11/17] vsock/virtio: support MSG_ZEROCOPY for
+Subject: Re: [RFC PATCH v5 12/17] vsock/loopback: support MSG_ZEROCOPY for
  transport
-Message-ID: <tx4i6pikd6k2lejpukxsf2auodldrsciic2xu23r66dnt3ozzm@7k7nw22ek5iv>
+Message-ID: <p2ctmue6xm6v7px7uir2rtav6lvgenakmh45t2hd5qvdxvbeyq@cqmlufisosgx>
 References: <20230701063947.3422088-1-AVKrasnov@sberdevices.ru>
- <20230701063947.3422088-12-AVKrasnov@sberdevices.ru>
+ <20230701063947.3422088-13-AVKrasnov@sberdevices.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20230701063947.3422088-12-AVKrasnov@sberdevices.ru>
+In-Reply-To: <20230701063947.3422088-13-AVKrasnov@sberdevices.ru>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -88,42 +88,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jul 01, 2023 at 09:39:41AM +0300, Arseniy Krasnov wrote:
->Add 'msgzerocopy_allow()' callback for virtio transport.
+On Sat, Jul 01, 2023 at 09:39:42AM +0300, Arseniy Krasnov wrote:
+>Add 'msgzerocopy_allow()' callback for loopback transport.
 >
 >Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 >---
 > Changelog:
 > v4 -> v5:
 >  * Move 'msgzerocopy_allow' right after seqpacket callbacks.
+>  * Don't use prototype for 'vsock_loopback_msgzerocopy_allow()'.
 >
-> net/vmw_vsock/virtio_transport.c | 7 +++++++
-> 1 file changed, 7 insertions(+)
+> net/vmw_vsock/vsock_loopback.c | 6 ++++++
+> 1 file changed, 6 insertions(+)
 
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
 >
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index 6cbb45bb12d2..8d3e9f441fa1 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -441,6 +441,11 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
-> 	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+>diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+>index 5c6360df1f31..048640167411 100644
+>--- a/net/vmw_vsock/vsock_loopback.c
+>+++ b/net/vmw_vsock/vsock_loopback.c
+>@@ -47,6 +47,10 @@ static int vsock_loopback_cancel_pkt(struct vsock_sock *vsk)
 > }
 >
->+static bool virtio_transport_msgzerocopy_allow(void)
+> static bool vsock_loopback_seqpacket_allow(u32 remote_cid);
+>+static bool vsock_loopback_msgzerocopy_allow(void)
 >+{
 >+	return true;
 >+}
->+
-> static bool virtio_transport_seqpacket_allow(u32 remote_cid);
 >
-> static struct virtio_transport virtio_transport = {
->@@ -474,6 +479,8 @@ static struct virtio_transport virtio_transport = {
-> 		.seqpacket_allow          = virtio_transport_seqpacket_allow,
+> static struct virtio_transport loopback_transport = {
+> 	.transport = {
+>@@ -79,6 +83,8 @@ static struct virtio_transport loopback_transport = {
+> 		.seqpacket_allow          = vsock_loopback_seqpacket_allow,
 > 		.seqpacket_has_data       = virtio_transport_seqpacket_has_data,
 >
->+		.msgzerocopy_allow        = virtio_transport_msgzerocopy_allow,
+>+		.msgzerocopy_allow        = vsock_loopback_msgzerocopy_allow,
 >+
 > 		.notify_poll_in           = virtio_transport_notify_poll_in,
 > 		.notify_poll_out          = virtio_transport_notify_poll_out,
