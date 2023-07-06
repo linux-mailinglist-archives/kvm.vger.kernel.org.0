@@ -2,287 +2,500 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE972749241
-	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 02:07:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84DE4749320
+	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 03:34:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231409AbjGFAHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jul 2023 20:07:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54482 "EHLO
+        id S232809AbjGFBe3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jul 2023 21:34:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229929AbjGFAHV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jul 2023 20:07:21 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2060.outbound.protection.outlook.com [40.107.94.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E35821993;
-        Wed,  5 Jul 2023 17:07:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VCjOg/+q8Gh8IiE2MV+NRLes92/1MH5aPAB0ktSAWMKiqgaZPrcKfzHN148fsQU38Wif3ppKq9nFTl8VCG5VFcQ0Pr2zc0kd0W7zs7jFeUS0q+yPyD0Q6yXxETgWgUi+kHXhEitG04/c4s792Sx94eImAMYxS7aneoSbDy2EybpccYOYjXqHPIA93Xt8KJYbf64zKX40WNLORS/lPFgMV6W/IZJnZV8xir5fUnykyQHUHZS8CHglGztBbFsgqolrIthSWsIYbsqIXGx2Lgfl7tXKwFdOOG+1Tn0PzYsTvs0Q7QoQDYozEC8FJqtIMUCCDZM5FwdftvyGvbZOOBm38A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RpP5a6cw4EeTRIq2b6GOheaVyQW5GRCg7EDcMu2xlFs=;
- b=Jio4vMh1BCi+8UpBDL631C8PpqarFirubVfD/yffEQ7WtFh2m6RN6RX9JNftBofd2OxHelJm+umLHzWWKtxaDwSQR0LV1rAvUbWtUcf1MpI7yQYanMbYL0NXCCtIqkXuvm65mPjCXwIkYejGji7GnSG1d4Fg2vE3BQCJkULYHnCBSG+xI34RWY9DIZVim4xKoOrPZMI4qATNeQant9Cdqg5AtZ/YO5M5QWzAmu42v2h4aEPUGKjQBgb4X8Z2Y3yYrbGQhOEz5ST71wqU0wjPUbkd9dHWnzgElokYYvL3oUD+KCMZpBsvLjzskSU4LmiEtYR7TktRXSrtPzrtRLtd1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RpP5a6cw4EeTRIq2b6GOheaVyQW5GRCg7EDcMu2xlFs=;
- b=UAIAAneKuyQ/LqikPfIC+YPcYQO1OH3kb0ePZWILEcf1eV7tU6pQjfPIrFF0KMDBNYNrDD2/jiN2l/F7a4QFAwTuQahZRiDIm/l1lzKMFTsnLFLStg0oFx6G4At/4qFqwbbBTGrLTliGJVpmrHrdIIecg+cZdCpnte+6/yF0hsk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- IA1PR12MB7589.namprd12.prod.outlook.com (2603:10b6:208:42b::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Thu, 6 Jul
- 2023 00:07:15 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::818a:c10c:ce4b:b3d6]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::818a:c10c:ce4b:b3d6%4]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
- 00:07:15 +0000
-Message-ID: <eff34828-545b-956b-f400-89b585706fe4@amd.com>
-Date:   Wed, 5 Jul 2023 17:07:11 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.11.2
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
- support it
-Content-Language: en-US
-To:     Eugenio Perez Martin <eperezma@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-References: <20230703142218.362549-1-eperezma@redhat.com>
- <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org>
- <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
- <20230704114159-mutt-send-email-mst@kernel.org>
- <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
- <CAJaqyWd0QC6x9WHBT0x9beZyC8ZrF2y=d9HvmT0+05RtGc8_og@mail.gmail.com>
-From:   Shannon Nelson <shannon.nelson@amd.com>
-In-Reply-To: <CAJaqyWd0QC6x9WHBT0x9beZyC8ZrF2y=d9HvmT0+05RtGc8_og@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR13CA0171.namprd13.prod.outlook.com
- (2603:10b6:a03:2c7::26) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+        with ESMTP id S230305AbjGFBe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jul 2023 21:34:28 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BD0171B;
+        Wed,  5 Jul 2023 18:34:26 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-55b83ae9be2so161967a12.2;
+        Wed, 05 Jul 2023 18:34:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688607266; x=1691199266;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2z8PnN8KkyatR/iExIdxTC6Q1MI9UWQ7DGb3pnOB+0w=;
+        b=iZ/PBanTWLJ6hbGVmIyAfv510opDHOsuxJTIQLbHPBgNBe19Mw5X9SMWjCbgYygnnI
+         l/1Nx7eu2yqlIUo1ZxDojlJ1DjuOB37OiiZXXxnmDopdOU5Dt1DkymMSHEgprQnsUGNv
+         ozm+ZGERGk2HGchcyqGhxbPe5hI9zH1qwMpmgoadAYUvZA1iyCTUNBWCXjK3Uo4+WC+E
+         aGG2JipUgVCYl3ha6exz0hGh4bJqBBzLvIsjJtVflX+p9LsD7py3GBzIi00BBwY5xOEW
+         mZZre7BCgwaHzhOn9tYvk3WAEGtbEV0pMYYuLtZHVvZl4jEowrJFyj8Cg4TCNiOyaSgA
+         8kDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688607266; x=1691199266;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2z8PnN8KkyatR/iExIdxTC6Q1MI9UWQ7DGb3pnOB+0w=;
+        b=c+VBtUUFQd2wK0tDYq3ioBUFZXAi55sD6fvi+1ibXlB1m5FeSkX7lH1kINbzN6ojnt
+         NlGeqR/wTwuaa0spZgONIGIajM+R/DArKVQn3YqeRyTHrqKuXwtJQOQB6dOrRE0VeTFm
+         oLywHlSxDbMgsScU0WiZGgYVQc+wx+SH3aTOZNNvswMxl2xbUn7wGfVPkticWjmai8UR
+         eEiB3dhIutZFXKTrzgBX2dZsmFijtch2GMisedWfQftW9M4+wFGKGHLeeCjVCX7qM1GU
+         etpx4do6LpE6r0EMchacwt/rJJ23e2oqei7pS+tYs5hxIknODQf4LgfzSeF4kl9DICak
+         kTPQ==
+X-Gm-Message-State: ABy/qLax7Wlq3J/dpCC32X9GVgjAdcxVoxTsXJgEfWIjzmYrgxIHdMzd
+        fTXLYWMMVC5ulBxWnm0UP+A=
+X-Google-Smtp-Source: APBJJlE2fLWVc5FBU1iez9G6bx8tNEAnPtmPjPbUG15dSkIAwuTIm53BpyqLXGkirGpFpCP1WuBetw==
+X-Received: by 2002:a05:6a20:8408:b0:12d:39c6:9f94 with SMTP id c8-20020a056a20840800b0012d39c69f94mr558590pzd.47.1688607265581;
+        Wed, 05 Jul 2023 18:34:25 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id ji11-20020a170903324b00b001ab01598f40sm108150plb.173.2023.07.05.18.34.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jul 2023 18:34:25 -0700 (PDT)
+Date:   Wed, 5 Jul 2023 18:34:23 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Peter Xu <peterx@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, isaku.yamahata@gmail.com
+Subject: Re: [PATCH v7 2/8] KVM: Introduce __kvm_follow_pfn function
+Message-ID: <20230706013423.GA3894444@ls.amr.corp.intel.com>
+References: <20230704075054.3344915-1-stevensd@google.com>
+ <20230704075054.3344915-3-stevensd@google.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|IA1PR12MB7589:EE_
-X-MS-Office365-Filtering-Correlation-Id: acc1374c-d8c2-400e-8d97-08db7db4f447
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aFucxTUXfxArMCgQrwF26LxSbb3GI0A7/O7nfJ3wYYsmsOUER491HsEHeAinZjv+J4+JvsPXdsVkOSynH4MwG75Gl6bRrGxuGc+aJ7qYjRPoSdSYz78Sv6KKcOWJzq7COHbJxfSvrVTYgVheL7vtVFxvwZgyjcr+SAetP4geZnvGFpE/ljqa3rqsIxaFu5dg2JOp8vneyQnktpMeMON6spgd8dQ5RaW8nRrupqssbL9aFauL6DcjIdoAnA7ah/dx/QeEqY4Y6GFntLRWzc6uhlo6HbHMc++1H4nNhYR68RrcuObcWXt7xMha3HFKiKCYyOKgC29jFHvyaywXdnYIae3DF5CcskCESKN0OnEz+6NqFD65Z36lFisYwDwpp1wGjWPELJR6EPzbmXnTQ58frhXY6WbralnN4ipLenWoZ8PRjgmp9xmCJWoeVo42dlJW0SFyGMLTJyxN8lHqC2Pvb9b6RXoPjLnbcNEQ5N1TAlHMbNfR08IHsUTTaIoTvvW71gUYMdsSW5l8o2/OmjqMMUsUa0k1t6zYj2yBOuLhr4AdZwwEJ12eu10fI9ah3Sdw8pz2oI2G5DvUTu2hsflSGsEmnto6Z9mYDs1AEGxF5ovcI1IoB6921UI7PEY8l6oZJarc+lyzig1WcpNIc06hXDdhSmg0H/v7mm1q1nG4RJD9GOBySgEf/hc9/QY11mUB
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(39860400002)(396003)(346002)(376002)(451199021)(2906002)(8676002)(66899021)(41300700001)(5660300002)(44832011)(8936002)(36756003)(6666004)(86362001)(31696002)(31686004)(478600001)(2616005)(26005)(6506007)(53546011)(966005)(6512007)(186003)(110136005)(84970400001)(66946007)(316002)(4326008)(66476007)(38100700002)(66556008)(6486002)(83380400001)(66574015)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MHpSSGdSdDJIb0tsVTVtQXJ2TGx6Q0VkT0p5NkprbUR6eHI4UmQxRXlZOFpF?=
- =?utf-8?B?ZVdibnlYaEZUaGlMV1llNVhtSDZrRkUwTHRVRG5yUnBFM2RVTS9qVzF3N2tu?=
- =?utf-8?B?WldvdjR5Zk5qY3FBNTVaN000WjFoYmNYdWlNS1cxZWZrY05YRHJwMjlkYStz?=
- =?utf-8?B?aDJvZkVvUEV4cjFXNlhOaW41dUdPWGs3L2NtU2w4VzQ0M3JYVDA1SDdscEtw?=
- =?utf-8?B?SHVWVzJyR3ZVanZZWUlUU2dhTkRJSlVNQTAxR1VsQld5bTdoMTNhSE53WkNa?=
- =?utf-8?B?blkzaUtMV3RIK3JyaVZjSGVtQXdWNm9VNTM1R0pWM0pDNXZFQ0tTRjYzendp?=
- =?utf-8?B?SjE4d0RPOWl5RFFqcHc5cTZVdXd1c0JPVy8ydWR2bUowTytVYThxaDE4dE8y?=
- =?utf-8?B?MS9nM0pnMFFxc29ZdGtET1Z1dFBYYVNTQ1NDNWt0ME1aMGZqdVBxbE1LQ3o2?=
- =?utf-8?B?QWlTTXBaR0NpekVsUmMydHhFcnFmdDRETUgwYVIzdTA1QzVQQ3dKdUtjYUxR?=
- =?utf-8?B?bjlTUGxoRExSWCtXVkNicDlhc0ZkRHVtN2tBSzBnQUhjMXMvVTdSWDdpZEtk?=
- =?utf-8?B?MW1IOVJoeXMxN1dBeUxaZ3plcDhtSmN6bXB4VlNLakN4NS9IUHUrN25VZjk0?=
- =?utf-8?B?K0VxLzJneVNmUlg3Qjh2NmxwcVpKV2JSLzRIbWZrQ3gwem9vMnN2SHk1ODBx?=
- =?utf-8?B?amRmdkp4cGtORWt4YkFhOW9DRWpCblBGVWloT3lzemlJWFhuRWNSN1R0bklh?=
- =?utf-8?B?SXJabURUODN0MmhXZG1zTnlvaTZaTWI5VGZZR2M2cThoVDhPenlJQ2podmJI?=
- =?utf-8?B?SVFHR0Q5UmRkSUI4NlJsYmdIUEVjRmJGOU9mTytOUmw5VlhRU2R6TkJXSjVQ?=
- =?utf-8?B?di9pK0ZPTy9hVnN2SksrV29vanRNM21YZ1hxaXJZeEUzSG03S05JbXBQcEJo?=
- =?utf-8?B?MXNSd0JkWTM1MFhaOFZheStFcEpJd3dET0MzQWdYSWtRamN6bWp6VU04bWJR?=
- =?utf-8?B?djJ4Y1gxSlhpZXB0Y1RwdjMvYW10U3U2elhldEFiZHFBQTlSOUlVMlQvMmU3?=
- =?utf-8?B?RHpXNXpraElGb2ZqanVPWWpjSXB4S3N1S1h2SXFwV2JmdDI2ZFNDRzRIa3hr?=
- =?utf-8?B?VjZVKzVyc2JLd29sRi9ZdmZXYk5hWmRpVStYbFliYlFnZ3ZaUVY0SlBWYnpP?=
- =?utf-8?B?OEFLRkMzeDYwM3BTRlhVYlkvdFlyZ3c2amJFNlYxcGgyeHJFQ0tpZmNkdytr?=
- =?utf-8?B?NGZZRldwZC9VK1Ftemh6cWdYWmcwbTNzbklUSUcyVG1YVlFqQzloYmVSb2tM?=
- =?utf-8?B?eDJvSC9OL1ZSWUNDM3B3b29CMkswQkZJUGJLM3JTcEdhTHVsc2NHamp1aEFV?=
- =?utf-8?B?M1l6QjVNOXAzYVhUZld2d3BpUEhkUFQ5WUFYTWFWUVljTzk1S0FYQm5JSEhp?=
- =?utf-8?B?REFabzdoTGNCODVVclJDT2pFRHRoNkxvTHBjanFLWEVFQm16aDZSUk8yYmtP?=
- =?utf-8?B?NG1DMXE3TEFlU00vQjNHSXIrd2E1NHo3dlBNbytFYkhUWVRiYjdHd3JwOTdo?=
- =?utf-8?B?bXlkVlNBWmpCbUZzT1Q1cTl4MWdGUDJGRFd1b0w3S3RrcU9pVG1IRXBaaWN0?=
- =?utf-8?B?bjZnRGRmOEFQSXRGME53WU8zM000V1hnSUE2dnBHbm4vWkRJV3RzSTF0Qjlp?=
- =?utf-8?B?TVJwWitpejJVbVpuVjhYNk5XYWtPNHdTTERUbXpEZDdMMldod2ZEZnlGWUFY?=
- =?utf-8?B?Mmwzc1VzakJkRFljOXhkeCtIa2xzamZPRlNvWktZQmE1SWE5MS9rcy9YN3Vw?=
- =?utf-8?B?UzU5ZkFBa2xnVE9vMWdSRjRKUmZPYXVSU20vUUNMS1B6ZXp6WXZyYlM1QWhM?=
- =?utf-8?B?czR2TE9VS2wwMWd4V2Irc2IvMFVMSndkaWlDNzd1SzBtM2dWVGZ6WWg0UUtT?=
- =?utf-8?B?c0I5bWJMbElEMldvNGFlbzdmeTJrK0lJMElyNlRmWFBWVnhSMHJUcXNYdHlv?=
- =?utf-8?B?UGJkd3RzT05ZRFFVK3NtZEluNXNuVEhuOUFmL3lrV3BwajRrZzFoR3A0MVhk?=
- =?utf-8?B?OC9LSzJGVVhXcXBMQWZNRlh5MEJxa2NwV0Y1ZFZXU2FYalZiM1RtSFBnKzJz?=
- =?utf-8?Q?TGVjBslVLsd0vaKCpGVqUWwuH?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: acc1374c-d8c2-400e-8d97-08db7db4f447
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 00:07:15.0687
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nXuvAtj2zfKb/Xf8o2cGF9QYI8KZBdp344Z9TfnPMybTPtstVVdQog2PLGqx3InwIl6cqAwpOKysyZyySGooOw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7589
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230704075054.3344915-3-stevensd@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/5/23 11:27 AM, Eugenio Perez Martin wrote:
- >
-> On Wed, Jul 5, 2023 at 9:50 AM Jason Wang <jasowang@redhat.com> wrote:
->>
->> On Tue, Jul 4, 2023 at 11:45 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->>>
->>> On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wrote:
->>>> On Tue, Jul 4, 2023 at 12:38 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->>>>>
->>>>> On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin wrote:
->>>>>> On Mon, Jul 3, 2023 at 4:52 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->>>>>>>
->>>>>>> On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio Pérez wrote:
->>>>>>>> With the current code it is accepted as long as userland send it.
->>>>>>>>
->>>>>>>> Although userland should not set a feature flag that has not been
->>>>>>>> offered to it with VHOST_GET_BACKEND_FEATURES, the current code will not
->>>>>>>> complain for it.
->>>>>>>>
->>>>>>>> Since there is no specific reason for any parent to reject that backend
->>>>>>>> feature bit when it has been proposed, let's control it at vdpa frontend
->>>>>>>> level. Future patches may move this control to the parent driver.
->>>>>>>>
->>>>>>>> Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
->>>>>>>> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
->>>>>>>
->>>>>>> Please do send v3. And again, I don't want to send "after driver ok" hack
->>>>>>> upstream at all, I merged it in next just to give it some testing.
->>>>>>> We want RING_ACCESS_AFTER_KICK or some such.
->>>>>>>
->>>>>>
->>>>>> Current devices do not support that semantic.
->>>>>
->>>>> Which devices specifically access the ring after DRIVER_OK but before
->>>>> a kick?
+On Tue, Jul 04, 2023 at 04:50:47PM +0900,
+David Stevens <stevensd@chromium.org> wrote:
 
-The PDS vdpa device can deal with a call to .set_vq_ready after 
-DRIVER_OK is set.  And I'm told that our VQ activity should start 
-without a kick.
+> From: David Stevens <stevensd@chromium.org>
+> 
+> Introduce __kvm_follow_pfn, which will replace __gfn_to_pfn_memslot.
+> __kvm_follow_pfn refactors the old API's arguments into a struct and,
+> where possible, combines the boolean arguments into a single flags
+> argument.
+> 
+> Signed-off-by: David Stevens <stevensd@chromium.org>
+> ---
+>  include/linux/kvm_host.h |  16 ++++
+>  virt/kvm/kvm_main.c      | 171 ++++++++++++++++++++++-----------------
+>  virt/kvm/kvm_mm.h        |   3 +-
+>  virt/kvm/pfncache.c      |   8 +-
+>  4 files changed, 122 insertions(+), 76 deletions(-)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 9d3ac7720da9..ef2763c2b12e 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -97,6 +97,7 @@
+>  #define KVM_PFN_ERR_HWPOISON	(KVM_PFN_ERR_MASK + 1)
+>  #define KVM_PFN_ERR_RO_FAULT	(KVM_PFN_ERR_MASK + 2)
+>  #define KVM_PFN_ERR_SIGPENDING	(KVM_PFN_ERR_MASK + 3)
+> +#define KVM_PFN_ERR_NEEDS_IO	(KVM_PFN_ERR_MASK + 4)
+>  
+>  /*
+>   * error pfns indicate that the gfn is in slot but faild to
+> @@ -1156,6 +1157,21 @@ unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot, gfn_t gfn,
+>  void kvm_release_page_clean(struct page *page);
+>  void kvm_release_page_dirty(struct page *page);
+>  
+> +struct kvm_follow_pfn {
+> +	const struct kvm_memory_slot *slot;
+> +	gfn_t gfn;
+> +	unsigned int flags;
+> +	bool atomic;
+> +	/* Allow a read fault to create a writeable mapping. */
+> +	bool allow_write_mapping;
 
-Our vdpa device FW doesn't currently have support for 
-VIRTIO_F_RING_RESET, but I believe it could be added without too much 
-trouble.
-
-sln
+Maybe, make them const for input arguments?
 
 
->>>>>
->>>>
->>>> Previous versions of the QEMU LM series did a spurious kick to start
->>>> traffic at the LM destination [1]. When it was proposed, that spurious
->>>> kick was removed from the series because to check for descriptors
->>>> after driver_ok, even without a kick, was considered work of the
->>>> parent driver.
->>>>
->>>> I'm ok to go back to this spurious kick, but I'm not sure if the hw
->>>> will read the ring before the kick actually. I can ask.
->>>>
->>>> Thanks!
->>>>
->>>> [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/msg02775.html
->>>
->>> Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, no?
->>
->> My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
->> sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
->>
->> But this reminds me one thing, as the thread is going too long, I
->> wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET is
->> supported?
->>
+> +
+> +	/* Outputs of __kvm_follow_pfn */
+> +	hva_t hva;
+> +	bool writable;
+> +};
+> +
+> +kvm_pfn_t __kvm_follow_pfn(struct kvm_follow_pfn *foll);
+> +
+>  kvm_pfn_t gfn_to_pfn(struct kvm *kvm, gfn_t gfn);
+>  kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
+>  		      bool *writable);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 371bd783ff2b..b13f22861d2f 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2486,24 +2486,22 @@ static inline int check_user_page_hwpoison(unsigned long addr)
+>   * true indicates success, otherwise false is returned.  It's also the
+>   * only part that runs if we can in atomic context.
+>   */
+> -static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+> -			    bool *writable, kvm_pfn_t *pfn)
+> +static bool hva_to_pfn_fast(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn)
+>  {
+>  	struct page *page[1];
+> +	bool write_fault = foll->flags & FOLL_WRITE;
+>  
+>  	/*
+>  	 * Fast pin a writable pfn only if it is a write fault request
+>  	 * or the caller allows to map a writable pfn for a read fault
+>  	 * request.
+>  	 */
+> -	if (!(write_fault || writable))
+> +	if (!(write_fault || foll->allow_write_mapping))
+>  		return false;
+>  
+> -	if (get_user_page_fast_only(addr, FOLL_WRITE, page)) {
+> +	if (get_user_page_fast_only(foll->hva, FOLL_WRITE, page)) {
+>  		*pfn = page_to_pfn(page[0]);
+> -
+> -		if (writable)
+> -			*writable = true;
+> +		foll->writable = foll->allow_write_mapping;
+>  		return true;
+>  	}
+>  
+> @@ -2514,35 +2512,26 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+>   * The slow path to get the pfn of the specified host virtual address,
+>   * 1 indicates success, -errno is returned if error is detected.
+>   */
+> -static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
+> -			   bool interruptible, bool *writable, kvm_pfn_t *pfn)
+> +static int hva_to_pfn_slow(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn)
+>  {
+> -	unsigned int flags = FOLL_HWPOISON;
+> +	unsigned int flags = FOLL_HWPOISON | FOLL_GET | foll->flags;
+
+Although adding FOLL_GET doesn't affect the behavior of
+get_user_pages_unlocked(), I wondered how this affects the next change
+It's better to mention it in the commit message.
+get_user_pages_*() called by hva_to_pfn_{fast, slot} imply FOLL_GET,
+but __kvm_follow_pfn() doesn't imply FOLL_GET.
+
+
+>  	struct page *page;
+>  	int npages;
+>  
+>  	might_sleep();
+>  
+> -	if (writable)
+> -		*writable = write_fault;
+> -
+> -	if (write_fault)
+> -		flags |= FOLL_WRITE;
+> -	if (async)
+> -		flags |= FOLL_NOWAIT;
+> -	if (interruptible)
+> -		flags |= FOLL_INTERRUPTIBLE;
+> -
+> -	npages = get_user_pages_unlocked(addr, 1, &page, flags);
+> +	npages = get_user_pages_unlocked(foll->hva, 1, &page, flags);
+>  	if (npages != 1)
+>  		return npages;
+>  
+> +	foll->writable = (foll->flags & FOLL_WRITE) && foll->allow_write_mapping;
+> +
+>  	/* map read fault as writable if possible */
+> -	if (unlikely(!write_fault) && writable) {
+> +	if (unlikely(!foll->writable) && foll->allow_write_mapping) {
+>  		struct page *wpage;
+>  
+> -		if (get_user_page_fast_only(addr, FOLL_WRITE, &wpage)) {
+> -			*writable = true;
+> +		if (get_user_page_fast_only(foll->hva, FOLL_WRITE, &wpage)) {
+> +			foll->writable = true;
+>  			put_page(page);
+>  			page = wpage;
+>  		}
+> @@ -2572,23 +2561,23 @@ static int kvm_try_get_pfn(kvm_pfn_t pfn)
+>  	return get_page_unless_zero(page);
+>  }
+>  
+> -static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+> -			       unsigned long addr, bool write_fault,
+> -			       bool *writable, kvm_pfn_t *p_pfn)
+> +static int hva_to_pfn_remapped(struct vm_area_struct *vma, struct kvm_follow_pfn *foll,
+> +			       kvm_pfn_t *p_pfn)
+>  {
+>  	kvm_pfn_t pfn;
+>  	pte_t *ptep;
+>  	spinlock_t *ptl;
+> +	bool write_fault = foll->flags & FOLL_WRITE;
+>  	int r;
+>  
+> -	r = follow_pte(vma->vm_mm, addr, &ptep, &ptl);
+> +	r = follow_pte(vma->vm_mm, foll->hva, &ptep, &ptl);
+>  	if (r) {
+>  		/*
+>  		 * get_user_pages fails for VM_IO and VM_PFNMAP vmas and does
+>  		 * not call the fault handler, so do it here.
+>  		 */
+>  		bool unlocked = false;
+> -		r = fixup_user_fault(current->mm, addr,
+> +		r = fixup_user_fault(current->mm, foll->hva,
+>  				     (write_fault ? FAULT_FLAG_WRITE : 0),
+>  				     &unlocked);
+>  		if (unlocked)
+> @@ -2596,7 +2585,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+>  		if (r)
+>  			return r;
+>  
+> -		r = follow_pte(vma->vm_mm, addr, &ptep, &ptl);
+> +		r = follow_pte(vma->vm_mm, foll->hva, &ptep, &ptl);
+>  		if (r)
+>  			return r;
+>  	}
+> @@ -2606,8 +2595,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+>  		goto out;
+>  	}
+>  
+> -	if (writable)
+> -		*writable = pte_write(*ptep);
+> +	foll->writable = pte_write(*ptep) && foll->allow_write_mapping;
+>  	pfn = pte_pfn(*ptep);
+>  
+>  	/*
+> @@ -2652,24 +2640,22 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+>   * 2): @write_fault = false && @writable, @writable will tell the caller
+>   *     whether the mapping is writable.
+>   */
+> -kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
+> -		     bool *async, bool write_fault, bool *writable)
+> +kvm_pfn_t hva_to_pfn(struct kvm_follow_pfn *foll)
+>  {
+>  	struct vm_area_struct *vma;
+>  	kvm_pfn_t pfn;
+>  	int npages, r;
+>  
+>  	/* we can do it either atomically or asynchronously, not both */
+> -	BUG_ON(atomic && async);
+> +	BUG_ON(foll->atomic && (foll->flags & FOLL_NOWAIT));
+>  
+> -	if (hva_to_pfn_fast(addr, write_fault, writable, &pfn))
+> +	if (hva_to_pfn_fast(foll, &pfn))
+>  		return pfn;
+>  
+> -	if (atomic)
+> +	if (foll->atomic)
+>  		return KVM_PFN_ERR_FAULT;
+>  
+> -	npages = hva_to_pfn_slow(addr, async, write_fault, interruptible,
+> -				 writable, &pfn);
+> +	npages = hva_to_pfn_slow(foll, &pfn);
+>  	if (npages == 1)
+>  		return pfn;
+>  	if (npages == -EINTR)
+> @@ -2677,83 +2663,122 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
+>  
+>  	mmap_read_lock(current->mm);
+>  	if (npages == -EHWPOISON ||
+> -	      (!async && check_user_page_hwpoison(addr))) {
+> +	      (!(foll->flags & FOLL_NOWAIT) && check_user_page_hwpoison(foll->hva))) {
+>  		pfn = KVM_PFN_ERR_HWPOISON;
+>  		goto exit;
+>  	}
+>  
+>  retry:
+> -	vma = vma_lookup(current->mm, addr);
+> +	vma = vma_lookup(current->mm, foll->hva);
+>  
+>  	if (vma == NULL)
+>  		pfn = KVM_PFN_ERR_FAULT;
+>  	else if (vma->vm_flags & (VM_IO | VM_PFNMAP)) {
+> -		r = hva_to_pfn_remapped(vma, addr, write_fault, writable, &pfn);
+> +		r = hva_to_pfn_remapped(vma, foll, &pfn);
+>  		if (r == -EAGAIN)
+>  			goto retry;
+>  		if (r < 0)
+>  			pfn = KVM_PFN_ERR_FAULT;
+>  	} else {
+> -		if (async && vma_is_valid(vma, write_fault))
+> -			*async = true;
+> -		pfn = KVM_PFN_ERR_FAULT;
+> +		if ((foll->flags & FOLL_NOWAIT) &&
+> +		    vma_is_valid(vma, foll->flags & FOLL_WRITE))
+> +			pfn = KVM_PFN_ERR_NEEDS_IO;
+> +		else
+> +			pfn = KVM_PFN_ERR_FAULT;
+>  	}
+>  exit:
+>  	mmap_read_unlock(current->mm);
+>  	return pfn;
+>  }
+>  
+> -kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+> -			       bool atomic, bool interruptible, bool *async,
+> -			       bool write_fault, bool *writable, hva_t *hva)
+> +kvm_pfn_t __kvm_follow_pfn(struct kvm_follow_pfn *foll)
+>  {
+> -	unsigned long addr = __gfn_to_hva_many(slot, gfn, NULL, write_fault);
+> -
+> -	if (hva)
+> -		*hva = addr;
+> +	foll->hva = __gfn_to_hva_many(foll->slot, foll->gfn, NULL,
+> +				      foll->flags & FOLL_WRITE);
+>  
+> -	if (addr == KVM_HVA_ERR_RO_BAD) {
+> -		if (writable)
+> -			*writable = false;
+> +	if (foll->hva == KVM_HVA_ERR_RO_BAD)
+>  		return KVM_PFN_ERR_RO_FAULT;
+> -	}
+>  
+> -	if (kvm_is_error_hva(addr)) {
+> -		if (writable)
+> -			*writable = false;
+> +	if (kvm_is_error_hva(foll->hva))
+>  		return KVM_PFN_NOSLOT;
+> -	}
+>  
+> -	/* Do not map writable pfn in the readonly memslot. */
+> -	if (writable && memslot_is_readonly(slot)) {
+> -		*writable = false;
+> -		writable = NULL;
+> -	}
+> +	if (memslot_is_readonly(foll->slot))
+> +		foll->allow_write_mapping = false;
+> +
+> +	return hva_to_pfn(foll);
+> +}
+> +EXPORT_SYMBOL_GPL(__kvm_follow_pfn);
+>  
+> -	return hva_to_pfn(addr, atomic, interruptible, async, write_fault,
+> -			  writable);
+> +kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+> +			       bool atomic, bool interruptible, bool *async,
+> +			       bool write_fault, bool *writable, hva_t *hva)
+> +{
+> +	kvm_pfn_t pfn;
+> +	struct kvm_follow_pfn foll = {
+> +		.slot = slot,
+> +		.gfn = gfn,
+> +		.flags = 0,
+> +		.atomic = atomic,
+> +		.allow_write_mapping = !!writable,
+> +	};
+> +
+> +	if (write_fault)
+> +		foll.flags |= FOLL_WRITE;
+> +	if (async)
+> +		foll.flags |= FOLL_NOWAIT;
+> +	if (interruptible)
+> +		foll.flags |= FOLL_INTERRUPTIBLE;
+> +
+> +	pfn = __kvm_follow_pfn(&foll);
+> +	if (pfn == KVM_PFN_ERR_NEEDS_IO) {
+> +		*async = true;
+> +		pfn = KVM_PFN_ERR_FAULT;
+> +	}
+> +	if (hva)
+> +		*hva = foll.hva;
+> +	if (writable)
+> +		*writable = foll.writable;
+> +	return pfn;
+>  }
+>  EXPORT_SYMBOL_GPL(__gfn_to_pfn_memslot);
+>  
+>  kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
+>  		      bool *writable)
+>  {
+> -	return __gfn_to_pfn_memslot(gfn_to_memslot(kvm, gfn), gfn, false, false,
+> -				    NULL, write_fault, writable, NULL);
+> +	kvm_pfn_t pfn;
+> +	struct kvm_follow_pfn foll = {
+> +		.slot = gfn_to_memslot(kvm, gfn),
+> +		.gfn = gfn,
+> +		.flags = write_fault ? FOLL_WRITE : 0,
+> +		.allow_write_mapping = !!writable,
+> +	};
+> +	pfn = __kvm_follow_pfn(&foll);
+> +	if (writable)
+> +		*writable = foll.writable;
+> +	return pfn;
+>  }
+>  EXPORT_SYMBOL_GPL(gfn_to_pfn_prot);
+>  
+>  kvm_pfn_t gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn)
+>  {
+> -	return __gfn_to_pfn_memslot(slot, gfn, false, false, NULL, true,
+> -				    NULL, NULL);
+> +	struct kvm_follow_pfn foll = {
+> +		.slot = slot,
+> +		.gfn = gfn,
+> +		.flags = FOLL_WRITE,
+> +	};
+> +	return __kvm_follow_pfn(&foll);
+>  }
+>  EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot);
+>  
+>  kvm_pfn_t gfn_to_pfn_memslot_atomic(const struct kvm_memory_slot *slot, gfn_t gfn)
+>  {
+> -	return __gfn_to_pfn_memslot(slot, gfn, true, false, NULL, true,
+> -				    NULL, NULL);
+> +	struct kvm_follow_pfn foll = {
+> +		.slot = slot,
+> +		.gfn = gfn,
+> +		.flags = FOLL_WRITE,
+> +		.atomic = true,
+> +	};
+> +	return __kvm_follow_pfn(&foll);
+>  }
+>  EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot_atomic);
+>  
+> diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
+> index 180f1a09e6ba..ed896aee5396 100644
+> --- a/virt/kvm/kvm_mm.h
+> +++ b/virt/kvm/kvm_mm.h
+> @@ -20,8 +20,7 @@
+>  #define KVM_MMU_UNLOCK(kvm)		spin_unlock(&(kvm)->mmu_lock)
+>  #endif /* KVM_HAVE_MMU_RWLOCK */
+>  
+> -kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
+> -		     bool *async, bool write_fault, bool *writable);
+> +kvm_pfn_t hva_to_pfn(struct kvm_follow_pfn *foll);
+>  
+>  #ifdef CONFIG_HAVE_KVM_PFNCACHE
+>  void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
+> diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+> index 2d6aba677830..e3fefa753a51 100644
+> --- a/virt/kvm/pfncache.c
+> +++ b/virt/kvm/pfncache.c
+> @@ -144,6 +144,12 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+>  	kvm_pfn_t new_pfn = KVM_PFN_ERR_FAULT;
+>  	void *new_khva = NULL;
+>  	unsigned long mmu_seq;
+> +	struct kvm_follow_pfn foll = {
+> +		.slot = gpc->memslot,
+> +		.gfn = gpa_to_gfn(gpc->gpa),
+> +		.flags = FOLL_WRITE,
+> +		.hva = gpc->uhva,
+> +	};
+>  
+>  	lockdep_assert_held(&gpc->refresh_lock);
+>  
+> @@ -183,7 +189,7 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+>  		}
+>  
+>  		/* We always request a writeable mapping */
+> -		new_pfn = hva_to_pfn(gpc->uhva, false, false, NULL, true, NULL);
+> +		new_pfn = hva_to_pfn(&foll);
+>  		if (is_error_noslot_pfn(new_pfn))
+>  			goto out_error;
+>  
+> -- 
+> 2.41.0.255.g8b1d071c50-goog
 > 
-> The problem with that is that the device needs to support all
-> RING_RESET, like to be able to change vq address etc after DRIVER_OK.
-> Not all HW support it.
-> 
-> We just need the subset of having the dataplane freezed until all CVQ
-> commands have been consumed. I'm sure current vDPA code already
-> supports it in some devices, like MLX and PSD.
-> 
-> Thanks!
-> 
->> Thanks
->>
->>>
->>>
->>>
->>>>>> My plan was to convert
->>>>>> it in vp_vdpa if needed, and reuse the current vdpa ops. Sorry if I
->>>>>> was not explicit enough.
->>>>>>
->>>>>> The only solution I can see to that is to trap & emulate in the vdpa
->>>>>> (parent?) driver, as talked in virtio-comment. But that complicates
->>>>>> the architecture:
->>>>>> * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
->>>>>> * Store vq enable state separately, at
->>>>>> vdpa->config->set_vq_ready(true), but not transmit that enable to hw
->>>>>> * Store the doorbell state separately, but do not configure it to the
->>>>>> device directly.
->>>>>>
->>>>>> But how to recover if the device cannot configure them at kick time,
->>>>>> for example?
->>>>>>
->>>>>> Maybe we can just fail if the parent driver does not support enabling
->>>>>> the vq after DRIVER_OK? That way no new feature flag is needed.
->>>>>>
->>>>>> Thanks!
->>>>>>
->>>>>>>
->>>>>>>> ---
->>>>>>>> Sent with Fixes: tag pointing to git.kernel.org/pub/scm/linux/kernel/git/mst
->>>>>>>> commit. Please let me know if I should send a v3 of [1] instead.
->>>>>>>>
->>>>>>>> [1] https://lore.kernel.org/lkml/20230609121244-mutt-send-email-mst@kernel.org/T/
->>>>>>>> ---
->>>>>>>>   drivers/vhost/vdpa.c | 7 +++++--
->>>>>>>>   1 file changed, 5 insertions(+), 2 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->>>>>>>> index e1abf29fed5b..a7e554352351 100644
->>>>>>>> --- a/drivers/vhost/vdpa.c
->>>>>>>> +++ b/drivers/vhost/vdpa.c
->>>>>>>> @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
->>>>>>>>   {
->>>>>>>>        struct vhost_vdpa *v = filep->private_data;
->>>>>>>>        struct vhost_dev *d = &v->vdev;
->>>>>>>> +     const struct vdpa_config_ops *ops = v->vdpa->config;
->>>>>>>>        void __user *argp = (void __user *)arg;
->>>>>>>>        u64 __user *featurep = argp;
->>>>>>>> -     u64 features;
->>>>>>>> +     u64 features, parent_features = 0;
->>>>>>>>        long r = 0;
->>>>>>>>
->>>>>>>>        if (cmd == VHOST_SET_BACKEND_FEATURES) {
->>>>>>>>                if (copy_from_user(&features, featurep, sizeof(features)))
->>>>>>>>                        return -EFAULT;
->>>>>>>> +             if (ops->get_backend_features)
->>>>>>>> +                     parent_features = ops->get_backend_features(v->vdpa);
->>>>>>>>                if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
->>>>>>>>                                 BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
->>>>>>>>                                 BIT_ULL(VHOST_BACKEND_F_RESUME) |
->>>>>>>> -                              BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK)))
->>>>>>>> +                              parent_features))
->>>>>>>>                        return -EOPNOTSUPP;
->>>>>>>>                if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
->>>>>>>>                     !vhost_vdpa_can_suspend(v))
->>>>>>>> --
->>>>>>>> 2.39.3
->>>>>>>
->>>>>
->>>
->>
-> 
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
