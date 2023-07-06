@@ -2,158 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 620917495EB
-	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 08:49:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48658749606
+	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 09:07:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233272AbjGFGty (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jul 2023 02:49:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60436 "EHLO
+        id S233604AbjGFHHX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jul 2023 03:07:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbjGFGtx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jul 2023 02:49:53 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09B5310E
-        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 23:49:52 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b6b98ac328so4180611fa.0
-        for <kvm@vger.kernel.org>; Wed, 05 Jul 2023 23:49:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1688626190; x=1691218190;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r5eWkSj4KC5nS3P+RLvcZXPptH23EBW7FjX/9bZ4xeY=;
-        b=ja4IOO3xVZ6/Tc75u/mIiFFibtnYxJ3DyQJiezKFRO1BT/i/tInsQdPBwqV1K6c8OB
-         NzrTW0CCdwtJDcyKr+K7eaRAfl7gSY3EPoTgo/V1gOdfqehluk6JZK6F4LvwA1z4DQCk
-         aCMPhrABaGhAhTIgENGDgkn/PB5cEiYnULzWI=
+        with ESMTP id S233511AbjGFHHV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jul 2023 03:07:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF4CBE65
+        for <kvm@vger.kernel.org>; Thu,  6 Jul 2023 00:06:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1688627194;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=POrI2HrupnKR3vfjjFVb4RJeA3XrZk3xd7QFOuOo4BE=;
+        b=WPi70VA2OFQNnPhOkqpzgUs2IzgpyuoN9KD9hPEDU78pzeX4b17JRJgP1fmx6zumQhFZRm
+        yx8ezUqy3s1J3WtOPJ+Rzo8flGyRJJ7A4I99nyfNzGTZpSKNQucyrykeODOaJe0Zd8t1Zg
+        2iT5P8/s2PchwTlSpZ+l7hVx0cwK3pQ=
+Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
+ [209.85.219.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-664-TE6DCQYQOdGhvzfXZ7lH4A-1; Thu, 06 Jul 2023 03:06:33 -0400
+X-MC-Unique: TE6DCQYQOdGhvzfXZ7lH4A-1
+Received: by mail-yb1-f200.google.com with SMTP id 3f1490d57ef6-bf0ba82473dso530360276.0
+        for <kvm@vger.kernel.org>; Thu, 06 Jul 2023 00:06:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688626190; x=1691218190;
+        d=1e100.net; s=20221208; t=1688627193; x=1691219193;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=r5eWkSj4KC5nS3P+RLvcZXPptH23EBW7FjX/9bZ4xeY=;
-        b=M6gTYjRrI8/FG+kt+g4haF8MT0aI5o2KsP78PVrjMJjlhyHXlOVvSSzkWE1AGmdBdN
-         9ENZXNupJxBXo5IJe9II1bev8/M8ZY1tz4eDxLrOkSHsm67FtsXGoPTyDyDRPGkqgwSi
-         Cd+4MWc7imSXVev2/9iAKV7dwmTazHDiMvqcZgIvQ0KCFBhThhhlxDnn51IX+KlrNYDz
-         r+yait/S5zaaF3Fhcr9erLnqTUNexMf+1Q51A0aNa8txLmJ4Pz1U9ocNC+mrnlcvUSpS
-         Xcd3T9Qw7LACQWzw9NPxfC1YvVqO0CaxY/rQ6pGts1LLrF+lILK5wYw2UGNr5qNWED1O
-         LftQ==
-X-Gm-Message-State: ABy/qLYxKR9UZmoVG24uO2DJjvCJsOKmz/g9IUdbsjbavlcUBAbWikEl
-        twYDfMIjxlGe+ZXUbJA7L2/woAgRQA/LBwL6MGjn9A==
-X-Google-Smtp-Source: APBJJlF7htU9Rd6ty5mPrsHjdKtTcK7sc+s+47FH3YkpHGjHXvbMbW6eRVcyDM6GyWvtGpLRUG3fOJ+jUV4yvf2Vv+s=
-X-Received: by 2002:a2e:b60d:0:b0:2b6:bb08:91c4 with SMTP id
- r13-20020a2eb60d000000b002b6bb0891c4mr609674ljn.42.1688626190310; Wed, 05 Jul
- 2023 23:49:50 -0700 (PDT)
+        bh=POrI2HrupnKR3vfjjFVb4RJeA3XrZk3xd7QFOuOo4BE=;
+        b=KmFNSp1evpcdrF4d5eBDEtOOZ8smrQVxu0AVf2XgwAme0m3ald+2tiSlNV+XnhokVS
+         6qW1pwTce9pGlBiXfjyAP7s6Zz9jqqH9Wv9pB9Sxag6m4PzFnJ7X2posSuiS5WNzFdRp
+         s5HHb7DyZJlLFGxjvAHz1NCTmn7LMC/yvPP6vKFX0YxHNXXnLY97+u5MbxUCT6fA54as
+         IAwpt1Ct+96nUZgtCVgnN0SWpgYVH5vCWWNthiBuaEgPI7n+HlMlfueP1vp4451lJVl/
+         s/2qElCRuMz86ZuVHvw5huBL2SZdSbjbCBJDBnzQAy8+fmY7kdA4ISYW2/6C0vq9FmDk
+         90xw==
+X-Gm-Message-State: ABy/qLaRhf89tNGbIclKQh1ulnXIK9a4pdGJreQEFMUWPVmPduQEq2un
+        +rdSvFvy2CisIodr2/y+NZaDHdTopc+sneEaCbtrAUSqeDupDwRakK5XdotDg9YWMdyiIHmibXd
+        NhxaCBTNXzx1xMkwKIWCEdnqXlF7z
+X-Received: by 2002:a25:b944:0:b0:c4d:96a2:5d96 with SMTP id s4-20020a25b944000000b00c4d96a25d96mr2165155ybm.34.1688627193147;
+        Thu, 06 Jul 2023 00:06:33 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHx7qsljWMwc5b+pAqOOzRL+zpISDZYM3lQSEoxYQUnDdgCGQcufSPdW0EttuPM5MBdQ9P2dGHiqiplFW64hl8=
+X-Received: by 2002:a25:b944:0:b0:c4d:96a2:5d96 with SMTP id
+ s4-20020a25b944000000b00c4d96a25d96mr2165135ybm.34.1688627192836; Thu, 06 Jul
+ 2023 00:06:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-4-stevensd@google.com>
- <20230705161914.00004070.zhi.wang.linux@gmail.com>
-In-Reply-To: <20230705161914.00004070.zhi.wang.linux@gmail.com>
-From:   David Stevens <stevensd@chromium.org>
-Date:   Thu, 6 Jul 2023 15:49:39 +0900
-Message-ID: <CAD=HUj5cbzjrc0KD7xcibtRMRCzoJRJAzt7jTHSXUSpzyAYbdg@mail.gmail.com>
-Subject: Re: [PATCH v7 3/8] KVM: Make __kvm_follow_pfn not imply FOLL_GET
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Peter Xu <peterx@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org
+References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
+ <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
+ <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
+ <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
+ <20230705043940-mutt-send-email-mst@kernel.org> <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
+In-Reply-To: <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Thu, 6 Jul 2023 09:05:56 +0200
+Message-ID: <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
+Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
+ support it
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Shannon Nelson <shannon.nelson@amd.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 5, 2023 at 10:19=E2=80=AFPM Zhi Wang <zhi.wang.linux@gmail.com>=
- wrote:
+On Thu, Jul 6, 2023 at 3:55=E2=80=AFAM Jason Wang <jasowang@redhat.com> wro=
+te:
 >
-> On Tue,  4 Jul 2023 16:50:48 +0900
-> David Stevens <stevensd@chromium.org> wrote:
+> On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
+> wrote:
+> >
+> > On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
+> > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <mst@redha=
+t.com> wrote:
+> > > >
+> > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wrot=
+e:
+> > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirkin <mst@r=
+edhat.com> wrote:
+> > > > > >
+> > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin =
+wrote:
+> > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsirkin <ms=
+t@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=C3=A9re=
+z wrote:
+> > > > > > > > > With the current code it is accepted as long as userland =
+send it.
+> > > > > > > > >
+> > > > > > > > > Although userland should not set a feature flag that has =
+not been
+> > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the curren=
+t code will not
+> > > > > > > > > complain for it.
+> > > > > > > > >
+> > > > > > > > > Since there is no specific reason for any parent to rejec=
+t that backend
+> > > > > > > > > feature bit when it has been proposed, let's control it a=
+t vdpa frontend
+> > > > > > > > > level. Future patches may move this control to the parent=
+ driver.
+> > > > > > > > >
+> > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE=
+_AFTER_DRIVER_OK backend feature")
+> > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > > > > > > >
+> > > > > > > > Please do send v3. And again, I don't want to send "after d=
+river ok" hack
+> > > > > > > > upstream at all, I merged it in next just to give it some t=
+esting.
+> > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
+> > > > > > > >
+> > > > > > >
+> > > > > > > Current devices do not support that semantic.
+> > > > > >
+> > > > > > Which devices specifically access the ring after DRIVER_OK but =
+before
+> > > > > > a kick?
+> > > > > >
+> > > > >
+> > > > > Previous versions of the QEMU LM series did a spurious kick to st=
+art
+> > > > > traffic at the LM destination [1]. When it was proposed, that spu=
+rious
+> > > > > kick was removed from the series because to check for descriptors
+> > > > > after driver_ok, even without a kick, was considered work of the
+> > > > > parent driver.
+> > > > >
+> > > > > I'm ok to go back to this spurious kick, but I'm not sure if the =
+hw
+> > > > > will read the ring before the kick actually. I can ask.
+> > > > >
+> > > > > Thanks!
+> > > > >
+> > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/msg0=
+2775.html
+> > > >
+> > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, no=
+?
+> > >
+> > > My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
+> > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
+> > >
+> > > But this reminds me one thing, as the thread is going too long, I
+> > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET is
+> > > supported?
+> > >
+> > > Thanks
+> >
+> > I don't see what does one have to do with another ...
+> >
+> > I think with RING_RESET we had another solution, enable rings
+> > mapping them to a zero page, then reset and re-enable later.
 >
-> > From: David Stevens <stevensd@chromium.org>
+> As discussed before, this seems to have some problems:
+>
+> 1) The behaviour is not clarified in the document
+> 2) zero is a valid IOVA
+>
+
+I think we're not on the same page here.
+
+As I understood, rings mapped to a zero page means essentially an
+avail ring whose avail_idx is always 0, offered to the device instead
+of the guest's ring. Once all CVQ commands are processed, we use
+RING_RESET to switch to the right ring, being guest's or SVQ vring.
+
+
+
+> Thanks
+>
 > >
-> > Make it so that __kvm_follow_pfn does not imply FOLL_GET. This allows
-> > callers to resolve a gfn when the associated pfn has a valid struct pag=
-e
-> > that isn't being actively refcounted (e.g. tail pages of non-compound
-> > higher order pages). For a caller to safely omit FOLL_GET, all usages o=
-f
-> > the returned pfn must be guarded by a mmu notifier.
+> > > >
+> > > >
+> > > >
+> > > > > > > My plan was to convert
+> > > > > > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorr=
+y if I
+> > > > > > > was not explicit enough.
+> > > > > > >
+> > > > > > > The only solution I can see to that is to trap & emulate in t=
+he vdpa
+> > > > > > > (parent?) driver, as talked in virtio-comment. But that compl=
+icates
+> > > > > > > the architecture:
+> > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
+> > > > > > > * Store vq enable state separately, at
+> > > > > > > vdpa->config->set_vq_ready(true), but not transmit that enabl=
+e to hw
+> > > > > > > * Store the doorbell state separately, but do not configure i=
+t to the
+> > > > > > > device directly.
+> > > > > > >
+> > > > > > > But how to recover if the device cannot configure them at kic=
+k time,
+> > > > > > > for example?
+> > > > > > >
+> > > > > > > Maybe we can just fail if the parent driver does not support =
+enabling
+> > > > > > > the vq after DRIVER_OK? That way no new feature flag is neede=
+d.
+> > > > > > >
+> > > > > > > Thanks!
+> > > > > > >
+> > > > > > > >
+> > > > > > > > > ---
+> > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/l=
+inux/kernel/git/mst
+> > > > > > > > > commit. Please let me know if I should send a v3 of [1] i=
+nstead.
+> > > > > > > > >
+> > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send=
+-email-mst@kernel.org/T/
+> > > > > > > > > ---
+> > > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
+> > > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
+> > > > > > > > >
+> > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > > > > > > > index e1abf29fed5b..a7e554352351 100644
+> > > > > > > > > --- a/drivers/vhost/vdpa.c
+> > > > > > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioc=
+tl(struct file *filep,
+> > > > > > > > >  {
+> > > > > > > > >       struct vhost_vdpa *v =3D filep->private_data;
+> > > > > > > > >       struct vhost_dev *d =3D &v->vdev;
+> > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->vdpa->conf=
+ig;
+> > > > > > > > >       void __user *argp =3D (void __user *)arg;
+> > > > > > > > >       u64 __user *featurep =3D argp;
+> > > > > > > > > -     u64 features;
+> > > > > > > > > +     u64 features, parent_features =3D 0;
+> > > > > > > > >       long r =3D 0;
+> > > > > > > > >
+> > > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
+> > > > > > > > >               if (copy_from_user(&features, featurep, siz=
+eof(features)))
+> > > > > > > > >                       return -EFAULT;
+> > > > > > > > > +             if (ops->get_backend_features)
+> > > > > > > > > +                     parent_features =3D ops->get_backen=
+d_features(v->vdpa);
+> > > > > > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURE=
+S |
+> > > > > > > > >                                BIT_ULL(VHOST_BACKEND_F_SU=
+SPEND) |
+> > > > > > > > >                                BIT_ULL(VHOST_BACKEND_F_RE=
+SUME) |
+> > > > > > > > > -                              BIT_ULL(VHOST_BACKEND_F_EN=
+ABLE_AFTER_DRIVER_OK)))
+> > > > > > > > > +                              parent_features))
+> > > > > > > > >                       return -EOPNOTSUPP;
+> > > > > > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUS=
+PEND)) &&
+> > > > > > > > >                    !vhost_vdpa_can_suspend(v))
+> > > > > > > > > --
+> > > > > > > > > 2.39.3
+> > > > > > > >
+> > > > > >
+> > > >
 > >
-> > This also adds a is_refcounted_page out parameter to kvm_follow_pfn tha=
-t
-> > is set when the returned pfn has an associated struct page with a valid
-> > refcount. Callers that don't pass FOLL_GET should remember this value
-> > and use it to avoid places like kvm_is_ad_tracked_page that assume a
-> > non-zero refcount.
-> >
-> > Signed-off-by: David Stevens <stevensd@chromium.org>
-> > ---
-> >  include/linux/kvm_host.h | 10 ++++++
-> >  virt/kvm/kvm_main.c      | 67 +++++++++++++++++++++-------------------
-> >  virt/kvm/pfncache.c      |  2 +-
-> >  3 files changed, 47 insertions(+), 32 deletions(-)
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index ef2763c2b12e..a45308c7d2d9 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1157,6 +1157,9 @@ unsigned long gfn_to_hva_memslot_prot(struct kvm_=
-memory_slot *slot, gfn_t gfn,
-> >  void kvm_release_page_clean(struct page *page);
-> >  void kvm_release_page_dirty(struct page *page);
-> >
-> > +void kvm_set_page_accessed(struct page *page);
-> > +void kvm_set_page_dirty(struct page *page);
-> > +
-> >  struct kvm_follow_pfn {
-> >       const struct kvm_memory_slot *slot;
-> >       gfn_t gfn;
-> > @@ -1164,10 +1167,17 @@ struct kvm_follow_pfn {
-> >       bool atomic;
-> >       /* Allow a read fault to create a writeable mapping. */
-> >       bool allow_write_mapping;
-> > +     /*
-> > +      * Usage of the returned pfn will be guared by a mmu notifier. Mu=
-st
->                                               ^guarded
-> > +      * be true if FOLL_GET is not set.
-> > +      */
-> > +     bool guarded_by_mmu_notifier;
-> >
-> It seems no one sets the guraded_by_mmu_notifier in this patch. Is
-> guarded_by_mmu_notifier always equal to !foll->FOLL_GET and set by the
-> caller of __kvm_follow_pfn()?
+>
 
-Yes, this is the case.
-
-> If yes, do we have to use FOLL_GET to resolve GFN associated with a tail =
-page?
-> It seems gup can tolerate gup_flags without FOLL_GET, but it is more like=
- a
-> temporary solution. I don't think it is a good idea to play tricks with
-> a temporary solution, more like we are abusing the toleration.
-
-I'm not sure I understand what you're getting at. This series never
-calls gup without FOLL_GET.
-
-This series aims to provide kvm_follow_pfn as a unified API on top of
-gup+follow_pte. Since one of the major clients of this API uses an mmu
-notifier, it makes sense to support returning a pfn without taking a
-reference. And we indeed need to do that for certain types of memory.
-
-> Is a flag like guarded_by_mmu_notifier (perhaps a better name) enough to
-> indicate a tail page?
-
-What do you mean by to indicate a tail page? Do you mean to indicate
-that the returned pfn refers to non-refcounted page? That's specified
-by is_refcounted_page.
-
--David
